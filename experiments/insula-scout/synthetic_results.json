@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "prototype": true,
+  "date_utc": "2026-09-25",
+  "surflo_revision": "bf14c6375a92911c45795710cd00bf2af17e9a13",
+  "question": "Does stock Surflo express coherent scene-level alternatives under identical ambiguous context?",
+  "checkpoint_sha256": "55fddb5dcbb5d375ba8036ec959acd215ee8ffd89e173cdabe1199e034052662",
+  "episode": {
+    "manifest_sha256": "4e9bab712a4fe0001059a24fb9f25e51077d89bf11fcfe0fdd2115710a488e11",
+    "seed": 20260925,
+    "context_views": 16,
+    "target_views": 8,
+    "image_size": [512, 384],
+    "paired_context_pixel_mismatches": 0,
+    "paired_context_sha256": "76f7ab7cefb57b2fcb2b70c7b419c4590f974c697b60e79576ae96be66ebf40c",
+    "scene_a": {
+      "hidden_object": "hidden_sofa",
+      "hidden_object_context_visibility": 0.0,
+      "hidden_object_target_visibility": 0.42775,
+      "target_new_surface_fraction": 0.9662625741552747
+    },
+    "scene_b": {
+      "hidden_object": "hidden_shelf",
+      "hidden_object_context_visibility": 0.0,
+      "hidden_object_target_visibility": 0.38515,
+      "target_new_surface_fraction": 0.9352208032004924
+    }
+  },
+  "settings": {
+    "seeds": [0, 1, 2, 3],
+    "num_query_points": 100000,
+    "num_steps": 100,
+    "tau_scene_diagonal_fraction": 0.01,
+    "tau": 0.12565067291259766,
+    "alignment_supervision": "context cameras plus context-visible common surfaces only"
+  },
+  "runs": [
+    {
+      "seed": 0,
+      "label": "hybrid",
+      "observed_common_recall": 0.8256140149997138,
+      "unobserved_common_recall": 0.45872641509433965,
+      "hidden_support_a": 0.8717186726102031,
+      "hidden_support_b": 0.5311708058793715,
+      "completion_candidate_precision_to_either_hypothesis": 0.24359550561797752,
+      "wall_seconds": 11.235377267934382,
+      "peak_vram_gib": 10.332587718963623
+    },
+    {
+      "seed": 1,
+      "label": "scene_a",
+      "observed_common_recall": 0.8253277609205931,
+      "unobserved_common_recall": 0.45214229559748426,
+      "hidden_support_a": 0.8665180782565627,
+      "hidden_support_b": 0.48808920425747593,
+      "completion_candidate_precision_to_either_hypothesis": 0.25074121135112243,
+      "wall_seconds": 10.880347506608814,
+      "peak_vram_gib": 10.33680248260498
+    },
+    {
+      "seed": 2,
+      "label": "hybrid",
+      "observed_common_recall": 0.8225797217610351,
+      "unobserved_common_recall": 0.4563679245283019,
+      "hidden_support_a": 0.8382862803368004,
+      "hidden_support_b": 0.5344652812975165,
+      "completion_candidate_precision_to_either_hypothesis": 0.2631118881118881,
+      "wall_seconds": 10.834273327142,
+      "peak_vram_gib": 10.33680248260498
+    },
+    {
+      "seed": 3,
+      "label": "hybrid",
+      "observed_common_recall": 0.8236674872616935,
+      "unobserved_common_recall": 0.4678655660377358,
+      "hidden_support_a": 0.87444279346211,
+      "hidden_support_b": 0.5420679168778509,
+      "completion_candidate_precision_to_either_hypothesis": 0.26813471502590674,
+      "wall_seconds": 10.935632655862719,
+      "peak_vram_gib": 10.33680248260498
+    }
+  ],
+  "aggregate": {
+    "baseline_behavior": "at_least_one_hybrid_completion",
+    "labels": ["hybrid", "scene_a", "hybrid", "hybrid"],
+    "mean_observed_common_recall": 0.824297246235759,
+    "mean_unobserved_common_recall": 0.4587755503144654,
+    "mean_hidden_support_a": 0.8627414561664191,
+    "mean_hidden_support_b": 0.5239483020780537,
+    "mean_completion_candidate_precision_to_either_hypothesis": 0.2563958300267237,
+    "mean_wall_seconds": 10.971407689386979,
+    "max_peak_vram_gib": 10.33680248260498
+  },
+  "raw_results_sha256": "57830262c293924732118cab5ff957ff23655267a580b129370c19dd4f5f7675",
+  "interpretation_guardrail": "The hidden scenes are observationally indistinguishable from context. This measures completion support and coherence, not recovery of a uniquely correct hidden scene. The scene_a label is threshold-based and still has substantial scene_b support.",
+  "conclusion": "Stock Surflo preserves observed common geometry substantially better than target-only common geometry and does not represent clean seed-dependent scene hypotheses on this episode. This motivates, but does not validate, a shared stochastic scene-level prior."
+}

@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "date_utc": "2026-09-25",
+  "surflo_commit": "bf14c6375a92911c45795710cd00bf2af17e9a13",
+  "checkpoint": {
+    "name": "surflo_v0.pt",
+    "sha256": "55fddb5dcbb5d375ba8036ec959acd215ee8ffd89e173cdabe1199e034052662"
+  },
+  "environment": {
+    "gpu": "NVIDIA B200",
+    "python": "3.10.20",
+    "torch": "2.9.1+cu130",
+    "torchvision": "0.24.1+cu130",
+    "nvcc": "13.2",
+    "numpy": "1.26.4",
+    "torch_geometric": "2.7.0",
+    "torch_cluster": "1.6.3+pt29cu130"
+  },
+  "sample_inference": {
+    "views": 16,
+    "seed_points": 100000,
+    "plain": {
+      "ode_seconds": 4.915953636169434,
+      "wall_seconds_including_startup": 29,
+      "final_points": 100000
+    },
+    "guided_default": {
+      "guided_reconstruction_seconds": 58.06483864784241,
+      "wall_seconds_including_startup": 92,
+      "final_gaussians_before_opacity_cull": 199555,
+      "point_cloud_points": 184945,
+      "mesh_vertices": 1568532,
+      "mesh_faces": 3134668,
+      "mesh_seconds": 3.4318859577178955
+    }
+  },
+  "public_eval": {
+    "benchmark": "tnt",
+    "scene": "Ignatius",
+    "views": 16,
+    "note": "Single-scene scout; not comparable to a full benchmark aggregate.",
+    "runs": [
+      {"method": "surflo/plain", "chamfer_mean_norm": 0.004678707850076351, "f1": 0.9056516885757446, "eval_seconds_excluding_model_startup": 7.841106176376343, "peak_vram_gib": 7.887717247009277},
+      {"method": "surflo/guided-no-densification", "chamfer_mean_norm": 0.004610196209784474, "f1": 0.8892757892608643, "eval_seconds_excluding_model_startup": 77.1965217590332, "peak_vram_gib": 11.320871829986572},
+      {"method": "vggt", "chamfer_mean_norm": 0.006064224331093151, "f1": 0.856494665145874, "eval_seconds_excluding_model_startup": 2.6926651000976562, "peak_vram_gib": 8.824503898620605},
+      {"method": "vggt+tsdf", "chamfer_mean_norm": 0.01475269634923042, "f1": 0.7349757552146912, "eval_seconds_excluding_model_startup": 3.5565505027770996, "peak_vram_gib": 8.824503898620605},
+      {"method": "da3", "chamfer_mean_norm": 0.0065271791666262026, "f1": 0.8212042450904846, "eval_seconds_excluding_model_startup": 2.751427173614502, "peak_vram_gib": 9.68532133102417},
+      {"method": "da3+tsdf", "chamfer_mean_norm": 0.014350698534962627, "f1": 0.7050963044166565, "eval_seconds_excluding_model_startup": 3.089343547821045, "peak_vram_gib": 9.68532133102417}
+    ]
+  },
+  "training_smoke": {
+    "views": 16,
+    "train_points": 8192,
+    "optimizer_steps": 1,
+    "loss": 0.2193,
+    "surface_net_grad_norm": 0.6169,
+    "peak_vram_reported_gb_decimal": 13,
+    "wall_seconds_including_startup_checkpoint_and_validation": 47,
+    "workaround": "Disable flash, memory-efficient, and cuDNN SDPA; use math SDPA."
+  }
+}

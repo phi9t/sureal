@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "id": "surflo-b200-insula-scout",
+  "captured_date_utc": "2026-09-25",
+  "purpose": "Reproduce every released Surflo execution class and probe stock Surflo on an observationally ambiguous synthetic scene pair.",
+  "source": {
+    "repository": "Surflo",
+    "revision": "bf14c6375a92911c45795710cd00bf2af17e9a13"
+  },
+  "executor": "run_scout.sh",
+  "insula": {
+    "build": "build.sh",
+    "enter": "enter.sh",
+    "dockerfile": "insula/Dockerfile",
+    "image": "surflo-insula:cuda13.2.1",
+    "default_cache_root": "~/.cache/surflo/insula-scout",
+    "cache_mount": "/cache/surflo",
+    "repo_mount": "/workspace/surflo",
+    "marker_env": "SURFLO_IN_INSULA",
+    "host_requirements": [
+      "docker-or-podman",
+      "bubblewrap",
+      "nvidia-driver"
+    ]
+  },
+  "runtime": {
+    "gpu": "NVIDIA B200 (sm_100)",
+    "cuda_image": "13.2.1-cudnn-devel-ubuntu24.04",
+    "python": "3.10.20",
+    "torch": "2.9.1+cu130",
+    "torchvision": "0.24.1+cu130",
+    "torch_cuda_arch_list": "10.0",
+    "known_deviation": "The released project matrix stops at torch 2.4 and CUDA 12.4; this B200 recipe uses the verified cu130 stack."
+  },
+  "inputs": {
+    "checkpoint": {
+      "hub_repository": "AntoineGuedon/Surflo-v0",
+      "filename": "surflo_v0.pt",
+      "cache_path": "checkpoints/surflo_v0.pt",
+      "sha256": "55fddb5dcbb5d375ba8036ec959acd215ee8ffd89e173cdabe1199e034052662"
+    },
+    "public_eval_scene": {
+      "hub_repository": "AntoineGuedon/Surflo-eval-data",
+      "repository_type": "dataset",
+      "include": "tnt/16views/Ignatius/*"
+    },
+    "synthetic_episode": {
+      "generator": "synthetic_ambiguity/episode.py",
+      "seed": 20260925,
+      "context_views": 16,
+      "target_views": 8,
+      "width": 512,
+      "height": 384,
+      "surface_points_per_box": 20000,
+      "manifest_cache_path": "synthetic-ambiguity/episode/manifest.json"
+    }
+  },
+  "stages": [
+    {
+      "id": "verify",
+      "driver_mode": "verify",
+      "requires_gpu": true,
+      "outputs": []
+    },
+    {
+      "id": "sample",
+      "driver_mode": "sample",
+      "requires_gpu": true,
+      "outputs": [
+        "outputs/plain-default-16v-100k",
+        "outputs/guided-default-16v-100k"
+      ]
+    },
+    {
+      "id": "public-eval",
+      "driver_mode": "eval",
+      "requires_gpu": true,
+      "outputs": [
+        "eval-results"
+      ]
+    },
+    {
+      "id": "train-smoke",
+      "driver_mode": "train-smoke",
+      "requires_gpu": true,
+      "environment": {
+        "PYTHONPATH_prefix": "math_sdpa"
+      },
+      "outputs": [
+        "train-smoke-8k"
+      ]
+    },
+    {
+      "id": "synthetic-ambiguity",
+      "driver_mode": "synthetic",
+      "requires_gpu": true,
+      "outputs": [
+        "synthetic-ambiguity/episode",
+        "synthetic-ambiguity/stock-surflo"
+      ]
+    }
+  ],
+  "evidence": {
+    "released_paths": "results.json",
+    "synthetic_probe": "synthetic_results.json",
+    "synthetic_probe_cache_path": "synthetic-ambiguity/stock-surflo/results.json"
+  },
+  "limitations": [
+    "The public benchmark evidence is a single scene, not a paper-table reproduction.",
+    "The training stage is one optimizer update, not convergence training.",
+    "The synthetic ambiguity stage is a controlled prototype, not a representative synthetic pretraining corpus.",
+    "Released non-commercial license restrictions remain in force."
+  ]
+}
