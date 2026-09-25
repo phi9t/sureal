@@ -3,12 +3,82 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import dataclass
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
-import subprocess
 import time
 from typing import Sequence
+
+
+@dataclass(frozen=True)
+class EpisodePaths:
+    root: Path
+    schema_version: int
+    manifest_path: Path
+    manifest: dict[str, object]
+    context_rgb: Path
+    cameras: Path
+    surface_a: Path
+    surface_b: Path
+
+
+def resolve_episode(episode_dir: Path) -> EpisodePaths:
+    """Resolve the stable v1 layout shared by manifest schemas v1 and v2."""
+    root = Path(episode_dir).resolve()
+    manifest_path = root / "manifest.json"
+    if not manifest_path.is_file():
+        raise FileNotFoundError(f"episode manifest is missing: {manifest_path}")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    schema_version = int(manifest.get("schema_version", 1))
+    if schema_version not in (1, 2):
+        raise RuntimeError(f"unsupported episode schema: {schema_version}")
+    paths = EpisodePaths(
+        root=root,
+        schema_version=schema_version,
+        manifest_path=manifest_path,
+        manifest=manifest,
+        context_rgb=root / "scene_a" / "context" / "rgb",
+        cameras=root / "cameras.npz",
+        surface_a=root / "scene_a" / "surface.npz",
+        surface_b=root / "scene_b" / "surface.npz",
+    )
+    for path in (paths.context_rgb, paths.cameras, paths.surface_a, paths.surface_b):
+        if not path.exists():
+            raise FileNotFoundError(f"episode input is missing: {path}")
+    return paths
+
+
+def target_new_mask(surface):
+    """Read the v1 alias first, with the schema-v2 canonical fallback."""
+    if "new_in_target" in surface:
+        return surface["new_in_target"].astype(bool)
+    if "target_only_visible" in surface:
+        return surface["target_only_visible"].astype(bool)
+    raise KeyError("surface is missing target-only visibility")
+
+
+def resolve_source_provenance(recipe_path: Path) -> dict[str, object]:
+    """Use the benchmark's shared digest implementation without coupling v1 probes."""
+    module_path = Path(recipe_path).resolve().parent / "pipeline" / "provenance.py"
+    spec = importlib.util.spec_from_file_location("photoreal_source_provenance", module_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load source provenance module: {module_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.resolve_source_provenance(recipe_path)
+
+
+def resolve_model_provenance(lock_path: Path) -> dict[str, object]:
+    """Read the same model lock used for cache verification and recipe audit."""
+    module_path = Path(lock_path).resolve().parent / "pipeline" / "model_lock.py"
+    spec = importlib.util.spec_from_file_location("photoreal_model_lock", module_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load model lock module: {module_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.model_provenance(module.load_model_lock(lock_path))
 
 
 def classify_hypothesis(support_a: float, support_b: float) -> dict[str, float | str]:
@@ -80,6 +150,8 @@ def run_probe(
     seeds: Sequence[int],
     num_query_points: int,
     num_steps: int,
+    vggt_provenance: dict[str, object] | None = None,
+    source_provenance: dict[str, object] | None = None,
 ) -> dict[str, object]:
     import numpy as np
     import torch
@@ -91,16 +163,17 @@ def run_probe(
         camera_centers_from_extrinsics,
     )
 
-    episode_dir = episode_dir.resolve()
+    episode = resolve_episode(episode_dir)
+    episode_dir = episode.root
     checkpoint = checkpoint.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
-    manifest_path = episode_dir / "manifest.json"
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest_path = episode.manifest_path
+    manifest = episode.manifest
     if manifest["paired_context"]["pixel_mismatches"] != 0:
         raise RuntimeError("paired context is not identical; refusing an ambiguity probe")
 
-    surface_a = np.load(episode_dir / "scene_a" / "surface.npz")
-    surface_b = np.load(episode_dir / "scene_b" / "surface.npz")
+    surface_a = np.load(episode.surface_a)
+    surface_b = np.load(episode.surface_b)
     points_a = surface_a["points"].astype(np.float32)
     points_b = surface_b["points"].astype(np.float32)
     hidden_a_mask = surface_a["hidden_hypothesis"].astype(bool)
@@ -109,7 +182,7 @@ def run_probe(
         ~hidden_a_mask & surface_a["context_visible"].astype(bool)
     ]
     common_new = points_a[
-        ~hidden_a_mask & surface_a["new_in_target"].astype(bool)
+        ~hidden_a_mask & target_new_mask(surface_a)
     ]
     common_all = points_a[~hidden_a_mask]
     hidden_a = points_a[
@@ -127,14 +200,14 @@ def run_probe(
     if len(hidden_a_exclusive) == 0 or len(hidden_b_exclusive) == 0:
         raise RuntimeError("hidden hypotheses have no exclusive target-visible surfaces")
 
-    camera_data = np.load(episode_dir / "cameras.npz")
+    camera_data = np.load(episode.cameras)
     gt_extrinsics = torch.from_numpy(camera_data["context_extrinsics"]).cuda().float()
     gt_camera_centers = camera_centers_from_extrinsics(gt_extrinsics)
     gt_observed = torch.from_numpy(common_observed).cuda().float()
 
     model = Surflo.from_checkpoint(str(checkpoint), device="cuda")
     scene = model.encode(
-        episode_dir / "scene_a" / "context" / "rgb",
+        episode.context_rgb,
         n_images=len(manifest["context_views"]),
         target_size=518,
         cull_radius=10.0,
@@ -239,20 +312,14 @@ def run_probe(
     else:
         baseline_behavior = "single_dominant_hypothesis"
 
-    try:
-        revision = subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], text=True, cwd=Path(__file__).resolve().parents[3],
-        ).strip()
-    except Exception:
-        revision = None
-
     payload = {
         "schema_version": 1,
         "prototype": True,
         "question": "Does stock Surflo express coherent scene-level alternatives under identical ambiguous context?",
-        "surflo_revision": revision,
+        "source": source_provenance,
         "episode_manifest_sha256": _sha256(manifest_path),
         "checkpoint": {"path": str(checkpoint), "sha256": _sha256(checkpoint)},
+        "vggt": vggt_provenance,
         "settings": {
             "seeds": [int(seed) for seed in seeds],
             "num_query_points": num_query_points,
@@ -303,10 +370,17 @@ def main() -> None:
     parser.add_argument("--seeds", default="0,1,2,3")
     parser.add_argument("--query-points", type=int, default=100_000)
     parser.add_argument("--steps", type=int, default=100)
+    parser.add_argument("--source-recipe", type=Path)
+    parser.add_argument("--model-lock", type=Path)
     args = parser.parse_args()
     seeds = [int(value) for value in args.seeds.split(",") if value.strip()]
     if not seeds:
         raise SystemExit("--seeds must contain at least one integer")
+    model_provenance = resolve_model_provenance(args.model_lock) if args.model_lock else None
+    vggt_provenance = model_provenance["vggt"] if model_provenance else None
+    source_provenance = (
+        resolve_source_provenance(args.source_recipe) if args.source_recipe else None
+    )
     payload = run_probe(
         episode_dir=args.episode,
         checkpoint=args.checkpoint,
@@ -314,6 +388,8 @@ def main() -> None:
         seeds=seeds,
         num_query_points=args.query_points,
         num_steps=args.steps,
+        vggt_provenance=vggt_provenance,
+        source_provenance=source_provenance,
     )
     print(json.dumps(payload["aggregate"], indent=2, sort_keys=True))
 

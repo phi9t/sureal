@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "id": "surflo-photoreal-paired-scene-phase-a",
+  "captured_date_utc": "2026-09-25",
+  "purpose": "Measure stock Surflo scene completion on two photoreal complete scenes with byte-identical partial observations.",
+  "source": {
+    "repository": "Surflo",
+    "base_revision": "4530c070e61f67b0aa37ab079c8120a08d1f09ff",
+    "worktree_state": "uncommitted_overlay",
+    "implementation_files": [
+      "../insula-scout/run_scout.sh",
+      "../insula-scout/synthetic_ambiguity/probe.py",
+      "../insula-scout/verify_recipe.py",
+      "assets.lock.json",
+      "build.sh",
+      "enter.sh",
+      "insula/Dockerfile",
+      "insula/build_rootfs.sh",
+      "insula/enter_rootfs.sh",
+      "model.lock.json",
+      "pipeline/assets.py",
+      "pipeline/blender_job.py",
+      "pipeline/contact_sheet.py",
+      "pipeline/contracts.py",
+      "pipeline/driver.py",
+      "pipeline/exchange.py",
+      "pipeline/geometry.py",
+      "pipeline/inside.sh",
+      "pipeline/model_lock.py",
+      "pipeline/probe_summary.py",
+      "pipeline/provenance.py",
+      "pipeline/run_store.py",
+      "pipeline/scene.py",
+      "pipeline/schema.py",
+      "pipeline/validator.py",
+      "probe.sh",
+      "run.sh",
+      "verify_recipe.py"
+    ],
+    "implementation_sha256": "521888171ecd8ebed9118d7252fe0feaf5e46fa57fa00c95d615704d1b4a9647"
+  },
+  "executor": "run.sh",
+  "renderer_insula": {
+    "build": "build.sh",
+    "enter": "enter.sh",
+    "dockerfile": "insula/Dockerfile",
+    "blender_version": "4.5.14",
+    "blender_archive_sha256": "9ba871ff2ecd36526b77432745980b7e6664ecd0c7ca11c48849073dcfe06da3",
+    "cache_mount": "/cache/blender",
+    "exchange_mount": "/exchange"
+  },
+  "surflo_insula": {
+    "enter": "../insula-scout/enter.sh",
+    "probe": "../insula-scout/synthetic_ambiguity/probe.py"
+  },
+  "assets": {
+    "lock": "assets.lock.json"
+  },
+  "episode": {
+    "default_run_id": "phase-a-v1",
+    "profile": "benchmark",
+    "device": "OPTIX",
+    "width": 512,
+    "height": 384,
+    "samples": 256,
+    "context_views": 16,
+    "target_views_per_hypothesis": 8,
+    "seed": 20260925,
+    "surface_points_per_hypothesis": 250000
+  },
+  "probe": {
+    "model_lock": "model.lock.json",
+    "seeds": [0, 1, 2, 3],
+    "num_query_points": 100000,
+    "num_steps": 100
+  },
+  "stages": [
+    {"id": "build", "driver_mode": "build", "network_mode": "host"},
+    {"id": "fetch", "driver_mode": "fetch", "network_mode": "networked"},
+    {"id": "render", "driver_mode": "render", "network_mode": "offline"},
+    {"id": "validate", "driver_mode": "validate", "network_mode": "offline"},
+    {"id": "probe", "driver_mode": "probe", "network_mode": "offline"}
+  ],
+  "analytic_baseline": "../insula-scout/synthetic_results.json",
+  "evidence": {
+    "tracked_results": "results.json",
+    "episode_manifest_cache_path": "photoreal-scenes/episodes/phase-a-v1/manifest.json",
+    "episode_validation_cache_path": "photoreal-scenes/episodes/phase-a-v1/validation.json",
+    "probe_results_cache_path": "photoreal-scenes/results/phase-a-v1/results.json"
+  },
+  "limitations": [
+    "This milestone evaluates stock Surflo; it does not train a scene prior.",
+    "It contains no language supervision, video generation, or 4D dynamics.",
+    "A valid measurement is required; no coherence label is required to pass."
+  ]
+}

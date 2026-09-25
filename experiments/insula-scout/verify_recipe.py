@@ -20,6 +20,8 @@ ALLOWED_DRIVER_MODES = {
     "synthetic-probe",
     "synthetic",
     "all",
+    "fetch-checkpoint",
+    "photoreal-probe",
 }
 
 

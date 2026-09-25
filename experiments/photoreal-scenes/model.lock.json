@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "checkpoint": {
+    "repository": "AntoineGuedon/Surflo-v0",
+    "filename": "surflo_v0.pt",
+    "cache_path": "checkpoints/surflo_v0.pt",
+    "sha256": "55fddb5dcbb5d375ba8036ec959acd215ee8ffd89e173cdabe1199e034052662"
+  },
+  "vggt": {
+    "repository": "facebook/VGGT-1B",
+    "revision": "860abec7937da0a4c03c41d3c269c366e82abdf9",
+    "cache_path": "huggingface/hub/models--facebook--VGGT-1B",
+    "files": {
+      "config.json": "a73e929a168b900546a84fe88cd70dfaaf2f8e39cf77355b12984eaa686f3855",
+      "model.safetensors": "f164acf60724910d8fe1578bb499d800850c7bb0948db7555c413f9fbe60467e"
+    }
+  }
+}

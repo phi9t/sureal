@@ -11,7 +11,15 @@ CACHE="${SURFLO_INSULA_CACHE_ROOT:-/cache/surflo}"
 export PATH="${CACHE}/venv/bin:${PATH}"
 export HF_HOME="${CACHE}/huggingface"
 export TORCH_EXTENSIONS_DIR="${CACHE}/torch-extensions"
-CKPT="${CACHE}/checkpoints/surflo_v0.pt"
+MODEL_LOCK="experiments/photoreal-scenes/model.lock.json"
+MODEL_LOCK_TOOL="experiments/photoreal-scenes/pipeline/model_lock.py"
+model_field() { python "${MODEL_LOCK_TOOL}" get --lock "${MODEL_LOCK}" --field "$1"; }
+CKPT_REPOSITORY="$(model_field checkpoint.repository)"
+CKPT_FILENAME="$(model_field checkpoint.filename)"
+CKPT="${CACHE}/$(model_field checkpoint.cache_path)"
+VGGT_REPOSITORY="$(model_field vggt.repository)"
+VGGT_REVISION="$(model_field vggt.revision)"
+VGGT_CACHE="${CACHE}/$(model_field vggt.cache_path)"
 EVAL_DATA="${CACHE}/eval-data"
 EVAL_RESULTS="${CACHE}/eval-results"
 SYNTHETIC_ROOT="${CACHE}/synthetic-ambiguity"
@@ -21,15 +29,31 @@ GPU="${CUDA_VISIBLE_DEVICES:-0}"
 export CUDA_VISIBLE_DEVICES="${GPU}"
 
 usage() {
-    echo "usage: $0 {verify|sample|eval|train-smoke|synthetic-generate|synthetic-probe|synthetic|all}" >&2
+    echo "usage: $0 {verify|sample|eval|train-smoke|fetch-checkpoint|synthetic-generate|synthetic-probe|synthetic|photoreal-probe|all}" >&2
+}
+
+verify_model_cache() {
+    python "${MODEL_LOCK_TOOL}" verify \
+        --lock "${MODEL_LOCK}" --cache-root "${CACHE}" >/dev/null
+}
+
+fetch_vggt() {
+    hf download "${VGGT_REPOSITORY}" --revision "${VGGT_REVISION}" \
+        config.json model.safetensors >/dev/null
+    mkdir -p "${VGGT_CACHE}/refs"
+    printf '%s' "${VGGT_REVISION}" >"${VGGT_CACHE}/refs/.main.tmp.$$"
+    mv -f "${VGGT_CACHE}/refs/.main.tmp.$$" "${VGGT_CACHE}/refs/main"
+    verify_model_cache
 }
 
 fetch_inputs() {
     mkdir -p "${CACHE}/checkpoints" "${EVAL_DATA}" "${EVAL_RESULTS}"
     if [[ ! -f "${CKPT}" ]]; then
-        hf download AntoineGuedon/Surflo-v0 surflo_v0.pt \
-            --local-dir "${CACHE}/checkpoints"
+        mkdir -p "$(dirname -- "${CKPT}")"
+        hf download "${CKPT_REPOSITORY}" "${CKPT_FILENAME}" \
+            --local-dir "$(dirname -- "${CKPT}")"
     fi
+    fetch_vggt
 }
 
 verify() {
@@ -135,15 +159,97 @@ synthetic_probe() {
         --steps 100
 }
 
+photoreal_probe() {
+    local episode=""
+    local output=""
+    local tracked_output=""
+    local overwrite=0
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --episode) episode="${2:?--episode requires a value}"; shift 2 ;;
+            --output) output="${2:?--output requires a value}"; shift 2 ;;
+            --update-tracked-output) tracked_output="${2:?--update-tracked-output requires a value}"; shift 2 ;;
+            --overwrite) overwrite=1; shift ;;
+            *) echo "unknown photoreal-probe argument: $1" >&2; return 2 ;;
+        esac
+    done
+    [[ -n "${episode}" && -n "${output}" ]] || {
+        echo "photoreal-probe requires --episode and --output" >&2
+        return 2
+    }
+    verify_model_cache
+    [[ -f "${episode}/manifest.json" ]] || {
+        echo "photoreal episode is missing: ${episode}" >&2
+        return 2
+    }
+    [[ -f "${episode}/validation.json" ]] || {
+        echo "photoreal episode validation is missing: ${episode}" >&2
+        return 2
+    }
+    if [[ -e "${output}" && "${overwrite}" != 1 ]]; then
+        echo "photoreal probe output already exists: ${output}; pass --overwrite" >&2
+        return 2
+    fi
+    local output_parent output_name staging backup
+    output_parent="$(dirname -- "${output}")"
+    output_name="$(basename -- "${output}")"
+    mkdir -p "${output_parent}"
+    staging="$(mktemp -d "${output_parent}/.${output_name}.tmp.XXXXXX")"
+    backup="${output_parent}/.${output_name}.old.$$"
+    if [[ -e "${backup}" ]]; then
+        echo "photoreal probe backup already exists: ${backup}" >&2
+        rm -rf -- "${staging}"
+        return 2
+    fi
+    local rc=0
+    HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
+    python experiments/insula-scout/synthetic_ambiguity/probe.py \
+        --episode "${episode}" \
+        --checkpoint "${CKPT}" \
+        --output "${staging}" \
+        --seeds 0,1,2,3 \
+        --query-points 100000 \
+        --steps 100 \
+        --source-recipe experiments/photoreal-scenes/recipe.json \
+        --model-lock "${MODEL_LOCK}" || rc=$?
+    if [[ "${rc}" != 0 ]]; then
+        rm -rf -- "${staging}"
+        return "${rc}"
+    fi
+    python experiments/photoreal-scenes/pipeline/probe_summary.py \
+        --raw "${staging}/results.json" \
+        --manifest "${episode}/manifest.json" \
+        --validation "${episode}/validation.json" \
+        --analytic-baseline experiments/insula-scout/synthetic_results.json \
+        --output "${staging}/compact-results.json" || rc=$?
+    if [[ "${rc}" != 0 ]]; then
+        rm -rf -- "${staging}"
+        return "${rc}"
+    fi
+    [[ ! -e "${output}" ]] || mv -- "${output}" "${backup}"
+    if ! mv -- "${staging}" "${output}"; then
+        [[ ! -e "${backup}" || -e "${output}" ]] || mv -- "${backup}" "${output}"
+        return 1
+    fi
+    [[ ! -e "${backup}" ]] || rm -rf -- "${backup}"
+    if [[ -n "${tracked_output}" ]]; then
+        mkdir -p "$(dirname -- "${tracked_output}")"
+        cp -- "${output}/compact-results.json" "${tracked_output}.tmp.$$"
+        mv -f -- "${tracked_output}.tmp.$$" "${tracked_output}"
+    fi
+}
+
 command="${1:-}"
 case "${command}" in
     verify) verify ;;
     sample) sample ;;
     eval) evaluate ;;
     train-smoke) train_smoke ;;
+    fetch-checkpoint) fetch_inputs ;;
     synthetic-generate) synthetic_generate ;;
     synthetic-probe) synthetic_probe ;;
     synthetic) synthetic_generate; synthetic_probe ;;
+    photoreal-probe) shift; photoreal_probe "$@" ;;
     all) verify; sample; evaluate; train_smoke; synthetic_generate; synthetic_probe ;;
     *) usage; exit 2 ;;
 esac
