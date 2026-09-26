@@ -32,7 +32,7 @@
     {
       "id": "nerf-synthetic", "mode": "download", "license": "NeRF dataset terms",
       "source": "https://cseweb.ucsd.edu/~viscomp/projects/LF/papers/ECCV20/nerf/nerf_example_data.zip", "sha256": "ce4e94e031c099a19ef04cfb6c71f1e47225d97d365be610b476e379a386c25f",
-      "byte_size": 370385516, "digest_status": "verified_2026-09-26", "archive_format": "zip", "extraction": "safe-zip", "consumers": ["nerfstudio-nerfacto-reference"]
+      "byte_size": 370385516, "digest_status": "verified_2026-09-26", "archive_format": "zip", "extraction": {"mode": "zip", "roots": ["nerf_llff_data", "nerf_synthetic"]}, "consumers": ["future-nerf-synthetic-extension"]
     },
     {
       "id": "surflo-paired-scenes", "mode": "repository", "license": "repository license and third-party notices",

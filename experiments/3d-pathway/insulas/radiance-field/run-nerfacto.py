@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import copy
 import csv
+import hashlib
 import json
 from pathlib import Path
 import platform
@@ -16,6 +17,7 @@ import time
 
 import numpy as np
 import PIL
+from scipy import ndimage
 import torch
 import torchvision
 import tinycudann as tcnn
@@ -26,7 +28,11 @@ from nerfstudio.configs.method_configs import method_configs
 
 NERFSTUDIO_COMMIT = "50e0e3c70c775e89333256213363badbf074f29d"
 TCNN_COMMIT = "0109538c37ac0bf613f2bac8de6cda48352feca7"
+REQUIREMENTS_LOCK_SHA256 = "02c623f2a636dd774dda048f1a08c8d936d0701f74d3f50b3a7916d2280ed65a"
 SEED = 260925
+SWEEP_COUNTS = (3, 5, 9)
+SWEEP_ITERATIONS = 1000
+SWEEP_RAYS = 1024
 
 
 def _write_json(path: Path, value: object) -> None:
@@ -42,6 +48,25 @@ def _source_commit(path: Path) -> str:
     ).stdout.strip()
 
 
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _seed_everything() -> None:
+    random.seed(SEED)
+    np.random.seed(SEED)
+    torch.manual_seed(SEED)
+    torch.cuda.manual_seed_all(SEED)
+    torch.backends.cuda.matmul.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+
 def _query_density(field: torch.nn.Module, points: np.ndarray, batch: int = 262144) -> np.ndarray:
     values = np.empty(len(points), dtype=np.float32)
     field.eval()
@@ -49,7 +74,9 @@ def _query_density(field: torch.nn.Module, points: np.ndarray, batch: int = 2621
         for start in range(0, len(points), batch):
             sample = torch.from_numpy(points[start : start + batch]).cuda()
             density = field.density_fn(sample)
-            values[start : start + len(sample)] = density.reshape(-1).detach().float().cpu().numpy()
+            values[start : start + len(sample)] = (
+                density.reshape(-1).detach().float().cpu().numpy()
+            )
     return values
 
 
@@ -94,13 +121,19 @@ def _environment_gates(trainer: object) -> dict[str, bool]:
         for parameter in trainer.pipeline.model.parameters()
         if parameter.grad is not None
     ]
-    model_gate = bool(gradients) and all(torch.isfinite(value).all().item() for value in gradients)
+    model_gate = bool(gradients) and all(
+        torch.isfinite(value).all().item() for value in gradients
+    )
     trainer.optimizers.zero_grad_all()
     if not model_gate:
         raise RuntimeError("Nerfacto forward/backward gate failed")
 
     density = _query_density_grid(trainer.pipeline.model.field, 32)
-    density_gate = density.shape == (32, 32, 32) and np.isfinite(density).all() and np.all(density >= 0.0)
+    density_gate = (
+        density.shape == (32, 32, 32)
+        and np.isfinite(density).all()
+        and np.all(density >= 0.0)
+    )
     if not density_gate:
         raise RuntimeError("Nerfacto density query gate failed")
     return {
@@ -111,7 +144,7 @@ def _environment_gates(trainer: object) -> dict[str, bool]:
     }
 
 
-def _target_camera(frame: dict[str, object], intrinsics: dict[str, object]) -> Cameras:
+def _camera(frame: dict[str, object], intrinsics: dict[str, object]) -> Cameras:
     camera_to_world = np.asarray(frame["camera_to_world_model"], dtype=np.float32).copy()
     camera_to_world[:3, 1:3] *= -1.0
     return Cameras(
@@ -138,37 +171,21 @@ def _camera_axis_depth(
     return ((points_numpy - center) @ rotation)[:, :, 2].astype(np.float32)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--input", type=Path, required=True)
-    parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--iterations", type=int, required=True)
-    parser.add_argument("--rays-per-batch", type=int, required=True)
-    parser.add_argument("--density-resolution", type=int, required=True)
-    args = parser.parse_args()
-    args.input = args.input.resolve(strict=True)
-    args.output.mkdir(parents=True, exist_ok=True)
-    manifest = json.loads((args.input / "manifest.json").read_text())
-    if manifest["scene_seed"] != SEED or args.iterations <= 0 or args.rays_per_batch <= 0:
-        raise ValueError("invalid locked Nerfacto execution configuration")
-
-    random.seed(SEED)
-    np.random.seed(SEED)
-    torch.manual_seed(SEED)
-    torch.cuda.manual_seed_all(SEED)
-    torch.backends.cuda.matmul.allow_tf32 = False
-    torch.backends.cudnn.allow_tf32 = False
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-
+def _config(
+    data: Path,
+    output: Path,
+    iterations: int,
+    rays_per_batch: int,
+    timestamp: str,
+) -> object:
     config = copy.deepcopy(method_configs["nerfacto"])
     config.machine.seed = SEED
     config.machine.num_devices = 1
-    config.output_dir = args.output / "training"
+    config.output_dir = output
     config.experiment_name = "controlled-sphere"
-    config.timestamp = "locked"
-    config.max_num_iterations = args.iterations
-    config.steps_per_save = args.iterations + 1
+    config.timestamp = timestamp
+    config.max_num_iterations = iterations
+    config.steps_per_save = iterations + 1
     config.steps_per_eval_batch = 0
     config.steps_per_eval_image = 0
     config.steps_per_eval_all_images = 0
@@ -176,9 +193,9 @@ def main() -> None:
     config.logging.local_writer.enable = False
     config.logging.profiler = "none"
     config.viewer.quit_on_train_completion = True
-    config.pipeline.datamanager.train_num_rays_per_batch = args.rays_per_batch
-    config.pipeline.datamanager.eval_num_rays_per_batch = args.rays_per_batch
-    config.pipeline.datamanager.dataparser.data = args.input
+    config.pipeline.datamanager.train_num_rays_per_batch = rays_per_batch
+    config.pipeline.datamanager.eval_num_rays_per_batch = rays_per_batch
+    config.pipeline.datamanager.dataparser.data = data
     config.pipeline.datamanager.dataparser.orientation_method = "none"
     config.pipeline.datamanager.dataparser.center_method = "none"
     config.pipeline.datamanager.dataparser.auto_scale_poses = False
@@ -195,15 +212,259 @@ def main() -> None:
     config.pipeline.model.collider_params = {"near_plane": 0.1, "far_plane": 6.0}
     config.pipeline.model.proposal_initial_sampler = "uniform"
     config.save_config()
+    return config
 
+
+def _train(
+    data: Path,
+    output: Path,
+    iterations: int,
+    rays_per_batch: int,
+    timestamp: str,
+    run_gates: bool,
+) -> tuple[object, object, float, dict[str, bool] | None]:
+    _seed_everything()
+    config = _config(data, output, iterations, rays_per_batch, timestamp)
     trainer = config.setup(local_rank=0, world_size=1)
     trainer.setup(test_mode="val")
-    gates = _environment_gates(trainer)
-    _write_json(args.output / "environment-gates.json", gates)
-    training_started = time.perf_counter()
+    gates = _environment_gates(trainer) if run_gates else None
+    started = time.perf_counter()
     trainer.train()
-    training_seconds = time.perf_counter() - training_started
+    training_seconds = time.perf_counter() - started
     trainer.pipeline.eval()
+    return trainer, config, training_seconds, gates
+
+
+def _lpips(model: object, predicted: torch.Tensor, truth: np.ndarray) -> tuple[float, float]:
+    truth_tensor = torch.from_numpy(truth.astype(np.float32) / 255.0).to(model.device)
+    predicted = predicted.to(model.device)
+    foreground = np.any(truth != 0, axis=-1)
+    rows, columns = np.nonzero(foreground)
+    if not len(rows):
+        raise RuntimeError("truth image has no foreground crop")
+    row_slice = slice(int(rows.min()), int(rows.max()) + 1)
+    column_slice = slice(int(columns.min()), int(columns.max()) + 1)
+
+    def score(left: torch.Tensor, right: torch.Tensor) -> float:
+        return float(
+            model.lpips(
+                left.permute(2, 0, 1).unsqueeze(0),
+                right.permute(2, 0, 1).unsqueeze(0),
+            )
+        )
+
+    return (
+        score(predicted, truth_tensor),
+        score(predicted[row_slice, column_slice], truth_tensor[row_slice, column_slice]),
+    )
+
+
+def _render_frames(
+    trainer: object,
+    frames: list[dict[str, object]],
+    intrinsics: dict[str, object],
+    input_root: Path,
+    render_dir: Path,
+    *,
+    geometry: bool,
+    perceptual: bool,
+) -> list[dict[str, object]]:
+    render_dir.mkdir(parents=True)
+    rows: list[dict[str, object]] = []
+    for frame in frames:
+        camera = _camera(frame, intrinsics)
+        with torch.no_grad():
+            outputs = trainer.pipeline.model.get_outputs_for_camera(camera)
+        rgb_tensor = outputs["rgb"].detach().float()
+        rgb_float = rgb_tensor.cpu().numpy().astype(np.float32)
+        rgb = np.clip(rgb_float * 255.0, 0.0, 255.0).round().astype(np.uint8)
+        np.save(render_dir / f"{frame['id']}.rgb.npy", rgb, allow_pickle=False)
+        np.save(
+            render_dir / f"{frame['id']}.rgb.float32.npy",
+            rgb_float,
+            allow_pickle=False,
+        )
+        if geometry:
+            accumulation = (
+                outputs["accumulation"].detach().float().cpu().numpy().squeeze(-1).astype(np.float32)
+            )
+            camera_to_world = np.asarray(frame["camera_to_world_model"], dtype=np.float64)
+            median_camera_depth = _camera_axis_depth(camera, outputs["depth"].detach(), camera_to_world)
+            expected_camera_depth = _camera_axis_depth(
+                camera, outputs["expected_depth"].detach(), camera_to_world
+            )
+            np.save(
+                render_dir / f"{frame['id']}.accumulation.npy",
+                accumulation,
+                allow_pickle=False,
+            )
+            np.save(
+                render_dir / f"{frame['id']}.median-camera-depth.npy",
+                median_camera_depth,
+                allow_pickle=False,
+            )
+            np.save(
+                render_dir / f"{frame['id']}.expected-camera-depth.npy",
+                expected_camera_depth,
+                allow_pickle=False,
+            )
+        if perceptual:
+            truth = np.load(input_root / str(frame["rgb_truth_path"]), allow_pickle=False)
+            with torch.no_grad():
+                full_lpips, crop_lpips = _lpips(trainer.pipeline.model, rgb_tensor, truth)
+            rows.append(
+                {"id": frame["id"], "lpips": full_lpips, "crop_lpips": crop_lpips}
+            )
+    return rows
+
+
+def _sweep_dataset(
+    destination: Path,
+    input_root: Path,
+    manifest: dict[str, object],
+    frame_ids: list[str],
+) -> Path:
+    destination.mkdir(parents=True)
+    frames_by_id = {frame["id"]: frame for frame in manifest["context_frames"]}
+    intrinsics = manifest["intrinsics"]
+    frames = []
+    for frame_id in frame_ids:
+        frame = frames_by_id[frame_id]
+        transform = np.asarray(frame["camera_to_world_model"], dtype=np.float64).copy()
+        transform[:3, 1:3] *= -1.0
+        frames.append(
+            {
+                "file_path": str((input_root / str(frame["image_path"])).resolve(strict=True)),
+                "transform_matrix": transform.tolist(),
+            }
+        )
+    transforms = {
+        "camera_model": "OPENCV",
+        "w": int(intrinsics["width"]),
+        "h": int(intrinsics["height"]),
+        "fl_x": float(intrinsics["fx"]),
+        "fl_y": float(intrinsics["fy"]),
+        "cx": float(intrinsics["cx"]),
+        "cy": float(intrinsics["cy"]),
+        "k1": 0.0,
+        "k2": 0.0,
+        "p1": 0.0,
+        "p2": 0.0,
+        "orientation_override": "none",
+        "center_override": "none",
+        "auto_scale_poses": False,
+        "scale_factor": 1.0,
+        "frames": frames,
+    }
+    _write_json(destination / "transforms.json", transforms)
+    return destination
+
+
+def _copy_primary_sweep(primary: Path, destination: Path, frames: list[dict[str, object]]) -> None:
+    destination.mkdir(parents=True)
+    for frame in frames:
+        for suffix in ("rgb.float32.npy", "accumulation.npy", "expected-camera-depth.npy"):
+            shutil.copy2(primary / f"{frame['id']}.{suffix}", destination / f"{frame['id']}.{suffix}")
+
+
+def _sweep_measurements(
+    output: Path,
+    input_root: Path,
+    manifest: dict[str, object],
+    density: np.ndarray,
+) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    target_frames = manifest.get("target_frames")
+    if not isinstance(target_frames, list):
+        raise RuntimeError("view sweep target inventory is missing")
+    for count in SWEEP_COUNTS:
+        psnrs = []
+        residuals = []
+        for frame in target_frames:
+            prefix = output / "view-sweep" / f"views-{count}" / str(frame["id"])
+            predicted = np.load(Path(f"{prefix}.rgb.float32.npy"), allow_pickle=False).astype(np.float64)
+            truth = np.load(input_root / str(frame["rgb_truth_path"]), allow_pickle=False).astype(np.float64) / 255.0
+            mse = float(np.mean((predicted - truth) ** 2))
+            psnrs.append(-10.0 * np.log10(mse))
+            expected = np.load(Path(f"{prefix}.expected-camera-depth.npy"), allow_pickle=False)
+            accumulation = np.load(Path(f"{prefix}.accumulation.npy"), allow_pickle=False)
+            truth_depth = np.load(input_root / str(frame["depth_path"]), allow_pickle=False)
+            common = np.load(
+                input_root / str(frame["common_visible_mask_path"]), allow_pickle=False
+            ).astype(bool)
+            valid = (truth_depth > 0.0) & common & (accumulation >= 0.5) & (expected > 0.0)
+            residuals.append(expected[valid] - truth_depth[valid])
+        residual = np.concatenate(residuals).astype(np.float64)
+        rows.extend(
+            [
+                {
+                    "factor": "context_view_count",
+                    "value": count,
+                    "metric": "target_psnr_db",
+                    "measurement": float(np.mean(psnrs)),
+                    "interpretation": "trained 1000-step sparse-view fit on fixed targets",
+                },
+                {
+                    "factor": "context_view_count",
+                    "value": count,
+                    "metric": "expected_depth_rmse_m",
+                    "measurement": float(np.sqrt(np.mean(residual * residual))),
+                    "interpretation": "common-visible accumulation-qualified rendered depth",
+                },
+            ]
+        )
+    component_resolution = min(32, density.shape[0])
+    indices = np.linspace(0, density.shape[0] - 1, component_resolution, dtype=np.int64)
+    component_grid = density[np.ix_(indices, indices, indices)]
+    structure = ndimage.generate_binary_structure(3, 1)
+    for threshold in (0.1, 1.0, 10.0, 100.0):
+        occupied = density >= threshold
+        _, component_count = ndimage.label(component_grid >= threshold, structure=structure)
+        rows.extend(
+            [
+                {
+                    "factor": "density_threshold",
+                    "value": threshold,
+                    "metric": "occupied_fraction",
+                    "measurement": float(np.mean(occupied)),
+                    "interpretation": "raw density has no canonical surface threshold",
+                },
+                {
+                    "factor": "density_threshold",
+                    "value": threshold,
+                    "metric": f"component_count_{component_resolution}cube",
+                    "measurement": int(component_count),
+                    "interpretation": "6-connected diagnostic components on the fixed reduced grid",
+                },
+            ]
+        )
+    return rows
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--iterations", type=int, required=True)
+    parser.add_argument("--rays-per-batch", type=int, required=True)
+    parser.add_argument("--density-resolution", type=int, required=True)
+    args = parser.parse_args()
+    args.input = args.input.resolve(strict=True)
+    args.output.mkdir(parents=True, exist_ok=True)
+    manifest = json.loads((args.input / "manifest.json").read_text())
+    if manifest["scene_seed"] != SEED or args.iterations <= 0 or args.rays_per_batch <= 0:
+        raise ValueError("invalid locked Nerfacto execution configuration")
+
+    trainer, config, training_seconds, gates = _train(
+        args.input,
+        args.output / "training",
+        args.iterations,
+        args.rays_per_batch,
+        "locked",
+        True,
+    )
+    assert gates is not None
+    _write_json(args.output / "environment-gates.json", gates)
 
     checkpoint_candidates = sorted(trainer.checkpoint_dir.glob("step-*.ckpt"))
     if len(checkpoint_candidates) != 1:
@@ -218,69 +479,94 @@ def main() -> None:
     density_seconds = time.perf_counter() - density_started
     np.save(args.output / "field.density_grid.float32.npy", density_grid, allow_pickle=False)
 
-    density_thresholds = (0.1, 1.0, 10.0, 100.0)
+    # Target truth is first opened only after the primary optimizer has completed.
+    target_frames = manifest["target_frames"]
+    frame_by_id = {frame["id"]: frame for frame in manifest["context_frames"]}
+    primary_contexts = [frame_by_id[item] for item in manifest["primary_context_frame_ids"]]
+    target_metrics = _render_frames(
+        trainer,
+        target_frames,
+        manifest["intrinsics"],
+        args.input,
+        args.output / "target-renders",
+        geometry=True,
+        perceptual=True,
+    )
+    context_metrics = _render_frames(
+        trainer,
+        primary_contexts,
+        manifest["intrinsics"],
+        args.input,
+        args.output / "context-renders",
+        geometry=False,
+        perceptual=True,
+    )
+    _write_json(args.output / "target-image-metrics.json", target_metrics)
+    _write_json(args.output / "context-image-metrics.json", context_metrics)
+    del trainer
+    torch.cuda.empty_cache()
+
+    sweep_seconds: dict[str, float] = {}
+    for count in SWEEP_COUNTS:
+        sweep_render_dir = args.output / "view-sweep" / f"views-{count}"
+        if (
+            manifest["profile"] == "smoke"
+            and count == 5
+            and args.iterations == SWEEP_ITERATIONS
+            and args.rays_per_batch == SWEEP_RAYS
+        ):
+            _copy_primary_sweep(args.output / "target-renders", sweep_render_dir, target_frames)
+            sweep_seconds[str(count)] = training_seconds
+            continue
+        data = _sweep_dataset(
+            args.output / "view-sweep-data" / f"views-{count}",
+            args.input,
+            manifest,
+            manifest["view_sweep_context_frame_ids"][str(count)],
+        )
+        sweep_trainer, _, elapsed, _ = _train(
+            data,
+            args.output / "sweep-training" / f"views-{count}",
+            SWEEP_ITERATIONS,
+            SWEEP_RAYS,
+            f"views-{count}",
+            False,
+        )
+        _render_frames(
+            sweep_trainer,
+            target_frames,
+            manifest["intrinsics"],
+            args.input,
+            sweep_render_dir,
+            geometry=True,
+            perceptual=False,
+        )
+        sweep_seconds[str(count)] = elapsed
+        del sweep_trainer
+        torch.cuda.empty_cache()
+
+    rows = _sweep_measurements(args.output, args.input, manifest, density_grid)
     with (args.output / "failure_sweep.csv").open("w", newline="", encoding="utf-8") as stream:
         writer = csv.DictWriter(
             stream,
-            fieldnames=["factor", "value", "measurement", "interpretation"],
+            fieldnames=["factor", "value", "metric", "measurement", "interpretation"],
         )
         writer.writeheader()
-        for threshold in density_thresholds:
-            writer.writerow(
-                {
-                    "factor": "density_threshold",
-                    "value": threshold,
-                    "measurement": float(np.mean(density_grid >= threshold)),
-                    "interpretation": "occupied grid fraction; density has no canonical surface threshold",
-                }
-            )
+        writer.writerows(rows)
 
-    render_dir = args.output / "target-renders"
-    render_dir.mkdir()
-    target_metrics = []
-    for frame in manifest["target_frames"]:
-        camera = _target_camera(frame, manifest["intrinsics"])
-        with torch.no_grad():
-            outputs = trainer.pipeline.model.get_outputs_for_camera(camera)
-        rgb_float = outputs["rgb"].detach().float().cpu().numpy()
-        rgb = np.clip(rgb_float * 255.0, 0.0, 255.0).round().astype(np.uint8)
-        accumulation = outputs["accumulation"].detach().float().cpu().numpy().squeeze(-1).astype(np.float32)
-        median_ray_depth = outputs["depth"].detach()
-        expected_ray_depth = outputs["expected_depth"].detach()
-        camera_to_world = np.asarray(frame["camera_to_world_model"], dtype=np.float64)
-        median_camera_depth = _camera_axis_depth(camera, median_ray_depth, camera_to_world)
-        expected_camera_depth = _camera_axis_depth(camera, expected_ray_depth, camera_to_world)
-        np.save(render_dir / f"{frame['id']}.rgb.npy", rgb, allow_pickle=False)
-        np.save(render_dir / f"{frame['id']}.rgb.float32.npy", rgb_float.astype(np.float32), allow_pickle=False)
-        np.save(render_dir / f"{frame['id']}.accumulation.npy", accumulation, allow_pickle=False)
-        np.save(render_dir / f"{frame['id']}.median-camera-depth.npy", median_camera_depth, allow_pickle=False)
-        np.save(render_dir / f"{frame['id']}.expected-camera-depth.npy", expected_camera_depth, allow_pickle=False)
-
-        truth_rgb = np.load(args.input / frame["rgb_truth_path"], allow_pickle=False)
-        batch = {"image": torch.from_numpy(truth_rgb.astype(np.float32) / 255.0)}
-        metric_output_keys = ["rgb", "accumulation", "depth"] + [
-            f"prop_depth_{index}" for index in range(config.pipeline.model.num_proposal_iterations)
-        ]
-        metric_outputs = {
-            key: outputs[key].to(trainer.pipeline.model.device)
-            for key in metric_output_keys
-        }
-        with torch.no_grad():
-            image_metrics, _ = trainer.pipeline.model.get_image_metrics_and_images(metric_outputs, batch)
-        target_metrics.append(
-            {
-                "id": frame["id"],
-                "psnr_db": float(image_metrics["psnr"]),
-                "ssim": float(image_metrics["ssim"]),
-                "lpips": float(image_metrics["lpips"]),
-            }
-        )
-    _write_json(args.output / "target-image-metrics.json", target_metrics)
+    shutil.rmtree(args.output / "training", ignore_errors=True)
+    shutil.rmtree(args.output / "sweep-training", ignore_errors=True)
 
     nerfstudio_commit = _source_commit(Path("/opt/src/nerfstudio"))
     tcnn_commit = _source_commit(Path("/opt/src/tiny-cuda-nn"))
     if nerfstudio_commit != NERFSTUDIO_COMMIT or tcnn_commit != TCNN_COMMIT:
         raise RuntimeError("installed source commit mismatch")
+    requirements_lock = Path("/etc/surflo-pathway-requirements.lock.txt")
+    resolved_requirements = Path("/etc/surflo-pathway-resolved-requirements.txt")
+    if _sha256(requirements_lock) != REQUIREMENTS_LOCK_SHA256:
+        raise RuntimeError("installed dependency lock mismatch")
+    shutil.copy2(requirements_lock, args.output / "requirements.lock.txt")
+    shutil.copy2(resolved_requirements, args.output / "resolved-requirements.txt")
     (args.output / "source-commit.txt").write_text(nerfstudio_commit + "\n")
     (args.output / "tcnn-commit.txt").write_text(tcnn_commit + "\n")
     shutil.copy2("/etc/surflo-pathway-insula", args.output / "insula-manifest.txt")
@@ -292,6 +578,8 @@ def main() -> None:
         {
             "nerfstudio_commit": nerfstudio_commit,
             "tiny_cuda_nn_commit": tcnn_commit,
+            "requirements_lock_sha256": _sha256(requirements_lock),
+            "resolved_requirements_sha256": _sha256(resolved_requirements),
             "torch": torch.__version__,
             "torchvision": torchvision.__version__,
             "pillow": PIL.__version__,
@@ -324,6 +612,12 @@ def main() -> None:
             "dataloader_num_workers": 1,
             "tf32": False,
             "seed": SEED,
+            "trained_view_sweep": {
+                "context_views": list(SWEEP_COUNTS),
+                "iterations": SWEEP_ITERATIONS,
+                "rays_per_batch": SWEEP_RAYS,
+            },
+            "view_sweep_training_seconds": sweep_seconds,
         },
     )
 

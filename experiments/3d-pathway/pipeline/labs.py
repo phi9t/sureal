@@ -465,6 +465,27 @@ def _radiance_field_lab(artifacts: Path, profile: str, scene: dict[str, Any], pr
         rmse_m = float(np.sqrt(np.mean(residual * residual)))
         return psnr_db, ssim, rmse_m
 
+    def intersect_sdf(
+        center_depth: np.ndarray, surface_rgb: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """Intersect each analytic ray with an SDF zero set without volume compositing."""
+        sdf = sample_depths[None, None, :] - center_depth[..., None]
+        sdf = np.where(evaluation_mask[..., None], sdf, 1.0)
+        crossing = (sdf[..., :-1] <= 0.0) & (sdf[..., 1:] >= 0.0)
+        has_crossing = np.any(crossing, axis=-1)
+        crossing_index = np.argmax(crossing, axis=-1)
+        low_depth = sample_depths[crossing_index]
+        high_depth = sample_depths[crossing_index + 1]
+        low_sdf = np.take_along_axis(sdf, crossing_index[..., None], axis=-1)[..., 0]
+        high_sdf = np.take_along_axis(
+            sdf, (crossing_index + 1)[..., None], axis=-1
+        )[..., 0]
+        root = low_depth - low_sdf * (high_depth - low_depth) / (high_sdf - low_sdf)
+        depth = np.where(has_crossing, root, 0.0)
+        accumulation = has_crossing.astype(np.float64)
+        rgb = np.where(has_crossing[..., None], surface_rgb, 0.0)
+        return rgb, depth, accumulation, sdf
+
     views = np.array([3, 5, 9], dtype=int)
     radiance_outputs: dict[int, tuple[np.ndarray, np.ndarray, np.ndarray, tuple[float, float, float]]] = {}
     sweep = []
@@ -488,7 +509,7 @@ def _radiance_field_lab(artifacts: Path, profile: str, scene: dict[str, Any], pr
         )
 
     surface_color = np.clip(truth_rgb * 0.84 + evaluation_mask[..., None] * 0.035, 0.0, 1.0)
-    surface_rgb, surface_depth, surface_accumulation = render_field(
+    surface_rgb, surface_depth, surface_accumulation, surface_sdf = intersect_sdf(
         truth_depth + evaluation_mask * 0.012,
         surface_color,
     )
@@ -506,6 +527,7 @@ def _radiance_field_lab(artifacts: Path, profile: str, scene: dict[str, Any], pr
         "radiance_field": {
             "representation": "volume density and radiance",
             "inference": "controlled analytic field evaluation",
+            "rendering_operator": "alpha compositing",
             "completion_claim": False,
             "psnr_db": radiance_scores[0],
             "rendered_depth_rmse_m": radiance_scores[2],
@@ -513,6 +535,7 @@ def _radiance_field_lab(artifacts: Path, profile: str, scene: dict[str, Any], pr
         "surface_model": {
             "representation": "signed-distance level set",
             "inference": "controlled analytic surface evaluation",
+            "rendering_operator": "zero-level ray intersection",
             "completion_claim": False,
             "psnr_db": surface_scores[0],
             "rendered_depth_rmse_m": surface_scores[2],
@@ -529,9 +552,11 @@ def _radiance_field_lab(artifacts: Path, profile: str, scene: dict[str, Any], pr
             "radiance_field_accumulation": radiance_accumulation,
             "radiance_field_depth_m": radiance_depth,
             "radiance_field_rgb": radiance_rgb,
+            "sample_depths_m": sample_depths,
             "surface_model_accumulation": surface_accumulation,
             "surface_model_depth_m": surface_depth,
             "surface_model_rgb": surface_rgb,
+            "surface_model_sdf_samples": surface_sdf,
             "truth_depth_m": truth_depth,
             "truth_rgb": truth_rgb,
         },
@@ -546,7 +571,7 @@ def _radiance_field_lab(artifacts: Path, profile: str, scene: dict[str, Any], pr
     return {
         "metrics": {
             "geometry": {
-                "radiance_field_surface_rmse_m": radiance_scores[2],
+                "radiance_field_rendered_depth_rmse_m": radiance_scores[2],
                 "surface_model_rmse_m": surface_scores[2],
             },
             "rendering": {

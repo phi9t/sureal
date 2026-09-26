@@ -337,10 +337,63 @@ def generate_radiance_field_scene(
     destination: Path, scene: dict[str, Any], profile: str
 ) -> dict[str, Any]:
     """Write the shared sphere plus a context-only Nerfstudio transform file."""
-    manifest = generate_implicit_surface_scene(destination, scene, profile)
+    nine_angles = [-45.0, -35.0, -25.0, -15.0, -5.0, 5.0, 15.0, 25.0, 35.0]
+    manifest = generate_implicit_surface_scene(
+        destination, scene, profile, context_angles_override=nine_angles
+    )
+    by_angle = {
+        float(frame["azimuth_degrees"]): frame for frame in manifest["context_frames"]
+    }
+    five_angles = [
+        float(value) for value in scene["cameras"]["context_azimuth_degrees"]
+    ]
+    sweep_angles = {
+        "3": [-45.0, -5.0, 35.0],
+        "5": five_angles,
+        "9": nine_angles,
+    }
+    for angles in sweep_angles.values():
+        if any(angle not in by_angle for angle in angles):
+            raise ValueError("radiance-field context-view sweep is not represented")
+    primary_angles = five_angles if profile == "smoke" else nine_angles
+    primary_frames = [by_angle[angle] for angle in primary_angles]
+
+    primary_centers = np.asarray(
+        [np.asarray(frame["camera_to_world_model"])[:3, 3] for frame in primary_frames]
+    )
+    radius = float(manifest["sphere_radius_m"])
+    for frame in manifest["context_frames"] + manifest["target_frames"]:
+        pixel_normals = np.load(destination / frame["normal_path"], allow_pickle=False)
+        foreground = np.linalg.norm(pixel_normals, axis=-1) > 0.0
+        pixel_points = radius * pixel_normals.astype(np.float64)
+        sight = primary_centers[:, None, None, :] - pixel_points[None, :, :, :]
+        support = np.sum(
+            np.sum(pixel_normals[None, :, :, :] * sight, axis=-1) > 0.0,
+            axis=0,
+        )
+        common_visible = (foreground & (support >= 2)).astype(np.uint8)
+        support_path = destination / frame["common_visible_mask_path"]
+        np.save(support_path, common_visible, allow_pickle=False)
+        frame["common_visible_mask_sha256"] = sha256_file(support_path)
+
+    truth_points = np.load(
+        destination / manifest["surface_truth"]["points_path"], allow_pickle=False
+    )
+    truth_normals = np.load(
+        destination / manifest["surface_truth"]["normals_path"], allow_pickle=False
+    )
+    truth_sight = primary_centers[:, None, :] - truth_points[None, :, :]
+    truth_support = np.sum(
+        np.sum(truth_normals[None, :, :] * truth_sight, axis=-1) > 0.0,
+        axis=0,
+    ).astype(np.int16)
+    truth_support_path = destination / manifest["surface_truth"]["support_path"]
+    np.save(truth_support_path, truth_support, allow_pickle=False)
+    manifest["surface_truth"]["support_sha256"] = sha256_file(truth_support_path)
+
     intrinsics = manifest["intrinsics"]
     frames = []
-    for frame in manifest["context_frames"]:
+    for frame in primary_frames:
         camera_to_world = np.asarray(
             frame["camera_to_world_model"], dtype=np.float64
         ).copy()
@@ -373,6 +426,11 @@ def generate_radiance_field_scene(
     transforms_path.write_bytes(canonical_json(transforms))
     manifest["nerfstudio_transforms_path"] = transforms_path.name
     manifest["nerfstudio_transforms_sha256"] = sha256_file(transforms_path)
+    manifest["primary_context_frame_ids"] = [frame["id"] for frame in primary_frames]
+    manifest["view_sweep_context_frame_ids"] = {
+        count: [by_angle[angle]["id"] for angle in angles]
+        for count, angles in sweep_angles.items()
+    }
     manifest["target_training_leakage"] = (
         "none; transforms.json contains context frames only"
     )
@@ -499,7 +557,10 @@ def _fibonacci_sphere(count: int, radius: float) -> tuple[np.ndarray, np.ndarray
 
 
 def generate_implicit_surface_scene(
-    destination: Path, scene: dict[str, Any], profile: str
+    destination: Path,
+    scene: dict[str, Any],
+    profile: str,
+    context_angles_override: list[float] | None = None,
 ) -> dict[str, Any]:
     """Write an analytic bounded sphere for a calibrated per-scene SDF fit."""
     if profile not in {"smoke", "full"}:
@@ -510,7 +571,7 @@ def generate_implicit_surface_scene(
     radius = float(sphere["radius"])
     intrinsics = scene["cameras"]["intrinsics"]
     orbit_radius = float(scene["cameras"]["orbit_radius"])
-    context_angles = (
+    context_angles = context_angles_override or (
         [float(value) for value in scene["cameras"]["context_azimuth_degrees"]]
         if profile == "smoke"
         else [-45.0, -35.0, -25.0, -15.0, -5.0, 5.0, 15.0, 25.0, 35.0]

@@ -44,27 +44,35 @@ def fake_nerfacto_engine(path: Path, fail: bool = False) -> Path:
             [[ " $* " == *" -e TORCH_HOME=/model "* ]]
             [[ " $* " == *":/model/hub/checkpoints/alexnet-owt-7be5be79.pth:ro "* ]]
             [[ " $* " == *" {FIXTURE_IMAGE_ID} "* ]]
-            work=''
+            input=''
+            output=''
             previous=''
             for argument in "$@"; do
-                if [[ "$previous" == -v && "$argument" == *:/work ]]; then
-                    work="${{argument%:/work}}"
+                if [[ "$previous" == -v && "$argument" == *:/input:ro ]]; then
+                    input="${{argument%:/input:ro}}"
+                elif [[ "$previous" == -v && "$argument" == *:/output ]]; then
+                    output="${{argument%:/output}}"
                 fi
                 previous="$argument"
             done
-            [[ -n "$work" ]]
+            [[ -n "$input" && -n "$output" ]]
+            [[ " $* " != *":/work "* ]]
             {failure}
-            python3 - "$work" <<'PY'
+            python3 - "$input" "$output" <<'PY'
             import json
             import math
+            import csv
             from pathlib import Path
+            import shutil
             import sys
             import numpy as np
 
-            root = Path(sys.argv[1])
-            manifest = json.loads((root / "input/manifest.json").read_text())
-            output = root / "output"
-            output.mkdir(exist_ok=True)
+            input_root = Path(sys.argv[1])
+            output = Path(sys.argv[2])
+            repository = Path("{ROOT}")
+            sys.path.insert(0, str(repository / "pipeline"))
+            from nerfacto_reference_runner import _component_count
+            manifest = json.loads((input_root / "manifest.json").read_text())
             resolution = 128 if manifest["profile"] == "smoke" else 256
             axis = np.linspace(-1.0, 1.0, resolution, dtype=np.float32)
             xx, yy, zz = np.meshgrid(axis, axis, axis, indexing="ij")
@@ -75,8 +83,8 @@ def fake_nerfacto_engine(path: Path, fail: bool = False) -> Path:
             render_dir.mkdir()
             metric_rows = []
             for frame in manifest["target_frames"]:
-                truth_rgb = np.load(root / "input" / frame["rgb_truth_path"], allow_pickle=False)
-                truth_depth = np.load(root / "input" / frame["depth_path"], allow_pickle=False)
+                truth_rgb = np.load(input_root / frame["rgb_truth_path"], allow_pickle=False)
+                truth_depth = np.load(input_root / frame["depth_path"], allow_pickle=False)
                 predicted_rgb = np.clip(truth_rgb.astype(np.float32) / 255.0 + 0.01, 0.0, 1.0).astype(np.float32)
                 foreground = truth_depth > 0.0
                 accumulation = np.where(foreground, 0.9, 0.1).astype(np.float32)
@@ -93,8 +101,48 @@ def fake_nerfacto_engine(path: Path, fail: bool = False) -> Path:
                     "psnr_db": -10.0 * math.log10(mse),
                     "ssim": 0.99,
                     "lpips": 0.02,
+                    "crop_lpips": 0.03,
                 }})
             (output / "target-image-metrics.json").write_text(json.dumps(metric_rows, sort_keys=True) + "\\n")
+
+            context_dir = output / "context-renders"
+            context_dir.mkdir()
+            context_rows = []
+            frames = {{frame["id"]: frame for frame in manifest["context_frames"]}}
+            for frame_id in manifest["primary_context_frame_ids"]:
+                frame = frames[frame_id]
+                truth_rgb = np.load(input_root / frame["rgb_truth_path"], allow_pickle=False)
+                predicted_rgb = np.clip(truth_rgb.astype(np.float32) / 255.0 + 0.005, 0.0, 1.0).astype(np.float32)
+                np.save(context_dir / f"{{frame_id}}.rgb.float32.npy", predicted_rgb, allow_pickle=False)
+                np.save(context_dir / f"{{frame_id}}.rgb.npy", np.rint(predicted_rgb * 255.0).astype(np.uint8), allow_pickle=False)
+                context_rows.append({{"id": frame_id, "lpips": 0.01, "crop_lpips": 0.015}})
+            (output / "context-image-metrics.json").write_text(json.dumps(context_rows, sort_keys=True) + "\\n")
+
+            sweep_metrics = {{}}
+            for view_count, color_error, depth_error in ((3, 0.03, 0.12), (5, 0.02, 0.08), (9, 0.01, 0.04)):
+                sweep_dir = output / "view-sweep" / f"views-{{view_count}}"
+                sweep_dir.mkdir(parents=True)
+                psnrs = []
+                residuals = []
+                for frame in manifest["target_frames"]:
+                    truth_rgb = np.load(input_root / frame["rgb_truth_path"], allow_pickle=False)
+                    truth_depth = np.load(input_root / frame["depth_path"], allow_pickle=False)
+                    foreground = truth_depth > 0.0
+                    predicted = np.clip(truth_rgb.astype(np.float32) / 255.0 + color_error, 0.0, 1.0).astype(np.float32)
+                    accumulation = np.where(foreground, 0.9, 0.1).astype(np.float32)
+                    expected = np.where(foreground, truth_depth + depth_error, 6.0).astype(np.float32)
+                    common = np.load(input_root / frame["common_visible_mask_path"], allow_pickle=False).astype(bool)
+                    psnrs.append(-10.0 * math.log10(float(np.mean((predicted.astype(np.float64) - truth_rgb.astype(np.float64) / 255.0) ** 2))))
+                    valid = foreground & common & (accumulation >= 0.5) & (expected > 0.0)
+                    residuals.append(expected[valid] - truth_depth[valid])
+                    np.save(sweep_dir / f"{{frame['id']}}.rgb.float32.npy", predicted, allow_pickle=False)
+                    np.save(sweep_dir / f"{{frame['id']}}.accumulation.npy", accumulation, allow_pickle=False)
+                    np.save(sweep_dir / f"{{frame['id']}}.expected-camera-depth.npy", expected, allow_pickle=False)
+                residual = np.concatenate(residuals).astype(np.float64)
+                sweep_metrics[str(view_count)] = {{
+                    "target_psnr_db": float(np.mean(psnrs)),
+                    "expected_depth_rmse_m": float(np.sqrt(np.mean(residual * residual))),
+                }}
 
             locked = output / "nerfstudio"
             locked.mkdir()
@@ -106,11 +154,17 @@ def fake_nerfacto_engine(path: Path, fail: bool = False) -> Path:
                 "schema_version=1\\nkind=radiance-field\\ncuda=12.8.1\\npython=3.12\\n"
                 "torch=2.7.1+cu128\\ntorchvision=0.22.1+cu128\\npillow=11.1.0\\n"
                 "nerfstudio_commit={NERFSTUDIO_COMMIT}\\ntiny_cuda_nn_commit={TCNN_COMMIT}\\n"
-                "tcnn_cuda_architectures=100\\nnetwork_policy=build-and-fetch-only\\n"
+                "tcnn_cuda_architectures=100\\n"
+                "requirements_lock_sha256=02c623f2a636dd774dda048f1a08c8d936d0701f74d3f50b3a7916d2280ed65a\\n"
+                "network_policy=build-and-fetch-only\\n"
             )
+            shutil.copy2(repository / "insulas/radiance-field/requirements.lock.txt", output / "requirements.lock.txt")
+            shutil.copy2(repository / "insulas/radiance-field/resolved-requirements.lock.txt", output / "resolved-requirements.txt")
             (output / "runtime-versions.json").write_text(json.dumps({{
                 "nerfstudio_commit": "{NERFSTUDIO_COMMIT}",
                 "tiny_cuda_nn_commit": "{TCNN_COMMIT}",
+                "requirements_lock_sha256": "02c623f2a636dd774dda048f1a08c8d936d0701f74d3f50b3a7916d2280ed65a",
+                "resolved_requirements_sha256": "75324c79132de2fcf25b60444c7e9820baeebbc3a6db2002eb601ac2b5c33e4c",
                 "torch": "2.7.1+cu128", "torchvision": "0.22.1+cu128",
                 "pillow": "11.1.0", "python": "3.12.3", "numpy": "2.5.2",
                 "cuda_runtime": "12.8", "cuda_compiler": "Cuda compilation tools, release 12.8, V12.8.93",
@@ -132,13 +186,29 @@ def fake_nerfacto_engine(path: Path, fail: bool = False) -> Path:
                 "proposal_initial_sampler": "uniform", "tf32": False,
                 "context_split_mode": "all-context-frames-train-and-eval",
                 "dataloader_num_workers": 1,
-                "seed": manifest["scene_seed"]
+                "seed": manifest["scene_seed"],
+                "trained_view_sweep": {{"context_views": [3, 5, 9], "iterations": 1000, "rays_per_batch": 1024}},
+                "view_sweep_training_seconds": {{"3": 1.0, "5": 1.0, "9": 1.0}}
             }}, sort_keys=True) + "\\n")
-            (output / "failure_sweep.csv").write_text(
-                "factor,value,measurement,interpretation\\n"
-                "density_threshold,0.1,0.2,no canonical surface threshold\\n"
-                "density_threshold,1.0,0.1,no canonical surface threshold\\n"
-            )
+            sweep_rows = []
+            for count, values in sweep_metrics.items():
+                for metric, measurement in values.items():
+                    sweep_rows.append({{
+                        "factor": "context_view_count", "value": count,
+                        "metric": metric, "measurement": measurement,
+                        "interpretation": "fixture trained sweep",
+                    }})
+            indices = np.linspace(0, resolution - 1, 32, dtype=np.int64)
+            component_grid = density[np.ix_(indices, indices, indices)]
+            for threshold, label in ((0.1, "0_1"), (1.0, "1"), (10.0, "10"), (100.0, "100")):
+                sweep_rows.extend([
+                    {{"factor": "density_threshold", "value": threshold, "metric": "occupied_fraction", "measurement": float(np.mean(density >= threshold)), "interpretation": "fixture threshold"}},
+                    {{"factor": "density_threshold", "value": threshold, "metric": "component_count_32cube", "measurement": _component_count(component_grid >= threshold), "interpretation": "fixture components"}},
+                ])
+            with (output / "failure_sweep.csv").open("w", newline="") as stream:
+                writer = csv.DictWriter(stream, fieldnames=["factor", "value", "metric", "measurement", "interpretation"])
+                writer.writeheader()
+                writer.writerows(sweep_rows)
             (output / "resource-usage.txt").write_text("Maximum resident set size (kbytes): 65432\\n")
             print("fixture Nerfacto completed")
             PY
@@ -212,27 +282,35 @@ class NerfactoReferenceFoundationTest(unittest.TestCase):
             "held-out depth restricted to common-visible analytic truth",
         )
         self.assertEqual(
-            adapter["evaluation_contract"]["surface_comparator"],
-            "module 09 NeuS-Facto baseline on the identical controlled scene",
+            adapter["evaluation_contract"]["comparison_guardrail"],
+            "do not compare heterogeneous retained Module 09 registry scalars",
         )
+        self.assertEqual(adapter["evaluation_contract"]["trained_view_sweep"], [3, 5, 9])
         self.assertEqual(adapter["acceptance"]["smoke"]["target_psnr_db_min"], 20.0)
         self.assertEqual(adapter["acceptance"]["full"]["expected_depth_rmse_m_max"], 0.7)
         self.assertEqual(
             adapter["baseline_environment"]["container_image_id"],
-            "sha256:11200316a8dfa0370891a8600f2b1bd884c701bad5c3750562d32dc530c935df",
+            "sha256:ad9955936be45e34595b3a03fbd9dcadd80daf9b77a6b7842c567467eec2356d",
         )
         self.assertEqual(adapter["baseline_environment"]["gpu_model"], "NVIDIA B200")
-        for key in ("last_verified_smoke", "last_verified_full"):
+        for profile, key in (
+            ("smoke", "last_verified_smoke"),
+            ("full", "last_verified_full"),
+        ):
             self.assertEqual(adapter[key]["date"], "2026-09-26")
             self.assertGreater(adapter[key]["training_steps_per_second"], 0.0)
             self.assertGreater(adapter[key]["peak_gpu_compute_memory_bytes"], 0)
-        self.assertGreater(
-            adapter["last_verified_smoke"]["target_psnr_db"],
-            adapter["last_verified_full"]["target_psnr_db"],
-        )
+            self.assertGreaterEqual(
+                adapter[key]["target_psnr_db"],
+                adapter["acceptance"][profile]["target_psnr_db_min"],
+            )
+            self.assertLessEqual(
+                adapter[key]["expected_depth_rmse_m"],
+                adapter["acceptance"][profile]["expected_depth_rmse_m_max"],
+            )
         self.assertLess(
-            adapter["last_verified_smoke"]["expected_depth_rmse_m"],
             adapter["last_verified_full"]["expected_depth_rmse_m"],
+            adapter["last_verified_smoke"]["expected_depth_rmse_m"],
         )
         self.assertIn("failure evidence", adapter["measurement_note"])
 
@@ -245,8 +323,11 @@ class NerfactoReferenceFoundationTest(unittest.TestCase):
         self.assertEqual(archive["sha256"], NERF_SYNTHETIC_SHA256)
         self.assertEqual(archive["byte_size"], 370385516)
         self.assertEqual(archive["digest_status"], "verified_2026-09-26")
-        self.assertEqual(archive["extraction"], "safe-zip")
-        self.assertEqual(archive["consumers"], ["nerfstudio-nerfacto-reference"])
+        self.assertEqual(
+            archive["extraction"],
+            {"mode": "zip", "roots": ["nerf_llff_data", "nerf_synthetic"]},
+        )
+        self.assertEqual(archive["consumers"], ["future-nerf-synthetic-extension"])
 
     def test_radiance_field_environment_is_blackwell_pinned(self) -> None:
         locks = json.loads((ROOT / "insulas/locks.json").read_text())["insulas"]
@@ -256,6 +337,17 @@ class NerfactoReferenceFoundationTest(unittest.TestCase):
         self.assertEqual(radiance["tiny_cuda_nn_source_commit"], TCNN_COMMIT)
         self.assertEqual(radiance["tcnn_cuda_architectures"], "100")
         self.assertEqual(radiance["pytorch"], "2.7.1+cu128")
+        dependency_lock = ROOT / "insulas/radiance-field/requirements.lock.txt"
+        self.assertTrue(dependency_lock.is_file())
+        self.assertEqual(
+            radiance["requirements_lock_sha256"],
+            __import__("hashlib").sha256(dependency_lock.read_bytes()).hexdigest(),
+        )
+        resolved_lock = ROOT / "insulas/radiance-field/resolved-requirements.lock.txt"
+        self.assertEqual(
+            radiance["resolved_requirements_sha256"],
+            __import__("hashlib").sha256(resolved_lock.read_bytes()).hexdigest(),
+        )
 
 
 class NerfactoReferenceExecutionContractTest(unittest.TestCase):
@@ -272,18 +364,21 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
             rendering = result["metrics"]["rendering"]
             geometry = result["metrics"]["geometry"]
             field = result["metrics"]["field"]
-            comparison = result["metrics"]["comparison"]
             self.assertGreater(rendering["target_psnr_db"], 35.0)
-            self.assertAlmostEqual(rendering["target_ssim"], 0.99)
+            self.assertNotAlmostEqual(rendering["target_ssim"], 0.99)
             self.assertAlmostEqual(rendering["target_lpips"], 0.02)
+            self.assertGreater(rendering["target_crop_ssim"], 0.0)
+            self.assertEqual(rendering["context_fit_views"], 5)
             self.assertAlmostEqual(geometry["expected_depth_rmse_m"], 0.025, places=5)
             self.assertAlmostEqual(geometry["median_depth_rmse_m"], 0.05, places=5)
             self.assertEqual(geometry["common_visible_accumulation_coverage"], 1.0)
             self.assertGreater(field["density_max"], 1.0)
-            self.assertFalse(comparison["metric_families_combined"])
+            self.assertEqual(set(result["metrics"]["failure_sweep"]), {"3", "5", "9"})
+            self.assertNotIn("comparison", result["metrics"])
             self.assertEqual(result["tool"]["container_image_id"], FIXTURE_IMAGE_ID)
             self.assertEqual(result["acceptance"]["target_psnr_db_min"], 20.0)
             self.assertIn("output/field.density_grid.float32.npy", result["provenance"]["artifacts_sha256"])
+            self.assertIn("output/resolved-requirements.txt", result["provenance"]["artifacts_sha256"])
             self.assertIn("## Rendering", (run_dir / "report.md").read_text())
 
             sys.path.insert(0, str(ROOT / "pipeline"))
@@ -330,7 +425,9 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
             values = np.load(density, allow_pickle=False)
             values.reshape(-1)[0] += 1.0
             np.save(density, values, allow_pickle=False)
-            with self.assertRaisesRegex(ValueError, "metric recomputation|artifact"):
+            with self.assertRaisesRegex(
+                ValueError, "metric recomputation|artifact|failure-sweep metric mismatch"
+            ):
                 validate_nerfacto_reference_result(run_dir)
 
     def test_real_profiles_are_explicit_b200_gates(self) -> None:
@@ -409,6 +506,9 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
             transforms = json.loads(transforms_path.read_text())
             self.assertEqual(manifest["nerfstudio_transforms_sha256"], sha256_file(transforms_path))
             self.assertEqual(len(transforms["frames"]), 5)
+            self.assertEqual(len(manifest["context_frames"]), 9)
+            self.assertEqual(len(manifest["primary_context_frame_ids"]), 5)
+            self.assertEqual(set(manifest["view_sweep_context_frame_ids"]), {"3", "5", "9"})
             self.assertTrue(all("context-" in frame["file_path"] for frame in transforms["frames"]))
             self.assertFalse(any("target-" in frame["file_path"] for frame in transforms["frames"]))
             self.assertEqual(transforms["orientation_override"], "none")
@@ -443,9 +543,11 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
         self.assertIn('outputs["accumulation"]', text)
         self.assertIn('outputs["expected_depth"]', text)
         self.assertIn("to(ray_bundle.directions.device)", text)
-        self.assertIn("metric_outputs", text)
-        self.assertIn("to(trainer.pipeline.model.device)", text)
-        self.assertNotIn("target_frames", text.split("trainer.train()", maxsplit=1)[0])
+        self.assertIn("model.lpips", text)
+        self.assertIn("truth_tensor", text)
+        self.assertIn("context-renders", text)
+        self.assertIn("view-sweep", text)
+        self.assertLess(text.index("trainer.train()"), text.index('manifest["target_frames"]'))
 
 if __name__ == "__main__":
     unittest.main()

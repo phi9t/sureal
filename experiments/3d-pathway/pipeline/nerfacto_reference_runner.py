@@ -7,6 +7,8 @@ import math
 import os
 from pathlib import Path
 import platform
+from collections import deque
+import csv
 import shutil
 import stat
 import tempfile
@@ -41,6 +43,7 @@ ADAPTER = "nerfacto"
 IMAGE = "surflo-pathway-radiance-field:1"
 PINNED_NERFSTUDIO_COMMIT = "50e0e3c70c775e89333256213363badbf074f29d"
 PINNED_TCNN_COMMIT = "0109538c37ac0bf613f2bac8de6cda48352feca7"
+REQUIREMENTS_LOCK_SHA256 = "02c623f2a636dd774dda048f1a08c8d936d0701f74d3f50b3a7916d2280ed65a"
 LPIPS_CHECKPOINT_ID = "nerfstudio-lpips-alexnet"
 LPIPS_CHECKPOINT_SHA256 = "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
 LPIPS_CHECKPOINT_BYTES = 244408911
@@ -58,6 +61,7 @@ PINNED_INSULA_MANIFEST = {
     "nerfstudio_commit": PINNED_NERFSTUDIO_COMMIT,
     "tiny_cuda_nn_commit": PINNED_TCNN_COMMIT,
     "tcnn_cuda_architectures": "100",
+    "requirements_lock_sha256": REQUIREMENTS_LOCK_SHA256,
     "network_policy": "build-and-fetch-only",
 }
 SUPPORT_CONTRACT = {
@@ -82,11 +86,12 @@ REFERENCE_IMPLEMENTATION = (
     "pipeline/reference_scene.py",
     "insulas/build.sh",
     "insulas/radiance-field/Dockerfile",
+    "insulas/radiance-field/requirements.lock.txt",
+    "insulas/radiance-field/resolved-requirements.lock.txt",
     "insulas/radiance-field/run-nerfacto.py",
     "insulas/locks.json",
     "assets.lock.json",
     "reference-result.schema.json",
-    "reference-adapters.json",
     "shared-scene.json",
 )
 
@@ -118,14 +123,6 @@ def _adapter_record() -> dict[str, Any]:
         item
         for item in load_json(ROOT / "reference-adapters.json")["adapters"]
         if item["id"] == "nerfstudio-nerfacto-reference"
-    )
-
-
-def _surface_comparator_record() -> dict[str, Any]:
-    return next(
-        item
-        for item in load_json(ROOT / "reference-adapters.json")["adapters"]
-        if item["id"] == "nerfstudio-neus-facto-reference"
     )
 
 
@@ -287,19 +284,194 @@ def _points_from_depth(
     return camera @ transform[:3, :3].T + transform[:3, 3]
 
 
+def _gaussian_ssim(left: np.ndarray, right: np.ndarray) -> float:
+    """Compute a fixed 11x11 Gaussian-window RGB SSIM using NumPy only."""
+    if left.shape != right.shape or left.ndim != 3 or left.shape[2] != 3:
+        raise ValueError("SSIM expects matching HxWx3 RGB arrays")
+    if left.shape[0] < 11 or left.shape[1] < 11:
+        raise ValueError("SSIM image or crop is smaller than the fixed 11x11 window")
+    x = left.astype(np.float64, copy=False)
+    y = right.astype(np.float64, copy=False)
+    if not np.isfinite(x).all() or not np.isfinite(y).all():
+        raise ValueError("SSIM inputs must be finite")
+    axis = np.arange(-5, 6, dtype=np.float64)
+    kernel = np.exp(-(axis * axis) / (2.0 * 1.5 * 1.5))
+    kernel /= np.sum(kernel)
+
+    def blur(image: np.ndarray) -> np.ndarray:
+        horizontal_source = np.pad(image, ((0, 0), (5, 5), (0, 0)), mode="reflect")
+        horizontal = sum(
+            float(weight) * horizontal_source[:, index : index + image.shape[1], :]
+            for index, weight in enumerate(kernel)
+        )
+        vertical_source = np.pad(horizontal, ((5, 5), (0, 0), (0, 0)), mode="reflect")
+        return sum(
+            float(weight) * vertical_source[index : index + image.shape[0], :, :]
+            for index, weight in enumerate(kernel)
+        )
+
+    mu_x = blur(x)
+    mu_y = blur(y)
+    sigma_x = np.maximum(blur(x * x) - mu_x * mu_x, 0.0)
+    sigma_y = np.maximum(blur(y * y) - mu_y * mu_y, 0.0)
+    sigma_xy = blur(x * y) - mu_x * mu_y
+    c1 = 0.01 ** 2
+    c2 = 0.03 ** 2
+    numerator = (2.0 * mu_x * mu_y + c1) * (2.0 * sigma_xy + c2)
+    denominator = (mu_x * mu_x + mu_y * mu_y + c1) * (sigma_x + sigma_y + c2)
+    return float(np.mean(numerator / denominator))
+
+
+def _tight_foreground_crop(mask: np.ndarray) -> tuple[slice, slice]:
+    rows, columns = np.nonzero(mask)
+    if not len(rows):
+        raise ValueError("foreground crop has no truth support")
+    return (
+        slice(int(np.min(rows)), int(np.max(rows)) + 1),
+        slice(int(np.min(columns)), int(np.max(columns)) + 1),
+    )
+
+
+def _psnr(predicted: np.ndarray, truth: np.ndarray) -> float:
+    mse = float(np.mean((predicted.astype(np.float64) - truth.astype(np.float64)) ** 2))
+    if not math.isfinite(mse) or mse <= 0.0:
+        raise ValueError("PSNR requires a finite non-zero residual")
+    return float(-10.0 * math.log10(mse))
+
+
+def _component_count(mask: np.ndarray) -> int:
+    """Count 6-connected components on a small diagnostic grid."""
+    if mask.ndim != 3:
+        raise ValueError("component mask must be a 3D grid")
+    visited = np.zeros(mask.shape, dtype=bool)
+    components = 0
+    for seed in np.argwhere(mask):
+        x, y, z = (int(value) for value in seed)
+        if visited[x, y, z]:
+            continue
+        components += 1
+        visited[x, y, z] = True
+        queue: deque[tuple[int, int, int]] = deque([(x, y, z)])
+        while queue:
+            cx, cy, cz = queue.popleft()
+            for nx, ny, nz in (
+                (cx - 1, cy, cz),
+                (cx + 1, cy, cz),
+                (cx, cy - 1, cz),
+                (cx, cy + 1, cz),
+                (cx, cy, cz - 1),
+                (cx, cy, cz + 1),
+            ):
+                if (
+                    0 <= nx < mask.shape[0]
+                    and 0 <= ny < mask.shape[1]
+                    and 0 <= nz < mask.shape[2]
+                    and mask[nx, ny, nz]
+                    and not visited[nx, ny, nz]
+                ):
+                    visited[nx, ny, nz] = True
+                    queue.append((nx, ny, nz))
+    return components
+
+
+def _image_metrics(
+    predicted: np.ndarray,
+    truth: np.ndarray,
+    foreground: np.ndarray,
+    perceptual: dict[str, Any],
+) -> dict[str, float]:
+    crop = _tight_foreground_crop(foreground)
+    predicted_crop = predicted[crop]
+    truth_crop = truth[crop]
+    return {
+        "psnr_db": _psnr(predicted, truth),
+        "foreground_psnr_db": _psnr(predicted[foreground], truth[foreground]),
+        "ssim": _gaussian_ssim(predicted, truth),
+        "crop_psnr_db": _psnr(predicted_crop, truth_crop),
+        "crop_ssim": _gaussian_ssim(predicted_crop, truth_crop),
+        "lpips": float(perceptual["lpips"]),
+        "crop_lpips": float(perceptual["crop_lpips"]),
+    }
+
+
+def _validate_failure_sweep(run_dir: Path, metrics: dict[str, Any]) -> None:
+    path = _require_regular_file(run_dir, "output/failure_sweep.csv")
+    with path.open(newline="", encoding="utf-8") as stream:
+        reader = csv.DictReader(stream)
+        if reader.fieldnames != [
+            "factor",
+            "value",
+            "metric",
+            "measurement",
+            "interpretation",
+        ]:
+            raise ValueError("Nerfacto failure-sweep columns mismatch")
+        rows = list(reader)
+    expected: dict[tuple[str, str, str], float | int] = {}
+    for count, values in metrics["failure_sweep"].items():
+        expected[("context_view_count", count, "target_psnr_db")] = values[
+            "target_psnr_db"
+        ]
+        expected[("context_view_count", count, "expected_depth_rmse_m")] = values[
+            "expected_depth_rmse_m"
+        ]
+    field = metrics["field"]
+    for value, label in (("0.1", "0_1"), ("1.0", "1"), ("10.0", "10"), ("100.0", "100")):
+        expected[("density_threshold", value, "occupied_fraction")] = field[
+            f"occupied_fraction_ge_{label}"
+        ]
+        expected[
+            (
+                "density_threshold",
+                value,
+                f"component_count_{field['component_grid_resolution']}cube",
+            )
+        ] = field[f"component_count_ge_{label}"]
+    actual: dict[tuple[str, str, str], float] = {}
+    for row in rows:
+        key = (row["factor"], row["value"], row["metric"])
+        if key in actual or not row["interpretation"]:
+            raise ValueError("Nerfacto failure-sweep row mismatch")
+        try:
+            actual[key] = float(row["measurement"])
+        except ValueError as error:
+            raise ValueError("Nerfacto failure-sweep value mismatch") from error
+    if actual.keys() != expected.keys() or any(
+        not math.isclose(actual[key], float(value), rel_tol=1e-6, abs_tol=1e-8)
+        for key, value in expected.items()
+    ):
+        raise ValueError("Nerfacto failure-sweep metric mismatch")
+
+
 def _evaluate_outputs(run_dir: Path, profile: str) -> dict[str, Any]:
     manifest = _validate_input_manifest(run_dir / "input", profile)
-    official = load_json(_require_regular_file(run_dir, "output/target-image-metrics.json"))
-    if [item.get("id") for item in official] != [frame["id"] for frame in manifest["target_frames"]]:
+    target_perceptual = load_json(
+        _require_regular_file(run_dir, "output/target-image-metrics.json")
+    )
+    context_perceptual = load_json(
+        _require_regular_file(run_dir, "output/context-image-metrics.json")
+    )
+    if [item.get("id") for item in target_perceptual] != [
+        frame["id"] for frame in manifest["target_frames"]
+    ]:
         raise ValueError("Nerfacto target metric inventory mismatch")
+    frame_by_id = {
+        frame["id"]: frame
+        for frame in manifest["context_frames"] + manifest["target_frames"]
+    }
+    primary_contexts = [frame_by_id[item] for item in manifest["primary_context_frame_ids"]]
+    if [item.get("id") for item in context_perceptual] != [
+        frame["id"] for frame in primary_contexts
+    ]:
+        raise ValueError("Nerfacto context metric inventory mismatch")
 
-    psnrs: list[float] = []
-    foreground_psnrs: list[float] = []
-    ssims: list[float] = []
-    lpips_values: list[float] = []
+    target_image_metrics: list[dict[str, Any]] = []
+    context_image_metrics: list[dict[str, Any]] = []
     median_residuals: list[np.ndarray] = []
     expected_residuals: list[np.ndarray] = []
     qualified_truth_depths: list[np.ndarray] = []
+    unsupported_residuals: list[np.ndarray] = []
+    unsupported_truth_depths: list[np.ndarray] = []
     predicted_points: list[np.ndarray] = []
     truth_points: list[np.ndarray] = []
     supported_total = 0
@@ -307,7 +479,7 @@ def _evaluate_outputs(run_dir: Path, profile: str) -> dict[str, Any]:
     unsupported_total = 0
     unsupported_qualified = 0
     intrinsics = manifest["intrinsics"]
-    for frame, image_metrics in zip(manifest["target_frames"], official):
+    for frame, perceptual in zip(manifest["target_frames"], target_perceptual):
         prefix = run_dir / "output/target-renders" / frame["id"]
         predicted_rgb = _regular_npy(Path(f"{prefix}.rgb.float32.npy"), "target RGB float")
         truth_rgb = _regular_npy(run_dir / "input" / frame["rgb_truth_path"], "truth RGB").astype(np.float64) / 255.0
@@ -326,16 +498,14 @@ def _evaluate_outputs(run_dir: Path, profile: str) -> dict[str, Any]:
             or np.any(accumulation > 1.0001)
         ):
             raise ValueError("Nerfacto target render shape, range, or finiteness mismatch")
-        mse = float(np.mean((predicted_rgb.astype(np.float64) - truth_rgb) ** 2))
-        psnr = float(-10.0 * math.log10(mse))
-        if not math.isclose(psnr, float(image_metrics["psnr_db"]), rel_tol=2e-5, abs_tol=2e-4):
-            raise ValueError("Nerfacto official and recomputed PSNR mismatch")
         foreground = truth_depth > 0.0
-        foreground_mse = float(np.mean((predicted_rgb[foreground].astype(np.float64) - truth_rgb[foreground]) ** 2))
-        psnrs.append(psnr)
-        foreground_psnrs.append(float(-10.0 * math.log10(foreground_mse)))
-        ssims.append(float(image_metrics["ssim"]))
-        lpips_values.append(float(image_metrics["lpips"]))
+        image_metrics = {
+            "id": frame["id"],
+            **_image_metrics(predicted_rgb, truth_rgb, foreground, perceptual),
+        }
+        if image_metrics["lpips"] < 0.0 or image_metrics["crop_lpips"] < 0.0:
+            raise ValueError("Nerfacto perceptual metrics must be non-negative")
+        target_image_metrics.append(image_metrics)
 
         qualified = accumulation >= SUPPORT_CONTRACT["accumulation_threshold"]
         supported = foreground & common
@@ -354,6 +524,11 @@ def _evaluate_outputs(run_dir: Path, profile: str) -> dict[str, Any]:
                 _points_from_depth(expected_depth, supported_valid, frame, intrinsics)
             )
             truth_points.append(_points_from_depth(truth_depth, supported, frame, intrinsics))
+        if np.any(unsupported_valid):
+            unsupported_residuals.append(
+                expected_depth[unsupported_valid] - truth_depth[unsupported_valid]
+            )
+            unsupported_truth_depths.append(truth_depth[unsupported_valid])
 
     if not median_residuals or supported_total == 0:
         raise ValueError("Nerfacto has no accumulation-qualified common-visible target rays")
@@ -374,6 +549,9 @@ def _evaluate_outputs(run_dir: Path, profile: str) -> dict[str, Any]:
             np.mean(np.abs(median_residual) / qualified_truth_depth)
         ),
         "expected_depth_rmse_m": float(np.sqrt(np.mean(expected_residual * expected_residual))),
+        "expected_depth_abs_rel": float(
+            np.mean(np.abs(expected_residual) / qualified_truth_depth)
+        ),
         "point_accuracy_rmse_m": float(np.sqrt(np.mean(accuracy * accuracy))),
         "point_completeness_rmse_m": float(np.sqrt(np.mean(completeness * completeness))),
         "point_samples_predicted": int(len(predicted_xyz)),
@@ -391,7 +569,12 @@ def _evaluate_outputs(run_dir: Path, profile: str) -> dict[str, Any]:
     density = _regular_npy(run_dir / "output/field.density_grid.float32.npy", "density grid")
     if density.dtype != np.float32 or density.shape != (resolution,) * 3 or not np.isfinite(density).all() or np.any(density < 0.0):
         raise ValueError("Nerfacto density grid shape, dtype, or values mismatch")
-    field = {
+    component_resolution = min(32, resolution)
+    component_indices = np.linspace(
+        0, resolution - 1, component_resolution, dtype=np.int64
+    )
+    component_grid = density[np.ix_(component_indices, component_indices, component_indices)]
+    field: dict[str, float | int] = {
         "density_min": float(np.min(density)),
         "density_median": float(np.median(density)),
         "density_p95": float(np.quantile(density, 0.95)),
@@ -400,38 +583,138 @@ def _evaluate_outputs(run_dir: Path, profile: str) -> dict[str, Any]:
         "occupied_fraction_ge_1": float(np.mean(density >= 1.0)),
         "occupied_fraction_ge_10": float(np.mean(density >= 10.0)),
         "occupied_fraction_ge_100": float(np.mean(density >= 100.0)),
+        "component_grid_resolution": component_resolution,
     }
-    comparator = _surface_comparator_record()[f"last_verified_{profile}"]
-    comparison = {
-        "metric_families_combined": False,
-        "identical_scene_contract_sha256": sha256_file(ROOT / "shared-scene.json"),
-        "surface_model_target_psnr_db": float(comparator["target_psnr_db"]),
-        "surface_model_common_visible_accuracy_rmse_m": float(
-            comparator["common_visible_accuracy_rmse_m"]
-        ),
-    }
+    for label, threshold in (("0_1", 0.1), ("1", 1.0), ("10", 10.0), ("100", 100.0)):
+        field[f"component_count_ge_{label}"] = _component_count(
+            component_grid >= threshold
+        )
+
+    for frame, perceptual in zip(primary_contexts, context_perceptual):
+        prefix = run_dir / "output/context-renders" / frame["id"]
+        predicted = _regular_npy(Path(f"{prefix}.rgb.float32.npy"), "context RGB float")
+        truth = _regular_npy(
+            run_dir / "input" / frame["rgb_truth_path"], "context truth RGB"
+        ).astype(np.float64) / 255.0
+        truth_depth = _regular_npy(
+            run_dir / "input" / frame["depth_path"], "context truth depth"
+        )
+        if predicted.shape != truth.shape or not np.isfinite(predicted).all():
+            raise ValueError("Nerfacto context render shape or finiteness mismatch")
+        context_image_metrics.append(
+            {
+                "id": frame["id"],
+                **_image_metrics(predicted, truth, truth_depth > 0.0, perceptual),
+            }
+        )
+
+    sweep: dict[str, dict[str, float | int]] = {}
+    for count in (3, 5, 9):
+        psnrs: list[float] = []
+        depth_residuals: list[np.ndarray] = []
+        for frame in manifest["target_frames"]:
+            prefix = run_dir / "output/view-sweep" / f"views-{count}" / frame["id"]
+            predicted = _regular_npy(Path(f"{prefix}.rgb.float32.npy"), "sweep target RGB")
+            expected_depth = _regular_npy(
+                Path(f"{prefix}.expected-camera-depth.npy"), "sweep expected depth"
+            )
+            accumulation = _regular_npy(
+                Path(f"{prefix}.accumulation.npy"), "sweep accumulation"
+            )
+            truth = _regular_npy(
+                run_dir / "input" / frame["rgb_truth_path"], "sweep truth RGB"
+            ).astype(np.float64) / 255.0
+            truth_depth = _regular_npy(
+                run_dir / "input" / frame["depth_path"], "sweep truth depth"
+            )
+            common = _regular_npy(
+                run_dir / "input" / frame["common_visible_mask_path"],
+                "sweep support",
+            ).astype(bool)
+            if (
+                predicted.shape != truth.shape
+                or expected_depth.shape != truth_depth.shape
+                or accumulation.shape != truth_depth.shape
+                or not all(
+                    np.isfinite(value).all()
+                    for value in (predicted, expected_depth, accumulation)
+                )
+            ):
+                raise ValueError("Nerfacto view-sweep output mismatch")
+            psnrs.append(_psnr(predicted, truth))
+            valid = (
+                (truth_depth > 0.0)
+                & common
+                & (accumulation >= SUPPORT_CONTRACT["accumulation_threshold"])
+                & (expected_depth > 0.0)
+            )
+            if np.any(valid):
+                depth_residuals.append(expected_depth[valid] - truth_depth[valid])
+        if not depth_residuals:
+            raise ValueError("Nerfacto view sweep has no qualified geometry support")
+        residual = np.concatenate(depth_residuals).astype(np.float64)
+        sweep[str(count)] = {
+            "context_views": count,
+            "iterations": 1000,
+            "rays_per_batch": 1024,
+            "target_psnr_db": float(np.mean(psnrs)),
+            "expected_depth_rmse_m": float(np.sqrt(np.mean(residual * residual))),
+        }
+
+    unsupported_residual = (
+        np.concatenate(unsupported_residuals).astype(np.float64)
+        if unsupported_residuals
+        else np.empty(0, dtype=np.float64)
+    )
+    unsupported_truth_depth = (
+        np.concatenate(unsupported_truth_depths).astype(np.float64)
+        if unsupported_truth_depths
+        else np.empty(0, dtype=np.float64)
+    )
+
+    def mean_metric(rows: list[dict[str, Any]], key: str) -> float:
+        return float(np.mean([float(row[key]) for row in rows]))
+
     metrics = {
         "rendering": {
-            "target_psnr_db": float(np.mean(psnrs)),
-            "target_foreground_psnr_db": float(np.mean(foreground_psnrs)),
-            "target_ssim": float(np.mean(ssims)),
-            "target_lpips": float(np.mean(lpips_values)),
-            "target_views": len(psnrs),
+            "metric_implementation": "host-numpy-gaussian-ssim-v1; LPIPS from pinned container",
+            "target_psnr_db": mean_metric(target_image_metrics, "psnr_db"),
+            "target_foreground_psnr_db": mean_metric(
+                target_image_metrics, "foreground_psnr_db"
+            ),
+            "target_ssim": mean_metric(target_image_metrics, "ssim"),
+            "target_crop_psnr_db": mean_metric(target_image_metrics, "crop_psnr_db"),
+            "target_crop_ssim": mean_metric(target_image_metrics, "crop_ssim"),
+            "target_lpips": mean_metric(target_image_metrics, "lpips"),
+            "target_crop_lpips": mean_metric(target_image_metrics, "crop_lpips"),
+            "target_views": len(target_image_metrics),
+            "target_per_view": target_image_metrics,
+            "context_fit_psnr_db": mean_metric(context_image_metrics, "psnr_db"),
+            "context_fit_ssim": mean_metric(context_image_metrics, "ssim"),
+            "context_fit_lpips": mean_metric(context_image_metrics, "lpips"),
+            "context_fit_views": len(context_image_metrics),
+            "context_fit_per_view": context_image_metrics,
         },
         "geometry": geometry,
         "field": field,
-        "comparison": comparison,
+        "failure_sweep": sweep,
         "unsupported": {
             "truth_rays": unsupported_total,
             "accumulation_qualified_rays": unsupported_qualified,
             "accumulation_coverage": 0.0 if unsupported_total == 0 else unsupported_qualified / unsupported_total,
+            "expected_depth_rmse_m": 0.0
+            if not len(unsupported_residual)
+            else float(np.sqrt(np.mean(unsupported_residual * unsupported_residual))),
+            "expected_depth_abs_rel": 0.0
+            if not len(unsupported_residual)
+            else float(
+                np.mean(np.abs(unsupported_residual) / unsupported_truth_depth)
+            ),
             "completion_claim": "none",
         },
     }
-    ensure_finite(
-        {key: value for key, value in metrics.items() if key != "comparison"},
-        "Nerfacto scored metrics",
-    )
+    ensure_finite(metrics, "Nerfacto scored metrics")
+    _validate_failure_sweep(run_dir, metrics)
     return metrics
 
 
@@ -443,10 +726,30 @@ def _validate_runtime_identity(run_dir: Path, profile: str) -> dict[str, Any]:
     manifest = _parse_key_value_manifest(_require_regular_file(run_dir, "output/insula-manifest.txt"))
     if manifest != PINNED_INSULA_MANIFEST:
         raise ValueError("radiance-field Insula manifest mismatch")
+    locks = load_json(ROOT / "insulas/locks.json")["insulas"]["radiance-field"]
+    requirements_lock = _require_regular_file(run_dir, "output/requirements.lock.txt")
+    resolved_requirements = _require_regular_file(
+        run_dir, "output/resolved-requirements.txt"
+    )
+    if (
+        sha256_file(ROOT / "insulas/radiance-field/requirements.lock.txt")
+        != REQUIREMENTS_LOCK_SHA256
+        or sha256_file(requirements_lock) != REQUIREMENTS_LOCK_SHA256
+        or sha256_file(
+            ROOT / "insulas/radiance-field/resolved-requirements.lock.txt"
+        )
+        != locks.get("resolved_requirements_sha256")
+        or sha256_file(resolved_requirements)
+        != locks.get("resolved_requirements_sha256")
+    ):
+        raise ValueError("Nerfacto dependency lock or resolved manifest mismatch")
     versions = load_json(_require_regular_file(run_dir, "output/runtime-versions.json"))
     if (
         versions.get("nerfstudio_commit") != PINNED_NERFSTUDIO_COMMIT
         or versions.get("tiny_cuda_nn_commit") != PINNED_TCNN_COMMIT
+        or versions.get("requirements_lock_sha256") != REQUIREMENTS_LOCK_SHA256
+        or versions.get("resolved_requirements_sha256")
+        != locks.get("resolved_requirements_sha256")
         or versions.get("torch") != "2.7.1+cu128"
         or versions.get("torchvision") != "0.22.1+cu128"
         or versions.get("pillow") != "11.1.0"
@@ -485,6 +788,8 @@ def _validate_runtime_identity(run_dir: Path, profile: str) -> dict[str, Any]:
         or summary.get("dataloader_num_workers") != 1
         or summary.get("tf32") is not False
         or summary.get("seed") != 260925
+        or summary.get("trained_view_sweep")
+        != {"context_views": [3, 5, 9], "iterations": 1000, "rays_per_batch": 1024}
         or not isinstance(summary.get("training_seconds"), (int, float))
         or summary["training_seconds"] <= 0
         or not math.isclose(summary.get("training_steps_per_second", -1.0), expected["iterations"] / summary["training_seconds"], rel_tol=1e-9)
@@ -534,7 +839,7 @@ def _report(profile: str, metrics: dict[str, Any]) -> str:
 
 ## Rendering
 
-Held-out target PSNR: {metrics['rendering']['target_psnr_db']:.3f} dB; SSIM: {metrics['rendering']['target_ssim']:.4f}; LPIPS: {metrics['rendering']['target_lpips']:.4f}.
+Held-out target PSNR: {metrics['rendering']['target_psnr_db']:.3f} dB; host-recomputed SSIM: {metrics['rendering']['target_ssim']:.4f}; pinned-container LPIPS: {metrics['rendering']['target_lpips']:.4f}. Context fit is reported separately at {metrics['rendering']['context_fit_psnr_db']:.3f} dB PSNR.
 
 ## Geometry
 
@@ -542,7 +847,7 @@ Accumulation-qualified common-visible expected-depth RMSE: {metrics['geometry'][
 
 ## Interpretation
 
-Nerfacto optimizes one deterministic per-scene density/radiance field. Density has no canonical surface level, and neither target-view stochasticity nor a hidden-scene posterior is sampled. The retained NeuS-Facto values are shown only as a separate surface-oriented comparator; no composite rank is formed.
+Nerfacto performs one seeded per-scene density/radiance optimization; CUDA execution can vary numerically. Density has no canonical surface level, and neither target-view stochasticity nor a hidden-scene posterior is sampled. The trained 3/5/9-view sweep is failure evidence. Module 09's retained mesh metrics use a different evaluator and are not copied into this result or collapsed into a composite rank.
 """
 
 
@@ -552,13 +857,13 @@ def _entrypoint_command(profile: str) -> list[str]:
         "/usr/bin/time",
         "-v",
         "-o",
-        "/work/output/resource-usage.txt",
+        "/output/resource-usage.txt",
         "python",
         "/usr/local/bin/run-nerfacto.py",
         "--input",
-        "/work/input",
+        "/input",
         "--output",
-        "/work/output",
+        "/output",
         "--iterations",
         str(config["iterations"]),
         "--rays-per-batch",
@@ -600,7 +905,9 @@ def _container_command(
         "-v",
         f"{cuda_cache}:/cuda-cache",
         "-v",
-        f"{staging.resolve()}:/work",
+        f"{(staging / 'input').resolve()}:/input:ro",
+        "-v",
+        f"{(staging / 'output').resolve()}:/output",
         "-v",
         f"{lpips_checkpoint}:/model/hub/checkpoints/{LPIPS_CHECKPOINT_FILENAME}:ro",
         image_id,
@@ -626,6 +933,8 @@ def _expected_config(
         "input_manifest_sha256": sha256_file(run_dir / "input/manifest.json"),
         "source_commit": PINNED_NERFSTUDIO_COMMIT,
         "dependency_commit": PINNED_TCNN_COMMIT,
+        "requirements_lock_sha256": REQUIREMENTS_LOCK_SHA256,
+        "resolved_requirements_sha256": load_json(ROOT / "insulas/locks.json")["insulas"]["radiance-field"]["resolved_requirements_sha256"],
         **PROFILE_CONFIG[profile],
         "seed": 260925,
         "camera_optimizer": "off",
@@ -637,6 +946,11 @@ def _expected_config(
         "context_split_mode": "all-context-frames-train-and-eval",
         "dataloader_num_workers": 1,
         "tf32": False,
+        "trained_view_sweep": {
+            "context_views": [3, 5, 9],
+            "iterations": 1000,
+            "rays_per_batch": 1024,
+        },
         "container_user_environment": {"USER": "surflo"},
         "support": SUPPORT_CONTRACT,
         "cuda_cache": CUDA_CACHE_POLICY,
@@ -715,7 +1029,9 @@ def run_nerfacto_reference(cache_root: Path, profile: str, run_id: str) -> Path:
     final = final_parent / ADAPTER
     if os.path.lexists(final_parent):
         raise FileExistsError(f"reference run already exists: {final}")
-    staging = staging_root / f"{run_id}.{ADAPTER}.{uuid.uuid4().hex}"
+    promotion = staging_root / f"{run_id}.{ADAPTER}.{uuid.uuid4().hex}"
+    staging = promotion / ADAPTER
+    promotion.mkdir()
     staging.mkdir()
     started = time.perf_counter()
     try:
@@ -791,9 +1107,8 @@ def run_nerfacto_reference(cache_root: Path, profile: str, run_id: str) -> Path:
         ensure_finite(result, "Nerfacto reference result")
         write_json(staging / "result.json", result)
         validate_nerfacto_reference_result(staging)
-        final_parent.mkdir()
-        os.replace(staging, final)
+        os.replace(promotion, final_parent)
         return final
     except BaseException:
-        shutil.rmtree(staging, ignore_errors=True)
+        shutil.rmtree(promotion, ignore_errors=True)
         raise

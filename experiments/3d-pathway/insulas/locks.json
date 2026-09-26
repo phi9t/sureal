@@ -49,7 +49,9 @@
       "pytorch": "2.7.1+cu128",
       "torchvision": "0.22.1+cu128",
       "pillow": "11.1.0",
-      "dockerfile_sha256": "14d812be2124ce95de554a08bedd06bbc9e8625d8a5b3d63d39a2f6be15f1690"
+      "requirements_lock_sha256": "02c623f2a636dd774dda048f1a08c8d936d0701f74d3f50b3a7916d2280ed65a",
+      "resolved_requirements_sha256": "75324c79132de2fcf25b60444c7e9820baeebbc3a6db2002eb601ac2b5c33e4c",
+      "dockerfile_sha256": "e18c649ef1b448cd22264354be6ab73558c62b1b4499c3dafe31526b97a58a2d"
     }
   }
 }

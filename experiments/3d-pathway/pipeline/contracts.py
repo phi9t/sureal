@@ -87,6 +87,19 @@ def validate_run_id(run_id: str) -> str:
 
 def validate_json_schema_instance(instance: Any, schema: dict[str, Any], location: str = "root") -> None:
     """Validate the dependency-free subset used by the tracked result/report schemas."""
+    for index, branch in enumerate(schema.get("allOf", [])):
+        validate_json_schema_instance(instance, branch, f"{location}.allOf[{index}]")
+    if "if" in schema:
+        try:
+            validate_json_schema_instance(instance, schema["if"], f"{location}.if")
+        except ValueError:
+            conditional = schema.get("else")
+            suffix = "else"
+        else:
+            conditional = schema.get("then")
+            suffix = "then"
+        if conditional is not None:
+            validate_json_schema_instance(instance, conditional, f"{location}.{suffix}")
     if "const" in schema and instance != schema["const"]:
         raise ValueError(f"schema const mismatch at {location}")
     if "enum" in schema and instance not in schema["enum"]:
@@ -95,6 +108,11 @@ def validate_json_schema_instance(instance: Any, schema: dict[str, Any], locatio
     types = {"object": dict, "array": list, "string": str, "boolean": bool, "number": (int, float), "integer": int}
     if expected in types and not isinstance(instance, types[expected]):
         raise ValueError(f"schema type mismatch at {location}: expected {expected}")
+    if isinstance(instance, (int, float)) and not isinstance(instance, bool):
+        if "minimum" in schema and instance < schema["minimum"]:
+            raise ValueError(f"schema minimum mismatch at {location}")
+        if "maximum" in schema and instance > schema["maximum"]:
+            raise ValueError(f"schema maximum mismatch at {location}")
     if isinstance(instance, str) and "pattern" in schema and re.fullmatch(schema["pattern"], instance) is None:
         raise ValueError(f"schema pattern mismatch at {location}")
     if isinstance(instance, list):

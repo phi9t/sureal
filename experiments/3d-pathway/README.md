@@ -3,8 +3,9 @@
 This directory backs the survey in
 [`docs/3d-reconstruction-pathway.md`](../../docs/3d-reconstruction-pathway.md).
 It provides deterministic concept labs for all fifteen modules, machine-readable
-source and asset registries, a common controlled scene, five distinct Insula
-definitions, provenance-aware run storage, and citation/terminology auditing.
+source and asset registries, a common controlled scene, six local Insula
+definitions plus the reused Blender and Surflo environments, provenance-aware
+run storage, and citation/terminology auditing.
 
 The smoke profile is the numerical and CI contract. The full profile only
 increases the deterministic repo-owned fixture workloads. Maintained systems
@@ -25,6 +26,7 @@ experiments/3d-pathway/run.sh reference --adapter colmap-mvs --profile smoke --r
 experiments/3d-pathway/run.sh reference --adapter orb-slam --profile smoke --run-id orb-slam-demo
 experiments/3d-pathway/run.sh reference --adapter depth-anything-v2 --profile smoke --run-id dav2-demo
 experiments/3d-pathway/run.sh reference --adapter neus-facto --profile smoke --run-id neus-demo
+experiments/3d-pathway/run.sh reference --adapter nerfacto --profile smoke --run-id nerfacto-demo
 python3 experiments/3d-pathway/pipeline/audit.py --offline
 
 # Required real-container gates (the full gate is intentionally opt-in):
@@ -36,6 +38,8 @@ python3 experiments/3d-pathway/pipeline/audit.py --offline
 (cd experiments/3d-pathway && SURFLO_REQUIRE_DEPTH_ANYTHING_FULL=1 python3 -m unittest -q tests.test_depth_anything_reference.DepthAnythingReferenceAdapterTest.test_real_full_reference_runs_when_required)
 (cd experiments/3d-pathway && SURFLO_REQUIRE_NEUS_FACTO_REFERENCE=1 python3 -m unittest -q tests.test_neus_facto_reference.NeuSFactoReferenceAdapterTest.test_real_profiles_are_explicit_b200_gates)
 (cd experiments/3d-pathway && SURFLO_REQUIRE_NEUS_FACTO_FULL=1 python3 -m unittest -q tests.test_neus_facto_reference.NeuSFactoReferenceAdapterTest.test_real_profiles_are_explicit_b200_gates)
+(cd experiments/3d-pathway && SURFLO_REQUIRE_NERFACTO_REFERENCE=1 python3 -m unittest -q tests.test_nerfacto_reference.NerfactoReferenceExecutionContractTest.test_real_profiles_are_explicit_b200_gates)
+(cd experiments/3d-pathway && SURFLO_REQUIRE_NERFACTO_FULL=1 python3 -m unittest -q tests.test_nerfacto_reference.NerfactoReferenceExecutionContractTest.test_real_profiles_are_explicit_b200_gates)
 
 # Explicit network boundaries:
 experiments/3d-pathway/run.sh build
@@ -130,6 +134,18 @@ field from calibrated RGB, extracts a 128-cube smoke or 256-cube full mesh,
 and reports common-visible geometry, held-out rendering, Eikonal residuals,
 and unsupported geometry separately. Back-side output is never called
 completion or a sampled scene hypothesis.
+
+The Nerfacto adapter uses a separate CUDA 12.8 Insula with the same immutable
+Nerfstudio and tiny-cuda-nn source commits, an exact Python requirements lock,
+and a byte-compared full resolved-package manifest. Inputs are mounted
+read-only, output is mounted separately, and execution has no network. The
+primary five-view smoke or nine-view full fit renders held-out targets and
+separately labelled context diagnostics; a fixed 3/5/9-view, 1,000-step sweep
+records sparse-view failure evidence. Host evaluation recomputes PSNR, a fixed
+Gaussian-window SSIM, visible-support depth/point metrics, unsupported-region
+errors, density occupancy, and component counts from persisted arrays. LPIPS
+comes from the pinned container but is not an acceptance gate. Density remains
+a rendering field diagnostic, not an SDF surface or hidden-scene completion.
 
 Runs default to `~/.cache/surflo/3d-pathway`. Set
 `SURFLO_PATHWAY_CACHE_ROOT` to choose another cache. A module first writes to

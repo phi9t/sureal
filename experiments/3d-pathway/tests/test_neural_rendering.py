@@ -37,6 +37,14 @@ class LearnedAndRenderableLabContractTest(unittest.TestCase):
             self.assertEqual(comparison["evidence"], "posed RGB only")
             self.assertEqual(comparison["radiance_field"]["representation"], "volume density and radiance")
             self.assertEqual(comparison["surface_model"]["representation"], "signed-distance level set")
+            self.assertEqual(
+                comparison["radiance_field"]["rendering_operator"],
+                "alpha compositing",
+            )
+            self.assertEqual(
+                comparison["surface_model"]["rendering_operator"],
+                "zero-level ray intersection",
+            )
             self.assertFalse(comparison["radiance_field"]["completion_claim"])
             self.assertFalse(comparison["surface_model"]["completion_claim"])
 
@@ -44,6 +52,11 @@ class LearnedAndRenderableLabContractTest(unittest.TestCase):
                 truth_rgb = arrays["truth_rgb"]
                 evaluation_mask = arrays["evaluation_mask"].astype(bool)
                 truth_depth = arrays["truth_depth_m"]
+                sample_depths = arrays["sample_depths_m"]
+                surface_sdf = arrays["surface_model_sdf_samples"]
+                self.assertEqual(surface_sdf.shape, (*truth_depth.shape, len(sample_depths)))
+                crossing = (surface_sdf[..., :-1] <= 0.0) & (surface_sdf[..., 1:] >= 0.0)
+                self.assertTrue(np.all(np.any(crossing[evaluation_mask], axis=-1)))
                 recomputed = {}
                 for name in ("radiance_field", "surface_model"):
                     predicted_rgb = arrays[f"{name}_rgb"]
@@ -52,6 +65,32 @@ class LearnedAndRenderableLabContractTest(unittest.TestCase):
                     recomputed[f"{name}_psnr_db"] = float(-10.0 * np.log10(mse))
                     residual = predicted_depth[evaluation_mask] - truth_depth[evaluation_mask]
                     recomputed[f"{name}_rmse_m"] = float(np.sqrt(np.mean(residual * residual)))
+
+                crossing_index = np.argmax(crossing, axis=-1)
+                low = np.take(sample_depths, crossing_index)
+                high = np.take(sample_depths, crossing_index + 1)
+                low_sdf = np.take_along_axis(
+                    surface_sdf, crossing_index[..., None], axis=-1
+                )[..., 0]
+                high_sdf = np.take_along_axis(
+                    surface_sdf, (crossing_index + 1)[..., None], axis=-1
+                )[..., 0]
+                offset = np.zeros_like(low)
+                np.divide(
+                    low_sdf * (high - low),
+                    high_sdf - low_sdf,
+                    out=offset,
+                    where=(high_sdf - low_sdf) != 0.0,
+                )
+                root = low - offset
+                self.assertTrue(
+                    np.allclose(
+                        arrays["surface_model_depth_m"][evaluation_mask],
+                        root[evaluation_mask],
+                        atol=1e-12,
+                        rtol=0.0,
+                    )
+                )
 
             rendering = result["metrics"]["rendering"]
             geometry = result["metrics"]["geometry"]
@@ -66,7 +105,7 @@ class LearnedAndRenderableLabContractTest(unittest.TestCase):
                 places=10,
             )
             self.assertAlmostEqual(
-                geometry["radiance_field_surface_rmse_m"],
+                geometry["radiance_field_rendered_depth_rmse_m"],
                 recomputed["radiance_field_rmse_m"],
                 places=10,
             )
@@ -135,7 +174,7 @@ class LearnedAndRenderableLabContractTest(unittest.TestCase):
 
             radiance = results["10"]["metrics"]
             self.assertGreater(radiance["rendering"]["radiance_field_psnr_db"], radiance["rendering"]["surface_model_psnr_db"])
-            self.assertGreater(radiance["geometry"]["radiance_field_surface_rmse_m"], radiance["geometry"]["surface_model_rmse_m"])
+            self.assertGreater(radiance["geometry"]["radiance_field_rendered_depth_rmse_m"], radiance["geometry"]["surface_model_rmse_m"])
 
             splats = results["11"]["metrics"]
             self.assertGreater(splats["rendering"]["splat_psnr_db"], splats["rendering"]["extracted_mesh_psnr_db"])

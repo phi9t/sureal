@@ -31,6 +31,26 @@ def run_cli(*args: str, cache: Path | None = None) -> subprocess.CompletedProces
 
 
 class RegistryContractTest(unittest.TestCase):
+    def test_dependency_free_schema_validator_enforces_conditional_branches(self) -> None:
+        from contracts import validate_json_schema_instance
+
+        schema = {
+            "type": "object",
+            "allOf": [
+                {
+                    "if": {"properties": {"adapter": {"const": "nerfacto"}}},
+                    "then": {"required": ["support"]},
+                }
+            ],
+        }
+        validate_json_schema_instance(
+            {"adapter": "other"}, schema, "conditional fixture"
+        )
+        with self.assertRaisesRegex(ValueError, "support"):
+            validate_json_schema_instance(
+                {"adapter": "nerfacto"}, schema, "conditional fixture"
+            )
+
     def test_curriculum_schema_declares_stable_module_contract(self) -> None:
         schema = json.loads((ROOT / "curriculum.schema.json").read_text())
         module = schema["$defs"]["module"]

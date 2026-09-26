@@ -144,12 +144,13 @@
         "required": ["support"],
         "properties": {
           "metrics": {
-            "required": ["rendering", "geometry", "field", "comparison"],
+            "required": ["rendering", "geometry", "field", "failure_sweep", "unsupported"],
             "properties": {
               "rendering": {"type": "object"},
               "geometry": {"type": "object"},
               "field": {"type": "object"},
-              "comparison": {"type": "object"}
+              "failure_sweep": {"type": "object"},
+              "unsupported": {"type": "object"}
             }
           },
           "tool": {"required": ["source_commit", "dependency_commit"]}

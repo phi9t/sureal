@@ -21,23 +21,27 @@ RUN python3 -m venv /opt/venv \
       --index-url https://download.pytorch.org/whl/cu128 \
       torch==2.7.1 torchvision==0.22.1
 
+COPY requirements.lock.txt /etc/surflo-pathway-requirements.lock.txt
+COPY resolved-requirements.lock.txt /etc/surflo-pathway-resolved-requirements.lock.txt
+RUN python -m pip install --no-cache-dir \
+      --requirement /etc/surflo-pathway-requirements.lock.txt
+
 RUN mkdir -p /opt/src/nerfstudio \
  && git -C /opt/src/nerfstudio init \
  && git -C /opt/src/nerfstudio remote add origin https://github.com/nerfstudio-project/nerfstudio.git \
  && git -C /opt/src/nerfstudio fetch --depth 1 origin "${NERFSTUDIO_COMMIT}" \
  && git -C /opt/src/nerfstudio checkout --detach FETCH_HEAD \
  && test "$(git -C /opt/src/nerfstudio rev-parse HEAD)" = "${NERFSTUDIO_COMMIT}" \
- && python -m pip install --no-cache-dir /opt/src/nerfstudio
+ && python -m pip install --no-cache-dir --no-deps /opt/src/nerfstudio
 
 RUN git clone --recursive https://github.com/NVlabs/tiny-cuda-nn.git /opt/src/tiny-cuda-nn \
  && git -C /opt/src/tiny-cuda-nn checkout --detach "${TCNN_COMMIT}" \
  && git -C /opt/src/tiny-cuda-nn submodule update --init --recursive \
  && test "$(git -C /opt/src/tiny-cuda-nn rev-parse HEAD)" = "${TCNN_COMMIT}" \
- && TCNN_CUDA_ARCHITECTURES=100 python -m pip install --no-cache-dir /opt/src/tiny-cuda-nn/bindings/torch
-
-# Nerfstudio's pinned pil_to_numpy implementation calls the pre-Pillow-12
-# private encoder signature. Keep that compatibility dependency explicit.
-RUN python -m pip install --no-cache-dir --force-reinstall Pillow==11.1.0
+ && TCNN_CUDA_ARCHITECTURES=100 python -m pip install --no-cache-dir --no-deps /opt/src/tiny-cuda-nn/bindings/torch \
+ && python -m pip check \
+ && python -m pip freeze --all > /etc/surflo-pathway-resolved-requirements.txt \
+ && cmp /etc/surflo-pathway-resolved-requirements.lock.txt /etc/surflo-pathway-resolved-requirements.txt
 
 RUN printf '%s\n' \
       'schema_version=1' \
@@ -50,6 +54,7 @@ RUN printf '%s\n' \
       "nerfstudio_commit=${NERFSTUDIO_COMMIT}" \
       "tiny_cuda_nn_commit=${TCNN_COMMIT}" \
       'tcnn_cuda_architectures=100' \
+      'requirements_lock_sha256=02c623f2a636dd774dda048f1a08c8d936d0701f74d3f50b3a7916d2280ed65a' \
       'network_policy=build-and-fetch-only' \
       > /etc/surflo-pathway-insula
 

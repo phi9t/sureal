@@ -101,7 +101,8 @@ Use seed `260925`, one GPU, TF32 off, deterministic cuDNN flags where honored,
 and no camera, mask, depth, normal, or monocular-prior supervision.  Lossless
 context RGB is the sole optimized evidence.  Store every effective field,
 optimizer, scheduler, sampler, precision, and determinism setting rather than
-assuming the method name captures them.
+assuming the method name captures them.  These controls do not make
+tiny-cuda-nn hash-grid updates bitwise deterministic.
 
 ## Identical-scene comparison with Module 09
 
@@ -182,10 +183,14 @@ Report separate metric families:
   metres, and threshold-wise component counts.  Any marching-cubes output
   belongs only to this threshold sweep because density has no canonical
   surface threshold.
-- **Comparison:** evaluate the Nerfacto and retained NeuS-Facto target arrays
-  with one shared metric implementation and identical masks, colour range,
-  crop, depths, and camera transform.  Show rendering and geometry columns side
-  by side; do not collapse them into a composite rank.
+- **Comparison guardrail:** the repo-owned concept lab evaluates analytic
+  volume density by alpha compositing and an analytic SDF by zero-level ray
+  intersection with one shared metric implementation.  The maintained Module
+  09 and Module 10 adapters retain different artifacts and geometry-support
+  definitions, so their registry scalars must not be copied into a supposed
+  common-evaluator table.  A later empirical cross-model comparison would need
+  both retained target arrays, identical masks/crops/depth conversion, and a
+  separately hash-bound shared evaluator.
 
 For the render family, compute each metric per target in RGB `[0,1]`, retain
 all three per-view values, and use their arithmetic mean as the primary
@@ -206,10 +211,9 @@ substantially wrong depth
 ([NeRF++ paper](https://arxiv.org/abs/2010.07492),
 [NerfingMVS paper](https://openaccess.thecvf.com/content/ICCV2021/html/Wei_NerfingMVS_Guided_Optimization_of_Neural_Radiance_Fields_for_Indoor_Multi-View_ICCV_2021_paper.html)).
 
-The first landing should set regression tolerances only after at least two
-verified B200 smoke runs and one full run.  Until those executions exist, record
-outcomes as uncalibrated measurements rather than fabricating acceptance
-numbers.  The mandatory failure sweep is context-view count (3, 5, 9) with the
+The landed regression tolerances were calibrated from repeated B200 smoke runs
+and full runs and intentionally bound the observed variation.  The mandatory
+failure sweep is context-view count (3, 5, 9) with the
 same target cameras and the smoke budget held at 1,000 steps x 1,024 rays: use
 azimuths `{-45,-5,35}`, the declared five-view set, and the generated nine-view
 set respectively.  Fixed pose perturbation, target-only appearance change,
@@ -222,7 +226,7 @@ repository threshold must come from its own controlled measurements
 
 | Item | Locked rule | Evidence and consequence |
 |---|---|---|
-| Nerfstudio | Commit [`50e0e3c`](https://github.com/nerfstudio-project/nerfstudio/tree/50e0e3c70c775e89333256213363badbf074f29d), Apache-2.0 | Install from the immutable source tree, not floating PyPI; `nerfacto` and `neus-facto` then share one audited framework pin ([licence](https://github.com/nerfstudio-project/nerfstudio/blob/50e0e3c70c775e89333256213363badbf074f29d/LICENSE)). |
+| Nerfstudio | Commit [`50e0e3c`](https://github.com/nerfstudio-project/nerfstudio/tree/50e0e3c70c775e89333256213363badbf074f29d), Apache-2.0 | Install from the immutable source tree with `--no-deps`; the tracked exact requirements lock and byte-compared full `pip freeze --all` manifest prevent floating transitive resolution, while `nerfacto` and `neus-facto` share one audited framework pin ([licence](https://github.com/nerfstudio-project/nerfstudio/blob/50e0e3c70c775e89333256213363badbf074f29d/LICENSE)). |
 | GPU runtime | Existing Ubuntu 24.04 / CUDA 12.8.1 / `torch==2.7.1+cu128` / `torchvision==0.22.1+cu128` image | PyTorch 2.7 introduced Blackwell support and CUDA 12.8 wheels; that supports the stack choice, not this method's numerical correctness ([PyTorch 2.7 release](https://pytorch.org/blog/pytorch-2-7/), [repository Insula lock](../insulas/locks.json)). |
 | tiny-cuda-nn | Commit [`0109538c37ac0bf613f2bac8de6cda48352feca7`](https://github.com/NVlabs/tiny-cuda-nn/tree/0109538c37ac0bf613f2bac8de6cda48352feca7), built with `TCNN_CUDA_ARCHITECTURES=100` | NVIDIA lists B200 as compute capability 10.0, and CUDA 12.8 adds compiler support for `SM_100`.  The pinned binding reads that environment variable and permits architecture 100 with CUDA >=12.8 ([NVIDIA GPU table](https://developer.nvidia.com/cuda/gpus), [CUDA 12.8 release notes](https://docs.nvidia.com/cuda/archive/12.8.0/cuda-toolkit-release-notes/), [binding setup](https://github.com/NVlabs/tiny-cuda-nn/blob/0109538c37ac0bf613f2bac8de6cda48352feca7/bindings/torch/setup.py)). |
 | Incidental learned asset | Reuse the Module 09 hash-locked torchvision AlexNet weights | The pinned model eagerly constructs LPIPS for evaluation, but this asset does not initialize the radiance field and is not a reconstruction prior ([model source](https://github.com/nerfstudio-project/nerfstudio/blob/50e0e3c70c775e89333256213363badbf074f29d/nerfstudio/models/nerfacto.py), [Module 09 lock description](module09-reference-selection.md)). |
@@ -245,7 +249,7 @@ record its immutable OCI ID and resolved package manifest.
 
 | Candidate | Primary-source semantics | Practical assessment | Outcome |
 |---|---|---|---|
-| **Pinned Nerfstudio Nerfacto** | Core recommended per-scene density/radiance method; hash field, two proposal networks, scene contraction, pose refinement and appearance codes are explicit components ([docs](https://github.com/nerfstudio-project/nerfstudio/blob/50e0e3c70c775e89333256213363badbf074f29d/docs/nerfology/methods/nerfacto.md)). | Reuses the exact framework, tcnn build, licence, LPIPS asset, and much of the container already exercised by Module 09; controlled config can remove pose/appearance confounders. | **Select.** Lowest-integration-cost maintained landing with a direct identical-scene comparison. |
+| **Pinned Nerfstudio Nerfacto** | Core recommended per-scene density/radiance method; hash field, two proposal networks, scene contraction, pose refinement and appearance codes are explicit components ([docs](https://github.com/nerfstudio-project/nerfstudio/blob/50e0e3c70c775e89333256213363badbf074f29d/docs/nerfology/methods/nerfacto.md)). | Reuses the exact framework, tcnn build, licence, LPIPS asset, and much of the container already exercised by Module 09; controlled config can remove pose/appearance confounders. | **Select.** Lowest-integration-cost maintained landing on the identical scene, with task metrics kept evaluator-specific. |
 | Nerfstudio `vanilla-nerf` | Two positional-encoding MLP fields, 64 coarse plus 128 importance samples, coarse/fine RGB MSE; registered as slow ([model](https://github.com/nerfstudio-project/nerfstudio/blob/50e0e3c70c775e89333256213363badbf074f29d/nerfstudio/models/vanilla_nerf.py), [registry](https://github.com/nerfstudio-project/nerfstudio/blob/50e0e3c70c775e89333256213363badbf074f29d/nerfstudio/configs/method_configs.py)). | Useful historical semantic control, but its pinned preset is wired to the Blender parser and omits the maintained fast-path choices this module is meant to exercise. | Later ablation; not the first maintained adapter. |
 | Nerfstudio `instant-ngp-bounded` | Bounded hash field with scene contraction disabled, one occupancy-grid level, black background and 8,192 rays/batch ([exact preset](https://github.com/nerfstudio-project/nerfstudio/blob/50e0e3c70c775e89333256213363badbf074f29d/nerfstudio/configs/method_configs.py)). | Same framework and a strong speed control, but its occupancy-grid/dynamic-batch pipeline changes more at once and gives a less direct comparison to NeuS-Facto's proposal-sampled path. | Secondary speed ablation. |
 | Official original NeRF | Per-scene 5D MLP queried along rays and optimized from posed images through differentiable volume rendering ([paper](https://arxiv.org/abs/2003.08934), [official repository](https://github.com/bmild/nerf/tree/14c55567a6d0fbd75d3fd12b0411f98160ba3237)). | Historically authoritative, but the release specifies Python 3.7, TensorFlow 1.15 and CUDA 10.0, so it would add a second compatibility port solely to reproduce semantics already available in the pinned framework ([environment file](https://github.com/bmild/nerf/blob/14c55567a6d0fbd75d3fd12b0411f98160ba3237/environment.yml)). | Historical reference, not the maintained execution dependency. |

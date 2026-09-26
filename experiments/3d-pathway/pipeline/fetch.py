@@ -14,6 +14,7 @@ import tarfile
 import time
 import uuid
 from urllib.request import urlopen
+import zipfile
 
 from contracts import ROOT, load_json, sha256_file
 
@@ -24,7 +25,13 @@ def _write_json_atomic(path: Path, value: object) -> None:
     os.replace(temporary, path)
 
 
-def _extraction_manifest(root: Path, archive: Path, declared_root: str) -> dict[str, object]:
+def _extraction_manifest(
+    root: Path,
+    archive: Path,
+    declared_root: str | None = None,
+    *,
+    declared_roots: list[str] | None = None,
+) -> dict[str, object]:
     files = []
     for path in sorted(root.rglob("*")):
         mode = path.lstat().st_mode
@@ -36,32 +43,61 @@ def _extraction_manifest(root: Path, archive: Path, declared_root: str) -> dict[
     tree_hash = hashlib.sha256(
         json.dumps(files, sort_keys=True, separators=(",", ":")).encode("utf-8")
     ).hexdigest()
-    return {
+    result: dict[str, object] = {
         "schema_version": 1,
         "archive_sha256": sha256_file(archive),
-        "root": declared_root,
         "file_count": len(files),
         "tree_sha256": tree_hash,
         "files": files,
     }
+    if declared_roots is None:
+        result["root"] = declared_root
+    else:
+        result["roots"] = declared_roots
+    return result
 
 
 def extract_locked_asset(asset: dict[str, object], archive: Path, destination: Path) -> Path:
     """Safely and atomically extract a hash-verified tar asset below destination."""
     extraction = asset.get("extraction")
-    if not isinstance(extraction, dict) or extraction.get("mode") != "tar":
+    if not isinstance(extraction, dict) or extraction.get("mode") not in {"tar", "zip"}:
         raise ValueError(f"asset has no supported extraction contract: {asset.get('id')}")
     asset_id = str(asset["id"])
-    declared_root = str(extraction.get("root", ""))
-    if not declared_root or "/" in declared_root or declared_root in {".", ".."}:
-        raise ValueError(f"invalid extraction root for {asset_id}")
+    mode = str(extraction["mode"])
+    declared_root: str | None = None
+    declared_roots: list[str] | None = None
+    if mode == "tar":
+        declared_root = str(extraction.get("root", ""))
+        if not declared_root or "/" in declared_root or declared_root in {".", ".."}:
+            raise ValueError(f"invalid extraction root for {asset_id}")
+    else:
+        roots = extraction.get("roots")
+        if (
+            not isinstance(roots, list)
+            or not roots
+            or any(
+                not isinstance(root, str)
+                or not root
+                or "/" in root
+                or root in {".", ".."}
+                for root in roots
+            )
+            or len(set(roots)) != len(roots)
+        ):
+            raise ValueError(f"invalid extraction roots for {asset_id}")
+        declared_roots = roots
     destination.mkdir(parents=True, exist_ok=True)
     target = destination / asset_id
     manifest_path = destination / f"{asset_id}.extraction.json"
     if target.is_dir() and manifest_path.is_file():
         existing = json.loads(manifest_path.read_text(encoding="utf-8"))
         if existing.get("archive_sha256") == sha256_file(archive):
-            actual = _extraction_manifest(target, archive, declared_root)
+            actual = _extraction_manifest(
+                target,
+                archive,
+                declared_root,
+                declared_roots=declared_roots,
+            )
             if actual == existing:
                 return target
         raise ValueError(f"existing extraction does not match locked archive: {asset_id}")
@@ -71,36 +107,67 @@ def extract_locked_asset(asset: dict[str, object], archive: Path, destination: P
     staging = destination / f".{asset_id}.extracting.{uuid.uuid4().hex}"
     staging.mkdir()
     try:
-        with tarfile.open(archive, "r:gz") as bundle:
-            for member in bundle.getmembers():
-                parts = Path(member.name).parts
-                if (
-                    not parts
-                    or Path(member.name).is_absolute()
-                    or ".." in parts
-                    or parts[0] != declared_root
-                    or member.issym()
-                    or member.islnk()
-                    or not (member.isdir() or member.isfile())
-                ):
-                    raise ValueError(f"unsafe archive member: {member.name}")
-                relative_parts = parts[1:]
-                if not relative_parts:
-                    if not member.isdir():
+        if mode == "tar":
+            with tarfile.open(archive, "r:gz") as bundle:
+                for member in bundle.getmembers():
+                    parts = Path(member.name).parts
+                    if (
+                        not parts
+                        or Path(member.name).is_absolute()
+                        or ".." in parts
+                        or parts[0] != declared_root
+                        or member.issym()
+                        or member.islnk()
+                        or not (member.isdir() or member.isfile())
+                    ):
                         raise ValueError(f"unsafe archive member: {member.name}")
-                    continue
-                output = staging.joinpath(*relative_parts)
-                if member.isdir():
-                    output.mkdir(parents=True, exist_ok=True)
-                    continue
-                output.parent.mkdir(parents=True, exist_ok=True)
-                source = bundle.extractfile(member)
-                if source is None:
-                    raise ValueError(f"unreadable archive member: {member.name}")
-                with source, output.open("xb") as stream:
-                    shutil.copyfileobj(source, stream)
-                output.chmod(0o644)
-        manifest = _extraction_manifest(staging, archive, declared_root)
+                    relative_parts = parts[1:]
+                    if not relative_parts:
+                        if not member.isdir():
+                            raise ValueError(f"unsafe archive member: {member.name}")
+                        continue
+                    output = staging.joinpath(*relative_parts)
+                    if member.isdir():
+                        output.mkdir(parents=True, exist_ok=True)
+                        continue
+                    output.parent.mkdir(parents=True, exist_ok=True)
+                    source = bundle.extractfile(member)
+                    if source is None:
+                        raise ValueError(f"unreadable archive member: {member.name}")
+                    with source, output.open("xb") as stream:
+                        shutil.copyfileobj(source, stream)
+                    output.chmod(0o644)
+        else:
+            assert declared_roots is not None
+            with zipfile.ZipFile(archive) as bundle:
+                for member in bundle.infolist():
+                    member_path = Path(member.filename)
+                    parts = member_path.parts
+                    unix_mode = member.external_attr >> 16
+                    if (
+                        not parts
+                        or member_path.is_absolute()
+                        or ".." in parts
+                        or parts[0] not in declared_roots
+                        or stat.S_ISLNK(unix_mode)
+                    ):
+                        raise ValueError(f"unsafe archive member: {member.filename}")
+                    output = staging.joinpath(*parts)
+                    if member.is_dir():
+                        output.mkdir(parents=True, exist_ok=True)
+                        continue
+                    if stat.S_IFMT(unix_mode) not in {0, stat.S_IFREG}:
+                        raise ValueError(f"unsafe archive member: {member.filename}")
+                    output.parent.mkdir(parents=True, exist_ok=True)
+                    with bundle.open(member, "r") as source, output.open("xb") as stream:
+                        shutil.copyfileobj(source, stream)
+                    output.chmod(0o644)
+        manifest = _extraction_manifest(
+            staging,
+            archive,
+            declared_root,
+            declared_roots=declared_roots,
+        )
         os.replace(staging, target)
         _write_json_atomic(manifest_path, manifest)
         return target
