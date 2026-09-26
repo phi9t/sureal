@@ -28,6 +28,7 @@
         "smoke": {"evaluated_cases_min": 3, "valid_pixel_fraction_min": 1.0, "raw_rmse_m_max": 15.0, "raw_abs_rel_max": 5.0, "affine_aligned_rmse_m_max": 4.0},
         "full": {"evaluated_cases_min": 11, "valid_pixel_fraction_min": 1.0, "raw_rmse_m_max": 15.0, "raw_abs_rel_max": 5.0, "affine_aligned_rmse_m_max": 4.0}
       },
+      "baseline_environment": {"container_image_id": "sha256:24684fbf6d0935abfea38fadfc5730882232f69e4dc2e06e375e3a5a0131f0ae", "gpu_model": "NVIDIA B200", "compute_capability": 10.0, "driver_version": "580.105.08", "pytorch": "2.13.0+cu132"},
       "model_contract": {
         "source_commit": "a561b849ebae10a6f5ef49e26c83cbbcd36c71bf",
         "checkpoint_revision": "3bc65d4e14a6786a61acec16453c50e12bf5f338",
@@ -35,6 +36,9 @@
         "encoder": "vits", "training_domain": "Hypersim indoor", "max_depth_m": 20.0,
         "prediction_domain": "input-visible-pixels", "hidden_scene_completion": false
       },
+      "evaluation_contract": {"input_size": 518, "raw_metric_score": "camera-axis depth in metres", "alignment_diagnostic": "per-case least-squares scale constrained non-negative plus shift", "smoke_cases": 3, "full_cases": 11, "stressors": ["center crop/rescale equivalent to 1.25x focal scale", "concave open-box OOD geometry"]},
+      "last_verified_smoke": {"date": "2026-09-26", "evaluated_cases": 3, "valid_pixel_fraction": 1.0, "raw_rmse_m": 3.795539693441414, "raw_abs_rel": 0.8363771583839711, "raw_delta1": 0.0, "affine_aligned_rmse_m": 1.1442639455547305, "shared_scene_raw_rmse_m": 3.9697715289928572, "focal_crop_raw_rmse_m": 3.8504613973531905, "ood_concavity_raw_rmse_m": 3.5543249328893185, "runtime_seconds": 8.219892547931522, "peak_cpu_memory_bytes": 1717301248, "peak_gpu_compute_memory_bytes": 1289748480},
+      "last_verified_full": {"date": "2026-09-26", "evaluated_cases": 11, "valid_pixel_fraction": 1.0, "raw_rmse_m": 3.974458461545385, "raw_abs_rel": 0.850752687217024, "raw_delta1": 0.0, "affine_aligned_rmse_m": 1.1868866952774737, "shared_scene_raw_rmse_m": 4.031821231527744, "focal_crop_raw_rmse_m": 3.8504613973531905, "ood_concavity_raw_rmse_m": 3.5543249328893185, "runtime_seconds": 12.818230285309255, "peak_cpu_memory_bytes": 1718317056, "peak_gpu_compute_memory_bytes": 1289748480},
       "measurement_note": "Raw metre-space error is the primary metric-depth score. Per-case affine alignment is reported only as a shape diagnostic and never substitutes for raw metric accuracy. Every output pixel is a deterministic, prior-conditioned prediction for an input-visible ray; the adapter emits no hidden geometry and samples no scene hypothesis."
     },
     {"id": "nerf-reference", "modules": ["10"], "status": "not_landed", "reason": "No trained reference invocation or expected-result lock is tracked."},

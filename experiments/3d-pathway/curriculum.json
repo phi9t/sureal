@@ -68,7 +68,7 @@
       "evidence": ["RGB and learned training priors"], "observable": "data-supported geometry plus a prior-conditioned estimate", "representation": "depth, voxels, or completed points",
       "inference": "amortized", "objectives": ["supervised depth", "learned matching", "completion loss"], "metrics": ["AbsRel", "scale-aligned RMSE", "Chamfer distance", "completion IoU"],
       "failure_sweep": ["weak correspondence", "metric scale", "out-of-distribution shape"], "insula": "neural-rendering",
-      "sources": ["eigen-2014", "ranftl-2020", "yao-2018", "yuan-2018", "song-2017"]
+      "sources": ["eigen-2014", "ranftl-2020", "yang-dav2-2024", "yao-2018", "yuan-2018", "song-2017"]
     },
     {
       "id": "09", "slug": "continuous-geometry-inverse-graphics", "title": "Continuous geometry and differentiable inverse graphics",

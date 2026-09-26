@@ -19,8 +19,8 @@ RUN apt-get update \
         'kind=neural-rendering' \
         'cuda=13.2.1' \
         "uv=${UV_VERSION}" \
-        'torch=2.10.0+cu130' \
-        'torchvision=0.25.0+cu130' \
+        'torch=2.13.0+cu132' \
+        'torchvision=0.28.0+cu132' \
         "depth_anything_v2_commit=${DEPTH_ANYTHING_V2_COMMIT}" \
         'network_policy=build-and-fetch-only' \
         > /etc/surflo-pathway-insula
@@ -34,15 +34,18 @@ RUN git init /opt/depth-anything-v2 \
     && printf '%s\n' "${DEPTH_ANYTHING_V2_COMMIT}" > /etc/surflo-depth-anything-v2-commit \
     && uv venv --python python3 /opt/depth-venv \
     && uv pip install --python /opt/depth-venv/bin/python \
-        --index-url https://download.pytorch.org/whl/cu130 \
-        torch==2.10.0 torchvision==0.25.0 \
+        --index-url https://download.pytorch.org/whl/cu132 \
+        torch==2.13.0 torchvision==0.28.0 \
     && uv pip install --python /opt/depth-venv/bin/python \
         numpy==2.4.3 opencv-python-headless==4.13.0.92 \
     && /opt/depth-venv/bin/python -c \
-        'import cv2, numpy, torch, torchvision; assert torch.__version__.startswith("2.10.0+"); assert torchvision.__version__.startswith("0.25.0+")'
+        'import cv2, numpy, torch, torchvision; assert torch.__version__ == "2.13.0+cu132"; assert torchvision.__version__ == "0.28.0+cu132"'
 
 ENV PATH="/opt/depth-venv/bin:${PATH}"
 ENV PYTHONPATH="/opt/depth-anything-v2/metric_depth"
+
+COPY run-depth-anything-v2.py /usr/local/bin/run-depth-anything-v2.py
+RUN chmod 0755 /usr/local/bin/run-depth-anything-v2.py
 
 RUN mkdir -p /workspace/surflo /cache/pathway /exchange /run/pathway-nvidia-driver
 WORKDIR /workspace/surflo

@@ -672,11 +672,16 @@ labels.
 ### Defining mathematics
 
 Monocular depth commonly minimizes scale-aware or scale/shift-invariant loss.
-For affine alignment,
+For the maintained metric-depth diagnostic, affine alignment is constrained to
+preserve depth order,
 
 \[
-(s^*,t^*)=\arg\min_{s,t}\sum_i(s\hat d_i+t-d_i)^2.
+(s^*,t^*)=\arg\min_{s\geq 0,t}\sum_i(s\hat d_i+t-d_i)^2.
 \]
+
+Raw metre-space error remains primary. If the unconstrained solution would use
+a negative scale, the diagnostic records the boundary solution \(s^*=0\)
+rather than making an order-reversed prediction look geometrically accurate.
 
 Learned MVS builds a cost volume by warping features through depth hypotheses,
 (C(p,d)=\operatorname{Var}_j f_j(w_j(p,d))). Point completion may minimize a
@@ -696,10 +701,13 @@ can be confidently wrong out of distribution.
 Start with supervised monocular prediction in
 [eigen-2014](https://proceedings.neurips.cc/paper/2014/hash/91c56ce4a249fae5419b90cba831e303-Abstract.html),
 then cross-dataset relative depth in
-[ranftl-2020](https://doi.org/10.1109/TPAMI.2020.3019967), learned multi-view
-cost volumes in [yao-2018](https://doi.org/10.1007/978-3-030-01237-3_47), point
-completion in [yuan-2018](https://doi.org/10.1109/3DV.2018.00088), and semantic
-scene completion in [song-2017](https://doi.org/10.1109/CVPR.2017.28).
+[ranftl-2020](https://doi.org/10.1109/TPAMI.2020.3019967), synthetic-to-real
+monocular training and metric fine-tuning in
+[yang-dav2-2024](https://arxiv.org/abs/2406.09414), learned multi-view cost
+volumes in [yao-2018](https://doi.org/10.1007/978-3-030-01237-3_47), point
+completion in [yuan-2018](https://doi.org/10.1109/3DV.2018.00088), and
+semantic scene completion in
+[song-2017](https://doi.org/10.1109/CVPR.2017.28).
 
 ### Reproduction lab
 
@@ -710,6 +718,45 @@ experiments/3d-pathway/run.sh run --module 08 --profile smoke --run-id pathway-0
 Inspect `result.json`, `report.md`, `artifacts/learned_depth.svg`, and
 `artifacts/failure_sweep.csv`. The lab compares metric and scale-aligned error,
 then weakens correspondence while recording unsupported completion separately.
+
+The maintained reference is the official Depth Anything V2 Metric Hypersim
+Small checkpoint. Fetch and build are the only networked steps; execution is
+offline and hash-verifies the 99,222,290-byte checkpoint before mounting it
+read-only:
+
+```bash
+experiments/3d-pathway/run.sh fetch --asset depth-anything-v2-metric-hypersim-small
+experiments/3d-pathway/run.sh build
+experiments/3d-pathway/run.sh reference --adapter depth-anything-v2 --profile smoke --run-id dav2-08
+```
+
+Source commit `a561b849ebae10a6f5ef49e26c83cbbcd36c71bf`, checkpoint
+revision `3bc65d4e14a6786a61acec16453c50e12bf5f338`, checkpoint SHA-256
+`b782898d8a3e8be1f639de33837ed85e9b4b73e40f8f5e5cd99067588d722545`,
+and the Apache-2.0 checkpoint declaration are locked. Smoke predicts the center
+shared-scene view plus a 1.25x effective-focal crop and a concave open-box OOD
+case. Full predicts all nine shared-scene views plus the same two stressors.
+Every target is camera-axis depth for an input-visible ray. There is no target
+or output behind an occluder, so this adapter is neither learned MVS nor scene
+completion; those branches remain represented by the concept lab and reading
+sequence.
+
+On the recorded B200 Insula, smoke/full processed 3/11 cases in 8.22/12.82 s
+with 1.29 GB peak compute memory. Raw RMSE was 3.80/3.97 m and raw AbsRel was
+0.836/0.851; \(\delta_1\) was zero in both profiles. Per-case order-preserving
+affine fitting reduced aggregate RMSE to 1.14/1.19 m, which is precisely why it
+is reported as a diagnostic rather than metric accuracy. The shared smoke case
+reached the \(s=0\) boundary, exposing that even a free positive scale could not
+recover its depth ordering. The stress cases did not have worse raw RMSE than
+the shared case, so the run makes no causal claim that crop or concavity alone
+caused the already-large domain failure.
+
+Reference artifacts include float32 depth maps, binary validity masks, fixed-
+scale truth/prediction/error PPM comparisons, per-case scores and affine
+parameters, runtime and CPU/GPU peaks, source/checkpoint/Insula manifests, a
+short interpretation, and the hash-bound `result.json`. Hypersim training and
+this repository-owned synthetic fixture make these a controlled OOD
+reproduction, not a third-party benchmark result.
 
 ### Transition
 

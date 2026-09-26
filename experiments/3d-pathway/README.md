@@ -23,6 +23,7 @@ experiments/3d-pathway/run.sh report --run-id demo-all
 experiments/3d-pathway/run.sh reference --adapter colmap-sfm --profile smoke --run-id colmap-demo
 experiments/3d-pathway/run.sh reference --adapter colmap-mvs --profile smoke --run-id colmap-mvs-demo
 experiments/3d-pathway/run.sh reference --adapter orb-slam --profile smoke --run-id orb-slam-demo
+experiments/3d-pathway/run.sh reference --adapter depth-anything-v2 --profile smoke --run-id dav2-demo
 python3 experiments/3d-pathway/pipeline/audit.py --offline
 
 # Required real-container gates (the full gate is intentionally opt-in):
@@ -30,11 +31,14 @@ python3 experiments/3d-pathway/pipeline/audit.py --offline
 (cd experiments/3d-pathway && SURFLO_REQUIRE_COLMAP_MVS_FULL=1 python3 -m unittest -q tests.test_colmap_mvs_reference.ColmapMvsReferenceAdapterTest.test_real_colmap_mvs_full_profile_on_b200)
 (cd experiments/3d-pathway && SURFLO_REQUIRE_ORB_SLAM_REFERENCE=1 python3 -m unittest -q tests.test_orb_slam_reference.OrbSlamReferenceContractTest.test_real_orb_slam_smoke_tracks_tum_rgbd_and_exports_a_map)
 (cd experiments/3d-pathway && SURFLO_REQUIRE_ORB_SLAM_FULL=1 python3 -m unittest -q tests.test_orb_slam_reference.OrbSlamReferenceContractTest.test_real_orb_slam_full_profile)
+(cd experiments/3d-pathway && SURFLO_REQUIRE_DEPTH_ANYTHING_REFERENCE=1 python3 -m unittest -q tests.test_depth_anything_reference.DepthAnythingReferenceAdapterTest.test_real_smoke_reference_runs_when_required)
+(cd experiments/3d-pathway && SURFLO_REQUIRE_DEPTH_ANYTHING_FULL=1 python3 -m unittest -q tests.test_depth_anything_reference.DepthAnythingReferenceAdapterTest.test_real_full_reference_runs_when_required)
 
 # Explicit network boundaries:
 experiments/3d-pathway/run.sh build
 experiments/3d-pathway/run.sh fetch
 experiments/3d-pathway/run.sh fetch --asset tum-rgbd
+experiments/3d-pathway/run.sh fetch --asset depth-anything-v2-metric-hypersim-small
 python3 experiments/3d-pathway/pipeline/audit.py --online
 ```
 
@@ -97,6 +101,18 @@ before loss and after tracking resumes so a new-map restart is not called
 relocalization. Asset extraction
 rejects links and traversal, records every file hash, and execution rechecks
 the archive and extraction tree before launching with `--network none`.
+
+The Depth Anything V2 adapter uses the neural-rendering Insula with source
+commit `a561b849ebae10a6f5ef49e26c83cbbcd36c71bf`, PyTorch 2.13.0/CUDA 13.2,
+and the Apache-licensed Metric Hypersim Small checkpoint at immutable Hub
+revision `3bc65d4e14a6786a61acec16453c50e12bf5f338`. The explicit fetch path locks
+the checkpoint byte count and SHA-256; reference execution verifies it again,
+mounts it read-only, and disables networking. Smoke evaluates one shared-scene
+view plus focal-crop and concave-OOD stressors; full evaluates nine shared
+views plus the stressors. Raw metre-space metrics remain primary, while
+per-case non-negative-scale affine alignment is only a shape diagnostic.
+Outputs are deterministic per-view visible-ray depths with no hidden-scene or
+posterior-sampling claim.
 
 Runs default to `~/.cache/surflo/3d-pathway`. Set
 `SURFLO_PATHWAY_CACHE_ROOT` to choose another cache. A module first writes to

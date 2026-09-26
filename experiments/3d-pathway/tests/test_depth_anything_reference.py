@@ -1,10 +1,16 @@
 from __future__ import annotations
 
 import json
+import hashlib
+import os
 from pathlib import Path
+import shutil
+import subprocess
 import sys
 import tempfile
+import textwrap
 import unittest
+from unittest import mock
 
 import numpy as np
 
@@ -15,6 +21,113 @@ SOURCE_COMMIT = "a561b849ebae10a6f5ef49e26c83cbbcd36c71bf"
 CHECKPOINT_REVISION = "3bc65d4e14a6786a61acec16453c50e12bf5f338"
 CHECKPOINT_SHA256 = "b782898d8a3e8be1f639de33837ed85e9b4b73e40f8f5e5cd99067588d722545"
 CHECKPOINT_BYTES = 99_222_290
+
+
+def fake_depth_engine(path: Path) -> Path:
+    engine = path / "fake-depth-container-engine"
+    engine.write_text(
+        textwrap.dedent(
+            f"""\
+            #!/usr/bin/env bash
+            set -euo pipefail
+            if [[ "${{1:-}}" == image && "${{2:-}}" == inspect ]]; then
+                printf 'sha256:fixture-depth-image\\n'
+                exit 0
+            fi
+            [[ "${{1:-}}" == run ]]
+            [[ " $* " == *" --network none "* ]]
+            [[ " $* " == *" --pull=never "* ]]
+            [[ " $* " == *" --gpus all "* ]]
+            [[ " $* " == *" --cidfile "* ]]
+            [[ " $* " == *" --user "* ]]
+            [[ " $* " == *" -e USER=surflo "* ]]
+            [[ " $* " == *" -e CUDA_CACHE_PATH=/cuda-cache "* ]]
+            [[ " $* " == *" sha256:fixture-depth-image "* ]]
+            work=''
+            checkpoint=''
+            previous=''
+            for argument in "$@"; do
+                if [[ "$previous" == -v && "$argument" == *:/work ]]; then
+                    work="${{argument%:/work}}"
+                elif [[ "$previous" == -v && "$argument" == *:/model/checkpoint.pth:ro ]]; then
+                    checkpoint="${{argument%:/model/checkpoint.pth:ro}}"
+                fi
+                previous="$argument"
+            done
+            [[ -n "$work" && -f "$checkpoint" ]]
+            python3 - "$work" <<'PY'
+            import json
+            from pathlib import Path
+            import sys
+
+            import numpy as np
+
+            root = Path(sys.argv[1])
+            manifest = json.loads((root / "input/manifest.json").read_text())
+            output = root / "output"
+            predictions = output / "predictions"
+            predictions.mkdir(parents=True)
+            for case in manifest["cases"]:
+                truth = np.load(root / "input" / case["depth_path"], allow_pickle=False)
+                prediction = (truth * 1.15 + 0.20).astype(np.float32)
+                valid = np.ones(truth.shape, dtype=np.uint8)
+                np.save(predictions / f"{{case['id']}}.depth.npy", prediction, allow_pickle=False)
+                np.save(predictions / f"{{case['id']}}.valid.npy", valid, allow_pickle=False)
+            (output / "source-commit.txt").write_text("{SOURCE_COMMIT}\\n")
+            (output / "insula-manifest.txt").write_text(
+                "schema_version=1\\n"
+                "kind=neural-rendering\\n"
+                "cuda=13.2.1\\n"
+                "uv=0.11.13\\n"
+                "torch=2.13.0+cu132\\n"
+                "torchvision=0.28.0+cu132\\n"
+                "depth_anything_v2_commit={SOURCE_COMMIT}\\n"
+                "network_policy=build-and-fetch-only\\n"
+            )
+            (output / "runtime-versions.json").write_text(json.dumps({{
+                "source_commit": "{SOURCE_COMMIT}",
+                "torch": "2.13.0+cu132",
+                "torchvision": "0.28.0+cu132",
+                "numpy": np.__version__,
+                "opencv": "4.13.0",
+                "cuda_runtime": "13.2",
+                "device": "fixture-cuda",
+            }}, sort_keys=True) + "\\n")
+            (output / "resource-usage.txt").write_text(
+                "Maximum resident set size (kbytes): 12345\\n"
+            )
+            print("fixture Depth Anything V2 completed")
+            PY
+            """
+        ),
+        encoding="utf-8",
+    )
+    engine.chmod(0o755)
+    return engine
+
+
+def run_fake_depth_reference(root: Path, profile: str = "smoke", run_id: str = "depth-smoke") -> Path:
+    sys.path.insert(0, str(ROOT / "pipeline"))
+    import depth_reference_runner
+
+    cache = root / "cache"
+    asset_dir = cache / "assets"
+    asset_dir.mkdir(parents=True)
+    checkpoint = asset_dir / "depth-anything-v2-metric-hypersim-small.archive"
+    checkpoint.write_bytes(b"fixture depth checkpoint")
+    fixture_sha = hashlib.sha256(checkpoint.read_bytes()).hexdigest()
+    official = {
+        item["id"]: item for item in json.loads((ROOT / "assets.lock.json").read_text())["assets"]
+    }["depth-anything-v2-metric-hypersim-small"]
+    record = {**official, "sha256": fixture_sha, "byte_size": checkpoint.stat().st_size}
+    engine = fake_depth_engine(root)
+    with (
+        mock.patch.object(depth_reference_runner, "_checkpoint_record", return_value=record),
+        mock.patch.object(depth_reference_runner, "CHECKPOINT_SHA256", fixture_sha),
+        mock.patch.object(depth_reference_runner, "CHECKPOINT_BYTES", checkpoint.stat().st_size),
+        mock.patch.dict(os.environ, {"SURFLO_PATHWAY_CONTAINER_ENGINE": str(engine)}),
+    ):
+        return depth_reference_runner.run_depth_reference(cache, profile, run_id)
 
 
 class DepthAnythingReferenceFoundationTest(unittest.TestCase):
@@ -70,8 +183,9 @@ class DepthAnythingReferenceFoundationTest(unittest.TestCase):
         self.assertEqual(locks["neural-rendering"]["depth_anything_v2_source_commit"], SOURCE_COMMIT)
         dockerfile = (ROOT / "insulas/neural-rendering/Dockerfile").read_text(encoding="utf-8")
         self.assertIn(f"ARG DEPTH_ANYTHING_V2_COMMIT={SOURCE_COMMIT}", dockerfile)
-        self.assertIn("torch==2.10.0", dockerfile)
-        self.assertIn("torchvision==0.25.0", dockerfile)
+        self.assertIn("--index-url https://download.pytorch.org/whl/cu132", dockerfile)
+        self.assertIn("torch==2.13.0", dockerfile)
+        self.assertIn("torchvision==0.28.0", dockerfile)
 
     def test_depth_metrics_keep_raw_metric_error_separate_from_alignment(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
@@ -87,6 +201,11 @@ class DepthAnythingReferenceFoundationTest(unittest.TestCase):
         self.assertAlmostEqual(metrics["affine_scale"], 1.4, places=5)
         self.assertAlmostEqual(metrics["affine_shift_m"], 0.7, places=5)
         self.assertEqual(metrics["valid_pixels"], truth.size)
+
+        inverted = _depth_metrics(np.flip(truth.reshape(-1)).reshape(truth.shape).copy(), truth)
+        self.assertEqual(inverted["affine_scale"], 0.0)
+        self.assertTrue(inverted["alignment_scale_at_boundary"])
+        self.assertGreater(inverted["affine_aligned_rmse_m"], 0.5)
 
     def test_controlled_inputs_are_deterministic_visible_depth_not_completion(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
@@ -130,6 +249,175 @@ class DepthAnythingReferenceFoundationTest(unittest.TestCase):
             full = generate_learned_depth_scene(root / "full", scene, "full")
             self.assertEqual(len(full["cases"]), 11)
             self.assertEqual(sum(case["family"] == "shared-scene" for case in full["cases"]), 9)
+
+
+class DepthAnythingReferenceAdapterTest(unittest.TestCase):
+    def test_checkpoint_asset_directory_cannot_escape_the_cache_root(self) -> None:
+        sys.path.insert(0, str(ROOT / "pipeline"))
+        from depth_reference_runner import _checkpoint_path
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            cache = root / "cache"
+            outside = root / "outside-assets"
+            cache.mkdir()
+            outside.mkdir()
+            checkpoint = outside / "depth-anything-v2-metric-hypersim-small.archive"
+            checkpoint.write_bytes(b"fixture")
+            (cache / "assets").symlink_to(outside, target_is_directory=True)
+            record = {
+                "sha256": hashlib.sha256(checkpoint.read_bytes()).hexdigest(),
+                "byte_size": checkpoint.stat().st_size,
+            }
+            with self.assertRaisesRegex(ValueError, "cache|escape|directory"):
+                _checkpoint_path(cache.resolve(), record)
+
+    def test_checkpoint_hash_mismatch_fails_before_execution(self) -> None:
+        sys.path.insert(0, str(ROOT / "pipeline"))
+        from depth_reference_runner import run_depth_reference
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            cache = root / "cache"
+            asset_dir = cache / "assets"
+            asset_dir.mkdir(parents=True)
+            (asset_dir / "depth-anything-v2-metric-hypersim-small.archive").write_bytes(b"wrong")
+            with mock.patch.dict(
+                os.environ,
+                {"SURFLO_PATHWAY_CONTAINER_ENGINE": str(fake_depth_engine(root))},
+            ):
+                with self.assertRaisesRegex(ValueError, "checkpoint.*(?:byte-size|hash)"):
+                    run_depth_reference(cache, "smoke", "bad-checkpoint")
+            self.assertFalse((cache / "reference-runs/bad-checkpoint").exists())
+
+    def test_fake_smoke_run_is_offline_scored_and_atomically_promoted(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            run_dir = run_fake_depth_reference(root)
+            result = json.loads((run_dir / "result.json").read_text())
+
+            self.assertEqual(result["adapter"], "depth-anything-v2")
+            self.assertEqual(result["module_ids"], ["08"])
+            self.assertEqual(result["network_mode"], "offline")
+            self.assertEqual(result["metrics"]["evaluated_cases"], 3)
+            self.assertEqual(result["metrics"]["valid_pixel_fraction"], 1.0)
+            self.assertGreater(result["metrics"]["raw_rmse_m"], 0.5)
+            self.assertLess(result["metrics"]["affine_aligned_rmse_m"], 1e-5)
+            self.assertEqual(set(result["case_metrics"]), {"shared-000", "focal-crop", "ood-concavity"})
+            self.assertEqual(
+                result["support"],
+                {
+                    "prediction_domain": "input-visible-pixels",
+                    "model_output": "deterministic-per-view-camera-axis-depth",
+                    "hidden_scene_prediction_count": 0,
+                    "complete_scene_samples": 0,
+                    "completion_claim": "none",
+                    "posterior_sampling_claim": "none",
+                },
+            )
+            for relative in (
+                "input/manifest.json",
+                "output/predictions/shared-000.depth.npy",
+                "output/predictions/focal-crop.depth.npy",
+                "output/predictions/ood-concavity.depth.npy",
+                "output/visualizations/shared-000-comparison.ppm",
+                "output/visualizations/focal-crop-comparison.ppm",
+                "output/visualizations/ood-concavity-comparison.ppm",
+                "output/checkpoint.json",
+                "output/runtime-versions.json",
+                "output/resource-summary.json",
+                "adapter.log",
+                "report.md",
+            ):
+                self.assertTrue((run_dir / relative).is_file(), relative)
+            self.assertFalse(any((root / "cache/reference-staging").glob("*")))
+
+            sys.path.insert(0, str(ROOT / "pipeline"))
+            import depth_reference_runner
+
+            checkpoint_record = json.loads((run_dir / "output/checkpoint.json").read_text())
+            with (
+                mock.patch.object(
+                    depth_reference_runner, "_checkpoint_record", return_value=checkpoint_record
+                ),
+                mock.patch.object(
+                    depth_reference_runner,
+                    "CHECKPOINT_SHA256",
+                    checkpoint_record["sha256"],
+                ),
+                mock.patch.object(
+                    depth_reference_runner,
+                    "CHECKPOINT_BYTES",
+                    checkpoint_record["byte_size"],
+                ),
+            ):
+                depth_reference_runner.validate_depth_reference_result(run_dir)
+
+                result["metrics"]["raw_rmse_m"] += 1.0
+                (run_dir / "result.json").write_text(json.dumps(result), encoding="utf-8")
+                with self.assertRaisesRegex(ValueError, "metric mismatch"):
+                    depth_reference_runner.validate_depth_reference_result(run_dir)
+
+    def test_full_profile_evaluates_all_shared_views_and_failure_cases(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            run_dir = run_fake_depth_reference(Path(temporary), "full", "depth-full")
+            result = json.loads((run_dir / "result.json").read_text())
+            self.assertEqual(result["metrics"]["evaluated_cases"], 11)
+            self.assertEqual(sum(key.startswith("shared-") for key in result["case_metrics"]), 9)
+            self.assertEqual(result["acceptance"]["evaluated_cases_min"], 11)
+
+    def test_real_smoke_reference_runs_when_required(self) -> None:
+        required = os.environ.get("SURFLO_REQUIRE_DEPTH_ANYTHING_REFERENCE") == "1"
+        docker = shutil.which("docker")
+        cache = Path(os.environ.get("SURFLO_PATHWAY_CACHE_ROOT", Path.home() / ".cache/surflo/3d-pathway"))
+        checkpoint = cache / "assets/depth-anything-v2-metric-hypersim-small.archive"
+        image = None if docker is None else subprocess.run(
+            [docker, "image", "inspect", "surflo-pathway-neural-rendering:1"],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        if docker is None or image is None or image.returncode != 0 or not checkpoint.is_file():
+            if required:
+                self.fail("required real Depth Anything V2 image/checkpoint is unavailable")
+            self.skipTest("real Depth Anything V2 image/checkpoint is unavailable")
+        sys.path.insert(0, str(ROOT / "pipeline"))
+        from depth_reference_runner import run_depth_reference
+
+        run_id = f"depth-real-smoke-test-{os.getpid()}"
+        run_dir = run_depth_reference(cache, "smoke", run_id)
+        result = json.loads((run_dir / "result.json").read_text())
+        self.assertEqual(result["metrics"]["evaluated_cases"], 3)
+        self.assertEqual(result["resources"]["gpu_measurement_status"], "measured")
+
+    def test_real_full_reference_runs_when_required(self) -> None:
+        required = os.environ.get("SURFLO_REQUIRE_DEPTH_ANYTHING_FULL") == "1"
+        if not required:
+            self.skipTest("full B200 profile is opt-in")
+        docker = shutil.which("docker")
+        cache = Path(
+            os.environ.get(
+                "SURFLO_PATHWAY_CACHE_ROOT", Path.home() / ".cache/surflo/3d-pathway"
+            )
+        )
+        checkpoint = cache / "assets/depth-anything-v2-metric-hypersim-small.archive"
+        image = None if docker is None else subprocess.run(
+            [docker, "image", "inspect", "surflo-pathway-neural-rendering:1"],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        if docker is None or image is None or image.returncode != 0 or not checkpoint.is_file():
+            self.fail("required full Depth Anything V2 image/checkpoint is unavailable")
+        sys.path.insert(0, str(ROOT / "pipeline"))
+        from depth_reference_runner import run_depth_reference
+
+        run_id = f"depth-real-full-test-{os.getpid()}"
+        run_dir = run_depth_reference(cache, "full", run_id)
+        result = json.loads((run_dir / "result.json").read_text())
+        self.assertEqual(result["metrics"]["evaluated_cases"], 11)
+        self.assertEqual(result["metrics"]["valid_pixel_fraction"], 1.0)
+        self.assertEqual(result["resources"]["gpu_measurement_status"], "measured")
 
 
 if __name__ == "__main__":

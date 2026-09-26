@@ -25,9 +25,9 @@
       "base_image": "nvidia/cuda:13.2.1-cudnn-devel-ubuntu24.04",
       "base_image_digest": "6435dc5a825b0095648d87a3c91240fd7788a85fafaf215739544d389ab74366",
       "depth_anything_v2_source_commit": "a561b849ebae10a6f5ef49e26c83cbbcd36c71bf",
-      "pytorch": "2.10.0+cu130",
-      "torchvision": "0.25.0+cu130",
-      "dockerfile_sha256": "9ae76308e0780e61fca15baf432a9e66c93112a2196a49dca74b8b62000e9786"
+      "pytorch": "2.13.0+cu132",
+      "torchvision": "0.28.0+cu132",
+      "dockerfile_sha256": "5c72207d5aa82587eac61802fffdc8fa518ffaede8ceca68eb781e56d482d03d"
     }
   }
 }
