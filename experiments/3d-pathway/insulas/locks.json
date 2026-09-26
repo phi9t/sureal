@@ -14,6 +14,13 @@
       "colmap_source_commit": "be5e29168d4aff238409d60424812df66aac919f",
       "dockerfile_sha256": "5cf42fe8ebd2512b76e1cc4129d243df855e67e1e3baf679e44f29512e59439f"
     },
+    "orb-slam": {
+      "base_image": "ubuntu:22.04",
+      "base_image_digest": "b8b6ee6aa931ecd9d0d952abc34dc0e5f7c6a30c6bb71b079fe399fde0329c02",
+      "orb_slam3_source_commit": "4452a3c4ab75b1cde34e5505a36ec3f9edcdc4c4",
+      "pangolin_source_commit": "dd801d244db3a8e27b7fe8020cd751404aa818fd",
+      "dockerfile_sha256": "a6b4a332125eb0a7db8eaa22e585c8d4bea72a5f80635f7dd880f3787320f853"
+    },
     "neural-rendering": {
       "base_image": "nvidia/cuda:13.2.1-cudnn-devel-ubuntu24.04",
       "base_image_digest": "6435dc5a825b0095648d87a3c91240fd7788a85fafaf215739544d389ab74366",

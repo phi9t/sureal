@@ -72,6 +72,13 @@ def _image_lock_errors(name: str, lock: dict[str, str], dockerfile_text: str) ->
         flags=re.MULTILINE,
     ):
         errors.append(f"Insula COLMAP source lock mismatch: {name}")
+    for key, label in (
+        ("orb_slam3_source_commit", "ORB-SLAM3"),
+        ("pangolin_source_commit", "Pangolin"),
+    ):
+        source_commit = lock.get(key)
+        if source_commit and len(re.findall(rf"\b{re.escape(source_commit)}\b", dockerfile_text)) < 2:
+            errors.append(f"Insula {label} source lock mismatch: {name}")
     return errors
 
 

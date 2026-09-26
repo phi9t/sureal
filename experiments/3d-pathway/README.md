@@ -3,7 +3,7 @@
 This directory backs the survey in
 [`docs/3d-reconstruction-pathway.md`](../../docs/3d-reconstruction-pathway.md).
 It provides deterministic concept labs for all fifteen modules, machine-readable
-source and asset registries, a common controlled scene, three distinct Insula
+source and asset registries, a common controlled scene, four distinct Insula
 definitions, provenance-aware run storage, and citation/terminology auditing.
 
 The smoke profile is the numerical and CI contract. The full profile only
@@ -22,11 +22,14 @@ experiments/3d-pathway/run.sh all --profile smoke --run-id demo-all
 experiments/3d-pathway/run.sh report --run-id demo-all
 experiments/3d-pathway/run.sh reference --adapter colmap-sfm --profile smoke --run-id colmap-demo
 experiments/3d-pathway/run.sh reference --adapter colmap-mvs --profile smoke --run-id colmap-mvs-demo
+experiments/3d-pathway/run.sh reference --adapter orb-slam --profile smoke --run-id orb-slam-demo
 python3 experiments/3d-pathway/pipeline/audit.py --offline
 
 # Required real-container gates (the full gate is intentionally opt-in):
 (cd experiments/3d-pathway && SURFLO_REQUIRE_COLMAP_MVS_REFERENCE=1 python3 -m unittest -q tests.test_colmap_mvs_reference.ColmapMvsReferenceAdapterTest.test_real_colmap_mvs_reconstructs_and_meshes_the_smoke_scene)
 (cd experiments/3d-pathway && SURFLO_REQUIRE_COLMAP_MVS_FULL=1 python3 -m unittest -q tests.test_colmap_mvs_reference.ColmapMvsReferenceAdapterTest.test_real_colmap_mvs_full_profile_on_b200)
+(cd experiments/3d-pathway && SURFLO_REQUIRE_ORB_SLAM_REFERENCE=1 python3 -m unittest -q tests.test_orb_slam_reference.OrbSlamReferenceContractTest.test_real_orb_slam_smoke_tracks_tum_rgbd_and_exports_a_map)
+(cd experiments/3d-pathway && SURFLO_REQUIRE_ORB_SLAM_FULL=1 python3 -m unittest -q tests.test_orb_slam_reference.OrbSlamReferenceContractTest.test_real_orb_slam_full_profile)
 
 # Explicit network boundaries:
 experiments/3d-pathway/run.sh build
@@ -78,6 +81,20 @@ and driver version.
 Integer metrics revalidate exactly; floating metrics use recorded 1e-9 relative
 and 1e-12 absolute tolerances, with the evaluating NumPy version retained in
 the hashed run configuration.
+
+The ORB-SLAM3 adapter uses its own Ubuntu 22.04 Insula with canonical upstream
+ORB-SLAM3 commit `4452a3c4ab75b1cde34e5505a36ec3f9edcdc4c4` and peeled Pangolin
+v0.6 commit `dd801d244db3a8e27b7fe8020cd751404aa818fd`. It runs TUM
+`freiburg1_xyz` in RGB-D mode without a viewer, exports the optimized
+trajectory and the persistent union of tracked sparse landmarks, and compares
+them with timestamped motion-capture poses and a deterministic visible RGB-D
+surface sample formed with the sequence's Brown-Conrady camera model. ATE/RPE
+and directed map distances remain separate; one-frame translational RPE is
+measured in the origin camera frame. The
+failure sweep blanks a contiguous frame interval to test relocalization and
+adds a moving RGB-D patch to expose static-world sensitivity. Asset extraction
+rejects links and traversal, records every file hash, and execution rechecks
+the archive and extraction tree before launching with `--network none`.
 
 Runs default to `~/.cache/surflo/3d-pathway`. Set
 `SURFLO_PATHWAY_CACHE_ROOT` to choose another cache. A module first writes to

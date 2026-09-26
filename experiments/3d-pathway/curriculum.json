@@ -8,6 +8,7 @@
   },
   "insulas": {
     "classical": "insulas/classical/Dockerfile",
+    "orb-slam": "insulas/orb-slam/Dockerfile",
     "neural-rendering": "insulas/neural-rendering/Dockerfile",
     "blender": "../photoreal-scenes/insula/Dockerfile",
     "surflo": "../insula-scout/insula/Dockerfile"
@@ -59,7 +60,7 @@
       "id": "07", "slug": "online-slam-mapping", "title": "Online SLAM and persistent mapping",
       "evidence": ["ordered visual or RGB-D stream"], "observable": "trajectory and map under static-world assumptions", "representation": "keyframes, landmarks, pose graph, and map",
       "inference": "hybrid", "objectives": ["tracking residual", "loop-closure pose-graph error"], "metrics": ["ATE", "RPE", "drift", "map F-score"],
-      "failure_sweep": ["loop closure", "camera motion", "object motion", "relocalization"], "insula": "classical",
+      "failure_sweep": ["loop closure", "camera motion", "object motion", "relocalization"], "insula": "orb-slam",
       "sources": ["newcombe-2011", "mur-artal-2015", "campos-2021", "sturm-2012"]
     },
     {

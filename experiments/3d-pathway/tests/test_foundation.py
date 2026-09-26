@@ -162,7 +162,7 @@ class DispatcherContractTest(unittest.TestCase):
 class InsulaContractTest(unittest.TestCase):
     def test_insulas_are_distinct_and_content_pinned(self) -> None:
         locks = json.loads((ROOT / "insulas" / "locks.json").read_text())["insulas"]
-        self.assertEqual(set(locks), {"classical", "classical-mvs", "neural-rendering"})
+        self.assertEqual(set(locks), {"classical", "classical-mvs", "orb-slam", "neural-rendering"})
         self.assertNotEqual(locks["classical"]["base_image"], locks["neural-rendering"]["base_image"])
         for name, lock in locks.items():
             with self.subTest(name=name):

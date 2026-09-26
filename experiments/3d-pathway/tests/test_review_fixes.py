@@ -64,7 +64,8 @@ class ReviewHardeningTest(unittest.TestCase):
         statuses = {item["id"]: item["status"] for item in adapters}
         self.assertEqual(statuses["colmap-sfm-reference"], "landed")
         self.assertEqual(statuses["colmap-mvs-reference"], "landed")
-        landed = {"colmap-sfm-reference", "colmap-mvs-reference"}
+        self.assertEqual(statuses["orb-slam-reference"], "landed")
+        landed = {"colmap-sfm-reference", "colmap-mvs-reference", "orb-slam-reference"}
         self.assertTrue(all(status == "not_landed" for adapter, status in statuses.items() if adapter not in landed))
 
         locks = json.loads((ROOT / "insulas" / "locks.json").read_text())["insulas"]
@@ -152,7 +153,8 @@ class ReviewHardeningTest(unittest.TestCase):
     def test_fetch_manifest_has_correct_tum_url_and_selection_contract(self) -> None:
         assets = {item["id"]: item for item in json.loads((ROOT / "assets.lock.json").read_text())["assets"]}
         self.assertIn("/freiburg1/", assets["tum-rgbd"]["source"])
-        self.assertEqual(assets["tum-rgbd"]["digest_status"], "declared_unverified")
+        self.assertEqual(assets["tum-rgbd"]["digest_status"], "verified_2026-09-26")
+        self.assertEqual(assets["tum-rgbd"]["extraction"]["mode"], "tar")
         self.assertTrue(assets["middlebury-mvs"]["consumers"])
         with tempfile.TemporaryDirectory() as temporary:
             emitted = run_cli("--emit-plan", "fetch", "--asset", "tum-rgbd", cache=Path(temporary))

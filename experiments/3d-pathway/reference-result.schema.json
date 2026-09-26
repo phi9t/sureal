@@ -5,14 +5,13 @@
   "required": ["schema_version", "adapter", "module_ids", "profile", "status", "network_mode", "metrics", "acceptance", "tool", "resources", "provenance"],
   "properties": {
     "schema_version": {"const": 1},
-    "adapter": {"enum": ["colmap-sfm", "colmap-mvs"]},
+    "adapter": {"enum": ["colmap-sfm", "colmap-mvs", "orb-slam"]},
     "module_ids": {"type": "array", "minItems": 1, "maxItems": 1, "items": {"type": "string", "pattern": "^[0-9]{2}$"}},
     "profile": {"enum": ["smoke", "full"]},
     "status": {"const": "complete"},
     "network_mode": {"const": "offline"},
     "metrics": {
       "type": "object",
-      "required": ["registered_images", "sparse_points", "mean_reprojection_error_px"],
       "properties": {
         "registered_images": {"type": "integer"},
         "sparse_points": {"type": "integer"},
@@ -24,7 +23,24 @@
         "completeness_mean_m": {"type": "number"},
         "supported_completeness_mean_m": {"type": "number"},
         "undersupported_completeness_mean_m": {"type": "number"},
-        "fscore_10cm": {"type": "number"}
+        "fscore_10cm": {"type": "number"},
+        "input_frames": {"type": "integer"},
+        "tracked_frames": {"type": "integer"},
+        "tracking_coverage": {"type": "number", "minimum": 0, "maximum": 1},
+        "lost_frames": {"type": "integer"},
+        "tracking_recoveries": {"type": "integer"},
+        "trajectory_matches": {"type": "integer"},
+        "ate_rmse_m": {"type": "number"},
+        "rpe_translation_rmse_m": {"type": "number"},
+        "rpe_rotation_rmse_deg": {"type": "number"},
+        "end_drift_m": {"type": "number"},
+        "map_points": {"type": "integer"},
+        "map_truth_points": {"type": "integer"},
+        "map_accuracy_mean_m": {"type": "number"},
+        "map_completeness_mean_m": {"type": "number"},
+        "map_precision_10cm": {"type": "number", "minimum": 0, "maximum": 1},
+        "map_recall_10cm": {"type": "number", "minimum": 0, "maximum": 1},
+        "map_fscore_10cm": {"type": "number", "minimum": 0, "maximum": 1}
       }
     },
     "acceptance": {
@@ -51,8 +67,8 @@
       "type": "object",
       "required": ["runtime_seconds", "host"],
       "properties": {
-        "runtime_seconds": {"type": "number"},
-        "peak_cpu_memory_bytes": {"type": "integer"},
+        "runtime_seconds": {"type": "number", "minimum": 0},
+        "peak_cpu_memory_bytes": {"type": "integer", "minimum": 1},
         "peak_gpu_compute_memory_bytes": {"type": "integer"},
         "gpu_memory_scope": {"type": "string"},
         "gpu_measurement_status": {"type": "string"},
@@ -62,5 +78,15 @@
       }
     },
     "provenance": {"type": "object", "required": ["config", "config_sha256", "implementation_sha256", "artifacts_sha256"]}
-  }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"adapter": {"enum": ["colmap-sfm", "colmap-mvs"]}}},
+      "then": {"properties": {"metrics": {"required": ["registered_images", "sparse_points", "mean_reprojection_error_px"]}}}
+    },
+    {
+      "if": {"properties": {"adapter": {"const": "orb-slam"}}},
+      "then": {"properties": {"metrics": {"required": ["input_frames", "tracked_frames", "tracking_coverage", "lost_frames", "tracking_recoveries", "trajectory_matches", "ate_rmse_m", "rpe_translation_rmse_m", "rpe_rotation_rmse_deg", "end_drift_m", "map_points", "map_truth_points", "map_accuracy_mean_m", "map_completeness_mean_m", "map_precision_10cm", "map_recall_10cm", "map_fscore_10cm"]}}}
+    }
+  ]
 }

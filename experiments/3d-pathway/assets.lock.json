@@ -12,8 +12,8 @@
     },
     {
       "id": "tum-rgbd", "mode": "download", "license": "TUM dataset terms",
-      "source": "https://cvg.cit.tum.de/rgbd/dataset/freiburg1/rgbd_dataset_freiburg1_xyz.tgz", "sha256": "856e4d3a3f0f149f87b8d892b8cd270e5c900994e1d3107eecb43d96c733bfb1",
-      "digest_status": "declared_unverified", "archive_format": "tar.gz", "extraction": "deferred_until_adapter_lands", "consumers": ["orb-slam-reference"]
+      "source": "https://cvg.cit.tum.de/rgbd/dataset/freiburg1/rgbd_dataset_freiburg1_xyz.tgz", "sha256": "a0236d97b8c30cd93b653656d2b6c293ff7c982a4130ef2a1a8beecdb124ef98",
+      "digest_status": "verified_2026-09-26", "archive_format": "tar.gz", "extraction": {"mode": "tar", "root": "rgbd_dataset_freiburg1_xyz"}, "consumers": ["orb-slam-reference"]
     },
     {
       "id": "nerf-synthetic", "mode": "download", "license": "NeRF dataset terms",

@@ -11,4 +11,5 @@ command -v "${ENGINE}" >/dev/null 2>&1 || {
 
 "${ENGINE}" build --network host --tag surflo-pathway-classical:1 "${HERE}/classical"
 "${ENGINE}" build --network host --tag surflo-pathway-classical-mvs:1 "${HERE}/classical-mvs"
+"${ENGINE}" build --network host --tag surflo-pathway-orb-slam:1 "${HERE}/orb-slam"
 "${ENGINE}" build --network host --tag surflo-pathway-neural-rendering:1 "${HERE}/neural-rendering"
