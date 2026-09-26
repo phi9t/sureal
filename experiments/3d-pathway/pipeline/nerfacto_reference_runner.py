@@ -481,6 +481,8 @@ def _validate_runtime_identity(run_dir: Path, profile: str) -> dict[str, Any]:
         or summary.get("near_plane_m") != 0.1
         or summary.get("far_plane_m") != 6.0
         or summary.get("proposal_initial_sampler") != "uniform"
+        or summary.get("context_split_mode") != "all-context-frames-train-and-eval"
+        or summary.get("dataloader_num_workers") != 1
         or summary.get("tf32") is not False
         or summary.get("seed") != 260925
         or not isinstance(summary.get("training_seconds"), (int, float))
@@ -632,6 +634,8 @@ def _expected_config(
         "near_plane_m": 0.1,
         "far_plane_m": 6.0,
         "proposal_initial_sampler": "uniform",
+        "context_split_mode": "all-context-frames-train-and-eval",
+        "dataloader_num_workers": 1,
         "tf32": False,
         "container_user_environment": {"USER": "surflo"},
         "support": SUPPORT_CONTRACT,

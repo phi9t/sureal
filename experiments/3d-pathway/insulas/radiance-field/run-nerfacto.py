@@ -130,7 +130,7 @@ def _camera_axis_depth(
     camera: Cameras, ray_depth: torch.Tensor, camera_to_world_opencv: np.ndarray
 ) -> np.ndarray:
     ray_bundle = camera.generate_rays(camera_indices=0, keep_shape=True).to("cuda")
-    depth = ray_depth.squeeze(-1)
+    depth = ray_depth.squeeze(-1).to(ray_bundle.directions.device)
     points = ray_bundle.origins + ray_bundle.directions * depth[..., None]
     points_numpy = points.detach().float().cpu().numpy()
     rotation = camera_to_world_opencv[:3, :3]
@@ -185,6 +185,8 @@ def main() -> None:
     config.pipeline.datamanager.dataparser.scale_factor = 1.0
     config.pipeline.datamanager.dataparser.scene_scale = 1.0
     config.pipeline.datamanager.dataparser.downscale_factor = 1
+    config.pipeline.datamanager.dataparser.eval_mode = "all"
+    config.pipeline.datamanager.dataloader_num_workers = 1
     config.pipeline.model.camera_optimizer.mode = "off"
     config.pipeline.model.use_appearance_embedding = False
     config.pipeline.model.disable_scene_contraction = True
@@ -255,9 +257,16 @@ def main() -> None:
         np.save(render_dir / f"{frame['id']}.expected-camera-depth.npy", expected_camera_depth, allow_pickle=False)
 
         truth_rgb = np.load(args.input / frame["rgb_truth_path"], allow_pickle=False)
-        batch = {"image": torch.from_numpy(truth_rgb.astype(np.float32) / 255.0).cuda()}
+        batch = {"image": torch.from_numpy(truth_rgb.astype(np.float32) / 255.0)}
+        metric_output_keys = ["rgb", "accumulation", "depth"] + [
+            f"prop_depth_{index}" for index in range(config.pipeline.model.num_proposal_iterations)
+        ]
+        metric_outputs = {
+            key: outputs[key].to(trainer.pipeline.model.device)
+            for key in metric_output_keys
+        }
         with torch.no_grad():
-            image_metrics, _ = trainer.pipeline.model.get_image_metrics_and_images(outputs, batch)
+            image_metrics, _ = trainer.pipeline.model.get_image_metrics_and_images(metric_outputs, batch)
         target_metrics.append(
             {
                 "id": frame["id"],
@@ -311,6 +320,8 @@ def main() -> None:
             "near_plane_m": 0.1,
             "far_plane_m": 6.0,
             "proposal_initial_sampler": "uniform",
+            "context_split_mode": "all-context-frames-train-and-eval",
+            "dataloader_num_workers": 1,
             "tf32": False,
             "seed": SEED,
         },

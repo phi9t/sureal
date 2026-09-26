@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+import shutil
+import subprocess
 import sys
 import tempfile
 import textwrap
@@ -128,6 +130,8 @@ def fake_nerfacto_engine(path: Path, fail: bool = False) -> Path:
                 "camera_optimizer": "off", "appearance_embedding": False,
                 "scene_contraction": False, "near_plane_m": 0.1, "far_plane_m": 6.0,
                 "proposal_initial_sampler": "uniform", "tf32": False,
+                "context_split_mode": "all-context-frames-train-and-eval",
+                "dataloader_num_workers": 1,
                 "seed": manifest["scene_seed"]
             }}, sort_keys=True) + "\\n")
             (output / "failure_sweep.csv").write_text(
@@ -189,7 +193,7 @@ class NerfactoReferenceFoundationTest(unittest.TestCase):
         }
         self.assertIn("nerfstudio-nerfacto-reference", adapters)
         adapter = adapters["nerfstudio-nerfacto-reference"]
-        self.assertEqual(adapter["status"], "not_landed")
+        self.assertEqual(adapter["status"], "landed")
         self.assertEqual(
             adapter["command"],
             "run.sh reference --adapter nerfacto --profile smoke --run-id ID",
@@ -211,6 +215,26 @@ class NerfactoReferenceFoundationTest(unittest.TestCase):
             adapter["evaluation_contract"]["surface_comparator"],
             "module 09 NeuS-Facto baseline on the identical controlled scene",
         )
+        self.assertEqual(adapter["acceptance"]["smoke"]["target_psnr_db_min"], 20.0)
+        self.assertEqual(adapter["acceptance"]["full"]["expected_depth_rmse_m_max"], 0.7)
+        self.assertEqual(
+            adapter["baseline_environment"]["container_image_id"],
+            "sha256:11200316a8dfa0370891a8600f2b1bd884c701bad5c3750562d32dc530c935df",
+        )
+        self.assertEqual(adapter["baseline_environment"]["gpu_model"], "NVIDIA B200")
+        for key in ("last_verified_smoke", "last_verified_full"):
+            self.assertEqual(adapter[key]["date"], "2026-09-26")
+            self.assertGreater(adapter[key]["training_steps_per_second"], 0.0)
+            self.assertGreater(adapter[key]["peak_gpu_compute_memory_bytes"], 0)
+        self.assertGreater(
+            adapter["last_verified_smoke"]["target_psnr_db"],
+            adapter["last_verified_full"]["target_psnr_db"],
+        )
+        self.assertLess(
+            adapter["last_verified_smoke"]["expected_depth_rmse_m"],
+            adapter["last_verified_full"]["expected_depth_rmse_m"],
+        )
+        self.assertIn("failure evidence", adapter["measurement_note"])
 
     def test_nerf_synthetic_archive_has_a_verified_lock(self) -> None:
         assets = {
@@ -258,7 +282,7 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
             self.assertGreater(field["density_max"], 1.0)
             self.assertFalse(comparison["metric_families_combined"])
             self.assertEqual(result["tool"]["container_image_id"], FIXTURE_IMAGE_ID)
-            self.assertEqual(result["acceptance"], {})
+            self.assertEqual(result["acceptance"]["target_psnr_db_min"], 20.0)
             self.assertIn("output/field.density_grid.float32.npy", result["provenance"]["artifacts_sha256"])
             self.assertIn("## Rendering", (run_dir / "report.md").read_text())
 
@@ -308,6 +332,39 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
             np.save(density, values, allow_pickle=False)
             with self.assertRaisesRegex(ValueError, "metric recomputation|artifact"):
                 validate_nerfacto_reference_result(run_dir)
+
+    def test_real_profiles_are_explicit_b200_gates(self) -> None:
+        for profile, variable in (
+            ("smoke", "SURFLO_REQUIRE_NERFACTO_REFERENCE"),
+            ("full", "SURFLO_REQUIRE_NERFACTO_FULL"),
+        ):
+            with self.subTest(profile=profile):
+                if os.environ.get(variable) != "1":
+                    continue
+                docker = shutil.which("docker")
+                self.assertIsNotNone(docker, "required Docker engine is unavailable")
+                inspected = subprocess.run(
+                    [docker, "image", "inspect", "surflo-pathway-radiance-field:1"],
+                    text=True,
+                    capture_output=True,
+                    check=False,
+                )
+                self.assertEqual(inspected.returncode, 0, inspected.stderr)
+                sys.path.insert(0, str(ROOT / "pipeline"))
+                from nerfacto_reference_runner import run_nerfacto_reference
+
+                cache = Path(
+                    os.environ.get(
+                        "SURFLO_PATHWAY_CACHE_ROOT",
+                        Path.home() / ".cache/surflo/3d-pathway",
+                    )
+                )
+                run_dir = run_nerfacto_reference(
+                    cache, profile, f"nerfacto-real-{profile}-test-{os.getpid()}"
+                )
+                result = json.loads((run_dir / "result.json").read_text())
+                self.assertEqual(result["profile"], profile)
+                self.assertEqual(result["resources"]["gpu_measurement_status"], "measured")
 
     def test_public_reference_plan_is_offline(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -380,9 +437,14 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
         self.assertIn("disable_scene_contraction = True", text)
         self.assertIn("orientation_method = \"none\"", text)
         self.assertIn("auto_scale_poses = False", text)
+        self.assertIn('eval_mode = "all"', text)
+        self.assertIn("dataloader_num_workers = 1", text)
         self.assertIn("get_outputs_for_camera", text)
         self.assertIn('outputs["accumulation"]', text)
         self.assertIn('outputs["expected_depth"]', text)
+        self.assertIn("to(ray_bundle.directions.device)", text)
+        self.assertIn("metric_outputs", text)
+        self.assertIn("to(trainer.pipeline.model.device)", text)
         self.assertNotIn("target_frames", text.split("trainer.train()", maxsplit=1)[0])
 
 if __name__ == "__main__":

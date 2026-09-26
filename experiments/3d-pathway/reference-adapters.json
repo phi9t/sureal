@@ -61,8 +61,12 @@
       "id": "nerfstudio-nerfacto-reference",
       "command": "run.sh reference --adapter nerfacto --profile smoke --run-id ID",
       "modules": ["10"],
-      "status": "not_landed",
-      "reason": "The source, environment, and evaluation contracts are pinned; the offline trained invocation and measured acceptance gates land in the executable-reference task.",
+      "status": "landed",
+      "acceptance": {
+        "smoke": {"target_psnr_db_min": 20.0, "target_ssim_min": 0.20, "common_visible_accumulation_coverage_min": 0.95, "expected_depth_rmse_m_max": 0.60, "point_fscore_10cm_min": 0.10},
+        "full": {"target_psnr_db_min": 18.0, "target_ssim_min": 0.20, "common_visible_accumulation_coverage_min": 0.95, "expected_depth_rmse_m_max": 0.70, "point_fscore_10cm_min": 0.10}
+      },
+      "baseline_environment": {"container_image_id": "sha256:11200316a8dfa0370891a8600f2b1bd884c701bad5c3750562d32dc530c935df", "gpu_model": "NVIDIA B200", "compute_capability": 10.0, "driver_version": "580.105.08", "torch": "2.7.1+cu128", "container_numpy": "2.5.2"},
       "model_contract": {
         "nerfstudio_source_commit": "50e0e3c70c775e89333256213363badbf074f29d",
         "tiny_cuda_nn_source_commit": "0109538c37ac0bf613f2bac8de6cda48352feca7",
@@ -72,10 +76,18 @@
         "posterior_sampling_claim": false
       },
       "evaluation_contract": {
+        "smoke_iterations": 1000,
+        "full_iterations": 20001,
+        "smoke_density_resolution": 128,
+        "full_density_resolution": 256,
+        "accumulation_threshold": 0.5,
         "rendering": "held-out target RGB; separate from geometry",
         "geometry": "held-out depth restricted to common-visible analytic truth",
         "surface_comparator": "module 09 NeuS-Facto baseline on the identical controlled scene"
-      }
+      },
+      "last_verified_smoke": {"date": "2026-09-26", "target_psnr_db": 23.048066218028612, "target_foreground_psnr_db": 16.132687334786542, "target_ssim": 0.8317113916079203, "target_lpips": 0.2532215317090352, "common_visible_accumulation_coverage": 0.9966487935656837, "expected_depth_rmse_m": 0.20132394154647137, "median_depth_rmse_m": 0.21257862360077184, "point_fscore_10cm": 0.8077380952380953, "training_seconds": 16.338006006088108, "training_steps_per_second": 61.20697958045586, "runtime_seconds": 36.20085500692949, "peak_cpu_memory_bytes": 2313252864, "peak_gpu_compute_memory_bytes": 4523556864},
+      "last_verified_full": {"date": "2026-09-26", "target_psnr_db": 20.62569904338164, "target_foreground_psnr_db": 13.827756154822154, "target_ssim": 0.8147878050804138, "target_lpips": 0.35848445693651837, "common_visible_accumulation_coverage": 0.9988927335640139, "expected_depth_rmse_m": 0.39362696430812566, "median_depth_rmse_m": 0.41512619891947433, "point_fscore_10cm": 0.24410904147800777, "training_seconds": 329.92901604110375, "training_steps_per_second": 60.62213090560123, "runtime_seconds": 352.4220933630131, "peak_cpu_memory_bytes": 2348818432, "peak_gpu_compute_memory_bytes": 4601151488},
+      "measurement_note": "Nerfacto optimizes one deterministic per-scene density/radiance field from context RGB. Rendering uses all three held-out targets; geometry uses only accumulation-qualified common-visible target rays, while unsupported rays are reported separately. The full profile's lower rendering and geometry scores are retained as back-arc extrapolation failure evidence, not tuned away or collapsed into a composite rank with NeuS-Facto. The adapter makes no completion or posterior-sampling claim."
     },
     {"id": "gaussian-splatting-reference", "modules": ["11"], "status": "not_landed", "reason": "No trained reference invocation or expected-result lock is tracked."},
     {"id": "foundation-geometry-reference", "modules": ["12"], "status": "not_landed", "reason": "No checkpoint-backed invocation is tracked in this pathway."}

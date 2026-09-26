@@ -965,6 +965,47 @@ field has lower depth RMSE. This controlled construction is a numerical
 concept demonstration, not a trained NeRF result; the maintained Nerfacto
 adapter below supplies the reproduction result.
 
+The maintained reproduction uses the pinned Nerfstudio `nerfacto` preset,
+which is a composite implementation rather than a paper-exact original NeRF:
+
+```bash
+experiments/3d-pathway/run.sh reference --adapter nerfacto \
+  --profile smoke --run-id nerfacto-smoke
+```
+
+Only the five smoke or nine full context RGB images appear in the training
+transform file. Target RGB is loaded after optimization solely for evaluation.
+The adapter disables camera optimization, appearance embeddings, and scene
+contraction; retains the upstream proposal sampler, field sizes, losses, mixed
+precision, and optimizers; uses metric near/far bounds of 0.1/6.0 m; and runs
+1,000 x 1,024-ray smoke or 20,001 x 2,048-ray full updates. A single loader
+worker and an all-context train/eval split avoid the pinned parallel loader's
+empty worker partition on this five-image fixture. They do not admit a target
+image into training.
+
+On the NVIDIA B200, two smoke executions established expected stochastic
+variation. The retained smoke measurement reached 23.05 dB PSNR, 0.832 SSIM,
+0.253 LPIPS, 0.201 m accumulation-qualified expected-depth RMSE, and 0.808
+point F-score at 10 cm in 16.3 training seconds. The full run reached 20.63 dB,
+0.815, 0.358, 0.394 m, and 0.244 respectively in 329.9 training seconds. Its
+lower scores despite more views and updates are retained as back-arc
+extrapolation failure evidence. Hash-grid CUDA updates are not bitwise
+deterministic here, so acceptance tolerances bound both observed smoke runs
+rather than promising identical values. LPIPS remains reported but is not a
+hard gate because otherwise valid full runs crossed its initially proposed
+tolerance; PSNR, SSIM, opacity coverage, depth RMSE, and point F-score retain
+independent regression bounds.
+
+Expected maintained-reference artifacts include the final checkpoint and
+resolved configuration, target RGB/accumulation/median-depth/expected-depth
+arrays, the 128³ or 256³ float32 density grid, threshold sweep, per-view image
+metrics, runtime/Insula/source manifests, resource trace, visualization,
+hash-bound `result.json`, and generated report. Density thresholds remain field
+diagnostics: a density field has no canonical SDF-like surface level. The
+locked NeRF Synthetic archive is available as a rendering-only canonical
+supplement; it is not used for this geometry score because the archive does
+not provide the analytic surface/support truth used by the shared comparison.
+
 ### Transition
 
 NeRF stores a scene in a network or feature grid. Gaussian splatting makes
