@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Surflo 3D pathway aggregate report manifest",
+  "type": "object",
+  "required": ["schema_version", "run_id", "module_ids", "complete_curriculum", "profiles", "measurement_kinds", "metric_families", "assumptions", "failure_interpretations", "source_ids", "report_sha256"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "run_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "module_ids": {"type": "array", "items": {"pattern": "^[0-9]{2}$"}},
+    "complete_curriculum": {"type": "boolean"},
+    "profiles": {"type": "array", "items": {"enum": ["smoke", "full"]}},
+    "measurement_kinds": {"type": "array", "items": {"enum": ["controlled_fixture", "reused_measured_result"]}},
+    "report_sha256": {"pattern": "^[0-9a-f]{64}$"}
+  }
+}

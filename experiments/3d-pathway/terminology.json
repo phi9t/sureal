@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "guardrails": [
+    {
+      "id": "nvs-is-not-surface-reconstruction",
+      "preferred": "Report novel-view rendering metrics separately from geometric surface metrics.",
+      "forbidden_patterns": ["psnr proves accurate geometry", "novel-view synthesis is surface reconstruction"]
+    },
+    {
+      "id": "completion-is-not-posterior-sampling",
+      "preferred": "A deterministic completion is one conditional estimate, not samples from a calibrated posterior.",
+      "forbidden_patterns": ["deterministic completion samples the posterior", "completion equals posterior sampling"]
+    },
+    {
+      "id": "point-noise-is-not-scene-noise",
+      "preferred": "Independent stochastic point decoding does not by itself define one coherent sampled scene hypothesis.",
+      "forbidden_patterns": ["independent point stochasticity is scene stochasticity", "more sampled points imply a scene posterior"]
+    }
+  ]
+}

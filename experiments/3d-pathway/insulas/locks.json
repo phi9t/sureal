@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "insulas": {
+    "classical": {
+      "base_image": "ubuntu:24.04",
+      "base_image_digest": "008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3",
+      "dockerfile_sha256": "ed149338f20f3e90c63697d0b3cec2c48023bd3a19d6d04dd3f3f652bff58fb4"
+    },
+    "neural-rendering": {
+      "base_image": "nvidia/cuda:13.2.1-cudnn-devel-ubuntu24.04",
+      "base_image_digest": "6435dc5a825b0095648d87a3c91240fd7788a85fafaf215739544d389ab74366",
+      "dockerfile_sha256": "7806108411068990b83f3efc15da9ade9bac0431468f7a978f676f72a8b22c5b"
+    }
+  }
+}

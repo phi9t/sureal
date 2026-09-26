@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Surflo 3D pathway maintained-reference result",
+  "type": "object",
+  "required": ["schema_version", "adapter", "module_ids", "profile", "status", "network_mode", "metrics", "acceptance", "tool", "resources", "provenance"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "adapter": {"const": "colmap-sfm"},
+    "module_ids": {"type": "array", "minItems": 1, "maxItems": 1, "items": {"type": "string", "pattern": "^[0-9]{2}$"}},
+    "profile": {"enum": ["smoke", "full"]},
+    "status": {"const": "complete"},
+    "network_mode": {"const": "offline"},
+    "metrics": {
+      "type": "object",
+      "required": ["registered_images", "sparse_points", "mean_reprojection_error_px"],
+      "properties": {
+        "registered_images": {"type": "integer"},
+        "sparse_points": {"type": "integer"},
+        "mean_reprojection_error_px": {"type": "number"}
+      }
+    },
+    "acceptance": {
+      "type": "object",
+      "required": ["registered_images_min", "sparse_points_min", "mean_reprojection_error_px_max"],
+      "properties": {
+        "registered_images_min": {"type": "integer"},
+        "sparse_points_min": {"type": "integer"},
+        "mean_reprojection_error_px_max": {"type": "number"}
+      }
+    },
+    "tool": {
+      "type": "object",
+      "required": ["name", "version", "package_version", "container_image", "container_image_id"],
+      "properties": {
+        "name": {"type": "string"},
+        "version": {"type": "string"},
+        "package_version": {"type": "string"},
+        "container_image": {"type": "string"},
+        "container_image_id": {"type": "string"}
+      }
+    },
+    "resources": {
+      "type": "object",
+      "required": ["runtime_seconds", "host"],
+      "properties": {"runtime_seconds": {"type": "number"}, "host": {"type": "string"}}
+    },
+    "provenance": {"type": "object", "required": ["config", "config_sha256", "implementation_sha256", "artifacts_sha256"]}
+  }
+}

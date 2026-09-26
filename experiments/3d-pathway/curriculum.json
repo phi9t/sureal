@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "cutoff": "2026-09-25",
+  "coordinate_convention": "right-handed world; OpenCV camera x-right/y-down/z-forward; metres",
+  "profiles": {
+    "smoke": {"samples": 64, "sweep_steps": 5, "purpose": "CI and numerical contracts"},
+    "full": {"samples": 4096, "sweep_steps": 17, "purpose": "expanded repo-owned concept-lab fixtures; not a heavyweight reference reproduction"}
+  },
+  "insulas": {
+    "classical": "insulas/classical/Dockerfile",
+    "neural-rendering": "insulas/neural-rendering/Dockerfile",
+    "blender": "../photoreal-scenes/insula/Dockerfile",
+    "surflo": "../insula-scout/insula/Dockerfile"
+  },
+  "modules": [
+    {
+      "id": "01", "slug": "image-formation-observability", "title": "Image formation and observability",
+      "evidence": ["calibrated 2D correspondences"], "observable": "rays, epipolar constraints, and structure up to gauge", "representation": "cameras and sparse 3D points",
+      "inference": "analytic", "objectives": ["reprojection error"], "metrics": ["epipolar residual", "triangulation error"],
+      "failure_sweep": ["baseline", "calibration error", "correspondence noise"], "insula": "classical",
+      "sources": ["longuet-higgins-1981", "hartley-sturm-1997", "zhang-2000"]
+    },
+    {
+      "id": "02", "slug": "shape-from-x", "title": "Shape-from-X",
+      "evidence": ["stereo", "motion", "shading", "silhouettes"], "observable": "cue-dependent visible shape", "representation": "depth, normals, or visual hull",
+      "inference": "analytic", "objectives": ["photometric and silhouette consistency"], "metrics": ["depth RMSE", "normal angular error", "IoU"],
+      "failure_sweep": ["texture", "lighting", "concavity", "baseline"], "insula": "classical",
+      "sources": ["marr-poggio-1979", "horn-1970", "woodham-1980", "laurentini-1994"]
+    },
+    {
+      "id": "03", "slug": "active-range-acquisition", "title": "Active range acquisition",
+      "evidence": ["structured light", "time of flight", "RGB-D", "LiDAR"], "observable": "sampled range under sensor response", "representation": "depth images and range points",
+      "inference": "analytic", "objectives": ["range likelihood"], "metrics": ["depth bias", "depth standard deviation", "missing rate"],
+      "failure_sweep": ["range", "incidence", "reflectance", "multipath"], "insula": "classical",
+      "sources": ["salvi-2010", "hansard-2012", "khoshelham-2012", "geiger-2012"]
+    },
+    {
+      "id": "04", "slug": "registration-range-fusion", "title": "Registration and range fusion",
+      "evidence": ["overlapping range scans"], "observable": "relative rigid alignment and sampled surface", "representation": "registered points, TSDF, or mesh",
+      "inference": "optimized", "objectives": ["point-to-plane distance", "truncated signed-distance agreement"], "metrics": ["pose error", "surface RMSE", "completeness"],
+      "failure_sweep": ["initialization", "overlap", "outliers", "sensor noise"], "insula": "classical",
+      "sources": ["besl-mckay-1992", "curless-levoy-1996", "lorensen-cline-1987", "kazhdan-2006"]
+    },
+    {
+      "id": "05", "slug": "structure-from-motion", "title": "Structure from motion and bundle adjustment",
+      "evidence": ["unordered overlapping RGB images"], "observable": "cameras and sparse structure up to gauge", "representation": "camera graph and sparse points",
+      "inference": "hybrid", "objectives": ["robust reprojection error"], "metrics": ["rotation error", "translation-direction error", "reprojection RMSE"],
+      "failure_sweep": ["repetition", "texture", "overlap", "outliers"], "insula": "classical",
+      "sources": ["fischler-bolles-1981", "lowe-2004", "triggs-2000", "schonberger-frahm-2016"]
+    },
+    {
+      "id": "06", "slug": "dense-mvs-meshing", "title": "Dense multi-view stereo and meshing",
+      "evidence": ["calibrated multi-view RGB"], "observable": "photo-consistent visible surfaces", "representation": "depth maps, fused points, and mesh",
+      "inference": "optimized", "objectives": ["photometric consistency", "visibility-aware regularization"], "metrics": ["accuracy", "completeness", "F-score"],
+      "failure_sweep": ["view count", "lighting", "occlusion", "texture"], "insula": "classical",
+      "sources": ["seitz-2006", "furukawa-ponce-2010", "schonberger-2017"]
+    },
+    {
+      "id": "07", "slug": "online-slam-mapping", "title": "Online SLAM and persistent mapping",
+      "evidence": ["ordered visual or RGB-D stream"], "observable": "trajectory and map under static-world assumptions", "representation": "keyframes, landmarks, pose graph, and map",
+      "inference": "hybrid", "objectives": ["tracking residual", "loop-closure pose-graph error"], "metrics": ["ATE", "RPE", "drift", "map F-score"],
+      "failure_sweep": ["loop closure", "camera motion", "object motion", "relocalization"], "insula": "classical",
+      "sources": ["newcombe-2011", "mur-artal-2015", "campos-2021", "sturm-2012"]
+    },
+    {
+      "id": "08", "slug": "learned-depth-completion", "title": "Learned depth, MVS, and deterministic completion",
+      "evidence": ["RGB and learned training priors"], "observable": "data-supported geometry plus a prior-conditioned estimate", "representation": "depth, voxels, or completed points",
+      "inference": "amortized", "objectives": ["supervised depth", "learned matching", "completion loss"], "metrics": ["AbsRel", "scale-aligned RMSE", "Chamfer distance", "completion IoU"],
+      "failure_sweep": ["weak correspondence", "metric scale", "out-of-distribution shape"], "insula": "neural-rendering",
+      "sources": ["eigen-2014", "ranftl-2020", "yao-2018", "yuan-2018", "song-2017"]
+    },
+    {
+      "id": "09", "slug": "continuous-geometry-inverse-graphics", "title": "Continuous geometry and differentiable inverse graphics",
+      "evidence": ["samples, images, masks, or latent codes"], "observable": "level sets constrained by samples and priors", "representation": "occupancy field, SDF, or differentiable mesh",
+      "inference": "hybrid", "objectives": ["occupancy likelihood", "SDF regression", "differentiable rendering loss"], "metrics": ["surface RMSE", "normal error", "topology error", "extraction time"],
+      "failure_sweep": ["sampling resolution", "topology", "hidden completion"], "insula": "neural-rendering",
+      "sources": ["mescheder-2019", "park-2019", "laine-2020", "yariv-2020", "wang-neus-2021"]
+    },
+    {
+      "id": "10", "slug": "neural-radiance-fields", "title": "Neural rendering and radiance fields",
+      "evidence": ["posed RGB images"], "observable": "view-conditioned radiance and volume density", "representation": "continuous radiance field",
+      "inference": "optimized", "objectives": ["volume-rendered photometric error"], "metrics": ["PSNR", "SSIM", "LPIPS", "geometry RMSE"],
+      "failure_sweep": ["view sparsity", "appearance change", "camera error", "geometry-rendering mismatch"], "insula": "neural-rendering",
+      "sources": ["lombardi-2019", "mildenhall-2020", "yu-pixelnerf-2021", "barron-2021", "wang-neus-2021"]
+    },
+    {
+      "id": "11", "slug": "gaussian-splatting", "title": "Gaussian splatting and explicit renderable primitives",
+      "evidence": ["posed RGB images or feed-forward image features"], "observable": "render-supporting anisotropic primitives", "representation": "3D or surfel-like Gaussian primitives",
+      "inference": "hybrid", "objectives": ["differentiable splat rendering loss", "surface regularization"], "metrics": ["PSNR", "render FPS", "surface RMSE", "mesh F-score"],
+      "failure_sweep": ["primitive count", "view sparsity", "surface regularization"], "insula": "neural-rendering",
+      "sources": ["zwicker-2001", "kerbl-2023", "guedon-lepetit-2024", "huang-2dgs-2024", "smart-splatt3r-2024"]
+    },
+    {
+      "id": "12", "slug": "feed-forward-geometry-foundations", "title": "Feed-forward visual geometry foundations",
+      "evidence": ["one or more unposed RGB images"], "observable": "amortized cameras and visible pointmaps under learned priors", "representation": "pointmaps, depths, cameras, and tracks",
+      "inference": "amortized", "objectives": ["confidence-weighted pointmap, depth, ray, pose, and matching losses"], "metrics": ["pose AUC", "depth error", "point-cloud accuracy", "runtime"],
+      "failure_sweep": ["overlap", "view count", "unseen surfaces", "alignment retained or removed"], "insula": "surflo",
+      "sources": ["wang-dust3r-2024", "leroy-mast3r-2024", "wang-vggt-2025", "lin-da3-2025"]
+    },
+    {
+      "id": "13", "slug": "generative-3d-scene-priors", "title": "Generative 3D and scene priors",
+      "evidence": ["partial geometry, images, or text plus a random variable"], "observable": "a conditional distribution only through training data and evidence", "representation": "sampled points, implicit parameters, radiance fields, meshes, or scene state",
+      "inference": "sampled", "objectives": ["continuous normalizing flow", "flow matching", "diffusion or score distillation"], "metrics": ["evidence consistency", "diversity", "within-sample coherence", "coverage"],
+      "failure_sweep": ["two-hypothesis ambiguity", "independent point noise", "shared scene latent"], "insula": "neural-rendering",
+      "sources": ["yang-pointflow-2019", "lipman-2023", "poole-2022", "hong-lrm-2023", "liu-zero123-2023"]
+    },
+    {
+      "id": "14", "slug": "dynamic-3d-4d", "title": "Dynamic 3D and 4D representations",
+      "evidence": ["time-indexed multi-view or monocular video"], "observable": "appearance, motion, and geometry under correspondence assumptions", "representation": "deformation field, time-conditioned radiance field, dynamic Gaussians, or trajectories",
+      "inference": "hybrid", "objectives": ["rendering, deformation, correspondence, and temporal consistency losses"], "metrics": ["temporal consistency", "trajectory error", "post-occlusion drift"],
+      "failure_sweep": ["static camera", "moving camera", "moving object", "occlusion duration"], "insula": "neural-rendering",
+      "sources": ["park-nerfies-2021", "pumarola-dnerf-2021", "luiten-dynamic3dgs-2024", "wu-4dgs-2024"]
+    },
+    {
+      "id": "15", "slug": "surflo-case-study", "title": "Surflo as the current case study",
+      "evidence": ["variable unposed RGB views encoded by frozen VGGT"], "observable": "visible and prior-supported oriented surface points", "representation": "Perceiver global tokens and independently transported 6D oriented points",
+      "inference": "sampled", "objectives": ["flow matching", "optional photometric rendering guidance"], "metrics": ["observed recall", "unobserved recall", "hidden support", "within-sample coherence"],
+      "failure_sweep": ["paired hidden hypotheses", "query count", "seed", "rendering guidance"], "insula": "surflo",
+      "sources": ["wang-vggt-2025", "lipman-2023", "guedon-surflo-2026"]
+    }
+  ]
+}

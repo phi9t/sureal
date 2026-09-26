@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "units": "metres",
+  "world_frame": {"handedness": "right", "up": "+Y", "forward": "-Z"},
+  "camera_frame": {"convention": "OpenCV", "x": "right", "y": "down", "z": "forward"},
+  "geometry": [
+    {"id": "ground", "primitive": "plane", "origin": [0.0, -1.0, 0.0], "normal": [0.0, 1.0, 0.0]},
+    {"id": "sphere", "primitive": "sphere", "center": [-0.65, -0.25, 0.1], "radius": 0.75},
+    {"id": "concave-box", "primitive": "open_box", "center": [0.9, -0.25, 0.0], "size": [1.0, 1.5, 1.0]},
+    {"id": "hidden-a", "primitive": "sphere", "center": [0.1, -0.2, -1.6], "radius": 0.35, "role": "hypothesis-a"},
+    {"id": "hidden-b", "primitive": "box", "center": [0.1, -0.2, -1.6], "size": [0.55, 0.55, 0.55], "role": "hypothesis-b"}
+  ],
+  "cameras": {
+    "intrinsics": {"width": 640, "height": 480, "fx": 520.0, "fy": 520.0, "cx": 319.5, "cy": 239.5},
+    "orbit_radius": 3.5,
+    "context_azimuth_degrees": [-45, -25, -5, 15, 35],
+    "target_azimuth_degrees": [120, 150, 180]
+  },
+  "reference_fixture": {
+    "kind": "calibrated_multidepth_plane_mosaic",
+    "purpose": "Non-degenerate maintained-SfM reference derived in the same world and camera convention",
+    "background_depth_m": 6.0,
+    "tile_rows": 5,
+    "tile_columns": 7,
+    "tile_center_x_angles": [-0.48, -0.32, -0.16, 0.0, 0.16, 0.32, 0.48],
+    "tile_center_y_angles": [-0.32, -0.16, 0.0, 0.16, 0.32],
+    "tile_depth_base_m": 2.7,
+    "tile_depth_step_m": 0.55,
+    "tile_depth_levels": 6,
+    "tile_half_width_angle": 0.082,
+    "tile_half_height_angle": 0.078,
+    "texture_scale_background": 94.0,
+    "texture_scale_tiles": 128.0,
+    "texture_count": 4,
+    "camera_x_smoke_m": [-0.2, -0.1, 0.0, 0.1, 0.2],
+    "camera_x_full_m": [-0.2, -0.15, -0.1, -0.05, 0.0, 0.05, 0.1, 0.15, 0.2]
+  },
+  "splits": {"geometry_mask": "common-visible", "context": [0, 1, 2, 3, 4], "target": [5, 6, 7]},
+  "seed": 260925
+}

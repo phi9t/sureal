@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "assets": [
+    {
+      "id": "controlled-suite", "mode": "generated", "license": "repository-owned",
+      "source": "shared-scene.json", "sha256": "dcb5f818685faf716090797c3ac08dc05a1861207d13e26e3ba743844d8b2cb3"
+    },
+    {
+      "id": "middlebury-mvs", "mode": "download", "license": "research dataset terms",
+      "source": "https://vision.middlebury.edu/mview/data/templeSparseRing.zip", "sha256": "08f4a0478cfcfbe38d045e51065735296ef08533414227b15d94ba8f90f55fd5",
+      "digest_status": "declared_unverified", "archive_format": "zip", "extraction": "deferred_until_adapter_lands", "consumers": ["colmap-mvs-reference"]
+    },
+    {
+      "id": "tum-rgbd", "mode": "download", "license": "TUM dataset terms",
+      "source": "https://cvg.cit.tum.de/rgbd/dataset/freiburg1/rgbd_dataset_freiburg1_xyz.tgz", "sha256": "856e4d3a3f0f149f87b8d892b8cd270e5c900994e1d3107eecb43d96c733bfb1",
+      "digest_status": "declared_unverified", "archive_format": "tar.gz", "extraction": "deferred_until_adapter_lands", "consumers": ["orb-slam-reference"]
+    },
+    {
+      "id": "nerf-synthetic", "mode": "download", "license": "NeRF dataset terms",
+      "source": "https://cseweb.ucsd.edu/~viscomp/projects/LF/papers/ECCV20/nerf/nerf_example_data.zip", "sha256": "2b501d6d887ba7461babe302ee3ff51b7eab76f5180b9810bb51784e905d6dc5",
+      "digest_status": "declared_unverified", "archive_format": "zip", "extraction": "deferred_until_adapter_lands", "consumers": ["nerf-reference"]
+    },
+    {
+      "id": "surflo-paired-scenes", "mode": "repository", "license": "repository license and third-party notices",
+      "source": "../photoreal-scenes/results.json", "sha256": "cf31460c1a770cccb7bb7126c623fef27c3603c0bae3833591af23405efb111b"
+    }
+  ]
+}

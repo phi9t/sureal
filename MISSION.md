@@ -566,3 +566,11 @@ This milestone does **not** implement scene-prior training, language supervision
 video generation, or 4D dynamics. It also excludes dynamic objects,
 transparency/refraction, and motion blur. Its purpose is to establish a strict,
 auditable static benchmark before any of those capabilities are introduced.
+
+## Reconstruction pathway
+
+The sourced, executable [3D reconstruction pathway](docs/3d-reconstruction-pathway.md)
+connects classical measurement, neural rendering, learned geometry, generative
+3D, dynamics, and Surflo. Its endpoint motivates the next objective: sample one
+persistent complete-scene state conditioned on the observations, then reuse it
+across points, cameras, and time.
