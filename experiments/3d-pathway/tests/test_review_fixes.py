@@ -65,7 +65,13 @@ class ReviewHardeningTest(unittest.TestCase):
         self.assertEqual(statuses["colmap-sfm-reference"], "landed")
         self.assertEqual(statuses["colmap-mvs-reference"], "landed")
         self.assertEqual(statuses["orb-slam-reference"], "landed")
-        landed = {"colmap-sfm-reference", "colmap-mvs-reference", "orb-slam-reference"}
+        self.assertEqual(statuses["depth-anything-v2-reference"], "landed")
+        landed = {
+            "colmap-sfm-reference",
+            "colmap-mvs-reference",
+            "orb-slam-reference",
+            "depth-anything-v2-reference",
+        }
         self.assertTrue(all(status == "not_landed" for adapter, status in statuses.items() if adapter not in landed))
 
         locks = json.loads((ROOT / "insulas" / "locks.json").read_text())["insulas"]
