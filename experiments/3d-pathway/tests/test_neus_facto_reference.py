@@ -258,7 +258,10 @@ class NeuSFactoReferenceFoundationTest(unittest.TestCase):
         lpips = assets["nerfstudio-lpips-alexnet"]
         self.assertEqual(lpips["sha256"], LPIPS_SHA256)
         self.assertEqual(lpips["byte_size"], 244408911)
-        self.assertEqual(lpips["consumers"], ["nerfstudio-neus-facto-reference"])
+        self.assertEqual(
+            lpips["consumers"],
+            ["nerfstudio-neus-facto-reference", "nerfstudio-nerfacto-reference"],
+        )
 
         dockerfile = (ROOT / "insulas/implicit-surface/Dockerfile").read_text()
         self.assertIn(f"ARG NERFSTUDIO_COMMIT={NERFSTUDIO_COMMIT}", dockerfile)

@@ -5,7 +5,7 @@
   "required": ["schema_version", "adapter", "module_ids", "profile", "status", "network_mode", "metrics", "acceptance", "tool", "resources", "provenance"],
   "properties": {
     "schema_version": {"const": 1},
-    "adapter": {"enum": ["colmap-sfm", "colmap-mvs", "orb-slam", "depth-anything-v2", "neus-facto"]},
+    "adapter": {"enum": ["colmap-sfm", "colmap-mvs", "orb-slam", "depth-anything-v2", "neus-facto", "nerfacto"]},
     "module_ids": {"type": "array", "minItems": 1, "maxItems": 1, "items": {"type": "string", "pattern": "^[0-9]{2}$"}},
     "profile": {"enum": ["smoke", "full"]},
     "status": {"const": "complete"},
@@ -132,6 +132,24 @@
               "rendering": {"type": "object"},
               "field": {"type": "object"},
               "unsupported": {"type": "object"}
+            }
+          },
+          "tool": {"required": ["source_commit", "dependency_commit"]}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"adapter": {"const": "nerfacto"}}},
+      "then": {
+        "required": ["support"],
+        "properties": {
+          "metrics": {
+            "required": ["rendering", "geometry", "field", "comparison"],
+            "properties": {
+              "rendering": {"type": "object"},
+              "geometry": {"type": "object"},
+              "field": {"type": "object"},
+              "comparison": {"type": "object"}
             }
           },
           "tool": {"required": ["source_commit", "dependency_commit"]}

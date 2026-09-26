@@ -335,7 +335,8 @@ def _lpips_checkpoint_record() -> dict[str, Any]:
         record.get("mode") != "download"
         or record.get("sha256") != LPIPS_CHECKPOINT_SHA256
         or record.get("byte_size") != LPIPS_CHECKPOINT_BYTES
-        or record.get("consumers") != ["nerfstudio-neus-facto-reference"]
+        or set(record.get("consumers", []))
+        != {"nerfstudio-neus-facto-reference", "nerfstudio-nerfacto-reference"}
         or not str(record.get("source", "")).endswith(LPIPS_CHECKPOINT_FILENAME)
     ):
         raise ValueError("NeuS-Facto LPIPS checkpoint lock mismatch")

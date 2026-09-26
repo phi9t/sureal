@@ -333,6 +333,53 @@ def generate_learned_depth_scene(
     return manifest
 
 
+def generate_radiance_field_scene(
+    destination: Path, scene: dict[str, Any], profile: str
+) -> dict[str, Any]:
+    """Write the shared sphere plus a context-only Nerfstudio transform file."""
+    manifest = generate_implicit_surface_scene(destination, scene, profile)
+    intrinsics = manifest["intrinsics"]
+    frames = []
+    for frame in manifest["context_frames"]:
+        camera_to_world = np.asarray(
+            frame["camera_to_world_model"], dtype=np.float64
+        ).copy()
+        camera_to_world[:3, 1:3] *= -1.0
+        frames.append(
+            {
+                "file_path": frame["image_path"],
+                "transform_matrix": camera_to_world.tolist(),
+            }
+        )
+    transforms = {
+        "camera_model": "OPENCV",
+        "w": int(intrinsics["width"]),
+        "h": int(intrinsics["height"]),
+        "fl_x": float(intrinsics["fx"]),
+        "fl_y": float(intrinsics["fy"]),
+        "cx": float(intrinsics["cx"]),
+        "cy": float(intrinsics["cy"]),
+        "k1": 0.0,
+        "k2": 0.0,
+        "p1": 0.0,
+        "p2": 0.0,
+        "orientation_override": "none",
+        "center_override": "none",
+        "auto_scale_poses": False,
+        "scale_factor": 1.0,
+        "frames": frames,
+    }
+    transforms_path = destination / "transforms.json"
+    transforms_path.write_bytes(canonical_json(transforms))
+    manifest["nerfstudio_transforms_path"] = transforms_path.name
+    manifest["nerfstudio_transforms_sha256"] = sha256_file(transforms_path)
+    manifest["target_training_leakage"] = (
+        "none; transforms.json contains context frames only"
+    )
+    (destination / "manifest.json").write_bytes(canonical_json(manifest))
+    return manifest
+
+
 def generate_colmap_mvs_scene(destination: Path, scene: dict[str, Any], profile: str) -> dict[str, Any]:
     """Add metric per-view depths and visible world-surface samples for MVS."""
     manifest = generate_colmap_scene(destination, scene, profile)

@@ -53,7 +53,10 @@ RUN printf '%s\n' \
       'network_policy=build-and-fetch-only' \
       > /etc/surflo-pathway-insula
 
-RUN python - <<'PY'
+COPY run-nerfacto.py /usr/local/bin/run-nerfacto.py
+RUN chmod 0555 /usr/local/bin/run-nerfacto.py \
+ && python -m py_compile /usr/local/bin/run-nerfacto.py \
+ && python - <<'PY'
 import torch
 import torchvision
 import nerfstudio

@@ -27,7 +27,7 @@
       "source": "https://download.pytorch.org/models/alexnet-owt-7be5be79.pth",
       "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
       "byte_size": 244408911, "digest_status": "verified_2026-09-26", "archive_format": "pytorch-state-dict",
-      "extraction": "not-required", "consumers": ["nerfstudio-neus-facto-reference"]
+      "extraction": "not-required", "consumers": ["nerfstudio-neus-facto-reference", "nerfstudio-nerfacto-reference"]
     },
     {
       "id": "nerf-synthetic", "mode": "download", "license": "NeRF dataset terms",

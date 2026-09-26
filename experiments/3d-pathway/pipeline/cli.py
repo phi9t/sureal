@@ -49,7 +49,7 @@ def parser() -> argparse.ArgumentParser:
     reference = commands.add_parser("reference")
     reference.add_argument(
         "--adapter",
-        choices=("colmap-sfm", "colmap-mvs", "orb-slam", "depth-anything-v2", "neus-facto"),
+        choices=("colmap-sfm", "colmap-mvs", "orb-slam", "depth-anything-v2", "neus-facto", "nerfacto"),
         required=True,
     )
     reference.add_argument("--profile", choices=("smoke", "full"), default="smoke")
