@@ -221,20 +221,20 @@ cp /work/output/text/cameras.txt /work/output/text/images.txt /work/output/text/
 """
 
 
-def _inspect_image(engine: str) -> str:
+def _inspect_image(engine: str, image: str = IMAGE) -> str:
     if shutil.which(engine) is None:
         raise ValueError(f"container engine not found: {engine}")
     completed = subprocess.run(
-        [engine, "image", "inspect", "--format", "{{.Id}}", IMAGE],
+        [engine, "image", "inspect", "--format", "{{.Id}}", image],
         text=True,
         capture_output=True,
         check=False,
     )
     if completed.returncode != 0:
-        raise ValueError(f"classical Insula is not built: {IMAGE}; run `run.sh build` first")
+        raise ValueError(f"classical Insula is not built: {image}; run `run.sh build` first")
     image_id = completed.stdout.strip()
     if not image_id:
-        raise ValueError(f"container image inspection returned no immutable ID: {IMAGE}")
+        raise ValueError(f"container image inspection returned no immutable ID: {image}")
     return image_id
 
 
@@ -265,7 +265,10 @@ def _parse_key_value_manifest(path: Path) -> dict[str, str]:
 
 def _validate_sqlite_database(path: Path) -> None:
     try:
-        connection = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+        # `mode=ro` alone still creates WAL/SHM sidecars for a database whose
+        # persistent journal mode is WAL.  Validation runs after provenance is
+        # sealed, so even empty sidecars would mutate the artifact tree.
+        connection = sqlite3.connect(f"file:{path}?mode=ro&immutable=1", uri=True)
         try:
             integrity = connection.execute("PRAGMA integrity_check").fetchone()
             tables = {
@@ -428,6 +431,10 @@ def _secure_directory(root: Path, name: str) -> Path:
 
 def run_reference(cache_root: Path, adapter: str, profile: str, run_id: str) -> Path:
     validate_run_id(run_id)
+    if adapter == "colmap-mvs":
+        from mvs_reference_runner import run_mvs_reference
+
+        return run_mvs_reference(cache_root, profile, run_id)
     if adapter != ADAPTER:
         raise ValueError(f"unknown landed reference adapter: {adapter}")
     if profile not in {"smoke", "full"}:

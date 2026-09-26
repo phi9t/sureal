@@ -131,6 +131,29 @@ def run_cli(*args: str, cache: Path, engine: Path, extra_env: dict[str, str] | N
 
 
 class ColmapReferenceAdapterTest(unittest.TestCase):
+    def test_sqlite_validation_does_not_create_wal_sidecars(self) -> None:
+        import sqlite3
+        from sys import path as import_path
+
+        import_path.insert(0, str(ROOT / "pipeline"))
+        from reference_runner import _validate_sqlite_database
+
+        with tempfile.TemporaryDirectory() as temporary:
+            database = Path(temporary) / "database.db"
+            connection = sqlite3.connect(database)
+            connection.execute("PRAGMA journal_mode=WAL")
+            for table in ("cameras", "images", "keypoints", "descriptors", "matches", "two_view_geometries"):
+                connection.execute(f"CREATE TABLE {table} (id INTEGER)")
+            connection.commit()
+            connection.close()
+            self.assertFalse(Path(f"{database}-wal").exists())
+            self.assertFalse(Path(f"{database}-shm").exists())
+
+            _validate_sqlite_database(database)
+
+            self.assertFalse(Path(f"{database}-wal").exists())
+            self.assertFalse(Path(f"{database}-shm").exists())
+
     def test_generated_scene_is_deterministic_and_records_full_calibration(self) -> None:
         from sys import path as import_path
         import_path.insert(0, str(ROOT / "pipeline"))
@@ -149,7 +172,10 @@ class ColmapReferenceAdapterTest(unittest.TestCase):
             self.assertEqual(len(first["frames"]), 5)
             for frame, camera_x in zip(first["frames"], scene["reference_fixture"]["camera_x_smoke_m"]):
                 self.assertEqual(frame["K"], [[520.0, 0.0, 319.5], [0.0, 520.0, 239.5], [0.0, 0.0, 1.0]])
-                self.assertEqual(frame["R_world_to_camera"], [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
+                self.assertEqual(
+                    frame["R_world_to_camera"],
+                    [[1.0, 0.0, 0.0], [0.0, -1.0, 0.0], [0.0, 0.0, -1.0]],
+                )
                 self.assertEqual(frame["t_world_to_camera_m"], [-camera_x, 0.0, 0.0])
                 self.assertEqual(frame["camera_center_m"], [camera_x, 0.0, 0.0])
                 image = root / "first" / "images" / frame["name"]

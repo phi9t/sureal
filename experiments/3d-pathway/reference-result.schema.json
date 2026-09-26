@@ -5,7 +5,7 @@
   "required": ["schema_version", "adapter", "module_ids", "profile", "status", "network_mode", "metrics", "acceptance", "tool", "resources", "provenance"],
   "properties": {
     "schema_version": {"const": 1},
-    "adapter": {"const": "colmap-sfm"},
+    "adapter": {"enum": ["colmap-sfm", "colmap-mvs"]},
     "module_ids": {"type": "array", "minItems": 1, "maxItems": 1, "items": {"type": "string", "pattern": "^[0-9]{2}$"}},
     "profile": {"enum": ["smoke", "full"]},
     "status": {"const": "complete"},
@@ -16,12 +16,19 @@
       "properties": {
         "registered_images": {"type": "integer"},
         "sparse_points": {"type": "integer"},
-        "mean_reprojection_error_px": {"type": "number"}
+        "mean_reprojection_error_px": {"type": "number"},
+        "dense_points": {"type": "integer"},
+        "mesh_faces": {"type": "integer"},
+        "camera_alignment_rmse_m": {"type": "number"},
+        "accuracy_mean_m": {"type": "number"},
+        "completeness_mean_m": {"type": "number"},
+        "supported_completeness_mean_m": {"type": "number"},
+        "undersupported_completeness_mean_m": {"type": "number"},
+        "fscore_10cm": {"type": "number"}
       }
     },
     "acceptance": {
       "type": "object",
-      "required": ["registered_images_min", "sparse_points_min", "mean_reprojection_error_px_max"],
       "properties": {
         "registered_images_min": {"type": "integer"},
         "sparse_points_min": {"type": "integer"},
@@ -35,6 +42,7 @@
         "name": {"type": "string"},
         "version": {"type": "string"},
         "package_version": {"type": "string"},
+        "source_commit": {"type": "string"},
         "container_image": {"type": "string"},
         "container_image_id": {"type": "string"}
       }
@@ -42,7 +50,16 @@
     "resources": {
       "type": "object",
       "required": ["runtime_seconds", "host"],
-      "properties": {"runtime_seconds": {"type": "number"}, "host": {"type": "string"}}
+      "properties": {
+        "runtime_seconds": {"type": "number"},
+        "peak_cpu_memory_bytes": {"type": "integer"},
+        "peak_gpu_compute_memory_bytes": {"type": "integer"},
+        "gpu_memory_scope": {"type": "string"},
+        "gpu_measurement_status": {"type": "string"},
+        "gpu_selection": {"type": "string"},
+        "gpu_hardware": {"type": "array"},
+        "host": {"type": "string"}
+      }
     },
     "provenance": {"type": "object", "required": ["config", "config_sha256", "implementation_sha256", "artifacts_sha256"]}
   }

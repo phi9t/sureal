@@ -31,7 +31,10 @@
     "tile_half_height_angle": 0.078,
     "texture_scale_background": 94.0,
     "texture_scale_tiles": 128.0,
-    "texture_count": 4,
+    "texture_count": 36,
+    "tile_texture_size": 256,
+    "tile_texture_assignment": "unique-per-tile",
+    "ground_truth_sample_stride_pixels": 4,
     "camera_x_smoke_m": [-0.2, -0.1, 0.0, 0.1, 0.2],
     "camera_x_full_m": [-0.2, -0.15, -0.1, -0.05, 0.0, 0.05, 0.1, 0.15, 0.2]
   },

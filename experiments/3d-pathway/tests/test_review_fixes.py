@@ -30,6 +30,31 @@ def run_cli(*args: str, cache: Path) -> subprocess.CompletedProcess[str]:
 
 
 class ReviewHardeningTest(unittest.TestCase):
+    def test_multistage_insula_locks_cover_the_runtime_image(self) -> None:
+        from audit import _image_lock_errors
+
+        lock = {
+            "base_image": "example/builder:1",
+            "base_image_digest": "a" * 64,
+            "runtime_image": "example/runtime:1",
+            "runtime_image_digest": "b" * 64,
+        }
+        dockerfile = (
+            f"FROM example/builder:1@sha256:{'a' * 64} AS builder\n"
+            f"FROM example/runtime:1@sha256:{'b' * 64} AS runtime\n"
+        )
+        self.assertEqual(_image_lock_errors("fixture", lock, dockerfile), [])
+        tampered = dockerfile.replace("b" * 64, "c" * 64)
+        self.assertIn(
+            "Insula runtime image lock mismatch: fixture",
+            _image_lock_errors("fixture", lock, tampered),
+        )
+        source_lock = dict(lock, colmap_source_commit="d" * 40)
+        self.assertIn(
+            "Insula COLMAP source lock mismatch: fixture",
+            _image_lock_errors("fixture", source_lock, dockerfile),
+        )
+
     def test_reference_scope_and_container_locks_are_honest(self) -> None:
         curriculum = json.loads((ROOT / "curriculum.json").read_text())
         self.assertIn("repo-owned concept", curriculum["profiles"]["full"]["purpose"].lower())
@@ -38,15 +63,16 @@ class ReviewHardeningTest(unittest.TestCase):
         self.assertTrue(adapters)
         statuses = {item["id"]: item["status"] for item in adapters}
         self.assertEqual(statuses["colmap-sfm-reference"], "landed")
-        self.assertTrue(all(status == "not_landed" for adapter, status in statuses.items() if adapter != "colmap-sfm-reference"))
+        self.assertEqual(statuses["colmap-mvs-reference"], "landed")
+        landed = {"colmap-sfm-reference", "colmap-mvs-reference"}
+        self.assertTrue(all(status == "not_landed" for adapter, status in statuses.items() if adapter not in landed))
 
         locks = json.loads((ROOT / "insulas" / "locks.json").read_text())["insulas"]
+        from audit import _image_lock_errors
+
         for name, lock in locks.items():
             dockerfile = ROOT / "insulas" / name / "Dockerfile"
-            first = dockerfile.read_text().splitlines()[0].removeprefix("FROM ")
-            image, digest = first.rsplit("@sha256:", 1)
-            self.assertEqual(lock["base_image"], image)
-            self.assertEqual(lock["base_image_digest"], digest)
+            self.assertEqual(_image_lock_errors(name, lock, dockerfile.read_text()), [])
             self.assertEqual(lock["dockerfile_sha256"], hashlib.sha256(dockerfile.read_bytes()).hexdigest())
 
     def test_corrected_primary_source_metadata(self) -> None:

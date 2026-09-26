@@ -47,6 +47,34 @@ def _normalized(value: str) -> str:
     return re.sub(r"[^a-z0-9]+", "", value.lower())
 
 
+def _image_lock_errors(name: str, lock: dict[str, str], dockerfile_text: str) -> list[str]:
+    errors: list[str] = []
+    image_refs = []
+    for line in dockerfile_text.splitlines():
+        match = re.match(r"^FROM\s+(\S+)", line, flags=re.IGNORECASE)
+        if match:
+            image_refs.append(match.group(1))
+    expected_base = f"{lock['base_image']}@sha256:{lock['base_image_digest']}"
+    if not image_refs or image_refs[0] != expected_base:
+        errors.append(f"Insula base image lock mismatch: {name}")
+    runtime_keys = {"runtime_image", "runtime_image_digest"}
+    present_runtime_keys = runtime_keys & set(lock)
+    if present_runtime_keys and present_runtime_keys != runtime_keys:
+        errors.append(f"Insula runtime image lock is incomplete: {name}")
+    elif present_runtime_keys:
+        expected_runtime = f"{lock['runtime_image']}@sha256:{lock['runtime_image_digest']}"
+        if expected_runtime not in image_refs[1:]:
+            errors.append(f"Insula runtime image lock mismatch: {name}")
+    source_commit = lock.get("colmap_source_commit")
+    if source_commit and not re.search(
+        rf"^ARG\s+COLMAP_GIT_COMMIT={re.escape(source_commit)}$",
+        dockerfile_text,
+        flags=re.MULTILINE,
+    ):
+        errors.append(f"Insula COLMAP source lock mismatch: {name}")
+    return errors
+
+
 def _crossref_check(source: dict[str, object]) -> str | None:
     url = str(source["primary_url"])
     prefix = "https://doi.org/"
@@ -139,10 +167,7 @@ def audit(online: bool) -> dict[str, object]:
         if not dockerfile.is_file() or sha256_file(dockerfile) != lock["dockerfile_sha256"]:
             errors.append(f"Insula Dockerfile hash mismatch: {name}")
             continue
-        first = dockerfile.read_text(encoding="utf-8").splitlines()[0]
-        expected = f"FROM {lock['base_image']}@sha256:{lock['base_image_digest']}"
-        if first != expected:
-            errors.append(f"Insula base image lock mismatch: {name}")
+        errors.extend(_image_lock_errors(name, lock, dockerfile.read_text(encoding="utf-8")))
 
     adapters = load_json(ROOT / "reference-adapters.json").get("adapters", [])
     if not adapters:

@@ -3,12 +3,12 @@
   "assets": [
     {
       "id": "controlled-suite", "mode": "generated", "license": "repository-owned",
-      "source": "shared-scene.json", "sha256": "dcb5f818685faf716090797c3ac08dc05a1861207d13e26e3ba743844d8b2cb3"
+      "source": "shared-scene.json", "sha256": "ea34899e68c042bd569cf5797e1eb9e0ebf5bd8a2dca260abca0cb58c605363e"
     },
     {
       "id": "middlebury-mvs", "mode": "download", "license": "research dataset terms",
       "source": "https://vision.middlebury.edu/mview/data/templeSparseRing.zip", "sha256": "08f4a0478cfcfbe38d045e51065735296ef08533414227b15d94ba8f90f55fd5",
-      "digest_status": "declared_unverified", "archive_format": "zip", "extraction": "deferred_until_adapter_lands", "consumers": ["colmap-mvs-reference"]
+      "digest_status": "declared_unverified", "archive_format": "zip", "extraction": "deferred_for_future_external_dataset_extension", "consumers": ["future-middlebury-mvs-extension"]
     },
     {
       "id": "tum-rgbd", "mode": "download", "license": "TUM dataset terms",

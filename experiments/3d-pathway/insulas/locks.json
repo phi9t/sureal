@@ -6,6 +6,14 @@
       "base_image_digest": "008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3",
       "dockerfile_sha256": "ed149338f20f3e90c63697d0b3cec2c48023bd3a19d6d04dd3f3f652bff58fb4"
     },
+    "classical-mvs": {
+      "base_image": "nvidia/cuda:12.9.1-devel-ubuntu24.04",
+      "base_image_digest": "e542739fcaa4f45da5add8c4cf5769783a61628b2518304a5bbe4ace468b8c8f",
+      "runtime_image": "nvidia/cuda:12.9.1-runtime-ubuntu24.04",
+      "runtime_image_digest": "1199283a7fd5fc7dcb472ea4c6b6d8eb378ef8c0b9aae5e731491c01a219ca43",
+      "colmap_source_commit": "be5e29168d4aff238409d60424812df66aac919f",
+      "dockerfile_sha256": "5cf42fe8ebd2512b76e1cc4129d243df855e67e1e3baf679e44f29512e59439f"
+    },
     "neural-rendering": {
       "base_image": "nvidia/cuda:13.2.1-cudnn-devel-ubuntu24.04",
       "base_image_digest": "6435dc5a825b0095648d87a3c91240fd7788a85fafaf215739544d389ab74366",

@@ -160,16 +160,16 @@ class DispatcherContractTest(unittest.TestCase):
 
 
 class InsulaContractTest(unittest.TestCase):
-    def test_classical_and_neural_insulas_are_distinct_and_content_pinned(self) -> None:
+    def test_insulas_are_distinct_and_content_pinned(self) -> None:
         locks = json.loads((ROOT / "insulas" / "locks.json").read_text())["insulas"]
-        self.assertEqual(set(locks), {"classical", "neural-rendering"})
+        self.assertEqual(set(locks), {"classical", "classical-mvs", "neural-rendering"})
         self.assertNotEqual(locks["classical"]["base_image"], locks["neural-rendering"]["base_image"])
         for name, lock in locks.items():
             with self.subTest(name=name):
                 dockerfile = ROOT / "insulas" / name / "Dockerfile"
                 self.assertTrue(dockerfile.is_file())
                 first_line = dockerfile.read_text().splitlines()[0]
-                self.assertRegex(first_line, r"^FROM .+@sha256:[0-9a-f]{64}$")
+                self.assertRegex(first_line, r"^FROM .+@sha256:[0-9a-f]{64}(?: AS builder)?$")
                 digest = hashlib.sha256(dockerfile.read_bytes()).hexdigest()
                 self.assertEqual(digest, lock["dockerfile_sha256"])
                 self.assertRegex(lock["base_image_digest"], r"^[0-9a-f]{64}$")

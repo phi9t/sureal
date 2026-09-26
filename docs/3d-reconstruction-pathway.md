@@ -442,11 +442,74 @@ view selection in unstructured image collections.
 
 ```bash
 experiments/3d-pathway/run.sh run --module 06 --profile smoke --run-id pathway-06
+experiments/3d-pathway/run.sh reference --adapter colmap-mvs --profile smoke --run-id colmap-mvs-06
 ```
 
 Inspect `result.json`, `report.md`, `artifacts/mvs_views.svg`, and
 `artifacts/failure_sweep.csv`. View count and exposure shift are separate
 sweeps; accuracy, completeness, and hidden-surface recall remain distinct.
+
+The maintained reference is a separate, offline COLMAP 4.2.0 execution pinned
+to source commit `be5e29168d4aff238409d60424812df66aac919f`. Its CUDA 12.9.1
+Insula is built explicitly for the available B200. This version boundary is
+material: upstream fixed empty PatchMatch outputs on `sm_100+` in the
+[COLMAP 4.0.3 release](https://github.com/colmap/colmap/releases/tag/4.0.3),
+and 4.2.0 retains that workaround. COLMAP's
+[installation guide](https://colmap.github.io/install.html) also notes that
+distribution packages do not provide CUDA support, so the dense reference is
+source-built rather than silently falling back to a CPU/package variant.
+
+The controlled fixture uses unique appearance for every depth tile to avoid
+turning repeated texture into an accidental pose ambiguity. Smoke uses five
+views and full uses nine. The adapter runs SIFT SfM, image undistortion,
+geometric-consistency PatchMatch, stereo fusion, and Poisson meshing. It emits
+the SQLite feature database, binary and text sparse models, photometric and
+geometric depth/normal maps, fused oriented points, a mesh, logs, manifests,
+and a hash-bound report. Execution is `--network none`; the immutable image ID
+and exact source commit are checked before atomic promotion.
+Base-image digests, the Dockerfile hash, and the per-run image ID are recorded,
+but Ubuntu dependencies are resolved during the explicit build. The result is
+version-attested rather than a claim of bit-reproducible OCI output; the
+reported B200 environment is descriptive baseline metadata, not a rebuild
+identity gate.
+
+Let (S) be the similarity estimated from recovered camera centers and
+orientations to the declared metric cameras, (P) the fused points, and (G) the
+repo-owned union of per-view visible-surface samples. Both aligned clouds are
+deduplicated on a 1 cm voxel grid, then sampled without replacement to at most
+8,192 voxels using seed 260925. This makes the score invariant to PLY row order
+and prevents repeated observations from weighting a surface multiple times.
+On the resulting spatial samples (\bar P,\bar G), the reference reports
+
+\[
+\operatorname{accuracy}=\frac{1}{|\bar P|}\sum_{p\in \bar P}\min_{g\in \bar G}\|p-g\|_2,
+\qquad
+\operatorname{completeness}=\frac{1}{|\bar G|}\sum_{g\in \bar G}\min_{p\in \bar P}\|g-p\|_2.
+\]
+
+Precision and recall threshold those two directed distances at 10 cm, and their
+harmonic mean is reported as F-score. These quantities are not collapsed with
+novel-view rendering metrics. The visible-surface contract includes deeper and
+background pixels that are visible in an input but may lack sufficient
+multi-view support; their miss remains in completeness. The report separately
+summarizes truth voxels receiving at least two sampled observations and those
+below that threshold, and claims a support failure only when that split explains
+the directed-error gap.
+Counts revalidate exactly. Floating metrics revalidate at 1e-9 relative and
+1e-12 absolute tolerance, and the hashed run configuration records the NumPy
+version used for evaluation.
+
+The verified B200 smoke baseline registers 5/5 views and produces 41,749 fused
+points and 257,274 unique non-degenerate mesh faces, with 0.034 m accuracy, 0.827 m completeness,
+and 0.387 F-score at 10 cm. Full registers 9/9 views and produces 105,548
+points and 628,823 such faces, with 0.046 m accuracy, 0.625 m completeness, and
+0.643 F-score. The tracked baselines live in `reference-adapters.json`; the
+large directed-error gap is retained as failure evidence rather than averaged
+away. COLMAP's GPU stages vary slightly, so acceptance is threshold-based
+rather than exact-output based. Smoke uses a
+deliberately loose 1 m completeness ceiling while
+still requiring supported-surface accuracy and a minimum 10 cm F-score; a
+five-view run is not rejected merely for exposing the intended support failure.
 
 ### Transition
 
@@ -1094,14 +1157,16 @@ run.sh validate --module MODULE --run-id ID
 run.sh report --run-id ID
 run.sh all --profile full
 run.sh reference --adapter colmap-sfm --profile smoke|full --run-id ID
+run.sh reference --adapter colmap-mvs --profile smoke|full --run-id ID
 ```
 
 `build` and `fetch` are networked by declaration. Lab execution, validation,
 and reporting are offline. Runs are written to cache-backed staging directories,
 validated for schema, finite values, hashes, artifacts, and metric-family
 separation, then atomically promoted. Existing run IDs are not overwritten.
-The classical and neural-rendering Insulas are distinct; the pathway references
-the existing Blender and Surflo Insulas for those specialized workloads.
+The classical SfM, CUDA/Blackwell classical-MVS, and neural-rendering Insulas
+are distinct; the pathway references the existing Blender and Surflo Insulas
+for those specialized workloads.
 Maintained reference runs use their own `reference-runs/` namespace so their
 measured outputs cannot be confused with controlled concept fixtures.
 
