@@ -11,6 +11,7 @@
     "orb-slam": "insulas/orb-slam/Dockerfile",
     "neural-rendering": "insulas/neural-rendering/Dockerfile",
     "implicit-surface": "insulas/implicit-surface/Dockerfile",
+    "radiance-field": "insulas/radiance-field/Dockerfile",
     "blender": "../photoreal-scenes/insula/Dockerfile",
     "surflo": "../insula-scout/insula/Dockerfile"
   },
