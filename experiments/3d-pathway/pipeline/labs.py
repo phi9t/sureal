@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import csv
+import io
 from pathlib import Path
 from typing import Any
+import zipfile
 
 import numpy as np
 
@@ -50,6 +52,18 @@ def _write_chart(path: Path, title: str, values: list[float], color: str = "#276
 <text x="{left}" y="244" font-family="sans-serif" font-size="11">controlled sweep (min={low:.4g}, max={high:.4g})</text></svg>\n''',
         encoding="utf-8",
     )
+
+
+def _write_npz_deterministic(path: Path, arrays: dict[str, np.ndarray]) -> None:
+    """Write NumPy arrays without embedding wall-clock timestamps."""
+    with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        for name in sorted(arrays):
+            payload = io.BytesIO()
+            np.lib.format.write_array(payload, np.asarray(arrays[name]), allow_pickle=False)
+            member = zipfile.ZipInfo(f"{name}.npy", date_time=(1980, 1, 1, 0, 0, 0))
+            member.compress_type = zipfile.ZIP_DEFLATED
+            member.external_attr = 0o644 << 16
+            archive.writestr(member, payload.getvalue())
 
 
 def _steps(profile_config: dict[str, Any]) -> int:
@@ -395,19 +409,152 @@ def _continuous_geometry_lab(artifacts: Path, profile: str, scene: dict[str, Any
 
 
 def _radiance_field_lab(artifacts: Path, profile: str, scene: dict[str, Any], profile_config: dict[str, Any]) -> dict[str, Any]:
-    views = np.unique(np.rint(np.linspace(3, 35, _steps(profile_config))).astype(int))
-    psnr = 22.0 + 4.1 * np.log2(views / 3.0)
-    geometry_error = 0.16 / np.sqrt(views / 3.0) + 0.035
+    side = max(8, int(np.sqrt(int(profile_config["samples"]))))
+    axis = np.linspace(-1.0, 1.0, side, dtype=np.float64)
+    image_x, image_y = np.meshgrid(axis, axis)
+    evaluation_mask = image_x * image_x + image_y * image_y <= 0.65 ** 2
+    radial = np.sqrt(np.clip(1.0 - (image_x * image_x + image_y * image_y) / 0.65 ** 2, 0.0, 1.0))
+    truth_depth = np.where(evaluation_mask, 2.0 - 0.28 * radial, 0.0)
+    foreground_rgb = np.stack(
+        [
+            0.55 + 0.20 * image_x,
+            0.32 + 0.16 * image_y,
+            0.18 + 0.12 * radial,
+        ],
+        axis=-1,
+    )
+    truth_rgb = np.where(evaluation_mask[..., None], foreground_rgb, 0.0)
+    sample_depths = np.linspace(1.25, 3.25, 96, dtype=np.float64)
+    delta = float(sample_depths[1] - sample_depths[0])
+
+    def render_field(center_depth: np.ndarray, sample_rgb: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        sigma = 180.0 * np.exp(
+            -0.5 * ((sample_depths[None, None, :] - center_depth[..., None]) / 0.022) ** 2
+        )
+        sigma *= evaluation_mask[..., None]
+        alpha = 1.0 - np.exp(-sigma * delta)
+        transmittance = np.concatenate(
+            [
+                np.ones((*alpha.shape[:2], 1), dtype=np.float64),
+                np.cumprod(1.0 - alpha[..., :-1] + 1e-12, axis=-1),
+            ],
+            axis=-1,
+        )
+        weights = alpha * transmittance
+        accumulation = np.sum(weights, axis=-1)
+        rendered_rgb = np.sum(weights[..., None] * sample_rgb[..., None, :], axis=-2)
+        rendered_depth = np.divide(
+            np.sum(weights * sample_depths[None, None, :], axis=-1),
+            accumulation,
+            out=np.zeros_like(accumulation),
+            where=accumulation > 1e-8,
+        )
+        return rendered_rgb, rendered_depth, accumulation
+
+    def scores(predicted_rgb: np.ndarray, predicted_depth: np.ndarray) -> tuple[float, float, float]:
+        image_mse = float(np.mean((predicted_rgb - truth_rgb) ** 2))
+        psnr_db = float(-10.0 * np.log10(image_mse))
+        x = truth_rgb.reshape(-1)
+        y = predicted_rgb.reshape(-1)
+        c1, c2 = 0.01 ** 2, 0.03 ** 2
+        ssim = float(
+            ((2.0 * np.mean(x) * np.mean(y) + c1) * (2.0 * np.mean((x - np.mean(x)) * (y - np.mean(y))) + c2))
+            / ((np.mean(x) ** 2 + np.mean(y) ** 2 + c1) * (np.var(x) + np.var(y) + c2))
+        )
+        residual = predicted_depth[evaluation_mask] - truth_depth[evaluation_mask]
+        rmse_m = float(np.sqrt(np.mean(residual * residual)))
+        return psnr_db, ssim, rmse_m
+
+    views = np.array([3, 5, 9], dtype=int)
+    radiance_outputs: dict[int, tuple[np.ndarray, np.ndarray, np.ndarray, tuple[float, float, float]]] = {}
     sweep = []
-    for view_count, image_score, surface_error in zip(views, psnr, geometry_error):
-        sweep.append({"parameter": "training_view_count", "value": int(view_count), "metric": "psnr_db", "measurement": float(image_score)})
-        sweep.append({"parameter": "training_view_count", "value": int(view_count), "metric": "surface_rmse_m", "measurement": float(surface_error)})
+    for view_count in views:
+        depth_bias_m = 0.24 * (3.0 / float(view_count)) ** 0.8
+        color_error = (0.028 * 3.0 / float(view_count)) * (
+            0.5 + 0.5 * np.sin(4.0 * image_x + 3.0 * image_y)
+        )
+        radiance_color = np.clip(truth_rgb + evaluation_mask[..., None] * color_error[..., None], 0.0, 1.0)
+        rendered_rgb, rendered_depth, accumulation = render_field(
+            truth_depth + evaluation_mask * depth_bias_m,
+            radiance_color,
+        )
+        field_scores = scores(rendered_rgb, rendered_depth)
+        radiance_outputs[int(view_count)] = (rendered_rgb, rendered_depth, accumulation, field_scores)
+        sweep.extend(
+            [
+                {"parameter": "training_view_count", "value": int(view_count), "metric": "psnr_db", "measurement": field_scores[0]},
+                {"parameter": "training_view_count", "value": int(view_count), "metric": "rendered_depth_rmse_m", "measurement": field_scores[2]},
+            ]
+        )
+
+    surface_color = np.clip(truth_rgb * 0.84 + evaluation_mask[..., None] * 0.035, 0.0, 1.0)
+    surface_rgb, surface_depth, surface_accumulation = render_field(
+        truth_depth + evaluation_mask * 0.012,
+        surface_color,
+    )
+    surface_scores = scores(surface_rgb, surface_depth)
+    radiance_rgb, radiance_depth, radiance_accumulation, radiance_scores = radiance_outputs[9]
+
+    comparison = {
+        "schema_version": 1,
+        "evidence": "posed RGB only",
+        "evaluation": {
+            "rendering": "full-frame RGB against the held-out analytic target",
+            "geometry": "rendered expected depth on the foreground evaluation mask",
+            "metric_families_combined": False,
+        },
+        "radiance_field": {
+            "representation": "volume density and radiance",
+            "inference": "controlled analytic field evaluation",
+            "completion_claim": False,
+            "psnr_db": radiance_scores[0],
+            "rendered_depth_rmse_m": radiance_scores[2],
+        },
+        "surface_model": {
+            "representation": "signed-distance level set",
+            "inference": "controlled analytic surface evaluation",
+            "completion_claim": False,
+            "psnr_db": surface_scores[0],
+            "rendered_depth_rmse_m": surface_scores[2],
+        },
+    }
+    (artifacts / "comparison.json").write_text(
+        __import__("json").dumps(comparison, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    _write_npz_deterministic(
+        artifacts / "field_comparison.npz",
+        {
+            "evaluation_mask": evaluation_mask.astype(np.uint8),
+            "radiance_field_accumulation": radiance_accumulation,
+            "radiance_field_depth_m": radiance_depth,
+            "radiance_field_rgb": radiance_rgb,
+            "surface_model_accumulation": surface_accumulation,
+            "surface_model_depth_m": surface_depth,
+            "surface_model_rgb": surface_rgb,
+            "truth_depth_m": truth_depth,
+            "truth_rgb": truth_rgb,
+        },
+    )
     _write_sweep(artifacts / "failure_sweep.csv", sweep)
-    _write_chart(artifacts / "radiance_vs_geometry.svg", "Novel-view fidelity does not determine surface fidelity", psnr.tolist(), "#3c60a6")
+    _write_chart(
+        artifacts / "radiance_vs_geometry.svg",
+        "Novel-view fidelity does not determine surface fidelity",
+        [radiance_outputs[int(view_count)][3][0] for view_count in views],
+        "#3c60a6",
+    )
     return {
         "metrics": {
-            "geometry": {"radiance_field_surface_rmse_m": 0.078, "surface_model_rmse_m": 0.019},
-            "rendering": {"radiance_field_psnr_db": 35.4, "surface_model_psnr_db": 31.2, "radiance_field_ssim": 0.971, "surface_model_ssim": 0.944},
+            "geometry": {
+                "radiance_field_surface_rmse_m": radiance_scores[2],
+                "surface_model_rmse_m": surface_scores[2],
+            },
+            "rendering": {
+                "radiance_field_psnr_db": radiance_scores[0],
+                "surface_model_psnr_db": surface_scores[0],
+                "radiance_field_ssim": radiance_scores[1],
+                "surface_model_ssim": surface_scores[1],
+            },
             "generative": {},
         },
         "failure_sweep": sweep,

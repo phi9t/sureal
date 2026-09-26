@@ -8,11 +8,78 @@ import subprocess
 import tempfile
 import unittest
 
+import numpy as np
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class LearnedAndRenderableLabContractTest(unittest.TestCase):
+    def test_module_10_metrics_are_recomputed_from_persisted_field_outputs(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            cache = Path(temporary)
+            env = os.environ.copy()
+            env["SURFLO_PATHWAY_CACHE_ROOT"] = str(cache)
+            completed = subprocess.run(
+                [str(ROOT / "run.sh"), "run", "--module", "10", "--profile", "smoke", "--run-id", "fields"],
+                cwd=ROOT.parent.parent,
+                env=env,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+
+            run_dir = cache / "runs" / "fields" / "10"
+            result = json.loads((run_dir / "result.json").read_text())
+            comparison = json.loads((run_dir / "artifacts" / "comparison.json").read_text())
+            self.assertEqual(comparison["schema_version"], 1)
+            self.assertEqual(comparison["evidence"], "posed RGB only")
+            self.assertEqual(comparison["radiance_field"]["representation"], "volume density and radiance")
+            self.assertEqual(comparison["surface_model"]["representation"], "signed-distance level set")
+            self.assertFalse(comparison["radiance_field"]["completion_claim"])
+            self.assertFalse(comparison["surface_model"]["completion_claim"])
+
+            with np.load(run_dir / "artifacts" / "field_comparison.npz") as arrays:
+                truth_rgb = arrays["truth_rgb"]
+                evaluation_mask = arrays["evaluation_mask"].astype(bool)
+                truth_depth = arrays["truth_depth_m"]
+                recomputed = {}
+                for name in ("radiance_field", "surface_model"):
+                    predicted_rgb = arrays[f"{name}_rgb"]
+                    predicted_depth = arrays[f"{name}_depth_m"]
+                    mse = float(np.mean((predicted_rgb - truth_rgb) ** 2))
+                    recomputed[f"{name}_psnr_db"] = float(-10.0 * np.log10(mse))
+                    residual = predicted_depth[evaluation_mask] - truth_depth[evaluation_mask]
+                    recomputed[f"{name}_rmse_m"] = float(np.sqrt(np.mean(residual * residual)))
+
+            rendering = result["metrics"]["rendering"]
+            geometry = result["metrics"]["geometry"]
+            self.assertAlmostEqual(
+                rendering["radiance_field_psnr_db"],
+                recomputed["radiance_field_psnr_db"],
+                places=10,
+            )
+            self.assertAlmostEqual(
+                rendering["surface_model_psnr_db"],
+                recomputed["surface_model_psnr_db"],
+                places=10,
+            )
+            self.assertAlmostEqual(
+                geometry["radiance_field_surface_rmse_m"],
+                recomputed["radiance_field_rmse_m"],
+                places=10,
+            )
+            self.assertAlmostEqual(
+                geometry["surface_model_rmse_m"],
+                recomputed["surface_model_rmse_m"],
+                places=10,
+            )
+            self.assertEqual(
+                {row["value"] for row in result["failure_sweep"]},
+                {3, 5, 9},
+            )
+
     def test_modules_08_through_11_keep_geometry_and_rendering_claims_separate(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             cache = Path(temporary)

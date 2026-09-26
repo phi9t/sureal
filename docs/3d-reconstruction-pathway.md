@@ -956,9 +956,14 @@ it is not presented as a paper-exact reproduction of the original NeRF.
 experiments/3d-pathway/run.sh run --module 10 --profile smoke --run-id pathway-10
 ```
 
-Inspect `result.json`, `report.md`, `artifacts/radiance_vs_geometry.svg`, and
-`artifacts/failure_sweep.csv`. The controlled comparison gives the radiance
-model higher PSNR and the surface-oriented model lower 3D RMSE on purpose.
+Inspect `result.json`, `report.md`, `artifacts/comparison.json`,
+`artifacts/field_comparison.npz`, `artifacts/radiance_vs_geometry.svg`, and
+`artifacts/failure_sweep.csv`. The repo-owned analytic lab alpha-composites
+sampled density and radiance, persists the exact RGB/depth arrays used for
+scoring, and gives the radiance field higher PSNR while the surface-oriented
+field has lower depth RMSE. This controlled construction is a numerical
+concept demonstration, not a trained NeRF result; the maintained Nerfacto
+adapter below supplies the reproduction result.
 
 ### Transition
 
