@@ -244,20 +244,46 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
                 encoding="utf-8",
             )
             trajectory = parse_tum_trajectory(trajectory_path)
+            source_timeline = [
+                trajectory[0],
+                (1.5, np.array([0.5, 0.0, 0.0]), np.array([0.0, 0.0, 0.0, 1.0])),
+                trajectory[1],
+            ]
             context_path.write_text(
                 "frame_index,timestamp,map_id\n0,1.0,4\n2,2.0,4\n",
                 encoding="utf-8",
             )
             self.assertEqual(
-                parse_trajectory_context(context_path, trajectory),
+                parse_trajectory_context(context_path, trajectory, source_timeline),
                 [(0, 1.0, 4), (2, 2.0, 4)],
             )
             context_path.write_text(
-                "frame_index,timestamp,map_id\n0,1.0,4\n2,2.1,4\n",
+                "frame_index,timestamp,map_id\n0,1.0,4\n1,2.0,4\n",
                 encoding="utf-8",
             )
-            with self.assertRaisesRegex(ValueError, "timestamp"):
-                parse_trajectory_context(context_path, trajectory)
+            with self.assertRaisesRegex(ValueError, "source-frame timestamp"):
+                parse_trajectory_context(context_path, trajectory, source_timeline)
+
+    def test_estimated_poses_recover_original_source_frame_indices(self) -> None:
+        sys.path.insert(0, str(ROOT / "pipeline"))
+        from slam_reference_runner import source_frame_indices
+
+        identity = np.array([0.0, 0.0, 0.0, 1.0])
+        truth = [
+            (float(index), np.array([float(index), 0.0, 0.0]), identity)
+            for index in range(4)
+        ]
+        self.assertEqual(source_frame_indices([truth[0], truth[1], truth[3]], truth), [0, 1, 3])
+
+    def test_nested_metric_comparison_is_float_tolerant_and_structure_exact(self) -> None:
+        sys.path.insert(0, str(ROOT / "pipeline"))
+        from slam_reference_runner import values_match
+
+        expected = {"segments": [{"map_id": 1, "metrics": {"ate_rmse_m": 0.01}}]}
+        recorded = {"segments": [{"map_id": 1, "metrics": {"ate_rmse_m": 0.01 + 1e-13}}]}
+        self.assertTrue(values_match(recorded, expected))
+        recorded["segments"][0]["map_id"] = 2
+        self.assertFalse(values_match(recorded, expected))
 
     def test_cpp_runner_exports_final_points_and_evaluable_failure_trajectories(self) -> None:
         source = (ROOT / "insulas/orb-slam/surflo_rgbd.cc").read_text(encoding="utf-8")

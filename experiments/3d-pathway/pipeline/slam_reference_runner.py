@@ -110,7 +110,9 @@ def parse_tum_trajectory(path: Path) -> list[TrajectoryRecord]:
 
 
 def parse_trajectory_context(
-    path: Path, trajectory: list[TrajectoryRecord]
+    path: Path,
+    trajectory: list[TrajectoryRecord],
+    source_timeline: list[TrajectoryRecord],
 ) -> list[TrajectoryContextRecord]:
     records: list[TrajectoryContextRecord] = []
     with path.open(encoding="utf-8", newline="") as stream:
@@ -134,6 +136,10 @@ def parse_trajectory_context(
     for record, pose in zip(records, trajectory, strict=True):
         if not math.isclose(record[1], pose[0], rel_tol=0.0, abs_tol=1e-6):
             raise ValueError("trajectory-context timestamp does not match its trajectory pose")
+        if record[0] >= len(source_timeline) or not math.isclose(
+            record[1], source_timeline[record[0]][0], rel_tol=0.0, abs_tol=1e-6
+        ):
+            raise ValueError("trajectory-context source-frame timestamp mismatch")
     return records
 
 
@@ -156,6 +162,23 @@ def _associate(
         used_truth.add(truth_index)
         matches.append((estimated[estimated_index], truth[truth_index]))
     return sorted(matches, key=lambda pair: pair[0][0])
+
+
+def source_frame_indices(
+    estimated: list[TrajectoryRecord],
+    source_timeline: list[TrajectoryRecord],
+    max_delta_seconds: float = 0.02,
+) -> list[int]:
+    matches = _associate(estimated, source_timeline, max_delta_seconds)
+    if len(matches) != len(estimated):
+        raise ValueError("trajectory poses do not map one-to-one onto source frames")
+    source_index_by_timestamp = {
+        record[0]: index for index, record in enumerate(source_timeline)
+    }
+    indices = [source_index_by_timestamp[source[0]] for _, source in matches]
+    if any(current <= previous for previous, current in zip(indices, indices[1:])):
+        raise ValueError("trajectory source-frame indices are not strictly increasing")
+    return indices
 
 
 def _rigid_alignment(source: np.ndarray, target: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -606,7 +629,11 @@ def _geometry_metrics(run_dir: Path) -> dict[str, float | int]:
     if any(float(np.min(np.abs(estimate_timestamps - record[0]))) > 1e-5 for record in keyframes):
         raise ValueError("keyframe trajectory is not a subset of the camera trajectory")
     truth = parse_tum_trajectory(run_dir / "config/groundtruth-prefix.txt")
-    trajectory, transform = evaluate_trajectory(estimate, truth)
+    trajectory, transform = evaluate_trajectory(
+        estimate,
+        truth,
+        estimated_frame_indices=source_frame_indices(estimate, truth),
+    )
     estimated_map = _read_ascii_ply(run_dir / "output/map.ply")
     truth_map = _read_ascii_ply(run_dir / "output/ground-truth-map.ply")
     aligned_map = (transform["rotation"] @ estimated_map.T).T + transform["translation"]
@@ -644,7 +671,9 @@ FAILURE_TRAJECTORY_CONTEXTS = {
 
 def _failure_trajectory_summary(run_dir: Path, variant_id: str, truth: list[TrajectoryRecord]) -> dict[str, Any]:
     trajectory = parse_tum_trajectory(run_dir / FAILURE_TRAJECTORIES[variant_id])
-    context = parse_trajectory_context(run_dir / FAILURE_TRAJECTORY_CONTEXTS[variant_id], trajectory)
+    context = parse_trajectory_context(
+        run_dir / FAILURE_TRAJECTORY_CONTEXTS[variant_id], trajectory, truth
+    )
     return summarize_failure_trajectory(trajectory, truth, context)
 
 
@@ -680,7 +709,7 @@ def _validate_failure_sweep(run_dir: Path) -> dict[str, Any]:
         variant_id = item["id"]
         trajectory = parse_tum_trajectory(run_dir / FAILURE_TRAJECTORIES[variant_id])
         context = parse_trajectory_context(
-            run_dir / FAILURE_TRAJECTORY_CONTEXTS[variant_id], trajectory
+            run_dir / FAILURE_TRAJECTORY_CONTEXTS[variant_id], trajectory, truth
         )
         if not math.isclose(
             float(coverage), len(trajectory) / len(truth), rel_tol=1e-12, abs_tol=1e-12
@@ -690,7 +719,7 @@ def _validate_failure_sweep(run_dir: Path) -> dict[str, Any]:
         known_map_ids = set(summary["map_ids"])
         if any(map_id >= 0 and map_id not in known_map_ids for map_id in map_ids):
             raise ValueError("SLAM failure-sweep map identity is absent from trajectory context")
-        if item.get("trajectory") != summary:
+        if not values_match(item.get("trajectory"), summary):
             raise ValueError("SLAM failure-sweep trajectory metric mismatch")
     return value
 
@@ -718,19 +747,34 @@ def _require_file(run_dir: Path, relative: str) -> Path:
     return path
 
 
+def values_match(recorded: Any, expected: Any) -> bool:
+    if isinstance(expected, dict):
+        return (
+            isinstance(recorded, dict)
+            and set(recorded) == set(expected)
+            and all(values_match(recorded[key], value) for key, value in expected.items())
+        )
+    if isinstance(expected, list):
+        return (
+            isinstance(recorded, list)
+            and len(recorded) == len(expected)
+            and all(values_match(left, right) for left, right in zip(recorded, expected, strict=True))
+        )
+    if isinstance(expected, bool):
+        return isinstance(recorded, bool) and recorded == expected
+    if isinstance(expected, int):
+        return not isinstance(recorded, bool) and isinstance(recorded, (int, float)) and recorded == expected
+    if isinstance(expected, float):
+        return (
+            not isinstance(recorded, bool)
+            and isinstance(recorded, (int, float))
+            and math.isclose(float(recorded), expected, rel_tol=1e-9, abs_tol=1e-12)
+        )
+    return recorded == expected
+
+
 def _metrics_match(recorded: dict[str, Any], actual: dict[str, Any]) -> bool:
-    if set(recorded) != set(actual):
-        return False
-    for key, expected in actual.items():
-        value = recorded[key]
-        if isinstance(expected, int):
-            if isinstance(value, bool) or value != expected:
-                return False
-        elif isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isclose(
-            float(value), float(expected), rel_tol=1e-9, abs_tol=1e-12
-        ):
-            return False
-    return True
+    return values_match(recorded, actual)
 
 
 def validate_slam_reference_result(run_dir: Path) -> dict[str, Any]:
