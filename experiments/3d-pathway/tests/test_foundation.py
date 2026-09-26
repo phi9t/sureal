@@ -172,7 +172,14 @@ class InsulaContractTest(unittest.TestCase):
         locks = json.loads((ROOT / "insulas" / "locks.json").read_text())["insulas"]
         self.assertEqual(
             set(locks),
-            {"classical", "classical-mvs", "orb-slam", "neural-rendering", "implicit-surface"},
+            {
+                "classical",
+                "classical-mvs",
+                "orb-slam",
+                "neural-rendering",
+                "implicit-surface",
+                "radiance-field",
+            },
         )
         self.assertNotEqual(locks["classical"]["base_image"], locks["neural-rendering"]["base_image"])
         for name, lock in locks.items():

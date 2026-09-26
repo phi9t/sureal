@@ -39,6 +39,17 @@
       "torchvision": "0.22.1+cu128",
       "pillow": "11.1.0",
       "dockerfile_sha256": "795dede2131811edef9b95f2cae27347078ca1b6b347776afe9a574ed8a2b7db"
+    },
+    "radiance-field": {
+      "base_image": "nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04",
+      "base_image_digest": "24c8e3581ea6330038b0d374920721983312627f8adbfcf390bdb4b399d280ed",
+      "nerfstudio_source_commit": "50e0e3c70c775e89333256213363badbf074f29d",
+      "tiny_cuda_nn_source_commit": "0109538c37ac0bf613f2bac8de6cda48352feca7",
+      "tcnn_cuda_architectures": "100",
+      "pytorch": "2.7.1+cu128",
+      "torchvision": "0.22.1+cu128",
+      "pillow": "11.1.0",
+      "dockerfile_sha256": "34814489e4fed910aa08c4ce6e8cf54fd5171a01ddd7e430f31ecdb878c86cee"
     }
   }
 }

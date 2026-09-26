@@ -945,7 +945,10 @@ conditioning in
 multiscale integration in
 [barron-2021](https://openaccess.thecvf.com/content/ICCV2021/html/Barron_Mip-NeRF_A_Multiscale_Representation_for_Anti-Aliasing_Neural_Radiance_Fields_ICCV_2021_paper.html),
 and the surface-oriented alternative in
-[wang-neus-2021](https://proceedings.neurips.cc/paper/2021/hash/e41e164f7485ec4a28741a2d0ea41c74-Abstract.html).
+[wang-neus-2021](https://proceedings.neurips.cc/paper/2021/hash/e41e164f7485ec4a28741a2d0ea41c74-Abstract.html). The maintained
+reference is the composite implementation registered in
+[nerfstudio-nerfacto-2025](https://github.com/nerfstudio-project/nerfstudio/tree/50e0e3c70c775e89333256213363badbf074f29d);
+it is not presented as a paper-exact reproduction of the original NeRF.
 
 ### Reproduction lab
 

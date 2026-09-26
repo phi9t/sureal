@@ -82,8 +82,8 @@
       "id": "10", "slug": "neural-radiance-fields", "title": "Neural rendering and radiance fields",
       "evidence": ["posed RGB images"], "observable": "view-conditioned radiance and volume density", "representation": "continuous radiance field",
       "inference": "optimized", "objectives": ["volume-rendered photometric error"], "metrics": ["PSNR", "SSIM", "LPIPS", "geometry RMSE"],
-      "failure_sweep": ["view sparsity", "appearance change", "camera error", "geometry-rendering mismatch"], "insula": "neural-rendering",
-      "sources": ["lombardi-2019", "mildenhall-2020", "yu-pixelnerf-2021", "barron-2021", "wang-neus-2021"]
+      "failure_sweep": ["view sparsity", "appearance change", "camera error", "geometry-rendering mismatch"], "insula": "radiance-field",
+      "sources": ["lombardi-2019", "mildenhall-2020", "yu-pixelnerf-2021", "barron-2021", "wang-neus-2021", "nerfstudio-nerfacto-2025"]
     },
     {
       "id": "11", "slug": "gaussian-splatting", "title": "Gaussian splatting and explicit renderable primitives",
