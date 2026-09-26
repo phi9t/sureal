@@ -84,7 +84,14 @@ class RegistryContractTest(unittest.TestCase):
         assets = json.loads((ROOT / "assets.lock.json").read_text())["assets"]
         self.assertEqual(
             {item["id"] for item in assets},
-            {"controlled-suite", "middlebury-mvs", "tum-rgbd", "nerf-synthetic", "surflo-paired-scenes"},
+            {
+                "controlled-suite",
+                "middlebury-mvs",
+                "tum-rgbd",
+                "depth-anything-v2-metric-hypersim-small",
+                "nerf-synthetic",
+                "surflo-paired-scenes",
+            },
         )
         for asset in assets:
             self.assertIn(asset["mode"], {"generated", "download", "repository"})

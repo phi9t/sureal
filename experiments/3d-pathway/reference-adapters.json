@@ -19,6 +19,24 @@
       "last_verified_full": {"date": "2026-09-26", "tracked_frames": 798, "tracking_coverage": 1.0, "keyframes": 61, "trajectory_matches": 798, "ate_rmse_m": 0.01040134799802561, "rpe_translation_rmse_m": 0.0058479709210676354, "rpe_rotation_rmse_deg": 0.3927566032849296, "endpoint_drift_m": 0.01982176392116573, "endpoint_rotation_drift_deg": 1.0985564897755802, "map_points": 2023, "map_accuracy_mean_m": 0.037021286016171495, "map_completeness_mean_m": 0.1449684614054696, "map_fscore_10cm": 0.6362999434781805, "runtime_seconds": 132.44962542923167, "peak_cpu_memory_bytes": 1640157184, "occlusion_tracking_coverage": 0.849624060150376, "occlusion_same_map_relocalized": false, "occlusion_map_switches": 1, "occlusion_aggregate_omitted_reason": "map-switch", "occlusion_pre_loss_ate_rmse_m": 0.010652090512306634, "occlusion_post_restart_ate_rmse_m": 0.053446859692039, "occlusion_post_restart_endpoint_drift_m": 0.20303785481728148, "dynamic_object_tracking_coverage": 1.0, "dynamic_object_ate_rmse_m": 0.0104518386719523, "dynamic_object_endpoint_drift_m": 0.01953957170352128},
       "measurement_note": "ORB-SLAM3 receives metric RGB-D, so validation uses rigid SE(3), not similarity, alignment. One-frame RPE uses only consecutive source frames within one Atlas-map gauge. ATE and start-to-end drift are omitted across map switches and reported per contiguous map segment instead. The exported map selects the largest valid Atlas map and contains live, observation-supported landmarks at final post-shutdown positions; its deterministic visible-depth comparison is neither a dense surface nor hidden-scene completion."
     },
+    {
+      "id": "depth-anything-v2-reference",
+      "command": "run.sh reference --adapter depth-anything-v2 --profile smoke --run-id ID",
+      "modules": ["08"],
+      "status": "landed",
+      "acceptance": {
+        "smoke": {"evaluated_cases_min": 3, "valid_pixel_fraction_min": 1.0, "raw_rmse_m_max": 15.0, "raw_abs_rel_max": 5.0, "affine_aligned_rmse_m_max": 4.0},
+        "full": {"evaluated_cases_min": 11, "valid_pixel_fraction_min": 1.0, "raw_rmse_m_max": 15.0, "raw_abs_rel_max": 5.0, "affine_aligned_rmse_m_max": 4.0}
+      },
+      "model_contract": {
+        "source_commit": "a561b849ebae10a6f5ef49e26c83cbbcd36c71bf",
+        "checkpoint_revision": "3bc65d4e14a6786a61acec16453c50e12bf5f338",
+        "checkpoint_sha256": "b782898d8a3e8be1f639de33837ed85e9b4b73e40f8f5e5cd99067588d722545",
+        "encoder": "vits", "training_domain": "Hypersim indoor", "max_depth_m": 20.0,
+        "prediction_domain": "input-visible-pixels", "hidden_scene_completion": false
+      },
+      "measurement_note": "Raw metre-space error is the primary metric-depth score. Per-case affine alignment is reported only as a shape diagnostic and never substitutes for raw metric accuracy. Every output pixel is a deterministic, prior-conditioned prediction for an input-visible ray; the adapter emits no hidden geometry and samples no scene hypothesis."
+    },
     {"id": "nerf-reference", "modules": ["10"], "status": "not_landed", "reason": "No trained reference invocation or expected-result lock is tracked."},
     {"id": "gaussian-splatting-reference", "modules": ["11"], "status": "not_landed", "reason": "No trained reference invocation or expected-result lock is tracked."},
     {"id": "foundation-geometry-reference", "modules": ["12"], "status": "not_landed", "reason": "No checkpoint-backed invocation is tracked in this pathway."}

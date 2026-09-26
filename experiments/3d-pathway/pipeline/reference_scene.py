@@ -149,6 +149,164 @@ def _write_xyz_ply(path: Path, points: np.ndarray) -> None:
         np.savetxt(stream, points, fmt="%.8g %.8g %.8g")
 
 
+def _write_pgm(path: Path, image: np.ndarray) -> None:
+    image = np.asarray(image)
+    if image.ndim != 2 or image.dtype != np.uint8:
+        raise ValueError("PGM images must be two-dimensional uint8 arrays")
+    height, width = image.shape
+    path.write_bytes(f"P5\n{width} {height}\n255\n".encode("ascii") + image.tobytes())
+
+
+def _crop_and_resize_nearest(values: np.ndarray, scale: float) -> np.ndarray:
+    """Center-crop by ``scale`` and map back to the original pixel lattice."""
+    if values.ndim != 2 or not 0.0 < scale < 1.0:
+        raise ValueError("focal stress requires a 2D input and a crop scale in (0, 1)")
+    height, width = values.shape
+    crop_height = int(round(height * scale))
+    crop_width = int(round(width * scale))
+    top = (height - crop_height) // 2
+    left = (width - crop_width) // 2
+    row_indices = top + np.minimum(
+        (np.arange(height, dtype=np.int64) * crop_height) // height, crop_height - 1
+    )
+    column_indices = left + np.minimum(
+        (np.arange(width, dtype=np.int64) * crop_width) // width, crop_width - 1
+    )
+    return values[np.ix_(row_indices, column_indices)]
+
+
+def _concave_open_box(
+    width: int, height: int, intrinsics: dict[str, float], seed: int
+) -> tuple[np.ndarray, np.ndarray]:
+    """Render a deterministic stepped recess used only as an OOD stressor."""
+    columns, rows = np.meshgrid(np.arange(width), np.arange(height))
+    ray_x = (columns - float(intrinsics["cx"])) / float(intrinsics["fx"])
+    ray_y = (rows - float(intrinsics["cy"])) / float(intrinsics["fy"])
+    outer = (np.abs(ray_x) <= 0.54) & (np.abs(ray_y) <= 0.40)
+    opening = (np.abs(ray_x) <= 0.34) & (np.abs(ray_y) <= 0.24)
+
+    depth = np.full((height, width), 6.0, dtype=np.float32)
+    depth[outer] = 3.05
+    depth[opening] = 5.20
+
+    # The four bands are visible interior walls between the front rim and the
+    # recessed back plane.  They make the case concave without defining any
+    # truth behind an occluder.
+    edge_distance = np.minimum(0.34 - np.abs(ray_x), 0.24 - np.abs(ray_y))
+    wall = opening & (edge_distance < 0.055)
+    wall_fraction = np.clip(edge_distance / 0.055, 0.0, 1.0)
+    depth[wall] = (3.05 + 2.15 * wall_fraction[wall]).astype(np.float32)
+
+    rng = np.random.default_rng(seed + 808)
+    noise = rng.integers(0, 37, size=(height, width), dtype=np.uint8).astype(np.int16)
+    world_x = ray_x * depth
+    world_y = ray_y * depth
+    texture = 112.0 + 48.0 * np.sin(world_x * 23.0) + 42.0 * np.cos(world_y * 31.0)
+    image = np.clip(texture + noise, 0, 255).astype(np.uint8)
+    image[outer & ~opening] = np.clip(image[outer & ~opening].astype(np.int16) + 35, 0, 255)
+    image[opening] = np.clip(image[opening].astype(np.int16) - 30, 0, 255)
+    return image.astype(np.uint8), depth
+
+
+def generate_learned_depth_scene(
+    destination: Path, scene: dict[str, Any], profile: str
+) -> dict[str, Any]:
+    """Write deterministic visible-ray inputs for the module 08 depth prior."""
+    if profile not in {"smoke", "full"}:
+        raise ValueError(f"unknown learned-depth profile: {profile}")
+    image_dir = destination / "images"
+    depth_dir = destination / "depth"
+    image_dir.mkdir(parents=True, exist_ok=False)
+    depth_dir.mkdir()
+    intrinsics = scene["cameras"]["intrinsics"]
+    fixture = scene["reference_fixture"]
+    width, height = int(intrinsics["width"]), int(intrinsics["height"])
+    all_camera_xs = fixture[f"camera_x_{profile}_m"]
+    camera_xs = [all_camera_xs[len(all_camera_xs) // 2]] if profile == "smoke" else all_camera_xs
+    textures = _scene_textures(scene)
+    cases: list[dict[str, Any]] = []
+    rendered: list[tuple[np.ndarray, np.ndarray]] = []
+
+    def add_case(
+        case_id: str,
+        family: str,
+        image: np.ndarray,
+        depth: np.ndarray,
+        extra: dict[str, Any] | None = None,
+    ) -> None:
+        image_path = image_dir / f"{case_id}.pgm"
+        depth_path = depth_dir / f"{case_id}.depth.npy"
+        _write_pgm(image_path, image)
+        np.save(depth_path, np.asarray(depth, dtype=np.float32), allow_pickle=False)
+        record: dict[str, Any] = {
+            "id": case_id,
+            "family": family,
+            "image_path": image_path.relative_to(destination).as_posix(),
+            "depth_path": depth_path.relative_to(destination).as_posix(),
+            "image_sha256": sha256_file(image_path),
+            "depth_sha256": sha256_file(depth_path),
+            "width": width,
+            "height": height,
+            "truth_semantics": "camera-axis-depth-metres",
+            "evaluation_support": "input-visible-pixels",
+        }
+        if extra:
+            record.update(extra)
+        cases.append(record)
+
+    for index, camera_x in enumerate(camera_xs):
+        image, depth = _render_with_depth(
+            width, height, intrinsics, fixture, float(camera_x), textures
+        )
+        rendered.append((image, depth))
+        add_case(
+            f"shared-{index:03d}",
+            "shared-scene",
+            image,
+            depth,
+            {"camera_x_m": float(camera_x), "effective_focal_scale": 1.0},
+        )
+
+    crop_scale = 0.8
+    center_image, center_depth = rendered[len(rendered) // 2]
+    add_case(
+        "focal-crop",
+        "focal-crop",
+        _crop_and_resize_nearest(center_image, crop_scale),
+        _crop_and_resize_nearest(center_depth, crop_scale),
+        {
+            "source_case_id": cases[len(cases) // 2]["id"],
+            "crop_scale": crop_scale,
+            "effective_focal_scale": 1.0 / crop_scale,
+        },
+    )
+    ood_image, ood_depth = _concave_open_box(width, height, intrinsics, int(scene["seed"]))
+    add_case(
+        "ood-concavity",
+        "ood-concavity",
+        ood_image,
+        ood_depth,
+        {"geometry": "concave-open-box", "effective_focal_scale": 1.0},
+    )
+
+    manifest = {
+        "schema_version": 1,
+        "profile": profile,
+        "prediction_domain": "input-visible-pixels",
+        "hidden_scene_truth": "not-defined",
+        "case_families": ["shared-scene", "focal-crop", "ood-concavity"],
+        "depth_units": "metres",
+        "camera_depth_semantics": "positive camera-axis z",
+        "intrinsics": {
+            key: intrinsics[key] for key in ("width", "height", "fx", "fy", "cx", "cy")
+        },
+        "scene_seed": scene["seed"],
+        "cases": cases,
+    }
+    (destination / "manifest.json").write_bytes(canonical_json(manifest))
+    return manifest
+
+
 def generate_colmap_mvs_scene(destination: Path, scene: dict[str, Any], profile: str) -> dict[str, Any]:
     """Add metric per-view depths and visible world-surface samples for MVS."""
     manifest = generate_colmap_scene(destination, scene, profile)

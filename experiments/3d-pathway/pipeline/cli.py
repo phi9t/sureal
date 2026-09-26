@@ -47,7 +47,11 @@ def parser() -> argparse.ArgumentParser:
     all_modules.add_argument("--profile", choices=("smoke", "full"), default="full")
     all_modules.add_argument("--run-id")
     reference = commands.add_parser("reference")
-    reference.add_argument("--adapter", choices=("colmap-sfm", "colmap-mvs", "orb-slam"), required=True)
+    reference.add_argument(
+        "--adapter",
+        choices=("colmap-sfm", "colmap-mvs", "orb-slam", "depth-anything-v2"),
+        required=True,
+    )
     reference.add_argument("--profile", choices=("smoke", "full"), default="smoke")
     reference.add_argument("--run-id")
     return result
