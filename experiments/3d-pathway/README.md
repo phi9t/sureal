@@ -86,13 +86,15 @@ The ORB-SLAM3 adapter uses its own Ubuntu 22.04 Insula with canonical upstream
 ORB-SLAM3 commit `4452a3c4ab75b1cde34e5505a36ec3f9edcdc4c4` and peeled Pangolin
 v0.6 commit `dd801d244db3a8e27b7fe8020cd751404aa818fd`. It runs TUM
 `freiburg1_xyz` in RGB-D mode without a viewer, exports the optimized
-trajectory and the persistent union of tracked sparse landmarks, and compares
-them with timestamped motion-capture poses and a deterministic visible RGB-D
+trajectory and final live sparse landmarks after shutdown, and compares them
+with timestamped motion-capture poses and a deterministic visible RGB-D
 surface sample formed with the sequence's Brown-Conrady camera model. ATE/RPE
 and directed map distances remain separate; one-frame translational RPE is
-measured in the origin camera frame. The
-failure sweep blanks a contiguous frame interval to test relocalization and
-adds a moving RGB-D patch to expose static-world sensitivity. Asset extraction
+measured in the origin camera frame, while endpoint drift uses the
+first-pose-relative start-to-end transform. The failure sweep exports and
+evaluates both perturbed trajectories; it also compares Atlas map identity
+before loss and after tracking resumes so a new-map restart is not called
+relocalization. Asset extraction
 rejects links and traversal, records every file hash, and execution rechecks
 the archive and extraction tree before launching with `--network none`.
 

@@ -1,4 +1,5 @@
 #include <System.h>
+#include <Map.h>
 #include <MapPoint.h>
 
 #include <opencv2/imgcodecs.hpp>
@@ -39,8 +40,30 @@ struct RunStats {
     int frames = 0;
     int tracked = 0;
     bool lost_during_perturbation = false;
-    bool recovered = false;
+    bool tracking_resumed = false;
+    bool same_map_relocalized = false;
+    long map_id_before_perturbation = -1;
+    long map_id_after_resume = -1;
 };
+
+long dominant_map_id(const std::vector<ORB_SLAM3::MapPoint*>& points) {
+    std::map<unsigned long, int> counts;
+    for (auto* point : points) {
+        if (point == nullptr || point->isBad()) continue;
+        ORB_SLAM3::Map* map = point->GetMap();
+        if (map == nullptr || map->IsBad()) continue;
+        counts[map->GetId()] += 1;
+    }
+    int best_count = 0;
+    long best_id = -1;
+    for (const auto& item : counts) {
+        if (item.second > best_count) {
+            best_count = item.second;
+            best_id = static_cast<long>(item.first);
+        }
+    }
+    return best_id;
+}
 
 std::vector<FrameRecord> load_associations(const std::string& path) {
     std::ifstream stream(path);
@@ -177,12 +200,18 @@ RunStats run_sequence(
     const std::string& output) {
     ORB_SLAM3::System slam(vocabulary, settings, ORB_SLAM3::System::RGBD, false);
     std::ofstream tracking;
+    std::ofstream variant_trajectory;
     if (mode == "baseline") {
         tracking.open(output + "/tracking.csv");
         tracking << "timestamp,state,tracked_map_points,runtime_seconds\n";
+    } else {
+        const std::string path = mode == "occlusion"
+            ? output + "/CameraTrajectory-occlusion.txt"
+            : output + "/CameraTrajectory-dynamic-object.txt";
+        variant_trajectory.open(path);
+        variant_trajectory << std::fixed;
     }
-    std::map<unsigned long, Eigen::Vector3f> landmarks;
-    std::vector<int> states;
+    std::map<unsigned long, ORB_SLAM3::MapPoint*> landmarks;
     RunStats stats;
     for (size_t index = 0; index < frames.size(); ++index) {
         cv::Mat rgb = cv::imread(dataset + "/" + frames[index].rgb, cv::IMREAD_UNCHANGED);
@@ -190,26 +219,45 @@ RunStats run_sequence(
         if (rgb.empty() || depth.empty()) throw std::runtime_error("failed to load TUM RGB-D frame");
         perturb(rgb, depth, mode, index, frames.size());
         const auto start = std::chrono::steady_clock::now();
-        slam.TrackRGBD(rgb, depth, frames[index].timestamp);
+        const Sophus::SE3f Tcw = slam.TrackRGBD(rgb, depth, frames[index].timestamp);
         const double elapsed = std::chrono::duration<double>(std::chrono::steady_clock::now() - start).count();
         const int state = slam.GetTrackingState();
         const auto points = slam.GetTrackedMapPoints();
-        states.push_back(state);
         stats.frames += 1;
         const bool tracked = state == 2 || state == 5;
         if (tracked) stats.tracked += 1;
+        if (mode != "baseline" && tracked) {
+            const Sophus::SE3f Twc = Tcw.inverse();
+            const Eigen::Vector3f translation = Twc.translation();
+            const Eigen::Quaternionf rotation = Twc.unit_quaternion();
+            variant_trajectory << std::setprecision(6) << frames[index].timestamp << ' '
+                               << std::setprecision(9) << translation.x() << ' ' << translation.y() << ' '
+                               << translation.z() << ' ' << rotation.x() << ' ' << rotation.y() << ' '
+                               << rotation.z() << ' ' << rotation.w() << '\n';
+        }
         const size_t disturbance_begin = frames.size() * 35 / 100;
         const size_t disturbance_end = frames.size() * 50 / 100;
+        const long map_id = dominant_map_id(points);
+        if (index < disturbance_begin && map_id >= 0) {
+            stats.map_id_before_perturbation = map_id;
+        }
         if (index >= disturbance_begin && index < disturbance_end && !tracked) {
             stats.lost_during_perturbation = true;
+        }
+        if (
+            index >= disturbance_end && stats.lost_during_perturbation && tracked
+            && !stats.tracking_resumed) {
+            stats.tracking_resumed = true;
+            stats.map_id_after_resume = map_id;
+            stats.same_map_relocalized = map_id >= 0 && map_id == stats.map_id_before_perturbation;
         }
         if (mode == "baseline") {
             tracking << std::setprecision(17) << frames[index].timestamp << ',' << state << ','
                      << points.size() << ',' << elapsed << '\n';
             for (auto* point : points) {
                 if (point == nullptr || point->isBad() || point->Observations() < 2) continue;
-                const Eigen::Vector3f position = point->GetWorldPos();
-                if (position.allFinite()) landmarks[point->mnId] = position;
+                while (point->GetReplaced() != nullptr) point = point->GetReplaced();
+                if (!point->isBad()) landmarks[point->mnId] = point;
             }
         }
         const double interval = index + 1 < frames.size()
@@ -217,18 +265,21 @@ RunStats run_sequence(
             : (index > 0 ? frames[index].timestamp - frames[index - 1].timestamp : 0.0);
         if (elapsed < interval) std::this_thread::sleep_for(std::chrono::duration<double>(interval - elapsed));
     }
+    variant_trajectory.close();
     slam.Shutdown();
-    const size_t disturbance_end = frames.size() * 50 / 100;
-    for (size_t index = disturbance_end; index < states.size(); ++index) {
-        if (stats.lost_during_perturbation && (states[index] == 2 || states[index] == 5)) {
-            stats.recovered = true;
-        }
-    }
     if (mode == "baseline") {
         slam.SaveTrajectoryTUM(output + "/CameraTrajectory.txt");
         slam.SaveKeyFrameTrajectoryTUM(output + "/KeyFrameTrajectory.txt");
-        std::map<std::tuple<int, int, int>, Eigen::Vector3f> voxels;
+        std::map<unsigned long, Eigen::Vector3f> final_landmarks;
         for (const auto& item : landmarks) {
+            ORB_SLAM3::MapPoint* point = item.second;
+            while (point != nullptr && point->GetReplaced() != nullptr) point = point->GetReplaced();
+            if (point == nullptr || point->isBad() || point->Observations() < 2) continue;
+            const Eigen::Vector3f position = point->GetWorldPos();
+            if (position.allFinite()) final_landmarks[point->mnId] = position;
+        }
+        std::map<std::tuple<int, int, int>, Eigen::Vector3f> voxels;
+        for (const auto& item : final_landmarks) {
             const Eigen::Vector3f& point = item.second;
             const auto key = std::make_tuple(
                 static_cast<int>(std::floor(point.x() / 0.02f)),
@@ -266,11 +317,17 @@ int main(int argc, char** argv) {
               << "{\"id\":\"occlusion\",\"tracking_coverage\":"
               << static_cast<double>(occlusion.tracked) / occlusion.frames
               << ",\"lost_during_perturbation\":" << occlusion.lost_during_perturbation
-              << ",\"recovered\":" << occlusion.recovered << "},"
+              << ",\"tracking_resumed\":" << occlusion.tracking_resumed
+              << ",\"same_map_relocalized\":" << occlusion.same_map_relocalized
+              << ",\"map_id_before_perturbation\":" << occlusion.map_id_before_perturbation
+              << ",\"map_id_after_resume\":" << occlusion.map_id_after_resume << "},"
               << "{\"id\":\"dynamic-object\",\"tracking_coverage\":"
               << static_cast<double>(dynamic.tracked) / dynamic.frames
               << ",\"lost_during_perturbation\":" << dynamic.lost_during_perturbation
-              << ",\"recovered\":" << dynamic.recovered << "}]}\n";
+              << ",\"tracking_resumed\":" << dynamic.tracking_resumed
+              << ",\"same_map_relocalized\":" << dynamic.same_map_relocalized
+              << ",\"map_id_before_perturbation\":" << dynamic.map_id_before_perturbation
+              << ",\"map_id_after_resume\":" << dynamic.map_id_after_resume << "}]}\n";
         return 0;
     } catch (const std::exception& error) {
         std::cerr << "surflo_rgbd: " << error.what() << '\n';

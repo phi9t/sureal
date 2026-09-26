@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import io
 import hashlib
 import json
@@ -159,6 +160,36 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
         self.assertAlmostEqual(metrics["ate_rmse_m"], 0.0)
         self.assertAlmostEqual(metrics["rpe_translation_rmse_m"], 2**0.5)
 
+    def test_endpoint_drift_is_first_pose_relative_not_final_aligned_residual(self) -> None:
+        sys.path.insert(0, str(ROOT / "pipeline"))
+        from slam_reference_runner import evaluate_trajectory
+
+        identity = np.array([0.0, 0.0, 0.0, 1.0])
+        truth = [
+            (float(index), np.array([float(index), 0.0, 0.0]), identity)
+            for index in range(4)
+        ]
+        estimated = [
+            (0.0, np.array([0.0, 0.0, 0.0]), identity),
+            (1.0, np.array([1.0, 0.0, 0.0]), identity),
+            (2.0, np.array([2.0, 0.0, 0.0]), identity),
+            (3.0, np.array([4.0, 0.0, 0.0]), identity),
+        ]
+
+        metrics, _ = evaluate_trajectory(estimated, truth)
+
+        self.assertNotIn("end_drift_m", metrics)
+        self.assertAlmostEqual(metrics["endpoint_drift_m"], 1.0)
+        self.assertAlmostEqual(metrics["endpoint_rotation_drift_deg"], 0.0)
+
+    def test_cpp_runner_exports_final_points_and_evaluable_failure_trajectories(self) -> None:
+        source = (ROOT / "insulas/orb-slam/surflo_rgbd.cc").read_text(encoding="utf-8")
+        self.assertIn("std::map<unsigned long, ORB_SLAM3::MapPoint*> landmarks", source)
+        self.assertLess(source.index("slam.Shutdown();"), source.rindex("point->GetWorldPos()"))
+        self.assertIn("point->GetReplaced()", source)
+        self.assertIn("same_map_relocalized", source)
+        self.assertIn("CameraTrajectory-dynamic-object.txt", source)
+
     def test_safe_tum_extraction_is_atomic_and_rejects_traversal(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
         from fetch import extract_locked_asset
@@ -258,6 +289,8 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
                     cp "$work/config/insula-manifest.expected" "$work/output/insula-manifest.txt"
                     cp "$work/config/groundtruth-prefix.txt" "$work/output/CameraTrajectory.txt"
                     cp "$work/config/groundtruth-prefix.txt" "$work/output/KeyFrameTrajectory.txt"
+                    sed -n '1,180p' "$work/config/groundtruth-prefix.txt" > "$work/output/CameraTrajectory-occlusion.txt"
+                    cp "$work/config/groundtruth-prefix.txt" "$work/output/CameraTrajectory-dynamic-object.txt"
                     {{
                       printf 'timestamp,state,tracked_map_points,runtime_seconds\\n'
                       for i in $(seq 0 299); do printf '%s.0,2,1200,0.01\\n' "$i"; done
@@ -267,7 +300,7 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
                       for i in $(seq 0 1199); do printf '0 0 %s\\n' "$i"; done
                     }} > "$work/output/map.ply"
                     cp "$work/output/map.ply" "$work/output/ground-truth-map.ply"
-                    printf '{{"variants":[{{"id":"occlusion","tracking_coverage":0.6,"lost_during_perturbation":true,"recovered":true}},{{"id":"dynamic-object","tracking_coverage":0.8,"lost_during_perturbation":false,"recovered":false}}]}}\\n' > "$work/output/failure-sweep.json"
+                    printf '{{"variants":[{{"id":"occlusion","tracking_coverage":0.6,"lost_during_perturbation":true,"tracking_resumed":true,"same_map_relocalized":true,"map_id_before_perturbation":0,"map_id_after_resume":0}},{{"id":"dynamic-object","tracking_coverage":1.0,"lost_during_perturbation":false,"tracking_resumed":false,"same_map_relocalized":false,"map_id_before_perturbation":1,"map_id_after_resume":-1}}]}}\\n' > "$work/output/failure-sweep.json"
                     printf 'Maximum resident set size (kbytes): 12345\\n' > "$work/output/resource-summary.txt"
                     printf 'fixture complete\\n'
                     """
@@ -277,7 +310,7 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
             engine.chmod(0o755)
             asset_manifest = {
                 "schema_version": 1,
-                "archive_sha256": "a" * 64,
+                "archive_sha256": "a0236d97b8c30cd93b653656d2b6c293ff7c982a4130ef2a1a8beecdb124ef98",
                 "tree_sha256": "b" * 64,
                 "file_count": 13,
                 "root": dataset.name,
@@ -291,16 +324,28 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
 
             self.assertEqual(run_dir, cache / "reference-runs/fixture-slam/orb-slam")
             result = json.loads((run_dir / "result.json").read_text())
+            original_result = copy.deepcopy(result)
             self.assertEqual(result["adapter"], "orb-slam")
             self.assertEqual(result["module_ids"], ["07"])
             self.assertEqual(result["tool"]["source_commit"], runner.PINNED_ORB_SLAM3_COMMIT)
-            self.assertEqual(result["provenance"]["asset_archive_sha256"], "a" * 64)
+            self.assertEqual(
+                result["provenance"]["asset_archive_sha256"],
+                "a0236d97b8c30cd93b653656d2b6c293ff7c982a4130ef2a1a8beecdb124ef98",
+            )
             self.assertEqual(result["metrics"]["tracked_frames"], 300)
+            self.assertEqual(result["metrics"]["keyframes"], 300)
             self.assertAlmostEqual(result["metrics"]["tracking_coverage"], 1.0)
             self.assertLess(result["metrics"]["ate_rmse_m"], 1e-12)
             self.assertEqual(result["resources"]["peak_cpu_memory_bytes"], 12345 * 1024)
             runner.validate_slam_reference_result(run_dir)
             self.assertFalse((cache / "reference-staging").is_symlink())
+
+            result["resources"]["runtime_seconds"] += 1.0
+            (run_dir / "result.json").write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
+            with self.assertRaisesRegex(ValueError, "resource summary mismatch"):
+                runner.validate_slam_reference_result(run_dir)
+            result = copy.deepcopy(original_result)
+            (run_dir / "result.json").write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
 
             result["tool"]["source_commit"] = "c" * 40
             (run_dir / "result.json").write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")

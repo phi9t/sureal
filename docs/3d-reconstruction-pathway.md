@@ -590,12 +590,14 @@ experiments/3d-pathway/run.sh reference --adapter orb-slam --profile full --run-
 The reference executions are offline. Smoke processes the first 300 associated
 RGB-D frames; full processes all 798. The headless runner exports the optimized
 camera and keyframe trajectories, per-frame tracking states, a voxel-deduplicated
-union of tracked landmarks, a depth-derived visible-surface reference, runtime,
-peak CPU memory, and two controlled variants. The occlusion variant blanks the
-middle 15% of RGB and depth frames before restoring observations; the dynamic
-variant inserts a moving foreground patch with inconsistent depth. These test
-relocalization and the static-world assumption respectively. They do not test
-unobserved scene completion.
+set of live landmarks at their final post-shutdown positions, a depth-derived
+visible-surface reference, runtime, peak CPU memory, and two controlled variants.
+The occlusion variant blanks the middle 15% of RGB and depth frames before
+restoring observations; the dynamic variant inserts a moving foreground patch
+with inconsistent depth. Both variants export an online trajectory. The first
+also records Atlas map identity before loss and after tracking resumes, so a
+new-map restart is not mislabeled as relocalization. They do not test unobserved
+scene completion.
 
 Metrics preserve their direction and task. ATE and RPE evaluate trajectory;
 landmark-to-depth distance is map accuracy; depth-to-landmark distance is map
@@ -603,29 +605,35 @@ completeness. Precision, recall, and F-score use a 10 cm threshold after one
 rigid SE(3) alignment estimated from the RGB-D trajectory. No scale alignment
 is allowed because RGB-D supplies metric scale. One-frame translational RPE is
 measured in the origin camera frame, rather than in the arbitrary world frame.
+Endpoint translation and rotation drift use the first-pose-relative start-to-end
+transform; they are not the final residual of a whole-trajectory alignment.
 The reference surface is a deterministic maximum of 8,192 visible RGB-D
 samples whose rays use the sequence's Brown-Conrady distortion coefficients,
-on a 5 cm voxel grid; the estimated map is the persistent union of observed
+on a 5 cm voxel grid; the estimated map contains final, live, observation-supported
 sparse landmarks on a 2 cm grid. Accordingly, its F-score is a sparse
 visible-map diagnostic, not a dense surface or complete-scene score.
 
 On the locked image and host recorded in `reference-adapters.json`, smoke
-tracked 300/300 frames with 0.0106 m ATE RMSE, 0.00608 m translational RPE,
-7,435 landmarks, and 0.841 map F-score. Full tracked 798/798 frames with 0.0104
-m ATE RMSE, 0.00602 m translational RPE, 10,389 landmarks, and 0.889 map
-F-score. Blank-frame tracking coverage fell to about 0.85 in both profiles and
-then recovered. The moving patch did not cause loss on this sequence, an
-important negative result rather than evidence that general dynamic scenes are
-solved. Thresholds—not exact outputs—gate reproduction because thread
-scheduling changes feature-map details.
+tracked 300/300 frames with 0.0111 m ATE RMSE, 0.00634 m translational RPE,
+0.0228 m endpoint drift, 1,749 final landmarks, and 0.575 map F-score. Full
+tracked 798/798 frames with 0.0102 m ATE RMSE, 0.00597 m translational RPE,
+0.0206 m endpoint drift, 2,006 final landmarks, and 0.637 map F-score.
+Blank-frame tracking coverage fell to about 0.85 in both profiles. Smoke resumed
+in the same Atlas map; full resumed in a new map and its occlusion ATE rose to
+0.0443 m, an explicit relocalization failure rather than a favorable-result
+requirement. The moving patch caused no tracking loss, but its trajectory is
+still evaluated (full ATE 0.0107 m and endpoint drift 0.0207 m), so coverage
+cannot hide pose damage. Thresholds—not exact outputs—gate reproduction because
+thread scheduling changes feature-map details.
 
 Expected artifacts are `trajectory.svg`, `output/CameraTrajectory.txt`,
-`output/KeyFrameTrajectory.txt`, `output/tracking.csv`, `output/map.ply`,
-`output/ground-truth-map.ply`, `output/failure-sweep.json`, `report.md`, and
-the hash-bound `result.json`. The adapter verifies the TUM archive and complete
+`output/KeyFrameTrajectory.txt`, the two perturbed `CameraTrajectory-*.txt`
+files, `output/tracking.csv`, `output/map.ply`, `output/ground-truth-map.ply`,
+`output/failure-sweep.json`, `output/resources.json`, `report.md`, and the
+hash-bound `result.json`. The adapter verifies the TUM archive and complete
 extraction tree, immutable container image, source and Insula manifests,
-semantic artifacts, recomputed metrics, acceptance thresholds, and atomic
-promotion.
+semantic artifacts, recomputed baseline and failure-trajectory metrics,
+resource-summary equality, acceptance thresholds, and atomic promotion.
 
 ### Transition
 

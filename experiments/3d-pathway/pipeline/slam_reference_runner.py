@@ -101,7 +101,7 @@ def parse_tum_trajectory(path: Path) -> list[TrajectoryRecord]:
         if not math.isclose(norm, 1.0, rel_tol=0.0, abs_tol=1e-3):
             raise ValueError(f"TUM trajectory requires a unit quaternion at line {line_number}")
         if records and timestamp <= records[-1][0]:
-            raise ValueError("TUM trajectory timestamps must be strictly increasing")
+            raise ValueError(f"TUM trajectory timestamps must be strictly increasing: {path}")
         records.append((timestamp, values[1:4], quaternion / norm))
     if not records:
         raise ValueError("TUM trajectory is empty")
@@ -184,7 +184,22 @@ def evaluate_trajectory(
         "ate_rmse_m": float(np.sqrt(np.mean(residuals * residuals))),
         "rpe_translation_rmse_m": float(np.sqrt(np.mean(np.square(translation_errors)))),
         "rpe_rotation_rmse_deg": float(np.sqrt(np.mean(np.square(rotation_errors)))),
-        "end_drift_m": float(residuals[-1]),
+        "endpoint_drift_m": float(
+            np.linalg.norm(
+                _quaternion_to_rotation(matches[0][0][2]).T @ (source[-1] - source[0])
+                - _quaternion_to_rotation(matches[0][1][2]).T @ (target[-1] - target[0])
+            )
+        ),
+        "endpoint_rotation_drift_deg": _rotation_angle_degrees(
+            (
+                _quaternion_to_rotation(matches[0][0][2]).T
+                @ _quaternion_to_rotation(matches[-1][0][2])
+            ).T
+            @ (
+                _quaternion_to_rotation(matches[0][1][2]).T
+                @ _quaternion_to_rotation(matches[-1][1][2])
+            )
+        ),
     }
     return metrics, {"rotation": rotation, "translation": translation}
 
@@ -475,13 +490,21 @@ def _verify_tum_asset(cache_root: Path) -> tuple[Path, dict[str, Any]]:
 def _geometry_metrics(run_dir: Path) -> dict[str, float | int]:
     tracking = _parse_tracking(run_dir / "output/tracking.csv")
     estimate = parse_tum_trajectory(run_dir / "output/CameraTrajectory.txt")
-    parse_tum_trajectory(run_dir / "output/KeyFrameTrajectory.txt")
+    keyframes = parse_tum_trajectory(run_dir / "output/KeyFrameTrajectory.txt")
+    estimate_timestamps = np.asarray([record[0] for record in estimate])
+    if any(float(np.min(np.abs(estimate_timestamps - record[0]))) > 1e-5 for record in keyframes):
+        raise ValueError("keyframe trajectory is not a subset of the camera trajectory")
     truth = parse_tum_trajectory(run_dir / "config/groundtruth-prefix.txt")
     trajectory, transform = evaluate_trajectory(estimate, truth)
     estimated_map = _read_ascii_ply(run_dir / "output/map.ply")
     truth_map = _read_ascii_ply(run_dir / "output/ground-truth-map.ply")
     aligned_map = (transform["rotation"] @ estimated_map.T).T + transform["translation"]
-    metrics = {**tracking, **trajectory, **evaluate_point_clouds(aligned_map, truth_map)}
+    metrics = {
+        **tracking,
+        "keyframes": len(keyframes),
+        **trajectory,
+        **evaluate_point_clouds(aligned_map, truth_map),
+    }
     ensure_finite(metrics, "ORB-SLAM metrics")
     return metrics
 
@@ -498,20 +521,76 @@ def _acceptance_failures(metrics: dict[str, Any], acceptance: dict[str, Any]) ->
     return [name for passed, name in checks if not passed]
 
 
-def _validate_failure_sweep(path: Path) -> dict[str, Any]:
+FAILURE_TRAJECTORIES = {
+    "occlusion": "output/CameraTrajectory-occlusion.txt",
+    "dynamic-object": "output/CameraTrajectory-dynamic-object.txt",
+}
+FAILURE_TRAJECTORY_METRICS = (
+    "trajectory_matches",
+    "ate_rmse_m",
+    "rpe_translation_rmse_m",
+    "rpe_rotation_rmse_deg",
+    "endpoint_drift_m",
+    "endpoint_rotation_drift_deg",
+)
+
+
+def _validate_failure_sweep(run_dir: Path) -> dict[str, Any]:
+    path = run_dir / "output/failure-sweep.json"
     value = load_json(path)
     variants = value.get("variants")
     if not isinstance(variants, list) or {item.get("id") for item in variants} != {"occlusion", "dynamic-object"}:
         raise ValueError("SLAM failure sweep must contain occlusion and dynamic-object variants")
+    truth = parse_tum_trajectory(run_dir / "config/groundtruth-prefix.txt")
     for item in variants:
         coverage = item.get("tracking_coverage")
         if isinstance(coverage, bool) or not isinstance(coverage, (int, float)) or not 0.0 <= coverage <= 1.0:
             raise ValueError("invalid SLAM failure-sweep coverage")
-        if not isinstance(item.get("recovered"), bool):
-            raise ValueError("invalid SLAM failure-sweep recovery flag")
         if not isinstance(item.get("lost_during_perturbation"), bool):
             raise ValueError("invalid SLAM failure-sweep loss flag")
+        if not isinstance(item.get("tracking_resumed"), bool):
+            raise ValueError("invalid SLAM failure-sweep resume flag")
+        if not isinstance(item.get("same_map_relocalized"), bool):
+            raise ValueError("invalid SLAM failure-sweep relocalization flag")
+        map_ids = (item.get("map_id_before_perturbation"), item.get("map_id_after_resume"))
+        if any(isinstance(map_id, bool) or not isinstance(map_id, int) or map_id < -1 for map_id in map_ids):
+            raise ValueError("invalid SLAM failure-sweep map identity")
+        if item["tracking_resumed"] and not item["lost_during_perturbation"]:
+            raise ValueError("SLAM tracking cannot resume without a recorded loss")
+        expected_same_map = (
+            item["tracking_resumed"]
+            and map_ids[0] >= 0
+            and map_ids[0] == map_ids[1]
+        )
+        if item["same_map_relocalized"] != expected_same_map:
+            raise ValueError("SLAM same-map relocalization flag does not match map identities")
+        trajectory = parse_tum_trajectory(run_dir / FAILURE_TRAJECTORIES[item["id"]])
+        if not math.isclose(
+            float(coverage), len(trajectory) / len(truth), rel_tol=1e-12, abs_tol=1e-12
+        ):
+            raise ValueError("SLAM failure-sweep coverage does not match its trajectory")
+        actual, _ = evaluate_trajectory(trajectory, truth)
+        expected = {name: actual[name] for name in FAILURE_TRAJECTORY_METRICS}
+        if not _metrics_match(item.get("trajectory", {}), expected):
+            raise ValueError("SLAM failure-sweep trajectory metric mismatch")
     return value
+
+
+def _record_failure_sweep_metrics(run_dir: Path) -> None:
+    path = run_dir / "output/failure-sweep.json"
+    value = load_json(path)
+    variants = value.get("variants")
+    if not isinstance(variants, list):
+        raise ValueError("invalid raw SLAM failure sweep")
+    truth = parse_tum_trajectory(run_dir / "config/groundtruth-prefix.txt")
+    for item in variants:
+        variant_id = item.get("id")
+        if variant_id not in FAILURE_TRAJECTORIES:
+            raise ValueError("invalid raw SLAM failure-sweep variant")
+        trajectory = parse_tum_trajectory(run_dir / FAILURE_TRAJECTORIES[variant_id])
+        actual, _ = evaluate_trajectory(trajectory, truth)
+        item["trajectory"] = {name: actual[name] for name in FAILURE_TRAJECTORY_METRICS}
+    write_json(path, value)
 
 
 def _require_file(run_dir: Path, relative: str) -> Path:
@@ -557,15 +636,17 @@ def validate_slam_reference_result(run_dir: Path) -> dict[str, Any]:
         "adapter.log", "report.md", "trajectory.svg", "input/dataset-contract.json",
         "config/associations.txt", "config/groundtruth-prefix.txt", "config/insula-manifest.expected",
         "output/CameraTrajectory.txt", "output/KeyFrameTrajectory.txt", "output/tracking.csv",
+        "output/CameraTrajectory-occlusion.txt", "output/CameraTrajectory-dynamic-object.txt",
         "output/map.ply", "output/ground-truth-map.ply", "output/source-commit.txt",
         "output/insula-manifest.txt", "output/failure-sweep.json", "output/resource-summary.txt",
+        "output/resources.json",
     ):
         _require_file(run_dir, relative)
     if _parse_manifest(run_dir / "output/insula-manifest.txt") != PINNED_INSULA_MANIFEST:
         raise ValueError("ORB-SLAM Insula manifest mismatch")
     if (run_dir / "output/source-commit.txt").read_text(encoding="utf-8").strip() != PINNED_ORB_SLAM3_COMMIT:
         raise ValueError("ORB-SLAM source commit mismatch")
-    _validate_failure_sweep(run_dir / "output/failure-sweep.json")
+    _validate_failure_sweep(run_dir)
     metrics = _geometry_metrics(run_dir)
     if not _metrics_match(result.get("metrics", {}), metrics):
         raise ValueError("ORB-SLAM metric mismatch")
@@ -609,8 +690,16 @@ def validate_slam_reference_result(run_dir: Path) -> dict[str, Any]:
         or config.get("asset_tree_sha256") != provenance.get("asset_tree_sha256")
     ):
         raise ValueError("asset provenance binding mismatch")
-    runtime = result["resources"].get("runtime_seconds")
-    peak_memory = result["resources"].get("peak_cpu_memory_bytes")
+    asset_lock = next(
+        item for item in load_json(ROOT / "assets.lock.json")["assets"] if item["id"] == "tum-rgbd"
+    )
+    if provenance.get("asset_archive_sha256") != asset_lock["sha256"]:
+        raise ValueError("asset provenance does not match the TUM RGB-D lock")
+    resource_summary = load_json(run_dir / "output/resources.json")
+    if result["resources"] != resource_summary:
+        raise ValueError("resource summary mismatch")
+    runtime = resource_summary.get("runtime_seconds")
+    peak_memory = resource_summary.get("peak_cpu_memory_bytes")
     if (
         isinstance(runtime, bool)
         or not isinstance(runtime, (int, float))
@@ -618,6 +707,7 @@ def validate_slam_reference_result(run_dir: Path) -> dict[str, Any]:
         or isinstance(peak_memory, bool)
         or not isinstance(peak_memory, int)
         or peak_memory <= 0
+        or peak_memory != _resource_memory(run_dir / "output/resource-summary.txt")
     ):
         raise ValueError("invalid SLAM resource measurement")
     implementation = {name: sha256_file(ROOT / name) for name in REFERENCE_IMPLEMENTATION}
@@ -635,7 +725,16 @@ def _resource_memory(path: Path) -> int:
     return int(match.group(1)) * 1024
 
 
-def _write_trajectory_svg(path: Path, estimate: list[TrajectoryRecord], truth: list[TrajectoryRecord]) -> None:
+def _write_trajectory_svg(
+    path: Path,
+    estimate: list[TrajectoryRecord],
+    truth: list[TrajectoryRecord],
+    transform: dict[str, np.ndarray],
+) -> None:
+    estimate = [
+        (timestamp, transform["rotation"] @ position + transform["translation"], quaternion)
+        for timestamp, position, quaternion in estimate
+    ]
     all_points = np.stack([record[1][[0, 2]] for record in estimate + truth])
     minimum = all_points.min(axis=0)
     span = np.maximum(all_points.max(axis=0) - minimum, 1e-9)
@@ -649,8 +748,9 @@ def _write_trajectory_svg(path: Path, estimate: list[TrajectoryRecord], truth: l
 
     path.write_text(
         '<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">'
-        '<rect width="640" height="360" fill="white"/>' + polyline(truth, "#222")
-        + polyline(estimate, "#d33") + "</svg>\n",
+        '<rect width="640" height="360" fill="white"/>'
+        '<text x="12" y="20" font-family="sans-serif" font-size="12">Aligned ORB-SLAM3 (red) / truth (black)</text>'
+        + polyline(truth, "#222") + polyline(estimate, "#d33") + "</svg>\n",
         encoding="utf-8",
     )
 
@@ -688,6 +788,7 @@ def run_slam_reference(cache_root: Path, profile: str, run_id: str) -> Path:
         (staging / "adapter.log").write_text(completed.stdout + completed.stderr, encoding="utf-8")
         if completed.returncode != 0:
             raise ValueError(f"ORB-SLAM adapter failed ({completed.returncode}): {completed.stderr.strip()}")
+        _record_failure_sweep_metrics(staging)
         metrics = _geometry_metrics(staging)
         acceptance = _adapter_record()["acceptance"][profile]
         failures = _acceptance_failures(metrics, acceptance)
@@ -695,8 +796,9 @@ def run_slam_reference(cache_root: Path, profile: str, run_id: str) -> Path:
             raise ValueError(f"ORB-SLAM result is below acceptance for: {', '.join(failures)}")
         estimate = parse_tum_trajectory(staging / "output/CameraTrajectory.txt")
         truth = parse_tum_trajectory(staging / "config/groundtruth-prefix.txt")
-        _write_trajectory_svg(staging / "trajectory.svg", estimate, truth)
-        sweep = _validate_failure_sweep(staging / "output/failure-sweep.json")
+        _, transform = evaluate_trajectory(estimate, truth)
+        _write_trajectory_svg(staging / "trajectory.svg", estimate, truth, transform)
+        sweep = _validate_failure_sweep(staging)
         (staging / "report.md").write_text(
             "# ORB-SLAM3 RGB-D reference\n\n"
             f"Tracked {metrics['tracked_frames']} of {metrics['input_frames']} frames "
@@ -724,6 +826,12 @@ def run_slam_reference(cache_root: Path, profile: str, run_id: str) -> Path:
             "map_fscore_threshold_m": 0.1,
             "acceptance": acceptance,
         }
+        resources = {
+            "runtime_seconds": time.perf_counter() - started,
+            "peak_cpu_memory_bytes": _resource_memory(staging / "output/resource-summary.txt"),
+            "host": platform.platform(),
+        }
+        write_json(staging / "output/resources.json", resources)
         result = {
             "schema_version": 1,
             "adapter": ADAPTER,
@@ -741,11 +849,7 @@ def run_slam_reference(cache_root: Path, profile: str, run_id: str) -> Path:
                 "container_image": IMAGE,
                 "container_image_id": image_id,
             },
-            "resources": {
-                "runtime_seconds": time.perf_counter() - started,
-                "peak_cpu_memory_bytes": _resource_memory(staging / "output/resource-summary.txt"),
-                "host": platform.platform(),
-            },
+            "resources": resources,
             "provenance": {
                 "config": config,
                 "config_sha256": hashlib.sha256(canonical_json(config)).hexdigest(),

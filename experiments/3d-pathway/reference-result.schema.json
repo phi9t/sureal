@@ -29,11 +29,13 @@
         "tracking_coverage": {"type": "number", "minimum": 0, "maximum": 1},
         "lost_frames": {"type": "integer"},
         "tracking_recoveries": {"type": "integer"},
+        "keyframes": {"type": "integer"},
         "trajectory_matches": {"type": "integer"},
         "ate_rmse_m": {"type": "number"},
         "rpe_translation_rmse_m": {"type": "number"},
         "rpe_rotation_rmse_deg": {"type": "number"},
-        "end_drift_m": {"type": "number"},
+        "endpoint_drift_m": {"type": "number"},
+        "endpoint_rotation_drift_deg": {"type": "number"},
         "map_points": {"type": "integer"},
         "map_truth_points": {"type": "integer"},
         "map_accuracy_mean_m": {"type": "number"},
@@ -86,7 +88,7 @@
     },
     {
       "if": {"properties": {"adapter": {"const": "orb-slam"}}},
-      "then": {"properties": {"metrics": {"required": ["input_frames", "tracked_frames", "tracking_coverage", "lost_frames", "tracking_recoveries", "trajectory_matches", "ate_rmse_m", "rpe_translation_rmse_m", "rpe_rotation_rmse_deg", "end_drift_m", "map_points", "map_truth_points", "map_accuracy_mean_m", "map_completeness_mean_m", "map_precision_10cm", "map_recall_10cm", "map_fscore_10cm"]}}}
+      "then": {"properties": {"metrics": {"required": ["input_frames", "tracked_frames", "tracking_coverage", "lost_frames", "tracking_recoveries", "keyframes", "trajectory_matches", "ate_rmse_m", "rpe_translation_rmse_m", "rpe_rotation_rmse_deg", "endpoint_drift_m", "endpoint_rotation_drift_deg", "map_points", "map_truth_points", "map_accuracy_mean_m", "map_completeness_mean_m", "map_precision_10cm", "map_recall_10cm", "map_fscore_10cm"]}}}
     }
   ]
 }
