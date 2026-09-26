@@ -8,6 +8,7 @@ import copy
 import csv
 import json
 from pathlib import Path
+import platform
 import random
 import shutil
 import subprocess
@@ -221,13 +222,16 @@ def main() -> None:
     config.pipeline.datamanager.dataparser.downscale_factor = 1
     config.pipeline.datamanager.dataparser.auto_orient = False
     config.pipeline.model.eval_num_rays_per_chunk = 4096
+    config.pipeline.model.sdf_field.inside_outside = True
     config.save_config()
 
     trainer = config.setup(local_rank=0, world_size=1)
     trainer.setup(test_mode="val")
     gates = _environment_gates(trainer)
     _write_json(args.output / "environment-gates.json", gates)
+    training_started = time.perf_counter()
     trainer.train()
+    training_seconds = time.perf_counter() - training_started
     trainer.pipeline.eval()
 
     checkpoint_candidates = sorted(trainer.checkpoint_dir.glob("step-*.ckpt"))
@@ -306,6 +310,9 @@ def main() -> None:
     (args.output / "source-commit.txt").write_text(nerfstudio_commit + "\n")
     (args.output / "tcnn-commit.txt").write_text(tcnn_commit + "\n")
     shutil.copy2("/etc/surflo-pathway-insula", args.output / "insula-manifest.txt")
+    cuda_compiler = subprocess.run(
+        ["nvcc", "--version"], text=True, capture_output=True, check=True
+    ).stdout.strip()
     _write_json(
         args.output / "runtime-versions.json",
         {
@@ -314,7 +321,10 @@ def main() -> None:
             "torch": torch.__version__,
             "torchvision": torchvision.__version__,
             "pillow": PIL.__version__,
+            "python": platform.python_version(),
+            "numpy": np.__version__,
             "cuda_runtime": torch.version.cuda,
+            "cuda_compiler": cuda_compiler,
             "compute_capability": list(torch.cuda.get_device_capability(0)),
             "tcnn_cuda_architectures": "100",
             "device": torch.cuda.get_device_name(0),
@@ -327,11 +337,14 @@ def main() -> None:
             "iterations": args.iterations,
             "rays_per_batch": args.rays_per_batch,
             "extraction_resolution": args.extraction_resolution,
+            "training_seconds": training_seconds,
+            "training_steps_per_second": args.iterations / training_seconds,
             "extraction_seconds": extraction_seconds,
             "mesh_vertices": len(vertices),
             "mesh_faces": len(faces),
             "camera_optimizer": "off",
             "mono_prior": False,
+            "inside_outside": True,
             "tf32": False,
             "seed": SEED,
         },

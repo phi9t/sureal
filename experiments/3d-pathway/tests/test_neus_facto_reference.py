@@ -130,7 +130,10 @@ def fake_neus_engine(path: Path, fail: bool = False) -> Path:
                 "torch": "2.7.1+cu128",
                 "torchvision": "0.22.1+cu128",
                 "pillow": "11.1.0",
+                "python": "3.12.3",
+                "numpy": "2.5.2",
                 "cuda_runtime": "12.8",
+                "cuda_compiler": "Cuda compilation tools, release 12.8, V12.8.93",
                 "compute_capability": [10, 0],
                 "tcnn_cuda_architectures": "100",
                 "device": "fixture NVIDIA B200",
@@ -146,11 +149,14 @@ def fake_neus_engine(path: Path, fail: bool = False) -> Path:
                 "iterations": 1000 if manifest["profile"] == "smoke" else 20001,
                 "rays_per_batch": 1024 if manifest["profile"] == "smoke" else 2048,
                 "extraction_resolution": resolution,
+                "training_seconds": 4.0,
+                "training_steps_per_second": (1000 if manifest["profile"] == "smoke" else 20001) / 4.0,
                 "extraction_seconds": 0.25,
                 "mesh_vertices": len(points),
                 "mesh_faces": len(faces),
                 "camera_optimizer": "off",
                 "mono_prior": False,
+                "inside_outside": True,
                 "tf32": False,
                 "seed": manifest["scene_seed"],
             }}, sort_keys=True) + "\\n")
@@ -221,6 +227,18 @@ class NeuSFactoReferenceFoundationTest(unittest.TestCase):
         adapter = adapters["nerfstudio-neus-facto-reference"]
         self.assertEqual(adapter["status"], "landed")
         self.assertEqual(adapter["modules"], ["09"])
+        self.assertEqual(adapter["baseline_environment"]["gpu_model"], "NVIDIA B200")
+        self.assertEqual(adapter["baseline_environment"]["compute_capability"], 10.0)
+        self.assertRegex(
+            adapter["baseline_environment"]["container_image_id"],
+            r"^sha256:[0-9a-f]{64}$",
+        )
+        for profile in ("last_verified_smoke", "last_verified_full"):
+            self.assertEqual(adapter[profile]["date"], "2026-09-26")
+            self.assertGreater(adapter[profile]["mesh_vertices"], 100)
+            self.assertGreater(adapter[profile]["training_steps_per_second"], 0.0)
+            self.assertGreater(adapter[profile]["peak_gpu_compute_memory_bytes"], 0)
+        self.assertIn("failure evidence", adapter["measurement_note"])
         self.assertIn("common_visible_fscore_10cm_min", adapter["acceptance"]["smoke"])
         self.assertIn("target_psnr_db_min", adapter["acceptance"]["full"])
         self.assertEqual(adapter["acceptance"]["smoke"]["common_visible_fscore_10cm_min"], 0.35)
@@ -253,6 +271,7 @@ class NeuSFactoReferenceFoundationTest(unittest.TestCase):
         self.assertIn('method_configs["neus-facto"]', entrypoint)
         self.assertIn("forward_geonetwork", entrypoint)
         self.assertIn("measure.marching_cubes", entrypoint)
+        self.assertIn("config.pipeline.model.sdf_field.inside_outside = True", entrypoint)
         self.assertIn("normals = (-gradients / lengths)", entrypoint)
         self.assertIn("get_outputs_for_camera", entrypoint)
         self.assertIn('f"safe.directory={path}"', entrypoint)
@@ -359,6 +378,20 @@ class NeuSFactoReferenceFoundationTest(unittest.TestCase):
 
 
 class NeuSFactoNumericalContractTest(unittest.TestCase):
+    def test_persisted_metric_comparison_is_float_tolerant_but_structurally_strict(self) -> None:
+        sys.path.insert(0, str(ROOT / "pipeline"))
+        from neus_reference_runner import _values_match
+
+        expected = {"score": 1.0, "count": 7, "labels": ["visible", True]}
+        self.assertTrue(
+            _values_match(
+                {"score": 1.0 + 5e-7, "count": 7, "labels": ["visible", True]},
+                expected,
+            )
+        )
+        self.assertFalse(_values_match({**expected, "count": 7.0}, expected))
+        self.assertFalse(_values_match({"score": 1.0, "count": 7}, expected))
+
     def test_surface_metrics_exclude_unsupported_truth_from_geometry_score(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
         from neus_reference_runner import _surface_metrics
@@ -446,8 +479,41 @@ class NeuSFactoReferenceAdapterTest(unittest.TestCase):
             self.assertEqual(config["extraction_resolution"], 128)
             self.assertEqual(config["container_user_environment"], {"USER": "surflo"})
             self.assertEqual(config["cuda_cache"], "persistent-cache-root-mount")
+            self.assertIs(config["inside_outside"], True)
+            self.assertEqual(config["evaluation_software"]["numpy"], np.__version__)
+            self.assertEqual(config["evaluation_software"]["python"], sys.version.split()[0])
+            self.assertEqual(
+                config["entrypoint_command"],
+                [
+                    "/usr/bin/time",
+                    "-v",
+                    "-o",
+                    "/work/output/resource-usage.txt",
+                    "python",
+                    "/usr/local/bin/run-neus-facto.py",
+                    "--input",
+                    "/work/input",
+                    "--output",
+                    "/work/output",
+                    "--iterations",
+                    "1000",
+                    "--rays-per-batch",
+                    "1024",
+                    "--extraction-resolution",
+                    "128",
+                ],
+            )
             self.assertEqual(config["lpips_backbone"]["sha256"], LPIPS_SHA256)
+            self.assertRegex(config["adapter_execution_contract_sha256"], r"^[0-9a-f]{64}$")
             self.assertEqual(result["tool"]["container_image_id"], FIXTURE_IMAGE_ID)
+            self.assertGreater(result["resources"]["training_seconds"], 0.0)
+            self.assertGreater(result["resources"]["training_steps_per_second"], 0.0)
+            versions = json.loads(
+                (run_dir / "output/runtime-versions.json").read_text()
+            )
+            self.assertEqual(versions["python"], "3.12.3")
+            self.assertEqual(versions["numpy"], "2.5.2")
+            self.assertIn("release 12.8", versions["cuda_compiler"])
             self.assertIn("output/mesh.ply", result["provenance"]["artifacts_sha256"])
             self.assertIn(
                 "output/field.sdf_grid.float32.npy",
@@ -508,6 +574,48 @@ class NeuSFactoReferenceAdapterTest(unittest.TestCase):
             from neus_reference_runner import validate_neus_reference_result
 
             with self.assertRaisesRegex(ValueError, "artifact"):
+                validate_neus_reference_result(run_dir)
+
+    def test_tampered_sdfstudio_metadata_is_rejected_as_input(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            run_dir = run_fake_neus_reference(Path(temporary))
+            metadata = run_dir / "input/meta_data.json"
+            value = json.loads(metadata.read_text())
+            value["camera_model"] = "PINHOLE"
+            metadata.write_text(json.dumps(value))
+
+            sys.path.insert(0, str(ROOT / "pipeline"))
+            from neus_reference_runner import validate_neus_reference_result
+
+            with self.assertRaisesRegex(ValueError, "input hash mismatch: meta_data.json"):
+                validate_neus_reference_result(run_dir)
+
+    def test_tampered_evaluation_or_compiler_provenance_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            run_dir = run_fake_neus_reference(Path(temporary))
+            result_path = run_dir / "result.json"
+            result = json.loads(result_path.read_text())
+            config = result["provenance"]["config"]
+            config["evaluation_software"]["numpy"] = "0.0.0"
+            result["provenance"]["config_sha256"] = hashlib.sha256(
+                json.dumps(config, sort_keys=True, separators=(",", ":")).encode()
+            ).hexdigest()
+            result_path.write_text(json.dumps(result))
+
+            sys.path.insert(0, str(ROOT / "pipeline"))
+            from neus_reference_runner import validate_neus_reference_result
+
+            with self.assertRaisesRegex(ValueError, "config identity"):
+                validate_neus_reference_result(run_dir)
+
+        with tempfile.TemporaryDirectory() as temporary:
+            run_dir = run_fake_neus_reference(Path(temporary))
+            versions_path = run_dir / "output/runtime-versions.json"
+            versions = json.loads(versions_path.read_text())
+            versions["cuda_compiler"] = "unknown"
+            versions_path.write_text(json.dumps(versions))
+
+            with self.assertRaisesRegex(ValueError, "runtime identity"):
                 validate_neus_reference_result(run_dir)
 
     def test_real_profiles_are_explicit_b200_gates(self) -> None:

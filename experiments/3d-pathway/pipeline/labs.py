@@ -308,7 +308,7 @@ def _continuous_geometry_lab(artifacts: Path, profile: str, scene: dict[str, Any
 
     extraction_resolution = 64 if profile == "smoke" else 128
     comparison = []
-    for representation, bytes_per_parameter in (("voxel", 1), ("occupancy", 4), ("sdf", 4)):
+    for representation, bytes_per_parameter in (("voxel", 4), ("occupancy", 4), ("sdf", 4)):
         surface = extracted_surface(extraction_resolution, representation)
         residual = np.abs(np.linalg.norm(surface, axis=1) - radius)
         comparison.append(

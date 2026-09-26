@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import json
 import os
 from pathlib import Path
@@ -49,6 +50,14 @@ class LearnedAndRenderableLabContractTest(unittest.TestCase):
             self.assertTrue(
                 (cache / "runs/neural/09/artifacts/representation_comparison.csv").is_file()
             )
+            with (
+                cache / "runs/neural/09/artifacts/representation_comparison.csv"
+            ).open(newline="") as stream:
+                storage = {
+                    float(row["sampled_grid_storage_mib"])
+                    for row in csv.DictReader(stream)
+                }
+            self.assertEqual(len(storage), 1, "all dense grids use the declared float32 encoding")
             self.assertGreaterEqual(
                 len({
                     row["parameter"]

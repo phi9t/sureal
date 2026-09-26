@@ -118,7 +118,7 @@ near/far, and image/metadata hashes.
 
 Use fixed seed `260925`, deterministic flags where supported, TF32 state
 recorded (off for the initial numerical reference), no camera optimization,
-no monocular priors, `neus-facto`, `inside_outside=False` for the bounded
+no monocular priors, `neus-facto`, `inside_outside=True` for the bounded
 object-centric fixture, and fixed scheduler/settings copied into the run
 configuration.  Start smoke at 1,000 steps with 1,024 rays/batch and a
 `128^3` field query grid; full uses 20,001 steps, 2,048 rays/batch and
@@ -138,13 +138,13 @@ For every successful run, write an atomic reference result with:
 
 - immutable source/dependency/wheel and container hashes; CUDA driver/runtime,
   compiler, GPU UUID/model/compute capability, `TCNN_CUDA_ARCHITECTURES`, seed,
-  determinism/TF32 settings and executed command;
+  determinism/TF32 settings and executed in-container command;
 - input and generated-fixture hashes; frames/AABB/transform, exact config,
   sampler counts, iteration count, resource/time summary and field-checkpoint
   hash;
 - `field.sdf_grid.float32.npy`, mesh PLY, validity/support masks, context and
-  target RGB/depth/normal renders, a 2D residual montage, a sliced SDF SVG,
-  and an `artifacts/failure_sweep.csv`;
+  target RGB/depth/normal arrays, a metric-summary SVG, an explicitly
+  schematic zero-level illustration, and an `artifacts/failure_sweep.csv`;
 - metrics separated into `geometry`, `rendering`, and `unsupported` families.
 
 Geometry is scored only in the declared **common-visible** surface region.
@@ -163,12 +163,12 @@ generative/completion metric for this adapter; report it as not applicable.
 
 **Measured acceptance tolerances** are controlled-fixture regression gates,
 not third-party leaderboard or reconstruction-quality claims.  The first
-verified B200 smoke runs produced common-visible F@10 cm of 0.433--0.490,
-accuracy RMSE of 0.201--0.224 m, completeness of 0.473--0.582, mean Eikonal
-residual of 0.089--0.097, and back-arc target PSNR of 8.15--8.24 dB.  The
-formal 20,001-step full run produced F@5 cm 0.225, RMSE 0.205 m,
-completeness 0.558, outward-normal error 60.9 degrees, Eikonal residual 0.032,
-and target PSNR 8.40 dB.  Its denser 256-cube extraction exposed more
+verified B200 smoke runs produced common-visible F@10 cm of 0.421--0.490,
+accuracy RMSE of 0.201--0.225 m, completeness of 0.473--0.582, mean Eikonal
+residual of 0.089--0.102, and back-arc target PSNR of 8.08--8.24 dB.  The
+latest 20,001-step full run produced F@5 cm 0.220, RMSE 0.212 m,
+completeness 0.538, outward-normal error 61.6 degrees, Eikonal residual 0.0318,
+and target PSNR 8.39 dB.  Its denser 256-cube extraction exposed more
 unsupported/spurious zero-level components, so full does not monotonically
 improve surface precision even though field regularity improves.
 

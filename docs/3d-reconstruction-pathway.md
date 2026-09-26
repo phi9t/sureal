@@ -872,13 +872,13 @@ NeuS-Facto forward/backward path, coarse SDF extraction, source commits,
 runtime versions, read-only checkpoint hash, offline container flags, and
 atomic artifact promotion.
 
-The first B200 smoke reproduction completed in 42.9 seconds with 5.32 GB peak
-compute memory. It reached common-visible F@10 cm 0.433, accuracy RMSE 0.224 m,
-outward-normal error 61.6 degrees, mean Eikonal residual 0.089, and back-arc
-target PSNR 8.24 dB. The formal full reproduction took 582.9 seconds and 6.40
-GB peak compute memory; it reached F@5 cm 0.225, RMSE 0.205 m, completeness
-0.558, outward-normal error 60.9 degrees, Eikonal residual 0.0324, and target
-PSNR 8.40 dB. These values establish reproducible execution gates, not quality
+The latest B200 smoke reproduction completed in 42.3 seconds with 5.32 GB peak
+compute memory. It reached common-visible F@10 cm 0.421, accuracy RMSE 0.225 m,
+outward-normal error 64.5 degrees, mean Eikonal residual 0.102, and back-arc
+target PSNR 8.08 dB. The full reproduction took 575.9 seconds and 6.40
+GB peak compute memory; it reached F@5 cm 0.220, RMSE 0.212 m, completeness
+0.538, outward-normal error 61.6 degrees, Eikonal residual 0.0318, and target
+PSNR 8.39 dB. These values establish reproducible execution gates, not quality
 claims: the field contains many zero crossings outside image-supported surface,
 and held-out views lie well beyond the context arc. The failure is the lesson.
 Photometric fit and Eikonal regularity do not prove accurate topology, hidden

@@ -86,8 +86,32 @@ REFERENCE_IMPLEMENTATION = (
     "assets.lock.json",
     "reference-result.schema.json",
     "shared-scene.json",
-    "reference-adapters.json",
 )
+
+
+def _values_match(actual: Any, expected: Any) -> bool:
+    """Compare recomputed data with tolerance only for floating-point leaves."""
+    if isinstance(expected, dict):
+        return (
+            isinstance(actual, dict)
+            and actual.keys() == expected.keys()
+            and all(_values_match(actual[key], value) for key, value in expected.items())
+        )
+    if isinstance(expected, list):
+        return (
+            isinstance(actual, list)
+            and len(actual) == len(expected)
+            and all(_values_match(left, right) for left, right in zip(actual, expected))
+        )
+    if isinstance(expected, bool):
+        return isinstance(actual, bool) and actual is expected
+    if isinstance(expected, int):
+        return type(actual) is int and actual == expected
+    if isinstance(expected, float):
+        return type(actual) is float and math.isclose(
+            actual, expected, rel_tol=1e-6, abs_tol=1e-8
+        )
+    return type(actual) is type(expected) and actual == expected
 
 
 def _finite_xyz(values: np.ndarray, label: str) -> np.ndarray:
@@ -281,6 +305,23 @@ def _adapter_record() -> dict[str, Any]:
     )
 
 
+def _adapter_execution_contract_sha256() -> str:
+    record = _adapter_record()
+    contract = {
+        key: record[key]
+        for key in (
+            "id",
+            "command",
+            "modules",
+            "status",
+            "acceptance",
+            "model_contract",
+            "evaluation_contract",
+        )
+    }
+    return hashlib.sha256(canonical_json(contract)).hexdigest()
+
+
 def _lpips_checkpoint_record() -> dict[str, Any]:
     matches = [
         item
@@ -346,6 +387,22 @@ def _validate_input_manifest(input_root: Path, profile: str) -> dict[str, Any]:
         )
         if manifest != expected:
             raise ValueError("NeuS-Facto input manifest does not match the shared-scene contract")
+        metadata_relative = expected["sdfstudio_metadata_path"]
+        metadata_hash = expected["sdfstudio_metadata_sha256"]
+        metadata_actual = _require_regular_file(input_root, metadata_relative)
+        if (
+            sha256_file(metadata_actual) != metadata_hash
+            or sha256_file(expected_root / metadata_relative) != metadata_hash
+        ):
+            raise ValueError(
+                f"NeuS-Facto input hash mismatch: {metadata_relative}"
+            )
+        try:
+            metadata_actual.resolve(strict=True).relative_to(input_root.resolve(strict=True))
+        except ValueError as error:
+            raise ValueError(
+                f"NeuS-Facto input escapes input root: {metadata_relative}"
+            ) from error
         records = expected["context_frames"] + expected["target_frames"]
         pairs = [
             ("image_path", "image_sha256"),
@@ -510,7 +567,10 @@ def _validate_runtime_identity(run_dir: Path, profile: str) -> dict[str, Any]:
         or versions.get("torch") != "2.7.1+cu128"
         or versions.get("torchvision") != "0.22.1+cu128"
         or versions.get("pillow") != "11.1.0"
+        or versions.get("python") != "3.12.3"
+        or versions.get("numpy") != "2.5.2"
         or versions.get("cuda_runtime") != "12.8"
+        or "release 12.8" not in str(versions.get("cuda_compiler", ""))
         or versions.get("compute_capability") != [10, 0]
         or versions.get("tcnn_cuda_architectures") != "100"
         or not versions.get("device")
@@ -534,8 +594,18 @@ def _validate_runtime_identity(run_dir: Path, profile: str) -> dict[str, Any]:
         or summary.get("extraction_resolution") != expected["extraction_resolution"]
         or summary.get("camera_optimizer") != "off"
         or summary.get("mono_prior") is not False
+        or summary.get("inside_outside") is not True
         or summary.get("tf32") is not False
         or summary.get("seed") != 260925
+        or not isinstance(summary.get("training_seconds"), (int, float))
+        or summary["training_seconds"] <= 0
+        or not isinstance(summary.get("training_steps_per_second"), (int, float))
+        or not math.isclose(
+            summary["training_steps_per_second"],
+            expected["iterations"] / summary["training_seconds"],
+            rel_tol=1e-9,
+            abs_tol=1e-12,
+        )
         or not isinstance(summary.get("extraction_seconds"), (int, float))
         or summary["extraction_seconds"] < 0
     ):
@@ -573,7 +643,7 @@ def _write_visualizations(run_dir: Path, metrics: dict[str, Any]) -> None:
     artifacts = run_dir / "artifacts"
     artifacts.mkdir()
     geometry = metrics["geometry"]
-    (artifacts / "surface-residuals.svg").write_text(
+    (artifacts / "metric-summary.svg").write_text(
         "<svg xmlns='http://www.w3.org/2000/svg' width='640' height='120'>"
         "<rect width='640' height='120' fill='#101820'/>"
         f"<text x='20' y='55' fill='#f2f2f2'>common-visible F@10cm: {geometry['common_visible_fscore_10cm']:.4f}</text>"
@@ -616,6 +686,28 @@ The back side contains {unsupported['truth_points']} zero-context-support truth 
 """
 
 
+def _entrypoint_command(profile: str) -> list[str]:
+    config = PROFILE_CONFIG[profile]
+    return [
+        "/usr/bin/time",
+        "-v",
+        "-o",
+        "/work/output/resource-usage.txt",
+        "python",
+        "/usr/local/bin/run-neus-facto.py",
+        "--input",
+        "/work/input",
+        "--output",
+        "/work/output",
+        "--iterations",
+        str(config["iterations"]),
+        "--rays-per-batch",
+        str(config["rays_per_batch"]),
+        "--extraction-resolution",
+        str(config["extraction_resolution"]),
+    ]
+
+
 def _container_command(
     engine: str,
     image_id: str,
@@ -624,7 +716,6 @@ def _container_command(
     lpips_checkpoint: Path,
     profile: str,
 ) -> list[str]:
-    config = PROFILE_CONFIG[profile]
     return [
         engine,
         "run",
@@ -653,22 +744,7 @@ def _container_command(
         "-v",
         f"{lpips_checkpoint}:/model/hub/checkpoints/{LPIPS_CHECKPOINT_FILENAME}:ro",
         image_id,
-        "/usr/bin/time",
-        "-v",
-        "-o",
-        "/work/output/resource-usage.txt",
-        "python",
-        "/usr/local/bin/run-neus-facto.py",
-        "--input",
-        "/work/input",
-        "--output",
-        "/work/output",
-        "--iterations",
-        str(config["iterations"]),
-        "--rays-per-batch",
-        str(config["rays_per_batch"]),
-        "--extraction-resolution",
-        str(config["extraction_resolution"]),
+        *_entrypoint_command(profile),
     ]
 
 
@@ -690,7 +766,9 @@ def validate_neus_reference_result(run_dir: Path) -> dict[str, Any]:
         raise ValueError("NeuS-Facto result profile mismatch")
     summary = _validate_runtime_identity(run_dir, profile)
     metrics, topology = _evaluate_outputs(run_dir, profile)
-    if result.get("metrics") != metrics or result.get("topology") != topology:
+    if not _values_match(result.get("metrics"), metrics) or not _values_match(
+        result.get("topology"), topology
+    ):
         raise ValueError("NeuS-Facto persisted metric recomputation mismatch")
     acceptance = _adapter_record()["acceptance"][profile]
     if result.get("acceptance") != acceptance:
@@ -722,11 +800,18 @@ def validate_neus_reference_result(run_dir: Path) -> dict[str, Any]:
         "seed": 260925,
         "camera_optimizer": "off",
         "mono_prior": False,
+        "inside_outside": True,
         "tf32": False,
         "container_user_environment": {"USER": "surflo"},
         "support": SUPPORT_CONTRACT,
         "cuda_cache": CUDA_CACHE_POLICY,
         "lpips_backbone": _lpips_checkpoint_record(),
+        "adapter_execution_contract_sha256": _adapter_execution_contract_sha256(),
+        "entrypoint_command": _entrypoint_command(profile),
+        "evaluation_software": {
+            "python": platform.python_version(),
+            "numpy": np.__version__,
+        },
         "acceptance": acceptance,
     }
     if config != expected_config:
@@ -806,6 +891,8 @@ def run_neus_reference(cache_root: Path, profile: str, run_id: str) -> Path:
             "gpu_hardware": gpu_hardware,
             "host": platform.platform(),
             "extraction_seconds": summary["extraction_seconds"],
+            "training_seconds": summary["training_seconds"],
+            "training_steps_per_second": summary["training_steps_per_second"],
         }
         write_json(staging / "output/resource-summary.json", resources)
         config = {
@@ -823,11 +910,18 @@ def run_neus_reference(cache_root: Path, profile: str, run_id: str) -> Path:
             "seed": 260925,
             "camera_optimizer": "off",
             "mono_prior": False,
+            "inside_outside": True,
             "tf32": False,
             "container_user_environment": {"USER": "surflo"},
             "support": SUPPORT_CONTRACT,
             "cuda_cache": CUDA_CACHE_POLICY,
             "lpips_backbone": lpips_checkpoint_record,
+            "adapter_execution_contract_sha256": _adapter_execution_contract_sha256(),
+            "entrypoint_command": _entrypoint_command(profile),
+            "evaluation_software": {
+                "python": platform.python_version(),
+                "numpy": np.__version__,
+            },
             "acceptance": acceptance,
         }
         result = {
