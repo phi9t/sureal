@@ -3,7 +3,7 @@
 This directory backs the survey in
 [`docs/3d-reconstruction-pathway.md`](../../docs/3d-reconstruction-pathway.md).
 It provides deterministic concept labs for all fifteen modules, machine-readable
-source and asset registries, a common controlled scene, six local Insula
+source and asset registries, a common controlled scene, seven local Insula
 definitions plus the reused Blender and Surflo environments, provenance-aware
 run storage, and citation/terminology auditing.
 
@@ -27,6 +27,7 @@ experiments/3d-pathway/run.sh reference --adapter orb-slam --profile smoke --run
 experiments/3d-pathway/run.sh reference --adapter depth-anything-v2 --profile smoke --run-id dav2-demo
 experiments/3d-pathway/run.sh reference --adapter neus-facto --profile smoke --run-id neus-demo
 experiments/3d-pathway/run.sh reference --adapter nerfacto --profile smoke --run-id nerfacto-demo
+experiments/3d-pathway/run.sh reference --adapter splatfacto --profile smoke --run-id splatfacto-demo
 python3 experiments/3d-pathway/pipeline/audit.py --offline
 
 # Required real-container gates (the full gate is intentionally opt-in):
@@ -40,6 +41,8 @@ python3 experiments/3d-pathway/pipeline/audit.py --offline
 (cd experiments/3d-pathway && SURFLO_REQUIRE_NEUS_FACTO_FULL=1 python3 -m unittest -q tests.test_neus_facto_reference.NeuSFactoReferenceAdapterTest.test_real_profiles_are_explicit_b200_gates)
 (cd experiments/3d-pathway && SURFLO_REQUIRE_NERFACTO_REFERENCE=1 python3 -m unittest -q tests.test_nerfacto_reference.NerfactoReferenceExecutionContractTest.test_real_profiles_are_explicit_b200_gates)
 (cd experiments/3d-pathway && SURFLO_REQUIRE_NERFACTO_FULL=1 python3 -m unittest -q tests.test_nerfacto_reference.NerfactoReferenceExecutionContractTest.test_real_profiles_are_explicit_b200_gates)
+(cd experiments/3d-pathway && SURFLO_REQUIRE_SPLATFACTO_REFERENCE=1 python3 -m unittest -q tests.test_splatfacto_reference.SplatfactoOutputContractTest.test_real_profiles_are_explicit_b200_gates)
+(cd experiments/3d-pathway && SURFLO_REQUIRE_SPLATFACTO_FULL=1 python3 -m unittest -q tests.test_splatfacto_reference.SplatfactoOutputContractTest.test_real_profiles_are_explicit_b200_gates)
 
 # Explicit network boundaries:
 experiments/3d-pathway/run.sh build
@@ -146,6 +149,19 @@ Gaussian-window SSIM, visible-support depth/point metrics, unsupported-region
 errors, density occupancy, and component counts from persisted arrays. LPIPS
 comes from the pinned container but is not an acceptance gate. Density remains
 a rendering field diagnostic, not an SDF surface or hidden-scene completion.
+
+The Splatfacto adapter uses a seventh, CUDA 12.8 Insula with the same pinned
+Nerfstudio source, gsplat 1.4.0 at commit
+`4d3a3b69db4de0326f983ccf7b7b255271a17b01`, and Blackwell-native Torch
+extensions. It fits explicit anisotropic Gaussian radiance primitives from
+calibrated context RGB with networking disabled and writes the normalized
+parameter arrays plus a face-free PLY labelled as renderable primitives. Host
+evaluation recomputes held-out image metrics, accumulation-qualified expected
+depth and point diagnostics, and a trained 3/5/9-view failure sweep. Expected
+depth is an alpha-compositing statistic. Vanilla Splatfacto exposes no
+canonical surface, triangle mesh, hidden-scene completion, or posterior scene
+sample; every such field is retained as unsupported rather than inferred from
+the PLY.
 
 Runs default to `~/.cache/surflo/3d-pathway`. Set
 `SURFLO_PATHWAY_CACHE_ROOT` to choose another cache. A module first writes to

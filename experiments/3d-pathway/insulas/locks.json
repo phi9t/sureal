@@ -52,6 +52,20 @@
       "requirements_lock_sha256": "02c623f2a636dd774dda048f1a08c8d936d0701f74d3f50b3a7916d2280ed65a",
       "resolved_requirements_sha256": "75324c79132de2fcf25b60444c7e9820baeebbc3a6db2002eb601ac2b5c33e4c",
       "dockerfile_sha256": "e18c649ef1b448cd22264354be6ab73558c62b1b4499c3dafe31526b97a58a2d"
+    },
+    "gaussian-splatting": {
+      "base_image": "nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04",
+      "base_image_digest": "24c8e3581ea6330038b0d374920721983312627f8adbfcf390bdb4b399d280ed",
+      "nerfstudio_source_commit": "50e0e3c70c775e89333256213363badbf074f29d",
+      "gsplat_source_commit": "4d3a3b69db4de0326f983ccf7b7b255271a17b01",
+      "gsplat_version": "1.4.0",
+      "torch_cuda_arch_list": "10.0",
+      "pytorch": "2.7.1+cu128",
+      "torchvision": "0.22.1+cu128",
+      "pillow": "11.1.0",
+      "requirements_lock_sha256": "02c623f2a636dd774dda048f1a08c8d936d0701f74d3f50b3a7916d2280ed65a",
+      "resolved_requirements_sha256": "75324c79132de2fcf25b60444c7e9820baeebbc3a6db2002eb601ac2b5c33e4c",
+      "dockerfile_sha256": "2845ba969c84689b2c32abab08802b8246ae81594291f3e01d8a50798ea7c3ed"
     }
   }
 }

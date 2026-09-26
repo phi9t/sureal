@@ -158,7 +158,11 @@ def _lpips_checkpoint_record() -> dict[str, Any]:
         or record.get("sha256") != LPIPS_CHECKPOINT_SHA256
         or record.get("byte_size") != LPIPS_CHECKPOINT_BYTES
         or set(record.get("consumers", []))
-        != {"nerfstudio-neus-facto-reference", "nerfstudio-nerfacto-reference"}
+        != {
+            "nerfstudio-neus-facto-reference",
+            "nerfstudio-nerfacto-reference",
+            "nerfstudio-splatfacto-reference",
+        }
         or not str(record.get("source", "")).endswith(LPIPS_CHECKPOINT_FILENAME)
     ):
         raise ValueError("Nerfacto LPIPS checkpoint lock mismatch")

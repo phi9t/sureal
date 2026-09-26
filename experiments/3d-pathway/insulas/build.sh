@@ -15,3 +15,4 @@ command -v "${ENGINE}" >/dev/null 2>&1 || {
 "${ENGINE}" build --network host --tag surflo-pathway-neural-rendering:1 "${HERE}/neural-rendering"
 "${ENGINE}" build --network host --tag surflo-pathway-implicit-surface:1 "${HERE}/implicit-surface"
 "${ENGINE}" build --network host --tag surflo-pathway-radiance-field:1 "${HERE}/radiance-field"
+"${ENGINE}" build --network host --tag surflo-pathway-gaussian-splatting:1 --file "${HERE}/gaussian-splatting/Dockerfile" "${HERE}"

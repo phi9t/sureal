@@ -12,6 +12,7 @@
     "neural-rendering": "insulas/neural-rendering/Dockerfile",
     "implicit-surface": "insulas/implicit-surface/Dockerfile",
     "radiance-field": "insulas/radiance-field/Dockerfile",
+    "gaussian-splatting": "insulas/gaussian-splatting/Dockerfile",
     "blender": "../photoreal-scenes/insula/Dockerfile",
     "surflo": "../insula-scout/insula/Dockerfile"
   },
@@ -90,8 +91,8 @@
       "id": "11", "slug": "gaussian-splatting", "title": "Gaussian splatting and explicit renderable primitives",
       "evidence": ["posed RGB images or feed-forward image features"], "observable": "render-supporting anisotropic primitives", "representation": "3D or surfel-like Gaussian primitives",
       "inference": "hybrid", "objectives": ["differentiable splat rendering loss", "surface regularization"], "metrics": ["PSNR", "render FPS", "surface RMSE", "mesh F-score"],
-      "failure_sweep": ["primitive count", "view sparsity", "surface regularization"], "insula": "neural-rendering",
-      "sources": ["zwicker-2001", "kerbl-2023", "guedon-lepetit-2024", "huang-2dgs-2024", "smart-splatt3r-2024"]
+      "failure_sweep": ["primitive count", "view sparsity", "surface regularization"], "insula": "gaussian-splatting",
+      "sources": ["zwicker-2001", "kerbl-2023", "nerfstudio-splatfacto-2025", "gsplat-1.4.0", "guedon-lepetit-2024", "huang-2dgs-2024", "smart-splatt3r-2024"]
     },
     {
       "id": "12", "slug": "feed-forward-geometry-foundations", "title": "Feed-forward visual geometry foundations",

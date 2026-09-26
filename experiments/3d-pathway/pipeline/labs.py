@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import io
+import json
 from pathlib import Path
 from typing import Any
 import zipfile
@@ -590,26 +591,199 @@ def _radiance_field_lab(artifacts: Path, profile: str, scene: dict[str, Any], pr
     }
 
 
-def _gaussian_splatting_lab(artifacts: Path, profile: str, scene: dict[str, Any], profile_config: dict[str, Any]) -> dict[str, Any]:
-    counts = np.unique(np.rint(np.geomspace(1_000, 1_048_576, _steps(profile_config))).astype(int))
-    psnr = 20.0 + 2.4 * np.log10(counts / 1000.0 + 1.0)
-    surface_error = 0.11 / np.log10(counts / 100.0 + 10.0) + 0.018
-    sweep = []
-    for count, image_score, error in zip(counts, psnr, surface_error):
-        sweep.append({"parameter": "primitive_count", "value": int(count), "metric": "psnr_db", "measurement": float(image_score)})
-        sweep.append({"parameter": "primitive_count", "value": int(count), "metric": "surface_rmse_m", "measurement": float(error)})
+def _render_orthographic_splats(
+    means: np.ndarray, colors: np.ndarray, resolution: int = 96
+) -> np.ndarray:
+    """Render a tiny deterministic EWA-style teaching image.
+
+    This deliberately uses only projected x/y and therefore exposes the core
+    ambiguity: appearance can remain stable while primitive centers move away
+    from the physical surface along the viewing direction.
+    """
+    color_sum = np.zeros((resolution, resolution, 3), dtype=np.float64)
+    weight_sum = np.zeros((resolution, resolution), dtype=np.float64)
+    sigma = 1.15
+    for mean, color in zip(means, colors):
+        column = (float(mean[0]) / 0.8 * 0.5 + 0.5) * (resolution - 1)
+        row = (0.5 - float(mean[1]) / 0.8 * 0.5) * (resolution - 1)
+        left = max(0, int(np.floor(column - 3.0 * sigma)))
+        right = min(resolution, int(np.ceil(column + 3.0 * sigma)) + 1)
+        top = max(0, int(np.floor(row - 3.0 * sigma)))
+        bottom = min(resolution, int(np.ceil(row + 3.0 * sigma)) + 1)
+        if left >= right or top >= bottom:
+            continue
+        xx, yy = np.meshgrid(
+            np.arange(left, right, dtype=np.float64),
+            np.arange(top, bottom, dtype=np.float64),
+        )
+        weight = np.exp(-0.5 * ((xx - column) ** 2 + (yy - row) ** 2) / sigma**2)
+        color_sum[top:bottom, left:right] += weight[..., None] * color
+        weight_sum[top:bottom, left:right] += weight
+    background = np.array([0.035, 0.047, 0.071], dtype=np.float64)
+    coverage = np.clip(weight_sum, 0.0, 1.0)[..., None]
+    normalized = np.divide(
+        color_sum,
+        weight_sum[..., None],
+        out=np.zeros_like(color_sum),
+        where=weight_sum[..., None] > 1e-12,
+    )
+    return (coverage * normalized + (1.0 - coverage) * background).astype(np.float32)
+
+
+def _gaussian_splatting_lab(
+    artifacts: Path,
+    profile: str,
+    scene: dict[str, Any],
+    profile_config: dict[str, Any],
+) -> dict[str, Any]:
+    radius = 0.72
+    truth_count = 4096 if profile == "smoke" else 8192
+    index = np.arange(truth_count, dtype=np.float64) + 0.5
+    z = 1.0 - 2.0 * index / truth_count
+    angle = np.pi * (3.0 - np.sqrt(5.0)) * index
+    radial = np.sqrt(np.maximum(0.0, 1.0 - z * z))
+    directions = np.stack(
+        (radial * np.cos(angle), radial * np.sin(angle), z), axis=1
+    )
+    truth_means = radius * directions
+    colors = np.stack(
+        (
+            0.25 + 0.65 * (directions[:, 0] + 1.0) * 0.5,
+            0.20 + 0.70 * (directions[:, 1] + 1.0) * 0.5,
+            0.30 + 0.60 * (directions[:, 2] + 1.0) * 0.5,
+        ),
+        axis=1,
+    ).astype(np.float32)
+    truth_rgb = _render_orthographic_splats(truth_means, colors)
+
+    maximum = 768 if profile == "smoke" else 2048
+    counts = np.unique(
+        np.rint(np.geomspace(64, maximum, _steps(profile_config))).astype(int)
+    )
+    count_psnr: list[float] = []
+    final_indices = np.empty(0, dtype=np.int64)
+    final_rgb = np.empty(0, dtype=np.float32)
+    sweep: list[dict[str, Any]] = []
+    for count in counts:
+        selected = np.linspace(0, truth_count - 1, int(count), dtype=np.int64)
+        rendered = _render_orthographic_splats(truth_means[selected], colors[selected])
+        mse = float(np.mean((rendered.astype(np.float64) - truth_rgb) ** 2))
+        psnr = float(-10.0 * np.log10(mse))
+        count_psnr.append(psnr)
+        sweep.append(
+            {
+                "parameter": "primitive_count",
+                "value": int(count),
+                "metric": "psnr_db",
+                "measurement": psnr,
+            }
+        )
+        final_indices = selected
+        final_rgb = rendered
+
+    selected_truth = truth_means[final_indices]
+    phase = np.sin(np.arange(len(final_indices), dtype=np.float64) * 1.61803398875)
+    jitter_amplitudes = np.linspace(0.0, 0.18, _steps(profile_config))
+    unregularized = selected_truth.copy()
+    jitter_rmse: list[float] = []
+    for amplitude in jitter_amplitudes:
+        candidate = selected_truth.copy()
+        candidate[:, 2] += float(amplitude) * phase
+        residual = np.linalg.norm(candidate, axis=1) - radius
+        rmse = float(np.sqrt(np.mean(residual * residual)))
+        jitter_rmse.append(rmse)
+        sweep.extend(
+            [
+                {
+                    "parameter": "depth_jitter_amplitude_m",
+                    "value": float(amplitude),
+                    "metric": "surface_rmse_m",
+                    "measurement": rmse,
+                },
+                {
+                    "parameter": "depth_jitter_amplitude_m",
+                    "value": float(amplitude),
+                    "metric": "psnr_db",
+                    "measurement": count_psnr[-1],
+                },
+            ]
+        )
+        unregularized = candidate
+    norm = np.linalg.norm(unregularized, axis=1, keepdims=True)
+    regularized = unregularized * (radius / norm)
+    unregularized = unregularized.astype(np.float32)
+    regularized = regularized.astype(np.float32)
+    unregularized_rmse = float(
+        np.sqrt(
+            np.mean(
+                (np.linalg.norm(unregularized.astype(np.float64), axis=1) - radius)
+                ** 2
+            )
+        )
+    )
+    regularized_rmse = float(
+        np.sqrt(
+            np.mean(
+                (np.linalg.norm(regularized.astype(np.float64), axis=1) - radius)
+                ** 2
+            )
+        )
+    )
+
+    _write_npz_deterministic(
+        artifacts / "gaussian_comparison.npz",
+        {
+            "truth_rgb": truth_rgb,
+            "splat_rgb": final_rgb,
+            "truth_radius_m": np.asarray(radius, dtype=np.float64),
+            "unregularized_means_m": unregularized,
+            "regularized_means_m": regularized,
+            "primitive_counts": counts.astype(np.int64),
+            "primitive_count_psnr_db": np.asarray(count_psnr, dtype=np.float64),
+            "depth_jitter_amplitudes_m": jitter_amplitudes.astype(np.float64),
+            "depth_jitter_surface_rmse_m": np.asarray(jitter_rmse, dtype=np.float64),
+        },
+    )
+    (artifacts / "gaussian_comparison.json").write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "evidence": "calibrated synthetic RGB",
+                "representation": "explicit anisotropic Gaussian primitives",
+                "inference": "analytic controlled construction",
+                "rendering_operator": "orthographic EWA-style splatting",
+                "mesh_extraction_supported": False,
+                "completion_claim": False,
+                "interpretation": "projected appearance is invariant to the controlled viewing-axis center perturbation",
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     _write_sweep(artifacts / "failure_sweep.csv", sweep)
-    _write_chart(artifacts / "splat_tradeoff.svg", "More renderable primitives do not guarantee a cleaner surface", psnr.tolist(), "#b04452")
+    _write_chart(
+        artifacts / "splat_tradeoff.svg",
+        "Projected image fidelity does not identify one physical surface",
+        jitter_rmse,
+        "#b04452",
+    )
     return {
         "metrics": {
-            "geometry": {"unregularized_surface_rmse_m": 0.071, "regularized_surface_rmse_m": 0.024, "mesh_f_score": 0.81},
-            "rendering": {"splat_psnr_db": 36.1, "extracted_mesh_psnr_db": 30.7, "render_fps": 124.0},
+            "geometry": {
+                "unregularized_surface_rmse_m": unregularized_rmse,
+                "regularized_surface_rmse_m": regularized_rmse,
+                "mesh_extraction_supported": False,
+            },
+            "rendering": {"splat_psnr_db": count_psnr[-1]},
             "generative": {},
         },
         "failure_sweep": sweep,
         "observations": [
             "A Gaussian cloud is an explicit renderable representation, but its primitive support need not be a single accurate surface.",
-            "Surface-aligned or 2D variants add geometric bias; mesh extraction is an additional inference step.",
+            "The controlled viewing-axis perturbation preserves this renderer's image while degrading center-to-surface error.",
+            "Vanilla 3D Gaussian splatting does not define triangle-mesh extraction or hidden-scene completion.",
         ],
     }
 

@@ -92,7 +92,40 @@
       "last_verified_full": {"date": "2026-09-26", "run_id": "module10-full-maskfix-final-20260926", "target_psnr_db": 22.16675831918123, "target_foreground_psnr_db": 14.75832338982354, "target_ssim": 0.7983070338609695, "target_crop_ssim": 0.37869410694679173, "target_lpips": 0.19831329584121704, "target_crop_lpips": 0.8062028090159098, "context_fit_psnr_db": 55.09999154289114, "common_visible_accumulation_coverage": 0.9778546712802768, "expected_depth_rmse_m": 0.05514694617282306, "median_depth_rmse_m": 0.0565838755479223, "point_fscore_10cm": 0.9955937346738597, "unsupported_expected_depth_rmse_m": 0.3691176060197903, "view_sweep_target_psnr_db": {"3": 21.122104334498083, "5": 21.80256211213391, "9": 22.01675777061246}, "training_seconds": 345.3708246657625, "training_steps_per_second": 57.911666451143496, "runtime_seconds": 461.3870686101727, "peak_cpu_memory_bytes": 2705195008, "peak_gpu_compute_memory_bytes": 7254048768},
       "measurement_note": "Nerfacto performs seeded per-scene density/radiance optimization from context RGB; CUDA execution can vary numerically. Rendering uses all three held-out targets and separately labelled context-fit diagnostics; geometry uses only accumulation-qualified common-visible target rays, while unsupported errors remain separate. A trained 3/5/9-view sweep records sparse-view failure evidence. Retained Module 09 registry scalars use different support and metric definitions and are not presented as a common-evaluator comparison. The adapter makes no completion or posterior-sampling claim."
     },
-    {"id": "gaussian-splatting-reference", "modules": ["11"], "status": "not_landed", "reason": "No trained reference invocation or expected-result lock is tracked."},
+    {
+      "id": "nerfstudio-splatfacto-reference",
+      "command": "run.sh reference --adapter splatfacto --profile smoke --run-id ID",
+      "modules": ["11"],
+      "status": "landed",
+      "acceptance": {
+        "smoke": {"target_psnr_db_min": 15.0, "target_ssim_min": 0.10, "common_visible_accumulation_coverage_min": 0.85, "expected_depth_rmse_m_max": 0.50, "point_fscore_10cm_min": 0.50},
+        "full": {"target_psnr_db_min": 18.0, "target_ssim_min": 0.80, "common_visible_accumulation_coverage_min": 0.95, "expected_depth_rmse_m_max": 0.80, "point_fscore_10cm_min": 0.05}
+      },
+      "baseline_environment": {"container_image_id": "sha256:74069c635937d049c262382cf0477133b046393abdde7871b9f035b8ae0d4736", "gpu_model": "NVIDIA B200", "compute_capability": 10.0, "driver_version": "580.105.08", "torch": "2.7.1+cu128", "container_numpy": "2.5.2", "gsplat": "1.4.0"},
+      "model_contract": {
+        "nerfstudio_source_commit": "50e0e3c70c775e89333256213363badbf074f29d",
+        "gsplat_source_commit": "4d3a3b69db4de0326f983ccf7b7b255271a17b01",
+        "method": "splatfacto",
+        "inference": "per-scene-optimization",
+        "initialization": "random",
+        "completion_claim": false,
+        "posterior_sampling_claim": false
+      },
+      "evaluation_contract": {
+        "smoke_iterations": 1000,
+        "full_iterations": 30000,
+        "initial_random_primitives": 50000,
+        "accumulation_threshold": 0.5,
+        "rendering": "held-out target RGB; separate from geometry",
+        "geometry": "view-conditioned expected-depth diagnostics on common-visible truth",
+        "context_fit_diagnostic": "all primary context cameras; labelled separately from held-out targets",
+        "trained_view_sweep": [3, 5, 9],
+        "unsupported_claims": ["triangle_mesh", "mesh_f_score", "canonical_surface", "hidden_surface_completion"]
+      },
+      "last_verified_smoke": {"date": "2026-09-26", "run_id": "module11-splatfacto-smoke-dev6-20260926", "target_psnr_db": 16.90333414974546, "target_ssim": 0.3850098598811131, "target_lpips": 0.2576293498277664, "context_fit_psnr_db": 27.91752912747223, "common_visible_accumulation_coverage": 0.9375558534405719, "expected_depth_rmse_m": 0.3138564509825729, "point_fscore_10cm": 0.743608869344711, "primitive_count": 1747, "unsupported_expected_depth_rmse_m": 0.7503082882573294, "training_seconds": 10.552561409305781, "runtime_seconds": 51.40555807529017, "peak_cpu_memory_bytes": 2851598336, "peak_gpu_compute_memory_bytes": 1610612736, "render_median_fps": 532.113748573534},
+      "last_verified_full": {"date": "2026-09-26", "run_id": "module11-splatfacto-full-dev1-20260926", "target_psnr_db": 21.658537259917452, "target_ssim": 0.9221052421616828, "target_lpips": 0.11378353089094162, "context_fit_psnr_db": 47.489261089499806, "common_visible_accumulation_coverage": 0.9913494809688581, "expected_depth_rmse_m": 0.07030746394840778, "point_fscore_5cm": 0.9541261733241653, "primitive_count": 2353, "unsupported_expected_depth_rmse_m": 0.7854780764627529, "training_seconds": 247.48266936233267, "runtime_seconds": 302.3079269370064, "peak_cpu_memory_bytes": 2925305856, "peak_gpu_compute_memory_bytes": 1610612736, "render_median_fps": 505.3451446551196},
+      "measurement_note": "Splatfacto optimizes one explicit Gaussian radiance representation from calibrated context RGB. Expected depth is an alpha-compositing statistic, not a surface intersection. Vanilla Splatfacto supplies no mesh extractor or hidden-scene posterior; those claims remain unsupported until separately pinned surface-aware and generative adapters land. Acceptance bounds are conservative seeded B200 execution-integrity gates calibrated from repeated smoke and full runs; they are not cross-method quality claims. Same-seed CUDA/adaptive-density calibration moved smoke target SSIM from 0.385 to 0.171; full 5 cm point F-score moved from 0.954 to 0.612, then another full fit produced 19.689 dB with 0.670 m expected-depth RMSE and 0.091 F-score at 10 cm. Quality metrics therefore retain broad non-collapse bounds rather than false reproducibility."
+    },
     {"id": "foundation-geometry-reference", "modules": ["12"], "status": "not_landed", "reason": "No checkpoint-backed invocation is tracked in this pathway."}
   ]
 }

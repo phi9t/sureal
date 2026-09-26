@@ -260,7 +260,11 @@ class NeuSFactoReferenceFoundationTest(unittest.TestCase):
         self.assertEqual(lpips["byte_size"], 244408911)
         self.assertEqual(
             lpips["consumers"],
-            ["nerfstudio-neus-facto-reference", "nerfstudio-nerfacto-reference"],
+            [
+                "nerfstudio-neus-facto-reference",
+                "nerfstudio-nerfacto-reference",
+                "nerfstudio-splatfacto-reference",
+            ],
         )
 
         dockerfile = (ROOT / "insulas/implicit-surface/Dockerfile").read_text()

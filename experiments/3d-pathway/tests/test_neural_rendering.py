@@ -15,6 +15,78 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LearnedAndRenderableLabContractTest(unittest.TestCase):
+    def test_module_11_metrics_are_recomputed_from_persisted_gaussian_outputs(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            cache = Path(temporary)
+            env = os.environ.copy()
+            env["SURFLO_PATHWAY_CACHE_ROOT"] = str(cache)
+            completed = subprocess.run(
+                [
+                    str(ROOT / "run.sh"),
+                    "run",
+                    "--module",
+                    "11",
+                    "--profile",
+                    "smoke",
+                    "--run-id",
+                    "splats",
+                ],
+                cwd=ROOT.parent.parent,
+                env=env,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+
+            run_dir = cache / "runs" / "splats" / "11"
+            result = json.loads((run_dir / "result.json").read_text())
+            comparison = json.loads(
+                (run_dir / "artifacts" / "gaussian_comparison.json").read_text()
+            )
+            self.assertEqual(comparison["schema_version"], 1)
+            self.assertEqual(comparison["evidence"], "calibrated synthetic RGB")
+            self.assertEqual(
+                comparison["representation"], "explicit anisotropic Gaussian primitives"
+            )
+            self.assertEqual(comparison["inference"], "analytic controlled construction")
+            self.assertFalse(comparison["mesh_extraction_supported"])
+            self.assertFalse(comparison["completion_claim"])
+
+            with np.load(run_dir / "artifacts" / "gaussian_comparison.npz") as arrays:
+                truth = arrays["truth_rgb"].astype(np.float64)
+                predicted = arrays["splat_rgb"].astype(np.float64)
+                unregularized = arrays["unregularized_means_m"].astype(np.float64)
+                regularized = arrays["regularized_means_m"].astype(np.float64)
+                radius = float(arrays["truth_radius_m"])
+                mse = float(np.mean((predicted - truth) ** 2))
+                psnr = float(-10.0 * np.log10(mse))
+                unregularized_rmse = float(
+                    np.sqrt(np.mean((np.linalg.norm(unregularized, axis=1) - radius) ** 2))
+                )
+                regularized_rmse = float(
+                    np.sqrt(np.mean((np.linalg.norm(regularized, axis=1) - radius) ** 2))
+                )
+
+            self.assertAlmostEqual(
+                result["metrics"]["rendering"]["splat_psnr_db"], psnr, places=10
+            )
+            self.assertAlmostEqual(
+                result["metrics"]["geometry"]["unregularized_surface_rmse_m"],
+                unregularized_rmse,
+                places=10,
+            )
+            self.assertAlmostEqual(
+                result["metrics"]["geometry"]["regularized_surface_rmse_m"],
+                regularized_rmse,
+                places=10,
+            )
+            self.assertGreater(unregularized_rmse, regularized_rmse)
+            self.assertEqual(
+                {row["parameter"] for row in result["failure_sweep"]},
+                {"primitive_count", "depth_jitter_amplitude_m"},
+            )
+
     def test_module_10_metrics_are_recomputed_from_persisted_field_outputs(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             cache = Path(temporary)
@@ -177,8 +249,12 @@ class LearnedAndRenderableLabContractTest(unittest.TestCase):
             self.assertGreater(radiance["geometry"]["radiance_field_rendered_depth_rmse_m"], radiance["geometry"]["surface_model_rmse_m"])
 
             splats = results["11"]["metrics"]
-            self.assertGreater(splats["rendering"]["splat_psnr_db"], splats["rendering"]["extracted_mesh_psnr_db"])
-            self.assertGreater(splats["geometry"]["unregularized_surface_rmse_m"], splats["geometry"]["regularized_surface_rmse_m"])
+            self.assertGreater(splats["rendering"]["splat_psnr_db"], 0.0)
+            self.assertGreater(
+                splats["geometry"]["unregularized_surface_rmse_m"],
+                splats["geometry"]["regularized_surface_rmse_m"],
+            )
+            self.assertFalse(splats["geometry"]["mesh_extraction_supported"])
 
     def test_report_explicitly_marks_non_applicable_metric_families(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

@@ -1049,7 +1049,8 @@ G(x)=\exp\!\left[-\tfrac12(x-\mu)^\top\Sigma^{-1}(x-\mu)\right],
 \]
 
 Projected alpha values are front-to-back composited,
-(C=\sum_i T_i\alpha_i c_i), (T_i=\prod_{j<i}(1-\alpha_j)). Surface methods
+\(C=\sum_i T_i\alpha_i c_i\), where
+\(T_i=\prod_{j<i}(1-\alpha_j)\). Surface methods
 regularize primitive normals, flatten one covariance axis, or reconstruct an
 additional scalar field before meshing.
 
@@ -1071,6 +1072,12 @@ Then read modern differentiable 3DGS in
 2D surfel-like primitives in
 [huang-2dgs-2024](https://doi.org/10.1145/3641519.3657428), and feed-forward
 prediction in [smart-splatt3r-2024](https://arxiv.org/abs/2408.13912).
+The maintained implementation is Nerfstudio Splatfacto at
+[nerfstudio-splatfacto-2025](https://github.com/nerfstudio-project/nerfstudio/tree/50e0e3c70c775e89333256213363badbf074f29d)
+with the pinned rasterization dependency
+[gsplat-1.4.0](https://github.com/nerfstudio-project/gsplat/tree/4d3a3b69db4de0326f983ccf7b7b255271a17b01).
+It is a maintained 3DGS-family reference, not a paper-exact reproduction of
+Kerbl et al.
 
 ### Reproduction lab
 
@@ -1078,10 +1085,57 @@ prediction in [smart-splatt3r-2024](https://arxiv.org/abs/2408.13912).
 experiments/3d-pathway/run.sh run --module 11 --profile smoke --run-id pathway-11
 ```
 
-Inspect `result.json`, `report.md`, `artifacts/splat_tradeoff.svg`, and
-`artifacts/failure_sweep.csv`. Primitive count is swept while PSNR and surface
-RMSE remain separate; surface regularization and extracted-mesh rendering are
-reported as different outputs.
+Inspect `result.json`, `report.md`, `artifacts/gaussian_comparison.npz`,
+`artifacts/gaussian_comparison.json`, `artifacts/splat_tradeoff.svg`, and
+`artifacts/failure_sweep.csv`. The repo-owned lab renders actual deterministic
+Gaussian arrays. Its primitive-count sweep recomputes image PSNR, while a
+viewing-axis center perturbation leaves the orthographic image unchanged and
+increases center-to-sphere error. Projecting those centers back to the known
+sphere is an analytic teaching regularizer, not a SuGaR/2DGS reproduction.
+Mesh extraction is explicitly unsupported.
+
+Run the maintained Splatfacto reproduction separately:
+
+```bash
+experiments/3d-pathway/run.sh reference --adapter splatfacto \
+  --profile smoke --run-id splatfacto-smoke
+```
+
+The adapter pins Nerfstudio commit
+`50e0e3c70c775e89333256213363badbf074f29d`, gsplat 1.4.0 commit
+`4d3a3b69db4de0326f983ccf7b7b255271a17b01`, Torch 2.7.1/CUDA 12.8,
+and a Blackwell `sm_100` build. It optimizes one representation from five
+smoke or nine full calibrated context RGB images with seed 260925, 50,000
+random initial primitives at scale 2, camera optimization disabled, a black
+background, the classic rasterizer, and scale regularization disabled. Smoke
+runs 1,000 updates; full runs 30,000. Target truth is opened only after the
+final checkpoint. Independent 3/5/9-view fits at 1,000 updates form the
+reference failure sweep.
+
+On the retained NVIDIA B200 calibration, smoke reached 16.90 dB held-out PSNR,
+0.385 SSIM, 0.258 LPIPS, 0.314 m common-visible expected-depth RMSE, and 0.744
+point F-score at 10 cm. Its primary fit took 10.6 seconds and ended with 1,747
+primitives. Full reached 21.66 dB, 0.922, 0.114, 0.070 m, and 0.954 F-score at
+5 cm in 247.5 training seconds, ending with 2,353 primitives. Both measured
+1.50 GiB peak GPU compute memory; median target rendering was 532 and 505 FPS,
+respectively, at the fixture resolution. These are retained configuration and
+hardware measurements, not copied paper results or cross-method rankings.
+Repeated same-seed CUDA calibration moved smoke target SSIM from 0.385 to
+0.171 and full 5 cm point F-score from 0.954 to 0.612; another adaptive-density
+full fit reached 19.69 dB but 0.670 m expected-depth RMSE and only 0.091
+F-score at 10 cm. The acceptance contract therefore uses broad non-collapse
+gates and retains the raw quality metrics as evidence instead of promising
+bitwise or basin-level reproducibility.
+
+Expected depth is the ordered alpha-compositing expectation converted to
+camera-axis depth, not a first physical surface intersection. Geometry scores
+therefore remain view-conditioned diagnostics on accumulation-qualified,
+common-visible rays. The full fit's visible expected-depth RMSE improved to
+0.070 m while its separately reported unsupported-region RMSE was 0.785 m.
+The output `gaussians.ply` is labelled renderable primitives, has no faces,
+and is never called a mesh. Canonical surface extraction, mesh F-score,
+hidden-surface completion, and posterior scene sampling remain unsupported;
+surface-aware SuGaR or 2DGS requires a distinct future adapter.
 
 ### Transition
 

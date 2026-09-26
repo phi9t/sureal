@@ -199,6 +199,7 @@ class InsulaContractTest(unittest.TestCase):
                 "neural-rendering",
                 "implicit-surface",
                 "radiance-field",
+                "gaussian-splatting",
             },
         )
         self.assertNotEqual(locks["classical"]["base_image"], locks["neural-rendering"]["base_image"])
