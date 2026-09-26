@@ -205,3 +205,6 @@ skyseg.onnx
 logs/
 .claude
 training/jean_zay
+
+# Agent-isolated feature worktrees
+.worktrees/
