@@ -41,6 +41,19 @@
       "last_verified_full": {"date": "2026-09-26", "evaluated_cases": 11, "valid_pixel_fraction": 1.0, "raw_rmse_m": 3.974458461545385, "raw_abs_rel": 0.850752687217024, "raw_delta1": 0.0, "affine_aligned_rmse_m": 1.194959349703643, "affine_scale": 0.01982995570989162, "affine_shift_m": 4.379357506064349, "shared_scene_raw_rmse_m": 4.031821231527744, "focal_crop_raw_rmse_m": 3.8504613973531905, "ood_concavity_raw_rmse_m": 3.5543249328893185, "runtime_seconds": 12.287358998786658, "peak_cpu_memory_bytes": 1718960128, "peak_gpu_compute_memory_bytes": 1289748480},
       "measurement_note": "Raw metre-space error is the primary metric-depth score. One profile-global affine alignment is reported only as a shape diagnostic and never substitutes for raw metric accuracy; per-case fits only localize failures. Every output pixel is a deterministic, prior-conditioned prediction for an input-visible ray; the adapter emits no hidden geometry and samples no scene hypothesis."
     },
+    {
+      "id": "nerfstudio-neus-facto-reference",
+      "command": "run.sh reference --adapter neus-facto --profile smoke --run-id ID",
+      "modules": ["09"],
+      "status": "landed",
+      "acceptance": {
+        "smoke": {"mesh_vertices_min": 100, "common_visible_fscore_10cm_min": 0.35, "common_visible_accuracy_rmse_m_max": 0.30, "common_visible_completeness_fraction_min": 0.45, "common_visible_normal_mean_deg_max": 85.0, "eikonal_mean_max": 0.20, "target_psnr_db_min": 7.0},
+        "full": {"mesh_vertices_min": 100, "common_visible_fscore_5cm_min": 0.15, "common_visible_accuracy_rmse_m_max": 0.30, "common_visible_completeness_fraction_min": 0.45, "common_visible_normal_mean_deg_max": 85.0, "eikonal_mean_max": 0.12, "target_psnr_db_min": 7.0}
+      },
+      "model_contract": {"nerfstudio_source_commit": "50e0e3c70c775e89333256213363badbf074f29d", "tiny_cuda_nn_source_commit": "0109538c37ac0bf613f2bac8de6cda48352feca7", "method": "neus-facto", "inference": "per-scene-optimization", "completion_claim": false, "posterior_sampling_claim": false},
+      "evaluation_contract": {"smoke_iterations": 1000, "full_iterations": 20001, "smoke_extraction_resolution": 128, "full_extraction_resolution": 256, "geometry_support": "truth samples visible from at least two context cameras", "unsupported_geometry": "reported separately and excluded from completeness and F-score", "rendering": "held-out target views; separate from geometry"},
+      "measurement_note": "NeuS-Facto optimizes one bounded SDF/radiance field from calibrated context RGB. Geometry is scored only on common-visible support; the unobserved back side is reported separately and is not a completion claim. Held-out rendering metrics are a distinct task family."
+    },
     {"id": "nerf-reference", "modules": ["10"], "status": "not_landed", "reason": "No trained reference invocation or expected-result lock is tracked."},
     {"id": "gaussian-splatting-reference", "modules": ["11"], "status": "not_landed", "reason": "No trained reference invocation or expected-result lock is tracked."},
     {"id": "foundation-geometry-reference", "modules": ["12"], "status": "not_landed", "reason": "No checkpoint-backed invocation is tracked in this pathway."}

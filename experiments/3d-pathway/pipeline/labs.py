@@ -262,25 +262,125 @@ def _learned_depth_lab(artifacts: Path, profile: str, scene: dict[str, Any], pro
 
 
 def _continuous_geometry_lab(artifacts: Path, profile: str, scene: dict[str, Any], profile_config: dict[str, Any]) -> dict[str, Any]:
-    resolutions = np.unique(np.rint(np.geomspace(32, 512, _steps(profile_config))).astype(int))
+    radius = float(next(item for item in scene["geometry"] if item["id"] == "sphere")["radius"])
+
+    def extracted_surface(resolution: int, representation: str) -> np.ndarray:
+        axis = np.linspace(-1.0, 1.0, resolution, dtype=np.float64)
+        x, y, z = np.meshgrid(axis, axis, axis, indexing="ij")
+        sdf = np.sqrt(x * x + y * y + z * z) - radius
+        if representation == "voxel":
+            field = sdf <= 0.0
+            level = 0.5
+        elif representation == "occupancy":
+            # A small finite-capacity anisotropy makes this a fitted occupancy
+            # surrogate rather than an exact re-encoding of the analytic SDF.
+            field = 1.0 / (1.0 + np.exp(18.0 * (sdf + 0.004 * (x * x - y * y))))
+            level = 0.5
+        elif representation == "sdf":
+            field = sdf
+            level = 0.0
+        else:
+            raise ValueError(f"unknown implicit representation: {representation}")
+        points: list[np.ndarray] = []
+        for dimension in range(3):
+            left_slice = [slice(None)] * 3
+            right_slice = [slice(None)] * 3
+            left_slice[dimension] = slice(0, -1)
+            right_slice[dimension] = slice(1, None)
+            left = field[tuple(left_slice)]
+            right = field[tuple(right_slice)]
+            crossing = (left > level) != (right > level)
+            indices = np.argwhere(crossing)
+            if len(indices) == 0:
+                continue
+            left_values = left[crossing].astype(np.float64)
+            right_values = right[crossing].astype(np.float64)
+            if representation == "voxel":
+                fraction = np.where(left_values <= level, 0.0, 1.0)
+            else:
+                fraction = (level - left_values) / (right_values - left_values)
+            coordinates = axis[indices].astype(np.float64)
+            coordinates[:, dimension] += fraction * (axis[1] - axis[0])
+            points.append(coordinates)
+        if not points:
+            raise ValueError("implicit extraction produced no zero crossings")
+        return np.concatenate(points, axis=0)
+
+    extraction_resolution = 64 if profile == "smoke" else 128
+    comparison = []
+    for representation, bytes_per_parameter in (("voxel", 1), ("occupancy", 4), ("sdf", 4)):
+        surface = extracted_surface(extraction_resolution, representation)
+        residual = np.abs(np.linalg.norm(surface, axis=1) - radius)
+        comparison.append(
+            {
+                "representation": representation,
+                "surface_samples": int(len(surface)),
+                "surface_rmse_m": float(np.sqrt(np.mean(residual * residual))),
+                "surface_max_error_m": float(np.max(residual)),
+                "extraction_evaluations": int(extraction_resolution ** 3),
+                "sampled_grid_storage_mib": float(
+                    extraction_resolution ** 3 * bytes_per_parameter / (1024.0 ** 2)
+                ),
+            }
+        )
+    comparison_path = artifacts / "representation_comparison.csv"
+    with comparison_path.open("w", newline="", encoding="utf-8") as stream:
+        writer = csv.DictWriter(stream, fieldnames=list(comparison[0]))
+        writer.writeheader()
+        writer.writerows(comparison)
+
+    resolutions = np.unique(
+        np.rint(np.geomspace(16, extraction_resolution, _steps(profile_config))).astype(int)
+    )
     memory_mib = resolutions.astype(np.float64) ** 3 * 4.0 / (1024.0 ** 2)
-    sweep = [
-        {"parameter": "grid_resolution", "value": int(resolution), "metric": "dense_voxel_memory_mib", "measurement": float(memory)}
-        for resolution, memory in zip(resolutions, memory_mib)
-    ]
+    sweep = []
+    for resolution, memory in zip(resolutions, memory_mib):
+        voxel_surface = extracted_surface(int(resolution), "voxel")
+        voxel_residual = np.abs(np.linalg.norm(voxel_surface, axis=1) - radius)
+        sweep.extend(
+            [
+                {"parameter": "grid_resolution", "value": int(resolution), "metric": "dense_float_grid_memory_mib", "measurement": float(memory)},
+                {"parameter": "grid_resolution", "value": int(resolution), "metric": "voxel_surface_rmse_m", "measurement": float(np.sqrt(np.mean(voxel_residual * voxel_residual)))},
+            ]
+        )
+
+    # Two surfaces separated by less than one cell expose finite-grid topology
+    # loss even though the field itself is continuous.
+    topology_gap_m = 0.03
+    for resolution in resolutions:
+        cell_width = 2.0 / (int(resolution) - 1)
+        sweep.append(
+            {"parameter": "topology_resolution", "value": int(resolution), "metric": "resolved_components", "measurement": 2.0 if cell_width < topology_gap_m else 1.0}
+        )
+
+    directions = np.linspace(-1.0, 1.0, 8192, endpoint=False) + 1.0 / 8192
+    unsupported = directions < -0.15
+    hidden_a_radius = np.where(unsupported, radius * 0.88, radius)
+    hidden_b_radius = np.where(unsupported, radius * 1.12, radius)
+    hidden_disagreement = np.abs(hidden_a_radius - hidden_b_radius) > 0.05
+    unsupported_fraction = float(np.mean(unsupported))
+    hidden_disagreement_fraction = float(np.mean(hidden_disagreement))
+    sweep.append(
+        {"parameter": "hidden_counterfactual", "value": "a-vs-b", "metric": "evidence_identical_disagreement_fraction", "measurement": hidden_disagreement_fraction}
+    )
     _write_sweep(artifacts / "failure_sweep.csv", sweep)
     _write_chart(artifacts / "representation_scaling.svg", "Dense voxel storage grows cubically", memory_mib.tolist(), "#895c2e")
-    extraction_resolution = 128 if profile == "smoke" else 512
+    by_name = {item["representation"]: item for item in comparison}
+    mlp_width = 512
+    mlp_layers = 8
+    implicit_parameter_count = 3 * mlp_width + (mlp_layers - 1) * mlp_width ** 2 + mlp_width
     return {
         "metrics": {
             "geometry": {
                 "voxel_memory_at_512_mib": 512.0,
-                "implicit_model_mib": 8.0,
-                "voxel_surface_rmse_m": 0.018,
-                "occupancy_surface_rmse_m": 0.009,
-                "sdf_surface_rmse_m": 0.006,
+                "implicit_model_mib": float(implicit_parameter_count * 4 / (1024.0 ** 2)),
+                "representations_compared": 3,
+                "voxel_surface_rmse_m": by_name["voxel"]["surface_rmse_m"],
+                "occupancy_surface_rmse_m": by_name["occupancy"]["surface_rmse_m"],
+                "sdf_surface_rmse_m": by_name["sdf"]["surface_rmse_m"],
                 "marching_cubes_evaluations": extraction_resolution ** 3,
-                "hidden_completion_fraction": 0.44,
+                "unsupported_surface_fraction": unsupported_fraction,
+                "hidden_counterfactual_disagreement_fraction": hidden_disagreement_fraction,
             },
             "rendering": {},
             "generative": {},
@@ -288,7 +388,8 @@ def _continuous_geometry_lab(artifacts: Path, profile: str, scene: dict[str, Any
         "failure_sweep": sweep,
         "observations": [
             "Continuous fields avoid storing every voxel but mesh extraction still evaluates a finite grid.",
-            "Topology and unobserved completion follow the fitted objective and prior, not continuity alone.",
+            "A close two-component field merges at coarse extraction resolution, so continuity does not remove topology discretization.",
+            "Two fields agree on the observed side and disagree on the hidden side; neither disagreement is evidence for completion.",
         ],
     }
 

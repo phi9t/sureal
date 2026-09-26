@@ -3,7 +3,7 @@
 This directory backs the survey in
 [`docs/3d-reconstruction-pathway.md`](../../docs/3d-reconstruction-pathway.md).
 It provides deterministic concept labs for all fifteen modules, machine-readable
-source and asset registries, a common controlled scene, four distinct Insula
+source and asset registries, a common controlled scene, five distinct Insula
 definitions, provenance-aware run storage, and citation/terminology auditing.
 
 The smoke profile is the numerical and CI contract. The full profile only
@@ -24,6 +24,7 @@ experiments/3d-pathway/run.sh reference --adapter colmap-sfm --profile smoke --r
 experiments/3d-pathway/run.sh reference --adapter colmap-mvs --profile smoke --run-id colmap-mvs-demo
 experiments/3d-pathway/run.sh reference --adapter orb-slam --profile smoke --run-id orb-slam-demo
 experiments/3d-pathway/run.sh reference --adapter depth-anything-v2 --profile smoke --run-id dav2-demo
+experiments/3d-pathway/run.sh reference --adapter neus-facto --profile smoke --run-id neus-demo
 python3 experiments/3d-pathway/pipeline/audit.py --offline
 
 # Required real-container gates (the full gate is intentionally opt-in):
@@ -33,12 +34,15 @@ python3 experiments/3d-pathway/pipeline/audit.py --offline
 (cd experiments/3d-pathway && SURFLO_REQUIRE_ORB_SLAM_FULL=1 python3 -m unittest -q tests.test_orb_slam_reference.OrbSlamReferenceContractTest.test_real_orb_slam_full_profile)
 (cd experiments/3d-pathway && SURFLO_REQUIRE_DEPTH_ANYTHING_REFERENCE=1 python3 -m unittest -q tests.test_depth_anything_reference.DepthAnythingReferenceAdapterTest.test_real_smoke_reference_runs_when_required)
 (cd experiments/3d-pathway && SURFLO_REQUIRE_DEPTH_ANYTHING_FULL=1 python3 -m unittest -q tests.test_depth_anything_reference.DepthAnythingReferenceAdapterTest.test_real_full_reference_runs_when_required)
+(cd experiments/3d-pathway && SURFLO_REQUIRE_NEUS_FACTO_REFERENCE=1 python3 -m unittest -q tests.test_neus_facto_reference.NeuSFactoReferenceAdapterTest.test_real_profiles_are_explicit_b200_gates)
+(cd experiments/3d-pathway && SURFLO_REQUIRE_NEUS_FACTO_FULL=1 python3 -m unittest -q tests.test_neus_facto_reference.NeuSFactoReferenceAdapterTest.test_real_profiles_are_explicit_b200_gates)
 
 # Explicit network boundaries:
 experiments/3d-pathway/run.sh build
 experiments/3d-pathway/run.sh fetch
 experiments/3d-pathway/run.sh fetch --asset tum-rgbd
 experiments/3d-pathway/run.sh fetch --asset depth-anything-v2-metric-hypersim-small
+experiments/3d-pathway/run.sh fetch --asset nerfstudio-lpips-alexnet
 python3 experiments/3d-pathway/pipeline/audit.py --online
 ```
 
@@ -114,6 +118,18 @@ profile-global non-negative-scale affine alignment is only a shape diagnostic;
 per-case fits are retained solely to localize failures.
 Outputs are deterministic per-view visible-ray depths with no hidden-scene or
 posterior-sampling claim.
+
+The NeuS-Facto adapter uses a dedicated CUDA 12.8 Insula with Nerfstudio commit
+`50e0e3c70c775e89333256213363badbf074f29d`, tiny-cuda-nn commit
+`0109538c37ac0bf613f2bac8de6cda48352feca7` built for `sm_100`, Torch
+2.7.1, and Pillow 11.1.0. The Pillow pin is required by the selected
+Nerfstudio source's image-loading API. Its LPIPS AlexNet initialization asset
+is explicitly fetched, byte/hash checked, and mounted read-only; optimization
+still runs with networking disabled. The adapter fits one bounded SDF/radiance
+field from calibrated RGB, extracts a 128-cube smoke or 256-cube full mesh,
+and reports common-visible geometry, held-out rendering, Eikonal residuals,
+and unsupported geometry separately. Back-side output is never called
+completion or a sampled scene hypothesis.
 
 Runs default to `~/.cache/surflo/3d-pathway`. Set
 `SURFLO_PATHWAY_CACHE_ROOT` to choose another cache. A module first writes to

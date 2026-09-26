@@ -23,6 +23,13 @@
       "extraction": "not-required", "consumers": ["depth-anything-v2-reference"]
     },
     {
+      "id": "nerfstudio-lpips-alexnet", "mode": "download", "license": "BSD-3-Clause",
+      "source": "https://download.pytorch.org/models/alexnet-owt-7be5be79.pth",
+      "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+      "byte_size": 244408911, "digest_status": "verified_2026-09-26", "archive_format": "pytorch-state-dict",
+      "extraction": "not-required", "consumers": ["nerfstudio-neus-facto-reference"]
+    },
+    {
       "id": "nerf-synthetic", "mode": "download", "license": "NeRF dataset terms",
       "source": "https://cseweb.ucsd.edu/~viscomp/projects/LF/papers/ECCV20/nerf/nerf_example_data.zip", "sha256": "2b501d6d887ba7461babe302ee3ff51b7eab76f5180b9810bb51784e905d6dc5",
       "digest_status": "declared_unverified", "archive_format": "zip", "extraction": "deferred_until_adapter_lands", "consumers": ["nerf-reference"]

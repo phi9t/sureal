@@ -777,9 +777,10 @@ image evidence optimizable; it does not add information absent from the images.
 
 ### Representation and inference
 
-An occupancy field maps ((x,z)\mapsto[0,1]). An SDF maps to signed distance,
-with the surface (f_\theta(x,z)=0). DeepSDF-style auto-decoders optimize a
-latent (z) for each shape. IDR jointly optimizes surface, appearance, and
+An occupancy field maps (o_\theta(x,z)\) to ([0,1]). An SDF maps a query to
+signed distance, with surface (\mathcal S=\{x:f_\theta(x,z)=0\}).
+DeepSDF-style auto-decoders optimize a latent (z) for each shape. IDR jointly
+optimizes surface, appearance, and
 cameras; NeuS converts an SDF into a volume-rendering density. Inference is
 amortized, per-instance optimized, or hybrid depending on how (z) and
 (\theta) are obtained.
@@ -818,6 +819,9 @@ GPU differentiation primitives in
 in [yariv-2020](https://proceedings.neurips.cc/paper/2020/hash/1a77befc3b608d6ed363567685f70e1e-Abstract.html),
 and SDF-aware volume rendering in
 [wang-neus-2021](https://proceedings.neurips.cc/paper/2021/hash/e41e164f7485ec4a28741a2d0ea41c74-Abstract.html).
+The executable reference uses the official
+[nerfstudio-neus-facto-2025](https://github.com/nerfstudio-project/nerfstudio/tree/50e0e3c70c775e89333256213363badbf074f29d),
+not an official-paper NeuS checkpoint.
 
 ### Reproduction lab
 
@@ -829,6 +833,61 @@ Inspect `result.json`, `report.md`, `artifacts/representation_scaling.svg`, and
 `artifacts/failure_sweep.csv`. Dense voxel memory is swept cubically while
 field storage, extraction evaluations, topology, and hidden completion are
 reported separately.
+
+The concept lab is analytic: it samples the same sphere as a finite voxel
+grid, occupancy level set, and signed-distance level set. It reports storage,
+zero-crossing samples, extraction work, a coarse-grid topology merge, and an
+unobserved counterfactual separately. An implicit field's compact parameters
+do not make marching-cubes evaluation free, and a value behind all cameras is
+not evidence-backed completion.
+
+### Maintained reference
+
+Fetch the one initialization-only perceptual backbone during the explicit
+networked phase, then run the pinned reference offline:
+
+```bash
+experiments/3d-pathway/run.sh fetch --asset nerfstudio-lpips-alexnet
+experiments/3d-pathway/run.sh reference --adapter neus-facto --profile smoke --run-id neus-smoke
+experiments/3d-pathway/run.sh reference --adapter neus-facto --profile full --run-id neus-full
+```
+
+NeuS-Facto observes calibrated context RGB only and optimizes one SDF/radiance
+field per scene. The repository-generated masks, depths, normals, analytic
+surface samples, and target images are evaluation truth, not training input.
+Camera poses remain fixed; there is no monocular prior, category latent,
+completion decoder, or posterior sampler. The adapter uses the SDFStudio
+OpenCV-to-Nerfstudio Y/Z axis conversion, queries the learned field in the
+declared object-centred metric frame, and flips gradients on export because
+the pinned configuration uses a positive-inside SDF while the pathway's normal
+convention is outward.
+
+Geometry is scored only against analytic truth visible from at least two
+context cameras. Target RGB and depth are a separate rendering family, field
+gradient residuals are a separate regularity family, and zero-context-support
+surface samples are reported without a completion score. Smoke trains for
+1,000 steps and extracts at (128^3); full uses the upstream-shaped 20,001
+steps and (256^3). Both verify the B200 `sm_100` tiny-cuda-nn kernel,
+NeuS-Facto forward/backward path, coarse SDF extraction, source commits,
+runtime versions, read-only checkpoint hash, offline container flags, and
+atomic artifact promotion.
+
+The first B200 smoke reproduction completed in 42.9 seconds with 5.32 GB peak
+compute memory. It reached common-visible F@10 cm 0.433, accuracy RMSE 0.224 m,
+outward-normal error 61.6 degrees, mean Eikonal residual 0.089, and back-arc
+target PSNR 8.24 dB. The formal full reproduction took 582.9 seconds and 6.40
+GB peak compute memory; it reached F@5 cm 0.225, RMSE 0.205 m, completeness
+0.558, outward-normal error 60.9 degrees, Eikonal residual 0.0324, and target
+PSNR 8.40 dB. These values establish reproducible execution gates, not quality
+claims: the field contains many zero crossings outside image-supported surface,
+and held-out views lie well beyond the context arc. The failure is the lesson.
+Photometric fit and Eikonal regularity do not prove accurate topology, hidden
+completion, or coherent scene-hypothesis sampling.
+
+Expected maintained-reference artifacts include the checkpoint and locked
+config, float32 SDF grid, NPZ/PLY mesh, target RGB/depth/normal arrays,
+resolution failure sweep, source/runtime/Insula manifests, resource trace,
+metric visualizations, hash-bound `result.json`, and the generated report.
 
 ### Transition
 

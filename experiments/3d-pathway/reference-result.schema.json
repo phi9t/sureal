@@ -5,7 +5,7 @@
   "required": ["schema_version", "adapter", "module_ids", "profile", "status", "network_mode", "metrics", "acceptance", "tool", "resources", "provenance"],
   "properties": {
     "schema_version": {"const": 1},
-    "adapter": {"enum": ["colmap-sfm", "colmap-mvs", "orb-slam", "depth-anything-v2"]},
+    "adapter": {"enum": ["colmap-sfm", "colmap-mvs", "orb-slam", "depth-anything-v2", "neus-facto"]},
     "module_ids": {"type": "array", "minItems": 1, "maxItems": 1, "items": {"type": "string", "pattern": "^[0-9]{2}$"}},
     "profile": {"enum": ["smoke", "full"]},
     "status": {"const": "complete"},
@@ -58,6 +58,7 @@
       }
     },
     "case_metrics": {"type": "object"},
+    "topology": {"type": "object"},
     "support": {"type": "object"},
     "acceptance": {
       "type": "object",
@@ -116,6 +117,24 @@
         "properties": {
           "metrics": {"required": ["evaluated_cases", "evaluated_pixels", "valid_pixels", "valid_pixel_fraction", "raw_rmse_m", "raw_abs_rel", "raw_delta1", "affine_aligned_rmse_m", "affine_aligned_abs_rel", "affine_scale", "affine_shift_m", "alignment_scale_at_boundary"]},
           "tool": {"required": ["source_commit"]}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"adapter": {"const": "neus-facto"}}},
+      "then": {
+        "required": ["topology", "support"],
+        "properties": {
+          "metrics": {
+            "required": ["geometry", "rendering", "field", "unsupported"],
+            "properties": {
+              "geometry": {"type": "object"},
+              "rendering": {"type": "object"},
+              "field": {"type": "object"},
+              "unsupported": {"type": "object"}
+            }
+          },
+          "tool": {"required": ["source_commit", "dependency_commit"]}
         }
       }
     }

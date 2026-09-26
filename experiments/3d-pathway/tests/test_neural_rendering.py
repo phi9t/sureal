@@ -39,6 +39,23 @@ class LearnedAndRenderableLabContractTest(unittest.TestCase):
             implicit = results["09"]["metrics"]["geometry"]
             self.assertGreater(implicit["voxel_memory_at_512_mib"], implicit["implicit_model_mib"])
             self.assertGreater(implicit["marching_cubes_evaluations"], 0)
+            self.assertEqual(implicit["representations_compared"], 3)
+            self.assertGreater(implicit["voxel_surface_rmse_m"], implicit["sdf_surface_rmse_m"])
+            self.assertGreaterEqual(
+                implicit["occupancy_surface_rmse_m"], implicit["sdf_surface_rmse_m"]
+            )
+            self.assertGreater(implicit["unsupported_surface_fraction"], 0.0)
+            self.assertGreater(implicit["hidden_counterfactual_disagreement_fraction"], 0.0)
+            self.assertTrue(
+                (cache / "runs/neural/09/artifacts/representation_comparison.csv").is_file()
+            )
+            self.assertGreaterEqual(
+                len({
+                    row["parameter"]
+                    for row in results["09"]["failure_sweep"]
+                }),
+                2,
+            )
 
             radiance = results["10"]["metrics"]
             self.assertGreater(radiance["rendering"]["radiance_field_psnr_db"], radiance["rendering"]["surface_model_psnr_db"])

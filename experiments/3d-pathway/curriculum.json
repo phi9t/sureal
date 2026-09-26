@@ -10,6 +10,7 @@
     "classical": "insulas/classical/Dockerfile",
     "orb-slam": "insulas/orb-slam/Dockerfile",
     "neural-rendering": "insulas/neural-rendering/Dockerfile",
+    "implicit-surface": "insulas/implicit-surface/Dockerfile",
     "blender": "../photoreal-scenes/insula/Dockerfile",
     "surflo": "../insula-scout/insula/Dockerfile"
   },
@@ -74,8 +75,8 @@
       "id": "09", "slug": "continuous-geometry-inverse-graphics", "title": "Continuous geometry and differentiable inverse graphics",
       "evidence": ["samples, images, masks, or latent codes"], "observable": "level sets constrained by samples and priors", "representation": "occupancy field, SDF, or differentiable mesh",
       "inference": "hybrid", "objectives": ["occupancy likelihood", "SDF regression", "differentiable rendering loss"], "metrics": ["surface RMSE", "normal error", "topology error", "extraction time"],
-      "failure_sweep": ["sampling resolution", "topology", "hidden completion"], "insula": "neural-rendering",
-      "sources": ["mescheder-2019", "park-2019", "laine-2020", "yariv-2020", "wang-neus-2021"]
+      "failure_sweep": ["sampling resolution", "topology", "hidden completion"], "insula": "implicit-surface",
+      "sources": ["mescheder-2019", "park-2019", "laine-2020", "yariv-2020", "wang-neus-2021", "nerfstudio-neus-facto-2025"]
     },
     {
       "id": "10", "slug": "neural-radiance-fields", "title": "Neural rendering and radiance fields",
