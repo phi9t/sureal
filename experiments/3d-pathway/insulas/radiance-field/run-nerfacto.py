@@ -17,6 +17,7 @@ import time
 
 import numpy as np
 import PIL
+from PIL import Image
 from scipy import ndimage
 import torch
 import torchvision
@@ -235,11 +236,17 @@ def _train(
     return trainer, config, training_seconds, gates
 
 
-def _lpips(model: object, predicted: torch.Tensor, truth: np.ndarray) -> tuple[float, float]:
+def _lpips(
+    model: object,
+    predicted: torch.Tensor,
+    truth: np.ndarray,
+    foreground_mask: np.ndarray,
+) -> tuple[float, float]:
     truth_tensor = torch.from_numpy(truth.astype(np.float32) / 255.0).to(model.device)
     predicted = predicted.to(model.device)
-    foreground = np.any(truth != 0, axis=-1)
-    rows, columns = np.nonzero(foreground)
+    if foreground_mask.shape != truth.shape[:2]:
+        raise RuntimeError("truth foreground mask has the wrong shape")
+    rows, columns = np.nonzero(foreground_mask)
     if not len(rows):
         raise RuntimeError("truth image has no foreground crop")
     row_slice = slice(int(rows.min()), int(rows.max()) + 1)
@@ -310,8 +317,16 @@ def _render_frames(
             )
         if perceptual:
             truth = np.load(input_root / str(frame["rgb_truth_path"]), allow_pickle=False)
+            foreground_mask = np.asarray(
+                Image.open(input_root / str(frame["mask_path"]))
+            ) > 0
             with torch.no_grad():
-                full_lpips, crop_lpips = _lpips(trainer.pipeline.model, rgb_tensor, truth)
+                full_lpips, crop_lpips = _lpips(
+                    trainer.pipeline.model,
+                    rgb_tensor,
+                    truth,
+                    foreground_mask,
+                )
             rows.append(
                 {"id": frame["id"], "lpips": full_lpips, "crop_lpips": crop_lpips}
             )

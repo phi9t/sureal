@@ -290,7 +290,7 @@ class NerfactoReferenceFoundationTest(unittest.TestCase):
         self.assertEqual(adapter["acceptance"]["full"]["expected_depth_rmse_m_max"], 0.7)
         self.assertEqual(
             adapter["baseline_environment"]["container_image_id"],
-            "sha256:ad9955936be45e34595b3a03fbd9dcadd80daf9b77a6b7842c567467eec2356d",
+            "sha256:49e4cbea691768dc3085796f5619266e156bc800ff8b92d88563498b872c12dc",
         )
         self.assertEqual(adapter["baseline_environment"]["gpu_model"], "NVIDIA B200")
         for profile, key in (
@@ -300,6 +300,9 @@ class NerfactoReferenceFoundationTest(unittest.TestCase):
             self.assertEqual(adapter[key]["date"], "2026-09-26")
             self.assertGreater(adapter[key]["training_steps_per_second"], 0.0)
             self.assertGreater(adapter[key]["peak_gpu_compute_memory_bytes"], 0)
+            self.assertNotAlmostEqual(
+                adapter[key]["target_lpips"], adapter[key]["target_crop_lpips"]
+            )
             self.assertGreaterEqual(
                 adapter[key]["target_psnr_db"],
                 adapter["acceptance"][profile]["target_psnr_db_min"],
@@ -545,9 +548,36 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
         self.assertIn("to(ray_bundle.directions.device)", text)
         self.assertIn("model.lpips", text)
         self.assertIn("truth_tensor", text)
+        self.assertIn('Image.open(input_root / str(frame["mask_path"]))', text)
+        self.assertIn("foreground_mask", text)
+        self.assertNotIn("np.any(truth != 0", text)
         self.assertIn("context-renders", text)
         self.assertIn("view-sweep", text)
         self.assertLess(text.index("trainer.train()"), text.index('manifest["target_frames"]'))
+
+    def test_lpips_crop_uses_truth_mask_not_nonzero_rgb(self) -> None:
+        sys.path.insert(0, str(ROOT / "pipeline"))
+        from contracts import load_json
+        from reference_scene import generate_radiance_field_scene
+
+        with tempfile.TemporaryDirectory() as temporary:
+            destination = Path(temporary) / "scene"
+            manifest = generate_radiance_field_scene(
+                destination,
+                load_json(ROOT / "shared-scene.json"),
+                "smoke",
+            )
+            frame = manifest["target_frames"][0]
+            truth = np.load(destination / frame["rgb_truth_path"], allow_pickle=False)
+            foreground = (
+                np.load(destination / frame["depth_path"], allow_pickle=False) > 0
+            )
+            rgb_nonzero = np.any(truth != 0, axis=-1)
+
+            self.assertTrue(rgb_nonzero.all())
+            self.assertGreater(np.count_nonzero(foreground), 0)
+            self.assertLess(np.count_nonzero(foreground), foreground.size)
+            self.assertFalse(np.array_equal(foreground, rgb_nonzero))
 
 if __name__ == "__main__":
     unittest.main()

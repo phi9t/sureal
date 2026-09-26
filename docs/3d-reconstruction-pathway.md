@@ -988,12 +988,13 @@ empty worker partition on this five-image fixture. They do not admit a target
 image into training.
 
 On the NVIDIA B200, the final provenance-bound smoke measurement reached
-22.72 dB PSNR, 0.884 host-recomputed SSIM, 0.247 pinned-container LPIPS,
-0.260 m accumulation-qualified expected-depth RMSE, and 0.664 point F-score at
-10 cm in 16.7 primary-training seconds. The full run reached 23.88 dB, 0.866,
-0.202, 0.072 m, and 0.989 respectively in 345.0 primary-training seconds. Its
-unsupported-region depth RMSE remained 0.418 m despite the stronger visible
-surface fit, retaining the back-arc extrapolation limitation. Each run
+21.78 dB PSNR, 0.367 host-recomputed SSIM, 0.422 full-frame LPIPS,
+0.218 m accumulation-qualified expected-depth RMSE, and 0.710 point F-score at
+10 cm in 18.8 primary-training seconds. The full run reached 22.17 dB, 0.798,
+0.198, 0.055 m, and 0.996 respectively in 345.4 primary-training seconds. The
+truth-mask crop LPIPS values, 0.630 and 0.806, remain distinct from full-frame
+LPIPS. Full-profile unsupported-region depth RMSE remained 0.369 m despite the
+stronger visible-surface fit, retaining the back-arc extrapolation limitation. Each run
 additionally trains 3-, 5-, and
 9-context-view controls for 1,000 updates at 1,024 rays per batch. Hash-grid
 CUDA updates are not bitwise deterministic here, so acceptance tolerances
