@@ -66,6 +66,7 @@ TRACKED_STATES = {2, 5}
 
 
 TrajectoryRecord = tuple[float, np.ndarray, np.ndarray]
+TrajectoryContextRecord = tuple[int, float, int]
 
 
 def _quaternion_to_rotation(quaternion: np.ndarray) -> np.ndarray:
@@ -105,6 +106,34 @@ def parse_tum_trajectory(path: Path) -> list[TrajectoryRecord]:
         records.append((timestamp, values[1:4], quaternion / norm))
     if not records:
         raise ValueError("TUM trajectory is empty")
+    return records
+
+
+def parse_trajectory_context(
+    path: Path, trajectory: list[TrajectoryRecord]
+) -> list[TrajectoryContextRecord]:
+    records: list[TrajectoryContextRecord] = []
+    with path.open(encoding="utf-8", newline="") as stream:
+        reader = csv.DictReader(stream)
+        if reader.fieldnames != ["frame_index", "timestamp", "map_id"]:
+            raise ValueError(f"invalid trajectory-context header: {path}")
+        for line_number, row in enumerate(reader, 2):
+            try:
+                frame_index = int(row["frame_index"])
+                timestamp = float(row["timestamp"])
+                map_id = int(row["map_id"])
+            except (TypeError, ValueError) as error:
+                raise ValueError(f"malformed trajectory context at line {line_number}") from error
+            if frame_index < 0 or map_id < 0 or not math.isfinite(timestamp):
+                raise ValueError(f"invalid trajectory context at line {line_number}")
+            if records and frame_index <= records[-1][0]:
+                raise ValueError("trajectory-context frame indices must be strictly increasing")
+            records.append((frame_index, timestamp, map_id))
+    if len(records) != len(trajectory):
+        raise ValueError("trajectory context and trajectory have different record counts")
+    for record, pose in zip(records, trajectory, strict=True):
+        if not math.isclose(record[1], pose[0], rel_tol=0.0, abs_tol=1e-6):
+            raise ValueError("trajectory-context timestamp does not match its trajectory pose")
     return records
 
 
@@ -148,8 +177,25 @@ def _rotation_angle_degrees(rotation: np.ndarray) -> float:
 
 
 def evaluate_trajectory(
-    estimated: list[TrajectoryRecord], truth: list[TrajectoryRecord], max_delta_seconds: float = 0.02
+    estimated: list[TrajectoryRecord],
+    truth: list[TrajectoryRecord],
+    max_delta_seconds: float = 0.02,
+    estimated_frame_indices: list[int] | None = None,
 ) -> tuple[dict[str, float | int], dict[str, np.ndarray]]:
+    if estimated_frame_indices is not None:
+        if len(estimated_frame_indices) != len(estimated):
+            raise ValueError("estimated frame indices and trajectory have different record counts")
+        if any(
+            current < 0 or (index > 0 and current <= estimated_frame_indices[index - 1])
+            for index, current in enumerate(estimated_frame_indices)
+        ):
+            raise ValueError("estimated frame indices must be non-negative and strictly increasing")
+        frame_index_by_timestamp = {
+            record[0]: frame_index
+            for record, frame_index in zip(estimated, estimated_frame_indices, strict=True)
+        }
+    else:
+        frame_index_by_timestamp = {record[0]: index for index, record in enumerate(estimated)}
     matches = _associate(estimated, truth, max_delta_seconds)
     if len(matches) < 3:
         raise ValueError(f"trajectory has too few timestamp matches: {len(matches)}")
@@ -163,6 +209,8 @@ def evaluate_trajectory(
     for index in range(len(matches) - 1):
         estimate_first, truth_first = matches[index]
         estimate_second, truth_second = matches[index + 1]
+        if frame_index_by_timestamp[estimate_second[0]] != frame_index_by_timestamp[estimate_first[0]] + 1:
+            continue
         estimated_delta = _quaternion_to_rotation(estimate_first[2]).T @ (
             estimate_second[1] - estimate_first[1]
         )
@@ -179,6 +227,8 @@ def evaluate_trajectory(
             @ _quaternion_to_rotation(truth_second[2])
         )
         rotation_errors.append(_rotation_angle_degrees(estimated_relative.T @ truth_relative))
+    if not translation_errors:
+        raise ValueError("trajectory has no consecutive source-frame pair for one-frame RPE")
     metrics: dict[str, float | int] = {
         "trajectory_matches": len(matches),
         "ate_rmse_m": float(np.sqrt(np.mean(residuals * residuals))),
@@ -202,6 +252,67 @@ def evaluate_trajectory(
         ),
     }
     return metrics, {"rotation": rotation, "translation": translation}
+
+
+def summarize_failure_trajectory(
+    trajectory: list[TrajectoryRecord],
+    truth: list[TrajectoryRecord],
+    context: list[TrajectoryContextRecord],
+) -> dict[str, Any]:
+    if len(trajectory) != len(context):
+        raise ValueError("trajectory context and trajectory have different record counts")
+    if not context:
+        raise ValueError("trajectory context is empty")
+    segments: list[tuple[int, int]] = []
+    start = 0
+    for index in range(1, len(context)):
+        previous = context[index - 1]
+        current = context[index]
+        if current[2] != previous[2] or current[0] != previous[0] + 1:
+            segments.append((start, index))
+            start = index
+    segments.append((start, len(context)))
+
+    segment_summaries: list[dict[str, Any]] = []
+    for begin, end in segments:
+        segment_context = context[begin:end]
+        segment: dict[str, Any] = {
+            "map_id": segment_context[0][2],
+            "first_frame_index": segment_context[0][0],
+            "last_frame_index": segment_context[-1][0],
+            "pose_count": end - begin,
+        }
+        if end - begin >= 3:
+            metrics, _ = evaluate_trajectory(
+                trajectory[begin:end],
+                truth,
+                estimated_frame_indices=[record[0] for record in segment_context],
+            )
+            segment["metrics"] = metrics
+        else:
+            segment["metrics_omitted_reason"] = "too-few-poses"
+        segment_summaries.append(segment)
+
+    map_ids = sorted({record[2] for record in context})
+    summary: dict[str, Any] = {
+        "pose_count": len(trajectory),
+        "map_ids": map_ids,
+        "map_switches": sum(
+            current[2] != previous[2] for previous, current in zip(context, context[1:])
+        ),
+        "single_gauge": len(map_ids) == 1,
+        "segments": segment_summaries,
+    }
+    if summary["single_gauge"]:
+        metrics, _ = evaluate_trajectory(
+            trajectory,
+            truth,
+            estimated_frame_indices=[record[0] for record in context],
+        )
+        summary["metrics"] = metrics
+    else:
+        summary["aggregate_omitted_reason"] = "map-switch"
+    return summary
 
 
 def _nearest_distances(query: np.ndarray, target: np.ndarray) -> np.ndarray:
@@ -525,14 +636,16 @@ FAILURE_TRAJECTORIES = {
     "occlusion": "output/CameraTrajectory-occlusion.txt",
     "dynamic-object": "output/CameraTrajectory-dynamic-object.txt",
 }
-FAILURE_TRAJECTORY_METRICS = (
-    "trajectory_matches",
-    "ate_rmse_m",
-    "rpe_translation_rmse_m",
-    "rpe_rotation_rmse_deg",
-    "endpoint_drift_m",
-    "endpoint_rotation_drift_deg",
-)
+FAILURE_TRAJECTORY_CONTEXTS = {
+    "occlusion": "output/TrajectoryContext-occlusion.csv",
+    "dynamic-object": "output/TrajectoryContext-dynamic-object.csv",
+}
+
+
+def _failure_trajectory_summary(run_dir: Path, variant_id: str, truth: list[TrajectoryRecord]) -> dict[str, Any]:
+    trajectory = parse_tum_trajectory(run_dir / FAILURE_TRAJECTORIES[variant_id])
+    context = parse_trajectory_context(run_dir / FAILURE_TRAJECTORY_CONTEXTS[variant_id], trajectory)
+    return summarize_failure_trajectory(trajectory, truth, context)
 
 
 def _validate_failure_sweep(run_dir: Path) -> dict[str, Any]:
@@ -564,14 +677,20 @@ def _validate_failure_sweep(run_dir: Path) -> dict[str, Any]:
         )
         if item["same_map_relocalized"] != expected_same_map:
             raise ValueError("SLAM same-map relocalization flag does not match map identities")
-        trajectory = parse_tum_trajectory(run_dir / FAILURE_TRAJECTORIES[item["id"]])
+        variant_id = item["id"]
+        trajectory = parse_tum_trajectory(run_dir / FAILURE_TRAJECTORIES[variant_id])
+        context = parse_trajectory_context(
+            run_dir / FAILURE_TRAJECTORY_CONTEXTS[variant_id], trajectory
+        )
         if not math.isclose(
             float(coverage), len(trajectory) / len(truth), rel_tol=1e-12, abs_tol=1e-12
         ):
             raise ValueError("SLAM failure-sweep coverage does not match its trajectory")
-        actual, _ = evaluate_trajectory(trajectory, truth)
-        expected = {name: actual[name] for name in FAILURE_TRAJECTORY_METRICS}
-        if not _metrics_match(item.get("trajectory", {}), expected):
+        summary = summarize_failure_trajectory(trajectory, truth, context)
+        known_map_ids = set(summary["map_ids"])
+        if any(map_id >= 0 and map_id not in known_map_ids for map_id in map_ids):
+            raise ValueError("SLAM failure-sweep map identity is absent from trajectory context")
+        if item.get("trajectory") != summary:
             raise ValueError("SLAM failure-sweep trajectory metric mismatch")
     return value
 
@@ -587,9 +706,7 @@ def _record_failure_sweep_metrics(run_dir: Path) -> None:
         variant_id = item.get("id")
         if variant_id not in FAILURE_TRAJECTORIES:
             raise ValueError("invalid raw SLAM failure-sweep variant")
-        trajectory = parse_tum_trajectory(run_dir / FAILURE_TRAJECTORIES[variant_id])
-        actual, _ = evaluate_trajectory(trajectory, truth)
-        item["trajectory"] = {name: actual[name] for name in FAILURE_TRAJECTORY_METRICS}
+        item["trajectory"] = _failure_trajectory_summary(run_dir, variant_id, truth)
     write_json(path, value)
 
 
@@ -637,6 +754,7 @@ def validate_slam_reference_result(run_dir: Path) -> dict[str, Any]:
         "config/associations.txt", "config/groundtruth-prefix.txt", "config/insula-manifest.expected",
         "output/CameraTrajectory.txt", "output/KeyFrameTrajectory.txt", "output/tracking.csv",
         "output/CameraTrajectory-occlusion.txt", "output/CameraTrajectory-dynamic-object.txt",
+        "output/TrajectoryContext-occlusion.csv", "output/TrajectoryContext-dynamic-object.csv",
         "output/map.ply", "output/ground-truth-map.ply", "output/source-commit.txt",
         "output/insula-manifest.txt", "output/failure-sweep.json", "output/resource-summary.txt",
         "output/resources.json",

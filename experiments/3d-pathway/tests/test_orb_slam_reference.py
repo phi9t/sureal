@@ -182,6 +182,83 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
         self.assertAlmostEqual(metrics["endpoint_drift_m"], 1.0)
         self.assertAlmostEqual(metrics["endpoint_rotation_drift_deg"], 0.0)
 
+    def test_one_frame_rpe_skips_nonconsecutive_source_frames(self) -> None:
+        sys.path.insert(0, str(ROOT / "pipeline"))
+        from slam_reference_runner import evaluate_trajectory
+
+        identity = np.array([0.0, 0.0, 0.0, 1.0])
+        truth = [
+            (float(index), np.array([float(index), 0.0, 0.0]), identity)
+            for index in range(4)
+        ]
+        estimated = [truth[0], truth[1], (3.0, np.array([30.0, 0.0, 0.0]), identity)]
+
+        metrics, _ = evaluate_trajectory(
+            estimated,
+            truth,
+            estimated_frame_indices=[0, 1, 3],
+        )
+
+        self.assertAlmostEqual(metrics["rpe_translation_rmse_m"], 0.0)
+        self.assertAlmostEqual(metrics["rpe_rotation_rmse_deg"], 0.0)
+
+    def test_failure_trajectory_omits_cross_map_aggregate_metrics(self) -> None:
+        sys.path.insert(0, str(ROOT / "pipeline"))
+        from slam_reference_runner import summarize_failure_trajectory
+
+        identity = np.array([0.0, 0.0, 0.0, 1.0])
+        truth = [
+            (float(index), np.array([float(index), 0.0, 0.0]), identity)
+            for index in range(8)
+        ]
+        estimated = [
+            *[(float(index), np.array([float(index), 0.0, 0.0]), identity) for index in range(3)],
+            *[(float(index), np.array([float(index) + 100.0, 0.0, 0.0]), identity) for index in range(5, 8)],
+        ]
+        context = [
+            *[(index, float(index), 1) for index in range(3)],
+            *[(index, float(index), 2) for index in range(5, 8)],
+        ]
+
+        summary = summarize_failure_trajectory(estimated, truth, context)
+
+        self.assertEqual(summary["pose_count"], 6)
+        self.assertEqual(summary["map_ids"], [1, 2])
+        self.assertEqual(summary["map_switches"], 1)
+        self.assertFalse(summary["single_gauge"])
+        self.assertNotIn("metrics", summary)
+        self.assertEqual(summary["aggregate_omitted_reason"], "map-switch")
+        self.assertEqual(len(summary["segments"]), 2)
+        self.assertTrue(all(segment["metrics"]["ate_rmse_m"] < 1e-12 for segment in summary["segments"]))
+
+    def test_trajectory_context_is_positionally_bound_to_the_trajectory(self) -> None:
+        sys.path.insert(0, str(ROOT / "pipeline"))
+        from slam_reference_runner import parse_trajectory_context, parse_tum_trajectory
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            trajectory_path = root / "trajectory.txt"
+            context_path = root / "context.csv"
+            trajectory_path.write_text(
+                "1.0 0 0 0 0 0 0 1\n2.0 1 0 0 0 0 0 1\n",
+                encoding="utf-8",
+            )
+            trajectory = parse_tum_trajectory(trajectory_path)
+            context_path.write_text(
+                "frame_index,timestamp,map_id\n0,1.0,4\n2,2.0,4\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(
+                parse_trajectory_context(context_path, trajectory),
+                [(0, 1.0, 4), (2, 2.0, 4)],
+            )
+            context_path.write_text(
+                "frame_index,timestamp,map_id\n0,1.0,4\n2,2.1,4\n",
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(ValueError, "timestamp"):
+                parse_trajectory_context(context_path, trajectory)
+
     def test_cpp_runner_exports_final_points_and_evaluable_failure_trajectories(self) -> None:
         source = (ROOT / "insulas/orb-slam/surflo_rgbd.cc").read_text(encoding="utf-8")
         self.assertIn("std::map<unsigned long, ORB_SLAM3::MapPoint*> landmarks", source)
@@ -189,6 +266,7 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
         self.assertIn("point->GetReplaced()", source)
         self.assertIn("same_map_relocalized", source)
         self.assertIn("CameraTrajectory-dynamic-object.txt", source)
+        self.assertIn("TrajectoryContext-dynamic-object.csv", source)
 
     def test_safe_tum_extraction_is_atomic_and_rejects_traversal(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
@@ -289,8 +367,19 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
                     cp "$work/config/insula-manifest.expected" "$work/output/insula-manifest.txt"
                     cp "$work/config/groundtruth-prefix.txt" "$work/output/CameraTrajectory.txt"
                     cp "$work/config/groundtruth-prefix.txt" "$work/output/KeyFrameTrajectory.txt"
-                    sed -n '1,180p' "$work/config/groundtruth-prefix.txt" > "$work/output/CameraTrajectory-occlusion.txt"
+                    {{
+                      sed -n '1,90p' "$work/config/groundtruth-prefix.txt"
+                      sed -n '211,300p' "$work/config/groundtruth-prefix.txt"
+                    }} > "$work/output/CameraTrajectory-occlusion.txt"
                     cp "$work/config/groundtruth-prefix.txt" "$work/output/CameraTrajectory-dynamic-object.txt"
+                    {{
+                      printf 'frame_index,timestamp,map_id\\n'
+                      for i in $(seq 0 89) $(seq 210 299); do printf '%s,%s.0,0\\n' "$i" "$i"; done
+                    }} > "$work/output/TrajectoryContext-occlusion.csv"
+                    {{
+                      printf 'frame_index,timestamp,map_id\\n'
+                      for i in $(seq 0 299); do printf '%s,%s.0,1\\n' "$i" "$i"; done
+                    }} > "$work/output/TrajectoryContext-dynamic-object.csv"
                     {{
                       printf 'timestamp,state,tracked_map_points,runtime_seconds\\n'
                       for i in $(seq 0 299); do printf '%s.0,2,1200,0.01\\n' "$i"; done
@@ -337,6 +426,12 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
             self.assertAlmostEqual(result["metrics"]["tracking_coverage"], 1.0)
             self.assertLess(result["metrics"]["ate_rmse_m"], 1e-12)
             self.assertEqual(result["resources"]["peak_cpu_memory_bytes"], 12345 * 1024)
+            sweep = json.loads((run_dir / "output/failure-sweep.json").read_text())
+            occlusion = next(item for item in sweep["variants"] if item["id"] == "occlusion")
+            self.assertTrue(occlusion["trajectory"]["single_gauge"])
+            self.assertEqual(occlusion["trajectory"]["pose_count"], 180)
+            self.assertEqual(len(occlusion["trajectory"]["segments"]), 2)
+            self.assertLess(occlusion["trajectory"]["metrics"]["rpe_translation_rmse_m"], 1e-12)
             runner.validate_slam_reference_result(run_dir)
             self.assertFalse((cache / "reference-staging").is_symlink())
 

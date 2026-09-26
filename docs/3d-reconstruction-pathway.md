@@ -607,6 +607,11 @@ is allowed because RGB-D supplies metric scale. One-frame translational RPE is
 measured in the origin camera frame, rather than in the arbitrary world frame.
 Endpoint translation and rotation drift use the first-pose-relative start-to-end
 transform; they are not the final residual of a whole-trajectory alignment.
+Each perturbed pose is positionally bound to its source-frame index and Atlas
+map ID. One-frame RPE therefore skips missing source frames. If Atlas switches
+maps, each contiguous single-map segment is aligned and scored independently;
+global ATE and endpoint drift are omitted because the maps do not share a
+validated gauge.
 The reference surface is a deterministic maximum of 8,192 visible RGB-D
 samples whose rays use the sequence's Brown-Conrady distortion coefficients,
 on a 5 cm voxel grid; the estimated map contains final, live, observation-supported
@@ -614,21 +619,24 @@ sparse landmarks on a 2 cm grid. Accordingly, its F-score is a sparse
 visible-map diagnostic, not a dense surface or complete-scene score.
 
 On the locked image and host recorded in `reference-adapters.json`, smoke
-tracked 300/300 frames with 0.0111 m ATE RMSE, 0.00634 m translational RPE,
-0.0228 m endpoint drift, 1,749 final landmarks, and 0.575 map F-score. Full
-tracked 798/798 frames with 0.0102 m ATE RMSE, 0.00597 m translational RPE,
-0.0206 m endpoint drift, 2,006 final landmarks, and 0.637 map F-score.
-Blank-frame tracking coverage fell to about 0.85 in both profiles. Smoke resumed
-in the same Atlas map; full resumed in a new map and its occlusion ATE rose to
-0.0443 m, an explicit relocalization failure rather than a favorable-result
-requirement. The moving patch caused no tracking loss, but its trajectory is
-still evaluated (full ATE 0.0107 m and endpoint drift 0.0207 m), so coverage
-cannot hide pose damage. Thresholds—not exact outputs—gate reproduction because
-thread scheduling changes feature-map details.
+tracked 300/300 frames with 0.0106 m ATE RMSE, 0.00595 m translational RPE,
+0.0277 m endpoint drift, 1,779 final landmarks, and 0.603 map F-score. Full
+tracked 798/798 frames with 0.0104 m ATE RMSE, 0.00585 m translational RPE,
+0.0198 m endpoint drift, 2,023 final landmarks, and 0.636 map F-score.
+Blank-frame tracking coverage was 0.833 in smoke and 0.850 in full. Smoke
+resumed in the same Atlas map; its same-gauge aggregate ATE was 0.0119 m. Full
+resumed in a new map, so no cross-map aggregate is reported: the pre-loss
+segment had 0.0107 m ATE, while the post-restart segment had 0.0534 m ATE and
+0.203 m endpoint drift. This is an explicit relocalization failure rather than
+a favorable-result requirement. The moving patch caused no tracking loss, but
+its trajectory is still evaluated (full ATE 0.0105 m and endpoint drift
+0.0195 m), so coverage cannot hide pose damage. Thresholds—not exact
+outputs—gate reproduction because thread scheduling changes feature-map details.
 
 Expected artifacts are `trajectory.svg`, `output/CameraTrajectory.txt`,
 `output/KeyFrameTrajectory.txt`, the two perturbed `CameraTrajectory-*.txt`
-files, `output/tracking.csv`, `output/map.ply`, `output/ground-truth-map.ply`,
+files, their two `TrajectoryContext-*.csv` frame/map bindings,
+`output/tracking.csv`, `output/map.ply`, `output/ground-truth-map.ply`,
 `output/failure-sweep.json`, `output/resources.json`, `report.md`, and the
 hash-bound `result.json`. The adapter verifies the TUM archive and complete
 extraction tree, immutable container image, source and Insula manifests,

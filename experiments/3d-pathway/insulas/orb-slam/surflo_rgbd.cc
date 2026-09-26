@@ -49,6 +49,7 @@ struct RunStats {
 long dominant_map_id(const std::vector<ORB_SLAM3::MapPoint*>& points) {
     std::map<unsigned long, int> counts;
     for (auto* point : points) {
+        while (point != nullptr && point->GetReplaced() != nullptr) point = point->GetReplaced();
         if (point == nullptr || point->isBad()) continue;
         ORB_SLAM3::Map* map = point->GetMap();
         if (map == nullptr || map->IsBad()) continue;
@@ -201,6 +202,7 @@ RunStats run_sequence(
     ORB_SLAM3::System slam(vocabulary, settings, ORB_SLAM3::System::RGBD, false);
     std::ofstream tracking;
     std::ofstream variant_trajectory;
+    std::ofstream trajectory_context;
     if (mode == "baseline") {
         tracking.open(output + "/tracking.csv");
         tracking << "timestamp,state,tracked_map_points,runtime_seconds\n";
@@ -208,8 +210,17 @@ RunStats run_sequence(
         const std::string path = mode == "occlusion"
             ? output + "/CameraTrajectory-occlusion.txt"
             : output + "/CameraTrajectory-dynamic-object.txt";
+        const std::string context_path = mode == "occlusion"
+            ? output + "/TrajectoryContext-occlusion.csv"
+            : output + "/TrajectoryContext-dynamic-object.csv";
         variant_trajectory.open(path);
+        trajectory_context.open(context_path);
+        if (!variant_trajectory || !trajectory_context) {
+            throw std::runtime_error("cannot open failure-trajectory outputs");
+        }
         variant_trajectory << std::fixed;
+        trajectory_context << std::fixed;
+        trajectory_context << "frame_index,timestamp,map_id\n";
     }
     std::map<unsigned long, ORB_SLAM3::MapPoint*> landmarks;
     RunStats stats;
@@ -226,7 +237,9 @@ RunStats run_sequence(
         stats.frames += 1;
         const bool tracked = state == 2 || state == 5;
         if (tracked) stats.tracked += 1;
+        const long map_id = dominant_map_id(points);
         if (mode != "baseline" && tracked) {
+            if (map_id < 0) throw std::runtime_error("tracked pose has no active map identity");
             const Sophus::SE3f Twc = Tcw.inverse();
             const Eigen::Vector3f translation = Twc.translation();
             const Eigen::Quaternionf rotation = Twc.unit_quaternion();
@@ -234,10 +247,11 @@ RunStats run_sequence(
                                << std::setprecision(9) << translation.x() << ' ' << translation.y() << ' '
                                << translation.z() << ' ' << rotation.x() << ' ' << rotation.y() << ' '
                                << rotation.z() << ' ' << rotation.w() << '\n';
+            trajectory_context << index << ',' << std::setprecision(6) << frames[index].timestamp
+                               << ',' << map_id << '\n';
         }
         const size_t disturbance_begin = frames.size() * 35 / 100;
         const size_t disturbance_end = frames.size() * 50 / 100;
-        const long map_id = dominant_map_id(points);
         if (index < disturbance_begin && map_id >= 0) {
             stats.map_id_before_perturbation = map_id;
         }
@@ -255,9 +269,10 @@ RunStats run_sequence(
             tracking << std::setprecision(17) << frames[index].timestamp << ',' << state << ','
                      << points.size() << ',' << elapsed << '\n';
             for (auto* point : points) {
+                while (point != nullptr && point->GetReplaced() != nullptr) point = point->GetReplaced();
                 if (point == nullptr || point->isBad() || point->Observations() < 2) continue;
-                while (point->GetReplaced() != nullptr) point = point->GetReplaced();
-                if (!point->isBad()) landmarks[point->mnId] = point;
+                ORB_SLAM3::Map* map = point->GetMap();
+                if (map != nullptr && !map->IsBad()) landmarks[point->mnId] = point;
             }
         }
         const double interval = index + 1 < frames.size()
@@ -266,20 +281,28 @@ RunStats run_sequence(
         if (elapsed < interval) std::this_thread::sleep_for(std::chrono::duration<double>(interval - elapsed));
     }
     variant_trajectory.close();
+    trajectory_context.close();
     slam.Shutdown();
     if (mode == "baseline") {
         slam.SaveTrajectoryTUM(output + "/CameraTrajectory.txt");
         slam.SaveKeyFrameTrajectoryTUM(output + "/KeyFrameTrajectory.txt");
-        std::map<unsigned long, Eigen::Vector3f> final_landmarks;
+        std::map<unsigned long, std::map<unsigned long, Eigen::Vector3f>> landmarks_by_map;
         for (const auto& item : landmarks) {
             ORB_SLAM3::MapPoint* point = item.second;
             while (point != nullptr && point->GetReplaced() != nullptr) point = point->GetReplaced();
             if (point == nullptr || point->isBad() || point->Observations() < 2) continue;
+            ORB_SLAM3::Map* map = point->GetMap();
+            if (map == nullptr || map->IsBad()) continue;
             const Eigen::Vector3f position = point->GetWorldPos();
-            if (position.allFinite()) final_landmarks[point->mnId] = position;
+            if (position.allFinite()) landmarks_by_map[map->GetId()][point->mnId] = position;
+        }
+        if (landmarks_by_map.empty()) throw std::runtime_error("no valid final landmark map");
+        auto selected = landmarks_by_map.begin();
+        for (auto candidate = landmarks_by_map.begin(); candidate != landmarks_by_map.end(); ++candidate) {
+            if (candidate->second.size() > selected->second.size()) selected = candidate;
         }
         std::map<std::tuple<int, int, int>, Eigen::Vector3f> voxels;
-        for (const auto& item : final_landmarks) {
+        for (const auto& item : selected->second) {
             const Eigen::Vector3f& point = item.second;
             const auto key = std::make_tuple(
                 static_cast<int>(std::floor(point.x() / 0.02f)),
