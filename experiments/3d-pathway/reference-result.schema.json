@@ -51,7 +51,10 @@
         "raw_abs_rel": {"type": "number", "minimum": 0},
         "raw_delta1": {"type": "number", "minimum": 0, "maximum": 1},
         "affine_aligned_rmse_m": {"type": "number", "minimum": 0},
-        "affine_aligned_abs_rel": {"type": "number", "minimum": 0}
+        "affine_aligned_abs_rel": {"type": "number", "minimum": 0},
+        "affine_scale": {"type": "number", "minimum": 0},
+        "affine_shift_m": {"type": "number"},
+        "alignment_scale_at_boundary": {"type": "boolean"}
       }
     },
     "case_metrics": {"type": "object"},
@@ -111,7 +114,7 @@
       "then": {
         "required": ["case_metrics", "support"],
         "properties": {
-          "metrics": {"required": ["evaluated_cases", "evaluated_pixels", "valid_pixels", "valid_pixel_fraction", "raw_rmse_m", "raw_abs_rel", "raw_delta1", "affine_aligned_rmse_m", "affine_aligned_abs_rel"]},
+          "metrics": {"required": ["evaluated_cases", "evaluated_pixels", "valid_pixels", "valid_pixel_fraction", "raw_rmse_m", "raw_abs_rel", "raw_delta1", "affine_aligned_rmse_m", "affine_aligned_abs_rel", "affine_scale", "affine_shift_m", "alignment_scale_at_boundary"]},
           "tool": {"required": ["source_commit"]}
         }
       }

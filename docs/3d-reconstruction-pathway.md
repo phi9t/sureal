@@ -672,8 +672,8 @@ labels.
 ### Defining mathematics
 
 Monocular depth commonly minimizes scale-aware or scale/shift-invariant loss.
-For the maintained metric-depth diagnostic, affine alignment is constrained to
-preserve depth order,
+For the maintained metric-depth diagnostic, one affine pair is fitted across
+the entire declared profile and constrained to preserve depth order,
 
 \[
 (s^*,t^*)=\arg\min_{s\geq 0,t}\sum_i(s\hat d_i+t-d_i)^2.
@@ -741,22 +741,23 @@ or output behind an occluder, so this adapter is neither learned MVS nor scene
 completion; those branches remain represented by the concept lab and reading
 sequence.
 
-On the recorded B200 Insula, smoke/full processed 3/11 cases in 8.22/12.82 s
+On the recorded B200 Insula, smoke/full processed 3/11 cases in 6.49/12.29 s
 with 1.29 GB peak compute memory. Raw RMSE was 3.80/3.97 m and raw AbsRel was
-0.836/0.851; \(\delta_1\) was zero in both profiles. Per-case order-preserving
-affine fitting reduced aggregate RMSE to 1.14/1.19 m, which is precisely why it
-is reported as a diagnostic rather than metric accuracy. The shared smoke case
-reached the \(s=0\) boundary, exposing that even a free positive scale could not
-recover its depth ordering. The stress cases did not have worse raw RMSE than
-the shared case, so the run makes no causal claim that crop or concavity alone
-caused the already-large domain failure.
+0.836/0.851; \(\delta_1\) was zero in both profiles. One profile-global,
+order-preserving affine fit reduced RMSE to 1.16/1.19 m, with scales 0.309 and
+0.0198; this near-flat full-profile fit is precisely why it is reported as a
+diagnostic rather than metric accuracy. The shared smoke case's separate
+localization fit reached the \(s=0\) boundary, exposing an order failure that a
+per-image aggregate would have obscured. The stress cases did not have worse
+raw RMSE than the shared case, so the run makes no causal claim that crop or
+concavity alone caused the already-large domain failure.
 
 Reference artifacts include float32 depth maps, binary validity masks, fixed-
-scale truth/prediction/error PPM comparisons, per-case scores and affine
-parameters, runtime and CPU/GPU peaks, source/checkpoint/Insula manifests, a
-short interpretation, and the hash-bound `result.json`. Hypersim training and
-this repository-owned synthetic fixture make these a controlled OOD
-reproduction, not a third-party benchmark result.
+scale truth/prediction/error PPM comparisons, one profile-global affine score,
+per-case localization scores, runtime and CPU/GPU peaks,
+source/checkpoint/Insula manifests, a short interpretation, and the hash-bound
+`result.json`. Hypersim training and this repository-owned synthetic fixture
+make these a controlled OOD reproduction, not a third-party benchmark result.
 
 ### Transition
 

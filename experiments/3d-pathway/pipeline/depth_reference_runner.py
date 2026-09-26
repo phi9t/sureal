@@ -7,6 +7,7 @@ import math
 import os
 from pathlib import Path
 import platform
+import re
 import shutil
 import stat
 import tempfile
@@ -46,6 +47,12 @@ CHECKPOINT_SHA256 = "b782898d8a3e8be1f639de33837ed85e9b4b73e40f8f5e5cd99067588d7
 CHECKPOINT_BYTES = 99_222_290
 INPUT_SIZE = 518
 MAX_DEPTH_M = 20.0
+TOOL_NAME = "Depth Anything V2 Metric Hypersim Small"
+TOOL_VERSION = "metric-hypersim-small"
+TOOL_PACKAGE_VERSION = f"source@{PINNED_SOURCE_COMMIT}"
+EVALUATION_SOFTWARE = {"numpy": np.__version__}
+CUDA_CACHE_POLICY = "persistent-cache-root-mount"
+IMAGE_ID_PATTERN = re.compile(r"sha256:[0-9a-f]{64}")
 PINNED_INSULA_MANIFEST = {
     "schema_version": "1",
     "kind": "neural-rendering",
@@ -82,6 +89,36 @@ REFERENCE_IMPLEMENTATION = (
 )
 
 
+def _affine_metrics(predicted: np.ndarray, target: np.ndarray) -> dict[str, Any]:
+    predicted = np.asarray(predicted, dtype=np.float64).reshape(-1)
+    target = np.asarray(target, dtype=np.float64).reshape(-1)
+    if predicted.shape != target.shape or predicted.size < 2:
+        raise ValueError("affine depth alignment requires matching non-trivial samples")
+    if not np.isfinite(predicted).all() or not np.isfinite(target).all():
+        raise ValueError("affine depth alignment requires finite samples")
+    centered_prediction = predicted - predicted.mean()
+    denominator = float(np.dot(centered_prediction, centered_prediction))
+    tolerance = float(np.finfo(np.float64).eps * max(1.0, np.dot(predicted, predicted)))
+    if denominator <= tolerance:
+        unconstrained_scale = 0.0
+    else:
+        unconstrained_scale = float(
+            np.dot(centered_prediction, target - target.mean()) / denominator
+        )
+    if not math.isfinite(unconstrained_scale):
+        raise ValueError("affine depth alignment is non-finite")
+    scale = max(0.0, unconstrained_scale)
+    shift = float(target.mean() - scale * predicted.mean())
+    aligned = scale * predicted + shift
+    return {
+        "affine_aligned_rmse_m": float(np.sqrt(np.mean((aligned - target) ** 2))),
+        "affine_aligned_abs_rel": float(np.mean(np.abs(aligned - target) / target)),
+        "affine_scale": scale,
+        "affine_shift_m": shift,
+        "alignment_scale_at_boundary": scale == 0.0,
+    }
+
+
 def _depth_metrics(prediction: np.ndarray, truth: np.ndarray) -> dict[str, Any]:
     prediction = np.asarray(prediction)
     truth = np.asarray(truth)
@@ -94,14 +131,6 @@ def _depth_metrics(prediction: np.ndarray, truth: np.ndarray) -> dict[str, Any]:
     predicted = prediction[valid].astype(np.float64)
     target = truth[valid].astype(np.float64)
     residual = predicted - target
-    design = np.column_stack((predicted, np.ones_like(predicted)))
-    coefficients, _, rank, _ = np.linalg.lstsq(design, target, rcond=None)
-    if rank < 2 or not np.isfinite(coefficients).all():
-        raise ValueError("affine depth alignment is degenerate")
-    unconstrained_scale, unconstrained_shift = (float(value) for value in coefficients)
-    scale = max(0.0, unconstrained_scale)
-    shift = float(target.mean()) if scale == 0.0 else unconstrained_shift
-    aligned = scale * predicted + shift
     ratios = np.maximum(predicted / target, target / predicted)
     metrics = {
         "valid_pixels": valid_pixels,
@@ -109,11 +138,7 @@ def _depth_metrics(prediction: np.ndarray, truth: np.ndarray) -> dict[str, Any]:
         "raw_rmse_m": float(np.sqrt(np.mean(residual * residual))),
         "raw_abs_rel": float(np.mean(np.abs(residual) / target)),
         "raw_delta1": float(np.mean(ratios < 1.25)),
-        "affine_aligned_rmse_m": float(np.sqrt(np.mean((aligned - target) ** 2))),
-        "affine_aligned_abs_rel": float(np.mean(np.abs(aligned - target) / target)),
-        "affine_scale": scale,
-        "affine_shift_m": shift,
-        "alignment_scale_at_boundary": scale == 0.0,
+        **_affine_metrics(predicted, target),
     }
     if not all(math.isfinite(value) for value in metrics.values()):
         raise ValueError("depth metrics must be finite")
@@ -357,6 +382,8 @@ def _evaluate_outputs(
     family_records: dict[str, list[dict[str, Any]]] = {
         family: [] for family in manifest["case_families"]
     }
+    profile_predictions: list[np.ndarray] = []
+    profile_targets: list[np.ndarray] = []
     total_pixels = 0
     for case in manifest["cases"]:
         shape = (int(case["height"]), int(case["width"]))
@@ -375,22 +402,44 @@ def _evaluate_outputs(
             raise ValueError(f"learned-depth validity mask is not binary: {case['id']}")
         if not np.isfinite(prediction[valid.astype(bool)]).all():
             raise ValueError(f"learned-depth prediction contains non-finite valid values: {case['id']}")
-        masked = np.where(valid.astype(bool), prediction, np.nan)
+        evaluation_mask = (
+            valid.astype(bool)
+            & np.isfinite(prediction)
+            & (prediction > 0.0)
+            & np.isfinite(truth)
+            & (truth > 0.0)
+        )
+        masked = np.where(evaluation_mask, prediction, np.nan)
         measured = _depth_metrics(masked, truth)
         record = {"family": case["family"], **measured}
         case_metrics[case["id"]] = record
         family_records[case["family"]].append(measured)
+        profile_predictions.append(prediction[evaluation_mask].astype(np.float64))
+        profile_targets.append(truth[evaluation_mask].astype(np.float64))
         total_pixels += int(truth.size)
 
     aggregate = _weighted_metrics(
         [{key: value for key, value in record.items() if key != "family"} for record in case_metrics.values()]
+    )
+    profile_affine = _affine_metrics(
+        np.concatenate(profile_predictions), np.concatenate(profile_targets)
     )
     metrics: dict[str, Any] = {
         "evaluated_cases": len(case_metrics),
         "evaluated_pixels": total_pixels,
         "valid_pixels": aggregate["valid_pixels"],
         "valid_pixel_fraction": float(aggregate["valid_pixels"] / total_pixels),
-        **{key: value for key, value in aggregate.items() if key != "valid_pixels"},
+        **{
+            key: value
+            for key, value in aggregate.items()
+            if key
+            not in {
+                "valid_pixels",
+                "affine_aligned_rmse_m",
+                "affine_aligned_abs_rel",
+            }
+        },
+        **profile_affine,
     }
     for family, records in family_records.items():
         family_metric = _weighted_metrics(records)
@@ -514,9 +563,13 @@ def validate_depth_reference_result(run_dir: Path) -> dict[str, Any]:
         raise ValueError("learned-depth support/claim contract mismatch")
     tool = result["tool"]
     if (
-        tool.get("name") != "Depth Anything V2 Metric Hypersim Small"
+        tool.get("name") != TOOL_NAME
+        or tool.get("version") != TOOL_VERSION
+        or tool.get("package_version") != TOOL_PACKAGE_VERSION
         or tool.get("source_commit") != PINNED_SOURCE_COMMIT
         or tool.get("container_image") != IMAGE
+        or not isinstance(tool.get("container_image_id"), str)
+        or IMAGE_ID_PATTERN.fullmatch(tool["container_image_id"]) is None
     ):
         raise ValueError("Depth Anything tool identity mismatch")
     provenance = result["provenance"]
@@ -540,6 +593,8 @@ def validate_depth_reference_result(run_dir: Path) -> dict[str, Any]:
         or config.get("max_depth_m") != MAX_DEPTH_M
         or config.get("container_user_environment") != {"USER": "surflo"}
         or config.get("support") != SUPPORT_CONTRACT
+        or config.get("evaluation_software") != EVALUATION_SOFTWARE
+        or config.get("cuda_cache") != CUDA_CACHE_POLICY
         or config.get("acceptance") != acceptance
         or result.get("acceptance") != acceptance
     ):
@@ -575,9 +630,11 @@ def _report(profile: str, metrics: dict[str, Any], case_metrics: dict[str, Any])
         f"{metrics['evaluated_cases']} deterministic single-view inputs.",
         "",
         f"Raw metric RMSE/AbsRel: {metrics['raw_rmse_m']:.4f} m / "
-        f"{metrics['raw_abs_rel']:.4f}. Per-case affine-aligned RMSE: "
-        f"{metrics['affine_aligned_rmse_m']:.4f} m. Raw metre-space error is the primary "
-        "metric-depth result; affine alignment is only a shape diagnostic.",
+        f"{metrics['raw_abs_rel']:.4f}. Profile-global affine-aligned RMSE: "
+        f"{metrics['affine_aligned_rmse_m']:.4f} m at scale "
+        f"{metrics['affine_scale']:.4f} and shift {metrics['affine_shift_m']:.4f} m. "
+        "Raw metre-space error is the primary metric-depth result; affine alignment is "
+        "only a shape diagnostic, and the per-case fits below only localize errors.",
         "",
         "| Case | Family | Raw RMSE (m) | Affine-aligned RMSE (m) | Affine scale | Shift (m) |",
         "|---|---|---:|---:|---:|---:|",
@@ -712,8 +769,8 @@ def run_depth_reference(cache_root: Path, profile: str, run_id: str) -> Path:
             "max_depth_m": MAX_DEPTH_M,
             "container_user_environment": {"USER": "surflo"},
             "support": SUPPORT_CONTRACT,
-            "evaluation_software": {"numpy": np.__version__},
-            "cuda_cache": "persistent-cache-root-mount",
+            "evaluation_software": EVALUATION_SOFTWARE,
+            "cuda_cache": CUDA_CACHE_POLICY,
             "acceptance": acceptance,
         }
         result = {
@@ -728,9 +785,9 @@ def run_depth_reference(cache_root: Path, profile: str, run_id: str) -> Path:
             "support": SUPPORT_CONTRACT,
             "acceptance": acceptance,
             "tool": {
-                "name": "Depth Anything V2 Metric Hypersim Small",
-                "version": "metric-hypersim-small",
-                "package_version": f"source@{PINNED_SOURCE_COMMIT}",
+                "name": TOOL_NAME,
+                "version": TOOL_VERSION,
+                "package_version": TOOL_PACKAGE_VERSION,
                 "source_commit": PINNED_SOURCE_COMMIT,
                 "container_image": IMAGE,
                 "container_image_id": image_id,

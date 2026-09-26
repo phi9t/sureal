@@ -21,6 +21,7 @@ SOURCE_COMMIT = "a561b849ebae10a6f5ef49e26c83cbbcd36c71bf"
 CHECKPOINT_REVISION = "3bc65d4e14a6786a61acec16453c50e12bf5f338"
 CHECKPOINT_SHA256 = "b782898d8a3e8be1f639de33837ed85e9b4b73e40f8f5e5cd99067588d722545"
 CHECKPOINT_BYTES = 99_222_290
+FIXTURE_IMAGE_ID = "sha256:" + "d" * 64
 
 
 def fake_depth_engine(path: Path) -> Path:
@@ -31,7 +32,7 @@ def fake_depth_engine(path: Path) -> Path:
             #!/usr/bin/env bash
             set -euo pipefail
             if [[ "${{1:-}}" == image && "${{2:-}}" == inspect ]]; then
-                printf 'sha256:fixture-depth-image\\n'
+                printf '{FIXTURE_IMAGE_ID}\\n'
                 exit 0
             fi
             [[ "${{1:-}}" == run ]]
@@ -42,7 +43,7 @@ def fake_depth_engine(path: Path) -> Path:
             [[ " $* " == *" --user "* ]]
             [[ " $* " == *" -e USER=surflo "* ]]
             [[ " $* " == *" -e CUDA_CACHE_PATH=/cuda-cache "* ]]
-            [[ " $* " == *" sha256:fixture-depth-image "* ]]
+            [[ " $* " == *" {FIXTURE_IMAGE_ID} "* ]]
             work=''
             checkpoint=''
             previous=''
@@ -69,7 +70,13 @@ def fake_depth_engine(path: Path) -> Path:
             predictions.mkdir(parents=True)
             for case in manifest["cases"]:
                 truth = np.load(root / "input" / case["depth_path"], allow_pickle=False)
-                prediction = (truth * 1.15 + 0.20).astype(np.float32)
+                transforms = {{
+                    "shared-scene": (1.15, 0.20),
+                    "focal-crop": (0.80, 1.00),
+                    "ood-concavity": (1.40, -0.30),
+                }}
+                scale, shift = transforms[case["family"]]
+                prediction = (truth * scale + shift).astype(np.float32)
                 valid = np.ones(truth.shape, dtype=np.uint8)
                 np.save(predictions / f"{{case['id']}}.depth.npy", prediction, allow_pickle=False)
                 np.save(predictions / f"{{case['id']}}.valid.npy", valid, allow_pickle=False)
@@ -207,6 +214,12 @@ class DepthAnythingReferenceFoundationTest(unittest.TestCase):
         self.assertTrue(inverted["alignment_scale_at_boundary"])
         self.assertGreater(inverted["affine_aligned_rmse_m"], 0.5)
 
+        constant = _depth_metrics(np.full_like(truth, 4.0), truth)
+        self.assertEqual(constant["affine_scale"], 0.0)
+        self.assertAlmostEqual(constant["affine_shift_m"], float(truth.mean()), places=6)
+        self.assertTrue(constant["alignment_scale_at_boundary"])
+        self.assertGreater(constant["affine_aligned_rmse_m"], 1.0)
+
     def test_controlled_inputs_are_deterministic_visible_depth_not_completion(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
         from contracts import load_json, sha256_file
@@ -302,7 +315,14 @@ class DepthAnythingReferenceAdapterTest(unittest.TestCase):
             self.assertEqual(result["metrics"]["evaluated_cases"], 3)
             self.assertEqual(result["metrics"]["valid_pixel_fraction"], 1.0)
             self.assertGreater(result["metrics"]["raw_rmse_m"], 0.5)
-            self.assertLess(result["metrics"]["affine_aligned_rmse_m"], 1e-5)
+            self.assertGreater(result["metrics"]["affine_aligned_rmse_m"], 0.05)
+            self.assertIn("affine_scale", result["metrics"])
+            self.assertTrue(
+                all(
+                    record["affine_aligned_rmse_m"] < 1e-5
+                    for record in result["case_metrics"].values()
+                )
+            )
             self.assertEqual(set(result["case_metrics"]), {"shared-000", "focal-crop", "ood-concavity"})
             self.assertEqual(
                 result["support"],
@@ -357,6 +377,64 @@ class DepthAnythingReferenceAdapterTest(unittest.TestCase):
                 (run_dir / "result.json").write_text(json.dumps(result), encoding="utf-8")
                 with self.assertRaisesRegex(ValueError, "metric mismatch"):
                     depth_reference_runner.validate_depth_reference_result(run_dir)
+
+    def test_validator_binds_tool_and_evaluator_provenance(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            run_dir = run_fake_depth_reference(Path(temporary), run_id="depth-provenance")
+            original = json.loads((run_dir / "result.json").read_text())
+            checkpoint_record = json.loads((run_dir / "output/checkpoint.json").read_text())
+            sys.path.insert(0, str(ROOT / "pipeline"))
+            import depth_reference_runner
+
+            mutations = (
+                ("tool-version", lambda result: result["tool"].__setitem__("version", "forged")),
+                (
+                    "package-version",
+                    lambda result: result["tool"].__setitem__("package_version", "forged"),
+                ),
+                (
+                    "image-id",
+                    lambda result: result["tool"].__setitem__("container_image_id", "forged"),
+                ),
+                (
+                    "evaluator-version",
+                    lambda result: result["provenance"]["config"].__setitem__(
+                        "evaluation_software", {"numpy": "forged"}
+                    ),
+                ),
+                (
+                    "cuda-cache-policy",
+                    lambda result: result["provenance"]["config"].__setitem__(
+                        "cuda_cache", "forged"
+                    ),
+                ),
+            )
+            with (
+                mock.patch.object(
+                    depth_reference_runner, "_checkpoint_record", return_value=checkpoint_record
+                ),
+                mock.patch.object(
+                    depth_reference_runner,
+                    "CHECKPOINT_SHA256",
+                    checkpoint_record["sha256"],
+                ),
+                mock.patch.object(
+                    depth_reference_runner,
+                    "CHECKPOINT_BYTES",
+                    checkpoint_record["byte_size"],
+                ),
+            ):
+                for name, mutate in mutations:
+                    with self.subTest(mutation=name):
+                        forged = json.loads(json.dumps(original))
+                        mutate(forged)
+                        config = forged["provenance"]["config"]
+                        forged["provenance"]["config_sha256"] = hashlib.sha256(
+                            depth_reference_runner.canonical_json(config)
+                        ).hexdigest()
+                        (run_dir / "result.json").write_text(json.dumps(forged))
+                        with self.assertRaisesRegex(ValueError, "identity|binding"):
+                            depth_reference_runner.validate_depth_reference_result(run_dir)
 
     def test_full_profile_evaluates_all_shared_views_and_failure_cases(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

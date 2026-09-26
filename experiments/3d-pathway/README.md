@@ -109,8 +109,9 @@ revision `3bc65d4e14a6786a61acec16453c50e12bf5f338`. The explicit fetch path loc
 the checkpoint byte count and SHA-256; reference execution verifies it again,
 mounts it read-only, and disables networking. Smoke evaluates one shared-scene
 view plus focal-crop and concave-OOD stressors; full evaluates nine shared
-views plus the stressors. Raw metre-space metrics remain primary, while
-per-case non-negative-scale affine alignment is only a shape diagnostic.
+views plus the stressors. Raw metre-space metrics remain primary, while one
+profile-global non-negative-scale affine alignment is only a shape diagnostic;
+per-case fits are retained solely to localize failures.
 Outputs are deterministic per-view visible-ray depths with no hidden-scene or
 posterior-sampling claim.
 
