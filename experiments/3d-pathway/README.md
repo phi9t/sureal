@@ -63,7 +63,12 @@ pathway images. `run.sh fetch --asset foundation-geometry-models` resolves the
 immutable VGGT-1B and DA3-BASE revisions plus the exact upstream VGGT source
 archive in `foundation-models.lock.json`, then checks every source, config, and
 weight byte. Preflight also rejects a dirty DA3 gitlink and verifies the full
-6.81 GB resolved venv tree against its lock. Execution mounts only ordered RGB,
+6.81 GB resolved venv tree against its lock. The environment is reconstructive:
+its recipe pins the CUDA base digest, dated Ubuntu snapshot, apt packages,
+Python and uv archives, a hash-complete PEP pylock, source builds, and the build
+scripts themselves. Clean-cache builds are normalized before complete-tree
+verification so independently built roots must agree byte for byte. Execution
+mounts only ordered RGB,
 the non-secret execution contract, and read-only source/model caches into the
 network-disabled container; evaluator cameras, depths, masks, and analytic
 surface truth remain host-side. Raw, pose-constrained SE(3), and

@@ -135,7 +135,7 @@
         "smoke": {"evaluated_cases_min": 6, "foreground_valid_fraction_min": 0.99, "relative_pose_auc_30_min": 0.50, "sim3_center_rmse_m_max": 0.50, "sim3_depth_abs_rel_max": 0.50, "sim3_point_rmse_m_max": 1.0, "observed_surface_fscore_min": 0.01, "unseen_surface_recall_max": 0.05, "roundtrip_max_px": 0.001},
         "full": {"evaluated_cases_min": 10, "foreground_valid_fraction_min": 0.99, "relative_pose_auc_30_min": 0.50, "sim3_center_rmse_m_max": 0.50, "sim3_depth_abs_rel_max": 0.50, "sim3_point_rmse_m_max": 1.0, "observed_surface_fscore_min": 0.01, "unseen_surface_recall_max": 0.05, "roundtrip_max_px": 0.001}
       },
-      "baseline_environment": {"container_image_id": "sha256:3006bcf0e893dd3f6a713a5552894e3a6059f74e7da4720cef46f7d1a7d45640", "gpu_model": "NVIDIA B200", "compute_capability": 10.0, "driver_version": "580.105.08", "torch": "2.9.1+cu130", "torchvision": "0.24.1+cu130"},
+      "baseline_environment": {"container_image_id": "sha256:eaf68603ced6f9abb5ee401522a07774183a8412ff3d9de61278f09c0738749d", "gpu_model": "NVIDIA B200", "compute_capability": 10.0, "driver_version": "580.105.08", "torch": "2.9.1+cu130", "torchvision": "0.24.1+cu130"},
       "model_contract": {
         "methods": ["vggt/direct", "da3-base/camera-head"],
         "vggt_source_commit": "a288dd0f14786c93483e45524328726ab7b1b4ce",
@@ -145,10 +145,10 @@
         "vggt_checkpoint_sha256": "f164acf60724910d8fe1578bb499d800850c7bb0948db7555c413f9fbe60467e",
         "da3_source_commit": "3d835ec1a5802d64a8b8b15f817a1ab54809bfe4",
         "da3_source_license": "Apache-2.0",
-        "da3_source_tree_sha256": "81d2a462f061af0ed2d8b889a0a1124fae1dde9410bcfb2df3bffb28fa07b4f5",
+        "da3_source_tree_sha256": "9cb268d766a4808110a21c69ca7786d9a1b1b03ecb2e329cf252088d26c17b74",
         "da3_base_checkpoint_revision": "f4a6c9b3c95e41c82048423d3493a81ec3fa810e",
         "da3_base_checkpoint_sha256": "e01067dc1659613083d9145a9a2547ccdbe6ccbbf83c4fe7b3e8a4e2bdae78b5",
-        "environment_tree_sha256": "65d28a33fc92aa93a3c6cb6923ddf8cbe3daef1ec25b20bcf1bd5844a008d86c",
+        "environment_tree_sha256": "26c304143a72f550022acf2bd13af3a63785140f2d7fa86adb662b30eaa88ad7",
         "inference": "amortized-feed-forward",
         "optimization": "none",
         "canonical_geometry": "depth unprojected through predicted cameras",
@@ -164,8 +164,8 @@
         "point_metrics": ["correspondence-error", "bidirectional-accuracy", "bidirectional-completeness", "chamfer-l1", "precision", "recall", "fscore"],
         "hidden_surface_completion": "unsupported"
       },
-      "last_verified_smoke": {"date": "2026-09-27", "run_id": "module12-smoke-final-reviewed-20260927", "vggt_pose_auc_30": 0.9103726634397172, "vggt_sim3_center_rmse_m": 0.03651982767887031, "vggt_sim3_depth_abs_rel": 0.009008088415061306, "vggt_sim3_point_rmse_m": 0.16125408762035287, "vggt_observed_point_fscore_10cm": 0.4130726809954751, "vggt_unseen_surface_recall_10cm": 0.0, "da3_pose_auc_30": 0.8167179499161327, "da3_sim3_center_rmse_m": 0.06491238579525883, "da3_sim3_depth_abs_rel": 0.02755266968720624, "da3_sim3_point_rmse_m": 0.297157842109795, "da3_observed_point_fscore_10cm": 0.30224747177798683, "da3_unseen_surface_recall_10cm": 0.0},
-      "last_verified_full": {"date": "2026-09-27", "run_id": "module12-full-final-reviewed-20260927", "vggt_pose_auc_30": 0.8677392120114166, "vggt_sim3_center_rmse_m": 0.08482442764449614, "vggt_sim3_depth_abs_rel": 0.013410340034596398, "vggt_sim3_point_rmse_m": 0.20490864116649676, "vggt_observed_point_fscore_5cm": 0.14912805079155672, "vggt_unseen_surface_recall_5cm": 0.0, "da3_pose_auc_30": 0.7121709468993523, "da3_sim3_center_rmse_m": 0.16018973696319286, "da3_sim3_depth_abs_rel": 0.01943698144868928, "da3_sim3_point_rmse_m": 0.3940919563252543, "da3_observed_point_fscore_5cm": 0.08354515550239235, "da3_unseen_surface_recall_5cm": 0.0},
+      "last_verified_smoke": {"date": "2026-09-27", "run_id": "module12-smoke-final-verified-20260927", "vggt_pose_auc_30": 0.9103726634397172, "vggt_sim3_center_rmse_m": 0.03651982767887031, "vggt_sim3_depth_abs_rel": 0.009008088415061306, "vggt_sim3_point_rmse_m": 0.16144011187582394, "vggt_observed_point_fscore_10cm": 0.4128123583408885, "vggt_unseen_surface_recall_10cm": 0.0, "da3_pose_auc_30": 0.8167179499161327, "da3_sim3_center_rmse_m": 0.06491238579525883, "da3_sim3_depth_abs_rel": 0.02755266968720624, "da3_sim3_point_rmse_m": 0.2971378761059153, "da3_observed_point_fscore_10cm": 0.2969929245283019, "da3_unseen_surface_recall_10cm": 0.0},
+      "last_verified_full": {"date": "2026-09-27", "run_id": "module12-full-final-verified-20260927", "vggt_pose_auc_30": 0.8677392120114166, "vggt_sim3_center_rmse_m": 0.08482442764449614, "vggt_sim3_depth_abs_rel": 0.013410340034596398, "vggt_sim3_point_rmse_m": 0.20515952371846324, "vggt_observed_point_fscore_5cm": 0.14912805079155672, "vggt_unseen_surface_recall_5cm": 0.0, "da3_pose_auc_30": 0.7121709468993523, "da3_sim3_center_rmse_m": 0.16018973696319286, "da3_sim3_depth_abs_rel": 0.01943698144868928, "da3_sim3_point_rmse_m": 0.3940595294165292, "da3_observed_point_fscore_5cm": 0.09045578917050691, "da3_unseen_surface_recall_5cm": 0.0},
       "measurement_note": "Both methods receive only unposed RGB. Raw, pose-constrained rigid, and pose-constrained similarity metrics are reported separately; evaluator alignment is not model optimization. Correspondence hit rate is not called F-score: bidirectional point precision/recall and their harmonic F1 are reported separately on ground-truth observed surfaces, while the unseen slice measures unsupported reach. VGGT's direct point head and queried tracks remain separate from its canonical depth-unprojected pointmap. DA3-BASE supplies cameras, depth, confidence, and unprojected points but no direct point or track head. Neither method emits a hidden-surface completion or a sampled complete scene."
     }
   ]

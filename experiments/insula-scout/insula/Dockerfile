@@ -1,30 +1,21 @@
-ARG CUDA_BASE=nvidia/cuda:13.2.1-cudnn-devel-ubuntu24.04
+ARG CUDA_BASE=nvidia/cuda@sha256:6435dc5a825b0095648d87a3c91240fd7788a85fafaf215739544d389ab74366
 FROM ${CUDA_BASE}
 
+ARG UBUNTU_SNAPSHOT=20260925T000000Z
+ARG APT_PACKAGES
 ARG UV_VERSION=0.11.13
 ARG UV_SHA256=f830ea3d38ae1492acf53cb7f2cd0f81d6ae22b42d2d7310a6c7d42c451e1a43
 
-RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        ca-certificates \
-        cmake \
-        curl \
-        g++-13 \
-        gcc-13 \
-        git \
-        libgl1 \
-        libglib2.0-0 \
-        libnuma-dev \
-        libsm6 \
-        libxext6 \
-        libxrender1 \
-        make \
-        ninja-build \
-        openssh-client \
-        patch \
-        pkg-config \
-        python3 \
-        xz-utils \
+RUN test -n "${APT_PACKAGES}" \
+    && printf '%s\n' \
+        'Types: deb' \
+        "URIs: https://snapshot.ubuntu.com/ubuntu/${UBUNTU_SNAPSHOT}/" \
+        'Suites: noble noble-updates noble-backports noble-security' \
+        'Components: main universe restricted multiverse' \
+        'Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg' \
+        > /etc/apt/sources.list.d/ubuntu.sources \
+    && apt-get -o Acquire::Check-Valid-Until=false update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${APT_PACKAGES} \
     && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 100 \
     && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 100 \
     && curl -fsSL --retry 3 --retry-delay 2 \
@@ -45,7 +36,8 @@ RUN mkdir -p \
         /workspace/surflo \
     && printf '%s\n' \
         'schema_version=1' \
-        'image=nvidia/cuda:13.2.1-cudnn-devel-ubuntu24.04' \
+        "image=${CUDA_BASE}" \
+        "ubuntu_snapshot=${UBUNTU_SNAPSHOT}" \
         'repo=surflo' \
         'mount=/workspace/surflo' \
         'marker=SURFLO_IN_INSULA' \

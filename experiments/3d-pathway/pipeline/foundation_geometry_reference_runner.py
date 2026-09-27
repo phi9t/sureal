@@ -29,6 +29,7 @@ from contracts import (
     validate_run_id,
     write_json,
 )
+from environment_manifest import environment_tree_manifest
 from mvs_reference_runner import _gpu_hardware, _peak_cpu_memory_bytes, _run_monitored
 from reference_runner import _hash_tree, _inspect_image, _require_regular_file, _secure_directory
 from reference_scene import _render_implicit_sphere, generate_implicit_surface_scene
@@ -53,6 +54,7 @@ SUPPORT_CONTRACT = {
 REFERENCE_IMPLEMENTATION = (
     "pipeline/cli.py",
     "pipeline/contracts.py",
+    "pipeline/environment_manifest.py",
     "pipeline/reference_runner.py",
     "pipeline/foundation_geometry_reference_runner.py",
     "pipeline/reference_scene.py",
@@ -578,8 +580,8 @@ def _direct_point_reprojection(
     points = np.asarray(points, dtype=np.float64)
     height, width = points.shape[1:3]
     rows, columns = np.meshgrid(
-        np.arange(height, dtype=np.float64) + 0.5,
-        np.arange(width, dtype=np.float64) + 0.5,
+        np.arange(height, dtype=np.float64),
+        np.arange(width, dtype=np.float64),
         indexing="ij",
     )
     errors = []
@@ -675,13 +677,12 @@ def _truth_for_case(
 
 
 def _tree_manifest(root: Path, *, environment: bool = False) -> dict[str, Any]:
+    if environment:
+        return environment_tree_manifest(root)
     records: list[dict[str, Any]] = []
     total_bytes = 0
-    native_binaries = []
     for path in sorted(root.rglob("*")):
         relative = path.relative_to(root).as_posix()
-        if environment and ("__pycache__" in path.parts or path.suffix == ".pyc"):
-            continue
         if path.is_symlink():
             records.append({"path": relative, "symlink": os.readlink(path)})
             continue
@@ -691,40 +692,17 @@ def _tree_manifest(root: Path, *, environment: bool = False) -> dict[str, Any]:
         record = {"path": relative, "size": size, "sha256": sha256_file(path)}
         records.append(record)
         total_bytes += size
-        if ".so" in path.name:
-            native_binaries.append(record)
     digest = hashlib.sha256(
         json.dumps(records, sort_keys=True, separators=(",", ":")).encode("utf-8")
     ).hexdigest()
     manifest: dict[str, Any] = {
         "schema_version": 1,
-        "root_kind": "resolved-python-environment" if environment else "source-tree",
+        "root_kind": "source-tree",
         "tree_sha256": digest,
         "file_count": len(records),
         "byte_size": total_bytes,
         "files": records,
     }
-    if environment:
-        distributions = []
-        for metadata in sorted(root.glob("lib/python*/site-packages/*.dist-info/METADATA")):
-            name = None
-            version = None
-            for line in metadata.read_text(encoding="utf-8", errors="replace").splitlines():
-                if line.startswith("Name: ") and name is None:
-                    name = line[6:]
-                elif line.startswith("Version: ") and version is None:
-                    version = line[9:]
-                if name is not None and version is not None:
-                    break
-            if name is not None and version is not None:
-                distributions.append({"name": name, "version": version})
-        manifest.update(
-            {
-                "exclusions": ["__pycache__", "*.pyc"],
-                "distributions": distributions,
-                "native_binaries": native_binaries,
-            }
-        )
     return manifest
 
 
@@ -739,7 +717,7 @@ def _tracked_source_manifest(checkout: Path) -> dict[str, Any]:
     if status.returncode != 0 or status.stdout:
         raise ValueError("Depth Anything 3 source checkout is dirty")
     listed = subprocess.run(
-        ["git", "ls-files", "-z"],
+        ["git", "ls-files", "--stage", "-z"],
         cwd=checkout,
         capture_output=True,
         check=False,
@@ -747,10 +725,23 @@ def _tracked_source_manifest(checkout: Path) -> dict[str, Any]:
     if listed.returncode != 0:
         raise ValueError("cannot inventory Depth Anything 3 source checkout")
     records = []
+    gitlinks = []
     for raw in listed.stdout.split(b"\0"):
         if not raw:
             continue
-        relative = raw.decode("utf-8")
+        try:
+            staged, raw_relative = raw.split(b"\t", 1)
+            mode, object_id, stage = staged.decode("ascii").split(" ")
+        except (ValueError, UnicodeDecodeError) as error:
+            raise ValueError("malformed Depth Anything 3 tracked source entry") from error
+        if stage != "0":
+            raise ValueError("Depth Anything 3 source checkout has unresolved index stages")
+        relative = raw_relative.decode("utf-8")
+        if mode == "160000":
+            record = {"path": relative, "mode": mode, "commit": object_id}
+            records.append(record)
+            gitlinks.append(record)
+            continue
         path = checkout / relative
         if path.is_file():
             records.append(
@@ -768,8 +759,9 @@ def _tracked_source_manifest(checkout: Path) -> dict[str, Any]:
             json.dumps(records, sort_keys=True, separators=(",", ":")).encode("utf-8")
         ).hexdigest(),
         "file_count": len(records),
-        "byte_size": sum(item["size"] for item in records),
+        "byte_size": sum(item.get("size", 0) for item in records),
         "files": records,
+        "gitlinks": gitlinks,
     }
 
 
@@ -781,6 +773,13 @@ def _verify_model_cache(pathway_cache_root: Path) -> dict[str, Any]:
     }:
         raise ValueError("foundation model lock is malformed")
     repository = ROOT.parent.parent
+    build_lock = lock["environment"].get("build_lock", {})
+    build_lock_path = repository / str(build_lock.get("path", ""))
+    if (
+        not build_lock_path.is_file()
+        or sha256_file(build_lock_path) != build_lock.get("sha256")
+    ):
+        raise ValueError("Surflo foundation environment build lock mismatch")
     source_checkout = repository / "submodules/Depth-Anything-3"
     completed = subprocess.run(
         ["git", "rev-parse", "HEAD"],
@@ -801,6 +800,7 @@ def _verify_model_cache(pathway_cache_root: Path) -> dict[str, Any]:
         da3_source_manifest["tree_sha256"] != da3_lock["source_tree_sha256"]
         or da3_source_manifest["file_count"] != da3_lock["source_tree_file_count"]
         or da3_source_manifest["byte_size"] != da3_lock["source_tree_byte_size"]
+        or da3_source_manifest["gitlinks"] != da3_lock["nested_gitlinks"]
     ):
         raise ValueError("Depth Anything 3 tracked source tree does not match its lock")
     cache_root = Path(
@@ -1010,6 +1010,88 @@ def _validate_archive(
     return arrays
 
 
+def _validated_track_record(
+    method_id: str,
+    case_id: str,
+    case_record: dict[str, Any],
+    arrays: dict[str, np.ndarray],
+    frame_ids: list[str],
+    height: int,
+    width: int,
+) -> dict[str, Any]:
+    record = case_record.get("tracks")
+    if method_id != VGGT_METHOD:
+        if record != {"status": "unsupported"}:
+            raise ValueError(f"unsupported track record mismatch: {method_id}/{case_id}")
+        return {"status": "unsupported", "query_count": 0}
+    if not isinstance(record, dict) or record.get("status") != "measured":
+        raise ValueError(f"missing measured track record: {method_id}/{case_id}")
+    expected_convention = {
+        "order": "xy",
+        "space": "processed input image pixels",
+        "origin": "(0,0) is the center of the upper-left pixel",
+        "pixel_center_lattice": "integer centers 0..W-1 and 0..H-1",
+    }
+    if (
+        record.get("query_frame") != {"index": 0, "frame_id": frame_ids[0]}
+        or record.get("coordinate_convention") != expected_convention
+        or record.get("resolution_hw") != [height, width]
+    ):
+        raise ValueError(f"track coordinate record mismatch: {method_id}/{case_id}")
+    semantics = {
+        "track_queries": "reference-frame query xy coordinates",
+        "tracks": "predicted xy coordinates for every frame and query",
+        "track_visibility": "per-frame visibility scores",
+        "track_confidence": "per-frame track confidence scores",
+    }
+    array_records = record.get("arrays")
+    if not isinstance(array_records, dict) or set(array_records) != set(semantics):
+        raise ValueError(f"track array record mismatch: {method_id}/{case_id}")
+    for name, expected_semantics in semantics.items():
+        expected = {
+            "archive_member": name,
+            "shape": list(arrays[name].shape),
+            "dtype": str(arrays[name].dtype),
+            "semantics": expected_semantics,
+        }
+        if array_records.get(name) != expected:
+            raise ValueError(f"track array metadata mismatch: {method_id}/{case_id}/{name}")
+    expected_scores = {
+        "visibility": {
+            "domain": "sigmoid score in [0,1]",
+            "threshold": None,
+            "semantics": "model estimate that the query is visible in each frame",
+        },
+        "confidence": {
+            "domain": "sigmoid score in [0,1]",
+            "threshold": None,
+            "semantics": "model confidence in each predicted track coordinate",
+        },
+    }
+    if any(record.get(name) != expected for name, expected in expected_scores.items()):
+        raise ValueError(f"track score semantics mismatch: {method_id}/{case_id}")
+    for name in ("track_visibility", "track_confidence"):
+        if np.min(arrays[name]) < 0.0 or np.max(arrays[name]) > 1.0:
+            raise ValueError(f"track score outside [0,1]: {method_id}/{case_id}/{name}")
+    result = dict(record)
+    result.update(
+        {
+            "query_count": int(arrays["track_queries"].shape[0]),
+            "observed_score_ranges": {
+                "visibility": [
+                    float(np.min(arrays["track_visibility"])),
+                    float(np.max(arrays["track_visibility"])),
+                ],
+                "confidence": [
+                    float(np.min(arrays["track_confidence"])),
+                    float(np.max(arrays["track_confidence"])),
+                ],
+            },
+        }
+    )
+    return result
+
+
 def _evaluate_case(
     staging: Path,
     evaluation: dict[str, Any],
@@ -1036,6 +1118,9 @@ def _evaluate_case(
     archive_path = _require_regular_file(staging, f"output/{archive_name}")
     arrays = _validate_archive(
         archive_path, method_id, len(frame_ids), height, width
+    )
+    tracks = _validated_track_record(
+        method_id, case_id, case_record, arrays, frame_ids, height, width
     )
     truth_depth, foreground, truth_points, truth_centers, truth_rotations = _truth_for_case(
         staging / "evaluation", evaluation, frame_ids, height, width
@@ -1242,10 +1327,7 @@ def _evaluate_case(
         },
         "pointmap_depth": pointmap_depth,
         "pointmap_direct": pointmap_direct,
-        "tracks": {
-            "status": "measured" if expected_tracks else "unsupported",
-            "query_count": int(arrays["track_queries"].shape[0]) if expected_tracks else 0,
-        },
+        "tracks": tracks,
         "gauge": {
             "raw": "unaligned learned gauge",
             "se3": "camera-orientation-constrained rigid evaluation alignment",
@@ -1293,6 +1375,7 @@ def _validate_inference_manifest(staging: Path) -> dict[str, Any]:
             "commit": model_lock["source_commit"],
             "license": model_lock["source_license"],
             "tree_sha256": source_tree_hashes[method_id],
+            "nested_gitlinks": model_lock["nested_gitlinks"],
         }:
             raise ValueError(f"foundation source record mismatch: {method_id}")
         if method.get("checkpoint") != {
@@ -1302,6 +1385,19 @@ def _validate_inference_manifest(staging: Path) -> dict[str, Any]:
             "files": model_lock["files"],
         }:
             raise ValueError(f"foundation checkpoint record mismatch: {method_id}")
+        parity = method.get("upstream_unprojection_parity", {})
+        expected_helper = (
+            "vggt.utils.geometry.unproject_depth_map_to_point_map"
+            if method_id == VGGT_METHOD
+            else "depth_anything_3.utils.geometry.unproject_depth"
+        )
+        if (
+            parity.get("helper") != expected_helper
+            or parity.get("pixel_coordinate_origin")
+            != "integer pixel centers (0,0) through (W-1,H-1)"
+            or float(parity.get("max_abs_error", math.inf)) > 1e-6
+        ):
+            raise ValueError(f"upstream unprojection parity failed: {method_id}")
         if set(method.get("cases", {})) != set(expected_cases):
             raise ValueError(f"foundation case set mismatch: {method_id}")
         for case_id, case in method["cases"].items():
@@ -1357,6 +1453,7 @@ def _validate_inference_manifest(staging: Path) -> dict[str, Any]:
     )
     if (
         environment.get("tree_sha256") != lock["environment"]["tree_sha256"]
+        or environment.get("build_lock") != lock["environment"]["build_lock"]
         or environment.get("file_count") != lock["environment"]["file_count"]
         or environment.get("byte_size") != lock["environment"]["byte_size"]
         or environment.get("manifest_sha256")

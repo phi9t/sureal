@@ -10,6 +10,7 @@ EMIT_PLAN=0
 REPO_MOUNT=/workspace/surflo
 CACHE_MOUNT=/cache/surflo
 DRIVER_MOUNT=/run/surflo-nvidia-driver
+GIT_COMMON_MOUNT=/run/surflo-git-common
 
 usage() {
     cat <<'EOF'
@@ -58,12 +59,27 @@ case "${NETWORK_MODE}" in
     *) die "SURFLO_INSULA_NETWORK must be networked or offline, got ${NETWORK_MODE}" ;;
 esac
 
+command -v git >/dev/null 2>&1 || die "git is required on the host"
+GIT_COMMON_DIR="$(git -C "${REPO_ROOT}" rev-parse --path-format=absolute --git-common-dir)" || \
+    die "cannot resolve the repository Git common directory"
+GIT_DIRECTORY="$(git -C "${REPO_ROOT}" rev-parse --path-format=absolute --git-dir)" || \
+    die "cannot resolve the repository Git directory"
+[[ -d "${GIT_COMMON_DIR}" ]] || die "Git common directory not found: ${GIT_COMMON_DIR}"
+[[ -d "${GIT_DIRECTORY}" ]] || die "Git directory not found: ${GIT_DIRECTORY}"
+GIT_DIRECTORY_RELATIVE="$(realpath --relative-to="${GIT_COMMON_DIR}" "${GIT_DIRECTORY}")"
+case "${GIT_DIRECTORY_RELATIVE}" in
+    .) INSULA_GIT_DIR="${GIT_COMMON_MOUNT}" ;;
+    ../*|/*) die "Git directory is outside its common directory: ${GIT_DIRECTORY}" ;;
+    *) INSULA_GIT_DIR="${GIT_COMMON_MOUNT}/${GIT_DIRECTORY_RELATIVE}" ;;
+esac
+
 if [[ "${EMIT_PLAN}" == 1 ]]; then
-    python3 - "${ROOTFS}" "${REPO_ROOT}" "${CACHE_ROOT}" "${NETWORK_MODE}" "$@" <<'PY'
+    python3 - "${ROOTFS}" "${REPO_ROOT}" "${CACHE_ROOT}" "${NETWORK_MODE}" \
+        "${GIT_COMMON_DIR}" "${INSULA_GIT_DIR}" "$@" <<'PY'
 import json
 import sys
 
-rootfs, repo, cache, network, *command = sys.argv[1:]
+rootfs, repo, cache, network, git_common, git_dir, *command = sys.argv[1:]
 print(json.dumps({
     "schema_version": 1,
     "rootfs": rootfs,
@@ -71,6 +87,10 @@ print(json.dumps({
     "repo_mount": "/workspace/surflo",
     "host_cache_root": cache,
     "cache_mount": "/cache/surflo",
+    "git_common_dir": git_common,
+    "git_common_mount": "/run/surflo-git-common",
+    "git_dir": git_dir,
+    "git_work_tree": "/workspace/surflo",
     "network_mode": network,
     "marker_env": "SURFLO_IN_INSULA",
     "command": command,
@@ -104,6 +124,7 @@ bwrap_args=(
     --tmpfs /tmp
     --tmpfs /run
     --dir "${DRIVER_MOUNT}"
+    --ro-bind "${GIT_COMMON_DIR}" "${GIT_COMMON_MOUNT}"
     --dev /dev
     --bind "${REPO_ROOT}" "${REPO_MOUNT}"
     --bind "${CACHE_ROOT}" "${CACHE_MOUNT}"
@@ -152,11 +173,16 @@ bwrap_args+=(
     --setenv TMPDIR "${CACHE_MOUNT}/tmp"
     --setenv CUDA_HOME /usr/local/cuda
     --setenv CUDA_PATH /usr/local/cuda
+    --setenv CC /usr/bin/gcc
+    --setenv CXX /usr/bin/g++
+    --setenv CUDAHOSTCXX /usr/bin/g++
     --setenv LD_LIBRARY_PATH "${DRIVER_MOUNT}:/usr/local/cuda/lib64:/usr/local/cuda/lib"
     --setenv HF_HOME "${CACHE_MOUNT}/huggingface"
     --setenv TORCH_EXTENSIONS_DIR "${CACHE_MOUNT}/torch-extensions"
     --setenv SURFLO_INSULA_CACHE_ROOT "${CACHE_MOUNT}"
     --setenv SURFLO_IN_INSULA 1
+    --setenv SURFLO_GIT_DIR "${INSULA_GIT_DIR}"
+    --setenv SURFLO_GIT_WORK_TREE "${REPO_MOUNT}"
     --setenv PYTHONNOUSERSITE 1
     --setenv USE_LIBUV 0
     --setenv NVIDIA_VISIBLE_DEVICES "${NVIDIA_VISIBLE_DEVICES:-all}"
@@ -164,7 +190,7 @@ bwrap_args+=(
 )
 
 for name in CUDA_VISIBLE_DEVICES HF_TOKEN HUGGING_FACE_HUB_TOKEN MAX_JOBS \
-    SURFLO_SCOUT_RUN_ID TERM TORCH_CUDA_ARCH_LIST; do
+    SURFLO_ENVIRONMENT_MANIFEST_OUT SURFLO_SCOUT_RUN_ID TERM TORCH_CUDA_ARCH_LIST; do
     if [[ "${!name+x}" == x ]]; then
         bwrap_args+=(--setenv "${name}" "${!name}")
     fi

@@ -124,8 +124,12 @@ echo "  arch       : $ARCH_NOTE"
 # ---------------------------------------------------------------------------
 # Required extensions
 # ---------------------------------------------------------------------------
-RASTERIZER="submodules/diff-gaussian-rasterization-surflo"
+RASTERIZER="${RASTERIZER_DIR_OVERRIDE:-submodules/diff-gaussian-rasterization-surflo}"
 [[ -d "$RASTERIZER" ]] || fail "$RASTERIZER not found." "Run this from the repository root."
+RASTERIZER_INSTALL="${RASTERIZER}"
+if [[ "${RASTERIZER_INSTALL}" != /* ]]; then
+    RASTERIZER_INSTALL="./${RASTERIZER_INSTALL}"
+fi
 
 # --no-build-isolation is REQUIRED, not an optimisation, and it is applied to
 # EVERY source-tree install below -- required and optional alike. The rasterizer,
@@ -159,15 +163,21 @@ EOF
 echo "  pinning for dependency resolution: $(tr '\n' ' ' < "$PIN_FILE")"
 
 BUILD_FLAGS=(--no-build-isolation)
+if [[ "${SURFLO_LOCKED_ENV:-0}" == 1 ]]; then
+    BUILD_FLAGS+=(--no-deps)
+fi
 
 say "1/3  diff_gaussian_rasterization_surflo  (Surflo renderer + occupancy)"
-pip install "${BUILD_FLAGS[@]}" -c "$PIN_FILE" "./$RASTERIZER"
+pip install "${BUILD_FLAGS[@]}" -c "$PIN_FILE" "$RASTERIZER_INSTALL"
 
 say "2/3  fused_ssim  (SSIM term of the rendering loss)"
-if FUSED_SSIM_DIR="$(find_dir fused-ssim)"; then
+if [[ -n "${FUSED_SSIM_DIR_OVERRIDE:-}" ]]; then
+    pip install "${BUILD_FLAGS[@]}" -c "$PIN_FILE" "${FUSED_SSIM_DIR_OVERRIDE}"
+elif FUSED_SSIM_DIR="$(find_dir fused-ssim)"; then
     pip install "${BUILD_FLAGS[@]}" -c "$PIN_FILE" "./$FUSED_SSIM_DIR"
 else
-    pip install "${BUILD_FLAGS[@]}" -c "$PIN_FILE" git+https://github.com/rahul-goel/fused-ssim.git
+    pip install "${BUILD_FLAGS[@]}" -c "$PIN_FILE" \
+        "git+https://github.com/rahul-goel/fused-ssim.git@${FUSED_SSIM_REF:-a7c48d6dd7ac6dc39a7958c7c4452e0b10418f38}"
 fi
 
 # GeoDel is the default Delaunay backend for mesh extraction, where the
@@ -177,10 +187,13 @@ fi
 # rasterizer anyway. Without it the code still runs, falling back to
 # scipy.spatial.Delaunay with a warning.
 say "3/3  geodel  (fast Delaunay; falls back to scipy if absent)"
-if GEODEL_DIR="$(find_dir GeoDel)"; then
+if [[ -n "${GEODEL_DIR_OVERRIDE:-}" ]]; then
+    pip install "${BUILD_FLAGS[@]}" -c "$PIN_FILE" "${GEODEL_DIR_OVERRIDE}"
+elif GEODEL_DIR="$(find_dir GeoDel)"; then
     pip install "${BUILD_FLAGS[@]}" -c "$PIN_FILE" "./$GEODEL_DIR"
 else
-    pip install "${BUILD_FLAGS[@]}" -c "$PIN_FILE" "git+https://github.com/Anttwo/GeoDel@${GEODEL_REF:-164a66a}"
+    pip install "${BUILD_FLAGS[@]}" -c "$PIN_FILE" \
+        "git+https://github.com/Anttwo/GeoDel@${GEODEL_REF:-164a66a85fd3d1c899292e9e3a9dddd9a9c7bcef}"
 fi
 
 # ---------------------------------------------------------------------------
@@ -200,13 +213,16 @@ fi
 if [[ "$WITH_DA3" == 1 ]]; then
     say "optional  Depth-Anything-3  (monodepth expert guidance)"
     if DA3_DIR="$(find_dir Depth-Anything-3)"; then
-        # DA3 leaves moviepy unpinned, but moviepy 2.x removed moviepy.editor.
-        pip install -c "$PIN_FILE" "moviepy<2"
-        # NO --no-build-isolation here: DA3 builds with hatchling (a PEP 517
-        # backend), and isolation is exactly what provisions it. Passing the
-        # flag makes pip fail with "Cannot import 'hatchling.build'". The flag
-        # is only for packages whose setup.py imports torch itself.
-        pip install -c "$PIN_FILE" -e "./$DA3_DIR"
+        if [[ "${SURFLO_LOCKED_ENV:-0}" == 1 ]]; then
+            # The content-addressed environment preinstalls DA3's exact runtime
+            # and hatch build dependencies. Never resolve from an index here.
+            pip install --no-deps --no-build-isolation -c "$PIN_FILE" -e "./$DA3_DIR"
+        else
+            # DA3 leaves moviepy unpinned, but moviepy 2.x removed moviepy.editor.
+            pip install -c "$PIN_FILE" "moviepy<2"
+            # Build isolation provisions hatchling for the ordinary installer.
+            pip install -c "$PIN_FILE" -e "./$DA3_DIR"
+        fi
     else
         fail "Depth-Anything-3/ not found (looked in submodules/ and the repo root)." \
              "Fetch the submodule, or drop --with-da3."

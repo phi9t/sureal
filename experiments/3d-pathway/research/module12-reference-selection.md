@@ -298,10 +298,15 @@ older scout did. `foundation-models.lock.json` selects the exact upstream VGGT
 archive at `a288dd0…` (archive SHA-256 `df4e7de…`, extracted-tree SHA-256
 `ec486998…`) rather than executing Surflo's vendored fork. It rejects a dirty
 DA3 checkout and verifies the complete tracked tree at `3d835ec…` (tree
-SHA-256 `81d2a462…`). It locks the selected VGGT-1B and DA3-BASE checkpoint
-bytes, and preflight hashes the complete resolved reused venv—40,069 records,
-6,810,610,151 bytes, tree SHA-256 `65d28a33…`—before the read-only offline
-container starts. The run record retains the complete file manifest,
+SHA-256 `9cb268d7…`), including its nested `da3_streaming/loop_utils/salad`
+gitlink. It locks the selected VGGT-1B and DA3-BASE checkpoint bytes, and
+preflight hashes the complete resolved venv—40,406 records, 6,811,435,428
+bytes, tree SHA-256 `26c30414…`—before the read-only offline container starts.
+That environment is reconstructive rather than merely descriptive: the lock
+pins the CUDA base digest, Ubuntu snapshot, 19 apt packages, standalone Python
+3.10.20 archive, uv 0.11.13, 204-package PEP pylock, source builds, and every
+build script. Two empty-cache builds normalized to the same byte-identical
+tree. The run record retains the complete file manifest,
 distribution versions, native binaries, loaded-module hashes, CUDA compiler,
 attention-backend flags, and model/source contracts.
 
@@ -530,10 +535,10 @@ affect the selected Apache-2.0 DA3-BASE checkpoint. The old scout remains
 historical path/toolchain evidence and is not retroactively called an
 exact-checkpoint reproduction.
 
-The sealed runs are `module12-smoke-final-reviewed-20260927` and
-`module12-full-final-reviewed-20260927`. The full profile executes fixed nested
+The sealed runs are `module12-smoke-final-verified-20260927` and
+`module12-full-final-verified-20260927`. The full profile executes fixed nested
 1/2/4/8/16-view subsets, high/medium/low/disconnected overlap pairs, and an
 eight-view permutation. Every case scores ground-truth observed and unseen
 surface slices. The 16-view primary case measured observed-surface F1 at 5 cm
-of 0.1491 for VGGT and 0.0835 for DA3-BASE; unseen recall was zero for both.
+of 0.1491 for VGGT and 0.0905 for DA3-BASE; unseen recall was zero for both.
 These are controlled-fixture measurements, not a paper-table reproduction.

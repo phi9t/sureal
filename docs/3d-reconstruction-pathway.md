@@ -1263,18 +1263,24 @@ scene-normalized thresholds. Confidence/coverage curves, direct-point
 reprojection diagnostics, per-stage cold-load/preprocess/network/decode/export
 timings, validity counts, source/checkpoint metadata, and the complete resolved
 environment/native-binary manifest are retained in the run artifacts.
+VGGT track records also declare the integer-centered processed-pixel lattice,
+query frame, array shapes and dtypes, and visibility/confidence semantics; DA3
+records tracks as unsupported. The foundation environment is rebuilt from an
+exact CUDA base digest, dated Ubuntu snapshot, locked Python/uv archives, PEP
+pylock, source pins, and hashed build scripts, then normalized and checked
+against a complete byte-tree lock before inference.
 
 On the locked NVIDIA B200 environment, smoke (five-view primary case) measured
 VGGT pose AUC@30 0.910, Sim(3) camera RMSE 0.0365 m, scaled depth AbsRel 0.0090,
 corresponding-point RMSE 0.161 m, and true observed-surface F1 0.413 at 10 cm;
-DA3-BASE measured 0.817, 0.0649 m, 0.0276, 0.297 m, and 0.302. Full
+DA3-BASE measured 0.817, 0.0649 m, 0.0276, 0.297 m, and 0.297. Full
 (16-view primary case) measured 0.868/0.0848 m/0.0134/0.205 m/0.149 at 5 cm
-for VGGT and 0.712/0.160 m/0.0194/0.394 m/0.0835 for DA3-BASE. Both unseen
+for VGGT and 0.712/0.160 m/0.0194/0.394 m/0.0905 for DA3-BASE. Both unseen
 surface recalls were zero at the declared thresholds. Primary-case totals were
-2.56/1.72 s smoke and 7.43/4.14 s full for VGGT/DA3; all inference cases took
-11.44/5.82 s and 25.69/13.11 s, respectively. End-to-end runtime, including
+2.69/1.64 s smoke and 6.83/4.17 s full for VGGT/DA3; all inference cases took
+11.92/5.65 s and 27.49/13.17 s, respectively. End-to-end runtime, including
 source/environment hashing, scene generation, evaluation, sealing, and report
-creation, was 47.6 s smoke and 89.0 s full. Measured peak compute memory was
+creation, was 48.2 s smoke and 88.4 s full. Measured peak compute memory was
 12.25 GB and 14.04 GB. These are one controlled-scene reproduction's integrity
 baselines, not paper-table results or a general ranking. Exact source,
 checkpoint, licence, preprocessing, environment, and protocol evidence is recorded in

@@ -2,9 +2,13 @@
   "schema_version": 2,
   "environment": {
     "cache_path": "venv",
-    "tree_sha256": "65d28a33fc92aa93a3c6cb6923ddf8cbe3daef1ec25b20bcf1bd5844a008d86c",
-    "file_count": 40069,
-    "byte_size": 6810610151,
+    "build_lock": {
+      "path": "experiments/insula-scout/foundation-environment.lock.json",
+      "sha256": "4e2f2abc0ab1a620efbd45ff25786c710cb175cf05d7711e3b94423f42c917e3"
+    },
+    "tree_sha256": "26c304143a72f550022acf2bd13af3a63785140f2d7fa86adb662b30eaa88ad7",
+    "file_count": 40406,
+    "byte_size": 6811435428,
     "exclusions": ["__pycache__", "*.pyc"]
   },
   "models": {
@@ -14,6 +18,7 @@
       "source_repository": "facebookresearch/vggt",
       "source_commit": "a288dd0f14786c93483e45524328726ab7b1b4ce",
       "source_license": "VGGT-License-and-Acceptable-Use-Policy",
+      "nested_gitlinks": [],
       "source_archive": {
         "id": "vggt-source-a288dd0f",
         "url": "https://github.com/facebookresearch/vggt/archive/a288dd0f14786c93483e45524328726ab7b1b4ce.tar.gz",
@@ -77,8 +82,15 @@
       "source_repository": "ByteDance-Seed/Depth-Anything-3",
       "source_commit": "3d835ec1a5802d64a8b8b15f817a1ab54809bfe4",
       "source_license": "Apache-2.0",
-      "source_tree_sha256": "81d2a462f061af0ed2d8b889a0a1124fae1dde9410bcfb2df3bffb28fa07b4f5",
-      "source_tree_file_count": 133,
+      "nested_gitlinks": [
+        {
+          "path": "da3_streaming/loop_utils/salad",
+          "mode": "160000",
+          "commit": "6aede13a3f6c25750bf7fde10209c06cb73060bb"
+        }
+      ],
+      "source_tree_sha256": "9cb268d766a4808110a21c69ca7786d9a1b1b03ecb2e329cf252088d26c17b74",
+      "source_tree_file_count": 134,
       "source_tree_byte_size": 25008449,
       "cache_path": "huggingface/hub/models--depth-anything--DA3-BASE",
       "files": {

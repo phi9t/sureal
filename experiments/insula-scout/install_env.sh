@@ -11,70 +11,150 @@ cd /workspace/surflo
 CACHE="${SURFLO_INSULA_CACHE_ROOT:-/cache/surflo}"
 VENV="${CACHE}/venv"
 PYTHON="${VENV}/bin/python"
-if [[ ! -x "${PYTHON}" ]]; then
-    uv venv --python 3.10 --seed "${VENV}"
+LOCK="experiments/insula-scout/foundation-environment.lock.json"
+PYLOCK="experiments/insula-scout/pylock.foundation.toml"
+VERIFY_SCRIPT="experiments/insula-scout/verify_environment_lock.py"
+
+/usr/bin/python3 "${VERIFY_SCRIPT}" --emit-plan >/dev/null
+if [[ -x "${PYTHON}" ]] \
+    && /usr/bin/python3 "${VERIFY_SCRIPT}" --verify-environment "${VENV}" >/dev/null 2>&1; then
+    printf 'foundation environment already matches its byte lock: %s\n' "${VENV}"
+    exit 0
 fi
+
+readarray -t LOCK_VALUES < <(
+    /usr/bin/python3 - "${LOCK}" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+lock = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+python = lock["python"]
+print(python["url"])
+print(python["sha256"])
+print(python["byte_size"])
+print(python["install_path"])
+for name in ("fused-ssim", "geodel"):
+    source = lock["source_builds"][name]
+    print(source["repository"])
+    print(source["commit"])
+print(lock["source_builds"]["nvdiffrast"]["commit"])
+print(lock["source_builds"]["diff-gaussian-rasterization-surflo"]["tree"])
+PY
+)
+PYTHON_URL="${LOCK_VALUES[0]}"
+PYTHON_SHA256="${LOCK_VALUES[1]}"
+PYTHON_BYTE_SIZE="${LOCK_VALUES[2]}"
+PYTHON_ROOT="${CACHE}/${LOCK_VALUES[3]}"
+FUSED_SSIM_REPOSITORY="${LOCK_VALUES[4]}"
+FUSED_SSIM_COMMIT="${LOCK_VALUES[5]}"
+GEODEL_REPOSITORY="${LOCK_VALUES[6]}"
+GEODEL_COMMIT="${LOCK_VALUES[7]}"
+NVDIFFRAST_COMMIT="${LOCK_VALUES[8]}"
+RASTERIZER_TREE="${LOCK_VALUES[9]}"
+
+mkdir -p "$(dirname -- "${PYTHON_ROOT}")"
+if [[ ! -x "${PYTHON_ROOT}/bin/python3.10" ]]; then
+    PYTHON_ARCHIVE="$(mktemp "${CACHE}/python-archive.XXXXXX")"
+    PYTHON_STAGE="$(mktemp -d "${CACHE}/python-stage.XXXXXX")"
+    curl -fsSL --retry 3 --retry-delay 2 -o "${PYTHON_ARCHIVE}" "${PYTHON_URL}"
+    [[ "$(stat -c '%s' "${PYTHON_ARCHIVE}")" == "${PYTHON_BYTE_SIZE}" ]]
+    printf '%s  %s\n' "${PYTHON_SHA256}" "${PYTHON_ARCHIVE}" | sha256sum -c -
+    tar -xzf "${PYTHON_ARCHIVE}" -C "${PYTHON_STAGE}"
+    test -x "${PYTHON_STAGE}/python/bin/python3.10"
+    mv -- "${PYTHON_STAGE}/python" "${PYTHON_ROOT}"
+    rm -f -- "${PYTHON_ARCHIVE}"
+    rmdir -- "${PYTHON_STAGE}"
+fi
+
+BACKUP=""
+cleanup_environment() {
+    if [[ -n "${BACKUP}" && -d "${BACKUP}" && ! -e "${VENV}" ]]; then
+        mv -- "${BACKUP}" "${VENV}"
+    fi
+}
+trap cleanup_environment EXIT
+if [[ -e "${VENV}" ]]; then
+    BACKUP="$(mktemp -d "${CACHE}/venv.previous.XXXXXX")"
+    rmdir -- "${BACKUP}"
+    mv -- "${VENV}" "${BACKUP}"
+fi
+uv venv --python "${PYTHON_ROOT}/bin/python3.10" "${VENV}"
 export PATH="${VENV}/bin:${PATH}"
 export HF_HOME="${CACHE}/huggingface"
 export TORCH_EXTENSIONS_DIR="${CACHE}/torch-extensions"
 export TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST:-10.0}"
 export MAX_JOBS="${MAX_JOBS:-8}"
 
-# Surflo's released environments stop at torch 2.4 / CUDA 12.4, which cannot
-# target B200 (sm_100).  This scout deliberately uses the current cu130 stack.
-uv pip install --python "${PYTHON}" \
-    torch==2.9.1 torchvision==0.24.1 \
-    --index-url https://download.pytorch.org/whl/cu130
+uv pip sync --python "${PYTHON}" --link-mode copy "${PYLOCK}"
+uv pip install --python "${PYTHON}" --no-deps --no-build-isolation \
+    -e '.[train,demo,texture]'
 
-uv pip install --python "${PYTHON}" \
-    'numpy>=1.26,<2' \
-    'einops>=0.8.2,<0.9' \
-    'flow-matching>=1.0.10,<2' \
-    'huggingface-hub>=0.24,<2' \
-    'hydra-core>=1.3.2,<1.4' \
-    'omegaconf>=2.3.0,<2.4' \
-    'pillow>=10,<13' \
-    'safetensors>=0.4,<1' \
-    'scipy>=1.15.3,<2' \
-    'torch-geometric>=2.7,<2.8' \
-    'tqdm>=4.67.3,<5' \
-    'trimesh>=4.11.3,<5' \
-    'ema-pytorch>=0.7.9,<0.9' \
-    'fvcore>=0.1.5,<0.2' \
-    'iopath>=0.1.9,<0.2' \
-    'wandb>=0.16,<1' \
-    'gradio>=4,<7' \
-    'plotly>=5,<7' \
-    'xatlas>=0.0.9,<0.1' \
-    addict ninja setuptools wheel
+SOURCE_ROOT="${CACHE}/build-sources"
+mkdir -p "${SOURCE_ROOT}"
+fetch_locked_git() {
+    local name="$1" repository="$2" commit="$3" destination stage
+    destination="${SOURCE_ROOT}/${name}-${commit}"
+    if [[ -d "${destination}/.git" ]] \
+        && [[ "$(git -C "${destination}" rev-parse HEAD)" == "${commit}" ]] \
+        && [[ -z "$(git -C "${destination}" status --porcelain=v1 --untracked-files=all)" ]]; then
+        printf '%s\n' "${destination}"
+        return 0
+    fi
+    if [[ -e "${destination}" ]]; then
+        rm -rf -- "${destination}"
+    fi
+    stage="$(mktemp -d "${SOURCE_ROOT}/.${name}.XXXXXX")"
+    git -C "${stage}" init -q || return 1
+    git -C "${stage}" remote add origin "${repository}" || return 1
+    git -C "${stage}" fetch -q --depth 1 origin "${commit}" || return 1
+    git -C "${stage}" checkout -q --detach FETCH_HEAD || return 1
+    git -C "${stage}" submodule update -q --init --recursive || return 1
+    [[ "$(git -C "${stage}" rev-parse HEAD)" == "${commit}" ]] || return 1
+    mv -- "${stage}" "${destination}" || return 1
+    printf '%s\n' "${destination}"
+}
 
-uv pip install --python "${PYTHON}" torch-cluster==1.6.3 \
-    --find-links https://data.pyg.org/whl/torch-2.9.0+cu130.html
-
-# The project metadata intentionally pins the authors' tested torch range.
-# Install the checkout without resolving that constraint, since torch and all
-# CUDA-agnostic dependencies were selected explicitly above.
-uv pip install --python "${PYTHON}" --no-deps -e '.[train,demo,texture]'
-
+FUSED_SSIM_SOURCE="$(fetch_locked_git fused-ssim "${FUSED_SSIM_REPOSITORY}" "${FUSED_SSIM_COMMIT}")"
+GEODEL_SOURCE="$(fetch_locked_git geodel "${GEODEL_REPOSITORY}" "${GEODEL_COMMIT}")"
+RASTERIZER_BUILD_SOURCE="${SOURCE_ROOT}/diff-gaussian-rasterization-surflo-${RASTERIZER_TREE}"
+if [[ -e "${RASTERIZER_BUILD_SOURCE}" ]]; then
+    rm -rf -- "${RASTERIZER_BUILD_SOURCE}"
+fi
+mkdir -p "${RASTERIZER_BUILD_SOURCE}"
+git --git-dir="${SURFLO_GIT_DIR}" --work-tree="${SURFLO_GIT_WORK_TREE}" \
+    archive "${RASTERIZER_TREE}" | tar -x -C "${RASTERIZER_BUILD_SOURCE}"
+export SURFLO_LOCKED_ENV=1
+export RASTERIZER_DIR_OVERRIDE="${RASTERIZER_BUILD_SOURCE}"
+export FUSED_SSIM_DIR_OVERRIDE="${FUSED_SSIM_SOURCE}"
+export GEODEL_DIR_OVERRIDE="${GEODEL_SOURCE}"
+export PIP_NO_INDEX=1
 bash install/build_extensions.sh --with-da3
 
 # nvdiffrast's legacy setup.py writes build/ and *.egg-info into its source
 # tree even for a non-editable install. Build it from a disposable copy so an
 # Insula build never dirties the checked-out submodule.
-NVDIFFRAST_BUILD_ROOT="$(mktemp -d "${CACHE}/nvdiffrast-build.XXXXXX")"
-trap 'rm -rf -- "${NVDIFFRAST_BUILD_ROOT}"' EXIT
-NVDIFFRAST_BUILD_SOURCE="${NVDIFFRAST_BUILD_ROOT}/nvdiffrast"
+NVDIFFRAST_BUILD_SOURCE="${SOURCE_ROOT}/nvdiffrast-${NVDIFFRAST_COMMIT}"
+if [[ -e "${NVDIFFRAST_BUILD_SOURCE}" ]]; then
+    rm -rf -- "${NVDIFFRAST_BUILD_SOURCE}"
+fi
 mkdir -p "${NVDIFFRAST_BUILD_SOURCE}"
 cp -a submodules/nvdiffrast/. "${NVDIFFRAST_BUILD_SOURCE}"
 uv pip install --python "${PYTHON}" --no-build-isolation --no-deps \
     "${NVDIFFRAST_BUILD_SOURCE}"
-rm -rf -- "${NVDIFFRAST_BUILD_ROOT}"
-trap - EXIT
-
-# DA3 uses addict without declaring it.  Its unconstrained xformers dependency
-# resolves to a cu128 wheel on this stack; the DA3-LARGE models use the MLP
-# fallback and were verified without xformers, so remove the incompatible wheel.
-uv pip install --python "${PYTHON}" addict
-uv pip uninstall --python "${PYTHON}" xformers || true
 
 python install/verify_install.py --check-isolation
+/usr/bin/python3 experiments/insula-scout/normalize_environment.py "${VENV}"
+
+if [[ -n "${SURFLO_ENVIRONMENT_MANIFEST_OUT:-}" ]]; then
+    /usr/bin/python3 "${VERIFY_SCRIPT}" --write-manifest "${SURFLO_ENVIRONMENT_MANIFEST_OUT}" \
+        --environment-root "${VENV}"
+else
+    /usr/bin/python3 "${VERIFY_SCRIPT}" --verify-environment "${VENV}"
+fi
+
+if [[ -n "${BACKUP}" && -d "${BACKUP}" ]]; then
+    rm -rf -- "${BACKUP}"
+fi
+BACKUP=""
+trap - EXIT

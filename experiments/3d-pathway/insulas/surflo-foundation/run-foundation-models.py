@@ -50,8 +50,8 @@ def _unproject_depth(depth, intrinsics, extrinsics):
     extrinsics = np.asarray(extrinsics, dtype=np.float32)
     height, width = depth.shape[-2:]
     rows, columns = np.meshgrid(
-        np.arange(height, dtype=np.float32) + 0.5,
-        np.arange(width, dtype=np.float32) + 0.5,
+        np.arange(height, dtype=np.float32),
+        np.arange(width, dtype=np.float32),
         indexing="ij",
     )
     result = []
@@ -72,6 +72,46 @@ def _unproject_depth(depth, intrinsics, extrinsics):
         translation = extrinsics[index, :3, 3]
         result.append((camera - translation) @ rotation)
     return np.asarray(result, dtype=np.float32)
+
+
+def _upstream_unprojection_parity() -> dict[str, dict[str, float | str]]:
+    """Execute both pinned upstream helpers against the canonical integer lattice."""
+    import numpy as np
+    import torch
+
+    from depth_anything_3.utils.geometry import unproject_depth as da3_unproject_depth
+    from vggt.utils.geometry import unproject_depth_map_to_point_map
+
+    depth = np.full((1, 2, 3), 2.0, dtype=np.float32)
+    intrinsics = np.asarray(
+        [[[2.0, 0.0, 0.25], [0.0, 4.0, -0.5], [0.0, 0.0, 1.0]]],
+        dtype=np.float32,
+    )
+    extrinsics = np.eye(4, dtype=np.float32)[None]
+    extrinsics[0, :3, 3] = np.asarray([0.3, -0.2, 0.4], dtype=np.float32)
+    canonical = _unproject_depth(depth, intrinsics, extrinsics)
+    vggt = unproject_depth_map_to_point_map(
+        depth[..., None], extrinsics[:, :3], intrinsics
+    )
+    c2w = np.linalg.inv(extrinsics)
+    da3 = da3_unproject_depth(
+        torch.from_numpy(depth[None, ..., None]),
+        torch.from_numpy(intrinsics[None]),
+        torch.from_numpy(c2w[None]),
+    )[0].cpu().numpy()
+    origin = "integer pixel centers (0,0) through (W-1,H-1)"
+    return {
+        VGGT_METHOD: {
+            "helper": "vggt.utils.geometry.unproject_depth_map_to_point_map",
+            "pixel_coordinate_origin": origin,
+            "max_abs_error": float(np.max(np.abs(canonical - vggt))),
+        },
+        DA3_METHOD: {
+            "helper": "depth_anything_3.utils.geometry.unproject_depth",
+            "pixel_coordinate_origin": origin,
+            "max_abs_error": float(np.max(np.abs(canonical - da3))),
+        },
+    }
 
 
 def _validity(depth, points, confidence) -> dict[str, Any]:
@@ -125,6 +165,52 @@ def _input_contract(
     }
 
 
+def _track_contract(
+    case: dict[str, Any],
+    processed_size,
+    queries,
+    tracks,
+    visibility,
+    confidence,
+) -> dict[str, Any]:
+    arrays = {
+        "track_queries": (queries, "reference-frame query xy coordinates"),
+        "tracks": (tracks, "predicted xy coordinates for every frame and query"),
+        "track_visibility": (visibility, "per-frame visibility scores"),
+        "track_confidence": (confidence, "per-frame track confidence scores"),
+    }
+    return {
+        "status": "measured",
+        "query_frame": {"index": 0, "frame_id": case["frame_ids"][0]},
+        "coordinate_convention": {
+            "order": "xy",
+            "space": "processed input image pixels",
+            "origin": "(0,0) is the center of the upper-left pixel",
+            "pixel_center_lattice": "integer centers 0..W-1 and 0..H-1",
+        },
+        "resolution_hw": [int(processed_size[0]), int(processed_size[1])],
+        "arrays": {
+            name: {
+                "archive_member": name,
+                "shape": list(value.shape),
+                "dtype": str(value.dtype),
+                "semantics": semantics,
+            }
+            for name, (value, semantics) in arrays.items()
+        },
+        "visibility": {
+            "domain": "sigmoid score in [0,1]",
+            "threshold": None,
+            "semantics": "model estimate that the query is visible in each frame",
+        },
+        "confidence": {
+            "domain": "sigmoid score in [0,1]",
+            "threshold": None,
+            "semantics": "model confidence in each predicted track coordinate",
+        },
+    }
+
+
 def _canonical_extrinsics(extrinsics):
     import numpy as np
 
@@ -149,8 +235,8 @@ def _geometry_checks(depth, points, extrinsics, intrinsics) -> dict[str, float]:
         raise ValueError("depth and pointmap shapes disagree")
     height, width = depth.shape[-2:]
     rows, columns = np.meshgrid(
-        np.arange(height, dtype=np.float64) + 0.5,
-        np.arange(width, dtype=np.float64) + 0.5,
+        np.arange(height, dtype=np.float64),
+        np.arange(width, dtype=np.float64),
         indexing="ij",
     )
     maximum_pixel_error = 0.0
@@ -183,8 +269,8 @@ def _direct_point_checks(points, extrinsics, intrinsics) -> dict[str, float | in
     intrinsics = np.asarray(intrinsics, dtype=np.float64)
     height, width = points.shape[1:3]
     rows, columns = np.meshgrid(
-        np.arange(height, dtype=np.float64) + 0.5,
-        np.arange(width, dtype=np.float64) + 0.5,
+        np.arange(height, dtype=np.float64),
+        np.arange(width, dtype=np.float64),
         indexing="ij",
     )
     errors = []
@@ -300,9 +386,17 @@ def _vggt_cases(manifest: dict[str, Any], input_root: Path, output_root: Path, m
             "camera_convention": "OpenCV world-to-camera",
             "depth_semantics": "camera-z relative scale",
             "canonical_pointmap": "depth unprojection",
-            "pixel_coordinate_origin": "half-integer pixel centers",
+            "pixel_coordinate_origin": "integer pixel centers (0,0) through (W-1,H-1)",
             "direct_pointmap_present": True,
             "tracks_present": True,
+            "tracks": _track_contract(
+                case,
+                [height, width],
+                queries.float().cpu().numpy().astype(np.float32),
+                tracks.astype(np.float32),
+                visibility.astype(np.float32),
+                track_confidence.astype(np.float32),
+            ),
             "confidence": {
                 "raw_head": "depth_conf",
                 "shape": list(confidence.shape),
@@ -418,9 +512,10 @@ def _da3_cases(manifest: dict[str, Any], input_root: Path, output_root: Path, mo
             "camera_convention": "OpenCV world-to-camera",
             "depth_semantics": "camera-z relative scale",
             "canonical_pointmap": "depth unprojection",
-            "pixel_coordinate_origin": "half-integer pixel centers",
+            "pixel_coordinate_origin": "integer pixel centers (0,0) through (W-1,H-1)",
             "direct_pointmap_present": False,
             "tracks_present": False,
+            "tracks": {"status": "unsupported"},
             "confidence": {
                 "raw_head": "prediction.conf",
                 "shape": list(confidence.shape),
@@ -498,6 +593,7 @@ def main() -> int:
     torch.backends.cudnn.benchmark = False
     torch.backends.cuda.matmul.allow_tf32 = False
     total_started = time.perf_counter()
+    upstream_unprojection_parity = _upstream_unprojection_parity()
     vggt_cases, vggt_load, vggt_peak = _vggt_cases(
         manifest, args.input, args.output, args.vggt_model
     )
@@ -514,12 +610,16 @@ def main() -> int:
             "commit": lock["models"]["vggt"]["source_commit"],
             "license": lock["models"]["vggt"]["source_license"],
             "tree_sha256": lock["models"]["vggt"]["source_archive"]["tree_sha256"],
+            "nested_gitlinks": lock["models"]["vggt"]["nested_gitlinks"],
         },
         DA3_METHOD: {
             "repository": lock["models"]["depth-anything-3"]["source_repository"],
             "commit": lock["models"]["depth-anything-3"]["source_commit"],
             "license": lock["models"]["depth-anything-3"]["source_license"],
             "tree_sha256": lock["models"]["depth-anything-3"]["source_tree_sha256"],
+            "nested_gitlinks": lock["models"]["depth-anything-3"][
+                "nested_gitlinks"
+            ],
         },
     }
     result = {
@@ -531,6 +631,9 @@ def main() -> int:
                 "source": source_contracts[VGGT_METHOD],
                 "checkpoint": _checkpoint_contract(lock["models"]["vggt"]),
                 "checkpoint_path": str(args.vggt_model),
+                "upstream_unprojection_parity": upstream_unprojection_parity[
+                    VGGT_METHOD
+                ],
                 "load_seconds": vggt_load,
                 "peak_gpu_memory_bytes": vggt_peak,
                 "cases": vggt_cases,
@@ -542,6 +645,9 @@ def main() -> int:
                     lock["models"]["depth-anything-3"]
                 ),
                 "checkpoint_path": str(args.da3_model),
+                "upstream_unprojection_parity": upstream_unprojection_parity[
+                    DA3_METHOD
+                ],
                 "load_seconds": da3_load,
                 "peak_gpu_memory_bytes": da3_peak,
                 "cases": da3_cases,
@@ -569,6 +675,7 @@ def main() -> int:
             "total_seconds": time.perf_counter() - total_started,
         },
         "environment": {
+            "build_lock": environment_lock["build_lock"],
             "tree_sha256": environment_manifest["tree_sha256"],
             "file_count": environment_manifest["file_count"],
             "byte_size": environment_manifest["byte_size"],

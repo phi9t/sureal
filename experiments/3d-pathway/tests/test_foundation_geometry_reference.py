@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import json
 import hashlib
+import importlib.util
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -157,9 +158,60 @@ def fake_foundation_engine(path: Path) -> Path:
                         "camera_convention": "OpenCV world-to-camera",
                         "depth_semantics": "camera-z relative scale",
                         "canonical_pointmap": "depth unprojection",
-                        "pixel_coordinate_origin": "half-integer pixel centers",
+                        "pixel_coordinate_origin": "integer pixel centers (0,0) through (W-1,H-1)",
                         "direct_pointmap_present": direct,
                         "tracks_present": direct,
+                        "tracks": (
+                            {{
+                                "status": "measured",
+                                "query_frame": {{"index": 0, "frame_id": case["frame_ids"][0]}},
+                                "coordinate_convention": {{
+                                    "order": "xy",
+                                    "space": "processed input image pixels",
+                                    "origin": "(0,0) is the center of the upper-left pixel",
+                                    "pixel_center_lattice": "integer centers 0..W-1 and 0..H-1",
+                                }},
+                                "resolution_hw": [height, width],
+                                "arrays": {{
+                                    "track_queries": {{
+                                        "archive_member": "track_queries",
+                                        "shape": [16, 2],
+                                        "dtype": "float32",
+                                        "semantics": "reference-frame query xy coordinates",
+                                    }},
+                                    "tracks": {{
+                                        "archive_member": "tracks",
+                                        "shape": [len(depths), 16, 2],
+                                        "dtype": "float32",
+                                        "semantics": "predicted xy coordinates for every frame and query",
+                                    }},
+                                    "track_visibility": {{
+                                        "archive_member": "track_visibility",
+                                        "shape": [len(depths), 16],
+                                        "dtype": "float32",
+                                        "semantics": "per-frame visibility scores",
+                                    }},
+                                    "track_confidence": {{
+                                        "archive_member": "track_confidence",
+                                        "shape": [len(depths), 16],
+                                        "dtype": "float32",
+                                        "semantics": "per-frame track confidence scores",
+                                    }},
+                                }},
+                                "visibility": {{
+                                    "domain": "sigmoid score in [0,1]",
+                                    "threshold": None,
+                                    "semantics": "model estimate that the query is visible in each frame",
+                                }},
+                                "confidence": {{
+                                    "domain": "sigmoid score in [0,1]",
+                                    "threshold": None,
+                                    "semantics": "model confidence in each predicted track coordinate",
+                                }},
+                            }}
+                            if direct
+                            else {{"status": "unsupported"}}
+                        ),
                         "confidence": {{
                             "raw_head": "fixture_confidence",
                             "shape": list(depths.shape),
@@ -207,6 +259,7 @@ def fake_foundation_engine(path: Path) -> Path:
                         "commit": model_lock["source_commit"],
                         "license": model_lock["source_license"],
                         "tree_sha256": source_tree,
+                        "nested_gitlinks": model_lock["nested_gitlinks"],
                     }},
                     "checkpoint": {{
                         "repository": model_lock["repository"],
@@ -215,6 +268,15 @@ def fake_foundation_engine(path: Path) -> Path:
                         "files": model_lock["files"],
                     }},
                     "checkpoint_path": "/locked/model",
+                    "upstream_unprojection_parity": {{
+                        "helper": (
+                            "vggt.utils.geometry.unproject_depth_map_to_point_map"
+                            if direct
+                            else "depth_anything_3.utils.geometry.unproject_depth"
+                        ),
+                        "pixel_coordinate_origin": "integer pixel centers (0,0) through (W-1,H-1)",
+                        "max_abs_error": 0.0,
+                    }},
                     "load_seconds": 0.01,
                     "peak_gpu_memory_bytes": 123456,
                     "cases": cases,
@@ -230,6 +292,7 @@ def fake_foundation_engine(path: Path) -> Path:
                     "dtype": "bfloat16", "total_seconds": 0.1,
                 }},
                 "environment": {{
+                    "build_lock": lock["environment"]["build_lock"],
                     "tree_sha256": environment["tree_sha256"],
                     "file_count": environment["file_count"],
                     "byte_size": environment["byte_size"],
@@ -316,6 +379,34 @@ def run_fake_foundation_reference(root: Path, run_id: str = "foundation-smoke") 
 
 
 class FoundationGeometryReferenceContractTest(unittest.TestCase):
+    def test_canonical_unprojection_matches_upstream_integer_pixel_lattice(self) -> None:
+        script = ROOT / "insulas/surflo-foundation/run-foundation-models.py"
+        spec = importlib.util.spec_from_file_location("foundation_models_runner", script)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        depth = np.full((1, 2, 3), 2.0, dtype=np.float32)
+        intrinsics = np.array(
+            [[[2.0, 0.0, 0.0], [0.0, 4.0, 0.0], [0.0, 0.0, 1.0]]],
+            dtype=np.float32,
+        )
+        extrinsics = np.eye(4, dtype=np.float32)[None]
+
+        points = module._unproject_depth(depth, intrinsics, extrinsics)
+
+        expected = np.array(
+            [
+                [
+                    [[0.0, 0.0, 2.0], [1.0, 0.0, 2.0], [2.0, 0.0, 2.0]],
+                    [[0.0, 0.5, 2.0], [1.0, 0.5, 2.0], [2.0, 0.5, 2.0]],
+                ]
+            ],
+            dtype=np.float32,
+        )
+        np.testing.assert_allclose(points, expected, atol=0.0, rtol=0.0)
+
     @unittest.skipUnless(
         os.environ.get("SURFLO_REQUIRE_FOUNDATION_GEOMETRY_REFERENCE") == "1",
         "set SURFLO_REQUIRE_FOUNDATION_GEOMETRY_REFERENCE=1 for the real B200 smoke gate",
@@ -433,6 +524,24 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
                 )
                 self.assertIn("case_total_seconds", method["runtime"])
                 self.assertIn("network_seconds", method["runtime"])
+            vggt_tracks = result["metrics"]["methods"]["vggt/direct"][
+                "primary_case"
+            ]["tracks"]
+            self.assertEqual(vggt_tracks["status"], "measured")
+            self.assertEqual(vggt_tracks["query_frame"]["index"], 0)
+            self.assertEqual(
+                vggt_tracks["query_frame"]["frame_id"],
+                "context-000",
+            )
+            self.assertEqual(vggt_tracks["resolution_hw"], [64, 84])
+            self.assertEqual(vggt_tracks["arrays"]["track_queries"]["shape"], [16, 2])
+            self.assertEqual(
+                vggt_tracks["arrays"]["tracks"]["shape"], [5, 16, 2]
+            )
+            self.assertEqual(
+                vggt_tracks["visibility"]["domain"], "sigmoid score in [0,1]"
+            )
+            self.assertEqual(vggt_tracks["visibility"]["threshold"], None)
             sweep = result["metrics"]["failure_sweep"]
             self.assertEqual(sweep["views-1-monocular"]["sweep"]["view_count"], 1)
             self.assertEqual(sweep["views-5-permuted"]["sweep"]["order"], "permuted")
@@ -447,14 +556,32 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
             inference = json.loads(
                 (run_dir / "output/inference-manifest.json").read_text()
             )
-            for method in inference["methods"].values():
+            for method_id, method in inference["methods"].items():
                 self.assertEqual(
                     set(method["source"]),
-                    {"repository", "commit", "license", "tree_sha256"},
+                    {
+                        "repository",
+                        "commit",
+                        "license",
+                        "tree_sha256",
+                        "nested_gitlinks",
+                    },
                 )
                 self.assertEqual(
                     set(method["checkpoint"]),
                     {"repository", "revision", "license", "files"},
+                )
+                parity = method["upstream_unprojection_parity"]
+                self.assertEqual(
+                    parity["pixel_coordinate_origin"],
+                    "integer pixel centers (0,0) through (W-1,H-1)",
+                )
+                self.assertLessEqual(parity["max_abs_error"], 1e-6)
+                self.assertIn(
+                    "vggt.utils.geometry"
+                    if method_id == "vggt/direct"
+                    else "depth_anything_3.utils.geometry",
+                    parity["helper"],
                 )
                 for case in method["cases"].values():
                     self.assertIn("ordered_image_sha256", case["inputs"])
@@ -462,7 +589,24 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
                     self.assertIn("finite_points", case["validity"])
                     self.assertEqual(case["gauge"]["alignment_applied"], "none")
                     self.assertIn("total", case["runtime_seconds"])
+                    if method_id == "vggt/direct":
+                        self.assertEqual(case["tracks"]["query_frame"]["index"], 0)
+                        self.assertEqual(
+                            case["tracks"]["coordinate_convention"]["order"], "xy"
+                        )
+                        self.assertEqual(
+                            case["tracks"]["arrays"]["track_confidence"]["shape"],
+                            [len(case["frame_ids"]), 16],
+                        )
+                    else:
+                        self.assertEqual(case["tracks"], {"status": "unsupported"})
             self.assertIn("tree_sha256", inference["environment"])
+            self.assertEqual(
+                inference["environment"]["build_lock"],
+                json.loads((ROOT / "foundation-models.lock.json").read_text())[
+                    "environment"
+                ]["build_lock"],
+            )
             self.assertIn("distributions", inference["environment"])
             self.assertIn("native_binaries", inference["environment"])
 
@@ -617,7 +761,18 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
             "df4e7de1184bcb28ad6b4a83ead828f34ba42fb18be03c034801ffeb3a058f91",
         )
         self.assertNotIn("vendored_source_files", models["vggt"])
+        self.assertEqual(models["vggt"]["nested_gitlinks"], [])
         self.assertEqual(models["depth-anything-3"]["source_commit"], DA3_SOURCE_COMMIT)
+        self.assertEqual(
+            models["depth-anything-3"]["nested_gitlinks"],
+            [
+                {
+                    "path": "da3_streaming/loop_utils/salad",
+                    "mode": "160000",
+                    "commit": "6aede13a3f6c25750bf7fde10209c06cb73060bb",
+                }
+            ],
+        )
         self.assertEqual(models["depth-anything-3"]["revision"], DA3_REVISION)
         self.assertEqual(
             models["depth-anything-3"]["files"]["model.safetensors"]["sha256"],
@@ -625,6 +780,13 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
         )
         self.assertEqual(models["depth-anything-3"]["license"], "Apache-2.0")
         self.assertRegex(lock["environment"]["tree_sha256"], r"^[0-9a-f]{64}$")
+        self.assertEqual(
+            lock["environment"]["build_lock"],
+            {
+                "path": "experiments/insula-scout/foundation-environment.lock.json",
+                "sha256": "4e2f2abc0ab1a620efbd45ff25786c710cb175cf05d7711e3b94423f42c917e3",
+            },
+        )
 
     def test_dirty_source_checkout_is_rejected_before_execution(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
@@ -654,6 +816,77 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
             source.write_text("VALUE = 2\n", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "dirty"):
                 _tracked_source_manifest(checkout)
+
+    def test_tracked_source_manifest_includes_nested_gitlink_commit(self) -> None:
+        sys.path.insert(0, str(ROOT / "pipeline"))
+        from foundation_geometry_reference_runner import _tracked_source_manifest
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            dependency = root / "dependency"
+            dependency.mkdir()
+            subprocess.run(["git", "init", "-q"], cwd=dependency, check=True)
+            (dependency / "nested.py").write_text("VALUE = 7\n", encoding="utf-8")
+            subprocess.run(["git", "add", "nested.py"], cwd=dependency, check=True)
+            subprocess.run(
+                [
+                    "git",
+                    "-c",
+                    "user.name=fixture",
+                    "-c",
+                    "user.email=fixture@example.invalid",
+                    "commit",
+                    "-qm",
+                    "nested",
+                ],
+                cwd=dependency,
+                check=True,
+            )
+            nested_commit = subprocess.run(
+                ["git", "rev-parse", "HEAD"],
+                cwd=dependency,
+                text=True,
+                capture_output=True,
+                check=True,
+            ).stdout.strip()
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            (root / "source.py").write_text("VALUE = 1\n", encoding="utf-8")
+            subprocess.run(
+                [
+                    "git",
+                    "-c",
+                    "advice.addEmbeddedRepo=false",
+                    "add",
+                    "source.py",
+                    "dependency",
+                ],
+                cwd=root,
+                check=True,
+                capture_output=True,
+            )
+            subprocess.run(
+                [
+                    "git",
+                    "-c",
+                    "user.name=fixture",
+                    "-c",
+                    "user.email=fixture@example.invalid",
+                    "commit",
+                    "-qm",
+                    "root",
+                ],
+                cwd=root,
+                check=True,
+            )
+
+            manifest = _tracked_source_manifest(root)
+
+        self.assertEqual(manifest["file_count"], 2)
+        self.assertEqual(
+            manifest["gitlinks"],
+            [{"path": "dependency", "mode": "160000", "commit": nested_commit}],
+        )
+        self.assertIn(manifest["gitlinks"][0], manifest["files"])
 
     def test_similarity_alignment_recovers_scale_rotation_and_translation(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
