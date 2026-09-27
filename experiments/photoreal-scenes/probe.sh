@@ -38,7 +38,7 @@ done
 EPISODE="/cache/surflo/photoreal-scenes/episodes/${RUN_ID}"
 OUTPUT="/cache/surflo/photoreal-scenes/results/${RUN_ID}"
 if [[ "${EMIT_PLAN}" == 1 ]]; then
-    printf '{"schema_version":1,"run_id":"%s","fetch_checkpoint":%s,"publisher_network_mode":"offline","surflo_network_mode":"%s","episode":"%s","output":"%s","seeds":[0,1,2,3],"num_query_points":100000,"num_steps":100,"overwrite":%s,"update_tracked_results":%s}\n' \
+    printf '{"schema_version":1,"run_id":"%s","fetch_checkpoint":%s,"publisher_network_mode":"offline","surflo_network_mode":"%s","episode":"%s","output":"%s","inference_mode":"plain","seeds":[0,1,2,3],"num_query_points":100000,"num_steps":100,"overwrite":%s,"update_tracked_results":%s}\n' \
         "${RUN_ID}" "$([[ "${FETCH_ONLY}" == 1 ]] && printf true || printf false)" \
         "$([[ "${FETCH_ONLY}" == 1 ]] && printf networked || printf offline)" \
         "${EPISODE}" "${OUTPUT}" \

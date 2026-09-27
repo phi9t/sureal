@@ -90,6 +90,7 @@ class RenderDriverTest(unittest.TestCase):
         )
         self.assertEqual(plan["seeds"], [0, 1, 2, 3])
         self.assertEqual(plan["num_query_points"], 100_000)
+        self.assertEqual(plan["inference_mode"], "plain")
         self.assertEqual(plan["num_steps"], 100)
         self.assertFalse(plan["overwrite"])
         self.assertFalse(plan["update_tracked_results"])

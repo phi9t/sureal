@@ -37,7 +37,7 @@
       "run.sh",
       "verify_recipe.py"
     ],
-    "implementation_sha256": "521888171ecd8ebed9118d7252fe0feaf5e46fa57fa00c95d615704d1b4a9647"
+    "implementation_sha256": "6fc3d0fecdea2d0e46fa9981f19c4669220ed2184dc77afb6b055fe45c6b4a77"
   },
   "executor": "run.sh",
   "renderer_insula": {
@@ -70,6 +70,7 @@
   },
   "probe": {
     "model_lock": "model.lock.json",
+    "inference_mode": "plain",
     "seeds": [0, 1, 2, 3],
     "num_query_points": 100000,
     "num_steps": 100

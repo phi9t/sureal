@@ -61,6 +61,8 @@ def build_summary(
     settings = _mapping(raw, "settings")
     if settings.get("seeds") != [0, 1, 2, 3]:
         raise ValueError("probe must contain seeds 0,1,2,3")
+    if settings.get("inference_mode") != "plain":
+        raise ValueError("probe must record plain inference mode")
     if settings.get("num_query_points") != 100_000 or settings.get("num_steps") != 100:
         raise ValueError("probe must use 100000 queries and 100 ODE steps")
     raw_runs = raw.get("runs")
@@ -109,6 +111,7 @@ def build_summary(
         },
         "source": source,
         "settings": {
+            "inference_mode": settings["inference_mode"],
             "seeds": settings["seeds"],
             "num_query_points": settings["num_query_points"],
             "num_steps": settings["num_steps"],

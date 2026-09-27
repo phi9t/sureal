@@ -139,6 +139,7 @@ class PhotorealRecipeTest(unittest.TestCase):
                             "worktree_state": "uncommitted_overlay",
                         },
                         "settings": {
+                            "inference_mode": "plain",
                             "seeds": [0, 1, 2, 3],
                             "num_query_points": 100000,
                             "num_steps": 100,
@@ -280,6 +281,7 @@ class PhotorealRecipeTest(unittest.TestCase):
                 recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
                 tracked_fixture = json.loads((root / "results.json").read_text(encoding="utf-8"))
                 raw = {
+                    "settings": {"inference_mode": "plain"},
                     "checkpoint": {
                         "sha256": tracked_fixture["model_provenance"]["checkpoint_sha256"]
                     },
@@ -341,6 +343,7 @@ class PhotorealRecipeTest(unittest.TestCase):
             [stage["id"] for stage in payload["stages"]],
             ["build", "fetch", "render", "validate", "probe"],
         )
+        self.assertEqual(payload["probe"]["inference_mode"], "plain")
         self.assertEqual(payload["probe"]["seeds"], [0, 1, 2, 3])
         self.assertEqual(payload["probe"]["num_query_points"], 100_000)
         self.assertEqual(payload["probe"]["num_steps"], 100)

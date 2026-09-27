@@ -321,6 +321,7 @@ def run_probe(
         "checkpoint": {"path": str(checkpoint), "sha256": _sha256(checkpoint)},
         "vggt": vggt_provenance,
         "settings": {
+            "inference_mode": "plain",
             "seeds": [int(seed) for seed in seeds],
             "num_query_points": num_query_points,
             "num_steps": num_steps,

@@ -79,7 +79,11 @@ def validate_recipe(
     probe = _mapping(recipe, "probe")
     if probe.get("seeds") != [0, 1, 2, 3]:
         raise RecipeError("probe seeds must be 0,1,2,3")
-    if probe.get("num_query_points") != 100_000 or probe.get("num_steps") != 100:
+    if (
+        probe.get("inference_mode") != "plain"
+        or probe.get("num_query_points") != 100_000
+        or probe.get("num_steps") != 100
+    ):
         raise RecipeError("probe must use 100000 queries and 100 ODE steps")
     model_lock_reference = probe.get("model_lock")
     if not isinstance(model_lock_reference, str):
@@ -138,7 +142,8 @@ def validate_recipe(
             raise RecipeError("tracked pass results must use benchmark OPTIX schema-v2 evidence")
         tracked_settings = _mapping(tracked, "settings")
         if (
-            tracked_settings.get("seeds") != probe["seeds"]
+            tracked_settings.get("inference_mode") != probe["inference_mode"]
+            or tracked_settings.get("seeds") != probe["seeds"]
             or tracked_settings.get("num_query_points") != probe["num_query_points"]
             or tracked_settings.get("num_steps") != probe["num_steps"]
         ):
@@ -211,6 +216,8 @@ def validate_recipe(
             raise RecipeError("cached validation report does not match tracked evidence")
     if probe_present:
         raw = json.loads(raw_probe.read_text(encoding="utf-8"))
+        if _mapping(raw, "settings").get("inference_mode") != probe["inference_mode"]:
+            raise RecipeError("raw probe inference mode does not match recipe")
         if _mapping(raw, "checkpoint").get("sha256") != checkpoint_hash:
             raise RecipeError("checkpoint pin does not match raw probe evidence")
         if raw.get("vggt") != expected_vggt:
@@ -226,6 +233,7 @@ def validate_recipe(
         "source": source_provenance,
         "stages": [{"id": stage["id"], "network_mode": stage["network_mode"]} for stage in stages],
         "probe": {
+            "inference_mode": probe["inference_mode"],
             "seeds": probe["seeds"],
             "num_query_points": probe["num_query_points"],
             "num_steps": probe["num_steps"],
