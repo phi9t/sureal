@@ -5,8 +5,11 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 import re
+import shutil
+import subprocess
 from typing import Any, Iterable
 
 
@@ -16,7 +19,7 @@ INPUT_FILES = (
     "shared-scene.json", "sources.json", "terminology.json",
 )
 IMPLEMENTATION_FILES = (
-    "pipeline/cli.py", "pipeline/contracts.py", "pipeline/dynamic.py", "pipeline/generative.py",
+    "pipeline/cli.py", "pipeline/contracts.py", "pipeline/controlled_suite.py", "pipeline/dynamic.py", "pipeline/generative.py",
     "pipeline/labs.py", "pipeline/math3d.py", "pipeline/reporting.py", "pipeline/runner.py",
     "pipeline/surflo_endpoint.py", "pipeline/validator.py",
 )
@@ -71,6 +74,59 @@ def curriculum() -> dict[str, Any]:
     return load_json(ROOT / "curriculum.json")
 
 
+def reference_adapter_name(record: dict[str, Any]) -> str:
+    """Return the dispatcher name declared by one registry record."""
+    command = str(record.get("command", ""))
+    match = re.search(r"(?:^|\s)--adapter\s+([a-z0-9-]+)(?:\s|$)", command)
+    if match is None:
+        raise ValueError(f"reference adapter command has no --adapter name: {record.get('id')}")
+    return match.group(1)
+
+
+def reference_adapters(*, landed_only: bool = False) -> list[dict[str, Any]]:
+    records = load_json(ROOT / "reference-adapters.json").get("adapters", [])
+    if not isinstance(records, list):
+        raise ValueError("reference adapter registry is malformed")
+    selected = [
+        record
+        for record in records
+        if isinstance(record, dict)
+        and (not landed_only or record.get("status") == "landed")
+    ]
+    names = [reference_adapter_name(record) for record in selected]
+    if len(names) != len(set(names)):
+        raise ValueError("reference adapter dispatcher names are not unique")
+    return selected
+
+
+def landed_reference_adapter_names() -> list[str]:
+    return [reference_adapter_name(record) for record in reference_adapters(landed_only=True)]
+
+
+def full_acceptance_status(
+    module_ids: list[str],
+    expected_module_ids: list[str],
+    module_profiles: list[str],
+    reference_names: list[str],
+    expected_reference_names: list[str],
+    reference_profiles: list[str],
+) -> bool:
+    """Return true only for the complete, all-full module and reference suite."""
+    return (
+        module_ids == expected_module_ids
+        and module_profiles == ["full"]
+        and reference_names == expected_reference_names
+        and reference_profiles == ["full"]
+    )
+
+
+def reference_adapter_by_name(adapter: str) -> dict[str, Any]:
+    for record in reference_adapters():
+        if reference_adapter_name(record) == adapter:
+            return record
+    raise ValueError(f"unknown reference adapter: {adapter}")
+
+
 def module_by_id(module_id: str) -> dict[str, Any]:
     normalized = f"{int(module_id):02d}" if module_id.isdigit() else module_id
     for module in curriculum()["modules"]:
@@ -84,6 +140,55 @@ def validate_run_id(run_id: str) -> str:
     if run_id in {".", ".."} or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}", run_id):
         raise ValueError("run ID must be one safe path component (letters, digits, dot, underscore, hyphen)")
     return run_id
+
+
+def selected_gpu_device(*, require_health: bool = True) -> str:
+    """Choose one physical GPU, excluding devices whose driver requests a reset."""
+    explicit = os.environ.get("SURFLO_PATHWAY_GPU_DEVICE")
+    if explicit is not None:
+        if re.fullmatch(r"[0-9]+", explicit) is None:
+            raise ValueError("SURFLO_PATHWAY_GPU_DEVICE must be one numeric GPU index")
+    if not require_health:
+        return explicit if explicit is not None else "0"
+    executable = shutil.which("nvidia-smi")
+    if executable is None:
+        raise ValueError("nvidia-smi is unavailable; cannot select a healthy GPU")
+    try:
+        completed = subprocess.run(
+            [
+                executable,
+                "--query-gpu=index,gpu_recovery_action",
+                "--format=csv,noheader,nounits",
+            ],
+            text=True,
+            capture_output=True,
+            check=False,
+            timeout=10,
+        )
+    except subprocess.TimeoutExpired as error:
+        raise ValueError("nvidia-smi timed out while selecting a healthy GPU") from error
+    if completed.returncode != 0:
+        raise ValueError("nvidia-smi could not report GPU recovery state")
+    devices: dict[str, str] = {}
+    for line in completed.stdout.splitlines():
+        fields = [field.strip() for field in line.split(",")]
+        if len(fields) == 2 and fields[0].isdigit() and fields[0] not in devices:
+            devices[fields[0]] = fields[1]
+    if explicit is not None:
+        if explicit not in devices:
+            raise ValueError(
+                f"SURFLO_PATHWAY_GPU_DEVICE={explicit} was not reported by nvidia-smi"
+            )
+        if devices[explicit].lower() not in {"none", "n/a"}:
+            raise ValueError(
+                f"SURFLO_PATHWAY_GPU_DEVICE={explicit} requires a reset: "
+                f"{devices[explicit]}"
+            )
+        return explicit
+    for index, recovery_action in devices.items():
+        if recovery_action.lower() in {"none", "n/a"}:
+            return index
+    raise ValueError("no GPU is usable without a reset")
 
 
 def validate_json_schema_instance(instance: Any, schema: dict[str, Any], location: str = "root") -> None:

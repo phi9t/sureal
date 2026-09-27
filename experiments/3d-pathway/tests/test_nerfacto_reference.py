@@ -10,6 +10,7 @@ import tempfile
 import textwrap
 import unittest
 from unittest import mock
+import zipfile
 
 import numpy as np
 
@@ -39,26 +40,29 @@ def fake_nerfacto_engine(path: Path, fail: bool = False) -> Path:
             [[ "${{1:-}}" == run ]]
             [[ " $* " == *" --network none "* ]]
             [[ " $* " == *" --pull=never "* ]]
-            [[ " $* " == *" --gpus all "* ]]
+            [[ " $* " == *" --gpus device="* ]]
             [[ " $* " == *" -e USER=surflo "* ]]
             [[ " $* " == *" -e TORCH_HOME=/model "* ]]
             [[ " $* " == *":/model/hub/checkpoints/alexnet-owt-7be5be79.pth:ro "* ]]
             [[ " $* " == *" {FIXTURE_IMAGE_ID} "* ]]
             input=''
             output=''
+            canonical=''
             previous=''
             for argument in "$@"; do
                 if [[ "$previous" == -v && "$argument" == *:/input:ro ]]; then
                     input="${{argument%:/input:ro}}"
                 elif [[ "$previous" == -v && "$argument" == *:/output ]]; then
                     output="${{argument%:/output}}"
+                elif [[ "$previous" == -v && "$argument" == *:/canonical:ro ]]; then
+                    canonical="${{argument%:/canonical:ro}}"
                 fi
                 previous="$argument"
             done
             [[ -n "$input" && -n "$output" ]]
             [[ " $* " != *":/work "* ]]
             {failure}
-            python3 - "$input" "$output" <<'PY'
+            python3 - "$input" "$output" "$canonical" <<'PY'
             import json
             import math
             import csv
@@ -69,14 +73,17 @@ def fake_nerfacto_engine(path: Path, fail: bool = False) -> Path:
 
             input_root = Path(sys.argv[1])
             output = Path(sys.argv[2])
+            canonical_root = Path(sys.argv[3]) if sys.argv[3] else None
             repository = Path("{ROOT}")
             sys.path.insert(0, str(repository / "pipeline"))
             from nerfacto_reference_runner import _component_count
             manifest = json.loads((input_root / "manifest.json").read_text())
             resolution = 128 if manifest["profile"] == "smoke" else 256
             axis = np.linspace(-1.0, 1.0, resolution, dtype=np.float32)
-            xx, yy, zz = np.meshgrid(axis, axis, axis, indexing="ij")
-            density = (25.0 * np.exp(-((np.sqrt(xx * xx + yy * yy + zz * zz) - 0.72) / 0.08) ** 2)).astype(np.float32)
+            density = np.empty((resolution, resolution, resolution), dtype=np.float32)
+            for start in range(0, resolution, 16):
+                xx, yy, zz = np.meshgrid(axis[start:start + 16], axis, axis, indexing="ij")
+                density[start:start + len(xx)] = (25.0 * np.exp(-((np.sqrt(xx * xx + yy * yy + zz * zz) - 0.72) / 0.08) ** 2)).astype(np.float32)
             np.save(output / "field.density_grid.float32.npy", density, allow_pickle=False)
 
             render_dir = output / "target-renders"
@@ -188,8 +195,43 @@ def fake_nerfacto_engine(path: Path, fail: bool = False) -> Path:
                 "dataloader_num_workers": 1,
                 "seed": manifest["scene_seed"],
                 "trained_view_sweep": {{"context_views": [3, 5, 9], "iterations": 1000, "rays_per_batch": 1024}},
-                "view_sweep_training_seconds": {{"3": 1.0, "5": 1.0, "9": 1.0}}
+                "view_sweep_training_seconds": {{"3": 1.0, "5": 1.0, "9": 1.0}},
+                "canonical_nerf_example": None if manifest["profile"] == "smoke" else {{
+                    "asset_id": "nerf-synthetic", "dataset": "nerf_synthetic/lego",
+                    "iterations": 2000, "rays_per_batch": 2048,
+                    "training_views": 16, "target_views": 4,
+                    "image_size": 256, "training_seconds": 2.0,
+                }},
             }}, sort_keys=True) + "\\n")
+            if manifest["profile"] == "full":
+                if canonical_root is None or not canonical_root.is_dir():
+                    raise RuntimeError("full Nerfacto fixture requires the canonical mount")
+                canonical_output = output / "canonical-nerf-example"
+                truth_dir = canonical_output / "truth"
+                render_dir = canonical_output / "renders"
+                truth_dir.mkdir(parents=True)
+                render_dir.mkdir(parents=True)
+                train_ids = [f"train/r_{{index}}" for index in (0, 6, 13, 19, 26, 33, 39, 46, 52, 59, 66, 72, 79, 85, 92, 99)]
+                target_ids = [f"test/r_{{index}}" for index in (0, 66, 132, 199)]
+                targets = []
+                yy, xx = np.mgrid[0:256, 0:256]
+                for ordinal, frame_id in enumerate(target_ids):
+                    truth = np.stack((xx / 255.0, yy / 255.0, np.full_like(xx, ordinal / 4.0)), axis=-1).astype(np.float32)
+                    predicted = np.clip(truth + 0.02, 0.0, 1.0).astype(np.float32)
+                    truth_path = f"truth/target-{{ordinal:03d}}.rgb.float32.npy"
+                    render_path = f"renders/target-{{ordinal:03d}}.rgb.float32.npy"
+                    np.save(canonical_output / truth_path, truth, allow_pickle=False)
+                    np.save(canonical_output / render_path, predicted, allow_pickle=False)
+                    targets.append({{"id": frame_id, "truth_path": truth_path, "render_path": render_path}})
+                (canonical_output / "manifest.json").write_text(json.dumps({{
+                    "schema_version": 1, "asset_id": "nerf-synthetic",
+                    "archive_sha256": "{NERF_SYNTHETIC_SHA256}",
+                    "extraction_tree_sha256": "b98a082b13d4b099d54cbcbea474d967cb3f448e9304494ba0749bde874936fe",
+                    "dataset": "nerf_synthetic/lego",
+                    "training_frame_ids": train_ids, "target_frame_ids": target_ids,
+                    "image_size": [256, 256], "iterations": 2000,
+                    "rays_per_batch": 2048, "seed": 260925, "targets": targets,
+                }}, sort_keys=True) + "\\n")
             sweep_rows = []
             for count, values in sweep_metrics.items():
                 for metric, measurement in values.items():
@@ -220,19 +262,33 @@ def fake_nerfacto_engine(path: Path, fail: bool = False) -> Path:
     return engine
 
 
-def run_fake_nerfacto_reference(root: Path, run_id: str = "nerfacto-smoke") -> Path:
+def run_fake_nerfacto_reference(
+    root: Path, run_id: str = "nerfacto-smoke", profile: str = "smoke"
+) -> Path:
     sys.path.insert(0, str(ROOT / "pipeline"))
     import nerfacto_reference_runner
 
     checkpoint = root / "fixture-alexnet-weights.pth"
     checkpoint.write_bytes(b"fixture weights")
+    canonical = root / "fixture-nerf-example"
+    canonical.mkdir()
+    extraction = {
+        "archive_sha256": NERF_SYNTHETIC_SHA256,
+        "tree_sha256": "b98a082b13d4b099d54cbcbea474d967cb3f448e9304494ba0749bde874936fe",
+        "file_count": 873,
+        "files": [],
+    }
     with mock.patch.dict(
         os.environ, {"SURFLO_PATHWAY_CONTAINER_ENGINE": str(fake_nerfacto_engine(root))}
     ), mock.patch.object(
         nerfacto_reference_runner, "_lpips_checkpoint_path", return_value=checkpoint
+    ), mock.patch.object(
+        nerfacto_reference_runner,
+        "_locked_nerf_example",
+        return_value=(canonical, extraction),
     ):
         return nerfacto_reference_runner.run_nerfacto_reference(
-            root / "cache", "smoke", run_id
+            root / "cache", profile, run_id
         )
 
 
@@ -289,6 +345,13 @@ class NerfactoReferenceFoundationTest(unittest.TestCase):
         self.assertEqual(adapter["acceptance"]["smoke"]["target_psnr_db_min"], 20.0)
         self.assertEqual(adapter["acceptance"]["full"]["expected_depth_rmse_m_max"], 0.7)
         self.assertEqual(
+            adapter["acceptance"]["full"].get("canonical_target_psnr_db_min"), 10.0
+        )
+        self.assertEqual(
+            adapter["evaluation_contract"].get("canonical_sample"),
+            "tree-verified NeRF example Lego; 16 fixed train and 4 held-out views",
+        )
+        self.assertEqual(
             adapter["baseline_environment"]["container_image_id"],
             "sha256:49e4cbea691768dc3085796f5619266e156bc800ff8b92d88563498b872c12dc",
         )
@@ -330,7 +393,13 @@ class NerfactoReferenceFoundationTest(unittest.TestCase):
             archive["extraction"],
             {"mode": "zip", "roots": ["nerf_llff_data", "nerf_synthetic"]},
         )
-        self.assertEqual(archive["consumers"], ["future-nerf-synthetic-extension"])
+        self.assertEqual(archive["consumers"], ["nerfstudio-nerfacto-reference"])
+        self.assertEqual(
+            archive["tree_sha256"],
+            "b98a082b13d4b099d54cbcbea474d967cb3f448e9304494ba0749bde874936fe",
+        )
+        self.assertEqual(archive["tree_file_count"], 873)
+        self.assertEqual(archive["tree_byte_size"], 385357718)
 
     def test_radiance_field_environment_is_blackwell_pinned(self) -> None:
         locks = json.loads((ROOT / "insulas/locks.json").read_text())["insulas"]
@@ -354,6 +423,58 @@ class NerfactoReferenceFoundationTest(unittest.TestCase):
 
 
 class NerfactoReferenceExecutionContractTest(unittest.TestCase):
+    def test_locked_nerf_example_recomputes_the_extracted_tree(self) -> None:
+        sys.path.insert(0, str(ROOT / "pipeline"))
+        import nerfacto_reference_runner
+        from contracts import load_json, sha256_file
+        from fetch import extract_locked_asset
+
+        self.assertTrue(hasattr(nerfacto_reference_runner, "_locked_nerf_example"))
+        with tempfile.TemporaryDirectory() as temporary:
+            cache = Path(temporary)
+            assets = cache / "assets"
+            assets.mkdir()
+            archive = assets / "nerf-synthetic.archive"
+            with zipfile.ZipFile(archive, "w") as bundle:
+                bundle.writestr("nerf_synthetic/lego/transforms_train.json", "{}\n")
+                bundle.writestr("nerf_synthetic/lego/transforms_val.json", "{}\n")
+                bundle.writestr("nerf_synthetic/lego/transforms_test.json", "{}\n")
+                bundle.writestr("nerf_synthetic/lego/train/r_0.png", b"fixture")
+                bundle.writestr("nerf_llff_data/fern/poses_bounds.npy", b"fixture")
+            record = {
+                "id": "nerf-synthetic",
+                "mode": "download",
+                "source": "https://example.org/nerf.zip",
+                "sha256": sha256_file(archive),
+                "byte_size": archive.stat().st_size,
+                "digest_status": "verified-test",
+                "archive_format": "zip",
+                "extraction": {
+                    "mode": "zip",
+                    "roots": ["nerf_llff_data", "nerf_synthetic"],
+                },
+                "consumers": ["nerfstudio-nerfacto-reference"],
+            }
+            extracted = extract_locked_asset(record, archive, assets)
+            extraction = load_json(assets / "nerf-synthetic.extraction.json")
+            record.update(
+                {
+                    "tree_sha256": extraction["tree_sha256"],
+                    "tree_file_count": extraction["file_count"],
+                    "tree_byte_size": sum(item["size"] for item in extraction["files"]),
+                }
+            )
+
+            lego, verified = nerfacto_reference_runner._locked_nerf_example(  # type: ignore[attr-defined]
+                cache, record
+            )
+            self.assertEqual(lego, extracted / "nerf_synthetic/lego")
+            self.assertEqual(verified["tree_sha256"], record["tree_sha256"])
+
+            (lego / "train/r_0.png").write_bytes(b"tampered")
+            with self.assertRaisesRegex(ValueError, "extraction|tree"):
+                nerfacto_reference_runner._locked_nerf_example(cache, record)  # type: ignore[attr-defined]
+
     def test_fake_smoke_run_is_offline_scored_and_atomically_promoted(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             run_dir = run_fake_nerfacto_reference(Path(temporary))
@@ -388,6 +509,37 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
             from nerfacto_reference_runner import validate_nerfacto_reference_result
 
             validate_nerfacto_reference_result(run_dir)
+
+    def test_full_reference_consumes_and_scores_the_locked_nerf_example(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            try:
+                run_dir = run_fake_nerfacto_reference(
+                    Path(temporary), run_id="nerfacto-full", profile="full"
+                )
+            except ValueError as error:
+                self.fail(f"full reference did not consume the canonical asset: {error}")
+            result = json.loads((run_dir / "result.json").read_text())
+            canonical = result["metrics"]["canonical_nerf_example"]
+            self.assertEqual(canonical["asset_id"], "nerf-synthetic")
+            self.assertEqual(canonical["archive_sha256"], NERF_SYNTHETIC_SHA256)
+            self.assertEqual(canonical["training_views"], 16)
+            self.assertEqual(canonical["target_views"], 4)
+            self.assertGreater(canonical["target_psnr_db"], 20.0)
+            self.assertGreater(canonical["target_ssim"], 0.0)
+            config = result["provenance"]["config"]["canonical_nerf_example"]
+            self.assertEqual(config["dataset"], "nerf_synthetic/lego")
+            self.assertEqual(config["iterations"], 2000)
+            self.assertIn("canonical NeRF example", (run_dir / "report.md").read_text())
+
+            truth = run_dir / "output/canonical-nerf-example/truth/target-000.rgb.float32.npy"
+            values = np.load(truth, allow_pickle=False)
+            values[0, 0, 0] += 0.1
+            np.save(truth, values, allow_pickle=False)
+            sys.path.insert(0, str(ROOT / "pipeline"))
+            from nerfacto_reference_runner import validate_nerfacto_reference_result
+
+            with self.assertRaisesRegex(ValueError, "canonical|metric|artifact"):
+                validate_nerfacto_reference_result(run_dir)
 
     def test_failed_container_is_not_promoted(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -431,6 +583,20 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
             with self.assertRaisesRegex(
                 ValueError, "metric recomputation|artifact|failure-sweep metric mismatch"
             ):
+                validate_nerfacto_reference_result(run_dir)
+
+    def test_tampered_resource_record_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            run_dir = run_fake_nerfacto_reference(Path(temporary))
+            result_path = run_dir / "result.json"
+            result = json.loads(result_path.read_text())
+            result["resources"]["runtime_seconds"] += 1.0
+            result_path.write_text(json.dumps(result))
+
+            sys.path.insert(0, str(ROOT / "pipeline"))
+            from nerfacto_reference_runner import validate_nerfacto_reference_result
+
+            with self.assertRaisesRegex(ValueError, "resource summary mismatch"):
                 validate_nerfacto_reference_result(run_dir)
 
     def test_real_profiles_are_explicit_b200_gates(self) -> None:
@@ -554,6 +720,23 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
         self.assertIn("context-renders", text)
         self.assertIn("view-sweep", text)
         self.assertLess(text.index("trainer.train()"), text.index('manifest["target_frames"]'))
+
+    def test_stale_container_entrypoint_is_rejected_before_training(self) -> None:
+        sys.path.insert(0, str(ROOT / "pipeline"))
+        from nerfacto_reference_runner import _verify_container_entrypoint
+
+        stale_hash = "0" * 64
+        completed = subprocess.CompletedProcess(
+            args=[],
+            returncode=0,
+            stdout=f"{stale_hash}  /usr/local/bin/run-nerfacto.py\n",
+            stderr="",
+        )
+        with mock.patch(
+            "nerfacto_reference_runner.subprocess.run", return_value=completed
+        ):
+            with self.assertRaisesRegex(ValueError, "stale.*entrypoint"):
+                _verify_container_entrypoint("docker", FIXTURE_IMAGE_ID)
 
     def test_lpips_crop_uses_truth_mask_not_nonzero_rgb(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))

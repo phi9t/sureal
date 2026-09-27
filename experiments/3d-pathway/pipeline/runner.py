@@ -15,6 +15,7 @@ from contextlib import contextmanager
 from typing import Any
 
 from contracts import IMPLEMENTATION_FILES, INPUT_FILES, ROOT, canonical_json, curriculum, module_by_id, sha256_file, validate_run_id, write_json
+from controlled_suite import ensure_controlled_suite, write_module_binding
 from labs import run_lab
 from reporting import module_report
 from validator import validate_result
@@ -76,11 +77,31 @@ def run_module(cache_root: Path, module_id: str, profile: str, run_id: str) -> P
     staging.mkdir()
     started = time.perf_counter()
     try:
+        controlled_suite = None
+        if profile == "full":
+            suite_root = ensure_controlled_suite(render_if_missing=True)
         with offline_network():
             lab = run_lab(module_id, staging / "artifacts", profile)
+            if profile == "full":
+                controlled_suite = write_module_binding(
+                    suite_root,
+                    staging / "artifacts" / "controlled-suite.json",
+                    module_id,
+                )["suite"]
+                lab.setdefault("observations", []).append(
+                    "This full-profile lab is bound to the shared hash-verified Blender/Cycles "
+                    "episode; its task-specific fixture metrics are not relabeled as benchmark scores."
+                )
         elapsed = time.perf_counter() - started
         profile_config = curriculum()["profiles"][profile]
-        config = {"module_id": module_id, "profile": profile, "run_id": run_id, "seed": 260925, "profile_config": profile_config}
+        config = {
+            "module_id": module_id,
+            "profile": profile,
+            "run_id": run_id,
+            "seed": 260925,
+            "profile_config": profile_config,
+            "controlled_suite": controlled_suite,
+        }
         measurement_kind = "reused_measured_result" if module_id == "15" else "controlled_fixture"
         artifacts_sha256 = _artifact_hashes(staging / "artifacts")
         result: dict[str, Any] = {
@@ -96,6 +117,7 @@ def run_module(cache_root: Path, module_id: str, profile: str, run_id: str) -> P
             "failure_sweep": lab["failure_sweep"],
             "failure_sweep_provenance": measurement_kind,
             "observations": lab.get("observations", []),
+            "controlled_suite": controlled_suite,
             "resources": {
                 "runtime_seconds": elapsed,
                 "peak_cpu_bytes": _peak_cpu_bytes(),

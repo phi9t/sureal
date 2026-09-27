@@ -9,7 +9,21 @@ from typing import Any
 
 import numpy as np
 
-from contracts import IMPLEMENTATION_FILES, INPUT_FILES, ROOT, canonical_json, ensure_finite, load_json, module_by_id, sha256_file, validate_json_schema_instance
+from contracts import (
+    IMPLEMENTATION_FILES,
+    INPUT_FILES,
+    ROOT,
+    canonical_json,
+    ensure_finite,
+    full_acceptance_status,
+    landed_reference_adapter_names,
+    load_json,
+    module_by_id,
+    reference_adapter_by_name,
+    sha256_file,
+    validate_json_schema_instance,
+)
+from controlled_suite import COMPATIBLE_MODULES, controlled_suite_record
 from dynamic import (
     DYNAMIC_ARRAY_SEMANTICS,
     DYNAMIC_CAMERA_CONTAMINATION,
@@ -31,7 +45,8 @@ from generative import (
     generate_ambiguity_failure_sweep,
 )
 from surflo_endpoint import build_surflo_endpoint, evaluate_surflo_evidence
-from reporting import module_report
+from reporting import aggregate_report, module_report
+from reference_runner import validate_landed_reference_result
 
 
 REQUIRED_TOP_LEVEL = {
@@ -390,6 +405,57 @@ def validate_result(run_dir: Path, expected_module: str | None = None) -> dict[s
         _validate_module14(run_dir, result)
     if result["module_id"] == "15":
         _validate_module15(run_dir, result)
+    controlled = result.get("controlled_suite")
+    controlled_artifact = artifacts / "controlled-suite.json"
+    if result["profile"] == "smoke":
+        if controlled is not None or provenance["config"].get("controlled_suite") is not None:
+            raise ValueError("smoke result unexpectedly binds the Blender controlled suite")
+        if controlled_artifact.exists():
+            raise ValueError("smoke result contains a controlled-suite artifact")
+    else:
+        if result["module_id"] not in COMPATIBLE_MODULES:
+            raise ValueError("full module is not registered as a controlled-suite consumer")
+        if not isinstance(controlled, dict) or not controlled_artifact.is_file():
+            raise ValueError("full result lacks its Blender controlled-suite binding")
+        payload = load_json(controlled_artifact)
+        record = controlled_suite_record()
+        if (
+            payload.get("schema_version") != 1
+            or payload.get("module_id") != result["module_id"]
+            or payload.get("suite") != controlled
+            or provenance["config"].get("controlled_suite") != controlled
+            or controlled.get("asset_id") != "controlled-suite"
+            or controlled.get("episode_id") != record["episode_id"]
+            or controlled.get("recipe_sha256") != record["sha256"]
+            or controlled.get("episode_manifest_sha256")
+            != record["episode_manifest_sha256"]
+            or controlled.get("validation_sha256") != record["validation_sha256"]
+            or controlled.get("artifact_count") != record["artifact_count"]
+            or controlled.get("renderer", {}).get("blender_version")
+            != record["blender_version"]
+            or controlled.get("renderer", {}).get("profile") != record["profile"]
+            or controlled.get("renderer", {}).get("samples") != record["samples"]
+            or controlled.get("views")
+            != {
+                "context": record["context_views"],
+                "target_per_hypothesis": record["target_views_per_hypothesis"],
+            }
+            or controlled.get("surface_points_per_hypothesis")
+            != record["surface_points_per_hypothesis"]
+        ):
+            raise ValueError("Blender controlled-suite result binding mismatch")
+        sensors = payload.get("sensor_simulations")
+        if (
+            not isinstance(sensors, dict)
+            or sensors.get("schema_version") != 1
+            or sensors.get("source_view") != "shared_context/0000"
+            or sensors.get("depth_units") != "metres"
+            or not isinstance(sensors.get("valid_pixels"), int)
+            or sensors["valid_pixels"] <= 0
+            or not isinstance(sensors.get("lidar_return_count"), int)
+            or sensors["lidar_return_count"] <= 0
+        ):
+            raise ValueError("Blender controlled-suite sensor binding mismatch")
     if (run_dir / "report.md").read_text(encoding="utf-8") != module_report(
         module_by_id(result["module_id"]), result
     ):
@@ -406,11 +472,101 @@ def validate_report(run_root: Path) -> dict[str, Any]:
     validate_json_schema_instance(manifest, load_json(ROOT / "report.schema.json"), "report")
     if manifest["report_sha256"] != sha256_file(run_root / "report.md"):
         raise ValueError("aggregate report hash mismatch")
-    actual_modules = [path.parent.name for path in sorted(run_root.glob("[0-9][0-9]/result.json"))]
+    module_paths = sorted(run_root.glob("[0-9][0-9]/result.json"))
+    actual_module_hashes = {
+        path.relative_to(run_root).as_posix(): sha256_file(path) for path in module_paths
+    }
+    if manifest["module_results_sha256"] != actual_module_hashes:
+        raise ValueError("aggregate module result hash mismatch")
+    reference_paths = sorted(run_root.glob("references/*/result.json"))
+    actual_reference_hashes = {
+        path.relative_to(run_root).as_posix(): sha256_file(path)
+        for path in reference_paths
+    }
+    if manifest["reference_results_sha256"] != actual_reference_hashes:
+        raise ValueError("aggregate reference result hash mismatch")
+
+    actual_modules = [path.parent.name for path in module_paths]
     if manifest["module_ids"] != actual_modules:
         raise ValueError("aggregate report module list mismatch")
     expected = [f"{index:02d}" for index in range(1, 16)]
     if manifest["complete_curriculum"] != (actual_modules == expected):
         raise ValueError("aggregate completeness flag mismatch")
+    module_items = [
+        (module_by_id(path.parent.name), validate_result(path.parent, path.parent.name))
+        for path in module_paths
+    ]
+    reference_by_name = {
+        path.parent.name: validate_landed_reference_result(path.parent, path.parent.name)
+        for path in reference_paths
+    }
+    expected_references = landed_reference_adapter_names()
+    unknown_references = sorted(set(reference_by_name) - set(expected_references))
+    if unknown_references:
+        raise ValueError(
+            f"aggregate contains unregistered reference adapters: {unknown_references}"
+        )
+    reference_items = [
+        (reference_adapter_by_name(adapter), reference_by_name[adapter])
+        for adapter in expected_references
+        if adapter in reference_by_name
+    ]
+    reference_names = [result["adapter"] for _, result in reference_items]
+    profiles = sorted({result["profile"] for _, result in module_items})
+    reference_profiles = sorted({result["profile"] for _, result in reference_items})
+    complete_references = reference_names == expected_references
+    expected_fields = {
+        "run_id": run_root.name,
+        "profiles": profiles,
+        "measurement_kinds": sorted(
+            {result["measurement_kind"] for _, result in module_items}
+        ),
+        "metric_families": ["geometry", "rendering", "generative"],
+        "assumptions": [
+            "Metrics remain separated by task family.",
+            "Controlled fixtures are not third-party benchmark reproductions.",
+        ],
+        "failure_interpretations": {
+            result["module_id"]: result.get("observations", [])
+            for _, result in module_items
+        },
+        "module_resources": {
+            result["module_id"]: result["resources"] for _, result in module_items
+        },
+        "reference_adapters": reference_names,
+        "reference_profiles": reference_profiles,
+        "complete_reference_suite": complete_references,
+        "full_acceptance": full_acceptance_status(
+            actual_modules,
+            expected,
+            profiles,
+            reference_names,
+            expected_references,
+            reference_profiles,
+        ),
+        "reference_failure_boundaries": {
+            result["adapter"]: record.get(
+                "measurement_note", "See the adapter evaluation contract."
+            )
+            for record, result in reference_items
+        },
+        "source_ids": sorted(
+            {
+                source
+                for module, _ in module_items
+                for source in module["sources"]
+            }
+        ),
+    }
+    for name, expected_value in expected_fields.items():
+        if manifest.get(name) != expected_value:
+            raise ValueError(f"aggregate {name.replace('_', ' ')} mismatch")
+    expected_report = aggregate_report(
+        run_root.name,
+        module_items,
+        reference_items,
+    )
+    if (run_root / "report.md").read_text(encoding="utf-8") != expected_report:
+        raise ValueError("aggregate report content mismatch")
     ensure_finite(manifest)
     return manifest

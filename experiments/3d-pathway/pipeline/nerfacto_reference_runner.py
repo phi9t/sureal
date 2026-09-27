@@ -11,6 +11,7 @@ from collections import deque
 import csv
 import shutil
 import stat
+import subprocess
 import tempfile
 import time
 from typing import Any
@@ -23,11 +24,13 @@ from contracts import (
     canonical_json,
     ensure_finite,
     load_json,
+    selected_gpu_device,
     sha256_file,
     validate_json_schema_instance,
     validate_run_id,
     write_json,
 )
+from fetch import extract_locked_asset
 from mvs_reference_runner import _gpu_hardware, _peak_cpu_memory_bytes, _run_monitored
 from reference_runner import (
     _hash_tree,
@@ -35,6 +38,7 @@ from reference_runner import (
     _parse_key_value_manifest,
     _require_regular_file,
     _secure_directory,
+    _validated_resource_summary,
 )
 from reference_scene import generate_radiance_field_scene
 
@@ -48,6 +52,10 @@ LPIPS_CHECKPOINT_ID = "nerfstudio-lpips-alexnet"
 LPIPS_CHECKPOINT_SHA256 = "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
 LPIPS_CHECKPOINT_BYTES = 244408911
 LPIPS_CHECKPOINT_FILENAME = "alexnet-owt-7be5be79.pth"
+NERF_SYNTHETIC_ASSET_ID = "nerf-synthetic"
+NERF_SYNTHETIC_SHA256 = "ce4e94e031c099a19ef04cfb6c71f1e47225d97d365be610b476e379a386c25f"
+NERF_SYNTHETIC_BYTES = 370385516
+NERF_SYNTHETIC_TREE_SHA256 = "b98a082b13d4b099d54cbcbea474d967cb3f448e9304494ba0749bde874936fe"
 IMAGE_ID_PATTERN = __import__("re").compile(r"sha256:[0-9a-f]{64}")
 CUDA_CACHE_POLICY = "persistent-cache-root-mount"
 PINNED_INSULA_MANIFEST = {
@@ -77,6 +85,19 @@ PROFILE_CONFIG = {
     "smoke": {"iterations": 1000, "rays_per_batch": 1024, "density_resolution": 128},
     "full": {"iterations": 20001, "rays_per_batch": 2048, "density_resolution": 256},
 }
+CANONICAL_NERF_EXAMPLE = {
+    "asset_id": NERF_SYNTHETIC_ASSET_ID,
+    "dataset": "nerf_synthetic/lego",
+    "training_frame_ids": [
+        f"train/r_{index}"
+        for index in (0, 6, 13, 19, 26, 33, 39, 46, 52, 59, 66, 72, 79, 85, 92, 99)
+    ],
+    "target_frame_ids": [f"test/r_{index}" for index in (0, 66, 132, 199)],
+    "image_size": 256,
+    "iterations": 2000,
+    "rays_per_batch": 2048,
+    "seed": 260925,
+}
 REFERENCE_IMPLEMENTATION = (
     "pipeline/cli.py",
     "pipeline/contracts.py",
@@ -94,6 +115,42 @@ REFERENCE_IMPLEMENTATION = (
     "reference-result.schema.json",
     "shared-scene.json",
 )
+
+
+def _verify_container_entrypoint(engine: str, image_id: str) -> None:
+    if Path(engine).name != "docker":
+        return
+    expected = sha256_file(ROOT / "insulas/radiance-field/run-nerfacto.py")
+    try:
+        completed = subprocess.run(
+            [
+                engine,
+                "run",
+                "--rm",
+                "--network",
+                "none",
+                "--pull=never",
+                image_id,
+                "sha256sum",
+                "/usr/local/bin/run-nerfacto.py",
+            ],
+            text=True,
+            capture_output=True,
+            check=False,
+            timeout=30,
+        )
+    except subprocess.TimeoutExpired as error:
+        raise ValueError("unable to verify Nerfacto container entrypoint") from error
+    embedded = None
+    for line in completed.stdout.splitlines():
+        fields = line.split()
+        if len(fields) == 2 and fields[1] == "/usr/local/bin/run-nerfacto.py":
+            embedded = fields[0]
+            break
+    if completed.returncode != 0 or embedded != expected:
+        raise ValueError(
+            "stale Nerfacto container entrypoint; rebuild with `run.sh build`"
+        )
 
 
 def _values_match(actual: Any, expected: Any) -> bool:
@@ -167,6 +224,70 @@ def _lpips_checkpoint_record() -> dict[str, Any]:
     ):
         raise ValueError("Nerfacto LPIPS checkpoint lock mismatch")
     return record
+
+
+def _nerf_synthetic_record() -> dict[str, Any]:
+    matches = [
+        item
+        for item in load_json(ROOT / "assets.lock.json")["assets"]
+        if item.get("id") == NERF_SYNTHETIC_ASSET_ID
+    ]
+    if len(matches) != 1:
+        raise ValueError("NeRF example asset registry mismatch")
+    record = matches[0]
+    if (
+        record.get("mode") != "download"
+        or record.get("sha256") != NERF_SYNTHETIC_SHA256
+        or record.get("byte_size") != NERF_SYNTHETIC_BYTES
+        or record.get("digest_status") != "verified_2026-09-26"
+        or record.get("archive_format") != "zip"
+        or record.get("extraction")
+        != {"mode": "zip", "roots": ["nerf_llff_data", "nerf_synthetic"]}
+        or record.get("tree_sha256") != NERF_SYNTHETIC_TREE_SHA256
+        or record.get("tree_file_count") != 873
+        or record.get("tree_byte_size") != 385357718
+        or record.get("consumers") != ["nerfstudio-nerfacto-reference"]
+    ):
+        raise ValueError("NeRF example asset lock mismatch")
+    return record
+
+
+def _locked_nerf_example(
+    cache_root: Path, record: dict[str, Any] | None = None
+) -> tuple[Path, dict[str, Any]]:
+    """Return the verified Lego example and its recomputed extraction witness."""
+
+    record = _nerf_synthetic_record() if record is None else record
+    assets = cache_root / "assets"
+    archive = assets / f"{NERF_SYNTHETIC_ASSET_ID}.archive"
+    try:
+        mode = archive.lstat().st_mode
+    except FileNotFoundError as error:
+        raise FileNotFoundError(
+            f"missing NeRF example archive: {archive}; "
+            f"run `run.sh fetch --asset {NERF_SYNTHETIC_ASSET_ID}`"
+        ) from error
+    if stat.S_ISLNK(mode) or not stat.S_ISREG(mode):
+        raise ValueError("NeRF example archive must be a regular non-symlink file")
+    if (
+        archive.stat().st_size != record.get("byte_size")
+        or sha256_file(archive) != record.get("sha256")
+    ):
+        raise ValueError("NeRF example archive hash or byte-size mismatch")
+    extracted = extract_locked_asset(record, archive, assets)
+    extraction = load_json(assets / f"{NERF_SYNTHETIC_ASSET_ID}.extraction.json")
+    if (
+        extraction.get("archive_sha256") != record.get("sha256")
+        or extraction.get("tree_sha256") != record.get("tree_sha256")
+        or extraction.get("file_count") != record.get("tree_file_count")
+        or sum(item.get("size", -1) for item in extraction.get("files", []))
+        != record.get("tree_byte_size")
+    ):
+        raise ValueError("NeRF example extraction tree does not match its lock")
+    lego = extracted / "nerf_synthetic" / "lego"
+    for name in ("transforms_train.json", "transforms_val.json", "transforms_test.json"):
+        _require_regular_file(lego, name)
+    return lego, extraction
 
 
 def _lpips_checkpoint_path(cache_root: Path, record: dict[str, Any]) -> Path:
@@ -447,6 +568,79 @@ def _validate_failure_sweep(run_dir: Path, metrics: dict[str, Any]) -> None:
         raise ValueError("Nerfacto failure-sweep metric mismatch")
 
 
+def _evaluate_canonical_nerf_example(run_dir: Path) -> dict[str, Any]:
+    root = run_dir / "output" / "canonical-nerf-example"
+    manifest = load_json(_require_regular_file(root, "manifest.json"))
+    target_rows = [
+        {
+            "id": frame_id,
+            "truth_path": f"truth/target-{ordinal:03d}.rgb.float32.npy",
+            "render_path": f"renders/target-{ordinal:03d}.rgb.float32.npy",
+        }
+        for ordinal, frame_id in enumerate(CANONICAL_NERF_EXAMPLE["target_frame_ids"])
+    ]
+    expected_manifest = {
+        "schema_version": 1,
+        "asset_id": NERF_SYNTHETIC_ASSET_ID,
+        "archive_sha256": NERF_SYNTHETIC_SHA256,
+        "extraction_tree_sha256": NERF_SYNTHETIC_TREE_SHA256,
+        "dataset": CANONICAL_NERF_EXAMPLE["dataset"],
+        "training_frame_ids": CANONICAL_NERF_EXAMPLE["training_frame_ids"],
+        "target_frame_ids": CANONICAL_NERF_EXAMPLE["target_frame_ids"],
+        "image_size": [
+            CANONICAL_NERF_EXAMPLE["image_size"],
+            CANONICAL_NERF_EXAMPLE["image_size"],
+        ],
+        "iterations": CANONICAL_NERF_EXAMPLE["iterations"],
+        "rays_per_batch": CANONICAL_NERF_EXAMPLE["rays_per_batch"],
+        "seed": CANONICAL_NERF_EXAMPLE["seed"],
+        "targets": target_rows,
+    }
+    if manifest != expected_manifest:
+        raise ValueError("canonical NeRF example manifest mismatch")
+    image_size = int(CANONICAL_NERF_EXAMPLE["image_size"])
+    per_view: list[dict[str, Any]] = []
+    for row in target_rows:
+        truth = _regular_npy(root / row["truth_path"], "canonical truth RGB")
+        predicted = _regular_npy(root / row["render_path"], "canonical rendered RGB")
+        if (
+            truth.dtype != np.float32
+            or predicted.dtype != np.float32
+            or truth.shape != (image_size, image_size, 3)
+            or predicted.shape != truth.shape
+            or not np.isfinite(truth).all()
+            or not np.isfinite(predicted).all()
+            or np.any(truth < 0.0)
+            or np.any(truth > 1.0)
+            or np.any(predicted < 0.0)
+            or np.any(predicted > 1.0)
+        ):
+            raise ValueError("canonical NeRF example render shape, dtype, range, or finiteness mismatch")
+        per_view.append(
+            {
+                "id": row["id"],
+                "psnr_db": _psnr(predicted, truth),
+                "ssim": _gaussian_ssim(predicted, truth),
+            }
+        )
+    result = {
+        "asset_id": NERF_SYNTHETIC_ASSET_ID,
+        "archive_sha256": NERF_SYNTHETIC_SHA256,
+        "extraction_tree_sha256": NERF_SYNTHETIC_TREE_SHA256,
+        "dataset": CANONICAL_NERF_EXAMPLE["dataset"],
+        "training_views": len(CANONICAL_NERF_EXAMPLE["training_frame_ids"]),
+        "target_views": len(per_view),
+        "iterations": CANONICAL_NERF_EXAMPLE["iterations"],
+        "rays_per_batch": CANONICAL_NERF_EXAMPLE["rays_per_batch"],
+        "image_size": image_size,
+        "target_psnr_db": float(np.mean([row["psnr_db"] for row in per_view])),
+        "target_ssim": float(np.mean([row["ssim"] for row in per_view])),
+        "target_per_view": per_view,
+    }
+    ensure_finite(result, "canonical NeRF example metrics")
+    return result
+
+
 def _evaluate_outputs(run_dir: Path, profile: str) -> dict[str, Any]:
     manifest = _validate_input_manifest(run_dir / "input", profile)
     target_perceptual = load_json(
@@ -717,6 +911,8 @@ def _evaluate_outputs(run_dir: Path, profile: str) -> dict[str, Any]:
             "completion_claim": "none",
         },
     }
+    if profile == "full":
+        metrics["canonical_nerf_example"] = _evaluate_canonical_nerf_example(run_dir)
     ensure_finite(metrics, "Nerfacto scored metrics")
     _validate_failure_sweep(run_dir, metrics)
     return metrics
@@ -801,6 +997,36 @@ def _validate_runtime_identity(run_dir: Path, profile: str) -> dict[str, Any]:
         or summary["density_query_seconds"] < 0
     ):
         raise ValueError("Nerfacto training identity mismatch")
+    canonical = summary.get("canonical_nerf_example")
+    if profile == "smoke":
+        if canonical is not None:
+            raise ValueError("smoke Nerfacto run unexpectedly executed the canonical dataset")
+    elif (
+        not isinstance(canonical, dict)
+        or canonical.keys()
+        != {
+            "asset_id",
+            "dataset",
+            "iterations",
+            "rays_per_batch",
+            "training_views",
+            "target_views",
+            "image_size",
+            "training_seconds",
+        }
+        or canonical.get("asset_id") != NERF_SYNTHETIC_ASSET_ID
+        or canonical.get("dataset") != CANONICAL_NERF_EXAMPLE["dataset"]
+        or canonical.get("iterations") != CANONICAL_NERF_EXAMPLE["iterations"]
+        or canonical.get("rays_per_batch") != CANONICAL_NERF_EXAMPLE["rays_per_batch"]
+        or canonical.get("training_views")
+        != len(CANONICAL_NERF_EXAMPLE["training_frame_ids"])
+        or canonical.get("target_views")
+        != len(CANONICAL_NERF_EXAMPLE["target_frame_ids"])
+        or canonical.get("image_size") != CANONICAL_NERF_EXAMPLE["image_size"]
+        or not isinstance(canonical.get("training_seconds"), (int, float))
+        or canonical["training_seconds"] <= 0
+    ):
+        raise ValueError("canonical NeRF example training identity mismatch")
     _require_regular_file(run_dir, "output/nerfstudio/checkpoint.ckpt")
     _require_regular_file(run_dir, "output/nerfstudio/config.yml")
     _require_regular_file(run_dir, "output/failure_sweep.csv")
@@ -809,6 +1035,17 @@ def _validate_runtime_identity(run_dir: Path, profile: str) -> dict[str, Any]:
 
 def _acceptance_failures(metrics: dict[str, Any], acceptance: dict[str, Any]) -> list[str]:
     values = {**metrics["rendering"], **metrics["geometry"], **metrics["field"]}
+    if "canonical_nerf_example" in metrics:
+        values.update(
+            {
+                "canonical_target_psnr_db": metrics["canonical_nerf_example"][
+                    "target_psnr_db"
+                ],
+                "canonical_target_ssim": metrics["canonical_nerf_example"][
+                    "target_ssim"
+                ],
+            }
+        )
     failures = []
     for key, threshold in acceptance.items():
         if key.endswith("_min"):
@@ -839,6 +1076,14 @@ def _write_visualizations(run_dir: Path, metrics: dict[str, Any]) -> None:
 
 
 def _report(profile: str, metrics: dict[str, Any]) -> str:
+    canonical = ""
+    if "canonical_nerf_example" in metrics:
+        measured = metrics["canonical_nerf_example"]
+        canonical = f"""
+## Locked canonical NeRF example
+
+The full profile consumed the tree-verified Lego sample from the canonical NeRF example archive, optimized from {measured['training_views']} fixed training views, and scored {measured['target_views']} held-out views. The canonical NeRF example measured {measured['target_psnr_db']:.3f} dB PSNR and {measured['target_ssim']:.4f} SSIM. These rendering measurements are reported separately from the analytic shared-scene geometry metrics.
+"""
     return f"""# Nerfacto maintained reference ({profile})
 
 ## Rendering
@@ -848,6 +1093,7 @@ Held-out target PSNR: {metrics['rendering']['target_psnr_db']:.3f} dB; host-reco
 ## Geometry
 
 Accumulation-qualified common-visible expected-depth RMSE: {metrics['geometry']['expected_depth_rmse_m']:.5f} m; F-score at 10 cm: {metrics['geometry']['point_fscore_10cm']:.4f}.
+{canonical}
 
 ## Interpretation
 
@@ -857,7 +1103,7 @@ Nerfacto performs one seeded per-scene density/radiance optimization; CUDA execu
 
 def _entrypoint_command(profile: str) -> list[str]:
     config = PROFILE_CONFIG[profile]
-    return [
+    command = [
         "/usr/bin/time",
         "-v",
         "-o",
@@ -875,6 +1121,18 @@ def _entrypoint_command(profile: str) -> list[str]:
         "--density-resolution",
         str(config["density_resolution"]),
     ]
+    if profile == "full":
+        command.extend(
+            [
+                "--canonical-input",
+                "/canonical",
+                "--canonical-archive-sha256",
+                NERF_SYNTHETIC_SHA256,
+                "--canonical-tree-sha256",
+                NERF_SYNTHETIC_TREE_SHA256,
+            ]
+        )
+    return command
 
 
 def _container_command(
@@ -884,8 +1142,10 @@ def _container_command(
     cuda_cache: Path,
     lpips_checkpoint: Path,
     profile: str,
+    canonical_input: Path | None,
+    gpu_device: str,
 ) -> list[str]:
-    return [
+    command = [
         engine,
         "run",
         "--rm",
@@ -893,7 +1153,7 @@ def _container_command(
         "none",
         "--pull=never",
         "--gpus",
-        "all",
+        f"device={gpu_device}",
         "--user",
         f"{os.getuid()}:{os.getgid()}",
         "-e",
@@ -917,6 +1177,13 @@ def _container_command(
         image_id,
         *_entrypoint_command(profile),
     ]
+    if canonical_input is not None:
+        image_index = command.index(image_id)
+        command[image_index:image_index] = [
+            "-v",
+            f"{canonical_input.resolve(strict=True)}:/canonical:ro",
+        ]
+    return command
 
 
 def _expected_config(
@@ -955,6 +1222,14 @@ def _expected_config(
             "iterations": 1000,
             "rays_per_batch": 1024,
         },
+        "canonical_nerf_example": None
+        if profile == "smoke"
+        else {
+            **CANONICAL_NERF_EXAMPLE,
+            "archive_sha256": NERF_SYNTHETIC_SHA256,
+            "extraction_tree_sha256": NERF_SYNTHETIC_TREE_SHA256,
+            "asset_lock": _nerf_synthetic_record(),
+        },
         "container_user_environment": {"USER": "surflo"},
         "support": SUPPORT_CONTRACT,
         "cuda_cache": CUDA_CACHE_POLICY,
@@ -983,6 +1258,34 @@ def validate_nerfacto_reference_result(run_dir: Path) -> dict[str, Any]:
     if profile not in PROFILE_CONFIG:
         raise ValueError("Nerfacto result profile mismatch")
     _validate_runtime_identity(run_dir, profile)
+    _validated_resource_summary(
+        run_dir,
+        result,
+        label="Nerfacto",
+        expected_keys={
+            "runtime_seconds",
+            "peak_cpu_memory_bytes",
+            "peak_gpu_compute_memory_bytes",
+            "gpu_memory_scope",
+            "gpu_measurement_status",
+            "gpu_selection",
+            "gpu_host_index",
+            "gpu_hardware",
+            "host",
+            "density_query_seconds",
+            "training_seconds",
+            "training_steps_per_second",
+            "canonical_training_seconds",
+        },
+        positive_keys=(
+            "runtime_seconds",
+            "peak_cpu_memory_bytes",
+            "density_query_seconds",
+            "training_seconds",
+            "training_steps_per_second",
+        ),
+        nonnegative_keys=("canonical_training_seconds",),
+    )
     metrics = _evaluate_outputs(run_dir, profile)
     if not _values_match(result.get("metrics"), metrics):
         raise ValueError("Nerfacto persisted metric recomputation mismatch")
@@ -1019,13 +1322,18 @@ def run_nerfacto_reference(cache_root: Path, profile: str, run_id: str) -> Path:
         raise ValueError(f"unknown profile: {profile}")
     engine = os.environ.get("SURFLO_PATHWAY_CONTAINER_ENGINE", "docker")
     image_id = _inspect_image(engine, IMAGE)
+    _verify_container_entrypoint(engine, image_id)
     gpu_hardware = _gpu_hardware(engine)
     if Path(engine).name == "docker" and not gpu_hardware:
         raise ValueError("unable to inventory GPU hardware for the real Nerfacto reference")
+    gpu_device = selected_gpu_device(require_health=Path(engine).name == "docker")
     cache_root.mkdir(parents=True, exist_ok=True)
     cache_root = cache_root.resolve(strict=True)
     lpips_record = _lpips_checkpoint_record()
     lpips_checkpoint = _lpips_checkpoint_path(cache_root, lpips_record)
+    canonical_input: Path | None = None
+    if profile == "full":
+        canonical_input, _ = _locked_nerf_example(cache_root)
     runs_root = _secure_directory(cache_root, "reference-runs")
     staging_root = _secure_directory(cache_root, "reference-staging")
     cuda_cache = _secure_directory(cache_root, "cuda-cache")
@@ -1044,7 +1352,14 @@ def run_nerfacto_reference(cache_root: Path, profile: str, run_id: str) -> Path:
         )
         (staging / "output").mkdir()
         command = _container_command(
-            engine, image_id, staging, cuda_cache, lpips_checkpoint, profile
+            engine,
+            image_id,
+            staging,
+            cuda_cache,
+            lpips_checkpoint,
+            profile,
+            canonical_input,
+            gpu_device,
         )
         completed, peak_gpu = _run_monitored(command, staging / "container.cid")
         (staging / "adapter.log").write_text(completed.stdout + completed.stderr, encoding="utf-8")
@@ -1066,12 +1381,16 @@ def run_nerfacto_reference(cache_root: Path, profile: str, run_id: str) -> Path:
             "peak_gpu_compute_memory_bytes": peak_gpu,
             "gpu_memory_scope": "container-cgroup-compute-process-sum",
             "gpu_measurement_status": "measured" if peak_gpu > 0 else "unavailable",
-            "gpu_selection": "all-visible; pinned entrypoint selects CUDA device 0",
+            "gpu_selection": "one healthy host GPU mapped to CUDA device 0",
+            "gpu_host_index": int(gpu_device),
             "gpu_hardware": gpu_hardware,
             "host": platform.platform(),
             "density_query_seconds": summary["density_query_seconds"],
             "training_seconds": summary["training_seconds"],
             "training_steps_per_second": summary["training_steps_per_second"],
+            "canonical_training_seconds": 0.0
+            if summary["canonical_nerf_example"] is None
+            else summary["canonical_nerf_example"]["training_seconds"],
         }
         write_json(staging / "output/resource-summary.json", resources)
         provisional_result = {

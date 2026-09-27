@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from datetime import date
 import json
 from pathlib import Path
 import re
@@ -15,7 +16,8 @@ from urllib.request import Request, urlopen
 from contracts import ROOT, load_json, sha256_file
 
 
-CITATION = re.compile(r"\[([a-z0-9][a-z0-9-]*)\]\((https://[^)]+)\)")
+CITATION = re.compile(r"\[([a-z0-9][a-z0-9.-]*)\]\((https://[^)]+)\)")
+EXTERNAL_LINK = re.compile(r"\[[^\]]+\]\((https://[^)]+)\)")
 
 
 def audit_text(text: str, known_sources: dict[str, str], forbidden_patterns: Iterable[str]) -> list[str]:
@@ -29,6 +31,40 @@ def audit_text(text: str, known_sources: dict[str, str], forbidden_patterns: Ite
     for pattern in forbidden_patterns:
         if pattern.lower() in lowered:
             errors.append(f"forbidden terminology: {pattern}")
+    return errors
+
+
+def external_link_errors(text: str, registered_urls: set[str]) -> list[str]:
+    """Return every Markdown HTTPS link that is absent from the evidence registry."""
+
+    return [
+        f"unregistered external link: {url}"
+        for url in sorted(set(EXTERNAL_LINK.findall(text)) - registered_urls)
+    ]
+
+
+def source_metadata_errors(sources: list[dict[str, object]], cutoff: date) -> list[str]:
+    """Enforce the survey's day-level historical-availability cutoff."""
+
+    errors: list[str] = []
+    for source in sources:
+        source_id = str(source.get("id", "<missing>"))
+        year = source.get("year")
+        raw_date = source.get("first_public_date")
+        if year == cutoff.year and not raw_date:
+            errors.append(f"cutoff-year source missing first_public_date: {source_id}")
+            continue
+        if not raw_date:
+            if isinstance(year, int) and year > cutoff.year:
+                errors.append(f"source after cutoff year: {source_id}")
+            continue
+        try:
+            published = date.fromisoformat(str(raw_date))
+        except ValueError:
+            errors.append(f"invalid first_public_date for source {source_id}: {raw_date}")
+            continue
+        if published > cutoff:
+            errors.append(f"source after cutoff date: {source_id} ({raw_date})")
     return errors
 
 
@@ -120,6 +156,7 @@ def audit(online: bool) -> dict[str, object]:
         survey = survey_path.read_text(encoding="utf-8")
 
     sources = registry.get("sources", [])
+    cutoff = date.fromisoformat(str(curriculum["cutoff"]))
     source_ids = [item.get("id") for item in sources]
     if len(source_ids) != len(set(source_ids)):
         errors.append("source IDs are not unique")
@@ -130,11 +167,10 @@ def audit(online: bool) -> dict[str, object]:
         if missing:
             errors.append(f"source {source_id or '<missing>'} missing {missing}")
             continue
-        if source["year"] > 2026:
-            errors.append(f"source after cutoff year: {source_id}")
         if not source["primary_url"].startswith("https://"):
             errors.append(f"non-HTTPS primary URL: {source_id}")
         known[source_id] = source["primary_url"]
+    errors.extend(source_metadata_errors(sources, cutoff))
     caveats = " ".join(item.get("credit_caveat", "") for item in sources).lower()
     for history in ("bundle adjustment", "splatting"):
         if history not in caveats:
@@ -152,6 +188,13 @@ def audit(online: bool) -> dict[str, object]:
 
     forbidden = [pattern for guardrail in terminology["guardrails"] for pattern in guardrail["forbidden_patterns"]]
     errors.extend(audit_text(survey, known, forbidden))
+    registered_urls = set(known.values())
+    registered_urls.update(
+        asset["source"]
+        for asset in assets.get("assets", [])
+        if isinstance(asset.get("source"), str) and asset["source"].startswith("https://")
+    )
+    errors.extend(external_link_errors(survey, registered_urls))
 
     for asset in assets.get("assets", []):
         if not re.fullmatch(r"[0-9a-f]{64}", asset.get("sha256", "")):

@@ -38,7 +38,7 @@ def fake_depth_engine(path: Path) -> Path:
             [[ "${{1:-}}" == run ]]
             [[ " $* " == *" --network none "* ]]
             [[ " $* " == *" --pull=never "* ]]
-            [[ " $* " == *" --gpus all "* ]]
+            [[ " $* " == *" --gpus device="* ]]
             [[ " $* " == *" --cidfile "* ]]
             [[ " $* " == *" --user "* ]]
             [[ " $* " == *" -e USER=surflo "* ]]

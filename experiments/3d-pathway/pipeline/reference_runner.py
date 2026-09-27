@@ -251,6 +251,52 @@ def _require_regular_file(run_dir: Path, relative: str) -> Path:
     return path
 
 
+def _validated_resource_summary(
+    run_dir: Path,
+    result: dict[str, Any],
+    *,
+    label: str,
+    expected_keys: set[str],
+    positive_keys: tuple[str, ...],
+    nonnegative_keys: tuple[str, ...] = (),
+) -> dict[str, Any]:
+    """Bind reported resources to the persisted summary and validate its shape."""
+    summary = load_json(_require_regular_file(run_dir, "output/resource-summary.json"))
+    if result.get("resources") != summary:
+        raise ValueError(f"{label} result resource summary mismatch")
+
+    def real_number(name: str) -> bool:
+        return isinstance(summary.get(name), (int, float)) and not isinstance(
+            summary.get(name), bool
+        )
+
+    if (
+        set(summary) != expected_keys
+        or any(not real_number(name) or float(summary[name]) <= 0.0 for name in positive_keys)
+        or any(
+            not real_number(name) or float(summary[name]) < 0.0
+            for name in nonnegative_keys
+        )
+        or not isinstance(summary.get("peak_gpu_compute_memory_bytes"), int)
+        or isinstance(summary.get("peak_gpu_compute_memory_bytes"), bool)
+        or summary["peak_gpu_compute_memory_bytes"] < 0
+        or summary.get("gpu_measurement_status") not in {"measured", "unavailable"}
+        or (summary["peak_gpu_compute_memory_bytes"] > 0)
+        != (summary["gpu_measurement_status"] == "measured")
+        or not isinstance(summary.get("gpu_host_index"), int)
+        or isinstance(summary.get("gpu_host_index"), bool)
+        or summary["gpu_host_index"] < 0
+        or not isinstance(summary.get("gpu_hardware"), list)
+        or any(
+            not isinstance(summary.get(name), str) or not summary[name]
+            for name in ("gpu_memory_scope", "gpu_selection", "host")
+        )
+    ):
+        raise ValueError(f"{label} resource summary contract mismatch")
+    ensure_finite(summary, f"{label} resource summary")
+    return summary
+
+
 def _parse_key_value_manifest(path: Path) -> dict[str, str]:
     parsed: dict[str, str] = {}
     for line in path.read_text(encoding="utf-8").splitlines():
@@ -412,6 +458,43 @@ def validate_reference_result(run_dir: Path, expected_adapter: str | None = None
     ):
         raise ValueError("COLMAP reconstruction is below the locked acceptance threshold")
     return result
+
+
+def validate_landed_reference_result(run_dir: Path, adapter: str) -> dict[str, Any]:
+    """Dispatch validation for any maintained adapter exposed by ``run.sh``."""
+    if adapter == "foundation-geometry":
+        from foundation_geometry_reference_runner import (
+            validate_foundation_geometry_reference_result,
+        )
+
+        return validate_foundation_geometry_reference_result(run_dir)
+    if adapter == "splatfacto":
+        from splatfacto_reference_runner import validate_splatfacto_reference_result
+
+        return validate_splatfacto_reference_result(run_dir)
+    if adapter == "nerfacto":
+        from nerfacto_reference_runner import validate_nerfacto_reference_result
+
+        return validate_nerfacto_reference_result(run_dir)
+    if adapter == "neus-facto":
+        from neus_reference_runner import validate_neus_reference_result
+
+        return validate_neus_reference_result(run_dir)
+    if adapter == "depth-anything-v2":
+        from depth_reference_runner import validate_depth_reference_result
+
+        return validate_depth_reference_result(run_dir)
+    if adapter == "orb-slam":
+        from slam_reference_runner import validate_slam_reference_result
+
+        return validate_slam_reference_result(run_dir)
+    if adapter == "colmap-mvs":
+        from mvs_reference_runner import validate_mvs_reference_result
+
+        return validate_mvs_reference_result(run_dir)
+    if adapter == ADAPTER:
+        return validate_reference_result(run_dir, adapter)
+    raise ValueError(f"unknown landed reference adapter: {adapter}")
 
 
 def _secure_directory(root: Path, name: str) -> Path:

@@ -39,7 +39,7 @@ def fake_splatfacto_engine(path: Path, fail: bool = False) -> Path:
             [[ "${{1:-}}" == run ]]
             [[ " $* " == *" --network none "* ]]
             [[ " $* " == *" --pull=never "* ]]
-            [[ " $* " == *" --gpus all "* ]]
+            [[ " $* " == *" --gpus device="* ]]
             [[ " $* " == *" -e USER=surflo "* ]]
             [[ " $* " == *" -e TORCH_EXTENSIONS_DIR=/cuda-cache/torch-extensions "* ]]
             [[ " $* " == *" -e TRITON_CACHE_DIR=/cuda-cache/triton "* ]]
@@ -343,6 +343,17 @@ class SplatfactoReferenceFoundationTest(unittest.TestCase):
                 "point_fscore_10cm_min",
             },
         )
+        self.assertEqual(
+            adapter["acceptance"]["full"],
+            {
+                "target_psnr_db_min": 18.0,
+                "target_ssim_min": 0.6,
+                "common_visible_accumulation_coverage_min": 0.95,
+                "expected_depth_rmse_m_max": 1.0,
+                "point_fscore_10cm_min": 0.01,
+            },
+        )
+        self.assertIn("stochastic B200", adapter["measurement_note"])
         self.assertEqual(adapter["baseline_environment"]["gpu_model"], "NVIDIA B200")
         self.assertEqual(adapter["last_verified_smoke"]["date"], "2026-09-26")
         self.assertEqual(adapter["last_verified_full"]["date"], "2026-09-26")
@@ -463,6 +474,15 @@ class SplatfactoOutputContractTest(unittest.TestCase):
             self.assertEqual(result["network_mode"], "offline")
             self.assertEqual(result["support"]["triangle_mesh"], "unsupported")
             self.assertEqual(result["support"]["completion_claim"], "none")
+            self.assertEqual(
+                result["provenance"]["config"]["container_user_environment"],
+                {
+                    "USER": "surflo",
+                    "PYTHONHASHSEED": "260925",
+                    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+                    "NVIDIA_TF32_OVERRIDE": "0",
+                },
+            )
             self.assertGreater(result["metrics"]["rendering"]["target_psnr_db"], 0.0)
             self.assertAlmostEqual(
                 result["metrics"]["geometry"]["expected_depth_rmse_m"],

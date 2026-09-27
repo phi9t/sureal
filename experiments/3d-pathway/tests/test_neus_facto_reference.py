@@ -38,7 +38,7 @@ def fake_neus_engine(path: Path, fail: bool = False) -> Path:
             [[ "${{1:-}}" == run ]]
             [[ " $* " == *" --network none "* ]]
             [[ " $* " == *" --pull=never "* ]]
-            [[ " $* " == *" --gpus all "* ]]
+            [[ " $* " == *" --gpus device="* ]]
             [[ " $* " == *" --cidfile "* ]]
             [[ " $* " == *" --user "* ]]
             [[ " $* " == *" -e USER=surflo "* ]]
@@ -581,6 +581,20 @@ class NeuSFactoReferenceAdapterTest(unittest.TestCase):
             from neus_reference_runner import validate_neus_reference_result
 
             with self.assertRaisesRegex(ValueError, "artifact"):
+                validate_neus_reference_result(run_dir)
+
+    def test_tampered_resource_record_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            run_dir = run_fake_neus_reference(Path(temporary))
+            result_path = run_dir / "result.json"
+            result = json.loads(result_path.read_text())
+            result["resources"]["runtime_seconds"] += 1.0
+            result_path.write_text(json.dumps(result))
+
+            sys.path.insert(0, str(ROOT / "pipeline"))
+            from neus_reference_runner import validate_neus_reference_result
+
+            with self.assertRaisesRegex(ValueError, "resource summary mismatch"):
                 validate_neus_reference_result(run_dir)
 
     def test_tampered_sdfstudio_metadata_is_rejected_as_input(self) -> None:

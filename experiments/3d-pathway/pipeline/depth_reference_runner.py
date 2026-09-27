@@ -22,6 +22,7 @@ from contracts import (
     canonical_json,
     ensure_finite,
     load_json,
+    selected_gpu_device,
     sha256_file,
     validate_json_schema_instance,
     validate_run_id,
@@ -527,7 +528,8 @@ def _validate_resources(run_dir: Path, result: dict[str, Any]) -> None:
             raise ValueError(f"{key} must be a non-negative integer")
     if (
         resources.get("gpu_memory_scope") != "container-cgroup-compute-process-sum"
-        or resources.get("gpu_selection") != "all-visible; model default CUDA device"
+        or resources.get("gpu_selection") != "one healthy host GPU mapped to CUDA device 0"
+        or not isinstance(resources.get("gpu_host_index"), int)
         or resources.get("gpu_measurement_status") not in {"measured", "unavailable"}
         or not isinstance(resources.get("gpu_hardware"), list)
         or not isinstance(resources.get("host"), str)
@@ -668,6 +670,7 @@ def run_depth_reference(cache_root: Path, profile: str, run_id: str) -> Path:
     gpu_hardware = _gpu_hardware(engine)
     if Path(engine).name == "docker" and not gpu_hardware:
         raise ValueError("unable to inventory GPU hardware for the real Depth Anything reference")
+    gpu_device = selected_gpu_device(require_health=Path(engine).name == "docker")
 
     cache_root.mkdir(parents=True, exist_ok=True)
     cache_root = cache_root.resolve(strict=True)
@@ -695,7 +698,7 @@ def run_depth_reference(cache_root: Path, profile: str, run_id: str) -> Path:
             "none",
             "--pull=never",
             "--gpus",
-            "all",
+            f"device={gpu_device}",
             "--user",
             f"{os.getuid()}:{os.getgid()}",
             "-e",
@@ -749,7 +752,8 @@ def run_depth_reference(cache_root: Path, profile: str, run_id: str) -> Path:
             "peak_gpu_compute_memory_bytes": peak_gpu,
             "gpu_memory_scope": "container-cgroup-compute-process-sum",
             "gpu_measurement_status": "measured" if peak_gpu > 0 else "unavailable",
-            "gpu_selection": "all-visible; model default CUDA device",
+            "gpu_selection": "one healthy host GPU mapped to CUDA device 0",
+            "gpu_host_index": int(gpu_device),
             "gpu_hardware": gpu_hardware,
             "host": platform.platform(),
         }

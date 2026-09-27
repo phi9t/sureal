@@ -9,6 +9,7 @@ from pathlib import Path
 import platform
 import shutil
 import sqlite3
+import stat
 import struct
 import subprocess
 import tempfile
@@ -23,11 +24,13 @@ from contracts import (
     canonical_json,
     ensure_finite,
     load_json,
+    selected_gpu_device,
     sha256_file,
     validate_json_schema_instance,
     validate_run_id,
     write_json,
 )
+from fetch import extract_locked_asset
 from reference_runner import (
     _format_shell_number,
     _hash_tree,
@@ -61,6 +64,12 @@ EVALUATION_SAMPLE_SEED = 260925
 FSCORE_THRESHOLD_M = 0.10
 METRIC_RELATIVE_TOLERANCE = 1e-9
 METRIC_ABSOLUTE_TOLERANCE = 1e-12
+MIDDLEBURY_ASSET_ID = "middlebury-mvs"
+MIDDLEBURY_ARCHIVE_SHA256 = "b4684adcfda53b47b0964355b4142c53cb28940bbb448e0e974f92748e428de9"
+MIDDLEBURY_TREE_SHA256 = "44eff8468fb2f807397f02449ae20b67262ec23c30b71477ee09d2532134acc5"
+MIDDLEBURY_VIEW_COUNT = 16
+MIDDLEBURY_DEPTH_NEAR_SCALE = 0.5
+MIDDLEBURY_DEPTH_FAR_SCALE = 1.5
 REFERENCE_IMPLEMENTATION = (
     "pipeline/cli.py",
     "pipeline/contracts.py",
@@ -73,17 +82,255 @@ REFERENCE_IMPLEMENTATION = (
     "reference-result.schema.json",
     "shared-scene.json",
     "reference-adapters.json",
+    "assets.lock.json",
 )
 
 
-def _container_script(manifest: dict[str, Any], profile: str) -> str:
+def _middlebury_record() -> dict[str, Any]:
+    matches = [
+        item
+        for item in load_json(ROOT / "assets.lock.json")["assets"]
+        if item.get("id") == MIDDLEBURY_ASSET_ID
+    ]
+    if len(matches) != 1:
+        raise ValueError("Middlebury MVS asset registry mismatch")
+    record = matches[0]
+    if (
+        record.get("mode") != "download"
+        or record.get("sha256") != MIDDLEBURY_ARCHIVE_SHA256
+        or record.get("byte_size") != 4004383
+        or record.get("digest_status") != "verified_2026-09-27"
+        or record.get("archive_format") != "zip"
+        or record.get("extraction")
+        != {"mode": "zip", "roots": ["templeSparseRing"]}
+        or record.get("tree_sha256") != MIDDLEBURY_TREE_SHA256
+        or record.get("tree_file_count") != 19
+        or record.get("tree_byte_size") != 4009956
+        or record.get("consumers") != ["colmap-mvs-reference"]
+    ):
+        raise ValueError("Middlebury MVS asset lock mismatch")
+    return record
+
+
+def _locked_middlebury(cache_root: Path) -> tuple[Path, dict[str, Any]]:
+    record = _middlebury_record()
+    assets = cache_root / "assets"
+    archive = assets / f"{MIDDLEBURY_ASSET_ID}.archive"
+    try:
+        mode = archive.lstat().st_mode
+    except FileNotFoundError as error:
+        raise FileNotFoundError(
+            f"missing Middlebury archive: {archive}; "
+            f"run `run.sh fetch --asset {MIDDLEBURY_ASSET_ID}`"
+        ) from error
+    if stat.S_ISLNK(mode) or not stat.S_ISREG(mode):
+        raise ValueError("Middlebury archive must be a regular non-symlink file")
+    if archive.stat().st_size != record["byte_size"] or sha256_file(archive) != record["sha256"]:
+        raise ValueError("Middlebury archive hash or byte-size mismatch")
+    extracted = extract_locked_asset(record, archive, assets)
+    extraction = load_json(assets / f"{MIDDLEBURY_ASSET_ID}.extraction.json")
+    if (
+        extraction.get("archive_sha256") != record["sha256"]
+        or extraction.get("tree_sha256") != record["tree_sha256"]
+        or extraction.get("file_count") != record["tree_file_count"]
+        or sum(item.get("size", -1) for item in extraction.get("files", []))
+        != record["tree_byte_size"]
+    ):
+        raise ValueError("Middlebury extraction tree does not match its lock")
+    source = extracted / "templeSparseRing"
+    _require_regular_file(source, "templeSR_par.txt")
+    return source, extraction
+
+
+def _rotation_to_colmap_quaternion(rotation: np.ndarray) -> np.ndarray:
+    if rotation.shape != (3, 3) or not np.isfinite(rotation).all():
+        raise ValueError("Middlebury rotation must be finite 3x3")
+    if not np.allclose(rotation @ rotation.T, np.eye(3), atol=1e-7, rtol=1e-7):
+        raise ValueError("Middlebury rotation is not orthonormal")
+    if not math.isclose(float(np.linalg.det(rotation)), 1.0, abs_tol=1e-7):
+        raise ValueError("Middlebury rotation is not proper")
+    trace = float(np.trace(rotation))
+    if trace > 0.0:
+        scale = math.sqrt(trace + 1.0) * 2.0
+        quaternion = np.array(
+            [
+                0.25 * scale,
+                (rotation[2, 1] - rotation[1, 2]) / scale,
+                (rotation[0, 2] - rotation[2, 0]) / scale,
+                (rotation[1, 0] - rotation[0, 1]) / scale,
+            ],
+            dtype=np.float64,
+        )
+    else:
+        diagonal = int(np.argmax(np.diag(rotation)))
+        if diagonal == 0:
+            scale = math.sqrt(1.0 + rotation[0, 0] - rotation[1, 1] - rotation[2, 2]) * 2.0
+            quaternion = np.array(
+                [
+                    (rotation[2, 1] - rotation[1, 2]) / scale,
+                    0.25 * scale,
+                    (rotation[0, 1] + rotation[1, 0]) / scale,
+                    (rotation[0, 2] + rotation[2, 0]) / scale,
+                ]
+            )
+        elif diagonal == 1:
+            scale = math.sqrt(1.0 + rotation[1, 1] - rotation[0, 0] - rotation[2, 2]) * 2.0
+            quaternion = np.array(
+                [
+                    (rotation[0, 2] - rotation[2, 0]) / scale,
+                    (rotation[0, 1] + rotation[1, 0]) / scale,
+                    0.25 * scale,
+                    (rotation[1, 2] + rotation[2, 1]) / scale,
+                ]
+            )
+        else:
+            scale = math.sqrt(1.0 + rotation[2, 2] - rotation[0, 0] - rotation[1, 1]) * 2.0
+            quaternion = np.array(
+                [
+                    (rotation[1, 0] - rotation[0, 1]) / scale,
+                    (rotation[0, 2] + rotation[2, 0]) / scale,
+                    (rotation[1, 2] + rotation[2, 1]) / scale,
+                    0.25 * scale,
+                ]
+            )
+    quaternion /= np.linalg.norm(quaternion)
+    if quaternion[0] < 0.0:
+        quaternion *= -1.0
+    return quaternion
+
+
+def _middlebury_patch_match_rows(frame_names: list[str]) -> list[str]:
+    source_offsets = (-1, 1, -2, 2, -3, 3, -4, 4)
+    rows: list[str] = []
+    for index, name in enumerate(frame_names):
+        source_names = [
+            frame_names[(index + offset) % len(frame_names)]
+            for offset in source_offsets
+        ]
+        rows.extend([name, ",".join(source_names)])
+    return rows
+
+
+def _prepare_middlebury_input(
+    source: Path, destination: Path, extraction: dict[str, Any]
+) -> dict[str, Any]:
+    lines = _require_regular_file(source, "templeSR_par.txt").read_text(
+        encoding="utf-8"
+    ).splitlines()
+    if not lines or lines[0].strip() != str(MIDDLEBURY_VIEW_COUNT):
+        raise ValueError("Middlebury calibration view count mismatch")
+    records = [line.split() for line in lines[1:] if line.strip()]
+    if len(records) != MIDDLEBURY_VIEW_COUNT or any(len(record) != 22 for record in records):
+        raise ValueError("Middlebury calibration row mismatch")
+    images = destination / "images"
+    model = destination / "model"
+    images.mkdir(parents=True)
+    model.mkdir()
+    camera_rows = ["# Camera list"]
+    image_rows = ["# Image list, two lines per image"]
+    frame_names: list[str] = []
+    origin_depths: list[float] = []
+    input_hashes: dict[str, str] = {}
+    for image_id, record in enumerate(records, 1):
+        name = record[0]
+        if name != f"templeSR{image_id:04d}.png":
+            raise ValueError("Middlebury image ordering mismatch")
+        try:
+            values = np.asarray([float(value) for value in record[1:]], dtype=np.float64)
+        except ValueError as error:
+            raise ValueError("Middlebury calibration is not numeric") from error
+        if not np.isfinite(values).all():
+            raise ValueError("Middlebury calibration must be finite")
+        intrinsics = values[:9].reshape(3, 3)
+        rotation = values[9:18].reshape(3, 3)
+        translation = values[18:21]
+        if (
+            not np.allclose(intrinsics[[0, 1], [1, 0]], 0.0, atol=1e-12)
+            or not np.allclose(intrinsics[2], [0.0, 0.0, 1.0], atol=1e-12)
+            or intrinsics[0, 0] <= 0.0
+            or intrinsics[1, 1] <= 0.0
+        ):
+            raise ValueError("Middlebury pinhole intrinsics mismatch")
+        quaternion = _rotation_to_colmap_quaternion(rotation)
+        if translation[2] <= 0.0:
+            raise ValueError("Middlebury world origin must be in front of every camera")
+        origin_depths.append(float(translation[2]))
+        source_image = _require_regular_file(source, name)
+        target_image = images / name
+        shutil.copy2(source_image, target_image)
+        input_hashes[f"images/{name}"] = sha256_file(target_image)
+        camera_rows.append(
+            f"{image_id} PINHOLE 640 480 "
+            f"{_format_shell_number(intrinsics[0, 0], 'fx')} "
+            f"{_format_shell_number(intrinsics[1, 1], 'fy')} "
+            f"{_format_shell_number(intrinsics[0, 2], 'cx')} "
+            f"{_format_shell_number(intrinsics[1, 2], 'cy')}"
+        )
+        pose = [*quaternion.tolist(), *translation.tolist()]
+        image_rows.extend(
+            [
+                f"{image_id} {' '.join(_format_shell_number(value, 'pose') for value in pose)} {image_id} {name}",
+                "",
+            ]
+        )
+        frame_names.append(name)
+    (model / "cameras.txt").write_text("\n".join(camera_rows) + "\n", encoding="utf-8")
+    (model / "images.txt").write_text("\n".join(image_rows) + "\n", encoding="utf-8")
+    (model / "points3D.txt").write_text("# 3D point list\n", encoding="utf-8")
+    patch_match_rows = _middlebury_patch_match_rows(frame_names)
+    patch_match_config = destination / "patch-match.cfg"
+    patch_match_config.write_text(
+        "\n".join(patch_match_rows) + "\n", encoding="utf-8"
+    )
+    calibration = destination / "templeSR_par.txt"
+    shutil.copy2(source / "templeSR_par.txt", calibration)
+    input_hashes["templeSR_par.txt"] = sha256_file(calibration)
+    for name in ("model/cameras.txt", "model/images.txt", "model/points3D.txt"):
+        input_hashes[name] = sha256_file(destination / name)
+    input_hashes["patch-match.cfg"] = sha256_file(patch_match_config)
+    manifest = {
+        "schema_version": 1,
+        "asset_id": MIDDLEBURY_ASSET_ID,
+        "archive_sha256": MIDDLEBURY_ARCHIVE_SHA256,
+        "extraction_tree_sha256": MIDDLEBURY_TREE_SHA256,
+        "dataset": "templeSparseRing",
+        "calibrated_views": MIDDLEBURY_VIEW_COUNT,
+        "image_size": [640, 480],
+        "frame_names": frame_names,
+        "source_view_strategy": "cyclic_neighbors_offsets_-1_1_-2_2_-3_3_-4_4",
+        "source_views_per_reference": 8,
+        "depth_range_derivation": (
+            "0.5 * minimum and 1.5 * maximum camera-space depth of world origin"
+        ),
+        "origin_depth_range_dataset_units": [min(origin_depths), max(origin_depths)],
+        "depth_range_dataset_units": [
+            MIDDLEBURY_DEPTH_NEAR_SCALE * min(origin_depths),
+            MIDDLEBURY_DEPTH_FAR_SCALE * max(origin_depths),
+        ],
+        "patch_match_output": "photometric",
+        "fusion_min_num_pixels": 1,
+        "poisson_depth": 8,
+        "fusion_scope": (
+            "structural execution support; cross-view geometry is scored on the controlled scene"
+        ),
+        "input_sha256": input_hashes,
+    }
+    write_json(destination / "manifest.json", manifest)
+    return manifest
+
+
+def _container_script(
+    manifest: dict[str, Any],
+    profile: str,
+    middlebury_manifest: dict[str, Any] | None = None,
+) -> str:
     intrinsics = manifest["intrinsics"]
     parameters = ",".join(
         _format_shell_number(intrinsics[key], key) for key in ("fx", "fy", "cx", "cy")
     )
     minimum_matches = 8 if profile == "smoke" else 12
     max_image_size = max(int(intrinsics["width"]), int(intrinsics["height"]))
-    return f"""set -euo pipefail
+    script = f"""set -euo pipefail
 export QT_QPA_PLATFORM=offscreen
 mkdir -p /work/output/sparse /work/output/text /work/output/dense
 colmap -h >/tmp/colmap-help.txt 2>&1
@@ -97,11 +344,13 @@ colmap feature_extractor \
   --ImageReader.camera_model PINHOLE \
   --ImageReader.single_camera 1 \
   --ImageReader.camera_params {parameters} \
-  --FeatureExtraction.use_gpu 1
+  --FeatureExtraction.use_gpu 1 \
+  --FeatureExtraction.gpu_index 0
 colmap exhaustive_matcher \
   --default_random_seed 260925 \
   --database_path /work/output/database.db \
-  --FeatureMatching.use_gpu 1
+  --FeatureMatching.use_gpu 1 \
+  --FeatureMatching.gpu_index 0
 colmap mapper \
   --database_path /work/output/database.db \
   --image_path /work/input/images \
@@ -144,11 +393,60 @@ colmap stereo_fusion \
   --StereoFusion.max_reproj_error 2 \
   --StereoFusion.max_depth_error 0.02 \
   --StereoFusion.max_normal_error 10
+awk '$1 == "element" && $2 == "vertex" {{found=1; if (($3 + 0) > 0) nonempty=1}} END {{exit !(found && nonempty)}}' /work/output/dense/fused.ply
 colmap poisson_mesher \
   --input_path /work/output/dense/fused.ply \
   --output_path /work/output/dense/meshed-poisson.ply \
   --PoissonMeshing.trim 5
 """
+    if profile == "full":
+        if middlebury_manifest is None:
+            raise ValueError("full MVS execution requires the Middlebury input manifest")
+        depth_range = middlebury_manifest.get("depth_range_dataset_units")
+        if (
+            not isinstance(depth_range, list)
+            or len(depth_range) != 2
+            or not all(isinstance(value, (int, float)) for value in depth_range)
+            or not 0.0 < float(depth_range[0]) < float(depth_range[1])
+        ):
+            raise ValueError("Middlebury depth range is invalid")
+        depth_min = _format_shell_number(float(depth_range[0]), "depth_min")
+        depth_max = _format_shell_number(float(depth_range[1]), "depth_max")
+        script += f"""
+mkdir -p /work/output/middlebury/dense
+colmap image_undistorter \
+  --image_path /work/input/middlebury/images \
+  --input_path /work/input/middlebury/model \
+  --output_path /work/output/middlebury/dense \
+  --output_type COLMAP \
+  --max_image_size 640
+cp /work/input/middlebury/patch-match.cfg /work/output/middlebury/dense/stereo/patch-match.cfg
+colmap patch_match_stereo \
+  --default_random_seed 260925 \
+  --workspace_path /work/output/middlebury/dense \
+  --workspace_format COLMAP \
+  --PatchMatchStereo.geom_consistency 0 \
+  --PatchMatchStereo.max_image_size 640 \
+  --PatchMatchStereo.depth_min {depth_min} \
+  --PatchMatchStereo.depth_max {depth_max} \
+  --PatchMatchStereo.gpu_index 0
+colmap stereo_fusion \
+  --workspace_path /work/output/middlebury/dense \
+  --workspace_format COLMAP \
+  --input_type photometric \
+  --output_path /work/output/middlebury/dense/fused.ply \
+  --StereoFusion.min_num_pixels 1 \
+  --StereoFusion.max_reproj_error 2 \
+  --StereoFusion.max_depth_error 0.02 \
+  --StereoFusion.max_normal_error 10
+awk '$1 == "element" && $2 == "vertex" {{found=1; if (($3 + 0) > 0) nonempty=1}} END {{exit !(found && nonempty)}}' /work/output/middlebury/dense/fused.ply
+colmap poisson_mesher \
+  --input_path /work/output/middlebury/dense/fused.ply \
+  --output_path /work/output/middlebury/dense/meshed-poisson.ply \
+  --PoissonMeshing.depth 8 \
+  --PoissonMeshing.trim 5
+"""
+    return script
 
 
 PLY_SCALAR_TYPES = {
@@ -861,7 +1159,7 @@ def _validate_required_artifacts(
 
 
 def _acceptance_failures(metrics: dict[str, Any], acceptance: dict[str, Any]) -> list[str]:
-    checks = (
+    checks = [
         (metrics["registered_images"] >= acceptance["registered_images_min"], "registered_images"),
         (metrics["dense_points"] >= acceptance["dense_points_min"], "dense_points"),
         (metrics["mesh_faces"] >= acceptance["mesh_faces_min"], "mesh_faces"),
@@ -869,8 +1167,112 @@ def _acceptance_failures(metrics: dict[str, Any], acceptance: dict[str, Any]) ->
         (metrics["accuracy_mean_m"] <= acceptance["accuracy_mean_m_max"], "accuracy_mean_m"),
         (metrics["completeness_mean_m"] <= acceptance["completeness_mean_m_max"], "completeness_mean_m"),
         (metrics["fscore_10cm"] >= acceptance["fscore_10cm_min"], "fscore_10cm"),
-    )
+    ]
+    if "middlebury_dense_points_min" in acceptance:
+        checks.extend(
+            [
+                (
+                    metrics.get("middlebury_calibrated_views")
+                    >= acceptance["middlebury_calibrated_views_min"],
+                    "middlebury_calibrated_views",
+                ),
+                (
+                    metrics.get("middlebury_dense_points")
+                    >= acceptance["middlebury_dense_points_min"],
+                    "middlebury_dense_points",
+                ),
+                (
+                    metrics.get("middlebury_mesh_faces")
+                    >= acceptance["middlebury_mesh_faces_min"],
+                    "middlebury_mesh_faces",
+                ),
+            ]
+        )
     return [name for passed, name in checks if not passed]
+
+
+def _middlebury_metrics(run_dir: Path) -> dict[str, int]:
+    input_root = run_dir / "input" / "middlebury"
+    manifest = load_json(_require_regular_file(input_root, "manifest.json"))
+    if (
+        manifest.get("schema_version") != 1
+        or manifest.get("asset_id") != MIDDLEBURY_ASSET_ID
+        or manifest.get("archive_sha256") != MIDDLEBURY_ARCHIVE_SHA256
+        or manifest.get("extraction_tree_sha256") != MIDDLEBURY_TREE_SHA256
+        or manifest.get("dataset") != "templeSparseRing"
+        or manifest.get("calibrated_views") != MIDDLEBURY_VIEW_COUNT
+        or manifest.get("image_size") != [640, 480]
+        or manifest.get("frame_names")
+        != [f"templeSR{index:04d}.png" for index in range(1, 17)]
+        or manifest.get("source_view_strategy")
+        != "cyclic_neighbors_offsets_-1_1_-2_2_-3_3_-4_4"
+        or manifest.get("source_views_per_reference") != 8
+        or manifest.get("depth_range_derivation")
+        != "0.5 * minimum and 1.5 * maximum camera-space depth of world origin"
+        or manifest.get("patch_match_output") != "photometric"
+        or manifest.get("fusion_min_num_pixels") != 1
+        or manifest.get("poisson_depth") != 8
+        or manifest.get("fusion_scope")
+        != "structural execution support; cross-view geometry is scored on the controlled scene"
+        or not isinstance(manifest.get("input_sha256"), dict)
+    ):
+        raise ValueError("Middlebury input manifest mismatch")
+    expected_paths = {
+        "templeSR_par.txt",
+        "model/cameras.txt",
+        "model/images.txt",
+        "model/points3D.txt",
+        "patch-match.cfg",
+        *(f"images/{name}" for name in manifest["frame_names"]),
+    }
+    if set(manifest["input_sha256"]) != expected_paths:
+        raise ValueError("Middlebury input inventory mismatch")
+    for relative, expected_hash in manifest["input_sha256"].items():
+        if sha256_file(_require_regular_file(input_root, relative)) != expected_hash:
+            raise ValueError(f"Middlebury input hash mismatch: {relative}")
+    calibration_lines = _require_regular_file(
+        input_root, "templeSR_par.txt"
+    ).read_text(encoding="utf-8").splitlines()
+    try:
+        origin_depths = [
+            float(line.split()[21]) for line in calibration_lines[1:] if line.strip()
+        ]
+    except (IndexError, ValueError) as error:
+        raise ValueError("Middlebury depth-range calibration mismatch") from error
+    expected_origin_range = [min(origin_depths), max(origin_depths)]
+    expected_depth_range = [
+        MIDDLEBURY_DEPTH_NEAR_SCALE * expected_origin_range[0],
+        MIDDLEBURY_DEPTH_FAR_SCALE * expected_origin_range[1],
+    ]
+    if (
+        len(origin_depths) != MIDDLEBURY_VIEW_COUNT
+        or not all(value > 0.0 and math.isfinite(value) for value in origin_depths)
+        or manifest.get("origin_depth_range_dataset_units") != expected_origin_range
+        or manifest.get("depth_range_dataset_units") != expected_depth_range
+    ):
+        raise ValueError("Middlebury depth-range calibration mismatch")
+    expected_patch_match = "\n".join(
+        _middlebury_patch_match_rows(manifest["frame_names"])
+    ) + "\n"
+    if (input_root / "patch-match.cfg").read_text(encoding="utf-8") != expected_patch_match:
+        raise ValueError("Middlebury source-view graph mismatch")
+    fused, _ = _read_ply_xyz(
+        _require_regular_file(run_dir, "output/middlebury/dense/fused.ply"),
+        require_normals=True,
+    )
+    _, mesh_faces = _read_ply_xyz(
+        _require_regular_file(
+            run_dir, "output/middlebury/dense/meshed-poisson.ply"
+        ),
+        validate_faces=True,
+    )
+    if len(fused) == 0 or mesh_faces == 0:
+        raise ValueError("Middlebury dense reconstruction is empty")
+    return {
+        "middlebury_calibrated_views": MIDDLEBURY_VIEW_COUNT,
+        "middlebury_dense_points": int(len(fused)),
+        "middlebury_mesh_faces": int(mesh_faces),
+    }
 
 
 def _metrics_match(recorded: dict[str, Any], recomputed: dict[str, Any]) -> bool:
@@ -932,12 +1334,28 @@ def validate_mvs_reference_result(run_dir: Path) -> dict[str, Any]:
         or config.get("cuda_cache") != "persistent-cache-root-mount"
     ):
         raise ValueError("reference config binding mismatch")
+    expected_middlebury = (
+        None
+        if result["profile"] == "smoke"
+        else {
+            "asset_id": MIDDLEBURY_ASSET_ID,
+            "dataset": "templeSparseRing",
+            "archive_sha256": MIDDLEBURY_ARCHIVE_SHA256,
+            "extraction_tree_sha256": MIDDLEBURY_TREE_SHA256,
+            "calibrated_views": MIDDLEBURY_VIEW_COUNT,
+            "asset_lock": _middlebury_record(),
+        }
+    )
+    if config.get("canonical_middlebury") != expected_middlebury:
+        raise ValueError("Middlebury config binding mismatch")
     implementation = {name: sha256_file(ROOT / name) for name in REFERENCE_IMPLEMENTATION}
     if provenance.get("implementation_sha256") != implementation:
         raise ValueError("implementation hash mismatch")
     if _hash_tree(run_dir) != provenance.get("artifacts_sha256"):
         raise ValueError("artifact hash mismatch")
     metrics = _geometry_metrics(run_dir)
+    if result["profile"] == "full":
+        metrics.update(_middlebury_metrics(run_dir))
     if not isinstance(result.get("metrics"), dict) or not _metrics_match(result["metrics"], metrics):
         raise ValueError("COLMAP MVS metric mismatch")
     _validate_required_artifacts(run_dir, metrics, result["profile"])
@@ -957,6 +1375,11 @@ def validate_mvs_reference_result(run_dir: Path) -> dict[str, Any]:
         "maximum_points_per_direction": EVALUATION_MAX_POINTS,
         "sample_seed": EVALUATION_SAMPLE_SEED,
         "support_threshold_observations": 2,
+        "canonical_sample": "Middlebury TempleSparseRing",
+        "canonical_calibrated_views": MIDDLEBURY_VIEW_COUNT,
+        "canonical_ground_truth_status": (
+            "laser ground truth is not distributed; report execution and structural support only"
+        ),
     }:
         raise ValueError("evaluation contract mismatch")
     failures = _acceptance_failures(metrics, acceptance)
@@ -972,7 +1395,8 @@ def validate_mvs_reference_result(run_dir: Path) -> dict[str, Any]:
             raise ValueError(f"{key} must be a non-negative integer")
     if (
         resources.get("gpu_memory_scope") != "container-cgroup-compute-process-sum"
-        or resources.get("gpu_selection") != "all-visible; PatchMatch index 0"
+        or resources.get("gpu_selection") != "one healthy host GPU mapped to CUDA device 0"
+        or not isinstance(resources.get("gpu_host_index"), int)
         or resources.get("gpu_measurement_status") not in {"measured", "unavailable"}
         or not isinstance(resources.get("gpu_hardware"), list)
         or not isinstance(resources.get("host"), str)
@@ -997,7 +1421,11 @@ def validate_mvs_reference_result(run_dir: Path) -> dict[str, Any]:
     ):
         raise ValueError("invalid recorded baseline environment")
     if resources["gpu_measurement_status"] == "measured":
-        selected = [device for device in resources["gpu_hardware"] if device.get("index") == 0]
+        selected = [
+            device
+            for device in resources["gpu_hardware"]
+            if device.get("index") == resources["gpu_host_index"]
+        ]
         if len(selected) != 1 or any(
             not isinstance(selected[0].get(field), value_type)
             or isinstance(selected[0].get(field), bool)
@@ -1144,8 +1572,14 @@ def run_mvs_reference(cache_root: Path, profile: str, run_id: str) -> Path:
     gpu_hardware = _gpu_hardware(engine)
     if Path(engine).name == "docker" and not gpu_hardware:
         raise ValueError("unable to inventory GPU hardware for the real MVS reference")
+    gpu_device = selected_gpu_device(require_health=Path(engine).name == "docker")
     cache_root.mkdir(parents=True, exist_ok=True)
     cache_root = cache_root.resolve(strict=True)
+    middlebury_source: Path | None = None
+    middlebury_extraction: dict[str, Any] | None = None
+    middlebury_manifest: dict[str, Any] | None = None
+    if profile == "full":
+        middlebury_source, middlebury_extraction = _locked_middlebury(cache_root)
     runs_root = _secure_directory(cache_root, "reference-runs")
     staging_root = _secure_directory(cache_root, "reference-staging")
     cuda_cache = _secure_directory(cache_root, "cuda-cache")
@@ -1158,15 +1592,21 @@ def run_mvs_reference(cache_root: Path, profile: str, run_id: str) -> Path:
     started = time.perf_counter()
     try:
         manifest = generate_colmap_mvs_scene(staging / "input", load_json(ROOT / "shared-scene.json"), profile)
+        if middlebury_source is not None and middlebury_extraction is not None:
+            middlebury_manifest = _prepare_middlebury_input(
+                middlebury_source,
+                staging / "input" / "middlebury",
+                middlebury_extraction,
+            )
         (staging / "output").mkdir()
         command = [
-            engine, "run", "--rm", "--network", "none", "--pull=never", "--gpus", "all",
+            engine, "run", "--rm", "--network", "none", "--pull=never", "--gpus", f"device={gpu_device}",
             "--user", f"{os.getuid()}:{os.getgid()}",
             "--cidfile", str(staging / "container.cid"),
             "-e", "CUDA_CACHE_PATH=/cuda-cache", "-v", f"{cuda_cache}:/cuda-cache",
             "-v", f"{staging.resolve()}:/work",
             image_id, "/usr/bin/time", "-v", "-o", "/work/output/resource-usage.txt",
-            "bash", "-lc", _container_script(manifest, profile),
+            "bash", "-lc", _container_script(manifest, profile, middlebury_manifest),
         ]
         completed, peak_gpu = _run_monitored(command, staging / "container.cid")
         (staging / "adapter.log").write_text(completed.stdout + completed.stderr, encoding="utf-8")
@@ -1175,6 +1615,8 @@ def run_mvs_reference(cache_root: Path, profile: str, run_id: str) -> Path:
         if Path(engine).name == "docker" and peak_gpu <= 0:
             raise ValueError("unable to measure compute memory for PatchMatch GPU index 0")
         metrics = _geometry_metrics(staging)
+        if profile == "full":
+            metrics.update(_middlebury_metrics(staging))
         version = (staging / "output/colmap-version.txt").read_text(encoding="utf-8").strip()
         source_commit = (staging / "output/source-commit.txt").read_text(encoding="utf-8").strip()
         if PINNED_COLMAP_VERSION not in version.split():
@@ -1215,7 +1657,20 @@ def run_mvs_reference(cache_root: Path, profile: str, run_id: str) -> Path:
             f"Supported/under-supported completeness is {metrics['supported_completeness_mean_m']:.4f}/"
             f"{metrics['undersupported_completeness_mean_m']:.4f} m over "
             f"{metrics['supported_truth_points']}/{metrics['undersupported_truth_points']} sampled truth voxels. "
-            f"{support_interpretation}\n",
+            f"{support_interpretation}\n"
+            + (
+                "\n## Canonical Middlebury sample\n\n"
+                f"The full profile consumed all {metrics['middlebury_calibrated_views']} calibrated "
+                "TempleSparseRing views from the byte- and tree-verified Middlebury archive. "
+                f"COLMAP fused {metrics['middlebury_dense_points']} oriented points and extracted "
+                f"{metrics['middlebury_mesh_faces']} non-degenerate mesh faces. The benchmark's "
+                "laser ground truth is not distributed. This branch therefore uses photometric "
+                "PatchMatch depth with a one-view fusion minimum and reports execution/support only, "
+                "not cross-view-consistent accuracy or completeness; those geometry claims come from "
+                "the controlled scene above.\n"
+                if profile == "full"
+                else ""
+            ),
             encoding="utf-8",
         )
         resources = {
@@ -1224,7 +1679,8 @@ def run_mvs_reference(cache_root: Path, profile: str, run_id: str) -> Path:
             "peak_gpu_compute_memory_bytes": peak_gpu,
             "gpu_memory_scope": "container-cgroup-compute-process-sum",
             "gpu_measurement_status": "measured" if peak_gpu > 0 else "unavailable",
-            "gpu_selection": "all-visible; PatchMatch index 0",
+            "gpu_selection": "one healthy host GPU mapped to CUDA device 0",
+            "gpu_host_index": int(gpu_device),
             "gpu_hardware": gpu_hardware,
             "host": platform.platform(),
         }
@@ -1245,6 +1701,16 @@ def run_mvs_reference(cache_root: Path, profile: str, run_id: str) -> Path:
             "validation_float_absolute_tolerance": METRIC_ABSOLUTE_TOLERANCE,
             "evaluation_software": {"numpy": np.__version__},
             "cuda_cache": "persistent-cache-root-mount",
+            "canonical_middlebury": None
+            if profile == "smoke"
+            else {
+                "asset_id": MIDDLEBURY_ASSET_ID,
+                "dataset": "templeSparseRing",
+                "archive_sha256": MIDDLEBURY_ARCHIVE_SHA256,
+                "extraction_tree_sha256": MIDDLEBURY_TREE_SHA256,
+                "calibrated_views": MIDDLEBURY_VIEW_COUNT,
+                "asset_lock": _middlebury_record(),
+            },
             "acceptance": acceptance,
         }
         result = {

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -33,7 +34,7 @@ def fake_mvs_engine(path: Path) -> Path:
             [[ "${{1:-}}" == run ]]
             [[ " $* " == *" --network none "* ]]
             [[ " $* " == *" --pull=never "* ]]
-            [[ " $* " == *" --gpus all "* ]]
+            [[ " $* " == *" --gpus device="* ]]
             [[ " $* " == *" --cidfile "* ]]
             [[ " $* " == *" --user "* ]]
             [[ " $* " == *" -e CUDA_CACHE_PATH=/cuda-cache "* ]]
@@ -174,6 +175,40 @@ def fake_mvs_engine(path: Path) -> Path:
                     for face in range(face_count)
                 )
             )
+            if manifest["profile"] == "full":
+                canonical_manifest = json.loads(
+                    (root / "input/middlebury/manifest.json").read_text()
+                )
+                assert canonical_manifest["asset_id"] == "middlebury-mvs"
+                assert canonical_manifest["calibrated_views"] == 16
+                assert len(canonical_manifest["frame_names"]) == 16
+                middlebury = output / "middlebury/dense"
+                middlebury.mkdir(parents=True)
+                canonical_vertices = vertices[:2000]
+                canonical_fused_header = [
+                    "ply", "format ascii 1.0", f"element vertex {{len(canonical_vertices)}}",
+                    "property float x", "property float y", "property float z",
+                    "property float nx", "property float ny", "property float nz", "end_header",
+                ]
+                (middlebury / "fused.ply").write_text(
+                    "\\n".join(canonical_fused_header + [f"{{vertex}} 0 0 1" for vertex in canonical_vertices]) + "\\n"
+                )
+                canonical_faces = 1000
+                canonical_mesh_header = (
+                    "ply\\nformat ascii 1.0\\n"
+                    f"element vertex {{len(canonical_vertices)}}\\n"
+                    "property float x\\nproperty float y\\nproperty float z\\n"
+                    f"element face {{canonical_faces}}\\n"
+                    "property list uchar int vertex_indices\\nend_header\\n"
+                )
+                (middlebury / "meshed-poisson.ply").write_text(
+                    canonical_mesh_header + "\\n".join(canonical_vertices) + "\\n" + "".join(
+                        f"3 {{(face // 159) * 160 + face % 159}} "
+                        f"{{(face // 159) * 160 + face % 159 + 1}} "
+                        f"{{(face // 159) * 160 + face % 159 + 160}}\\n"
+                        for face in range(canonical_faces)
+                    )
+                )
             connection = sqlite3.connect(output / "database.db")
             connection.execute("CREATE TABLE cameras (camera_id INTEGER PRIMARY KEY, model INTEGER, width INTEGER, height INTEGER, params BLOB, prior_focal_length INTEGER)")
             connection.execute("CREATE TABLE images (image_id INTEGER PRIMARY KEY, name TEXT, camera_id INTEGER)")
@@ -205,6 +240,126 @@ def fake_mvs_engine(path: Path) -> Path:
 
 
 class ColmapMvsReferenceAdapterTest(unittest.TestCase):
+    def test_middlebury_archive_is_byte_and_tree_locked_to_the_mvs_adapter(self) -> None:
+        assets = {
+            item["id"]: item
+            for item in json.loads((ROOT / "assets.lock.json").read_text())["assets"]
+        }
+        middlebury = assets["middlebury-mvs"]
+        self.assertEqual(
+            middlebury["source"],
+            "https://grail.cs.washington.edu/projects/mview/templeSparseRing_update.zip",
+        )
+        self.assertEqual(
+            middlebury["sha256"],
+            "b4684adcfda53b47b0964355b4142c53cb28940bbb448e0e974f92748e428de9",
+        )
+        self.assertEqual(middlebury.get("byte_size"), 4004383)
+        self.assertEqual(middlebury["digest_status"], "verified_2026-09-27")
+        self.assertEqual(
+            middlebury["extraction"],
+            {"mode": "zip", "roots": ["templeSparseRing"]},
+        )
+        self.assertEqual(
+            middlebury.get("tree_sha256"),
+            "44eff8468fb2f807397f02449ae20b67262ec23c30b71477ee09d2532134acc5",
+        )
+        self.assertEqual(middlebury.get("tree_file_count"), 19)
+        self.assertEqual(middlebury.get("tree_byte_size"), 4009956)
+        self.assertEqual(middlebury["consumers"], ["colmap-mvs-reference"])
+
+    def test_middlebury_import_declares_source_views_and_guards_empty_fusion(self) -> None:
+        """Calibrated models without sparse tracks need an explicit MVS view graph."""
+        from sys import path as import_path
+
+        import_path.insert(0, str(ROOT / "pipeline"))
+        from mvs_reference_runner import _container_script, _prepare_middlebury_input
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source"
+            destination = root / "input"
+            source.mkdir()
+            calibration = ["16"]
+            for index in range(1, 17):
+                name = f"templeSR{index:04d}.png"
+                (source / name).write_bytes(b"fixture png")
+                calibration.append(
+                    f"{name} 1520.4 0 302.32 0 1525.9 246.87 0 0 1 "
+                    f"1 0 0 0 1 0 0 0 1 {index / 1000:.6f} 0 0.6"
+                )
+            (source / "templeSR_par.txt").write_text(
+                "\n".join(calibration) + "\n", encoding="utf-8"
+            )
+
+            manifest = _prepare_middlebury_input(source, destination, {})
+            config_path = destination / "patch-match.cfg"
+            lines = config_path.read_text(encoding="utf-8").splitlines()
+            self.assertEqual(len(lines), 32)
+            frame_names = set(manifest["frame_names"])
+            for offset in range(0, len(lines), 2):
+                reference = lines[offset]
+                sources = lines[offset + 1].split(",")
+                self.assertIn(reference, frame_names)
+                self.assertEqual(len(sources), 8)
+                self.assertEqual(len(set(sources)), 8)
+                self.assertNotIn(reference, sources)
+                self.assertTrue(set(sources).issubset(frame_names))
+            self.assertEqual(
+                manifest["input_sha256"]["patch-match.cfg"],
+                hashlib.sha256(config_path.read_bytes()).hexdigest(),
+            )
+            self.assertEqual(
+                manifest["origin_depth_range_dataset_units"], [0.6, 0.6]
+            )
+            self.assertAlmostEqual(manifest["depth_range_dataset_units"][0], 0.3)
+            self.assertAlmostEqual(manifest["depth_range_dataset_units"][1], 0.9)
+            self.assertEqual(manifest["patch_match_output"], "photometric")
+            self.assertEqual(manifest["fusion_min_num_pixels"], 1)
+            self.assertEqual(manifest["poisson_depth"], 8)
+
+            script = _container_script(
+                {
+                    "intrinsics": {
+                        "width": 640,
+                        "height": 480,
+                        "fx": 520.0,
+                        "fy": 520.0,
+                        "cx": 319.5,
+                        "cy": 239.5,
+                    }
+                },
+                "full",
+                manifest,
+            )
+            self.assertIn(
+                "--PatchMatchStereo.depth_min "
+                f"{manifest['depth_range_dataset_units'][0]:.17g}",
+                script,
+            )
+            self.assertIn(
+                "--PatchMatchStereo.depth_max "
+                f"{manifest['depth_range_dataset_units'][1]:.17g}",
+                script,
+            )
+            copy_config = (
+                "cp /work/input/middlebury/patch-match.cfg "
+                "/work/output/middlebury/dense/stereo/patch-match.cfg"
+            )
+            self.assertIn(copy_config, script)
+            canonical_script = script[script.index(copy_config) :]
+            self.assertIn("--PatchMatchStereo.geom_consistency 0", canonical_script)
+            self.assertIn("--input_type photometric", canonical_script)
+            self.assertIn("--StereoFusion.min_num_pixels 1", canonical_script)
+            self.assertIn("--PoissonMeshing.depth 8", canonical_script)
+            middlebury_mesh = script.index(
+                "--input_path /work/output/middlebury/dense/fused.ply"
+            )
+            self.assertLess(
+                script.index("awk", script.index(copy_config)),
+                middlebury_mesh,
+            )
+
     def test_canonical_sampling_is_order_and_duplicate_invariant(self) -> None:
         from sys import path as import_path
 
@@ -543,6 +698,30 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
                 },
             )
 
+    def test_mvs_gpu_stages_are_pinned_to_one_visible_device(self) -> None:
+        """Auto-selecting every visible GPU is invalid on partitioned B200 hosts."""
+        from sys import path as import_path
+
+        import_path.insert(0, str(ROOT / "pipeline"))
+        from mvs_reference_runner import _container_script
+
+        script = _container_script(
+            {
+                "intrinsics": {
+                    "width": 640,
+                    "height": 480,
+                    "fx": 520.0,
+                    "fy": 520.0,
+                    "cx": 319.5,
+                    "cy": 239.5,
+                }
+            },
+            "smoke",
+        )
+        self.assertIn("--FeatureExtraction.gpu_index 0", script)
+        self.assertIn("--FeatureMatching.gpu_index 0", script)
+        self.assertIn("--PatchMatchStereo.gpu_index 0", script)
+
     def test_mvs_scene_emits_deterministic_metric_depth_and_visible_surface_truth(self) -> None:
         """Dropping metric GT generation must break the dense-geometry evaluation contract."""
         from sys import path as import_path
@@ -657,28 +836,69 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
                 validate_mvs_reference_result(run_dir)
 
     def test_full_reference_uses_nine_views_and_full_acceptance(self) -> None:
-        """Collapsing full MVS to the smoke view set must fail profile parity."""
+        """Full MVS must consume both the controlled suite and canonical Middlebury."""
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             cache = root / "cache"
-            completed = run_cli(
-                "reference",
-                "--adapter",
-                "colmap-mvs",
-                "--profile",
-                "full",
-                "--run-id",
-                "mvs-full",
-                cache=cache,
-                engine=fake_mvs_engine(root),
+            middlebury = root / "middlebury"
+            middlebury.mkdir()
+            calibration = ["16"]
+            for index in range(1, 17):
+                name = f"templeSR{index:04d}.png"
+                (middlebury / name).write_bytes(b"fixture png")
+                calibration.append(
+                    f"{name} 1520.4 0 302.32 0 1525.9 246.87 0 0 1 "
+                    f"1 0 0 0 1 0 0 0 1 {index / 1000:.6f} 0 0.6"
+                )
+            (middlebury / "templeSR_par.txt").write_text(
+                "\n".join(calibration) + "\n", encoding="utf-8"
             )
-            self.assertEqual(completed.returncode, 0, completed.stderr)
-            result = json.loads(
-                (cache / "reference-runs/mvs-full/colmap-mvs/result.json").read_text()
-            )
+            from sys import path as import_path
+
+            import_path.insert(0, str(ROOT / "pipeline"))
+            import mvs_reference_runner
+
+            extraction = {
+                "archive_sha256": "b4684adcfda53b47b0964355b4142c53cb28940bbb448e0e974f92748e428de9",
+                "tree_sha256": "44eff8468fb2f807397f02449ae20b67262ec23c30b71477ee09d2532134acc5",
+                "file_count": 19,
+                "files": [],
+            }
+            with mock.patch.dict(
+                os.environ,
+                {"SURFLO_PATHWAY_CONTAINER_ENGINE": str(fake_mvs_engine(root))},
+            ), mock.patch.object(
+                mvs_reference_runner,
+                "_locked_middlebury",
+                return_value=(middlebury, extraction),
+                create=True,
+            ):
+                try:
+                    run_dir = mvs_reference_runner.run_mvs_reference(
+                        cache, "full", "mvs-full"
+                    )
+                except (KeyError, ValueError) as error:
+                    self.fail(f"full reference did not consume Middlebury: {error}")
+            result = json.loads((run_dir / "result.json").read_text())
             self.assertEqual(result["metrics"]["registered_images"], 9)
             self.assertEqual(result["metrics"]["dense_points"], 172_800)
             self.assertEqual(result["acceptance"]["registered_images_min"], 7)
+            self.assertEqual(
+                result["acceptance"].get("middlebury_calibrated_views_min"), 16
+            )
+            self.assertEqual(
+                result["acceptance"].get("middlebury_dense_points_min"), 1000
+            )
+            self.assertEqual(
+                result["acceptance"].get("middlebury_mesh_faces_min"), 500
+            )
+            self.assertEqual(result["metrics"].get("middlebury_calibrated_views"), 16)
+            self.assertGreater(result["metrics"].get("middlebury_dense_points", 0), 1000)
+            self.assertGreater(result["metrics"].get("middlebury_mesh_faces", 0), 500)
+            canonical = result["provenance"]["config"].get("canonical_middlebury")
+            self.assertIsInstance(canonical, dict)
+            self.assertEqual(canonical["dataset"], "templeSparseRing")
+            self.assertIn("Middlebury", (run_dir / "report.md").read_text())
 
     def test_reference_rejects_dense_support_below_the_registry_threshold(self) -> None:
         """Removing most fused points must prevent atomic promotion."""
@@ -757,6 +977,20 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
             self.fail("SURFLO_REQUIRE_COLMAP_MVS_FULL=1 but the MVS Insula is not built")
         with tempfile.TemporaryDirectory() as temporary:
             cache = Path(temporary) / "cache"
+            source_cache = Path(
+                os.environ.get(
+                    "SURFLO_PATHWAY_CACHE_ROOT",
+                    Path.home() / ".cache/surflo/3d-pathway",
+                )
+            ).expanduser()
+            source_archive = source_cache / "assets/middlebury-mvs.archive"
+            if not source_archive.is_file():
+                self.fail(
+                    "SURFLO_REQUIRE_COLMAP_MVS_FULL=1 but the locked Middlebury "
+                    "archive is absent; run `run.sh fetch --asset middlebury-mvs`"
+                )
+            (cache / "assets").mkdir(parents=True)
+            shutil.copy2(source_archive, cache / "assets/middlebury-mvs.archive")
             completed = run_cli(
                 "reference",
                 "--adapter",

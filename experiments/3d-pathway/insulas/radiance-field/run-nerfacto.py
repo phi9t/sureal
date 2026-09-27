@@ -34,6 +34,13 @@ SEED = 260925
 SWEEP_COUNTS = (3, 5, 9)
 SWEEP_ITERATIONS = 1000
 SWEEP_RAYS = 1024
+NERF_SYNTHETIC_SHA256 = "ce4e94e031c099a19ef04cfb6c71f1e47225d97d365be610b476e379a386c25f"
+NERF_SYNTHETIC_TREE_SHA256 = "b98a082b13d4b099d54cbcbea474d967cb3f448e9304494ba0749bde874936fe"
+CANONICAL_IMAGE_SIZE = 256
+CANONICAL_ITERATIONS = 2000
+CANONICAL_RAYS = 2048
+CANONICAL_TRAIN_INDICES = (0, 6, 13, 19, 26, 33, 39, 46, 52, 59, 66, 72, 79, 85, 92, 99)
+CANONICAL_TARGET_INDICES = (0, 66, 132, 199)
 
 
 def _write_json(path: Path, value: object) -> None:
@@ -382,6 +389,190 @@ def _copy_primary_sweep(primary: Path, destination: Path, frames: list[dict[str,
             shutil.copy2(primary / f"{frame['id']}.{suffix}", destination / f"{frame['id']}.{suffix}")
 
 
+def _canonical_source_frame(
+    frames: list[dict[str, object]], split: str, index: int
+) -> dict[str, object]:
+    expected = f"{split}/r_{index}"
+    matches = [
+        frame
+        for frame in frames
+        if str(frame.get("file_path", "")).removeprefix("./") == expected
+    ]
+    if len(matches) != 1:
+        raise RuntimeError(f"canonical NeRF example frame inventory mismatch: {expected}")
+    return matches[0]
+
+
+def _canonical_rgb(source: Path) -> np.ndarray:
+    with Image.open(source) as image:
+        rgba = image.convert("RGBA").resize(
+            (CANONICAL_IMAGE_SIZE, CANONICAL_IMAGE_SIZE),
+            resample=Image.Resampling.LANCZOS,
+        )
+        values = np.asarray(rgba, dtype=np.float32) / 255.0
+    alpha = values[..., 3:4]
+    return (values[..., :3] * alpha + (1.0 - alpha)).astype(np.float32)
+
+
+def _prepare_canonical_nerf_example(
+    source: Path,
+    destination: Path,
+    archive_sha256: str,
+    tree_sha256: str,
+) -> tuple[Path, list[dict[str, object]], dict[str, object]]:
+    if archive_sha256 != NERF_SYNTHETIC_SHA256 or tree_sha256 != NERF_SYNTHETIC_TREE_SHA256:
+        raise RuntimeError("canonical NeRF example asset identity mismatch")
+    train_record = json.loads((source / "transforms_train.json").read_text())
+    test_record = json.loads((source / "transforms_test.json").read_text())
+    train_frames = train_record.get("frames")
+    test_frames = test_record.get("frames")
+    if (
+        not isinstance(train_frames, list)
+        or len(train_frames) != 100
+        or not isinstance(test_frames, list)
+        or len(test_frames) != 200
+        or train_record.get("camera_angle_x") != test_record.get("camera_angle_x")
+    ):
+        raise RuntimeError("canonical NeRF example transforms mismatch")
+    destination.mkdir(parents=True)
+    images = destination / "images"
+    truth = destination.parent / "truth"
+    images.mkdir()
+    truth.mkdir()
+    transformed_train: list[dict[str, object]] = []
+    training_ids: list[str] = []
+    for ordinal, index in enumerate(CANONICAL_TRAIN_INDICES):
+        frame = _canonical_source_frame(train_frames, "train", index)
+        frame_id = f"train/r_{index}"
+        rgb = _canonical_rgb(source / f"{frame_id}.png")
+        image_path = images / f"train-{ordinal:03d}.png"
+        Image.fromarray(np.rint(rgb * 255.0).astype(np.uint8), mode="RGB").save(image_path)
+        transformed_train.append(
+            {
+                "file_path": f"images/{image_path.name}",
+                "transform_matrix": frame["transform_matrix"],
+            }
+        )
+        training_ids.append(frame_id)
+    target_frames: list[dict[str, object]] = []
+    target_rows: list[dict[str, str]] = []
+    for ordinal, index in enumerate(CANONICAL_TARGET_INDICES):
+        frame = _canonical_source_frame(test_frames, "test", index)
+        frame_id = f"test/r_{index}"
+        rgb = _canonical_rgb(source / f"{frame_id}.png")
+        truth_path = truth / f"target-{ordinal:03d}.rgb.float32.npy"
+        np.save(truth_path, rgb, allow_pickle=False)
+        opencv = np.asarray(frame["transform_matrix"], dtype=np.float64).copy()
+        if opencv.shape != (4, 4) or not np.isfinite(opencv).all():
+            raise RuntimeError("canonical NeRF example camera transform mismatch")
+        opencv[:3, 1:3] *= -1.0
+        target_frames.append(
+            {"id": frame_id, "camera_to_world_model": opencv.tolist()}
+        )
+        target_rows.append(
+            {
+                "id": frame_id,
+                "truth_path": f"truth/{truth_path.name}",
+                "render_path": f"renders/target-{ordinal:03d}.rgb.float32.npy",
+            }
+        )
+    angle_x = float(train_record["camera_angle_x"])
+    focal = 0.5 * CANONICAL_IMAGE_SIZE / np.tan(0.5 * angle_x)
+    intrinsics = {
+        "width": CANONICAL_IMAGE_SIZE,
+        "height": CANONICAL_IMAGE_SIZE,
+        "fx": float(focal),
+        "fy": float(focal),
+        "cx": CANONICAL_IMAGE_SIZE / 2.0,
+        "cy": CANONICAL_IMAGE_SIZE / 2.0,
+    }
+    transforms = {
+        "camera_model": "OPENCV",
+        "w": CANONICAL_IMAGE_SIZE,
+        "h": CANONICAL_IMAGE_SIZE,
+        "fl_x": float(focal),
+        "fl_y": float(focal),
+        "cx": CANONICAL_IMAGE_SIZE / 2.0,
+        "cy": CANONICAL_IMAGE_SIZE / 2.0,
+        "k1": 0.0,
+        "k2": 0.0,
+        "p1": 0.0,
+        "p2": 0.0,
+        "orientation_override": "none",
+        "center_override": "none",
+        "auto_scale_poses": False,
+        "scale_factor": 1.0,
+        "frames": transformed_train,
+    }
+    _write_json(destination / "transforms.json", transforms)
+    manifest = {
+        "schema_version": 1,
+        "asset_id": "nerf-synthetic",
+        "archive_sha256": archive_sha256,
+        "extraction_tree_sha256": tree_sha256,
+        "dataset": "nerf_synthetic/lego",
+        "training_frame_ids": training_ids,
+        "target_frame_ids": [frame["id"] for frame in target_frames],
+        "image_size": [CANONICAL_IMAGE_SIZE, CANONICAL_IMAGE_SIZE],
+        "iterations": CANONICAL_ITERATIONS,
+        "rays_per_batch": CANONICAL_RAYS,
+        "seed": SEED,
+        "targets": target_rows,
+    }
+    return destination, target_frames, {"intrinsics": intrinsics, "manifest": manifest}
+
+
+def _run_canonical_nerf_example(
+    source: Path,
+    output: Path,
+    archive_sha256: str,
+    tree_sha256: str,
+) -> dict[str, object]:
+    canonical_output = output / "canonical-nerf-example"
+    data, target_frames, prepared = _prepare_canonical_nerf_example(
+        source,
+        canonical_output / "data",
+        archive_sha256,
+        tree_sha256,
+    )
+    trainer, _, training_seconds, _ = _train(
+        data,
+        canonical_output / "training",
+        CANONICAL_ITERATIONS,
+        CANONICAL_RAYS,
+        "canonical-nerf-example",
+        False,
+    )
+    render_dir = canonical_output / "renders"
+    render_dir.mkdir()
+    for ordinal, frame in enumerate(target_frames):
+        camera = _camera(frame, prepared["intrinsics"])
+        with torch.no_grad():
+            outputs = trainer.pipeline.model.get_outputs_for_camera(camera)
+        predicted = outputs["rgb"].detach().float().cpu().numpy().astype(np.float32)
+        if predicted.shape != (CANONICAL_IMAGE_SIZE, CANONICAL_IMAGE_SIZE, 3):
+            raise RuntimeError("canonical NeRF example render shape mismatch")
+        np.save(
+            render_dir / f"target-{ordinal:03d}.rgb.float32.npy",
+            predicted,
+            allow_pickle=False,
+        )
+    _write_json(canonical_output / "manifest.json", prepared["manifest"])
+    del trainer
+    torch.cuda.empty_cache()
+    shutil.rmtree(canonical_output / "training", ignore_errors=True)
+    return {
+        "asset_id": "nerf-synthetic",
+        "dataset": "nerf_synthetic/lego",
+        "iterations": CANONICAL_ITERATIONS,
+        "rays_per_batch": CANONICAL_RAYS,
+        "training_views": len(CANONICAL_TRAIN_INDICES),
+        "target_views": len(CANONICAL_TARGET_INDICES),
+        "image_size": CANONICAL_IMAGE_SIZE,
+        "training_seconds": training_seconds,
+    }
+
+
 def _sweep_measurements(
     output: Path,
     input_root: Path,
@@ -463,12 +654,26 @@ def main() -> None:
     parser.add_argument("--iterations", type=int, required=True)
     parser.add_argument("--rays-per-batch", type=int, required=True)
     parser.add_argument("--density-resolution", type=int, required=True)
+    parser.add_argument("--canonical-input", type=Path)
+    parser.add_argument("--canonical-archive-sha256")
+    parser.add_argument("--canonical-tree-sha256")
     args = parser.parse_args()
     args.input = args.input.resolve(strict=True)
     args.output.mkdir(parents=True, exist_ok=True)
     manifest = json.loads((args.input / "manifest.json").read_text())
     if manifest["scene_seed"] != SEED or args.iterations <= 0 or args.rays_per_batch <= 0:
         raise ValueError("invalid locked Nerfacto execution configuration")
+    canonical_arguments = (
+        args.canonical_input,
+        args.canonical_archive_sha256,
+        args.canonical_tree_sha256,
+    )
+    if manifest["profile"] == "full":
+        if any(value is None for value in canonical_arguments):
+            raise ValueError("full profile requires the locked canonical NeRF example")
+        args.canonical_input = args.canonical_input.resolve(strict=True)
+    elif any(value is not None for value in canonical_arguments):
+        raise ValueError("smoke profile must not consume the canonical NeRF example")
 
     trainer, config, training_seconds, gates = _train(
         args.input,
@@ -569,6 +774,15 @@ def main() -> None:
         writer.writeheader()
         writer.writerows(rows)
 
+    canonical_summary = None
+    if manifest["profile"] == "full":
+        canonical_summary = _run_canonical_nerf_example(
+            args.canonical_input,
+            args.output,
+            args.canonical_archive_sha256,
+            args.canonical_tree_sha256,
+        )
+
     shutil.rmtree(args.output / "training", ignore_errors=True)
     shutil.rmtree(args.output / "sweep-training", ignore_errors=True)
 
@@ -633,6 +847,7 @@ def main() -> None:
                 "rays_per_batch": SWEEP_RAYS,
             },
             "view_sweep_training_seconds": sweep_seconds,
+            "canonical_nerf_example": canonical_summary,
         },
     )
 

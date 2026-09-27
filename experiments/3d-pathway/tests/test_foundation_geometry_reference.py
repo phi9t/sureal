@@ -38,7 +38,7 @@ def fake_foundation_engine(path: Path) -> Path:
             [[ "${{1:-}}" == run ]]
             [[ " $* " == *" --network none "* ]]
             [[ " $* " == *" --pull=never "* ]]
-            [[ " $* " == *" --gpus all "* ]]
+            [[ " $* " == *" --gpus device="* ]]
             evidence=''
             output=''
             repo=''
@@ -480,6 +480,7 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
                             "depth-anything-3": da3_source,
                         },
                     },
+                    "1",
                 )
         shell = command[-1]
         self.assertNotIn("/usr/bin/time", shell)
@@ -1000,6 +1001,8 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
     def test_pathway_build_prepares_reused_surflo_insula(self) -> None:
         build = (ROOT / "insulas/build.sh").read_text(encoding="utf-8")
         self.assertIn("insula-scout/build.sh", build)
+        self.assertIn("selected_gpu_device", build)
+        self.assertIn("CUDA_VISIBLE_DEVICES", build)
 
     def test_relative_pose_auc_is_invariant_to_global_similarity_gauge(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))

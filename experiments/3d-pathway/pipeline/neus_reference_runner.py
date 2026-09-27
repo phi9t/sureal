@@ -21,6 +21,7 @@ from contracts import (
     canonical_json,
     ensure_finite,
     load_json,
+    selected_gpu_device,
     sha256_file,
     validate_json_schema_instance,
     validate_run_id,
@@ -33,6 +34,7 @@ from reference_runner import (
     _parse_key_value_manifest,
     _require_regular_file,
     _secure_directory,
+    _validated_resource_summary,
 )
 from reference_scene import generate_implicit_surface_scene
 
@@ -720,6 +722,7 @@ def _container_command(
     cuda_cache: Path,
     lpips_checkpoint: Path,
     profile: str,
+    gpu_device: str,
 ) -> list[str]:
     return [
         engine,
@@ -729,7 +732,7 @@ def _container_command(
         "none",
         "--pull=never",
         "--gpus",
-        "all",
+        f"device={gpu_device}",
         "--user",
         f"{os.getuid()}:{os.getgid()}",
         "-e",
@@ -770,6 +773,32 @@ def validate_neus_reference_result(run_dir: Path) -> dict[str, Any]:
     if profile not in PROFILE_CONFIG:
         raise ValueError("NeuS-Facto result profile mismatch")
     summary = _validate_runtime_identity(run_dir, profile)
+    _validated_resource_summary(
+        run_dir,
+        result,
+        label="NeuS-Facto",
+        expected_keys={
+            "runtime_seconds",
+            "peak_cpu_memory_bytes",
+            "peak_gpu_compute_memory_bytes",
+            "gpu_memory_scope",
+            "gpu_measurement_status",
+            "gpu_selection",
+            "gpu_host_index",
+            "gpu_hardware",
+            "host",
+            "extraction_seconds",
+            "training_seconds",
+            "training_steps_per_second",
+        },
+        positive_keys=(
+            "runtime_seconds",
+            "peak_cpu_memory_bytes",
+            "extraction_seconds",
+            "training_seconds",
+            "training_steps_per_second",
+        ),
+    )
     metrics, topology = _evaluate_outputs(run_dir, profile)
     if not _values_match(result.get("metrics"), metrics) or not _values_match(
         result.get("topology"), topology
@@ -842,6 +871,7 @@ def run_neus_reference(cache_root: Path, profile: str, run_id: str) -> Path:
     gpu_hardware = _gpu_hardware(engine)
     if Path(engine).name == "docker" and not gpu_hardware:
         raise ValueError("unable to inventory GPU hardware for the real NeuS-Facto reference")
+    gpu_device = selected_gpu_device(require_health=Path(engine).name == "docker")
     cache_root.mkdir(parents=True, exist_ok=True)
     cache_root = cache_root.resolve(strict=True)
     lpips_checkpoint_record = _lpips_checkpoint_record()
@@ -862,7 +892,13 @@ def run_neus_reference(cache_root: Path, profile: str, run_id: str) -> Path:
         )
         (staging / "output").mkdir()
         command = _container_command(
-            engine, image_id, staging, cuda_cache, lpips_checkpoint, profile
+            engine,
+            image_id,
+            staging,
+            cuda_cache,
+            lpips_checkpoint,
+            profile,
+            gpu_device,
         )
         completed, peak_gpu = _run_monitored(command, staging / "container.cid")
         (staging / "adapter.log").write_text(
@@ -892,7 +928,8 @@ def run_neus_reference(cache_root: Path, profile: str, run_id: str) -> Path:
             "peak_gpu_compute_memory_bytes": peak_gpu,
             "gpu_memory_scope": "container-cgroup-compute-process-sum",
             "gpu_measurement_status": "measured" if peak_gpu > 0 else "unavailable",
-            "gpu_selection": "all-visible; pinned entrypoint selects CUDA device 0",
+            "gpu_selection": "one healthy host GPU mapped to CUDA device 0",
+            "gpu_host_index": int(gpu_device),
             "gpu_hardware": gpu_hardware,
             "host": platform.platform(),
             "extraction_seconds": summary["extraction_seconds"],

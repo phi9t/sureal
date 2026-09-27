@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import hashlib
 import json
 import os
@@ -30,6 +31,23 @@ def run_cli(*args: str, cache: Path) -> subprocess.CompletedProcess[str]:
 
 
 class ReviewHardeningTest(unittest.TestCase):
+    def test_gpu_adapters_select_one_device_per_run(self) -> None:
+        for name in (
+            "neus_reference_runner.py",
+            "nerfacto_reference_runner.py",
+            "splatfacto_reference_runner.py",
+            "foundation_geometry_reference_runner.py",
+        ):
+            tree = ast.parse((PIPELINE / name).read_text(encoding="utf-8"))
+            calls = [
+                node
+                for node in ast.walk(tree)
+                if isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Name)
+                and node.func.id == "selected_gpu_device"
+            ]
+            self.assertEqual(len(calls), 1, name)
+
     def test_multistage_insula_locks_cover_the_runtime_image(self) -> None:
         from audit import _image_lock_errors
 
@@ -170,10 +188,24 @@ class ReviewHardeningTest(unittest.TestCase):
         self.assertEqual(assets["tum-rgbd"]["digest_status"], "verified_2026-09-26")
         self.assertEqual(assets["tum-rgbd"]["extraction"]["mode"], "tar")
         self.assertTrue(assets["middlebury-mvs"]["consumers"])
+        self.assertEqual(assets["controlled-suite"]["episode_id"], "phase-a-v1")
+        self.assertEqual(assets["controlled-suite"]["artifact_count"], 444)
+        self.assertEqual(len(assets["controlled-suite"]["consumers"]), 15)
         with tempfile.TemporaryDirectory() as temporary:
             emitted = run_cli("--emit-plan", "fetch", "--asset", "tum-rgbd", cache=Path(temporary))
             self.assertEqual(emitted.returncode, 0, emitted.stderr)
             self.assertEqual(json.loads(emitted.stdout)["assets"], ["tum-rgbd"])
+            controlled = run_cli(
+                "--emit-plan",
+                "fetch",
+                "--asset",
+                "controlled-suite",
+                cache=Path(temporary),
+            )
+            self.assertEqual(controlled.returncode, 0, controlled.stderr)
+            self.assertEqual(
+                json.loads(controlled.stdout)["assets"], ["controlled-suite"]
+            )
 
 
 if __name__ == "__main__":

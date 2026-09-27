@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+from datetime import date
 from pathlib import Path
+import re
 import subprocess
 import sys
 import unittest
@@ -56,6 +58,13 @@ class SurveyContractTest(unittest.TestCase):
         self.assertIn("point stochasticity", text)
         self.assertIn("scene stochasticity", text)
 
+    def test_survey_explains_stochastic_splatfacto_support_gates(self) -> None:
+        text = DOC.read_text()
+        self.assertIn("stochastic B200 support/non-collapse gates", text)
+        self.assertIn("0.894 m expected-depth RMSE", text)
+        self.assertIn("0.017 F-score at 10 cm", text)
+        self.assertIn("not cross-method quality claims", text)
+
     def test_mission_links_concisely_to_pathway(self) -> None:
         mission = (REPO_ROOT / "MISSION.md").read_text()
         marker = "docs/3d-reconstruction-pathway.md"
@@ -92,6 +101,84 @@ class AuditContractTest(unittest.TestCase):
         )
         self.assertTrue(any("unknown citation" in error for error in errors))
         self.assertTrue(any("forbidden terminology" in error for error in errors))
+
+    def test_dotted_source_ids_are_audited_instead_of_skipped(self) -> None:
+        from audit import audit_text
+
+        errors = audit_text(
+            "[gsplat-1.4.0](https://example.org/wrong)",
+            {"gsplat-1.4.0": "https://example.org/right"},
+            forbidden_patterns=[],
+        )
+        self.assertEqual(
+            errors,
+            ["citation URL mismatch for gsplat-1.4.0: https://example.org/wrong"],
+        )
+
+    def test_every_material_external_link_is_registered(self) -> None:
+        survey = DOC.read_text(encoding="utf-8")
+        sources = json.loads((ROOT / "sources.json").read_text())["sources"]
+        assets = json.loads((ROOT / "assets.lock.json").read_text())["assets"]
+        registered = {source["primary_url"] for source in sources}
+        registered.update(
+            asset["source"]
+            for asset in assets
+            if isinstance(asset.get("source"), str)
+            and asset["source"].startswith("https://")
+        )
+        linked = set(re.findall(r"\[[^\]]+\]\((https://[^)]+)\)", survey))
+        self.assertEqual(linked - registered, set())
+
+    def test_cutoff_year_sources_have_day_level_availability_dates_before_cutoff(self) -> None:
+        curriculum = json.loads((ROOT / "curriculum.json").read_text())
+        cutoff = date.fromisoformat(curriculum["cutoff"])
+        sources = json.loads((ROOT / "sources.json").read_text())["sources"]
+        cutoff_year_sources = [source for source in sources if source["year"] == cutoff.year]
+        self.assertGreater(len(cutoff_year_sources), 0)
+        for source in cutoff_year_sources:
+            with self.subTest(source=source["id"]):
+                self.assertIn("first_public_date", source)
+                self.assertLessEqual(date.fromisoformat(source["first_public_date"]), cutoff)
+
+    def test_audit_rejects_missing_or_post_cutoff_availability_dates(self) -> None:
+        import audit
+
+        self.assertTrue(hasattr(audit, "source_metadata_errors"))
+        errors = audit.source_metadata_errors(  # type: ignore[attr-defined]
+            [
+                {"id": "missing-date", "year": 2026},
+                {
+                    "id": "after-cutoff",
+                    "year": 2026,
+                    "first_public_date": "2026-09-26",
+                },
+                {
+                    "id": "before-cutoff",
+                    "year": 2026,
+                    "first_public_date": "2026-09-25",
+                },
+            ],
+            date(2026, 9, 25),
+        )
+        self.assertEqual(
+            errors,
+            [
+                "cutoff-year source missing first_public_date: missing-date",
+                "source after cutoff date: after-cutoff (2026-09-26)",
+            ],
+        )
+
+    def test_audit_rejects_unregistered_descriptive_external_link(self) -> None:
+        import audit
+
+        self.assertTrue(hasattr(audit, "external_link_errors"))
+        self.assertEqual(
+            audit.external_link_errors(  # type: ignore[attr-defined]
+                "[installation guide](https://example.org/install)",
+                {"https://example.org/paper"},
+            ),
+            ["unregistered external link: https://example.org/install"],
+        )
 
 
 if __name__ == "__main__":

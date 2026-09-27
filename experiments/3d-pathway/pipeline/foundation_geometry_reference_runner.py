@@ -24,6 +24,7 @@ from contracts import (
     canonical_json,
     ensure_finite,
     load_json,
+    selected_gpu_device,
     sha256_file,
     validate_json_schema_instance,
     validate_run_id,
@@ -883,6 +884,7 @@ def _container_command(
     staging: Path,
     cuda_cache: Path,
     execution_inputs: dict[str, Any],
+    gpu_device: str,
 ) -> list[str]:
     repository = ROOT.parent.parent.resolve()
     cache_root = Path(
@@ -902,7 +904,7 @@ def _container_command(
         "none",
         "--pull=never",
         "--gpus",
-        "all",
+        f"device={gpu_device}",
         "--cidfile",
         str(staging / "container.cid"),
         "--user",
@@ -1784,6 +1786,7 @@ def run_foundation_geometry_reference(
     gpu_hardware = _gpu_hardware(engine)
     if Path(engine).name == "docker" and not gpu_hardware:
         raise ValueError("unable to inventory GPU hardware for foundation geometry")
+    gpu_device = selected_gpu_device(require_health=Path(engine).name == "docker")
     runs_root = _secure_directory(cache_root, "reference-runs")
     staging_root = _secure_directory(cache_root, "reference-staging")
     cuda_cache = _secure_directory(cache_root, "cuda-cache")
@@ -1811,7 +1814,12 @@ def run_foundation_geometry_reference(
         )
         (staging / "output").mkdir()
         command = _container_command(
-            engine, image_id, staging, cuda_cache, execution_inputs
+            engine,
+            image_id,
+            staging,
+            cuda_cache,
+            execution_inputs,
+            gpu_device,
         )
         completed, peak_gpu = _run_monitored(command, staging / "container.cid")
         (staging / "adapter.log").write_text(
@@ -1845,7 +1853,8 @@ def run_foundation_geometry_reference(
             "peak_gpu_compute_memory_bytes": peak_gpu,
             "gpu_memory_scope": "container-cgroup-compute-process-sum",
             "gpu_measurement_status": "measured" if peak_gpu > 0 else "unavailable",
-            "gpu_selection": "CUDA device 0",
+            "gpu_selection": "one healthy host GPU mapped to CUDA device 0",
+            "gpu_host_index": int(gpu_device),
             "gpu_hardware": gpu_hardware,
             "host": platform.platform(),
         }

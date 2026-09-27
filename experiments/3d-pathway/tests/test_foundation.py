@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -122,6 +123,44 @@ class RegistryContractTest(unittest.TestCase):
 
 
 class DispatcherContractTest(unittest.TestCase):
+    def test_gpu_selection_skips_reset_devices_and_validates_overrides(self) -> None:
+        from contracts import selected_gpu_device
+
+        completed = subprocess.CompletedProcess(
+            ["nvidia-smi"],
+            0,
+            stdout="0, Reset\n1, None\n2, None\n",
+            stderr="",
+        )
+        with (
+            patch.dict(os.environ, {}, clear=False),
+            patch("contracts.subprocess.run", return_value=completed),
+        ):
+            os.environ.pop("SURFLO_PATHWAY_GPU_DEVICE", None)
+            self.assertEqual(selected_gpu_device(), "1")
+        with (
+            patch.dict(os.environ, {"SURFLO_PATHWAY_GPU_DEVICE": "1"}),
+            patch("contracts.shutil.which", return_value="/usr/bin/nvidia-smi"),
+            patch("contracts.subprocess.run", return_value=completed),
+        ):
+            self.assertEqual(selected_gpu_device(), "1")
+        with (
+            patch.dict(os.environ, {"SURFLO_PATHWAY_GPU_DEVICE": "0"}),
+            patch("contracts.shutil.which", return_value="/usr/bin/nvidia-smi"),
+            patch("contracts.subprocess.run", return_value=completed),
+        ):
+            with self.assertRaisesRegex(ValueError, "requires a reset"):
+                selected_gpu_device()
+        with (
+            patch.dict(os.environ, {"SURFLO_PATHWAY_GPU_DEVICE": "6"}),
+            patch("contracts.shutil.which", return_value="/usr/bin/nvidia-smi"),
+            patch("contracts.subprocess.run", return_value=completed),
+        ):
+            with self.assertRaisesRegex(ValueError, "not reported"):
+                selected_gpu_device()
+        with patch.dict(os.environ, {"SURFLO_PATHWAY_GPU_DEVICE": "6"}):
+            self.assertEqual(selected_gpu_device(require_health=False), "6")
+
     def test_list_returns_machine_readable_module_catalog(self) -> None:
         result = run_cli("list", "--json")
         self.assertEqual(result.returncode, 0, result.stderr)

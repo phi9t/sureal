@@ -7,10 +7,13 @@ source and asset registries, a common controlled scene, seven local Insula
 definitions plus the reused Blender and Surflo environments, provenance-aware
 run storage, and citation/terminology auditing.
 
-The smoke profile is the numerical and CI contract. The full profile only
-increases the deterministic repo-owned fixture workloads. Maintained systems
-run through explicit reference adapters, separately from both concept profiles.
-`reference-adapters.json` distinguishes landed adapters from future work.
+The smoke profile is the numerical and CI contract. A full `all` run increases
+the deterministic repo-owned fixture workloads **and** executes every landed
+maintained reference adapter, then binds both evidence families into one atomic
+cross-era report. Use `all --profile full --fixture-only` only when deliberately
+testing the larger concept fixtures without claiming full acceptance. Maintained
+systems also remain individually executable through explicit reference adapters.
+`reference-adapters.json` is the source of truth for the landed suite.
 Controlled fixtures are teaching experiments, not reproduced third-party
 leaderboard values.
 
@@ -21,6 +24,8 @@ experiments/3d-pathway/run.sh run --module 01 --profile smoke --run-id demo-01
 experiments/3d-pathway/run.sh validate --module 01 --run-id demo-01
 experiments/3d-pathway/run.sh all --profile smoke --run-id demo-all
 experiments/3d-pathway/run.sh report --run-id demo-all
+# B200 acceptance: all 15 full fixtures plus all eight maintained adapters.
+experiments/3d-pathway/run.sh all --profile full --run-id pathway-full-e2e
 experiments/3d-pathway/run.sh reference --adapter colmap-sfm --profile smoke --run-id colmap-demo
 experiments/3d-pathway/run.sh reference --adapter colmap-mvs --profile smoke --run-id colmap-mvs-demo
 experiments/3d-pathway/run.sh reference --adapter orb-slam --profile smoke --run-id orb-slam-demo
@@ -50,12 +55,24 @@ python3 experiments/3d-pathway/pipeline/audit.py --offline
 # Explicit network boundaries:
 experiments/3d-pathway/run.sh build
 experiments/3d-pathway/run.sh fetch
+experiments/3d-pathway/run.sh fetch --asset controlled-suite
 experiments/3d-pathway/run.sh fetch --asset tum-rgbd
 experiments/3d-pathway/run.sh fetch --asset depth-anything-v2-metric-hypersim-small
 experiments/3d-pathway/run.sh fetch --asset nerfstudio-lpips-alexnet
 experiments/3d-pathway/run.sh fetch --asset foundation-geometry-models
 python3 experiments/3d-pathway/pipeline/audit.py --online
 ```
+
+`build` also prepares the pinned Blender 4.5.14 rootfs. Fetching
+`controlled-suite` resolves the locked CC0 inputs for the existing photoreal
+scene recipe. Full modules consume the validated `phase-a-v1` Blender/Cycles
+episode; when it is not already cached, the dispatcher renders it offline.
+Before any lab uses it, validation checks the locked recipe, episode and
+validation manifests, all 444 artifact hashes, 16 context cameras, 8 target
+views per hypothesis, and 250,000 surface samples per complete scene. Each full
+module records that binding and deterministic RGB-D, ToF, and sparse-LiDAR
+summaries derived from the metric depth/range and normal buffers. Those shared
+inputs do not turn task-specific teaching metrics into benchmark scores.
 
 The Module 12 reference reuses the Surflo B200 Insula and its persistent model
 cache. `run.sh build` now prepares that Insula/rootfs/venv as well as the seven
@@ -123,6 +140,13 @@ Integer metrics revalidate exactly; floating metrics use recorded 1e-9 relative
 and 1e-12 absolute tolerances, with the evaluating NumPy version retained in
 the hashed run configuration.
 
+Full MVS additionally consumes the byte- and tree-locked official Middlebury
+`TempleSparseRing` archive. It imports all 16 supplied calibrated cameras and
+requires fused-point and non-degenerate mesh support from the offline COLMAP
+run. Because that archive does not distribute the laser ground truth, the
+canonical result is kept as an execution/support check and is never reported as
+an accuracy or completeness score.
+
 The ORB-SLAM3 adapter uses its own Ubuntu 22.04 Insula with canonical upstream
 ORB-SLAM3 commit `4452a3c4ab75b1cde34e5505a36ec3f9edcdc4c4` and peeled Pangolin
 v0.6 commit `dd801d244db3a8e27b7fe8020cd751404aa818fd`. It runs TUM
@@ -175,6 +199,11 @@ Gaussian-window SSIM, visible-support depth/point metrics, unsupported-region
 errors, density occupancy, and component counts from persisted arrays. LPIPS
 comes from the pinned container but is not an acceptance gate. Density remains
 a rendering field diagnostic, not an SDF surface or hidden-scene completion.
+The full profile also recomputes the locked NeRF example bundle's 873-file
+extraction tree, trains a fixed 16-view Lego split, and scores four held-out
+views. This canonical rendering score is reported beside, not merged with, the
+analytic shared-scene geometry score. Smoke retains the dependency-light
+controlled-scene contract.
 
 The Splatfacto adapter uses a seventh, CUDA 12.8 Insula with the same pinned
 Nerfstudio source, gsplat 1.4.0 at commit
@@ -220,10 +249,14 @@ metric and independently regenerates the occlusion-duration sweep; no image
 metric is reported because the fixture does not render images.
 `all` stages the complete run and promotes it atomically; its `report.json`
 manifest records completeness, sources, assumptions, interpretations, and the
-Markdown report hash. A report made from a partial run says so explicitly.
+Markdown report hash. Full `all` runs stage all landed maintained adapters under
+`references/`, bind every module and reference result hash, and set
+`full_acceptance=true` only when all fifteen full-profile modules and the entire
+reference suite validate. A report made from a partial or fixture-only run says
+so explicitly.
 
-`assets.lock.json` records the generated controlled suite, selected canonical
-dataset inputs, and the existing paired-scene result. Downloaded datasets and
-checkpoints stay outside Git. `sources.json` is the source of truth for title,
-authors, year, venue, primary URL, themes, supported claims, and historical
-credit caveats.
+`assets.lock.json` records the generated Blender controlled suite, selected
+canonical dataset inputs, and the existing paired-scene result. Downloaded
+datasets and checkpoints stay outside Git. `sources.json` is the source of
+truth for title, authors, year, venue, primary URL, themes, supported claims,
+and historical credit caveats.

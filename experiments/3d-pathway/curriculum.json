@@ -57,7 +57,7 @@
       "evidence": ["calibrated multi-view RGB"], "observable": "photo-consistent visible surfaces", "representation": "depth maps, fused points, and mesh",
       "inference": "optimized", "objectives": ["photometric consistency", "visibility-aware regularization"], "metrics": ["accuracy", "completeness", "F-score"],
       "failure_sweep": ["view count", "lighting", "occlusion", "texture"], "insula": "classical",
-      "sources": ["seitz-2006", "furukawa-ponce-2010", "schonberger-2017"]
+      "sources": ["seitz-2006", "furukawa-ponce-2010", "schonberger-2017", "colmap-4.0.3-release", "colmap-install-2026"]
     },
     {
       "id": "07", "slug": "online-slam-mapping", "title": "Online SLAM and persistent mapping",

@@ -21,6 +21,7 @@ from contracts import (
     canonical_json,
     ensure_finite,
     load_json,
+    selected_gpu_device,
     sha256_file,
     validate_json_schema_instance,
     validate_run_id,
@@ -59,6 +60,12 @@ LPIPS_CHECKPOINT_BYTES = 244408911
 LPIPS_CHECKPOINT_FILENAME = "alexnet-owt-7be5be79.pth"
 IMAGE_ID_PATTERN = __import__("re").compile(r"sha256:[0-9a-f]{64}")
 SEED = 260925
+DETERMINISTIC_ENVIRONMENT = {
+    "USER": "surflo",
+    "PYTHONHASHSEED": str(SEED),
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "NVIDIA_TF32_OVERRIDE": "0",
+}
 PROFILE_CONFIG = {
     "smoke": {"iterations": 1000},
     "full": {"iterations": 30000},
@@ -754,6 +761,7 @@ def _validated_resources(run_dir: Path, result: dict[str, Any]) -> dict[str, Any
         "gpu_memory_scope",
         "gpu_measurement_status",
         "gpu_selection",
+        "gpu_host_index",
         "gpu_hardware",
         "host",
         "training_seconds",
@@ -843,6 +851,7 @@ def _container_command(
     cuda_cache: Path,
     lpips_checkpoint: Path,
     profile: str,
+    gpu_device: str,
 ) -> list[str]:
     return [
         engine,
@@ -852,11 +861,17 @@ def _container_command(
         "none",
         "--pull=never",
         "--gpus",
-        "all",
+        f"device={gpu_device}",
         "--user",
         f"{os.getuid()}:{os.getgid()}",
         "-e",
         "USER=surflo",
+        "-e",
+        f"PYTHONHASHSEED={DETERMINISTIC_ENVIRONMENT['PYTHONHASHSEED']}",
+        "-e",
+        f"CUBLAS_WORKSPACE_CONFIG={DETERMINISTIC_ENVIRONMENT['CUBLAS_WORKSPACE_CONFIG']}",
+        "-e",
+        f"NVIDIA_TF32_OVERRIDE={DETERMINISTIC_ENVIRONMENT['NVIDIA_TF32_OVERRIDE']}",
         "--cidfile",
         str(staging / "container.cid"),
         "-e",
@@ -915,7 +930,7 @@ def _expected_config(
         "rasterization_mode": "classic",
         "tf32": False,
         "trained_view_sweep": {"context_views": [3, 5, 9], "iterations": 1000},
-        "container_user_environment": {"USER": "surflo"},
+        "container_user_environment": DETERMINISTIC_ENVIRONMENT,
         "support": SUPPORT_CONTRACT,
         "cuda_cache": "persistent-cache-root-mount",
         "lpips_backbone": _lpips_checkpoint_record(),
@@ -993,6 +1008,7 @@ def run_splatfacto_reference(cache_root: Path, profile: str, run_id: str) -> Pat
     gpu_hardware = _gpu_hardware(engine)
     if Path(engine).name == "docker" and not gpu_hardware:
         raise ValueError("unable to inventory GPU hardware for the real Splatfacto reference")
+    gpu_device = selected_gpu_device(require_health=Path(engine).name == "docker")
     cache_root.mkdir(parents=True, exist_ok=True)
     cache_root = cache_root.resolve(strict=True)
     checkpoint = _lpips_checkpoint_path(cache_root, _lpips_checkpoint_record())
@@ -1014,7 +1030,13 @@ def run_splatfacto_reference(cache_root: Path, profile: str, run_id: str) -> Pat
         )
         (staging / "output").mkdir()
         command = _container_command(
-            engine, image_id, staging, cuda_cache, checkpoint, profile
+            engine,
+            image_id,
+            staging,
+            cuda_cache,
+            checkpoint,
+            profile,
+            gpu_device,
         )
         completed, peak_gpu = _run_monitored(command, staging / "container.cid")
         (staging / "adapter.log").write_text(
@@ -1044,7 +1066,8 @@ def run_splatfacto_reference(cache_root: Path, profile: str, run_id: str) -> Pat
             "peak_gpu_compute_memory_bytes": peak_gpu,
             "gpu_memory_scope": "container-cgroup-compute-process-sum",
             "gpu_measurement_status": "measured" if peak_gpu > 0 else "unavailable",
-            "gpu_selection": "all-visible; pinned entrypoint selects CUDA device 0",
+            "gpu_selection": "one healthy host GPU mapped to CUDA device 0",
+            "gpu_host_index": int(gpu_device),
             "gpu_hardware": gpu_hardware,
             "host": platform.platform(),
             "training_seconds": summary["training_seconds"],
