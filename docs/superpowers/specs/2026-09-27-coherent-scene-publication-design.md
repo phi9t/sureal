@@ -1,7 +1,8 @@
 # Coherent Scene Publication and Evidence Hardening Design
 
-**Date:** 2026-09-27  
-**Status:** Approved in-chat design; written specification awaiting review  
+**Date:** 2026-09-27
+
+**Status:** Approved in-chat design; written specification awaiting review
 **Base:** `phi9t/mainline` at `4ff0ab8`
 
 ## Purpose
