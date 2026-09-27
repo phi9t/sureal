@@ -212,7 +212,30 @@ class AmbiguousSceneContractTest(unittest.TestCase):
             result["metrics"]["generative"][
                 "independent_point_coherence"
             ] = expected_coherence
+            expected_sweep_measurement = result["failure_sweep"][0]["measurement"]
             result["failure_sweep"][0]["measurement"] = 0.123
+            (run_dir / "result.json").write_text(
+                json.dumps(result, indent=2, sort_keys=True) + "\n"
+            )
+            validation = subprocess.run(
+                [
+                    str(ROOT / "run.sh"),
+                    "validate",
+                    "--module",
+                    "13",
+                    "--run-id",
+                    "ambiguity-contract",
+                ],
+                cwd=REPO_ROOT,
+                env=env,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(validation.returncode, 0)
+            self.assertIn("Module 13 failure sweep mismatch", validation.stderr)
+
+            result["failure_sweep"][0]["measurement"] = expected_sweep_measurement
             sweep_path = run_dir / "artifacts/failure_sweep.csv"
             with sweep_path.open(newline="", encoding="utf-8") as stream:
                 sweep_rows = list(csv.DictReader(stream))
