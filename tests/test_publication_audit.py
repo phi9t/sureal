@@ -4,6 +4,7 @@ from contextlib import redirect_stdout
 import io
 import json
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
@@ -415,6 +416,70 @@ class RepositoryIdentityTests(unittest.TestCase):
                     check=False,
                 )
                 self.assertEqual(result.returncode, 0, path)
+
+
+class PublicationWorkflowTests(unittest.TestCase):
+    def workflow(self) -> str:
+        return (REPOSITORY_ROOT / ".github/workflows/publication.yml").read_text(
+            encoding="utf-8"
+        )
+
+    def test_publication_workflow_is_sha_pinned_and_least_privilege(self) -> None:
+        workflow = self.workflow()
+        expected_actions = {
+            "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+            "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+            "gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7",
+        }
+        references = re.findall(
+            r"^\s*-?\s*uses:\s*(\S+?)(?:\s+#.*)?$", workflow, re.MULTILINE
+        )
+
+        self.assertTrue(expected_actions.issubset(references))
+        self.assertTrue(references)
+        for reference in references:
+            self.assertRegex(reference, r"@[0-9a-f]{40}$")
+        self.assertRegex(workflow, r"(?m)^permissions:\n  contents: read$")
+        self.assertNotIn("write-all", workflow)
+
+    def test_publication_workflow_runs_a_recursive_full_history_checkout(self) -> None:
+        workflow = self.workflow()
+
+        self.assertIn("name: publication", workflow)
+        self.assertIn("pull_request:", workflow)
+        self.assertRegex(workflow, r"(?m)^\s+branches: \[main\]$")
+        self.assertGreaterEqual(workflow.count("fetch-depth: 0"), 2)
+        self.assertGreaterEqual(workflow.count("submodules: recursive"), 2)
+        self.assertIn("cancel-in-progress: true", workflow)
+        self.assertGreaterEqual(workflow.count("timeout-minutes:"), 2)
+
+    def test_publication_workflow_runs_audit_tests_build_and_twine(self) -> None:
+        workflow = self.workflow()
+
+        for text in (
+            "python-version: \"3.10\"",
+            "build==1.6.1",
+            "twine==7.0.0",
+            "tomli==2.4.1",
+            "python -m unittest tests.test_publication_audit -v",
+            "python scripts/publication_audit.py --root .",
+            "python -m build",
+            "python -m twine check dist/*",
+            "GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}",
+        ):
+            self.assertIn(text, workflow)
+        lowered = workflow.lower()
+        self.assertNotIn("cuda", lowered)
+        self.assertNotIn("upload-artifact", lowered)
+        self.assertNotIn("hf download", lowered)
+
+    def test_real_repository_passes_publication_audit(self) -> None:
+        report = publication_audit.audit_repository(REPOSITORY_ROOT)
+
+        self.assertEqual(report["status"], "pass", report["errors"])
+        self.assertEqual(report["errors"], [])
+        self.assertGreater(report["tracked_files"], 0)
+        self.assertEqual(report["gitlinks"], 2)
 
 
 if __name__ == "__main__":
