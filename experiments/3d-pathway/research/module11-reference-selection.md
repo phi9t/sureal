@@ -473,7 +473,7 @@ No unexecuted paper number or Module 10 Nerfacto threshold should be copied
 into Module 11. The landed contract fixes seed 260925 and was exercised
 repeatedly on one B200 image. Adaptive density control and CUDA atomics reached
 materially different same-seed basins: smoke target SSIM ranged from 0.171 to
-0.770 in observed runs; full fits included 5 cm F-scores of 0.612 and 0.954,
+0.804 in observed runs; full fits included 5 cm F-scores of 0.612 and 0.963,
 and one fit reached 19.689 dB with 0.670 m expected-depth RMSE and 0.091
 F-score at 10 cm. The accepted retained runs and their per-view evidence are
 recorded in the adapter registry.

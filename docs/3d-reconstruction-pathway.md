@@ -1122,8 +1122,9 @@ primitives. Full reached 21.33 dB, 0.923, 0.119, 0.069 m, and 0.963 F-score at
 1.50 GiB peak GPU compute memory; median target rendering was 555 and 517 FPS,
 respectively, at the fixture resolution. These are retained configuration and
 hardware measurements, not copied paper results or cross-method rankings.
-Repeated same-seed CUDA calibration moved smoke target SSIM from 0.385 to
-0.171 and full 5 cm point F-score from 0.954 to 0.612; another adaptive-density
+Across repeated same-seed CUDA calibration and the retained reviewed runs,
+smoke target SSIM ranged from 0.171 to 0.804 and full 5 cm point F-score from
+0.612 to 0.963; another adaptive-density
 full fit reached 19.69 dB but 0.670 m expected-depth RMSE and only 0.091
 F-score at 10 cm. The acceptance contract therefore uses broad non-collapse
 gates and retains the raw quality metrics as evidence instead of promising
