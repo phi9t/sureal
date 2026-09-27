@@ -231,6 +231,19 @@ Every completed module contains:
 - `artifacts/failure_sweep.csv`: controlled intervention and response;
 - at least one SVG visualization plus any module-specific compact evidence.
 
+Concept labs run in the host Python process with
+`network_isolation=python_socket_guard`: the runner replaces Python's socket
+constructors during lab execution. This catches accidental networking through
+those Python paths, but it is not an operating-system network sandbox. The
+maintained adapters use container network isolation for their offline runs.
+Their guarantees are intentionally reported separately.
+
+Fixture CPU memory is reported with
+`cpu_memory_scope=process_lifetime_high_water_mark`. The value comes from the
+runner process high-water mark and can include earlier work in that process; it
+is not an isolated per-module peak. Use subprocess isolation before treating
+fixture memory values as directly comparable per-module measurements.
+
 Every metric and artifact is labeled `controlled_fixture`, except module 15,
 which is labeled `reused_measured_result` and checked against its asset lock.
 Module 13's controlled fixture persists two mutually exclusive hidden-scene

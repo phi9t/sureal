@@ -123,6 +123,8 @@ def run_module(cache_root: Path, module_id: str, profile: str, run_id: str) -> P
                 "peak_cpu_bytes": _peak_cpu_bytes(),
                 "peak_gpu_bytes": 0,
                 "gpu": os.environ.get("NVIDIA_VISIBLE_DEVICES", "not-used"),
+                "network_isolation": "python_socket_guard",
+                "cpu_memory_scope": "process_lifetime_high_water_mark",
             },
             "provenance": {
                 "environment": {

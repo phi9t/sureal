@@ -203,10 +203,23 @@ class DispatcherContractTest(unittest.TestCase):
             self.assertTrue(payload["failure_sweep"])
             self.assertIn("runtime_seconds", payload["resources"])
             self.assertIn("peak_cpu_bytes", payload["resources"])
+            self.assertEqual(
+                payload["resources"]["network_isolation"],
+                "python_socket_guard",
+            )
+            self.assertEqual(
+                payload["resources"]["cpu_memory_scope"],
+                "process_lifetime_high_water_mark",
+            )
             self.assertIn("environment", payload["provenance"])
             self.assertIn("inputs_sha256", payload["provenance"])
             self.assertIn("config_sha256", payload["provenance"])
             self.assertIn("artifacts_sha256", payload["provenance"])
+            module_text = (run_dir / "report.md").read_text()
+            self.assertIn("network_isolation=python_socket_guard", module_text)
+            self.assertIn(
+                "cpu_memory_scope=process_lifetime_high_water_mark", module_text
+            )
 
             validation = run_cli("validate", "--module", "01", "--run-id", "contract-01", cache=cache)
             self.assertEqual(validation.returncode, 0, validation.stderr)
@@ -226,6 +239,10 @@ class DispatcherContractTest(unittest.TestCase):
             self.assertIn("Geometry metrics", text)
             self.assertIn("Rendering metrics", text)
             self.assertIn("Generative metrics", text)
+            self.assertIn("network_isolation=python_socket_guard", text)
+            self.assertIn(
+                "cpu_memory_scope=process_lifetime_high_water_mark", text
+            )
 
 
 class InsulaContractTest(unittest.TestCase):

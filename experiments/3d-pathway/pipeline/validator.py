@@ -371,6 +371,12 @@ def validate_result(run_dir: Path, expected_module: str | None = None) -> dict[s
     for required in ("runtime_seconds", "peak_cpu_bytes", "peak_gpu_bytes"):
         if required not in result["resources"]:
             raise ValueError(f"resources missing {required}")
+    if (
+        result["resources"].get("network_isolation") != "python_socket_guard"
+        or result["resources"].get("cpu_memory_scope")
+        != "process_lifetime_high_water_mark"
+    ):
+        raise ValueError("fixture runtime contract mismatch")
     provenance = result["provenance"]
     for required in ("environment", "config", "inputs_sha256", "config_sha256", "implementation_sha256", "artifacts_sha256", "artifact_provenance", "reports_sha256"):
         if required not in provenance:

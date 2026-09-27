@@ -171,6 +171,41 @@ class ReviewHardeningTest(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "offline"):
                 socket.create_connection(("example.com", 80))
 
+    def test_validator_rejects_runtime_contract_tampering(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            cache = Path(temporary)
+            for field, replacement in (
+                ("network_isolation", "os_network_namespace"),
+                ("cpu_memory_scope", "per_module_isolated_peak"),
+            ):
+                with self.subTest(field=field):
+                    run_id = f"runtime-contract-{field}"
+                    completed = run_cli(
+                        "run",
+                        "--module",
+                        "01",
+                        "--profile",
+                        "smoke",
+                        "--run-id",
+                        run_id,
+                        cache=cache,
+                    )
+                    self.assertEqual(completed.returncode, 0, completed.stderr)
+                    result_path = cache / "runs" / run_id / "01" / "result.json"
+                    result = json.loads(result_path.read_text())
+                    result["resources"][field] = replacement
+                    result_path.write_text(json.dumps(result))
+                    validation = run_cli(
+                        "validate",
+                        "--module",
+                        "01",
+                        "--run-id",
+                        run_id,
+                        cache=cache,
+                    )
+                    self.assertNotEqual(validation.returncode, 0)
+                    self.assertIn("runtime contract mismatch", validation.stderr)
+
     def test_all_is_complete_and_module_15_is_reused_measurement(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             cache = Path(temporary)
