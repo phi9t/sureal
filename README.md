@@ -1,3 +1,48 @@
+# Sureal
+
+Sureal is a research codebase for studying the path from geometric
+reconstruction to persistent, generative scene representations. It is a fork of [Surflo](https://github.com/Anttwo/Surflo), whose model, implementation,
+authors, and paper form the inherited reconstruction baseline. If you want Surflo itself,
+including its canonical project history and releases, use the
+[Surflo repository](https://github.com/Anttwo/Surflo).
+
+The Python package and import name remain `surflo` so existing checkpoints,
+configurations, scripts, and downstream code stay compatible. Sureal adds the
+reproduction pathway, controlled experiments, reference integrations, and the
+persistent-scene research direction described below; it does not claim to be
+the original Surflo project. The public repository is
+[github.com/phi9t/sureal](https://github.com/phi9t/sureal).
+
+> **License:** this repository inherits the Gaussian-Splatting License and is
+> restricted to **non-commercial research and evaluation**. Read
+> [LICENSE.md](LICENSE.md) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
+> before using or redistributing the code.
+
+## Project map
+
+- [Research mission](MISSION.md) — why coherent scene hypotheses require a
+  persistent sampled scene state.
+- [3D reconstruction pathway](docs/3d-reconstruction-pathway.md) — a sourced,
+  reproduction-oriented route from cameras and surfaces to generative scenes.
+- [Executable pathway labs](experiments/3d-pathway/README.md) — locked inputs,
+  maintained references, controlled failures, and cross-era reports.
+- [Surflo lineage](UPSTREAM.md) — upstream provenance and the compatibility
+  boundary between inherited Surflo code and Sureal additions.
+
+Validation has three intentionally separate tiers:
+
+- **Portable:** CPU-only publication, metadata, syntax, and offline source
+  checks run by GitHub Actions and `python scripts/publication_audit.py --root .`.
+- **Smoke:** local/container numerical contracts and small adapter checks,
+  dispatched with `experiments/3d-pathway/run.sh all --profile smoke`.
+- **Full B200:** hash-verified all-module experiments on the NVIDIA B200,
+  dispatched with `experiments/3d-pathway/run.sh all --profile full`.
+
+The sections below retain the Surflo reference implementation and its original
+technical instructions.
+
+## Surflo reference implementation
+
 <div align="center">
 <h1> 
   Surflo: Consistent 3D Surface Flow Model <br>with Global State
@@ -58,7 +103,7 @@ CUDA extensions built against your torch, so there is no `pip install surflo`.
 
 Start by cloning the repo with `--recursive`:
 ```bash
-git clone git@github.com:Anttwo/Surflo.git --recursive 
+git clone --recursive git@github.com:phi9t/sureal.git
 ```
 
 We provide ready-made installation files for CUDA **11.8**, **12.1** and **12.4** in
@@ -575,9 +620,10 @@ python scripts/evaluate.py benchmarks=tnt predictor=da3 \
 
 </details>
 
-## Citation
+## Original Surflo paper citation
 
-If you use Surflo in your research, please cite:
+If you use the inherited Surflo model or implementation in your research,
+please cite the original Surflo paper:
 
 ```bibtex
 @article{guedon2026surflo,

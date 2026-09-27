@@ -159,7 +159,6 @@ def _identity_errors(root: Path, entries: dict[str, IndexEntry]) -> list[str]:
         readme = _read_tracked_blob(root, readme_entry).decode("utf-8", errors="replace")
         for required_text in (
             "Sureal",
-            "fork of Surflo",
             "surflo",
             "non-commercial research and evaluation",
             TARGET_URL,
@@ -167,6 +166,11 @@ def _identity_errors(root: Path, entries: dict[str, IndexEntry]) -> list[str]:
         ):
             if required_text not in readme:
                 errors.append(f"README.md: missing required identity text: {required_text}")
+        if not any(
+            disclosure in readme
+            for disclosure in ("fork of Surflo", "fork of [Surflo]")
+        ):
+            errors.append("README.md: missing required identity text: fork of Surflo")
 
     metadata_entry = entries.get("pyproject.toml")
     if metadata_entry is None:

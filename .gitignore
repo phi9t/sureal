@@ -1,21 +1,18 @@
-# TO REMOVE
+# Project-specific local and generated files
 submodules/diff-gaussian-rasterization
 submodules/diff-gaussian-rasterization_ours
-# submodules/diff-gaussian-rasterization-surflo
 submodules/diff-gaussian-rasterization-surflo/tests/
 
-# CUSTOM
 CLAUDE.md
 *.ipynb
 training/dumps/
 training/eval_results/
 training/outputs/
-training/logs
+training/logs/
 exploration/
 checkpoints/
 MODEL_CARD.md
 
-# TO REMOVE
 training/analyze_train_stability.py
 training/stability_report/
 training/MULTIVIEW_DEV_NONDEV_INVESTIGATION.md
@@ -31,17 +28,16 @@ scripts/merge_multiview_dirs.py
 
 surflo/old_inference/
 
-eval_results
+eval_results/
 
-outputs
-exploration
+outputs/
 
 README_backup.md
 
 *.slurm
 *.ply
 
-wandb
+wandb/
 
 .hydra/
 ckpt/
@@ -57,7 +53,6 @@ _verify_keys.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
-**/__pycache__/
 *.py[cod]
 *$py.class
 
@@ -162,7 +157,7 @@ celerybeat.pid
 
 # Environments
 .env
-.venv
+.venv/
 env/
 venv/
 ENV/
@@ -200,7 +195,6 @@ skyseg.onnx
 
 # pixi environments
 .pixi
-*.egg-info
 /datasets/
 logs/
 .claude

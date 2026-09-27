@@ -15,6 +15,7 @@ from scripts import publication_audit
 
 TARGET_URL = "https://github.com/phi9t/sureal"
 UPSTREAM_URL = "https://github.com/Anttwo/Surflo"
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_PUBLIC_FILES = {
     ".github/workflows/publication.yml",
     ".gitignore",
@@ -103,7 +104,7 @@ class PublicationFixture:
             "LICENSE.md": "non-commercial research and evaluation\n",
             "README.md": (
                 "# Sureal\n\n"
-                f"Sureal is a fork of Surflo ({UPSTREAM_URL}). The installed "
+                f"Sureal is a fork of [Surflo]({UPSTREAM_URL}). The installed "
                 "package and Python imports remain surflo.\n\n"
                 "Use is limited to non-commercial research and evaluation.\n\n"
                 f"Repository: {TARGET_URL}\n"
@@ -300,6 +301,120 @@ class PortableAuditTests(unittest.TestCase):
         self.assertEqual(report["tracked_files"], 0)
         self.assertEqual(report["gitlinks"], 0)
         self.assertTrue(any("repository" in error for error in report["errors"]))
+
+
+class RepositoryIdentityTests(unittest.TestCase):
+    def test_repository_declares_sureal_identity_and_surflo_compatibility(self) -> None:
+        readme = (REPOSITORY_ROOT / "README.md").read_text(encoding="utf-8")
+
+        self.assertIn("# Sureal", readme)
+        self.assertIn(f"fork of [Surflo]({UPSTREAM_URL})", readme)
+        self.assertIn(
+            "git clone --recursive git@github.com:phi9t/sureal.git", readme
+        )
+        self.assertIn("Python package and import name remain `surflo`", readme)
+        self.assertIn("non-commercial research and evaluation", readme)
+        for link in (
+            "[Research mission](MISSION.md)",
+            "[3D reconstruction pathway](docs/3d-reconstruction-pathway.md)",
+            "[Executable pathway labs](experiments/3d-pathway/README.md)",
+        ):
+            self.assertIn(link, readme)
+        for tier in ("Portable", "Smoke", "Full B200"):
+            self.assertIn(tier, readme)
+
+    def test_package_metadata_keeps_surflo_name_and_points_to_both_repositories(
+        self,
+    ) -> None:
+        metadata = publication_audit.tomllib.loads(
+            (REPOSITORY_ROOT / "pyproject.toml").read_text(encoding="utf-8")
+        )["project"]
+
+        self.assertEqual(metadata["name"], "surflo")
+        self.assertEqual(metadata["version"], "0.1.0")
+        self.assertEqual(metadata["requires-python"], "==3.10.*")
+        self.assertEqual(metadata["license"], {"file": "LICENSE.md"})
+        self.assertEqual(metadata["urls"]["Homepage"], TARGET_URL)
+        self.assertEqual(metadata["urls"]["Repository"], TARGET_URL)
+        self.assertEqual(metadata["urls"]["Upstream"], UPSTREAM_URL)
+        self.assertEqual(metadata["urls"]["Paper"], "https://arxiv.org/abs/2606.13644")
+
+    def test_public_docs_cover_contribution_security_release_and_lineage(self) -> None:
+        expected = {
+            "UPSTREAM.md": (
+                UPSTREAM_URL,
+                "complete Git history",
+                "surflo",
+                "Sureal additions",
+            ),
+            "CONTRIBUTING.md": (
+                "pull request",
+                "non-commercial research and evaluation",
+                "python scripts/publication_audit.py --root .",
+                "smoke",
+                "full",
+            ),
+            "SECURITY.md": (
+                "main",
+                "https://github.com/phi9t/sureal/security/advisories/new",
+                "Do not",
+                "research code",
+            ),
+            "RELEASING.md": (
+                "python scripts/publication_audit.py --root .",
+                "python -m build",
+                "gitleaks git",
+                "--no-local",
+                "git ls-remote",
+                "force",
+            ),
+        }
+        for relative_path, phrases in expected.items():
+            with self.subTest(path=relative_path):
+                content = (REPOSITORY_ROOT / relative_path).read_text(encoding="utf-8")
+                for phrase in phrases:
+                    self.assertIn(phrase, content)
+
+    def test_original_surflo_citation_and_license_remain_present(self) -> None:
+        readme = (REPOSITORY_ROOT / "README.md").read_text(encoding="utf-8")
+        license_text = (REPOSITORY_ROOT / "LICENSE.md").read_text(encoding="utf-8")
+        notices = (REPOSITORY_ROOT / "THIRD_PARTY_NOTICES.md").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("Original Surflo paper citation", readme)
+        self.assertIn("@article{guedon2026surflo", readme)
+        self.assertIn("Gaussian-Splatting License", license_text)
+        self.assertIn("Gaussian-Splatting License", notices)
+        self.assertIn("may not be used commercially", notices)
+
+    def test_publication_generated_paths_remain_ignored(self) -> None:
+        paths = (
+            ".worktrees/publication-test/file",
+            ".env",
+            ".venv/bin/python",
+            "package.egg-info/PKG-INFO",
+            "pkg/__pycache__/module.cpython-310.pyc",
+            "pkg/module.pyc",
+            "checkpoints/model.pt",
+            "outputs/result.json",
+            "wandb/latest-run",
+            "training/logs/run.log",
+            "training/outputs/result.json",
+        )
+        for path in paths:
+            with self.subTest(path=path):
+                result = run(
+                    "git",
+                    "check-ignore",
+                    "--no-index",
+                    "-q",
+                    "--",
+                    path,
+                    cwd=REPOSITORY_ROOT,
+                    check=False,
+                )
+                self.assertEqual(result.returncode, 0, path)
 
 
 if __name__ == "__main__":
