@@ -1064,6 +1064,8 @@ def _write_dynamic_trajectories_svg(
     fixture: dict[str, np.ndarray],
 ) -> None:
     truth = fixture["truth_object_xyz"]
+    truth_camera = fixture["truth_camera_xyz"]
+    estimated_camera = fixture["estimated_camera_xyz"]
     predictions = fixture["post_occlusion_prediction_xyz"]
     start = int(fixture["occlusion_start_index"][0])
     reappearance = int(fixture["reappearance_index"][0])
@@ -1073,13 +1075,20 @@ def _write_dynamic_trajectories_svg(
     top = 58.0
     plot_height = 150.0
 
-    def polyline(values: np.ndarray, panel: int, color: str) -> str:
+    def polyline(
+        values: np.ndarray,
+        panel: int,
+        color: str,
+        width: float = 2.4,
+        dash: str = "",
+    ) -> str:
         points = []
         for frame, value in enumerate(values):
             x = left + panel * panel_width + 155.0 * frame / (frame_count - 1)
             y = top + plot_height * (0.5 - float(value) / 1.7)
             points.append(f"{x:.2f},{y:.2f}")
-        return f'<polyline points="{" ".join(points)}" fill="none" stroke="{color}" stroke-width="2.4"/>'
+        dash_attribute = f' stroke-dasharray="{dash}"' if dash else ""
+        return f'<polyline points="{" ".join(points)}" fill="none" stroke="{color}" stroke-width="{width}"{dash_attribute}/>'
 
     panels = []
     for index, name in enumerate(DYNAMIC_VARIANTS):
@@ -1098,6 +1107,8 @@ def _write_dynamic_trajectories_svg(
                 f'<line x1="{panel_left:.1f}" y1="{top + plot_height / 2:.1f}" x2="{panel_left + 155:.1f}" y2="{top + plot_height / 2:.1f}" stroke="#bbb"/>',
                 polyline(truth[index, :, 0, 0], index, "#2f6f9f"),
                 polyline(truth[index, :, 1, 0], index, "#c34d58"),
+                polyline(truth_camera[index, :, 0], index, "#4b8b3b", 1.5, "5 3"),
+                polyline(estimated_camera[index, :, 0], index, "#222", 1.2, "2 3"),
                 f'<circle cx="{marker_x:.2f}" cy="{prediction_y[0]:.2f}" r="4" fill="none" stroke="#111" stroke-width="2"/>',
                 f'<circle cx="{marker_x:.2f}" cy="{prediction_y[1]:.2f}" r="4" fill="none" stroke="#111" stroke-width="2"/>',
             ]
@@ -1107,7 +1118,7 @@ def _write_dynamic_trajectories_svg(
 <rect width="620" height="255" fill="white"/>
 <text x="20" y="22" font-family="sans-serif" font-size="15">Persistent identities through a fully occluded encounter</text>
 {"".join(panels)}
-<text x="35" y="231" font-family="sans-serif" font-size="11">blue/red: true identity x(t); grey: occlusion; black rings: constant-velocity predictions</text>
+<text x="35" y="231" font-family="sans-serif" font-size="11">blue/red: object IDs; green/black dash: true/estimated camera; rings: predictions</text>
 </svg>
 ''',
         encoding="utf-8",

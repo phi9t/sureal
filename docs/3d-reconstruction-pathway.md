@@ -1615,7 +1615,7 @@ displacement RMSE to 0.0158 m, and identity-aware reappearance error to 0.478
 m, even though camera-relative observation residual remained numerical zero.
 Full uses 129 frames and 32 hidden frames and preserves the same controlled
 0.36/0.04 m identity-aware/set-aligned contrast; the contaminated condition
-measured 0.478/0.132 m with 0.145 m camera ATE.
+measured 0.478/0.318 m with 0.145 m camera ATE.
 This is an analytic observability and metric-contract experiment, not a quality
 claim for any cited system. Detailed source, maintained-reference, and
 terminology evidence is in

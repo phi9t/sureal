@@ -324,15 +324,19 @@ def evaluate_dynamic_fixture(
         )
         if not np.array_equal(assignments[variant_index], expected_assignment):
             raise ValueError("post-occlusion assignment is inconsistent")
-        assigned_detections = detections[variant_index, expected_assignment]
         assigned_source_ids = source_ids[variant_index, expected_assignment]
         identity_truth = truth_objects[variant_index, reappearance]
+        truth_set_assignment = _assignment(
+            predictions[variant_index],
+            identity_truth,
+        )
+        assigned_truth = identity_truth[truth_set_assignment]
         identity_errors = np.linalg.norm(
             predictions[variant_index] - identity_truth,
             axis=-1,
         )
         set_errors = np.linalg.norm(
-            predictions[variant_index] - assigned_detections,
+            predictions[variant_index] - assigned_truth,
             axis=-1,
         )
         camera_errors = np.linalg.norm(

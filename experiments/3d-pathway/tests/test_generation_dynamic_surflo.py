@@ -313,6 +313,17 @@ class DynamicSceneContractTest(unittest.TestCase):
         )
         self.assertGreater(joint["temporal_displacement_rmse_m"], 0.0)
 
+    def test_set_aligned_error_uses_world_truth_not_biased_detections(self) -> None:
+        from dynamic import evaluate_dynamic_fixture, generate_dynamic_fixture
+
+        joint = evaluate_dynamic_fixture(
+            generate_dynamic_fixture(frame_count=33, occlusion_frames=0)
+        )["moving_camera_object"]
+        self.assertAlmostEqual(
+            joint["set_aligned_reappearance_rmse_m"],
+            joint["identity_aware_post_occlusion_rmse_m"],
+        )
+
     def test_dynamic_fixture_rejects_invalid_frame_and_occlusion_contracts(self) -> None:
         from dynamic import generate_dynamic_fixture
 
