@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import hashlib
 import json
 import os
@@ -163,6 +164,29 @@ class AmbiguousSceneContractTest(unittest.TestCase):
                 recomputed["shared_scene_latent"]["best_hypothesis_rmse_m"],
                 metrics["shared_latent_best_hypothesis_rmse_m"],
             )
+            result["profile"] = "full"
+            (run_dir / "result.json").write_text(
+                json.dumps(result, indent=2, sort_keys=True) + "\n"
+            )
+            validation = subprocess.run(
+                [
+                    str(ROOT / "run.sh"),
+                    "validate",
+                    "--module",
+                    "13",
+                    "--run-id",
+                    "ambiguity-contract",
+                ],
+                cwd=REPO_ROOT,
+                env=env,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(validation.returncode, 0)
+            self.assertIn("Module 13 fixture/profile mismatch", validation.stderr)
+            result["profile"] = "smoke"
+            expected_coherence = metrics["independent_point_coherence"]
             result["metrics"]["generative"]["independent_point_coherence"] = 1.0
             (run_dir / "result.json").write_text(
                 json.dumps(result, indent=2, sort_keys=True) + "\n"
@@ -184,6 +208,45 @@ class AmbiguousSceneContractTest(unittest.TestCase):
             )
             self.assertNotEqual(validation.returncode, 0)
             self.assertIn("Module 13 metric mismatch", validation.stderr)
+
+            result["metrics"]["generative"][
+                "independent_point_coherence"
+            ] = expected_coherence
+            result["failure_sweep"][0]["measurement"] = 0.123
+            sweep_path = run_dir / "artifacts/failure_sweep.csv"
+            with sweep_path.open(newline="", encoding="utf-8") as stream:
+                sweep_rows = list(csv.DictReader(stream))
+            sweep_rows[0]["measurement"] = "0.123"
+            with sweep_path.open("w", newline="", encoding="utf-8") as stream:
+                writer = csv.DictWriter(
+                    stream,
+                    fieldnames=["parameter", "value", "metric", "measurement"],
+                )
+                writer.writeheader()
+                writer.writerows(sweep_rows)
+            result["provenance"]["artifacts_sha256"]["failure_sweep.csv"] = (
+                hashlib.sha256(sweep_path.read_bytes()).hexdigest()
+            )
+            (run_dir / "result.json").write_text(
+                json.dumps(result, indent=2, sort_keys=True) + "\n"
+            )
+            validation = subprocess.run(
+                [
+                    str(ROOT / "run.sh"),
+                    "validate",
+                    "--module",
+                    "13",
+                    "--run-id",
+                    "ambiguity-contract",
+                ],
+                cwd=REPO_ROOT,
+                env=env,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(validation.returncode, 0)
+            self.assertIn("Module 13 failure sweep mismatch", validation.stderr)
 
 
 class FrontierLabContractTest(unittest.TestCase):

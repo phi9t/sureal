@@ -10,6 +10,9 @@ import numpy as np
 EVIDENCE_TOLERANCE_M = 1e-6
 COHERENT_SAMPLE_THRESHOLD = 0.95
 RMSE_BLOCK_SAMPLES = 256
+AMBIGUITY_RANDOM_SEED = 260925
+AMBIGUITY_SWEEP_SAMPLES = 64
+AMBIGUITY_PROFILE_POINTS = {"smoke": 257, "full": 4097}
 AMBIGUITY_ARRAY_SEMANTICS = {
     "observed_truth_xyz": "input-visible occluder points shared by both hypotheses",
     "independent_observed_xyz": "visible points predicted by every independent-point sample",
@@ -281,3 +284,56 @@ def evaluate_ambiguity_fixture(
         "independent_points": independent,
         "shared_scene_latent": shared,
     }
+
+
+def generate_ambiguity_failure_sweep(
+    sweep_steps: int,
+) -> tuple[list[dict[str, str | int | float]], list[float]]:
+    """Recompute the resolution sweep and its chart values from the contract."""
+    if sweep_steps < 2:
+        raise ValueError("the ambiguity failure sweep needs at least two steps")
+    point_counts = np.unique(
+        np.rint(np.geomspace(17, 16385, sweep_steps)).astype(int)
+    )
+    rows: list[dict[str, str | int | float]] = []
+    coherence: list[float] = []
+    reference_shared_latents: np.ndarray | None = None
+    for point_count in point_counts:
+        fixture = generate_ambiguity_fixture(
+            samples=AMBIGUITY_SWEEP_SAMPLES,
+            hidden_points_per_sample=int(point_count),
+            seed=AMBIGUITY_RANDOM_SEED,
+        )
+        summaries = evaluate_ambiguity_fixture(fixture)
+        independent = summaries["independent_points"]
+        shared = summaries["shared_scene_latent"]
+        shared_latents = fixture["shared_scene_latents"]
+        if reference_shared_latents is None:
+            reference_shared_latents = shared_latents.copy()
+        resolution_consistency = float(
+            np.mean(shared_latents == reference_shared_latents)
+        )
+        coherence.append(float(independent["within_sample_coherence"]))
+        for metric, measurement in (
+            ("independent_point_coherence", independent["within_sample_coherence"]),
+            ("independent_hybrid_fraction", independent["hybrid_sample_fraction"]),
+            (
+                "independent_repeat_query_consistency",
+                independent["repeat_query_consistency"],
+            ),
+            ("shared_latent_coherence", shared["within_sample_coherence"]),
+            (
+                "shared_repeat_query_consistency",
+                shared["repeat_query_consistency"],
+            ),
+            ("shared_resolution_latent_consistency", resolution_consistency),
+        ):
+            rows.append(
+                {
+                    "parameter": "points_per_sample",
+                    "value": int(point_count),
+                    "metric": metric,
+                    "measurement": float(measurement),
+                }
+            )
+    return rows, coherence

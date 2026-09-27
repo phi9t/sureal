@@ -14,9 +14,12 @@ import numpy as np
 from contracts import ROOT, load_json, sha256_file
 from generative import (
     AMBIGUITY_ARRAY_SEMANTICS,
+    AMBIGUITY_PROFILE_POINTS,
+    AMBIGUITY_RANDOM_SEED,
     COHERENT_SAMPLE_THRESHOLD,
     EVIDENCE_TOLERANCE_M,
     evaluate_ambiguity_fixture,
+    generate_ambiguity_failure_sweep,
     generate_ambiguity_fixture,
 )
 from math3d import (
@@ -967,11 +970,11 @@ def _write_ambiguity_samples_svg(
 
 def _generative_scene_lab(artifacts: Path, profile: str, scene: dict[str, Any], profile_config: dict[str, Any]) -> dict[str, Any]:
     samples = int(profile_config["samples"])
-    points = 257 if profile == "smoke" else 4097
+    points = AMBIGUITY_PROFILE_POINTS[profile]
     fixture = generate_ambiguity_fixture(
         samples=samples,
         hidden_points_per_sample=points,
-        seed=260925,
+        seed=AMBIGUITY_RANDOM_SEED,
     )
     comparison = evaluate_ambiguity_fixture(fixture)
     independent = comparison["independent_points"]
@@ -986,7 +989,7 @@ def _generative_scene_lab(artifacts: Path, profile: str, scene: dict[str, Any], 
             "coordinate_convention": "right-handed xyz in metres",
             "sample_count": samples,
             "hidden_points_per_sample": points,
-            "random_seed": 260925,
+            "random_seed": AMBIGUITY_RANDOM_SEED,
             "evidence_tolerance_m": EVIDENCE_TOLERANCE_M,
             "coherent_sample_threshold": COHERENT_SAMPLE_THRESHOLD,
         },
@@ -1004,42 +1007,7 @@ def _generative_scene_lab(artifacts: Path, profile: str, scene: dict[str, Any], 
         json.dumps(comparison_record, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
-    point_counts = np.unique(np.rint(np.geomspace(17, 16385, _steps(profile_config))).astype(int))
-    coherence = []
-    sweep = []
-    reference_shared_latents = None
-    for point_count in point_counts:
-        sweep_fixture = generate_ambiguity_fixture(
-            samples=64,
-            hidden_points_per_sample=int(point_count),
-            seed=260925,
-        )
-        summaries = evaluate_ambiguity_fixture(sweep_fixture)
-        independent_summary = summaries["independent_points"]
-        shared_summary = summaries["shared_scene_latent"]
-        shared_latents = sweep_fixture["shared_scene_latents"]
-        if reference_shared_latents is None:
-            reference_shared_latents = shared_latents.copy()
-        resolution_consistency = float(
-            np.mean(shared_latents == reference_shared_latents)
-        )
-        coherence.append(float(independent_summary["within_sample_coherence"]))
-        for metric, measurement in (
-            ("independent_point_coherence", independent_summary["within_sample_coherence"]),
-            ("independent_hybrid_fraction", independent_summary["hybrid_sample_fraction"]),
-            ("independent_repeat_query_consistency", independent_summary["repeat_query_consistency"]),
-            ("shared_latent_coherence", shared_summary["within_sample_coherence"]),
-            ("shared_repeat_query_consistency", shared_summary["repeat_query_consistency"]),
-            ("shared_resolution_latent_consistency", resolution_consistency),
-        ):
-            sweep.append(
-                {
-                    "parameter": "points_per_sample",
-                    "value": int(point_count),
-                    "metric": metric,
-                    "measurement": float(measurement),
-                }
-            )
+    sweep, coherence = generate_ambiguity_failure_sweep(_steps(profile_config))
     _write_sweep(artifacts / "failure_sweep.csv", sweep)
     _write_chart(artifacts / "scene_coherence.svg", "More independent points converge to a stable hybrid, not one scene", coherence, "#b3456c")
     return {

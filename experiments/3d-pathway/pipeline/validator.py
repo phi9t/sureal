@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import csv
 import math
 from pathlib import Path
 from typing import Any
@@ -11,9 +12,12 @@ import numpy as np
 from contracts import IMPLEMENTATION_FILES, INPUT_FILES, ROOT, canonical_json, ensure_finite, load_json, sha256_file, validate_json_schema_instance
 from generative import (
     AMBIGUITY_ARRAY_SEMANTICS,
+    AMBIGUITY_PROFILE_POINTS,
+    AMBIGUITY_RANDOM_SEED,
     COHERENT_SAMPLE_THRESHOLD,
     EVIDENCE_TOLERANCE_M,
     evaluate_ambiguity_fixture,
+    generate_ambiguity_failure_sweep,
 )
 
 
@@ -40,6 +44,13 @@ def _validate_module13(run_dir: Path, result: dict[str, Any]) -> None:
         raise ValueError("Module 13 ambiguity archive is invalid") from error
     recomputed = evaluate_ambiguity_fixture(fixture)
     comparison = load_json(comparison_path)
+    profile_config = load_json(ROOT / "curriculum.json")["profiles"][result["profile"]]
+    expected_assignment_shape = (
+        int(profile_config["samples"]),
+        AMBIGUITY_PROFILE_POINTS[result["profile"]],
+    )
+    if fixture["independent_assignments"].shape != expected_assignment_shape:
+        raise ValueError("Module 13 fixture/profile mismatch")
     expected_array_records = {
         name: {
             "shape": list(array.shape),
@@ -54,7 +65,7 @@ def _validate_module13(run_dir: Path, result: dict[str, Any]) -> None:
         "coordinate_convention": "right-handed xyz in metres",
         "sample_count": int(fixture["independent_assignments"].shape[0]),
         "hidden_points_per_sample": int(fixture["independent_assignments"].shape[1]),
-        "random_seed": 260925,
+        "random_seed": AMBIGUITY_RANDOM_SEED,
         "evidence_tolerance_m": EVIDENCE_TOLERANCE_M,
         "coherent_sample_threshold": COHERENT_SAMPLE_THRESHOLD,
     }
@@ -123,6 +134,29 @@ def _validate_module13(run_dir: Path, result: dict[str, Any]) -> None:
         for name, expected in expected_metrics.items()
     ):
         raise ValueError("Module 13 metric mismatch")
+
+    expected_sweep, _ = generate_ambiguity_failure_sweep(
+        int(profile_config["sweep_steps"])
+    )
+    sweep_path = run_dir / "artifacts" / "failure_sweep.csv"
+    try:
+        with sweep_path.open(newline="", encoding="utf-8") as stream:
+            reader = csv.DictReader(stream)
+            if reader.fieldnames != ["parameter", "value", "metric", "measurement"]:
+                raise ValueError("Module 13 failure sweep mismatch")
+            csv_sweep = [
+                {
+                    "parameter": row["parameter"],
+                    "value": int(row["value"]),
+                    "metric": row["metric"],
+                    "measurement": float(row["measurement"]),
+                }
+                for row in reader
+            ]
+    except (OSError, KeyError, TypeError, ValueError) as error:
+        raise ValueError("Module 13 failure sweep mismatch") from error
+    if result["failure_sweep"] != expected_sweep or csv_sweep != expected_sweep:
+        raise ValueError("Module 13 failure sweep mismatch")
 
 
 def validate_result(run_dir: Path, expected_module: str | None = None) -> dict[str, Any]:
