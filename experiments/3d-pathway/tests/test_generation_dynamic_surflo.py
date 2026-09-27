@@ -383,9 +383,8 @@ class DynamicSceneContractTest(unittest.TestCase):
             self.assertTrue(archive_path.is_file())
             self.assertTrue((run_dir / "artifacts/dynamic_trajectories.svg").is_file())
             with np.load(archive_path, allow_pickle=False) as archive:
-                recomputed = evaluate_dynamic_fixture(
-                    {name: archive[name] for name in archive.files}
-                )
+                archive_fixture = {name: archive[name] for name in archive.files}
+            recomputed = evaluate_dynamic_fixture(archive_fixture)
             result = json.loads((run_dir / "result.json").read_text())
             result_path = run_dir / "result.json"
 
@@ -416,6 +415,23 @@ class DynamicSceneContractTest(unittest.TestCase):
                 result["metrics"]["geometry"][
                     "static_camera_post_occlusion_error_m"
                 ],
+            )
+            original_time = archive_fixture["time_s"].copy()
+            archive_fixture["time_s"] = np.sign(original_time) * np.abs(
+                original_time
+            ) ** 3
+            np.savez_compressed(archive_path, **archive_fixture)
+            result["provenance"]["artifacts_sha256"]["dynamic_sequence.npz"] = (
+                hashlib.sha256(archive_path.read_bytes()).hexdigest()
+            )
+            validation = validate()
+            self.assertNotEqual(validation.returncode, 0)
+            self.assertIn("Module 14 fixture contract mismatch", validation.stderr)
+
+            archive_fixture["time_s"] = original_time
+            np.savez_compressed(archive_path, **archive_fixture)
+            result["provenance"]["artifacts_sha256"]["dynamic_sequence.npz"] = (
+                hashlib.sha256(archive_path.read_bytes()).hexdigest()
             )
             expected_metric = result["metrics"]["geometry"][
                 "static_camera_post_occlusion_error_m"

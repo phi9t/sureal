@@ -19,6 +19,7 @@ from dynamic import (
     dynamic_result_metrics,
     evaluate_dynamic_fixture,
     generate_dynamic_failure_sweep,
+    generate_dynamic_fixture,
 )
 from generative import (
     AMBIGUITY_ARRAY_SEMANTICS,
@@ -196,6 +197,12 @@ def _validate_module14(run_dir: Path, result: dict[str, Any]) -> None:
         != max_occlusion
     ):
         raise ValueError("Module 14 fixture/profile mismatch")
+    expected_fixture = generate_dynamic_fixture(frame_count, max_occlusion)
+    if set(fixture) != set(expected_fixture) or any(
+        not np.array_equal(fixture[name], expected_fixture[name])
+        for name in expected_fixture
+    ):
+        raise ValueError("Module 14 fixture contract mismatch")
     expected_array_records = {
         name: {
             "shape": list(array.shape),
