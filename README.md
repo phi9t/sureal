@@ -22,6 +22,9 @@ the original Surflo project. The public repository is
 
 - [Research mission](MISSION.md) — why coherent scene hypotheses require a
   persistent sampled scene state.
+- [Coherent scene hypotheses](docs/coherent-scene-hypotheses.md) — what Sureal
+  establishes today, where its evidence stops, and the learned experiment that
+  would test the proposed persistent scene state.
 - [3D reconstruction pathway](docs/3d-reconstruction-pathway.md) — a sourced,
   reproduction-oriented route from cameras and surfaces to generative scenes.
 - [Executable pathway labs](experiments/3d-pathway/README.md) — locked inputs,

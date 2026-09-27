@@ -22,7 +22,9 @@ REQUIRED_PUBLIC_FILES = {
     ".gitignore",
     ".gitmodules",
     "CONTRIBUTING.md",
+    "docs/coherent-scene-hypotheses.md",
     "LICENSE.md",
+    "MISSION.md",
     "README.md",
     "RELEASING.md",
     "SECURITY.md",
@@ -102,6 +104,13 @@ class PublicationFixture:
             ".gitignore": "build/\ndist/\n*.egg-info/\n__pycache__/\n*.pyc\n",
             ".gitmodules": "",
             "CONTRIBUTING.md": "# Contributing\n",
+            "docs/coherent-scene-hypotheses.md": (
+                "# Coherent scene hypotheses\n\n"
+                "Inherited reconstruction system. Sureal experimental infrastructure. "
+                "Proposed learned research. Repository-recorded GPU measurements were "
+                "not independently rerun. Support labels do not certify object "
+                "completeness.\n"
+            ),
             "LICENSE.md": (
                 "Gaussian-Splatting License\n"
                 "non-commercial research and evaluation\n"
@@ -113,7 +122,13 @@ class PublicationFixture:
                 "Use is limited to non-commercial research and evaluation. "
                 "See [LICENSE.md](LICENSE.md) and "
                 "[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).\n\n"
+                "[Coherent scene hypotheses](docs/coherent-scene-hypotheses.md)\n\n"
                 f"Repository: {TARGET_URL}\n"
+            ),
+            "MISSION.md": (
+                "# Mission\n\n"
+                "See [Coherent scene hypotheses](docs/coherent-scene-hypotheses.md).\n\n"
+                r"$z \sim p_\psi(z\mid O)$" "\n"
             ),
             "RELEASING.md": "# Releasing\n",
             "SECURITY.md": "# Security\n",
@@ -384,6 +399,35 @@ class RepositoryIdentityTests(unittest.TestCase):
             self.assertIn(link, readme)
         for tier in ("Portable", "Smoke", "Full B200"):
             self.assertIn(tier, readme)
+
+    def test_canonical_assessment_separates_evidence_from_research_direction(
+        self,
+    ) -> None:
+        readme = (REPOSITORY_ROOT / "README.md").read_text(encoding="utf-8")
+        mission = (REPOSITORY_ROOT / "MISSION.md").read_text(encoding="utf-8")
+        assessment_path = REPOSITORY_ROOT / "docs/coherent-scene-hypotheses.md"
+
+        self.assertTrue(assessment_path.is_file())
+        assessment = assessment_path.read_text(encoding="utf-8")
+        self.assertIn(
+            "[Coherent scene hypotheses](docs/coherent-scene-hypotheses.md)",
+            readme,
+        )
+        for phrase in (
+            "Inherited reconstruction system",
+            "Sureal experimental infrastructure",
+            "Proposed learned research",
+            "repository-recorded GPU measurements",
+            "not independently rerun",
+            "support labels",
+            "do not certify object completeness",
+        ):
+            self.assertIn(phrase, assessment)
+        self.assertIn("docs/coherent-scene-hypotheses.md", mission)
+        self.assertIn(r"p_\psi(z\mid O)", mission)
+        self.assertLessEqual(len(mission.splitlines()), 120)
+        for public_document in (mission, assessment):
+            self.assertNotIn(":chatgpt-content-reference", public_document)
 
     def test_package_metadata_keeps_surflo_name_and_points_to_both_repositories(
         self,
