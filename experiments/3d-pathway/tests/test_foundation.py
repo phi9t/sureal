@@ -52,6 +52,43 @@ class RegistryContractTest(unittest.TestCase):
                 {"adapter": "nerfacto"}, schema, "conditional fixture"
             )
 
+    def test_result_schema_pins_fixture_runtime_contract_values(self) -> None:
+        from contracts import validate_json_schema_instance
+
+        schema = json.loads((ROOT / "result.schema.json").read_text())
+        resources = schema["properties"]["resources"]
+        expected = {
+            "network_isolation": "python_socket_guard",
+            "cpu_memory_scope": "process_lifetime_high_water_mark",
+        }
+        for field, value in expected.items():
+            with self.subTest(field=field):
+                self.assertEqual(resources["properties"][field]["const"], value)
+                fixture = {
+                    "schema_version": 1,
+                    "module_id": "01",
+                    "profile": "smoke",
+                    "status": "complete",
+                    "network_mode": "offline",
+                    "measurement_kind": "controlled_fixture",
+                    "metrics": {},
+                    "metric_provenance": {},
+                    "failure_sweep": [{}, {}],
+                    "failure_sweep_provenance": "controlled_fixture",
+                    "resources": {
+                        "runtime_seconds": 0.1,
+                        "peak_cpu_bytes": 1,
+                        "peak_gpu_bytes": 0,
+                        **expected,
+                        field: "overstated_contract",
+                    },
+                    "provenance": {},
+                }
+                with self.assertRaisesRegex(
+                    ValueError, f"result.resources.{field}"
+                ):
+                    validate_json_schema_instance(fixture, schema, "result")
+
     def test_curriculum_schema_declares_stable_module_contract(self) -> None:
         schema = json.loads((ROOT / "curriculum.schema.json").read_text())
         module = schema["$defs"]["module"]

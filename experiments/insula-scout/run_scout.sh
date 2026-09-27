@@ -202,6 +202,8 @@ photoreal_probe() {
         return 2
     fi
     local rc=0
+    local measurement_date_utc
+    measurement_date_utc="$(date -u +%F)"
     HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
     python experiments/insula-scout/synthetic_ambiguity/probe.py \
         --episode "${episode}" \
@@ -221,6 +223,7 @@ photoreal_probe() {
         --manifest "${episode}/manifest.json" \
         --validation "${episode}/validation.json" \
         --analytic-baseline experiments/insula-scout/synthetic_results.json \
+        --measurement-date-utc "${measurement_date_utc}" \
         --output "${staging}/compact-results.json" || rc=$?
     if [[ "${rc}" != 0 ]]; then
         rm -rf -- "${staging}"

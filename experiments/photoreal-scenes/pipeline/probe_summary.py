@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timezone
+from datetime import date
 import hashlib
 import json
 import math
@@ -56,6 +56,8 @@ def build_summary(
     manifest_path: Path,
     validation_path: Path,
     analytic_baseline_path: Path,
+    *,
+    measurement_date_utc: str,
 ) -> dict[str, Any]:
     raw_path = Path(raw_path)
     manifest_path = Path(manifest_path)
@@ -63,6 +65,11 @@ def build_summary(
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     validation = json.loads(Path(validation_path).read_text(encoding="utf-8"))
     baseline = json.loads(Path(analytic_baseline_path).read_text(encoding="utf-8"))
+    try:
+        if date.fromisoformat(measurement_date_utc).isoformat() != measurement_date_utc:
+            raise ValueError
+    except (TypeError, ValueError) as error:
+        raise ValueError("measurement_date_utc must be an ISO 8601 calendar date") from error
     if raw.get("episode_manifest_sha256") != _sha256(manifest_path):
         raise ValueError("raw probe episode hash does not match the supplied manifest")
     if (
@@ -121,7 +128,7 @@ def build_summary(
     return {
         "schema_version": 2,
         "status": "pass",
-        "date_utc": datetime.now(timezone.utc).date().isoformat(),
+        "measurement_date_utc": measurement_date_utc,
         "question": raw.get("question"),
         "episode": {
             "schema_version": manifest.get("schema_version"),
@@ -174,10 +181,15 @@ def main() -> None:
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--validation", type=Path, required=True)
     parser.add_argument("--analytic-baseline", type=Path, required=True)
+    parser.add_argument("--measurement-date-utc", required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     payload = build_summary(
-        args.raw, args.manifest, args.validation, args.analytic_baseline
+        args.raw,
+        args.manifest,
+        args.validation,
+        args.analytic_baseline,
+        measurement_date_utc=args.measurement_date_utc,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(

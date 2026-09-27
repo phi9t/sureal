@@ -11,6 +11,8 @@ From a clean candidate commit:
 ```bash
 python -m unittest tests.test_publication_audit -v
 python scripts/publication_audit.py --root .
+python -m pip install numpy==1.26.4
+PYTHONPATH=experiments/3d-pathway python -m unittest discover -s experiments/3d-pathway/tests -p 'test_*.py' -v
 python -m build
 python -m twine check dist/*
 python -m compileall -q scripts tests surflo
@@ -19,7 +21,8 @@ git diff --check HEAD
 gitleaks git --redact --no-banner --exit-code 1 .
 ```
 
-Run `bash -n` on every tracked shell script. Verify the applicable smoke/full
+Run `bash -n` on every tracked shell script. The required CPU numerical gate is
+not evidence for a fresh B200 measurement. Verify the applicable smoke/full
 scientific tier separately; do not represent the portable checks as GPU result
 reproduction. Build output belongs in a temporary directory or an ignored
 `dist/`, never in the commit.

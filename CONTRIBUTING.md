@@ -31,6 +31,10 @@ Run the narrowest relevant tests while developing, then the applicable gate:
 python -m unittest tests.test_publication_audit -v
 python scripts/publication_audit.py --root .
 
+# Required offline CPU numerical-contract gate (Python 3.10)
+python -m pip install numpy==1.26.4
+PYTHONPATH=experiments/3d-pathway python -m unittest discover -s experiments/3d-pathway/tests -p 'test_*.py' -v
+
 # Containerized numerical and adapter smoke checks
 experiments/3d-pathway/run.sh all --profile smoke
 
@@ -38,6 +42,9 @@ experiments/3d-pathway/run.sh all --profile smoke
 experiments/3d-pathway/run.sh all --profile full
 ```
 
-The portable gate does not claim CUDA or scientific-result reproduction. State
-which smoke or full modules you ran, and explain any hardware-gated checks that
-were not run.
+The required CPU numerical gate validates fixtures, evaluators, corruption
+rejection, and aggregate semantics.
+It is not evidence for a fresh B200 measurement. The portable gates do not
+claim CUDA or scientific-result
+reproduction. State which smoke or full modules you ran, and explain any
+hardware-gated checks that were not run.
