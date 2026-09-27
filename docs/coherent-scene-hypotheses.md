@@ -340,9 +340,11 @@ episode likewise does not turn its teaching metric into a benchmark score.
 At the inspected commit, publication CI covered repository auditing,
 distribution metadata, and secret scanning. The repository also contained a
 substantial CPU numerical suite, but it was not a required CI job. A separate
-required numerical job should exercise concept fixtures, evaluator contracts,
-corruption rejection, and aggregate semantics. B200 reference execution should
-remain an explicitly versioned, separately reported gate.
+required `numerical-contracts` job now runs that complete offline CPU suite,
+covering concept fixtures, evaluator contracts, corruption rejection, and
+aggregate semantics. This job is not evidence for a fresh GPU measurement.
+B200 reference execution remains an explicitly versioned, separately reported
+gate.
 
 ### The positive shared-latent example is constructed
 
