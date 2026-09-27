@@ -115,6 +115,29 @@ on it for anything commercial.
 
 ---
 
+## Publication and CI tooling
+
+The following tools validate the repository but are not redistributed in its
+source or package artifacts. Workflow actions are pinned to exact commits;
+Python tools are pinned to exact releases.
+
+| Tool | Pin | License and use |
+|---|---|---|
+| [actions/checkout](https://github.com/actions/checkout) | `d23441a48e516b6c34aea4fa41551a30e30af803` (v6) | MIT License |
+| [actions/setup-python](https://github.com/actions/setup-python) | `ece7cb06caefa5fff74198d8649806c4678c61a1` (v6) | MIT License |
+| [gitleaks/gitleaks-action](https://github.com/gitleaks/gitleaks-action) | `ff98106e4c7b2bc287b24eaf42907196329070c7` (v2.3.9) | Gitleaks Action EULA; personal-account repositories require no license key, while organization-account repositories do |
+| [build 1.6.1](https://pypi.org/project/build/1.6.1/) | `1.6.1` | MIT License |
+| [twine 7.0.0](https://pypi.org/project/twine/7.0.0/) | `7.0.0` | Apache License 2.0 |
+| [tomli 2.4.1](https://pypi.org/project/tomli/2.4.1/) | `2.4.1` | MIT License |
+| [Gitleaks CLI](https://github.com/gitleaks/gitleaks) | `v8.30.1`, release archive SHA-256 `551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb` | MIT License; used for the local full-history release gate |
+
+The action EULA is retained upstream at the pinned revision. Its personal-
+versus-organization account distinction is why publication uses the action only
+for this personal-account repository; a future organization transfer must
+re-evaluate the license-key requirement.
+
+---
+
 *This file is a good-faith inventory prepared by the authors, not legal advice.
 If you intend to use Surflo outside non-commercial research and evaluation, seek
 your own legal review and contact the respective licensors.*

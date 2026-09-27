@@ -102,17 +102,24 @@ class PublicationFixture:
             ".gitignore": "build/\ndist/\n*.egg-info/\n__pycache__/\n*.pyc\n",
             ".gitmodules": "",
             "CONTRIBUTING.md": "# Contributing\n",
-            "LICENSE.md": "non-commercial research and evaluation\n",
+            "LICENSE.md": (
+                "Gaussian-Splatting License\n"
+                "non-commercial research and evaluation\n"
+            ),
             "README.md": (
                 "# Sureal\n\n"
                 f"Sureal is a fork of [Surflo]({UPSTREAM_URL}). The installed "
                 "package and Python imports remain surflo.\n\n"
-                "Use is limited to non-commercial research and evaluation.\n\n"
+                "Use is limited to non-commercial research and evaluation. "
+                "See [LICENSE.md](LICENSE.md) and "
+                "[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).\n\n"
                 f"Repository: {TARGET_URL}\n"
             ),
             "RELEASING.md": "# Releasing\n",
             "SECURITY.md": "# Security\n",
-            "THIRD_PARTY_NOTICES.md": "# Third-party notices\n",
+            "THIRD_PARTY_NOTICES.md": (
+                "# Third-party notices\n\nGaussian-Splatting License\n"
+            ),
             "UPSTREAM.md": f"# Upstream\n\n{UPSTREAM_URL}\n",
             "pyproject.toml": (
                 "[project]\n"
@@ -176,13 +183,26 @@ class StaticAuditTests(unittest.TestCase):
         self.assertTrue(any("submodules/missing" in error for error in errors), errors)
 
     def test_tracked_generated_and_oversized_files_are_rejected(self) -> None:
-        self.fixture.write("build/generated.txt", "generated\n")
+        generated_paths = (
+            ".venv/bin/python",
+            ".worktrees/candidate/HEAD",
+            "build/generated.txt",
+            "checkpoints/model.pt",
+            "datasets/raw.bin",
+            "outputs/result.json",
+            "training/logs/run.log",
+            "training/outputs/result.json",
+            "wandb/latest-run",
+        )
+        for path in generated_paths:
+            self.fixture.write(path, "x")
         self.fixture.write("large.dat", b"0123456789")
-        run("git", "add", "-f", "build/generated.txt", "large.dat", cwd=self.fixture.root)
+        run("git", "add", "-f", *generated_paths, "large.dat", cwd=self.fixture.root)
 
         errors = publication_audit.static_errors(self.fixture.root, max_blob_bytes=9)
 
-        self.assertTrue(any("build/generated.txt" in error for error in errors), errors)
+        for path in generated_paths:
+            self.assertTrue(any(path in error for error in errors), (path, errors))
         self.assertTrue(any("large.dat" in error and "9" in error for error in errors), errors)
 
     def test_ignored_generated_file_is_not_rejected(self) -> None:
@@ -203,6 +223,19 @@ class StaticAuditTests(unittest.TestCase):
         self.assertNotIn(sentinel, serialized)
         self.assertNotIn("A" * 40, serialized)
 
+    def test_staged_blob_is_the_audit_source_of_truth(self) -> None:
+        sentinel = "github_pat_" + "B" * 82
+        self.fixture.write("staged.txt", f"credential: {sentinel}\n")
+        run("git", "add", "staged.txt", cwd=self.fixture.root)
+        self.fixture.write("staged.txt", "safe unstaged replacement\n")
+
+        errors = publication_audit.static_errors(self.fixture.root)
+        serialized = json.dumps(errors)
+
+        self.assertTrue(any("staged.txt" in error for error in errors), errors)
+        self.assertTrue(any("GitHub token" in error for error in errors), errors)
+        self.assertNotIn(sentinel, serialized)
+
     def test_invalid_or_wrong_package_metadata_is_reported(self) -> None:
         cases = {
             "invalid": "[project\n",
@@ -216,6 +249,34 @@ class StaticAuditTests(unittest.TestCase):
                 self.assertTrue(
                     any("pyproject.toml" in error for error in errors), errors
                 )
+
+    def test_license_and_notice_links_and_contents_are_required(self) -> None:
+        readme = (self.fixture.root / "README.md").read_text(encoding="utf-8")
+        self.fixture.write(
+            "README.md",
+            readme.replace("[LICENSE.md](LICENSE.md)", "license")
+            .replace("[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)", "notices"),
+        )
+        self.fixture.write("LICENSE.md", "unrelated terms\n")
+        self.fixture.write("THIRD_PARTY_NOTICES.md", "# Empty notices\n")
+        run(
+            "git",
+            "add",
+            "README.md",
+            "LICENSE.md",
+            "THIRD_PARTY_NOTICES.md",
+            cwd=self.fixture.root,
+        )
+
+        errors = publication_audit.static_errors(self.fixture.root)
+
+        for text in (
+            "README.md: missing required license link: LICENSE.md",
+            "README.md: missing required license link: THIRD_PARTY_NOTICES.md",
+            "LICENSE.md: Gaussian-Splatting License text is not preserved",
+            "THIRD_PARTY_NOTICES.md: Gaussian-Splatting License notice is not preserved",
+        ):
+            self.assertIn(text, errors)
 
 
 class PortableAuditTests(unittest.TestCase):
@@ -388,6 +449,27 @@ class RepositoryIdentityTests(unittest.TestCase):
         self.assertIn("Gaussian-Splatting License", license_text)
         self.assertIn("Gaussian-Splatting License", notices)
         self.assertIn("may not be used commercially", notices)
+
+    def test_publication_tooling_provenance_is_recorded(self) -> None:
+        notices = (REPOSITORY_ROOT / "THIRD_PARTY_NOTICES.md").read_text(
+            encoding="utf-8"
+        )
+
+        expected = (
+            "actions/checkout",
+            "d23441a48e516b6c34aea4fa41551a30e30af803",
+            "actions/setup-python",
+            "ece7cb06caefa5fff74198d8649806c4678c61a1",
+            "gitleaks/gitleaks-action",
+            "ff98106e4c7b2bc287b24eaf42907196329070c7",
+            "build 1.6.1",
+            "twine 7.0.0",
+            "tomli 2.4.1",
+            "MIT License",
+            "Apache License 2.0",
+        )
+        for value in expected:
+            self.assertIn(value, notices)
 
     def test_publication_generated_paths_remain_ignored(self) -> None:
         paths = (

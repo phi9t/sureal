@@ -99,12 +99,8 @@ def _index_entries(root: Path) -> list[IndexEntry]:
 
 
 def _read_tracked_blob(root: Path, entry: IndexEntry) -> bytes:
-    path = root / entry.path
-    try:
-        if path.is_file() and not path.is_symlink():
-            return path.read_bytes()
-    except OSError as error:
-        raise AuditInputError(f"cannot read tracked file: {entry.path}") from error
+    """Read the exact blob represented by the Git index entry."""
+
     return _git(root, "cat-file", "blob", entry.object_id)
 
 
@@ -134,12 +130,64 @@ def _is_generated_path(path: str) -> bool:
     parts = PurePosixPath(path).parts
     if not parts:
         return False
-    if parts[0] in {"build", "dist"}:
+    if parts[0] in {
+        ".eggs",
+        ".hypothesis",
+        ".mypy_cache",
+        ".nox",
+        ".pipcache",
+        ".pixi",
+        ".pyre",
+        ".pytest_cache",
+        ".pytype",
+        ".tools",
+        ".tox",
+        ".venv",
+        ".worktrees",
+        "ENV",
+        "build",
+        "checkpoints",
+        "ckpt",
+        "cover",
+        "datasets",
+        "develop-eggs",
+        "dist",
+        "downloads",
+        "eggs",
+        "env",
+        "eval_results",
+        "exploration",
+        "htmlcov",
+        "instance",
+        "lib",
+        "lib64",
+        "logs",
+        "outputs",
+        "parts",
+        "pip-wheel-metadata",
+        "profile_default",
+        "sdist",
+        "site",
+        "target",
+        "var",
+        "venv",
+        "wandb",
+        "wheels",
+        "__pypackages__",
+    }:
+        return True
+    if len(parts) >= 2 and parts[:2] in {
+        ("training", "dumps"),
+        ("training", "eval_results"),
+        ("training", "logs"),
+        ("training", "outputs"),
+        ("training", "stability_report"),
+    }:
         return True
     return any(
-        part == "__pycache__"
+        part in {"__pycache__", "tmp"}
         or part.endswith(".egg-info")
-        or part.endswith((".pyc", ".pyo"))
+        or part.endswith((".log", ".ply", ".prof", ".pyc", ".pyo", ".slurm", ".so"))
         for part in parts
     )
 
@@ -171,6 +219,24 @@ def _identity_errors(root: Path, entries: dict[str, IndexEntry]) -> list[str]:
             for disclosure in ("fork of Surflo", "fork of [Surflo]")
         ):
             errors.append("README.md: missing required identity text: fork of Surflo")
+        for linked_file in ("LICENSE.md", "THIRD_PARTY_NOTICES.md"):
+            if f"]({linked_file})" not in readme:
+                errors.append(
+                    f"README.md: missing required license link: {linked_file}"
+                )
+
+    for path, error in (
+        ("LICENSE.md", "LICENSE.md: Gaussian-Splatting License text is not preserved"),
+        (
+            "THIRD_PARTY_NOTICES.md",
+            "THIRD_PARTY_NOTICES.md: Gaussian-Splatting License notice is not preserved",
+        ),
+    ):
+        entry = entries.get(path)
+        if entry is not None and b"Gaussian-Splatting License" not in _read_tracked_blob(
+            root, entry
+        ):
+            errors.append(error)
 
     metadata_entry = entries.get("pyproject.toml")
     if metadata_entry is None:
