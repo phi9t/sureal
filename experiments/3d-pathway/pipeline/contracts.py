@@ -16,8 +16,9 @@ INPUT_FILES = (
     "shared-scene.json", "sources.json", "terminology.json",
 )
 IMPLEMENTATION_FILES = (
-    "pipeline/cli.py", "pipeline/contracts.py", "pipeline/generative.py", "pipeline/labs.py",
-    "pipeline/math3d.py", "pipeline/reporting.py", "pipeline/runner.py", "pipeline/validator.py",
+    "pipeline/cli.py", "pipeline/contracts.py", "pipeline/dynamic.py", "pipeline/generative.py",
+    "pipeline/labs.py", "pipeline/math3d.py", "pipeline/reporting.py", "pipeline/runner.py",
+    "pipeline/validator.py",
 )
 
 

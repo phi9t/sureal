@@ -12,6 +12,17 @@ import zipfile
 import numpy as np
 
 from contracts import ROOT, load_json, sha256_file
+from dynamic import (
+    DYNAMIC_ARRAY_SEMANTICS,
+    DYNAMIC_CAMERA_CONTAMINATION,
+    DYNAMIC_PROFILE_FRAMES,
+    DYNAMIC_PROFILE_MAX_OCCLUSION,
+    DYNAMIC_VARIANTS,
+    dynamic_result_metrics,
+    evaluate_dynamic_fixture,
+    generate_dynamic_failure_sweep,
+    generate_dynamic_fixture,
+)
 from generative import (
     AMBIGUITY_ARRAY_SEMANTICS,
     AMBIGUITY_PROFILE_POINTS,
@@ -1048,36 +1059,118 @@ def _generative_scene_lab(artifacts: Path, profile: str, scene: dict[str, Any], 
     }
 
 
+def _write_dynamic_trajectories_svg(
+    path: Path,
+    fixture: dict[str, np.ndarray],
+) -> None:
+    truth = fixture["truth_object_xyz"]
+    predictions = fixture["post_occlusion_prediction_xyz"]
+    start = int(fixture["occlusion_start_index"][0])
+    reappearance = int(fixture["reappearance_index"][0])
+    frame_count = truth.shape[1]
+    panel_width = 190.0
+    left = 35.0
+    top = 58.0
+    plot_height = 150.0
+
+    def polyline(values: np.ndarray, panel: int, color: str) -> str:
+        points = []
+        for frame, value in enumerate(values):
+            x = left + panel * panel_width + 155.0 * frame / (frame_count - 1)
+            y = top + plot_height * (0.5 - float(value) / 1.7)
+            points.append(f"{x:.2f},{y:.2f}")
+        return f'<polyline points="{" ".join(points)}" fill="none" stroke="{color}" stroke-width="2.4"/>'
+
+    panels = []
+    for index, name in enumerate(DYNAMIC_VARIANTS):
+        panel_left = left + index * panel_width
+        hidden_x = panel_left + 155.0 * start / (frame_count - 1)
+        hidden_width = 155.0 * (reappearance - start) / (frame_count - 1)
+        marker_x = panel_left + 155.0 * reappearance / (frame_count - 1)
+        prediction_y = [
+            top + plot_height * (0.5 - float(value) / 1.7)
+            for value in predictions[index, :, 0]
+        ]
+        panels.extend(
+            [
+                f'<text x="{panel_left:.1f}" y="43" font-family="sans-serif" font-size="11">{name.replace("_", " ")}</text>',
+                f'<rect x="{hidden_x:.2f}" y="{top:.1f}" width="{hidden_width:.2f}" height="{plot_height:.1f}" fill="#e5e5e5"/>',
+                f'<line x1="{panel_left:.1f}" y1="{top + plot_height / 2:.1f}" x2="{panel_left + 155:.1f}" y2="{top + plot_height / 2:.1f}" stroke="#bbb"/>',
+                polyline(truth[index, :, 0, 0], index, "#2f6f9f"),
+                polyline(truth[index, :, 1, 0], index, "#c34d58"),
+                f'<circle cx="{marker_x:.2f}" cy="{prediction_y[0]:.2f}" r="4" fill="none" stroke="#111" stroke-width="2"/>',
+                f'<circle cx="{marker_x:.2f}" cy="{prediction_y[1]:.2f}" r="4" fill="none" stroke="#111" stroke-width="2"/>',
+            ]
+        )
+    path.write_text(
+        f'''<svg xmlns="http://www.w3.org/2000/svg" width="620" height="255" viewBox="0 0 620 255">
+<rect width="620" height="255" fill="white"/>
+<text x="20" y="22" font-family="sans-serif" font-size="15">Persistent identities through a fully occluded encounter</text>
+{"".join(panels)}
+<text x="35" y="231" font-family="sans-serif" font-size="11">blue/red: true identity x(t); grey: occlusion; black rings: constant-velocity predictions</text>
+</svg>
+''',
+        encoding="utf-8",
+    )
+
+
 def _dynamic_scene_lab(artifacts: Path, profile: str, scene: dict[str, Any], profile_config: dict[str, Any]) -> dict[str, Any]:
-    durations = np.rint(np.linspace(0, 32, _steps(profile_config))).astype(int)
-    static_error = 0.006 + 0.0012 * durations
-    camera_error = 0.009 + 0.0028 * durations
-    joint_error = 0.014 + 0.0055 * durations
-    sweep = []
-    for duration, stable, moving, joint in zip(durations, static_error, camera_error, joint_error):
-        sweep.extend([
-            {"parameter": "occlusion_frames_static_camera", "value": int(duration), "metric": "post_occlusion_error_m", "measurement": float(stable)},
-            {"parameter": "occlusion_frames_moving_camera", "value": int(duration), "metric": "post_occlusion_error_m", "measurement": float(moving)},
-            {"parameter": "occlusion_frames_moving_camera_object", "value": int(duration), "metric": "post_occlusion_error_m", "measurement": float(joint)},
-        ])
+    frame_count = DYNAMIC_PROFILE_FRAMES[profile]
+    max_occlusion = DYNAMIC_PROFILE_MAX_OCCLUSION[profile]
+    fixture = generate_dynamic_fixture(frame_count, max_occlusion)
+    comparison = evaluate_dynamic_fixture(fixture)
+    _write_npz_deterministic(artifacts / "dynamic_sequence.npz", fixture)
+    _write_dynamic_trajectories_svg(
+        artifacts / "dynamic_trajectories.svg",
+        fixture,
+    )
+    comparison_record = {
+        "schema_version": 1,
+        "fixture": {
+            "event": "two indistinguishable objects reverse while fully occluded",
+            "coordinate_convention": "right-handed world xyz in metres",
+            "frame_count": frame_count,
+            "occlusion_frames": max_occlusion,
+            "variants": list(DYNAMIC_VARIANTS),
+            "joint_motion_camera_contamination": DYNAMIC_CAMERA_CONTAMINATION,
+        },
+        "conditions": comparison,
+        "arrays": {
+            name: {
+                "shape": list(array.shape),
+                "dtype": str(array.dtype),
+                "semantics": DYNAMIC_ARRAY_SEMANTICS[name],
+            }
+            for name, array in sorted(fixture.items())
+        },
+    }
+    (artifacts / "dynamic_comparison.json").write_text(
+        json.dumps(comparison_record, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    sweep, joint_drift = generate_dynamic_failure_sweep(
+        frame_count,
+        max_occlusion,
+        _steps(profile_config),
+    )
     _write_sweep(artifacts / "failure_sweep.csv", sweep)
-    _write_chart(artifacts / "temporal_drift.svg", "Occlusion amplifies camera/object-motion ambiguity", joint_error.tolist(), "#684998")
+    _write_chart(
+        artifacts / "temporal_drift.svg",
+        "Occlusion exposes identity and camera/object-motion ambiguity",
+        joint_drift,
+        "#684998",
+    )
     return {
         "metrics": {
-            "geometry": {
-                "static_camera_post_occlusion_error_m": float(static_error[-1]),
-                "moving_camera_post_occlusion_error_m": float(camera_error[-1]),
-                "moving_camera_object_post_occlusion_error_m": float(joint_error[-1]),
-                "temporal_correspondence_accuracy": 0.83,
-                "camera_object_disentanglement_accuracy": 0.71,
-            },
-            "rendering": {"temporal_psnr_db": 29.4},
+            "geometry": dynamic_result_metrics(comparison),
+            "rendering": {},
             "generative": {},
         },
         "failure_sweep": sweep,
         "observations": [
-            "Temporal rendering quality does not guarantee persistent identity through occlusion.",
-            "Joint camera and object motion requires an explicit disentanglement assumption or cue.",
+            "Near-correct unordered geometry can still carry the wrong persistent identity after complete occlusion.",
+            "Known camera motion matches the static-camera result; joint motion fails only when dynamic support leaks into the camera estimate.",
+            "No rendering metric is reported because this observability fixture does not render images.",
         ],
     }
 

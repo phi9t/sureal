@@ -272,6 +272,185 @@ class AmbiguousSceneContractTest(unittest.TestCase):
             self.assertIn("Module 13 failure sweep mismatch", validation.stderr)
 
 
+class DynamicSceneContractTest(unittest.TestCase):
+    def test_occlusion_can_preserve_set_geometry_while_switching_identity(self) -> None:
+        from dynamic import evaluate_dynamic_fixture, generate_dynamic_fixture
+
+        fixture = generate_dynamic_fixture(frame_count=65, occlusion_frames=16)
+        static = evaluate_dynamic_fixture(fixture)["static_camera"]
+        self.assertLess(static["set_aligned_reappearance_rmse_m"], 0.08)
+        self.assertGreater(static["identity_aware_post_occlusion_rmse_m"], 0.2)
+        self.assertEqual(static["post_occlusion_identity_accuracy"], 0.0)
+
+    def test_known_camera_motion_does_not_create_object_drift(self) -> None:
+        from dynamic import evaluate_dynamic_fixture, generate_dynamic_fixture
+
+        comparison = evaluate_dynamic_fixture(
+            generate_dynamic_fixture(frame_count=65, occlusion_frames=16)
+        )
+        self.assertAlmostEqual(
+            comparison["static_camera"]["identity_aware_post_occlusion_rmse_m"],
+            comparison["moving_camera"]["identity_aware_post_occlusion_rmse_m"],
+        )
+        self.assertEqual(comparison["moving_camera"]["camera_ate_m"], 0.0)
+        self.assertLess(
+            comparison["moving_camera"]["temporal_displacement_rmse_m"],
+            1e-12,
+        )
+
+    def test_dynamic_support_contaminates_camera_object_factorization(self) -> None:
+        from dynamic import evaluate_dynamic_fixture, generate_dynamic_fixture
+
+        comparison = evaluate_dynamic_fixture(
+            generate_dynamic_fixture(frame_count=65, occlusion_frames=16)
+        )
+        moving = comparison["moving_camera"]
+        joint = comparison["moving_camera_object"]
+        self.assertGreater(joint["camera_ate_m"], moving["camera_ate_m"])
+        self.assertGreater(
+            joint["identity_aware_post_occlusion_rmse_m"],
+            moving["identity_aware_post_occlusion_rmse_m"],
+        )
+        self.assertGreater(joint["temporal_displacement_rmse_m"], 0.0)
+
+    def test_dynamic_fixture_rejects_invalid_frame_and_occlusion_contracts(self) -> None:
+        from dynamic import generate_dynamic_fixture
+
+        for frames, occlusion in ((8, 2), (33, -1), (33, 30)):
+            with self.subTest(frames=frames, occlusion=occlusion):
+                with self.assertRaises(ValueError):
+                    generate_dynamic_fixture(
+                        frame_count=frames,
+                        occlusion_frames=occlusion,
+                    )
+
+    def test_dynamic_fixture_rejects_inconsistent_camera_and_visibility(self) -> None:
+        from dynamic import evaluate_dynamic_fixture, generate_dynamic_fixture
+
+        camera_tamper = generate_dynamic_fixture(33, 8)
+        camera_tamper["estimated_camera_xyz"][0, 0, 0] += 0.1
+        with self.assertRaisesRegex(ValueError, "visible world reconstruction"):
+            evaluate_dynamic_fixture(camera_tamper)
+
+        visibility_tamper = generate_dynamic_fixture(33, 8)
+        visibility_tamper["observed_mask"][0, 0, 0] = False
+        with self.assertRaisesRegex(ValueError, "observed mask"):
+            evaluate_dynamic_fixture(visibility_tamper)
+
+        prediction_tamper = generate_dynamic_fixture(33, 8)
+        prediction_tamper["post_occlusion_prediction_xyz"][0, 0, 0] += 0.1
+        with self.assertRaisesRegex(ValueError, "post-occlusion prediction"):
+            evaluate_dynamic_fixture(prediction_tamper)
+
+    def test_module14_persists_recomputable_dynamic_evidence(self) -> None:
+        from dynamic import evaluate_dynamic_fixture
+
+        with tempfile.TemporaryDirectory() as temporary:
+            cache = Path(temporary)
+            env = os.environ.copy()
+            env["SURFLO_PATHWAY_CACHE_ROOT"] = str(cache)
+            completed = subprocess.run(
+                [
+                    str(ROOT / "run.sh"),
+                    "run",
+                    "--module",
+                    "14",
+                    "--profile",
+                    "smoke",
+                    "--run-id",
+                    "dynamic-contract",
+                ],
+                cwd=REPO_ROOT,
+                env=env,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            run_dir = cache / "runs" / "dynamic-contract" / "14"
+            archive_path = run_dir / "artifacts/dynamic_sequence.npz"
+            self.assertTrue(archive_path.is_file())
+            self.assertTrue((run_dir / "artifacts/dynamic_trajectories.svg").is_file())
+            with np.load(archive_path, allow_pickle=False) as archive:
+                recomputed = evaluate_dynamic_fixture(
+                    {name: archive[name] for name in archive.files}
+                )
+            result = json.loads((run_dir / "result.json").read_text())
+            result_path = run_dir / "result.json"
+
+            def validate() -> subprocess.CompletedProcess[str]:
+                result_path.write_text(
+                    json.dumps(result, indent=2, sort_keys=True) + "\n"
+                )
+                return subprocess.run(
+                    [
+                        str(ROOT / "run.sh"),
+                        "validate",
+                        "--module",
+                        "14",
+                        "--run-id",
+                        "dynamic-contract",
+                    ],
+                    cwd=REPO_ROOT,
+                    env=env,
+                    text=True,
+                    capture_output=True,
+                    check=False,
+                )
+
+            self.assertAlmostEqual(
+                recomputed["static_camera"][
+                    "identity_aware_post_occlusion_rmse_m"
+                ],
+                result["metrics"]["geometry"][
+                    "static_camera_post_occlusion_error_m"
+                ],
+            )
+            expected_metric = result["metrics"]["geometry"][
+                "static_camera_post_occlusion_error_m"
+            ]
+            result["metrics"]["geometry"][
+                "static_camera_post_occlusion_error_m"
+            ] = 0.0
+            validation = validate()
+            self.assertNotEqual(validation.returncode, 0)
+            self.assertIn("Module 14 metric mismatch", validation.stderr)
+
+            result["metrics"]["geometry"][
+                "static_camera_post_occlusion_error_m"
+            ] = expected_metric
+            result["profile"] = "full"
+            validation = validate()
+            self.assertNotEqual(validation.returncode, 0)
+            self.assertIn("Module 14 fixture/profile mismatch", validation.stderr)
+
+            result["profile"] = "smoke"
+            expected_sweep_measurement = result["failure_sweep"][0]["measurement"]
+            result["failure_sweep"][0]["measurement"] = 0.123
+            validation = validate()
+            self.assertNotEqual(validation.returncode, 0)
+            self.assertIn("Module 14 failure sweep mismatch", validation.stderr)
+
+            result["failure_sweep"][0]["measurement"] = expected_sweep_measurement
+            sweep_path = run_dir / "artifacts/failure_sweep.csv"
+            with sweep_path.open(newline="", encoding="utf-8") as stream:
+                sweep_rows = list(csv.DictReader(stream))
+            sweep_rows[0]["measurement"] = "0.123"
+            with sweep_path.open("w", newline="", encoding="utf-8") as stream:
+                writer = csv.DictWriter(
+                    stream,
+                    fieldnames=["parameter", "value", "metric", "measurement"],
+                )
+                writer.writeheader()
+                writer.writerows(sweep_rows)
+            result["provenance"]["artifacts_sha256"]["failure_sweep.csv"] = (
+                hashlib.sha256(sweep_path.read_bytes()).hexdigest()
+            )
+            validation = validate()
+            self.assertNotEqual(validation.returncode, 0)
+            self.assertIn("Module 14 failure sweep mismatch", validation.stderr)
+
+
 class FrontierLabContractTest(unittest.TestCase):
     def test_modules_12_through_15_emit_foundation_generation_dynamic_and_surflo_evidence(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

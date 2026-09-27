@@ -15,6 +15,11 @@
       "id": "point-noise-is-not-scene-noise",
       "preferred": "Independent stochastic point decoding does not by itself define one coherent sampled scene hypothesis.",
       "forbidden_patterns": ["independent point stochasticity is scene stochasticity", "more sampled points imply a scene posterior", "arbitrary-resolution point sampling is coherent scene sampling", "pooled point diversity proves scene diversity"]
+    },
+    {
+      "id": "dynamic-rendering-is-not-persistent-tracking",
+      "preferred": "Time-conditioned rendering, temporal smoothness, and high image quality do not establish material correspondence or persistent identity through occlusion.",
+      "forbidden_patterns": ["time conditioning proves correspondence", "dynamic view synthesis proves persistent tracking", "temporal smoothness proves identity"]
     }
   ]
 }

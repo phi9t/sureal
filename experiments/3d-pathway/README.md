@@ -210,6 +210,14 @@ visible evidence in `ambiguity_samples.npz`. Validation recomputes its
 evidence, coherence, coverage, persistence, and best-hypothesis metrics from
 that archive; the toy result is a factorization test, not a published-model
 reproduction.
+Module 14 persists exact cameras, camera-relative observations, visibility,
+world-frame object identities, reconstructed visible centers, reappearance
+predictions, unordered detections, and identity assignments in
+`dynamic_sequence.npz`. Its analytic bounce-versus-pass-through event separates
+set-aligned geometry from persistent identity and known camera motion from
+dynamic-support leakage into the camera estimate. Validation recomputes every
+metric and independently regenerates the occlusion-duration sweep; no image
+metric is reported because the fixture does not render images.
 `all` stages the complete run and promotes it atomically; its `report.json`
 manifest records completeness, sources, assumptions, interpretations, and the
 Markdown report hash. A report made from a partial run says so explicitly.

@@ -1442,52 +1442,152 @@ motion.
 
 ### Evidence and observability
 
-Dynamic reconstruction uses time-indexed images, sometimes from multiple
-cameras. Visible motion mixes camera motion, object motion, nonrigid
-deformation, illumination, and occlusion. Correspondence through time is
-observable only where appearance and motion make identity trackable. Long
-occlusion requires memory or a prior, not interpolation of visible pixels.
+Dynamic reconstruction uses time-indexed RGB or RGB-D observations, sometimes
+from synchronized cameras and sometimes from one moving camera. Image motion
+mixes camera motion, object root motion, local deformation, illumination,
+visibility, and correspondence. For a world point (X_i(t)),
+
+\[
+u_i(t)=\pi\!\left(K(t)T_{cw}(t)X_i(t)\right).
+\]
+
+An arbitrary time-dependent world transform (H(t)) can be exchanged between
+scene and camera,
+
+\[
+X'_i(t)=H(t)X_i(t),\qquad
+T'_{cw}(t)=T_{cw}(t)H(t)^{-1},
+\]
+
+without changing the projected point. Static background, known calibration,
+metric depth, synchronized views, inertial evidence, rigidity, or a learned
+motion prior is therefore needed to choose a camera/object gauge. Optical flow
+is image displacement; scene flow is a world-space 3D displacement; neither
+alone guarantees a reconstructed surface or long-range identity.
+
+Occlusion is missing evidence. A smooth interpolation behind an occluder can
+choose the wrong identity even when the unordered geometry at reappearance is
+nearly correct. Topology change, object birth/death, and temporary visibility
+loss are separate events and require separate contracts.
 
 ### Representation and inference
 
-Nerfies and D-NeRF map observations through a deformation field into a
-canonical radiance field. Dynamic 3D Gaussians preserve primitive identities;
-4D Gaussian methods learn deformation over time. Alternatives include explicit
-scene flow, trajectories, time-conditioned fields, and persistent object
-states. Inference can be per-sequence optimized or amortized, but the
-camera/object factorization must be explicit.
+Classical non-rigid factorization restricts shape to a low-dimensional basis;
+scene-flow methods estimate explicit 3D displacement; DynamicFusion combines
+metric RGB-D fusion with a canonical-to-live warp. D-NeRF and Nerfies optimize
+time-conditioned or observation-conditioned deformations into canonical
+radiance fields. NSFF adds forward/backward scene flow, while HyperNeRF lifts a
+canonical template into a higher-dimensional ambient space for topology
+change. BANMo makes root pose, articulation, camera, canonical shape, and
+appearance separate variables; RoDynRF jointly optimizes cameras and a
+static/dynamic radiance decomposition.
+
+Persistent Dynamic 3D Gaussians intentionally propagate indexed primitives;
+4D-GS instead emphasizes compact deformation-driven rendering, which is not by
+itself a material-correspondence guarantee. OmniMotion optimizes long-range
+quasi-3D tracks; St4RTrack predicts world-frame pointmaps and trajectories;
+StreamSplat propagates online dynamic Gaussians. MoRel uses global and local
+anchors for long sequences, while GaME updates the latest map after structural
+change rather than retaining every object's complete history. These outputs
+are per-sequence optimized, online deterministic, or feed-forward estimates;
+none is generative future or scene-hypothesis sampling merely because it is
+time dependent.
 
 ### Defining mathematics
 
-A deformation model uses (x_c=W(x,t)) and renders
-(F(x_c,d)). Temporal consistency may penalize
+A material trajectory defines scene flow
+
+\[
+v_i(t)=X_i(t+\Delta t)-X_i(t),
+\]
+
+while a canonical model maps (X_c=W_t(X_t)) and renders a field
+(F(X_c,d,a_t)). A general (W_t) need not be invertible; a single ordinary 3D
+canonical template cannot continuously represent every topology change.
+Temporal consistency may penalize
 
 \[
 \sum_{t,i}\|X_i(t+1)-\Phi_t(X_i(t))\|^2,
 \]
 
-but this requires identities (i) or a correspondence field (\Phi_t).
-Evaluation needs trajectory error, temporal geometry consistency, and
-post-occlusion re-identification in addition to frame PSNR.
+but this requires identities (i) or a defined correspondence field (\Phi_t).
+For an object hidden through (t_b), the identity-aware reappearance error is
+
+\[
+E_{\mathrm{reid}}=\frac1{|Q|}\sum_{i\in Q}
+\|\widehat X_i(t_b+1)-X_i(t_b+1)\|_2.
+\]
+
+It must be reported beside the set-aligned error that is free to permute
+object IDs. A low set error and a high identity-aware error expose a tracker
+that reconstructs the right places with the wrong histories.
+
+### Objectives and metrics
+
+Rendering, depth, optical-flow, scene-flow, cycle, deformation-smoothness,
+rigidity, and correspondence losses supervise different claims. Keep held-out
+PSNR/SSIM/LPIPS separate from surface/depth error, world-frame trajectory EPE,
+camera ATE, temporal displacement error, visibility accuracy, identity
+switches, and first-frame reappearance error. Short-range flow-warp or flicker
+metrics test appearance continuity, not material persistence. No rendering
+metric is emitted by the repo-owned lab because it does not render images.
 
 ### Assumptions and failure modes
 
-Canonical deformation struggles with topology change and newly appearing
-content. Time-conditioned models can memorize frames without persistent
-correspondence. Moving-camera and moving-object ambiguity causes drift.
-Occlusion deletes direct evidence, so an apparently smooth interpolation may
-switch identity. Dynamic rendering metrics can mask these failures.
+Low-rank, articulated, locally rigid, smooth-flow, and canonical-deformation
+priors each exclude valid motions. Canonical deformation struggles with
+topology change and newly appearing content; fixed persistent primitives
+cannot reconstruct objects absent at initialization. Time-conditioned fields
+can memorize frames without a stable material correspondence. Pairwise or
+short-window trackers lose history under long occlusion. Joint camera/scene
+optimization fails when background support is weak, camera motion is fast, or
+intrinsics change. A high-quality dynamic render can therefore coexist with
+wrong depth, camera trajectory, primitive identity, or re-identification.
 
 ### Primary-source reading sequence
 
-Read canonical deformation in
-[park-nerfies-2021](https://openaccess.thecvf.com/content/ICCV2021/html/Park_Nerfies_Deformable_Neural_Radiance_Fields_ICCV_2021_paper.html),
-time-conditioned NeRF in
+Start with low-rank non-rigid factorization in
+[bregler-nrsfm-2000](https://doi.org/10.1109/CVPR.2000.854941), the original 3D
+motion quantity in
+[vedula-scene-flow-1999](https://doi.org/10.1109/ICCV.1999.790293), and metric
+canonical fusion in
+[newcombe-dynamicfusion-2015](https://openaccess.thecvf.com/content_cvpr_2015/html/Newcombe_DynamicFusion_Reconstruction_and_2015_CVPR_paper.html).
+Then compare time-conditioned canonical rendering in
 [pumarola-dnerf-2021](https://openaccess.thecvf.com/content/CVPR2021/html/Pumarola_D-NeRF_Neural_Radiance_Fields_for_Dynamic_Scenes_CVPR_2021_paper.html),
-persistent primitives in
-[luiten-dynamic3dgs-2024](https://doi.org/10.1109/3DV62453.2024.00044), and
-compact 4D deformation in
+elastic observation-to-canonical warps in
+[park-nerfies-2021](https://openaccess.thecvf.com/content/ICCV2021/html/Park_Nerfies_Deformable_Neural_Radiance_Fields_ICCV_2021_paper.html),
+explicit neural scene flow in
+[li-nsff-2021](https://openaccess.thecvf.com/content/CVPR2021/html/Li_Neural_Scene_Flow_Fields_for_Space-Time_View_Synthesis_of_Dynamic_CVPR_2021_paper.html),
+and topology-changing hyperspace in
+[park-hypernerf-2021](https://hypernerf.github.io/).
+
+For factorization and correspondence, read articulated root/camera/local
+motion in
+[yang-banmo-2022](https://openaccess.thecvf.com/content/CVPR2022/html/Yang_BANMo_Building_Animatable_3D_Neural_Models_From_Many_Casual_Videos_CVPR_2022_paper.html),
+joint camera/static/dynamic optimization in
+[liu-rodynrf-2023](https://openaccess.thecvf.com/content/CVPR2023/html/Liu_Robust_Dynamic_Radiance_Fields_CVPR_2023_paper.html),
+and occlusion-aware long-range tracks in
+[wang-omnimotion-2023](https://openaccess.thecvf.com/content/ICCV2023/html/Wang_Tracking_Everything_Everywhere_All_at_Once_ICCV_2023_paper.html).
+Contrast explicitly persistent primitives in
+[luiten-dynamic3dgs-2024](https://doi.org/10.1109/3DV62453.2024.00044) with
+deformation-driven Gaussian rendering in
 [wu-4dgs-2024](https://openaccess.thecvf.com/content/CVPR2024/html/Wu_4D_Gaussian_Splatting_for_Real-Time_Dynamic_Scene_Rendering_CVPR_2024_paper.html).
+
+Finally, read feed-forward world-frame tracks in
+[feng-st4rtrack-2025](https://st4rtrack.github.io/), online uncalibrated
+Gaussian reconstruction in
+[wu-streamsplat-2026](https://proceedings.iclr.cc/paper_files/paper/2026/hash/c822d05dcc00695ed6b63c9e97bb3449-Abstract-Conference.html),
+long-sequence local anchors in
+[kwak-morel-2026](https://cmlab-korea.github.io/MoRel/), and latest-state
+evolving maps in [yugay-game-2026](https://vladimiryugay.github.io/game/).
+The last method deliberately answers a different question from preserving a
+complete 4D identity history.
+
+St4RTrack is the preferred maintained learned-reference candidate because its
+world-frame pointmaps and APD/EPE tracking outputs align with this module's
+camera/object and persistence metrics. It is documented here, not claimed as
+an executed reference: code, weights, licence, preprocessing, coordinate
+adapter, and a B200 smoke result must be hash-locked before that status changes.
 
 ### Reproduction lab
 
@@ -1495,9 +1595,31 @@ compact 4D deformation in
 experiments/3d-pathway/run.sh run --module 14 --profile smoke --run-id pathway-14
 ```
 
-Inspect `result.json`, `report.md`, `artifacts/temporal_drift.svg`, and
-`artifacts/failure_sweep.csv`. The same event is evaluated with static camera,
-moving camera, and joint camera/object motion while occlusion duration grows.
+Inspect `result.json`, `report.md`, `artifacts/dynamic_sequence.npz`,
+`artifacts/dynamic_comparison.json`, `artifacts/dynamic_trajectories.svg`,
+`artifacts/temporal_drift.svg`, and `artifacts/failure_sweep.csv`. Two
+indistinguishable objects approach and reverse while fully occluded. A
+constant-velocity tracker instead predicts pass-through. The same event is
+evaluated with a static camera, a moving camera whose motion is known, and
+joint motion where 35% of one dynamic object's displacement leaks into the
+camera estimate. The sweep increases hidden duration.
+
+Every result metric is recomputed from the NPZ, and validation independently
+regenerates the sweep. Smoke uses 33 frames and eight hidden frames. Static
+and known-moving-camera conditions both measured 0.36 m identity-aware error,
+0.04 m set-aligned error, and zero identity accuracy: the unordered geometry
+was nearly correct while both histories were switched. Known camera motion
+added effectively zero visible or temporal error. With camera/object leakage,
+camera ATE rose to 0.143 m, visible-object RMSE to 0.107 m, temporal
+displacement RMSE to 0.0158 m, and identity-aware reappearance error to 0.478
+m, even though camera-relative observation residual remained numerical zero.
+Full uses 129 frames and 32 hidden frames and preserves the same controlled
+0.36/0.04 m identity-aware/set-aligned contrast; the contaminated condition
+measured 0.478/0.132 m with 0.145 m camera ATE.
+This is an analytic observability and metric-contract experiment, not a quality
+claim for any cited system. Detailed source, maintained-reference, and
+terminology evidence is in
+`experiments/3d-pathway/research/module14-dynamic-4d.md`.
 
 ### Transition
 

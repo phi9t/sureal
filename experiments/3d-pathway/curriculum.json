@@ -111,9 +111,9 @@
     {
       "id": "14", "slug": "dynamic-3d-4d", "title": "Dynamic 3D and 4D representations",
       "evidence": ["time-indexed multi-view or monocular video"], "observable": "appearance, motion, and geometry under correspondence assumptions", "representation": "deformation field, time-conditioned radiance field, dynamic Gaussians, or trajectories",
-      "inference": "hybrid", "objectives": ["rendering, deformation, correspondence, and temporal consistency losses"], "metrics": ["temporal consistency", "trajectory error", "post-occlusion drift"],
-      "failure_sweep": ["static camera", "moving camera", "moving object", "occlusion duration"], "insula": "neural-rendering",
-      "sources": ["park-nerfies-2021", "pumarola-dnerf-2021", "luiten-dynamic3dgs-2024", "wu-4dgs-2024"]
+      "inference": "hybrid", "objectives": ["rendering, deformation, correspondence, visibility, and temporal consistency losses"], "metrics": ["camera ATE", "temporal displacement error", "identity-aware post-occlusion error", "set-aligned reappearance error", "post-occlusion identity accuracy"],
+      "failure_sweep": ["static camera", "known moving camera", "joint camera/object motion", "camera-motion leakage", "occlusion duration"], "insula": "neural-rendering",
+      "sources": ["bregler-nrsfm-2000", "vedula-scene-flow-1999", "newcombe-dynamicfusion-2015", "pumarola-dnerf-2021", "park-nerfies-2021", "li-nsff-2021", "park-hypernerf-2021", "yang-banmo-2022", "liu-rodynrf-2023", "wang-omnimotion-2023", "luiten-dynamic3dgs-2024", "wu-4dgs-2024", "feng-st4rtrack-2025", "wu-streamsplat-2026", "kwak-morel-2026", "yugay-game-2026"]
     },
     {
       "id": "15", "slug": "surflo-case-study", "title": "Surflo as the current case study",

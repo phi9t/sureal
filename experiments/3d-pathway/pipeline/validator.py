@@ -10,6 +10,16 @@ from typing import Any
 import numpy as np
 
 from contracts import IMPLEMENTATION_FILES, INPUT_FILES, ROOT, canonical_json, ensure_finite, load_json, sha256_file, validate_json_schema_instance
+from dynamic import (
+    DYNAMIC_ARRAY_SEMANTICS,
+    DYNAMIC_CAMERA_CONTAMINATION,
+    DYNAMIC_PROFILE_FRAMES,
+    DYNAMIC_PROFILE_MAX_OCCLUSION,
+    DYNAMIC_VARIANTS,
+    dynamic_result_metrics,
+    evaluate_dynamic_fixture,
+    generate_dynamic_failure_sweep,
+)
 from generative import (
     AMBIGUITY_ARRAY_SEMANTICS,
     AMBIGUITY_PROFILE_POINTS,
@@ -30,6 +40,25 @@ REQUIRED_TOP_LEVEL = {
 def _require_type(value: Any, expected: type, location: str) -> None:
     if not isinstance(value, expected):
         raise ValueError(f"schema type mismatch at {location}: expected {expected.__name__}")
+
+
+def _load_failure_sweep(path: Path, module_label: str) -> list[dict[str, str | int | float]]:
+    try:
+        with path.open(newline="", encoding="utf-8") as stream:
+            reader = csv.DictReader(stream)
+            if reader.fieldnames != ["parameter", "value", "metric", "measurement"]:
+                raise ValueError(f"{module_label} failure sweep mismatch")
+            return [
+                {
+                    "parameter": row["parameter"],
+                    "value": int(row["value"]),
+                    "metric": row["metric"],
+                    "measurement": float(row["measurement"]),
+                }
+                for row in reader
+            ]
+    except (OSError, KeyError, TypeError, ValueError) as error:
+        raise ValueError(f"{module_label} failure sweep mismatch") from error
 
 
 def _validate_module13(run_dir: Path, result: dict[str, Any]) -> None:
@@ -138,25 +167,87 @@ def _validate_module13(run_dir: Path, result: dict[str, Any]) -> None:
     expected_sweep, _ = generate_ambiguity_failure_sweep(
         int(profile_config["sweep_steps"])
     )
-    sweep_path = run_dir / "artifacts" / "failure_sweep.csv"
-    try:
-        with sweep_path.open(newline="", encoding="utf-8") as stream:
-            reader = csv.DictReader(stream)
-            if reader.fieldnames != ["parameter", "value", "metric", "measurement"]:
-                raise ValueError("Module 13 failure sweep mismatch")
-            csv_sweep = [
-                {
-                    "parameter": row["parameter"],
-                    "value": int(row["value"]),
-                    "metric": row["metric"],
-                    "measurement": float(row["measurement"]),
-                }
-                for row in reader
-            ]
-    except (OSError, KeyError, TypeError, ValueError) as error:
-        raise ValueError("Module 13 failure sweep mismatch") from error
+    csv_sweep = _load_failure_sweep(
+        run_dir / "artifacts" / "failure_sweep.csv",
+        "Module 13",
+    )
     if result["failure_sweep"] != expected_sweep or csv_sweep != expected_sweep:
         raise ValueError("Module 13 failure sweep mismatch")
+
+
+def _validate_module14(run_dir: Path, result: dict[str, Any]) -> None:
+    archive_path = run_dir / "artifacts" / "dynamic_sequence.npz"
+    comparison_path = run_dir / "artifacts" / "dynamic_comparison.json"
+    if not archive_path.is_file() or not comparison_path.is_file():
+        raise ValueError("Module 14 recomputation artifacts are missing")
+    try:
+        with np.load(archive_path, allow_pickle=False) as archive:
+            fixture = {name: archive[name] for name in archive.files}
+    except (OSError, ValueError) as error:
+        raise ValueError("Module 14 dynamic archive is invalid") from error
+    comparison = evaluate_dynamic_fixture(fixture)
+    profile = result["profile"]
+    frame_count = DYNAMIC_PROFILE_FRAMES[profile]
+    max_occlusion = DYNAMIC_PROFILE_MAX_OCCLUSION[profile]
+    if (
+        fixture["truth_object_xyz"].shape[1] != frame_count
+        or int(fixture["reappearance_index"][0])
+        - int(fixture["occlusion_start_index"][0])
+        != max_occlusion
+    ):
+        raise ValueError("Module 14 fixture/profile mismatch")
+    expected_array_records = {
+        name: {
+            "shape": list(array.shape),
+            "dtype": str(array.dtype),
+            "semantics": DYNAMIC_ARRAY_SEMANTICS[name],
+        }
+        for name, array in sorted(fixture.items())
+    }
+    expected_fixture_record = {
+        "event": "two indistinguishable objects reverse while fully occluded",
+        "coordinate_convention": "right-handed world xyz in metres",
+        "frame_count": frame_count,
+        "occlusion_frames": max_occlusion,
+        "variants": list(DYNAMIC_VARIANTS),
+        "joint_motion_camera_contamination": DYNAMIC_CAMERA_CONTAMINATION,
+    }
+    comparison_record = load_json(comparison_path)
+    if (
+        comparison_record.get("schema_version") != 1
+        or comparison_record.get("fixture") != expected_fixture_record
+        or comparison_record.get("conditions") != comparison
+        or comparison_record.get("arrays") != expected_array_records
+    ):
+        raise ValueError("Module 14 dynamic comparison record mismatch")
+
+    expected_metrics = dynamic_result_metrics(comparison)
+    recorded_metrics = result["metrics"]["geometry"]
+    if set(recorded_metrics) != set(expected_metrics) or any(
+        not math.isclose(
+            float(recorded_metrics[name]),
+            float(expected),
+            rel_tol=0.0,
+            abs_tol=1e-12,
+        )
+        for name, expected in expected_metrics.items()
+    ):
+        raise ValueError("Module 14 metric mismatch")
+    if result["metrics"]["rendering"] or result["metrics"]["generative"]:
+        raise ValueError("Module 14 unsupported metric family is non-empty")
+
+    profile_config = load_json(ROOT / "curriculum.json")["profiles"][profile]
+    expected_sweep, _ = generate_dynamic_failure_sweep(
+        frame_count,
+        max_occlusion,
+        int(profile_config["sweep_steps"]),
+    )
+    csv_sweep = _load_failure_sweep(
+        run_dir / "artifacts" / "failure_sweep.csv",
+        "Module 14",
+    )
+    if result["failure_sweep"] != expected_sweep or csv_sweep != expected_sweep:
+        raise ValueError("Module 14 failure sweep mismatch")
 
 
 def validate_result(run_dir: Path, expected_module: str | None = None) -> dict[str, Any]:
@@ -225,6 +316,8 @@ def validate_result(run_dir: Path, expected_module: str | None = None) -> dict[s
             raise ValueError("Surflo source result does not match asset lock")
     if result["module_id"] == "13":
         _validate_module13(run_dir, result)
+    if result["module_id"] == "14":
+        _validate_module14(run_dir, result)
     ensure_finite(result)
     return result
 
