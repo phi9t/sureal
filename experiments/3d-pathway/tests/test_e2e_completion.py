@@ -193,6 +193,8 @@ class EndToEndCompletionContractTest(unittest.TestCase):
                 "runtime_seconds": 1.25,
                 "peak_cpu_bytes": 4096,
                 "peak_gpu_bytes": 0,
+                "network_isolation": "python_socket_guard",
+                "cpu_memory_scope": "process_lifetime_high_water_mark",
             },
             "observations": ["Monocular SfM retains a global similarity gauge."],
         }
@@ -231,6 +233,10 @@ class EndToEndCompletionContractTest(unittest.TestCase):
         self.assertIn("colmap-sfm", report)
         self.assertIn("runtime_seconds=12.5", report)
         self.assertIn("peak_gpu_compute_memory_bytes=16384", report)
+        self.assertIn("network_isolation=python_socket_guard", report)
+        self.assertIn(
+            "cpu_memory_scope=process_lifetime_high_water_mark", report
+        )
         self.assertIn("per-scene-optimization", report)
         self.assertIn("Sparse visible structure is not dense surface completion.", report)
         self.assertIn("Monocular SfM retains a global similarity gauge.", report)

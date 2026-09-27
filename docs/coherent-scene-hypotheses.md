@@ -352,6 +352,19 @@ aggregate semantics. This job is not evidence for a fresh GPU measurement.
 B200 reference execution remains an explicitly versioned, separately reported
 gate.
 
+### Fixture runtime scopes are explicit
+
+Concept labs report `network_isolation=python_socket_guard`. The runner blocks
+Python socket construction during lab execution, which catches accidental
+network access through those Python paths but is not an operating-system
+network sandbox. Maintained adapters use container network isolation and retain
+that stronger guarantee separately.
+
+They also report
+`cpu_memory_scope=process_lifetime_high_water_mark`. The recorded CPU value is
+the host process high-water mark and can include earlier work in the same
+process, so it is process-cumulative rather than an isolated per-module peak.
+
 ### The positive shared-latent example is constructed
 
 Module 13 copies visible points into each sample. Independent samples receive

@@ -72,6 +72,16 @@ def module_report(module: dict[str, Any], result: dict[str, Any]) -> str:
     )
     lines.extend(["", "## Interpretation", ""])
     lines.extend(f"- {item}" for item in result.get("observations", []))
+    resources = result["resources"]
+    lines.extend(
+        [
+            "",
+            "## Runtime measurement contract",
+            "",
+            f"- `network_isolation={resources['network_isolation']}`",
+            f"- `cpu_memory_scope={resources['cpu_memory_scope']}`",
+        ]
+    )
     lines.append("")
     return "\n".join(lines)
 
@@ -136,7 +146,9 @@ def aggregate_report(
             f"- **{module['id']} {module['title']}**: "
             f"runtime_seconds={_format_metric(resources.get('runtime_seconds', 'unavailable'))}, "
             f"peak_cpu_bytes={_format_metric(resources.get('peak_cpu_bytes', 'unavailable'))}, "
-            f"peak_gpu_bytes={_format_metric(resources.get('peak_gpu_bytes', 'unavailable'))}"
+            f"peak_gpu_bytes={_format_metric(resources.get('peak_gpu_bytes', 'unavailable'))}, "
+            f"network_isolation={_format_metric(resources.get('network_isolation', 'unavailable'))}, "
+            f"cpu_memory_scope={_format_metric(resources.get('cpu_memory_scope', 'unavailable'))}"
         )
     lines.append("")
 
