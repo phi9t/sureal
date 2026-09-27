@@ -1296,21 +1296,35 @@ one sample internally coherent.
 
 ### Evidence and observability
 
-Evidence may be partial points, one or more images, or text. Training defines a
-prior over shapes or scenes. The desired object is a conditional distribution
-(p(S\mid O)), where all hypotheses explain observation (O) while differing
-only where evidence permits. Diversity without evidence consistency is noise;
-evidence consistency without mode coverage is collapse; marginal point
-coverage without within-sample coherence is hybridization.
+Evidence may be partial geometry, one or more images, a scene layout, or text.
+Training data supplies the prior; the observation (O) constrains a complete
+state (S). The target is (p(S\mid O)), not simply a noisy prediction. A
+completion is supported only where it preserves observed constraints, varies
+where (O) is genuinely ambiguous, and keeps all outputs belonging to one
+sample mutually consistent. Diversity without evidence consistency is noise;
+evidence consistency without mode coverage is collapse; pooled point coverage
+without within-sample coherence is hybridization. The posterior is rarely
+known for real scenes, which is why the lab below uses two exactly balanced,
+identifiable hidden hypotheses.
 
 ### Representation and inference
 
-PointFlow samples a shape latent and then points conditionally. Flow matching
-trains continuous transports. Diffusion can generate implicit parameters,
-images used as multi-view priors, or 3D assets. DreamFusion optimizes a scene
-through a 2D diffusion prior; Zero-1-to-3 produces view-conditioned images;
-LRMs amortize image-to-triplane prediction. These solve different conditional
-tasks and should not be grouped under one accuracy number.
+“Generative 3D” names different probabilistic objects. PointFlow samples a
+global shape latent and then points conditionally. Shap-E diffuses parameters
+of an implicit function. EG3D samples a hybrid triplane representation that is
+rendered from cameras. DreamFusion optimizes one representation through a
+frozen 2D score, while Zero-1-to-3 directly samples camera-conditioned images.
+LRM amortizes deterministic image-to-triplane prediction. DiffComplete samples
+object completion; DiffuScene and Coherent 3D Scene Diffusion model joint
+object configurations. These outputs, inference procedures, and evidence
+contracts are different and must not be collapsed into one accuracy ranking.
+
+Sampling one persistent implicit field or scene-level object set is
+structurally closer to a scene hypothesis than drawing unrelated points, but
+it is still not posterior inference unless the conditioning preserves evidence
+and the samples cover valid alternatives. A deterministic global encoding
+(h(O)) is likewise not a stochastic scene state: independent decoders can
+share (h(O)) while their private noise selects incompatible hidden modes.
 
 ### Defining mathematics
 
@@ -1320,34 +1334,73 @@ Flow matching learns a vector field for a probability path:
 \mathcal L_{FM}=\mathbb E_{t,x_t}\|v_\theta(x_t,t,O)-u_t(x_t\mid O)\|_2^2.
 \]
 
-The crucial factorization is structural. Independent point decoding resembles
-(\prod_i p(x_i\mid O)). A coherent scene sampler uses
+The crucial factorization is structural. If two hidden scenes (A) and (B)
+are equally compatible with the same observation, independent point decoding
+implements
+
+\[
+p_{\mathrm{ind}}(X\mid O)=\prod_i\left[\tfrac12p_A(x_i)+
+\tfrac12p_B(x_i)\right].
+\]
+
+It has the correct one-point marginal, yet almost every sufficiently dense
+sample mixes mutually exclusive worlds. A scene mixture instead implements
+
+\[
+p_{\mathrm{scene}}(X\mid O)=\tfrac12\prod_i p_A(x_i)+
+\tfrac12\prod_i p_B(x_i).
+\]
+
+More generally, a coherent scene sampler uses
 
 \[
 p(S\mid O)=\int p(S\mid z^*,O)p(z^*\mid O)\,dz^*,
 \]
 
-then reuses one sampled (z^*) for every point, camera, and time step.
+then reuses one sampled (z^*) for every point count, query batch, camera, and
+time step. Flow matching specifies a transport objective; it does not specify
+whether the transported state is one point, an object set, or a persistent
+scene latent. PointFlow predates the Flow Matching objective and already has a
+shared shape latent, so it belongs on the coherent side of this analytic
+contrast even though it does not solve conditional scene inference by itself.
 
 ### Assumptions and failure modes
 
-Text or image priors can overpower geometry. Score distillation can exploit a
-2D model without producing multi-view consistency. Object generators do not
-automatically compose scenes with physical relations. Independent random
-points can represent both hidden modes in aggregate while mixing them in every
-single sample. Diversity must be measured between samples and coherence within
-samples.
+Text or image priors can overpower observed geometry. Score distillation can
+exploit a 2D model without producing multi-view consistency. A stochastic view
+generator can redraw hidden content for every camera. Individually plausible
+object completions can intersect, float, or lose identity when composed.
+Independent random points can cover both hidden modes in aggregate while
+mixing them within every sample; redrawing a global latent between query
+batches defeats persistence too. A single ground-truth completion cannot
+identify a one-to-many posterior, and best-of-(K) alone rewards sample count.
+Report observed-evidence error, within-sample coherence, hybrid fraction,
+coherent mode coverage, between-sample diversity, calibration where known, and
+cross-query persistence separately.
 
 ### Primary-source reading sequence
 
 Read hierarchical point generation in
 [yang-pointflow-2019](https://openaccess.thecvf.com/content_ICCV_2019/html/Yang_PointFlow_3D_Point_Cloud_Generation_With_Continuous_Normalizing_Flows_ICCV_2019_paper.html),
 the general flow objective in
-[lipman-2023](https://openreview.net/forum?id=PqvMRDCJT9t), 2D-prior optimization
-in [poole-2022](https://arxiv.org/abs/2209.14988), amortized large reconstruction
-in [hong-lrm-2023](https://arxiv.org/abs/2311.04400), and view-conditioned image
-priors in
+[lipman-2023](https://openreview.net/forum?id=PqvMRDCJT9t), and persistent
+implicit-parameter diffusion in
+[jun-shap-e-2023](https://arxiv.org/abs/2305.02463). Contrast one latent
+rendered from many cameras in
+[chan-eg3d-2022](https://openaccess.thecvf.com/content/CVPR2022/html/Chan_Efficient_Geometry-Aware_3D_Generative_Adversarial_Networks_CVPR_2022_paper.html)
+with view-conditioned image sampling in
 [liu-zero123-2023](https://openaccess.thecvf.com/content/ICCV2023/html/Liu_Zero-1-to-3_Zero-shot_One_Image_to_3D_Object_ICCV_2023_paper.html).
+Then separate 2D-prior optimization in
+[poole-2022](https://arxiv.org/abs/2209.14988) from amortized deterministic
+reconstruction in [hong-lrm-2023](https://arxiv.org/abs/2311.04400). For the
+move from objects to scenes, read probabilistic object completion in
+[chu-diffcomplete-2023](https://proceedings.neurips.cc/paper_files/paper/2023/hash/ef7bd1f9cbf8a5ab7ddcaccd50699c90-Abstract.html),
+set-level scene synthesis in
+[tang-diffuscene-2024](https://openaccess.thecvf.com/content/CVPR2024/html/Tang_DiffuScene_Denoising_Diffusion_Models_for_Generative_Indoor_Scene_Synthesis_CVPR_2024_paper.html),
+joint image-conditioned pose/shape denoising in
+[dahnert-scene-diffusion-2024](https://proceedings.neurips.cc/paper_files/paper/2024/hash/29c8c615b3187ee995029284702d3f43-Abstract-Conference.html),
+and open-set relational composition in
+[shi-scenemaker-2026](https://openaccess.thecvf.com/content/CVPR2026/html/Shi_SceneMaker_Open-set_3D_Scene_Generation_with_Decoupled_De-occlusion_and_Pose_CVPR_2026_paper.html).
 
 ### Reproduction lab
 
@@ -1356,9 +1409,28 @@ experiments/3d-pathway/run.sh run --module 13 --profile smoke --run-id pathway-1
 ```
 
 Inspect `result.json`, `report.md`, `artifacts/scene_coherence.svg`,
-`artifacts/ambiguity_comparison.json`, and `artifacts/failure_sweep.csv`. Both
-samplers cover two hypotheses and satisfy the shared visible evidence. Only the
-shared-latent sampler chooses one hypothesis per sample.
+`artifacts/ambiguity_samples.svg`, `artifacts/ambiguity_samples.npz`,
+`artifacts/ambiguity_comparison.json`, and `artifacts/failure_sweep.csv`. The
+fixture places the same hidden object either left or right behind an identical
+48-point observed occluder. The NPZ contains both hypotheses, every stochastic
+assignment, repeated-query draws, and predicted visible points; validation
+recomputes the reported metrics from those arrays.
+
+In the locked smoke run (64 samples, 257 hidden points), independent decoding
+had coherence 0.527, hybrid fraction 1.0, coherent-hypothesis coverage 0,
+repeat-query consistency 0.498, and best-hypothesis RMSE 0.853 m. Its marginal
+mode entropy was effectively one bit while its coherent-scene entropy was
+zero: pooled diversity hid the failure. The shared
+latent scored 1.0 coherence, 1.0 coherent coverage, 1.0 repeat consistency,
+and zero best-hypothesis RMSE. Both covered both modes in aggregate and had
+perfect observed-evidence consistency, so marginal coverage and evidence fit
+cannot explain the difference. Full (4,096 samples, 4,097 hidden points)
+measured 0.506 versus 1.0 coherence and 0.500 versus 1.0 repeated-query
+consistency. As point count rises, the independent sample converges more
+reliably to a stable hybrid, not to a scene. This is an analytic factorization
+test, not a reproduction or quality claim for any cited model. The detailed
+source and terminology ledger is in
+`experiments/3d-pathway/research/module13-generative-scene-priors.md`.
 
 ### Transition
 

@@ -104,9 +104,9 @@
     {
       "id": "13", "slug": "generative-3d-scene-priors", "title": "Generative 3D and scene priors",
       "evidence": ["partial geometry, images, or text plus a random variable"], "observable": "a conditional distribution only through training data and evidence", "representation": "sampled points, implicit parameters, radiance fields, meshes, or scene state",
-      "inference": "sampled", "objectives": ["continuous normalizing flow", "flow matching", "diffusion or score distillation"], "metrics": ["evidence consistency", "diversity", "within-sample coherence", "coverage"],
-      "failure_sweep": ["two-hypothesis ambiguity", "independent point noise", "shared scene latent"], "insula": "neural-rendering",
-      "sources": ["yang-pointflow-2019", "lipman-2023", "poole-2022", "hong-lrm-2023", "liu-zero123-2023"]
+      "inference": "sampled", "objectives": ["continuous normalizing flow", "flow matching", "diffusion or score distillation"], "metrics": ["evidence consistency", "within-sample coherence", "coherent hypothesis coverage", "scene-level diversity", "cross-query persistence"],
+      "failure_sweep": ["two-hypothesis ambiguity", "independent point noise", "shared scene latent", "point-count resolution", "repeated query"], "insula": "neural-rendering",
+      "sources": ["yang-pointflow-2019", "lipman-2023", "poole-2022", "hong-lrm-2023", "liu-zero123-2023", "jun-shap-e-2023", "chan-eg3d-2022", "chu-diffcomplete-2023", "tang-diffuscene-2024", "dahnert-scene-diffusion-2024", "shi-scenemaker-2026"]
     },
     {
       "id": "14", "slug": "dynamic-3d-4d", "title": "Dynamic 3D and 4D representations",

@@ -12,7 +12,13 @@ import zipfile
 import numpy as np
 
 from contracts import ROOT, load_json, sha256_file
-from generative import compare_ambiguous_samplers
+from generative import (
+    AMBIGUITY_ARRAY_SEMANTICS,
+    COHERENT_SAMPLE_THRESHOLD,
+    EVIDENCE_TOLERANCE_M,
+    evaluate_ambiguity_fixture,
+    generate_ambiguity_fixture,
+)
 from math3d import (
     apply_transform,
     fundamental_from_poses,
@@ -912,20 +918,128 @@ def _foundation_geometry_lab(artifacts: Path, profile: str, scene: dict[str, Any
     }
 
 
+def _write_ambiguity_samples_svg(
+    path: Path,
+    fixture: dict[str, np.ndarray],
+) -> None:
+    hypothesis_a = fixture["hidden_hypothesis_a_xyz"]
+    hypothesis_b = fixture["hidden_hypothesis_b_xyz"]
+    independent = fixture["independent_assignments"][0].astype(bool)
+    shared_b = bool(fixture["shared_scene_latents"][0])
+    step = max(1, len(independent) // 96)
+    selected = np.arange(0, len(independent), step)[:96]
+    independent_points = np.where(
+        independent[selected, None],
+        hypothesis_b[selected],
+        hypothesis_a[selected],
+    )
+    shared_points = hypothesis_b[selected] if shared_b else hypothesis_a[selected]
+
+    def circles(points: np.ndarray, offset: float, color: str) -> str:
+        elements = []
+        for x, _, z in points:
+            pixel_x = offset + 112.0 + 72.0 * float(x)
+            pixel_y = 178.0 - 92.0 * float(z)
+            elements.append(
+                f'<circle cx="{pixel_x:.2f}" cy="{pixel_y:.2f}" r="2.2" fill="{color}"/>'
+            )
+        return "".join(elements)
+
+    path.write_text(
+        f'''<svg xmlns="http://www.w3.org/2000/svg" width="620" height="250" viewBox="0 0 620 250">
+<rect width="620" height="250" fill="white"/>
+<text x="20" y="24" font-family="sans-serif" font-size="15">Two hidden hypotheses behind identical observed support</text>
+<text x="56" y="48" font-family="sans-serif" font-size="12">independent point noise: hybrid sample</text>
+<text x="356" y="48" font-family="sans-serif" font-size="12">one shared scene latent: coherent sample</text>
+<rect x="55" y="166" width="225" height="8" fill="#454b52"/>
+<rect x="355" y="166" width="225" height="8" fill="#454b52"/>
+{circles(independent_points[~independent[selected]], 55.0, "#2f6f9f")}
+{circles(independent_points[independent[selected]], 55.0, "#c34d58")}
+{circles(shared_points, 355.0, "#4b8b3b")}
+<path d="M167 222 L154 204 L180 204 Z" fill="#222"/><path d="M467 222 L454 204 L480 204 Z" fill="#222"/>
+<text x="167" y="240" text-anchor="middle" font-family="sans-serif" font-size="11">camera; dark bar is observed occluder</text>
+<text x="467" y="240" text-anchor="middle" font-family="sans-serif" font-size="11">camera; hidden choice persists across queries</text>
+</svg>
+''',
+        encoding="utf-8",
+    )
+
+
 def _generative_scene_lab(artifacts: Path, profile: str, scene: dict[str, Any], profile_config: dict[str, Any]) -> dict[str, Any]:
     samples = int(profile_config["samples"])
     points = 257 if profile == "smoke" else 4097
-    comparison = compare_ambiguous_samplers(samples=samples, points_per_sample=points, seed=260925)
+    fixture = generate_ambiguity_fixture(
+        samples=samples,
+        hidden_points_per_sample=points,
+        seed=260925,
+    )
+    comparison = evaluate_ambiguity_fixture(fixture)
     independent = comparison["independent_points"]
     shared = comparison["shared_scene_latent"]
-    (artifacts / "ambiguity_comparison.json").write_text(__import__("json").dumps(comparison, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    _write_npz_deterministic(artifacts / "ambiguity_samples.npz", fixture)
+    _write_ambiguity_samples_svg(artifacts / "ambiguity_samples.svg", fixture)
+    comparison_record = {
+        "schema_version": 1,
+        "fixture": {
+            "evidence": "48 input-visible points on an occluding plane",
+            "hidden_hypotheses": "one object translated left or right behind the plane",
+            "coordinate_convention": "right-handed xyz in metres",
+            "sample_count": samples,
+            "hidden_points_per_sample": points,
+            "random_seed": 260925,
+            "evidence_tolerance_m": EVIDENCE_TOLERANCE_M,
+            "coherent_sample_threshold": COHERENT_SAMPLE_THRESHOLD,
+        },
+        "samplers": comparison,
+        "arrays": {
+            name: {
+                "shape": list(array.shape),
+                "dtype": str(array.dtype),
+                "semantics": AMBIGUITY_ARRAY_SEMANTICS[name],
+            }
+            for name, array in sorted(fixture.items())
+        },
+    }
+    (artifacts / "ambiguity_comparison.json").write_text(
+        json.dumps(comparison_record, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
     point_counts = np.unique(np.rint(np.geomspace(17, 16385, _steps(profile_config))).astype(int))
     coherence = []
     sweep = []
+    reference_shared_latents = None
     for point_count in point_counts:
-        summary = compare_ambiguous_samplers(samples=64, points_per_sample=int(point_count), seed=260925)["independent_points"]
-        coherence.append(summary["within_sample_coherence"])
-        sweep.append({"parameter": "points_per_sample", "value": int(point_count), "metric": "independent_point_coherence", "measurement": summary["within_sample_coherence"]})
+        sweep_fixture = generate_ambiguity_fixture(
+            samples=64,
+            hidden_points_per_sample=int(point_count),
+            seed=260925,
+        )
+        summaries = evaluate_ambiguity_fixture(sweep_fixture)
+        independent_summary = summaries["independent_points"]
+        shared_summary = summaries["shared_scene_latent"]
+        shared_latents = sweep_fixture["shared_scene_latents"]
+        if reference_shared_latents is None:
+            reference_shared_latents = shared_latents.copy()
+        resolution_consistency = float(
+            np.mean(shared_latents == reference_shared_latents)
+        )
+        coherence.append(float(independent_summary["within_sample_coherence"]))
+        for metric, measurement in (
+            ("independent_point_coherence", independent_summary["within_sample_coherence"]),
+            ("independent_hybrid_fraction", independent_summary["hybrid_sample_fraction"]),
+            ("independent_repeat_query_consistency", independent_summary["repeat_query_consistency"]),
+            ("shared_latent_coherence", shared_summary["within_sample_coherence"]),
+            ("shared_repeat_query_consistency", shared_summary["repeat_query_consistency"]),
+            ("shared_resolution_latent_consistency", resolution_consistency),
+        ):
+            sweep.append(
+                {
+                    "parameter": "points_per_sample",
+                    "value": int(point_count),
+                    "metric": metric,
+                    "measurement": float(measurement),
+                }
+            )
     _write_sweep(artifacts / "failure_sweep.csv", sweep)
     _write_chart(artifacts / "scene_coherence.svg", "More independent points converge to a stable hybrid, not one scene", coherence, "#b3456c")
     return {
@@ -935,15 +1049,33 @@ def _generative_scene_lab(artifacts: Path, profile: str, scene: dict[str, Any], 
             "generative": {
                 "independent_point_coherence": independent["within_sample_coherence"],
                 "independent_point_hybrid_fraction": independent["hybrid_sample_fraction"],
+                "independent_point_hypothesis_coverage": independent["hypothesis_coverage"],
+                "independent_point_coherent_hypothesis_coverage": independent["coherent_hypothesis_coverage"],
+                "independent_point_evidence_consistency": independent["evidence_consistency"],
+                "independent_point_evidence_rmse_m": independent["evidence_rmse_m"],
+                "independent_point_worst_sample_evidence_rmse_m": independent["worst_sample_evidence_rmse_m"],
+                "independent_point_marginal_mode_entropy_bits": independent["marginal_mode_entropy_bits"],
+                "independent_point_coherent_scene_entropy_bits": independent["coherent_scene_entropy_bits"],
+                "independent_point_balanced_posterior_frequency_error": independent["balanced_posterior_frequency_error"],
+                "independent_point_repeat_query_consistency": independent["repeat_query_consistency"],
+                "independent_point_best_hypothesis_rmse_m": independent["best_hypothesis_rmse_m"],
                 "shared_latent_coherence": shared["within_sample_coherence"],
                 "shared_latent_hypothesis_coverage": shared["hypothesis_coverage"],
+                "shared_latent_coherent_hypothesis_coverage": shared["coherent_hypothesis_coverage"],
                 "shared_latent_evidence_consistency": shared["evidence_consistency"],
+                "shared_latent_evidence_rmse_m": shared["evidence_rmse_m"],
+                "shared_latent_worst_sample_evidence_rmse_m": shared["worst_sample_evidence_rmse_m"],
+                "shared_latent_scene_entropy_bits": shared["coherent_scene_entropy_bits"],
+                "shared_latent_balanced_posterior_frequency_error": shared["balanced_posterior_frequency_error"],
+                "shared_latent_repeat_query_consistency": shared["repeat_query_consistency"],
+                "shared_latent_best_hypothesis_rmse_m": shared["best_hypothesis_rmse_m"],
             },
         },
         "failure_sweep": sweep,
         "observations": [
-            "Independent per-point randomness covers both marginal modes but mixes them within almost every sample.",
-            "One shared latent chooses a persistent complete-scene hypothesis that can be reused across all decoded points and views.",
+            "Independent per-point randomness has nearly one bit of marginal diversity while coherent-scene diversity is zero: every sample is a hybrid.",
+            "One shared latent chooses a persistent complete-scene hypothesis and remains unchanged across repeated queries and output resolutions.",
+            "Both samplers preserve the identical visible evidence, so evidence fit and pooled mode coverage cannot distinguish their joint structure.",
         ],
     }
 

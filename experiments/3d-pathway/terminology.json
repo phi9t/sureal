@@ -14,7 +14,7 @@
     {
       "id": "point-noise-is-not-scene-noise",
       "preferred": "Independent stochastic point decoding does not by itself define one coherent sampled scene hypothesis.",
-      "forbidden_patterns": ["independent point stochasticity is scene stochasticity", "more sampled points imply a scene posterior"]
+      "forbidden_patterns": ["independent point stochasticity is scene stochasticity", "more sampled points imply a scene posterior", "arbitrary-resolution point sampling is coherent scene sampling", "pooled point diversity proves scene diversity"]
     }
   ]
 }

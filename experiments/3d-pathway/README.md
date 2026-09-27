@@ -204,6 +204,12 @@ Every completed module contains:
 
 Every metric and artifact is labeled `controlled_fixture`, except module 15,
 which is labeled `reused_measured_result` and checked against its asset lock.
+Module 13's controlled fixture persists two mutually exclusive hidden-scene
+hypotheses, all independent-point and shared-latent draws, repeat queries, and
+visible evidence in `ambiguity_samples.npz`. Validation recomputes its
+evidence, coherence, coverage, persistence, and best-hypothesis metrics from
+that archive; the toy result is a factorization test, not a published-model
+reproduction.
 `all` stages the complete run and promotes it atomically; its `report.json`
 manifest records completeness, sources, assumptions, interpretations, and the
 Markdown report hash. A report made from a partial run says so explicitly.

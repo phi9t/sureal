@@ -2,10 +2,19 @@
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
 from contracts import IMPLEMENTATION_FILES, INPUT_FILES, ROOT, canonical_json, ensure_finite, load_json, sha256_file, validate_json_schema_instance
+from generative import (
+    AMBIGUITY_ARRAY_SEMANTICS,
+    COHERENT_SAMPLE_THRESHOLD,
+    EVIDENCE_TOLERANCE_M,
+    evaluate_ambiguity_fixture,
+)
 
 
 REQUIRED_TOP_LEVEL = {
@@ -17,6 +26,103 @@ REQUIRED_TOP_LEVEL = {
 def _require_type(value: Any, expected: type, location: str) -> None:
     if not isinstance(value, expected):
         raise ValueError(f"schema type mismatch at {location}: expected {expected.__name__}")
+
+
+def _validate_module13(run_dir: Path, result: dict[str, Any]) -> None:
+    archive_path = run_dir / "artifacts" / "ambiguity_samples.npz"
+    comparison_path = run_dir / "artifacts" / "ambiguity_comparison.json"
+    if not archive_path.is_file() or not comparison_path.is_file():
+        raise ValueError("Module 13 recomputation artifacts are missing")
+    try:
+        with np.load(archive_path, allow_pickle=False) as archive:
+            fixture = {name: archive[name] for name in archive.files}
+    except (OSError, ValueError) as error:
+        raise ValueError("Module 13 ambiguity archive is invalid") from error
+    recomputed = evaluate_ambiguity_fixture(fixture)
+    comparison = load_json(comparison_path)
+    expected_array_records = {
+        name: {
+            "shape": list(array.shape),
+            "dtype": str(array.dtype),
+            "semantics": AMBIGUITY_ARRAY_SEMANTICS[name],
+        }
+        for name, array in sorted(fixture.items())
+    }
+    expected_fixture_record = {
+        "evidence": "48 input-visible points on an occluding plane",
+        "hidden_hypotheses": "one object translated left or right behind the plane",
+        "coordinate_convention": "right-handed xyz in metres",
+        "sample_count": int(fixture["independent_assignments"].shape[0]),
+        "hidden_points_per_sample": int(fixture["independent_assignments"].shape[1]),
+        "random_seed": 260925,
+        "evidence_tolerance_m": EVIDENCE_TOLERANCE_M,
+        "coherent_sample_threshold": COHERENT_SAMPLE_THRESHOLD,
+    }
+    if (
+        comparison.get("schema_version") != 1
+        or comparison.get("fixture") != expected_fixture_record
+        or comparison.get("samplers") != recomputed
+        or comparison.get("arrays") != expected_array_records
+    ):
+        raise ValueError("Module 13 ambiguity comparison record mismatch")
+
+    independent = recomputed["independent_points"]
+    shared = recomputed["shared_scene_latent"]
+    expected_metrics = {
+        "independent_point_coherence": independent["within_sample_coherence"],
+        "independent_point_hybrid_fraction": independent["hybrid_sample_fraction"],
+        "independent_point_hypothesis_coverage": independent["hypothesis_coverage"],
+        "independent_point_coherent_hypothesis_coverage": independent[
+            "coherent_hypothesis_coverage"
+        ],
+        "independent_point_evidence_consistency": independent["evidence_consistency"],
+        "independent_point_evidence_rmse_m": independent["evidence_rmse_m"],
+        "independent_point_worst_sample_evidence_rmse_m": independent[
+            "worst_sample_evidence_rmse_m"
+        ],
+        "independent_point_marginal_mode_entropy_bits": independent[
+            "marginal_mode_entropy_bits"
+        ],
+        "independent_point_coherent_scene_entropy_bits": independent[
+            "coherent_scene_entropy_bits"
+        ],
+        "independent_point_balanced_posterior_frequency_error": independent[
+            "balanced_posterior_frequency_error"
+        ],
+        "independent_point_repeat_query_consistency": independent[
+            "repeat_query_consistency"
+        ],
+        "independent_point_best_hypothesis_rmse_m": independent[
+            "best_hypothesis_rmse_m"
+        ],
+        "shared_latent_coherence": shared["within_sample_coherence"],
+        "shared_latent_hypothesis_coverage": shared["hypothesis_coverage"],
+        "shared_latent_coherent_hypothesis_coverage": shared[
+            "coherent_hypothesis_coverage"
+        ],
+        "shared_latent_evidence_consistency": shared["evidence_consistency"],
+        "shared_latent_evidence_rmse_m": shared["evidence_rmse_m"],
+        "shared_latent_worst_sample_evidence_rmse_m": shared[
+            "worst_sample_evidence_rmse_m"
+        ],
+        "shared_latent_scene_entropy_bits": shared["coherent_scene_entropy_bits"],
+        "shared_latent_balanced_posterior_frequency_error": shared[
+            "balanced_posterior_frequency_error"
+        ],
+        "shared_latent_repeat_query_consistency": shared["repeat_query_consistency"],
+        "shared_latent_best_hypothesis_rmse_m": shared["best_hypothesis_rmse_m"],
+    }
+    recorded_metrics = result["metrics"]["generative"]
+    if set(recorded_metrics) != set(expected_metrics) or any(
+        not math.isclose(
+            float(recorded_metrics[name]),
+            float(expected),
+            rel_tol=0.0,
+            abs_tol=1e-12,
+        )
+        for name, expected in expected_metrics.items()
+    ):
+        raise ValueError("Module 13 metric mismatch")
 
 
 def validate_result(run_dir: Path, expected_module: str | None = None) -> dict[str, Any]:
@@ -83,6 +189,8 @@ def validate_result(run_dir: Path, expected_module: str | None = None) -> dict[s
         asset = next(item for item in load_json(ROOT / "assets.lock.json")["assets"] if item["id"] == "surflo-paired-scenes")
         if result.get("source_results_sha256") != asset["sha256"]:
             raise ValueError("Surflo source result does not match asset lock")
+    if result["module_id"] == "13":
+        _validate_module13(run_dir, result)
     ensure_finite(result)
     return result
 
