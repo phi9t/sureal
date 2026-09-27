@@ -488,6 +488,8 @@ class SurfloEndpointContractTest(unittest.TestCase):
             (REPO_ROOT / "experiments" / "insula-scout" / "results.json").read_text()
         )
         endpoint = build_surflo_endpoint(source, scout)
+        self.assertIn("paired_support_labels", endpoint["arrays"])
+        self.assertNotIn("paired_labels", endpoint["arrays"])
         geometry = endpoint["metrics"]["geometry"]
         generative = endpoint["metrics"]["generative"]
         self.assertAlmostEqual(geometry["observed_common_recall"], 0.765712258537032)
@@ -502,8 +504,8 @@ class SurfloEndpointContractTest(unittest.TestCase):
         supported_source = json.loads(json.dumps(source))
         supported_source["runs"][0]["exclusive_hidden_support_a"] = 0.72
         supported_source["runs"][0]["exclusive_hidden_support_b"] = 0.08
-        supported_source["runs"][0]["label"] = "scene_a"
-        supported_source["aggregate"]["labels"][0] = "scene_a"
+        supported_source["runs"][0]["support_label"] = "scene_a"
+        supported_source["aggregate"]["support_labels"][0] = "scene_a"
         supported_source["aggregate"]["mean_hidden_support_a"] = 0.18
         supported_source["aggregate"]["mean_hidden_support_b"] = 0.02
         supported = build_surflo_endpoint(supported_source, scout)
@@ -517,6 +519,12 @@ class SurfloEndpointContractTest(unittest.TestCase):
             supported["metrics"]["generative"]["hidden_hypothesis_support"],
             0.18,
         )
+
+        inconsistent_label = json.loads(json.dumps(source))
+        inconsistent_label["runs"][0]["support_label"] = "scene_a"
+        inconsistent_label["aggregate"]["support_labels"][0] = "scene_a"
+        with self.assertRaisesRegex(ValueError, "classification mismatch"):
+            build_surflo_endpoint(inconsistent_label, scout)
 
         unlocked_mode = json.loads(json.dumps(source))
         unlocked_mode["settings"]["inference_mode"] = "guided"
@@ -569,6 +577,8 @@ class SurfloEndpointContractTest(unittest.TestCase):
             archive_path = run_dir / "artifacts/surflo_endpoint_evidence.npz"
             with np.load(archive_path, allow_pickle=False) as archive:
                 arrays = {name: archive[name] for name in archive.files}
+            self.assertIn("paired_support_labels", arrays)
+            self.assertNotIn("paired_labels", arrays)
             recomputed = evaluate_surflo_evidence(arrays)
             self.assertEqual(recomputed["metrics"], result["metrics"])
             self.assertEqual(recomputed["sweep"], result["failure_sweep"])

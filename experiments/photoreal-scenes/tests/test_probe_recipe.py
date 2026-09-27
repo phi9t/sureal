@@ -191,6 +191,7 @@ class PhotorealRecipeTest(unittest.TestCase):
                 manifest_path.read_bytes()
             ).hexdigest()
             raw_path.write_text(json.dumps(raw_payload), encoding="utf-8")
+            expected_raw_sha = hashlib.sha256(raw_path.read_bytes()).hexdigest()
             validation_path.write_text(
                 json.dumps(
                     {
@@ -212,9 +213,14 @@ class PhotorealRecipeTest(unittest.TestCase):
             )
             expected_validation_sha = hashlib.sha256(validation_path.read_bytes()).hexdigest()
         self.assertEqual(payload["status"], "pass")
+        self.assertEqual(payload["schema_version"], 2)
         self.assertTrue(payload["acceptance"]["valid_measurements"])
         self.assertEqual([run["seed"] for run in payload["runs"]], [0, 1, 2, 3])
-        self.assertEqual(payload["runs"][0]["label"], "unsupported")
+        self.assertEqual(payload["runs"][0]["support_label"], "unsupported")
+        self.assertNotIn("label", payload["runs"][0])
+        self.assertEqual(payload["aggregate"]["support_labels"], ["unsupported"] * 4)
+        self.assertNotIn("labels", payload["aggregate"])
+        self.assertEqual(payload["artifacts"]["raw_results_sha256"], expected_raw_sha)
         self.assertEqual(
             payload["artifacts"]["validation_report_sha256"],
             expected_validation_sha,
@@ -226,6 +232,20 @@ class PhotorealRecipeTest(unittest.TestCase):
         self.assertEqual(payload["model_provenance"]["checkpoint_sha256"], "b" * 64)
         self.assertEqual(payload["model_provenance"]["vggt"]["revision"], "c" * 40)
         self.assertEqual(payload["source"]["implementation_sha256"], "1" * 64)
+
+    def test_recipe_rejects_legacy_derived_summary_schema(self) -> None:
+        verifier = _load_recipe_module()
+        tracked = json.loads((ROOT / "results.json").read_text(encoding="utf-8"))
+        tracked["schema_version"] = 1
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            recipe_path = self._write_self_contained_recipe(
+                root, tracked_results=tracked
+            )
+            with self.assertRaisesRegex(
+                verifier.RecipeError, "derived results must use schema version 2"
+            ):
+                verifier.validate_recipe(recipe_path, cache_root=root / "cache")
 
     def test_recipe_declares_a_recomputed_source_overlay(self) -> None:
         provenance = _load_provenance_module()

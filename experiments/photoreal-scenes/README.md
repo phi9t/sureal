@@ -103,7 +103,8 @@ target/target-only surface visibility is 73.1% for the sofa and 59.7% for the
 shelf, exceeding the 25% threshold.
 
 The four Surflo seeds completed at 100,000 queries and 100 ODE steps. All were
-classified `unsupported`; this is a valid finding, not a benchmark failure.
+support-classified `unsupported`; this is a valid finding, not a benchmark
+failure.
 Mean observed-common recall is 0.7657, mean unobserved-common recall is 0.0564,
 and mean hidden support is 0 for both hypotheses. Per-seed completion
 precision, camera error, runtime, VRAM, and artifact hashes are preserved in
@@ -130,7 +131,9 @@ Validation requires finite arrays, unit normals, consistent depth/ray distance,
 valid IDs and shapes, the exact frame counts, byte-identical context, differing
 targets, zero hidden-context visibility, and at least 25% hidden target and
 target-only visibility. Probe acceptance requires four complete, valid
-measurements; it does not require a predetermined coherence label.
+measurements; it does not require a predetermined support label. These labels
+summarize thresholded relative support for the two benchmark alternatives; they
+do not certify object completeness or within-sample scene coherence.
 
 This is the first static diagnostic milestone. It evaluates stock Surflo and does
 not train a scene prior. It also does not add language supervision, video
