@@ -4,10 +4,13 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import platform
 import resource
+import subprocess
+import sys
 import time
 from typing import Any
 
@@ -24,7 +27,102 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--vggt-model", type=Path, required=True)
     parser.add_argument("--da3-model", type=Path, required=True)
+    parser.add_argument("--vggt-source", type=Path, required=True)
+    parser.add_argument("--da3-source", type=Path, required=True)
+    parser.add_argument("--model-lock", type=Path, required=True)
+    parser.add_argument("--environment-manifest", type=Path, required=True)
     return parser
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _unproject_depth(depth, intrinsics, extrinsics):
+    import numpy as np
+
+    depth = np.asarray(depth, dtype=np.float32)
+    intrinsics = np.asarray(intrinsics, dtype=np.float32)
+    extrinsics = np.asarray(extrinsics, dtype=np.float32)
+    height, width = depth.shape[-2:]
+    rows, columns = np.meshgrid(
+        np.arange(height, dtype=np.float32) + 0.5,
+        np.arange(width, dtype=np.float32) + 0.5,
+        indexing="ij",
+    )
+    result = []
+    for index in range(len(depth)):
+        camera = np.stack(
+            (
+                (columns - intrinsics[index, 0, 2])
+                * depth[index]
+                / intrinsics[index, 0, 0],
+                (rows - intrinsics[index, 1, 2])
+                * depth[index]
+                / intrinsics[index, 1, 1],
+                depth[index],
+            ),
+            axis=-1,
+        )
+        rotation = extrinsics[index, :3, :3]
+        translation = extrinsics[index, :3, 3]
+        result.append((camera - translation) @ rotation)
+    return np.asarray(result, dtype=np.float32)
+
+
+def _validity(depth, points, confidence) -> dict[str, Any]:
+    import numpy as np
+
+    depth = np.asarray(depth)
+    points = np.asarray(points)
+    return {
+        "total_pixels": int(depth.size),
+        "finite_depth": int(np.count_nonzero(np.isfinite(depth))),
+        "positive_depth": int(np.count_nonzero(np.isfinite(depth) & (depth > 0.0))),
+        "finite_points": int(np.count_nonzero(np.isfinite(points).all(axis=-1))),
+        "in_frame_points": int(np.prod(depth.shape)),
+        "finite_confidence": int(np.count_nonzero(np.isfinite(confidence))),
+        "confidence_threshold": None,
+        "confidence_selected": int(np.size(confidence)),
+        "sky_mask_status": "unsupported",
+        "background_mask_status": "unsupported-model-side",
+        "evaluation_mask_status": "evaluator-only; not mounted into inference container",
+    }
+
+
+def _checkpoint_contract(record: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "repository": record["repository"],
+        "revision": record["revision"],
+        "license": record["license"],
+        "files": record["files"],
+    }
+
+
+def _input_contract(
+    case: dict[str, Any],
+    manifest: dict[str, Any],
+    processed_size,
+    *,
+    geometric_transform: str,
+    normalization: str,
+) -> dict[str, Any]:
+    return {
+        "ordered_image_sha256": case["image_sha256"],
+        "ordered_frame_ids": case["frame_ids"],
+        "original_size_hw": manifest["original_size_hw"],
+        "processed_size_hw": list(processed_size),
+        "exif_orientation_action": "none; repository-generated RGB PNG",
+        "reference_view_index_before_reorder": 0,
+        "reference_view_index_after_reorder": 0,
+        "final_order": "exactly the declared input order",
+        "geometric_transform": geometric_transform,
+        "normalization": normalization,
+    }
 
 
 def _canonical_extrinsics(extrinsics):
@@ -77,6 +175,36 @@ def _geometry_checks(depth, points, extrinsics, intrinsics) -> dict[str, float]:
     }
 
 
+def _direct_point_checks(points, extrinsics, intrinsics) -> dict[str, float | int]:
+    import numpy as np
+
+    points = np.asarray(points, dtype=np.float64)
+    extrinsics = np.asarray(extrinsics, dtype=np.float64)
+    intrinsics = np.asarray(intrinsics, dtype=np.float64)
+    height, width = points.shape[1:3]
+    rows, columns = np.meshgrid(
+        np.arange(height, dtype=np.float64) + 0.5,
+        np.arange(width, dtype=np.float64) + 0.5,
+        indexing="ij",
+    )
+    errors = []
+    positive = 0
+    for index in range(len(points)):
+        camera = points[index] @ extrinsics[index, :3, :3].T + extrinsics[index, :3, 3]
+        valid = np.isfinite(camera).all(axis=-1) & (camera[..., 2] > 0.0)
+        positive += int(np.count_nonzero(valid))
+        if np.any(valid):
+            x = intrinsics[index, 0, 0] * camera[..., 0] / camera[..., 2] + intrinsics[index, 0, 2]
+            y = intrinsics[index, 1, 1] * camera[..., 1] / camera[..., 2] + intrinsics[index, 1, 2]
+            errors.append(np.sqrt((x[valid] - columns[valid]) ** 2 + (y[valid] - rows[valid]) ** 2))
+    values = np.concatenate(errors)
+    return {
+        "direct_point_positive_depth_count": positive,
+        "direct_point_reprojection_mean_px": float(np.mean(values)),
+        "direct_point_reprojection_max_px": float(np.max(values)),
+    }
+
+
 def _save_archive(path: Path, **arrays: Any) -> None:
     import numpy as np
 
@@ -91,10 +219,9 @@ def _vggt_cases(manifest: dict[str, Any], input_root: Path, output_root: Path, m
     import numpy as np
     import torch
 
-    from surflo.data.utils import load_and_preprocess_images
-    from surflo.nn.vggt.models.vggt import VGGT
-    from surflo.nn.vggt.utils.pose_enc import pose_encoding_to_extri_intri
-    from surflo.utils.geometry import depths_to_points_parallel_batched
+    from vggt.models.vggt import VGGT
+    from vggt.utils.load_fn import load_and_preprocess_images
+    from vggt.utils.pose_enc import pose_encoding_to_extri_intri
 
     started = time.perf_counter()
     model = VGGT.from_pretrained(str(model_path)).to("cuda").eval()
@@ -103,9 +230,10 @@ def _vggt_cases(manifest: dict[str, Any], input_root: Path, output_root: Path, m
     torch.cuda.reset_peak_memory_stats()
     cases: dict[str, Any] = {}
     for case in manifest["cases"]:
+        case_started = time.perf_counter()
         image_paths = [str(input_root / path) for path in case["image_paths"]]
         preprocessing_started = time.perf_counter()
-        images = load_and_preprocess_images(image_paths, mode="crop", target_size=518)
+        images = load_and_preprocess_images(image_paths, mode="crop")
         preprocessing_seconds = time.perf_counter() - preprocessing_started
         height, width = images.shape[-2:]
         query_x, query_y = torch.meshgrid(
@@ -125,13 +253,10 @@ def _vggt_cases(manifest: dict[str, Any], input_root: Path, output_root: Path, m
         extrinsics, intrinsics = pose_encoding_to_extri_intri(
             prediction["pose_enc"], images.shape[-2:]
         )
-        points = depths_to_points_parallel_batched(
-            intrinsics, extrinsics, prediction["depth"], to_world=True
-        )
         depth = prediction["depth"][0, ..., 0].float().cpu().numpy()
-        pointmap_depth = points[0].float().cpu().numpy()
         extrinsics_array = _canonical_extrinsics(extrinsics[0].float().cpu().numpy())
         intrinsics_array = intrinsics[0].float().cpu().numpy()
+        pointmap_depth = _unproject_depth(depth, intrinsics_array, extrinsics_array)
         direct = prediction["world_points"][0].float().cpu().numpy()
         confidence = prediction["depth_conf"][0].float().cpu().numpy()
         tracks = prediction["track"][0].float().cpu().numpy()
@@ -140,6 +265,8 @@ def _vggt_cases(manifest: dict[str, Any], input_root: Path, output_root: Path, m
         decoding_seconds = time.perf_counter() - decode_started
         archive = f"{VGGT_METHOD.replace('/', '-')}-{case['id']}.npz"
         checks = _geometry_checks(depth, pointmap_depth, extrinsics_array, intrinsics_array)
+        checks.update(_direct_point_checks(direct, extrinsics_array, intrinsics_array))
+        export_started = time.perf_counter()
         _save_archive(
             output_root / archive,
             confidence=confidence.astype(np.float32),
@@ -153,24 +280,49 @@ def _vggt_cases(manifest: dict[str, Any], input_root: Path, output_root: Path, m
             track_visibility=visibility.astype(np.float32),
             tracks=tracks.astype(np.float32),
         )
+        export_seconds = time.perf_counter() - export_started
+        total_seconds = time.perf_counter() - case_started
         cases[case["id"]] = {
             "archive": archive,
             "frame_ids": case["frame_ids"],
             "original_size_hw": manifest["original_size_hw"],
             "processed_size_hw": [height, width],
-            "preprocessing": "width=518 aspect-preserving resize; height rounded to patch multiple; no padding for this suite",
+            "preprocessing": "official crop loader: width=518 aspect-preserving bicubic resize; height rounded to patch multiple; center crop above 518; cross-image white padding if needed",
+            "inputs": _input_contract(
+                case,
+                manifest,
+                [height, width],
+                geometric_transform="official width-518 crop-mode resize/crop/pad path",
+                normalization="PIL RGB to torch float tensor in [0,1]; no channel mean/std normalization",
+            ),
             "reference_view_index": 0,
             "optimization": "none",
             "camera_convention": "OpenCV world-to-camera",
             "depth_semantics": "camera-z relative scale",
             "canonical_pointmap": "depth unprojection",
+            "pixel_coordinate_origin": "half-integer pixel centers",
             "direct_pointmap_present": True,
             "tracks_present": True,
+            "confidence": {
+                "raw_head": "depth_conf",
+                "shape": list(confidence.shape),
+                "domain": "positive model score; not cross-model calibrated",
+                "threshold": None,
+            },
+            "validity": _validity(depth, pointmap_depth, confidence),
+            "gauge": {
+                "reference": "learned shared world frame anchored by the first input",
+                "metric_scale": False,
+                "alignment_applied": "none",
+                "optimization": "none",
+            },
             "checks": checks,
             "runtime_seconds": {
                 "preprocessing": preprocessing_seconds,
                 "network": network_seconds,
-                "decoding_export": decoding_seconds,
+                "decoding_unprojection": decoding_seconds,
+                "export": export_seconds,
+                "total": total_seconds,
             },
         }
     return cases, load_seconds, int(torch.cuda.max_memory_allocated())
@@ -181,7 +333,6 @@ def _da3_cases(manifest: dict[str, Any], input_root: Path, output_root: Path, mo
     import torch
 
     from depth_anything_3.api import DepthAnything3
-    from surflo.utils.geometry import depths_to_points_parallel
 
     started = time.perf_counter()
     model = DepthAnything3.from_pretrained(str(model_path)).to("cuda").eval()
@@ -190,28 +341,46 @@ def _da3_cases(manifest: dict[str, Any], input_root: Path, output_root: Path, mo
     torch.cuda.reset_peak_memory_stats()
     cases: dict[str, Any] = {}
     for case in manifest["cases"]:
+        case_started = time.perf_counter()
         image_paths = [str(input_root / path) for path in case["image_paths"]]
-        torch.cuda.synchronize()
-        network_started = time.perf_counter()
-        prediction = model.inference(
+        preprocessing_started = time.perf_counter()
+        imgs_cpu, extrinsics_input, intrinsics_input = model._preprocess_inputs(
             image_paths,
-            process_res=504,
-            process_res_method="upper_bound_resize",
-            ref_view_strategy="first",
-            use_ray_pose=False,
+            None,
+            None,
+            504,
+            "upper_bound_resize",
+        )
+        images, extrinsics_tensor, intrinsics_tensor = model._prepare_model_inputs(
+            imgs_cpu, extrinsics_input, intrinsics_input
+        )
+        normalized_extrinsics = model._normalize_extrinsics(
+            extrinsics_tensor.clone() if extrinsics_tensor is not None else None
+        )
+        torch.cuda.synchronize()
+        preprocessing_seconds = time.perf_counter() - preprocessing_started
+        network_started = time.perf_counter()
+        raw_output = model._run_model_forward(
+            images,
+            normalized_extrinsics,
+            intrinsics_tensor,
+            [],
+            False,
+            False,
+            "first",
         )
         torch.cuda.synchronize()
         network_seconds = time.perf_counter() - network_started
         decode_started = time.perf_counter()
+        prediction = model._convert_to_prediction(raw_output)
+        prediction = model._align_to_input_extrinsics_intrinsics(
+            extrinsics_input, intrinsics_input, prediction, True
+        )
+        prediction = model._add_processed_images(prediction, imgs_cpu)
         depth = np.asarray(prediction.depth, dtype=np.float32)
         extrinsics_array = _canonical_extrinsics(prediction.extrinsics)
         intrinsics_array = np.asarray(prediction.intrinsics, dtype=np.float32)
-        depth_tensor = torch.from_numpy(depth).cuda()
-        extrinsics_tensor = torch.from_numpy(extrinsics_array[:, :3]).cuda()
-        intrinsics_tensor = torch.from_numpy(intrinsics_array).cuda()
-        pointmap_depth = depths_to_points_parallel(
-            intrinsics_tensor, extrinsics_tensor, depth_tensor, to_world=True
-        ).float().cpu().numpy()
+        pointmap_depth = _unproject_depth(depth, intrinsics_array, extrinsics_array)
         confidence = (
             np.asarray(prediction.conf, dtype=np.float32)
             if prediction.conf is not None
@@ -220,6 +389,7 @@ def _da3_cases(manifest: dict[str, Any], input_root: Path, output_root: Path, mo
         decoding_seconds = time.perf_counter() - decode_started
         archive = f"{DA3_METHOD.replace('/', '-')}-{case['id']}.npz"
         checks = _geometry_checks(depth, pointmap_depth, extrinsics_array, intrinsics_array)
+        export_started = time.perf_counter()
         _save_archive(
             output_root / archive,
             confidence=confidence,
@@ -228,30 +398,84 @@ def _da3_cases(manifest: dict[str, Any], input_root: Path, output_root: Path, mo
             intrinsics_px=intrinsics_array,
             pointmap_depth=pointmap_depth.astype(np.float32),
         )
+        export_seconds = time.perf_counter() - export_started
+        total_seconds = time.perf_counter() - case_started
         cases[case["id"]] = {
             "archive": archive,
             "frame_ids": case["frame_ids"],
             "original_size_hw": manifest["original_size_hw"],
             "processed_size_hw": list(depth.shape[-2:]),
             "preprocessing": "504px upper-bound aspect-preserving resize; dimensions rounded to patch multiple",
+            "inputs": _input_contract(
+                case,
+                manifest,
+                depth.shape[-2:],
+                geometric_transform="504px upper-bound aspect-preserving resize with patch-multiple dimensions",
+                normalization="ImageNet RGB mean=[0.485,0.456,0.406], std=[0.229,0.224,0.225]",
+            ),
             "reference_view_index": 0,
             "optimization": "none",
             "camera_convention": "OpenCV world-to-camera",
             "depth_semantics": "camera-z relative scale",
             "canonical_pointmap": "depth unprojection",
+            "pixel_coordinate_origin": "half-integer pixel centers",
             "direct_pointmap_present": False,
             "tracks_present": False,
+            "confidence": {
+                "raw_head": "prediction.conf",
+                "shape": list(confidence.shape),
+                "domain": "raw model confidence; not cross-model calibrated",
+                "threshold": None,
+            },
+            "validity": _validity(depth, pointmap_depth, confidence),
+            "gauge": {
+                "reference": "learned shared world frame with fixed first-image reference selection",
+                "metric_scale": False,
+                "alignment_applied": "none",
+                "optimization": "none",
+            },
             "checks": checks,
             "runtime_seconds": {
-                "preprocessing_and_network": network_seconds,
-                "decoding_export": decoding_seconds,
+                "preprocessing": preprocessing_seconds,
+                "network": network_seconds,
+                "decoding_unprojection": decoding_seconds,
+                "export": export_seconds,
+                "total": total_seconds,
             },
         }
     return cases, load_seconds, int(torch.cuda.max_memory_allocated())
 
 
+def _loaded_module_files() -> list[dict[str, Any]]:
+    records = []
+    seen = set()
+    for module in sys.modules.values():
+        value = getattr(module, "__file__", None)
+        if not value:
+            continue
+        path = Path(value)
+        try:
+            resolved = path.resolve(strict=True)
+        except (FileNotFoundError, OSError):
+            continue
+        key = str(resolved)
+        if key in seen or not resolved.is_file():
+            continue
+        seen.add(key)
+        records.append(
+            {
+                "path": key,
+                "byte_size": resolved.stat().st_size,
+                "sha256": _sha256(resolved),
+            }
+        )
+    return sorted(records, key=lambda item: item["path"])
+
+
 def main() -> int:
     args = _parser().parse_args()
+    sys.path.insert(0, str(args.da3_source / "src"))
+    sys.path.insert(0, str(args.vggt_source))
     import numpy as np
     import torch
     import torchvision
@@ -260,6 +484,15 @@ def main() -> int:
         raise FileExistsError(f"output directory is not empty: {args.output}")
     args.output.mkdir(parents=True, exist_ok=True)
     manifest = json.loads((args.input / "manifest.json").read_text())
+    lock = json.loads(args.model_lock.read_text())
+    environment_lock = lock["environment"]
+    environment_manifest = json.loads(args.environment_manifest.read_text())
+    if (
+        environment_manifest["tree_sha256"] != environment_lock["tree_sha256"]
+        or environment_manifest["file_count"] != environment_lock["file_count"]
+        or environment_manifest["byte_size"] != environment_lock["byte_size"]
+    ):
+        raise ValueError("foundation environment manifest does not match its lock")
     torch.manual_seed(260925)
     np.random.seed(260925)
     torch.backends.cudnn.benchmark = False
@@ -272,12 +505,31 @@ def main() -> int:
         manifest, args.input, args.output, args.da3_model
     )
     torch.cuda.synchronize()
+    nvcc = subprocess.run(
+        ["nvcc", "--version"], text=True, capture_output=True, check=False
+    )
+    source_contracts = {
+        VGGT_METHOD: {
+            "repository": lock["models"]["vggt"]["source_repository"],
+            "commit": lock["models"]["vggt"]["source_commit"],
+            "license": lock["models"]["vggt"]["source_license"],
+            "tree_sha256": lock["models"]["vggt"]["source_archive"]["tree_sha256"],
+        },
+        DA3_METHOD: {
+            "repository": lock["models"]["depth-anything-3"]["source_repository"],
+            "commit": lock["models"]["depth-anything-3"]["source_commit"],
+            "license": lock["models"]["depth-anything-3"]["source_license"],
+            "tree_sha256": lock["models"]["depth-anything-3"]["source_tree_sha256"],
+        },
+    }
     result = {
-        "schema_version": 1,
+        "schema_version": 2,
         "network_mode": "offline",
         "methods": {
             VGGT_METHOD: {
                 "source_commit": VGGT_SOURCE_COMMIT,
+                "source": source_contracts[VGGT_METHOD],
+                "checkpoint": _checkpoint_contract(lock["models"]["vggt"]),
                 "checkpoint_path": str(args.vggt_model),
                 "load_seconds": vggt_load,
                 "peak_gpu_memory_bytes": vggt_peak,
@@ -285,6 +537,10 @@ def main() -> int:
             },
             DA3_METHOD: {
                 "source_commit": DA3_SOURCE_COMMIT,
+                "source": source_contracts[DA3_METHOD],
+                "checkpoint": _checkpoint_contract(
+                    lock["models"]["depth-anything-3"]
+                ),
                 "checkpoint_path": str(args.da3_model),
                 "load_seconds": da3_load,
                 "peak_gpu_memory_bytes": da3_peak,
@@ -302,7 +558,28 @@ def main() -> int:
             "cudnn_benchmark": torch.backends.cudnn.benchmark,
             "tf32": torch.backends.cuda.matmul.allow_tf32,
             "dtype": "bfloat16 autocast where supported by model",
+            "numpy": np.__version__,
+            "attention_backend": {
+                "selection": "PyTorch scaled-dot-product attention automatic backend; xformers absent",
+                "flash_sdp_enabled": torch.backends.cuda.flash_sdp_enabled(),
+                "memory_efficient_sdp_enabled": torch.backends.cuda.mem_efficient_sdp_enabled(),
+                "math_sdp_enabled": torch.backends.cuda.math_sdp_enabled(),
+            },
+            "cuda_compiler": nvcc.stdout.strip() if nvcc.returncode == 0 else "unavailable",
             "total_seconds": time.perf_counter() - total_started,
+        },
+        "environment": {
+            "tree_sha256": environment_manifest["tree_sha256"],
+            "file_count": environment_manifest["file_count"],
+            "byte_size": environment_manifest["byte_size"],
+            "manifest_sha256": _sha256(args.environment_manifest),
+            "distributions": environment_manifest["distributions"],
+            "native_binaries": environment_manifest["native_binaries"],
+            "python_executable": {
+                "path": sys.executable,
+                "sha256": _sha256(Path(sys.executable).resolve()),
+            },
+            "loaded_module_files": _loaded_module_files(),
         },
     }
     (args.output / "inference-manifest.json").write_text(

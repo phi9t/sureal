@@ -16,3 +16,4 @@ command -v "${ENGINE}" >/dev/null 2>&1 || {
 "${ENGINE}" build --network host --tag surflo-pathway-implicit-surface:1 "${HERE}/implicit-surface"
 "${ENGINE}" build --network host --tag surflo-pathway-radiance-field:1 "${HERE}/radiance-field"
 "${ENGINE}" build --network host --tag surflo-pathway-gaussian-splatting:1 --file "${HERE}/gaussian-splatting/Dockerfile" "${HERE}"
+SURFLO_PATHWAY_CONTAINER_ENGINE="${ENGINE}" "${HERE}/../../insula-scout/build.sh"

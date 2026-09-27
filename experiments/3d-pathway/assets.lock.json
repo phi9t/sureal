@@ -31,7 +31,7 @@
     },
     {
       "id": "foundation-geometry-models", "mode": "huggingface_snapshot", "license": "mixed: VGGT-1B CC-BY-NC-4.0; DA3-BASE Apache-2.0",
-      "source": "foundation-models.lock.json", "sha256": "44d67ac99b136f9a4eb8b79006896401ec4606e93e0658a8e19c2193868a45be",
+      "source": "foundation-models.lock.json", "sha256": "9997d1eafcedbd9f3691710b31c854bab52d4c4ec7f3cc841ab4f07c45121c26",
       "digest_status": "verified_2026-09-27", "consumers": ["foundation-geometry-reference"]
     },
     {

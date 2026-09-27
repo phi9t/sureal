@@ -132,17 +132,23 @@
       "modules": ["12"],
       "status": "landed",
       "acceptance": {
-        "smoke": {"evaluated_cases_min": 4, "foreground_valid_fraction_min": 0.99, "relative_pose_auc_30_min": 0.50, "sim3_center_rmse_m_max": 0.50, "sim3_depth_abs_rel_max": 0.50, "sim3_point_rmse_m_max": 1.0, "roundtrip_max_px": 0.001},
-        "full": {"evaluated_cases_min": 5, "foreground_valid_fraction_min": 0.99, "relative_pose_auc_30_min": 0.50, "sim3_center_rmse_m_max": 0.50, "sim3_depth_abs_rel_max": 0.50, "sim3_point_rmse_m_max": 1.0, "roundtrip_max_px": 0.001}
+        "smoke": {"evaluated_cases_min": 6, "foreground_valid_fraction_min": 0.99, "relative_pose_auc_30_min": 0.50, "sim3_center_rmse_m_max": 0.50, "sim3_depth_abs_rel_max": 0.50, "sim3_point_rmse_m_max": 1.0, "observed_surface_fscore_min": 0.01, "unseen_surface_recall_max": 0.05, "roundtrip_max_px": 0.001},
+        "full": {"evaluated_cases_min": 10, "foreground_valid_fraction_min": 0.99, "relative_pose_auc_30_min": 0.50, "sim3_center_rmse_m_max": 0.50, "sim3_depth_abs_rel_max": 0.50, "sim3_point_rmse_m_max": 1.0, "observed_surface_fscore_min": 0.01, "unseen_surface_recall_max": 0.05, "roundtrip_max_px": 0.001}
       },
       "baseline_environment": {"container_image_id": "sha256:3006bcf0e893dd3f6a713a5552894e3a6059f74e7da4720cef46f7d1a7d45640", "gpu_model": "NVIDIA B200", "compute_capability": 10.0, "driver_version": "580.105.08", "torch": "2.9.1+cu130", "torchvision": "0.24.1+cu130"},
       "model_contract": {
         "methods": ["vggt/direct", "da3-base/camera-head"],
+        "vggt_source_commit": "a288dd0f14786c93483e45524328726ab7b1b4ce",
+        "vggt_source_license": "VGGT-License-and-Acceptable-Use-Policy",
+        "vggt_source_tree_sha256": "ec486998bbcb868e77d586c86fe6d2bbe625ef596e897f74ea23e4df312797c0",
         "vggt_checkpoint_revision": "860abec7937da0a4c03c41d3c269c366e82abdf9",
         "vggt_checkpoint_sha256": "f164acf60724910d8fe1578bb499d800850c7bb0948db7555c413f9fbe60467e",
         "da3_source_commit": "3d835ec1a5802d64a8b8b15f817a1ab54809bfe4",
+        "da3_source_license": "Apache-2.0",
+        "da3_source_tree_sha256": "81d2a462f061af0ed2d8b889a0a1124fae1dde9410bcfb2df3bffb28fa07b4f5",
         "da3_base_checkpoint_revision": "f4a6c9b3c95e41c82048423d3493a81ec3fa810e",
         "da3_base_checkpoint_sha256": "e01067dc1659613083d9145a9a2547ccdbe6ccbbf83c4fe7b3e8a4e2bdae78b5",
+        "environment_tree_sha256": "65d28a33fc92aa93a3c6cb6923ddf8cbe3daef1ec25b20bcf1bd5844a008d86c",
         "inference": "amortized-feed-forward",
         "optimization": "none",
         "canonical_geometry": "depth unprojected through predicted cameras",
@@ -151,14 +157,16 @@
       },
       "evaluation_contract": {
         "evidence": "ordered unposed RGB only",
-        "alignment_rows": ["raw", "se3", "sim3"],
-        "smoke_cases": ["views-2-high-overlap", "views-2-low-overlap", "views-3", "views-5"],
-        "full_cases": ["views-2-high-overlap", "views-2-low-overlap", "views-3", "views-5", "views-9"],
+        "alignment_rows": ["raw", "pose-constrained-se3", "pose-constrained-sim3"],
+        "smoke_cases": ["views-1-monocular", "views-2-high-overlap", "views-2-low-overlap", "views-3", "views-5", "views-5-permuted"],
+        "full_cases": ["views-1-monocular", "views-2", "views-4", "views-8", "views-16", "views-2-high-overlap", "views-2-medium-overlap", "views-2-low-overlap", "views-2-disconnected", "views-8-permuted"],
+        "surface_slices": ["ground-truth-observed", "ground-truth-unseen"],
+        "point_metrics": ["correspondence-error", "bidirectional-accuracy", "bidirectional-completeness", "chamfer-l1", "precision", "recall", "fscore"],
         "hidden_surface_completion": "unsupported"
       },
-      "last_verified_smoke": {"date": "2026-09-27", "run_id": "module12-smoke-landed-20260927", "vggt_pose_auc_30": 0.9082544904019108, "vggt_sim3_center_rmse_m": 0.036052952825236545, "vggt_sim3_depth_abs_rel": 0.009356472052200094, "vggt_sim3_point_rmse_m": 0.16546558603991482, "vggt_point_fscore_10cm": 0.269775390625, "da3_pose_auc_30": 0.8167179499161327, "da3_sim3_center_rmse_m": 0.06411070077723126, "da3_sim3_depth_abs_rel": 0.027534110514058997, "da3_sim3_point_rmse_m": 0.3060548101949181, "da3_point_fscore_10cm": 0.03955078125},
-      "last_verified_full": {"date": "2026-09-27", "run_id": "module12-full-landed-20260927", "vggt_pose_auc_30": 0.9185010114984006, "vggt_sim3_center_rmse_m": 0.03540170026885925, "vggt_sim3_depth_abs_rel": 0.009535053705057842, "vggt_sim3_point_rmse_m": 0.16294159611424353, "vggt_point_fscore_5cm": 0.07763671875, "da3_pose_auc_30": 0.8431158334641655, "da3_sim3_center_rmse_m": 0.060345915445083456, "da3_sim3_depth_abs_rel": 0.028594810103404315, "da3_sim3_point_rmse_m": 0.29656370211582106, "da3_point_fscore_5cm": 0.00048828125},
-      "measurement_note": "Both methods receive only unposed RGB. Raw, rigid, and similarity-aligned metrics are reported separately; evaluator alignment is not model optimization. VGGT's direct point head and queried tracks remain separate from its canonical depth-unprojected pointmap. DA3-BASE supplies cameras, depth, confidence, and unprojected points but no direct point or track head. Neither method emits a hidden-surface completion or a sampled complete scene."
+      "last_verified_smoke": {"date": "2026-09-27", "run_id": "module12-smoke-final-reviewed-20260927", "vggt_pose_auc_30": 0.9103726634397172, "vggt_sim3_center_rmse_m": 0.03651982767887031, "vggt_sim3_depth_abs_rel": 0.009008088415061306, "vggt_sim3_point_rmse_m": 0.16125408762035287, "vggt_observed_point_fscore_10cm": 0.4130726809954751, "vggt_unseen_surface_recall_10cm": 0.0, "da3_pose_auc_30": 0.8167179499161327, "da3_sim3_center_rmse_m": 0.06491238579525883, "da3_sim3_depth_abs_rel": 0.02755266968720624, "da3_sim3_point_rmse_m": 0.297157842109795, "da3_observed_point_fscore_10cm": 0.30224747177798683, "da3_unseen_surface_recall_10cm": 0.0},
+      "last_verified_full": {"date": "2026-09-27", "run_id": "module12-full-final-reviewed-20260927", "vggt_pose_auc_30": 0.8677392120114166, "vggt_sim3_center_rmse_m": 0.08482442764449614, "vggt_sim3_depth_abs_rel": 0.013410340034596398, "vggt_sim3_point_rmse_m": 0.20490864116649676, "vggt_observed_point_fscore_5cm": 0.14912805079155672, "vggt_unseen_surface_recall_5cm": 0.0, "da3_pose_auc_30": 0.7121709468993523, "da3_sim3_center_rmse_m": 0.16018973696319286, "da3_sim3_depth_abs_rel": 0.01943698144868928, "da3_sim3_point_rmse_m": 0.3940919563252543, "da3_observed_point_fscore_5cm": 0.08354515550239235, "da3_unseen_surface_recall_5cm": 0.0},
+      "measurement_note": "Both methods receive only unposed RGB. Raw, pose-constrained rigid, and pose-constrained similarity metrics are reported separately; evaluator alignment is not model optimization. Correspondence hit rate is not called F-score: bidirectional point precision/recall and their harmonic F1 are reported separately on ground-truth observed surfaces, while the unseen slice measures unsupported reach. VGGT's direct point head and queried tracks remain separate from its canonical depth-unprojected pointmap. DA3-BASE supplies cameras, depth, confidence, and unprojected points but no direct point or track head. Neither method emits a hidden-surface completion or a sampled complete scene."
     }
   ]
 }

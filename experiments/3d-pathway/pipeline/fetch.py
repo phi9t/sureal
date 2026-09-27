@@ -22,7 +22,7 @@ from contracts import ROOT, load_json, sha256_file
 
 def huggingface_snapshot_commands(lock: dict[str, object]) -> list[list[str]]:
     models = lock.get("models")
-    if lock.get("schema_version") != 1 or not isinstance(models, dict):
+    if lock.get("schema_version") != 2 or not isinstance(models, dict):
         raise ValueError("foundation model lock is malformed")
     commands = []
     for model_id in ("vggt", "depth-anything-3"):
@@ -45,7 +45,7 @@ def huggingface_snapshot_commands(lock: dict[str, object]) -> list[list[str]]:
     return commands
 
 
-def fetch_foundation_models() -> None:
+def fetch_foundation_models(pathway_cache_root: Path) -> None:
     lock = load_json(ROOT / "foundation-models.lock.json")
     launcher = ROOT.parent / "insula-scout/enter.sh"
     for command in huggingface_snapshot_commands(lock):
@@ -64,6 +64,31 @@ def fetch_foundation_models() -> None:
                 raise ValueError(f"fetched model byte-size mismatch: {model_id}/{filename}")
             if sha256_file(path) != expected["sha256"]:
                 raise ValueError(f"fetched model hash mismatch: {model_id}/{filename}")
+    source = lock["models"]["vggt"]["source_archive"]
+    source_asset = {
+        "id": source["id"],
+        "source": source["url"],
+        "sha256": source["sha256"],
+        "extraction": {"mode": "tar", "root": source["root"]},
+    }
+    destination = pathway_cache_root / "assets"
+    destination.mkdir(parents=True, exist_ok=True)
+    archive = destination / f"{source['id']}.archive"
+    if not archive.is_file() or sha256_file(archive) != source["sha256"]:
+        candidate = download_candidate(source_asset, destination)
+        if candidate.stat().st_size != source["byte_size"]:
+            raise ValueError("VGGT source archive byte-size mismatch")
+        promote_candidate(candidate, archive, source["sha256"], source["id"])
+    extracted = extract_locked_asset(source_asset, archive, destination)
+    manifest = load_json(destination / f"{source['id']}.extraction.json")
+    if (
+        manifest.get("tree_sha256") != source["tree_sha256"]
+        or manifest.get("file_count") != source["tree_file_count"]
+        or sum(item["size"] for item in manifest.get("files", []))
+        != source["tree_byte_size"]
+        or extracted.name != source["id"]
+    ):
+        raise ValueError("VGGT source extraction does not match its lock")
 
 
 def _write_json_atomic(path: Path, value: object) -> None:
@@ -278,7 +303,7 @@ def main() -> int:
             if asset["id"] not in requested:
                 continue
             try:
-                fetch_foundation_models()
+                fetch_foundation_models(args.cache_root)
             except Exception as error:
                 failures.append(f"{asset['id']}: {error}")
             continue

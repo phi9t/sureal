@@ -1,13 +1,32 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "environment": {
+    "cache_path": "venv",
+    "tree_sha256": "65d28a33fc92aa93a3c6cb6923ddf8cbe3daef1ec25b20bcf1bd5844a008d86c",
+    "file_count": 40069,
+    "byte_size": 6810610151,
+    "exclusions": ["__pycache__", "*.pyc"]
+  },
   "models": {
     "vggt": {
       "repository": "facebook/VGGT-1B",
       "revision": "860abec7937da0a4c03c41d3c269c366e82abdf9",
-      "upstream_source_commit": "a288dd0f14786c93483e45524328726ab7b1b4ce",
+      "source_repository": "facebookresearch/vggt",
+      "source_commit": "a288dd0f14786c93483e45524328726ab7b1b4ce",
+      "source_license": "VGGT-License-and-Acceptable-Use-Policy",
+      "source_archive": {
+        "id": "vggt-source-a288dd0f",
+        "url": "https://github.com/facebookresearch/vggt/archive/a288dd0f14786c93483e45524328726ab7b1b4ce.tar.gz",
+        "sha256": "df4e7de1184bcb28ad6b4a83ead828f34ba42fb18be03c034801ffeb3a058f91",
+        "byte_size": 65030689,
+        "root": "vggt-a288dd0f14786c93483e45524328726ab7b1b4ce",
+        "tree_sha256": "ec486998bbcb868e77d586c86fe6d2bbe625ef596e897f74ea23e4df312797c0",
+        "tree_file_count": 171,
+        "tree_byte_size": 66006555
+      },
       "license": "CC-BY-NC-4.0",
       "cache_path": "huggingface/hub/models--facebook--VGGT-1B",
-      "vendored_source_files": {
+      "legacy_vendored_source_files_not_executed": {
         "surflo/nn/vggt/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "surflo/nn/vggt/heads/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "surflo/nn/vggt/heads/camera_head.py": "1a2777b7d6e53dce1c8dab0420cf2af524cf47735056e939b64cdea83c30398e",
@@ -57,6 +76,10 @@
       "license": "Apache-2.0",
       "source_repository": "ByteDance-Seed/Depth-Anything-3",
       "source_commit": "3d835ec1a5802d64a8b8b15f817a1ab54809bfe4",
+      "source_license": "Apache-2.0",
+      "source_tree_sha256": "81d2a462f061af0ed2d8b889a0a1124fae1dde9410bcfb2df3bffb28fa07b4f5",
+      "source_tree_file_count": 133,
+      "source_tree_byte_size": 25008449,
       "cache_path": "huggingface/hub/models--depth-anything--DA3-BASE",
       "files": {
         "config.json": {

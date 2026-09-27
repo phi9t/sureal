@@ -1212,6 +1212,9 @@ scores. It is an observability lesson, not a reproduced leaderboard.
 The maintained comparison is separate and checkpoint-backed:
 
 ```bash
+# Networked build. This also prepares the reused Surflo B200 Insula and venv.
+experiments/3d-pathway/run.sh build
+
 # Networked, explicit, and hash verified. Restricted weights are not committed.
 experiments/3d-pathway/run.sh fetch --asset foundation-geometry-models
 
@@ -1224,8 +1227,9 @@ experiments/3d-pathway/run.sh reference --adapter foundation-geometry \
 
 It runs two precisely named direct modes from unposed RGB only:
 
-- `vggt/direct` uses the original VGGT-1B checkpoint, the repo's file-hashed
-  vendored implementation, 518-pixel preprocessing, predicted cameras and
+- `vggt/direct` uses the original VGGT-1B checkpoint and the exact upstream
+  `a288dd0…` source archive, both independently byte-locked. It uses official
+  518-pixel preprocessing, predicted cameras and
   camera-z depth, depth unprojection as the canonical pointmap, the untouched
   direct point head as a second result, and 16 queried tracks. The checkpoint
   is CC BY-NC 4.0; this scientific reference is not permission for commercial
@@ -1237,22 +1241,43 @@ It runs two precisely named direct modes from unposed RGB only:
 
 Raw, SE(3), and Sim(3) rows remain separate. Alignment is performed by the
 evaluator after the feed-forward pass and is never relabelled as model
-optimization. The overlap/view sweep uses two high-overlap views, two
-low-overlap views, three views, five views, and—in the full profile—nine views.
+optimization. Camera orientation fixes the global rotation before fitting
+rigid or similarity translation/scale, so two-view alignment has no arbitrary
+rotation about its baseline. Monocular scale uses declared visible-point
+correspondences and is labelled evaluator-only.
+
+The smoke sweep covers native one-view inference, high/low-overlap pairs,
+three/five views, and a five-view permutation. The full sweep uses fixed nested
+1/2/4/8/16-view subsets, high/medium/low/disconnected pairs, and an eight-view
+permutation. Every case evaluates ground-truth observed and unseen surface
+slices defined from the selected cameras, not model confidence.
 Ground-truth cameras, masks, depths, and surfaces live outside the container's
 RGB-only input mount. Bundle adjustment, global alignment, metric scale,
 watertight surfaces, hidden completion, and posterior scene sampling remain
 explicitly unsupported.
 
+Corresponding-pixel threshold accuracy is not called F-score. Point-cloud
+precision and completeness use bidirectional nearest-neighbor distances, and
+their harmonic mean is reported as F1 at the declared metric and
+scene-normalized thresholds. Confidence/coverage curves, direct-point
+reprojection diagnostics, per-stage cold-load/preprocess/network/decode/export
+timings, validity counts, source/checkpoint metadata, and the complete resolved
+environment/native-binary manifest are retained in the run artifacts.
+
 On the locked NVIDIA B200 environment, smoke (five-view primary case) measured
-VGGT pose AUC@30 0.908, Sim(3) camera RMSE 0.036 m, scaled depth AbsRel 0.0094,
-and corresponding visible-point RMSE 0.165 m; DA3-BASE measured 0.817, 0.064 m,
-0.0275, and 0.306 m. Full (nine views) measured 0.919/0.035 m/0.0095/0.163 m
-for VGGT and 0.843/0.060 m/0.0286/0.297 m for DA3-BASE. End-to-end runtime was
-34.8 s smoke and 45.8 s full, with measured peak compute memory 12.60 GB and
-15.36 GB. These are one controlled-scene reproduction's integrity baselines,
-not paper-table results or a general ranking. Exact source, checkpoint,
-licence, preprocessing, and protocol evidence is recorded in
+VGGT pose AUC@30 0.910, Sim(3) camera RMSE 0.0365 m, scaled depth AbsRel 0.0090,
+corresponding-point RMSE 0.161 m, and true observed-surface F1 0.413 at 10 cm;
+DA3-BASE measured 0.817, 0.0649 m, 0.0276, 0.297 m, and 0.302. Full
+(16-view primary case) measured 0.868/0.0848 m/0.0134/0.205 m/0.149 at 5 cm
+for VGGT and 0.712/0.160 m/0.0194/0.394 m/0.0835 for DA3-BASE. Both unseen
+surface recalls were zero at the declared thresholds. Primary-case totals were
+2.56/1.72 s smoke and 7.43/4.14 s full for VGGT/DA3; all inference cases took
+11.44/5.82 s and 25.69/13.11 s, respectively. End-to-end runtime, including
+source/environment hashing, scene generation, evaluation, sealing, and report
+creation, was 47.6 s smoke and 89.0 s full. Measured peak compute memory was
+12.25 GB and 14.04 GB. These are one controlled-scene reproduction's integrity
+baselines, not paper-table results or a general ranking. Exact source,
+checkpoint, licence, preprocessing, environment, and protocol evidence is recorded in
 `experiments/3d-pathway/research/module12-reference-selection.md`.
 
 ### Transition

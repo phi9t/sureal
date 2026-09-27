@@ -58,13 +58,19 @@ python3 experiments/3d-pathway/pipeline/audit.py --online
 ```
 
 The Module 12 reference reuses the Surflo B200 Insula and its persistent model
-cache. `run.sh fetch --asset foundation-geometry-models` resolves only the
-immutable VGGT-1B and DA3-BASE revisions in `foundation-models.lock.json`, then
-checks every config and weight byte. Execution mounts only ordered RGB and a
-case manifest into the network-disabled container; evaluator cameras, depths,
-masks, and analytic surface truth remain host-side. Raw, SE(3), and Sim(3)
-scores are retained separately. VGGT direct points/tracks are not conflated
-with depth-unprojected points, and DA3's missing direct-point/track heads are
+cache. `run.sh build` now prepares that Insula/rootfs/venv as well as the seven
+pathway images. `run.sh fetch --asset foundation-geometry-models` resolves the
+immutable VGGT-1B and DA3-BASE revisions plus the exact upstream VGGT source
+archive in `foundation-models.lock.json`, then checks every source, config, and
+weight byte. Preflight also rejects a dirty DA3 gitlink and verifies the full
+6.81 GB resolved venv tree against its lock. Execution mounts only ordered RGB,
+the non-secret execution contract, and read-only source/model caches into the
+network-disabled container; evaluator cameras, depths, masks, and analytic
+surface truth remain host-side. Raw, pose-constrained SE(3), and
+pose-constrained Sim(3) scores are retained separately. The full sweep covers
+nested 1/2/4/8/16 views, four overlap levels, order permutation, and observed
+versus unseen truth surfaces. VGGT direct points/tracks are not conflated with
+depth-unprojected points, and DA3's missing direct-point/track heads are
 reported as unsupported. The original VGGT-1B weights are CC BY-NC 4.0;
 DA3-BASE source and weights are Apache-2.0.
 

@@ -35,10 +35,12 @@ drop-in-equivalent result.
 The selected default is `vggt/direct`: one feed-forward pass followed only by
 deterministic pose decoding and depth unprojection.  VGGT's optional
 PyCOLMAP bundle adjustment, DUSt3R global alignment, and MASt3R sparse global
-alignment are retained as explicitly named `optimization=on` interventions.
-They must never be included in the direct runtime or accuracy result.  This
+alignment remain explicitly named `optimization=on` follow-on interventions,
+not implicit steps in this first direct-only adapter. They must receive
+separate adapter/result IDs before execution and must never be included in the
+direct runtime or accuracy result. This
 preserves Module 12's amortized-inference claim while making the curriculum's
-“alignment retained or removed” sweep executable
+“alignment retained or removed” distinction enforceable
 ([curriculum entry](../curriculum.json)).
 
 ## Status and scope
@@ -263,8 +265,8 @@ the original Giant, Large, and Nested checkpoints deprecated and recommend the
 refreshed versions.  Do not compare a mutable `depth-anything/DA3-LARGE` alias
 to a `-1.1` result without naming and hashing both artifacts.
 
-This repository has three provenance gaps that the Module 12 landing must
-close:
+The pre-landing audit found three provenance gaps that the Module 12 adapter
+had to close:
 
 1. `surflo/nn/vggt` is a locally modified vendored fork introduced at Surflo
    commit `85a6ec80a612c392efbc2c974b6a090b93cae28d`; imports and output plumbing
@@ -290,6 +292,18 @@ close:
    retroactively assigned to an unrecorded cache.  The scout's DA3 timing and
    metric are useful execution evidence but not a fully reproducible
    checkpoint result.
+
+The maintained adapter closes those execution gaps without claiming that the
+older scout did. `foundation-models.lock.json` selects the exact upstream VGGT
+archive at `a288dd0…` (archive SHA-256 `df4e7de…`, extracted-tree SHA-256
+`ec486998…`) rather than executing Surflo's vendored fork. It rejects a dirty
+DA3 checkout and verifies the complete tracked tree at `3d835ec…` (tree
+SHA-256 `81d2a462…`). It locks the selected VGGT-1B and DA3-BASE checkpoint
+bytes, and preflight hashes the complete resolved reused venv—40,069 records,
+6,810,610,151 bytes, tree SHA-256 `65d28a33…`—before the read-only offline
+container starts. The run record retains the complete file manifest,
+distribution versions, native binaries, loaded-module hashes, CUDA compiler,
+attention-backend flags, and model/source contracts.
 
 ## Runtime and B200 assessment
 
@@ -320,8 +334,10 @@ raw geometry completed in 2.693 seconds excluding model startup, reached 8.825
 GiB peak VRAM, normalized Chamfer 0.006064, and F1 0.8565.  DA3 completed in
 2.751 seconds, reached 9.685 GiB, normalized Chamfer 0.006527, and F1 0.8212
 ([machine-readable results](../../insula-scout/results.json)).
-This is one integration scout, not a benchmark aggregate; the DA3 weight
-revision gap and the scout-to-VGGT-lock linkage gap above remain.
+This is one integration scout, not a benchmark aggregate; its DA3 weight
+revision and scout-to-VGGT-lock gaps remain properties of that historical
+record. The maintained adapter is a new exact-pin run and does not relabel the
+scout.
 
 The same scout found that TSDF post-processing made both methods worse on that
 scene.  Therefore raw pointmaps and `+tsdf` are separate methods; TSDF may not
@@ -434,8 +450,9 @@ Land one deterministic factorial sweep spanning:
 - reference choice/order: fixed first image plus at least one permutation;
 - observed versus unseen evaluation surface, defined by ground-truth camera
   visibility rather than model confidence; and
-- direct versus retained optimization for every implementation that supports
-  both.
+- direct versus retained optimization for every result that declares an
+  optimization mode; this first direct-only adapter records supported optional
+  BA as `not-run` rather than fabricating or silently applying it.
 
 Report camera relative-pose AUC at declared angular thresholds, depth AbsRel
 and threshold accuracy both raw and with the declared scale/shift alignment,
@@ -490,8 +507,9 @@ The first maintained adapter is complete only when it:
 - executes the exact source and selected checkpoint bytes offline on B200;
 - emits the canonical camera/depth/two-pointmap/track-capability record and
   passes the geometry round-trip checks;
-- keeps feed-forward and BA/global-alignment artifacts, timing, and result IDs
-  separate;
+- keeps feed-forward and any separately landed BA/global-alignment artifacts,
+  timing, and result IDs separate; the direct-only result records BA as
+  `not-run`;
 - lands the overlap/view-count/unseen/alignment sweep with raw, SE(3), and
   Sim(3) metrics; and
 - records terms without embedding or redistributing restricted weights.
@@ -503,10 +521,19 @@ uncertainty, watertight reconstruction, hidden-surface completion, dynamic
 scene reconstruction, arbitrary camera models, universal order invariance,
 paper-table reproduction, or upstream-certified B200 support.
 
-Open gates remain: legal acceptance of the selected VGGT code/weight terms;
-exact provenance or replacement of Surflo's vendored VGGT fork; a byte lock for
-the DA3 checkpoint used by the existing scout; publisher clarification of the
-DA3-LARGE-1.1 licence conflict; and a fresh exact-pin B200 run for both selected
-VGGT and permissive-fallback DA3-BASE.  None requires changing the scientific
-selection, but each must be resolved before the corresponding execution is
-called reproducible.
+The executable selection's technical gates are closed by running the exact
+upstream VGGT pin, exact DA3 gitlink, selected checkpoint bytes, complete
+environment lock, and fresh B200 smoke/full profiles. Legal acceptance of the
+VGGT code/weight terms remains the deployer's responsibility. Publisher
+clarification of the DA3-LARGE-1.1 licence conflict remains open but does not
+affect the selected Apache-2.0 DA3-BASE checkpoint. The old scout remains
+historical path/toolchain evidence and is not retroactively called an
+exact-checkpoint reproduction.
+
+The sealed runs are `module12-smoke-final-reviewed-20260927` and
+`module12-full-final-reviewed-20260927`. The full profile executes fixed nested
+1/2/4/8/16-view subsets, high/medium/low/disconnected overlap pairs, and an
+eight-view permutation. Every case scores ground-truth observed and unseen
+surface slices. The 16-view primary case measured observed-surface F1 at 5 cm
+of 0.1491 for VGGT and 0.0835 for DA3-BASE; unseen recall was zero for both.
+These are controlled-fixture measurements, not a paper-table reproduction.
