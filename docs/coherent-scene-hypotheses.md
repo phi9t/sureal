@@ -19,6 +19,10 @@ below are **repository-recorded GPU measurements** and were not independently re
 for this assessment. The repository's CPU contracts and publication checks are
 separate from those recorded B200 runs.
 
+The photoreal summary's `measurement_date_utc=2026-09-25` identifies the
+original GPU measurement. Its schema-v2 migration preserves that date rather
+than presenting the derivation day as a new experiment.
+
 ## 1. Three layers, kept distinct
 
 | Layer | Main locations | Contribution |

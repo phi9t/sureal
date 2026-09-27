@@ -130,6 +130,14 @@ def validate_recipe(
     tracked = json.loads((root / evidence["tracked_results"]).read_text(encoding="utf-8"))
     if tracked.get("schema_version") != 2:
         raise RecipeError("derived results must use schema version 2")
+    measurement_date_utc = evidence.get("measurement_date_utc")
+    if (
+        not isinstance(measurement_date_utc, str)
+        or re.fullmatch(r"\d{4}-\d{2}-\d{2}", measurement_date_utc) is None
+        or tracked.get("measurement_date_utc") != measurement_date_utc
+        or "date_utc" in tracked
+    ):
+        raise RecipeError("tracked results measurement date does not match the recipe")
     if tracked.get("status") not in {"pending", "pass"}:
         raise RecipeError("tracked results status must be pending or pass")
     if _mapping(tracked, "comparison").get("analytic_baseline_behavior") != baseline_behavior:

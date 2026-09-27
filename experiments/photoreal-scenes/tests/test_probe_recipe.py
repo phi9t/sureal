@@ -209,11 +209,17 @@ class PhotorealRecipeTest(unittest.TestCase):
                 encoding="utf-8",
             )
             payload = summary.build_summary(
-                raw_path, manifest_path, validation_path, baseline_path
+                raw_path,
+                manifest_path,
+                validation_path,
+                baseline_path,
+                measurement_date_utc="2026-09-25",
             )
             expected_validation_sha = hashlib.sha256(validation_path.read_bytes()).hexdigest()
         self.assertEqual(payload["status"], "pass")
         self.assertEqual(payload["schema_version"], 2)
+        self.assertEqual(payload["measurement_date_utc"], "2026-09-25")
+        self.assertNotIn("date_utc", payload)
         self.assertTrue(payload["acceptance"]["valid_measurements"])
         self.assertEqual([run["seed"] for run in payload["runs"]], [0, 1, 2, 3])
         self.assertEqual(payload["runs"][0]["support_label"], "unsupported")

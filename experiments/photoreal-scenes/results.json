@@ -28,7 +28,6 @@
     "favorable_outcome_required": false,
     "photoreal_behavior": "no_supported_hidden_completion"
   },
-  "date_utc": "2026-09-27",
   "episode": {
     "device": "OPTIX",
     "manifest_sha256": "9df5874db09c15b08b708a7164531fea681a7897faf038944d359665067a92f8",
@@ -50,6 +49,7 @@
     }
   },
   "interpretation_guardrail": "The two ground-truth hidden scenes are observationally indistinguishable from the context. This probe measures completion support and coherence, not recovery of a uniquely correct hidden scene.",
+  "measurement_date_utc": "2026-09-25",
   "model_provenance": {
     "checkpoint_sha256": "55fddb5dcbb5d375ba8036ec959acd215ee8ffd89e173cdabe1199e034052662",
     "vggt": {

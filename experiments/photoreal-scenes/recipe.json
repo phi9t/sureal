@@ -37,7 +37,7 @@
       "run.sh",
       "verify_recipe.py"
     ],
-    "implementation_sha256": "1bc98a1bcb3ef7e4ef52ad67b6e12b2c01e6c0e043077c0287f30832c569f968"
+    "implementation_sha256": "e7f1fc9ead7a6b50074d0836c1a18b684af6e91f0eaec7516731dbce1847a7ef"
   },
   "executor": "run.sh",
   "renderer_insula": {
@@ -84,6 +84,7 @@
   ],
   "analytic_baseline": "../insula-scout/synthetic_results.json",
   "evidence": {
+    "measurement_date_utc": "2026-09-25",
     "tracked_results": "results.json",
     "episode_manifest_cache_path": "photoreal-scenes/episodes/phase-a-v1/manifest.json",
     "episode_validation_cache_path": "photoreal-scenes/episodes/phase-a-v1/validation.json",

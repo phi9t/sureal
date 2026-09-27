@@ -22,8 +22,8 @@
         "runtime_seconds": {"type": "number"},
         "peak_cpu_bytes": {"type": "integer"},
         "peak_gpu_bytes": {"type": "integer"},
-        "network_isolation": {"type": "string"},
-        "cpu_memory_scope": {"type": "string"}
+        "network_isolation": {"const": "python_socket_guard"},
+        "cpu_memory_scope": {"const": "process_lifetime_high_water_mark"}
       }
     },
     "provenance": {"type": "object"}

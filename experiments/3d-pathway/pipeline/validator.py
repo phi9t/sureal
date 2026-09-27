@@ -332,6 +332,19 @@ def validate_result(run_dir: Path, expected_module: str | None = None) -> dict[s
     if not result_path.is_file():
         raise ValueError(f"missing result: {result_path}")
     result = load_json(result_path)
+    resources = result.get("resources")
+    if isinstance(resources, dict) and (
+        (
+            "network_isolation" in resources
+            and resources["network_isolation"] != "python_socket_guard"
+        )
+        or (
+            "cpu_memory_scope" in resources
+            and resources["cpu_memory_scope"]
+            != "process_lifetime_high_water_mark"
+        )
+    ):
+        raise ValueError("fixture runtime contract mismatch")
     validate_json_schema_instance(result, load_json(ROOT / "result.schema.json"), "result")
     missing = REQUIRED_TOP_LEVEL - set(result)
     if missing:

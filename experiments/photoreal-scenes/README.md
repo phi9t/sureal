@@ -102,6 +102,10 @@ to the corresponding object table and no hidden ID occurs in context. Hidden
 target/target-only surface visibility is 73.1% for the sofa and 59.7% for the
 shelf, exceeding the 25% threshold.
 
+The tracked summary records `measurement_date_utc=2026-09-25`. That field dates
+the original GPU measurement; migrating or regenerating the derived summary
+must preserve it and must not substitute the derivation day.
+
 The four Surflo seeds completed at 100,000 queries and 100 ODE steps. All were
 support-classified `unsupported`; this is a valid finding, not a benchmark
 failure.
