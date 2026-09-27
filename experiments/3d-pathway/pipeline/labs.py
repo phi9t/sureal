@@ -788,31 +788,126 @@ def _gaussian_splatting_lab(
     }
 
 
+def _similarity_align(source: np.ndarray, target: np.ndarray) -> tuple[np.ndarray, float, np.ndarray, np.ndarray]:
+    """Least-squares similarity alignment from corresponding row-vector points."""
+    source_center = np.mean(source, axis=0)
+    target_center = np.mean(target, axis=0)
+    source_zero = source - source_center
+    target_zero = target - target_center
+    covariance = target_zero.T @ source_zero / len(source)
+    left, singular_values, right_transpose = np.linalg.svd(covariance)
+    handedness = np.ones(3)
+    handedness[-1] = np.sign(np.linalg.det(left @ right_transpose))
+    rotation = left @ np.diag(handedness) @ right_transpose
+    source_variance = float(np.mean(np.sum(source_zero * source_zero, axis=1)))
+    scale = float(np.sum(singular_values * handedness) / source_variance)
+    translation = target_center - scale * (rotation @ source_center)
+    aligned = scale * (source @ rotation.T) + translation
+    return aligned, scale, rotation, translation
+
+
 def _foundation_geometry_lab(artifacts: Path, profile: str, scene: dict[str, Any], profile_config: dict[str, Any]) -> dict[str, Any]:
-    model_rows = [
-        {"model": "DUSt3R", "pose_auc": 0.61, "depth_rmse_m": 0.091, "point_rmse_m": 0.112, "runtime_s": 0.82, "retained_alignment": True},
-        {"model": "MASt3R", "pose_auc": 0.69, "depth_rmse_m": 0.078, "point_rmse_m": 0.084, "runtime_s": 0.94, "retained_alignment": True},
-        {"model": "VGGT", "pose_auc": 0.77, "depth_rmse_m": 0.065, "point_rmse_m": 0.071, "runtime_s": 0.48, "retained_alignment": False},
-        {"model": "Depth Anything 3", "pose_auc": 0.81, "depth_rmse_m": 0.058, "point_rmse_m": 0.063, "runtime_s": 0.52, "retained_alignment": False},
-    ]
-    # Values are controlled-lab signals, not published benchmark reproduction.
-    comparison = {"measurement_kind": "controlled_fixture", "disclaimer": "Synthetic teaching signals; not checkpoint-backed benchmark measurements.", "systems": model_rows}
-    (artifacts / "model_comparison.json").write_text(__import__("json").dumps(comparison, indent=2) + "\n", encoding="utf-8")
+    point_count = max(64, int(profile_config["samples"]))
+    indices = np.arange(point_count, dtype=np.float64)
+    golden_angle = np.pi * (3.0 - np.sqrt(5.0))
+    z = 1.0 - 2.0 * (indices + 0.5) / point_count
+    radius_xy = np.sqrt(1.0 - z * z)
+    truth_surface = np.column_stack(
+        (radius_xy * np.cos(golden_angle * indices), radius_xy * np.sin(golden_angle * indices), z)
+    )
+    visible_support = truth_surface[:, 2] >= 0.0
+    truth_visible = truth_surface[visible_support]
+
+    angle = np.deg2rad(31.0)
+    rotation = np.array(
+        [
+            [np.cos(angle), -np.sin(angle), 0.0],
+            [np.sin(angle), np.cos(angle), 0.0],
+            [0.0, 0.0, 1.0],
+        ]
+    )
+    scale = 1.7
+    translation = np.array([0.42, -0.31, 0.24])
+    predicted_gauge = ((truth_visible - translation) @ rotation) / scale
+    aligned_visible, estimated_scale, estimated_rotation, estimated_translation = _similarity_align(
+        predicted_gauge, truth_visible
+    )
+    raw_rmse = float(
+        np.sqrt(np.mean(np.sum((predicted_gauge - truth_visible) ** 2, axis=1)))
+    )
+    aligned_rmse = float(
+        np.sqrt(np.mean(np.sum((aligned_visible - truth_visible) ** 2, axis=1)))
+    )
+
+    _write_npz_deterministic(
+        artifacts / "gauge_alignment.npz",
+        {
+            "aligned_visible_points_m": aligned_visible,
+            "estimated_rotation": estimated_rotation,
+            "estimated_scale": np.asarray(estimated_scale),
+            "estimated_translation_m": estimated_translation,
+            "predicted_gauge_points": predicted_gauge,
+            "truth_surface_points_m": truth_surface,
+            "truth_visible_points_m": truth_visible,
+            "truth_visible_support_mask": visible_support,
+        },
+    )
+    comparison = {
+        "schema_version": 1,
+        "measurement_kind": "analytic_teaching_fixture",
+        "evidence": "calibrated visible surface points",
+        "representation": "pointmap samples in an arbitrary similarity gauge",
+        "inference": "known similarity gauge transform",
+        "alignment_required": True,
+        "completion_claim": False,
+        "disclaimer": "This fixture demonstrates observability and alignment; checkpoint-backed model measurements belong to the maintained reference adapter.",
+    }
+    (artifacts / "model_comparison.json").write_text(
+        json.dumps(comparison, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+
     overlaps = np.linspace(0.1, 0.9, _steps(profile_config))
-    point_error = 0.15 * np.exp(-2.1 * overlaps) + 0.025
-    sweep = [{"parameter": "view_overlap", "value": float(value), "metric": "aligned_point_rmse_m", "measurement": float(error)} for value, error in zip(overlaps, point_error)]
+    rng = np.random.default_rng(260925)
+    point_error = []
+    sweep = []
+    for overlap in overlaps:
+        noise_std = 0.004 + 0.055 * (1.0 - overlap)
+        noisy = predicted_gauge + rng.normal(0.0, noise_std, predicted_gauge.shape)
+        aligned_noisy, _, _, _ = _similarity_align(noisy, truth_visible)
+        error = float(
+            np.sqrt(np.mean(np.sum((aligned_noisy - truth_visible) ** 2, axis=1)))
+        )
+        point_error.append(error)
+        sweep.append(
+            {
+                "parameter": "view_overlap",
+                "value": float(overlap),
+                "metric": "similarity_aligned_point_rmse_m",
+                "measurement": error,
+            }
+        )
     _write_sweep(artifacts / "failure_sweep.csv", sweep)
-    _write_chart(artifacts / "foundation_geometry.svg", "Amortized pointmaps improve with shared visible support", point_error.tolist(), "#2b8290")
+    _write_chart(
+        artifacts / "foundation_geometry.svg",
+        "Visible-point accuracy degrades as shared support shrinks",
+        point_error,
+        "#2b8290",
+    )
     return {
         "metrics": {
-            "geometry": {"raw_point_rmse_m": 0.184, "aligned_point_rmse_m": 0.063, "pose_auc": 0.81, "depth_rmse_m": 0.058, "hidden_surface_recall": 0.0},
+            "geometry": {
+                "raw_point_rmse_m": raw_rmse,
+                "similarity_aligned_point_rmse_m": aligned_rmse,
+                "visible_surface_recall": 1.0,
+                "hidden_surface_recall": 0.0,
+            },
             "rendering": {},
             "generative": {},
         },
         "failure_sweep": sweep,
         "observations": [
-            "Pointmaps and predicted cameras amortize visible geometry but do not observe occluded surfaces.",
-            "Some pipelines still retain global alignment or optimization stages; feed-forward does not always mean optimization-free.",
+            "A global similarity gauge can dominate raw point error even when the visible geometry is exact after alignment.",
+            "The pointmap contains only supported visible samples; the unobserved hemisphere has zero recall and is not a completion claim.",
         ],
     }
 

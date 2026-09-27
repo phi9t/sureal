@@ -15,6 +15,68 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LearnedAndRenderableLabContractTest(unittest.TestCase):
+    def test_module_12_teaches_gauge_alignment_without_invented_model_scores(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            cache = Path(temporary)
+            env = os.environ.copy()
+            env["SURFLO_PATHWAY_CACHE_ROOT"] = str(cache)
+            completed = subprocess.run(
+                [
+                    str(ROOT / "run.sh"),
+                    "run",
+                    "--module",
+                    "12",
+                    "--profile",
+                    "smoke",
+                    "--run-id",
+                    "foundation-geometry",
+                ],
+                cwd=ROOT.parent.parent,
+                env=env,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+
+            run_dir = cache / "runs" / "foundation-geometry" / "12"
+            result = json.loads((run_dir / "result.json").read_text())
+            comparison = json.loads(
+                (run_dir / "artifacts" / "model_comparison.json").read_text()
+            )
+            self.assertEqual(comparison["schema_version"], 1)
+            self.assertEqual(comparison["measurement_kind"], "analytic_teaching_fixture")
+            self.assertEqual(comparison["evidence"], "calibrated visible surface points")
+            self.assertEqual(comparison["inference"], "known similarity gauge transform")
+            self.assertTrue(comparison["alignment_required"])
+            self.assertFalse(comparison["completion_claim"])
+            self.assertNotIn("systems", comparison)
+
+            with np.load(run_dir / "artifacts" / "gauge_alignment.npz") as arrays:
+                truth = arrays["truth_visible_points_m"].astype(np.float64)
+                predicted = arrays["predicted_gauge_points"].astype(np.float64)
+                aligned = arrays["aligned_visible_points_m"].astype(np.float64)
+                full_surface = arrays["truth_surface_points_m"].astype(np.float64)
+                visible_support = arrays["truth_visible_support_mask"].astype(bool)
+
+            raw_rmse = float(np.sqrt(np.mean(np.sum((predicted - truth) ** 2, axis=1))))
+            aligned_rmse = float(np.sqrt(np.mean(np.sum((aligned - truth) ** 2, axis=1))))
+            geometry = result["metrics"]["geometry"]
+            self.assertAlmostEqual(geometry["raw_point_rmse_m"], raw_rmse, places=12)
+            self.assertAlmostEqual(
+                geometry["similarity_aligned_point_rmse_m"], aligned_rmse, places=12
+            )
+            self.assertGreater(raw_rmse, 0.1)
+            self.assertLess(aligned_rmse, 1e-10)
+            self.assertEqual(len(full_surface), len(visible_support))
+            self.assertTrue(np.any(visible_support))
+            self.assertTrue(np.any(~visible_support))
+            self.assertEqual(geometry["hidden_surface_recall"], 0.0)
+            self.assertEqual(
+                {row["parameter"] for row in result["failure_sweep"]},
+                {"view_overlap"},
+            )
+
     def test_module_11_metrics_are_recomputed_from_persisted_gaussian_outputs(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             cache = Path(temporary)
