@@ -129,6 +129,7 @@ Python tools are pinned to exact releases.
 | [build 1.6.1](https://pypi.org/project/build/1.6.1/) | `1.6.1` | MIT License |
 | [twine 7.0.0](https://pypi.org/project/twine/7.0.0/) | `7.0.0` | Apache License 2.0 |
 | [tomli 2.4.1](https://pypi.org/project/tomli/2.4.1/) | `2.4.1` | MIT License |
+| [NumPy 1.26.4](https://pypi.org/project/numpy/1.26.4/) | `1.26.4` | BSD 3-Clause License; used by the required CPU numerical-contract job |
 | [Gitleaks CLI](https://github.com/gitleaks/gitleaks) | `v8.30.1`, release archive SHA-256 `551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb` | MIT License; used for the local full-history release gate |
 
 The action EULA is retained upstream at the pinned revision. Its personal-

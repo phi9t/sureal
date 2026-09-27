@@ -599,6 +599,30 @@ class PublicationWorkflowTests(unittest.TestCase):
         self.assertNotIn("upload-artifact", lowered)
         self.assertNotIn("hf download", lowered)
 
+    def test_publication_workflow_runs_required_cpu_numerical_contracts(self) -> None:
+        workflow = self.workflow()
+        match = re.search(
+            r"(?ms)^  numerical-contracts:\n(?P<body>.*?)(?=^  [a-z0-9-]+:\n|\Z)",
+            workflow,
+        )
+
+        self.assertIsNotNone(match)
+        job = match.group("body") if match is not None else ""
+        for text in (
+            "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+            "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+            "fetch-depth: 0",
+            "submodules: recursive",
+            'python-version: "3.10"',
+            "numpy==1.26.4",
+            "PYTHONPATH=experiments/3d-pathway python -m unittest discover -s experiments/3d-pathway/tests -p 'test_*.py' -v",
+        ):
+            self.assertIn(text, job)
+        timeout = re.search(r"(?m)^    timeout-minutes: (\d+)$", job)
+        self.assertIsNotNone(timeout)
+        self.assertGreaterEqual(int(timeout.group(1)), 20)
+        self.assertNotIn("SURFLO_REQUIRE_", job)
+
     def test_real_repository_passes_publication_audit(self) -> None:
         report = publication_audit.audit_repository(REPOSITORY_ROOT)
 

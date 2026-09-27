@@ -32,10 +32,14 @@ the original Surflo project. The public repository is
 - [Surflo lineage](UPSTREAM.md) — upstream provenance and the compatibility
   boundary between inherited Surflo code and Sureal additions.
 
-Validation has three intentionally separate tiers:
+Validation has four intentionally separate tiers:
 
 - **Portable:** CPU-only publication, metadata, syntax, and offline source
   checks run by GitHub Actions and `python scripts/publication_audit.py --root .`.
+- **Numerical contracts:** the complete deterministic CPU pathway suite runs as
+  a required GitHub Actions job, covering concept fixtures, evaluator
+  recomputation, corruption rejection, and aggregate semantics. It does not run
+  the maintained GPU/container references.
 - **Smoke:** local/container numerical contracts and small adapter checks,
   dispatched with `experiments/3d-pathway/run.sh all --profile smoke`.
 - **Full B200:** hash-verified all-module experiments on the NVIDIA B200,
