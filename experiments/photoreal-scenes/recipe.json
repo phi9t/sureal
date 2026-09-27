@@ -37,7 +37,7 @@
       "run.sh",
       "verify_recipe.py"
     ],
-    "implementation_sha256": "6fc3d0fecdea2d0e46fa9981f19c4669220ed2184dc77afb6b055fe45c6b4a77"
+    "implementation_sha256": "1bc98a1bcb3ef7e4ef52ad67b6e12b2c01e6c0e043077c0287f30832c569f968"
   },
   "executor": "run.sh",
   "renderer_insula": {

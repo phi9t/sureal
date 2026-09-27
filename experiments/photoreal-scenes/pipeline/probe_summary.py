@@ -22,6 +22,8 @@ MEASUREMENTS = (
     "wall_seconds",
     "peak_vram_gib",
 )
+SUPPORT_THRESHOLD = 0.10
+HYBRID_MINORITY_RATIO = 0.60
 
 
 def _sha256(path: Path) -> str:
@@ -37,6 +39,16 @@ def _mapping(payload: dict[str, Any], key: str) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ValueError(f"{key} must be an object")
     return value
+
+
+def _support_label(support_a: float, support_b: float) -> str:
+    largest = max(support_a, support_b)
+    smallest = min(support_a, support_b)
+    if largest < SUPPORT_THRESHOLD:
+        return "unsupported"
+    if smallest / max(largest, 1e-12) >= HYBRID_MINORITY_RATIO:
+        return "hybrid"
+    return "scene_a" if support_a > support_b else "scene_b"
 
 
 def build_summary(
@@ -70,6 +82,7 @@ def build_summary(
         raise ValueError("probe must contain four runs")
 
     runs = []
+    support_labels = []
     for expected_seed, run in enumerate(raw_runs):
         if not isinstance(run, dict) or run.get("seed") != expected_seed:
             raise ValueError("probe runs must be ordered seeds 0,1,2,3")
@@ -77,20 +90,36 @@ def build_summary(
         if not all(math.isfinite(value) for value in values.values()):
             raise ValueError(f"probe seed {expected_seed} contains non-finite measurements")
         hypothesis = _mapping(run, "hypothesis")
-        label = hypothesis.get("label")
-        if label not in {"unsupported", "hybrid", "scene_a", "scene_b"}:
-            raise ValueError(f"probe seed {expected_seed} has invalid label: {label}")
-        runs.append({"seed": expected_seed, "label": label, **values})
+        raw_label = hypothesis.get("label")
+        support_label = _support_label(
+            values["exclusive_hidden_support_a"],
+            values["exclusive_hidden_support_b"],
+        )
+        if raw_label != support_label:
+            raise ValueError(
+                f"probe seed {expected_seed} support classification mismatch: "
+                f"raw={raw_label}, recomputed={support_label}"
+            )
+        support_labels.append(support_label)
+        runs.append(
+            {"seed": expected_seed, "support_label": support_label, **values}
+        )
 
     renderer = _mapping(manifest, "renderer")
     scenes = _mapping(manifest, "scenes")
     aggregate = _mapping(raw, "aggregate")
+    if aggregate.get("labels") != support_labels:
+        raise ValueError("raw aggregate labels do not match per-seed support labels")
+    derived_aggregate = {
+        key: value for key, value in aggregate.items() if key != "labels"
+    }
+    derived_aggregate["support_labels"] = support_labels
     analytic_aggregate = _mapping(baseline, "aggregate")
     checkpoint = _mapping(raw, "checkpoint")
     vggt = _mapping(raw, "vggt")
     source = _mapping(raw, "source")
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "status": "pass",
         "date_utc": datetime.now(timezone.utc).date().isoformat(),
         "question": raw.get("question"),
@@ -119,7 +148,7 @@ def build_summary(
             "tau": settings.get("tau"),
         },
         "runs": runs,
-        "aggregate": aggregate,
+        "aggregate": derived_aggregate,
         "comparison": {
             "analytic_baseline_path": "../insula-scout/synthetic_results.json",
             "analytic_baseline_behavior": analytic_aggregate.get("baseline_behavior"),

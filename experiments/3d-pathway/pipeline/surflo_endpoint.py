@@ -29,7 +29,10 @@ SURFLO_ARRAY_SEMANTICS = {
     "paired_completion_precision": "fraction of completion candidates close to either complete hidden hypothesis, one value per seed",
     "paired_hidden_support_a": "recall of scene-A-exclusive hidden target-visible surface, one value per seed",
     "paired_hidden_support_b": "recall of scene-B-exclusive hidden target-visible surface, one value per seed",
-    "paired_labels": "classification recomputed from the two exclusive hidden-support values",
+    "paired_support_labels": (
+        "thresholded relative-support classification recomputed from the two "
+        "exclusive hidden-support values; not a completeness or coherence certificate"
+    ),
     "paired_observed_recall": "recall of common context-visible surface, one value per seed",
     "paired_peak_vram_gib": "measured peak VRAM, one value per seed",
     "paired_seeds": "Surflo point-noise seeds used by the paired-scene probe",
@@ -67,10 +70,10 @@ def _source_arrays(
     paired_source: dict[str, Any], scout_source: dict[str, Any]
 ) -> dict[str, np.ndarray]:
     if (
-        paired_source.get("schema_version") != 1
+        paired_source.get("schema_version") != 2
         or paired_source.get("status") != "pass"
     ):
-        raise ValueError("paired-scene source is not a passing schema-v1 result")
+        raise ValueError("paired-scene source is not a passing schema-v2 result")
     settings = paired_source.get("settings")
     runs = paired_source.get("runs")
     if not isinstance(settings, dict) or not isinstance(runs, list):
@@ -104,7 +107,7 @@ def _source_arrays(
             )
         support_a = numeric["exclusive_hidden_support_a"][-1]
         support_b = numeric["exclusive_hidden_support_b"][-1]
-        label = run.get("label")
+        label = run.get("support_label")
         if label not in ALLOWED_LABELS or label != _classification(
             support_a, support_b
         ):
@@ -117,7 +120,7 @@ def _source_arrays(
     if not isinstance(aggregate, dict):
         raise ValueError("paired-scene source aggregate is missing")
     expected_aggregate = {
-        "labels": labels,
+        "support_labels": labels,
         "mean_observed_common_recall": float(
             np.mean(numeric["observed_common_recall"])
         ),
@@ -177,7 +180,7 @@ def _source_arrays(
 
     return {
         "paired_seeds": np.asarray(seeds, dtype=np.int64),
-        "paired_labels": np.asarray(labels, dtype="<U11"),
+        "paired_support_labels": np.asarray(labels, dtype="<U11"),
         "paired_observed_recall": np.asarray(
             numeric["observed_common_recall"], dtype=np.float64
         ),
@@ -218,7 +221,7 @@ def evaluate_surflo_evidence(arrays: dict[str, np.ndarray]) -> dict[str, Any]:
     if set(arrays) != set(SURFLO_ARRAY_SEMANTICS):
         raise ValueError("Surflo evidence array set mismatch")
     seeds = np.asarray(arrays["paired_seeds"])
-    labels = np.asarray(arrays["paired_labels"])
+    labels = np.asarray(arrays["paired_support_labels"])
     if (
         seeds.shape != (4,)
         or not np.array_equal(seeds, np.arange(4))
@@ -227,13 +230,13 @@ def evaluate_surflo_evidence(arrays: dict[str, np.ndarray]) -> dict[str, Any]:
         raise ValueError("Surflo paired evidence shape mismatch")
     for name, values in arrays.items():
         values = np.asarray(values)
-        if name in {"paired_labels", "scout_methods"}:
+        if name in {"paired_support_labels", "scout_methods"}:
             continue
         if values.ndim != 1 or not np.all(np.isfinite(values)):
             raise ValueError(f"Surflo evidence array is invalid: {name}")
     paired_numeric_names = {name for name in arrays if name.startswith("paired_")} - {
         "paired_seeds",
-        "paired_labels",
+        "paired_support_labels",
     }
     if any(np.asarray(arrays[name]).shape != (4,) for name in paired_numeric_names):
         raise ValueError("Surflo paired numeric evidence shape mismatch")
@@ -257,7 +260,7 @@ def evaluate_surflo_evidence(arrays: dict[str, np.ndarray]) -> dict[str, Any]:
         [_classification(a, b) for a, b in zip(support_a, support_b, strict=True)]
     )
     if not np.array_equal(labels, expected_labels):
-        raise ValueError("Surflo paired labels do not match hidden support")
+        raise ValueError("Surflo paired support labels do not match hidden support")
 
     methods = np.asarray(arrays["scout_methods"])
     if len(set(methods.tolist())) != len(methods):

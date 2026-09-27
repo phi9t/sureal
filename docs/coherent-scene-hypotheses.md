@@ -292,6 +292,12 @@ least 60% of the larger; remaining samples receive the alternative with greater
 support. Consequently, 11% support for A and zero for B can receive the A
 support label while missing most of A.
 
+In the derived schema these values are named `support_label`,
+`support_labels`, and `paired_support_labels`. A `scene_a` or `scene_b` value
+means only that the named alternative has greater relative support after the
+unsupported and hybrid gates; it does not mean that the object has adequate
+coverage.
+
 These **support labels do not certify object completeness**, topology, physical
 plausibility, or full-scene coherence. They are thresholded relative-support
 summaries. The Module 15 curriculum therefore reports support-label fractions

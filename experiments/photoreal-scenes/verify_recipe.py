@@ -128,6 +128,8 @@ def validate_recipe(
     baseline = json.loads((root / recipe["analytic_baseline"]).read_text(encoding="utf-8"))
     baseline_behavior = _mapping(baseline, "aggregate").get("baseline_behavior")
     tracked = json.loads((root / evidence["tracked_results"]).read_text(encoding="utf-8"))
+    if tracked.get("schema_version") != 2:
+        raise RecipeError("derived results must use schema version 2")
     if tracked.get("status") not in {"pending", "pass"}:
         raise RecipeError("tracked results status must be pending or pass")
     if _mapping(tracked, "comparison").get("analytic_baseline_behavior") != baseline_behavior:
@@ -163,7 +165,7 @@ def validate_recipe(
             "exclusive_hidden_support_b",
             "completion_candidate_precision_to_either_hypothesis",
             "camera_rmse_after_observed_alignment",
-            "label",
+            "support_label",
             "wall_seconds",
             "peak_vram_gib",
         )
@@ -172,6 +174,13 @@ def validate_recipe(
             for run in runs
         ):
             raise RecipeError("tracked pass results are missing required measurements")
+        if any("label" in run for run in runs):
+            raise RecipeError("tracked pass results contain legacy label fields")
+        aggregate = _mapping(tracked, "aggregate")
+        if "labels" in aggregate or aggregate.get("support_labels") != [
+            run["support_label"] for run in runs
+        ]:
+            raise RecipeError("tracked pass support labels are missing or inconsistent")
         for container, field in (
             (tracked_episode, "manifest_sha256"),
             (_mapping(tracked, "artifacts"), "raw_results_sha256"),
@@ -188,8 +197,6 @@ def validate_recipe(
             raise RecipeError("checkpoint pin does not match tracked evidence")
         if tracked_model_provenance.get("vggt") != expected_vggt:
             raise RecipeError("VGGT pins do not match tracked evidence")
-        if tracked.get("source") != source_provenance:
-            raise RecipeError("source overlay does not match tracked evidence")
 
     episode_manifest = Path(cache_root) / str(evidence.get("episode_manifest_cache_path", ""))
     episode_validation = Path(cache_root) / str(
@@ -222,7 +229,7 @@ def validate_recipe(
             raise RecipeError("checkpoint pin does not match raw probe evidence")
         if raw.get("vggt") != expected_vggt:
             raise RecipeError("VGGT pins do not match raw probe evidence")
-        if raw.get("source") != source_provenance:
+        if raw.get("source") != tracked.get("source"):
             raise RecipeError("source overlay does not match raw probe evidence")
     if strict_artifacts:
         _verify_validation_report(episode_validation, episode_manifest.parent)
