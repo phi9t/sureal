@@ -7,11 +7,13 @@ import re
 import subprocess
 import sys
 import unittest
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = ROOT.parent.parent
 DOC = REPO_ROOT / "docs" / "3d-reconstruction-pathway.md"
+CANONICAL_DOC = REPO_ROOT / "docs" / "coherent-scene-hypotheses.md"
 sys.path.insert(0, str(ROOT / "pipeline"))
 
 
@@ -100,6 +102,26 @@ class AuditContractTest(unittest.TestCase):
             forbidden_patterns=["psnr proves accurate geometry"],
         )
         self.assertTrue(any("unknown citation" in error for error in errors))
+        self.assertTrue(any("forbidden terminology" in error for error in errors))
+
+    def test_offline_audit_checks_the_canonical_assessment(self) -> None:
+        import audit
+
+        original_read_text = Path.read_text
+
+        def injected_assessment(path: Path, *args, **kwargs) -> str:
+            if path.resolve() == CANONICAL_DOC.resolve():
+                return (
+                    "[missing-source](https://example.invalid/missing) and "
+                    "PSNR proves accurate geometry."
+                )
+            return original_read_text(path, *args, **kwargs)
+
+        with mock.patch.object(Path, "read_text", injected_assessment):
+            errors = audit.audit(online=False)["errors"]
+
+        self.assertTrue(any("unknown citation: missing-source" in error for error in errors))
+        self.assertTrue(any("unregistered external link" in error for error in errors))
         self.assertTrue(any("forbidden terminology" in error for error in errors))
 
     def test_dotted_source_ids_are_audited_instead_of_skipped(self) -> None:

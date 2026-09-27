@@ -18,6 +18,10 @@ from contracts import ROOT, load_json, sha256_file
 
 CITATION = re.compile(r"\[([a-z0-9][a-z0-9.-]*)\]\((https://[^)]+)\)")
 EXTERNAL_LINK = re.compile(r"\[[^\]]+\]\((https://[^)]+)\)")
+PUBLIC_PROJECT_URLS = {
+    "https://github.com/Anttwo/Surflo",
+    "https://github.com/phi9t/sureal",
+}
 
 
 def audit_text(text: str, known_sources: dict[str, str], forbidden_patterns: Iterable[str]) -> list[str]:
@@ -149,11 +153,17 @@ def audit(online: bool) -> dict[str, object]:
     assets = load_json(ROOT / "assets.lock.json")
     terminology = load_json(ROOT / "terminology.json")
     survey_path = ROOT.parent.parent / "docs" / "3d-reconstruction-pathway.md"
+    canonical_path = ROOT.parent.parent / "docs" / "coherent-scene-hypotheses.md"
     if not survey_path.is_file():
         errors.append(f"missing survey: {survey_path}")
         survey = ""
     else:
         survey = survey_path.read_text(encoding="utf-8")
+    if not canonical_path.is_file():
+        errors.append(f"missing canonical assessment: {canonical_path}")
+        canonical = ""
+    else:
+        canonical = canonical_path.read_text(encoding="utf-8")
 
     sources = registry.get("sources", [])
     cutoff = date.fromisoformat(str(curriculum["cutoff"]))
@@ -187,14 +197,23 @@ def audit(online: bool) -> dict[str, object]:
                 errors.append(f"module {module.get('id')} source absent from survey: {source_id}")
 
     forbidden = [pattern for guardrail in terminology["guardrails"] for pattern in guardrail["forbidden_patterns"]]
-    errors.extend(audit_text(survey, known, forbidden))
+    for label, document in (("survey", survey), ("canonical assessment", canonical)):
+        errors.extend(
+            f"{label}: {error}"
+            for error in audit_text(document, known, forbidden)
+        )
     registered_urls = set(known.values())
     registered_urls.update(
         asset["source"]
         for asset in assets.get("assets", [])
         if isinstance(asset.get("source"), str) and asset["source"].startswith("https://")
     )
-    errors.extend(external_link_errors(survey, registered_urls))
+    registered_urls.update(PUBLIC_PROJECT_URLS)
+    for label, document in (("survey", survey), ("canonical assessment", canonical)):
+        errors.extend(
+            f"{label}: {error}"
+            for error in external_link_errors(document, registered_urls)
+        )
 
     for asset in assets.get("assets", []):
         if not re.fullmatch(r"[0-9a-f]{64}", asset.get("sha256", "")):
