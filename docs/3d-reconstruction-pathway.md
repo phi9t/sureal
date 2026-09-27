@@ -1645,7 +1645,12 @@ in a 6D position/normal space and is transported by a conditional flow using
 the same deterministic global token set. Optional rendering guidance correlates
 nearby points during ODE integration, and meshing converts the oriented cloud
 into a surface. This improves output resolution and visible-surface consistency
-without a fixed output grid.
+without a fixed output grid. The pathway's locked single-scene scout makes the
+improvement concrete without promoting it to a benchmark claim: on Tanks &
+Temples Ignatius, plain Surflo measured 0.9057 surface F1 and 0.004679
+normalized Chamfer, versus 0.8565 and 0.006064 for the inherited VGGT
+pointmap. Guided Surflo measured 0.8893 F1 and 0.004610 Chamfer, so guidance
+did not improve every geometric metric even on that one scene.
 
 ### Defining mathematics
 
@@ -1689,12 +1694,23 @@ experiments/3d-pathway/run.sh run --module 15 --profile smoke --run-id pathway-1
 ```
 
 Inspect `result.json`, `report.md`, `artifacts/surflo_hidden_support.svg`,
-`artifacts/surflo_endpoint.json`, and `artifacts/failure_sweep.csv`. The lab
-hashes and reuses the tracked photoreal result: all four seeds are
+`artifacts/surflo_visible_surface.svg`, `artifacts/surflo_endpoint.json`,
+`artifacts/surflo_endpoint_evidence.npz`, and `artifacts/failure_sweep.csv`.
+The lab hashes and reuses both tracked result sets: the B200 single-scene scout
+for visible-surface quality and the photoreal paired-scene result for hidden
+support. It recomputes every reported scalar from the archived measured rows,
+and validation independently compares those rows with both repository asset
+locks. In the paired probe all four seeds are
 `unsupported`, mean observed-common recall is about 0.766, mean
 unobserved-common recall about 0.056, and support for either hidden hypothesis
-is zero. This is evidence for the open problem, not a failure hidden by an
+is zero. The paired run used plain inference, 100,000 query points, and 100 ODE
+steps; query count and rendering guidance were held fixed rather than claimed
+as executed sweep axes. A favorable hidden completion is not an acceptance
+condition. This is evidence for the open problem, not a failure hidden by an
 acceptance threshold.
+The code-level architecture, measurement boundary, and persistent-state
+interface are detailed in
+`experiments/3d-pathway/research/module15-surflo-synthesis.md`.
 
 ### Transition
 

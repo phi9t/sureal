@@ -18,7 +18,7 @@ INPUT_FILES = (
 IMPLEMENTATION_FILES = (
     "pipeline/cli.py", "pipeline/contracts.py", "pipeline/dynamic.py", "pipeline/generative.py",
     "pipeline/labs.py", "pipeline/math3d.py", "pipeline/reporting.py", "pipeline/runner.py",
-    "pipeline/validator.py",
+    "pipeline/surflo_endpoint.py", "pipeline/validator.py",
 )
 
 

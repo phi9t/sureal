@@ -41,7 +41,12 @@ def module_report(module: dict[str, Any], result: dict[str, Any]) -> str:
         else:
             lines.append("- Not applicable for this module.")
         lines.append("")
-    lines.extend(["## Controlled failure sweep", ""])
+    sweep_heading = (
+        "Recorded seed outcomes"
+        if result["measurement_kind"] == "reused_measured_result"
+        else "Controlled failure sweep"
+    )
+    lines.extend([f"## {sweep_heading}", ""])
     lines.extend(
         f"- {row['parameter']}={row['value']}: {row['metric']}={_format_metric(row['measurement'])}"
         for row in result["failure_sweep"]

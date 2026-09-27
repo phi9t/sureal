@@ -30,6 +30,7 @@ from generative import (
     evaluate_ambiguity_fixture,
     generate_ambiguity_failure_sweep,
 )
+from surflo_endpoint import build_surflo_endpoint, evaluate_surflo_evidence
 
 
 REQUIRED_TOP_LEVEL = {
@@ -257,6 +258,57 @@ def _validate_module14(run_dir: Path, result: dict[str, Any]) -> None:
         raise ValueError("Module 14 failure sweep mismatch")
 
 
+def _validate_module15(run_dir: Path, result: dict[str, Any]) -> None:
+    archive_path = run_dir / "artifacts" / "surflo_endpoint_evidence.npz"
+    endpoint_path = run_dir / "artifacts" / "surflo_endpoint.json"
+    if not archive_path.is_file() or not endpoint_path.is_file():
+        raise ValueError("Module 15 recomputation artifacts are missing")
+    paired_path = ROOT.parent / "photoreal-scenes" / "results.json"
+    scout_path = ROOT.parent / "insula-scout" / "results.json"
+    locks = {
+        item["id"]: item for item in load_json(ROOT / "assets.lock.json")["assets"]
+    }
+    paired_hash = sha256_file(paired_path)
+    scout_hash = sha256_file(scout_path)
+    if (
+        paired_hash != locks["surflo-paired-scenes"]["sha256"]
+        or result.get("source_results_sha256") != paired_hash
+        or scout_hash != locks["surflo-visible-scout"]["sha256"]
+        or result.get("scout_results_sha256") != scout_hash
+    ):
+        raise ValueError("Module 15 source result does not match asset locks")
+    expected = build_surflo_endpoint(
+        load_json(paired_path),
+        load_json(scout_path),
+        paired_sha256=paired_hash,
+        scout_sha256=scout_hash,
+    )
+    try:
+        with np.load(archive_path, allow_pickle=False) as archive:
+            arrays = {name: archive[name] for name in archive.files}
+    except (OSError, ValueError) as error:
+        raise ValueError("Module 15 evidence archive is invalid") from error
+    if set(arrays) != set(expected["arrays"]) or any(
+        not np.array_equal(arrays[name], expected["arrays"][name])
+        for name in expected["arrays"]
+    ):
+        raise ValueError("Module 15 evidence does not match locked sources")
+    recomputed = evaluate_surflo_evidence(arrays)
+    if result["metrics"] != recomputed["metrics"]:
+        raise ValueError("Module 15 metric mismatch")
+    if result["metrics"]["rendering"]:
+        raise ValueError("Module 15 unsupported rendering metric family is non-empty")
+    endpoint = load_json(endpoint_path)
+    if endpoint != expected["record"]:
+        raise ValueError("Module 15 endpoint record mismatch")
+    csv_sweep = _load_failure_sweep(
+        run_dir / "artifacts" / "failure_sweep.csv",
+        "Module 15",
+    )
+    if result["failure_sweep"] != recomputed["sweep"] or csv_sweep != recomputed["sweep"]:
+        raise ValueError("Module 15 failure sweep mismatch")
+
+
 def validate_result(run_dir: Path, expected_module: str | None = None) -> dict[str, Any]:
     result_path = run_dir / "result.json"
     if not result_path.is_file():
@@ -317,14 +369,12 @@ def validate_result(run_dir: Path, expected_module: str | None = None) -> dict[s
     reports = provenance["reports_sha256"]
     if reports != {"report.md": sha256_file(run_dir / "report.md")}:
         raise ValueError("report hash mismatch")
-    if result["module_id"] == "15":
-        asset = next(item for item in load_json(ROOT / "assets.lock.json")["assets"] if item["id"] == "surflo-paired-scenes")
-        if result.get("source_results_sha256") != asset["sha256"]:
-            raise ValueError("Surflo source result does not match asset lock")
     if result["module_id"] == "13":
         _validate_module13(run_dir, result)
     if result["module_id"] == "14":
         _validate_module14(run_dir, result)
+    if result["module_id"] == "15":
+        _validate_module15(run_dir, result)
     ensure_finite(result)
     return result
 

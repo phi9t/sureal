@@ -45,6 +45,7 @@ from math3d import (
     triangulate_point,
     unproject,
 )
+from surflo_endpoint import build_surflo_endpoint
 
 
 def _write_sweep(path: Path, rows: list[dict[str, Any]]) -> None:
@@ -1187,37 +1188,55 @@ def _dynamic_scene_lab(artifacts: Path, profile: str, scene: dict[str, Any], pro
 
 
 def _surflo_lab(artifacts: Path, profile: str, scene: dict[str, Any], profile_config: dict[str, Any]) -> dict[str, Any]:
-    source_path = ROOT.parent / "photoreal-scenes" / "results.json"
-    source = load_json(source_path)
-    aggregate = source["aggregate"]
-    source_hash = sha256_file(source_path)
-    summary = {
-        "source_results_sha256": source_hash,
-        "labels": aggregate["labels"],
-        "mean_observed_common_recall": aggregate["mean_observed_common_recall"],
-        "mean_unobserved_common_recall": aggregate["mean_unobserved_common_recall"],
-        "mean_hidden_support_a": aggregate["mean_hidden_support_a"],
-        "mean_hidden_support_b": aggregate["mean_hidden_support_b"],
-    }
-    (artifacts / "surflo_endpoint.json").write_text(__import__("json").dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    sweep = [
-        {"parameter": "seed", "value": run["seed"], "metric": "hidden_hypothesis_support", "measurement": max(run["exclusive_hidden_support_a"], run["exclusive_hidden_support_b"])}
-        for run in source["runs"]
-    ]
+    paired_path = ROOT.parent / "photoreal-scenes" / "results.json"
+    scout_path = ROOT.parent / "insula-scout" / "results.json"
+    paired_hash = sha256_file(paired_path)
+    scout_hash = sha256_file(scout_path)
+    endpoint = build_surflo_endpoint(
+        load_json(paired_path),
+        load_json(scout_path),
+        paired_sha256=paired_hash,
+        scout_sha256=scout_hash,
+    )
+    _write_npz_deterministic(
+        artifacts / "surflo_endpoint_evidence.npz", endpoint["arrays"]
+    )
+    (artifacts / "surflo_endpoint.json").write_text(
+        json.dumps(endpoint["record"], indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    sweep = endpoint["sweep"]
     _write_sweep(artifacts / "failure_sweep.csv", sweep)
-    _write_chart(artifacts / "surflo_hidden_support.svg", "Tracked Surflo support for either hidden hypothesis", [row["measurement"] for row in sweep], "#cc4b37")
+    _write_chart(
+        artifacts / "surflo_hidden_support.svg",
+        "Tracked Surflo support for either hidden hypothesis",
+        [row["measurement"] for row in sweep],
+        "#cc4b37",
+    )
+    geometry = endpoint["metrics"]["geometry"]
+    _write_chart(
+        artifacts / "surflo_visible_surface.svg",
+        "Single-scene surface F1: plain, guided, inherited VGGT",
+        [
+            geometry["scout_surflo_plain_f1"],
+            geometry["scout_surflo_guided_f1"],
+            geometry["scout_vggt_f1"],
+        ],
+        "#287f5b",
+    )
     return {
-        "metrics": {
-            "geometry": {"observed_common_recall": aggregate["mean_observed_common_recall"], "unobserved_common_recall": aggregate["mean_unobserved_common_recall"]},
-            "rendering": {},
-            "generative": {"hidden_hypothesis_support": max(aggregate["mean_hidden_support_a"], aggregate["mean_hidden_support_b"]), "coherent_supported_seed_fraction": 0.0},
-        },
+        "metrics": endpoint["metrics"],
         "failure_sweep": sweep,
         "observations": [
             "Tracked paired-scene outcome: unsupported for all four seeds.",
+            "On the single Ignatius scout scene, plain Surflo improves surface F1 over the frozen VGGT pointmap; this is not a full benchmark aggregate.",
             "Arbitrary-resolution stochastic point transport is not equivalent to sampling one persistent complete-scene hypothesis.",
         ],
-        "extra_result": {"source_results_sha256": source_hash, "source_result_status": source["status"]},
+        "extra_result": {
+            "source_results_sha256": paired_hash,
+            "scout_results_sha256": scout_hash,
+            "source_result_status": "pass",
+        },
     }
 
 

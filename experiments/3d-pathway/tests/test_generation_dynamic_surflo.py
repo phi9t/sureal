@@ -478,6 +478,111 @@ class DynamicSceneContractTest(unittest.TestCase):
             self.assertIn("Module 14 failure sweep mismatch", validation.stderr)
 
 
+class SurfloEndpointContractTest(unittest.TestCase):
+    def test_endpoint_metrics_are_recomputed_from_seed_records(self) -> None:
+        from surflo_endpoint import build_surflo_endpoint
+
+        source_path = REPO_ROOT / "experiments" / "photoreal-scenes" / "results.json"
+        source = json.loads(source_path.read_text())
+        scout = json.loads(
+            (REPO_ROOT / "experiments" / "insula-scout" / "results.json").read_text()
+        )
+        endpoint = build_surflo_endpoint(source, scout)
+        geometry = endpoint["metrics"]["geometry"]
+        generative = endpoint["metrics"]["generative"]
+        self.assertAlmostEqual(geometry["observed_common_recall"], 0.765712258537032)
+        self.assertAlmostEqual(geometry["unobserved_common_recall"], 0.0564191350822387)
+        self.assertEqual(generative["hidden_hypothesis_support"], 0.0)
+        self.assertEqual(generative["coherent_supported_seed_fraction"], 0.0)
+        self.assertEqual(endpoint["sweep"][0]["value"], 0)
+
+        supported_source = json.loads(json.dumps(source))
+        supported_source["runs"][0]["exclusive_hidden_support_a"] = 0.72
+        supported_source["runs"][0]["exclusive_hidden_support_b"] = 0.08
+        supported_source["runs"][0]["label"] = "scene_a"
+        supported_source["aggregate"]["labels"][0] = "scene_a"
+        supported_source["aggregate"]["mean_hidden_support_a"] = 0.18
+        supported_source["aggregate"]["mean_hidden_support_b"] = 0.02
+        supported = build_surflo_endpoint(supported_source, scout)
+        self.assertEqual(
+            supported["metrics"]["generative"]["coherent_supported_seed_fraction"],
+            0.25,
+        )
+        self.assertEqual(
+            supported["metrics"]["generative"]["hidden_hypothesis_support"],
+            0.18,
+        )
+
+        source["aggregate"]["mean_observed_common_recall"] = 0.99
+        with self.assertRaisesRegex(ValueError, "source aggregate mismatch"):
+            build_surflo_endpoint(source, scout)
+
+    def test_module15_persists_locked_recomputable_endpoint(self) -> None:
+        from surflo_endpoint import evaluate_surflo_evidence
+
+        with tempfile.TemporaryDirectory() as temporary:
+            cache = Path(temporary)
+            env = os.environ.copy()
+            env["SURFLO_PATHWAY_CACHE_ROOT"] = str(cache)
+            completed = subprocess.run(
+                [
+                    str(ROOT / "run.sh"),
+                    "run",
+                    "--module",
+                    "15",
+                    "--profile",
+                    "smoke",
+                    "--run-id",
+                    "surflo-endpoint-contract",
+                ],
+                cwd=REPO_ROOT,
+                env=env,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            run_dir = cache / "runs" / "surflo-endpoint-contract" / "15"
+            result_path = run_dir / "result.json"
+            result = json.loads(result_path.read_text())
+            endpoint = json.loads(
+                (run_dir / "artifacts/surflo_endpoint.json").read_text()
+            )
+            architecture = endpoint["architecture"]
+            self.assertEqual(architecture["evidence_state"], "deterministic_global_tokens")
+            self.assertEqual(architecture["stochastic_variable_scope"], "query_point")
+            self.assertFalse(architecture["sampled_persistent_scene_state"])
+            self.assertFalse(architecture["cross_query_hypothesis_persistence"])
+            self.assertEqual(endpoint["benchmark"]["inference_mode"], "plain")
+
+            archive_path = run_dir / "artifacts/surflo_endpoint_evidence.npz"
+            with np.load(archive_path, allow_pickle=False) as archive:
+                arrays = {name: archive[name] for name in archive.files}
+            recomputed = evaluate_surflo_evidence(arrays)
+            self.assertEqual(recomputed["metrics"], result["metrics"])
+            self.assertEqual(recomputed["sweep"], result["failure_sweep"])
+
+            result["metrics"]["geometry"]["observed_common_recall"] = 0.99
+            result_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
+            validation = subprocess.run(
+                [
+                    str(ROOT / "run.sh"),
+                    "validate",
+                    "--module",
+                    "15",
+                    "--run-id",
+                    "surflo-endpoint-contract",
+                ],
+                cwd=REPO_ROOT,
+                env=env,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(validation.returncode, 0)
+            self.assertIn("Module 15 metric mismatch", validation.stderr)
+
+
 class FrontierLabContractTest(unittest.TestCase):
     def test_modules_12_through_15_emit_foundation_generation_dynamic_and_surflo_evidence(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -517,6 +622,9 @@ class FrontierLabContractTest(unittest.TestCase):
             photoreal = REPO_ROOT / "experiments" / "photoreal-scenes" / "results.json"
             expected_hash = hashlib.sha256(photoreal.read_bytes()).hexdigest()
             self.assertEqual(surflo["source_results_sha256"], expected_hash)
+            scout = REPO_ROOT / "experiments" / "insula-scout" / "results.json"
+            expected_scout_hash = hashlib.sha256(scout.read_bytes()).hexdigest()
+            self.assertEqual(surflo["scout_results_sha256"], expected_scout_hash)
             self.assertEqual(surflo["metrics"]["generative"]["hidden_hypothesis_support"], 0.0)
             self.assertEqual(surflo["observations"][0], "Tracked paired-scene outcome: unsupported for all four seeds.")
 

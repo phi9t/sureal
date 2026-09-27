@@ -118,8 +118,8 @@
     {
       "id": "15", "slug": "surflo-case-study", "title": "Surflo as the current case study",
       "evidence": ["variable unposed RGB views encoded by frozen VGGT"], "observable": "visible and prior-supported oriented surface points", "representation": "Perceiver global tokens and independently transported 6D oriented points",
-      "inference": "sampled", "objectives": ["flow matching", "optional photometric rendering guidance"], "metrics": ["observed recall", "unobserved recall", "hidden support", "within-sample coherence"],
-      "failure_sweep": ["paired hidden hypotheses", "query count", "seed", "rendering guidance"], "insula": "surflo",
+      "inference": "hybrid", "objectives": ["amortized deterministic evidence encoding", "sampled per-query flow matching", "optional photometric rendering guidance"], "metrics": ["single-scene surface F1 and Chamfer", "observed common recall", "unobserved common recall", "hidden-hypothesis support", "coherent supported-seed fraction"],
+      "failure_sweep": ["four point-noise seeds at fixed plain inference settings under paired hidden hypotheses"], "insula": "surflo",
       "sources": ["wang-vggt-2025", "lipman-2023", "guedon-surflo-2026"]
     }
   ]

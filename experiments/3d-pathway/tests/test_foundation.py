@@ -113,6 +113,7 @@ class RegistryContractTest(unittest.TestCase):
                 "foundation-geometry-models",
                 "nerf-synthetic",
                 "surflo-paired-scenes",
+                "surflo-visible-scout",
             },
         )
         for asset in assets:
