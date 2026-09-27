@@ -116,8 +116,8 @@ the first visible frame
 
 \[
 E_{\mathrm{reid}}=
-\frac{1}{|Q|}\sum_{i\in Q}
-\left\|\widehat X_i(t_b+1)-X_i(t_b+1)\right\|_2,
+\sqrt{\frac{1}{|Q|}\sum_{i\in Q}
+\left\|\widehat X_i(t_b+1)-X_i(t_b+1)\right\|_2^2},
 \]
 
 together with identity switches and visibility classification. Adjacent-frame
@@ -691,9 +691,9 @@ without claiming photorealism, topology change, or a learned-model benchmark.
 The same event is evaluated in three matched conditions:
 
 1. **static camera, moving objects**;
-2. **moving camera, moving objects, oracle camera translation**; and
+2. **moving camera, moving objects, oracle world-frame camera center**; and
 3. **moving camera, moving objects, contaminated factorization**, where 35% of
-   one object's displacement leaks into the estimated camera translation.
+   one object's displacement leaks into the estimated world-frame camera center.
 
 Camera-relative measurements remain consistent in all three conditions. The
 second condition demonstrates that camera motion is not intrinsically an error

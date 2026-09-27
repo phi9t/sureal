@@ -18,8 +18,8 @@ DYNAMIC_CAMERA_CONTAMINATION = 0.35
 DYNAMIC_ARRAY_SEMANTICS = {
     "time_s": "uniform frame times in seconds",
     "variant_names": "ordered camera/object-motion condition names",
-    "truth_camera_xyz": "ground-truth world-frame camera translations",
-    "estimated_camera_xyz": "camera translations used to recover world motion",
+    "truth_camera_xyz": "ground-truth world-frame camera centers",
+    "estimated_camera_xyz": "world-frame camera centers used to recover world motion",
     "truth_object_xyz": "persistent world-frame object identities through time",
     "observed_object_camera_xyz": "camera-relative object centers; zero where occluded",
     "observed_mask": "whether each camera-relative object center is visible",

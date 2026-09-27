@@ -1514,8 +1514,8 @@ but this requires identities (i) or a defined correspondence field (\Phi_t).
 For an object hidden through (t_b), the identity-aware reappearance error is
 
 \[
-E_{\mathrm{reid}}=\frac1{|Q|}\sum_{i\in Q}
-\|\widehat X_i(t_b+1)-X_i(t_b+1)\|_2.
+E_{\mathrm{reid}}=\sqrt{\frac1{|Q|}\sum_{i\in Q}
+\|\widehat X_i(t_b+1)-X_i(t_b+1)\|_2^2}.
 \]
 
 It must be reported beside the set-aligned error that is free to permute
@@ -1602,7 +1602,7 @@ indistinguishable objects approach and reverse while fully occluded. A
 constant-velocity tracker instead predicts pass-through. The same event is
 evaluated with a static camera, a moving camera whose motion is known, and
 joint motion where 35% of one dynamic object's displacement leaks into the
-camera estimate. The sweep increases hidden duration.
+world-frame camera-center estimate. The sweep increases hidden duration.
 
 Every result metric is recomputed from the NPZ, and validation independently
 regenerates the sweep. Smoke uses 33 frames and eight hidden frames. Static
