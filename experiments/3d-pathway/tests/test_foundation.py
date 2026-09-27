@@ -171,6 +171,7 @@ class DispatcherContractTest(unittest.TestCase):
         )
         with (
             patch.dict(os.environ, {}, clear=False),
+            patch("contracts.shutil.which", return_value="/usr/bin/nvidia-smi"),
             patch("contracts.subprocess.run", return_value=completed),
         ):
             os.environ.pop("SURFLO_PATHWAY_GPU_DEVICE", None)
