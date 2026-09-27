@@ -64,8 +64,8 @@
       "torchvision": "0.22.1+cu128",
       "pillow": "11.1.0",
       "requirements_lock_sha256": "02c623f2a636dd774dda048f1a08c8d936d0701f74d3f50b3a7916d2280ed65a",
-      "resolved_requirements_sha256": "75324c79132de2fcf25b60444c7e9820baeebbc3a6db2002eb601ac2b5c33e4c",
-      "dockerfile_sha256": "2845ba969c84689b2c32abab08802b8246ae81594291f3e01d8a50798ea7c3ed"
+      "resolved_requirements_sha256": "587350cc8d7a65840facd27ebcf6fabc43f1e09d4f82541efa851ae914631076",
+      "dockerfile_sha256": "47b50990c2229ef0ba4f6c8b6b0660379ed05056dbf9500fe0330a5c39f667f8"
     }
   }
 }

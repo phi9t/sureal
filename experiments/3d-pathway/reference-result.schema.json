@@ -165,11 +165,45 @@
           "metrics": {
             "required": ["rendering", "geometry", "representation", "failure_sweep", "unsupported"],
             "properties": {
-              "rendering": {"type": "object"},
-              "geometry": {"type": "object"},
-              "representation": {"type": "object"},
-              "failure_sweep": {"type": "object"},
-              "unsupported": {"type": "object"}
+              "rendering": {
+                "type": "object",
+                "required": ["target_psnr_db", "target_ssim", "target_lpips", "context_fit_psnr_db"],
+                "properties": {
+                  "target_psnr_db": {"type": "number"},
+                  "target_ssim": {"type": "number"},
+                  "target_lpips": {"type": "number"},
+                  "context_fit_psnr_db": {"type": "number"}
+                }
+              },
+              "geometry": {
+                "type": "object",
+                "required": ["expected_depth_rmse_m", "common_visible_accumulation_coverage", "point_fscore_10cm"],
+                "properties": {
+                  "expected_depth_rmse_m": {"type": "number", "minimum": 0},
+                  "common_visible_accumulation_coverage": {"type": "number", "minimum": 0, "maximum": 1},
+                  "point_fscore_10cm": {"type": "number", "minimum": 0, "maximum": 1}
+                }
+              },
+              "representation": {
+                "type": "object",
+                "required": ["primitive_count", "parameter_bytes", "ply_bytes"],
+                "properties": {
+                  "primitive_count": {"type": "integer", "minimum": 1},
+                  "parameter_bytes": {"type": "integer", "minimum": 1},
+                  "ply_bytes": {"type": "integer", "minimum": 1}
+                }
+              },
+              "failure_sweep": {"type": "object", "minProperties": 3},
+              "unsupported": {
+                "type": "object",
+                "required": ["triangle_mesh", "mesh_f_score", "canonical_surface", "hidden_surface_completion"],
+                "properties": {
+                  "triangle_mesh": {"const": "unsupported"},
+                  "mesh_f_score": {"const": "unsupported"},
+                  "canonical_surface": {"const": "unsupported"},
+                  "hidden_surface_completion": {"const": "unsupported"}
+                }
+              }
             }
           },
           "tool": {"required": ["source_commit", "dependency_commit"]}

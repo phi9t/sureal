@@ -52,6 +52,7 @@ PINNED_NERFSTUDIO_COMMIT = "50e0e3c70c775e89333256213363badbf074f29d"
 PINNED_GSPLAT_COMMIT = "4d3a3b69db4de0326f983ccf7b7b255271a17b01"
 PINNED_GSPLAT_VERSION = "1.4.0"
 REQUIREMENTS_LOCK_SHA256 = "02c623f2a636dd774dda048f1a08c8d936d0701f74d3f50b3a7916d2280ed65a"
+RESOLVED_REQUIREMENTS_SHA256 = "587350cc8d7a65840facd27ebcf6fabc43f1e09d4f82541efa851ae914631076"
 LPIPS_CHECKPOINT_ID = "nerfstudio-lpips-alexnet"
 LPIPS_CHECKPOINT_SHA256 = "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
 LPIPS_CHECKPOINT_BYTES = 244408911
@@ -87,6 +88,7 @@ PINNED_INSULA_MANIFEST = {
     "gsplat_version": PINNED_GSPLAT_VERSION,
     "torch_cuda_arch_list": "10.0",
     "requirements_lock_sha256": REQUIREMENTS_LOCK_SHA256,
+    "resolved_requirements_sha256": RESOLVED_REQUIREMENTS_SHA256,
     "network_policy": "build-and-fetch-only",
 }
 REFERENCE_IMPLEMENTATION = (
@@ -104,7 +106,6 @@ REFERENCE_IMPLEMENTATION = (
     "insulas/radiance-field/resolved-requirements.lock.txt",
     "insulas/locks.json",
     "assets.lock.json",
-    "reference-adapters.json",
     "reference-result.schema.json",
     "shared-scene.json",
 )
@@ -191,9 +192,19 @@ def _adapter_execution_contract_sha256() -> str:
             "model_contract",
             "evaluation_contract",
             "acceptance",
+            "baseline_environment",
         )
     }
     return hashlib.sha256(canonical_json(contract)).hexdigest()
+
+
+def _approved_image_id() -> str:
+    image_id = _adapter_record().get("baseline_environment", {}).get(
+        "container_image_id"
+    )
+    if IMAGE_ID_PATTERN.fullmatch(str(image_id)) is None:
+        raise ValueError("Splatfacto approved calibration image ID is invalid")
+    return str(image_id)
 
 
 def _lpips_checkpoint_record() -> dict[str, Any]:
@@ -254,7 +265,17 @@ def _mean(rows: list[dict[str, Any]], key: str) -> float:
     return float(np.mean([float(row[key]) for row in rows]))
 
 
-def _binary_ply_header(path: Path) -> str:
+def _expected_resolved_requirements() -> bytes:
+    source = (ROOT / "insulas/radiance-field/resolved-requirements.lock.txt").read_text()
+    expected = source.replace(
+        "gsplat==1.4.0\n", "gsplat @ file:///opt/src/gsplat\n"
+    ).encode()
+    if hashlib.sha256(expected).hexdigest() != RESOLVED_REQUIREMENTS_SHA256:
+        raise ValueError("Splatfacto transformed resolved dependency lock mismatch")
+    return expected
+
+
+def _binary_ply_header(path: Path) -> tuple[list[str], int]:
     """Read only the ASCII header of a binary PLY artifact."""
     lines: list[str] = []
     size = 0
@@ -270,9 +291,54 @@ def _binary_ply_header(path: Path) -> str:
                 decoded = line.decode("ascii", errors="strict")
             except UnicodeDecodeError as error:
                 raise ValueError("Splatfacto PLY header is not ASCII") from error
-            lines.append(decoded)
+            lines.append(decoded.rstrip("\r\n"))
             if line.rstrip(b"\r\n") == b"end_header":
-                return "".join(lines)
+                return lines, size
+
+
+def _validate_gaussian_ply(
+    path: Path, archive_path: Path, primitive_count: int
+) -> int:
+    property_names = (
+        "x", "y", "z", "nx", "ny", "nz", "f_dc_0", "f_dc_1", "f_dc_2",
+        "opacity", "scale_0", "scale_1", "scale_2", "rot_0", "rot_1", "rot_2", "rot_3",
+    )
+    expected_header = [
+        "ply",
+        "format binary_little_endian 1.0",
+        "comment renderable_primitives_not_mesh",
+        f"element vertex {primitive_count}",
+        *(f"property float {name}" for name in property_names),
+        "end_header",
+    ]
+    header, payload_offset = _binary_ply_header(path)
+    if header != expected_header:
+        raise ValueError("Splatfacto PLY schema or semantics mismatch")
+    dtype = np.dtype([(name, "<f4") for name in property_names])
+    contents = path.read_bytes()
+    expected_size = payload_offset + primitive_count * dtype.itemsize
+    if len(contents) != expected_size:
+        raise ValueError(
+            f"Splatfacto PLY payload length mismatch: {len(contents)} != {expected_size}"
+        )
+    records = np.frombuffer(contents, dtype=dtype, count=primitive_count, offset=payload_offset)
+    matrix = records.view("<f4").reshape(primitive_count, len(property_names))
+    if not np.isfinite(matrix).all():
+        raise ValueError("Splatfacto PLY payload is non-finite")
+    with np.load(archive_path, allow_pickle=False) as archive:
+        expected = np.column_stack(
+            (
+                archive["means"],
+                np.zeros((primitive_count, 3), dtype=np.float32),
+                archive["features_dc"],
+                archive["opacity_logits"],
+                archive["log_scales"],
+                archive["quaternions"],
+            )
+        ).astype(np.float32, copy=False)
+    if not np.array_equal(matrix, expected):
+        raise ValueError("Splatfacto PLY payload does not match Gaussian archive")
+    return len(contents)
 
 
 def _evaluate_outputs(run_dir: Path, profile: str) -> dict[str, Any]:
@@ -424,14 +490,11 @@ def _evaluate_outputs(run_dir: Path, profile: str) -> dict[str, Any]:
         np.sqrt(np.mean(center_residual * center_residual))
     )
     ply = _require_regular_file(run_dir, "output/gaussians.ply")
-    header = _binary_ply_header(ply)
-    if (
-        "comment renderable_primitives_not_mesh" not in header
-        or f"element vertex {representation['primitive_count']}" not in header
-        or "element face" in header
-    ):
-        raise ValueError("Splatfacto PLY semantics mismatch")
-    representation["ply_bytes"] = ply.stat().st_size
+    representation["ply_bytes"] = _validate_gaussian_ply(
+        ply,
+        run_dir / "output/gaussians.npz",
+        representation["primitive_count"],
+    )
 
     sweep: dict[str, dict[str, float | int]] = {}
     for count in (3, 5, 9):
@@ -591,9 +654,9 @@ def _validate_runtime_identity(run_dir: Path, profile: str) -> dict[str, Any]:
     if (
         sha256_file(ROOT / "insulas/radiance-field/requirements.lock.txt") != REQUIREMENTS_LOCK_SHA256
         or sha256_file(requirements) != REQUIREMENTS_LOCK_SHA256
-        or sha256_file(ROOT / "insulas/radiance-field/resolved-requirements.lock.txt")
-        != locks["resolved_requirements_sha256"]
-        or sha256_file(resolved) != locks["resolved_requirements_sha256"]
+        or resolved.read_bytes() != _expected_resolved_requirements()
+        or sha256_file(resolved) != RESOLVED_REQUIREMENTS_SHA256
+        or locks["resolved_requirements_sha256"] != RESOLVED_REQUIREMENTS_SHA256
     ):
         raise ValueError("Splatfacto dependency lock mismatch")
     versions = load_json(_require_regular_file(run_dir, "output/runtime-versions.json"))
@@ -601,6 +664,8 @@ def _validate_runtime_identity(run_dir: Path, profile: str) -> dict[str, Any]:
         versions.get("nerfstudio_commit") != PINNED_NERFSTUDIO_COMMIT
         or versions.get("gsplat_commit") != PINNED_GSPLAT_COMMIT
         or versions.get("gsplat") != PINNED_GSPLAT_VERSION
+        or versions.get("gsplat_direct_url") != "file:///opt/src/gsplat"
+        or versions.get("resolved_requirements_sha256") != RESOLVED_REQUIREMENTS_SHA256
         or versions.get("torch") != "2.7.1+cu128"
         or versions.get("torchvision") != "0.22.1+cu128"
         or versions.get("pillow") != "11.1.0"
@@ -676,6 +741,50 @@ def _acceptance_failures(metrics: dict[str, Any], acceptance: dict[str, Any]) ->
         else:
             raise ValueError(f"unsupported Splatfacto acceptance key: {key}")
     return failures
+
+
+def _validated_resources(run_dir: Path, result: dict[str, Any]) -> dict[str, Any]:
+    summary = load_json(_require_regular_file(run_dir, "output/resource-summary.json"))
+    if result.get("resources") != summary:
+        raise ValueError("Splatfacto result resource summary mismatch")
+    expected_keys = {
+        "runtime_seconds",
+        "peak_cpu_memory_bytes",
+        "peak_gpu_compute_memory_bytes",
+        "gpu_memory_scope",
+        "gpu_measurement_status",
+        "gpu_selection",
+        "gpu_hardware",
+        "host",
+        "training_seconds",
+        "training_steps_per_second",
+        "render_median_fps",
+        "render_p95_latency_ms",
+    }
+    positive = (
+        "runtime_seconds",
+        "peak_cpu_memory_bytes",
+        "training_seconds",
+        "training_steps_per_second",
+        "render_median_fps",
+        "render_p95_latency_ms",
+    )
+    if (
+        set(summary) != expected_keys
+        or any(not isinstance(summary.get(name), (int, float)) for name in positive)
+        or any(float(summary[name]) <= 0.0 for name in positive)
+        or not isinstance(summary.get("peak_gpu_compute_memory_bytes"), int)
+        or summary["peak_gpu_compute_memory_bytes"] < 0
+        or summary.get("gpu_measurement_status")
+        not in {"measured", "unavailable"}
+        or (summary["peak_gpu_compute_memory_bytes"] > 0)
+        != (summary["gpu_measurement_status"] == "measured")
+        or not isinstance(summary.get("gpu_hardware"), list)
+        or not summary.get("host")
+    ):
+        raise ValueError("Splatfacto resource summary contract mismatch")
+    ensure_finite(summary, "Splatfacto resource summary")
+    return summary
 
 
 def _write_visualization(run_dir: Path, metrics: dict[str, Any]) -> None:
@@ -839,6 +948,7 @@ def validate_splatfacto_reference_result(run_dir: Path) -> dict[str, Any]:
     if profile not in PROFILE_CONFIG:
         raise ValueError("Splatfacto result profile mismatch")
     _validate_runtime_identity(run_dir, profile)
+    _validated_resources(run_dir, result)
     metrics = _evaluate_outputs(run_dir, profile)
     if not _values_match(result.get("metrics"), metrics):
         raise ValueError("Splatfacto persisted metric recomputation mismatch")
@@ -853,7 +963,7 @@ def validate_splatfacto_reference_result(run_dir: Path) -> dict[str, Any]:
         tool.get("source_commit") != PINNED_NERFSTUDIO_COMMIT
         or tool.get("dependency_commit") != PINNED_GSPLAT_COMMIT
         or tool.get("container_image") != IMAGE
-        or IMAGE_ID_PATTERN.fullmatch(str(tool.get("container_image_id", ""))) is None
+        or tool.get("container_image_id") != _approved_image_id()
     ):
         raise ValueError("Splatfacto tool identity mismatch")
     config = result["provenance"]["config"]
@@ -875,6 +985,11 @@ def run_splatfacto_reference(cache_root: Path, profile: str, run_id: str) -> Pat
         raise ValueError(f"unknown profile: {profile}")
     engine = os.environ.get("SURFLO_PATHWAY_CONTAINER_ENGINE", "docker")
     image_id = _inspect_image(engine, IMAGE)
+    if image_id != _approved_image_id():
+        raise ValueError(
+            f"Splatfacto image {image_id} is not the approved calibration image "
+            f"{_approved_image_id()}"
+        )
     gpu_hardware = _gpu_hardware(engine)
     if Path(engine).name == "docker" and not gpu_hardware:
         raise ValueError("unable to inventory GPU hardware for the real Splatfacto reference")

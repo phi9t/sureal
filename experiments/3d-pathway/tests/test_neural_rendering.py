@@ -47,7 +47,8 @@ class LearnedAndRenderableLabContractTest(unittest.TestCase):
             self.assertEqual(comparison["schema_version"], 1)
             self.assertEqual(comparison["evidence"], "calibrated synthetic RGB")
             self.assertEqual(
-                comparison["representation"], "explicit anisotropic Gaussian primitives"
+                comparison["representation"],
+                "simplified isotropic screen-space Gaussian samples",
             )
             self.assertEqual(comparison["inference"], "analytic controlled construction")
             self.assertFalse(comparison["mesh_extraction_supported"])

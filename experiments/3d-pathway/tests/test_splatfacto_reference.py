@@ -17,7 +17,11 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 NERFSTUDIO_COMMIT = "50e0e3c70c775e89333256213363badbf074f29d"
 GSPLAT_COMMIT = "4d3a3b69db4de0326f983ccf7b7b255271a17b01"
-FIXTURE_IMAGE_ID = "sha256:" + "b" * 64
+FIXTURE_IMAGE_ID = next(
+    item["baseline_environment"]["container_image_id"]
+    for item in json.loads((ROOT / "reference-adapters.json").read_text())["adapters"]
+    if item["id"] == "nerfstudio-splatfacto-reference"
+)
 
 
 def fake_splatfacto_engine(path: Path, fail: bool = False) -> Path:
@@ -82,14 +86,29 @@ def fake_splatfacto_engine(path: Path, fail: bool = False) -> Path:
                 quaternions=quaternions, opacity_logits=opacity_logits,
                 features_dc=features_dc,
             )
-            header = (
-                "ply\\nformat binary_little_endian 1.0\\n"
-                "comment renderable_primitives_not_mesh\\n"
-                "element vertex 4\\nproperty float x\\nend_header\\n"
-            ).encode("ascii")
-            # A binary PLY body is arbitrary bytes and must never be decoded as
-            # part of the ASCII header validation.
-            (output / "gaussians.ply").write_bytes(header + b"\\xbe" + b"\\x00" * 15)
+            ply_names = (
+                "x", "y", "z", "nx", "ny", "nz", "f_dc_0", "f_dc_1", "f_dc_2",
+                "opacity", "scale_0", "scale_1", "scale_2", "rot_0", "rot_1", "rot_2", "rot_3",
+            )
+            ply_dtype = np.dtype([(name, "<f4") for name in ply_names])
+            vertices = np.zeros(4, dtype=ply_dtype)
+            for index, name in enumerate(("x", "y", "z")):
+                vertices[name] = means[:, index]
+            for index, name in enumerate(("f_dc_0", "f_dc_1", "f_dc_2")):
+                vertices[name] = features_dc[:, index]
+            vertices["opacity"] = opacity_logits[:, 0]
+            for index, name in enumerate(("scale_0", "scale_1", "scale_2")):
+                vertices[name] = log_scales[:, index]
+            for index, name in enumerate(("rot_0", "rot_1", "rot_2", "rot_3")):
+                vertices[name] = quaternions[:, index]
+            header_lines = [
+                "ply", "format binary_little_endian 1.0",
+                "comment renderable_primitives_not_mesh", "element vertex 4",
+            ]
+            header_lines.extend(f"property float {{name}}" for name in ply_names)
+            header_lines.append("end_header")
+            header = ("\\n".join(header_lines) + "\\n").encode("ascii")
+            (output / "gaussians.ply").write_bytes(header + vertices.tobytes())
 
             target_dir = output / "target-renders"
             context_dir = output / "context-renders"
@@ -179,14 +198,19 @@ def fake_splatfacto_engine(path: Path, fail: bool = False) -> Path:
                 "nerfstudio_commit={NERFSTUDIO_COMMIT}\\ngsplat_commit={GSPLAT_COMMIT}\\n"
                 "gsplat_version=1.4.0\\ntorch_cuda_arch_list=10.0\\n"
                 "requirements_lock_sha256=02c623f2a636dd774dda048f1a08c8d936d0701f74d3f50b3a7916d2280ed65a\\n"
+                "resolved_requirements_sha256=587350cc8d7a65840facd27ebcf6fabc43f1e09d4f82541efa851ae914631076\\n"
                 "network_policy=build-and-fetch-only\\n"
             )
             shutil.copy2(repository / "insulas/radiance-field/requirements.lock.txt", output / "requirements.lock.txt")
-            shutil.copy2(repository / "insulas/radiance-field/resolved-requirements.lock.txt", output / "resolved-requirements.txt")
-            resolved_sha = "75324c79132de2fcf25b60444c7e9820baeebbc3a6db2002eb601ac2b5c33e4c"
+            resolved_text = (repository / "insulas/radiance-field/resolved-requirements.lock.txt").read_text()
+            (output / "resolved-requirements.txt").write_text(
+                resolved_text.replace("gsplat==1.4.0\\n", "gsplat @ file:///opt/src/gsplat\\n")
+            )
+            resolved_sha = "587350cc8d7a65840facd27ebcf6fabc43f1e09d4f82541efa851ae914631076"
             (output / "runtime-versions.json").write_text(json.dumps({{
                 "nerfstudio_commit": "{NERFSTUDIO_COMMIT}", "gsplat_commit": "{GSPLAT_COMMIT}",
-                "gsplat": "1.4.0", "requirements_lock_sha256": "02c623f2a636dd774dda048f1a08c8d936d0701f74d3f50b3a7916d2280ed65a",
+                "gsplat": "1.4.0", "gsplat_direct_url": "file:///opt/src/gsplat",
+                "requirements_lock_sha256": "02c623f2a636dd774dda048f1a08c8d936d0701f74d3f50b3a7916d2280ed65a",
                 "resolved_requirements_sha256": resolved_sha, "torch": "2.7.1+cu128",
                 "torchvision": "0.22.1+cu128", "pillow": "11.1.0", "python": "3.12.3",
                 "numpy": "2.5.2", "cuda_runtime": "12.8",
@@ -336,10 +360,17 @@ class SplatfactoReferenceFoundationTest(unittest.TestCase):
             gaussian["requirements_lock_sha256"],
             hashlib.sha256(requirements.read_bytes()).hexdigest(),
         )
+        expected_resolved = resolved.read_text().replace(
+            "gsplat==1.4.0\n", "gsplat @ file:///opt/src/gsplat\n"
+        ).encode()
         self.assertEqual(
             gaussian["resolved_requirements_sha256"],
-            hashlib.sha256(resolved.read_bytes()).hexdigest(),
+            hashlib.sha256(expected_resolved).hexdigest(),
         )
+        dockerfile = (ROOT / "insulas/gaussian-splatting/Dockerfile").read_text()
+        self.assertIn("git -C /opt/src/gsplat submodule update --init --recursive", dockerfile)
+        self.assertIn("--force-reinstall /opt/src/gsplat", dockerfile)
+        self.assertIn("direct_url.json", dockerfile)
 
     def test_public_reference_plan_is_offline(self) -> None:
         completed = subprocess.run(
@@ -403,6 +434,11 @@ class SplatfactoReferenceFoundationTest(unittest.TestCase):
             set(branch["then"]["properties"]["metrics"]["required"]),
             {"rendering", "geometry", "representation", "failure_sweep", "unsupported"},
         )
+        metric_properties = branch["then"]["properties"]["metrics"]["properties"]
+        self.assertIn("target_psnr_db", metric_properties["rendering"]["required"])
+        self.assertIn("expected_depth_rmse_m", metric_properties["geometry"]["required"])
+        self.assertIn("primitive_count", metric_properties["representation"]["required"])
+        self.assertIn("triangle_mesh", metric_properties["unsupported"]["required"])
 
     def test_entrypoint_runs_iteration_zero_preflight_on_the_primary_trainer(self) -> None:
         text = (ROOT / "insulas/gaussian-splatting/run-splatfacto.py").read_text()
@@ -526,6 +562,59 @@ class SplatfactoOutputContractTest(unittest.TestCase):
             np.savez_compressed(run_dir / "output/gaussians.npz", **arrays)
             with self.assertRaisesRegex(ValueError, "unit quaternion"):
                 validate_splatfacto_reference_result(run_dir)
+
+    def test_truncated_or_nonfinite_gaussian_ply_is_rejected(self) -> None:
+        import sys
+
+        sys.path.insert(0, str(ROOT / "pipeline"))
+        from splatfacto_reference_runner import validate_splatfacto_reference_result
+
+        with tempfile.TemporaryDirectory() as temporary:
+            run_dir = run_fake_splatfacto_reference(Path(temporary), "truncated-ply")
+            ply = run_dir / "output/gaussians.ply"
+            ply.write_bytes(ply.read_bytes()[:-1])
+            with self.assertRaisesRegex(ValueError, "PLY payload length"):
+                validate_splatfacto_reference_result(run_dir)
+
+        with tempfile.TemporaryDirectory() as temporary:
+            run_dir = run_fake_splatfacto_reference(Path(temporary), "nonfinite-ply")
+            ply = run_dir / "output/gaussians.ply"
+            payload = bytearray(ply.read_bytes())
+            offset = payload.index(b"end_header\n") + len(b"end_header\n")
+            payload[offset : offset + 4] = np.asarray(np.nan, dtype="<f4").tobytes()
+            ply.write_bytes(payload)
+            with self.assertRaisesRegex(ValueError, "PLY payload is non-finite"):
+                validate_splatfacto_reference_result(run_dir)
+
+    def test_tampered_resources_or_unapproved_image_are_rejected(self) -> None:
+        import sys
+
+        sys.path.insert(0, str(ROOT / "pipeline"))
+        import splatfacto_reference_runner
+
+        with tempfile.TemporaryDirectory() as temporary:
+            run_dir = run_fake_splatfacto_reference(Path(temporary), "resource-tamper")
+            result_path = run_dir / "result.json"
+            result = json.loads(result_path.read_text())
+            result["resources"]["runtime_seconds"] = 999999.0
+            result_path.write_text(json.dumps(result))
+            with self.assertRaisesRegex(ValueError, "resource summary mismatch"):
+                splatfacto_reference_runner.validate_splatfacto_reference_result(run_dir)
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            with mock.patch.object(
+                splatfacto_reference_runner,
+                "_inspect_image",
+                return_value="sha256:" + "c" * 64,
+            ), mock.patch.dict(
+                os.environ,
+                {"SURFLO_PATHWAY_CONTAINER_ENGINE": str(fake_splatfacto_engine(root))},
+            ):
+                with self.assertRaisesRegex(ValueError, "approved calibration image"):
+                    splatfacto_reference_runner.run_splatfacto_reference(
+                        root / "cache", "smoke", "unapproved-image"
+                    )
 
     def test_gaussian_parameter_validator_rejects_non_unit_quaternions(self) -> None:
         import sys

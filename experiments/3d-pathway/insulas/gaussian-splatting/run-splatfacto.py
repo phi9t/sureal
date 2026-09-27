@@ -7,6 +7,7 @@ import argparse
 import copy
 import csv
 import hashlib
+import importlib.metadata
 import json
 from pathlib import Path
 import platform
@@ -587,6 +588,12 @@ def main() -> None:
     gsplat_commit = _source_commit(Path("/opt/src/gsplat"))
     if nerfstudio_commit != NERFSTUDIO_COMMIT or gsplat_commit != GSPLAT_COMMIT:
         raise RuntimeError("installed source commit mismatch")
+    direct_url_text = importlib.metadata.distribution("gsplat").read_text("direct_url.json")
+    if direct_url_text is None:
+        raise RuntimeError("installed gsplat has no direct source provenance")
+    gsplat_direct_url = json.loads(direct_url_text)
+    if gsplat_direct_url != {"dir_info": {}, "url": "file:///opt/src/gsplat"}:
+        raise RuntimeError("installed gsplat is not bound to the pinned source checkout")
     requirements = Path("/etc/surflo-pathway-requirements.lock.txt")
     resolved = Path("/etc/surflo-pathway-resolved-requirements.txt")
     if _sha256(requirements) != REQUIREMENTS_LOCK_SHA256:
@@ -605,6 +612,7 @@ def main() -> None:
             "nerfstudio_commit": nerfstudio_commit,
             "gsplat_commit": gsplat_commit,
             "gsplat": gsplat.__version__,
+            "gsplat_direct_url": gsplat_direct_url["url"],
             "requirements_lock_sha256": _sha256(requirements),
             "resolved_requirements_sha256": _sha256(resolved),
             "torch": torch.__version__,

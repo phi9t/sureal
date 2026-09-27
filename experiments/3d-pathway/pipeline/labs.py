@@ -749,9 +749,9 @@ def _gaussian_splatting_lab(
             {
                 "schema_version": 1,
                 "evidence": "calibrated synthetic RGB",
-                "representation": "explicit anisotropic Gaussian primitives",
+                "representation": "simplified isotropic screen-space Gaussian samples",
                 "inference": "analytic controlled construction",
-                "rendering_operator": "orthographic EWA-style splatting",
+                "rendering_operator": "orthographic isotropic EWA-style normalized-weight teaching renderer",
                 "mesh_extraction_supported": False,
                 "completion_claim": False,
                 "interpretation": "projected appearance is invariant to the controlled viewing-axis center perturbation",

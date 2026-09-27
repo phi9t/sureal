@@ -1087,8 +1087,10 @@ experiments/3d-pathway/run.sh run --module 11 --profile smoke --run-id pathway-1
 
 Inspect `result.json`, `report.md`, `artifacts/gaussian_comparison.npz`,
 `artifacts/gaussian_comparison.json`, `artifacts/splat_tradeoff.svg`, and
-`artifacts/failure_sweep.csv`. The repo-owned lab renders actual deterministic
-Gaussian arrays. Its primitive-count sweep recomputes image PSNR, while a
+`artifacts/failure_sweep.csv`. The repo-owned lab renders deterministic,
+isotropic screen-space Gaussian samples with a normalized-weight teaching
+renderer; it is not an anisotropic, visibility-aware 3DGS implementation. Its
+primitive-count sweep recomputes image PSNR, while a
 viewing-axis center perturbation leaves the orthographic image unchanged and
 increases center-to-sphere error. Projecting those centers back to the known
 sphere is an analytic teaching regularizer, not a SuGaR/2DGS reproduction.
@@ -1112,12 +1114,12 @@ runs 1,000 updates; full runs 30,000. Target truth is opened only after the
 final checkpoint. Independent 3/5/9-view fits at 1,000 updates form the
 reference failure sweep.
 
-On the retained NVIDIA B200 calibration, smoke reached 16.90 dB held-out PSNR,
-0.385 SSIM, 0.258 LPIPS, 0.314 m common-visible expected-depth RMSE, and 0.744
-point F-score at 10 cm. Its primary fit took 10.6 seconds and ended with 1,747
-primitives. Full reached 21.66 dB, 0.922, 0.114, 0.070 m, and 0.954 F-score at
-5 cm in 247.5 training seconds, ending with 2,353 primitives. Both measured
-1.50 GiB peak GPU compute memory; median target rendering was 532 and 505 FPS,
+On the retained NVIDIA B200 calibration, smoke reached 22.54 dB held-out PSNR,
+0.804 SSIM, 0.153 LPIPS, 0.201 m common-visible expected-depth RMSE, and 0.724
+point F-score at 10 cm. Its primary fit took 11.1 seconds and ended with 1,749
+primitives. Full reached 21.33 dB, 0.923, 0.119, 0.069 m, and 0.963 F-score at
+5 cm in 251.8 training seconds, ending with 2,605 primitives. Both measured
+1.50 GiB peak GPU compute memory; median target rendering was 555 and 517 FPS,
 respectively, at the fixture resolution. These are retained configuration and
 hardware measurements, not copied paper results or cross-method rankings.
 Repeated same-seed CUDA calibration moved smoke target SSIM from 0.385 to
@@ -1131,7 +1133,7 @@ Expected depth is the ordered alpha-compositing expectation converted to
 camera-axis depth, not a first physical surface intersection. Geometry scores
 therefore remain view-conditioned diagnostics on accumulation-qualified,
 common-visible rays. The full fit's visible expected-depth RMSE improved to
-0.070 m while its separately reported unsupported-region RMSE was 0.785 m.
+0.069 m while its separately reported unsupported-region RMSE was 0.869 m.
 The output `gaussians.ply` is labelled renderable primitives, has no faces,
 and is never called a mesh. Canonical surface extraction, mesh F-score,
 hidden-surface completion, and posterior scene sampling remain unsupported;
