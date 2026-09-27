@@ -1707,7 +1707,11 @@ is zero. The paired run used plain inference, 100,000 query points, and 100 ODE
 steps; query count and rendering guidance were held fixed rather than claimed
 as executed sweep axes. A favorable hidden completion is not an acceptance
 condition. This is evidence for the open problem, not a failure hidden by an
-acceptance threshold.
+acceptance threshold. The compact result retains hidden-hypothesis support
+labels, not the point-level evidence needed to report within-sample coherence.
+It also omits the candidate numerator and denominator, so the pathway preserves
+the per-seed completion-precision values in the archive but does not aggregate
+or interpret their zeros.
 The code-level architecture, measurement boundary, and persistent-state
 interface are detailed in
 `experiments/3d-pathway/research/module15-surflo-synthesis.md`.

@@ -80,6 +80,8 @@ def _source_arrays(
         raise ValueError("paired-scene source must contain ordered seeds 0,1,2,3")
     if settings.get("num_query_points") != 100_000 or settings.get("num_steps") != 100:
         raise ValueError("paired-scene source settings mismatch")
+    if settings.get("inference_mode") != "plain":
+        raise ValueError("paired-scene inference mode is not locked to plain")
 
     numeric: dict[str, list[float]] = {field: [] for field in PAIRED_NUMERIC_FIELDS}
     labels: list[str] = []
@@ -289,7 +291,7 @@ def evaluate_surflo_evidence(arrays: dict[str, np.ndarray]) -> dict[str, Any]:
     plain = method_index["surflo/plain"]
     guided = method_index["surflo/guided-no-densification"]
     vggt = method_index["vggt"]
-    coherent = np.isin(labels, ["scene_a", "scene_b"])
+    single_hypothesis_support = np.isin(labels, ["scene_a", "scene_b"])
     hybrid = labels == "hybrid"
     unsupported = labels == "unsupported"
     hidden_support = np.maximum(support_a, support_b)
@@ -314,10 +316,9 @@ def evaluate_surflo_evidence(arrays: dict[str, np.ndarray]) -> dict[str, Any]:
             "hidden_hypothesis_support": float(np.mean(hidden_support)),
             "hidden_hypothesis_a_support": float(np.mean(support_a)),
             "hidden_hypothesis_b_support": float(np.mean(support_b)),
-            "completion_candidate_precision_to_either_hypothesis": float(
-                np.mean(arrays["paired_completion_precision"])
+            "single_hypothesis_support_label_fraction": float(
+                np.mean(single_hypothesis_support)
             ),
-            "coherent_supported_seed_fraction": float(np.mean(coherent)),
             "hybrid_seed_fraction": float(np.mean(hybrid)),
             "unsupported_seed_fraction": float(np.mean(unsupported)),
         },
@@ -367,7 +368,7 @@ def build_surflo_endpoint(
             },
         },
         "benchmark": {
-            "inference_mode": "plain",
+            "inference_mode": paired_source["settings"]["inference_mode"],
             "query_points": int(paired_source["settings"]["num_query_points"]),
             "ode_steps": int(paired_source["settings"]["num_steps"]),
             "seeds": paired_source["settings"]["seeds"],
@@ -410,6 +411,17 @@ def build_surflo_endpoint(
         "resource_summary": {
             "paired_mean_wall_seconds": float(np.mean(arrays["paired_wall_seconds"])),
             "paired_peak_vram_gib": float(np.max(arrays["paired_peak_vram_gib"])),
+        },
+        "metric_limitations": {
+            "completion_candidate_precision": (
+                "retained per seed in the evidence archive but not aggregated: "
+                "the compact source omits candidate numerators and denominators, "
+                "and zero can mean no candidates"
+            ),
+            "within_sample_coherence": (
+                "not reported: exclusive hidden-surface support labels do not retain "
+                "point-level consistency or cross-query persistence evidence"
+            ),
         },
     }
     return {

@@ -493,7 +493,10 @@ class SurfloEndpointContractTest(unittest.TestCase):
         self.assertAlmostEqual(geometry["observed_common_recall"], 0.765712258537032)
         self.assertAlmostEqual(geometry["unobserved_common_recall"], 0.0564191350822387)
         self.assertEqual(generative["hidden_hypothesis_support"], 0.0)
-        self.assertEqual(generative["coherent_supported_seed_fraction"], 0.0)
+        self.assertEqual(generative["single_hypothesis_support_label_fraction"], 0.0)
+        self.assertNotIn(
+            "completion_candidate_precision_to_either_hypothesis", generative
+        )
         self.assertEqual(endpoint["sweep"][0]["value"], 0)
 
         supported_source = json.loads(json.dumps(source))
@@ -505,13 +508,20 @@ class SurfloEndpointContractTest(unittest.TestCase):
         supported_source["aggregate"]["mean_hidden_support_b"] = 0.02
         supported = build_surflo_endpoint(supported_source, scout)
         self.assertEqual(
-            supported["metrics"]["generative"]["coherent_supported_seed_fraction"],
+            supported["metrics"]["generative"][
+                "single_hypothesis_support_label_fraction"
+            ],
             0.25,
         )
         self.assertEqual(
             supported["metrics"]["generative"]["hidden_hypothesis_support"],
             0.18,
         )
+
+        unlocked_mode = json.loads(json.dumps(source))
+        unlocked_mode["settings"]["inference_mode"] = "guided"
+        with self.assertRaisesRegex(ValueError, "inference mode"):
+            build_surflo_endpoint(unlocked_mode, scout)
 
         source["aggregate"]["mean_observed_common_recall"] = 0.99
         with self.assertRaisesRegex(ValueError, "source aggregate mismatch"):
@@ -545,6 +555,7 @@ class SurfloEndpointContractTest(unittest.TestCase):
             run_dir = cache / "runs" / "surflo-endpoint-contract" / "15"
             result_path = run_dir / "result.json"
             result = json.loads(result_path.read_text())
+            original_result = json.loads(json.dumps(result))
             endpoint = json.loads(
                 (run_dir / "artifacts/surflo_endpoint.json").read_text()
             )
@@ -562,25 +573,59 @@ class SurfloEndpointContractTest(unittest.TestCase):
             self.assertEqual(recomputed["metrics"], result["metrics"])
             self.assertEqual(recomputed["sweep"], result["failure_sweep"])
 
+            def validate() -> subprocess.CompletedProcess[str]:
+                return subprocess.run(
+                    [
+                        str(ROOT / "run.sh"),
+                        "validate",
+                        "--module",
+                        "15",
+                        "--run-id",
+                        "surflo-endpoint-contract",
+                    ],
+                    cwd=REPO_ROOT,
+                    env=env,
+                    text=True,
+                    capture_output=True,
+                    check=False,
+                )
+
             result["metrics"]["geometry"]["observed_common_recall"] = 0.99
             result_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
-            validation = subprocess.run(
-                [
-                    str(ROOT / "run.sh"),
-                    "validate",
-                    "--module",
-                    "15",
-                    "--run-id",
-                    "surflo-endpoint-contract",
-                ],
-                cwd=REPO_ROOT,
-                env=env,
-                text=True,
-                capture_output=True,
-                check=False,
-            )
+            validation = validate()
             self.assertNotEqual(validation.returncode, 0)
             self.assertIn("Module 15 metric mismatch", validation.stderr)
+
+            result = json.loads(json.dumps(original_result))
+            result["measurement_kind"] = "controlled_fixture"
+            result["failure_sweep_provenance"] = "controlled_fixture"
+            result["source_result_status"] = "pending"
+            for family in result["metric_provenance"].values():
+                for name in family:
+                    family[name] = "controlled_fixture"
+            for name in result["provenance"]["artifact_provenance"]:
+                result["provenance"]["artifact_provenance"][name] = (
+                    "controlled_fixture"
+                )
+            result_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
+            validation = validate()
+            self.assertNotEqual(validation.returncode, 0)
+            self.assertIn("measurement kind does not match module contract", validation.stderr)
+
+            report_path = run_dir / "report.md"
+            report_path.write_text(
+                report_path.read_text().replace(
+                    "REUSED MEASURED RESULT", "CONTROLLED FIXTURE"
+                )
+            )
+            result = json.loads(json.dumps(original_result))
+            result["provenance"]["reports_sha256"]["report.md"] = hashlib.sha256(
+                report_path.read_bytes()
+            ).hexdigest()
+            result_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
+            validation = validate()
+            self.assertNotEqual(validation.returncode, 0)
+            self.assertIn("report content does not match result", validation.stderr)
 
 
 class FrontierLabContractTest(unittest.TestCase):

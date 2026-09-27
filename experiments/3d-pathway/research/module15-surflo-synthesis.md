@@ -32,22 +32,24 @@ The repository implementation exposes the same boundary directly:
 
 ## Exact sample space
 
-Let (O) be the input images and let the frozen evidence pipeline plus
-Perceiver produce (h(O)). Plain Surflo draws a source value for each query
+Let $O$ be the input images and let the frozen evidence pipeline plus
+Perceiver produce $h(O)$. Plain Surflo draws a source value for each query
 point and transports it through a shared conditional velocity field:
 
 \[
-x_i(1)\sim p_0(\cdot\mid O),\qquad
+x_i(0)\sim p_0(\cdot\mid O),\qquad
 \frac{d x_i(t)}{dt}=v_\theta(x_i(t),t,h(O)),\qquad
-x_i(0)=(p_i,p_i+\epsilon n_i).
+x_i(1)=(p_i,p_i+\epsilon n_i).
 \]
 
 The last equality is the repository's 6D oriented-point representation; the
 normal is recovered from the normalized difference of the two 3D components.
-The time direction follows the released inference implementation, which moves
-from the source at (t=1) toward the surface at (t=0).
+The convention follows standard flow matching and the released plain-inference
+path: the source is $x_0$, the surface target is $x_1$, and the ODE time grid
+moves from 0 to 1. Only the optional mean-flow branch reverses its integration
+grid.
 
-The deterministic state (h(O)) is shared, and all queries share the learned
+The deterministic state $h(O)$ is shared, and all queries share the learned
 field parameters. Those facts provide cross-view conditioning. They do not
 introduce a sampled random variable whose value denotes one complete scene.
 In plain inference, changing the point seed or extending the query set draws
@@ -99,7 +101,7 @@ The photoreal benchmark renders the same 16 context images for two mutually
 exclusive complete L-room hypotheses. Scene A contains a hidden sofa; scene B
 contains a hidden shelf. Target views reveal the difference, but target images
 are withheld from reconstruction. Therefore neither hidden completion is
-uniquely recoverable from (O), while both are valid conditional hypotheses.
+uniquely recoverable from $O$, while both are valid conditional hypotheses.
 
 Four stock plain-Surflo runs use seeds 0–3, 100,000 queries, and 100 ODE steps.
 The result wrapper recomputes these quantities from the per-seed records:
@@ -110,7 +112,7 @@ The result wrapper recomputes these quantities from the per-seed records:
 | Mean unobserved-common recall | 0.0564 |
 | Mean exclusive hidden support, scene A | 0 |
 | Mean exclusive hidden support, scene B | 0 |
-| Coherently supported seed fraction | 0 |
+| Single-hypothesis support-label fraction | 0 |
 | Unsupported seed fraction | 1 |
 
 The result is accepted because the experiment requires valid measurements, not
@@ -118,6 +120,13 @@ a favorable completion. It does not show that Surflo always fails to complete
 hidden geometry, nor does it estimate a calibrated posterior from four seeds.
 It shows that this locked ambiguous episode provides no evidence that point
 stochasticity sampled either complete hidden hypothesis.
+
+The compact result does not retain point assignments, candidate counts, or
+candidate numerators. It therefore cannot support a within-sample coherence
+metric, and the recorded completion-candidate precision of zero is ambiguous
+between an empty candidate set and an all-incorrect set. The pathway archives
+that published per-seed field for provenance but excludes it from aggregate
+metrics and claims.
 
 The analytic paired-room scout is a different diagnostic. It produced hybrid
 support for most seeds, whereas the photoreal probe supported neither hidden

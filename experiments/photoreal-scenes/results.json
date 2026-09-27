@@ -114,6 +114,7 @@
   ],
   "schema_version": 1,
   "settings": {
+    "inference_mode": "plain",
     "num_query_points": 100000,
     "num_steps": 100,
     "seeds": [

@@ -41,7 +41,8 @@
     },
     {
       "id": "surflo-paired-scenes", "mode": "repository", "license": "repository license and third-party notices",
-      "source": "../photoreal-scenes/results.json", "sha256": "cf31460c1a770cccb7bb7126c623fef27c3603c0bae3833591af23405efb111b"
+      "source": "../photoreal-scenes/results.json", "sha256": "76c22d4612c4acc0ff63ae81660632a6aa4991de10bd8172805c5b5c7007e163",
+      "inference_mode": "plain"
     },
     {
       "id": "surflo-visible-scout", "mode": "repository", "license": "repository license and dataset terms",

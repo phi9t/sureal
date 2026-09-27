@@ -9,7 +9,7 @@ from typing import Any
 
 import numpy as np
 
-from contracts import IMPLEMENTATION_FILES, INPUT_FILES, ROOT, canonical_json, ensure_finite, load_json, sha256_file, validate_json_schema_instance
+from contracts import IMPLEMENTATION_FILES, INPUT_FILES, ROOT, canonical_json, ensure_finite, load_json, module_by_id, sha256_file, validate_json_schema_instance
 from dynamic import (
     DYNAMIC_ARRAY_SEMANTICS,
     DYNAMIC_CAMERA_CONTAMINATION,
@@ -31,6 +31,7 @@ from generative import (
     generate_ambiguity_failure_sweep,
 )
 from surflo_endpoint import build_surflo_endpoint, evaluate_surflo_evidence
+from reporting import module_report
 
 
 REQUIRED_TOP_LEVEL = {
@@ -272,9 +273,11 @@ def _validate_module15(run_dir: Path, result: dict[str, Any]) -> None:
     scout_hash = sha256_file(scout_path)
     if (
         paired_hash != locks["surflo-paired-scenes"]["sha256"]
+        or locks["surflo-paired-scenes"].get("inference_mode") != "plain"
         or result.get("source_results_sha256") != paired_hash
         or scout_hash != locks["surflo-visible-scout"]["sha256"]
         or result.get("scout_results_sha256") != scout_hash
+        or result.get("source_result_status") != "pass"
     ):
         raise ValueError("Module 15 source result does not match asset locks")
     expected = build_surflo_endpoint(
@@ -328,9 +331,14 @@ def validate_result(run_dir: Path, expected_module: str | None = None) -> dict[s
         raise ValueError(f"expected module {expected_module}, got {result['module_id']}")
     if set(result["metrics"]) != {"geometry", "rendering", "generative"}:
         raise ValueError("metrics must retain geometry, rendering, and generative families")
-    if result["measurement_kind"] not in {"controlled_fixture", "reused_measured_result"}:
-        raise ValueError("unknown measurement kind")
-    if result["failure_sweep_provenance"] != result["measurement_kind"]:
+    expected_measurement_kind = (
+        "reused_measured_result"
+        if result["module_id"] == "15"
+        else "controlled_fixture"
+    )
+    if result["measurement_kind"] != expected_measurement_kind:
+        raise ValueError("measurement kind does not match module contract")
+    if result["failure_sweep_provenance"] != expected_measurement_kind:
         raise ValueError("failure sweep provenance mismatch")
     _require_type(result["metrics"], dict, "metrics")
     _require_type(result["failure_sweep"], list, "failure_sweep")
@@ -338,6 +346,11 @@ def validate_result(run_dir: Path, expected_module: str | None = None) -> dict[s
         _require_type(metrics, dict, f"metrics.{family}")
         if set(result["metric_provenance"].get(family, {})) != set(metrics):
             raise ValueError(f"metric provenance mismatch for {family}")
+        if any(
+            value != expected_measurement_kind
+            for value in result["metric_provenance"][family].values()
+        ):
+            raise ValueError(f"metric provenance value mismatch for {family}")
     if len(result["failure_sweep"]) < 2:
         raise ValueError("failure sweep is incomplete")
     for required in ("runtime_seconds", "peak_cpu_bytes", "peak_gpu_bytes"):
@@ -355,7 +368,9 @@ def validate_result(run_dir: Path, expected_module: str | None = None) -> dict[s
     }
     if actual != recorded:
         raise ValueError("artifact hash mismatch")
-    if set(provenance["artifact_provenance"]) != set(recorded):
+    if provenance["artifact_provenance"] != {
+        name: expected_measurement_kind for name in recorded
+    }:
         raise ValueError("artifact provenance mismatch")
     actual_inputs = {name: sha256_file(ROOT / name) for name in INPUT_FILES}
     if provenance["inputs_sha256"] != actual_inputs:
@@ -375,6 +390,10 @@ def validate_result(run_dir: Path, expected_module: str | None = None) -> dict[s
         _validate_module14(run_dir, result)
     if result["module_id"] == "15":
         _validate_module15(run_dir, result)
+    if (run_dir / "report.md").read_text(encoding="utf-8") != module_report(
+        module_by_id(result["module_id"]), result
+    ):
+        raise ValueError("report content does not match result")
     ensure_finite(result)
     return result
 
