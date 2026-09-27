@@ -431,6 +431,10 @@ def _secure_directory(root: Path, name: str) -> Path:
 
 def run_reference(cache_root: Path, adapter: str, profile: str, run_id: str) -> Path:
     validate_run_id(run_id)
+    if adapter == "foundation-geometry":
+        from foundation_geometry_reference_runner import run_foundation_geometry_reference
+
+        return run_foundation_geometry_reference(cache_root, profile, run_id)
     if adapter == "splatfacto":
         from splatfacto_reference_runner import run_splatfacto_reference
 

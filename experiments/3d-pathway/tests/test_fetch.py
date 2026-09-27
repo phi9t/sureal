@@ -14,6 +14,39 @@ sys.path.insert(0, str(ROOT / "pipeline"))
 
 
 class FetchPromotionContractTest(unittest.TestCase):
+    def test_foundation_model_fetch_commands_pin_revisions_and_files(self) -> None:
+        from fetch import huggingface_snapshot_commands
+
+        commands = huggingface_snapshot_commands(
+            json.loads((ROOT / "foundation-models.lock.json").read_text())
+        )
+
+        self.assertEqual(len(commands), 2)
+        self.assertEqual(
+            commands[0],
+            [
+                "hf",
+                "download",
+                "facebook/VGGT-1B",
+                "--revision",
+                "860abec7937da0a4c03c41d3c269c366e82abdf9",
+                "config.json",
+                "model.safetensors",
+            ],
+        )
+        self.assertEqual(
+            commands[1],
+            [
+                "hf",
+                "download",
+                "depth-anything/DA3-BASE",
+                "--revision",
+                "f4a6c9b3c95e41c82048423d3493a81ec3fa810e",
+                "config.json",
+                "model.safetensors",
+            ],
+        )
+
     def test_locked_zip_extraction_is_safe_atomic_and_manifested(self) -> None:
         from fetch import extract_locked_asset
 

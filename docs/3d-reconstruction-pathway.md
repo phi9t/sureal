@@ -1202,9 +1202,58 @@ experiments/3d-pathway/run.sh run --module 12 --profile smoke --run-id pathway-1
 ```
 
 Inspect `result.json`, `report.md`, `artifacts/foundation_geometry.svg`,
-`artifacts/model_comparison.json`, and `artifacts/failure_sweep.csv`. The table
-is a controlled contract fixture, not a reproduced leaderboard; maintained
-model adapters in the Surflo environment are the full-profile target.
+`artifacts/model_comparison.json`, `artifacts/gauge_alignment.npz`, and
+`artifacts/failure_sweep.csv`. This repo-owned fixture applies a known global
+similarity to exact visible points, then shows that raw error can be large while
+Sim(3)-aligned error is numerical zero. Its overlap sweep is analytic, its
+unobserved hemisphere has zero recall, and it contains no named-model quality
+scores. It is an observability lesson, not a reproduced leaderboard.
+
+The maintained comparison is separate and checkpoint-backed:
+
+```bash
+# Networked, explicit, and hash verified. Restricted weights are not committed.
+experiments/3d-pathway/run.sh fetch --asset foundation-geometry-models
+
+# Offline B200 execution after fetch.
+experiments/3d-pathway/run.sh reference --adapter foundation-geometry \
+  --profile smoke --run-id module12-smoke
+experiments/3d-pathway/run.sh reference --adapter foundation-geometry \
+  --profile full --run-id module12-full
+```
+
+It runs two precisely named direct modes from unposed RGB only:
+
+- `vggt/direct` uses the original VGGT-1B checkpoint, the repo's file-hashed
+  vendored implementation, 518-pixel preprocessing, predicted cameras and
+  camera-z depth, depth unprojection as the canonical pointmap, the untouched
+  direct point head as a second result, and 16 queried tracks. The checkpoint
+  is CC BY-NC 4.0; this scientific reference is not permission for commercial
+  use or redistribution.
+- `da3-base/camera-head` uses Apache-2.0 DA3-BASE at 504-pixel upper-bound
+  resize with fixed first-image reference selection. It predicts cameras,
+  camera-z depth, and confidence; points are obtained by deterministic
+  unprojection. It has no direct point head or track output.
+
+Raw, SE(3), and Sim(3) rows remain separate. Alignment is performed by the
+evaluator after the feed-forward pass and is never relabelled as model
+optimization. The overlap/view sweep uses two high-overlap views, two
+low-overlap views, three views, five views, and—in the full profile—nine views.
+Ground-truth cameras, masks, depths, and surfaces live outside the container's
+RGB-only input mount. Bundle adjustment, global alignment, metric scale,
+watertight surfaces, hidden completion, and posterior scene sampling remain
+explicitly unsupported.
+
+On the locked NVIDIA B200 environment, smoke (five-view primary case) measured
+VGGT pose AUC@30 0.908, Sim(3) camera RMSE 0.036 m, scaled depth AbsRel 0.0094,
+and corresponding visible-point RMSE 0.165 m; DA3-BASE measured 0.817, 0.064 m,
+0.0275, and 0.306 m. Full (nine views) measured 0.919/0.035 m/0.0095/0.163 m
+for VGGT and 0.843/0.060 m/0.0286/0.297 m for DA3-BASE. End-to-end runtime was
+34.8 s smoke and 45.8 s full, with measured peak compute memory 12.60 GB and
+15.36 GB. These are one controlled-scene reproduction's integrity baselines,
+not paper-table results or a general ranking. Exact source, checkpoint,
+licence, preprocessing, and protocol evidence is recorded in
+`experiments/3d-pathway/research/module12-reference-selection.md`.
 
 ### Transition
 

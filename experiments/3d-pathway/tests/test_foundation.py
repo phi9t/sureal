@@ -110,12 +110,13 @@ class RegistryContractTest(unittest.TestCase):
                 "tum-rgbd",
                 "depth-anything-v2-metric-hypersim-small",
                 "nerfstudio-lpips-alexnet",
+                "foundation-geometry-models",
                 "nerf-synthetic",
                 "surflo-paired-scenes",
             },
         )
         for asset in assets:
-            self.assertIn(asset["mode"], {"generated", "download", "repository"})
+            self.assertIn(asset["mode"], {"generated", "download", "huggingface_snapshot", "repository"})
             self.assertRegex(asset["sha256"], r"^[0-9a-f]{64}$")
 
 

@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "models": {
+    "vggt": {
+      "repository": "facebook/VGGT-1B",
+      "revision": "860abec7937da0a4c03c41d3c269c366e82abdf9",
+      "upstream_source_commit": "a288dd0f14786c93483e45524328726ab7b1b4ce",
+      "license": "CC-BY-NC-4.0",
+      "cache_path": "huggingface/hub/models--facebook--VGGT-1B",
+      "vendored_source_files": {
+        "surflo/nn/vggt/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "surflo/nn/vggt/heads/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "surflo/nn/vggt/heads/camera_head.py": "1a2777b7d6e53dce1c8dab0420cf2af524cf47735056e939b64cdea83c30398e",
+        "surflo/nn/vggt/heads/dpt_head.py": "b83ff030043f2ba808afb0c0ebc2f40f1d2ddc9d0b4b847bdfd53670f2d03e17",
+        "surflo/nn/vggt/heads/head_act.py": "428bdb087f457b809a66e22d7d01147c1cb4dab43bb0d98bc61c7f05d8383a1e",
+        "surflo/nn/vggt/heads/track_head.py": "5838f10401ad4c614e5608314f7b27b9195af8839e8bbb3321bfb6aad41a3e59",
+        "surflo/nn/vggt/heads/track_modules/__init__.py": "3cb62676c3fad403516673b2e99cdb6cbc0b71f814c3bb7f551bfa1e8495e062",
+        "surflo/nn/vggt/heads/track_modules/base_track_predictor.py": "8afb4311f71b74a85a2faf12386e72a782678e8d5e223a95645b951e6fbae185",
+        "surflo/nn/vggt/heads/track_modules/blocks.py": "7c00a9edec0c4ce0ba773063ba72e578004731dc3f9a6386478f2c1d2f06e948",
+        "surflo/nn/vggt/heads/track_modules/modules.py": "3b86a7580cee368ddb97a37a879b82943a8f82ca539979ecdd3218c27a4aa811",
+        "surflo/nn/vggt/heads/track_modules/utils.py": "0480f9c7a452310affc4cf4566c6ba37fde80675c476123ee61a4eab121f4917",
+        "surflo/nn/vggt/heads/utils.py": "2dce4c0dca1974a5250cc5d5d95bd3417e3ba9494978437a12d5ab6bbff4d4df",
+        "surflo/nn/vggt/layers/__init__.py": "e3c28c7b775165b6844000eb69f44d104d6c3803ac7da5d59f6ac3ecfb46d9d8",
+        "surflo/nn/vggt/layers/attention.py": "fa89ee31aaaacefd8b8d4d48c6c2b498295a7b2e6922516c5f1988cfe159a33a",
+        "surflo/nn/vggt/layers/block.py": "e2ed5042a9521fe22d4bebc4e5a669a53fe31b295289b7bbab676334e4a2acd1",
+        "surflo/nn/vggt/layers/ca_block.py": "d4a880a89983397465cc6136504fc30df3fbc380d64370b2469e48dd4784cd6f",
+        "surflo/nn/vggt/layers/cross_attention.py": "0c5fbef53eac376a4ffb9ce6353885cd8a0de9db62a6c843b2a174beec2a82e9",
+        "surflo/nn/vggt/layers/drop_path.py": "b9f8236e86054b9d9a71275efcad2a9ecaa1f86b529d4b8d6109ddb5e806f67a",
+        "surflo/nn/vggt/layers/layer_scale.py": "83586eaa81ef11828b1001f3dd85747ba362df23ddb57c8454b2eba279f5a558",
+        "surflo/nn/vggt/layers/mlp.py": "2af60ef7909783a5e04b35ebfba7f6da45c36aae4ba0bb9ad68499d1336cadcb",
+        "surflo/nn/vggt/layers/patch_embed.py": "c2543ec293951d081db662b2125027625f6e632971630facaa7f911c2377d335",
+        "surflo/nn/vggt/layers/rope.py": "bf66c3119da2d2696057b34e77c6499463c1f24ef0bcb96dc947fff7c32c27c2",
+        "surflo/nn/vggt/layers/swiglu_ffn.py": "af287ee5b7e6a2a5608ed78cf8d392a00191718825a3889c224ccaa0fd914089",
+        "surflo/nn/vggt/layers/vision_transformer.py": "fac3b498e261a4b0193393f8ee0c221311a43fe5869b66803de50ea42e129d24",
+        "surflo/nn/vggt/models/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "surflo/nn/vggt/models/aggregator.py": "869d43dcb8f9b478dc36deef0379eb7d16b134fc7b468ea2bedcbf81be7a3c2e",
+        "surflo/nn/vggt/models/vggt.py": "57d7b75d5ace553555fac8485d5a9519dd1d99e9b1ed4db0d8afa9783bc7d62d",
+        "surflo/nn/vggt/utils/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "surflo/nn/vggt/utils/pose_enc.py": "845fc3a46cb851bebf0720b8fc2b9f34334ae8e11f1982376ba59f90ff18f22b",
+        "surflo/nn/vggt/utils/rotation.py": "ad3a904e243c6654f0aa5f1d0206ace5f2d61011bc1bf8f492b40e0b76cb2070",
+        "surflo/nn/vggt/utils/time_sampling.py": "50caeb369640831e49e143b3ca49c1c9b741f28ecb73d9900c95111d869f20dc"
+      },
+      "files": {
+        "config.json": {
+          "sha256": "a73e929a168b900546a84fe88cd70dfaaf2f8e39cf77355b12984eaa686f3855",
+          "byte_size": 62
+        },
+        "model.safetensors": {
+          "sha256": "f164acf60724910d8fe1578bb499d800850c7bb0948db7555c413f9fbe60467e",
+          "byte_size": 5026367224
+        }
+      }
+    },
+    "depth-anything-3": {
+      "repository": "depth-anything/DA3-BASE",
+      "revision": "f4a6c9b3c95e41c82048423d3493a81ec3fa810e",
+      "license": "Apache-2.0",
+      "source_repository": "ByteDance-Seed/Depth-Anything-3",
+      "source_commit": "3d835ec1a5802d64a8b8b15f817a1ab54809bfe4",
+      "cache_path": "huggingface/hub/models--depth-anything--DA3-BASE",
+      "files": {
+        "config.json": {
+          "sha256": "5e34115ebc17bd2d8d43033c5f72e9446ac8833fd61d3fa160b7e67e0bb5b7b5",
+          "byte_size": 1205
+        },
+        "model.safetensors": {
+          "sha256": "e01067dc1659613083d9145a9a2547ccdbe6ccbbf83c4fe7b3e8a4e2bdae78b5",
+          "byte_size": 541518028
+        }
+      }
+    }
+  }
+}

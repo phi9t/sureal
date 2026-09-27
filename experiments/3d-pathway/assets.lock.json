@@ -30,6 +30,11 @@
       "extraction": "not-required", "consumers": ["nerfstudio-neus-facto-reference", "nerfstudio-nerfacto-reference", "nerfstudio-splatfacto-reference"]
     },
     {
+      "id": "foundation-geometry-models", "mode": "huggingface_snapshot", "license": "mixed: VGGT-1B CC-BY-NC-4.0; DA3-BASE Apache-2.0",
+      "source": "foundation-models.lock.json", "sha256": "44d67ac99b136f9a4eb8b79006896401ec4606e93e0658a8e19c2193868a45be",
+      "digest_status": "verified_2026-09-27", "consumers": ["foundation-geometry-reference"]
+    },
+    {
       "id": "nerf-synthetic", "mode": "download", "license": "NeRF dataset terms",
       "source": "https://cseweb.ucsd.edu/~viscomp/projects/LF/papers/ECCV20/nerf/nerf_example_data.zip", "sha256": "ce4e94e031c099a19ef04cfb6c71f1e47225d97d365be610b476e379a386c25f",
       "byte_size": 370385516, "digest_status": "verified_2026-09-26", "archive_format": "zip", "extraction": {"mode": "zip", "roots": ["nerf_llff_data", "nerf_synthetic"]}, "consumers": ["future-nerf-synthetic-extension"]

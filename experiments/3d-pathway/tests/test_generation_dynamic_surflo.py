@@ -52,7 +52,10 @@ class FrontierLabContractTest(unittest.TestCase):
                 self.assertTrue(any((run_dir / "artifacts").glob("*.svg")))
 
             foundation = results["12"]["metrics"]["geometry"]
-            self.assertLess(foundation["aligned_point_rmse_m"], foundation["raw_point_rmse_m"])
+            self.assertLess(
+                foundation["similarity_aligned_point_rmse_m"],
+                foundation["raw_point_rmse_m"],
+            )
             self.assertEqual(foundation["hidden_surface_recall"], 0.0)
 
             generation = results["13"]["metrics"]["generative"]

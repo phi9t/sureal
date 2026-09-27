@@ -126,6 +126,39 @@
       "last_verified_full": {"date": "2026-09-26", "run_id": "module11-splatfacto-full-reviewed-20260926", "target_psnr_db": 21.327524053015967, "target_ssim": 0.9231457669296593, "target_lpips": 0.11895293245712917, "context_fit_psnr_db": 47.49675275633119, "common_visible_accumulation_coverage": 0.991280276816609, "expected_depth_rmse_m": 0.06936031990015215, "point_fscore_5cm": 0.963317229269606, "primitive_count": 2605, "unsupported_expected_depth_rmse_m": 0.8694558411404169, "training_seconds": 251.82282254472375, "runtime_seconds": 307.1225138171576, "peak_cpu_memory_bytes": 2881798144, "peak_gpu_compute_memory_bytes": 1610612736, "render_median_fps": 517.1192824472847},
       "measurement_note": "Splatfacto optimizes one explicit Gaussian radiance representation from calibrated context RGB. Expected depth is an alpha-compositing statistic, not a surface intersection. Vanilla Splatfacto supplies no mesh extractor or hidden-scene posterior; those claims remain unsupported until separately pinned surface-aware and generative adapters land. Acceptance bounds are conservative seeded B200 execution-integrity gates calibrated from repeated smoke and full runs; they are not cross-method quality claims. Across same-seed CUDA/adaptive-density calibration and the retained reviewed runs, smoke target SSIM ranged from 0.171 to 0.804 and full 5 cm point F-score from 0.612 to 0.963; another full fit produced 19.689 dB with 0.670 m expected-depth RMSE and 0.091 F-score at 10 cm. Quality metrics therefore retain broad non-collapse bounds rather than false reproducibility."
     },
-    {"id": "foundation-geometry-reference", "modules": ["12"], "status": "not_landed", "reason": "No checkpoint-backed invocation is tracked in this pathway."}
+    {
+      "id": "foundation-geometry-reference",
+      "command": "run.sh reference --adapter foundation-geometry --profile smoke --run-id ID",
+      "modules": ["12"],
+      "status": "landed",
+      "acceptance": {
+        "smoke": {"evaluated_cases_min": 4, "foreground_valid_fraction_min": 0.99, "relative_pose_auc_30_min": 0.50, "sim3_center_rmse_m_max": 0.50, "sim3_depth_abs_rel_max": 0.50, "sim3_point_rmse_m_max": 1.0, "roundtrip_max_px": 0.001},
+        "full": {"evaluated_cases_min": 5, "foreground_valid_fraction_min": 0.99, "relative_pose_auc_30_min": 0.50, "sim3_center_rmse_m_max": 0.50, "sim3_depth_abs_rel_max": 0.50, "sim3_point_rmse_m_max": 1.0, "roundtrip_max_px": 0.001}
+      },
+      "baseline_environment": {"container_image_id": "sha256:3006bcf0e893dd3f6a713a5552894e3a6059f74e7da4720cef46f7d1a7d45640", "gpu_model": "NVIDIA B200", "compute_capability": 10.0, "driver_version": "580.105.08", "torch": "2.9.1+cu130", "torchvision": "0.24.1+cu130"},
+      "model_contract": {
+        "methods": ["vggt/direct", "da3-base/camera-head"],
+        "vggt_checkpoint_revision": "860abec7937da0a4c03c41d3c269c366e82abdf9",
+        "vggt_checkpoint_sha256": "f164acf60724910d8fe1578bb499d800850c7bb0948db7555c413f9fbe60467e",
+        "da3_source_commit": "3d835ec1a5802d64a8b8b15f817a1ab54809bfe4",
+        "da3_base_checkpoint_revision": "f4a6c9b3c95e41c82048423d3493a81ec3fa810e",
+        "da3_base_checkpoint_sha256": "e01067dc1659613083d9145a9a2547ccdbe6ccbbf83c4fe7b3e8a4e2bdae78b5",
+        "inference": "amortized-feed-forward",
+        "optimization": "none",
+        "canonical_geometry": "depth unprojected through predicted cameras",
+        "completion_claim": false,
+        "posterior_sampling_claim": false
+      },
+      "evaluation_contract": {
+        "evidence": "ordered unposed RGB only",
+        "alignment_rows": ["raw", "se3", "sim3"],
+        "smoke_cases": ["views-2-high-overlap", "views-2-low-overlap", "views-3", "views-5"],
+        "full_cases": ["views-2-high-overlap", "views-2-low-overlap", "views-3", "views-5", "views-9"],
+        "hidden_surface_completion": "unsupported"
+      },
+      "last_verified_smoke": {"date": "2026-09-27", "run_id": "module12-smoke-landed-20260927", "vggt_pose_auc_30": 0.9082544904019108, "vggt_sim3_center_rmse_m": 0.036052952825236545, "vggt_sim3_depth_abs_rel": 0.009356472052200094, "vggt_sim3_point_rmse_m": 0.16546558603991482, "vggt_point_fscore_10cm": 0.269775390625, "da3_pose_auc_30": 0.8167179499161327, "da3_sim3_center_rmse_m": 0.06411070077723126, "da3_sim3_depth_abs_rel": 0.027534110514058997, "da3_sim3_point_rmse_m": 0.3060548101949181, "da3_point_fscore_10cm": 0.03955078125},
+      "last_verified_full": {"date": "2026-09-27", "run_id": "module12-full-landed-20260927", "vggt_pose_auc_30": 0.9185010114984006, "vggt_sim3_center_rmse_m": 0.03540170026885925, "vggt_sim3_depth_abs_rel": 0.009535053705057842, "vggt_sim3_point_rmse_m": 0.16294159611424353, "vggt_point_fscore_5cm": 0.07763671875, "da3_pose_auc_30": 0.8431158334641655, "da3_sim3_center_rmse_m": 0.060345915445083456, "da3_sim3_depth_abs_rel": 0.028594810103404315, "da3_sim3_point_rmse_m": 0.29656370211582106, "da3_point_fscore_5cm": 0.00048828125},
+      "measurement_note": "Both methods receive only unposed RGB. Raw, rigid, and similarity-aligned metrics are reported separately; evaluator alignment is not model optimization. VGGT's direct point head and queried tracks remain separate from its canonical depth-unprojected pointmap. DA3-BASE supplies cameras, depth, confidence, and unprojected points but no direct point or track head. Neither method emits a hidden-surface completion or a sampled complete scene."
+    }
   ]
 }

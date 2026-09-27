@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import shutil
 import stat
+import subprocess
 import tarfile
 import time
 import uuid
@@ -17,6 +18,52 @@ from urllib.request import urlopen
 import zipfile
 
 from contracts import ROOT, load_json, sha256_file
+
+
+def huggingface_snapshot_commands(lock: dict[str, object]) -> list[list[str]]:
+    models = lock.get("models")
+    if lock.get("schema_version") != 1 or not isinstance(models, dict):
+        raise ValueError("foundation model lock is malformed")
+    commands = []
+    for model_id in ("vggt", "depth-anything-3"):
+        record = models.get(model_id)
+        if not isinstance(record, dict):
+            raise ValueError(f"foundation model lock is missing {model_id}")
+        files = record.get("files")
+        if not isinstance(files, dict) or set(files) != {"config.json", "model.safetensors"}:
+            raise ValueError(f"foundation model file lock is malformed: {model_id}")
+        commands.append(
+            [
+                "hf",
+                "download",
+                str(record["repository"]),
+                "--revision",
+                str(record["revision"]),
+                *sorted(files),
+            ]
+        )
+    return commands
+
+
+def fetch_foundation_models() -> None:
+    lock = load_json(ROOT / "foundation-models.lock.json")
+    launcher = ROOT.parent / "insula-scout/enter.sh"
+    for command in huggingface_snapshot_commands(lock):
+        subprocess.run([str(launcher), *command], cwd=ROOT.parent.parent, check=True)
+    cache_root = Path(
+        os.environ.get(
+            "SURFLO_INSULA_CACHE_ROOT",
+            Path.home() / ".cache" / "surflo" / "insula-scout",
+        )
+    ).expanduser().resolve()
+    for model_id, record in lock["models"].items():
+        snapshot = cache_root / record["cache_path"] / "snapshots" / record["revision"]
+        for filename, expected in record["files"].items():
+            path = snapshot / filename
+            if not path.is_file() or path.stat().st_size != expected["byte_size"]:
+                raise ValueError(f"fetched model byte-size mismatch: {model_id}/{filename}")
+            if sha256_file(path) != expected["sha256"]:
+                raise ValueError(f"fetched model hash mismatch: {model_id}/{filename}")
 
 
 def _write_json_atomic(path: Path, value: object) -> None:
@@ -216,13 +263,25 @@ def main() -> int:
     destination = args.cache_root / "assets"
     destination.mkdir(parents=True, exist_ok=True)
     registry = load_json(ROOT / "assets.lock.json")["assets"]
-    known = {asset["id"] for asset in registry if asset["mode"] == "download"}
+    known = {
+        asset["id"]
+        for asset in registry
+        if asset["mode"] in {"download", "huggingface_snapshot"}
+    }
     requested = set(args.assets or known)
     unknown = requested - known
     if unknown:
         raise ValueError(f"unknown downloadable assets: {sorted(unknown)}")
     failures: list[str] = []
     for asset in registry:
+        if asset["mode"] == "huggingface_snapshot":
+            if asset["id"] not in requested:
+                continue
+            try:
+                fetch_foundation_models()
+            except Exception as error:
+                failures.append(f"{asset['id']}: {error}")
+            continue
         if asset["mode"] != "download":
             continue
         if asset["id"] not in requested:

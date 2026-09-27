@@ -28,6 +28,7 @@ experiments/3d-pathway/run.sh reference --adapter depth-anything-v2 --profile sm
 experiments/3d-pathway/run.sh reference --adapter neus-facto --profile smoke --run-id neus-demo
 experiments/3d-pathway/run.sh reference --adapter nerfacto --profile smoke --run-id nerfacto-demo
 experiments/3d-pathway/run.sh reference --adapter splatfacto --profile smoke --run-id splatfacto-demo
+experiments/3d-pathway/run.sh reference --adapter foundation-geometry --profile smoke --run-id foundation-geometry-demo
 python3 experiments/3d-pathway/pipeline/audit.py --offline
 
 # Required real-container gates (the full gate is intentionally opt-in):
@@ -43,6 +44,8 @@ python3 experiments/3d-pathway/pipeline/audit.py --offline
 (cd experiments/3d-pathway && SURFLO_REQUIRE_NERFACTO_FULL=1 python3 -m unittest -q tests.test_nerfacto_reference.NerfactoReferenceExecutionContractTest.test_real_profiles_are_explicit_b200_gates)
 (cd experiments/3d-pathway && SURFLO_REQUIRE_SPLATFACTO_REFERENCE=1 python3 -m unittest -q tests.test_splatfacto_reference.SplatfactoOutputContractTest.test_real_profiles_are_explicit_b200_gates)
 (cd experiments/3d-pathway && SURFLO_REQUIRE_SPLATFACTO_FULL=1 python3 -m unittest -q tests.test_splatfacto_reference.SplatfactoOutputContractTest.test_real_profiles_are_explicit_b200_gates)
+(cd experiments/3d-pathway && SURFLO_REQUIRE_FOUNDATION_GEOMETRY_REFERENCE=1 python3 -m unittest -q tests.test_foundation_geometry_reference.FoundationGeometryReferenceContractTest.test_real_smoke_reference_runs_when_required)
+(cd experiments/3d-pathway && SURFLO_REQUIRE_FOUNDATION_GEOMETRY_FULL=1 python3 -m unittest -q tests.test_foundation_geometry_reference.FoundationGeometryReferenceContractTest.test_real_full_reference_runs_when_required)
 
 # Explicit network boundaries:
 experiments/3d-pathway/run.sh build
@@ -50,8 +53,20 @@ experiments/3d-pathway/run.sh fetch
 experiments/3d-pathway/run.sh fetch --asset tum-rgbd
 experiments/3d-pathway/run.sh fetch --asset depth-anything-v2-metric-hypersim-small
 experiments/3d-pathway/run.sh fetch --asset nerfstudio-lpips-alexnet
+experiments/3d-pathway/run.sh fetch --asset foundation-geometry-models
 python3 experiments/3d-pathway/pipeline/audit.py --online
 ```
+
+The Module 12 reference reuses the Surflo B200 Insula and its persistent model
+cache. `run.sh fetch --asset foundation-geometry-models` resolves only the
+immutable VGGT-1B and DA3-BASE revisions in `foundation-models.lock.json`, then
+checks every config and weight byte. Execution mounts only ordered RGB and a
+case manifest into the network-disabled container; evaluator cameras, depths,
+masks, and analytic surface truth remain host-side. Raw, SE(3), and Sim(3)
+scores are retained separately. VGGT direct points/tracks are not conflated
+with depth-unprojected points, and DA3's missing direct-point/track heads are
+reported as unsupported. The original VGGT-1B weights are CC BY-NC 4.0;
+DA3-BASE source and weights are Apache-2.0.
 
 The landed COLMAP SfM adapter requires the classical image produced by
 `run.sh build`. It renders the shared scene's explicit calibrated, multi-depth

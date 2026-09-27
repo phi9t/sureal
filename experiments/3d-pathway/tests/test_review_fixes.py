@@ -69,6 +69,7 @@ class ReviewHardeningTest(unittest.TestCase):
         self.assertEqual(statuses["nerfstudio-neus-facto-reference"], "landed")
         self.assertEqual(statuses["nerfstudio-nerfacto-reference"], "landed")
         self.assertEqual(statuses["nerfstudio-splatfacto-reference"], "landed")
+        self.assertEqual(statuses["foundation-geometry-reference"], "landed")
         landed = {
             "colmap-sfm-reference",
             "colmap-mvs-reference",
@@ -77,6 +78,7 @@ class ReviewHardeningTest(unittest.TestCase):
             "nerfstudio-neus-facto-reference",
             "nerfstudio-nerfacto-reference",
             "nerfstudio-splatfacto-reference",
+            "foundation-geometry-reference",
         }
         self.assertTrue(all(status == "not_landed" for adapter, status in statuses.items() if adapter not in landed))
 

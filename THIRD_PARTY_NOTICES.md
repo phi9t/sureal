@@ -82,6 +82,16 @@ These weights are not redistributed in this repository, but every Surflo run
 depends on them, so their non-commercial restriction applies in practice to any
 use of Surflo.
 
+### Depth Anything 3 BASE — ByteDance Ltd. and/or its affiliates
+
+*Apache License 2.0.*
+<https://huggingface.co/depth-anything/DA3-BASE>
+
+The optional Module 12 maintained reference downloads the exact checkpoint at
+run time. The weights are not redistributed in this repository. Other Depth
+Anything 3 variants can carry different or conflicting terms and are not
+silently substituted for this locked BASE checkpoint.
+
 ---
 
 ## Optional components installed separately
