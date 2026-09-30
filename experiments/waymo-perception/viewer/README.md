@@ -8,6 +8,11 @@ exported by a small PyArrow/NumPy pipeline. No TensorFlow and no Waymo SDK.
 
 Radar is not part of the Perception release, so the viewer has no radar layer.
 
+A hosted copy of the viewer and a landing page live at
+<https://phi9t.github.io/sureal/> (branch `gh-pages`, assembled with
+`run.sh pages`). It carries no data: run `run.sh serve` locally and paste the
+bundle URL it prints into the hosted splash.
+
 ## License note
 
 Waymo Open Dataset data is licensed for non-commercial use and may not be
