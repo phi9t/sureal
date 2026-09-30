@@ -3,7 +3,9 @@
 Usage: python -m export.serve --dist DIR --bundles DIR [--port 8420] [--host 127.0.0.1]
 
 Bundles are Waymo-derived data under the Waymo Open Dataset terms: keep this
-server bound to localhost or a trusted network. Supports HTTP Range requests.
+server bound to localhost or a trusted network. Supports HTTP Range requests and
+sends permissive CORS headers so the GitHub Pages build of the viewer can load
+bundles from this local server via ?bundle=http://127.0.0.1:PORT/bundles/...
 """
 import argparse
 import json
@@ -45,6 +47,7 @@ def make_handler(dist, bundles):
             data = json.dumps(obj).encode()
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
+            self.send_header("Access-Control-Allow-Origin", "*")
             self.send_header("Content-Length", str(len(data)))
             self.end_headers()
             self.wfile.write(data)
@@ -62,6 +65,7 @@ def make_handler(dist, bundles):
             self.send_response(status)
             self.send_header("Content-Type", MIME.get(target.suffix, "application/octet-stream"))
             self.send_header("Accept-Ranges", "bytes")
+            self.send_header("Access-Control-Allow-Origin", "*")
             self.send_header("Content-Length", str(end - start + 1))
             if status == 206:
                 self.send_header("Content-Range", "bytes %d-%d/%d" % (start, end, size))

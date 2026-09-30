@@ -68,3 +68,10 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); f
 #scene-list button:hover { border-color: var(--accent); }
 #scene-list button small { display: block; color: var(--muted); margin-top: 3px; font-size: 10px; }
 .ui-hidden #panel, .ui-hidden #hud, .ui-hidden #strip, .ui-hidden #timeline, .ui-hidden #labels { display: none; }
+.url-form { display: grid; gap: 6px; margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--panel-border); }
+.url-form label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.url-form input { background: #0d131d; color: var(--fg); border: 1px solid var(--panel-border); border-radius: 8px; padding: 9px 12px; font-family: var(--mono); font-size: 12px; }
+.url-form input:focus { outline: none; border-color: var(--accent); }
+.url-form button { justify-self: start; background: var(--accent); color: #06101a; border: 0; border-radius: 8px; padding: 8px 16px; font-weight: 600; cursor: pointer; }
+.url-form small { color: var(--muted); line-height: 1.5; }
+.url-form code { font-family: var(--mono); color: var(--fg); }

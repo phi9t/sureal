@@ -18,6 +18,7 @@ Usage: run.sh COMMAND [ARGS]
   dev                           vite dev server serving bundles from the cache
   build                         production build into web/dist
   serve [PORT]                  serve web/dist plus bundles with the stdlib server
+  pages OUT_DIR [IMG_DIR]       assemble the GitHub Pages site (landing + built viewer)
 
 Environment: WAYMO_VIEWER_CACHE (default ~/.cache/waystone/waymo-perception/viewer),
 WAYMO_VIEWER_VENV (default ./.venv).
@@ -60,6 +61,17 @@ case "$cmd" in
         ;;
     build)
         (cd "$HERE/web" && npx vite build "$@")
+        ;;
+    pages)
+        [[ $# -ge 1 ]] || { usage >&2; exit 2; }
+        out="$1"; img="${2:-}"
+        (cd "$HERE/web" && npx vite build)
+        rm -rf -- "$out"; mkdir -p -- "$out/viewer" "$out/img"
+        cp -- "$HERE/site/index.html" "$out/"
+        cp -R -- "$HERE/web/dist/." "$out/viewer/"
+        touch -- "$out/.nojekyll"
+        [[ -z "$img" ]] || cp -- "$img"/*.jpg "$out/img/"
+        echo "pages site assembled at $out"
         ;;
     serve)
         need_venv

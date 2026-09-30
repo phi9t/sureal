@@ -31,6 +31,7 @@ function bundleServer(): Plugin {
             }
           }
           res.setHeader("Content-Type", "application/json");
+          res.setHeader("Access-Control-Allow-Origin", "*");
           res.end(JSON.stringify({ root, scenes }));
           return;
         }
@@ -43,6 +44,7 @@ function bundleServer(): Plugin {
         const size = fs.statSync(file).size;
         res.setHeader("Content-Type", MIME[path.extname(file)] ?? "application/octet-stream");
         res.setHeader("Accept-Ranges", "bytes");
+        res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Cache-Control", "no-cache");
         const range = req.headers.range;
         if (range) {

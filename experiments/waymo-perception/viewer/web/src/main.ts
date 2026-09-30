@@ -18,34 +18,47 @@ import { Panels } from "./ui/panels";
 
 const $ = (id: string) => document.getElementById(id)!;
 
+function urlForm(list: HTMLElement, resolve: (url: string) => void, hint: string): void {
+  const form = document.createElement("form");
+  form.className = "url-form";
+  form.innerHTML = `<label>Bundle URL</label><input type="url" placeholder="http://127.0.0.1:8420/bundles/&lt;slice&gt;/&lt;context&gt;/" required /><button type="submit">Open</button><small>${hint}</small>`;
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    let url = (form.querySelector("input") as HTMLInputElement).value.trim();
+    if (!url.endsWith("/")) url += "/";
+    history.replaceState(null, "", `?bundle=${encodeURIComponent(url)}`);
+    resolve(url);
+  });
+  list.append(form);
+}
+
 async function chooseScene(): Promise<string> {
   const params = new URLSearchParams(location.search);
   const direct = params.get("bundle");
   if (direct) return direct.endsWith("/") ? direct : direct + "/";
   const msg = $("splash-msg");
   const list = $("scene-list");
-  try {
-    const scenes = await listScenes();
-    if (!scenes.length) {
-      msg.textContent = "No bundles found. Run `run.sh export SLICE CONTEXT` first, then reload.";
-      return new Promise(() => {});
-    }
-    msg.textContent = "Choose a scene";
-    return new Promise((resolve) => {
-      for (const s of scenes) {
-        const b = document.createElement("button");
-        b.innerHTML = `${s.context}<small>${s.slice}</small>`;
-        b.addEventListener("click", () => {
-          history.replaceState(null, "", `?bundle=${encodeURIComponent(s.url)}`);
-          resolve(s.url);
-        });
-        list.append(b);
-      }
-    });
-  } catch (e) {
-    msg.textContent = `Could not list bundles (${String(e)}). Pass ?bundle=/bundles/<slice>/<context>/`;
-    return new Promise(() => {});
-  }
+  const hint = "Waymo data cannot be redistributed, so bundles are served from your own machine: run <code>run.sh export</code> then <code>run.sh serve</code> and paste the bundle URL it prints. Loopback URLs work from this page in Chrome and Firefox.";
+  return new Promise((resolve) => {
+    listScenes()
+      .then((scenes) => {
+        msg.textContent = scenes.length ? "Choose a scene" : "No bundles found next to this page.";
+        for (const s of scenes) {
+          const b = document.createElement("button");
+          b.innerHTML = `${s.context}<small>${s.slice}</small>`;
+          b.addEventListener("click", () => {
+            history.replaceState(null, "", `?bundle=${encodeURIComponent(s.url)}`);
+            resolve(s.url);
+          });
+          list.append(b);
+        }
+        urlForm(list, resolve, hint);
+      })
+      .catch(() => {
+        msg.textContent = "This copy of the viewer has no bundles of its own.";
+        urlForm(list, resolve, hint);
+      });
+  });
 }
 
 async function main(): Promise<void> {
