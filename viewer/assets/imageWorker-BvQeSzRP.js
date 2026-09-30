@@ -1,0 +1,1 @@
+self.onmessage=async e=>{let{id:t,url:n,maxWidth:r}=e.data;try{let e=await fetch(n);if(!e.ok)throw Error(`${e.status}`);let i=await e.blob(),a={colorSpaceConversion:`default`,premultiplyAlpha:`none`};r>0&&(a.resizeWidth=r),r>0&&(a.resizeQuality=`medium`);let o=await createImageBitmap(i,a);self.postMessage({id:t,bitmap:o},[o])}catch(e){self.postMessage({id:t,error:String(e)})}};
