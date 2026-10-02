@@ -257,3 +257,11 @@ overfit20261002b/context_pfn
 Corrected journal publisher receipt naming collision. Original results receipt restored byte-for-byte to the SHA recorded in entry 29; journal publication now has its own receipt. Remote objects were intact. Live Insula regression passes all eight tracker contracts.
 
 Evidence: [tier1-result](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-results-hdfs-verified.json)
+
+## 33. 2026-10-02T23:26:12.280271+00:00 — observation
+
+task07/data-gates
+
+Reconciled completed point/grid replay: all 103 selected scenes, 203850 returns, 3513295187 points and 478579462 eligible semantic points. Rechecked progress SHA, all 103 individual evidence SHAs and summed totals. Host aggregate of individual live admissions; scientific protocol and held-out outcomes remain open.
+
+Evidence: [point-grid-f](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/point-grid-full103-and-overfit-box-retained-audit.json)

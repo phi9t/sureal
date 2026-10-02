@@ -46,12 +46,12 @@ A separate live aggregate audit reconciles all103 camera lifecycles, including
 the pilot and both recovered gaps:
 [camera evidence](research/scientific-camera-full103-verified.json).
 
-The full-support point-to-native-grid replay remains active. Its current
-[progress record](research/scientific-point-grid-progress.json) admits scenes
-only after two complete payload passes and a separate live retained-receipt audit.
-Do not change its pinned pipeline modules or worker files while the process runs.
-Completion requires all103 selected identities, not a partial progress count.
-
+The full-support point-to-native-grid replay has admitted all103 selected scenes,
+203,850 return records,3,513,295,187 points and478,579,462 eligible semantic
+points. The [retained aggregate](research/point-grid-full103-and-overfit-box-retained-audit.json)
+is a host rehash of the individually independent live admissions. Current
+receipt hashes and summed denominators were rechecked on2026-10-02; this does
+not claim a new live aggregate audit or model quality.
 These data gates supply ticket07's evidence; they do not close its protocol.
 Next freeze scientific model configurations, training-only anchor choices,
 sampling and loss rules, overfit acceptance thresholds, resource budgets and
