@@ -1,0 +1,75 @@
+{
+  "source": {
+    "name": "uncompressed/scenario/validation/validation.tfrecord-00000-of-00150",
+    "bucket": "waymo_open_dataset_motion_v_1_2_1",
+    "generation": "1706585154034912",
+    "contentType": "application/octet-stream",
+    "size": "273686917",
+    "md5Hash": "DkLTAOR7tjxe3ZSK3Fb0xQ==",
+    "crc32c": "rASJ4g==",
+    "updated": "2024-01-30T03:25:54.127Z"
+  },
+  "source_sha256": "b137390216e3a62640a8a950c5299ce085e08eebb01f989ba47f79836ef1dbad",
+  "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/datasets/waymo-motion/v1.2.1/pilot/validation/1706585154034912-b137390216e3a62640a8a950c5299ce085e08eebb01f989ba47f79836ef1dbad.tfrecord",
+  "hdfs_readback_exact": true,
+  "raw_peak_bytes": 2119762126,
+  "local_source": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/validation-source-a868d46fe8f046abbb6fb4540116e0e5/source.tfrecord",
+  "candidate_sha256": "1522d69ce83426ef20691f6876da854c29666043f9b548a608b4281955255925",
+  "inventory_sha256": "4057a285744b8b92bb8f2d57c31a2c6cc1e8151496d2a7512fc1c0cda4979b67",
+  "checks": [
+    {
+      "command": [
+        "bash",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/gcs.sh",
+        "--",
+        "storage",
+        "cp",
+        "gs://waymo_open_dataset_motion_v_1_2_1/uncompressed/scenario/validation/validation.tfrecord-00000-of-00150#1706585154034912",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/validation-source-a868d46fe8f046abbb6fb4540116e0e5/source.tfrecord"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/validation-source-a868d46fe8f046abbb6fb4540116e0e5/gcs-download.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "layout-profile",
+        "--project",
+        "sureal",
+        "--json"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/validation-source-a868d46fe8f046abbb6fb4540116e0e5/layout.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "--mkdir-parents",
+        "put",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/validation-source-a868d46fe8f046abbb6fb4540116e0e5/source.tfrecord",
+        "hdfs://harunava/user/tiger/waystone/sureal/datasets/waymo-motion/v1.2.1/pilot/validation/1706585154034912-b137390216e3a62640a8a950c5299ce085e08eebb01f989ba47f79836ef1dbad.tfrecord"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/validation-source-a868d46fe8f046abbb6fb4540116e0e5/hdfs-put.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "get",
+        "hdfs://harunava/user/tiger/waystone/sureal/datasets/waymo-motion/v1.2.1/pilot/validation/1706585154034912-b137390216e3a62640a8a950c5299ce085e08eebb01f989ba47f79836ef1dbad.tfrecord",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/validation-source-a868d46fe8f046abbb6fb4540116e0e5/source.tfrecord"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/validation-source-a868d46fe8f046abbb6fb4540116e0e5/hdfs-get.log"
+    }
+  ],
+  "scope": "acquired validation pilot source only; framing/protobuf/causal ingestion gates pending"
+}
