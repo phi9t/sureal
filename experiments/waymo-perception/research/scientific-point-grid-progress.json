@@ -1,0 +1,5058 @@
+{
+  "selected_scenes": 103,
+  "candidate_sha256": "393220a85c198d61eba135e95a5888997fd9ec50cae16ef50025ae16ff0d3233",
+  "admitted_scenes": 103,
+  "records": 203850,
+  "points": 3513295187,
+  "eligible_semantic_points": 478579462,
+  "scene_evidence": {
+    "1730266523558914470_305_260_325_260": {
+      "evidence": "scientific-point-grid-1730266523558914470_305_260_325_260-verified.json",
+      "evidence_sha256": "5542976f55d264e1d7f6c89b7f2df59e255197940b7c5917728bd458507593b9",
+      "receipt_sha256": "923693b5bf5a8c6b06fb6dafb74dc9c8e1398201832c26afe4bb67a204154e3d",
+      "validation": {
+        "scene": "1730266523558914470_305_260_325_260",
+        "records": 1970,
+        "points": 32547972,
+        "eligible_semantic_points": 2720971,
+        "native_counts": [
+          117066,
+          250789,
+          138252,
+          15306,
+          0,
+          0,
+          0,
+          7094,
+          2744,
+          831,
+          12560,
+          0,
+          0,
+          0,
+          542239,
+          490213,
+          98341,
+          28146,
+          736348,
+          35521,
+          22572,
+          203568,
+          136447
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 41.2414044420002,
+            "peak_rss_kib": 88904,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.40855808701599,
+            "peak_rss_kib": 97456,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "15036582848618865396_3752_830_3772_830": {
+      "evidence": "scientific-point-grid-15036582848618865396_3752_830_3772_830-verified.json",
+      "evidence_sha256": "53ef56c45238222b2057791b46ba19abc9950fa4e5614774e84b4b968a6d5478",
+      "receipt_sha256": "8cfee0dd9c21ce58cc7795fdb22e84693d632977f1d25043e992a6da3653bf08",
+      "validation": {
+        "scene": "15036582848618865396_3752_830_3772_830",
+        "records": 1980,
+        "points": 35851264,
+        "eligible_semantic_points": 4852282,
+        "native_counts": [
+          13833,
+          577588,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3967,
+          13430,
+          0,
+          21060,
+          0,
+          0,
+          0,
+          1201292,
+          1002152,
+          98528,
+          65049,
+          1056805,
+          0,
+          0,
+          628676,
+          183735
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 45.988679228001274,
+            "peak_rss_kib": 92532,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.213759599020705,
+            "peak_rss_kib": 92688,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "11343624116265195592_5910_530_5930_530": {
+      "evidence": "scientific-point-grid-11343624116265195592_5910_530_5930_530-verified.json",
+      "evidence_sha256": "b37e58bdba0cc7d3cf23b1e1f84614961b23a6097a661c281fc02e324756b796",
+      "receipt_sha256": "5260747932e66f5e4b217a97ae7208129d43399b6c0c0d46ba808a10fb6d0871",
+      "validation": {
+        "scene": "11343624116265195592_5910_530_5930_530",
+        "records": 1990,
+        "points": 29019898,
+        "eligible_semantic_points": 6579076,
+        "native_counts": [
+          8647,
+          520244,
+          0,
+          0,
+          0,
+          0,
+          0,
+          18,
+          50917,
+          14058,
+          63487,
+          0,
+          0,
+          0,
+          445281,
+          1543514,
+          214176,
+          141464,
+          2437920,
+          56116,
+          94920,
+          717269,
+          279692
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 38.89937741996255,
+            "peak_rss_kib": 88020,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 17.872398843988776,
+            "peak_rss_kib": 82540,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "4447423683538547117_536_022_556_022": {
+      "evidence": "scientific-point-grid-4447423683538547117_536_022_556_022-verified.json",
+      "evidence_sha256": "6144047e0f84af4d2b0b2f973de21d214662779f89640c0216e6a0969e8a0e49",
+      "receipt_sha256": "0fe60788132b8c8e0d9e7325e21242fc5a069fab6a20b98160e81e263a852b32",
+      "validation": {
+        "scene": "4447423683538547117_536_022_556_022",
+        "records": 1980,
+        "points": 32487824,
+        "eligible_semantic_points": 4435319,
+        "native_counts": [
+          14456,
+          476348,
+          77191,
+          0,
+          0,
+          0,
+          0,
+          103,
+          15139,
+          361,
+          17166,
+          0,
+          0,
+          0,
+          407776,
+          1538751,
+          47275,
+          82661,
+          1382314,
+          49346,
+          1404,
+          166942,
+          172542
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 40.57999214302981,
+            "peak_rss_kib": 89312,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 16.535162710992154,
+            "peak_rss_kib": 109020,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "14503113925613619599_975_506_995_506": {
+      "evidence": "scientific-point-grid-14503113925613619599_975_506_995_506-verified.json",
+      "evidence_sha256": "1f471dfba42d359cda7dbe22dd4b4170ed48f11edc457dba63db2c4d31c3bcf6",
+      "receipt_sha256": "d63a2fedfa218b258738993df2b77aaa8fd258c768545107a3b9bbced02b07f1",
+      "validation": {
+        "scene": "14503113925613619599_975_506_995_506",
+        "records": 1980,
+        "points": 38361436,
+        "eligible_semantic_points": 6990016,
+        "native_counts": [
+          13993,
+          292625,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1288,
+          2566,
+          0,
+          22772,
+          0,
+          0,
+          0,
+          2448158,
+          1665973,
+          126080,
+          40043,
+          1335553,
+          0,
+          148,
+          733146,
+          321664
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 48.79333466099342,
+            "peak_rss_kib": 104240,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 21.71909477596637,
+            "peak_rss_kib": 99404,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "3375636961848927657_1942_000_1962_000": {
+      "evidence": "scientific-point-grid-3375636961848927657_1942_000_1962_000-verified.json",
+      "evidence_sha256": "f1b6fe32eb6a4eef7f599ed1b3640d96514983290762195b6c5ed8e6f38ea36c",
+      "receipt_sha256": "a13bb050354e4a3df04cf3dd26eda652ee29d91a4c415fdf171dd42974d5e1ef",
+      "validation": {
+        "scene": "3375636961848927657_1942_000_1962_000",
+        "records": 1980,
+        "points": 28016899,
+        "eligible_semantic_points": 4857357,
+        "native_counts": [
+          84518,
+          348881,
+          0,
+          0,
+          98199,
+          0,
+          0,
+          11066,
+          82263,
+          8910,
+          61642,
+          1130,
+          0,
+          0,
+          3148013,
+          350513,
+          41652,
+          38293,
+          280672,
+          4680,
+          54070,
+          13456,
+          313917
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 36.008679151011165,
+            "peak_rss_kib": 85056,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 15.397674344945699,
+            "peak_rss_kib": 100956,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "6813611334239274394_535_000_555_000": {
+      "evidence": "scientific-point-grid-6813611334239274394_535_000_555_000-verified.json",
+      "evidence_sha256": "5808c961ad851145173039842e64b6fd7a5331ebd6a0855e6eab1604c65abff9",
+      "receipt_sha256": "d23554508cd41677329bd2a7c406abf378e5101fa8a3c5c978c9edd7d15691f5",
+      "validation": {
+        "scene": "6813611334239274394_535_000_555_000",
+        "records": 1950,
+        "points": 30800390,
+        "eligible_semantic_points": 5478105,
+        "native_counts": [
+          251168,
+          361792,
+          281390,
+          0,
+          0,
+          0,
+          0,
+          0,
+          30317,
+          0,
+          95035,
+          669,
+          0,
+          0,
+          1558905,
+          1676746,
+          144948,
+          42972,
+          664606,
+          4924,
+          53910,
+          271993,
+          289898
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 37.69418926700018,
+            "peak_rss_kib": 101736,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 16.951325313013513,
+            "peak_rss_kib": 95580,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "990914685337955114_980_000_1000_000": {
+      "evidence": "scientific-point-grid-990914685337955114_980_000_1000_000-verified.json",
+      "evidence_sha256": "8ac812ce8051911230e979bd4b147b6c804252a0ddc3e32efce9baa49452f1ba",
+      "receipt_sha256": "3442382bf15a0372c3cb04c6f47a29c5f7344b2c90cfbdcfad8f8e0c9e66828f",
+      "validation": {
+        "scene": "990914685337955114_980_000_1000_000",
+        "records": 1980,
+        "points": 35228086,
+        "eligible_semantic_points": 4705941,
+        "native_counts": [
+          68510,
+          449482,
+          519611,
+          12672,
+          2705,
+          0,
+          142,
+          120482,
+          31309,
+          2706,
+          67416,
+          463,
+          618,
+          0,
+          1898657,
+          86004,
+          27281,
+          47032,
+          895928,
+          10408,
+          86733,
+          6234,
+          440058
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 45.288010032032616,
+            "peak_rss_kib": 96704,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.395077815046534,
+            "peak_rss_kib": 117596,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "8796914080594559459_4284_170_4304_170": {
+      "evidence": "scientific-point-grid-8796914080594559459_4284_170_4304_170-verified.json",
+      "evidence_sha256": "61ae0c0242e3dd2443787cbdf915f01d6bdb906ee48eecc411dfdcd273676c90",
+      "receipt_sha256": "bfe14407472a1767dde7b1351b164d50f658cefa5b8db56e6d8b0791481e08b0",
+      "validation": {
+        "scene": "8796914080594559459_4284_170_4304_170",
+        "records": 1990,
+        "points": 37077947,
+        "eligible_semantic_points": 5126742,
+        "native_counts": [
+          6047,
+          63955,
+          1546,
+          0,
+          0,
+          0,
+          0,
+          1313,
+          6328,
+          0,
+          11951,
+          0,
+          0,
+          0,
+          1499536,
+          1055820,
+          107815,
+          77498,
+          1266481,
+          80127,
+          0,
+          731616,
+          222756
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 47.80085293302545,
+            "peak_rss_kib": 97908,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.313213412999175,
+            "peak_rss_kib": 116116,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "12257951615341726923_2196_690_2216_690": {
+      "evidence": "scientific-point-grid-12257951615341726923_2196_690_2216_690-verified.json",
+      "evidence_sha256": "753e18fb498b0671cf81b222b6ed74d36a1fbe87fd01ab45fecc5241a48c43bc",
+      "receipt_sha256": "847fe2ddd3b2f4c43ff9961be818caa6614960aad3282576a78cbeb471ddbf93",
+      "validation": {
+        "scene": "12257951615341726923_2196_690_2216_690",
+        "records": 1980,
+        "points": 32590501,
+        "eligible_semantic_points": 5952289,
+        "native_counts": [
+          41388,
+          308844,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1623,
+          112078,
+          0,
+          55836,
+          16119,
+          0,
+          0,
+          1390559,
+          1101884,
+          145039,
+          124338,
+          1872019,
+          68361,
+          1267,
+          428016,
+          326306
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 41.497161537990905,
+            "peak_rss_kib": 90960,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.01694945298368,
+            "peak_rss_kib": 86916,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "13186511704021307558_2000_000_2020_000": {
+      "evidence": "scientific-point-grid-13186511704021307558_2000_000_2020_000-verified.json",
+      "evidence_sha256": "97965adf602c01e7399814c4f2b10c7bf90e02d0c88c9dc2fcb778ee74b5c2c7",
+      "receipt_sha256": "68600ece030e91744ff1960784eed7085f869cc58b54f25c854c6072df4251dd",
+      "validation": {
+        "scene": "13186511704021307558_2000_000_2020_000",
+        "records": 1980,
+        "points": 32281988,
+        "eligible_semantic_points": 4105313,
+        "native_counts": [
+          179140,
+          44112,
+          785881,
+          42813,
+          0,
+          0,
+          470,
+          7861,
+          36005,
+          2593,
+          33680,
+          2159,
+          0,
+          0,
+          1840240,
+          232967,
+          83075,
+          37349,
+          453265,
+          8319,
+          36349,
+          107698,
+          350477
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 41.1152254799963,
+            "peak_rss_kib": 88868,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.404329682991374,
+            "peak_rss_kib": 87988,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "17885096890374683162_755_580_775_580": {
+      "evidence": "scientific-point-grid-17885096890374683162_755_580_775_580-verified.json",
+      "evidence_sha256": "511782b5ea7f268a4f03c44d3e2d6aa2de4634ddbaae2e7a7248b6cc260540b2",
+      "receipt_sha256": "d9b2384fb642e36246130a06a7d90f7930747fc448ac8448d1ff300f6253f75d",
+      "validation": {
+        "scene": "17885096890374683162_755_580_775_580",
+        "records": 1980,
+        "points": 40148154,
+        "eligible_semantic_points": 7251991,
+        "native_counts": [
+          44022,
+          288690,
+          0,
+          0,
+          0,
+          0,
+          15865,
+          39775,
+          36210,
+          0,
+          53977,
+          0,
+          0,
+          0,
+          1852094,
+          2560367,
+          303938,
+          59126,
+          676930,
+          1038,
+          23070,
+          955496,
+          385415
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 51.34726668597432,
+            "peak_rss_kib": 96300,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 21.940523124998435,
+            "peak_rss_kib": 120112,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "7912728502266478772_1202_200_1222_200": {
+      "evidence": "scientific-point-grid-7912728502266478772_1202_200_1222_200-verified.json",
+      "evidence_sha256": "e1178c828bbce0b090e01b16c94f909a1a01a9e2d6c36f4cd8affa46f688517e",
+      "receipt_sha256": "32cf167a1a6b82bb640721bc539562152bb5c44427b9cd455ee37ccef2e8e789",
+      "validation": {
+        "scene": "7912728502266478772_1202_200_1222_200",
+        "records": 1960,
+        "points": 35284571,
+        "eligible_semantic_points": 3092660,
+        "native_counts": [
+          4222,
+          46969,
+          0,
+          0,
+          0,
+          0,
+          0,
+          975,
+          19233,
+          0,
+          16851,
+          0,
+          0,
+          0,
+          471323,
+          853691,
+          100582,
+          46734,
+          655329,
+          33453,
+          2363,
+          694875,
+          150282
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 45.12497875804547,
+            "peak_rss_kib": 93828,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.17939451005077,
+            "peak_rss_kib": 91160,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "4723255145958809564_741_350_761_350": {
+      "evidence": "scientific-point-grid-4723255145958809564_741_350_761_350-verified.json",
+      "evidence_sha256": "0c9360daef830ccc34c052c02b645222110cba25ffaf963658e738b91fff0c38",
+      "receipt_sha256": "ffa7e8358148a598367289fd2fa98bb7c9f106577739147f65fd063fb046c83c",
+      "validation": {
+        "scene": "4723255145958809564_741_350_761_350",
+        "records": 1990,
+        "points": 35255285,
+        "eligible_semantic_points": 8016456,
+        "native_counts": [
+          57874,
+          511184,
+          0,
+          0,
+          58,
+          0,
+          5,
+          6478,
+          40285,
+          8860,
+          68041,
+          0,
+          0,
+          0,
+          1005306,
+          2421618,
+          188405,
+          155199,
+          2418143,
+          86656,
+          115137,
+          800510,
+          190571
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 43.69652825803496,
+            "peak_rss_kib": 91268,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.525034246966243,
+            "peak_rss_kib": 109352,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "8454755173123314088_3202_000_3222_000": {
+      "evidence": "scientific-point-grid-8454755173123314088_3202_000_3222_000-verified.json",
+      "evidence_sha256": "b069c9c2a1de1e1bef6510e962e1e5123a66c1812852406c9af0936968f8005e",
+      "receipt_sha256": "0ec5d963a817c736133690d860652f51c896d771bbc815a317fda09288bd3270",
+      "validation": {
+        "scene": "8454755173123314088_3202_000_3222_000",
+        "records": 1980,
+        "points": 31250201,
+        "eligible_semantic_points": 4283348,
+        "native_counts": [
+          11162,
+          628527,
+          5704,
+          0,
+          873,
+          0,
+          0,
+          0,
+          1351,
+          0,
+          6468,
+          0,
+          0,
+          0,
+          1436943,
+          156640,
+          207,
+          8819,
+          1345639,
+          77441,
+          739,
+          575385,
+          38612
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 39.89018186804606,
+            "peak_rss_kib": 88776,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 17.85140634997515,
+            "peak_rss_kib": 87076,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "3894883757914505116_1840_000_1860_000": {
+      "evidence": "scientific-point-grid-3894883757914505116_1840_000_1860_000-verified.json",
+      "evidence_sha256": "5a57d656092c2641514cc6331e67f4e0539f55e8ef4806c48de7d2dcab387134",
+      "receipt_sha256": "7123b4d336d758f23d29b12eb330b35c70014e64cc31332fd36a54e36c990c6e",
+      "validation": {
+        "scene": "3894883757914505116_1840_000_1860_000",
+        "records": 1970,
+        "points": 33514297,
+        "eligible_semantic_points": 4638522,
+        "native_counts": [
+          35196,
+          544610,
+          3380,
+          0,
+          0,
+          8,
+          0,
+          4717,
+          29852,
+          0,
+          60333,
+          83,
+          0,
+          12884,
+          2345032,
+          633322,
+          66374,
+          28580,
+          594764,
+          7601,
+          40388,
+          2655,
+          263939
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 42.701536379987374,
+            "peak_rss_kib": 91036,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.185826284985524,
+            "peak_rss_kib": 97860,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "13271285919570645382_5320_000_5340_000": {
+      "evidence": "scientific-point-grid-13271285919570645382_5320_000_5340_000-verified.json",
+      "evidence_sha256": "dbeaf92693716ba091721de464867de4e9beb5f60f1fd3fa4211611daf2c4a9e",
+      "receipt_sha256": "7445de9d7fcb8a366b407b4db7e076291a8c042145b88d81553b7acaeb811696",
+      "validation": {
+        "scene": "13271285919570645382_5320_000_5340_000",
+        "records": 1990,
+        "points": 37174388,
+        "eligible_semantic_points": 4986691,
+        "native_counts": [
+          62744,
+          612416,
+          53937,
+          1144,
+          2671,
+          0,
+          2517,
+          24519,
+          43119,
+          15135,
+          71345,
+          0,
+          0,
+          1,
+          2615536,
+          69824,
+          193967,
+          28814,
+          601554,
+          1751,
+          76990,
+          105200,
+          466251
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 46.07097826100653,
+            "peak_rss_kib": 100248,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.088061641028617,
+            "peak_rss_kib": 100232,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "8345535260120974350_1980_000_2000_000": {
+      "evidence": "scientific-point-grid-8345535260120974350_1980_000_2000_000-verified.json",
+      "evidence_sha256": "84660360545632090fe8f2c2e10f55302fee6b254efadd07dd0b99d8a1806290",
+      "receipt_sha256": "54d7a88a4a2739f464d01f1f1d53780f198cda15321efe7efb854e3b669908ca",
+      "validation": {
+        "scene": "8345535260120974350_1980_000_2000_000",
+        "records": 1990,
+        "points": 36896669,
+        "eligible_semantic_points": 4983664,
+        "native_counts": [
+          27693,
+          306934,
+          0,
+          0,
+          0,
+          0,
+          0,
+          9095,
+          7606,
+          0,
+          22546,
+          0,
+          0,
+          0,
+          1585533,
+          1998647,
+          3858,
+          45129,
+          767753,
+          12452,
+          19955,
+          53839,
+          150317
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 46.51025610900251,
+            "peak_rss_kib": 100888,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 21.305069960013498,
+            "peak_rss_kib": 102272,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "1357883579772440606_2365_000_2385_000": {
+      "evidence": "scientific-point-grid-1357883579772440606_2365_000_2385_000-verified.json",
+      "evidence_sha256": "3c4d2b346e3f0672ba2b2000ae861f24deb76820e022401ad554c5f6fe8ebe2a",
+      "receipt_sha256": "6f1cd46db877567da280dfe5e5011311b6075c8faff02db5f1b36939d681f1f5",
+      "validation": {
+        "scene": "1357883579772440606_2365_000_2385_000",
+        "records": 1980,
+        "points": 32783361,
+        "eligible_semantic_points": 4495632,
+        "native_counts": [
+          5756,
+          166051,
+          7125,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1782,
+          0,
+          55580,
+          0,
+          0,
+          0,
+          2302100,
+          1356,
+          0,
+          0,
+          1694273,
+          152030,
+          12217,
+          103118,
+          0
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 41.133605233975686,
+            "peak_rss_kib": 96832,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 16.996117368980777,
+            "peak_rss_kib": 102044,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "16977844994272847523_2140_000_2160_000": {
+      "evidence": "scientific-point-grid-16977844994272847523_2140_000_2160_000-verified.json",
+      "evidence_sha256": "55356f938218cc5b3d9904511bf3f22771bf21cd0cf223154ee858cf3ec24854",
+      "receipt_sha256": "43f91d8f4e03ccb690e658e7e7e2f882cba5e502bb434e2f9aaf420d28568b47",
+      "validation": {
+        "scene": "16977844994272847523_2140_000_2160_000",
+        "records": 1980,
+        "points": 31830463,
+        "eligible_semantic_points": 4084920,
+        "native_counts": [
+          141670,
+          558207,
+          3411,
+          0,
+          201726,
+          0,
+          20475,
+          64222,
+          40763,
+          2669,
+          135235,
+          28,
+          824,
+          0,
+          1750756,
+          144129,
+          31393,
+          63429,
+          317048,
+          2450,
+          2166,
+          250295,
+          495694
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 40.430941956990864,
+            "peak_rss_kib": 90716,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.280597888980992,
+            "peak_rss_kib": 84968,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "4487677815262010875_4940_000_4960_000": {
+      "evidence": "scientific-point-grid-4487677815262010875_4940_000_4960_000-verified.json",
+      "evidence_sha256": "17a2f68f785c2ea0a144b9cfa1fc8e62baf05a8d10d9e3661fc53736d6d52f0b",
+      "receipt_sha256": "96d7e7d86340891824d2fddbb3aac3abce11c43787216e5db586b4796fe71906",
+      "validation": {
+        "scene": "4487677815262010875_4940_000_4960_000",
+        "records": 1980,
+        "points": 35984264,
+        "eligible_semantic_points": 4699860,
+        "native_counts": [
+          226963,
+          90186,
+          50,
+          80860,
+          213,
+          0,
+          41,
+          369771,
+          35772,
+          850,
+          72097,
+          19,
+          0,
+          0,
+          2512391,
+          110786,
+          20509,
+          26256,
+          671855,
+          10255,
+          62952,
+          43019,
+          591978
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 46.015429675986525,
+            "peak_rss_kib": 98668,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.473572688002605,
+            "peak_rss_kib": 90464,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "809159138284604331_3355_840_3375_840": {
+      "evidence": "scientific-point-grid-809159138284604331_3355_840_3375_840-verified.json",
+      "evidence_sha256": "2f8704ab57eab8722b21afb5adae95559de75007d38621420c588ecaf8204972",
+      "receipt_sha256": "a62b1f956cb9a38b93506dfc1dcca1b37a88ec929a25cf0648fcbbe84f66d38f",
+      "validation": {
+        "scene": "809159138284604331_3355_840_3375_840",
+        "records": 1990,
+        "points": 35513228,
+        "eligible_semantic_points": 4820976,
+        "native_counts": [
+          4059,
+          11402,
+          0,
+          0,
+          0,
+          0,
+          0,
+          5580,
+          4008,
+          0,
+          11440,
+          0,
+          0,
+          0,
+          612491,
+          1291545,
+          120158,
+          121983,
+          928974,
+          112410,
+          1167,
+          1360861,
+          238957
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 45.01840709999669,
+            "peak_rss_kib": 95740,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.518791193026118,
+            "peak_rss_kib": 91600,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "3966447614090524826_320_000_340_000": {
+      "evidence": "scientific-point-grid-3966447614090524826_320_000_340_000-verified.json",
+      "evidence_sha256": "7456f4ca1907390788195522ae764ca40ff71a8dd3b0ca5f9d1f83fd79827f40",
+      "receipt_sha256": "8d9efdf16e027c2fb961e280016ff7ffe02310e39f271a67419ce5bba9c374fe",
+      "validation": {
+        "scene": "3966447614090524826_320_000_340_000",
+        "records": 1980,
+        "points": 36286643,
+        "eligible_semantic_points": 4858414,
+        "native_counts": [
+          35485,
+          795402,
+          21631,
+          0,
+          3298,
+          0,
+          0,
+          373,
+          29984,
+          165,
+          28557,
+          4835,
+          0,
+          0,
+          2030980,
+          1002108,
+          18718,
+          9786,
+          660228,
+          49974,
+          1435,
+          21035,
+          179905
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 46.05296347098192,
+            "peak_rss_kib": 93528,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 21.12638692499604,
+            "peak_rss_kib": 88936,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "5083516879091912247_3600_000_3620_000": {
+      "evidence": "scientific-point-grid-5083516879091912247_3600_000_3620_000-verified.json",
+      "evidence_sha256": "80def604e194cc22f26b8f6518d95ddee795a0a7c46e40c3708f8c3faf81a3cf",
+      "receipt_sha256": "86a65d687cd267eb398c00143b1d82a706f98c7702bf1d106aed7a86d35d248a",
+      "validation": {
+        "scene": "5083516879091912247_3600_000_3620_000",
+        "records": 1970,
+        "points": 35193225,
+        "eligible_semantic_points": 4694911,
+        "native_counts": [
+          110964,
+          628157,
+          256929,
+          1020190,
+          68621,
+          0,
+          60,
+          55098,
+          59072,
+          2555,
+          31486,
+          9497,
+          0,
+          0,
+          1425738,
+          131896,
+          16225,
+          25205,
+          775313,
+          32718,
+          6600,
+          3375,
+          146176
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 44.55831794400001,
+            "peak_rss_kib": 92616,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.444441266008653,
+            "peak_rss_kib": 97624,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "6142170920525844857_2080_000_2100_000": {
+      "evidence": "scientific-point-grid-6142170920525844857_2080_000_2100_000-verified.json",
+      "evidence_sha256": "5b6ff108fc47d0d32c2f8f4b3207fe75d42bbf00e4c031a07fbbdf4f8ec39926",
+      "receipt_sha256": "ba6a23956c8d814f20bde17015f15dd7675c96a6f7aa7a33346d1981a3b5d5c9",
+      "validation": {
+        "scene": "6142170920525844857_2080_000_2100_000",
+        "records": 1990,
+        "points": 35544227,
+        "eligible_semantic_points": 4781545,
+        "native_counts": [
+          28875,
+          396504,
+          3134,
+          0,
+          0,
+          0,
+          1550,
+          3274,
+          25730,
+          0,
+          93625,
+          0,
+          0,
+          368,
+          2600466,
+          571906,
+          60421,
+          32846,
+          661416,
+          0,
+          43925,
+          16623,
+          269757
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 45.05079949001083,
+            "peak_rss_kib": 100540,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.975210263975896,
+            "peak_rss_kib": 100348,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "17782258508241656695_1354_000_1374_000": {
+      "evidence": "scientific-point-grid-17782258508241656695_1354_000_1374_000-verified.json",
+      "evidence_sha256": "f1f2ee251327945ec294a735351cdcbff20647c68bcfd1d30c41e5481b8ff070",
+      "receipt_sha256": "b323e9f5dd0d105e3340df35c4cd86a2f2187baed2ec09be342b75ce2696d5bd",
+      "validation": {
+        "scene": "17782258508241656695_1354_000_1374_000",
+        "records": 1980,
+        "points": 33882213,
+        "eligible_semantic_points": 3148482,
+        "native_counts": [
+          19248,
+          205161,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          20742,
+          70,
+          25203,
+          0,
+          774,
+          0,
+          746312,
+          1083824,
+          50394,
+          33959,
+          444565,
+          8092,
+          16635,
+          421613,
+          91138
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 44.708422571013216,
+            "peak_rss_kib": 94268,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.007351623033173,
+            "peak_rss_kib": 87736,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "13830510593707564159_5575_000_5595_000": {
+      "evidence": "scientific-point-grid-13830510593707564159_5575_000_5595_000-verified.json",
+      "evidence_sha256": "3a5bd3611b374d8ca7e9a603b658382ace0941397058b51418136a80cfc8b382",
+      "receipt_sha256": "3742391414a285af8e8eff6b53cc525e723dac74bcb15f5e052a05357412a159",
+      "validation": {
+        "scene": "13830510593707564159_5575_000_5595_000",
+        "records": 1990,
+        "points": 24755553,
+        "eligible_semantic_points": 1933274,
+        "native_counts": [
+          273469,
+          50598,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          5064,
+          0,
+          6752,
+          0,
+          0,
+          0,
+          361125,
+          514954,
+          7824,
+          0,
+          540593,
+          20707,
+          0,
+          425657,
+          0
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 34.2263579639839,
+            "peak_rss_kib": 88672,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 14.591260992980096,
+            "peak_rss_kib": 95820,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "14369250836076988112_7249_040_7269_040": {
+      "evidence": "scientific-point-grid-14369250836076988112_7249_040_7269_040-verified.json",
+      "evidence_sha256": "6d68ba18089dee54ae7b7aebb49b014cb47809df396a028bf0e88a5bd90035b2",
+      "receipt_sha256": "8a932f6e7f94306afa064052d3ec886b81f81aeb2da0633e7791a39e63238474",
+      "validation": {
+        "scene": "14369250836076988112_7249_040_7269_040",
+        "records": 1990,
+        "points": 36487281,
+        "eligible_semantic_points": 5001953,
+        "native_counts": [
+          12590,
+          14554,
+          0,
+          0,
+          0,
+          0,
+          1773,
+          2947,
+          12166,
+          0,
+          17918,
+          0,
+          0,
+          0,
+          675663,
+          1881631,
+          79166,
+          104017,
+          981842,
+          73911,
+          324,
+          858106,
+          297935
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 46.481231899990235,
+            "peak_rss_kib": 103472,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.595016832987312,
+            "peak_rss_kib": 104848,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "11004685739714500220_2300_000_2320_000": {
+      "evidence": "scientific-point-grid-11004685739714500220_2300_000_2320_000-verified.json",
+      "evidence_sha256": "fe49e2cf893e02f91d46deeff2e60a4e6a8f9b55cf1c45c90cd95c86eeb7f358",
+      "receipt_sha256": "9aadb3ebef887f93f42d3ca76db0a1565a8df75c643d41925cbef33a33805e94",
+      "validation": {
+        "scene": "11004685739714500220_2300_000_2320_000",
+        "records": 1990,
+        "points": 24384748,
+        "eligible_semantic_points": 3085175,
+        "native_counts": [
+          15999,
+          181014,
+          2041,
+          0,
+          0,
+          0,
+          0,
+          27175,
+          12083,
+          0,
+          10422,
+          86,
+          0,
+          0,
+          264732,
+          1549772,
+          9097,
+          66930,
+          773547,
+          360,
+          35765,
+          78610,
+          73541
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 32.19939785997849,
+            "peak_rss_kib": 76604,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 14.091667354980018,
+            "peak_rss_kib": 73916,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "15539619898625779290_760_000_780_000": {
+      "evidence": "scientific-point-grid-15539619898625779290_760_000_780_000-verified.json",
+      "evidence_sha256": "5b7d14714f6de98c0a1fae7815b94ed304ed6eae7942ae0ef2812d1b3f9d06cc",
+      "receipt_sha256": "373fdf08908bd1f377e309ba5e0cd7da5633a4c66ee63c814a67a9112e9f3222",
+      "validation": {
+        "scene": "15539619898625779290_760_000_780_000",
+        "records": 1980,
+        "points": 33627112,
+        "eligible_semantic_points": 4360464,
+        "native_counts": [
+          170356,
+          695400,
+          256039,
+          0,
+          0,
+          0,
+          0,
+          18630,
+          11242,
+          88,
+          36714,
+          632,
+          0,
+          0,
+          2307384,
+          92268,
+          38333,
+          31036,
+          736158,
+          4605,
+          0,
+          193,
+          131742
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 42.62471761298366,
+            "peak_rss_kib": 90548,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.60973632900277,
+            "peak_rss_kib": 98696,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "14004546003548947884_2331_861_2351_861": {
+      "evidence": "scientific-point-grid-14004546003548947884_2331_861_2351_861-verified.json",
+      "evidence_sha256": "b8780e9a62a4d618ce06b05f154bd863756d7f5aa83b147c23e5c23e9f3b8168",
+      "receipt_sha256": "e2efae840e77e0255f3c126eebc39c554ca857e0aa06eedf5c06b99015862a67",
+      "validation": {
+        "scene": "14004546003548947884_2331_861_2351_861",
+        "records": 1980,
+        "points": 38653298,
+        "eligible_semantic_points": 6958235,
+        "native_counts": [
+          82690,
+          268236,
+          0,
+          0,
+          0,
+          0,
+          1244,
+          3608,
+          10437,
+          0,
+          5642,
+          0,
+          0,
+          2488,
+          2408365,
+          1616106,
+          140367,
+          43508,
+          1357678,
+          0,
+          5054,
+          826921,
+          268581
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 69.02087008702802,
+            "peak_rss_kib": 100644,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 22.47208119201241,
+            "peak_rss_kib": 99252,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "1005081002024129653_5313_150_5333_150": {
+      "evidence": "scientific-point-grid-1005081002024129653_5313_150_5333_150-verified.json",
+      "evidence_sha256": "834e29c35b3261f1b1bdb303b1beb2cf4082f53df2c2143ded6e76c1a9fc71ff",
+      "receipt_sha256": "19e6c7867284bb97df60778ecede3b96102dd0bbd09819dc5f08555b9f571233",
+      "validation": {
+        "scene": "1005081002024129653_5313_150_5333_150",
+        "records": 1990,
+        "points": 34357856,
+        "eligible_semantic_points": 4654641,
+        "native_counts": [
+          10047,
+          84104,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8632,
+          10713,
+          0,
+          17196,
+          0,
+          0,
+          0,
+          2259387,
+          827530,
+          55899,
+          61354,
+          857727,
+          25016,
+          0,
+          291987,
+          155096
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 45.8746143829776,
+            "peak_rss_kib": 109788,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.382733537000604,
+            "peak_rss_kib": 87748,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "13506499849906169066_120_000_140_000": {
+      "evidence": "scientific-point-grid-13506499849906169066_120_000_140_000-verified.json",
+      "evidence_sha256": "abfd98cb855bc9c6d810fee72df5451e6c0d82745705161d5d7bd2598e6a657f",
+      "receipt_sha256": "9ef6fc7177209343099d42a033e0492effd36d3bf7641545439a4f25a0abce03",
+      "validation": {
+        "scene": "13506499849906169066_120_000_140_000",
+        "records": 1980,
+        "points": 32158303,
+        "eligible_semantic_points": 4282138,
+        "native_counts": [
+          93819,
+          696761,
+          493,
+          4158,
+          0,
+          0,
+          338,
+          26178,
+          50460,
+          2808,
+          56688,
+          415,
+          0,
+          353,
+          1759696,
+          264998,
+          37665,
+          19968,
+          1032779,
+          32052,
+          21264,
+          5481,
+          269583
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 40.96261868899455,
+            "peak_rss_kib": 88760,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.451013799000066,
+            "peak_rss_kib": 96592,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "6559997992780479765_1039_000_1059_000": {
+      "evidence": "scientific-point-grid-6559997992780479765_1039_000_1059_000-verified.json",
+      "evidence_sha256": "b9f69b824c64f481a3291823d5f6965c6edf90ea9943aac9c2b8df20efa7aa99",
+      "receipt_sha256": "12e7446dbcbc9c9c127b0439e7d524c9fbb3196c5c37782021e4300ae5a19794",
+      "validation": {
+        "scene": "6559997992780479765_1039_000_1059_000",
+        "records": 1990,
+        "points": 33500377,
+        "eligible_semantic_points": 4428512,
+        "native_counts": [
+          70785,
+          42490,
+          52560,
+          0,
+          0,
+          0,
+          0,
+          0,
+          34173,
+          0,
+          15779,
+          0,
+          0,
+          0,
+          880000,
+          1656880,
+          109815,
+          16884,
+          596150,
+          22843,
+          9178,
+          897140,
+          94620
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 52.03066463203868,
+            "peak_rss_kib": 90120,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 22.42850315500982,
+            "peak_rss_kib": 90872,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "3224923476345749285_4480_000_4500_000": {
+      "evidence": "scientific-point-grid-3224923476345749285_4480_000_4500_000-verified.json",
+      "evidence_sha256": "3ce988bde37c7c6dadd12e7490b9d4b91c8fe431bc577df012e5f615d931bc14",
+      "receipt_sha256": "ca98b3f22336e9883d377fa69eb18e9df044a0e78a1d9c1295f12b81eb2f5b69",
+      "validation": {
+        "scene": "3224923476345749285_4480_000_4500_000",
+        "records": 1970,
+        "points": 37409319,
+        "eligible_semantic_points": 5103365,
+        "native_counts": [
+          39756,
+          338875,
+          16937,
+          0,
+          0,
+          0,
+          0,
+          184,
+          9690,
+          0,
+          19559,
+          0,
+          0,
+          0,
+          2371335,
+          924052,
+          85558,
+          27129,
+          747288,
+          2054,
+          5284,
+          3807,
+          551613
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 47.43707914900733,
+            "peak_rss_kib": 98088,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 21.142009256000165,
+            "peak_rss_kib": 103484,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "14250544550818363063_880_000_900_000": {
+      "evidence": "scientific-point-grid-14250544550818363063_880_000_900_000-verified.json",
+      "evidence_sha256": "08382df181ff5957a22b0ff379fccf6f92c1ff2c6fc80e746c15e33deced8f5c",
+      "receipt_sha256": "3e8bcc45eea1e0678a150b59e145edf1b68a780c2b45f4141d40f96073e36b12",
+      "validation": {
+        "scene": "14250544550818363063_880_000_900_000",
+        "records": 1990,
+        "points": 35950142,
+        "eligible_semantic_points": 4843949,
+        "native_counts": [
+          14173,
+          548547,
+          24030,
+          0,
+          141824,
+          0,
+          0,
+          4769,
+          23601,
+          0,
+          37115,
+          0,
+          0,
+          0,
+          140312,
+          1980537,
+          135935,
+          67778,
+          1099602,
+          2138,
+          16,
+          611345,
+          26400
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 45.20976097101811,
+            "peak_rss_kib": 92880,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.58377449400723,
+            "peak_rss_kib": 112644,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "2088865281951278665_4460_000_4480_000": {
+      "evidence": "scientific-point-grid-2088865281951278665_4460_000_4480_000-verified.json",
+      "evidence_sha256": "5cea690699dffa12131455aa4bbcf743898cd9fc5c33c7ba7d1dd442f7d1db56",
+      "receipt_sha256": "217ebc6b45feb55f3cfdfe12e10a46909791a334dbbe52a658977a419e720913",
+      "validation": {
+        "scene": "2088865281951278665_4460_000_4480_000",
+        "records": 1980,
+        "points": 31652733,
+        "eligible_semantic_points": 4317715,
+        "native_counts": [
+          33661,
+          477582,
+          9123,
+          0,
+          0,
+          0,
+          0,
+          3607,
+          17397,
+          6257,
+          39147,
+          0,
+          0,
+          0,
+          1370675,
+          466089,
+          10125,
+          94102,
+          1331699,
+          80601,
+          3237,
+          123357,
+          284717
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 39.910298603994306,
+            "peak_rss_kib": 95224,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 17.792976568976883,
+            "peak_rss_kib": 92996,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "12856053589272984699_1020_000_1040_000": {
+      "evidence": "scientific-point-grid-12856053589272984699_1020_000_1040_000-verified.json",
+      "evidence_sha256": "08083ab56c03360a44f698c81ba64c77c2c11ddc64aceae77c81f39d2fe5c809",
+      "receipt_sha256": "ea340c94094466665191c9923362dd54fabbe726f3bd0098ce3e0c08df35b47e",
+      "validation": {
+        "scene": "12856053589272984699_1020_000_1040_000",
+        "records": 1980,
+        "points": 36765151,
+        "eligible_semantic_points": 4943504,
+        "native_counts": [
+          33973,
+          437044,
+          53493,
+          0,
+          0,
+          0,
+          0,
+          3817,
+          27355,
+          143,
+          57088,
+          92,
+          0,
+          2380,
+          2141833,
+          483601,
+          202007,
+          42089,
+          906998,
+          16745,
+          27156,
+          31488,
+          510175
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 47.37165089399787,
+            "peak_rss_kib": 94480,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 21.842235221993178,
+            "peak_rss_kib": 94648,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "11489533038039664633_4820_000_4840_000": {
+      "evidence": "scientific-point-grid-11489533038039664633_4820_000_4840_000-verified.json",
+      "evidence_sha256": "6c395f587aea08ca2704df723faae6479031a9e562e36ab7783a607cfa9ee83d",
+      "receipt_sha256": "c146cbece0da471465e9c93874c0b06c960a95f451feec69d01ffb4541f91168",
+      "validation": {
+        "scene": "11489533038039664633_4820_000_4840_000",
+        "records": 1990,
+        "points": 38472032,
+        "eligible_semantic_points": 5150052,
+        "native_counts": [
+          48176,
+          108970,
+          665710,
+          30584,
+          0,
+          0,
+          0,
+          25661,
+          5816,
+          4072,
+          98390,
+          0,
+          0,
+          360,
+          1548485,
+          1653685,
+          20104,
+          2671,
+          497528,
+          0,
+          0,
+          77302,
+          410714
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 48.65980993001722,
+            "peak_rss_kib": 94732,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.30410218902398,
+            "peak_rss_kib": 105304,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "13619063687271391084_1519_680_1539_680": {
+      "evidence": "scientific-point-grid-13619063687271391084_1519_680_1539_680-verified.json",
+      "evidence_sha256": "30d78dc47aea2bddfa202526771a0c37eae13d675de6fd4aeeb4d8cc52eb385d",
+      "receipt_sha256": "10a467a750399659ce5a9d8e290011986032bcdef92c5825a852d1331056565d",
+      "validation": {
+        "scene": "13619063687271391084_1519_680_1539_680",
+        "records": 1990,
+        "points": 34738340,
+        "eligible_semantic_points": 4748573,
+        "native_counts": [
+          39335,
+          193922,
+          187327,
+          0,
+          910,
+          0,
+          0,
+          18356,
+          60812,
+          1674,
+          32502,
+          12415,
+          818,
+          0,
+          812203,
+          1083307,
+          241658,
+          121732,
+          1218749,
+          15888,
+          8792,
+          471982,
+          265526
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 44.174259151972365,
+            "peak_rss_kib": 100308,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.266905521973968,
+            "peak_rss_kib": 101852,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "15628918650068847391_8077_670_8097_670": {
+      "evidence": "scientific-point-grid-15628918650068847391_8077_670_8097_670-verified.json",
+      "evidence_sha256": "3c5e830184750ad168dcd7e29e5ba03b518271f9aaea66b3b2c89e5990178f78",
+      "receipt_sha256": "1a1cbbd69b960fb40a82fa59a9771d7306a5209c655a0ac8d3570cba69976905",
+      "validation": {
+        "scene": "15628918650068847391_8077_670_8097_670",
+        "records": 1970,
+        "points": 31150189,
+        "eligible_semantic_points": 4237924,
+        "native_counts": [
+          44436,
+          448881,
+          9738,
+          0,
+          502,
+          0,
+          1000,
+          2569,
+          12668,
+          0,
+          34858,
+          0,
+          0,
+          0,
+          1075957,
+          341398,
+          49763,
+          71697,
+          1807251,
+          54576,
+          74,
+          191388,
+          135604
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 39.64356488897465,
+            "peak_rss_kib": 96328,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 17.75467109499732,
+            "peak_rss_kib": 95416,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "14098575914252965554_511_000_531_000": {
+      "evidence": "scientific-point-grid-14098575914252965554_511_000_531_000-verified.json",
+      "evidence_sha256": "60d729aaacd16a13fb058c2a1e05dc47df77d0757b781dfc1c9f480e1c472c72",
+      "receipt_sha256": "8d3234ce853068ed07d51c68c7726fa888e082e6f579f6011614135de105bf6b",
+      "validation": {
+        "scene": "14098575914252965554_511_000_531_000",
+        "records": 1900,
+        "points": 33044285,
+        "eligible_semantic_points": 4653467,
+        "native_counts": [
+          30315,
+          555279,
+          922,
+          0,
+          1445,
+          0,
+          28,
+          0,
+          40623,
+          2991,
+          28203,
+          0,
+          0,
+          0,
+          1450848,
+          686675,
+          96349,
+          58330,
+          441439,
+          11930,
+          0,
+          1023348,
+          255057
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 41.25201472698245,
+            "peak_rss_kib": 96744,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 17.64013293600874,
+            "peak_rss_kib": 85976,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "10734565072045778791_440_000_460_000": {
+      "evidence": "scientific-point-grid-10734565072045778791_440_000_460_000-verified.json",
+      "evidence_sha256": "02259dda7c7a8966a32c89cdfaf64e8e4fd63ed94c4573a055bbaf40780b5a14",
+      "receipt_sha256": "6aeb96c5a69dd0a4c4acd3a5b8b78e0fbccb9099303b8f6fbe0ff4dbf0254afa",
+      "validation": {
+        "scene": "10734565072045778791_440_000_460_000",
+        "records": 1990,
+        "points": 35959888,
+        "eligible_semantic_points": 4794569,
+        "native_counts": [
+          12385,
+          227810,
+          0,
+          0,
+          0,
+          0,
+          0,
+          16176,
+          14511,
+          0,
+          18610,
+          0,
+          0,
+          0,
+          661177,
+          1308845,
+          43967,
+          10000,
+          591583,
+          0,
+          0,
+          1717751,
+          184139
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 45.18805232498562,
+            "peak_rss_kib": 99820,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.764998906990513,
+            "peak_rss_kib": 87656,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "2681180680221317256_1144_000_1164_000": {
+      "evidence": "scientific-point-grid-2681180680221317256_1144_000_1164_000-verified.json",
+      "evidence_sha256": "d24c6a0028ee36ca687820597816e4bc7372c2a915291a09312f37eb61a4b36d",
+      "receipt_sha256": "fcc001131500552c522e29da06a61d542439f6e14f18e8971419fbfd3ca60a86",
+      "validation": {
+        "scene": "2681180680221317256_1144_000_1164_000",
+        "records": 1980,
+        "points": 31283550,
+        "eligible_semantic_points": 4196717,
+        "native_counts": [
+          86298,
+          492318,
+          84359,
+          0,
+          0,
+          0,
+          0,
+          0,
+          61400,
+          20358,
+          47468,
+          172,
+          0,
+          0,
+          462323,
+          1554655,
+          74762,
+          97021,
+          894343,
+          1036,
+          24945,
+          339866,
+          41691
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 41.00609084998723,
+            "peak_rss_kib": 87192,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 16.534935016999952,
+            "peak_rss_kib": 83968,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "8722413665055769182_2840_000_2860_000": {
+      "evidence": "scientific-point-grid-8722413665055769182_2840_000_2860_000-verified.json",
+      "evidence_sha256": "7dbbecfbaaa608e4e8e1455d82bc0b1dd659ed507c68fa71e0df03c960b2725f",
+      "receipt_sha256": "651fdd5f42348f2c0a37aea9d6dc3d1d123bf52fe1dc6eb6f2bf719c59148bfa",
+      "validation": {
+        "scene": "8722413665055769182_2840_000_2860_000",
+        "records": 1970,
+        "points": 38800913,
+        "eligible_semantic_points": 5351677,
+        "native_counts": [
+          41488,
+          358924,
+          14790,
+          36310,
+          192905,
+          0,
+          0,
+          83695,
+          13798,
+          95,
+          32833,
+          508,
+          346,
+          1507,
+          1760173,
+          1429968,
+          38430,
+          51463,
+          724892,
+          10981,
+          712,
+          586140,
+          13207
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 48.72866335400613,
+            "peak_rss_kib": 115100,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.33764850499574,
+            "peak_rss_kib": 104588,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "12012663867578114640_820_000_840_000": {
+      "evidence": "scientific-point-grid-12012663867578114640_820_000_840_000-verified.json",
+      "evidence_sha256": "e876fcd5fb905fda847f3eb4f5cebd4c03b2fc7fecf02d390b0fb9942cce41c1",
+      "receipt_sha256": "395984ba9ce7d314541b961e07a13c75d095a5aae56b4065e167f0ccfafb4fbe",
+      "validation": {
+        "scene": "12012663867578114640_820_000_840_000",
+        "records": 1990,
+        "points": 35441711,
+        "eligible_semantic_points": 4773540,
+        "native_counts": [
+          32136,
+          890491,
+          0,
+          0,
+          0,
+          0,
+          0,
+          27481,
+          45979,
+          783,
+          88654,
+          0,
+          0,
+          0,
+          2413317,
+          104597,
+          62380,
+          10986,
+          734542,
+          1231,
+          83140,
+          29,
+          309930
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 46.58994208200602,
+            "peak_rss_kib": 90700,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.485239723988343,
+            "peak_rss_kib": 86460,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "9907794657177651763_1126_570_1146_570": {
+      "evidence": "scientific-point-grid-9907794657177651763_1126_570_1146_570-verified.json",
+      "evidence_sha256": "c5c865cd00ae83ae8b498d14991f02a9c72d40b5045f86237009ade4eba3f628",
+      "receipt_sha256": "66589ac1f20b0835cf56a464ca3b97475ada9a0b4b409f1be83eb04dc7389e05",
+      "validation": {
+        "scene": "9907794657177651763_1126_570_1146_570",
+        "records": 1990,
+        "points": 33246788,
+        "eligible_semantic_points": 3031779,
+        "native_counts": [
+          3480,
+          468185,
+          23478,
+          7193,
+          0,
+          0,
+          0,
+          3891,
+          11121,
+          363,
+          34652,
+          0,
+          0,
+          0,
+          233747,
+          691507,
+          100069,
+          68748,
+          1082354,
+          7423,
+          2200,
+          198845,
+          98003
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 42.180905343964696,
+            "peak_rss_kib": 95168,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.4211484430125,
+            "peak_rss_kib": 98356,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "13807633218762107566_6625_000_6645_000": {
+      "evidence": "scientific-point-grid-13807633218762107566_6625_000_6645_000-verified.json",
+      "evidence_sha256": "f664dd9d55181788ed7da271a075a2da1b36389db2309d8ecf98fe98db385868",
+      "receipt_sha256": "b5174314c032f8150b6d865974dfc735749f8d66cc1e1280f93c91c74fe922fd",
+      "validation": {
+        "scene": "13807633218762107566_6625_000_6645_000",
+        "records": 1990,
+        "points": 30031984,
+        "eligible_semantic_points": 4161502,
+        "native_counts": [
+          46791,
+          44130,
+          4031,
+          0,
+          9577,
+          0,
+          0,
+          29,
+          13403,
+          536,
+          53452,
+          0,
+          0,
+          0,
+          609827,
+          1161663,
+          30920,
+          124268,
+          998392,
+          17176,
+          1835,
+          855204,
+          237059
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 37.384030714049004,
+            "peak_rss_kib": 92788,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 17.06758053402882,
+            "peak_rss_kib": 93928,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "7850521592343484282_4576_090_4596_090": {
+      "evidence": "scientific-point-grid-7850521592343484282_4576_090_4596_090-verified.json",
+      "evidence_sha256": "41901997a24000d1fb91921ffa35df0a83742d54fff4c192c1f1b9f676430178",
+      "receipt_sha256": "0d3e5fd9fa15c42823ba34967f46e2e33bec8f93a1b2372d87c3a50a335d1664",
+      "validation": {
+        "scene": "7850521592343484282_4576_090_4596_090",
+        "records": 1970,
+        "points": 33308135,
+        "eligible_semantic_points": 2960324,
+        "native_counts": [
+          4697,
+          52235,
+          743,
+          0,
+          0,
+          0,
+          0,
+          0,
+          17424,
+          976,
+          23339,
+          0,
+          0,
+          0,
+          357361,
+          955671,
+          375,
+          13775,
+          507635,
+          35845,
+          11554,
+          972575,
+          10816
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 40.872236758994404,
+            "peak_rss_kib": 110716,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 16.88711593399057,
+            "peak_rss_kib": 109576,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "12303641360375776820_4378_000_4398_000": {
+      "evidence": "scientific-point-grid-12303641360375776820_4378_000_4398_000-verified.json",
+      "evidence_sha256": "fd7496fc4f0da3f60e3bec1fb21966d40d817e1d041795f783a4ee1f1dbe7cd9",
+      "receipt_sha256": "b0cacd020ea280245f530b1fd82ca03b0bb38fcf43ea272d6bce90e82e1380a1",
+      "validation": {
+        "scene": "12303641360375776820_4378_000_4398_000",
+        "records": 1990,
+        "points": 31125883,
+        "eligible_semantic_points": 4365603,
+        "native_counts": [
+          63703,
+          238536,
+          25185,
+          0,
+          0,
+          0,
+          0,
+          200,
+          20355,
+          2409,
+          44076,
+          0,
+          0,
+          0,
+          1193321,
+          1179165,
+          69805,
+          59290,
+          1115223,
+          16238,
+          6752,
+          221871,
+          173177
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 40.51394390303176,
+            "peak_rss_kib": 91852,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 17.440900385030545,
+            "peak_rss_kib": 88196,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "2415873247906962761_5460_000_5480_000": {
+      "evidence": "scientific-point-grid-2415873247906962761_5460_000_5480_000-verified.json",
+      "evidence_sha256": "e3733e7893b9840982067b331e40ab79c7b8aebd1c0437d9e3429e3e89416f59",
+      "receipt_sha256": "aae8226e1a84865e114a36fa7041fa73c92469a3fe6aa2e45c54b934b475d881",
+      "validation": {
+        "scene": "2415873247906962761_5460_000_5480_000",
+        "records": 1980,
+        "points": 36217311,
+        "eligible_semantic_points": 4845820,
+        "native_counts": [
+          54384,
+          681027,
+          7036,
+          0,
+          0,
+          0,
+          0,
+          45208,
+          20377,
+          0,
+          150797,
+          0,
+          3458,
+          70,
+          2794399,
+          182947,
+          51591,
+          24259,
+          590820,
+          1045,
+          5054,
+          3311,
+          284421
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 46.24960257898783,
+            "peak_rss_kib": 92328,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.360888517985586,
+            "peak_rss_kib": 88556,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "2656110181316327570_940_000_960_000": {
+      "evidence": "scientific-point-grid-2656110181316327570_940_000_960_000-verified.json",
+      "evidence_sha256": "38a05d990368df2277d6a7a9e0bbc40c59fde0ee60c73b4168ab36e3eb391dbe",
+      "receipt_sha256": "493e528f646531d32c32fbd102c6be622512136666b82edae2ebe81dabe19ceb",
+      "validation": {
+        "scene": "2656110181316327570_940_000_960_000",
+        "records": 1980,
+        "points": 36177045,
+        "eligible_semantic_points": 4731732,
+        "native_counts": [
+          192140,
+          195419,
+          240690,
+          0,
+          0,
+          0,
+          0,
+          153767,
+          35512,
+          5838,
+          179632,
+          2162,
+          628,
+          2166,
+          2269727,
+          74305,
+          76702,
+          44735,
+          869911,
+          29298,
+          39757,
+          2160,
+          509323
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 45.83969330304535,
+            "peak_rss_kib": 93840,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.87237636296777,
+            "peak_rss_kib": 105096,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "16473613811052081539_1060_000_1080_000": {
+      "evidence": "scientific-point-grid-16473613811052081539_1060_000_1080_000-verified.json",
+      "evidence_sha256": "b27e8e14f692157c263b0599c005e05593532235916bafc0b74be783b96020e2",
+      "receipt_sha256": "3d9aaf30d3e2f7f53b61387644228871c2721297fb350849d9f8dbd462768452",
+      "validation": {
+        "scene": "16473613811052081539_1060_000_1080_000",
+        "records": 1970,
+        "points": 35730522,
+        "eligible_semantic_points": 4756964,
+        "native_counts": [
+          112498,
+          518563,
+          2131,
+          0,
+          98,
+          0,
+          0,
+          47021,
+          41700,
+          7961,
+          162746,
+          3190,
+          0,
+          0,
+          2126699,
+          552769,
+          24428,
+          45694,
+          606010,
+          5948,
+          71265,
+          292391,
+          248350
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 44.84260389202973,
+            "peak_rss_kib": 100028,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.668560439022258,
+            "peak_rss_kib": 102036,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "16646502593577530501_4878_080_4898_080": {
+      "evidence": "scientific-point-grid-16646502593577530501_4878_080_4898_080-verified.json",
+      "evidence_sha256": "4c7dbed943393ef57d7f13a6d71a68c5e37a9c6240d3b26722a32acf8e8c40b9",
+      "receipt_sha256": "c445b26f4987067f78f4b4410081c495b5ac01f5b06f0baa73402816b3ed125c",
+      "validation": {
+        "scene": "16646502593577530501_4878_080_4898_080",
+        "records": 1990,
+        "points": 39261178,
+        "eligible_semantic_points": 3586357,
+        "native_counts": [
+          26210,
+          97427,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1044,
+          7467,
+          0,
+          9364,
+          30,
+          0,
+          0,
+          745295,
+          1628746,
+          177003,
+          29364,
+          570416,
+          18964,
+          1752,
+          202634,
+          96851
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 49.9635870269849,
+            "peak_rss_kib": 96656,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 21.08895417896565,
+            "peak_rss_kib": 101200,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "7921369793217703814_1060_000_1080_000": {
+      "evidence": "scientific-point-grid-7921369793217703814_1060_000_1080_000-verified.json",
+      "evidence_sha256": "077511449a8f0652159993cca9267633513aca3d18ad3940826e74057eb01711",
+      "receipt_sha256": "486f3056d6960a1cf72fc541b9c6623842ea2905169e0a29538df189f2dab601",
+      "validation": {
+        "scene": "7921369793217703814_1060_000_1080_000",
+        "records": 1980,
+        "points": 37687242,
+        "eligible_semantic_points": 5012110,
+        "native_counts": [
+          92111,
+          1151055,
+          7281,
+          3068,
+          225054,
+          0,
+          0,
+          111587,
+          56337,
+          1339,
+          24037,
+          5631,
+          5881,
+          0,
+          2952437,
+          12128,
+          1603,
+          16698,
+          232731,
+          2009,
+          3980,
+          5617,
+          193637
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 46.94550826703198,
+            "peak_rss_kib": 93588,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.673082262976095,
+            "peak_rss_kib": 89336,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "9385013624094020582_2547_650_2567_650": {
+      "evidence": "scientific-point-grid-9385013624094020582_2547_650_2567_650-verified.json",
+      "evidence_sha256": "5f11671ce59d595f883141f51782c219414e59e1c077aa4907a265a9f1f032ed",
+      "receipt_sha256": "00f65dc0659140317b02260287d3e2d45b0a17bc2732098c8c670158592f1c0f",
+      "validation": {
+        "scene": "9385013624094020582_2547_650_2567_650",
+        "records": 1980,
+        "points": 36064438,
+        "eligible_semantic_points": 3274975,
+        "native_counts": [
+          8795,
+          27454,
+          0,
+          0,
+          0,
+          0,
+          0,
+          6209,
+          10231,
+          0,
+          10648,
+          0,
+          0,
+          0,
+          1051522,
+          752085,
+          71002,
+          56632,
+          638814,
+          23689,
+          0,
+          462847,
+          163842
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 45.98070298600942,
+            "peak_rss_kib": 94288,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.70722001802642,
+            "peak_rss_kib": 101868,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "1191788760630624072_3880_000_3900_000": {
+      "evidence": "scientific-point-grid-1191788760630624072_3880_000_3900_000-verified.json",
+      "evidence_sha256": "dc0ecb7b97fc098d76df84f3d6fb2492bb94471ab4e765a43acab26c38661174",
+      "receipt_sha256": "f87a610584665c7a3f766406d6f2304de11ba3085a7b8a30a54c5511a8dfb465",
+      "validation": {
+        "scene": "1191788760630624072_3880_000_3900_000",
+        "records": 1990,
+        "points": 35405780,
+        "eligible_semantic_points": 4730880,
+        "native_counts": [
+          48554,
+          272524,
+          46531,
+          0,
+          0,
+          0,
+          0,
+          235,
+          67806,
+          0,
+          68362,
+          0,
+          0,
+          0,
+          1417741,
+          1330806,
+          37626,
+          35449,
+          1054730,
+          40692,
+          12197,
+          73124,
+          273057
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 45.281205367005896,
+            "peak_rss_kib": 92028,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.15124419599306,
+            "peak_rss_kib": 87868,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "6390847454531723238_6000_000_6020_000": {
+      "evidence": "scientific-point-grid-6390847454531723238_6000_000_6020_000-verified.json",
+      "evidence_sha256": "14f7c036cd31657c5ba9d3a0039434e33daa0ecf579162ae29474b6e68f1129f",
+      "receipt_sha256": "a9c44d2c48479ff56d10de667b7558cf6b7c2d347b633af04c799a105f6c53a8",
+      "validation": {
+        "scene": "6390847454531723238_6000_000_6020_000",
+        "records": 1990,
+        "points": 34795683,
+        "eligible_semantic_points": 4666869,
+        "native_counts": [
+          49600,
+          687229,
+          1922,
+          0,
+          0,
+          0,
+          0,
+          594,
+          31755,
+          31,
+          53225,
+          277,
+          0,
+          0,
+          1756562,
+          759272,
+          12126,
+          28251,
+          973491,
+          1641,
+          38131,
+          18407,
+          303955
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 47.41771783796139,
+            "peak_rss_kib": 94652,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.06513596198056,
+            "peak_rss_kib": 88808,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "13840133134545942567_1060_000_1080_000": {
+      "evidence": "scientific-point-grid-13840133134545942567_1060_000_1080_000-verified.json",
+      "evidence_sha256": "1c660ef4e90227189f8199afc8a4272624975636135a7d754d7cf752cbbc6546",
+      "receipt_sha256": "8c1121ffbca2c3521e133d07c196bb5976122ba2de26d83075eb350e33e9cfc2",
+      "validation": {
+        "scene": "13840133134545942567_1060_000_1080_000",
+        "records": 1980,
+        "points": 31936558,
+        "eligible_semantic_points": 2848469,
+        "native_counts": [
+          36150,
+          236802,
+          698,
+          0,
+          473,
+          0,
+          27245,
+          52949,
+          39116,
+          5098,
+          118907,
+          1230,
+          213,
+          684,
+          819223,
+          311770,
+          58021,
+          73738,
+          680280,
+          9734,
+          92971,
+          75175,
+          244142
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 40.439071523956954,
+            "peak_rss_kib": 89428,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.08202147699194,
+            "peak_rss_kib": 83800,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "5525943706123287091_4100_000_4120_000": {
+      "evidence": "scientific-point-grid-5525943706123287091_4100_000_4120_000-verified.json",
+      "evidence_sha256": "f54f4083fb73d32f5506ba24084bdccd02175ce3de11fb363c978dd762266586",
+      "receipt_sha256": "cf299fc21e85c81e71563311e7747d415b3301dde98ec607a90f3da83686cf44",
+      "validation": {
+        "scene": "5525943706123287091_4100_000_4120_000",
+        "records": 1990,
+        "points": 34015823,
+        "eligible_semantic_points": 4620109,
+        "native_counts": [
+          15920,
+          420423,
+          26621,
+          0,
+          17158,
+          0,
+          4113,
+          2331,
+          58522,
+          2611,
+          73459,
+          28706,
+          0,
+          0,
+          1397262,
+          502265,
+          106844,
+          117991,
+          1364218,
+          10186,
+          10772,
+          203500,
+          273127
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 44.06252492003841,
+            "peak_rss_kib": 90392,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.71217886195518,
+            "peak_rss_kib": 95396,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "5200186706748209867_80_000_100_000": {
+      "evidence": "scientific-point-grid-5200186706748209867_80_000_100_000-verified.json",
+      "evidence_sha256": "d45e4850c6e32c79b3a9ba996a596f33364490f0a15924c6084bf85584852502",
+      "receipt_sha256": "b1a9a5c02a0f8dbd06de0091ee2094e4bfb908f1740e83e3854b696840dd462e",
+      "validation": {
+        "scene": "5200186706748209867_80_000_100_000",
+        "records": 1990,
+        "points": 26731204,
+        "eligible_semantic_points": 2351147,
+        "native_counts": [
+          2633,
+          24623,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1070,
+          14824,
+          0,
+          5358,
+          105,
+          0,
+          0,
+          69548,
+          827416,
+          60,
+          3007,
+          352081,
+          26945,
+          6782,
+          1019328,
+          0
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 37.02133103302913,
+            "peak_rss_kib": 78900,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 16.125305224966723,
+            "peak_rss_kib": 85324,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "15696964848687303249_4615_200_4635_200": {
+      "evidence": "scientific-point-grid-15696964848687303249_4615_200_4635_200-verified.json",
+      "evidence_sha256": "784995fc3963c9038bcb701f6ffea62561cf632522e6d3fce6783b89708c37d0",
+      "receipt_sha256": "50f5edf38b894bf541ca5565a07bdb83a8a04f9a37e7634f1f7766caea56aed9",
+      "validation": {
+        "scene": "15696964848687303249_4615_200_4635_200",
+        "records": 1980,
+        "points": 35108184,
+        "eligible_semantic_points": 4833493,
+        "native_counts": [
+          11013,
+          625005,
+          1484,
+          0,
+          0,
+          0,
+          3169,
+          18973,
+          49612,
+          10473,
+          60112,
+          0,
+          0,
+          0,
+          517587,
+          1484634,
+          223993,
+          54380,
+          1327952,
+          29792,
+          81870,
+          172852,
+          171605
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 43.7966790139908,
+            "peak_rss_kib": 97544,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.302519347984344,
+            "peak_rss_kib": 112040,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "10599748131695282446_1380_000_1400_000": {
+      "evidence": "scientific-point-grid-10599748131695282446_1380_000_1400_000-verified.json",
+      "evidence_sha256": "2291ad218d1b4523e95b80ecdd8627819997734596de37602fa7802393a87519",
+      "receipt_sha256": "20f903a7ec323cd63477d51cffd619fbcea74083152ba76528137cb39b7b2f92",
+      "validation": {
+        "scene": "10599748131695282446_1380_000_1400_000",
+        "records": 1980,
+        "points": 32911565,
+        "eligible_semantic_points": 2926541,
+        "native_counts": [
+          86874,
+          292759,
+          110650,
+          0,
+          0,
+          0,
+          408,
+          58841,
+          20985,
+          387,
+          30732,
+          7920,
+          0,
+          16862,
+          1372732,
+          264849,
+          43074,
+          16229,
+          273256,
+          19786,
+          414,
+          155325,
+          241332
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 41.5226137949503,
+            "peak_rss_kib": 91112,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.844507644011173,
+            "peak_rss_kib": 84820,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "4575961016807404107_880_000_900_000": {
+      "evidence": "scientific-point-grid-4575961016807404107_880_000_900_000-verified.json",
+      "evidence_sha256": "6b8bdd3a640065bf823d13395327a34835aa2974c2be438ea3e3f26908ba9222",
+      "receipt_sha256": "1a09c7bfbd1057bd77425482142ba11c6d3143ec5d829a2cc2e4ada03b1b99e6",
+      "validation": {
+        "scene": "4575961016807404107_880_000_900_000",
+        "records": 1980,
+        "points": 35944040,
+        "eligible_semantic_points": 4903102,
+        "native_counts": [
+          30437,
+          567863,
+          1534,
+          23712,
+          118135,
+          0,
+          1413,
+          11432,
+          27238,
+          553,
+          87190,
+          0,
+          5274,
+          20015,
+          1703332,
+          650122,
+          231145,
+          37721,
+          536705,
+          38415,
+          8248,
+          701092,
+          131963
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 45.864904601010494,
+            "peak_rss_kib": 94184,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.7968495709938,
+            "peak_rss_kib": 88056,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "10082223140073588526_6140_000_6160_000": {
+      "evidence": "scientific-point-grid-10082223140073588526_6140_000_6160_000-verified.json",
+      "evidence_sha256": "c36ee88b81fdd64d5d0abe9a93dd7ee9461eb25f74c0888521835eaddfe59273",
+      "receipt_sha256": "5f089db31d802270f6e37ec728e8f67c4c5a8ee1c9715ca098885e5d27889c87",
+      "validation": {
+        "scene": "10082223140073588526_6140_000_6160_000",
+        "records": 1970,
+        "points": 37307825,
+        "eligible_semantic_points": 5094095,
+        "native_counts": [
+          30870,
+          519320,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8609,
+          35674,
+          0,
+          115744,
+          0,
+          0,
+          99,
+          1838427,
+          1333118,
+          60773,
+          25190,
+          846042,
+          13784,
+          23503,
+          4582,
+          269230
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 46.616427312023006,
+            "peak_rss_kib": 93644,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.510367388022132,
+            "peak_rss_kib": 90756,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "3657581213864582252_340_000_360_000": {
+      "evidence": "scientific-point-grid-3657581213864582252_340_000_360_000-verified.json",
+      "evidence_sha256": "5be2cc5ffc93f54368fb990130a7d67e47e91160f5ebdda9bdb811a857e48441",
+      "receipt_sha256": "f21901b2742f781a5336576aa152921cfe268b2d5a0ba5779047b59d76d7c930",
+      "validation": {
+        "scene": "3657581213864582252_340_000_360_000",
+        "records": 1980,
+        "points": 37501560,
+        "eligible_semantic_points": 5148261,
+        "native_counts": [
+          16974,
+          488330,
+          0,
+          0,
+          0,
+          0,
+          0,
+          881,
+          28769,
+          0,
+          71457,
+          240,
+          0,
+          0,
+          1463846,
+          1865125,
+          35621,
+          25043,
+          967188,
+          1469,
+          4173,
+          56736,
+          139383
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 47.49028556304984,
+            "peak_rss_kib": 100176,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.548064375994727,
+            "peak_rss_kib": 105752,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "5468483805452515080_4540_000_4560_000": {
+      "evidence": "scientific-point-grid-5468483805452515080_4540_000_4560_000-verified.json",
+      "evidence_sha256": "979122c37af133d18f469e021c98b0101e20b457ed58dd44e6d43f1850aa5e9d",
+      "receipt_sha256": "826440d3f638cc7089e1df1543fba96fb89d68805609c8559b068948f27bdee3",
+      "validation": {
+        "scene": "5468483805452515080_4540_000_4560_000",
+        "records": 1710,
+        "points": 26564493,
+        "eligible_semantic_points": 3871771,
+        "native_counts": [
+          68643,
+          158529,
+          0,
+          0,
+          0,
+          0,
+          0,
+          6332,
+          17169,
+          0,
+          33580,
+          0,
+          80,
+          0,
+          2551822,
+          118541,
+          38650,
+          25618,
+          650317,
+          8415,
+          22619,
+          2403,
+          237696
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 33.75362066802336,
+            "peak_rss_kib": 87808,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 15.460101797012612,
+            "peak_rss_kib": 84108,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "4427374597960783085_4168_000_4188_000": {
+      "evidence": "scientific-point-grid-4427374597960783085_4168_000_4188_000-verified.json",
+      "evidence_sha256": "32771a599ebed3471b8c99a60010ad987b2bbcbde5d4a927a01c1d0102f6df9c",
+      "receipt_sha256": "fb486afe278e987f45f29925ac282489605bfac398382bcdcf84bc6d0a260a8b",
+      "validation": {
+        "scene": "4427374597960783085_4168_000_4188_000",
+        "records": 1990,
+        "points": 36641562,
+        "eligible_semantic_points": 5025174,
+        "native_counts": [
+          30162,
+          141332,
+          1469,
+          0,
+          0,
+          0,
+          0,
+          0,
+          40122,
+          0,
+          34285,
+          0,
+          0,
+          0,
+          1257922,
+          1784407,
+          26965,
+          68031,
+          1154003,
+          14716,
+          28054,
+          250516,
+          223352
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 44.90604723099386,
+            "peak_rss_kib": 115184,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.733749577018898,
+            "peak_rss_kib": 88672,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "183829460855609442_430_000_450_000": {
+      "evidence": "scientific-point-grid-183829460855609442_430_000_450_000-verified.json",
+      "evidence_sha256": "ed58985385565fb783177b6aabe77c662793321ee62f9223eb886e6314126d17",
+      "receipt_sha256": "63bbb0a4b56100d53dd4a7c644720c56321f6c56adee84fecbb15b856d8f336e",
+      "validation": {
+        "scene": "183829460855609442_430_000_450_000",
+        "records": 1990,
+        "points": 33603771,
+        "eligible_semantic_points": 4501107,
+        "native_counts": [
+          71912,
+          502001,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          16098,
+          0,
+          26650,
+          0,
+          0,
+          0,
+          669314,
+          2046983,
+          220449,
+          21954,
+          369357,
+          6204,
+          3069,
+          544033,
+          74995
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 43.507996269036084,
+            "peak_rss_kib": 89256,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.130801455001347,
+            "peak_rss_kib": 96060,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "3437741670889149170_1411_550_1431_550": {
+      "evidence": "scientific-point-grid-3437741670889149170_1411_550_1431_550-verified.json",
+      "evidence_sha256": "6616859d1109f834e92449870cc65859dfca98671131ef0162ff6abc5cdf386d",
+      "receipt_sha256": "00e7bbe9fb29f685c485cc8e8892aa681b15dd6eeae2da3703d13c87c6fcb840",
+      "validation": {
+        "scene": "3437741670889149170_1411_550_1431_550",
+        "records": 1980,
+        "points": 35636742,
+        "eligible_semantic_points": 6850317,
+        "native_counts": [
+          17160,
+          33105,
+          0,
+          0,
+          4950,
+          0,
+          0,
+          6887,
+          15792,
+          0,
+          14256,
+          393,
+          0,
+          0,
+          1730924,
+          2262087,
+          90249,
+          91825,
+          1346743,
+          0,
+          0,
+          930115,
+          322991
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 56.10730527702253,
+            "peak_rss_kib": 100488,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.058691448997706,
+            "peak_rss_kib": 115372,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "9465500459680839281_1100_000_1120_000": {
+      "evidence": "scientific-point-grid-9465500459680839281_1100_000_1120_000-verified.json",
+      "evidence_sha256": "0dc14501f4139c438d78f0ff8a60c2459e5ca80ab5dd71741b5ad8af44c9ff74",
+      "receipt_sha256": "61ba5717eb7c45e77d50cd568cd8fc22365ff31ecb9b6c4293f0c33dc66bb9bd",
+      "validation": {
+        "scene": "9465500459680839281_1100_000_1120_000",
+        "records": 1990,
+        "points": 34993776,
+        "eligible_semantic_points": 3118104,
+        "native_counts": [
+          14404,
+          326316,
+          25810,
+          1031,
+          0,
+          0,
+          0,
+          3199,
+          36816,
+          9286,
+          29671,
+          0,
+          0,
+          0,
+          1063231,
+          762571,
+          114602,
+          16097,
+          438296,
+          7083,
+          16087,
+          51567,
+          216441
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 44.11426660895813,
+            "peak_rss_kib": 97160,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.891508028958924,
+            "peak_rss_kib": 97172,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "18295766828140813622_6775_000_6795_000": {
+      "evidence": "scientific-point-grid-18295766828140813622_6775_000_6795_000-verified.json",
+      "evidence_sha256": "9602e20da7cbbef02e63a007e6af3b7304b98958feb3b14b7717a4441b883960",
+      "receipt_sha256": "bddf516f9da6d75a3380d98e738d99eb10f63d9641224c2702118eb6fdb9a1a6",
+      "validation": {
+        "scene": "18295766828140813622_6775_000_6795_000",
+        "records": 1990,
+        "points": 24390440,
+        "eligible_semantic_points": 3255453,
+        "native_counts": [
+          34230,
+          424877,
+          0,
+          0,
+          0,
+          374,
+          0,
+          2442,
+          13571,
+          4418,
+          40341,
+          0,
+          0,
+          0,
+          492146,
+          357656,
+          110160,
+          80917,
+          1142589,
+          91139,
+          40652,
+          318308,
+          135863
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 33.41958132700529,
+            "peak_rss_kib": 77596,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 14.458647833031137,
+            "peak_rss_kib": 73668,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "14262448332225315249_1280_000_1300_000": {
+      "evidence": "scientific-point-grid-14262448332225315249_1280_000_1300_000-verified.json",
+      "evidence_sha256": "94a6b938000e7c95e16a2ec193c6bf504005e0a4dfa4f034ae72dfb12bde4770",
+      "receipt_sha256": "d5aaec85bf07b0877eaab045fed39d24af30e76b0cd4c7e3e7489846fff7cf17",
+      "validation": {
+        "scene": "14262448332225315249_1280_000_1300_000",
+        "records": 1990,
+        "points": 35700397,
+        "eligible_semantic_points": 4660924,
+        "native_counts": [
+          201125,
+          447767,
+          6100,
+          168659,
+          4191,
+          0,
+          0,
+          67690,
+          27008,
+          4375,
+          92601,
+          0,
+          1071,
+          0,
+          2159752,
+          245961,
+          143526,
+          44929,
+          759775,
+          21213,
+          61224,
+          59121,
+          345961
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 43.683505231980234,
+            "peak_rss_kib": 103492,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.260364836954977,
+            "peak_rss_kib": 116388,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "18446264979321894359_3700_000_3720_000": {
+      "evidence": "scientific-point-grid-18446264979321894359_3700_000_3720_000-verified.json",
+      "evidence_sha256": "ac7f7632c8ee13944e5d13b0f9e0d2e60e65f57e76df69120bdd81a6e2830375",
+      "receipt_sha256": "580ae44b3436eacc1c46e54f2ca88fcf35f326868b04a9ef66cd0e7ebf4df335",
+      "validation": {
+        "scene": "18446264979321894359_3700_000_3720_000",
+        "records": 1990,
+        "points": 35570341,
+        "eligible_semantic_points": 3004292,
+        "native_counts": [
+          210713,
+          174652,
+          0,
+          0,
+          0,
+          0,
+          110,
+          71015,
+          25730,
+          4141,
+          93777,
+          60,
+          4627,
+          0,
+          1368127,
+          171096,
+          25838,
+          34047,
+          642462,
+          25321,
+          87891,
+          1570,
+          273828
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 45.45339321298525,
+            "peak_rss_kib": 89012,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.592096321983263,
+            "peak_rss_kib": 89208,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "14687328292438466674_892_000_912_000": {
+      "evidence": "scientific-point-grid-14687328292438466674_892_000_912_000-verified.json",
+      "evidence_sha256": "52b302e26f46c15b240bf4375610d56a548e1c8d64b900227c9bb82ec72c0a7f",
+      "receipt_sha256": "d67c73ef28d94096212209821172231aabe84683c0aaa08592578738ecafb92b",
+      "validation": {
+        "scene": "14687328292438466674_892_000_912_000",
+        "records": 1980,
+        "points": 34146181,
+        "eligible_semantic_points": 4686314,
+        "native_counts": [
+          18216,
+          299019,
+          0,
+          454870,
+          0,
+          0,
+          0,
+          2424,
+          20811,
+          2588,
+          33986,
+          0,
+          0,
+          0,
+          143567,
+          832234,
+          413786,
+          64443,
+          1090019,
+          2517,
+          1631,
+          1139448,
+          184971
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 43.82645385095384,
+            "peak_rss_kib": 91772,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.42160087299999,
+            "peak_rss_kib": 89304,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "6161542573106757148_585_030_605_030": {
+      "evidence": "scientific-point-grid-6161542573106757148_585_030_605_030-verified.json",
+      "evidence_sha256": "354cfa5556fe788e3657ef4da6abcc67dfde854c5fb92c35eaf1c43a751a71ab",
+      "receipt_sha256": "2070cbe5429c11042b2177eeeed0715759096029f752adac8b0aaf89ad6b20fc",
+      "validation": {
+        "scene": "6161542573106757148_585_030_605_030",
+        "records": 1980,
+        "points": 37517194,
+        "eligible_semantic_points": 3459789,
+        "native_counts": [
+          5204,
+          64195,
+          482,
+          0,
+          0,
+          0,
+          0,
+          3464,
+          33737,
+          0,
+          23394,
+          0,
+          0,
+          0,
+          382882,
+          1270024,
+          122605,
+          62409,
+          664971,
+          26886,
+          24672,
+          612380,
+          167688
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 48.267662609985564,
+            "peak_rss_kib": 94820,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 21.139290550956503,
+            "peak_rss_kib": 99348,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "6183008573786657189_5414_000_5434_000": {
+      "evidence": "scientific-point-grid-6183008573786657189_5414_000_5434_000-verified.json",
+      "evidence_sha256": "48d913378be723fe40f51b934a86ac27f4e15e1e984ff0ae67b30249ebc61f93",
+      "receipt_sha256": "866d69b59a55aff5720cd722084546ceeeba665615789371e7ac77df22c72c7b",
+      "validation": {
+        "scene": "6183008573786657189_5414_000_5434_000",
+        "records": 1990,
+        "points": 27917321,
+        "eligible_semantic_points": 4944961,
+        "native_counts": [
+          9465,
+          193946,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          9164,
+          6440,
+          91457,
+          0,
+          0,
+          0,
+          550108,
+          1070188,
+          20747,
+          122158,
+          1904660,
+          60320,
+          37655,
+          638551,
+          239567
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 36.214186597964726,
+            "peak_rss_kib": 86064,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 16.41981857700739,
+            "peak_rss_kib": 80668,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "15611747084548773814_3740_000_3760_000": {
+      "evidence": "scientific-point-grid-15611747084548773814_3740_000_3760_000-verified.json",
+      "evidence_sha256": "6e6b34d78ed3c76ea288c5b2286e4303ed3cee0340764f46565555bbbdba70c0",
+      "receipt_sha256": "bc8e49e1202e893c36d8c1180ebf0181a5eeab76cc88ec43c6426c8c4cd0c838",
+      "validation": {
+        "scene": "15611747084548773814_3740_000_3760_000",
+        "records": 1980,
+        "points": 36426334,
+        "eligible_semantic_points": 3267211,
+        "native_counts": [
+          47059,
+          225953,
+          451346,
+          0,
+          0,
+          0,
+          6277,
+          80536,
+          18871,
+          1228,
+          50991,
+          133,
+          0,
+          0,
+          1469440,
+          142808,
+          44591,
+          22957,
+          455025,
+          6950,
+          47579,
+          13902,
+          228624
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 46.27919008402387,
+            "peak_rss_kib": 94244,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.139444162952714,
+            "peak_rss_kib": 104016,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "30779396576054160_1880_000_1900_000": {
+      "evidence": "scientific-point-grid-30779396576054160_1880_000_1900_000-verified.json",
+      "evidence_sha256": "91e7f527a0e5924ae7d46a332b15802c6121da70fb5e46ea20936d42939aacda",
+      "receipt_sha256": "54ec18e0ddf87b52b881951716408f34762dcb2aa8f1175c3307aa29b555bd8b",
+      "validation": {
+        "scene": "30779396576054160_1880_000_1900_000",
+        "records": 1980,
+        "points": 36361503,
+        "eligible_semantic_points": 4804034,
+        "native_counts": [
+          155460,
+          588326,
+          124514,
+          5365,
+          0,
+          0,
+          970,
+          259554,
+          30972,
+          870,
+          75857,
+          0,
+          0,
+          0,
+          2624229,
+          17514,
+          0,
+          21086,
+          644715,
+          13880,
+          30858,
+          0,
+          365324
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 45.94307994900737,
+            "peak_rss_kib": 93048,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.029378024977632,
+            "peak_rss_kib": 98232,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "1457696187335927618_595_027_615_027": {
+      "evidence": "scientific-point-grid-1457696187335927618_595_027_615_027-verified.json",
+      "evidence_sha256": "4023ec8eaa5bc92cd934a3c0923c01438670de61f42837249f7ddf6d65078145",
+      "receipt_sha256": "487b3f628a3ad483642a059decca7b8aa8f256477c1c4ecfbf846116ea023165",
+      "validation": {
+        "scene": "1457696187335927618_595_027_615_027",
+        "records": 1990,
+        "points": 30817765,
+        "eligible_semantic_points": 5549588,
+        "native_counts": [
+          18360,
+          244812,
+          16416,
+          0,
+          0,
+          0,
+          2875,
+          2567,
+          8726,
+          2583,
+          46190,
+          0,
+          0,
+          405,
+          1350444,
+          859537,
+          86951,
+          61716,
+          1637789,
+          55175,
+          16940,
+          990143,
+          166319
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 40.37621496198699,
+            "peak_rss_kib": 97524,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.47167941101361,
+            "peak_rss_kib": 92628,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "17962792089966876718_2210_933_2230_933": {
+      "evidence": "scientific-point-grid-17962792089966876718_2210_933_2230_933-verified.json",
+      "evidence_sha256": "9764e4112a33405de586aeb78d5a7d5b89fa955803430ddf552795d0a162de5e",
+      "receipt_sha256": "f91a70db3ea179232c42221a4f7586a6b9fc5a3caa8fdb88feae33f6797b1cb0",
+      "validation": {
+        "scene": "17962792089966876718_2210_933_2230_933",
+        "records": 1990,
+        "points": 32688319,
+        "eligible_semantic_points": 4452916,
+        "native_counts": [
+          6836,
+          31745,
+          3739,
+          0,
+          12573,
+          0,
+          0,
+          0,
+          13434,
+          0,
+          14439,
+          574,
+          0,
+          0,
+          514489,
+          1099996,
+          189683,
+          78132,
+          1226742,
+          91556,
+          2,
+          1005673,
+          170139
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 39.67469151603291,
+            "peak_rss_kib": 109024,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 16.85300087899668,
+            "peak_rss_kib": 108328,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "18331704533904883545_1560_000_1580_000": {
+      "evidence": "scientific-point-grid-18331704533904883545_1560_000_1580_000-verified.json",
+      "evidence_sha256": "5eaaea72fb01e8eaa0920eb9f3e5e7afb10188ca9dfaad8f684124c96fcff7fa",
+      "receipt_sha256": "95f7809264b645be3f5e799f2d95abebab7ff95170a702018066f8d2577b7799",
+      "validation": {
+        "scene": "18331704533904883545_1560_000_1580_000",
+        "records": 1980,
+        "points": 36468651,
+        "eligible_semantic_points": 4938109,
+        "native_counts": [
+          21792,
+          400964,
+          13539,
+          0,
+          0,
+          0,
+          0,
+          0,
+          26414,
+          0,
+          52763,
+          0,
+          0,
+          0,
+          2069958,
+          729019,
+          43783,
+          47363,
+          956717,
+          0,
+          67225,
+          305317,
+          225047
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 45.752686205960345,
+            "peak_rss_kib": 94144,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.957611630030442,
+            "peak_rss_kib": 93828,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "17626999143001784258_2760_000_2780_000": {
+      "evidence": "scientific-point-grid-17626999143001784258_2760_000_2780_000-verified.json",
+      "evidence_sha256": "c65316d2f3585588de52c5150c97cb365a394db90bbe0b6c1ba203ff12c9ba4d",
+      "receipt_sha256": "e40d4a3f69d73f16ec22db17557c5e200c02eeef604ccebc9aecf6a128d29f9e",
+      "validation": {
+        "scene": "17626999143001784258_2760_000_2780_000",
+        "records": 1980,
+        "points": 34146362,
+        "eligible_semantic_points": 4481319,
+        "native_counts": [
+          171951,
+          377352,
+          27888,
+          8,
+          64951,
+          0,
+          0,
+          43797,
+          34234,
+          13207,
+          194364,
+          3281,
+          0,
+          0,
+          1520193,
+          458042,
+          43650,
+          138750,
+          727982,
+          543,
+          15357,
+          226505,
+          591215
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 43.31442829401931,
+            "peak_rss_kib": 91788,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.21236379898619,
+            "peak_rss_kib": 98828,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "7650923902987369309_2380_000_2400_000": {
+      "evidence": "scientific-point-grid-7650923902987369309_2380_000_2400_000-verified.json",
+      "evidence_sha256": "e3c071c85b5f48bae3876e761b61f5c2b97509145fbee96d8ccd6f3b921f9bfa",
+      "receipt_sha256": "21cafa4c5d33f05b989502fe5f2ef52dc8db56d88794f877736287def2bbffca",
+      "validation": {
+        "scene": "7650923902987369309_2380_000_2400_000",
+        "records": 1980,
+        "points": 36422811,
+        "eligible_semantic_points": 3272997,
+        "native_counts": [
+          18033,
+          161590,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          13142,
+          0,
+          26487,
+          0,
+          0,
+          0,
+          1175764,
+          990433,
+          71,
+          35311,
+          651948,
+          11859,
+          34635,
+          33395,
+          138362
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 44.121783195005264,
+            "peak_rss_kib": 114408,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.919423836981878,
+            "peak_rss_kib": 94380,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "1071392229495085036_1844_790_1864_790": {
+      "evidence": "scientific-point-grid-1071392229495085036_1844_790_1864_790-verified.json",
+      "evidence_sha256": "2601c11fa6f09dd4ce972f10b59198549912fc73d556cf972157900ce7476c4d",
+      "receipt_sha256": "892a7253baaa53dcfc76f040d480ce861f25b922ef77331ca9ae85ce396d5713",
+      "validation": {
+        "scene": "1071392229495085036_1844_790_1864_790",
+        "records": 1980,
+        "points": 36531129,
+        "eligible_semantic_points": 6664082,
+        "native_counts": [
+          18773,
+          23077,
+          0,
+          0,
+          0,
+          0,
+          11311,
+          0,
+          36676,
+          0,
+          24022,
+          142,
+          0,
+          0,
+          1959972,
+          2027534,
+          105823,
+          99606,
+          1216202,
+          19681,
+          55797,
+          733416,
+          350823
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 45.751335813023616,
+            "peak_rss_kib": 94388,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.16776827099966,
+            "peak_rss_kib": 100820,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "8956556778987472864_3404_790_3424_790": {
+      "evidence": "scientific-point-grid-8956556778987472864_3404_790_3424_790-verified.json",
+      "evidence_sha256": "7a6edff73cf01fdecb22891567f16eb6834acb7a8e0470edc5238693b77706b7",
+      "receipt_sha256": "0167af9e62b4f831fe2e59a752d3a74296ac9a151ff168d863c446a81a363cb1",
+      "validation": {
+        "scene": "8956556778987472864_3404_790_3424_790",
+        "records": 1970,
+        "points": 32706922,
+        "eligible_semantic_points": 4277335,
+        "native_counts": [
+          182046,
+          634506,
+          8938,
+          0,
+          0,
+          0,
+          0,
+          50119,
+          25768,
+          0,
+          41704,
+          0,
+          306,
+          0,
+          1545612,
+          499507,
+          72803,
+          58079,
+          910310,
+          0,
+          0,
+          162128,
+          267555
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 41.58719144004863,
+            "peak_rss_kib": 89976,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.926131380954757,
+            "peak_rss_kib": 93812,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "15959580576639476066_5087_580_5107_580": {
+      "evidence": "scientific-point-grid-15959580576639476066_5087_580_5107_580-verified.json",
+      "evidence_sha256": "020d828f5d5d66dc90165482a346a3ae66afe2183dc03c65210d4c0fe35ec788",
+      "receipt_sha256": "24d9fb2bc703ecb0575b232e3426067314f5e25cbeda231cc8b432d4308f3392",
+      "validation": {
+        "scene": "15959580576639476066_5087_580_5107_580",
+        "records": 1990,
+        "points": 37068135,
+        "eligible_semantic_points": 5031192,
+        "native_counts": [
+          23740,
+          101734,
+          7149,
+          0,
+          0,
+          0,
+          0,
+          10563,
+          349,
+          0,
+          10565,
+          0,
+          0,
+          0,
+          1697679,
+          1109510,
+          76907,
+          36149,
+          1052438,
+          0,
+          3975,
+          673565,
+          250609
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 45.6392362829647,
+            "peak_rss_kib": 102736,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.74286172405118,
+            "peak_rss_kib": 98472,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "447576862407975570_4360_000_4380_000": {
+      "evidence": "scientific-point-grid-447576862407975570_4360_000_4380_000-verified.json",
+      "evidence_sha256": "5891442a121d397edcf2c316ae242c9f41af64eaf120474a0ca35d954a735a04",
+      "receipt_sha256": "d456f6b2f37f78caeaae826ba677df667951b2acb86480e2834b19bda7df7fab",
+      "validation": {
+        "scene": "447576862407975570_4360_000_4380_000",
+        "records": 1980,
+        "points": 34210177,
+        "eligible_semantic_points": 4619688,
+        "native_counts": [
+          78702,
+          440987,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8898,
+          0,
+          72416,
+          0,
+          0,
+          203,
+          3035228,
+          402748,
+          65874,
+          15507,
+          388037,
+          6024,
+          0,
+          11442,
+          172324
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 43.63288550701691,
+            "peak_rss_kib": 94900,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.574508350982796,
+            "peak_rss_kib": 88884,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "4759225533437988401_800_000_820_000": {
+      "evidence": "scientific-point-grid-4759225533437988401_800_000_820_000-verified.json",
+      "evidence_sha256": "411c1addba2bc327e4a16467b8f655a43c7629e01a501de1891ea68596217c28",
+      "receipt_sha256": "ed0bdf52b731c0c5b799d04e69f47e78b2cdad12606c5601bf55f650eb8d9589",
+      "validation": {
+        "scene": "4759225533437988401_800_000_820_000",
+        "records": 1980,
+        "points": 34882229,
+        "eligible_semantic_points": 4626851,
+        "native_counts": [
+          75521,
+          807345,
+          10823,
+          3947,
+          0,
+          0,
+          0,
+          40310,
+          30140,
+          9185,
+          79842,
+          1848,
+          0,
+          0,
+          2587629,
+          87771,
+          49400,
+          34026,
+          480236,
+          5225,
+          3285,
+          20456,
+          375383
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 43.92257476301165,
+            "peak_rss_kib": 97260,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.78636278299382,
+            "peak_rss_kib": 87748,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "1024360143612057520_3580_000_3600_000": {
+      "evidence": "scientific-point-grid-1024360143612057520_3580_000_3600_000-verified.json",
+      "evidence_sha256": "10bd121a9e613dbd6e8a8435701073ebdd160880d8d4dac2fc7a03f783821374",
+      "receipt_sha256": "990708c7ba6bd23425cefceb093957c17a3f746c6930875fd56ad05c9dd83bbc",
+      "validation": {
+        "scene": "1024360143612057520_3580_000_3600_000",
+        "records": 1990,
+        "points": 33212978,
+        "eligible_semantic_points": 4391080,
+        "native_counts": [
+          111672,
+          728939,
+          22931,
+          0,
+          16234,
+          0,
+          97,
+          45153,
+          60063,
+          14805,
+          74492,
+          819,
+          0,
+          0,
+          1812974,
+          92583,
+          42147,
+          41430,
+          1154271,
+          9345,
+          61577,
+          17576,
+          195644
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 41.36619474698091,
+            "peak_rss_kib": 91032,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.513733072963078,
+            "peak_rss_kib": 86264,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "11048712972908676520_545_000_565_000": {
+      "evidence": "scientific-point-grid-11048712972908676520_545_000_565_000-verified.json",
+      "evidence_sha256": "a87fbee9e2b6e57ef8fa4feddf35575c3da30c84d0b0f4f05e18d4bb13c4fda9",
+      "receipt_sha256": "03f8e3e103640314f4ba4aa99e4ae45fda25868607d39306c5b1fe62dac314b6",
+      "validation": {
+        "scene": "11048712972908676520_545_000_565_000",
+        "records": 1990,
+        "points": 31982853,
+        "eligible_semantic_points": 4357367,
+        "native_counts": [
+          13111,
+          315790,
+          40912,
+          0,
+          5864,
+          0,
+          0,
+          6526,
+          31023,
+          2202,
+          24640,
+          37919,
+          0,
+          0,
+          842563,
+          833046,
+          138097,
+          97207,
+          1375951,
+          29293,
+          15969,
+          324952,
+          235413
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 40.43751975003397,
+            "peak_rss_kib": 88612,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.180194718006533,
+            "peak_rss_kib": 85528,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "9243656068381062947_1297_428_1317_428": {
+      "evidence": "scientific-point-grid-9243656068381062947_1297_428_1317_428-verified.json",
+      "evidence_sha256": "f398acccf7741b302a0a2f34af928fddfd6fd944e14b85b8c2587a84186afdfb",
+      "receipt_sha256": "7bf83c893a737f0c51235de4ec7485b506aca95a4b608a29b74d18c2a5977041",
+      "validation": {
+        "scene": "9243656068381062947_1297_428_1317_428",
+        "records": 1980,
+        "points": 35891728,
+        "eligible_semantic_points": 9774875,
+        "native_counts": [
+          101292,
+          426208,
+          0,
+          0,
+          0,
+          0,
+          15371,
+          425331,
+          26990,
+          24473,
+          17461,
+          329,
+          0,
+          0,
+          2882179,
+          2342297,
+          158520,
+          105471,
+          2085798,
+          75122,
+          1912,
+          621245,
+          566168
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 45.69508017896442,
+            "peak_rss_kib": 101000,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.348697690991685,
+            "peak_rss_kib": 90532,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "14081240615915270380_4399_000_4419_000": {
+      "evidence": "scientific-point-grid-14081240615915270380_4399_000_4419_000-verified.json",
+      "evidence_sha256": "c50aaeff8f2ddb042a35d03fc0d85a8c3474d8e972d58ba17eef080d38b8ab48",
+      "receipt_sha256": "f15aa01e00bd090e616835a12665f61f034cd7c7b18760b19f9f14418d14b2cb",
+      "validation": {
+        "scene": "14081240615915270380_4399_000_4419_000",
+        "records": 1980,
+        "points": 24074330,
+        "eligible_semantic_points": 3191118,
+        "native_counts": [
+          28015,
+          647853,
+          20952,
+          0,
+          0,
+          0,
+          0,
+          555,
+          34579,
+          5722,
+          44967,
+          1264,
+          0,
+          0,
+          270574,
+          610788,
+          27998,
+          65110,
+          985733,
+          11361,
+          56982,
+          323247,
+          83433
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 31.672176207008306,
+            "peak_rss_kib": 91936,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 12.862772874999791,
+            "peak_rss_kib": 81672,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "933621182106051783_4160_000_4180_000": {
+      "evidence": "scientific-point-grid-933621182106051783_4160_000_4180_000-verified.json",
+      "evidence_sha256": "b18f098e21c170154e11be9fb93c545fbbd717d8daddd78993f698d6004d126c",
+      "receipt_sha256": "3e4d0707477ea9234253ba93e34cc74d675c1dde544ffbd12db4bff56c3401aa",
+      "validation": {
+        "scene": "933621182106051783_4160_000_4180_000",
+        "records": 1980,
+        "points": 34630205,
+        "eligible_semantic_points": 4660723,
+        "native_counts": [
+          40593,
+          1016166,
+          28041,
+          0,
+          0,
+          0,
+          0,
+          16414,
+          22214,
+          254,
+          30320,
+          577,
+          0,
+          3887,
+          2224600,
+          227812,
+          20026,
+          13719,
+          838869,
+          5377,
+          51263,
+          331,
+          160853
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 44.60248054302065,
+            "peak_rss_kib": 92728,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.66757765697548,
+            "peak_rss_kib": 89840,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "12831741023324393102_2673_230_2693_230": {
+      "evidence": "scientific-point-grid-12831741023324393102_2673_230_2693_230-verified.json",
+      "evidence_sha256": "8a72e456ae14870d48673fa78accb14973d3c44486ddc7c0176f73823c10229b",
+      "receipt_sha256": "897bd59de57a873dfe98c768f969538b84bac1cd82a74cb8831debb5fc1ad323",
+      "validation": {
+        "scene": "12831741023324393102_2673_230_2693_230",
+        "records": 1980,
+        "points": 37788778,
+        "eligible_semantic_points": 6886353,
+        "native_counts": [
+          32944,
+          299515,
+          18224,
+          0,
+          0,
+          0,
+          0,
+          3742,
+          20717,
+          0,
+          21511,
+          0,
+          0,
+          0,
+          2559711,
+          1311633,
+          98075,
+          36262,
+          1536051,
+          104,
+          278,
+          691625,
+          288905
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 48.31208752701059,
+            "peak_rss_kib": 98872,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 21.123630331945606,
+            "peak_rss_kib": 100460,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "6680764940003341232_2260_000_2280_000": {
+      "evidence": "scientific-point-grid-6680764940003341232_2260_000_2280_000-verified.json",
+      "evidence_sha256": "a6ee4948f53caf809d736fd28897d32c014066b4a68f5849cafb57672e96a15a",
+      "receipt_sha256": "ca5e457f916a6edea60884287231e98ecba2776a1fccdc2b87913c611bd25450",
+      "validation": {
+        "scene": "6680764940003341232_2260_000_2280_000",
+        "records": 1980,
+        "points": 38978883,
+        "eligible_semantic_points": 5296384,
+        "native_counts": [
+          23252,
+          707688,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4605,
+          28055,
+          0,
+          25715,
+          0,
+          0,
+          0,
+          1146734,
+          1856645,
+          59360,
+          36285,
+          1099921,
+          0,
+          35293,
+          55214,
+          240869
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 48.566895199008286,
+            "peak_rss_kib": 118856,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 21.519038633967284,
+            "peak_rss_kib": 97868,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "18024188333634186656_1566_600_1586_600": {
+      "evidence": "scientific-point-grid-18024188333634186656_1566_600_1586_600-verified.json",
+      "evidence_sha256": "f9a2739e2e1a3d4d3ba1c7f32b3bdaa248362efa1f89bce2aa96f3db29d90268",
+      "receipt_sha256": "b5acc375cd2219ee1548550f8c203c08db6faa9d0c31543d1c30a40bdbab7edd",
+      "validation": {
+        "scene": "18024188333634186656_1566_600_1586_600",
+        "records": 1980,
+        "points": 34134340,
+        "eligible_semantic_points": 3127216,
+        "native_counts": [
+          12609,
+          143542,
+          0,
+          0,
+          0,
+          0,
+          0,
+          47824,
+          23334,
+          142,
+          49521,
+          0,
+          0,
+          0,
+          481775,
+          782949,
+          166582,
+          59053,
+          881545,
+          2609,
+          1640,
+          291239,
+          195461
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 43.32954606699059,
+            "peak_rss_kib": 97256,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.679921020986512,
+            "peak_rss_kib": 109260,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "8331804655557290264_4351_740_4371_740": {
+      "evidence": "scientific-point-grid-8331804655557290264_4351_740_4371_740-verified.json",
+      "evidence_sha256": "65935773311a0e0444f457a3f2365fd5ef53d51b4689d71d46d86e1028df2b8c",
+      "receipt_sha256": "58f90932a7dd12bdccc3a775d815debb32ec5a593767d543912d7db016b9d337",
+      "validation": {
+        "scene": "8331804655557290264_4351_740_4371_740",
+        "records": 1990,
+        "points": 33669454,
+        "eligible_semantic_points": 6171739,
+        "native_counts": [
+          12997,
+          186664,
+          15381,
+          0,
+          0,
+          0,
+          0,
+          16053,
+          11732,
+          0,
+          26396,
+          446,
+          0,
+          317,
+          1512811,
+          1104770,
+          181369,
+          99113,
+          1627188,
+          115107,
+          933,
+          1021576,
+          251883
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 43.454646400001366,
+            "peak_rss_kib": 97316,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.751775923999958,
+            "peak_rss_kib": 93036,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "2094681306939952000_2972_300_2992_300": {
+      "evidence": "scientific-point-grid-2094681306939952000_2972_300_2992_300-verified.json",
+      "evidence_sha256": "26cbca3a39f0496d0b6b0cf1b8338c0cd78d03721a75d4258183d74604f4e52d",
+      "receipt_sha256": "753954b63a183c7aeb2fc577500a77b66c2f89c29e68664d4a821466a18960dd",
+      "validation": {
+        "scene": "2094681306939952000_2972_300_2992_300",
+        "records": 1990,
+        "points": 27920421,
+        "eligible_semantic_points": 3725833,
+        "native_counts": [
+          11279,
+          443501,
+          930,
+          0,
+          0,
+          0,
+          0,
+          10095,
+          27679,
+          755,
+          37266,
+          0,
+          0,
+          0,
+          332268,
+          664953,
+          28763,
+          58165,
+          1742582,
+          75148,
+          15636,
+          195485,
+          92607
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 36.2796352240257,
+            "peak_rss_kib": 88084,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 16.067859570961446,
+            "peak_rss_kib": 82884,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "4575389405178805994_4900_000_4920_000": {
+      "evidence": "scientific-point-grid-4575389405178805994_4900_000_4920_000-verified.json",
+      "evidence_sha256": "4f67df6dc975c530c3d085a03c2afc913597e6b9e1949df3670dfe77b2f146a3",
+      "receipt_sha256": "c623686e2b70fcda9f184f216e8367757077c8e67f8b2b56a172c997a660dd0c",
+      "validation": {
+        "scene": "4575389405178805994_4900_000_4920_000",
+        "records": 1990,
+        "points": 35019979,
+        "eligible_semantic_points": 4713363,
+        "native_counts": [
+          53598,
+          671104,
+          30647,
+          0,
+          256,
+          0,
+          0,
+          32119,
+          24556,
+          6999,
+          47287,
+          0,
+          13636,
+          17550,
+          2136058,
+          164216,
+          50314,
+          45635,
+          1082040,
+          25071,
+          93947,
+          5329,
+          266599
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 43.90580636798404,
+            "peak_rss_kib": 100332,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.080841008981224,
+            "peak_rss_kib": 102568,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "7119831293178745002_1094_720_1114_720": {
+      "evidence": "scientific-point-grid-7119831293178745002_1094_720_1114_720-verified.json",
+      "evidence_sha256": "aabf2eac4ecffde5e5a4d573e93ea210db84b5bd8a92ae032f44183dc9bea674",
+      "receipt_sha256": "f153d5442f08c67c70d31db3be04386980ff2a58784e7b75e982e82a1e06706b",
+      "validation": {
+        "scene": "7119831293178745002_1094_720_1114_720",
+        "records": 1980,
+        "points": 36226972,
+        "eligible_semantic_points": 4964606,
+        "native_counts": [
+          11398,
+          162667,
+          0,
+          304,
+          0,
+          0,
+          0,
+          6518,
+          8835,
+          0,
+          11144,
+          0,
+          0,
+          0,
+          1759727,
+          1222036,
+          34005,
+          53398,
+          951690,
+          73449,
+          5003,
+          512517,
+          163313
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 46.06846583302831,
+            "peak_rss_kib": 92768,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 19.87853477295721,
+            "peak_rss_kib": 103720,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "5372281728627437618_2005_000_2025_000": {
+      "evidence": "scientific-point-grid-5372281728627437618_2005_000_2025_000-verified.json",
+      "evidence_sha256": "7e9aa40909809acac176d01070789e1f91b0531bc09125d4e297dce32c903b06",
+      "receipt_sha256": "f793f208304ff9612b3067fc07d5b161dd9eaa539c24e623d247791e48b83d8a",
+      "validation": {
+        "scene": "5372281728627437618_2005_000_2025_000",
+        "records": 1980,
+        "points": 31998417,
+        "eligible_semantic_points": 5769701,
+        "native_counts": [
+          10408,
+          485642,
+          45420,
+          0,
+          7559,
+          0,
+          0,
+          0,
+          3320,
+          0,
+          64844,
+          0,
+          0,
+          0,
+          2438727,
+          71030,
+          1751,
+          0,
+          2035103,
+          174785,
+          2580,
+          438931,
+          9
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 41.251382737013046,
+            "peak_rss_kib": 90440,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 18.689049364998937,
+            "peak_rss_kib": 86760,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    },
+    "13982731384839979987_1680_000_1700_000": {
+      "evidence": "scientific-point-grid-13982731384839979987_1680_000_1700_000-verified.json",
+      "evidence_sha256": "de8937c00f397253c90ec85353d28ccaed53f619407e4f5b4738dad1a0eeef7b",
+      "receipt_sha256": "bfbbe8ed327558487357529c9ef0afcf440981d3617b99786300cc0463018657",
+      "validation": {
+        "scene": "13982731384839979987_1680_000_1700_000",
+        "records": 1990,
+        "points": 36446371,
+        "eligible_semantic_points": 4874517,
+        "native_counts": [
+          55583,
+          912804,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2226,
+          37749,
+          243,
+          80554,
+          0,
+          0,
+          0,
+          2034449,
+          579951,
+          49004,
+          16722,
+          855803,
+          31671,
+          26523,
+          31928,
+          214890
+        ],
+        "worker_resources": {
+          "producer": {
+            "elapsed_seconds": 46.832981548970565,
+            "peak_rss_kib": 92680,
+            "rss_scope": "worker_process_peak"
+          },
+          "reference": {
+            "elapsed_seconds": 20.47059297701344,
+            "peak_rss_kib": 89164,
+            "rss_scope": "worker_process_peak"
+          }
+        },
+        "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+      }
+    }
+  },
+  "scope": "point/grid metadata and full-support replay only; scientific protocol/model comparisons remain open"
+}

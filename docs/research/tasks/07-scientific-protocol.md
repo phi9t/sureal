@@ -4,7 +4,7 @@
 
 **Blocked by:** [06](06-r0-closeout.md)
 
-**Status:** preparing — all103 scenes /1,751 native sources admitted; full64 training-box replay, full103 semantic reconciliation, native shapes and camera lifecycles verified; full-support point/grid replay active; scientific configuration and budget freeze remain open
+**Status:** preparing — all103 scenes /1,751 native sources admitted; full64 training-box replay, full103 semantic reconciliation, native shapes and camera lifecycles verified; full-support point/grid replay complete; scientific configuration and budget freeze remain open
 
 **Lane:** core
 
@@ -161,3 +161,8 @@ or held-out model comparisons are claimed.
 [Draft numerical protocol](../../../experiments/waymo-perception/research/pointpillars-scientific-protocol.candidate.json) specifies current-frame five-LiDAR/two-return physical inputs,128m square half-open ROI,512-cell grid,20,000 pillars/32 points, eight training-median anchors, scalar assignment and existing loss/NMS adaptations. It declares seeds17/29/43,20,000 updates, development-only checkpoint selection, a16-training-frame overfit gate, full native held-out GT including outside-ROI targets, segment-level pooled-metric uncertainty, and explicit resource caps. The24 reserved device-hours per seed is a proposed hard cap, not an extrapolated runtime estimate.
 
 [Independent live structural audit](../../../experiments/waymo-perception/research/pointpillars-protocol-candidate-structure-verified.json) checks exact source/code hashes,64/8/16 disjoint cohorts, physical-feature exclusion, measured resource-layout compatibility and six malformed-candidate refusals. This admits draft structure only. Native observation/target joins, target exclusions, assignment/optimizer/export resource pilot, tiny overfit and full protocol admission remain gates before the main scientific run. Neither ticket is closed, and no encoder comparison or held-out quality is established.
+
+## Completed point/grid data gate (2026-10-02)
+
+All103 selected scenes completed the two-pass full-support point/grid replay.
+The [retained aggregate](../../../experiments/waymo-perception/research/point-grid-full103-and-overfit-box-retained-audit.json) records203,850 returns,3,513,295,187 points and478,579,462 eligible semantic points. Its progress hash, all103 evidence hashes and summed denominators were rechecked against current files. This is a host reconciliation of individual live admissions; scientific protocol acceptance and held-out model comparisons remain open. Earlier running-state descriptions are historical.
