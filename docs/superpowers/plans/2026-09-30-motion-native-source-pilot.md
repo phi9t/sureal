@@ -15,3 +15,7 @@ Use `experiments/waymo-perception/research/motion-source-pilot.candidate.json` a
 Acceptance: successful generation-pinned source/HDFS readback; complete live framing/protobuf inventory; exact supported scenario-extension correspondence or explicit missingness; causal projection and deliberate leakage rejection on native examples; native metric handoff with independent numerical/count agreement; current source/code/runtime/output hash receipts and measured storage, RSS and runtime. Failed or partial artifacts remain unpromoted. Recoverable raw cleanup must leave the bounded local slice and immutable recovery metadata intact.
 
 Open scientific work: freeze whole-scenario train/development/held-out cohorts and extension coverage, train the tracks/maps baseline, compare LiDAR/camera-token/fused features under identical causal access and compute budgets, calculate scenario-level uncertainty, and publish adopt/reject/needs-more-evidence decisions.
+
+## Source-backed execution ruling2026-10-02
+
+Real extension101d4e5775093d0c contains only native fields12/13 and no scenario_id, consistent with the pinned official sensor tutorials. Replace step5's unconditional extension native-ID equality with exact authenticated filename/generation/content linkage to the base native ID; any supplied payload ID must still match. Preserve wrong-key and duplicate-augmentation refusal. This corrects an unsupported stronger requirement; it does not allow heuristic joins. The actual Motion camera inventory has8 streams per frame; do not copy Perception's5-camera assumption.
