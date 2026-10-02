@@ -1,0 +1,128 @@
+{
+  "deep_pfn": {
+    "title": "Deeper point MLP",
+    "status": "runnable",
+    "hypothesis": "Pointwise nonlinear depth may improve geometry encoding without spatial interactions.",
+    "configuration": "Append Linear64\u219264 (no bias), pointwise LayerNorm eps1e-3 and ReLU after the original Linear9\u219264/BN/ReLU; keep max pooling and64-channel output.",
+    "attribution": "Extra depth retains the original padded BN/max policy; do not attribute gains to masking.",
+    "document": "ideas/deep_pfn.md",
+    "historical_final_mean_APH": 0.8483433333333333
+  },
+  "context_pfn": {
+    "title": "Contextual pillar encoder",
+    "status": "runnable",
+    "hypothesis": "A point may benefit from its pillar-wide geometric context before pooling.",
+    "configuration": "Compute valid-point max and mean of64 features; broadcast128-channel context; concatenate192 channels; Linear192\u219264/pointwiseLN/ReLU; masked max.",
+    "attribution": "Compare with masked_pfn to isolate the pooling-mask change. BN still includes padding during training.",
+    "document": "ideas/context_pfn.md",
+    "historical_final_mean_APH": 0.8572623333333333
+  },
+  "residual_bev": {
+    "title": "Residual BEV CNN",
+    "status": "runnable",
+    "hypothesis": "Identity paths may improve spatial optimization without adding parameters.",
+    "configuration": "Keep original downsampling/upbranches; wrap each same-width stride1 Conv/GN/ReLU unit as ReLU(x+unit(x)).",
+    "attribution": "Minimal residual adaptation, not a reproduction of ResNet. Parameters and detection lattice match baseline.",
+    "document": "ideas/residual_bev.md",
+    "historical_final_mean_APH": 0.907812
+  },
+  "retain64": {
+    "title": "64 points per pillar",
+    "status": "runnable",
+    "hypothesis": "The32-point cap may discard useful measurements.",
+    "configuration": "Keep0.25m grid and20k pillars; increase per-pillar point cap32\u219264; regenerate observations/centroids, preserve byte-identical native targets.",
+    "attribution": "Seeded within-pillar samples can differ. Point statistics/padding change along with retained measurements.",
+    "document": "ideas/retain64.md",
+    "historical_final_mean_APH": 0.8482486666666667
+  },
+  "masked_pfn": {
+    "title": "Masked pillar pooling",
+    "status": "runnable",
+    "hypothesis": "Padded slots may distort the pooled representation.",
+    "configuration": "Keep originalLinear/BN/ReLU; exclude invalid slots only in final maximum.",
+    "attribution": "BN still includes padded slots during training. Evaluation padding-extension invariance is required.",
+    "document": "ideas/masked_pfn.md",
+    "historical_final_mean_APH": 0.8863856666666666
+  },
+  "window_bev": {
+    "title": "Coarse BEV window attention",
+    "status": "runnable",
+    "hypothesis": "Learned spatial interactions may improve the coarsest BEV features.",
+    "configuration": "Append GN8\u2192Fourierposition\u2192qkv1\u00d71\u21928\u00d78-window attention,4heads\u00d764channels\u2192output1\u00d71\u2192residual addition after stage3.",
+    "attribution": "Compare coarse_mlp; parameter matching is not FLOP matching. No shift, FFN, dropout or global attention.",
+    "document": "ideas/window_bev.md",
+    "historical_final_mean_APH": 0.8784186666666667
+  },
+  "coarse_mlp": {
+    "title": "Equal-parameter convolution control",
+    "status": "runnable",
+    "hypothesis": "Added coarse-stage capacity may explain an apparent attention gain.",
+    "configuration": "Append GN8\u2192Conv1\u00d71(256\u2192512)\u2192ReLU\u2192Conv1\u00d71(512\u2192256)\u2192residual addition.",
+    "attribution": "Exactly262656 added parameters, equal to window_bev. Report actual time/memory; compute is not matched.",
+    "document": "ideas/coarse_mlp.md",
+    "historical_final_mean_APH": 0.8785733333333333
+  },
+  "all_pillars": {
+    "title": "All occupied pillars in the fixture",
+    "status": "runnable",
+    "hypothesis": "Pillar truncation may remove all measurements from small objects.",
+    "configuration": "Keep32 points; raise pillar cap20k\u219230k, covering all26384 occupied pillars in the current fixed frame.",
+    "attribution": "Only this fixture has all-pillar coverage. Removing the sampling draw changes subsequent seeded point samples; target arrays remain byte-identical.",
+    "document": "ideas/all_pillars.md",
+    "historical_final_mean_APH": 0.8307906666666667
+  },
+  "ragged_pillars": {
+    "title": "Ragged dynamic pillars",
+    "status": "planned",
+    "hypothesis": "Removing the per-pillar point cutoff may improve support and avoid padding artifacts.",
+    "configuration": "Retain all points within selected pillars, use segmented centroid/reduction with source-index lineage; keep pillar-cap removal separate.",
+    "attribution": "Pin normalization axes, segmented gradients and resource behavior before implementation; compare fixed packing when caps do not bind.",
+    "document": "ideas/ragged_pillars.md",
+    "historical_final_mean_APH": null
+  },
+  "grid_fine": {
+    "title": "Fine0.125m grouping",
+    "status": "planned",
+    "hypothesis": "Finer XY cells may preserve small-object geometry.",
+    "configuration": "Keep128mROI;1024\u00b2 input grid; first study preserves physical0.5m detection-head spacing and anchor templates.",
+    "attribution": "Exact downsampling topology is not yet frozen. Track truncation changes; input resolution and head resolution are different experiments.",
+    "document": "ideas/grid_fine.md",
+    "historical_final_mean_APH": null
+  },
+  "grid_coarse": {
+    "title": "Coarse0.5m grouping",
+    "status": "planned",
+    "hypothesis": "Coarser cells may reduce computation without sacrificing useful geometry.",
+    "configuration": "Keep128mROI;256\u00b2 input grid; preserve physical0.5m head spacing in first study.",
+    "attribution": "Pin stride/downsampling changes before execution; increased point truncation may offset lower spatial cost.",
+    "document": "ideas/grid_coarse.md",
+    "historical_final_mean_APH": null
+  },
+  "point_attention": {
+    "title": "Within-pillar attention",
+    "status": "planned",
+    "hypothesis": "Relative point-to-point interactions may improve summaries of local shape.",
+    "configuration": "Use relativeXYZ, valid-token masks and invariant pooling, retaining64 output channels.",
+    "attribution": "Freeze depth/width/head count and an appropriate MLP control before implementation; test padding and point-order behavior.",
+    "document": "ideas/point_attention.md",
+    "historical_final_mean_APH": null
+  },
+  "range_fusion": {
+    "title": "Range-view features into pillars",
+    "status": "planned",
+    "hypothesis": "Sensor-neighborhood context may complement metric pillar geometry.",
+    "configuration": "Encode range images; gather features by laser/return/row/column and retained source index; concatenate before pillar pooling.",
+    "attribution": "Existing native prototype is not trained architecture admission. Preserve both returns and original point/projection identities; no semantic-target leakage.",
+    "document": "ideas/range_fusion.md",
+    "historical_final_mean_APH": null
+  },
+  "sparse_bev_transformer": {
+    "title": "Sparse spatial transformer",
+    "status": "planned",
+    "hypothesis": "Occupied spatial tokens may support broader context at controlled cost.",
+    "configuration": "Separate sparse token/set indexing and metric position from detection export; DSVT is a research anchor.",
+    "attribution": "Exact topology and sparse-backbone interface remain to be specified. Do not equate this with generic dense ViT replacement.",
+    "document": "ideas/sparse_bev_transformer.md",
+    "historical_final_mean_APH": null
+  }
+}
