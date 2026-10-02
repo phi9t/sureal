@@ -94,3 +94,7 @@ The codebook stage's live Python peakRSS is53,180KiB and feature checking time0.
 ## Separate validation source inventory (2026-10-02)
 
 The273,686,917-byte validation shard passed generation-pinned GCS size/MD5 and exact HDFS readback. Independent live Python and native C++ inventories reconcile287 records and complete source bytes. [Validation reconciliation](../../../experiments/waymo-perception/research/motion-validation-inventory-reconciliation.json) records every offset/length match and the bytewise lowest native ID11818a3a928aaefa with its exact payload hash. Current unique raw/protobuf storage remains below2GiB. Validation extension linkage, causal projection and native metric handoff remain open; the two pilot shards are not a frozen scientific forecasting cohort.
+
+## Bounded raw retention
+
+The fully inventoried training pilot shard was locally released after its original source integrity, complete independent live framing/protobuf inventories and exact HDFS readback. A second bounded HDFS download reproduced all448,622,357 bytes and the pinned SHA exactly before its temporary recovery copy was released. [Release receipt](../../../experiments/waymo-perception/research/motion-training-raw-release-verified.json) records recovery URI/command and immutable parent hashes. Selected native truth and causal observations remain local; future full-shard replay must rehydrate from HDFS rather than assume the original raw path exists. Original acquisition/inventory receipts are preserved.
