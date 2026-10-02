@@ -1,0 +1,122 @@
+{
+  "status": "pinned implemented evaluator contracts; cross-modal ontology mapping remains open",
+  "upstream_commit": "99a4cb3ff07e2fe06c2ce73da001f850f628e45a",
+  "source_hashes": {
+    "label.proto": "9151695b08990cb82ea46f3799ff86d97ff2c8781184a0e1bd200f9b5d751342",
+    "protos/segmentation.proto": "6be44cdd2075b088316eeac3d07896907ba358b2b7a4ccee9a10906b50764118",
+    "protos/camera_segmentation.proto": "87a454d332eb4b15a3b11d5a975a7c37e35fc52c6ddb4a9b2bdc49b6c37bbe7e",
+    "protos/metrics.proto": "3c461e0d4abc3d934af5b820b270a62e246b7238a58a928cbc032d090244bf83",
+    "protos/segmentation_metrics.proto": "10709c40cfa0114190f584c546b3e0b29ac0aafa319fe4f5e891123951a2b47c",
+    "metrics/tools/compute_detection_metrics_main.cc": "ab321d792de6e5f658b13a9c6d91e8c1bc66c2301d2ab9a37ed4b7cee842969c",
+    "metrics/tools/compute_segmentation_metrics_main.cc": "86cf404599168bee5205ed134d92d7b713ae84231d0608f812d6f6f1f737bf2a",
+    "metrics/segmentation_metrics.cc": "9309e5b9f51b00a67a40478d7586a182cdba4497d205a5c02d87c79bad2f48ce"
+  },
+  "detection": {
+    "box": "upright 3D vehicle-frame meters; length=x width=y height=z heading radians",
+    "matcher": "Hungarian",
+    "iou_thresholds_by_box_type": [
+      0,
+      0.7,
+      0.5,
+      0.5,
+      0.5
+    ],
+    "class_ids": {
+      "0": "unknown",
+      "1": "vehicle",
+      "2": "pedestrian",
+      "3": "sign",
+      "4": "cyclist"
+    },
+    "score_cutoffs": "i*0.01 for i=0..99, then 1.0",
+    "difficulty": [
+      "LEVEL_1",
+      "LEVEL_2"
+    ],
+    "breakdowns": [
+      "OBJECT_TYPE",
+      "RANGE"
+    ],
+    "nonpositive_lidar_point_groundtruth": "ignored",
+    "missing_difficulty": "<=5 points LEVEL_2, otherwise LEVEL_1",
+    "NLZ": "prediction overlap flag must be explicitly derived; CLI does not derive polygon intersections",
+    "LET_and_camera_2D": "separate contracts; not supported by this default CLI"
+  },
+  "lidar_semantics": {
+    "classes": {
+      "0": "TYPE_UNDEFINED",
+      "1": "TYPE_CAR",
+      "2": "TYPE_TRUCK",
+      "3": "TYPE_BUS",
+      "4": "TYPE_OTHER_VEHICLE",
+      "5": "TYPE_MOTORCYCLIST",
+      "6": "TYPE_BICYCLIST",
+      "7": "TYPE_PEDESTRIAN",
+      "8": "TYPE_SIGN",
+      "9": "TYPE_TRAFFIC_LIGHT",
+      "10": "TYPE_POLE",
+      "11": "TYPE_CONSTRUCTION_CONE",
+      "12": "TYPE_BICYCLE",
+      "13": "TYPE_MOTORCYCLE",
+      "14": "TYPE_BUILDING",
+      "15": "TYPE_VEGETATION",
+      "16": "TYPE_TREE_TRUNK",
+      "17": "TYPE_CURB",
+      "18": "TYPE_ROAD",
+      "19": "TYPE_LANE_MARKER",
+      "20": "TYPE_OTHER_GROUND",
+      "21": "TYPE_WALKABLE",
+      "22": "TYPE_SIDEWALK"
+    },
+    "sensor": "TOP",
+    "returns": [
+      1,
+      2
+    ],
+    "payload": "zlib-compressed native MatrixInt32 ordered semantic values only; no instance IDs",
+    "undefined_groundtruth": "ignored",
+    "undefined_prediction": "false negative on defined groundtruth",
+    "zero_union_class_iou": 1.0,
+    "mean": "all 22 configured classes, including zero-union classes"
+  },
+  "camera_semantic_diagnostic": {
+    "classes": {
+      "0": "TYPE_UNDEFINED",
+      "1": "TYPE_EGO_VEHICLE",
+      "2": "TYPE_CAR",
+      "3": "TYPE_TRUCK",
+      "4": "TYPE_BUS",
+      "5": "TYPE_OTHER_LARGE_VEHICLE",
+      "6": "TYPE_BICYCLE",
+      "7": "TYPE_MOTORCYCLE",
+      "8": "TYPE_TRAILER",
+      "9": "TYPE_PEDESTRIAN",
+      "10": "TYPE_CYCLIST",
+      "11": "TYPE_MOTORCYCLIST",
+      "12": "TYPE_BIRD",
+      "13": "TYPE_GROUND_ANIMAL",
+      "14": "TYPE_CONSTRUCTION_CONE_POLE",
+      "15": "TYPE_POLE",
+      "16": "TYPE_PEDESTRIAN_OBJECT",
+      "17": "TYPE_SIGN",
+      "18": "TYPE_TRAFFIC_LIGHT",
+      "19": "TYPE_BUILDING",
+      "20": "TYPE_ROAD",
+      "21": "TYPE_LANE_MARKER",
+      "22": "TYPE_ROAD_MARKER",
+      "23": "TYPE_SIDEWALK",
+      "24": "TYPE_VEGETATION",
+      "25": "TYPE_SKY",
+      "26": "TYPE_GROUND",
+      "27": "TYPE_DYNAMIC",
+      "28": "TYPE_STATIC"
+    },
+    "undefined_groundtruth": "excluded",
+    "undefined_prediction": "false negative on defined truth",
+    "eligible_pixel_mask": "explicit boolean support mask",
+    "zero_union_class_iou": null,
+    "mean": "classes 1..28 with positive union; report class list and denominators",
+    "official_panoptic_STQ_parity": false
+  },
+  "ontology_policy": "Never equate raw integer IDs across box/LiDAR/camera namespaces. Cross-modal mappings must be explicitly preregistered and independently audited before mask-transfer comparison."
+}
