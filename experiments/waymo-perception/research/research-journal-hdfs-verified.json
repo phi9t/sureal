@@ -1,50 +1,50 @@
 {
   "all_results_uploaded_and_readback_exact": true,
-  "hdfs_prefix": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33",
+  "hdfs_prefix": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1",
   "files": {
     "experiment-registry.json": {
-      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/experiment-registry.json",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/experiment-registry.json",
       "sha256": "479f3bb4746226347ee37b4dcffa1676a91c6b5aadf2c5bf7565cbdfe2ea127e",
       "bytes": 9310
     },
     "experiments.json": {
-      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/experiments.json",
-      "sha256": "67c2c514eb32aece64914bdd7a652519e2a730b963bb2291775972071e6c7de0",
-      "bytes": 55644
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/experiments.json",
+      "sha256": "cea7a41b950cdcef28cbd684fe22534fa5c17e9d0e154b26cd1895c0724617f9",
+      "bytes": 56028
     },
     "experiment-tracker.md": {
-      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/experiment-tracker.md",
-      "sha256": "02d43eb1eeec14484c9c8420ec325636fee33ab62a06a88287f1c009a521f026",
-      "bytes": 2389
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/experiment-tracker.md",
+      "sha256": "553eb1a24d14b1473a7d6fc1f108c77388cdfeed43d42dabf232870d7cdb085e",
+      "bytes": 2396
     },
     "research-journal.jsonl": {
-      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/research-journal.jsonl",
-      "sha256": "f940cf518d69d349720fedd0f1972a099e1069e258fcd69405614735a1065d15",
-      "bytes": 28516
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/research-journal.jsonl",
+      "sha256": "2bd84d51a10f64936480bbc1cb21d4056884eda5d43ff10e9c26ece82994480f",
+      "bytes": 30266
     },
     "research-journal.md": {
-      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/research-journal.md",
-      "sha256": "691b52b9b4afd8b8240ac958d7e3b40f7eb38ff8f8edea0876b3599994c9ed22",
-      "bytes": 18427
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/research-journal.md",
+      "sha256": "7bb4c74b8122dec813a874233f2771e541bed9e5373b694d3d499b9434eee15a",
+      "bytes": 19607
     },
     "journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731": {
-      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
       "sha256": "5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
       "bytes": 95540
     },
     "journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8": {
-      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
       "sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
       "bytes": 513970
     },
     "journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b": {
-      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
       "sha256": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
       "bytes": 55622
     }
   },
-  "manifest_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/manifest.json",
-  "manifest_sha256": "80afb190095b1ba88fab5bfed4d9ec58ae6b202e1f639b34639c753a4f099570",
+  "manifest_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/manifest.json",
+  "manifest_sha256": "6885627054dc6c832b6f3925d5622645009dd896dddec8275836d82943b777d3",
   "checks": [
     {
       "command": [
@@ -55,11 +55,11 @@
         "token-file",
         "--mkdir-parents",
         "put",
-        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/staged/experiment-registry.json",
-        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/experiment-registry.json"
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/staged/experiment-registry.json",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/experiment-registry.json"
       ],
       "exit_code": 0,
-      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/0-put.log"
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/0-put.log"
     },
     {
       "command": [
@@ -69,11 +69,11 @@
         "--auth-source",
         "token-file",
         "get",
-        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/experiment-registry.json",
-        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/experiment-registry.json"
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/experiment-registry.json",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/experiment-registry.json"
       ],
       "exit_code": 0,
-      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/0-get.log"
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/0-get.log"
     },
     {
       "command": [
@@ -84,11 +84,11 @@
         "token-file",
         "--mkdir-parents",
         "put",
-        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/staged/experiments.json",
-        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/experiments.json"
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/staged/experiments.json",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/experiments.json"
       ],
       "exit_code": 0,
-      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/1-put.log"
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/1-put.log"
     },
     {
       "command": [
@@ -98,11 +98,11 @@
         "--auth-source",
         "token-file",
         "get",
-        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/experiments.json",
-        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/experiments.json"
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/experiments.json",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/experiments.json"
       ],
       "exit_code": 0,
-      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/1-get.log"
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/1-get.log"
     },
     {
       "command": [
@@ -113,11 +113,11 @@
         "token-file",
         "--mkdir-parents",
         "put",
-        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/staged/experiment-tracker.md",
-        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/experiment-tracker.md"
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/staged/experiment-tracker.md",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/experiment-tracker.md"
       ],
       "exit_code": 0,
-      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/2-put.log"
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/2-put.log"
     },
     {
       "command": [
@@ -127,11 +127,11 @@
         "--auth-source",
         "token-file",
         "get",
-        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/experiment-tracker.md",
-        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/experiment-tracker.md"
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/experiment-tracker.md",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/experiment-tracker.md"
       ],
       "exit_code": 0,
-      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/2-get.log"
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/2-get.log"
     },
     {
       "command": [
@@ -142,11 +142,11 @@
         "token-file",
         "--mkdir-parents",
         "put",
-        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/staged/research-journal.jsonl",
-        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/research-journal.jsonl"
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/staged/research-journal.jsonl",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/research-journal.jsonl"
       ],
       "exit_code": 0,
-      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/3-put.log"
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/3-put.log"
     },
     {
       "command": [
@@ -156,11 +156,11 @@
         "--auth-source",
         "token-file",
         "get",
-        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/research-journal.jsonl",
-        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/research-journal.jsonl"
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/research-journal.jsonl",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/research-journal.jsonl"
       ],
       "exit_code": 0,
-      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/3-get.log"
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/3-get.log"
     },
     {
       "command": [
@@ -171,11 +171,11 @@
         "token-file",
         "--mkdir-parents",
         "put",
-        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/staged/research-journal.md",
-        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/research-journal.md"
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/staged/research-journal.md",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/research-journal.md"
       ],
       "exit_code": 0,
-      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/4-put.log"
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/4-put.log"
     },
     {
       "command": [
@@ -185,11 +185,11 @@
         "--auth-source",
         "token-file",
         "get",
-        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/research-journal.md",
-        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/research-journal.md"
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/research-journal.md",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/research-journal.md"
       ],
       "exit_code": 0,
-      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/4-get.log"
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/4-get.log"
     },
     {
       "command": [
@@ -200,11 +200,11 @@
         "token-file",
         "--mkdir-parents",
         "put",
-        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/staged/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
-        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731"
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/staged/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731"
       ],
       "exit_code": 0,
-      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/5-put.log"
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/5-put.log"
     },
     {
       "command": [
@@ -214,11 +214,11 @@
         "--auth-source",
         "token-file",
         "get",
-        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
-        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731"
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731"
       ],
       "exit_code": 0,
-      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/5-get.log"
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/5-get.log"
     },
     {
       "command": [
@@ -229,11 +229,11 @@
         "token-file",
         "--mkdir-parents",
         "put",
-        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/staged/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
-        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8"
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/staged/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8"
       ],
       "exit_code": 0,
-      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/6-put.log"
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/6-put.log"
     },
     {
       "command": [
@@ -243,11 +243,11 @@
         "--auth-source",
         "token-file",
         "get",
-        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
-        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8"
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8"
       ],
       "exit_code": 0,
-      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/6-get.log"
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/6-get.log"
     },
     {
       "command": [
@@ -258,11 +258,11 @@
         "token-file",
         "--mkdir-parents",
         "put",
-        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/staged/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
-        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b"
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/staged/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b"
       ],
       "exit_code": 0,
-      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/7-put.log"
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/7-put.log"
     },
     {
       "command": [
@@ -272,11 +272,11 @@
         "--auth-source",
         "token-file",
         "get",
-        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
-        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b"
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b"
       ],
       "exit_code": 0,
-      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/7-get.log"
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/7-get.log"
     },
     {
       "command": [
@@ -287,11 +287,11 @@
         "token-file",
         "--mkdir-parents",
         "put",
-        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/manifest.json",
-        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/manifest.json"
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/manifest.json",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/manifest.json"
       ],
       "exit_code": 0,
-      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/manifest-put.log"
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/manifest-put.log"
     },
     {
       "command": [
@@ -301,11 +301,11 @@
         "--auth-source",
         "token-file",
         "get",
-        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/manifest.json",
-        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/manifest-readback.json"
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/manifest.json",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/manifest-readback.json"
       ],
       "exit_code": 0,
-      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-97b7dc06fa8d486fbdb400dcf3298b33/manifest-get.log"
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-b7945d31ed694e0493b1d2bdbd6f2aa1/manifest-get.log"
     }
   ],
   "tool_pins": {
