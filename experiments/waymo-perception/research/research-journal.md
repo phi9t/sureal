@@ -273,3 +273,11 @@ balanced16/decoder-version
 Historical balanced16 uses decoderV2 despite scoring-parallel-v3 directory naming. Corrected APH has not been rerun. Both terminal candidates have every class detection AP below 0.8, supporting rejection of larger-training promotion independent of low historical heading scores; retain old measurements and require live receipts for corrections.
 
 Evidence: [balanced-stu](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced-study-recovery-20261002.json)
+
+## 35. 2026-10-02T23:30:21.034884+00:00 — observation
+
+overfit20261002b/storage
+
+All 15 closed trained cases retained on HDFS. Revalidated publication receipt SHA, exact original closure/result binding, and release inventory equality. Compact recovery index records global manifest/archive URIs and hashes. This host revalidation does not claim a new remote transfer.
+
+Evidence: [tier1-hdfs-r](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-hdfs-retention-index.json)
