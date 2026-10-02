@@ -281,3 +281,11 @@ overfit20261002b/storage
 All 15 closed trained cases retained on HDFS. Revalidated publication receipt SHA, exact original closure/result binding, and release inventory equality. Compact recovery index records global manifest/archive URIs and hashes. This host revalidation does not claim a new remote transfer.
 
 Evidence: [tier1-hdfs-r](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-hdfs-retention-index.json)
+
+## 36. 2026-10-02T23:37:31.767579+00:00 — observation
+
+task19/source-pilot
+
+Acquired generation-pinned training shard with exact HDFS readback under combined raw cap. Independent live Python and native C++ readers each inventory 492 records and complete 448622357 bytes; all offsets/lengths and selected payload SHA reconcile. Native lowest-ID pilot has 91 timestamps,current10,62 tracks,2 targets. Extension metadata resolved; causal/extension/real metric gates remain open.
+
+Evidence: [motion-train](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-training-inventory-reconciliation.json)
