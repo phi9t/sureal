@@ -305,3 +305,11 @@ task19/camera-codebook
 Supplied camera codebook is Git-blob pinned and HDFS readback verified. Separate live native extraction and NumPy literal lookup validate all 22528 tokens on observation-only inputs, preserving unique frame/camera/position keys; finite features22528x32 from8192x32 float32 codebook. Three malformed-index fixtures refuse. Observation input SHA matches admitted causal output. Forecasting utility and RGB reconstruction are not established.
 
 Evidence: [motion-codeb](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-codebook-live-verified.json)
+
+## 39. 2026-10-02T23:52:27.004521+00:00 — observation
+
+task19/validation-source
+
+Separate pinned validation shard passed source integrity and exact HDFS readback. Two independent live readers each cover all287 records/273686917 bytes; offsets/lengths and selected native payload SHA reconcile. Lowest-ID pilot11818a3a928aaefa. Raw/protobuf unique-inode accounting remains below2GiB. Validation extension/causal/native metric gates and scientific forecasting remain open.
+
+Evidence: [motion-valid](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-validation-inventory-reconciliation.json)
