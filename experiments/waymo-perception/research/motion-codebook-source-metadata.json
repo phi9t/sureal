@@ -1,0 +1,10 @@
+{
+  "request": "https://api.github.com/repos/waymo-research/waymo-open-dataset/contents/tutorial/womd_camera_codebook.npy?ref=99a4cb3ff07e2fe06c2ce73da001f850f628e45a",
+  "file": {
+    "name": "womd_camera_codebook.npy",
+    "path": "tutorial/womd_camera_codebook.npy",
+    "sha": "64c90db81db83813c03106a3824c10d2058135e0",
+    "size": 1048704,
+    "download_url": "https://raw.githubusercontent.com/waymo-research/waymo-open-dataset/99a4cb3ff07e2fe06c2ce73da001f850f628e45a/tutorial/womd_camera_codebook.npy"
+  }
+}

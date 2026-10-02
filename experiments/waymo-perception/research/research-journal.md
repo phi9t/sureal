@@ -289,3 +289,11 @@ task19/source-pilot
 Acquired generation-pinned training shard with exact HDFS readback under combined raw cap. Independent live Python and native C++ readers each inventory 492 records and complete 448622357 bytes; all offsets/lengths and selected payload SHA reconcile. Native lowest-ID pilot has 91 timestamps,current10,62 tracks,2 targets. Extension metadata resolved; causal/extension/real metric gates remain open.
 
 Evidence: [motion-train](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-training-inventory-reconciliation.json)
+
+## 37. 2026-10-02T23:44:40.217121+00:00 — decision
+
+task19/source-pilot
+
+Actual extension contains only fields12/13 and no scenario_id, matching pinned official tutorials. Bind authenticated exact filename/generation/hash to base native ID; reject mismatched supplied IDs, wrong external keys and duplicate augmentation. Live v5 checks exact 11-step causal sensor/history prefix and rejects future12th sensor frame. Observed Motion camera support is eight streams, not Perception five. No forecasting quality or ticket19 closure.
+
+Evidence: [motion-train](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-training-native-link-verified.json)
