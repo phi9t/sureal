@@ -313,3 +313,11 @@ task19/validation-source
 Separate pinned validation shard passed source integrity and exact HDFS readback. Two independent live readers each cover all287 records/273686917 bytes; offsets/lengths and selected native payload SHA reconcile. Lowest-ID pilot11818a3a928aaefa. Raw/protobuf unique-inode accounting remains below2GiB. Validation extension/causal/native metric gates and scientific forecasting remain open.
 
 Evidence: [motion-valid](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-validation-inventory-reconciliation.json)
+
+## 40. 2026-10-02T23:55:14.669873+00:00 — decision
+
+task19/raw-retention
+
+Released only the fully inventoried 448622357-byte training raw shard after exact source/HDFS and complete independent live framing/protobuf proofs. A second bounded HDFS download reproduced exact size/SHA before temporary copy release. Native selected truth and causal observations remain local; full-shard replays require recorded HDFS rehydration. Original receipts remain immutable.
+
+Evidence: [motion-train](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-training-raw-release-verified.json)

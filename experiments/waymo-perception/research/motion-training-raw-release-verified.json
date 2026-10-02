@@ -1,0 +1,25 @@
+{
+  "source_receipt_sha256": "acbee4a82363a38de1970f7a20e6e6a8e607e5c5a135467aaff315b85d8ddc50",
+  "framing_receipt_sha256": "53c19dfe21f08b9f2c9dafda3fb4d9e9769a98a4e0f88e83c9a96c9016588c25",
+  "native_inventory_receipt_sha256": "793152226bcef8242997b81b815b4533d001e7acd5d265799671f8fdd23a29ef",
+  "source_sha256": "27491c6c0b84bb9e27cec361600685d4669934a58c9018ddcc9b2dc06147cab7",
+  "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/datasets/waymo-motion/v1.2.1/pilot/training/1706572783766122-27491c6c0b84bb9e27cec361600685d4669934a58c9018ddcc9b2dc06147cab7.tfrecord",
+  "local_source": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/training-source-8a73740fe44e4f139d5462db1c633268/source.tfrecord",
+  "bytes": 448622357,
+  "scope": "only fully inventoried pilot raw shard; selected native truth/causal observations and original source receipts retained",
+  "recovery_command": [
+    "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+    "--error-format",
+    "json",
+    "--auth-source",
+    "token-file",
+    "get",
+    "hdfs://harunava/user/tiger/waystone/sureal/datasets/waymo-motion/v1.2.1/pilot/training/1706572783766122-27491c6c0b84bb9e27cec361600685d4669934a58c9018ddcc9b2dc06147cab7.tfrecord",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-training-raw-release-v1/recovery.tfrecord"
+  ],
+  "recovery_exit_code": 0,
+  "repeat_hdfs_readback_exact": true,
+  "raw_source_released": true,
+  "selected_truth_retained": true,
+  "causal_observations_retained": true
+}
