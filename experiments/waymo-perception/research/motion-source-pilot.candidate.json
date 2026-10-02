@@ -1,0 +1,34 @@
+{
+  "status": "bounded source pilot candidate; no acquisition or scientific cohort freeze",
+  "release": "v1.2.1",
+  "inventory_sha256": "4057a285744b8b92bb8f2d57c31a2c6cc1e8151496d2a7512fc1c0cda4979b67",
+  "selection_rule": "lowest bytewise Scenario object name per official split fitting existing remaining single-source raw cap; chosen before payload/model outcomes",
+  "combined_raw_cap_bytes": 2147483648,
+  "retained_engineering_bytes": 1200154353,
+  "single_source_available_bytes": 947329295,
+  "objects": {
+    "training": {
+      "name": "uncompressed/scenario/training/training.tfrecord-00000-of-01000",
+      "bucket": "waymo_open_dataset_motion_v_1_2_1",
+      "generation": "1706572783766122",
+      "contentType": "application/octet-stream",
+      "size": "448622357",
+      "md5Hash": "uObNvAAlbQfl0M1NJzAOPw==",
+      "crc32c": "ovv/yg==",
+      "updated": "2024-01-29T23:59:43.863Z"
+    },
+    "validation": {
+      "name": "uncompressed/scenario/validation/validation.tfrecord-00000-of-00150",
+      "bucket": "waymo_open_dataset_motion_v_1_2_1",
+      "generation": "1706585154034912",
+      "contentType": "application/octet-stream",
+      "size": "273686917",
+      "md5Hash": "DkLTAOR7tjxe3ZSK3Fb0xQ==",
+      "crc32c": "rASJ4g==",
+      "updated": "2024-01-30T03:25:54.127Z"
+    }
+  },
+  "storage_policy": "one staged raw source under shared lease; generation-pinned transfer, HDFS mirror/readback, immutable record inventory, recovery before eviction",
+  "next_gate": "wait until active Perception raw-staging workflow permits acquisition; verify source framing/compression and scenario_ids, then resolve paired historical sensor extension objects from metadata",
+  "scope": "acquisition pilot only; no smaller cohort replaces later frozen held-out forecasting study"
+}
