@@ -265,3 +265,11 @@ task07/data-gates
 Reconciled completed point/grid replay: all 103 selected scenes, 203850 returns, 3513295187 points and 478579462 eligible semantic points. Rechecked progress SHA, all 103 individual evidence SHAs and summed totals. Host aggregate of individual live admissions; scientific protocol and held-out outcomes remain open.
 
 Evidence: [point-grid-f](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/point-grid-full103-and-overfit-box-retained-audit.json)
+
+## 34. 2026-10-02T23:27:35.343036+00:00 — observation
+
+balanced16/decoder-version
+
+Historical balanced16 uses decoderV2 despite scoring-parallel-v3 directory naming. Corrected APH has not been rerun. Both terminal candidates have every class detection AP below 0.8, supporting rejection of larger-training promotion independent of low historical heading scores; retain old measurements and require live receipts for corrections.
+
+Evidence: [balanced-stu](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced-study-recovery-20261002.json)
