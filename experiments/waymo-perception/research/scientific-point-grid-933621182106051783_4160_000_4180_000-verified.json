@@ -1,0 +1,128 @@
+{
+  "scene": "933621182106051783_4160_000_4180_000",
+  "membership": {
+    "official_split": "validation",
+    "research_splits": [
+      "camera_validation"
+    ]
+  },
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/point-grid-sources-v1/933621182106051783_4160_000_4180_000/receipt.json",
+  "receipt_sha256": "3e4d0707477ea9234253ba93e34cc74d675c1dde544ffbd12db4bff56c3401aa",
+  "shape_admission_sha256": "f4ec7eb4dfe31dba5fa9db62941bd640acc5bf763b5585ba06efe40fca670150",
+  "candidate_sha256": "393220a85c198d61eba135e95a5888997fd9ec50cae16ef50025ae16ff0d3233",
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/point-grid-sources-v1/933621182106051783_4160_000_4180_000",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/scientific-point-grid-retained-v1-933621182106051783_4160_000_4180_000/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/scientific-point-grid-retained-v1-933621182106051783_4160_000_4180_000/input",
+        "/tmp/input",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.scratch",
+        "/tmp/worker",
+        "--",
+        "python",
+        "-c",
+        "import json,sys,importlib.util\nfrom pathlib import Path\nsys.path.insert(0,'/tmp/worker');from point_grid_retained_audit import verify\nassert importlib.util.find_spec('tensorflow') is None\ne=json.loads(Path('/tmp/input/expected.json').read_text());v=verify('/source',e,code_root='/experiment',workers='/tmp/worker')\nPath('/outputs/check.json').write_text(json.dumps(v,indent=2));print('PASS retained full scientific point/grid',v['scene'],v['points'])\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "expected_sha256": "c2c8c8b9f1c2e576fb764b463f20d1500e47cbb12f5159cc4b2fc1dca16cf6af",
+  "auditor_sha256": "d6c27e0c47a13c978367704d7e6d89fb3d7d07206e5a5844fe1221626c2529bf",
+  "validation": {
+    "scene": "933621182106051783_4160_000_4180_000",
+    "records": 1980,
+    "points": 34630205,
+    "eligible_semantic_points": 4660723,
+    "native_counts": [
+      40593,
+      1016166,
+      28041,
+      0,
+      0,
+      0,
+      0,
+      16414,
+      22214,
+      254,
+      30320,
+      577,
+      0,
+      3887,
+      2224600,
+      227812,
+      20026,
+      13719,
+      838869,
+      5377,
+      51263,
+      331,
+      160853
+    ],
+    "worker_resources": {
+      "producer": {
+        "elapsed_seconds": 44.60248054302065,
+        "peak_rss_kib": 92728,
+        "rss_scope": "worker_process_peak"
+      },
+      "reference": {
+        "elapsed_seconds": 19.66757765697548,
+        "peak_rss_kib": 89840,
+        "rss_scope": "worker_process_peak"
+      }
+    },
+    "scope": "retained identity and two full passes admitted; scientific model comparisons remain open"
+  },
+  "audit_artifacts": {
+    "live.log": "51668d3b6f332963e01d5113636fef2f5786591d8a0df7390ba213a8e0d66436",
+    "check.json": "1834ae07c59540b645471c533b498230110fb6909df4173260f62da269617268"
+  },
+  "scope": "actual immutable HDFS point/native-grid full support and independent live receipt admission; no model evaluation claim"
+}
