@@ -297,3 +297,11 @@ task19/source-pilot
 Actual extension contains only fields12/13 and no scenario_id, matching pinned official tutorials. Bind authenticated exact filename/generation/hash to base native ID; reject mismatched supplied IDs, wrong external keys and duplicate augmentation. Live v5 checks exact 11-step causal sensor/history prefix and rejects future12th sensor frame. Observed Motion camera support is eight streams, not Perception five. No forecasting quality or ticket19 closure.
 
 Evidence: [motion-train](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-training-native-link-verified.json)
+
+## 38. 2026-10-02T23:48:58.751862+00:00 — observation
+
+task19/camera-codebook
+
+Supplied camera codebook is Git-blob pinned and HDFS readback verified. Separate live native extraction and NumPy literal lookup validate all 22528 tokens on observation-only inputs, preserving unique frame/camera/position keys; finite features22528x32 from8192x32 float32 codebook. Three malformed-index fixtures refuse. Observation input SHA matches admitted causal output. Forecasting utility and RGB reconstruction are not established.
+
+Evidence: [motion-codeb](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-codebook-live-verified.json)
