@@ -1,0 +1,82 @@
+{
+  "source": {
+    "bucket": "waymo_open_dataset_motion_v_1_2_1",
+    "content_type": "application/octet-stream",
+    "crc32c_hash": "qphExQ==",
+    "creation_time": "2024-01-30T19:01:27+0000",
+    "etag": "CITl4Z3mhYQDEAE=",
+    "generation": "1706641287836292",
+    "md5_hash": "5y9bowADTZkbATEywxfS7A==",
+    "metageneration": 1,
+    "name": "uncompressed/lidar_and_camera/validation/11818a3a928aaefa.tfrecord",
+    "size": 4810884,
+    "storage_class": "STANDARD",
+    "storage_class_update_time": "2024-01-30T19:01:27+0000",
+    "storage_url": "gs://waymo_open_dataset_motion_v_1_2_1/uncompressed/lidar_and_camera/validation/11818a3a928aaefa.tfrecord#1706641287836292",
+    "update_time": "2024-01-30T19:01:27+0000",
+    "md5Hash": "5y9bowADTZkbATEywxfS7A=="
+  },
+  "source_sha256": "a33485f7936b39596a9948ad18d7bac17e594101a43cce88180450c79b653c6c",
+  "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/datasets/waymo-motion/v1.2.1/pilot/validation/1706641287836292-a33485f7936b39596a9948ad18d7bac17e594101a43cce88180450c79b653c6c.tfrecord",
+  "hdfs_readback_exact": true,
+  "raw_peak_bytes": 1676668458,
+  "local_source": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/validation-extension-a047963e2ccb4cc8877051b841c01f71/source.tfrecord",
+  "candidate_sha256": "1522d69ce83426ef20691f6876da854c29666043f9b548a608b4281955255925",
+  "inventory_sha256": "4057a285744b8b92bb8f2d57c31a2c6cc1e8151496d2a7512fc1c0cda4979b67",
+  "checks": [
+    {
+      "command": [
+        "bash",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/gcs.sh",
+        "--",
+        "storage",
+        "cp",
+        "gs://waymo_open_dataset_motion_v_1_2_1/uncompressed/lidar_and_camera/validation/11818a3a928aaefa.tfrecord#1706641287836292",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/validation-extension-a047963e2ccb4cc8877051b841c01f71/source.tfrecord"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/validation-extension-a047963e2ccb4cc8877051b841c01f71/gcs-download.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "layout-profile",
+        "--project",
+        "sureal",
+        "--json"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/validation-extension-a047963e2ccb4cc8877051b841c01f71/layout.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "--mkdir-parents",
+        "put",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/validation-extension-a047963e2ccb4cc8877051b841c01f71/source.tfrecord",
+        "hdfs://harunava/user/tiger/waystone/sureal/datasets/waymo-motion/v1.2.1/pilot/validation/1706641287836292-a33485f7936b39596a9948ad18d7bac17e594101a43cce88180450c79b653c6c.tfrecord"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/validation-extension-a047963e2ccb4cc8877051b841c01f71/hdfs-put.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "get",
+        "hdfs://harunava/user/tiger/waystone/sureal/datasets/waymo-motion/v1.2.1/pilot/validation/1706641287836292-a33485f7936b39596a9948ad18d7bac17e594101a43cce88180450c79b653c6c.tfrecord",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/validation-extension-a047963e2ccb4cc8877051b841c01f71/source.tfrecord"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/validation-extension-a047963e2ccb4cc8877051b841c01f71/hdfs-get.log"
+    }
+  ],
+  "scope": "acquired exact selected validation extension only; framing/native linkage/causality pending"
+}

@@ -202,3 +202,9 @@ training/jean_zay
 
 # Agent-isolated feature worktrees
 .worktrees/
+
+# Waymo viewer (experiments/waymo-perception/viewer): JS deps, builds, venv
+node_modules/
+.vite/
+experiments/waymo-perception/viewer/web/dist/
+experiments/waymo-perception/viewer/.venv/

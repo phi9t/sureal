@@ -1,0 +1,5 @@
+# Investigation only; separate from Surflo and the optional SDK.
+pyarrow==25.0.1
+numpy==2.5.3
+pillow==12.3.0
+jsonschema==4.26.0

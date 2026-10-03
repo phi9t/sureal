@@ -1,0 +1,286 @@
+{
+  "schema_version": 1,
+  "runs": [
+    {
+      "id": "overfit20261002b",
+      "results": "research/tier1-overfit20261002b-results.json",
+      "closure": "research/tier1-closure-live-final-v4-verified.json",
+      "hdfs_results": "research/tier1-results-hdfs-verified.json",
+      "recipes": {
+        "baseline": {
+          "architecture": "baseline",
+          "norm": "gn_backbone",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference"
+        },
+        "deep_pfn": {
+          "architecture": "deep_pfn",
+          "norm": "gn_backbone",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference"
+        },
+        "context_pfn": {
+          "architecture": "context_pfn",
+          "norm": "gn_backbone",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference"
+        },
+        "masked_pfn": {
+          "architecture": "masked_pfn",
+          "norm": "gn_backbone",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference"
+        },
+        "residual_bev": {
+          "architecture": "residual_bev",
+          "norm": "gn_backbone",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference"
+        },
+        "window_bev": {
+          "architecture": "window_bev",
+          "norm": "gn_backbone",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference"
+        },
+        "coarse_mlp": {
+          "architecture": "coarse_mlp",
+          "norm": "gn_backbone",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference"
+        },
+        "retain64": {
+          "architecture": "baseline",
+          "norm": "gn_backbone",
+          "max_points": 64,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference"
+        },
+        "all_pillars": {
+          "architecture": "baseline",
+          "norm": "gn_backbone",
+          "max_points": 32,
+          "pillar_cap": 30000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference",
+          "equivalence_control": true
+        },
+        "full_bn": {
+          "architecture": "baseline",
+          "norm": "bn",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference"
+        },
+        "point_ln": {
+          "architecture": "baseline",
+          "norm": "gn_backbone_ln_pillar",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference"
+        },
+        "no_norm": {
+          "architecture": "baseline",
+          "norm": "no_norm",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference"
+        },
+        "foreground_prior": {
+          "architecture": "baseline",
+          "norm": "gn_backbone",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": 0.01,
+          "loss": "reference"
+        },
+        "lr3e4": {
+          "architecture": "baseline",
+          "norm": "gn_backbone",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0003,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference"
+        },
+        "no_clip": {
+          "architecture": "baseline",
+          "norm": "gn_backbone",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": null,
+          "foreground_prior": null,
+          "loss": "reference"
+        },
+        "class_balanced_focal": {
+          "architecture": "baseline",
+          "norm": "gn_backbone",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "class_balanced_positive"
+        }
+      },
+      "goals": {
+        "no_norm": "Measure whether removing normalization changes fit iterations and stability.",
+        "full_bn": "Measure dense BatchNorm effects on fitting and evaluation-time statistics.",
+        "class_balanced_focal": "Measure whether balancing positive class contributions accelerates all-class fitting.",
+        "no_clip": "Measure whether removing clipping speeds or destabilizes the fixed-batch trajectory."
+      }
+    },
+    {
+      "id": "expanded20261002a",
+      "results": "research/advanced-expanded20261002a-results.json",
+      "closure": "research/advanced-closure-expanded20261002a-verified.json",
+      "admission": "research/advanced-native-admission-verified.json",
+      "recipes": {
+        "grid_fine": {
+          "architecture": "grid_fine",
+          "norm": "gn_backbone",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference",
+          "observation": "grid_fine"
+        },
+        "grid_coarse": {
+          "architecture": "grid_coarse",
+          "norm": "gn_backbone",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference",
+          "observation": "grid_coarse"
+        },
+        "ragged_pillars": {
+          "architecture": "ragged_pillars",
+          "norm": "gn_backbone",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference",
+          "observation": "ragged_pillars"
+        },
+        "point_attention": {
+          "architecture": "point_attention",
+          "norm": "gn_backbone",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference",
+          "observation": "baseline"
+        },
+        "point_mlp_control": {
+          "architecture": "point_mlp_control",
+          "norm": "gn_backbone",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference",
+          "observation": "baseline"
+        },
+        "range_fusion": {
+          "architecture": "range_fusion",
+          "norm": "gn_backbone",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference",
+          "observation": "range_fusion"
+        },
+        "zero_range_control": {
+          "architecture": "zero_range_control",
+          "norm": "gn_backbone",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference",
+          "observation": "range_fusion"
+        },
+        "sparse_bev_transformer": {
+          "architecture": "sparse_bev_transformer",
+          "norm": "gn_backbone",
+          "max_points": 32,
+          "pillar_cap": 20000,
+          "learning_rate": 0.0001,
+          "clip": 10.0,
+          "foreground_prior": null,
+          "loss": "reference",
+          "observation": "baseline"
+        }
+      },
+      "goals": {
+        "grid_fine": "Measure fine-grid retention and learning with unchanged physical detection anchors.",
+        "grid_coarse": "Measure coarse-grid retention and learning with unchanged physical detection anchors.",
+        "ragged_pillars": "Test all-point pillar encoding without the32-point cutoff.",
+        "point_attention": "Test learned point interaction against the matched-parameter point-MLP control.",
+        "point_mlp_control": "Isolate added point-feature capacity from point attention.",
+        "range_fusion": "Test native range-view context against zero-range ablation.",
+        "zero_range_control": "Isolate range-context information from the added frontend topology.",
+        "sparse_bev_transformer": "Test occupied-token spatial processing against dense BEV convolution."
+      }
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "contract.py": "a3ad8663d9f0fa8710cf507782e50bcf9a15df5977341ae5ec066549bfc26275",
+  "test_contract.py": "e5d5f2516496c655ce7d5c6c9ba371aab3586d329fb3e94ea630cf80f2ea6c9a",
+  "runtime/Dockerfile.cpu": "c6fc09866287332f72a9fd1b5316d021b8a85300f078f26352e4c89126667dd8",
+  "runtime/Dockerfile.training": "8a1ce15368377e3d0e0bb336f0be6fb8aa14a26cdd1405771e12714aa6edd298",
+  "runtime/requirements.lock": "3da8cda842bf20eb62548f4a8fa5f4beabb510c3b7e6df1e9777d6c213614ca2",
+  "runtime/requirements.in": "b21ebe61c67dcedc11fadf99151ad7fbf68b3c6fbd5be5a75669b7ff9fb7ee51"
+}

@@ -1,0 +1,88 @@
+{
+  "command": [
+    "bwrap",
+    "--unshare-all",
+    "--die-with-parent",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/metrics-rootfs",
+    "/",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-native-metric-audit-v1/code",
+    "/experiment",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-export-v1/output",
+    "/source",
+    "--bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-native-metric-audit-v1/output",
+    "/outputs",
+    "--proc",
+    "/proc",
+    "--dev",
+    "/dev",
+    "--tmpfs",
+    "/tmp",
+    "--clearenv",
+    "--setenv",
+    "HOME",
+    "/tmp/private-home",
+    "--setenv",
+    "PATH",
+    "/usr/local/bin:/usr/bin:/bin",
+    "--setenv",
+    "PYTHONNOUSERSITE",
+    "1",
+    "--setenv",
+    "PYTHONDONTWRITEBYTECODE",
+    "1",
+    "--setenv",
+    "PYTHONPATH",
+    "/experiment",
+    "--chdir",
+    "/experiment",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-metrics-v2/output",
+    "/tmp/scored",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-native-metric-audit-v1/input/expected.json",
+    "/tmp/expected.json",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-native-metric-audit-v1/input/score-receipt.json",
+    "/tmp/score-receipt.json",
+    "--",
+    "python",
+    "/experiment/cohort/audit_metrics_sustained_v3.py"
+  ],
+  "exit_code": 0,
+  "runtime_lock": {
+    "schema_version": 1,
+    "image_id": "sha256:c0018cf57e482c6a9e6623ea32f29c6039f22f5dafb0f3311bad6d411a7bb135",
+    "rootfs_sha256": "831a5955ce709cb46b82688ba0f0371c37e1af707ffb870b24c555d53d4f5542",
+    "upstream_commit": "99a4cb3ff07e2fe06c2ce73da001f850f628e45a",
+    "recipe_hashes": {
+      "Dockerfile": "b85397cec37dd8322f538b26f60c785122442f1db3844850b3cd8a35ea218681",
+      "CMakeLists.txt": "36532e0d6fc0b4e5c9662c5272691d2b1d7390dce805dfae6f8c5fe32c314774"
+    }
+  },
+  "source_pins": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-native-metric-audit-v1/code/cohort/audit_metrics_sustained_v3.py": "21513daa1f42773e08ef7eed4f5738d40eb953eecce0a7389b71d65b9eb9ce0d"
+  },
+  "parent_receipt_sha256": "6a59512f16a9cbc927f53f71f0cb75470e3e5dfe8bd62c882b0329c590cb0f50",
+  "inputs": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-native-metric-audit-v1/input/expected.json": "f0368517265b43e3d923f4552e1a9118745a5695a81e1119a0ee82d63e86e410",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-native-metric-audit-v1/input/score-receipt.json": "6a59512f16a9cbc927f53f71f0cb75470e3e5dfe8bd62c882b0329c590cb0f50"
+  },
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-native-metric-audit-v1/output/live.log": "3eef8dee9c5b38a5cad8569c5a50cea5743e4e5dcb318685d63df35a55bf63f7",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-native-metric-audit-v1/output/check.json": "cddea1a049f606694a2e68d0ebf34b91b1dd007e4c7d1301be75f69b88076c61",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-native-metric-audit-v1/output/metrics.stdout": "409de32f25870879647c198e52cbe9ffadf911d255faff37f523abc3400bc9d5"
+  },
+  "validation": {
+    "all_export_fields_independently_reread": true,
+    "native_metric_replay_exact": true,
+    "mean_populated_class_APH": 0.13753142000000002,
+    "all_class_APH_gate_passed": false,
+    "scope": "independent full16 V3 native protobuf/export/metric audit; original four-class native GT retained; no heldout claim"
+  },
+  "elapsed_seconds": 111.39773955498822,
+  "scope": "independent allprotobuf field readback and nativefull16 metric replay on historical2000 heads; fullGT; no new sustainedtraining/science"
+}

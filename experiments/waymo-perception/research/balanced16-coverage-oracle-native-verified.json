@@ -1,0 +1,779 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/gpu-rootfs",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/code",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-export-v1/output",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/prepared",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/input",
+        "/tmp/inputs",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2",
+        "/tmp/native",
+        "--",
+        "/opt/waymo/bin/python",
+        "/experiment/oracle.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.4308053809800185,
+      "artifacts": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/prepared/live.log": "211ccdc6145c4766962ad38fa3941f9a146de82ff38e3e0dcb0ec9b970b7455c",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/prepared/check.json": "e566171ce68d0c958369fc369a7e822e67d71ab9255200694d8da11c7b075c30",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/prepared/positive_native/predictions.json": "36e4468fa57bdc795b897f5095b334bdf760b308397bb3bf14ae627767f18bb3",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/prepared/positive_native/preparation.json": "3c5cfb9526c8e8bc710425a9687b31f2784a8d6cd6056845ad002a15c76e4e37",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/prepared/positive_native/groundtruth.json": "63c3ae4827ae88cd1d77e4ad34017fd1e564e4087c502d7ca255bf5c72f63143",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/prepared/training_roi/predictions.json": "52010fbf60ae2e3f36b3d81b209aa3aafd4329fe9a006a4cdf1ed07c9c5bee64",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/prepared/training_roi/preparation.json": "17d60974380bdb2fa1deab81a05db4c7429618513bb94346c08b568c193c4f99",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/prepared/training_roi/groundtruth.json": "63c3ae4827ae88cd1d77e4ad34017fd1e564e4087c502d7ca255bf5c72f63143",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/prepared/anchor_covered/predictions.json": "8cc1ad39e7fa34d15e56aa33f57561c88c6b3cd3859c1a6486f4936a78d592f3",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/prepared/anchor_covered/preparation.json": "e72c39e5d63d265581b643ba96c4f47cdad5f6e472b731b2039d0b9b30e29cda",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/prepared/anchor_covered/groundtruth.json": "63c3ae4827ae88cd1d77e4ad34017fd1e564e4087c502d7ca255bf5c72f63143"
+      }
+    },
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/metrics-rootfs",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/code",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/prepared/positive_native",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-positive_native",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--",
+        "python",
+        "/experiment/cohort/metrics_sustained_v3.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.7594289060216397,
+      "artifacts": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-positive_native/predictions.bin": "d5b9518f369564915545bf448f757c61d0b66410da7a012d6eb878af02bc9bdd",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-positive_native/live.log": "8c987eda5127e38b6d47b9b55723c90f1fdbddf20572ed977180e83d30fd5bda",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-positive_native/check.json": "f56bc6ceae1200531e6a0251b02e35994ac0998c375d9438a05a67e70c8ef604",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-positive_native/groundtruth.bin": "5913a8a802b27d501dcac1c7654554f223131a0dbe92a6ef96362eeef88583d7",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-positive_native/metrics.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-positive_native/metrics.stdout": "fe043302af521504e457142aa1d94bb4cce65bd30a5bab4274915feac9f7d042"
+      }
+    },
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/metrics-rootfs",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/code",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/prepared/training_roi",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-training_roi",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--",
+        "python",
+        "/experiment/cohort/metrics_sustained_v3.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.009376230009366,
+      "artifacts": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-training_roi/predictions.bin": "020716d9350206c191d95e20a5a9b449d3c933e86c81c3a531f8ed41eed071e4",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-training_roi/live.log": "93d799737be8ce016d48adb23d09e9af0ef710a3cb24d8ac0b2c54d5bca963dd",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-training_roi/check.json": "d7001420b6569383548687bb7cb855e7170fdcea3d43510eb05c01de836e4482",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-training_roi/groundtruth.bin": "5913a8a802b27d501dcac1c7654554f223131a0dbe92a6ef96362eeef88583d7",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-training_roi/metrics.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-training_roi/metrics.stdout": "004fa1b73d05c881a1a9221e8feddd578ea72dbdf907b573f7af7111cb7eec88"
+      }
+    },
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/metrics-rootfs",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/code",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/prepared/anchor_covered",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-anchor_covered",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--",
+        "python",
+        "/experiment/cohort/metrics_sustained_v3.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.9178447139565833,
+      "artifacts": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-anchor_covered/predictions.bin": "b5252ed6d5909974390cf27aa52f8e7f4aa9302c1a19cc82554a5c645b7e97ba",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-anchor_covered/live.log": "705f5ba44295cb59334b60e3436a1ffa202e37855354273612e58e6802e4f67e",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-anchor_covered/check.json": "99afd9ca2c2b227270cc38359379107674d7aaea4167260fa05b494c927def68",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-anchor_covered/groundtruth.bin": "5913a8a802b27d501dcac1c7654554f223131a0dbe92a6ef96362eeef88583d7",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-anchor_covered/metrics.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/scored-anchor_covered/metrics.stdout": "2f3f3eb3e67db7e15bac9e3f9474b5e1dea5a2d8f665f45207b706c91c044cff"
+      }
+    }
+  ],
+  "source_pins": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/code/oracle.py": "a5f1a9bd0a27e555377edacb1db87c4e6377a2d51834fa99e5586879815033e1",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/code/cohort/metrics_sustained_v3.py": "1f79c8a5e4471b44015f85023c54ef05c1ebd842c2a32f5c79ca1a4741933995",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/code/pipeline/detection_export.py": "a361e44755ce45a251534b1a1fd8b1e12d9d1e8fadd02f6d6cfdafe98a46f7c2",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/code/pipeline/segmentation_export.py": "bd17238a202ad90e00cafc4694a1fce3d86c9dda82314ca6e5bb6ff4986d1723"
+  },
+  "inputs": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/input/expected.json": "9d24d74bfda21eab1f7cb553b0ea720a4aa26bb6ee41c4755204b3a916a1650f",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/input/manifest.json": "ab2ffa9c3652c24118ad3f52a0011f7e2895b3f3b82b64b86903dde51f84a675"
+  },
+  "parent_receipt_sha256": "92bae9921d46e5fd57dd7458eb0b845fb520fc8bf41d5db33bfabcbc7ed7ab0e",
+  "historical_manifest_sha256": "7e36ef6c43492e69e9d846b008d382ed694b4f5b795cc72208262a8b246c9873",
+  "runtime_lock": {
+    "image_id": "sha256:46bdaa6e8d9058d7e09419085dfcf9a4527e801330045ae8e0f387f454413b86",
+    "rootfs_sha256": "55f63770083be16ea76764422c51e6e5d995b2d65e9785b552e118a64c6e2f1f",
+    "recipe_hashes": {
+      "Dockerfile": "48484266fe92aaf1a94823fac0746eafef7ac78d0a8754fa9d8f279e8d96c19b",
+      "requirements.lock": "038ba6bbc16870b6430481127b15ab2830e5dac0a6b14c30f218a43853e35923",
+      "build.sh": "bd554045bf0dd40aeceb495fd25ff6ea62ad8e04e93a0c81b203f2c141bcce55"
+    }
+  },
+  "metric_runtime_lock": {
+    "schema_version": 1,
+    "image_id": "sha256:c0018cf57e482c6a9e6623ea32f29c6039f22f5dafb0f3311bad6d411a7bb135",
+    "rootfs_sha256": "831a5955ce709cb46b82688ba0f0371c37e1af707ffb870b24c555d53d4f5542",
+    "upstream_commit": "99a4cb3ff07e2fe06c2ce73da001f850f628e45a",
+    "recipe_hashes": {
+      "Dockerfile": "b85397cec37dd8322f538b26f60c785122442f1db3844850b3cd8a35ea218681",
+      "CMakeLists.txt": "36532e0d6fc0b4e5c9662c5272691d2b1d7390dce805dfae6f8c5fe32c314774"
+    }
+  },
+  "validation": {
+    "frames": [
+      {
+        "identity": "13840133134545942567_1060_000_1080_000:1558402354862835",
+        "counts": {
+          "positive_native": {
+            "1": 27,
+            "2": 59,
+            "3": 27,
+            "4": 10
+          },
+          "training_roi": {
+            "1": 24,
+            "2": 57,
+            "3": 22,
+            "4": 10
+          },
+          "anchor_covered": {
+            "1": 24,
+            "2": 57,
+            "3": 21,
+            "4": 10
+          }
+        },
+        "uncovered_ids": [
+          "Z5kFobm5wzwlYOkEzSfJBA"
+        ]
+      },
+      {
+        "identity": "16977844994272847523_2140_000_2160_000:1557450680964094",
+        "counts": {
+          "positive_native": {
+            "1": 38,
+            "2": 23,
+            "3": 18,
+            "4": 8
+          },
+          "training_roi": {
+            "1": 38,
+            "2": 20,
+            "3": 16,
+            "4": 7
+          },
+          "anchor_covered": {
+            "1": 38,
+            "2": 20,
+            "3": 16,
+            "4": 7
+          }
+        },
+        "uncovered_ids": []
+      },
+      {
+        "identity": "17885096890374683162_755_580_775_580:1506906083489022",
+        "counts": {
+          "positive_native": {
+            "1": 31,
+            "2": 8,
+            "3": 14,
+            "4": 1
+          },
+          "training_roi": {
+            "1": 27,
+            "2": 8,
+            "3": 14,
+            "4": 1
+          },
+          "anchor_covered": {
+            "1": 27,
+            "2": 8,
+            "3": 14,
+            "4": 1
+          }
+        },
+        "uncovered_ids": []
+      },
+      {
+        "identity": "4575961016807404107_880_000_900_000:1544656166412547",
+        "counts": {
+          "positive_native": {
+            "1": 36,
+            "2": 10,
+            "3": 14,
+            "4": 1
+          },
+          "training_roi": {
+            "1": 31,
+            "2": 10,
+            "3": 11,
+            "4": 1
+          },
+          "anchor_covered": {
+            "1": 31,
+            "2": 10,
+            "3": 10,
+            "4": 1
+          }
+        },
+        "uncovered_ids": [
+          "oyRNw2P4Fx4Y5MS4cQc-9w"
+        ]
+      },
+      {
+        "identity": "13506499849906169066_120_000_140_000:1552353849872908",
+        "counts": {
+          "positive_native": {
+            "1": 89,
+            "2": 12,
+            "3": 19,
+            "4": 1
+          },
+          "training_roi": {
+            "1": 81,
+            "2": 11,
+            "3": 16,
+            "4": 1
+          },
+          "anchor_covered": {
+            "1": 81,
+            "2": 11,
+            "3": 14,
+            "4": 1
+          }
+        },
+        "uncovered_ids": [
+          "g9FhdQlNd-TOHxukFnXYFA",
+          "ntxrTRPDC3sxr1_FfkOlCg"
+        ]
+      },
+      {
+        "identity": "16977844994272847523_2140_000_2160_000:1557450685964257",
+        "counts": {
+          "positive_native": {
+            "1": 45,
+            "2": 23,
+            "3": 19,
+            "4": 8
+          },
+          "training_roi": {
+            "1": 43,
+            "2": 22,
+            "3": 17,
+            "4": 8
+          },
+          "anchor_covered": {
+            "1": 43,
+            "2": 22,
+            "3": 17,
+            "4": 8
+          }
+        },
+        "uncovered_ids": []
+      },
+      {
+        "identity": "15696964848687303249_4615_200_4635_200:1507241626220091",
+        "counts": {
+          "positive_native": {
+            "1": 63,
+            "2": 6,
+            "3": 31,
+            "4": 1
+          },
+          "training_roi": {
+            "1": 56,
+            "2": 6,
+            "3": 27,
+            "4": 1
+          },
+          "anchor_covered": {
+            "1": 56,
+            "2": 6,
+            "3": 22,
+            "4": 1
+          }
+        },
+        "uncovered_ids": [
+          "5G6WyBfSMgtc6wuSBA-KaA",
+          "7lxAtB-rLbntdKf6gINMsw",
+          "E4igwSrX336DekQTUZPRZg",
+          "kuSMey4RRVCUqKyMAAryig",
+          "rdc2oSOcQ7s2OiGVoS4wCw"
+        ]
+      },
+      {
+        "identity": "16977844994272847523_2140_000_2160_000:1557450679864286",
+        "counts": {
+          "positive_native": {
+            "1": 36,
+            "2": 20,
+            "3": 16,
+            "4": 7
+          },
+          "training_roi": {
+            "1": 36,
+            "2": 18,
+            "3": 14,
+            "4": 5
+          },
+          "anchor_covered": {
+            "1": 36,
+            "2": 18,
+            "3": 14,
+            "4": 5
+          }
+        },
+        "uncovered_ids": []
+      },
+      {
+        "identity": "12856053589272984699_1020_000_1040_000:1552658368873652",
+        "counts": {
+          "positive_native": {
+            "1": 41,
+            "2": 2,
+            "3": 17,
+            "4": 0
+          },
+          "training_roi": {
+            "1": 39,
+            "2": 2,
+            "3": 17,
+            "4": 0
+          },
+          "anchor_covered": {
+            "1": 39,
+            "2": 2,
+            "3": 13,
+            "4": 0
+          }
+        },
+        "uncovered_ids": [
+          "4oSIdajfTy5CLof6XUHyhg",
+          "KVZRY_I-8YALVxwN9R_ycw",
+          "P8yuA8ciHXeb6dxqW-AeAA",
+          "m6WUJKPaMTED1nhhlKV36w"
+        ]
+      },
+      {
+        "identity": "15628918650068847391_8077_670_8097_670:1508889335260598",
+        "counts": {
+          "positive_native": {
+            "1": 29,
+            "2": 2,
+            "3": 16,
+            "4": 0
+          },
+          "training_roi": {
+            "1": 27,
+            "2": 2,
+            "3": 14,
+            "4": 0
+          },
+          "anchor_covered": {
+            "1": 27,
+            "2": 2,
+            "3": 11,
+            "4": 0
+          }
+        },
+        "uncovered_ids": [
+          "an91bNDyzLsgs0PV7t3byA",
+          "dpUydZSaQERe3ulu7fhWxg",
+          "ewC_ERHqsNinSw0FhtYYqw"
+        ]
+      },
+      {
+        "identity": "7850521592343484282_4576_090_4596_090:1520908476792400",
+        "counts": {
+          "positive_native": {
+            "1": 10,
+            "2": 0,
+            "3": 11,
+            "4": 0
+          },
+          "training_roi": {
+            "1": 9,
+            "2": 0,
+            "3": 11,
+            "4": 0
+          },
+          "anchor_covered": {
+            "1": 9,
+            "2": 0,
+            "3": 10,
+            "4": 0
+          }
+        },
+        "uncovered_ids": [
+          "gSoK-8QqPK8f1iBnhhlP_w"
+        ]
+      },
+      {
+        "identity": "7921369793217703814_1060_000_1080_000:1557159628222386",
+        "counts": {
+          "positive_native": {
+            "1": 42,
+            "2": 38,
+            "3": 19,
+            "4": 0
+          },
+          "training_roi": {
+            "1": 38,
+            "2": 36,
+            "3": 14,
+            "4": 0
+          },
+          "anchor_covered": {
+            "1": 38,
+            "2": 36,
+            "3": 11,
+            "4": 0
+          }
+        },
+        "uncovered_ids": [
+          "IgjdGdzZyFvJUL8JG2aAoQ",
+          "KJW07wKHH_4-z-iPdgtg1g",
+          "N_GqPOmQfz3Wa6E3vu8CJw"
+        ]
+      },
+      {
+        "identity": "7921369793217703814_1060_000_1080_000:1557159618222385",
+        "counts": {
+          "positive_native": {
+            "1": 38,
+            "2": 42,
+            "3": 19,
+            "4": 0
+          },
+          "training_roi": {
+            "1": 33,
+            "2": 39,
+            "3": 14,
+            "4": 0
+          },
+          "anchor_covered": {
+            "1": 33,
+            "2": 39,
+            "3": 12,
+            "4": 0
+          }
+        },
+        "uncovered_ids": [
+          "IgjdGdzZyFvJUL8JG2aAoQ",
+          "N_GqPOmQfz3Wa6E3vu8CJw"
+        ]
+      },
+      {
+        "identity": "13830510593707564159_5575_000_5595_000:1518657072511849",
+        "counts": {
+          "positive_native": {
+            "1": 6,
+            "2": 0,
+            "3": 1,
+            "4": 0
+          },
+          "training_roi": {
+            "1": 4,
+            "2": 0,
+            "3": 1,
+            "4": 0
+          },
+          "anchor_covered": {
+            "1": 4,
+            "2": 0,
+            "3": 1,
+            "4": 0
+          }
+        },
+        "uncovered_ids": []
+      },
+      {
+        "identity": "11004685739714500220_2300_000_2320_000:1553640277306703",
+        "counts": {
+          "positive_native": {
+            "1": 13,
+            "2": 22,
+            "3": 10,
+            "4": 0
+          },
+          "training_roi": {
+            "1": 13,
+            "2": 22,
+            "3": 10,
+            "4": 0
+          },
+          "anchor_covered": {
+            "1": 13,
+            "2": 21,
+            "3": 8,
+            "4": 0
+          }
+        },
+        "uncovered_ids": [
+          "8-7bTNGWUlWqADUHKbnjqg",
+          "LKzoHHU1XPCsto5GeIYEXg",
+          "urmcmNZZc76A2LnemjZrcg"
+        ]
+      },
+      {
+        "identity": "3966447614090524826_320_000_340_000:1553023288374080",
+        "counts": {
+          "positive_native": {
+            "1": 37,
+            "2": 2,
+            "3": 15,
+            "4": 0
+          },
+          "training_roi": {
+            "1": 34,
+            "2": 2,
+            "3": 13,
+            "4": 0
+          },
+          "anchor_covered": {
+            "1": 34,
+            "2": 2,
+            "3": 8,
+            "4": 0
+          }
+        },
+        "uncovered_ids": [
+          "J2CrM1vPeKnFntUlPERAqQ",
+          "NPIn-kgH74nFcw5wJzMFuQ",
+          "PyGa8w8QNKWglNOE95fsnQ",
+          "XkyoaTnPOIyyAWIkRZUeEQ",
+          "mYNd4LOCSNy3TvQicQuLiQ"
+        ]
+      }
+    ],
+    "counts": {
+      "positive_native": {
+        "1": 581,
+        "2": 269,
+        "3": 266,
+        "4": 37
+      },
+      "training_roi": {
+        "1": 533,
+        "2": 255,
+        "3": 231,
+        "4": 34
+      },
+      "anchor_covered": {
+        "1": 533,
+        "2": 254,
+        "3": 202,
+        "4": 34
+      }
+    },
+    "elapsed_seconds": 4.010188175016083,
+    "peak_rss_kib": 99068,
+    "scope": "annotation-only ideal predictions for positive native GT, trainingROI GT and anchor-covered GT; diagnostic of target support, not a mathematical bound on unconstrained predictions or model evidence"
+  },
+  "native_LEVEL2_per_class": {
+    "positive_native": {
+      "1": {
+        "AP": 1.0,
+        "APH": 1.0
+      },
+      "2": {
+        "AP": 1.0,
+        "APH": 1.0
+      },
+      "3": {
+        "AP": 1.0,
+        "APH": 1.0
+      },
+      "4": {
+        "AP": 1.0,
+        "APH": 1.0
+      }
+    },
+    "training_roi": {
+      "1": {
+        "AP": 0.917384,
+        "APH": 0.917384
+      },
+      "2": {
+        "AP": 0.947955,
+        "APH": 0.947955
+      },
+      "3": {
+        "AP": 0.868421,
+        "APH": 0.868421
+      },
+      "4": {
+        "AP": 0.918919,
+        "APH": 0.918919
+      }
+    },
+    "anchor_covered": {
+      "1": {
+        "AP": 0.917384,
+        "APH": 0.917384
+      },
+      "2": {
+        "AP": 0.944238,
+        "APH": 0.944238
+      },
+      "3": {
+        "AP": 0.759399,
+        "APH": 0.759399
+      },
+      "4": {
+        "AP": 0.918919,
+        "APH": 0.918919
+      }
+    }
+  },
+  "scope": "annotation-only ideal coverage diagnostic against unchanged full native GT; no model inference/training/architecture improvement or unconstrained mathematical ceiling"
+}

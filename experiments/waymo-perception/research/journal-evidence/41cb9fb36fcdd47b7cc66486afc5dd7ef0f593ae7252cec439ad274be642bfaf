@@ -1,0 +1,41 @@
+{
+  "output_directory": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-35",
+  "manifest_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/input/manifest.json",
+  "manifest_sha256": "0466ce55c4aa24b8155ed4838ac1e89982b23e7798edacefc09f1b754c2e5849",
+  "step": 35,
+  "stage_receipts": {
+    "train": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/train-35-verified.json",
+      "sha256": "076dbeefcb34a7e9b1da019ae0d8a374faa0cefce4da22bbc849d319a209f07d"
+    },
+    "audit": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/audit-35-verified.json",
+      "sha256": "a0e78816b694656c49eb418eb74a47fc66affb52cb5251a221222129a4d9bd02"
+    },
+    "literal-loss": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/literal-loss-35-verified.json",
+      "sha256": "6c435e33f96aa47f2cadcad18dafbb686346d07f5b7c7368f75e432cfa9509aa"
+    },
+    "export": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/export-35-verified.json",
+      "sha256": "8a10627c918844afb5aa5da8093a30c77676c082129aba89c4a4a6622c35fac1"
+    },
+    "proposals": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/proposals-35-verified.json",
+      "sha256": "5af8c4f44b4cdd44b113a08626b5015680b47be6fccc42e3fc65571be06278d5"
+    },
+    "score": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-scoring-recovery-native20261003b/score-35-verified.json",
+      "sha256": "1452fc2ee41f18a50b982377ee96bbc878aee7b133d5e486891931750bc3a629"
+    },
+    "metrics-audit": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-scoring-recovery-native20261003b/metrics-audit-35-verified.json",
+      "sha256": "4fb072551224de42ea544964e17ce346a39afa86bc8826db39bc4e87f10b79f1"
+    }
+  },
+  "parent_pilot_admission": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-admission-native20261003b-recovered.json",
+    "sha256": "ecaf72cc586934e40b0fe8235ef771766666f647d211004ccd42d1e9292ab7be"
+  },
+  "scope": "restored original admitted pilot35 checkpoint; no new updates, native metrics or fitting success"
+}

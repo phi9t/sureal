@@ -1,0 +1,103 @@
+"""Frozen ticket41 protocol; callers supply independently verified input/receipt pins.
+
+This validates identity and policy, not the authenticity of a receipt. Admission
+must additionally replay/re-hash the referenced evidence in live Insula.
+"""
+import copy
+import json
+import re
+
+_SHA256 = re.compile(r"[0-9a-f]{64}\Z")
+_POLICY = {
+    "schema_version": 1,
+    "treatments": ["A0", "A1", "A2", "A3"],
+    "graph": {"initial_radius": 1, "max_radius": 3, "slots_per_cell": 8,
+              "expansion": "deficient_components", "legacy_exceptions": True},
+    "optimizer": {"name": "Adam", "lr": 1e-4, "betas": [0.9, 0.999],
+                  "eps": 1e-8, "weight_decay": 0, "foreach": False, "clip": 10},
+    "model": {"seed": 17, "bev_norm": "GN8", "pillar_norm": "BN",
+              "dtype": "float32", "tf32": False, "deterministic": True,
+              "augmentation": False, "decoder": "correctedV3"},
+    "loss": {"focal_alpha": 0.25, "focal_gamma": 2.0, "smooth_l1_beta": 1/9,
+             "direction": "canonical_legacy", "localization_weight": 2.0,
+             "direction_weight": 0.2, "normalizer": "positive_count"},
+    "costs": {"A1": "1-nearestBEVIoU", "A2": [1.0, 1.0],
+              "A3": [1.0, 2.0, 0.2, 1.0], "warmup_end": 64, "ramp_end": 256},
+    "checkpoints": {
+        "fixed": [0,25,50,100,200,300,500,750,1000,1500,2000,3000,4000,6000,8000,10000],
+        "balanced16": [0,1000,2000,4000,8000,12000,16000,24000,32000]},
+    "budgets": {"gpu_bytes": 8589934592, "rss_bytes": 17179869184,
+                "raw_bytes": 2147483648, "scientific_bytes": 16106127360,
+                "case_reserve_bytes": 2147483648, "step_seconds": 7200,
+                "native_seconds": 14400, "host_seconds": 14700,
+                "fixed_primary_updates": 2000, "fixed_updates": 10000, "balanced_updates": 32000},
+    "fit": {"classes": [1,2,3,4], "metric": "native_LEVEL2_APH", "threshold": 0.8,
+            "consecutive": 2, "terminal_required": True, "confirmation_updates": 1000},
+}
+_SCOPE = {"eligible_count": 1053, "native_count": 1279,
+          "fixed_eligible_count": 73, "frame_count": 16,
+          "class_counts": [533,255,231,34]}
+_INPUT_HASHES = ("frames_sha256", "eligible_gt_sha256", "native_gt_sha256",
+                 "fixed_frame_sha256", "baseline_sources_sha256")
+
+
+def _canonical(value):
+    try:
+        return json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False)
+    except (ValueError, TypeError) as exc:
+        raise ValueError("contract must contain finite JSON values") from exc
+
+
+def _hash(value, name):
+    if not isinstance(value, str) or not _SHA256.fullmatch(value):
+        raise ValueError(f"missing or invalid {name}")
+
+
+def prediction_alpha(completed_updates: int) -> float:
+    """Assignment for the next update uses this completed-update cursor."""
+    if type(completed_updates) is not int or completed_updates < 0:
+        raise ValueError("completed_updates must be a nonnegative integer")
+    return min(1.0, max(0.0, (completed_updates - 64) / 192))
+
+
+def validate_contract(candidate: dict, *, inputs: dict, runtime_locks: dict) -> dict:
+    """Reject scope/policy drift; return a deeply isolated validated manifest.
+
+    ``inputs`` and ``runtime_locks`` must come from verified external artifacts,
+    never from the candidate itself. SHA strings alone do not admit a runtime.
+    """
+    if not all(type(x) is dict for x in (candidate, inputs, runtime_locks)):
+        raise ValueError("manifest, inputs and runtime locks must be dictionaries")
+    _canonical(candidate)
+    for key, expected in _POLICY.items():
+        if key not in candidate or _canonical(candidate[key]) != _canonical(expected):
+            raise ValueError(f"changed study policy: {key}")
+    if set(inputs) != set(_INPUT_HASHES) | set(_SCOPE):
+        raise ValueError("incomplete or unknown input identities")
+    for key in _INPUT_HASHES:
+        _hash(inputs[key], key)
+    for key, expected in _SCOPE.items():
+        if _canonical(inputs[key]) != _canonical(expected):
+            raise ValueError(f"changed study scope: {key}")
+    if _canonical(candidate.get("inputs")) != _canonical(inputs):
+        raise ValueError("candidate input identities differ from verified inputs")
+    if set(runtime_locks) != {"cpu", "training"}:
+        raise ValueError("both CPU and training runtime admissions are required")
+    for role, lock in runtime_locks.items():
+        if type(lock) is not dict or set(lock) != {
+            "rootfs_sha256", "solver", "scipy_version", "admission_sha256"
+        }:
+            raise ValueError(f"incomplete runtime identity: {role}")
+        _hash(lock["rootfs_sha256"], role + " rootfs")
+        _hash(lock["admission_sha256"], role + " admission")
+        if lock["solver"] != "scipy.optimize.linear_sum_assignment":
+            raise ValueError(f"missing admitted SciPy solver: {role}")
+        if not isinstance(lock["scipy_version"], str) or not re.fullmatch(
+            r"\d+\.\d+\.\d+", lock["scipy_version"]
+        ):
+            raise ValueError(f"missing pinned SciPy version: {role}")
+    if runtime_locks["cpu"]["scipy_version"] != runtime_locks["training"]["scipy_version"]:
+        raise ValueError("solver versions differ across preparation and training")
+    if _canonical(candidate.get("runtime_locks")) != _canonical(runtime_locks):
+        raise ValueError("candidate runtime identities differ from admissions")
+    return copy.deepcopy(candidate)

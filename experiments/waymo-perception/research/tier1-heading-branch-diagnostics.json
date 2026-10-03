@@ -1,0 +1,26 @@
+{
+  "1": {
+    "positive_anchors": 338,
+    "raw_outside_canonical_period": 0,
+    "opposite_direction_after_legacy_correction": 7,
+    "opposite_direction_after_fixed_correction": 7
+  },
+  "2": {
+    "positive_anchors": 30,
+    "raw_outside_canonical_period": 12,
+    "opposite_direction_after_legacy_correction": 12,
+    "opposite_direction_after_fixed_correction": 0
+  },
+  "3": {
+    "positive_anchors": 16,
+    "raw_outside_canonical_period": 5,
+    "opposite_direction_after_legacy_correction": 5,
+    "opposite_direction_after_fixed_correction": 0
+  },
+  "4": {
+    "positive_anchors": 6,
+    "raw_outside_canonical_period": 0,
+    "opposite_direction_after_legacy_correction": 0,
+    "opposite_direction_after_fixed_correction": 0
+  }
+}

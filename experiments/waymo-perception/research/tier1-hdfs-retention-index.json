@@ -1,0 +1,219 @@
+{
+  "run": "tier1-overfit20261002b",
+  "closed_trained_cases": 15,
+  "results_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+  "closure_sha256": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+  "cases": {
+    "baseline": {
+      "publication_manifest_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-baseline-45d18c10b5aa46eea396a6a964f2da8c/publication-manifest.json",
+      "publication_manifest_sha256": "ecc8a3cba326107fea2d0a8ae88e207cbe0b995cd5dde6eb500402be86355a4d",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-baseline-45d18c10b5aa46eea396a6a964f2da8c/verified-publication.json",
+      "publication_receipt_sha256": "8e569a2e8ba238da8f315210b022542dc79bff2c7d1c56ab5b3f3cbbfef0e414",
+      "release_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-baseline-45d18c10b5aa46eea396a6a964f2da8c/release-completed.json",
+      "release_receipt_sha256": "b4c3d4b251b468401a7ff90baf254b88d7bb3318dcc2088b7602b72192a28eb2",
+      "released_member_count": 225,
+      "released_payload_bytes": 112037515,
+      "archive_hdfs_uris": [
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-baseline-45d18c10b5aa46eea396a6a964f2da8c/0ff71c24631a639a1d18af5a2020a5522fcc1e0a5dc6da8fe8a26adff523592e/archive.tar.gz",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-baseline-45d18c10b5aa46eea396a6a964f2da8c/ee20f60de64794327d29cd4b999b8f01d4d9c48fe713e59bd1dd72e962329684/archive.tar.gz"
+      ]
+    },
+    "class_balanced_focal": {
+      "publication_manifest_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-class_balanced_focal-bf1649b42fa94ecbace4b0eac18d4328/publication-manifest.json",
+      "publication_manifest_sha256": "2da3a9df6aa052481309b789f6e64efbdcff0850d9f52ac1e7076563fe3a589e",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-class_balanced_focal-bf1649b42fa94ecbace4b0eac18d4328/verified-publication.json",
+      "publication_receipt_sha256": "38fa4244b91bd63116284d73d1dc82f9a4a7949ecec0d67b43ba1ff321633a70",
+      "release_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-class_balanced_focal-bf1649b42fa94ecbace4b0eac18d4328/release-completed.json",
+      "release_receipt_sha256": "0ea99595e15cd22b6f5bf735339e272fcb44f01c7de0f20128043a743a24550b",
+      "released_member_count": 141,
+      "released_payload_bytes": 110237394,
+      "archive_hdfs_uris": [
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-class_balanced_focal-bf1649b42fa94ecbace4b0eac18d4328/494a0b680b742021614be3fab4f1e738bf8e253ed36009813b08146aa0fbcb4b/archive.tar.gz",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-class_balanced_focal-bf1649b42fa94ecbace4b0eac18d4328/c0036a8ecf0ec8f4ba33ba09c53ad676b1ff437e1486912b2555f67835fd3331/archive.tar.gz"
+      ]
+    },
+    "coarse_mlp": {
+      "publication_manifest_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-coarse_mlp-f48853b6dc714ca7b32bb7729bb2f5cd/publication-manifest.json",
+      "publication_manifest_sha256": "92d15389dfee400583248b80bcac4fc1dfc60a68f7eebac33dfdea11270b8441",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-coarse_mlp-f48853b6dc714ca7b32bb7729bb2f5cd/verified-publication.json",
+      "publication_receipt_sha256": "837076e61b5835c9d12e13702fc02afb1ae244dd8396d7c46de27912ed988176",
+      "release_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-coarse_mlp-f48853b6dc714ca7b32bb7729bb2f5cd/release-completed.json",
+      "release_receipt_sha256": "60255ac4cc7f8177fe472721025ba70b0b44635c5d9268c3b9a6098a8d4b73d2",
+      "released_member_count": 141,
+      "released_payload_bytes": 113398170,
+      "archive_hdfs_uris": [
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-coarse_mlp-f48853b6dc714ca7b32bb7729bb2f5cd/b319fa009900b144b63ffcc8bd97812556c0ff52e8b61b134b686e444facf041/archive.tar.gz",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-coarse_mlp-f48853b6dc714ca7b32bb7729bb2f5cd/ba7840c194db7d955939e0b04cba7649e9a8ced73577e60609ab6a8138c9a385/archive.tar.gz"
+      ]
+    },
+    "context_pfn": {
+      "publication_manifest_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-context_pfn-7ec0b8c679734a218ebaee050a52abb2/publication-manifest.json",
+      "publication_manifest_sha256": "3e70d6edb20b3f4f75a1b2b4a802e759b08d13c5b1b8122c3ced880b0f0d94af",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-context_pfn-7ec0b8c679734a218ebaee050a52abb2/verified-publication.json",
+      "publication_receipt_sha256": "53435731fddf19a549753cef2f3ada06db33d870a9736d48225bd7c1a7e0f2c3",
+      "release_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-context_pfn-7ec0b8c679734a218ebaee050a52abb2/release-completed.json",
+      "release_receipt_sha256": "907faf8a779a383a114ad9aa3785860e98b96a33df05651ae9e17e2ddd624565",
+      "released_member_count": 141,
+      "released_payload_bytes": 110455214,
+      "archive_hdfs_uris": [
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-context_pfn-7ec0b8c679734a218ebaee050a52abb2/5c66b3460756515803bfec4340cb73982d36722ccd5b62406624553119a4f037/archive.tar.gz",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-context_pfn-7ec0b8c679734a218ebaee050a52abb2/671e9a3fc48dba152472eb53a16506c6786bc120bf625c5ab41df111be484f04/archive.tar.gz"
+      ]
+    },
+    "deep_pfn": {
+      "publication_manifest_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-deep_pfn-7f4c4ebe80254539922e018ff9baef4d/publication-manifest.json",
+      "publication_manifest_sha256": "c85fbcca7cb66ca00bd0cb426a4b9a1aa0167d9feb3be9329f6d0b9a9037b794",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-deep_pfn-7f4c4ebe80254539922e018ff9baef4d/verified-publication.json",
+      "publication_receipt_sha256": "d336aab198dc56b7ed2ba8f06f9ca086b8bf8649a3fe926cacaf53047149752a",
+      "release_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-deep_pfn-7f4c4ebe80254539922e018ff9baef4d/release-completed.json",
+      "release_receipt_sha256": "0fae136dd8688501061cbef3993dd5f55ea27a45ee448d88eda5863edc202ad9",
+      "released_member_count": 143,
+      "released_payload_bytes": 110322540,
+      "archive_hdfs_uris": [
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-deep_pfn-7f4c4ebe80254539922e018ff9baef4d/57ea30d170a175c725277b049adcb2defcf5da92a991e1dfd8daedc9fb03331f/archive.tar.gz",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-deep_pfn-7f4c4ebe80254539922e018ff9baef4d/98ec3be05c168b08023f4f01785aaf0157bf5f79f5217995bd167607bf54dfdc/archive.tar.gz"
+      ]
+    },
+    "foreground_prior": {
+      "publication_manifest_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-foreground_prior-18ba41c2a48b44b188457cfbdb0a3b96/publication-manifest.json",
+      "publication_manifest_sha256": "1010f1ea842a3864e1aaed66abb3032d284df91623727fc03883971c1865b519",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-foreground_prior-18ba41c2a48b44b188457cfbdb0a3b96/verified-publication.json",
+      "publication_receipt_sha256": "f4e73ed42ee6af2e5e8d3d98e89b686ceff5f8e80771ce62b82fd7c8d6c78f6d",
+      "release_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-foreground_prior-18ba41c2a48b44b188457cfbdb0a3b96/release-completed.json",
+      "release_receipt_sha256": "c9715cb3d9d1a3bd3ecefd0b128e5d209d3e68e51f186cd7f45c580a619bf0ed",
+      "released_member_count": 158,
+      "released_payload_bytes": 109086380,
+      "archive_hdfs_uris": [
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-foreground_prior-18ba41c2a48b44b188457cfbdb0a3b96/269de5a05a46b920c54912a8b0f1d87d54a742e9969233bc32ce7b77d9956c63/archive.tar.gz",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-foreground_prior-18ba41c2a48b44b188457cfbdb0a3b96/c1ac425cfc46b854e39f876ed134c5deb6f26f8c391477ab34fd27228843897f/archive.tar.gz"
+      ]
+    },
+    "full_bn": {
+      "publication_manifest_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-full_bn-72927f0d44bf4177bb7410487730dbf7/publication-manifest.json",
+      "publication_manifest_sha256": "b185274bad6f59262f782626694f0c7b9a15b3b907f6637fd6bf128d19822d5f",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-full_bn-72927f0d44bf4177bb7410487730dbf7/verified-publication.json",
+      "publication_receipt_sha256": "d7ab4cb173ccfd2d757fee4da71450e359a3288a0551cafb8d160eef1ff0476b",
+      "release_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-full_bn-72927f0d44bf4177bb7410487730dbf7/release-completed.json",
+      "release_receipt_sha256": "5bd393bd3e29de32f66ff4003124b25fc89d836e3cf5f751bdf4518677cee8ec",
+      "released_member_count": 209,
+      "released_payload_bytes": 105484729,
+      "archive_hdfs_uris": [
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-full_bn-72927f0d44bf4177bb7410487730dbf7/72d92bddc5a4a4bfa65dd378b6d5cdea022c1b066216cdee7c731097947c8856/archive.tar.gz",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-full_bn-72927f0d44bf4177bb7410487730dbf7/bf18458cfb423097a99d6c828c58b15ad235206f4180c4d8353423e41800791d/archive.tar.gz"
+      ]
+    },
+    "lr3e4": {
+      "publication_manifest_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-lr3e4-801f02ddec9a413fb50fb1fb6be91716/publication-manifest.json",
+      "publication_manifest_sha256": "368201b263d555a880f5612c35e12694e98e661b764286e4938f1ca56d7a3732",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-lr3e4-801f02ddec9a413fb50fb1fb6be91716/verified-publication.json",
+      "publication_receipt_sha256": "7097a9248cbba79e1cf2a37f00b22d8c6ac8556821397605a6684b803f59dd41",
+      "release_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-lr3e4-801f02ddec9a413fb50fb1fb6be91716/release-completed.json",
+      "release_receipt_sha256": "7c0d72d228f54ac1d1cab35d0bb8b77070ba06c78ca91062f78e1904d974d964",
+      "released_member_count": 141,
+      "released_payload_bytes": 109668042,
+      "archive_hdfs_uris": [
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-lr3e4-801f02ddec9a413fb50fb1fb6be91716/9c825ea2e3d53aef2bbd07e2b16a9591027dea3431220a280f974c006e2a35ba/archive.tar.gz",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-lr3e4-801f02ddec9a413fb50fb1fb6be91716/e8f16d128ee12e9250f82c52a8f44566e32337cd6c482d8b79191069861e16e0/archive.tar.gz"
+      ]
+    },
+    "masked_pfn": {
+      "publication_manifest_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-masked_pfn-c006662b541946f180b562890dc0edec/publication-manifest.json",
+      "publication_manifest_sha256": "0397a1a0822f38bdc647dab65d6e08f4a3e3d550e111d16511b55c826baa8993",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-masked_pfn-c006662b541946f180b562890dc0edec/verified-publication.json",
+      "publication_receipt_sha256": "a3c72f0c5df5b62b45feb50fd22e40b89f4708ccddc09cc906dcb353c9c945fe",
+      "release_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-masked_pfn-c006662b541946f180b562890dc0edec/release-completed.json",
+      "release_receipt_sha256": "f336866a7316a1a93fa78876a7202c60a5a6251f303ae502b14f93e3c3635ab4",
+      "released_member_count": 141,
+      "released_payload_bytes": 110203229,
+      "archive_hdfs_uris": [
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-masked_pfn-c006662b541946f180b562890dc0edec/7c997e28e414dad8e3e1f7f3c8a4d22b7303603db27a88e34743b831c1081aec/archive.tar.gz",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-masked_pfn-c006662b541946f180b562890dc0edec/b074c91a25cc686e61b9d5cd5283846ca85d00f998e106e1f4cabc60a5ba928d/archive.tar.gz"
+      ]
+    },
+    "no_clip": {
+      "publication_manifest_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-no_clip-3d492ecb9298484cbfb49b5c3abd74ab/publication-manifest.json",
+      "publication_manifest_sha256": "2156111aa5e11a8c648fd7eb8293111a8cb8b74abe42ac300baca1b9768e8b91",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-no_clip-3d492ecb9298484cbfb49b5c3abd74ab/verified-publication.json",
+      "publication_receipt_sha256": "f6b7368a796d4bd92f39a5a7ea794a8b03a234ff2d28a79389304d1d9d23f422",
+      "release_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-no_clip-3d492ecb9298484cbfb49b5c3abd74ab/release-completed.json",
+      "release_receipt_sha256": "d00fe1c82166a0d015367937bcd98b395b7d634f98884aa016c4ea14a915c286",
+      "released_member_count": 226,
+      "released_payload_bytes": 112689747,
+      "archive_hdfs_uris": [
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-no_clip-3d492ecb9298484cbfb49b5c3abd74ab/38f07b68c4e1ec1fecef2e435c4559d88bce689566fa5921a2df1201c9d63219/archive.tar.gz",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-no_clip-3d492ecb9298484cbfb49b5c3abd74ab/9028e93ab5cb1684baaca359a2949e6973972c57221c2f94a7bba1bbc26c8caf/archive.tar.gz"
+      ]
+    },
+    "no_norm": {
+      "publication_manifest_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-no_norm-ce9dc40265b64191bfc097523e3ad091/publication-manifest.json",
+      "publication_manifest_sha256": "9d70fd274da93e4c7c5e39409852b294e5fc2672522a6bce3641db230f3ac306",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-no_norm-ce9dc40265b64191bfc097523e3ad091/verified-publication.json",
+      "publication_receipt_sha256": "29ed20fdbe8cb2661a78af3bb3f424832f60d850e27ebf29fb8d71a73829abf7",
+      "release_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-no_norm-ce9dc40265b64191bfc097523e3ad091/release-completed.json",
+      "release_receipt_sha256": "524bb850d9d441d32838cbe340905ee43f4bef372167684649d6d94fe559193b",
+      "released_member_count": 260,
+      "released_payload_bytes": 108899436,
+      "archive_hdfs_uris": [
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-no_norm-ce9dc40265b64191bfc097523e3ad091/40818eb3a70b6ab8fbf43faa6c56e0aabdd651d81158ebd9adfa854c5880fc16/archive.tar.gz",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-no_norm-ce9dc40265b64191bfc097523e3ad091/5ac284e626a443c3f4e624c823211d48c812c4af12101ec1305bc71807bfd2da/archive.tar.gz"
+      ]
+    },
+    "point_ln": {
+      "publication_manifest_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-point_ln-74d9ca39dd674ec483b13291da306939/publication-manifest.json",
+      "publication_manifest_sha256": "ec603c775e04495f5797a536cab99423663c9f9e238e372cc7aebb5efbb8a5be",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-point_ln-74d9ca39dd674ec483b13291da306939/verified-publication.json",
+      "publication_receipt_sha256": "2f909f2050bbd9c97d48ba50e49c4fe431f2d981219fd855686b94bff6f719b8",
+      "release_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-point_ln-74d9ca39dd674ec483b13291da306939/release-completed.json",
+      "release_receipt_sha256": "0c2fb6f2431d95124804eb0dc21329f77d68a33fc26872033b9945e62060d964",
+      "released_member_count": 141,
+      "released_payload_bytes": 110311436,
+      "archive_hdfs_uris": [
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-point_ln-74d9ca39dd674ec483b13291da306939/7b77106ac7a0d3e5618de3a6a0940b074e17ecdee24e00001a2c83634ab17ec5/archive.tar.gz",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-point_ln-74d9ca39dd674ec483b13291da306939/836d873a91d1ef8ed061754c5651c5abac7e63fbd80ec922b0149c678812ad78/archive.tar.gz"
+      ]
+    },
+    "residual_bev": {
+      "publication_manifest_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-residual_bev-74e369255cf141e9b5786d3ca31ed414/publication-manifest.json",
+      "publication_manifest_sha256": "1055e14faefa2732ca627e001fb0dbc5eca4040ab841356d2361661cc59438b5",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-residual_bev-74e369255cf141e9b5786d3ca31ed414/verified-publication.json",
+      "publication_receipt_sha256": "bacdec21ab9552b69163ef6f8ee473a65530a78bf4f3bb269411cb053884d9e9",
+      "release_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-residual_bev-74e369255cf141e9b5786d3ca31ed414/release-completed.json",
+      "release_receipt_sha256": "36f6db7f35b93827f74c481ec613d19cfadb0b667f0d7bb0660bc83941b9fc4d",
+      "released_member_count": 141,
+      "released_payload_bytes": 109018298,
+      "archive_hdfs_uris": [
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-residual_bev-74e369255cf141e9b5786d3ca31ed414/8d7cbd49a6283c97420c6381fc1efd6ae78cce907309346453877ef26c375e9e/archive.tar.gz",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-residual_bev-74e369255cf141e9b5786d3ca31ed414/a8ea50f3475778cf35b30d639c6ec1575100b359308938697ea4b13c8d11a2aa/archive.tar.gz"
+      ]
+    },
+    "retain64": {
+      "publication_manifest_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-retain64-c9904a010b7a4cfd891f9135867b8b0a/publication-manifest.json",
+      "publication_manifest_sha256": "dabb37dd8aa8c3f4430e1f8f711d97c9d9186a40c3e7750502a798b7a2fb79e4",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-retain64-c9904a010b7a4cfd891f9135867b8b0a/verified-publication.json",
+      "publication_receipt_sha256": "a3015b4bb09c2f90a1d35aa8ab4f39f2e3b5656819587659892e163a9c4a67a0",
+      "release_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-retain64-c9904a010b7a4cfd891f9135867b8b0a/release-completed.json",
+      "release_receipt_sha256": "b1fce42cd6e073eb6b6e2ab4f23b18053a4b086da9e9305f4f3d55b58e9d6c93",
+      "released_member_count": 141,
+      "released_payload_bytes": 110247220,
+      "archive_hdfs_uris": [
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-retain64-c9904a010b7a4cfd891f9135867b8b0a/193a4cfaf39d91a8498528c845e9cab6de851710ff0d9d0aa011212b114db11b/archive.tar.gz",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-retain64-c9904a010b7a4cfd891f9135867b8b0a/bb3c294b32edcfafd46f9872980577800da8676eefe3ac27ea940de53d942edf/archive.tar.gz"
+      ]
+    },
+    "window_bev": {
+      "publication_manifest_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-window_bev-69c531c1265b4693876268a8ff5975f1/publication-manifest.json",
+      "publication_manifest_sha256": "49a517d8e3ed3a57e360b21a4f5317b84eca4a0d283045ad23de653abc6552ed",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-window_bev-69c531c1265b4693876268a8ff5975f1/verified-publication.json",
+      "publication_receipt_sha256": "065862d447188d44892d085385826281980a1f9683137922e94e06a45010228e",
+      "release_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-tier1-overfit20261002b-window_bev-69c531c1265b4693876268a8ff5975f1/release-completed.json",
+      "release_receipt_sha256": "588b6c3221e6846964a144160d25f692fe90d492f7b8db33ca594ab7a74c03a7",
+      "released_member_count": 141,
+      "released_payload_bytes": 113566722,
+      "archive_hdfs_uris": [
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-window_bev-69c531c1265b4693876268a8ff5975f1/147bddc88e32d484b2a0ccebe38a6e11e192f0e5f4e158eb79c59fb8935ed305/archive.tar.gz",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/tier1-overfit20261002b-window_bev-69c531c1265b4693876268a8ff5975f1/fb7f1c3f3e5f70d5ec7298ef9ae1ac0903ade4a6649e6ecc80cb8095e9bcdd31/archive.tar.gz"
+      ]
+    }
+  },
+  "scope": "host revalidation of existing independently live-verified upload/download/rehydration and release receipts; remote objects not transferred again by this index"
+}

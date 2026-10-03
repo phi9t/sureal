@@ -1,0 +1,44 @@
+import hashlib,json,os,shutil,signal,sys,time,traceback
+from pathlib import Path
+P=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception')
+run=sys.argv[1];R=Path('/tmp')/run;R.mkdir();shutil.copytree(P/'resources',R/'host-code/resources');sys.path[:0]=[str(R/'host-code'),str(P)]
+from resources.scoped_stage import run_scoped
+from resources.stage_accounting import admit_worker
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cpu_authority=P/'research/balanced16-sustained-candidate-live-verified.json';cpu_lock=json.loads(cpu_authority.read_text())['runtime_lock'];cpu_root=Path.home()/'.cache/waystone/waymo-perception/insula/rootfs-v2';verify_rootfs(cpu_root,cpu_lock['rootfs_sha256'])
+report={'runtime_lock':cpu_lock,'runtime_authority':{'path':str(cpu_authority),'sha256':sha(cpu_authority)},'host_dependency_pins':{str(p):sha(p) for p in (P/'pipeline').glob('*.py')},'fresh_rootfs_verification':True,'cases':[],'source_pins':{str(p):sha(p) for p in (R/'host-code').rglob('*.py')},'host_driver_sha256':sha(__file__),'artifacts':{}}
+for kind in ['detached-success','detached-timeout','live-insula-positive']:
+ case=R/kind;case.mkdir();code=case/'code';code.mkdir();(case/'input').mkdir();output=case/'output';output.mkdir();pidfile=case/'child.pid';marker=case/'late-write'
+ child='import time;time.sleep(.4);open('+repr(str(marker))+',"w").write("escaped");time.sleep(5)'
+ parent='import subprocess,sys;child=subprocess.Popen([sys.executable,"-c",'+repr(child)+'],start_new_session=True);open('+repr(str(pidfile))+',"w").write(str(child.pid))'
+ command=[sys.executable,'-c',parent+(';import time;time.sleep(5)' if kind=='detached-timeout' else '')]
+ if kind=='live-insula-positive':
+  worker=code/'probe.py';worker.write_text('import importlib.util,json,resource,subprocess,sys\nassert importlib.util.find_spec("tensorflow") is None\nsubprocess.run([sys.executable,"-c","x=bytearray(16*1024**2)"],check=True)\nx=bytearray(16*1024**2)\nprint(json.dumps({"tensorflow_absent":True,"peak":resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}),flush=True)\n')
+  command=launch_plan(cpu_root,code,case/'input',output,['python','/experiment/probe.py'])
+  resource_output=case/'worker-resources';resource_output.mkdir();i=command.index('--');command[i:i]=['--ro-bind',str(R/'host-code/resources'),'/tmp/resource-layer','--bind',str(resource_output),'/tmp/resource-output'];i=command.index('--');command[i+2:i+2]=['/tmp/resource-layer/execute_worker.py','/tmp/resource-output']
+ record={'kind':kind,'command':command}
+ try:
+  with (output/'live.log').open('w') as stream:result=run_scoped(command,cwd=code,stream=stream,timeout=.15 if kind=='detached-timeout' else 10,cap_bytes=134217728)
+  record['measurement']=result
+  if kind=='live-insula-positive':
+   worker_resource=json.loads((resource_output/'worker-resource.json').read_text());record['worker_resource']=worker_resource;record['admission']=admit_worker(result,worker_resource,command,['/experiment/probe.py'],134217728)
+   assert json.loads((output/'live.log').read_text())['tensorflow_absent'];assert result['stage_lifecycle']['remaining_children']==[];assert worker_resource['child_lifecycle']['remaining_children']==[]
+  else:
+   assert 'resource_admission' not in result
+   time.sleep(.6);assert not marker.exists(),'detached child survived the measured stage'
+  record['passed']=True
+ except BaseException:
+  record['passed']=False;record['failure']=traceback.format_exc()
+ finally:
+  if pidfile.exists():
+   try:os.kill(int(pidfile.read_text()),signal.SIGKILL)
+   except ProcessLookupError:pass
+  report['cases'].append(record)
+  for p in case.rglob('*'):
+   if p.is_file():report['artifacts'][str(p)]=sha(p)
+report['passed']=all(c['passed'] for c in report['cases']);report['scope']='real kernel-capped host descendant refusal/cleanup and positive TensorFlow-free live CPU Insula; not full-controller admission'
+(P/'research'/f'{run}-verified.json').write_text(json.dumps(report,indent=2)+'\n')
+print(json.dumps({c['kind']:{'passed':c['passed'],'failure':c.get('failure')} for c in report['cases']},indent=2),flush=True)
+sys.exit(0 if report['passed'] else 1)

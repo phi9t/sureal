@@ -1,0 +1,14 @@
+{
+  "command": [
+    "python",
+    "cohort/admit_sustained.py",
+    "--run-id",
+    "preparation20261003b"
+  ],
+  "exit_code": 1,
+  "stderr": "Traceback (most recent call last):\n  File \"/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/cohort/admit_sustained.py\", line 72, in <module>\n    if __name__=='__main__':main()\n                            ^^^^^^\n  File \"/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/cohort/admit_sustained.py\", line 21, in main\n    lock=(C/'insula/architecture-experiments.lock').open('a');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)\n                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nBlockingIOError: [Errno 11] Resource temporarily unavailable\n",
+  "launcher_sha256": "6cb53eb2f1ce5dd1c98980643b1d4fae6b0ef4358bca25d2478c3b525d1d6772",
+  "live_processes": "    PID     ELAPSED COMMAND\n  86356    03:36:21 python /data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/advanced/run.py --run-id expanded20261002a\n4029172    03:45:45 python experiments/waymo-perception/scripts/run-expanded-matrix.py\n",
+  "no_run_or_payload_created": true,
+  "scope": "host serialization refusal while specific expanded processes live; no native GPU admission"
+}

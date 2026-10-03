@@ -1,0 +1,330 @@
+{
+  "cases": [
+    {
+      "kind": "detached-success",
+      "command": [
+        "/usr/local/bin/python",
+        "-c",
+        "import subprocess,sys;child=subprocess.Popen([sys.executable,\"-c\",'import time;time.sleep(.4);open(\\'/tmp/sustained-resource-scoped-lifecycle-green-v2/detached-success/late-write\\',\"w\").write(\"escaped\");time.sleep(5)'],start_new_session=True);open('/tmp/sustained-resource-scoped-lifecycle-green-v2/detached-success/child.pid',\"w\").write(str(child.pid))"
+      ],
+      "measurement": {
+        "command": [
+          "/usr/local/bin/python",
+          "-c",
+          "import subprocess,sys;child=subprocess.Popen([sys.executable,\"-c\",'import time;time.sleep(.4);open(\\'/tmp/sustained-resource-scoped-lifecycle-green-v2/detached-success/late-write\\',\"w\").write(\"escaped\");time.sleep(5)'],start_new_session=True);open('/tmp/sustained-resource-scoped-lifecycle-green-v2/detached-success/child.pid',\"w\").write(str(child.pid))"
+        ],
+        "exit_code": 0,
+        "timed_out": false,
+        "peak_rss_kib": 25820,
+        "elapsed_seconds": 0.03158527601044625,
+        "measurement": "wait4.ru_maxrss_KiB_largest_waited_child",
+        "completed_launcher_descendants": [],
+        "kernel_scope": {
+          "path": "/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-lifecycle-green20261003b.scope",
+          "memory_max_bytes": 134217728,
+          "memory_swap_max_bytes": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "members_verified": true,
+          "kernel_events": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0
+          },
+          "process_ids": [
+            2833440,
+            2833454
+          ]
+        },
+        "stage_lifecycle": {
+          "caller_pid": 2833440,
+          "scope_members_before": [
+            2833440
+          ],
+          "scope_members_after": [
+            2833440,
+            2833454
+          ],
+          "remaining_children": [
+            2833454
+          ],
+          "subreaper_verified": false
+        },
+        "cleanup": {
+          "complete": true,
+          "terminated_process_ids": [
+            2833454
+          ]
+        },
+        "lifecycle_violation": true
+      },
+      "passed": true
+    },
+    {
+      "kind": "detached-timeout",
+      "command": [
+        "/usr/local/bin/python",
+        "-c",
+        "import subprocess,sys;child=subprocess.Popen([sys.executable,\"-c\",'import time;time.sleep(.4);open(\\'/tmp/sustained-resource-scoped-lifecycle-green-v2/detached-timeout/late-write\\',\"w\").write(\"escaped\");time.sleep(5)'],start_new_session=True);open('/tmp/sustained-resource-scoped-lifecycle-green-v2/detached-timeout/child.pid',\"w\").write(str(child.pid));import time;time.sleep(5)"
+      ],
+      "measurement": {
+        "command": [
+          "/usr/local/bin/python",
+          "-c",
+          "import subprocess,sys;child=subprocess.Popen([sys.executable,\"-c\",'import time;time.sleep(.4);open(\\'/tmp/sustained-resource-scoped-lifecycle-green-v2/detached-timeout/late-write\\',\"w\").write(\"escaped\");time.sleep(5)'],start_new_session=True);open('/tmp/sustained-resource-scoped-lifecycle-green-v2/detached-timeout/child.pid',\"w\").write(str(child.pid));import time;time.sleep(5)"
+        ],
+        "exit_code": -15,
+        "timed_out": true,
+        "peak_rss_kib": 25820,
+        "elapsed_seconds": 0.1647406420088373,
+        "measurement": "wait4.ru_maxrss_KiB_largest_waited_child",
+        "completed_launcher_descendants": [],
+        "kernel_scope": {
+          "path": "/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-lifecycle-green20261003b.scope",
+          "memory_max_bytes": 134217728,
+          "memory_swap_max_bytes": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "members_verified": true,
+          "kernel_events": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0
+          },
+          "process_ids": [
+            2833440,
+            2833495
+          ]
+        },
+        "stage_lifecycle": {
+          "caller_pid": 2833440,
+          "scope_members_before": [
+            2833440
+          ],
+          "scope_members_after": [
+            2833440,
+            2833495
+          ],
+          "remaining_children": [
+            2833495
+          ],
+          "subreaper_verified": false
+        },
+        "cleanup": {
+          "complete": true,
+          "terminated_process_ids": [
+            2833495
+          ]
+        },
+        "lifecycle_violation": true
+      },
+      "passed": true
+    },
+    {
+      "kind": "live-insula-positive",
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/tmp/sustained-resource-scoped-lifecycle-green-v2/live-insula-positive/code",
+        "/experiment",
+        "--ro-bind",
+        "/tmp/sustained-resource-scoped-lifecycle-green-v2/live-insula-positive/input",
+        "/source",
+        "--bind",
+        "/tmp/sustained-resource-scoped-lifecycle-green-v2/live-insula-positive/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/tmp/sustained-resource-scoped-lifecycle-green-v2/host-code/resources",
+        "/tmp/resource-layer",
+        "--bind",
+        "/tmp/sustained-resource-scoped-lifecycle-green-v2/live-insula-positive/worker-resources",
+        "/tmp/resource-output",
+        "--",
+        "python",
+        "/tmp/resource-layer/execute_worker.py",
+        "/tmp/resource-output",
+        "/experiment/probe.py"
+      ],
+      "measurement": {
+        "command": [
+          "bwrap",
+          "--unshare-all",
+          "--die-with-parent",
+          "--ro-bind",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+          "/",
+          "--ro-bind",
+          "/tmp/sustained-resource-scoped-lifecycle-green-v2/live-insula-positive/code",
+          "/experiment",
+          "--ro-bind",
+          "/tmp/sustained-resource-scoped-lifecycle-green-v2/live-insula-positive/input",
+          "/source",
+          "--bind",
+          "/tmp/sustained-resource-scoped-lifecycle-green-v2/live-insula-positive/output",
+          "/outputs",
+          "--proc",
+          "/proc",
+          "--dev",
+          "/dev",
+          "--tmpfs",
+          "/tmp",
+          "--clearenv",
+          "--setenv",
+          "HOME",
+          "/tmp/private-home",
+          "--setenv",
+          "PATH",
+          "/usr/local/bin:/usr/bin:/bin",
+          "--setenv",
+          "PYTHONNOUSERSITE",
+          "1",
+          "--setenv",
+          "PYTHONDONTWRITEBYTECODE",
+          "1",
+          "--setenv",
+          "PYTHONPATH",
+          "/experiment",
+          "--chdir",
+          "/experiment",
+          "--ro-bind",
+          "/tmp/sustained-resource-scoped-lifecycle-green-v2/host-code/resources",
+          "/tmp/resource-layer",
+          "--bind",
+          "/tmp/sustained-resource-scoped-lifecycle-green-v2/live-insula-positive/worker-resources",
+          "/tmp/resource-output",
+          "--",
+          "python",
+          "/tmp/resource-layer/execute_worker.py",
+          "/tmp/resource-output",
+          "/experiment/probe.py"
+        ],
+        "exit_code": 0,
+        "timed_out": false,
+        "peak_rss_kib": 30344,
+        "elapsed_seconds": 0.11382109497208148,
+        "measurement": "wait4.ru_maxrss_KiB_largest_waited_child",
+        "completed_launcher_descendants": [
+          {
+            "pid": 2833549,
+            "peak_rss_kib": 30344
+          }
+        ],
+        "kernel_scope": {
+          "path": "/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-lifecycle-green20261003b.scope",
+          "memory_max_bytes": 134217728,
+          "memory_swap_max_bytes": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "members_verified": true,
+          "kernel_events": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0
+          },
+          "process_ids": [
+            2833440
+          ]
+        },
+        "stage_lifecycle": {
+          "caller_pid": 2833440,
+          "scope_members_before": [
+            2833440
+          ],
+          "scope_members_after": [
+            2833440
+          ],
+          "remaining_children": [],
+          "subreaper_verified": true
+        },
+        "resource_admission": {
+          "peak_rss_bytes": 31072256,
+          "aggregate_cap_bytes": 134217728,
+          "scope": "largest waited-child RSS plus external aggregate kernel cap; not tree RSS sum"
+        }
+      },
+      "worker_resource": {
+        "worker_argv": [
+          "/experiment/probe.py"
+        ],
+        "worker_pid": 2,
+        "measurement": "in-runtime getrusage SELF and waited CHILDREN KiB",
+        "self_peak_rss_kib": 30344,
+        "waited_child_peak_rss_kib": 24844,
+        "peak_rss_kib": 30344,
+        "elapsed_seconds": 0.037137870967853814,
+        "exit_code": 0,
+        "child_lifecycle": {
+          "subreaper_verified": true,
+          "remaining_children": [],
+          "contract": "all created descendants completed and waited; detached children unsupported"
+        },
+        "scope": "worker process and largest waited child; not simultaneous tree RSS sum"
+      },
+      "admission": {
+        "peak_rss_bytes": 31072256,
+        "aggregate_cap_bytes": 134217728,
+        "scope": "separate launcher and in-runtime worker/waited-child peaks under aggregate kernel cap; not summed tree RSS"
+      },
+      "passed": true
+    }
+  ],
+  "source_pins": {
+    "/tmp/sustained-resource-scoped-lifecycle-green-v2/host-code/resources/kernel_scope.py": "4a9f8440b91ce8203e3f9bbc25dbe25dad83a33378544e4ede61412f9e1f2e89",
+    "/tmp/sustained-resource-scoped-lifecycle-green-v2/host-code/resources/test_kernel_scope.py": "e5ff0b3b67a3b85a5799da096078ac7e07454d6230e16cace99282b96285f9a8",
+    "/tmp/sustained-resource-scoped-lifecycle-green-v2/host-code/resources/test_stage_accounting.py": "8a28c803161b28318b23a6caea03024d6ceff782d187f81a54850d4d22da8a86",
+    "/tmp/sustained-resource-scoped-lifecycle-green-v2/host-code/resources/scoped_stage.py": "e8c170bfcf0e6cd9202444ca310b5964cc00d4deb00beb212add02f8a2664e2e",
+    "/tmp/sustained-resource-scoped-lifecycle-green-v2/host-code/resources/test_scoped_stage.py": "1a5a0120e5f77b4e2b4f737e242e45ef9f379ad7e96208cc2dc782e3af4ff149",
+    "/tmp/sustained-resource-scoped-lifecycle-green-v2/host-code/resources/test_execute_worker.py": "26c1e44dacf7056498c5f4deb2c8a06b91830848aeb5d63f0819380bc98ae2d3",
+    "/tmp/sustained-resource-scoped-lifecycle-green-v2/host-code/resources/execute_worker.py": "b4a746f941944d4342ade71f7338498b06f96e21bc56141eb90d40276508add8",
+    "/tmp/sustained-resource-scoped-lifecycle-green-v2/host-code/resources/test_worker_admission.py": "816a6ab4d7cb891e97ed279e46a2fea491ce8865f3dd30f2c6ea7bff825f4bb7",
+    "/tmp/sustained-resource-scoped-lifecycle-green-v2/host-code/resources/stage_accounting.py": "baef4b065f9ebb3aa7a2296ccaede595e2514c8144b18bace315f3a805b3716b",
+    "/tmp/sustained-resource-scoped-lifecycle-green-v2/host-code/resources/process_lifecycle.py": "bfde67be0f66296565dca964c8a2ca3e6bb733e31016fbc87c78f57dd49b09f0"
+  },
+  "host_driver_sha256": "7b8694db53137d150450338ee8f5832a3c425186fa305a11fa11be3c0c2204ea",
+  "artifacts": {
+    "/tmp/sustained-resource-scoped-lifecycle-green-v2/detached-success/child.pid": "957ea7590a50c58c229d9456ae7c9991becd0aeb72dda711e9c549f6807ad566",
+    "/tmp/sustained-resource-scoped-lifecycle-green-v2/detached-success/output/live.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/tmp/sustained-resource-scoped-lifecycle-green-v2/detached-timeout/child.pid": "195860bbe36d7e8339d4c64db93350d96a008229bda92ac25a266d90d41bedf4",
+    "/tmp/sustained-resource-scoped-lifecycle-green-v2/detached-timeout/output/live.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/tmp/sustained-resource-scoped-lifecycle-green-v2/live-insula-positive/worker-resources/worker-resource.json": "b9c4843898e9f4077965a96dfd5d3559ac50013703d1b9f68b5e7b3ca1b193ff",
+    "/tmp/sustained-resource-scoped-lifecycle-green-v2/live-insula-positive/output/live.log": "9d6215b6e1943ca08b6e4d77dc3992a8a2459f9cbeb4b674f8d81aeae10b675c",
+    "/tmp/sustained-resource-scoped-lifecycle-green-v2/live-insula-positive/code/probe.py": "6e60937c4c0fa6a3c00642cadb30d29f28641e02d23c4daaf5e7e93703eb1769"
+  },
+  "passed": true,
+  "scope": "real kernel-capped host descendant refusal/cleanup and positive TensorFlow-free live CPU Insula; not full-controller admission"
+}

@@ -1,0 +1,36 @@
+{
+  "scope": "one actual fixed-frame GN8/PFNBN forward/backward runtime regression only; legacy targets, NO optimizer/training-study update or fit/native result",
+  "initial_tensor_sha256": "304418a48ff7cc85b141de498cff1ec147ac500d7a28a9e47e044205c23f68b2",
+  "loss": {
+    "classification": 794.6611938476562,
+    "localization": 2.5873265266418457,
+    "direction": 0.679247260093689,
+    "total": 799.9717407226562
+  },
+  "positive_anchors": 390,
+  "positive_anchors_per_class": {
+    "1": 338,
+    "2": 30,
+    "3": 16,
+    "4": 6
+  },
+  "all_gradients_finite": true,
+  "parameters_unchanged": true,
+  "optimizer_updates": 0,
+  "synchronized_forward_backward_seconds": 1.3642036970122717,
+  "peak_allocated_bytes": 1583460352,
+  "peak_reserved_bytes": 2713714688,
+  "peak_rss_kib": 2153448,
+  "tf32": false,
+  "deterministic": true,
+  "recipe": {
+    "architecture": "baseline",
+    "norm": "gn_backbone",
+    "max_points": 32,
+    "pillar_cap": 20000,
+    "learning_rate": 0.0001,
+    "clip": 10.0,
+    "foreground_prior": null,
+    "loss": "reference"
+  }
+}

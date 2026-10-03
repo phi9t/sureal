@@ -1,0 +1,79 @@
+# Reviewed false positives from PR #2, publication run 37146578518.
+# Each finding is a SHA-256 digest in an immutable research receipt, not a
+# credential. Suppression is limited to this commit/path/rule/line fingerprint;
+# the same file or value introduced in another commit remains scanned.
+# See SECURITY.md for the review policy. No path, rule, or digest allowlist.
+2e80d61e92a70793640d5cb535de11ade0715518:experiments/waymo-perception/research/motion-training-native-link-verified.json:generic-api-key:222
+c970a2bee44f8df0bdc5494e8120211796ad475b:experiments/waymo-perception/research/motion-codebook-live-verified.json:generic-api-key:122
+c970a2bee44f8df0bdc5494e8120211796ad475b:experiments/waymo-perception/research/motion-codebook-live-verified.json:generic-api-key:153
+c970a2bee44f8df0bdc5494e8120211796ad475b:experiments/waymo-perception/research/motion-codebook-live-verified.json:generic-api-key:155
+c970a2bee44f8df0bdc5494e8120211796ad475b:experiments/waymo-perception/research/motion-codebook-live-verified.json:generic-api-key:159
+8a4f168949b91b8d63b28e9e7873ee1c545ecb6c:experiments/waymo-perception/research/advanced-range-fixture-verified.json:generic-api-key:41
+8a4f168949b91b8d63b28e9e7873ee1c545ecb6c:experiments/waymo-perception/research/advanced-all-cpu-contracts-final-verified.json:generic-api-key:107
+8a4f168949b91b8d63b28e9e7873ee1c545ecb6c:experiments/waymo-perception/research/advanced-all-cpu-contracts-final-verified.json:generic-api-key:120
+8a4f168949b91b8d63b28e9e7873ee1c545ecb6c:experiments/waymo-perception/research/advanced-native-admission-verified.json:generic-api-key:54
+8a4f168949b91b8d63b28e9e7873ee1c545ecb6c:experiments/waymo-perception/research/advanced-native-admission-verified.json:generic-api-key:67
+873f4863e46fff5618a7bbce336be951caa7aa06:experiments/waymo-perception/research/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731:generic-api-key:53
+873f4863e46fff5618a7bbce336be951caa7aa06:experiments/waymo-perception/research/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731:generic-api-key:66
+174e12b55fe5a1c4452aad270e73a38028d4bf94:experiments/waymo-perception/research/auth-keepalive-red-verified.json:generic-api-key:91
+174e12b55fe5a1c4452aad270e73a38028d4bf94:experiments/waymo-perception/research/auth-keepalive-green-verified.json:generic-api-key:79
+174e12b55fe5a1c4452aad270e73a38028d4bf94:experiments/waymo-perception/research/auth-keepalive-green-verified.json:generic-api-key:92
+d536416f40c635ebbb7323397c75f892455d7629:experiments/waymo-perception/research/tier1-heading-step2000a-verified.json:generic-api-key:503
+d536416f40c635ebbb7323397c75f892455d7629:experiments/waymo-perception/research/tier1-heading-step2000a-verified.json:generic-api-key:1175
+
+# Additional reviewed SHA-256 artifact-digest findings from a full HEAD history
+# scan using Gitleaks 8.24.3 (including merged research branches).
+125e6f5c6d76b4e6c56e1c8f9ac9baaf2fa20337:experiments/waymo-perception/research/balanced16-pilot-hdfs-retention-verified.json:generic-api-key:166
+125e6f5c6d76b4e6c56e1c8f9ac9baaf2fa20337:experiments/waymo-perception/research/balanced16-pilot-hdfs-retention-verified.json:generic-api-key:179
+27ee41f8cc216428a44b4947e8ff5f10fd51c1c6:experiments/waymo-perception/research/journal-evidence/89228a43ccf546713ce4e7b770ac9bce40f0f505ee0d1b9bd411cc055b6cb08a:generic-api-key:231
+27ee41f8cc216428a44b4947e8ff5f10fd51c1c6:experiments/waymo-perception/research/journal-evidence/89228a43ccf546713ce4e7b770ac9bce40f0f505ee0d1b9bd411cc055b6cb08a:generic-api-key:244
+27ee41f8cc216428a44b4947e8ff5f10fd51c1c6:experiments/waymo-perception/research/native-cache-hdfs-retention-verified.json:generic-api-key:231
+27ee41f8cc216428a44b4947e8ff5f10fd51c1c6:experiments/waymo-perception/research/native-cache-hdfs-retention-verified.json:generic-api-key:244
+3aa795a864e953e6742cb2ea680876b3e2900904:experiments/waymo-perception/research/journal-evidence/7ac5e7e3845521c91ee32594fa6d28d0966fafdf8b16a77dac87b59ee2e14bb6:generic-api-key:910
+3aa795a864e953e6742cb2ea680876b3e2900904:experiments/waymo-perception/research/journal-evidence/7ac5e7e3845521c91ee32594fa6d28d0966fafdf8b16a77dac87b59ee2e14bb6:generic-api-key:923
+3aa795a864e953e6742cb2ea680876b3e2900904:experiments/waymo-perception/research/journal-evidence/edf4e933b25a1ea1b3a84beaf2a9751e99ba37851e8523d9d358565752f735b2:generic-api-key:119
+3aa795a864e953e6742cb2ea680876b3e2900904:experiments/waymo-perception/research/journal-evidence/edf4e933b25a1ea1b3a84beaf2a9751e99ba37851e8523d9d358565752f735b2:generic-api-key:132
+3aa795a864e953e6742cb2ea680876b3e2900904:experiments/waymo-perception/research/pilot35-checkpoint-hdfs-recovery-verified.json:generic-api-key:910
+3aa795a864e953e6742cb2ea680876b3e2900904:experiments/waymo-perception/research/pilot35-checkpoint-hdfs-recovery-verified.json:generic-api-key:923
+3aa795a864e953e6742cb2ea680876b3e2900904:experiments/waymo-perception/research/sustained-checkpoint-hdfs-retention-verified.json:generic-api-key:119
+3aa795a864e953e6742cb2ea680876b3e2900904:experiments/waymo-perception/research/sustained-checkpoint-hdfs-retention-verified.json:generic-api-key:132
+4db5ad1982135e7eecd3a53725e3d823fac026e6:experiments/waymo-perception/research/advanced-closure-expanded20261002a-verified.json:generic-api-key:110
+4db5ad1982135e7eecd3a53725e3d823fac026e6:experiments/waymo-perception/research/advanced-closure-expanded20261002a-verified.json:generic-api-key:123
+5e643c10fa03ccdef2ad60109fd9818c45ec36b1:experiments/waymo-perception/research/expanded-hdfs-evidence/grid_coarse-publication.json:generic-api-key:31
+5e643c10fa03ccdef2ad60109fd9818c45ec36b1:experiments/waymo-perception/research/expanded-hdfs-evidence/grid_coarse-publication.json:generic-api-key:44
+5e643c10fa03ccdef2ad60109fd9818c45ec36b1:experiments/waymo-perception/research/expanded-hdfs-evidence/grid_fine-publication.json:generic-api-key:31
+5e643c10fa03ccdef2ad60109fd9818c45ec36b1:experiments/waymo-perception/research/expanded-hdfs-evidence/grid_fine-publication.json:generic-api-key:44
+5e643c10fa03ccdef2ad60109fd9818c45ec36b1:experiments/waymo-perception/research/expanded-hdfs-evidence/point_attention-publication.json:generic-api-key:31
+5e643c10fa03ccdef2ad60109fd9818c45ec36b1:experiments/waymo-perception/research/expanded-hdfs-evidence/point_attention-publication.json:generic-api-key:44
+5e643c10fa03ccdef2ad60109fd9818c45ec36b1:experiments/waymo-perception/research/expanded-hdfs-evidence/point_mlp_control-publication.json:generic-api-key:31
+5e643c10fa03ccdef2ad60109fd9818c45ec36b1:experiments/waymo-perception/research/expanded-hdfs-evidence/point_mlp_control-publication.json:generic-api-key:44
+5e643c10fa03ccdef2ad60109fd9818c45ec36b1:experiments/waymo-perception/research/expanded-hdfs-evidence/ragged_pillars-publication.json:generic-api-key:31
+5e643c10fa03ccdef2ad60109fd9818c45ec36b1:experiments/waymo-perception/research/expanded-hdfs-evidence/ragged_pillars-publication.json:generic-api-key:44
+5e643c10fa03ccdef2ad60109fd9818c45ec36b1:experiments/waymo-perception/research/expanded-hdfs-evidence/range_fusion-publication.json:generic-api-key:31
+5e643c10fa03ccdef2ad60109fd9818c45ec36b1:experiments/waymo-perception/research/expanded-hdfs-evidence/range_fusion-publication.json:generic-api-key:44
+5e643c10fa03ccdef2ad60109fd9818c45ec36b1:experiments/waymo-perception/research/expanded-hdfs-evidence/sparse_bev_transformer-publication.json:generic-api-key:31
+5e643c10fa03ccdef2ad60109fd9818c45ec36b1:experiments/waymo-perception/research/expanded-hdfs-evidence/sparse_bev_transformer-publication.json:generic-api-key:44
+5e643c10fa03ccdef2ad60109fd9818c45ec36b1:experiments/waymo-perception/research/expanded-hdfs-evidence/zero_range_control-publication.json:generic-api-key:31
+5e643c10fa03ccdef2ad60109fd9818c45ec36b1:experiments/waymo-perception/research/expanded-hdfs-evidence/zero_range_control-publication.json:generic-api-key:44
+9e25ae097dc141241eb0d363ccf3ddb619ad6a65:experiments/waymo-perception/research/journal-evidence/07b9ba2524f010f54dd5e9e9348db3725a480fcbb6e01419705cad81f423fa96:generic-api-key:222
+9e25ae097dc141241eb0d363ccf3ddb619ad6a65:experiments/waymo-perception/research/journal-evidence/c2dd47004afd677b1c8616d3ca8e0de63f6c2eb767a2ba2a36b07fefe10fd96f:generic-api-key:1175
+9e25ae097dc141241eb0d363ccf3ddb619ad6a65:experiments/waymo-perception/research/journal-evidence/c2dd47004afd677b1c8616d3ca8e0de63f6c2eb767a2ba2a36b07fefe10fd96f:generic-api-key:503
+9e25ae097dc141241eb0d363ccf3ddb619ad6a65:experiments/waymo-perception/research/journal-evidence/f00de66b75a6aa93f7b46c3a79d029e77b33cf29cb85f1a69286a4dfa1fe569a:generic-api-key:122
+9e25ae097dc141241eb0d363ccf3ddb619ad6a65:experiments/waymo-perception/research/journal-evidence/f00de66b75a6aa93f7b46c3a79d029e77b33cf29cb85f1a69286a4dfa1fe569a:generic-api-key:153
+9e25ae097dc141241eb0d363ccf3ddb619ad6a65:experiments/waymo-perception/research/journal-evidence/f00de66b75a6aa93f7b46c3a79d029e77b33cf29cb85f1a69286a4dfa1fe569a:generic-api-key:155
+9e25ae097dc141241eb0d363ccf3ddb619ad6a65:experiments/waymo-perception/research/journal-evidence/f00de66b75a6aa93f7b46c3a79d029e77b33cf29cb85f1a69286a4dfa1fe569a:generic-api-key:159
+a444c0ed30eb0ff373de34f5c75305511a3eccf0:experiments/waymo-perception/research/motion-delta-components-green-verified.json:generic-api-key:56
+a444c0ed30eb0ff373de34f5c75305511a3eccf0:experiments/waymo-perception/research/motion-delta-components-red-verified.json:generic-api-key:56
+cd1ee93682c1ef7801c46869b6c20c9cc702e362:experiments/waymo-perception/research/journal-evidence/40f07709d88d0286f8ff0a64a71f05c684f8fe66fb20a82f7127c44f0d32588d:generic-api-key:1432
+cd1ee93682c1ef7801c46869b6c20c9cc702e362:experiments/waymo-perception/research/journal-evidence/40f07709d88d0286f8ff0a64a71f05c684f8fe66fb20a82f7127c44f0d32588d:generic-api-key:1445
+cd1ee93682c1ef7801c46869b6c20c9cc702e362:experiments/waymo-perception/research/motion-geometry-hdfs-retention-verified.json:generic-api-key:1432
+cd1ee93682c1ef7801c46869b6c20c9cc702e362:experiments/waymo-perception/research/motion-geometry-hdfs-retention-verified.json:generic-api-key:1445
+d0c8d3ad91d350bd4d14aa55685e15cd480cf350:experiments/waymo-perception/research/motion-validation-codebook-live-verified.json:generic-api-key:122
+d0c8d3ad91d350bd4d14aa55685e15cd480cf350:experiments/waymo-perception/research/motion-validation-codebook-live-verified.json:generic-api-key:153
+d0c8d3ad91d350bd4d14aa55685e15cd480cf350:experiments/waymo-perception/research/motion-validation-codebook-live-verified.json:generic-api-key:155
+d0c8d3ad91d350bd4d14aa55685e15cd480cf350:experiments/waymo-perception/research/motion-validation-codebook-live-verified.json:generic-api-key:159
+d0c8d3ad91d350bd4d14aa55685e15cd480cf350:experiments/waymo-perception/research/motion-validation-native-link-verified.json:generic-api-key:222
+e919ebc2dd096bfce3576defcb6f57e21d3a1da6:experiments/waymo-perception/research/journal-evidence/c4c013873723012c0bd527a6911f01c3f0806a7cffc576dcd44820ec03901318:generic-api-key:110
+e919ebc2dd096bfce3576defcb6f57e21d3a1da6:experiments/waymo-perception/research/journal-evidence/c4c013873723012c0bd527a6911f01c3f0806a7cffc576dcd44820ec03901318:generic-api-key:123
+e919ebc2dd096bfce3576defcb6f57e21d3a1da6:experiments/waymo-perception/research/journal-evidence/ff5292bb601c79ef74e55d32209c81aeb166e2dfb9ab181cc16c4a15f4cb5f0c:generic-api-key:54
+e919ebc2dd096bfce3576defcb6f57e21d3a1da6:experiments/waymo-perception/research/journal-evidence/ff5292bb601c79ef74e55d32209c81aeb166e2dfb9ab181cc16c4a15f4cb5f0c:generic-api-key:67

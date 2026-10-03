@@ -1,0 +1,75 @@
+{
+  "source": {
+    "name": "uncompressed/scenario/training/training.tfrecord-00000-of-01000",
+    "bucket": "waymo_open_dataset_motion_v_1_2_1",
+    "generation": "1706572783766122",
+    "contentType": "application/octet-stream",
+    "size": "448622357",
+    "md5Hash": "uObNvAAlbQfl0M1NJzAOPw==",
+    "crc32c": "ovv/yg==",
+    "updated": "2024-01-29T23:59:43.863Z"
+  },
+  "source_sha256": "27491c6c0b84bb9e27cec361600685d4669934a58c9018ddcc9b2dc06147cab7",
+  "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/datasets/waymo-motion/v1.2.1/pilot/training/1706572783766122-27491c6c0b84bb9e27cec361600685d4669934a58c9018ddcc9b2dc06147cab7.tfrecord",
+  "hdfs_readback_exact": true,
+  "raw_peak_bytes": 1804558739,
+  "local_source": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/training-source-8a73740fe44e4f139d5462db1c633268/source.tfrecord",
+  "candidate_sha256": "1522d69ce83426ef20691f6876da854c29666043f9b548a608b4281955255925",
+  "inventory_sha256": "4057a285744b8b92bb8f2d57c31a2c6cc1e8151496d2a7512fc1c0cda4979b67",
+  "checks": [
+    {
+      "command": [
+        "bash",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/gcs.sh",
+        "--",
+        "storage",
+        "cp",
+        "gs://waymo_open_dataset_motion_v_1_2_1/uncompressed/scenario/training/training.tfrecord-00000-of-01000#1706572783766122",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/training-source-8a73740fe44e4f139d5462db1c633268/source.tfrecord"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/training-source-8a73740fe44e4f139d5462db1c633268/gcs-download.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "layout-profile",
+        "--project",
+        "sureal",
+        "--json"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/training-source-8a73740fe44e4f139d5462db1c633268/layout.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "--mkdir-parents",
+        "put",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/training-source-8a73740fe44e4f139d5462db1c633268/source.tfrecord",
+        "hdfs://harunava/user/tiger/waystone/sureal/datasets/waymo-motion/v1.2.1/pilot/training/1706572783766122-27491c6c0b84bb9e27cec361600685d4669934a58c9018ddcc9b2dc06147cab7.tfrecord"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/training-source-8a73740fe44e4f139d5462db1c633268/hdfs-put.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "get",
+        "hdfs://harunava/user/tiger/waystone/sureal/datasets/waymo-motion/v1.2.1/pilot/training/1706572783766122-27491c6c0b84bb9e27cec361600685d4669934a58c9018ddcc9b2dc06147cab7.tfrecord",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/training-source-8a73740fe44e4f139d5462db1c633268/source.tfrecord"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-pilot/training-source-8a73740fe44e4f139d5462db1c633268/hdfs-get.log"
+    }
+  ],
+  "scope": "acquired training pilot source only; framing/protobuf/causal ingestion gates pending"
+}

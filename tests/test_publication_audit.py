@@ -534,6 +534,10 @@ class RepositoryIdentityTests(unittest.TestCase):
             "wandb/latest-run",
             "training/logs/run.log",
             "training/outputs/result.json",
+            "node_modules/index.js",
+            "experiments/waymo-perception/viewer/web/node_modules/three/package.json",
+            "experiments/waymo-perception/viewer/web/dist/index.html",
+            "experiments/waymo-perception/viewer/.venv/bin/python",
         )
         for path in paths:
             with self.subTest(path=path):

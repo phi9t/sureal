@@ -1,0 +1,20 @@
+{
+  "scope": "retained failed independent launcher-vs-worker lower-bound check; not successful resource admission",
+  "launcher_wait4_peak_rss_kib": 24984,
+  "worker_self_peak_rss_kib": 26596,
+  "failed_assertion": "launcher wait4 peak >= worker SELF peak",
+  "runtime_lock": {
+    "image_id": "sha256:46bdaa6e8d9058d7e09419085dfcf9a4527e801330045ae8e0f387f454413b86",
+    "rootfs_sha256": "55f63770083be16ea76764422c51e6e5d995b2d65e9785b552e118a64c6e2f1f",
+    "recipe_hashes": {
+      "Dockerfile": "48484266fe92aaf1a94823fac0746eafef7ac78d0a8754fa9d8f279e8d96c19b",
+      "requirements.lock": "038ba6bbc16870b6430481127b15ab2830e5dac0a6b14c30f218a43853e35923",
+      "build.sh": "bd554045bf0dd40aeceb495fd25ff6ea62ad8e04e93a0c81b203f2c141bcce55"
+    }
+  },
+  "artifacts": {
+    "/tmp/sureal-scoped-stage-live20261003b/accounting-before-admission.json": "4fb0e15734af22190be08cb06c61752a31b6a5f9965e208c9b54ae4e89e14d1c",
+    "/tmp/sureal-scoped-stage-live20261003b/output/live.log": "be8188d12e620df11659be62ce95e6bcc765a1abe957da61eebc77fb857d3462"
+  },
+  "follow_up": "Separate in-runtime SELF/waited-CHILDREN accounting; positive capped fixture v2 uses separate measured fields."
+}

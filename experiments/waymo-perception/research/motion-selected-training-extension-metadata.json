@@ -1,0 +1,16 @@
+{
+  "bucket": "waymo_open_dataset_motion_v_1_2_1",
+  "content_type": "application/octet-stream",
+  "crc32c_hash": "wfAI/g==",
+  "creation_time": "2024-01-30T19:18:58+0000",
+  "etag": "CJ3375LqhYQDEAE=",
+  "generation": "1706642338741149",
+  "md5_hash": "DhSbX8vBSt9lLj0arw18LA==",
+  "metageneration": 1,
+  "name": "uncompressed/lidar_and_camera/training/101d4e5775093d0c.tfrecord",
+  "size": 5081750,
+  "storage_class": "STANDARD",
+  "storage_class_update_time": "2024-01-30T19:18:58+0000",
+  "storage_url": "gs://waymo_open_dataset_motion_v_1_2_1/uncompressed/lidar_and_camera/training/101d4e5775093d0c.tfrecord#1706642338741149",
+  "update_time": "2024-01-30T19:18:58+0000"
+}

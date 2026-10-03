@@ -29,6 +29,8 @@ the original Surflo project. The public repository is
   reproduction-oriented route from cameras and surfaces to generative scenes.
 - [Executable pathway labs](experiments/3d-pathway/README.md) — locked inputs,
   maintained references, controlled failures, and cross-era reports.
+- [Waymo perception pipeline](experiments/waymo-perception/README.md) — draft
+  scene-centric data processing line for calibrated Waymo Perception inputs.
 - [Surflo lineage](UPSTREAM.md) — upstream provenance and the compatibility
   boundary between inherited Surflo code and Sureal additions.
 

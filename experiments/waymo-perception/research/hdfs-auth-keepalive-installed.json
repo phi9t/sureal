@@ -1,0 +1,22 @@
+{
+  "service": "/data02/home/philip.yang/.config/systemd/user/sureal-hdfs-auth.service",
+  "service_sha256": "8545528869b89203dad5c587af2bb8b1c98e3d10972b8eb4b9445d3b35f79da0",
+  "timer": "/data02/home/philip.yang/.config/systemd/user/sureal-hdfs-auth.timer",
+  "timer_sha256": "a89417d7e061bea7c05aaab5131d6decefded203aefcb5c4e317a598b08a9676",
+  "installed_script": "/data02/home/philip.yang/.local/lib/sureal/hdfs_auth_keepalive.py",
+  "installed_script_sha256": "ff0b26bb1ecef4eff96d5a331da1cb3f66f71c7c420492fce502c4a73ec16d63",
+  "source_script_sha256": "ff0b26bb1ecef4eff96d5a331da1cb3f66f71c7c420492fce502c4a73ec16d63",
+  "config_file": "/data02/home/philip.yang/.local/state/sureal/hdfs-auth/config.json",
+  "config_sha256": "ba2ade99723fb6c4efc54590d81071df995286c91e7c25bc8907bcfb6b88d6fd",
+  "status": {
+    "ok": true,
+    "ticket_renewed": true,
+    "interactive_login_required": false,
+    "renewal_window_warning": false,
+    "stage": "token-refresh",
+    "exit_code": 0,
+    "checked_unix_seconds": 1790980672,
+    "interactive_refresh_script": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/scripts/refresh-hdfs-auth.sh"
+  },
+  "scope": "renew existing tickets and cached token; interactive login required beyond Kerberos renewal window"
+}

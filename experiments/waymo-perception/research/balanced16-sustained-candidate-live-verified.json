@@ -1,0 +1,81 @@
+{
+  "command": [
+    "bwrap",
+    "--unshare-all",
+    "--die-with-parent",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+    "/",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-candidate-v1/code",
+    "/experiment",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-candidate-v1/inputs",
+    "/source",
+    "--bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-candidate-v1/output",
+    "/outputs",
+    "--proc",
+    "/proc",
+    "--dev",
+    "/dev",
+    "--tmpfs",
+    "/tmp",
+    "--clearenv",
+    "--setenv",
+    "HOME",
+    "/tmp/private-home",
+    "--setenv",
+    "PATH",
+    "/usr/local/bin:/usr/bin:/bin",
+    "--setenv",
+    "PYTHONNOUSERSITE",
+    "1",
+    "--setenv",
+    "PYTHONDONTWRITEBYTECODE",
+    "1",
+    "--setenv",
+    "PYTHONPATH",
+    "/experiment",
+    "--chdir",
+    "/experiment",
+    "--",
+    "python",
+    "-c",
+    "import json\nfrom pathlib import Path\nfrom cohort.sustained_contract import validate_contract\ncandidate=json.loads(Path('/source/candidate.json').read_text());original=json.loads(Path('/source/original.json').read_text());frames=[{k:f[k] for k in ['identity','split','sha256']} for f in original['manifest']['frames']];validate_contract(candidate,frames);report={'original_training_frames_exact':len(frames),'recipes':candidate['recipes'],'max_updates':candidate['max_updates'],'max_training_seconds':candidate['max_training_seconds'],'decoder_version':candidate['decoder_version'],'scope':'candidate identity/execution contract only; no training or scientific admission'};Path('/outputs/check.json').write_text(json.dumps(report,indent=2));print('PASS exact16 training frames and four matched recipes')"
+  ],
+  "exit_code": 0,
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "pins": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-candidate-v1/code/cohort/sustained_contract.py": "0e9246cba6d70df477a26be089716d2faea7bf354660dc0d5dec76d2c2f9147a",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-candidate-v1/inputs/candidate.json": "d53888395457705e57ba46d2dcbcb7a830f3b1127de1a34a85c7295d3b45ca0a",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-candidate-v1/inputs/original.json": "7e36ef6c43492e69e9d846b008d382ed694b4f5b795cc72208262a8b246c9873",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort16-baseline-balanced20261002a/run.json": "7e36ef6c43492e69e9d846b008d382ed694b4f5b795cc72208262a8b246c9873"
+  },
+  "validation": {
+    "original_training_frames_exact": 16,
+    "recipes": [
+      "baseline",
+      "residual_bev",
+      "class_balanced",
+      "prior_bias"
+    ],
+    "max_updates": 32000,
+    "max_training_seconds": 7200,
+    "decoder_version": 3,
+    "scope": "candidate identity/execution contract only; no training or scientific admission"
+  },
+  "elapsed_seconds": 0.05589069495908916,
+  "peak_children_rss_kib": 50000,
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-candidate-v1/output/live.log": "b23964c9d4e905ca110307601dd0d6477dbff028f2bb56f077a8928e77c4cb2e",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-candidate-v1/output/check.json": "2ba56a7570a3d2153af47f4051e4f783461b8fb09fe8537f1e4d3aacb785b205"
+  }
+}

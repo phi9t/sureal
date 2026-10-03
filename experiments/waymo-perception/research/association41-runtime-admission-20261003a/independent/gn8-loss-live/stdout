@@ -1,0 +1,1 @@
+PASS literal loss/head/input audit {'classification': 794.6611918810489, 'localization': 2.587326501854083, 'direction': 0.6792472099984602, 'total': 799.9716943267567}

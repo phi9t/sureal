@@ -1,0 +1,30 @@
+{
+  "reason": "Historical source bytes retained under non-discoverable names; avoid pytest collection of archival test modules",
+  "prior_index_sha256": "8ddab0dac90d053b41318eecbdb3a6f654c7203350fed7862d99d1852ec323d3",
+  "renames": {
+    "source-contract-v3/contract.py": {
+      "retained_as": "source-contract-v3/contract.py.source",
+      "sha256": "35abd24396ab06ff38d4c1ad50af44a0920fb73927e1d8b6a3bf2723454f9a57"
+    },
+    "source-contract-v3/test_contract.py": {
+      "retained_as": "source-contract-v3/test_contract.py.source",
+      "sha256": "8a1ad69dad73746b590a4908a48bf24422e0018310f0e1af89fd19214b0ad151"
+    },
+    "source-contract-v1/contract.py": {
+      "retained_as": "source-contract-v1/contract.py.source",
+      "sha256": "69936d6fd6bbc6ce894e46611abeee67a74c1507ea407b35d008ad500b2b0d57"
+    },
+    "source-contract-v1/test_contract.py": {
+      "retained_as": "source-contract-v1/test_contract.py.source",
+      "sha256": "699b295cc47a833f9e0b74c60f80cc6fb42018795ad4261a165db74599e5e2c5"
+    },
+    "source-contract-v2/contract.py": {
+      "retained_as": "source-contract-v2/contract.py.source",
+      "sha256": "a3ad8663d9f0fa8710cf507782e50bcf9a15df5977341ae5ec066549bfc26275"
+    },
+    "source-contract-v2/test_contract.py": {
+      "retained_as": "source-contract-v2/test_contract.py.source",
+      "sha256": "e5d5f2516496c655ce7d5c6c9ba371aab3586d329fb3e94ea630cf80f2ea6c9a"
+    }
+  }
+}

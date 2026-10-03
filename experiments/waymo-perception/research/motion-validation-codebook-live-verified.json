@@ -1,0 +1,162 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-cli-rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-validation-codebook-live-v1/code",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-validation-codebook-live-v1/inputs",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-validation-codebook-live-v1/native-output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--",
+        "/bin/sh",
+        "-c",
+        "g++ -std=c++17 -O2 -I/generated /experiment/tokens.cc /motion-build/libwod_motion_proto.a -lprotobuf -pthread -o /outputs/tokens && /outputs/tokens /source/observations.pb /outputs/tokens.tsv"
+      ],
+      "exit_code": 0,
+      "runtime_lock": {
+        "schema_version": 1,
+        "image_id": "sha256:49d07c49427a0d4e94270502b4d90dc227e3917885e705dc2b44a75c863a63cf",
+        "parent_image_id": "sha256:84fb83dd874d0cfff8e9ee3df0759d89f9ad85e9538c0071c9eb606a13d8c233",
+        "upstream_commit": "99a4cb3ff07e2fe06c2ce73da001f850f628e45a",
+        "rootfs_sha256": "c471473b944157119d0d6440a9e95515dfda4d4c554d4cfafa4374da40bf9c8e",
+        "recipe_hashes": {
+          "Dockerfile": "687fc6c0e6f6f64480ef7b91f2b2cab1c12211faf129c132342cdc2a5b16c66a",
+          "CMakeLists.txt": "8f746509c33b45c67ca0b5accb5b043413318386029af16733506240de9de1c1",
+          "motion_metrics_main.cc": "10414722119c7db14c6c5e4fa2f67beb67e1d1cea3b1c7d203f36e6f5ebc6bba"
+        }
+      }
+    },
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-validation-codebook-live-v1/code",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-validation-codebook-live-v1/feature-input",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-validation-codebook-live-v1/feature-output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--",
+        "python",
+        "/experiment/features.py"
+      ],
+      "exit_code": 0,
+      "runtime_lock": {
+        "schema_version": 1,
+        "platform": "linux/amd64",
+        "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+        "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+        "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+        "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+      }
+    }
+  ],
+  "source_pins": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-validation-codebook-live-v1/code/features.py": "86cc45059aef44278fa7fe85d5ea28489822b46124cd0991e3dfdea5c6c9f413",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-validation-codebook-live-v1/code/inventory.cc": "abe18156aed17298ef8f4523444e63b80852e36ac7c061bbea581e252b17f60a",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-validation-codebook-live-v1/code/tokens.cc": "0a05fa3a2dd40fa74e9a52dfc5beac8e47dd9d12d00054a7e90688bd7bd83679"
+  },
+  "input_pins": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-validation-codebook-live-v1/inputs/codebook.npy": "7e40db84c7435a9c9dcb67e76acb76f165e5e307f306b8b25b837c0244669ccd",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-validation-codebook-live-v1/inputs/observations.pb": "85365af948859d081f8758e283fd7d1c1a8e680c0c20bafcd17ab11b1965985d"
+  },
+  "validation": {
+    "codebook_shape": [
+      8192,
+      32
+    ],
+    "dtype": "float32",
+    "native_tokens": 22528,
+    "minimum_index": 2,
+    "maximum_index": 8190,
+    "feature_shape": [
+      22528,
+      32
+    ],
+    "all_indices_in_bounds": true,
+    "literal_row_gather_exact": true,
+    "invalid_indices_refused": 3,
+    "native_frame_camera_position_keys_unique": true,
+    "tensorflow_absent": true,
+    "elapsed_seconds": 0.13419610302662477,
+    "peak_rss_kib": 52696,
+    "scope": "native historical camera-codebook features only; no RGB reconstruction or forecasting quality"
+  },
+  "elapsed_seconds": 6.332903756992891,
+  "peak_children_rss_kib": 56784,
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-validation-codebook-live-v1/native-output/tokens": "c17a2080a13e1bd6850cc08adcb13af01165031b050c9330ad7465408782b704",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-validation-codebook-live-v1/native-output/live.log": "99ac140bc887d2f303306db211be2cdad1269d162da6a7a80595a169bc02c644",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-validation-codebook-live-v1/native-output/tokens.tsv": "a8e9d78689b10567ff1c39dae249eb97568bcec4ded424629664e6024a6ca51b",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-validation-codebook-live-v1/feature-output/features.npy": "34ad907ed2a3b43e9747f674faacaa51b844f70667065042799900ba479f2312",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-validation-codebook-live-v1/feature-output/live.log": "ab234dedd06f11ec5b549e2eee6e7043a7e96a391ffd9cab26892685798af2e9",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-validation-codebook-live-v1/feature-output/check.json": "634dbb1d3de0c36eacd1808d8bc5730033a7f826646ff49d81bd74804958ec6a",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-validation-codebook-live-v1/feature-output/keys.npy": "8b8657373368172b8f45441c179fa822a2b4a9413a1b127929b352d60023712d"
+  },
+  "scope": "live native observation-only camera token extraction and codebook row correspondence; no forecasting quality or RGB claim"
+}
