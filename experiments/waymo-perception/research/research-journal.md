@@ -593,3 +593,11 @@ balanced16-sustained
 Independent live literal assignment audit matched all 524288 anchor labels/target indices for each of16 frames. All30 uncovered targets have positive overlap:28 lose maximizing anchors to strictly greater overlap,2 signs lose ties;27 sign-sign,2 sign-vehicle,1 pedestrian-pedestrian conflicts.28 within-class conflicts show class restriction alone does not resolve those collisions. No target/model change or promotion; investigate matching as a separate one-factor treatment.
 
 Evidence: [balanced16-c](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-coverage-causes-verified.json)
+
+## 75. 2026-10-03T05:08:38.902977+00:00 — observation
+
+balanced16-sustained
+
+Extended independent literal chunk reference and separately mounted GPU transition verifier prepared. Live missing-module/worker RED then58/59-test GREEN; independent review reran59. CPU1000-update restart exact beyondpilot35; full nativeGPU extended transition/controller/metrics/HDFS stillrequired. No active frozen pilot sources changed or fit/science promotion.
+
+Evidence: [sustained-ch](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-chunk-reference-red-v1-verified.json), [sustained-ch](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-chunk-reference-green-v1-verified.json), [sustained-tr](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-transition-worker-red-v1-verified.json), [sustained-tr](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-transition-worker-green-v1-verified.json)
