@@ -625,3 +625,19 @@ balanced16-sustained
 Pilot-retention preparation binds externallypinned finalreceipt to all21 stage admissions and exact57 checkpoint/head/report/log files; missing/changed/extra/symlink/failedstage fixtures refuse. MissinginventoryRED ->72GREEN; unchanged verifiedarchive/hostclosure logic ported to pilot-onlyHDFSnamespace, separatefull-union5faultgate required before release. Freshreview75CPUgroups pass. Actualcompletepilot/nativeGPUtransition/HDFSpublication/release pending; no payloaddeleted or scientificpromotion.
 
 Evidence: [sustained-pi](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-pilot-inventory-red-v1-verified.json), [sustained-pi](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-pilot-inventory-green-v1-verified.json), [sustained-pi](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-pilot-retention-green-v1-verified.json)
+
+## 79. 2026-10-03T05:37:59.936489+00:00 — observation
+
+balanced16-sustained
+
+Native0/19/35 engineering pilot now all21stages admitted after exacttwo-bound-only score35recovery. Independentreview809distincthashes/57payloadfiles/full1279GT/8000predictions; exactfull0to35+restart19to35 model/Adam/RNG/cursor/all16heads. Step35 cumulativetrain4.954181s, scoring636.837s, maxreplayGPU1845126144bytes/RSS3141448KiB. AllfourAPH0atshortpilot; no fit/scientificpromotion. Original600s failure preserved; HDFSretention/release remainsseparate.
+
+Evidence: [balanced16-s](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-admission-native20261003b-recovered.json)
+
+## 80. 2026-10-03T05:40:30.167217+00:00 — observation
+
+balanced16-sustained
+
+Separatelymounted nativeGPU transition verifier passed exact19to35 fullmodel/Adam/RNG/cursor (onlytimeexcluded), producer interval reconciliation and all16heads. Transitionpeak1843184640GPUbytes/3048628KiBRSS; headreplay3135480KiBRSS, elapsed35.820s. Independentreview303hashbindings. Firstattempt failed beforePython because /verifier absent underreadonlyroot; retainedfailure, correctedreadonlymount /tmp/verifier undertmpfs in newv2namespace. No originalproducerpackage changed; nativechunksbeyond35 stillrequired.
+
+Evidence: [sustained-tr](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-transition-native-mount-failed.json), [sustained-tr](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-transition-native-verified.json)
