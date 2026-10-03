@@ -329,3 +329,11 @@ task19/native-metric-handoff
 Validation extension and observation-only camera codebook path pass independently live. Real acquired training/validation native targets scored with explicit oracle0/2m diagnostics. Separate native truth/prediction parser derives errors/counts; live checker matches four comparisons within1e-3m and rejects8 corruptions. Validation ADE count8/FDE count6 preserves two missing endpoints. No trained or causal forecasting quality claim.
 
 Evidence: [motion-real-](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-real-metric-handoff-verified.json)
+
+## 42. 2026-10-03T00:28:04.271926+00:00 — observation
+
+task19/lidar-delta
+
+Live RED/GREEN4 NumPy delta tests and complete242-component native scalar parity pass for both11-step pilots. All5 LiDARs/two returns and TOP pixel poses retained; per-pilot32243200 decoded values and positive support1902370/1820913. Initial256MiB preparation limit failed; revised512MiB fits unchanged15GiB global cap, read-only verification avoids duplicate payloads. All4 source channels preserved; NLZ excluded from future physical features. XYZ/calibration/current-reference geometry still pending.
+
+Evidence: [motion-delta](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-delta-complete-live-verified.json)
