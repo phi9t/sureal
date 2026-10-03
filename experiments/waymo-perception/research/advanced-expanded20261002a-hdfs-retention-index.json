@@ -1,0 +1,105 @@
+{
+  "results_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
+  "closure_sha256": "c4c013873723012c0bd527a6911f01c3f0806a7cffc576dcd44820ec03901318",
+  "cases": [
+    {
+      "case": "grid_fine",
+      "publication": "research/expanded-hdfs-evidence/grid_fine-publication.json",
+      "publication_sha256": "ed00823563b01f12b71f0b73ea5727b5b8fc581647d4111f2a60aa865aad2215",
+      "release": "research/expanded-hdfs-evidence/grid_fine-release.json",
+      "release_sha256": "02bcfb8d7bd40712ec522aa6e923f036b872aeb036d783802928be8b612c64ff",
+      "chunks": 2,
+      "files": 141,
+      "archived_bytes": 110130417,
+      "hdfs_manifest_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-grid_fine-a3eeda5fb8774c6787e1aaf9a8daac2c/publication-manifest.json",
+      "hdfs_manifest_sha256": "e8ddf74e6b71a7986fbead3b07dcc09fa59dceeece3ac4c95e82fd8e23e3caa6"
+    },
+    {
+      "case": "grid_coarse",
+      "publication": "research/expanded-hdfs-evidence/grid_coarse-publication.json",
+      "publication_sha256": "7ac5be6805e1e68c7eef48e1d6e280f07113fd45c6848332ee17d31bc30f850e",
+      "release": "research/expanded-hdfs-evidence/grid_coarse-release.json",
+      "release_sha256": "6665af30d4e19389590914f0ebcc233fbf711d09b3291aa1f11fd95ff78c3338",
+      "chunks": 2,
+      "files": 141,
+      "archived_bytes": 110256909,
+      "hdfs_manifest_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-grid_coarse-c6a8509bb73f45989c92b5e7f257ac3c/publication-manifest.json",
+      "hdfs_manifest_sha256": "80e0003fa2c995402669b8d5aedfb685ab62efa05126fed7c4a18d880f9f54f7"
+    },
+    {
+      "case": "ragged_pillars",
+      "publication": "research/expanded-hdfs-evidence/ragged_pillars-publication.json",
+      "publication_sha256": "fde6c49a98ef46f6f6b3e12abc01dc9d09b0861077b8e0fede72baf5db9fd367",
+      "release": "research/expanded-hdfs-evidence/ragged_pillars-release.json",
+      "release_sha256": "73da0d5c052db547e591e0b0f2db94b7885b6d1603534b0df0819be22d9f1f61",
+      "chunks": 2,
+      "files": 141,
+      "archived_bytes": 110201518,
+      "hdfs_manifest_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-ragged_pillars-54cc94c99aaa49568fd49295a15c1fa5/publication-manifest.json",
+      "hdfs_manifest_sha256": "94f0db2cea8695dbc1254704f5fb6e3222f37044130585511ad98b63a3c00c89"
+    },
+    {
+      "case": "point_attention",
+      "publication": "research/expanded-hdfs-evidence/point_attention-publication.json",
+      "publication_sha256": "74435b825ed9df5c4d4c8feea9d8ae761d1efc8ba0b8d2ff771e0900b70565ca",
+      "release": "research/expanded-hdfs-evidence/point_attention-release.json",
+      "release_sha256": "955011778101656156ad194524e54085cdd995df3140dcbc2110401a0dedbcc5",
+      "chunks": 2,
+      "files": 141,
+      "archived_bytes": 110616827,
+      "hdfs_manifest_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-point_attention-5811f195886047c2bdb5f829b365fc53/publication-manifest.json",
+      "hdfs_manifest_sha256": "38385941aeb3af06ba444988f59e33efa4b192e5d8184e85f51e24cac3083d8d"
+    },
+    {
+      "case": "point_mlp_control",
+      "publication": "research/expanded-hdfs-evidence/point_mlp_control-publication.json",
+      "publication_sha256": "9706c8ca9b2b08a29228a5748aadb5e443277f93ea9cb15bc3ccc1472fe8a2b2",
+      "release": "research/expanded-hdfs-evidence/point_mlp_control-release.json",
+      "release_sha256": "f85a338ace04b71f387818b4d931dba2551f9ec7bb6109458b8c33085854c819",
+      "chunks": 2,
+      "files": 141,
+      "archived_bytes": 110645204,
+      "hdfs_manifest_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-point_mlp_control-e638e2a8d2124b09ac9db5a3569b5843/publication-manifest.json",
+      "hdfs_manifest_sha256": "080b39b8bdf8544fdb84b7e4e07f3629c8113dc4ecf2d61ecf25baab44aa417a"
+    },
+    {
+      "case": "range_fusion",
+      "publication": "research/expanded-hdfs-evidence/range_fusion-publication.json",
+      "publication_sha256": "71b2a03a47ab87037ecaa7b50caa05dbee96a770b653448dd5cceb1850511a0c",
+      "release": "research/expanded-hdfs-evidence/range_fusion-release.json",
+      "release_sha256": "cc0456d90c37ea290777e5616b9f4696d00ed348b0dcfaa22748796f100e0438",
+      "chunks": 2,
+      "files": 141,
+      "archived_bytes": 115962857,
+      "hdfs_manifest_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-range_fusion-c0e3ced31993482e89179d1602d70b53/publication-manifest.json",
+      "hdfs_manifest_sha256": "5284e5b92481c73ed687d7a275a2fde141d7a57c642a734b90b8e4df80ff8f12"
+    },
+    {
+      "case": "zero_range_control",
+      "publication": "research/expanded-hdfs-evidence/zero_range_control-publication.json",
+      "publication_sha256": "bd36b1b7c9acb73f7b0bc20e62edbe68762c54b7365dd8b73ebb4cdc42ca1d80",
+      "release": "research/expanded-hdfs-evidence/zero_range_control-release.json",
+      "release_sha256": "62dd1c01f5dc0a2064e2680739ae020f13b041ca5e63b680c65fc1ddb1ad2115",
+      "chunks": 2,
+      "files": 141,
+      "archived_bytes": 115921739,
+      "hdfs_manifest_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/publication-manifest.json",
+      "hdfs_manifest_sha256": "11f01bea917739af194d0b73a449ccef5bc67c311f82143462ab52f9b818e319"
+    },
+    {
+      "case": "sparse_bev_transformer",
+      "publication": "research/expanded-hdfs-evidence/sparse_bev_transformer-publication.json",
+      "publication_sha256": "3ee93c7cf1dfe87f439b45cf3cca8872e2b1998a32b54053f9355fd75ca032c4",
+      "release": "research/expanded-hdfs-evidence/sparse_bev_transformer-release.json",
+      "release_sha256": "72fe48cc712b6d5b2a3909fe7e4639a69f008112d4f004904b5dbd41a15307b7",
+      "chunks": 1,
+      "files": 277,
+      "archived_bytes": 46775559,
+      "hdfs_manifest_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-sparse_bev_transformer-58745daf22ae478e85aa60053bff25cb/publication-manifest.json",
+      "hdfs_manifest_sha256": "54e8a44f48373fa41b0e55cd7877c0418ce1fe2d1e872f816997100767462cbe"
+    }
+  ],
+  "all8_cases_retained_and_locally_released": true,
+  "unique_scientific_payload_bytes": 14232119769,
+  "scope": "full expanded payload exact HDFS readback/live member recovery/global admission and cache release; fixed-batch engineering results only"
+}
