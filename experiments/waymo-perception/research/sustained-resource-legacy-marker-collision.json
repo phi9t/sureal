@@ -1,0 +1,9 @@
+{
+  "finding": "Important: normalized marker collides with malformed raw header",
+  "source": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/continuation/legacy_values.py",
+  "source_sha256": "6e1b7eee6b1266e936eebdc1984d80b5abb603a77aa53ca8e8ac68b0a4fc755f",
+  "original": "W20261003 07:16:14.727084     5 iou.cc:172] Tiny box dim seen, return 0.0 IOU.\n",
+  "changed": "W<logging-timestamp>     5 iou.cc:172] Tiny box dim seen, return 0.0 IOU.\n",
+  "host_reproduction_equal": true,
+  "scope": "host read-only reproduction; not live Insula execution"
+}

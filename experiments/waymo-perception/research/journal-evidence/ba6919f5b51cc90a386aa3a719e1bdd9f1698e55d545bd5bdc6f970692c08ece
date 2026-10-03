@@ -1,0 +1,29 @@
+import json,os,shutil,sys
+from pathlib import Path
+P=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P))
+from resources.sources import sha,validate_sources
+from resources.stage import run_stage,validate_proof,write_new
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+from cohort.sustained_sources import validate_sources as validate_native
+from cohort.sustained_controller_sources import validate_host_sources
+C=Path.home()/'.cache/waystone/waymo-perception';N=C/'insula/balanced16-sustained-baseline-controller20261003a';A=C/'insula/resource-legacy-seven-controller20261003a-v3'
+step=int(sys.argv[1]);R=Path('/tmp')/('sureal-legacy-independent-state-'+str(step));R.mkdir();(R/'input').mkdir();(R/'output').mkdir()
+def ref(p):return {'path':str(p),'sha256':sha(p)}
+run=json.loads((N/'run.json').read_text());runtime=json.loads((N/'runtime-lock.json').read_text());shared=json.loads((P/'research/sustained-resource-shared-hdfs-live-v4-verified.json').read_text());identity_path=Path(shared['resource_identity_path']);assert sha(identity_path)==shared['resource_identity_sha256'];identity=json.loads(identity_path.read_text());pins=identity['source_pins']
+old=json.loads((P/'research/sustained-resource-legacy-gpu-v2-verified.json').read_text())['original_native_sha256']
+def guard():
+ validate_native(P,run['source_hashes'],runtime,runtime);validate_native(N/'code',run['source_hashes'],runtime,runtime);validate_host_sources(P,run['host_source_pins']);validate_sources(P/'resources',pins)
+ for p,h in old.items():assert sha(p)==h
+ assert sha(identity_path)==shared['resource_identity_sha256']
+guard();verify_rootfs(C/'gpu-rootfs',runtime['rootfs_sha256'])
+job=json.loads((A/('state-'+str(step)+'-input/job.json')).read_text());write_new(R/'input/job.json',job);shutil.copyfile('/tmp/sureal-legacy-independent-state-worker.py',R/'input/worker.py')
+source_cmd=json.loads((A/('state-'+str(step)+'-resources/resource-admitted.json')).read_text())['original_command']
+cmd=launch_plan(C/'gpu-rootfs',N/'code',R/'input',R/'output',['/opt/waymo/bin/python','/source/worker.py']);i=cmd.index('--')
+for target in ['/tmp/original-producer','/tmp/fresh-producer','/tmp/prior-report.json']:
+ if target in source_cmd:cmd[i:i]=['--ro-bind',source_cmd[source_cmd.index(target)-1],target];i+=3
+code=validate_sources(P/'resources',pins)
+with (R/'output/live.log').open('w') as stream:run_stage(cmd,N/'code',dict(os.environ),stream,1800,code=code,current_sources=P/'resources',source_pins=pins,evidence_directory=R/'resources',native_output=R/'output',cap_bytes=16*1024**3)
+proof=json.loads((R/'resources/resource-admitted.json').read_text());admission=validate_proof(proof,cmd,P/'resources',pins,R/'output',16*1024**3,1800);guard()
+write_new(R/'verified.json',{'passed':True,'step':step,'driver':ref(__file__),'worker':ref(R/'input/worker.py'),'job':ref(R/'input/job.json'),'result':ref(R/'output/check.json'),'proof':ref(R/'resources/resource-admitted.json'),'resource_admission':admission,'source_counts':{'native':len(run['source_hashes']),'host':len(run['host_source_pins']),'resources':len(pins)},'original_native_sha256':old,'resource_identity':ref(identity_path),'runtime':runtime})
+print((R/'output/check.json').read_text())
