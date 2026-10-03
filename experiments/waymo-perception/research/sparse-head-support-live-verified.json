@@ -1,0 +1,477 @@
+{
+  "command": [
+    "bwrap",
+    "--unshare-all",
+    "--die-with-parent",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/gpu-rootfs",
+    "/",
+    "--ro-bind",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+    "/experiment",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sparse-head-support-20261003c/inputs",
+    "/source",
+    "--bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sparse-head-support-20261003c/output",
+    "/outputs",
+    "--proc",
+    "/proc",
+    "--dev",
+    "/dev",
+    "--tmpfs",
+    "/tmp",
+    "--clearenv",
+    "--setenv",
+    "HOME",
+    "/tmp/private-home",
+    "--setenv",
+    "PATH",
+    "/usr/local/bin:/usr/bin:/bin",
+    "--setenv",
+    "PYTHONNOUSERSITE",
+    "1",
+    "--setenv",
+    "PYTHONDONTWRITEBYTECODE",
+    "1",
+    "--setenv",
+    "PYTHONPATH",
+    "/experiment",
+    "--chdir",
+    "/experiment",
+    "--",
+    "/opt/waymo/bin/python",
+    "/experiment/analysis/sparse-head-support.py"
+  ],
+  "exit_code": 0,
+  "runtime_lock": {
+    "image_id": "sha256:46bdaa6e8d9058d7e09419085dfcf9a4527e801330045ae8e0f387f454413b86",
+    "rootfs_sha256": "55f63770083be16ea76764422c51e6e5d995b2d65e9785b552e118a64c6e2f1f",
+    "recipe_hashes": {
+      "Dockerfile": "48484266fe92aaf1a94823fac0746eafef7ac78d0a8754fa9d8f279e8d96c19b",
+      "requirements.lock": "038ba6bbc16870b6430481127b15ab2830e5dac0a6b14c30f218a43853e35923",
+      "build.sh": "bd554045bf0dd40aeceb495fd25ff6ea62ad8e04e93a0c81b203f2c141bcce55"
+    }
+  },
+  "pins": {
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-allclass-fixture-verified.json": "04b4810656823ab00bda279bfec0f4d6f8248ab1457d567d5b64b7b80e675dcb",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/analysis/sparse-head-support.py": "2229a0da1c6fc909064899e9b4b1b6f78a71e767ec252834ac6b0b1125c059d4",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/advanced/spatial_modules.py": "bdbd9be5809aa389c93f7008a900b98809d60685ec3eef4c2678e006752152f6",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/advanced/models.py": "8bd0c741cf35f1107fcc92d238c1c88b2efcb809f9c3ad8d4ff07d1d47b79624",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/advanced/sparse_sets.py": "c27ca6f6894933df75c77ca7195a956990ec2927c6cb5e86a324b8d750d025fe",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/pipeline/pillar_detector.py": "0aef80adb63784844782871745262d15144c36831714c8607b9a91be787936cc",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sparse-head-support-20261003c/inputs/targets.npz": "f18bbd165a1ab973913dd61ef14d7a6aa4e13e705daec6f581fe9c7e56fde892",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sparse-head-support-20261003c/inputs/observations.npz": "ff658a42ef42f8fedd93036e3aa8064a80c0e967d0e8569cffd68eff1b67344e"
+  },
+  "elapsed_seconds": 1.6892099129618146,
+  "peak_children_rss_kib": 91620,
+  "validation": {
+    "classes": {
+      "1": {
+        "positive_anchors": 338,
+        "unsupported_positive_anchors": 30,
+        "objects": 36,
+        "objects_without_supported_positive_anchor": 1,
+        "object_support": [
+          {
+            "target_index": 1,
+            "positive_anchors": 10,
+            "supported_positive_anchors": 8
+          },
+          {
+            "target_index": 3,
+            "positive_anchors": 11,
+            "supported_positive_anchors": 5
+          },
+          {
+            "target_index": 4,
+            "positive_anchors": 10,
+            "supported_positive_anchors": 10
+          },
+          {
+            "target_index": 5,
+            "positive_anchors": 10,
+            "supported_positive_anchors": 10
+          },
+          {
+            "target_index": 6,
+            "positive_anchors": 9,
+            "supported_positive_anchors": 9
+          },
+          {
+            "target_index": 9,
+            "positive_anchors": 9,
+            "supported_positive_anchors": 9
+          },
+          {
+            "target_index": 12,
+            "positive_anchors": 10,
+            "supported_positive_anchors": 10
+          },
+          {
+            "target_index": 14,
+            "positive_anchors": 10,
+            "supported_positive_anchors": 10
+          },
+          {
+            "target_index": 15,
+            "positive_anchors": 8,
+            "supported_positive_anchors": 8
+          },
+          {
+            "target_index": 16,
+            "positive_anchors": 10,
+            "supported_positive_anchors": 10
+          },
+          {
+            "target_index": 18,
+            "positive_anchors": 10,
+            "supported_positive_anchors": 10
+          },
+          {
+            "target_index": 20,
+            "positive_anchors": 9,
+            "supported_positive_anchors": 9
+          },
+          {
+            "target_index": 21,
+            "positive_anchors": 9,
+            "supported_positive_anchors": 9
+          },
+          {
+            "target_index": 25,
+            "positive_anchors": 8,
+            "supported_positive_anchors": 8
+          },
+          {
+            "target_index": 27,
+            "positive_anchors": 10,
+            "supported_positive_anchors": 7
+          },
+          {
+            "target_index": 28,
+            "positive_anchors": 11,
+            "supported_positive_anchors": 11
+          },
+          {
+            "target_index": 29,
+            "positive_anchors": 10,
+            "supported_positive_anchors": 10
+          },
+          {
+            "target_index": 30,
+            "positive_anchors": 6,
+            "supported_positive_anchors": 6
+          },
+          {
+            "target_index": 34,
+            "positive_anchors": 10,
+            "supported_positive_anchors": 10
+          },
+          {
+            "target_index": 36,
+            "positive_anchors": 9,
+            "supported_positive_anchors": 9
+          },
+          {
+            "target_index": 43,
+            "positive_anchors": 12,
+            "supported_positive_anchors": 12
+          },
+          {
+            "target_index": 44,
+            "positive_anchors": 9,
+            "supported_positive_anchors": 8
+          },
+          {
+            "target_index": 45,
+            "positive_anchors": 8,
+            "supported_positive_anchors": 8
+          },
+          {
+            "target_index": 46,
+            "positive_anchors": 10,
+            "supported_positive_anchors": 10
+          },
+          {
+            "target_index": 48,
+            "positive_anchors": 9,
+            "supported_positive_anchors": 9
+          },
+          {
+            "target_index": 51,
+            "positive_anchors": 10,
+            "supported_positive_anchors": 10
+          },
+          {
+            "target_index": 57,
+            "positive_anchors": 12,
+            "supported_positive_anchors": 12
+          },
+          {
+            "target_index": 58,
+            "positive_anchors": 9,
+            "supported_positive_anchors": 9
+          },
+          {
+            "target_index": 60,
+            "positive_anchors": 9,
+            "supported_positive_anchors": 9
+          },
+          {
+            "target_index": 62,
+            "positive_anchors": 10,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 64,
+            "positive_anchors": 9,
+            "supported_positive_anchors": 9
+          },
+          {
+            "target_index": 65,
+            "positive_anchors": 10,
+            "supported_positive_anchors": 10
+          },
+          {
+            "target_index": 66,
+            "positive_anchors": 9,
+            "supported_positive_anchors": 0
+          },
+          {
+            "target_index": 68,
+            "positive_anchors": 7,
+            "supported_positive_anchors": 7
+          },
+          {
+            "target_index": 70,
+            "positive_anchors": 8,
+            "supported_positive_anchors": 8
+          },
+          {
+            "target_index": 72,
+            "positive_anchors": 8,
+            "supported_positive_anchors": 8
+          }
+        ]
+      },
+      "2": {
+        "positive_anchors": 30,
+        "unsupported_positive_anchors": 0,
+        "objects": 18,
+        "objects_without_supported_positive_anchor": 0,
+        "object_support": [
+          {
+            "target_index": 2,
+            "positive_anchors": 2,
+            "supported_positive_anchors": 2
+          },
+          {
+            "target_index": 7,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 10,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 11,
+            "positive_anchors": 2,
+            "supported_positive_anchors": 2
+          },
+          {
+            "target_index": 23,
+            "positive_anchors": 2,
+            "supported_positive_anchors": 2
+          },
+          {
+            "target_index": 24,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 26,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 33,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 35,
+            "positive_anchors": 2,
+            "supported_positive_anchors": 2
+          },
+          {
+            "target_index": 39,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 40,
+            "positive_anchors": 6,
+            "supported_positive_anchors": 6
+          },
+          {
+            "target_index": 47,
+            "positive_anchors": 2,
+            "supported_positive_anchors": 2
+          },
+          {
+            "target_index": 50,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 55,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 56,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 63,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 67,
+            "positive_anchors": 2,
+            "supported_positive_anchors": 2
+          },
+          {
+            "target_index": 71,
+            "positive_anchors": 2,
+            "supported_positive_anchors": 2
+          }
+        ]
+      },
+      "3": {
+        "positive_anchors": 16,
+        "unsupported_positive_anchors": 0,
+        "objects": 14,
+        "objects_without_supported_positive_anchor": 0,
+        "object_support": [
+          {
+            "target_index": 0,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 8,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 13,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 19,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 22,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 32,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 41,
+            "positive_anchors": 2,
+            "supported_positive_anchors": 2
+          },
+          {
+            "target_index": 42,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 49,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 53,
+            "positive_anchors": 2,
+            "supported_positive_anchors": 2
+          },
+          {
+            "target_index": 54,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 59,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 61,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 69,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          }
+        ]
+      },
+      "4": {
+        "positive_anchors": 6,
+        "unsupported_positive_anchors": 0,
+        "objects": 5,
+        "objects_without_supported_positive_anchor": 0,
+        "object_support": [
+          {
+            "target_index": 17,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 31,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 37,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          },
+          {
+            "target_index": 38,
+            "positive_anchors": 2,
+            "supported_positive_anchors": 2
+          },
+          {
+            "target_index": 52,
+            "positive_anchors": 1,
+            "supported_positive_anchors": 1
+          }
+        ]
+      }
+    },
+    "unsupported_head_cells": 46432,
+    "total_head_cells": 65536,
+    "background_anchors_without_local_support": 371383,
+    "scope": "Structural local occupied-token support only. Global normalization statistics can couple cells. Missing local support is not a measured attribution of AP errors; supported cells can also fail. No architecture treatment or scientific promotion."
+  },
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sparse-head-support-20261003c/output/live.log": "37402eac96179f81498ddcba16dedbcc697ab51d8f383a99ae0cc750f685675c",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sparse-head-support-20261003c/output/check.json": "6bc601e01245e8d90474b4d91fe03bb892518ecda526dae0f59eba16db38b3be"
+  }
+}

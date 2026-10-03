@@ -377,3 +377,11 @@ motion-foundation
 Checked-in reproducible Motion foundation runner passed fresh live Insula: 42 native tests, 19 boundary groups, 2 byte-exact causal prefixes and 2 future-sensor refusals, 10.20s / 55948 KiB child RSS. Unsafe IDs and reused directories refuse without overwriting receipts. Aggregate ticket19 acceptance and scientific comparisons remain open.
 
 Evidence: [motion-found](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-foundation-reproducible-run-verified.json)
+
+## 48. 2026-10-03T01:52:27.718127+00:00 — hypothesis
+
+sparse_bev_transformer
+
+Live structural support diagnostic: vehicle has30/338 positive anchors outside occupied-token support and1/36 objects with no supported positive; all pedestrian/sign/cyclist positives supported. One missing-support vehicle does not explain the full APH gap. Decision needs-more-evidence; no running architecture or gate changes.
+
+Evidence: [sparse-head-](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sparse-head-support-live-verified.json)
