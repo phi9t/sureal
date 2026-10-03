@@ -321,3 +321,11 @@ task19/raw-retention
 Released only the fully inventoried 448622357-byte training raw shard after exact source/HDFS and complete independent live framing/protobuf proofs. A second bounded HDFS download reproduced exact size/SHA before temporary copy release. Native selected truth and causal observations remain local; full-shard replays require recorded HDFS rehydration. Original receipts remain immutable.
 
 Evidence: [motion-train](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-training-raw-release-verified.json)
+
+## 41. 2026-10-03T00:07:31.378318+00:00 — observation
+
+task19/native-metric-handoff
+
+Validation extension and observation-only camera codebook path pass independently live. Real acquired training/validation native targets scored with explicit oracle0/2m diagnostics. Separate native truth/prediction parser derives errors/counts; live checker matches four comparisons within1e-3m and rejects8 corruptions. Validation ADE count8/FDE count6 preserves two missing endpoints. No trained or causal forecasting quality claim.
+
+Evidence: [motion-real-](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-real-metric-handoff-verified.json)
