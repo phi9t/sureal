@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-10-02T23:23:08.374080+00:00",
+  "updated_utc": "2026-10-03T02:48:16.524046+00:00",
   "scope": "fixed all-class training batch; no heldout, segmentation or full-dataset completion claim",
   "experiments": [
     {
@@ -1069,32 +1069,45 @@
         "final live Insula closure"
       ],
       "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
-      "stage": "running_or_verifying",
+      "stage": "native_fit_pending_closure",
       "trained": true,
-      "updates": 300,
-      "confirmation_update": null,
-      "time_to_fit": null,
-      "cumulative_train_seconds": null,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          22.07741769956192,
+          37.95106626022607
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 57.37348473793827,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 57.37348473793827,
       "terminal_LEVEL2_per_class": {
         "1": {
-          "AP": 0.893481,
-          "APH": 0.890064
+          "AP": 1.0,
+          "APH": 0.978169
         },
         "2": {
-          "AP": 0.760648,
-          "APH": 0.756926
+          "AP": 1.0,
+          "APH": 0.998992
         },
         "3": {
-          "AP": 0.31131,
-          "APH": 0.309636
+          "AP": 0.928571,
+          "APH": 0.927627
         },
         "4": {
-          "AP": 0.1,
-          "APH": 0.099777
+          "AP": 1.0,
+          "APH": 0.999547
         }
       },
-      "worst_terminal_APH": 0.099777,
-      "result_sha256": "fbcf631d3b54b3dfbacc2733b1bde5e3dbdf20c9bb5d5463f947b111d863821c",
+      "worst_terminal_APH": 0.927627,
+      "result_sha256": "2a3eac21d9b5078eea86fdb0a33d8f55787e05bb3d3408bccd221e39dd3b565c",
       "closure_candidate_sha256": null,
       "result_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-results.json",
       "closure_path": null,
@@ -1124,15 +1137,45 @@
         "final live Insula closure"
       ],
       "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
-      "stage": "gpu_admitted",
-      "trained": false,
-      "updates": null,
-      "confirmation_update": null,
-      "time_to_fit": null,
-      "cumulative_train_seconds": null,
-      "terminal_LEVEL2_per_class": {},
-      "worst_terminal_APH": null,
-      "result_sha256": "fbcf631d3b54b3dfbacc2733b1bde5e3dbdf20c9bb5d5463f947b111d863821c",
+      "stage": "native_fit_pending_closure",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          18.54637504252605,
+          32.12174880312523
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 48.79892970103538,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 48.79892970103538,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.986726
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.999121
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.926807
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.999561
+        }
+      },
+      "worst_terminal_APH": 0.926807,
+      "result_sha256": "2a3eac21d9b5078eea86fdb0a33d8f55787e05bb3d3408bccd221e39dd3b565c",
       "closure_candidate_sha256": null,
       "result_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-results.json",
       "closure_path": null,
@@ -1162,15 +1205,45 @@
         "final live Insula closure"
       ],
       "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
-      "stage": "gpu_admitted",
-      "trained": false,
-      "updates": null,
-      "confirmation_update": null,
-      "time_to_fit": null,
-      "cumulative_train_seconds": null,
-      "terminal_LEVEL2_per_class": {},
-      "worst_terminal_APH": null,
-      "result_sha256": "fbcf631d3b54b3dfbacc2733b1bde5e3dbdf20c9bb5d5463f947b111d863821c",
+      "stage": "native_fit_pending_closure",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          19.545064764562994,
+          33.86449509119848
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 51.27499999460997,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 51.27499999460997,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.998744
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.99788
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.927527
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.999431
+        }
+      },
+      "worst_terminal_APH": 0.927527,
+      "result_sha256": "2a3eac21d9b5078eea86fdb0a33d8f55787e05bb3d3408bccd221e39dd3b565c",
       "closure_candidate_sha256": null,
       "result_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-results.json",
       "closure_path": null,
@@ -1200,15 +1273,45 @@
         "final live Insula closure"
       ],
       "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
-      "stage": "gpu_admitted",
-      "trained": false,
-      "updates": null,
-      "confirmation_update": null,
-      "time_to_fit": null,
-      "cumulative_train_seconds": null,
-      "terminal_LEVEL2_per_class": {},
-      "worst_terminal_APH": null,
-      "result_sha256": "fbcf631d3b54b3dfbacc2733b1bde5e3dbdf20c9bb5d5463f947b111d863821c",
+      "stage": "native_fit_pending_closure",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          43.194750747061335,
+          73.26095212518703
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 110.58177473011892,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 110.58177473011892,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.984122
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.998716
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.926812
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.997981
+        }
+      },
+      "worst_terminal_APH": 0.926812,
+      "result_sha256": "2a3eac21d9b5078eea86fdb0a33d8f55787e05bb3d3408bccd221e39dd3b565c",
       "closure_candidate_sha256": null,
       "result_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-results.json",
       "closure_path": null,
@@ -1238,15 +1341,45 @@
         "final live Insula closure"
       ],
       "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
-      "stage": "gpu_admitted",
-      "trained": false,
-      "updates": null,
-      "confirmation_update": null,
-      "time_to_fit": null,
-      "cumulative_train_seconds": null,
-      "terminal_LEVEL2_per_class": {},
-      "worst_terminal_APH": null,
-      "result_sha256": "fbcf631d3b54b3dfbacc2733b1bde5e3dbdf20c9bb5d5463f947b111d863821c",
+      "stage": "native_fit_pending_closure",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          34.8594728949829,
+          58.550918615597766
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 87.57246883586049,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 87.57246883586049,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 0.99512,
+          "APH": 0.880378
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.996736
+        },
+        "3": {
+          "AP": 0.813736,
+          "APH": 0.811483
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.998172
+        }
+      },
+      "worst_terminal_APH": 0.811483,
+      "result_sha256": "2a3eac21d9b5078eea86fdb0a33d8f55787e05bb3d3408bccd221e39dd3b565c",
       "closure_candidate_sha256": null,
       "result_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-results.json",
       "closure_path": null,
@@ -1276,15 +1409,45 @@
         "final live Insula closure"
       ],
       "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
-      "stage": "gpu_admitted",
-      "trained": false,
-      "updates": null,
-      "confirmation_update": null,
-      "time_to_fit": null,
-      "cumulative_train_seconds": null,
-      "terminal_LEVEL2_per_class": {},
-      "worst_terminal_APH": null,
-      "result_sha256": "fbcf631d3b54b3dfbacc2733b1bde5e3dbdf20c9bb5d5463f947b111d863821c",
+      "stage": "native_fit_pending_closure",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          88.7809785430436,
+          149.74099597986788
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 224.76139738614438,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 224.76139738614438,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 0.988814,
+          "APH": 0.946316
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.99799
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.926328
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.995888
+        }
+      },
+      "worst_terminal_APH": 0.926328,
+      "result_sha256": "2a3eac21d9b5078eea86fdb0a33d8f55787e05bb3d3408bccd221e39dd3b565c",
       "closure_candidate_sha256": null,
       "result_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-results.json",
       "closure_path": null,
@@ -1314,15 +1477,45 @@
         "final live Insula closure"
       ],
       "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
-      "stage": "gpu_admitted",
-      "trained": false,
-      "updates": null,
-      "confirmation_update": null,
-      "time_to_fit": null,
-      "cumulative_train_seconds": null,
-      "terminal_LEVEL2_per_class": {},
-      "worst_terminal_APH": null,
-      "result_sha256": "fbcf631d3b54b3dfbacc2733b1bde5e3dbdf20c9bb5d5463f947b111d863821c",
+      "stage": "native_fit_pending_closure",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          88.3006609727745,
+          148.56673440651502
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 223.68377439532196,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 223.68377439532196,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.999391
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.999123
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.92697
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.99891
+        }
+      },
+      "worst_terminal_APH": 0.92697,
+      "result_sha256": "2a3eac21d9b5078eea86fdb0a33d8f55787e05bb3d3408bccd221e39dd3b565c",
       "closure_candidate_sha256": null,
       "result_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-results.json",
       "closure_path": null,
@@ -1352,15 +1545,32 @@
         "final live Insula closure"
       ],
       "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
-      "stage": "gpu_admitted",
-      "trained": false,
-      "updates": null,
+      "stage": "running_or_verifying",
+      "trained": true,
+      "updates": 8000,
       "confirmation_update": null,
       "time_to_fit": null,
       "cumulative_train_seconds": null,
-      "terminal_LEVEL2_per_class": {},
-      "worst_terminal_APH": null,
-      "result_sha256": "fbcf631d3b54b3dfbacc2733b1bde5e3dbdf20c9bb5d5463f947b111d863821c",
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 0.765732,
+          "APH": 0.765594
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.999751
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.92834
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.999891
+        }
+      },
+      "worst_terminal_APH": 0.765594,
+      "result_sha256": "2a3eac21d9b5078eea86fdb0a33d8f55787e05bb3d3408bccd221e39dd3b565c",
       "closure_candidate_sha256": null,
       "result_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-results.json",
       "closure_path": null,
@@ -1373,7 +1583,7 @@
       "result_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-overfit20261002b-results.json"
     },
     "expanded20261002a": {
-      "result_sha256": "fbcf631d3b54b3dfbacc2733b1bde5e3dbdf20c9bb5d5463f947b111d863821c",
+      "result_sha256": "2a3eac21d9b5078eea86fdb0a33d8f55787e05bb3d3408bccd221e39dd3b565c",
       "result_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-results.json"
     }
   }
