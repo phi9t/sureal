@@ -1,0 +1,165 @@
+{
+  "review_role": "one fresh whole-increment independent read-only review",
+  "checkout": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer",
+  "base": "b497ae0",
+  "ready_to_merge": "Yes, preparation only",
+  "critical": [],
+  "important": [],
+  "minor": [],
+  "strengths": [
+    "ResourceBackend preserves original native checks and seals/checks a separate immutable seven-stage companion before persistence; a consistently re-pinned leaf proof/binding fails companion comparison.",
+    "Exact raw metadata inventory and pinned archive library enforce regular source files, bounded payload, member equality and checksum recovery; original publisher always refuses release.",
+    "Launcher grace is bounded by min(overall deadline, now+100ms), actually wait4 reaps and measures helpers, includes elapsed time, preserves worker descendant refusal and cleanup."
+  ],
+  "validation": {
+    "fresh_live_suite": {
+      "command": "python /tmp/sureal-resource-checkpoint-gate.py sustained-resource-review-independent-20261003a",
+      "receipt": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-review-independent-20261003a-verified.json",
+      "sha256": "01c67ae52ab48c3f815836f4c5012ee977849a6fb8689c65d9429fb7bedf8618",
+      "receipt_exit_code": 0,
+      "groups": 36,
+      "raw_log": "/tmp/sustained-resource-review-independent-20261003a/output/live.log"
+    },
+    "independent_capped_archive": {
+      "command": "systemd-run --user --scope --unit=sureal-sustained-resource-independent-review20261003a -p MemoryMax=16G -p MemorySwapMax=0 -p MemoryAccounting=yes env PYTHONDONTWRITEBYTECODE=1 python /tmp/sureal-resource-independent-live.py",
+      "report": "/tmp/sureal-resource-independent-live-20261003a/report.json",
+      "report_sha256": "a9c47d76d9ee4f12831f8e48d14cff3d1219293024a1c071de14868e2b4f15e8",
+      "driver_sha256": "26960d0f87f14e898cc2f9b2391a32f07060d6bc4e696c2aab5579bca9af7262",
+      "files": 691,
+      "payload_bytes": 3166162,
+      "mode_results": [
+        {
+          "mode": "verify",
+          "host_peak_rss_kib": 67972,
+          "worker_self_peak_rss_kib": 19904,
+          "worker_waited_child_peak_rss_kib": 0,
+          "elapsed_seconds": 0.15350476297317073,
+          "kernel_scope": {
+            "path": "/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-resource-independent-review20261003a.scope",
+            "memory_max_bytes": 17179869184,
+            "memory_swap_max_bytes": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "members_verified": true,
+            "kernel_events": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0
+            },
+            "process_ids": [
+              1441481
+            ]
+          },
+          "completed_helpers": [
+            {
+              "pid": 1441965,
+              "peak_rss_kib": 19904
+            }
+          ]
+        },
+        {
+          "mode": "rehydrate",
+          "host_peak_rss_kib": 67972,
+          "worker_self_peak_rss_kib": 20824,
+          "worker_waited_child_peak_rss_kib": 0,
+          "elapsed_seconds": 0.24450403603259474,
+          "kernel_scope": {
+            "path": "/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-resource-independent-review20261003a.scope",
+            "memory_max_bytes": 17179869184,
+            "memory_swap_max_bytes": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "members_verified": true,
+            "kernel_events": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0
+            },
+            "process_ids": [
+              1441481
+            ]
+          },
+          "completed_helpers": [
+            {
+              "pid": 1442131,
+              "peak_rss_kib": 20976
+            }
+          ]
+        }
+      ]
+    },
+    "independent_archive_refusal_probes": {
+      "receipt": "/tmp/sureal-resource-archive-edge-live-v2/receipt.json",
+      "receipt_sha256": "f94bf0ea64bc4089aa382118fc52ccb131afe83f6212abbb83b0e309cb1c1889",
+      "exit_code": 0,
+      "cases": [
+        "member-union",
+        "missing-module",
+        "changed-module-pin",
+        "changed-manifest-pin",
+        "escape",
+        "absolute",
+        "symlink",
+        "hardlink",
+        "source-file-symlink"
+      ],
+      "first_attempt": "/tmp/sureal-resource-archive-edge-live/receipt.json",
+      "first_attempt_note": "Reviewer temporary fixture directory naming collision; source and failed log retained. Corrected isolated v2 run passed all9."
+    },
+    "raw_evidence_audit": {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python /tmp/sureal-resource-independent-audit.py",
+      "report": "/tmp/sureal-resource-independent-audit.json",
+      "report_sha256": "ab1cfb723bfdd3656886688be06975a3d22dccb1b760e6b16ebc4012a073534a",
+      "driver_sha256": "55071e7a0ab54efe22cf58ff736b04df3ccab1b6d0f53d91a9a18a9100626a01",
+      "hash_bindings_checked": 7020,
+      "unique_files_checked": 5612,
+      "resource_closure": 22,
+      "native_workers_original_and_frozen": 295,
+      "native_hosts_original_and_frozen": 23,
+      "original_run_sha256": "96dc607ae8238774ca875588d65eaf463f120227e161ae792a9187c8e6635d7d",
+      "original_state_sha256": "dac2ce421243c4750175f98152cdc1ce4ecb7e1a493ddee7050c42fcc09e7765",
+      "original_checkpoints": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-00/checkpoint.pt": "8057a5496c4d6ec4d19b9de33034c6cca753ea39d8f03fd765ad7011cdf301ee",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-1000/checkpoint.pt": "37de2375b0b10f92a56468bd9ffe0b2fea42f257c5949efa80fd29c621a8ff4a"
+      },
+      "preserved_archive_failure": "Reconciled raw v1 attempt digest, direct launch exit0/lifecycle refusal/complete cleanup, exact v2 HDFS downloads and all restored bytes; diagnostic raw PID996182 comm bwrap, State Z (zombie)."
+    },
+    "rootfs_recomputation": {
+      "archive_cpu": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+      "suite_gpu": "55f63770083be16ea76764422c51e6e5d995b2d65e9785b552e118a64c6e2f1f"
+    },
+    "historical_red_green": "All8 receipt exit codes, frozen source/log pins and actual failure/pass logs checked; RED1/GREEN0 for checkpoint, backend, archive worker and helper settle."
+  },
+  "declined_to_judge": [
+    {
+      "behavior": "Complete checkpoint HDFS retention, reconstruction and release",
+      "reason": "Future gate outside this preparation increment. resource_inventory does not retain native receipt per-stage input_hashes snapshots or every external input/runtime dependency needed for full reconstruction. The preparation archive claims only raw source/proof/log closure, and publish_and_release unconditionally refuses. The current code does not establish full checkpoint closure."
+    },
+    {
+      "behavior": "Legacy0/1000 bounded resource revalidation and native GPU/state parity through the new resource backend",
+      "reason": "Explicit future gates; immutable historical native run/state/checkpoints were hash-checked, not rerun or relabeled resource-admitted."
+    },
+    {
+      "behavior": "Full sustained runner continuation, scientific fitting admission and local payload release",
+      "reason": "User-approved ordering requires remaining resource gates first; no training, merge, push or release performed."
+    },
+    {
+      "behavior": "Fresh independent HDFS upload/download",
+      "reason": "Reviewed actual author transfer commands/log hashes and exact original packed/downloaded bytes, then independently ran live capped verification/recovery of those preserved HDFS downloads; no new network transfer performed."
+    },
+    {
+      "behavior": "Actual native seven-stage companion admission",
+      "reason": "Fresh36-group suite tests resource seams with explicit native-kernel mocks; it does not prove a new full native checkpoint. Existing actual stage/backend evidence remains separate."
+    }
+  ],
+  "recommendations": [
+    "Keep full checkpoint transport fail-closed until every per-stage input/parent dependency and its reconstruction binding is retained and independently recovered.",
+    "Record36 as the current passing suite count when updating milestone status; the approved-order document accurately labels its34 count as at recording."
+  ],
+  "verdict_reason": "No material defects found in the reviewed preparation scope. All36 fresh live suite groups and9 independent archive refusal probes pass; independently observed16GiB capped verification/recovery and7020 exact hash bindings reconcile. This verdict permits preparation-only landing and grants no full resource, training or release admission.",
+  "checkout_mutation": "No source/index/branch edits. Only uniquely named stock-harness research test receipt was created; all other independent drivers, artifacts and reports are under /tmp."
+}

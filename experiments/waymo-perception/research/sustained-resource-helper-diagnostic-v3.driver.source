@@ -1,0 +1,33 @@
+"""Observe actual launcher descendants before existing fail-closed cleanup."""
+import json,os,shutil,sys
+from pathlib import Path
+P=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P))
+from resources import scoped_stage
+from resources.stage import run_stage
+from resources.sources import freeze_sources,sha
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+C=Path.home()/'.cache/waystone/waymo-perception';R=Path('/tmp/sustained-resource-helper-diagnostic-v3');R.mkdir();pins=freeze_sources(P/'resources',R/'code');experiment=R/'experiment';experiment.mkdir();shutil.copyfile(R/'code/archive_worker.py',experiment/'archive_worker.py');proofs=R/'proofs';proofs.mkdir()
+raw=Path('/tmp/sustained-resource-archive-live-v1');job=json.loads((raw/'input/rehydrate-live/job.json').read_text());inputs=R/'input';inputs.mkdir();(inputs/'job.json').write_text(json.dumps(job));library=C/'insula/balanced16-sustained-baseline-controller20261003a/host-source/advanced/archive.py';root=C/'insula/rootfs-v2';runtime=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,runtime['rootfs_sha256'])
+original=scoped_stage.read_scope;observed=[]
+def watch(*args,**kwargs):
+ value=original(*args,**kwargs)
+ if kwargs.get("pid") is not None:return value
+ for pid in value["process_ids"]:
+  if pid==os.getpid():continue
+  info={'pid':pid}
+  for label in ('comm','stat','status','cmdline'):
+   try:info[label]=(Path('/proc')/str(pid)/label).read_text().replace('\0',' ')
+   except (FileNotFoundError,ProcessLookupError):info[label]='exited before observation'
+  observed.append(info)
+ return value
+scoped_stage.read_scope=watch
+for index in range(50):
+ out=R/f'output{index}';out.mkdir();command=launch_plan(root,experiment,raw/'download',out,['python','/experiment/archive_worker.py','rehydrate']);at=command.index('--');command[at:at]=['--ro-bind',str(inputs),'/tmp/inputs','--ro-bind',str(library),'/tmp/resource-archive.py']
+ try:
+  with (out/'live.log').open('w') as log:run_stage(command,experiment,dict(os.environ),log,300,code=R/'code',current_sources=P/'resources',source_pins=pins,evidence_directory=proofs/f'stage{index}',native_output=out,cap_bytes=16*1024**3)
+ except ValueError:
+  assert observed;print(json.dumps(observed,indent=2),flush=True);break
+else:print('No launcher race reproduced in50 attempts',flush=True)
+report={'scope':'diagnostic observer of refused actual launcher lifecycle, no admission or release','observed':observed,'driver_sha256':sha(__file__),'source_pins':pins,'runtime_lock':runtime}
+(P/'research/sustained-resource-helper-diagnostic-v3.json').write_text(json.dumps(report,indent=2)+'\n')

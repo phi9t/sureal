@@ -1,0 +1,19 @@
+{
+  "scope": "preserved raw preparation archive live failure; HDFS archive/manifest downloads exact, recovery worker completed but launcher lifecycle refused; no checkpoint release or full resource admission",
+  "failure_proof": {
+    "path": "/tmp/sustained-resource-archive-live-v1/proofs/rehydrate-live/attempt.json",
+    "sha256": "b1ac7d137496877760261b7a751e4bc2baa7e3ed00d9ead1b51b2060bff4e99c"
+  },
+  "driver_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-archive-live.driver.source",
+  "driver_sha256": "7aef85b78a53f38e6ee54ae9888618351aae4af3aca113dfb549b08535f01bfd",
+  "downloaded_archive_sha256": "b9b744a1a53c6710643afbdb1eb96d019abf33932f80a622203464c93ec44594",
+  "downloaded_manifest_sha256": "52bb706d04cbd6e0f0ee94c81d5f43b677641dc21ca74968f7cbb2ade7555c1b",
+  "exact_archive_readback": true,
+  "exact_manifest_readback": true,
+  "diagnostic": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-helper-diagnostic-v3.json",
+    "sha256": "98642f9ebf13bfee0537e43b5fb4f16cb938f56dd6f8b4f61403a974a1088d9f"
+  },
+  "refused_descendant_comm": "bwrap",
+  "refused_descendant_state": "Z (zombie)"
+}

@@ -1,0 +1,13 @@
+{
+  "scope": "independent literal journal hash-chain and every immutable evidence reference, exact staged versus HDFS-downloaded manifest/payload bytes; no claim that indirect raw artifacts inside receipt JSON were archived",
+  "snapshot_hdfs_prefix": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-dce6b328e5f749f1b41946a1e2c50192",
+  "publication_receipt_sha256": "195d481a19bbf5b4fb35421204d9eabd62035381eed15a0f991e8435b20c13f8",
+  "manifest_sha256": "be23b9a18487ef752f17867338b073b1646660f0f7211d8ccaa622bb3fc605d0",
+  "downloaded_files": 163,
+  "journal_entries": 99,
+  "evidence_references": 226,
+  "journal_head_sha256": "b780509097b49a2a4acc8fabb7ddcd45a2c89db5811fcbb5e2996524a2b42263",
+  "verified_transfers": 328,
+  "independent_verifier_sha256": "a3fa2cbe6b4e5866193ccafb0c625a704e0328e6955e0ab4d2ca1e629203be83",
+  "all_checks_passed": true
+}

@@ -18,6 +18,22 @@ def _reap_completed():
     return completed
 
 
+def _settle_launchers(cap_bytes,caller,deadline):
+    """Wait only until the stage deadline for adopted launcher completion.
+
+    A Bubblewrap helper can exit after the direct launcher. Every completed
+    helper is actually waited/measured; remaining children still refuse.
+    The original worker's stricter no-unwaited-child gate is unchanged.
+    """
+    completed=[]
+    while True:
+        completed.extend(_reap_completed())
+        terminal=read_scope(cap_bytes);children=direct_children()
+        if not children and terminal['process_ids']==[caller] or time.monotonic()>=deadline:
+            return completed,terminal,children
+        time.sleep(min(.002,max(0,deadline-time.monotonic())))
+
+
 def _cleanup(path):
     """Terminate only members of this initially exclusive stage scope.
 
@@ -53,6 +69,7 @@ def _cleanup(path):
 
 
 def run_scoped(command, *, cwd, stream, timeout, cap_bytes, env=None):
+    started=time.monotonic()
     initial=read_scope(cap_bytes)
     caller=os.getpid()
     if initial['process_ids']!=[caller]:
@@ -70,11 +87,11 @@ def run_scoped(command, *, cwd, stream, timeout, cap_bytes, env=None):
         result=measure(command,cwd=cwd,stream=stream,timeout=timeout,env=env,observer=observe)
         # Bubblewrap can leave an exited helper for its subreaper to wait.
         # Include actual wait4 usage; never treat an un-reaped zombie as proof.
-        completed=_reap_completed()
+        completed,terminal,children=_settle_launchers(cap_bytes,caller,min(started+timeout,time.monotonic()+.1))
         result['completed_launcher_descendants']=completed
         result['peak_rss_kib']=max([result['peak_rss_kib']]+[item['peak_rss_kib'] for item in completed])
-        terminal=read_scope(cap_bytes)
-        children=direct_children()
+        result['elapsed_seconds']=time.monotonic()-started
+        if result['elapsed_seconds']>timeout:result['timed_out']=True
     except BaseException:
         _cleanup(initial['path'])
         raise
