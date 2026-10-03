@@ -27,7 +27,7 @@ fixed all-class training batch; no heldout, segmentation or full-dataset complet
 | expanded20261002a/point_mlp_control | native_fit_pending_closure | 750 | 87.6 | 0.811 |
 | expanded20261002a/range_fusion | native_fit_pending_closure | 750 | 224.8 | 0.926 |
 | expanded20261002a/zero_range_control | native_fit_pending_closure | 750 | 223.7 | 0.927 |
-| expanded20261002a/sparse_bev_transformer | running_or_verifying | — | — | 0.766 |
+| expanded20261002a/sparse_bev_transformer | running_or_verifying | — | — | 0.742 |
 
 Each row’s goal, complete recipe, verifier contract and acceptance criteria are in [experiments.json](experiments.json). Definitions are in [experiment-registry.json](experiment-registry.json). Notes are in [research-journal.md](research-journal.md).
 

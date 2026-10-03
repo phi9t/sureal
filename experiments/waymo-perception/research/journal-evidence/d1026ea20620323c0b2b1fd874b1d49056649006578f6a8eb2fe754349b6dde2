@@ -1,0 +1,8 @@
+{
+  "reviewer": "/root/motion_geometry_review",
+  "scope": "two engineering-pilot current-reference geometry gate",
+  "audit_receipt_sha256": "1c92d54fdd2ee86417288e255e31f5bf7f5b8a1ca13a06b7a99795a32a1e190b",
+  "findings": [],
+  "verdict": "ready for two-pilot geometry preparation gate; scientific forecasting and ticket19 remain open",
+  "reviewer_report": "Verified all700 pinned hashes and repository-to-executed-source equality. Read-only replay passed both pilots:220 unique returns,3,723,283 points, maximum discrepancy2.35012e-12m. Analytic fixtures passed; all eight retained serialized corruptions failed for intended reasons. Native checker independently decodes protobuf tensors and computes direct world\u2192current geometry."
+}
