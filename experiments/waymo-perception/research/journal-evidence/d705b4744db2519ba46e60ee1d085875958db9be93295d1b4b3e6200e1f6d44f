@@ -1,0 +1,25 @@
+"""Actual capped Insula execution of a separately snapshotted test namespace."""
+import hashlib,json,os,shutil,sys
+from pathlib import Path
+P=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P))
+from resources.sources import sha,validate_sources
+from resources.stage import run_stage,validate_proof,write_new
+R=Path('/tmp')/sys.argv[1];R.mkdir()
+for folder in ['resources','continuation','continuation_control','pipeline','gpu','tier1','cohort','architecture','advanced']:
+ shutil.copytree(P/folder,R/'code'/folder,ignore=shutil.ignore_patterns('__pycache__'))
+(R/'input').mkdir();(R/'output').mkdir()
+x=json.loads((P/'research/sustained-checkpoint-inventory-red-v1-verified.json').read_text());cmd=x['command'].copy()
+for name,path in [('/experiment',R/'code'),('/source',R/'input'),('/outputs',R/'output')]:cmd[cmd.index(name)-1]=str(path)
+(R/'input/run-tests.py').write_text('import unittest\nr=unittest.main(module=None, exit=False)\nif not r.result.wasSuccessful(): raise AssertionError("live test suite failed")\n')
+i=cmd.index('--');cmd=cmd[:i+1]+['/opt/waymo/bin/python','/source/run-tests.py']+sys.argv[2:]+['-v']
+identity=json.loads((P/'research/sustained-resource-shared-hdfs-live-v4-verified.json').read_text());pins=json.loads(Path(identity['resource_identity_path']).read_text())['source_pins'];code=validate_sources(P/'resources',pins)
+result={'scope':'live capped CPU Insula parity tests; no producer or release admission','driver_sha256':sha(__file__),'runtime_lock':x['runtime_lock'],'source_pins':{str(p):sha(p) for p in (R/'code').rglob('*.py')}}
+try:
+ with (R/'output/live.log').open('w') as stream:
+  run_stage(cmd,R/'code',dict(os.environ),stream,1800,code=code,current_sources=P/'resources',source_pins=pins,evidence_directory=R/'resources',native_output=R/'output',cap_bytes=16*1024**3)
+ result['passed']=True
+except BaseException as error:
+ result.update(passed=False,error={'type':type(error).__name__,'message':str(error)})
+result.update(command=cmd,log={'path':str(R/'output/live.log'),'sha256':sha(R/'output/live.log')})
+write_new(R/'verified.json',result)
+print((R/'output/live.log').read_text()[-6000:]);print('PASSED',result['passed'])
