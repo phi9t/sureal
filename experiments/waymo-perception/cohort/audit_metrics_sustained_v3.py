@@ -1,3 +1,4 @@
+from cohort.sustained_scoring_budget import DEFAULT_NATIVE_SECONDS
 import hashlib,json,math,re,subprocess
 from pathlib import Path
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
@@ -18,7 +19,7 @@ for name in ['predictions','groundtruth']:
   difficulty=re.search(r'detection_difficulty_level: (\S+)',b)
   if record['difficulty'] is None:assert difficulty is None
   else:assert difficulty[1]=={0:'UNKNOWN',1:'LEVEL_1',2:'LEVEL_2'}[record['difficulty']]
-run=subprocess.run(['/metrics-build/compute_detection_metrics','/tmp/scored/predictions.bin','/tmp/scored/groundtruth.bin'],capture_output=True,text=True,timeout=600);assert run.returncode==0
+run=subprocess.run(['/metrics-build/compute_detection_metrics','/tmp/scored/predictions.bin','/tmp/scored/groundtruth.bin'],capture_output=True,text=True,timeout=DEFAULT_NATIVE_SECONDS);assert run.returncode==0
 metrics={name:{'AP':float(ap),'APH':float(aph)} for name,ap,aph in re.findall(r'(\S+): \[mAP ([^\]]+)\] \[mAPH ([^\]]+)\]',run.stdout)};assert metrics==r['validation']['metrics']
 values=r['validation']['LEVEL2_per_class'];assert values=={category:metrics[f'OBJECT_TYPE_TYPE_{name}_LEVEL_2'] for category,name in {'1':'VEHICLE','2':'PEDESTRIAN','3':'SIGN','4':'CYCLIST'}.items()};assert set(values)=={'1','2','3','4'} and all(math.isfinite(v) and 0<=v<=1 for row in values.values() for v in row.values());mean=sum(x['APH'] for x in values.values())/len(values);passed=all(x['APH']>=.8 for x in values.values());assert math.isclose(mean,r['validation']['mean_populated_class_APH']) and r['validation']['APH_gate_passed']==passed and r['validation']['all_class_APH_gate_passed']==passed
 assert r['validation']['decoder_version']==3 and r['validation']['groundtruth_policy']=='all native four-class boxes; native evaluator handles eligibility'

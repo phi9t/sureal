@@ -12,6 +12,7 @@ from pipeline.insula_entry import launch_plan
 from tier1.storage import sha,unique_payload_bytes
 from tier1.admission import reserve_write
 from cohort.sustained_contract import validate_contract
+from cohort.sustained_scoring_budget import stage_timeout
 from cohort.sustained_sources import validate_sources
 from cohort.sustained_stage_inputs import freeze_inputs,bind_stage_paths
 
@@ -59,7 +60,7 @@ def main():
   else:command=launch_plan(C/'gpu-rootfs',package,stage_source,directory,['/opt/waymo/bin/python','/experiment/cohort/'+worker])
   extra=bind_stage_paths(extra,source,stage_source)
   index=command.index('--');command[index:index]=['--ro-bind',str(stage_source),'/tmp/inputs','--ro-bind',str(native),'/tmp/native','--ro-bind',str(W/'balanced16-physical-v2'),'/tmp/physical','--ro-bind',str(W/'balanced16-labels-v2'),'/tmp/boxes','--ro-bind',str(runtime_path),'/tmp/runtime-lock.json','--ro-bind',str(W),'/tmp/scientific','--setenv','CUBLAS_WORKSPACE_CONFIG',':4096:8',*extra]
-  with (directory/'live.log').open('w') as log:result=run_stage(command,package,dict(os.environ),log,timeout=1800)
+  with (directory/'live.log').open('w') as log:result=run_stage(command,package,dict(os.environ),log,timeout=stage_timeout(metrics))
   if result.returncode:raise RuntimeError(f'{name} failed; retained log: {directory}/live.log')
   validate_sources(package,pins,runtime,runtime)
   if any(sha(path)!=digest for path,digest in input_hashes.items()):raise ValueError('immutable stage inputs changed')

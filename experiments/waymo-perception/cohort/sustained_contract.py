@@ -43,7 +43,7 @@ def fit_status(samples,terminal_step,stop_reason):
   passed=all(x>=.8 for x in aph.values());passing.append(passed)
   if passed and first_pass is None:first_pass=step
   previous=step
- if len(passing)>=2 and all(passing[-2:]):return 'sustained native overfit'
+ if len(passing)>=2 and all(passing[-2:]) and not forced_time_terminal:return 'sustained native overfit'
  if stop_reason=='gate':raise ValueError('native sustained gate did not pass')
  if passing[-1]:return 'unconfirmed terminal pass'
  if stop_reason=='time_cap':return 'training-time censored without sustained overfit'
