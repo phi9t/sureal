@@ -417,3 +417,19 @@ balanced16-sustained
 Actual GPU-only16-frame chunk worker implemented but not GPU-admitted. LiveCPU combined25groups passed after review RED→GREEN fixes: preserve time-censored actual steps/state and resource-overrun evidence; reject rewind before mutation; require complete source/runtime bindings. Roundrobin newstudy is matched within4treatments, not historical PCG64 trajectory. NativeGPU/CUDA16 replay, controller/scoring/HDFS lifecycle remain open.
 
 Evidence: [balanced16-s](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-loop-red-review-v2-verified.json), [balanced16-s](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-loop-green-review-verified.json), [balanced16-s](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-sources-green-verified.json), [balanced16-w](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-worker-preparation-suite-v1-verified.json)
+
+## 53. 2026-10-03T02:46:44.947630+00:00 — observation
+
+balanced16-sustained
+
+Independent balanced16 checkpoint/head replay worker prepared. Live Insula CPU29 preparation groups pass, including exact nested model/Adam/RNG comparisons and CPU refusal of producer and verifier. GPU replay, mid-cycle continuation, literal losses, native V3 metrics and HDFS lifecycle remain open; no fit or scientific promotion.
+
+Evidence: [balanced16-r](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-replay-preparation-suite-v2-verified.json)
+
+## 54. 2026-10-03T02:48:16.513418+00:00 — observation
+
+balanced16-sustained
+
+Replay preparation review corrected CUDA peak accounting: reset before loading checkpoint/model/Adam and deep-copy state equality, preserving the full audit peak. Final live CPU29 suite v3 passes; native GPU execution remains pending.
+
+Evidence: [balanced16-r](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-replay-preparation-suite-v3-verified.json)
