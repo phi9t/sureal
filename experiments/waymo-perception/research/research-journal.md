@@ -361,3 +361,11 @@ motion-native-source-pilot
 Pooled verifier review found a NaN acceptance gap. Live finite tests reproduced six accepted-NaN failures; explicit finite observed/reference ADE/FDE now passes two regression groups and28 corrupt-score probes. This supersedes the previous20-probe checker admission; unchanged native scoring outputs still reconcile. Corrected unsupported horizon-corruption prose to actual tested fault types. Retention review found no blocker.
 
 Evidence: [motion-poole](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-pooled-finite-red-verified.json), [motion-poole](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-pooled-finite-green-verified.json)
+
+## 46. 2026-10-03T01:35:48.541479+00:00 — observation
+
+motion-native-source-pilot
+
+Fresh foundation replay passes explicit TensorFlow absence,42 native tests and19 unique boundary groups, with two exact real causal prefixes and two future-sensor refusals. Current pooled reference and native scorer both bind directly to selected original truth SHA in full source inventories; prior reference used the retained sensor-leak probe copy with unchanged labels, now superseded without numerical changes. Scientific model/cohort comparisons and aggregate ticket19 audit remain open.
+
+Evidence: [motion-pilot](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-pilot-foundation-replay-verified.json), [motion-real-](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-real-pooled-native-truth-verified.json)

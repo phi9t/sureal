@@ -4,6 +4,8 @@ Four oracle diagnostic controls pool the two acquired native scenarios with offs
 
 Vehicle support is9 ADE but7 FDE measurements because two targets have missing endpoints. With only the training example offset by2m, pooled vehicle ADE is2/9 and FDE2/7; with only validation offset, they are16/9 and12/7. One pedestrian retains separate1/1 support. All controls agree with the native scorer within declared1e-3m tolerance. Duplicate scenarios and wrong scenario/prediction identities refuse without output;28 damaged score/count/class/scenario-count/nonfinite copies are rejected by the independent checker.
 
-[Live receipt](motion-real-pooled-metric-verified.json) pins both runtimes, sources, original metric handoff and outputs. This deliberately mixes official splits only as an explicit scorer diagnostic. Scientific training, tuning and held-out evaluation must keep those splits separate. No causal predictor, learned forecast quality or improvement is claimed.
+[Current live receipt](motion-real-pooled-native-truth-verified.json) pins both runtimes, sources, original metric handoff and outputs. This deliberately mixes official splits only as an explicit scorer diagnostic. Scientific training, tuning and held-out evaluation must keep those splits separate. No causal predictor, learned forecast quality or improvement is claimed.
 
 The earlier comparator accepted NaN; fresh review reproduced it. Live RED→GREEN finite tests now reject observed and reference NaN/±Infinity. The finite checker receipt supersedes the earlier20-probe checker admission; native scorer/reference outputs remain unchanged.
+
+Current admission uses the exact original selected native truth payloads for both scorer and independent reference, with SHA256 matching the complete native inventories. The initial pooled reference used a sensor-leak probe copy whose track labels were unchanged; its correct numbers remain historical preparation, but v2 replaces that reference provenance.
