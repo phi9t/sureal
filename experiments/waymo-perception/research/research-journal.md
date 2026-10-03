@@ -585,3 +585,11 @@ balanced16-sustained
 Independent live native annotation-only coverage controls: positive-native idealAPH all1; trainingROI idealAPH .917384/.947955/.868421/.918919; anchor-covered idealAPH .917384/.944238/.759399/.918919.29ROI signs and1pedestrian lackpositiveanchors. The covered-sign control is below.8 evenwithperfectboxes/scores andbeforeNMS, so optimization alone doesnot create missingpositive supervision. This is a target-support diagnostic, not a mathematical ceiling on unconstrained models or scientific improvement. Keep allGT/allclassgate; investigate assignment/grid conflicts separately from matched losscontrols.
 
 Evidence: [balanced16-c](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-coverage-oracle-native-verified.json), [balanced16-c](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-coverage-oracle-audit-verified.json)
+
+## 74. 2026-10-03T05:00:05.431582+00:00 — observation
+
+balanced16-sustained
+
+Independent live literal assignment audit matched all 524288 anchor labels/target indices for each of16 frames. All30 uncovered targets have positive overlap:28 lose maximizing anchors to strictly greater overlap,2 signs lose ties;27 sign-sign,2 sign-vehicle,1 pedestrian-pedestrian conflicts.28 within-class conflicts show class restriction alone does not resolve those collisions. No target/model change or promotion; investigate matching as a separate one-factor treatment.
+
+Evidence: [balanced16-c](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-coverage-causes-verified.json)
