@@ -393,3 +393,11 @@ motion-source-inventory
 Live aggregate reconciles1150 authenticated Scenario objects and492+287=779 full native records, exact offsets/lengths/EOF/source metadata/selected native IDs and payload SHA. Five malformed copies refuse. Review caught a781 success-string error; rerun derives779 from verified counts. This is source-inventory admission only, not full ticket19 or scientific cohort closure.
 
 Evidence: [motion-inven](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-inventory-acceptance-live-verified.json)
+
+## 50. 2026-10-03T02:06:27.445355+00:00 — decision
+
+balanced16-sustained
+
+Prepared controlled V3 balanced16 continuation: baseline/residual/class balancing/low prior, seed17,32k updates or7200 synchronized training seconds. Live candidate matches16 original training-frame identities/hashes. Fresh review sequence/premature-stop bugs reproduced RED then fixed GREEN7groups. No GPU continuation launched; expanded sweep/closure/HDFS storage gates precede execution.
+
+Evidence: [balanced16-s](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-contract-green-review-verified.json), [balanced16-s](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-candidate-live-verified.json)
