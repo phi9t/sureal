@@ -114,6 +114,24 @@ class ResourceBackend(NativeBackend):
         fresh=self._launching_stage==receipt['requested_stage'] and not (self.R/(receipt['requested_stage']+'-verified.json')).exists()
         self._resource_stage(receipt,require_binding=not fresh)
 
+    def train_and_admit(self,previous,target):
+        from resources.checkpoint import seal_checkpoint
+        record=super().train_and_admit(previous,target)
+        seal_checkpoint(self,record)
+        return record
+
+    def check_record(self,record,previous):
+        from resources.checkpoint import validate_checkpoint
+        super().check_record(record,previous)
+        validate_checkpoint(self,record)
+
+    def persist(self,records,decision=None,diagnostic=None):
+        previous=None
+        for record in records:
+            self.check_record(record,previous);previous=record
+        if diagnostic is not None:self.check_record(diagnostic,previous)
+        return super().persist(records,decision,diagnostic)
+
     def publish_and_release(self,record):
         # The native publisher preserves only its exact19 producer members.
         # Never let that release retire payloads before their separately retained

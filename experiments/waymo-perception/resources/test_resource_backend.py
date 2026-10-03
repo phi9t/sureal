@@ -21,10 +21,10 @@ class ResourceBackendTests(unittest.TestCase):
             path,digest=prepare(b,b.R/'resource-layer');b.attach_resources(path,digest)
         return b,path,digest
 
-    def stage_fixture(self,root,b):
+    def stage_fixture(self,root,b,name='literal-loss-1000'):
         from resources.test_resource_stage import ResourceStageTests
         scratch=root/'fixture';scratch.mkdir();_,_,native,proof=ResourceStageTests().fixture(scratch)
-        evidence=b.resource_root/'stages/literal-loss-1000';shutil.move(str(scratch/'attempt'),evidence)
+        evidence=b.resource_root/'stages'/name;shutil.move(str(scratch/'attempt'),evidence)
         worker=evidence/'worker/worker-resource.json';log=evidence/'execution.log'
         code=Path(b.resource_identity['source_pins']['stage.py']['snapshot']).parent
         command=proof['original_command'][:proof['original_command'].index('--')]+['--ro-bind',str(code),'/tmp/resource-layer','--bind',str(worker.parent),'/tmp/resource-output','--','python','/tmp/resource-layer/execute_worker.py','/tmp/resource-output','/experiment/worker.py']
@@ -32,8 +32,8 @@ class ResourceBackendTests(unittest.TestCase):
         proof['host_measurement']['kernel_scope']['memory_max_bytes']=16*1024**3;proof['resource_admission']['aggregate_cap_bytes']=16*1024**3
         proof['artifacts']['worker_resource']['path']=str(worker);proof['artifacts']['execution_log']['path']=str(log)
         (evidence/'resource-admitted.json').write_text(json.dumps(proof))
-        receipt={'stage':'literal-loss-1000','requested_stage':'literal-loss-1000','command':command,'output_directory':str(native),'artifacts':{str(native/'live.log'):sha(native/'live.log')}}
-        path=b.R/'literal-loss-1000-verified.json';path.write_text(json.dumps(receipt))
+        receipt={'stage':name,'requested_stage':name,'command':command,'output_directory':str(native),'artifacts':{str(native/'live.log'):sha(native/'live.log')}}
+        path=b.R/(name+'-verified.json');path.write_text(json.dumps(receipt))
         return receipt,path,evidence
 
     def test_identity_and_native_run_edits_cannot_be_rebaselined(self):

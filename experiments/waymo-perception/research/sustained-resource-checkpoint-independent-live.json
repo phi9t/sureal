@@ -1,0 +1,396 @@
+{
+  "passed": true,
+  "scope": "independently observed bounded Insula archive verification/recovery; original downloaded HDFS bytes; no native checkpoint admission",
+  "driver_sha256": "26960d0f87f14e898cc2f9b2391a32f07060d6bc4e696c2aab5579bca9af7262",
+  "rootfs_actual_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+  "source_pins": {
+    "archive_worker.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/archive_worker.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/archive_worker.py",
+      "sha256": "a5ff82c6947fa07f83cb9140aae86a3c060cf676d43daea8d92b68f70799e12d"
+    },
+    "backend.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/backend.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/backend.py",
+      "sha256": "c2889cf53abb335211eb10321df7329e21248cca727cb64224f1b6dd90333662"
+    },
+    "checkpoint.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/checkpoint.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/checkpoint.py",
+      "sha256": "54c1bd69e036c3ee94454fd06f9f0dcc4db0a7cecb499cc4f07d142ec85c1287"
+    },
+    "command.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/command.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/command.py",
+      "sha256": "1a44bc70f62abe7ec48eea9dbf12c27b2b83816793d3ca1fc506bf22d938cc40"
+    },
+    "execute_worker.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/execute_worker.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/execute_worker.py",
+      "sha256": "b4a746f941944d4342ade71f7338498b06f96e21bc56141eb90d40276508add8"
+    },
+    "kernel_scope.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/kernel_scope.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/kernel_scope.py",
+      "sha256": "4a9f8440b91ce8203e3f9bbc25dbe25dad83a33378544e4ede61412f9e1f2e89"
+    },
+    "process_lifecycle.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/process_lifecycle.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/process_lifecycle.py",
+      "sha256": "bfde67be0f66296565dca964c8a2ca3e6bb733e31016fbc87c78f57dd49b09f0"
+    },
+    "scoped_stage.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/scoped_stage.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/scoped_stage.py",
+      "sha256": "d753f2df936496cddb76f9bd09215100552f56a5d7754d52e54434b9ee042738"
+    },
+    "sources.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/sources.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/sources.py",
+      "sha256": "2f1eef953bd39e40b49e7fc18e906c4b0ea11d17266c5822aae842966179d5af"
+    },
+    "stage.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/stage.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/stage.py",
+      "sha256": "f8e8baf91d752185fd3f57ba27af3cec683540bcb0932275bdfcf4643f1d4ff9"
+    },
+    "stage_accounting.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/stage_accounting.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/stage_accounting.py",
+      "sha256": "baef4b065f9ebb3aa7a2296ccaede595e2514c8144b18bace315f3a805b3716b"
+    },
+    "test_execute_worker.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_execute_worker.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/test_execute_worker.py",
+      "sha256": "26c1e44dacf7056498c5f4deb2c8a06b91830848aeb5d63f0819380bc98ae2d3"
+    },
+    "test_kernel_scope.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_kernel_scope.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/test_kernel_scope.py",
+      "sha256": "e5ff0b3b67a3b85a5799da096078ac7e07454d6230e16cace99282b96285f9a8"
+    },
+    "test_resource_archive.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_archive.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/test_resource_archive.py",
+      "sha256": "b474142e8dd4c428996717452fec3c889a68e05eb0a30ab592f7b4d0c9d22514"
+    },
+    "test_resource_backend.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_backend.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/test_resource_backend.py",
+      "sha256": "021938bd33c74fe31300672995aaf9471cd9b2b81fbdaecd7305253bac3ae425"
+    },
+    "test_resource_checkpoint.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_checkpoint.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/test_resource_checkpoint.py",
+      "sha256": "205a5dc0543eebfc045466d59f005ee62834f823a7e03caefa757ecce0058a0b"
+    },
+    "test_resource_command.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_command.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/test_resource_command.py",
+      "sha256": "98255f18a16799ca18e7a32e6087e8d3b39de44c38d44a2fc0d8e0b60aba32c6"
+    },
+    "test_resource_sources.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_sources.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/test_resource_sources.py",
+      "sha256": "08b06457df38c99413e33aaf1bce5afbd703a5628b22d5e29c54f6265fa253bf"
+    },
+    "test_resource_stage.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_stage.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/test_resource_stage.py",
+      "sha256": "4aafb2d74de5075e9ab1c4d8147a772ea991604452fa85f817747c136296720b"
+    },
+    "test_scoped_stage.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_scoped_stage.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/test_scoped_stage.py",
+      "sha256": "30b81ad6cf79248e6d83b4021f38a0aff22c0604f0f2c071d6c8e34cc7b40835"
+    },
+    "test_stage_accounting.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_stage_accounting.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/test_stage_accounting.py",
+      "sha256": "8a28c803161b28318b23a6caea03024d6ceff782d187f81a54850d4d22da8a86"
+    },
+    "test_worker_admission.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_worker_admission.py",
+      "snapshot": "/tmp/sureal-resource-independent-live-20261003a/code/test_worker_admission.py",
+      "sha256": "816a6ab4d7cb891e97ed279e46a2fea491ce8865f3dd30f2c6ea7bff825f4bb7"
+    }
+  },
+  "inventory_count": 691,
+  "archive_sha256": "c391293120677ce94faa2418d449a909fb0d946c676a06cb285608d288d22289",
+  "manifest_sha256": "c9f98c0894da199fec225d95d42f37d8471818543a3e44f2517842d3fc1ad0c6",
+  "results": [
+    {
+      "mode": "verify",
+      "proof_path": "/tmp/sureal-resource-independent-live-20261003a/proofs/verify/resource-admitted.json",
+      "proof_sha256": "55441aca00a9cbc429c358b898cd458bd80043da6fa85190a1c829b663d4f238",
+      "host": {
+        "command": [
+          "bwrap",
+          "--unshare-all",
+          "--die-with-parent",
+          "--ro-bind",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+          "/",
+          "--ro-bind",
+          "/tmp/sureal-resource-independent-live-20261003a/experiment",
+          "/experiment",
+          "--ro-bind",
+          "/tmp/sustained-resource-archive-live-v2/download",
+          "/source",
+          "--bind",
+          "/tmp/sureal-resource-independent-live-20261003a/verify",
+          "/outputs",
+          "--proc",
+          "/proc",
+          "--dev",
+          "/dev",
+          "--tmpfs",
+          "/tmp",
+          "--clearenv",
+          "--setenv",
+          "HOME",
+          "/tmp/private-home",
+          "--setenv",
+          "PATH",
+          "/usr/local/bin:/usr/bin:/bin",
+          "--setenv",
+          "PYTHONNOUSERSITE",
+          "1",
+          "--setenv",
+          "PYTHONDONTWRITEBYTECODE",
+          "1",
+          "--setenv",
+          "PYTHONPATH",
+          "/experiment",
+          "--chdir",
+          "/experiment",
+          "--ro-bind",
+          "/tmp/sureal-resource-independent-live-20261003a/verify-input",
+          "/tmp/inputs",
+          "--ro-bind",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/host-source/advanced/archive.py",
+          "/tmp/resource-archive.py",
+          "--ro-bind",
+          "/tmp/sureal-resource-independent-live-20261003a/code",
+          "/tmp/resource-layer",
+          "--bind",
+          "/tmp/sureal-resource-independent-live-20261003a/proofs/verify/worker",
+          "/tmp/resource-output",
+          "--",
+          "python",
+          "/tmp/resource-layer/execute_worker.py",
+          "/tmp/resource-output",
+          "/experiment/archive_worker.py",
+          "verify"
+        ],
+        "exit_code": 0,
+        "timed_out": false,
+        "peak_rss_kib": 67972,
+        "elapsed_seconds": 0.15350476297317073,
+        "measurement": "wait4.ru_maxrss_KiB_largest_waited_child",
+        "completed_launcher_descendants": [
+          {
+            "pid": 1441965,
+            "peak_rss_kib": 19904
+          }
+        ],
+        "kernel_scope": {
+          "path": "/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-resource-independent-review20261003a.scope",
+          "memory_max_bytes": 17179869184,
+          "memory_swap_max_bytes": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "members_verified": true,
+          "kernel_events": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0
+          },
+          "process_ids": [
+            1441481
+          ]
+        },
+        "stage_lifecycle": {
+          "caller_pid": 1441481,
+          "scope_members_before": [
+            1441481
+          ],
+          "scope_members_after": [
+            1441481
+          ],
+          "remaining_children": [],
+          "subreaper_verified": true
+        },
+        "resource_admission": {
+          "peak_rss_bytes": 69603328,
+          "aggregate_cap_bytes": 17179869184,
+          "scope": "largest waited-child RSS plus external aggregate kernel cap; not tree RSS sum"
+        }
+      },
+      "worker": {
+        "worker_argv": [
+          "/experiment/archive_worker.py",
+          "verify"
+        ],
+        "worker_pid": 2,
+        "measurement": "in-runtime getrusage SELF and waited CHILDREN KiB",
+        "self_peak_rss_kib": 19904,
+        "waited_child_peak_rss_kib": 0,
+        "peak_rss_kib": 19904,
+        "elapsed_seconds": 0.0746441439841874,
+        "exit_code": 0,
+        "child_lifecycle": {
+          "subreaper_verified": true,
+          "remaining_children": [],
+          "contract": "all created descendants completed and waited; detached children unsupported"
+        },
+        "scope": "worker process and largest waited child; not simultaneous tree RSS sum"
+      },
+      "result": {
+        "exact_members_and_hashes": true,
+        "members": 691,
+        "payload_bytes": 3166162,
+        "archive_sha256": "c391293120677ce94faa2418d449a909fb0d946c676a06cb285608d288d22289"
+      }
+    },
+    {
+      "mode": "rehydrate",
+      "proof_path": "/tmp/sureal-resource-independent-live-20261003a/proofs/rehydrate/resource-admitted.json",
+      "proof_sha256": "263fb5a4bc8c8b81bb0aa1412c685f92b6b4c87f33897e59e2e274d88cb649be",
+      "host": {
+        "command": [
+          "bwrap",
+          "--unshare-all",
+          "--die-with-parent",
+          "--ro-bind",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+          "/",
+          "--ro-bind",
+          "/tmp/sureal-resource-independent-live-20261003a/experiment",
+          "/experiment",
+          "--ro-bind",
+          "/tmp/sustained-resource-archive-live-v2/download",
+          "/source",
+          "--bind",
+          "/tmp/sureal-resource-independent-live-20261003a/rehydrate",
+          "/outputs",
+          "--proc",
+          "/proc",
+          "--dev",
+          "/dev",
+          "--tmpfs",
+          "/tmp",
+          "--clearenv",
+          "--setenv",
+          "HOME",
+          "/tmp/private-home",
+          "--setenv",
+          "PATH",
+          "/usr/local/bin:/usr/bin:/bin",
+          "--setenv",
+          "PYTHONNOUSERSITE",
+          "1",
+          "--setenv",
+          "PYTHONDONTWRITEBYTECODE",
+          "1",
+          "--setenv",
+          "PYTHONPATH",
+          "/experiment",
+          "--chdir",
+          "/experiment",
+          "--ro-bind",
+          "/tmp/sureal-resource-independent-live-20261003a/rehydrate-input",
+          "/tmp/inputs",
+          "--ro-bind",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/host-source/advanced/archive.py",
+          "/tmp/resource-archive.py",
+          "--ro-bind",
+          "/tmp/sureal-resource-independent-live-20261003a/code",
+          "/tmp/resource-layer",
+          "--bind",
+          "/tmp/sureal-resource-independent-live-20261003a/proofs/rehydrate/worker",
+          "/tmp/resource-output",
+          "--",
+          "python",
+          "/tmp/resource-layer/execute_worker.py",
+          "/tmp/resource-output",
+          "/experiment/archive_worker.py",
+          "rehydrate"
+        ],
+        "exit_code": 0,
+        "timed_out": false,
+        "peak_rss_kib": 67972,
+        "elapsed_seconds": 0.24450403603259474,
+        "measurement": "wait4.ru_maxrss_KiB_largest_waited_child",
+        "completed_launcher_descendants": [
+          {
+            "pid": 1442131,
+            "peak_rss_kib": 20976
+          }
+        ],
+        "kernel_scope": {
+          "path": "/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-resource-independent-review20261003a.scope",
+          "memory_max_bytes": 17179869184,
+          "memory_swap_max_bytes": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "members_verified": true,
+          "kernel_events": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0
+          },
+          "process_ids": [
+            1441481
+          ]
+        },
+        "stage_lifecycle": {
+          "caller_pid": 1441481,
+          "scope_members_before": [
+            1441481
+          ],
+          "scope_members_after": [
+            1441481
+          ],
+          "remaining_children": [],
+          "subreaper_verified": true
+        },
+        "resource_admission": {
+          "peak_rss_bytes": 69603328,
+          "aggregate_cap_bytes": 17179869184,
+          "scope": "largest waited-child RSS plus external aggregate kernel cap; not tree RSS sum"
+        }
+      },
+      "worker": {
+        "worker_argv": [
+          "/experiment/archive_worker.py",
+          "rehydrate"
+        ],
+        "worker_pid": 2,
+        "measurement": "in-runtime getrusage SELF and waited CHILDREN KiB",
+        "self_peak_rss_kib": 20824,
+        "waited_child_peak_rss_kib": 0,
+        "peak_rss_kib": 20824,
+        "elapsed_seconds": 0.16293733601924032,
+        "exit_code": 0,
+        "child_lifecycle": {
+          "subreaper_verified": true,
+          "remaining_children": [],
+          "contract": "all created descendants completed and waited; detached children unsupported"
+        },
+        "scope": "worker process and largest waited child; not simultaneous tree RSS sum"
+      },
+      "result": {
+        "exact_members_and_hashes": true,
+        "members": 691,
+        "payload_bytes": 3166162,
+        "archive_sha256": "c391293120677ce94faa2418d449a909fb0d946c676a06cb285608d288d22289",
+        "verified_rehydration": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+"""Measured live archival of raw preparation evidence; no checkpoint release."""
+import hashlib,json,os,shutil,signal,subprocess,sys,uuid
+from pathlib import Path
+P=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P))
+from resources.sources import sha,freeze_sources,validate_sources
+from resources.stage import run_stage,validate_proof,write_new
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+C=Path.home()/'.cache/waystone/waymo-perception';cap=16*1024**3
+name=sys.argv[1];R=Path('/tmp')/name;R.mkdir();pins=freeze_sources(P/'resources',R/'resource-code');experiment=R/'experiment';experiment.mkdir();shutil.copyfile(R/'resource-code/archive_worker.py',experiment/'archive_worker.py')
+worker_digest=sha(experiment/'archive_worker.py');assert worker_digest==pins['archive_worker.py']['sha256']
+root=C/'insula/rootfs-v2';runtime=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,runtime['rootfs_sha256'])
+native=C/'insula/balanced16-sustained-baseline-controller20261003a';run=json.loads((native/'run.json').read_text());library=Path(run['host_source_pins']['advanced/archive.py']['snapshot']);library_digest=run['host_source_pins']['advanced/archive.py']['sha256'];assert sha(library)==library_digest
+raw=R/'raw';raw.mkdir();files={}
+def include(name,path,digest=None):
+ path=Path(path);assert path.is_file() and not any(p.is_symlink() for p in [path,*path.parents]);actual=sha(path);assert digest is None or actual==digest
+ destination=raw/name;destination.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(path,destination);assert sha(destination)==actual;files[name]={'path':str(path),'sha256':actual,'bytes':path.stat().st_size}
+for relative,pin in pins.items():
+ for kind in ('original','snapshot'):include('resource-'+kind+'/'+relative,pin[kind],pin['sha256'])
+for relative,pin in run['host_source_pins'].items():
+ for kind in ('original','snapshot'):include('native-host-'+kind+'/'+relative,pin[kind],pin['sha256'])
+for relative,digest in run['source_hashes'].items():
+ include('native-current/'+relative,P/relative,digest);include('native-package/'+relative,native/'code'/relative,digest)
+for relative in ('identity.json','stages/literal-loss-resource20261003a/resource-admitted.json','stages/literal-loss-resource20261003a/native-resource-binding.json','stages/literal-loss-resource20261003a/worker/worker-resource.json','stages/literal-loss-resource20261003a/execution.log'):
+ include('historical-resource/'+relative,native/'resource-layer-20261003a'/relative)
+for relative in ('run.json','literal-loss-resource20261003a-verified.json','loss-resource-20261003a/check.json','state.json'):
+ include('native-parents/'+relative,native/relative)
+for filename in ('sustained-resource-helper-settle-green-v1-verified.json','sustained-resource-checkpoint-backend-green-v1-verified.json'):
+ include('preparation-receipts/'+filename,P/'research'/filename)
+inputs=R/'input';inputs.mkdir();evidence=R/'proofs';evidence.mkdir()
+job={'source_sha256':{name:entry['sha256'] for name,entry in files.items()},'max_bytes':64*1024**2,'archive_module_path':'/tmp/resource-archive.py','archive_module_sha256':library_digest}
+write_new(R/'expected.json',files)
+steps=[]
+def live(mode,source,label):
+ validate_sources(P/'resources',pins);assert sha(library)==library_digest and sha(experiment/'archive_worker.py')==worker_digest
+ task=inputs/label;task.mkdir();write_new(task/'job.json',job);out=R/label;out.mkdir()
+ command=launch_plan(root,experiment,source,out,['python','/experiment/archive_worker.py',mode]);at=command.index('--');command[at:at]=['--ro-bind',str(task),'/tmp/inputs','--ro-bind',str(library),'/tmp/resource-archive.py']
+ with (out/'live.log').open('w') as stream:run_stage(command,experiment,dict(os.environ),stream,300,code=R/'resource-code',current_sources=P/'resources',source_pins=pins,evidence_directory=evidence/label,native_output=out,cap_bytes=cap)
+ proof_path=evidence/label/'resource-admitted.json';proof=json.loads(proof_path.read_text());validate_proof(proof,command,P/'resources',pins,out,cap,300)
+ result=json.loads((out/'check.json').read_text());steps.append({'stage':label,'command':command,'proof':{'path':str(proof_path),'sha256':sha(proof_path)},'validation':result,'artifacts':{str(p):sha(p) for p in out.rglob('*') if p.is_file()}})
+ return out
+packed=live('create',raw,'create-live');job['manifest_sha256']=sha(packed/'manifest.json')
+CLI=Path.home()/'workspace/waystone/scripts/waystone';waystone=CLI.parents[1];tool_pins={str(CLI):sha(CLI)}
+for relative in ('rust/target/debug/waystone','native/libhdfs_client/dist/lib/libhdfs_client.so','native/libhdfs_client/dist/bin/hdfs.bin'):tool_pins[str(waystone/relative)]=sha(waystone/relative)
+transfers=[]
+def external(arguments,label,timeout=300):
+ validate_sources(P/'resources',pins);assert all(sha(path)==digest for path,digest in tool_pins.items())
+ command=[str(CLI),'--error-format','json','--command-timeout-secs',str(timeout),*(['--auth-source','token-file'] if arguments[0] in ('ls','put','get') else []),*arguments]
+ child=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,start_new_session=True)
+ try:stdout,_=child.communicate(timeout=timeout+5)
+ except subprocess.TimeoutExpired:
+  os.killpg(child.pid,signal.SIGKILL);stdout,_=child.communicate();(R/(label+'.log')).write_text(stdout);raise RuntimeError('bounded HDFS operation timed out')
+ (R/(label+'.log')).write_text(stdout);assert child.returncode==0,label
+ transfers.append({'stage':label,'command':command,'exit_code':0,'log_path':str(R/(label+'.log')),'log_sha256':sha(R/(label+'.log'))});return stdout
+layout=json.loads(external(['layout-profile','--project','sureal','--json'],'layout',30));assert layout['project']=='sureal';remote=layout['paths']['runs'].rstrip('/')+'/perception-resource-preparation/'+name
+external(['ls',layout['project_root']],'authenticated-read',30);download=R/'download';download.mkdir()
+for filename in ('archive.tar.gz','manifest.json'):
+ external(['put','--mkdir-parents',str(packed/filename),remote+'/'+filename],filename+'-put')
+ external(['get',remote+'/'+filename,str(download/filename)],filename+'-get');assert sha(download/filename)==sha(packed/filename)
+verified=live('verify',download,'verify-live');recovered=live('rehydrate',download,'rehydrate-live')
+for name_,entry in files.items():assert sha(recovered/'restored'/name_)==entry['sha256']
+job['manifest_sha256']='0'*64
+try:live('rehydrate',download,'corrupt-manifest-refusal')
+except ValueError:
+ attempt=R/'proofs/corrupt-manifest-refusal/attempt.json';assert attempt.is_file();assert not (R/'corrupt-manifest-refusal/restored').exists()
+else:raise AssertionError('corrupt manifest accepted')
+manifest=json.loads((packed/'manifest.json').read_text());assert {m['path']:m['sha256'] for m in manifest['members']}=={name:entry['sha256'] for name,entry in files.items()}
+assert len(steps)==3 and all(sha(entry['path'])==entry['sha256'] for entry in files.values())
+report={'passed':True,'scope':'raw source/proof/log preparation closure exact HDFS readback and three measured live Insula archive stages; not a checkpoint companion, legacy admission, scientific result or payload release','driver_sha256':sha(__file__),'rootfs':str(root),'runtime_lock':runtime,'source_pins':pins,'archive_worker_sha256':worker_digest,'archive_library':{'path':str(library),'sha256':library_digest},'expected_inventory_path':str(R/'expected.json'),'expected_inventory_sha256':sha(R/'expected.json'),'files':len(files),'payload_bytes':manifest['payload_bytes'],'archive_sha256':manifest['archive_sha256'],'manifest_sha256':sha(packed/'manifest.json'),'manifest_path':str(download/'manifest.json'),'archive_path':str(download/'archive.tar.gz'),'recovered_directory':str(recovered/'restored'),'hdfs_prefix':remote,'tool_pins':tool_pins,'transfers':transfers,'live_stages':steps,'corrupt_manifest_refusal':{'path':str(attempt),'sha256':sha(attempt)},'no_payload_released':True}
+write_new(P/'research'/f'{sys.argv[1]}-verified.json',report)
+print('PASS raw resource/source/log exact HDFS readback and live recovery',len(files),'files',manifest['payload_bytes'],'bytes; no checkpoint release',flush=True)
