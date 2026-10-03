@@ -689,3 +689,59 @@ overfit20261002b, expanded20261002a, balanced16-sustained
 Initial experiment analysis independently reviewed: 23 trained rows reconciled with live closure reports plus the separately bound cap control; deterministic descriptive JSON/PNG/SVG. Baseline selected-frame native fit500/confirm750; historical16frame2000updates exactly125visits/frame. Balanced16 GNbackbone retains pillarBN and terminal eval/batch-statistics total-loss ratios are3.638baseline/4.298residual. Class-balanced positives improve early rare classes with vehicle tradeoff; foregroundprior confirms later. Missing29signs/1pedestrian have measured assignmentconflicts; covered-target sign idealAPH.759399. Pointattention has positive750update matched-MLP quality evidence; rangefusion has no advantage over zerorange; sparse recipe is capacity/support-confounded negative. Recommendations preserve current fourrecipes, fullGT and sustained.8classgate; frozenweight normalization/object-level attribution and heldout selection remain proposed. No new optimizer or native metric execution.
 
 Evidence: [2026-10-03-i](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.md), [2026-10-03-i](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.py), [2026-10-03-i](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.json), [2026-10-03-i](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.png), [2026-10-03-i](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.svg), [2026-10-03-i](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/2026-10-03-initial-experiments-evidence-audit.md), [tier1-overfi](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-overfit20261002b-results.json), [advanced-exp](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-results.json), [tier1-closur](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-closure-live-final-v4-verified.json), [tier1-termin](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-terminal-cap-equivalence-verified.json), [advanced-clo](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-closure-expanded20261002a-verified.json), [balanced-stu](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced-study-recovery-20261002.json), [balanced16-h](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-historical-v3-fullgt-metrics-verified.json), [balanced16-h](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-historical-v3-native-metric-audit-verified.json), [balanced16-h](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-historical-v3-proposal-audit-verified.json), [one-batch-bn](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/one-batch-bn-counterfactual-verified.json), [one-batch-bn](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/one-batch-bn-counterfactual-scoring-verified.json), [normalizatio](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/normalization-ablation-result.json), [architecture](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/architecture-first-cohort-results.json), [tier1-allcla](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-allclass-fixture-verified.json), [balanced16-c](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-coverage-oracle-native-verified.json), [balanced16-c](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-coverage-causes-verified.json), [sparse-head-](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sparse-head-support-live-verified.json), [tier1-headin](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-heading-step2000a-verified.json)
+
+## 87. 2026-10-03T07:15:57.972822+00:00 — observation
+
+balanced16-sustained
+
+Fresh controller review reproduced mutable decoder anchors and original worker source drift accepted on resume. Both bindings are fixed; the meaningful RED has two assertion failures and live GREEN v2 passes105 groups. Intermediate GREEN v1 has fixture errors and is not passing evidence. Native controller20261003a probe is live; no fit or held-out claim.
+
+Evidence: [sustained-co](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-controller-review-bindings-red-v1-verified.json), [sustained-co](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-controller-review-bindings-green-v2-verified.json)
+
+## 88. 2026-10-03T07:15:58.024422+00:00 — decision
+
+prediction-target-association
+
+Existing ticket41 prediction-target-association is authoritative for target coverage, with A0-A3 and six live implementation gates. A duplicate coverage-only draft was removed after repository reconciliation. Current sustained16 optimization assignments remain unchanged; coverage improvement does not establish model quality.
+
+Evidence: [41-predictio](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/41-prediction-target-association.md)
+
+## 89. 2026-10-03T07:18:13.455006+00:00 — observation
+
+motion-foundation
+
+Current host reconciliation checks seven Motion foundation receipts: all147 directly listed retained artifacts match, no changed absolute-path binding was found, but664 geometry references in the original audit are absent locally after declared archive/release. Aggregate live acceptance must reconcile exact archived members/recovery provenance; this host check does not close ticket19 or demonstrate learned forecasting.
+
+Evidence: [motion-found](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-foundation-current-artifact-reconciliation.json)
+
+## 90. 2026-10-03T07:19:35.486524+00:00 — observation
+
+motion-foundation
+
+Fresh authenticated HDFS global-manifest download matches the admitted SHA256. All664 absent geometry paths have exact original producer-artifact, published-member and declared-release SHA bindings. This establishes retained lineage, not fresh chunk recovery or aggregate live ticket19 acceptance. Correction to preceding journal observation: directly listed matching artifacts total135, not147; the per-receipt machine evidence already had the correct counts.
+
+Evidence: [motion-archi](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-archived-geometry-current-lineage.json)
+
+## 91. 2026-10-03T07:23:01.450054+00:00 — decision
+
+main-research-program
+
+Adopted user-approved cross-session initial-experiment priorities: compact pillar/dense-GN clipped-Adam reference; object-level measurement/assignment/proposal failure ledger(ticket42); frozen-weight balanced16 normalization native-quality diagnostic(ticket43), conditional separate pillarLN; unchanged four-recipe sustained controls/budgets/gates; separate ticket41 coverage/geometry; small residual/masked/attention shortlist with held-out multiseed promotion. Range/sparse evidence remains exploratory/recipe-specific. Active source-frozen GPU queue preserved, no prior relaunch and no efficacy adoption.
+
+Evidence: [2026-10-03-i](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.md), [2026-10-03-i](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/2026-10-03-initial-experiments-review.json), [42-object-fa](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/42-object-failure-ledger.md), [43-frozen-no](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/43-frozen-normalization-diagnostic.md)
+
+## 92. 2026-10-03T07:49:54.766989+00:00 — observation
+
+association41/contract20261003a
+
+Ticket41.1 partial engineering checkpoint: original CPU/training Insula roots lack SciPy; new additive roots built without altering them. Live CPU contract31/31 plus separate solver/input/isolation audit verifies1053eligible/1279native/fixed73. GPU M0 refused existing architecturelock before launch; active controller20261003a preserved. Overall41.1 remains open; no optimizer, fitting result, balanced16 promotion, runnable registry entry, HDFS recovery or local release.
+
+Evidence: [contract-los](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.superpowers/sdd/2026-10-03-prediction-target-association/contract-loss-green.log), [receipt.json](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.superpowers/sdd/2026-10-03-prediction-target-association/independent-cpu-audit/live/receipt.json), [check.json](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.superpowers/sdd/2026-10-03-prediction-target-association/independent-cpu-audit/live/check.json), [runtime-reha](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.superpowers/sdd/2026-10-03-prediction-target-association/independent-cpu-audit/runtime-rehash.json), [blocked.json](/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/association41-training-m0-20261003a/blocked.json), [manifest.pen](/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/association-runs/contract20261003a/manifest.pending.json)
+
+## 93. 2026-10-03T08:45:43.558178+00:00 — observation
+
+association41/contract20261003d
+
+41.1 independently live-admitted: final source-v4 contract passes 41 CPU Insula tests and collection. Additive SciPy CPU/training runtimes and GN8 CUDA forward/backward are admitted with zero optimizer updates. Seven input preimages bind all1053 eligible/all1279 native GT and fixed73. Historical evidence preserved; no fitting, native-oracle, operator, registry or HDFS release claim. Advance to41.2.
+
+Evidence: [status.json](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/association41-contract-final-20261003d/status.json), [manifest.jso](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/association41-contract-final-20261003d/manifest.json), [receipt.json](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/association41-contract-final-20261003d/final-accept-v4-live/receipt.json), [receipt.json](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/association41-contract-final-20261003d/contract41-live/receipt.json)

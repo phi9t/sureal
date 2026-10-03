@@ -1,0 +1,8 @@
+{
+  "milestone": "41.1",
+  "engineering_status": "accepted",
+  "manifest_sha256": "d062ae9734e872cd2560013da54b00ee55faf6a2731370728740f87c29a427b9",
+  "optimizer_updates": 0,
+  "scope": "Contract/runtime only; graph, costs, fitting, native metrics and HDFS not admitted.",
+  "independent_acceptance_receipt_sha256": "62cb43600cfef0f1c5b3a890745382eb6c3c47e65c1c57526d0ffaf1aed43dd9"
+}

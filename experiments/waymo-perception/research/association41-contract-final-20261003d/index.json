@@ -1,0 +1,21 @@
+{
+  "contract41-live/collection.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "contract41-live/collection.stdout": "323accf0bd68ff2b14da14200707b4a52f4cfc71e4902d09f7eba18aff4cc328",
+  "contract41-live/receipt.json": "c10fb6eef42e95e2777af29921106a8289c9455b22973442cec7a1adc6506a4a",
+  "contract41-live/tests.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "contract41-live/tests.stdout": "0836c391b4c8fa23a8d83d4771aeda004a74443b96d131a9cff33ac284097715",
+  "final-accept-v4-checker.py.source": "4c30f2e23643f048a6e03f3cfc0a6442c049c75d51290fb9022e8e6c959de50f",
+  "final-accept-v4-live/check.json": "f84ef29fc7f00b0a71357c2ca9bb002cffdffd6eda764f95c11e42c3b517a980",
+  "final-accept-v4-live/receipt.json": "62cb43600cfef0f1c5b3a890745382eb6c3c47e65c1c57526d0ffaf1aed43dd9",
+  "final-accept-v4-live/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "final-accept-v4-live/stdout": "a2f2f77af80fa5f7e91e5a9276336c98a371aa6330f192996a5678f2a979ddad",
+  "manifest.json": "d062ae9734e872cd2560013da54b00ee55faf6a2731370728740f87c29a427b9",
+  "source-contract-v4/contract.py.source": "c1c3a7a928a4ccf637557cdd7637a1db794691ed81d01d7762805516c69aaeb1",
+  "source-contract-v4/runtime/Dockerfile.cpu": "c6fc09866287332f72a9fd1b5316d021b8a85300f078f26352e4c89126667dd8",
+  "source-contract-v4/runtime/Dockerfile.training": "8a1ce15368377e3d0e0bb336f0be6fb8aa14a26cdd1405771e12714aa6edd298",
+  "source-contract-v4/runtime/requirements.in": "b21ebe61c67dcedc11fadf99151ad7fbf68b3c6fbd5be5a75669b7ff9fb7ee51",
+  "source-contract-v4/runtime/requirements.lock": "3da8cda842bf20eb62548f4a8fa5f4beabb510c3b7e6df1e9777d6c213614ca2",
+  "source-contract-v4/test_contract.py.source": "d9db07fd0581a11bebe1d696d5552be1c6a65935fee5941f1e9325727e2a84b8",
+  "source-contract-v4/test_provenance.py.source": "7e446a8eaf27a2adb7f80d654ca63bb659432328bef7a8bd844bbbb3b0ea8912",
+  "status.json": "775e5759f977edce011aa25213a6dece765c0955198cc9440f03acee673d0ff1"
+}
