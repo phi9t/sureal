@@ -473,3 +473,11 @@ balanced16-sustained
 Actual literal-loss worker refuses three freshlyexternallyhashed corrupt reports on original16 native tensors:NaNloss,wrongfiniteclassificationloss,wrongframeidentity. No acceptanceoutputs. Guards validated beyond inputhash checks; new GPU/V3/science acceptance remains pending.
 
 Evidence: [balanced16-l](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-literal-native-refusals-verified.json)
+
+## 60. 2026-10-03T03:28:54.872459+00:00 — observation
+
+balanced16-sustained
+
+Native GT reconciliation:16 frames contain1279 boxes vs1053 positive-point trainingROI boxes. NewGT export retains100 positive-point outsideROI plus126 zero-point boxes; None difficulty preserved after meaningful native regression failure. Live41 CPU groups and independent full1279 nativefield checks pass. Historical2000 heads V3 export runs with8000 proposals/fullGT; proposal/native metric audits and newtraining pending. HistoricalROI/V2 is contextonly.
+
+Evidence: [balanced16-f](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-full-native-gt-verified.json), [balanced16-h](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-historical-v3-fullgt-export-verified.json), [balanced16-f](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-full-gt-preparation-v2-verified.json)
