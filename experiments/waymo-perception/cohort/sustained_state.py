@@ -1,6 +1,8 @@
 """Exact continuation state, bound to externally supplied experiment identity.
 
-The caller separately admits source/input/runtime identities and persisted file
+Over-budget terminal time is retained honestly; the caller rejects resource
+admission and continuation independently. The caller separately admits
+source/input/runtime identities and persisted file
 hashes. This module never treats a checkpoint's own identity as trusted.
 """
 import copy,math,random
@@ -13,7 +15,7 @@ def _validate(saved,model,optimizer,identity):
  if not isinstance(saved,dict) or set(saved)!=KEYS or saved['identity']!=identity:raise ValueError('checkpoint identity/state differs')
  step=saved['steps'];seconds=saved['training_seconds']
  if type(step) is not int or not 0<=step<=32000 or type(saved['frame_cursor']) is not int or saved['frame_cursor']!=step%16:raise ValueError('invalid update/frame cursor')
- if isinstance(seconds,bool) or not isinstance(seconds,(int,float)) or not math.isfinite(seconds) or not 0<=seconds<=7200:raise ValueError('invalid synchronized training time')
+ if isinstance(seconds,bool) or not isinstance(seconds,(int,float)) or not math.isfinite(seconds) or seconds<0:raise ValueError('invalid synchronized training time')
  current=model.state_dict();state=saved['model']
  if not isinstance(state,dict) or state.keys()!=current.keys():raise ValueError('model state incomplete')
  for key,value in state.items():
