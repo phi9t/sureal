@@ -1,6 +1,6 @@
 """Independent literal GPU transition audit, executed outside the frozen package.
 
-Mount this worker and sustained_chunk_reference.py at /verifier; the original
+Mount this worker and sustained_chunk_reference.py at /tmp/verifier; the original
 source-frozen producer package stays at /experiment. External host admission
 must pin both verifier files, all inputs, checkpoint bytes and live outputs.
 """

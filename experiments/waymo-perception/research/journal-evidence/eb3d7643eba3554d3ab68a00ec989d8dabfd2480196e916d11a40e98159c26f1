@@ -1,0 +1,14 @@
+{
+  "exit_code": 1,
+  "failure": "bwrap could not create /verifier under readonly rootfs; no Python/GPU worker executed",
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sustained-transition-native-v1/host-driver.py": "2007ee68f4ac5ff95dfd08b8e9908623ac0bf6458e18be9c4dc2e12e5fd7bcaf",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sustained-transition-native-v1/input/audit.json": "4846fbe9e88e6033bff0a8c04602bd09eba592939f8c6fbe45658a1f9c061d30",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sustained-transition-native-v1/input/transition.json": "e88fc26a94ad2333dabccf6ed2625e624f5db1b9ca589c6078528871890b8cfe",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sustained-transition-native-v1/input/manifest.json": "0466ce55c4aa24b8155ed4838ac1e89982b23e7798edacefc09f1b754c2e5849",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sustained-transition-native-v1/output/live.log": "d8a8540367b2dea1069589fc795eaac35870b02c89f3526c56ac65c3d0991575",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sustained-transition-native-v1/verifier/audit_sustained_transition.py": "8ff38c27a0f0f70d1508333b4dcb6206149604121d158d0a93a40b9456fa1ff3",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sustained-transition-native-v1/verifier/sustained_chunk_reference.py": "dae5d9da655c3d6589cba61b4bb9a5db225e89ed3e89e9c768ea6a6431208a61"
+  },
+  "scope": "failed standalone verifier mount only; original pilot checkpoint/heads unchanged"
+}
