@@ -1,12 +1,15 @@
-"""Freeze the host closure that admits, archives and releases sustained checkpoint bytes."""
+"""Freeze the host closure for sustained controller execution and retention."""
 import hashlib,shutil
 from pathlib import Path
-REQUIRED=(
- 'cohort/publish_sustained_checkpoint.py','cohort/sustained_checkpoint_inventory.py',
- 'cohort/checkpoint_retention_audit.py','cohort/checkpoint_retention_sources.py',
- 'cohort/sustained_controller_lock.py','cohort/checkpoint_retention_policy.py','tier1/admission.py','tier1/storage.py','advanced/archive.py',
- 'advanced/retention.py','pipeline/insula_entry.py','pipeline/runtime_identity.py',
-)
+from cohort.checkpoint_retention_sources import REQUIRED as RETENTION_REQUIRED
+REQUIRED=tuple(sorted(set(RETENTION_REQUIRED)|{
+ 'cohort/run_sustained.py','cohort/sustained_controller_backend.py',
+ 'cohort/sustained_controller_sources.py','cohort/sustained_workflow.py',
+ 'cohort/sustained_control.py','cohort/sustained_admission.py',
+ 'cohort/sustained_contract.py','cohort/sustained_scoring_budget.py',
+ 'cohort/sustained_stage_inputs.py','cohort/sustained_sources.py',
+ 'architecture/experiment_runner.py',
+}))
 def sha(path):
  with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
 def regular(path):

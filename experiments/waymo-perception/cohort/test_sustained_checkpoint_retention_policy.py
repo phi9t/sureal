@@ -7,6 +7,11 @@ class CheckpointRetentionPolicyTests(unittest.TestCase):
    w=Path(temp)
    for step in [0,789,1000,32000]:
     root=w/'balanced16-sustained-baseline-run1'/f'update-{step:02d}';root.mkdir(parents=True,exist_ok=True);self.assertEqual(checkpoint_case(w,root,step),'balanced16-sustained-baseline-run1')
+ def test_time_censored_checkpoint_keeps_original_requested_output_path(self):
+  with tempfile.TemporaryDirectory() as temp:
+   w=Path(temp);root=w/'balanced16-sustained-case/update-1000';root.mkdir(parents=True)
+   self.assertEqual(checkpoint_case(w,root,789,requested_step=1000),'balanced16-sustained-case')
+   with self.assertRaises(ValueError):checkpoint_case(w,root,1001,requested_step=1000)
  def test_foreign_nested_mismatched_and_boolean_step_refused(self):
   with tempfile.TemporaryDirectory() as temp:
    w=Path(temp)

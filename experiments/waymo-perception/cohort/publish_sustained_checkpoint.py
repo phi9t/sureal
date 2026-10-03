@@ -10,13 +10,15 @@ from pipeline.insula_entry import launch_plan
 from pipeline.runtime_identity import verify_rootfs
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing';CLI=Path.home()/'workspace/waystone/scripts/waystone'
 def main():
- parser=argparse.ArgumentParser();parser.add_argument('--receipt',type=Path,required=True);parser.add_argument('--receipt-sha256',required=True);parser.add_argument('--release',action='store_true');a=parser.parse_args()
- lock=(C/'insula/architecture-experiments.lock').open('a');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+ parser=argparse.ArgumentParser();parser.add_argument('--receipt',type=Path,required=True);parser.add_argument('--receipt-sha256',required=True);parser.add_argument('--release',action='store_true');parser.add_argument('--lock-fd',type=int);a=parser.parse_args()
+ from cohort.sustained_controller_lock import acquire_experiment_lock
+ lock=acquire_experiment_lock(C/'insula/architecture-experiments.lock',a.lock_fd)
  from cohort.sustained_checkpoint_inventory import freeze_checkpoint_inventory
  from cohort.checkpoint_retention_policy import checkpoint_case
  from cohort.checkpoint_retention_sources import freeze_host_sources,validate_host_sources
- final=json.loads(a.receipt.read_text());payload=Path(final['output_directory']);a.case=checkpoint_case(W,payload,final['step'])
+ final=json.loads(a.receipt.read_text());payload=Path(final['output_directory'])
  inventory=freeze_checkpoint_inventory(payload,a.receipt,a.receipt_sha256)
+ a.case=checkpoint_case(W,payload,final['step'],requested_step=inventory['requested_step'])
  native_files={str(p.relative_to(payload)):sha(p) for p in payload.rglob('*') if p.is_file()};assert native_files
  chunks=[];limit=max(64*1024**2,max((payload/name).stat().st_size for name in native_files));assert limit<=DEFAULT_LIMIT;current=[];size=0
  for name in sorted(native_files):
