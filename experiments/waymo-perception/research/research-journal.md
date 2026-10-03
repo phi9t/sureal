@@ -569,3 +569,11 @@ balanced16-sustained
 Stopped the first native-cache HDFS retention host before release after review found missing host admission/deletion-source pins. All128 cache files and16 independent admissions were revalidated intact; partial chunks are not whole-cache acceptance. Ten-file host closure is now frozen and checked before all external/live stages and release;55 live CPU groups pass. Fresh full-cache publication/admission is running.
 
 Evidence: [native-cache](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/native-cache-retention-interrupted-before-release.json), [native-cache](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/native-cache-host-pins-green-v1-verified.json)
+
+## 72. 2026-10-03T04:16:13.942788+00:00 — observation
+
+balanced16-sustained
+
+Fresh original native-input-cache preservation passed full128-member/21-chunk HDFS readback and independent live recovery admission, including5badpublication refusals.1040757892 bytes recoverable; cache-only local release leaves2872821397 scientificbytes available, above required2GiB. Exact ten-file host closure was frozen and checked before release. Native baseline0/19/35 GPU admission pilot launched; training/restart/loss/proposal/native-metric gates remain pending, with no fit or scientific claim.
+
+Evidence: [native-cache](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/native-cache-hdfs-retention-verified.json), [native-cache](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/native-cache-hdfs-release-verified.json)
