@@ -1,0 +1,29 @@
+"""Live additive backend with the original frozen sixteen-frame loss auditor."""
+import json,sys
+from pathlib import Path
+P=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P))
+from cohort.sustained_controller_backend import NativeBackend,C
+from cohort.sustained_controller_lock import acquire_experiment_lock
+from resources.backend import ResourceBackend,prepare_identity
+from resources.sources import sha,validate_sources
+run=sys.argv[1];suffix=sys.argv[2]
+report={'scope':'live additive backend native sixteen-frame loss audit and resource proof; no training, legacy admission or HDFS payload release','driver_sha256':sha(__file__)}
+with acquire_experiment_lock(C/'insula/architecture-experiments.lock') as lock:
+ b=NativeBackend('controller20261003a','baseline',lock,resume=True)
+ state=(b.R/'state.json').read_bytes();original_native_run=sha(b.R/'run.json')
+ original_checkpoints={str(Path(record['root'])/'checkpoint.pt'):sha(Path(record['root'])/'checkpoint.pt') for record in json.loads(state)['records']}
+ identity_path,identity_digest=prepare_identity(b,b.R/('resource-layer-'+suffix))
+ b.__class__=ResourceBackend;b._resource_identity=None;b.attach_resources(identity_path,identity_digest)
+ native=b.R/('loss-resource-'+suffix);name='literal-loss-resource'+suffix
+ path=b.stage(name,'audit_sustained_loss.py',native,['--ro-bind',str(Path(json.loads(state)['records'][-1]['root'])),'/source'],gpu=False,logical_step=1000)
+ receipt=json.loads(path.read_text());b.check_stage(receipt)
+ actual=json.loads((native/'check.json').read_text());reference=json.loads((b.R/'loss-1000/check.json').read_text())
+ retained={'peak_rss_kib','elapsed_seconds'}
+ assert {k:v for k,v in actual.items() if k not in retained}=={k:v for k,v in reference.items() if k not in retained}
+ assert (b.R/'state.json').read_bytes()==state and sha(b.R/'run.json')==original_native_run
+ assert all(sha(path)==digest for path,digest in original_checkpoints.items())
+ proof_path=b.resource_root/'stages'/name/'resource-admitted.json';proof=json.loads(proof_path.read_text())
+ assert actual['peak_rss_kib']<=proof['worker_measurement']['self_peak_rss_kib'];validate_sources(P/'resources',b.resource_identity['source_pins'])
+ report.update({'passed':True,'resource_identity_path':str(identity_path),'resource_identity_sha256':identity_digest,'source_pins':b.resource_identity['source_pins'],'native_source_pins':b.pins,'native_host_source_pins':b.host_pins,'native_receipt_path':str(path),'native_receipt_sha256':sha(path),'resource_proof_path':str(proof_path),'resource_proof_sha256':sha(proof_path),'binding_path':str(proof_path.parent/'native-resource-binding.json'),'binding_sha256':sha(proof_path.parent/'native-resource-binding.json'),'resource_admission':proof['resource_admission'],'state_sha256':sha(b.R/'state.json'),'original_native_run_sha256':original_native_run,'checkpoint_sha256':original_checkpoints,'rows':len(actual['rows']),'original_loss_report_sha256':sha(b.R/'loss-1000/check.json'),'all_literal_losses_match_original':True,'timing_and_rss_fields_are_new_measurements':True,'runtime_lock':receipt['runtime_lock'],'artifacts':receipt['artifacts']})
+(P/'research'/f'{run}-verified.json').write_text(json.dumps(report,indent=2)+'\n')
+print('PASS: unchanged original16-frame native loss auditor through additive backend, exact loss parity, measured resource admission, original state/checkpoints unchanged',flush=True)

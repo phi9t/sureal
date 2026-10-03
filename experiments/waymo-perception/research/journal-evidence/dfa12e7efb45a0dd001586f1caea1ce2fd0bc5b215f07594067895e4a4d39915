@@ -1,0 +1,33 @@
+{
+  "reviewer": "/root/resource_backend_whole_review",
+  "verdict": "approve preparation-only landing",
+  "critical_or_important_findings": [],
+  "independently_verified": {
+    "hash_checks": 697,
+    "resource_files": 18,
+    "native_sources": 295,
+    "native_host_sources": 23,
+    "fixture_tests": 28,
+    "native_loss_rows_exact": 16,
+    "actual_execution_rootfs_recomputed": true,
+    "real_backend_attachment_guard_stage_check": true,
+    "actual_legacy_step0_step1000_missing_resource_proofs_refused": true,
+    "release_without_resource_hdfs_closure_refused": true,
+    "native_state_checkpoints_and_run_unchanged": true
+  },
+  "measurement_scope": "Reviewer validated retained genuine kernel cap/lifecycle/accounting evidence; did not independently observe the historical kernel scope while it ran.",
+  "remaining_gates": [
+    "checkpoint-level immutable resource companions",
+    "legacy bounded resource revalidation",
+    "native GPU/state equivalence",
+    "resource proof/source/log HDFS exact recovery/readback",
+    "source-frozen full controller launcher"
+  ],
+  "scope": "stage-execution attachment only; does not admit controller continuation, training, release or overall research completion",
+  "receipts": {
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-backend-red-v1-verified.json": "0556c0f24f7da6146866872af7e7cc986bd1bf0ce49dab09b9bd200baf8e1d70",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-backend-green-v1-verified.json": "abd8ac1577d3d548eadf4642de8118c29d63db54651d19179b9bf5b5de3f432b",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-backend-green-v2-verified.json": "4e77f7ec071a06f6878cb12c8115a6ee3cf43691d52a4d32bf5f19eca448ba13",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-backend-live-v1-verified.json": "415fd057181cabe8c89185be436bba0e3ab505e382f170b2b017d2a7410a6508"
+  }
+}
