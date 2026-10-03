@@ -1,0 +1,36 @@
+{
+  "scope": "independent CUDA runtime/isolation/driver and solver interoperability verification; no optimizer/study update",
+  "device": "NVIDIA B200",
+  "capability": [
+    10,
+    0
+  ],
+  "producer_receipt_sha256": "1a2a89a27ab34873890a76e42820f3bd1c06a09a5cd293fc5f40b98d8b97c845",
+  "checker_sha256": "2302069571caf48535c78a574f9dcd1a246a47eeb16e414d17c59e1bf624d896",
+  "rootfs_sha256": "d9231707d19cc7b1e7248123e75f25f63ff42d6676075bb5ef563834b9072fb8",
+  "driver_hashes": {
+    "libcuda.so": "df9183549feb062f4195e6cf130e0ef372de4a59e59dbe51554ad8c3c5b167db",
+    "libcuda.so.1": "df9183549feb062f4195e6cf130e0ef372de4a59e59dbe51554ad8c3c5b167db",
+    "libcuda.so.580.105.08": "df9183549feb062f4195e6cf130e0ef372de4a59e59dbe51554ad8c3c5b167db",
+    "libnvidia-ptxjitcompiler.so": "1ed129c4f703547fe5f8961dada7d53cb2981404fabdbfa9b9b3e3d83a04f6ac",
+    "libnvidia-ptxjitcompiler.so.1": "1ed129c4f703547fe5f8961dada7d53cb2981404fabdbfa9b9b3e3d83a04f6ac",
+    "libnvidia-ptxjitcompiler.so.580.105.08": "1ed129c4f703547fe5f8961dada7d53cb2981404fabdbfa9b9b3e3d83a04f6ac",
+    "libnvidia-nvvm.so": "6d623daba56b6404a4a9138e687bf8383b95e879fde4a2de6d4cd534ce312f23",
+    "libnvidia-nvvm.so.4": "6d623daba56b6404a4a9138e687bf8383b95e879fde4a2de6d4cd534ce312f23",
+    "libnvidia-nvvm.so.580.105.08": "6d623daba56b6404a4a9138e687bf8383b95e879fde4a2de6d4cd534ce312f23"
+  },
+  "source_hashes": {
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/association/contract.py": "35abd24396ab06ff38d4c1ad50af44a0920fb73927e1d8b6a3bf2723454f9a57",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/association/test_contract.py": "8a1ad69dad73746b590a4908a48bf24422e0018310f0e1af89fd19214b0ad151",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.superpowers/sdd/2026-10-03-prediction-target-association/m0-b.py": "5237c3db772e79bfb31a23e5b53fe92f9a613bac4696f136656f41f053d7a0cd",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/gpu/probe.py": "5428080aa77202de78a1e9b610c59206aba3165226ef0615d7b838405df8e350"
+  },
+  "numeric_tamper_rejected": true,
+  "network_blocked": true,
+  "readonly_root_source_input": true,
+  "private_home": true,
+  "single_physical_gpu": "/dev/nvidia1",
+  "torch": "2.9.1+cu130",
+  "scipy": "1.18.1",
+  "numpy": "2.5.3"
+}

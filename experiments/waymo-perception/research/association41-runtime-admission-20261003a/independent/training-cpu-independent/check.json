@@ -1,0 +1,20 @@
+{
+  "scope": "independent training-root CPU-only initial-state and solver verification; no CUDA driver regression, optimizer or admission",
+  "initial_sha256": "304418a48ff7cc85b141de498cff1ec147ac500d7a28a9e47e044205c23f68b2",
+  "parameters": 4847144,
+  "CUDA_devices": 0,
+  "producer_receipt_sha256": "bb3a561aa87739931f625c3e5aac4a877dce2b788841d47ee66d0d5b11eede9d",
+  "probe_sha256": "3d950e579c5b842ac3d6181cf7969032ddf99997e1c2f44ac654141db369c0f6",
+  "checker_sha256": "16a74d62b4e17b4072e67982c72ce8d715fb585f3eef191bca454c09234c9a71",
+  "producer_sources_rehashed": {
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.superpowers/sdd/2026-10-03-prediction-target-association/training-root-cpu-probe.py": "3d950e579c5b842ac3d6181cf7969032ddf99997e1c2f44ac654141db369c0f6",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/tier1/models.py": "66f11059442396bb757a40ef619f28932126337188696ae439b8101faf723733",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/tier1/catalog.py": "4a33cc1719c4a32203ee6574301854c7c2cab8a51fc09b3cdd9cb3fcb90f550f",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/gpu/norm_variants.py": "c90ee1004dbb79d66895c72be8d5dad1f0b2a4e731ee77ddfcd19ff6bf120f8b",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/gpu/architecture_variants.py": "c42042ed95cca74d519026149d3fe7e0f681c42da060f4a5b9d5428efd70eb35",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/gpu/architecture_followups.py": "679e89728e059bace5a373ba50b73978ec1c1741c53492d6a89badc18d844368",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/pipeline/pillar_detector.py": "0aef80adb63784844782871745262d15144c36831714c8607b9a91be787936cc",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/pipeline/detector_loss.py": "4b439109a08fae64a652a4b6545239e35c181fdc92018ac112df7d37a0224b87"
+  },
+  "rootfs_expected_sha256": "d9231707d19cc7b1e7248123e75f25f63ff42d6676075bb5ef563834b9072fb8"
+}

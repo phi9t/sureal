@@ -1,0 +1,62 @@
+import pathlib,json,hashlib,copy
+from association.contract import validate_contract
+P=pathlib.Path;H=lambda p:hashlib.sha256(P(p).read_bytes()).hexdigest();J=lambda x:hashlib.sha256(json.dumps(x,sort_keys=True,ensure_ascii=True,separators=(',',':')).encode()).hexdigest()
+def mapped(p):
+ s=str(p)
+ if s.startswith('/data02/home/philip.yang/.cache/waystone/waymo-perception/'):return P('/tmp/cache')/s.split('/waymo-perception/',1)[1]
+ if s.startswith('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/'):return P('/tmp/tracer')/s.split('/waymo-tracer/',1)[1]
+ if s.startswith('/tmp/association41-independent-recon-20261003a/'):return P('/tmp/original')/s.split('/association41-independent-recon-20261003a/',1)[1]
+ raise AssertionError('unmapped '+s)
+mfile=P('/tmp/cache/insula/association-runs/contract20261003d/manifest.json');assert H(mfile)=='d062ae9734e872cd2560013da54b00ee55faf6a2731370728740f87c29a427b9';m=json.loads(mfile.read_text());bundle=P('/experiment/research/association41-runtime-admission-20261003a');index=json.loads((bundle/'index.json').read_text())
+for n,h in index.items():assert H(bundle/n)==h,n
+assert H(bundle/'manifest.json')==index['manifest.json'] # historical immutable proof, not current d
+renames=json.loads((bundle/'snapshot-renames.json').read_text());assert H(bundle/'index-before-snapshot-renames.json')==renames['prior_index_sha256'];old_index=json.loads((bundle/'index-before-snapshot-renames.json').read_text())
+for old,h in old_index.items():
+ name=renames['renames'][old]['retained_as'] if old in renames['renames'] else old
+ assert H(bundle/name)==h
+v4=P('/tmp/tracer/.superpowers/sdd/2026-10-03-prediction-target-association/source-contract-v4');v4index=json.loads((v4/'index.json').read_text())
+for name,h in v4index.items():assert H(v4/name)==h==m['association_source_hashes'][name]
+for key,ref in m['verification_receipts'].items():
+ q=mapped(ref['path']);assert H(q)==ref['sha256'];r=json.loads(q.read_text());assert r['exit_code']==0
+ for n,h in r.get('artifacts',{}).items():assert H(q.parent/n)==h,(key,n)
+ assert H(bundle/'independent'/key/'receipt.json')==ref['sha256']
+# Producer output reopening, including large retained heads omitted from durable index.
+for n in ['association41-cpu-m0-20261003a','association41-training-m0-20261003b','association41-training-cpu-probe-20261003a','association41-gn8-runtime-forward-20261003b']:
+ q=P('/tmp/cache/insula')/n/'receipt.json';r=json.loads(q.read_text());assert r['exit_code']==0
+ for f,h in r['artifacts'].items():assert H(q.parent/f)==h,(n,f)
+for n,pin in m['baseline_source_hashes'].items():assert H('/experiment/'+n)==pin
+for n,pin in m['association_source_hashes'].items():assert H('/experiment/association/'+n)==pin
+assert H(mapped(m['baseline_manifest']['path']))==m['baseline_manifest']['sha256']
+recon=json.loads(P('/tmp/original/input-rehash.json').read_text());assert m['frame_bindings']==recon['frames']
+source_map={name:H('/experiment/'+name) for name in m['baseline_source_hashes']}
+association_map={name:H('/experiment/association/'+name) for name in m['association_source_hashes']}
+initial_ref=json.loads(P('/tmp/original/training-cpu-independent/check.json').read_text())['initial_sha256']
+derived={'frames_sha256':recon['frames'],'fixed_frame_sha256':recon['frames'][7],'baseline_sources_sha256':source_map,'association_sources_sha256':association_map,'initial_model_tensors_sha256':{t:initial_ref for t in ['A0','A1','A2','A3']}}
+for field,ids in [('native_gt_sha256','native_ids'),('eligible_gt_sha256','eligible_ids')]:derived[field]=[{'identity':f['identity'],'ids':sorted(f[ids]),'boxes_sha256':f['boxes_sha256']} for f in recon['frames']]
+assert m['input_hash_preimages']==derived
+inputs={k:J(v) for k,v in derived.items()};inputs.update({'eligible_count':1053,'native_count':1279,'fixed_eligible_count':73,'frame_count':16,'class_counts':[533,255,231,34]});assert inputs==m['inputs']
+# Independently reconstruct rather than trusting mutable caller strings.
+rr=copy.deepcopy(m['runtime_locks'])
+for role,receiptkey in [('cpu','live'),('training','gpu-live')]:
+ rr[role]['admission_sha256']=H(mapped(m['verification_receipts'][receiptkey]['path']))
+ lock=json.loads(P('/tmp/cache/insula/association41-'+role+'-20261003a.lock.json').read_text());assert lock['rootfs_sha256']==rr[role]['rootfs_sha256']
+ for filename,h in lock['recipe_hashes'].items():assert H('/experiment/association/runtime/'+filename)==h
+for n,h in json.loads(mapped(m['verification_receipts']['gpu-live']['path']).read_text())['runtime_lock']['recipe_hashes'].items():assert H('/experiment/association/runtime/'+n)==h
+accepted=validate_contract(m,inputs=inputs,runtime_locks=rr);assert accepted==m
+variants=['missingGPU','changedInput','sourceMap','frameIDs','preimages','initialHashes','recipes','encoding']
+for variant in variants:
+ candidate=copy.deepcopy(m)
+ if variant=='missingGPU':candidate['runtime_locks']['training']['admission_sha256']=None
+ elif variant=='changedInput':candidate['inputs']['frames_sha256']='0'*64
+ elif variant=='sourceMap':candidate['baseline_source_hashes']['gpu/norm_variants.py']='1'*64
+ elif variant=='frameIDs':candidate['frame_bindings'][0]['eligible_ids'][0]='different_nonempty_object'
+ elif variant=='preimages':candidate['input_hash_preimages']['native_gt_sha256'][0]['ids'][0]='different_nonempty_object'
+ elif variant=='initialHashes':candidate['initial_model_tensor_sha256']={t:'2'*64 for t in ['A0','A1','A2','A3']}
+ elif variant=='recipes':candidate['model_construction_recipe']['max_points']=31
+ elif variant=='encoding':candidate['input_hash_encoding']['ensure_ascii']=False
+ try:validate_contract(candidate,inputs=inputs,runtime_locks=rr)
+ except ValueError:pass
+ else:raise AssertionError('mutation accepted '+variant)
+initial=json.loads((P('/tmp/original/training-cpu-independent/check.json')).read_text());assert set(m['initial_model_tensor_sha256'])=={'A0','A1','A2','A3'} and set(m['initial_model_tensor_sha256'].values())=={initial['initial_sha256']};assert m['model_construction_recipe']==json.loads(P('/tmp/cache/insula/association41-training-cpu-probe-20261003a/check.json').read_text())['recipe']
+out={'verdict':'ACCEPT Task41.1 runtime/input/source/contract only; no graph/target/oracle/native/model-fit admission','manifest_sha256':H(mfile),'bundle_index_sha256':H(bundle/'index.json'),'indexed_files_rehashed':len(index),'receipts_rehashed':m['verification_receipts'],'checker_sha256':H('/tmp/checker.py'),'source_v4_index_sha256':H(v4/'index.json'),'historical_renames_bytes_preserved':True,'seven_preimages_independently_derived':True,'source_files_rehashed':len(m['baseline_source_hashes']),'initial_tensor_sha256':m['initial_model_tensor_sha256'],'tamper_controls':variants,'limits':'Actual GN8 gradient arrays not exported; finite gradients are producer runtime assertions. Historical cohort drifts remain outside admitted model source scope. No optimizer executed.'}
+P('/outputs/check.json').write_text(json.dumps(out,indent=2));print('ACCEPT 41.1 only; index',len(index),'source',len(m['baseline_source_hashes']),'receipts',len(m['verification_receipts']))
