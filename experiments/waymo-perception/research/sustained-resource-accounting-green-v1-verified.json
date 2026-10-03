@@ -1,0 +1,68 @@
+{
+  "command": [
+    "bwrap",
+    "--unshare-all",
+    "--die-with-parent",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/gpu-rootfs",
+    "/",
+    "--ro-bind",
+    "/tmp/sustained-resource-accounting-green-v1/code",
+    "/experiment",
+    "--ro-bind",
+    "/tmp/sustained-resource-accounting-green-v1/input",
+    "/source",
+    "--bind",
+    "/tmp/sustained-resource-accounting-green-v1/output",
+    "/outputs",
+    "--proc",
+    "/proc",
+    "--dev",
+    "/dev",
+    "--tmpfs",
+    "/tmp",
+    "--clearenv",
+    "--setenv",
+    "HOME",
+    "/tmp/private-home",
+    "--setenv",
+    "PATH",
+    "/usr/local/bin:/usr/bin:/bin",
+    "--setenv",
+    "PYTHONNOUSERSITE",
+    "1",
+    "--setenv",
+    "PYTHONDONTWRITEBYTECODE",
+    "1",
+    "--setenv",
+    "PYTHONPATH",
+    "/experiment",
+    "--chdir",
+    "/experiment",
+    "--",
+    "/opt/waymo/bin/python",
+    "-m",
+    "unittest",
+    "resources.test_stage_accounting",
+    "-v"
+  ],
+  "exit_code": 0,
+  "runtime_lock": {
+    "image_id": "sha256:46bdaa6e8d9058d7e09419085dfcf9a4527e801330045ae8e0f387f454413b86",
+    "rootfs_sha256": "55f63770083be16ea76764422c51e6e5d995b2d65e9785b552e118a64c6e2f1f",
+    "recipe_hashes": {
+      "Dockerfile": "48484266fe92aaf1a94823fac0746eafef7ac78d0a8754fa9d8f279e8d96c19b",
+      "requirements.lock": "038ba6bbc16870b6430481127b15ab2830e5dac0a6b14c30f218a43853e35923",
+      "build.sh": "bd554045bf0dd40aeceb495fd25ff6ea62ad8e04e93a0c81b203f2c141bcce55"
+    }
+  },
+  "host_driver_sha256": "f8196b97d8f237fa28e78c6bc0d64b400079504b1204cf81047f46c21d312f1c",
+  "source_pins": {
+    "/tmp/sustained-resource-accounting-green-v1/code/resources/test_stage_accounting.py": "af54c0d251f2377d39cdaaf0d583eb81175060bec56b645bf9a479837c2162d1",
+    "/tmp/sustained-resource-accounting-green-v1/code/resources/stage_accounting.py": "281b192274ef8febfd9b124e804b2f9355eff7b9d472b70986890dba92578922"
+  },
+  "artifacts": {
+    "/tmp/sustained-resource-accounting-green-v1/output/live.log": "7f7c49d090ed8f94ccac1d60df7b1088eeeab8aa991203949eb8b7ea3bc5bfe6"
+  },
+  "scope": "live CPU Insula wait4 largest-child RSS and strict resource admission preparation; no native model or historical scorer RSS claim"
+}
