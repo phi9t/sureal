@@ -385,3 +385,11 @@ sparse_bev_transformer
 Live structural support diagnostic: vehicle has30/338 positive anchors outside occupied-token support and1/36 objects with no supported positive; all pedestrian/sign/cyclist positives supported. One missing-support vehicle does not explain the full APH gap. Decision needs-more-evidence; no running architecture or gate changes.
 
 Evidence: [sparse-head-](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sparse-head-support-live-verified.json)
+
+## 49. 2026-10-03T01:58:27.576813+00:00 — observation
+
+motion-source-inventory
+
+Live aggregate reconciles1150 authenticated Scenario objects and492+287=779 full native records, exact offsets/lengths/EOF/source metadata/selected native IDs and payload SHA. Five malformed copies refuse. Review caught a781 success-string error; rerun derives779 from verified counts. This is source-inventory admission only, not full ticket19 or scientific cohort closure.
+
+Evidence: [motion-inven](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-inventory-acceptance-live-verified.json)
