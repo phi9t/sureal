@@ -337,3 +337,11 @@ task19/lidar-delta
 Live RED/GREEN4 NumPy delta tests and complete242-component native scalar parity pass for both11-step pilots. All5 LiDARs/two returns and TOP pixel poses retained; per-pilot32243200 decoded values and positive support1902370/1820913. Initial256MiB preparation limit failed; revised512MiB fits unchanged15GiB global cap, read-only verification avoids duplicate payloads. All4 source channels preserved; NLZ excluded from future physical features. XYZ/calibration/current-reference geometry still pending.
 
 Evidence: [motion-delta](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-delta-complete-live-verified.json)
+
+## 43. 2026-10-03T00:55:04.989545+00:00 — observation
+
+motion-native-source-pilot
+
+Independent live native current-reference geometry passes all220 returns and3,723,283 points across two engineering pilots. Worst coordinate error2.35012e-12m under declared1e-6m; exact pixel/physical-feature parity, analytic polar/SE3/RPY and8 serialized-corruption refusals. Fresh review found no findings. This admits geometry preparation only; full evaluator/cohort admission, causal model overfit and held-out forecasting comparisons remain open.
+
+Evidence: [motion-curre](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-current-geometry-audit-live-verified.json), [motion-curre](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-current-geometry-review.json)

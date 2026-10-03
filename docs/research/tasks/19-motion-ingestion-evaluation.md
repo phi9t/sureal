@@ -4,7 +4,7 @@
 
 **Blocked by:** [06](06-r0-closeout.md)
 
-**Status:** preparing — separate locked native runtime/regressions, acquired training/validation inventories, native causal sensor linkage, camera-codebook features and oracle metric handoff verified live; decoded LiDAR geometry and scientific forecasting protocol/comparisons remain open
+**Status:** preparing — separate locked native runtime/regressions, acquired training/validation inventories, native causal sensor linkage, camera-codebook features and oracle metric handoff verified live; decoded LiDAR geometry verified on two engineering pilots; full evaluator/cohort admission and scientific forecasting protocol/comparisons remain open
 
 **Lane:** core
 
@@ -114,3 +114,9 @@ A bounded TensorFlow-free NumPy component decoder passed live RED→GREEN4 tests
 **Resource ruling:** the initial256MiB component-only preparation limit failed on the combined payload489,642,517 bytes. Failed admission remains retained. The revised512MiB limit fits within the unchanged15GiB global cap; no duplicate payload generation was used. The successful native reference reads existing arrays read-only and compares source bytes. The measured scientific payload snapshot was15,425,098,002 bytes below16,106,127,360; temporary decoded arrays are in RAM, not retained dense tensor copies. Live NumPy checking took2.22s with87,152KiB process peakRSS; compilation/native stages are accounted separately in their receipts.
 
 This proves compressed tensor values/support, not calibrated XYZ. Laser calibration/frame poses, per-pixel compensation, original ray keys and current-reference geometry must still pass separate live native checks before LiDAR forecasting feature claims. Model/held-out comparisons and ticket19 completion remain open. Source semantics follow the [pinned upstream decoder](https://github.com/waymo-research/waymo-open-dataset/blob/99a4cb3ff07e2fe06c2ce73da001f850f628e45a/src/waymo_open_dataset/utils/compression/delta_encoder.py).
+
+## Independent native current-reference geometry gate (2026-10-03)
+
+[Live native audit](../../../experiments/waymo-perception/research/motion-current-geometry-audit-live-verified.json) independently reads observation-only protobufs and verifies all220 returns /3,723,283 positive points across the two pilots. Every XYZ agrees within declared1e-6m; worst observed error2.35012e-12m. Exact row/column identities and float32 range/intensity/elongation agree, with NLZ excluded. The auditor computes a direct world→current chain; it does not consume producer calibration metadata, intermediate decoded components or its transform helpers. Ordered RPY, polar-column and SE3 analytic fixtures pass. Eight damaged serialized streams are refused; deliberately omitting XYZ comparison makes the shifted-coordinate test fail, providing live RED→GREEN evidence. A fresh read-only review found no blocking findings.
+
+[Reviewable summary](../../../experiments/waymo-perception/research/motion-current-geometry-status.md) records native sensor/return coverage, pose conventions, clocks and limitations. Live audit suite took33.98s including compilations and deliberate corruption probes, with69,652KiB child peakRSS; measured global scientific payload15,715,115,346 bytes below unchanged16,106,127,360-byte cap. Failed native compilationsv1/v2 are retained, not admitted as RED or gate evidence. TensorFlow-free value/projection/geometry preparation now passes on the two engineering examples. The acceptance checklist remains open pending complete evaluator/cohort admission and its scientific protocol; no trained forecasting baseline or held-out effect is claimed.
