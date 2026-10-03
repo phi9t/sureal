@@ -401,3 +401,11 @@ balanced16-sustained
 Prepared controlled V3 balanced16 continuation: baseline/residual/class balancing/low prior, seed17,32k updates or7200 synchronized training seconds. Live candidate matches16 original training-frame identities/hashes. Fresh review sequence/premature-stop bugs reproduced RED then fixed GREEN7groups. No GPU continuation launched; expanded sweep/closure/HDFS storage gates precede execution.
 
 Evidence: [balanced16-s](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-contract-green-review-verified.json), [balanced16-s](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-candidate-live-verified.json)
+
+## 51. 2026-10-03T02:17:24.482528+00:00 — decision
+
+balanced16-sustained
+
+Combined continuation preparation passed15 liveCPU groups:7contract/3loss/5state. Classbalance uses zero absent-class positive weight with fixed4-class denominator; exact allpresent/zero-positive parity, no improvement assumed. CPU restart19→35 preserves model/Adam/RNG/cursor. Review Adamalias/late RNG failures reproduced RED and fixed GREEN. Native GPU/CUDA16 replay and full trainer/scoring still required.
+
+Evidence: [balanced16-s](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-loss-green-verified.json), [balanced16-s](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-state-red-review-verified.json), [balanced16-c](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-continuation-cpu-suite-v1-verified.json)
