@@ -657,3 +657,27 @@ balanced16-sustained
 Generic sustained checkpoint inventory preparation passes79 live Insula CPU tests after witnessed missing-module RED and a separate reviewed manifest-mismatch RED→GREEN. One checkpoint must bind exactly seven externally admitted successful stages, all stage artifacts, original manifest, bounded actual/requested step, resource-admitted stop and exact19 checkpoint/report/log/all16head files. This byte-lineage helper does not establish native extended fitting, underlying stage mathematics or HDFS release; generic rolling publication and four-case controller remain open.
 
 Evidence: [sustained-ch](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-checkpoint-manifest-red-v1-verified.json), [sustained-ch](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-checkpoint-manifest-green-v1-verified.json)
+
+## 83. 2026-10-03T06:02:33.204054+00:00 — observation
+
+balanced16-sustained
+
+Rolling checkpoint publication preparation passes85 live CPU tests and independent code review: exact W/case/update-step policy, eleven-source host closure, seven-stage checkpoint inventory, preserved archive/readback/live recovery and separate union-before-release order. Source-frozen original pilot is unchanged. Actual rolling retention trial remains pending recovery-admission review and new HDFS publication.
+
+Evidence: [sustained-ch](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-checkpoint-path-red-v1-verified.json), [sustained-ch](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-checkpoint-retention-green-v1-verified.json)
+
+## 84. 2026-10-03T06:05:04.733792+00:00 — observation
+
+balanced16-sustained
+
+Recovered the original admitted35-update checkpoint from nine original HDFS chunks through live Insula rehydration:19files411,001,906bytes exactly match the original publication and training-stage artifacts. Independent review reconciled237 hashbindings and all seven unchanged stage receipts; source admission SHA41cb9fb36fcdd47b7cc66486afc5dd7ef0f593ae7252cec439ad274be642bfaf. Step0/19 remain evicted. This restores original evidence only; no new model updates or native scores were produced. The rolling publisher is now executing separately under its eleven pinned host sources.
+
+Evidence: [pilot35-chec](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/pilot35-checkpoint-hdfs-recovery-verified.json), [pilot35-roll](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/pilot35-rolling-retention-admission.json)
+
+## 85. 2026-10-03T06:07:25.875538+00:00 — observation
+
+balanced16-sustained
+
+Actual rolling checkpoint HDFS trial admitted and independently reviewed: restored original35 checkpoint19files411,001,906bytes preserved across8chunks24livecreate/verify/rehydrate proofs32transferlogs, exactglobalreadback and independentwholeunion5corrupt-copyrefusals. Only19checkpoint paths released;11hostbindings8parentreceipts and originalfailure/nonpayload evidence unchanged. Free scientific storage is2,872,821,397bytes. This admits storage interface only; no new training or metric result. Keep-two/retire-older controller orchestration, native extended trajectories and four matched cases remain open.
+
+Evidence: [sustained-ch](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-checkpoint-hdfs-retention-verified.json), [sustained-ch](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-checkpoint-hdfs-release-verified.json), [sustained-ch](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-checkpoint-hdfs-closeout-reconciled.json)

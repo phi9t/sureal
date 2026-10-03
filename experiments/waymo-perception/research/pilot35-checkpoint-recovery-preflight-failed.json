@@ -1,0 +1,8 @@
+{
+  "host_driver_sha256": "e69961f82411e1c585b531e743420b847ca18d3270eeff42b317612492cffe38",
+  "failure": "preflight rejected retained empty heads directory; no HDFS transfer or payload write executed",
+  "root_contents": [
+    "heads"
+  ],
+  "scope": "host preflight failure only; original archive/release unaffected"
+}
