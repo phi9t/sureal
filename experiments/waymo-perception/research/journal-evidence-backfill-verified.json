@@ -1,0 +1,609 @@
+{
+  "journal_entries": 56,
+  "journal_sha256": "45ab4a8b5761ff0254a2016c94989e967a130c244d80b8cf5931515f5344eb62",
+  "journal_history_unchanged": true,
+  "all_referenced_evidence_snapshotted_exact": true,
+  "references": [
+    {
+      "sequence": 1,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "snapshot": "research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 1,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "sha256": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "snapshot": "research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 2,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "snapshot": "research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 2,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "sha256": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "snapshot": "research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 3,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "snapshot": "research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 3,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "sha256": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "snapshot": "research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 4,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "snapshot": "research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 4,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "sha256": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "snapshot": "research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 5,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "snapshot": "research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 5,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "sha256": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "snapshot": "research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 6,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "snapshot": "research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 6,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "sha256": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "snapshot": "research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 7,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "snapshot": "research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 7,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "sha256": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "snapshot": "research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 8,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "snapshot": "research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 8,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "sha256": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "snapshot": "research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 9,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "snapshot": "research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 9,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "sha256": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "snapshot": "research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 10,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "snapshot": "research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 10,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "sha256": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "snapshot": "research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 11,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "snapshot": "research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 11,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "sha256": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "snapshot": "research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 12,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "snapshot": "research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 12,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "sha256": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "snapshot": "research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 13,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "snapshot": "research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 13,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "sha256": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "snapshot": "research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 14,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "snapshot": "research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 14,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "sha256": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "snapshot": "research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 15,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "snapshot": "research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 15,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "sha256": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "snapshot": "research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 16,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "snapshot": "research/journal-evidence/a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 16,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "sha256": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "snapshot": "research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 17,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "sha256": "5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "snapshot": "research/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 18,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "sha256": "5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "snapshot": "research/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 19,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "sha256": "5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "snapshot": "research/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 20,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "sha256": "5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "snapshot": "research/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 21,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "sha256": "5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "snapshot": "research/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 22,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "sha256": "5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "snapshot": "research/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 23,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "sha256": "5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "snapshot": "research/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 24,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "sha256": "5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "snapshot": "research/journal-evidence/5655510d9a3661d776e371ee4b3d52f9d18230fbcf5fb705fd58eb1025101731",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 25,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-overfit20261002b-closed.json",
+      "sha256": "28c6e80a2c1d9f72de547f3e7149f0ec9eb3997b25dc5f1b5edb377ff8a6ca9f",
+      "snapshot": "research/journal-evidence/28c6e80a2c1d9f72de547f3e7149f0ec9eb3997b25dc5f1b5edb377ff8a6ca9f",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 26,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-heading-step2000a-verified.json",
+      "sha256": "c2dd47004afd677b1c8616d3ca8e0de63f6c2eb767a2ba2a36b07fefe10fd96f",
+      "snapshot": "research/journal-evidence/c2dd47004afd677b1c8616d3ca8e0de63f6c2eb767a2ba2a36b07fefe10fd96f",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 27,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-overfit20261002b-results.md",
+      "sha256": "24f20e484e3e71d8b4a0abbf3b9ea482e7cded4be56588cc7b44a0af69cc42b4",
+      "snapshot": "research/journal-evidence/24f20e484e3e71d8b4a0abbf3b9ea482e7cded4be56588cc7b44a0af69cc42b4",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 28,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/experiment-registry.json",
+      "sha256": "479f3bb4746226347ee37b4dcffa1676a91c6b5aadf2c5bf7565cbdfe2ea127e",
+      "snapshot": "research/journal-evidence/479f3bb4746226347ee37b4dcffa1676a91c6b5aadf2c5bf7565cbdfe2ea127e",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 29,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-results-hdfs-verified.json",
+      "sha256": "d3f8ed2d68b9cb8f5e6150516bacf61ffc1de075127841500725dbac5c06f564",
+      "snapshot": "research/journal-evidence/d3f8ed2d68b9cb8f5e6150516bacf61ffc1de075127841500725dbac5c06f564",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 30,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/experiment-registry.json",
+      "sha256": "479f3bb4746226347ee37b4dcffa1676a91c6b5aadf2c5bf7565cbdfe2ea127e",
+      "snapshot": "research/journal-evidence/479f3bb4746226347ee37b4dcffa1676a91c6b5aadf2c5bf7565cbdfe2ea127e",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 31,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-closure-live-final-v4-verified.json",
+      "sha256": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "snapshot": "research/journal-evidence/0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 31,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-results-hdfs-verified.json",
+      "sha256": "7f31c10e31a49dc1160a51c6efa9ba6711606823740312dc23727783adf8944a",
+      "snapshot": "research/journal-evidence/7f31c10e31a49dc1160a51c6efa9ba6711606823740312dc23727783adf8944a",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 32,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-results-hdfs-verified.json",
+      "sha256": "d3f8ed2d68b9cb8f5e6150516bacf61ffc1de075127841500725dbac5c06f564",
+      "snapshot": "research/journal-evidence/d3f8ed2d68b9cb8f5e6150516bacf61ffc1de075127841500725dbac5c06f564",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 33,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/point-grid-full103-and-overfit-box-retained-audit.json",
+      "sha256": "114bd67141d488c05f0222b659c6c2c5a500f0b2cbbb50d90e458f873e607cc7",
+      "snapshot": "research/journal-evidence/114bd67141d488c05f0222b659c6c2c5a500f0b2cbbb50d90e458f873e607cc7",
+      "method": "current exact bytes"
+    },
+    {
+      "sequence": 34,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced-study-recovery-20261002.json",
+      "sha256": "6ef4f418110d089f01e721d9cb84a61895769511f64dad029f8b0ad366a6a214",
+      "snapshot": "research/journal-evidence/6ef4f418110d089f01e721d9cb84a61895769511f64dad029f8b0ad366a6a214",
+      "method": "current exact bytes"
+    },
+    {
+      "sequence": 35,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-hdfs-retention-index.json",
+      "sha256": "1350c65490186ad5b514e606b69d728ef824309fa39ca44c0fff1dd4ae7e056b",
+      "snapshot": "research/journal-evidence/1350c65490186ad5b514e606b69d728ef824309fa39ca44c0fff1dd4ae7e056b",
+      "method": "current exact bytes"
+    },
+    {
+      "sequence": 36,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-training-inventory-reconciliation.json",
+      "sha256": "e53525b9065c1bc6907dfb1c7a52b0ab0f5258c15046818d71303582dd6453b7",
+      "snapshot": "research/journal-evidence/e53525b9065c1bc6907dfb1c7a52b0ab0f5258c15046818d71303582dd6453b7",
+      "method": "current exact bytes"
+    },
+    {
+      "sequence": 37,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-training-native-link-verified.json",
+      "sha256": "07b9ba2524f010f54dd5e9e9348db3725a480fcbb6e01419705cad81f423fa96",
+      "snapshot": "research/journal-evidence/07b9ba2524f010f54dd5e9e9348db3725a480fcbb6e01419705cad81f423fa96",
+      "method": "current exact bytes"
+    },
+    {
+      "sequence": 38,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-codebook-live-verified.json",
+      "sha256": "f00de66b75a6aa93f7b46c3a79d029e77b33cf29cb85f1a69286a4dfa1fe569a",
+      "snapshot": "research/journal-evidence/f00de66b75a6aa93f7b46c3a79d029e77b33cf29cb85f1a69286a4dfa1fe569a",
+      "method": "current exact bytes"
+    },
+    {
+      "sequence": 39,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-validation-inventory-reconciliation.json",
+      "sha256": "a4bf5169d35ee0b2cece9a45f69cf53a78722bbca52e5866620219a960397e80",
+      "snapshot": "research/journal-evidence/a4bf5169d35ee0b2cece9a45f69cf53a78722bbca52e5866620219a960397e80",
+      "method": "current exact bytes"
+    },
+    {
+      "sequence": 40,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-training-raw-release-verified.json",
+      "sha256": "0375de1b47383a5ebbe920e8892b130fbe6fb3c79c3c96212ae2a389a1c9c539",
+      "snapshot": "research/journal-evidence/0375de1b47383a5ebbe920e8892b130fbe6fb3c79c3c96212ae2a389a1c9c539",
+      "method": "current exact bytes"
+    },
+    {
+      "sequence": 41,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-real-metric-handoff-verified.json",
+      "sha256": "21a856a74379957f538747bedfd7159011eeb884b32c2e5400abd1be502307a8",
+      "snapshot": "research/journal-evidence/21a856a74379957f538747bedfd7159011eeb884b32c2e5400abd1be502307a8",
+      "method": "current exact bytes"
+    },
+    {
+      "sequence": 42,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-delta-complete-live-verified.json",
+      "sha256": "9d5da03a736cc98baebe41e1b3e8f08e1592b49ce0405d199958aa9cb9ae74b6",
+      "snapshot": "research/journal-evidence/9d5da03a736cc98baebe41e1b3e8f08e1592b49ce0405d199958aa9cb9ae74b6",
+      "method": "current exact bytes"
+    },
+    {
+      "sequence": 43,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-current-geometry-audit-live-verified.json",
+      "sha256": "1c92d54fdd2ee86417288e255e31f5bf7f5b8a1ca13a06b7a99795a32a1e190b",
+      "snapshot": "research/journal-evidence/1c92d54fdd2ee86417288e255e31f5bf7f5b8a1ca13a06b7a99795a32a1e190b",
+      "method": "current exact bytes"
+    },
+    {
+      "sequence": 43,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-current-geometry-review.json",
+      "sha256": "d1026ea20620323c0b2b1fd874b1d49056649006578f6a8eb2fe754349b6dde2",
+      "snapshot": "research/journal-evidence/d1026ea20620323c0b2b1fd874b1d49056649006578f6a8eb2fe754349b6dde2",
+      "method": "current exact bytes"
+    },
+    {
+      "sequence": 44,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-real-pooled-metric-verified.json",
+      "sha256": "a1285aad2825dc80c7b301678de2263dfb5adffb1924c54c2a802ac5748b2185",
+      "snapshot": "research/journal-evidence/a1285aad2825dc80c7b301678de2263dfb5adffb1924c54c2a802ac5748b2185",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 44,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-geometry-hdfs-retention-verified.json",
+      "sha256": "40f07709d88d0286f8ff0a64a71f05c684f8fe66fb20a82f7127c44f0d32588d",
+      "snapshot": "research/journal-evidence/40f07709d88d0286f8ff0a64a71f05c684f8fe66fb20a82f7127c44f0d32588d",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 44,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-geometry-retention-admission-verified.json",
+      "sha256": "3b7848892ca0b55c87386b9e2a78e1ded1dfa761acd3771b952f959d82267465",
+      "snapshot": "research/journal-evidence/3b7848892ca0b55c87386b9e2a78e1ded1dfa761acd3771b952f959d82267465",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 44,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-geometry-local-release-verified.json",
+      "sha256": "b088e5b674f07e73803d7c7060257c808717b77ba93e4ed7a0de0fcd5bb5d519",
+      "snapshot": "research/journal-evidence/b088e5b674f07e73803d7c7060257c808717b77ba93e4ed7a0de0fcd5bb5d519",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 45,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-pooled-finite-red-verified.json",
+      "sha256": "410cb883b0b2156d57ad23be9ab97881a8324e2f2130f3fc23d153fc5e61afcd",
+      "snapshot": "research/journal-evidence/410cb883b0b2156d57ad23be9ab97881a8324e2f2130f3fc23d153fc5e61afcd",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 45,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-pooled-finite-green-verified.json",
+      "sha256": "3783db1936e9889ae9697419c32ff60261fd760ba951519350bf04518e78f224",
+      "snapshot": "research/journal-evidence/3783db1936e9889ae9697419c32ff60261fd760ba951519350bf04518e78f224",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 46,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-pilot-foundation-replay-verified.json",
+      "sha256": "466537ee1c370ebde5595d7e111b2bf9cf9e2fb710b019b30115025dbb0f3459",
+      "snapshot": "research/journal-evidence/466537ee1c370ebde5595d7e111b2bf9cf9e2fb710b019b30115025dbb0f3459",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 46,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-real-pooled-native-truth-verified.json",
+      "sha256": "86be3aff48b88c93cb51201e0edc65dd1a4eec737276bf1b170ef4ef8ea63c60",
+      "snapshot": "research/journal-evidence/86be3aff48b88c93cb51201e0edc65dd1a4eec737276bf1b170ef4ef8ea63c60",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 47,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-foundation-reproducible-run-verified.json",
+      "sha256": "849714dc861a958e18be6292886f582d27e00346f5ca277d4cc1a5e2b80bbc4b",
+      "snapshot": "research/journal-evidence/849714dc861a958e18be6292886f582d27e00346f5ca277d4cc1a5e2b80bbc4b",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 48,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sparse-head-support-live-verified.json",
+      "sha256": "1b92d4d563a036c38bce019ebc68cc6f3bd9e2b95ff8ee5cc140238e5e90d165",
+      "snapshot": "research/journal-evidence/1b92d4d563a036c38bce019ebc68cc6f3bd9e2b95ff8ee5cc140238e5e90d165",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 49,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-inventory-acceptance-live-verified.json",
+      "sha256": "9e72fbb89740e4ca5857102943999fba29d5435274a6799748d93c050a2a050c",
+      "snapshot": "research/journal-evidence/9e72fbb89740e4ca5857102943999fba29d5435274a6799748d93c050a2a050c",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 50,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-contract-green-review-verified.json",
+      "sha256": "87ac99f6b7776889644ef57e76343e0d33cc674f666c02564d3d697e4bd81e0b",
+      "snapshot": "research/journal-evidence/87ac99f6b7776889644ef57e76343e0d33cc674f666c02564d3d697e4bd81e0b",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 50,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-candidate-live-verified.json",
+      "sha256": "8a2a3d75002656f96d86550d5891dece5e22fd4cf9dc80a68707000745c629cd",
+      "snapshot": "research/journal-evidence/8a2a3d75002656f96d86550d5891dece5e22fd4cf9dc80a68707000745c629cd",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 51,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-loss-green-verified.json",
+      "sha256": "dee91c650d84cbbfea16b1f52f7047cff029a0e2772f9e9618428599e83fc1c9",
+      "snapshot": "research/journal-evidence/dee91c650d84cbbfea16b1f52f7047cff029a0e2772f9e9618428599e83fc1c9",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 51,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-state-red-review-verified.json",
+      "sha256": "0fff5c2f012cc5cd6d9ffb79b2e4e55d78967303fce28a4e259b674b7326fe40",
+      "snapshot": "research/journal-evidence/0fff5c2f012cc5cd6d9ffb79b2e4e55d78967303fce28a4e259b674b7326fe40",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 51,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-continuation-cpu-suite-v1-verified.json",
+      "sha256": "2fca888c0c6b43dd4fcc400b2db65a697a8bd76fc3b42c09d6c6a11081f4d775",
+      "snapshot": "research/journal-evidence/2fca888c0c6b43dd4fcc400b2db65a697a8bd76fc3b42c09d6c6a11081f4d775",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 52,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-loop-red-review-v2-verified.json",
+      "sha256": "40396017c3bb085940fc38d1ec885c663f1a55f0de8402342897b71cd522ad22",
+      "snapshot": "research/journal-evidence/40396017c3bb085940fc38d1ec885c663f1a55f0de8402342897b71cd522ad22",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 52,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-loop-green-review-verified.json",
+      "sha256": "3cc00798ec2a3bcbb4c2c6bcd821aeabe90980d63db6807c48438858c52bb492",
+      "snapshot": "research/journal-evidence/3cc00798ec2a3bcbb4c2c6bcd821aeabe90980d63db6807c48438858c52bb492",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 52,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-sources-green-verified.json",
+      "sha256": "66d3987810b60c6e06d0e36a68bc299a310d65bb1c1ef45fbf7bdc1591d93e35",
+      "snapshot": "research/journal-evidence/66d3987810b60c6e06d0e36a68bc299a310d65bb1c1ef45fbf7bdc1591d93e35",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 52,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-worker-preparation-suite-v1-verified.json",
+      "sha256": "df7c16f50f9d16ffa8e43e13222fa95d9276a8643e0d1d3256d802687a1f3f69",
+      "snapshot": "research/journal-evidence/df7c16f50f9d16ffa8e43e13222fa95d9276a8643e0d1d3256d802687a1f3f69",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 53,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-replay-preparation-suite-v2-verified.json",
+      "sha256": "e8d3be2717dab8ec1810fea6d0dfb37c9820d95f8f0e43355a61d3894c465868",
+      "snapshot": "research/journal-evidence/e8d3be2717dab8ec1810fea6d0dfb37c9820d95f8f0e43355a61d3894c465868",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 54,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-replay-preparation-suite-v3-verified.json",
+      "sha256": "93cacf984b3771cf9a98aef3f8fb4699fa67ec08e3e11dbdcf944a888f69493d",
+      "snapshot": "research/journal-evidence/93cacf984b3771cf9a98aef3f8fb4699fa67ec08e3e11dbdcf944a888f69493d",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 55,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-native-pilot-preparation-v1-verified.json",
+      "sha256": "ec9e5223395318b2df31b1d310e4c22fe20f3c8a0275b86a4c958b53076091ee",
+      "snapshot": "research/journal-evidence/ec9e5223395318b2df31b1d310e4c22fe20f3c8a0275b86a4c958b53076091ee",
+      "method": "existing immutable snapshot"
+    },
+    {
+      "sequence": 56,
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-native-pilot-preparation-v3-verified.json",
+      "sha256": "51fdb5cf2726eb8b5f6d748d4f81d9e0e56b5ceeddc0ca50ade8e056249d8e1c",
+      "snapshot": "research/journal-evidence/51fdb5cf2726eb8b5f6d748d4f81d9e0e56b5ceeddc0ca50ade8e056249d8e1c",
+      "method": "existing immutable snapshot"
+    }
+  ],
+  "historical_recovery": {
+    "sequence": 31,
+    "source": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/advanced-expanded20261002a/source/experiment/research/tier1-results-hdfs-verified.json",
+    "sha256": "7f31c10e31a49dc1160a51c6efa9ba6711606823740312dc23727783adf8944a"
+  },
+  "scope": "exact journal evidence retention including superseded historical receipts; later correction notes remain authoritative; does not reinstate invalid historical claims"
+}

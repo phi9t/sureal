@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-10-03T02:56:06.504779+00:00",
+  "updated_utc": "2026-10-03T03:05:06.616224+00:00",
   "scope": "fixed all-class training batch; no heldout, segmentation or full-dataset completion claim",
   "experiments": [
     {
@@ -1107,7 +1107,7 @@
         }
       },
       "worst_terminal_APH": 0.927627,
-      "result_sha256": "2a3eac21d9b5078eea86fdb0a33d8f55787e05bb3d3408bccd221e39dd3b565c",
+      "result_sha256": "d331ccfd91515f90fc5783d94a2cf0cc958380d58e09216c35bfe7292c1f169c",
       "closure_candidate_sha256": null,
       "result_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-results.json",
       "closure_path": null,
@@ -1175,7 +1175,7 @@
         }
       },
       "worst_terminal_APH": 0.926807,
-      "result_sha256": "2a3eac21d9b5078eea86fdb0a33d8f55787e05bb3d3408bccd221e39dd3b565c",
+      "result_sha256": "d331ccfd91515f90fc5783d94a2cf0cc958380d58e09216c35bfe7292c1f169c",
       "closure_candidate_sha256": null,
       "result_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-results.json",
       "closure_path": null,
@@ -1243,7 +1243,7 @@
         }
       },
       "worst_terminal_APH": 0.927527,
-      "result_sha256": "2a3eac21d9b5078eea86fdb0a33d8f55787e05bb3d3408bccd221e39dd3b565c",
+      "result_sha256": "d331ccfd91515f90fc5783d94a2cf0cc958380d58e09216c35bfe7292c1f169c",
       "closure_candidate_sha256": null,
       "result_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-results.json",
       "closure_path": null,
@@ -1311,7 +1311,7 @@
         }
       },
       "worst_terminal_APH": 0.926812,
-      "result_sha256": "2a3eac21d9b5078eea86fdb0a33d8f55787e05bb3d3408bccd221e39dd3b565c",
+      "result_sha256": "d331ccfd91515f90fc5783d94a2cf0cc958380d58e09216c35bfe7292c1f169c",
       "closure_candidate_sha256": null,
       "result_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-results.json",
       "closure_path": null,
@@ -1379,7 +1379,7 @@
         }
       },
       "worst_terminal_APH": 0.811483,
-      "result_sha256": "2a3eac21d9b5078eea86fdb0a33d8f55787e05bb3d3408bccd221e39dd3b565c",
+      "result_sha256": "d331ccfd91515f90fc5783d94a2cf0cc958380d58e09216c35bfe7292c1f169c",
       "closure_candidate_sha256": null,
       "result_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-results.json",
       "closure_path": null,
@@ -1447,7 +1447,7 @@
         }
       },
       "worst_terminal_APH": 0.926328,
-      "result_sha256": "2a3eac21d9b5078eea86fdb0a33d8f55787e05bb3d3408bccd221e39dd3b565c",
+      "result_sha256": "d331ccfd91515f90fc5783d94a2cf0cc958380d58e09216c35bfe7292c1f169c",
       "closure_candidate_sha256": null,
       "result_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-results.json",
       "closure_path": null,
@@ -1515,7 +1515,7 @@
         }
       },
       "worst_terminal_APH": 0.92697,
-      "result_sha256": "2a3eac21d9b5078eea86fdb0a33d8f55787e05bb3d3408bccd221e39dd3b565c",
+      "result_sha256": "d331ccfd91515f90fc5783d94a2cf0cc958380d58e09216c35bfe7292c1f169c",
       "closure_candidate_sha256": null,
       "result_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-results.json",
       "closure_path": null,
@@ -1547,30 +1547,30 @@
       "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
       "stage": "running_or_verifying",
       "trained": true,
-      "updates": 8000,
+      "updates": 10000,
       "confirmation_update": null,
       "time_to_fit": null,
       "cumulative_train_seconds": null,
       "terminal_LEVEL2_per_class": {
         "1": {
-          "AP": 0.765732,
-          "APH": 0.765594
+          "AP": 0.771797,
+          "APH": 0.741925
         },
         "2": {
-          "AP": 1.0,
-          "APH": 0.999751
+          "AP": 0.991521,
+          "APH": 0.990472
         },
         "3": {
           "AP": 0.928571,
-          "APH": 0.92834
+          "APH": 0.92684
         },
         "4": {
           "AP": 1.0,
-          "APH": 0.999891
+          "APH": 0.998926
         }
       },
-      "worst_terminal_APH": 0.765594,
-      "result_sha256": "2a3eac21d9b5078eea86fdb0a33d8f55787e05bb3d3408bccd221e39dd3b565c",
+      "worst_terminal_APH": 0.741925,
+      "result_sha256": "d331ccfd91515f90fc5783d94a2cf0cc958380d58e09216c35bfe7292c1f169c",
       "closure_candidate_sha256": null,
       "result_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-results.json",
       "closure_path": null,
@@ -1583,7 +1583,7 @@
       "result_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-overfit20261002b-results.json"
     },
     "expanded20261002a": {
-      "result_sha256": "2a3eac21d9b5078eea86fdb0a33d8f55787e05bb3d3408bccd221e39dd3b565c",
+      "result_sha256": "d331ccfd91515f90fc5783d94a2cf0cc958380d58e09216c35bfe7292c1f169c",
       "result_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-results.json"
     }
   }

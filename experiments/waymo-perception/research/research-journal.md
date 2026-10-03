@@ -449,3 +449,11 @@ balanced16-sustained
 Nativepilot preparation review fixed stale command inputs: every stage freezes unique manifest/job/audit bytes, records their hashes, and rejects reuse. Final live CPU34 groups include historicalstage target preservation across later job changes; nativeGPU still pending.
 
 Evidence: [balanced16-n](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-native-pilot-preparation-v3-verified.json)
+
+## 57. 2026-10-03T02:58:45.990523+00:00 — observation
+
+research-journal
+
+Backfilled exact immutable evidence for all56 historical journal entries:85 references/45 unique payloads, including superseded note31 receipt recovered byte-for-byte from the expanded run frozen source. Journal history unchanged; later correction notes remain authoritative. Complete next HDFS snapshot readback still required.
+
+Evidence: [journal-evid](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence-backfill-verified.json)

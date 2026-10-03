@@ -1,0 +1,20 @@
+{
+  "records": 492,
+  "source_bytes": 448622357,
+  "framing_inventory_sha256": "8dec44b77641eb328360150f52a15fbd112d10f5352cd3b3cb888ed7bd96bfc8",
+  "native_inventory_sha256": "6e93fa43df4b95cfd6e254cf7921eac2bed3d80a8baac65e6dad570182451f3a",
+  "selected": {
+    "index": "182",
+    "offset": "169558342",
+    "payload_bytes": "420486",
+    "scenario_id": "101d4e5775093d0c",
+    "current_index": "10",
+    "timestamps": "91",
+    "tracks": "62",
+    "targets": "2",
+    "lidar_frames": "0",
+    "camera_frames": "0"
+  },
+  "selected_payload_sha256": "7f88a64321d0fb9d833cd00b72701ed16bc00d8c4eacea7dde434183d1622a67",
+  "scope": "host exact reconciliation of two complete independent live source inventories; native causal projection and sensor linkage pending"
+}
