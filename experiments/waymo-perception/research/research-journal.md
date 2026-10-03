@@ -345,3 +345,19 @@ motion-native-source-pilot
 Independent live native current-reference geometry passes all220 returns and3,723,283 points across two engineering pilots. Worst coordinate error2.35012e-12m under declared1e-6m; exact pixel/physical-feature parity, analytic polar/SE3/RPY and8 serialized-corruption refusals. Fresh review found no findings. This admits geometry preparation only; full evaluator/cohort admission, causal model overfit and held-out forecasting comparisons remain open.
 
 Evidence: [motion-curre](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-current-geometry-audit-live-verified.json), [motion-curre](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-current-geometry-review.json)
+
+## 44. 2026-10-03T01:09:52.816995+00:00 — observation
+
+motion-native-source-pilot
+
+Native acquired pooled scorer parity passes four oracle controls with nine vehicle ADE/seven FDE measurements; weighted sums preserve missing endpoints, duplicate/wrong-ID pairs and20 corrupted scores refuse. Motion derivatives1396files/653550907bytes retained in21HDFS chunks with exact readback and live recovery, then separate manifest admission; only those derived local files released. Native slice remains local. This is evaluator/storage preparation, not trained/held-out forecast quality.
+
+Evidence: [motion-real-](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-real-pooled-metric-verified.json), [motion-geome](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-geometry-hdfs-retention-verified.json), [motion-geome](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-geometry-retention-admission-verified.json), [motion-geome](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-geometry-local-release-verified.json)
+
+## 45. 2026-10-03T01:16:38.615578+00:00 — decision
+
+motion-native-source-pilot
+
+Pooled verifier review found a NaN acceptance gap. Live finite tests reproduced six accepted-NaN failures; explicit finite observed/reference ADE/FDE now passes two regression groups and28 corrupt-score probes. This supersedes the previous20-probe checker admission; unchanged native scoring outputs still reconcile. Corrected unsupported horizon-corruption prose to actual tested fault types. Retention review found no blocker.
+
+Evidence: [motion-poole](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-pooled-finite-red-verified.json), [motion-poole](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-pooled-finite-green-verified.json)

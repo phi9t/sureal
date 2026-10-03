@@ -1,0 +1,164 @@
+{
+  "command": [
+    "bwrap",
+    "--unshare-all",
+    "--die-with-parent",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+    "/",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-pooled-finite-v2/code",
+    "/experiment",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-real-pooled-v1/native",
+    "/source",
+    "--bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-pooled-finite-v2/green",
+    "/outputs",
+    "--proc",
+    "/proc",
+    "--dev",
+    "/dev",
+    "--tmpfs",
+    "/tmp",
+    "--clearenv",
+    "--setenv",
+    "HOME",
+    "/tmp/private-home",
+    "--setenv",
+    "PATH",
+    "/usr/local/bin:/usr/bin:/bin",
+    "--setenv",
+    "PYTHONNOUSERSITE",
+    "1",
+    "--setenv",
+    "PYTHONDONTWRITEBYTECODE",
+    "1",
+    "--setenv",
+    "PYTHONPATH",
+    "/experiment",
+    "--chdir",
+    "/experiment",
+    "--",
+    "python",
+    "/experiment/test_finite.py"
+  ],
+  "exit_code": 0,
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "parent_pooled_receipt_sha256": "a1285aad2825dc80c7b301678de2263dfb5adffb1924c54c2a802ac5748b2185",
+  "red_receipt_sha256": "410cb883b0b2156d57ad23be9ab97881a8324e2f2130f3fc23d153fc5e61afcd",
+  "pins": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-pooled-finite-v2/code/check.py": "93ce8a9a7b0a274c9f0754bbff41cf401139134eb87cbd17ca689b0e6dd4b2cb",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-pooled-finite-v2/code/test_finite.py": "989bd1f663035e4497f57b0cd6c9a53efc5960bc456c2c3cda4ff8209453d55f"
+  },
+  "validation": {
+    "controls": [
+      {
+        "training_oracle_offset_m": 0,
+        "validation_oracle_offset_m": 0,
+        "classes": [
+          {
+            "object_type": 1,
+            "ADE_measurements": 9,
+            "FDE_measurements": 7,
+            "missing_endpoint_measurements": 2,
+            "minADE": 0,
+            "minFDE": 0
+          },
+          {
+            "object_type": 2,
+            "ADE_measurements": 1,
+            "FDE_measurements": 1,
+            "missing_endpoint_measurements": 0,
+            "minADE": 0,
+            "minFDE": 0
+          }
+        ]
+      },
+      {
+        "training_oracle_offset_m": 0,
+        "validation_oracle_offset_m": 2,
+        "classes": [
+          {
+            "object_type": 1,
+            "ADE_measurements": 9,
+            "FDE_measurements": 7,
+            "missing_endpoint_measurements": 2,
+            "minADE": 1.77777779,
+            "minFDE": 1.71428573
+          },
+          {
+            "object_type": 2,
+            "ADE_measurements": 1,
+            "FDE_measurements": 1,
+            "missing_endpoint_measurements": 0,
+            "minADE": 0,
+            "minFDE": 0
+          }
+        ]
+      },
+      {
+        "training_oracle_offset_m": 2,
+        "validation_oracle_offset_m": 0,
+        "classes": [
+          {
+            "object_type": 1,
+            "ADE_measurements": 9,
+            "FDE_measurements": 7,
+            "missing_endpoint_measurements": 2,
+            "minADE": 0.222222224,
+            "minFDE": 0.285714298
+          },
+          {
+            "object_type": 2,
+            "ADE_measurements": 1,
+            "FDE_measurements": 1,
+            "missing_endpoint_measurements": 0,
+            "minADE": 2,
+            "minFDE": 2
+          }
+        ]
+      },
+      {
+        "training_oracle_offset_m": 2,
+        "validation_oracle_offset_m": 2,
+        "classes": [
+          {
+            "object_type": 1,
+            "ADE_measurements": 9,
+            "FDE_measurements": 7,
+            "missing_endpoint_measurements": 2,
+            "minADE": 2,
+            "minFDE": 2
+          },
+          {
+            "object_type": 2,
+            "ADE_measurements": 1,
+            "FDE_measurements": 1,
+            "missing_endpoint_measurements": 0,
+            "minADE": 2,
+            "minFDE": 2
+          }
+        ]
+      }
+    ],
+    "corrupt_score_refusals": 28,
+    "displacement_tolerance_m": 0.001,
+    "elapsed_seconds": 0.0015285079716704786,
+    "peak_rss_kib": 16156,
+    "scope": "two acquired native scenarios pooled solely as oracle scorer diagnostic; training and validation never mixed for scientific model evaluation"
+  },
+  "finite_regression_groups_passed": 2,
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-pooled-finite-v2/green/live.log": "21aa977e803ab4fe4aa782ece3bf7670f29d5ab9c75f8e0aa29f3977050eec53",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-pooled-finite-v2/green/check.json": "59a5b9e85327109d50c951fc414cfb51bd8bab3bfdabfbbf015fcba28b1623f1"
+  },
+  "scope": "live GREEN:28 corrupt pooled-score refusals and observed/reference nonfinite tests; supersedes original20-probe checker admission only"
+}
