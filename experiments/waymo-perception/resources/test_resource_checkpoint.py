@@ -15,7 +15,14 @@ class ResourceCheckpointTests(unittest.TestCase):
 
     def fixture(self,root):
         from resources.backend import ResourceBackend,prepare_identity
-        b=ResourceBackend.__new__(ResourceBackend);b.R=root/'run';b.R.mkdir();b.output=root/'payload';b.output.mkdir();b.source=b.R/'input';b.source.mkdir();(b.source/'manifest.json').write_text('{}');b.manifest_sha=sha(b.source/'manifest.json');b.anchor_sha='b'*64;b._resource_identity=None;(b.R/'run.json').write_text('{"fixture":"native"}')
+        b=ResourceBackend.__new__(ResourceBackend);b.R=root/'run';b.R.mkdir();b.output=root/'payload';b.output.mkdir();b.source=b.R/'input';b.source.mkdir();b.anchor_sha='b'*64;b._resource_identity=None;(b.R/'run.json').write_text('{"fixture":"native"}')
+        b.native=root/'scientific/balanced16-native-v2';native=b.native/'scene/100/producer';native.mkdir(parents=True)
+        for name in ['observations.npz','targets.npz','report.json']:(native/name).write_text(name)
+        physical=b.native.parent/'balanced16-physical-v2/scene/producer/100.npz';physical.parent.mkdir(parents=True);physical.write_text('physical')
+        boxes=b.native.parent/'balanced16-labels-v2/scene/producer/targets.json';boxes.parent.mkdir(parents=True);boxes.write_text('full native GT fixture')
+        b.manifest={'frames':[{'identity':'scene:100','relative_directory':'scene/100/producer','sha256':{name:sha(native/name) for name in ['observations.npz','targets.npz','report.json']},'physical_sha256':sha(physical),'boxes_sha256':sha(boxes)}]};(b.source/'manifest.json').write_text(json.dumps(b.manifest));b.manifest_sha=sha(b.source/'manifest.json')
+        driver=root/'libcuda.fixture.so';driver.write_text('driver bytes');b.old={'driver_hashes':{str(driver):sha(driver)}}
+        b.runtime_path=b.R/'runtime-lock.json';b.runtime_path.write_text('{"rootfs_sha256":"runtime fixture"}')
         from cohort.sustained_controller_backend import P
         b.package=b.R/'code';b.package.mkdir();worker=b.package/'cohort/sustained_scoring_budget.py';worker.parent.mkdir();worker.write_bytes((P/'cohort/sustained_scoring_budget.py').read_bytes());b.pins={'cohort/sustained_scoring_budget.py':sha(worker)}
         host=root/'host.py';host.write_text('host');snapshot=b.R/'host.py';snapshot.write_bytes(host.read_bytes());b.host_pins={'host.py':{'original':str(host),'snapshot':str(snapshot),'sha256':sha(host)}}
@@ -24,12 +31,18 @@ class ResourceCheckpointTests(unittest.TestCase):
         refs={}
         for stage in ['train','audit','literal-loss','export','proposals','score','metrics-audit']:
             child=root/stage;child.mkdir();receipt,path,evidence=test_resource_backend.ResourceBackendTests().stage_fixture(child,b,stage+'-1000')
+            inputs=b.R/(stage+'-1000-input');inputs.mkdir();(inputs/'job.json').write_text(json.dumps({'stage':stage}));receipt['input_hashes']={str(inputs/'job.json'):sha(inputs/'job.json')};receipt['driver_hashes']=b.old['driver_hashes'] if stage in {'train','audit'} else {};receipt['verifier_source_pins']={}
+            output=Path(receipt['output_directory']);(output/'check.json').write_text(json.dumps({'stage':stage}));receipt['artifacts'][str(output/'check.json')]=sha(output/'check.json')
+            if stage=='audit':
+                verifier=b.R/'verifier/audit_sustained_transition.py';verifier.parent.mkdir();verifier.write_text('verifier fixture');receipt['verifier_source_pins']={str(verifier):sha(verifier)}
+            path.write_text(json.dumps(receipt))
             if stage in {'score','metrics-audit'}:
                 proof_path=evidence/'resource-admitted.json';proof=json.loads(proof_path.read_text());proof['timeout_seconds']=14700;proof_path.write_text(json.dumps(proof))
             with patch('resources.backend.NativeBackend.guard'),patch('resources.backend.NativeBackend.check_stage'):b.bind_completed_stage(path)
             refs[stage]={'path':str(path),'sha256':sha(path)}
         final=b.R/'checkpoint-1000-admitted.json';final.write_text(json.dumps({'step':1000,'manifest_sha256':b.manifest_sha,'stage_receipts':refs}))
-        return b,{'step':1000,'target_step':1000,'root':str(b.output),'checkpoint_sha256':'c'*64,'final_path':str(final),'final_sha256':sha(final)}
+        report=b.R/'producer-report-1000.json';report.write_text('{}')
+        return b,{'step':1000,'target_step':1000,'root':str(b.output),'checkpoint_sha256':'c'*64,'final_path':str(final),'final_sha256':sha(final),'report_snapshot':str(report),'report_sha256':sha(report)}
 
     def test_all_seven_stages_bound_and_consistently_repinned_leaf_still_refused(self):
         seal,validate,_=self.api()
@@ -63,6 +76,40 @@ class ResourceCheckpointTests(unittest.TestCase):
                 for name,entry in files.items():self.assertEqual(sha(entry['path']),entry['sha256'])
                 log=Path(files['stages/train/execution.log']['path']);log.write_text('changed archived evidence')
                 with self.assertRaises(ValueError):inventory(b,record)
+
+    def test_inventory_covers_raw_stage_inputs_nonproducer_outputs_and_verifiers(self):
+        seal,_,inventory=self.api()
+        with tempfile.TemporaryDirectory() as temp:
+            b,record=self.fixture(Path(temp))
+            with patch('resources.backend.NativeBackend.guard'),patch('resources.backend.NativeBackend.check_stage'):
+                seal(b,record);files=inventory(b,record)
+                for stage in ['train','audit','literal-loss','export','proposals','score','metrics-audit']:
+                    self.assertIn('stages/'+stage+'/inputs/job.json',files)
+                    self.assertIn('stages/'+stage+'/outputs/check.json',files)
+                self.assertIn('stages/audit/verifiers/audit_sustained_transition.py',files)
+                self.assertIn('producer-report.json',files);self.assertIn('native-runtime-lock.json',files)
+
+    def shared(self,b):
+        try:from resources.dependencies import shared_inventory
+        except ImportError:self.fail('checkpoint recovery needs the exact shared cohort and driver dependency bundle')
+        return shared_inventory(b)
+
+    def test_shared_input_union_and_duplicate_frame_refusal(self):
+        with tempfile.TemporaryDirectory() as temp:
+            b,_=self.fixture(Path(temp))
+            with patch('resources.backend.NativeBackend.guard'):
+                files=self.shared(b);self.assertEqual(len(files),6)
+                self.assertIn('native/scene/100/producer/observations.npz',files);self.assertIn('physical/scene/producer/100.npz',files);self.assertIn('boxes/scene/producer/targets.json',files);self.assertIn('drivers/libcuda.fixture.so',files)
+                self.assertTrue(all(sha(entry['path'])==entry['sha256'] for entry in files.values()))
+                b.manifest['frames'].append(b.manifest['frames'][0])
+                with self.assertRaises(ValueError):self.shared(b)
+
+    def test_changed_physical_dependency_refuses_before_archival(self):
+        with tempfile.TemporaryDirectory() as temp:
+            b,_=self.fixture(Path(temp))
+            with patch('resources.backend.NativeBackend.guard'):
+                self.shared(b);(b.native.parent/'balanced16-physical-v2/scene/producer/100.npz').write_text('changed measurement')
+                with self.assertRaises(ValueError):self.shared(b)
 
     def test_backend_seals_new_checkpoint_and_checks_companion_before_persist(self):
         self.api()

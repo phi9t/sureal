@@ -1,0 +1,69 @@
+{
+  "passed": true,
+  "driver_sha256": "d1bbe45fe58068e5fac8f99d98355adebdd7de817c403e7d68bdc09531903f33",
+  "receipts": [
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-dependencies-red-v1-verified.json",
+      "sha256": "884bd6a6c14e15ecc523d1d4931989c2577d24e22f1c81511ca4fa9c95c2f051",
+      "exit_code": 1,
+      "groups": 39
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-dependencies-green-v1-verified.json",
+      "sha256": "762ddfa7df632401b3976bfbb95e7a0598454507922222732021386a20145417",
+      "exit_code": 0,
+      "groups": 39
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-retention-red-v1-verified.json",
+      "sha256": "030856110afe32d82df9ec19234a8701428d2b49bb0b6ce8923801645a059975",
+      "exit_code": 1,
+      "groups": 42
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-retention-green-v1-verified.json",
+      "sha256": "211e2236d6e867ff29d5a66a366d453b34b9e69174c1bd7992fe6169031f9cdc",
+      "exit_code": 0,
+      "groups": 42
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-retention-binding-red-v1-verified.json",
+      "sha256": "2ab87c9f972c740df4c5ed32a926c466d449ec8d5a5869fd4faad2fc0b3c60a9",
+      "exit_code": 1,
+      "groups": 43
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-retention-binding-green-v1-verified.json",
+      "sha256": "dbfb342e523d4a5b3c636bdaa4ac406bea07d1c627e7b6666b7d14e0c47fb774",
+      "exit_code": 0,
+      "groups": 43
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-cross-device-red-v1-verified.json",
+      "sha256": "1ff84694a84da9b118759d1034568f73b8d75b1ba0a1c217768784df40cf96ae",
+      "exit_code": 1,
+      "groups": 44
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-cross-device-green-v1-verified.json",
+      "sha256": "bd5e7e7d00de45a91ee7c08cb51d8bcdf551c286dc10944f53d72814cca01641",
+      "exit_code": 0,
+      "groups": 44
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-chunk-limit-red-v1-verified.json",
+      "sha256": "47012e6d4fc6f8fd682660330c642f8fd43e442c4cbb55c4ca99a31a978bbfb5",
+      "exit_code": 1
+    }
+  ],
+  "hash_bindings_checked": 3507,
+  "unique_files_checked": 3507,
+  "production_v1_failure": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-shared-hdfs-live-v1-failure.json",
+    "sha256": "da5595e7b92c85a86103db941a2e709f640396e643dd3c3b9b93650f5e5c42a3",
+    "error": {
+      "type": "OSError",
+      "message": "[Errno 18] Invalid cross-device link: '/usr/lib/x86_64-linux-gnu/libcuda.so.580.105.08' -> '/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-shared-e70463e5e93f4a0a83a67de813692d4c/raw/drivers/libcuda.so.580.105.08'"
+    }
+  }
+}

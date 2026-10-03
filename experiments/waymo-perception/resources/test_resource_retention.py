@@ -1,0 +1,94 @@
+"""Recovery membership is checked against an external exact input inventory."""
+import copy,errno,hashlib,json,tempfile,unittest
+from pathlib import Path
+from unittest.mock import patch
+
+
+class ResourceRetentionTests(unittest.TestCase):
+    def api(self):
+        try:from resources.retention_audit import validate_union
+        except ImportError:self.fail('resource publication requires a separate exact-member live recovery union gate')
+        return validate_union
+
+    def fixture(self,root):
+        raw=root/'raw';raw.mkdir();asset=raw/'input.json';asset.write_text('frozen input');digest=hashlib.sha256(asset.read_bytes()).hexdigest();expected={'input.json':{'path':str(asset),'sha256':digest,'bytes':asset.stat().st_size}}
+        member={'path':'input.json','sha256':digest,'bytes':asset.stat().st_size};archive='a'*64
+        validation={'archive_sha256':archive,'exact_members_and_hashes':True,'members':1,'payload_bytes':member['bytes']}
+        checks=[]
+        for stage in ['create-live','archive-put','archive-get','manifest-put','manifest-get','verify-live','rehydrate-live']:
+            checks.append({'stage':stage,'exit_code':0,**({'validation':{**validation,**({'verified_rehydration':True} if stage=='rehydrate-live' else {})}} if stage.endswith('-live') else {})})
+        prefix='hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-test'
+        chunk={'manifest':{'members':[member],'payload_bytes':member['bytes'],'archive_sha256':archive,'archive_bytes':100},'archive_hdfs_uri':prefix+'/'+archive+'/archive.tar.gz','manifest_hdfs_uri':prefix+'/'+archive+'/manifest.json','checks':checks}
+        original={'schema_version':1,'kind':'shared','source_inventory':expected,'chunks':[chunk],'hdfs_prefix':prefix};pub={**copy.deepcopy(original),'manifest_readback_exact':True,'publication_manifest_hdfs_uri':prefix+'/publication-manifest.json','publication_manifest_sha256':'b'*64}
+        return pub,expected,original,raw
+
+    def test_exact_union_and_missing_recovery_refusal(self):
+        validate=self.api()
+        with tempfile.TemporaryDirectory() as temp:
+            pub,expected,original,raw=self.fixture(Path(temp));result=validate(pub,expected,original,raw)
+            self.assertTrue(result['whole_member_union_exact']);self.assertEqual(result['files'],1)
+            for fault in ['missing_member','changed_digest','duplicate_member','missing_rehydrate','wrong_namespace','readback','changed_input']:
+                bad=copy.deepcopy(pub);readback=copy.deepcopy(original)
+                if fault=='missing_member':bad['chunks'][0]['manifest']['members']=[]
+                elif fault=='changed_digest':bad['chunks'][0]['manifest']['members'][0]['sha256']='0'*64
+                elif fault=='duplicate_member':bad['chunks'][0]['manifest']['members']*=2
+                elif fault=='missing_rehydrate':bad['chunks'][0]['checks'].pop()
+                elif fault=='wrong_namespace':bad['hdfs_prefix']='hdfs://foreign/unknown'
+                elif fault=='readback':bad['manifest_readback_exact']=False
+                else:(raw/'input.json').write_text('changed input')
+                # Corrupt even consistently rewritten candidate/readback copies;
+                # the independent expected inventory still must hold.
+                if fault not in {'readback','changed_input'}:readback={k:v for k,v in bad.items() if k not in {'manifest_readback_exact','publication_manifest_hdfs_uri','publication_manifest_sha256'}}
+                with self.assertRaises(ValueError):validate(bad,expected,readback,raw)
+
+    def test_chunk_partition_is_complete_bounded_and_order_independent(self):
+        try:from resources.retention import partition
+        except ImportError:self.fail('resource retention needs bounded chunk partitioning before writes')
+        values={'b':{'bytes':7},'a':{'bytes':5},'c':{'bytes':4}}
+        result=partition(values,10);self.assertEqual(result,[['a'],['b'],['c']]);self.assertEqual(partition(dict(reversed(list(values.items()))),10),result)
+        with self.assertRaises(ValueError):partition({'large':{'bytes':11}},10)
+        with self.assertRaises(ValueError):partition({},10)
+
+    def test_live_result_is_bound_to_retained_job_and_downloaded_manifest(self):
+        try:from resources.retention_audit import validate_archive_snapshot
+        except ImportError:self.fail('live recovery admission must bind actual retained jobs, results and downloaded manifests')
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp);pub,expected,original,raw=self.fixture(root);chunk=pub['chunks'][0]
+            library=root/'archive.py';library.write_text('pinned archive');pub['archive_library']={'path':str(library),'sha256':hashlib.sha256(library.read_bytes()).hexdigest()}
+            pub['execution_directory']=str(root/'execution');pub['runtime_lock']={'rootfs_sha256':'r'*64};pub['rootfs_path']=str(root/'rootfs')
+            for suffix in ['manifest','readback']:
+                path=root/(suffix+'.json');path.write_text(json.dumps(chunk['manifest'],sort_keys=True,indent=2)+'\n')
+                chunk[suffix+'_path']=str(path)
+            chunk['manifest_sha256']=hashlib.sha256(path.read_bytes()).hexdigest()
+            inputs=root/'inputs';inputs.mkdir();job={'source_sha256':{'input.json':expected['input.json']['sha256']},'max_bytes':128*1024**2,'archive_module_path':'/tmp/resource-archive.py','archive_module_sha256':pub['archive_library']['sha256'],'manifest_sha256':chunk['manifest_sha256']}
+            jobpath=inputs/'job.json';jobpath.write_text(json.dumps(job));out=root/'result';out.mkdir();checkpath=out/'check.json';log=out/'live.log';log.write_text('PASS archive recovery\n')
+            check=chunk['checks'][6];checkpath.write_text(json.dumps(check['validation']))
+            check.update({'input_directory':str(inputs),'input_hashes':{str(jobpath):hashlib.sha256(jobpath.read_bytes()).hexdigest()},'artifacts':{str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in out.iterdir()},'command':['bwrap','--unshare-all','--die-with-parent','--ro-bind',pub['rootfs_path'],'/','--ro-bind',pub['execution_directory'],'/experiment','--ro-bind',str(inputs),'/tmp/inputs','--ro-bind',str(library),'/tmp/resource-archive.py','--','python','/experiment/resources/archive_worker.py','rehydrate']})
+            validate_archive_snapshot(pub,chunk,check,'rehydrate')
+            for fault in ['result','job','library','mount','manifest','input_inventory']:
+                bad=copy.deepcopy(check);candidate=copy.deepcopy(chunk)
+                if fault=='result':bad['validation']['payload_bytes']+=1
+                elif fault=='job':
+                    altered=root/'bad-job';altered.mkdir();changed={**job,'source_sha256':{}};file=altered/'job.json';file.write_text(json.dumps(changed));bad['input_directory']=str(altered);bad['input_hashes']={str(file):hashlib.sha256(file.read_bytes()).hexdigest()};bad['command'][bad['command'].index('/tmp/inputs')-1]=str(altered)
+                elif fault=='library':bad['command'][bad['command'].index('/tmp/resource-archive.py')-1]=str(root/'foreign.py')
+                elif fault=='mount':bad['command'][bad['command'].index('/experiment')-1]=str(root/'foreign')
+                elif fault=='manifest':candidate['manifest']['archive_bytes']+=1
+                else:bad['input_hashes']={}
+                with self.assertRaises(ValueError):validate_archive_snapshot(pub,candidate,bad,'rehydrate')
+
+    def test_cross_filesystem_member_uses_verified_bounded_copy(self):
+        try:from resources.retention import stage_member
+        except ImportError:self.fail('driver inputs on another filesystem require bounded verified staging')
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp);source=root/'driver.so';source.write_bytes(b'driver bytes');entry={'path':str(source),'sha256':hashlib.sha256(source.read_bytes()).hexdigest(),'bytes':source.stat().st_size};destination=root/'staged.so'
+            with patch('resources.retention.os.link',side_effect=OSError(errno.EXDEV,'cross-device')):
+                result=stage_member(entry,destination,root);self.assertEqual(destination.read_bytes(),source.read_bytes());self.assertEqual(result['storage'],'copied');self.assertEqual(result['bytes'],len(b'driver bytes'))
+            with patch('resources.retention.os.link',side_effect=OSError(errno.EACCES,'not permitted')):
+                with self.assertRaises(OSError):stage_member(entry,root/'refused.so',root)
+            self.assertFalse((root/'refused.so').exists())
+            with patch('resources.retention.os.link',side_effect=OSError(errno.EXDEV,'cross-device')),patch('resources.retention.reserve_write',side_effect=ValueError('reserve refused')):
+                with self.assertRaises(ValueError):stage_member(entry,root/'budget-refused.so',root)
+            self.assertFalse((root/'budget-refused.so').exists())
+
+
+if __name__=='__main__':unittest.main()

@@ -1,0 +1,12 @@
+[
+  {
+    "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/gpu-rootfs",
+    "sha256": "55f63770083be16ea76764422c51e6e5d995b2d65e9785b552e118a64c6e2f1f",
+    "seconds": 18.945867075002752
+  },
+  {
+    "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+    "sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "seconds": 0.672177959990222
+  }
+]
