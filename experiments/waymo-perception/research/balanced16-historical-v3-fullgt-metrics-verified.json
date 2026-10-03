@@ -1,0 +1,327 @@
+{
+  "command": [
+    "bwrap",
+    "--unshare-all",
+    "--die-with-parent",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/metrics-rootfs",
+    "/",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-metrics-v2/code",
+    "/experiment",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-export-v1/output",
+    "/source",
+    "--bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-metrics-v2/output",
+    "/outputs",
+    "--proc",
+    "/proc",
+    "--dev",
+    "/dev",
+    "--tmpfs",
+    "/tmp",
+    "--clearenv",
+    "--setenv",
+    "HOME",
+    "/tmp/private-home",
+    "--setenv",
+    "PATH",
+    "/usr/local/bin:/usr/bin:/bin",
+    "--setenv",
+    "PYTHONNOUSERSITE",
+    "1",
+    "--setenv",
+    "PYTHONDONTWRITEBYTECODE",
+    "1",
+    "--setenv",
+    "PYTHONPATH",
+    "/experiment",
+    "--chdir",
+    "/experiment",
+    "--",
+    "python",
+    "/experiment/cohort/metrics_sustained_v3.py"
+  ],
+  "exit_code": 0,
+  "runtime_lock": {
+    "schema_version": 1,
+    "image_id": "sha256:c0018cf57e482c6a9e6623ea32f29c6039f22f5dafb0f3311bad6d411a7bb135",
+    "rootfs_sha256": "831a5955ce709cb46b82688ba0f0371c37e1af707ffb870b24c555d53d4f5542",
+    "upstream_commit": "99a4cb3ff07e2fe06c2ce73da001f850f628e45a",
+    "recipe_hashes": {
+      "Dockerfile": "b85397cec37dd8322f538b26f60c785122442f1db3844850b3cd8a35ea218681",
+      "CMakeLists.txt": "36532e0d6fc0b4e5c9662c5272691d2b1d7390dce805dfae6f8c5fe32c314774"
+    }
+  },
+  "source_pins": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-metrics-v2/code/cohort/metrics_sustained_v3.py": "1f79c8a5e4471b44015f85023c54ef05c1ebd842c2a32f5c79ca1a4741933995",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-metrics-v2/code/pipeline/detection_export.py": "a361e44755ce45a251534b1a1fd8b1e12d9d1e8fadd02f6d6cfdafe98a46f7c2",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-metrics-v2/code/pipeline/segmentation_export.py": "bd17238a202ad90e00cafc4694a1fce3d86c9dda82314ca6e5bb6ff4986d1723"
+  },
+  "parent_receipt_sha256": "92bae9921d46e5fd57dd7458eb0b845fb520fc8bf41d5db33bfabcbc7ed7ab0e",
+  "parent_artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-export-v1/output/live.log": "41bc515248aa7fa51f1e815ede010db56241c4bc9bd04b65e7c5cf3393b5f8e2",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-export-v1/output/predictions.json": "05fb8247654bf413d6af98c515be31935e1bab8e26f4c13429fa9b91888e6643",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-export-v1/output/preparation.json": "7d1a59b685dbaac9a24d3c6cb40fd91ae6e5e15491993b214026d5751df828fe",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-export-v1/output/groundtruth.json": "63c3ae4827ae88cd1d77e4ad34017fd1e564e4087c502d7ca255bf5c72f63143"
+  },
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-metrics-v2/output/predictions.bin": "03c3e83329d92bce9195a69b94afa3a81bd577c483f5da469ffdbb13a0d8c53d",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-metrics-v2/output/live.log": "33c5124e8e859d2b1cdf640e2da3655c615df031abc263af266a14473a453727",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-metrics-v2/output/check.json": "92bc293c751d36b8c6b88280c1f0504f3c928d9a26bc83d1ea5922dd276e5811",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-metrics-v2/output/groundtruth.bin": "5913a8a802b27d501dcac1c7654554f223131a0dbe92a6ef96362eeef88583d7",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-metrics-v2/output/metrics.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-metrics-v2/output/metrics.stdout": "409de32f25870879647c198e52cbe9ffadf911d255faff37f523abc3400bc9d5"
+  },
+  "validation": {
+    "frames": [
+      {
+        "identity": "13840133134545942567_1060_000_1080_000:1558402354862835",
+        "native_groundtruth": 132,
+        "training_eligible_groundtruth": 113,
+        "zero_point_groundtruth": 9,
+        "predictions": 500,
+        "uncovered_targets": 1
+      },
+      {
+        "identity": "16977844994272847523_2140_000_2160_000:1557450680964094",
+        "native_groundtruth": 97,
+        "training_eligible_groundtruth": 81,
+        "zero_point_groundtruth": 10,
+        "predictions": 500,
+        "uncovered_targets": 0
+      },
+      {
+        "identity": "17885096890374683162_755_580_775_580:1506906083489022",
+        "native_groundtruth": 60,
+        "training_eligible_groundtruth": 50,
+        "zero_point_groundtruth": 6,
+        "predictions": 500,
+        "uncovered_targets": 0
+      },
+      {
+        "identity": "4575961016807404107_880_000_900_000:1544656166412547",
+        "native_groundtruth": 63,
+        "training_eligible_groundtruth": 53,
+        "zero_point_groundtruth": 2,
+        "predictions": 500,
+        "uncovered_targets": 1
+      },
+      {
+        "identity": "13506499849906169066_120_000_140_000:1552353849872908",
+        "native_groundtruth": 135,
+        "training_eligible_groundtruth": 109,
+        "zero_point_groundtruth": 14,
+        "predictions": 500,
+        "uncovered_targets": 2
+      },
+      {
+        "identity": "16977844994272847523_2140_000_2160_000:1557450685964257",
+        "native_groundtruth": 108,
+        "training_eligible_groundtruth": 90,
+        "zero_point_groundtruth": 13,
+        "predictions": 500,
+        "uncovered_targets": 0
+      },
+      {
+        "identity": "15696964848687303249_4615_200_4635_200:1507241626220091",
+        "native_groundtruth": 109,
+        "training_eligible_groundtruth": 90,
+        "zero_point_groundtruth": 8,
+        "predictions": 500,
+        "uncovered_targets": 5
+      },
+      {
+        "identity": "16977844994272847523_2140_000_2160_000:1557450679864286",
+        "native_groundtruth": 96,
+        "training_eligible_groundtruth": 73,
+        "zero_point_groundtruth": 17,
+        "predictions": 500,
+        "uncovered_targets": 0
+      },
+      {
+        "identity": "12856053589272984699_1020_000_1040_000:1552658368873652",
+        "native_groundtruth": 75,
+        "training_eligible_groundtruth": 58,
+        "zero_point_groundtruth": 15,
+        "predictions": 500,
+        "uncovered_targets": 4
+      },
+      {
+        "identity": "15628918650068847391_8077_670_8097_670:1508889335260598",
+        "native_groundtruth": 52,
+        "training_eligible_groundtruth": 43,
+        "zero_point_groundtruth": 5,
+        "predictions": 500,
+        "uncovered_targets": 3
+      },
+      {
+        "identity": "7850521592343484282_4576_090_4596_090:1520908476792400",
+        "native_groundtruth": 26,
+        "training_eligible_groundtruth": 20,
+        "zero_point_groundtruth": 5,
+        "predictions": 500,
+        "uncovered_targets": 1
+      },
+      {
+        "identity": "7921369793217703814_1060_000_1080_000:1557159628222386",
+        "native_groundtruth": 105,
+        "training_eligible_groundtruth": 88,
+        "zero_point_groundtruth": 6,
+        "predictions": 500,
+        "uncovered_targets": 3
+      },
+      {
+        "identity": "7921369793217703814_1060_000_1080_000:1557159618222385",
+        "native_groundtruth": 112,
+        "training_eligible_groundtruth": 86,
+        "zero_point_groundtruth": 13,
+        "predictions": 500,
+        "uncovered_targets": 2
+      },
+      {
+        "identity": "13830510593707564159_5575_000_5595_000:1518657072511849",
+        "native_groundtruth": 8,
+        "training_eligible_groundtruth": 5,
+        "zero_point_groundtruth": 1,
+        "predictions": 500,
+        "uncovered_targets": 0
+      },
+      {
+        "identity": "11004685739714500220_2300_000_2320_000:1553640277306703",
+        "native_groundtruth": 47,
+        "training_eligible_groundtruth": 45,
+        "zero_point_groundtruth": 2,
+        "predictions": 500,
+        "uncovered_targets": 3
+      },
+      {
+        "identity": "3966447614090524826_320_000_340_000:1553023288374080",
+        "native_groundtruth": 54,
+        "training_eligible_groundtruth": 49,
+        "zero_point_groundtruth": 0,
+        "predictions": 500,
+        "uncovered_targets": 5
+      }
+    ],
+    "native_groundtruth": 1279,
+    "eligible_groundtruth": 1279,
+    "training_eligible_groundtruth": 1053,
+    "groundtruth_policy": "all native four-class boxes; native evaluator handles eligibility",
+    "decoder_version": 3,
+    "manifest_sha256": "c5c49b55a410b3c9a145d1adceb536703773a3f32a721eb71216edbd236076ab",
+    "head_hashes": {
+      "heads-11.npz": "e00b77a44815e354d02d1d9b3ce039f0e34b650c3846c53536f021aead8d942f",
+      "heads-04.npz": "2f4e9bbd6ca76956f62cfc1291ebdfbdeea0b054000d892b725b418fabc223f5",
+      "heads-15.npz": "a17726cf2942bf6b9aaf7e9c7e95c56a690b5f51cc454431c693a79127276900",
+      "heads-08.npz": "177288f62a0ea4958c831d72af2c12b0788216949f8ad4b60acfd3efc5cf5145",
+      "heads-02.npz": "6d66beb90429a93915771290f18bae0b68298b388926f8f1c63bbb91cae4e1cc",
+      "heads-00.npz": "091254786de14a63d12fa544c1a25268045d67c7a8672e0ab9eee5f68d44f136",
+      "heads-03.npz": "d1a20f520ca6acc5dacd3f22a1071866cb0b32a2cfab860370dc65d289387988",
+      "heads-14.npz": "2ca2f085995ea146e3bfff917a1ce5566f2c9b594ad35d553a4161f771ae91f5",
+      "heads-13.npz": "18b98d13b3b745d3b595e014cebd5e5811be48b715dc27737a0804ffb763aff4",
+      "heads-06.npz": "b27d6ca9ce77a6b2b1df5640f9268fc2c168ef75cbdc03431d3cf29d82feab6a",
+      "heads-05.npz": "a856c05d3e5173e2e450c89af1dd2fce0657b5d2612feb466da88148e76e4289",
+      "heads-07.npz": "2be6a1e7a8442d1d5cd1e04322a9c24b85b4c857f0ed9b115d12330d9b25530c",
+      "heads-12.npz": "906cbfe4502e3e6807d2c3812c1c604a9eddaf98442516ad1b775bb1596d1da6",
+      "heads-01.npz": "9920fc08d72a3c65163f72523a3c7ecbb0656e40738fcc30c16c104b13ffd1a8",
+      "heads-10.npz": "af50969eb1252c7d158f6b5d492167233132a7f8b42edc89592101da9de70a0f",
+      "heads-09.npz": "c321684e516277c35199da4f190f3d8dd3f5ddeef44f5a4dadf55837ab55f057"
+    },
+    "anchor_templates_sha256": "4bcc69590d664b32ff1ece5e8f00345c76f9564f419b091bf05f6482a5c56d52",
+    "predictions": 8000,
+    "groundtruth_by_class": {
+      "1": 639,
+      "2": 300,
+      "3": 302,
+      "4": 38
+    },
+    "elapsed_seconds": 45.67460454796674,
+    "peak_rss_kib": 247420,
+    "scope": "16-frame training-only full native GT V3 diagnostic; native eligibility handled by official evaluator; no heldout inference",
+    "LEVEL2_per_class": {
+      "1": {
+        "AP": 0.377241,
+        "APH": 0.281619
+      },
+      "2": {
+        "AP": 0.275674,
+        "APH": 0.242956
+      },
+      "3": {
+        "AP": 0.0274796,
+        "APH": 0.0236408
+      },
+      "4": {
+        "AP": 0.0019305,
+        "APH": 0.00190988
+      }
+    },
+    "mean_populated_class_APH": 0.13753142000000002,
+    "APH_gate_passed": false,
+    "all_class_APH_gate_passed": false,
+    "checkpoint_confirmation_required": true,
+    "metrics": {
+      "OBJECT_TYPE_TYPE_VEHICLE_LEVEL_1": {
+        "AP": 0.400512,
+        "APH": 0.298732
+      },
+      "OBJECT_TYPE_TYPE_VEHICLE_LEVEL_2": {
+        "AP": 0.377241,
+        "APH": 0.281619
+      },
+      "OBJECT_TYPE_TYPE_PEDESTRIAN_LEVEL_1": {
+        "AP": 0.296403,
+        "APH": 0.261782
+      },
+      "OBJECT_TYPE_TYPE_PEDESTRIAN_LEVEL_2": {
+        "AP": 0.275674,
+        "APH": 0.242956
+      },
+      "OBJECT_TYPE_TYPE_SIGN_LEVEL_1": {
+        "AP": 0.0338613,
+        "APH": 0.0291469
+      },
+      "OBJECT_TYPE_TYPE_SIGN_LEVEL_2": {
+        "AP": 0.0274796,
+        "APH": 0.0236408
+      },
+      "OBJECT_TYPE_TYPE_CYCLIST_LEVEL_1": {
+        "AP": 0.00204082,
+        "APH": 0.00201901
+      },
+      "OBJECT_TYPE_TYPE_CYCLIST_LEVEL_2": {
+        "AP": 0.0019305,
+        "APH": 0.00190988
+      },
+      "30)_LEVEL_1": {
+        "AP": 0.0,
+        "APH": 0.0
+      },
+      "30)_LEVEL_2": {
+        "AP": 0.0,
+        "APH": 0.0
+      },
+      "50)_LEVEL_1": {
+        "AP": 0.0,
+        "APH": 0.0
+      },
+      "50)_LEVEL_2": {
+        "AP": 0.0,
+        "APH": 0.0
+      },
+      "+inf)_LEVEL_1": {
+        "AP": 0.0133779,
+        "APH": 0.013235
+      },
+      "+inf)_LEVEL_2": {
+        "AP": 0.0124224,
+        "APH": 0.0122896
+      }
+    },
+    "scoring_seconds": 112.78338081599213
+  },
+  "elapsed_seconds": 112.96806302299956,
+  "scope": "official native fullGT V3 metrics on historical2000 heads; independent export/proposal/metric audits still required; no new sustainedfit/science"
+}

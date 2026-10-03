@@ -12,3 +12,8 @@ def freeze_inputs(source,destination):
  for path in destination.iterdir():
   with path.open('rb') as stream:hashes[str(path)]=hashlib.file_digest(stream,'sha256').hexdigest()
  return destination,hashes
+
+def bind_stage_paths(arguments,source,frozen):
+ """Redirect every template input alias to this stage's immutable snapshot."""
+ source=Path(source);frozen=Path(frozen)
+ return [str(frozen/Path(value).relative_to(source)) if Path(value).is_absolute() and Path(value).is_relative_to(source) else value for value in arguments]
