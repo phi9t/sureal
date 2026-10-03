@@ -457,3 +457,19 @@ research-journal
 Backfilled exact immutable evidence for all56 historical journal entries:85 references/45 unique payloads, including superseded note31 receipt recovered byte-for-byte from the expanded run frozen source. Journal history unchanged; later correction notes remain authoritative. Complete next HDFS snapshot readback still required.
 
 Evidence: [journal-evid](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence-backfill-verified.json)
+
+## 58. 2026-10-03T03:12:39.533761+00:00 — observation
+
+balanced16-sustained
+
+Independent NumPy literal detector-loss auditor passes37 CPU preparation groups and all16 actual historical baseline2000 nativehead checks (6.304s/430976KiB RSS). Cyclistpositiveanchors56 vsvehicle4788; cyclists~2.2% of mean positivefocal contribution. Needs-more-evidence: preregistered classbalance comparison pending. No new GPU/V3/science promotion.
+
+Evidence: [balanced16-l](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-literal-native-fixture-verified.json), [balanced16-l](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-literal-loss-preparation-v2-verified.json)
+
+## 59. 2026-10-03T03:14:52.113481+00:00 — observation
+
+balanced16-sustained
+
+Actual literal-loss worker refuses three freshlyexternallyhashed corrupt reports on original16 native tensors:NaNloss,wrongfiniteclassificationloss,wrongframeidentity. No acceptanceoutputs. Guards validated beyond inputhash checks; new GPU/V3/science acceptance remains pending.
+
+Evidence: [balanced16-l](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-literal-native-refusals-verified.json)

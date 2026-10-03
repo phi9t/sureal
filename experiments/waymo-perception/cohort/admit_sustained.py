@@ -8,6 +8,7 @@ from pathlib import Path
 P=Path(__file__).resolve().parents[1];sys.path[:0]=[str(P),str(P/'architecture')]
 from experiment_runner import run_stage
 from pipeline.runtime_identity import verify_rootfs
+from pipeline.insula_entry import launch_plan
 from tier1.storage import sha,unique_payload_bytes
 from tier1.admission import reserve_write
 from cohort.sustained_contract import validate_contract
@@ -46,16 +47,19 @@ def main():
  runtime_path=R/'runtime-lock.json';runtime_path.write_text(json.dumps(runtime,indent=2)+'\n')
  manifest={'candidate':candidate,'frames':frames,'recipe':'baseline','source_hashes':pins,'runtime_lock':runtime};source=R/'input';source.mkdir();manifest_path=source/'manifest.json';manifest_path.write_text(json.dumps(manifest,indent=2)+'\n');manifest_sha=sha(manifest_path)
  output=W/f'balanced16-sustained-admission-{a.run_id}';output.mkdir();receipts={}
- def stage(name,worker,directory,extra):
+ def stage(name,worker,directory,extra,gpu=True):
   directory.mkdir();stage_source,input_hashes=freeze_inputs(source,R/(name+'-input'));command=old['checks'][0]['command'].copy()
-  for target,path in [('/experiment',package),('/source',stage_source),('/outputs',directory)]:command[command.index(target)-1]=str(path)
-  command[-1]='/experiment/cohort/'+worker;index=command.index('--');command[index:index]=['--ro-bind',str(native),'/tmp/native','--ro-bind',str(runtime_path),'/tmp/runtime-lock.json','--ro-bind',str(W),'/tmp/scientific','--setenv','CUBLAS_WORKSPACE_CONFIG',':4096:8',*extra]
+  if gpu:
+   for target,path in [('/experiment',package),('/source',stage_source),('/outputs',directory)]:command[command.index(target)-1]=str(path)
+   command[-1]='/experiment/cohort/'+worker
+  else:command=launch_plan(C/'gpu-rootfs',package,stage_source,directory,['/opt/waymo/bin/python','/experiment/cohort/'+worker])
+  index=command.index('--');command[index:index]=['--ro-bind',str(stage_source),'/tmp/inputs','--ro-bind',str(native),'/tmp/native','--ro-bind',str(runtime_path),'/tmp/runtime-lock.json','--ro-bind',str(W),'/tmp/scientific','--setenv','CUBLAS_WORKSPACE_CONFIG',':4096:8',*extra]
   with (directory/'live.log').open('w') as log:result=run_stage(command,package,dict(os.environ),log,timeout=1800)
   if result.returncode:raise RuntimeError(f'{name} failed; retained log: {directory}/live.log')
   validate_sources(package,pins,runtime,runtime)
   if any(sha(path)!=digest for path,digest in input_hashes.items()):raise ValueError('immutable stage inputs changed')
   if sha(manifest_path)!=manifest_sha or unique_payload_bytes(W)>15*1024**3 or unique_payload_bytes(output)>2*1024**3:raise ValueError('manifest or storage admission violated')
-  receipt={'stage':name,'command':command,'exit_code':0,'source_hashes':pins,'runtime_lock':runtime,'driver_hashes':old['driver_hashes'],'manifest_sha256':manifest_sha,'expanded_closure_sha256':sha(closure),'historical_manifest_sha256':sha(historical),'input_hashes':input_hashes,'job_sha256':sha(stage_source/('job.json' if worker=='train_sustained.py' else 'audit.json')),'artifacts':{str(p):sha(p) for p in directory.rglob('*') if p.is_file()},'scope':'native engineering pilot only; sustained fitting/science/native APH pending'}
+  receipt={'stage':name,'command':command,'exit_code':0,'source_hashes':pins,'runtime_lock':runtime,'driver_hashes':old['driver_hashes'],'manifest_sha256':manifest_sha,'expanded_closure_sha256':sha(closure),'historical_manifest_sha256':sha(historical),'input_hashes':input_hashes,'job_sha256':sha(stage_source/('job.json' if worker=='train_sustained.py' else 'audit.json' if gpu else 'loss-audit.json')),'artifacts':{str(p):sha(p) for p in directory.rglob('*') if p.is_file()},'scope':'native engineering pilot only; sustained fitting/science/native APH pending'}
   receipt_path=R/(name+'-verified.json');receipt_path.write_text(json.dumps(receipt,indent=2)+'\n');receipts[name]={'path':str(receipt_path),'sha256':sha(receipt_path)};print('ADMITTED',name,flush=True)
  previous=None
  for step in [0,19,35]:
@@ -68,6 +72,10 @@ def main():
   (source/'audit.json').write_text(json.dumps(audit));audit_dir=R/f'audit-{step:02d}';stage(f'audit-{step}','replay_sustained.py',audit_dir,['--ro-bind',str(directory),'/tmp/retained',*(['--ro-bind',str(previous),'/tmp/previous'] if step==35 else [])])
   replay=json.loads((audit_dir/'replay.json').read_text())
   if len(replay['checked_frames'])!=16 or step==35 and len(replay['pilot_reference_checks'])!=2:raise ValueError('mandatory full16/restart audit missing')
+  (source/'loss-audit.json').write_text(json.dumps({'manifest_sha256':manifest_sha,'report_sha256':sha(directory/'check.json'),'head_hashes':report['head_hashes']}))
+  # The loss worker reads retained report/heads through /source; stage inputs
+  # remain separately immutable at /tmp/inputs.
+  stage(f'literal-loss-{step}','audit_sustained_loss.py',R/f'loss-{step:02d}',['--ro-bind',str(directory),'/source'],gpu=False)
   previous=directory
  final={'run_directory':str(R),'output_directory':str(output),'manifest_sha256':manifest_sha,'stage_receipts':receipts,'scope':'native baseline0/19/35 exact state/heads/reference pilot; no sustained-fit or scientific acceptance'}
  (P/'research'/f'balanced16-sustained-admission-{a.run_id}-verified.json').write_text(json.dumps(final,indent=2)+'\n');print('PASS native baseline admission pilot; full scoring/loss/HDFS gates remain',flush=True)
