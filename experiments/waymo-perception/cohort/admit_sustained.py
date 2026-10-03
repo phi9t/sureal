@@ -13,7 +13,7 @@ from tier1.storage import sha,unique_payload_bytes
 from tier1.admission import reserve_write
 from cohort.sustained_contract import validate_contract
 from cohort.sustained_sources import validate_sources
-from cohort.sustained_stage_inputs import freeze_inputs
+from cohort.sustained_stage_inputs import freeze_inputs,bind_stage_paths
 
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing'
 
@@ -36,6 +36,7 @@ def main():
   for name,digest in frame['sha256'].items():
    if sha(native/parts/name)!=digest:raise ValueError('original native frame changed')
  old=json.loads((C/'detector-gpu-live-a/receipt.json').read_text());runtime=old['runtime_lock'];verify_rootfs(C/'gpu-rootfs',runtime['rootfs_sha256'])
+ metric_runtime=json.loads(Path(str(C/'metrics-rootfs')+'.lock.json').read_text());verify_rootfs(C/'metrics-rootfs',metric_runtime['rootfs_sha256'])
  for path,digest in old['driver_hashes'].items():
   if sha(path)!=digest:raise ValueError('driver changed')
  R=C/'insula'/f'balanced16-sustained-admission-{a.run_id}';R.mkdir();package=R/'code';package.mkdir()
@@ -45,21 +46,25 @@ def main():
    dest=package/path.relative_to(P);dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(path,dest)
  pins={str(p.relative_to(package)):sha(p) for p in package.rglob('*.py')};validate_sources(package,pins,runtime,runtime)
  runtime_path=R/'runtime-lock.json';runtime_path.write_text(json.dumps(runtime,indent=2)+'\n')
- manifest={'candidate':candidate,'frames':frames,'recipe':'baseline','source_hashes':pins,'runtime_lock':runtime};source=R/'input';source.mkdir();manifest_path=source/'manifest.json';manifest_path.write_text(json.dumps(manifest,indent=2)+'\n');manifest_sha=sha(manifest_path)
+ anchor_path=P/'research/training-anchor-templates.candidate.json';anchor_receipt=json.loads((P/'research/training-anchor-candidate-verified.json').read_text())
+ if sha(anchor_path)!=anchor_receipt['expected']['candidate_sha256']:raise ValueError('admitted anchor templates changed')
+ manifest={'candidate':candidate,'frames':frames,'recipe':'baseline','source_hashes':pins,'runtime_lock':runtime};source=R/'input';source.mkdir();manifest_path=source/'manifest.json';manifest_path.write_text(json.dumps(manifest,indent=2)+'\n');manifest_sha=sha(manifest_path);(source/'anchor-templates.json').write_bytes(anchor_path.read_bytes())
  output=W/f'balanced16-sustained-admission-{a.run_id}';output.mkdir();receipts={}
- def stage(name,worker,directory,extra,gpu=True):
+ def stage(name,worker,directory,extra,gpu=True,metrics=False):
   directory.mkdir();stage_source,input_hashes=freeze_inputs(source,R/(name+'-input'));command=old['checks'][0]['command'].copy()
   if gpu:
    for target,path in [('/experiment',package),('/source',stage_source),('/outputs',directory)]:command[command.index(target)-1]=str(path)
    command[-1]='/experiment/cohort/'+worker
+  elif metrics:command=launch_plan(C/'metrics-rootfs',package,stage_source,directory,['python','/experiment/cohort/'+worker])
   else:command=launch_plan(C/'gpu-rootfs',package,stage_source,directory,['/opt/waymo/bin/python','/experiment/cohort/'+worker])
-  index=command.index('--');command[index:index]=['--ro-bind',str(stage_source),'/tmp/inputs','--ro-bind',str(native),'/tmp/native','--ro-bind',str(runtime_path),'/tmp/runtime-lock.json','--ro-bind',str(W),'/tmp/scientific','--setenv','CUBLAS_WORKSPACE_CONFIG',':4096:8',*extra]
+  extra=bind_stage_paths(extra,source,stage_source)
+  index=command.index('--');command[index:index]=['--ro-bind',str(stage_source),'/tmp/inputs','--ro-bind',str(native),'/tmp/native','--ro-bind',str(W/'balanced16-physical-v2'),'/tmp/physical','--ro-bind',str(W/'balanced16-labels-v2'),'/tmp/boxes','--ro-bind',str(runtime_path),'/tmp/runtime-lock.json','--ro-bind',str(W),'/tmp/scientific','--setenv','CUBLAS_WORKSPACE_CONFIG',':4096:8',*extra]
   with (directory/'live.log').open('w') as log:result=run_stage(command,package,dict(os.environ),log,timeout=1800)
   if result.returncode:raise RuntimeError(f'{name} failed; retained log: {directory}/live.log')
   validate_sources(package,pins,runtime,runtime)
   if any(sha(path)!=digest for path,digest in input_hashes.items()):raise ValueError('immutable stage inputs changed')
   if sha(manifest_path)!=manifest_sha or unique_payload_bytes(W)>15*1024**3 or unique_payload_bytes(output)>2*1024**3:raise ValueError('manifest or storage admission violated')
-  receipt={'stage':name,'command':command,'exit_code':0,'source_hashes':pins,'runtime_lock':runtime,'driver_hashes':old['driver_hashes'],'manifest_sha256':manifest_sha,'expanded_closure_sha256':sha(closure),'historical_manifest_sha256':sha(historical),'input_hashes':input_hashes,'job_sha256':sha(stage_source/('job.json' if worker=='train_sustained.py' else 'audit.json' if gpu else 'loss-audit.json')),'artifacts':{str(p):sha(p) for p in directory.rglob('*') if p.is_file()},'scope':'native engineering pilot only; sustained fitting/science/native APH pending'}
+  receipt={'stage':name,'command':command,'exit_code':0,'source_hashes':pins,'runtime_lock':metric_runtime if metrics else runtime,'driver_hashes':old['driver_hashes'] if gpu else {},'manifest_sha256':manifest_sha,'expanded_closure_sha256':sha(closure),'historical_manifest_sha256':sha(historical),'input_hashes':input_hashes,'job_sha256':sha(stage_source/'job.json') if worker=='train_sustained.py' else None,'artifacts':{str(p):sha(p) for p in directory.rglob('*') if p.is_file()},'scope':'native engineering pilot only; sustained fitting/science/native APH pending'}
   receipt_path=R/(name+'-verified.json');receipt_path.write_text(json.dumps(receipt,indent=2)+'\n');receipts[name]={'path':str(receipt_path),'sha256':sha(receipt_path)};print('ADMITTED',name,flush=True)
  previous=None
  for step in [0,19,35]:
@@ -76,7 +81,14 @@ def main():
   # The loss worker reads retained report/heads through /source; stage inputs
   # remain separately immutable at /tmp/inputs.
   stage(f'literal-loss-{step}','audit_sustained_loss.py',R/f'loss-{step:02d}',['--ro-bind',str(directory),'/source'],gpu=False)
+  (source/'export-audit.json').write_text(json.dumps({'manifest_sha256':manifest_sha,'anchor_templates_sha256':sha(source/'anchor-templates.json'),'head_hashes':report['head_hashes']}))
+  prepared=R/f'prepared-{step:02d}';stage(f'export-{step}','prepare_sustained_v3.py',prepared,['--ro-bind',str(directory/'heads'),'/source'],gpu=False)
+  export_receipt=json.loads(Path(receipts[f'export-{step}']['path']).read_text());export_receipt['inputs']={p:h for p,h in export_receipt['input_hashes'].items() if Path(p).name in {'manifest.json','anchor-templates.json','export-audit.json'}};export_receipt['validation']=json.loads((prepared/'preparation.json').read_text());(source/'score-receipt.json').write_text(json.dumps(export_receipt,indent=2)+'\n');(source/'expected.json').write_text(json.dumps({'receipt':export_receipt,'receipt_sha256':sha(source/'score-receipt.json')}))
+  stage(f'proposals-{step}','audit_proposals_sustained_v3.py',R/f'proposal-audit-{step:02d}',['--ro-bind',str(prepared),'/source','--ro-bind',str(directory/'heads'),'/tmp/heads','--ro-bind',str(source/'score-receipt.json'),'/tmp/score-receipt.json','--ro-bind',str(source/'expected.json'),'/tmp/expected.json'],gpu=False)
+  scored=R/f'scored-{step:02d}';stage(f'score-{step}','metrics_sustained_v3.py',scored,['--ro-bind',str(prepared),'/source'],gpu=False,metrics=True)
+  score_receipt=json.loads(Path(receipts[f'score-{step}']['path']).read_text());score_receipt['parent_artifacts']=export_receipt['artifacts'];score_receipt['validation']=json.loads((scored/'check.json').read_text());(source/'score-receipt.json').write_text(json.dumps(score_receipt,indent=2)+'\n');(source/'expected.json').write_text(json.dumps({'receipt':score_receipt,'receipt_sha256':sha(source/'score-receipt.json')}))
+  stage(f'metrics-audit-{step}','audit_metrics_sustained_v3.py',R/f'metric-audit-{step:02d}',['--ro-bind',str(prepared),'/source','--ro-bind',str(scored),'/tmp/scored','--ro-bind',str(source/'score-receipt.json'),'/tmp/score-receipt.json','--ro-bind',str(source/'expected.json'),'/tmp/expected.json'],gpu=False,metrics=True)
   previous=directory
  final={'run_directory':str(R),'output_directory':str(output),'manifest_sha256':manifest_sha,'stage_receipts':receipts,'scope':'native baseline0/19/35 exact state/heads/reference pilot; no sustained-fit or scientific acceptance'}
- (P/'research'/f'balanced16-sustained-admission-{a.run_id}-verified.json').write_text(json.dumps(final,indent=2)+'\n');print('PASS native baseline admission pilot; full scoring/loss/HDFS gates remain',flush=True)
+ (P/'research'/f'balanced16-sustained-admission-{a.run_id}-verified.json').write_text(json.dumps(final,indent=2)+'\n');print('PASS native baseline admission pilot; sustained controller/HDFS gates remain',flush=True)
 if __name__=='__main__':main()

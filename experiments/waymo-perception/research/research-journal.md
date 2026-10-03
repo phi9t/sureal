@@ -481,3 +481,75 @@ balanced16-sustained
 Native GT reconciliation:16 frames contain1279 boxes vs1053 positive-point trainingROI boxes. NewGT export retains100 positive-point outsideROI plus126 zero-point boxes; None difficulty preserved after meaningful native regression failure. Live41 CPU groups and independent full1279 nativefield checks pass. Historical2000 heads V3 export runs with8000 proposals/fullGT; proposal/native metric audits and newtraining pending. HistoricalROI/V2 is contextonly.
 
 Evidence: [balanced16-f](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-full-native-gt-verified.json), [balanced16-h](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-historical-v3-fullgt-export-verified.json), [balanced16-f](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-full-gt-preparation-v2-verified.json)
+
+## 61. 2026-10-03T03:37:54.793542+00:00 — observation
+
+expanded20261002a/grid_fine
+
+Evidence-derived stage: verified_overfit. Updates: 750; worst terminal native APH: 0.927627. This is a fixed-batch training diagnostic.
+
+Evidence: [bd2f550988d8](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381), [c4c013873723](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/c4c013873723012c0bd527a6911f01c3f0806a7cffc576dcd44820ec03901318), [ff5292bb601c](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/ff5292bb601c79ef74e55d32209c81aeb166e2dfb9ab181cc16c4a15f4cb5f0c)
+
+## 62. 2026-10-03T03:37:54.798507+00:00 — observation
+
+expanded20261002a/grid_coarse
+
+Evidence-derived stage: verified_overfit. Updates: 750; worst terminal native APH: 0.926807. This is a fixed-batch training diagnostic.
+
+Evidence: [bd2f550988d8](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381), [c4c013873723](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/c4c013873723012c0bd527a6911f01c3f0806a7cffc576dcd44820ec03901318), [ff5292bb601c](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/ff5292bb601c79ef74e55d32209c81aeb166e2dfb9ab181cc16c4a15f4cb5f0c)
+
+## 63. 2026-10-03T03:37:54.802930+00:00 — observation
+
+expanded20261002a/ragged_pillars
+
+Evidence-derived stage: verified_overfit. Updates: 750; worst terminal native APH: 0.927527. This is a fixed-batch training diagnostic.
+
+Evidence: [bd2f550988d8](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381), [c4c013873723](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/c4c013873723012c0bd527a6911f01c3f0806a7cffc576dcd44820ec03901318), [ff5292bb601c](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/ff5292bb601c79ef74e55d32209c81aeb166e2dfb9ab181cc16c4a15f4cb5f0c)
+
+## 64. 2026-10-03T03:37:54.807510+00:00 — observation
+
+expanded20261002a/point_attention
+
+Evidence-derived stage: verified_overfit. Updates: 750; worst terminal native APH: 0.926812. This is a fixed-batch training diagnostic.
+
+Evidence: [bd2f550988d8](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381), [c4c013873723](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/c4c013873723012c0bd527a6911f01c3f0806a7cffc576dcd44820ec03901318), [ff5292bb601c](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/ff5292bb601c79ef74e55d32209c81aeb166e2dfb9ab181cc16c4a15f4cb5f0c)
+
+## 65. 2026-10-03T03:37:54.811695+00:00 — observation
+
+expanded20261002a/point_mlp_control
+
+Evidence-derived stage: verified_overfit. Updates: 750; worst terminal native APH: 0.811483. This is a fixed-batch training diagnostic.
+
+Evidence: [bd2f550988d8](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381), [c4c013873723](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/c4c013873723012c0bd527a6911f01c3f0806a7cffc576dcd44820ec03901318), [ff5292bb601c](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/ff5292bb601c79ef74e55d32209c81aeb166e2dfb9ab181cc16c4a15f4cb5f0c)
+
+## 66. 2026-10-03T03:37:54.821916+00:00 — observation
+
+expanded20261002a/range_fusion
+
+Evidence-derived stage: verified_overfit. Updates: 750; worst terminal native APH: 0.926328. This is a fixed-batch training diagnostic.
+
+Evidence: [bd2f550988d8](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381), [c4c013873723](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/c4c013873723012c0bd527a6911f01c3f0806a7cffc576dcd44820ec03901318), [ff5292bb601c](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/ff5292bb601c79ef74e55d32209c81aeb166e2dfb9ab181cc16c4a15f4cb5f0c)
+
+## 67. 2026-10-03T03:37:54.826097+00:00 — observation
+
+expanded20261002a/zero_range_control
+
+Evidence-derived stage: verified_overfit. Updates: 750; worst terminal native APH: 0.92697. This is a fixed-batch training diagnostic.
+
+Evidence: [bd2f550988d8](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381), [c4c013873723](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/c4c013873723012c0bd527a6911f01c3f0806a7cffc576dcd44820ec03901318), [ff5292bb601c](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/ff5292bb601c79ef74e55d32209c81aeb166e2dfb9ab181cc16c4a15f4cb5f0c)
+
+## 68. 2026-10-03T03:37:54.830370+00:00 — observation
+
+expanded20261002a/sparse_bev_transformer
+
+Evidence-derived stage: verified_censored. Updates: 10000; worst terminal native APH: 0.741925. This is a fixed-batch training diagnostic.
+
+Evidence: [bd2f550988d8](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381), [c4c013873723](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/c4c013873723012c0bd527a6911f01c3f0806a7cffc576dcd44820ec03901318), [ff5292bb601c](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/ff5292bb601c79ef74e55d32209c81aeb166e2dfb9ab181cc16c4a15f4cb5f0c)
+
+## 69. 2026-10-03T03:49:15.607552+00:00 — observation
+
+balanced16-sustained
+
+Historical balanced16 baseline2000 heads now have full native-GT V3 scoring and independent geometry/protobuf/native-metric replay. All-class APH gate fails: vehicle .281619, pedestrian .242956, sign .0236408, cyclist .00190988. Complete catalog validation closes reviewed unknown-frame/duplicate-GT loopholes; 49 live CPU groups pass. This is scoring preparation, not new sustained training or held-out evidence.
+
+Evidence: [balanced16-h](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-historical-v3-proposal-audit-verified.json), [balanced16-h](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-historical-v3-native-metric-audit-verified.json), [balanced16-h](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-historical-v3-fullgt-metrics-verified.json), [balanced16-c](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-catalog-green-v1-verified.json)
