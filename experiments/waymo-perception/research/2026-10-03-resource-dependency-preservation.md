@@ -1,0 +1,37 @@
+# Resource dependency preservation — 2026-10-03
+
+This increment preserves the inputs needed by the retained balanced16 native pipeline. It does not admit training continuation, complete checkpoint recovery, or a scientific model result.
+
+## Actual shared-input result
+
+The production v4 run preserves **80 files / 1,381,569,242 bytes** in twelve archives with payloads at most 128 MiB. The union comprises 77 native observations/targets/reports, physical measurement and full native box files, plus three pinned GPU driver libraries. Each chunk has exact archive and manifest HDFS readback followed by measured live Insula verification and recovery. A separate live whole-union auditor reconciles all members against the external input inventory and refuses five corrupt copies. Original native run/state and retained checkpoints 0/1,000 remain unchanged.
+
+Author evidence: [v4 live report](sustained-resource-shared-hdfs-live-v4-verified.json), [driver](sustained-resource-shared-hdfs-live-v4.driver.source), and [44-group live suite](sustained-resource-audit-runtime-green-v1-verified.json). [Independent whole-increment review](sustained-resource-dependencies-independent-review.json) admits preparation-only landing: fresh44/44,25HDFS GETs and24genuine16GiB/zeroSwap/noOOM recovery stages reconcile the exact80-file union. No open Critical/Important/Minor findings; the mount finding is resolved. [Raw transport report](sustained-resource-dependencies-independent-transport.json) records all stage references. Full native/controller admission remains open.
+
+The exact global manifest is at `hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-sustained-baseline-controller20261003a-shared-8f07f93610c84e0d904dc27f07373e1d/publication-manifest.json`. The local publication receipt SHA256 is `315e088c9123334841b99afedb43da49490aa99b1a42fe5256830de12637fc6c`.
+
+## Journal and raw verification evidence
+
+The same reviewed publisher separately preserved an immutable metadata snapshot: **2,748 files / 42,723,282 bytes**. It includes the journal through entry 104, its 248 evidence references, the registry and dashboard snapshot, all 26 resource helpers, and the retained native/resource source, job, proof and log metadata. Sensor payloads, model checkpoints, native binaries and driver libraries are outside this metadata bundle.
+
+[Author publication evidence](resource-evidence-journal104-hdfs-verified.json) and [independent recovery](resource-evidence-journal104-hdfs-independent.json) reconcile the exact union. The reviewer performed three fresh HDFS downloads and two capped live Insula verification/recovery stages, independently checked the 104-entry journal hash chain and all 248 evidence references, and confirmed zero swap, no OOM, unchanged scientific storage and unchanged native state/checkpoints. This supplements evidence retention; it does not extend native continuation admission.
+
+The metadata global manifest is at `hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-sustained-baseline-controller20261003a-shared-5c1db7a621f442799946d395cd2788fa/publication-manifest.json`. The publication receipt SHA256 is `ceec53557787c47dfbec19b20db167819facad05b927ce7299da556ef2e4d299`; the independent report SHA256 is `09418606787858677274df2ebdb57a0ef96e1bc52baf548aa1e13872a6848b8b`. Journal head 104 is `403f5136377f159cea44012235fc742d8f7c900e3985205286b9a9ce97e053d1`.
+
+## Dependencies and bounded execution
+
+Checkpoint inventory now includes all seven native stages' immutable raw input snapshots, nonproducer outputs, verifier sources, producer report, runtime lock, proofs, logs and complete original/snapshot source closures. Fixture tests mock the native/kernel seam explicitly; they do not prove a real seven-stage checkpoint companion or the legacy continuation policy.
+
+Shared cohort/driver bytes are preserved separately to avoid repeating those inputs with each model checkpoint. Runtime roots, kernel and GPU remain pinned environmental identities rather than embedded rootfs payloads. Changed environment identity must refuse recovery. The 128 MiB chunk bound accommodates the largest 96 MiB driver library; GPU 8 GiB, RSS 16 GiB, zero swap, raw 2 GiB, science 15 GiB, case 2 GiB and all time/fit gates are unchanged. EXDEV alone permits a verified copy into scientific staging after reservation; other filesystem errors refuse. Only newly created aliases/copies/archive/recovery temporary files retire after all gates. Original inputs and model checkpoints are retained.
+
+## Retained refusals and correction
+
+Production v1 refused cross-device hardlinking before upload; its report and driver remain retained. V2 and v3 recovered all twelve chunks but failed before the whole-union worker could start because absolute evidence mountpoints could not be created under a readonly rootfs. Those failures remain retained; neither run is admitted.
+
+The direct retained-bundle pilot first executed the union auditor successfully but resource admission correctly refused duplicate `/outputs` bindings. The corrected pilot and production v4 both admit the whole union. Only the union auditor uses a private root with every unmasked source-runtime entry readonly; existing experiment/source/output/dev/proc/tmp roles replace their source stubs. Exact entry membership, masked roles, source symlink types/targets and actual argv are recorded. Root symlink entries dereference into mounts, so the effective namespace is explicitly different from the original source tree. Original rootfs content SHA and ordinary archive/native launch grammar are unchanged.
+
+## Remaining execution dependencies
+
+Journal entry 103 reaffirms the [approved execution order](2026-10-03-approved-execution-order.md): complete resource admission first, resume frozen baseline → residual_bev → class_balanced → prior_bias, queue diagnostics 42 then 43, and continue isolated 41.2 ownership from admitted 41.1. Baseline's next prescribed checkpoint is 2,000.
+
+Still required before new optimizer updates: bounded legacy 0/1,000 revalidation, unchanged native GPU/model/Adam/RNG/cursor/head and metric parity, actual complete checkpoint companion recovery, production retention/release integration and independent full-runner admission. The backend still refuses native payload release unconditionally. No held-out detection, camera/segmentation/SAM or forecasting completion follows from this preservation result.

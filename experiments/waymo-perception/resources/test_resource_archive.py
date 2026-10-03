@@ -32,5 +32,17 @@ class ResourceArchiveTests(unittest.TestCase):
             with self.assertRaises(ValueError):process(job,'create',source,out)
             self.assertFalse((out/'archive.tar.gz').exists())
 
+    def test_bounded_driver_sized_chunks_and_over_limit_refusal(self):
+        process=self.api()
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp);source=root/'source';source.mkdir();(source/'driver').write_text('driver fixture');module=Path(__file__).resolve().parents[1]/'advanced/archive.py'
+            job={'source_sha256':{'driver':sha(source/'driver')},'max_bytes':128*1024**2,'archive_module_path':str(module),'archive_module_sha256':sha(module)}
+            good=root/'good';good.mkdir()
+            try:result=process(job,'create',source,good)
+            except ValueError:self.fail('shared driver dependencies require bounded128MiB chunks without increasing process/storage budgets')
+            self.assertTrue(result['exact_members_and_hashes']);bad=root/'bad';bad.mkdir();job['max_bytes']+=1
+            with self.assertRaises(ValueError):process(job,'create',source,bad)
+            self.assertFalse((bad/'archive.tar.gz').exists())
+
 
 if __name__=='__main__':unittest.main()

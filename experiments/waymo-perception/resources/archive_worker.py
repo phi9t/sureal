@@ -1,4 +1,4 @@
-"""Bounded metadata archive using the separately pinned admitted tar library."""
+"""Bounded resource/input archive using the separately pinned admitted library."""
 import hashlib,importlib.util,json,shutil,sys,tarfile
 from pathlib import Path
 
@@ -10,8 +10,8 @@ def sha(path):
 def process(job,mode,source,output):
     source=Path(source);output=Path(output);module=Path(job['archive_module_path'])
     if (not module.is_absolute() or not module.is_file() or any(p.is_symlink() for p in [module,*module.parents]) or
-        sha(module)!=job['archive_module_sha256'] or type(job['max_bytes']) is not int or not 0<job['max_bytes']<=64*1024**2):
-        raise ValueError('pinned archive library and bounded metadata payload required')
+        sha(module)!=job['archive_module_sha256'] or type(job['max_bytes']) is not int or not 0<job['max_bytes']<=128*1024**2):
+        raise ValueError('pinned archive library and bounded resource payload required')
     spec=importlib.util.spec_from_file_location('resource_archive_library',module);library=importlib.util.module_from_spec(spec);spec.loader.exec_module(library)
     if mode=='create':
         for name,digest in job['source_sha256'].items():

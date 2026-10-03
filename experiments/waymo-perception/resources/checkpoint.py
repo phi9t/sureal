@@ -5,6 +5,7 @@ It preserves all seven stage proofs under one digest for progression/recovery.
 """
 import json
 from pathlib import Path
+from advanced.archive import safe_name
 from cohort.sustained_controller_backend import P
 from resources.sources import regular,sha
 from resources.stage import write_new,require_separate
@@ -81,8 +82,8 @@ def resource_inventory(backend,record):
     """Exact raw closure to archive separately from the nineteen producer files."""
     companion=validate_checkpoint(backend,record);files={}
     def add(name,path,digest=None):
-        relative=Path(name);entry=reference(path)
-        if relative.is_absolute() or '..' in relative.parts or relative.as_posix()!=name or name in files or digest is not None and entry['sha256']!=digest:
+        safe_name(name);entry=reference(path)
+        if name in files or digest is not None and entry['sha256']!=digest:
             raise ValueError('unique safe resource member and unchanged digest required')
         entry['bytes']=Path(path).stat().st_size;files[name]=entry
     add('identity.json',backend.resource_identity_path,backend.resource_identity_sha256)
@@ -90,6 +91,8 @@ def resource_inventory(backend,record):
     add('native-final.json',record['final_path'],record['final_sha256'])
     add('native-run.json',backend.R/'run.json',backend.resource_identity['native_run_sha256'])
     add('native-manifest.json',backend.source/'manifest.json',backend.manifest_sha)
+    add('producer-report.json',record['report_snapshot'],record['report_sha256'])
+    add('native-runtime-lock.json',backend.runtime_path)
     for name,pin in backend.resource_identity['source_pins'].items():
         for kind in ['original','snapshot']:add('resource-'+kind+'/'+name,pin[kind],pin['sha256'])
     for name,digest in backend.pins.items():
@@ -102,4 +105,20 @@ def resource_inventory(backend,record):
         proof=json.loads(Path(refs['resource_proof']['path']).read_text())
         for label,key in [('worker.json','worker_resource'),('execution.log','execution_log')]:
             add('stages/'+stage+'/'+label,proof['artifacts'][key]['path'],proof['artifacts'][key]['sha256'])
+        receipt=json.loads(Path(refs['native_receipt']['path']).read_text())
+        inputs=backend.R/(receipt['requested_stage']+'-input')
+        if not receipt['input_hashes']:raise ValueError('native stage frozen input snapshots required')
+        for path,digest in receipt['input_hashes'].items():
+            relative=Path(path).relative_to(inputs).as_posix()
+            add('stages/'+stage+'/inputs/'+relative,path,digest)
+        for path,digest in receipt['verifier_source_pins'].items():
+            relative=Path(path).relative_to(backend.R/'verifier').as_posix()
+            add('stages/'+stage+'/verifiers/'+relative,path,digest)
+        output=Path(receipt['output_directory'])
+        for path,digest in receipt['artifacts'].items():
+            # The unchanged native publisher separately recovers all19 producer
+            # members. Retain every other stage output needed by native resume.
+            if not Path(path).is_relative_to(Path(record['root'])):
+                relative=Path(path).relative_to(output).as_posix()
+                add('stages/'+stage+'/outputs/'+relative,path,digest)
     return files

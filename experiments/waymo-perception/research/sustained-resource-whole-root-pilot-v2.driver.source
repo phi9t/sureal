@@ -1,0 +1,31 @@
+"""Test actual whole-union launch on retained readbacks before any new upload."""
+import json,os,sys
+from pathlib import Path
+P=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P))
+from resources.sources import sha,validate_sources
+from resources.stage import run_stage,validate_proof,write_new
+from pipeline.insula_entry import launch_plan
+C=Path.home()/'.cache/waystone/waymo-perception'
+old=C/'insula/resource-retention-balanced16-sustained-baseline-controller20261003a-shared-5a74e356862244deb88a264e48f82908'
+pub=json.loads((old/'audit-input/publication.json').read_text());pins=pub['resource_source_pins'];code=validate_sources(P/'resources',pins)
+raw=C/'scientific-processing'/old.name.replace('resource-retention-','resource-retention-',1)/'raw'
+# The scientific staging name uses the bundle identifier, without its metadata
+# directory's extra resource-retention prefix.
+raw=C/'scientific-processing/resource-retention-balanced16-sustained-baseline-controller20261003a-shared-5a74e356862244deb88a264e48f82908/raw'
+R=Path('/tmp/sureal-resource-whole-root-pilot-v2');R.mkdir();out=R/'output';out.mkdir();(R/'proofs').mkdir()
+rootfs=Path(pub['rootfs_path']);masked={'experiment','source','outputs','dev','proc','tmp'};all_entries=sorted(rootfs.iterdir(),key=lambda p:p.name);entries=[p for p in all_entries if p.name not in masked]
+command=launch_plan(rootfs,Path(pub['execution_directory']),raw,out,['python','/experiment/resources/retention_audit.py'])
+index=command.index('--ro-bind');assert command[index:index+3]==['--ro-bind',str(rootfs),'/']
+bindings=[item for path in entries for item in ['--ro-bind',str(path),'/'+path.name]];command[index:index+3]=bindings
+at=command.index('--');native=C/'insula/balanced16-sustained-baseline-controller20261003a'
+command[at:at]=['--ro-bind',str(old/'audit-input'),'/tmp/inputs','--ro-bind',pub['archive_library']['path'],'/tmp/resource-archive.py','--tmpfs','/data02','--ro-bind',str(old),str(old),'--ro-bind',str(native),str(native),'--ro-bind',str(P/'resources'),str(P/'resources')]
+record={'scope':'retained v3 byte-identical resource whole-union launcher pilot; no new transfer/training/release','driver_sha256':sha(__file__),'rootfs_sha256':pub['runtime_lock']['rootfs_sha256'],'rootfs_top_level_readonly_bindings':bindings,'source_pins':pins,'input_sha256':{str(p):sha(p) for p in (old/'audit-input').iterdir()}}
+record['masked_runtime_role_entries']=[p.name for p in all_entries if p.name in masked];record['runtime_source_entry_types']={p.name:{'kind':'symlink' if p.is_symlink() else 'directory' if p.is_dir() else 'file','symlink_target':os.readlink(p) if p.is_symlink() else None} for p in all_entries}
+try:
+ with (out/'live.log').open('w') as stream:run_stage(command,Path(pub['execution_directory']),dict(os.environ),stream,300,code=code,current_sources=P/'resources',source_pins=pins,evidence_directory=R/'proofs/whole',native_output=out,cap_bytes=16*1024**3)
+ proof=R/'proofs/whole/resource-admitted.json';value=json.loads(proof.read_text());validate_proof(value,command,P/'resources',pins,out,16*1024**3,300)
+ record.update({'passed':True,'command':command,'resource_proof_path':str(proof),'resource_proof_sha256':sha(proof),'validation':json.loads((out/'check.json').read_text())})
+except BaseException as error:
+ record.update({'passed':False,'error':str(error),'command':command});write_new(R/'failure.json',record);raise
+write_new(R/'verified.json',record)
+print('PASS decomposed readonly runtime/whole-union pilot',record['validation'],flush=True)
