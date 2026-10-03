@@ -369,3 +369,11 @@ motion-native-source-pilot
 Fresh foundation replay passes explicit TensorFlow absence,42 native tests and19 unique boundary groups, with two exact real causal prefixes and two future-sensor refusals. Current pooled reference and native scorer both bind directly to selected original truth SHA in full source inventories; prior reference used the retained sensor-leak probe copy with unchanged labels, now superseded without numerical changes. Scientific model/cohort comparisons and aggregate ticket19 audit remain open.
 
 Evidence: [motion-pilot](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-pilot-foundation-replay-verified.json), [motion-real-](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-real-pooled-native-truth-verified.json)
+
+## 47. 2026-10-03T01:46:59.715733+00:00 — observation
+
+motion-foundation
+
+Checked-in reproducible Motion foundation runner passed fresh live Insula: 42 native tests, 19 boundary groups, 2 byte-exact causal prefixes and 2 future-sensor refusals, 10.20s / 55948 KiB child RSS. Unsafe IDs and reused directories refuse without overwriting receipts. Aggregate ticket19 acceptance and scientific comparisons remain open.
+
+Evidence: [motion-found](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-foundation-reproducible-run-verified.json)
