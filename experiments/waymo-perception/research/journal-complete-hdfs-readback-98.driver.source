@@ -1,0 +1,33 @@
+"""Independent literal validation of exact HDFS downloads and journal chain."""
+import hashlib,json
+from pathlib import Path
+P=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research')
+R=Path('/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-70bb5500c2334e8d81a6a6063199c608')
+def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+receipt_path=P/'research-journal-hdfs-verified.json';receipt=json.loads(receipt_path.read_text())
+assert receipt['all_results_uploaded_and_readback_exact'] is True
+assert receipt['hdfs_prefix'].endswith('/snapshot-'+R.name)
+manifest=json.loads((R/'manifest-readback.json').read_text())
+assert manifest==receipt['files'];assert sha(R/'manifest-readback.json')==sha(R/'manifest.json')==receipt['manifest_sha256']
+for name,metadata in manifest.items():
+ relative=Path(name);assert not relative.is_absolute() and '..' not in relative.parts and relative.as_posix()==name
+ path=R/relative;staged=R/'staged'/relative
+ assert path.is_file() and not path.is_symlink();assert sha(path)==metadata['sha256']==sha(staged)
+ assert path.stat().st_size==metadata['bytes']
+entries=[];previous=None;references=0
+for line in (R/'research-journal.jsonl').read_text().splitlines():
+ assert line
+ entry=json.loads(line);digest=entry['sha256'];payload={k:v for k,v in entry.items() if k!='sha256'}
+ assert type(entry['sequence']) is int and entry['sequence']==len(entries)+1
+ assert payload['previous_hash']==previous
+ assert hashlib.sha256(json.dumps(payload,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()).hexdigest()==digest
+ for reference in entry['evidence']:
+  name='journal-evidence/'+reference['sha256'];assert name in manifest
+  assert sha(R/name)==reference['sha256'];references+=1
+ previous=digest;entries.append(entry)
+assert len(entries)==98
+assert all(sha(path)==digest for path,digest in receipt['tool_pins'].items())
+assert all(c['exit_code']==0 for c in receipt['checks'])
+report={'scope':'independent literal journal hash-chain and every immutable evidence reference, exact staged versus HDFS-downloaded manifest/payload bytes; no claim that indirect raw artifacts inside receipt JSON were archived','snapshot_hdfs_prefix':receipt['hdfs_prefix'],'publication_receipt_sha256':sha(receipt_path),'manifest_sha256':receipt['manifest_sha256'],'downloaded_files':len(manifest),'journal_entries':len(entries),'evidence_references':references,'journal_head_sha256':previous,'verified_transfers':len(receipt['checks']),'independent_verifier_sha256':sha(__file__),'all_checks_passed':True}
+(P/'journal-complete-hdfs-readback-98-verified.json').write_text(json.dumps(report,indent=2)+'\n')
+print(json.dumps(report,indent=2))
