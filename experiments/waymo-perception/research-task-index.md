@@ -90,3 +90,7 @@ User requested every planned idea. The concrete written design and implementatio
 ## Experiment tracking and journal
 
 [Live tracker](research/experiment-tracker.md) records24 experiment definitions, goals, recipes, verifiers, acceptance and evidence-derived status. [Research journal](research/research-journal.md) separates observations, hypotheses, decisions and follow-up work. Registry and journal snapshots are retained on HDFS with exact readback receipts. [Tracking CLI](tracking/README.md) documents refresh, watch, note, verification and publication.
+
+## Motion native source pilot progress (2026-10-03)
+
+Separate generation-pinned training/validation shards and extensions are HDFS-mirrored and independently live-inventoried. Native filename-key linkage,11-step causal prefixes, future/key/duplicate refusal and observation-only camera codebook features pass for both selected pilot IDs. [Native oracle metric handoff](research/motion-real-metric-handoff-verified.json) matches separately derived errors/counts and rejects corruption. These oracle diagnostics are not baseline forecasts. Decoded native LiDAR geometry and ticket19 completion remain open; tickets20/21 still require their independent scientific protocol/model/held-out comparisons. The training raw shard is locally evicted with exact HDFS recovery proof; selected truth and causal slices remain local.

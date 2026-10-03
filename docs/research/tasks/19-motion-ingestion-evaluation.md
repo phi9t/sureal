@@ -4,7 +4,7 @@
 
 **Blocked by:** [06](06-r0-closeout.md)
 
-**Status:** preparing — separate locked native Motion runtime and 42 upstream regression tests independently verified live; ingestion and analytic evaluator parity remain open
+**Status:** preparing — separate locked native runtime/regressions, acquired training/validation inventories, native causal sensor linkage, camera-codebook features and oracle metric handoff verified live; decoded LiDAR geometry and scientific forecasting protocol/comparisons remain open
 
 **Lane:** core
 
