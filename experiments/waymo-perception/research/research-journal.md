@@ -649,3 +649,11 @@ balanced16-sustained
 Pilot HDFS preservation and pilot-only release completed:57 files /1,242,670,817 bytes across25 chunks,75 live create/verify/rehydration stages and independent full-union/global-readback admission with5 corrupt-copy refusals. Fresh host reconciliation confirms22 parents,10 host-source pairs, all57 released paths absent and2,872,821,397 bytes free under the unchanged15GiB cap. The two-GiB reserve is restored. This is storage/execution evidence, not fitting or held-out improvement; arbitrary checkpoint rolling retention and the four-case controller remain open.
 
 Evidence: [balanced16-p](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-pilot-hdfs-retention-verified.json), [balanced16-p](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-pilot-hdfs-release-verified.json), [balanced16-p](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-pilot-hdfs-closeout-reconciled.json)
+
+## 82. 2026-10-03T05:54:03.735087+00:00 — observation
+
+balanced16-sustained
+
+Generic sustained checkpoint inventory preparation passes79 live Insula CPU tests after witnessed missing-module RED and a separate reviewed manifest-mismatch RED→GREEN. One checkpoint must bind exactly seven externally admitted successful stages, all stage artifacts, original manifest, bounded actual/requested step, resource-admitted stop and exact19 checkpoint/report/log/all16head files. This byte-lineage helper does not establish native extended fitting, underlying stage mathematics or HDFS release; generic rolling publication and four-case controller remain open.
+
+Evidence: [sustained-ch](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-checkpoint-manifest-red-v1-verified.json), [sustained-ch](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-checkpoint-manifest-green-v1-verified.json)
