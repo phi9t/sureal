@@ -1,0 +1,39 @@
+{
+  "scope": "merged preparation source equality, live36-group suite and originalnative state/checkpoint preservation; not full resource/controller continuation",
+  "merged_revision": "b37d8819c6fbe9c41b7ee8a17181c2729467eed8",
+  "resources": {
+    "process_lifecycle.py": "bfde67be0f66296565dca964c8a2ca3e6bb733e31016fbc87c78f57dd49b09f0",
+    "stage_accounting.py": "baef4b065f9ebb3aa7a2296ccaede595e2514c8144b18bace315f3a805b3716b",
+    "test_worker_admission.py": "816a6ab4d7cb891e97ed279e46a2fea491ce8865f3dd30f2c6ea7bff825f4bb7",
+    "test_resource_archive.py": "b474142e8dd4c428996717452fec3c889a68e05eb0a30ab592f7b4d0c9d22514",
+    "execute_worker.py": "b4a746f941944d4342ade71f7338498b06f96e21bc56141eb90d40276508add8",
+    "stage.py": "f8e8baf91d752185fd3f57ba27af3cec683540bcb0932275bdfcf4643f1d4ff9",
+    "archive_worker.py": "a5ff82c6947fa07f83cb9140aae86a3c060cf676d43daea8d92b68f70799e12d",
+    "test_execute_worker.py": "26c1e44dacf7056498c5f4deb2c8a06b91830848aeb5d63f0819380bc98ae2d3",
+    "test_scoped_stage.py": "30b81ad6cf79248e6d83b4021f38a0aff22c0604f0f2c071d6c8e34cc7b40835",
+    "scoped_stage.py": "d753f2df936496cddb76f9bd09215100552f56a5d7754d52e54434b9ee042738",
+    "test_stage_accounting.py": "8a28c803161b28318b23a6caea03024d6ceff782d187f81a54850d4d22da8a86",
+    "backend.py": "c2889cf53abb335211eb10321df7329e21248cca727cb64224f1b6dd90333662",
+    "sources.py": "2f1eef953bd39e40b49e7fc18e906c4b0ea11d17266c5822aae842966179d5af",
+    "test_kernel_scope.py": "e5ff0b3b67a3b85a5799da096078ac7e07454d6230e16cace99282b96285f9a8",
+    "test_resource_checkpoint.py": "205a5dc0543eebfc045466d59f005ee62834f823a7e03caefa757ecce0058a0b",
+    "test_resource_sources.py": "08b06457df38c99413e33aaf1bce5afbd703a5628b22d5e29c54f6265fa253bf",
+    "test_resource_command.py": "98255f18a16799ca18e7a32e6087e8d3b39de44c38d44a2fc0d8e0b60aba32c6",
+    "command.py": "1a44bc70f62abe7ec48eea9dbf12c27b2b83816793d3ca1fc506bf22d938cc40",
+    "test_resource_stage.py": "4aafb2d74de5075e9ab1c4d8147a772ea991604452fa85f817747c136296720b",
+    "checkpoint.py": "54c1bd69e036c3ee94454fd06f9f0dcc4db0a7cecb499cc4f07d142ec85c1287",
+    "test_resource_backend.py": "021938bd33c74fe31300672995aaf9471cd9b2b81fbdaecd7305253bac3ae425",
+    "kernel_scope.py": "4a9f8440b91ce8203e3f9bbc25dbe25dad83a33378544e4ede61412f9e1f2e89"
+  },
+  "live_receipt_sha256": "827c94bbcd78d9e144db605f80e1061c4880ff1c9e25ffe609e505f2d46dca51",
+  "live_receipt_exit_code": 0,
+  "live_groups": 36,
+  "original_run_sha256": "96dc607ae8238774ca875588d65eaf463f120227e161ae792a9187c8e6635d7d",
+  "original_state_sha256": "dac2ce421243c4750175f98152cdc1ce4ecb7e1a493ddee7050c42fcc09e7765",
+  "original_checkpoints": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-00/checkpoint.pt": "8057a5496c4d6ec4d19b9de33034c6cca753ea39d8f03fd765ad7011cdf301ee",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-1000/checkpoint.pt": "37de2375b0b10f92a56468bd9ffe0b2fea42f257c5949efa80fd29c621a8ff4a"
+  },
+  "independent_review_sha256": "728bd00364f81a4628de157adf59a7f69ad19a20f281f829f4368f1355d65f91",
+  "all_checks_passed": true
+}
