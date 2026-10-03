@@ -577,3 +577,11 @@ balanced16-sustained
 Fresh original native-input-cache preservation passed full128-member/21-chunk HDFS readback and independent live recovery admission, including5badpublication refusals.1040757892 bytes recoverable; cache-only local release leaves2872821397 scientificbytes available, above required2GiB. Exact ten-file host closure was frozen and checked before release. Native baseline0/19/35 GPU admission pilot launched; training/restart/loss/proposal/native-metric gates remain pending, with no fit or scientific claim.
 
 Evidence: [native-cache](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/native-cache-hdfs-retention-verified.json), [native-cache](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/native-cache-hdfs-release-verified.json)
+
+## 73. 2026-10-03T04:33:38.910822+00:00 — observation
+
+balanced16-sustained
+
+Independent live native annotation-only coverage controls: positive-native idealAPH all1; trainingROI idealAPH .917384/.947955/.868421/.918919; anchor-covered idealAPH .917384/.944238/.759399/.918919.29ROI signs and1pedestrian lackpositiveanchors. The covered-sign control is below.8 evenwithperfectboxes/scores andbeforeNMS, so optimization alone doesnot create missingpositive supervision. This is a target-support diagnostic, not a mathematical ceiling on unconstrained models or scientific improvement. Keep allGT/allclassgate; investigate assignment/grid conflicts separately from matched losscontrols.
+
+Evidence: [balanced16-c](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-coverage-oracle-native-verified.json), [balanced16-c](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-coverage-oracle-audit-verified.json)
