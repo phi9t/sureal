@@ -7,3 +7,7 @@ The class-balanced port matches the admitted all-present equation exactly, handl
 Safe serialized CPU restart at update19 reproduces the uninterrupted state at35, including Adam and Python/NumPy/Torch RNG, across a16-frame cursor boundary. Review exposed mutable Adam aliases and late malformed-RNG failure; dedicated live RED reproduced both, then the fixed suite passed. Restored continuation cannot mutate the retained input snapshot, and malformed RNG is refused before live state changes.
 
 The [implementation plan](../../../docs/superpowers/plans/2026-10-03-balanced16-sustained-overfit.md) still requires native GPU/CUDA restart and all16 head replay, trainer/controller implementation, independent literal losses/proposals/export/native metrics, HDFS recovery/retention and full fit decisions. No new16-frame training has launched and ticket07/scientific training remain gated. Replay each receipt command using retained frozen source and a fresh output directory.
+
+## Actual worker preparation
+
+[Latest combined CPU suite](balanced16-worker-preparation-suite-v1-verified.json) passes25 groups, including six loop/censor/rewind groups, three complete-source/runtime binding groups and the GPU-only worker guard. The native worker is implemented but not GPU-admitted. Complete nativeGPU/CUDA/all16 head replay, controller/scoring/HDFS retention and fit comparisons are still required. Time-censored trajectories retain actual steps/timing; atomic overruns retain evidence with failed resource admission. Review regressions and their successful reruns are preserved.

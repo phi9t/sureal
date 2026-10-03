@@ -409,3 +409,11 @@ balanced16-sustained
 Combined continuation preparation passed15 liveCPU groups:7contract/3loss/5state. Classbalance uses zero absent-class positive weight with fixed4-class denominator; exact allpresent/zero-positive parity, no improvement assumed. CPU restart19→35 preserves model/Adam/RNG/cursor. Review Adamalias/late RNG failures reproduced RED and fixed GREEN. Native GPU/CUDA16 replay and full trainer/scoring still required.
 
 Evidence: [balanced16-s](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-loss-green-verified.json), [balanced16-s](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-state-red-review-verified.json), [balanced16-c](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-continuation-cpu-suite-v1-verified.json)
+
+## 52. 2026-10-03T02:36:23.270996+00:00 — observation
+
+balanced16-sustained
+
+Actual GPU-only16-frame chunk worker implemented but not GPU-admitted. LiveCPU combined25groups passed after review RED→GREEN fixes: preserve time-censored actual steps/state and resource-overrun evidence; reject rewind before mutation; require complete source/runtime bindings. Roundrobin newstudy is matched within4treatments, not historical PCG64 trajectory. NativeGPU/CUDA16 replay, controller/scoring/HDFS lifecycle remain open.
+
+Evidence: [balanced16-s](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-loop-red-review-v2-verified.json), [balanced16-s](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-loop-green-review-verified.json), [balanced16-s](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-sources-green-verified.json), [balanced16-w](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-worker-preparation-suite-v1-verified.json)
