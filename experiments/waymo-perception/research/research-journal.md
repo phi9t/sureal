@@ -641,3 +641,11 @@ balanced16-sustained
 Separatelymounted nativeGPU transition verifier passed exact19to35 fullmodel/Adam/RNG/cursor (onlytimeexcluded), producer interval reconciliation and all16heads. Transitionpeak1843184640GPUbytes/3048628KiBRSS; headreplay3135480KiBRSS, elapsed35.820s. Independentreview303hashbindings. Firstattempt failed beforePython because /verifier absent underreadonlyroot; retainedfailure, correctedreadonlymount /tmp/verifier undertmpfs in newv2namespace. No originalproducerpackage changed; nativechunksbeyond35 stillrequired.
 
 Evidence: [sustained-tr](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-transition-native-mount-failed.json), [sustained-tr](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-transition-native-verified.json)
+
+## 81. 2026-10-03T05:48:21.065290+00:00 — observation
+
+balanced16-sustained
+
+Pilot HDFS preservation and pilot-only release completed:57 files /1,242,670,817 bytes across25 chunks,75 live create/verify/rehydration stages and independent full-union/global-readback admission with5 corrupt-copy refusals. Fresh host reconciliation confirms22 parents,10 host-source pairs, all57 released paths absent and2,872,821,397 bytes free under the unchanged15GiB cap. The two-GiB reserve is restored. This is storage/execution evidence, not fitting or held-out improvement; arbitrary checkpoint rolling retention and the four-case controller remain open.
+
+Evidence: [balanced16-p](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-pilot-hdfs-retention-verified.json), [balanced16-p](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-pilot-hdfs-release-verified.json), [balanced16-p](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-pilot-hdfs-closeout-reconciled.json)
