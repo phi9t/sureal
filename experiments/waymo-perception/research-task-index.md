@@ -91,6 +91,20 @@ User requested every planned idea. The concrete written design and implementatio
 
 [Live tracker](research/experiment-tracker.md) records24 experiment definitions, goals, recipes, verifiers, acceptance and evidence-derived status. [Research journal](research/research-journal.md) separates observations, hypotheses, decisions and follow-up work. Registry and journal snapshots are retained on HDFS with exact readback receipts. [Tracking CLI](tracking/README.md) documents refresh, watch, note, verification and publication.
 
+## First-class models and training workstream
+
+The user selected first-class `sureal/models/` and `sureal/training/`, starting with duplicated fixed-frame producers while preserving the specialized sustained loop. [Design proposal](../../docs/superpowers/specs/2026-10-03-first-class-models-training-design.md) and [research work guide](../../docs/research/README.md) define the scope. Implementation remains gated by written design/plan review, active implementation closeout and fresh live admission. These supporting tasks do not close the original scientific comparisons.
+
+| Ticket | Deliverable | Blocked by |
+| --- | --- | --- |
+| [44](../../docs/research/tasks/44-models-training-reference-admission.md) | Frozen reference and independent migration comparison admission | Review gates, active implementation closeout |
+| [45](../../docs/research/tasks/45-first-class-models-and-layers.md) | Installed scientific models, neural layers and equivalent detector assembly | 44 |
+| [46](../../docs/research/tasks/46-first-class-training-policy-and-state.md) | Losses, optimizer policy and explicit checkpoint formats | 45 |
+| [47](../../docs/research/tasks/47-shared-fixed-frame-producer.md) | One maintained fixed-frame producer and thin experiment adapters | 46 |
+| [48](../../docs/research/tasks/48-models-training-retention-and-closeout.md) | Discoverability, HDFS recovery evidence and landed closeout | 47 |
+
+[Queue policy](../../docs/research/task-queue.md) records scheduling responsibilities. Existing numbered task files define acceptance; experiment state remains evidence-derived. Preserve the prior approved research order and active frozen packages during migration.
+
 ## Motion native source pilot progress (2026-10-03)
 
 Separate generation-pinned training/validation shards and extensions are HDFS-mirrored and independently live-inventoried. Native filename-key linkage,11-step causal prefixes, future/key/duplicate refusal and observation-only camera codebook features pass for both selected pilot IDs. [Native oracle metric handoff](research/motion-real-metric-handoff-verified.json) matches separately derived errors/counts and rejects corruption. These oracle diagnostics are not baseline forecasts. Native LiDAR decoding/calibrated XYZ, camera codebook lookup and fresh foundation/evaluator replay now have separate live evidence. Ticket19 aggregate acceptance/closeout remains open; tickets20/21 still require their independent scientific protocol/model/held-out comparisons. The training raw shard is locally evicted with exact HDFS recovery proof; selected truth and causal slices remain local.
