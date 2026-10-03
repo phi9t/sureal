@@ -1,0 +1,8 @@
+import hashlib,json,shutil,subprocess,sys
+from pathlib import Path
+P=Path('/data02/home/philip.yang/workspace/sureal/experiments/waymo-perception');run=sys.argv[1];R=Path('/tmp')/run;R.mkdir();shutil.copytree(P/'resources',R/'code/resources');(R/'input').mkdir();(R/'output').mkdir()
+old=json.loads((P/'research/sustained-checkpoint-inventory-red-v1-verified.json').read_text());cmd=old['command'].copy()
+for name,p in [('/experiment',R/'code'),('/source',R/'input'),('/outputs',R/'output')]:cmd[cmd.index(name)-1]=str(p)
+i=cmd.index('unittest');cmd=cmd[:i]+['unittest','discover','-s','resources','-p','test_*.py','-v'];result=subprocess.run(cmd,capture_output=True,text=True);log=R/'output/live.log';log.write_text(result.stdout+result.stderr)
+def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+receipt={'command':cmd,'exit_code':result.returncode,'runtime_lock':old['runtime_lock'],'host_driver_sha256':sha(__file__),'source_pins':{str(p):sha(p) for p in (R/'code').rglob('*.py')},'artifacts':{str(log):sha(log)},'scope':'live CPU Insula wait4 largest-child RSS and strict resource admission preparation; no native model or historical scorer RSS claim'};(R/'merged-verified.json').write_text(json.dumps(receipt,indent=2)+'\n');print(log.read_text()[-3000:]);print('EXIT',result.returncode)
