@@ -1,0 +1,17 @@
+import hashlib,json,shutil,sys
+from pathlib import Path
+P=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');R=Path('/tmp/sureal-score1000-resources20261003a');R.mkdir();shutil.copytree(P/'resources',R/'host-code/resources');sys.path[:0]=[str(R/'host-code'),str(P)]
+from resources.scoped_stage import run_scoped
+from resources.stage_accounting import admit_worker
+from pipeline.runtime_identity import verify_rootfs
+case=Path.home()/'.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a';original=case/'score-1000-verified.json';old=json.loads(original.read_text());cmd=old['command'].copy();root=Path(cmd[cmd.index('/')-1]);verify_rootfs(root,old['runtime_lock']['rootfs_sha256']);output=R/'native-output';output.mkdir();metadata=R/'worker-resources';metadata.mkdir();cmd[cmd.index('/outputs')-1]=str(output);index=cmd.index('--');worker_argv=cmd[index+2:];cmd[index:index]=['--ro-bind',str(R/'host-code/resources'),'/tmp/resource-layer','--bind',str(metadata),'/tmp/resource-output'];index=cmd.index('--');cmd[index+2:index+2]=['/tmp/resource-layer/execute_worker.py','/tmp/resource-output']
+def sha(p):
+ with Path(p).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+for path,expected in old['input_hashes'].items():assert sha(path)==expected
+for name,expected in old['source_hashes'].items():assert sha(case/'code'/name)==expected
+with (R/'live.log').open('w') as stream:measured=run_scoped(cmd,cwd=case/'code',stream=stream,timeout=14700,cap_bytes=16*1024**3)
+worker=json.loads((metadata/'worker-resource.json').read_text());resource_gate=admit_worker(measured,worker,cmd,worker_argv,16*1024**3);new=json.loads((output/'check.json').read_text());previous=json.loads((Path(old['output_directory'])/'check.json').read_text())
+assert new['metrics']==previous['metrics'] and new['head_hashes']==previous['head_hashes'] and new['manifest_sha256']==previous['manifest_sha256'];assert new['native_groundtruth']==previous['native_groundtruth']==1279 and new['predictions']==previous['predictions']==8000
+for name in ['predictions.bin','groundtruth.bin']:assert sha(output/name)==old['artifacts'][str(Path(old['output_directory'])/name)]
+for path,expected in old['input_hashes'].items():assert sha(path)==expected
+proof={'scope':'new bounded resource verification replay of identical frozen1000 native score inputs; no optimizer or model-state changes; historical scorer RSS remains unknown','original_receipt_sha256':sha(original),'original_command':old['command'],'actual_command':cmd,'runtime_lock':old['runtime_lock'],'launcher_measurement':measured,'worker_measurement':worker,'resource_admission':resource_gate,'exact_native_metrics_and_protobuf_parity':True,'groundtruth':1279,'predictions':8000,'host_driver_sha256':sha(__file__),'resource_source_pins':{str(p):sha(p) for p in (R/'host-code').rglob('*.py')},'artifacts':{str(p):sha(p) for p in R.rglob('*') if p.is_file() and not p.is_relative_to(R/'host-code')}};(P/'research/sustained-score1000-resource-replay-verified.json').write_text(json.dumps(proof,indent=2)+'\n');print('NATIVE RESOURCE REPLAY PASS workerKiB',worker['peak_rss_kib'],'launcherKiB',measured['peak_rss_kib'],flush=True)

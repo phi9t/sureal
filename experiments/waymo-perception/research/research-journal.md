@@ -745,3 +745,35 @@ association41/contract20261003d
 41.1 independently live-admitted: final source-v4 contract passes 41 CPU Insula tests and collection. Additive SciPy CPU/training runtimes and GN8 CUDA forward/backward are admitted with zero optimizer updates. Seven input preimages bind all1053 eligible/all1279 native GT and fixed73. Historical evidence preserved; no fitting, native-oracle, operator, registry or HDFS release claim. Advance to41.2.
 
 Evidence: [status.json](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/association41-contract-final-20261003d/status.json), [manifest.jso](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/association41-contract-final-20261003d/manifest.json), [receipt.json](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/association41-contract-final-20261003d/final-accept-v4-live/receipt.json), [receipt.json](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/association41-contract-final-20261003d/contract41-live/receipt.json)
+
+## 94. 2026-10-03T16:40:46.618499+00:00 — observation
+
+balanced16-sustained
+
+Native0/1000 probe completed14 live stages and independent correctness/source review; APH at1000=.0166233/.00270372/0/0,66.17723 syncedseconds. Full continuation withheld for verified resource gap: inherited export RSS is not native scorer RSS; proposal/metric audits have no measured gate. Real systemduser scope probe exposes kernel16GiB memory.max. Investigate external whole-tree cap/live resource refusal without modifying frozen training sources. No fit/scientific claim.
+
+Evidence: [balanced16-s](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-controller20261003a-live.json)
+
+## 95. 2026-10-03T16:44:06.274116+00:00 — observation
+
+balanced16-sustained
+
+Actual live Insula external-kernel-cap probe:8MiB succeeds under64MiB memory.max;128MiB terminates before ALLOCATED, cgroup memory.events observes oom_kill1 and charge reaches67108864. TF absence passes; tool/fixture/source/log pins retained. Feasibility only, not full-controller resource admission or historical scoreRSS. Next independently bind whole-tree/stage accounting to unchanged source/run identities before continuation.
+
+Evidence: [sustained-ex](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-external-memory-live-probe.json), [sustained-ex](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-external-memory-live-probe.py)
+
+## 96. 2026-10-03T17:11:02.569863+00:00 — observation
+
+balanced16-sustained
+
+Resource preparation passes13 live CPUInsula groups. Actual capped fixture passes with separate worker28324KiB and launcher25020KiB measurements; prior launcher>=worker lower-bound check failed24984<26596 and remains retained. Actual native score1000 resource verification replay is running in real16GiB/zero-swap scope with unchanged frozen inputs, fresh outputs and mandatory exact metric/protobuf parity. No model changes. Controller integration/full legacy-resource policy and independent admission remain pending.
+
+Evidence: [sustained-re](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-worker-admission-green-v1-verified.json), [sustained-re](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-scoped-live-v2-verified.json), [sustained-re](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-launcher-lower-bound-failure.json), [sustained-sc](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-score1000-resource-replay.driver.source)
+
+## 97. 2026-10-03T17:39:06.521852+00:00 — observation
+
+balanced16-sustained
+
+Resource foundation passes15 live Insula groups and3 real capped lifecycle fixtures, independently reviewed for preparation-only landing. Reproduced and fixed unwaited/detached process accounting and timeout escape; subreaper plus exact exclusive cgroup membership, waited helper RSS and PID-descriptor cleanup now prevent false admission. Earlier positive-v2 incorrectly attached GPU lock to CPU command: that runtime claim is explicitly invalidated, raw evidence retained, and positive-v3 freshly verifies actual CPU/GPU suite roots. Native score1000 bounded replay completed585s with exact native metrics and prediction/GT protobuf bytes,1279GT/8000proposals; it used earlier resource sources without current lifecycle gate, so remains diagnostic. No optimizer/model changes; full controller integration/legacy revalidation/native equivalence remain open.
+
+Evidence: [sustained-re](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-foundation-current-verification.json), [sustained-re](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-foundation-independent-review.json), [sustained-re](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-lifecycle-suite-green-v2-verified.json), [sustained-re](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-scoped-lifecycle-green-v3-verified.json), [sustained-sc](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-score1000-resource-replay-verified.json)
