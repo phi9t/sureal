@@ -553,3 +553,19 @@ balanced16-sustained
 Historical balanced16 baseline2000 heads now have full native-GT V3 scoring and independent geometry/protobuf/native-metric replay. All-class APH gate fails: vehicle .281619, pedestrian .242956, sign .0236408, cyclist .00190988. Complete catalog validation closes reviewed unknown-frame/duplicate-GT loopholes; 49 live CPU groups pass. This is scoring preparation, not new sustained training or held-out evidence.
 
 Evidence: [balanced16-h](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-historical-v3-proposal-audit-verified.json), [balanced16-h](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-historical-v3-native-metric-audit-verified.json), [balanced16-h](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-historical-v3-fullgt-metrics-verified.json), [balanced16-c](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-catalog-green-v1-verified.json)
+
+## 70. 2026-10-03T04:11:33.563336+00:00 — observation
+
+expanded20261002a
+
+All eight expanded architecture/control payloads are retained in HDFS with exact readback, 45 live creation/verification/rehydration proofs over15 chunks, full manifests and source-bound local release. The1264 files/830511030 bytes are recoverable through the retention index. Cases remain training-only diagnostics; storage release did not suffice for the required2GiB balanced16 reserve, so independent native-input-cache preservation is underway without removing historical model cases.
+
+Evidence: [advanced-exp](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-hdfs-retention-index.json)
+
+## 71. 2026-10-03T04:11:33.614547+00:00 — observation
+
+balanced16-sustained
+
+Stopped the first native-cache HDFS retention host before release after review found missing host admission/deletion-source pins. All128 cache files and16 independent admissions were revalidated intact; partial chunks are not whole-cache acceptance. Ten-file host closure is now frozen and checked before all external/live stages and release;55 live CPU groups pass. Fresh full-cache publication/admission is running.
+
+Evidence: [native-cache](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/native-cache-retention-interrupted-before-release.json), [native-cache](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/native-cache-host-pins-green-v1-verified.json)

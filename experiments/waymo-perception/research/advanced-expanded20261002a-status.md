@@ -17,6 +17,6 @@ Successful treatments first pass in the sampled update interval (300, 500], with
 
 These are one-frame, training-only engineering diagnostics with the historical eligible ROI GT contract. They do not establish held-out architecture gains. Range fusion and its zero-range control both fit; this does not demonstrate that range information improves generalization. The transformer negative result remains evidence for investigation, not a reason to discard transformers generally.
 
-The expanded payloads still require verified HDFS archival/recovery/admission before local release. Sustained balanced16 fitting, official full-native-GT evaluation, and held-out research remain pending.
+All eight expanded payloads now have verified HDFS archival, exact readback, live recovery and manifest admission, followed by local release (1,264 files / 830,511,030 bytes). Recovery locations and hashes are recorded in advanced-expanded20261002a-hdfs-retention-index.json. Sustained balanced16 fitting, official full-native-GT evaluation, and held-out research remain pending.
 
 Evidence: advanced-expanded20261002a-results.json and advanced-closure-expanded20261002a-verified.json.
