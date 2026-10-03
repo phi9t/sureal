@@ -601,3 +601,11 @@ balanced16-sustained
 Extended independent literal chunk reference and separately mounted GPU transition verifier prepared. Live missing-module/worker RED then58/59-test GREEN; independent review reran59. CPU1000-update restart exact beyondpilot35; full nativeGPU extended transition/controller/metrics/HDFS stillrequired. No active frozen pilot sources changed or fit/science promotion.
 
 Evidence: [sustained-ch](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-chunk-reference-red-v1-verified.json), [sustained-ch](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-chunk-reference-green-v1-verified.json), [sustained-tr](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-transition-worker-red-v1-verified.json), [sustained-tr](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-transition-worker-green-v1-verified.json)
+
+## 76. 2026-10-03T05:13:04.339417+00:00 — observation
+
+balanced16-sustained
+
+Native0/19/35 pilot ended at score35: official evaluator subprocess exceeded600seconds.19of21 stages retained incl complete35 GPUstate/full0-to35+restart19-to35 heads/literal loss/proposals. All exports8000predictions; step35 has5404vehicles vs1476at0 and1774at19. Official Hungarian uses square max(pred,GT) matrix and101scorecutoffs; composition is a performance hypothesis, not demonstrated cause. Training checkpoints/resourcegates intact. No pilotcompletion or sustainedfit claim.
+
+Evidence: [balanced16-s](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-sustained-pilot-timeout.json)
