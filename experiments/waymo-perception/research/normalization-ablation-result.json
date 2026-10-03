@@ -1,0 +1,230 @@
+{
+  "scope": "Single fixed training batch, seed17, unchanged optimizer, 2000 updates. Not heldout or whole-model admission.",
+  "results": [
+    {
+      "variant": "bn",
+      "final": {
+        "step": 2000,
+        "cumulative_train_seconds": 146.44826879474567,
+        "evaluation_losses": [
+          {
+            "classification": 0.004672369919717312,
+            "localization": 0.026704320684075356,
+            "direction": 0.00030978251015767455,
+            "total": 0.05814296752214432
+          }
+        ],
+        "LEVEL2_per_class": {
+          "1": {
+            "AP": 1.0,
+            "APH": 0.998079
+          },
+          "2": {
+            "AP": 1.0,
+            "APH": 0.988051
+          },
+          "3": {
+            "AP": 0.284091,
+            "APH": 0.226459
+          }
+        },
+        "mean_populated_class_APH": 0.7375296666666666,
+        "mean_gate_passed": false,
+        "populated_class_gate_passed": false,
+        "minimum_populated_class_APH": 0.226459
+      },
+      "first_observed_pass": {
+        "mean_gate_passed": {
+          "status": "first observed sampled pass; sustained/final pass separate",
+          "bracket_updates": [
+            1000,
+            1500
+          ],
+          "bracket_train_seconds": [
+            72.92246173642343,
+            107.30235505336896
+          ]
+        },
+        "populated_class_gate_passed": {
+          "status": "not reached at sampled checkpoints",
+          "budget_updates": 2000,
+          "budget_train_seconds": 146.44826879474567
+        }
+      },
+      "mean_pass_sustained_at_remaining_samples": false,
+      "scoring_receipt": "native-one-batch-learning-curve-scoring-verified.json",
+      "scoring_sha256": "58c5bf64874a4b7bd7a0e8a85b5ff80f14786b0837dbb372d9306c1eca56791e",
+      "audit_receipt": "learning-curve-score-audits-verified.json",
+      "audit_sha256": "6faa5bb80db424d46bdec90f8489b5bb3168e2135dd69c0d5f0d9e366d213743",
+      "decoder_scope": "original primary decoder"
+    },
+    {
+      "variant": "gn_backbone",
+      "final": {
+        "step": 2000,
+        "cumulative_train_seconds": 130.3054608135135,
+        "evaluation_losses": [
+          {
+            "classification": 0.0013946922263130546,
+            "localization": 0.0003526501532178372,
+            "direction": 0.0004065986431669444,
+            "total": 0.0021813123021274805
+          }
+        ],
+        "LEVEL2_per_class": {
+          "1": {
+            "AP": 1.0,
+            "APH": 0.999841
+          },
+          "2": {
+            "AP": 1.0,
+            "APH": 0.99974
+          },
+          "3": {
+            "AP": 0.727273,
+            "APH": 0.636074
+          }
+        },
+        "mean_populated_class_APH": 0.8785516666666666,
+        "mean_gate_passed": true,
+        "populated_class_gate_passed": false,
+        "minimum_populated_class_APH": 0.636074
+      },
+      "first_observed_pass": {
+        "mean_gate_passed": {
+          "status": "first observed sampled pass; sustained/final pass separate",
+          "bracket_updates": [
+            300,
+            500
+          ],
+          "bracket_train_seconds": [
+            19.835233957506716,
+            32.811675781500526
+          ]
+        },
+        "populated_class_gate_passed": {
+          "status": "not reached at sampled checkpoints",
+          "budget_updates": 2000,
+          "budget_train_seconds": 130.3054608135135
+        }
+      },
+      "mean_pass_sustained_at_remaining_samples": true,
+      "scoring_receipt": "norm-gn_backbone-scoring-verified.json",
+      "scoring_sha256": "4e724c43ffa3b38915f92796acb4ea70618198ab8a9733a8e89eb75ef1d14bf1",
+      "audit_receipt": "norm-gn_backbone-score-audits-verified.json",
+      "audit_sha256": "297021f840788a612e375cf0b0a5b5bd520958336e510a4dee510d1f608e1313",
+      "decoder_scope": "original primary decoder"
+    },
+    {
+      "variant": "gn_backbone_ln_pillar",
+      "final": {
+        "step": 2000,
+        "cumulative_train_seconds": 125.61133301840164,
+        "evaluation_losses": [
+          {
+            "classification": 0.0011946148006245494,
+            "localization": 0.00024360866518691182,
+            "direction": 0.0002964681189041585,
+            "total": 0.001741125714033842
+          }
+        ],
+        "LEVEL2_per_class": {
+          "1": {
+            "AP": 1.0,
+            "APH": 0.999583
+          },
+          "2": {
+            "AP": 1.0,
+            "APH": 0.999144
+          },
+          "3": {
+            "AP": 0.727273,
+            "APH": 0.571648
+          }
+        },
+        "mean_populated_class_APH": 0.8567916666666667,
+        "mean_gate_passed": true,
+        "populated_class_gate_passed": false,
+        "minimum_populated_class_APH": 0.571648
+      },
+      "first_observed_pass": {
+        "mean_gate_passed": {
+          "status": "first observed sampled pass; sustained/final pass separate",
+          "bracket_updates": [
+            200,
+            300
+          ],
+          "bracket_train_seconds": [
+            12.941808016505092,
+            19.245112592587247
+          ]
+        },
+        "populated_class_gate_passed": {
+          "status": "not reached at sampled checkpoints",
+          "budget_updates": 2000,
+          "budget_train_seconds": 125.61133301840164
+        }
+      },
+      "mean_pass_sustained_at_remaining_samples": true,
+      "scoring_receipt": "norm-gn_backbone_ln_pillar-scoring-verified.json",
+      "scoring_sha256": "54da59baa840fc997a1913cd7cd3fab203abb071495e6e7cbb84eb910ea127cd",
+      "audit_receipt": "norm-gn_backbone_ln_pillar-score-audits-verified.json",
+      "audit_sha256": "5eddd8e9159dfa683db581da46212701eb223df929e0d2914e3763b672de995f",
+      "decoder_scope": "original primary decoder"
+    },
+    {
+      "variant": "no_norm",
+      "final": {
+        "step": 2000,
+        "cumulative_train_seconds": 94.96349954640027,
+        "evaluation_losses": [
+          {
+            "classification": 335.00567626953125,
+            "localization": 0.07288578897714615,
+            "direction": 0.002312293043360114,
+            "total": 335.15191650390625
+          }
+        ],
+        "LEVEL2_per_class": {
+          "1": {
+            "AP": 1.0,
+            "APH": 0.675154
+          },
+          "2": {
+            "AP": 1.0,
+            "APH": 0.976562
+          },
+          "3": {
+            "AP": 0.216169,
+            "APH": 0.212239
+          }
+        },
+        "mean_populated_class_APH": 0.6213183333333333,
+        "mean_gate_passed": false,
+        "populated_class_gate_passed": false,
+        "minimum_populated_class_APH": 0.212239
+      },
+      "first_observed_pass": {
+        "mean_gate_passed": {
+          "status": "not reached at sampled checkpoints",
+          "budget_updates": 2000,
+          "budget_train_seconds": 94.96349954640027
+        },
+        "populated_class_gate_passed": {
+          "status": "not reached at sampled checkpoints",
+          "budget_updates": 2000,
+          "budget_train_seconds": 94.96349954640027
+        }
+      },
+      "mean_pass_sustained_at_remaining_samples": false,
+      "scoring_receipt": "norm-no_norm-score-first-verified.json",
+      "scoring_sha256": "47deff1654012e2bb54e4a347ae1e4ba2162954e6dfa092c133f5223dca4edca",
+      "audit_receipt": "norm-no_norm-score-first-audits-verified.json",
+      "audit_sha256": "8da9dc703004438104222a27d4a550fab05208b5270c58431b1cb3204f0741fe",
+      "decoder_scope": "secondary score-before-decode"
+    }
+  ],
+  "verified_artifact_hashes": 660,
+  "decision": "Carry GN backbone and GN+pointwise LN forward as candidates; GN backbone has higher final APH, GN+LN faster first sampled mean pass. No normalization is worse under this unchanged recipe. Strict per-class gate fails for every variant; cyclist coverage absent.",
+  "secondary_decoder": "Original no-norm export failure preserved. Score-before-decode repair excludes unused below-floor boxes before exponentiation; exact equivalence confirmed on all33 BN/GN/GNLN checkpoint proposal exports. No-norm independently audited on all11 secondary checkpoints."
+}
