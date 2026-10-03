@@ -1,0 +1,774 @@
+{
+  "scope": "descriptive reanalysis of existing verified experiments; no new training or native replay",
+  "source_sha256": {
+    "tier1-overfit20261002b-results.json": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+    "advanced-expanded20261002a-results.json": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
+    "tier1-closure-live-final-v4-verified.json": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+    "tier1-terminal-cap-equivalence-verified.json": "9ac0e14bc860ae007a6f9ef65024f279c8125c895a29e2e7dde63c0184c848b8",
+    "advanced-closure-expanded20261002a-verified.json": "c4c013873723012c0bd527a6911f01c3f0806a7cffc576dcd44820ec03901318",
+    "balanced-study-recovery-20261002.json": "6ef4f418110d089f01e721d9cb84a61895769511f64dad029f8b0ad366a6a214",
+    "balanced16-historical-v3-fullgt-metrics-verified.json": "6a59512f16a9cbc927f53f71f0cb75470e3e5dfe8bd62c882b0329c590cb0f50",
+    "balanced16-historical-v3-native-metric-audit-verified.json": "f2ca241fc6db6a7f82e73f4523d326aea77c7d4e591cf2aeb27693c3b4d6f594",
+    "balanced16-historical-v3-proposal-audit-verified.json": "db1b767e5565eb3a107aca97bc080e88a5052bb461bc6e6707e5076a2b3fb2b3",
+    "one-batch-bn-counterfactual-verified.json": "e76d2ccdd430eaed4fde39ec75a4f47aa87e93e1feea41d34bc08f0b93f17344",
+    "one-batch-bn-counterfactual-scoring-verified.json": "3724751534f39f754735e15c06a94e0900f1bc36f4974ca16cac3b2ad43749cc",
+    "normalization-ablation-result.json": "385120330d5d8409a41467d1407b1fd89a1df78f27995e55a9b412da0b237c33",
+    "architecture-first-cohort-results.json": "90b6061f21fcc6be87c42927e0717f94750c7f539c8e0144c0b17e738920e1eb",
+    "tier1-allclass-fixture-verified.json": "04b4810656823ab00bda279bfec0f4d6f8248ab1457d567d5b64b7b80e675dcb",
+    "balanced16-coverage-oracle-native-verified.json": "509b526abb9936434388ca78a5c7d69344db2e27ad248c73b5e1a14a72ec4f7d",
+    "balanced16-coverage-causes-verified.json": "4f4a111755a24e41e8069ac98ec6e3d480c5181ec56f0dce7d7552489854730b",
+    "sparse-head-support-live-verified.json": "1b92d4d563a036c38bce019ebc68cc6f3bd9e2b95ff8ee5cc140238e5e90d165",
+    "tier1-heading-step2000a-verified.json": "c2dd47004afd677b1c8616d3ca8e0de63f6c2eb767a2ba2a36b07fefe10fd96f"
+  },
+  "analysis_source_sha256": "a71bcc23281a09c7a5d4c9e20889b16a4027eb8bdeecc7a36476133380eaf96d",
+  "plotting_library_version": "3.10.0",
+  "tier1": {
+    "baseline": {
+      "parameters": 4847144,
+      "retained_terminal_update": 4000,
+      "confirmation_update": 750,
+      "first_fit_interval": [
+        300,
+        500
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.971524,
+        0.999002,
+        0.92688,
+        0.999221
+      ],
+      "confirmation_APH": [
+        0.999459,
+        0.999411,
+        0.927779,
+        0.999499
+      ],
+      "clipped_updates": 150,
+      "clipped_fraction_to_retained_terminal": 0.0375,
+      "confirmation_train_seconds": 133.63048808620078,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "deep_pfn": {
+      "parameters": 4851368,
+      "retained_terminal_update": 750,
+      "confirmation_update": 750,
+      "first_fit_interval": [
+        300,
+        500
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.984784,
+        0.998935,
+        0.927862,
+        0.998708
+      ],
+      "confirmation_APH": [
+        0.984784,
+        0.998935,
+        0.927862,
+        0.998708
+      ],
+      "clipped_updates": 157,
+      "clipped_fraction_to_retained_terminal": 0.20933333333333334,
+      "confirmation_train_seconds": 150.56321854400449,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "context_pfn": {
+      "parameters": 4859560,
+      "retained_terminal_update": 750,
+      "confirmation_update": 750,
+      "first_fit_interval": [
+        300,
+        500
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.998372,
+        0.982694,
+        0.926738,
+        0.998541
+      ],
+      "confirmation_APH": [
+        0.998372,
+        0.982694,
+        0.926738,
+        0.998541
+      ],
+      "clipped_updates": 144,
+      "clipped_fraction_to_retained_terminal": 0.192,
+      "confirmation_train_seconds": 60.57330483919941,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "masked_pfn": {
+      "parameters": 4847144,
+      "retained_terminal_update": 750,
+      "confirmation_update": 750,
+      "first_fit_interval": [
+        300,
+        500
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.99866,
+        0.998549,
+        0.926735,
+        0.998554
+      ],
+      "confirmation_APH": [
+        0.99866,
+        0.998549,
+        0.926735,
+        0.998554
+      ],
+      "clipped_updates": 134,
+      "clipped_fraction_to_retained_terminal": 0.17866666666666667,
+      "confirmation_train_seconds": 53.46621083759237,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "residual_bev": {
+      "parameters": 4847144,
+      "retained_terminal_update": 750,
+      "confirmation_update": 750,
+      "first_fit_interval": [
+        300,
+        500
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.9989,
+        0.99818,
+        0.927404,
+        0.999647
+      ],
+      "confirmation_APH": [
+        0.9989,
+        0.99818,
+        0.927404,
+        0.999647
+      ],
+      "clipped_updates": 133,
+      "clipped_fraction_to_retained_terminal": 0.17733333333333334,
+      "confirmation_train_seconds": 65.57020326063503,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "window_bev": {
+      "parameters": 5109800,
+      "retained_terminal_update": 750,
+      "confirmation_update": 750,
+      "first_fit_interval": [
+        300,
+        500
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.999467,
+        0.999287,
+        0.928069,
+        0.999142
+      ],
+      "confirmation_APH": [
+        0.999467,
+        0.999287,
+        0.928069,
+        0.999142
+      ],
+      "clipped_updates": 146,
+      "clipped_fraction_to_retained_terminal": 0.19466666666666665,
+      "confirmation_train_seconds": 64.89854338910664,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "coarse_mlp": {
+      "parameters": 5109800,
+      "retained_terminal_update": 750,
+      "confirmation_update": 750,
+      "first_fit_interval": [
+        300,
+        500
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.998261,
+        0.997501,
+        0.926117,
+        0.997525
+      ],
+      "confirmation_APH": [
+        0.998261,
+        0.997501,
+        0.926117,
+        0.997525
+      ],
+      "clipped_updates": 136,
+      "clipped_fraction_to_retained_terminal": 0.18133333333333335,
+      "confirmation_train_seconds": 146.4527927809395,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "retain64": {
+      "parameters": 4847144,
+      "retained_terminal_update": 750,
+      "confirmation_update": 750,
+      "first_fit_interval": [
+        300,
+        500
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.975576,
+        0.998878,
+        0.927294,
+        0.998936
+      ],
+      "confirmation_APH": [
+        0.975576,
+        0.998878,
+        0.927294,
+        0.998936
+      ],
+      "clipped_updates": 150,
+      "clipped_fraction_to_retained_terminal": 0.2,
+      "confirmation_train_seconds": 173.6372897209949,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "all_pillars": {
+      "status": "exact observation equivalence control",
+      "kind": "equivalence control"
+    },
+    "full_bn": {
+      "parameters": 4847144,
+      "retained_terminal_update": 3000,
+      "confirmation_update": 3000,
+      "first_fit_interval": [
+        1500,
+        2000
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.998832,
+        0.997852,
+        0.924655,
+        0.998157
+      ],
+      "confirmation_APH": [
+        0.998832,
+        0.997852,
+        0.924655,
+        0.998157
+      ],
+      "clipped_updates": 168,
+      "clipped_fraction_to_retained_terminal": 0.056,
+      "confirmation_train_seconds": 218.66393289418193,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "point_ln": {
+      "parameters": 4847144,
+      "retained_terminal_update": 750,
+      "confirmation_update": 750,
+      "first_fit_interval": [
+        300,
+        500
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.980994,
+        0.998391,
+        0.927689,
+        0.998468
+      ],
+      "confirmation_APH": [
+        0.980994,
+        0.998391,
+        0.927689,
+        0.998468
+      ],
+      "clipped_updates": 138,
+      "clipped_fraction_to_retained_terminal": 0.184,
+      "confirmation_train_seconds": 103.25395156489685,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "no_norm": {
+      "parameters": 4841128,
+      "retained_terminal_update": 8000,
+      "confirmation_update": 8000,
+      "first_fit_interval": [
+        4000,
+        6000
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.830212,
+        0.910012,
+        0.90165,
+        0.984013
+      ],
+      "confirmation_APH": [
+        0.830212,
+        0.910012,
+        0.90165,
+        0.984013
+      ],
+      "clipped_updates": 7978,
+      "clipped_fraction_to_retained_terminal": 0.99725,
+      "confirmation_train_seconds": 434.8188971193158,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "foreground_prior": {
+      "parameters": 4847144,
+      "retained_terminal_update": 1000,
+      "confirmation_update": 1000,
+      "first_fit_interval": [
+        500,
+        750
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.998638,
+        0.998884,
+        0.927387,
+        0.999439
+      ],
+      "confirmation_APH": [
+        0.998638,
+        0.998884,
+        0.927387,
+        0.999439
+      ],
+      "clipped_updates": 565,
+      "clipped_fraction_to_retained_terminal": 0.565,
+      "confirmation_train_seconds": 72.59372828627238,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "lr3e4": {
+      "parameters": 4847144,
+      "retained_terminal_update": 750,
+      "confirmation_update": 750,
+      "first_fit_interval": [
+        300,
+        500
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.93417,
+        0.98972,
+        0.926955,
+        0.996813
+      ],
+      "confirmation_APH": [
+        0.93417,
+        0.98972,
+        0.926955,
+        0.996813
+      ],
+      "clipped_updates": 130,
+      "clipped_fraction_to_retained_terminal": 0.17333333333333334,
+      "confirmation_train_seconds": 54.2528485035873,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "no_clip": {
+      "parameters": 4847144,
+      "retained_terminal_update": 4000,
+      "confirmation_update": 4000,
+      "first_fit_interval": [
+        2000,
+        3000
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.997886,
+        0.997716,
+        0.925742,
+        0.999231
+      ],
+      "confirmation_APH": [
+        0.997886,
+        0.997716,
+        0.925742,
+        0.999231
+      ],
+      "clipped_updates": 0,
+      "clipped_fraction_to_retained_terminal": 0.0,
+      "confirmation_train_seconds": 273.8454443717492,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "class_balanced_focal": {
+      "parameters": 4847144,
+      "retained_terminal_update": 750,
+      "confirmation_update": 750,
+      "first_fit_interval": [
+        300,
+        500
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.999104,
+        0.999041,
+        0.92757,
+        0.999186
+      ],
+      "confirmation_APH": [
+        0.999104,
+        0.999041,
+        0.92757,
+        0.999186
+      ],
+      "clipped_updates": 121,
+      "clipped_fraction_to_retained_terminal": 0.16133333333333333,
+      "confirmation_train_seconds": 53.30203852476552,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    }
+  },
+  "expanded": {
+    "grid_fine": {
+      "parameters": 4847144,
+      "retained_terminal_update": 750,
+      "confirmation_update": 750,
+      "first_fit_interval": [
+        300,
+        500
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.978169,
+        0.998992,
+        0.927627,
+        0.999547
+      ],
+      "confirmation_APH": [
+        0.978169,
+        0.998992,
+        0.927627,
+        0.999547
+      ],
+      "clipped_updates": 140,
+      "clipped_fraction_to_retained_terminal": 0.18666666666666668,
+      "confirmation_train_seconds": 57.37348473793827,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "grid_coarse": {
+      "parameters": 4847144,
+      "retained_terminal_update": 750,
+      "confirmation_update": 750,
+      "first_fit_interval": [
+        300,
+        500
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.986726,
+        0.999121,
+        0.926807,
+        0.999561
+      ],
+      "confirmation_APH": [
+        0.986726,
+        0.999121,
+        0.926807,
+        0.999561
+      ],
+      "clipped_updates": 157,
+      "clipped_fraction_to_retained_terminal": 0.20933333333333334,
+      "confirmation_train_seconds": 48.79892970103538,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "ragged_pillars": {
+      "parameters": 4847144,
+      "retained_terminal_update": 750,
+      "confirmation_update": 750,
+      "first_fit_interval": [
+        300,
+        500
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.998744,
+        0.99788,
+        0.927527,
+        0.999431
+      ],
+      "confirmation_APH": [
+        0.998744,
+        0.99788,
+        0.927527,
+        0.999431
+      ],
+      "clipped_updates": 148,
+      "clipped_fraction_to_retained_terminal": 0.19733333333333333,
+      "confirmation_train_seconds": 51.27499999460997,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "point_attention": {
+      "parameters": 4880552,
+      "retained_terminal_update": 750,
+      "confirmation_update": 750,
+      "first_fit_interval": [
+        300,
+        500
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.984122,
+        0.998716,
+        0.926812,
+        0.997981
+      ],
+      "confirmation_APH": [
+        0.984122,
+        0.998716,
+        0.926812,
+        0.997981
+      ],
+      "clipped_updates": 160,
+      "clipped_fraction_to_retained_terminal": 0.21333333333333335,
+      "confirmation_train_seconds": 110.58177473011892,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "point_mlp_control": {
+      "parameters": 4880552,
+      "retained_terminal_update": 750,
+      "confirmation_update": 750,
+      "first_fit_interval": [
+        300,
+        500
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.880378,
+        0.996736,
+        0.811483,
+        0.998172
+      ],
+      "confirmation_APH": [
+        0.880378,
+        0.996736,
+        0.811483,
+        0.998172
+      ],
+      "clipped_updates": 146,
+      "clipped_fraction_to_retained_terminal": 0.19466666666666665,
+      "confirmation_train_seconds": 87.57246883586049,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "range_fusion": {
+      "parameters": 5321352,
+      "retained_terminal_update": 750,
+      "confirmation_update": 750,
+      "first_fit_interval": [
+        300,
+        500
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.946316,
+        0.99799,
+        0.926328,
+        0.995888
+      ],
+      "confirmation_APH": [
+        0.946316,
+        0.99799,
+        0.926328,
+        0.995888
+      ],
+      "clipped_updates": 153,
+      "clipped_fraction_to_retained_terminal": 0.204,
+      "confirmation_train_seconds": 224.76139738614438,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "zero_range_control": {
+      "parameters": 5321352,
+      "retained_terminal_update": 750,
+      "confirmation_update": 750,
+      "first_fit_interval": [
+        300,
+        500
+      ],
+      "right_censored": false,
+      "terminal_APH": [
+        0.999391,
+        0.999123,
+        0.92697,
+        0.99891
+      ],
+      "confirmation_APH": [
+        0.999391,
+        0.999123,
+        0.92697,
+        0.99891
+      ],
+      "clipped_updates": 135,
+      "clipped_fraction_to_retained_terminal": 0.18,
+      "confirmation_train_seconds": 223.68377439532196,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    },
+    "sparse_bev_transformer": {
+      "parameters": 2064808,
+      "retained_terminal_update": 10000,
+      "confirmation_update": null,
+      "first_fit_interval": null,
+      "right_censored": true,
+      "terminal_APH": [
+        0.741925,
+        0.990472,
+        0.92684,
+        0.998926
+      ],
+      "confirmation_APH": null,
+      "clipped_updates": 894,
+      "clipped_fraction_to_retained_terminal": 0.0894,
+      "confirmation_train_seconds": null,
+      "timing_scope": "synchronized training wall; contention prevents throughput ranking"
+    }
+  },
+  "balanced16_historical": {
+    "baseline": {
+      "frame_visits": {
+        "0": 125,
+        "1": 125,
+        "2": 125,
+        "3": 125,
+        "4": 125,
+        "5": 125,
+        "6": 125,
+        "7": 125,
+        "8": 125,
+        "9": 125,
+        "10": 125,
+        "11": 125,
+        "12": 125,
+        "13": 125,
+        "14": 125,
+        "15": 125
+      },
+      "initial_negative_focal": 1558.205135345459,
+      "final_negative_focal": 0.07183389877900481,
+      "initial_positive_anchor_focal": 0.7084447555243969,
+      "final_positive_anchor_focal": 0.2417224571108818,
+      "terminal_eval_loss": 1.0732298716902733,
+      "terminal_batch_statistics_loss": 0.2949722893536091,
+      "terminal_eval_to_batch_statistics_loss_ratio": 3.638409133421,
+      "clipped_updates": 1472,
+      "historical_V2_ROI_APH": {
+        "1": {
+          "AP": 0.411214,
+          "APH": 0.306981
+        },
+        "2": {
+          "AP": 0.289355,
+          "APH": 0.237434
+        },
+        "3": {
+          "AP": 0.0316432,
+          "APH": 0.0225062
+        },
+        "4": {
+          "AP": 0.00210084,
+          "APH": 0.00207839
+        }
+      }
+    },
+    "residual_bev": {
+      "frame_visits": {
+        "0": 125,
+        "1": 125,
+        "2": 125,
+        "3": 125,
+        "4": 125,
+        "5": 125,
+        "6": 125,
+        "7": 125,
+        "8": 125,
+        "9": 125,
+        "10": 125,
+        "11": 125,
+        "12": 125,
+        "13": 125,
+        "14": 125,
+        "15": 125
+      },
+      "initial_negative_focal": 1537.932918548584,
+      "final_negative_focal": 0.042569726007059216,
+      "initial_positive_anchor_focal": 0.7111546564847231,
+      "final_positive_anchor_focal": 0.36070472514256835,
+      "terminal_eval_loss": 1.2669103611260653,
+      "terminal_batch_statistics_loss": 0.294759648386389,
+      "terminal_eval_to_batch_statistics_loss_ratio": 4.298113286745822,
+      "clipped_updates": 1427,
+      "historical_V2_ROI_APH": {
+        "1": {
+          "AP": 0.319798,
+          "APH": 0.266018
+        },
+        "2": {
+          "AP": 0.185227,
+          "APH": 0.154996
+        },
+        "3": {
+          "AP": 0.0120622,
+          "APH": 0.00269353
+        },
+        "4": {
+          "AP": 0.0132919,
+          "APH": 0.0045449
+        }
+      }
+    }
+  },
+  "balanced16_baseline2000_V3_fullnativeGT_APH": {
+    "1": {
+      "AP": 0.377241,
+      "APH": 0.281619
+    },
+    "2": {
+      "AP": 0.275674,
+      "APH": 0.242956
+    },
+    "3": {
+      "AP": 0.0274796,
+      "APH": 0.0236408
+    },
+    "4": {
+      "AP": 0.0019305,
+      "APH": 0.00190988
+    }
+  },
+  "initial_allclass_positive_anchors": [
+    338,
+    30,
+    16,
+    6
+  ],
+  "initial_positive_anchor_class_fractions": [
+    0.8666666666666667,
+    0.07692307692307693,
+    0.041025641025641026,
+    0.015384615384615385
+  ],
+  "positive_class_focal_reweighting": [
+    0.28846153846153844,
+    3.25,
+    6.09375,
+    16.25
+  ],
+  "initial_background_to_positive_anchor_focal_ratio": 1267.2417781324857,
+  "additional_deep_PFN_parameter_fraction": 0.0008714409970077225,
+  "old17GT_frozen_BN_counterfactual": {
+    "optimizer_updates": 0,
+    "weights_bitwise_unchanged": true,
+    "loss_before": 0.05814296752214432,
+    "loss_after": 0.00748347956687212,
+    "historical_mean_APH_before": 0.7375296666666666,
+    "historical_mean_APH_after": 0.864156
+  },
+  "exposure_normalization": {
+    "historical16_frame_updates": 2000,
+    "visits_per_frame": 125,
+    "single_frame_first_native_pass": 500,
+    "single_frame_confirmation": 750,
+    "sixteen_frame_equal_visit_budgets": [
+      8000,
+      12000
+    ],
+    "qualification": "visit accounting, not a predicted fit time; frame mixture and sampler also differ"
+  }
+}

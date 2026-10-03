@@ -1,0 +1,106 @@
+{
+  "run_directory": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a",
+  "recovery_directory": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-scoring-recovery-native20261003b",
+  "output_directory": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a",
+  "manifest_sha256": "0466ce55c4aa24b8155ed4838ac1e89982b23e7798edacefc09f1b754c2e5849",
+  "stage_receipts": {
+    "train-0": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/train-0-verified.json",
+      "sha256": "113cef3d6fb3a53ec981ee8bb4824b1159f403f6e359c8dc49f3385a3e5309a1"
+    },
+    "audit-0": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/audit-0-verified.json",
+      "sha256": "6bd933737c60621ef904fc457ec1a3cf586c7caedb719314f25c840faa4da6aa"
+    },
+    "literal-loss-0": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/literal-loss-0-verified.json",
+      "sha256": "a4c853b5d1325e3ef30b2eee9e0892b37756be18571558c02f100e83d4693945"
+    },
+    "export-0": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/export-0-verified.json",
+      "sha256": "8a8757e0fc0e3d281cccbc4bda47361fa61ab36fd8fd882287c9a23d45009544"
+    },
+    "proposals-0": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/proposals-0-verified.json",
+      "sha256": "0708f801b9f95ca941dad9af155e94e84a34d5dbc77aeabe026d82fe83a74541"
+    },
+    "score-0": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/score-0-verified.json",
+      "sha256": "30b553c4abf19d9270bd84a9e6f96d4c5ad37ed01eee96e2bfdd151cb7ff3d4c"
+    },
+    "metrics-audit-0": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/metrics-audit-0-verified.json",
+      "sha256": "c6050a2608827bc188e85dbdc5b100c75a5fcbaf6f4f0046b0c2399ccd015f2b"
+    },
+    "train-19": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/train-19-verified.json",
+      "sha256": "1587b5bb464f6fc15b539596026d7c41320d715a8ae5192aea9c8eed486a62c9"
+    },
+    "audit-19": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/audit-19-verified.json",
+      "sha256": "2046c702941a68a8881b6d9791194bb3f95dc5fcc50552405e36bce2a32ed244"
+    },
+    "literal-loss-19": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/literal-loss-19-verified.json",
+      "sha256": "c021ba206fd4e793a8896687941264791d60b9741c864654fe59973f18675356"
+    },
+    "export-19": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/export-19-verified.json",
+      "sha256": "43064ae011de1fe4e0cdd3dabd3a554efad19b210c33595ce646bc48f286324c"
+    },
+    "proposals-19": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/proposals-19-verified.json",
+      "sha256": "864631eabb3ee590b1a4fc74b8b2dbf342d84080aa4c31aa738919357b0331e4"
+    },
+    "score-19": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/score-19-verified.json",
+      "sha256": "c44ef82b69058bea348d6450baf84f9704d756a3fd25f83feef88fdd434cb080"
+    },
+    "metrics-audit-19": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/metrics-audit-19-verified.json",
+      "sha256": "74c3169d26caf54c2102b58d1ad32ab6534d4c90b9b6987a39846d0f6144e688"
+    },
+    "train-35": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/train-35-verified.json",
+      "sha256": "076dbeefcb34a7e9b1da019ae0d8a374faa0cefce4da22bbc849d319a209f07d"
+    },
+    "audit-35": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/audit-35-verified.json",
+      "sha256": "a0e78816b694656c49eb418eb74a47fc66affb52cb5251a221222129a4d9bd02"
+    },
+    "literal-loss-35": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/literal-loss-35-verified.json",
+      "sha256": "6c435e33f96aa47f2cadcad18dafbb686346d07f5b7c7368f75e432cfa9509aa"
+    },
+    "export-35": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/export-35-verified.json",
+      "sha256": "8a10627c918844afb5aa5da8093a30c77676c082129aba89c4a4a6622c35fac1"
+    },
+    "proposals-35": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-admission-native20261003a/proposals-35-verified.json",
+      "sha256": "5af8c4f44b4cdd44b113a08626b5015680b47be6fccc42e3fc65571be06278d5"
+    },
+    "score-35": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-scoring-recovery-native20261003b/score-35-verified.json",
+      "sha256": "1452fc2ee41f18a50b982377ee96bbc878aee7b133d5e486891931750bc3a629"
+    },
+    "metrics-audit-35": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-scoring-recovery-native20261003b/metrics-audit-35-verified.json",
+      "sha256": "4fb072551224de42ea544964e17ce346a39afa86bc8826db39bc4e87f10b79f1"
+    }
+  },
+  "recovery_changes": {
+    "metrics_sustained_v3.py": {
+      "original_sha256": "1f79c8a5e4471b44015f85023c54ef05c1ebd842c2a32f5c79ca1a4741933995",
+      "recovery_sha256": "05d9838aa9080fe466247bdfd0fda3e7e9ce646aaec0dcb7f7ecac8400fe7537",
+      "only_change": "native subprocess timeout=600 -> timeout=1800"
+    },
+    "audit_metrics_sustained_v3.py": {
+      "original_sha256": "21513daa1f42773e08ef7eed4f5738d40eb953eecce0a7389b71d65b9eb9ce0d",
+      "recovery_sha256": "068d876d5ac32821524886cf80a9342ab807724200cb7fc7d5755d2b81ee4df8",
+      "only_change": "native subprocess timeout=600 -> timeout=1800"
+    }
+  },
+  "original_failure_sha256": "0a94f12631703106651b14f78ac0e84ebaac9bb3220b4f4b868ebe2215210250",
+  "scope": "recovered native baseline0/19/35 engineering pilot; independent review/retention required; no sustained fit or scientific acceptance"
+}

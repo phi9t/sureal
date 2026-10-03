@@ -1,0 +1,41 @@
+# 41 — Prediction–target association and supervision coverage
+
+Status: specified; not implemented, not runnable, no new execution evidence.
+
+Goal: give every eligible object distinct, geometrically plausible prediction responsibility and establish whether ownership/3Dgeometry/prediction-aware association improves native detection fitting and time-to-fit.
+
+Parent: [34 — rare-class diagnosis](34-rare-class-learning-diagnosis.md). Dependencies: existing live runtime/evaluation gates01/08/09, independently audited33/35cohort/fixed-batch fixtures, and this study's frozen ticket07protocol/runtime/retention admission. This does not require scientific completion of ticket10 to diagnose its baseline. A balanced16case additionally requires that treatment's fixed-batch fitting pass.
+
+Design: [association specification](../../superpowers/specs/2026-10-03-prediction-target-association-design.md). Plan: [41.1–41.6 implementation tasks](../../superpowers/plans/2026-10-03-prediction-target-association.md). Experiments: [operator handbook](../../../experiments/waymo-perception/research/prediction-target-association-study.md).
+
+## Evidence motivating the work
+
+In balanced16,29eligible signs and1pedestrian have no positive assignment. Independent replay establishes28strict-overlap conflicts and2ties, all with positive maximum overlap;28conflicts are same-class. The annotation-only signAPHcontrol is0.759399for coveredtargets and0.868421for all eligibleROIobjects against unchangedfullnativeGT. These are supervision diagnostics, not model/NMS results or an unconstrained prediction ceiling. See [coverage report](../../../experiments/waymo-perception/research/balanced16-coverage-oracle-status.md).
+
+## Work packages and verifiers
+
+| Subticket | Clear goal | Mandatory live verifier | Acceptance |
+| --- | --- | --- | --- |
+| 41.1 Contract/runtime | Freeze a reproducible association comparison | CPUInsula contract fixtures and separate source/input/runtime/hash admission; newM0if solver root changes | Exact baseline,frames,recipes,budgets and independent solver identity; no active-root mutation. |
+| 41.2 Ownership | Implement globally distinct coverage using existingBEVcost | Exhaustive tiny-graph oracle; independently rebuilt16fullgrids,owners/residuals/directions; annotation-onlynativeoracle | Zero uncovered among1,053eligibleGT, unique reservations, preserved unreservedlegacylabels and all1,279nativeGT; explicit boundedgraphfailure. |
+| 41.3 Geometry/quality | Implement independently testable3Danddetachedlearnedcosts | Analytic rotated/height/zeroIoU/cost fixtures; actual-frameCUDAforward/backward; independentloss/gradient and targetaudits | Exact specifiedA2/A3costs,warm-up and ownership; noGTfeatureleak or hidden loss/decoder change. |
+| 41.4 First-tierfit | Test A0–A3on the admitted all-classframe and measure learningcost | Complete native curves, exact model/Adam/RNG/head/assignment restart replay and class-complete metric admission | EveryclassLEVEL2APH>=.8at consecutive samples includingterminal within10,000updates, or an admitted finite negative; no cohortpromotion for a failed case. |
+| 41.5 Cohortsignal | Test admitted cases on balanced16and distinguish remaining failures | Independent fullGT/native scoring, per-objectsupport/score/top-K/NMStraces and complete trajectoryreplay | Same sustained all-classgate within32,000updates/7,200stepseconds; honest time/updatecensoring, no weakgate substitution. |
+| 41.6 Tracking/retention | Make results inspectable, resumable and durablyrecoverable | Live operator/registryprojection/journal tests; actualHDFSupload/readback and independentInsularecovery; whole-studyadmission | Immutable treatment/evidence identity, exact retainedresults, bounded localstorage and evidence-backed decision table. |
+
+## Experiment treatments
+
+- A0`legacy`: matched unchanged reference.
+- A1`coverage_bev`: global reservations, currentnearestBEVcost; retain legacypositives on unreservedslots.
+- A2`coverage_3d`: sharedgraph/reservationpolicy with encodedcenter/size androtated3Doverlapcost.
+- A3`coverage_prediction`: A2warm-up, then detachedcurrentclass/box/direction/3Doverlapcosts with exact assignmentreplay.
+
+Fixed losses,decoder,backbone,initialweights,optimizer,eligibility and candidategraph acrossA0–A3except the named matchingtreatment. A0retains its original matcher; the shared candidategraph applies toA1–A3. Report changedpositivecounts/backgroundnormalizers as treatment effects. Quota,object-normalization,NMSandquery-headfollow-ups require separately frozen controls and remain conditional.
+
+## Acceptance and decision
+
+Close the engineering study only when all planned stages/cases have independently admitted outcomes or explicitly scoped conditional non-execution, realtarget/oraclechecks pass, fixed/cohortcurves and failureattribution are retained, HDFSrecovery is verified and a matched decision is recorded. Runtime/verification/resource failures remain unresolved implementation outcomes; a finite fit failure is useful research evidence.
+
+An improvement candidate must pass both fixed-batch and balanced16all-classnativegates, preserving fullGT, sourceidentities and unchangedresourcecaps. Coverage alone does not pass training. An admitted study with a negative result closes its diagnostic question without promoting a model. Held-out benefit, scientificmodeladoption, segmentation,camera,forecasting andplanning remain open.
+
+Resources: singleexistingGPUlock; allocatedGPU8GiB,RSS16GiB,raw2GiB,scientific15GiBunique-inodepayload,reserve2GiBperactivecase. Scoring14,400s/host14,700s is independent of7,200straining. Localrelease requires upload,exactreadback and independentliveHDFSrecovery; no historicaldeletion or authmutation.

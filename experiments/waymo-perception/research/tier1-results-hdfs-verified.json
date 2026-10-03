@@ -1,0 +1,213 @@
+{
+  "all_results_uploaded_and_readback_exact": true,
+  "hdfs_prefix": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/results-tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a",
+  "files": {
+    "tier1-overfit20261002b-results.json": {
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/results-tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/tier1-overfit20261002b-results.json",
+      "sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "bytes": 513970
+    },
+    "tier1-overfit20261002b-closed.json": {
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/results-tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/tier1-overfit20261002b-closed.json",
+      "sha256": "28c6e80a2c1d9f72de547f3e7149f0ec9eb3997b25dc5f1b5edb377ff8a6ca9f",
+      "bytes": 15521
+    },
+    "tier1-overfit20261002b-results.md": {
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/results-tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/tier1-overfit20261002b-results.md",
+      "sha256": "24f20e484e3e71d8b4a0abbf3b9ea482e7cded4be56588cc7b44a0af69cc42b4",
+      "bytes": 3786
+    },
+    "tier1-closure-live-final-v4-verified.json": {
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/results-tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/tier1-closure-live-final-v4-verified.json",
+      "sha256": "0740307eff6bad3e300ae36040a0b49d020c379f7b82371fa3a9e0065994310b",
+      "bytes": 55622
+    },
+    "tier1-terminal-cap-equivalence-verified.json": {
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/results-tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/tier1-terminal-cap-equivalence-verified.json",
+      "sha256": "9ac0e14bc860ae007a6f9ef65024f279c8125c895a29e2e7dde63c0184c848b8",
+      "bytes": 8060
+    }
+  },
+  "manifest_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/results-tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/manifest.json",
+  "manifest_sha256": "d6c570967b0864af157a21cd48cae1cb98fc1259be91d0366d20e4cab676792e",
+  "checks": [
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "--mkdir-parents",
+        "put",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-overfit20261002b-results.json",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/results-tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/tier1-overfit20261002b-results.json"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/0-put.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "get",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/results-tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/tier1-overfit20261002b-results.json",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/tier1-overfit20261002b-results.json"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/0-get.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "--mkdir-parents",
+        "put",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-overfit20261002b-closed.json",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/results-tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/tier1-overfit20261002b-closed.json"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/1-put.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "get",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/results-tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/tier1-overfit20261002b-closed.json",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/tier1-overfit20261002b-closed.json"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/1-get.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "--mkdir-parents",
+        "put",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-overfit20261002b-results.md",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/results-tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/tier1-overfit20261002b-results.md"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/2-put.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "get",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/results-tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/tier1-overfit20261002b-results.md",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/tier1-overfit20261002b-results.md"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/2-get.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "--mkdir-parents",
+        "put",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-closure-live-final-v4-verified.json",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/results-tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/tier1-closure-live-final-v4-verified.json"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/3-put.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "get",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/results-tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/tier1-closure-live-final-v4-verified.json",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/tier1-closure-live-final-v4-verified.json"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/3-get.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "--mkdir-parents",
+        "put",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-terminal-cap-equivalence-verified.json",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/results-tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/tier1-terminal-cap-equivalence-verified.json"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/4-put.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "get",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/results-tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/tier1-terminal-cap-equivalence-verified.json",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/tier1-terminal-cap-equivalence-verified.json"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/4-get.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "--mkdir-parents",
+        "put",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/manifest.json",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/results-tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/manifest.json"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/manifest-put.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "get",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/results-tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/manifest.json",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/manifest-readback.json"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/tier1-results-publication-5e3264ee959c4b87a54c6c7020ec326a/manifest-get.log"
+    }
+  ],
+  "tool_pins": {
+    "/data02/home/philip.yang/workspace/waystone/scripts/waystone": "fa8c5ba0b0b1f5778df0dbbc03de94d6ffef2e8b7411f9ce2df2dd28d7b36ffb"
+  },
+  "scope": "full original fixed-batch curves/table/closed results/final Insula and cap receipts; model/proposal payloads archived separately"
+}

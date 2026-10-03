@@ -1,0 +1,623 @@
+{
+  "rows": [
+    {
+      "case": "baseline",
+      "status": "sustained native overfit",
+      "parameters": 4847144,
+      "updates": 4000,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          32.310343475372065,
+          77.30945189524209
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 133.63048808620078,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 482.6635688919923,
+      "native_compute_seconds_sum": 505.7099509849795,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.971524
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.999002
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.92688
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.999221
+        }
+      },
+      "clipped_steps": 150
+    },
+    {
+      "case": "deep_pfn",
+      "status": "sustained native overfit",
+      "parameters": 4851368,
+      "updates": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          64.77117270277813,
+          131.7580552274012
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 150.56321854400449,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 150.56321854400449,
+      "native_compute_seconds_sum": 1519.956457304128,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.984784
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.998935
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.927862
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.998708
+        }
+      },
+      "clipped_steps": 157
+    },
+    {
+      "case": "context_pfn",
+      "status": "sustained native overfit",
+      "parameters": 4859560,
+      "updates": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          21.74377358291531,
+          37.41012646857416
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 60.57330483919941,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 60.57330483919941,
+      "native_compute_seconds_sum": 631.8339456490357,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.998372
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.982694
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.926738
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.998541
+        }
+      },
+      "clipped_steps": 144
+    },
+    {
+      "case": "masked_pfn",
+      "status": "sustained native overfit",
+      "parameters": 4847144,
+      "updates": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          20.4680840986548,
+          35.22118620254332
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 53.46621083759237,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 53.46621083759237,
+      "native_compute_seconds_sum": 465.55213438003557,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.99866
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.998549
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.926735
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.998554
+        }
+      },
+      "clipped_steps": 134
+    },
+    {
+      "case": "residual_bev",
+      "status": "sustained native overfit",
+      "parameters": 4847144,
+      "updates": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          32.5289193362114,
+          47.388605506683234
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 65.57020326063503,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 65.57020326063503,
+      "native_compute_seconds_sum": 471.62355908198515,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.9989
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.99818
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.927404
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.999647
+        }
+      },
+      "clipped_steps": 133
+    },
+    {
+      "case": "window_bev",
+      "status": "sustained native overfit",
+      "parameters": 5109800,
+      "updates": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          28.40744778997032,
+          43.847877541033085
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 64.89854338910664,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 64.89854338910664,
+      "native_compute_seconds_sum": 515.9288420450175,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.999467
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.999287
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.928069
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.999142
+        }
+      },
+      "clipped_steps": 146
+    },
+    {
+      "case": "coarse_mlp",
+      "status": "sustained native overfit",
+      "parameters": 5109800,
+      "updates": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          58.32463690423174,
+          126.92416246439097
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 146.4527927809395,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 146.4527927809395,
+      "native_compute_seconds_sum": 474.78945535991807,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.998261
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.997501
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.926117
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.997525
+        }
+      },
+      "clipped_steps": 136
+    },
+    {
+      "case": "retain64",
+      "status": "sustained native overfit",
+      "parameters": 4847144,
+      "updates": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          35.19190595205873,
+          155.24854425137164
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 173.6372897209949,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 173.6372897209949,
+      "native_compute_seconds_sum": 489.9758490130189,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 0.996697,
+          "APH": 0.975576
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.998878
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.927294
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.998936
+        }
+      },
+      "clipped_steps": 150
+    },
+    {
+      "case": "full_bn",
+      "status": "sustained native overfit",
+      "parameters": 4847144,
+      "updates": 3000,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          1500,
+          2000
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          99.65144158370094,
+          155.12687947286759
+        ],
+        "confirmation_update": 3000,
+        "confirmation_train_seconds": 218.66393289418193,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 218.66393289418193,
+      "native_compute_seconds_sum": 674.7618980198749,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.998832
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.997852
+        },
+        "3": {
+          "AP": 0.928572,
+          "APH": 0.924655
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.998157
+        }
+      },
+      "clipped_steps": 168
+    },
+    {
+      "case": "point_ln",
+      "status": "sustained native overfit",
+      "parameters": 4847144,
+      "updates": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          19.80275004717987,
+          85.65327525895555
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 103.25395156489685,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 103.25395156489685,
+      "native_compute_seconds_sum": 710.5307801259332,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.980994
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.998391
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.927689
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.998468
+        }
+      },
+      "clipped_steps": 138
+    },
+    {
+      "case": "no_norm",
+      "status": "sustained native overfit",
+      "parameters": 4841128,
+      "updates": 8000,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          4000,
+          6000
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          237.33000772848027,
+          333.5755673516542
+        ],
+        "confirmation_update": 8000,
+        "confirmation_train_seconds": 434.8188971193158,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 434.8188971193158,
+      "native_compute_seconds_sum": 2408.39286048105,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 0.944246,
+          "APH": 0.830212
+        },
+        "2": {
+          "AP": 0.959211,
+          "APH": 0.910012
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.90165
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.984013
+        }
+      },
+      "clipped_steps": 7978
+    },
+    {
+      "case": "foreground_prior",
+      "status": "sustained native overfit",
+      "parameters": 4847144,
+      "updates": 1000,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          500,
+          750
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          35.83718497265363,
+          53.79956354148453
+        ],
+        "confirmation_update": 1000,
+        "confirmation_train_seconds": 72.59372828627238,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 72.59372828627238,
+      "native_compute_seconds_sum": 458.45937962882454,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.998638
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.998884
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.927387
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.999439
+        }
+      },
+      "clipped_steps": 565
+    },
+    {
+      "case": "lr3e4",
+      "status": "sustained native overfit",
+      "parameters": 4847144,
+      "updates": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          21.70222347107483,
+          36.31316500820685
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 54.2528485035873,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 54.2528485035873,
+      "native_compute_seconds_sum": 443.50806311907945,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 0.936292,
+          "APH": 0.93417
+        },
+        "2": {
+          "AP": 0.991636,
+          "APH": 0.98972
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.926955
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.996813
+        }
+      },
+      "clipped_steps": 130
+    },
+    {
+      "case": "no_clip",
+      "status": "sustained native overfit",
+      "parameters": 4847144,
+      "updates": 4000,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          2000,
+          3000
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          138.25857130164513,
+          206.30417250061873
+        ],
+        "confirmation_update": 4000,
+        "confirmation_train_seconds": 273.8454443717492,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 273.8454443717492,
+      "native_compute_seconds_sum": 850.089563754038,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 0.998932,
+          "APH": 0.997886
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.997716
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.925742
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.999231
+        }
+      },
+      "clipped_steps": 0
+    },
+    {
+      "case": "class_balanced_focal",
+      "status": "sustained native overfit",
+      "parameters": 4847144,
+      "updates": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          20.34045762126334,
+          35.034784869872965
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 53.30203852476552,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 53.30203852476552,
+      "native_compute_seconds_sum": 310.63541228784015,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.999104
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.999041
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.92757
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.999186
+        }
+      },
+      "clipped_steps": 121
+    }
+  ],
+  "verified_stage_receipts": 771,
+  "unique_scientific_payload_bytes": 15651999905,
+  "all_cases_finished": true,
+  "scope": "training-only fixed-one-frame fitting; two consecutive native four-class APH >= .8; no heldout claim"
+}

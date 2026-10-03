@@ -1,0 +1,19 @@
+{
+  "reviewer": "/root/motion_geometry_review",
+  "original_verdict": "not ready: important NaN acceptance gap; no retention blocker",
+  "findings": [
+    {
+      "severity": "important",
+      "finding": "NaN observed/reference displacements accepted",
+      "resolution": "live RED six subtest failures; finite checks and two regression groups GREEN; main corruption suite28/28",
+      "evidence_sha256": "3783db1936e9889ae9697419c32ff60261fd760ba951519350bf04518e78f224"
+    },
+    {
+      "severity": "important after regrade",
+      "finding": "overclaimed horizon corruption coverage",
+      "resolution": "prose now names actual scenario-count/class/nonfinite faults; no horizon mutation claim"
+    }
+  ],
+  "retention_assessment": "220 evidence hashes and1396path/653550907byte exact release/publication union verified; no blocker",
+  "ready_after_fix": "all blocking findings resolved by witnessed live RED\u2192GREEN; scientific forecasting remains open"
+}

@@ -1,0 +1,64 @@
+{
+  "source": {
+    "request": "https://api.github.com/repos/waymo-research/waymo-open-dataset/contents/tutorial/womd_camera_codebook.npy?ref=99a4cb3ff07e2fe06c2ce73da001f850f628e45a",
+    "file": {
+      "name": "womd_camera_codebook.npy",
+      "path": "tutorial/womd_camera_codebook.npy",
+      "sha": "64c90db81db83813c03106a3824c10d2058135e0",
+      "size": 1048704,
+      "download_url": "https://raw.githubusercontent.com/waymo-research/waymo-open-dataset/99a4cb3ff07e2fe06c2ce73da001f850f628e45a/tutorial/womd_camera_codebook.npy"
+    }
+  },
+  "sha256": "7e40db84c7435a9c9dcb67e76acb76f165e5e307f306b8b25b837c0244669ccd",
+  "git_blob_sha1": "64c90db81db83813c03106a3824c10d2058135e0",
+  "local_source": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-codebook-pinned-v1/codebook.npy",
+  "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/datasets/waymo-motion/codebooks/7e40db84c7435a9c9dcb67e76acb76f165e5e307f306b8b25b837c0244669ccd/codebook.npy",
+  "hdfs_readback_exact": true,
+  "checks": [
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "layout-profile",
+        "--project",
+        "sureal",
+        "--json"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-codebook-pinned-v1/layout.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "--mkdir-parents",
+        "put",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-codebook-pinned-v1/codebook.npy",
+        "hdfs://harunava/user/tiger/waystone/sureal/datasets/waymo-motion/codebooks/7e40db84c7435a9c9dcb67e76acb76f165e5e307f306b8b25b837c0244669ccd/codebook.npy"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-codebook-pinned-v1/put.log"
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--auth-source",
+        "token-file",
+        "get",
+        "hdfs://harunava/user/tiger/waystone/sureal/datasets/waymo-motion/codebooks/7e40db84c7435a9c9dcb67e76acb76f165e5e307f306b8b25b837c0244669ccd/codebook.npy",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-codebook-pinned-v1/readback.npy"
+      ],
+      "exit_code": 0,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-codebook-pinned-v1/get.log"
+    }
+  ],
+  "scope": "pinned learned camera codebook only; live shape/index/feature correspondence validation pending"
+}

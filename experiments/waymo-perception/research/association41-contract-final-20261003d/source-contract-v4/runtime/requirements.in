@@ -1,0 +1,4 @@
+# Keep the baseline NumPy identity; resolve and freeze additive dependencies.
+numpy==2.5.3
+scipy
+pytest

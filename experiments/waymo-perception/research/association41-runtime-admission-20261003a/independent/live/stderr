@@ -1,0 +1,2 @@
+/tmp/audit/checker.py:26: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  assert im.size==(3,2) and list(im.getdata())==[(17,29,43)]*6

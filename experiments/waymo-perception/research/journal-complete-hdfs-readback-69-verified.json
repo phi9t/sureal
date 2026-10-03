@@ -1,0 +1,12 @@
+{
+  "journal_entries": 69,
+  "all_references_present_in_hdfs_manifest": true,
+  "all_downloaded_files_exact": true,
+  "files": 66,
+  "hdfs_prefix": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-a7f2586163ae4fa193ace81c19d20a1f",
+  "publication_receipt_sha256": "738cb7c52cec590d0dac61527a59a35ab1fff92c49115fd5ffe64e382dcc61c2",
+  "manifest_sha256": "fa77137d44049e95cc9ec4bde23c77adb0bd4bb6c97c554d853ddd034b041627",
+  "journal_sha256": "1d0c6e34711cf7eb104dfa7723642473f36ddd0021fa957efa784e0b04e9a995",
+  "scope": "complete69-entry evidence-indexed journal HDFS readback; no scientific or nativeGPU acceptance",
+  "publication_receipt_snapshot": "research/journal-evidence/738cb7c52cec590d0dac61527a59a35ab1fff92c49115fd5ffe64e382dcc61c2"
+}

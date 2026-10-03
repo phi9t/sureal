@@ -1,0 +1,12 @@
+{
+  "point_grid_scenes": 103,
+  "totals": {
+    "records": 203850,
+    "points": 3513295187,
+    "eligible_semantic_points": 478579462
+  },
+  "point_progress_sha256": "de4d5cff98164f4c2ca4e3fbd9e43d0736d23367751e86e8eb1c4fe9b2d66a33",
+  "native_box_target_scenes": 13,
+  "box_progress_sha256": "cf9ba8481b1657640bc84f5ab493c30fd15b02db54f26e08e22908afa3a6c918",
+  "scope": "host rehash of complete individually independent live admissions; selected-point caches and scientific protocol/model results remain separate"
+}

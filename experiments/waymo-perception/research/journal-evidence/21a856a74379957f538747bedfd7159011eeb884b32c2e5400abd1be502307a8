@@ -1,0 +1,156 @@
+{
+  "command": [
+    "bwrap",
+    "--unshare-all",
+    "--die-with-parent",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+    "/",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-real-metric-check-v1/code",
+    "/experiment",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-real-metric-check-v1/inputs",
+    "/source",
+    "--bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-real-metric-check-v1/output",
+    "/outputs",
+    "--proc",
+    "/proc",
+    "--dev",
+    "/dev",
+    "--tmpfs",
+    "/tmp",
+    "--clearenv",
+    "--setenv",
+    "HOME",
+    "/tmp/private-home",
+    "--setenv",
+    "PATH",
+    "/usr/local/bin:/usr/bin:/bin",
+    "--setenv",
+    "PYTHONNOUSERSITE",
+    "1",
+    "--setenv",
+    "PYTHONDONTWRITEBYTECODE",
+    "1",
+    "--setenv",
+    "PYTHONPATH",
+    "/experiment",
+    "--chdir",
+    "/experiment",
+    "--",
+    "python",
+    "/experiment/check.py"
+  ],
+  "exit_code": 0,
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "pins": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-real-metric-check-v1/code/check.py": "284efa22ffa9bfdd9c0bd79950f20d8b0056d2d7fa2627c960731be01ce0296d",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-real-metric-check-v1/inputs/validation/expected-2.tsv": "b846b8b4cc84fa778d4b317f41be77a5850c9849a89cd9f532969e69d2ed812a",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-real-metric-check-v1/inputs/validation/score-0.json": "f1674269a100f7972798ef16cd2deaf85577b8a54176ed01c77cf07cff87cf34",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-real-metric-check-v1/inputs/validation/score-2.json": "c0b94fe1bba71eb243b4505034a857f11cb2aa0f9de516426399fdf1b76764dd",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-real-metric-check-v1/inputs/validation/expected-0.tsv": "69d0a112e8ff025ddb6a27efee89fdd0afeea8da45b1e278ea654ee70b2153fa",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-real-metric-check-v1/inputs/training/expected-2.tsv": "cf8566b47cc7598d8dd57635f929e6a0bd88f5e447d23af53fbb4125559433c4",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-real-metric-check-v1/inputs/training/score-0.json": "6b0e0291133b416c12615b346ea2ef3bb806b159cc3609407d28eb0b3a848f8b",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-real-metric-check-v1/inputs/training/score-2.json": "c702b2e69acbe7ca0e93a2b44aa3c58adf499ab02c6f27d77bc29699fb15b9f2",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-real-metric-check-v1/inputs/training/expected-0.tsv": "2dc61c1a7a0acefe9829efde45e6ebfce28badb95fd7c2a3432e46e52dff9700"
+  },
+  "parent_receipt_hashes": {
+    "motion-real-metric-execution.json": "948e650ccd1f036a0464572fcc3bb9daf1c664796a15d87eece996faa9640dfd",
+    "motion-real-metric-reference-execution.json": "224b910b485f697b87f31913b211dde8f5be8ea3737240697d29b9ce1838f538"
+  },
+  "validation": {
+    "comparisons": [
+      {
+        "split": "training",
+        "oracle_offset_meters": 0,
+        "classes": [
+          {
+            "object_type": 1,
+            "ADE_measurements": 1,
+            "FDE_measurements": 1,
+            "missing_endpoint_measurements": 0,
+            "minADE": 0.0,
+            "minFDE": 0.0
+          },
+          {
+            "object_type": 2,
+            "ADE_measurements": 1,
+            "FDE_measurements": 1,
+            "missing_endpoint_measurements": 0,
+            "minADE": 0.0,
+            "minFDE": 0.0
+          }
+        ]
+      },
+      {
+        "split": "training",
+        "oracle_offset_meters": 2,
+        "classes": [
+          {
+            "object_type": 1,
+            "ADE_measurements": 1,
+            "FDE_measurements": 1,
+            "missing_endpoint_measurements": 0,
+            "minADE": 2.0,
+            "minFDE": 2.0
+          },
+          {
+            "object_type": 2,
+            "ADE_measurements": 1,
+            "FDE_measurements": 1,
+            "missing_endpoint_measurements": 0,
+            "minADE": 2.0,
+            "minFDE": 2.0
+          }
+        ]
+      },
+      {
+        "split": "validation",
+        "oracle_offset_meters": 0,
+        "classes": [
+          {
+            "object_type": 1,
+            "ADE_measurements": 8,
+            "FDE_measurements": 6,
+            "missing_endpoint_measurements": 2,
+            "minADE": 0.0,
+            "minFDE": 0.0
+          }
+        ]
+      },
+      {
+        "split": "validation",
+        "oracle_offset_meters": 2,
+        "classes": [
+          {
+            "object_type": 1,
+            "ADE_measurements": 8,
+            "FDE_measurements": 6,
+            "missing_endpoint_measurements": 2,
+            "minADE": 2.0,
+            "minFDE": 2.0
+          }
+        ]
+      }
+    ],
+    "count_or_displacement_corruptions_refused": 8,
+    "float_displacement_tolerance_meters": 0.001,
+    "elapsed_seconds": 0.0006895450060255826,
+    "peak_rss_kib": 11320,
+    "scope": "oracle native metric handoff parity only; missing futures are not perfect predictions; no forecasting quality"
+  },
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-real-metric-check-v1/output/live.log": "86ee0132cd13d1719db7ca451f037239378f4815b6f51f8f22418457d1e9c8ee",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/motion-real-metric-check-v1/output/check.json": "bce15397a9cfd9e903312a05431e79cdf3d53014db782860227f60df2686e6d2"
+  },
+  "scope": "independently live-reconciled native acquired training/validation target metric handoff; oracle diagnostics only, not a forecasting baseline"
+}

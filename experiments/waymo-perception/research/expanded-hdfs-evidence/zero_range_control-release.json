@@ -1,0 +1,992 @@
+{
+  "publication_receipt_sha256": "bd36b1b7c9acb73f7b0bc20e62edbe68762c54b7365dd8b73ebb4cdc42ca1d80",
+  "released": [
+    {
+      "bytes": 120144,
+      "path": "check.json",
+      "sha256": "dbae019a840998410e4dbf19715a38c413a0fe2300fa3a1fe25b086e8bd75653",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/b84a01225de5d163377132c8ee374e17d904b89b1cdf1e3d361ace38650ebcfc/archive.tar.gz"
+    },
+    {
+      "bytes": 25013397,
+      "path": "checkpoint-0000/heads-00.npz",
+      "sha256": "4b2eda89fe784dd5f065820be90e566f5a06156ade2fbe3af2187e9a087b831c",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/checkpoint-0000/heads-00.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/b84a01225de5d163377132c8ee374e17d904b89b1cdf1e3d361ace38650ebcfc/archive.tar.gz"
+    },
+    {
+      "bytes": 24030859,
+      "path": "checkpoint-0750/heads-00.npz",
+      "sha256": "360f669c03953bd2cd36b94a8491848fd8718d8486af88e948a24ed24d3d5a7f",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/checkpoint-0750/heads-00.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/b84a01225de5d163377132c8ee374e17d904b89b1cdf1e3d361ace38650ebcfc/archive.tar.gz"
+    },
+    {
+      "bytes": 64027867,
+      "path": "checkpoint.pt",
+      "sha256": "8357ade70a3f98337c60ad678f4421a4fca42bd420ac9139e790ae4068edc405",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/checkpoint.pt",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 159,
+      "path": "live.log",
+      "sha256": "45b33ade9515c9c75f04ccb780b0ae3c55b2b96a1263cc3646c8e1995c712eb5",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 4519,
+      "path": "scoring/0/expected.json",
+      "sha256": "d70a58e775584cf9566ed852c2da7d1a368680c6bf03838dca8f6e73ac0fd706",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/0/expected.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 239,
+      "path": "scoring/0/metric-audit/check.json",
+      "sha256": "e6169ef7c23d9a4914604ab3723ea302cd03ba6b057439d19d6c60bffe863155",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/0/metric-audit/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 63,
+      "path": "scoring/0/metric-audit/live.log",
+      "sha256": "06eae2e249e30fbb9526227f96010c7ab2fb0ccb64183dab5ad21f8dba7f635b",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/0/metric-audit/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 1731,
+      "path": "scoring/0/metric-audit/metrics.stdout",
+      "sha256": "0a1afcca01b227655873ebf4e3245c57646bf4ac092c3d9d255f2370a551cd7c",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/0/metric-audit/metrics.stdout",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 28740,
+      "path": "scoring/0/prepared/groundtruth.json",
+      "sha256": "e032fa1c22180fbe9e2b50632b873dc4f2c6ffabbfb4df900bdf934152540f0f",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/0/prepared/groundtruth.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 94,
+      "path": "scoring/0/prepared/live.log",
+      "sha256": "07242d04c61e7106b4362b7a9cff398a13ac525f93e09e89a08f772acbb3c1d9",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/0/prepared/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 206332,
+      "path": "scoring/0/prepared/predictions.json",
+      "sha256": "68162ad3b508608bc746006e73c507857cdff089f41b7bcdd546bd11e1ad4170",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/0/prepared/predictions.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 402,
+      "path": "scoring/0/prepared/preparation.json",
+      "sha256": "515c4847f868171ad1638d801c17557c5606a90d26aa14beedc0ca7d05f794cb",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/0/prepared/preparation.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 273,
+      "path": "scoring/0/proposal-audit/check.json",
+      "sha256": "986b0887f019112e8269bef04405769028bc27cb59972ed3f54bcc84294e9205",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/0/proposal-audit/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 88,
+      "path": "scoring/0/proposal-audit/live.log",
+      "sha256": "ae34aedda40b981ea3a3a42678cf131c94a96f5affc590ea89d7f9fb1c1ece00",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/0/proposal-audit/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 5274,
+      "path": "scoring/0/score-receipt.json",
+      "sha256": "3a4d022c657436d3c2eb99223259601f8591887cc9c07d0c710ccd5b7b01ed0f",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/0/score-receipt.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 1941,
+      "path": "scoring/0/scored/check.json",
+      "sha256": "27d1e042591d3e1b06ab151e94910e6e57489e9ee66160c4993cfcd2685800e6",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/0/scored/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 11270,
+      "path": "scoring/0/scored/groundtruth.bin",
+      "sha256": "43c8de7766c51d4d0ee3574a1b3c455de03b092bc2ec349ea418987377b6d2b3",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/0/scored/groundtruth.bin",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 52,
+      "path": "scoring/0/scored/live.log",
+      "sha256": "75b99195547dd11fe84e09408b17e025344aefdd949ffa45eb2dfa1811bed087",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/0/scored/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 2007,
+      "path": "scoring/0/scored/metrics.stderr",
+      "sha256": "5b104258ae573fc824d5f3a0aa742ad3c05b357be27f656b6ec43487f31fb4cb",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/0/scored/metrics.stderr",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 1731,
+      "path": "scoring/0/scored/metrics.stdout",
+      "sha256": "0a1afcca01b227655873ebf4e3245c57646bf4ac092c3d9d255f2370a551cd7c",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/0/scored/metrics.stdout",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 78034,
+      "path": "scoring/0/scored/predictions.bin",
+      "sha256": "b8ba26418ed635682a9ec4acaadddbda008b0136a25077af2462996d7921531d",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/0/scored/predictions.bin",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 4582,
+      "path": "scoring/100/expected.json",
+      "sha256": "52e894119767aafe9b45d41604a50fdc93c3f501c5080b5ded48f85ab6472d7d",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/100/expected.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 247,
+      "path": "scoring/100/metric-audit/check.json",
+      "sha256": "d7ace8548b47dce50474a90b1b21f892cd17d0c23222007e3d27244f45a1854a",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/100/metric-audit/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 71,
+      "path": "scoring/100/metric-audit/live.log",
+      "sha256": "0258e05f7b26922f069f9f6091fc17a8dfe626eebe71b1cb3d6c42de30ebc5b4",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/100/metric-audit/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 1831,
+      "path": "scoring/100/metric-audit/metrics.stdout",
+      "sha256": "57235f3393364cb5493d6127fc75328115aef97bf5c288c337b4a3c76d2178df",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/100/metric-audit/metrics.stdout",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 28740,
+      "path": "scoring/100/prepared/groundtruth.json",
+      "sha256": "e032fa1c22180fbe9e2b50632b873dc4f2c6ffabbfb4df900bdf934152540f0f",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/100/prepared/groundtruth.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 94,
+      "path": "scoring/100/prepared/live.log",
+      "sha256": "07242d04c61e7106b4362b7a9cff398a13ac525f93e09e89a08f772acbb3c1d9",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/100/prepared/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 205924,
+      "path": "scoring/100/prepared/predictions.json",
+      "sha256": "c38cd276016dec5b79e7142b46f311246d6cd5f315970e89cacc2ef85871a81c",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/100/prepared/predictions.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 402,
+      "path": "scoring/100/prepared/preparation.json",
+      "sha256": "66eaa5c21050af070e2bc8b2b6fe44866d1b93eaf978885176413a5fca5c23a4",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/100/prepared/preparation.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 273,
+      "path": "scoring/100/proposal-audit/check.json",
+      "sha256": "986b0887f019112e8269bef04405769028bc27cb59972ed3f54bcc84294e9205",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/100/proposal-audit/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 88,
+      "path": "scoring/100/proposal-audit/live.log",
+      "sha256": "ae34aedda40b981ea3a3a42678cf131c94a96f5affc590ea89d7f9fb1c1ece00",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/100/proposal-audit/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 5337,
+      "path": "scoring/100/score-receipt.json",
+      "sha256": "d719ac0903d4ae7f248602cbaf491ac316ef6ac0d86d18f22f4f08d0e2a01501",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/100/score-receipt.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 1984,
+      "path": "scoring/100/scored/check.json",
+      "sha256": "02ca86d2252549cecd65c99353f3135734b6b5d88258ebaaa6528205b9a88369",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/100/scored/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 11270,
+      "path": "scoring/100/scored/groundtruth.bin",
+      "sha256": "43c8de7766c51d4d0ee3574a1b3c455de03b092bc2ec349ea418987377b6d2b3",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/100/scored/groundtruth.bin",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 60,
+      "path": "scoring/100/scored/live.log",
+      "sha256": "8c005175776375d33cb6f20e7ffd1e6475216582082ce366ee9d6f037910d716",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/100/scored/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 0,
+      "path": "scoring/100/scored/metrics.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/100/scored/metrics.stderr",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 1831,
+      "path": "scoring/100/scored/metrics.stdout",
+      "sha256": "57235f3393364cb5493d6127fc75328115aef97bf5c288c337b4a3c76d2178df",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/100/scored/metrics.stdout",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 78098,
+      "path": "scoring/100/scored/predictions.bin",
+      "sha256": "2022763fc402914645698c0d3eebcaaad973445e21ecad7228d1d360aab53fa9",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/100/scored/predictions.bin",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 4611,
+      "path": "scoring/200/expected.json",
+      "sha256": "3dc95f7bb5ae710e5de509bb2f647ab2b5bbe6e0818a67b39409615fa6200397",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/200/expected.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 246,
+      "path": "scoring/200/metric-audit/check.json",
+      "sha256": "29c10b63dd87e13937baa99aac0d865f177a02b7d85995d08747dd6d0c01741c",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/200/metric-audit/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 70,
+      "path": "scoring/200/metric-audit/live.log",
+      "sha256": "bcffe1ef535aedcea689a5fb1633bda5901b7593b1dd15e9bcf78b5f00e89d74",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/200/metric-audit/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 1899,
+      "path": "scoring/200/metric-audit/metrics.stdout",
+      "sha256": "f040a8723f90802ad9725a43d9bac7f3c3eead4ec88cbdead2d5383ee6eacb82",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/200/metric-audit/metrics.stdout",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 28740,
+      "path": "scoring/200/prepared/groundtruth.json",
+      "sha256": "e032fa1c22180fbe9e2b50632b873dc4f2c6ffabbfb4df900bdf934152540f0f",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/200/prepared/groundtruth.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 94,
+      "path": "scoring/200/prepared/live.log",
+      "sha256": "07242d04c61e7106b4362b7a9cff398a13ac525f93e09e89a08f772acbb3c1d9",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/200/prepared/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 206046,
+      "path": "scoring/200/prepared/predictions.json",
+      "sha256": "404023c73dfc451414b021ad210c3a4a9c2416cae42686fe4ca74f2c758d32d1",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/200/prepared/predictions.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 402,
+      "path": "scoring/200/prepared/preparation.json",
+      "sha256": "024ba2618b91702a62d81a377f5ecbadd8824b0835a48b65f0a3baf34bbef05a",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/200/prepared/preparation.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 273,
+      "path": "scoring/200/proposal-audit/check.json",
+      "sha256": "986b0887f019112e8269bef04405769028bc27cb59972ed3f54bcc84294e9205",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/200/proposal-audit/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 88,
+      "path": "scoring/200/proposal-audit/live.log",
+      "sha256": "ae34aedda40b981ea3a3a42678cf131c94a96f5affc590ea89d7f9fb1c1ece00",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/200/proposal-audit/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 5366,
+      "path": "scoring/200/score-receipt.json",
+      "sha256": "23b2c43d7f83cfc3acbefc148c82ef172a8b45dce32336c795f2c5d13695896e",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/200/score-receipt.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 2013,
+      "path": "scoring/200/scored/check.json",
+      "sha256": "6f5f4eba4558f53d7437247ad838912fbe64295088ccd5ae49209cf7f66667ab",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/200/scored/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 11270,
+      "path": "scoring/200/scored/groundtruth.bin",
+      "sha256": "43c8de7766c51d4d0ee3574a1b3c455de03b092bc2ec349ea418987377b6d2b3",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/200/scored/groundtruth.bin",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 59,
+      "path": "scoring/200/scored/live.log",
+      "sha256": "165cc3449d1c3d1b620d9439ec9ce6f6edc638452c3e96413f62471c6ed827ae",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/200/scored/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 0,
+      "path": "scoring/200/scored/metrics.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/200/scored/metrics.stderr",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 1899,
+      "path": "scoring/200/scored/metrics.stdout",
+      "sha256": "f040a8723f90802ad9725a43d9bac7f3c3eead4ec88cbdead2d5383ee6eacb82",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/200/scored/metrics.stdout",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 78111,
+      "path": "scoring/200/scored/predictions.bin",
+      "sha256": "36b1aa506b2d3eca3d731245084c3ebb2536e188444491f12c60535ad617b839",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/200/scored/predictions.bin",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 4531,
+      "path": "scoring/25/expected.json",
+      "sha256": "633af2f77d84d253a4ae20ca11c43182eb1789e5022004510a047bcf2d6c8e39",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/25/expected.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 239,
+      "path": "scoring/25/metric-audit/check.json",
+      "sha256": "e6169ef7c23d9a4914604ab3723ea302cd03ba6b057439d19d6c60bffe863155",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/25/metric-audit/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 63,
+      "path": "scoring/25/metric-audit/live.log",
+      "sha256": "06eae2e249e30fbb9526227f96010c7ab2fb0ccb64183dab5ad21f8dba7f635b",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/25/metric-audit/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 1731,
+      "path": "scoring/25/metric-audit/metrics.stdout",
+      "sha256": "0a1afcca01b227655873ebf4e3245c57646bf4ac092c3d9d255f2370a551cd7c",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/25/metric-audit/metrics.stdout",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 28740,
+      "path": "scoring/25/prepared/groundtruth.json",
+      "sha256": "e032fa1c22180fbe9e2b50632b873dc4f2c6ffabbfb4df900bdf934152540f0f",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/25/prepared/groundtruth.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 94,
+      "path": "scoring/25/prepared/live.log",
+      "sha256": "07242d04c61e7106b4362b7a9cff398a13ac525f93e09e89a08f772acbb3c1d9",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/25/prepared/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 205585,
+      "path": "scoring/25/prepared/predictions.json",
+      "sha256": "296ae2f818d3d3b1518def685766600b7bfebb78ac7551566a50a66ce4502720",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/25/prepared/predictions.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 402,
+      "path": "scoring/25/prepared/preparation.json",
+      "sha256": "f2531effc98b449634636e874f1b2d5206986a9674fb7bae87a84173faf5890a",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/25/prepared/preparation.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 273,
+      "path": "scoring/25/proposal-audit/check.json",
+      "sha256": "986b0887f019112e8269bef04405769028bc27cb59972ed3f54bcc84294e9205",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/25/proposal-audit/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 88,
+      "path": "scoring/25/proposal-audit/live.log",
+      "sha256": "ae34aedda40b981ea3a3a42678cf131c94a96f5affc590ea89d7f9fb1c1ece00",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/25/proposal-audit/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 5286,
+      "path": "scoring/25/score-receipt.json",
+      "sha256": "98a4b180c78ab792a74f5dcb44363fb9ea16d69d75aa794c5d167bbfe436c68b",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/25/score-receipt.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 1943,
+      "path": "scoring/25/scored/check.json",
+      "sha256": "4022c6f934f249f67a0b4e3cc55beb212046cc670f966934e11365ac314cbfb5",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/25/scored/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 11270,
+      "path": "scoring/25/scored/groundtruth.bin",
+      "sha256": "43c8de7766c51d4d0ee3574a1b3c455de03b092bc2ec349ea418987377b6d2b3",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/25/scored/groundtruth.bin",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 52,
+      "path": "scoring/25/scored/live.log",
+      "sha256": "75b99195547dd11fe84e09408b17e025344aefdd949ffa45eb2dfa1811bed087",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/25/scored/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 551,
+      "path": "scoring/25/scored/metrics.stderr",
+      "sha256": "fa48c97cbd9f74f1506e4a6dcaa60d389a4265dc8d5d416151301eb788b4cb89",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/25/scored/metrics.stderr",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 1731,
+      "path": "scoring/25/scored/metrics.stdout",
+      "sha256": "0a1afcca01b227655873ebf4e3245c57646bf4ac092c3d9d255f2370a551cd7c",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/25/scored/metrics.stdout",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 78038,
+      "path": "scoring/25/scored/predictions.bin",
+      "sha256": "d13cf61ca4769e951c03f49ef78ba4cf6b2c09ad373a1a5dcd89e451ce6cfaa4",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/25/scored/predictions.bin",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 4633,
+      "path": "scoring/300/expected.json",
+      "sha256": "775577a25ca6766d904ed106af4b4b8a2aecf51ef205074195428e5a943858dc",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/300/expected.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 244,
+      "path": "scoring/300/metric-audit/check.json",
+      "sha256": "30fd0f62dc30caba8de4df89680723d4c9045c2cecf722fc4b533e0b4bf94567",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/300/metric-audit/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 68,
+      "path": "scoring/300/metric-audit/live.log",
+      "sha256": "70480ca2de3b99c49ab37298eb6f04156059c0e52478ca0f98e46368ee00134d",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/300/metric-audit/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 2013,
+      "path": "scoring/300/metric-audit/metrics.stdout",
+      "sha256": "87b1cdf2c3656188689d3d420a7df9d9d8b4583dd3527fa8a72b989a61dab823",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/300/metric-audit/metrics.stdout",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 28740,
+      "path": "scoring/300/prepared/groundtruth.json",
+      "sha256": "e032fa1c22180fbe9e2b50632b873dc4f2c6ffabbfb4df900bdf934152540f0f",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/300/prepared/groundtruth.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 94,
+      "path": "scoring/300/prepared/live.log",
+      "sha256": "07242d04c61e7106b4362b7a9cff398a13ac525f93e09e89a08f772acbb3c1d9",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/300/prepared/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 205996,
+      "path": "scoring/300/prepared/predictions.json",
+      "sha256": "68a1feebdca7a4f7fe52548b96fe7c0b5f34d966ef4063b0649b5599afb2e7c8",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/300/prepared/predictions.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 401,
+      "path": "scoring/300/prepared/preparation.json",
+      "sha256": "86a7785d8fd02ecfa90097b4bdcce667c673b49541baff87f195fa25b7bb5f0a",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/300/prepared/preparation.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 273,
+      "path": "scoring/300/proposal-audit/check.json",
+      "sha256": "986b0887f019112e8269bef04405769028bc27cb59972ed3f54bcc84294e9205",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/300/proposal-audit/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 88,
+      "path": "scoring/300/proposal-audit/live.log",
+      "sha256": "ae34aedda40b981ea3a3a42678cf131c94a96f5affc590ea89d7f9fb1c1ece00",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/300/proposal-audit/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 5388,
+      "path": "scoring/300/score-receipt.json",
+      "sha256": "cc2d64382ac0b5fae4ba0cfbd061a90f389c8a862dcc2c13cfe8821c95a3b75d",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/300/score-receipt.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 2035,
+      "path": "scoring/300/scored/check.json",
+      "sha256": "d96cf771df34708d1622c668ed48f062b80e93515aea082b50363e19fdfe60b4",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/300/scored/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 11270,
+      "path": "scoring/300/scored/groundtruth.bin",
+      "sha256": "43c8de7766c51d4d0ee3574a1b3c455de03b092bc2ec349ea418987377b6d2b3",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/300/scored/groundtruth.bin",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 57,
+      "path": "scoring/300/scored/live.log",
+      "sha256": "a48cd4b1ce2724d7cdf75422e6fe437aabc9eeae19e25f81ad02a7f9cbccb163",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/300/scored/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 0,
+      "path": "scoring/300/scored/metrics.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/300/scored/metrics.stderr",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 2013,
+      "path": "scoring/300/scored/metrics.stdout",
+      "sha256": "87b1cdf2c3656188689d3d420a7df9d9d8b4583dd3527fa8a72b989a61dab823",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/300/scored/metrics.stdout",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 78109,
+      "path": "scoring/300/scored/predictions.bin",
+      "sha256": "00359e5f9900ebb14d06b0119d765421c6c704d20ef13646e7b099f915890e02",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/300/scored/predictions.bin",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 4529,
+      "path": "scoring/50/expected.json",
+      "sha256": "0508cece03bba95f49c8a0e45edff27d9921bf69d29052517b83b37c2d6c41a8",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/50/expected.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 239,
+      "path": "scoring/50/metric-audit/check.json",
+      "sha256": "e6169ef7c23d9a4914604ab3723ea302cd03ba6b057439d19d6c60bffe863155",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/50/metric-audit/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 63,
+      "path": "scoring/50/metric-audit/live.log",
+      "sha256": "06eae2e249e30fbb9526227f96010c7ab2fb0ccb64183dab5ad21f8dba7f635b",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/50/metric-audit/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 1731,
+      "path": "scoring/50/metric-audit/metrics.stdout",
+      "sha256": "0a1afcca01b227655873ebf4e3245c57646bf4ac092c3d9d255f2370a551cd7c",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/50/metric-audit/metrics.stdout",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 28740,
+      "path": "scoring/50/prepared/groundtruth.json",
+      "sha256": "e032fa1c22180fbe9e2b50632b873dc4f2c6ffabbfb4df900bdf934152540f0f",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/50/prepared/groundtruth.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 94,
+      "path": "scoring/50/prepared/live.log",
+      "sha256": "07242d04c61e7106b4362b7a9cff398a13ac525f93e09e89a08f772acbb3c1d9",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/50/prepared/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 205429,
+      "path": "scoring/50/prepared/predictions.json",
+      "sha256": "ff61fc8265ff2cf8078f4ff2e919a32e5b6c77573ee81fc0e94437f700230e08",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/50/prepared/predictions.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 401,
+      "path": "scoring/50/prepared/preparation.json",
+      "sha256": "9f9ffd533658c81f9b7269d0ee60cd06aed6fb88dbeffd3aa1ad8b51f6a62eea",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/50/prepared/preparation.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 273,
+      "path": "scoring/50/proposal-audit/check.json",
+      "sha256": "986b0887f019112e8269bef04405769028bc27cb59972ed3f54bcc84294e9205",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/50/proposal-audit/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 88,
+      "path": "scoring/50/proposal-audit/live.log",
+      "sha256": "ae34aedda40b981ea3a3a42678cf131c94a96f5affc590ea89d7f9fb1c1ece00",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/50/proposal-audit/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 5284,
+      "path": "scoring/50/score-receipt.json",
+      "sha256": "d2f6c6464a5ba095998e68d10c1395826035dba1f0e72aa4c6477a36f2b28d32",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/50/score-receipt.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 1941,
+      "path": "scoring/50/scored/check.json",
+      "sha256": "cffa84536b290892c5036759b1948aedc3e1b96ada5d16dd5528b0aa61ed9ad1",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/50/scored/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 11270,
+      "path": "scoring/50/scored/groundtruth.bin",
+      "sha256": "43c8de7766c51d4d0ee3574a1b3c455de03b092bc2ec349ea418987377b6d2b3",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/50/scored/groundtruth.bin",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 52,
+      "path": "scoring/50/scored/live.log",
+      "sha256": "75b99195547dd11fe84e09408b17e025344aefdd949ffa45eb2dfa1811bed087",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/50/scored/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 0,
+      "path": "scoring/50/scored/metrics.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/50/scored/metrics.stderr",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 1731,
+      "path": "scoring/50/scored/metrics.stdout",
+      "sha256": "0a1afcca01b227655873ebf4e3245c57646bf4ac092c3d9d255f2370a551cd7c",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/50/scored/metrics.stdout",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 78007,
+      "path": "scoring/50/scored/predictions.bin",
+      "sha256": "4275a27f743cdc2e1b916dd72ec3d4e7b16f93ef213ee3b2167e4e7226eff774",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/50/scored/predictions.bin",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 4654,
+      "path": "scoring/500/expected.json",
+      "sha256": "db39c0d820c69e160b07f57a91baff8709f1df10f1808ccc5cb0437d04d39b1f",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/500/expected.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 245,
+      "path": "scoring/500/metric-audit/check.json",
+      "sha256": "655f3f8ab634c01c8049cc03f6d3a231ed7402c05920e10141e78e2834914572",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/500/metric-audit/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 70,
+      "path": "scoring/500/metric-audit/live.log",
+      "sha256": "3a580145704767e8bbda05c9ae9c0f9797844330a33e41fca39a52536e3cd981",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/500/metric-audit/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 1979,
+      "path": "scoring/500/metric-audit/metrics.stdout",
+      "sha256": "6f6ff6307e72ae0dd2d7916f939f2e5817d9936210c8d3b4f79e2cd334897441",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/500/metric-audit/metrics.stdout",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 28740,
+      "path": "scoring/500/prepared/groundtruth.json",
+      "sha256": "e032fa1c22180fbe9e2b50632b873dc4f2c6ffabbfb4df900bdf934152540f0f",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/500/prepared/groundtruth.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 94,
+      "path": "scoring/500/prepared/live.log",
+      "sha256": "07242d04c61e7106b4362b7a9cff398a13ac525f93e09e89a08f772acbb3c1d9",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/500/prepared/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 205939,
+      "path": "scoring/500/prepared/predictions.json",
+      "sha256": "1a78723416496afdfe27113de763086ef6e55ede4e4306419996cd39f790726c",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/500/prepared/predictions.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 402,
+      "path": "scoring/500/prepared/preparation.json",
+      "sha256": "c49d112d7517c13c8388f0a353cc5bdbe5d2b0cfc7a705e0ce4744ae45f3ddc3",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/500/prepared/preparation.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 273,
+      "path": "scoring/500/proposal-audit/check.json",
+      "sha256": "986b0887f019112e8269bef04405769028bc27cb59972ed3f54bcc84294e9205",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/500/proposal-audit/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 88,
+      "path": "scoring/500/proposal-audit/live.log",
+      "sha256": "ae34aedda40b981ea3a3a42678cf131c94a96f5affc590ea89d7f9fb1c1ece00",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/500/proposal-audit/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 5409,
+      "path": "scoring/500/score-receipt.json",
+      "sha256": "1b3b2ad6820bd20dfc7c83a2f9e5cd21df69aa93b53af834e34545eed2df5d20",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/500/score-receipt.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 2056,
+      "path": "scoring/500/scored/check.json",
+      "sha256": "2077ec6f2ce106fd4075f65c6fda21ecfe4221cc6841e78dc42e84f9dc4e5819",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/500/scored/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 11270,
+      "path": "scoring/500/scored/groundtruth.bin",
+      "sha256": "43c8de7766c51d4d0ee3574a1b3c455de03b092bc2ec349ea418987377b6d2b3",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/500/scored/groundtruth.bin",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 58,
+      "path": "scoring/500/scored/live.log",
+      "sha256": "2c89d75853a73a648061e0fe39a9565a38b1f76386f397d6d955f24f506c2583",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/500/scored/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 0,
+      "path": "scoring/500/scored/metrics.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/500/scored/metrics.stderr",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 1979,
+      "path": "scoring/500/scored/metrics.stdout",
+      "sha256": "6f6ff6307e72ae0dd2d7916f939f2e5817d9936210c8d3b4f79e2cd334897441",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/500/scored/metrics.stdout",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 78088,
+      "path": "scoring/500/scored/predictions.bin",
+      "sha256": "62edaddd3196dd8e3e253f33abe60744330d13d66d3c6a702fe6759cf1df4bf4",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/500/scored/predictions.bin",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 4636,
+      "path": "scoring/750/expected.json",
+      "sha256": "a455b78dbdf96ae48885ec06426c0420fe6a297a06e1b0cff8927ff4e98a007a",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/750/expected.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 244,
+      "path": "scoring/750/metric-audit/check.json",
+      "sha256": "fd345b5f7c0fa7b98a035a9422c5ee1f861562189070a299a626488daf2f4c90",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/750/metric-audit/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 69,
+      "path": "scoring/750/metric-audit/live.log",
+      "sha256": "4f43851b77b12c8909fddb24ac2e8e73d9829a869d528fd2f474cbc9ec0cd4f9",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/750/metric-audit/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 1963,
+      "path": "scoring/750/metric-audit/metrics.stdout",
+      "sha256": "cf02b847b35c71220d4160ce0fcc8d43e51ce2228dd07b4150eca5d6636b44d2",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/750/metric-audit/metrics.stdout",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 28740,
+      "path": "scoring/750/prepared/groundtruth.json",
+      "sha256": "e032fa1c22180fbe9e2b50632b873dc4f2c6ffabbfb4df900bdf934152540f0f",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/750/prepared/groundtruth.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 94,
+      "path": "scoring/750/prepared/live.log",
+      "sha256": "07242d04c61e7106b4362b7a9cff398a13ac525f93e09e89a08f772acbb3c1d9",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/750/prepared/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 205935,
+      "path": "scoring/750/prepared/predictions.json",
+      "sha256": "b88ebab954f7fc9832115803c90bd515bd519c7bdc41f02e114c279a80f80e04",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/750/prepared/predictions.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 402,
+      "path": "scoring/750/prepared/preparation.json",
+      "sha256": "5d6b39e8384741f13174e7ef67ef236d332b6cc3d9a8e19974b03a66daab128d",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/750/prepared/preparation.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 273,
+      "path": "scoring/750/proposal-audit/check.json",
+      "sha256": "986b0887f019112e8269bef04405769028bc27cb59972ed3f54bcc84294e9205",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/750/proposal-audit/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 88,
+      "path": "scoring/750/proposal-audit/live.log",
+      "sha256": "ae34aedda40b981ea3a3a42678cf131c94a96f5affc590ea89d7f9fb1c1ece00",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/750/proposal-audit/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 5391,
+      "path": "scoring/750/score-receipt.json",
+      "sha256": "6fbf271547a8b9d22aabffcb9dd97a0f70beb6a44ac39d176ff115bd02a7858b",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/750/score-receipt.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 2038,
+      "path": "scoring/750/scored/check.json",
+      "sha256": "88f9754dd8252d570f941e04726c12640b9ed4e29187106299aa5f59132f76f2",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/750/scored/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 11270,
+      "path": "scoring/750/scored/groundtruth.bin",
+      "sha256": "43c8de7766c51d4d0ee3574a1b3c455de03b092bc2ec349ea418987377b6d2b3",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/750/scored/groundtruth.bin",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 57,
+      "path": "scoring/750/scored/live.log",
+      "sha256": "52edb164c2cc37a6b9673990c7cb8cf943fe2217d086cb2a7600b1855e513c6f",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/750/scored/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 0,
+      "path": "scoring/750/scored/metrics.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/750/scored/metrics.stderr",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 1963,
+      "path": "scoring/750/scored/metrics.stdout",
+      "sha256": "cf02b847b35c71220d4160ce0fcc8d43e51ce2228dd07b4150eca5d6636b44d2",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/750/scored/metrics.stdout",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    },
+    {
+      "bytes": 78086,
+      "path": "scoring/750/scored/predictions.bin",
+      "sha256": "19e21c6d4b9b4916b45dd7d40e79a55dc45c7148ebd6e2fb8812e368ef62a834",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/advanced-expanded20261002a-zero_range_control/scoring/750/scored/predictions.bin",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit/advanced-expanded20261002a-zero_range_control-fbc10623b2ab472b8c67163f7848c16d/c3c508fbd76789df0d096f6f6f031e39d8855e4de55001275c3fb1d70de68939/archive.tar.gz"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+import hashlib,json,math
+from pathlib import Path
+import numpy as np
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+e=json.loads(Path('/tmp/expected.json').read_text());r=e['receipt'];v=r['validation'];assert sha('/experiment/research/architecture-'+r['manifest']['architecture_variant']+'-execution-verified.json')==e['receipt_sha256']
+base=Path('/source')
+for path,h in r['artifacts'].items():
+ relative=Path(path).relative_to(e['source_directory']);assert sha(base/relative)==h
+for p,h in r['candidate_hashes'].items():assert sha(Path('/experiment')/p)==h
+frame=r['manifest']['frames'][0];directory=Path('/tmp/native')/frame['relative_directory']
+for name,h in frame['sha256'].items():assert sha(directory/name)==h
+with np.load(directory/'targets.npz',allow_pickle=False) as data:labels=data['labels'];targets=data['box_targets'].astype(np.float32).astype(float);directions=data['direction_targets']
+positive=labels>0;normalizer=max(1,int(positive.sum()));y=(labels[:,None]==np.arange(1,5)[None,:]).astype(float)
+assert v['clipped_steps']==sum(x['gradient_norm_before_clip']>10 for x in v['step_records'])
+assert len(v['synchronized_step_seconds'])==v['updates']==2000 and all(math.isfinite(x) and x>0 for x in v['synchronized_step_seconds'])
+assert math.isclose(sum(v['synchronized_step_seconds']),v['cumulative_train_seconds'])
+for curve,component in zip(v['checkpoint_curve'],v['component_curve']):
+ step=curve['step'];assert step==component['step'];assert math.isclose(sum(v['synchronized_step_seconds'][:step]),curve['cumulative_train_seconds'])
+ with np.load(base/('checkpoint-%04d'%step)/'heads-00.npz',allow_pickle=False) as data:logits=data['classification'].astype(float);residuals=data['box_residuals'].astype(float);direction=data['direction'].astype(float)
+ probability=np.exp(-np.logaddexp(0,-logits));correct=y*probability+(1-y)*(1-probability);alpha=.25*y+.75*(1-y);focal=alpha*(1-correct)**2*(np.logaddexp(0,logits)-y*logits)
+ pos=float((focal*positive[:,None]).sum()/normalizer);neg=float((focal*((labels>=0)&~positive)[:,None]).sum()/normalizer)
+ difference=residuals-targets;difference[:,6]=np.sin(difference[:,6]);absolute=np.abs(difference);local=float((np.where(absolute<1/9,4.5*difference**2,absolute-1/18)*positive[:,None]).sum()/normalizer)
+ d=float(((np.logaddexp(direction[:,0],direction[:,1])-direction[np.arange(len(direction)),directions])*positive).sum()/normalizer)
+ expected={'classification':pos+neg,'localization':local,'direction':d,'total':pos+neg+2*local+.2*d}
+ for key,value in expected.items():assert math.isclose(value,curve['evaluation_losses'][0][key],rel_tol=2e-5,abs_tol=2e-5)
+ assert math.isclose(pos,component['positive_focal'],rel_tol=2e-5,abs_tol=2e-5) and math.isclose(neg,component['negative_focal'],rel_tol=2e-5,abs_tol=2e-5)
+ assert math.isclose(float(probability[positive,labels[positive]-1].mean()),component['true_class_positive_probability_mean'],rel_tol=2e-5,abs_tol=2e-5)
+Path('/outputs/check.json').write_text(json.dumps({'sampled_checkpoints':len(v['checkpoint_curve']),'all_saved_eval_losses_and_positive_negative_components_literal':True,'timing_and_clipping_arithmetic':True,'native_checkpoint_replay_required_separately':True,'scope':'independent live retained loss/timing/head audit; batch-statistics diagnostic attribution and native scoring remain separate'}));print('PASS independent norm loss/timing audit; checkpoint replay separate')

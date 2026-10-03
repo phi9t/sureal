@@ -1,0 +1,27 @@
+{
+  "scope": "independent review of descriptive analysis and recommendations; no new model/runtime/native-score admission",
+  "reviewer": "/root/initial_analysis_review",
+  "base_commit": "3aa795a864e953e6742cb2ea680876b3e2900904",
+  "critical_findings": [],
+  "important_findings": [],
+  "minor_finding_resolved": "Matplotlib SVG date/random IDs replaced with fixed hashsalt and omitted Date; identical repeated JSON/PNG/SVG verified.",
+  "checks": [
+    "23 trained row summaries match final live closure data",
+    "one separately admitted cap equivalence control remains separate",
+    "confirmation checkpoint separated from retained terminal",
+    "18 input hashes and script hash match",
+    "91 local citations resolve",
+    "GT decoder and sampler scopes remain distinct",
+    "matched750 point/range pairs and architecture confounds retained",
+    "current approved16frame fourrecipe native gate unchanged"
+  ],
+  "reviewed_sha256": {
+    "experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.md": "9811738e5e819da4708a36c7abf00bd655287d3bb9fe7d3e7fe8ee441803ecde",
+    "experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.py": "a71bcc23281a09c7a5d4c9e20889b16a4027eb8bdeecc7a36476133380eaf96d",
+    "experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.json": "7cca76e837ee4b54994fd8760a41c96ee4796a1dfe6a399aaf68630dc23b6616",
+    "experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.png": "9b45a82fdd3187cb8512afcf2afd43f4265d16c5f39c7677fdbdd32e45b7a5fa",
+    "experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.svg": "affda293228bf6f6fe86ed5720028bfa1184e03a578dd610ca34eea3455b5870",
+    "experiments/waymo-perception/research/2026-10-03-initial-experiments-evidence-audit.md": "9b4dfcf36dacae5ccbe6a7e21267891ac56766e77e3a7db5221034d27d353473"
+  },
+  "ready_to_land": true
+}

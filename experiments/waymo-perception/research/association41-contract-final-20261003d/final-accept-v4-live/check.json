@@ -1,0 +1,54 @@
+{
+  "verdict": "ACCEPT Task41.1 runtime/input/source/contract only; no graph/target/oracle/native/model-fit admission",
+  "manifest_sha256": "d062ae9734e872cd2560013da54b00ee55faf6a2731370728740f87c29a427b9",
+  "bundle_index_sha256": "397084d22f9b272ab201e491c90a98dd28196722ddf8c45d73f5ceef3df29fe5",
+  "indexed_files_rehashed": 85,
+  "receipts_rehashed": {
+    "live": {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.superpowers/sdd/2026-10-03-prediction-target-association/independent-final-runtime-audit/live/receipt.json",
+      "sha256": "437acdbd0802e1705f1a1d2bdbb418c41e7b6b8f3a4e396b54ca0a9fd70f4ae7"
+    },
+    "final-map-live": {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.superpowers/sdd/2026-10-03-prediction-target-association/independent-final-runtime-audit/final-map-live/receipt.json",
+      "sha256": "c7ae2083ef5647e1db407f8a80fa0a0c72e4fdf3d245bf9c94fc36d229b4f0b0"
+    },
+    "gpu-live": {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.superpowers/sdd/2026-10-03-prediction-target-association/independent-final-runtime-audit/gpu-live/receipt.json",
+      "sha256": "a4904e147d77c441cf97aedf82075c0110dc8c314023cfd4cdf640dfb7704db3"
+    },
+    "gn8-loss-live": {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.superpowers/sdd/2026-10-03-prediction-target-association/independent-final-runtime-audit/gn8-loss-live/receipt.json",
+      "sha256": "19d81a09dfca18c48ca16cbcc47dbe93f38ed3981e96abb010a83a88e7aa6dd7"
+    },
+    "contract32-live": {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.superpowers/sdd/2026-10-03-prediction-target-association/independent-final-runtime-audit/contract32-live/receipt.json",
+      "sha256": "871f85ac84ffeb94103cfd0a2ebf64882cb544b058783099d1e488bc1fc13fdc"
+    },
+    "training-cpu-independent": {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.superpowers/sdd/2026-10-03-prediction-target-association/independent-final-runtime-audit/training-cpu-independent/receipt.json",
+      "sha256": "d33023d9460a191b1c5707182d77d762a40c42f130504fb2ca19dcc8b380f0c4"
+    }
+  },
+  "checker_sha256": "4c30f2e23643f048a6e03f3cfc0a6442c049c75d51290fb9022e8e6c959de50f",
+  "source_v4_index_sha256": "c917ea3b8990c33f5d47999c1a72577e9c4746a9ba85452f6ea4daa093dd5410",
+  "historical_renames_bytes_preserved": true,
+  "seven_preimages_independently_derived": true,
+  "source_files_rehashed": 172,
+  "initial_tensor_sha256": {
+    "A0": "304418a48ff7cc85b141de498cff1ec147ac500d7a28a9e47e044205c23f68b2",
+    "A1": "304418a48ff7cc85b141de498cff1ec147ac500d7a28a9e47e044205c23f68b2",
+    "A2": "304418a48ff7cc85b141de498cff1ec147ac500d7a28a9e47e044205c23f68b2",
+    "A3": "304418a48ff7cc85b141de498cff1ec147ac500d7a28a9e47e044205c23f68b2"
+  },
+  "tamper_controls": [
+    "missingGPU",
+    "changedInput",
+    "sourceMap",
+    "frameIDs",
+    "preimages",
+    "initialHashes",
+    "recipes",
+    "encoding"
+  ],
+  "limits": "Actual GN8 gradient arrays not exported; finite gradients are producer runtime assertions. Historical cohort drifts remain outside admitted model source scope. No optimizer executed."
+}

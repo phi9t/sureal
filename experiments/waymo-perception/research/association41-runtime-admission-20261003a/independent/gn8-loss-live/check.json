@@ -1,0 +1,26 @@
+{
+  "scope": "independent CPU literal loss/head/input audit; producer gradient/parameter assertions reviewed but no exported gradients or parameter snapshots to independently reconstruct",
+  "producer_receipt_sha256": "da47ecb61c53388e7a9ab5cd8aef126cd39dce68091371c66074dec8dd38a89f",
+  "checker_sha256": "518da25ff0161763a5183c970e2cd9950fbef25a6f9a87fcb5dfb2b2b61526a5",
+  "computed_float64_losses": {
+    "classification": 794.6611918810489,
+    "localization": 2.587326501854083,
+    "direction": 0.6792472099984602,
+    "total": 799.9716943267567
+  },
+  "producer_fp32_losses": {
+    "classification": 794.6611938476562,
+    "localization": 2.5873265266418457,
+    "direction": 0.679247260093689,
+    "total": 799.9717407226562
+  },
+  "loss_rtol": 2e-06,
+  "tampered_box_loss_rejected": true,
+  "heads_sha256": "f5295d2bc2d9c04f9a6dd6b0c57fcabf12bed6c06f2496df8788b7045a2ec2d5",
+  "positive_anchors": 390,
+  "resource_report": {
+    "peak_allocated_bytes": 1583460352,
+    "peak_reserved_bytes": 2713714688,
+    "peak_rss_kib": 2153448
+  }
+}
