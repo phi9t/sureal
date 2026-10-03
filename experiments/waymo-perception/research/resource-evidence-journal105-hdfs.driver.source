@@ -1,0 +1,50 @@
+"""Snapshot journal and raw resource metadata; never copy/release model data."""
+import fcntl,json,shutil,sys,uuid
+from pathlib import Path
+P=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P))
+from cohort.sustained_controller_backend import NativeBackend,C
+from cohort.sustained_controller_lock import acquire_experiment_lock
+from resources.backend import ResourceBackend
+from resources.retention import publish_bundle,LIMIT
+from resources.sources import regular,sha
+from resources.stage import write_new
+from tracking.journal import read_entries
+allowed={'.py','.json','.jsonl','.log','.md','.source'}
+with acquire_experiment_lock(C/'insula/architecture-experiments.lock') as lock:
+ b=NativeBackend('controller20261003a','baseline',lock,resume=True)
+ author=json.loads((P/'research/sustained-resource-shared-hdfs-live-v4-verified.json').read_text());identity=Path(author['resource_identity_path'])
+ b.__class__=ResourceBackend;b._resource_identity=None;b.attach_resources(identity,author['resource_identity_sha256'])
+ original=author['original_native_sha256'];assert all(sha(path)==digest for path,digest in original.items())
+ capture=C/'insula'/('resource-evidence-snapshot-'+uuid.uuid4().hex);capture.mkdir();assets=capture/'assets';assets.mkdir()
+ roots=[b.R,P/'resources',Path('/tmp/sureal-resource-dependencies-independent-transport-20261003'),Path('/tmp/sureal-resource-dependencies-review-sourceonly-v4-live-20261003'),Path('/tmp/sureal-resource-whole-root-pilot-v1'),Path('/tmp/sureal-resource-whole-root-pilot-v2')]
+ roots+=list((C/'insula').glob('resource-retention-balanced16-sustained-baseline-controller20261003a-shared-*'))
+ roots+=list((C/'insula').glob('resource-legacy-gpu-controller20261003a-*'))
+ roots+=[Path('/tmp/sureal-resource-legacy-gpu-independent'),Path('/tmp/sureal-resource-dependencies-merged-v1')]
+ selected={path for root in roots for path in root.rglob('*') if path.is_file() and path.suffix in allowed and '__pycache__' not in path.parts}
+ selected|={path for path in (P/'research').glob('sustained-resource-*') if path.is_file() and path.suffix in allowed}
+ selected.add(P/'research/2026-10-03-resource-dependency-preservation.md');selected.add(P/'research/2026-10-03-approved-execution-order.md')
+ selected.add(P/'research/2026-10-03-resource-native-gpu-revalidation.md');selected.add(Path(__file__).resolve())
+ selected|={path for path in (P/'research').glob('resource-evidence-journal104*') if path.is_file() and path.suffix in allowed}
+ originals={};inventory={}
+ def snapshot(path):
+  if not regular(path) or path.stat().st_size>LIMIT:raise ValueError('bounded regular metadata only')
+  name='by-path/'+path.as_posix().lstrip('/');target=assets/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(path,target);digest=sha(target)
+  if sha(path)!=digest:raise ValueError('metadata changed during immutable capture')
+  originals[str(path)]=digest;inventory[name]={'path':str(target),'sha256':digest,'bytes':target.stat().st_size}
+ with (P/'research/experiment-tracker.lock').open('a') as tl,(P/'research/research-journal.lock').open('a') as jl:
+  fcntl.flock(tl,fcntl.LOCK_EX);fcntl.flock(jl,fcntl.LOCK_SH)
+  entries=read_entries(P/'research/research-journal.jsonl');assert len(entries)==105
+  selected|={P/'research'/name for name in ['experiment-registry.json','experiments.json','experiment-tracker.md','research-journal.jsonl','research-journal.md']}
+  selected|={p for p in (P/'research/journal-evidence').iterdir() if p.is_file()}
+  for path in sorted(selected):snapshot(path)
+  assert all(sha(path)==digest for path,digest in originals.items())
+ descriptor={'scope':'immutable journal105 and selected raw resource proof/source/log/test/failure metadata; no model checkpoint or sensor-array payload, no full native admission',
+             'journal_entries':105,'journal_head_sha256':entries[-1]['sha256'],'original_source_sha256':originals,
+             'shared_data_publication':author['publication'],'native_sha256':original,'driver_sha256':sha(__file__)}
+ write_new(capture/'capture.json',descriptor);snapshot(capture/'capture.json')
+ print('PRESERVING resource raw metadata/journal105',len(inventory),sum(v['bytes'] for v in inventory.values()),flush=True)
+ publication=publish_bundle(b,'shared',inventory);assert all(sha(path)==digest for path,digest in original.items())
+ report={**descriptor,'passed':True,'captured_files':len(inventory),'captured_bytes':sum(v['bytes'] for v in inventory.values()),
+         'capture_path':str(capture/'capture.json'),'capture_sha256':sha(capture/'capture.json'),'publication':publication,'native_state_and_checkpoints_unchanged':True}
+ write_new(P/'research/resource-evidence-journal105-hdfs-verified.json',report)
+print('PASS raw resource metadata/journal105 exact HDFS readback and live recovery',flush=True)

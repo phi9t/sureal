@@ -1,0 +1,680 @@
+{
+  "passed": true,
+  "scope": "bounded supplemental evidence-retention verification only; no new implementation review, full checkpoint/runner/scientific admission, or original payload release",
+  "driver_sha256": "7a0e557bf37d660965c8bf55d40c43aa74b9bd6312e8db95fa36e3dac14b28a3",
+  "prior_review_sha256": "3547df94fca032e97093912b0f25fbfbae4b94bdeb6110ec277045e767e09ce7",
+  "source_pins": {
+    "archive_worker.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/archive_worker.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/archive_worker.py",
+      "sha256": "f110e1a57ebbe9c4d62f9d4d88ba577ac5da5526c1c536b1c84663386126d94e"
+    },
+    "backend.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/backend.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/backend.py",
+      "sha256": "c2889cf53abb335211eb10321df7329e21248cca727cb64224f1b6dd90333662"
+    },
+    "checkpoint.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/checkpoint.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/checkpoint.py",
+      "sha256": "cbc21df64f9674ee728c5574b1b18a5be19d1f81d84acd2077377a83c5a45449"
+    },
+    "command.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/command.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/command.py",
+      "sha256": "1a44bc70f62abe7ec48eea9dbf12c27b2b83816793d3ca1fc506bf22d938cc40"
+    },
+    "dependencies.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/dependencies.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/dependencies.py",
+      "sha256": "d00b0a6233e8a76855d8e81fe081f7e77168bb53224dc2312db1b2aa31496b31"
+    },
+    "execute_worker.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/execute_worker.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/execute_worker.py",
+      "sha256": "b4a746f941944d4342ade71f7338498b06f96e21bc56141eb90d40276508add8"
+    },
+    "kernel_scope.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/kernel_scope.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/kernel_scope.py",
+      "sha256": "4a9f8440b91ce8203e3f9bbc25dbe25dad83a33378544e4ede61412f9e1f2e89"
+    },
+    "process_lifecycle.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/process_lifecycle.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/process_lifecycle.py",
+      "sha256": "bfde67be0f66296565dca964c8a2ca3e6bb733e31016fbc87c78f57dd49b09f0"
+    },
+    "retention.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/retention.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/retention.py",
+      "sha256": "b9cc1380a45f064a57ef22c5ea2efd1b98384a21bf2017538307fd879dbbaf44"
+    },
+    "retention_audit.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/retention_audit.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/retention_audit.py",
+      "sha256": "26b8d2907f023af4c3745ae2dbad0d2de442f26b3d4297ffa519851958829116"
+    },
+    "scoped_stage.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/scoped_stage.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/scoped_stage.py",
+      "sha256": "d753f2df936496cddb76f9bd09215100552f56a5d7754d52e54434b9ee042738"
+    },
+    "sources.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/sources.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/sources.py",
+      "sha256": "2f1eef953bd39e40b49e7fc18e906c4b0ea11d17266c5822aae842966179d5af"
+    },
+    "stage.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/stage.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/stage.py",
+      "sha256": "f8e8baf91d752185fd3f57ba27af3cec683540bcb0932275bdfcf4643f1d4ff9"
+    },
+    "stage_accounting.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/stage_accounting.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/stage_accounting.py",
+      "sha256": "baef4b065f9ebb3aa7a2296ccaede595e2514c8144b18bace315f3a805b3716b"
+    },
+    "test_execute_worker.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_execute_worker.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/test_execute_worker.py",
+      "sha256": "26c1e44dacf7056498c5f4deb2c8a06b91830848aeb5d63f0819380bc98ae2d3"
+    },
+    "test_kernel_scope.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_kernel_scope.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/test_kernel_scope.py",
+      "sha256": "e5ff0b3b67a3b85a5799da096078ac7e07454d6230e16cace99282b96285f9a8"
+    },
+    "test_resource_archive.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_archive.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/test_resource_archive.py",
+      "sha256": "513d7b839ccd37619919ed78a38943e09db97c0a222524f24e661e29e8ce6de8"
+    },
+    "test_resource_backend.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_backend.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/test_resource_backend.py",
+      "sha256": "021938bd33c74fe31300672995aaf9471cd9b2b81fbdaecd7305253bac3ae425"
+    },
+    "test_resource_checkpoint.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_checkpoint.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/test_resource_checkpoint.py",
+      "sha256": "7f6119ce1fa662c6d624fdb6b7e801b6249f3066a8a82bd7809e0f50e780faaa"
+    },
+    "test_resource_command.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_command.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/test_resource_command.py",
+      "sha256": "98255f18a16799ca18e7a32e6087e8d3b39de44c38d44a2fc0d8e0b60aba32c6"
+    },
+    "test_resource_retention.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_retention.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/test_resource_retention.py",
+      "sha256": "023ba4bec0a3f06a0f254ebdbcbf67736b2c04c50948ee0b7e10e1080b5248ef"
+    },
+    "test_resource_sources.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_sources.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/test_resource_sources.py",
+      "sha256": "08b06457df38c99413e33aaf1bce5afbd703a5628b22d5e29c54f6265fa253bf"
+    },
+    "test_resource_stage.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_stage.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/test_resource_stage.py",
+      "sha256": "4aafb2d74de5075e9ab1c4d8147a772ea991604452fa85f817747c136296720b"
+    },
+    "test_scoped_stage.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_scoped_stage.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/test_scoped_stage.py",
+      "sha256": "30b81ad6cf79248e6d83b4021f38a0aff22c0604f0f2c071d6c8e34cc7b40835"
+    },
+    "test_stage_accounting.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_stage_accounting.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/test_stage_accounting.py",
+      "sha256": "8a28c803161b28318b23a6caea03024d6ceff782d187f81a54850d4d22da8a86"
+    },
+    "test_worker_admission.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_worker_admission.py",
+      "snapshot": "/tmp/sureal-resource-evidence-journal105-independent/code/test_worker_admission.py",
+      "sha256": "816a6ab4d7cb891e97ed279e46a2fea491ce8865f3dd30f2c6ea7bff825f4bb7"
+    }
+  },
+  "transfers": [
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--command-timeout-secs",
+        "300",
+        "--auth-source",
+        "token-file",
+        "get",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-sustained-baseline-controller20261003a-shared-5ae0ddafd4d14616927cbadefc7d61cc/publication-manifest.json",
+        "/tmp/sureal-resource-evidence-journal105-independent/global-readback.json"
+      ],
+      "exit_code": 0,
+      "log_path": "/tmp/sureal-resource-evidence-journal105-independent/global-get.log",
+      "log_sha256": "fb2b2dbb02f89d25ada9c9663cb8fef0f00cf3ecdd44a323841dde8e54882d2f",
+      "seconds": 1.6120546040474437
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--command-timeout-secs",
+        "300",
+        "--auth-source",
+        "token-file",
+        "get",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-sustained-baseline-controller20261003a-shared-5ae0ddafd4d14616927cbadefc7d61cc/364c3f57108dd1b3137dc2d9a98590b4faa8ea1c0ae32bbdaeef7773a4a7dac7/manifest.json",
+        "/tmp/sureal-resource-evidence-journal105-independent/download/manifest.json"
+      ],
+      "exit_code": 0,
+      "log_path": "/tmp/sureal-resource-evidence-journal105-independent/manifest.json-get.log",
+      "log_sha256": "29a35179a6f5b0abc2644df11ac55b269c8b0174e28175cb555d54bf64013b10",
+      "seconds": 1.5120667849550955
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--command-timeout-secs",
+        "300",
+        "--auth-source",
+        "token-file",
+        "get",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-sustained-baseline-controller20261003a-shared-5ae0ddafd4d14616927cbadefc7d61cc/364c3f57108dd1b3137dc2d9a98590b4faa8ea1c0ae32bbdaeef7773a4a7dac7/archive.tar.gz",
+        "/tmp/sureal-resource-evidence-journal105-independent/download/archive.tar.gz"
+      ],
+      "exit_code": 0,
+      "log_path": "/tmp/sureal-resource-evidence-journal105-independent/archive.tar.gz-get.log",
+      "log_sha256": "789b96ad89a7ad1c9f5fa99f75c9aef9c9774a355c903aa39f892a7e3da29af8",
+      "seconds": 1.7118611260084435
+    }
+  ],
+  "results": [
+    {
+      "mode": "verify",
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/tmp/sureal-resource-evidence-journal105-independent/experiment",
+        "/experiment",
+        "--ro-bind",
+        "/tmp/sureal-resource-evidence-journal105-independent/download",
+        "/source",
+        "--bind",
+        "/tmp/sureal-resource-evidence-journal105-independent/verify",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/tmp/sureal-resource-evidence-journal105-independent/verify-input",
+        "/tmp/inputs",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/host-source/advanced/archive.py",
+        "/tmp/resource-archive.py",
+        "--ro-bind",
+        "/tmp/sureal-resource-evidence-journal105-independent/code",
+        "/tmp/resource-layer",
+        "--bind",
+        "/tmp/sureal-resource-evidence-journal105-independent/proofs/verify/worker",
+        "/tmp/resource-output",
+        "--",
+        "python",
+        "/tmp/resource-layer/execute_worker.py",
+        "/tmp/resource-output",
+        "/experiment/resources/archive_worker.py",
+        "verify"
+      ],
+      "proof_path": "/tmp/sureal-resource-evidence-journal105-independent/proofs/verify/resource-admitted.json",
+      "proof_sha256": "d51dbc750e1c93e570dd453c9884773d324f00f4ca13fcd581969b67494780bf",
+      "job_path": "/tmp/sureal-resource-evidence-journal105-independent/verify-input/job.json",
+      "job_sha256": "23d018bab8c3f0d6e1a858999d34ebb2305f5e0a6f6010c1c5e42a2621c95928",
+      "artifacts": {
+        "/tmp/sureal-resource-evidence-journal105-independent/verify/check.json": "8b5c376f6f05ea058c6d401b6f832ae9b500642077592b68cbf80c5c5fefa974",
+        "/tmp/sureal-resource-evidence-journal105-independent/verify/live.log": "487c0b4fc189fbc9d2a602d5d1829d4fcfcf251eb61a132c8619db9bb6f721e9"
+      },
+      "host": {
+        "command": [
+          "bwrap",
+          "--unshare-all",
+          "--die-with-parent",
+          "--ro-bind",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+          "/",
+          "--ro-bind",
+          "/tmp/sureal-resource-evidence-journal105-independent/experiment",
+          "/experiment",
+          "--ro-bind",
+          "/tmp/sureal-resource-evidence-journal105-independent/download",
+          "/source",
+          "--bind",
+          "/tmp/sureal-resource-evidence-journal105-independent/verify",
+          "/outputs",
+          "--proc",
+          "/proc",
+          "--dev",
+          "/dev",
+          "--tmpfs",
+          "/tmp",
+          "--clearenv",
+          "--setenv",
+          "HOME",
+          "/tmp/private-home",
+          "--setenv",
+          "PATH",
+          "/usr/local/bin:/usr/bin:/bin",
+          "--setenv",
+          "PYTHONNOUSERSITE",
+          "1",
+          "--setenv",
+          "PYTHONDONTWRITEBYTECODE",
+          "1",
+          "--setenv",
+          "PYTHONPATH",
+          "/experiment",
+          "--chdir",
+          "/experiment",
+          "--ro-bind",
+          "/tmp/sureal-resource-evidence-journal105-independent/verify-input",
+          "/tmp/inputs",
+          "--ro-bind",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/host-source/advanced/archive.py",
+          "/tmp/resource-archive.py",
+          "--ro-bind",
+          "/tmp/sureal-resource-evidence-journal105-independent/code",
+          "/tmp/resource-layer",
+          "--bind",
+          "/tmp/sureal-resource-evidence-journal105-independent/proofs/verify/worker",
+          "/tmp/resource-output",
+          "--",
+          "python",
+          "/tmp/resource-layer/execute_worker.py",
+          "/tmp/resource-output",
+          "/experiment/resources/archive_worker.py",
+          "verify"
+        ],
+        "exit_code": 0,
+        "timed_out": false,
+        "peak_rss_kib": 79412,
+        "elapsed_seconds": 0.6391996859456412,
+        "measurement": "wait4.ru_maxrss_KiB_largest_waited_child",
+        "completed_launcher_descendants": [
+          {
+            "pid": 1400983,
+            "peak_rss_kib": 24460
+          }
+        ],
+        "kernel_scope": {
+          "path": "/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-evidence-journal105-independent.scope",
+          "memory_max_bytes": 17179869184,
+          "memory_swap_max_bytes": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "members_verified": true,
+          "kernel_events": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0
+          },
+          "process_ids": [
+            1398703
+          ]
+        },
+        "stage_lifecycle": {
+          "caller_pid": 1398703,
+          "scope_members_before": [
+            1398703
+          ],
+          "scope_members_after": [
+            1398703
+          ],
+          "remaining_children": [],
+          "subreaper_verified": true
+        },
+        "resource_admission": {
+          "peak_rss_bytes": 81317888,
+          "aggregate_cap_bytes": 17179869184,
+          "scope": "largest waited-child RSS plus external aggregate kernel cap; not tree RSS sum"
+        }
+      },
+      "worker": {
+        "worker_argv": [
+          "/experiment/resources/archive_worker.py",
+          "verify"
+        ],
+        "worker_pid": 2,
+        "measurement": "in-runtime getrusage SELF and waited CHILDREN KiB",
+        "self_peak_rss_kib": 24460,
+        "waited_child_peak_rss_kib": 0,
+        "peak_rss_kib": 24460,
+        "elapsed_seconds": 0.5711341989808716,
+        "exit_code": 0,
+        "child_lifecycle": {
+          "subreaper_verified": true,
+          "remaining_children": [],
+          "contract": "all created descendants completed and waited; detached children unsupported"
+        },
+        "scope": "worker process and largest waited child; not simultaneous tree RSS sum"
+      },
+      "result": {
+        "exact_members_and_hashes": true,
+        "members": 3290,
+        "payload_bytes": 70687190,
+        "archive_sha256": "364c3f57108dd1b3137dc2d9a98590b4faa8ea1c0ae32bbdaeef7773a4a7dac7"
+      }
+    },
+    {
+      "mode": "rehydrate",
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/tmp/sureal-resource-evidence-journal105-independent/experiment",
+        "/experiment",
+        "--ro-bind",
+        "/tmp/sureal-resource-evidence-journal105-independent/download",
+        "/source",
+        "--bind",
+        "/tmp/sureal-resource-evidence-journal105-independent/rehydrate",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/tmp/sureal-resource-evidence-journal105-independent/rehydrate-input",
+        "/tmp/inputs",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/host-source/advanced/archive.py",
+        "/tmp/resource-archive.py",
+        "--ro-bind",
+        "/tmp/sureal-resource-evidence-journal105-independent/code",
+        "/tmp/resource-layer",
+        "--bind",
+        "/tmp/sureal-resource-evidence-journal105-independent/proofs/rehydrate/worker",
+        "/tmp/resource-output",
+        "--",
+        "python",
+        "/tmp/resource-layer/execute_worker.py",
+        "/tmp/resource-output",
+        "/experiment/resources/archive_worker.py",
+        "rehydrate"
+      ],
+      "proof_path": "/tmp/sureal-resource-evidence-journal105-independent/proofs/rehydrate/resource-admitted.json",
+      "proof_sha256": "dafbaba4f97dbd9e00d7329dffd1383f8cc59829638a7fa7259755b78bdcfed9",
+      "job_path": "/tmp/sureal-resource-evidence-journal105-independent/rehydrate-input/job.json",
+      "job_sha256": "23d018bab8c3f0d6e1a858999d34ebb2305f5e0a6f6010c1c5e42a2621c95928",
+      "artifacts": {
+        "/tmp/sureal-resource-evidence-journal105-independent/rehydrate/check.json": "36cb0335d13a29d6d66d24e5957d82c1b0b3524c9ad9847dbbadd0c0acec2714",
+        "/tmp/sureal-resource-evidence-journal105-independent/rehydrate/live.log": "85c60d494752f984dbae51b10c6d5c405f7cda9be79072451481d4a3f20f149d"
+      },
+      "host": {
+        "command": [
+          "bwrap",
+          "--unshare-all",
+          "--die-with-parent",
+          "--ro-bind",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+          "/",
+          "--ro-bind",
+          "/tmp/sureal-resource-evidence-journal105-independent/experiment",
+          "/experiment",
+          "--ro-bind",
+          "/tmp/sureal-resource-evidence-journal105-independent/download",
+          "/source",
+          "--bind",
+          "/tmp/sureal-resource-evidence-journal105-independent/rehydrate",
+          "/outputs",
+          "--proc",
+          "/proc",
+          "--dev",
+          "/dev",
+          "--tmpfs",
+          "/tmp",
+          "--clearenv",
+          "--setenv",
+          "HOME",
+          "/tmp/private-home",
+          "--setenv",
+          "PATH",
+          "/usr/local/bin:/usr/bin:/bin",
+          "--setenv",
+          "PYTHONNOUSERSITE",
+          "1",
+          "--setenv",
+          "PYTHONDONTWRITEBYTECODE",
+          "1",
+          "--setenv",
+          "PYTHONPATH",
+          "/experiment",
+          "--chdir",
+          "/experiment",
+          "--ro-bind",
+          "/tmp/sureal-resource-evidence-journal105-independent/rehydrate-input",
+          "/tmp/inputs",
+          "--ro-bind",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/host-source/advanced/archive.py",
+          "/tmp/resource-archive.py",
+          "--ro-bind",
+          "/tmp/sureal-resource-evidence-journal105-independent/code",
+          "/tmp/resource-layer",
+          "--bind",
+          "/tmp/sureal-resource-evidence-journal105-independent/proofs/rehydrate/worker",
+          "/tmp/resource-output",
+          "--",
+          "python",
+          "/tmp/resource-layer/execute_worker.py",
+          "/tmp/resource-output",
+          "/experiment/resources/archive_worker.py",
+          "rehydrate"
+        ],
+        "exit_code": 0,
+        "timed_out": false,
+        "peak_rss_kib": 79412,
+        "elapsed_seconds": 1.3753509339876473,
+        "measurement": "wait4.ru_maxrss_KiB_largest_waited_child",
+        "completed_launcher_descendants": [
+          {
+            "pid": 1401031,
+            "peak_rss_kib": 28212
+          }
+        ],
+        "kernel_scope": {
+          "path": "/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-evidence-journal105-independent.scope",
+          "memory_max_bytes": 17179869184,
+          "memory_swap_max_bytes": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "members_verified": true,
+          "kernel_events": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0
+          },
+          "process_ids": [
+            1398703
+          ]
+        },
+        "stage_lifecycle": {
+          "caller_pid": 1398703,
+          "scope_members_before": [
+            1398703
+          ],
+          "scope_members_after": [
+            1398703
+          ],
+          "remaining_children": [],
+          "subreaper_verified": true
+        },
+        "resource_admission": {
+          "peak_rss_bytes": 81317888,
+          "aggregate_cap_bytes": 17179869184,
+          "scope": "largest waited-child RSS plus external aggregate kernel cap; not tree RSS sum"
+        }
+      },
+      "worker": {
+        "worker_argv": [
+          "/experiment/resources/archive_worker.py",
+          "rehydrate"
+        ],
+        "worker_pid": 2,
+        "measurement": "in-runtime getrusage SELF and waited CHILDREN KiB",
+        "self_peak_rss_kib": 28212,
+        "waited_child_peak_rss_kib": 0,
+        "peak_rss_kib": 28212,
+        "elapsed_seconds": 1.3063520300202072,
+        "exit_code": 0,
+        "child_lifecycle": {
+          "subreaper_verified": true,
+          "remaining_children": [],
+          "contract": "all created descendants completed and waited; detached children unsupported"
+        },
+        "scope": "worker process and largest waited child; not simultaneous tree RSS sum"
+      },
+      "result": {
+        "exact_members_and_hashes": true,
+        "members": 3290,
+        "payload_bytes": 70687190,
+        "archive_sha256": "364c3f57108dd1b3137dc2d9a98590b4faa8ea1c0ae32bbdaeef7773a4a7dac7",
+        "verified_rehydration": true
+      }
+    }
+  ],
+  "original_serialized_lock": {
+    "device": 66308,
+    "inode": 163461002,
+    "exclusive": true
+  },
+  "prior_gpu_review": {
+    "path": "/tmp/sureal-resource-legacy-gpu-independent.json",
+    "sha256": "5b152a2235927d73009a3623fcf0bd296ab5a9a34a8cdca94494292937182181"
+  },
+  "native_source_bytes_exact": 295,
+  "author_report": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/resource-evidence-journal105-hdfs-verified.json",
+    "sha256": "7dda0eb9bc5744e1a2261d0983282f22e9db9b211fb72acf4fcf8ef6a2bccbdc"
+  },
+  "capture": {
+    "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-evidence-snapshot-d4dda54f903c49d3b4ac11a3499f7666/capture.json",
+    "sha256": "80b45304b036b72eca6e0a442d815fb3bb7cb8580047c310a7058f5f5f9cbf28"
+  },
+  "publication": {
+    "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-shared-5ae0ddafd4d14616927cbadefc7d61cc/verified-publication.json",
+    "sha256": "23c5190dce8c8ed50a7c9a0e0e4afc93e61f80fca3940c951db26ced257b699d"
+  },
+  "captured_files": 3290,
+  "captured_bytes": 70687190,
+  "reviewed_helper_bytes_exact": 26,
+  "native_sha256": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/state.json": "dac2ce421243c4750175f98152cdc1ce4ecb7e1a493ddee7050c42fcc09e7765",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/run.json": "96dc607ae8238774ca875588d65eaf463f120227e161ae792a9187c8e6635d7d",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-00/checkpoint.pt": "8057a5496c4d6ec4d19b9de33034c6cca753ea39d8f03fd765ad7011cdf301ee",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-1000/checkpoint.pt": "37de2375b0b10f92a56468bd9ffe0b2fea42f257c5949efa80fd29c621a8ff4a"
+  },
+  "rootfs_actual_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+  "scientific_bytes_before": 14495101235,
+  "retained_union": {
+    "files": 3290,
+    "chunks": 1,
+    "payload_bytes": 70687190,
+    "whole_member_union_exact": true,
+    "all_chunks_live_rehydrated": true
+  },
+  "gpu_raw_proof_output_log_refs_verified": {
+    "/tmp/sureal-resource-legacy-gpu-independent/audit-0-resources/resource-admitted.json": "4e8da04fbb0b2ae61a0e90bad07b2ec48b59a29191ef71ba8b9ac7b6875b709f",
+    "/tmp/sureal-resource-legacy-gpu-independent/audit-0-outputs/transition.json": "a186bcefa8601a836357054f6d4f834e5bc00273224849ab3b868b5b23871de7",
+    "/tmp/sureal-resource-legacy-gpu-independent/audit-0-outputs/replay.json": "84e5d341d553713ee8b959786aae48bb79a348098ccc4bc6fbda6aa39897ecf4",
+    "/tmp/sureal-resource-legacy-gpu-independent/audit-0-outputs/live.log": "dc1011d7c1092e5dc9420cd837cddc39dd8133ed817d2fa80014787824effa62",
+    "/tmp/sureal-resource-legacy-gpu-independent/audit-0-resources/worker/worker-resource.json": "4193fe7b0da30462a517792a4c2624b355aac272574903813402fa396a2ee277",
+    "/tmp/sureal-resource-legacy-gpu-independent/audit-0-resources/execution.log": "dc1011d7c1092e5dc9420cd837cddc39dd8133ed817d2fa80014787824effa62",
+    "/tmp/sureal-resource-legacy-gpu-independent/audit-1000-resources/resource-admitted.json": "5e1605bc284a104685408da4e2dfd5f9d5e60518a7536f6a08ccf4df3b273c4e",
+    "/tmp/sureal-resource-legacy-gpu-independent/audit-1000-outputs/transition.json": "73f6ebbd83d8876c73374d8c142ca69a07eab5901433347e26ca29973003aeef",
+    "/tmp/sureal-resource-legacy-gpu-independent/audit-1000-outputs/replay.json": "72e67735419f1cd69bb200e052a93607ef1a75c35ffa6421a654978a79248568",
+    "/tmp/sureal-resource-legacy-gpu-independent/audit-1000-outputs/live.log": "07b59fcd02b9e510421e6710ef26a711fdabf21f655d4a01d19e7ea999010535",
+    "/tmp/sureal-resource-legacy-gpu-independent/audit-1000-resources/worker/worker-resource.json": "95a06dcd56fcd5e0d2128946d8a6c79c6ba0757960cbb7f248f9ded7a8b83c68",
+    "/tmp/sureal-resource-legacy-gpu-independent/audit-1000-resources/execution.log": "07b59fcd02b9e510421e6710ef26a711fdabf21f655d4a01d19e7ea999010535",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-0-resources/resource-admitted.json": "28c16563e37801303a36e6e0d1919e681a51c0b7193c9bfdf33ac76559fa4719",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-0-outputs/live.log": "dc1011d7c1092e5dc9420cd837cddc39dd8133ed817d2fa80014787824effa62",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-0-outputs/replay.json": "47e97a78ed3b03f2d9f962a8e7b65736330306a512f580a05c19c76fb38afd62",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-0-outputs/transition.json": "408fb613bd09c681b465d08c895dfd4c65aa3d32fa7d66cb6d2f3e83fe2ff6ed",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-0-resources/worker/worker-resource.json": "0223862786d4a1de36f30120e481e727c0697ef86ad9ef882f920b13bb36e98b",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-0-resources/execution.log": "dc1011d7c1092e5dc9420cd837cddc39dd8133ed817d2fa80014787824effa62",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-1000-resources/resource-admitted.json": "2a2fdf18c436798ecd709fca99d7bac57b684de4757eb3dec2559f288662bed0",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-1000-outputs/live.log": "07b59fcd02b9e510421e6710ef26a711fdabf21f655d4a01d19e7ea999010535",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-1000-outputs/replay.json": "a905dad3b495e5b99b244f259920ffc2b380b36ec058f102ebea8241c1b367fb",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-1000-outputs/transition.json": "632cfea9e50c709cda3b8fc99b92b273749dca6b636328b4f86e2080484f2437",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-1000-resources/worker/worker-resource.json": "66179304eaa50c16c0d5acc7e5a66453a5366e01cbb64f10217cb88ee86deb69",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-1000-resources/execution.log": "07b59fcd02b9e510421e6710ef26a711fdabf21f655d4a01d19e7ea999010535"
+  },
+  "scientific_bytes_after": 14495101235,
+  "exact_recovered_metadata_union": true,
+  "journal_entries": 105,
+  "journal_head_sha256": "90a5f08906ab13cb2e4cb4a9a3c20df893198ec404413f2821755e093b2ee52b",
+  "journal_evidence_references_verified": 257,
+  "native_state_and_checkpoints_unchanged": true,
+  "prior_final_review_unchanged": true,
+  "prior_gpu_review_unchanged": true,
+  "temporary_payloads_removed_only_after_exact_gates": true,
+  "declined_to_judge": [
+    "Full model/checkpoint/raw sensor/driver payload recovery; these are explicitly excluded from this metadata bundle.",
+    "Full controller/runner/native GPU state admission, checkpoint release or scientific readiness; prior review exclusions remain unchanged.",
+    "Independent PUT/create repetition, deliberately injected transport faults, or future HDFS availability.",
+    "A new code review or new claims about historical scientific results; this is evidence-preservation verification only."
+  ]
+}

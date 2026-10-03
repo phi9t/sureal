@@ -1,0 +1,58 @@
+"""Bounded live revalidation of original GPU audits; no producer continuation."""
+import json,os,sys,traceback
+from pathlib import Path
+P=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P))
+from cohort.sustained_controller_backend import NativeBackend,C
+from cohort.sustained_controller_lock import acquire_experiment_lock
+from resources.backend import ResourceBackend,CAP_BYTES
+from resources.sources import sha,validate_sources
+from resources.stage import run_stage,validate_proof,write_new
+from cohort.sustained_scoring_budget import stage_timeout
+
+REPORT=P/'research/sustained-resource-legacy-gpu-v1-verified.json'
+ROOT=C/'insula/resource-legacy-gpu-controller20261003a-v1'
+volatile={'replay.json':{'peak_allocated_bytes','peak_rss_kib','elapsed_seconds'},'transition.json':{'peak_allocated_bytes','peak_rss_kib','elapsed_seconds'}}
+report={'schema_version':1,'scope':'fresh capped execution of original independent GPU transition/head audits for retained0/1000; not producer continuation, legacy companion policy, checkpoint release or full runner admission','driver_path':str(Path(__file__).resolve()),'driver_sha256':sha(__file__),'stages':[]}
+try:
+ with acquire_experiment_lock(C/'insula/architecture-experiments.lock') as lock:
+  b=NativeBackend('controller20261003a','baseline',lock,resume=True)
+  state=json.loads((b.R/'state.json').read_text());prev=None
+  for record in state['records']: b.check_record(record,prev);prev=record
+  original={str(b.R/n):sha(b.R/n) for n in ('run.json','state.json')}
+  for record in state['records']:
+   original[str(Path(record['root'])/'checkpoint.pt')]=sha(Path(record['root'])/'checkpoint.pt')
+   original[record['final_path']]=record['final_sha256']
+  root_before=sha(b.R/'state.json')
+  shared=json.loads((P/'research/sustained-resource-shared-hdfs-live-v4-verified.json').read_text())
+  b.__class__=ResourceBackend;b._resource_identity=None;b.attach_resources(shared['resource_identity_path'],shared['resource_identity_sha256'])
+  code=validate_sources(P/'resources',b.resource_identity['source_pins']);ROOT.mkdir(exist_ok=False)
+  report.update({'original_native_sha256':original,'resource_identity_path':str(b.resource_identity_path),'resource_identity_sha256':b.resource_identity_sha256,'source_pins':b.resource_identity['source_pins'],'manifest_sha256':b.manifest_sha,'comparison_excluded_measurements':{k:sorted(v) for k,v in volatile.items()}})
+  for step in (0,1000):
+   name='audit-'+str(step);receiptpath=b.R/(name+'-verified.json');native=json.loads(receiptpath.read_text());NativeBackend.check_stage(b,native)
+   output=ROOT/(name+'-outputs');output.mkdir();command=native['command'].copy();command[command.index('/outputs')-1]=str(output);unwrapped=command.copy()
+   proofroot=ROOT/(name+'-resources')
+   print('START bounded original GPU audit',step,flush=True)
+   with (output/'live.log').open('w') as stream:
+    run_stage(command,b.package,dict(os.environ),stream,stage_timeout(False),code=code,current_sources=P/'resources',source_pins=b.resource_identity['source_pins'],evidence_directory=proofroot,native_output=output,cap_bytes=CAP_BYTES)
+   proofpath=proofroot/'resource-admitted.json';proof=json.loads(proofpath.read_text());validate_proof(proof,command,P/'resources',b.resource_identity['source_pins'],output,CAP_BYTES,stage_timeout(False))
+   assert proof['original_command']==unwrapped
+   expected=native['command'].copy();expected[expected.index('/outputs')-1]=str(output);assert expected==unwrapped
+   comparisons={}
+   for filename,excluded in volatile.items():
+    old=Path(native['output_directory'])/filename;new=output/filename;a=json.loads(old.read_text());z=json.loads(new.read_text())
+    assert set(a)==set(z) and {k:v for k,v in a.items() if k not in excluded}=={k:v for k,v in z.items() if k not in excluded},filename
+    assert z['peak_allocated_bytes']<=8*1024**3 and z['peak_rss_kib']<=16*1024**2
+    comparisons[filename]={'original':{'path':str(old),'sha256':sha(old)},'fresh':{'path':str(new),'sha256':sha(new)},'excluded_measurements':sorted(excluded),'all_other_fields_exact':True,'fresh_report':z}
+   b.guard();assert all(sha(p)==s for p,s in original.items())
+   stage={'step':step,'native_parent':{'path':str(receiptpath),'sha256':sha(receiptpath)},'native_input_hashes':native['input_hashes'],'native_verifier_source_pins':native['verifier_source_pins'],'proof':{'path':str(proofpath),'sha256':sha(proofpath)},'actual_command':command,'only_original_output_mount_replaced_before_resource_wrapping':True,'comparisons':comparisons,'output_artifacts':{str(f):sha(f) for f in output.iterdir() if f.is_file()},'resource_admission':proof['resource_admission']}
+   report['stages'].append(stage);write_new(ROOT/(name+'-comparison.json'),stage)
+   print('PASS bounded GPU state/heads',step,'RSS',proof['resource_admission']['peak_rss_bytes'],flush=True)
+  assert sha(b.R/'state.json')==root_before and all(sha(p)==s for p,s in original.items())
+  report.update({'passed':True,'native_state_and_checkpoints_unchanged':True,'fresh_gpu_audits':2,'literal_updates_revalidated':[0,1000],'original_training_seconds_unchanged':state['records'][-1]['report']['cumulative_train_seconds']})
+  write_new(ROOT/'verified.json',report);write_new(REPORT,report)
+except BaseException as e:
+ report.update({'passed':False,'error':{'type':type(e).__name__,'message':str(e)},'traceback':traceback.format_exc()})
+ failure=P/'research/sustained-resource-legacy-gpu-v1-failure.json'
+ if not failure.exists():write_new(failure,report)
+ raise
+print('PASS bounded legacy GPU evidence; no producer progress or release',flush=True)
