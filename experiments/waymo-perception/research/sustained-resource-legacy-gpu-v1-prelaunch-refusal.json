@@ -1,0 +1,22 @@
+{
+  "scope": "host systemd prelaunch refusal; no Python or live Insula worker started",
+  "passed": false,
+  "exit_code": 1,
+  "error": "Unknown assignment: MemoryOOMGroup=yes",
+  "command": [
+    "systemd-run",
+    "--user",
+    "--scope",
+    "--quiet",
+    "--unit=sureal-resource-legacy-gpu-v1",
+    "-p",
+    "MemoryMax=16G",
+    "-p",
+    "MemorySwapMax=0",
+    "-p",
+    "MemoryOOMGroup=yes",
+    "python",
+    "/tmp/sureal-resource-legacy-gpu-v1.py"
+  ],
+  "correction": "Use only supported MemoryMax and MemorySwapMax properties; the resource helper independently requires exact memory.max, zero memory.swap.max, exclusive scope membership and no OOM events."
+}
