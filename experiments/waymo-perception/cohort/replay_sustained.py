@@ -1,5 +1,5 @@
 """Independent checkpoint/head audit. This does not certify native APH or fit."""
-import hashlib,importlib.util,json,resource,time
+import hashlib,importlib.util,json,random,resource,time
 from pathlib import Path
 import numpy as np
 import torch
@@ -7,8 +7,10 @@ from cohort.sustained_contract import validate_contract
 from cohort.sustained_sources import validate_sources
 from cohort.sustained_state import restore_state,capture_state
 from cohort.sustained_replay_values import require_exact_state,require_exact_heads
+from cohort.sustained_reference import reference_updates
+from cohort.sustained_loss import class_balanced_objective
 from tier1.catalog import catalog
-from tier1.models import build,optimizer,deterministic
+from tier1.models import build,optimizer,deterministic,objective
 
 def sha(path):
  with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
@@ -29,6 +31,32 @@ def main():
  deterministic();case=catalog()[names[manifest['recipe']]];model=build(case).cuda();opt=optimizer(model,case);restore_state(state,model,opt,identity)
  # Loading must preserve every model/Adam/RNG/cursor value, not just weights.
  require_exact_state(state,capture_state(model,opt,identity,state['steps'],state['training_seconds']))
+ pilot_checks=[]
+ if audit.get('pilot_reference'):
+  if state['steps']!=35:raise ValueError('pilot reference requires terminal35')
+  native_frames=[]
+  for frame in frames:
+   directory=safe('/tmp/native',frame['relative_directory'])
+   for name,value in frame['sha256'].items():
+    if sha(safe(directory,name))!=value:raise ValueError('native pilot input differs')
+   with np.load(directory/'observations.npz',allow_pickle=False) as data:
+    obs=tuple(torch.from_numpy(data[k].astype(np.float32) if k=='points' else data[k]).pin_memory() for k in ['points','counts','coordinates'])
+   with np.load(directory/'targets.npz',allow_pickle=False) as data:
+    truth=tuple(torch.from_numpy(data[k].astype(np.float32) if k=='box_targets' else data[k]).pin_memory()[None] for k in ['labels','box_targets','direction_targets'])
+   native_frames.append((obs,truth))
+  previous_path=Path('/tmp/previous/checkpoint.pt')
+  if sha(previous_path)!=audit['previous_checkpoint_sha256']:raise ValueError('previous external checkpoint differs')
+  previous=torch.load(previous_path,map_location='cuda',weights_only=True)
+  if previous['steps']!=19:raise ValueError('pilot restart requires step19')
+  loss=class_balanced_objective if manifest['recipe']=='class_balanced' else lambda output,truth:objective(output,truth,case)
+  del model,opt
+  for initial,name in [(None,'independent full0-to35'),(previous,'independent restart19-to35')]:
+   deterministic();random.seed(17);np.random.seed(17);model=build(case).cuda();opt=optimizer(model,case)
+   actual=reference_updates(model,opt,native_frames,loss,identity,35,checkpoint=initial)
+   require_exact_state(state,actual,exclude_training_seconds=True);pilot_checks.append(name)
+   del actual
+   if initial is None:del model,opt
+  restore_state(state,model,opt,identity)
  model.eval();checked=[]
  with torch.no_grad():
   for index,frame in enumerate(frames):
@@ -45,6 +73,6 @@ def main():
  restore_state(state,model,opt,identity);require_exact_state(state,capture_state(model,opt,identity,state['steps'],state['training_seconds']))
  peak=torch.cuda.max_memory_allocated();rss=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
  if peak>8*1024**3 or rss>16*1024**2:raise ValueError('audit resource cap exceeded')
- Path('/outputs/replay.json').write_text(json.dumps({'checkpoint_sha256':sha(checkpoint),'manifest_sha256':identity['manifest_sha256'],'updates':state['steps'],'checked_frames':checked,'head_hashes':audit['head_hashes'],'peak_allocated_bytes':peak,'peak_rss_kib':rss,'elapsed_seconds':time.monotonic()-started,'scope':'exact restored model/Adam/RNG/cursor and all16 inference heads; independent continuation, literal losses and native metrics still required'},indent=2)+'\n')
+ Path('/outputs/replay.json').write_text(json.dumps({'checkpoint_sha256':sha(checkpoint),'manifest_sha256':identity['manifest_sha256'],'updates':state['steps'],'checked_frames':checked,'pilot_reference_checks':pilot_checks,'head_hashes':audit['head_hashes'],'peak_allocated_bytes':peak,'peak_rss_kib':rss,'elapsed_seconds':time.monotonic()-started,'scope':'exact restored model/Adam/RNG/cursor and all16 inference heads; independent continuation, literal losses and native metrics still required'},indent=2)+'\n')
  print('ADMITTED exact checkpoint restoration and all16 heads',flush=True)
 if __name__=='__main__':main()

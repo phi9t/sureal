@@ -433,3 +433,19 @@ balanced16-sustained
 Replay preparation review corrected CUDA peak accounting: reset before loading checkpoint/model/Adam and deep-copy state equality, preserving the full audit peak. Final live CPU29 suite v3 passes; native GPU execution remains pending.
 
 Evidence: [balanced16-r](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-replay-preparation-suite-v3-verified.json)
+
+## 55. 2026-10-03T02:53:46.439350+00:00 — observation
+
+balanced16-sustained
+
+Prepared serialized native baseline0/19/35 admission launcher and independent reference updates. Live CPU32 preparation groups pass; actualhost launch refused confirmed-live expanded GPU lock beforecreatingpayload. Native GPU/reference/head admission, literal losses, V3 metrics, HDFS lifecycle and sustained fitting still pending.
+
+Evidence: [balanced16-n](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-native-pilot-preparation-v1-verified.json)
+
+## 56. 2026-10-03T02:55:18.302662+00:00 — observation
+
+balanced16-sustained
+
+Nativepilot preparation review fixed stale command inputs: every stage freezes unique manifest/job/audit bytes, records their hashes, and rejects reuse. Final live CPU34 groups include historicalstage target preservation across later job changes; nativeGPU still pending.
+
+Evidence: [balanced16-n](/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-native-pilot-preparation-v3-verified.json)
