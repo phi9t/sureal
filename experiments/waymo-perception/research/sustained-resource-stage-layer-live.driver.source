@@ -1,0 +1,27 @@
+import hashlib,json,sys,traceback
+from pathlib import Path
+P=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P))
+from resources.sources import freeze_sources,sha
+from resources.stage import run_stage,validate_proof
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+run=sys.argv[1];R=Path('/tmp')/run;R.mkdir();pins=freeze_sources(P/'resources',R/'resource-code')
+root=Path('/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2');authority=P/'research/balanced16-sustained-candidate-live-verified.json';lock=json.loads(authority.read_text())['runtime_lock'];verify_rootfs(root,lock['rootfs_sha256'])
+report={'scope':'actual capped source-pinned launcher success/failure and resource proof; not full controller or native model admission','runtime_lock':lock,'runtime_authority_sha256':sha(authority),'source_pins':pins,'driver_sha256':sha(__file__),'cases':[],'host_dependency_pins':{str(p):sha(p) for p in (P/'pipeline').glob('*.py')}}
+for mode in ['positive','worker-failure']:
+ case=R/mode;case.mkdir();code=case/'code';code.mkdir();source=case/'input';source.mkdir();native=case/'native';native.mkdir();evidence=case/'resources'
+ worker=code/'probe.py';worker.write_text('import importlib.util,json,resource,subprocess,sys\nfrom pathlib import Path\nassert importlib.util.find_spec("tensorflow") is None\nif sys.argv[1]=="worker-failure":raise RuntimeError("controlled live worker failure")\nsubprocess.run([sys.executable,"-c","x=bytearray(8*1024**2)"],check=True)\nx=bytearray(16*1024**2)\nPath("/outputs/check.json").write_text(json.dumps({"argv":sys.argv,"tensorflow_absent":True,"self_peak":resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}))\n')
+ command=launch_plan(root,code,source,native,['python','/experiment/probe.py',mode,'literal$(touch bad)']);original=command.copy();item={'mode':mode,'original_command':original}
+ try:
+  with (native/'live.log').open('w') as stream:result=run_stage(command,code,None,stream,30,code=R/'resource-code',current_sources=P/'resources',source_pins=pins,evidence_directory=evidence,native_output=native,cap_bytes=134217728)
+  assert mode=='positive';proof=json.loads((evidence/'resource-admitted.json').read_text());admitted=validate_proof(proof,command,P/'resources',pins,native,134217728,30);observed=json.loads((native/'check.json').read_text());assert observed['argv']==['/experiment/probe.py',mode,'literal$(touch bad)'];assert observed['tensorflow_absent'];assert proof['worker_measurement']['self_peak_rss_kib']>=observed['self_peak'];assert result.returncode==0 and command!=original;assert not (native/'bad').exists()
+  item.update({'passed':True,'resource_proof':proof,'resource_admission':admitted})
+ except BaseException as error:
+  if mode!='worker-failure':raise
+  attempt=json.loads((evidence/'attempt.json').read_text());assert attempt['admitted'] is False and attempt['host_measurement']['exit_code']!=0;assert not (evidence/'resource-admitted.json').exists() and not (native/'check.json').exists();item.update({'passed':True,'failed_attempt':attempt,'expected_error_type':type(error).__name__})
+ item['artifacts']={str(p):sha(p) for p in case.rglob('*') if p.is_file()};report['cases'].append(item)
+from resources.sources import validate_sources
+validate_sources(P/'resources',pins)
+assert all(sha(p)==digest for p,digest in report['host_dependency_pins'].items())
+report['passed']=True
+(P/'research'/f'{run}-verified.json').write_text(json.dumps(report,indent=2)+'\n');print('PASS: actual source-pinned capped Insula success and durable failed worker refusal; original argv preserved; no native training',flush=True)

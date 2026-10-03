@@ -1,0 +1,37 @@
+{
+  "reviewer": "/root/resource_stage_whole_review",
+  "reviewed_scope": "source/command/stage launcher preparation only; no native optimizer or full-controller admission",
+  "initial_verdict": "request changes",
+  "findings": [
+    {
+      "id": "command-grammar",
+      "severity": "P2",
+      "finding": "Proof accepted consistently mutated bash, absent isolation flag, fake native-output mount and a namespace flag used as an environment value.",
+      "resolution": "Single nonmutating bwrap option parser shared by launch and proof validation; exact parsed native bind required.",
+      "regression": "test_consistently_forged_launch_records_cannot_bypass_command_grammar"
+    },
+    {
+      "id": "payload-evidence-overlap",
+      "severity": "P2",
+      "finding": "Resource evidence could be nested in the releasable native payload.",
+      "resolution": "Absolute, regular, resolved resource evidence and source paths must be disjoint from native payload before evidence creation and on admission.",
+      "regression": [
+        "test_resource_closure_cannot_be_nested_in_native_payload",
+        "test_overlapping_resource_directory_refused_before_creation_or_launch"
+      ]
+    }
+  ],
+  "verification_method": "Author fix pass after fresh independent review: witnessed live RED, GREEN full suite and actual capped fixtures. No second reviewer verdict is claimed.",
+  "red_receipt": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-review-contract-red-v1-verified.json",
+  "green_receipt": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-review-contract-green-v1-verified.json",
+  "live_receipt": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-stage-layer-live-v4-verified.json",
+  "scope_limitations": [
+    "Frozen original native sources were not changed.",
+    "Backend integration, legacy0/1000 bounded revalidation and exact native GPU/state parity remain pending.",
+    "HDFS proof/source/log closure retention must precede native payload release.",
+    "Raw historical RSS fields are not reinterpreted as native evaluator measurements."
+  ],
+  "red_receipt_sha256": "6a3c4c06099a5b37ff42fe500fa817881254cdb625be37a16e248b37938ab7b1",
+  "green_receipt_sha256": "b281f0fe7458659aa9384d0d66bd7b741f51bd3c23d0e95a4bcfcdbb631bdf57",
+  "live_receipt_sha256": "f2396c81ec16a1320cc458ad31a14e22910e0e0e60f7f18c4de49873c034f8a0"
+}
