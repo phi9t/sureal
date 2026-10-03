@@ -41,6 +41,9 @@ class SustainedContractTests(unittest.TestCase):
  def test_missing_or_early_checkpoint_cannot_confirm(self):
   for steps in [[1000,1001],[0,1000,1001],[0,1000,4000]]:
    with self.assertRaises(ValueError):fit_status(self.samples(steps,set(steps[1:])),steps[-1],'gate')
+ def test_early_time_terminal_cannot_confirm(self):
+  samples=self.samples([0,1000,1001],{1000,1001})
+  self.assertEqual(fit_status(samples,1001,'time_cap'),'unconfirmed terminal pass')
  def test_first_pass_cannot_end_at_gate(self):
   with self.assertRaises(ValueError):fit_status(self.samples([0,1000],{1000}),1000,'gate')
   steps=[0,1000,2000,4000,8000,12000,16000,24000,32000]
