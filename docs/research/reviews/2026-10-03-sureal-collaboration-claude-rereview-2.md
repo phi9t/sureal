@@ -1,6 +1,6 @@
 # Claude second-review provenance
 
-Claude reviewed exact commit `d5ead21fb46ddef78bed8d8ac0f8b122ca1f0c01`; all line references below refer to that revision. The response succeeded, with tools disabled. [Provenance](2026-10-03-sureal-collaboration-claude-rereview-2.json) pins the22 source files and raw request/response. The report is preserved verbatim; no live runtime or implementation approval is claimed.
+Claude reviewed exact commit `d5ead21fb46ddef78bed8d8ac0f8b122ca1f0c01`; all line references below refer to that revision. The response succeeded, with tools disabled. [Provenance](2026-10-03-sureal-collaboration-claude-rereview-2.json) pins the22 source files and raw request/response. The report below normalizes trailing whitespace; its exact raw response/report is retained and hashed in provenance; no live runtime or implementation approval is claimed.
 
 ---
 
@@ -66,7 +66,7 @@ The fixes resolve the original structural blockers: commit-before-gate, the 53.0
   - every tool item in the attempt's turn range terminal;
   - no queued input;
   - two scans 5 s apart showing no process whose incarnation, cwd or fds fall in the owned worktree/output scope.
-  
+
   Record it as a limited-coverage stop requiring lead sign-off. Alternatively, state that failure of this probe is a user-escalated design blocker before 50 starts.
 
 **N4 — No-goal mode has no continuation operation.** PLAN:71–84, 145, 189, 195.
@@ -82,7 +82,7 @@ The fixes resolve the original structural blockers: commit-before-gate, the 53.0
 - **Fix:** define each mode's executor:
   - `host-fixture-execute` is run by the lead's pinned controller during fixture preparation and yields a receipt.
   - The in-Insula checker only parses the document and compares receipts.
-  
+
   Rename the mode to reflect that. Also state whether `/outputs/fixtures/<pilot>` is a copy of the prepared fixture or the `/outputs` mount itself.
 
 **N6 — The pilot checker executes from the candidate tree, and no step enforces the write scope on the candidate diff.** CHK-A:12, 26, 40; PLAN:135, 204–205; SPEC:79.
@@ -123,7 +123,7 @@ The fixes resolve the original structural blockers: commit-before-gate, the 53.0
   - T50:29 and PLAN:195 — multi-turn/resume and the fork fixture;
   - T53:49 — third-start, duplicate and GPU refusals in the final pilot;
   - T54:34 — idle-between-turn and long-job progress.
-  
+
   Since "missing coverage refuses" is relative to COV, omitted verifiers can be skipped silently.
 - **Fix:** add these cases and give each case specific artifact names.
 
@@ -165,7 +165,7 @@ Help or schema presence only; live behaviour unproved:
   - metadata `--if-match`;
   - `import --target --new-instance`;
   - a second daemon under its own `KATA_HOME`/socket.
-  
+
   If the second daemon fails, the response is unspecified and the plan should say so.
 - **Codex:**
   - `thread/goal/get`, `thread/queue/list` and `thread/list` cwd filter;
