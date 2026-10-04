@@ -97,13 +97,27 @@ The user selected first-class `sureal/models/` and `sureal/training/`, starting 
 
 | Ticket | Deliverable | Blocked by |
 | --- | --- | --- |
-| [44](../../docs/research/tasks/44-models-training-reference-admission.md) | Frozen reference and independent migration comparison admission | Review gates, active implementation closeout |
+| [44](../../docs/research/tasks/44-models-training-reference-admission.md) | Frozen reference and independent migration comparison admission | Review gates, admitted local protocol 53 |
 | [45](../../docs/research/tasks/45-first-class-models-and-layers.md) | Installed scientific models, neural layers and equivalent detector assembly | 44 |
 | [46](../../docs/research/tasks/46-first-class-training-policy-and-state.md) | Losses, optimizer policy and explicit checkpoint formats | 45 |
 | [47](../../docs/research/tasks/47-shared-fixed-frame-producer.md) | One maintained fixed-frame producer and thin experiment adapters | 46 |
 | [48](../../docs/research/tasks/48-models-training-retention-and-closeout.md) | Discoverability, HDFS recovery evidence and landed closeout | 47 |
 
 [Queue policy](../../docs/research/task-queue.md) records scheduling responsibilities. Existing numbered task files define acceptance; experiment state remains evidence-derived. Preserve the prior approved research order and active frozen packages during migration.
+
+## Sureal-local serial collaboration protocol
+
+After the current worker's full owned integration closeout and a verified pristine `phi9t/mainline`, the user selected a minimal local lead–worker protocol before models/training migration. Corenius is a design reference; no Corenius implementation or runtime is required. [Design proposal](../../docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md) and [queue policy](../../docs/research/task-queue.md) preserve existing scientific evidence and execution contracts.
+
+| Ticket | Deliverable | Blocked by |
+| --- | --- | --- |
+| [49](../../docs/research/tasks/49-collaboration-project-admission.md) | Pristine canonical base, local records and exclusive controller lock | Current closeout, written design/plan review |
+| [50](../../docs/research/tasks/50-collaboration-worker-attempts.md) | One bounded worker in a private task clone | 49 |
+| [51](../../docs/research/tasks/51-collaboration-candidate-verification.md) | Exact immutable candidate submission, verification and repair | 50 |
+| [52](../../docs/research/tasks/52-collaboration-landing-recovery.md) | Conditional exact fast-forward landing and recovery | 51 |
+| [53](../../docs/research/tasks/53-collaboration-cleanup-closeout.md) | Retained evidence, safe cleanup and two real serial tasks | 52 |
+
+All implementation milestones require independent live Insula receipts. These tickets are specified, not completed. Stage order is pristine mainline → 49–53 → models/training44–48; no historical worktree or frozen scientific artifact is discarded by adopting that order.
 
 ## Motion native source pilot progress (2026-10-03)
 
