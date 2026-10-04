@@ -41,7 +41,7 @@ Every implementation milestone runs actual live Insula and retains independent v
 
 ## Sureal-local collaboration workstream
 
-All implementation and authoritative task/spec documents belong in this repository. The protocol uses one persistent lead, initially one worker seat, task-scoped workspaces (recommended linked worktrees), exact candidates, conditional fast-forward landing and explicit recovery/cleanup. Runtime records and disposable workspaces stay outside canonical source to keep it pristine.
+All implementation and authoritative task/spec documents belong in this repository. Reviewed specs/plans land on mainline before execution; the [queue policy](task-queue.md#mainline-task-definitions-and-worker-claims) binds each live claim to its worker session, attempt and workspace, including explicit takeover. The protocol uses one persistent lead, initially one worker seat, task-scoped workspaces (recommended linked worktrees), exact candidates, conditional fast-forward landing and explicit recovery/cleanup. Runtime records and disposable workspaces stay outside canonical source to keep it pristine.
 
 | Task | Deliverable | Dependency |
 | --- | --- | --- |

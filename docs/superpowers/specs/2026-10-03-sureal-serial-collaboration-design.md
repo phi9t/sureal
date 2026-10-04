@@ -37,11 +37,11 @@ Task brief includes stable task ID, intent revision/digest, linked Git task spec
 
 At start:
 
-1. Acquire the controller lock and allocate a free worker seat within admitted capacity. In v1 capacity is one; an active or unresolved attempt occupies it.
+1. Acquire the controller lock, verify the pinned task spec/plan is on admitted mainline B, reserve a unique current claim for that task and allocate a free worker seat within admitted capacity. In v1 capacity is one; an active or unresolved attempt occupies it.
 2. Recheck canonical mainline equals admitted B and is clean.
 3. Create a task workspace outside the canonical source checkout, on a unique disposable `codex/<task-id>/<attempt-id>` branch at B. A linked Git worktree is the recommended initial mode.
-4. Record workspace kind/path, Git common-directory identity, branch, seat and attempt identity before launching the worker.
-5. Launch a fresh bounded worker with the exact admitted brief; retain startup/exit provenance.
+4. Record claim ID/generation, workspace kind/path, Git common-directory identity, branch, seat and attempt identity before launching the worker; capture/reconcile the actual worker session and process identities.
+5. Launch a fresh bounded worker with the exact admitted brief and claim identities; require its matching acknowledgement before RUNNING and retain startup/exit provenance. Lost acknowledgement leaves STARTING/UNKNOWN ownership reserved.
 
 ## Workspace isolation and future workers
 
@@ -117,7 +117,7 @@ Keep a small current-state projection, per-task immutable records and an ordered
 
 ## Queue and evidence
 
-Git task specs remain acceptance authority. A lead selects one admitted work item; optional Kata supplies scheduling/ownership/blocked-by relationships later. Kata is not a prerequisite for the serial protocol, and a Kata closed flag never authorizes landing.
+Reviewed task specs and required plans land on mainline before implementation admission; pin their revisions to B. The controller owns live claims and session/attempt/workspace mapping, while Git defines acceptance. [Task queue policy](../../research/task-queue.md#mainline-task-definitions-and-worker-claims) defines the claim, acknowledgement, status and explicit takeover contract. Reserve a task and seat durably before dispatch; stale claim generations cannot submit or land. Takeover preserves prior work, confirms stop/reconciliation, then records a fresh claim/attempt/session/workspace. Optional issue backends are views/integrations until one ownership transition is defined; issue assignment or closure never independently authorizes execution or landing.
 
 The existing Sureal experiment registry and journal retain recipes, outcomes and scientific interpretation. Protocol task state records attempts/candidates/integration, not a second set of model metrics. Link these records by exact identities.
 

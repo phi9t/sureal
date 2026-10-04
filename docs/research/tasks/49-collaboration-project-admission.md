@@ -13,12 +13,12 @@ Milestone: P0. Implementation home: Sureal. Corenius is a design reference only.
 - Inventory/disposition of outstanding owned code, docs, evidence, commits and mutating attempts; no work is discarded to manufacture cleanliness.
 - Exact transition base on `refs/heads/phi9t/mainline`, clean tracked/index/untracked state and independently observed publication when required.
 - Repository-local project initialization/status through the proposed `scripts/collab.py` entrypoint, external owned runtime-state directory and one exclusive protocol lock.
-- Atomic durable records and source/project identity checks, exercised on real temporary Git fixtures.
+- Atomic durable records and source/project identity checks, exercised on real temporary Git fixtures. Status maps stable task IDs and pinned mainline spec/plan revisions to current claim, worker session, attempt, workspace and evidence; runtime ownership stays outside source.
 
 ## Verifiers
 
 - Live Insula executes actual project/identity/lock/cleanliness tests and an independent artifact audit.
-- Refuse dirty index, tracked/untracked modifications, wrong ref/root, competing lock acquisition and corrupted project state.
+- Refuse dirty index, tracked/untracked modifications, wrong ref/root, competing lock acquisition, branch-only/unpinned task definitions and corrupted project state.
 - Admit an additive protocol test runtime with Git/Python if needed; do not mutate active scientific runtime roots.
 
 ## Acceptance
