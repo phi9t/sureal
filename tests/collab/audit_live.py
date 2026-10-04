@@ -9,6 +9,7 @@ sys.dont_write_bytecode = True
 
 from audit_support.raw_git import InvalidEvidence, materialize, retain, verify_materialization
 from audit_support.verification import audit
+from audit_support.recovery import reconstruct_queue
 
 
 def main(argv=None):
@@ -23,6 +24,9 @@ def main(argv=None):
     keep = commands.add_parser("retain")
     for name in ("repository", "candidate", "output", "owner"):
         keep.add_argument("--" + name, required=True)
+    recover=commands.add_parser('reconstruct-queue')
+    for name in ('export','export-sha256','kata','kata-sha256','output','owner'):
+        recover.add_argument('--'+name,required=True)
     gate = commands.add_parser("audit")
     for name in ("ticket","phase","candidate","candidate-role","materialization",
                  "gate-admission","evidence","output"):
@@ -41,6 +45,11 @@ def main(argv=None):
             print(json.dumps({"schema_version":1,"status":value["status"],"accepted":value["accepted"],
                               "report":str(Path(args.output)),"reason":value.get("reason")},sort_keys=True))
             return code
+        if args.command=='reconstruct-queue':
+            _,receipt=reconstruct_queue({'path':args.export,'sha256':args.export_sha256},
+                {'path':args.kata,'sha256':args.kata_sha256},Path(args.output),args.owner)
+            print(json.dumps({'schema_version':1,'outcome':'ok','reconstruction':receipt},sort_keys=True))
+            return 0
         if args.command == "materialize":
             value = materialize(Path(args.repository), args.candidate, Path(args.source),
                                 Path(args.receipt), args.owner)

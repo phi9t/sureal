@@ -14,7 +14,8 @@ from .raw_git import InvalidEvidence, run_git, sha256, strict_json, verify_mater
 from .runtime import bwrap_options, check_bwrap, check_measurements, rootfs_digest
 from .conditions import check_boundary, check_refusal_cause, check_source_command, option, check_ignore_change
 from .build import check_build
-from .search_index import FTS_TABLES
+from .search_index import FTS_TABLES, check_physical_search_closure
+from .recovery import reconstruct_queue
 
 
 REFUSALS = {
@@ -279,7 +280,7 @@ def selected_projection(database: dict, uid: str) -> dict:
             "issues":sorted(public,key=lambda row:row["uid"]),"links":sorted(relations)}
 
 
-def queue_restore(case, admission=None, **_):
+def queue_restore(case, admission=None, reconstruction_root=None, **_):
     data = manifest(case)
     source = sqlite_projection(data["source_db"])
     restored = sqlite_projection(data["restored_db"])
@@ -320,7 +321,6 @@ def queue_restore(case, admission=None, **_):
     require(all(row["from_issue_uid"] in {i["uid"] for i in chosen["issues"]} and
                 row["to_issue_uid"] in {i["uid"] for i in chosen["issues"]} for row in restored["links"]),
             "Foreign relations restored")
-    check_auxiliary_closure(source,restored,baseline,uid)
     require(scope_search_projection(source,uid)==scope_search_projection(restored,uid),
             "Restored project search semantics differ from selected source issues/comments")
     require(restored["meta"].get("instance_uid") and restored["meta"]["instance_uid"]!=source["meta"].get("instance_uid"),
@@ -342,9 +342,23 @@ def queue_restore(case, admission=None, **_):
     require("--input" in import_["argv"] and
             import_["argv"][import_["argv"].index("--input")+1]==data["export"]["path"],
             "Actual restored input differs from retained export")
+    recovery=None;receipt=None
+    if restored['search_index'] is not None:
+        require(admission is not None and reconstruction_root is not None,
+                'Native physical closure requires admitted tool and fresh audit-owned replay root')
+        tool=admission['tools']['kata']
+        require(export['argv'][0]==import_['argv'][0]==str(artifact(tool)),
+                'Source export/import tool differs from independently pinned native executable')
+        recovery,receipt=reconstruct_queue(data['export'],tool,Path(reconstruction_root),admission['authors']['auditor'])
+        require(recovery['meta']['instance_uid'] not in
+                {source['meta']['instance_uid'],restored['meta']['instance_uid']},
+                'Independent native reconstruction reused existing instance identity')
+        check_native_schema(recovery,admission)
+    check_auxiliary_closure(source,restored,baseline,uid,recovery)
     return {"project_uid":uid,"issue_uids":sorted(row["uid"] for row in chosen["issues"]),
             "links":actual["links"],"restored_instance_uid":restored["meta"]["instance_uid"],
-            "search_index_sha256":content_digest(scope_search_projection(restored,uid))}
+            "search_index_sha256":content_digest(scope_search_projection(restored,uid)),
+            'independent_native_reconstruction':receipt}
 
 
 def scope_search_projection(database,uid):
@@ -360,7 +374,7 @@ def scope_search_projection(database,uid):
             "config":facts["config"]}
 
 
-def check_auxiliary_closure(source,restored,baseline,uid):
+def check_auxiliary_closure(source,restored,baseline,uid,independent_recovery=None):
     project=next(row for row in source["projects"] if row["uid"]==uid)
     target=next(row for row in restored["projects"] if row["uid"]==uid)
     require({k:v for k,v in project.items() if k!="id"}==
@@ -385,9 +399,10 @@ def check_auxiliary_closure(source,restored,baseline,uid):
             if result.get(key) is not None:
                 result[key]=uid if key=="project_id" else issues[result[key]]
         return result
-    # Physical FTS segments can differ after genuine export/import. Each DB's
-    # reopened postings/docsize/config were independently rebuilt and checked
-    # against all actual issue/comment text by sqlite_projection.
+    # Source segments contain other projects and historical updates. Recovered
+    # segments instead must exactly match a separately executed fresh import,
+    # including current shadow rows with search-invisible deleted payload.
+    check_physical_search_closure(restored,independent_recovery)
     ignored={"projects","issues","links","meta"}|FTS_TABLES
     for table,rows in restored["tables"].items():
         if table in ignored:

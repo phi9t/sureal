@@ -111,6 +111,30 @@ completion. Each case's `execution.log` is retained actual command stdout.
   numeric document IDs to stable issue UIDs and must agree. Read-only status
   compares actual raw search-table facts too. Never execute index repair or
   integrity writes on the observed database.
+  Active postings alone do not prove physical payload scope: a native
+  insert/commit/delete/commit may leave unrelated bytes in current FTS shadow
+  rows. The gate executes its own pinned native `import --new-instance` of
+  the exact retained export, into a new audit-owned target and fresh private
+  KATA_HOME. Every virtual/config/data/docsize/idx SQL row must exactly equal
+  this independently recovered index, along with actual issue/comment text
+  and numeric document ownership. Producer replay receipts or pass flags
+  cannot supply this reference. No repair/optimization of either observed
+  artifact is permitted.
+  Reconstruction outputs are retained beside the audit report at
+  `<report-stem>-native-reconstruction/`; existing output roots refuse reuse.
+  The independently executed command, tool/helper/Python/export hashes,
+  exact bounded private environment, native exit/stdout/stderr/time/RSS,
+  fresh instance and cgroup facts are included in the report's artifact
+  closure. A fresh user scope enforces 256MiB RAM, zero swap, 32 tasks; native
+  import has a 60-second timeout, 64MiB per-file and 128MiB total retained
+  output bound. It must leave no descendant or home database/socket/token
+  payload. The installed native empty `runtime/<12-hex-machine>` directories
+  are retained explicitly. No shared Kata daemon is started or touched.
+  `reconstruct-queue --export ABS --export-sha256 SHA --kata ABS
+  --kata-sha256 SHA --output NEW_ABS --owner ID` exposes the same independently
+  owned reconstruction primitive for review controls, without milestone
+  acceptance. `native_recovery_controls.py` repeats the native positive,
+  exact reviewer R2, owned deleted-payload and Unicode/comments controls.
 * Map gate: raw canonical M/parent Git diff, map and binding blobs, source
   definition pins and real-project SQLite snapshot. Only `.kata.toml`, the
   `.kata.local.toml` ignore line and `docs/research/kata-task-map.json` may change;

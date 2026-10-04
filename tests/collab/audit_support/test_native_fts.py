@@ -7,6 +7,7 @@ import tempfile
 import unittest
 
 from audit_support.evidence import sqlite_projection
+from audit_support.cases import check_auxiliary_closure
 
 
 class NativeSearchTests(unittest.TestCase):
@@ -76,6 +77,33 @@ class NativeSearchTests(unittest.TestCase):
         self.assertEqual(before["issues"],after["issues"])
         self.assertEqual(before["search_index"],after["search_index"])
         self.assertNotEqual(before["tables"],after["tables"])
+
+    def test_deleted_foreign_term_cannot_hide_in_current_shadow_payload(self):
+        clean=sqlite_projection(self.reference())
+        marker='foreignhistoricalpayloadneedle'
+        self.connection.execute("INSERT INTO issues_fts(rowid,title,body,comments) VALUES(999999,?,'','')",(marker,))
+        self.connection.commit()
+        self.connection.execute("INSERT INTO issues_fts(issues_fts,rowid,title,body,comments) "
+                                "VALUES('delete',999999,?,'','')",(marker,))
+        self.connection.commit()
+        self.assertEqual(self.connection.execute("SELECT rowid FROM issues_fts WHERE issues_fts MATCH ?",(marker,)).fetchall(),[])
+        current=self.connection.execute('SELECT block FROM issues_fts_data').fetchall()
+        self.assertTrue(any(marker.encode() in row[0] for row in current))
+        contaminated=sqlite_projection(self.reference())
+        self.assertEqual(clean['search_index'],contaminated['search_index'])
+        # Ignoring shadow rows after active-posting validation wrongly accepts
+        # this actual insert/commit/delete/commit contamination.
+        with self.assertRaises(ValueError):
+            check_auxiliary_closure(clean,contaminated,{'tables':{}},clean['projects'][0]['uid'],clean)
+
+    def test_native_physical_closure_accepts_exact_fresh_rows_with_unicode_comments(self):
+        fresh=sqlite_projection(self.reference())
+        check_auxiliary_closure(fresh,fresh,{'tables':{}},fresh['projects'][0]['uid'],fresh)
+
+    def test_native_physical_closure_refuses_missing_reconstruction(self):
+        fresh=sqlite_projection(self.reference())
+        with self.assertRaises(ValueError):
+            check_auxiliary_closure(fresh,fresh,{'tables':{}},fresh['projects'][0]['uid'])
 
 
 if __name__=="__main__":

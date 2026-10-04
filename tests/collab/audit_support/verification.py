@@ -116,7 +116,9 @@ def audit(*,ticket,phase,role,candidate,materialization_path,admission_path,evid
                             "Case execution.log differs from actual stdout")
             require(case["id"] in ORACLES,"No independently implemented oracle for required case")
             facts=ORACLES[case["id"]](case_dir,admission=admission,materialization=materialization,
-                                      role=role,phase=phase)
+                                      role=role,phase=phase,
+                                      reconstruction_root=output.parent/(output.stem+'-native-reconstruction'))
+            refs.extend(collect_references(facts))
             report["cases"][case["id"]]={"derived_facts":facts,
                 "raw_artifacts":sorted({(ref["path"],ref["sha256"]) for ref in refs})}
             report["cases"][case["id"]]["raw_artifacts"]=[{"path":path,"sha256":digest}

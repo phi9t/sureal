@@ -72,3 +72,32 @@ def check_search_index(connection, schema, issues, comments):
         return actual
     finally:
         rebuilt.close()
+
+
+def check_physical_search_closure(restored, independently_recovered):
+    """Compare current rows, including historical payload invisible to search.
+
+    A native fresh import commits index segments differently from a one-shot
+    semantic rebuild. Its independently executed reconstruction is therefore
+    the physical reference; neither repair nor optimization is an oracle.
+    """
+    if restored['search_index'] is None:
+        require(not FTS_TABLES.intersection(restored['tables']),
+                'Partial physical native search closure')
+        return
+    require(independently_recovered is not None,
+            'Independent fresh native reconstruction required for physical search closure')
+    require(restored['sql_schema']==independently_recovered['sql_schema'],
+            'Native reconstruction schema differs')
+    def text_ownership(database):
+        return {'issues':sorted([row['id'],row['uid'],row['title'],row['body']]
+                               for row in database['issues']),
+                'comments':sorted([row['id'],row['issue_id'],row['body']]
+                                 for row in database['tables'].get('comments',[]))}
+    require(text_ownership(restored)==text_ownership(independently_recovered),
+            'Native reconstruction search text/document ownership differs')
+    require(restored['search_index']==independently_recovered['search_index'],
+            'Native reconstruction active search semantics differ')
+    require(all(restored['tables'][table]==independently_recovered['tables'][table]
+                for table in FTS_TABLES),
+            'Current native FTS shadow payload differs from independent fresh scoped recovery')
