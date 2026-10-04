@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "scope": "retire only failed pre-worker publisher temporary hardlink aliases after exact source preservation and independent HDFS union; no original/replay/model release or runner admission",
+  "independent_receipt": {
+    "path": "/tmp/sureal-legacy-closeout-independent.json",
+    "sha256": "cea070fee20873713b1f475503f5d95feac9ba4320a2f4a0816ee3005b18eefc"
+  },
+  "removed_temporary_directory": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/resource-retention-balanced16-sustained-baseline-controller20261003a-checkpoint-090215d57c0748ccb6b5ec03cfd22acb",
+  "temporary_members": 1586,
+  "temporary_payload_bytes": 113795790,
+  "source_snapshot_retained": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-closeout-preservation-controller20261003a-v1",
+  "scientific_bytes_before": 15443076286,
+  "scientific_bytes_after": 15329280496,
+  "original_six_artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/run.json": "96dc607ae8238774ca875588d65eaf463f120227e161ae792a9187c8e6635d7d",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/state.json": "dac2ce421243c4750175f98152cdc1ce4ecb7e1a493ddee7050c42fcc09e7765",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-00/checkpoint.pt": "8057a5496c4d6ec4d19b9de33034c6cca753ea39d8f03fd765ad7011cdf301ee",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-00-admitted.json": "dde09eb7e6d65e781597da82870ca6c64ea5bff1ea77d31b8b8268ec5a0ad364",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-1000/checkpoint.pt": "37de2375b0b10f92a56468bd9ffe0b2fea42f257c5949efa80fd29c621a8ff4a",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-1000-admitted.json": "b0a874b87a2541ab13b2a97e36540b458b54bb0996c6e679a8c156d0160f52d9"
+  },
+  "driver": {
+    "path": "/tmp/sureal-legacy-closeout-postverify.py",
+    "sha256": "3c538a8448f208c17f4d349489c52e679463bf305898721a43e9738ea2a67db9"
+  }
+}

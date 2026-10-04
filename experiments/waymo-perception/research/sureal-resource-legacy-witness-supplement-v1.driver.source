@@ -1,0 +1,50 @@
+"""Preserve missing referenced verifier sources without changing the first union."""
+import json,shutil,sys
+from pathlib import Path
+P=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P))
+from cohort.sustained_controller_backend import NativeBackend,C
+from cohort.sustained_controller_lock import acquire_experiment_lock
+from resources.backend import ResourceBackend
+from resources.retention import publish_bundle
+from resources.sources import sha
+from resources.stage import write_new
+ROOT=C/'insula/resource-legacy-witness-supplement-controller20261003a-v1'
+with acquire_experiment_lock(C/'insula/architecture-experiments.lock') as lock:
+ main=P/'research/sustained-resource-legacy-preservation-v2-verified.json';value=json.loads(main.read_text())
+ if value['passed'] is not True or value['complete_disjoint_recovered_union_exact'] is not True:raise ValueError('original declared asset union must be admitted first')
+ b=NativeBackend('controller20261003a','baseline',lock,resume=True)
+ state=json.loads((b.R/'state.json').read_text());previous=None
+ for record in state['records']:b.check_record(record,previous);previous=record
+ shared=json.loads((P/'research/sustained-resource-shared-hdfs-live-v4-verified.json').read_text());b.__class__=ResourceBackend;b._resource_identity=None;b.attach_resources(shared['resource_identity_path'],shared['resource_identity_sha256'])
+ ROOT.mkdir(exist_ok=False);snapshot=ROOT/'snapshot';snapshot.mkdir()
+ missing=Path('/tmp/sureal-legacy-witness-reference-audit.json');audit=json.loads(missing.read_text());refs={p:e['sha256'] for p,e in audit['missing'].items()};inventory={}
+ if audit['unresolved'] or len(refs)!=14:raise ValueError('complete resolved witness reference audit required')
+ for source,digest in refs.items():
+  source=Path(source)
+  if sha(source)!=digest:raise ValueError('unchanged independently referenced witness source required')
+  target=snapshot/'bodies'/source.relative_to('/tmp');target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source,target)
+ for source in [Path('/tmp/sureal-resource-legacy-gpu-v1.py'),Path('/tmp/sureal-legacy-extra-paired-witness-reference.json'),missing,main,Path('/tmp/sureal-legacy-parity-independent-review.json'),Path('/tmp/sureal-legacy-witness-reference-audit.py'),Path(__file__),P/'research/research-journal.jsonl',P/'research/research-journal.md',P/'research/2026-10-03-models-training-closeout-handoff.md']:
+  shutil.copyfile(source,snapshot/(source.name+'.source' if source.suffix=='.py' else source.name))
+ from tracking.journal import read_entries
+ entries=read_entries(P/'research/research-journal.jsonl')
+ if len(entries)!=108 or entries[-1]['sha256']!='3c9d4c78f4b3b9dd248e61e693ed726a4c6f279466a0dd27b15a0a1e9e4910e5':raise ValueError('exact acknowledged journal108 required')
+ for reference in entries[-1]['evidence']:
+  source=P/'research/journal-evidence'/reference['sha256']
+  if sha(source)!=reference['sha256']:raise ValueError('journal108 evidence snapshot changed')
+  target=snapshot/'journal-evidence'/reference['sha256'];target.parent.mkdir(exist_ok=True);shutil.copyfile(source,target)
+ for name in ['sureal-continuation-merged-tests','sureal-continuation-namespace-red1','sureal-continuation-namespace-green1']:
+  shutil.copytree(Path('/tmp')/name,snapshot/'unlanded-test-evidence'/name,ignore=shutil.ignore_patterns('__pycache__'))
+ for source in [Path('/tmp/sureal-continuation-merged-gate.py'),Path('/tmp/sureal-continuation-runtime-gate.py')]:
+  shutil.copyfile(source,snapshot/(source.name+'.source'))
+ external=snapshot/'external-architecture-proposal';external.mkdir()
+ for source,digest in [(Path('/data02/home/philip.yang/workspace/sureal/docs/superpowers/specs/2026-10-03-first-class-models-training-design.md'),'32fd3ea749a55463a9806c583e2ebb5086aed57a8ef9f920127c14620c04d364'),(Path('/data02/home/philip.yang/devx/tmp/architecture-review-20261003-155741-421997.html'),'948b2dda39a2133bf973fb977e58c80969a971b093b2b178977fbc672bcb02bb')]:
+  if sha(source)!=digest:raise ValueError('observed external proposal changed; preserve owner and refuse implicit replacement')
+  shutil.copyfile(source,external/source.name)
+ for path in snapshot.rglob('*'):
+  if not path.is_file():continue
+  inventory['witness-supplement/'+path.relative_to(snapshot).as_posix()]={'path':str(path),'sha256':sha(path),'bytes':path.stat().st_size}
+ write_new(ROOT/'expected.json',inventory);publication=publish_bundle(b,'checkpoint',inventory)
+ if any(sha(path)!=digest for path,digest in value['original_native_sha256'].items()):raise ValueError('original native state changed')
+ report={'schema_version':1,'passed':True,'scope':'separate missing witness-source supplement; original frozen asset union unchanged; no full runner or original/replay release','main_preservation':{'path':str(main),'sha256':sha(main)},'source_inventory_path':str(ROOT/'expected.json'),'source_inventory_sha256':sha(ROOT/'expected.json'),'missing_referenced_witness_sha256':refs,'publication':publication,'driver_path':str(Path(__file__).resolve()),'driver_sha256':sha(__file__)}
+ write_new(ROOT/'verified.json',report);write_new(P/'research/sustained-resource-legacy-witness-supplement-v1-verified.json',report)
+print('PASS independent witness source supplement preserved',flush=True)

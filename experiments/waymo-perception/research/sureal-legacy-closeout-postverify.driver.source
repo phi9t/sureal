@@ -1,0 +1,25 @@
+import json,pathlib,shutil,sys
+P=pathlib.Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P));R=P/'research'
+from cohort.sustained_controller_lock import acquire_experiment_lock
+from cohort.sustained_controller_backend import C,W
+from resources.sources import sha
+from resources.stage import validate_proof
+from tier1.storage import unique_payload_bytes
+receipt=pathlib.Path('/tmp/sureal-legacy-closeout-independent.json');x=json.loads(receipt.read_text());assert sha(receipt)=='cea070fee20873713b1f475503f5d95feac9ba4320a2f4a0816ee3005b18eefc' and x['passed'] is True
+for stage in x['archive_stages']:
+ ref=stage['proof'];assert sha(ref['path'])==ref['sha256'];v=json.loads(pathlib.Path(ref['path']).read_text());assert validate_proof(v,v['command'],P/'resources',x['resource_source_pins'],pathlib.Path(v['native_output_directory']),16*1024**3,v['timeout_seconds'])==stage['resource_admission']
+for path,h in x['original_six_artifacts'].items():assert sha(path)==h
+failed_name='resource-retention-balanced16-sustained-baseline-controller20261003a-checkpoint-090215d57c0748ccb6b5ec03cfd22acb'
+with acquire_experiment_lock(C/'insula/architecture-experiments.lock'):
+ directory=W/failed_name;source=C/'insula/resource-legacy-closeout-preservation-controller20261003a-v1';inventory=json.loads((source/'expected.json').read_text());coverage=set(x['recovered_union'].values());assert directory.exists() and not directory.is_symlink();seen={p.relative_to(directory/'raw').as_posix():p for p in (directory/'raw').rglob('*') if p.is_file()};assert set(seen)==set(inventory)
+ for name,e in inventory.items():
+  p=seen[name];assert not p.is_symlink() and sha(p)==e['sha256'] and sha(e['path'])==e['sha256'] and e['sha256'] in coverage and p.stat().st_size==e['bytes']
+ other=[p for p in directory.rglob('*') if p.is_file() and not p.is_relative_to(directory/'raw')];assert [p.relative_to(directory).as_posix() for p in other]==['0/packed/live.log'] and other[0].stat().st_size==0
+ before=unique_payload_bytes(W);shutil.rmtree(directory)
+ for path,h in x['original_six_artifacts'].items():assert sha(path)==h
+ result={'passed':True,'scope':'retire only failed pre-worker publisher temporary hardlink aliases after exact source preservation and independent HDFS union; no original/replay/model release or runner admission','independent_receipt':{'path':str(receipt),'sha256':sha(receipt)},'removed_temporary_directory':str(directory),'temporary_members':len(inventory),'temporary_payload_bytes':sum(e['bytes'] for e in inventory.values()),'source_snapshot_retained':str(source),'scientific_bytes_before':before,'scientific_bytes_after':unique_payload_bytes(W),'original_six_artifacts':x['original_six_artifacts'],'driver':{'path':str(pathlib.Path(__file__).resolve()),'sha256':sha(__file__)}}
+ assert result['scientific_bytes_after']==15329280496
+ (R/'sureal-legacy-closeout-postverify.json').write_text(json.dumps(result,indent=2)+'\n')
+for source,name in [('/tmp/sureal-legacy-closeout-independent.json','sustained-resource-legacy-closeout-independent.json'),('/tmp/sureal-legacy-closeout-independent.py','sureal-legacy-closeout-independent.driver.source'),('/tmp/sureal-legacy-closeout-postverify.py','sureal-legacy-closeout-postverify.driver.source'),('/tmp/sureal-models-training-proposal-preservation.json','sureal-models-training-proposal-preservation.json')]:
+ (R/name).write_bytes(pathlib.Path(source).read_bytes())
+print('PASS final two proof/artifact checks; retired only1586 failed prelaunch aliases, science15329280496; originals/replays exact')

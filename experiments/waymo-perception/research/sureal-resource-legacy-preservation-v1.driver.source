@@ -1,0 +1,87 @@
+"""Preserve retained and replay payloads plus immutable raw execution metadata.
+
+This performs no release and grants no companion/controller/runner admission.
+"""
+import json,shutil,sys,traceback
+from pathlib import Path
+P=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P))
+from cohort.sustained_controller_backend import NativeBackend,C
+from cohort.sustained_controller_lock import acquire_experiment_lock
+from cohort.sustained_checkpoint_inventory import freeze_checkpoint_inventory
+from resources.backend import ResourceBackend
+from resources.dependencies import shared_inventory
+from resources.retention import publish_bundle
+from resources.sources import sha,regular
+from resources.stage import write_new
+from tier1.storage import unique_payload_bytes
+ROOT=C/'insula/resource-legacy-preservation-controller20261003a-v1'
+REPORT=P/'research/sustained-resource-legacy-preservation-v1-verified.json'
+report={'schema_version':1,'scope':'bounded exact HDFS preservation/recovery of producer/replay/shared assets and immutable metadata; no original or replay payload release, sealed companion, controller or runner admission','driver_path':str(Path(__file__).resolve()),'driver_sha256':sha(__file__)}
+try:
+ with acquire_experiment_lock(C/'insula/architecture-experiments.lock') as lock:
+  b=NativeBackend('controller20261003a','baseline',lock,resume=True);state=json.loads((b.R/'state.json').read_text());prev=None
+  for record in state['records']:b.check_record(record,prev);prev=record
+  replay_path=P/'research/sustained-resource-legacy-seven-v5-verified.json';replay=json.loads(replay_path.read_text())
+  if replay['passed'] is not True or replay['completed_legacy_stages']!=12:raise ValueError('complete author replay evidence required before preservation')
+  review_path=Path('/tmp/sureal-legacy-parity-independent-review.json');review=json.loads(review_path.read_text())
+  if review.get('passed') is not True:raise ValueError('independent live replay/source gate required')
+  original={str(b.R/n):sha(b.R/n) for n in ('run.json','state.json')}
+  for record in state['records']:
+   original[str(Path(record['root'])/'checkpoint.pt')]=record['checkpoint_sha256'];original[record['final_path']]=record['final_sha256']
+  shared=json.loads((P/'research/sustained-resource-shared-hdfs-live-v4-verified.json').read_text())
+  b.__class__=ResourceBackend;b._resource_identity=None;b.attach_resources(shared['resource_identity_path'],shared['resource_identity_sha256'])
+  ROOT.mkdir(exist_ok=False);snapshot=ROOT/'snapshot';snapshot.mkdir()
+  shutil.copytree(b.R,snapshot/'original-case',ignore=shutil.ignore_patterns('__pycache__'))
+  for name in ['resource-legacy-seven-controller20261003a-v'+str(i) for i in range(1,6)]+['resource-legacy-gpu-controller20261003a-v1','resource-legacy-gpu-controller20261003a-v2']:
+   path=C/'insula'/name
+   if path.exists():shutil.copytree(path,snapshot/'legacy-evidence'/name,ignore=shutil.ignore_patterns('__pycache__'))
+  for name in ['continuation','continuation_control']:shutil.copytree(P/name,snapshot/'current-extensions'/name,ignore=shutil.ignore_patterns('__pycache__'))
+  notes=snapshot/'research';notes.mkdir()
+  for name in ['research-journal.jsonl','research-journal.md','2026-10-03-approved-execution-order.md','sustained-resource-shared-hdfs-live-v4-verified.json','sustained-resource-legacy-gpu-independent.json']:
+   shutil.copyfile(P/'research'/name,notes/name)
+  shutil.copytree(P/'research/journal-evidence',notes/'journal-evidence')
+  for path in (P/'research').glob('sureal-continuation*-verified.json'):shutil.copyfile(path,notes/path.name)
+  for path in (P/'research').glob('sustained-resource-legacy-seven-v*-*.json'):shutil.copyfile(path,notes/path.name)
+  shutil.copyfile(review_path,notes/'independent-review.json')
+  for path in Path('/tmp').glob('sureal-resource-legacy-seven-v*.py'):shutil.copyfile(path,notes/(path.name+'.source'))
+  shutil.copyfile(__file__,notes/'preservation.driver.source')
+  shutil.copyfile('/tmp/sureal-continuation-control-gate.py',notes/'tests.driver.source')
+  for name in ['sureal-legacy-independent-state-0','sureal-legacy-independent-state-1000']:
+   path=Path('/tmp')/name
+   if path.exists():shutil.copytree(path,snapshot/'independent-live'/name,ignore=shutil.ignore_patterns('__pycache__'))
+  for path in sorted(Path('/tmp').glob('sureal-continuation*')):
+   if path.is_dir() and (path/'verified.json').is_file():shutil.copytree(path,snapshot/'live-test-evidence'/path.name,ignore=shutil.ignore_patterns('__pycache__'))
+  for name in ['sureal-legacy-independent-state-worker.py','sureal-legacy-independent-state-driver.py','sureal-legacy-stderr-diagnostic.json','sureal-legacy-marker-collision.json']:
+   shutil.copyfile(Path('/tmp')/name,notes/(name+'.source' if name.endswith('.py') else name))
+  shutil.copyfile(P.parents[1]/'docs/superpowers/plans/2026-10-03-balanced16-sustained-overfit.md',notes/'approved-plan.md')
+  shutil.copyfile(P.parents[1]/'.superpowers/sdd/2026-10-03-balanced16-sustained-overfit/progress.md',notes/'execution-ledger.md')
+  inventory={}
+  def add(name,path,digest=None):
+   if name in inventory or not regular(path) or digest is not None and sha(path)!=digest:raise ValueError('unique immutable artifact member required')
+   inventory[name]={'path':str(path),'sha256':sha(path),'bytes':path.stat().st_size}
+  for record in state['records']:
+   native=freeze_checkpoint_inventory(Path(record['root']),record['final_path'],record['final_sha256'])
+   for name,digest in native['source_sha256'].items():add('producer-'+str(record['step'])+'/'+name,Path(record['root'])/name,digest)
+   entry=next(e for e in replay['stages'] if e['requested_stage']=='train-'+str(record['step']))
+   fresh=Path(json.loads(Path(entry['proof']['path']).read_text())['native_output_directory'])
+   names={str(p.relative_to(fresh)) for p in fresh.rglob('*') if p.is_file()}
+   if names!=set(native['source_sha256']):raise ValueError('complete nineteen-member replay payload required')
+   for name in names:add('replay-'+str(record['step'])+'/'+name,fresh/name,entry['output_artifacts'][str(fresh/name)])
+  for name,value in shared_inventory(b).items():add('shared/'+name,Path(value['path']),value['sha256'])
+  for path in snapshot.rglob('*'):
+   if path.is_symlink():raise ValueError('metadata snapshot symlink refused')
+   if path.is_file():add('metadata/'+path.relative_to(snapshot).as_posix(),path)
+  bytes_before=unique_payload_bytes(b.output.parent)
+  write_new(ROOT/'expected.json',inventory)
+  report.update(original_native_sha256=original,source_inventory_sha256=sha(ROOT/'expected.json'),members=len(inventory),source_bytes=sum(x['bytes'] for x in inventory.values()),scientific_bytes_before=bytes_before)
+  publication=publish_bundle(b,'checkpoint',inventory)
+  if any(sha(path)!=digest for path,digest in original.items()):raise ValueError('original native evidence changed')
+  if unique_payload_bytes(b.output.parent)!=bytes_before:raise ValueError('original/replay scientific payload retention changed')
+  report.update(passed=True,publication=publication,original_and_replay_payloads_retained=True,scientific_bytes_after=unique_payload_bytes(b.output.parent))
+  write_new(ROOT/'verified.json',report);write_new(REPORT,report)
+except BaseException as error:
+ report.update(passed=False,error={'type':type(error).__name__,'message':str(error)},traceback=traceback.format_exc())
+ failure=P/'research/sustained-resource-legacy-preservation-v1-failure.json'
+ if not failure.exists():write_new(failure,report)
+ raise
+print('PASS HDFS artifact preservation; no original or replay release',flush=True)

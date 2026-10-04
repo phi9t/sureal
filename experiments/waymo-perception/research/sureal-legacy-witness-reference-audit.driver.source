@@ -1,0 +1,28 @@
+import json,hashlib
+from pathlib import Path
+C=Path.home()/'.cache/waystone/waymo-perception/insula';inventory=json.loads((C/'resource-legacy-preservation-controller20261003a-v2/expected.json').read_text());by_hash={}
+for name,e in inventory.items():by_hash.setdefault(e['sha256'],[]).append((name,e))
+roots=[Path('/tmp/sureal-legacy-parity-independent-review.json'),*[Path('/tmp/sureal-legacy-independent-state-'+str(s)+'/verified.json') for s in [0,1000]]]
+queue=[{'path':str(p),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in roots];visited=set();records=[];missing={};unresolved=[]
+while queue:
+ ref=queue.pop();key=(ref['path'],ref['sha256'])
+ if key in visited:continue
+ visited.add(key);candidates=by_hash.get(ref['sha256'],[]);source=Path(ref['path'])
+ if candidates:
+  name,entry=candidates[0];source=Path(entry['path']);assert hashlib.sha256(source.read_bytes()).hexdigest()==ref['sha256'];record={**ref,'covered_member':name,'covered_source_path':str(source)}
+ elif source.is_file():
+  assert hashlib.sha256(source.read_bytes()).hexdigest()==ref['sha256'];missing[str(source)]={'sha256':ref['sha256'],'bytes':source.stat().st_size};record={**ref,'missing_from_frozen_inventory':True}
+ else:
+  unresolved.append(ref);continue
+ records.append(record)
+ if ref['path'].endswith('.json'):
+  value=json.loads(source.read_text())
+  def collect(x):
+   if isinstance(x,dict):
+    if isinstance(x.get('path'),str) and isinstance(x.get('sha256'),str) and len(x['sha256'])==64:queue.append({'path':x['path'],'sha256':x['sha256']})
+    for y in x.values():collect(y)
+   elif isinstance(x,list):
+    for y in x:collect(y)
+  collect(value)
+result={'roots':[str(p) for p in roots],'references':records,'missing':missing,'unresolved':unresolved,'reference_count':len(records),'missing_files':len(missing),'missing_bytes':sum(e['bytes'] for e in missing.values()),'scope':'all reachable canonical path/sha256 objects; renamed identical inventory bodies count with explicit member mapping'}
+p=Path('/tmp/sureal-legacy-witness-reference-audit.json');p.write_text(json.dumps(result,indent=2)+'\n');print({k:result[k] for k in ['reference_count','missing_files','missing_bytes','unresolved']});print(json.dumps(missing,indent=2))

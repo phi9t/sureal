@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "scope": "separate missing witness-source supplement; original frozen asset union unchanged; no full runner or original/replay release",
+  "main_preservation": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-legacy-preservation-v2-verified.json",
+    "sha256": "ff75ebf2e22297eb54c50990e25eb54e1b9ca4d3a3bf92719b82c46da04c88d3"
+  },
+  "source_inventory_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-witness-supplement-controller20261003a-v1/expected.json",
+  "source_inventory_sha256": "e57cd92031761d83e2a63c0b83a06528b8fd9136fe0d29320bbe2814461b4974",
+  "missing_referenced_witness_sha256": {
+    "/tmp/sureal-legacy-independent-state-driver-v2.py": "82e19b1ed4cfb245e7f025fd9342acc48f54e7d4491b79951dc4ebd79d2fe6e3",
+    "/tmp/sureal-legacy-independent-report.py": "e750c12330a59114bc7f34f1a3c9fd016d4360c590ef9fe5312f7871a1fb0cc0",
+    "/tmp/sureal-legacy-prior-gpu-reconcile.py": "84fb3e898224f5258e240e1f619ee2b037c4b19a8afe837ee8d3f6f594211225",
+    "/tmp/sureal-legacy-independent-reconcile-v2.py": "7b6336152032b2821ebb8a013ac4cc85127b3088a64ce7a5c74591fad46c462c",
+    "/tmp/sureal-legacy-independent-reconcile.py": "bc1cf43a6a64f535866558d21366fcd12d1a55a1a21de69fa2fb58439859d7e3",
+    "/tmp/sureal-legacy-prior-gpu-reconcile.json": "3754ca40e0ed66805626689ebba1973ab3f400c63e425b96209ed80287c232ef",
+    "/tmp/sureal-resource-legacy-gpu-independent/audit-1000-outputs/transition.json": "73f6ebbd83d8876c73374d8c142ca69a07eab5901433347e26ca29973003aeef",
+    "/tmp/sureal-resource-legacy-gpu-independent/audit-1000-outputs/replay.json": "72e67735419f1cd69bb200e052a93607ef1a75c35ffa6421a654978a79248568",
+    "/tmp/sureal-resource-legacy-gpu-independent/audit-1000-resources/resource-admitted.json": "5e1605bc284a104685408da4e2dfd5f9d5e60518a7536f6a08ccf4df3b273c4e",
+    "/tmp/sureal-resource-legacy-gpu-independent/audit-1000-resources/worker/worker-resource.json": "95a06dcd56fcd5e0d2128946d8a6c79c6ba0757960cbb7f248f9ded7a8b83c68",
+    "/tmp/sureal-resource-legacy-gpu-independent/audit-0-outputs/transition.json": "a186bcefa8601a836357054f6d4f834e5bc00273224849ab3b868b5b23871de7",
+    "/tmp/sureal-resource-legacy-gpu-independent/audit-0-outputs/replay.json": "84e5d341d553713ee8b959786aae48bb79a348098ccc4bc6fbda6aa39897ecf4",
+    "/tmp/sureal-resource-legacy-gpu-independent/audit-0-resources/resource-admitted.json": "4e8da04fbb0b2ae61a0e90bad07b2ec48b59a29191ef71ba8b9ac7b6875b709f",
+    "/tmp/sureal-resource-legacy-gpu-independent/audit-0-resources/worker/worker-resource.json": "4193fe7b0da30462a517792a4c2624b355aac272574903813402fa396a2ee277"
+  },
+  "publication": {
+    "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-checkpoint-76053458d0c14a2cb7cd08b8d2f2f61f/verified-publication.json",
+    "sha256": "bc8ec545bd49dfb220046334847fe7907ca024ab7c19b382e9d29c4251821649",
+    "hdfs_manifest_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-sustained-baseline-controller20261003a-checkpoint-76053458d0c14a2cb7cd08b8d2f2f61f/publication-manifest.json",
+    "kind": "checkpoint"
+  },
+  "driver_path": "/tmp/sureal-resource-legacy-witness-supplement-v1.py",
+  "driver_sha256": "8c25ce2f78f168260676e31f3b554f769034401bb60f693348e27e7b2b15710e"
+}
