@@ -25,13 +25,13 @@ A ready task becomes assigned through a Kata owner claim coordinated under the c
 | Project identity, task ID, spec path and revision | Identify the exact work and acceptance contract |
 | Brief digest, exact base B, allowed scope/resources | Bind execution to its admitted inputs and authority |
 | Claim ID/generation, attempt ID, worker seat | Identify the sole current owner and reject obsolete claims |
-| Worker session/thread ID and owned process identity | Show which actual session is executing; capture both before dispatch where possible, or reconcile launch identity before RUNNING |
+| Native session ID, exact primary thread ID, runtime instance and owned process handles | Session groups threads; thread ID addresses the worker. Capture/reconcile actual launch identity before RUNNING; server PID may be shared |
 | Workspace kind/path, common Git directory, branch | Locate the owned source and record shared metadata |
 | State, dispatch acknowledgement, progress/evidence references | Separate assigned, running, unknown, submitted and completed facts |
 
 The lead/controller selects a task from Kata’s unowned ready queue, rechecks its landed spec and dependencies, and claims it using a unique attempt actor (`--as sureal/<attempt-id>`). Default human/user identity is insufficient because separate sessions would look like the same owner. The controller refuses an existing active/unknown claim for that task, an occupied seat, unmet dependencies or conflicting declared write/resource scope. The two v1 seats allow independent tasks concurrently, with only one active owner per task and distinct worktrees/branches. Reject a third active attempt, overlapping declared write scopes and conflicting shared resources. Scope checks use declared write sets and explicit shared-resource ownership; they do not prove that undeclared filesystem access is impossible.
 
-The worker acknowledges the exact task/spec/brief/claim/attempt identities before implementation. If the launch adapter reveals its session ID only after launch, record STARTING, recover that identity and obtain the acknowledgement before marking RUNNING. A lost acknowledgement leaves the attempt unresolved, not available for reassignment. The detailed plan must specify the adapter and this handshake.
+The worker acknowledges the exact task/spec/brief/claim/attempt identities before implementation. If the launch adapter reveals its thread/session IDs only after launch, record STARTING, recover that identity and obtain the acknowledgement before marking RUNNING. A lost acknowledgement leaves the attempt unresolved, not available for reassignment. The detailed plan must specify the adapter and this handshake.
 
 Every controller mutation, progress report, submission, repair and landing references the current Kata issue/owner plus claim generation and attempt, and verifies that they still match. Read-only status shows task, spec revision, state/blocker, owner session, attempt, workspace/branch, base/candidate and evidence. Messaging with `codex queue` carries those identities; delivery alone is not a claim or start receipt. This controller/status interface is proposed, not implemented today.
 
@@ -54,6 +54,8 @@ A claim, metadata update, launch and issue comment are separate effects. Before 
 The installed Kata v0.14.3 supports `claim`, `ready`, `--blocked-by`, `--as`, metadata `--if-match`, events and project-scoped export. Current upstream documentation has newer flags; implement against the admitted installed version or explicitly admit an upgrade. At inspection, `kata whoami` resolves to `philip.yang`, confirming the need for distinct attempt actors.
 
 Sources: [Kata quickstart](https://github.com/kenn-io/kata/blob/main/docs/get-started/quickstart.md), [shared-project model](https://github.com/kenn-io/kata/blob/main/docs/workflows/sharing.md), and installed `kata version`, `quickstart` and command help. Runtime inspections are configuration evidence, not completed integration gates.
+
+The [Codex runtime entity model](../superpowers/specs/2026-10-03-codex-runtime-domain-design.md) distinguishes native session grouping, exact worker thread, turn, item and thread-scoped goal. Claim/dispatch/summary joins require the thread ID; shared sessionId or daemon PID does not identify an owner.
 
 ## User-facing worker and queue overview
 

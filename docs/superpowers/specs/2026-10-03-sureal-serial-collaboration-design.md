@@ -29,6 +29,8 @@ Before starting managed execution, the current worker completes its current task
 - **Controller:** a small local CLI owns state transitions, workspace identity, the exclusive protocol lock, candidate retention and integration. It does not invent task acceptance or interpret model output as proof.
 - **Human:** owns intent, architecture and applicable integration/publication authorization. Record the applicable Sureal landing delegation with the admitted task before its first managed landing. Authority never extends to another repository or branch.
 
+The [Codex runtime entity model](2026-10-03-codex-runtime-domain-design.md) fixes session/thread/turn/item/goal identities. A worker attempt binds one exact primary thread and worktree; native sessionId groups threads and is not an ownership key.
+
 The CLI and lead are distinct roles even if both are operated in the same terminal. Task acceptance remains an evidence-backed decision.
 
 ## One task, one exact base, one candidate
@@ -40,7 +42,7 @@ At start:
 1. Acquire the controller lock, verify the pinned task spec/plan is on admitted mainline B, reserve its Kata owner through a unique attempt actor and durable controller intent and allocate a free worker seat within admitted capacity. In v1 capacity is two; each active or unresolved attempt occupies its own seat. Refuse a third start and duplicate task ownership.
 2. Recheck canonical mainline equals admitted B and is clean.
 3. Create a task workspace outside the canonical source checkout, on a unique disposable `codex/<task-id>/<attempt-id>` branch at B. A linked Git worktree is the recommended initial mode.
-4. Record Kata issue/owner/revision, claim ID/generation, workspace kind/path, Git common-directory identity, branch, seat and attempt identity before launching the worker; capture/reconcile the actual worker session and process identities.
+4. Record Kata issue/owner/revision, claim ID/generation, workspace kind/path, Git common-directory identity, branch, seat and attempt identity before launching the worker; capture/reconcile native sessionId, exact primary threadId, runtime incarnation and owned tool/process handles. Multiple threads may share the app-server PID.
 5. Launch a fresh bounded worker with the exact admitted brief and claim identities; require its matching acknowledgement before RUNNING and retain startup/exit provenance. Lost acknowledgement leaves STARTING/UNKNOWN ownership reserved.
 
 ## Workspace isolation and concurrent workers
@@ -133,7 +135,7 @@ The first research tasks can exercise the models/training workstream once this r
 
 A read-only local overview is required for v1, implemented in Sureal and backed by the same status projection as the CLI. It combines two worker cards, the centralized Kata queue, task/spec progress and a recent-change timeline. The user can understand current work from summaries; raw transcripts are an optional evidence drilldown. [Ticket54](../../research/tasks/54-worker-program-observability.md) defines the verifier and acceptance, and blocks full-loop admission53.
 
-Each worker card shows its seat, real session/attempt/claim identities, task goal, Kata issue and pinned spec/plan links, owned workspace/branch, base/candidate, current focus, recent actions/findings, last observed activity, blocker/wait reason, next expected action and verification/landing/cleanup status. A compact narrative targets at most 120 words plus a short evidence-linked timeline. Show elapsed phase time and source refresh time; activity absence is not proof of a hung or stopped process. Historical attempts remain discoverable after takeover.
+Each worker card shows its seat, real session/thread/current-turn/attempt/claim identities, task goal, Kata issue and pinned spec/plan links, owned workspace/branch, base/candidate, current focus, recent actions/findings, last observed activity, blocker/wait reason, next expected action and verification/landing/cleanup status. A compact narrative targets at most 120 words plus a short evidence-linked timeline. Show elapsed phase time and source refresh time; activity absence is not proof of a hung or stopped process. Historical attempts remain discoverable after takeover.
 
 The queue shows ready/claimed/running/waiting/blocked/needs-verification/needs-landing/closed groups, owners and dependency reasons. Task/spec progress separately shows draft versus reviewed/landed definitions, admission blockers, candidate evidence and verified closure. Initially index the admitted collaboration/model-training lane and discovered repository tickets; older research items with unaudited receipts display UNKNOWN/NOT AUDITED rather than invented completion. Grouping is a derived view, not another editable queue.
 

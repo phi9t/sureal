@@ -6,7 +6,7 @@ Status: design proposal; required part of overview54 and concurrent protocol adm
 
 For each owned worker, answer: what objective is it pursuing, can it act, is it making progress, is execution responsive, what would unblock it, and how trustworthy/current is that answer?
 
-Join exact project/task/spec/claim-generation/attempt/session/workspace identities. Record the assigned objective and native goal identity/status where available. The inspected schema has no separate goal ID: bind thread ID, goal creation time and objective digest, plus retained update identity; a task-only session explicitly shows NO NATIVE GOAL. Session activity, native goal lifecycle, attempt/process lifecycle, progress health, Kata task stage and integration outcome are distinct fields. Never infer task completion or released ownership from session idleness, goal completion or a health warning.
+Join exact project/task/spec/claim-generation/attempt/session/thread/workspace identities under the [Codex runtime model](2026-10-03-codex-runtime-domain-design.md). SessionId groups threads; primary threadId is the worker address. Retain current/last turnId for progress, not ownership. Record the assigned objective and native goal identity/status where available. The inspected schema has no separate goal ID: bind thread ID, goal creation time and objective digest, plus retained update identity; a task-only session explicitly shows NO NATIVE GOAL. Session activity, native goal lifecycle, attempt/process lifecycle, progress health, Kata task stage and integration outcome are distinct fields. Never infer task completion or released ownership from session idleness, goal completion or a health warning.
 
 ## Operating state
 
