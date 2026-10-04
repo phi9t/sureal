@@ -1,0 +1,29 @@
+{
+  "axis": "Spec",
+  "base": "89e8912",
+  "scope": "Six cached documentation/journal paths recording Sureal-local tooling-home correction",
+  "findings": [],
+  "assessment": "Suitable metadata-only landing; no protocol approval, implementation or scientific admission is implied",
+  "checks": {
+    "six_metadata_paths": true,
+    "117_append_chain": true,
+    "117_snapshots_exact": true,
+    "Sureal_sole_home_explicit": true,
+    "Corenius_readonly_no_efforts_controlplane_import_runtime_changes": true,
+    "local_cli_proposed_not_created": true,
+    "no_mandatory_Kata_or_daemon": true,
+    "closeout_pristine_protocol49_53_models44_48_order_preserved": true,
+    "foreign_owner_branch_revision_retained_not_modified_here": true,
+    "frozen_scientific_live_HDFS_evidence_scopes_preserved": true,
+    "117_git_only_no_HDFS_extension": true
+  },
+  "staged_sha256": {
+    "experiments/waymo-perception/research/2026-10-04-canonical-source-reconciliation.md": "3697928e674624f9d0425468a1faba473c642f41ea348e0693bd2cd07e4d59b1",
+    "experiments/waymo-perception/research/2026-10-04-post-closeout-stage-handoff.md": "7ee0bc88c78f8cd57c557ba1b72f2b28cd97ce3158c1f95bf2a27a81474c9363",
+    "experiments/waymo-perception/research/journal-evidence/3697928e674624f9d0425468a1faba473c642f41ea348e0693bd2cd07e4d59b1": "3697928e674624f9d0425468a1faba473c642f41ea348e0693bd2cd07e4d59b1",
+    "experiments/waymo-perception/research/journal-evidence/7ee0bc88c78f8cd57c557ba1b72f2b28cd97ce3158c1f95bf2a27a81474c9363": "7ee0bc88c78f8cd57c557ba1b72f2b28cd97ce3158c1f95bf2a27a81474c9363",
+    "experiments/waymo-perception/research/research-journal.jsonl": "56df50f2bf1275fcdede336a2f55f1a5005271f0ce6265087f39b96b7eebc711",
+    "experiments/waymo-perception/research/research-journal.md": "b3df4a1a5cf1790c8aa56b117a8599963ea3316b4eeebbf80d28063a4010ba74"
+  },
+  "repo_index_unchanged_by_reviewer": true
+}
