@@ -1,0 +1,30 @@
+{
+  "pid": 815702,
+  "command": [
+    "python3",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/process-scientific-cohort.py",
+    "--output",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1",
+    "--scene",
+    "2094681306939952000_2972_300_2992_300",
+    "--scene",
+    "4575389405178805994_4900_000_4920_000",
+    "--scene",
+    "7119831293178745002_1094_720_1114_720",
+    "--scene",
+    "5372281728627437618_2005_000_2025_000",
+    "--scene",
+    "13982731384839979987_1680_000_1700_000"
+  ],
+  "remaining": [
+    "2094681306939952000_2972_300_2992_300",
+    "4575389405178805994_4900_000_4920_000",
+    "7119831293178745002_1094_720_1114_720",
+    "5372281728627437618_2005_000_2025_000",
+    "13982731384839979987_1680_000_1700_000"
+  ],
+  "driver_sha256": "aba539b489503e119530bdc29674f24978df3cfd3fdaaac854f92eb0902551f5",
+  "status": "resumed unchanged original queue; final cohort admission pending",
+  "admission_pid": 815703,
+  "capture_pid": 815704
+}

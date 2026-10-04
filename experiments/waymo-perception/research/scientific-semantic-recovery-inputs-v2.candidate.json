@@ -1,0 +1,519 @@
+{
+  "status": "pinned missing semantic recovery inputs; HDFS replay not executed",
+  "observed_utc": "2026-10-01T04:47:57.625792+00:00",
+  "processing_snapshot_sha256": "114696b982bd541fe425b1eb8d8543bace93a49993cd0b51d035b02245540aa7",
+  "semantic_snapshot_sha256": "9bd0d802cd1e03c594ec91a02c470381e13074bdb7cb91bc93907e782c40042b",
+  "full_cohort_scenes": 103,
+  "completed_scenes_without_semantic_capture": 22,
+  "sources": [
+    {
+      "scene": "1730266523558914470_305_260_325_260",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "lifecycle_evidence": "scientific-training-replay-evidence.json",
+      "lifecycle_evidence_sha256": "cadfd370bf17fb1413da99e56ed57d1edd6daaa7170535049b885b51c373f201",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/training-replay-a/receipt.json",
+      "live_receipt_sha256": "76cf197644a5baf497f666e34b00809295d9e07dad19ccf7fd08756dbcc125d1",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/training-publication-a/receipt.json",
+      "publication_receipt_sha256": "248dfa385a5d540e2d7863e22777f5f439d77a4e13c1e74533a7b7682c07407f",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/training-publication-a/packed/publication.json",
+      "publication_manifest_sha256": "e8dbff0a4e74b003b615dbc1dae508078aec59dad5db5334bf3b9c84eada151e",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/1730266523558914470_305_260_325_260/fae12ded2bb31c2e87a5d91811e09f9c45234a249a44f103bf82cf730abd1a6f.tar",
+      "archive_sha256": "fae12ded2bb31c2e87a5d91811e09f9c45234a249a44f103bf82cf730abd1a6f",
+      "archive_bytes": 3022008320,
+      "report_sha256": "e18b2576b5e1aa40e538b6a20b46f49e6eec0e662472c32873f8f908fc7e0a0d",
+      "records": 1970,
+      "points": 32547972
+    },
+    {
+      "scene": "4759225533437988401_800_000_820_000",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "lifecycle_evidence": "scientific-camera-validation-replay-evidence.json",
+      "lifecycle_evidence_sha256": "080aa3fb5e036cbf9fde0b9e7cb8a281de849a4669ee35db17f045d322a2a6ce",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/camera-validation-replay-a/receipt.json",
+      "live_receipt_sha256": "aa05c5c8b2da9f3666d8343458bfd6895d338c156a259e57d3e7bf6cd873a0aa",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/camera-validation-publication-a/receipt.json",
+      "publication_receipt_sha256": "6125a8bd2dcb1263f736e6c9ef66071d870da4e40a8bad1ad152d344d6fd08f4",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/camera-validation-publication-a/packed/publication.json",
+      "publication_manifest_sha256": "347ab7f519964d04ef52899b251b34f81e4a434d7d441f558e8240cb8eb8f072",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/4759225533437988401_800_000_820_000/600b95f7ca09fb4b75f17d8a7ed11c786aee6ecc0f6ead83d93c3cf2ea04d178.tar",
+      "archive_sha256": "600b95f7ca09fb4b75f17d8a7ed11c786aee6ecc0f6ead83d93c3cf2ea04d178",
+      "archive_bytes": 3251701760,
+      "report_sha256": "69f8ac62f2422efd2a6a614c86763c54f7e7f73ed557afbf49eeee7cf85ea270",
+      "records": 1980,
+      "points": 34882229
+    },
+    {
+      "scene": "15036582848618865396_3752_830_3772_830",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "lifecycle_evidence": "scientific-15036582848618865396_3752_830_3772_830-replay-evidence.json",
+      "lifecycle_evidence_sha256": "76ab8b095f5e85122098f787130077b9b79e72c803fa0310be5c47ea2623027a",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/replay-15036582848618865396_3752_830_3772_830/receipt.json",
+      "live_receipt_sha256": "71a5e91151fd8b7a7f51d45edadbab62a584cd412ccc25b9ba09f97336ca6a4b",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/publication-15036582848618865396_3752_830_3772_830/receipt.json",
+      "publication_receipt_sha256": "067adb4037ae68c86dc025d8c924ad2f27f9a3e734921e6198a970ee1a757317",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/publication-15036582848618865396_3752_830_3772_830/packed/publication.json",
+      "publication_manifest_sha256": "5f956ee1bb12a4bdcf7b40f3bc3d4129b301b216fb2f0653c55941194892ccec",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/15036582848618865396_3752_830_3772_830/928fd98bbf6ce943d4bef78b788ce27164333228ccba36405e4444a47865cc85.tar",
+      "archive_sha256": "928fd98bbf6ce943d4bef78b788ce27164333228ccba36405e4444a47865cc85",
+      "archive_bytes": 3342172160,
+      "report_sha256": "4e3ced13e5766baaa3076b0a23b02cdb766eee9aacfcbbafb873c1edbcc46fcf",
+      "records": 1980,
+      "points": 35851264
+    },
+    {
+      "scene": "11343624116265195592_5910_530_5930_530",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "lifecycle_evidence": "cohort-driver-first-lifecycle-verified.json",
+      "lifecycle_evidence_sha256": "daa54c1a48593bcedb810528a61f4cd985d623532c8737a5db10fe83f35ca9e4",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-native-a/receipt.json",
+      "live_receipt_sha256": "563a7a24d0e4a986ffa2bb4c8cff5c921a103618935b00cebf8b9fcaf10bd80c",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/11343624116265195592_5910_530_5930_530/point-publication/receipt.json",
+      "publication_receipt_sha256": "b26042c7ec403d99dc2dcc3cf340b07999d94ec0644b1a472f9a51a5e8d444b9",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/11343624116265195592_5910_530_5930_530/point-publication/packed/publication.json",
+      "publication_manifest_sha256": "d642093bd3e451590b4d243504390bad004f8d7e82fa28bb97b27700a3ea40ee",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/11343624116265195592_5910_530_5930_530/8f66b4bc728173dfa82f1a559115d00333b4e16b609cf23a95f617e485e38c0b.tar",
+      "archive_sha256": "8f66b4bc728173dfa82f1a559115d00333b4e16b609cf23a95f617e485e38c0b",
+      "archive_bytes": 2727495680,
+      "report_sha256": "e9becbd9b28de69619b23a6736559a6cffe1343fcbd15fe74e54a7ade94c28a6",
+      "records": 1990,
+      "points": 29019898
+    },
+    {
+      "scene": "4447423683538547117_536_022_556_022",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "lifecycle_evidence": "cohort-checkpoint-4447423683538547117_536_022_556_022-verified.json",
+      "lifecycle_evidence_sha256": "13e0a79df509c018c89f9cad8f7304500d4e57b6bf5a3c72ee5e6567c4dad544",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-4447423683538547117_536_022_556_022/receipt.json",
+      "live_receipt_sha256": "82a02d9bef066e401dffef4aaf8b5a57f87cc7bb5a7a0868afee7f65dd3cc76c",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/4447423683538547117_536_022_556_022/point-publication/receipt.json",
+      "publication_receipt_sha256": "83aad8517f1b37ce2d62c548228c8d1449854dfd9e1a43e650848f8a9bd79110",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/4447423683538547117_536_022_556_022/point-publication/packed/publication.json",
+      "publication_manifest_sha256": "81fb6a36d691ae2ffc9c5623f2235c63b138da79f2c19508023d7c93843536d0",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/4447423683538547117_536_022_556_022/d083a87ad72bebf68ff00523bca8c9ec681196b2b0d96eb70ebeba6d0ad2a3e1.tar",
+      "archive_sha256": "d083a87ad72bebf68ff00523bca8c9ec681196b2b0d96eb70ebeba6d0ad2a3e1",
+      "archive_bytes": 3029391360,
+      "report_sha256": "d83e96a7e344d4416d72ea2fcb1083e3e2c1fb95c6096d437010a651c8169bc6",
+      "records": 1980,
+      "points": 32487824
+    },
+    {
+      "scene": "14503113925613619599_975_506_995_506",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "lifecycle_evidence": "cohort-checkpoint-14503113925613619599_975_506_995_506-verified.json",
+      "lifecycle_evidence_sha256": "f0b0b0033df650aac51881b4aac66fb3c5ab9f556ecfddb403763c470144ff92",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-14503113925613619599_975_506_995_506/receipt.json",
+      "live_receipt_sha256": "858c38e6981a8bb9e25192de1b352786b7eb220b9f1ea5395df2270b0b24beab",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/14503113925613619599_975_506_995_506/point-publication/receipt.json",
+      "publication_receipt_sha256": "ee85a61b87dba96ee30ce546e057744f1d1f7cedfb3fc90cb0541690f44ac670",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/14503113925613619599_975_506_995_506/point-publication/packed/publication.json",
+      "publication_manifest_sha256": "c0c0a52fbf930ef2590dce1fb66637be479aefe3831d8bd69bdeaee22a5f99f8",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/14503113925613619599_975_506_995_506/2fe5d3962b28671b8f7076ead7ccc53a8761c2dc820801cd93503b5f70c47cdf.tar",
+      "archive_sha256": "2fe5d3962b28671b8f7076ead7ccc53a8761c2dc820801cd93503b5f70c47cdf",
+      "archive_bytes": 3590205440,
+      "report_sha256": "e003f2298cdacce7097c410c1d3dee82f9dfa0815ea7b961c2fbf405d1c8f469",
+      "records": 1980,
+      "points": 38361436
+    },
+    {
+      "scene": "3375636961848927657_1942_000_1962_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "lifecycle_evidence": "cohort-checkpoint-3375636961848927657_1942_000_1962_000-verified.json",
+      "lifecycle_evidence_sha256": "fc3626f66ab955b5f2d628888ddc3310ba28d30d174e29c46a1056434d3a446a",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-3375636961848927657_1942_000_1962_000/receipt.json",
+      "live_receipt_sha256": "2976bf79e62b4c17a3670c7f261eb5d5138a089464e7a9426a024f0b4ffdbd8f",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/3375636961848927657_1942_000_1962_000/point-publication/receipt.json",
+      "publication_receipt_sha256": "4066853643a4fee6752e8e7d45b239a517f11e4b9707a26e246305311805f306",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/3375636961848927657_1942_000_1962_000/point-publication/packed/publication.json",
+      "publication_manifest_sha256": "849eae1c97977d0136f1136fb9bc457f6011333acc51f792f562fd43702d3dac",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/3375636961848927657_1942_000_1962_000/7c954228b624f5dad93fb6c58a2f061afd61cb6a31498c8d6525495a1310b12d.tar",
+      "archive_sha256": "7c954228b624f5dad93fb6c58a2f061afd61cb6a31498c8d6525495a1310b12d",
+      "archive_bytes": 2622023680,
+      "report_sha256": "dfba1b0a945ab379cf5d7094e9ad8cef05e79943ba7a07d9796beb03b3d22c79",
+      "records": 1980,
+      "points": 28016899
+    },
+    {
+      "scene": "6813611334239274394_535_000_555_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "lifecycle_evidence": "cohort-checkpoint-6813611334239274394_535_000_555_000-verified.json",
+      "lifecycle_evidence_sha256": "b6fff30ab993d2e63a31f321ddd4cafad0814b71fa58f3a88a44908180a17957",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-6813611334239274394_535_000_555_000/receipt.json",
+      "live_receipt_sha256": "4e1787f86ac690de2247a097bffe0ed069a3e809717ba380fa2afb574b72e5a6",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/6813611334239274394_535_000_555_000/point-publication/receipt.json",
+      "publication_receipt_sha256": "cfa4904818e8332c2c1ba4e4461afbe27c8f8c4268ba7cb6767d80ae375e86ed",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/6813611334239274394_535_000_555_000/point-publication/packed/publication.json",
+      "publication_manifest_sha256": "06357dec2122ed8ffe1dd64bfe197457bca14a426357dea7592f73d6f09e14a0",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/6813611334239274394_535_000_555_000/0f24789170918e2f9eb93299cda1e78d552937c756228c64d147e7198c966d3b.tar",
+      "archive_sha256": "0f24789170918e2f9eb93299cda1e78d552937c756228c64d147e7198c966d3b",
+      "archive_bytes": 2884321280,
+      "report_sha256": "6a7699a8273cf6841c205324fc229c8eeb9903a9393ff93de5884de51453ab4f",
+      "records": 1950,
+      "points": 30800390
+    },
+    {
+      "scene": "990914685337955114_980_000_1000_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "lifecycle_evidence": "cohort-checkpoint-990914685337955114_980_000_1000_000-verified.json",
+      "lifecycle_evidence_sha256": "e720c0b3f4dddbba62e6de68032d6d207abd69757dc3988e7a98cd3eb69a7b73",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-990914685337955114_980_000_1000_000/receipt.json",
+      "live_receipt_sha256": "dd0a777fcaf4d1baf847b9a3a6afb87cd60a6034e8a55c5c0806ab9e6c6d6fe1",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/990914685337955114_980_000_1000_000/point-publication/receipt.json",
+      "publication_receipt_sha256": "14e29d7849767dce5c6755ddad7c2a798eb5433677907e70fb3af555a408b118",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/990914685337955114_980_000_1000_000/point-publication/packed/publication.json",
+      "publication_manifest_sha256": "ce1bacde5e6117a3c3e787a5a145932ff6e9affe44ae81f755cfd3f9e7fd1325",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/990914685337955114_980_000_1000_000/2ed61dc7a0d7cdad227e0dcc853c937c910746d96020102cef02e6e45da9fc58.tar",
+      "archive_sha256": "2ed61dc7a0d7cdad227e0dcc853c937c910746d96020102cef02e6e45da9fc58",
+      "archive_bytes": 3284090880,
+      "report_sha256": "59a42d49875847454043000160829d4e445269ed04f8ead47c48ca636ff74c91",
+      "records": 1980,
+      "points": 35228086
+    },
+    {
+      "scene": "8796914080594559459_4284_170_4304_170",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "lifecycle_evidence": "cohort-checkpoint-8796914080594559459_4284_170_4304_170-verified.json",
+      "lifecycle_evidence_sha256": "e64021fa51e45cb92a6b0598ae7be4c72f57ab5b18aed6df9486e629b11e461e",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-8796914080594559459_4284_170_4304_170/receipt.json",
+      "live_receipt_sha256": "a5eca961f03ed89018f50e6a889bac6a2ca5cb33d410e8e48ff7bb3dedda52c8",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/8796914080594559459_4284_170_4304_170/point-publication/receipt.json",
+      "publication_receipt_sha256": "6cc55a2fa534a776ca99f20ffc2eb46c21fa4b9fdf9ccdb94d63d3d269dc147d",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/8796914080594559459_4284_170_4304_170/point-publication/packed/publication.json",
+      "publication_manifest_sha256": "f80cc0dcc78368a1bde36daf9d37aaf4d8adfdb2c4b666c1a5eec11653c90311",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/8796914080594559459_4284_170_4304_170/862f16084a4832ba7a23ba60be0953b1a819b34ce351b0f824d17cdf7daef9c1.tar",
+      "archive_sha256": "862f16084a4832ba7a23ba60be0953b1a819b34ce351b0f824d17cdf7daef9c1",
+      "archive_bytes": 3457177600,
+      "report_sha256": "f53026acf97a28f96f5f9b68df6c83947f86fc3b0382e7c6a58d005f1aae3d49",
+      "records": 1990,
+      "points": 37077947
+    },
+    {
+      "scene": "12257951615341726923_2196_690_2216_690",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "lifecycle_evidence": "cohort-checkpoint-12257951615341726923_2196_690_2216_690-verified.json",
+      "lifecycle_evidence_sha256": "d4c46986dd2ac74c22f37ae84c53013bf283e803b0e166944dae62c99d6c86de",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-12257951615341726923_2196_690_2216_690/receipt.json",
+      "live_receipt_sha256": "1ec0bb665c9a5cf57fc02ea09cb765bd53f9fb93af8cdcff831928a4cad57da0",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/12257951615341726923_2196_690_2216_690/point-publication/receipt.json",
+      "publication_receipt_sha256": "49dfe949ccb0a20ed3ef5dc2caa75755ed3832aeee87250873604c8460d4c3c7",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/12257951615341726923_2196_690_2216_690/point-publication/packed/publication.json",
+      "publication_manifest_sha256": "caf90a6b99a0be81db65e93da942d9360ab5c24835174322e0a55a361ebb5b74",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/12257951615341726923_2196_690_2216_690/3584ccd640f352ee4cbb41830495efe3a337bdd8b3960c2f657f50fdb6c95529.tar",
+      "archive_sha256": "3584ccd640f352ee4cbb41830495efe3a337bdd8b3960c2f657f50fdb6c95529",
+      "archive_bytes": 3051202560,
+      "report_sha256": "0653b651ba584357c27fb1e322e555b07065a46f39f08dbafbbf5b2f34a1d6b4",
+      "records": 1980,
+      "points": 32590501
+    },
+    {
+      "scene": "13186511704021307558_2000_000_2020_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "lifecycle_evidence": "cohort-checkpoint-13186511704021307558_2000_000_2020_000-verified.json",
+      "lifecycle_evidence_sha256": "339105e201f2ca0c9442d403e1247445dfc4d3928765c0c399c65c4faf829b34",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-13186511704021307558_2000_000_2020_000/receipt.json",
+      "live_receipt_sha256": "ff0464991af420df0071a82b467a2f80d7c6e29f1a585a7973104e17fad5b58e",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/13186511704021307558_2000_000_2020_000/point-publication/receipt.json",
+      "publication_receipt_sha256": "48f98012ae40f9f3999c67fb92a03f4130680ffad84cb5180b5fc2eb36a3a7df",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/13186511704021307558_2000_000_2020_000/point-publication/packed/publication.json",
+      "publication_manifest_sha256": "5136c2d067188ac9f46a1ef3f916d196ce53fa366ce21318d0e208df4d35aa57",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/13186511704021307558_2000_000_2020_000/3b28bac267549cb270f879e3f10f81cfbc5d4cd86363b11f7471febe08b4fa6a.tar",
+      "archive_sha256": "3b28bac267549cb270f879e3f10f81cfbc5d4cd86363b11f7471febe08b4fa6a",
+      "archive_bytes": 3009146880,
+      "report_sha256": "0556330073a99c8c55b4a30d12274eb54b5dcc6dff0c77ecee97597a618b3887",
+      "records": 1980,
+      "points": 32281988
+    },
+    {
+      "scene": "17885096890374683162_755_580_775_580",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "lifecycle_evidence": "cohort-checkpoint-17885096890374683162_755_580_775_580-verified.json",
+      "lifecycle_evidence_sha256": "3a64d4cefa52fe92a30da96516fe5b38d3fbed6d54ef7bc5e2bb88453a376892",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-17885096890374683162_755_580_775_580/receipt.json",
+      "live_receipt_sha256": "7cc8e0797752fc3a0ff97661717f6d16c3a65cb2f2a43bd7fa4cd9163db62083",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/17885096890374683162_755_580_775_580/point-publication/receipt.json",
+      "publication_receipt_sha256": "f210d6e18fbe3fb2dde7458c13cbca1c0f1f9f68bf04bf293c4d903a27772e42",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/17885096890374683162_755_580_775_580/point-publication/packed/publication.json",
+      "publication_manifest_sha256": "c13f17a3eb01ee21b7372dd211fd6a7e4099365ebf710699e4532c2a292e077a",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/17885096890374683162_755_580_775_580/02bee397e25331cf63820c34ebea5daac4f5396ee5de17066b9a10bcd5fb60f7.tar",
+      "archive_sha256": "02bee397e25331cf63820c34ebea5daac4f5396ee5de17066b9a10bcd5fb60f7",
+      "archive_bytes": 3756933120,
+      "report_sha256": "8065056bdcc89149e8f52ba65be13759d82f77c2489808c70b47d411d1c5017c",
+      "records": 1980,
+      "points": 40148154
+    },
+    {
+      "scene": "7912728502266478772_1202_200_1222_200",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "lifecycle_evidence": "cohort-checkpoint-7912728502266478772_1202_200_1222_200-verified.json",
+      "lifecycle_evidence_sha256": "7c070cb02c97084574f147d79cfc6ed0978a2902a5809d61ae944f0447585fd8",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-7912728502266478772_1202_200_1222_200/receipt.json",
+      "live_receipt_sha256": "0ce78805acbbaa7c0b10a9b15f498e157c322f9632bc5384be7d94c0800a28a2",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/7912728502266478772_1202_200_1222_200/point-publication/receipt.json",
+      "publication_receipt_sha256": "671903808b7b4a34d49c4eab8e886d66f23e6536cbf3b08884b20b6a598c2a99",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/7912728502266478772_1202_200_1222_200/point-publication/packed/publication.json",
+      "publication_manifest_sha256": "eafb93c3a1b4af0c0bc7dc4034d8c52a34f05a375229b2f9ff0f033183e03b85",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/7912728502266478772_1202_200_1222_200/da8d495ad4730ee442250b9be1dbdf3c2d74746f3e1f02ad77c6d0958c5e5d6a.tar",
+      "archive_sha256": "da8d495ad4730ee442250b9be1dbdf3c2d74746f3e1f02ad77c6d0958c5e5d6a",
+      "archive_bytes": 3275827200,
+      "report_sha256": "3391bf550c062e09e4eeecede14d4a082d92436f355f4eb1637235b91dbd4790",
+      "records": 1960,
+      "points": 35284571
+    },
+    {
+      "scene": "4723255145958809564_741_350_761_350",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "lifecycle_evidence": "cohort-checkpoint-4723255145958809564_741_350_761_350-verified.json",
+      "lifecycle_evidence_sha256": "e5484fca00967f5ff085f7e794e8480d672cbb09daf4db4ba2ade123e218a277",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-4723255145958809564_741_350_761_350/receipt.json",
+      "live_receipt_sha256": "48dc5aacf8cf04b8fb6557671f610ca7abb4923cc3f1cc9541d1ae09598092ec",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/4723255145958809564_741_350_761_350/point-publication/receipt.json",
+      "publication_receipt_sha256": "9b645b36f8f52aae79c50125071cd259c59393238e3808c5d987a888360c40d3",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/4723255145958809564_741_350_761_350/point-publication/packed/publication.json",
+      "publication_manifest_sha256": "584d6ca787dac795c9811ce57435c71435fd81bca0b7511a434e3ce99f885f37",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/4723255145958809564_741_350_761_350/a02268e069715be41c3d62902f20ebf70f7e2199019382ba7fcd9ed9a5f8cc85.tar",
+      "archive_sha256": "a02268e069715be41c3d62902f20ebf70f7e2199019382ba7fcd9ed9a5f8cc85",
+      "archive_bytes": 3313029120,
+      "report_sha256": "5c26a66f8ad0b5448c601028ab8b768a09203986a1e7cb4d17bfc0067073ac90",
+      "records": 1990,
+      "points": 35255285
+    },
+    {
+      "scene": "8454755173123314088_3202_000_3222_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "lifecycle_evidence": "cohort-checkpoint-8454755173123314088_3202_000_3222_000-verified.json",
+      "lifecycle_evidence_sha256": "9534e5e5d6611ab852bf866b912feb08a228234eb81ec95f64c542e0b88fec0b",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-8454755173123314088_3202_000_3222_000/receipt.json",
+      "live_receipt_sha256": "aa2497aee5fe82c45b1c9a6ec5ec5f51f5854bea55cec820d85d0f516cfb83e4",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/8454755173123314088_3202_000_3222_000/point-publication/receipt.json",
+      "publication_receipt_sha256": "f3aa7b3cb9571467259918d4d43e86e8a076e826ed9bb67f2878381ea5821af9",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/8454755173123314088_3202_000_3222_000/point-publication/packed/publication.json",
+      "publication_manifest_sha256": "2ca37a6c10d730431defa2af1a90afa5ec049483a60ede634260e860d090c367",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/8454755173123314088_3202_000_3222_000/1c216616220c24ae13c3f6a5dba3af5a7bfbd09cc074f0f43c61681836fe4b63.tar",
+      "archive_sha256": "1c216616220c24ae13c3f6a5dba3af5a7bfbd09cc074f0f43c61681836fe4b63",
+      "archive_bytes": 2914283520,
+      "report_sha256": "336b6306f18ed8bdff89f441f63efcb6af749f920c1cb582f7def2a83e84fb09",
+      "records": 1980,
+      "points": 31250201
+    },
+    {
+      "scene": "3894883757914505116_1840_000_1860_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "lifecycle_evidence": "cohort-checkpoint-3894883757914505116_1840_000_1860_000-verified.json",
+      "lifecycle_evidence_sha256": "37085e7af0a6a42b0dabfb4a039dfcdfdf8d612c531aece50afbb12990736297",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-3894883757914505116_1840_000_1860_000/receipt.json",
+      "live_receipt_sha256": "de4c8ebeaaf562d96c8a5340aba6129e25e82a93135e4beb40a9ff38361b4543",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/3894883757914505116_1840_000_1860_000/point-publication/receipt.json",
+      "publication_receipt_sha256": "b40309706c687296940a3d179cce2286d9c49cce8cac54220f301045452d0531",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/3894883757914505116_1840_000_1860_000/point-publication/packed/publication.json",
+      "publication_manifest_sha256": "5d4df6515cf74a1bd641747619a165bf6aa7cad7699ce6322020c46451191dca",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/3894883757914505116_1840_000_1860_000/f9d9f4af7016a3ba0e1abf39f4407feeb82e4b67a7280c7f3a9a4c0b512c0cfc.tar",
+      "archive_sha256": "f9d9f4af7016a3ba0e1abf39f4407feeb82e4b67a7280c7f3a9a4c0b512c0cfc",
+      "archive_bytes": 3125606400,
+      "report_sha256": "f0b212f11fa77bea47af1cc76e53cd3e26fd50c7e21f82c5f246abec737be051",
+      "records": 1970,
+      "points": 33514297
+    },
+    {
+      "scene": "13271285919570645382_5320_000_5340_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "lifecycle_evidence": "cohort-checkpoint-13271285919570645382_5320_000_5340_000-verified.json",
+      "lifecycle_evidence_sha256": "4c996e4360db400c9de9564be059e9b85258db07da086b62c3defcfd68a97030",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-13271285919570645382_5320_000_5340_000/receipt.json",
+      "live_receipt_sha256": "f8d77bacd3d73c8af83e99bf6e89ca5c5fe44fd970a867d1b829bfe3dd135b91",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/13271285919570645382_5320_000_5340_000/point-publication/receipt.json",
+      "publication_receipt_sha256": "f140bc676331ec91f243f0dbe6cf9640b1db05009bd14c55d93e34e9e15a8caf",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/13271285919570645382_5320_000_5340_000/point-publication/packed/publication.json",
+      "publication_manifest_sha256": "3f51f6b25a3a62b1d16f5b9b1e90f5b11449c49237c34a6fec6ec9a3100e7ab4",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/13271285919570645382_5320_000_5340_000/a158c462d4e633673a628f22816c11e4ff73c5fc94ca8c76ca0e0ce9841aeb6c.tar",
+      "archive_sha256": "a158c462d4e633673a628f22816c11e4ff73c5fc94ca8c76ca0e0ce9841aeb6c",
+      "archive_bytes": 3465400320,
+      "report_sha256": "23ce392d60f6d238ee76a9b469aa877757270c5ba5f025d314a4ce0ae9eb5ae6",
+      "records": 1990,
+      "points": 37174388
+    },
+    {
+      "scene": "8345535260120974350_1980_000_2000_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "lifecycle_evidence": "cohort-checkpoint-8345535260120974350_1980_000_2000_000-verified.json",
+      "lifecycle_evidence_sha256": "c02e82b707f34a96fa6a3054935a9ae2e93f0d12159f8ae03798ec9f3e04a2ec",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-8345535260120974350_1980_000_2000_000/receipt.json",
+      "live_receipt_sha256": "d75cdd0c738762ccfd601778de338182154b0c00c67a02a8f34e7599cab3ff9d",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/8345535260120974350_1980_000_2000_000/point-publication/receipt.json",
+      "publication_receipt_sha256": "1ad64c24d5d61076269a14e706d2de4ed037480c3d137a138ced095d31857069",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/8345535260120974350_1980_000_2000_000/point-publication/packed/publication.json",
+      "publication_manifest_sha256": "3f6b355b843222509f88aca199fed77790926f59060e8d56b45ab31b89e6499c",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/8345535260120974350_1980_000_2000_000/b31cbd29f8a47b99983d0177541b75646dbd7e16b8ad31a49019fd488e94b786.tar",
+      "archive_sha256": "b31cbd29f8a47b99983d0177541b75646dbd7e16b8ad31a49019fd488e94b786",
+      "archive_bytes": 3439534080,
+      "report_sha256": "9c68e7043e23e46eae2229d710f730fa2db54eda7461da137dc2e55496ac73f2",
+      "records": 1990,
+      "points": 36896669
+    },
+    {
+      "scene": "1357883579772440606_2365_000_2385_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "lifecycle_evidence": "cohort-checkpoint-1357883579772440606_2365_000_2385_000-verified.json",
+      "lifecycle_evidence_sha256": "793194e282b623899c36bc69185cc846d203364d60663622da5f74dbdf5e30eb",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-1357883579772440606_2365_000_2385_000/receipt.json",
+      "live_receipt_sha256": "e466df65837b1fde2af46e8c50c6596ef71e84d814a10fa7d327e7df541aa0e8",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/1357883579772440606_2365_000_2385_000/point-publication/receipt.json",
+      "publication_receipt_sha256": "44c4757cbf20e325840fb50ff3ac2da718016ac87844a650acbaea09b5a2c2be",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/1357883579772440606_2365_000_2385_000/point-publication/packed/publication.json",
+      "publication_manifest_sha256": "b280e32ca435512a3d544c2b2e101401f7cbdfd41fce9d21efec12264263b9fb",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/1357883579772440606_2365_000_2385_000/b3bad587624bdd8a188901f61c04636742af4b4421076dfee860f6653de50b8c.tar",
+      "archive_sha256": "b3bad587624bdd8a188901f61c04636742af4b4421076dfee860f6653de50b8c",
+      "archive_bytes": 3057008640,
+      "report_sha256": "0197999994597ce1b9e7136dcf523b39cc5177f43141d85e2257dbc45827e945",
+      "records": 1980,
+      "points": 32783361
+    },
+    {
+      "scene": "16977844994272847523_2140_000_2160_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "lifecycle_evidence": "cohort-checkpoint-16977844994272847523_2140_000_2160_000-verified.json",
+      "lifecycle_evidence_sha256": "b7b711a010140ee493e05a33c6d67bdb19f615beaa715bd13f41c3c3ede31ab3",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-16977844994272847523_2140_000_2160_000/receipt.json",
+      "live_receipt_sha256": "13dfcd2b2734d68cc07f46f130d16b528ce382bd919b00d9c1a39d76ff7c6b0d",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/16977844994272847523_2140_000_2160_000/point-publication/receipt.json",
+      "publication_receipt_sha256": "dbe6467e3883e3225050d8364bcae9cc5d2cb5ccdb376e23590c4216d83e4156",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/16977844994272847523_2140_000_2160_000/point-publication/packed/publication.json",
+      "publication_manifest_sha256": "f19a5a80063fec57aacda9207ab4e80ad8d9218eba2ccccc61adbba19af35b8a",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/16977844994272847523_2140_000_2160_000/91a175fe2b189aca40def5cfef219f31c727a444b2649f7223021cd8e71d91c2.tar",
+      "archive_sha256": "91a175fe2b189aca40def5cfef219f31c727a444b2649f7223021cd8e71d91c2",
+      "archive_bytes": 2967152640,
+      "report_sha256": "66e839a1e4156552e5913ad980cb1c11f8d418af524db9fd6513061f3052646e",
+      "records": 1980,
+      "points": 31830463
+    },
+    {
+      "scene": "9465500459680839281_1100_000_1120_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "development"
+        ]
+      },
+      "lifecycle_evidence": "cohort-checkpoint-9465500459680839281_1100_000_1120_000-verified.json",
+      "lifecycle_evidence_sha256": "a625e477c51e92bf4da9d50a3aecb11b600871210a362b3468b8fdd55abb47a4",
+      "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-admission-resumed-9465500459680839281_1100_000_1120_000/receipt.json",
+      "live_receipt_sha256": "9ff3cbd9d174ce3e73d93467fa3ea6950eae05cb4fd3001ba4df34b6e2496a0e",
+      "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/9465500459680839281_1100_000_1120_000/point-publication/receipt.json",
+      "publication_receipt_sha256": "782acd8a0085890f37b8c5d26b44655aa5c62918c10efa5378863dc3a059bd92",
+      "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/9465500459680839281_1100_000_1120_000/point-publication/packed/publication.json",
+      "publication_manifest_sha256": "015d0945e9823dc8239939eb3b63e02c3fface4c9c1ff0028183de00d813e978",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/9465500459680839281_1100_000_1120_000/fa24b7ac4081cad1bf70c3c75ccedd582d7dfb019d1665a5dc063f4446c5a617.tar",
+      "archive_sha256": "fa24b7ac4081cad1bf70c3c75ccedd582d7dfb019d1665a5dc063f4446c5a617",
+      "archive_bytes": 3249418240,
+      "report_sha256": "f1ab562033e274d8c83ae65ef4f3ce013b5ffb92120a4b9431417afaecb67dfb",
+      "records": 1990,
+      "points": 34993776
+    }
+  ],
+  "largest_archive_bytes": 3756933120,
+  "total_archive_bytes": 69835130880,
+  "scope": "metadata and historical receipt lineage only; sequential HDFS replay after active queue, revalidate original membership/runtime/source identities and verify native valid-range labels live before coverage admission; no narrowed cohort or ticket closure"
+}

@@ -1,0 +1,5 @@
+# Evidence-driven pillar retention control
+
+Source-support-v2 shows3signs whose eligible physical points all belong to discarded pillars under20kcap. all_pillars keeps maxpoints32 and allows30000pillars, exceeding all26384occupiedcells in this fixedframe; retains every eligiblepillar. This isolates pillar truncation, though seeded point samples can differ when RNG no longer consumes a pillar-selection draw. Independent source-index/allanchor audit and unchanged targetNPZbyteidentity precede the same2000update/native gates. No targetselection or silent cap change to baseline. Resource limits unchanged; observed point retention and sign support reported. Larger scenes may still hit30kcap; this is all-pillars only for the verified fixture.
+
+Authorized architecture-study retention direction; append-only followup spec separate from already pinned window/control spec. Baseline GN backbone,seed17,Adam1e-4,clip10,2000updates,11checkpoints,FP32/deterministic,full17GT. GPU8GiB/RSS16GiB/scientific15GiB/raw2GiB. Independent live Insula cache/loss/checkpoint/proposal/protobuf/native metric gates. No fullclass or heldout adoption.

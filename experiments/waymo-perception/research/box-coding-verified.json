@@ -1,0 +1,80 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/box-coding-live-a/receipt.json",
+  "receipt_sha256": "e150c8f21d3d179710a75d2469f0b0780a9c37d3de70925b3ba7db4ffda6ae69",
+  "status": "native center-Z box coding analytic fixtures passed live",
+  "verified_utc": "2026-09-30T16:46:41.588392+00:00",
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/box-coding-live-a",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--",
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_box_coding.py",
+        "-v"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "elapsed_seconds": 0.20346292498288676,
+  "peak_child_rss_kib": 46120,
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "candidate_hashes": {
+    "pipeline/box_coding.py": "35655760cdc9aa5cdfafd38c55b64ecef799da2f9cb9f614c46a5b955bd0262e",
+    "tests/test_box_coding.py": "3a94eafd08721a53c23dd480765556ffcb7541ccc30687b84ec44e2bcc889756"
+  },
+  "artifacts": {
+    "live.log": "c85c9d65b70003a43dcc9a6717d420ac5005ba6450c2866a5c639fe7aa58daac"
+  },
+  "scope": "independent NumPy reference geometry only; trainable head, losses, assignment, NMS and scientific protocol open"
+}

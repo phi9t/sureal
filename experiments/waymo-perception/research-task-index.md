@@ -118,3 +118,30 @@ The original balanced16 baseline0/19/35 GPU pilot ended at a confirmed600-second
 ## Rolling checkpoint HDFS interface (2026-10-03)
 
 The checkpoint-only publisher now has [actual live retention evidence](research/sustained-checkpoint-hdfs-closeout-reconciled.json):19 original admitted checkpoint files /411,001,906 bytes,8 HDFS chunks,24 live archive/verify/recovery stages, exact global readback and independent full-union admission with5 corrupt-copy refusals before checkpoint-only release. The source/identity/path preparation passes85 live CPU tests. This proves the arbitrary-step storage interface on the original35-update checkpoint; no new model updates or scores were generated. The four-case controller, keep-two/retire-older orchestration, native extended trajectories and all scientific comparisons remain open.
+
+## Prediction–target association study (specified 2026-10-03)
+
+[41: association and supervision coverage](../../docs/research/tasks/41-prediction-target-association.md)
+is a dedicated follow-up under ticket 34. The [design](../../docs/superpowers/specs/2026-10-03-prediction-target-association-design.md),
+[implementation plan](../../docs/superpowers/plans/2026-10-03-prediction-target-association.md)
+and [experiment handbook](research/prediction-target-association-study.md) specify
+A0 legacy, A1 globally covered nearest-BEV ownership, A2 3D-aware matching and
+A3 detached prediction-dependent matching. Each work package has live Insula
+verifiers and acceptance criteria. The target gate requires all 1,053 eligible
+balanced16 objects covered; native evaluation retains all 1,279 GT boxes.
+Fixed-batch fitting precedes balanced16, with the unchanged sustained all-four-class
+APH >=0.8 gate. HDFS exact recovery precedes any declared local release.
+
+Status is specified, not implemented or runnable. This documentation update does
+not register runs, alter active four-case optimization controls, change historical
+targets, update generated tracking/journal state or claim new execution evidence.
+Positive quota, object-balanced loss, NMS and query-head changes are conditional
+follow-ups with separate controls; held-out and broader program goals remain open.
+
+## Separate target-coverage follow-up
+
+[Ticket41 — prediction–target association](../../docs/research/tasks/41-prediction-target-association.md) is the existing authoritative study for the independently observed missing-target problem. Its numerical design, six implementation gates and A0–A3 treatments cover ownership, geometry and detached prediction-aware matching. It is specified only; the active sustained16 optimization recipes keep their original assignment unchanged. No second ticket41 is created.
+
+## User-approved initial-experiment investigation priorities
+
+Keep compact pillar/dense-GN CNN and clipped Adam as reference; complete the active four-recipe sustained16 controls unchanged. [42: object failure ledger](../../docs/research/tasks/42-object-failure-ledger.md) specifies measurement/assignment/geometry/ranking/suppression/native-match evidence. [43: frozen normalization diagnostic](../../docs/research/tasks/43-frozen-normalization-diagnostic.md) tests pillarBN state with frozen weights and identical full-native-GT decoding before any separate pillarLN treatment. Existing41 isolates supervision ownership/geometry. Residual/masked pooling and controlled point attention form the initial follow-up shortlist; range and sparse mechanisms remain exploratory. Scientific promotion requires held-out multiseed quality/resource evidence; one-frame saturation and historical reanalysis are not adoption.

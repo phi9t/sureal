@@ -1,0 +1,43 @@
+{
+  "ticket": "09",
+  "status": "verified-complete",
+  "gate_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/perception-gate-audit-b/receipt.json",
+  "gate_receipt_sha256": "877dc6fe412c24749e5f1e500b90abfade80b12df016b3387e11d510b6595cb8",
+  "independent_requirement_audit": {
+    "pinned_native_detection_semantics_configuration": "evaluation/contracts.json and source/Git-blob checks",
+    "independent_fixture_expectations": "native GTest/fake parity plus eight detection and five segmentation fixtures",
+    "TF_free_build_runtime": "fixed CMake native source graph, pinned rootfs and both-binary ldd/import checks",
+    "missing_vs_annotated_empty": "live camera/point mask fixtures and source coverage checks",
+    "camera_native_mapping_and_denominators": "29-ID source schema, camera diagnostic fixtures and all 990 PNG rows reconciled",
+    "live_candidate_receipts_resources": "11 current receipts, all artifact/code hashes, 15 live boundary tests and real route resource reports",
+    "replay_and_limitations": "perception gate report with exact commands and explicit LET/2D/panoptic scope"
+  },
+  "resources": {
+    "real-semantic-live-b": {
+      "elapsed_seconds": 18.758974480006145,
+      "children_peak_rss_kib": 48400,
+      "output_bytes": 37482310
+    },
+    "real-detection-live-b": {
+      "elapsed_seconds": 46.11329590799869,
+      "children_peak_rss_kib": 50084,
+      "output_bytes": 11122248
+    },
+    "real-nlz-live-a": {
+      "elapsed_seconds": 34.62750217501889,
+      "peak_rss_kib": 99700
+    },
+    "real-camera-semantic-live-a": {
+      "elapsed_seconds": 28.988873130991124,
+      "peak_rss_kib": 240120
+    }
+  },
+  "scope": "default native 3D AP/APH and TOP semantic IoU plus explicitly nonofficial camera semantic diagnostic; LET/2D detection/panoptic STQ require separate gates",
+  "limitations": [
+    "Engineering label self-replay proves evaluator correctness, not model quality.",
+    "Camera semantic scores are explicitly diagnostic; official temporal panoptic/STQ parity remains separate.",
+    "LET and camera 2D detection need task-specific configurations and live verification before those experiments.",
+    "Cross-modal ontology mapping and scientific protocol are not closed by this evaluator gate.",
+    "Engineering scenes have no positive NLZ points; positive geometry/native suppression are covered by analytic controls."
+  ]
+}

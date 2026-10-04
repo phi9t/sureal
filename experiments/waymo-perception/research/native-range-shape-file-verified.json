@@ -1,0 +1,77 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-shape-file-tests-green",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/slices/validation-two-scenes-20260929",
+        "/source",
+        "--",
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_native_range_shape_file.py",
+        "-v"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "code_sha256": {
+    "native_range_shapes.py": "055f9b877dfcce4210fc4c86bc24a1a2d1bb315deec56e033e2eba1e272e3b69",
+    "native_range_shape_file.py": "35f7b67a099c53dd1f6bc5a484a013b3e3a3500e0a0b6304a7be8125f00ade64"
+  },
+  "test_sha256": "aa5add5c65db800ba40373120c1a96b225b84251c062315a5edc7c8c7c4c70d4",
+  "artifacts": {
+    "live.log": "47ea8ce092e7304474ad355c99ef0d7637bfd9483617299e82b9b6fd31c5c6b5"
+  },
+  "scope": "immutable source admission fixtures; no scientific HDFS replay",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-shape-file-tests-green/receipt.json",
+  "receipt_sha256": "7a738df90079c7d3e4a32fe3d0a3dec8d32d0bb79a8d0a9deeabb8a41a72f55c"
+}

@@ -1,0 +1,79 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/detector-geometry-live-a/receipt.json",
+  "receipt_sha256": "817769f5fb6170e6234018973cc46f0c09878e09950a27f11bb954dc07890973",
+  "status": "analytic nearest assignment IoU and enclosing NMS passed live",
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/detector-geometry-live-a",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--",
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_detector_geometry.py",
+        "-v"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "elapsed_seconds": 0.19781289499951527,
+  "peak_child_rss_kib": 46092,
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "candidate_hashes": {
+    "pipeline/detector_geometry.py": "b3bdaa7860bc4e112bd6bc2749182699bf5f35b070292a5c24c41f357157c64f",
+    "tests/test_detector_geometry.py": "83fab8c92b07f071ee982e57a1718acb37646238ebd4831f117d33f0acaf8432"
+  },
+  "artifacts": {
+    "live.log": "fc9eccdb06f105aa5f37c91dd81c846918874e08226e3e69f99e61bca5fe5e9f"
+  },
+  "scope": "axis-aligned reference geometry only; native rotated 3D evaluator remains separate; full detector/protocol/training open"
+}

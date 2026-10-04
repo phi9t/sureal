@@ -1,14 +1,17 @@
 # Waymo perception pipeline
 
-Status: planning and source-contract research.
+Status: two-scene acquisition and offline processing tracer completed; production pipeline remains planned.
 
-Storage: the complete selected dataset lives in HDFS; a small local slice
-targets two complete scenes with every available modality. HDFS paths, local
+Storage target: the complete dataset lives in HDFS. The acquired slice contains
+two complete scenes with all 17 available component families, mirrored to HDFS. HDFS paths, local
 cache policy, byte budget and materialization defer to `~/workspace/waystone`;
 Sureal validates and consumes its slice/inventory handoff.
 
 Runtime constraint: no TensorFlow. The proposed first reader uses PyArrow
 directly; later tensor processing uses Torch and/or JAX, without SDK imports.
+
+See [real-data investigation evidence](research/tracer-bullet-e2e.md) for the
+local slice, commands, coverage, unresolved associations and repeatability checks.
 
 ## Set up GCS access
 
@@ -48,6 +51,18 @@ SUREAL already owns the relevant machinery for metric cameras, range evidence,
 object identities, immutable experiment outputs, Insula execution, and
 evidence-bounded 3D reports.
 
+## Research program
+
+The [Perception-first research program](../../docs/superpowers/specs/2026-09-29-waymo-research-program-design.md)
+turns the acquired slice into gated geometry, semantic/detection, fusion, memory
+and separate downstream-task experiments. Concrete model bases are
+[PointPillars → CenterPoint head → SWFormer](research/lidar-encoder-bases.md)
+[RSN and range-view features](research/range-view-bases.md),
+and [FCOS3D / BEVDepth / BEVFormer with LET evaluation](research/camera-encoder-bases.md).
+The dedicated Insula sensor-to-scene tracer and subsequent scoped milestones
+have retained live evidence. The [task index](research-task-index.md) records
+current acceptance and remaining research gates.
+
 ## Active design artifacts
 
 - [Design spec](../../docs/superpowers/specs/2026-09-29-waymo-perception-data-pipeline-design.md)
@@ -73,9 +88,10 @@ experiments/waymo-perception/
   pipeline/
 ```
 
-The JSON schemas, runner, environment, and pipeline code are intentionally not
-created yet. They should be added after the access policy, runtime isolation,
-and first manifest schema decisions are resolved.
+This layout records the original planning proposal. The tracer schemas,
+isolated runtime, processing/verifier sources and scoped runners were added
+subsequently; their retained receipts and current acceptance status are linked
+from the task index. The complete production-pipeline gate remains separate.
 
 ## Intended first module
 
@@ -110,18 +126,16 @@ experiments/waymo-perception/viewer/run.sh export SLICE_DIR CONTEXT
 experiments/waymo-perception/viewer/run.sh dev
 ```
 
-## Current status
+## Current gates
 
-- Waymo terms were accepted and the isolated gcloud CLI is authenticated for
-  `gs://waymo_open_dataset_v_2_0_1`.
-- Waystone delivered an all-modality two-scene validation slice
-  (`validation-two-scenes-20260929`, 17 components, 1.2 GB, SHA-256 receipt)
-  under its cache root; the viewer exporter consumes it directly.
-- The manifest pipeline described in the plan below is still unimplemented on
-  this branch; the viewer is a self-contained consumer of the raw slice.
-- The first task consumer is undecided. The recommended first product is a
-  scene manifest that can later support reconstruction, BEV, fusion, or
-  TorchTitan training exports.
+- Waystone delivered and HDFS-mirrored the all-modality two-scene development
+  slice; the source inventory and offline tracer evidence are retained.
+- The locked, TensorFlow-free Insula reader and scoped processing checks have
+  live receipts. These establish engineering correctness within their declared
+  scope, not full-dataset quality or a production pipeline.
+- Complete resource/backend/retention/runner admission remains required before
+  resuming the frozen four-recipe balanced16 sweep. Detection, segmentation,
+  SAM and downstream forecasting retain separate scientific acceptance gates.
 
 ## Non-goals
 
@@ -130,3 +144,20 @@ experiments/waymo-perception/viewer/run.sh dev
 - Add Waymo dependencies to Surflo's base import path.
 - Train a perception model before one-segment manifest validation exists.
 - Claim benchmark quality from reader or conversion smoke tests.
+
+## Run architecture experiments
+
+Each tested direction and planned follow-up has its own [experiment document](architecture/README.md).
+The dispatcher has a source-bound live CPU admission for `list` and
+`show residual_bev`. The underlying historical seven-stage experiment runners
+retain their separate live receipts; catalog checks do not repeat or extend
+those scientific measurements. The complete balanced16 resource/continuation
+gate remains open. See the closeout inventory for scoped evidence and blockers.
+
+```bash
+python experiments/waymo-perception/architecture.py list
+python experiments/waymo-perception/architecture.py run residual_bev --run-id residual-trial01
+python experiments/waymo-perception/architecture.py verify residual_bev --run-id residual-trial01
+```
+
+Training, checkpoint replay and native scoring/audits run live Insula. Historical results remain unchanged; planned ideas are refused until implemented. See the guide for prerequisites, budgets, logs and acceptance gates.

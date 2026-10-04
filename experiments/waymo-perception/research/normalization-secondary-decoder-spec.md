@@ -1,0 +1,7 @@
+# Secondary score-before-decode investigation
+
+Keep primary normalization-study records and historical baseline decoder unchanged. No-norm primary export failed at25 updates:3729 unselected anchors have nonfinite/zero dimensions after exponentiation; all are below score.05, none belong to pre-NMS4096. At2000,307932 unused anchors fail similarly. Model heads remain finite and supervised box loss never constrains those unused background residuals.
+
+Versioned diagnostic decoder filters by the identical class-score floor and deterministic top4096 before physical decoding, then applies identical direction correction/NMS/post500. Reject nonfinite raw heads and invalid selected geometry; do not clip dimensions, drop selected invalid predictions, alter thresholds or use GT. Global anchor IDs and ties are preserved.
+
+Red→green live contracts must refuse selected invalid boxes and accept unused finite residual extremes. Before interpreting secondary no-norm scores, independently compare every saved checkpoint's selected proposal fields against existing BN, GN-backbone and GN+LN exports; they must agree exactly. Execute the fixed no-norm frozen-head checkpoint grid with all17 original native GT. Separate literal geometry/export/native metric audits remain mandatory. This is a posthoc engineering decoder treatment, not a silent replacement of preregistered primary results or heldout evidence.

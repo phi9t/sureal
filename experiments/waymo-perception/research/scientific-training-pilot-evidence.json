@@ -1,0 +1,26 @@
+{
+  "status": "first scientific training scene independently checked live; publication/replay and cohort remain open",
+  "scene": "1730266523558914470_305_260_325_260",
+  "records": 1970,
+  "points": 32547972,
+  "working_set_bytes": 10038227794,
+  "receipt_hashes": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/training-pilot-a/evidence/camera_calibration/receipt.json": "6a11b24a8c5ef60a06f24abb8e530527dacb4b820db4347d72cea7e4777fe46b",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/training-pilot-a/evidence/lidar_box/receipt.json": "938f7c41f429c17a719a8a9c917282e9838f44c0a6d51b7102f5872acf2860dc",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/training-pilot-a/evidence/lidar_calibration/receipt.json": "391e1d4390aa222801206eb0e459bde78a9ab6571ac997674df76de7ec709394",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/training-pilot-a/evidence/lidar_camera_projection/receipt.json": "9a8b5c8387218dddbf53006da35d128b6276cf7687a349a50e26b2eb78caa885",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/training-pilot-a/evidence/lidar_pose/receipt.json": "859939e45bfe5c56905660ef87da589eeae258e4254e8256053e27639fa37eba",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/training-pilot-a/evidence/lidar_segmentation/receipt.json": "9225d8689355dc78e3746856c8b350d9f1993ad1e160089fca263842b5829487",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/training-pilot-a/evidence/reconstruction/receipt.json": "fc0fcef6859cf6afb243855fe9a82ab51e0a3e34371a3c76143acaa7d60bbab4",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/training-pilot-a/evidence/vehicle_pose/receipt.json": "3d57897f7e7dea110b0a859debf7b7184485746c4bfed089f9236dece122949b"
+  },
+  "scope": "seven source sidecar checks plus native scene check; no full-cohort/scientific comparison claim",
+  "resume": {
+    "session": 20533,
+    "exit_code": 0,
+    "verified_components": 7,
+    "verified_scene": true,
+    "receipt_identities_unchanged": true,
+    "scope": "actual full CLI resume checked existing component/scene hashes; no new producer/transfer phases were invoked"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "status": "preparation evidence; protocol and source processing remain open",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/staging-lease-live-a/receipt.json",
+  "receipt_sha256": "acab91861003a2bcf2703da609bfad2b9badb1360631490b0cdb314cae134bef",
+  "scope": "future shared-lease ownership; already-running acquisition remains legacy but is actively detected; no preprocessing transfer started"
+}

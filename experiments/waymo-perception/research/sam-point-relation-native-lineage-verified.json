@@ -1,0 +1,148 @@
+{
+  "relation_receipt_sha256": "76ae363a75eacfee0758109b72dd935918e57ae546978a30232137a2af2c05a5",
+  "teacher_receipt_sha256": "a06ec7bb3c8ca1c4c2442d669d63278d3b4d3673d006965cfed061b2b8a4f1da",
+  "mask_artifact_sha256": "8746ffe3f82fecd3608c8769d8b79d8d979b9ffd0061c94691831982d46ab084",
+  "validation": {
+    "frame": {
+      "context": "5847910688643719375_180_000_200_000",
+      "timestamp": 1548722489547369
+    },
+    "camera": 1,
+    "points": 157870,
+    "masks": 3,
+    "source_rows": [
+      {
+        "source": {
+          "context": "5847910688643719375_180_000_200_000",
+          "timestamp": 1548722489547369,
+          "laser": 1,
+          "return": 1,
+          "motion": "compensated",
+          "points": 148363,
+          "segmentation_present": true,
+          "scalar_max_error_m": 6.044054146059352e-13,
+          "artifact": "5847910688643719375_180_000_200_000-1548722489547369-1-1.npz",
+          "sha256": "09a5d0f83296e744fffc46b232f5dd7d8df9e88697986b4275a4d2d7294e4667",
+          "native_shape": [
+            64,
+            2650,
+            4
+          ]
+        },
+        "start": 0,
+        "end": 148363
+      },
+      {
+        "source": {
+          "context": "5847910688643719375_180_000_200_000",
+          "timestamp": 1548722489547369,
+          "laser": 1,
+          "return": 2,
+          "motion": "compensated",
+          "points": 9507,
+          "segmentation_present": true,
+          "scalar_max_error_m": 4.618527782440651e-13,
+          "artifact": "5847910688643719375_180_000_200_000-1548722489547369-1-2.npz",
+          "sha256": "92f7d8a363b587e13954a0a90f76547c9451cb58aea8bfeb687af74752af6b5c",
+          "native_shape": [
+            64,
+            2650,
+            4
+          ]
+        },
+        "start": 148363,
+        "end": 157870
+      }
+    ],
+    "prompt_origin": "native_camera_box_oracle_engineering_only",
+    "projectable_points": 21234,
+    "projected_mask_points": [
+      0,
+      0,
+      0
+    ],
+    "native_semantic_histograms_on_projected_incidence": [
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "visibility_supplied": false,
+    "promoted_visible_points": 0,
+    "elapsed_seconds": 0.7238902719982434,
+    "peak_rss_kib": 67692,
+    "scope": "engineering oracle mask/native projection incidence verified by literal reference; no visibility, categorical pseudo-label, semantic improvement or scientific distillation claim"
+  },
+  "scope": "retained teacher/relation artifact linkage checked; initial three oracle masks contain zero native TOP projected points, so this sample cannot establish useful point-semantic support"
+}

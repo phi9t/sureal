@@ -1,0 +1,11 @@
+{
+  "pid": 2371235,
+  "script": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.scratch/await-camera-lifecycle-gaps.py",
+  "script_sha256": "39eaab31216ea0f53ea7f777bd12b764c4c441a768514d44ecf92c56bd52e13f",
+  "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/continuation-logs/camera-lifecycle-gaps-v1.log",
+  "required_scenes": [
+    "1730266523558914470_305_260_325_260",
+    "4759225533437988401_800_000_820_000"
+  ],
+  "status": "armed; waits for semantic v4 and full103 shape replay terminal; both gaps remain open"
+}

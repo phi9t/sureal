@@ -1,0 +1,75 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/detector-optimizer-resource-v1",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/detector-optimizer-resource-audit-v1/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/detector-optimizer-resource-audit-v1/input",
+        "/tmp/input",
+        "--",
+        "python",
+        "-c",
+        "import hashlib,json,math\nfrom pathlib import Path\nsha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()\ne=json.loads(Path('/tmp/input/expected.json').read_text());r=e['receipt'];assert sha('/experiment/research/detector-optimizer-resource-verified.json')==e['receipt_sha256']\nfor p,h in r['candidate_hashes'].items():assert sha(Path('/experiment')/p)==h\nfor p,h in r['artifacts'].items():assert sha(Path('/source')/Path(p).name)==h\nv=json.loads(Path('/source/check.json').read_text());assert v==r['validation']\nassert v['seed']==17 and v['grid']==[512,512] and v['classes']==4 and v['anchors_per_cell']==8 and v['pillars']==20000 and v['points_per_pillar']==32\nassert v['parameters']==4817114+(8-2)*(4+7+2)*(384+1)\nassert type(v['parameter_tensors']) is int and v['parameter_tensors']>0\nassert v['optimizer_state_bytes']==8*v['parameters']+4*v['parameter_tensors']\nassert v['synthetic_optimizer_steps']==3 and v['first_update_analytic_check'] is True and v['tf32'] is False\nassert len(v['step_seconds'])==len(v['synthetic_losses'])==3\nassert all(type(x) in (int,float) and math.isfinite(x) and x>0 for x in v['step_seconds'])\nassert all(math.isfinite(x) and x>=0 for x in v['synthetic_losses'])\nassert v['peak_reserved_bytes']>=v['peak_allocated_bytes']>v['optimizer_state_bytes']>0 and v['peak_rss_kib']>0\nPath('/outputs/check.json').write_text(json.dumps({'parameters':v['parameters'],'optimizer_state_bytes':v['optimizer_state_bytes'],'peak_allocated_bytes':v['peak_allocated_bytes'],'synthetic_steps':3,'scope':'retained resource report independently reconciled; native scientific costs and outcomes remain unverified'}));print('PASS independent retained optimizer resource audit')\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "producer_evidence_sha256": "b0f43d04d61814f621fffcbe3c495fcce0f889765e4a481406b6d3b6a049ea4a",
+  "validation": {
+    "parameters": 4847144,
+    "optimizer_state_bytes": 38777416,
+    "peak_allocated_bytes": 1417361920,
+    "synthetic_steps": 3,
+    "scope": "retained resource report independently reconciled; native scientific costs and outcomes remain unverified"
+  },
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/detector-optimizer-resource-audit-v1/output/check.json": "fecdb7d5d783de8c526d357e39bb2b36d0f59b8980bf3ea73bfe6951c2132e83",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/detector-optimizer-resource-audit-v1/output/live.log": "a9d75990dabd2c0c96303500c07e2cf73c6f855b5b053b2713a088f429fa20a1"
+  }
+}

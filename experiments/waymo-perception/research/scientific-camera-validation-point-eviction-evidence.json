@@ -1,0 +1,8 @@
+{
+  "status": "verified point eviction completed",
+  "manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/camera-validation-pilot-a/point-eviction.json",
+  "manifest_sha256": "54691bac3469df324d9622c18d091b4f269ccfe0a56fa708a20e5aebdacf9238",
+  "bytes_evicted": 6501023684,
+  "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/4759225533437988401_800_000_820_000/600b95f7ca09fb4b75f17d8a7ed11c786aee6ecc0f6ead83d93c3cf2ea04d178.tar",
+  "scope": "one held-out scene point payloads; sidecars retained"
+}

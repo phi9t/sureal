@@ -1,0 +1,8 @@
+{
+  "pid": 2230074,
+  "script": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.scratch/await-semantic-recovery-admission-v3.py",
+  "script_sha256": "5c36dcb733f01d52dca61726ba504f665c86951b060e2c84c0f2168f4ffefb18",
+  "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/semantic-recovery-admission-v3.log",
+  "inventory_sha256": "49767cc6c0d1a3d309e025ea563c4f1fa88883846d2664d76838e12de2810a80",
+  "status": "started; actual execution and independent scene admission pending"
+}

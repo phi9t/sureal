@@ -1,0 +1,19 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-shape-source-driver-fixture-a/cache/scientific-processing/shape-source/receipt.json",
+  "receipt_sha256": "aacea0d47188d00f4f447bb7882872af8cab47988399e995a30f0d8b043bed69",
+  "validation": {
+    "scene": "5847910688643719375_180_000_200_000",
+    "records_verified": 1980,
+    "native_rows": 990,
+    "present_shape_records": 1980,
+    "null_shape_records": 0,
+    "source_sha256": "22e9ee98f67e14fb9990aebac58671835739585d719342a4dcb7212b554b6f46",
+    "scope": "independent literal source-shape comparison; provenance/runtime admission external",
+    "worker_resources": {
+      "elapsed_seconds": 1.3642234330181964,
+      "peak_rss_kib": 78240,
+      "rss_scope": "worker_process_peak"
+    }
+  },
+  "scope": "actual native one-source driver and independent live worker under fixture transfer; real103 HDFS execution pending"
+}

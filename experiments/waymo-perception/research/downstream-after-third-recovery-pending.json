@@ -1,0 +1,10 @@
+{
+  "queue_pid": 1021324,
+  "admission_pid": 1030094,
+  "capture_pid": 1030095,
+  "box_waiter_pid": 1030096,
+  "semantic_recovery_waiter_pid": 1030097,
+  "prior_capture_pid": 815704,
+  "linkage_pid": 1305902,
+  "scope": "capture continuation waits existing capture to avoid overlap; full103 scope retained"
+}

@@ -1,0 +1,81 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/pillar-encoder-live-a/receipt.json",
+  "receipt_sha256": "7a4b5101e8d72db6d987d64471914b5cc5216d724c766d45522118ee1b43e87f",
+  "status": "analytic PointPillars encoder preparation verified live on CPU Torch",
+  "verified_utc": "2026-09-30T16:38:39.210070+00:00",
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/gpu-rootfs",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/pillar-encoder-live-a",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--",
+        "/opt/waymo/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_pillar_encoder.py",
+        "-v"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "elapsed_seconds": 1.4869902899954468,
+  "peak_child_rss_kib": 91436,
+  "candidate_hashes": {
+    "pipeline/pillar_encoder.py": "0bd5aabd2ebef1d65c84fe0ad89a6ccc642af5308183e608e4ce703cf7bcc192",
+    "tests/test_pillar_encoder.py": "dee1ee23047e982a2025d7bacc8788def9d98cbf88d9c7f2fb1882d926c720aa"
+  },
+  "runtime_lock": {
+    "image_id": "sha256:46bdaa6e8d9058d7e09419085dfcf9a4527e801330045ae8e0f387f454413b86",
+    "rootfs_sha256": "55f63770083be16ea76764422c51e6e5d995b2d65e9785b552e118a64c6e2f1f",
+    "recipe_hashes": {
+      "Dockerfile": "48484266fe92aaf1a94823fac0746eafef7ac78d0a8754fa9d8f279e8d96c19b",
+      "requirements.lock": "038ba6bbc16870b6430481127b15ab2830e5dac0a6b14c30f218a43853e35923",
+      "build.sh": "bd554045bf0dd40aeceb495fd25ff6ea62ad8e04e93a0c81b203f2c141bcce55"
+    }
+  },
+  "artifacts": {
+    "live.log": "c51cf3fd26b4cf1a7d6c0679353c87fdb7182c2b6bcaf1fd19020d2c386006b7"
+  },
+  "scope": "CPU analytic decorations/PFN/scatter only; no GPU encoder proof, model training, detector or ticket closure"
+}

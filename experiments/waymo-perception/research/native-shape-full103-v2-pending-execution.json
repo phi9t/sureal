@@ -1,0 +1,7 @@
+{
+  "pid": 2350750,
+  "script": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.scratch/await-scientific-native-shapes-v2.py",
+  "script_sha256": "7bb33f6a0f28b3fe51ab06cd0221aacb32a0b1c1d2d41cc2189f54f7e7547983",
+  "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/continuation-logs/native-shape-continuation-v2.log",
+  "status": "waits for semantic v4 exact22 admissions; no source replay started yet"
+}

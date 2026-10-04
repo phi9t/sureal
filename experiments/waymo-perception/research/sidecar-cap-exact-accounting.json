@@ -1,0 +1,10 @@
+{
+  "role": "read-only exact archive accounting; no payload or admission",
+  "files": 51101,
+  "manifest_bytes": 7473482,
+  "archive_bytes": 7239157760,
+  "working_bytes": 8849593311,
+  "projected_peak_before_publication_metadata": 16088751071,
+  "cap_bytes": 16106127360,
+  "headroom_before_publication_metadata": 17376289
+}

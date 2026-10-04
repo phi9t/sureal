@@ -1,0 +1,6 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/segmentation-export-live-a/receipt.json",
+  "receipt_sha256": "0d2c07b824488ef1fcc4c429aea374430b10cf8bbfefe338167283b21b0b8249",
+  "scope": "structured exporter analytic integration; real-source identity and export checks pending",
+  "ticket_09": "open"
+}

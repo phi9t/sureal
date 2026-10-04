@@ -1,0 +1,15 @@
+{
+  "milestone": "M4",
+  "status": "verified-complete",
+  "receipt_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/m4-live-b/receipt.json",
+  "receipt_sha256": "79674a3a3bf5cb87ed3ee8c4d907382fcddb6d4cbf0eb71ca1613b2bf81b74e0",
+  "validation": {
+    "passed": true,
+    "frames": 4,
+    "camera_views": 20,
+    "sensor_return_views": 40,
+    "artifacts": 131
+  },
+  "elapsed_seconds": 19.032492619997356,
+  "visual_review": "first scene front camera overlay inspected; supplementary only"
+}

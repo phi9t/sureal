@@ -1,0 +1,6 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/detection-export-live-a/receipt.json",
+  "receipt_sha256": "412b25ee64b47a9492c301675d561499c47323c7d1092713418a0831689b7bec",
+  "scope": "analytic exporter integration; real detection source replay pending",
+  "ticket_09": "open"
+}

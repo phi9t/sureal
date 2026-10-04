@@ -1,0 +1,77 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-box-targets-a/receipt.json",
+  "receipt_sha256": "9fc4e65396b99d8002ce22fc68ecd02e6642b27ad1dc914687b62aeba0502fec",
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/slices/validation-two-scenes-20260929",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-box-targets-a",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--",
+        "python",
+        "-c",
+        "import json,hashlib,numpy as np;from pathlib import Path;from pipeline.sensor_records import select_rows;from pipeline.anchor_grid import anchor_grid;from pipeline.detector_geometry import nearest_bev_iou;from pipeline.anchor_assignment import assign_overlaps;from pipeline.box_coding import encode_boxes,decode_boxes\ns=json.loads(Path('/source/slice.json').read_text());e=next(x for x in s['objects'] if x['context']=='5847910688643719375_180_000_200_000' and x['component']=='lidar_box');p=Path('/source')/e['relative_path'];assert hashlib.sha256(p.read_bytes()).hexdigest()==e['sha256'];rows=list(select_rows(p,timestamps={1548722487147541}));prefix='[LiDARBoxComponent].';fields=['box.center.x','box.center.y','box.center.z','box.size.x','box.size.y','box.size.z','box.heading'];eligible=[];seen=set()\nfor row in rows:\n key=(row['key.segment_context_name'],row['key.frame_timestamp_micros'],row['key.laser_object_id']);assert key not in seen and key[:2]==('5847910688643719375_180_000_200_000',1548722487147541);seen.add(key);b=np.array([row[prefix+f] for f in fields]);assert np.isfinite(b).all() and np.all(b[3:6]>0)\n if row[prefix+'type'] in (1,2,3,4) and np.all(b[:3]>=np.array([-64,-64,-3])) and np.all(b[:3]<np.array([64,64,5])):eligible.append({'identity':list(key),'box':b.tolist(),'class':row[prefix+'type']})\nboxes=np.array([r['box'] for r in eligible]);classes=np.array([r['class'] for r in eligible]);templates=np.array([[4.,2.,1.5,.5,0.],[4.,2.,1.5,.5,np.pi/2]])\nanchors=anchor_grid(nx=512,ny=512,cell_size=(.25,.25),origin=(-64.,-64.),templates=templates);assigned=assign_overlaps(nearest_bev_iou(anchors,boxes),classes,positive=.6,negative=.45);labels=assigned['labels'];ids=assigned['target_indices'];positive=labels>0;encoded=np.zeros_like(anchors);encoded[positive]=encode_boxes(boxes[ids[positive]],anchors[positive]);directions=np.zeros(len(labels),dtype=np.int64);directions[positive]=(boxes[ids[positive],6]>0).astype(np.int64)\nnp.testing.assert_allclose(decode_boxes(encoded[positive],anchors[positive])[:,:6],boxes[ids[positive],:6],atol=1e-10);np.testing.assert_array_equal(labels[positive],classes[ids[positive]])\nnp.savez('/outputs/targets.npz',labels=labels,box_targets=encoded,direction_targets=directions,target_indices=ids,anchors=anchors)\nr={'status':'native exact-frame box targets prepared and box decode reconciled','source':e,'frame_timestamp':1548722487147541,'native_rows':len(rows),'eligible_rows':eligible,'excluded_rows':len(rows)-len(eligible),'positive_anchors':int(positive.sum()),'ignored_anchors':int((labels<0).sum()),'background_anchors':int((labels==0).sum()),'templates':templates.tolist(),'scope':'engineering fixture templates/thresholds; no scientific anchor configuration or trained accuracy claim'};Path('/outputs/check.json').write_text(json.dumps(r,indent=2));print('PASS native box targets',len(rows),len(eligible),int(positive.sum()))\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "source_sha256": "9bea6d3b681fd36f9e822bfe469868e28dd678a923d9ac671392275def87f9d5",
+  "elapsed_seconds": 2.8876884740020614,
+  "peak_child_rss_kib": 17148,
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "candidate_hashes": {
+    "pipeline/anchor_grid.py": "2846a69b632483f9553523954ab72fd9af4672edf1c628d79333333cc762b60e",
+    "pipeline/anchor_assignment.py": "f8c5e2cefdd69ab25428d39474ab2b2e89ae17d469de3d89ac1a4143ce5d2464",
+    "pipeline/detector_geometry.py": "b3bdaa7860bc4e112bd6bc2749182699bf5f35b070292a5c24c41f357157c64f",
+    "pipeline/box_coding.py": "35655760cdc9aa5cdfafd38c55b64ecef799da2f9cb9f614c46a5b955bd0262e",
+    "pipeline/sensor_records.py": "60ff664871791ad7e620d90706c28fb18fc66040eca3675a7e7c7d1a7e2a20d9"
+  },
+  "artifacts": {
+    "live.log": "fd9c1d625dcf24a4c9a2a17ebb14fc98eefdd0ce16c480a47e90e57111f1e9d3",
+    "check.json": "23866ddcf900f5e0284faf75e93686c2a6c749ab6a18eafc0135f2460dd6a0da",
+    "targets.npz": "d2c2e7a938653146e8731c6d98431346d0dea3a60dfe2865580523c401fb4d68"
+  }
+}

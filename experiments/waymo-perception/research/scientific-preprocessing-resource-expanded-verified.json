@@ -1,0 +1,1761 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/scientific-preprocessing-resource-b/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/scientific-preprocessing-resource-b/input",
+        "/mnt",
+        "--",
+        "python",
+        "-c",
+        "import json,hashlib,statistics,math\nfrom pathlib import Path\npins=json.loads(Path('/mnt/trusted.json').read_text());rows=[];stages={}\nfor scene,digest in pins['checkpoints'].items():\n path=Path('/source/cohort-v1')/scene/'receipt.json';assert not path.is_symlink();assert hashlib.sha256(path.read_bytes()).hexdigest()==digest;d=json.loads(path.read_text());assert d['scene']==scene;assert len(d['checks'])==10 and all(c['exit_code']==0 for c in d['checks'])\n durations={}\n for c in d['checks']:\n  value=c['elapsed_seconds'];assert math.isfinite(value) and value>=0;durations[c['stage']]=value;stages.setdefault(c['stage'],[]).append(value)\n assert len(durations)==10;elapsed=d['elapsed_seconds'];assert math.isfinite(elapsed) and elapsed>=sum(durations.values())-1\n pointpub=json.loads((path.parent/'point-publication/receipt.json').read_text());campub=json.loads((path.parent/'camera-publication/receipt.json').read_text());sidepub=json.loads((path.parent/'sidecar-publication/receipt.json').read_text())\n # Admission links these retained receipt bytes through the externally pinned checkpoint.\n for p in [path.parent/'point-publication/receipt.json',path.parent/'camera-publication/receipt.json',path.parent/'sidecar-publication/receipt.json']:\n  assert hashlib.sha256(p.read_bytes()).hexdigest()==d['retained_evidence_hashes'][str(p).replace('/source',pins['host_working'],1)]\n rows.append({'scene':scene,'membership':d['membership'],'points':d['point_validation']['points'],'elapsed_seconds':elapsed,'stage_seconds':durations,'peak_child_rss_kib':d['peak_child_rss_kib'],'point_archive_bytes':pointpub['archive']['archive_bytes'],'camera_archive_bytes':campub['archive']['archive_bytes'],'sidecar_archive_bytes':sidepub['archive']['archive_bytes']})\ndef summary(values):return {'min':min(values),'median':statistics.median(values),'max':max(values),'sum':sum(values)}\nreport={'status':'verified completed-queued-scene preprocessing resource inventory','scenes':len(rows),'selected_scenes':pins['selected_scenes'],'rows':rows,'elapsed_seconds':summary([r['elapsed_seconds'] for r in rows]),'stage_seconds':{k:summary(v) for k,v in stages.items()},'scope':'observed completed queued scenes only, not full-cohort extrapolation or training/evaluation GPU cost; 15GiB decoded cap remains candidate'};Path('/outputs/report.json').write_text(json.dumps(report,indent=2));print('PASS resource inventory',report['scenes'],report['elapsed_seconds'])\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "verified_utc": "2026-10-01T02:59:04.283315+00:00",
+  "elapsed_seconds": 0.09055179200368002,
+  "peak_child_rss_kib": 16432,
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "artifacts": {
+    "input/trusted.json": "fd6ba3fc8e40c15a2e843d07de27a49f1ddf5e0855898851bb9188b02b18081e",
+    "live.log": "31ddb2cc1797a723f6dba5ae8a64d9d93171b14f49bedb2ef7ecec2a942bacb2",
+    "output/report.json": "007a56bba443f254f73d5d35eca6d0aea2d0432498e0d43b66c748507cc338ee"
+  },
+  "validation": {
+    "status": "verified completed-queued-scene preprocessing resource inventory",
+    "scenes": 59,
+    "selected_scenes": 103,
+    "rows": [
+      {
+        "scene": "11343624116265195592_5910_530_5930_530",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 29019898,
+        "elapsed_seconds": 447.7737608800235,
+        "stage_seconds": {
+          "point-preprocess": 16.993808361992706,
+          "point-publication": 73.42719609601772,
+          "point-replay": 51.651464112015674,
+          "point-evict": 5.367861536011333,
+          "sidecar-publication": 163.81805693998467,
+          "sidecar-evict": 24.143261168996105,
+          "camera-preprocess": 21.82238703299663,
+          "camera-publication": 19.55059953199816,
+          "camera-replay": 47.567727492016274,
+          "camera-evict": 3.24223649900523
+        },
+        "peak_child_rss_kib": 183076,
+        "point_archive_bytes": 2727495680,
+        "camera_archive_bytes": 377036800,
+        "sidecar_archive_bytes": 7199201280
+      },
+      {
+        "scene": "4447423683538547117_536_022_556_022",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 32487824,
+        "elapsed_seconds": 602.3081620079756,
+        "stage_seconds": {
+          "point-preprocess": 202.24962916297955,
+          "point-publication": 67.52878312699613,
+          "point-replay": 58.11502418899909,
+          "point-evict": 6.598842730018077,
+          "sidecar-publication": 132.63413672699244,
+          "sidecar-evict": 22.67503615800524,
+          "camera-preprocess": 21.880111328995554,
+          "camera-publication": 18.43411832797574,
+          "camera-replay": 48.31024125998374,
+          "camera-evict": 3.444315019005444
+        },
+        "peak_child_rss_kib": 177708,
+        "point_archive_bytes": 3029391360,
+        "camera_archive_bytes": 393021440,
+        "sidecar_archive_bytes": 7101020160
+      },
+      {
+        "scene": "14503113925613619599_975_506_995_506",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 38361436,
+        "elapsed_seconds": 615.0242938489828,
+        "stage_seconds": {
+          "point-preprocess": 200.51893904202734,
+          "point-publication": 93.17630374498549,
+          "point-replay": 71.67952843100647,
+          "point-evict": 7.711497937008971,
+          "sidecar-publication": 141.502129711007,
+          "sidecar-evict": 21.677754272008315,
+          "camera-preprocess": 14.85537654600921,
+          "camera-publication": 13.948224619001849,
+          "camera-replay": 26.99529810799868,
+          "camera-evict": 1.5115317509917077
+        },
+        "peak_child_rss_kib": 178840,
+        "point_archive_bytes": 3590205440,
+        "camera_archive_bytes": 353341440,
+        "sidecar_archive_bytes": 7099996160
+      },
+      {
+        "scene": "3375636961848927657_1942_000_1962_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 28016899,
+        "elapsed_seconds": 646.8396778299939,
+        "stage_seconds": {
+          "point-preprocess": 204.42930252099177,
+          "point-publication": 71.23582508400432,
+          "point-replay": 51.22487283498049,
+          "point-evict": 5.464508366014343,
+          "sidecar-publication": 192.80589063899242,
+          "sidecar-evict": 23.329359459981788,
+          "camera-preprocess": 27.101887265016558,
+          "camera-publication": 15.468163176003145,
+          "camera-replay": 33.72749586397549,
+          "camera-evict": 2.257257049990585
+        },
+        "peak_child_rss_kib": 178840,
+        "point_archive_bytes": 2622023680,
+        "camera_archive_bytes": 379811840,
+        "sidecar_archive_bytes": 7144499200
+      },
+      {
+        "scene": "6813611334239274394_535_000_555_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 30800390,
+        "elapsed_seconds": 555.9556385680044,
+        "stage_seconds": {
+          "point-preprocess": 191.1325750130054,
+          "point-publication": 67.88496112401481,
+          "point-replay": 53.07156541701988,
+          "point-evict": 5.828597343992442,
+          "sidecar-publication": 133.32972664400586,
+          "sidecar-evict": 22.53167030098848,
+          "camera-preprocess": 15.421773000009125,
+          "camera-publication": 15.17864636000013,
+          "camera-replay": 30.156407166010467,
+          "camera-evict": 1.7915184010053053
+        },
+        "peak_child_rss_kib": 178840,
+        "point_archive_bytes": 2884321280,
+        "camera_archive_bytes": 385617920,
+        "sidecar_archive_bytes": 7012843520
+      },
+      {
+        "scene": "990914685337955114_980_000_1000_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 35228086,
+        "elapsed_seconds": 690.6339134899899,
+        "stage_seconds": {
+          "point-preprocess": 216.5462959659926,
+          "point-publication": 75.22274485399248,
+          "point-replay": 64.59490726099466,
+          "point-evict": 7.064926874008961,
+          "sidecar-publication": 192.92606050299946,
+          "sidecar-evict": 25.729816169012338,
+          "camera-preprocess": 18.835345035011414,
+          "camera-publication": 17.07793575100368,
+          "camera-replay": 47.41842035899754,
+          "camera-evict": 2.8334078830084763
+        },
+        "peak_child_rss_kib": 179292,
+        "point_archive_bytes": 3284090880,
+        "camera_archive_bytes": 340828160,
+        "sidecar_archive_bytes": 7149936640
+      },
+      {
+        "scene": "8796914080594559459_4284_170_4304_170",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 37077947,
+        "elapsed_seconds": 597.5462385700084,
+        "stage_seconds": {
+          "point-preprocess": 194.37570464800228,
+          "point-publication": 85.78058425700874,
+          "point-replay": 63.67973429398262,
+          "point-evict": 6.82722832300351,
+          "sidecar-publication": 147.05376035699737,
+          "sidecar-evict": 20.91545466601383,
+          "camera-preprocess": 15.476052328012884,
+          "camera-publication": 14.025990850001108,
+          "camera-replay": 28.037883718992816,
+          "camera-evict": 1.5801249069918413
+        },
+        "peak_child_rss_kib": 179292,
+        "point_archive_bytes": 3457177600,
+        "camera_archive_bytes": 344545280,
+        "sidecar_archive_bytes": 7112407040
+      },
+      {
+        "scene": "12257951615341726923_2196_690_2216_690",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 32590501,
+        "elapsed_seconds": 651.9419390499825,
+        "stage_seconds": {
+          "point-preprocess": 206.6156751329836,
+          "point-publication": 80.32011592300842,
+          "point-replay": 58.713971668999875,
+          "point-evict": 6.149932593980338,
+          "sidecar-publication": 167.24591408699052,
+          "sidecar-evict": 23.783533106994582,
+          "camera-preprocess": 19.851724431995535,
+          "camera-publication": 22.853111181990243,
+          "camera-replay": 41.92883231697488,
+          "camera-evict": 2.894831516983686
+        },
+        "peak_child_rss_kib": 182040,
+        "point_archive_bytes": 3051202560,
+        "camera_archive_bytes": 393205760,
+        "sidecar_archive_bytes": 7159367680
+      },
+      {
+        "scene": "13186511704021307558_2000_000_2020_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 32281988,
+        "elapsed_seconds": 581.9430978120072,
+        "stage_seconds": {
+          "point-preprocess": 194.85014168100315,
+          "point-publication": 75.65685202399618,
+          "point-replay": 56.13334145900444,
+          "point-evict": 6.483297000988387,
+          "sidecar-publication": 140.06889743797365,
+          "sidecar-evict": 22.212620178004727,
+          "camera-preprocess": 15.963038524001604,
+          "camera-publication": 17.562238626996987,
+          "camera-replay": 30.72865922699566,
+          "camera-evict": 1.985309623007197
+        },
+        "peak_child_rss_kib": 182040,
+        "point_archive_bytes": 3009146880,
+        "camera_archive_bytes": 323184640,
+        "sidecar_archive_bytes": 7101747200
+      },
+      {
+        "scene": "17885096890374683162_755_580_775_580",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 40148154,
+        "elapsed_seconds": 624.4522382039868,
+        "stage_seconds": {
+          "point-preprocess": 203.99056276201736,
+          "point-publication": 84.70159120499738,
+          "point-replay": 66.20482937898487,
+          "point-evict": 7.747516742994776,
+          "sidecar-publication": 151.20033195900032,
+          "sidecar-evict": 22.610590208001668,
+          "camera-preprocess": 18.106794469000306,
+          "camera-publication": 15.301896560995374,
+          "camera-replay": 30.830583260016283,
+          "camera-evict": 1.9362683650106192
+        },
+        "peak_child_rss_kib": 182040,
+        "point_archive_bytes": 3756933120,
+        "camera_archive_bytes": 398632960,
+        "sidecar_archive_bytes": 7134863360
+      },
+      {
+        "scene": "7912728502266478772_1202_200_1222_200",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 35284571,
+        "elapsed_seconds": 634.7481569290103,
+        "stage_seconds": {
+          "point-preprocess": 185.7531788230117,
+          "point-publication": 87.84459310901002,
+          "point-replay": 61.485348860995146,
+          "point-evict": 6.578233766980702,
+          "sidecar-publication": 175.66500384098617,
+          "sidecar-evict": 21.417543580988422,
+          "camera-preprocess": 34.17934244099888,
+          "camera-publication": 15.278449025005102,
+          "camera-replay": 25.496946950996062,
+          "camera-evict": 1.37691176898079
+        },
+        "peak_child_rss_kib": 182040,
+        "point_archive_bytes": 3275827200,
+        "camera_archive_bytes": 309299200,
+        "sidecar_archive_bytes": 6981867520
+      },
+      {
+        "scene": "4723255145958809564_741_350_761_350",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 35255285,
+        "elapsed_seconds": 631.0429821049911,
+        "stage_seconds": {
+          "point-preprocess": 200.98291605801205,
+          "point-publication": 75.31553093102411,
+          "point-replay": 59.46945895400131,
+          "point-evict": 6.656724091008073,
+          "sidecar-publication": 159.70568500901572,
+          "sidecar-evict": 23.235281942994334,
+          "camera-preprocess": 21.3149925149919,
+          "camera-publication": 18.50867502699839,
+          "camera-replay": 41.70713544200407,
+          "camera-evict": 2.925482610007748
+        },
+        "peak_child_rss_kib": 182040,
+        "point_archive_bytes": 3313029120,
+        "camera_archive_bytes": 422000640,
+        "sidecar_archive_bytes": 7202949120
+      },
+      {
+        "scene": "8454755173123314088_3202_000_3222_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 31250201,
+        "elapsed_seconds": 584.6863512849959,
+        "stage_seconds": {
+          "point-preprocess": 186.7102796479885,
+          "point-publication": 73.17753387699486,
+          "point-replay": 57.123972598987166,
+          "point-evict": 6.251475672004744,
+          "sidecar-publication": 144.44899502501357,
+          "sidecar-evict": 22.066113660024712,
+          "camera-preprocess": 23.22993745698477,
+          "camera-publication": 18.660244115977548,
+          "camera-replay": 31.594158588995924,
+          "camera-evict": 2.0072253289981745
+        },
+        "peak_child_rss_kib": 182040,
+        "point_archive_bytes": 2914283520,
+        "camera_archive_bytes": 303544320,
+        "sidecar_archive_bytes": 7088424960
+      },
+      {
+        "scene": "3894883757914505116_1840_000_1860_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 33514297,
+        "elapsed_seconds": 572.0134847609734,
+        "stage_seconds": {
+          "point-preprocess": 194.82824036301463,
+          "point-publication": 73.3681452619785,
+          "point-replay": 57.67604004801251,
+          "point-evict": 6.2375841030152515,
+          "sidecar-publication": 138.83234896001522,
+          "sidecar-evict": 22.36318891798146,
+          "camera-preprocess": 15.8643089219986,
+          "camera-publication": 13.984195293014636,
+          "camera-replay": 27.006143948005047,
+          "camera-evict": 1.8838809959997889
+        },
+        "peak_child_rss_kib": 182136,
+        "point_archive_bytes": 3125606400,
+        "camera_archive_bytes": 296867840,
+        "sidecar_archive_bytes": 7071825920
+      },
+      {
+        "scene": "13271285919570645382_5320_000_5340_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 37174388,
+        "elapsed_seconds": 668.4173610060243,
+        "stage_seconds": {
+          "point-preprocess": 211.00613053300185,
+          "point-publication": 77.94825892901281,
+          "point-replay": 64.47268290200736,
+          "point-evict": 7.336861635005334,
+          "sidecar-publication": 175.8304581119737,
+          "sidecar-evict": 23.962774279993027,
+          "camera-preprocess": 21.09390599501785,
+          "camera-publication": 18.441381988988724,
+          "camera-replay": 43.278515473997686,
+          "camera-evict": 3.0495268520026
+        },
+        "peak_child_rss_kib": 182136,
+        "point_archive_bytes": 3465400320,
+        "camera_archive_bytes": 394414080,
+        "sidecar_archive_bytes": 7168696320
+      },
+      {
+        "scene": "8345535260120974350_1980_000_2000_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 36896669,
+        "elapsed_seconds": 604.6731652980088,
+        "stage_seconds": {
+          "point-preprocess": 196.84152520500356,
+          "point-publication": 79.80285298399394,
+          "point-replay": 64.7251745009853,
+          "point-evict": 6.821964535018196,
+          "sidecar-publication": 149.3179591629887,
+          "sidecar-evict": 21.417394384974614,
+          "camera-preprocess": 15.562037112016696,
+          "camera-publication": 15.367764574009925,
+          "camera-replay": 32.32572075200733,
+          "camera-evict": 1.8472439649922308
+        },
+        "peak_child_rss_kib": 182136,
+        "point_archive_bytes": 3439534080,
+        "camera_archive_bytes": 349992960,
+        "sidecar_archive_bytes": 7120527360
+      },
+      {
+        "scene": "1357883579772440606_2365_000_2385_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 32783361,
+        "elapsed_seconds": 600.0513213629893,
+        "stage_seconds": {
+          "point-preprocess": 189.12822345198947,
+          "point-publication": 91.21634380001342,
+          "point-replay": 58.98694010899635,
+          "point-evict": 6.550768226006767,
+          "sidecar-publication": 148.84246521498426,
+          "sidecar-evict": 23.50486089999322,
+          "camera-preprocess": 15.66373833702528,
+          "camera-publication": 13.959535511996364,
+          "camera-replay": 29.888756023021415,
+          "camera-evict": 1.8969413199811243
+        },
+        "peak_child_rss_kib": 182136,
+        "point_archive_bytes": 3057008640,
+        "camera_archive_bytes": 286597120,
+        "sidecar_archive_bytes": 7074037760
+      },
+      {
+        "scene": "16977844994272847523_2140_000_2160_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 31830463,
+        "elapsed_seconds": 637.5333011369803,
+        "stage_seconds": {
+          "point-preprocess": 202.82699342200067,
+          "point-publication": 78.17760900600115,
+          "point-replay": 55.762773714988725,
+          "point-evict": 5.863740939996205,
+          "sidecar-publication": 160.28424695599824,
+          "sidecar-evict": 24.147137130988995,
+          "camera-preprocess": 21.755249537003692,
+          "camera-publication": 19.69808553601615,
+          "camera-replay": 43.842359533999115,
+          "camera-evict": 3.2497641869995277
+        },
+        "peak_child_rss_kib": 182136,
+        "point_archive_bytes": 2967152640,
+        "camera_archive_bytes": 405770240,
+        "sidecar_archive_bytes": 7139266560
+      },
+      {
+        "scene": "4487677815262010875_4940_000_4960_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 35984264,
+        "elapsed_seconds": 625.4512041750131,
+        "stage_seconds": {
+          "point-preprocess": 203.41520863201004,
+          "point-publication": 91.52530430699699,
+          "point-replay": 61.17114940099418,
+          "point-evict": 6.860823705996154,
+          "sidecar-publication": 146.7851287870144,
+          "sidecar-evict": 24.38945316898753,
+          "camera-preprocess": 16.965572880988475,
+          "camera-publication": 16.28764930702164,
+          "camera-replay": 34.191890228015836,
+          "camera-evict": 2.2226388629933354
+        },
+        "peak_child_rss_kib": 182136,
+        "point_archive_bytes": 3354890240,
+        "camera_archive_bytes": 365721600,
+        "sidecar_archive_bytes": 7132794880
+      },
+      {
+        "scene": "809159138284604331_3355_840_3375_840",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 35513228,
+        "elapsed_seconds": 585.788455041009,
+        "stage_seconds": {
+          "point-preprocess": 187.76150728898938,
+          "point-publication": 76.63631554899621,
+          "point-replay": 61.64369707601145,
+          "point-evict": 6.621206530020572,
+          "sidecar-publication": 146.51717813502182,
+          "sidecar-evict": 21.194680750981206,
+          "camera-preprocess": 15.533969823998632,
+          "camera-publication": 18.370026869990397,
+          "camera-replay": 30.01873279499705,
+          "camera-evict": 1.6254875979793724
+        },
+        "peak_child_rss_kib": 182136,
+        "point_archive_bytes": 3310776320,
+        "camera_archive_bytes": 437760000,
+        "sidecar_archive_bytes": 7106990080
+      },
+      {
+        "scene": "3966447614090524826_320_000_340_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 36286643,
+        "elapsed_seconds": 591.2042051870085,
+        "stage_seconds": {
+          "point-preprocess": 194.80602273301338,
+          "point-publication": 76.81787107198033,
+          "point-replay": 66.10661360700033,
+          "point-evict": 8.132766021997668,
+          "sidecar-publication": 132.90867390698986,
+          "sidecar-evict": 23.06257084500976,
+          "camera-preprocess": 17.341436147980858,
+          "camera-publication": 19.184386884997366,
+          "camera-replay": 30.209901862981496,
+          "camera-evict": 2.0177874310174957
+        },
+        "peak_child_rss_kib": 182136,
+        "point_archive_bytes": 3382435840,
+        "camera_archive_bytes": 369346560,
+        "sidecar_archive_bytes": 7107747840
+      },
+      {
+        "scene": "5083516879091912247_3600_000_3620_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 35193225,
+        "elapsed_seconds": 633.0047714069951,
+        "stage_seconds": {
+          "point-preprocess": 208.43419698398793,
+          "point-publication": 83.03786325000692,
+          "point-replay": 65.6428822989983,
+          "point-evict": 6.9265222280228045,
+          "sidecar-publication": 137.36353378600325,
+          "sidecar-evict": 24.514405630994588,
+          "camera-preprocess": 19.929800608981168,
+          "camera-publication": 18.75417698000092,
+          "camera-replay": 42.793334432994016,
+          "camera-evict": 2.9862950179958716
+        },
+        "peak_child_rss_kib": 182136,
+        "point_archive_bytes": 3281131520,
+        "camera_archive_bytes": 379627520,
+        "sidecar_archive_bytes": 7109836800
+      },
+      {
+        "scene": "6142170920525844857_2080_000_2100_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 35544227,
+        "elapsed_seconds": 591.4070666629996,
+        "stage_seconds": {
+          "point-preprocess": 197.43911138002295,
+          "point-publication": 74.60458989700419,
+          "point-replay": 62.479764435003744,
+          "point-evict": 6.604671634006081,
+          "sidecar-publication": 138.9476358719985,
+          "sidecar-evict": 22.835182481998345,
+          "camera-preprocess": 17.84597110300092,
+          "camera-publication": 14.71137486898806,
+          "camera-replay": 32.59928257999127,
+          "camera-evict": 2.4060157139902003
+        },
+        "peak_child_rss_kib": 182136,
+        "point_archive_bytes": 3313510400,
+        "camera_archive_bytes": 340459520,
+        "sidecar_archive_bytes": 7144755200
+      },
+      {
+        "scene": "17782258508241656695_1354_000_1374_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 33882213,
+        "elapsed_seconds": 561.8625771320076,
+        "stage_seconds": {
+          "point-preprocess": 189.2623934430012,
+          "point-publication": 74.2208973140223,
+          "point-replay": 60.07276214999729,
+          "point-evict": 6.309882725006901,
+          "sidecar-publication": 137.47412328599603,
+          "sidecar-evict": 21.740920543001266,
+          "camera-preprocess": 14.234175396006322,
+          "camera-publication": 13.928699805983342,
+          "camera-replay": 23.638903622020734,
+          "camera-evict": 1.3226104819914326
+        },
+        "peak_child_rss_kib": 182136,
+        "point_archive_bytes": 3147427840,
+        "camera_archive_bytes": 326082560,
+        "sidecar_archive_bytes": 7066685440
+      },
+      {
+        "scene": "13830510593707564159_5575_000_5595_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 24755553,
+        "elapsed_seconds": 570.5279934730206,
+        "stage_seconds": {
+          "point-preprocess": 176.04675021299045,
+          "point-publication": 58.4770386449818,
+          "point-replay": 45.08671687199967,
+          "point-evict": 4.822779614012688,
+          "sidecar-publication": 169.44962844398106,
+          "sidecar-evict": 20.92099831000087,
+          "camera-preprocess": 18.578318244981347,
+          "camera-publication": 18.672953120985767,
+          "camera-replay": 37.997944318980444,
+          "camera-evict": 2.3956612090114504
+        },
+        "peak_child_rss_kib": 182136,
+        "point_archive_bytes": 2300108800,
+        "camera_archive_bytes": 446105600,
+        "sidecar_archive_bytes": 7078225920
+      },
+      {
+        "scene": "14369250836076988112_7249_040_7269_040",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 36487281,
+        "elapsed_seconds": 594.3292263680196,
+        "stage_seconds": {
+          "point-preprocess": 196.48256659600884,
+          "point-publication": 77.21175286101061,
+          "point-replay": 62.57812917602132,
+          "point-evict": 6.763792493002256,
+          "sidecar-publication": 138.15356194699416,
+          "sidecar-evict": 23.93681947499863,
+          "camera-preprocess": 17.792187348008156,
+          "camera-publication": 16.708010998001555,
+          "camera-replay": 31.956676939007593,
+          "camera-evict": 1.7771947370201815
+        },
+        "peak_child_rss_kib": 182136,
+        "point_archive_bytes": 3401902080,
+        "camera_archive_bytes": 407941120,
+        "sidecar_archive_bytes": 7110359040
+      },
+      {
+        "scene": "11004685739714500220_2300_000_2320_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 24384748,
+        "elapsed_seconds": 540.4035255549825,
+        "stage_seconds": {
+          "point-preprocess": 197.36610293097328,
+          "point-publication": 60.916137488005916,
+          "point-replay": 45.161019480990944,
+          "point-evict": 4.737283000984462,
+          "sidecar-publication": 130.7695562080189,
+          "sidecar-evict": 22.755496400000993,
+          "camera-preprocess": 16.189540370978648,
+          "camera-publication": 17.285985577007523,
+          "camera-replay": 24.85236534802243,
+          "camera-evict": 1.5911370329849888
+        },
+        "peak_child_rss_kib": 182136,
+        "point_archive_bytes": 2273157120,
+        "camera_archive_bytes": 366295040,
+        "sidecar_archive_bytes": 7129600000
+      },
+      {
+        "scene": "15539619898625779290_760_000_780_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 33627112,
+        "elapsed_seconds": 587.7331338860095,
+        "stage_seconds": {
+          "point-preprocess": 201.26002789201448,
+          "point-publication": 72.29598026699387,
+          "point-replay": 60.71202279801946,
+          "point-evict": 6.490547870023875,
+          "sidecar-publication": 139.86964034999255,
+          "sidecar-evict": 24.036361539998325,
+          "camera-preprocess": 16.868094579986064,
+          "camera-publication": 17.282583663007244,
+          "camera-replay": 26.061355036013993,
+          "camera-evict": 1.8154832650034223
+        },
+        "peak_child_rss_kib": 182136,
+        "point_archive_bytes": 3134863360,
+        "camera_archive_bytes": 315330560,
+        "sidecar_archive_bytes": 7111413760
+      },
+      {
+        "scene": "14004546003548947884_2331_861_2351_861",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 38653298,
+        "elapsed_seconds": 588.0391854929912,
+        "stage_seconds": {
+          "point-preprocess": 201.30279615800828,
+          "point-publication": 76.57341479600291,
+          "point-replay": 70.87799515898223,
+          "point-evict": 7.699114618008025,
+          "sidecar-publication": 132.5861147500109,
+          "sidecar-evict": 20.947507996985223,
+          "camera-preprocess": 14.991763479978545,
+          "camera-publication": 15.686963584012119,
+          "camera-replay": 24.666397713008337,
+          "camera-evict": 1.5752074159972835
+        },
+        "peak_child_rss_kib": 182136,
+        "point_archive_bytes": 3617361920,
+        "camera_archive_bytes": 377118720,
+        "sidecar_archive_bytes": 7105986560
+      },
+      {
+        "scene": "1005081002024129653_5313_150_5333_150",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 34357856,
+        "elapsed_seconds": 574.2934011949983,
+        "stage_seconds": {
+          "point-preprocess": 186.34648333099904,
+          "point-publication": 81.99799922000966,
+          "point-replay": 62.151089138002135,
+          "point-evict": 6.9531427979818545,
+          "sidecar-publication": 133.652192893991,
+          "sidecar-evict": 21.201074423996033,
+          "camera-preprocess": 17.468417935015168,
+          "camera-publication": 14.950545801984845,
+          "camera-replay": 28.16642580399639,
+          "camera-evict": 1.6010772089939564
+        },
+        "peak_child_rss_kib": 182136,
+        "point_archive_bytes": 3203194880,
+        "camera_archive_bytes": 339302400,
+        "sidecar_archive_bytes": 7112335360
+      },
+      {
+        "scene": "13506499849906169066_120_000_140_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 32158303,
+        "elapsed_seconds": 628.6670259200037,
+        "stage_seconds": {
+          "point-preprocess": 208.4843162120087,
+          "point-publication": 69.83649924900965,
+          "point-replay": 55.865489884017734,
+          "point-evict": 5.768961173977004,
+          "sidecar-publication": 140.00895402001333,
+          "sidecar-evict": 24.697052517993143,
+          "camera-preprocess": 23.82797241699882,
+          "camera-publication": 20.551552074000938,
+          "camera-replay": 53.69407512398902,
+          "camera-evict": 3.7051172239880543
+        },
+        "peak_child_rss_kib": 182136,
+        "point_archive_bytes": 2998487040,
+        "camera_archive_bytes": 412569600,
+        "sidecar_archive_bytes": 7155118080
+      },
+      {
+        "scene": "6559997992780479765_1039_000_1059_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 33500377,
+        "elapsed_seconds": 567.8056615869864,
+        "stage_seconds": {
+          "point-preprocess": 187.11801652400754,
+          "point-publication": 73.164492136013,
+          "point-replay": 57.71617841999978,
+          "point-evict": 6.180387165019056,
+          "sidecar-publication": 145.47631236701272,
+          "sidecar-evict": 21.09054235299118,
+          "camera-preprocess": 15.942773448012304,
+          "camera-publication": 13.74543509198702,
+          "camera-replay": 26.661523804010358,
+          "camera-evict": 1.3567418809980154
+        },
+        "peak_child_rss_kib": 187896,
+        "point_archive_bytes": 3122984960,
+        "camera_archive_bytes": 347176960,
+        "sidecar_archive_bytes": 7113973760
+      },
+      {
+        "scene": "3224923476345749285_4480_000_4500_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 37409319,
+        "elapsed_seconds": 599.2970086259884,
+        "stage_seconds": {
+          "point-preprocess": 196.77364607300842,
+          "point-publication": 88.60764452398871,
+          "point-replay": 66.55286751899985,
+          "point-evict": 7.358564957015915,
+          "sidecar-publication": 142.5747419919935,
+          "sidecar-evict": 22.427752017014427,
+          "camera-preprocess": 13.620510007982375,
+          "camera-publication": 13.71894743599114,
+          "camera-replay": 25.411465854005655,
+          "camera-evict": 1.4108209749974776
+        },
+        "peak_child_rss_kib": 187896,
+        "point_archive_bytes": 3487703040,
+        "camera_archive_bytes": 298455040,
+        "sidecar_archive_bytes": 7055851520
+      },
+      {
+        "scene": "14250544550818363063_880_000_900_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 35950142,
+        "elapsed_seconds": 607.0762712820142,
+        "stage_seconds": {
+          "point-preprocess": 200.62522961897776,
+          "point-publication": 73.46704382199096,
+          "point-replay": 62.16231767399586,
+          "point-evict": 7.019955481984653,
+          "sidecar-publication": 143.17465389400604,
+          "sidecar-evict": 23.53788324899506,
+          "camera-preprocess": 19.09789671798353,
+          "camera-publication": 17.467121305002365,
+          "camera-replay": 36.54249154101126,
+          "camera-evict": 2.539144206995843
+        },
+        "peak_child_rss_kib": 187896,
+        "point_archive_bytes": 3351224320,
+        "camera_archive_bytes": 415303680,
+        "sidecar_archive_bytes": 7152343040
+      },
+      {
+        "scene": "2088865281951278665_4460_000_4480_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 31652733,
+        "elapsed_seconds": 612.280734119995,
+        "stage_seconds": {
+          "point-preprocess": 196.28855952300364,
+          "point-publication": 70.50678657597746,
+          "point-replay": 55.30933266301872,
+          "point-evict": 6.128722075984115,
+          "sidecar-publication": 167.9365765679977,
+          "sidecar-evict": 23.33528642199235,
+          "camera-preprocess": 17.9214277320134,
+          "camera-publication": 16.290734876005445,
+          "camera-replay": 35.45314532800694,
+          "camera-evict": 2.26367967898841
+        },
+        "peak_child_rss_kib": 187896,
+        "point_archive_bytes": 2951792640,
+        "camera_archive_bytes": 355532800,
+        "sidecar_archive_bytes": 7121561600
+      },
+      {
+        "scene": "12856053589272984699_1020_000_1040_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 36765151,
+        "elapsed_seconds": 681.5701312330202,
+        "stage_seconds": {
+          "point-preprocess": 198.17946776599274,
+          "point-publication": 80.49425041198265,
+          "point-replay": 63.8008139859885,
+          "point-evict": 6.930603271001019,
+          "sidecar-publication": 155.97842842599493,
+          "sidecar-evict": 22.273319107975112,
+          "camera-preprocess": 17.208602789003635,
+          "camera-publication": 82.2142862729961,
+          "camera-replay": 31.29706755100051,
+          "camera-evict": 2.1356036179931834
+        },
+        "peak_child_rss_kib": 187896,
+        "point_archive_bytes": 3427143680,
+        "camera_archive_bytes": 428636160,
+        "sidecar_archive_bytes": 7103672320
+      },
+      {
+        "scene": "11489533038039664633_4820_000_4840_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 38472032,
+        "elapsed_seconds": 630.1431271169859,
+        "stage_seconds": {
+          "point-preprocess": 207.82349150499795,
+          "point-publication": 109.14022550699883,
+          "point-replay": 70.0339328419941,
+          "point-evict": 7.298220412980299,
+          "sidecar-publication": 134.35115164899617,
+          "sidecar-evict": 22.946590933017433,
+          "camera-preprocess": 15.088411517994246,
+          "camera-publication": 14.266649686003802,
+          "camera-replay": 26.729347509972285,
+          "camera-evict": 1.4805092480091844
+        },
+        "peak_child_rss_kib": 187896,
+        "point_archive_bytes": 3585966080,
+        "camera_archive_bytes": 331325440,
+        "sidecar_archive_bytes": 7130316800
+      },
+      {
+        "scene": "13619063687271391084_1519_680_1539_680",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 34738340,
+        "elapsed_seconds": 601.7246016039862,
+        "stage_seconds": {
+          "point-preprocess": 207.6625322100008,
+          "point-publication": 69.92334910901263,
+          "point-replay": 63.4470069190138,
+          "point-evict": 6.889793077018112,
+          "sidecar-publication": 133.81075244999374,
+          "sidecar-evict": 24.18417405799846,
+          "camera-preprocess": 18.960935359005816,
+          "camera-publication": 17.225981657014927,
+          "camera-replay": 35.18743774900213,
+          "camera-evict": 2.4997576890164055
+        },
+        "peak_child_rss_kib": 187896,
+        "point_archive_bytes": 3239188480,
+        "camera_archive_bytes": 381184000,
+        "sidecar_archive_bytes": 7155496960
+      },
+      {
+        "scene": "15628918650068847391_8077_670_8097_670",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 31150189,
+        "elapsed_seconds": 616.733087392,
+        "stage_seconds": {
+          "point-preprocess": 214.7676229630015,
+          "point-publication": 69.02859930400155,
+          "point-replay": 56.499012157000834,
+          "point-evict": 5.875006643007509,
+          "sidecar-publication": 138.1417866179836,
+          "sidecar-evict": 28.251203152001835,
+          "camera-preprocess": 20.5639607339981,
+          "camera-publication": 18.0891807450098,
+          "camera-replay": 41.917390354006784,
+          "camera-evict": 2.96011193600134
+        },
+        "peak_child_rss_kib": 187896,
+        "point_archive_bytes": 2904965120,
+        "camera_archive_bytes": 359813120,
+        "sidecar_archive_bytes": 7077283840
+      },
+      {
+        "scene": "14098575914252965554_511_000_531_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 33044285,
+        "elapsed_seconds": 553.474949038995,
+        "stage_seconds": {
+          "point-preprocess": 188.45790081599262,
+          "point-publication": 68.95112016799976,
+          "point-replay": 55.06554992101155,
+          "point-evict": 6.956291831011185,
+          "sidecar-publication": 128.6461951659876,
+          "sidecar-evict": 22.44234276501811,
+          "camera-preprocess": 16.318933845992433,
+          "camera-publication": 14.94836108299205,
+          "camera-replay": 28.95290450900211,
+          "camera-evict": 1.95053405300132
+        },
+        "peak_child_rss_kib": 187896,
+        "point_archive_bytes": 3082280960,
+        "camera_archive_bytes": 381992960,
+        "sidecar_archive_bytes": 6810664960
+      },
+      {
+        "scene": "10734565072045778791_440_000_460_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 35959888,
+        "elapsed_seconds": 589.2062724079879,
+        "stage_seconds": {
+          "point-preprocess": 197.2932120480109,
+          "point-publication": 84.62252043801709,
+          "point-replay": 61.07363492899458,
+          "point-evict": 7.088131550990511,
+          "sidecar-publication": 124.49526251701172,
+          "sidecar-evict": 21.514222366997274,
+          "camera-preprocess": 18.283344516006764,
+          "camera-publication": 17.459176409000065,
+          "camera-replay": 33.99227066099411,
+          "camera-evict": 2.1699264330090955
+        },
+        "peak_child_rss_kib": 187896,
+        "point_archive_bytes": 3351705600,
+        "camera_archive_bytes": 498698240,
+        "sidecar_archive_bytes": 7121254400
+      },
+      {
+        "scene": "2681180680221317256_1144_000_1164_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 31283550,
+        "elapsed_seconds": 594.4750892269949,
+        "stage_seconds": {
+          "point-preprocess": 204.59856995299924,
+          "point-publication": 71.56780257201171,
+          "point-replay": 56.79452900000615,
+          "point-evict": 5.8993726529879496,
+          "sidecar-publication": 143.71834336497704,
+          "sidecar-evict": 24.576549046993023,
+          "camera-preprocess": 17.156409657996846,
+          "camera-publication": 16.600667370017618,
+          "camera-replay": 30.542942530009896,
+          "camera-evict": 1.9773867029871326
+        },
+        "peak_child_rss_kib": 187896,
+        "point_archive_bytes": 2917273600,
+        "camera_archive_bytes": 416696320,
+        "sidecar_archive_bytes": 7136460800
+      },
+      {
+        "scene": "8722413665055769182_2840_000_2860_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 38800913,
+        "elapsed_seconds": 629.4506971179799,
+        "stage_seconds": {
+          "point-preprocess": 207.1751595530077,
+          "point-publication": 88.47329049601103,
+          "point-replay": 63.991361361026065,
+          "point-evict": 7.429634650005028,
+          "sidecar-publication": 133.33729433600092,
+          "sidecar-evict": 24.17530320197693,
+          "camera-preprocess": 20.559036307007773,
+          "camera-publication": 17.403477859013947,
+          "camera-replay": 41.8031672660145,
+          "camera-evict": 2.837875620025443
+        },
+        "peak_child_rss_kib": 187896,
+        "point_archive_bytes": 3617730560,
+        "camera_archive_bytes": 405401600,
+        "sidecar_archive_bytes": 7102720000
+      },
+      {
+        "scene": "12012663867578114640_820_000_840_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 35441711,
+        "elapsed_seconds": 618.9771631059994,
+        "stage_seconds": {
+          "point-preprocess": 213.62258742999984,
+          "point-publication": 71.35249499400379,
+          "point-replay": 61.9194772990013,
+          "point-evict": 6.565792143985163,
+          "sidecar-publication": 141.37361884498387,
+          "sidecar-evict": 24.810753850004403,
+          "camera-preprocess": 19.361559756012866,
+          "camera-publication": 16.454204334993847,
+          "camera-replay": 38.747318333014846,
+          "camera-evict": 2.663139541982673
+        },
+        "peak_child_rss_kib": 187896,
+        "point_archive_bytes": 3304038400,
+        "camera_archive_bytes": 333701120,
+        "sidecar_archive_bytes": 7182284800
+      },
+      {
+        "scene": "13807633218762107566_6625_000_6645_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 30031984,
+        "elapsed_seconds": 587.7940732449933,
+        "stage_seconds": {
+          "point-preprocess": 191.37230831899797,
+          "point-publication": 93.58876617098576,
+          "point-replay": 54.44840228301473,
+          "point-evict": 5.848094081011368,
+          "sidecar-publication": 130.75799905799795,
+          "sidecar-evict": 22.484017301001586,
+          "camera-preprocess": 18.99952323900652,
+          "camera-publication": 16.38149333500769,
+          "camera-replay": 31.183012741006678,
+          "camera-evict": 1.9312524069973733
+        },
+        "peak_child_rss_kib": 178696,
+        "point_archive_bytes": 2801571840,
+        "camera_archive_bytes": 473077760,
+        "sidecar_archive_bytes": 7122626560
+      },
+      {
+        "scene": "7850521592343484282_4576_090_4596_090",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 33308135,
+        "elapsed_seconds": 649.6699339530023,
+        "stage_seconds": {
+          "point-preprocess": 196.6025461999816,
+          "point-publication": 67.78036700500525,
+          "point-replay": 55.64712507399963,
+          "point-evict": 6.217262733000098,
+          "sidecar-publication": 210.14709145700908,
+          "sidecar-evict": 21.743963077984517,
+          "camera-preprocess": 17.620472701004473,
+          "camera-publication": 16.769126578001305,
+          "camera-replay": 34.381733155983966,
+          "camera-evict": 2.506641336978646
+        },
+        "peak_child_rss_kib": 179684,
+        "point_archive_bytes": 3092961280,
+        "camera_archive_bytes": 393717760,
+        "sidecar_archive_bytes": 7022080000
+      },
+      {
+        "scene": "12303641360375776820_4378_000_4398_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 31125883,
+        "elapsed_seconds": 698.7952365110104,
+        "stage_seconds": {
+          "point-preprocess": 191.8399496760103,
+          "point-publication": 199.96118758898228,
+          "point-replay": 55.060432405996835,
+          "point-evict": 6.205830999999307,
+          "sidecar-publication": 141.64345886500087,
+          "sidecar-evict": 22.777131210983498,
+          "camera-preprocess": 15.781716091994895,
+          "camera-publication": 15.628180230007274,
+          "camera-replay": 27.84181893398636,
+          "camera-evict": 1.7807317879924085
+        },
+        "peak_child_rss_kib": 179684,
+        "point_archive_bytes": 2903951360,
+        "camera_archive_bytes": 402401280,
+        "sidecar_archive_bytes": 7144632320
+      },
+      {
+        "scene": "2415873247906962761_5460_000_5480_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 36217311,
+        "elapsed_seconds": 637.1969788279966,
+        "stage_seconds": {
+          "point-preprocess": 204.51203673900454,
+          "point-publication": 89.94604808898293,
+          "point-replay": 63.75909684700309,
+          "point-evict": 6.858704215992475,
+          "sidecar-publication": 149.25309523998294,
+          "sidecar-evict": 24.09333752299426,
+          "camera-preprocess": 24.280893626011675,
+          "camera-publication": 16.675824465986807,
+          "camera-replay": 33.793382650997955,
+          "camera-evict": 2.3015223639959004
+        },
+        "peak_child_rss_kib": 179684,
+        "point_archive_bytes": 3376117760,
+        "camera_archive_bytes": 373278720,
+        "sidecar_archive_bytes": 7117639680
+      },
+      {
+        "scene": "2656110181316327570_940_000_960_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 36177045,
+        "elapsed_seconds": 647.2059066919901,
+        "stage_seconds": {
+          "point-preprocess": 206.10951615698286,
+          "point-publication": 82.11639980197651,
+          "point-replay": 64.60693324700696,
+          "point-evict": 7.835406482015969,
+          "sidecar-publication": 154.53270602299017,
+          "sidecar-evict": 24.571607383986702,
+          "camera-preprocess": 20.761821575986687,
+          "camera-publication": 17.87794979501632,
+          "camera-replay": 43.46986835001735,
+          "camera-evict": 3.019011763011804
+        },
+        "peak_child_rss_kib": 179928,
+        "point_archive_bytes": 3372595200,
+        "camera_archive_bytes": 368762880,
+        "sidecar_archive_bytes": 7132559360
+      },
+      {
+        "scene": "16473613811052081539_1060_000_1080_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 35730522,
+        "elapsed_seconds": 614.1951137110009,
+        "stage_seconds": {
+          "point-preprocess": 200.8158502469887,
+          "point-publication": 78.6321011899854,
+          "point-replay": 62.02577677500085,
+          "point-evict": 7.449535809981171,
+          "sidecar-publication": 135.71133651901619,
+          "sidecar-evict": 25.00695383999846,
+          "camera-preprocess": 22.48655044697807,
+          "camera-publication": 18.626281192991883,
+          "camera-replay": 38.664796785014914,
+          "camera-evict": 2.617991320003057
+        },
+        "peak_child_rss_kib": 179928,
+        "point_archive_bytes": 3331082240,
+        "camera_archive_bytes": 504432640,
+        "sidecar_archive_bytes": 7089438720
+      },
+      {
+        "scene": "16646502593577530501_4878_080_4898_080",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 39261178,
+        "elapsed_seconds": 640.0773028650146,
+        "stage_seconds": {
+          "point-preprocess": 209.0432814139931,
+          "point-publication": 89.76448408601573,
+          "point-replay": 68.12411049101502,
+          "point-evict": 7.187000502977753,
+          "sidecar-publication": 154.44065315500484,
+          "sidecar-evict": 21.62666471899138,
+          "camera-preprocess": 16.60086816002149,
+          "camera-publication": 19.81868523702724,
+          "camera-replay": 30.98330674599856,
+          "camera-evict": 1.86583488699398
+        },
+        "peak_child_rss_kib": 182000,
+        "point_archive_bytes": 3645880320,
+        "camera_archive_bytes": 447774720,
+        "sidecar_archive_bytes": 7089192960
+      },
+      {
+        "scene": "7921369793217703814_1060_000_1080_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 37687242,
+        "elapsed_seconds": 682.1778791349789,
+        "stage_seconds": {
+          "point-preprocess": 218.96696219901787,
+          "point-publication": 133.0664959709975,
+          "point-replay": 61.2759831410076,
+          "point-evict": 6.966187257989077,
+          "sidecar-publication": 139.10105115099577,
+          "sidecar-evict": 25.035967789008282,
+          "camera-preprocess": 20.4884602400125,
+          "camera-publication": 17.21126932199695,
+          "camera-replay": 35.162897637987044,
+          "camera-evict": 2.4196821479999926
+        },
+        "peak_child_rss_kib": 182000,
+        "point_archive_bytes": 3512985600,
+        "camera_archive_bytes": 386324480,
+        "sidecar_archive_bytes": 7146403840
+      },
+      {
+        "scene": "9385013624094020582_2547_650_2567_650",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 36064438,
+        "elapsed_seconds": 599.1241125219967,
+        "stage_seconds": {
+          "point-preprocess": 190.15548886402394,
+          "point-publication": 75.70105152600445,
+          "point-replay": 63.045450892008375,
+          "point-evict": 6.721721754001919,
+          "sidecar-publication": 158.37655052699847,
+          "sidecar-evict": 21.816036426986102,
+          "camera-preprocess": 15.74156028899597,
+          "camera-publication": 16.292738177988213,
+          "camera-replay": 29.32705545600038,
+          "camera-evict": 1.6691273610049393
+        },
+        "peak_child_rss_kib": 182076,
+        "point_archive_bytes": 3349114880,
+        "camera_archive_bytes": 400875520,
+        "sidecar_archive_bytes": 7052646400
+      },
+      {
+        "scene": "1191788760630624072_3880_000_3900_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 35405780,
+        "elapsed_seconds": 630.232111557998,
+        "stage_seconds": {
+          "point-preprocess": 201.6981200230075,
+          "point-publication": 87.8684420940117,
+          "point-replay": 59.86378634397988,
+          "point-evict": 6.744909433007706,
+          "sidecar-publication": 164.79243373899953,
+          "sidecar-evict": 22.98580531400512,
+          "camera-preprocess": 18.399980515998323,
+          "camera-publication": 15.118025364005007,
+          "camera-replay": 29.949893599026836,
+          "camera-evict": 1.9228095379949082
+        },
+        "peak_child_rss_kib": 182076,
+        "point_archive_bytes": 3300505600,
+        "camera_archive_bytes": 359198720,
+        "sidecar_archive_bytes": 7144908800
+      },
+      {
+        "scene": "6390847454531723238_6000_000_6020_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 34795683,
+        "elapsed_seconds": 669.4785322740208,
+        "stage_seconds": {
+          "point-preprocess": 208.59015876299236,
+          "point-publication": 81.54287065999233,
+          "point-replay": 61.82297738298075,
+          "point-evict": 6.569756954006152,
+          "sidecar-publication": 183.76154898598907,
+          "sidecar-evict": 22.484179520019097,
+          "camera-preprocess": 21.421739841025556,
+          "camera-publication": 18.775543067982653,
+          "camera-replay": 40.51682868899661,
+          "camera-evict": 2.7618694229749963
+        },
+        "peak_child_rss_kib": 182108,
+        "point_archive_bytes": 3243888640,
+        "camera_archive_bytes": 400373760,
+        "sidecar_archive_bytes": 7147048960
+      },
+      {
+        "scene": "13840133134545942567_1060_000_1080_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 31936558,
+        "elapsed_seconds": 762.4177671530051,
+        "stage_seconds": {
+          "point-preprocess": 202.2606113300135,
+          "point-publication": 85.45023435002076,
+          "point-replay": 53.98365116500645,
+          "point-evict": 5.717134524980793,
+          "sidecar-publication": 265.7830178620061,
+          "sidecar-evict": 24.811727007006994,
+          "camera-preprocess": 23.61234449298354,
+          "camera-publication": 21.106237921019783,
+          "camera-replay": 53.98189676302718,
+          "camera-evict": 3.687866632011719
+        },
+        "peak_child_rss_kib": 182108,
+        "point_archive_bytes": 2966169600,
+        "camera_archive_bytes": 442603520,
+        "sidecar_archive_bytes": 7135180800
+      },
+      {
+        "scene": "5525943706123287091_4100_000_4120_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 34015823,
+        "elapsed_seconds": 653.5640282870154,
+        "stage_seconds": {
+          "point-preprocess": 198.20828987899586,
+          "point-publication": 90.34265432402026,
+          "point-replay": 57.759976468019886,
+          "point-evict": 6.187258363002911,
+          "sidecar-publication": 185.82364037600928,
+          "sidecar-evict": 23.004616937978426,
+          "camera-preprocess": 18.70594841701677,
+          "camera-publication": 16.27797443998861,
+          "camera-replay": 33.966729533014586,
+          "camera-evict": 2.2348655149980914
+        },
+        "peak_child_rss_kib": 182108,
+        "point_archive_bytes": 3171502080,
+        "camera_archive_bytes": 362823680,
+        "sidecar_archive_bytes": 7149711360
+      },
+      {
+        "scene": "5200186706748209867_80_000_100_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 26731204,
+        "elapsed_seconds": 539.1699181110016,
+        "stage_seconds": {
+          "point-preprocess": 178.91752395100775,
+          "point-publication": 85.83620748799876,
+          "point-replay": 48.017195975000504,
+          "point-evict": 4.944985775015084,
+          "sidecar-publication": 127.76976372700301,
+          "sidecar-evict": 21.00243806501385,
+          "camera-preprocess": 14.027776784001617,
+          "camera-publication": 13.670686585013755,
+          "camera-replay": 25.70063296300941,
+          "camera-evict": 1.243869229016127
+        },
+        "peak_child_rss_kib": 182108,
+        "point_archive_bytes": 2483036160,
+        "camera_archive_bytes": 334336000,
+        "sidecar_archive_bytes": 7085957120
+      },
+      {
+        "scene": "15696964848687303249_4615_200_4635_200",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 35108184,
+        "elapsed_seconds": 671.4618926440016,
+        "stage_seconds": {
+          "point-preprocess": 209.47318708398961,
+          "point-publication": 85.68616136399214,
+          "point-replay": 60.38935968701844,
+          "point-evict": 6.408715238998411,
+          "sidecar-publication": 172.01855733100092,
+          "sidecar-evict": 24.800983207998797,
+          "camera-preprocess": 23.386352978996,
+          "camera-publication": 19.27305239799898,
+          "camera-replay": 44.7461560810043,
+          "camera-evict": 3.1716554410231765
+        },
+        "peak_child_rss_kib": 182108,
+        "point_archive_bytes": 3273635840,
+        "camera_archive_bytes": 433121280,
+        "sidecar_archive_bytes": 7146803200
+      }
+    ],
+    "elapsed_seconds": {
+      "min": 447.7737608800235,
+      "median": 612.280734119995,
+      "max": 762.4177671530051,
+      "sum": 36205.072436987946
+    },
+    "stage_seconds": {
+      "point-preprocess": {
+        "min": 16.993808361992706,
+        "median": 200.51893904202734,
+        "max": 218.96696219901787,
+        "sum": 11577.139432417054
+      },
+      "point-publication": {
+        "min": 58.4770386449818,
+        "median": 77.94825892901281,
+        "max": 199.96118758898228,
+        "sum": 4832.520581019053
+      },
+      "point-replay": {
+        "min": 45.08671687199967,
+        "median": 61.07363492899458,
+        "max": 71.67952843100647,
+        "sum": 3538.517235079111
+      },
+      "point-evict": {
+        "min": 4.737283000984462,
+        "median": 6.604671634006081,
+        "max": 8.132766021997668,
+        "sum": 387.71603686906747
+      },
+      "sidecar-publication": {
+        "min": 124.49526251701172,
+        "median": 143.71834336497704,
+        "max": 265.7830178620061,
+        "sum": 8946.926011880889
+      },
+      "sidecar-evict": {
+        "min": 20.91545466601383,
+        "median": 22.946590933017433,
+        "max": 28.251203152001835,
+        "sum": 1361.7672664178244
+      },
+      "camera-preprocess": {
+        "min": 13.620510007982375,
+        "median": 18.106794469000306,
+        "max": 34.17934244099888,
+        "sum": 1107.9450344030338
+      },
+      "camera-publication": {
+        "min": 13.670686585013755,
+        "median": 16.769126578001305,
+        "max": 82.2142862729961,
+        "sum": 1061.0614578300156
+      },
+      "camera-replay": {
+        "min": 23.638903622020734,
+        "median": 32.32572075200733,
+        "max": 53.98189676302718,
+        "sum": 2028.5970543641306
+      },
+      "camera-evict": {
+        "min": 1.243869229016127,
+        "median": 2.1356036179931834,
+        "max": 3.7051172239880543,
+        "sum": 132.13545397893176
+      }
+    },
+    "scope": "observed completed queued scenes only, not full-cohort extrapolation or training/evaluation GPU cost; 15GiB decoded cap remains candidate"
+  },
+  "excluded_completed_lifecycles": [
+    {
+      "scene": "1730266523558914470_305_260_325_260",
+      "reason": "manual pilot lifecycle; no comparable ten-stage driver timing"
+    },
+    {
+      "scene": "4759225533437988401_800_000_820_000",
+      "reason": "manual pilot lifecycle; no comparable ten-stage driver timing"
+    },
+    {
+      "scene": "15036582848618865396_3752_830_3772_830",
+      "reason": "manual pilot lifecycle; no comparable ten-stage driver timing"
+    },
+    {
+      "scene": "9907794657177651763_1126_570_1146_570",
+      "reason": "recovered interrupted lifecycle; no comparable ten-stage driver elapsed measurement"
+    }
+  ],
+  "scope": "observed comparable preprocessing only; no full-cohort cost extrapolation, training/evaluation budget or cap freeze",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/scientific-preprocessing-resource-b/receipt.json",
+  "receipt_sha256": "350d90c5160def3e38c9af9d472e01bd0ce57d843f46dd1f5b2eb59e5ff20b82"
+}

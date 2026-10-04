@@ -1,0 +1,78 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/point-semantic-live-a/receipt.json",
+  "receipt_sha256": "afdc5430fb6c67bf282e950cea3978e0c44810242fabdc79994489df24b1c033",
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/gpu-rootfs",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/point-semantic-live-a/input",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/point-semantic-live-a/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--",
+        "/opt/waymo/bin/python",
+        "-m",
+        "unittest",
+        "tests.test_point_semantic_encoder",
+        "-v"
+      ],
+      "exit_code": 0,
+      "groups": 4
+    }
+  ],
+  "verified_utc": "2026-09-30T18:50:02.978898+00:00",
+  "elapsed_seconds": 1.6253513020055834,
+  "peak_child_rss_kib": 92192,
+  "runtime_lock": {
+    "image_id": "sha256:46bdaa6e8d9058d7e09419085dfcf9a4527e801330045ae8e0f387f454413b86",
+    "rootfs_sha256": "55f63770083be16ea76764422c51e6e5d995b2d65e9785b552e118a64c6e2f1f",
+    "recipe_hashes": {
+      "Dockerfile": "48484266fe92aaf1a94823fac0746eafef7ac78d0a8754fa9d8f279e8d96c19b",
+      "requirements.lock": "038ba6bbc16870b6430481127b15ab2830e5dac0a6b14c30f218a43853e35923",
+      "build.sh": "bd554045bf0dd40aeceb495fd25ff6ea62ad8e04e93a0c81b203f2c141bcce55"
+    }
+  },
+  "candidate_hashes": {
+    "pipeline/point_semantic_encoder.py": "a9646947d8131c6eb95d3ae576575c7dbe66c0a66020376962ed26e4fb8016d1",
+    "tests/test_point_semantic_encoder.py": "5136542b5b50a294ac425e68f41eddd8ecacdea51e8ae5d8a2b10013878ab4ed"
+  },
+  "artifacts": {
+    "red.log": "703c20969429387340e64cd45d8eb5c688a6a47f1a62e26e623459b88b43cace",
+    "live.log": "fc176917b5feb6f53679b9d18aec47d9a96c3fa74269a021ce77a54844fcb6ec"
+  },
+  "scope": "independent all-point MLP/global-context semantic candidate; CPU Torch analytic fixtures only, no GPU/real-point integration/optimizer/heldout result"
+}

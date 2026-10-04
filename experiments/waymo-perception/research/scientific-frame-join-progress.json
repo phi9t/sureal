@@ -1,0 +1,98 @@
+{
+  "status": "partial scientific key reconciliation; acquisition still active",
+  "audited_utc": "2026-09-30T09:12:07.061951+00:00",
+  "complete_scenes": [
+    {
+      "scene": "1730266523558914470_305_260_325_260",
+      "official_split": "training",
+      "frames": 197,
+      "components": 17
+    },
+    {
+      "scene": "15036582848618865396_3752_830_3772_830",
+      "official_split": "training",
+      "frames": 198,
+      "components": 17
+    },
+    {
+      "scene": "11343624116265195592_5910_530_5930_530",
+      "official_split": "training",
+      "frames": 199,
+      "components": 17
+    },
+    {
+      "scene": "4447423683538547117_536_022_556_022",
+      "official_split": "training",
+      "frames": 198,
+      "components": 17
+    },
+    {
+      "scene": "14503113925613619599_975_506_995_506",
+      "official_split": "training",
+      "frames": 198,
+      "components": 17
+    },
+    {
+      "scene": "3375636961848927657_1942_000_1962_000",
+      "official_split": "training",
+      "frames": 198,
+      "components": 17
+    },
+    {
+      "scene": "6813611334239274394_535_000_555_000",
+      "official_split": "training",
+      "frames": 195,
+      "components": 17
+    },
+    {
+      "scene": "990914685337955114_980_000_1000_000",
+      "official_split": "training",
+      "frames": 198,
+      "components": 17
+    },
+    {
+      "scene": "8796914080594559459_4284_170_4304_170",
+      "official_split": "training",
+      "frames": 199,
+      "components": 17
+    },
+    {
+      "scene": "12257951615341726923_2196_690_2216_690",
+      "official_split": "training",
+      "frames": 198,
+      "components": 17
+    },
+    {
+      "scene": "13186511704021307558_2000_000_2020_000",
+      "official_split": "training",
+      "frames": 198,
+      "components": 17
+    },
+    {
+      "scene": "17885096890374683162_755_580_775_580",
+      "official_split": "training",
+      "frames": 198,
+      "components": 17
+    },
+    {
+      "scene": "7912728502266478772_1202_200_1222_200",
+      "official_split": "training",
+      "frames": 196,
+      "components": 17
+    },
+    {
+      "scene": "4723255145958809564_741_350_761_350",
+      "official_split": "training",
+      "frames": 199,
+      "components": 17
+    },
+    {
+      "scene": "8454755173123314088_3202_000_3222_000",
+      "official_split": "training",
+      "frames": 198,
+      "components": 17
+    }
+  ],
+  "scope": "frame-set equality, aggregate five-sensor cardinality, lidar/projection native-key digest equality, annotation timestamp subsets; sensor enum validity, payload alignment and full independent source replay remain open",
+  "acquisition_snapshot_sha256": "e6efb20622cf13ca81ac1b55284a26cfacb2a7b978d3a3b5096215f602b1a1e8"
+}

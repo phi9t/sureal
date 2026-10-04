@@ -1,0 +1,5 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sidecar-eviction-live-b/receipt.json",
+  "receipt_sha256": "5ce868d3b0da54e7fc16f3311ad7f79563903bac763293279204ab23b832d291",
+  "scope": "live fixtures only; actual scientific eviction pending"
+}

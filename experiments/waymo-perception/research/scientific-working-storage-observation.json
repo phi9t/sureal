@@ -1,0 +1,8 @@
+{
+  "observed_utc": "2026-09-30T22:52:47.369165+00:00",
+  "root": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing",
+  "observed_bytes": 14812625533,
+  "observed_files": 31855,
+  "candidate_cap_bytes": 16106127360,
+  "scope": "non-atomic live working-tree observation; not peak or resource freeze"
+}

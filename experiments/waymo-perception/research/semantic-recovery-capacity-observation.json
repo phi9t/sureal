@@ -1,0 +1,15 @@
+{
+  "observed_utc": "2026-10-01T05:01:53.945705+00:00",
+  "status": "capacity observation during active queue; not a staging admission",
+  "working_bytes_observed": 15722699525,
+  "largest_missing_derived_archive_bytes": 3756933120,
+  "sum_observed_plus_one_archive_bytes": 19479632645,
+  "candidate_working_limit_bytes": 16106127360,
+  "headroom_bytes_for_this_observation": -3373505285,
+  "command": [
+    "du",
+    "-sb",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing"
+  ],
+  "scope": "queue still owns staging; footprint may change and must be recalculated under lease before transfer"
+}

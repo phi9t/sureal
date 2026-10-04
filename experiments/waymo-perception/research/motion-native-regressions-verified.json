@@ -1,0 +1,11 @@
+{
+  "status": "native Motion upstream regressions independently verified live",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-native-live-a/receipt.json",
+  "receipt_sha256": "ec7db09b956b1e58bd65d4bb930975318249ed87fac8799a42b4598a43732339",
+  "test_counts": {
+    "motion_metrics": 19,
+    "motion_metrics_utils": 23
+  },
+  "rootfs_sha256": "fc622c3c32c3a467c992d028bdfb1fba51fca57f9c2f174541ba6ce3aa65c51c",
+  "scope": "upstream metric/utility regressions only; native CLI, independent analytic parity, acquired scenarios/causal extensions and ticket19 closure remain open"
+}

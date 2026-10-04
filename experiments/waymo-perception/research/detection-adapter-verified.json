@@ -1,0 +1,12 @@
+{
+  "scope": "default native 3D CLI boundary only; broader ticket 09 remains open",
+  "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/detection-adapter-live-a/receipt.json",
+  "receipt_sha256": "d8498ab02f42d6cb10575074c3d52251cc1ac0af96558882c02864759c8d47da",
+  "independent_checks": [
+    "all output and candidate hashes reopened",
+    "all 32 breakdowns matched pinned expectations within 1e-6",
+    "four boundary tests passed live",
+    "real malformed protobuf returned zero and was rejected"
+  ],
+  "ticket_09": "open"
+}

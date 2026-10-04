@@ -1,0 +1,78 @@
+{
+  "status": "full synthetic production orchestration with in-worker memory verified; actual HDFS replay pending",
+  "verified_utc": "2026-10-01T04:29:05.902950+00:00",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/training-box-driver-fixture-a/run-c/receipt.json",
+  "receipt_sha256": "ae649db0e8f88a47fa93dca737a7bade86dcf4cfbf4071963ee53dd32721c690",
+  "test_command": [
+    "bwrap",
+    "--unshare-all",
+    "--die-with-parent",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+    "/",
+    "--ro-bind",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+    "/experiment",
+    "--bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/training-box-job-provenance-green-a/output",
+    "/outputs",
+    "--proc",
+    "/proc",
+    "--dev",
+    "/dev",
+    "--tmpfs",
+    "/tmp",
+    "--clearenv",
+    "--setenv",
+    "HOME",
+    "/tmp/private-home",
+    "--setenv",
+    "PATH",
+    "/usr/local/bin:/usr/bin:/bin",
+    "--setenv",
+    "PYTHONNOUSERSITE",
+    "1",
+    "--setenv",
+    "PYTHONDONTWRITEBYTECODE",
+    "1",
+    "--setenv",
+    "PYTHONPATH",
+    "/experiment",
+    "--chdir",
+    "/experiment",
+    "--",
+    "python",
+    "-c",
+    "import importlib.util,sys,unittest; assert importlib.util.find_spec('tensorflow') is None; suite=unittest.defaultTestLoader.discover('tests',pattern='test_training_box*.py'); result=unittest.TextTestRunner(verbosity=2).run(suite); assert result.testsRun==52 and not result.skipped; sys.exit(not result.wasSuccessful())"
+  ],
+  "test_exit_code": 0,
+  "test_groups": 52,
+  "scope": "synthetic mirror transfers; two isolated full64 workers measure own process peak RSS; not real-cohort resources",
+  "worker_resources": [
+    {
+      "elapsed_seconds": 4.853729516995372,
+      "peak_rss_kib": 73368,
+      "rss_scope": "worker_process_peak"
+    },
+    {
+      "elapsed_seconds": 5.049707328988006,
+      "peak_rss_kib": 70304,
+      "rss_scope": "worker_process_peak"
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "hashes": {
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/pipeline/training_box_job.py": "47f0f4b1bfb911deaecf068a6f1e1a9cd916d4700c1cdd17ffc4dd1bc6c7f628",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/pipeline/training_box_replay.py": "0b48cf52b7bac20aaf008432696aa134cbb75cb98270f7fda2cbc1b2361e62ef",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/tests/test_training_box_job.py": "5c97890bd704ea4cb3265564d5c9a8b32fa8e8d2ade08d833903ec03779bde60",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/training-box-worker-resources-green.log": "be92f2666aea6bf6a5513b4da35ce597beb59980a20ca08b69785ae33252237e",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/training-box-worker-resources-red.log": "4ac3d2aab9a8cb864414e1079010bfbdfdfa56359c96265e0e59709b46c22c71"
+  }
+}

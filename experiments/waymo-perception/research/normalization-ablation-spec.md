@@ -1,0 +1,13 @@
+# Fixed-batch normalization ablation
+
+Authorized2026-10-01: compare a few norms using Tier1 quality and time-to-fit. Training-only diagnostic, not heldout architecture adoption.
+
+Treatments: audited original BN reference; GN8 in every BEV BatchNorm2d with original pillar BN retained; GN8 BEV plus per-point channel LayerNorm replacing pillar BN; Identity replacing every BN. Eps1e-3 and affine parameters retained where normalization exists. No-norm retains original bias-free convolution/linear architecture: bias additions would be another treatment. Padding/point pooling/scatter/head/assignment/loss/NMS remain unchanged. Constructor seed17 and replacement after construction preserve every original convolution/linear weight, checked by a live contract fixture. LN does not pool across points; GN does not pool across examples; both have identical train/eval normalization rules.
+
+Fixed first native training frame and complete17 eligible GT (3 vehicles,3 pedestrians,11 signs;3 signs have no positive anchor), no cyclist. Same observations/targets/hashes, seed17, Adam1e-4 betas(.9,.999) eps1e-8 wd0 foreachFalse, clip10,2000 updates, no augmentation/resampling, FP32/TF32off/deterministic algorithms. Checkpoints0,25,50,100,200,300,500,750,1000,1500,2000. Preserve all source and target support. Do not silently retune a failing variant.
+
+Report per-class native AP/APH at every checkpoint, final quality, first observed and sustained passing checkpoint brackets under mean>=.8 and populated-class>=.8, synchronized-step wall time, worker/scoring/audit overhead, peak memory/storage, parameter count, clipped updates and loss/confidence components. Missing cyclist coverage and sign target gaps prevent whole-model admission. Negative results or nonfinite/resource failures are retained outcomes, not excuses to switch the recipe.
+
+Live checks: red→green normalization contract; locked single-B200 runtime/driver and source pins; native training/cache/output hashes; separate literal loss/timing checks and fresh checkpoint/head replay; independent decoding/NMS, point counts/NLZ, GT coverage, protobuf reread and native scoring for sampled predictions. Historical baseline exact outputs/receipts retained. Different normalization axes change the architecture; comparisons describe the entire specified treatment, not just a generic norm name.
+
+Storage unchanged15GiB scientific cap; reserve768MiB per active treatment, workerRSS16GiB and CUDA allocated8GiB caps. GPU training serial on one exposed device. All experiments remain local fixed-batch diagnostics; adoption into the main scientific recipe requires multi-frame/heldout evidence and revised protocol admission.

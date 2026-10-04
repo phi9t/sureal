@@ -1,0 +1,30 @@
+{
+  "status": "native engineering camera sidecars independently checked live",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-sidecars-native-a/receipt.json",
+  "receipt_sha256": "7b951250c4acf91e1969afe44f675f33dd2184ed1e1e506c457b573f3de22e28",
+  "validation": {
+    "camera_image": {
+      "status": "native camera keys/scalars/binary bytes independently reconciled",
+      "rows": 990,
+      "binary_fields": 990,
+      "output_bytes": 303126104,
+      "source_sha256": "702b08d6fe33b41b69d5f9b915a44647e063838cca70cff8973ccc430e491466"
+    },
+    "camera_segmentation": {
+      "status": "native camera keys/scalars/binary bytes independently reconciled",
+      "rows": 495,
+      "binary_fields": 990,
+      "output_bytes": 14500617,
+      "source_sha256": "25b50b6ef4aeef36f7326e4741190ce9b285f9188846b2af76c26b002e4c625a"
+    },
+    "camera_box": {
+      "status": "native camera keys/scalars/binary bytes independently reconciled",
+      "rows": 22429,
+      "binary_fields": 0,
+      "output_bytes": 21995189,
+      "source_sha256": "aa43a2d0ec14e653baddb87a37f99f5bd510298b901b8868d9ef022b2678487e"
+    }
+  },
+  "scope": "one engineering scene binary/scalar/key retention only; image/label decoding and scientific HDFS integration remain open",
+  "limitations": "preparation evidence only; this orchestration receipt lacks complete per-invocation timing/RSS and cannot close a research milestone"
+}

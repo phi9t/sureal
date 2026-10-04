@@ -1,0 +1,9 @@
+{
+  "status": "preparation evidence; no ticket closure",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/scientific-sidecars-live-a/receipt.json",
+  "receipt_sha256": "9298d80ae50a69952e82d6c7849f167d15c01a0401e8357033da20ad3481f426",
+  "rows": 20495,
+  "arrays": 2238,
+  "output_bytes": 7105788537,
+  "scope": "full selected component tables for one retained engineering scene; scientific source processing, scene reconstruction and protocol freeze remain open"
+}

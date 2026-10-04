@@ -1,0 +1,25 @@
+{
+  "status": "live GPU encoder evidence independently audited",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/pillar-gpu-live-a/receipt.json",
+  "receipt_sha256": "97b3edb3a6f9212c2decc2b89946a9c78d34a6b6e08274fe80fbcab029a52d28",
+  "validation": {
+    "status": "analytic PFN BN and CPU/GPU parity passed",
+    "assertions": [
+      "numpy padded-slot BN output",
+      "numpy running mean and unbiased running variance",
+      "padding retained after BN/ReLU",
+      "CPU/GPU scatter outputs",
+      "CPU/GPU input and parameter gradients",
+      "TensorFlow absent",
+      "one visible GPU"
+    ],
+    "device": "NVIDIA B200",
+    "seed": 17,
+    "elapsed_seconds": 0.6199858159816358,
+    "peak_allocated_bytes": 17063424,
+    "max_output_error": 0.0,
+    "max_input_gradient_error": 0.0,
+    "scope": "analytic encoder only; no resource budget extrapolation, training, detector or held-out claim"
+  },
+  "scope": "analytic encoder only; no resource budget extrapolation, training, detector or held-out claim"
+}

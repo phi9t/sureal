@@ -1,0 +1,201 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/gpu-rootfs",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/m3-live-b",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/range-pillar-native-gpu-a/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/range-frontend-native-gpu-a/input",
+        "/mnt",
+        "--tmpfs",
+        "/driver",
+        "--dev-bind",
+        "/dev/nvidia1",
+        "/dev/nvidia1",
+        "--dev-bind",
+        "/dev/nvidiactl",
+        "/dev/nvidiactl",
+        "--dev-bind",
+        "/dev/nvidia-uvm",
+        "/dev/nvidia-uvm",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libcuda.so.580.105.08",
+        "/driver/libcuda.so",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libcuda.so.580.105.08",
+        "/driver/libcuda.so.1",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libcuda.so.580.105.08",
+        "/driver/libcuda.so.580.105.08",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libnvidia-ptxjitcompiler.so.580.105.08",
+        "/driver/libnvidia-ptxjitcompiler.so",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libnvidia-ptxjitcompiler.so.580.105.08",
+        "/driver/libnvidia-ptxjitcompiler.so.1",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libnvidia-ptxjitcompiler.so.580.105.08",
+        "/driver/libnvidia-ptxjitcompiler.so.580.105.08",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libnvidia-nvvm.so.580.105.08",
+        "/driver/libnvidia-nvvm.so",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libnvidia-nvvm.so.580.105.08",
+        "/driver/libnvidia-nvvm.so.4",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libnvidia-nvvm.so.580.105.08",
+        "/driver/libnvidia-nvvm.so.580.105.08",
+        "--setenv",
+        "PATH",
+        "/opt/waymo/bin:/usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "LD_LIBRARY_PATH",
+        "/driver:/usr/local/cuda/lib64",
+        "--setenv",
+        "CUDA_VISIBLE_DEVICES",
+        "0",
+        "--setenv",
+        "OMP_NUM_THREADS",
+        "2",
+        "--",
+        "/opt/waymo/bin/python",
+        "/experiment/gpu/range-pillar-native-probe.py"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "image_id": "sha256:46bdaa6e8d9058d7e09419085dfcf9a4527e801330045ae8e0f387f454413b86",
+    "rootfs_sha256": "55f63770083be16ea76764422c51e6e5d995b2d65e9785b552e118a64c6e2f1f",
+    "recipe_hashes": {
+      "Dockerfile": "48484266fe92aaf1a94823fac0746eafef7ac78d0a8754fa9d8f279e8d96c19b",
+      "requirements.lock": "038ba6bbc16870b6430481127b15ab2830e5dac0a6b14c30f218a43853e35923",
+      "build.sh": "bd554045bf0dd40aeceb495fd25ff6ea62ad8e04e93a0c81b203f2c141bcce55"
+    }
+  },
+  "candidate_hashes": {
+    "gpu/range-pillar-native-probe.py": "04f53e88c9c2694a0dd82b08cfd9fd18c805b4063a3a32f94f915165fbe34c81",
+    "pipeline/range_frontend.py": "d43c4499036db5bebfdd856a2274d8b60703f733828bceb05c8f96c99f9ca743",
+    "pipeline/native_range_grid.py": "75ba9579354733c5428676b91c121dfcfe6c74790edd3c7122c74c10f3db49c7",
+    "pipeline/pillar_packing.py": "786318c98614b628ce300d10b24acef5e232a753e62209d5966314fc8793b22e",
+    "pipeline/packed_point_features.py": "e5f7bdb35183b700643638802c2090a1403110bc7d21ee5fbdd7e87b5db6986e",
+    "pipeline/pillar_encoder.py": "0bd5aabd2ebef1d65c84fe0ad89a6ccc642af5308183e608e4ce703cf7bcc192",
+    "pipeline/pillar_detector.py": "0aef80adb63784844782871745262d15144c36831714c8607b9a91be787936cc",
+    "pipeline/range_pillar_hybrid.py": "dac4ef7e2559324dc498883b05eb23621ab198928f8d00ec6c6d0c0384df044f"
+  },
+  "input_hashes": {
+    "trusted.json": "c5029ba68643b99b3f216440a40280fbccd42d6ebd717dfbf0cb4571f4ce4ab7",
+    "source_report": "9e49eb493517714be0ddcd5158aad9fe08c4575a96bd777b0219eebaf112c906",
+    "shape_inventory": "77bf84a300fae503b6b735f40ebabdcd5ce12c9b541f748d6bfa16eac50e3281"
+  },
+  "validation": {
+    "status": "native ungated range point pillar shared-head forward/backward passed",
+    "frame": {
+      "context": "5847910688643719375_180_000_200_000",
+      "timestamp": 1548722489547369
+    },
+    "sensor": "TOP",
+    "returns": [
+      1,
+      2
+    ],
+    "native_shapes": [
+      [
+        64,
+        2650,
+        4
+      ],
+      [
+        64,
+        2650,
+        4
+      ]
+    ],
+    "points": 157870,
+    "eligible_point_elements": 152773,
+    "gathered_features": 157870,
+    "channels": 32,
+    "parameter_count": 5291344,
+    "packing": {
+      "input_points": 157870,
+      "outside_roi": 1802,
+      "eligible_points": 156068,
+      "eligible_pillars": 12342,
+      "retained_pillars": 12342,
+      "pillar_limit_dropped_points": 0,
+      "point_limit_dropped_points": 88069,
+      "retained_points": 67999
+    },
+    "prediction_shapes": {
+      "classification": [
+        1,
+        131072,
+        3
+      ],
+      "box_residuals": [
+        1,
+        131072,
+        7
+      ],
+      "direction": [
+        1,
+        131072,
+        2
+      ]
+    },
+    "foreground_selection": "disabled",
+    "semantic_support_scope": "all valid native points, independent of pillar sampling",
+    "load_and_grid_seconds": 0.5483470949984621,
+    "forward_backward_seconds": 0.9458694720233325,
+    "gather_seconds": 0.0015207680116873235,
+    "peak_allocated_bytes": 2642208768,
+    "seed": 17,
+    "optimizer_steps": 0,
+    "device": "NVIDIA B200",
+    "scope": "engineering native ungated hybrid; native semantics and synthetic foreground/detector objectives; zero optimizer updates, no trained detection or held-out accuracy claim"
+  },
+  "artifacts": {
+    "live.log": "d87e342c748a21018e10db5be1f78f7f5523abee8e3a5fcb063b48851bac851e",
+    "output/check.json": "1db29b14e13f30379e083edba560f07c0eadcaad475e7fa213de0b7817f6ea0e"
+  },
+  "scope": "native untrained complete ungated hybrid engineering integration only",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/range-pillar-native-gpu-a/receipt.json",
+  "receipt_sha256": "e42804f3630723c80e401f49f3a9840c3a40aa354ec605344d8412257f35d632"
+}

@@ -1,0 +1,30 @@
+{
+  "run_id": "balanced20261002a",
+  "variants": [
+    "baseline",
+    "residual_bev"
+  ],
+  "stage": "failed",
+  "checkpoint_grid": [
+    0,
+    1000,
+    2000
+  ],
+  "updates_per_candidate": 2000,
+  "scope": "balanced16 training-only fit; full-dataset training remains quality gated",
+  "completed": [
+    {
+      "stage": "training",
+      "variant": "baseline",
+      "exit_code": 0
+    }
+  ],
+  "active_variant": "residual_bev",
+  "failed_command": [
+    "/usr/local/bin/python",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/cohort/run_balanced.py",
+    "residual_bev",
+    "--run-id",
+    "balanced20261002a"
+  ]
+}

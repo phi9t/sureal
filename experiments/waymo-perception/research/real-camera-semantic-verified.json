@@ -1,0 +1,19 @@
+{
+  "receipts": {
+    "real-camera-semantic-live-a": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/real-camera-semantic-live-a/receipt.json",
+      "sha256": "5dd77e4a75cc990317013fbd002119fde723bf387767f04af9655b2af16d0e6e"
+    },
+    "real-camera-source-check-a": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/real-camera-source-check-a/receipt.json",
+      "sha256": "9495730b5eae9a84a283d5b8ec47496886349cf12f4fea0ea8c5dfca6db485ec"
+    }
+  },
+  "annotated_images": 990,
+  "missing_annotations": 995,
+  "eligible_pixels": 2133338748,
+  "elapsed_seconds": 28.988873130991124,
+  "peak_rss_kib": 240120,
+  "scope": "native camera semantic diagnostics and coverage verified; official panoptic/STQ parity not claimed",
+  "ticket_09": "open"
+}

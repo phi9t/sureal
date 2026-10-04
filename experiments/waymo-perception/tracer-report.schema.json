@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "component_count": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "component_summaries": {
+      "type": "array"
+    },
+    "environment": {
+      "type": "object"
+    },
+    "joins": {
+      "type": "object"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "manifest_rows": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "passed": {
+      "const": true
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "source_bytes": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "source_files": {
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "schema_version",
+    "passed",
+    "source_files",
+    "source_bytes",
+    "manifest_rows",
+    "component_count",
+    "component_summaries",
+    "joins",
+    "environment",
+    "limitations"
+  ],
+  "type": "object"
+}

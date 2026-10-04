@@ -1,0 +1,34 @@
+{
+  "status": "first scientific camera source processing independently audited live",
+  "scene": "15036582848618865396_3752_830_3772_830",
+  "processing": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/camera-15036582848618865396_3752_830_3772_830",
+  "receipt_hashes": {
+    "camera_image": "8276d980303dd8eed697733f0e232c2fc76ebf25cef9997b3c6874d658dc1745",
+    "camera_segmentation": "6ba9bed24317fa64fb06bb780ad4398909e463b229085203bf135fa073b97d22",
+    "camera_box": "9cfdfac53af6e674fc15f90278e7c1f4ed1d76f2cc16a7e21f4b15aeea682930"
+  },
+  "validation": {
+    "camera_image": {
+      "status": "native camera keys/scalars/binary bytes independently reconciled",
+      "rows": 990,
+      "binary_fields": 990,
+      "output_bytes": 340504968,
+      "source_sha256": "49df907d981e4e46b6c103a75e41a15da20fb23abec73854bb5b124d7adcf905"
+    },
+    "camera_segmentation": {
+      "status": "native camera keys/scalars/binary bytes independently reconciled",
+      "rows": 100,
+      "binary_fields": 200,
+      "output_bytes": 2899587,
+      "source_sha256": "741ef8547935655dd939b3460c65f218d44df6dc061eb493a4dc9b99b5e6fa09"
+    },
+    "camera_box": {
+      "status": "native camera keys/scalars/binary bytes independently reconciled",
+      "rows": 9198,
+      "binary_fields": 0,
+      "output_bytes": 9103691,
+      "source_sha256": "1936a03eb8a6c253692f4b642d9e93eb304527706e489f6fc76d9b551b43d5f2"
+    }
+  },
+  "scope": "original JPEG/PNG bytes, native scalar/nullable fields and keys; image/mask decoding, immutable publication/replay and task-specific assembly/protocol remain open"
+}

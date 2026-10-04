@@ -1,0 +1,648 @@
+{
+  "status": "scientific source acquisition candidate; protocol not frozen",
+  "scenes": {
+    "1730266523558914470_305_260_325_260": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "15036582848618865396_3752_830_3772_830": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "11343624116265195592_5910_530_5930_530": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "4447423683538547117_536_022_556_022": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "14503113925613619599_975_506_995_506": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "3375636961848927657_1942_000_1962_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "6813611334239274394_535_000_555_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "990914685337955114_980_000_1000_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "8796914080594559459_4284_170_4304_170": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "12257951615341726923_2196_690_2216_690": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "13186511704021307558_2000_000_2020_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "17885096890374683162_755_580_775_580": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "7912728502266478772_1202_200_1222_200": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "4723255145958809564_741_350_761_350": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "8454755173123314088_3202_000_3222_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "3894883757914505116_1840_000_1860_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "13271285919570645382_5320_000_5340_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "8345535260120974350_1980_000_2000_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "1357883579772440606_2365_000_2385_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "16977844994272847523_2140_000_2160_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "4487677815262010875_4940_000_4960_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "809159138284604331_3355_840_3375_840": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "3966447614090524826_320_000_340_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "5083516879091912247_3600_000_3620_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "6142170920525844857_2080_000_2100_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "17782258508241656695_1354_000_1374_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "13830510593707564159_5575_000_5595_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "14369250836076988112_7249_040_7269_040": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "11004685739714500220_2300_000_2320_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "15539619898625779290_760_000_780_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "14004546003548947884_2331_861_2351_861": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "1005081002024129653_5313_150_5333_150": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "13506499849906169066_120_000_140_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "6559997992780479765_1039_000_1059_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "3224923476345749285_4480_000_4500_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "14250544550818363063_880_000_900_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "2088865281951278665_4460_000_4480_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "12856053589272984699_1020_000_1040_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "11489533038039664633_4820_000_4840_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "13619063687271391084_1519_680_1539_680": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "15628918650068847391_8077_670_8097_670": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "14098575914252965554_511_000_531_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "10734565072045778791_440_000_460_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "2681180680221317256_1144_000_1164_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "8722413665055769182_2840_000_2860_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "12012663867578114640_820_000_840_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "9907794657177651763_1126_570_1146_570": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "13807633218762107566_6625_000_6645_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "7850521592343484282_4576_090_4596_090": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "12303641360375776820_4378_000_4398_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "2415873247906962761_5460_000_5480_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "2656110181316327570_940_000_960_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "16473613811052081539_1060_000_1080_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "16646502593577530501_4878_080_4898_080": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "7921369793217703814_1060_000_1080_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "9385013624094020582_2547_650_2567_650": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "1191788760630624072_3880_000_3900_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "6390847454531723238_6000_000_6020_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "13840133134545942567_1060_000_1080_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "5525943706123287091_4100_000_4120_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "5200186706748209867_80_000_100_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "15696964848687303249_4615_200_4635_200": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "10599748131695282446_1380_000_1400_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "4575961016807404107_880_000_900_000": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "10082223140073588526_6140_000_6160_000": {
+      "official_split": "training",
+      "research_splits": [
+        "development"
+      ]
+    },
+    "3657581213864582252_340_000_360_000": {
+      "official_split": "training",
+      "research_splits": [
+        "development"
+      ]
+    },
+    "5468483805452515080_4540_000_4560_000": {
+      "official_split": "training",
+      "research_splits": [
+        "development"
+      ]
+    },
+    "4427374597960783085_4168_000_4188_000": {
+      "official_split": "training",
+      "research_splits": [
+        "development"
+      ]
+    },
+    "183829460855609442_430_000_450_000": {
+      "official_split": "training",
+      "research_splits": [
+        "development"
+      ]
+    },
+    "3437741670889149170_1411_550_1431_550": {
+      "official_split": "training",
+      "research_splits": [
+        "development"
+      ]
+    },
+    "9465500459680839281_1100_000_1120_000": {
+      "official_split": "training",
+      "research_splits": [
+        "development"
+      ]
+    },
+    "18295766828140813622_6775_000_6795_000": {
+      "official_split": "training",
+      "research_splits": [
+        "development"
+      ]
+    },
+    "14262448332225315249_1280_000_1300_000": {
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ]
+    },
+    "18446264979321894359_3700_000_3720_000": {
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ]
+    },
+    "14687328292438466674_892_000_912_000": {
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ]
+    },
+    "6161542573106757148_585_030_605_030": {
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ]
+    },
+    "6183008573786657189_5414_000_5434_000": {
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ]
+    },
+    "15611747084548773814_3740_000_3760_000": {
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ]
+    },
+    "30779396576054160_1880_000_1900_000": {
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ]
+    },
+    "1457696187335927618_595_027_615_027": {
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ]
+    },
+    "17962792089966876718_2210_933_2230_933": {
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ]
+    },
+    "18331704533904883545_1560_000_1580_000": {
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ]
+    },
+    "17626999143001784258_2760_000_2780_000": {
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ]
+    },
+    "7650923902987369309_2380_000_2400_000": {
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ]
+    },
+    "1071392229495085036_1844_790_1864_790": {
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ]
+    },
+    "8956556778987472864_3404_790_3424_790": {
+      "official_split": "validation",
+      "research_splits": [
+        "validation",
+        "camera_validation"
+      ]
+    },
+    "15959580576639476066_5087_580_5107_580": {
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ]
+    },
+    "447576862407975570_4360_000_4380_000": {
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ]
+    },
+    "4759225533437988401_800_000_820_000": {
+      "official_split": "validation",
+      "research_splits": [
+        "camera_validation"
+      ]
+    },
+    "1024360143612057520_3580_000_3600_000": {
+      "official_split": "validation",
+      "research_splits": [
+        "camera_validation"
+      ]
+    },
+    "11048712972908676520_545_000_565_000": {
+      "official_split": "validation",
+      "research_splits": [
+        "camera_validation"
+      ]
+    },
+    "9243656068381062947_1297_428_1317_428": {
+      "official_split": "validation",
+      "research_splits": [
+        "camera_validation"
+      ]
+    },
+    "14081240615915270380_4399_000_4419_000": {
+      "official_split": "validation",
+      "research_splits": [
+        "camera_validation"
+      ]
+    },
+    "933621182106051783_4160_000_4180_000": {
+      "official_split": "validation",
+      "research_splits": [
+        "camera_validation"
+      ]
+    },
+    "12831741023324393102_2673_230_2693_230": {
+      "official_split": "validation",
+      "research_splits": [
+        "camera_validation"
+      ]
+    },
+    "6680764940003341232_2260_000_2280_000": {
+      "official_split": "validation",
+      "research_splits": [
+        "camera_validation"
+      ]
+    },
+    "18024188333634186656_1566_600_1586_600": {
+      "official_split": "validation",
+      "research_splits": [
+        "camera_validation"
+      ]
+    },
+    "8331804655557290264_4351_740_4371_740": {
+      "official_split": "validation",
+      "research_splits": [
+        "camera_validation"
+      ]
+    },
+    "2094681306939952000_2972_300_2992_300": {
+      "official_split": "validation",
+      "research_splits": [
+        "camera_validation"
+      ]
+    },
+    "4575389405178805994_4900_000_4920_000": {
+      "official_split": "validation",
+      "research_splits": [
+        "camera_validation"
+      ]
+    },
+    "7119831293178745002_1094_720_1114_720": {
+      "official_split": "validation",
+      "research_splits": [
+        "camera_validation"
+      ]
+    },
+    "5372281728627437618_2005_000_2025_000": {
+      "official_split": "validation",
+      "research_splits": [
+        "camera_validation"
+      ]
+    },
+    "13982731384839979987_1680_000_1700_000": {
+      "official_split": "validation",
+      "research_splits": [
+        "camera_validation"
+      ]
+    }
+  },
+  "components": [
+    "camera_box",
+    "camera_calibration",
+    "camera_hkp",
+    "camera_image",
+    "camera_segmentation",
+    "camera_to_lidar_box_association",
+    "lidar",
+    "lidar_box",
+    "lidar_calibration",
+    "lidar_camera_projection",
+    "lidar_camera_synced_box",
+    "lidar_hkp",
+    "lidar_pose",
+    "lidar_segmentation",
+    "projected_lidar_box",
+    "stats",
+    "vehicle_pose"
+  ],
+  "expected_objects": 1751,
+  "local_staging_limit_bytes": 2147483648,
+  "per_object_limit_bytes": 1073741824,
+  "hdfs_root": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw",
+  "policy": "one source object and one HDFS verification copy at a time; raw payloads removed after receipt; whole-segment splits; label tables may be empty without being absent"
+}

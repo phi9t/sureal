@@ -1,0 +1,9 @@
+{
+  "status": "serial real recovery continuation armed; waiting original103 and earlier box replay terminal",
+  "session_id": 19219,
+  "runner": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.scratch/await-semantic-recovery.py",
+  "runner_sha256": "20cb5c4a18a17a43b025b04cf95fc1952ff793b5ad1b72f3ecf3e26274fc2ebd",
+  "inventory_sha256": "49767cc6c0d1a3d309e025ea563c4f1fa88883846d2664d76838e12de2810a80",
+  "armed_utc": "2026-10-01T05:26:27.500763+00:00",
+  "scope": "pending execution only; complete missing-set equality, original source pins, shared leases and independent live receipt admission required; no recovered-data result"
+}

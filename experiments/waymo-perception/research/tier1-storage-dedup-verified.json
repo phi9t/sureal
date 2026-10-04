@@ -1,0 +1,480 @@
+{
+  "before_unique_payload_bytes": 15959924863,
+  "after_unique_payload_bytes": 14072208953,
+  "reclaimed_bytes": 1887715910,
+  "all_original_paths_and_content_digests_preserved": true,
+  "groups": [
+    {
+      "sha256": "369efc7b9063841b03c0c7f24731adb367973d29652bc8a01369685119de1241",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-v1/checkpoint.pt",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-exclusive-v2/checkpoint.pt"
+      ],
+      "relinked_bytes": 58405994
+    },
+    {
+      "sha256": "ddeada691889cae84da73916bde8b6a7bf162243d2e7cdb2ce483d5b21f59f51",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-v1/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-v1/checkpoint-2000/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-exclusive-v2/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-exclusive-v2/checkpoint-2000/heads-00.npz"
+      ],
+      "relinked_bytes": 81791298
+    },
+    {
+      "sha256": "798f2faec706a67d305f18084696cef038f6319c165e4609a5f5e9e3d26c30b8",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-v1/checkpoint-0000/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-exclusive-v2/checkpoint-0000/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "7ea007076374377351f31ed26fe37378b1f97f43de5227858eca8daeb7746918",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-v1/checkpoint-0100/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-exclusive-v2/checkpoint-0100/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "39e71b8312d1b0aaa8f8f18485808677fcfb9faaef9533b975cd84e46b399a2e",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-v1/checkpoint-0300/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-exclusive-v2/checkpoint-0300/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "44f90980b6a3d327d55a89d7d9a825cddd54ca61f724a1cfd2186d86b789f170",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-v1/checkpoint-1500/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-exclusive-v2/checkpoint-1500/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "cb7a9284a0540bf9f82deea2647c56f96634b9fcde57656997c685dacddb3be0",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-v1/checkpoint-0025/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-exclusive-v2/checkpoint-0025/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "74208ed31a943ab5f76d51c05f4e80e9bdefc99c127301536757014373409ca3",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-v1/checkpoint-1000/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-exclusive-v2/checkpoint-1000/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "f7b1e679ad672c22631ae75a6b9ea1b63ae10acd7a1712e43c67208027d7af3c",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-v1/checkpoint-0050/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-exclusive-v2/checkpoint-0050/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "c8fe78ffbc70ce5460fd851d9f669a0f718a98e49aa5cf4521b9c8dbfd2df765",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-v1/checkpoint-0750/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-exclusive-v2/checkpoint-0750/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "8ae133fb3361c652f45dca12b08415b06650a809f0cd740a873f7344dce37e5f",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-v1/checkpoint-0200/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-exclusive-v2/checkpoint-0200/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "385c1c5dd46ebef8cd67f026be16a6c4220a6b618cdeaf8bd7e46aa9aac12c19",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-v1/checkpoint-0500/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-context_pfn-exclusive-v2/checkpoint-0500/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "0f5ff1bb69c55fb89cd23d7ff8686f671ccffc17d86aa10bd2ad3344f69725b8",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/norm-gn_backbone-v1/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/norm-gn_backbone-v1/checkpoint-2000/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "cab4aff1ee6fa7b2074cc957812f51d5a3a4df6c914ae7486c5ef48f35d271b1",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/norm-gn_backbone-v1/checkpoint-0000/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-masked_pfn-v1/checkpoint-0000/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort16-baseline-fit20261002a/checkpoint-0000/heads-00.npz"
+      ],
+      "relinked_bytes": 54527532
+    },
+    {
+      "sha256": "fe7e36532df33be824baefc709bc7d8a47600b06152a315226046d08e17a8811",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-masked_pfn-v1/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-masked_pfn-v1/checkpoint-2000/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "c42467ef38a38258849cbd55bce72e92fdbda4ef82c93c60a01ba05339b99e37",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-deep_pfn-v1/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-deep_pfn-v1/checkpoint-2000/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "e5ad42678b689edfbf18b01399e817ef5946e9623635b1ff762dc809e0b47aac",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/native-one-batch-overfit-v1/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/native-one-batch-learning-curve-v1/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/native-one-batch-learning-curve-v1/checkpoint-2000/heads-00.npz"
+      ],
+      "relinked_bytes": 54527532
+    },
+    {
+      "sha256": "3555cf41df7d03197be5d4cd9f1babfb88689aa506bcba1816b8df34aff68440",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-retain64-v1/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-retain64-v1/checkpoint-2000/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "e8995b486e60bd2adf96540a9c43bf12dfb6e2ef225f5b547f11e07e2e0f8c88",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/norm-no_norm-v1/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/norm-no_norm-v1/checkpoint-2000/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "33b4443a4e391f50173b7449b7f652d2b0e65a4ae891cbd2eefa94d4142d21c2",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-window_bev-v1/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-window_bev-v1/checkpoint-2000/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "4c6a8748835850ca64c6a33df38946e5c7a7f45e51efaa7747be72874571e725",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev--runner-live-20261002-v1/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev--runner-live-20261002-v1/checkpoint-2000/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev-v1/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev-v1/checkpoint-2000/heads-00.npz"
+      ],
+      "relinked_bytes": 81791298
+    },
+    {
+      "sha256": "62477be82731f7aea8eb4130eae074c51eb783cd5af106e9b81ccff611fb6b62",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev--runner-live-20261002-v1/checkpoint-0000/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev-v1/checkpoint-0000/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "56236286bb6e258d6d816a3027ad8f9f6c2b0c477c06bb2d6335240972ac2cc0",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev--runner-live-20261002-v1/checkpoint-0100/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev-v1/checkpoint-0100/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "64b5cad2ed0ee074de47ac15c7b48c9b1843f6b93361f4cd8490bc7d58fba255",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev--runner-live-20261002-v1/checkpoint-0300/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev-v1/checkpoint-0300/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "addf40d53db189ce1bca055dd32f7ccbd462bc9f682f80edd10abb06d9d1307c",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev--runner-live-20261002-v1/checkpoint-1500/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev-v1/checkpoint-1500/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "e5aa570bc2ce0724b16639ae81fe3e2135f73dea94bb34eb78ba66aa3a36fcce",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev--runner-live-20261002-v1/checkpoint-0025/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev-v1/checkpoint-0025/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "6a798a00219d4625b7e4d3fd81a50dcc21606156b2d93a22ee4eef0c109967d6",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev--runner-live-20261002-v1/checkpoint-1000/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev-v1/checkpoint-1000/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "788f727327918bd4732cbd4c903a78860b992cb63842d26d713e3b13669a7820",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev--runner-live-20261002-v1/checkpoint-0050/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev-v1/checkpoint-0050/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "12eef01a98ee97e0b4f20491a8eb21d2e92434c4abfdc6ac8de4515eb4799722",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev--runner-live-20261002-v1/checkpoint-0750/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev-v1/checkpoint-0750/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "4f288f351f39565f293a629e78b1867d8181bc0109c8d178a7b0dc6c322420c7",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev--runner-live-20261002-v1/checkpoint-0200/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev-v1/checkpoint-0200/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "28cd349fcc9071674806cd93da26eaf146d40ff5de8abc97bf46744a12e754ec",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev--runner-live-20261002-v1/checkpoint-0500/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-residual_bev-v1/checkpoint-0500/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "6ef5ee660173ea2f4eb3f043d8ab6798b492d549b26745a78382a5f38b8fbade",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-coarse_mlp-v1/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-coarse_mlp-v1/checkpoint-2000/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "36f4cf092f3bc9f5e3d374ad2c868ad899b38f32069967ec77b4586bd1b99dab",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-all_pillars-v1/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-all_pillars-v1/checkpoint-2000/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "1fe694ab30a999cbeb7da92f495ba244c16a2cdcb480bbd420c73ea039aaeb35",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/norm-gn_backbone_ln_pillar-v1/heads-00.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/norm-gn_backbone_ln_pillar-v1/checkpoint-2000/heads-00.npz"
+      ],
+      "relinked_bytes": 27263766
+    },
+    {
+      "sha256": "c44aeef2a266349776ad8e438782810a5bc1f3048e1bb03c337d6f25c98cbd7e",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-all_pillars-cache-v1/7912728502266478772_1202_200_1222_200/1506905332721474/producer/targets.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/overfit-native-cache-v1/7912728502266478772_1202_200_1222_200/1506905332721474/producer/targets.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-retain64-cache-v1/7912728502266478772_1202_200_1222_200/1506905332721474/producer/targets.npz"
+      ],
+      "relinked_bytes": 83888172
+    },
+    {
+      "sha256": "cf367ef39f254971e289e25277d9e5dfff48e6306c4c4a9f86d31c98a0eb12f3",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/17885096890374683162_755_580_775_580/1506906083489022/producer/targets.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-labels-v2/17885096890374683162_755_580_775_580/targets/1506906083489022/targets.npz"
+      ],
+      "relinked_bytes": 41944086
+    },
+    {
+      "sha256": "e466ddafa4f8a532635f23e994f82a2cf5a5a873d980570443f0cfe3f43d5eee",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13840133134545942567_1060_000_1080_000/1558402354862835/producer/targets.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-labels-v2/13840133134545942567_1060_000_1080_000/targets/1558402354862835/targets.npz"
+      ],
+      "relinked_bytes": 41944086
+    },
+    {
+      "sha256": "293a9e0304860f0ca557f2b9f0afb91299ab24f4d130c3821269d2a2ea04dd6f",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13830510593707564159_5575_000_5595_000/1518657072511849/producer/targets.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-labels-v2/13830510593707564159_5575_000_5595_000/targets/1518657072511849/targets.npz"
+      ],
+      "relinked_bytes": 41944086
+    },
+    {
+      "sha256": "4ba94168b2a2dfd186e786c393efea572b501671bc93d831afccca676390fe20",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7921369793217703814_1060_000_1080_000/1557159618222385/producer/targets.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-labels-v2/7921369793217703814_1060_000_1080_000/targets/1557159618222385/targets.npz"
+      ],
+      "relinked_bytes": 41944086
+    },
+    {
+      "sha256": "c045c0035938a6defb515d46414b4c2b97a4e93fc48328e4e48ee956f7ebb3cb",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7921369793217703814_1060_000_1080_000/1557159628222386/producer/targets.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-labels-v2/7921369793217703814_1060_000_1080_000/targets/1557159628222386/targets.npz"
+      ],
+      "relinked_bytes": 41944086
+    },
+    {
+      "sha256": "667360615a440664252a23aa2373351467276488a8585ae2d02fa051dd2a49cf",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/15628918650068847391_8077_670_8097_670/1508889335260598/producer/targets.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-labels-v2/15628918650068847391_8077_670_8097_670/targets/1508889335260598/targets.npz"
+      ],
+      "relinked_bytes": 41944086
+    },
+    {
+      "sha256": "5b651ebb7b8a8c4a70d61c64ff3b085e90fb5cc45338512ebb8dc667d1898227",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/15696964848687303249_4615_200_4635_200/1507241626220091/producer/targets.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-labels-v2/15696964848687303249_4615_200_4635_200/targets/1507241626220091/targets.npz"
+      ],
+      "relinked_bytes": 41944086
+    },
+    {
+      "sha256": "c9250a56cb91e276ed74880f282dd504966941f7cefd31535bdb857d3fbb4527",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/3966447614090524826_320_000_340_000/1553023288374080/producer/targets.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-labels-v2/3966447614090524826_320_000_340_000/targets/1553023288374080/targets.npz"
+      ],
+      "relinked_bytes": 41944086
+    },
+    {
+      "sha256": "f457453de529ebe27f84e0b2b2e96a4cc697eb2fe5ce5b5ad4cc6e3bdb8a1d15",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450685964257/producer/targets.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-labels-v2/16977844994272847523_2140_000_2160_000/targets/1557450685964257/targets.npz"
+      ],
+      "relinked_bytes": 41944086
+    },
+    {
+      "sha256": "31154e86a66091de71e79e241b0c059f22997cc3c6fef4083c89e1b0b6ac4f89",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450680964094/producer/targets.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-labels-v2/16977844994272847523_2140_000_2160_000/targets/1557450680964094/targets.npz"
+      ],
+      "relinked_bytes": 41944086
+    },
+    {
+      "sha256": "f18bbd165a1ab973913dd61ef14d7a6aa4e13e705daec6f581fe9c7e56fde892",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450679864286/producer/targets.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-labels-v2/16977844994272847523_2140_000_2160_000/targets/1557450679864286/targets.npz"
+      ],
+      "relinked_bytes": 41944086
+    },
+    {
+      "sha256": "757f613ac6cb4c796953df26d69e4aaefada3f14c1565793da22c522250ad9f1",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/12856053589272984699_1020_000_1040_000/1552658368873652/producer/targets.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-labels-v2/12856053589272984699_1020_000_1040_000/targets/1552658368873652/targets.npz"
+      ],
+      "relinked_bytes": 41944086
+    },
+    {
+      "sha256": "77f5d5301ac4dffa06f1f51b8467ea0bced7a4877ba464998d758df3540afb91",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13506499849906169066_120_000_140_000/1552353849872908/producer/targets.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-labels-v2/13506499849906169066_120_000_140_000/targets/1552353849872908/targets.npz"
+      ],
+      "relinked_bytes": 41944086
+    },
+    {
+      "sha256": "8d3d56f93ac33cd673f1e866f9f3f0c23e2a9c8ed2909a52a8d196ce030983cf",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7850521592343484282_4576_090_4596_090/1520908476792400/producer/targets.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-labels-v2/7850521592343484282_4576_090_4596_090/targets/1520908476792400/targets.npz"
+      ],
+      "relinked_bytes": 41944086
+    },
+    {
+      "sha256": "16dcae515fd4926ccd03c95135cd887b1f7f63f27d56b64b064189461cb17c7a",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/11004685739714500220_2300_000_2320_000/1553640277306703/producer/targets.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-labels-v2/11004685739714500220_2300_000_2320_000/targets/1553640277306703/targets.npz"
+      ],
+      "relinked_bytes": 41944086
+    },
+    {
+      "sha256": "87f75e117a13feb7d017fed2cab5175ee0aba70c8150595b3519e143e3453e52",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/4575961016807404107_880_000_900_000/1544656166412547/producer/targets.npz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-labels-v2/4575961016807404107_880_000_900_000/targets/1544656166412547/targets.npz"
+      ],
+      "relinked_bytes": 41944086
+    },
+    {
+      "sha256": "bc9cdaa7d8144beb39bc5bbead293fefd3c86c2e0059c8b5a687e20a66a0c9e5",
+      "paths": [
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/9907794657177651763_1126_570_1146_570/sidecar-publication-rerun-exists/input/trusted.json",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/9907794657177651763_1126_570_1146_570/sidecar-publication/input/trusted.json",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/9907794657177651763_1126_570_1146_570/sidecar-publication-interrupted/input/trusted.json"
+      ],
+      "relinked_bytes": 11029494
+    }
+  ],
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--tmpfs",
+        "/tmp",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/tier1",
+        "/tmp/tier1",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--clearenv",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--chdir",
+        "/tmp/tier1",
+        "--",
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-p",
+        "test_storage.py"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "worker_sha256": "95e06fa87131b4c904aa455ad0eaa02688576b8f9c1557d0bf0c0265810dc15e",
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "scope": "physical unique-inode payload accounting; historical logical path sums remain historical"
+}

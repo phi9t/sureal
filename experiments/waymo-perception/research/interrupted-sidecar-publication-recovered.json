@@ -1,0 +1,15 @@
+{
+  "status": "recovered complete live sidecar publication and verified eviction reconciled",
+  "scene": "9907794657177651763_1126_570_1146_570",
+  "publication_receipt_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/9907794657177651763_1126_570_1146_570/sidecar-publication/receipt.json",
+  "publication_receipt_sha256": "21e92c66556b4dbb591ab5c94962a224f6bcce955cdacffb7d5baab5aa5df521",
+  "eviction_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/9907794657177651763_1126_570_1146_570/points/sidecar-eviction.json",
+  "eviction_sha256": "bc3928b34063cc0e2c22efa723852aa96cea86829a0e17364a525caa15f8980a",
+  "live_eviction_check_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/9907794657177651763_1126_570_1146_570/recovery-sidecar-eviction-live.json",
+  "live_eviction_check_sha256": "cd8b04c544cdca2527d3fd7ecfc5e063d846d76d01d04c6609ba9212e567fe9f",
+  "files": 56807,
+  "bytes_evicted": 14297253405,
+  "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/component-bundles-v1/scientific/9907794657177651763_1126_570_1146_570/8f49152157c40e473a0326c3f00138842b51fd88db21d705b731965389752c7a.tar",
+  "archive_sha256": "8f49152157c40e473a0326c3f00138842b51fd88db21d705b731965389752c7a",
+  "scope": "Sidecar publication recovery only; camera lifecycle, full scene checkpoint and independent checkpoint admission remain open."
+}

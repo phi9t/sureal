@@ -1,0 +1,3195 @@
+{
+  "status": "partial native valid-range semantic support inventory; no reduced cohort or protocol closure",
+  "selected_scenes": 103,
+  "scenes_observed": 81,
+  "scenes_pending": 22,
+  "scene_evidence": {
+    "4487677815262010875_4940_000_4960_000": {
+      "evidence": "scientific-semantic-support-4487677815262010875_4940_000_4960_000-verified.json",
+      "receipt_sha256": "6df5afa897dca32f9ec20333bfd13a0c9a251a87cf727e0c0985616bd127afd0",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        226963,
+        90186,
+        50,
+        80860,
+        213,
+        0,
+        41,
+        369771,
+        35772,
+        850,
+        72097,
+        19,
+        0,
+        0,
+        2512391,
+        110786,
+        20509,
+        26256,
+        671855,
+        10255,
+        62952,
+        43019,
+        591978
+      ],
+      "eligible_point_elements": 4699860,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-4487677815262010875_4940_000_4960_000-lifecycle-linked.json"
+    },
+    "809159138284604331_3355_840_3375_840": {
+      "evidence": "scientific-semantic-support-809159138284604331_3355_840_3375_840-verified.json",
+      "receipt_sha256": "c466b48c992180659f3efadd359794916538ddfecc475c90f8622fa570055c59",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        4059,
+        11402,
+        0,
+        0,
+        0,
+        0,
+        0,
+        5580,
+        4008,
+        0,
+        11440,
+        0,
+        0,
+        0,
+        612491,
+        1291545,
+        120158,
+        121983,
+        928974,
+        112410,
+        1167,
+        1360861,
+        238957
+      ],
+      "eligible_point_elements": 4820976,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-809159138284604331_3355_840_3375_840-lifecycle-linked.json"
+    },
+    "3966447614090524826_320_000_340_000": {
+      "evidence": "scientific-semantic-support-3966447614090524826_320_000_340_000-verified.json",
+      "receipt_sha256": "2eacca7f07df097c75bb4d82929964d5e4bc3a5ea06c954285c4d46510d040b6",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        35485,
+        795402,
+        21631,
+        0,
+        3298,
+        0,
+        0,
+        373,
+        29984,
+        165,
+        28557,
+        4835,
+        0,
+        0,
+        2030980,
+        1002108,
+        18718,
+        9786,
+        660228,
+        49974,
+        1435,
+        21035,
+        179905
+      ],
+      "eligible_point_elements": 4858414,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-3966447614090524826_320_000_340_000-lifecycle-linked.json"
+    },
+    "5083516879091912247_3600_000_3620_000": {
+      "evidence": "scientific-semantic-support-5083516879091912247_3600_000_3620_000-verified.json",
+      "receipt_sha256": "16d369a2fd18a05e57d7fa4db9b9dfc645b0b702e56517afca20039752a4e48a",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        110964,
+        628157,
+        256929,
+        1020190,
+        68621,
+        0,
+        60,
+        55098,
+        59072,
+        2555,
+        31486,
+        9497,
+        0,
+        0,
+        1425738,
+        131896,
+        16225,
+        25205,
+        775313,
+        32718,
+        6600,
+        3375,
+        146176
+      ],
+      "eligible_point_elements": 4694911,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-5083516879091912247_3600_000_3620_000-lifecycle-linked.json"
+    },
+    "6142170920525844857_2080_000_2100_000": {
+      "evidence": "scientific-semantic-support-6142170920525844857_2080_000_2100_000-verified.json",
+      "receipt_sha256": "edb33b2c268cb1a749b4c41dc12d8d242d79561d0c2d5c3cf7183a07d1849c8a",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        28875,
+        396504,
+        3134,
+        0,
+        0,
+        0,
+        1550,
+        3274,
+        25730,
+        0,
+        93625,
+        0,
+        0,
+        368,
+        2600466,
+        571906,
+        60421,
+        32846,
+        661416,
+        0,
+        43925,
+        16623,
+        269757
+      ],
+      "eligible_point_elements": 4781545,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-6142170920525844857_2080_000_2100_000-lifecycle-linked.json"
+    },
+    "17782258508241656695_1354_000_1374_000": {
+      "evidence": "scientific-semantic-support-17782258508241656695_1354_000_1374_000-verified.json",
+      "receipt_sha256": "2068d4d357938312cdc740cdedf973d98d907d7517f3400effed9d047f0d6cef",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        19248,
+        205161,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        20742,
+        70,
+        25203,
+        0,
+        774,
+        0,
+        746312,
+        1083824,
+        50394,
+        33959,
+        444565,
+        8092,
+        16635,
+        421613,
+        91138
+      ],
+      "eligible_point_elements": 3148482,
+      "annotated_frames": 20,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-17782258508241656695_1354_000_1374_000-lifecycle-linked.json"
+    },
+    "13830510593707564159_5575_000_5595_000": {
+      "evidence": "scientific-semantic-support-13830510593707564159_5575_000_5595_000-verified.json",
+      "receipt_sha256": "821a05308d398ebecef164dc8c2098ea6aa8161f7ba5bc5b9bebcf4de4259ac0",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        273469,
+        50598,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        5064,
+        0,
+        6752,
+        0,
+        0,
+        0,
+        361125,
+        514954,
+        7824,
+        0,
+        540593,
+        20707,
+        0,
+        425657,
+        0
+      ],
+      "eligible_point_elements": 1933274,
+      "annotated_frames": 20,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-13830510593707564159_5575_000_5595_000-lifecycle-linked.json"
+    },
+    "14369250836076988112_7249_040_7269_040": {
+      "evidence": "scientific-semantic-support-14369250836076988112_7249_040_7269_040-verified.json",
+      "receipt_sha256": "3fdf6fe0e2cc5917e11d76b9af482adb655a5df9675d65ab66c1f9232701f73f",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        12590,
+        14554,
+        0,
+        0,
+        0,
+        0,
+        1773,
+        2947,
+        12166,
+        0,
+        17918,
+        0,
+        0,
+        0,
+        675663,
+        1881631,
+        79166,
+        104017,
+        981842,
+        73911,
+        324,
+        858106,
+        297935
+      ],
+      "eligible_point_elements": 5001953,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-14369250836076988112_7249_040_7269_040-lifecycle-linked.json"
+    },
+    "11004685739714500220_2300_000_2320_000": {
+      "evidence": "scientific-semantic-support-11004685739714500220_2300_000_2320_000-verified.json",
+      "receipt_sha256": "aaa65051c46e22d21a8a017df922365a5fe8534c687de8b486eb0ef67baf8813",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        15999,
+        181014,
+        2041,
+        0,
+        0,
+        0,
+        0,
+        27175,
+        12083,
+        0,
+        10422,
+        86,
+        0,
+        0,
+        264732,
+        1549772,
+        9097,
+        66930,
+        773547,
+        360,
+        35765,
+        78610,
+        73541
+      ],
+      "eligible_point_elements": 3085175,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-11004685739714500220_2300_000_2320_000-lifecycle-linked.json"
+    },
+    "15539619898625779290_760_000_780_000": {
+      "evidence": "scientific-semantic-support-15539619898625779290_760_000_780_000-verified.json",
+      "receipt_sha256": "9a913e550f743125a4c35d0cce4f77fb47b6479d94a8e856c88429d64da32bcc",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        170356,
+        695400,
+        256039,
+        0,
+        0,
+        0,
+        0,
+        18630,
+        11242,
+        88,
+        36714,
+        632,
+        0,
+        0,
+        2307384,
+        92268,
+        38333,
+        31036,
+        736158,
+        4605,
+        0,
+        193,
+        131742
+      ],
+      "eligible_point_elements": 4360464,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-15539619898625779290_760_000_780_000-lifecycle-linked.json"
+    },
+    "14004546003548947884_2331_861_2351_861": {
+      "evidence": "scientific-semantic-support-14004546003548947884_2331_861_2351_861-verified.json",
+      "receipt_sha256": "79adcc62f1b4660d787c66b7a2a805ab06b14695501853195f16ad1647300930",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        82690,
+        268236,
+        0,
+        0,
+        0,
+        0,
+        1244,
+        3608,
+        10437,
+        0,
+        5642,
+        0,
+        0,
+        2488,
+        2408365,
+        1616106,
+        140367,
+        43508,
+        1357678,
+        0,
+        5054,
+        826921,
+        268581
+      ],
+      "eligible_point_elements": 6958235,
+      "annotated_frames": 40,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-14004546003548947884_2331_861_2351_861-lifecycle-linked.json"
+    },
+    "1005081002024129653_5313_150_5333_150": {
+      "evidence": "scientific-semantic-support-1005081002024129653_5313_150_5333_150-verified.json",
+      "receipt_sha256": "1ca310bf63408d97ad3fd4248208cd6499a77209d0afb91523b48a0d280736c6",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        10047,
+        84104,
+        0,
+        0,
+        0,
+        0,
+        0,
+        8632,
+        10713,
+        0,
+        17196,
+        0,
+        0,
+        0,
+        2259387,
+        827530,
+        55899,
+        61354,
+        857727,
+        25016,
+        0,
+        291987,
+        155096
+      ],
+      "eligible_point_elements": 4654641,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-1005081002024129653_5313_150_5333_150-lifecycle-linked.json"
+    },
+    "13506499849906169066_120_000_140_000": {
+      "evidence": "scientific-semantic-support-13506499849906169066_120_000_140_000-verified.json",
+      "receipt_sha256": "49399de8bf4440f1839e34af446c356051dda691091c533cefcc5bb1239f4fb1",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        93819,
+        696761,
+        493,
+        4158,
+        0,
+        0,
+        338,
+        26178,
+        50460,
+        2808,
+        56688,
+        415,
+        0,
+        353,
+        1759696,
+        264998,
+        37665,
+        19968,
+        1032779,
+        32052,
+        21264,
+        5481,
+        269583
+      ],
+      "eligible_point_elements": 4282138,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-13506499849906169066_120_000_140_000-lifecycle-linked.json"
+    },
+    "6559997992780479765_1039_000_1059_000": {
+      "evidence": "scientific-semantic-support-6559997992780479765_1039_000_1059_000-verified.json",
+      "receipt_sha256": "5223ac3687ccf4e896ba1293d092da1678f60bea13ee49c9274cbe6d777c0b30",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        70785,
+        42490,
+        52560,
+        0,
+        0,
+        0,
+        0,
+        0,
+        34173,
+        0,
+        15779,
+        0,
+        0,
+        0,
+        880000,
+        1656880,
+        109815,
+        16884,
+        596150,
+        22843,
+        9178,
+        897140,
+        94620
+      ],
+      "eligible_point_elements": 4428512,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-6559997992780479765_1039_000_1059_000-lifecycle-linked.json"
+    },
+    "3224923476345749285_4480_000_4500_000": {
+      "evidence": "scientific-semantic-support-3224923476345749285_4480_000_4500_000-verified.json",
+      "receipt_sha256": "90f65e053996a1157e48b021c36c0d015e940449588986be0798a68253186336",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        39756,
+        338875,
+        16937,
+        0,
+        0,
+        0,
+        0,
+        184,
+        9690,
+        0,
+        19559,
+        0,
+        0,
+        0,
+        2371335,
+        924052,
+        85558,
+        27129,
+        747288,
+        2054,
+        5284,
+        3807,
+        551613
+      ],
+      "eligible_point_elements": 5103365,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-3224923476345749285_4480_000_4500_000-lifecycle-linked.json"
+    },
+    "14250544550818363063_880_000_900_000": {
+      "evidence": "scientific-semantic-support-14250544550818363063_880_000_900_000-verified.json",
+      "receipt_sha256": "de2a5cb9aa8e1d25b15749e2e6289cca685208b262cc68db579c24f677faf310",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        14173,
+        548547,
+        24030,
+        0,
+        141824,
+        0,
+        0,
+        4769,
+        23601,
+        0,
+        37115,
+        0,
+        0,
+        0,
+        140312,
+        1980537,
+        135935,
+        67778,
+        1099602,
+        2138,
+        16,
+        611345,
+        26400
+      ],
+      "eligible_point_elements": 4843949,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-14250544550818363063_880_000_900_000-lifecycle-linked.json"
+    },
+    "2088865281951278665_4460_000_4480_000": {
+      "evidence": "scientific-semantic-support-2088865281951278665_4460_000_4480_000-verified.json",
+      "receipt_sha256": "ca28b353c65c672ea4d949150c6fdc9240316a15f3c0fd494eb876b3fa8b0d14",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        33661,
+        477582,
+        9123,
+        0,
+        0,
+        0,
+        0,
+        3607,
+        17397,
+        6257,
+        39147,
+        0,
+        0,
+        0,
+        1370675,
+        466089,
+        10125,
+        94102,
+        1331699,
+        80601,
+        3237,
+        123357,
+        284717
+      ],
+      "eligible_point_elements": 4317715,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-2088865281951278665_4460_000_4480_000-lifecycle-linked.json"
+    },
+    "12856053589272984699_1020_000_1040_000": {
+      "evidence": "scientific-semantic-support-12856053589272984699_1020_000_1040_000-verified.json",
+      "receipt_sha256": "c830678ea0ca155fcf660652831664c4aba76ccea4c97511df150f0125d8a82c",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        33973,
+        437044,
+        53493,
+        0,
+        0,
+        0,
+        0,
+        3817,
+        27355,
+        143,
+        57088,
+        92,
+        0,
+        2380,
+        2141833,
+        483601,
+        202007,
+        42089,
+        906998,
+        16745,
+        27156,
+        31488,
+        510175
+      ],
+      "eligible_point_elements": 4943504,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-12856053589272984699_1020_000_1040_000-lifecycle-linked.json"
+    },
+    "11489533038039664633_4820_000_4840_000": {
+      "evidence": "scientific-semantic-support-11489533038039664633_4820_000_4840_000-verified.json",
+      "receipt_sha256": "e30bb669e3802c3f09162a7b84bb33b8fa3e646e802d52ff6bd9722bf508cb37",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        48176,
+        108970,
+        665710,
+        30584,
+        0,
+        0,
+        0,
+        25661,
+        5816,
+        4072,
+        98390,
+        0,
+        0,
+        360,
+        1548485,
+        1653685,
+        20104,
+        2671,
+        497528,
+        0,
+        0,
+        77302,
+        410714
+      ],
+      "eligible_point_elements": 5150052,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-11489533038039664633_4820_000_4840_000-lifecycle-linked.json"
+    },
+    "13619063687271391084_1519_680_1539_680": {
+      "evidence": "scientific-semantic-support-13619063687271391084_1519_680_1539_680-verified.json",
+      "receipt_sha256": "ea2432ad0e6c018e1b4cbd4265eb39e4f5a9b082f01d3164d9c224d6a66d4bb9",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        39335,
+        193922,
+        187327,
+        0,
+        910,
+        0,
+        0,
+        18356,
+        60812,
+        1674,
+        32502,
+        12415,
+        818,
+        0,
+        812203,
+        1083307,
+        241658,
+        121732,
+        1218749,
+        15888,
+        8792,
+        471982,
+        265526
+      ],
+      "eligible_point_elements": 4748573,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-13619063687271391084_1519_680_1539_680-lifecycle-linked.json"
+    },
+    "15628918650068847391_8077_670_8097_670": {
+      "evidence": "scientific-semantic-support-15628918650068847391_8077_670_8097_670-verified.json",
+      "receipt_sha256": "8cd7a8a5768c95c63797604159967c654a935146d14bf907f7f28a2343ed75be",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        44436,
+        448881,
+        9738,
+        0,
+        502,
+        0,
+        1000,
+        2569,
+        12668,
+        0,
+        34858,
+        0,
+        0,
+        0,
+        1075957,
+        341398,
+        49763,
+        71697,
+        1807251,
+        54576,
+        74,
+        191388,
+        135604
+      ],
+      "eligible_point_elements": 4237924,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-15628918650068847391_8077_670_8097_670-lifecycle-linked.json"
+    },
+    "14098575914252965554_511_000_531_000": {
+      "evidence": "scientific-semantic-support-14098575914252965554_511_000_531_000-verified.json",
+      "receipt_sha256": "b511557ec7c45d1a1018f29e2152e58c8fc61f197aa917af8df52452f4138657",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        30315,
+        555279,
+        922,
+        0,
+        1445,
+        0,
+        28,
+        0,
+        40623,
+        2991,
+        28203,
+        0,
+        0,
+        0,
+        1450848,
+        686675,
+        96349,
+        58330,
+        441439,
+        11930,
+        0,
+        1023348,
+        255057
+      ],
+      "eligible_point_elements": 4653467,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-14098575914252965554_511_000_531_000-lifecycle-linked.json"
+    },
+    "10734565072045778791_440_000_460_000": {
+      "evidence": "scientific-semantic-support-10734565072045778791_440_000_460_000-verified.json",
+      "receipt_sha256": "4d92a5ad9fde175927ac5b608bd82f804a3b929106a00fd62b8afe459316fbe1",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        12385,
+        227810,
+        0,
+        0,
+        0,
+        0,
+        0,
+        16176,
+        14511,
+        0,
+        18610,
+        0,
+        0,
+        0,
+        661177,
+        1308845,
+        43967,
+        10000,
+        591583,
+        0,
+        0,
+        1717751,
+        184139
+      ],
+      "eligible_point_elements": 4794569,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-10734565072045778791_440_000_460_000-lifecycle-linked.json"
+    },
+    "2681180680221317256_1144_000_1164_000": {
+      "evidence": "scientific-semantic-support-2681180680221317256_1144_000_1164_000-verified.json",
+      "receipt_sha256": "4bd4ce4b412f232a8bc59e5e136c6b94ec04ffc0947b8637e1fa916c1eec5b63",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        86298,
+        492318,
+        84359,
+        0,
+        0,
+        0,
+        0,
+        0,
+        61400,
+        20358,
+        47468,
+        172,
+        0,
+        0,
+        462323,
+        1554655,
+        74762,
+        97021,
+        894343,
+        1036,
+        24945,
+        339866,
+        41691
+      ],
+      "eligible_point_elements": 4196717,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-2681180680221317256_1144_000_1164_000-lifecycle-linked.json"
+    },
+    "8722413665055769182_2840_000_2860_000": {
+      "evidence": "scientific-semantic-support-8722413665055769182_2840_000_2860_000-verified.json",
+      "receipt_sha256": "4b57582ee73170e888821eee26ed185551d23997cc41f0accb0c1b5d51098a70",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        41488,
+        358924,
+        14790,
+        36310,
+        192905,
+        0,
+        0,
+        83695,
+        13798,
+        95,
+        32833,
+        508,
+        346,
+        1507,
+        1760173,
+        1429968,
+        38430,
+        51463,
+        724892,
+        10981,
+        712,
+        586140,
+        13207
+      ],
+      "eligible_point_elements": 5351677,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-8722413665055769182_2840_000_2860_000-lifecycle-linked.json"
+    },
+    "12012663867578114640_820_000_840_000": {
+      "evidence": "scientific-semantic-support-12012663867578114640_820_000_840_000-verified.json",
+      "receipt_sha256": "a229a79642023d75dada37694b877e023b48ca29b3dfdfeb7c916f8c405a5763",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        32136,
+        890491,
+        0,
+        0,
+        0,
+        0,
+        0,
+        27481,
+        45979,
+        783,
+        88654,
+        0,
+        0,
+        0,
+        2413317,
+        104597,
+        62380,
+        10986,
+        734542,
+        1231,
+        83140,
+        29,
+        309930
+      ],
+      "eligible_point_elements": 4773540,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-12012663867578114640_820_000_840_000-lifecycle-linked.json"
+    },
+    "9907794657177651763_1126_570_1146_570": {
+      "evidence": "scientific-semantic-support-9907794657177651763_1126_570_1146_570-verified.json",
+      "receipt_sha256": "1e79333087f00f248a2e4694a3bf335d3c5c1154f086b3d5a65f9c32960d1a63",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        3480,
+        468185,
+        23478,
+        7193,
+        0,
+        0,
+        0,
+        3891,
+        11121,
+        363,
+        34652,
+        0,
+        0,
+        0,
+        233747,
+        691507,
+        100069,
+        68748,
+        1082354,
+        7423,
+        2200,
+        198845,
+        98003
+      ],
+      "eligible_point_elements": 3031779,
+      "annotated_frames": 20,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-9907794657177651763_1126_570_1146_570-lifecycle-linked.json"
+    },
+    "13807633218762107566_6625_000_6645_000": {
+      "evidence": "scientific-semantic-support-13807633218762107566_6625_000_6645_000-verified.json",
+      "receipt_sha256": "62b3646c39a3d84b212075d5382080386657a75cc767203238831f6ebdfad6fc",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        46791,
+        44130,
+        4031,
+        0,
+        9577,
+        0,
+        0,
+        29,
+        13403,
+        536,
+        53452,
+        0,
+        0,
+        0,
+        609827,
+        1161663,
+        30920,
+        124268,
+        998392,
+        17176,
+        1835,
+        855204,
+        237059
+      ],
+      "eligible_point_elements": 4161502,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-13807633218762107566_6625_000_6645_000-lifecycle-linked.json"
+    },
+    "7850521592343484282_4576_090_4596_090": {
+      "evidence": "scientific-semantic-support-7850521592343484282_4576_090_4596_090-verified.json",
+      "receipt_sha256": "1346bb8b946733369fc796476619540c9ce82731ba6e791bd1a1b896af5eb17b",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        4697,
+        52235,
+        743,
+        0,
+        0,
+        0,
+        0,
+        0,
+        17424,
+        976,
+        23339,
+        0,
+        0,
+        0,
+        357361,
+        955671,
+        375,
+        13775,
+        507635,
+        35845,
+        11554,
+        972575,
+        10816
+      ],
+      "eligible_point_elements": 2960324,
+      "annotated_frames": 20,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-7850521592343484282_4576_090_4596_090-lifecycle-linked.json"
+    },
+    "12303641360375776820_4378_000_4398_000": {
+      "evidence": "scientific-semantic-support-12303641360375776820_4378_000_4398_000-verified.json",
+      "receipt_sha256": "eb7a92526227d0c106b638c420dc87219388a9a44de042fc272bd1e73f3cc533",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        63703,
+        238536,
+        25185,
+        0,
+        0,
+        0,
+        0,
+        200,
+        20355,
+        2409,
+        44076,
+        0,
+        0,
+        0,
+        1193321,
+        1179165,
+        69805,
+        59290,
+        1115223,
+        16238,
+        6752,
+        221871,
+        173177
+      ],
+      "eligible_point_elements": 4365603,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-12303641360375776820_4378_000_4398_000-lifecycle-linked.json"
+    },
+    "2415873247906962761_5460_000_5480_000": {
+      "evidence": "scientific-semantic-support-2415873247906962761_5460_000_5480_000-verified.json",
+      "receipt_sha256": "2370fecb27dab88ad5431cdd9f97d70504d804a1d31cd65492a6b54205f9ef0c",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        54384,
+        681027,
+        7036,
+        0,
+        0,
+        0,
+        0,
+        45208,
+        20377,
+        0,
+        150797,
+        0,
+        3458,
+        70,
+        2794399,
+        182947,
+        51591,
+        24259,
+        590820,
+        1045,
+        5054,
+        3311,
+        284421
+      ],
+      "eligible_point_elements": 4845820,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-2415873247906962761_5460_000_5480_000-lifecycle-linked.json"
+    },
+    "2656110181316327570_940_000_960_000": {
+      "evidence": "scientific-semantic-support-2656110181316327570_940_000_960_000-verified.json",
+      "receipt_sha256": "711c75ef04265b70bbe3f73e134be2ce64ac79bdfbd4ce07d802ed6a257d5d84",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        192140,
+        195419,
+        240690,
+        0,
+        0,
+        0,
+        0,
+        153767,
+        35512,
+        5838,
+        179632,
+        2162,
+        628,
+        2166,
+        2269727,
+        74305,
+        76702,
+        44735,
+        869911,
+        29298,
+        39757,
+        2160,
+        509323
+      ],
+      "eligible_point_elements": 4731732,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-2656110181316327570_940_000_960_000-lifecycle-linked.json"
+    },
+    "16473613811052081539_1060_000_1080_000": {
+      "evidence": "scientific-semantic-support-16473613811052081539_1060_000_1080_000-verified.json",
+      "receipt_sha256": "6bc60b31b171958cf1324269021505ff707e0079ef33cf457a1bc0e3cb3604d3",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        112498,
+        518563,
+        2131,
+        0,
+        98,
+        0,
+        0,
+        47021,
+        41700,
+        7961,
+        162746,
+        3190,
+        0,
+        0,
+        2126699,
+        552769,
+        24428,
+        45694,
+        606010,
+        5948,
+        71265,
+        292391,
+        248350
+      ],
+      "eligible_point_elements": 4756964,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-16473613811052081539_1060_000_1080_000-lifecycle-linked.json"
+    },
+    "16646502593577530501_4878_080_4898_080": {
+      "evidence": "scientific-semantic-support-16646502593577530501_4878_080_4898_080-verified.json",
+      "receipt_sha256": "f7bd421558b47cc7753fa8dd75e6ce4f8901aa7a98cdbbd288d965e396489b19",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        26210,
+        97427,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1044,
+        7467,
+        0,
+        9364,
+        30,
+        0,
+        0,
+        745295,
+        1628746,
+        177003,
+        29364,
+        570416,
+        18964,
+        1752,
+        202634,
+        96851
+      ],
+      "eligible_point_elements": 3586357,
+      "annotated_frames": 20,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-16646502593577530501_4878_080_4898_080-lifecycle-linked.json"
+    },
+    "7921369793217703814_1060_000_1080_000": {
+      "evidence": "scientific-semantic-support-7921369793217703814_1060_000_1080_000-verified.json",
+      "receipt_sha256": "6db88cd487a5a545158647b7ba3a9f12093859eedbeb330f245e9fe8158af986",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        92111,
+        1151055,
+        7281,
+        3068,
+        225054,
+        0,
+        0,
+        111587,
+        56337,
+        1339,
+        24037,
+        5631,
+        5881,
+        0,
+        2952437,
+        12128,
+        1603,
+        16698,
+        232731,
+        2009,
+        3980,
+        5617,
+        193637
+      ],
+      "eligible_point_elements": 5012110,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-7921369793217703814_1060_000_1080_000-lifecycle-linked.json"
+    },
+    "9385013624094020582_2547_650_2567_650": {
+      "evidence": "scientific-semantic-support-9385013624094020582_2547_650_2567_650-verified.json",
+      "receipt_sha256": "94ff6ad3f84fb589972aa2e23f4473f1bf677121db44c3e07426f6c7cb264e52",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        8795,
+        27454,
+        0,
+        0,
+        0,
+        0,
+        0,
+        6209,
+        10231,
+        0,
+        10648,
+        0,
+        0,
+        0,
+        1051522,
+        752085,
+        71002,
+        56632,
+        638814,
+        23689,
+        0,
+        462847,
+        163842
+      ],
+      "eligible_point_elements": 3274975,
+      "annotated_frames": 20,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-9385013624094020582_2547_650_2567_650-lifecycle-linked.json"
+    },
+    "1191788760630624072_3880_000_3900_000": {
+      "evidence": "scientific-semantic-support-1191788760630624072_3880_000_3900_000-verified.json",
+      "receipt_sha256": "0d2a5e5c7780dbe09d6a22553eb57ff340891d7ac335ef50009bf4b884de60b3",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        48554,
+        272524,
+        46531,
+        0,
+        0,
+        0,
+        0,
+        235,
+        67806,
+        0,
+        68362,
+        0,
+        0,
+        0,
+        1417741,
+        1330806,
+        37626,
+        35449,
+        1054730,
+        40692,
+        12197,
+        73124,
+        273057
+      ],
+      "eligible_point_elements": 4730880,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-1191788760630624072_3880_000_3900_000-lifecycle-linked.json"
+    },
+    "6390847454531723238_6000_000_6020_000": {
+      "evidence": "scientific-semantic-support-6390847454531723238_6000_000_6020_000-verified.json",
+      "receipt_sha256": "37c6ed223824af3254c937fecc3e1e4cee7516e486e39f5bd82350f3007ad4f4",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        49600,
+        687229,
+        1922,
+        0,
+        0,
+        0,
+        0,
+        594,
+        31755,
+        31,
+        53225,
+        277,
+        0,
+        0,
+        1756562,
+        759272,
+        12126,
+        28251,
+        973491,
+        1641,
+        38131,
+        18407,
+        303955
+      ],
+      "eligible_point_elements": 4666869,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-6390847454531723238_6000_000_6020_000-lifecycle-linked.json"
+    },
+    "13840133134545942567_1060_000_1080_000": {
+      "evidence": "scientific-semantic-support-13840133134545942567_1060_000_1080_000-verified.json",
+      "receipt_sha256": "35ba6aedbc7b8d04d445e0e26f6f474ba4b39366d83edabdeef4b8d3e567f050",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        36150,
+        236802,
+        698,
+        0,
+        473,
+        0,
+        27245,
+        52949,
+        39116,
+        5098,
+        118907,
+        1230,
+        213,
+        684,
+        819223,
+        311770,
+        58021,
+        73738,
+        680280,
+        9734,
+        92971,
+        75175,
+        244142
+      ],
+      "eligible_point_elements": 2848469,
+      "annotated_frames": 20,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-13840133134545942567_1060_000_1080_000-lifecycle-linked.json"
+    },
+    "5525943706123287091_4100_000_4120_000": {
+      "evidence": "scientific-semantic-support-5525943706123287091_4100_000_4120_000-verified.json",
+      "receipt_sha256": "93fffe173a8ca72138212f1213d4f249ed7bc7ebff03c65d18396d344dd103cf",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        15920,
+        420423,
+        26621,
+        0,
+        17158,
+        0,
+        4113,
+        2331,
+        58522,
+        2611,
+        73459,
+        28706,
+        0,
+        0,
+        1397262,
+        502265,
+        106844,
+        117991,
+        1364218,
+        10186,
+        10772,
+        203500,
+        273127
+      ],
+      "eligible_point_elements": 4620109,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-5525943706123287091_4100_000_4120_000-lifecycle-linked.json"
+    },
+    "5200186706748209867_80_000_100_000": {
+      "evidence": "scientific-semantic-support-5200186706748209867_80_000_100_000-verified.json",
+      "receipt_sha256": "3743453473250a92c82005c66a7e0e7234944464610e03090ea3659f4b17825e",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        2633,
+        24623,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1070,
+        14824,
+        0,
+        5358,
+        105,
+        0,
+        0,
+        69548,
+        827416,
+        60,
+        3007,
+        352081,
+        26945,
+        6782,
+        1019328,
+        0
+      ],
+      "eligible_point_elements": 2351147,
+      "annotated_frames": 20,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-5200186706748209867_80_000_100_000-lifecycle-linked.json"
+    },
+    "15696964848687303249_4615_200_4635_200": {
+      "evidence": "scientific-semantic-support-15696964848687303249_4615_200_4635_200-verified.json",
+      "receipt_sha256": "cdd5d7c4f5f629b7b31bbdc461cf0f1886766ef3f5d41a67fb6aa63a6e72f650",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        11013,
+        625005,
+        1484,
+        0,
+        0,
+        0,
+        3169,
+        18973,
+        49612,
+        10473,
+        60112,
+        0,
+        0,
+        0,
+        517587,
+        1484634,
+        223993,
+        54380,
+        1327952,
+        29792,
+        81870,
+        172852,
+        171605
+      ],
+      "eligible_point_elements": 4833493,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-15696964848687303249_4615_200_4635_200-lifecycle-linked.json"
+    },
+    "10599748131695282446_1380_000_1400_000": {
+      "evidence": "scientific-semantic-support-10599748131695282446_1380_000_1400_000-verified.json",
+      "receipt_sha256": "ba1b980ea33ec61796b2d7878bda4c67254f7753505969b0a9a2c0e07955c308",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        86874,
+        292759,
+        110650,
+        0,
+        0,
+        0,
+        408,
+        58841,
+        20985,
+        387,
+        30732,
+        7920,
+        0,
+        16862,
+        1372732,
+        264849,
+        43074,
+        16229,
+        273256,
+        19786,
+        414,
+        155325,
+        241332
+      ],
+      "eligible_point_elements": 2926541,
+      "annotated_frames": 20,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-10599748131695282446_1380_000_1400_000-lifecycle-linked.json"
+    },
+    "4575961016807404107_880_000_900_000": {
+      "evidence": "scientific-semantic-support-4575961016807404107_880_000_900_000-verified.json",
+      "receipt_sha256": "d5ea5d798f7e6ca196d4ab84f5def4b46687062a776f7702029fcb32162cef35",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        30437,
+        567863,
+        1534,
+        23712,
+        118135,
+        0,
+        1413,
+        11432,
+        27238,
+        553,
+        87190,
+        0,
+        5274,
+        20015,
+        1703332,
+        650122,
+        231145,
+        37721,
+        536705,
+        38415,
+        8248,
+        701092,
+        131963
+      ],
+      "eligible_point_elements": 4903102,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-4575961016807404107_880_000_900_000-lifecycle-linked.json"
+    },
+    "10082223140073588526_6140_000_6160_000": {
+      "evidence": "scientific-semantic-support-10082223140073588526_6140_000_6160_000-verified.json",
+      "receipt_sha256": "4f8447372622496abfb84c796f315ab938c838ca7da874b0e61c8a919ae10e1a",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "development"
+        ]
+      },
+      "native_counts": [
+        30870,
+        519320,
+        0,
+        0,
+        0,
+        0,
+        0,
+        8609,
+        35674,
+        0,
+        115744,
+        0,
+        0,
+        99,
+        1838427,
+        1333118,
+        60773,
+        25190,
+        846042,
+        13784,
+        23503,
+        4582,
+        269230
+      ],
+      "eligible_point_elements": 5094095,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-10082223140073588526_6140_000_6160_000-lifecycle-linked.json"
+    },
+    "3657581213864582252_340_000_360_000": {
+      "evidence": "scientific-semantic-support-3657581213864582252_340_000_360_000-verified.json",
+      "receipt_sha256": "5eada441baaf08051e9c782bf3af72bded24c1f49f4d4e5a5fddf66a11f45fae",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "development"
+        ]
+      },
+      "native_counts": [
+        16974,
+        488330,
+        0,
+        0,
+        0,
+        0,
+        0,
+        881,
+        28769,
+        0,
+        71457,
+        240,
+        0,
+        0,
+        1463846,
+        1865125,
+        35621,
+        25043,
+        967188,
+        1469,
+        4173,
+        56736,
+        139383
+      ],
+      "eligible_point_elements": 5148261,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-3657581213864582252_340_000_360_000-lifecycle-linked.json"
+    },
+    "5468483805452515080_4540_000_4560_000": {
+      "evidence": "scientific-semantic-support-5468483805452515080_4540_000_4560_000-verified.json",
+      "receipt_sha256": "980368b5b9331eeb2d00c1877e49992e5e22b0bd912b45efcdad6775187df678",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "development"
+        ]
+      },
+      "native_counts": [
+        68643,
+        158529,
+        0,
+        0,
+        0,
+        0,
+        0,
+        6332,
+        17169,
+        0,
+        33580,
+        0,
+        80,
+        0,
+        2551822,
+        118541,
+        38650,
+        25618,
+        650317,
+        8415,
+        22619,
+        2403,
+        237696
+      ],
+      "eligible_point_elements": 3871771,
+      "annotated_frames": 28,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-5468483805452515080_4540_000_4560_000-lifecycle-linked.json"
+    },
+    "4427374597960783085_4168_000_4188_000": {
+      "evidence": "scientific-semantic-support-4427374597960783085_4168_000_4188_000-verified.json",
+      "receipt_sha256": "5f1e7b12c700910aabb0619c126540c0f3318aec3b6a38a160040127c3d42d27",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "development"
+        ]
+      },
+      "native_counts": [
+        30162,
+        141332,
+        1469,
+        0,
+        0,
+        0,
+        0,
+        0,
+        40122,
+        0,
+        34285,
+        0,
+        0,
+        0,
+        1257922,
+        1784407,
+        26965,
+        68031,
+        1154003,
+        14716,
+        28054,
+        250516,
+        223352
+      ],
+      "eligible_point_elements": 5025174,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-4427374597960783085_4168_000_4188_000-lifecycle-linked.json"
+    },
+    "183829460855609442_430_000_450_000": {
+      "evidence": "scientific-semantic-support-183829460855609442_430_000_450_000-verified.json",
+      "receipt_sha256": "6eb94013af3af1dba9298a8641cf38ff41ba7a274f900ee9eeaf3a2252ca1f01",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "development"
+        ]
+      },
+      "native_counts": [
+        71912,
+        502001,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        16098,
+        0,
+        26650,
+        0,
+        0,
+        0,
+        669314,
+        2046983,
+        220449,
+        21954,
+        369357,
+        6204,
+        3069,
+        544033,
+        74995
+      ],
+      "eligible_point_elements": 4501107,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-183829460855609442_430_000_450_000-lifecycle-linked.json"
+    },
+    "3437741670889149170_1411_550_1431_550": {
+      "evidence": "scientific-semantic-support-3437741670889149170_1411_550_1431_550-verified.json",
+      "receipt_sha256": "9f6bca8d8d0d51e4de00ffed6fb2fc822048fd87a980c187c94e0574c426dafe",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "development"
+        ]
+      },
+      "native_counts": [
+        17160,
+        33105,
+        0,
+        0,
+        4950,
+        0,
+        0,
+        6887,
+        15792,
+        0,
+        14256,
+        393,
+        0,
+        0,
+        1730924,
+        2262087,
+        90249,
+        91825,
+        1346743,
+        0,
+        0,
+        930115,
+        322991
+      ],
+      "eligible_point_elements": 6850317,
+      "annotated_frames": 42,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-3437741670889149170_1411_550_1431_550-lifecycle-linked.json"
+    },
+    "18295766828140813622_6775_000_6795_000": {
+      "evidence": "scientific-semantic-support-18295766828140813622_6775_000_6795_000-verified.json",
+      "receipt_sha256": "37f0804add4c2845203b0a3d1118b15d2819b7929c6937615266b8fa427511e2",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "development"
+        ]
+      },
+      "native_counts": [
+        34230,
+        424877,
+        0,
+        0,
+        0,
+        374,
+        0,
+        2442,
+        13571,
+        4418,
+        40341,
+        0,
+        0,
+        0,
+        492146,
+        357656,
+        110160,
+        80917,
+        1142589,
+        91139,
+        40652,
+        318308,
+        135863
+      ],
+      "eligible_point_elements": 3255453,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-18295766828140813622_6775_000_6795_000-lifecycle-linked.json"
+    },
+    "14262448332225315249_1280_000_1300_000": {
+      "evidence": "scientific-semantic-support-14262448332225315249_1280_000_1300_000-verified.json",
+      "receipt_sha256": "85e6096d0a075c44677b72ca85c283ad8460ccf8f7e9fac9ab432cdea7d8e752",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "native_counts": [
+        201125,
+        447767,
+        6100,
+        168659,
+        4191,
+        0,
+        0,
+        67690,
+        27008,
+        4375,
+        92601,
+        0,
+        1071,
+        0,
+        2159752,
+        245961,
+        143526,
+        44929,
+        759775,
+        21213,
+        61224,
+        59121,
+        345961
+      ],
+      "eligible_point_elements": 4660924,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-14262448332225315249_1280_000_1300_000-lifecycle-linked.json"
+    },
+    "18446264979321894359_3700_000_3720_000": {
+      "evidence": "scientific-semantic-support-18446264979321894359_3700_000_3720_000-verified.json",
+      "receipt_sha256": "5aa97cb4854229c68c612d4ed48b45a4ee1db830f2da96ede4953717047882d5",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "native_counts": [
+        210713,
+        174652,
+        0,
+        0,
+        0,
+        0,
+        110,
+        71015,
+        25730,
+        4141,
+        93777,
+        60,
+        4627,
+        0,
+        1368127,
+        171096,
+        25838,
+        34047,
+        642462,
+        25321,
+        87891,
+        1570,
+        273828
+      ],
+      "eligible_point_elements": 3004292,
+      "annotated_frames": 20,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-18446264979321894359_3700_000_3720_000-lifecycle-linked.json"
+    },
+    "14687328292438466674_892_000_912_000": {
+      "evidence": "scientific-semantic-support-14687328292438466674_892_000_912_000-verified.json",
+      "receipt_sha256": "cea98ed933a82541c065c01de29d3e0db43cf41446ded1b7220d23a6235c06a5",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "native_counts": [
+        18216,
+        299019,
+        0,
+        454870,
+        0,
+        0,
+        0,
+        2424,
+        20811,
+        2588,
+        33986,
+        0,
+        0,
+        0,
+        143567,
+        832234,
+        413786,
+        64443,
+        1090019,
+        2517,
+        1631,
+        1139448,
+        184971
+      ],
+      "eligible_point_elements": 4686314,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-14687328292438466674_892_000_912_000-lifecycle-linked.json"
+    },
+    "6161542573106757148_585_030_605_030": {
+      "evidence": "scientific-semantic-support-6161542573106757148_585_030_605_030-verified.json",
+      "receipt_sha256": "a1f784d75e31d24034f1ca0b81058c57023eed09417fc893f30172cceaf4ff6c",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "native_counts": [
+        5204,
+        64195,
+        482,
+        0,
+        0,
+        0,
+        0,
+        3464,
+        33737,
+        0,
+        23394,
+        0,
+        0,
+        0,
+        382882,
+        1270024,
+        122605,
+        62409,
+        664971,
+        26886,
+        24672,
+        612380,
+        167688
+      ],
+      "eligible_point_elements": 3459789,
+      "annotated_frames": 20,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-6161542573106757148_585_030_605_030-lifecycle-linked.json"
+    },
+    "6183008573786657189_5414_000_5434_000": {
+      "evidence": "scientific-semantic-support-6183008573786657189_5414_000_5434_000-verified.json",
+      "receipt_sha256": "aa244c1086b278d6c3f8c0fb5d0e7e8a67c2e03f8405396aa5812542451ca709",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "native_counts": [
+        9465,
+        193946,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        9164,
+        6440,
+        91457,
+        0,
+        0,
+        0,
+        550108,
+        1070188,
+        20747,
+        122158,
+        1904660,
+        60320,
+        37655,
+        638551,
+        239567
+      ],
+      "eligible_point_elements": 4944961,
+      "annotated_frames": 40,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-6183008573786657189_5414_000_5434_000-lifecycle-linked.json"
+    },
+    "15611747084548773814_3740_000_3760_000": {
+      "evidence": "scientific-semantic-support-15611747084548773814_3740_000_3760_000-verified.json",
+      "receipt_sha256": "598e24ab82df7b0bad4455742abbb6d1fed04cba7f2738778766c655d140d8ef",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "native_counts": [
+        47059,
+        225953,
+        451346,
+        0,
+        0,
+        0,
+        6277,
+        80536,
+        18871,
+        1228,
+        50991,
+        133,
+        0,
+        0,
+        1469440,
+        142808,
+        44591,
+        22957,
+        455025,
+        6950,
+        47579,
+        13902,
+        228624
+      ],
+      "eligible_point_elements": 3267211,
+      "annotated_frames": 20,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-15611747084548773814_3740_000_3760_000-lifecycle-linked.json"
+    },
+    "30779396576054160_1880_000_1900_000": {
+      "evidence": "scientific-semantic-support-30779396576054160_1880_000_1900_000-verified.json",
+      "receipt_sha256": "e93bac6090d5005d1f98170567123f2518f5ce881c2fc3e22edf6d79031ad57a",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "native_counts": [
+        155460,
+        588326,
+        124514,
+        5365,
+        0,
+        0,
+        970,
+        259554,
+        30972,
+        870,
+        75857,
+        0,
+        0,
+        0,
+        2624229,
+        17514,
+        0,
+        21086,
+        644715,
+        13880,
+        30858,
+        0,
+        365324
+      ],
+      "eligible_point_elements": 4804034,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-30779396576054160_1880_000_1900_000-lifecycle-linked.json"
+    },
+    "1457696187335927618_595_027_615_027": {
+      "evidence": "scientific-semantic-support-1457696187335927618_595_027_615_027-verified.json",
+      "receipt_sha256": "43d467e976beb8c990f7d2ef4e0786469a8c3bd44f3b2859416e171048a49731",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "native_counts": [
+        18360,
+        244812,
+        16416,
+        0,
+        0,
+        0,
+        2875,
+        2567,
+        8726,
+        2583,
+        46190,
+        0,
+        0,
+        405,
+        1350444,
+        859537,
+        86951,
+        61716,
+        1637789,
+        55175,
+        16940,
+        990143,
+        166319
+      ],
+      "eligible_point_elements": 5549588,
+      "annotated_frames": 40,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-1457696187335927618_595_027_615_027-lifecycle-linked.json"
+    },
+    "17962792089966876718_2210_933_2230_933": {
+      "evidence": "scientific-semantic-support-17962792089966876718_2210_933_2230_933-verified.json",
+      "receipt_sha256": "ebe581baa4f352d0a2408f44719a27c151a1c5f32ae6587ce15cb01e71a53910",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "native_counts": [
+        6836,
+        31745,
+        3739,
+        0,
+        12573,
+        0,
+        0,
+        0,
+        13434,
+        0,
+        14439,
+        574,
+        0,
+        0,
+        514489,
+        1099996,
+        189683,
+        78132,
+        1226742,
+        91556,
+        2,
+        1005673,
+        170139
+      ],
+      "eligible_point_elements": 4452916,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-17962792089966876718_2210_933_2230_933-lifecycle-linked.json"
+    },
+    "18331704533904883545_1560_000_1580_000": {
+      "evidence": "scientific-semantic-support-18331704533904883545_1560_000_1580_000-verified.json",
+      "receipt_sha256": "d43ca6ca870cf80a47df1506d3c531c1c97bf16851ad0b03ffe7a4eadba0b7c9",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "native_counts": [
+        21792,
+        400964,
+        13539,
+        0,
+        0,
+        0,
+        0,
+        0,
+        26414,
+        0,
+        52763,
+        0,
+        0,
+        0,
+        2069958,
+        729019,
+        43783,
+        47363,
+        956717,
+        0,
+        67225,
+        305317,
+        225047
+      ],
+      "eligible_point_elements": 4938109,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-18331704533904883545_1560_000_1580_000-lifecycle-linked.json"
+    },
+    "17626999143001784258_2760_000_2780_000": {
+      "evidence": "scientific-semantic-support-17626999143001784258_2760_000_2780_000-verified.json",
+      "receipt_sha256": "964482d90ca47795009c189b031f8dd80aac850d674628a392fab5aae6047e64",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "native_counts": [
+        171951,
+        377352,
+        27888,
+        8,
+        64951,
+        0,
+        0,
+        43797,
+        34234,
+        13207,
+        194364,
+        3281,
+        0,
+        0,
+        1520193,
+        458042,
+        43650,
+        138750,
+        727982,
+        543,
+        15357,
+        226505,
+        591215
+      ],
+      "eligible_point_elements": 4481319,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-17626999143001784258_2760_000_2780_000-lifecycle-linked.json"
+    },
+    "7650923902987369309_2380_000_2400_000": {
+      "evidence": "scientific-semantic-support-7650923902987369309_2380_000_2400_000-verified.json",
+      "receipt_sha256": "b5c89bbd89a45ce82f8e3d53cda44cec4ec145abaed717b6da1388e453e4339b",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "native_counts": [
+        18033,
+        161590,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        13142,
+        0,
+        26487,
+        0,
+        0,
+        0,
+        1175764,
+        990433,
+        71,
+        35311,
+        651948,
+        11859,
+        34635,
+        33395,
+        138362
+      ],
+      "eligible_point_elements": 3272997,
+      "annotated_frames": 20,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-7650923902987369309_2380_000_2400_000-lifecycle-linked.json"
+    },
+    "1071392229495085036_1844_790_1864_790": {
+      "evidence": "scientific-semantic-support-1071392229495085036_1844_790_1864_790-verified.json",
+      "receipt_sha256": "fabe228390ddd7f507b12ad089ffea4b21eb83bac3cbd4bab399000159cef84b",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "native_counts": [
+        18773,
+        23077,
+        0,
+        0,
+        0,
+        0,
+        11311,
+        0,
+        36676,
+        0,
+        24022,
+        142,
+        0,
+        0,
+        1959972,
+        2027534,
+        105823,
+        99606,
+        1216202,
+        19681,
+        55797,
+        733416,
+        350823
+      ],
+      "eligible_point_elements": 6664082,
+      "annotated_frames": 40,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-1071392229495085036_1844_790_1864_790-lifecycle-linked.json"
+    },
+    "8956556778987472864_3404_790_3424_790": {
+      "evidence": "scientific-semantic-support-8956556778987472864_3404_790_3424_790-verified.json",
+      "receipt_sha256": "664cfb711832fe8b76c859c90d23c8c97d5969ef15a0c31355cf4ba53284ed5f",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation",
+          "camera_validation"
+        ]
+      },
+      "native_counts": [
+        182046,
+        634506,
+        8938,
+        0,
+        0,
+        0,
+        0,
+        50119,
+        25768,
+        0,
+        41704,
+        0,
+        306,
+        0,
+        1545612,
+        499507,
+        72803,
+        58079,
+        910310,
+        0,
+        0,
+        162128,
+        267555
+      ],
+      "eligible_point_elements": 4277335,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-8956556778987472864_3404_790_3424_790-lifecycle-linked.json"
+    },
+    "15959580576639476066_5087_580_5107_580": {
+      "evidence": "scientific-semantic-support-15959580576639476066_5087_580_5107_580-verified.json",
+      "receipt_sha256": "46449ccb4b0127cd3c6c366e69b2e8154821590f26d4314259608230cb2cd5e7",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "native_counts": [
+        23740,
+        101734,
+        7149,
+        0,
+        0,
+        0,
+        0,
+        10563,
+        349,
+        0,
+        10565,
+        0,
+        0,
+        0,
+        1697679,
+        1109510,
+        76907,
+        36149,
+        1052438,
+        0,
+        3975,
+        673565,
+        250609
+      ],
+      "eligible_point_elements": 5031192,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-15959580576639476066_5087_580_5107_580-lifecycle-linked.json"
+    },
+    "447576862407975570_4360_000_4380_000": {
+      "evidence": "scientific-semantic-support-447576862407975570_4360_000_4380_000-verified.json",
+      "receipt_sha256": "fe51c11c9647879c5259eaa2cdc289fd7612b19f80869c154d78bf5dee01df60",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "native_counts": [
+        78702,
+        440987,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        8898,
+        0,
+        72416,
+        0,
+        0,
+        203,
+        3035228,
+        402748,
+        65874,
+        15507,
+        388037,
+        6024,
+        0,
+        11442,
+        172324
+      ],
+      "eligible_point_elements": 4619688,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-447576862407975570_4360_000_4380_000-lifecycle-linked.json"
+    },
+    "1024360143612057520_3580_000_3600_000": {
+      "evidence": "scientific-semantic-support-1024360143612057520_3580_000_3600_000-verified.json",
+      "receipt_sha256": "a0c4b100940eadf609485046f9f63c23eb4527665eadc4f5f5c2ac6ce987ea91",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "native_counts": [
+        111672,
+        728939,
+        22931,
+        0,
+        16234,
+        0,
+        97,
+        45153,
+        60063,
+        14805,
+        74492,
+        819,
+        0,
+        0,
+        1812974,
+        92583,
+        42147,
+        41430,
+        1154271,
+        9345,
+        61577,
+        17576,
+        195644
+      ],
+      "eligible_point_elements": 4391080,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-1024360143612057520_3580_000_3600_000-lifecycle-linked.json"
+    },
+    "11048712972908676520_545_000_565_000": {
+      "evidence": "scientific-semantic-support-11048712972908676520_545_000_565_000-verified.json",
+      "receipt_sha256": "d0065b3d4989ea43ba1d3a012942957cecadb52718e9a3a76402ceb76128c608",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "native_counts": [
+        13111,
+        315790,
+        40912,
+        0,
+        5864,
+        0,
+        0,
+        6526,
+        31023,
+        2202,
+        24640,
+        37919,
+        0,
+        0,
+        842563,
+        833046,
+        138097,
+        97207,
+        1375951,
+        29293,
+        15969,
+        324952,
+        235413
+      ],
+      "eligible_point_elements": 4357367,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-11048712972908676520_545_000_565_000-lifecycle-linked.json"
+    },
+    "9243656068381062947_1297_428_1317_428": {
+      "evidence": "scientific-semantic-support-9243656068381062947_1297_428_1317_428-verified.json",
+      "receipt_sha256": "a461971c55b7e3d52606d75a1cf4917273c2b67a61235213e94a57b705afa3e0",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "native_counts": [
+        101292,
+        426208,
+        0,
+        0,
+        0,
+        0,
+        15371,
+        425331,
+        26990,
+        24473,
+        17461,
+        329,
+        0,
+        0,
+        2882179,
+        2342297,
+        158520,
+        105471,
+        2085798,
+        75122,
+        1912,
+        621245,
+        566168
+      ],
+      "eligible_point_elements": 9774875,
+      "annotated_frames": 60,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-9243656068381062947_1297_428_1317_428-lifecycle-linked.json"
+    },
+    "14081240615915270380_4399_000_4419_000": {
+      "evidence": "scientific-semantic-support-14081240615915270380_4399_000_4419_000-verified.json",
+      "receipt_sha256": "159c3ae525e77a47babf957eb4b63c2bc93b837d7edc9a22e08642e3a2f55e11",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "native_counts": [
+        28015,
+        647853,
+        20952,
+        0,
+        0,
+        0,
+        0,
+        555,
+        34579,
+        5722,
+        44967,
+        1264,
+        0,
+        0,
+        270574,
+        610788,
+        27998,
+        65110,
+        985733,
+        11361,
+        56982,
+        323247,
+        83433
+      ],
+      "eligible_point_elements": 3191118,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-14081240615915270380_4399_000_4419_000-lifecycle-linked.json"
+    },
+    "933621182106051783_4160_000_4180_000": {
+      "evidence": "scientific-semantic-support-933621182106051783_4160_000_4180_000-verified.json",
+      "receipt_sha256": "1c0c37837ba3b9e2dbc834c997ed888653daab3fa7e8d63a8abc49b90a243494",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "native_counts": [
+        40593,
+        1016166,
+        28041,
+        0,
+        0,
+        0,
+        0,
+        16414,
+        22214,
+        254,
+        30320,
+        577,
+        0,
+        3887,
+        2224600,
+        227812,
+        20026,
+        13719,
+        838869,
+        5377,
+        51263,
+        331,
+        160853
+      ],
+      "eligible_point_elements": 4660723,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-933621182106051783_4160_000_4180_000-lifecycle-linked.json"
+    },
+    "12831741023324393102_2673_230_2693_230": {
+      "evidence": "scientific-semantic-support-12831741023324393102_2673_230_2693_230-verified.json",
+      "receipt_sha256": "c549fb28ee210559a5c0e0091f2bd13c132e24ff74df90ad6cd2ae96188a7122",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "native_counts": [
+        32944,
+        299515,
+        18224,
+        0,
+        0,
+        0,
+        0,
+        3742,
+        20717,
+        0,
+        21511,
+        0,
+        0,
+        0,
+        2559711,
+        1311633,
+        98075,
+        36262,
+        1536051,
+        104,
+        278,
+        691625,
+        288905
+      ],
+      "eligible_point_elements": 6886353,
+      "annotated_frames": 40,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-12831741023324393102_2673_230_2693_230-lifecycle-linked.json"
+    },
+    "6680764940003341232_2260_000_2280_000": {
+      "evidence": "scientific-semantic-support-6680764940003341232_2260_000_2280_000-verified.json",
+      "receipt_sha256": "8fac9690420545c4951f84350cf4e5d47c93173855dfc6cc842364b22dcec4c8",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "native_counts": [
+        23252,
+        707688,
+        0,
+        0,
+        0,
+        0,
+        0,
+        4605,
+        28055,
+        0,
+        25715,
+        0,
+        0,
+        0,
+        1146734,
+        1856645,
+        59360,
+        36285,
+        1099921,
+        0,
+        35293,
+        55214,
+        240869
+      ],
+      "eligible_point_elements": 5296384,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-6680764940003341232_2260_000_2280_000-lifecycle-linked.json"
+    },
+    "18024188333634186656_1566_600_1586_600": {
+      "evidence": "scientific-semantic-support-18024188333634186656_1566_600_1586_600-verified.json",
+      "receipt_sha256": "6d8e939f5d73fe48bd528563c5dbbb486817332986c97460a15e9c956d195705",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "native_counts": [
+        12609,
+        143542,
+        0,
+        0,
+        0,
+        0,
+        0,
+        47824,
+        23334,
+        142,
+        49521,
+        0,
+        0,
+        0,
+        481775,
+        782949,
+        166582,
+        59053,
+        881545,
+        2609,
+        1640,
+        291239,
+        195461
+      ],
+      "eligible_point_elements": 3127216,
+      "annotated_frames": 20,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-18024188333634186656_1566_600_1586_600-lifecycle-linked.json"
+    },
+    "8331804655557290264_4351_740_4371_740": {
+      "evidence": "scientific-semantic-support-8331804655557290264_4351_740_4371_740-verified.json",
+      "receipt_sha256": "1e33241c2a14540e587a959eb12a2ea0929a9d84f7a9ea6e8b751dc839c42b22",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "native_counts": [
+        12997,
+        186664,
+        15381,
+        0,
+        0,
+        0,
+        0,
+        16053,
+        11732,
+        0,
+        26396,
+        446,
+        0,
+        317,
+        1512811,
+        1104770,
+        181369,
+        99113,
+        1627188,
+        115107,
+        933,
+        1021576,
+        251883
+      ],
+      "eligible_point_elements": 6171739,
+      "annotated_frames": 40,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-8331804655557290264_4351_740_4371_740-lifecycle-linked.json"
+    },
+    "2094681306939952000_2972_300_2992_300": {
+      "evidence": "scientific-semantic-support-2094681306939952000_2972_300_2992_300-verified.json",
+      "receipt_sha256": "95958289274222c33f80cc1094bbdf8c216a49b97322d2bc9bc1a6885b06cd85",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "native_counts": [
+        11279,
+        443501,
+        930,
+        0,
+        0,
+        0,
+        0,
+        10095,
+        27679,
+        755,
+        37266,
+        0,
+        0,
+        0,
+        332268,
+        664953,
+        28763,
+        58165,
+        1742582,
+        75148,
+        15636,
+        195485,
+        92607
+      ],
+      "eligible_point_elements": 3725833,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-2094681306939952000_2972_300_2992_300-lifecycle-linked.json"
+    },
+    "4575389405178805994_4900_000_4920_000": {
+      "evidence": "scientific-semantic-support-4575389405178805994_4900_000_4920_000-verified.json",
+      "receipt_sha256": "f15646475e448fa4dc8f14d86ca2d67b2974b79364bfe3ff18d64174e86037b8",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "native_counts": [
+        53598,
+        671104,
+        30647,
+        0,
+        256,
+        0,
+        0,
+        32119,
+        24556,
+        6999,
+        47287,
+        0,
+        13636,
+        17550,
+        2136058,
+        164216,
+        50314,
+        45635,
+        1082040,
+        25071,
+        93947,
+        5329,
+        266599
+      ],
+      "eligible_point_elements": 4713363,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-4575389405178805994_4900_000_4920_000-lifecycle-linked.json"
+    },
+    "7119831293178745002_1094_720_1114_720": {
+      "evidence": "scientific-semantic-support-7119831293178745002_1094_720_1114_720-verified.json",
+      "receipt_sha256": "069c133e80a0dae114f9b4203a3166b5e644ca365b7e44f07999ae224e0cf2b4",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "native_counts": [
+        11398,
+        162667,
+        0,
+        304,
+        0,
+        0,
+        0,
+        6518,
+        8835,
+        0,
+        11144,
+        0,
+        0,
+        0,
+        1759727,
+        1222036,
+        34005,
+        53398,
+        951690,
+        73449,
+        5003,
+        512517,
+        163313
+      ],
+      "eligible_point_elements": 4964606,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-7119831293178745002_1094_720_1114_720-lifecycle-linked.json"
+    },
+    "5372281728627437618_2005_000_2025_000": {
+      "evidence": "scientific-semantic-support-5372281728627437618_2005_000_2025_000-verified.json",
+      "receipt_sha256": "2146011aa36dd2373fcee8251457cc91189c928df570a15838951e49ea52ec62",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "native_counts": [
+        10408,
+        485642,
+        45420,
+        0,
+        7559,
+        0,
+        0,
+        0,
+        3320,
+        0,
+        64844,
+        0,
+        0,
+        0,
+        2438727,
+        71030,
+        1751,
+        0,
+        2035103,
+        174785,
+        2580,
+        438931,
+        9
+      ],
+      "eligible_point_elements": 5769701,
+      "annotated_frames": 40,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-5372281728627437618_2005_000_2025_000-lifecycle-linked.json"
+    },
+    "13982731384839979987_1680_000_1700_000": {
+      "evidence": "scientific-semantic-support-13982731384839979987_1680_000_1700_000-verified.json",
+      "receipt_sha256": "0af46c85964c8bc7ee9e1fcfd195b41911f7b503456d96e3062e854d8a998c24",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "native_counts": [
+        55583,
+        912804,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2226,
+        37749,
+        243,
+        80554,
+        0,
+        0,
+        0,
+        2034449,
+        579951,
+        49004,
+        16722,
+        855803,
+        31671,
+        26523,
+        31928,
+        214890
+      ],
+      "eligible_point_elements": 4874517,
+      "annotated_frames": 30,
+      "lifecycle_linkage": "linked",
+      "linkage_evidence": "scientific-semantic-support-13982731384839979987_1680_000_1700_000-lifecycle-linked.json"
+    }
+  },
+  "native_counts": [
+    4473648,
+    29666073,
+    3044339,
+    1835281,
+    896791,
+    374,
+    79393,
+    2457003,
+    2061056,
+    176929,
+    3991478,
+    124099,
+    37112,
+    69714,
+    116448685,
+    71494510,
+    6237532,
+    4107749,
+    75448334,
+    2031043,
+    1730236,
+    29309126,
+    17950355
+  ],
+  "eligible_point_elements": 369197212,
+  "scope": "coverage-only point support from verified reconstruction; training/heldout membership remains separate, final lifecycle linkage and full original cohort required"
+}

@@ -1,0 +1,23 @@
+{
+  "status": "native target/current-frame GPU preparation receipts audited",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/native-supervised-gpu-a/receipt.json",
+  "receipt_sha256": "89241dd7afc8b0c7a670dacf97df73a74ffc52e1126614e0d1f8f8c316f2570a",
+  "target_receipt_sha256": "9fc4e65396b99d8002ce22fc68ecd02e6642b27ad1dc914687b62aeba0502fec",
+  "validation": {
+    "status": "native physical observations and native current-frame targets GPU backward passed",
+    "packed_sha256": "c78d0199f0fc985eff4c941b8c72ebff63632660a84f3f03fca66874bea14422",
+    "target_sha256": "d2c2e7a938653146e8731c6d98431346d0dea3a60dfe2865580523c401fb4d68",
+    "positive_anchors": 773,
+    "loss_components": {
+      "classification": 94.45931243896484,
+      "localization": 9.945034980773926,
+      "direction": 1.4789795875549316,
+      "total": 114.64517974853516
+    },
+    "forward_backward_seconds": 1.0474270669801626,
+    "peak_allocated_bytes": 1196469760,
+    "optimizer_steps": 0,
+    "scope": "engineering real-supervision integration only; fixture anchors, no trained checkpoint or held-out accuracy"
+  },
+  "scope": "preparation only; independent native-target checker, scientific anchors/protocol and training remain open"
+}

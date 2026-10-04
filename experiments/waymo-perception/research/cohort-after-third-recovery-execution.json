@@ -1,0 +1,24 @@
+{
+  "pid": 1021324,
+  "command": [
+    "python3",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/process-scientific-cohort.py",
+    "--output",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1",
+    "--scene",
+    "4575389405178805994_4900_000_4920_000",
+    "--scene",
+    "7119831293178745002_1094_720_1114_720",
+    "--scene",
+    "5372281728627437618_2005_000_2025_000",
+    "--scene",
+    "13982731384839979987_1680_000_1700_000"
+  ],
+  "remaining": [
+    "4575389405178805994_4900_000_4920_000",
+    "7119831293178745002_1094_720_1114_720",
+    "5372281728627437618_2005_000_2025_000",
+    "13982731384839979987_1680_000_1700_000"
+  ],
+  "scope": "unchanged original queue resumed; downstream observers require rearm"
+}

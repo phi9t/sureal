@@ -1,0 +1,10 @@
+{
+  "scope": "live analytic/convolution computation passed; isolation and independent numerical artifact verification pending",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/gpu-live-c/receipt.json",
+  "receipt_sha256": "451a2607005e4c9eb5d49cc793581c5d48d88f3910308427b0200aac0dd3f532",
+  "device": "NVIDIA B200",
+  "torch": "2.9.1+cu130",
+  "elapsed_seconds": 0.7155408500111662,
+  "peak_allocated_bytes": 21667328,
+  "ticket_08": "open"
+}

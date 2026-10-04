@@ -1,0 +1,1501 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/native-overfit-v1",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-overfit-head-diagnostics-v1/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.scratch/native-overfit-head-diagnostics.py",
+        "/tmp/worker.py",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-overfit-v1/inputs/manifest.json",
+        "/tmp/manifest.json",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/overfit-native-cache-v1",
+        "/tmp/native",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/native-overfit-prepared-v2/predictions.json",
+        "/tmp/predictions.json",
+        "--",
+        "python",
+        "/tmp/worker.py"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "worker_sha256": "3fc1504b6184ee6cf5525e1183e9e33c01333efec132ba6e07e670e52527e0a3",
+  "training_evidence_sha256": "bf05274cde3dfa9ffdcc3afa282d540b93808eea3a355a6b11da9fdfabaa23a6",
+  "scoring_evidence_sha256": "4dcf8fbcc0515f0291fe7487fa672d51282bebe212ea890cd18d96dbdde24b19",
+  "validation": {
+    "scope": "observational final-head/target/ranking diagnostics; no model modification or quality acceptance",
+    "frames": [
+      {
+        "identity": "7912728502266478772_1202_200_1222_200:1506905332721474",
+        "per_class": {
+          "1": {
+            "positive_anchors": 29,
+            "true_class_probability_quantiles": [
+              0.19866220012074198,
+              0.22338406300426017,
+              0.6875248624462784,
+              0.8398881451961807,
+              0.867201289545993
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 0.7586206896551724,
+            "selected_positive_anchors": 3,
+            "positive_linear_residual_mae": [
+              0.030631633984678677,
+              0.024694467620081553,
+              0.05566898697197856,
+              0.10627470773491304,
+              0.07458945951919817,
+              0.07768655616590396
+            ]
+          },
+          "2": {
+            "positive_anchors": 6,
+            "true_class_probability_quantiles": [
+              0.059510020145874844,
+              0.06972713526903195,
+              0.11423976334238571,
+              0.13629819524804607,
+              0.13841131554997893
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 1.0,
+            "selected_positive_anchors": 3,
+            "positive_linear_residual_mae": [
+              0.06500766667544718,
+              0.09122567189236482,
+              0.6372784643308985,
+              0.2132463314582117,
+              0.031712629262025026,
+              0.10789090215373447
+            ]
+          },
+          "3": {
+            "positive_anchors": 12,
+            "true_class_probability_quantiles": [
+              0.027242003110698073,
+              0.030467135070542606,
+              0.05162991473295343,
+              0.29230983283833406,
+              0.3537842417308459
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 0.9166666666666666,
+            "selected_positive_anchors": 4,
+            "positive_linear_residual_mae": [
+              0.10186979445472659,
+              0.13470002594847855,
+              0.3097519697482138,
+              0.44366028125902285,
+              0.15694997755733214,
+              0.2143546929347873
+            ]
+          },
+          "4": {
+            "positive_anchors": 0,
+            "true_class_probability_quantiles": null,
+            "classification_accuracy": null,
+            "direction_accuracy": null,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": null
+          }
+        },
+        "background_max_probability_quantiles": [
+          0.000783070448241297,
+          0.009495328098536177,
+          0.019396452467154754,
+          0.04644146210100492,
+          0.4598970240721454
+        ],
+        "background_above_floor": 4195,
+        "exported_predictions": 500,
+        "exported_positive_anchor_predictions": 10,
+        "selected_score_quantiles": [
+          0.0782888289353468,
+          0.10057288560942032,
+          0.867201289545993
+        ]
+      },
+      {
+        "identity": "8796914080594559459_4284_170_4304_170:1507681730263098",
+        "per_class": {
+          "1": {
+            "positive_anchors": 45,
+            "true_class_probability_quantiles": [
+              0.004179869478071219,
+              0.017197836298613732,
+              0.06916133890859488,
+              0.6936273812000979,
+              0.8718571031499256
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 0.9555555555555556,
+            "selected_positive_anchors": 4,
+            "positive_linear_residual_mae": [
+              0.10966214153030077,
+              0.05555894326590903,
+              0.12962814019207367,
+              0.06863811965440968,
+              0.10720143339677678,
+              0.08334378986311461
+            ]
+          },
+          "2": {
+            "positive_anchors": 0,
+            "true_class_probability_quantiles": null,
+            "classification_accuracy": null,
+            "direction_accuracy": null,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": null
+          },
+          "3": {
+            "positive_anchors": 13,
+            "true_class_probability_quantiles": [
+              0.016901399239260696,
+              0.017138079859799895,
+              0.04300096474130899,
+              0.14458812990816625,
+              0.18216040136024142
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 0.8461538461538461,
+            "selected_positive_anchors": 4,
+            "positive_linear_residual_mae": [
+              0.1716678594377095,
+              0.10996741940907,
+              0.44333304995377004,
+              0.2891227850779018,
+              0.20928714871814336,
+              0.16892449670876028
+            ]
+          },
+          "4": {
+            "positive_anchors": 0,
+            "true_class_probability_quantiles": null,
+            "classification_accuracy": null,
+            "direction_accuracy": null,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": null
+          }
+        },
+        "background_max_probability_quantiles": [
+          0.0007086786013080269,
+          0.00941796190526667,
+          0.01823035034161101,
+          0.04099875683921027,
+          0.44213349725587175
+        ],
+        "background_above_floor": 2745,
+        "exported_predictions": 500,
+        "exported_positive_anchor_predictions": 8,
+        "selected_score_quantiles": [
+          0.06984670601011453,
+          0.08323862551298075,
+          0.8718571031499256
+        ]
+      },
+      {
+        "identity": "14369250836076988112_7249_040_7269_040:1507658201233279",
+        "per_class": {
+          "1": {
+            "positive_anchors": 8,
+            "true_class_probability_quantiles": [
+              0.006251112434540844,
+              0.006349665499283887,
+              0.010916131410409726,
+              0.03156879046826741,
+              0.03960811003476298
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 0.625,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": [
+              0.14306999053118838,
+              0.06797212757109958,
+              0.08146496626044242,
+              0.233984240422355,
+              0.0759805084554604,
+              0.0708235703969852
+            ]
+          },
+          "2": {
+            "positive_anchors": 0,
+            "true_class_probability_quantiles": null,
+            "classification_accuracy": null,
+            "direction_accuracy": null,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": null
+          },
+          "3": {
+            "positive_anchors": 4,
+            "true_class_probability_quantiles": [
+              0.034198267049422,
+              0.03689118669567873,
+              0.09208693167981732,
+              0.14446494502652188,
+              0.14595026539959258
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 1.0,
+            "selected_positive_anchors": 2,
+            "positive_linear_residual_mae": [
+              0.09413416115477617,
+              0.12696269690911033,
+              0.4794263153987331,
+              0.21440946508167585,
+              0.29302557519261696,
+              0.23437904686338812
+            ]
+          },
+          "4": {
+            "positive_anchors": 0,
+            "true_class_probability_quantiles": null,
+            "classification_accuracy": null,
+            "direction_accuracy": null,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": null
+          }
+        },
+        "background_max_probability_quantiles": [
+          0.000750071967933918,
+          0.009804947982895858,
+          0.020360824387815488,
+          0.048118302675486335,
+          0.7450605967835565
+        ],
+        "background_above_floor": 4683,
+        "exported_predictions": 500,
+        "exported_positive_anchor_predictions": 2,
+        "selected_score_quantiles": [
+          0.08353888664565617,
+          0.10596779040029297,
+          0.7450605967835565
+        ]
+      },
+      {
+        "identity": "13271285919570645382_5320_000_5340_000:1544465669937500",
+        "per_class": {
+          "1": {
+            "positive_anchors": 303,
+            "true_class_probability_quantiles": [
+              0.03896290048672642,
+              0.12226460031406344,
+              0.2847012303395944,
+              0.6256205462483428,
+              0.8114513308494651
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 0.9603960396039604,
+            "selected_positive_anchors": 37,
+            "positive_linear_residual_mae": [
+              0.0411584725038041,
+              0.04089077029962813,
+              0.12928358147124058,
+              0.0485191468500946,
+              0.044554617433235286,
+              0.07095250968793705
+            ]
+          },
+          "2": {
+            "positive_anchors": 11,
+            "true_class_probability_quantiles": [
+              0.025948364828579,
+              0.026818918667941245,
+              0.05079860898604012,
+              0.11276859136096137,
+              0.1304782839231649
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 0.8181818181818182,
+            "selected_positive_anchors": 2,
+            "positive_linear_residual_mae": [
+              0.05830204954886454,
+              0.07284245837287781,
+              0.10770447454660967,
+              0.23098088896694466,
+              0.08709193054676856,
+              0.12175575662791684
+            ]
+          },
+          "3": {
+            "positive_anchors": 38,
+            "true_class_probability_quantiles": [
+              0.00845576765470181,
+              0.023024589989106205,
+              0.05462603161992165,
+              0.10374568374126392,
+              0.2190660844724017
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 0.9736842105263158,
+            "selected_positive_anchors": 7,
+            "positive_linear_residual_mae": [
+              0.09042571640593788,
+              0.07026806981520166,
+              0.2823503430418071,
+              0.14985050031519653,
+              0.1258123366526285,
+              0.13569877402283456
+            ]
+          },
+          "4": {
+            "positive_anchors": 0,
+            "true_class_probability_quantiles": null,
+            "classification_accuracy": null,
+            "direction_accuracy": null,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": null
+          }
+        },
+        "background_max_probability_quantiles": [
+          0.00041672800201480813,
+          0.009411118066880721,
+          0.017446139698647722,
+          0.04223326314062231,
+          0.3502256391500338
+        ],
+        "background_above_floor": 3274,
+        "exported_predictions": 500,
+        "exported_positive_anchor_predictions": 46,
+        "selected_score_quantiles": [
+          0.08304560424885313,
+          0.10364995969565821,
+          0.8114513308494651
+        ]
+      },
+      {
+        "identity": "8722413665055769182_2840_000_2860_000:1557958509325722",
+        "per_class": {
+          "1": {
+            "positive_anchors": 456,
+            "true_class_probability_quantiles": [
+              0.012804905205009974,
+              0.08887262723013309,
+              0.3381105979666881,
+              0.6286494909329832,
+              0.8287216374564135
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 0.881578947368421,
+            "selected_positive_anchors": 49,
+            "positive_linear_residual_mae": [
+              0.04879755063667706,
+              0.03199025174605796,
+              0.10323045123675686,
+              0.040014895147050665,
+              0.04319717397751716,
+              0.056007005172743186
+            ]
+          },
+          "2": {
+            "positive_anchors": 9,
+            "true_class_probability_quantiles": [
+              0.031121335517697628,
+              0.03673185122238699,
+              0.04196291818616017,
+              0.06316247001313659,
+              0.07003475126462863
+            ],
+            "classification_accuracy": 0.8888888888888888,
+            "direction_accuracy": 0.5555555555555556,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": [
+              0.05553691328069759,
+              0.12807308585824803,
+              0.0746803373058359,
+              0.29319182107655883,
+              0.07013555544642405,
+              0.16827124071255573
+            ]
+          },
+          "3": {
+            "positive_anchors": 8,
+            "true_class_probability_quantiles": [
+              0.006742689842602948,
+              0.008711653396338514,
+              0.028405360725732354,
+              0.04539299587895722,
+              0.049845192001225204
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 0.5,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": [
+              0.07993875479144584,
+              0.05150255392400719,
+              0.6222376502626275,
+              0.1798835318176536,
+              0.06546600708516381,
+              0.10827408083024616
+            ]
+          },
+          "4": {
+            "positive_anchors": 0,
+            "true_class_probability_quantiles": null,
+            "classification_accuracy": null,
+            "direction_accuracy": null,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": null
+          }
+        },
+        "background_max_probability_quantiles": [
+          0.0007931454315977607,
+          0.009433419786371123,
+          0.0185024876659968,
+          0.046223346474006555,
+          0.44566705323975125
+        ],
+        "background_above_floor": 4169,
+        "exported_predictions": 500,
+        "exported_positive_anchor_predictions": 49,
+        "selected_score_quantiles": [
+          0.08971567505278069,
+          0.11590480624603235,
+          0.8287216374564135
+        ]
+      },
+      {
+        "identity": "4447423683538547117_536_022_556_022:1509377835676730",
+        "per_class": {
+          "1": {
+            "positive_anchors": 353,
+            "true_class_probability_quantiles": [
+              0.0019160313292154725,
+              0.012612517875061036,
+              0.09737061540334845,
+              0.5958429493340046,
+              0.8830318730570866
+            ],
+            "classification_accuracy": 0.9830028328611898,
+            "direction_accuracy": 0.5439093484419264,
+            "selected_positive_anchors": 36,
+            "positive_linear_residual_mae": [
+              0.0857027863542766,
+              0.05767405814349394,
+              0.18669492774114174,
+              0.10284611231077986,
+              0.09891056828114653,
+              0.12679971098086013
+            ]
+          },
+          "2": {
+            "positive_anchors": 1,
+            "true_class_probability_quantiles": [
+              0.0063641465866652,
+              0.0063641465866652,
+              0.0063641465866652,
+              0.0063641465866652,
+              0.0063641465866652
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 1.0,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": [
+              0.08845648235075787,
+              0.05346699136528396,
+              0.5866425314901373,
+              0.7831822945383211,
+              0.16449048900694202,
+              0.7888296103291282
+            ]
+          },
+          "3": {
+            "positive_anchors": 4,
+            "true_class_probability_quantiles": [
+              0.008598584835753926,
+              0.009918270463444998,
+              0.01948412482589132,
+              0.03392193009659731,
+              0.037329594684971094
+            ],
+            "classification_accuracy": 0.75,
+            "direction_accuracy": 0.5,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": [
+              0.10201914501852372,
+              0.0413242322914727,
+              0.5764216042047555,
+              0.6486069191518745,
+              0.09895453351116541,
+              0.20044359267077466
+            ]
+          },
+          "4": {
+            "positive_anchors": 0,
+            "true_class_probability_quantiles": null,
+            "classification_accuracy": null,
+            "direction_accuracy": null,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": null
+          }
+        },
+        "background_max_probability_quantiles": [
+          0.00024365227611485122,
+          0.009668590874166933,
+          0.01946075190366156,
+          0.04680178331248375,
+          0.5139814441089756
+        ],
+        "background_above_floor": 4328,
+        "exported_predictions": 500,
+        "exported_positive_anchor_predictions": 36,
+        "selected_score_quantiles": [
+          0.08433198160614447,
+          0.10830161354910364,
+          0.8830318730570866
+        ]
+      },
+      {
+        "identity": "8454755173123314088_3202_000_3222_000:1518654686741547",
+        "per_class": {
+          "1": {
+            "positive_anchors": 240,
+            "true_class_probability_quantiles": [
+              0.012053944191196476,
+              0.04816172593193947,
+              0.18238689377587264,
+              0.6488777495273753,
+              0.8494883733361571
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 0.8791666666666667,
+            "selected_positive_anchors": 32,
+            "positive_linear_residual_mae": [
+              0.07276183511851284,
+              0.038973043050234926,
+              0.09604695078550898,
+              0.06674364440211591,
+              0.06043911540321129,
+              0.07926493463752676
+            ]
+          },
+          "2": {
+            "positive_anchors": 0,
+            "true_class_probability_quantiles": null,
+            "classification_accuracy": null,
+            "direction_accuracy": null,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": null
+          },
+          "3": {
+            "positive_anchors": 0,
+            "true_class_probability_quantiles": null,
+            "classification_accuracy": null,
+            "direction_accuracy": null,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": null
+          },
+          "4": {
+            "positive_anchors": 0,
+            "true_class_probability_quantiles": null,
+            "classification_accuracy": null,
+            "direction_accuracy": null,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": null
+          }
+        },
+        "background_max_probability_quantiles": [
+          0.0007040063198842579,
+          0.009567759679729863,
+          0.018786791359525667,
+          0.04058961460946782,
+          0.45201698818027136
+        ],
+        "background_above_floor": 2318,
+        "exported_predictions": 500,
+        "exported_positive_anchor_predictions": 32,
+        "selected_score_quantiles": [
+          0.06711539100386471,
+          0.07953691930635709,
+          0.8494883733361571
+        ]
+      },
+      {
+        "identity": "5525943706123287091_4100_000_4120_000:1507730158608059",
+        "per_class": {
+          "1": {
+            "positive_anchors": 199,
+            "true_class_probability_quantiles": [
+              0.004385820781534513,
+              0.028117978157901454,
+              0.17297252738443972,
+              0.6842057604571726,
+              0.8711916354573441
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 0.6381909547738693,
+            "selected_positive_anchors": 22,
+            "positive_linear_residual_mae": [
+              0.07111244066126814,
+              0.061137641023478045,
+              0.24543077626727353,
+              0.10609373359576665,
+              0.08564284961298498,
+              0.1319386377705062
+            ]
+          },
+          "2": {
+            "positive_anchors": 5,
+            "true_class_probability_quantiles": [
+              0.0142487632568715,
+              0.017860449064943808,
+              0.02795901904424529,
+              0.045777111848337285,
+              0.05184561901083253
+            ],
+            "classification_accuracy": 0.8,
+            "direction_accuracy": 0.4,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": [
+              0.06681492534255407,
+              0.12739887137118747,
+              0.4040212849550763,
+              0.4350535777030714,
+              0.2250026090820338,
+              0.2179025019297427
+            ]
+          },
+          "3": {
+            "positive_anchors": 30,
+            "true_class_probability_quantiles": [
+              0.014853995814477479,
+              0.019725286601598724,
+              0.03920357422567098,
+              0.08548407066515959,
+              0.18337848341728477
+            ],
+            "classification_accuracy": 0.8333333333333334,
+            "direction_accuracy": 0.8,
+            "selected_positive_anchors": 4,
+            "positive_linear_residual_mae": [
+              0.12950680817486748,
+              0.1335830727787258,
+              0.5302011195453324,
+              0.3506526184243269,
+              0.21115985574321472,
+              0.17695706342181616
+            ]
+          },
+          "4": {
+            "positive_anchors": 2,
+            "true_class_probability_quantiles": [
+              0.009870903535139681,
+              0.011602176004259852,
+              0.01852726588074053,
+              0.02545235575722121,
+              0.027183628226341378
+            ],
+            "classification_accuracy": 0.0,
+            "direction_accuracy": 1.0,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": [
+              0.029036935950730303,
+              0.06593040981869497,
+              0.06661151610871587,
+              0.16371160269139323,
+              0.09840994464649147,
+              0.06790162582403433
+            ]
+          }
+        },
+        "background_max_probability_quantiles": [
+          2.2395997289516687e-05,
+          0.009732565050927303,
+          0.01951292587838587,
+          0.04539511279569125,
+          0.5093014320976268
+        ],
+        "background_above_floor": 3999,
+        "exported_predictions": 500,
+        "exported_positive_anchor_predictions": 26,
+        "selected_score_quantiles": [
+          0.08184764318684933,
+          0.10015891147838354,
+          0.8711916354573441
+        ]
+      },
+      {
+        "identity": "4487677815262010875_4940_000_4960_000:1557326022347111",
+        "per_class": {
+          "1": {
+            "positive_anchors": 176,
+            "true_class_probability_quantiles": [
+              0.011588177209882035,
+              0.047824903527032406,
+              0.16408720796363097,
+              0.673238802063955,
+              0.84100151221641
+            ],
+            "classification_accuracy": 0.9943181818181818,
+            "direction_accuracy": 0.9034090909090909,
+            "selected_positive_anchors": 20,
+            "positive_linear_residual_mae": [
+              0.05971213839848576,
+              0.057558103986114606,
+              0.24518204203223085,
+              0.08152516178900195,
+              0.05413509393709135,
+              0.11072795329170634
+            ]
+          },
+          "2": {
+            "positive_anchors": 94,
+            "true_class_probability_quantiles": [
+              0.010953836134993742,
+              0.017384547096915493,
+              0.04039405836935023,
+              0.0787659617036897,
+              0.2591473323931968
+            ],
+            "classification_accuracy": 0.9680851063829787,
+            "direction_accuracy": 0.7021276595744681,
+            "selected_positive_anchors": 7,
+            "positive_linear_residual_mae": [
+              0.07809276792274399,
+              0.09770843767698631,
+              0.18411097768579934,
+              0.3730538217930416,
+              0.1427500055451904,
+              0.22881699773381559
+            ]
+          },
+          "3": {
+            "positive_anchors": 27,
+            "true_class_probability_quantiles": [
+              0.00831859840904586,
+              0.015081820730836007,
+              0.034201125668632884,
+              0.07867298885231483,
+              0.1138592957892832
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 0.9259259259259259,
+            "selected_positive_anchors": 3,
+            "positive_linear_residual_mae": [
+              0.08804805632349796,
+              0.0805048768291922,
+              0.5560019871745422,
+              0.3082762701102002,
+              0.17997901339106648,
+              0.20139596309995295
+            ]
+          },
+          "4": {
+            "positive_anchors": 0,
+            "true_class_probability_quantiles": null,
+            "classification_accuracy": null,
+            "direction_accuracy": null,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": null
+          }
+        },
+        "background_max_probability_quantiles": [
+          0.00021689450246687255,
+          0.009355969849255887,
+          0.016801532507785065,
+          0.04078673868378147,
+          0.45464035525947627
+        ],
+        "background_above_floor": 2828,
+        "exported_predictions": 500,
+        "exported_positive_anchor_predictions": 30,
+        "selected_score_quantiles": [
+          0.07538564380250631,
+          0.09340601909093157,
+          0.84100151221641
+        ]
+      },
+      {
+        "identity": "10599748131695282446_1380_000_1400_000:1558033878647442",
+        "per_class": {
+          "1": {
+            "positive_anchors": 324,
+            "true_class_probability_quantiles": [
+              0.004425744685349617,
+              0.015931195447134613,
+              0.0729521644649531,
+              0.5239165071357476,
+              0.8119849095863472
+            ],
+            "classification_accuracy": 0.9660493827160493,
+            "direction_accuracy": 0.595679012345679,
+            "selected_positive_anchors": 30,
+            "positive_linear_residual_mae": [
+              0.08945171496335524,
+              0.06129108180355068,
+              0.249162607718112,
+              0.09677527358786597,
+              0.07223196750463515,
+              0.09444119805099899
+            ]
+          },
+          "2": {
+            "positive_anchors": 54,
+            "true_class_probability_quantiles": [
+              0.009075143626571696,
+              0.013922205635886626,
+              0.021400563887562063,
+              0.0468628301402368,
+              0.06665427632098488
+            ],
+            "classification_accuracy": 0.7407407407407407,
+            "direction_accuracy": 0.5370370370370371,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": [
+              0.13584508581251997,
+              0.16077673072690807,
+              0.3664918958889738,
+              0.537050448482633,
+              0.23873151885777036,
+              0.3193369899555201
+            ]
+          },
+          "3": {
+            "positive_anchors": 8,
+            "true_class_probability_quantiles": [
+              0.009965977755729908,
+              0.012496171434133457,
+              0.02112746410018819,
+              0.028097174497540567,
+              0.03339669702315599
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 1.0,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": [
+              0.18864903420867865,
+              0.15004154732367264,
+              1.0359490329927927,
+              0.1831799215374974,
+              0.19950694323798426,
+              0.2650250824318851
+            ]
+          },
+          "4": {
+            "positive_anchors": 0,
+            "true_class_probability_quantiles": null,
+            "classification_accuracy": null,
+            "direction_accuracy": null,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": null
+          }
+        },
+        "background_max_probability_quantiles": [
+          0.0007370607631683943,
+          0.009277764721434984,
+          0.015694244829101582,
+          0.039559606652684376,
+          0.8273258541969891
+        ],
+        "background_above_floor": 2850,
+        "exported_predictions": 500,
+        "exported_positive_anchor_predictions": 30,
+        "selected_score_quantiles": [
+          0.07686176341814735,
+          0.09664916686694561,
+          0.8273258541969891
+        ]
+      },
+      {
+        "identity": "3224923476345749285_4480_000_4500_000:1549501331198565",
+        "per_class": {
+          "1": {
+            "positive_anchors": 71,
+            "true_class_probability_quantiles": [
+              0.00293026140494956,
+              0.008324115157631491,
+              0.0930190172442289,
+              0.442330389807277,
+              0.6706166404424634
+            ],
+            "classification_accuracy": 0.9859154929577465,
+            "direction_accuracy": 0.39436619718309857,
+            "selected_positive_anchors": 8,
+            "positive_linear_residual_mae": [
+              0.0788063106634723,
+              0.0901479026764851,
+              0.2762737509017191,
+              0.10439305451437055,
+              0.10218095145794358,
+              0.11887115617474639
+            ]
+          },
+          "2": {
+            "positive_anchors": 2,
+            "true_class_probability_quantiles": [
+              0.05161481001311998,
+              0.05301672033179048,
+              0.05862436160647248,
+              0.06423200288115448,
+              0.06563391319982498
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 1.0,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": [
+              0.15002562062401772,
+              0.34533713704523017,
+              0.07303174026310444,
+              0.4205742609120089,
+              0.08687294882281077,
+              0.18808599073991905
+            ]
+          },
+          "3": {
+            "positive_anchors": 15,
+            "true_class_probability_quantiles": [
+              0.02295558520474438,
+              0.024165705815327482,
+              0.03197575928700573,
+              0.10110261470605655,
+              0.1743215868637837
+            ],
+            "classification_accuracy": 0.8,
+            "direction_accuracy": 0.8666666666666667,
+            "selected_positive_anchors": 2,
+            "positive_linear_residual_mae": [
+              0.18805216963724705,
+              0.2231190219989025,
+              0.6273718237783202,
+              0.657475907429942,
+              0.2539180751271729,
+              0.39471244371596254
+            ]
+          },
+          "4": {
+            "positive_anchors": 0,
+            "true_class_probability_quantiles": null,
+            "classification_accuracy": null,
+            "direction_accuracy": null,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": null
+          }
+        },
+        "background_max_probability_quantiles": [
+          0.0005686588231918355,
+          0.009122981744386657,
+          0.013917986832292803,
+          0.04016695688441134,
+          0.8287074742696293
+        ],
+        "background_above_floor": 3124,
+        "exported_predictions": 500,
+        "exported_positive_anchor_predictions": 10,
+        "selected_score_quantiles": [
+          0.08080760435139368,
+          0.10384903853809166,
+          0.8287074742696293
+        ]
+      },
+      {
+        "identity": "8454755173123314088_3202_000_3222_000:1518654700641367",
+        "per_class": {
+          "1": {
+            "positive_anchors": 219,
+            "true_class_probability_quantiles": [
+              0.017664691182419458,
+              0.055522871448540685,
+              0.22462110845388766,
+              0.5772255264531032,
+              0.7686895692096262
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 0.817351598173516,
+            "selected_positive_anchors": 30,
+            "positive_linear_residual_mae": [
+              0.06704384726727596,
+              0.03826045259989096,
+              0.09581157854188985,
+              0.07602458693910939,
+              0.06650303476208269,
+              0.08357388544463877
+            ]
+          },
+          "2": {
+            "positive_anchors": 0,
+            "true_class_probability_quantiles": null,
+            "classification_accuracy": null,
+            "direction_accuracy": null,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": null
+          },
+          "3": {
+            "positive_anchors": 10,
+            "true_class_probability_quantiles": [
+              0.006585343674465627,
+              0.007764637568062086,
+              0.008751026139897611,
+              0.014970035533664588,
+              0.01631825336488355
+            ],
+            "classification_accuracy": 0.9,
+            "direction_accuracy": 1.0,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": [
+              0.09586829010300328,
+              0.12369043183796927,
+              0.32026196709818705,
+              0.2604383312022122,
+              0.2443215036575639,
+              0.11445541244246435
+            ]
+          },
+          "4": {
+            "positive_anchors": 0,
+            "true_class_probability_quantiles": null,
+            "classification_accuracy": null,
+            "direction_accuracy": null,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": null
+          }
+        },
+        "background_max_probability_quantiles": [
+          0.0008506552295926091,
+          0.009506923655270692,
+          0.018278562366407576,
+          0.0381085816663509,
+          0.41947897649212396
+        ],
+        "background_above_floor": 1663,
+        "exported_predictions": 500,
+        "exported_positive_anchor_predictions": 30,
+        "selected_score_quantiles": [
+          0.06141657688920028,
+          0.07426924426787027,
+          0.7686895692096262
+        ]
+      },
+      {
+        "identity": "13271285919570645382_5320_000_5340_000:1544465679337513",
+        "per_class": {
+          "1": {
+            "positive_anchors": 338,
+            "true_class_probability_quantiles": [
+              0.02520868046063479,
+              0.11815042664044303,
+              0.27520946723467477,
+              0.6965855327995708,
+              0.8768949325962816
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 0.9349112426035503,
+            "selected_positive_anchors": 40,
+            "positive_linear_residual_mae": [
+              0.04665911738882765,
+              0.04432934320705717,
+              0.12396656302150862,
+              0.053176845007968446,
+              0.04611137574150147,
+              0.07343750164997342
+            ]
+          },
+          "2": {
+            "positive_anchors": 13,
+            "true_class_probability_quantiles": [
+              0.031166960412769992,
+              0.036740897149154385,
+              0.05917631371651271,
+              0.11607479404366888,
+              0.11856916132720706
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 0.6153846153846154,
+            "selected_positive_anchors": 3,
+            "positive_linear_residual_mae": [
+              0.04418730633107871,
+              0.056214913701100766,
+              0.06772017189903838,
+              0.2621539731029304,
+              0.08300404650333579,
+              0.16152496092004662
+            ]
+          },
+          "3": {
+            "positive_anchors": 37,
+            "true_class_probability_quantiles": [
+              0.01168502204565762,
+              0.02639236098006019,
+              0.0515191703171757,
+              0.11006786559646622,
+              0.2109450872590481
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 0.9459459459459459,
+            "selected_positive_anchors": 8,
+            "positive_linear_residual_mae": [
+              0.0847625180978692,
+              0.0804522130602381,
+              0.25035885019994003,
+              0.13693558444245685,
+              0.09245500345638964,
+              0.12152242577867826
+            ]
+          },
+          "4": {
+            "positive_anchors": 1,
+            "true_class_probability_quantiles": [
+              0.016476441258461063,
+              0.016476441258461063,
+              0.016476441258461063,
+              0.016476441258461063,
+              0.016476441258461063
+            ],
+            "classification_accuracy": 0.0,
+            "direction_accuracy": 1.0,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": [
+              0.05933605880832615,
+              0.04520511585494716,
+              0.042083220419125864,
+              0.06538264716074507,
+              0.047025842899649145,
+              0.15944672109978977
+            ]
+          }
+        },
+        "background_max_probability_quantiles": [
+          0.0002792647112293115,
+          0.009351951137789008,
+          0.01738101421706245,
+          0.04376902319348832,
+          0.3792558264117728
+        ],
+        "background_above_floor": 3681,
+        "exported_predictions": 500,
+        "exported_positive_anchor_predictions": 51,
+        "selected_score_quantiles": [
+          0.08733206497309547,
+          0.11072809444281631,
+          0.8768949325962816
+        ]
+      },
+      {
+        "identity": "2415873247906962761_5460_000_5480_000:1542756269548778",
+        "per_class": {
+          "1": {
+            "positive_anchors": 290,
+            "true_class_probability_quantiles": [
+              0.0020904476446866674,
+              0.01000491205771894,
+              0.060155412698010516,
+              0.39141551317711426,
+              0.8720367398958647
+            ],
+            "classification_accuracy": 0.9724137931034482,
+            "direction_accuracy": 0.5724137931034483,
+            "selected_positive_anchors": 27,
+            "positive_linear_residual_mae": [
+              0.08338917672888996,
+              0.06457400757534089,
+              0.15831421524722553,
+              0.08600578968202023,
+              0.10124717833918595,
+              0.13600357140808034
+            ]
+          },
+          "2": {
+            "positive_anchors": 27,
+            "true_class_probability_quantiles": [
+              0.006966842959291756,
+              0.012139601627784366,
+              0.021617949768689554,
+              0.051856109567527106,
+              0.08530933468237124
+            ],
+            "classification_accuracy": 0.5925925925925926,
+            "direction_accuracy": 0.5925925925925926,
+            "selected_positive_anchors": 1,
+            "positive_linear_residual_mae": [
+              0.14919601255378914,
+              0.157614270292371,
+              0.19705000111589643,
+              0.6361063048004783,
+              0.23314650309869028,
+              0.2843838783300144
+            ]
+          },
+          "3": {
+            "positive_anchors": 13,
+            "true_class_probability_quantiles": [
+              0.010887436125376506,
+              0.014332756892323596,
+              0.028402445994986758,
+              0.04225110199057315,
+              0.04388333437579696
+            ],
+            "classification_accuracy": 0.9230769230769231,
+            "direction_accuracy": 0.7692307692307693,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": [
+              0.20105323679325274,
+              0.1563546299902519,
+              1.2806338193908324,
+              0.6706255920235198,
+              0.2590627653162552,
+              0.6360826185580764
+            ]
+          },
+          "4": {
+            "positive_anchors": 0,
+            "true_class_probability_quantiles": null,
+            "classification_accuracy": null,
+            "direction_accuracy": null,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": null
+          }
+        },
+        "background_max_probability_quantiles": [
+          0.0007588519077125705,
+          0.009065127830741204,
+          0.013478140525443182,
+          0.03421128237469637,
+          0.5594735373582684
+        ],
+        "background_above_floor": 1927,
+        "exported_predictions": 500,
+        "exported_positive_anchor_predictions": 28,
+        "selected_score_quantiles": [
+          0.0684498587167698,
+          0.0847647013191466,
+          0.8720367398958647
+        ]
+      },
+      {
+        "identity": "3375636961848927657_1942_000_1962_000:1520979236788944",
+        "per_class": {
+          "1": {
+            "positive_anchors": 262,
+            "true_class_probability_quantiles": [
+              0.0018482826270924185,
+              0.006987991181284215,
+              0.02210765025370122,
+              0.15186673386585112,
+              0.30744141643009626
+            ],
+            "classification_accuracy": 0.9045801526717557,
+            "direction_accuracy": 0.583969465648855,
+            "selected_positive_anchors": 13,
+            "positive_linear_residual_mae": [
+              0.09924249011727884,
+              0.07983153211592083,
+              0.8240210554759563,
+              0.11464047421379332,
+              0.11687439267656638,
+              0.1560933123883801
+            ]
+          },
+          "2": {
+            "positive_anchors": 6,
+            "true_class_probability_quantiles": [
+              0.013201448398490686,
+              0.013766952079130913,
+              0.015515269143887626,
+              0.027604668347078205,
+              0.029069236138454482
+            ],
+            "classification_accuracy": 1.0,
+            "direction_accuracy": 0.3333333333333333,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": [
+              0.22227702972789606,
+              0.22479625312421136,
+              0.18414472296300852,
+              0.49247223283552305,
+              0.22751385056662246,
+              0.4161015195138238
+            ]
+          },
+          "3": {
+            "positive_anchors": 27,
+            "true_class_probability_quantiles": [
+              0.010011183754996655,
+              0.011980871525123903,
+              0.022238275470421908,
+              0.047801908446030855,
+              0.07177746299804327
+            ],
+            "classification_accuracy": 0.9259259259259259,
+            "direction_accuracy": 0.6666666666666666,
+            "selected_positive_anchors": 1,
+            "positive_linear_residual_mae": [
+              0.21303979199707007,
+              0.23318107193591586,
+              1.4796708132697107,
+              0.5713276115661376,
+              0.3937427155408883,
+              0.4080204806135845
+            ]
+          },
+          "4": {
+            "positive_anchors": 0,
+            "true_class_probability_quantiles": null,
+            "classification_accuracy": null,
+            "direction_accuracy": null,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": null
+          }
+        },
+        "background_max_probability_quantiles": [
+          0.0007509008643463942,
+          0.009173574512333782,
+          0.014545735446185435,
+          0.03660769877997105,
+          0.5084113039792425
+        ],
+        "background_above_floor": 2139,
+        "exported_predictions": 500,
+        "exported_positive_anchor_predictions": 14,
+        "selected_score_quantiles": [
+          0.06614909259309086,
+          0.08196106700852873,
+          0.5084113039792425
+        ]
+      },
+      {
+        "identity": "2415873247906962761_5460_000_5480_000:1542756270248731",
+        "per_class": {
+          "1": {
+            "positive_anchors": 289,
+            "true_class_probability_quantiles": [
+              0.002244026105677436,
+              0.01020313931105945,
+              0.05883031397403037,
+              0.40286385984140016,
+              0.8575138214079762
+            ],
+            "classification_accuracy": 0.9826989619377162,
+            "direction_accuracy": 0.5709342560553633,
+            "selected_positive_anchors": 29,
+            "positive_linear_residual_mae": [
+              0.08154390020237473,
+              0.06328019630584673,
+              0.15793548680456365,
+              0.09285212179131741,
+              0.10090187253278807,
+              0.1256151294241674
+            ]
+          },
+          "2": {
+            "positive_anchors": 35,
+            "true_class_probability_quantiles": [
+              0.006020978621655043,
+              0.011445433170531977,
+              0.022804219177643286,
+              0.05214913300248242,
+              0.06981313199589347
+            ],
+            "classification_accuracy": 0.7142857142857143,
+            "direction_accuracy": 0.5428571428571428,
+            "selected_positive_anchors": 1,
+            "positive_linear_residual_mae": [
+              0.14796931039163336,
+              0.15538292739567972,
+              0.1828317141795582,
+              0.5667104247726555,
+              0.1719256870105379,
+              0.2719340282947136
+            ]
+          },
+          "3": {
+            "positive_anchors": 13,
+            "true_class_probability_quantiles": [
+              0.010046524305079178,
+              0.014303685327213107,
+              0.020095929848010466,
+              0.036913350457468935,
+              0.041950612885616884
+            ],
+            "classification_accuracy": 0.8461538461538461,
+            "direction_accuracy": 0.7692307692307693,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": [
+              0.2049549933116434,
+              0.1576682249707471,
+              1.314894284909676,
+              0.6715345475969823,
+              0.28370072578685057,
+              0.6389162720860331
+            ]
+          },
+          "4": {
+            "positive_anchors": 0,
+            "true_class_probability_quantiles": null,
+            "classification_accuracy": null,
+            "direction_accuracy": null,
+            "selected_positive_anchors": 0,
+            "positive_linear_residual_mae": null
+          }
+        },
+        "background_max_probability_quantiles": [
+          0.0008764233464468327,
+          0.009073518583037,
+          0.01348271578557138,
+          0.03325699825132931,
+          0.629148690191012
+        ],
+        "background_above_floor": 1800,
+        "exported_predictions": 500,
+        "exported_positive_anchor_predictions": 30,
+        "selected_score_quantiles": [
+          0.06872306742184427,
+          0.08622292402912674,
+          0.8575138214079762
+        ]
+      }
+    ]
+  },
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-overfit-head-diagnostics-v1/output/live.log": "783292586de8c9a109d92e4c1aee53fbc1ac8d931d6d8bbce8eefa97c2893adb",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-overfit-head-diagnostics-v1/output/check.json": "f687c78ced58b723787ad7a046ebcca28b9576f82eaf192bb05cb4741b21b628"
+  },
+  "scope": "observational live diagnostics, not independently audited scientific acceptance"
+}

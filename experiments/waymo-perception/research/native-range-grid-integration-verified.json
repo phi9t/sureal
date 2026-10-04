@@ -1,0 +1,88 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/m3-live-b",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-range-grid-a/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-pillar-packing-a/input",
+        "/mnt",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-range-shapes-a/output",
+        "/tmp/native-shapes",
+        "--",
+        "python",
+        "-c",
+        "import json,hashlib,time,resource,numpy as np\nfrom pathlib import Path\nfrom pipeline.native_range_grid import native_range_grid,gather_range_features\nstart=time.monotonic();shape_index=json.loads(Path('/tmp/native-shapes/shapes.json').read_text());shapes={(r['context'],r['timestamp'],r['laser'],r['return']):r['native_shape'] for r in shape_index['rows']}\nreport=json.loads(Path('/source/reconstruction/report.json').read_text());points=records=annotated=eligible=0;grids=[]\nfor r in report['rows']:\n p=Path('/source/reconstruction')/r['artifact'];assert hashlib.file_digest(p.open('rb'),'sha256').hexdigest()==r['sha256']\n with np.load(p,allow_pickle=False) as a:\n  identity={k:r[k] for k in ['context','timestamp','laser','return','motion']};identity['pixels']=a['pixels']\n  targets={'segmentation':a['segmentation']} if r['segmentation_present'] else {}\n  record={'identity':identity,'return_present':True,'observations':{'physical_features':a['physical_features'],'xyz':a['xyz']},'targets':targets,'evaluation':{'nlz':a['nlz']}}\n  grid=native_range_grid(record,shapes[(r['context'],r['timestamp'],r['laser'],r['return'])])\n  np.testing.assert_array_equal(gather_range_features(grid,grid['measurements']),a['physical_features'])\n  np.testing.assert_array_equal(gather_range_features(grid,grid['source_indices']),np.arange(r['points']))\n  assert int(grid['valid'].sum())==r['points'];assert np.all(grid['measurements'][~grid['valid']]==0)\n  assert grid['annotation_present']==r['segmentation_present']\n  expected=int(np.count_nonzero(a['segmentation'][:,1])) if r['segmentation_present'] else 0\n  assert int(grid['semantic_supervised'].sum())==expected\n  eligible+=expected;points+=r['points'];records+=1;annotated+=r['segmentation_present']\nassert points==report['points'] and records==3970\nv={'records':records,'points':points,'annotated_returns':annotated,'eligible_point_elements':eligible,'elapsed_seconds':time.monotonic()-start,'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'scope':'two engineering scenes; native grid/point identity roundtrip only; no trained frontend or scientific accuracy result'}\nPath('/outputs/check.json').write_text(json.dumps(v,indent=2));print('PASS complete native range grid roundtrip',v)\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "candidate_hashes": {
+    "pipeline/native_range_grid.py": "75ba9579354733c5428676b91c121dfcfe6c74790edd3c7122c74c10f3db49c7"
+  },
+  "input_hashes": {
+    "reconstruction_report": "9e49eb493517714be0ddcd5158aad9fe08c4575a96bd777b0219eebaf112c906",
+    "shape_inventory": "77bf84a300fae503b6b735f40ebabdcd5ce12c9b541f748d6bfa16eac50e3281"
+  },
+  "validation": {
+    "records": 3970,
+    "points": 71891534,
+    "annotated_returns": 120,
+    "eligible_point_elements": 9204259,
+    "elapsed_seconds": 72.63479724898934,
+    "peak_rss_kib": 85804,
+    "scope": "two engineering scenes; native grid/point identity roundtrip only; no trained frontend or scientific accuracy result"
+  },
+  "artifacts": {
+    "live.log": "047135582128ba8f08448796cd73e3f957f9bf90afd94cc3367f789c6a305f47",
+    "output/check.json": "cb621bf75f0dfb98b7ae7fa8768f1686463025fe03d8d8871aba18174c5cf34d"
+  },
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-range-grid-a/receipt.json",
+  "receipt_sha256": "73d8bb6d6e7f9ffc8f6aabaa07df03b16d5f0d2dc86adf20e8890b582caebd85"
+}

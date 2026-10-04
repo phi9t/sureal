@@ -1,0 +1,500 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/scientific-preprocessing-resource-a/receipt.json",
+  "receipt_sha256": "9097a90c406dd5a68e3f457f34959a50a4ea7edc51e3afbd187d14349557ed7f",
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/scientific-preprocessing-resource-a/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/scientific-preprocessing-resource-a/input",
+        "/mnt",
+        "--",
+        "python",
+        "-c",
+        "import json,hashlib,statistics,math\nfrom pathlib import Path\npins=json.loads(Path('/mnt/trusted.json').read_text());rows=[];stages={}\nfor scene,digest in pins['checkpoints'].items():\n path=Path('/source/cohort-v1')/scene/'receipt.json';assert not path.is_symlink();assert hashlib.sha256(path.read_bytes()).hexdigest()==digest;d=json.loads(path.read_text());assert d['scene']==scene;assert len(d['checks'])==10 and all(c['exit_code']==0 for c in d['checks'])\n durations={}\n for c in d['checks']:\n  value=c['elapsed_seconds'];assert math.isfinite(value) and value>=0;durations[c['stage']]=value;stages.setdefault(c['stage'],[]).append(value)\n assert len(durations)==10;elapsed=d['elapsed_seconds'];assert math.isfinite(elapsed) and elapsed>=sum(durations.values())-1\n pointpub=json.loads((path.parent/'point-publication/receipt.json').read_text());campub=json.loads((path.parent/'camera-publication/receipt.json').read_text());sidepub=json.loads((path.parent/'sidecar-publication/receipt.json').read_text())\n # Admission links these retained receipt bytes through the externally pinned checkpoint.\n for p in [path.parent/'point-publication/receipt.json',path.parent/'camera-publication/receipt.json',path.parent/'sidecar-publication/receipt.json']:\n  assert hashlib.sha256(p.read_bytes()).hexdigest()==d['retained_evidence_hashes'][str(p).replace('/source',pins['host_working'],1)]\n rows.append({'scene':scene,'membership':d['membership'],'points':d['point_validation']['points'],'elapsed_seconds':elapsed,'stage_seconds':durations,'peak_child_rss_kib':d['peak_child_rss_kib'],'point_archive_bytes':pointpub['archive']['archive_bytes'],'camera_archive_bytes':campub['archive']['archive_bytes'],'sidecar_archive_bytes':sidepub['archive']['archive_bytes']})\ndef summary(values):return {'min':min(values),'median':statistics.median(values),'max':max(values),'sum':sum(values)}\nreport={'status':'verified completed-queued-scene preprocessing resource inventory','scenes':len(rows),'selected_scenes':pins['selected_scenes'],'rows':rows,'elapsed_seconds':summary([r['elapsed_seconds'] for r in rows]),'stage_seconds':{k:summary(v) for k,v in stages.items()},'scope':'observed completed queued scenes only, not full-cohort extrapolation or training/evaluation GPU cost; 15GiB decoded cap remains candidate'};Path('/outputs/report.json').write_text(json.dumps(report,indent=2));print('PASS resource inventory',report['scenes'],report['elapsed_seconds'])\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "verified_utc": "2026-09-30T18:39:23.571786+00:00",
+  "elapsed_seconds": 0.0673505830054637,
+  "peak_child_rss_kib": 46624,
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "artifacts": {
+    "live.log": "874671fbfc8c1a1e816ae4586576c98dc57bba63ff8c7bc6d412c4ed4c36dc36",
+    "input/trusted.json": "3263f07b3746c738f95193dc1b895d57277548f06310751a92a8923be7c393b0",
+    "output/report.json": "7dba5bf2be1158747e6aff2bb743597d6234860e091fc5b11c0e89cd93bbe8ad"
+  },
+  "validation": {
+    "status": "verified completed-queued-scene preprocessing resource inventory",
+    "scenes": 13,
+    "selected_scenes": 103,
+    "rows": [
+      {
+        "scene": "11343624116265195592_5910_530_5930_530",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 29019898,
+        "elapsed_seconds": 447.7737608800235,
+        "stage_seconds": {
+          "point-preprocess": 16.993808361992706,
+          "point-publication": 73.42719609601772,
+          "point-replay": 51.651464112015674,
+          "point-evict": 5.367861536011333,
+          "sidecar-publication": 163.81805693998467,
+          "sidecar-evict": 24.143261168996105,
+          "camera-preprocess": 21.82238703299663,
+          "camera-publication": 19.55059953199816,
+          "camera-replay": 47.567727492016274,
+          "camera-evict": 3.24223649900523
+        },
+        "peak_child_rss_kib": 183076,
+        "point_archive_bytes": 2727495680,
+        "camera_archive_bytes": 377036800,
+        "sidecar_archive_bytes": 7199201280
+      },
+      {
+        "scene": "4447423683538547117_536_022_556_022",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 32487824,
+        "elapsed_seconds": 602.3081620079756,
+        "stage_seconds": {
+          "point-preprocess": 202.24962916297955,
+          "point-publication": 67.52878312699613,
+          "point-replay": 58.11502418899909,
+          "point-evict": 6.598842730018077,
+          "sidecar-publication": 132.63413672699244,
+          "sidecar-evict": 22.67503615800524,
+          "camera-preprocess": 21.880111328995554,
+          "camera-publication": 18.43411832797574,
+          "camera-replay": 48.31024125998374,
+          "camera-evict": 3.444315019005444
+        },
+        "peak_child_rss_kib": 177708,
+        "point_archive_bytes": 3029391360,
+        "camera_archive_bytes": 393021440,
+        "sidecar_archive_bytes": 7101020160
+      },
+      {
+        "scene": "14503113925613619599_975_506_995_506",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 38361436,
+        "elapsed_seconds": 615.0242938489828,
+        "stage_seconds": {
+          "point-preprocess": 200.51893904202734,
+          "point-publication": 93.17630374498549,
+          "point-replay": 71.67952843100647,
+          "point-evict": 7.711497937008971,
+          "sidecar-publication": 141.502129711007,
+          "sidecar-evict": 21.677754272008315,
+          "camera-preprocess": 14.85537654600921,
+          "camera-publication": 13.948224619001849,
+          "camera-replay": 26.99529810799868,
+          "camera-evict": 1.5115317509917077
+        },
+        "peak_child_rss_kib": 178840,
+        "point_archive_bytes": 3590205440,
+        "camera_archive_bytes": 353341440,
+        "sidecar_archive_bytes": 7099996160
+      },
+      {
+        "scene": "3375636961848927657_1942_000_1962_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 28016899,
+        "elapsed_seconds": 646.8396778299939,
+        "stage_seconds": {
+          "point-preprocess": 204.42930252099177,
+          "point-publication": 71.23582508400432,
+          "point-replay": 51.22487283498049,
+          "point-evict": 5.464508366014343,
+          "sidecar-publication": 192.80589063899242,
+          "sidecar-evict": 23.329359459981788,
+          "camera-preprocess": 27.101887265016558,
+          "camera-publication": 15.468163176003145,
+          "camera-replay": 33.72749586397549,
+          "camera-evict": 2.257257049990585
+        },
+        "peak_child_rss_kib": 178840,
+        "point_archive_bytes": 2622023680,
+        "camera_archive_bytes": 379811840,
+        "sidecar_archive_bytes": 7144499200
+      },
+      {
+        "scene": "6813611334239274394_535_000_555_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 30800390,
+        "elapsed_seconds": 555.9556385680044,
+        "stage_seconds": {
+          "point-preprocess": 191.1325750130054,
+          "point-publication": 67.88496112401481,
+          "point-replay": 53.07156541701988,
+          "point-evict": 5.828597343992442,
+          "sidecar-publication": 133.32972664400586,
+          "sidecar-evict": 22.53167030098848,
+          "camera-preprocess": 15.421773000009125,
+          "camera-publication": 15.17864636000013,
+          "camera-replay": 30.156407166010467,
+          "camera-evict": 1.7915184010053053
+        },
+        "peak_child_rss_kib": 178840,
+        "point_archive_bytes": 2884321280,
+        "camera_archive_bytes": 385617920,
+        "sidecar_archive_bytes": 7012843520
+      },
+      {
+        "scene": "990914685337955114_980_000_1000_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 35228086,
+        "elapsed_seconds": 690.6339134899899,
+        "stage_seconds": {
+          "point-preprocess": 216.5462959659926,
+          "point-publication": 75.22274485399248,
+          "point-replay": 64.59490726099466,
+          "point-evict": 7.064926874008961,
+          "sidecar-publication": 192.92606050299946,
+          "sidecar-evict": 25.729816169012338,
+          "camera-preprocess": 18.835345035011414,
+          "camera-publication": 17.07793575100368,
+          "camera-replay": 47.41842035899754,
+          "camera-evict": 2.8334078830084763
+        },
+        "peak_child_rss_kib": 179292,
+        "point_archive_bytes": 3284090880,
+        "camera_archive_bytes": 340828160,
+        "sidecar_archive_bytes": 7149936640
+      },
+      {
+        "scene": "8796914080594559459_4284_170_4304_170",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 37077947,
+        "elapsed_seconds": 597.5462385700084,
+        "stage_seconds": {
+          "point-preprocess": 194.37570464800228,
+          "point-publication": 85.78058425700874,
+          "point-replay": 63.67973429398262,
+          "point-evict": 6.82722832300351,
+          "sidecar-publication": 147.05376035699737,
+          "sidecar-evict": 20.91545466601383,
+          "camera-preprocess": 15.476052328012884,
+          "camera-publication": 14.025990850001108,
+          "camera-replay": 28.037883718992816,
+          "camera-evict": 1.5801249069918413
+        },
+        "peak_child_rss_kib": 179292,
+        "point_archive_bytes": 3457177600,
+        "camera_archive_bytes": 344545280,
+        "sidecar_archive_bytes": 7112407040
+      },
+      {
+        "scene": "12257951615341726923_2196_690_2216_690",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 32590501,
+        "elapsed_seconds": 651.9419390499825,
+        "stage_seconds": {
+          "point-preprocess": 206.6156751329836,
+          "point-publication": 80.32011592300842,
+          "point-replay": 58.713971668999875,
+          "point-evict": 6.149932593980338,
+          "sidecar-publication": 167.24591408699052,
+          "sidecar-evict": 23.783533106994582,
+          "camera-preprocess": 19.851724431995535,
+          "camera-publication": 22.853111181990243,
+          "camera-replay": 41.92883231697488,
+          "camera-evict": 2.894831516983686
+        },
+        "peak_child_rss_kib": 182040,
+        "point_archive_bytes": 3051202560,
+        "camera_archive_bytes": 393205760,
+        "sidecar_archive_bytes": 7159367680
+      },
+      {
+        "scene": "13186511704021307558_2000_000_2020_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 32281988,
+        "elapsed_seconds": 581.9430978120072,
+        "stage_seconds": {
+          "point-preprocess": 194.85014168100315,
+          "point-publication": 75.65685202399618,
+          "point-replay": 56.13334145900444,
+          "point-evict": 6.483297000988387,
+          "sidecar-publication": 140.06889743797365,
+          "sidecar-evict": 22.212620178004727,
+          "camera-preprocess": 15.963038524001604,
+          "camera-publication": 17.562238626996987,
+          "camera-replay": 30.72865922699566,
+          "camera-evict": 1.985309623007197
+        },
+        "peak_child_rss_kib": 182040,
+        "point_archive_bytes": 3009146880,
+        "camera_archive_bytes": 323184640,
+        "sidecar_archive_bytes": 7101747200
+      },
+      {
+        "scene": "17885096890374683162_755_580_775_580",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 40148154,
+        "elapsed_seconds": 624.4522382039868,
+        "stage_seconds": {
+          "point-preprocess": 203.99056276201736,
+          "point-publication": 84.70159120499738,
+          "point-replay": 66.20482937898487,
+          "point-evict": 7.747516742994776,
+          "sidecar-publication": 151.20033195900032,
+          "sidecar-evict": 22.610590208001668,
+          "camera-preprocess": 18.106794469000306,
+          "camera-publication": 15.301896560995374,
+          "camera-replay": 30.830583260016283,
+          "camera-evict": 1.9362683650106192
+        },
+        "peak_child_rss_kib": 182040,
+        "point_archive_bytes": 3756933120,
+        "camera_archive_bytes": 398632960,
+        "sidecar_archive_bytes": 7134863360
+      },
+      {
+        "scene": "7912728502266478772_1202_200_1222_200",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 35284571,
+        "elapsed_seconds": 634.7481569290103,
+        "stage_seconds": {
+          "point-preprocess": 185.7531788230117,
+          "point-publication": 87.84459310901002,
+          "point-replay": 61.485348860995146,
+          "point-evict": 6.578233766980702,
+          "sidecar-publication": 175.66500384098617,
+          "sidecar-evict": 21.417543580988422,
+          "camera-preprocess": 34.17934244099888,
+          "camera-publication": 15.278449025005102,
+          "camera-replay": 25.496946950996062,
+          "camera-evict": 1.37691176898079
+        },
+        "peak_child_rss_kib": 182040,
+        "point_archive_bytes": 3275827200,
+        "camera_archive_bytes": 309299200,
+        "sidecar_archive_bytes": 6981867520
+      },
+      {
+        "scene": "4723255145958809564_741_350_761_350",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 35255285,
+        "elapsed_seconds": 631.0429821049911,
+        "stage_seconds": {
+          "point-preprocess": 200.98291605801205,
+          "point-publication": 75.31553093102411,
+          "point-replay": 59.46945895400131,
+          "point-evict": 6.656724091008073,
+          "sidecar-publication": 159.70568500901572,
+          "sidecar-evict": 23.235281942994334,
+          "camera-preprocess": 21.3149925149919,
+          "camera-publication": 18.50867502699839,
+          "camera-replay": 41.70713544200407,
+          "camera-evict": 2.925482610007748
+        },
+        "peak_child_rss_kib": 182040,
+        "point_archive_bytes": 3313029120,
+        "camera_archive_bytes": 422000640,
+        "sidecar_archive_bytes": 7202949120
+      },
+      {
+        "scene": "8454755173123314088_3202_000_3222_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "points": 31250201,
+        "elapsed_seconds": 584.6863512849959,
+        "stage_seconds": {
+          "point-preprocess": 186.7102796479885,
+          "point-publication": 73.17753387699486,
+          "point-replay": 57.123972598987166,
+          "point-evict": 6.251475672004744,
+          "sidecar-publication": 144.44899502501357,
+          "sidecar-evict": 22.066113660024712,
+          "camera-preprocess": 23.22993745698477,
+          "camera-publication": 18.660244115977548,
+          "camera-replay": 31.594158588995924,
+          "camera-evict": 2.0072253289981745
+        },
+        "peak_child_rss_kib": 182040,
+        "point_archive_bytes": 2914283520,
+        "camera_archive_bytes": 303544320,
+        "sidecar_archive_bytes": 7088424960
+      }
+    ],
+    "elapsed_seconds": {
+      "min": 447.7737608800235,
+      "median": 615.0242938489828,
+      "max": 690.6339134899899,
+      "sum": 7864.896450579952
+    },
+    "stage_seconds": {
+      "point-preprocess": {
+        "min": 16.993808361992706,
+        "median": 200.51893904202734,
+        "max": 216.5462959659926,
+        "sum": 2405.149008820008
+      },
+      "point-publication": {
+        "min": 67.52878312699613,
+        "median": 75.31553093102411,
+        "max": 93.17630374498549,
+        "sum": 1011.2726153560507
+      },
+      "point-replay": {
+        "min": 51.22487283498049,
+        "median": 58.713971668999875,
+        "max": 71.67952843100647,
+        "sum": 773.1480194599717
+      },
+      "point-evict": {
+        "min": 5.367861536011333,
+        "median": 6.578233766980702,
+        "max": 7.747516742994776,
+        "sum": 84.73064297801466
+      },
+      "sidecar-publication": {
+        "min": 132.63413672699244,
+        "median": 151.20033195900032,
+        "max": 192.92606050299946,
+        "sum": 2042.4045888799592
+      },
+      "sidecar-evict": {
+        "min": 20.91545466601383,
+        "median": 22.610590208001668,
+        "max": 25.729816169012338,
+        "sum": 296.32803487201454
+      },
+      "camera-preprocess": {
+        "min": 14.85537654600921,
+        "median": 19.851724431995535,
+        "max": 34.17934244099888,
+        "sum": 268.0387623740244
+      },
+      "camera-publication": {
+        "min": 13.948224619001849,
+        "median": 17.07793575100368,
+        "max": 22.853111181990243,
+        "sum": 221.84829315394745
+      },
+      "camera-replay": {
+        "min": 25.496946950996062,
+        "median": 31.594158588995924,
+        "max": 48.31024125998374,
+        "sum": 464.4997897539579
+      },
+      "camera-evict": {
+        "min": 1.37691176898079,
+        "median": 2.0072253289981745,
+        "max": 3.444315019005444,
+        "sum": 29.786420722986804
+      }
+    },
+    "scope": "observed completed queued scenes only, not full-cohort extrapolation or training/evaluation GPU cost; 15GiB decoded cap remains candidate"
+  }
+}

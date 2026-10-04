@@ -1,0 +1,44 @@
+{
+  "status": "current evaluator boundaries verified; ticket 09 consolidated evidence audit remains open",
+  "live_evaluator_suite": {
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "patterns": [
+      "test_native_detection_adapter.py",
+      "test_detection_export.py",
+      "test_segmentation_export.py",
+      "test_camera_semantic_scoring.py",
+      "test_nlz_overlap.py"
+    ]
+  },
+  "host_suite": {
+    "tests": 67,
+    "status": "passed",
+    "context": "probe-venv python with probe-venv/bin first in PATH"
+  },
+  "candidate_hashes": {
+    "evaluation/evaluator-unit-checks.py": "626c2188a0dbfd9e8536ce96a0666d5581361c85eb6f93c0051762f2e63c1a4f",
+    "pipeline/detection_export.py": "a361e44755ce45a251534b1a1fd8b1e12d9d1e8fadd02f6d6cfdafe98a46f7c2",
+    "pipeline/segmentation_export.py": "bd17238a202ad90e00cafc4694a1fce3d86c9dda82314ca6e5bb6ff4986d1723",
+    "pipeline/native_detection_adapter.py": "1f8cde2bfb9a451c6308b774202e152b90fd4ee9623198f7cd654ef3be11c078",
+    "pipeline/camera_semantic_scoring.py": "0ca2efcecf217845eaab344ed59aa94c09e1f25984c3b85a6ddcb28fdffdcd9d",
+    "pipeline/nlz_overlap.py": "796ac6e2107fb399c1069fa6979423e362a85c36add25b7973705ecb90966ee4"
+  },
+  "artifact_hashes": {
+    "evaluator-unit-results.json": "70f28c2f31c66ded16410347c6de28230a55319dec944087c5449506468bbb84",
+    "host-tests.log": "66b8db129422de8a2bfaf8d24f53c34313e20ae513f3c768568ac370fd1f6036",
+    "tests.log": "cefe355a8b60658a112bed53a08ee64f7c08460b272889c69eafade3be20365e",
+    "host-tests-corrected-path.log": "2b801c3b2cb1daf17c04d6d1d7afea9e3fac65fa6af490359887e6118b8782cb",
+    "evaluator-unit.log": "0742e3665f3c5fa6fdc27f30337d7c82c8ca9cb50d0b046c4b5d4893f8727675"
+  },
+  "failed_attempts": [
+    "Broad host-oriented suite in CPU Insula: 2 GCS bootstrap failures (curl absent), 6 M0 evidence-cache errors (private HOME), one host-runtime skip.",
+    "Initial host suite: subprocess selected system Python without pyarrow; corrected PATH passed all 67."
+  ],
+  "limitations": [
+    "The passing host suite supplements, but does not substitute for, live evaluator integration receipts.",
+    "Fresh consolidated replay/resource evidence and full receipt requirement reconciliation are still required before ticket 09 closure."
+  ]
+}

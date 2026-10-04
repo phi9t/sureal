@@ -1,0 +1,48 @@
+"""Fresh capped offline CPU tests for closeout; no optimizer/model continuation."""
+import json,os,pathlib,shutil,sys,traceback
+P=pathlib.Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P));sys.dont_write_bytecode=True
+from resources.sources import freeze_sources,sha,validate_sources
+from resources.stage import run_stage,validate_proof,write_new
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+from cohort.sustained_controller_lock import acquire_experiment_lock
+from cohort.sustained_controller_backend import NativeBackend,C,W
+from tier1.storage import unique_payload_bytes
+R=C/'insula/comprehensive-closeout-live-tests-v7';F=pathlib.Path('/tmp/sureal-comprehensive-closeout-live-tests-v7.json')
+report={'passed':False,'scope':'fresh source-pinned offline CPU closeout tests only; no new training, complete continuation gate or migration admission','driver':{'path':__file__,'sha256':sha(__file__)},'stages':[]}
+def save():F.write_text(json.dumps(report,indent=2)+'\n')
+try:
+ with acquire_experiment_lock(C/'insula/architecture-experiments.lock') as lock:
+  R.mkdir();(R/'proofs').mkdir();b=NativeBackend('controller20261003a','baseline',lock,resume=True);state=json.loads((b.R/'state.json').read_text());prior=None
+  for record in state['records']:b.check_record(record,prior);prior=record
+  original=json.loads((P/'research/sustained-resource-legacy-parity-independent.json').read_text());report['original_six_artifacts']=original['original_six_artifacts'];report['scientific_bytes_before']=unique_payload_bytes(W)
+  pins=freeze_sources(P/'resources',R/'resource-source');assert len(pins)==26 and {n:v['sha256'] for n,v in pins.items()}=={n:v['sha256'] for n,v in original['resource_source_pins'].items()};report['resource_source_pins']=pins
+  root=C/'insula/rootfs-v2';cpu_runtime=json.loads(pathlib.Path(str(root)+'.lock.json').read_text());verify_rootfs(root,cpu_runtime['rootfs_sha256']);report['runtime_locks']={'cpu':cpu_runtime,'torch':b.runtime}
+  package=R/'experiment';package.mkdir();all_files=[p for p in P.rglob('*.py') if '__pycache__' not in p.parts and '.scratch' not in p.parts];all_files += [p for p in P.iterdir() if p.is_file() and p.suffix in {'.json','.sh','.in','.lock'}];all_files+=[P/'insula/Dockerfile'];report['source_snapshot']={}
+  for src in all_files:
+   dst=package/src.relative_to(P);dst.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(src,dst);report['source_snapshot'][src.relative_to(P).as_posix()]={'sha256':sha(src),'bytes':src.stat().st_size}
+  write_new(R/'source-pins.json',report['source_snapshot'])
+  source=R/'input';source.mkdir();worker=pathlib.Path('/tmp/sureal-comprehensive-closeout-cpu-worker-v2.py');report['worker']={'path':str(worker),'sha256':sha(worker)};out=R/'probe';out.mkdir()
+  cmd=launch_plan(root,package,source,out,['python','/tmp/closeout-worker.py','probe'])
+  def stage(name,command,directory):
+   assert sha(worker)==report['worker']['sha256'];i=command.index('--');command[i:i]=['--ro-bind',str(worker),'/tmp/closeout-worker.py']
+   with (directory/'live.log').open('w') as log:run_stage(command,P,dict(os.environ),log,300,code=R/'resource-source',current_sources=P/'resources',source_pins=pins,evidence_directory=R/'proofs'/name,native_output=directory,cap_bytes=16*1024**3)
+   proof=R/'proofs'/name/'resource-admitted.json';v=json.loads(proof.read_text());admission=validate_proof(v,command,P/'resources',pins,directory,16*1024**3,300)
+   report['stages'].append({'name':name,'proof':{'path':str(proof),'sha256':sha(proof)},'resource_admission':admission,'log':{'path':str(directory/'live.log'),'sha256':sha(directory/'live.log')}});save()
+  stage('probe',cmd,out);print((out/'live.log').read_text(),flush=True)
+  omit={'test_camera_projection_cli','test_motion_causal_projection','test_motion_joint_cli','test_motion_native_cli','test_motion_pooled_cli','test_semantic_recovery_accounting','test_semantic_recovery_receipt','test_semantic_recovery_receipt_aligned','test_tracer_runtime','test_m0_receipt','test_gcs_bootstrap'}
+  modules=['tests.'+p.stem for p in sorted((P/'tests').glob('test_*.py')) if p.stem not in omit]
+  modules+=['continuation_runtime.test_identity','explorer.test_data']
+  torch_names={'test_camera_interpolation_parity','test_detector_loss','test_packed_point_features','test_pillar_detector','test_pillar_encoder','test_point_semantic_encoder','test_range_frontend','test_range_pillar_hybrid','test_sparse_window_attention'}
+  groups=[('cpu',root,[n for n in modules if n.rsplit('.',1)[-1] not in torch_names],'python'),('torch',C/'gpu-rootfs',[n for n in modules if n.rsplit('.',1)[-1] in torch_names],'/opt/waymo/bin/python')]
+  report['selected_modules']=modules;report['fixture_specific_modules_deferred']=sorted(omit)
+  for label,rt,selected,interpreter in groups:
+   src=R/(label+'-input');src.mkdir();(src/'modules.json').write_text(json.dumps(selected)+'\n');out=R/label;out.mkdir();(out/'tmp').mkdir()
+   cmd=launch_plan(rt,package,src,out,[interpreter,'/tmp/closeout-worker.py','suite']);idx=cmd.index('--');cmd[idx:idx]=['--setenv','PATH',('/opt/waymo/bin:' if label=='torch' else '')+'/usr/local/bin:/usr/bin:/bin','--setenv','PYTHONPATH','/experiment:/experiment/architecture:/experiment/tests:/experiment/explorer','--setenv','TMPDIR','/outputs/tmp','--setenv','OMP_NUM_THREADS','1','--setenv','MKL_NUM_THREADS','1'];stage(label,cmd,out)
+  out=R/'dispatcher';out.mkdir();cmd=launch_plan(root,package,source,out,['python','/tmp/closeout-worker.py','dispatcher']);stage('dispatcher-list',cmd,out)
+  report['dispatch_entrypoint']={'path':str(P/'architecture.py'),'sha256':sha(P/'architecture.py'),'scope':'list/bootstrap wiring only; underlying frozen runner admission separate'}
+  for name,pin in report['source_snapshot'].items():assert sha(P/name)==sha(package/name)==pin['sha256']
+  for p,h in report['original_six_artifacts'].items():assert sha(p)==h
+  b.guard();report['scientific_bytes_after']=unique_payload_bytes(W);assert report['scientific_bytes_after']==report['scientific_bytes_before'];report['passed']=True;save();print('PASS fresh closeout live CPU suite',flush=True)
+except Exception:
+ report['failure']=traceback.format_exc();save();raise

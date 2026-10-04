@@ -1,0 +1,18 @@
+{
+  "scene": "6161542573106757148_585_030_605_030",
+  "membership": {
+    "official_split": "validation",
+    "research_splits": [
+      "validation"
+    ]
+  },
+  "source": {
+    "size_bytes": 191492157,
+    "sha256": "4d876f423191f8fc2fdc47dd3989ca67c49bdb695947c3cb1561a8a2f7ade106",
+    "md5_base64": "4z02getapekTb/ZP7pNZiw=="
+  },
+  "inventory": {
+    "rows": 990,
+    "key_sha256": "0bcc6eb66d49dcf2bdff2d85ad087d81ee1f150ed79c349056468c781ec4a8e7"
+  }
+}

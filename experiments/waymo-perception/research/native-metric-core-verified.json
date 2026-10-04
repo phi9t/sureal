@@ -1,0 +1,9 @@
+{
+  "status": "native detection/segmentation live core verified; ticket 09 broader export/config/camera criteria open",
+  "detection_expectations_compared": 26,
+  "absolute_tolerance": 1e-06,
+  "segmentation_miou": 0.00395302,
+  "receipt_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/metrics-live-a/receipt.json",
+  "receipt_sha256": "723cf2d40d9fc298e9c60e47cde91b1c2cdc9cfc1356751b2130ed9af8dc3224",
+  "upstream_commit": "99a4cb3ff07e2fe06c2ce73da001f850f628e45a"
+}

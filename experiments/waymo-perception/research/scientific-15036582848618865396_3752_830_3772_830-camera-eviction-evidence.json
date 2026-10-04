@@ -1,0 +1,10 @@
+{
+  "status": "verified camera eviction completed",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/camera-eviction-15036582848618865396_3752_830_3772_830/receipt.json",
+  "receipt_sha256": "400b384343a025a6bb82e3edd439d32715cbf012297508e7125c41dbb199ae8e",
+  "manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/camera-15036582848618865396_3752_830_3772_830/camera-eviction.json",
+  "manifest_sha256": "c828228e07beb93b8e8e53c65f40e7fb0692ec9a310682cb2859deb5907e4c21",
+  "bytes_evicted": 716345686,
+  "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/camera-bundles-v1/scientific/15036582848618865396_3752_830_3772_830/3687de8359304693bf999282702285c9264343672fb4ec23c24eae3240342b52.tar",
+  "scope": "one scientific camera scene; payloads absent and trusted publication/replay identities unchanged"
+}

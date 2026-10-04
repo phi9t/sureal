@@ -1,0 +1,18 @@
+{
+  "validation": {
+    "status": "existing HDFS archive independently read back and digest matched",
+    "command": [
+      "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+      "get",
+      "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/component-bundles-v1/scientific/9907794657177651763_1126_570_1146_570/8f49152157c40e473a0326c3f00138842b51fd88db21d705b731965389752c7a.tar",
+      "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/9907794657177651763_1126_570_1146_570/sidecar-publication/packed/sidecars.tar"
+    ],
+    "exit_code": 0,
+    "archive_sha256": "8f49152157c40e473a0326c3f00138842b51fd88db21d705b731965389752c7a",
+    "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/component-bundles-v1/scientific/9907794657177651763_1126_570_1146_570/8f49152157c40e473a0326c3f00138842b51fd88db21d705b731965389752c7a.tar",
+    "bytes": 7176837120
+  },
+  "evidence_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/9907794657177651763_1126_570_1146_570/existing-sidecar-readback.json",
+  "evidence_sha256": "d2dd83b1681901899b8d66991b9372ccdff7e640f602640b460aecd36ef717f4",
+  "scope": "Existing HDFS archive readback identity only; complete publication/eviction/camera and scene checkpoint remain open."
+}

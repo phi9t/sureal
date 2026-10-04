@@ -1,0 +1,67 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-range-shapes-a/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/slices/validation-two-scenes-20260929",
+        "/source",
+        "--",
+        "python",
+        "-c",
+        "import json,hashlib,pyarrow.parquet as pq\nfrom pathlib import Path\nm=json.loads(Path('/source/slice.json').read_text());rows=[];seen=set();sources=[]\nfor obj in m['objects']:\n if obj['component']!='lidar':continue\n p=Path('/source')/obj['relative_path'];digest=hashlib.file_digest(p.open('rb'),'sha256').hexdigest();assert digest==obj['sha256'];sources.append({'context':obj['context'],'sha256':digest})\n columns=['key.segment_context_name','key.frame_timestamp_micros','key.laser_name']+[f'[LiDARComponent].range_image_return{i}.shape' for i in [1,2]]\n for batch in pq.ParquetFile(p).iter_batches(batch_size=64,columns=columns):\n  for r in batch.to_pylist():\n   for ret in [1,2]:\n    shape=r[f'[LiDARComponent].range_image_return{ret}.shape'];key=(r['key.segment_context_name'],r['key.frame_timestamp_micros'],r['key.laser_name'],ret)\n    assert key not in seen and key[0]==obj['context'];seen.add(key)\n    if shape is not None:assert len(shape)==3 and all(type(x) is int and x>0 for x in shape) and shape[2]==4\n    rows.append({'context':key[0],'timestamp':key[1],'laser':key[2],'return':ret,'native_shape':shape})\nassert len(sources)==2 and len(rows)==3970\nPath('/outputs/shapes.json').write_text(json.dumps({'sources':sources,'rows':rows,'scope':'engineering native metadata only; null shape retained, no inferred grid extent'},indent=2))\nprint('PASS original grid shape inventory',len(rows),'records',len(sources),'source-pinned scenes')\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "artifacts": {
+    "output/shapes.json": "77bf84a300fae503b6b735f40ebabdcd5ce12c9b541f748d6bfa16eac50e3281",
+    "live.log": "e9bcd3143bbd18f72507b7fde70068a579a6932dc55c0abc7f0701ac69d7fcd9"
+  },
+  "scope": "engineering native shape metadata recovered in live Insula; scientific103 shape replay still required",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-range-shapes-a/receipt.json",
+  "receipt_sha256": "60641f713bd10f5bd841b5fda1ba556b9ba6b599ea5798de4625966d5a822cc0"
+}

@@ -1,0 +1,18 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/real-semantic-live-b/receipt.json",
+  "receipt_sha256": "20289b80152bb247933d421b33db7fd40ea9684b32c7a86b8f9d2efe3261f4b6",
+  "source_checker_sha256": "d980d271e80734c70fd7f09806febe2af5b8bd2a49f5922fd7604605e53648a2",
+  "source_check_artifacts": {
+    "command.json": "86f6b4718251b8719d2de05c244aa1d93c1ffeea7e1423fa5c1a9c22743b3bb6",
+    "live.log": "25012098b14303897ab511b0580fc98e06e52266b8dd0773423a3546d2d89e79",
+    "source-validation.json": "6c0fe1db98fe3f838992f2eef1bbc55199cdce3a3acdad906ca4d614ad00010c"
+  },
+  "frames": 60,
+  "returns": 120,
+  "points": 9726038,
+  "elapsed_seconds": 18.758974480006145,
+  "children_peak_rss_kib": 48400,
+  "output_bytes": 37482310,
+  "scope": "all engineering-slice labeled TOP points; label replay verifies evaluator only; no model-quality claim",
+  "ticket_09": "open: remaining detection exports, full dependency/configuration/class-mapping checks"
+}

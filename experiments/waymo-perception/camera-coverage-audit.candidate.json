@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "status": "coverage audit candidates; not frozen scientific cohort",
+  "selection": "Audit every official validation camera-segmentation shard larger than the observed empty-table size 10204 bytes, excluding engineering segments. Native positive label coverage, not file size, determines eligibility. Select the first 16 eligible scenes in SHA256(sureal-camera-coverage-v1:segment) order; retain all audited denominators. If fewer than 16 are eligible, leave protocol open. No model outcomes consulted.",
+  "inventory_sha256": "700d0972a677231332ae631634c785cd4aa4105e7a30360aeb9fba7fb2023b3f",
+  "cohorts": {
+    "validation": [
+      "4759225533437988401_800_000_820_000",
+      "1024360143612057520_3580_000_3600_000",
+      "11048712972908676520_545_000_565_000",
+      "9243656068381062947_1297_428_1317_428",
+      "8956556778987472864_3404_790_3424_790",
+      "14081240615915270380_4399_000_4419_000",
+      "933621182106051783_4160_000_4180_000",
+      "12831741023324393102_2673_230_2693_230",
+      "6680764940003341232_2260_000_2280_000",
+      "18024188333634186656_1566_600_1586_600",
+      "8331804655557290264_4351_740_4371_740",
+      "2094681306939952000_2972_300_2992_300",
+      "4575389405178805994_4900_000_4920_000",
+      "7119831293178745002_1094_720_1114_720",
+      "5372281728627437618_2005_000_2025_000",
+      "13982731384839979987_1680_000_1700_000",
+      "7932945205197754811_780_000_800_000",
+      "17694030326265859208_2340_000_2360_000"
+    ]
+  },
+  "excluded_engineering_segments": [
+    "5847910688643719375_180_000_200_000",
+    "8137195482049459160_3100_000_3120_000"
+  ]
+}

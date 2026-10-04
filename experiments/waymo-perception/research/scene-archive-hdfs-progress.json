@@ -1,0 +1,15 @@
+{
+  "status": "engineering derived HDFS round trip verified; scientific publication gate remains open",
+  "audited_utc": "2026-09-30T10:09:22.022160+00:00",
+  "exec_session": 75069,
+  "exec_status": "terminal exit 0",
+  "current_checker_exec_session": 57885,
+  "current_checker_exec_status": "terminal exit 0",
+  "archive_sha256": "6b9ce27c0ec88aa33bd0bc7487967b6fc189c304c8104d483bf6fd6329148702",
+  "archive_bytes": 3376015360,
+  "independently_measured_working_set_bytes": 13856307502,
+  "working_set_limit_bytes": 16106127360,
+  "publication_receipt_sha256": "7a5be366c9faf62ca00b6aea92094e332e35360ce05bfee208ffa6a32b6b87d9",
+  "current_checker_receipt_sha256": "1fa512b4a5cf7822c7fcf1aa86044dcf82472b079e6cb8a2ef9f663a31feb857",
+  "scope": "all 1981 downloaded engineering-scene members independently validated live; scientific cohort and replay-loader gates remain open"
+}

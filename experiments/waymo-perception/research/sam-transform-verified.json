@@ -1,0 +1,91 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/gpu-rootfs",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/point-semantic-live-a/input",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sam-transform-a/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/model-source-inspection/sam-dca509fe793f601edb92606367a655c15ac00fdf/transforms.py",
+        "/tmp/upstream-transform.py",
+        "--",
+        "/opt/waymo/bin/python",
+        "-c",
+        "import importlib.util,json,hashlib,numpy as np,torch\nfrom pathlib import Path\nfrom PIL import Image\nfrom torchvision.ops import nms\nspec=importlib.util.spec_from_file_location('official_sam_transform','/tmp/upstream-transform.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)\nt=m.ResizeLongestSide(32);image=np.arange(13*29*3,dtype=np.uint8).reshape(13,29,3);resized=t.apply_image(image)\nassert resized.shape==(14,32,3)\nexpected=np.asarray(Image.fromarray(image).resize((32,14),resample=Image.Resampling.BILINEAR));np.testing.assert_array_equal(resized,expected)\nboxes=np.array([[1.,2.,27.,12.]]);mapped=t.apply_boxes(boxes,(13,29));np.testing.assert_allclose(mapped,boxes*np.array([32/29,14/13,32/29,14/13]),rtol=0,atol=1e-12);np.testing.assert_array_equal(boxes,[[1.,2.,27.,12.]])\nassert m.ResizeLongestSide.get_preprocess_shape(1280,1920,1024)==(683,1024)\ntorch_version=t.apply_image_torch(torch.from_numpy(image.copy()).permute(2,0,1)[None].float())[0].permute(1,2,0).numpy();difference=float(np.abs(torch_version-resized.astype(np.float32)).max())\nassert nms(torch.tensor([[0.,0.,2.,2.],[0.,0.,2.,2.]]),torch.tensor([.9,.8]),.5).tolist()==[0]\nr={'source_sha256':hashlib.sha256(Path('/tmp/upstream-transform.py').read_bytes()).hexdigest(),'fixture_native_shape':[13,29],'resized_shape':[14,32],'large_native_resized_shape':[683,1024],'PIL_expected_image_parity':'exact','prompt_box_scaling_tolerance':1e-12,'torch_vs_expected_image_max_abs':difference,'torchvision_nms_cpu':'passed','scope':'official pinned SAM preprocessing/dependency probe; no checkpoint inference or Waymo mask result'}\nPath('/outputs/check.json').write_text(json.dumps(r,indent=2));print('PASS official SAM transform',r)\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "code_commit": "dca509fe793f601edb92606367a655c15ac00fdf",
+  "runtime_lock": {
+    "image_id": "sha256:46bdaa6e8d9058d7e09419085dfcf9a4527e801330045ae8e0f387f454413b86",
+    "rootfs_sha256": "55f63770083be16ea76764422c51e6e5d995b2d65e9785b552e118a64c6e2f1f",
+    "recipe_hashes": {
+      "Dockerfile": "48484266fe92aaf1a94823fac0746eafef7ac78d0a8754fa9d8f279e8d96c19b",
+      "requirements.lock": "038ba6bbc16870b6430481127b15ab2830e5dac0a6b14c30f218a43853e35923",
+      "build.sh": "bd554045bf0dd40aeceb495fd25ff6ea62ad8e04e93a0c81b203f2c141bcce55"
+    }
+  },
+  "validation": {
+    "source_sha256": "26a649f2bca8a4a24b4d56617487a9a54c4279e559b2b813c9de38f58a60107c",
+    "fixture_native_shape": [
+      13,
+      29
+    ],
+    "resized_shape": [
+      14,
+      32
+    ],
+    "large_native_resized_shape": [
+      683,
+      1024
+    ],
+    "PIL_expected_image_parity": "exact",
+    "prompt_box_scaling_tolerance": 1e-12,
+    "torch_vs_expected_image_max_abs": 0.9487152099609375,
+    "torchvision_nms_cpu": "passed",
+    "scope": "official pinned SAM preprocessing/dependency probe; no checkpoint inference or Waymo mask result"
+  },
+  "artifacts": {
+    "live.log": "97ec7ab41d3c2288c00eba69f5e704d6dfe2278938f83e170bbcf3afe2d83d32",
+    "output/check.json": "ff16d4af0e5e516e4c44afe1a7eda279233d72d3e91b2e4f3a508cf825bdedef"
+  },
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sam-transform-a/receipt.json",
+  "receipt_sha256": "38c9c14bc40558c1410c663bb279758c079a552d0013a92b5d58cb3a4e18de11"
+}

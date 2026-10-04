@@ -1,0 +1,24 @@
+{
+  "scene": "4575389405178805994_4900_000_4920_000",
+  "command": [
+    "python3",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/publish-scientific-sidecars-compressed.py",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/4575389405178805994_4900_000_4920_000/points",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/4575389405178805994_4900_000_4920_000/sidecar-publication",
+    "--expected-scene-receipt-sha256",
+    "2cc7665d3398a9e28c8a5734da23780238832789496cea93d2fb223126c3d077"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 103.69108347798465,
+  "metadata_preflight_bytes": 8993756130,
+  "metadata_reserve_bytes": 16777216,
+  "archive_output_ceiling_enforced_by_writer": true,
+  "cap_bytes": 16106127360,
+  "measured_end_bytes": 9473165411,
+  "candidate_hashes": {
+    "publish-scientific-sidecars-compressed.py": "de2fe7d3d7e05ae121581cd7c91ecf25e51af4f04d2a95e679ebf83c855dc092",
+    "pipeline/compressed_component_archive.py": "d9fb8258210f14703ece9e2e934ae9d2993074eeba807d20271125f17a29caa4",
+    "pipeline/compressed_component_archive_validate.py": "a6ff9fef99fa2af63c3dceabd95729509ada79ac3a05f8110b551c83bdd0f3fa"
+  },
+  "scope": "publication recovery only; independent audit, eviction, camera stages and full lifecycle admission remain required"
+}

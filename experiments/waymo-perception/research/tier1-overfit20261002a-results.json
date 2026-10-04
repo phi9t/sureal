@@ -1,0 +1,686 @@
+{
+  "run_directory": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/tier1-overfit20261002a",
+  "metadata_sha256": "0cd268006e825607492f543aae9c6cac12a81ac4c278d98d11a1c16456c78c33",
+  "cases": {
+    "baseline": {
+      "status": "running extension",
+      "curve": [
+        {
+          "step": 0,
+          "cumulative_train_seconds": 0,
+          "evaluation_losses": [
+            {
+              "classification": 790.3201904296875,
+              "localization": 2.504995107650757,
+              "direction": 0.6401427984237671,
+              "total": 795.458251953125
+            }
+          ],
+          "batch_statistics_losses": {
+            "classification": 794.6611938476562,
+            "localization": 2.5873265266418457,
+            "direction": 0.679247260093689,
+            "total": 799.9717407226562
+          },
+          "head_sha256": "c932b4b9cba26cdb72fac3d6f7a1cba0854f92d4c7ec9c7b1d3ccf402a90cc01",
+          "class_statistics": {
+            "1": {
+              "positive_anchors": 338,
+              "true_class_probability_mean": 0.5183489918708801
+            },
+            "2": {
+              "positive_anchors": 30,
+              "true_class_probability_mean": 0.5117926001548767
+            },
+            "3": {
+              "positive_anchors": 16,
+              "true_class_probability_mean": 0.4224182963371277
+            },
+            "4": {
+              "positive_anchors": 6,
+              "true_class_probability_mean": 0.3946819305419922
+            }
+          },
+          "LEVEL2_per_class": {
+            "1": {
+              "AP": 0.0,
+              "APH": 0.0
+            },
+            "2": {
+              "AP": 0.0,
+              "APH": 0.0
+            },
+            "3": {
+              "AP": 0.0,
+              "APH": 0.0
+            },
+            "4": {
+              "AP": 0.0,
+              "APH": 0.0
+            }
+          },
+          "all_class_quality_passed": false
+        },
+        {
+          "step": 25,
+          "cumulative_train_seconds": 2.0058008511550725,
+          "evaluation_losses": [
+            {
+              "classification": 101.57840728759766,
+              "localization": 1.3351646661758423,
+              "direction": 0.7088760733604431,
+              "total": 104.39051055908203
+            }
+          ],
+          "batch_statistics_losses": {
+            "classification": 100.50768280029297,
+            "localization": 1.3355778455734253,
+            "direction": 0.7105434536933899,
+            "total": 103.3209457397461
+          },
+          "head_sha256": "ab56a647fa3a1d7745e7fe2a56c388e46582d45b079d6a84974f1f406c618338",
+          "class_statistics": {
+            "1": {
+              "positive_anchors": 338,
+              "true_class_probability_mean": 0.31505051255226135
+            },
+            "2": {
+              "positive_anchors": 30,
+              "true_class_probability_mean": 0.27674973011016846
+            },
+            "3": {
+              "positive_anchors": 16,
+              "true_class_probability_mean": 0.2534716725349426
+            },
+            "4": {
+              "positive_anchors": 6,
+              "true_class_probability_mean": 0.26274576783180237
+            }
+          },
+          "LEVEL2_per_class": {
+            "1": {
+              "AP": 0.0,
+              "APH": 0.0
+            },
+            "2": {
+              "AP": 0.0,
+              "APH": 0.0
+            },
+            "3": {
+              "AP": 0.0,
+              "APH": 0.0
+            },
+            "4": {
+              "AP": 0.0,
+              "APH": 0.0
+            }
+          },
+          "all_class_quality_passed": false
+        },
+        {
+          "step": 50,
+          "cumulative_train_seconds": 3.70474706729874,
+          "evaluation_losses": [
+            {
+              "classification": 20.347095489501953,
+              "localization": 0.7127870321273804,
+              "direction": 0.6316760182380676,
+              "total": 21.899003982543945
+            }
+          ],
+          "batch_statistics_losses": {
+            "classification": 20.32700538635254,
+            "localization": 0.7122839689254761,
+            "direction": 0.6315960884094238,
+            "total": 21.877893447875977
+          },
+          "head_sha256": "8bdf2caff6666cba5618d821b095ff9e262eb95f41e874889a1b9642863c8781",
+          "class_statistics": {
+            "1": {
+              "positive_anchors": 338,
+              "true_class_probability_mean": 0.21220915019512177
+            },
+            "2": {
+              "positive_anchors": 30,
+              "true_class_probability_mean": 0.17126242816448212
+            },
+            "3": {
+              "positive_anchors": 16,
+              "true_class_probability_mean": 0.15993797779083252
+            },
+            "4": {
+              "positive_anchors": 6,
+              "true_class_probability_mean": 0.1483728140592575
+            }
+          },
+          "LEVEL2_per_class": {
+            "1": {
+              "AP": 0.0,
+              "APH": 0.0
+            },
+            "2": {
+              "AP": 0.0,
+              "APH": 0.0
+            },
+            "3": {
+              "AP": 0.0,
+              "APH": 0.0
+            },
+            "4": {
+              "AP": 0.0,
+              "APH": 0.0
+            }
+          },
+          "all_class_quality_passed": false
+        },
+        {
+          "step": 100,
+          "cumulative_train_seconds": 7.072857392136939,
+          "evaluation_losses": [
+            {
+              "classification": 1.6056915521621704,
+              "localization": 0.2452031522989273,
+              "direction": 0.5496343970298767,
+              "total": 2.2060248851776123
+            }
+          ],
+          "batch_statistics_losses": {
+            "classification": 1.6050406694412231,
+            "localization": 0.24268798530101776,
+            "direction": 0.5513363480567932,
+            "total": 2.200683832168579
+          },
+          "head_sha256": "d29d00f9abb954f5b64914c4a8e0acec71ce46deba9a905a281c9863be9cf04c",
+          "class_statistics": {
+            "1": {
+              "positive_anchors": 338,
+              "true_class_probability_mean": 0.11045501381158829
+            },
+            "2": {
+              "positive_anchors": 30,
+              "true_class_probability_mean": 0.07245007157325745
+            },
+            "3": {
+              "positive_anchors": 16,
+              "true_class_probability_mean": 0.06721135973930359
+            },
+            "4": {
+              "positive_anchors": 6,
+              "true_class_probability_mean": 0.059031806886196136
+            }
+          },
+          "LEVEL2_per_class": {
+            "1": {
+              "AP": 0.0596572,
+              "APH": 0.0301225
+            },
+            "2": {
+              "AP": 0.0,
+              "APH": 0.0
+            },
+            "3": {
+              "AP": 0.0,
+              "APH": 0.0
+            },
+            "4": {
+              "AP": 0.0,
+              "APH": 0.0
+            }
+          },
+          "all_class_quality_passed": false
+        },
+        {
+          "step": 200,
+          "cumulative_train_seconds": 13.978557635331526,
+          "evaluation_losses": [
+            {
+              "classification": 0.4933239221572876,
+              "localization": 0.014941594563424587,
+              "direction": 0.3080163896083832,
+              "total": 0.5848103761672974
+            }
+          ],
+          "batch_statistics_losses": {
+            "classification": 0.4921647608280182,
+            "localization": 0.010939598083496094,
+            "direction": 0.3085556924343109,
+            "total": 0.5757550597190857
+          },
+          "head_sha256": "c53151a7f3f0766d566cc264305b690eadca204ace5a27d795e8cf490e87fa8a",
+          "class_statistics": {
+            "1": {
+              "positive_anchors": 338,
+              "true_class_probability_mean": 0.2400294840335846
+            },
+            "2": {
+              "positive_anchors": 30,
+              "true_class_probability_mean": 0.07536064833402634
+            },
+            "3": {
+              "positive_anchors": 16,
+              "true_class_probability_mean": 0.08052507042884827
+            },
+            "4": {
+              "positive_anchors": 6,
+              "true_class_probability_mean": 0.04831196367740631
+            }
+          },
+          "LEVEL2_per_class": {
+            "1": {
+              "AP": 0.529056,
+              "APH": 0.434449
+            },
+            "2": {
+              "AP": 0.0,
+              "APH": 0.0
+            },
+            "3": {
+              "AP": 0.0714286,
+              "APH": 0.000918453
+            },
+            "4": {
+              "AP": 0.0,
+              "APH": 0.0
+            }
+          },
+          "all_class_quality_passed": false
+        },
+        {
+          "step": 300,
+          "cumulative_train_seconds": 32.310343475372065,
+          "evaluation_losses": [
+            {
+              "classification": 0.19805020093917847,
+              "localization": 0.00360907893627882,
+              "direction": 0.11664579063653946,
+              "total": 0.2285975068807602
+            }
+          ],
+          "batch_statistics_losses": {
+            "classification": 0.19749821722507477,
+            "localization": 0.0026372745633125305,
+            "direction": 0.11667891591787338,
+            "total": 0.22610855102539062
+          },
+          "head_sha256": "634defcde45f271dc1b57fcca3eb6b7a64206e2911faf65e71c1a94e2dcab4ea",
+          "class_statistics": {
+            "1": {
+              "positive_anchors": 338,
+              "true_class_probability_mean": 0.5290688276290894
+            },
+            "2": {
+              "positive_anchors": 30,
+              "true_class_probability_mean": 0.17309357225894928
+            },
+            "3": {
+              "positive_anchors": 16,
+              "true_class_probability_mean": 0.19321109354496002
+            },
+            "4": {
+              "positive_anchors": 6,
+              "true_class_probability_mean": 0.09823234379291534
+            }
+          },
+          "LEVEL2_per_class": {
+            "1": {
+              "AP": 0.889674,
+              "APH": 0.887463
+            },
+            "2": {
+              "AP": 0.732251,
+              "APH": 0.602588
+            },
+            "3": {
+              "AP": 0.465848,
+              "APH": 0.305762
+            },
+            "4": {
+              "AP": 0.0,
+              "APH": 0.0
+            }
+          },
+          "all_class_quality_passed": false
+        },
+        {
+          "step": 500,
+          "cumulative_train_seconds": 77.30945189524209,
+          "evaluation_losses": [
+            {
+              "classification": 0.03365887701511383,
+              "localization": 0.002232714556157589,
+              "direction": 0.009188028052449226,
+              "total": 0.039961911737918854
+            }
+          ],
+          "batch_statistics_losses": {
+            "classification": 0.03363800048828125,
+            "localization": 0.0020308690145611763,
+            "direction": 0.009196280501782894,
+            "total": 0.039538994431495667
+          },
+          "head_sha256": "ba0c5d93f4326cb09a325b1302a7ac86c611344acf6bbd08647976d3cd6c8bd6",
+          "class_statistics": {
+            "1": {
+              "positive_anchors": 338,
+              "true_class_probability_mean": 0.808972954750061
+            },
+            "2": {
+              "positive_anchors": 30,
+              "true_class_probability_mean": 0.5641158223152161
+            },
+            "3": {
+              "positive_anchors": 16,
+              "true_class_probability_mean": 0.5716477632522583
+            },
+            "4": {
+              "positive_anchors": 6,
+              "true_class_probability_mean": 0.5779209136962891
+            }
+          },
+          "LEVEL2_per_class": {
+            "1": {
+              "AP": 1.0,
+              "APH": 0.998933
+            },
+            "2": {
+              "AP": 1.0,
+              "APH": 0.664584
+            },
+            "3": {
+              "AP": 0.928571,
+              "APH": 0.733775
+            },
+            "4": {
+              "AP": 1.0,
+              "APH": 0.999151
+            }
+          },
+          "all_class_quality_passed": false
+        },
+        {
+          "step": 750,
+          "cumulative_train_seconds": 133.63048808620078,
+          "evaluation_losses": [
+            {
+              "classification": 0.011267637833952904,
+              "localization": 0.00016253850481007248,
+              "direction": 0.002726029371842742,
+              "total": 0.01213792059570551
+            }
+          ],
+          "batch_statistics_losses": {
+            "classification": 0.011267077177762985,
+            "localization": 0.00015421901480294764,
+            "direction": 0.0027259313501417637,
+            "total": 0.012120701372623444
+          },
+          "head_sha256": "2c866613cf002dcaaa5069a6261063eaf40112490ca88fd53a707a467ec1ac1a",
+          "class_statistics": {
+            "1": {
+              "positive_anchors": 338,
+              "true_class_probability_mean": 0.8665744662284851
+            },
+            "2": {
+              "positive_anchors": 30,
+              "true_class_probability_mean": 0.7585013508796692
+            },
+            "3": {
+              "positive_anchors": 16,
+              "true_class_probability_mean": 0.7437774538993835
+            },
+            "4": {
+              "positive_anchors": 6,
+              "true_class_probability_mean": 0.7675678133964539
+            }
+          },
+          "LEVEL2_per_class": {
+            "1": {
+              "AP": 1.0,
+              "APH": 0.999459
+            },
+            "2": {
+              "AP": 1.0,
+              "APH": 0.741473
+            },
+            "3": {
+              "AP": 0.928571,
+              "APH": 0.713751
+            },
+            "4": {
+              "AP": 1.0,
+              "APH": 0.999499
+            }
+          },
+          "all_class_quality_passed": false
+        },
+        {
+          "step": 1000,
+          "cumulative_train_seconds": 191.81088588031707,
+          "evaluation_losses": [
+            {
+              "classification": 0.0060964045114815235,
+              "localization": 0.00017049515736289322,
+              "direction": 0.0014543040888383985,
+              "total": 0.006728255655616522
+            }
+          ],
+          "batch_statistics_losses": {
+            "classification": 0.006096431519836187,
+            "localization": 0.00016633080667816103,
+            "direction": 0.0014544447185471654,
+            "total": 0.006719981785863638
+          },
+          "head_sha256": "26f80809ed8a29585c7d4f9ba30c5ec4b123fc0ae4fdd76b8734f08ba06fa629",
+          "class_statistics": {
+            "1": {
+              "positive_anchors": 338,
+              "true_class_probability_mean": 0.8872662782669067
+            },
+            "2": {
+              "positive_anchors": 30,
+              "true_class_probability_mean": 0.8082697987556458
+            },
+            "3": {
+              "positive_anchors": 16,
+              "true_class_probability_mean": 0.7904253005981445
+            },
+            "4": {
+              "positive_anchors": 6,
+              "true_class_probability_mean": 0.8130416870117188
+            }
+          },
+          "LEVEL2_per_class": {
+            "1": {
+              "AP": 1.0,
+              "APH": 0.97266
+            },
+            "2": {
+              "AP": 1.0,
+              "APH": 0.703233
+            },
+            "3": {
+              "AP": 0.928572,
+              "APH": 0.713743
+            },
+            "4": {
+              "AP": 1.0,
+              "APH": 0.999549
+            }
+          },
+          "all_class_quality_passed": false
+        },
+        {
+          "step": 1500,
+          "cumulative_train_seconds": 240.8548292934429,
+          "evaluation_losses": [
+            {
+              "classification": 0.00263786967843771,
+              "localization": 0.0005270930705592036,
+              "direction": 0.0005150777287781239,
+              "total": 0.0037950712721794844
+            }
+          ],
+          "batch_statistics_losses": {
+            "classification": 0.0026378161273896694,
+            "localization": 0.0005286982632242143,
+            "direction": 0.0005152151570655406,
+            "total": 0.0037982556968927383
+          },
+          "head_sha256": "dc08479a383ac53c1c23a7b43ff73885e90e7cb34e2505c1c8e85bc4e5615465",
+          "class_statistics": {
+            "1": {
+              "positive_anchors": 338,
+              "true_class_probability_mean": 0.9229604005813599
+            },
+            "2": {
+              "positive_anchors": 30,
+              "true_class_probability_mean": 0.871159017086029
+            },
+            "3": {
+              "positive_anchors": 16,
+              "true_class_probability_mean": 0.8549551367759705
+            },
+            "4": {
+              "positive_anchors": 6,
+              "true_class_probability_mean": 0.8805524706840515
+            }
+          },
+          "LEVEL2_per_class": {
+            "1": {
+              "AP": 1.0,
+              "APH": 0.999266
+            },
+            "2": {
+              "AP": 1.0,
+              "APH": 0.723149
+            },
+            "3": {
+              "AP": 0.928571,
+              "APH": 0.713944
+            },
+            "4": {
+              "AP": 1.0,
+              "APH": 0.999302
+            }
+          },
+          "all_class_quality_passed": false
+        },
+        {
+          "step": 2000,
+          "cumulative_train_seconds": 274.07391278853174,
+          "evaluation_losses": [
+            {
+              "classification": 0.0010073055746033788,
+              "localization": 5.469549432746135e-05,
+              "direction": 0.0003111745754722506,
+              "total": 0.0011789314448833466
+            }
+          ],
+          "batch_statistics_losses": {
+            "classification": 0.0010072721634060144,
+            "localization": 5.477073500514962e-05,
+            "direction": 0.00031131968717090786,
+            "total": 0.0011790775461122394
+          },
+          "head_sha256": "8a79e0e693b9f1cc6dfc207ffe38c4d75272d5be02b5a0beb1e1208a39cb047a",
+          "class_statistics": {
+            "1": {
+              "positive_anchors": 338,
+              "true_class_probability_mean": 0.9331138730049133
+            },
+            "2": {
+              "positive_anchors": 30,
+              "true_class_probability_mean": 0.8914293050765991
+            },
+            "3": {
+              "positive_anchors": 16,
+              "true_class_probability_mean": 0.8745180368423462
+            },
+            "4": {
+              "positive_anchors": 6,
+              "true_class_probability_mean": 0.8992525339126587
+            }
+          },
+          "LEVEL2_per_class": {
+            "1": {
+              "AP": 1.0,
+              "APH": 0.999486
+            },
+            "2": {
+              "AP": 1.0,
+              "APH": 0.758646
+            },
+            "3": {
+              "AP": 0.928571,
+              "APH": 0.714347
+            },
+            "4": {
+              "AP": 1.0,
+              "APH": 0.99937
+            }
+          },
+          "all_class_quality_passed": false
+        },
+        {
+          "step": 3000,
+          "cumulative_train_seconds": 348.0452699586167,
+          "evaluation_losses": [
+            {
+              "classification": 0.00029949084273539484,
+              "localization": 1.0161039426748175e-05,
+              "direction": 0.00013676987146027386,
+              "total": 0.00034716687514446676
+            }
+          ],
+          "batch_statistics_losses": {
+            "classification": 0.0002994920068886131,
+            "localization": 1.0102636224473827e-05,
+            "direction": 0.00013681448763236403,
+            "total": 0.00034706018050201237
+          },
+          "head_sha256": "daa843ee1285a1698ec13f6a79a8723c89b75150875f968674981aaf59c11572",
+          "class_statistics": {
+            "1": {
+              "positive_anchors": 338,
+              "true_class_probability_mean": 0.9492903351783752
+            },
+            "2": {
+              "positive_anchors": 30,
+              "true_class_probability_mean": 0.9187690019607544
+            },
+            "3": {
+              "positive_anchors": 16,
+              "true_class_probability_mean": 0.9033416509628296
+            },
+            "4": {
+              "positive_anchors": 6,
+              "true_class_probability_mean": 0.9236132502555847
+            }
+          },
+          "LEVEL2_per_class": {
+            "1": {
+              "AP": 1.0,
+              "APH": 0.99994
+            },
+            "2": {
+              "AP": 1.0,
+              "APH": 0.759893
+            },
+            "3": {
+              "AP": 0.928572,
+              "APH": 0.714205
+            },
+            "4": {
+              "AP": 1.0,
+              "APH": 0.999876
+            }
+          },
+          "all_class_quality_passed": false
+        }
+      ],
+      "parameters": 4847144,
+      "updates": 3000
+    }
+  },
+  "scope": "one fixed all-class batch; native all four LEVEL2 APH >= .8 at consecutive terminal checkpoints; training only"
+}

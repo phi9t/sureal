@@ -1,0 +1,100 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/norm-no_norm-v1",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/no-norm-decode-failure-v1/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.scratch/no-norm-decode-failure.py",
+        "/tmp/worker.py",
+        "--",
+        "python",
+        "/tmp/worker.py"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "training_evidence_sha256": "9b5294807ddc3596ade8029e0daa66d56a05d20571bf6c91eafa9f63e93817db",
+  "worker_sha256": "15a1579acaeee4c0ad042095b43e77c78fd9780a46f71a40084be9c9c93053e1",
+  "validation": {
+    "variant": "no_norm",
+    "scope": "independent literal decoded-dimension failure count plus original decoder refusal; no native quality claim",
+    "checkpoints": [
+      {
+        "step": 25,
+        "heads_sha256": "f8e78febf6f57b4670262dd187ea9a5c6edf161be769426442c6f1b4db4ae3a4",
+        "head_values_finite": true,
+        "log_dimension_residual_range": [
+          -2439.193115234375,
+          3615.822021484375
+        ],
+        "invalid_decoded_dimensions_all_anchors": 3729,
+        "invalid_above_score_floor": 0,
+        "invalid_in_preNMS4096": 0,
+        "decoder_error": "nonfinite or degenerate decoded box"
+      },
+      {
+        "step": 2000,
+        "heads_sha256": "e8995b486e60bd2adf96540a9c43bf12dfb6e2ef225f5b547f11e07e2e0f8c88",
+        "head_values_finite": true,
+        "log_dimension_residual_range": [
+          -2682103296.0,
+          2101700096.0
+        ],
+        "invalid_decoded_dimensions_all_anchors": 307932,
+        "invalid_above_score_floor": 0,
+        "invalid_in_preNMS4096": 0,
+        "decoder_error": "nonfinite or degenerate decoded box"
+      }
+    ]
+  },
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/no-norm-decode-failure-v1/output/live.log": "42f2a93a7d5818a8113d63439be1d59f001855ef18ec3087cb80bb5a1577dc80",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/no-norm-decode-failure-v1/output/check.json": "21bf76b37d8c8ed08c153466e9573fabd93b63c954b99377e325919dc1a5198a"
+  }
+}

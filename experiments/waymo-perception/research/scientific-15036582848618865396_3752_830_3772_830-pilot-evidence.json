@@ -1,0 +1,15 @@
+{
+  "status": "next training scene independently audited after live preprocessing",
+  "processing": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/train-15036582848618865396_3752_830_3772_830",
+  "receipt_hashes": {
+    "camera_calibration": "055154f90982f154eed8c7f3902aade0cb994ddd50602cb1050428e4f64a25f5",
+    "lidar_box": "e88ed33bc8f178cf6728064ff15217779830ebf28dcef8a456d8fd460f08a28a",
+    "lidar_calibration": "a15e719b64e851e8d66052b67a87a7de20089753d9aaa0a50154eea184246c6c",
+    "lidar_camera_projection": "33bb75448298539232be690474586dc7c383554725602d732762e0a3a2d6cf49",
+    "lidar_pose": "c761d75d907a07ff68301d8e4e83cc95c6b14b05bfbbcd0c90387b2cb0b56dfe",
+    "lidar_segmentation": "3417be14e99a79aa6832307206c92f4f36f5adfbe026a02ca4585a5c3f938342",
+    "reconstruction": "a95f85e9bb85f97f3040416f58d4c8ba1b434f9946b1984018851824c1ede50a",
+    "vehicle_pose": "24dd5de0920c31175f81ac1a04c0d44ac777c46399a2d5d34f4a3c2c143a226c"
+  },
+  "scope": "native reconstruction/sidecars only; publication/replay and camera task inputs pending"
+}

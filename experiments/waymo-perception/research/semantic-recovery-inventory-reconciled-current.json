@@ -1,0 +1,126 @@
+{
+  "observed_utc": "2026-10-01T06:47:11.446781+00:00",
+  "snapshot_hashes": {
+    "manifest": "c181a07edc21731a3e1b74a2274e286c9bc4207e6e0c46e6a1f2403978608370",
+    "processing": "4ef773df24286b58a1e4aba9e091711b70708580cba02596f793f9a6bd30c3e3",
+    "semantic": "8fccb0f941d99a165ac5167410d1da914d03575cab580d70a00a66d34916f083",
+    "inventory": "49767cc6c0d1a3d309e025ea563c4f1fa88883846d2664d76838e12de2810a80"
+  },
+  "selected_scenes": 103,
+  "processed_scenes": 83,
+  "semantic_scenes": 62,
+  "missing_processed_scenes": 22,
+  "sources": [
+    {
+      "scene": "1730266523558914470_305_260_325_260",
+      "archive_sha256": "fae12ded2bb31c2e87a5d91811e09f9c45234a249a44f103bf82cf730abd1a6f",
+      "publication_manifest_sha256": "e8dbff0a4e74b003b615dbc1dae508078aec59dad5db5334bf3b9c84eada151e"
+    },
+    {
+      "scene": "4759225533437988401_800_000_820_000",
+      "archive_sha256": "600b95f7ca09fb4b75f17d8a7ed11c786aee6ecc0f6ead83d93c3cf2ea04d178",
+      "publication_manifest_sha256": "347ab7f519964d04ef52899b251b34f81e4a434d7d441f558e8240cb8eb8f072"
+    },
+    {
+      "scene": "15036582848618865396_3752_830_3772_830",
+      "archive_sha256": "928fd98bbf6ce943d4bef78b788ce27164333228ccba36405e4444a47865cc85",
+      "publication_manifest_sha256": "5f956ee1bb12a4bdcf7b40f3bc3d4129b301b216fb2f0653c55941194892ccec"
+    },
+    {
+      "scene": "11343624116265195592_5910_530_5930_530",
+      "archive_sha256": "8f66b4bc728173dfa82f1a559115d00333b4e16b609cf23a95f617e485e38c0b",
+      "publication_manifest_sha256": "d642093bd3e451590b4d243504390bad004f8d7e82fa28bb97b27700a3ea40ee"
+    },
+    {
+      "scene": "4447423683538547117_536_022_556_022",
+      "archive_sha256": "d083a87ad72bebf68ff00523bca8c9ec681196b2b0d96eb70ebeba6d0ad2a3e1",
+      "publication_manifest_sha256": "81fb6a36d691ae2ffc9c5623f2235c63b138da79f2c19508023d7c93843536d0"
+    },
+    {
+      "scene": "14503113925613619599_975_506_995_506",
+      "archive_sha256": "2fe5d3962b28671b8f7076ead7ccc53a8761c2dc820801cd93503b5f70c47cdf",
+      "publication_manifest_sha256": "c0c0a52fbf930ef2590dce1fb66637be479aefe3831d8bd69bdeaee22a5f99f8"
+    },
+    {
+      "scene": "3375636961848927657_1942_000_1962_000",
+      "archive_sha256": "7c954228b624f5dad93fb6c58a2f061afd61cb6a31498c8d6525495a1310b12d",
+      "publication_manifest_sha256": "849eae1c97977d0136f1136fb9bc457f6011333acc51f792f562fd43702d3dac"
+    },
+    {
+      "scene": "6813611334239274394_535_000_555_000",
+      "archive_sha256": "0f24789170918e2f9eb93299cda1e78d552937c756228c64d147e7198c966d3b",
+      "publication_manifest_sha256": "06357dec2122ed8ffe1dd64bfe197457bca14a426357dea7592f73d6f09e14a0"
+    },
+    {
+      "scene": "990914685337955114_980_000_1000_000",
+      "archive_sha256": "2ed61dc7a0d7cdad227e0dcc853c937c910746d96020102cef02e6e45da9fc58",
+      "publication_manifest_sha256": "ce1bacde5e6117a3c3e787a5a145932ff6e9affe44ae81f755cfd3f9e7fd1325"
+    },
+    {
+      "scene": "8796914080594559459_4284_170_4304_170",
+      "archive_sha256": "862f16084a4832ba7a23ba60be0953b1a819b34ce351b0f824d17cdf7daef9c1",
+      "publication_manifest_sha256": "f80cc0dcc78368a1bde36daf9d37aaf4d8adfdb2c4b666c1a5eec11653c90311"
+    },
+    {
+      "scene": "12257951615341726923_2196_690_2216_690",
+      "archive_sha256": "3584ccd640f352ee4cbb41830495efe3a337bdd8b3960c2f657f50fdb6c95529",
+      "publication_manifest_sha256": "caf90a6b99a0be81db65e93da942d9360ab5c24835174322e0a55a361ebb5b74"
+    },
+    {
+      "scene": "13186511704021307558_2000_000_2020_000",
+      "archive_sha256": "3b28bac267549cb270f879e3f10f81cfbc5d4cd86363b11f7471febe08b4fa6a",
+      "publication_manifest_sha256": "5136c2d067188ac9f46a1ef3f916d196ce53fa366ce21318d0e208df4d35aa57"
+    },
+    {
+      "scene": "17885096890374683162_755_580_775_580",
+      "archive_sha256": "02bee397e25331cf63820c34ebea5daac4f5396ee5de17066b9a10bcd5fb60f7",
+      "publication_manifest_sha256": "c13f17a3eb01ee21b7372dd211fd6a7e4099365ebf710699e4532c2a292e077a"
+    },
+    {
+      "scene": "7912728502266478772_1202_200_1222_200",
+      "archive_sha256": "da8d495ad4730ee442250b9be1dbdf3c2d74746f3e1f02ad77c6d0958c5e5d6a",
+      "publication_manifest_sha256": "eafb93c3a1b4af0c0bc7dc4034d8c52a34f05a375229b2f9ff0f033183e03b85"
+    },
+    {
+      "scene": "4723255145958809564_741_350_761_350",
+      "archive_sha256": "a02268e069715be41c3d62902f20ebf70f7e2199019382ba7fcd9ed9a5f8cc85",
+      "publication_manifest_sha256": "584d6ca787dac795c9811ce57435c71435fd81bca0b7511a434e3ce99f885f37"
+    },
+    {
+      "scene": "8454755173123314088_3202_000_3222_000",
+      "archive_sha256": "1c216616220c24ae13c3f6a5dba3af5a7bfbd09cc074f0f43c61681836fe4b63",
+      "publication_manifest_sha256": "2ca37a6c10d730431defa2af1a90afa5ec049483a60ede634260e860d090c367"
+    },
+    {
+      "scene": "3894883757914505116_1840_000_1860_000",
+      "archive_sha256": "f9d9f4af7016a3ba0e1abf39f4407feeb82e4b67a7280c7f3a9a4c0b512c0cfc",
+      "publication_manifest_sha256": "5d4df6515cf74a1bd641747619a165bf6aa7cad7699ce6322020c46451191dca"
+    },
+    {
+      "scene": "13271285919570645382_5320_000_5340_000",
+      "archive_sha256": "a158c462d4e633673a628f22816c11e4ff73c5fc94ca8c76ca0e0ce9841aeb6c",
+      "publication_manifest_sha256": "3f51f6b25a3a62b1d16f5b9b1e90f5b11449c49237c34a6fec6ec9a3100e7ab4"
+    },
+    {
+      "scene": "8345535260120974350_1980_000_2000_000",
+      "archive_sha256": "b31cbd29f8a47b99983d0177541b75646dbd7e16b8ad31a49019fd488e94b786",
+      "publication_manifest_sha256": "3f6b355b843222509f88aca199fed77790926f59060e8d56b45ab31b89e6499c"
+    },
+    {
+      "scene": "1357883579772440606_2365_000_2385_000",
+      "archive_sha256": "b3bad587624bdd8a188901f61c04636742af4b4421076dfee860f6653de50b8c",
+      "publication_manifest_sha256": "b280e32ca435512a3d544c2b2e101401f7cbdfd41fce9d21efec12264263b9fb"
+    },
+    {
+      "scene": "16977844994272847523_2140_000_2160_000",
+      "archive_sha256": "91a175fe2b189aca40def5cfef219f31c727a444b2649f7223021cd8e71d91c2",
+      "publication_manifest_sha256": "f19a5a80063fec57aacda9207ab4e80ad8d9218eba2ccccc61adbba19af35b8a"
+    },
+    {
+      "scene": "9465500459680839281_1100_000_1120_000",
+      "archive_sha256": "fa24b7ac4081cad1bf70c3c75ccedd582d7dfb019d1665a5dc063f4446c5a617",
+      "publication_manifest_sha256": "015d0945e9823dc8239939eb3b63e02c3fface4c9c1ff0028183de00d813e978"
+    }
+  ],
+  "scope": "current snapshot and externally pinned lifecycle/publication identities reconciled; real recovery and final103 semantic admission pending"
+}

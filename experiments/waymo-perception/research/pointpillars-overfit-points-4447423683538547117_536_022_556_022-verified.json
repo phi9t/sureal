@@ -1,0 +1,101 @@
+{
+  "scene": "4447423683538547117_536_022_556_022",
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/overfit-point-frames-v1/4447423683538547117_536_022_556_022",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/overfit-points-retained-4447423683538547117_536_022_556_022-v1/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/overfit-points-retained-4447423683538547117_536_022_556_022-v1/input",
+        "/tmp/input",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.scratch",
+        "/tmp/workers",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/overfit-box-targets-v1/4447423683538547117_536_022_556_022/producer",
+        "/tmp/boxes",
+        "--",
+        "python",
+        "-c",
+        "import hashlib,json,math\nfrom pathlib import Path\nimport numpy as np\nsha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()\ne=json.loads(Path('/tmp/input/expected.json').read_text());assert sha('/source/receipt.json')==e['receipt_sha256'];rec=json.loads(Path('/source/receipt.json').read_text());entry=e['entry'];assert rec['scene']==entry['scene'] and rec['candidate_sha256']==e['candidate_sha256'] and rec['runtime_lock']==e['runtime_lock'] and rec['point_publication']==entry['point_publication'];assert rec['box_evidence_sha256']==e['box_evidence_sha256'] and rec['box_report_sha256']==e['box_report_sha256'];assert len(rec['checks'])==2 and all(type(x['exit_code']) is int and x['exit_code']==0 for x in rec['checks'])\nfor p,h in e['code_hashes'].items():assert sha(Path('/experiment')/p)==h\nfor p,h in e['worker_hashes'].items():assert sha(Path('/tmp/workers')/p)==h\nfor p,h in rec['artifacts'].items():assert sha(Path('/source')/p)==h\nassert sha('/source/producer/report.json')==sha('/source/reference/report.json');report=json.loads(Path('/source/producer/report.json').read_text());assert report['scene']==entry['scene'] and report['native_source_records']==entry['records'] and report['native_source_points']==entry['points'];assert [f['timestamp_micros'] for f in report['frames']]==sorted(entry['timestamps']);assert sha('/tmp/boxes/targets.json')==e['box_report_sha256'];boxes=json.loads(Path('/tmp/boxes/targets.json').read_text());assert boxes['scene']==entry['scene'] and [f['timestamp_micros'] for f in boxes['frames']]==sorted(entry['timestamps']);results=[];roi=e['roi']\nfor frame,target in zip(report['frames'],boxes['frames']):\n path=Path('/source/producer')/frame['file'];assert sha(path)==frame['sha256'] and path.stat().st_size==frame['bytes']<=64*1024**2\n with np.load(path,allow_pickle=False) as arrays:\n  assert set(arrays.files)=={'physical_points','measurement_identity','evaluation_nlz','return_states'};features=arrays['physical_points'];ids=arrays['measurement_identity'];nlz=arrays['evaluation_nlz'];states=arrays['return_states'];n=frame['points'];assert features.shape==(n,4) and features.dtype==np.float64 and np.isfinite(features).all();assert ids.shape==(n,4) and ids.dtype==np.int64 and np.isin(ids[:,0],range(1,6)).all() and np.isin(ids[:,1],(1,2)).all() and np.all(ids[:,2:]>=0);assert nlz.shape==(n,) and np.isin(nlz,[-1,1]).all();assert states.shape==(10,4) and states.dtype==np.int64\n  assert states[:,:2].tolist()==[[l,r] for l in range(1,6) for r in (1,2)] and np.isin(states[:,2],(0,1)).all() and np.all(states[:,3]>=0) and states[:,3].sum()==n\n  for laser,ret,present,count in states:\n   assert int(((ids[:,0]==laser)&(ids[:,1]==ret)).sum())==count and (present or count==0)\n  assert len(set(map(tuple,ids.tolist())))==n\n reasons={k:0 for k in ('unknown_class','zero_native_points','center_outside_roi','eligible')};classes={str(k):0 for k in range(1,5)}\n for row in target['rows']:\n  assert row['context_name']==entry['scene'] and row['frame_timestamp_micros']==frame['timestamp_micros']\n  if row['type'] not in (1,2,3,4):reason='unknown_class'\n  elif row['num_lidar_points_in_box']<=0:reason='zero_native_points'\n  elif not all(roi[i]<=row['box'][i]<roi[i+3] for i in range(3)):reason='center_outside_roi'\n  else:reason='eligible';classes[str(row['type'])]+=1\n  reasons[reason]+=1\n assert sum(reasons.values())==len(target['rows'])\n results.append({'timestamp_micros':frame['timestamp_micros'],'points':n,'native_box_rows':len(target['rows']),'annotation_state':target['annotation_state'],'training_target_reasons':reasons,'eligible_class_counts':classes})\nfor mode in ('producer','reference'):\n resources=json.loads((Path('/source')/mode/'resources.json').read_text());assert math.isfinite(resources['elapsed_seconds']) and resources['elapsed_seconds']>=0 and resources['peak_rss_kib']>0\ntransfer=rec['transfer'];assert transfer['sha256']==entry['point_publication']['archive_sha256'] and transfer['archive_bytes']==entry['point_publication']['archive_bytes'] and transfer['working_peak_bound_bytes']<=15*1024**3-256*1024**2 and rec['consumer_reserve_bytes']==256*1024**2 and rec['selected_payload_bytes_to_date']<=1024**3\nPath('/outputs/check.json').write_text(json.dumps({'scene':entry['scene'],'selected_frames':results,'scope':'retained native physical frame/box identity join and target exclusions independently reconciled; packing, optimizer/overfit and heldout evidence remain open'}));print('PASS retained selected physical/target join',entry['scene'])\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/overfit-point-frames-v1/4447423683538547117_536_022_556_022/receipt.json",
+  "receipt_sha256": "db6886f4313c5ad1228643963de97815ab340e2af3652809f56b16bad4e920df",
+  "candidate_sha256": "11a8e88d55cae10826b67e3079173d22260dd4c730a0e679c71fe84a7b91722e",
+  "validation": {
+    "scene": "4447423683538547117_536_022_556_022",
+    "selected_frames": [
+      {
+        "timestamp_micros": 1509377835676730,
+        "points": 164318,
+        "native_box_rows": 50,
+        "annotation_state": "native_box_rows_present",
+        "training_target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 5,
+          "center_outside_roi": 3,
+          "eligible": 42
+        },
+        "eligible_class_counts": {
+          "1": 38,
+          "2": 1,
+          "3": 3,
+          "4": 0
+        }
+      }
+    ],
+    "scope": "retained native physical frame/box identity join and target exclusions independently reconciled; packing, optimizer/overfit and heldout evidence remain open"
+  },
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/overfit-points-retained-4447423683538547117_536_022_556_022-v1/output/check.json": "3ce113c3e4b9cbca2d7ebd3e1d85c80db531b42c3d7b6624a4bc1634d571eca8",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/overfit-points-retained-4447423683538547117_536_022_556_022-v1/output/live.log": "67fbf05ecec9cd46882e6e721aa6f61382f07fb2ff23c41dabb1f2f9614b7b18"
+  }
+}

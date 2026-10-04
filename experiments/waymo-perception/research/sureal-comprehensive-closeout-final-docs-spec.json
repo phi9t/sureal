@@ -1,0 +1,48 @@
+{
+  "axis": "Spec",
+  "scope": "Final amendment: README, CONTEXT, explorer README and comprehensive final inventory; no new implementation review or execution",
+  "inventory_sha256": "040df9f16b89e7ae0e488d1346ab3d02386a458de9d03d16456aa3e3885b5be3",
+  "independent_supplement_sha256": "a40247475ec8dfd5d79b506951cbeed43c4c3efc164e7c644cb7dbedd6c10198",
+  "counts": {
+    "selected_for_integration_after_verification": 1292,
+    "excluded_timestamp_only_projection": 1,
+    "excluded_local_scratch_or_cache": 1161,
+    "already_integrated": 9,
+    "blocked_preserved": 19,
+    "excluded_generated_sensor_payload": 2,
+    "excluded_synchronization_lock": 2
+  },
+  "assessment": "Suitable scoped closeout documentation/inventory after minor README history correction; final landing still conditional on narrowed allowlist HDFS exact readback and independent recovery/retention proof",
+  "findings": [
+    {
+      "severity": "minor",
+      "category": "incorrect_documentation_status",
+      "path": "experiments/waymo-perception/README.md",
+      "line": 91,
+      "quote": "The JSON schemas, runner, environment, and pipeline code are intentionally not created yet.",
+      "requirement_quote": "land EVERY ready owned code/docs/evidence ... anything unlandable explicit path/blocker/disposition",
+      "requirement_source": "binding user closeout request; truthful evidence role/history",
+      "issue": "Unlabelled original-plan statement contradicts existing/selected schemas and runners and the amended current gates section. Label the paragraph historical or state current implementation scope."
+    }
+  ],
+  "resolved_prior_blockers": {
+    "association9": "Exact paths preserved locally, excluded from landing, storage mismatch and missing41.2live gate explicit",
+    "continuation2": "Excluded despite namespace fixtures; incomplete backend/retention/runner retained as blocker",
+    "explorer7": "Generation/provenance/content gate absent, explicit excluded candidate status; worker evidence stays narrower",
+    "audit_cohort1": "Excluded pending exact-source native live audit"
+  },
+  "evidence_scope_checks": {
+    "312_tests_and_dispatch_independently_reconciled": true,
+    "source_and_original_checkpoint_preservation_reported": true,
+    "archive_verification_pending_explicit": true,
+    "no_new_scientific_admission": true,
+    "no_new_GPU_execution": true,
+    "no_runtime_or_sweep_resume_authorization": true
+  },
+  "protected_models_draft": {
+    "path": "/data02/home/philip.yang/workspace/sureal/docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+    "owner": "architecture-review session",
+    "disposition": "keep unstaged, preserve exact bytes; committed51 proposal already integrated viaa3c6955; no migration or Kata activation"
+  },
+  "limits": "Read-only document and retained receipt review. No independent HDFS mutation/execution, no declaration publication has completed, no blanket newscientific acceptance."
+}
