@@ -19,6 +19,7 @@ Milestone: P4. Implementation home: Sureal.
 
 - Actual worker/lead/controller loop with live Insula checks and independent candidate/integration evidence; scripted model-free fixtures complement but do not replace the actual worker handoff.
 - Interrupt cleanup after landing, retain LANDED plus pending cleanup, and resume cleanup without relaunching work or deleting foreign data.
+- Export/restore only the Sureal Kata project and reconcile owners/stages with retained execution receipts before claiming recovery.
 - Retain/reopen protocol records and required research artifacts; use existing verified HDFS readback/live recovery before any scientific payload release.
 - Reconcile the complete stage index and independently review the full implementation against this specification.
 
@@ -27,7 +28,7 @@ Milestone: P4. Implementation home: Sureal.
 - T2's base is exactly T1's reviewed landed commit; initial capacity one and clean canonical source are maintained; ownership remains per seat/task/attempt.
 - All required evidence and candidate objects survive cleanup; no unique unsubmitted work is discarded.
 - Cleanup, publication and integration remain separately recorded facts. An uncertain outcome never frees a seat or marks the task complete.
-- Sureal runs the protocol without any Corenius runtime/code/policy dependency or mandatory Kata setup.
+- Sureal runs the protocol with its admitted shared Kata project and no Corenius runtime/code/policy dependency. Both pilot issues retain spec pins, real owner/session/attempt links and verified closure evidence; Kata stage and actual execution receipts reconcile.
 - The admitted loop is ready to carry the scientific model/training workstream; protocol completion does not establish model quality.
 
 ## Closure evidence

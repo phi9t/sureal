@@ -51,6 +51,6 @@ All implementation and authoritative task/spec documents belong in this reposito
 | [52](tasks/52-collaboration-landing-recovery.md) | Exact fast-forward landing and interrupted-effect recovery | 51 |
 | [53](tasks/53-collaboration-cleanup-closeout.md) | Safe cleanup and two real serial-task cycles | 52 |
 
-Execution remains gated on clean mainline and written design/plan admission. These are specifications, not completed protocol capabilities. Once admitted, the local protocol carries models/training44–48. Kata remains optional scheduling support rather than a runtime dependency.
+Execution remains gated on clean mainline and written design/plan admission. These are specifications, not completed protocol capabilities. Once admitted, the local protocol carries models/training44–48. The revised proposal uses one shared Kata project for live scheduling/ownership, linked to committed specs; the controller supplies worker dispatch and exact-candidate execution receipts.
 
 [Full research task index](../../experiments/waymo-perception/research-task-index.md) · [Existing experiment tracker](../../experiments/waymo-perception/tracking/README.md)

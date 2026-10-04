@@ -6,18 +6,19 @@ At inspection on 2026-10-03, numbered Markdown files in `docs/research/tasks/` a
 
 `codex queue` delivers a message to a worker session. It is not a dependency-aware work ledger. An experiment registry defines runs, not engineering ticket ownership. A design file describes the desired system, not what is ready to execute.
 
-Proposed v1 ownership is file-backed through the Sureal controller. Kata remains an optional later queue backend; it has not been enabled by this proposal.
+Proposed v1 uses Kata as the centralized operational task ledger, with the Sureal controller providing worker dispatch and exact-candidate verification/integration. This supersedes the earlier optional-Kata/file-only queue proposal. Kata is installed and its local daemon is healthy, but Sureal is not yet registered; this document does not claim initialization or implementation.
 
 - Git mainline owns reviewed design specs, task acceptance, dependencies, implementation plans and versioned evidence manifests.
-- The controller owns live claims, worker/session/attempt/workspace identities and candidate/integration state in durable project-local runtime records outside canonical source.
+- Kata owns queue priority, dependency edges, current logical owner and operational stage. Issue metadata/comments link each assignment to its actual worker session, attempt, workspace and evidence.
+- The controller owns durable launch/process/candidate/verification/integration receipts outside canonical source. These records reconcile Kata updates; they are not a competing task queue or separately assignable owner ledger.
 - The experiment registry/tracker and immutable journal own recipes, observed run outcomes and research interpretation.
-- Optional issues in GitHub or Kata link to the stable Git task ID and spec revision. They are a discoverable view of work; issue assignment or closure alone does not grant a controller claim or establish acceptance.
+- Each Kata issue links to the stable Git task ID and pinned spec/plan revision rather than copying their detailed acceptance. Optional GitHub issues are additional discussion/views. Kata assignment reserves work, while actual dispatch and completion require controller receipts.
 
 ## Mainline task definitions and worker claims
 
 Land reviewed task specs and required plans on `phi9t/mainline` before admitting their implementation. Each task keeps its existing stable ticket ID and path. Admission reads the spec at the exact mainline base B, retains its Git blob/content identity and the linked design/plan identities, and verifies dependencies from actual closure evidence. Draft-only or branch-only definitions cannot enter the managed ready queue. A later acceptance change must land explicitly and create a new admitted brief; it cannot silently change a running attempt.
 
-A ready task becomes assigned through one durable claim under the controller lock, before dispatch. Claim records contain:
+A ready task becomes assigned through a Kata owner claim coordinated under the controller lock, before dispatch. Kata metadata links the assignment fields below; controller receipts retain their exact historical values:
 
 | Field | Purpose |
 | --- | --- |
@@ -28,19 +29,31 @@ A ready task becomes assigned through one durable claim under the controller loc
 | Workspace kind/path, common Git directory, branch | Locate the owned source and record shared metadata |
 | State, dispatch acknowledgement, progress/evidence references | Separate assigned, running, unknown, submitted and completed facts |
 
-The lead selects a task; the controller refuses an existing active/unknown claim for that task, an occupied seat, unmet dependencies or conflicting declared write/resource scope. Future multiple seats still allow only one active owner per task. Scope checks use declared write sets and explicit shared-resource ownership; they do not prove that undeclared filesystem access is impossible.
+The lead/controller selects a task from Kata’s unowned ready queue, rechecks its landed spec and dependencies, and claims it using a unique attempt actor (`--as sureal/<attempt-id>`). Default human/user identity is insufficient because separate sessions would look like the same owner. The controller refuses an existing active/unknown claim for that task, an occupied seat, unmet dependencies or conflicting declared write/resource scope. Future multiple seats still allow only one active owner per task. Scope checks use declared write sets and explicit shared-resource ownership; they do not prove that undeclared filesystem access is impossible.
 
 The worker acknowledges the exact task/spec/brief/claim/attempt identities before implementation. If the launch adapter reveals its session ID only after launch, record STARTING, recover that identity and obtain the acknowledgement before marking RUNNING. A lost acknowledgement leaves the attempt unresolved, not available for reassignment. The detailed plan must specify the adapter and this handshake.
 
-Every controller mutation, progress report, submission, repair and landing references the current claim generation and attempt. Read-only status shows task, spec revision, state/blocker, owner session, attempt, workspace/branch, base/candidate and evidence. Messaging with `codex queue` carries those identities; delivery alone is not a claim or start receipt. This controller/status interface is proposed, not implemented today.
+Every controller mutation, progress report, submission, repair and landing references the current Kata issue/owner plus claim generation and attempt, and verifies that they still match. Read-only status shows task, spec revision, state/blocker, owner session, attempt, workspace/branch, base/candidate and evidence. Messaging with `codex queue` carries those identities; delivery alone is not a claim or start receipt. This controller/status interface is proposed, not implemented today.
 
 ### Takeover
 
 An inactive-looking conversation, elapsed time or missing heartbeat is insufficient to free ownership. Inspect the actual worker/process/workspace state, stop or reconcile the prior attempt and preserve commits, unsubmitted changes, checkpoints and logs before release. An unresolved effect keeps the task occupied.
 
-Under the lock, record the old attempt's disposition and invalidate its claim generation. Allocate a new claim, attempt, session and workspace; carry forward an explicit handoff manifest of retained work/evidence and recheck the current base/spec. Accepted patches or checkpoints are explicit inputs with provenance, not implicit inheritance of the old attempt's verification. The replacement acknowledges its new assignment; old-session updates and submissions are rejected. These tokens fence controller operations, not arbitrary processes with filesystem access; confirmed stop and workspace separation remain necessary.
+Under the lock, record the old attempt's disposition and invalidate its claim generation before releasing/transferring the Kata owner. Allocate a new Kata claim, attempt, session and workspace; carry forward an explicit handoff manifest of retained work/evidence and recheck the current base/spec. Accepted patches or checkpoints are explicit inputs with provenance, not implicit inheritance of the old attempt's verification. The replacement acknowledges its new assignment; old-session updates and submissions are rejected. These tokens fence controller operations, not arbitrary processes with filesystem access; confirmed stop and workspace separation remain necessary.
 
-Specs, reviewed handoff/closure evidence and useful journal updates land as ordinary owned commits. Mutable RUNNING/owner fields remain in runtime records so each assignment does not dirty mainline. Retain those records through the established storage/recovery process; issue comments and checked-in status snapshots, if used, are derived views with an observation time.
+Specs, reviewed handoff/closure evidence and useful journal updates land as ordinary owned commits. Mutable queue stage/owner fields live in Kata, with execution receipts outside source, so each assignment does not dirty mainline. Retain those records through the established storage/recovery process; issue comments and checked-in status snapshots, if used, are derived views with an observation time.
+
+### Broker and execution boundary
+
+Use one existing local Kata daemon/project for all Sureal worktrees, with a committed `.kata.toml` binding. All workers connect to that same database through the daemon. A later remote daemon can serve multiple hosts; v1 has one local controller and initial capacity one. HDFS retains project-scoped exports and evidence, not the live SQLite database.
+
+Kata supplies ready/next queries, owner claims, priority, blocked-by edges, comments/metadata, events and human queue views. It does not launch workers, allocate GPUs or prove that a process is running. The controller provides that dispatch boundary and reports verified runtime facts back to Kata. A RUNNING label without matching launch/acknowledgement evidence is a reconciliation discrepancy.
+
+A claim, metadata update, launch and issue comment are separate effects. Before them, persist a controller intent binding issue, spec, unique actor and attempt. Claim the issue, re-read owner/revision, then publish one assignment metadata object using supported revision-conditional metadata updates before launch. Use idempotency keys for issue creation and explicit event/receipt identities for updates. If a call fails or its acknowledgement is lost, inspect Kata and actual process state; retain ownership and mark pending reconciliation rather than dispatch twice or silently switch to a file-only queue. The exact durable ordering and revision checks belong in the implementation plan and crash tests. Raw `--force` or manual owner/metadata changes do not transfer a running process safely; the controller must detect and reconcile them.
+
+The installed Kata v0.14.3 supports `claim`, `ready`, `--blocked-by`, `--as`, metadata `--if-match`, events and project-scoped export. Current upstream documentation has newer flags; implement against the admitted installed version or explicitly admit an upgrade. At inspection, `kata whoami` resolves to `philip.yang`, confirming the need for distinct attempt actors.
+
+Sources: [Kata quickstart](https://github.com/kenn-io/kata/blob/main/docs/get-started/quickstart.md), [shared-project model](https://github.com/kenn-io/kata/blob/main/docs/workflows/sharing.md), and installed `kata version`, `quickstart` and command help. Runtime inspections are configuration evidence, not completed integration gates.
 
 ## Queue lifecycle
 
@@ -50,7 +63,7 @@ Specs, reviewed handoff/closure evidence and useful journal updates land as ordi
 | Needs decision | Design/plan or scientific activation unresolved | Explicit review-gate predecessor; `needs-human` label |
 | Blocked | A prerequisite is not verified complete | Explicit `blocked-by` relationship |
 | Ready | No open prerequisite; execution conditions admitted | Available in filtered ready queue |
-| Claimed | Controller durably reserves task and seat before dispatch | Current claim/generation, attempt, session and workspace record |
+| Claimed | Kata owner reserved through controller before dispatch | Unique actor plus assignment metadata and durable attempt receipt |
 | Running | Worker acknowledges assignment and actual execution starts | Matching claim/session/attempt plus dispatch and execution evidence |
 | Needs verification | Candidate exists, required independent checks incomplete | `needs-verification` label; remains open |
 | Needs landing | Required checks pass but integration incomplete | `needs-landing` label; remains open |
@@ -73,28 +86,28 @@ current task + owned integration closeout
 
 The user selected the [Sureal-local serial collaboration protocol](../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md) as the next supporting stage. Corenius is a design reference only. Models/training remains the first scientific architecture migration. Both workstreams require their written design/plan review before execution. Planning and read-only reference discovery may proceed while execution gates are open; active frozen inventories and the original scientific contracts remain preserved.
 
-The protocol's initial scheduling is file-backed and serial: the lead selects one admitted Git task, and the local controller owns per-seat attempt/candidate state and serialized landing state, initially with capacity one. It does not require Kata initialization. If Kata is later enabled, it supplies ownership/priorities/dependencies without replacing exact-candidate admission or becoming a second authority for scientific outcomes.
+The protocol's initial scheduling uses Kata with capacity one: the lead selects one admitted ready issue; the controller coordinates its Kata claim, per-seat execution receipts and serialized landing. Kata is the operational queue; committed specs and independently reopened evidence remain acceptance authority. A closed issue alone cannot authorize landing or unblock actual execution without its required closure evidence.
 
 After protocol admission, each managed task starts in its own task-scoped workspace (linked worktrees are recommended initially) and each verification uses a separately materialized immutable candidate. Existing worktrees remain part of the pre-protocol integration inventory; do not delete them without an explicit disposition. All actual GPU verification still shares the existing exclusive experiment lock.
 
-When enabling Kata, start with these scoped architecture items and the current relevant research follow-ups, not a bulk claim that all historical tickets have been reconciled. Import additional existing tickets after inspecting their latest acceptance and receipts; preserve old filenames/numbers.
+When registering Sureal and importing Kata tasks, start with these scoped architecture items and the current relevant research follow-ups, not a bulk claim that all historical tickets have been reconciled. Import additional existing tickets after inspecting their latest acceptance and receipts; preserve old filenames/numbers.
 
-## Optional future Kata integration
+## Kata operating procedure after admission
 
-These commands apply only after a deliberate backend setup and workspace binding; they are operational guidance, not evidence of completed setup. If Kata is adopted, define one controller-backed ownership transition and reconciliation contract before dispatch; independent Kata and controller claims must not disagree.
+These commands apply after deliberate project setup and workspace binding; they are operational guidance, not evidence of completed setup. The implemented controller coordinates claims/assignment metadata and dispatch; below shows the underlying queue operations, not a complete crash-safe launch procedure.
 
 ```bash
 kata ready --unowned --no-label needs-human --agent
 kata show ISSUE_REF --agent
-kata claim ISSUE_REF --agent
+kata claim ISSUE_REF --as sureal/ATTEMPT_ID --agent
 ```
 
 Before claiming: read the linked design, task spec and execution plan; verify prerequisites and live resource ownership. Do not treat a ready listing as permission to bypass an acceptance gate.
 
-Record the worktree, branch and worker session in a comment. Update the issue with the exact candidate and independent verification artifacts. Land only ready owned changes; keep unrelated scratch/raw/auth files out of commits.
+Record assignment identities in revision-checked metadata and append worktree/branch/session context in a comment. Read back both owner and assignment before dispatch. Update the issue with the exact candidate and independent verification artifacts. Land only ready owned changes; keep unrelated scratch/raw/auth files out of commits.
 
 ```bash
-kata comment ISSUE_REF --body-file NOTE.md --agent
+kata comment ISSUE_REF --body-stdin --agent < NOTE.md
 kata close ISSUE_REF --done \
   --message 'State the scoped deliverable and actual independent verification.' \
   --commit LANDED_SHA \
@@ -102,7 +115,7 @@ kata close ISSUE_REF --done \
   --evidence 'test:ACTUAL_LIVE_COMMAND' --agent
 ```
 
-Use actual supported CLI options; `kata comment --help` is authoritative for comment text input. A close asserts completion. The message and linked evidence must cover this ticket's live Insula, retention and landing criteria; a commit hash alone does not prove them.
+Use installed supported CLI options; `kata comment --help` is authoritative for comment text input. The inspected v0.14.3 supports `--body`, `--body-file` and `--body-stdin`. A close asserts completion. The message and linked evidence must cover this ticket's live Insula, retention and landing criteria; a commit hash alone does not prove them.
 
 Use explicit `--blocked-by` relationships for execution ordering. Do not rely on project grouping or `related` links to block work. Search before creation and use stable idempotency keys. Workers claim ownership before making overlapping changes.
 
@@ -112,6 +125,6 @@ Until tickets49–53 implement and verify the controller, the persistent lead se
 
 ## Persistence and reconciliation
 
-Controller records must be retained and independently restored before claiming recovery. If Kata is later enabled, its database is not automatically stored in Git or HDFS because `.kata.toml` is checked in. Retain a project-scoped export with the repository's established storage process when creating a recovery checkpoint; do not export unrelated projects. Independently verify restoration before claiming disaster recovery.
+Controller records must be retained and independently restored before claiming recovery. Kata’s database is not automatically stored in Git or HDFS because `.kata.toml` is checked in. Retain a project-scoped export with the repository's established storage process when creating a recovery checkpoint; do not export unrelated projects. Independently verify restoration before claiming disaster recovery.
 
 If the operational queue and a Git spec disagree, stop that affected execution, inspect the version/evidence, and correct the queue or revise the spec explicitly. Preserve evidence and record the decision; never weaken a task's acceptance to make its queue status look complete.

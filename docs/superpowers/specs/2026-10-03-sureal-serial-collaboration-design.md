@@ -37,10 +37,10 @@ Task brief includes stable task ID, intent revision/digest, linked Git task spec
 
 At start:
 
-1. Acquire the controller lock, verify the pinned task spec/plan is on admitted mainline B, reserve a unique current claim for that task and allocate a free worker seat within admitted capacity. In v1 capacity is one; an active or unresolved attempt occupies it.
+1. Acquire the controller lock, verify the pinned task spec/plan is on admitted mainline B, reserve its Kata owner through a unique attempt actor and durable controller intent and allocate a free worker seat within admitted capacity. In v1 capacity is one; an active or unresolved attempt occupies it.
 2. Recheck canonical mainline equals admitted B and is clean.
 3. Create a task workspace outside the canonical source checkout, on a unique disposable `codex/<task-id>/<attempt-id>` branch at B. A linked Git worktree is the recommended initial mode.
-4. Record claim ID/generation, workspace kind/path, Git common-directory identity, branch, seat and attempt identity before launching the worker; capture/reconcile the actual worker session and process identities.
+4. Record Kata issue/owner/revision, claim ID/generation, workspace kind/path, Git common-directory identity, branch, seat and attempt identity before launching the worker; capture/reconcile the actual worker session and process identities.
 5. Launch a fresh bounded worker with the exact admitted brief and claim identities; require its matching acknowledgement before RUNNING and retain startup/exit provenance. Lost acknowledgement leaves STARTING/UNKNOWN ownership reserved.
 
 ## Workspace isolation and future workers
@@ -117,7 +117,9 @@ Keep a small current-state projection, per-task immutable records and an ordered
 
 ## Queue and evidence
 
-Reviewed task specs and required plans land on mainline before implementation admission; pin their revisions to B. The controller owns live claims and session/attempt/workspace mapping, while Git defines acceptance. [Task queue policy](../../research/task-queue.md#mainline-task-definitions-and-worker-claims) defines the claim, acknowledgement, status and explicit takeover contract. Reserve a task and seat durably before dispatch; stale claim generations cannot submit or land. Takeover preserves prior work, confirms stop/reconciliation, then records a fresh claim/attempt/session/workspace. Optional issue backends are views/integrations until one ownership transition is defined; issue assignment or closure never independently authorizes execution or landing.
+Reviewed task specs and required plans land on mainline before implementation admission; pin their revisions to B. Kata is the centralized operational queue for priorities, dependencies, logical owner and stage. Its issues link to detailed Git specs and outcome evidence rather than duplicating acceptance prose. The controller coordinates unique-attempt Kata claims with durable session/process/workspace and candidate/integration receipts; it does not maintain another separately assignable queue.
+
+[Task queue policy](../../research/task-queue.md#mainline-task-definitions-and-worker-claims) defines assignment, acknowledgement, status and explicit takeover. Claim/metadata/launch effects require prepared records, readback and recovery; no cross-system atomicity is assumed. Reserve ownership before dispatch, reject stale claim generations, and reconcile pending Kata writes before launch or reassignment. Takeover preserves prior work, confirms stop, then transfers Kata ownership to a fresh attempt/session/workspace. A closed issue does not replace live verification or authorize landing.
 
 The existing Sureal experiment registry and journal retain recipes, outcomes and scientific interpretation. Protocol task state records attempts/candidates/integration, not a second set of model metrics. Link these records by exact identities.
 
@@ -125,7 +127,7 @@ The first research tasks can exercise the models/training workstream once this r
 
 ## Repository-local implementation
 
-The proposed entrypoint is `scripts/collab.py`, implemented in this repository with Python standard-library modules and the installed Git/Codex/Insula tools. Introduce private helper modules only where they concentrate real complexity; no generic agent SDK or new daemon is required. The implementation plan will fix the exact functions and check commands.
+The proposed entrypoint is `scripts/collab.py`, implemented in this repository with Python standard-library modules and the installed Git/Kata/Codex/Insula tools. Introduce private helper modules only where they concentrate real complexity; no generic agent SDK or new daemon is required. The implementation plan will fix the exact functions and check commands.
 
 Project runtime records and disposable task workspaces live in a configurable sibling directory, proposed as `../.sureal-collab/<project-id>/`, so canonical source remains clean. This is Sureal-owned runtime state, not a Corenius checkout or dependency. Tests use temporary fixture repositories/state directories.
 
@@ -145,7 +147,7 @@ Every stage ends with independently audited real execution. Runtime/state corrup
 
 ## Deliberate scope
 
-v1 is a task controller with initial worker capacity one, recommended Git worktrees, file-backed state, bounded briefs, exact candidates and explicit recovery. No new general workflow engine, database, agent hierarchy, automatic scheduling, jj backend, unbounded persistent worker, multi-worker concurrency or replacement of existing research retention is part of this proposal.
+v1 is a task controller with initial worker capacity one, recommended Git worktrees, a shared Kata queue and file-backed execution receipts, bounded briefs, exact candidates and explicit recovery. No new general workflow engine, custom database or scheduler daemon, agent hierarchy, automatic scheduling, jj backend, unbounded persistent worker, multi-worker concurrency or replacement of existing research retention is part of this proposal.
 
 Corenius supplies ideas and inspected examples only. No Corenius code, runtime, crate, policy synchronizer or effort is required to run this protocol. Its inspected landing helper rebases before gating, so it is not a dependency or an implementation to call. Implement the exact-candidate and expected-base contract locally in Sureal.
 
