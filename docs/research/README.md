@@ -25,7 +25,7 @@ The research program currently uses versioned Markdown task specifications, exec
 
 ## Models and training: the next architecture workstream
 
-The user selected a [Sureal-local serial collaboration protocol](../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md) as the supporting stage after pristine mainline and before this scientific migration. Corenius is a design reference only.
+The user selected a [Sureal-local two-worker collaboration protocol](../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md) as the supporting stage after pristine mainline and before this scientific migration. Corenius is a design reference only.
 
 [Design proposal](../superpowers/specs/2026-10-03-first-class-models-training-design.md).
 
@@ -41,16 +41,22 @@ Every implementation milestone runs actual live Insula and retains independent v
 
 ## Sureal-local collaboration workstream
 
-All implementation and authoritative task/spec documents belong in this repository. The protocol uses one persistent lead, initially one worker seat, task-scoped workspaces (recommended linked worktrees), exact candidates, conditional fast-forward landing and explicit recovery/cleanup. Runtime records and disposable workspaces stay outside canonical source to keep it pristine.
+[Retained full v1 specification](../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md) · [Codex runtime identities](../superpowers/specs/2026-10-03-codex-runtime-domain-design.md) · [Worker operating state and health](../superpowers/specs/2026-10-03-worker-session-state-design.md) · [Implementation plan](../superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md). The design session recorded prior specification approval; the [ownership authority reconciliation](reviews/2026-10-04-collaboration-integration-admission.md), plan review and pristine-mainline/live implementation gates remain open.
+
+All implementation and authoritative task/spec documents belong in this repository. Reviewed specs/plans land on mainline before execution; the [queue policy](task-queue.md#mainline-task-definitions-and-worker-claims) binds each live claim to its worker session, attempt and workspace, including explicit takeover. The protocol uses one persistent lead, two concurrent worker seats from v1, task-scoped workspaces (recommended linked worktrees), exact candidates, conditional fast-forward landing and explicit recovery/cleanup. Runtime records and disposable workspaces stay outside canonical source to keep it pristine.
 
 | Task | Deliverable | Dependency |
 | --- | --- | --- |
 | [49](tasks/49-collaboration-project-admission.md) | Clean-base admission, local state and lock | Current closeout; design/plan review |
-| [50](tasks/50-collaboration-worker-attempts.md) | One fresh bounded worker in a task worktree | 49 |
+| [50](tasks/50-collaboration-worker-attempts.md) | Two concurrent sessions in distinct task worktrees | 49 |
 | [51](tasks/51-collaboration-candidate-verification.md) | Immutable candidates, exact verification and repair | 50 |
 | [52](tasks/52-collaboration-landing-recovery.md) | Exact fast-forward landing and interrupted-effect recovery | 51 |
-| [53](tasks/53-collaboration-cleanup-closeout.md) | Safe cleanup and two real serial-task cycles | 52 |
+| [53.0](tasks/53-0-collaboration-retention-cleanup-foundation.md) | Landed retention/cleanup/check capabilities | 52 |
+| [54](tasks/54-worker-program-observability.md) | Worker summaries, state graphs and queue/spec overview | 49–52; landed53.0 |
+| [53](tasks/53-collaboration-cleanup-closeout.md) | Safe cleanup, concurrent pilot and stale-candidate refresh | 52; 54 |
 
-Execution remains gated on clean mainline and written design/plan admission. These are specifications, not completed protocol capabilities. Once admitted, the local protocol carries models/training44–48. Kata remains optional scheduling support rather than a runtime dependency.
+Execution remains gated on clean mainline and written design/plan admission. These are specifications, not completed protocol capabilities. Once admitted, the local protocol carries models/training44–48. The revised proposal uses one shared Kata project for live scheduling/ownership, linked to committed specs; the controller supplies worker dispatch and exact-candidate execution receipts.
+
+The user-requested [Claude review](reviews/2026-10-03-sureal-collaboration-claude-review.md) of the implementation plan returned **changes required**. The report retains exact-source provenance and separates spec compliance from design concerns; corrections and plan admission remain open.
 
 [Full research task index](../../experiments/waymo-perception/research-task-index.md) · [Existing experiment tracker](../../experiments/waymo-perception/tracking/README.md)

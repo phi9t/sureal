@@ -1,0 +1,335 @@
+{
+  "schema_version": 1,
+  "axis": "Standards",
+  "utc": "2026-10-04T03:44:09.676266+00:00",
+  "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer",
+  "base": "8285a0993ea6e1293614f335c62f7e88c06e299f",
+  "requested_source_head": "d5ead21fb46ddef78bed8d8ac0f8b122ca1f0c01",
+  "review_command": "git diff --cached 8285a0993ea6e1293614f335c62f7e88c06e299f",
+  "review_epoch": "Original21-path indexed candidate reviewed before staged integration/admission qualification; exact reviewed bytes revalidated against pinned source20 + unchanged index1. Current index has advanced to22 paths and is not this report scope.",
+  "source_commits": [
+    "d5ead21fb46ddef78bed8d8ac0f8b122ca1f0c01 Fix collaboration review contracts and land cleanup before concurrent pilot",
+    "f9fbd5be5b632798f409aa65fb9743588606d701 Retain Claude collaboration plan review and hold execution gate",
+    "4469127623350ad5a644ae8c4dd0f8f21ab7c990 Record collaboration spec approval and concrete implementation plan",
+    "5ab76b3a0efb2970e2762f657fb60ee38b3226f6 Complete full v1 collaboration specification and concrete live gates",
+    "3321bb8556e40105a2d0f188ba24101b35d74a77 Model native Codex session trees threads turns and task bindings",
+    "fa257289c5c722fca4572e685c90657cdcd47be1 Define worker operating states and evidence-based stuck/hung health",
+    "c093595a956dc13ef1866ce17947b0371921eea6 Specify worker summaries and read-only program overview as a v1 gate",
+    "9c4c6a7c1454c3a042e9fa1f86aadd3bb10021c2 Require two concurrent worker sessions and live concurrency pilot in v1",
+    "c22865fcb12f110d713311025bc5afdac7723025 Specify Kata as centralized queue linked to committed task contracts",
+    "6b694c8a434387b6be190fa2b87952957766bd20 Specify mainline task admission and explicit worker ownership handoff"
+  ],
+  "passed": true,
+  "summary": "No hard Standards violations or meaningful Fowler documentation/contract smells in the original21 indexed documentation paths. Review is fixed to8285a099..d5ead21, with retained mainline task-index content; twenty source bodies match the pinned branch. Domain identities, reserve/ack, recovery, immutable-candidate and evidence boundaries are specified explicitly. The retained Claude changes-required report preserves its raw body, fifteen source-file pins and request/response digests; its resolution ledger leaves fresh plan review and live capability gates open.39 coverage cases and pilot manifests are future proof obligations, not passed checks. The19 blocked sources, accepted models/training design and journal120 remain unchanged. This is a Standards result for the initial source-only epoch. Separate Spec authority reconciliation between file-backed optional-backend steering and mandatory-Kata/two-seat proposals remains open; no runtime/backend policy, implementation, execution, training, cleanup or HDFS admission follows. Four later staged notices and the new integration/admission note require the separate final22-path review.",
+  "hard_standards_violations": [],
+  "judgment_smells": [],
+  "standards_sources": [
+    {
+      "path": "CONTRIBUTING.md",
+      "lines": "3-19",
+      "rule": "Preserve reproducibility, compatibility and source/artifact locks; document assumptions/provenance for compact selected reports."
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "lines": "45-50",
+      "rule": "Portable checks are not fresh GPU or scientific acceptance."
+    }
+  ],
+  "smell_baseline_considered": [
+    "Mysterious Name",
+    "Duplicated Code",
+    "Feature Envy",
+    "Data Clumps",
+    "Primitive Obsession",
+    "Repeated Switches",
+    "Shotgun Surgery",
+    "Divergent Change",
+    "Speculative Generality",
+    "Message Chains",
+    "Middle Man",
+    "Refused Bequest"
+  ],
+  "reviewed_paths": [
+    {
+      "path": "CONTEXT.md",
+      "sha256": "c5c06bc8eac525244e72e96dd9b583d0e368f87db3e1f491acc1e2e344696cdc",
+      "bytes": 1866,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "pinned d5ead21 Git blob",
+      "current_index_matches_initial": true
+    },
+    {
+      "path": "docs/collaboration/checks/53.A.json",
+      "sha256": "d398d298a620719d2acc825c91568aef8c278aa83930daf943c1b54632c0cf6c",
+      "bytes": 7321,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "pinned d5ead21 Git blob",
+      "current_index_matches_initial": true
+    },
+    {
+      "path": "docs/collaboration/checks/53.B.json",
+      "sha256": "8e73b656da24d128c35c90da5dacbeb147ec49f50f5c65ed2fce997609eff527",
+      "bytes": 6556,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "pinned d5ead21 Git blob",
+      "current_index_matches_initial": true
+    },
+    {
+      "path": "docs/collaboration/coverage.json",
+      "sha256": "b7c2024b8d897b020453ad79f6f8fd2f5206a1721890ad5505a04ce5a71ff625",
+      "bytes": 15703,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "pinned d5ead21 Git blob",
+      "current_index_matches_initial": true
+    },
+    {
+      "path": "docs/research/README.md",
+      "sha256": "3d04f55c42b33cbe30ee8214f4b95ded48a78bdf1cacd22db094d05d66c4f481",
+      "bytes": 6748,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "pinned d5ead21 Git blob",
+      "current_index_matches_initial": false
+    },
+    {
+      "path": "docs/research/reviews/2026-10-03-sureal-collaboration-claude-review.json",
+      "sha256": "7bcb1dad81ebba4e1edde4efe88a883c331394b9e0681dcd8f36bba5efe25519",
+      "bytes": 2903,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "pinned d5ead21 Git blob",
+      "current_index_matches_initial": true
+    },
+    {
+      "path": "docs/research/reviews/2026-10-03-sureal-collaboration-claude-review.md",
+      "sha256": "ce2e36b382150eee5878c3ed57ee70c9a44e30db148f48ebd59f0e8cfb948112",
+      "bytes": 20361,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "pinned d5ead21 Git blob",
+      "current_index_matches_initial": true
+    },
+    {
+      "path": "docs/research/reviews/2026-10-03-sureal-collaboration-review-resolution.md",
+      "sha256": "87ba54f5296be469366afd3b59f40ab8e5e98634fe8ff87b75a5891ddec96dcb",
+      "bytes": 7439,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "pinned d5ead21 Git blob",
+      "current_index_matches_initial": true
+    },
+    {
+      "path": "docs/research/task-queue.md",
+      "sha256": "2e27dad47c83cf01be5d8b64bd6f3a4cbe907df98548f33de3d0fe5ba5ac0c1c",
+      "bytes": 18787,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "pinned d5ead21 Git blob",
+      "current_index_matches_initial": false
+    },
+    {
+      "path": "docs/research/tasks/49-collaboration-project-admission.md",
+      "sha256": "cdc21bc22d2584bc7252ed790506255df46b2b38d0ddd2cf9c7b4147ead4e47f",
+      "bytes": 3494,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "pinned d5ead21 Git blob",
+      "current_index_matches_initial": true
+    },
+    {
+      "path": "docs/research/tasks/50-collaboration-worker-attempts.md",
+      "sha256": "1e7c56dd40156b5a84acaacab71011d4c5c27c52c5a81e1550c5678601ea4a1b",
+      "bytes": 5556,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "pinned d5ead21 Git blob",
+      "current_index_matches_initial": true
+    },
+    {
+      "path": "docs/research/tasks/51-collaboration-candidate-verification.md",
+      "sha256": "d6d9b0857456d8c5f618d85e24847b47452ea20a19808ebed3708c5a357543ed",
+      "bytes": 2402,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "pinned d5ead21 Git blob",
+      "current_index_matches_initial": true
+    },
+    {
+      "path": "docs/research/tasks/52-collaboration-landing-recovery.md",
+      "sha256": "90293f433f8fef7a177815387ce4ab9576eaa4b9bbec270bbd662b9818af9300",
+      "bytes": 3026,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "pinned d5ead21 Git blob",
+      "current_index_matches_initial": true
+    },
+    {
+      "path": "docs/research/tasks/53-0-collaboration-retention-cleanup-foundation.md",
+      "sha256": "61cc740644a22ba31927ad313848841a483fbeadc33c79e0f2a7d278ac67ea63",
+      "bytes": 3197,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "pinned d5ead21 Git blob",
+      "current_index_matches_initial": true
+    },
+    {
+      "path": "docs/research/tasks/53-collaboration-cleanup-closeout.md",
+      "sha256": "87283dcc14f8c424df82dc016be73b452a30a24ff5d3c890a22989887d6bf127",
+      "bytes": 7343,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "pinned d5ead21 Git blob",
+      "current_index_matches_initial": true
+    },
+    {
+      "path": "docs/research/tasks/54-worker-program-observability.md",
+      "sha256": "c42743e9fc9ceaf978c84ab63be1edbd486ae38f9e6bb3daf09d1a772092a1aa",
+      "bytes": 8253,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "pinned d5ead21 Git blob",
+      "current_index_matches_initial": true
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md",
+      "sha256": "831e2cc589a0a52d04ee10a53b503c92060e6223d4b80d7c5fdb5ed2dfe28914",
+      "bytes": 59861,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "pinned d5ead21 Git blob",
+      "current_index_matches_initial": false
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-codex-runtime-domain-design.md",
+      "sha256": "b249f898a7dab4a9ba92fbe810ed9f126d2593a37e25376f23871910b718a288",
+      "bytes": 7760,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "pinned d5ead21 Git blob",
+      "current_index_matches_initial": true
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "sha256": "016759635bb19de04e1d209c25916e08a138d5a9240797f95630139b83fd742e",
+      "bytes": 33294,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "pinned d5ead21 Git blob",
+      "current_index_matches_initial": false
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-worker-session-state-design.md",
+      "sha256": "1729245934fabc06998fcc2beac5ff3a7ddf273b9ea13eb10e374f1a87ba4bb1",
+      "bytes": 12903,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "pinned d5ead21 Git blob",
+      "current_index_matches_initial": true
+    },
+    {
+      "path": "experiments/waymo-perception/research-task-index.md",
+      "sha256": "3fcdc8ad336c32fcc040d432f1f859de75648b7da74711cb72ae586394823062",
+      "bytes": 20518,
+      "reviewed_epoch": "original 21-path indexed candidate",
+      "validation_source": "current unchanged index",
+      "current_index_matches_initial": true
+    }
+  ],
+  "preservation_census": {
+    "path": "/tmp/sureal-doc-branch-preserved-pins.json",
+    "sha256": "19fe2cc0ac3a71311386b44dc6a57ec58d7492b8473087e5f72d4bbc8e5f9219",
+    "utc": "2026-10-04T03:31:22.526469+00:00",
+    "nineteen_blocked_sources_exact": {
+      "experiments/waymo-perception/association/candidate_graph.py": true,
+      "experiments/waymo-perception/association/matching.py": true,
+      "experiments/waymo-perception/association/native.py": true,
+      "experiments/waymo-perception/association/prepare.py": true,
+      "experiments/waymo-perception/association/targets.py": true,
+      "experiments/waymo-perception/association/test_matching.py": true,
+      "experiments/waymo-perception/association/test_native.py": true,
+      "experiments/waymo-perception/association/test_prepare.py": true,
+      "experiments/waymo-perception/association/test_targets.py": true,
+      "experiments/waymo-perception/audit-cohort-labels.py": true,
+      "experiments/waymo-perception/continuation_runtime/identity.py": true,
+      "experiments/waymo-perception/continuation_runtime/test_identity.py": true,
+      "experiments/waymo-perception/explorer/acquire_previews.py": true,
+      "experiments/waymo-perception/explorer/build.py": true,
+      "experiments/waymo-perception/explorer/data.py": true,
+      "experiments/waymo-perception/explorer/public-viewer.fragment.html": true,
+      "experiments/waymo-perception/explorer/run_joint_render.py": true,
+      "experiments/waymo-perception/explorer/scene-explorer.template.html": true,
+      "experiments/waymo-perception/explorer/test_data.py": true
+    },
+    "journal120_unchanged": [
+      {
+        "path": "experiments/waymo-perception/research/research-journal.jsonl",
+        "sha256": "f7d02ad75dd80bbadc126f49e2529715d0e8cc43f178d384146e4d4466c7b1e4",
+        "index_equals_base": true
+      }
+    ],
+    "accepted_model_training_design_exact_base": true,
+    "mainline_task_index_content_retained": true,
+    "foreign_head_role": "Pinned historical census only; moving owner HEAD/worktree contents not read or adopted."
+  },
+  "review_provenance_checks": {
+    "source_commit": "4469127623350ad5a644ae8c4dd0f8f21ab7c990",
+    "fifteen_source_file_pins_valid": {
+      "CONTEXT.md": true,
+      "docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md": true,
+      "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md": true,
+      "docs/superpowers/specs/2026-10-03-codex-runtime-domain-design.md": true,
+      "docs/superpowers/specs/2026-10-03-worker-session-state-design.md": true,
+      "docs/research/task-queue.md": true,
+      "docs/research/tasks/49-collaboration-project-admission.md": true,
+      "docs/research/tasks/50-collaboration-worker-attempts.md": true,
+      "docs/research/tasks/51-collaboration-candidate-verification.md": true,
+      "docs/research/tasks/52-collaboration-landing-recovery.md": true,
+      "docs/research/tasks/54-worker-program-observability.md": true,
+      "docs/research/tasks/53-collaboration-cleanup-closeout.md": true,
+      "pyproject.toml": true,
+      "experiments/waymo-perception/pipeline/insula_entry.py": true,
+      "experiments/waymo-perception/resources/stage.py": true
+    },
+    "tracked_review_body_sha256": "2609602d334fc180f98921d3d76ae498a67a8820c11e942ef282638c941de3fc",
+    "local_request_response_review_pins_valid": {
+      "request.txt": true,
+      "response.json": true,
+      "review.md": true
+    },
+    "verdict": "changes required",
+    "role": "Historical documentation review and resolution, not fresh runtime validation or implementation approval."
+  },
+  "future_acceptance_manifests": {
+    "coverage_sha256": "b7c2024b8d897b020453ad79f6f8fd2f5206a1721890ad5505a04ce5a71ff625",
+    "coverage_case_count": 39,
+    "pilot_checks": {
+      "docs/collaboration/checks/53.A.json": {
+        "keys": [
+          "schema_version",
+          "pilot",
+          "document",
+          "helper_source",
+          "placeholder_resolution",
+          "checks",
+          "required_scenarios"
+        ],
+        "bytes": 7321,
+        "role": "Future pinned argv/oracle manifest; no execution or capability proof."
+      },
+      "docs/collaboration/checks/53.B.json": {
+        "keys": [
+          "schema_version",
+          "pilot",
+          "document",
+          "helper_source",
+          "placeholder_resolution",
+          "checks",
+          "required_scenarios"
+        ],
+        "bytes": 6556,
+        "role": "Future pinned argv/oracle manifest; no execution or capability proof."
+      }
+    },
+    "role": "Proposed acceptance contracts only; no runs performed.",
+    "coverage_cases_by_stage": {
+      "49": 6,
+      "50": 7,
+      "51": 4,
+      "52": 5,
+      "53.0": 6,
+      "54": 6,
+      "53": 5
+    }
+  },
+  "scope_limits": [
+    "Initial source-only21-doc Standards review; final staged22 qualification not covered.",
+    "No cross-axis reranking; separate Spec authority finding remains open.",
+    "No new tests/live commands, queue/process/worktree changes, source edits or repository mutations.",
+    "No protocol, Kata, multiworker, model/training, scientific release, runtime or HDFS admission."
+  ],
+  "landing_suitability": "Initial21 documentation conforms to reviewed Standards; final integration recommendation deferred to exact qualified22-path review and separate Spec result."
+}

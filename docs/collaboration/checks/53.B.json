@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "pilot": "53.B",
+  "document": "docs/collaboration/incidents/README.md",
+  "helper_source": "landed53.0 pinned base source",
+  "placeholder_resolution": "fixture preparation admits absolute paths/IDs; argv substitution only, never shell evaluation",
+  "checks": [
+    {
+      "id": "links",
+      "argv": [
+        "python",
+        "/source/tests/collab/pilot_checks.py",
+        "links",
+        "--document",
+        "$DOCUMENT",
+        "--source",
+        "/source"
+      ],
+      "expected_exit": 0,
+      "oracle": "Every local link resolves in candidate C/tree; external active URL schemes refused; source unchanged."
+    },
+    {
+      "id": "hygiene",
+      "argv": [
+        "python",
+        "/source/tests/collab/pilot_checks.py",
+        "hygiene",
+        "--document",
+        "$DOCUMENT",
+        "--fixture",
+        "$FIXTURE"
+      ],
+      "expected_exit": 0,
+      "oracle": "Document/snapshot excludes randomized fixture secret and private-trace canaries; no raw transcript body; HTML escaping fixtures pass."
+    },
+    {
+      "id": "commands",
+      "argv": [
+        "python",
+        "/source/tests/collab/pilot_checks.py",
+        "commands",
+        "--document",
+        "$DOCUMENT",
+        "--fixture",
+        "$FIXTURE",
+        "--manifest",
+        "$MANIFEST"
+      ],
+      "expected_exit": 0,
+      "oracle": "Every collab-example scenario is present, exact admitted argv parses, and expected outcome matches independently reopened actual fixture or outer-pilot effect/readback; every required scenario covered."
+    }
+  ],
+  "required_scenarios": [
+    {
+      "id": "observe",
+      "mode": "host-fixture-execute",
+      "argv": [
+        "python3",
+        "$CONTROLLER/scripts/collab.py",
+        "--project-state",
+        "$STATE",
+        "observe",
+        "--once"
+      ],
+      "expected_outcome": "ok",
+      "expected_exit": 0,
+      "oracle": "Reopen exact runtime/source/context plus raw effect/log and actual Git/Kata/Codex readback. Success verify/land/close and incident scenarios use independently audited prepilot fixtures at exact B, completed before pilot dispatch; claim/submit use actual outer pilot. No candidate verification depends on its own future landing/closure. Fixture coverage cannot certify the final actual handoff."
+    },
+    {
+      "id": "unknown-stop",
+      "mode": "host-fixture-execute",
+      "argv": [
+        "python3",
+        "$CONTROLLER/scripts/collab.py",
+        "--project-state",
+        "$STATE",
+        "--operation-id",
+        "$OP",
+        "task",
+        "takeover",
+        "--attempt",
+        "$UNKNOWN_ATTEMPT",
+        "--disposition",
+        "$DISPOSITION"
+      ],
+      "expected_outcome": "unknown",
+      "expected_exit": 3,
+      "oracle": "Reopen exact runtime/source/context plus raw effect/log and actual Git/Kata/Codex readback. Success verify/land/close and incident scenarios use independently audited prepilot fixtures at exact B, completed before pilot dispatch; claim/submit use actual outer pilot. No candidate verification depends on its own future landing/closure. Fixture coverage cannot certify the final actual handoff."
+    },
+    {
+      "id": "stale-land",
+      "mode": "prepilot-live-fixture-receipt",
+      "argv": [
+        "python3",
+        "$CONTROLLER/scripts/collab.py",
+        "--project-state",
+        "$STATE",
+        "--operation-id",
+        "$OP",
+        "task",
+        "land",
+        "--candidate",
+        "$STALE_CANDIDATE",
+        "--review",
+        "$OLD_REVIEW"
+      ],
+      "expected_outcome": "refused",
+      "expected_exit": 2,
+      "oracle": "Reopen exact runtime/source/context plus raw effect/log and actual Git/Kata/Codex readback. Success verify/land/close and incident scenarios use independently audited prepilot fixtures at exact B, completed before pilot dispatch; claim/submit use actual outer pilot. No candidate verification depends on its own future landing/closure. Fixture coverage cannot certify the final actual handoff."
+    },
+    {
+      "id": "refresh",
+      "mode": "prepilot-live-fixture-receipt",
+      "argv": [
+        "python3",
+        "$CONTROLLER/scripts/collab.py",
+        "--project-state",
+        "$STATE",
+        "--operation-id",
+        "$OP",
+        "task",
+        "refresh",
+        "--attempt",
+        "$OLD_ATTEMPT",
+        "--disposition",
+        "$DISPOSITION",
+        "--brief",
+        "$NEW_BRIEF"
+      ],
+      "expected_outcome": "ok",
+      "expected_exit": 0,
+      "oracle": "Reopen exact runtime/source/context plus raw effect/log and actual Git/Kata/Codex readback. Success verify/land/close and incident scenarios use independently audited prepilot fixtures at exact B, completed before pilot dispatch; claim/submit use actual outer pilot. No candidate verification depends on its own future landing/closure. Fixture coverage cannot certify the final actual handoff."
+    },
+    {
+      "id": "recover",
+      "mode": "host-fixture-execute",
+      "argv": [
+        "python3",
+        "$CONTROLLER/scripts/collab.py",
+        "--project-state",
+        "$STATE",
+        "--operation-id",
+        "$OP",
+        "recover",
+        "--effect",
+        "$PENDING_EFFECT"
+      ],
+      "expected_outcome": "ok",
+      "expected_exit": 0,
+      "oracle": "Reopen exact runtime/source/context plus raw effect/log and actual Git/Kata/Codex readback. Success verify/land/close and incident scenarios use independently audited prepilot fixtures at exact B, completed before pilot dispatch; claim/submit use actual outer pilot. No candidate verification depends on its own future landing/closure. Fixture coverage cannot certify the final actual handoff."
+    },
+    {
+      "id": "cleanup",
+      "mode": "prepilot-live-fixture-receipt",
+      "argv": [
+        "python3",
+        "$CONTROLLER/scripts/collab.py",
+        "--project-state",
+        "$STATE",
+        "--operation-id",
+        "$OP",
+        "cleanup",
+        "--attempt",
+        "$STOPPED_ATTEMPT",
+        "--retention",
+        "$RETENTION"
+      ],
+      "expected_outcome": "ok",
+      "expected_exit": 0,
+      "oracle": "Reopen exact runtime/source/context plus raw effect/log and actual Git/Kata/Codex readback. Success verify/land/close and incident scenarios use independently audited prepilot fixtures at exact B, completed before pilot dispatch; claim/submit use actual outer pilot. No candidate verification depends on its own future landing/closure. Fixture coverage cannot certify the final actual handoff."
+    }
+  ]
+}

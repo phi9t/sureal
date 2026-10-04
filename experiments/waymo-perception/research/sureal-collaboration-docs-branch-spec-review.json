@@ -1,0 +1,103 @@
+{
+  "axis": "Spec",
+  "base": "8285a0993ea6e1293614f335c62f7e88c06e299f",
+  "requested_source_tip": "d5ead21fb46ddef78bed8d8ac0f8b122ca1f0c01",
+  "reviewed_scope": "entire owned ten-commit documentation bundle; staged 21 paths",
+  "staged_sha256": {
+    "CONTEXT.md": "c5c06bc8eac525244e72e96dd9b583d0e368f87db3e1f491acc1e2e344696cdc",
+    "docs/collaboration/checks/53.A.json": "d398d298a620719d2acc825c91568aef8c278aa83930daf943c1b54632c0cf6c",
+    "docs/collaboration/checks/53.B.json": "8e73b656da24d128c35c90da5dacbeb147ec49f50f5c65ed2fce997609eff527",
+    "docs/collaboration/coverage.json": "b7c2024b8d897b020453ad79f6f8fd2f5206a1721890ad5505a04ce5a71ff625",
+    "docs/research/README.md": "3d04f55c42b33cbe30ee8214f4b95ded48a78bdf1cacd22db094d05d66c4f481",
+    "docs/research/reviews/2026-10-03-sureal-collaboration-claude-review.json": "7bcb1dad81ebba4e1edde4efe88a883c331394b9e0681dcd8f36bba5efe25519",
+    "docs/research/reviews/2026-10-03-sureal-collaboration-claude-review.md": "ce2e36b382150eee5878c3ed57ee70c9a44e30db148f48ebd59f0e8cfb948112",
+    "docs/research/reviews/2026-10-03-sureal-collaboration-review-resolution.md": "87ba54f5296be469366afd3b59f40ab8e5e98634fe8ff87b75a5891ddec96dcb",
+    "docs/research/task-queue.md": "2e27dad47c83cf01be5d8b64bd6f3a4cbe907df98548f33de3d0fe5ba5ac0c1c",
+    "docs/research/tasks/49-collaboration-project-admission.md": "cdc21bc22d2584bc7252ed790506255df46b2b38d0ddd2cf9c7b4147ead4e47f",
+    "docs/research/tasks/50-collaboration-worker-attempts.md": "1e7c56dd40156b5a84acaacab71011d4c5c27c52c5a81e1550c5678601ea4a1b",
+    "docs/research/tasks/51-collaboration-candidate-verification.md": "d6d9b0857456d8c5f618d85e24847b47452ea20a19808ebed3708c5a357543ed",
+    "docs/research/tasks/52-collaboration-landing-recovery.md": "90293f433f8fef7a177815387ce4ab9576eaa4b9bbec270bbd662b9818af9300",
+    "docs/research/tasks/53-0-collaboration-retention-cleanup-foundation.md": "61cc740644a22ba31927ad313848841a483fbeadc33c79e0f2a7d278ac67ea63",
+    "docs/research/tasks/53-collaboration-cleanup-closeout.md": "87283dcc14f8c424df82dc016be73b452a30a24ff5d3c890a22989887d6bf127",
+    "docs/research/tasks/54-worker-program-observability.md": "c42743e9fc9ceaf978c84ab63be1edbd486ae38f9e6bb3daf09d1a772092a1aa",
+    "docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md": "831e2cc589a0a52d04ee10a53b503c92060e6223d4b80d7c5fdb5ed2dfe28914",
+    "docs/superpowers/specs/2026-10-03-codex-runtime-domain-design.md": "b249f898a7dab4a9ba92fbe810ed9f126d2593a37e25376f23871910b718a288",
+    "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md": "016759635bb19de04e1d209c25916e08a138d5a9240797f95630139b83fd742e",
+    "docs/superpowers/specs/2026-10-03-worker-session-state-design.md": "1729245934fabc06998fcc2beac5ff3a7ddf273b9ea13eb10e374f1a87ba4bb1",
+    "experiments/waymo-perception/research-task-index.md": "3fcdc8ad336c32fcc040d432f1f859de75648b7da74711cb72ae586394823062"
+  },
+  "source_commits": [
+    "d5ead21fb46ddef78bed8d8ac0f8b122ca1f0c01",
+    "f9fbd5be5b632798f409aa65fb9743588606d701",
+    "4469127623350ad5a644ae8c4dd0f8f21ab7c990",
+    "5ab76b3a0efb2970e2762f657fb60ee38b3226f6",
+    "3321bb8556e40105a2d0f188ba24101b35d74a77",
+    "fa257289c5c722fca4572e685c90657cdcd47be1",
+    "c093595a956dc13ef1866ce17947b0371921eea6",
+    "9c4c6a7c1454c3a042e9fa1f86aadd3bb10021c2",
+    "c22865fcb12f110d713311025bc5afdac7723025",
+    "6b694c8a434387b6be190fa2b87952957766bd20"
+  ],
+  "findings": [
+    {
+      "id": "SPEC-1",
+      "severity": "Important",
+      "category": "unreconciled authority/scope contract",
+      "paths": [
+        {
+          "path": "docs/research/task-queue.md",
+          "lines": [
+            9,
+            12,
+            21,
+            52,
+            99
+          ]
+        },
+        {
+          "path": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+          "lines": [
+            64,
+            136,
+            140,
+            145
+          ]
+        },
+        {
+          "path": "docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md",
+          "lines": [
+            5,
+            7
+          ]
+        }
+      ],
+      "requirement_quote": "live ownership outside source, optional backend views until single transition defined",
+      "source_quote": "This supersedes the earlier optional-Kata/file-only queue proposal.",
+      "additional_source_quote": "Kata owns queue priority, dependency edges, current logical owner and operational stage.",
+      "finding": "The proposed bundle promotes Kata from optional backend/view to logical-owner authority and makes it required for dispatch. The prepared claim/CAS/thread/ack handshake is specified as separate effects, with a future capability gate; it is not a currently admitted ownership transition. This broader proposal may be retained under the whole-branch documentation request, but its normative supersession text is not explicitly reconciled with the latest backend-neutral steering. Historical author/user-approval headers do not supply that reconciliation.",
+      "requested_resolution": "Record explicit unresolved proposal/authority disposition at documentation landing; reconcile the single authoritative ownership transition and backend role against current steering at design/plan review before activation. Do not infer mandatory Kata or two-seat activation from this documentation merge."
+    }
+  ],
+  "documentation_landing": "Suitable as retained proposed documentation only with explicit SPEC-1 unresolved disposition; not an unqualified current-policy or implementation approval.",
+  "checks": {
+    "exact_scope_matches_preserved_inventory": true,
+    "blocked19_source_mismatches": [],
+    "journal120_exact_hash_paths": [
+      "experiments/waymo-perception/research/research-journal.jsonl"
+    ],
+    "journal120_not_in_staged_scope": true,
+    "coverage_oracle_cases": 39,
+    "source_runtime_changes": false,
+    "mainline_before_admission_exact_base_claim_generation_ack_unknown_takeover_stale_reverification": "specified",
+    "order": "owned closeout -> pristine -> design/plan/live-gated 49 -> 50 -> 51 -> 52 -> 53.0 -> 54 -> 53 -> models/training44-48",
+    "independent_native_mathematical_scientific_evidence_contracts": "preserved; no new scientific admission claimed",
+    "Claude_report_role": "historical changes-required review at 4469127, correction ledger not live proof",
+    "capability_status": "help/schema provenance only; actual transport/queue/stop/durability/retention capabilities remain live gated"
+  },
+  "preservation_input_sha256": "19fe2cc0ac3a71311386b44dc6a57ec58d7492b8473087e5f72d4bbc8e5f9219",
+  "limitations": [
+    "No implementation, network, live job, process stop, queue, cleanup or runtime tests performed.",
+    "Historical source-approval headers treated as author-recorded history, not present implementation authorization.",
+    "Moving foreign owner HEAD not re-observed; dated supplied census retained."
+  ]
+}

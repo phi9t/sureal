@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "utc": "2026-10-04T03:48:40.392753+00:00",
+  "generation_command": "python /tmp/sureal-doc-branch-closeout.py; exact generator retained in journal121 evidence",
+  "scope": "entire requested committed documentation branch plus explicitly qualified open-authority disposition and Git-only bookkeeping",
+  "base": "8285a0993ea6e1293614f335c62f7e88c06e299f",
+  "requested_ownership_commit": "6b694c8a434387b6be190fa2b87952957766bd20",
+  "source_branch": "codex/serial-collaboration-specs",
+  "source_head": "d5ead21fb46ddef78bed8d8ac0f8b122ca1f0c01",
+  "source_commits": [
+    "d5ead21fb46ddef78bed8d8ac0f8b122ca1f0c01 Fix collaboration review contracts and land cleanup before concurrent pilot",
+    "f9fbd5be5b632798f409aa65fb9743588606d701 Retain Claude collaboration plan review and hold execution gate",
+    "4469127623350ad5a644ae8c4dd0f8f21ab7c990 Record collaboration spec approval and concrete implementation plan",
+    "5ab76b3a0efb2970e2762f657fb60ee38b3226f6 Complete full v1 collaboration specification and concrete live gates",
+    "3321bb8556e40105a2d0f188ba24101b35d74a77 Model native Codex session trees threads turns and task bindings",
+    "fa257289c5c722fca4572e685c90657cdcd47be1 Define worker operating states and evidence-based stuck/hung health",
+    "c093595a956dc13ef1866ce17947b0371921eea6 Specify worker summaries and read-only program overview as a v1 gate",
+    "9c4c6a7c1454c3a042e9fa1f86aadd3bb10021c2 Require two concurrent worker sessions and live concurrency pilot in v1",
+    "c22865fcb12f110d713311025bc5afdac7723025 Specify Kata as centralized queue linked to committed task contracts",
+    "6b694c8a434387b6be190fa2b87952957766bd20 Specify mainline task admission and explicit worker ownership handoff"
+  ],
+  "source_commit_count": 10,
+  "source_paths": 21,
+  "qualified_document_paths": 22,
+  "integration_state": "prepared independently reviewed bundle; canonical landing and remote readback recorded after final combined review",
+  "review_axes": {
+    "Standards": {
+      "initial_findings": 0,
+      "qualified_findings": 0,
+      "initial_report": "sureal-collaboration-docs-branch-standards-review.json",
+      "qualified_report": "sureal-collaboration-docs-branch-qualified-standards-review.json"
+    },
+    "Spec": {
+      "initial_findings": 1,
+      "open_findings": 1,
+      "new_qualified_findings": 0,
+      "id": "SPEC-1",
+      "status": "OPEN ownership-authority choice; safely qualified for documentation retention, not implementation admission",
+      "initial_report": "sureal-collaboration-docs-branch-spec-review.json",
+      "qualified_report": "sureal-collaboration-docs-branch-qualified-spec-review.json"
+    }
+  },
+  "fresh_checks": [
+    {
+      "command": "python -m unittest tests.test_publication_audit -v",
+      "exit_code": 0,
+      "tests": 24,
+      "seconds": 12.445,
+      "role": "portable host gate, not protocol/scientific live acceptance"
+    },
+    {
+      "command": "python scripts/publication_audit.py --root .",
+      "exit_code": 0,
+      "status": "pass",
+      "tracked_files": 4002,
+      "errors": [],
+      "epoch": "qualified22-document candidate before later bookkeeping"
+    },
+    {
+      "command": "python /tmp/sureal-doc-branch-document-audit.py",
+      "exit_code": 0,
+      "local_links": 170,
+      "anchors": 6,
+      "missing": 0,
+      "required_future_oracles": 39,
+      "role": "source/structure/manifest/provenance validation, never executed future gates"
+    }
+  ],
+  "retained_Claude_review": "changes required at4469127, exact15Git-source pins and verbatim report body preserved; corrections recorded, fresh plan re-review/admission still required",
+  "task_ownership": "reviewed stable mainline spec/plan at B; onecurrentowner/task; durableclaim-generation/seat/actualthread-session/process/attempt/workspace/scope/evidence; ackbeforeRUNNING,unknownstartupholds; retainedstop/reconciledhandoff/freshidentities; obsoleteclaimsrefused; mutableownershipoutsidesource",
+  "authority_decision": "latestfile-backed/optional-backend handoff vsbroaderKata-as-logical-ownerproposal remainsopen; notices prevent treating branchlanding asbackendchoice oractivation",
+  "admission_note": "../../../docs/research/reviews/2026-10-04-collaboration-integration-admission.md",
+  "qualified_proposal_order": "49\u219250\u219251\u219252\u219253.0\u219254\u219253\u2192models/training44\u201348, after pristine/source/process/resource/design-plan/live admission",
+  "retained_work": "19blockedscientific sourcebodies andoriginalhashes/inventoryreasons preserved; foreign work observation timestamped, notcurrentquiescence; noworkspace/processretirement",
+  "foreign_observation": {
+    "utc": "2026-10-04T03:31:22.526469+00:00",
+    "head": "d5ead21fb46ddef78bed8d8ac0f8b122ca1f0c01",
+    "working_paths_at_observation": 0,
+    "disposition": "all committed source throughpind5included; subsequent owner work, ifany, remainsretained/unreviewed ratherthandiscarded"
+  },
+  "frozen_science": "fullnativeGT, sourcepackages, recipes, resource/scoringcaps, checkpoint0/1000 andidentities, registry scientificcontent andjournalprefix unchanged; nooptimizerupdates/newscores",
+  "retention": "newdocs/receipt/journal121Git-onlyaftersealedHDFS113; originalexactreadback/live-recoveryproofs unchanged, noscientificpayloadrelease",
+  "execution_boundary": "noKataregistration/claim, dispatcher/controller, nativeworkerstart, protocol/modelsimplementation, plan/runtimegatepromotion"
+}

@@ -1,0 +1,90 @@
+{
+  "axis": "Spec",
+  "base": "8285a0993ea6e1293614f335c62f7e88c06e299f",
+  "source_tip": "d5ead21fb46ddef78bed8d8ac0f8b122ca1f0c01",
+  "scope": "bounded re-review of admission qualifications; all 22 staged pins independently matched",
+  "staged_sha256": {
+    "CONTEXT.md": "c5c06bc8eac525244e72e96dd9b583d0e368f87db3e1f491acc1e2e344696cdc",
+    "docs/collaboration/checks/53.A.json": "d398d298a620719d2acc825c91568aef8c278aa83930daf943c1b54632c0cf6c",
+    "docs/collaboration/checks/53.B.json": "8e73b656da24d128c35c90da5dacbeb147ec49f50f5c65ed2fce997609eff527",
+    "docs/collaboration/coverage.json": "b7c2024b8d897b020453ad79f6f8fd2f5206a1721890ad5505a04ce5a71ff625",
+    "docs/research/README.md": "188087d2dc3fbb8bc5f8baebc4d5e9b4411218d1d2edced1cebb60891377e229",
+    "docs/research/reviews/2026-10-03-sureal-collaboration-claude-review.json": "7bcb1dad81ebba4e1edde4efe88a883c331394b9e0681dcd8f36bba5efe25519",
+    "docs/research/reviews/2026-10-03-sureal-collaboration-claude-review.md": "ce2e36b382150eee5878c3ed57ee70c9a44e30db148f48ebd59f0e8cfb948112",
+    "docs/research/reviews/2026-10-03-sureal-collaboration-review-resolution.md": "87ba54f5296be469366afd3b59f40ab8e5e98634fe8ff87b75a5891ddec96dcb",
+    "docs/research/reviews/2026-10-04-collaboration-integration-admission.md": "8d6060822c6fefa038491dd0f1aeb9294a23bb98c8d6f8302898e56570c2eb7c",
+    "docs/research/task-queue.md": "1c8c8c747db6cdc79258bad1cf00aa76ae1b20797ae9b99c2cb3225015017bac",
+    "docs/research/tasks/49-collaboration-project-admission.md": "cdc21bc22d2584bc7252ed790506255df46b2b38d0ddd2cf9c7b4147ead4e47f",
+    "docs/research/tasks/50-collaboration-worker-attempts.md": "1e7c56dd40156b5a84acaacab71011d4c5c27c52c5a81e1550c5678601ea4a1b",
+    "docs/research/tasks/51-collaboration-candidate-verification.md": "d6d9b0857456d8c5f618d85e24847b47452ea20a19808ebed3708c5a357543ed",
+    "docs/research/tasks/52-collaboration-landing-recovery.md": "90293f433f8fef7a177815387ce4ab9576eaa4b9bbec270bbd662b9818af9300",
+    "docs/research/tasks/53-0-collaboration-retention-cleanup-foundation.md": "61cc740644a22ba31927ad313848841a483fbeadc33c79e0f2a7d278ac67ea63",
+    "docs/research/tasks/53-collaboration-cleanup-closeout.md": "87283dcc14f8c424df82dc016be73b452a30a24ff5d3c890a22989887d6bf127",
+    "docs/research/tasks/54-worker-program-observability.md": "c42743e9fc9ceaf978c84ab63be1edbd486ae38f9e6bb3daf09d1a772092a1aa",
+    "docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md": "66b26423db83d05d6898ba1e7ce23d0a46d558f2049a5336ce7db721710b5d35",
+    "docs/superpowers/specs/2026-10-03-codex-runtime-domain-design.md": "b249f898a7dab4a9ba92fbe810ed9f126d2593a37e25376f23871910b718a288",
+    "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md": "3a6f967ec111e2e3d396153b42775dd4bab97e414af8d20ac391cde711b468d6",
+    "docs/superpowers/specs/2026-10-03-worker-session-state-design.md": "1729245934fabc06998fcc2beac5ff3a7ddf273b9ea13eb10e374f1a87ba4bb1",
+    "experiments/waymo-perception/research-task-index.md": "3fcdc8ad336c32fcc040d432f1f859de75648b7da74711cb72ae586394823062"
+  },
+  "remaining_SPEC_1": {
+    "id": "SPEC-1",
+    "severity": "Important",
+    "category": "unreconciled authority/scope contract",
+    "paths": [
+      {
+        "path": "docs/research/task-queue.md",
+        "lines": [
+          9,
+          12,
+          21,
+          52,
+          99
+        ]
+      },
+      {
+        "path": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+        "lines": [
+          64,
+          136,
+          140,
+          145
+        ]
+      },
+      {
+        "path": "docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md",
+        "lines": [
+          5,
+          7
+        ]
+      }
+    ],
+    "requirement_quote": "live ownership outside source, optional backend views until single transition defined",
+    "source_quote": "This supersedes the earlier optional-Kata/file-only queue proposal.",
+    "additional_source_quote": "Kata owns queue priority, dependency edges, current logical owner and operational stage.",
+    "finding": "The proposed bundle promotes Kata from optional backend/view to logical-owner authority and makes it required for dispatch. The prepared claim/CAS/thread/ack handshake is specified as separate effects, with a future capability gate; it is not a currently admitted ownership transition. This broader proposal may be retained under the whole-branch documentation request, but its normative supersession text is not explicitly reconciled with the latest backend-neutral steering. Historical author/user-approval headers do not supply that reconciliation.",
+    "requested_resolution": "Record explicit unresolved proposal/authority disposition at documentation landing; reconcile the single authoritative ownership transition and backend role against current steering at design/plan review before activation. Do not infer mandatory Kata or two-seat activation from this documentation merge.",
+    "status": "OPEN; truthfully qualified for documentation retention, backend authority not resolved",
+    "qualification": "Prominent queue/spec/plan/README notices and the new integration-admission note explicitly override an interpretation of mandatory Kata as admitted current policy. Queue supersession is conditional. The original finding is retained, not downgraded."
+  },
+  "new_findings": [],
+  "documentation_landing": "Suitable for documentation-only retention/landing with SPEC-1 explicitly open. No implementation-plan, backend, two-seat, runtime or scientific admission.",
+  "checks": {
+    "scope_and_pins_exact": true,
+    "changed_original_paths": [
+      "docs/research/README.md",
+      "docs/research/task-queue.md",
+      "docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md",
+      "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md"
+    ],
+    "new_admission_note": "docs/research/reviews/2026-10-04-collaboration-integration-admission.md",
+    "blocked19_unchanged": true,
+    "journal120_unchanged": true,
+    "original_review_artifacts_unchanged": true,
+    "common_claim_ack_unknown_takeover_retention_contract": "retained explicitly",
+    "future_authority_pristine_plan_runtime_live_gates": "open explicitly",
+    "stage_order": "49 -> 50 -> 51 -> 52 -> 53.0 -> 54 -> 53 -> models/training44-48"
+  },
+  "input_scope_sha256": "f439044f0d10814c69742db771bcb1dd3d30eabca7fb2e6c9cef9962f077cbf4",
+  "limitations": "Read-only documentation re-review. No source, index, queue, process, cleanup, backend, runtime, HDFS or scientific mutation or live tests."
+}
