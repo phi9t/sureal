@@ -1,0 +1,76 @@
+{
+  "cutoff_ms": 1791140207276,
+  "threads": [
+    {
+      "id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "turn_count": 960,
+      "turn_statuses": {
+        "completed": 955,
+        "failed": 3,
+        "interrupted": 1,
+        "inProgress": 1
+      },
+      "item_counts": {
+        "agentMessage": 2852,
+        "collabAgentToolCall": 64,
+        "commandExecution": 6759,
+        "contextCompaction": 60,
+        "fileChange": 245,
+        "imageView": 7,
+        "reasoning": 6607,
+        "sleep": 418,
+        "subAgentActivity": 462,
+        "userMessage": 88,
+        "webSearch": 57
+      },
+      "error_turns": [
+        {
+          "turn_id": "01a0f2a7-a0e4-7a30-a065-2f2ed5c571ac",
+          "status": "failed",
+          "error_json": "{\"message\":\"Selected model is at capacity. Please try a different model.\",\"codexErrorInfo\":\"serverOverloaded\",\"additionalDetails\":null,\"misalignment\":null}",
+          "started_at": 1790777467,
+          "completed_at": 1790777984,
+          "duration_ms": 517075
+        },
+        {
+          "turn_id": "01a100a7-6692-7743-9ce9-62ac701afc7d",
+          "status": "failed",
+          "error_json": "{\"message\":\"Selected model is at capacity. Please try a different model.\",\"codexErrorInfo\":\"serverOverloaded\",\"additionalDetails\":null,\"misalignment\":null}",
+          "started_at": 1791012333,
+          "completed_at": 1791012691,
+          "duration_ms": 358382
+        },
+        {
+          "turn_id": "01a1059f-6b12-7360-a6cb-6268290a4d1e",
+          "status": "failed",
+          "error_json": "{\"message\":\"Error running remote compact task: Selected model is at capacity. Please try a different model.\",\"codexErrorInfo\":\"serverOverloaded\",\"additionalDetails\":null,\"misalignment\":null}",
+          "started_at": 1791095696,
+          "completed_at": 1791123500,
+          "duration_ms": 27804061
+        }
+      ]
+    },
+    {
+      "id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+      "turn_count": 41,
+      "turn_statuses": {
+        "completed": 40,
+        "inProgress": 1
+      },
+      "item_counts": {
+        "agentMessage": 152,
+        "collabAgentToolCall": 5,
+        "commandExecution": 502,
+        "contextCompaction": 8,
+        "fileChange": 21,
+        "imageView": 1,
+        "reasoning": 416,
+        "sleep": 5,
+        "subAgentActivity": 23,
+        "userMessage": 39,
+        "webSearch": 17
+      },
+      "error_turns": []
+    }
+  ]
+}

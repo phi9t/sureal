@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "reviewed_report": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-session-retrospective-20261004/docs/research/reviews/2026-10-04-waymo-session-retrospective.md",
+  "report_sha256": "b1a8da140b94dae1ebb1e37ba381b972a8f44854c3bcc9653e67f0efebc1019f",
+  "pinned_source_base": "a553645ef22761aa7708abf1ee109952a6cd2c38",
+  "verdict": "pass",
+  "findings": [],
+  "checked_claims": [
+    {
+      "claim": "Coverage is 29 cutoff-eligible root/descendant threads plus 22 same-checkout Guardian review satellites, reported as 51 indexed session records.",
+      "result": "supported",
+      "basis": "inventory-summary.json gives full_descendant_threads=29, guardian_review_satellite_threads=22, seed_threads=51 and records that these are locally indexed histories; the report explicitly discloses no full transcript replay and does not imply total external-history completeness."
+    },
+    {
+      "claim": "Root turn and compaction counts and the failed compaction event are activity/error facts, not waste, outage, or productivity measurements.",
+      "result": "supported",
+      "basis": "root-accounting.json matches 960 implementation turns (955 completed, 3 failed, 1 interrupted, 1 in progress), 60 compaction items, and 41 frontier turns/8 compactions. The final failed turn's native interval is 06:34:56Z–14:18:20Z, error is serverOverloaded, duration_ms=27804061; the report explicitly rejects interpreting that duration as outage/hang time or attributing cause to thread size. The inventory notes a one-row unresolved commandExecution discrepancy; the report does not assert the disputed command count."
+    },
+    {
+      "claim": "Only task49 is accepted at cutoff; dispatch/runtime/stop proof and tasks50–54 including retention/cleanup, observer and final pilot remain gated.",
+      "result": "supported",
+      "basis": "The pinned task49 closeout says no managed dispatch before task50 and identifies remaining task50 transport/stop gate; the accepted plan order is 49→50→51→52→53.0→54→53→44→45→46→47→48. The consolidation preserves this sequence and does not count ordinary retrospective subagents as managed overlap."
+    },
+    {
+      "claim": "MAC's status/ownership/recovery/parallel-preparation benefits are prospective, and no throughput improvement has been measured.",
+      "result": "supported",
+      "basis": "Ticket49's actual acceptance is distinguished from specified but unimplemented later capabilities. The report calls benefits prospective, says there is no MAC throughput improvement measured, and proposes counters as observations rather than new acceptance gates."
+    },
+    {
+      "claim": "Resource, refresh, review-cost, stale-base and independence limitations remain material.",
+      "result": "supported",
+      "basis": "The report notes one shared GPU and explicit resource locks; stale candidates require fresh attempts and verification; independent reviews can err; ticket49's evidence/review work has real overhead; and worker concurrency cannot grant data access, GPU capacity or scientific validity. It recommends a GPU owner paired with CPU-only frozen-input preparation/verification and does not imply model migration tasks44–48 can be parallelized past their dependency chain."
+    },
+    {
+      "claim": "Scientific preparation may proceed separately from implementation/optimizer admission, while the approved experiment order and gates stay intact.",
+      "result": "supported",
+      "basis": "The preparation proposal explicitly limits work to plans, frozen inventories, protocols, definitions, and auditable fixtures, and states that this does not authorize implementation/admission. It preserves42→43, keeps41.2 separate, and retains resource/continuation gates."
+    },
+    {
+      "claim": "The retrospective avoids causal or scope overstatement.",
+      "result": "supported",
+      "basis": "It states that thread size is not proven to cause provider overload, separates fitted-frame evidence from held-out/generalization claims, discloses indexed-history limitations, and distinguishes measured repository/runtime facts from hypotheses and proposed acceleration metrics."
+    }
+  ],
+  "review_limits": "Read-only consolidation review against the assigned incident map, inventory/accounting artifacts, and the specified pinned a553645 source receipts. This is not a re-audit of all scientific artifacts or raw rollout transcripts."
+}

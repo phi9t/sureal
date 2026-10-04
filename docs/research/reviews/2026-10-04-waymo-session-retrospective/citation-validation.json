@@ -1,0 +1,16 @@
+{
+  "scope": "Exact MAC evidence identities/times and science public-message ID presence/cutoff; not an independent rerun of historical live scientific experiments.",
+  "mac_items_checked": 25,
+  "science_ids_checked": 7,
+  "findings": [],
+  "reviewed_inputs": [
+    {
+      "path": "mac/incident-mapping.json",
+      "sha256": "00f769eea18f3cb436e19c15a98b97f03476f09de6e2716197f4f55b2f9da6b4"
+    },
+    {
+      "path": "science/research-retrospective.md",
+      "sha256": "453279853e28ccfecb0de9b40374e621e446b1be1a239776987b4f8d5b6cd7f6"
+    }
+  ]
+}
