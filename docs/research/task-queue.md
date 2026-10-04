@@ -1,6 +1,6 @@
 # Research task queue policy
 
-**Integration admission status (2026-10-04 UTC):** this committed bundle is retained for review. The latest ownership handoff describes file-backed controller claims with optional issue-backend views; the later bundle proposes centralized Kata ownership. That authority choice is unresolved. Statements below requiring Kata describe the proposed v1, not an admitted operational policy. Historical approval headers do not authorize backend setup, two-seat activation or implementation. See the [authority reconciliation note](reviews/2026-10-04-collaboration-integration-admission.md).
+**Integration admission status (2026-10-04 UTC):** the user follow-up selects centralized Kata as the proposed scheduler/broker authority, superseding optional-Kata/file-only scheduling. This resolves the earlier proposal-authority conflict. The actual ownership transition, installed capabilities, design/plan and live admission gates remain open; statements below describe the proposed v1, not an active operating policy. No backend setup, worker activation or implementation is authorized by this documentation update. See the [authority reconciliation note](reviews/2026-10-04-collaboration-integration-admission.md).
 
 ## Current mechanism and roles
 
@@ -8,7 +8,7 @@ At inspection on 2026-10-03, numbered Markdown files in `docs/research/tasks/` a
 
 `codex queue` delivers a message to a worker session. It is not a dependency-aware work ledger. An experiment registry defines runs, not engineering ticket ownership. A design file describes the desired system, not what is ready to execute.
 
-Proposed v1 uses Kata as the centralized operational task ledger, with the Sureal controller providing worker dispatch and exact-candidate verification/integration. It would supersede the earlier optional-Kata/file-only queue proposal only after the ownership authority is explicitly reconciled and admitted. Kata is installed and its local daemon is healthy, but Sureal is not yet registered; this document does not claim initialization or implementation.
+Proposed v1 uses Kata as the centralized operational task ledger, with the Sureal controller providing worker dispatch and exact-candidate verification/integration. The user selected this direction over the earlier optional-Kata/file-only queue proposal; operational activation still requires the ownership-transition and implementation gates. At the reported inspection, Kata was installed and its local daemon healthy, but Sureal was not registered; this document does not claim fresh inspection, initialization or implementation.
 
 - Git mainline owns reviewed design specs, task acceptance, dependencies, implementation plans and versioned evidence manifests.
 - Kata owns queue priority, dependency edges, current logical owner and operational stage. Issue metadata/comments link each assignment to its actual worker session, attempt, workspace and evidence.

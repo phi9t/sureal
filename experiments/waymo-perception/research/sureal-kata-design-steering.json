@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "base": "dca14888df5f5101a532a5fdf14b92cefbd184d9",
+  "provenance": "Explicit latest user design steering after prior documentation landing; no fresh Kata runtime inspection",
+  "already_landed_proposal_commit": "c22865fcb12f110d713311025bc5afdac7723025",
+  "ancestor_of_published_documentation_landing": true,
+  "user_direction": "Kata is the centralized operational scheduler/broker linked to committed task descriptions; supersedes optional-Kata/file-only design",
+  "roles": {
+    "Kata": "ready/priorities/blocked-by/logical owner/stage",
+    "committed_specs_plans": "exact acceptance and outcome evidence",
+    "Sureal_controller": "dispatch and durable process/candidate/verification/integration receipts, never another owner queue"
+  },
+  "prior_SPEC_1_disposition": "Proposal-authority direction resolved by latest user steering; old review reports and journal121 remain exact historical records. Actual ownership-transition capabilities/admission still open.",
+  "future_contracts": [
+    "one shared Sureal project across worktrees",
+    "distinct --as sureal/<attempt-id> actor",
+    "durable intent before separate claim/metadata/launch effects",
+    "owner/revision readback and supported metadata --if-match",
+    "matching acknowledgement and reconciliation of uncertain effects",
+    "installed v0.14.3 feature validation, no upstream flags assumed",
+    "project-scoped export/restore",
+    "closed issue never replaces live proof"
+  ],
+  "activation": "NOT performed or authorized by this steering: no Kata registration/issues/claims, dispatch, protocol/models implementation or new live gates",
+  "fresh_source_check": "c22865f ancestry to dca1488 exact; nineteen blocked worker bodies exact",
+  "historical_configuration": "User reports installed v0.14.3 healthy daemon, default actor philip.yang, Sureal unregistered; not freshly inspected here",
+  "preservation": "All19 blocked source hashes checked exact; frozen science, later design-owner work and prior HDFS retention stay intact",
+  "journal": "Entry122 is Git-only after sealedHDFS113, no payload release or new HDFS proof",
+  "scope": "prepared documentation-only clarification for independent review and mainline landing"
+}
