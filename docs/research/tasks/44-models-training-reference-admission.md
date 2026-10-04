@@ -4,7 +4,7 @@ Design milestone: MT-0. Workstream: first-class models and training.
 
 **Goal:** freeze the actual landed scientific reference and prove that old/new implementation comparisons can execute in isolated, pinned runtimes before relocating model behavior.
 
-**Activation:** the active worker finishes its current implementation milestone and lands ready owned work; the written design and implementation plan are reviewed. This does not require completing the entire research program or all future training. The existing worker's live source tree and running source packages remain intact.
+**Activation:** the active worker finishes its current implementation milestone and lands ready owned work; pristine mainline and [53 — local protocol closeout](53-collaboration-cleanup-closeout.md) are admitted; this workstream's written design and implementation plan are reviewed. This does not require completing the entire research program or all future training. The existing worker's live source tree and running source packages remain intact.
 
 **Dependencies:** current live runtime/geometry/evaluation foundations 01/06/08/09; the applicable resource and storage admission. This is a migration gate, not scientific completion of ticket 10.
 

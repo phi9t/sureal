@@ -14,6 +14,8 @@ The user selected:
 - Consolidation of the duplicated one-frame producer loops first; retain the existing sustained loop.
 - Models and training before the later data, geometry, evaluation, analysis and execution migrations.
 
+Subsequent steering adds the [Sureal-local collaboration protocol](2026-10-03-sureal-serial-collaboration-design.md) as supporting infrastructure after pristine mainline and before this scientific migration. Corenius is a design reference only; all implementation stays in Sureal. Protocol ticket 53 is an execution prerequisite for task 44.
+
 The migration preserves scientific behavior. Architecture improvements, new losses, new sampling strategies and new experiments are separate research changes with their own gates.
 
 ## Evidence behind the design
@@ -211,7 +213,7 @@ The milestone contracts are decomposed into independently reviewable task specif
 
 | Milestone | Task specification | Blocked by |
 | --- | --- | --- |
-| MT-0 | [44 — reference admission](../../research/tasks/44-models-training-reference-admission.md) | Design/plan review and active implementation closeout |
+| MT-0 | [44 — reference admission](../../research/tasks/44-models-training-reference-admission.md) | Design/plan review and admitted local protocol 53 |
 | MT-1 | [45 — models and layers](../../research/tasks/45-first-class-models-and-layers.md) | 44 |
 | MT-2 | [46 — training policy and state](../../research/tasks/46-first-class-training-policy-and-state.md) | 45 |
 | MT-3 | [47 — shared fixed-frame producer](../../research/tasks/47-shared-fixed-frame-producer.md) | 46 |

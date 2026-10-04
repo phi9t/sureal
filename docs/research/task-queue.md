@@ -36,11 +36,17 @@ Preserve the existing [approved research execution order](../../experiments/waym
 The models/training architecture lane is:
 
 ```text
-written design + implementation-plan review ──┐
-active implementation closeout / ready landing ──┴─> 44 -> 45 -> 46 -> 47 -> 48
+current task + owned integration closeout
+    -> pristine phi9t/mainline
+    -> local protocol 49 -> 50 -> 51 -> 52 -> 53
+    -> models/training 44 -> 45 -> 46 -> 47 -> 48
 ```
 
-Models/training is the first architecture migration. Planning and read-only reference discovery may proceed while its execution gates are open. Independent worktrees may be used; all actual GPU verification shares the existing exclusive lock. The original goal need not finish before migration, but active frozen inventories must be preserved.
+The user selected the [Sureal-local serial collaboration protocol](../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md) as the next supporting stage. Corenius is a design reference only. Models/training remains the first scientific architecture migration. Both workstreams require their written design/plan review before execution. Planning and read-only reference discovery may proceed while execution gates are open; active frozen inventories and the original scientific contracts remain preserved.
+
+The protocol's initial scheduling is file-backed and serial: the lead selects one admitted Git task, and the local controller owns its one-seat attempt/candidate/landing state. It does not require Kata initialization. If Kata is later enabled, it supplies ownership/priorities/dependencies without replacing exact-candidate admission or becoming a second authority for scientific outcomes.
+
+After protocol admission, each managed task starts in its own independent Git clone and each verification uses a separately materialized immutable candidate. Existing worktrees remain part of the pre-protocol integration inventory; do not delete them simply because the new workflow uses clones. All actual GPU verification still shares the existing exclusive experiment lock.
 
 When enabling Kata, start with these scoped architecture items and the current relevant research follow-ups, not a bulk claim that all historical tickets have been reconciled. Import additional existing tickets after inspecting their latest acceptance and receipts; preserve old filenames/numbers.
 
