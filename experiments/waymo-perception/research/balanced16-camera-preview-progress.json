@@ -1,0 +1,71 @@
+{
+  "expected_scenes": 13,
+  "admitted_scenes": 13,
+  "scene_receipts": [
+    {
+      "scene": "11004685739714500220_2300_000_2320_000",
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-camera-previews-v2/11004685739714500220_2300_000_2320_000/receipt.json",
+      "sha256": "29481df5167442a2d6b2ea9dcc5695043e852900570a71a4fe5e3c70b1808347"
+    },
+    {
+      "scene": "12856053589272984699_1020_000_1040_000",
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-camera-previews-v2/12856053589272984699_1020_000_1040_000/receipt.json",
+      "sha256": "8e7accbf35fc695b6b97dfa4345e89cab44195e8b8eb05e485d5f2c135facf9d"
+    },
+    {
+      "scene": "13506499849906169066_120_000_140_000",
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-camera-previews-v2/13506499849906169066_120_000_140_000/receipt.json",
+      "sha256": "b109e179bd6a9e79860a9b7a314a8f5c66d52a769837224ab68d5d4620f98be7"
+    },
+    {
+      "scene": "13830510593707564159_5575_000_5595_000",
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-camera-previews-v2/13830510593707564159_5575_000_5595_000/receipt.json",
+      "sha256": "cfd517b879648bdb92675aea3636aa083e52be4c31cf0eab8e1d3712fc2c2299"
+    },
+    {
+      "scene": "13840133134545942567_1060_000_1080_000",
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-camera-previews-v2/13840133134545942567_1060_000_1080_000/receipt.json",
+      "sha256": "6f5516deaabc6a07ba52eb741044f98c6580af9ee0dcabb7d35a3d7d1d13983e"
+    },
+    {
+      "scene": "15628918650068847391_8077_670_8097_670",
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-camera-previews-v2/15628918650068847391_8077_670_8097_670/receipt.json",
+      "sha256": "5bc1c6e1f0945fbbc9371836a192de7981a3137626114667d53a701d588d56f5"
+    },
+    {
+      "scene": "15696964848687303249_4615_200_4635_200",
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-camera-previews-v2/15696964848687303249_4615_200_4635_200/receipt.json",
+      "sha256": "5667bf9fa0643e40f013165f23a060de46ff2481aea429f329d21fc877c79e92"
+    },
+    {
+      "scene": "16977844994272847523_2140_000_2160_000",
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-camera-previews-v2/16977844994272847523_2140_000_2160_000/receipt.json",
+      "sha256": "f5a6f6d6cb08978376e529f6a821d353d698169aae14fcf0762328b5a9b9a4ee"
+    },
+    {
+      "scene": "17885096890374683162_755_580_775_580",
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-camera-previews-v2/17885096890374683162_755_580_775_580/receipt.json",
+      "sha256": "68865324c8937f045d577a49bf2835e628cb70f243f34929dd571eb0fbaa1636"
+    },
+    {
+      "scene": "3966447614090524826_320_000_340_000",
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-camera-previews-v2/3966447614090524826_320_000_340_000/receipt.json",
+      "sha256": "1009103729abc88e0ffe7762ec179c01e39a0cfaa3a840508aea8a8c5b99c50f"
+    },
+    {
+      "scene": "4575961016807404107_880_000_900_000",
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-camera-previews-v2/4575961016807404107_880_000_900_000/receipt.json",
+      "sha256": "a4e214224214a2b14ae00f16ed4c6147ebd3eb79148fc6764f08cba048cb164f"
+    },
+    {
+      "scene": "7850521592343484282_4576_090_4596_090",
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-camera-previews-v2/7850521592343484282_4576_090_4596_090/receipt.json",
+      "sha256": "8744ce620dfa6397b684927f452c35f13b6c01342f4ad79a990d411e18094fc8"
+    },
+    {
+      "scene": "7921369793217703814_1060_000_1080_000",
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-camera-previews-v2/7921369793217703814_1060_000_1080_000/receipt.json",
+      "sha256": "a08d397546c79a5931d847705fd4c6383bbfb2710e9c7d952ee378c18ed57325"
+    }
+  ]
+}

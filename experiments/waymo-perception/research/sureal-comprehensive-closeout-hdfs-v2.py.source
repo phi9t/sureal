@@ -1,0 +1,29 @@
+"""Publish an explicit reviewed UTF-8 source/report/proof allowlist; no payload export."""
+import json,pathlib,sys,shutil
+P=pathlib.Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P));sys.dont_write_bytecode=True;R=P/'research'
+from cohort.sustained_controller_backend import NativeBackend,C,W
+from cohort.sustained_controller_lock import acquire_experiment_lock
+from resources.backend import ResourceBackend
+from resources.retention import publish_bundle
+from resources.sources import sha,regular
+from resources.stage import write_new
+from tier1.storage import unique_payload_bytes
+ROOT=C/'insula/comprehensive-closeout-retention-v2'
+ALLOW=pathlib.Path('/tmp/sureal-comprehensive-closeout-hdfs-allowlist.json')
+with acquire_experiment_lock(C/'insula/architecture-experiments.lock') as lock:
+ allow=json.loads(ALLOW.read_text());entries=allow['members'];assert 0<len(entries)<4500
+ passing=json.loads(pathlib.Path('/tmp/sureal-comprehensive-closeout-passing-tests-dispatch.json').read_text());assert passing['passed']
+ b=NativeBackend('controller20261003a','baseline',lock,resume=True);state=json.loads((b.R/'state.json').read_text());prior=None
+ for record in state['records']:b.check_record(record,prior);prior=record
+ shared=json.loads((R/'sustained-resource-shared-hdfs-live-v4-verified.json').read_text());b.__class__=ResourceBackend;b._resource_identity=None;b.attach_resources(shared['resource_identity_path'],shared['resource_identity_sha256'])
+ ROOT.mkdir();snapshot=ROOT/'snapshot';snapshot.mkdir();before=unique_payload_bytes(W);inventory={}
+ for name,e in entries.items():
+  p=pathlib.Path(e['path']);assert regular(p) and sha(p)==e['sha256'] and p.stat().st_size==e['bytes'];target=snapshot/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(p,target);assert sha(target)==e['sha256'];inventory[name]={'path':str(target),'sha256':e['sha256'],'bytes':e['bytes']}
+ for src,name in [(ALLOW,'explicit-allowlist.json'),(pathlib.Path(__file__),'publisher.source'),(pathlib.Path('/tmp/sureal-comprehensive-closeout-hdfs-allowlist.py'),'allowlist-builder.source')]:
+  dst=snapshot/name;shutil.copyfile(src,dst);inventory['comprehensive-closeout/publication-policy/'+name]={'path':str(dst),'sha256':sha(dst),'bytes':dst.stat().st_size}
+ write_new(ROOT/'expected.json',inventory);print('PRESERVE EXPLICIT SOURCE/REPORT/PROOF METADATA',len(inventory),sum(e['bytes'] for e in inventory.values()),flush=True)
+ publication=publish_bundle(b,'checkpoint',inventory)
+ for p,h in passing['original_six_artifacts'].items():assert sha(p)==h
+ value={'passed':True,'scope':allow['scope']+';19blocked candidate sources preserved but not runtime-admitted; previews/cache trees omitted; no model/rawsensor payload export, checkpoint release or fullrunner admission','publication':publication,'source_inventory_path':str(ROOT/'expected.json'),'source_inventory_sha256':sha(ROOT/'expected.json'),'members':len(inventory),'source_bytes':sum(e['bytes'] for e in inventory.values()),'journal_entries':112,'scientific_bytes_before':before,'scientific_bytes_after':unique_payload_bytes(W),'original_six_artifacts':passing['original_six_artifacts'],'driver':{'path':__file__,'sha256':sha(__file__)},'allowlist':{'path':str(ALLOW),'sha256':sha(ALLOW)}}
+ write_new(ROOT/'verified.json',value);write_new(pathlib.Path('/tmp/sureal-comprehensive-closeout-hdfs.json'),value);write_new(R/'sureal-comprehensive-closeout-hdfs.json',value)
+print('PASS exact narrowed HDFS metadata readback/live union',flush=True)

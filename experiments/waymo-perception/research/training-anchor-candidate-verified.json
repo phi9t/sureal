@@ -1,0 +1,81 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/training-anchor-candidate-v1/input",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/training-anchor-candidate-v1/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/training-anchor-candidate-v1/input",
+        "/tmp/input",
+        "--",
+        "python",
+        "-c",
+        "import hashlib,json,math,importlib.util\nfrom pathlib import Path\nimport numpy as np\nfrom pipeline.anchor_grid import anchor_grid\nassert importlib.util.find_spec(\"tensorflow\") is None\nsha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()\ne=json.loads(Path('/tmp/input/expected.json').read_text());r=Path('/experiment/research')\nassert sha(r/'training-anchor-templates.candidate.json')==e['candidate_sha256']\nassert sha(r/'training-box-audited-distribution-summary.json')==e['summary_sha256']\nassert sha(r/'training-box-full64-replay-verified.json')==e['audit_sha256']\nassert sha('/experiment/pipeline/anchor_grid.py')==e['grid_code_sha256']\nc=json.loads((r/'training-anchor-templates.candidate.json').read_text());s=json.loads((r/'training-box-audited-distribution-summary.json').read_text());audit=json.loads((r/'training-box-full64-replay-verified.json').read_text())\nassert s['audit_evidence_sha256']==e['audit_sha256']==c['audit_evidence_sha256']\nassert c['summary_sha256']==e['summary_sha256'] and s['native_rows']==726715\nassert audit['checks'] and all(x['exit_code']==0 for x in audit['checks'])\nassert len(c['templates'])==8\nfor i,t in enumerate(c['templates']):\n cls=i//2+1;assert t['class_id']==cls\n expected=s['classes'][str(cls)]['median_length_width_height_center_z']+[0.0 if i%2==0 else math.pi/2]\n assert t['values']==expected and all(math.isfinite(x) for x in expected) and min(expected[:3])>0\n# Analytic non-square grid probes center-Z and flatten orientation independently.\ng=anchor_grid(nx=4,ny=2,cell_size=[.2,.3],origin=[-1,-2],templates=[x['values'] for x in c['templates']])\nassert g.shape==(16,7)\nfor i,row in enumerate(g):\n cell=i//8;t=c['templates'][i%8]['values']\n np.testing.assert_allclose(row,[-1+(2*cell+1)*.2,-2+.3,t[3],*t[:3],t[4]],rtol=0,atol=1e-14)\nvalue={'classes':4,'templates':8,'analytic_anchors':16,'cyclist_unique_training_tracks':s['classes']['4']['unique_tracks'],'scope':'training-only median derivation and analytic layout; no training or heldout quality claim'}\nPath('/outputs/check.json').write_text(json.dumps(value,indent=2));print('PASS training-only medians, lineage, native center-Z, class/yaw and XY order')\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "expected": {
+    "candidate_sha256": "4bcc69590d664b32ff1ece5e8f00345c76f9564f419b091bf05f6482a5c56d52",
+    "summary_sha256": "78b33cad1c61adf54c393293f9ee846962809fa0aa9d640c35f82f0f899903a6",
+    "audit_sha256": "17cd6b26363946bb7c761bac7fa064113d345d855d51282f3a82ad2378db0e58",
+    "grid_code_sha256": "2846a69b632483f9553523954ab72fd9af4672edf1c628d79333333cc762b60e"
+  },
+  "validation": {
+    "classes": 4,
+    "templates": 8,
+    "analytic_anchors": 16,
+    "cyclist_unique_training_tracks": 38,
+    "scope": "training-only median derivation and analytic layout; no training or heldout quality claim"
+  },
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/training-anchor-candidate-v1/output/check.json": "f03a6471c24742a9aa7d4c5a70dab1c9ed1da41107d97189cb57a1931a45fde4",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/training-anchor-candidate-v1/output/live.log": "d66a88d979a50829456b76a0ca0a76f8b7b38ba81db6633f77d92e4b673cfe5b"
+  },
+  "scope": "candidate preparation only; ticket07 and10 remain open"
+}

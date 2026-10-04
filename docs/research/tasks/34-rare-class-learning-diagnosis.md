@@ -29,3 +29,17 @@ The [coverage controls](../../../experiments/waymo-perception/research/balanced1
 Next diagnostic: independently reconstruct original nearest-BEV overlaps and forced assignments for every uncovered object, distinguish zero overlap from collisions with other GT/classes, and inspect retained physical support and decoder/NMS losses separately. Any replacement assignment/grid is a distinct one-factor treatment with frozen rules and independent native target/model/export verifiers. Preserve the preregistered four optimization recipes and all-class gate; do not combine target changes silently or remove GT. The running0/19/35 GPU pilot proves execution/restart before sustained cases, not scientific readiness.
 
 Completed assignment diagnostic: independent live reconstruction matched every label and target index across the full 16-frame grids. All 30 uncovered targets have positive overlap; 28 lose their maximizing anchors to strictly higher overlap, and two lose equal-overlap ties. Of these conflicts, 28 are within the same class. This rejects zero overlap as the explanation for this cohort and shows that class-restricted matching alone cannot resolve the existing same-class conflicts. Matching treatments remain unimplemented and unpromoted; preserve the original control and investigate coverage-preserving matching separately from grid/height/NMS changes. See the linked coverage report and `balanced16-coverage-causes-verified.json`.
+
+## Specified association follow-up (2026-10-03)
+
+[Ticket 41](41-prediction-target-association.md) turns the ownership diagnosis into
+an A0–A3 controlled study: unchanged reference, global coverage with existing
+BEV cost, 3D-aware cost and detached prediction-dependent cost. Its
+[specification](../../superpowers/specs/2026-10-03-prediction-target-association-design.md)
+and [implementation plan](../../superpowers/plans/2026-10-03-prediction-target-association.md)
+define bounded candidate feasibility, independent target/oracle/gradient/restart
+verifiers, fixed-batch before balanced16 fitting, per-object suppression traces
+and HDFS retention. Every implementation milestone requires live Insula.
+Loss allocation and NMS remain separate follow-ups. The study is specified only;
+the existing optimization controls, target caches and generated tracker/journal
+are unchanged.

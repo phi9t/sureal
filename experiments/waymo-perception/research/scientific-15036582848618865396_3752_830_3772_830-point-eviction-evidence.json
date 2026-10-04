@@ -1,0 +1,7 @@
+{
+  "status": "verified point eviction completed",
+  "manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/train-15036582848618865396_3752_830_3772_830/point-eviction.json",
+  "manifest_sha256": "fe3ba4d9ccbde03f67cdc3d07a54ed5ede58e05b8be20ee90ea75b3cceecdaee",
+  "bytes_evicted": 6681955248,
+  "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/15036582848618865396_3752_830_3772_830/928fd98bbf6ce943d4bef78b788ce27164333228ccba36405e4444a47865cc85.tar"
+}

@@ -1,0 +1,77 @@
+{
+  "status": "fresh live retained archive validation passed",
+  "validation": {
+    "files": 56807,
+    "archive_sha256": "8f49152157c40e473a0326c3f00138842b51fd88db21d705b731965389752c7a",
+    "manifest_sha256": "c0424109890a43e8574d63db48f15ec5f6f436216bc95a1a2b8c8838d28b5c78",
+    "archive_bytes": 7176837120,
+    "provenance": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "scene": "9907794657177651763_1126_570_1146_570",
+      "scene_receipt_sha256": "b295d91b3b4a26452a19e58e7c95be3ae30764390f1d74d9e61e034c6d3f676d",
+      "source_receipt_hashes": {
+        "camera_calibration": "c1bdbe75434ad4cb6790c79ab8e530ba38cc0ad41aca12d1d713e8c8f8e786f1",
+        "lidar_box": "8ab71d737bede8ff4c0a9fc5eabf43c627dc20f1406d025d8c8a73eb481a60b2",
+        "lidar_calibration": "bd846a07b2548cb2b3148c80f49001f99f8cbcaca42aefd4d28032ba657d75c3",
+        "lidar_camera_projection": "7a31741d26b0945cf163964d406021107705f687ababe0bf6908a3d323b6900d",
+        "lidar_pose": "d7ab60f3aed21befe9e42f0445a32c1c3152c9e7954dc848233bd78503e6585a",
+        "lidar_segmentation": "984a02f2bc03239ccb421aef826501efc581820daab03dbe50ce7078a3371d30",
+        "vehicle_pose": "7bebd826f794f3ec02c9cd05cda895c5c1af5fafa2c961dafdfe4edc97218e74"
+      },
+      "sources": {
+        "camera_calibration": {
+          "generation": "1709075783479155",
+          "sha256": "9b824df55fc3446a013750c63c366866c9097541ab4b200ca3335b097bbd7bb5",
+          "source_record_sha256": "349199081d1e24104845ee52a2ecc739467d6a50525bee978dfad70a033bee40"
+        },
+        "lidar_box": {
+          "generation": "1709075794881187",
+          "sha256": "88d9df5e7f8147a0b3f085d4c8d3951e56bdd378f39c034e3c2f440dd4768749",
+          "source_record_sha256": "c4ac61b7d8581f76e4366c97194e0e76f919d3f78a7ae8fc03f2180f41c28ca4"
+        },
+        "lidar_calibration": {
+          "generation": "1709075765603518",
+          "sha256": "a33c2e4cc4ee703a8d7a5442439c4786a7d3c7ea5710824281119d9c09dd79b6",
+          "source_record_sha256": "e5f5674e600c7066929b39964c60e3227eabac2ce9c7f028d634d37f4c674b6a"
+        },
+        "lidar_camera_projection": {
+          "generation": "1709076799944563",
+          "sha256": "d2924a9e482ddb5015c2cf6a74370019e618af4488963309f438257f5f1b0e19",
+          "source_record_sha256": "07918e923d4d639c323aaa445fcc314d0cda65cea43ae166ad26ea6b1b7b7992"
+        },
+        "lidar_pose": {
+          "generation": "1709076543769290",
+          "sha256": "8a320d0bd12a3380ce5e466cd9161e2d28e8b42121d80c723aeba41d2c0434eb",
+          "source_record_sha256": "d14ed613cfc566637fed09fa2c78f80c9c1e978b6b763c13026c6494533fec03"
+        },
+        "lidar_segmentation": {
+          "generation": "1709078384430759",
+          "sha256": "661bb1817afab6cda922abfa4939ad1f43ef19349f1cb66a893fc67f679cd751",
+          "source_record_sha256": "95646eed260cc2c6538d7dd051f996cf66a9239df48d52f58ea1015c650e5077"
+        },
+        "vehicle_pose": {
+          "generation": "1709078392665758",
+          "sha256": "e05decc3676490f45ca14eeedaa94f856f469eb233e33988d326bb6ff1bb8a29",
+          "source_record_sha256": "de9d0975ee108ceee1b6476ba7e4d874c86e585b90e0cf8b2b617b2fb55c3a88"
+        }
+      }
+    },
+    "status": "all decoded component identities reconciled",
+    "publication_manifest_sha256": "2d9c229fac5a1001a99a7b827d047b900d61891b3d52ca7d000f16fd8aa38c31"
+  },
+  "exit": {
+    "exit_code": 0,
+    "ended_utc": "2026-09-30T23:59:46.935991+00:00"
+  },
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sidecar-interruption-recheck-9907794657177651763_1126_570_1146_570/live.log": "c2f5e7fbe25f14ad838b29d3891d07ed91b1ff378d3816f5bdef20d1c1e9dc80",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sidecar-interruption-recheck-9907794657177651763_1126_570_1146_570/check.json": "a5ce5b9f655ae266c91197d710531864973953832bf5e6a3bb0b80bbe930c8ce",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sidecar-interruption-recheck-9907794657177651763_1126_570_1146_570/invocation.json": "044b8cbdc32cb337f96eb0ff90654f09ff82ecac1fba5b90a5079bee11a77d61",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sidecar-interruption-recheck-9907794657177651763_1126_570_1146_570/exit.json": "ff8b9332077f7902909c42d586e64f6071cb6858bfc65769dae72cc72f168d16",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sidecar-interruption-recheck-9907794657177651763_1126_570_1146_570/pid.json": "b7c97393a93b4dfe54c42b569629809d96c4f74801d1a1db78ac281ecab16e0b"
+  },
+  "scope": "Does not supply missing original publisher receipt, fresh HDFS round trip, eviction, camera lifecycle or full scene checkpoint."
+}

@@ -1,0 +1,46 @@
+"""Explicit text/source/evidence allowlist; excludes sensor previews and cache trees."""
+import pathlib,json,hashlib,shutil,re
+T=pathlib.Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer');R=T/'experiments/waymo-perception/research'
+def sha(p):return hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()
+inv=json.loads((R/'sureal-comprehensive-closeout-final-inventory.json').read_text())
+for e in inv['entries']:
+ if e['disposition']=='excluded_generated_sensor_payload':
+  e['hdfs_member']=None;e['remaining_blocker']='Automatic approval review rejected the broad export containing sensor-image preview derivatives. Retain these generated previews locally; source native data remain in their existing HDFS publication. Derivative export is unnecessary to source/evidence closeout and was omitted rather than requested again.'
+inv['archive_policy']='Explicit reviewed source/doc/report and bounded proof-metadata allowlist only. No raw sensor payload, generated viewer, credentials, cache tree, globbed temporary tree, model weights or dataset arrays.'
+(R/'sureal-comprehensive-closeout-final-inventory.json').write_text(json.dumps(inv,indent=2)+'\n')
+files={}
+def add(p,name):
+ p=pathlib.Path(p);assert p.is_file() and not p.is_symlink();data=p.read_bytes();data.decode('utf-8');assert b'-----BEGIN PRIVATE KEY' not in data and b'-----BEGIN RSA PRIVATE KEY' not in data and re.search(rb'data:image/(?:jpeg|png);base64,[A-Za-z0-9+/=]{128}',data) is None
+ files[name]={'path':str(p),'sha256':sha(p),'bytes':len(data)}
+c=json.load(open('/tmp/sureal-comprehensive-closeout-candidates.json'))
+for e in c['candidates']:add(T/e['path'],'comprehensive-closeout/backlog/'+e['path'])
+names=['research-journal.jsonl','research-journal.md','sureal-comprehensive-closeout-inventory.json','sureal-comprehensive-closeout-final-inventory.json','sureal-comprehensive-closeout-reconcile.json','sureal-comprehensive-closeout-standards-review.json','sureal-comprehensive-closeout-spec-review.json','sureal-comprehensive-closeout-live-evidence-audit.json','sureal-comprehensive-closeout-passing-tests-dispatch.json']
+for n in names:add(R/n,'comprehensive-closeout/evidence/'+n)
+for n in ['sureal-comprehensive-closeout-independent-supplement.json','sureal-comprehensive-tests-independent.py']:
+ add(pathlib.Path('/tmp')/n,'comprehensive-closeout/evidence/'+n)
+passing=json.load(open('/tmp/sureal-comprehensive-closeout-passing-tests-dispatch.json'))
+# Capture only explicitly declared proof and output metadata, never directory trees.
+for i,reference in enumerate([*[s['proof'] for s in passing['passing_suites']],passing['proof']]):
+ path=pathlib.Path(reference['path']);assert sha(path)==reference['sha256'];add(path,f'comprehensive-closeout/live-proofs/{i}/resource-admitted.json');proof=json.loads(path.read_text())
+ for j,(name,e) in enumerate(proof['artifacts'].items()):
+  p=pathlib.Path(e['path']);assert sha(p)==e['sha256'];add(p,f'comprehensive-closeout/live-proofs/{i}/artifacts/{j}-'+p.name)
+ # These named sidecars bind actual scoped execution and accounting.
+ for rel in ['attempt.json','worker/worker-resource.json','host-resource.json']:
+  p=path.parent/rel
+  if p.is_file():add(p,f'comprehensive-closeout/live-proofs/{i}/'+rel)
+for n in ['sureal-comprehensive-closeout-live-tests.py','sureal-comprehensive-closeout-live-tests-v2.py','sureal-comprehensive-closeout-live-tests-v3.py','sureal-comprehensive-closeout-live-tests-v4.py','sureal-comprehensive-closeout-live-tests-v5.py','sureal-comprehensive-closeout-live-tests-v6.py','sureal-comprehensive-closeout-live-tests-v7.py','sureal-comprehensive-closeout-dispatch-v8.py','sureal-comprehensive-closeout-dispatch-v9.py','sureal-comprehensive-closeout-cpu-worker.py','sureal-comprehensive-closeout-cpu-worker-v2.py','sureal-comprehensive-closeout-dispatch-worker-v8.py','sureal-comprehensive-closeout-dispositions.py','sureal-comprehensive-closeout-journal-start.py']:
+ add(pathlib.Path('/tmp')/n,'comprehensive-closeout/verification-operators/'+n+'.source')
+for n in ['sureal-comprehensive-closeout-live-tests.json','sureal-comprehensive-closeout-live-tests-v2.json','sureal-comprehensive-closeout-live-tests-v3.json','sureal-comprehensive-closeout-live-tests-v4.json','sureal-comprehensive-closeout-live-tests-v5.json','sureal-comprehensive-closeout-live-tests-v6.json','sureal-comprehensive-closeout-live-tests-v7.json']:
+ add(pathlib.Path('/tmp')/n,'comprehensive-closeout/failed-attempts/'+n)
+for rel in ['comprehensive-closeout-live-tests-v7/cpu/test-summary.json','comprehensive-closeout-live-tests-v7/torch/test-summary.json','comprehensive-closeout-live-tests-v7/cpu-input/modules.json','comprehensive-closeout-live-tests-v7/torch-input/modules.json','comprehensive-closeout-live-tests-v7/source-pins.json','comprehensive-closeout-dispatch-v9/output/dispatch.json','comprehensive-closeout-dispatch-v9/experiment/architecture/registry.json']:
+ add(pathlib.Path('/data02/home/philip.yang/.cache/waystone/waymo-perception/insula')/rel,'comprehensive-closeout/bounded-raw-metadata/'+rel)
+for n in ['sureal-comprehensive-closeout-portable-tests.log','sureal-comprehensive-closeout-publication-audit.log','sureal-comprehensive-closeout-numerical-tests-v2.log']:
+ add(pathlib.Path('/tmp')/n,'comprehensive-closeout/portable-checks/'+n)
+for root,label in [(pathlib.Path('/tmp/sureal-comprehensive-closeout-live-tests-v5'),'failed-v5'),(pathlib.Path('/tmp/sureal-comprehensive-closeout-live-tests-v6'),'failed-v6'),(pathlib.Path('/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/comprehensive-closeout-live-tests-v7'),'failed-v7'),(pathlib.Path('/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/comprehensive-closeout-dispatch-v8'),'failed-v8')]:
+ for rel in ['suite/live.log','suite/test-summary.json','cpu/live.log','cpu/test-summary.json','dispatcher/live.log','output/live.log','proofs/suite/attempt.json','proofs/cpu/attempt.json','proofs/dispatcher-list/attempt.json','proofs/dispatcher/attempt.json']:
+  p=root/rel
+  if p.is_file():add(p,'comprehensive-closeout/failed-proof-metadata/'+label+'/'+rel)
+refused={'action':'broad archive with generated sensor previews and temporary-record globs','executed':False,'automatic_review_reason':'Unacceptable risk: user authorized closeout evidence but not sensitive raw-payload export; narrow the action first.','resolution':'Publish this explicit reviewed UTF-8 source/doc/report/proof allowlist only; omit generated preview payloads and all broad temporary/cache trees; no bypass or alternate route for the rejected payload.'}
+p=R/'sureal-comprehensive-closeout-archive-review-refusal.json';p.write_text(json.dumps(refused,indent=2)+'\n');add(p,'comprehensive-closeout/evidence/'+p.name)
+assert len(files)<4500
+pathlib.Path('/tmp/sureal-comprehensive-closeout-hdfs-allowlist.json').write_text(json.dumps({'scope':inv['archive_policy'],'members':files},indent=2)+'\n');print('EXPLICIT TEXT/SOURCE/PROOF ALLOWLIST',len(files),sum(e['bytes'] for e in files.values()))

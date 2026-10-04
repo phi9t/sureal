@@ -1,0 +1,104 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/m3-live-b",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/point-grid-linkage-native-v2/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.scratch",
+        "/tmp/linkage",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-range-shapes-a/output",
+        "/tmp/native-shapes",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/point-grid-linkage-native-v2/input",
+        "/tmp/expected",
+        "--",
+        "python",
+        "/tmp/linkage/point-grid-native-worker.py"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "input_hashes": {
+    "report_sha256": "9e49eb493517714be0ddcd5158aad9fe08c4575a96bd777b0219eebaf112c906",
+    "shapes_sha256": "77bf84a300fae503b6b735f40ebabdcd5ce12c9b541f748d6bfa16eac50e3281"
+  },
+  "candidate_hashes": {
+    "pipeline/native_range_grid.py": "75ba9579354733c5428676b91c121dfcfe6c74790edd3c7122c74c10f3db49c7"
+  },
+  "script_hashes": {
+    "point_grid_linkage.py": "e144cfe91073ded4141e759d06871ced2d1815b383fe6860708154ebb6494512",
+    "test_point_grid_linkage.py": "1b1244acc0622700c1818640aa79c0bb2a55b05d20b566585e925566babea703",
+    "point-grid-native-worker.py": "e552820863dcc2bb1159a3d6e9300f3f262a6e4b6c0692062fec16a7570205b2",
+    "run-point-grid-native.py": "443f6be797eec22762e063753c8213d40bff8c9396798e5cc5f926214f126a45"
+  },
+  "elapsed_seconds": 71.18062384799123,
+  "validation": {
+    "records": 3970,
+    "points": 71891534,
+    "eligible_semantic_points": 9204259,
+    "present_empty_returns": 15,
+    "absent_returns": 0,
+    "absent_with_shape_records": 0,
+    "native_grid_cells": 515782400,
+    "annotated_returns": 120,
+    "scope": "two complete engineering scenes; full-support point/native-grid linkage; scientific103 and scientific metrics remain open",
+    "worker_resources": {
+      "elapsed_seconds": 70.97227329801535,
+      "peak_rss_kib": 75736,
+      "rss_scope": "worker_process_peak"
+    }
+  },
+  "artifacts": {
+    "live.log": "d079192a86c40c37e8d567be0034592cb28f29bda138eaac52539028817047ca",
+    "check.json": "e57c5ec843d966a219d126cdf4054e1a10785cdf673b6e6d6f360665974d7775"
+  },
+  "output": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/point-grid-linkage-native-v2/output",
+  "scope": "new complete join checker/live fixture refusals and native engineering integration; actual full103 linkage unverified"
+}

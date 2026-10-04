@@ -1,0 +1,13 @@
+{
+  "run_directory": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort16-residual_bev-balanced20261002b",
+  "output_directory": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort16-residual_bev-balanced20261002b",
+  "metadata_sha256": "24c2ebb034d2e9e3543128549d36b4416a2dddb7cbcf8b949216ee6d158875da",
+  "stage_receipts": {
+    "coverage-verified.json": "816397c9ee04186eac7c7443006973b8528f44b461a7a4704f906d49a89c6e86",
+    "loss-verified.json": "41a7ffb1cd547ee0c19b97385a5f6f633bf85f27b30781821ac38a7429cf6f67",
+    "train-verified.json": "ab0e4efd41b971aeb6feb5b1a788f6aa57f67d8b4f61c2d092f4778f2d7ded18",
+    "checkpoint-verified.json": "dc41e4038c2e7be8145ed2e866eed7a48002bf9ad2d48f0b6dbf7ac874934279",
+    "protocol-verified.json": "b693e48c6bd10a806e7365e97c67489b304f69782050c87dbf780a966393b429"
+  },
+  "scope": "execution/replay/loss; native scores still required"
+}

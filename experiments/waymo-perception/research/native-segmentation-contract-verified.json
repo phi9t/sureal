@@ -1,0 +1,11 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/segmentation-contract-live-b/receipt.json",
+  "receipt_sha256": "e1f568d97ed00bdd54d6097e635a2755f38f1bfd774714942af72f3e8ccc9746",
+  "independent_checks": [
+    "all candidate/artifact hashes reopened",
+    "five mean-IoU expectations parsed separately",
+    "all stderr logs empty"
+  ],
+  "scope": "native semantic protobuf/zlib export fixtures; real source export adapter not yet verified",
+  "ticket_09": "open"
+}

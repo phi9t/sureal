@@ -1,0 +1,7 @@
+{
+  "status": "verified sidecar eviction completed",
+  "manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/train-15036582848618865396_3752_830_3772_830/sidecar-eviction.json",
+  "manifest_sha256": "2ddf5eb016b7980c849b94a926ad889015fb2fefda333520646ff6415ec03adc",
+  "bytes_evicted": 14186966082,
+  "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/component-bundles-v1/scientific/15036582848618865396_3752_830_3772_830/831c25b93355e5981f452df10748a841c697c4e57a1c7b1a5f67813e82327fdb.tar"
+}

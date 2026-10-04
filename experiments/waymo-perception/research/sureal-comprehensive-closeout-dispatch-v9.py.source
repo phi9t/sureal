@@ -1,0 +1,23 @@
+import json,os,pathlib,sys,shutil
+P=pathlib.Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P));sys.dont_write_bytecode=True
+from resources.sources import sha,freeze_sources
+from resources.stage import run_stage,validate_proof
+from pipeline.insula_entry import launch_plan
+from cohort.sustained_controller_backend import NativeBackend,C,W
+from cohort.sustained_controller_lock import acquire_experiment_lock
+from tier1.storage import unique_payload_bytes
+R=C/'insula/comprehensive-closeout-dispatch-v9'
+with acquire_experiment_lock(C/'insula/architecture-experiments.lock') as lock:
+ b=NativeBackend('controller20261003a','baseline',lock,resume=True);R.mkdir();(R/'proofs').mkdir();(R/'input').mkdir();out=R/'output';out.mkdir()
+ v7=C/'insula/comprehensive-closeout-live-tests-v7';package=R/'experiment';shutil.copytree(v7/'experiment',package);report=json.loads(pathlib.Path('/tmp/sureal-comprehensive-closeout-live-tests-v7.json').read_text());assert len(report['stages'])==3
+ extra=package/'architecture/registry.json';shutil.copyfile(P/'architecture/registry.json',extra)
+ pins=freeze_sources(P/'resources',R/'resources');worker=pathlib.Path('/tmp/sureal-comprehensive-closeout-dispatch-worker-v8.py')
+ for name,pin in report['source_snapshot'].items():assert sha(P/name)==sha(package/name)==pin['sha256']
+ root=C/'insula/rootfs-v2';cmd=launch_plan(root,package,R/'input',out,['python','/tmp/dispatch-worker.py']);i=cmd.index('--');cmd[i:i]=['--ro-bind',str(package),'/tmp/repo/experiments/waymo-perception','--ro-bind',str(worker),'/tmp/dispatch-worker.py'];original=cmd.copy()
+ with (out/'live.log').open('w') as log:run_stage(cmd,P,dict(os.environ),log,300,code=R/'resources',current_sources=P/'resources',source_pins=pins,evidence_directory=R/'proofs/dispatcher',native_output=out,cap_bytes=16*1024**3)
+ proof=R/'proofs/dispatcher/resource-admitted.json';v=json.loads(proof.read_text());admission=validate_proof(v,cmd,P/'resources',pins,out,16*1024**3,300)
+ for name,pin in report['source_snapshot'].items():assert sha(P/name)==sha(package/name)==pin['sha256']
+ for p,h in report['original_six_artifacts'].items():assert sha(p)==h
+ b.guard();assert unique_payload_bytes(W)==report['scientific_bytes_before']
+ result={'passed':True,'scope':'312 actual successful CPU/Torch test invocations from v7 plus fresh v9 dispatch-only gate; v7 whole attempt failed in dispatcher and remains retained, no complete runner/training/resource admission','passing_suites':report['stages'][1:3],'source_snapshot':report['source_snapshot'],'suite_attempt':{'path':'/tmp/sureal-comprehensive-closeout-live-tests-v7.json','sha256':sha('/tmp/sureal-comprehensive-closeout-live-tests-v7.json')},'worker':{'path':str(worker),'sha256':sha(worker)},'registry':{'path':str(extra),'sha256':sha(extra),'original_path':str(P/'architecture/registry.json')},'dispatcher_source':{'path':str(P/'architecture.py'),'sha256':sha(P/'architecture.py')},'proof':{'path':str(proof),'sha256':sha(proof)},'resource_admission':admission,'original_command':original,'resource_source_pins':pins,'output':str(out),'driver':{'path':__file__,'sha256':sha(__file__)},'original_six_artifacts':report['original_six_artifacts'],'scientific_bytes':unique_payload_bytes(W)}
+ pathlib.Path('/tmp/sureal-comprehensive-closeout-passing-tests-dispatch.json').write_text(json.dumps(result,indent=2)+'\n');print('PASS312 suite invocations + entrypoint list/show only',flush=True)

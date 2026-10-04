@@ -1,0 +1,1865 @@
+{
+  "selected_scenes": 103,
+  "job_index_sha256": "71a7c084e1124ab30b90bb3f19f17a2705188559ac3082008ee9a3b592b422da",
+  "source_inventory_sha256": "99c6ea7a6b7f76675e798d84b6e0f4a84f90c027465d22e5da4d89421b871b95",
+  "admitted_scenes": 103,
+  "records_verified": 203850,
+  "scene_evidence": {
+    "1730266523558914470_305_260_325_260": {
+      "evidence": "scientific-native-shape-1730266523558914470_305_260_325_260-verified.json",
+      "evidence_sha256": "b34cf238c39729b423f2f9c7b1f736f31f04a1e8559ae0a5d74bd0cd71721fbb",
+      "receipt_sha256": "1028eb38ae4ec80e661527e52874cfb3cb6f34ffdf910e5cc336d32d6efa9246",
+      "validation": {
+        "scene": "1730266523558914470_305_260_325_260",
+        "records_verified": 1970,
+        "present_shape_records": 1970,
+        "null_shape_records": 0,
+        "source_sha256": "353a45f3e82059ed2dc5aace569e0eb4bae3ece4991b43c166befbc08d6500b8",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "15036582848618865396_3752_830_3772_830": {
+      "evidence": "scientific-native-shape-15036582848618865396_3752_830_3772_830-verified.json",
+      "evidence_sha256": "f7f3429b1596ccae7237d4c316226cec4d9873f5b77b78ad4b7590e8cb5f6f8f",
+      "receipt_sha256": "d8176f74ef28204dd9bbca3dc59f5afd433c0afaa6548448226b9a0e9254aa0d",
+      "validation": {
+        "scene": "15036582848618865396_3752_830_3772_830",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "116a426c9067316e505ffd9a4973671e17af68a3fe727e90462b9fe86d46cad3",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "11343624116265195592_5910_530_5930_530": {
+      "evidence": "scientific-native-shape-11343624116265195592_5910_530_5930_530-verified.json",
+      "evidence_sha256": "1aef6dae50fa2518b45f9ba2f791679e039649312a3c45a99dde7d9ab9c1c33c",
+      "receipt_sha256": "f8f8edbada87de47ceeaae3e62da54e1b43e1bfe932a7ba002bde346ad20c844",
+      "validation": {
+        "scene": "11343624116265195592_5910_530_5930_530",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "1df53f3b74410aa9cdf78d1f3b45bf49e695090edfb48439c609419939fc3bda",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "4447423683538547117_536_022_556_022": {
+      "evidence": "scientific-native-shape-4447423683538547117_536_022_556_022-verified.json",
+      "evidence_sha256": "b31417f1c6902b51638d027b68c2079af89f38a0ce14cf551ed6e559dda40653",
+      "receipt_sha256": "b80e761fbc1836c3544212e8703a3967e512884425e51dacf4fd407e8fed134b",
+      "validation": {
+        "scene": "4447423683538547117_536_022_556_022",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "c133d9b58239525ef354744904932eb0b4b3843745ed69141b72663caa3afa54",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "14503113925613619599_975_506_995_506": {
+      "evidence": "scientific-native-shape-14503113925613619599_975_506_995_506-verified.json",
+      "evidence_sha256": "655e9cc004d9d7f20c358a86110bbe14065c094dc8e9ba1806e7b43a206749d1",
+      "receipt_sha256": "5a24d9435b8bb85450d00e7d8509b8817fec266fb40a2cea7fdf19f0b3946a42",
+      "validation": {
+        "scene": "14503113925613619599_975_506_995_506",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "30e32bcf58430d65ac7dabbcbb9e78fdc62839521ed3b8b5f528eba2ac59e714",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "3375636961848927657_1942_000_1962_000": {
+      "evidence": "scientific-native-shape-3375636961848927657_1942_000_1962_000-verified.json",
+      "evidence_sha256": "497c8eb76afbdea3f4f482267a61da888ad364bb0d77643c567cd10fc1afb4b9",
+      "receipt_sha256": "f35620e16c21a8dfff5dccae1703fe6590b66022096555a5e184baa44b308c60",
+      "validation": {
+        "scene": "3375636961848927657_1942_000_1962_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "a1fba97eaf0031f671d4d8f8adfde555159946b4e8a9bf03a6861b718db43f7e",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "6813611334239274394_535_000_555_000": {
+      "evidence": "scientific-native-shape-6813611334239274394_535_000_555_000-verified.json",
+      "evidence_sha256": "8a4016f7860125d3e35ab5c3816a97022a206b040bf7d5eb0619eca6fe09f0ae",
+      "receipt_sha256": "f5cd2a735ee4c20c317cfc2fff0933525f7015aa6f66dcacd1fb39687c71b070",
+      "validation": {
+        "scene": "6813611334239274394_535_000_555_000",
+        "records_verified": 1950,
+        "present_shape_records": 1950,
+        "null_shape_records": 0,
+        "source_sha256": "34b1c9cc2e6d01b3e70de29a9b093e37848d7d156ca3dcf6b0a37791a7c1fee3",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "990914685337955114_980_000_1000_000": {
+      "evidence": "scientific-native-shape-990914685337955114_980_000_1000_000-verified.json",
+      "evidence_sha256": "3ba55b0d86fa11bb76c299fe05df4db6e7fd724614d8ec8871ec168a20e7967a",
+      "receipt_sha256": "0b3b97aed98ff5c168d184555a7fa018a6046bc3f6a50999977252ef4cb599fe",
+      "validation": {
+        "scene": "990914685337955114_980_000_1000_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "2a6e40d0514d9f8a08b9bda34de5e5de2702b5d2d419d399c703dcfc124c66d8",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "8796914080594559459_4284_170_4304_170": {
+      "evidence": "scientific-native-shape-8796914080594559459_4284_170_4304_170-verified.json",
+      "evidence_sha256": "3917d46165709875a414a6d438e0370ff65d6ca06a798a7cfcad3b3118a08fe8",
+      "receipt_sha256": "2c27588a88e32fb412ff14098c83a9eb4ee01835ce39601aa7da910ed47f161f",
+      "validation": {
+        "scene": "8796914080594559459_4284_170_4304_170",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "7a8ba4eedeeb57b35dbb1213d14287f1d6d36547aed67d815c24045670e0bbbe",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "12257951615341726923_2196_690_2216_690": {
+      "evidence": "scientific-native-shape-12257951615341726923_2196_690_2216_690-verified.json",
+      "evidence_sha256": "639a4b64dcee62955603dd744263db4f136679af0553bf6f22a5b96a60bf7e0e",
+      "receipt_sha256": "33b78d74961a4d7a84008b40c5ec19285fa794c6de1d8f7cc7f1b8600cc3aecd",
+      "validation": {
+        "scene": "12257951615341726923_2196_690_2216_690",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "1edc8915138b6f11596a2ea2b6fa2ccd2cafc5a5f71c9d11c3c171c689380f6e",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "13186511704021307558_2000_000_2020_000": {
+      "evidence": "scientific-native-shape-13186511704021307558_2000_000_2020_000-verified.json",
+      "evidence_sha256": "b1611c2d39376abae850a0ee9f7e35deae7c66b39f40553657b95501da5ee6de",
+      "receipt_sha256": "c80c3b4761041b3e6617a4e02986f2df33adaf7ae73dcd8320f3d74be20a18bb",
+      "validation": {
+        "scene": "13186511704021307558_2000_000_2020_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "44d5c9b3aba186af73aa47ef86e2049e8affcf099366b1d1f71e6f17991fe5cc",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "17885096890374683162_755_580_775_580": {
+      "evidence": "scientific-native-shape-17885096890374683162_755_580_775_580-verified.json",
+      "evidence_sha256": "2ee190bdb7a314d4f69c1d0252dd621a512f434feaa4cd366fb6ac98f053370c",
+      "receipt_sha256": "48735be03c44fa4583406c5d30d36ebc83079af001b2148102f643a072689942",
+      "validation": {
+        "scene": "17885096890374683162_755_580_775_580",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "699a96dc1b0f37173827fd9791545ba1e2380ad89c6feb8e5f7f8bb49555e953",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "7912728502266478772_1202_200_1222_200": {
+      "evidence": "scientific-native-shape-7912728502266478772_1202_200_1222_200-verified.json",
+      "evidence_sha256": "5d36cb077c54108ffd8e1dfb4ee0679fd5f7865f6d3f13951819812b017f6f83",
+      "receipt_sha256": "56317c6c27836e9aa79f5a6bfa832f1c863d75aa3e283c1c74895c5bd0666369",
+      "validation": {
+        "scene": "7912728502266478772_1202_200_1222_200",
+        "records_verified": 1960,
+        "present_shape_records": 1960,
+        "null_shape_records": 0,
+        "source_sha256": "aeafba53ea3fdda2f303abedf578b307a140bd01d8fa42c1cc085a963c5ff59c",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "4723255145958809564_741_350_761_350": {
+      "evidence": "scientific-native-shape-4723255145958809564_741_350_761_350-verified.json",
+      "evidence_sha256": "55b033c22c40bf6efa16bc2b80588582871659923c1dfa623d0d172bf9573657",
+      "receipt_sha256": "a11665a6d7cf187453afd9c9da00b1ae3ce100a8ffafd2a99228bf27da26f088",
+      "validation": {
+        "scene": "4723255145958809564_741_350_761_350",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "ae5c8ce688379027a7116cf09ea282b043b0674488fdd67b57f98eb397df34ca",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "8454755173123314088_3202_000_3222_000": {
+      "evidence": "scientific-native-shape-8454755173123314088_3202_000_3222_000-verified.json",
+      "evidence_sha256": "aed9a798436ddecdaa584e5210c9a778f9f833451a3e991367bda4c6c4c52f8a",
+      "receipt_sha256": "af987ba3d3c8db661a54fffb7a50a7cadea3683ca23a9cac36f6de1454e31153",
+      "validation": {
+        "scene": "8454755173123314088_3202_000_3222_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "9fc7c40541ca29138b4c3076c578006dc7452b4934aedd2fc8ac90c40b90e127",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "3894883757914505116_1840_000_1860_000": {
+      "evidence": "scientific-native-shape-3894883757914505116_1840_000_1860_000-verified.json",
+      "evidence_sha256": "7ba3dacace08255dc159d9dd75251d8ba8300ad8bfd1718dfd1970780a9d5b7c",
+      "receipt_sha256": "fbf4edecf6aedcc2c1b90540b87725690a58bed76b6265fc7be076e7b34ec990",
+      "validation": {
+        "scene": "3894883757914505116_1840_000_1860_000",
+        "records_verified": 1970,
+        "present_shape_records": 1970,
+        "null_shape_records": 0,
+        "source_sha256": "b6ddab601545339147cec9eb6372e6096bc8be1527b9f49af1f67eab8826e43b",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "13271285919570645382_5320_000_5340_000": {
+      "evidence": "scientific-native-shape-13271285919570645382_5320_000_5340_000-verified.json",
+      "evidence_sha256": "9630ef9e135073cc2356bba5b30ca5a642c883a1861dd821a91e3327310625b1",
+      "receipt_sha256": "50902b837bac1717db3a496c441a8670460d5b2e0a90cfa2e18eb49fc71f7ab3",
+      "validation": {
+        "scene": "13271285919570645382_5320_000_5340_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "99e411c13be30dbc9913fa259cc0dfe2b987cf689dcb57d5a61c47abc4c25b7c",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "8345535260120974350_1980_000_2000_000": {
+      "evidence": "scientific-native-shape-8345535260120974350_1980_000_2000_000-verified.json",
+      "evidence_sha256": "5d28a00ecdd97c8c72f776624d49074f0213607ae9549b6f8e975943449ef0de",
+      "receipt_sha256": "b8b3b60dec5411fd2bf72f2cc16962040a6e7902bfdd699e0307ae71d24b0ec7",
+      "validation": {
+        "scene": "8345535260120974350_1980_000_2000_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "af8aab2e481eaa40c503b103be5fae677ae054fc04e4e46c98d19df53947df36",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "1357883579772440606_2365_000_2385_000": {
+      "evidence": "scientific-native-shape-1357883579772440606_2365_000_2385_000-verified.json",
+      "evidence_sha256": "69460b2134b246f678a098dd4b8eeb05a379f4350592cbe3a33fb035295a66f5",
+      "receipt_sha256": "856e938d5e7f379c87ba81a53311578f491af5634abf7aed8ee940fc3e004fa9",
+      "validation": {
+        "scene": "1357883579772440606_2365_000_2385_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "db58f07189d46f38269df876419c255e31c166ef374ed6bfd42e1461976802de",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "16977844994272847523_2140_000_2160_000": {
+      "evidence": "scientific-native-shape-16977844994272847523_2140_000_2160_000-verified.json",
+      "evidence_sha256": "a5f9a5bbb17303b680c00906f435610afa0311b5ef2f29f9ce7ec08889da3035",
+      "receipt_sha256": "0174f2e29c1317fbe839d42c6c0c87e8807dd352ad23172099fc496fcffd7ade",
+      "validation": {
+        "scene": "16977844994272847523_2140_000_2160_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "68978710deb6710a98c4423c26724e95ea29b8d3dc9debcf0a35528253e16f9d",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "4487677815262010875_4940_000_4960_000": {
+      "evidence": "scientific-native-shape-4487677815262010875_4940_000_4960_000-verified.json",
+      "evidence_sha256": "1ef895758eb161747c12cf724bf9d20cb6195827b801ca0eb3e31aa6c295f87c",
+      "receipt_sha256": "a3b5729eb221ad635114713ab62df7522c26f71278c15f6151b1f0cb3c9d45a6",
+      "validation": {
+        "scene": "4487677815262010875_4940_000_4960_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "5a1a79113730875a6c84ce974ec16243d23e5570d4235ab508afaaee3c4c14bf",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "809159138284604331_3355_840_3375_840": {
+      "evidence": "scientific-native-shape-809159138284604331_3355_840_3375_840-verified.json",
+      "evidence_sha256": "138fd62b557a8298e8233ca1178e765b3629ad77938bcc90e13cfd5130d66473",
+      "receipt_sha256": "9782ac1a17dc8590f7d9811bf778cc1cab8b611a74a377b58e4dcd84a69f3317",
+      "validation": {
+        "scene": "809159138284604331_3355_840_3375_840",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "c772fc361e13cf1829962db9764a7f70d94e702a5811b0c3adb035ac7514ee5b",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "3966447614090524826_320_000_340_000": {
+      "evidence": "scientific-native-shape-3966447614090524826_320_000_340_000-verified.json",
+      "evidence_sha256": "08f1ea38c5c646538c50369330346b6be55ad94f0fef33137807af63584b5acc",
+      "receipt_sha256": "6c3189425a74310d1693628bbaadbf765aeafbb130f1605b375c4c7e86276716",
+      "validation": {
+        "scene": "3966447614090524826_320_000_340_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "62be17cbcc67a26f2a83b1c5bc683c73603f68faca411a1de8130e1edea5e45e",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "5083516879091912247_3600_000_3620_000": {
+      "evidence": "scientific-native-shape-5083516879091912247_3600_000_3620_000-verified.json",
+      "evidence_sha256": "6272ce785dfa41d2202426051cb037c2ec8e66cad4f7c060d2f2d119b2bda463",
+      "receipt_sha256": "3bd52e465cb3e9b2f443e2a25bfd84365e2a230bbf6ea918e3739538daabaff3",
+      "validation": {
+        "scene": "5083516879091912247_3600_000_3620_000",
+        "records_verified": 1970,
+        "present_shape_records": 1970,
+        "null_shape_records": 0,
+        "source_sha256": "ab56cdb3e089a55a2dc5a4ddb71b8d4de4a5f70df8339cf409d92e67a301e721",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "6142170920525844857_2080_000_2100_000": {
+      "evidence": "scientific-native-shape-6142170920525844857_2080_000_2100_000-verified.json",
+      "evidence_sha256": "1313c43dbeecac3cd3e70171d38989f3851f5133d30f1edf92a5dea8be7cfe96",
+      "receipt_sha256": "3d91dedd26a249b60b79a2c2ebd69c6e751fb110f59c89c86c3366cc26094c0f",
+      "validation": {
+        "scene": "6142170920525844857_2080_000_2100_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "11bcfda240d04373ab478964da022ea5b2f10f83c3a9bdc1fc3c13bef958d3ec",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "17782258508241656695_1354_000_1374_000": {
+      "evidence": "scientific-native-shape-17782258508241656695_1354_000_1374_000-verified.json",
+      "evidence_sha256": "33cbb8b75d03e34487f9862189af5d4c04d8910cad1c4e2cfc855449915943ed",
+      "receipt_sha256": "6a0f31b11b5d53ead2a4400058b8b137ca34fe880eb6914b22463da240409c27",
+      "validation": {
+        "scene": "17782258508241656695_1354_000_1374_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "c4e69880892b32d33737a68eb1ed2300d8ed8d82cf58267de4a17e29efc624f8",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "13830510593707564159_5575_000_5595_000": {
+      "evidence": "scientific-native-shape-13830510593707564159_5575_000_5595_000-verified.json",
+      "evidence_sha256": "6b5eebf326e0963b94169f063a9f3c3cf9f460f6d649e90952bbab313e577e0a",
+      "receipt_sha256": "ad20d672c934141912441aa45794e107edbf459aac12d31c3c22bae1afc6755c",
+      "validation": {
+        "scene": "13830510593707564159_5575_000_5595_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "16bfa3b0a590e9effb45897301d8ebe496e7cb9edb167bb13b8d616192729c00",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "14369250836076988112_7249_040_7269_040": {
+      "evidence": "scientific-native-shape-14369250836076988112_7249_040_7269_040-verified.json",
+      "evidence_sha256": "f64fd00b9509d09afd702964d36aebf6ff54011be4b811d799ed8f31b9ae1af4",
+      "receipt_sha256": "d3da059cbe626a70e8d41875b9993e12320575413018a48df575839e07e034f3",
+      "validation": {
+        "scene": "14369250836076988112_7249_040_7269_040",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "8ba6d04e2b91b0b46c60c8763899541840e81c53ddc62aa3ef1986ef1b1d33c6",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "11004685739714500220_2300_000_2320_000": {
+      "evidence": "scientific-native-shape-11004685739714500220_2300_000_2320_000-verified.json",
+      "evidence_sha256": "964be5329d7a76d0a5e15c7bd114e119a4adc04a7e83a6664da5e671be81df19",
+      "receipt_sha256": "555e1cc3e814526f33108e040ce48fb4accbd68bf2fb0cf61e5b9b68fedafd55",
+      "validation": {
+        "scene": "11004685739714500220_2300_000_2320_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "6a50a292072d7ee25dbe56495e163a491a922cce195df85cbd8d24de2971569c",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "15539619898625779290_760_000_780_000": {
+      "evidence": "scientific-native-shape-15539619898625779290_760_000_780_000-verified.json",
+      "evidence_sha256": "ed06011c791f50b2f3a8d18b3e469c426dc021e4695e784f746d23aac47a7aa0",
+      "receipt_sha256": "9d923599b9a18bdf7a8cb22dae9673f74ec97c1088decf7bdf4bf537208952e6",
+      "validation": {
+        "scene": "15539619898625779290_760_000_780_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "3b9590237d4cb1a21a45a60d7cf1fed77cf7db51f14a5d896f0188e80fbfc0a4",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "14004546003548947884_2331_861_2351_861": {
+      "evidence": "scientific-native-shape-14004546003548947884_2331_861_2351_861-verified.json",
+      "evidence_sha256": "259a95de3b5fc6046c2bb2182a7a5cc96bc8975f33e3f094e88b041f22fd79c2",
+      "receipt_sha256": "8cbd3af4e53867dde20d3acc173fe620c41bd2c95a1aa04eea20df60d697f7c0",
+      "validation": {
+        "scene": "14004546003548947884_2331_861_2351_861",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "be68ce3db9f04b3a1da1b374692a0f6a295aa1940beaff6225816369226b7e4d",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "1005081002024129653_5313_150_5333_150": {
+      "evidence": "scientific-native-shape-1005081002024129653_5313_150_5333_150-verified.json",
+      "evidence_sha256": "cb2cb5cdf4dd2d7cde7e2919ede7c533513034c06cc02bbf2cd753028516e9b4",
+      "receipt_sha256": "7160f52aa03d16dddb8fcfff3d38804b9cca180c020f011bdf62ffa26ccca332",
+      "validation": {
+        "scene": "1005081002024129653_5313_150_5333_150",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "8c7761a760d0793493251f4abdfc181a45d1af6697408f50c88baea0afbbc044",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "13506499849906169066_120_000_140_000": {
+      "evidence": "scientific-native-shape-13506499849906169066_120_000_140_000-verified.json",
+      "evidence_sha256": "696f9b9dd34ccfce393896145d486dc16742483df70711b35c1c33132d7b7563",
+      "receipt_sha256": "b576c32f05d3949b5782f884ad774513b70e1c7170030633065065dfc5625f06",
+      "validation": {
+        "scene": "13506499849906169066_120_000_140_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "2d7d5886a1e7bf28ceff52dc80e534f02c02845a3972ae36bed96692036be279",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "6559997992780479765_1039_000_1059_000": {
+      "evidence": "scientific-native-shape-6559997992780479765_1039_000_1059_000-verified.json",
+      "evidence_sha256": "8e67a9598782e3ce25adfbc59bff7786816bd848f8653c5dfcf202898eeea429",
+      "receipt_sha256": "0ee7254e81902be3097f63c573b59acc3d3a5e316a9dfc503813fbaf5d0b9904",
+      "validation": {
+        "scene": "6559997992780479765_1039_000_1059_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "f6295d9cf7964cf37ef14c8e3fbbd0e280896e058ebf42c24259330db9e2fc5b",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "3224923476345749285_4480_000_4500_000": {
+      "evidence": "scientific-native-shape-3224923476345749285_4480_000_4500_000-verified.json",
+      "evidence_sha256": "a48eb38e1e246294d8c569efc63788abbf9a16c5d7692ed4d1dd5ff91c0565bb",
+      "receipt_sha256": "09133756856220c8482b32b7f97f1eff85b0a96eec8c3f2fc6cbd9ef6650dbd6",
+      "validation": {
+        "scene": "3224923476345749285_4480_000_4500_000",
+        "records_verified": 1970,
+        "present_shape_records": 1970,
+        "null_shape_records": 0,
+        "source_sha256": "f3c7b0ed83aece671cc8c569d9551925dfd94f0378cb3a9bdfcc212914f596ca",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "14250544550818363063_880_000_900_000": {
+      "evidence": "scientific-native-shape-14250544550818363063_880_000_900_000-verified.json",
+      "evidence_sha256": "a8d979613af0e020e8676561bb51aeeae75135dd9633061f8cc22a37966b05bb",
+      "receipt_sha256": "79a90536af82f74f4b957c230bc5c05e7dced89462ee2abc0ac8791d7e3794dc",
+      "validation": {
+        "scene": "14250544550818363063_880_000_900_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "0d5feec10a4edc18b2b7d50963db63bd1ef6460306935b42d74873f019ffec5a",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "2088865281951278665_4460_000_4480_000": {
+      "evidence": "scientific-native-shape-2088865281951278665_4460_000_4480_000-verified.json",
+      "evidence_sha256": "930e8accf9c4e113becf0c0b5d222809e0f120c32cbbd2e5dbed206bec23849c",
+      "receipt_sha256": "d6e6d165cef0bac6248482b40bafb55e93f8ec59d1ec415eb86295ef73fcd64b",
+      "validation": {
+        "scene": "2088865281951278665_4460_000_4480_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "864aff70f1b1853f4c24340297259b5e1b2a4753eaaa06917da8741d9366f886",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "12856053589272984699_1020_000_1040_000": {
+      "evidence": "scientific-native-shape-12856053589272984699_1020_000_1040_000-verified.json",
+      "evidence_sha256": "a2c4625269406eab5937074f9a590267f964144c759b5a35ec95dd9a1964dbd3",
+      "receipt_sha256": "3f07fbc126ddcca76bd22f088578e885f267d8dfb5d2211000016a7869c9c617",
+      "validation": {
+        "scene": "12856053589272984699_1020_000_1040_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "64be12b8facc5652c2791834ffdeb60e37bec1fa345eccf7e68d3b53918fa3b2",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "11489533038039664633_4820_000_4840_000": {
+      "evidence": "scientific-native-shape-11489533038039664633_4820_000_4840_000-verified.json",
+      "evidence_sha256": "da789a4d38c9f67b7d5dbfb143b443ed559fd8e7d2f00b98561371e3b79e5a4f",
+      "receipt_sha256": "7714ae21c3359abf87d067419bd7075af965502dd20a217b49763df43a185fb3",
+      "validation": {
+        "scene": "11489533038039664633_4820_000_4840_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "880b4241e6445b224dfe70a05a924a5be3ac6eb4b9a66258b229ce6a5968102a",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "13619063687271391084_1519_680_1539_680": {
+      "evidence": "scientific-native-shape-13619063687271391084_1519_680_1539_680-verified.json",
+      "evidence_sha256": "08b9e528af451f8c8c075f6b06729384b3f792be8f69f8833263096c151970f6",
+      "receipt_sha256": "f7fc90e655a9636c712c57d4b7d297a4e9c78c7052d36e7ed6c8e6316a9bc822",
+      "validation": {
+        "scene": "13619063687271391084_1519_680_1539_680",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "1ae01ac288bb147d7d3c5c262467e3073e0d7efb37419886262589a8a3b68a30",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "15628918650068847391_8077_670_8097_670": {
+      "evidence": "scientific-native-shape-15628918650068847391_8077_670_8097_670-verified.json",
+      "evidence_sha256": "4d7490bf6075790ba0564e14e8118d86d299de03810b94530b7bd4992cfe455a",
+      "receipt_sha256": "133ad24984245767e7845fdfd13e2199bebe686b28d38077d9b61e8e779b6923",
+      "validation": {
+        "scene": "15628918650068847391_8077_670_8097_670",
+        "records_verified": 1970,
+        "present_shape_records": 1970,
+        "null_shape_records": 0,
+        "source_sha256": "e9728840fa89a692998b7fa99f5f35d35154a913b324706d4be5788e4f190c1f",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "14098575914252965554_511_000_531_000": {
+      "evidence": "scientific-native-shape-14098575914252965554_511_000_531_000-verified.json",
+      "evidence_sha256": "a393a521b6323d753616a9102da2bf6c340ef79a7adb89efecd0b8de14181320",
+      "receipt_sha256": "a675316459e8a35674d19edc2a3b19090c211870479ed1259796df75fedd8701",
+      "validation": {
+        "scene": "14098575914252965554_511_000_531_000",
+        "records_verified": 1900,
+        "present_shape_records": 1900,
+        "null_shape_records": 0,
+        "source_sha256": "953a9afa8b2a4ab7859e000b9f2361679d6a18db65f4bfd2978a705a6a6657e7",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "10734565072045778791_440_000_460_000": {
+      "evidence": "scientific-native-shape-10734565072045778791_440_000_460_000-verified.json",
+      "evidence_sha256": "ac2211bcff44e38b74787570d6f15fd7e12eb71b4ab274b781ef6ccd189588e2",
+      "receipt_sha256": "2f1495d07272e57b20eb5d2f7509059bac5f15a8dd9f95f3571477f281b75a2d",
+      "validation": {
+        "scene": "10734565072045778791_440_000_460_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "f74cdd6f7b436785e5d6cecb73183506a5911c82083a9e5b18f809774489cd39",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "2681180680221317256_1144_000_1164_000": {
+      "evidence": "scientific-native-shape-2681180680221317256_1144_000_1164_000-verified.json",
+      "evidence_sha256": "26cb0105629ed7ef25c62454dbaaedcd6b3460a3a95aef5c7bf9ef33815f2fe8",
+      "receipt_sha256": "b4e371630a4bbec948e858bfa0a00f170d72cc510058b3bddebce4304e1c7922",
+      "validation": {
+        "scene": "2681180680221317256_1144_000_1164_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "67d866774a05c6a6a6532afa0a1eef4a7b7cbc3cef33b3de61d78fb2acb7eb60",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "8722413665055769182_2840_000_2860_000": {
+      "evidence": "scientific-native-shape-8722413665055769182_2840_000_2860_000-verified.json",
+      "evidence_sha256": "9d3e253ba7a86712254121327ce2d4e7cacf655eef466facbe0b6873d83dbbcc",
+      "receipt_sha256": "3f20821aabb1993e65ed9e65bd887275a196ba31ff2ba52c2defe63c82933c19",
+      "validation": {
+        "scene": "8722413665055769182_2840_000_2860_000",
+        "records_verified": 1970,
+        "present_shape_records": 1970,
+        "null_shape_records": 0,
+        "source_sha256": "d8cadba7300ad96d1413dcfcb71134e16245d23d3e578912011ae537921f32ad",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "12012663867578114640_820_000_840_000": {
+      "evidence": "scientific-native-shape-12012663867578114640_820_000_840_000-verified.json",
+      "evidence_sha256": "9a966946a24e36082d628bced7ea4aef46c15e720dd504a4db954c59753a82e1",
+      "receipt_sha256": "7cd159388efe7ce8b3587008ee096915e449f7d97ffa4e79d45f3d7200a28772",
+      "validation": {
+        "scene": "12012663867578114640_820_000_840_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "480a4f6d676c1d03d1855b34970e96055221a1ebcae8047e795657bef27bfb5c",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "9907794657177651763_1126_570_1146_570": {
+      "evidence": "scientific-native-shape-9907794657177651763_1126_570_1146_570-verified.json",
+      "evidence_sha256": "c28b83a6abfec07381cfa0017750c33003341c1c42741211fe7e3a876b72848d",
+      "receipt_sha256": "380e47228d0ecff40af1ee2cba7ff4b430e78db8a24d92275191df43abff8506",
+      "validation": {
+        "scene": "9907794657177651763_1126_570_1146_570",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "625a37cfa097b28a276658c3a78ccdbd78bef6a39f3e17d859844e11707941d4",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "13807633218762107566_6625_000_6645_000": {
+      "evidence": "scientific-native-shape-13807633218762107566_6625_000_6645_000-verified.json",
+      "evidence_sha256": "6912ae651f03d0f66d54f50ddf5da791aaf8f6a73b67ff8201d4ac04a4556b8d",
+      "receipt_sha256": "e1de89ba21096cc3389e5bb2dc70f11f439180cb9e62a1d33e27a8ac3b2b8509",
+      "validation": {
+        "scene": "13807633218762107566_6625_000_6645_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "46b44a884b79b2f3fd92dcc623a212da6eb6654200704a93ce7216c3fa7163cb",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "7850521592343484282_4576_090_4596_090": {
+      "evidence": "scientific-native-shape-7850521592343484282_4576_090_4596_090-verified.json",
+      "evidence_sha256": "3296dc2a0df0b3f05af83015d02327585dd7f4a3ba58039929051a441d79db24",
+      "receipt_sha256": "79ebd9c439a4f9fbe6cbd0b9f4f95ff109e0aceb17cae9b265a0245f72483c47",
+      "validation": {
+        "scene": "7850521592343484282_4576_090_4596_090",
+        "records_verified": 1970,
+        "present_shape_records": 1970,
+        "null_shape_records": 0,
+        "source_sha256": "6ef0f41f4318874705e613ac0b1d6585db6e977e0f15cab461e6148537c3e1fb",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "12303641360375776820_4378_000_4398_000": {
+      "evidence": "scientific-native-shape-12303641360375776820_4378_000_4398_000-verified.json",
+      "evidence_sha256": "45c9bbe9480d59eaedcd648f676ba80bdd79a69319e978aedee0d844568c9269",
+      "receipt_sha256": "f2fa696208fcda056f3dc4064a5cbbaad27de7d282ab731a44e7368309d48cf6",
+      "validation": {
+        "scene": "12303641360375776820_4378_000_4398_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "dd6f76d2bf59e2053dc46bcec9dc7fffc10e49c1d186ebd7c03bdb8ac41e4970",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "2415873247906962761_5460_000_5480_000": {
+      "evidence": "scientific-native-shape-2415873247906962761_5460_000_5480_000-verified.json",
+      "evidence_sha256": "35e502bc3bceed3c32f5015e33219066753a1581e137e4e155e6f8e3a1e27ce7",
+      "receipt_sha256": "0415010b91d44d306cd88f6717e960e4311d173674e862e319c5b1ff6e059f08",
+      "validation": {
+        "scene": "2415873247906962761_5460_000_5480_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "74eb3b5220d4ceb81a3ced9a0dbd5cdb94d02940a261fbe3eb77a5369af321b3",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "2656110181316327570_940_000_960_000": {
+      "evidence": "scientific-native-shape-2656110181316327570_940_000_960_000-verified.json",
+      "evidence_sha256": "6741696a952c480f14ef9ef1af174d5534bf676a1f04c745effcf4ea14a41176",
+      "receipt_sha256": "8da181168ab79821dea9b9f65af0dca2359a3dbd090da5a2b08c5a964acce963",
+      "validation": {
+        "scene": "2656110181316327570_940_000_960_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "1eb69207029bd0f321b15ec307ef84174e29d5737f943e925935be4ab27fe8f6",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "16473613811052081539_1060_000_1080_000": {
+      "evidence": "scientific-native-shape-16473613811052081539_1060_000_1080_000-verified.json",
+      "evidence_sha256": "b27da3dff5493f8ba49c01e069d2115d5542752da09383a74fa334d24759f647",
+      "receipt_sha256": "c8006f58c17695a9e4f6163cf5395eb761c9537790b53aa384913da41475d72d",
+      "validation": {
+        "scene": "16473613811052081539_1060_000_1080_000",
+        "records_verified": 1970,
+        "present_shape_records": 1970,
+        "null_shape_records": 0,
+        "source_sha256": "de89b9dfca1c153bd291afe8ef080087bfe2667fbfebffd5f8d69a995f725ed1",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "16646502593577530501_4878_080_4898_080": {
+      "evidence": "scientific-native-shape-16646502593577530501_4878_080_4898_080-verified.json",
+      "evidence_sha256": "8f820e549c0151069fd802905410df497763e6118576d4900684373352a46aca",
+      "receipt_sha256": "7912fa74b4b95551e63a5e635b60bb3830781f269b9bd3847ef3393b7a87e7c0",
+      "validation": {
+        "scene": "16646502593577530501_4878_080_4898_080",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "3c32fda3bf01cf21ef4e37b599e8d17fcea79b106519ab5c07996733f0e16af7",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "7921369793217703814_1060_000_1080_000": {
+      "evidence": "scientific-native-shape-7921369793217703814_1060_000_1080_000-verified.json",
+      "evidence_sha256": "be8d6cf5e490d76e13d5c3b159914b0310e6cec39fddade9e0fa52f2a25edc2a",
+      "receipt_sha256": "a4082bb57353aeeeecf30d8934e60c7dde68ed4b785d537ec2c482307abfd602",
+      "validation": {
+        "scene": "7921369793217703814_1060_000_1080_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "19422cefb7ac9a5d0a640953056a6dc5f963fc5cb137b59faf9c3654eec32685",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "9385013624094020582_2547_650_2567_650": {
+      "evidence": "scientific-native-shape-9385013624094020582_2547_650_2567_650-verified.json",
+      "evidence_sha256": "e140eacb8f9c46cafddd927ff27bd91162b3471650919219563ebaa254635e0d",
+      "receipt_sha256": "7e1d9ad155162ae7edb33af77fe48c8e797eacf2c56bada7a1d1dbd3a827da3f",
+      "validation": {
+        "scene": "9385013624094020582_2547_650_2567_650",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "eb21c374745313469706a5ee580fec15637db44bbded862d6f7cf8141313d1c2",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "1191788760630624072_3880_000_3900_000": {
+      "evidence": "scientific-native-shape-1191788760630624072_3880_000_3900_000-verified.json",
+      "evidence_sha256": "016fa90560385e9b0598e186dde62e7ef6f546eb3411b300dc4f68dd7b54f55b",
+      "receipt_sha256": "53b5d62219c3226e19b0b8994f8e704c769749559b8ea6684c1a3de476d93c12",
+      "validation": {
+        "scene": "1191788760630624072_3880_000_3900_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "a70a9202337472e783cd704443e189d65a9ff6302b75c228596bf53ab2a405c9",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "6390847454531723238_6000_000_6020_000": {
+      "evidence": "scientific-native-shape-6390847454531723238_6000_000_6020_000-verified.json",
+      "evidence_sha256": "b7fa259c5d69495df9877123b38c35cc5e1ab8650118f53c3a5d966fc557b9a5",
+      "receipt_sha256": "64adb91954f7aa2ce7281d9a844a1c49767edf8b129dcf203d1e4c29a0f84307",
+      "validation": {
+        "scene": "6390847454531723238_6000_000_6020_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "006b879d6d182aeeba3868e923e5aa357f2ee593c7d0e05da728eadd7851dc01",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "13840133134545942567_1060_000_1080_000": {
+      "evidence": "scientific-native-shape-13840133134545942567_1060_000_1080_000-verified.json",
+      "evidence_sha256": "134a56e21ae159d83cba5daab610996cc3663a7561e7b3d4888280347fcd4052",
+      "receipt_sha256": "f0133bb38e1022b790dec6f2426b8f519bb6aab696a545317f4f406c340175cc",
+      "validation": {
+        "scene": "13840133134545942567_1060_000_1080_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "0e6fc597c2b02ce329f31f3d9c96d66369f21febe66de09e92058d6a785e41e3",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "5525943706123287091_4100_000_4120_000": {
+      "evidence": "scientific-native-shape-5525943706123287091_4100_000_4120_000-verified.json",
+      "evidence_sha256": "9930bfcbbd2347a23c4cbcc0649337f6313c99e62b00676e1662aa7552335010",
+      "receipt_sha256": "d6ab083b7e4fbe09130247b9b3227f36bafac56e71c91d7bb75b7483bbfad834",
+      "validation": {
+        "scene": "5525943706123287091_4100_000_4120_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "b9925cdf552a4f1d76f14cd1d49645d541b6f060f23cbd214c40c5342302782a",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "5200186706748209867_80_000_100_000": {
+      "evidence": "scientific-native-shape-5200186706748209867_80_000_100_000-verified.json",
+      "evidence_sha256": "b4ecf162c2e7e20d62194aa0ef05c48354d735062681b021e0d52f91ec2a8e36",
+      "receipt_sha256": "1200c31d491d898d677217b0c3a572783733b73902c267f5e1a39127159a2406",
+      "validation": {
+        "scene": "5200186706748209867_80_000_100_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "88622687c5d3859b0e8e6926b7fefa7d17437c2b47c3427279906ba560d50677",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "15696964848687303249_4615_200_4635_200": {
+      "evidence": "scientific-native-shape-15696964848687303249_4615_200_4635_200-verified.json",
+      "evidence_sha256": "07ccd85353203a69bc984b955245a31e43459db0f4072765f3b73bd00c32927a",
+      "receipt_sha256": "97feab3f3f408e54973ebea358c0608e09d90af8a75c75210000fd05686b926b",
+      "validation": {
+        "scene": "15696964848687303249_4615_200_4635_200",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "a99dd3dd57fadc7b1eddc618c1188ef7625db0d31ca655cab50ac9e7f2b9da2a",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "10599748131695282446_1380_000_1400_000": {
+      "evidence": "scientific-native-shape-10599748131695282446_1380_000_1400_000-verified.json",
+      "evidence_sha256": "e05b11effb5f017d3a9cafc76c340a0dac7fc8596a37776f06227c0d83285da4",
+      "receipt_sha256": "e4dedd73a3efaf78fe1642060e887c32d167345a2817597ff3da719a45953610",
+      "validation": {
+        "scene": "10599748131695282446_1380_000_1400_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "8768d777274462abd97353aca299eb5d3b9b211a607dd66321265f8246a19656",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "4575961016807404107_880_000_900_000": {
+      "evidence": "scientific-native-shape-4575961016807404107_880_000_900_000-verified.json",
+      "evidence_sha256": "f6b082b90a8f8441f14bd2f633d59584cdc695b0c9c97d16be7886e48da464b0",
+      "receipt_sha256": "7a82ac7d143f41565b05a70bd5057381124f36f6fdcf26dcfdb52850fe54fb88",
+      "validation": {
+        "scene": "4575961016807404107_880_000_900_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "3c6ce6c8c22c86d930914b05a5911379b55de7717825369e2beffa984f023da8",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        }
+      }
+    },
+    "10082223140073588526_6140_000_6160_000": {
+      "evidence": "scientific-native-shape-10082223140073588526_6140_000_6160_000-verified.json",
+      "evidence_sha256": "1b165bdba84955bf7d708530ee5289e3071b3c2ff079b1d6bb58f37ba73dd536",
+      "receipt_sha256": "3fbd5850ba8a122dc178d20273e0b948d35f5ca7ec1f76ed1d91c7db12e21b4d",
+      "validation": {
+        "scene": "10082223140073588526_6140_000_6160_000",
+        "records_verified": 1970,
+        "present_shape_records": 1970,
+        "null_shape_records": 0,
+        "source_sha256": "e231cbacf3e76a0a93960f8e253bf2d3ad4b1e98a787d7b169d012e1dddb84ed",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "development"
+          ]
+        }
+      }
+    },
+    "3657581213864582252_340_000_360_000": {
+      "evidence": "scientific-native-shape-3657581213864582252_340_000_360_000-verified.json",
+      "evidence_sha256": "910c8f55373ce888b3ea3351abda0c6de968933bca716f9c2c3a122169a58fa3",
+      "receipt_sha256": "f756d818b9e78d2bb02055098b9536fb600e4f31c5d12dad72d34614858acf28",
+      "validation": {
+        "scene": "3657581213864582252_340_000_360_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "56443108ae7a39e44cad95dd20109895007139fa663c156bc05cbe4e88766384",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "development"
+          ]
+        }
+      }
+    },
+    "5468483805452515080_4540_000_4560_000": {
+      "evidence": "scientific-native-shape-5468483805452515080_4540_000_4560_000-verified.json",
+      "evidence_sha256": "4c79dcb954e70e95838826742e925503c27c28c0535b8f23979cc324f1b5a57e",
+      "receipt_sha256": "5349fefcee2a2c7efd2fe1518f7a0ad4b3f3df5292c7854672dedc19b9ff08ab",
+      "validation": {
+        "scene": "5468483805452515080_4540_000_4560_000",
+        "records_verified": 1710,
+        "present_shape_records": 1710,
+        "null_shape_records": 0,
+        "source_sha256": "fc788ac71bb94623b139f0d4ab7d14be9f6a0cfaae526eb19e28dd70af65a37b",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "development"
+          ]
+        }
+      }
+    },
+    "4427374597960783085_4168_000_4188_000": {
+      "evidence": "scientific-native-shape-4427374597960783085_4168_000_4188_000-verified.json",
+      "evidence_sha256": "6ed0d5a75d028b8163d87eaf846fefce71e3199deda33aa3f4273b4eac8ee3f0",
+      "receipt_sha256": "c9f94b02269b9cb424468c8822c1fb5f5c6a11b5a99c631d11244a302a3f7621",
+      "validation": {
+        "scene": "4427374597960783085_4168_000_4188_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "c25f99f7e68fe7a8a9ee844d287b0b36fa2cca6566ceabe5054dfb14e143a3bb",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "development"
+          ]
+        }
+      }
+    },
+    "183829460855609442_430_000_450_000": {
+      "evidence": "scientific-native-shape-183829460855609442_430_000_450_000-verified.json",
+      "evidence_sha256": "6b78a976cbe64a059903b89d425845ac0c0f6263919d6c4f5c63fe5025121b8e",
+      "receipt_sha256": "5e8c55bde5b4293814f467f18f2152dd8c393b56461bd6fb66409a5df301ee3e",
+      "validation": {
+        "scene": "183829460855609442_430_000_450_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "a94d65c44a75f1e301db15dcd2b372801c6dfe8ddfe4c2c3609b1ca0e45face5",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "development"
+          ]
+        }
+      }
+    },
+    "3437741670889149170_1411_550_1431_550": {
+      "evidence": "scientific-native-shape-3437741670889149170_1411_550_1431_550-verified.json",
+      "evidence_sha256": "ab8ef584a4f2aaad8bfbc64aac08b34aff635c47e4490c340dc7877e3affafa5",
+      "receipt_sha256": "3de7b557e1f06e061f5ec8816adc2e37ce8ae8c04c240eca0dc4d0902b639b5c",
+      "validation": {
+        "scene": "3437741670889149170_1411_550_1431_550",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "59abe038fc552af7bd4483d7f65caf2871f2ba17479cdb4d00d849e4fcfad7c1",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "development"
+          ]
+        }
+      }
+    },
+    "9465500459680839281_1100_000_1120_000": {
+      "evidence": "scientific-native-shape-9465500459680839281_1100_000_1120_000-verified.json",
+      "evidence_sha256": "e83795d96943319f4f5e17915624359c6c3b259f34538260b579308c200a02f0",
+      "receipt_sha256": "df9e4fd8b25fbae0c71116c5f308ba8f0794df7918c0f2332743f02c6ab54021",
+      "validation": {
+        "scene": "9465500459680839281_1100_000_1120_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "65ea82e471ab688964a9b5c65636765fef69a170a4ea2c2d641279b4b69191ff",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "development"
+          ]
+        }
+      }
+    },
+    "18295766828140813622_6775_000_6795_000": {
+      "evidence": "scientific-native-shape-18295766828140813622_6775_000_6795_000-verified.json",
+      "evidence_sha256": "ef3fb086a6087165908a218068c3fcb0a55da27c409aa696a4e9936c4fe4c7a4",
+      "receipt_sha256": "179f9e68377d6abc4f39720b4bbf146c2c31ecc8537d6b1bb5931fbe4ecb33e1",
+      "validation": {
+        "scene": "18295766828140813622_6775_000_6795_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "e7ab4939136777a5d25eb1ee120cc0ed02f53d33caa8759d1d0d932981173b7c",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "development"
+          ]
+        }
+      }
+    },
+    "14262448332225315249_1280_000_1300_000": {
+      "evidence": "scientific-native-shape-14262448332225315249_1280_000_1300_000-verified.json",
+      "evidence_sha256": "b5656f76e34e7a8a23c71d9ce0eec673eb80e0100eaa54f1df4261ffb55aa151",
+      "receipt_sha256": "e3493c40677922b1e92b4d5c26ff33b8f443fc25376158242ac33e919d5dd886",
+      "validation": {
+        "scene": "14262448332225315249_1280_000_1300_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "c1ffc0dde33d5f8f5ddd14b46cfe70d16b41958f698275a550e535ba93575d46",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        }
+      }
+    },
+    "18446264979321894359_3700_000_3720_000": {
+      "evidence": "scientific-native-shape-18446264979321894359_3700_000_3720_000-verified.json",
+      "evidence_sha256": "d1c044e0d2c51e97a93bcef103c1cf20bc8a5d63c2e1e4472601115fa378f1cf",
+      "receipt_sha256": "0e7d29da81c617ddee8d772900df2ef8e689e478fc59926c335ed6080c391ea7",
+      "validation": {
+        "scene": "18446264979321894359_3700_000_3720_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "2cae331aaeb70b8cbbecfbe454eda3fa5aec89658b042b5e4ef24f8daf5bc63a",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        }
+      }
+    },
+    "14687328292438466674_892_000_912_000": {
+      "evidence": "scientific-native-shape-14687328292438466674_892_000_912_000-verified.json",
+      "evidence_sha256": "7a4f5a839187b02b6f379068a2ee40c55c74f4ed852dcaaf79099478ae8c5dcd",
+      "receipt_sha256": "4980013f631d479354b5a7cdd384e950d087997bc684eb0216e1552ed26683a7",
+      "validation": {
+        "scene": "14687328292438466674_892_000_912_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "fdcb787e598ae4f8d1385458cb908b87a26a7383eac5a77d7cd5f655dbb27630",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        }
+      }
+    },
+    "6161542573106757148_585_030_605_030": {
+      "evidence": "scientific-native-shape-6161542573106757148_585_030_605_030-verified.json",
+      "evidence_sha256": "db00ac83b76962bcbb0b772a1d22f7cc70dc46efa3d2f3c503c95327d878a5b6",
+      "receipt_sha256": "6a1db4d4affd9fd331e291c48e72a7a3f0826c1cc19b1f7d8e2f9c68fe789d14",
+      "validation": {
+        "scene": "6161542573106757148_585_030_605_030",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "4d876f423191f8fc2fdc47dd3989ca67c49bdb695947c3cb1561a8a2f7ade106",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        }
+      }
+    },
+    "6183008573786657189_5414_000_5434_000": {
+      "evidence": "scientific-native-shape-6183008573786657189_5414_000_5434_000-verified.json",
+      "evidence_sha256": "363acf1c7f607ef7ce0e37717fab38edc06e5f1ae751a6237159526cc6199731",
+      "receipt_sha256": "b1b8d452f9065d7afeb14f41b7280dc797a422244f32a674fc56a83ddc6bf917",
+      "validation": {
+        "scene": "6183008573786657189_5414_000_5434_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "0e38b343198c996bded57b498d0bb2c5f9cb3eb99fc1dcb30fb6fcb14c0fc73a",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        }
+      }
+    },
+    "15611747084548773814_3740_000_3760_000": {
+      "evidence": "scientific-native-shape-15611747084548773814_3740_000_3760_000-verified.json",
+      "evidence_sha256": "aecabbc7e25e92336eaa385a4e32b37e8b54d26bea2ff27c382ea06819f3585d",
+      "receipt_sha256": "c951aff051027f5e74cb942654e78c2f0d41e63957f9f14f93894e2f210046a8",
+      "validation": {
+        "scene": "15611747084548773814_3740_000_3760_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "e19637b28933ccf14450a566855b233afd385e19e072720b9b0188c6a567cc19",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        }
+      }
+    },
+    "30779396576054160_1880_000_1900_000": {
+      "evidence": "scientific-native-shape-30779396576054160_1880_000_1900_000-verified.json",
+      "evidence_sha256": "80123b5e1fda02e4f966040babe63ab554b75b3fffbe54158974f51a56d2885c",
+      "receipt_sha256": "d40dbcd6fab554f7fd0457fe5cb0c8d86a0fab71061e4e883e1ce0cbdf78b69b",
+      "validation": {
+        "scene": "30779396576054160_1880_000_1900_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "eefb173f2032031ae1fe0fcfa1be1501ac53c50128d5fa85530c2b1f3f488b33",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        }
+      }
+    },
+    "1457696187335927618_595_027_615_027": {
+      "evidence": "scientific-native-shape-1457696187335927618_595_027_615_027-verified.json",
+      "evidence_sha256": "3dc44b1bb17c0b06471a7ceb8c6fc367116dba1b26da50486c58df85e9e634d3",
+      "receipt_sha256": "74f063e453e13f0577a673f0e67c9efbfd7c6101536a2760950fa6d9b57c7909",
+      "validation": {
+        "scene": "1457696187335927618_595_027_615_027",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "3021f8ac5c4e0deeaba45925c8c51a8f01e679e62493f91dcae801573108f298",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        }
+      }
+    },
+    "17962792089966876718_2210_933_2230_933": {
+      "evidence": "scientific-native-shape-17962792089966876718_2210_933_2230_933-verified.json",
+      "evidence_sha256": "09c29f970956df9854eaa5551b71e00b5220de09efb18b4984e15bc029720af9",
+      "receipt_sha256": "61d112615f1ae8c09316aa4b794989b345f250bbb56119f847714b3bbffbe0ff",
+      "validation": {
+        "scene": "17962792089966876718_2210_933_2230_933",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "a0112aef28839d6cb7a14a6f4644b454246b26d5a2789721ac696d05412c0270",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        }
+      }
+    },
+    "18331704533904883545_1560_000_1580_000": {
+      "evidence": "scientific-native-shape-18331704533904883545_1560_000_1580_000-verified.json",
+      "evidence_sha256": "10d27b6eb7cc04ab6e3fdf458fea384cc3eefdb5070e12bd8b7523119c29c26c",
+      "receipt_sha256": "1ecf49d402d6ee030859c53b4166d53574adcbf6a6ede0f4d65fe1151c1ab467",
+      "validation": {
+        "scene": "18331704533904883545_1560_000_1580_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "da8601c90827c98801ea8e815b0db1791b9b13f4ea13fd5ab5a28045a701576a",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        }
+      }
+    },
+    "17626999143001784258_2760_000_2780_000": {
+      "evidence": "scientific-native-shape-17626999143001784258_2760_000_2780_000-verified.json",
+      "evidence_sha256": "ec28c99ac01539afde2b256e5601b3f18c8d4aeb57392a15758e896aa2d92ae6",
+      "receipt_sha256": "10fbffca16027dab4fec9aeeb0c28ec1048076a215ba188b2cae075f38a4cb2d",
+      "validation": {
+        "scene": "17626999143001784258_2760_000_2780_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "58a63abaff5eacaf401704803190eb1bc900b5fabc1b9f0e5aedb60c12203ea9",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        }
+      }
+    },
+    "7650923902987369309_2380_000_2400_000": {
+      "evidence": "scientific-native-shape-7650923902987369309_2380_000_2400_000-verified.json",
+      "evidence_sha256": "0885842077df0b9e6716ff4a0334fe7323a4bda71637c15ecddc17258993a5f1",
+      "receipt_sha256": "fdb5c668fc17cb856dad84beed2de47d9a976d17c1f88a00ba038b62163ad928",
+      "validation": {
+        "scene": "7650923902987369309_2380_000_2400_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "dafbc7ece03ca55e8f49e955e17d268c793ec22ee63fde1c9afcc1ff3cc0949b",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        }
+      }
+    },
+    "1071392229495085036_1844_790_1864_790": {
+      "evidence": "scientific-native-shape-1071392229495085036_1844_790_1864_790-verified.json",
+      "evidence_sha256": "3c1226db73589a643ea0a1906f066259dad0c2d4c808ec5f13b1eb154c5e4932",
+      "receipt_sha256": "49cb19190a8d374ff31f6bfe854a9922e94eafa446eec2b9f127353efa8c38e9",
+      "validation": {
+        "scene": "1071392229495085036_1844_790_1864_790",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "e200b7a89e209af3eb7d5310fe086a0c9610b3668b75fbb53289c216ebb455bd",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        }
+      }
+    },
+    "8956556778987472864_3404_790_3424_790": {
+      "evidence": "scientific-native-shape-8956556778987472864_3404_790_3424_790-verified.json",
+      "evidence_sha256": "0faa29677420e636e5f0760b8d73ff94d5024da79f718d06c7786598a2e4be44",
+      "receipt_sha256": "bddfbb46b9677dd386c524e9e38431a1409f2baa57791aaf121464d3d286104e",
+      "validation": {
+        "scene": "8956556778987472864_3404_790_3424_790",
+        "records_verified": 1970,
+        "present_shape_records": 1970,
+        "null_shape_records": 0,
+        "source_sha256": "9ea276b7a478d11edfa89878b7720ef4bf416a527676fd50fa12640df1ddbf01",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation",
+            "camera_validation"
+          ]
+        }
+      }
+    },
+    "15959580576639476066_5087_580_5107_580": {
+      "evidence": "scientific-native-shape-15959580576639476066_5087_580_5107_580-verified.json",
+      "evidence_sha256": "063666829839bf2a57858ef1dfc3eeedead904d11ed56926a8fd77d5c0d2c749",
+      "receipt_sha256": "43497480aa2558d91230bf45e01f5e9380b583e873aa78b6c5b98dcba94c8333",
+      "validation": {
+        "scene": "15959580576639476066_5087_580_5107_580",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "98f3dd2eb5e98bbdc6c83ae90d643db4f28cb5401352d38fb4f68484d4e2f34c",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        }
+      }
+    },
+    "447576862407975570_4360_000_4380_000": {
+      "evidence": "scientific-native-shape-447576862407975570_4360_000_4380_000-verified.json",
+      "evidence_sha256": "b4d82153d28b8af036366a005b5d71e13d1b50eede8a395f8d02d03d2dc015ee",
+      "receipt_sha256": "9e79f915103d0d5fc35647a7048fa3a88a2e7c9318d9d641500d63e526194627",
+      "validation": {
+        "scene": "447576862407975570_4360_000_4380_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "df6624d24a54d15d866ed8ec8fdcdb93e5b044edd2824c6625bf9aaa6aa382cb",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        }
+      }
+    },
+    "4759225533437988401_800_000_820_000": {
+      "evidence": "scientific-native-shape-4759225533437988401_800_000_820_000-verified.json",
+      "evidence_sha256": "6952627a60e52e3f9cd3235f79cb91c3d6fccbe587b19f6e568b904bb9118539",
+      "receipt_sha256": "12465186b9eb786d5dd7690529a2eea6b657b5c9a531cd483ff7da0ef1861754",
+      "validation": {
+        "scene": "4759225533437988401_800_000_820_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "5e7588521901f2c3cb8332ab9e98f20f893b62f4f6d25d2bbe3ce6d14d8d115f",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        }
+      }
+    },
+    "1024360143612057520_3580_000_3600_000": {
+      "evidence": "scientific-native-shape-1024360143612057520_3580_000_3600_000-verified.json",
+      "evidence_sha256": "940f934a88e95ad034ee1b28d7502a4d2e0e25cad17cff45021167507f26650c",
+      "receipt_sha256": "94fa3d7fc3a2a12840d1c7685374ee665a6b2c8afecb449bce15d6437bba4bb2",
+      "validation": {
+        "scene": "1024360143612057520_3580_000_3600_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "8750866d1b955f0331d05dfd6fb4c2a127af565dbe0d78386df35e182f238254",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        }
+      }
+    },
+    "11048712972908676520_545_000_565_000": {
+      "evidence": "scientific-native-shape-11048712972908676520_545_000_565_000-verified.json",
+      "evidence_sha256": "1e71d8a127bf81d70d27557394e198ef82502c7cc7ffbef084fb709ff114d776",
+      "receipt_sha256": "3afe3193750eda427eb89f902096937376c0840ea1411054431df400fe9a637a",
+      "validation": {
+        "scene": "11048712972908676520_545_000_565_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "263448c9ea7accf417c362afd6277ab6c9494bfc27a2a68029f9a91f3d4ff584",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        }
+      }
+    },
+    "9243656068381062947_1297_428_1317_428": {
+      "evidence": "scientific-native-shape-9243656068381062947_1297_428_1317_428-verified.json",
+      "evidence_sha256": "02532039922c62fbff5fd66120702dad89f12df0664e27d5867aaab81c7fc0d9",
+      "receipt_sha256": "1cde7f926692e872c0be1641ea133b0f9c393676bb04080be673121084ee35d9",
+      "validation": {
+        "scene": "9243656068381062947_1297_428_1317_428",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "b816864bcea08abb769e818f0b0fd84430474cf7510730a17017c66cc5002112",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        }
+      }
+    },
+    "14081240615915270380_4399_000_4419_000": {
+      "evidence": "scientific-native-shape-14081240615915270380_4399_000_4419_000-verified.json",
+      "evidence_sha256": "92308b0d74cc5613c98ef97fc99f9bfc411ee3775b451f56f63247d635310623",
+      "receipt_sha256": "e64d9ec8514ad6c74c46d744e38d9d92e4098599c061e1cddbe40999ddad1635",
+      "validation": {
+        "scene": "14081240615915270380_4399_000_4419_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "0f483364ea35b1e73ba9a133710a6fcbae4f3911ad9330f79c0a95090e148bbb",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        }
+      }
+    },
+    "933621182106051783_4160_000_4180_000": {
+      "evidence": "scientific-native-shape-933621182106051783_4160_000_4180_000-verified.json",
+      "evidence_sha256": "f4ec7eb4dfe31dba5fa9db62941bd640acc5bf763b5585ba06efe40fca670150",
+      "receipt_sha256": "d3edf59d5cbaf613afec2859c3981078dec7a3675f0bac7c12204b7d2e84d3df",
+      "validation": {
+        "scene": "933621182106051783_4160_000_4180_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "e540348fddb086a9f5c488ac9fd9370aec3e699a45971304afdccf9ad63f72b1",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        }
+      }
+    },
+    "12831741023324393102_2673_230_2693_230": {
+      "evidence": "scientific-native-shape-12831741023324393102_2673_230_2693_230-verified.json",
+      "evidence_sha256": "809a1af3094d7d6a69830beacf627b65ef8d587c60123ae30b561184fc183135",
+      "receipt_sha256": "20cda2932842adc5679da124701def70c5b1ce9885a67381cc9cf76343b372a3",
+      "validation": {
+        "scene": "12831741023324393102_2673_230_2693_230",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "c7c646e8c01df61a629c0e38ce8d78b761ec8bdfde8597b5c6a502387a6f3532",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        }
+      }
+    },
+    "6680764940003341232_2260_000_2280_000": {
+      "evidence": "scientific-native-shape-6680764940003341232_2260_000_2280_000-verified.json",
+      "evidence_sha256": "0224f0cecd0f783edfaaeabebcf2940c83a7f2fb4e9624390d774fe3735c6b05",
+      "receipt_sha256": "d64ee21bbb3defaeaabf74b53f5e212b6d9faf954d145c0acb7d71c8475fc2d0",
+      "validation": {
+        "scene": "6680764940003341232_2260_000_2280_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "a71227d4a790366ca77af743f8d38cf7cc1dcf85efcb28417cd8ce1f63e8c8fc",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        }
+      }
+    },
+    "18024188333634186656_1566_600_1586_600": {
+      "evidence": "scientific-native-shape-18024188333634186656_1566_600_1586_600-verified.json",
+      "evidence_sha256": "43256ab4995ad9efe0c925be2eb27c157ccb83867aeaea1457038ec96107e8ae",
+      "receipt_sha256": "90af943e42767689f3488093cabd3a7cfe6f25d59d16653a19f9b6fef3920532",
+      "validation": {
+        "scene": "18024188333634186656_1566_600_1586_600",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "10d2bbbe902c4d6203c238bff03ca84533d20f2ce883193c6d24dc8454d27569",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        }
+      }
+    },
+    "8331804655557290264_4351_740_4371_740": {
+      "evidence": "scientific-native-shape-8331804655557290264_4351_740_4371_740-verified.json",
+      "evidence_sha256": "e421757b46a46b3e390df3665370923c1754ebb4e3b553f237ab3745f4103de2",
+      "receipt_sha256": "73a9a70fd34bb681e9ce5bfe270aadafbff957f9791d969c13c75f12bdaba04e",
+      "validation": {
+        "scene": "8331804655557290264_4351_740_4371_740",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "2def72d0ffb75158b1545acf303a71fe09909136656f2b55cd9fa01ff2fca060",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        }
+      }
+    },
+    "2094681306939952000_2972_300_2992_300": {
+      "evidence": "scientific-native-shape-2094681306939952000_2972_300_2992_300-verified.json",
+      "evidence_sha256": "e565d0123c3a43e1c9adf5f8cb25398a5902e59e8ad9d2a8b2b675fa8fa71be4",
+      "receipt_sha256": "c537114857d0d1b4744ec941e910b089fce14c68fbd07cee6822583e2b6b22ba",
+      "validation": {
+        "scene": "2094681306939952000_2972_300_2992_300",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "fe1004a9e45e373d05d8629260f87a0c569f79ed5c987a59e3a9063b29064ffe",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        }
+      }
+    },
+    "4575389405178805994_4900_000_4920_000": {
+      "evidence": "scientific-native-shape-4575389405178805994_4900_000_4920_000-verified.json",
+      "evidence_sha256": "1ffe9a6b21b0607df55eb4651f1f8ebeddf135305075c217d5557b305aa19e4b",
+      "receipt_sha256": "32854c9c8c71e8f0134f6da2433ccdfb7fa9b35379395ebd6e6913dfe96dd65a",
+      "validation": {
+        "scene": "4575389405178805994_4900_000_4920_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "296f80d9298938600d466298c5a00e06f169c1d1e8fcccc8a2c5ba81136c99c1",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        }
+      }
+    },
+    "7119831293178745002_1094_720_1114_720": {
+      "evidence": "scientific-native-shape-7119831293178745002_1094_720_1114_720-verified.json",
+      "evidence_sha256": "ce0e1aeb8211ed1de31ce6035086844c8befdd22cadbb2314ece364742e0daf3",
+      "receipt_sha256": "e839d80b69edab09aecb4df103f74fdfc7e9d01f30b45d14591c75ea9c27ce86",
+      "validation": {
+        "scene": "7119831293178745002_1094_720_1114_720",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "4b7894f4455a7faeb8e15e60ce14d2e9d430b84965ff6294a918dc4639bba3b6",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        }
+      }
+    },
+    "5372281728627437618_2005_000_2025_000": {
+      "evidence": "scientific-native-shape-5372281728627437618_2005_000_2025_000-verified.json",
+      "evidence_sha256": "6d95c594be742ca062d9bc1fc8c407ddd2db31587e03940467605664f8a9eb07",
+      "receipt_sha256": "4eb1368675608f9f7ba9222f89fcc391be1223dd0eea82c42fa805e4b46de21e",
+      "validation": {
+        "scene": "5372281728627437618_2005_000_2025_000",
+        "records_verified": 1980,
+        "present_shape_records": 1980,
+        "null_shape_records": 0,
+        "source_sha256": "cc23030185d6efa569377e4060f633abf9a9a9449b32e32745fb3c5dfcef2176",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        }
+      }
+    },
+    "13982731384839979987_1680_000_1700_000": {
+      "evidence": "scientific-native-shape-13982731384839979987_1680_000_1700_000-verified.json",
+      "evidence_sha256": "33e8b32f488dfeb44aefc1ae912d8e8ab4256a32418dc4b9f271199471f57bdb",
+      "receipt_sha256": "2cedae8ecad5e57e51e33c9fd9afe93273d43a5fa916ff4031eb3c219e74f393",
+      "validation": {
+        "scene": "13982731384839979987_1680_000_1700_000",
+        "records_verified": 1990,
+        "present_shape_records": 1990,
+        "null_shape_records": 0,
+        "source_sha256": "614d6504b134d958a4a2220d1236057f8772a61f11d6852f2b898f1ed429c254",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        }
+      }
+    }
+  },
+  "scope": "shape metadata only; native point-grid linkage and scientific comparisons remain open"
+}

@@ -1,0 +1,12 @@
+{
+  "status": "two scientific native-record archive replays independently checked live",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/replay-15036582848618865396_3752_830_3772_830/receipt.json",
+  "receipt_sha256": "71a5e91151fd8b7a7f51d45edadbab62a584cd412ccc25b9ba09f97336ca6a4b",
+  "validation": {
+    "records": 1980,
+    "points": 35851264,
+    "identity_array_digest": "f08bd9c42d9188197988c084a315ff681a49fd4c73ff4be8832d7bceaf165dc9",
+    "status": "all returned arrays independently match verified source point records"
+  },
+  "scope": "one scientific scene point records; camera/detector input assembly, remaining cohort and protocol acceptance remain open"
+}

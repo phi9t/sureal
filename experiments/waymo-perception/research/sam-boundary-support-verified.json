@@ -1,0 +1,104 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sam-boundary-support-a",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-native-bridge-a/input",
+        "/tmp/native-input",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-native-bridge-a/output",
+        "/tmp/projected",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sam-native-image-all-a/output",
+        "/tmp/sam",
+        "--",
+        "python",
+        "-c",
+        "import json,time,resource,numpy as np\nfrom pathlib import Path\nstart=time.monotonic()\nwith np.load('/tmp/sam/masks.npz',allow_pickle=False) as a:masks=a['masks'][:,0]\nwith np.load('/tmp/native-input/native.npz',allow_pickle=False) as a:cp=a['camera_projection']\nn=len(cp);h,w=masks.shape[1:];slots=cp.reshape(n,2,3);rows=[];us=[];vs=[]\nfor s in range(2):\n c,u,v=slots[:,s,:].T;valid=(c==1)&(u>=0)&(u<w)&(v>=0)&(v<h);rows.extend(np.flatnonzero(valid));us.extend(u[valid]);vs.extend(v[valid])\nrows=np.array(rows);u=np.array(us,dtype=np.int64);v=np.array(vs,dtype=np.int64);radii=[0,1,3,5];hits={r:np.zeros((n,len(masks)),bool) for r in radii}\nfor j,mask in enumerate(masks):\n integral=np.pad(mask.astype(np.int32).cumsum(0,dtype=np.int32).cumsum(1,dtype=np.int32),((1,0),(1,0)))\n for r in radii:\n  valid=(u>=r)&(u+r<w)&(v>=r)&(v+r<h);keep=np.zeros(len(u),bool);uv=u[valid];vv=v[valid];area=integral[vv+r+1,uv+r+1]-integral[vv-r,uv+r+1]-integral[vv+r+1,uv-r]+integral[vv-r,uv-r];keep[valid]=area==(2*r+1)**2\n  # Independent all-slot shifted pixel lookup, no integral image.\n  reference=valid.copy()\n  for dv in range(-r,r+1):\n   for du in range(-r,r+1):reference[valid]&=mask[vv+dv,uv+du]\n  np.testing.assert_array_equal(keep,reference);np.logical_or.at(hits[r][:,j],rows,keep)\nfor a,b in zip(radii[:-1],radii[1:]):assert not (hits[b]&~hits[a]).any()\nassert int(hits[0].any(1).sum())==1486\nresult={'points':n,'masks':len(masks),'front_slots':len(rows),'pixel_radii':{str(r):{'unique_associated_points':int(x.any(1).sum()),'supported_masks':int(x.any(0).sum()),'point_mask_relations':int(x.sum()),'overlapping_points':int((x.sum(1)>1).sum())} for r,x in hits.items()},'elapsed_seconds':time.monotonic()-start,'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'scope':'all63 oracle-prompt SAM masks, native supplied pixels; square-neighborhood boundary diagnostic only, not physical visibility or frozen scientific thresholds'}\nPath('/outputs/check.json').write_text(json.dumps(result,indent=2));print(json.dumps(result))\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+  "teacher_receipt_sha256": "b58f0c76677eac60968c2abeda1e3127d8e30e08c6815c6c81ab38a46380a7ed",
+  "source_native_npz_sha256": "791a2789957cbfa1de398cadce98be6b70730c9f5ba49f3632d1cdba44214890",
+  "script_sha256": "db82baedf06b360a96741edb7eac7341ccbdf42209b7696fca5373f45980309a",
+  "validation": {
+    "points": 157870,
+    "masks": 63,
+    "front_slots": 21234,
+    "pixel_radii": {
+      "0": {
+        "unique_associated_points": 1486,
+        "supported_masks": 26,
+        "point_mask_relations": 1535,
+        "overlapping_points": 47
+      },
+      "1": {
+        "unique_associated_points": 1396,
+        "supported_masks": 25,
+        "point_mask_relations": 1426,
+        "overlapping_points": 29
+      },
+      "3": {
+        "unique_associated_points": 1206,
+        "supported_masks": 20,
+        "point_mask_relations": 1216,
+        "overlapping_points": 10
+      },
+      "5": {
+        "unique_associated_points": 1038,
+        "supported_masks": 14,
+        "point_mask_relations": 1044,
+        "overlapping_points": 6
+      }
+    },
+    "elapsed_seconds": 3.1332107149937656,
+    "peak_rss_kib": 237708,
+    "scope": "all63 oracle-prompt SAM masks, native supplied pixels; square-neighborhood boundary diagnostic only, not physical visibility or frozen scientific thresholds"
+  },
+  "artifacts": {
+    "live.log": "2f575c04b352146e92903150603d5a786dc571822a9189b4c24aa77005d16a22",
+    "check.json": "5b5f796b35af9fb8191337e11498ae90b8f8c16e6608af3fa81e451bfed7abfe"
+  },
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sam-boundary-support-a/receipt.json",
+  "receipt_sha256": "de67228f2a9fa0483b572d7b8aa80ae2e21252e1116a00953b77e09ce15b831a",
+  "native_input_preparation_sha256": "e72bc378af4bb1cc98c57e211645c50aecb1acedb0244f20dd7922bc29cd3392",
+  "native_input_lineage_verified": true
+}

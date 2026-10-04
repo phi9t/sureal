@@ -1,0 +1,306 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/overfit-point-frames-v1/7912728502266478772_1202_200_1222_200/producer",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/architecture-retention-support-v2",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.scratch/architecture-retention-support-v2.py",
+        "/tmp/worker.py",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/overfit-native-cache-v1/7912728502266478772_1202_200_1222_200/1506905332721474/input",
+        "/tmp/input",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/overfit-native-cache-v1/7912728502266478772_1202_200_1222_200/1506905332721474/producer",
+        "/tmp/original",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-retain64-cache-v1/7912728502266478772_1202_200_1222_200/1506905332721474/producer",
+        "/tmp/retained",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/overfit-box-targets-v1/7912728502266478772_1202_200_1222_200/producer",
+        "/tmp/boxes",
+        "--",
+        "python",
+        "/tmp/worker.py"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "retention_evidence_sha256": "61242db6789bcbbe1504bacf6f03ab2bc4f8fd8df3c2d5569bfa69ae60ab2e9d",
+  "worker_sha256": "9a9543b45c0df640e40e322685ff78a4aa6d23d5f73b7ec0a3b3051d9e3b9658",
+  "validation": {
+    "objects": [
+      {
+        "object_id": "28HzDN4VJ22The9Q--jNWA",
+        "class": 3,
+        "native_label_point_count": 51,
+        "derived_oriented_box_point_support": {
+          "physical": 50,
+          "32": 15,
+          "64": 29,
+          "eligible_physical": 50,
+          "32_within_selected_pillars": 50,
+          "64_within_selected_pillars": 50
+        }
+      },
+      {
+        "object_id": "75RjriO02rAjrYo8Q57_ZQ",
+        "class": 1,
+        "native_label_point_count": 422,
+        "derived_oriented_box_point_support": {
+          "physical": 417,
+          "32": 333,
+          "64": 333,
+          "eligible_physical": 417,
+          "32_within_selected_pillars": 333,
+          "64_within_selected_pillars": 333
+        }
+      },
+      {
+        "object_id": "7CeV_v1mgR0qwX9Ga8RZxg",
+        "class": 2,
+        "native_label_point_count": 40,
+        "derived_oriented_box_point_support": {
+          "physical": 39,
+          "32": 22,
+          "64": 22,
+          "eligible_physical": 39,
+          "32_within_selected_pillars": 22,
+          "64_within_selected_pillars": 22
+        }
+      },
+      {
+        "object_id": "DIuoOLnjbBLWwTdFVNhZww",
+        "class": 3,
+        "native_label_point_count": 95,
+        "derived_oriented_box_point_support": {
+          "physical": 90,
+          "32": 49,
+          "64": 80,
+          "eligible_physical": 90,
+          "32_within_selected_pillars": 85,
+          "64_within_selected_pillars": 85
+        }
+      },
+      {
+        "object_id": "QgFKoCS2DIcu2AZdxm5rhg",
+        "class": 3,
+        "native_label_point_count": 32,
+        "derived_oriented_box_point_support": {
+          "physical": 27,
+          "32": 21,
+          "64": 21,
+          "eligible_physical": 27,
+          "32_within_selected_pillars": 21,
+          "64_within_selected_pillars": 21
+        }
+      },
+      {
+        "object_id": "RFQouA7KDyYTXZCedGe9Cw",
+        "class": 3,
+        "native_label_point_count": 85,
+        "derived_oriented_box_point_support": {
+          "physical": 82,
+          "32": 43,
+          "64": 51,
+          "eligible_physical": 82,
+          "32_within_selected_pillars": 51,
+          "64_within_selected_pillars": 51
+        }
+      },
+      {
+        "object_id": "Sf_hcK6g2tHJOd4wBEIcuw",
+        "class": 3,
+        "native_label_point_count": 55,
+        "derived_oriented_box_point_support": {
+          "physical": 52,
+          "32": 33,
+          "64": 48,
+          "eligible_physical": 52,
+          "32_within_selected_pillars": 51,
+          "64_within_selected_pillars": 51
+        }
+      },
+      {
+        "object_id": "SmAsrEQPvQV7jTfpdoN6Og",
+        "class": 3,
+        "native_label_point_count": 18,
+        "derived_oriented_box_point_support": {
+          "physical": 17,
+          "32": 0,
+          "64": 0,
+          "eligible_physical": 17,
+          "32_within_selected_pillars": 0,
+          "64_within_selected_pillars": 0
+        }
+      },
+      {
+        "object_id": "aJwipID1ePV0UGdysgH8bQ",
+        "class": 2,
+        "native_label_point_count": 22,
+        "derived_oriented_box_point_support": {
+          "physical": 21,
+          "32": 21,
+          "64": 21,
+          "eligible_physical": 21,
+          "32_within_selected_pillars": 21,
+          "64_within_selected_pillars": 21
+        }
+      },
+      {
+        "object_id": "bU66PwbHjTNyZjiZk-simg",
+        "class": 3,
+        "native_label_point_count": 95,
+        "derived_oriented_box_point_support": {
+          "physical": 89,
+          "32": 50,
+          "64": 55,
+          "eligible_physical": 89,
+          "32_within_selected_pillars": 55,
+          "64_within_selected_pillars": 55
+        }
+      },
+      {
+        "object_id": "djn_ctMR7rtB5HVlTnXdTw",
+        "class": 1,
+        "native_label_point_count": 258,
+        "derived_oriented_box_point_support": {
+          "physical": 253,
+          "32": 147,
+          "64": 147,
+          "eligible_physical": 253,
+          "32_within_selected_pillars": 147,
+          "64_within_selected_pillars": 147
+        }
+      },
+      {
+        "object_id": "iIo9TDXjZmFZ7pY7ePPTBw",
+        "class": 3,
+        "native_label_point_count": 5,
+        "derived_oriented_box_point_support": {
+          "physical": 4,
+          "32": 4,
+          "64": 4,
+          "eligible_physical": 4,
+          "32_within_selected_pillars": 4,
+          "64_within_selected_pillars": 4
+        }
+      },
+      {
+        "object_id": "iJGyNO9lu_H9zWMU-j55rA",
+        "class": 2,
+        "native_label_point_count": 32,
+        "derived_oriented_box_point_support": {
+          "physical": 31,
+          "32": 29,
+          "64": 29,
+          "eligible_physical": 31,
+          "32_within_selected_pillars": 29,
+          "64_within_selected_pillars": 29
+        }
+      },
+      {
+        "object_id": "pfSFH9OHVfn__IfVyHI9lA",
+        "class": 3,
+        "native_label_point_count": 10,
+        "derived_oriented_box_point_support": {
+          "physical": 5,
+          "32": 0,
+          "64": 0,
+          "eligible_physical": 5,
+          "32_within_selected_pillars": 0,
+          "64_within_selected_pillars": 0
+        }
+      },
+      {
+        "object_id": "sMilx6iKg8NsUlc54Ankcg",
+        "class": 3,
+        "native_label_point_count": 74,
+        "derived_oriented_box_point_support": {
+          "physical": 80,
+          "32": 51,
+          "64": 67,
+          "eligible_physical": 80,
+          "32_within_selected_pillars": 67,
+          "64_within_selected_pillars": 67
+        }
+      },
+      {
+        "object_id": "vL2mxbpLwp5_sQ8Jzh0sVA",
+        "class": 3,
+        "native_label_point_count": 1,
+        "derived_oriented_box_point_support": {
+          "physical": 3,
+          "32": 0,
+          "64": 0,
+          "eligible_physical": 3,
+          "32_within_selected_pillars": 0,
+          "64_within_selected_pillars": 0
+        }
+      },
+      {
+        "object_id": "vokfcbfEO6D_YLtChJ8Lxg",
+        "class": 1,
+        "native_label_point_count": 8377,
+        "derived_oriented_box_point_support": {
+          "physical": 8223,
+          "32": 2968,
+          "64": 4485,
+          "eligible_physical": 8223,
+          "32_within_selected_pillars": 6307,
+          "64_within_selected_pillars": 6307
+        }
+      }
+    ],
+    "scope": "GT-conditioned support diagnostic only; never model input or native annotation replacement"
+  },
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/architecture-retention-support-v2/live.log": "92ff73b35a79d883f9a69681f8c0011e1fb164b26a50051a29103de543b7a7d1",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/architecture-retention-support-v2/check.json": "2a7ba9686dea3e98cfd090758b23c7a0b0fc5e2a5a05fa886a27b8114a8d0347"
+  }
+}

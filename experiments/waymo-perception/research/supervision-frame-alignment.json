@@ -1,0 +1,13 @@
+{
+  "status": "all acquired frame catalogs independently checked live",
+  "scenes_audited": 103,
+  "scenes_pending": 0,
+  "scope": "timestamp catalogs only; point/pixel validity and per-camera alignment require native payload checks",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/supervision-alignment-live-c/receipt.json",
+  "receipt_sha256": "5c1e2bdbe0ce00f8a0b46fe7a876508b2ef43b722ca10892798c5cfa3b0bc327",
+  "point_label_frames": 3118,
+  "camera_conditioned_point_frames": 3118,
+  "camera_mask_label_frames": 2735,
+  "joint_annotation_frames": 437,
+  "point_labels_missing_camera_measurements": 0
+}

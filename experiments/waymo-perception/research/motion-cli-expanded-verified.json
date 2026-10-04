@@ -1,0 +1,7 @@
+{
+  "status": "expanded native Motion analytic boundary independently verified live",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-cli-expanded-live-a/receipt.json",
+  "receipt_sha256": "276dadb12d4964b5dfb57ec41fb90d8a4f540ac70f19512a977b1b6ae6e9cc17",
+  "fixture_groups": 6,
+  "scope": "single-scenario analytic errors/counts/missingness, serialized K and confidence mAP plus malformed/identity/endpoint/nonfinite-speed rejection; pooled scoring, joint/interacting cases and acquired causal ingestion remain open"
+}

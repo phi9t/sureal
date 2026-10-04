@@ -1,0 +1,116 @@
+"""Fresh HDFS union recovery and original cold-model GPU verification; no release."""
+import hashlib,json,math,os,shutil,subprocess,sys,time,traceback
+from pathlib import Path
+sys.dont_write_bytecode=True
+P=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P))
+from resources.sources import sha,regular,freeze_sources,validate_sources
+from resources.stage import run_stage,validate_proof,write_new
+from resources.retention_audit import validate_union,validate_live_references
+from resources.dependencies import shared_inventory
+from cohort.sustained_checkpoint_inventory import freeze_checkpoint_inventory
+from cohort.sustained_controller_lock import acquire_experiment_lock
+from cohort.sustained_controller_backend import NativeBackend,C,W
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+from tier1.storage import unique_payload_bytes
+R=Path('/tmp/sureal-comprehensive-hdfs-independent');FINAL=Path('/tmp/sureal-comprehensive-closeout-hdfs-independent.json')
+AUTHOR=Path('/tmp/sureal-comprehensive-closeout-hdfs.json')
+SUPPLEMENT=Path(sys.argv[1]) if len(sys.argv)>1 else None
+report={'schema_version':1,'passed':False,'scope':'fresh GET and capped archive recovery of explicit comprehensive closeout metadata allowlist; blocked code remains blocked; no new GPU/model/runner/release claim','driver':{'path':str(Path(__file__)),'sha256':sha(__file__)},'transfers':[],'archive_stages':[],'gpu_stages':[],'budget_checks':[],'groups':[]}
+def persist():FINAL.write_text(json.dumps(report,indent=2,allow_nan=False)+'\n')
+def ref(path):return {'path':str(path),'sha256':sha(path)}
+def read(path):return json.loads(Path(path).read_text())
+def loadref(value):assert regular(Path(value['path'])) and sha(value['path'])==value['sha256'];return read(value['path'])
+def equal(a,b,path):
+ assert type(a) is type(b),path
+ if isinstance(a,dict):
+  assert a.keys()==b.keys(),path
+  for k in a:equal(a[k],b[k],path+'.'+str(k))
+ elif isinstance(a,list):
+  assert len(a)==len(b),path
+  for i,(u,v) in enumerate(zip(a,b)):equal(u,v,path+'.'+str(i))
+ else:
+  if isinstance(a,float):assert math.isfinite(a) and math.isfinite(b),path
+  assert a==b,path
+
+def guard(reserve=0,label='guard'):
+ assert sha(__file__)==report['driver']['sha256']
+ b.guard();validate_sources(P/'resources',pins)
+ assert {f.relative_to(R/'experiment/resources').as_posix():sha(f) for f in (R/'experiment/resources').rglob('*.py')}=={n:v['sha256'] for n,v in pins.items()}
+ for path,digest in originals.items():assert sha(path)==digest
+ assert sha(prior_review['resource_identity']['path'])==prior_review['resource_identity']['sha256']
+ for path,value in prior_review['owned_sources'].items():assert sha(P/path)==value['sha256']
+ science=unique_payload_bytes(W);case=unique_payload_bytes(b.output);scratch=unique_payload_bytes(S)
+ assert science+reserve<=15*1024**3,('scientific reserve',science,reserve)
+ assert case<=2*1024**3 and scratch<=2*1024**3
+ assert unique_payload_bytes(C/'scientific-processing-staging')<=2*1024**3
+ report['budget_checks'].append({'label':label,'scientific_bytes':science,'additional_reserve_bytes':reserve,'scientific_cap_bytes':15*1024**3,'original_case_bytes':case,'separate_recovery_scratch_bytes':scratch,'per_case_cap_bytes':2*1024**3});persist()
+
+def get(pub,uri,path,label):
+ assert not path.exists()
+ for p,d in pub['waystone_tool_sha256'].items():assert sha(p)==d
+ command=[str(Path.home()/'workspace/waystone/scripts/waystone'),'--error-format','json','--command-timeout-secs','300','--auth-source','token-file','get',uri,str(path)]
+ started=time.monotonic();result=subprocess.run(command,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,timeout=305)
+ log=R/'transfers'/(label+'.log');log.write_text(result.stdout)
+ report['transfers'].append({'command':command,'exit_code':result.returncode,'seconds':time.monotonic()-started,'log':ref(log)});persist();assert result.returncode==0
+
+def live_archive(pub,chunk,group_index,index,download,mode):
+ name=f'g{group_index}-c{index}-{mode}';inputdir=R/'jobs'/name;inputdir.mkdir();out=S/name;out.mkdir();saved=R/'outputs'/name;saved.mkdir()
+ library=Path(pub['archive_library']['path']);assert sha(library)==pub['archive_library']['sha256']
+ job={'source_sha256':{m['path']:m['sha256'] for m in chunk['manifest']['members']},'max_bytes':128*1024**2,'archive_module_path':'/tmp/resource-archive.py','archive_module_sha256':sha(library),'manifest_sha256':chunk['manifest_sha256']};write_new(inputdir/'job.json',job)
+ command=launch_plan(Path(pub['rootfs_path']),R/'experiment',download,out,['python','/experiment/resources/archive_worker.py',mode]);at=command.index('--');command[at:at]=['--ro-bind',str(inputdir),'/tmp/inputs','--ro-bind',str(library),'/tmp/resource-archive.py']
+ with (out/'live.log').open('w') as stream:run_stage(command,R/'experiment',dict(os.environ),stream,300,code=R/'code',current_sources=P/'resources',source_pins=pins,evidence_directory=R/'proofs'/name,native_output=out,cap_bytes=16*1024**3)
+ proofpath=R/'proofs'/name/'resource-admitted.json';proof=read(proofpath);admission=validate_proof(proof,command,P/'resources',pins,out,16*1024**3,300);result=read(out/'check.json');manifest=chunk['manifest']
+ assert result['exact_members_and_hashes'] and result['archive_sha256']==manifest['archive_sha256'] and result['payload_bytes']==manifest['payload_bytes'] and result['members']==len(manifest['members'])
+ for f in ['check.json','live.log']:shutil.copyfile(out/f,saved/f)
+ report['archive_stages'].append({'group':group_index,'chunk':index,'mode':mode,'proof':ref(proofpath),'job':ref(inputdir/'job.json'),'outputs':{f:ref(saved/f) for f in ['check.json','live.log']},'result':result,'resource_admission':admission,'kernel_scope':proof['host_measurement']['kernel_scope']});persist();return out
+
+try:
+ assert AUTHOR.is_file() and read(AUTHOR)['passed'] is True
+ with acquire_experiment_lock(C/'insula/architecture-experiments.lock') as lock:
+  R.mkdir();shutil.copyfile(__file__,R/'driver.source');report['driver_snapshot']=ref(R/'driver.source');[(R/n).mkdir() for n in ['transfers','jobs','outputs','proofs']];S=W/'comprehensive-closeout-independent-recovery';S.mkdir();(S/'retained').mkdir()
+  b=NativeBackend('controller20261003a','baseline',lock,resume=True);state=read(b.R/'state.json');previous=None
+  for record in state['records']:b.check_record(record,previous);previous=record
+  prior_review=read('/tmp/sureal-legacy-parity-independent-review.json');assert sha('/tmp/sureal-legacy-parity-independent-review.json')=='056b2a17dba10e474e603f2a74f84990e3475a159459a8fe14ae22e42927e050';originals=prior_review['original_six_artifacts'];pins=freeze_sources(P/'resources',R/'code');assert len(pins)==26 and {n:p['sha256'] for n,p in pins.items()}=={n:p['sha256'] for n,p in prior_review['resource_source_pins'].items()};(R/'experiment').mkdir();shutil.copytree(R/'code',R/'experiment/resources');(R/'experiment/advanced').mkdir()
+  author=read(AUTHOR);expected=loadref({'path':author['source_inventory_path'],'sha256':author['source_inventory_sha256']});allow=loadref(author['allowlist']);assert len(expected)==author['members'] and sum(e['bytes'] for e in expected.values())==author['source_bytes'];assert author['original_six_artifacts']==originals
+  policy_names={'comprehensive-closeout/publication-policy/'+n for n in ['explicit-allowlist.json','publisher.source','allowlist-builder.source']};assert set(expected)==set(allow['members'])|policy_names
+  for n,e in allow['members'].items():assert expected[n]['sha256']==e['sha256'] and expected[n]['bytes']==e['bytes']
+  for e in expected.values():assert regular(Path(e['path'])) and sha(e['path'])==e['sha256'] and Path(e['path']).stat().st_size==e['bytes']
+  report.update(author_report=ref(AUTHOR),explicit_allowlist=author['allowlist'],original_six_artifacts=originals,source_counts={'native':295,'host':23,'resources':26,'parity_extensions':6},resource_source_pins=pins,scientific_bytes_before=unique_payload_bytes(W),lock={'path':str(C/'insula/architecture-experiments.lock'),'inode':os.fstat(lock.fileno()).st_ino,'exclusive':True});guard(label='initial')
+  pub=loadref(author['publication']);assert pub['source_inventory']==expected and pub['resource_identity_sha256']==prior_review['resource_identity']['sha256'] and pub['native_manifest_sha256']==b.manifest_sha;validate_sources(P/'resources',pub['resource_source_pins']);validate_live_references(pub);verify_rootfs(Path(pub['rootfs_path']),pub['runtime_lock']['rootfs_sha256']);library=Path(pub['archive_library']['path']);assert sha(library)==pub['archive_library']['sha256'];shutil.copyfile(library,R/'experiment/advanced/archive.py')
+  globalpath=R/'global.json';get(pub,pub['publication_manifest_hdfs_uri'],globalpath,'global');assert sha(globalpath)==pub['publication_manifest_sha256'];report['union_validation']=validate_union(pub,expected,read(globalpath));recovered={}
+  for i,chunk in enumerate(pub['chunks']):
+   m=chunk['manifest'];guard(m['archive_bytes']+m['payload_bytes']+16*1024**2,label=f'chunk-{i}-reserve');task=S/f'chunk-{i}';task.mkdir();download=task/'download';download.mkdir()
+   for name,uri,d in [('manifest.json',chunk['manifest_hdfs_uri'],chunk['manifest_sha256']),('archive.tar.gz',chunk['archive_hdfs_uri'],m['archive_sha256'])]:get(pub,uri,download/name,f'chunk-{i}-'+name);assert sha(download/name)==d
+   assert read(download/'manifest.json')==m and (download/'archive.tar.gz').stat().st_size==m['archive_bytes'];shutil.copyfile(download/'manifest.json',R/f'chunk-{i}-manifest.json');verified=live_archive(pub,chunk,0,i,download,'verify');restored=live_archive(pub,chunk,0,i,download,'rehydrate')
+   for member in m['members']:
+    n=member['path'];p=restored/'restored'/n;e=expected[n];assert n not in recovered and regular(p) and sha(p)==e['sha256'] and p.stat().st_size==e['bytes'];target=S/'retained'/n;target.parent.mkdir(parents=True,exist_ok=True);os.replace(p,target);recovered[n]=e['sha256']
+   write_new(R/f'chunk-{i}-temporary-release.json',{'scope':'only fresh exact-verified download/recovery scratch','archive':ref(download/'archive.tar.gz')});shutil.rmtree(task);shutil.rmtree(verified);shutil.rmtree(restored);guard(label=f'chunk-{i}-complete');print('PASS comprehensive chunk',i,flush=True)
+  assert recovered=={n:e['sha256'] for n,e in expected.items()}
+  def archived(n):return S/'retained'/n
+  ep='comprehensive-closeout/evidence/';inventory=read(archived(ep+'sureal-comprehensive-closeout-final-inventory.json'));blocked=[e for e in inventory['entries'] if e['disposition']=='blocked_preserved'];assert len(blocked)==19
+  for e in blocked:assert recovered[e['hdfs_member']]==e['sha256'];assert sha(e['preserved_local_path'])==e['sha256']
+  omitted=[e for e in inventory['entries'] if e['disposition']=='excluded_generated_sensor_payload'];assert len(omitted)==2 and all(e.get('hdfs_member') is None for e in omitted)
+  assert 'No raw sensor payload' in allow['scope'];assert read(archived('comprehensive-closeout/publication-policy/explicit-allowlist.json'))==allow
+  journal=archived(ep+'research-journal.jsonl');entries=[];previous=None;coverage=set(recovered.values())
+  for line in journal.read_text().splitlines():
+   e=json.loads(line);payload={k:v for k,v in e.items() if k!='sha256'};assert payload['sequence']==len(entries)+1 and payload['previous_hash']==previous;assert hashlib.sha256(json.dumps(payload,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()).hexdigest()==e['sha256'];previous=e['sha256'];entries.append(e)
+  assert len(entries)==112
+  for e in entries[-1]['evidence']:assert e['sha256'] in coverage
+  prioraudit=Path('/tmp/sureal-comprehensive-closeout-live-evidence-audit.json');supp=Path('/tmp/sureal-comprehensive-closeout-independent-supplement.json');assert recovered[ep+'sureal-comprehensive-closeout-live-evidence-audit.json']==sha(prioraudit);assert recovered[ep+'sureal-comprehensive-closeout-independent-supplement.json']==sha(supp);sv=read(supp);assert sv['passed'];checked=[]
+  for st in sv['stages']:
+   for r in [st['proof'],*st['artifacts'].values()]:assert r['sha256'] in coverage;checked.append(r)
+  for r in [*sv['workers'],*sv['module_jsons'],sv['driver'],sv['author_receipt'],sv['architecture_entrypoint']['result'],* [v['body'] for v in sv['suite_summaries']]]:assert r['sha256'] in coverage
+  missing_witnesses=[]
+  for h in sv['historical_attempts']:
+   for key in ['report','driver','attempt','execution_log']:
+    if key in h and h[key]['sha256'] not in coverage:missing_witnesses.append(h[key])
+  for version in [3,4]:
+   path=Path(f'/tmp/sureal-comprehensive-closeout-live-tests-v{version}/proofs/probe/attempt.json')
+   if sha(path) not in coverage:missing_witnesses.append(ref(path))
+  refusals=read(archived(ep+'sureal-comprehensive-closeout-archive-review-refusal.json'));assert refusals['executed'] is False
+  report.update(recovered_union=recovered,members=len(recovered),source_bytes=sum(e['bytes'] for e in expected.values()),chunks=len(pub['chunks']),journal_entries=112,journal_head_sha256=previous,latest_journal_evidence=len(entries[-1]['evidence']),prior_audit=ref(prioraudit),test_supplement=ref(supp),live_test_proof_references_recovered=checked,blocked_paths=[e['path'] for e in blocked],generated_preview_paths_omitted=[e['path'] for e in omitted],archive_review_refusal_preserved=refusals,missing_small_witnesses_for_separate_supplement=missing_witnesses,scope_limit='exact explicit source/doc/report/proof allowlist, not arbitrary cache trees, complete runtime snapshots or raw scientific payloads');persist()
+  write_new(R/'metadata-temporary-release.json',{'scope':'only successful fresh recovered explicit metadata after exact union/role verification','members':{str(p):sha(p) for p in (S/'retained').rglob('*') if p.is_file()}});shutil.rmtree(S);guard(label='final');assert unique_payload_bytes(W)==report['scientific_bytes_before']
+  report.update(passed=True,scientific_bytes_after=unique_payload_bytes(W),independent_HDFS_GET=True,independent_HDFS_PUT=False,new_GPU_execution=False,original_and_replay_payloads_unchanged=True,blocked19_still_unadmitted=True,full_runner_or_release_admission=False,declined_to_judge=['No new code review, training, GPU or scientific acceptance.','Blocked association9, runtime2, explorer7 and cohort-audit1 remain unadmitted.','Acquisition source retains existing lease/preflight scope only.','No complete backend/companion/shared-parent/keep-two/retention/full-runner admission.','No fresh guarantee for HDFS objects outside this exact narrowed allowlist.','No generated sensor-preview/cache/model payload export and no complete self-contained runtime recovery claim.']);persist();print('PASS independent comprehensive narrowed metadata HDFS recovery',flush=True)
+except BaseException as error:
+ report['error']={'type':type(error).__name__,'message':str(error),'traceback':traceback.format_exc()};persist();raise

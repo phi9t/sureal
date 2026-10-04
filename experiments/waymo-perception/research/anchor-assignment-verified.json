@@ -1,0 +1,81 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/anchor-assignment-live-a/receipt.json",
+  "receipt_sha256": "2043678693608f194209e72806076acf6c6163babcc67b4ebb4a540fe46d0d46",
+  "status": "assignment analytic fixtures passed live",
+  "verified_utc": "2026-09-30T16:49:54.761332+00:00",
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/anchor-assignment-live-a",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--",
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_anchor_assignment.py",
+        "-v"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "elapsed_seconds": 0.21805118399788626,
+  "peak_child_rss_kib": 46384,
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "candidate_hashes": {
+    "pipeline/anchor_assignment.py": "f8c5e2cefdd69ab25428d39474ab2b2e89ae17d469de3d89ac1a4143ce5d2464",
+    "tests/test_anchor_assignment.py": "c1ae76477c2721e875e6e11a350806320426fb918f1b4f4c1eb01d853c5a6729"
+  },
+  "artifacts": {
+    "live.log": "232903ab967f40d0bd8537a3c5df51862cec257297a518e1cdb04a2cff9a50d5"
+  },
+  "upstream_source": "https://github.com/nutonomy/second.pytorch/blob/449c7c0d081eaad44f08159f64af26d2a59f1f4c/second/core/target_ops.py",
+  "scope": "no-subsampling overlap assignment reference only; similarity kernel, anchor policy, losses and training remain open"
+}

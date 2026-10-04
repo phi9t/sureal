@@ -1,0 +1,11 @@
+{
+  "upstream_commit": "99a4cb3ff07e2fe06c2ce73da001f850f628e45a",
+  "source_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/camera-model-source",
+  "source_hashes": {
+    "camera_model.cc": "876a6a78dc34f5f8698cea570ce982cdbcf33b3f1cc06b6b047703cd6f9b38f6",
+    "camera_model.h": "31f22d10a0c7ec84b8771bcd8f1a029518b1f08b85c8d458d3c2e56fc086538c",
+    "camera_model_test.cc": "63e3e69159e2ecb0dbb3c4737705adc818a71b19b22eb17e8c368b41944bbe6f",
+    "BUILD": "8110e3af9dc8c099729c082bc5e185550cc2884ba6576d6e5f9f24de428ea506"
+  },
+  "scope": "pinned upstream C++ camera core and tests; build/native timing/depth parity pending"
+}

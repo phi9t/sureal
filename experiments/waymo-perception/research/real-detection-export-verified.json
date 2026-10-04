@@ -1,0 +1,15 @@
+{
+  "receipts": {
+    "real-detection-export-a": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/real-detection-export-a/receipt.json",
+      "sha256": "1e85efd3ece94ff074ecede033496618e3ee5c7e13e8407035f5bbc536ae6b75"
+    },
+    "real-box-source-check-a": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/real-box-source-check-a/receipt.json",
+      "sha256": "56ce9098d9666659c3de93999bb75a2a6fe29d9d91825c1cb34a214503c900d5"
+    }
+  },
+  "objects": 38363,
+  "scope": "native geometry/identities/metadata and self-replay scoring verified; production NLZ and resource-complete replay remain open",
+  "ticket_09": "open"
+}

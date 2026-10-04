@@ -1,0 +1,345 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/native-one-batch-overfit-prepared-v3",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/one-batch-sign-geometry-v1/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.scratch/one-batch-sign-geometry-diagnostics.py",
+        "/tmp/worker.py",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/overfit-native-cache-v1/7912728502266478772_1202_200_1222_200/1506905332721474/producer/report.json",
+        "/tmp/native-report.json",
+        "--",
+        "python",
+        "/tmp/worker.py"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "worker_sha256": "5d86650261a232e5768aa027f5a3ff977e220436a31602bc4b4496f2c4327b94",
+  "input_hashes": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/overfit-native-cache-v1/7912728502266478772_1202_200_1222_200/1506905332721474/producer/report.json": "c4cb5b466057022326c3b10b0d86eaa685ca8c7bd52cd1c11207863e46d33686",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/native-one-batch-overfit-prepared-v3/predictions.json": "471638d11f7f330ac0a94b3ca6137b9f5c15cb1925fcf8da48c91aa5066c4787",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/native-one-batch-overfit-prepared-v3/groundtruth.json": "669c9599c821071d83b3ebfd6d0b29860ef80721ff69ef4c089c7535f306e655"
+  },
+  "validation": {
+    "scope": "observational literal polygon-intersection diagnostics; independent geometry calculation with analytic fixtures, not native evaluator match assignments or separately audited scientific acceptance",
+    "signs": [
+      {
+        "object_id": "28HzDN4VJ22The9Q--jNWA",
+        "native_point_count": 51,
+        "target_uncovered": false,
+        "dimensions_m": [
+          0.10397881780300157,
+          0.31309301856211724,
+          0.5773714009126252
+        ],
+        "thin_axis_center_tolerance_m_for_aligned_IoU_half": 0.034659605934333856,
+        "best_same_class_exported_iou3d_diagnostic": 0.7926137274067799,
+        "best_prediction_score": 0.8288719603760585,
+        "center_error_GT_local_m": [
+          0.008190901282473649,
+          -0.005352218221393424,
+          0.00030428403462590126
+        ],
+        "dimension_error_m": [
+          -0.0021686195635550604,
+          0.005776620854563763,
+          -0.025558064390707846
+        ],
+        "absolute_heading_error_rad": 0.002599848016274997
+      },
+      {
+        "object_id": "DIuoOLnjbBLWwTdFVNhZww",
+        "native_point_count": 95,
+        "target_uncovered": false,
+        "dimensions_m": [
+          0.1581892113408383,
+          0.8216417966410063,
+          0.8116475606297513
+        ],
+        "thin_axis_center_tolerance_m_for_aligned_IoU_half": 0.052729737113612764,
+        "best_same_class_exported_iou3d_diagnostic": 0.822029290729168,
+        "best_prediction_score": 0.873160521367489,
+        "center_error_GT_local_m": [
+          -0.001174883802212659,
+          0.012719957176160427,
+          -0.01044379816800145
+        ],
+        "dimension_error_m": [
+          0.010258057556069872,
+          -0.004498540418577335,
+          0.0059459062416868935
+        ],
+        "absolute_heading_error_rad": 3.0862375162088096
+      },
+      {
+        "object_id": "QgFKoCS2DIcu2AZdxm5rhg",
+        "native_point_count": 32,
+        "target_uncovered": false,
+        "dimensions_m": [
+          0.15278636753567465,
+          0.8574149291076754,
+          0.6583046527904344
+        ],
+        "thin_axis_center_tolerance_m_for_aligned_IoU_half": 0.05092878917855822,
+        "best_same_class_exported_iou3d_diagnostic": 0.37500726089528474,
+        "best_prediction_score": 0.8768976607278726,
+        "center_error_GT_local_m": [
+          0.059224947438079274,
+          -0.0005089727073756124,
+          0.05416014624994636
+        ],
+        "dimension_error_m": [
+          -0.00752912061918512,
+          -0.024055538002538124,
+          0.00990494729965996
+        ],
+        "absolute_heading_error_rad": 3.139497695786261
+      },
+      {
+        "object_id": "RFQouA7KDyYTXZCedGe9Cw",
+        "native_point_count": 85,
+        "target_uncovered": true,
+        "dimensions_m": [
+          0.2148447974347642,
+          0.9981365912501069,
+          0.9499999999999886
+        ],
+        "thin_axis_center_tolerance_m_for_aligned_IoU_half": 0.07161493247825473,
+        "best_same_class_exported_iou3d_diagnostic": 0.0031759650497822,
+        "best_prediction_score": 0.9131640076396615,
+        "center_error_GT_local_m": [
+          -0.01738704393617201,
+          0.057366307863682034,
+          -0.7272176449701879
+        ],
+        "dimension_error_m": [
+          -0.03229084573102284,
+          -0.21761327161317523,
+          -0.4273000126937342
+        ],
+        "absolute_heading_error_rad": 0.3934386424338392
+      },
+      {
+        "object_id": "Sf_hcK6g2tHJOd4wBEIcuw",
+        "native_point_count": 55,
+        "target_uncovered": true,
+        "dimensions_m": [
+          0.11866369856943493,
+          0.6545646969493512,
+          0.4800000000000182
+        ],
+        "thin_axis_center_tolerance_m_for_aligned_IoU_half": 0.039554566189811645,
+        "best_same_class_exported_iou3d_diagnostic": 0.0,
+        "best_prediction_score": 0.9131640076396615,
+        "center_error_GT_local_m": [
+          -2.8317458831674576,
+          -16.840528161731726,
+          0.3006531619748438
+        ],
+        "dimension_error_m": [
+          0.06389025313430644,
+          0.1259586226875805,
+          0.04269998730623625
+        ],
+        "absolute_heading_error_rad": 3.0189902124679344
+      },
+      {
+        "object_id": "SmAsrEQPvQV7jTfpdoN6Og",
+        "native_point_count": 18,
+        "target_uncovered": true,
+        "dimensions_m": [
+          0.06140247926751362,
+          0.7536797158897817,
+          0.7599999999999909
+        ],
+        "thin_axis_center_tolerance_m_for_aligned_IoU_half": 0.020467493089171205,
+        "best_same_class_exported_iou3d_diagnostic": 0.14795820879882632,
+        "best_prediction_score": 0.8583733718281402,
+        "center_error_GT_local_m": [
+          -0.03330233630966381,
+          -0.019734833904757408,
+          0.08442055323188091
+        ],
+        "dimension_error_m": [
+          -0.010843536875454834,
+          -0.28581739171138315,
+          -0.14079194229663505
+        ],
+        "absolute_heading_error_rad": 3.1166665966284635
+      },
+      {
+        "object_id": "bU66PwbHjTNyZjiZk-simg",
+        "native_point_count": 95,
+        "target_uncovered": false,
+        "dimensions_m": [
+          0.1138700936967183,
+          0.6522092135443929,
+          0.8299999999999841
+        ],
+        "thin_axis_center_tolerance_m_for_aligned_IoU_half": 0.0379566978989061,
+        "best_same_class_exported_iou3d_diagnostic": 0.7028045666457811,
+        "best_prediction_score": 0.8278304977588123,
+        "center_error_GT_local_m": [
+          -0.015857542141505383,
+          -0.017641327805948546,
+          0.00220430053052878
+        ],
+        "dimension_error_m": [
+          -0.0011326271975315577,
+          -0.008191426027533866,
+          -0.02020583396768849
+        ],
+        "absolute_heading_error_rad": 0.016261739065286385
+      },
+      {
+        "object_id": "iIo9TDXjZmFZ7pY7ePPTBw",
+        "native_point_count": 5,
+        "target_uncovered": false,
+        "dimensions_m": [
+          0.10661161098112115,
+          0.6621238938057618,
+          0.7958407079646008
+        ],
+        "thin_axis_center_tolerance_m_for_aligned_IoU_half": 0.03553720366037372,
+        "best_same_class_exported_iou3d_diagnostic": 0.5370519340267556,
+        "best_prediction_score": 0.8790235265910927,
+        "center_error_GT_local_m": [
+          0.01454717981697624,
+          -0.042771041754212646,
+          0.1058611654489745
+        ],
+        "dimension_error_m": [
+          0.0054170220267254765,
+          0.0037479512468063803,
+          0.007703304554380064
+        ],
+        "absolute_heading_error_rad": 0.031678142961172995
+      },
+      {
+        "object_id": "pfSFH9OHVfn__IfVyHI9lA",
+        "native_point_count": 10,
+        "target_uncovered": false,
+        "dimensions_m": [
+          0.04983423332713264,
+          0.4549626393992601,
+          0.6200000000000045
+        ],
+        "thin_axis_center_tolerance_m_for_aligned_IoU_half": 0.016611411109044214,
+        "best_same_class_exported_iou3d_diagnostic": 0.43083639111717736,
+        "best_prediction_score": 0.8583733718281402,
+        "center_error_GT_local_m": [
+          -0.01953314059289431,
+          -0.0013323030671674565,
+          -0.0010086698181468456
+        ],
+        "dimension_error_m": [
+          0.0007247090649261448,
+          0.012899684779138387,
+          -0.0007919422966486955
+        ],
+        "absolute_heading_error_rad": 0.027873833648984103
+      },
+      {
+        "object_id": "sMilx6iKg8NsUlc54Ankcg",
+        "native_point_count": 74,
+        "target_uncovered": false,
+        "dimensions_m": [
+          0.1604612245246428,
+          0.7098911533930452,
+          0.5099999999999909
+        ],
+        "thin_axis_center_tolerance_m_for_aligned_IoU_half": 0.0534870748415476,
+        "best_same_class_exported_iou3d_diagnostic": 0.3910370526477865,
+        "best_prediction_score": 0.9131640076396615,
+        "center_error_GT_local_m": [
+          -0.0009116317625510431,
+          0.045619721419065645,
+          0.0033475941302976153
+        ],
+        "dimension_error_m": [
+          0.022092727179098576,
+          0.07063216624388646,
+          0.012699987306263538
+        ],
+        "absolute_heading_error_rad": 0.39343864243388893
+      },
+      {
+        "object_id": "vL2mxbpLwp5_sQ8Jzh0sVA",
+        "native_point_count": 1,
+        "target_uncovered": false,
+        "dimensions_m": [
+          0.0940283458942961,
+          0.5899011707672945,
+          0.48074594955869543
+        ],
+        "thin_axis_center_tolerance_m_for_aligned_IoU_half": 0.031342781964765365,
+        "best_same_class_exported_iou3d_diagnostic": 0.7258503757062562,
+        "best_prediction_score": 0.8747953938729987,
+        "center_error_GT_local_m": [
+          0.0012690947250599991,
+          0.01850921075821317,
+          0.029020994402789935
+        ],
+        "dimension_error_m": [
+          -0.0008450326288624854,
+          -0.015386899480172023,
+          -3.7861667091521056e-05
+        ],
+        "absolute_heading_error_rad": 0.04981306741268954
+      }
+    ]
+  },
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/one-batch-sign-geometry-v1/output/live.log": "0fcb072f87389310e3d96df392abe2e8c9d08e788f42519a23010e9d8622b8f9",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/one-batch-sign-geometry-v1/output/check.json": "9252d6380b0df43fbe0cf62dd4bc21612e2c0e32287789a1b065bd68bc6ea0f3"
+  },
+  "scope": "live observational geometry diagnostics; not an independently audited quality acceptance"
+}

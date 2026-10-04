@@ -1,0 +1,26 @@
+{
+  "variants": [
+    {
+      "variant": "gn_backbone",
+      "exit_code": 0,
+      "wall_seconds": 159.33144725998864,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/continuation-logs/norm-gn_backbone-training-v1.log",
+      "status": "trained; native scoring/audit pending"
+    },
+    {
+      "variant": "gn_backbone_ln_pillar",
+      "exit_code": 0,
+      "wall_seconds": 155.32920908398228,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/continuation-logs/norm-gn_backbone_ln_pillar-training-v1.log",
+      "status": "trained; native scoring/audit pending"
+    },
+    {
+      "variant": "no_norm",
+      "exit_code": 0,
+      "wall_seconds": 124.04303122300189,
+      "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/continuation-logs/norm-no_norm-training-v1.log",
+      "status": "trained; native scoring/audit pending"
+    }
+  ],
+  "scope": "serial fixed-batch norm training; independent/native results separate"
+}

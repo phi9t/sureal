@@ -1,0 +1,50 @@
+{
+  "status": "integrated GPU pilot evidence independently audited",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/detector-gpu-live-a/receipt.json",
+  "receipt_sha256": "a19011d47822a4f51467f129ba155b9ea647fff2e08c4d505c314714010f580b",
+  "validation": {
+    "status": "synthetic integrated GPU detector/loss pilot passed",
+    "seed": 17,
+    "device": "NVIDIA B200",
+    "torch": "2.9.1+cu130",
+    "grid": [
+      512,
+      512
+    ],
+    "batch_size": 1,
+    "pillars": 20000,
+    "points_per_pillar": 32,
+    "physical_channels": [
+      "x",
+      "y",
+      "z",
+      "intensity"
+    ],
+    "classes": 4,
+    "anchors_per_cell": 2,
+    "parameter_count": 4817114,
+    "forward_backward_seconds": [
+      0.734008041996276,
+      0.045191195007646456,
+      0.04478350299177691
+    ],
+    "synthetic_losses": [
+      7903.56201171875,
+      7903.56201171875,
+      7903.56201171875
+    ],
+    "peak_allocated_bytes": 1305486336,
+    "peak_reserved_bytes": 1694498816,
+    "optimizer_steps": 0,
+    "tf32": false,
+    "assertions": [
+      "single visible GPU",
+      "TensorFlow absent",
+      "stride-two anchor count",
+      "finite integrated loss",
+      "finite gradients for all parameters"
+    ],
+    "scope": "synthetic model resource pilot only; native packing/I/O/optimizer cost, scientific budget, training and held-out quality unverified"
+  },
+  "scope": "synthetic model resource pilot only; native packing/I/O/optimizer cost, scientific budget, training and held-out quality unverified"
+}

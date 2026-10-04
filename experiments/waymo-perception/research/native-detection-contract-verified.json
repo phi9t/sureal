@@ -1,0 +1,38 @@
+{
+  "scope": "native schema encoding and default 3D detection analytic fixtures; ticket 09 not yet complete",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/detection-contract-live-a/receipt.json",
+  "receipt_sha256": "fa54551985e1d14b3273d54663aca7f061640527b5b1e64a4b75f5d4faa07c28",
+  "independent_reconciliation": [
+    "all artifact hashes",
+    "current verifier identity",
+    "six fixtures with both difficulty levels",
+    "dynamic dependencies for both native binaries"
+  ],
+  "expected_vehicle_AP_APH": {
+    "perfect": [
+      1,
+      1
+    ],
+    "empty": [
+      0,
+      0
+    ],
+    "wrong-class": [
+      0,
+      0
+    ],
+    "displaced": [
+      0,
+      0
+    ],
+    "heading-reversed": [
+      1,
+      0
+    ],
+    "ignored-no-points": [
+      0,
+      0
+    ]
+  },
+  "ticket_09": "open"
+}

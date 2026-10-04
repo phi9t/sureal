@@ -1,0 +1,12 @@
+{
+  "scene": "4575389405178805994_4900_000_4920_000",
+  "archive_bytes": 7182551040,
+  "files": 45641,
+  "working_bytes": 8976978426,
+  "compact_trusted_bytes": 4163132,
+  "packing_reserve_bytes": 65536,
+  "projected_peak_bytes": 16163758134,
+  "cap_bytes": 16106127360,
+  "headroom_bytes": -57630774,
+  "scope": "read-only recovery preflight; publication not executed"
+}

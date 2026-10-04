@@ -1,0 +1,17 @@
+{
+  "command": [
+    "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+    "--error-format",
+    "json",
+    "--command-timeout-secs",
+    "15",
+    "auth",
+    "keepalive",
+    "--refresh-token",
+    "--json"
+  ],
+  "exit_code": 10,
+  "stdout": "Password for philip.yang@BYTEDANCE.COM: \nPassword for philip.yang@BYTEDANCE.COM: \n",
+  "stderr": "kinit: Pre-authentication failed: Cannot read password while getting initial credentials\n{\"schema_version\":1,\"type\":\"error\",\"class\":\"auth\",\"exit_code\":10,\"message\":\"Kerberos refresh command /usr/bin/kinit failed with status exit status: 1\"}\n",
+  "elapsed_seconds": 0.11102139198919758
+}

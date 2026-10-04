@@ -1,0 +1,472 @@
+{
+  "selected_frames": 16,
+  "admitted_frames": 16,
+  "candidate_sha256": "c38c93b505f9a1e0f02ff23a8d3666669c1f92a79b95de04301d4ac77083c22a",
+  "frame_evidence": {
+    "7912728502266478772_1202_200_1222_200:1506905332721474": {
+      "evidence": "overfit-native-cache-7912728502266478772_1202_200_1222_200-1506905332721474-verified.json",
+      "evidence_sha256": "e9ff780872371606beaef9187f07e701c1f49b62f4bf4e816e7d4aed9fc7ea46",
+      "validation": {
+        "scene": "7912728502266478772_1202_200_1222_200",
+        "timestamp_micros": 1506905332721474,
+        "input_points": 183738,
+        "retained_points": 101303,
+        "positive_anchor_counts_by_class": {
+          "1": 29,
+          "2": 6,
+          "3": 12,
+          "4": 0
+        },
+        "eligible_targets": 17,
+        "uncovered_targets": 3,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 2,
+          "center_outside_roi": 0,
+          "eligible": 17
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.125522312009707,
+          "peak_rss_kib": 212688
+        }
+      }
+    },
+    "8796914080594559459_4284_170_4304_170:1507681730263098": {
+      "evidence": "overfit-native-cache-8796914080594559459_4284_170_4304_170-1507681730263098-verified.json",
+      "evidence_sha256": "a3fb7358bfa48d126e5ff2f397a15bea118b99250598c24c43584469d486281b",
+      "validation": {
+        "scene": "8796914080594559459_4284_170_4304_170",
+        "timestamp_micros": 1507681730263098,
+        "input_points": 184383,
+        "retained_points": 105767,
+        "positive_anchor_counts_by_class": {
+          "1": 45,
+          "2": 0,
+          "3": 13,
+          "4": 0
+        },
+        "eligible_targets": 16,
+        "uncovered_targets": 1,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 0,
+          "center_outside_roi": 1,
+          "eligible": 16
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.10081790399272,
+          "peak_rss_kib": 212652
+        }
+      }
+    },
+    "14369250836076988112_7249_040_7269_040:1507658201233279": {
+      "evidence": "overfit-native-cache-14369250836076988112_7249_040_7269_040-1507658201233279-verified.json",
+      "evidence_sha256": "5d5899586ceea25783eed3a3eb6457b0381139a9f5ddd6c436ba264f8415b066",
+      "validation": {
+        "scene": "14369250836076988112_7249_040_7269_040",
+        "timestamp_micros": 1507658201233279,
+        "input_points": 174751,
+        "retained_points": 95421,
+        "positive_anchor_counts_by_class": {
+          "1": 8,
+          "2": 0,
+          "3": 4,
+          "4": 0
+        },
+        "eligible_targets": 5,
+        "uncovered_targets": 1,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 2,
+          "center_outside_roi": 2,
+          "eligible": 5
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 1.9596465840004385,
+          "peak_rss_kib": 208484
+        }
+      }
+    },
+    "13271285919570645382_5320_000_5340_000:1544465669937500": {
+      "evidence": "overfit-native-cache-13271285919570645382_5320_000_5340_000-1544465669937500-verified.json",
+      "evidence_sha256": "2aea6c2c3c93c84955589ac793edae736c00601f23787aff09881b135dff957c",
+      "validation": {
+        "scene": "13271285919570645382_5320_000_5340_000",
+        "timestamp_micros": 1544465669937500,
+        "input_points": 186237,
+        "retained_points": 114312,
+        "positive_anchor_counts_by_class": {
+          "1": 303,
+          "2": 11,
+          "3": 38,
+          "4": 0
+        },
+        "eligible_targets": 72,
+        "uncovered_targets": 1,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 11,
+          "center_outside_roi": 6,
+          "eligible": 72
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.787778908968903,
+          "peak_rss_kib": 231512
+        }
+      }
+    },
+    "8722413665055769182_2840_000_2860_000:1557958509325722": {
+      "evidence": "overfit-native-cache-8722413665055769182_2840_000_2860_000-1557958509325722-verified.json",
+      "evidence_sha256": "720eeb33b14b1faec79fdc388bad5693e75ae9d69e49ffbcd084502691dddb6b",
+      "validation": {
+        "scene": "8722413665055769182_2840_000_2860_000",
+        "timestamp_micros": 1557958509325722,
+        "input_points": 204368,
+        "retained_points": 120456,
+        "positive_anchor_counts_by_class": {
+          "1": 456,
+          "2": 9,
+          "3": 8,
+          "4": 0
+        },
+        "eligible_targets": 64,
+        "uncovered_targets": 1,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 9,
+          "center_outside_roi": 7,
+          "eligible": 64
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.8626225260086358,
+          "peak_rss_kib": 234704
+        }
+      }
+    },
+    "4447423683538547117_536_022_556_022:1509377835676730": {
+      "evidence": "overfit-native-cache-4447423683538547117_536_022_556_022-1509377835676730-verified.json",
+      "evidence_sha256": "12fe509ef5d8ad565965bd6f1095ecdf8023c126cc20febdfae5270cbb3dc83e",
+      "validation": {
+        "scene": "4447423683538547117_536_022_556_022",
+        "timestamp_micros": 1509377835676730,
+        "input_points": 164318,
+        "retained_points": 98795,
+        "positive_anchor_counts_by_class": {
+          "1": 353,
+          "2": 1,
+          "3": 4,
+          "4": 0
+        },
+        "eligible_targets": 42,
+        "uncovered_targets": 0,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 5,
+          "center_outside_roi": 3,
+          "eligible": 42
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.4667476739850827,
+          "peak_rss_kib": 222816
+        }
+      }
+    },
+    "8454755173123314088_3202_000_3222_000:1518654686741547": {
+      "evidence": "overfit-native-cache-8454755173123314088_3202_000_3222_000-1518654686741547-verified.json",
+      "evidence_sha256": "b21c94999d320273e7dd89b17a547930e60ca903301ded15a527070111ca65f3",
+      "validation": {
+        "scene": "8454755173123314088_3202_000_3222_000",
+        "timestamp_micros": 1518654686741547,
+        "input_points": 159726,
+        "retained_points": 92294,
+        "positive_anchor_counts_by_class": {
+          "1": 240,
+          "2": 0,
+          "3": 0,
+          "4": 0
+        },
+        "eligible_targets": 25,
+        "uncovered_targets": 0,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 4,
+          "center_outside_roi": 5,
+          "eligible": 25
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.2120518520241603,
+          "peak_rss_kib": 214796
+        }
+      }
+    },
+    "5525943706123287091_4100_000_4120_000:1507730158608059": {
+      "evidence": "overfit-native-cache-5525943706123287091_4100_000_4120_000-1507730158608059-verified.json",
+      "evidence_sha256": "2712dc33e1e938a63356b60dcb0ac771a0f26502b60c8cac3768f1385480d3e0",
+      "validation": {
+        "scene": "5525943706123287091_4100_000_4120_000",
+        "timestamp_micros": 1507730158608059,
+        "input_points": 171125,
+        "retained_points": 112472,
+        "positive_anchor_counts_by_class": {
+          "1": 199,
+          "2": 5,
+          "3": 30,
+          "4": 2
+        },
+        "eligible_targets": 55,
+        "uncovered_targets": 4,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 1,
+          "center_outside_roi": 5,
+          "eligible": 55
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.6846885880222544,
+          "peak_rss_kib": 227752
+        }
+      }
+    },
+    "4487677815262010875_4940_000_4960_000:1557326022347111": {
+      "evidence": "overfit-native-cache-4487677815262010875_4940_000_4960_000-1557326022347111-verified.json",
+      "evidence_sha256": "c35bd7f40f339767836fe296e60fba6e26a34b01226db6932708e3a4642be240",
+      "validation": {
+        "scene": "4487677815262010875_4940_000_4960_000",
+        "timestamp_micros": 1557326022347111,
+        "input_points": 176787,
+        "retained_points": 122792,
+        "positive_anchor_counts_by_class": {
+          "1": 176,
+          "2": 94,
+          "3": 27,
+          "4": 0
+        },
+        "eligible_targets": 89,
+        "uncovered_targets": 3,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 5,
+          "center_outside_roi": 6,
+          "eligible": 89
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 3.1292542990413494,
+          "peak_rss_kib": 240876
+        }
+      }
+    },
+    "10599748131695282446_1380_000_1400_000:1558033878647442": {
+      "evidence": "overfit-native-cache-10599748131695282446_1380_000_1400_000-1558033878647442-verified.json",
+      "evidence_sha256": "00c747a64094796fc15e3820e637cb2162a2732cd57483f9a555564742c4390a",
+      "validation": {
+        "scene": "10599748131695282446_1380_000_1400_000",
+        "timestamp_micros": 1558033878647442,
+        "input_points": 172334,
+        "retained_points": 129178,
+        "positive_anchor_counts_by_class": {
+          "1": 324,
+          "2": 54,
+          "3": 8,
+          "4": 0
+        },
+        "eligible_targets": 72,
+        "uncovered_targets": 0,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 5,
+          "center_outside_roi": 6,
+          "eligible": 72
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.6145801009843126,
+          "peak_rss_kib": 228272
+        }
+      }
+    },
+    "3224923476345749285_4480_000_4500_000:1549501331198565": {
+      "evidence": "overfit-native-cache-3224923476345749285_4480_000_4500_000-1549501331198565-verified.json",
+      "evidence_sha256": "ec97e1956cd093347705e7ab35cc5bf04cb6cb01217200b8f06799eae9bbeca2",
+      "validation": {
+        "scene": "3224923476345749285_4480_000_4500_000",
+        "timestamp_micros": 1549501331198565,
+        "input_points": 196577,
+        "retained_points": 131313,
+        "positive_anchor_counts_by_class": {
+          "1": 71,
+          "2": 2,
+          "3": 15,
+          "4": 0
+        },
+        "eligible_targets": 23,
+        "uncovered_targets": 4,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 2,
+          "center_outside_roi": 2,
+          "eligible": 23
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 1.9963410540367477,
+          "peak_rss_kib": 208964
+        }
+      }
+    },
+    "8454755173123314088_3202_000_3222_000:1518654700641367": {
+      "evidence": "overfit-native-cache-8454755173123314088_3202_000_3222_000-1518654700641367-verified.json",
+      "evidence_sha256": "2eea08a5e13946b1fae5a934e31f677cc0310022aa805d7810bfe24ea0f2988e",
+      "validation": {
+        "scene": "8454755173123314088_3202_000_3222_000",
+        "timestamp_micros": 1518654700641367,
+        "input_points": 157425,
+        "retained_points": 81035,
+        "positive_anchor_counts_by_class": {
+          "1": 219,
+          "2": 0,
+          "3": 10,
+          "4": 0
+        },
+        "eligible_targets": 23,
+        "uncovered_targets": 0,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 4,
+          "center_outside_roi": 2,
+          "eligible": 23
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.1898440229706466,
+          "peak_rss_kib": 214220
+        }
+      }
+    },
+    "13271285919570645382_5320_000_5340_000:1544465679337513": {
+      "evidence": "overfit-native-cache-13271285919570645382_5320_000_5340_000-1544465679337513-verified.json",
+      "evidence_sha256": "8ea0098b4165b8cfeaafb2958f7fb535655dda980fbe175280455633f4571b4d",
+      "validation": {
+        "scene": "13271285919570645382_5320_000_5340_000",
+        "timestamp_micros": 1544465679337513,
+        "input_points": 186806,
+        "retained_points": 114362,
+        "positive_anchor_counts_by_class": {
+          "1": 338,
+          "2": 13,
+          "3": 37,
+          "4": 1
+        },
+        "eligible_targets": 78,
+        "uncovered_targets": 1,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 6,
+          "center_outside_roi": 5,
+          "eligible": 78
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.799720866023563,
+          "peak_rss_kib": 235112
+        }
+      }
+    },
+    "2415873247906962761_5460_000_5480_000:1542756269548778": {
+      "evidence": "overfit-native-cache-2415873247906962761_5460_000_5480_000-1542756269548778-verified.json",
+      "evidence_sha256": "8ee96dd80566619956f8c9960ef91ea91c167a4e8c9696b98cbba98f797d489b",
+      "validation": {
+        "scene": "2415873247906962761_5460_000_5480_000",
+        "timestamp_micros": 1542756269548778,
+        "input_points": 182908,
+        "retained_points": 96605,
+        "positive_anchor_counts_by_class": {
+          "1": 290,
+          "2": 27,
+          "3": 13,
+          "4": 0
+        },
+        "eligible_targets": 56,
+        "uncovered_targets": 0,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 2,
+          "center_outside_roi": 6,
+          "eligible": 56
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.0987933650030755,
+          "peak_rss_kib": 216116
+        }
+      }
+    },
+    "3375636961848927657_1942_000_1962_000:1520979236788944": {
+      "evidence": "overfit-native-cache-3375636961848927657_1942_000_1962_000-1520979236788944-verified.json",
+      "evidence_sha256": "44b56c5c50248cafcf3280c158483423874bb6dc6bdc2363763c2c04e4977476",
+      "validation": {
+        "scene": "3375636961848927657_1942_000_1962_000",
+        "timestamp_micros": 1520979236788944,
+        "input_points": 150026,
+        "retained_points": 86709,
+        "positive_anchor_counts_by_class": {
+          "1": 262,
+          "2": 6,
+          "3": 27,
+          "4": 0
+        },
+        "eligible_targets": 56,
+        "uncovered_targets": 0,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 9,
+          "center_outside_roi": 3,
+          "eligible": 56
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.0876912499661557,
+          "peak_rss_kib": 213552
+        }
+      }
+    },
+    "2415873247906962761_5460_000_5480_000:1542756270248731": {
+      "evidence": "overfit-native-cache-2415873247906962761_5460_000_5480_000-1542756270248731-verified.json",
+      "evidence_sha256": "e602124bccbb669ef63082b554e4727a6ad2cc24bc9c4f5fa2a13fd2eec02102",
+      "validation": {
+        "scene": "2415873247906962761_5460_000_5480_000",
+        "timestamp_micros": 1542756270248731,
+        "input_points": 183174,
+        "retained_points": 95573,
+        "positive_anchor_counts_by_class": {
+          "1": 289,
+          "2": 35,
+          "3": 13,
+          "4": 0
+        },
+        "eligible_targets": 57,
+        "uncovered_targets": 0,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 1,
+          "center_outside_roi": 6,
+          "eligible": 57
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.108284423011355,
+          "peak_rss_kib": 216228
+        }
+      }
+    }
+  },
+  "scope": "native prepared inputs only; no optimization or quality result"
+}

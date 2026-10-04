@@ -1,0 +1,8 @@
+{
+  "status": "verified sidecar eviction completed",
+  "manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/camera-validation-pilot-a/sidecar-eviction.json",
+  "manifest_sha256": "ddfb65a561c0c834145cb47137b18e1ef11ed8dfb3ec288cee64f2a8914642bf",
+  "bytes_evicted": 14231874515,
+  "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/component-bundles-v1/scientific/4759225533437988401_800_000_820_000/d2844f923e3057dbc987cbe71b6eec46ba586bfa0d0c631adadd57c82cb8a05d.tar",
+  "scope": "one held-out scene; all intended sidecar payloads removed, receipts/recovery manifest preserved"
+}

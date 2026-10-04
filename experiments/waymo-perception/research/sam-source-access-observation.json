@@ -1,0 +1,13 @@
+{
+  "code_commit": "dca509fe793f601edb92606367a655c15ac00fdf",
+  "transform_url": "https://raw.githubusercontent.com/facebookresearch/segment-anything/dca509fe793f601edb92606367a655c15ac00fdf/segment_anything/utils/transforms.py",
+  "transform_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/model-source-inspection/sam-dca509fe793f601edb92606367a655c15ac00fdf/transforms.py",
+  "transform_sha256": "26a649f2bca8a4a24b4d56617487a9a54c4279e559b2b813c9de38f58a60107c",
+  "checkpoint_url": "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth",
+  "checkpoint_head": {
+    "status": 200,
+    "content_length": "375042383",
+    "etag": "\"dd6e14655a594ad8d2c1f256ccf6076e-45\""
+  },
+  "scope": "pinned official transform source inspection and public checkpoint metadata only; no checkpoint acquired or inference result"
+}

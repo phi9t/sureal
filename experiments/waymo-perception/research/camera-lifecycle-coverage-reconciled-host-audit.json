@@ -1,0 +1,27 @@
+{
+  "point_scenes_admitted": 103,
+  "camera_scenes_with_retained_lifecycle_evidence": 101,
+  "full_checkpoint_camera_scenes": 100,
+  "separate_camera_pilot": {
+    "scene": "15036582848618865396_3752_830_3772_830",
+    "references": {
+      "camera-publication": {
+        "evidence_sha256": "65929d173a609b1ce1ed5e0d22819ec7f9d65154e2711359be7fbe12b1d94049",
+        "receipt_sha256": "5063e4ca3d8ba010ad12407da634d106ce05740e2a8028f646a7b527482b0ddb"
+      },
+      "camera-replay": {
+        "evidence_sha256": "3c056838469d8ae459aefd9f1cd9bb832d0cddc4dff0f5237b7b3e43a4a1ef3d",
+        "receipt_sha256": "6cdd501e3aa3f8cd8d1a408bb3183ac839de5b1a666b8aa30a50818d1f71c50b"
+      },
+      "camera-eviction": {
+        "evidence_sha256": "0a76e7e07e14a82dcf0e65a2666b33d76f48266c05cd0f05fb61582f6c32e74e",
+        "receipt_sha256": "400b384343a025a6bb82e3edd439d32715cbf012297508e7125c41dbb199ae8e"
+      }
+    }
+  },
+  "camera_lifecycle_missing_scenes": [
+    "1730266523558914470_305_260_325_260",
+    "4759225533437988401_800_000_820_000"
+  ],
+  "scope": "host retained receipt coverage audit; two camera lifecycles and full-cohort independent camera admission remain required"
+}

@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "scope": "final current docs/inventory/journal113/canonicalCPU/fresh-independent-GET proof metadata plus exact two omitted prelaunch attempts; no payload export, new source implementation, training, release or fullrunner admission",
+  "publication": {
+    "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-checkpoint-5a9e87d9e3114b63b6a0ee8aa5faf49e/verified-publication.json",
+    "sha256": "dbd9b191c3ddda496c0b61be8e5d8160435dedc9e1c2e29d786e18cb6072a3e5",
+    "hdfs_manifest_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-sustained-baseline-controller20261003a-checkpoint-5a9e87d9e3114b63b6a0ee8aa5faf49e/publication-manifest.json",
+    "kind": "checkpoint"
+  },
+  "source_inventory_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/comprehensive-closeout-final-metadata-v1/expected.json",
+  "source_inventory_sha256": "f429dc7a3cf404b437d5d72173c2bf5ba449bf5abdc391ae3a32ed291ce9de1d",
+  "members": 65,
+  "source_bytes": 13566658,
+  "journal_entries": 113,
+  "journal_head_sha256": "636a0b1a482c1a76309d6b2f4ed5e272b6e39cd4eb3262740260fb6ad5fd3992",
+  "scientific_bytes_before": 15329280496,
+  "scientific_bytes_after": 15329280496,
+  "driver": {
+    "path": "/tmp/sureal-comprehensive-closeout-final-metadata.py",
+    "sha256": "9311a650b3e3a23f5e3c9bc30db677caba5b8f5622dea854631ca37febef99c7"
+  },
+  "prior_independent_receipt": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sureal-comprehensive-closeout-hdfs-independent.json",
+    "sha256": "54782f267b3c7435802ee329391dd7284382e0736d2efef931c76cea98c53a49"
+  }
+}

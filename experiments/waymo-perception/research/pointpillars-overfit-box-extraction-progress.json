@@ -1,0 +1,151 @@
+{
+  "selected_scenes": 13,
+  "admitted_scenes": 13,
+  "candidate_sha256": "a899058a9045a2dc318f50f6de36a9bd56e6092f4ed70a21bd19a8ead220f3f0",
+  "scene_evidence": {
+    "10599748131695282446_1380_000_1400_000": {
+      "evidence": "pointpillars-overfit-box-10599748131695282446_1380_000_1400_000-verified.json",
+      "evidence_sha256": "64c62c81cb7a5fddf794e725327a61ab5930d295f4a54430d68f7345ba7b3fc4",
+      "validation": {
+        "scene": "10599748131695282446_1380_000_1400_000",
+        "native_rows": 20324,
+        "selected_frames": 1,
+        "selected_box_rows": 83,
+        "scope": "retained target/source lineage independently admitted; point join and training remain open"
+      }
+    },
+    "13271285919570645382_5320_000_5340_000": {
+      "evidence": "pointpillars-overfit-box-13271285919570645382_5320_000_5340_000-verified.json",
+      "evidence_sha256": "accf96818d8486d055e68451c74e2d25c1b835401c1ec5b99f2bcb71e526eadb",
+      "validation": {
+        "scene": "13271285919570645382_5320_000_5340_000",
+        "native_rows": 17767,
+        "selected_frames": 2,
+        "selected_box_rows": 178,
+        "scope": "retained target/source lineage independently admitted; point join and training remain open"
+      }
+    },
+    "14369250836076988112_7249_040_7269_040": {
+      "evidence": "pointpillars-overfit-box-14369250836076988112_7249_040_7269_040-verified.json",
+      "evidence_sha256": "c53c0a99e24f2a001d04a2d8e77c8b6d84b048dbf332c28d436c3da57005c5ba",
+      "validation": {
+        "scene": "14369250836076988112_7249_040_7269_040",
+        "native_rows": 2558,
+        "selected_frames": 1,
+        "selected_box_rows": 9,
+        "scope": "retained target/source lineage independently admitted; point join and training remain open"
+      }
+    },
+    "2415873247906962761_5460_000_5480_000": {
+      "evidence": "pointpillars-overfit-box-2415873247906962761_5460_000_5480_000-verified.json",
+      "evidence_sha256": "bca0b85f7cdb717ffb38c3f741282a8ac46a93de1d41e73cd237acadd933f081",
+      "validation": {
+        "scene": "2415873247906962761_5460_000_5480_000",
+        "native_rows": 13654,
+        "selected_frames": 2,
+        "selected_box_rows": 128,
+        "scope": "retained target/source lineage independently admitted; point join and training remain open"
+      }
+    },
+    "3224923476345749285_4480_000_4500_000": {
+      "evidence": "pointpillars-overfit-box-3224923476345749285_4480_000_4500_000-verified.json",
+      "evidence_sha256": "a39cbacb9c05db9a9f21a289b811a87db55240128f79bfed31e1b88bf1511198",
+      "validation": {
+        "scene": "3224923476345749285_4480_000_4500_000",
+        "native_rows": 6740,
+        "selected_frames": 1,
+        "selected_box_rows": 27,
+        "scope": "retained target/source lineage independently admitted; point join and training remain open"
+      }
+    },
+    "3375636961848927657_1942_000_1962_000": {
+      "evidence": "pointpillars-overfit-box-3375636961848927657_1942_000_1962_000-verified.json",
+      "evidence_sha256": "d9a3d005cc04c503b78aa82aac58c7111feeb86c85a847fdba395821e55f55a4",
+      "validation": {
+        "scene": "3375636961848927657_1942_000_1962_000",
+        "native_rows": 13577,
+        "selected_frames": 1,
+        "selected_box_rows": 68,
+        "scope": "retained target/source lineage independently admitted; point join and training remain open"
+      }
+    },
+    "4447423683538547117_536_022_556_022": {
+      "evidence": "pointpillars-overfit-box-4447423683538547117_536_022_556_022-verified.json",
+      "evidence_sha256": "a227e6eb6b2d707b27f83a74c3239c3d6243773f643bc9eb21e892aba34f7fa1",
+      "validation": {
+        "scene": "4447423683538547117_536_022_556_022",
+        "native_rows": 9328,
+        "selected_frames": 1,
+        "selected_box_rows": 50,
+        "scope": "retained target/source lineage independently admitted; point join and training remain open"
+      }
+    },
+    "4487677815262010875_4940_000_4960_000": {
+      "evidence": "pointpillars-overfit-box-4487677815262010875_4940_000_4960_000-verified.json",
+      "evidence_sha256": "9a338a08f09795dfe8be782294cbfe050088b46e98866ea02e4a68199691e7b0",
+      "validation": {
+        "scene": "4487677815262010875_4940_000_4960_000",
+        "native_rows": 17606,
+        "selected_frames": 1,
+        "selected_box_rows": 100,
+        "scope": "retained target/source lineage independently admitted; point join and training remain open"
+      }
+    },
+    "5525943706123287091_4100_000_4120_000": {
+      "evidence": "pointpillars-overfit-box-5525943706123287091_4100_000_4120_000-verified.json",
+      "evidence_sha256": "91543d6d6cf346d6d28c3240f693387f1a2b1c899868bdf70d8190c9a8678657",
+      "validation": {
+        "scene": "5525943706123287091_4100_000_4120_000",
+        "native_rows": 12820,
+        "selected_frames": 1,
+        "selected_box_rows": 61,
+        "scope": "retained target/source lineage independently admitted; point join and training remain open"
+      }
+    },
+    "7912728502266478772_1202_200_1222_200": {
+      "evidence": "pointpillars-overfit-box-7912728502266478772_1202_200_1222_200-verified.json",
+      "evidence_sha256": "e3aacc60803028eabb9f2c00432be926742d973f465309f16da10835787882a8",
+      "validation": {
+        "scene": "7912728502266478772_1202_200_1222_200",
+        "native_rows": 4439,
+        "selected_frames": 1,
+        "selected_box_rows": 19,
+        "scope": "retained target/source lineage independently admitted; point join and training remain open"
+      }
+    },
+    "8454755173123314088_3202_000_3222_000": {
+      "evidence": "pointpillars-overfit-box-8454755173123314088_3202_000_3222_000-verified.json",
+      "evidence_sha256": "d2b6bcfde94152d50527880430b3776e93f5fb6aa985ebfdb27c38b1f7ebff96",
+      "validation": {
+        "scene": "8454755173123314088_3202_000_3222_000",
+        "native_rows": 6036,
+        "selected_frames": 2,
+        "selected_box_rows": 63,
+        "scope": "retained target/source lineage independently admitted; point join and training remain open"
+      }
+    },
+    "8722413665055769182_2840_000_2860_000": {
+      "evidence": "pointpillars-overfit-box-8722413665055769182_2840_000_2860_000-verified.json",
+      "evidence_sha256": "9abbc421b812e20e5a9e3aaaac47cac49a78c8587fb2f5236c5d7a770f036e34",
+      "validation": {
+        "scene": "8722413665055769182_2840_000_2860_000",
+        "native_rows": 18962,
+        "selected_frames": 1,
+        "selected_box_rows": 80,
+        "scope": "retained target/source lineage independently admitted; point join and training remain open"
+      }
+    },
+    "8796914080594559459_4284_170_4304_170": {
+      "evidence": "pointpillars-overfit-box-8796914080594559459_4284_170_4304_170-verified.json",
+      "evidence_sha256": "a38da4ac1362e5d92509f310e20b594e14d7dff575d94cf6cbcffd18543242b2",
+      "validation": {
+        "scene": "8796914080594559459_4284_170_4304_170",
+        "native_rows": 3094,
+        "selected_frames": 1,
+        "selected_box_rows": 17,
+        "scope": "retained target/source lineage independently admitted; point join and training remain open"
+      }
+    }
+  },
+  "scope": "native box targets only; point join and overfit remain open"
+}

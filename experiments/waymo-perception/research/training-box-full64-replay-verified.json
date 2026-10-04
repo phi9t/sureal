@@ -1,0 +1,90 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/training-box-distributions-v1",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/training-box-full64-retained-audit-a/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/training-box-full64-retained-audit-a/input",
+        "/mnt",
+        "--",
+        "python",
+        "-c",
+        "import json; from pathlib import Path; from pipeline.training_box_replay_audit import verify_replay_receipt; e=json.loads(Path('/mnt/expected.json').read_text()); r=verify_replay_receipt('/source',expected_receipt_sha256=e['receipt_sha256'],expected_job=e['job'],expected_sources=e['sources'],expected_runtime_lock=e['runtime_lock'],code_root='/experiment'); Path('/outputs/check.json').write_text(json.dumps(r)); print('PASS independent full64 retained receipt audit',r['native_rows'])"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "replay_receipt_sha256": "1405e55a6b9a509a2a4c88949c82190d411b6c1bc3f19a74ace1cb7967bc33c4",
+  "candidate_sha256": "e3d56055681b30b226bc1826b90a96d7459fa97887ab641c311e37d75382e62b",
+  "audit_candidate_sha256": "736edca87e131e50f320174a5b522be53a0ac1571e20a8afa393ce7d92775dea",
+  "validation": {
+    "status": "both full64 replay receipts independently reconciled",
+    "sources_per_pass": 64,
+    "native_rows": 726715,
+    "worker_resources": [
+      {
+        "elapsed_seconds": 115.78632623300655,
+        "peak_rss_kib": 688604,
+        "rss_scope": "worker_process_peak"
+      },
+      {
+        "elapsed_seconds": 107.58326178102288,
+        "peak_rss_kib": 626008,
+        "rss_scope": "worker_process_peak"
+      }
+    ],
+    "scope": "retained replay evidence; no anchor adoption or trained scientific result"
+  },
+  "artifacts": {
+    "live.log": "a667d4225c9aff8e114dedb5aae3b72b081091815b31640db2d549373884695d",
+    "input/expected.json": "f06d84e70a4dbe866d4e77c07ebef2fbd81d2120613493eae640b2ba5b382225",
+    "output/check.json": "9f842dc96a470e1c9c59ca296c97646a8635065d092888796b54c148123f3980"
+  },
+  "scope": "full64 live receipt admission; detector configuration and trained comparisons remain open"
+}

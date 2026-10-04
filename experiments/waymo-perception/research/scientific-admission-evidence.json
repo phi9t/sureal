@@ -1,0 +1,8 @@
+{
+  "status": "preparation evidence; ticket 07 remains open",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/scientific-admission-live-a/receipt.json",
+  "receipt_sha256": "ed20e4b76f9346d81deca5f2219229efd91e783673b0819b558a271db6f1647f",
+  "complete_scenes": 19,
+  "tests": 5,
+  "scope": "provenance admission only; no source payload transfer, reconstruction or full protocol closure"
+}

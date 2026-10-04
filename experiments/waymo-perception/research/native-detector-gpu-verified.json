@@ -1,0 +1,26 @@
+{
+  "status": "native packing checker and GPU model evidence independently reconciled",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/native-detector-gpu-live-a/receipt.json",
+  "receipt_sha256": "0618e2566426a9c7bf06f30a7a15caacb7270ef520a68f792ab32ad8e652a86f",
+  "checker_receipt_sha256": "b5df16fee2a2d378988ef29c4c4b77e55282f48531426d6cde5b8f708137ba6a",
+  "validation": {
+    "status": "trusted native engineering points to full GPU detector passed",
+    "packed_sha256": "c78d0199f0fc985eff4c941b8c72ebff63632660a84f3f03fca66874bea14422",
+    "input_cast": "physical float64 to model float32",
+    "pillars": 14384,
+    "retained_points": 92603,
+    "grid": [
+      512,
+      512
+    ],
+    "anchor_predictions": 131072,
+    "forward_backward_seconds": 0.7718871279794257,
+    "total_seconds": 1.1317859069968108,
+    "peak_allocated_bytes": 1193811456,
+    "device": "NVIDIA B200",
+    "optimizer_steps": 0,
+    "target_status": "synthetic all-background diagnostic only; native box targets not loaded",
+    "scope": "native observation/model integration only; no trained predictions, overfit or held-out accuracy"
+  },
+  "scope": "native observation/model integration only; no trained predictions, overfit or held-out accuracy"
+}

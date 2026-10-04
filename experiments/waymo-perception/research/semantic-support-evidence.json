@@ -1,0 +1,10 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/semantic-support-live-a/receipt.json",
+  "receipt_sha256": "b6877fdc710fb9db3e11226ed0342564649655d982a4aa0c077c514966bf42bf",
+  "validation": {
+    "passed": true,
+    "eligible_points": 4777237,
+    "annotated_frames": 30
+  },
+  "scope": "one engineering scene; full scientific class support and protocol freeze remain open"
+}

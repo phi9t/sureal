@@ -2,6 +2,16 @@
 
 A persistent catalog of tested directions and planned follow-ups. The runner uses host Python standard library only; model training and native evaluation run inside the existing locked Insula roots. Torch is inside the GPU root, not required on the host. No TensorFlow.
 
+Prediction–target association is a separately specified experiment axis:
+[study handbook](../research/prediction-target-association-study.md),
+[ticket 41](../../../docs/research/tasks/41-prediction-target-association.md).
+Its A0–A3 matrix separates legacy ownership, global coverage, 3D geometry and
+prediction-dependent matching while keeping the baseline architecture/loss/decoder
+fixed. These treatments are planned and are not supported by this architecture
+runner. Existing results retain their original target contract; coverage, live
+implementation admission, actual native fitting and held-out benefit remain
+separate gates.
+
 | ID | Status | Goal |
 | --- | --- | --- |
 | [deep_pfn](ideas/deep_pfn.md) | runnable | Pointwise nonlinear depth may improve geometry encoding without spatial interactions. |

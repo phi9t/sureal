@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "scope": "Git-only exact-byte preservation of the bounded final independent live proof/job/result JSON; immutable HDFS65snapshot remains unchanged",
+  "independent_report_sha256": "09f8565419a5fe15f0601a7cc8e92f70423b2182b15d16d7b1aeaf80dd74ec9b",
+  "records": [
+    {
+      "original_path": "/tmp/sureal-comprehensive-final-metadata-independent/proofs/g0-c0-verify/resource-admitted.json",
+      "sha256": "04202f5e65dcced4c2ea347e4035906e4aacbdd79712ace5816558ad7c265c51",
+      "bytes": 17736,
+      "git_snapshot": "experiments/waymo-perception/research/journal-evidence/04202f5e65dcced4c2ea347e4035906e4aacbdd79712ace5816558ad7c265c51"
+    },
+    {
+      "original_path": "/tmp/sureal-comprehensive-final-metadata-independent/proofs/g0-c0-verify/worker/worker-resource.json",
+      "sha256": "9738ca4178a21809a6d5d4545e385bac1fa24122091185e7b0cb6530eccb67f1",
+      "bytes": 594,
+      "git_snapshot": "experiments/waymo-perception/research/journal-evidence/9738ca4178a21809a6d5d4545e385bac1fa24122091185e7b0cb6530eccb67f1"
+    },
+    {
+      "original_path": "/tmp/sureal-comprehensive-final-metadata-independent/jobs/g0-c0-verify/job.json",
+      "sha256": "1c3409194ed37068a86417d1abff7f74f9a3b52d5b29cc7ada252f09349bc524",
+      "bytes": 11383,
+      "git_snapshot": "experiments/waymo-perception/research/journal-evidence/1c3409194ed37068a86417d1abff7f74f9a3b52d5b29cc7ada252f09349bc524"
+    },
+    {
+      "original_path": "/tmp/sureal-comprehensive-final-metadata-independent/outputs/g0-c0-verify/check.json",
+      "sha256": "12a1d70c55319571cc9df0acb0345256c7800109ab9a7f744ea09ca3c0655330",
+      "bytes": 173,
+      "git_snapshot": "experiments/waymo-perception/research/journal-evidence/12a1d70c55319571cc9df0acb0345256c7800109ab9a7f744ea09ca3c0655330"
+    },
+    {
+      "original_path": "/tmp/sureal-comprehensive-final-metadata-independent/proofs/g0-c0-rehydrate/resource-admitted.json",
+      "sha256": "a4a2df8bf2ca89227d5c80925904cd569c6679ec5ad65268e6e42ae16bc0cbef",
+      "bytes": 17787,
+      "git_snapshot": "experiments/waymo-perception/research/journal-evidence/a4a2df8bf2ca89227d5c80925904cd569c6679ec5ad65268e6e42ae16bc0cbef"
+    },
+    {
+      "original_path": "/tmp/sureal-comprehensive-final-metadata-independent/proofs/g0-c0-rehydrate/worker/worker-resource.json",
+      "sha256": "40f9aa1c14591e3167e35bf101ac0ed44f238f622bb068839bdaed38db73d4b3",
+      "bytes": 597,
+      "git_snapshot": "experiments/waymo-perception/research/journal-evidence/40f9aa1c14591e3167e35bf101ac0ed44f238f622bb068839bdaed38db73d4b3"
+    },
+    {
+      "original_path": "/tmp/sureal-comprehensive-final-metadata-independent/jobs/g0-c0-rehydrate/job.json",
+      "sha256": "1c3409194ed37068a86417d1abff7f74f9a3b52d5b29cc7ada252f09349bc524",
+      "bytes": 11383,
+      "git_snapshot": "experiments/waymo-perception/research/journal-evidence/1c3409194ed37068a86417d1abff7f74f9a3b52d5b29cc7ada252f09349bc524"
+    },
+    {
+      "original_path": "/tmp/sureal-comprehensive-final-metadata-independent/outputs/g0-c0-rehydrate/check.json",
+      "sha256": "11493f222dc3ed0aa194ff68f70c19d3883809809575f5ea78e60c5dbd5fa528",
+      "bytes": 205,
+      "git_snapshot": "experiments/waymo-perception/research/journal-evidence/11493f222dc3ed0aa194ff68f70c19d3883809809575f5ea78e60c5dbd5fa528"
+    }
+  ],
+  "excluded_console_logs": "Raw console and transfer .log files remain local under repository publication policy; previous65snapshot preserves prior required proof metadata and logs in HDFS. No log renamed or force-added. Final raw tree stays retained at /tmp/sureal-comprehensive-final-metadata-independent",
+  "source_snapshot": "26 unchanged resource sources already committed; the independently verified source identity remains frozen",
+  "payload_release": false
+}

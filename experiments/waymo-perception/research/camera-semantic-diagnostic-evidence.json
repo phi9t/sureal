@@ -1,0 +1,6 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/camera-scoring-live-a/receipt.json",
+  "receipt_sha256": "bc577428bca0fe0605652113ef57d55a109db57d79199e0203d9d0ebd314660c",
+  "scope": "four analytic camera semantic diagnostic fixtures; not official panoptic/STQ parity",
+  "ticket_09": "open"
+}

@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "review": "Independent read-only Standards-axis interpretation review before authorized Git integration",
+  "reviewed_utc": "2026-10-04T02:05:57.266142+00:00",
+  "passed": true,
+  "findings": [],
+  "scope": "Final closeout note, final inventory, journal114 and exact ready staging manifest only; prior source structural review retained. No new tests, scientific execution, HDFS operations, authentication actions, source edits, index edits or branch edits.",
+  "base": "0823cbbb77ffa3923ff51bd4067678a7dbdaa533",
+  "reviewed_staging_manifest": {
+    "path": "/tmp/sureal-comprehensive-closeout-ready-staging.json",
+    "sha256": "8b4d41d74261bfe1ad832410d576b9de1945d7e09af763d56bdcf51aec871e02",
+    "paths": 1343,
+    "index_paths_exact": true,
+    "all_staged_SHA256_and_byte_counts_exact": true,
+    "composition": "1292 selected original backlog paths plus51 explicit closeout metadata paths; this new review report is outside that reviewed manifest until separately added"
+  },
+  "metadata_bytes": [
+    {
+      "path": "experiments/waymo-perception/research/2026-10-04-comprehensive-integration-closeout.md",
+      "sha256": "262a93e081482bb11684f9bf7c195e99f4349e0b972503b0ceddd50c7f149693",
+      "bytes": 6633
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-comprehensive-closeout-final-inventory.json",
+      "sha256": "ea876fd1226b1cbfc29094baad66c25f026e05701230d5dbbe4885c1d235c651",
+      "bytes": 1505321
+    },
+    {
+      "path": "experiments/waymo-perception/research/research-journal.jsonl",
+      "sha256": "504107bfdc7415dbba18085166a1d16bfb2a0997fb928d7f791b5b4374286912",
+      "bytes": 169345
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-comprehensive-closeout-final-readback-evidence.json",
+      "sha256": "424bd4dcd8f40d0334b5ffbf225c48182c0b0609b8da37e0adc1769c9df99484",
+      "bytes": 3804
+    }
+  ],
+  "claims_review": {
+    "integration_scope": "Closeout is limited to ready owned backlog. Overall research, complete resource/continuation backend/retention/runner, migration, model training and scientific promotion remain incomplete or separately gated.",
+    "historical_evidence": "Failed/pending/oracle/producer records retain roles; CPU/Torch312 and dispatcher list/show admission do not extend historical seven-stage experiment measurements. Canonical numerical209pass/10skips and publication checks remain independently scoped.",
+    "blocked_paths": "19 excluded and preserved: association9, continuation_runtime2, explorer7, standalone cohort-label audit1; all have per-file blockers. Every local blocked byte matches final inventory; all19 SHA256 pins also match earlier1381-member independent recovered-union metadata.",
+    "protected_draft": {
+      "path": "/data02/home/philip.yang/workspace/sureal/docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "owner": "architecture-review session",
+      "current_sha256": "32fd3ea749a55463a9806c583e2ebb5086aed57a8ef9f920127c14620c04d364",
+      "excluded_from_ready_transaction": true,
+      "policy": "Preserve unchanged; committed51f1b39/a3c6955 documentation does not admit model migration or Kata setup."
+    },
+    "exclusions": "No blocked file, scratch/cache path, generated preview, synchronization lock, timestamp-only registry projection or protected root draft appears in1343 ready paths. No.log file is staged; canonical numerical log remains in sealed HDFS metadata.",
+    "archive_claim": "Closeout cites already completed initial1381-member and final65-member independent GET/recovery scopes. It does not claim a new publication, checkpoint release or complete runner admission. Broad automatic archive rejection remains recorded; narrowed allowlist preserves the prior source/data publications."
+  },
+  "inventory_checks": {
+    "entries": 2486,
+    "counts": {
+      "selected_for_integration_after_verification": 1292,
+      "excluded_timestamp_only_projection": 1,
+      "excluded_local_scratch_or_cache": 1161,
+      "already_integrated": 9,
+      "blocked_preserved": 19,
+      "excluded_generated_sensor_payload": 2,
+      "excluded_synchronization_lock": 2
+    },
+    "counts_exact": true,
+    "all1292_selected_in_ready_manifest": true,
+    "blocked_and_excluded_absent_from_ready_manifest": true,
+    "blocked19_local_bytes_exact": true,
+    "blocked19_previous_archive_union_hashes_exact": true,
+    "final_staging_adjustment": "Exclude one generated numerical console .log from Git; the sealed final HDFS metadata deliberately retains it. Immutable inventory/journal/archive epochs retain earlier conditional selection without claiming a committed log."
+  },
+  "immutable_archive_epoch": {
+    "final_independent_report": "sureal-comprehensive-closeout-final-metadata-independent.json",
+    "sha256": "09f8565419a5fe15f0601a7cc8e92f70423b2182b15d16d7b1aeaf80dd74ec9b",
+    "members": 65,
+    "source_bytes": 13566658,
+    "journal_entries": 113,
+    "journal113_head_sha256": "636a0b1a482c1a76309d6b2f4ed5e272b6e39cd4eb3262740260fb6ad5fd3992",
+    "journal113_prefix_sha256": "021e44822c62de58bd8b81b42008e1696d8c61f1359594963b2c37d8f62598c0",
+    "current_first113_bytes_match_independently_recovered_archive_member": true,
+    "sealed_closeout_document_sha256": "0f6e19ff96aa78655fc0fb2ecc34e0bb2f053a244e35be7e1d452dd8b68c9920",
+    "current_closeout_document_sha256": "262a93e081482bb11684f9bf7c195e99f4349e0b972503b0ceddd50c7f149693",
+    "epoch_difference_explicitly_Git_only": true,
+    "scientific_bytes_before_and_after": 15329280496,
+    "full_runner_or_release_admission": false
+  },
+  "journal114": {
+    "sequence": 114,
+    "sha256": "74be4d6f237a96a5d97cb19e243a0fd6b32a0a7a5ae6449bafdfdcca6ff84210",
+    "previous_hash": "636a0b1a482c1a76309d6b2f4ed5e272b6e39cd4eb3262740260fb6ad5fd3992",
+    "links_exact_journal113": true,
+    "complete114_entry_hash_chain_valid": true,
+    "retained_evidence_bodies": 4,
+    "all_retained_evidence_SHA256_exact": true,
+    "interpretation": "Explicit later Git-only record outside sealed113HDFS snapshot; admits scoped integration intent and preserves active/incomplete research goal. No extra HDFS content, new scientific execution, model migration, recipe change or payload release asserted.",
+    "inventory_epoch_note": "Entry114 retains preceding inventory SHA2565186a43ea2c19a75fd67aaf20c61df6038265a8a3e13c921a7abc70c379ff647 in immutable journal-evidence. Later final inventory records Git-only raw-proof preservation; it does not replace that retained body or extend sealed journal113 HDFS."
+  },
+  "deferred_maintenance": "Prior duplication judgment remains deferred; frozen source and independent mathematical/geometry/metric verifiers remain untouched.",
+  "recommendation": "Suitable for the authorized scoped Git integration using the exact reviewed transaction and a separately recorded addition of this review report. Final Git landing receipt remains a later fact; no successful merge is claimed by this review.",
+  "Git_only_final_raw_proof_preservation": {
+    "mapping_path": "experiments/waymo-perception/research/sureal-comprehensive-closeout-final-readback-evidence.json",
+    "mapping_sha256": "424bd4dcd8f40d0334b5ffbf225c48182c0b0609b8da37e0adc1769c9df99484",
+    "records": 8,
+    "unique_digest_bodies": 7,
+    "all_original_and_staged_snapshot_digest_bodies_exact": true,
+    "record_checks": [
+      {
+        "original_path": "/tmp/sureal-comprehensive-final-metadata-independent/proofs/g0-c0-verify/resource-admitted.json",
+        "git_snapshot": "experiments/waymo-perception/research/journal-evidence/04202f5e65dcced4c2ea347e4035906e4aacbdd79712ace5816558ad7c265c51",
+        "sha256": "04202f5e65dcced4c2ea347e4035906e4aacbdd79712ace5816558ad7c265c51",
+        "bytes": 17736,
+        "exact_original_and_snapshot": true,
+        "bounded_JSON_type": "dict",
+        "snapshot_in_ready_manifest": true
+      },
+      {
+        "original_path": "/tmp/sureal-comprehensive-final-metadata-independent/proofs/g0-c0-verify/worker/worker-resource.json",
+        "git_snapshot": "experiments/waymo-perception/research/journal-evidence/9738ca4178a21809a6d5d4545e385bac1fa24122091185e7b0cb6530eccb67f1",
+        "sha256": "9738ca4178a21809a6d5d4545e385bac1fa24122091185e7b0cb6530eccb67f1",
+        "bytes": 594,
+        "exact_original_and_snapshot": true,
+        "bounded_JSON_type": "dict",
+        "snapshot_in_ready_manifest": true
+      },
+      {
+        "original_path": "/tmp/sureal-comprehensive-final-metadata-independent/jobs/g0-c0-verify/job.json",
+        "git_snapshot": "experiments/waymo-perception/research/journal-evidence/1c3409194ed37068a86417d1abff7f74f9a3b52d5b29cc7ada252f09349bc524",
+        "sha256": "1c3409194ed37068a86417d1abff7f74f9a3b52d5b29cc7ada252f09349bc524",
+        "bytes": 11383,
+        "exact_original_and_snapshot": true,
+        "bounded_JSON_type": "dict",
+        "snapshot_in_ready_manifest": true
+      },
+      {
+        "original_path": "/tmp/sureal-comprehensive-final-metadata-independent/outputs/g0-c0-verify/check.json",
+        "git_snapshot": "experiments/waymo-perception/research/journal-evidence/12a1d70c55319571cc9df0acb0345256c7800109ab9a7f744ea09ca3c0655330",
+        "sha256": "12a1d70c55319571cc9df0acb0345256c7800109ab9a7f744ea09ca3c0655330",
+        "bytes": 173,
+        "exact_original_and_snapshot": true,
+        "bounded_JSON_type": "dict",
+        "snapshot_in_ready_manifest": true
+      },
+      {
+        "original_path": "/tmp/sureal-comprehensive-final-metadata-independent/proofs/g0-c0-rehydrate/resource-admitted.json",
+        "git_snapshot": "experiments/waymo-perception/research/journal-evidence/a4a2df8bf2ca89227d5c80925904cd569c6679ec5ad65268e6e42ae16bc0cbef",
+        "sha256": "a4a2df8bf2ca89227d5c80925904cd569c6679ec5ad65268e6e42ae16bc0cbef",
+        "bytes": 17787,
+        "exact_original_and_snapshot": true,
+        "bounded_JSON_type": "dict",
+        "snapshot_in_ready_manifest": true
+      },
+      {
+        "original_path": "/tmp/sureal-comprehensive-final-metadata-independent/proofs/g0-c0-rehydrate/worker/worker-resource.json",
+        "git_snapshot": "experiments/waymo-perception/research/journal-evidence/40f9aa1c14591e3167e35bf101ac0ed44f238f622bb068839bdaed38db73d4b3",
+        "sha256": "40f9aa1c14591e3167e35bf101ac0ed44f238f622bb068839bdaed38db73d4b3",
+        "bytes": 597,
+        "exact_original_and_snapshot": true,
+        "bounded_JSON_type": "dict",
+        "snapshot_in_ready_manifest": true
+      },
+      {
+        "original_path": "/tmp/sureal-comprehensive-final-metadata-independent/jobs/g0-c0-rehydrate/job.json",
+        "git_snapshot": "experiments/waymo-perception/research/journal-evidence/1c3409194ed37068a86417d1abff7f74f9a3b52d5b29cc7ada252f09349bc524",
+        "sha256": "1c3409194ed37068a86417d1abff7f74f9a3b52d5b29cc7ada252f09349bc524",
+        "bytes": 11383,
+        "exact_original_and_snapshot": true,
+        "bounded_JSON_type": "dict",
+        "snapshot_in_ready_manifest": true
+      },
+      {
+        "original_path": "/tmp/sureal-comprehensive-final-metadata-independent/outputs/g0-c0-rehydrate/check.json",
+        "git_snapshot": "experiments/waymo-perception/research/journal-evidence/11493f222dc3ed0aa194ff68f70c19d3883809809575f5ea78e60c5dbd5fa528",
+        "sha256": "11493f222dc3ed0aa194ff68f70c19d3883809809575f5ea78e60c5dbd5fa528",
+        "bytes": 205,
+        "exact_original_and_snapshot": true,
+        "bounded_JSON_type": "dict",
+        "snapshot_in_ready_manifest": true
+      }
+    ],
+    "scope": "Git-only exact-byte preservation of the bounded final independent live proof/job/result JSON; immutable HDFS65snapshot remains unchanged",
+    "console_log_policy": "Raw console and transfer .log files remain local under repository publication policy; previous65snapshot preserves prior required proof metadata and logs in HDFS. No log renamed or force-added. Final raw tree stays retained at /tmp/sureal-comprehensive-final-metadata-independent",
+    "no_new_HDFS_snapshot": true,
+    "no_scientific_or_payload_release_admission": true,
+    "inventory_mapping_pin_matches": true
+  }
+}

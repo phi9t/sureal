@@ -1,0 +1,3381 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-full103-retained-audit-v1/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-full103-retained-audit-v1/input",
+        "/tmp/input",
+        "--",
+        "python",
+        "-c",
+        "import hashlib,json,importlib.util,time,resource\nfrom pathlib import Path\nfrom pipeline.cohort_checkpoint import verify_checkpoint\nassert importlib.util.find_spec('tensorflow') is None\ne=json.loads(Path('/tmp/input/expected.json').read_text());sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()\nassert sha('/experiment/scientific-acquisition.candidate.json')==e['manifest_sha256'];m=json.loads(Path('/experiment/scientific-acquisition.candidate.json').read_text());seen=set();result=[];started=time.monotonic()\nfor entry in e['entries']:\n scene=entry['scene'];assert scene not in seen and entry['membership']==m['scenes'][scene];seen.add(scene)\n if entry['kind']=='pilot':path=Path(entry['checkpoint'])\n else:\n  original=Path(entry['checkpoint']);root=Path(e['working_root']);assert root in original.parents and '..' not in original.parts;path=Path('/source')/original.relative_to(root)\n v=verify_checkpoint(path,expected_checkpoint_sha256=entry['checkpoint_sha256'],code_root='/experiment',expected_runtime_lock=e['runtime_lock'],expected_manifest_sha256=e['manifest_sha256'],expected_source_hashes=entry['source_hashes'],path_remap={e['working_root']:'/source'})\n assert v['scene']==scene\n if entry['kind']=='full':assert v['worker_receipts']==16 and v['verified_evictions']==3\n else:assert entry['kind'] in ('pilot','gap') and v['worker_receipts']==5 and v['verified_evictions']==1\n # Reopen the camera replay attached to each retained checkpoint explicitly.\n checkpoint=json.loads(path.read_text());replay_paths=[p for p in checkpoint['retained_evidence_hashes'] if p.endswith('/camera-replay/receipt.json') or '/camera-replay-' in p and p.endswith('/receipt.json')]\n assert len(replay_paths)==1\n original=Path(replay_paths[0]);relative=original.relative_to(Path(e['working_root']));replay=json.loads((Path('/source')/relative).read_text())\n assert replay['scene']==scene and len(replay['checks'])==2 and all(type(c['exit_code']) is int and c['exit_code']==0 for c in replay['checks'])\n result.append({'scene':scene,'membership':entry['membership'],'kind':entry['kind'],'checkpoint_sha256':entry['checkpoint_sha256'],'camera_validation':replay['validation'],'lifecycle':v})\nassert seen==set(m['scenes']) and len(result)==103\nvalue={'scenes':103,'full_checkpoint_scenes':100,'separate_pilot_scenes':1,'recovered_gap_scenes':2,'entries':result,'worker_resources':{'elapsed_seconds':time.monotonic()-started,'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'rss_scope':'worker_process_peak'},'scope':'complete native camera measurement/annotation publication, two native replays and eviction lineage; model/geometry/protocol scientific comparisons remain open'}\nPath('/outputs/check.json').write_text(json.dumps(value,indent=2)+'\\n');print('PASS all103 original camera lifecycles independently reconciled',flush=True)\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "expected_sha256": "dcd5afdbd2ff49d5859d5c75d6407914c05f4a562140d27b49d102dd0e42b07f",
+  "checker_sha256": "2b95483af7f637689e6f3f67b94b134342e127d2a5ff5aadf968275253abb844",
+  "manifest_sha256": "c181a07edc21731a3e1b74a2274e286c9bc4207e6e0c46e6a1f2403978608370",
+  "validation": {
+    "scenes": 103,
+    "full_checkpoint_scenes": 100,
+    "separate_pilot_scenes": 1,
+    "recovered_gap_scenes": 2,
+    "entries": [
+      {
+        "scene": "11343624116265195592_5910_530_5930_530",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "3f4ee326c4c631afe4471ea3d99154d62bc801572f47f50e7baaad179830a273",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 19260
+          },
+          "identity_field_digest": "f96b9a214fa59860dfe83e6222dbd70a962f542ad165fd1c173fe7cee6815a79",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215323342,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "11343624116265195592_5910_530_5930_530",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 49573,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "4447423683538547117_536_022_556_022",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "b31f39e6ac760ca27f3875cfb2375cbe107a38af01fcf0feccede8e17b14ac3f",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 100,
+            "camera_box": 20268
+          },
+          "identity_field_digest": "6831b2c1b125620e9feeb6e03f42f444746ad6959a7e0425d9b500a81b3d958e",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215490308,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "4447423683538547117_536_022_556_022",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 46049,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "14503113925613619599_975_506_995_506",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "d8007b7959cb5cc818be2df787492f7b8091e334407a3fbd298112647b62259e",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 100,
+            "camera_box": 1266
+          },
+          "identity_field_digest": "9dfcee8dc7057a9290e4c66af1a793b031a8bfb3bd9584cb24de470c2aa63f9d",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215500800,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "14503113925613619599_975_506_995_506",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 12357,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "3375636961848927657_1942_000_1962_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "16b4d55ab407e73a6abbb47054c230167f396a8303a29512aa0477835931ea18",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 100,
+            "camera_box": 9409
+          },
+          "identity_field_digest": "b722ba663d5a2477f7bf092164ca41fb56bed578d82c1ff22c7dcef7f91406ee",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215141602,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "3375636961848927657_1942_000_1962_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 43708,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "6813611334239274394_535_000_555_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "7e3d90e5c262583a8613fd6c373ae35738d02e9044862cd4b7bfe2cbd5ed05d4",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 975,
+            "camera_segmentation": 95,
+            "camera_box": 4073
+          },
+          "identity_field_digest": "20015cbc4e2a4872a8a7d360bdc3b3a528cf7328b22beb7834a6ed1577ba32f2",
+          "camera_mask_pixels": 204725760,
+          "eligible_camera_mask_pixels": 204240246,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "6813611334239274394_535_000_555_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 24787,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "990914685337955114_980_000_1000_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "0b5cd70794843b98a54076c6da9598e8db536609279153eb2f8f4e20568828f7",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 95,
+            "camera_box": 14551
+          },
+          "identity_field_digest": "ac2f841eb7e5413a8b84d13dfd63ba171370e6ca3ed87f5f1bc8d2d70b62db57",
+          "camera_mask_pixels": 204725760,
+          "eligible_camera_mask_pixels": 204695497,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "990914685337955114_980_000_1000_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 65837,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "8796914080594559459_4284_170_4304_170",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "42dc8d8cc5c15bf5db79e97c765783166ef9e05388425663015c44e68d64a1db",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 3428
+          },
+          "identity_field_digest": "14f30e3a69e17f47aca19b04564dbf25e2220208c79f336cf7edcb00cae9459d",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215324925,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "8796914080594559459_4284_170_4304_170",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 16775,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "12257951615341726923_2196_690_2216_690",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "fd857c555a3e1adbaa1f61de2c93027963d70531db6a22057737863e49a3c7dd",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 100,
+            "camera_box": 15760
+          },
+          "identity_field_digest": "6bea4f458f5ae940a5f093cc80263a67413b6b04cdd8a3d5f60a4fb403a76b92",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 213989728,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "12257951615341726923_2196_690_2216_690",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 57799,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "13186511704021307558_2000_000_2020_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "327125b1fc5b08b0186d2a861c15d37ab1ab68a4f2211acdb48272edbae91b86",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 95,
+            "camera_box": 8480
+          },
+          "identity_field_digest": "822b06bc07aecb95bb8c9323b8e07a18e9cb5d7a563489bd5e233ff96cf788da",
+          "camera_mask_pixels": 204725760,
+          "eligible_camera_mask_pixels": 204700340,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "13186511704021307558_2000_000_2020_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 34606,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "17885096890374683162_755_580_775_580",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "290ba7af07350ccb8ac909ec809a7084ec56c1adc15440caa839009ec307c03b",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 100,
+            "camera_box": 5582
+          },
+          "identity_field_digest": "01879ec0a0943bb6f6253e51845f760303ed9e57eb3dc549936777474f204581",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215243654,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "17885096890374683162_755_580_775_580",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 34859,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "7912728502266478772_1202_200_1222_200",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "a532ca8ac2aa29dd08b8dc78b7913e832b1031be411e722ffadd0511ff89b8e1",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 980,
+            "camera_segmentation": 100,
+            "camera_box": 2275
+          },
+          "identity_field_digest": "f2f1b4d3f5b641526e8098d4806746edca8b46a4acf4c98ee0d3538ffd7774f4",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215500215,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "7912728502266478772_1202_200_1222_200",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 18188,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "4723255145958809564_741_350_761_350",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "73c985efdce22703eb8262cac25f1b8d4d12984565a233319f39a87fcc9b6fcb",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 15228
+          },
+          "identity_field_digest": "7e9a99469263b59686086c610674c4ec2cca42e3fc68cb5642dcbc7ba47320cc",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215484674,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "4723255145958809564_741_350_761_350",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 47515,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "8454755173123314088_3202_000_3222_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "fa95bc77c1618fb9afefbf06a65d2fa0ff23329bc20ca9e33976670fc0ff00ec",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 100,
+            "camera_box": 9112
+          },
+          "identity_field_digest": "2dcd7bced68585863313b59854b61cedc21c9ef5a3bf5b438f209e99419715b4",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215406945,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "8454755173123314088_3202_000_3222_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 28309,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "3894883757914505116_1840_000_1860_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "1ab848a681927b0829320f016b1a620b827ed50e73e1d3d6cf737ffc9a8faa53",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 985,
+            "camera_segmentation": 0,
+            "camera_box": 7620
+          },
+          "identity_field_digest": "28129da90df25f0e04479c21dc6255c4eae4f1dca1896c4d705a4e224aa62801",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "3894883757914505116_1840_000_1860_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 36225,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "13271285919570645382_5320_000_5340_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "bf2c7d65ab03222ef37453603024285cf62512c93c06507330940b4edfffaf47",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 16728
+          },
+          "identity_field_digest": "7e8eef30a6f5f60d2ca9f9c62088148582584b4cba1c78de05989e579f4f1842",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215475551,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "13271285919570645382_5320_000_5340_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 59421,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "8345535260120974350_1980_000_2000_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "674a8c58fd417a288b2fa977f85c7881fe113a186d4ab7d474c9a2f38021084e",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 4824
+          },
+          "identity_field_digest": "4de04cf9bd15e352de11f0f82a6c3c618696b3335232fc6f420921df0949682a",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215500697,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "8345535260120974350_1980_000_2000_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 22407,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "1357883579772440606_2365_000_2385_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "0d75ca11f8956a9ce5a6d4ba5e43886dbfc5ae0e1a36b0f9f7c3096fa65f7386",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 100,
+            "camera_box": 8256
+          },
+          "identity_field_digest": "e554ea38ee57820279cc8a274c0946d4fbee91c473414bff4074ada942002ce5",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215498005,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "1357883579772440606_2365_000_2385_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 19955,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "16977844994272847523_2140_000_2160_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "7889044c500e7af1cc14a4b8b29ec87c1fd3ce770a1461311c1415cb847c0ad7",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 0,
+            "camera_box": 19551
+          },
+          "identity_field_digest": "8aeaf39b000824d587608c5dfa876292f11582a34867628d7a2f95eb7f134f1d",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "16977844994272847523_2140_000_2160_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 64954,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "4487677815262010875_4940_000_4960_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "42615291d2229e672773fbe860b018f8c09ba3388371a68e0980b6bf3a7a0491",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 100,
+            "camera_box": 9437
+          },
+          "identity_field_digest": "df304860cb8995f857e9cfcf04186ecfe3fd35abbdff23b8b2768adbbba275e8",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215496254,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "4487677815262010875_4940_000_4960_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 51774,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "809159138284604331_3355_840_3375_840",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "321a299ddfdf0653bfe5daf9eb2317fbdedeea767838d9a4a3bf51973a13f270",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 1079
+          },
+          "identity_field_digest": "cc447cca5e30c8de0d84d5b8116147a8ef6d7723fe97a2df1203b8948e2b5334",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 214615054,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "809159138284604331_3355_840_3375_840",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 11600,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "3966447614090524826_320_000_340_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "ea70f9e7fd778cec31034305c39509596ca336b35fcda83c0a8ace85c8f3be86",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 100,
+            "camera_box": 5644
+          },
+          "identity_field_digest": "861cf99308528bbcfd334539abedead771f362e06f1d6597b1701e4fe30b01e7",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215496505,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "3966447614090524826_320_000_340_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 34935,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "5083516879091912247_3600_000_3620_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "09fa37e21fa6b674c7a74f83473d1c121261ce03b8dc16bba88667bc9e0b48f8",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 985,
+            "camera_segmentation": 100,
+            "camera_box": 17161
+          },
+          "identity_field_digest": "d1164e14459b344b57f6cc45b553be553dd68853c93fcb9fe284768f6e0a8d59",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215486054,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "5083516879091912247_3600_000_3620_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 65886,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "6142170920525844857_2080_000_2100_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "de96213561eafd73e1fe558c337d8d940db9ea93912762e027d0fd05d7328590",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 6114
+          },
+          "identity_field_digest": "d37045b9aa258630c6be25736138b6df353b820f146b07ae4f300787d0903d60",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215500800,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "6142170920525844857_2080_000_2100_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 36329,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "17782258508241656695_1354_000_1374_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "32b410fe34a2812bf0e717d9c87b8ad0c39a7b1c511c1fad42a69ca6f107639d",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 5,
+            "camera_box": 1532
+          },
+          "identity_field_digest": "1097cef7ebac7b888e8cc42db20d21a0bfd2e9fe365e24afa437538fd315eab3",
+          "camera_mask_pixels": 10775040,
+          "eligible_camera_mask_pixels": 9277375,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "17782258508241656695_1354_000_1374_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 23252,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "13830510593707564159_5575_000_5595_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "b28b035a8f91ac2e4e7f1bbfb97a6f3997309eafa751c20bdb4d2d401e8c058f",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 9126
+          },
+          "identity_field_digest": "55e71eef4409dc6c4fcc7d15fc9e1f78ca7984d011ac6da85393a06762bfb54d",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 212084438,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "13830510593707564159_5575_000_5595_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 18791,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "14369250836076988112_7249_040_7269_040",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "06cb0ea3354b169ee47fab6ad9f5bb3b7d4693bb3ae3fc2db9384917e3255421",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 3099
+          },
+          "identity_field_digest": "4d2b41099d6039c4e2c13586ebde0881b682890f7e6c31ddf1ef3f85488d10ba",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215499700,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "14369250836076988112_7249_040_7269_040",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 15374,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "11004685739714500220_2300_000_2320_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "597fbb10bf517c61dbc00174f47c552c50740364a34565bdf50a9b9991a1b04f",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 0,
+            "camera_box": 2842
+          },
+          "identity_field_digest": "f2c25a2f7249f6a207ac691935ee2d1531f6da41c746add20f078abfdc530ab0",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "11004685739714500220_2300_000_2320_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 24849,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "15539619898625779290_760_000_780_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "d0c23fda349deede39b15eefd972e56f7e8d24f20e6f4596038cecae5036150e",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 0,
+            "camera_box": 6909
+          },
+          "identity_field_digest": "cb49d329a1e8cf8f921cbfa4b07fcd5b0d8bd8790ba20702bfa77dbfc3f64a48",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "15539619898625779290_760_000_780_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 37804,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "14004546003548947884_2331_861_2351_861",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "e80ef39c0443577f0cd4af844f2b15d251270b4dd22706d1c66a0697d9acba46",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 0,
+            "camera_box": 2440
+          },
+          "identity_field_digest": "6f50e57c5931cfe5b1ce6ad3267ca71db08e2c1725d2d14032bb1832197737ca",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "14004546003548947884_2331_861_2351_861",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 16349,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "1005081002024129653_5313_150_5333_150",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "f5019e11712c285634586ad1cf756ec4573c3d6693f8af2d342a801cf9a71218",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 3622
+          },
+          "identity_field_digest": "daac44fd4bc66dd8ee511e68116dc0453c468efa8e34dbddade5b1590cd313e2",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215499940,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "1005081002024129653_5313_150_5333_150",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 16931,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "13506499849906169066_120_000_140_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "a42ba16b70ed3e417c06fb0b5b4287293d0b5c7844b50b836eee316c56b1fc21",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 100,
+            "camera_box": 23190
+          },
+          "identity_field_digest": "f5b30226343f071e2dce8f687770b8704fe12ff7371b6b56545b98d8ac2545b0",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215473626,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "13506499849906169066_120_000_140_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 77185,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "6559997992780479765_1039_000_1059_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "36d9cf9ab48b659cebaac959ae8acc4d84d2aecec2ff107024b1d595f1e32d35",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 1012
+          },
+          "identity_field_digest": "b479e5adbc838f2768415a446e5b86ce9c2b5e601fb1ddea6e7fe50bed389109",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 214046265,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "6559997992780479765_1039_000_1059_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 15173,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "3224923476345749285_4480_000_4500_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "c76754b7165bb65b79f8d3a8d12792e1b5f61ca61fbb9d86d6b6344145a99e81",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 985,
+            "camera_segmentation": 100,
+            "camera_box": 2680
+          },
+          "identity_field_digest": "0319e96d1e7075587ce7e7d093f6676481b9fcbe0219c7d672476814ff22ff51",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215495173,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "3224923476345749285_4480_000_4500_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 23251,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "14250544550818363063_880_000_900_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "b30e91c3d3a538188f1a106ba277e41073ac134a5d5e4c6bb21ddaa1b167c940",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 10851
+          },
+          "identity_field_digest": "6d8546dfd8591f411089a41e343c33ecbca6eb6095ec52df4e8b3a762f7eda62",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215500231,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "14250544550818363063_880_000_900_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 45032,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "2088865281951278665_4460_000_4480_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "bdf9ab3460934fcdae3cc57a37d1c530dea884632278fb5341e2a0e515d02c4d",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 100,
+            "camera_box": 10183
+          },
+          "identity_field_digest": "f81b76c27b9ddcdf99a478ea5241da832b75ce245aef98055b3a5c77faa98ba7",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215487110,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "2088865281951278665_4460_000_4480_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 46664,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "12856053589272984699_1020_000_1040_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "86896241207dd9f9272a5797a0a2fc35963be79185b49c9d7ea456bc07a198f7",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 0,
+            "camera_box": 6163
+          },
+          "identity_field_digest": "bffa70fdb6986dc31881c93c262f7b6b00f4f637141be149f1acafd5d189c54e",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "12856053589272984699_1020_000_1040_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 33008,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "11489533038039664633_4820_000_4840_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "3caa994a3c90b99a3b931be1ffe0717626657a1251ab0496e62e926cd367f9cf",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 2512
+          },
+          "identity_field_digest": "1233ac1e7f49a3676c67bdefdee925cd1c807eecfe81a8feeacd97cf3751855c",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215500531,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "11489533038039664633_4820_000_4840_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 25195,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "13619063687271391084_1519_680_1539_680",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "78963501f6eb68b3fe2f4500cb26d8905fa7f1a96d6fadbf3b695ba1e7880473",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 9630
+          },
+          "identity_field_digest": "3e99c8d378a0a75f0e878d9b2c92352e8c4cb7d6dd5b9ec948bfc13d7dc43201",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 214668076,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "13619063687271391084_1519_680_1539_680",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 45441,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "15628918650068847391_8077_670_8097_670",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "c700657646366aafa9a6cf7d4c71febebdb7350ef27c9b5f2a6c2fc29f118a62",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 985,
+            "camera_segmentation": 100,
+            "camera_box": 16920
+          },
+          "identity_field_digest": "28d84be8461400139aba19a3ff19e5bb388ee5c5caf5b311163c0a6b54614bb0",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 214615986,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "15628918650068847391_8077_670_8097_670",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 48665,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "14098575914252965554_511_000_531_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "8ff7a70a5889016e49d9875d2daff74590f15187d5d9c65c2a05c31f33fd43db",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 950,
+            "camera_segmentation": 100,
+            "camera_box": 4065
+          },
+          "identity_field_digest": "ff76a7673dc35cb74a322c02ba4b9e39ac182dbd3dbc405481749ee20d853f0e",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215404167,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "14098575914252965554_511_000_531_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 25298,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "10734565072045778791_440_000_460_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "4a9e14c5f41af01703e6002c76a6ab97ad1b3d88b34e4feb61f9b8149bdde203",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 3096
+          },
+          "identity_field_digest": "33cde747463e287acd0345e7c4de96b59226dd4a0dbccf8e0cfe032663cdb800",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215498990,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "10734565072045778791_440_000_460_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 21059,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "2681180680221317256_1144_000_1164_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "afe39a391687253bf472f8be106ad7e857f1ae27df5a7335a99911861ad1ed04",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 55,
+            "camera_box": 5369
+          },
+          "identity_field_digest": "268bf3dcec75ae440d399b10cddaa6ebfb733f45f04aaba4e10af6cc7b7f8b06",
+          "camera_mask_pixels": 118525440,
+          "eligible_camera_mask_pixels": 105924183,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "2681180680221317256_1144_000_1164_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 49487,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "8722413665055769182_2840_000_2860_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "ef024d46b0b8770afb129acdd7556f6e056d054be45d5c1b13cfa938c6ade5b6",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 985,
+            "camera_segmentation": 100,
+            "camera_box": 14677
+          },
+          "identity_field_digest": "1d124f17053912178dabc5e76b4215803158385b4a6d32d0e0f51c9e54f89e32",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215488086,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "8722413665055769182_2840_000_2860_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 59692,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "12012663867578114640_820_000_840_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "1892e6a4cdaab6761e5538937d04b3bd5b7ac0e69ade512254c7c335cbb706f0",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 14887
+          },
+          "identity_field_digest": "3d746bedd822f9ed1d8d5ac6806fca90611f8cb13143995503a813faaed47184",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215474147,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "12012663867578114640_820_000_840_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 64686,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "9907794657177651763_1126_570_1146_570",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "cfc08652b44b216bb8a771dc3eab44fc6044bd7609ab118a7b453793822930de",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 26634
+          },
+          "identity_field_digest": "29ecb89bb9fc393aa5873e27d5e2593da6e621959eb6bf9dbf517a63804437f4",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215477513,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "9907794657177651763_1126_570_1146_570",
+          "retained_files": 36,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 87727,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "13807633218762107566_6625_000_6645_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "deccaa6a055e39727d86108e7ff6344f1f8634fd4bbeb184caf7aaf7adc91e3a",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 60,
+            "camera_box": 3356
+          },
+          "identity_field_digest": "9226b2f8f67de1d70c19dec157b32a48d0c22a425a2fd83e95457e6caada9f89",
+          "camera_mask_pixels": 129300480,
+          "eligible_camera_mask_pixels": 114109503,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "13807633218762107566_6625_000_6645_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 21909,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "7850521592343484282_4576_090_4596_090",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "cfe7993609c255ae59a3ba5e136c439cdb43b259608decbacd16c9a5a6658504",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 985,
+            "camera_segmentation": 50,
+            "camera_box": 5942
+          },
+          "identity_field_digest": "f28bf63ed6686a4ed0a50c8655d2f9017dfbaf0da9e6688b5c9b9add2e62317e",
+          "camera_mask_pixels": 107750400,
+          "eligible_camera_mask_pixels": 92175821,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "7850521592343484282_4576_090_4596_090",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 22897,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "12303641360375776820_4378_000_4398_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "5330a538da791678716b0f632c1978a458f137a6cb1a78ba3dcc37559455878e",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 15,
+            "camera_box": 3682
+          },
+          "identity_field_digest": "4ac03b8cf62cd01574eaf091bd0cf9895563324a424cca7cd82036fdce147958",
+          "camera_mask_pixels": 32325120,
+          "eligible_camera_mask_pixels": 28696606,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "12303641360375776820_4378_000_4398_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 33574,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "2415873247906962761_5460_000_5480_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "db014c2b9bbe938daf608b9f3aad29d068cc53f81ef01f805cf41970173219fe",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 100,
+            "camera_box": 10075
+          },
+          "identity_field_digest": "50bb5ac34e47075ba1fde53e06c7e551b0912b10f84abe093f387cf1522e075b",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215498436,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "2415873247906962761_5460_000_5480_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 44508,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "2656110181316327570_940_000_960_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "22ca60939c7ae8bde34d05d12f8e9937fcb75aa3b3c129878b97494be03ee943",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 95,
+            "camera_box": 17606
+          },
+          "identity_field_digest": "9a845fb09ce3b775aa8e3aea9544979ca50ead8bbffb18139f5d3b36751aa409",
+          "camera_mask_pixels": 204725760,
+          "eligible_camera_mask_pixels": 204302481,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "2656110181316327570_940_000_960_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 59828,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "16473613811052081539_1060_000_1080_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "b2c5c578018bb790184d56b4c90624a5a37f7485652750d9cb226447c7aa41a4",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 985,
+            "camera_segmentation": 100,
+            "camera_box": 9460
+          },
+          "identity_field_digest": "f9a17138fe63a623b60712627f47488db2d9ac4b04fa83b84be894c3d5c20656",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215416231,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "16473613811052081539_1060_000_1080_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 47541,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "16646502593577530501_4878_080_4898_080",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "3cf8bdf28aca18cbea596985d5a7821762fc0d910fb2035a9d4ee7131c279274",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 3362
+          },
+          "identity_field_digest": "1b3731454bf0c940e952c017bc74725ff0a9a0ff1274cae6d8ed242f8bf6e6ce",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215489920,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "16646502593577530501_4878_080_4898_080",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 18743,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "7921369793217703814_1060_000_1080_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "e434c2ca283d92fc37834d29b8a2dcba39e2f86ca4a56ceef0bcb88d12758d3c",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 100,
+            "camera_box": 10827
+          },
+          "identity_field_digest": "4428b3440803a9db71ca6860f48d576f96c610b099952e64df2bf12cc6151fdd",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215499256,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "7921369793217703814_1060_000_1080_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 60264,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "9385013624094020582_2547_650_2567_650",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "434471e59a84003f828eaa484bbcb6e60bec1f6818dacf9499f668bedd0dc78c",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 100,
+            "camera_box": 1876
+          },
+          "identity_field_digest": "cc048e821b219a13e4b5f9ab2300e18eec161fc0e4cb1c757ac09aafbb1550f9",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215498765,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "9385013624094020582_2547_650_2567_650",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 16561,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "1191788760630624072_3880_000_3900_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "7b75b47d18905cf2223930962da223be494629c2bfee93eb4ceca8ff7648a5c0",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 6155
+          },
+          "identity_field_digest": "041e20187aa48426d08ae211314dee2a8f91648f6dc823c5b82ffd7a8d79827f",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215497448,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "1191788760630624072_3880_000_3900_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 36450,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "6390847454531723238_6000_000_6020_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "aca6ebfdbdd08ee7841e9d4488a93758f32b7de1923c3e60e1f68b04d520acdb",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 14571
+          },
+          "identity_field_digest": "7ea0a0dbd9fd4a152e33ab5a878ca147c7170e868f2f1d739d6f74bd88d6c775",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215493006,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "6390847454531723238_6000_000_6020_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 45982,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "13840133134545942567_1060_000_1080_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "48b923f82ae1d0a1832fd0757cef4d6854897d7d1fc2277143f4d97e8fc534a7",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 100,
+            "camera_box": 22139
+          },
+          "identity_field_digest": "0ae22f429639afe4306d71e15d9cfb0e130277189f892b7ccf126a6f0e848e28",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215491646,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "13840133134545942567_1060_000_1080_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 79854,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "5525943706123287091_4100_000_4120_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "13a2311e47129ec7aa90ca40c43c1004b473eb663600dfa8c4d8b4b8239c1b88",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 9229
+          },
+          "identity_field_digest": "313572f1ca4d4633191504d8ec9bc867b0ce230bc6c388b45d17a23a3e1e82b3",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 214918728,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "5525943706123287091_4100_000_4120_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 42028,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "5200186706748209867_80_000_100_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "5fc0cb19846e5b8b031872cbb2ac5bc78b006ff789b54f15336743d3e6f6ca56",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 290
+          },
+          "identity_field_digest": "799d6052e16801376e86a969841216ca770e91c1d0b3b2ef1712d17580f00ea6",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215500800,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "5200186706748209867_80_000_100_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 13997,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "15696964848687303249_4615_200_4635_200",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "55fe31c4eee82abfd5475b4ee7105f83f6a6a079a94ead2db412bc9dd0b520ed",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 100,
+            "camera_box": 16755
+          },
+          "identity_field_digest": "ae034c5671898b1ca9b10957a4199d8e69a1c20f4c086d60a464ef4fe8c68bbe",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215406808,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "15696964848687303249_4615_200_4635_200",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 66386,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "10599748131695282446_1380_000_1400_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "b7e61d4b990d7a4ea480350e2fb159054bd95d69693801823dcf3cddb4379611",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 100,
+            "camera_box": 12489
+          },
+          "identity_field_digest": "4ce49e82c406208a8516f32b09d9c13e5805ccc6259c46f8abdb53959f2aa930",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215490330,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "10599748131695282446_1380_000_1400_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 60242,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "4575961016807404107_880_000_900_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "12920f325154d9d4aae3e43950f23319d16f7f1518dd26827f77498e477c537b",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 100,
+            "camera_box": 8834
+          },
+          "identity_field_digest": "df36553346082381a32e015542ec61bce696f85d20745a81fc97aadad744c8b9",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215487674,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "4575961016807404107_880_000_900_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 40543,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "10082223140073588526_6140_000_6160_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "development"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "6c4df0d46837d8298465d56a0c0c1299579feaf6cc4a24e29c72401c3e597afc",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 985,
+            "camera_segmentation": 30,
+            "camera_box": 5813
+          },
+          "identity_field_digest": "b19424d0e59cf9303cf1e82c4474080aa5c3dad71263924b67ca22397cae6d4b",
+          "camera_mask_pixels": 64650240,
+          "eligible_camera_mask_pixels": 55403739,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "10082223140073588526_6140_000_6160_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 34756,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "3657581213864582252_340_000_360_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "development"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "b9ecce06caa99e8058a3da8614426deb8a6eabdaca24b89036d4eab295a95651",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 100,
+            "camera_box": 6830
+          },
+          "identity_field_digest": "186fe0992914a62110f521852a8b1c4c2b97644abbdd07dadb63c18156b873b8",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215491820,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "3657581213864582252_340_000_360_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 31143,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "5468483805452515080_4540_000_4560_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "development"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "53dc1948c697b262332d439ec3dde5e5f59b1a57702746fa5bfcb54aff0aa93d",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 855,
+            "camera_segmentation": 90,
+            "camera_box": 4858
+          },
+          "identity_field_digest": "38616c44c6eae40a5766548a488b52b3f5e0cb362a406b332f3074b7b52d78bc",
+          "camera_mask_pixels": 193950720,
+          "eligible_camera_mask_pixels": 192544079,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "5468483805452515080_4540_000_4560_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 24803,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "4427374597960783085_4168_000_4188_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "development"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "536799677af677e6bd8494bf51074dae7585502d7d608bb2abf0510f1b1e4a77",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 7028
+          },
+          "identity_field_digest": "3eedbfb75bb2bdf698fd2dd6cd0096a7c2eac807de9b32a3f250651a3a04fb79",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215493494,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "4427374597960783085_4168_000_4188_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 25211,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "183829460855609442_430_000_450_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "development"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "4bb701a33099a6568e74d7d83bb25bb0252d1d67554e781d187842c6425ed25c",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 0,
+            "camera_box": 8592
+          },
+          "identity_field_digest": "a5b3de2601d33e5562a4558ca02a9564d60c929dd3df6fc0785f1016b6525add",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "183829460855609442_430_000_450_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 33497,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "3437741670889149170_1411_550_1431_550",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "development"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "94665f74ed15208387733acaa9f065fb8513c5435925271ccbac1c479d471e37",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 0,
+            "camera_box": 1555
+          },
+          "identity_field_digest": "2ba69f887464fcbf49e070e23f6c558708fa810070c5d536ad1dd69ec5021921",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "3437741670889149170_1411_550_1431_550",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 12534,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "9465500459680839281_1100_000_1120_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "development"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "81a2c8b8519111499147b1b76001102623055173ac994bfcf3081ae8bb911969",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 8376
+          },
+          "identity_field_digest": "c26ebd80e77968c4b3eb87cf8c4e253bfc99ba3cda03b8509dc5787eec33a767",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215498955,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "9465500459680839281_1100_000_1120_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 36773,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "18295766828140813622_6775_000_6795_000",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "development"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "66c08ba7b914efd1096679133e3e402877dd54e8821c56edc6cbc3d07428d376",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 100,
+            "camera_box": 10065
+          },
+          "identity_field_digest": "78076b85d8a71c6eb84fd493e0ee92a6da790c465f5f799f1ae9cf2c45976992",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215485227,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "18295766828140813622_6775_000_6795_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 31220,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "14262448332225315249_1280_000_1300_000",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "6a4ad2cb588b552da2d29ea5a7408c52773da55a9416318f0555afcef5a85fe5",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 0,
+            "camera_box": 15625
+          },
+          "identity_field_digest": "cbf73538464c9e4af330dbec21ed0386a89bcb7df4b42190d06da2822fdb9352",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "14262448332225315249_1280_000_1300_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 63264,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "18446264979321894359_3700_000_3720_000",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "bca2d6452fca729936bae3d1f74b925b2d7e37c8fbf3fa4c1a693443e8116eb7",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 0,
+            "camera_box": 17361
+          },
+          "identity_field_digest": "5a956a3ae12663294807b5b21ece9cccd50a497cc2e63873ce2251813d610f0e",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "18446264979321894359_3700_000_3720_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 67344,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "14687328292438466674_892_000_912_000",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "e195cad3d0d556ef1cd636a4d07851cfec29eccbccf1fc6b8f752cdc4d97b04f",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 0,
+            "camera_box": 1832
+          },
+          "identity_field_digest": "3cd67b533a68a9796d132f129d756ef90a867325ba06e4107dfc6a4c5f1f4fe9",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "14687328292438466674_892_000_912_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 24755,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "6161542573106757148_585_030_605_030",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "561ae4890e7c499f084297be1c321014664f38684fa589b5f15d9466ff6eb3ad",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 0,
+            "camera_box": 4065
+          },
+          "identity_field_digest": "5c168af199052d470038c9b6fbb65f498749228a07a9f08c659a5672648812e3",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "6161542573106757148_585_030_605_030",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 31932,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "6183008573786657189_5414_000_5434_000",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "b07a8e1b191a150391dcd9354e3a8290aca9ec3913567c4ba93b9346dcf80ae5",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 0,
+            "camera_box": 4749
+          },
+          "identity_field_digest": "aafb2ae9ec2e8157cd6459bff9e42e5d3c5691802d7a4d10be185efbe145f739",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "6183008573786657189_5414_000_5434_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 19878,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "15611747084548773814_3740_000_3760_000",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "8a61765127053695ad3916f7029ee25cf4567efb4e529dd319ea28665a937bcd",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 0,
+            "camera_box": 11674
+          },
+          "identity_field_digest": "967823be0299888cc8c1dc9ba60fd2ebb6b2c45bb3846f933eaf45b4338019e7",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "15611747084548773814_3740_000_3760_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 53901,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "30779396576054160_1880_000_1900_000",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "0a5641c3fb74132b6e9c0e80dfeffd0bebc1490db70764fa9c1feec7ba40c476",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 0,
+            "camera_box": 18321
+          },
+          "identity_field_digest": "13ff4815686420b0349da68112371d545a0f5bd25b32c8dcb7e5a8d4eaea2cbf",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "30779396576054160_1880_000_1900_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 73822,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "1457696187335927618_595_027_615_027",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "70b5eb38f799dacc21f3b7113c472c5981c0dfbfb1766049cfac9921330d6401",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 0,
+            "camera_box": 13498
+          },
+          "identity_field_digest": "96cb101bdfeb5db1d51aa80117f4a1ca2df4beacadc2a61878bdd491e60a3904",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "1457696187335927618_595_027_615_027",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 43935,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "17962792089966876718_2210_933_2230_933",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "eb6614a77c0fba020b75b279967c1928b350fd564b8979d2a4678bff71b4fc60",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 0,
+            "camera_box": 12449
+          },
+          "identity_field_digest": "f44b305daf701f7192404bd5db114844c40f021b639361f0f50f99109a82dc44",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "17962792089966876718_2210_933_2230_933",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 32172,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "18331704533904883545_1560_000_1580_000",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "b8906d639d159b11746ad716a2bb9ca5934f73be94be5095c0bc9af3198279be",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 0,
+            "camera_box": 8158
+          },
+          "identity_field_digest": "6d95fda3773cc9efec67daf9a71f7e27b097bd8aede4487c6cc7a133e7ce79fb",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "18331704533904883545_1560_000_1580_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 33759,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "17626999143001784258_2760_000_2780_000",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "444a4e76f1ddd6d0987e6eb44ab3ca0392a84dbde29ae2332081ad3653e5636e",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 0,
+            "camera_box": 14200
+          },
+          "identity_field_digest": "4736f3efa2d302c8f383b1d67478ec693b51e5eca36389f629dbbce5f2cf29eb",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "17626999143001784258_2760_000_2780_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 51151,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "7650923902987369309_2380_000_2400_000",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "4313b28bdc1a856abc02ae6e5f71acac7ab44300dd46dd811e1cfb9be7adb5c9",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 0,
+            "camera_box": 4347
+          },
+          "identity_field_digest": "9705414241ac7c9177fb84e34d689714c0809937e69849fc4b4d58d036a21aa6",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "7650923902987369309_2380_000_2400_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 22130,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "1071392229495085036_1844_790_1864_790",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "c65611d0ed5e5ae058b4251ea1c7ac25e576f656c9e4d57ff4efbca6b89b4bf5",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 0,
+            "camera_box": 4188
+          },
+          "identity_field_digest": "a2f1167a5c605dbc28b46c9bbbbe0eb2fcf3dd85ac18f6de8d804939ff085cd6",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "1071392229495085036_1844_790_1864_790",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 23571,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "8956556778987472864_3404_790_3424_790",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation",
+            "camera_validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "6f2b69b73905cd9f8de4c9ba2b0602465fd8c9102d1a57e173d12b5e3f662c1b",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 985,
+            "camera_segmentation": 490,
+            "camera_box": 29370
+          },
+          "identity_field_digest": "2d2b5bb479e68c758e03bd062d2554245e821de22afacf101e20b1f17067d63a",
+          "camera_mask_pixels": 1055953920,
+          "eligible_camera_mask_pixels": 1055887782,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "8956556778987472864_3404_790_3424_790",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 107855,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "15959580576639476066_5087_580_5107_580",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "f914adfb2bfc1534d86c2a20c7e649917b98fa7bb9108dd4f1b7357fec4c4179",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 0,
+            "camera_box": 2421
+          },
+          "identity_field_digest": "f0ee46c84ec515bdcdb5d2faf4080ea31e40ec972211b8120b362538c5a4baf3",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "15959580576639476066_5087_580_5107_580",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 14688,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "447576862407975570_4360_000_4380_000",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "f8d0a0f1bcbda5a853c24e521a6b3fc9f1a41f7617b8cdb349338009043a52d5",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 0,
+            "camera_box": 3958
+          },
+          "identity_field_digest": "94de906736bc490234ef5035f3e68c3ed941bf6fe9150c7fcaaeddab696813d4",
+          "camera_mask_pixels": 0,
+          "eligible_camera_mask_pixels": 0,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "447576862407975570_4360_000_4380_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 22637,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "1024360143612057520_3580_000_3600_000",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "b03e3efbec78dff6c987691160c3aea2507837f3b591332af6bf71a491dffeb4",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 495,
+            "camera_box": 17404
+          },
+          "identity_field_digest": "840b16b997b6341b87047a9f7bdb43d9f92f2a9d6d4e76be3b9a3fad2dd6721d",
+          "camera_mask_pixels": 1066728960,
+          "eligible_camera_mask_pixels": 1066543790,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "1024360143612057520_3580_000_3600_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 61828,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "11048712972908676520_545_000_565_000",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "c13448ae01fa62194491f0bf3baf42c6bc912154d22298204b16472c1fce00e7",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 495,
+            "camera_box": 14217
+          },
+          "identity_field_digest": "de721618edda0359f9bb229c1e28cc91d40a05a3c1d7197b2a470f6fee59171b",
+          "camera_mask_pixels": 1066728960,
+          "eligible_camera_mask_pixels": 1066455413,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "11048712972908676520_545_000_565_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 44007,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "9243656068381062947_1297_428_1317_428",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "66e209d85197f2a1d4c6c3210cdbd12aeca39b511ba8cf6bb7fc83099f72b1b6",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 495,
+            "camera_box": 15129
+          },
+          "identity_field_digest": "5c0f05d4f1302c8095860fb0f8907252ac6b50148a77b490372bc3fd84c1b77d",
+          "camera_mask_pixels": 1066728960,
+          "eligible_camera_mask_pixels": 1066377374,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "9243656068381062947_1297_428_1317_428",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 71681,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "14081240615915270380_4399_000_4419_000",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "4b0229350542b723f97ff4999ea673eccca530f040a8d2e510959eabd82d1114",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 495,
+            "camera_box": 9257
+          },
+          "identity_field_digest": "621ae3760d4e5b4c2533ea150ac56227e42489a655d83c06d2ff4ee7791a33c5",
+          "camera_mask_pixels": 1066728960,
+          "eligible_camera_mask_pixels": 1056601078,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "14081240615915270380_4399_000_4419_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 37447,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "933621182106051783_4160_000_4180_000",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "048d60577d5b131b5601b68fc558659149d03c10afaaa6307434a735e4386dd2",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 495,
+            "camera_box": 10895
+          },
+          "identity_field_digest": "c60d47a504e459b7adfcb36a6b499ed81d2c6aaee37588789703de11a16c69a9",
+          "camera_mask_pixels": 1066728960,
+          "eligible_camera_mask_pixels": 1066707776,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "933621182106051783_4160_000_4180_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 44275,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "12831741023324393102_2673_230_2693_230",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "5924e6f3d97e82675685fbafb0c77eb63fe1003b14a59849b94f7d53454b9bce",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 495,
+            "camera_box": 4039
+          },
+          "identity_field_digest": "64d8642508c5564b66ffd07ed899f66e0b32f9c7233b74649b3724b7d2cf1993",
+          "camera_mask_pixels": 1066728960,
+          "eligible_camera_mask_pixels": 1066623652,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "12831741023324393102_2673_230_2693_230",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 20147,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "6680764940003341232_2260_000_2280_000",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "fc679e3a08faca2f5af2662cf7a02de3678eadd8824c920789567bbebf21c6e1",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 495,
+            "camera_box": 10352
+          },
+          "identity_field_digest": "0f9f6407ba917a0f8895d32d2b84debb2958b1254040b611e224f09a35868b32",
+          "camera_mask_pixels": 1066728960,
+          "eligible_camera_mask_pixels": 1066690052,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "6680764940003341232_2260_000_2280_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 32392,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "18024188333634186656_1566_600_1586_600",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "a6306ebc91aed1679f823badf6e1e71c842d9e75d3cedc1cb7f2c66adc4222e9",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 470,
+            "camera_box": 12193
+          },
+          "identity_field_digest": "a6b5a9aef281cb3d7eee71d2bb61f8c9fe2ff99d44b7ac0401f8d0750e42dd89",
+          "camera_mask_pixels": 1012853760,
+          "eligible_camera_mask_pixels": 966605648,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "18024188333634186656_1566_600_1586_600",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 78720,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "8331804655557290264_4351_740_4371_740",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "d01e6d94975a3f34e4fa103c6df768553822b4cbe65cdb0284699eb40e662cad",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 495,
+            "camera_box": 9297
+          },
+          "identity_field_digest": "f332a602e32e120ee821337e3b5d4c7e6ecf2a4a6130cbcdb6535de38eebac3b",
+          "camera_mask_pixels": 1066728960,
+          "eligible_camera_mask_pixels": 1065889770,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "8331804655557290264_4351_740_4371_740",
+          "retained_files": 31,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 39379,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "2094681306939952000_2972_300_2992_300",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "b61112ce38828560baaf84530ed34f17a22ea2df3c588f1280780e6536a7fcf4",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 495,
+            "camera_box": 20937
+          },
+          "identity_field_digest": "d7d0e50751b58d6f451f2d3c40111b0f219f63b26e804821dd4095c085efdedd",
+          "camera_mask_pixels": 1066728960,
+          "eligible_camera_mask_pixels": 1066700667,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "2094681306939952000_2972_300_2992_300",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 59303,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "4575389405178805994_4900_000_4920_000",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "1cce32d7c1cbf8de0d2274a6f9d6c4a1cc24f4be8da191b6594acfea318fbe24",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 495,
+            "camera_box": 17728
+          },
+          "identity_field_digest": "46106444a5eb2e14c50b5801dc8d7cd2cee35e3843081ac575bb5e341f315680",
+          "camera_mask_pixels": 1066728960,
+          "eligible_camera_mask_pixels": 1066308641,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "4575389405178805994_4900_000_4920_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 68840,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "7119831293178745002_1094_720_1114_720",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "38fc7f12e13fdba1869ffc9830acbae6e0b3cfe3a15c13cbe469abb56b3af95f",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 495,
+            "camera_box": 4938
+          },
+          "identity_field_digest": "8ce90ac8d86eb55e2fd7f4e23c4ca205751435d77ff336a7ea37e0da5d11945f",
+          "camera_mask_pixels": 1066728960,
+          "eligible_camera_mask_pixels": 1066718364,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "7119831293178745002_1094_720_1114_720",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 24350,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "5372281728627437618_2005_000_2025_000",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "e3666040c7d7140f13e760709ee817223917e3197b31202e0fb938d54a0e483a",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 490,
+            "camera_box": 8694
+          },
+          "identity_field_digest": "23fd59bdaf930334fedb316acc9d75162e7ee1a009b8e251f1c4447f8956e514",
+          "camera_mask_pixels": 1055953920,
+          "eligible_camera_mask_pixels": 1055023527,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "5372281728627437618_2005_000_2025_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 21657,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "13982731384839979987_1680_000_1700_000",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        },
+        "kind": "full",
+        "checkpoint_sha256": "9aa329dd2efa589b0175bfc225bcee0c33bfdb0cce6073764f38b2a04e1c90f6",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 995,
+            "camera_segmentation": 300,
+            "camera_box": 7033
+          },
+          "identity_field_digest": "560db24f1a411c6de783f71093357d90f88c7d2db8e77bf7c84ffe5d5ae542dc",
+          "camera_mask_pixels": 646502400,
+          "eligible_camera_mask_pixels": 562477903,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "13982731384839979987_1680_000_1700_000",
+          "retained_files": 30,
+          "worker_receipts": 16,
+          "verified_evictions": 3,
+          "evicted_artifacts": 39902,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "15036582848618865396_3752_830_3772_830",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "pilot",
+        "checkpoint_sha256": "d4dac4b10ed62302d7426afb2f6a69d72aeaf86207a0ea2b70acf24e664d5224",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 100,
+            "camera_box": 9198
+          },
+          "identity_field_digest": "617157e605957314e6198abbb44643f615cb185e29a8340ac4d14b0e801c5d82",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215500240,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "15036582848618865396_3752_830_3772_830",
+          "retained_files": 31,
+          "worker_receipts": 5,
+          "verified_evictions": 1,
+          "evicted_artifacts": 11482,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "1730266523558914470_305_260_325_260",
+        "membership": {
+          "official_split": "training",
+          "research_splits": [
+            "train"
+          ]
+        },
+        "kind": "gap",
+        "checkpoint_sha256": "cbf1905d2ea8dfb91ce6fbc130072d6da770a5ddd0a8b9c8694d95a400624063",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 985,
+            "camera_segmentation": 100,
+            "camera_box": 10185
+          },
+          "identity_field_digest": "2e073aa1e700ecea6f58997f5843f3199781a5d17aa19570e1d989900ea06723",
+          "camera_mask_pixels": 215500800,
+          "eligible_camera_mask_pixels": 215492064,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "1730266523558914470_305_260_325_260",
+          "retained_files": 36,
+          "worker_receipts": 5,
+          "verified_evictions": 1,
+          "evicted_artifacts": 12459,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      },
+      {
+        "scene": "4759225533437988401_800_000_820_000",
+        "membership": {
+          "official_split": "validation",
+          "research_splits": [
+            "camera_validation"
+          ]
+        },
+        "kind": "gap",
+        "checkpoint_sha256": "d59be9ac9708072f6655685420f0f06664e21d23c4a311b961dcf001e9e04621",
+        "camera_validation": {
+          "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+          "rows": {
+            "camera_image": 990,
+            "camera_segmentation": 495,
+            "camera_box": 10961
+          },
+          "identity_field_digest": "fef5d046628c74e54e4ebc74e0973126a6037234a2ce0fdb65d5cdeda3a17bd1",
+          "camera_mask_pixels": 1066728960,
+          "eligible_camera_mask_pixels": 1066703628,
+          "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+        },
+        "lifecycle": {
+          "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+          "scene": "4759225533437988401_800_000_820_000",
+          "retained_files": 36,
+          "worker_receipts": 5,
+          "verified_evictions": 1,
+          "evicted_artifacts": 14430,
+          "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+        }
+      }
+    ],
+    "worker_resources": {
+      "elapsed_seconds": 268.64913368801353,
+      "peak_rss_kib": 188088,
+      "rss_scope": "worker_process_peak"
+    },
+    "scope": "complete native camera measurement/annotation publication, two native replays and eviction lineage; model/geometry/protocol scientific comparisons remain open"
+  },
+  "live_log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-full103-retained-audit-v1/output/live.log",
+  "live_log_sha256": "f65faa74e58e95ebc6c1bd6f93747ceeaa91ec45871ea62a6a9a3641c09f71f0",
+  "output": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-full103-retained-audit-v1/output",
+  "scope": "all103 original camera lifecycle native evidence independently admitted live; point-grid/train/eval remain separate"
+}

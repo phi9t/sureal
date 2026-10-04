@@ -1,0 +1,13 @@
+{
+  "status": "first scientific training point archive replay independently verified live",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/training-replay-a/receipt.json",
+  "receipt_sha256": "76cf197644a5baf497f666e34b00809295d9e07dad19ccf7fd08756dbcc125d1",
+  "scene": "1730266523558914470_305_260_325_260",
+  "validation": {
+    "records": 1970,
+    "points": 32547972,
+    "identity_array_digest": "cf24938556dffc7591a461d4bf0762ccdcf1870042e849f5b8dc2f2c0e230b6d",
+    "status": "all returned arrays independently match verified source point records"
+  },
+  "scope": "one scientific scene point records; camera/detector input assembly, remaining cohort and protocol acceptance remain open"
+}

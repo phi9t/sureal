@@ -1,0 +1,7 @@
+{
+  "pid": 2348064,
+  "script": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.scratch/await-semantic-recovery-admission-v4.py",
+  "script_sha256": "4f7f58011949abf7ea8ef99899209c1279ccf32683c3d581f343d699289d2b4f",
+  "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/continuation-logs/semantic-recovery-admission-v4.log",
+  "status": "started fresh outputs for remaining16; prior six admissions and refused seventh retained"
+}

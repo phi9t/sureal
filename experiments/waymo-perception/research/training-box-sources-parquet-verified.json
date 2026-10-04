@@ -1,0 +1,85 @@
+{
+  "status": "live native-source adapter fixtures verified; full64 payload replay pending",
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/training-box-sources-green-b/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--",
+        "python",
+        "-c",
+        "import importlib.util,sys,unittest; assert importlib.util.find_spec('tensorflow') is None; suite=unittest.defaultTestLoader.discover('tests',pattern='test_training_box*.py'); result=unittest.TextTestRunner(verbosity=2).run(suite); assert result.testsRun==13 and not result.skipped; sys.exit(not result.wasSuccessful())"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "verified_utc": "2026-10-01T03:18:18.441400+00:00",
+  "elapsed_seconds": 0.24484476499492303,
+  "peak_child_rss_kib": 15652,
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "candidate_hashes": {
+    "pipeline/training_box_sources.py": "ca8d6c94890b177446aba33bffac66f905c99124dd32b575278e6acd4b9be3db",
+    "pipeline/training_box_statistics.py": "426e5983f11416215f007aae534afce99dfa969214a5532ee4a8675bed84413f",
+    "tests/test_training_box_sources.py": "65eef64b1c5c67edb37743b674a047c6cb87e2d0f5c72975afb1d663b0f1ed50",
+    "tests/test_training_box_statistics.py": "acbc99e182f34bf37676f96c2f18fdc0231f1218a2068043c4c988d07e96e2dd"
+  },
+  "artifacts": {
+    "live.log": "33dda9db3e992a1293e439afd84004ad76aeefce53284dd842224996592d604e"
+  },
+  "validation": {
+    "test_groups": 13,
+    "adapter_groups": 9,
+    "statistics_groups": 4,
+    "source_completeness": "omitted/extra/duplicate sources rejected, zero-row and unknown-only sources completed",
+    "geometry": "literal native length/width/height/center-Z medians and p10/p90; no ROI or track deduplication",
+    "failure_gates": "non-training, row count, native key, duplicate unknown row, malformed geometry, late read failure",
+    "scope": "analytic native source-boundary fixtures only; no actual64-source statistics, anchors or scientific gate closure",
+    "parquet_boundary_groups": 1,
+    "tensorflow_absent": true
+  },
+  "red_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/training-box-sources-red-a/receipt.json",
+  "red_receipt_sha256": "e438048cdbdc83428a9dc6e37cb7e3f88456b1facc990b4b2027450272b6e488",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/training-box-sources-green-b/receipt.json",
+  "receipt_sha256": "2e7053d0ec98a2ae17f6ce0443f00cb89945d3b7ba166af782612d6e456fab33"
+}

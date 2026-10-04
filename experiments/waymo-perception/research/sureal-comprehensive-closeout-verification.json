@@ -1,0 +1,57 @@
+{
+  "passed": true,
+  "scope": "fresh applicable closeout tests plus independent original-source/live evidence reconciliation; no new model training or fullresource admission",
+  "checks": [
+    {
+      "name": "portable-publication-unit",
+      "tests": 24,
+      "failures": 0,
+      "errors": 0,
+      "log": "/tmp/sureal-comprehensive-closeout-portable-tests.log",
+      "interpreter": "hostPython3.14.5",
+      "log_sha256": "d6bc62fece4246f3c0bcda522385a8f486f170c601def6293d9338d2c05776a3"
+    },
+    {
+      "name": "offline-numerical-canonical",
+      "tests": 209,
+      "failures": 0,
+      "errors": 0,
+      "skips": 10,
+      "log": "/tmp/sureal-comprehensive-closeout-numerical-py310.log",
+      "interpreter": "CPython3.10.21",
+      "numpy": "1.26.4",
+      "log_sha256": "aecf872a867861b74bd3e139fd27b201a97c97a3f7df4583bfa15586fc11a1db"
+    },
+    {
+      "name": "live-offline-CPU-Torch",
+      "tests": 312,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "evidence": "sureal-comprehensive-closeout-independent-supplement.json",
+      "scope": "287CPU+25TorchCPU, no GPU/optimizer execution; real16GiB/swap0"
+    },
+    {
+      "name": "dispatch-bootstrap",
+      "checks": [
+        "list",
+        "show residual_bev"
+      ],
+      "evidence": "sureal-comprehensive-closeout-passing-tests-dispatch.json",
+      "scope": "no new runner or scientific admission"
+    }
+  ],
+  "publication_audit": {
+    "errors": [],
+    "gitlinks": 2,
+    "max_blob_bytes": 26214400,
+    "schema_version": 1,
+    "status": "pass",
+    "tracked_files": 3905
+  },
+  "independent_test_receipt_sha256": "a40247475ec8dfd5d79b506951cbeed43c4c3efc164e7c644cb7dbedd6c10198",
+  "independent_hdfs_receipt_sha256": "54782f267b3c7435802ee329391dd7284382e0736d2efef931c76cea98c53a49",
+  "failed_epochs": "v1-v4 prelaunch refusals; v5/v6 failed environment suites; v7 passed suites but failed whole dispatcher attempt; v8 namespace bind failure; v9 separately passes list/show; all roles retained",
+  "blocked_source_files": 19,
+  "full_program_complete": false
+}

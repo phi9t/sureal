@@ -1,0 +1,21 @@
+{
+  "checks": [
+    {
+      "case": "exact",
+      "limit_bytes": 2048,
+      "exit_code": 1,
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\nOSError: [Errno 22] Invalid argument\n"
+    },
+    {
+      "case": "aligned",
+      "limit_bytes": 4096,
+      "exit_code": 0,
+      "stderr": ""
+    }
+  ],
+  "successful_archive_bytes": 3022008320,
+  "failed_archive_bytes": 3251701760,
+  "failed_archive_padding_bytes": 2048,
+  "cause": "native client O_DIRECT final write rounds to4096 bytes before truncate; exact unaligned RLIMIT_FSIZE yields EINVAL",
+  "scope": "local reproduction and native source inspection; bounded aligned staging fix and live real recovery remain required"
+}

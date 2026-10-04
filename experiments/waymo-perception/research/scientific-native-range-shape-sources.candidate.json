@@ -1,0 +1,1662 @@
+{
+  "status": "candidate source inventory; no real shape replay executed",
+  "acquisition_sha256": "c181a07edc21731a3e1b74a2274e286c9bc4207e6e0c46e6a1f2403978608370",
+  "sources": [
+    {
+      "scene": "1730266523558914470_305_260_325_260",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-1730266523558914470_305_260_325_260.json",
+      "source_receipt_sha256": "56623cf07392e7a78a8cebe8978571524162f5c9a8c5996267855fe6cac3957c",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/1730266523558914470_305_260_325_260.parquet",
+      "source_sha256": "353a45f3e82059ed2dc5aace569e0eb4bae3ece4991b43c166befbc08d6500b8",
+      "source_bytes": 165876979,
+      "native_rows": 985,
+      "native_key_sha256": "1bb6ef00c9441c73a244230b0c216133fe8a8599cc7d5b569959c7651763885f"
+    },
+    {
+      "scene": "15036582848618865396_3752_830_3772_830",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-15036582848618865396_3752_830_3772_830.json",
+      "source_receipt_sha256": "bf7da9ee53987ce4e1827d3498e50948ddb2338e452ffb3f169cf041f4f67202",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/15036582848618865396_3752_830_3772_830.parquet",
+      "source_sha256": "116a426c9067316e505ffd9a4973671e17af68a3fe727e90462b9fe86d46cad3",
+      "source_bytes": 175827564,
+      "native_rows": 990,
+      "native_key_sha256": "8777bd3035a29ca33cb57a040315569eed26f707df51811ff6daf23c11a6b5d0"
+    },
+    {
+      "scene": "11343624116265195592_5910_530_5930_530",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-11343624116265195592_5910_530_5930_530.json",
+      "source_receipt_sha256": "d57f73e796b51a13aac5104f713dbc0979f11aa786b488af836320d1a2b5137a",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/11343624116265195592_5910_530_5930_530.parquet",
+      "source_sha256": "1df53f3b74410aa9cdf78d1f3b45bf49e695090edfb48439c609419939fc3bda",
+      "source_bytes": 148020782,
+      "native_rows": 995,
+      "native_key_sha256": "8bb6ac740c21a13d771d99a80b2658b3c93bf53420676816cc55a1b95840fd82"
+    },
+    {
+      "scene": "4447423683538547117_536_022_556_022",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-4447423683538547117_536_022_556_022.json",
+      "source_receipt_sha256": "e8fe8048094f925e0b36bd1e03336b12ecf6dddb018a493fc9988bf306bad94d",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/4447423683538547117_536_022_556_022.parquet",
+      "source_sha256": "c133d9b58239525ef354744904932eb0b4b3843745ed69141b72663caa3afa54",
+      "source_bytes": 161719933,
+      "native_rows": 990,
+      "native_key_sha256": "c69b3ab198c94cf72d565245903de7caef9168368206cfd1474441495fdf6d28"
+    },
+    {
+      "scene": "14503113925613619599_975_506_995_506",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-14503113925613619599_975_506_995_506.json",
+      "source_receipt_sha256": "a81e2149b0814f5ce19e0d6c6728e2bfa30043369bde01db06979c9470a20ce5",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/14503113925613619599_975_506_995_506.parquet",
+      "source_sha256": "30e32bcf58430d65ac7dabbcbb9e78fdc62839521ed3b8b5f528eba2ac59e714",
+      "source_bytes": 178337916,
+      "native_rows": 990,
+      "native_key_sha256": "5cbbbdaa86eb9b7912fee309f35d5464553fdbe57880de02e922f66d7263a2b9"
+    },
+    {
+      "scene": "3375636961848927657_1942_000_1962_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-3375636961848927657_1942_000_1962_000.json",
+      "source_receipt_sha256": "d9b4351dccd428db0da8ba42de24467be905c095c1170aa6402dee79ffe00f10",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/3375636961848927657_1942_000_1962_000.parquet",
+      "source_sha256": "a1fba97eaf0031f671d4d8f8adfde555159946b4e8a9bf03a6861b718db43f7e",
+      "source_bytes": 146544887,
+      "native_rows": 990,
+      "native_key_sha256": "d68cc985501677671e8bc2d7edf8bf5b3bb99865dc978ea85aadfb6266913d90"
+    },
+    {
+      "scene": "6813611334239274394_535_000_555_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-6813611334239274394_535_000_555_000.json",
+      "source_receipt_sha256": "d739675c2f48a0d0baef25227a8708bbaeb2d4d8ff202c028de284b89b807992",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/6813611334239274394_535_000_555_000.parquet",
+      "source_sha256": "34b1c9cc2e6d01b3e70de29a9b093e37848d7d156ca3dcf6b0a37791a7c1fee3",
+      "source_bytes": 159424888,
+      "native_rows": 975,
+      "native_key_sha256": "6289fc58924db031ca47d6c79cec56a54dd1ec481cf4f0cce1fd6cba66261dc2"
+    },
+    {
+      "scene": "990914685337955114_980_000_1000_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-990914685337955114_980_000_1000_000.json",
+      "source_receipt_sha256": "6e0818be70d0c34fe1504ab822aff92120c86e166b41bd0759efc6456bcae150",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/990914685337955114_980_000_1000_000.parquet",
+      "source_sha256": "2a6e40d0514d9f8a08b9bda34de5e5de2702b5d2d419d399c703dcfc124c66d8",
+      "source_bytes": 172538822,
+      "native_rows": 990,
+      "native_key_sha256": "b48cec8f9efb9d1e5f2cb11b0f013fac3b10753cbde5f3ab58602d8e7ec95cfc"
+    },
+    {
+      "scene": "8796914080594559459_4284_170_4304_170",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-8796914080594559459_4284_170_4304_170.json",
+      "source_receipt_sha256": "73e6c9d7ed7f3d2ed9d54a87cfcaa45fa1aa7025116aed66ac415fa4dcd138f8",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/8796914080594559459_4284_170_4304_170.parquet",
+      "source_sha256": "7a8ba4eedeeb57b35dbb1213d14287f1d6d36547aed67d815c24045670e0bbbe",
+      "source_bytes": 182181040,
+      "native_rows": 995,
+      "native_key_sha256": "a22f1e2d7de1e44bc584fb109811b865a7d5d97b4507e7d4857450dd84a40bf8"
+    },
+    {
+      "scene": "12257951615341726923_2196_690_2216_690",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-12257951615341726923_2196_690_2216_690.json",
+      "source_receipt_sha256": "2979d526e236e31c3e92110fb7d2e3f6a299d6d5fca3e5cb633f3d3fb978410b",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/12257951615341726923_2196_690_2216_690.parquet",
+      "source_sha256": "1edc8915138b6f11596a2ea2b6fa2ccd2cafc5a5f71c9d11c3c171c689380f6e",
+      "source_bytes": 168260828,
+      "native_rows": 990,
+      "native_key_sha256": "a299966844b7e7dbd55bd72503f65910395fd63ffcb36dbf050d73453f6ab2cf"
+    },
+    {
+      "scene": "13186511704021307558_2000_000_2020_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-13186511704021307558_2000_000_2020_000.json",
+      "source_receipt_sha256": "4985bddebba39b0de44c2860f230ef67e7516c2b758e77a1af2ea41964794ca1",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/13186511704021307558_2000_000_2020_000.parquet",
+      "source_sha256": "44d5c9b3aba186af73aa47ef86e2049e8affcf099366b1d1f71e6f17991fe5cc",
+      "source_bytes": 153648522,
+      "native_rows": 990,
+      "native_key_sha256": "8167b3bcc05dfa18f5fddba43a28790a9fdf4edb2b35a8c5b6612522129f7445"
+    },
+    {
+      "scene": "17885096890374683162_755_580_775_580",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-17885096890374683162_755_580_775_580.json",
+      "source_receipt_sha256": "b15500a3e80bc790cce78b189b3b62d254edd645a76f506d440e5a065cef8400",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/17885096890374683162_755_580_775_580.parquet",
+      "source_sha256": "699a96dc1b0f37173827fd9791545ba1e2380ad89c6feb8e5f7f8bb49555e953",
+      "source_bytes": 201322429,
+      "native_rows": 990,
+      "native_key_sha256": "cfae6270fd849946bf803a09c33ce06993cab9bd46ad6009e30fa8060df361e1"
+    },
+    {
+      "scene": "7912728502266478772_1202_200_1222_200",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-7912728502266478772_1202_200_1222_200.json",
+      "source_receipt_sha256": "4da3f09466f2b2fa12de2fb0d43b4dffc953adee774ab562ec60d2c5e029f240",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/7912728502266478772_1202_200_1222_200.parquet",
+      "source_sha256": "aeafba53ea3fdda2f303abedf578b307a140bd01d8fa42c1cc085a963c5ff59c",
+      "source_bytes": 172335048,
+      "native_rows": 980,
+      "native_key_sha256": "b6cbc8eb50f33d1062bce623be7ad6d33fa49e9aaefcfdb72e4461c5a7f131c2"
+    },
+    {
+      "scene": "4723255145958809564_741_350_761_350",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-4723255145958809564_741_350_761_350.json",
+      "source_receipt_sha256": "74e676b1f87d58739600cb90d6eccb0c53fbcf9dacb564f240a72a9d7c5b7b5f",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/4723255145958809564_741_350_761_350.parquet",
+      "source_sha256": "ae5c8ce688379027a7116cf09ea282b043b0674488fdd67b57f98eb397df34ca",
+      "source_bytes": 180842191,
+      "native_rows": 995,
+      "native_key_sha256": "518b5802fc542c91867c4d362546608c7f9aa6948cfcb0942405489b2dc4312c"
+    },
+    {
+      "scene": "8454755173123314088_3202_000_3222_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-8454755173123314088_3202_000_3222_000.json",
+      "source_receipt_sha256": "38f5aa737284b2ad8cb99bed98c4166cf3f179cfe2f2645589864a72e72cd4c4",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/8454755173123314088_3202_000_3222_000.parquet",
+      "source_sha256": "9fc7c40541ca29138b4c3076c578006dc7452b4934aedd2fc8ac90c40b90e127",
+      "source_bytes": 150917671,
+      "native_rows": 990,
+      "native_key_sha256": "d2298999c2456ecd236c665987b8c48a2b8d9477f26f1782fb141deb372d8f91"
+    },
+    {
+      "scene": "3894883757914505116_1840_000_1860_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-3894883757914505116_1840_000_1860_000.json",
+      "source_receipt_sha256": "5cbeaf791f6705dac1e9ffa4ea0d049bf08d8d80d1f43d80103ca1b2147a640c",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/3894883757914505116_1840_000_1860_000.parquet",
+      "source_sha256": "b6ddab601545339147cec9eb6372e6096bc8be1527b9f49af1f67eab8826e43b",
+      "source_bytes": 171306643,
+      "native_rows": 985,
+      "native_key_sha256": "bfe90cf7b0cfa784bfaa92df6c47be9392b16461105743049a25ab412384265f"
+    },
+    {
+      "scene": "13271285919570645382_5320_000_5340_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-13271285919570645382_5320_000_5340_000.json",
+      "source_receipt_sha256": "9d549297de175ec2456867bc3d2cd57538899324573de06926ea182a313c4731",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/13271285919570645382_5320_000_5340_000.parquet",
+      "source_sha256": "99e411c13be30dbc9913fa259cc0dfe2b987cf689dcb57d5a61c47abc4c25b7c",
+      "source_bytes": 175712056,
+      "native_rows": 995,
+      "native_key_sha256": "c3956abb601e8f70b8377428d8e1b85f3e7d68a601d4c3dea72d189aaf61fd09"
+    },
+    {
+      "scene": "8345535260120974350_1980_000_2000_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-8345535260120974350_1980_000_2000_000.json",
+      "source_receipt_sha256": "e3c690423fe33b6948c4dba9a0515093c22c81501b670833847e753f479c63ae",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/8345535260120974350_1980_000_2000_000.parquet",
+      "source_sha256": "af8aab2e481eaa40c503b103be5fae677ae054fc04e4e46c98d19df53947df36",
+      "source_bytes": 179249006,
+      "native_rows": 995,
+      "native_key_sha256": "e1b2952eceac255ffc8e3e34c7429ab22706d31ac35a218a9607f2217867e355"
+    },
+    {
+      "scene": "1357883579772440606_2365_000_2385_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-1357883579772440606_2365_000_2385_000.json",
+      "source_receipt_sha256": "44e883cc6ef3fef43137996054dd77dee6ef33ec46914a47f305abeca63ee956",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/1357883579772440606_2365_000_2385_000.parquet",
+      "source_sha256": "db58f07189d46f38269df876419c255e31c166ef374ed6bfd42e1461976802de",
+      "source_bytes": 149637843,
+      "native_rows": 990,
+      "native_key_sha256": "03f3da2aea25ce2eff45f3f5c8462bf3f71438e165ff3522e92c8e63e25908e9"
+    },
+    {
+      "scene": "16977844994272847523_2140_000_2160_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-16977844994272847523_2140_000_2160_000.json",
+      "source_receipt_sha256": "4600513c09fe8b348947dbc8cbae838472a290200bbb672216c2e3c596d9b00a",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/16977844994272847523_2140_000_2160_000.parquet",
+      "source_sha256": "68978710deb6710a98c4423c26724e95ea29b8d3dc9debcf0a35528253e16f9d",
+      "source_bytes": 155549083,
+      "native_rows": 990,
+      "native_key_sha256": "705d2398d2ad71db46767100b992c6d27495d799a116b853095f73b8fb730bdb"
+    },
+    {
+      "scene": "4487677815262010875_4940_000_4960_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-4487677815262010875_4940_000_4960_000.json",
+      "source_receipt_sha256": "07af71e00f191520ab262c16a75745339aee75d0964f7ef67d9bcf65b13a21f9",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/4487677815262010875_4940_000_4960_000.parquet",
+      "source_sha256": "5a1a79113730875a6c84ce974ec16243d23e5570d4235ab508afaaee3c4c14bf",
+      "source_bytes": 176500200,
+      "native_rows": 990,
+      "native_key_sha256": "216adbe3d775677a1da7a2356b78d100aca0cb47eb76aa0f42ba5d878ff99a06"
+    },
+    {
+      "scene": "809159138284604331_3355_840_3375_840",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-809159138284604331_3355_840_3375_840.json",
+      "source_receipt_sha256": "753c80007b05a1c917c0056a88d551ce19aa411c9a535521454b2574576e378e",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/809159138284604331_3355_840_3375_840.parquet",
+      "source_sha256": "c772fc361e13cf1829962db9764a7f70d94e702a5811b0c3adb035ac7514ee5b",
+      "source_bytes": 178890646,
+      "native_rows": 995,
+      "native_key_sha256": "0d4a0fc1f13fd4f93719d014bdc79c22286b17b0e1a6c7ae896027a203510b65"
+    },
+    {
+      "scene": "3966447614090524826_320_000_340_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-3966447614090524826_320_000_340_000.json",
+      "source_receipt_sha256": "4f072ff374e1779b9bdcd17efdaf2dcfab3449928069db50a407fcca42e36dbd",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/3966447614090524826_320_000_340_000.parquet",
+      "source_sha256": "62be17cbcc67a26f2a83b1c5bc683c73603f68faca411a1de8130e1edea5e45e",
+      "source_bytes": 175128803,
+      "native_rows": 990,
+      "native_key_sha256": "1650d71746c15bf65bd81763ce1e10c46cd70fa40b5eede3daf6c1c9e0d311c6"
+    },
+    {
+      "scene": "5083516879091912247_3600_000_3620_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-5083516879091912247_3600_000_3620_000.json",
+      "source_receipt_sha256": "39991bd087ca937939413447fe09014bacbe79fb8d9879f84fd76815b946efcb",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/5083516879091912247_3600_000_3620_000.parquet",
+      "source_sha256": "ab56cdb3e089a55a2dc5a4ddb71b8d4de4a5f70df8339cf409d92e67a301e721",
+      "source_bytes": 171331508,
+      "native_rows": 985,
+      "native_key_sha256": "bcda545b078cb4f224a249f3169d6dcacd2c73785cf19f0db3601b965b0130e0"
+    },
+    {
+      "scene": "6142170920525844857_2080_000_2100_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-6142170920525844857_2080_000_2100_000.json",
+      "source_receipt_sha256": "884c262adc7ea91b694bf474bf63c6c003c1646d1623cdee640b6d23f25ee274",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/6142170920525844857_2080_000_2100_000.parquet",
+      "source_sha256": "11bcfda240d04373ab478964da022ea5b2f10f83c3a9bdc1fc3c13bef958d3ec",
+      "source_bytes": 170251151,
+      "native_rows": 995,
+      "native_key_sha256": "3d5104ac167b2f1c6e665313d9e07c028e393e035d18029b5a0b2c882a0790e9"
+    },
+    {
+      "scene": "17782258508241656695_1354_000_1374_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-17782258508241656695_1354_000_1374_000.json",
+      "source_receipt_sha256": "f802c730fd47e5c7f77f6ae678df32fdd083977d1879026be21626702981eff7",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/17782258508241656695_1354_000_1374_000.parquet",
+      "source_sha256": "c4e69880892b32d33737a68eb1ed2300d8ed8d82cf58267de4a17e29efc624f8",
+      "source_bytes": 175623174,
+      "native_rows": 990,
+      "native_key_sha256": "7a872b2f10920099da5cf7c08583173a0baeb01d5aa274d181538a4278329584"
+    },
+    {
+      "scene": "13830510593707564159_5575_000_5595_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-13830510593707564159_5575_000_5595_000.json",
+      "source_receipt_sha256": "304dd906206b5477bc2e08baf47a76a40d51ba152779173bf3101fa1c250dc57",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/13830510593707564159_5575_000_5595_000.parquet",
+      "source_sha256": "16bfa3b0a590e9effb45897301d8ebe496e7cb9edb167bb13b8d616192729c00",
+      "source_bytes": 133075237,
+      "native_rows": 995,
+      "native_key_sha256": "1f84a61690f3b1839b6f86c215c5eddad760d3623955fc09fd8f0a08266a7c7d"
+    },
+    {
+      "scene": "14369250836076988112_7249_040_7269_040",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-14369250836076988112_7249_040_7269_040.json",
+      "source_receipt_sha256": "3e25b40da125a544c018bb129429598b9ba7cbfbb42ee4e0db6955ff931a7b79",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/14369250836076988112_7249_040_7269_040.parquet",
+      "source_sha256": "8ba6d04e2b91b0b46c60c8763899541840e81c53ddc62aa3ef1986ef1b1d33c6",
+      "source_bytes": 183927070,
+      "native_rows": 995,
+      "native_key_sha256": "11239e34046a365b574b4ded86fd527153e7d96015b7eb091080b3b2b315837a"
+    },
+    {
+      "scene": "11004685739714500220_2300_000_2320_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-11004685739714500220_2300_000_2320_000.json",
+      "source_receipt_sha256": "57766cc02690b38b15246485e2b1b871b2dfff3579777a37046b15dfbd952cc8",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/11004685739714500220_2300_000_2320_000.parquet",
+      "source_sha256": "6a50a292072d7ee25dbe56495e163a491a922cce195df85cbd8d24de2971569c",
+      "source_bytes": 125935515,
+      "native_rows": 995,
+      "native_key_sha256": "c323470645873747c514cdaa56989a7ca38eafe6f7d71d1c733bb7117b7a7e55"
+    },
+    {
+      "scene": "15539619898625779290_760_000_780_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-15539619898625779290_760_000_780_000.json",
+      "source_receipt_sha256": "b0fb00f0e5de15f43bb34f06f1d764a5fb6a19549a45a27d25d3dcc4e1b2c8a5",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/15539619898625779290_760_000_780_000.parquet",
+      "source_sha256": "3b9590237d4cb1a21a45a60d7cf1fed77cf7db51f14a5d896f0188e80fbfc0a4",
+      "source_bytes": 165167697,
+      "native_rows": 990,
+      "native_key_sha256": "92feecbe799df6e6e329b6927c5c8fd094a20ea538242cd837914b5a1fe201cb"
+    },
+    {
+      "scene": "14004546003548947884_2331_861_2351_861",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-14004546003548947884_2331_861_2351_861.json",
+      "source_receipt_sha256": "3e7e32921a4c35319054d73f516a7f1788145df61eb1917e47c3d1c5e6b63207",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/14004546003548947884_2331_861_2351_861.parquet",
+      "source_sha256": "be68ce3db9f04b3a1da1b374692a0f6a295aa1940beaff6225816369226b7e4d",
+      "source_bytes": 185306565,
+      "native_rows": 990,
+      "native_key_sha256": "5addb0ed5d4f79d39aed6efff5d0f5a03f75cae22b6f963b411bd7504abdca9c"
+    },
+    {
+      "scene": "1005081002024129653_5313_150_5333_150",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-1005081002024129653_5313_150_5333_150.json",
+      "source_receipt_sha256": "93a486dfaa7f1583c16da5d29ea89da6f3e7365dda1011ff231d6b9938658f7d",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/1005081002024129653_5313_150_5333_150.parquet",
+      "source_sha256": "8c7761a760d0793493251f4abdfc181a45d1af6697408f50c88baea0afbbc044",
+      "source_bytes": 171304448,
+      "native_rows": 995,
+      "native_key_sha256": "6da0d7b057cba476883a004ee1b3c533fbd1c4ebd878e7c1e3ae598baef6cc46"
+    },
+    {
+      "scene": "13506499849906169066_120_000_140_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-13506499849906169066_120_000_140_000.json",
+      "source_receipt_sha256": "f1266d7915e3c44f2f51f821075ce9932f11c6a8803aaae3d5ce1943148ab5ab",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/13506499849906169066_120_000_140_000.parquet",
+      "source_sha256": "2d7d5886a1e7bf28ceff52dc80e534f02c02845a3972ae36bed96692036be279",
+      "source_bytes": 159490566,
+      "native_rows": 990,
+      "native_key_sha256": "5d3fcfd16d551c177dc71682ee98b52a090a410bf9fdcca222e1e90dfeaa2f5b"
+    },
+    {
+      "scene": "6559997992780479765_1039_000_1059_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-6559997992780479765_1039_000_1059_000.json",
+      "source_receipt_sha256": "d07cc2bbdfba7300473446fd1a41dce2f411eb34d17e19207aba0a52a5395c68",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/6559997992780479765_1039_000_1059_000.parquet",
+      "source_sha256": "f6295d9cf7964cf37ef14c8e3fbbd0e280896e058ebf42c24259330db9e2fc5b",
+      "source_bytes": 175760365,
+      "native_rows": 995,
+      "native_key_sha256": "5690cd7ffface5d0e8bf5c4ca5a22a0880f811d68f2caeb59d237698d453ef5f"
+    },
+    {
+      "scene": "3224923476345749285_4480_000_4500_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-3224923476345749285_4480_000_4500_000.json",
+      "source_receipt_sha256": "99a11c115bc9763b212f752ca88fbfd7840ca4f34c635244d83c4c7389db46a5",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/3224923476345749285_4480_000_4500_000.parquet",
+      "source_sha256": "f3c7b0ed83aece671cc8c569d9551925dfd94f0378cb3a9bdfcc212914f596ca",
+      "source_bytes": 177658716,
+      "native_rows": 985,
+      "native_key_sha256": "b5ac679a3296fef8c4190fdf434542921c2760442f0c1a798727c50cccb23c9d"
+    },
+    {
+      "scene": "14250544550818363063_880_000_900_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-14250544550818363063_880_000_900_000.json",
+      "source_receipt_sha256": "32d42f7c9ef17efef188614e9d4ae2f999983cec1bda186cb0ace3929bf73fec",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/14250544550818363063_880_000_900_000.parquet",
+      "source_sha256": "0d5feec10a4edc18b2b7d50963db63bd1ef6460306935b42d74873f019ffec5a",
+      "source_bytes": 180856140,
+      "native_rows": 995,
+      "native_key_sha256": "d958b24df53457ef5ab348568c7ac58ac5176ec55c40b65a17f5b65868a15fca"
+    },
+    {
+      "scene": "2088865281951278665_4460_000_4480_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-2088865281951278665_4460_000_4480_000.json",
+      "source_receipt_sha256": "0c58d1dd99a6e74e1fd5aec77ae28ec5338312ad72e56dbc9bbc0c2597f4ffbc",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/2088865281951278665_4460_000_4480_000.parquet",
+      "source_sha256": "864aff70f1b1853f4c24340297259b5e1b2a4753eaaa06917da8741d9366f886",
+      "source_bytes": 147496749,
+      "native_rows": 990,
+      "native_key_sha256": "6b0ef387646b1a46a93dbda7a00a1139bbda6beb7d9b9a54b15e09de5a3631e7"
+    },
+    {
+      "scene": "12856053589272984699_1020_000_1040_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-12856053589272984699_1020_000_1040_000.json",
+      "source_receipt_sha256": "fbf0bd1294b95a1701f4feb1ab112710df5f1dc85f666df80abc26a9820caedd",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/12856053589272984699_1020_000_1040_000.parquet",
+      "source_sha256": "64be12b8facc5652c2791834ffdeb60e37bec1fa345eccf7e68d3b53918fa3b2",
+      "source_bytes": 168945040,
+      "native_rows": 990,
+      "native_key_sha256": "e91989e90169b29a7321dfa9434d4a8aed6d2b3cba93417dcdac2f57ef0d3a54"
+    },
+    {
+      "scene": "11489533038039664633_4820_000_4840_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-11489533038039664633_4820_000_4840_000.json",
+      "source_receipt_sha256": "f7a69297046e78b32dde2e71bc1d6a4b25931167391b3a3888152477e4716920",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/11489533038039664633_4820_000_4840_000.parquet",
+      "source_sha256": "880b4241e6445b224dfe70a05a924a5be3ac6eb4b9a66258b229ce6a5968102a",
+      "source_bytes": 180404847,
+      "native_rows": 995,
+      "native_key_sha256": "dcdc79d970cbf3006513814357b69b2189abd3bdbc86b62dcddde39bf7e1b377"
+    },
+    {
+      "scene": "13619063687271391084_1519_680_1539_680",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-13619063687271391084_1519_680_1539_680.json",
+      "source_receipt_sha256": "82243206992d779ae62b52343761ed1aa4873e0e7c3402a87f8d7fd2ca0666bd",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/13619063687271391084_1519_680_1539_680.parquet",
+      "source_sha256": "1ae01ac288bb147d7d3c5c262467e3073e0d7efb37419886262589a8a3b68a30",
+      "source_bytes": 176576560,
+      "native_rows": 995,
+      "native_key_sha256": "bb2f2af62f0df311d44890f36232dce7e326e27ca561c10928e2c61ffdd17307"
+    },
+    {
+      "scene": "15628918650068847391_8077_670_8097_670",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-15628918650068847391_8077_670_8097_670.json",
+      "source_receipt_sha256": "0e3abcd045e5542265d6d70114ae82d6cb2faf2fd0758a94fd82431b87b99c3c",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/15628918650068847391_8077_670_8097_670.parquet",
+      "source_sha256": "e9728840fa89a692998b7fa99f5f35d35154a913b324706d4be5788e4f190c1f",
+      "source_bytes": 157658032,
+      "native_rows": 985,
+      "native_key_sha256": "aeabd7a9c1c8bac579958bbc0f9b828dd561eafffee94c97aa9d8b183b7fdf88"
+    },
+    {
+      "scene": "14098575914252965554_511_000_531_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-14098575914252965554_511_000_531_000.json",
+      "source_receipt_sha256": "906ba630141c97a08fb31b3feb941ba9dcc4702928319ca9ce564d36b8c28b7d",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/14098575914252965554_511_000_531_000.parquet",
+      "source_sha256": "953a9afa8b2a4ab7859e000b9f2361679d6a18db65f4bfd2978a705a6a6657e7",
+      "source_bytes": 165344764,
+      "native_rows": 950,
+      "native_key_sha256": "edb638f330303e6e6e68e76e284be24be5d826833a33c358728315bc51871b5f"
+    },
+    {
+      "scene": "10734565072045778791_440_000_460_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-10734565072045778791_440_000_460_000.json",
+      "source_receipt_sha256": "60fc7329e19b6016f3409718b49069ca2e9400a4176dc35a2e163caaa2f67ed5",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/10734565072045778791_440_000_460_000.parquet",
+      "source_sha256": "f74cdd6f7b436785e5d6cecb73183506a5911c82083a9e5b18f809774489cd39",
+      "source_bytes": 178947421,
+      "native_rows": 995,
+      "native_key_sha256": "f171adac71cd8d5493a37bcb08b7581bd636ccdd899633013e2b7bccc0c0f84c"
+    },
+    {
+      "scene": "2681180680221317256_1144_000_1164_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-2681180680221317256_1144_000_1164_000.json",
+      "source_receipt_sha256": "275f61d1caa7383954feaf7230269eae186510a4e4ae227945668763c016a687",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/2681180680221317256_1144_000_1164_000.parquet",
+      "source_sha256": "67d866774a05c6a6a6532afa0a1eef4a7b7cbc3cef33b3de61d78fb2acb7eb60",
+      "source_bytes": 170429317,
+      "native_rows": 990,
+      "native_key_sha256": "b7ce0eec7fc5221734818cf6ebee2fdf3b6a0049b20edc8f28583d9197fe40f5"
+    },
+    {
+      "scene": "8722413665055769182_2840_000_2860_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-8722413665055769182_2840_000_2860_000.json",
+      "source_receipt_sha256": "09f3619a946c394c880277a3fa3ab658b17cfd74ba39b53e1e3ec1bce73d0ed0",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/8722413665055769182_2840_000_2860_000.parquet",
+      "source_sha256": "d8cadba7300ad96d1413dcfcb71134e16245d23d3e578912011ae537921f32ad",
+      "source_bytes": 199519176,
+      "native_rows": 985,
+      "native_key_sha256": "ceb41ca3413edf6557cf5ce64aa7adfc8dd4416636a82d9c41402325d1c770c1"
+    },
+    {
+      "scene": "12012663867578114640_820_000_840_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-12012663867578114640_820_000_840_000.json",
+      "source_receipt_sha256": "d280391e1103d0319d2a7bdb864706a357a69596562bb384769e5a4c9c48d856",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/12012663867578114640_820_000_840_000.parquet",
+      "source_sha256": "480a4f6d676c1d03d1855b34970e96055221a1ebcae8047e795657bef27bfb5c",
+      "source_bytes": 171584835,
+      "native_rows": 995,
+      "native_key_sha256": "601ab839ca972ccca08c195060205320ac327ad67a5effd659a2fbe13ecf9ec2"
+    },
+    {
+      "scene": "9907794657177651763_1126_570_1146_570",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-9907794657177651763_1126_570_1146_570.json",
+      "source_receipt_sha256": "0b8014eb87a46cf53aa9a78e3b3864ec6fe186a8948cf0ad86abb45700588286",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/9907794657177651763_1126_570_1146_570.parquet",
+      "source_sha256": "625a37cfa097b28a276658c3a78ccdbd78bef6a39f3e17d859844e11707941d4",
+      "source_bytes": 166574279,
+      "native_rows": 995,
+      "native_key_sha256": "2f1178bbcaf3f52e79cd63ddd99f27ef26707dab8dbc91c00b071242ae8aee70"
+    },
+    {
+      "scene": "13807633218762107566_6625_000_6645_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-13807633218762107566_6625_000_6645_000.json",
+      "source_receipt_sha256": "714ba8107def756f68e2d1e8b91fb17aa3b99d227eea4f84184461d35da644c9",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/13807633218762107566_6625_000_6645_000.parquet",
+      "source_sha256": "46b44a884b79b2f3fd92dcc623a212da6eb6654200704a93ce7216c3fa7163cb",
+      "source_bytes": 155088171,
+      "native_rows": 995,
+      "native_key_sha256": "19c49c1af4ff683e04163d8db38b0b540da6c3c6c024122620f715462bf56718"
+    },
+    {
+      "scene": "7850521592343484282_4576_090_4596_090",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-7850521592343484282_4576_090_4596_090.json",
+      "source_receipt_sha256": "aa09de1db5d0755e79bd91fd95732f3cd9ebe28b917871cc72144c83d8c79783",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/7850521592343484282_4576_090_4596_090.parquet",
+      "source_sha256": "6ef0f41f4318874705e613ac0b1d6585db6e977e0f15cab461e6148537c3e1fb",
+      "source_bytes": 165992900,
+      "native_rows": 985,
+      "native_key_sha256": "e44c1763dd03cf314073d2842c0324455429069afca583d247fcda917e5261b5"
+    },
+    {
+      "scene": "12303641360375776820_4378_000_4398_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-12303641360375776820_4378_000_4398_000.json",
+      "source_receipt_sha256": "aa3e24813c268ef99b4bd6cfee273b2e17e258b7820b9d87dc56830e7c15f52d",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/12303641360375776820_4378_000_4398_000.parquet",
+      "source_sha256": "dd6f76d2bf59e2053dc46bcec9dc7fffc10e49c1d186ebd7c03bdb8ac41e4970",
+      "source_bytes": 157650041,
+      "native_rows": 995,
+      "native_key_sha256": "d8ca8bad19a72386e5ee9a5c4a923d95982602d7342b5aa17c065d407599e439"
+    },
+    {
+      "scene": "2415873247906962761_5460_000_5480_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-2415873247906962761_5460_000_5480_000.json",
+      "source_receipt_sha256": "e627553a8faa500c9d623924769d22c435bdc74c128407b51af17f56d2108993",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/2415873247906962761_5460_000_5480_000.parquet",
+      "source_sha256": "74eb3b5220d4ceb81a3ced9a0dbd5cdb94d02940a261fbe3eb77a5369af321b3",
+      "source_bytes": 172511112,
+      "native_rows": 990,
+      "native_key_sha256": "e63745754eb620282fb9a98a49bb94df27d4007cb8df6a2541e766a8fc828b5a"
+    },
+    {
+      "scene": "2656110181316327570_940_000_960_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-2656110181316327570_940_000_960_000.json",
+      "source_receipt_sha256": "42b1fdbb30cc8b2af8d686cc03c848ac3049d26bf4e4cc677599a7d1cb14edf4",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/2656110181316327570_940_000_960_000.parquet",
+      "source_sha256": "1eb69207029bd0f321b15ec307ef84174e29d5737f943e925935be4ab27fe8f6",
+      "source_bytes": 176558864,
+      "native_rows": 990,
+      "native_key_sha256": "3d94934e85fdc3058eef0edae0fd01c0719a28bf423602033937b6c67e51791f"
+    },
+    {
+      "scene": "16473613811052081539_1060_000_1080_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-16473613811052081539_1060_000_1080_000.json",
+      "source_receipt_sha256": "f34cde602ccb1180d40645c27519386b278760ebb2c230aae7b38a47168f4fe2",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/16473613811052081539_1060_000_1080_000.parquet",
+      "source_sha256": "de89b9dfca1c153bd291afe8ef080087bfe2667fbfebffd5f8d69a995f725ed1",
+      "source_bytes": 172724365,
+      "native_rows": 985,
+      "native_key_sha256": "84939e1b73e6a97b32a706ef6427feb6ce99cada06aadee606a923c35ea3a691"
+    },
+    {
+      "scene": "16646502593577530501_4878_080_4898_080",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-16646502593577530501_4878_080_4898_080.json",
+      "source_receipt_sha256": "5c871d8fbbd71429806f1b94d5a435f7bcd667514cd06afec270506cdddf20dd",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/16646502593577530501_4878_080_4898_080.parquet",
+      "source_sha256": "3c32fda3bf01cf21ef4e37b599e8d17fcea79b106519ab5c07996733f0e16af7",
+      "source_bytes": 204311418,
+      "native_rows": 995,
+      "native_key_sha256": "ed11cbc8dbd2fca4f7bd8a9556861491b72b0d67dab9b873c6da41811bd1a82a"
+    },
+    {
+      "scene": "7921369793217703814_1060_000_1080_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-7921369793217703814_1060_000_1080_000.json",
+      "source_receipt_sha256": "e6bf6f6191b16f7379dbce7137ad261ef3fe0bddd43cb2291453fea472d653d0",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/7921369793217703814_1060_000_1080_000.parquet",
+      "source_sha256": "19422cefb7ac9a5d0a640953056a6dc5f963fc5cb137b59faf9c3654eec32685",
+      "source_bytes": 189980182,
+      "native_rows": 990,
+      "native_key_sha256": "0e07acb799c598af4902fd3e3d503aeba3424f6980ef77083a9c3f8dc671f928"
+    },
+    {
+      "scene": "9385013624094020582_2547_650_2567_650",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-9385013624094020582_2547_650_2567_650.json",
+      "source_receipt_sha256": "5c839c82e93565d1cda55476e29efa180f325af0063b3f8e1724a5fe569810fa",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/9385013624094020582_2547_650_2567_650.parquet",
+      "source_sha256": "eb21c374745313469706a5ee580fec15637db44bbded862d6f7cf8141313d1c2",
+      "source_bytes": 173294464,
+      "native_rows": 990,
+      "native_key_sha256": "0b9caf0b156f4a098bedda5f7985f28cb74b5575bbadb2de7838494487df3227"
+    },
+    {
+      "scene": "1191788760630624072_3880_000_3900_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-1191788760630624072_3880_000_3900_000.json",
+      "source_receipt_sha256": "fcf24be2caec1676edbe1585e79726fea6bfb06313596faac2d80c3927ef7064",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/1191788760630624072_3880_000_3900_000.parquet",
+      "source_sha256": "a70a9202337472e783cd704443e189d65a9ff6302b75c228596bf53ab2a405c9",
+      "source_bytes": 170470675,
+      "native_rows": 995,
+      "native_key_sha256": "0ff219b540485d42ca65d132cef697cc1a8045ddcff75e45c2709557654bf6f1"
+    },
+    {
+      "scene": "6390847454531723238_6000_000_6020_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-6390847454531723238_6000_000_6020_000.json",
+      "source_receipt_sha256": "f2e7946e4e20abd20495c00478af4fad83d7a752a49dacdecd7ba8abc32e624f",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/6390847454531723238_6000_000_6020_000.parquet",
+      "source_sha256": "006b879d6d182aeeba3868e923e5aa357f2ee593c7d0e05da728eadd7851dc01",
+      "source_bytes": 163988476,
+      "native_rows": 995,
+      "native_key_sha256": "226a719e763daa58e14897b65ebbc462807b8f634268e68b89c360b96d5f550f"
+    },
+    {
+      "scene": "13840133134545942567_1060_000_1080_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-13840133134545942567_1060_000_1080_000.json",
+      "source_receipt_sha256": "85608b2f9b993831934204a4d097cad63a8739e2de17b7041ee80bbed097a408",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/13840133134545942567_1060_000_1080_000.parquet",
+      "source_sha256": "0e6fc597c2b02ce329f31f3d9c96d66369f21febe66de09e92058d6a785e41e3",
+      "source_bytes": 160780343,
+      "native_rows": 990,
+      "native_key_sha256": "6b6fbd12af1b97b4e916ba22af7815053652fbb313d02a3333eb9609c685359a"
+    },
+    {
+      "scene": "5525943706123287091_4100_000_4120_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-5525943706123287091_4100_000_4120_000.json",
+      "source_receipt_sha256": "5037472faa0fff0bf61735271e1e933ebe985ab42123364ec41c5f8c2796a90b",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/5525943706123287091_4100_000_4120_000.parquet",
+      "source_sha256": "b9925cdf552a4f1d76f14cd1d49645d541b6f060f23cbd214c40c5342302782a",
+      "source_bytes": 169652075,
+      "native_rows": 995,
+      "native_key_sha256": "847c07704f1cbe98a9ce14712b0edf9ed71ecb6d4232726d239f67092f8bb569"
+    },
+    {
+      "scene": "5200186706748209867_80_000_100_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-5200186706748209867_80_000_100_000.json",
+      "source_receipt_sha256": "dc06fa7e546ad152fdca8782106094b2f90b7dbeb7be398ec4b15fcebbea0665",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/5200186706748209867_80_000_100_000.parquet",
+      "source_sha256": "88622687c5d3859b0e8e6926b7fefa7d17437c2b47c3427279906ba560d50677",
+      "source_bytes": 135170011,
+      "native_rows": 995,
+      "native_key_sha256": "772730ca56a9dcfffd0300ea0b7f4e7d459d4a65fdcac427679c5170facbb9b0"
+    },
+    {
+      "scene": "15696964848687303249_4615_200_4635_200",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-15696964848687303249_4615_200_4635_200.json",
+      "source_receipt_sha256": "bd87d75cd9010d30ab9f5fb7b0d9afa425f75fc63fa009e0916429b10781deb7",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/15696964848687303249_4615_200_4635_200.parquet",
+      "source_sha256": "a99dd3dd57fadc7b1eddc618c1188ef7625db0d31ca655cab50ac9e7f2b9da2a",
+      "source_bytes": 180787014,
+      "native_rows": 990,
+      "native_key_sha256": "fccccf1cd4519d2697e76d692ddd1bebf567754c6dad3e7224bd5a93af5bca27"
+    },
+    {
+      "scene": "10599748131695282446_1380_000_1400_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-10599748131695282446_1380_000_1400_000.json",
+      "source_receipt_sha256": "f0b473e5c7235c936f4533c53792d08ca357a5a7ca5b58d8df2b37b9ce31c061",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/10599748131695282446_1380_000_1400_000.parquet",
+      "source_sha256": "8768d777274462abd97353aca299eb5d3b9b211a607dd66321265f8246a19656",
+      "source_bytes": 169252916,
+      "native_rows": 990,
+      "native_key_sha256": "95184aefb416a4bdb9dd661e82b398f5b82d3f535968c1dff231d34056727526"
+    },
+    {
+      "scene": "4575961016807404107_880_000_900_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "source_receipt": "training-lidar-4575961016807404107_880_000_900_000.json",
+      "source_receipt_sha256": "5c7313b87d07dd56dcdb2fd5b0cce20d6734af603058b20d93b15cf08a50a058",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/4575961016807404107_880_000_900_000.parquet",
+      "source_sha256": "3c6ce6c8c22c86d930914b05a5911379b55de7717825369e2beffa984f023da8",
+      "source_bytes": 173234437,
+      "native_rows": 990,
+      "native_key_sha256": "ff9e4b760a6fce9be679217ee7d66c50dd3d1a35e799712190037a8979f28489"
+    },
+    {
+      "scene": "10082223140073588526_6140_000_6160_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "development"
+        ]
+      },
+      "source_receipt": "training-lidar-10082223140073588526_6140_000_6160_000.json",
+      "source_receipt_sha256": "bd042cc64d77d874f484548f2f6c0e37655529f91645da788645d9374145196d",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/10082223140073588526_6140_000_6160_000.parquet",
+      "source_sha256": "e231cbacf3e76a0a93960f8e253bf2d3ad4b1e98a787d7b169d012e1dddb84ed",
+      "source_bytes": 185995828,
+      "native_rows": 985,
+      "native_key_sha256": "73d70c8a2792fffe99f7881dd01b322a65930868774a4aa53fe2a02cc9918cf6"
+    },
+    {
+      "scene": "3657581213864582252_340_000_360_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "development"
+        ]
+      },
+      "source_receipt": "training-lidar-3657581213864582252_340_000_360_000.json",
+      "source_receipt_sha256": "c1043634a82fac2d22dd18e3f2ec99d3e48fa2a9a846fe1be376c5689caa71d5",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/3657581213864582252_340_000_360_000.parquet",
+      "source_sha256": "56443108ae7a39e44cad95dd20109895007139fa663c156bc05cbe4e88766384",
+      "source_bytes": 191641154,
+      "native_rows": 990,
+      "native_key_sha256": "57f847fc1d33e74f965f7896f51b8aedc334acc61d752f42d78ce6128b73c270"
+    },
+    {
+      "scene": "5468483805452515080_4540_000_4560_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "development"
+        ]
+      },
+      "source_receipt": "training-lidar-5468483805452515080_4540_000_4560_000.json",
+      "source_receipt_sha256": "41bb69cfaea57806220e851ec62f670dd856bf3bd8cd60d99474dcec8f6fc956",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/5468483805452515080_4540_000_4560_000.parquet",
+      "source_sha256": "fc788ac71bb94623b139f0d4ab7d14be9f6a0cfaae526eb19e28dd70af65a37b",
+      "source_bytes": 130215402,
+      "native_rows": 855,
+      "native_key_sha256": "61017a8f0b51bcc02fd08bf99d566e8cacd2dc1e0591b4010cdda01ba3bd2885"
+    },
+    {
+      "scene": "4427374597960783085_4168_000_4188_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "development"
+        ]
+      },
+      "source_receipt": "training-lidar-4427374597960783085_4168_000_4188_000.json",
+      "source_receipt_sha256": "369d74fae44a85b2e58f83a03209d7c4cebf3eb92066e7db9c6c5eee515ad523",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/4427374597960783085_4168_000_4188_000.parquet",
+      "source_sha256": "c25f99f7e68fe7a8a9ee844d287b0b36fa2cca6566ceabe5054dfb14e143a3bb",
+      "source_bytes": 184017857,
+      "native_rows": 995,
+      "native_key_sha256": "7ec44c755019f5089f9a2ff9c308dc239958c63477611b51c3fcdb332f48892c"
+    },
+    {
+      "scene": "183829460855609442_430_000_450_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "development"
+        ]
+      },
+      "source_receipt": "training-lidar-183829460855609442_430_000_450_000.json",
+      "source_receipt_sha256": "edd793c9755c05be9fcd2c2fc4d8e3704fc9137f643b2b1a8035ec902c32db53",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/183829460855609442_430_000_450_000.parquet",
+      "source_sha256": "a94d65c44a75f1e301db15dcd2b372801c6dfe8ddfe4c2c3609b1ca0e45face5",
+      "source_bytes": 181073206,
+      "native_rows": 995,
+      "native_key_sha256": "8ac7365080236f8e7ec5ced5749248a4b9009dffbff657dfcfae59616b902c5e"
+    },
+    {
+      "scene": "3437741670889149170_1411_550_1431_550",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "development"
+        ]
+      },
+      "source_receipt": "training-lidar-3437741670889149170_1411_550_1431_550.json",
+      "source_receipt_sha256": "b88389067e8a40ad7e1c28338d26b4c6a76b5a32bcc3a86e4dda336c4e9772a9",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/3437741670889149170_1411_550_1431_550.parquet",
+      "source_sha256": "59abe038fc552af7bd4483d7f65caf2871f2ba17479cdb4d00d849e4fcfad7c1",
+      "source_bytes": 177941456,
+      "native_rows": 990,
+      "native_key_sha256": "beda0dc3c346adb26d8ed024ad0187c40bd1dd8a1fdc3a3fd9fd248e8d5d9ae2"
+    },
+    {
+      "scene": "9465500459680839281_1100_000_1120_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "development"
+        ]
+      },
+      "source_receipt": "training-lidar-9465500459680839281_1100_000_1120_000.json",
+      "source_receipt_sha256": "b19a68a49a91724ecd4909ac4e17d99553b93d858cbd469bb60f935e69d0735d",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/9465500459680839281_1100_000_1120_000.parquet",
+      "source_sha256": "65ea82e471ab688964a9b5c65636765fef69a170a4ea2c2d641279b4b69191ff",
+      "source_bytes": 166981759,
+      "native_rows": 995,
+      "native_key_sha256": "0971d434119b1ca4ca7e65b7f48a6f97de73495181803f394a29fccc2c588c76"
+    },
+    {
+      "scene": "18295766828140813622_6775_000_6795_000",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "development"
+        ]
+      },
+      "source_receipt": "training-lidar-18295766828140813622_6775_000_6795_000.json",
+      "source_receipt_sha256": "629dd754f5e82f6ddaad8782e6a40c658533f2d3baf6cbc763be72f3fd39b0c9",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/18295766828140813622_6775_000_6795_000.parquet",
+      "source_sha256": "e7ab4939136777a5d25eb1ee120cc0ed02f53d33caa8759d1d0d932981173b7c",
+      "source_bytes": 127036467,
+      "native_rows": 995,
+      "native_key_sha256": "8403cbfc95df5f6f641f38cb13049720e60e312d7214c65b9b6bfc07eb3852e6"
+    },
+    {
+      "scene": "14262448332225315249_1280_000_1300_000",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-14262448332225315249_1280_000_1300_000.json",
+      "source_receipt_sha256": "d6a2a371e57352a40cc113229b0ba4144d46d6a585a6180ce0daf3631bc30d12",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/14262448332225315249_1280_000_1300_000.parquet",
+      "source_sha256": "c1ffc0dde33d5f8f5ddd14b46cfe70d16b41958f698275a550e535ba93575d46",
+      "source_bytes": 175539494,
+      "native_rows": 995,
+      "native_key_sha256": "5b17741466b0a384d45175dc39f638e7d690e20dcae6afbe649307ae94ab63ef"
+    },
+    {
+      "scene": "18446264979321894359_3700_000_3720_000",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-18446264979321894359_3700_000_3720_000.json",
+      "source_receipt_sha256": "6890cfe73ff704e95f265f0137e3414e689bb62a762af7c07911cf40d5ed90e7",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/18446264979321894359_3700_000_3720_000.parquet",
+      "source_sha256": "2cae331aaeb70b8cbbecfbe454eda3fa5aec89658b042b5e4ef24f8daf5bc63a",
+      "source_bytes": 180397361,
+      "native_rows": 995,
+      "native_key_sha256": "4c9d7c71fd364394e7d9d34ab9c12bd017ab85ac46702e436aadcd7f7583a60a"
+    },
+    {
+      "scene": "14687328292438466674_892_000_912_000",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-14687328292438466674_892_000_912_000.json",
+      "source_receipt_sha256": "af2a5b01509c9df00b296f97961b9ba356cb752c7ab10ea0cc669c7ac0047ce3",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/14687328292438466674_892_000_912_000.parquet",
+      "source_sha256": "fdcb787e598ae4f8d1385458cb908b87a26a7383eac5a77d7cd5f655dbb27630",
+      "source_bytes": 170623058,
+      "native_rows": 990,
+      "native_key_sha256": "284301e90400966bf3299964fb1b58b788eb550f2a747d483450877881ad0908"
+    },
+    {
+      "scene": "6161542573106757148_585_030_605_030",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-6161542573106757148_585_030_605_030.json",
+      "source_receipt_sha256": "c1b49db9edf798a15521a269a084fef264c1fbab20941d915ab75fa1acc82464",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/6161542573106757148_585_030_605_030.parquet",
+      "source_sha256": "4d876f423191f8fc2fdc47dd3989ca67c49bdb695947c3cb1561a8a2f7ade106",
+      "source_bytes": 191492157,
+      "native_rows": 990,
+      "native_key_sha256": "0bcc6eb66d49dcf2bdff2d85ad087d81ee1f150ed79c349056468c781ec4a8e7"
+    },
+    {
+      "scene": "6183008573786657189_5414_000_5434_000",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-6183008573786657189_5414_000_5434_000.json",
+      "source_receipt_sha256": "7072539cf074d76f208621200ddcad8f7cb84c0c4f029b4e8a07664ba83fe8d3",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/6183008573786657189_5414_000_5434_000.parquet",
+      "source_sha256": "0e38b343198c996bded57b498d0bb2c5f9cb3eb99fc1dcb30fb6fcb14c0fc73a",
+      "source_bytes": 141190230,
+      "native_rows": 995,
+      "native_key_sha256": "c0f0c1ac379bbd212126fa15f0e788cfc99d8f2511225a0dede1c1e85c76c6b8"
+    },
+    {
+      "scene": "15611747084548773814_3740_000_3760_000",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-15611747084548773814_3740_000_3760_000.json",
+      "source_receipt_sha256": "f11335a545577b2553870cdb78fdba87929d1f6ab025baf48e9bdb519bb3fdb6",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/15611747084548773814_3740_000_3760_000.parquet",
+      "source_sha256": "e19637b28933ccf14450a566855b233afd385e19e072720b9b0188c6a567cc19",
+      "source_bytes": 180275033,
+      "native_rows": 990,
+      "native_key_sha256": "43aa4fa8c840edb4cfd04f01fa69ac10514bddda6a97e21efaf60d25328ba408"
+    },
+    {
+      "scene": "30779396576054160_1880_000_1900_000",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-30779396576054160_1880_000_1900_000.json",
+      "source_receipt_sha256": "e0c64ec8647d0100775dd6b56779a026d7b15f4dd8ba51d7fce7ee1f4e2875e9",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/30779396576054160_1880_000_1900_000.parquet",
+      "source_sha256": "eefb173f2032031ae1fe0fcfa1be1501ac53c50128d5fa85530c2b1f3f488b33",
+      "source_bytes": 174099836,
+      "native_rows": 990,
+      "native_key_sha256": "f0854e97f329477dcb9500add240d8ecafbfedb486fdc71ca98fae9063a6eb85"
+    },
+    {
+      "scene": "1457696187335927618_595_027_615_027",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-1457696187335927618_595_027_615_027.json",
+      "source_receipt_sha256": "40b53e9f01ca9ab384da29ba47788a6b31bacff99490e880a831d1c62e9a062e",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/1457696187335927618_595_027_615_027.parquet",
+      "source_sha256": "3021f8ac5c4e0deeaba45925c8c51a8f01e679e62493f91dcae801573108f298",
+      "source_bytes": 152053337,
+      "native_rows": 995,
+      "native_key_sha256": "2507797efdad4d12ba731fe10db2feca69868d747d716b288877b480eb2be640"
+    },
+    {
+      "scene": "17962792089966876718_2210_933_2230_933",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-17962792089966876718_2210_933_2230_933.json",
+      "source_receipt_sha256": "8477af7b746bb2130e675a91981e0afe296d02e80648ddbd4ad8ad0a312142cd",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/17962792089966876718_2210_933_2230_933.parquet",
+      "source_sha256": "a0112aef28839d6cb7a14a6f4644b454246b26d5a2789721ac696d05412c0270",
+      "source_bytes": 163966246,
+      "native_rows": 995,
+      "native_key_sha256": "a1ac4da19c23ab331b330135b01f97bafdabd5847153d397e584d0ec758b7d45"
+    },
+    {
+      "scene": "18331704533904883545_1560_000_1580_000",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-18331704533904883545_1560_000_1580_000.json",
+      "source_receipt_sha256": "79c5e5e0e99a497cf4034696161fa564157326fae6f2615872bf549e63774d5c",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/18331704533904883545_1560_000_1580_000.parquet",
+      "source_sha256": "da8601c90827c98801ea8e815b0db1791b9b13f4ea13fd5ab5a28045a701576a",
+      "source_bytes": 172400077,
+      "native_rows": 990,
+      "native_key_sha256": "934c5ce3dbc97da67b469b439ad0f1802011081b6a56b4e3c526edc6044da2f2"
+    },
+    {
+      "scene": "17626999143001784258_2760_000_2780_000",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-17626999143001784258_2760_000_2780_000.json",
+      "source_receipt_sha256": "dbf3074dbd8d7b703d0d72fc71c487abd069515694a238be1463f51719986d8f",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/17626999143001784258_2760_000_2780_000.parquet",
+      "source_sha256": "58a63abaff5eacaf401704803190eb1bc900b5fabc1b9f0e5aedb60c12203ea9",
+      "source_bytes": 170470618,
+      "native_rows": 990,
+      "native_key_sha256": "43125116f18196110dc9afe00cc5bed84d860458632cff4502f21f93dcbba292"
+    },
+    {
+      "scene": "7650923902987369309_2380_000_2400_000",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-7650923902987369309_2380_000_2400_000.json",
+      "source_receipt_sha256": "894b2e8369ba2b4108c2253f3d7da726339c759b1da988fec01716f5335240ee",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/7650923902987369309_2380_000_2400_000.parquet",
+      "source_sha256": "dafbc7ece03ca55e8f49e955e17d268c793ec22ee63fde1c9afcc1ff3cc0949b",
+      "source_bytes": 173480796,
+      "native_rows": 990,
+      "native_key_sha256": "4e379563609b99eced34516aa5bca1cad42f9378eb0a74efafee7c2e30643554"
+    },
+    {
+      "scene": "1071392229495085036_1844_790_1864_790",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-1071392229495085036_1844_790_1864_790.json",
+      "source_receipt_sha256": "e43ea29de5c56357b6eb062c00e4ca0a1455bd09603946b467ca3a56ad5b6fb0",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/1071392229495085036_1844_790_1864_790.parquet",
+      "source_sha256": "e200b7a89e209af3eb7d5310fe086a0c9610b3668b75fbb53289c216ebb455bd",
+      "source_bytes": 180370534,
+      "native_rows": 990,
+      "native_key_sha256": "8365792ac017651ef91434f1f6c45e99543bcf627440dc7ff40461f8d10c522c"
+    },
+    {
+      "scene": "8956556778987472864_3404_790_3424_790",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation",
+          "camera_validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-8956556778987472864_3404_790_3424_790.json",
+      "source_receipt_sha256": "177842099ea5f880a0b631e4e822d5e8f0e817840ece32a97f7767613dafa42f",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/8956556778987472864_3404_790_3424_790.parquet",
+      "source_sha256": "9ea276b7a478d11edfa89878b7720ef4bf416a527676fd50fa12640df1ddbf01",
+      "source_bytes": 158010493,
+      "native_rows": 985,
+      "native_key_sha256": "157d457f9322e2e662bfff65d70ae4080329b82fe7e48fb620373de42989d320"
+    },
+    {
+      "scene": "15959580576639476066_5087_580_5107_580",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-15959580576639476066_5087_580_5107_580.json",
+      "source_receipt_sha256": "63dbd6234ba3eed64bb596d709e7bb57f40189bd4723e052eb45ac3b10995241",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/15959580576639476066_5087_580_5107_580.parquet",
+      "source_sha256": "98f3dd2eb5e98bbdc6c83ae90d643db4f28cb5401352d38fb4f68484d4e2f34c",
+      "source_bytes": 177800305,
+      "native_rows": 995,
+      "native_key_sha256": "e60168f63bda29d7a5cb3d9201607fa0e8edfac9dc341ff2d6bb7789f7f857f7"
+    },
+    {
+      "scene": "447576862407975570_4360_000_4380_000",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-447576862407975570_4360_000_4380_000.json",
+      "source_receipt_sha256": "a592012bd147fecd239f8a84f08824adb1598aeaddff95b02eefa273ccc50a61",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/447576862407975570_4360_000_4380_000.parquet",
+      "source_sha256": "df6624d24a54d15d866ed8ec8fdcdb93e5b044edd2824c6625bf9aaa6aa382cb",
+      "source_bytes": 168597390,
+      "native_rows": 990,
+      "native_key_sha256": "f026cf30e6bd3fb025d33996bb0966b0f2645b349583a68da1d32f2f274fdb25"
+    },
+    {
+      "scene": "4759225533437988401_800_000_820_000",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-4759225533437988401_800_000_820_000.json",
+      "source_receipt_sha256": "df43a5bbf20e07db3cd3d0850e23308e242c07da846c31e8d16e7abd914ca3f0",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/4759225533437988401_800_000_820_000.parquet",
+      "source_sha256": "5e7588521901f2c3cb8332ab9e98f20f893b62f4f6d25d2bbe3ce6d14d8d115f",
+      "source_bytes": 168047057,
+      "native_rows": 990,
+      "native_key_sha256": "ed3fe0d2d1124a6c1225a59691ce036213d2a15997ab4dd1cff6e87c292129d7"
+    },
+    {
+      "scene": "1024360143612057520_3580_000_3600_000",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-1024360143612057520_3580_000_3600_000.json",
+      "source_receipt_sha256": "9d8c7d932859459d8a0d29a8d7fefb093739277276de43928d10a3e7eba14332",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/1024360143612057520_3580_000_3600_000.parquet",
+      "source_sha256": "8750866d1b955f0331d05dfd6fb4c2a127af565dbe0d78386df35e182f238254",
+      "source_bytes": 158888782,
+      "native_rows": 995,
+      "native_key_sha256": "601e5f567648c564e5ab885e6cea2b04e66c59da2c750623f7846affdb22e55e"
+    },
+    {
+      "scene": "11048712972908676520_545_000_565_000",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-11048712972908676520_545_000_565_000.json",
+      "source_receipt_sha256": "d5b67096e4096830fa5ece1bc6e69ef0300b93af5d94fceac26dfae9fc0a7e53",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/11048712972908676520_545_000_565_000.parquet",
+      "source_sha256": "263448c9ea7accf417c362afd6277ab6c9494bfc27a2a68029f9a91f3d4ff584",
+      "source_bytes": 161614920,
+      "native_rows": 995,
+      "native_key_sha256": "4f317ed4df44e265cfac84fbf9848fa84ade836d9bcdcaa7e77196e072e61245"
+    },
+    {
+      "scene": "9243656068381062947_1297_428_1317_428",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-9243656068381062947_1297_428_1317_428.json",
+      "source_receipt_sha256": "b017e80195902d058d44c1c0e5c203a4f3059a2d369735a7c0634d383dacba79",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/9243656068381062947_1297_428_1317_428.parquet",
+      "source_sha256": "b816864bcea08abb769e818f0b0fd84430474cf7510730a17017c66cc5002112",
+      "source_bytes": 174393583,
+      "native_rows": 990,
+      "native_key_sha256": "0384ead9ef538543a42f5f89140fd967ac07e6564eecb52a4991bb6ae05b8b88"
+    },
+    {
+      "scene": "14081240615915270380_4399_000_4419_000",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-14081240615915270380_4399_000_4419_000.json",
+      "source_receipt_sha256": "0f2dc4847f405971f20b1ab565c60362bb677e763f65677742e128cd19e3fe19",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/14081240615915270380_4399_000_4419_000.parquet",
+      "source_sha256": "0f483364ea35b1e73ba9a133710a6fcbae4f3911ad9330f79c0a95090e148bbb",
+      "source_bytes": 127244015,
+      "native_rows": 990,
+      "native_key_sha256": "25d72ba8ecf9ff546176f2c3ea593a5c2a96117a6d11908d26792ab06d2fd7db"
+    },
+    {
+      "scene": "933621182106051783_4160_000_4180_000",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-933621182106051783_4160_000_4180_000.json",
+      "source_receipt_sha256": "40b730032bb572d6492d8d90e81ad6eb1afef5a35c53c7cce399a59ba58abfdd",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/933621182106051783_4160_000_4180_000.parquet",
+      "source_sha256": "e540348fddb086a9f5c488ac9fd9370aec3e699a45971304afdccf9ad63f72b1",
+      "source_bytes": 168568941,
+      "native_rows": 990,
+      "native_key_sha256": "b790adcbd46a2c15ef721ebb1b0e6893b4ed62a32e6255d2970accb594938bd7"
+    },
+    {
+      "scene": "12831741023324393102_2673_230_2693_230",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-12831741023324393102_2673_230_2693_230.json",
+      "source_receipt_sha256": "d651cc7e69723a62be1bd05217d3043e9aee5a32c2236e2fe5e44c84e8e869fa",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/12831741023324393102_2673_230_2693_230.parquet",
+      "source_sha256": "c7c646e8c01df61a629c0e38ce8d78b761ec8bdfde8597b5c6a502387a6f3532",
+      "source_bytes": 181693433,
+      "native_rows": 990,
+      "native_key_sha256": "88751132753ba8acf2d9f5f4af6b1edf63dc772df4894c863e33f44fd0ba2b0c"
+    },
+    {
+      "scene": "6680764940003341232_2260_000_2280_000",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-6680764940003341232_2260_000_2280_000.json",
+      "source_receipt_sha256": "897ddbbc851d49ec701a2f489889e9b619b9a4f5cc2baf1ddb73999bb1851c41",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/6680764940003341232_2260_000_2280_000.parquet",
+      "source_sha256": "a71227d4a790366ca77af743f8d38cf7cc1dcf85efcb28417cd8ce1f63e8c8fc",
+      "source_bytes": 188626939,
+      "native_rows": 990,
+      "native_key_sha256": "8ed898376564dd465c3890176a1d3b3e896b9dfda042035fb1e5893e8a8b41fc"
+    },
+    {
+      "scene": "18024188333634186656_1566_600_1586_600",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-18024188333634186656_1566_600_1586_600.json",
+      "source_receipt_sha256": "c1866a3d280d18affa7cecf18a8f5e1227dd3b5e18e4167918027fc30e188374",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/18024188333634186656_1566_600_1586_600.parquet",
+      "source_sha256": "10d2bbbe902c4d6203c238bff03ca84533d20f2ce883193c6d24dc8454d27569",
+      "source_bytes": 169305387,
+      "native_rows": 990,
+      "native_key_sha256": "3e56ef1e79c7d10dff7395b86a7a24d32c9c037caf1f07b9fc71dd0b31f7bfe4"
+    },
+    {
+      "scene": "8331804655557290264_4351_740_4371_740",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-8331804655557290264_4351_740_4371_740.json",
+      "source_receipt_sha256": "829a495af0bbefcf01570ada1dc85fb12550fa3c1dc8e162ad58763c46dd4f14",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/8331804655557290264_4351_740_4371_740.parquet",
+      "source_sha256": "2def72d0ffb75158b1545acf303a71fe09909136656f2b55cd9fa01ff2fca060",
+      "source_bytes": 168207425,
+      "native_rows": 995,
+      "native_key_sha256": "b4f6d9680739cd179d856310545fa2e9f4ad5db31ff9865ce2443d4dfab4fabf"
+    },
+    {
+      "scene": "2094681306939952000_2972_300_2992_300",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-2094681306939952000_2972_300_2992_300.json",
+      "source_receipt_sha256": "106ea748c7153b82a181270ed918ca0fe5f8f1c4050b1fb26759c58090f087df",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/2094681306939952000_2972_300_2992_300.parquet",
+      "source_sha256": "fe1004a9e45e373d05d8629260f87a0c569f79ed5c987a59e3a9063b29064ffe",
+      "source_bytes": 138162682,
+      "native_rows": 995,
+      "native_key_sha256": "30c559065d62ae985b70a2414d68650196a50b6dbc47e4ada6746a2bad122f2a"
+    },
+    {
+      "scene": "4575389405178805994_4900_000_4920_000",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-4575389405178805994_4900_000_4920_000.json",
+      "source_receipt_sha256": "2445a8bf416cd038a30881226353f116a2562259a3c217188c966376adf7c710",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/4575389405178805994_4900_000_4920_000.parquet",
+      "source_sha256": "296f80d9298938600d466298c5a00e06f169c1d1e8fcccc8a2c5ba81136c99c1",
+      "source_bytes": 165795372,
+      "native_rows": 995,
+      "native_key_sha256": "90977f9a51142e602585a0261e62c2a0a9acb3443ffc2092c3933b24e1384e53"
+    },
+    {
+      "scene": "7119831293178745002_1094_720_1114_720",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-7119831293178745002_1094_720_1114_720.json",
+      "source_receipt_sha256": "82104f8c1e8caa92be34c22192d32391ccd498e0a47e9484c6ac66c17191a356",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/7119831293178745002_1094_720_1114_720.parquet",
+      "source_sha256": "4b7894f4455a7faeb8e15e60ce14d2e9d430b84965ff6294a918dc4639bba3b6",
+      "source_bytes": 180426747,
+      "native_rows": 990,
+      "native_key_sha256": "3a0f415a1ffa9ffa9ec406989cf0995f9e6a2a9a4985e0bdfc702e413a0b580f"
+    },
+    {
+      "scene": "5372281728627437618_2005_000_2025_000",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-5372281728627437618_2005_000_2025_000.json",
+      "source_receipt_sha256": "f68cac60c1d7b504f97edcfe95fb1e82c020eb6effea01fc06a61f2b77f10070",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/5372281728627437618_2005_000_2025_000.parquet",
+      "source_sha256": "cc23030185d6efa569377e4060f633abf9a9a9449b32e32745fb3c5dfcef2176",
+      "source_bytes": 150485932,
+      "native_rows": 990,
+      "native_key_sha256": "7e59067544eaaf5d9850ea72ac47769de07160f5d409b9f7b662446fa5a965ef"
+    },
+    {
+      "scene": "13982731384839979987_1680_000_1700_000",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "source_receipt": "validation-lidar-13982731384839979987_1680_000_1700_000.json",
+      "source_receipt_sha256": "355f7bb0184250d7782c50451b059a6a880bd4a79a9027c588be852478b62af3",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/validation/lidar/13982731384839979987_1680_000_1700_000.parquet",
+      "source_sha256": "614d6504b134d958a4a2220d1236057f8772a61f11d6852f2b898f1ed429c254",
+      "source_bytes": 174633054,
+      "native_rows": 995,
+      "native_key_sha256": "1436ddd659629c1ff7fab3c3109c3915549b0962088423382c31f6eb66d87c65"
+    }
+  ],
+  "source_count": 103,
+  "total_readback_bytes": 17382154779,
+  "largest_source_bytes": 204311418,
+  "expected_shape_records": 203850,
+  "raw_limit_bytes": 2147483648,
+  "retained_engineering_raw_bytes": 1200154353,
+  "policy": "serial under shared queue/raw leases after processing, box replay and semantic recovery; native null shape preserved, no inferred positive-return extent"
+}

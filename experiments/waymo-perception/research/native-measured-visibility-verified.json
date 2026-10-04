@@ -1,0 +1,132 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-measured-visibility-a",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-native-bridge-a/input",
+        "/tmp/native-input",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-native-bridge-a/output",
+        "/tmp/projected",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sam-native-image-all-a/output",
+        "/tmp/sam",
+        "--",
+        "python",
+        "-c",
+        "import json,time,resource,numpy as np\nfrom pathlib import Path\nfrom pipeline.projection_visibility import measured_projection_visibility\nfrom pipeline.point_mask_relation import point_mask_relation\nstart=time.monotonic()\nwith np.load('/tmp/native-input/native.npz',allow_pickle=False) as a:cp=a['camera_projection'].astype(np.int64)\nwith np.load('/tmp/sam/masks.npz',allow_pickle=False) as a:masks=a['masks'][:,0]\np=np.loadtxt('/tmp/projected/projection.csv',delimiter=',');n=len(cp);assert p.shape==(n,5);np.testing.assert_array_equal(p[:,0],np.arange(n));slots=cp.reshape(n,2,3)\ndepths=np.full((n,2),np.nan);valid=(slots[:,:,0]==1)&(slots[:,:,1]>=0)&(slots[:,:,1]<1920)&(slots[:,:,2]>=0)&(slots[:,:,2]<1280)&(p[:,1,None]==1)&(p[:,4,None]>0)\ndepths[valid]=np.broadcast_to(p[:,4,None],(n,2))[valid]\n# Independent sorted pixel/depth frontier: first depth in each lexicographic group.\nri,si=np.nonzero(valid);keys=slots[ri,si];z=depths[ri,si];order=np.lexsort((z,keys[:,2],keys[:,1],keys[:,0]));sortedkeys=keys[order];first=np.r_[True,np.any(sortedkeys[1:]!=sortedkeys[:-1],axis=1)];group=np.cumsum(first)-1;nearest=z[order][np.flatnonzero(first)][group];ref_min=np.empty(len(order));ref_min[order]=nearest\nr={'points':n,'masks':len(masks),'valid_front_slots':len(ri),'distinct_measured_pixels':int(first.sum()),'pixel_collisions_excess_slots':int(len(ri)-first.sum()),'tolerance_diagnostics':{},'scope':'sparse measured-depth diagnostic using static-world approximate depth and supplied pixels; no physical visibility promotion'}\nfor tol in [0.,.1,.5,1.]:\n actual=measured_projection_visibility(cp,depths,{1:(1280,1920)},depth_tolerance_m=tol);ref=np.zeros((n,2),bool);ref[ri,si]=z<=ref_min+tol;np.testing.assert_array_equal(actual['supported'],ref)\n relation=point_mask_relation(cp,masks,camera=1,visibility=actual['supported']);assert relation['points']==n\n r['tolerance_diagnostics'][str(tol)]={'nearest_measured_slots':int(ref.sum()),'behind_measured_slots':int((valid&~ref).sum()),'mask_incidence_points':int(relation['projected_hits'].any(1).sum()),'mask_nearest_measured_points':int(relation['visible_hits'].any(1).sum()),'reason_counts':{str(k):int(v) for k,v in zip(*np.unique(actual['reasons'],return_counts=True))}}\nr['elapsed_seconds']=time.monotonic()-start;r['peak_rss_kib']=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss\nPath('/outputs/check.json').write_text(json.dumps(r,indent=2));print(json.dumps(r))\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+  "projection_receipt_sha256": "4e05f9ca420da688259b80738ebd47661c1498292198628a9aac8a0f1d08596d",
+  "teacher_receipt_sha256": "b58f0c76677eac60968c2abeda1e3127d8e30e08c6815c6c81ab38a46380a7ed",
+  "code_sha256": {
+    "projection_visibility.py": "f8aa42531a70aee0980f346c7f42d54d31ea037c0aaf43d93e685707a1e2525b",
+    "point_mask_relation.py": "68f1577d0e5caf582396ade6dab4f65bfdfb80148eaca4fd960030ad2ec37a3f"
+  },
+  "script_sha256": "5900cd64f33282b828f877dd878417d58d2a2ec83f9af85c289cf155c2f028da",
+  "validation": {
+    "points": 157870,
+    "masks": 63,
+    "valid_front_slots": 21234,
+    "distinct_measured_pixels": 20968,
+    "pixel_collisions_excess_slots": 266,
+    "tolerance_diagnostics": {
+      "0.0": {
+        "nearest_measured_slots": 20968,
+        "behind_measured_slots": 266,
+        "mask_incidence_points": 1486,
+        "mask_nearest_measured_points": 1479,
+        "reason_counts": {
+          "behind_measured_surface": 266,
+          "camera_unavailable": 89881,
+          "nearest_measured_support": 20968,
+          "no_projection": 204625
+        }
+      },
+      "0.1": {
+        "nearest_measured_slots": 20968,
+        "behind_measured_slots": 266,
+        "mask_incidence_points": 1486,
+        "mask_nearest_measured_points": 1479,
+        "reason_counts": {
+          "behind_measured_surface": 266,
+          "camera_unavailable": 89881,
+          "nearest_measured_support": 20968,
+          "no_projection": 204625
+        }
+      },
+      "0.5": {
+        "nearest_measured_slots": 20968,
+        "behind_measured_slots": 266,
+        "mask_incidence_points": 1486,
+        "mask_nearest_measured_points": 1479,
+        "reason_counts": {
+          "behind_measured_surface": 266,
+          "camera_unavailable": 89881,
+          "nearest_measured_support": 20968,
+          "no_projection": 204625
+        }
+      },
+      "1.0": {
+        "nearest_measured_slots": 20968,
+        "behind_measured_slots": 266,
+        "mask_incidence_points": 1486,
+        "mask_nearest_measured_points": 1479,
+        "reason_counts": {
+          "behind_measured_surface": 266,
+          "camera_unavailable": 89881,
+          "nearest_measured_support": 20968,
+          "no_projection": 204625
+        }
+      }
+    },
+    "scope": "sparse measured-depth diagnostic using static-world approximate depth and supplied pixels; no physical visibility promotion",
+    "elapsed_seconds": 3.3944588439771906,
+    "peak_rss_kib": 284116
+  },
+  "artifacts": {
+    "live.log": "60c0a08f8662b717b56fe136c25e91fb54fb4e0bc30ad9384b46af3547e315b6",
+    "check.json": "43b6c46e0e847a1ed349771dd45c8dee637c0b976962d0e3fdeaf9cfa731725a"
+  },
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-measured-visibility-a/receipt.json",
+  "receipt_sha256": "ab151f37a680d602846ecc09f9ce05aeb281ace4858688d2c712115fe63af908"
+}

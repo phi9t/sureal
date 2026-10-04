@@ -1,0 +1,236 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/foreground-native-a/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/m3-live-b",
+        "/source",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/slices/validation-two-scenes-20260929",
+        "/tmp/slice",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/foreground-native-a/input",
+        "/mnt",
+        "--",
+        "python",
+        "-c",
+        "import json,hashlib,math,time,resource,numpy as np,pyarrow.parquet as pq\nfrom pathlib import Path\nfrom pipeline.foreground_support import foreground_support,selection_diagnostics\nstarted=time.monotonic();d=json.loads(Path('/mnt/trusted.json').read_text());o=d['box_source'];p=Path('/tmp/slice')/o['relative_path'];assert hashlib.file_digest(p.open('rb'),'sha256').hexdigest()==o['sha256']\nfields=['center.x','center.y','center.z','size.x','size.y','size.z','heading'];prefix='[LiDARBoxComponent].box.'\nrows=[r for r in pq.read_table(p).to_pylist() if r['key.frame_timestamp_micros']==d['timestamp']]\nassert rows and all(r['key.segment_context_name']==o['context'] for r in rows)\nboxes=np.array([[r[prefix+f] for f in fields] for r in rows]);classes=np.array([r['[LiDARBoxComponent].type'] for r in rows],dtype=np.int64);points=[]\nfor r in d['rows']:\n p=Path('/source/reconstruction')/r['artifact'];assert hashlib.file_digest(p.open('rb'),'sha256').hexdigest()==r['sha256']\n with np.load(p,allow_pickle=False) as a:points.append(a['xyz'])\nxyz=np.concatenate(points);target=foreground_support(xyz,boxes,classes)\n# Independent scalar world-space polygon half-planes plus vertical limits.\nworld=[tuple(map(float,p)) for p in xyz]\nfor box,indices in zip(boxes,target['object_point_indices']):\n cx,cy,cz,l,w,height,heading=map(float,box);cos,sin=math.cos(heading),math.sin(heading)\n corners=[(cx+u*cos-v*sin,cy+u*sin+v*cos) for u,v in [(-l/2,-w/2),(l/2,-w/2),(l/2,w/2),(-l/2,w/2)]]\n reference=[]\n for i,(px,py,pz) in enumerate(world):\n  if abs(pz-cz)>height/2:continue\n  inside=True\n  for j,(ax,ay) in enumerate(corners):\n   bx,by=corners[(j+1)%4]\n   if (bx-ax)*(py-ay)-(by-ay)*(px-ax)<0:inside=False;break\n  if inside:reference.append(i)\n np.testing.assert_array_equal(indices,np.array(reference,dtype=np.int64))\ncontrols={}\nfor name,selected in [('all',np.ones(len(xyz),dtype=bool)),('none',np.zeros(len(xyz),dtype=bool)),('oracle_box_union',target['class_membership'].any(axis=1))]:\n v=selection_diagnostics(target,selected,minimum_points=5);controls[name]=v\n for k,row in v['classes'].items():\n  if row['foreground_points']:assert row['point_recall']==(0 if name=='none' else 1)\nresult={'frame':{'context':o['context'],'timestamp':d['timestamp']},'points':len(xyz),'boxes':len(boxes),'sensor':'TOP','returns':[1,2],'controls':controls,'elapsed_seconds':time.monotonic()-started,'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'scope':'native full pairwise scalar geometry parity and theoretical selection controls; no trained gate or held-out result'}\nPath('/outputs/check.json').write_text(json.dumps(result,indent=2));print('PASS independent native foreground geometry',len(xyz),'points',len(boxes),'boxes')\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "candidate_hashes": {
+    "pipeline/foreground_support.py": "91dac7f45c2fbc1cd71d39c63eec27c09c266a557b49e88aa2e59d381d2ec3fa"
+  },
+  "input_sha256": "d0caacf19f8f6890ccb628bc6cf17c863b4e582d8dc1c201fbfccabb456b916e",
+  "validation": {
+    "frame": {
+      "context": "5847910688643719375_180_000_200_000",
+      "timestamp": 1548722489547369
+    },
+    "points": 157870,
+    "boxes": 81,
+    "sensor": "TOP",
+    "returns": [
+      1,
+      2
+    ],
+    "controls": {
+      "all": {
+        "selected_points": 157870,
+        "input_points": 157870,
+        "minimum_points": 5,
+        "classes": {
+          "1": {
+            "foreground_points": 52658,
+            "selected_foreground_points": 52658,
+            "point_recall": 1.0,
+            "annotated_objects": 40,
+            "objects_without_observed_support": 7,
+            "supported_objects": 33,
+            "objects_retaining_one": 33,
+            "objects_retaining_minimum": 28
+          },
+          "2": {
+            "foreground_points": 2135,
+            "selected_foreground_points": 2135,
+            "point_recall": 1.0,
+            "annotated_objects": 14,
+            "objects_without_observed_support": 1,
+            "supported_objects": 13,
+            "objects_retaining_one": 13,
+            "objects_retaining_minimum": 13
+          },
+          "3": {
+            "foreground_points": 472,
+            "selected_foreground_points": 472,
+            "point_recall": 1.0,
+            "annotated_objects": 27,
+            "objects_without_observed_support": 10,
+            "supported_objects": 17,
+            "objects_retaining_one": 17,
+            "objects_retaining_minimum": 15
+          },
+          "4": {
+            "foreground_points": 0,
+            "selected_foreground_points": 0,
+            "point_recall": null,
+            "annotated_objects": 0,
+            "objects_without_observed_support": 0,
+            "supported_objects": 0,
+            "objects_retaining_one": 0,
+            "objects_retaining_minimum": 0
+          }
+        }
+      },
+      "none": {
+        "selected_points": 0,
+        "input_points": 157870,
+        "minimum_points": 5,
+        "classes": {
+          "1": {
+            "foreground_points": 52658,
+            "selected_foreground_points": 0,
+            "point_recall": 0.0,
+            "annotated_objects": 40,
+            "objects_without_observed_support": 7,
+            "supported_objects": 33,
+            "objects_retaining_one": 0,
+            "objects_retaining_minimum": 0
+          },
+          "2": {
+            "foreground_points": 2135,
+            "selected_foreground_points": 0,
+            "point_recall": 0.0,
+            "annotated_objects": 14,
+            "objects_without_observed_support": 1,
+            "supported_objects": 13,
+            "objects_retaining_one": 0,
+            "objects_retaining_minimum": 0
+          },
+          "3": {
+            "foreground_points": 472,
+            "selected_foreground_points": 0,
+            "point_recall": 0.0,
+            "annotated_objects": 27,
+            "objects_without_observed_support": 10,
+            "supported_objects": 17,
+            "objects_retaining_one": 0,
+            "objects_retaining_minimum": 0
+          },
+          "4": {
+            "foreground_points": 0,
+            "selected_foreground_points": 0,
+            "point_recall": null,
+            "annotated_objects": 0,
+            "objects_without_observed_support": 0,
+            "supported_objects": 0,
+            "objects_retaining_one": 0,
+            "objects_retaining_minimum": 0
+          }
+        }
+      },
+      "oracle_box_union": {
+        "selected_points": 55264,
+        "input_points": 157870,
+        "minimum_points": 5,
+        "classes": {
+          "1": {
+            "foreground_points": 52658,
+            "selected_foreground_points": 52658,
+            "point_recall": 1.0,
+            "annotated_objects": 40,
+            "objects_without_observed_support": 7,
+            "supported_objects": 33,
+            "objects_retaining_one": 33,
+            "objects_retaining_minimum": 28
+          },
+          "2": {
+            "foreground_points": 2135,
+            "selected_foreground_points": 2135,
+            "point_recall": 1.0,
+            "annotated_objects": 14,
+            "objects_without_observed_support": 1,
+            "supported_objects": 13,
+            "objects_retaining_one": 13,
+            "objects_retaining_minimum": 13
+          },
+          "3": {
+            "foreground_points": 472,
+            "selected_foreground_points": 472,
+            "point_recall": 1.0,
+            "annotated_objects": 27,
+            "objects_without_observed_support": 10,
+            "supported_objects": 17,
+            "objects_retaining_one": 17,
+            "objects_retaining_minimum": 15
+          },
+          "4": {
+            "foreground_points": 0,
+            "selected_foreground_points": 0,
+            "point_recall": null,
+            "annotated_objects": 0,
+            "objects_without_observed_support": 0,
+            "supported_objects": 0,
+            "objects_retaining_one": 0,
+            "objects_retaining_minimum": 0
+          }
+        }
+      }
+    },
+    "elapsed_seconds": 5.765419734991156,
+    "peak_rss_kib": 231152,
+    "scope": "native full pairwise scalar geometry parity and theoretical selection controls; no trained gate or held-out result"
+  },
+  "artifacts": {
+    "output/check.json": "08b830a564fb4acc4adfd95bffb706886843bc06e712ca90130be6bb656ffa91",
+    "input/trusted.json": "d0caacf19f8f6890ccb628bc6cf17c863b4e582d8dc1c201fbfccabb456b916e",
+    "live.log": "19a4e03951f907149fb659a36065d98e2cd415a566f23ed4efd8876f682a90f4"
+  },
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/foreground-native-a/receipt.json",
+  "receipt_sha256": "b762ee01a11683d9a1660d5542bd5cdce0d7bb20937cc056aa1ed4ab02fb50bc"
+}

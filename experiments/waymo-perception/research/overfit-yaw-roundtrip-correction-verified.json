@@ -1,0 +1,11 @@
+{
+  "old_helper_sha256": "af304f790d258be3f95799d2aa94fd4ee60b7171480849d6340f1f727282e625",
+  "corrected_helper_sha256": "f368358b6e6c6daab577cf803634b0aa625da6547f09ee119d8d8e21b7e9aa93",
+  "test_sha256": "e3c2d9ba5a42d3321ce8bbe7c13760805db136f0caabcf1473ab34fef582822e",
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/overfit-yaw-roundtrip-tests-red/live.log": "fbe93e7b384f0cd26c502c432db24274aaf69b4930c724f8d91bbb8a4ddd3e91",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/overfit-yaw-roundtrip-tests-green/live.log": "a626407facf1102b512cc38f00f6e7d889aa6280a5c03d1722ac6d1c4eb08dc5"
+  },
+  "live_integration_evidence_sha256": "a3e5d1410893ad5369bb2fe92e50b5fc570ecd7c433f72c0964696fdaaa73ff9",
+  "scope": "exact encoded-target/decode roundtrip at +/-pi and +/-2pi plus integrated literal reference; scientific optimization remains open"
+}

@@ -1,0 +1,78 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/pointpillars-protocol-candidate-v1/input",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/pointpillars-protocol-candidate-v1/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/pointpillars-protocol-candidate-v1/input",
+        "/tmp/input",
+        "--",
+        "python",
+        "-c",
+        "import copy,hashlib,json,math,importlib.util\nfrom pathlib import Path\nassert importlib.util.find_spec('tensorflow') is None\nsha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()\np=Path('/experiment/research/pointpillars-scientific-protocol.candidate.json');e=json.loads(Path('/tmp/input/expected.json').read_text());assert sha(p)==e['candidate_sha256'];d=json.loads(p.read_text())\nfor path,h in d['pins'].items():assert sha(Path('/experiment')/path)==h\ncohort=json.loads(Path('/experiment/scientific-cohort.candidate.json').read_text());a=json.loads(Path('/experiment/research/training-anchor-templates.candidate.json').read_text())\ndef check(d):\n assert d['cohorts']==cohort['cohorts'] and d['excluded_engineering_segments']==cohort['excluded_engineering_segments']\n groups=[set(d['cohorts'][k]) for k in ('train','development','validation')];assert [len(g) for g in groups]==[64,8,16]\n assert all(not groups[i]&groups[j] for i in range(3) for j in range(i+1,3))\n assert not set.union(*groups)&set(d['excluded_engineering_segments'])\n assert d['seeds']==[17,29,43]\n obs=d['observations'];assert obs['features']==['vehicle_x','vehicle_y','vehicle_z','intensity'] and obs['time']=='current frame only'\n assert obs['lasers']==[1,2,3,4,5] and obs['returns']==[1,2]\n roi=obs['roi_half_open'];cell=obs['cell_size'];assert len(roi)==6 and all(math.isfinite(v) for v in roi) and all(roi[i]<roi[i+3] for i in range(3))\n assert [(roi[i+3]-roi[i])/cell[i] for i in range(2)]==[512,512]\n assert obs['max_pillars']==20000 and obs['max_points_per_pillar']==32\n assert d['model']['classes']==[1,2,3,4] and d['model']['anchors_per_cell']==len(a['templates'])==8\n assert d['model']['assignment']['negative']<d['model']['assignment']['positive'] and d['model']['decode']['post_limit']<=d['model']['decode']['pre_limit']\n opt=d['optimization'];assert opt['updates']==20000 and opt['checkpoint_interval']==2000 and opt['batch_size']==1\n assert 'development' in opt['selection'] and 'validation opened once' in opt['selection']\n assert d['evaluation']['heldout_GT']=='all original native validation targets under pinned evaluator; do not remove GT outside model ROI or sampling support'\n u=d['evaluation']['uncertainty'];assert u['unit']=='whole segment' and u['confidence']==.95 and u['bootstrap_replicates']==10000\n assert d['resource_limits']['local_raw_bytes']==2147483648 and d['resource_limits']['local_scientific_working_bytes']==16106127360\n assert d['resource_limits']['reserved_device_hours_per_seed']==24 and d['resource_limits']['peak_cuda_allocated_bytes']==8589934592\n assert len(d['pre_execution_gates'])==6 and 'candidate' in d['status']\ncheck(d)\nmutants=[]\nm=copy.deepcopy(d);m['cohorts']['train'][0]=m['cohorts']['validation'][0];mutants.append(m)\nm=copy.deepcopy(d);m['observations']['features'].append('NLZ');mutants.append(m)\nm=copy.deepcopy(d);m['model']['anchors_per_cell']=2;mutants.append(m)\nm=copy.deepcopy(d);m['evaluation']['heldout_GT']='ROI filtered';mutants.append(m)\nm=copy.deepcopy(d);m['evaluation']['uncertainty']['unit']='frame';mutants.append(m)\nm=copy.deepcopy(d);m['resource_limits']['local_raw_bytes']*=2;mutants.append(m)\nfor m in mutants:\n try:check(m)\n except AssertionError:pass\n else:raise AssertionError('mutant admitted')\nPath('/outputs/check.json').write_text(json.dumps({'candidate_sha256':e['candidate_sha256'],'cohort_counts':[64,8,16],'refused_mutants':len(mutants),'scope':'candidate structure, hash identity and leakage/resource invariants only; native training/overfit/protocol execution admission remains open'},indent=2));print('PASS candidate structure and6 leakage/resource mutations refused')\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "candidate_sha256": "4e30dd8d4bf918a25c77c3f056d18865a2f28a3d694f5094528644f7f4c95630",
+  "validation": {
+    "candidate_sha256": "4e30dd8d4bf918a25c77c3f056d18865a2f28a3d694f5094528644f7f4c95630",
+    "cohort_counts": [
+      64,
+      8,
+      16
+    ],
+    "refused_mutants": 6,
+    "scope": "candidate structure, hash identity and leakage/resource invariants only; native training/overfit/protocol execution admission remains open"
+  },
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/pointpillars-protocol-candidate-v1/output/check.json": "f86a7a5d551ffb8387eebe4110663da79aefabbd797143454d225b9375601b95",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/pointpillars-protocol-candidate-v1/output/live.log": "794f130afb4b4b84e22630a6b237a8276d98756b5cd7a541178071a367db9ccf"
+  }
+}

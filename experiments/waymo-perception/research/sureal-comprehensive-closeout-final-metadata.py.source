@@ -1,0 +1,43 @@
+"""Explicit small metadata supplement; no sensor/model/cache-tree export."""
+import json,pathlib,sys,shutil
+T=pathlib.Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer');P=T/'experiments/waymo-perception';R=P/'research';sys.path.insert(0,str(P));sys.dont_write_bytecode=True
+from cohort.sustained_controller_backend import NativeBackend,C,W
+from cohort.sustained_controller_lock import acquire_experiment_lock
+from resources.backend import ResourceBackend
+from resources.retention import publish_bundle
+from resources.sources import sha,regular
+from resources.stage import write_new
+from tracking.journal import read_entries
+from tier1.storage import unique_payload_bytes
+ROOT=C/'insula/comprehensive-closeout-final-metadata-v1'
+with acquire_experiment_lock(C/'insula/architecture-experiments.lock') as lock:
+ independent=R/'sureal-comprehensive-closeout-hdfs-independent.json';prior=json.loads(independent.read_text());assert prior['passed'] and sha(independent)=='54782f267b3c7435802ee329391dd7284382e0736d2efef931c76cea98c53a49'
+ b=NativeBackend('controller20261003a','baseline',lock,resume=True);state=json.loads((b.R/'state.json').read_text());prev=None
+ for record in state['records']:b.check_record(record,prev);prev=record
+ shared=json.loads((R/'sustained-resource-shared-hdfs-live-v4-verified.json').read_text());b.__class__=ResourceBackend;b._resource_identity=None;b.attach_resources(shared['resource_identity_path'],shared['resource_identity_sha256'])
+ ROOT.mkdir();snapshot=ROOT/'snapshot';snapshot.mkdir();before=unique_payload_bytes(W);inventory={}
+ def copy(src,name):
+  src=pathlib.Path(src);assert regular(src);data=src.read_bytes();data.decode('utf-8');dst=snapshot/name;dst.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(src,dst);assert sha(src)==sha(dst);inventory['final-metadata/'+name]={'path':str(dst),'sha256':sha(dst),'bytes':len(data)}
+ paths=json.load(open('/tmp/sureal-comprehensive-closeout-created-paths.json'))
+ for name in paths:copy(T/name,'git-closeout/'+name)
+ for name in ['experiments/waymo-perception/README.md','experiments/waymo-perception/CONTEXT.md','experiments/waymo-perception/explorer/README.md','experiments/waymo-perception/research-task-index.md']:copy(T/name,'final-docs/'+name)
+ entries=read_entries(R/'research-journal.jsonl');assert len(entries)==113
+ for entry in entries[-2:]:
+  for e in entry['evidence']:copy(R/'journal-evidence'/e['sha256'],'journal-evidence/'+e['sha256'])
+ copy('/tmp/sureal-comprehensive-closeout-numerical-py310.log','canonical-cpu/numerical-py310.log');copy(__file__,'publisher.source')
+ # Only explicit proof/artifact/job/transfer-log references from the independent report.
+ for i,stage in enumerate(prior['archive_stages']):
+  for key in ['proof','job']:
+   e=stage[key];assert sha(e['path'])==e['sha256'];copy(e['path'],f'independent-raw/{i}/'+key+'.json')
+  proof=json.loads(pathlib.Path(stage['proof']['path']).read_text())
+  for j,e in enumerate(proof['artifacts'].values()):assert sha(e['path'])==e['sha256'];copy(e['path'],f'independent-raw/{i}/artifact-{j}-'+pathlib.Path(e['path']).name)
+  for name,e in stage['outputs'].items():assert sha(e['path'])==e['sha256'];copy(e['path'],f'independent-raw/{i}/output-'+name)
+ for i,transfer in enumerate(prior['transfers']):
+  e=transfer['log'];assert sha(e['path'])==e['sha256'];copy(e['path'],f'independent-transfers/{i}.log')
+ copy('/tmp/sureal-comprehensive-hdfs-independent.py','independent-driver.source')
+ write_new(ROOT/'expected.json',inventory);print('PRESERVE EXPLICIT FINAL METADATA',len(inventory),sum(e['bytes'] for e in inventory.values()),flush=True)
+ publication=publish_bundle(b,'checkpoint',inventory)
+ for p,h in json.loads((R/'sureal-comprehensive-closeout-passing-tests-dispatch.json').read_text())['original_six_artifacts'].items():assert sha(p)==h
+ value={'passed':True,'scope':'final current docs/inventory/journal113/canonicalCPU/fresh-independent-GET proof metadata plus exact two omitted prelaunch attempts; no payload export, new source implementation, training, release or fullrunner admission','publication':publication,'source_inventory_path':str(ROOT/'expected.json'),'source_inventory_sha256':sha(ROOT/'expected.json'),'members':len(inventory),'source_bytes':sum(e['bytes'] for e in inventory.values()),'journal_entries':113,'journal_head_sha256':entries[-1]['sha256'],'scientific_bytes_before':before,'scientific_bytes_after':unique_payload_bytes(W),'driver':{'path':__file__,'sha256':sha(__file__)},'prior_independent_receipt':{'path':str(independent),'sha256':sha(independent)}}
+ write_new(ROOT/'verified.json',value);write_new(pathlib.Path('/tmp/sureal-comprehensive-closeout-final-metadata.json'),value);write_new(R/'sureal-comprehensive-closeout-final-metadata.json',value)
+print('PASS explicit final metadata author recovery',flush=True)

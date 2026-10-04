@@ -1,0 +1,11 @@
+{
+  "status": "first scientific native sidecar bundle independently audited after successful live publication",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/training-sidecar-publication-a/receipt.json",
+  "receipt_sha256": "b5c883426125f99eb1e9c2c88a2a95a18462339f9278dcdd628793e5ece1bce2",
+  "scene": "1730266523558914470_305_260_325_260",
+  "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/component-bundles-v1/scientific/1730266523558914470_305_260_325_260/7118e5663fb6a3c4ee4aaed7faaf08f2075d82b4e0a49625c52e4b659577d4e0.tar",
+  "archive_sha256": "7118e5663fb6a3c4ee4aaed7faaf08f2075d82b4e0a49625c52e4b659577d4e0",
+  "files": 21769,
+  "working_set_bytes": 14057765696,
+  "scope": "seven native decoded sidecar families for one training scene; eviction, camera task assembly and full cohort protocol remain open"
+}

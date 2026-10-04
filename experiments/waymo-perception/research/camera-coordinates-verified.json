@@ -1,0 +1,77 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-coordinates-live-a/receipt.json",
+  "receipt_sha256": "70404f539753e1b0180e44c73340595f812db9803a4922d6f5fc2e1961b975cd",
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-coordinates-live-a/input",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-coordinates-live-a/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--",
+        "python",
+        "-m",
+        "unittest",
+        "tests.test_camera_coordinates",
+        "-v"
+      ],
+      "exit_code": 0,
+      "groups": 4
+    }
+  ],
+  "verified_utc": "2026-09-30T19:16:27.676407+00:00",
+  "elapsed_seconds": 0.19426645498606376,
+  "peak_child_rss_kib": 45856,
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "candidate_hashes": {
+    "pipeline/camera_coordinates.py": "f7423301089c43ddc26527ebe31c89e6a4c4d2d6991a6986138aca815a2bc5a6",
+    "tests/test_camera_coordinates.py": "67d7cde1109926b08725e34735039f5e3e44b170e3d328eb3c8621a441990202"
+  },
+  "artifacts": {
+    "red.log": "90dd767f5bd35b825f9651aa719f13685881f97b54d6509b51db14d3eb611c12",
+    "live.log": "ba519c6b18c1ca2b1061ac06908a186fd418ec0ded2aa2c24a6fe4d978fc1e41"
+  },
+  "scope": "coordinate math only; actual image interpolation, models and native annotation edge conventions need separate integration"
+}

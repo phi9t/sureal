@@ -1,0 +1,6 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/segment-statistics-live-b/receipt.json",
+  "receipt_sha256": "6c44ed047ec1fe7a00dad1fae2aba6e55be35b9dec6d879b7ffadb3bff7d3484",
+  "scope": "five analytic aggregate/cluster/pairing fixtures only; ticket 07 open",
+  "ticket_07": "open"
+}

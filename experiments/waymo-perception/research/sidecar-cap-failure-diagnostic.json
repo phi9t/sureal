@@ -1,0 +1,19 @@
+{
+  "scene": "9243656068381062947_1297_428_1317_428",
+  "working_bytes": 8849593250,
+  "sidecar_bytes": 7188356551,
+  "sidecar_files": 51101,
+  "archive_upper_bytes": 7257461191,
+  "cap_bytes": 16106127360,
+  "families": {
+    "lidar_pose": 806141889,
+    "lidar_camera_projection": 6175121387,
+    "lidar_segmentation": 162896621,
+    "lidar_calibration": 7941,
+    "camera_calibration": 9171,
+    "vehicle_pose": 219054,
+    "lidar_box": 43960488
+  },
+  "projected_peak_bytes": 16107054441,
+  "excess_bytes": 927081
+}

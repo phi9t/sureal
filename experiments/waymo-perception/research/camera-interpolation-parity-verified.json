@@ -1,0 +1,77 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-interpolation-live-a/receipt.json",
+  "receipt_sha256": "6d4b57479e65b3e38ffb93cf2528a771b5d6956a0286ee8a8c937d77ec38ab29",
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/gpu-rootfs",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-interpolation-live-a/input",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-interpolation-live-a/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--",
+        "/opt/waymo/bin/python",
+        "-m",
+        "unittest",
+        "tests.test_camera_interpolation_parity",
+        "-v"
+      ],
+      "exit_code": 0,
+      "groups": 2
+    }
+  ],
+  "verified_utc": "2026-09-30T19:21:02.523519+00:00",
+  "elapsed_seconds": 1.5184820120048244,
+  "peak_child_rss_kib": 91648,
+  "runtime_lock": {
+    "image_id": "sha256:46bdaa6e8d9058d7e09419085dfcf9a4527e801330045ae8e0f387f454413b86",
+    "rootfs_sha256": "55f63770083be16ea76764422c51e6e5d995b2d65e9785b552e118a64c6e2f1f",
+    "recipe_hashes": {
+      "Dockerfile": "48484266fe92aaf1a94823fac0746eafef7ac78d0a8754fa9d8f279e8d96c19b",
+      "requirements.lock": "038ba6bbc16870b6430481127b15ab2830e5dac0a6b14c30f218a43853e35923",
+      "build.sh": "bd554045bf0dd40aeceb495fd25ff6ea62ad8e04e93a0c81b203f2c141bcce55"
+    }
+  },
+  "candidate_hashes": {
+    "pipeline/camera_coordinates.py": "f7423301089c43ddc26527ebe31c89e6a4c4d2d6991a6986138aca815a2bc5a6",
+    "tests/test_camera_interpolation_parity.py": "352863db30152143d770f0b7c2243a32a73c51948af4cbce3376dd232f42afb0"
+  },
+  "artifacts": {
+    "live.log": "34ccd7c1b20f9efc36a51b4e789ee30bbc0cbb89cd6fae39af20a5416eac7fde"
+  },
+  "scope": "actual CPU Torch bilinear align_corners=False antialias=False ramp parity only; no camera model/nativeannotation/SAM preprocessing claim"
+}

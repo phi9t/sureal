@@ -1,0 +1,77 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/mask-point-support-live-a/receipt.json",
+  "receipt_sha256": "4f5ff6e29b238820ddcdf3526f311146b3171db0cf3004a796f153efcedde90e",
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/mask-point-support-live-a/input",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/mask-point-support-live-a/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--",
+        "python",
+        "-m",
+        "unittest",
+        "tests.test_mask_point_support",
+        "-v"
+      ],
+      "exit_code": 0,
+      "groups": 4
+    }
+  ],
+  "verified_utc": "2026-09-30T19:03:55.658860+00:00",
+  "elapsed_seconds": 0.1563489020045381,
+  "peak_child_rss_kib": 43984,
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "candidate_hashes": {
+    "pipeline/mask_point_support.py": "7ac3ad8db3588ccb35bb5879501cc91f6dee47a03f396477f49004932aa7bd2c",
+    "tests/test_mask_point_support.py": "8d86a7b147da38d0b3a8816170861ea72c973ca317a6d8f4f2b75db299edb999"
+  },
+  "artifacts": {
+    "red.log": "72f8ba8f21bc7ab04aa36f232826e194272c49ce0d4b9b15a37b5c5d6f24ec77",
+    "live.log": "dc378d60a8bd34ff241a7eddf4428ffbf682d672ccea286222f534c809d6c8e4"
+  },
+  "scope": "analytic support association only; real camera/SAM checkpoint provenance and visibility geometry not implemented by this module"
+}

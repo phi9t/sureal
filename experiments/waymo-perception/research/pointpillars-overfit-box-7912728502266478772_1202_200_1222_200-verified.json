@@ -1,0 +1,81 @@
+{
+  "scene": "7912728502266478772_1202_200_1222_200",
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/overfit-box-targets-v1/7912728502266478772_1202_200_1222_200",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/overfit-box-retained-7912728502266478772_1202_200_1222_200-v1/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/overfit-box-retained-7912728502266478772_1202_200_1222_200-v1/input",
+        "/tmp/input",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.scratch",
+        "/tmp/workers",
+        "--",
+        "python",
+        "-c",
+        "import hashlib,json,math\nfrom pathlib import Path\nsha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()\ne=json.loads(Path('/tmp/input/expected.json').read_text());assert sha('/source/receipt.json')==e['receipt_sha256'];rec=json.loads(Path('/source/receipt.json').read_text());entry=e['entry'];assert rec['scene']==entry['scene'] and rec['runtime_lock']==e['runtime_lock'] and rec['selection_sha256']==e['selection_sha256'] and rec['candidate_sha256']==e['candidate_sha256'];assert rec['source_receipt_sha256']==entry['source_receipt_sha256'] and rec['source_sha256']==entry['source']['sha256'];assert len(rec['checks'])==2 and all(type(x['exit_code']) is int and x['exit_code']==0 for x in rec['checks'])\nfor p,h in e['code_hashes'].items():assert sha(Path('/experiment')/p)==h\nfor p,h in e['worker_hashes'].items():assert sha(Path('/tmp/workers')/p)==h\nfor p,h in rec['artifacts'].items():assert sha(Path('/source')/p)==h\nassert sha('/source/producer/targets.json')==sha('/source/reference/targets.json');t=json.loads(Path('/source/producer/targets.json').read_text());assert t['scene']==entry['scene'] and t['native_rows']==entry['source']['inventory']['rows'];assert [f['timestamp_micros'] for f in t['frames']]==sorted(entry['timestamps']);total=0\nfor frame in t['frames']:\n assert frame['annotation_state']==('native_box_rows_present' if frame['rows'] else 'no_native_box_rows_coverage_unresolved');seen=set()\n for row in frame['rows']:\n  assert row['context_name']==entry['scene'] and row['frame_timestamp_micros']==frame['timestamp_micros'] and row['object_id'] not in seen;seen.add(row['object_id']);assert len(row['box'])==7 and all(math.isfinite(v) for v in row['box']) and min(row['box'][3:6])>0;total+=1\nfor mode in ('producer','reference'):\n resources=json.loads((Path('/source')/mode/'resources.json').read_text());assert math.isfinite(resources['elapsed_seconds']) and resources['elapsed_seconds']>=0 and resources['peak_rss_kib']>0\ntransfer=rec['transfer'];assert transfer['sha256']==entry['source']['sha256'] and transfer['size_bytes']==int(entry['source']['source_metadata']['size']) and transfer['transfer_exit_code']==0 and transfer['raw_peak_bytes_including_retained']<=2147483648\nPath('/outputs/check.json').write_text(json.dumps({'scene':entry['scene'],'native_rows':t['native_rows'],'selected_frames':len(t['frames']),'selected_box_rows':total,'scope':'retained target/source lineage independently admitted; point join and training remain open'}));print('PASS independently retained native box targets',entry['scene'])\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/overfit-box-targets-v1/7912728502266478772_1202_200_1222_200/receipt.json",
+  "receipt_sha256": "75e840c3a2468daf4e5864ee0c9a546ded83fc4d02f052a9990004d9cae89c5f",
+  "candidate_sha256": "a899058a9045a2dc318f50f6de36a9bd56e6092f4ed70a21bd19a8ead220f3f0",
+  "validation": {
+    "scene": "7912728502266478772_1202_200_1222_200",
+    "native_rows": 4439,
+    "selected_frames": 1,
+    "selected_box_rows": 19,
+    "scope": "retained target/source lineage independently admitted; point join and training remain open"
+  },
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/overfit-box-retained-7912728502266478772_1202_200_1222_200-v1/output/check.json": "5f725f4e80b02b6f48cd493dbea17e05626f81945391fe68b6bdcbe2d36f214d",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/overfit-box-retained-7912728502266478772_1202_200_1222_200-v1/output/live.log": "9eac01e43220c8b100ca04dbe8360697863692510694e44331e5ef0e4a22939e"
+  }
+}

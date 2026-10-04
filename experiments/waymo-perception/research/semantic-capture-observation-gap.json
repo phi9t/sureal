@@ -1,0 +1,18 @@
+{
+  "status": "independent admission stopped on missing semantic capture; queue continues unchanged",
+  "observed_utc": "2026-10-01T04:45:15.650517+00:00",
+  "scene": "9465500459680839281_1100_000_1120_000",
+  "terminal_admission_session": 94142,
+  "terminal_capture_session": 22422,
+  "capture_stop_reason": "900-second read-only observation interval expired; no source restart",
+  "new_readonly_capture_session": 34337,
+  "queue_pid": 1609839,
+  "checkpoint_pointer": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/cohort-checkpoint-9465500459680839281_1100_000_1120_000-verified.json",
+  "checkpoint_pointer_sha256": "448d6966f74558dae655e0f54eee1622cd2fa672b9b73689146b4b69e629b6fe",
+  "required_next_actions": [
+    "independently reconcile processing admission separate from absent semantic receipt",
+    "recover missing support from immutable HDFS point publication after queue ownership released",
+    "resume independent admission for remaining original scenes"
+  ],
+  "scope": "missing support remains unaccepted; no cohort narrowing or protocol freeze"
+}

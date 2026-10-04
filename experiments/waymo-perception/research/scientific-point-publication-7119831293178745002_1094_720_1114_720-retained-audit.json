@@ -1,0 +1,13 @@
+{
+  "scene": "7119831293178745002_1094_720_1114_720",
+  "receipt_sha256": "382e94a96fcd76791f0d09a269d9ac32fa5c71709c31e1ea350183765c68f917",
+  "artifacts_rehashed": 11,
+  "candidate_hashes": {
+    "publish-scientific-scene.py": "b4209634d24d665eb2c8a20b64719c1267fecb754aa21c04daeb41a804496a0e",
+    "pipeline/scene_archive.py": "173e50454d04e4d34d86f37aa21fc68db07ca500f8fbed70ba2913ccd8b41d5c",
+    "pipeline/scene_archive_validate.py": "3268231c6488536d509dbc3ec89f379ecbc05d8fb9633e487757051a53dc12a8",
+    "pipeline/scientific_publication.py": "40f0495162a95d9e7e13f11ee5a97bef279196c46fbd641c14ef2713065c4230"
+  },
+  "status": "successful live publication retained artifacts rehashed",
+  "scope": "publication only; independent replay and full lifecycle remain open"
+}

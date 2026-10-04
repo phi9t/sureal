@@ -3,6 +3,22 @@
 This roadmap replaces the parked TorchTitan `.scratch/waymo-perception/`
 tracker as the active owner for the Waymo perception line of work.
 
+## Investigation checkpoint — 2026-09-29
+
+The acquire-first two-scene tracer is complete; see
+[coverage and evidence](research/tracer-bullet-e2e.md). It establishes authenticated
+GCS acquisition, Waystone-resolved HDFS storage/readback and an offline
+Parquet reader over all 17 component families. Production handoff automation,
+point conversion, temporal geometry and reduced-pilot model metrics remain
+open. The statuses below describe those broader gates.
+
+## Research charter
+
+The [research-program draft](../../docs/superpowers/specs/2026-09-29-waymo-research-program-design.md)
+defines hypotheses and scientific acceptance gates. R0 closes the remaining
+dedicated-Insula and geometric tracer prerequisites before model training.
+The two current validation scenes remain development fixtures.
+
 ## 01. Upstream contract research
 
 Type: research

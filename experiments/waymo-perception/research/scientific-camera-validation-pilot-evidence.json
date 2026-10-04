@@ -1,0 +1,15 @@
+{
+  "status": "camera-validation scientific reconstruction independently audited",
+  "processing": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/camera-validation-pilot-a",
+  "receipt_hashes": {
+    "camera_calibration": "f501399eb4bd3c5bbbbd9b2ccd72f2fd635a6694df226156b77f1ec3563e2c39",
+    "lidar_box": "626fe6c806628538c1e12a2d6186d2d7f76e59cbe5912199376f5bc6b51bad0c",
+    "lidar_calibration": "d665fda257da231a36b4a06d903cd1902ec1c047ac1bad138b33e20657026519",
+    "lidar_camera_projection": "100e52a3c90dfc2ca0111cb58111ac47074b12fddc64bf4d034a2ccad303589b",
+    "lidar_pose": "22c35b805fa3e20979e6be7b7f98f037155858e1d2966bf16d7edf5b081ca04a",
+    "lidar_segmentation": "6192d48038208d754905cba9e3a1c02bc327068c3606a2c897324119de748bdd",
+    "reconstruction": "bc24f786a200e426286ff3e3f6fe3e1e733a5a2128cbed14106dbacddc01cc40",
+    "vehicle_pose": "da2ecd0572e88bb65616b6e4d48cad4a2412cbfa9091bb6759a3019c82dc94a2"
+  },
+  "scope": "single native scene preprocessing only; immutable publication/replay, camera image and mask task assembly and full scientific protocol remain open"
+}

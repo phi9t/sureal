@@ -1,0 +1,17 @@
+{
+  "admitted_native_frames": 16,
+  "input_points": 2834683,
+  "retained_model_points": 1698387,
+  "eligible_native_boxes": 750,
+  "uncovered_native_boxes": 19,
+  "positive_anchor_counts_by_class": {
+    "1": 3602,
+    "2": 263,
+    "3": 259,
+    "4": 3
+  },
+  "peak_observed_worker_rss_kib": 3075028,
+  "producer_reference_seconds_sum": 70.83564912201837,
+  "progress_sha256": "2653735d8c734eef9c1edaf7eefde17a1f5d1d18d20810ce3e0dfd8cce10be49",
+  "scope": "host rehash of all16 independent live native cache admissions; no GPU optimization, overfit score or heldout result"
+}

@@ -1,0 +1,98 @@
+{
+  "audit_evidence_sha256": "17cd6b26363946bb7c761bac7fa064113d345d855d51282f3a82ad2378db0e58",
+  "producer_report_sha256": "b53b849ae87303390a0dfb4e708d98f0489908cb9262ea8a23961ef7fd707e88",
+  "native_rows": 726715,
+  "classes": {
+    "1": {
+      "box_rows": 393607,
+      "unique_tracks": 3759,
+      "median_length_width_height_center_z": [
+        4.602356074314182,
+        2.0612393366017967,
+        1.6899999999999977,
+        0.8063550173531269
+      ],
+      "p10_length_width_height_center_z": [
+        4.018459496493931,
+        1.8243835285418792,
+        1.4400000000000048,
+        -0.2254962941723498
+      ],
+      "p90_length_width_height_center_z": [
+        5.5788124813536,
+        2.386845259866851,
+        2.1599999999999966,
+        1.9953349681083297
+      ]
+    },
+    "2": {
+      "box_rows": 120003,
+      "unique_tracks": 1029,
+      "median_length_width_height_center_z": [
+        0.9189979312599498,
+        0.8516948112350944,
+        1.7501082414562603,
+        0.9227371272875118
+      ],
+      "p10_length_width_height_center_z": [
+        0.6715929597806277,
+        0.6814422688806079,
+        1.5300000000000047,
+        0.00811288157532886
+      ],
+      "p90_length_width_height_center_z": [
+        1.1366016354782005,
+        1.0294626678915588,
+        1.9300000000000068,
+        1.7794537122676677
+      ]
+    },
+    "3": {
+      "box_rows": 208075,
+      "unique_tracks": 1817,
+      "median_length_width_height_center_z": [
+        0.0940283458942961,
+        0.554649192009059,
+        0.6100000000000101,
+        2.3163501756481537
+      ],
+      "p10_length_width_height_center_z": [
+        0.061920129618830644,
+        0.33262568972078355,
+        0.3599999999999852,
+        0.600839701988366
+      ],
+      "p90_length_width_height_center_z": [
+        0.17259418019856407,
+        0.9539265493756026,
+        1.0500000000000114,
+        3.399828681846306
+      ]
+    },
+    "4": {
+      "box_rows": 5030,
+      "unique_tracks": 38,
+      "median_length_width_height_center_z": [
+        1.8135049750960714,
+        0.8085331046703855,
+        1.75,
+        0.713728670040922
+      ],
+      "p10_length_width_height_center_z": [
+        1.5303079145025864,
+        0.7100640442198173,
+        1.519999999999996,
+        -0.18731331968800755
+      ],
+      "p90_length_width_height_center_z": [
+        1.988728611899404,
+        0.996407462671861,
+        1.9000000000000057,
+        1.058791053671308
+      ]
+    }
+  },
+  "weighting": "one equally weighted native box row per frame/object; repeated track observations retained",
+  "geometry": "native length,width,height,center_z in vehicle reference; no ROI clipping or heading-template inference",
+  "scope": "verified training-only descriptive statistics; anchor selection and heldout improvement remain unproven"
+}

@@ -1,0 +1,11 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/detection-contract-live-b/receipt.json",
+  "receipt_sha256": "2f432b85c8d56b90e08948762e6634bd33836ba94c08d15e6b40eccd41cf1cad",
+  "verified_fixtures": 8,
+  "NLZ_control": {
+    "extra_false_positive_AP_APH": 0.5,
+    "same_prediction_marked_NLZ_AP_APH": 1.0
+  },
+  "scope": "native suppression of NLZ false positives verified; real full export candidate promotion still needs relevant receipts",
+  "ticket_09": "open"
+}

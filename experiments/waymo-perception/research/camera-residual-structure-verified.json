@@ -1,0 +1,220 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-residual-structure-a",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-native-bridge-a/input",
+        "/tmp/native-input",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-native-bridge-a/output",
+        "/tmp/projected",
+        "--",
+        "python",
+        "-c",
+        "import json,numpy as np\nfrom pathlib import Path\nwith np.load('/tmp/native-input/native.npz',allow_pickle=False) as a:cp=a['camera_projection']\np=np.loadtxt('/tmp/projected/projection.csv',delimiter=',');n=len(cp);assert p.shape==(n,5);np.testing.assert_array_equal(p[:,0],np.arange(n));slots=cp.reshape(n,2,3)\nids=[];uv=[]\nfor s in range(2):\n c,u,v=slots[:,s,:].T;mask=(c==1)&(u>=0)&(u<1920)&(v>=0)&(v<1280)&(p[:,1]==1);ids.extend(np.flatnonzero(mask));uv.extend(slots[mask,s,1:3])\nids=np.asarray(ids);uv=np.asarray(uv);delta=p[ids,2:4]-uv;depth=p[ids,4];norm=np.linalg.norm(delta,axis=1)\ndef summary(mask):\n d=delta[mask];return {'count':int(mask.sum()),'mean_delta_uv':d.mean(0).tolist() if len(d) else None,'p50_p95_l2':np.quantile(norm[mask],[.5,.95]).tolist() if len(d) else None}\nr={'slots':len(ids),'depth_bins':{},'horizontal_bins':{},'vertical_bins':{},'quantization_diagnostics':{}}\nfor name,x,edges in [('depth_bins',depth,[0,10,20,40,80,1000]),('horizontal_bins',uv[:,0],[0,480,960,1440,1920]),('vertical_bins',uv[:,1],[0,320,640,960,1280])]:\n for lo,hi in zip(edges[:-1],edges[1:]):r[name][str(lo)+':'+str(hi)]=summary((x>=lo)&(x<hi))\nfor name,fn in [('nearest',np.rint),('floor',np.floor),('ceil',np.ceil)]:\n diff=fn(p[ids,2:4])-uv;r['quantization_diagnostics'][name]={'exact_both_axes':int((diff==0).all(1).sum()),'within_one_both_axes':int((abs(diff)<=1).all(1).sum())}\nr['beyond_floor_unit_square']=int(((delta<0)|(delta>=1)).any(1).sum());r['scope']='one unchanged native engineering frame; diagnostics only; no fitted correction or visibility promotion'\nPath('/outputs/results.json').write_text(json.dumps(r,indent=2));print(json.dumps(r))\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+  "projection_receipt_sha256": "4e05f9ca420da688259b80738ebd47661c1498292198628a9aac8a0f1d08596d",
+  "script_sha256": "d8163d34cdfdb97e7edc297c844eaf59f687256c51065809e60c31229c77fa8f",
+  "validation": {
+    "slots": 21234,
+    "depth_bins": {
+      "0:10": {
+        "count": 4640,
+        "mean_delta_uv": [
+          0.457516162995789,
+          0.47448062667321883
+        ],
+        "p50_p95_l2": [
+          1.1674334443118717,
+          2.705486357988662
+        ]
+      },
+      "10:20": {
+        "count": 5470,
+        "mean_delta_uv": [
+          0.5168030848456703,
+          0.4909321518915292
+        ],
+        "p50_p95_l2": [
+          1.3327230730208384,
+          2.8218562546199877
+        ]
+      },
+      "20:40": {
+        "count": 7172,
+        "mean_delta_uv": [
+          0.3607255295806403,
+          0.5122374055096218
+        ],
+        "p50_p95_l2": [
+          1.3833044534534382,
+          2.775521730302779
+        ]
+      },
+      "40:80": {
+        "count": 3952,
+        "mean_delta_uv": [
+          0.40822229476732486,
+          0.5029237799484791
+        ],
+        "p50_p95_l2": [
+          1.2366990687024297,
+          2.8368215844468523
+        ]
+      },
+      "80:1000": {
+        "count": 0,
+        "mean_delta_uv": null,
+        "p50_p95_l2": null
+      }
+    },
+    "horizontal_bins": {
+      "0:480": {
+        "count": 4983,
+        "mean_delta_uv": [
+          0.29463073765073355,
+          0.48053920289511015
+        ],
+        "p50_p95_l2": [
+          1.3245542380364963,
+          2.7015501109954974
+        ]
+      },
+      "480:960": {
+        "count": 4735,
+        "mean_delta_uv": [
+          0.4147476073038883,
+          0.5139368348187935
+        ],
+        "p50_p95_l2": [
+          1.2621735224385464,
+          2.683141880547717
+        ]
+      },
+      "960:1440": {
+        "count": 5890,
+        "mean_delta_uv": [
+          0.5004953228958525,
+          0.4957225577126628
+        ],
+        "p50_p95_l2": [
+          1.2461805752545936,
+          2.8010766749797487
+        ]
+      },
+      "1440:1920": {
+        "count": 5626,
+        "mean_delta_uv": [
+          0.4924126447431607,
+          0.4977758271348891
+        ],
+        "p50_p95_l2": [
+          1.3471309914423326,
+          2.929579499009199
+        ]
+      }
+    },
+    "vertical_bins": {
+      "0:320": {
+        "count": 0,
+        "mean_delta_uv": null,
+        "p50_p95_l2": null
+      },
+      "320:640": {
+        "count": 4812,
+        "mean_delta_uv": [
+          0.43913775038843905,
+          0.5059503107205899
+        ],
+        "p50_p95_l2": [
+          1.1247228306256511,
+          2.6142954132532377
+        ]
+      },
+      "640:960": {
+        "count": 10905,
+        "mean_delta_uv": [
+          0.42221106972127725,
+          0.5030119181856055
+        ],
+        "p50_p95_l2": [
+          1.4267934059653713,
+          2.8620641940339953
+        ]
+      },
+      "960:1280": {
+        "count": 5517,
+        "mean_delta_uv": [
+          0.4409757671378315,
+          0.47640612040607067
+        ],
+        "p50_p95_l2": [
+          1.2135692821046626,
+          2.718923627644962
+        ]
+      }
+    },
+    "quantization_diagnostics": {
+      "nearest": {
+        "exact_both_axes": 2479,
+        "within_one_both_axes": 13366
+      },
+      "floor": {
+        "exact_both_axes": 4875,
+        "within_one_both_axes": 13471
+      },
+      "ceil": {
+        "exact_both_axes": 85,
+        "within_one_both_axes": 12757
+      }
+    },
+    "beyond_floor_unit_square": 16359,
+    "scope": "one unchanged native engineering frame; diagnostics only; no fitted correction or visibility promotion"
+  },
+  "artifacts": {
+    "live.log": "d03612c0d85c6f9032d49636adef8359e1cb98fa716b596907de98a75e52de85",
+    "results.json": "5e67ebe4d0c8bdd22776b9c39fb4660b9275f86b4dbdb821190eb1fe738872d1"
+  },
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-residual-structure-a/receipt.json",
+  "receipt_sha256": "3de6635555de26ab64ab2cbfd35125ef9b39d3fc30c4083bc81f936335fd1e20"
+}

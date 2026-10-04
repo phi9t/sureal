@@ -1,0 +1,158 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/native-shape-sources-v1",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/pointpillars-overfit-selection-v1/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/pointpillars-overfit-selection-v1/input",
+        "/tmp/input",
+        "--",
+        "python",
+        "-c",
+        "import json,hashlib,copy\nfrom pathlib import Path\nsha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()\ne=json.loads(Path('/tmp/input/expected.json').read_text());r=Path('/experiment/research');assert sha(r/'pointpillars-scientific-protocol.candidate.json')==e['protocol_sha256'];assert sha(r/'pointpillars-overfit-frames.candidate.json')==e['candidate_sha256'];d=json.loads((r/'pointpillars-scientific-protocol.candidate.json').read_text());c=json.loads((r/'pointpillars-overfit-frames.candidate.json').read_text())\nassert c['protocol_sha256']==e['protocol_sha256'] and len(c['sources'])==64 and {x['scene'] for x in c['sources']}==set(d['cohorts']['train'])\nkeys=set();counts=0\nfor src in c['sources']:\n scene=src['scene'];ep=r/src['evidence'];assert sha(ep)==src['evidence_sha256'];admission=json.loads(ep.read_text());assert admission['membership']=={'official_split':'training','research_splits':['train']};assert admission['checks'] and all(x['exit_code']==0 for x in admission['checks'])\n p=Path('/source')/scene;assert sha(p/'receipt.json')==src['receipt_sha256']==admission['receipt_sha256'];receipt=json.loads((p/'receipt.json').read_text());assert receipt['checks'] and all(x['exit_code']==0 for x in receipt['checks']);assert sha(p/'worker/shapes.json')==src['report_sha256']==receipt['report_sha256']==receipt['artifacts']['worker/shapes.json']\n report=json.loads((p/'worker/shapes.json').read_text());rows=report['shapes']['records'];assert report['shapes']['scene']==scene and len(rows)==src['records'];identities=set();timestamps=set()\n for row in rows:\n  assert row['context']==scene and type(row['timestamp']) is int and row['timestamp']>0 and row['laser'] in range(1,6) and row['return'] in (1,2)\n  identity=(row['timestamp'],row['laser'],row['return']);assert identity not in identities;identities.add(identity);timestamps.add(row['timestamp'])\n assert len(timestamps)==src['frames'] and len(identities)==10*len(timestamps)\n for timestamp in timestamps:keys.add((scene,timestamp))\n counts+=len(rows)\nassert len(keys)==c['eligible_training_frames']\nordered=sorted(keys,key=lambda x:(hashlib.sha256(f'overfit-v1:{x[0]}:{x[1]}'.encode()).hexdigest(),*x))[:16]\nexpected=[{'scene':scene,'timestamp_micros':t,'selection_hash':hashlib.sha256(f'overfit-v1:{scene}:{t}'.encode()).hexdigest()} for scene,t in ordered]\ndef check(frames):\n assert frames==expected and len({(x['scene'],x['timestamp_micros']) for x in frames})==16\n assert all(x['scene'] in d['cohorts']['train'] for x in frames)\ncheck(c['frames']);mutants=[]\nm=copy.deepcopy(c['frames']);m[0]['scene']=d['cohorts']['validation'][0];mutants.append(m)\nm=copy.deepcopy(c['frames']);m[1]=copy.deepcopy(m[0]);mutants.append(m)\nm=copy.deepcopy(c['frames']);m[0]['timestamp_micros']+=1;mutants.append(m)\nm=copy.deepcopy(c['frames']);m[0],m[1]=m[1],m[0];mutants.append(m)\nfor m in mutants:\n try:check(m)\n except AssertionError:pass\n else:raise AssertionError('invalid selection admitted')\nPath('/outputs/check.json').write_text(json.dumps({'training_scenes':64,'eligible_training_frames':len(keys),'native_return_records':counts,'selected_frames':expected,'refused_mutants':4,'scope':'native metadata selection independently reconciled; no sensor payload/box joins or overfit outcome established'},indent=2));print('PASS exact16 training frame identities independently selected from',len(keys),'native frame keys')\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "candidate_sha256": "4653a08907c11e7807f0c9a2d67af369c7e934b9e93925d8926363b962a8f996",
+  "protocol_sha256": "4e30dd8d4bf918a25c77c3f056d18865a2f28a3d694f5094528644f7f4c95630",
+  "validation": {
+    "training_scenes": 64,
+    "eligible_training_frames": 12676,
+    "native_return_records": 126760,
+    "selected_frames": [
+      {
+        "scene": "7912728502266478772_1202_200_1222_200",
+        "timestamp_micros": 1506905332721474,
+        "selection_hash": "000caa9729d9c6c0f40208ad9901433861d6c6af01606d95643702c728d94880"
+      },
+      {
+        "scene": "8796914080594559459_4284_170_4304_170",
+        "timestamp_micros": 1507681730263098,
+        "selection_hash": "00114d43bfe3a71c84935152e14b77f2b6b1222df2c0b23ec1780b067ceff8a6"
+      },
+      {
+        "scene": "14369250836076988112_7249_040_7269_040",
+        "timestamp_micros": 1507658201233279,
+        "selection_hash": "0018e37d49fc6a65647ac04d063561418e5174f7e3e619717839c13509bc5ed1"
+      },
+      {
+        "scene": "13271285919570645382_5320_000_5340_000",
+        "timestamp_micros": 1544465669937500,
+        "selection_hash": "001903c2d9cc9af4a7a75d483fd2c871c54fa3dc2ad5b7fb1fec1b01b0115396"
+      },
+      {
+        "scene": "8722413665055769182_2840_000_2860_000",
+        "timestamp_micros": 1557958509325722,
+        "selection_hash": "001d2edf2b04160f805150331ed2805e2812da66c447e33037b98d9c9787acbd"
+      },
+      {
+        "scene": "4447423683538547117_536_022_556_022",
+        "timestamp_micros": 1509377835676730,
+        "selection_hash": "0021f4b420ac81c393bf0dca4dc936a5cc96e536acbaba3f63dc3287228152cb"
+      },
+      {
+        "scene": "8454755173123314088_3202_000_3222_000",
+        "timestamp_micros": 1518654686741547,
+        "selection_hash": "003307f7ebdb6fcec0f55fd3fc25cae516c30ff06cef0093b0aa5cfe2e16d1e9"
+      },
+      {
+        "scene": "5525943706123287091_4100_000_4120_000",
+        "timestamp_micros": 1507730158608059,
+        "selection_hash": "00356793c12bc3c219b7dc9232f2394a06ef484ea761c5b0ed1661c422355ba5"
+      },
+      {
+        "scene": "4487677815262010875_4940_000_4960_000",
+        "timestamp_micros": 1557326022347111,
+        "selection_hash": "0035b8a6e8aecb5f247e377c1b619a8c5557ebd5e8f28b6693d5178321dca244"
+      },
+      {
+        "scene": "10599748131695282446_1380_000_1400_000",
+        "timestamp_micros": 1558033878647442,
+        "selection_hash": "00379fc26af7436a22bf75d0598ccb94988de29177ed6cdef415d3cc35c10314"
+      },
+      {
+        "scene": "3224923476345749285_4480_000_4500_000",
+        "timestamp_micros": 1549501331198565,
+        "selection_hash": "003917ba4aa5ab13ba5861bbc9b33237a7ceb2608ba6cc3983459ba182851e29"
+      },
+      {
+        "scene": "8454755173123314088_3202_000_3222_000",
+        "timestamp_micros": 1518654700641367,
+        "selection_hash": "003a92a41680fbb4218d0f7ce178026a428cc9d09a8c4351fcbb75fe1b3db28a"
+      },
+      {
+        "scene": "13271285919570645382_5320_000_5340_000",
+        "timestamp_micros": 1544465679337513,
+        "selection_hash": "003e2f3218464074516d4339c88407f50eaa81b407d6e9bab893c8248e3dc289"
+      },
+      {
+        "scene": "2415873247906962761_5460_000_5480_000",
+        "timestamp_micros": 1542756269548778,
+        "selection_hash": "00419600449549e3550cc71e72414e1d88a74502c35c01468eb4160ef5fc2b39"
+      },
+      {
+        "scene": "3375636961848927657_1942_000_1962_000",
+        "timestamp_micros": 1520979236788944,
+        "selection_hash": "0046fbd17a995e2e6b671f9c07e89afe64f8013c62a0a767f86ed5a937a470e6"
+      },
+      {
+        "scene": "2415873247906962761_5460_000_5480_000",
+        "timestamp_micros": 1542756270248731,
+        "selection_hash": "004f3527b258c7969fb5f78ab2d579a57fc986dcfbc048c9e88a64839872efba"
+      }
+    ],
+    "refused_mutants": 4,
+    "scope": "native metadata selection independently reconciled; no sensor payload/box joins or overfit outcome established"
+  },
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/pointpillars-overfit-selection-v1/output/check.json": "bf944f22cea3ad774fc11be86a908150a3b7cf68db4f44cc56905ff63647efcd",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/pointpillars-overfit-selection-v1/output/live.log": "cf72bdb81e8bbca4360937a28c96637b6bdae95d6661f337136b69e1121e166a"
+  }
+}

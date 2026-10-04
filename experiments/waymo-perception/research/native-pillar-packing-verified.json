@@ -1,0 +1,75 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-pillar-packing-a/receipt.json",
+  "receipt_sha256": "7eeb0cb9224df44f8d857b63f7bcb83002bfcfc962163956fd84923519a04917",
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/m3-live-b",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-pillar-packing-a/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-pillar-packing-a/input",
+        "/mnt",
+        "--",
+        "python",
+        "-c",
+        "import json,hashlib,numpy as np; from pathlib import Path; from pipeline.pillar_packing import pack_points\ntrusted=json.loads(Path('/mnt/trusted.json').read_text()); points=[]; offsets=[]; n=0\nfor r in trusted['rows']:\n p=Path('/source/reconstruction')/r['artifact']; assert hashlib.sha256(p.read_bytes()).hexdigest()==r['sha256']\n with np.load(p,allow_pickle=False) as a:\n  physical=np.concatenate((a['xyz'],a['physical_features'][:,1:2]),axis=1); assert physical.shape==(r['points'],4); points.append(physical); offsets.append({'row':r,'start':n,'end':n+len(physical)}); n+=len(physical)\noriginal=np.concatenate(points); result=pack_points(original,roi=(-64.,-64.,-3.,64.,64.,5.),cell_size=(.25,.25),max_pillars=20000,max_points=32,seed=17)\nvalid=result['source_indices']>=0; indices=result['source_indices'][valid]; assert len(indices)==len(np.unique(indices)); np.testing.assert_array_equal(result['points'][valid],original[indices])\nassert result['counts_report']['input_points']==n; assert np.all(result['counts']==valid.sum(axis=1)); assert np.all(result['source_indices'][~valid]==-1)\nnp.savez('/outputs/packed.npz',points=result['points'],counts=result['counts'],coordinates=result['coordinates'],source_indices=result['source_indices'])\nPath('/outputs/check.json').write_text(json.dumps({'status':'native all-sensor/both-return packing source identity reconciled','frame':{'context':trusted['rows'][0]['context'],'timestamp':trusted['rows'][0]['timestamp']},'sources':offsets,'counts_report':result['counts_report'],'grid':result['grid'],'scope':'engineering frame only; no scientific training or held-out claim'},indent=2)); print('PASS native packing',result['counts_report'])\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "source_receipt_sha256": "621ffda779db7b33064db91816c8d09e30d1a9a0328bd5a6818661f4e8f824c0",
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "candidate_hashes": {
+    "pipeline/pillar_packing.py": "786318c98614b628ce300d10b24acef5e232a753e62209d5966314fc8793b22e"
+  },
+  "artifacts": {
+    "input/trusted.json": "602ba313168cd73e9fe8285a1eb46cd072bf94a2038e182a03988f4c3ee246ef",
+    "output/packed.npz": "c78d0199f0fc985eff4c941b8c72ebff63632660a84f3f03fca66874bea14422",
+    "output/check.json": "ad0fe7d6d02f5530301c9763861cf9168eea07bd2a5a9dc68cfbfb4700ea237e",
+    "live.log": "853907d7374e8f9cbe1a0e175fdfee507f91fdefd78c06b70fba4a63dde2f6d3"
+  }
+}

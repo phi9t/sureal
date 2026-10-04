@@ -1,0 +1,39 @@
+# Reference-based distance: R4D as an optional camera hypothesis
+
+Checked 2026-09-29 against the full 30-page [R4D paper](https://arxiv.org/pdf/2206.04831), including appendices, and [Waymo’s research page](https://waymo.com/research/r4d-utilizing-reference-objects-for-long-range-distance-estimation/). The proposed SUREAL tests below are adaptations.
+
+## Verified scope and assumptions
+
+R4D estimates **per-object optical-axis distance from camera to object center**, not Euclidean range, dense pixel depth, or complete 3D boxes. Inputs are an image, target/reference 2D boxes, and reference distances. ResNet-50/ROIAlign extracts target, reference and union-region features; an MLP encodes box geometry and reference distance; attention fuses target-reference pairs. An auxiliary head supervises relative distance during training. Appendix A obtains short-range reference distances from a multi-view-fusion LiDAR 3D detector; they remain inference inputs. Appendix J tests camera-only references predicted by a near-range monocular distance estimator. Pseudo long-range KITTI truncates LiDAR at 40 m; custom Waymo labels cover 80–300 m, using radar-assisted annotation and trajectory constraints. Paper metrics are fractions below 5/10/15% relative error, Abs Rel, Sq Rel, RMSE and log-RMSE, evaluated on long-range objects. [Paper §§3–5, Appendices A/J](https://arxiv.org/pdf/2206.04831).
+
+The official page describes the graph/reference idea and links the paper; both say the authors intended to make the custom Waymo long-range labels public. That statement is **not verified dataset availability**. This bounded check did not identify a downloadable long-range-label artifact, official source implementation or checkpoint. Do not assume the ordinary Waymo perception release contains this label extension, or promise the paper’s 80–300 m evaluation locally. [Waymo research page](https://waymo.com/research/r4d-utilizing-reference-objects-for-long-range-distance-estimation/).
+
+## Oracle versus operational inputs
+
+“Known reference distance” means an externally supplied metric anchor. The main configuration therefore uses LiDAR **at inference**, even though its long-range targets are visible in the camera beyond the short-range LiDAR cutoff. It belongs in an RGB+LiDAR configuration. Ground-truth near-reference distances may be useful as a labeled oracle diagnostic, but cannot silently replace detector estimates in an operational experiment.
+
+The pure-image variant is a distinct, relevant camera-only control: predicted near-object distances become noisy metric anchors. It does not establish that references are known exactly, or that the same performance follows with an arbitrary camera depth model.
+
+R4D is conditional on supplied target boxes. The main text mentions detected boxes, but does not specify a reproducible target-detector/proposal-quality protocol for its main distance tables. Therefore **do not assert either that all targets are oracle boxes or that the tables establish end-to-end target detection performance**. Appendix E compares monocular 3D detectors using bipartite matching to ground-truth 2D boxes and distance scores on matched pairs, further emphasizing conditional evaluation. For SUREAL, explicitly separate ground-truth target-box diagnostics from detected-target evaluation, where misses and false positives are recorded.
+
+## Connection to the camera-depth branch
+
+R4D supplies a useful relation hypothesis alongside FCOS3D, BEVDepth and BEVFormer: **can near-object metric anchors and learned object relationships improve distant object depth beyond appearance-only or pixel-depth cues?** It is an object-distance module, so initially attach it as an optional auxiliary/refinement head with frozen target proposals rather than replacing camera geometry or the shared detection head.
+
+Use a shared camera backbone and fixed target box list. Compare an appearance/geometry distance MLP, a model with sparse projected LiDAR depth available, and the R4D-style relation head using references derived from those same allowed measurements. This measures the representation of metric evidence rather than giving only one model extra sensor data. Include camera-only predicted reference distances as a separate mode. Sparse LiDAR supervision during training and LiDAR references required at inference must be recorded separately.
+
+For BEVDepth, preserve the distinction between dense/ray depth supervision for lifting features and object-center distance supervision. A pixel near a projected object surface does not directly supply center optical depth. For BEVFormer, an implicit BEV representation can produce an object distance estimate through its detection output; adding references tests an extra hypothesis rather than proving that implicit depth lacks metric information. If reference refinement later changes BEV lifting, report that as a separate architectural experiment.
+
+## Bounded implementation sequence
+
+1. **Establish available labels.** Use existing standard Waymo object-center labels only inside their supported range and visibility. A synthetic cutoff within that labeled range can test extrapolation beyond withheld LiDAR, but call it pseudo long-range; it cannot validate real 80–300 m performance. Ensure target-point measurements beyond the cutoff are absent from all model inputs and reference construction.
+2. **One-camera, one-frame conditional test.** Transform labels/reference centers into the selected camera coordinate system and derive optical-axis depth. Keep intrinsics, crop/resizing transforms, target boxes and reference association fixed. Add ROI target/reference/union features, box geometry and metric reference values; compare no-reference, average aggregation and attention aggregation. Mask references not visible in that camera.
+3. **Separate input regimes.** Run oracle target boxes with predicted references for diagnosis, then detected target boxes with the same reference predictions. Compare oracle references only as an upper bound. For the camera-only regime, freeze or cross-fit the near-distance estimator so validation labels cannot enter reference predictions.
+4. **Probe failure modes.** Sweep reference count, noise, missing references, box jitter and distance strata; compare relative auxiliary supervision and distance augmentation on/off. Define an appearance-only fallback for zero references. Keep synthetic label augmentation within training; evaluation uses actual distances.
+5. **Integrate only after evidence.** Compare detection/center-distance quality before and after refinement with identical detections and data. Record total inference latency including the reference detector; an inexpensive relation head can still depend on an expensive upstream LiDAR path.
+
+## Metrics and TensorFlow-free boundary
+
+For positive target depth `d*`, report `|d−d*|/d*`, fractions below 0.05/0.10/0.15, mean absolute relative error, mean `(d−d*)²/d*`, RMSE in meters, and log-RMSE. Keep camera optical depth distinct from ego Euclidean distance and BEV radius when selecting distance bins. State the binning coordinate explicitly. Alongside conditional distance metrics, report target detection coverage and reference coverage to expose selection bias. Use matched-box distance scores together with detection AP/APH when integrated into the detector.
+
+The CNN, ROIAlign, MLPs, masked reference attention and losses can be implemented in PyTorch; JAX is also possible with a suitable differentiable ROI sampler and padded reference capacity. TPU training in the paper does not identify the original frontend or prove an available JAX port. Keep the model and adapters TensorFlow-free; audit label loading, camera projection and evaluation dependencies independently. Treat this as a small paper-inspired implementation until code, exact target-proposal protocol and custom long-range labels are verified.

@@ -1,0 +1,215 @@
+{
+  "admitted_checkpoints": 11,
+  "expected_checkpoints": 11,
+  "admissions": [
+    {
+      "step": 0,
+      "checks": {
+        "geometry": {
+          "predictions": 500,
+          "eligible_groundtruth": 17,
+          "literal_score_first_decode_nms_and_measurement_metadata": true,
+          "all_native_eligible_GT_retained": true,
+          "scope": "independent one-batch prediction geometry and GT audit; protobuf/native metric audit separate"
+        },
+        "metrics": {
+          "all_export_fields_independently_reread": true,
+          "native_metric_replay_exact": true,
+          "mean_populated_class_APH": 0.0,
+          "APH_gate_passed": false,
+          "scope": "independent single-training-batch native export and scoring audit; no heldout claim"
+        }
+      }
+    },
+    {
+      "step": 25,
+      "checks": {
+        "geometry": {
+          "predictions": 500,
+          "eligible_groundtruth": 17,
+          "literal_score_first_decode_nms_and_measurement_metadata": true,
+          "all_native_eligible_GT_retained": true,
+          "scope": "independent one-batch prediction geometry and GT audit; protobuf/native metric audit separate"
+        },
+        "metrics": {
+          "all_export_fields_independently_reread": true,
+          "native_metric_replay_exact": true,
+          "mean_populated_class_APH": 0.0,
+          "APH_gate_passed": false,
+          "scope": "independent single-training-batch native export and scoring audit; no heldout claim"
+        }
+      }
+    },
+    {
+      "step": 50,
+      "checks": {
+        "geometry": {
+          "predictions": 500,
+          "eligible_groundtruth": 17,
+          "literal_score_first_decode_nms_and_measurement_metadata": true,
+          "all_native_eligible_GT_retained": true,
+          "scope": "independent one-batch prediction geometry and GT audit; protobuf/native metric audit separate"
+        },
+        "metrics": {
+          "all_export_fields_independently_reread": true,
+          "native_metric_replay_exact": true,
+          "mean_populated_class_APH": 0.0,
+          "APH_gate_passed": false,
+          "scope": "independent single-training-batch native export and scoring audit; no heldout claim"
+        }
+      }
+    },
+    {
+      "step": 100,
+      "checks": {
+        "geometry": {
+          "predictions": 500,
+          "eligible_groundtruth": 17,
+          "literal_score_first_decode_nms_and_measurement_metadata": true,
+          "all_native_eligible_GT_retained": true,
+          "scope": "independent one-batch prediction geometry and GT audit; protobuf/native metric audit separate"
+        },
+        "metrics": {
+          "all_export_fields_independently_reread": true,
+          "native_metric_replay_exact": true,
+          "mean_populated_class_APH": 0.0,
+          "APH_gate_passed": false,
+          "scope": "independent single-training-batch native export and scoring audit; no heldout claim"
+        }
+      }
+    },
+    {
+      "step": 200,
+      "checks": {
+        "geometry": {
+          "predictions": 500,
+          "eligible_groundtruth": 17,
+          "literal_score_first_decode_nms_and_measurement_metadata": true,
+          "all_native_eligible_GT_retained": true,
+          "scope": "independent one-batch prediction geometry and GT audit; protobuf/native metric audit separate"
+        },
+        "metrics": {
+          "all_export_fields_independently_reread": true,
+          "native_metric_replay_exact": true,
+          "mean_populated_class_APH": 0.3810274333333334,
+          "APH_gate_passed": false,
+          "scope": "independent single-training-batch native export and scoring audit; no heldout claim"
+        }
+      }
+    },
+    {
+      "step": 300,
+      "checks": {
+        "geometry": {
+          "predictions": 387,
+          "eligible_groundtruth": 17,
+          "literal_score_first_decode_nms_and_measurement_metadata": true,
+          "all_native_eligible_GT_retained": true,
+          "scope": "independent one-batch prediction geometry and GT audit; protobuf/native metric audit separate"
+        },
+        "metrics": {
+          "all_export_fields_independently_reread": true,
+          "native_metric_replay_exact": true,
+          "mean_populated_class_APH": 0.8047403333333333,
+          "APH_gate_passed": true,
+          "scope": "independent single-training-batch native export and scoring audit; no heldout claim"
+        }
+      }
+    },
+    {
+      "step": 500,
+      "checks": {
+        "geometry": {
+          "predictions": 130,
+          "eligible_groundtruth": 17,
+          "literal_score_first_decode_nms_and_measurement_metadata": true,
+          "all_native_eligible_GT_retained": true,
+          "scope": "independent one-batch prediction geometry and GT audit; protobuf/native metric audit separate"
+        },
+        "metrics": {
+          "all_export_fields_independently_reread": true,
+          "native_metric_replay_exact": true,
+          "mean_populated_class_APH": 0.8466643333333334,
+          "APH_gate_passed": true,
+          "scope": "independent single-training-batch native export and scoring audit; no heldout claim"
+        }
+      }
+    },
+    {
+      "step": 750,
+      "checks": {
+        "geometry": {
+          "predictions": 66,
+          "eligible_groundtruth": 17,
+          "literal_score_first_decode_nms_and_measurement_metadata": true,
+          "all_native_eligible_GT_retained": true,
+          "scope": "independent one-batch prediction geometry and GT audit; protobuf/native metric audit separate"
+        },
+        "metrics": {
+          "all_export_fields_independently_reread": true,
+          "native_metric_replay_exact": true,
+          "mean_populated_class_APH": 0.8460683333333333,
+          "APH_gate_passed": true,
+          "scope": "independent single-training-batch native export and scoring audit; no heldout claim"
+        }
+      }
+    },
+    {
+      "step": 1000,
+      "checks": {
+        "geometry": {
+          "predictions": 50,
+          "eligible_groundtruth": 17,
+          "literal_score_first_decode_nms_and_measurement_metadata": true,
+          "all_native_eligible_GT_retained": true,
+          "scope": "independent one-batch prediction geometry and GT audit; protobuf/native metric audit separate"
+        },
+        "metrics": {
+          "all_export_fields_independently_reread": true,
+          "native_metric_replay_exact": true,
+          "mean_populated_class_APH": 0.8474806666666667,
+          "APH_gate_passed": true,
+          "scope": "independent single-training-batch native export and scoring audit; no heldout claim"
+        }
+      }
+    },
+    {
+      "step": 1500,
+      "checks": {
+        "geometry": {
+          "predictions": 37,
+          "eligible_groundtruth": 17,
+          "literal_score_first_decode_nms_and_measurement_metadata": true,
+          "all_native_eligible_GT_retained": true,
+          "scope": "independent one-batch prediction geometry and GT audit; protobuf/native metric audit separate"
+        },
+        "metrics": {
+          "all_export_fields_independently_reread": true,
+          "native_metric_replay_exact": true,
+          "mean_populated_class_APH": 0.8476633333333333,
+          "APH_gate_passed": true,
+          "scope": "independent single-training-batch native export and scoring audit; no heldout claim"
+        }
+      }
+    },
+    {
+      "step": 2000,
+      "checks": {
+        "geometry": {
+          "predictions": 33,
+          "eligible_groundtruth": 17,
+          "literal_score_first_decode_nms_and_measurement_metadata": true,
+          "all_native_eligible_GT_retained": true,
+          "scope": "independent one-batch prediction geometry and GT audit; protobuf/native metric audit separate"
+        },
+        "metrics": {
+          "all_export_fields_independently_reread": true,
+          "native_metric_replay_exact": true,
+          "mean_populated_class_APH": 0.8482486666666667,
+          "APH_gate_passed": true,
+          "scope": "independent single-training-batch native export and scoring audit; no heldout claim"
+        }
+      }
+    }
+  ]
+}
