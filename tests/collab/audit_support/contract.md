@@ -165,6 +165,35 @@ pins exact A49. `kata.native_baseline_db` binds the installed schema. Later
 admissions list exact accepted prior receipt references in
 `prior_acceptances[implementation|metadata][gate|post-landing]`; prior flags,
 empty/incomplete coverage or unadmitted digests never authorize a transition.
+If a reviewed successor auditor consumes a prior phase judged by another
+immutable auditor, the lead additionally pins
+`prior_auditor_authorities[<prior-report-sha256>]` to exactly
+`{schema_version:1, auditor:<original>, authors:<original>, coverage:<original>}`
+from that phase's original GateAdmission. Reopen the original materialization,
+independent reviewer/source/tree pins, reviewer-pinned cold pack through fresh
+recovery, exact unchanged coverage, complete prior cases and every raw artifact.
+The current auditor still needs its own independent exact-source admission.
+Neither current-auditor equality nor historical report flags replace proof.
+
+Artifact collection hashes every absolute raw reference and refuses missing,
+changed or symlinked inputs. Relative inventory file/link descriptors,
+spec/plan pins in typed task definitions, committed-map binding pins and
+reference-scan diagnostic descriptors are metadata in their enclosing hashed
+record. Additional nested raw references still reopen normally. Actual source
+and M binding bytes remain dedicated-oracle inputs; missing-blob negative
+fixtures remain refused by the definition verifier. A deliberately malformed
+JSON payload is an opaque hashed artifact to the collector; any consumer that
+requires a protocol record still parses and validates it independently.
+
+For schema1 `independent-metadata-source-review` only, the exact
+`scope_review.binding` and `scope_review.task_map` positions are source pins.
+The collector first reopens that review's materialization, candidate/parent/tree
+and source identity plus a fresh recovery of its retained Git pack. It resolves
+the literal `.kata.toml` and `docs/research/kata-task-map.json` files under that
+verified source, checks hashes, and compares binding/project/version and map
+parent/task count/fixed entry keys against actual bytes. Extra nested raw
+references still reopen; unknown positions or malformed paths/types refuse.
+This source-pin resolution grants no review, gate, landing or closure acceptance.
 
 The report has kind `independent-collaboration-audit`, ticket/phase/role,
 candidate/parent/tree and exact source/admission/coverage/auditor/review digests,

@@ -8,7 +8,7 @@ import tomllib
 
 from .evidence import (artifact, command_record, directory_snapshot, git_facts,
                        json_artifact, result_from_command, sqlite_projection,
-                       check_native_schema, read_live_project)
+                       check_native_schema, read_live_project, auditor_snapshot)
 from .facts import check_journal, content_digest, require, select_cases
 from .raw_git import InvalidEvidence, run_git, sha256, strict_json, verify_materialization, verify_retention
 from .runtime import bwrap_options, check_bwrap, check_measurements, rootfs_digest
@@ -578,19 +578,27 @@ def accepted_report(reference, *, candidate, role, phase, admission=None):
     coverage=json_artifact(admission["coverage"])
     required=select_cases(coverage,"49",phase,role)
     require(set(value["cases"])=={case["id"] for case in required},"Prior phase coverage incomplete")
-    require(value["coverage_sha256"]==admission["coverage"]["sha256"] and
-            value["auditor"]["candidate"]==admission["auditor"]["candidate"] and
-            value["auditor"]["materialization_sha256"]==admission["auditor"]["materialization"]["sha256"] and
-            value["auditor"]["review_sha256"]==admission["auditor"]["review"]["sha256"],
-            "Prior phase auditor/oracle/review authority differs")
     source=verify_materialization(artifact(value["materialization"]),candidate)
     original=json_artifact(value["gate_admission"])
-    require(value["materialization_sha256"]==value["materialization"]["sha256"] and
+    require(original.get('kind')=='GateAdmission' and
+            value["materialization_sha256"]==value["materialization"]["sha256"] and
             value["gate_admission_sha256"]==value["gate_admission"]["sha256"] and
             all(value[key]==source[key] for key in ("candidate","parent","tree")) and
             all(original["source"][key]==source[key] for key in ("candidate","parent","tree")) and
             original["source"]["materialization_sha256"]==value["materialization_sha256"],
             "Prior phase exact source/admission binding differs")
+    original_authority={'schema_version':1,'auditor':original['auditor'],
+                        'authors':original['authors'],'coverage':original['coverage']}
+    if original['auditor']!=admission['auditor'] or original['authors']!=admission['authors']:
+        allowed=admission.get('prior_auditor_authorities',{}).get(reference['sha256'])
+        require(allowed==original_authority,
+                'Original prior auditor authority was not explicitly admitted at this report digest')
+    auditor_snapshot(original_authority)
+    require(value['coverage_sha256']==admission['coverage']['sha256']==original['coverage']['sha256'] and
+            value['auditor']['candidate']==original['auditor']['candidate'] and
+            value['auditor']['materialization_sha256']==original['auditor']['materialization']['sha256'] and
+            value['auditor']['review_sha256']==original['auditor']['review']['sha256'],
+            'Prior phase reviewed auditor/oracle authority differs from its original admission')
     verify_retention(artifact(original["source"]["retention"]),candidate)
     for expected in required:
         refs=value["cases"][expected["id"]]["raw_artifacts"]

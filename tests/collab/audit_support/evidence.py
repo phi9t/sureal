@@ -5,9 +5,10 @@ import json
 import os
 from pathlib import Path
 import sqlite3
+import tomllib
 
 from .facts import require, parse_record
-from .raw_git import InvalidEvidence, run_git, sha256, strict_json
+from .raw_git import InvalidEvidence, run_git, sha256, strict_json, verify_materialization, verify_retention
 from .search_index import check_search_index, sql_value
 
 
@@ -25,18 +26,118 @@ def json_artifact(reference: dict) -> dict:
     return strict_json(artifact(reference))
 
 
-def nested_references(value) -> list[dict]:
+def auditor_snapshot(authority: dict) -> dict:
+    """Reopen a reviewed immutable auditor, including its fresh cold recovery."""
+    auditor=authority['auditor'];authors=authority['authors']
+    require(set(authors)=={'producer','auditor','reviewer'} and len(set(authors.values()))==3 and
+            all(isinstance(value,str) and value for value in authors.values()),
+            'Independent author/reviewer identity missing')
+    source=verify_materialization(artifact(auditor['materialization']),auditor['candidate'])
+    require(auditor['source']==source['source'],'Auditor snapshot source identity differs')
+    review=json_artifact(auditor['review'])
+    require(review.get('kind')=='independent-auditor-source-review' and
+            review['candidate']==auditor['candidate'] and review['verdict']=='pass' and
+            review['reviewer']==authors['reviewer'] and review['author']==authors['auditor'] and
+            review['materialization']==auditor['materialization'] and review['source']==source['source'] and
+            all(review[key]==source[key] for key in ('candidate','parent','tree')),
+            'Independent auditor review/source provenance mismatch')
+    retained=verify_retention(artifact(review['retention']),auditor['candidate'])
+    require(retained['repository']==source['repository'] and retained['tree']==source['tree'],
+            'Reviewed auditor cold retention differs from snapshot')
+    coverage=artifact(authority['coverage'])
+    require(sha256(Path(source['source'])/'docs/collaboration/coverage.json')==sha256(coverage),
+            'Coverage differs from reviewed immutable auditor oracle')
+    return source
+
+
+def metadata_review_source_pins(review: dict) -> list[dict]:
+    """Resolve two schema-specific descriptors, never a generic relative ref."""
+    require(type(review.get('schema_version')) is int and review['schema_version']==1 and
+            review.get('candidate_role')=='metadata', 'Unsupported metadata source review schema/role')
+    source=verify_materialization(artifact(review['materialization']),review['candidate'])
+    require(all(review.get(key)==source[key] for key in ('candidate','parent','tree','source')),
+            'Metadata source review materialization identity differs')
+    retained=verify_retention(artifact(review['retention']),review['candidate'])
+    require(retained['repository']==source['repository'] and retained['tree']==source['tree'],
+            'Metadata source review cold retention differs')
+    scope=review['scope_review']
+    require(isinstance(scope,dict) and {'binding','task_map'}<=set(scope),
+            'Metadata source review pin positions missing')
+    references=[]
+    for key,relative in [('binding','.kata.toml'),('task_map','docs/research/kata-task-map.json')]:
+        pin=scope[key]
+        require(isinstance(pin,dict) and pin.get('path')==relative and
+                isinstance(pin.get('sha256'),str) and len(pin['sha256'])==64 and
+                all(char in '0123456789abcdef' for char in pin['sha256']),
+                'Malformed reviewed source pin')
+        ref={'path':str(Path(source['source'])/relative),'sha256':pin['sha256']}
+        artifact(ref);references.append(ref)
+    binding=scope['binding'];mapping=scope['task_map']
+    native_binding=tomllib.loads(Path(references[0]['path']).read_text())
+    require(type(binding.get('version')) is int and binding['version']==1 and
+            native_binding.get('version')==binding['version'] and
+            isinstance(binding.get('project_name'),str) and binding['project_name'] and
+            native_binding.get('project',{}).get('name')==binding['project_name'],
+            'Reviewed binding semantics differ from exact source')
+    native_map=strict_json(Path(references[1]['path']))
+    entry_keys=['issue_uid','definition_revision','spec','plan','dependencies']
+    require(native_map.get('schema_version')==1 and isinstance(native_map.get('tasks'),dict) and
+            type(mapping.get('task_count')) is int and mapping['task_count']>0 and
+            mapping['task_count']==len(native_map['tasks']) and mapping.get('fixed_entry_keys')==entry_keys and
+            mapping.get('no_mutable_owner_status_labels_in_git') is True and
+            all(isinstance(entry,dict) and set(entry)==set(entry_keys) for entry in native_map['tasks'].values()) and
+            native_map.get('source_commit')==mapping.get('source_commit')==source['parent'] and
+            native_map.get('binding')=={'path':'.kata.toml','sha256':binding['sha256']} and
+            native_map.get('project',{}).get('name')==binding['project_name'],
+            'Reviewed task map semantics differ from exact source')
+    return references
+
+
+def nested_references(value, *, metadata=False) -> list[dict]:
     found = []
     if isinstance(value,dict):
-        if "path" in value and "sha256" in value and not {"blob","oid"}.intersection(value):
+        reviewed_pins=(value.get('kind')=='independent-metadata-source-review')
+        if reviewed_pins:
+            found.extend(metadata_review_source_pins(value))
+        # Typed descriptor fields are metadata. Any *additional* nested raw
+        # references still traverse normally and cannot hide behind that type.
+        if not metadata and "path" in value and "sha256" in value and not {"blob","oid"}.intersection(value):
             path = artifact(value)
             found.append({"path":str(path),"sha256":value["sha256"]})
         else:
-            for child in value.values():
-                found.extend(nested_references(child))
+            for key,child in value.items():
+                if reviewed_pins and key=='scope_review':
+                    # Only these two positions have source-relative descriptor
+                    # semantics. Additional nested raw inputs still reopen.
+                    for name,descriptor in child.items():
+                        found.extend(nested_references(descriptor,metadata=name in {'binding','task_map'}))
+                    continue
+                inventory=(key=='files' and isinstance(child,list) and isinstance(value.get('root'),str)
+                           and Path(value['root']).is_absolute())
+                binding=(key=='binding' and value.get('schema_version')==1 and
+                         {'project','source_commit','tasks'}<=set(value))
+                diagnostic=(key=='issues' and value.get('kind')=='read-only-A3-reference-shape-scan')
+                source_pin=(key in {'spec','plan'} and value.get('schema_version')==1 and
+                            {'task_id','source_commit','spec','plan','goal','dependencies'}<=set(value))
+                if inventory:
+                    for entry in child:
+                        require(isinstance(entry,dict) and entry.get('kind') in {'file','symlink'} and
+                                isinstance(entry.get('path'),str) and not Path(entry['path']).is_absolute() and
+                                '..' not in Path(entry['path']).parts and
+                                isinstance(entry.get('sha256'),str) and len(entry['sha256'])==64,
+                                'Malformed source inventory descriptor')
+                if binding:
+                    require(isinstance(child,dict) and set(child)=={'path','sha256'} and
+                            child['path']=='.kata.toml' and isinstance(child['sha256'],str) and len(child['sha256'])==64,
+                            'Malformed committed binding pin')
+                if diagnostic:
+                    require(isinstance(child,list) and all(isinstance(entry,dict) and
+                            {'owner','json_pointer','error','path','sha256'}<=set(entry) for entry in child),
+                            'Malformed reference-scan diagnostic descriptor')
+                found.extend(nested_references(child,metadata=inventory or binding or diagnostic or source_pin))
     elif isinstance(value,list):
         for child in value:
-            found.extend(nested_references(child))
+            found.extend(nested_references(child,metadata=metadata))
     return found
 
 
