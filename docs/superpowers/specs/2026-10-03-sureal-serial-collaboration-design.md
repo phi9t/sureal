@@ -120,6 +120,7 @@ Command names below are the proposed interface, not currently available capabili
 | `status` | Read-only text/JSON snapshot of both seats, tasks/queue, current states/evidence/blockers and source freshness; no source/queue mutation |
 | `task import` | Search/map committed task definitions to scoped Kata issues, idempotently create missing issues/dependency edges and link pins; never blindly mark old work done |
 | `task close` | Validate independent ticket-specific closure, retain the separate Kata-close effect/readback; manual evidence-backed closure remains the bootstrap path until this operation is admitted |
+| `task continue` | Start another explicitly admitted bounded turn on the same live attempt/thread/brief/generation; refuse in-flight turn/active goal or stale claim; foreground supervision and distinct launch/ack receipts |
 | `task start` | Check readiness/closure/scope/capacity/B, reserve attempt intent, claim unique Kata actor, allocate owned worktree, bind exact fresh thread, obtain matching acknowledgement and start bounded work |
 | `task submit` | Match current owner/claim/thread/attempt/B, stop/freeze source, check single clean commit, retain candidate and record report; no acceptance inference |
 | `task verify` | Materialize retained C separately, run admitted checks/live Insula, independently audit artifacts and retain review disposition; never test mutable worker leftovers |

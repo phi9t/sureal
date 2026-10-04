@@ -118,11 +118,11 @@ Record assignment identities in revision-checked metadata and append worktree/br
 
 ```bash
 kata comment ISSUE_REF --body-stdin --agent < NOTE.md
-kata close ISSUE_REF --done \
+kata close ISSUE_REF --reason done \
   --message 'State the scoped deliverable and actual independent verification.' \
   --commit LANDED_SHA \
   --evidence 'reviewed-paths:docs/research/tasks/TASK.md' \
-  --evidence 'test:ACTUAL_LIVE_COMMAND' --agent
+  --test 'ACTUAL_LIVE_COMMAND' --agent
 ```
 
 Use installed supported CLI options; `kata comment --help` is authoritative for comment text input. The inspected v0.14.3 supports `--body`, `--body-file` and `--body-stdin`. A close asserts completion. The message and linked evidence must cover this ticket's live Insula, retention and landing criteria; a commit hash alone does not prove them.

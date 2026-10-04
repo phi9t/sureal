@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "authority": "Bounded owned live test fixtures; final53.A/B actual useful repo tasks remain separate.",
+  "capacity": 2,
+  "briefs": [
+    {
+      "id": "probe.A",
+      "goal": "Validate exact assignment, source identity and an owned live Insula Git-state probe.",
+      "writes": [
+        "fixture/worker-a/"
+      ],
+      "outputs": "attempt-owned unique output path",
+      "native_goal": false,
+      "acceptance": "Exact public report/ack plus actual namespace/source/resource evidence."
+    },
+    {
+      "id": "probe.B",
+      "goal": "Validate concurrent independent source/turn identity, continuation and controlled handoff.",
+      "writes": [
+        "fixture/worker-b/"
+      ],
+      "outputs": "attempt-owned unique output path",
+      "native_goal": false,
+      "acceptance": "Actual overlap/continuation and twice-observed stop before retirement."
+    }
+  ],
+  "materialization": "Live driver commits these pinned brief definitions into its owned Git fixture at exact fixture base; never admits draft-only definitions to the real project."
+}

@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "creator": "Lead manually, under retained explicit per-probe authorization; no implicit native-goal authority from a health label.",
+  "execution_role": "Non-managed isolated runtime fixture with no task claim or scientific writes; all concurrently executing fixture/managed worker threads count toward shared capacity2 test budget.",
+  "authorization_required": [
+    "objective",
+    "fixture_root",
+    "native_methods",
+    "write_scope",
+    "allowed_goal_statuses",
+    "resource_budget",
+    "authorizing_user_message"
+  ],
+  "failure": "Missing explicit authorization/capability blocks relevant fixture gate before dispatch; no auto-create on an unrelated thread.",
+  "probes": [
+    {
+      "id": "fork",
+      "ticket": "50",
+      "methods": [
+        "thread/start",
+        "thread/fork",
+        "thread/read"
+      ],
+      "goal": "Demonstrate shared session grouping without inherited task/progress ownership.",
+      "output": "fork-native-identities.json"
+    },
+    {
+      "id": "native-goal-states",
+      "ticket": "54",
+      "methods": [
+        "thread/start",
+        "thread/goal/set",
+        "thread/goal/get"
+      ],
+      "goal": "Demonstrate native goal lifecycle separately from operating/task state.",
+      "output": "native-goal-state-readbacks.json",
+      "constraint": "The explicit fixture authorization lists objective/status transitions; tool/native-goal rules still apply and may refuse. No managed worker goal is mutated."
+    }
+  ]
+}
