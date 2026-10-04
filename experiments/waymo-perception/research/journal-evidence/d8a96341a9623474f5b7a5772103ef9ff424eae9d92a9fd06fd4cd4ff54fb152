@@ -1,0 +1,177 @@
+{
+  "auditor": {
+    "candidate": "e07de852356b1d0f7e0acee787689060dd0e4979",
+    "materialization": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/materialization.json",
+      "sha256": "1228dfcd5c73e6fed46858097df4de818d56660637755a60b9e20ef7d52d5044"
+    },
+    "review": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-auditor-review-e07de85.json",
+      "sha256": "4c10a69d14ef071d44acdf595ba5a66291f24fffe4e70bf69f2adb2b2d76208e"
+    },
+    "source": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/source-a50"
+  },
+  "authorization": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/observer-launch-admission-v4.json",
+    "sha256": "ea6a67f1af27a450d095cb7ea0e686064582c0e9d3104bb937761db5988cb986"
+  },
+  "cleanup_permitted": false,
+  "ended_ms": 1791150131591,
+  "error_type": "InvalidEvidence",
+  "fixture_provenance": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-provenance-v4.json",
+    "sha256": "32fc8e9980735a56dbbf4e9eb69da751130d2127628b9cfb71c61d9cd5d01007"
+  },
+  "incomplete_native_observation": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-observer-v4/run/incomplete-native-observation.json",
+    "sha256": "1c8fc9df7eaa94e99da1335b6ffd3335402c86602fcd1b7639d9dab527309b3f"
+  },
+  "initialization": {
+    "userAgent": "codex-tui/0.160.0 (Debian 12.0.0; x86_64) tmux-256color (sureal_independent_stop_observer; 1)"
+  },
+  "kind": "IndependentNativeStopPreflight",
+  "managed_dispatch_accepted": false,
+  "native_command_provenance": {
+    "rendered_command": "/bin/bash -lc '/usr/bin/systemd-run --user --scope --unit sureal-sustained-collab-stop50-20261004d --property MemoryMax=134217728 --property MemorySwapMax=0 -- /usr/bin/python3.11 -I -B /data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/fixture-operator-candidate-v8/source/tests/collab/fixture_support/native_stop_fixture.py payload --output /data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/payload --fixture-id stop50-20261004d'",
+    "rendered_command_sha256": "e17d16b527695bb2d114e55696c4b170da7b06075d321ccc9587875cc9703ed7",
+    "rendered_prefix": [
+      "/bin/bash",
+      "-lc"
+    ],
+    "shell_executable": {
+      "path": "/usr/bin/bash",
+      "sha256": "a4b895f98db75079f2af6e510c95db0d5c5d596e448bf3fe689d0bfdd182e28e"
+    },
+    "submitted_command": "/usr/bin/systemd-run --user --scope --unit sureal-sustained-collab-stop50-20261004d --property MemoryMax=134217728 --property MemorySwapMax=0 -- /usr/bin/python3.11 -I -B /data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/fixture-operator-candidate-v8/source/tests/collab/fixture_support/native_stop_fixture.py payload --output /data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/payload --fixture-id stop50-20261004d",
+    "submitted_command_sha256": "78c853478eefe7065a0634bf731e254bd985ee77219605fbd88a5c3ac8085715"
+  },
+  "observations": [],
+  "observer_scope": {
+    "device": 25,
+    "exists": true,
+    "inode": 11500388,
+    "members": [
+      2658668
+    ],
+    "memory_max": 268435456,
+    "oom_kill": 0,
+    "path": "/sys/fs/cgroup/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-collab-stop50-observer-20261004d.scope",
+    "swap_max": 0
+  },
+  "ownership_released": false,
+  "reason": "No actual executed native tool witness",
+  "remaining_conjunctions": [
+    "isolated-Kata",
+    "model-worker-common-Git-and-nested-Insula-grants",
+    "shared-writer-and-resource-reconciliation"
+  ],
+  "runtime": {
+    "daemon": {
+      "boot_id": "6f48f645-3b26-40c9-93fb-db4190c7629b",
+      "executable": {
+        "path": "/data02/home/philip.yang/.codex/packages/app-server-daemon/releases/0.160.0-x86_64-unknown-linux-musl/bin/codex",
+        "sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad"
+      },
+      "pid": 1401274,
+      "start_ticks": 30399734
+    },
+    "endpoint": {
+      "device": 31,
+      "inode": 2017378,
+      "path": "/tmp/codex-daemon-1018/7646eedd140fe70616c0009f52e63754c41b8f5a74d415ebc1981c157036787d",
+      "uid": 1018
+    },
+    "schema_provenance": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema-provenance-v2-experimental.json",
+      "sha256": "0ff346a90128074979b897434625769b32be778b10faccac14d80924e6d77404"
+    },
+    "schemas": {
+      "ThreadBackgroundTerminalsListParams": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadBackgroundTerminalsListParams.json",
+        "sha256": "7ac232410d59afd308dca04f8c0b08f20fa6e87f00bd0d3b5892b7ce8b31d2ee"
+      },
+      "ThreadBackgroundTerminalsListResponse": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadBackgroundTerminalsListResponse.json",
+        "sha256": "b56b1cbcb1d60079ee9f9caaeef29cad869a25b4a6d356566f7c9f672faa7bf4"
+      },
+      "ThreadGoalGetParams": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadGoalGetParams.json",
+        "sha256": "1a5de89b3c5c49528af404a65411a73ef05dc7c9c49c3f00c90d9926dfe34137"
+      },
+      "ThreadGoalGetResponse": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadGoalGetResponse.json",
+        "sha256": "f610000963194731c96ce2b45e46722ca700f1b6ccc1fc55a2fd95e526018fd9"
+      },
+      "ThreadItemsListParams": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadItemsListParams.json",
+        "sha256": "d5cf9784413f1d1abba756e04e48b273a9d12ab2c5675442e91b6a4ee55e19f0"
+      },
+      "ThreadItemsListResponse": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadItemsListResponse.json",
+        "sha256": "bc8a8dcb9a48d9ca38b0a5faa89b80ec2fd57398cd3a8dcc15097776153f6c74"
+      },
+      "ThreadQueueListParams": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadQueueListParams.json",
+        "sha256": "b4c889089eee8a0f785ff85e0128a4d3f347353870fa848221096a472223773b"
+      },
+      "ThreadQueueListResponse": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadQueueListResponse.json",
+        "sha256": "be4e0bfa6fc776101f96582543605d2eff6186309a08903203512b99c5005926"
+      },
+      "ThreadReadParams": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadReadParams.json",
+        "sha256": "dfe040c6ac71d30795b8be3f3ff232e66f362a37f883b491e5d1ea367f470db4"
+      },
+      "ThreadReadResponse": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadReadResponse.json",
+        "sha256": "2af6b987644cfb23e6f408f3cfb29e73ad6255ba2294366d36d56aeabe3854da"
+      },
+      "ThreadShellCommandParams": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadShellCommandParams.json",
+        "sha256": "dc646457ca36be601c8c3d15c44d14907d9a165ccf2b9635a8e9a878f0ca0727"
+      },
+      "ThreadShellCommandResponse": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadShellCommandResponse.json",
+        "sha256": "fd4911613f6a6da2ca13b75342501d4d61f64e00a1083c6d60038369b8caeefe"
+      },
+      "ThreadStartParams": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadStartParams.json",
+        "sha256": "80a40a7fac15b4bf70efb7f893fb353acc0a0d30c68f54aee4f01923deca85de"
+      },
+      "ThreadStartResponse": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadStartResponse.json",
+        "sha256": "92f5ddc37717b922de1dc0b0405e9a6d463f370554e2091610c6e595bc2616d4"
+      },
+      "ThreadTurnsListParams": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadTurnsListParams.json",
+        "sha256": "2a8b93d7d4437cc25e16a1dde16d8db3c338d39e16c5eece2a56e943a21577d7"
+      },
+      "ThreadTurnsListResponse": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadTurnsListResponse.json",
+        "sha256": "8db83d38553204a223cf349680c59b0cc674ba95a4637e1995bfeabd73c80219"
+      }
+    },
+    "transport": "websocket-over-owned-unix"
+  },
+  "schema_version": 1,
+  "started_ms": 1791150097333,
+  "status": "unknown",
+  "stop_capability": false,
+  "task50_accepted": false,
+  "transport": {
+    "endpoint": {
+      "device": 31,
+      "inode": 2017378,
+      "path": "/tmp/codex-daemon-1018/7646eedd140fe70616c0009f52e63754c41b8f5a74d415ebc1981c157036787d",
+      "uid": 1018
+    },
+    "peer_pid": 1401274,
+    "peer_uid": 1018,
+    "status_line": "HTTP/1.1 101 Switching Protocols",
+    "transport": "websocket-over-owned-unix"
+  },
+  "user_authority": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/stop-preflight-user-authority-v5.json",
+    "sha256": "fb4657725d81045bc44a9c8c8607f2e9c9b5d7614471123aee54c4a1e4cf11d8"
+  }
+}

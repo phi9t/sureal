@@ -1,0 +1,219 @@
+{
+  "accepted_scope": {
+    "auth_coverage_producer_scientific_resources_unchanged": true,
+    "canonical_HEAD_ref_tree_index": "a553645ef22761aa7708abf1ee109952a6cd2c38",
+    "canonical_tracked_index_untracked_clean": true,
+    "docs_3e9_ancestor": true,
+    "durable_effects_results": {
+      "effects": 62,
+      "results": 62,
+      "unacknowledged": 0
+    },
+    "exact_fast_forward_nonforce_push_readback": true,
+    "fresh_remote_exactR": true,
+    "legacy19_unique_source_hashes_preserved": true,
+    "managed_workers_observed": 0,
+    "native49_single_closed_at": "2026-10-04T17:57:25.709Z",
+    "original15_registrations_retained": true,
+    "other13_native_tasks_open_unowned": true,
+    "ready_owned_scoped25_integration_complete": true,
+    "ticket49_original_six_phase_acceptance_unchanged": true
+  },
+  "candidate": "a553645ef22761aa7708abf1ee109952a6cd2c38",
+  "cooperative_shared_state_observations": {
+    "browser_runtime_cache_deltas": [
+      {
+        "clean": false,
+        "observed_status_delta": [
+          "?? .scratch/explorer-chrome-cdp/Safe Browsing/UrlBilling.store.4_13435613103286873",
+          "?? .scratch/explorer-chrome-cdp/Safe Browsing/UrlBilling.store.4_13435614900398298",
+          "?? .scratch/explorer-chrome-cdp/Safe Browsing/UrlMalBin.store.4_13435613103287639",
+          "?? .scratch/explorer-chrome-cdp/Safe Browsing/UrlMalBin.store.4_13435614900399124",
+          "?? .scratch/explorer-chrome-cdp/Safe Browsing/UrlMalware.store.4_13435613103281732",
+          "?? .scratch/explorer-chrome-cdp/Safe Browsing/UrlMalware.store.4_13435614900393073",
+          "?? .scratch/explorer-chrome-cdp/Safe Browsing/UrlSoceng.store.4_13435613103059558",
+          "?? .scratch/explorer-chrome-cdp/Safe Browsing/UrlSoceng.store.4_13435614900172371",
+          "?? .scratch/explorer-chrome-cdp/Safe Browsing/UrlUws.store.4_13435613103285300",
+          "?? .scratch/explorer-chrome-cdp/Safe Browsing/UrlUws.store.4_13435614900396596"
+        ],
+        "registration": {
+          "HEAD": "8466a07dcd7a51501ae69049b36d40d4fd7b57d6",
+          "branch": "refs/heads/work/waymo-tracer",
+          "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer"
+        },
+        "runtime_browser_cache_delta_only": true,
+        "status_matches": false
+      }
+    ],
+    "common_ref_deltas": {
+      "refs/codex/turn-diffs/checkpoints/6f694efb72984244de66faeb5a5763c5/6ba6331dd87f72dea2c7d32478f7e8e3/1791141623241/5397c120-76b2-4145-ae79-83aedabde557": {
+        "before": null,
+        "now": "715caef1a74d6d2727ba73ba88a3b100421cdc3d"
+      },
+      "refs/codex/turn-diffs/checkpoints/6f694efb72984244de66faeb5a5763c5/706aae6f65a98b1a56bfc79340edfdc2/1791135720708/4184691e-d243-4e97-84d1-fb0a37c23180": {
+        "before": "1ff89a14189d4066933d380e9d9508a738cf070f",
+        "now": null
+      },
+      "refs/heads/codex/waymo-session-retrospective-20261004": {
+        "before": null,
+        "now": "4ae822b755d95df416d544ffaac131ba9a76a584"
+      }
+    },
+    "external_unadmitted_workspace": {
+      "current_status": "",
+      "disposition": "Retain external active/unadmitted WIP; reconcile ownership/contribution before integration and actual writers/resources before managed admission. No cleanup/control/acceptance claim.",
+      "owner": "unobserved",
+      "registration": {
+        "HEAD": "4ae822b755d95df416d544ffaac131ba9a76a584",
+        "branch": "refs/heads/codex/waymo-session-retrospective-20261004",
+        "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-session-retrospective-20261004"
+      }
+    },
+    "ignored_path_additions": [
+      "!! .worktrees/waymo-session-retrospective-20261004/"
+    ],
+    "ignored_path_removals": []
+  },
+  "coverage_limits": [
+    "Pristine applies to canonical checkout and all ready owned contributions, not all worktrees or global writer quiescence.",
+    "External retrospective workspace and its WIP are retained, unadmitted and not owned or dispatched by this lead/operator; actual session owner remains unobserved.",
+    "Historical retained scientific/browser caches and native capture refs may change cooperatively; no source cleanup or acceptance promotion is inferred.",
+    "Native status is a13-open-task view; separate actualshow and fresh selected SQL prove14total and one closed49.",
+    "Selected closure database covers project/issues/23links/meta, not a complete labels/claims backup; five pending-model holds retain their separate accepted native evidence.",
+    "No new HDFS retention/release, scientific acceptance, managed worker, task50 implementation or future-stage acceptance is claimed."
+  ],
+  "findings": [],
+  "kind": "independent-final-pristine-integration-review",
+  "legacy19_remaining_blockers": {
+    "association": "ticket41.2 ownership/literal independent live admission pending",
+    "continuation_runtime": "remaining full runner/scientific resource gate pending",
+    "explorer": "original scoped scene/preview/runtime admission pending"
+  },
+  "next_stage_conditions": [
+    "Read-only or isolated capability preflight may proceed from exact clean publishedR.",
+    "Fresh actual writer/session/resource reconciliation, including external unadmitted workspace ownership, remains required before shared managed dispatch/stop/integration.",
+    "All task50 onward written contracts, independent exact-source/live gates and scientific budgets remain unchanged."
+  ],
+  "observed_ms": 1791141947920,
+  "parent": "d2ebbd33f48f2b8e5f81912872fd8f832dca9b01",
+  "references": {
+    "actual_landing": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/integration-closeout49-v1/landing-v1/landing.json",
+      "sha256": "f488538b055b0b67f5988b7bca609a26baf6ee59c333cb342469319ce574f0ba"
+    },
+    "actual_landing_outer_command": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/integration-closeout49-v1/landing-command/actual-command.json",
+      "sha256": "dbed67196d5a47c31091e65305b243fc02cc0229d6892675e67f172f11bf9779"
+    },
+    "bounded_checker": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab49-final-pristine-checks-a553645-v4.py",
+      "sha256": "5f5e3066056a44f55de9430118816f48bc39fbdfc6f86451e260ed1fc27dfc2f"
+    },
+    "cold_retention": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/integration-closeout49-v1/retained-candidate/retention.json",
+      "sha256": "7f7d0be0be63c62e6cd53e0e5b3d854dce752e440ed9dfb1d16caa608a4ada77"
+    },
+    "fresh_bounded_facts": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab49-final-pristine-review-a553645-facts.json",
+      "sha256": "800728cd8628f998ff8a14bf6e0260efadabc980febbade546e6eca2921411b5"
+    },
+    "landing_command": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/integration-closeout49-v1/landing-v1/exact-fast-forward/actual-command.json",
+      "sha256": "b1762327797703f491b0157126ec9f91721ef77905666d2786fcfeb2f8bcc921"
+    },
+    "legacy19_preservation": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/legacy19-preservation-during49.json",
+      "sha256": "a392a149fa4b965eb64b2a6eeb64d90343f9958a8b146cc707f6608cab93abc2"
+    },
+    "materialization": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/integration-closeout49-v1/materialization.json",
+      "sha256": "1270061721a37a78c059670adf269f1566a1c60e3ff17d09f15f51066477ac90"
+    },
+    "native49_closed_show_command": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/integration-closeout49-v1/native-show49-r/actual-command.json",
+      "sha256": "14a48f53a140e13b1b89febb1ff8a7a9ac70128fe2ac4202c71b5bc59e9ea76e"
+    },
+    "native_open_status_command": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/integration-closeout49-v1/native-status-r/actual-command.json",
+      "sha256": "c5d920aca934cd10ef309fc59ef6d40fc182c6838c42047990b60b39388efe67"
+    },
+    "operator_review": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab49-integration-landing-operator-review-v4.json",
+      "sha256": "484be9ef7b78891b4da2ee7d8a55db3c412bffc80b8dc89a04ae956c29b571bc"
+    },
+    "original_ticket49_acceptance": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab49-final-acceptance-review-20261004.json",
+      "sha256": "8c4263ccbec6e7144f2e766d93e1d4967cbf6af34f2df6224dbce08e06b001cb"
+    },
+    "publication_command": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/integration-closeout49-v1/landing-v1/publication-readback/actual-command.json",
+      "sha256": "193bf3db90fb36cf0f607612ebbf6b51b1c0c9ba006277711922a018b0446a35"
+    },
+    "push_command": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/integration-closeout49-v1/landing-v1/exact-publication/actual-command.json",
+      "sha256": "875ceccc553e65d09bedf0f1d5a0a2d1f935364383d228c9f122032f5fc2a906"
+    },
+    "retained_disposition": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/integration-closeout49-v1/landing-v1/retained-work-disposition.json",
+      "sha256": "88c47e4f1f4f3266c16fa30d8fa242379ffafb04e8c2d8a90da0b49722c98d21"
+    },
+    "retained_owned_census": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/integration-closeout49-v1/post-retained-work-census-v1.json",
+      "sha256": "c1699eb93e817687491bf3bcde80cba164f21d91313e73f7b330a1b1ee6f0142"
+    },
+    "spec_review": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab49-integration-spec-review-a553645.json",
+      "sha256": "9d8b2cae1066253e4b9d5ca0d43879f85fe8cc0bbfb769b5c544b86dc1be4174"
+    },
+    "standards_review": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab49-integration-standards-review-a553645.json",
+      "sha256": "67fe4035570820839dd412e9645b6c927f7df183334a20323b51b282fd838652"
+    }
+  },
+  "remaining_owned_contribution_disposition": {
+    "auditor_A4_A5": "Exact eight source bodies integrated in R; original branch/commits/snapshots/cold packs retained with original review/audit authorities.",
+    "docs_review_worktree": "Full reviewed3e9f366 bundle ancestor of canonical R; retained clean source/worktree, no deletion.",
+    "foreign_prunable_registrations": "No repair/prune/delete or unrelated repository mutation.",
+    "pages_deploy": "Historical detached deployment workspace retained, no new deployment or runtime claim.",
+    "producer49_a_through_d": "Historical superseded source candidates retained in original worktrees/branches and command/evidence ledgers; not promoted to current acceptance.",
+    "producer49_e_and_D_M": "Accepted/published original candidates and cold/live evidence retained.",
+    "waymo_tracer": "Nineteen exact source bodies retained with association41.2, full continuation/resource, generator/coverage live-verifier blockers; other scratch/cache/preview/process entries keep documented historical dispositions."
+  },
+  "reviewer": {
+    "identity": "/root/collab_execution_admission_review",
+    "native_thread_id": "01a105a5-de93-74a3-adad-c5184f54a751"
+  },
+  "reviewer_provenance": {
+    "final_checker_exit_code": 0,
+    "incorrect_assumptions": [
+      "Global common-ref and ignored-path equality was unnecessary; native capture refs and external work can change.",
+      "Detached registration shape required native boolean normalization.",
+      "Five historical Chrome SafeBrowsing cache version rotations were runtime changes rather than source disposition changes.",
+      "Native status was initially assumed to contain14tasks instead of13open tasks plus separateclosed49."
+    ],
+    "no_shared_mutation_native_effect_cleanup_oldgate_rerun_or_cold_replay": true,
+    "preserved_attempts": [
+      {
+        "path": "/data02/home/philip.yang/devx/tmp/collab49-final-pristine-checks-a553645-v2.py",
+        "sha256": "1f7a342d5a0349ca83ae2899d01343a6bb8c3a3cb2677d368f51663152cbbb47"
+      },
+      {
+        "path": "/data02/home/philip.yang/devx/tmp/collab49-final-pristine-checks-a553645-v3.py",
+        "sha256": "e387edacc1d60c684a5b2387ce3a9c6a3848b9d57754d4c172aeebb4a36a3c66"
+      },
+      {
+        "path": "/data02/home/philip.yang/devx/tmp/collab49-final-pristine-checks-a553645-v4.py",
+        "sha256": "5f5e3066056a44f55de9430118816f48bc39fbdfc6f86451e260ed1fc27dfc2f"
+      },
+      {
+        "path": "/data02/home/philip.yang/devx/tmp/collab49-final-pristine-checks-a553645.py",
+        "sha256": "093f90e992c5a20feef7667f074bf72ae275c46316059dda789df006f753a9a6"
+      }
+    ],
+    "scope_correction": "Earlier private checkers over-expanded canonical/owned acceptance; their stops were reviewer assumptions, not implementation or scientific failures."
+  },
+  "schema_version": 1,
+  "sealed_ms": 1791142017146,
+  "tree": "715caef1a74d6d2727ba73ba88a3b100421cdc3d",
+  "verdict": "pass"
+}

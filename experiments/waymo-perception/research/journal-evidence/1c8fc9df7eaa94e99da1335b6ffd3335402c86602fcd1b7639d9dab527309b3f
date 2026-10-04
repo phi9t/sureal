@@ -1,0 +1,107 @@
+{
+  "kind": "IncompleteNativeObservation",
+  "records": [
+    {
+      "ended_ms": 1791150116042,
+      "method": "thread/read",
+      "params": {
+        "includeTurns": false,
+        "threadId": "01a108dc-eb20-7bb3-a9d9-8678fd287671"
+      },
+      "request_id": 2,
+      "response": {
+        "thread": {
+          "cwd": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration50-fixture-20261004d",
+          "id": "01a108dc-eb20-7bb3-a9d9-8678fd287671",
+          "sessionId": "01a108dc-eb20-7bb3-a9d9-8678fd287671",
+          "status": {
+            "activeFlags": [],
+            "type": "active"
+          }
+        }
+      },
+      "started_ms": 1791150116040
+    },
+    {
+      "ended_ms": 1791150116042,
+      "method": "thread/goal/get",
+      "params": {
+        "threadId": "01a108dc-eb20-7bb3-a9d9-8678fd287671"
+      },
+      "request_id": 3,
+      "response": {
+        "goal": null
+      },
+      "started_ms": 1791150116042
+    },
+    {
+      "ended_ms": 1791150116043,
+      "method": "thread/turns/list",
+      "params": {
+        "cursor": null,
+        "itemsView": "notLoaded",
+        "limit": 100,
+        "sortDirection": "asc",
+        "threadId": "01a108dc-eb20-7bb3-a9d9-8678fd287671"
+      },
+      "request_id": 4,
+      "response": {
+        "data": [
+          {
+            "id": "01a108dc-ec4e-7e93-8798-7bcee48e7814",
+            "status": "inProgress"
+          }
+        ],
+        "nextCursor": null
+      },
+      "started_ms": 1791150116042
+    },
+    {
+      "ended_ms": 1791150116044,
+      "method": "thread/items/list",
+      "params": {
+        "cursor": null,
+        "limit": 100,
+        "sortDirection": "asc",
+        "threadId": "01a108dc-eb20-7bb3-a9d9-8678fd287671"
+      },
+      "request_id": 5,
+      "response": {
+        "data": [],
+        "nextCursor": null
+      },
+      "started_ms": 1791150116043
+    },
+    {
+      "ended_ms": 1791150116045,
+      "method": "thread/queue/list",
+      "params": {
+        "cursor": null,
+        "limit": 100,
+        "threadId": "01a108dc-eb20-7bb3-a9d9-8678fd287671"
+      },
+      "request_id": 6,
+      "response": {
+        "data": [],
+        "nextCursor": null
+      },
+      "started_ms": 1791150116044
+    },
+    {
+      "ended_ms": 1791150116045,
+      "method": "thread/backgroundTerminals/list",
+      "params": {
+        "cursor": null,
+        "limit": 100,
+        "threadId": "01a108dc-eb20-7bb3-a9d9-8678fd287671"
+      },
+      "request_id": 7,
+      "response": {
+        "data": [],
+        "nextCursor": null
+      },
+      "started_ms": 1791150116045
+    }
+  ],
+  "schema_version": 1
+}

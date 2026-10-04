@@ -1,0 +1,106 @@
+{
+  "author": "/root/collab49_independent_auditor",
+  "author_native_fixture_effects_performed": false,
+  "author_native_thread_id": "01a105a4-cdbd-7400-9824-20e8dbb615bb",
+  "candidate": "e07de852356b1d0f7e0acee787689060dd0e4979",
+  "commands": {
+    "all-corrected-auditor-tests-command": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/all-corrected-auditor-tests-command.json",
+      "sha256": "7fba7e27eff8675af44c1334ec4a71648dae82704d3fea70e87b4d61d6e38f75"
+    },
+    "frozen-all-auditor-tests-command": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/frozen-all-auditor-tests-command.json",
+      "sha256": "e8a787b4a74d5e19d21c2431c68ab9cac03627f6fcee53fc9346dfb38f9ffea6"
+    },
+    "frozen-source-cold-materialization-command": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/frozen-source-cold-materialization-command.json",
+      "sha256": "747b35f960cd226c05264368be9647ad64d34e304100870d122a8c7f8a6054cc"
+    },
+    "frozen-source-cold-reverification-command": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/frozen-source-cold-reverification-command.json",
+      "sha256": "4bf956e68b26dba83b49d62da18321eff3e4ca9ceb57ae4d979282959bc7707a"
+    },
+    "lost-initial-native-records-red-command": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/lost-initial-native-records-red-command.json",
+      "sha256": "f48f5d792fb542dcacae00a31f991a9476ec854862f0809c9024ec4a0faf0251"
+    },
+    "retained-failed-native-records-green-command": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/retained-failed-native-records-green-command.json",
+      "sha256": "f96bb79a71d9f11f2f5807e5e700153556bdabcce55d134584d29fd3428a4a1c"
+    }
+  },
+  "contract": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/source-a50/tests/collab/audit_support/runtime-probe-contract.md",
+    "sha256": "6696574e32f19744cedeb0a900004b9b2bce208e9d0aafa742d9d13b0e2bfff5"
+  },
+  "corrections": {
+    "historical_evidence": "No reconstruction of original discarded reads; original failed report remains unchanged.",
+    "retained_initial_reads": "Native validation/kernel/retention failure preserves bounded allowlisted read records; only successful fsynced snapshot clears client buffer.",
+    "unknown_safety": "Missing native running tool witness remains UNKNOWN/no-release/no-cleanup; failed observe component reopens all six method/params/response records."
+  },
+  "entrypoint": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/source-a50/tests/collab/audit_support/runtime_probe.py",
+    "sha256": "2f57150bc77f50511cc72ba61faa192af4bbc6c72a0f8cfff0d848cf85ec0afa"
+  },
+  "kind": "IndependentRuntimeProbeSourceReviewPackage",
+  "live_stop_proof": false,
+  "managed_dispatch_accepted": false,
+  "materialization": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/materialization.json",
+    "sha256": "1228dfcd5c73e6fed46858097df4de818d56660637755a60b9e20ef7d52d5044"
+  },
+  "original_failed_observer": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-observer-v3/run/report.json",
+    "sha256": "53b54de374c0f7b7675a13e7cd722f89ee8b87a190f5d1bae8dcb38b77ab192b"
+  },
+  "original_public_rollout_diagnostic": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-fixture-public-rollout-diagnostic-v3.json",
+    "sha256": "3a4b97b2a8f7f87ded89ea07e12cfc395efe5a917dfeff995ca65b371486268f"
+  },
+  "parent": "58bb73246e5f9ae102748394cca946d113e68fc9",
+  "preserved_originals": [
+    "All prior candidates, cold sources, reviews and live failures",
+    "Canonical/producer/science/coverage/Kata/runtime unchanged by auditor",
+    "Mandatory running witness, two-observation stop proof and resources unchanged"
+  ],
+  "previous_accepted_review": {
+    "path": "/data02/home/philip.yang/devx/tmp/collab50-auditor-review-58bb732.json",
+    "sha256": "94851bc2eddcef2f56d45cee374306a41cb71e8ec61d27d28c3832b6782c1800"
+  },
+  "previous_package": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-4/review-package.json",
+    "sha256": "7234fa8729bf03ae996103c2bffab494fde011ffdf0f4624058b7c45a2997db2"
+  },
+  "retention": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/cold-retention/retention.json",
+    "sha256": "4df9c7d58f783d400513bc0edb2217f56a4cc3daebd98666f275d4b3ba21dbd1"
+  },
+  "schema_version": 1,
+  "scope": [
+    "tests/collab/audit_support/runtime_probe.py",
+    "tests/collab/audit_support/runtime-probe-contract.md",
+    "tests/collab/audit_support/test_probe_collection.py"
+  ],
+  "source": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/source-a50",
+  "source_revalidation": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/snapshot-reverified.json",
+    "sha256": "a10737a0ecb49da27e5a4eed35bc3d0deb38521f14d0a165ce99b8a831c5fcb9"
+  },
+  "source_review_status": "pending",
+  "stage": "A50.5-retain-failed-native-observations",
+  "task50_accepted": false,
+  "tests": {
+    "auditor_component_tests": 107,
+    "fresh_frozen_command": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/frozen-all-auditor-tests-command.json",
+      "sha256": "e8a787b4a74d5e19d21c2431c68ab9cac03627f6fcee53fc9346dfb38f9ffea6"
+    },
+    "required_controls": [
+      "Empty-native-tool retains exact six read records",
+      "Kernel gap retains reads",
+      "Failed durable write retains reads; actual successful write alone clears",
+      "Observe exits3 UNKNOWN and durable incomplete_native_observation preserves six reads, no release/cleanup/managed acceptance"
+    ]
+  },
+  "tree": "af7a9ce34215f2f72a7f3d7171a2f69edac6ee42"
+}

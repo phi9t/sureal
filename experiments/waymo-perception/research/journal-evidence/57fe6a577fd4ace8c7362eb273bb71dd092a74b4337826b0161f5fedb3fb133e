@@ -1,0 +1,102 @@
+{
+  "admission": {
+    "live_stop_capability_proved": false,
+    "managed_dispatch_accepted": false,
+    "no_native_application_Kata_scientific_or_shared_source_effect_by_reviewer": true,
+    "old_thread_retry_release_cleanup_authorized": false,
+    "passive_events_are_diagnostic_not_witness_or_stop_acceptance": true,
+    "requires_fresh_separate_explicit_fixture_and_observer_admissions": true,
+    "source_snapshot_review_pass_only": true,
+    "task50_accepted": false
+  },
+  "author": "/root",
+  "author_native_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+  "candidate": "8441d98b3c935ea39d048568b409efd92e261c91",
+  "findings": [],
+  "kind": "independent-native-fixture-source-review",
+  "materialization": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/fixture-operator-candidate-v8/materialization.json",
+    "sha256": "455c73c6357d0957eb0cff05a6a374e7d8bd05b37c6bbda5f5f88641a4e43fd0"
+  },
+  "operator_sha256": "759740fa1f6c9cbf763cf4c75c7e07c989a1510197907afafa55084c54a8cc1f",
+  "parent": "80e886fee5e5f4ab5bd308a156222c1fa1c1f4a9",
+  "references": [
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/fixture-operator-candidate-v8/source/tests/collab/fixture_support/native_stop_fixture.py",
+      "sha256": "759740fa1f6c9cbf763cf4c75c7e07c989a1510197907afafa55084c54a8cc1f"
+    },
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-review-8441d98-hosttests/actual-command.json",
+      "sha256": "ed7a6655d296d7bac052ea417cf1157dbf80311ea90a3f113945128ddb16f2dc"
+    },
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-review-8441d98-deadline-controls.json",
+      "sha256": "519efb0add083244ccc5a2089086c9f89fc9d1b83ef04f6cdfd8c2342f6f2fe9"
+    },
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-native-fixture-review-80e886f.json",
+      "sha256": "91e2e5d890d7a908f86a2eb5ed9f78d1fe4fe743f18a2437681a74cf651e0bb6"
+    },
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-actual-preflight-review-v3.json",
+      "sha256": "b364ab371787c349a7c136111524d7ee0b62fb25a7bf8be78f631571e3195fe3"
+    },
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-auditor-review-e07de85.json",
+      "sha256": "4c10a69d14ef071d44acdf595ba5a66291f24fffe4e70bf69f2adb2b2d76208e"
+    }
+  ],
+  "resolved_findings": [
+    {
+      "controls": {
+        "path": "/data02/home/philip.yang/devx/tmp/collab50-review-8441d98-deadline-controls.json",
+        "sha256": "519efb0add083244ccc5a2089086c9f89fc9d1b83ef04f6cdfd8c2342f6f2fe9"
+      },
+      "id": "F1",
+      "original_review": {
+        "path": "/data02/home/philip.yang/devx/tmp/collab50-native-fixture-review-80e886f.json",
+        "sha256": "91e2e5d890d7a908f86a2eb5ed9f78d1fe4fe743f18a2437681a74cf651e0bb6"
+      },
+      "resolution": "Post-receive check_deadline now precedes recording. Independent late-receive controls against overall window and started-frame2s deadline both refuse and save no event."
+    }
+  ],
+  "retention": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/fixture-operator-candidate-v8/retention.json",
+    "sha256": "8db81c4e5233aa84c63f9c2506e921ed12291a1f3dcf0dcce09b1cf5f45900db"
+  },
+  "reviewed_ms": 1791150010737,
+  "reviewer": "/root/collab_execution_admission_review",
+  "reviewer_control_notes": [
+    "An initial unchanged-module check wrongly assumed the separate A50 auditor paths existed inside this fixture candidate tree. They are separately retained/admitted sources. The Git lookup failed; corrected to the literal two-file fixture delta plus the independent A50.5 review. This checker assumption is not a fixture/product failure."
+  ],
+  "reviewer_native_thread_id": "01a105a5-de93-74a3-adad-c5184f54a751",
+  "schema_version": 1,
+  "scope_review": {
+    "exact2_changed_paths_vs_v7": [
+      "tests/collab/fixture_support/native_stop_fixture.py",
+      "tests/collab/fixture_support/test_native_stop_fixture.py"
+    ],
+    "fresh_cold_objects": 6568,
+    "no_auditor_or_scientific_changes_in_exact_fixture_delta": true,
+    "passive_diagnostic": "Original connection only; exact own thread and public method/item allowlist; command hashes replace text; private/unrelated data excluded. No added application RPC or subscription.",
+    "privacy_and_caps_host_controls": true,
+    "source_entries": 4120,
+    "unchanged_guards": "Pinned source/tool/workspace/common Git/peer/cgroup and durable pre-effect requests; shell60s/90000ms, observer120s, passive95s/2s,128frames/32MiB, no retries or acceptance changes.",
+    "whole_source_union_and_fresh_cold_reconstruction": true
+  },
+  "source": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/fixture-operator-candidate-v8/source",
+  "tests": {
+    "command": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-review-8441d98-hosttests/actual-command.json",
+      "sha256": "ed7a6655d296d7bac052ea417cf1157dbf80311ea90a3f113945128ddb16f2dc"
+    },
+    "independent_controls": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-review-8441d98-deadline-controls.json",
+      "sha256": "519efb0add083244ccc5a2089086c9f89fc9d1b83ef04f6cdfd8c2342f6f2fe9"
+    },
+    "source_host_tests": 14,
+    "source_host_tests_verdict": "pass"
+  },
+  "tree": "8a6a9f1a7c075cbe4216ebf20f97c78992465c46",
+  "verdict": "pass"
+}

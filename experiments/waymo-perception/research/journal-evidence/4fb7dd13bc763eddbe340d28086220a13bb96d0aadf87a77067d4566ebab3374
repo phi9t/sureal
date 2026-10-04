@@ -1,0 +1,225 @@
+{
+  "findings": [
+    {
+      "file": "tests/collab/audit_support/probe_authority.py",
+      "id": "N1",
+      "line": 139,
+      "priority": "P1",
+      "summary": "load_fixture accesses facts['status']; its real evidence.git_facts helper returns status_z_hex instead. The actual3944 observer consequently exits UNKNOWN before native observation. Correct the seam with a real Git/full-load regression and independently review a new immutable snapshot before a fresh live proof."
+    },
+    {
+      "file": "tests/collab/audit_support/runtime_probe.py",
+      "id": "N2",
+      "line": 113,
+      "priority": "P1",
+      "summary": "The current expected hash is the submitted command, while the actual native item renders exact /bin/bash -lc plus submitted command. Literal diagnostics rederive both distinct hashes. Any correction must bind the specific rendering and exact submitted source/hash; no fuzzy fallback or acceptance of this failed probe."
+    }
+  ],
+  "isolated_kata_preflight": {
+    "api_schema_version": "0.10.0",
+    "commands": 5,
+    "current_owned_pid_and_scope_absent": true,
+    "daemon_birth_ticks": 56274054,
+    "daemon_pid": 2007207,
+    "database": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/home/kata.db",
+      "sha256": "28e9a49bbdd4a809cf9ef16d0c1a4bc8d96eed22df4eb76723fcf295c08dd61a"
+    },
+    "native_default_system_project": true,
+    "native_schema_version": 25,
+    "project_uid": "01M44B2SQKK9JG8XR2EJ08E959",
+    "read_only_database_counts": {
+      "issue_claims": 0,
+      "issue_labels": 0,
+      "issues": 0,
+      "links": 0,
+      "pending_claim_requests": 0
+    },
+    "resource_proof": "retained actual incarnation shows the sole daemon in 256MiB/zero-swap scope, no OOM; client commands are literal five receipts, not an aggregate memory proof",
+    "scope": "private native start/health/project-create/list/same-daemon-stop only",
+    "shared_scope": "all five commands bind private KATA_HOME/database; this review proves no shared target in those calls, not a global shared-database byte-equivalence census",
+    "verdict": "pass",
+    "version": "v0.14.3"
+  },
+  "kind": "IndependentActualCapabilityPreflightReview",
+  "native_stop_preflight": {
+    "actual_exit_code": 3,
+    "actual_fixture_command_rendering": "specific /bin/bash -lc shlex rendering of exact submitted command; diagnostics retained, not a running witness or stop proof",
+    "candidate": "3944feee1ea81656668c459728910e76d4c2cdf4",
+    "cleanup_permitted": false,
+    "observer_resource_scope": {
+      "device": 25,
+      "exists": true,
+      "inode": 11445618,
+      "members": [
+        2044747
+      ],
+      "memory_max": 268435456,
+      "oom_kill": 0,
+      "path": "/sys/fs/cgroup/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-collab-stop50-observer-20261004b.scope",
+      "swap_max": 0
+    },
+    "ownership_released": false,
+    "status": "unknown",
+    "stop_capability": false,
+    "task50_accepted": false,
+    "thread_id": "01a108b2-965f-7bd3-a592-be588c979bac",
+    "witness_count": 0
+  },
+  "observed_ms": 1791147738039,
+  "references": [
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/admission.json",
+      "sha256": "94abab44c5ad9de11e519d56746383ef9dfee5cdbec3c22020b04f7eb117128e"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/actual-incarnation.json",
+      "sha256": "22af67fd13173d89e612a6fd42634c90a500d6869571c98cc77557b5e51b00da"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/post-stop.json",
+      "sha256": "1cc5529b2013e106a7a268d1f7beb1012973f743335da20f0997ce42e7b1fcab"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/project-create-intent.json",
+      "sha256": "326819b052937bb95951adbf3e3aae4df30b80c1e014def45cd979c400366200"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/stop-intent.json",
+      "sha256": "85e8993bf7462936108a0746b37ab521030df390f1a3d257563a466aeaba0a41"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/start-command/actual-command.json",
+      "sha256": "494f97ab19d330198fafc39d3b1bf2f5e9382cc5ad9153664fcfb08b3556cf91"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/start-command/stdout",
+      "sha256": "53b92279e560089f30ca1d54fb1e1f3d27db1b5a5a40975313e6a4428e2a09b7"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/start-command/stderr",
+      "sha256": "d7528c268dcefa80396a56581af1c4765a313984219e44a9f6b19c4962e3880d"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/health-command/actual-command.json",
+      "sha256": "87dbf92e0ad8b8bc9646c66998c44948f03e31a21f86ce3ff59aad81f3572e19"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/health-command/stdout",
+      "sha256": "5a9c530d74d5b7f3c6c67d021f925964c13d3d40845ac1dcc007226eaec048b8"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/health-command/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/create-command/actual-command.json",
+      "sha256": "9b7c4a67fe4997e392aa89763f0ea42a2e9ace619e788b41bd6110a9361ee830"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/create-command/stdout",
+      "sha256": "63295a387f125d0ce37864bf355cae69ec6e6d8a6e6f0d3370c90f0a2260f24b"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/create-command/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/list-command/actual-command.json",
+      "sha256": "cad2daa429a7d93b1f68670ef30361ce70e5e2b7cd8613b9a1b7f480e8933b58"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/list-command/stdout",
+      "sha256": "cabf21875a48e64fffd7bc42d4d95c9ffa630f6f5589a97a2fb333d9bd5e7e0f"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/list-command/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/stop-command/actual-command.json",
+      "sha256": "841f418a15b4be983dd1ec5eb3cb3ae5dc089d39bbf328653d9d42bfcbb3200d"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/stop-command/stdout",
+      "sha256": "e9a8921c5a59f6dd0ed0c30e35659ed4eda107db103999c1087f9ee0555ce993"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/stop-command/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/data02/home/philip.yang/.local/bin/kata",
+      "sha256": "81d5cd58d558504f3ce326a473460e364c002a582ddbeb36f2cd53816f84841f"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/isolated-kata-preflight-v1/home/kata.db",
+      "sha256": "28e9a49bbdd4a809cf9ef16d0c1a4bc8d96eed22df4eb76723fcf295c08dd61a"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-observer-v2/run/report.json",
+      "sha256": "3127af6806b10a08147dc852c4d5d0c61192d40b12451024f9468e5fbe9f6658"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-observer-command-v2/actual-command.json",
+      "sha256": "c50cdc6de362c233dfbf45398974ac2c9a4839f572f6acc856ba61e8cfdb472a"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-observer-command-v2/stdout",
+      "sha256": "112a97583a11922f6992c80c32fe393662be81ce85e5e1ff3671cada3fab4561"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-observer-command-v2/stderr",
+      "sha256": "ed8f27c66e8e4448e1f7e94e2992e3311dec86382b84c9cfeb78d291de501108"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/observer-launch-admission-v2.json",
+      "sha256": "888a738e2bb3c761b14fa6c6ce53f718b177e146b1078c7409ad23f550b1ca31"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-provenance-v2.json",
+      "sha256": "b72aab0da6c58a0b0770453a9a88b095f0558dce36db627ca8b27db56a12be8f"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v2/fixture-launch.json",
+      "sha256": "724c659e406b4a277766097be19de8ccc80390a491ddd7ebdc2168ec4c06692f"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-command-rendering-diagnostic-v2.json",
+      "sha256": "da8304431b3e795c16127d07a82ee81e1158bcbb35dca3599a095b3ae0fcda21"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-fixture-shape-diagnostic-v2.json",
+      "sha256": "c64e00ed169f552ea0592dfc785a8fcce2fe56ae0f5351cd3b8f1eb3bfcc44b0"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-3/source-a50/tests/collab/audit_support/probe_authority.py",
+      "sha256": "233cd2afb3092cee4d4eea082cbbddb277fc7e07ba089ab1c0f54c1e840ae193"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-3/source-a50/tests/collab/audit_support/evidence.py",
+      "sha256": "178976ba6579f0aed4720c4592487a976091f825b1cb33e49d1010b6f106ade5"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-3/source-a50/tests/collab/audit_support/runtime_probe.py",
+      "sha256": "872965a5b9a159cba5c343fbc4038b2e5e32dbf029dc6c76d9f8927ea661cf54"
+    }
+  ],
+  "remaining_gates": [
+    "fresh independently reviewed observer and literal live running witness plus two >=5s stop observations",
+    "model-worker common-Git and nested-Insula grants",
+    "shared writer/resource reconciliation",
+    "all other ticket50 acceptance conjunctions"
+  ],
+  "reviewer": {
+    "identity": "/root/collab_execution_admission_review",
+    "native_thread_id": "01a105a5-de93-74a3-adad-c5184f54a751"
+  },
+  "reviewer_assumptions_and_limits": [
+    "An initial private read-only SQLite check incorrectly queried issue_links; native table is links. The failed checker is a reviewer schema assumption, corrected by literal native sqlite_master readback, not a Kata acceptance failure.",
+    "No native API calls, fixture dispatch, process control, cleanup, shared source edits, goal effects, or claims were performed by this reviewer.",
+    "No current full ticket50, models grant, managed dispatch, retention-release or scientific acceptance is asserted."
+  ],
+  "schema_version": 1,
+  "verdict": "changes-required"
+}

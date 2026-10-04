@@ -1,0 +1,96 @@
+{
+  "admission": {
+    "live_stop_capability_proved": false,
+    "managed_dispatch_accepted": false,
+    "no_native_application_Kata_scientific_or_shared_source_effect_by_reviewer": true,
+    "normal_native_invocation_admitted": false,
+    "old_thread_retry_release_cleanup_authorized": false,
+    "task50_accepted": false
+  },
+  "author": "/root",
+  "author_native_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+  "candidate": "80e886fee5e5f4ab5bd308a156222c1fa1c1f4a9",
+  "findings": [
+    {
+      "file": "tests/collab/fixture_support/native_stop_fixture.py",
+      "id": "F1",
+      "independent_control": {
+        "path": "/data02/home/philip.yang/devx/tmp/collab50-review-80e886f-deadline-control.json",
+        "sha256": "f7e8b7665c21642b26d9216138d93387ba40df36f860acba2cfae87035b3ee42"
+      },
+      "line": 267,
+      "priority": "P1",
+      "required_correction": "Check the current absolute deadline after receive and before retaining its event; exercise delayed/buffered receive completion beyond both the started-frame and overall window deadline. Preserve existing95s/2s bounds and no new application RPC/stop acceptance.",
+      "summary": "Passive drain lacks an absolute post-receive deadline check. A fully buffered receive/parse or final receive that finishes after its current frame/window deadline is retained as successful diagnostic metadata; the loop then returns normally after the 95s end instead of recording UNKNOWN. call() already performs check_deadline after receive, but this new path does not."
+    }
+  ],
+  "kind": "independent-native-fixture-source-review",
+  "materialization": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/fixture-operator-candidate-v7/materialization.json",
+    "sha256": "d60e218eb5f10602b98766e16a07bd2be652b696e15724ff104c8fcac930d303"
+  },
+  "operator_sha256": "249f4dbdfa0bf3dd104e22de8a20f9861bd41027b2c5e5f976c1257c047da973",
+  "parent": "2a8064e28b75508865f8f88e24713fb06d618c02",
+  "references": [
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/fixture-operator-candidate-v7/source/tests/collab/fixture_support/native_stop_fixture.py",
+      "sha256": "249f4dbdfa0bf3dd104e22de8a20f9861bd41027b2c5e5f976c1257c047da973"
+    },
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-review-80e886f-hosttests/actual-command.json",
+      "sha256": "23ebca2a8bddbd555def9e624e6322f22c89c86c5b7ca94bcb70423555a5ef9d"
+    },
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-review-80e886f-deadline-control.json",
+      "sha256": "f7e8b7665c21642b26d9216138d93387ba40df36f860acba2cfae87035b3ee42"
+    },
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-review-80e886f-cold-facts.json",
+      "sha256": "e1502826c065307bab74efc05525ee1ee2c5cf417f3a32dff3729cf334faadf0"
+    },
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-auditor-review-e07de85.json",
+      "sha256": "4c10a69d14ef071d44acdf595ba5a66291f24fffe4e70bf69f2adb2b2d76208e"
+    }
+  ],
+  "retention": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/fixture-operator-candidate-v7/retention.json",
+    "sha256": "819196fd0475b7a9d5781412814023a36743990babbaf3519566832ec091ffb8"
+  },
+  "reviewed_ms": 1791149819346,
+  "reviewer": "/root/collab_execution_admission_review",
+  "reviewer_native_thread_id": "01a105a5-de93-74a3-adad-c5184f54a751",
+  "schema_version": 1,
+  "scope_review": {
+    "exact3_changed_paths": [
+      "tests/collab/fixture_support/contract.md",
+      "tests/collab/fixture_support/native_stop_fixture.py",
+      "tests/collab/fixture_support/test_native_stop_fixture.py"
+    ],
+    "fresh_cold_objects": 6561,
+    "positive_properties": [
+      "Same connection and exact fixture thread filter; allowed turn/status/command item metadata only",
+      "Commands are hashed; private content, unrelated threads/item types and RPC responses are excluded",
+      "128-frame and32MiB projected-event caps; durable individual saves",
+      "No added application RPC/subscription; existing source/workspace/tool/cgroup/no-retry guards preserved"
+    ],
+    "publication_transport_or_stop_policy_change": false,
+    "source_entries": 4120
+  },
+  "source": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/fixture-operator-candidate-v7/source",
+  "tests": {
+    "cold_verification": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-review-80e886f-cold-facts.json",
+      "sha256": "e1502826c065307bab74efc05525ee1ee2c5cf417f3a32dff3729cf334faadf0"
+    },
+    "command": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-review-80e886f-hosttests/actual-command.json",
+      "sha256": "23ebca2a8bddbd555def9e624e6322f22c89c86c5b7ca94bcb70423555a5ef9d"
+    },
+    "independent_deadline_counterexample": "reproduced: start100/end101, receive completes104, one event saved, no timeout",
+    "source_host_tests": 13,
+    "source_host_tests_verdict": "pass"
+  },
+  "tree": "45943e189a31a9dfacd7d63d1b64f039b0e25a4d",
+  "verdict": "changes-required"
+}
