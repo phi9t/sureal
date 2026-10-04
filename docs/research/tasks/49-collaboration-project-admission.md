@@ -6,7 +6,7 @@ Milestone: P0. Implementation home: Sureal. Corenius is a design reference only.
 
 **Dependencies:** current worker integration closeout, written protocol design/implementation-plan review, required live runtime admission. This does not require completion of the scientific program.
 
-**Spec:** [Sureal serial collaboration](../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md).
+**Spec:** [Sureal two-worker collaboration](../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md).
 
 ## Deliverables
 

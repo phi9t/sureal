@@ -6,7 +6,7 @@ Milestone: P3. Implementation home: Sureal.
 
 **Dependencies:** 51.
 
-**Spec:** [Sureal serial collaboration](../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md).
+**Spec:** [Sureal two-worker collaboration](../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md).
 
 ## Deliverables
 
@@ -21,7 +21,7 @@ Milestone: P3. Implementation home: Sureal.
 - Interrupt before/after the Git effect and before result acknowledgement; recover correctly when main equals B, C or neither.
 - Exercise publication acknowledgement loss against an owned fixture remote; refuse divergence and force operations.
 - Independently verify resulting refs/trees and prepared/result evidence, not a controller `passed` flag.
-- In a real Git fixture, construct two candidates from the same B. After landing one, prove the other is stale and cannot reuse its former verification. This does not require parallel dispatch in v1.
+- In a real Git fixture, construct two candidates from the same B. After landing one, prove the other is stale and cannot reuse its former verification. Also exercise serialized landing while an unrelated worker remains active in its distinct worktree; acceptance freezes only the submitted candidate and refuses shared-state uncertainty.
 
 ## Acceptance
 

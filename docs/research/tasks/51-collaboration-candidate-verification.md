@@ -6,7 +6,7 @@ Milestone: P2. Implementation home: Sureal.
 
 **Dependencies:** 50.
 
-**Spec:** [Sureal serial collaboration](../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md).
+**Spec:** [Sureal two-worker collaboration](../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md).
 
 ## Deliverables
 
@@ -20,6 +20,7 @@ Milestone: P2. Implementation home: Sureal.
 - Real Git probes cover zero/two commits, merge commits, wrong base, dirty index/tracked/untracked state and foreign task identity.
 - Live Insula verifies the actual separately materialized candidate; independent audit reopens outputs and evidence bindings.
 - Deliberately swap C/tree/brief/base or mutate the worker checkout; prove invalid evidence cannot authorize the current candidate.
+- Verify one frozen candidate while the other worker continues in its own worktree; prove source/output identities and evidence cannot be mixed across attempts.
 
 ## Acceptance
 

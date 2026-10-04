@@ -1,10 +1,10 @@
-# Sureal-local serial lead–worker collaboration protocol
+# Sureal-local two-worker collaboration protocol
 
 Status: design proposal. Implementation home is settled: all code, specs and task definitions belong to Sureal. Corenius is a read-only design reference. Implementation starts after integration closeout, verified pristine mainline and written design/plan review.
 
 ## Goal
 
-Replace long-lived divergent implementation worktrees and conversational task handoff with one persistent lead, initially one worker seat, bounded task briefs, task-scoped Git workspaces, immutable candidates, exact-candidate verification and conditional fast-forward landing.
+Replace long-lived divergent implementation worktrees and conversational task handoff with one persistent lead, two concurrent worker seats from v1, bounded task briefs, task-scoped Git workspaces, immutable candidates, exact-candidate verification and conditional fast-forward landing.
 
 Sureal is the managed project and implementation home. Its canonical ref remains `refs/heads/phi9t/mainline`; the attachment's `main` is a role, not an instruction to rename a branch. The existing models/training task specs 44–48 remain the first scientific architecture workstream after protocol adoption.
 
@@ -25,7 +25,7 @@ Before starting managed execution, the current worker completes its current task
 ## Roles and authority
 
 - **Lead:** persistent reasoning session; decomposes work, chooses the next admitted brief, reviews the exact candidate and requests landing. It does not repair a submitted candidate in place.
-- **Worker seat:** at most one active task attempt per seat. Initial capacity is one seat; this is a rollout policy, not a permanent single-worker restriction. Each attempt starts a fresh worker thread/process in its own mutable workspace.
+- **Worker seat:** at most one active task attempt per seat. Initial capacity is two seats, with concurrent independent tasks required for v1 admission. Each attempt starts a fresh worker thread/process in its own mutable workspace.
 - **Controller:** a small local CLI owns state transitions, workspace identity, the exclusive protocol lock, candidate retention and integration. It does not invent task acceptance or interpret model output as proof.
 - **Human:** owns intent, architecture and applicable integration/publication authorization. Record the applicable Sureal landing delegation with the admitted task before its first managed landing. Authority never extends to another repository or branch.
 
@@ -37,13 +37,13 @@ Task brief includes stable task ID, intent revision/digest, linked Git task spec
 
 At start:
 
-1. Acquire the controller lock, verify the pinned task spec/plan is on admitted mainline B, reserve its Kata owner through a unique attempt actor and durable controller intent and allocate a free worker seat within admitted capacity. In v1 capacity is one; an active or unresolved attempt occupies it.
+1. Acquire the controller lock, verify the pinned task spec/plan is on admitted mainline B, reserve its Kata owner through a unique attempt actor and durable controller intent and allocate a free worker seat within admitted capacity. In v1 capacity is two; each active or unresolved attempt occupies its own seat. Refuse a third start and duplicate task ownership.
 2. Recheck canonical mainline equals admitted B and is clean.
 3. Create a task workspace outside the canonical source checkout, on a unique disposable `codex/<task-id>/<attempt-id>` branch at B. A linked Git worktree is the recommended initial mode.
 4. Record Kata issue/owner/revision, claim ID/generation, workspace kind/path, Git common-directory identity, branch, seat and attempt identity before launching the worker; capture/reconcile the actual worker session and process identities.
 5. Launch a fresh bounded worker with the exact admitted brief and claim identities; require its matching acknowledgement before RUNNING and retain startup/exit provenance. Lost acknowledgement leaves STARTING/UNKNOWN ownership reserved.
 
-## Workspace isolation and future workers
+## Workspace isolation and concurrent workers
 
 A linked worktree has separate working files, index and HEAD, while sharing the repository's object store, ordinary branch refs and configuration by default. It supports multiple concurrent branches efficiently. Therefore workers must own unique branches, and only the controller may change canonical mainline under the protocol. This is a cooperative authority rule: worktrees do not technically prevent arbitrary Git commands from modifying shared refs.
 
@@ -51,9 +51,13 @@ A clone has its own Git metadata and refs. It is an alternative when independent
 
 Recommend implementing linked worktrees first. Retain workspace kind in records so a clone mode can be added deliberately; do not advertise an unimplemented mode or introduce a generic adapter framework. Verification may use a fresh detached worktree or source snapshot with declared output paths, independently of worker workspace kind.
 
-Record ownership per seat, task and attempt rather than using one project-wide mutable `active_task` identity. v1 still dispatches only one worker; a parallel scheduler is deferred. Future capacity increases allow one workspace and unique branch per active attempt, while landing remains serialized. Scope claims and the existing exclusive GPU lock still govern shared resources.
+Record ownership per seat, task and attempt rather than using one project-wide mutable `active_task` identity. v1 runs two worker sessions concurrently, each in a distinct worktree and unique branch. Attempts also own separate writable output/cache/log directories; immutable input data may be shared. Concurrent writable attempts never share a task worktree, branch or mutable build workspace. Clone mode remains optional.
 
-If two future workers start at B, landing C makes another candidate D with parent B stale. D must explicitly refresh its base to C and produce a newly verified candidate before landing. More clones do not avoid this integration issue. No automatic rebase or reuse of old verification at landing is allowed.
+The lead selects independent ready tasks with declared write scopes. The controller rejects overlapping or unresolved write/resource ownership before dispatch, including parent/child directory overlap and shared scientific outputs. Dependent tasks wait for their predecessor's verified closure; two seats do not permit bypassing the models/training44–48 chain. Each worker can develop while the other is active; global lock sections reserve/reconcile state and integrate candidates, never span a worker's whole execution or a wait for resource availability.
+
+Landing remains serialized through the controller. Only the submitted attempt must be stopped/frozen; unrelated work in the other worktree can continue. The existing exclusive GPU lock still permits only one scientific GPU execution at a time. Kata records waiting-for-resource separately from actual executing state; worker capacity two does not increase admitted GPU/RAM/storage limits.
+
+If both workers start at B, landing C makes another candidate D with parent B stale. D must explicitly refresh its base to C through a newly recorded attempt/claim and produce a newly verified candidate before landing. Preserve D, its evidence and any unsubmitted work before refreshing. The fresh attempt starts in its own worktree at C and applies explicitly retained prior work under the unchanged admitted brief; it does not silently inherit D's verification. More clones do not avoid this integration issue. No automatic rebase or reuse of old verification at landing is allowed.
 
 Worker produces one commit C with exactly one parent B. Development and repair may amend only its own disposable candidate line when the approved brief grants that operation; shared branches and historical commits are never amended.
 
@@ -79,7 +83,7 @@ Under the exclusive controller lock:
 - Current submitted candidate is C, has one parent B and the expected tree.
 - The brief, workspace and candidate identities match the accepted verification.
 - Required checks/review and any configured landing authorization apply to C.
-- The submitted attempt is stopped/frozen and has no uncertain effect. In v1 the sole worker seat must be reconciled; future workers on other branches cannot mutate this candidate or canonical source.
+- The submitted attempt is stopped/frozen and has no uncertain effect. The other seat may remain active in its distinct owned worktree, provided it cannot mutate this candidate or canonical source under the admitted write-scope policy.
 
 Persist a landing intent with expected main B and candidate C before the Git effect. For the normal checked-out canonical repository, perform fast-forward-only integration under the cooperative single-writer lock and immediately verify HEAD/tree/index/working files are exactly C and clean. Do not use update-ref alone on a checked-out branch: moving the ref without synchronizing its checkout is not a completed landing.
 
@@ -91,19 +95,19 @@ Remote publication is separately recorded from local integration. If configured,
 
 ## Recovery and cleanup
 
-All state-changing operations use one controller lock and durable prepared/result records. Write metadata atomically; interrupted writes, missing events or conflicting identities fail closed. The detailed implementation must specify event/record ordering and fsync before its crash tests.
+All state-changing operations use short controller critical sections and durable prepared/result records. Two workers execute outside that lock; candidate landing is serialized inside it. Write metadata atomically; interrupted writes, missing events or conflicting identities fail closed. The detailed implementation must specify event/record ordering and fsync before its crash tests.
 
 Recovery inspects actual Git state, candidate objects and owned attempt/process state:
 
 - Main=B with retained C: no completed integration; keep the operation prepared or resume after revalidation.
 - Main=C with matching tree: reconcile the completed Git effect, then finish receipt/cleanup/publication as applicable.
-- Main neither B nor C, or an unknown worker effect: retain uncertainty and refuse another task until reconciled.
+- Main neither B nor C, or uncertain shared integration/resource state: retain uncertainty and hold affected dispatch/integration until reconciled. Unknown state confined by evidence to one owned attempt holds that seat and its conflicting scopes; an unrelated admitted attempt may continue. If confinement cannot be established, hold project mutation.
 
 Do not blindly rerun worker launch or a Git effect because its acknowledgement was lost. Unknown attempt state occupies the worker seat. An exit code alone does not prove all subprocesses stopped.
 
 Before workspace removal, retain the task brief, every candidate/report/verification/landing record and required scientific artifacts; confirm owned processes have stopped; verify the owned disposable path is neither canonical, a symlink, nor a foreign workspace. For a linked worktree, use Git worktree removal after those checks and preserve the shared Git common directory, retained refs and other worktrees. Abort/cleanup does not discard unsubmitted work without a recorded disposition and applicable authorization.
 
-Cleanup success is recorded separately from landing. A cleanup failure leaves C landed and retryable cleanup; it never implies failed work requiring relaunch. The next task may start only after the previous attempt/effects are reconciled and the v1 single-seat cleanup condition is satisfied.
+Cleanup success is recorded separately from landing. A cleanup failure leaves C landed and retryable cleanup; it never implies failed work requiring relaunch. A seat can be reused only after its previous attempt/effects and owned-workspace cleanup are reconciled. The other seat can continue independently when shared state/resources are known safe. Removing one worktree must not change the other worker's files, branch, process or retained objects.
 
 ## Minimum state
 
@@ -138,22 +142,22 @@ The small command surface covers project initialization/status, task start, cand
 | Stage | Goal | Verifier | Acceptance |
 | --- | --- | --- | --- |
 | P0: project admission | Establish the clean canonical ref and persistent record/lock contract | Real Git fixtures and live Insula identity/cleanliness/lock refusal probes | Exact admitted base; no source/runtime mutation; competing start refused |
-| P1: worker attempt | Allocate a task worktree and start/stop one fresh bounded worker | Actual subprocess/thread handoff, namespace/process evidence and second-worker refusal | Brief/base/seat/workspace identities match; owned branch policy holds; shared Git metadata is recorded; no unresolved seat released |
+| P1: worker attempts | Start two fresh bounded worker sessions in distinct worktrees | Actual overlapping session/process execution, unique Kata claims, third-start/duplicate/scope refusal and live Insula audit | Both seats run concurrently; identities and write/resource ownership match; no unresolved seat released |
 | P2: candidate verification | Submit, retain, verify and repair immutable single-commit candidates | Real commit/dirty/merge probes; actual separate candidate checkout and live Insula artifact audit | C1 evidence cannot authorize C2; wrong brief/base/tree and mutation refused |
 | P3: exact landing/recovery | Advance mainline to the reviewed C and reconcile interruption | Real Git fast-forward/stale refusal plus faults before/after Git effect and publication acknowledgement | Exact reviewed commit lands; no rewrite/force; uncertainty blocks dispatch |
-| P4: cleanup and Sureal pilot | Retain records, remove only disposable owned state and run two serial tasks | Actual cleanup/recovery and two full lead→worker→verify→land cycles with live Insula evidence | Task2 starts at landed Task1 head; canonical clean; scientific evidence retained; no lost owned work |
+| P4: cleanup and Sureal pilot | Run two concurrent tasks, serialize exact landing and refresh the stale candidate | Actual overlapping workers, stale refusal, fresh-attempt re-verification, per-seat cleanup/recovery and live Insula evidence | Both start at B; reviewed C lands first; D from B is refused; newly verified E with parent C lands second; other seat survives cleanup |
 
 Every stage ends with independently audited real execution. Runtime/state corruption and infrastructure failures remain implementation failures; they are not silently accepted as research negatives.
 
 ## Deliberate scope
 
-v1 is a task controller with initial worker capacity one, recommended Git worktrees, a shared Kata queue and file-backed execution receipts, bounded briefs, exact candidates and explicit recovery. No new general workflow engine, custom database or scheduler daemon, agent hierarchy, automatic scheduling, jj backend, unbounded persistent worker, multi-worker concurrency or replacement of existing research retention is part of this proposal.
+v1 is a task controller with initial worker capacity two, recommended Git worktrees, a shared Kata queue and file-backed execution receipts, bounded briefs, exact candidates and explicit recovery. No new general workflow engine, custom database or scheduler daemon, agent hierarchy, automatic scheduling, jj backend, unbounded persistent worker, capacity beyond two or replacement of existing research retention is part of this proposal.
 
 Corenius supplies ideas and inspected examples only. No Corenius code, runtime, crate, policy synchronizer or effort is required to run this protocol. Its inspected landing helper rebases before gating, so it is not a dependency or an implementation to call. Implement the exact-candidate and expected-base contract locally in Sureal.
 
 ## Inspected sources
 
-- User-provided attachment: Pasted text.txt, “one persistent lead and one serial worker”.
+- User-provided attachment: Pasted text.txt, “one persistent lead and one serial worker”; superseded on worker capacity by the user's explicit requirement for two concurrent sessions from the start. The existing filename is retained for link continuity.
 - Sureal initially inspected at 4d0091d. At correction, mainline a3c6955 includes models/training documents51f1b39, while stale draft/scratch leftovers still prevent pristine admission. This session performed no cleanup of the active canonical checkout.
 - Corenius inspected read-only at a21316f: AGENTS.md, CONSTITUTION.md, CONTEXT.md, docs/agents/agentic-engineering.md, tools/agents/land.py, worktree-landing.md and crate documentation. This read-only inspection informs the design; implementation and authoritative records remain in Sureal.
 - [Git worktrees and shared refs](https://git-scm.com/docs/git-worktree)
@@ -166,7 +170,7 @@ Corenius supplies ideas and inspected examples only. No Corenius code, runtime, 
 | Milestone | Sureal task specification | Blocked by |
 | --- | --- | --- |
 | P0 | [49 — project and clean-base admission](../../research/tasks/49-collaboration-project-admission.md) | Current closeout; written design/plan review |
-| P1 | [50 — serial worker attempts](../../research/tasks/50-collaboration-worker-attempts.md) | 49 |
+| P1 | [50 — two concurrent worker attempts](../../research/tasks/50-collaboration-worker-attempts.md) | 49 |
 | P2 | [51 — immutable candidates and verification](../../research/tasks/51-collaboration-candidate-verification.md) | 50 |
 | P3 | [52 — exact landing and recovery](../../research/tasks/52-collaboration-landing-recovery.md) | 51 |
 | P4 | [53 — cleanup and full-loop admission](../../research/tasks/53-collaboration-cleanup-closeout.md) | 52 |
