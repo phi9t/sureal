@@ -35,7 +35,7 @@ The user requested correction of the [Claude review](2026-10-03-sureal-collabora
 
 ## Capability findings: what inspection proves
 
-Read-only installed help on2026-10-04 confirms Kata exposes `init --project`, create idempotency key, claim refusal unless `--force`, unassign, close, metadata revision conditions and import with fresh target/new-instance. The review's suggestion that these flags might be absent is a **live-behavior unknown**, not a confirmed absent interface. Help does not prove actual claim/restore/daemon isolation; those remain49/50/53.0 live gates.
+Read-only installed help on2026-10-04 confirms Kata exposes `init --project --workspace`, create idempotency key, claim refusal unless `--force`, unassign, close, metadata revision conditions and import with fresh target/new-instance. The review's suggestion that these flags might be absent is a **live-behavior unknown**, not a confirmed absent interface. Help does not prove actual claim/restore/daemon isolation; those remain49/50/53.0 live gates.
 
 Fresh generated experimental Codex schema exposes thread cwd filtering, goal-get, paginated queue-list, turn interrupt and explicit thread-start approval/sandbox fields. Schema does not prove disconnect survival, approval handling, read side effects or owned-tool-process coverage.50/54 must probe actual behavior; unsupported coverage retains UNKNOWN and blocks release. No fabricated methods or automatic goal mutation may substitute.
 
@@ -97,3 +97,11 @@ Read-only inspection additionally confirmed sources/archive helpers require Pyth
 | R13 | Corrected stale cross-references, clarified manifests are already committed inputs, retained read-only scientific-lock wording and added53.0 to README dependencies. |
 
 The corrected bundle is documentation only. Actual native stop coverage, cgroup delegation, isolated Kata behavior, HDFS no-overwrite/readback and live Insula acceptance remain implementation gates.
+
+## Focused role-contract correction
+
+The [focused Claude check](2026-10-03-sureal-collaboration-claude-focused-review.md) of deed4aa confirms twelve narrow findings fully resolved and identifies only the role-map ambiguity below; it finds no dependency cycle. Its historical verdict remains retained.
+
+| Finding | Correction / disposition |
+| --- | --- |
+| B1 | Added authoritative ticket_roles:49 implementation+metadata;50/51/52/53.0/54 implementation;53 pilot-state+metadata. all expands only to listed roles; unlisted roles refuse. Every listed role requires nonempty gate/post-landing/closure receipts. Shared49 gates intentionally rerun at M;53 pilot gates are E-state and F uses its metadata gate. Removed premature M clauses from X landing oracles, reconciled takeover wording, pinned probe invocation paths and recorded installed init --workspace help. |

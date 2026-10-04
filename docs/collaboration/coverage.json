@@ -107,7 +107,7 @@
         "candidate_roles": [
           "implementation"
         ],
-        "oracle": "Independently reopen exact accepted X/current-stage candidate, sole parent, canonical ref/HEAD/tree/index/tracked/untracked/ignored disposition and configured remote; exact fast-forward, no rewrite.49 additionally records separately verified M.",
+        "oracle": "Independently reopen exact accepted X/current-stage candidate, sole parent, canonical ref/HEAD/tree/index/tracked/untracked/ignored disposition and configured remote; exact fast-forward, no rewrite.",
         "required_raw_evidence": [
           "cases/exact-stage-landing/candidate-context.json",
           "cases/exact-stage-landing/accepted-gate-audit.json",
@@ -328,7 +328,7 @@
         "candidate_roles": [
           "implementation"
         ],
-        "oracle": "Independently reopen exact accepted X/current-stage candidate, sole parent, canonical ref/HEAD/tree/index/tracked/untracked/ignored disposition and configured remote; exact fast-forward, no rewrite.49 additionally records separately verified M.",
+        "oracle": "Independently reopen exact accepted X/current-stage candidate, sole parent, canonical ref/HEAD/tree/index/tracked/untracked/ignored disposition and configured remote; exact fast-forward, no rewrite.",
         "required_raw_evidence": [
           "cases/exact-stage-landing/candidate-context.json",
           "cases/exact-stage-landing/accepted-gate-audit.json",
@@ -459,7 +459,7 @@
         "candidate_roles": [
           "implementation"
         ],
-        "oracle": "Independently reopen exact accepted X/current-stage candidate, sole parent, canonical ref/HEAD/tree/index/tracked/untracked/ignored disposition and configured remote; exact fast-forward, no rewrite.49 additionally records separately verified M.",
+        "oracle": "Independently reopen exact accepted X/current-stage candidate, sole parent, canonical ref/HEAD/tree/index/tracked/untracked/ignored disposition and configured remote; exact fast-forward, no rewrite.",
         "required_raw_evidence": [
           "cases/exact-stage-landing/candidate-context.json",
           "cases/exact-stage-landing/accepted-gate-audit.json",
@@ -570,7 +570,7 @@
         "candidate_roles": [
           "implementation"
         ],
-        "oracle": "Independently reopen exact accepted X/current-stage candidate, sole parent, canonical ref/HEAD/tree/index/tracked/untracked/ignored disposition and configured remote; exact fast-forward, no rewrite.49 additionally records separately verified M.",
+        "oracle": "Independently reopen exact accepted X/current-stage candidate, sole parent, canonical ref/HEAD/tree/index/tracked/untracked/ignored disposition and configured remote; exact fast-forward, no rewrite.",
         "required_raw_evidence": [
           "cases/exact-stage-landing/candidate-context.json",
           "cases/exact-stage-landing/accepted-gate-audit.json",
@@ -838,7 +838,7 @@
         "candidate_roles": [
           "implementation"
         ],
-        "oracle": "Independently reopen exact accepted X/current-stage candidate, sole parent, canonical ref/HEAD/tree/index/tracked/untracked/ignored disposition and configured remote; exact fast-forward, no rewrite.49 additionally records separately verified M.",
+        "oracle": "Independently reopen exact accepted X/current-stage candidate, sole parent, canonical ref/HEAD/tree/index/tracked/untracked/ignored disposition and configured remote; exact fast-forward, no rewrite.",
         "required_raw_evidence": [
           "cases/exact-stage-landing/candidate-context.json",
           "cases/exact-stage-landing/accepted-gate-audit.json",
@@ -1046,5 +1046,30 @@
       }
     ]
   },
-  "phase_contract": "Require every case matching ticket,phase,candidate-role. Empty matching phase refuses. Gate before landing; post-landing after exact ref effect; closure after close/readback. Close preconditions use accepted gate/post and retention, never its own later close readback. All implementation and metadata role receipts required for ticket closure."
+  "phase_contract": "Require every case matching ticket,phase,candidate-role; reject a role outside ticket_roles. all means every role listed for that ticket. Ticket49 intentionally reruns shared all-role fixture/source gates for M; ticket53 pilot gates apply only to pilot-state and F has its own metadata gate. Empty matching phase refuses. Gate before landing; post-landing after exact ref effect; closure after close/readback. Close preconditions use accepted gate/post and retention, never its own later close readback. Ticket closure requires accepted gate and post-landing receipts for every role in ticket_roles, followed by the required closure audit for those roles; an empty phase refuses for those roles.",
+  "ticket_roles": {
+    "49": [
+      "implementation",
+      "metadata"
+    ],
+    "50": [
+      "implementation"
+    ],
+    "51": [
+      "implementation"
+    ],
+    "52": [
+      "implementation"
+    ],
+    "53.0": [
+      "implementation"
+    ],
+    "54": [
+      "implementation"
+    ],
+    "53": [
+      "pilot-state",
+      "metadata"
+    ]
+  }
 }

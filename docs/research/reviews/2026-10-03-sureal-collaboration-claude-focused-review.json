@@ -1,0 +1,21 @@
+{
+  "source_commit": "deed4aadf4ec94516674710613473c30d9d88e59",
+  "source_files": {
+    "docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md": "650a8c165a7681ab6b28d9c4e0f4916743da5b081826fc0e30227e01d24bc074",
+    "docs/collaboration/coverage.json": "7dc076cf585e099f98a86480eb6e5b75e9592393f7d5b67e0afa24a61fce4fef",
+    "docs/collaboration/fixtures/runtime-probes.json": "0bb3a26f0a65fa6d7d84a7500d007d1ceebfcf34d17c107ad83cda5542241c32",
+    "docs/collaboration/checks/53.B.json": "f36efe70ba76e7ba496c75645e156562457dbd85e1847bc06bd3ef1999033ead",
+    "docs/research/tasks/50-collaboration-worker-attempts.md": "b76e6cd611ac4905bfb431f91036cca3549aecec4db41fd8a09cca220a5d3193",
+    "docs/research/reviews/2026-10-03-sureal-collaboration-review-resolution.md": "3b94773187185a53646c00c8d91a95addab0657e2d8623eee1b0de1031fe74b0"
+  },
+  "artifact_directory": "/data02/home/philip.yang/devx/tmp/sureal-collaboration-claude-focused-t0g980fn",
+  "tools_enabled": [],
+  "reported_models": [
+    "claude-fable-5-1"
+  ],
+  "verdict": "not PASS yet; B1 only",
+  "request_sha256": "d2544a3e3f8980099c04a90e06eea954a86b98474563ae4ed4ca0030092944f1",
+  "response_sha256": "47872501bbfb1bdbb221cfeef74938af8ece4124f292bf143ce3f651940f67fe",
+  "review_body_sha256": "e30161c42813afc26e535b79dac387702a3930cf6d41ba948206e0dc1f1c0805",
+  "rendered_report_sha256": "24fc725483dae5125ba2227ccc849d4d7d2f063bfc03d729b26a6c50c6e475b0"
+}
