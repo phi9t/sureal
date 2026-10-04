@@ -21,6 +21,7 @@ Milestone: P3. Implementation home: Sureal.
 - Interrupt before/after the Git effect and before result acknowledgement; recover correctly when main equals B, C or neither.
 - Exercise publication acknowledgement loss against an owned fixture remote; refuse divergence and force operations.
 - Independently verify resulting refs/trees and prepared/result evidence, not a controller `passed` flag.
+- In a real Git fixture, construct two candidates from the same B. After landing one, prove the other is stale and cannot reuse its former verification. This does not require parallel dispatch in v1.
 
 ## Acceptance
 

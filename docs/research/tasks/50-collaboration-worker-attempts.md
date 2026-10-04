@@ -2,7 +2,7 @@
 
 Milestone: P1. Implementation home: Sureal.
 
-**Goal:** start exactly one fresh bounded worker attempt from an immutable task brief and exact mainline base in an independent Git clone.
+**Goal:** start exactly one fresh bounded worker attempt from an immutable task brief and exact mainline base in a task-scoped Git workspace, initially a linked worktree.
 
 **Dependencies:** 49.
 
@@ -11,14 +11,14 @@ Milestone: P1. Implementation home: Sureal.
 ## Deliverables
 
 - Start captures task/brief/base/workspace/attempt identity before dispatch.
-- Independent disposable clone outside canonical source; task branch uses `codex/` prefix. No linked worktree/shared Git refs in v1.
-- One serial worker seat and fresh task thread/process; retained startup, exit and process disposition.
+- Disposable linked worktree outside canonical source; unique `codex/<task-id>/<attempt-id>` branch. Record workspace kind/path and shared Git common-directory identity. Clone mode is an optional later implementation, not a prerequisite.
+- Initial capacity one, with seat/task/attempt ownership recorded separately to permit later capacity expansion; fresh task thread/process; retained startup, exit and process disposition.
 - Explicit aborted/unknown attempt handling; lost launch acknowledgement never blindly starts another worker.
 
 ## Verifiers
 
 - Actual subprocess handoff inside live Insula with the admitted brief/base; independently reopen process and workspace evidence.
-- Change private clone refs and prove canonical refs remain unchanged; do not claim OS isolation merely from independent Git metadata.
+- In real Git fixtures, prove worktrees have separate files/index/HEAD and shared ordinary refs/objects; exercise owned-branch operations and canonical-mainline guard refusal. Record cooperative enforcement honestly; do not claim independent refs or OS isolation.
 - Refuse a second start, foreign workspace, changed brief/base and unresolved process state.
 
 ## Acceptance
@@ -30,4 +30,4 @@ Milestone: P1. Implementation home: Sureal.
 
 ## Closure evidence
 
-Retain task/brief/source/runtime pins, clone identity, dispatch/exit/process evidence, concurrent-start refusal, independent live receipts and reviewed landed implementation.
+Retain task/brief/source/runtime pins, workspace/seat identity, dispatch/exit/process evidence, concurrent-start refusal, independent live receipts and reviewed landed implementation.

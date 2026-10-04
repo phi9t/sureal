@@ -1,0 +1,41 @@
+import hashlib,json,re,subprocess
+from pathlib import Path
+from urllib.parse import unquote
+root=Path.cwd();base='19854df4b54769b394a0390d7c92867df6964316';source='447267246d08d20747ea21fac99bda33bfeed311'
+paths=subprocess.check_output(['git','diff','--cached','--name-only',base],text=True).splitlines()
+expected=subprocess.check_output(['git','diff','--name-only',source+'^',source],text=True).splitlines()
+assert len(paths)==7 and paths==expected
+missing=[];links=0
+for p in paths:
+ data=Path(p).read_bytes();text=data.decode()
+ for target in re.findall(r'\[[^\]\n]+\]\(([^)\n]+)\)',text):
+  target=target.strip('<>')
+  if target.startswith(('https://','http://','mailto:','#','app://')):continue
+  links+=1;resolved=(Path(p).parent/unquote(target.split('#')[0])).resolve()
+  if not resolved.exists():missing.append({'source':p,'target':target})
+ for marker in ('<<<<<<< ','=======\n','>>>>>>> '):assert marker not in text
+ if p!='experiments/waymo-perception/research-task-index.md':assert data==subprocess.check_output(['git','show',source+':'+p])
+assert not missing,missing
+idx='experiments/waymo-perception/research-task-index.md'
+old=subprocess.check_output(['git','show',base+':'+idx],text=True);new=Path(idx).read_text()
+assert new[new.index('## Prediction–target association study'):] == old[old.index('## Prediction–target association study'):]
+for n in (50,52,53):
+ p=next(p for p in paths if p.startswith('docs/research/tasks/'+str(n)+'-'))
+ for heading in ('**Goal:**','**Dependencies:**','## Deliverables','## Verifiers','## Acceptance','## Closure evidence'):assert heading in Path(p).read_text()
+pins=json.loads(Path('/tmp/sureal-doc447-preserved-pins.json').read_text())
+for p,h in pins['blocked_source_sha256'].items():assert hashlib.sha256(Path(p).read_bytes()).hexdigest()==h
+journal_path=Path('experiments/waymo-perception/research/research-journal.jsonl')
+assert hashlib.sha256(journal_path.read_bytes()).hexdigest()==pins['journal119_prefix_sha256']
+registry='experiments/waymo-perception/research/experiments.json';observed=json.loads(Path(registry).read_text());reference=json.loads(subprocess.check_output(['git','show',base+':'+registry],text=True));observed.pop('updated_utc');reference.pop('updated_utc');assert observed==reference
+model='docs/superpowers/specs/2026-10-03-first-class-models-training-design.md';assert Path(model).read_bytes()==subprocess.check_output(['git','show',base+':'+model])
+ten=json.loads(Path('experiments/waymo-perception/research/sureal-doc60-ten-targets.json').read_text())
+for row in ten:
+ assert hashlib.sha256(Path(row['path']).read_bytes()).hexdigest()==row['mainline_sha256']
+ assert hashlib.sha256(subprocess.check_output(['git','show',base+':'+row['path']])).hexdigest()==row['mainline_sha256']
+protected=json.loads(Path('experiments/waymo-perception/research/sureal-doc60-integration.json').read_text())['protected_scientific_host_hash_rechecks']
+for row in protected:
+ with Path(row['path']).open('rb') as f:actual=hashlib.file_digest(f,'sha256').hexdigest()
+ assert actual==row['sha256']
+report={'schema_version':1,'base':base,'requested_source_commit':source,'generation_command':'python /tmp/sureal-doc447-document-audit.py; exact generator retained in journal120 evidence','scope':'documentation-only linked-worktree and future-capacity clarification; no implementation/gate promotion','paths':[{ 'path':p,'sha256':hashlib.sha256(Path(p).read_bytes()).hexdigest()} for p in paths],'local_links_checked':links,'missing_local_links':missing,'source_docs_exact_except_additive_mainline_research_index':True,'research41_42_43_mainline_suffix_preserved':True,'model_MT0_MT1_reference_unchanged':True,'all19_blocked_source_sha256_exact':True,'journal119_prefix_exact_before120_append':True,'registry_semantics_exact_excluded_timestamp_projection':True,'ten_old_index_targets_already_landed_exact':True,'protected_scientific_host_hash_rechecks':protected,'future_gates':'pristine canonical/source/process/resource and written design/plan/live milestones required; Sureal-only49–53 precede scientific44–48'}
+Path('/tmp/sureal-doc447-document-audit.json').write_text(json.dumps(report,indent=2)+'\n')
+print(json.dumps({k:v for k,v in report.items() if k not in ('paths','protected_scientific_host_hash_rechecks')},indent=2))

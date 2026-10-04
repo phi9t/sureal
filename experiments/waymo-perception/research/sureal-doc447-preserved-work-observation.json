@@ -1,0 +1,124 @@
+{
+  "utc": "2026-10-04T03:19:50.958689+00:00",
+  "base": "19854df4b54769b394a0390d7c92867df6964316",
+  "source": "447267246d08d20747ea21fac99bda33bfeed311",
+  "source_parent": "60ede2883ffebe455cf0672ddede3fa0b7e7d4e2",
+  "blocked_source_sha256": {
+    "experiments/waymo-perception/association/candidate_graph.py": "8e43b93ca958598ea3a6732a36a897d4576706501d06499ea13d31877e850644",
+    "experiments/waymo-perception/association/matching.py": "f698f7055321ce4f35667fd9d8a59cc832de8fbfdad1f34b3f2add1b84e941f0",
+    "experiments/waymo-perception/association/native.py": "a50481591f32f72c0da9405d18bab87fe4007ef217c5c49d532158100225949e",
+    "experiments/waymo-perception/association/prepare.py": "b33b1730e4daffea80c051a518557ea8794698e64ef8bd3c78d334f994d0a776",
+    "experiments/waymo-perception/association/targets.py": "223de7d4d1c5c9314376f0cc6cf1c7ec1f50e6e44fd54956ac09dc21d8bc9664",
+    "experiments/waymo-perception/association/test_matching.py": "a565710dc35db3f6fae4ab6e72b6f7b2348453a9a88c1ebe05ef010e2e5d83fb",
+    "experiments/waymo-perception/association/test_native.py": "57d9d25aa64e43a7511da4c6fad030746c876028342920700ec0bcb43d701974",
+    "experiments/waymo-perception/association/test_prepare.py": "c4373e05c8eed74631b718c3713e9e91ddb094e253116924a36585e4727c51cc",
+    "experiments/waymo-perception/association/test_targets.py": "f42fd840b578b4c1e580dc91e9c2c8c97e65551f996eaf10d7e117d59c55c6e7",
+    "experiments/waymo-perception/audit-cohort-labels.py": "c9f695b596150c531bef6aceb382ca9b09e0654f05e73348d5df5277bc653a55",
+    "experiments/waymo-perception/continuation_runtime/identity.py": "5f9155a3eaf384c0841db04480053a2227b19ad8f85e0f4c243c184f016dfe08",
+    "experiments/waymo-perception/continuation_runtime/test_identity.py": "24d0b0f0a9fe7ff390ec1431752b0d63ae6ac38e377deccc76d08fd2082e7acf",
+    "experiments/waymo-perception/explorer/acquire_previews.py": "35b7e8479106f6d7b023d48de0938aacf0915457b14d901780f6bbf62fcfbeaf",
+    "experiments/waymo-perception/explorer/build.py": "b034f3199bfcdb536e3610ce6e5d38aef0a8406b401827fbcc1186225b40992d",
+    "experiments/waymo-perception/explorer/data.py": "d96efc019ad70fd41edb6e52e48afa3a375b6338f67eeb26d131fa1ecf810639",
+    "experiments/waymo-perception/explorer/public-viewer.fragment.html": "b2b3d0a3ec065e90f055879f50b9b7c38f5a4ce7af4e35645f41eda612bd4066",
+    "experiments/waymo-perception/explorer/run_joint_render.py": "89334ab970de2d22398a5a451f384ff6cc8febafd0a5da8ac724781418143df6",
+    "experiments/waymo-perception/explorer/scene-explorer.template.html": "5464b59c3f6ac3444e3104750d91a9fa96ecb3f8a89696421df5941125d8b079",
+    "experiments/waymo-perception/explorer/test_data.py": "3ed7597c75fa654aeb0e02d0bb1e80cf8009f48576d07f6f901d929a0495ecbc"
+  },
+  "journal119_prefix_sha256": "98cef16219aff70a21ccd09ab2c93e1c3783e6a5fb04611611ec413d2fcc4f4f",
+  "foreign_worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/models-training-task-specs",
+  "foreign_head": "f9fbd5be5b632798f409aa65fb9743588606d701",
+  "foreign_working_paths": [
+    {
+      "path": "docs/research/README.md",
+      "status": " M",
+      "bytes": 6748,
+      "sha256": "3d04f55c42b33cbe30ee8214f4b95ded48a78bdf1cacd22db094d05d66c4f481",
+      "disposition": "foreign design-session-owned active work retained; not edited, adopted, staged or cleaned by this integration"
+    },
+    {
+      "path": "docs/research/task-queue.md",
+      "status": " M",
+      "bytes": 18787,
+      "sha256": "2e27dad47c83cf01be5d8b64bd6f3a4cbe907df98548f33de3d0fe5ba5ac0c1c",
+      "disposition": "foreign design-session-owned active work retained; not edited, adopted, staged or cleaned by this integration"
+    },
+    {
+      "path": "docs/research/tasks/50-collaboration-worker-attempts.md",
+      "status": " M",
+      "bytes": 5556,
+      "sha256": "1e7c56dd40156b5a84acaacab71011d4c5c27c52c5a81e1550c5678601ea4a1b",
+      "disposition": "foreign design-session-owned active work retained; not edited, adopted, staged or cleaned by this integration"
+    },
+    {
+      "path": "docs/research/tasks/52-collaboration-landing-recovery.md",
+      "status": " M",
+      "bytes": 3026,
+      "sha256": "90293f433f8fef7a177815387ce4ab9576eaa4b9bbec270bbd662b9818af9300",
+      "disposition": "foreign design-session-owned active work retained; not edited, adopted, staged or cleaned by this integration"
+    },
+    {
+      "path": "docs/research/tasks/53-collaboration-cleanup-closeout.md",
+      "status": " M",
+      "bytes": 7343,
+      "sha256": "87283dcc14f8c424df82dc016be73b452a30a24ff5d3c890a22989887d6bf127",
+      "disposition": "foreign design-session-owned active work retained; not edited, adopted, staged or cleaned by this integration"
+    },
+    {
+      "path": "docs/research/tasks/54-worker-program-observability.md",
+      "status": " M",
+      "bytes": 8253,
+      "sha256": "c42743e9fc9ceaf978c84ab63be1edbd486ae38f9e6bb3daf09d1a772092a1aa",
+      "disposition": "foreign design-session-owned active work retained; not edited, adopted, staged or cleaned by this integration"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md",
+      "status": " M",
+      "bytes": 58582,
+      "sha256": "d46475d8416ac6a19fa6193d196e4594953b6163410925c371ad53ed2e694b34",
+      "disposition": "foreign design-session-owned active work retained; not edited, adopted, staged or cleaned by this integration"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "status": " M",
+      "bytes": 33294,
+      "sha256": "016759635bb19de04e1d209c25916e08a138d5a9240797f95630139b83fd742e",
+      "disposition": "foreign design-session-owned active work retained; not edited, adopted, staged or cleaned by this integration"
+    },
+    {
+      "path": "experiments/waymo-perception/research-task-index.md",
+      "status": " M",
+      "bytes": 17721,
+      "sha256": "7f889372dc32c9f84235714a2372d9559ed05321cb3a1526902433156ed3d482",
+      "disposition": "foreign design-session-owned active work retained; not edited, adopted, staged or cleaned by this integration"
+    },
+    {
+      "path": "docs/collaboration/checks/53.A.json",
+      "status": "??",
+      "bytes": 7321,
+      "sha256": "d398d298a620719d2acc825c91568aef8c278aa83930daf943c1b54632c0cf6c",
+      "disposition": "foreign design-session-owned active work retained; not edited, adopted, staged or cleaned by this integration"
+    },
+    {
+      "path": "docs/collaboration/checks/53.B.json",
+      "status": "??",
+      "bytes": 6556,
+      "sha256": "8e73b656da24d128c35c90da5dacbeb147ec49f50f5c65ed2fce997609eff527",
+      "disposition": "foreign design-session-owned active work retained; not edited, adopted, staged or cleaned by this integration"
+    },
+    {
+      "path": "docs/collaboration/coverage.json",
+      "status": "??",
+      "bytes": 15703,
+      "sha256": "b7c2024b8d897b020453ad79f6f8fd2f5206a1721890ad5505a04ce5a71ff625",
+      "disposition": "foreign design-session-owned active work retained; not edited, adopted, staged or cleaned by this integration"
+    },
+    {
+      "path": "docs/research/tasks/53-0-collaboration-retention-cleanup-foundation.md",
+      "status": "??",
+      "bytes": 3197,
+      "sha256": "61cc740644a22ba31927ad313848841a483fbeadc33c79e0f2a7d278ac67ea63",
+      "disposition": "foreign design-session-owned active work retained; not edited, adopted, staged or cleaned by this integration"
+    }
+  ],
+  "source_scope": "seven documentation paths only; no protocol implementation"
+}

@@ -1,0 +1,287 @@
+{
+  "schema_version": 1,
+  "axis": "Standards",
+  "utc": "2026-10-04T03:22:21.022314+00:00",
+  "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer",
+  "base": "19854df4b54769b394a0390d7c92867df6964316",
+  "requested_commit": "447267246d08d20747ea21fac99bda33bfeed311",
+  "source_parent": "60ede2883ffebe455cf0672ddede3fa0b7e7d4e2",
+  "review_command": "git diff --cached 19854df4b54769b394a0390d7c92867df6964316",
+  "commit_list": [
+    "447267246d08d20747ea21fac99bda33bfeed311 Recommend task worktrees and preserve future worker capacity"
+  ],
+  "passed": true,
+  "summary": "No documented Standards violations or meaningful Fowler documentation/contract smells. The seven-path candidate contains only requested447, with six exact source447 bodies and the task index retaining current mainline41-43 additions. Linked worktrees are recommended initially; branch/seat/task/attempt and common-directory identity are explicit. Shared refs/configuration and cooperative enforcement are described honestly, without OS-isolation claims. Capacity one is a rollout policy; future capacity does not add a parallel scheduler or weaken serialized exact-candidate landing, stale-base refresh/reverification, exclusive GPU ownership or retention-before-cleanup. Pristine/design/plan/live gates remain future admission requirements.19 blocked source hashes, unchanged journal119, ten already-landed target bodies and all current local links validate. Laterf9 owner work is census-only and remains outside candidate/adoption.",
+  "hard_standards_violations": [],
+  "judgment_smells": [],
+  "standards_sources": [
+    {
+      "path": "CONTRIBUTING.md",
+      "lines": "3-19",
+      "rule": "Focused changes preserve reproducibility/compatibility and source/artifact locks, with explicit provenance and evidence assumptions."
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "lines": "45-50",
+      "rule": "Portable/documentation checks do not establish fresh GPU/scientific reproduction."
+    }
+  ],
+  "reviewed_paths": [
+    {
+      "path": "docs/research/README.md",
+      "sha256": "668fbd196defa8ecaea7b03578ce0675a1a646043c290d44a68aa9222dbbb19e",
+      "bytes": 5318,
+      "working_matches_index": true,
+      "exact_source447": true
+    },
+    {
+      "path": "docs/research/task-queue.md",
+      "sha256": "5bb472806944ba1202ebb655dd2dc01a32e2e3b1108c5f858e0af953ec19c65b",
+      "bytes": 7293,
+      "working_matches_index": true,
+      "exact_source447": true
+    },
+    {
+      "path": "docs/research/tasks/50-collaboration-worker-attempts.md",
+      "sha256": "866a3abf509030e74ed1672fc7aa2b80ec77abb488d29b6ba9ae7937230ddcab",
+      "bytes": 2189,
+      "working_matches_index": true,
+      "exact_source447": true
+    },
+    {
+      "path": "docs/research/tasks/52-collaboration-landing-recovery.md",
+      "sha256": "d46a0b6d618485c26229d883cec499fb6b1688e58e94f4d730cf2956dc5da9dd",
+      "bytes": 2357,
+      "working_matches_index": true,
+      "exact_source447": true
+    },
+    {
+      "path": "docs/research/tasks/53-collaboration-cleanup-closeout.md",
+      "sha256": "f3223700fa70d0f4609ff69f3b980218361047752cf4ceb73e6e7ebb0574354c",
+      "bytes": 2611,
+      "working_matches_index": true,
+      "exact_source447": true
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "sha256": "df811e4e8187c60e85c552a03ae6f597be7574c472d34d56a9fb6b7e3b4aa25e",
+      "bytes": 19311,
+      "working_matches_index": true,
+      "exact_source447": true
+    },
+    {
+      "path": "experiments/waymo-perception/research-task-index.md",
+      "sha256": "947b0aad52ef837e2ee85b0d233e4675097cfa61b826ec428fad7fbd503a3136",
+      "bytes": 20176,
+      "working_matches_index": true,
+      "exact_source447": false
+    }
+  ],
+  "per_hunk_assessment": [
+    {
+      "paths": [
+        "docs/research/README.md",
+        "docs/research/task-queue.md",
+        "experiments/waymo-perception/research-task-index.md"
+      ],
+      "conclusion": "Navigation/queue summaries consistently describe task-scoped workspaces, initial capacity one and preserved gated scientific order; no scheduling activation."
+    },
+    {
+      "path": "docs/research/tasks/50-collaboration-worker-attempts.md",
+      "lines": "5,13-15,21,33",
+      "conclusion": "Unique codex/<task>/<attempt> branches and workspace kind/shared-common-dir/per-seat ownership require real refusal probes; clone mode optional later, shared refs and no OS guarantee explicit."
+    },
+    {
+      "path": "docs/research/tasks/52-collaboration-landing-recovery.md",
+      "lines": "23",
+      "conclusion": "Adds real stale-candidate refusal after competing B-based candidate lands; old verification cannot authorize new base, no parallel dispatch required in v1."
+    },
+    {
+      "path": "docs/research/tasks/53-collaboration-cleanup-closeout.md",
+      "lines": "14,27",
+      "conclusion": "Git-aware worktree cleanup preserves common Git directory, retained candidate refs and other worktrees; capacity one and per-attempt ownership remain explicit."
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "lines": "40-56,66-88,104-106,137-152",
+      "conclusion": "Worktree-first mode, honest cooperative isolation, optional clone dependencies, explicit future per-seat ownership, exact serialized landing/stale reverify and retention-safe cleanup are coherent proposal contracts, not implemented claims."
+    }
+  ],
+  "preservation_checks": {
+    "mainline41_42_43_index_suffix_exact": true,
+    "journal119_sha256": "98cef16219aff70a21ccd09ab2c93e1c3783e6a5fb04611611ec413d2fcc4f4f",
+    "journal_unchanged": true,
+    "nineteen_blocked_sources": [
+      {
+        "path": "experiments/waymo-perception/association/candidate_graph.py",
+        "sha256": "8e43b93ca958598ea3a6732a36a897d4576706501d06499ea13d31877e850644",
+        "bytes": 6293
+      },
+      {
+        "path": "experiments/waymo-perception/association/matching.py",
+        "sha256": "f698f7055321ce4f35667fd9d8a59cc832de8fbfdad1f34b3f2add1b84e941f0",
+        "bytes": 2255
+      },
+      {
+        "path": "experiments/waymo-perception/association/native.py",
+        "sha256": "a50481591f32f72c0da9405d18bab87fe4007ef217c5c49d532158100225949e",
+        "bytes": 2741
+      },
+      {
+        "path": "experiments/waymo-perception/association/prepare.py",
+        "sha256": "b33b1730e4daffea80c051a518557ea8794698e64ef8bd3c78d334f994d0a776",
+        "bytes": 9008
+      },
+      {
+        "path": "experiments/waymo-perception/association/targets.py",
+        "sha256": "223de7d4d1c5c9314376f0cc6cf1c7ec1f50e6e44fd54956ac09dc21d8bc9664",
+        "bytes": 2604
+      },
+      {
+        "path": "experiments/waymo-perception/association/test_matching.py",
+        "sha256": "a565710dc35db3f6fae4ab6e72b6f7b2348453a9a88c1ebe05ef010e2e5d83fb",
+        "bytes": 4460
+      },
+      {
+        "path": "experiments/waymo-perception/association/test_native.py",
+        "sha256": "57d9d25aa64e43a7511da4c6fad030746c876028342920700ec0bcb43d701974",
+        "bytes": 943
+      },
+      {
+        "path": "experiments/waymo-perception/association/test_prepare.py",
+        "sha256": "c4373e05c8eed74631b718c3713e9e91ddb094e253116924a36585e4727c51cc",
+        "bytes": 1691
+      },
+      {
+        "path": "experiments/waymo-perception/association/test_targets.py",
+        "sha256": "f42fd840b578b4c1e580dc91e9c2c8c97e65551f996eaf10d7e117d59c55c6e7",
+        "bytes": 2836
+      },
+      {
+        "path": "experiments/waymo-perception/audit-cohort-labels.py",
+        "sha256": "c9f695b596150c531bef6aceb382ca9b09e0654f05e73348d5df5277bc653a55",
+        "bytes": 3291
+      },
+      {
+        "path": "experiments/waymo-perception/continuation_runtime/identity.py",
+        "sha256": "5f9155a3eaf384c0841db04480053a2227b19ad8f85e0f4c243c184f016dfe08",
+        "bytes": 5719
+      },
+      {
+        "path": "experiments/waymo-perception/continuation_runtime/test_identity.py",
+        "sha256": "24d0b0f0a9fe7ff390ec1431752b0d63ae6ac38e377deccc76d08fd2082e7acf",
+        "bytes": 6520
+      },
+      {
+        "path": "experiments/waymo-perception/explorer/acquire_previews.py",
+        "sha256": "35b7e8479106f6d7b023d48de0938aacf0915457b14d901780f6bbf62fcfbeaf",
+        "bytes": 3749
+      },
+      {
+        "path": "experiments/waymo-perception/explorer/build.py",
+        "sha256": "b034f3199bfcdb536e3610ce6e5d38aef0a8406b401827fbcc1186225b40992d",
+        "bytes": 712
+      },
+      {
+        "path": "experiments/waymo-perception/explorer/data.py",
+        "sha256": "d96efc019ad70fd41edb6e52e48afa3a375b6338f67eeb26d131fa1ecf810639",
+        "bytes": 3704
+      },
+      {
+        "path": "experiments/waymo-perception/explorer/public-viewer.fragment.html",
+        "sha256": "b2b3d0a3ec065e90f055879f50b9b7c38f5a4ce7af4e35645f41eda612bd4066",
+        "bytes": 10987
+      },
+      {
+        "path": "experiments/waymo-perception/explorer/run_joint_render.py",
+        "sha256": "89334ab970de2d22398a5a451f384ff6cc8febafd0a5da8ac724781418143df6",
+        "bytes": 4403
+      },
+      {
+        "path": "experiments/waymo-perception/explorer/scene-explorer.template.html",
+        "sha256": "5464b59c3f6ac3444e3104750d91a9fa96ecb3f8a89696421df5941125d8b079",
+        "bytes": 9819
+      },
+      {
+        "path": "experiments/waymo-perception/explorer/test_data.py",
+        "sha256": "3ed7597c75fa654aeb0e02d0bb1e80cf8009f48576d07f6f901d929a0495ecbc",
+        "bytes": 764
+      }
+    ],
+    "ten_existing_targets": [
+      {
+        "path": "docs/superpowers/plans/2026-10-02-perception-architecture-study.md",
+        "sha256": "7faad1ecdbdac5be4a12c5e954001386c379e7af55c220092224374a5422d6e3",
+        "bytes": 6232,
+        "exact_fixed_base_and_index": true
+      },
+      {
+        "path": "docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md",
+        "sha256": "fef072b2737a4fda94a029944fb999d78be482669b1cd989af953d93b5e7ecf1",
+        "bytes": 7616,
+        "exact_fixed_base_and_index": true
+      },
+      {
+        "path": "experiments/waymo-perception/research/gpu-runtime-verified.json",
+        "sha256": "8ddba7959900ff761f297e6d00f2acc19315aa18ffd84898090a27d0dff4ef91",
+        "bytes": 1066,
+        "exact_fixed_base_and_index": true
+      },
+      {
+        "path": "experiments/waymo-perception/research/perception-evaluators-verified.json",
+        "sha256": "36503c09ab411f95ecb6fb3153a3838a6875840b4d652700486edf0b48b08d12",
+        "bytes": 2408,
+        "exact_fixed_base_and_index": true
+      },
+      {
+        "path": "experiments/waymo-perception/research/r0-geometric-insula.md",
+        "sha256": "7dd1d458a489cb9135028d550dc80fbf0822e369ebb4392a7b5c150738c8846f",
+        "bytes": 3323,
+        "exact_fixed_base_and_index": true
+      },
+      {
+        "path": "experiments/waymo-perception/research/scientific-camera-full103-verified.json",
+        "sha256": "71c597b04556e489d642031c81ae799b20c1e2bde0f9d7c3186ace41b7b11ae4",
+        "bytes": 150904,
+        "exact_fixed_base_and_index": true
+      },
+      {
+        "path": "experiments/waymo-perception/research/scientific-native-shape-full103-retained-audit.json",
+        "sha256": "1b733e92f1ef97623d0d6e31d5747c9b82672c3d96d37f84cdc199e0b51cdbe7",
+        "bytes": 25061,
+        "exact_fixed_base_and_index": true
+      },
+      {
+        "path": "experiments/waymo-perception/research/scientific-semantic-full103-verified.json",
+        "sha256": "79318f6b9ad327163c45b9eb7df1369369a3adf560ba389cf1992275022ce9bf",
+        "bytes": 5972,
+        "exact_fixed_base_and_index": true
+      },
+      {
+        "path": "experiments/waymo-perception/research/tier1-batch-overfit-verifier.md",
+        "sha256": "ac34461b43b25f4617ccd7218282ccf00edf27b5c5eb0c5d989a474f2efe997a",
+        "bytes": 7125,
+        "exact_fixed_base_and_index": true
+      },
+      {
+        "path": "experiments/waymo-perception/research/training-box-full64-replay-verified.json",
+        "sha256": "17cd6b26363946bb7c761bac7fa064113d345d855d51282f3a82ad2378db0e58",
+        "bytes": 3617,
+        "exact_fixed_base_and_index": true
+      }
+    ],
+    "local_link_occurrences_checked": 106,
+    "all_local_targets_present": true,
+    "foreign_census": {
+      "path": "/tmp/sureal-doc447-preserved-pins.json",
+      "sha256": "ef9e151c3b9326015e9f06f085e94f217cb4a79909de86cbe52871f2e946ae1e",
+      "utc": "2026-10-04T03:19:50.958689+00:00",
+      "head": "f9fbd5be5b632798f409aa65fb9743588606d701",
+      "owned_paths": 13,
+      "role": "Point-in-time path/hash census only; later owner files/HEAD not read as candidate, edited, staged or adopted."
+    }
+  },
+  "heuristic_assessment": "Full Fowler baseline considered only for meaningful documentation/contract implications; no smells. Intentional task/index cross-links are navigation, and workspace kind/per-seat identities are required by direct user clarification, not speculative adapter hooks. Independent mathematical/artifact verifiers retained; tooling-covered whitespace/link concerns excluded. No cross-axis reranking.",
+  "scope_caveats": "Read-only seven-document Standards review; no source/index/branch/queue/process/foreign-work mutations, no tests or live/GPU/HDFS actions. Later owner documentation not read. This report does not approve the future design/plan/runtime gates or review later journal120 metadata.",
+  "landing_suitability": "Suitable for authorized requested447 documentation integration on these exact seven staged body pins, preserving source447 ancestry and current mainline additions; later bookkeeping requires separate review."
+}

@@ -1,0 +1,65 @@
+import datetime,hashlib,json,subprocess,sys
+from pathlib import Path
+root=Path.cwd();r=root/'experiments/waymo-perception/research'
+base='19854df4b54769b394a0390d7c92867df6964316';source='447267246d08d20747ea21fac99bda33bfeed311'
+assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==base
+assert subprocess.check_output(['git','rev-parse','MERGE_HEAD'],text=True).strip()==source
+expected=subprocess.check_output(['git','diff','--name-only',source+'^',source],text=True).splitlines()
+assert subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()==expected
+s=json.loads(Path('/tmp/sureal-doc447-standards-review.json').read_text());p=json.loads(Path('/tmp/sureal-doc447-spec-review.json').read_text())
+assert s['passed'] and not s['hard_standards_violations'] and not s['judgment_smells']
+assert not p['findings']
+for src,name in (('/tmp/sureal-doc447-document-audit.json','sureal-doc447-document-audit.json'),('/tmp/sureal-doc447-standards-review.json','sureal-doc447-standards-review.json'),('/tmp/sureal-doc447-spec-review.json','sureal-doc447-spec-review.json'),('/tmp/sureal-doc447-preserved-pins.json','sureal-doc447-preserved-work-observation.json')):(r/name).write_bytes(Path(src).read_bytes())
+pins=json.loads((r/'sureal-doc447-preserved-work-observation.json').read_text())
+for path,h in pins['blocked_source_sha256'].items():assert hashlib.sha256(Path(path).read_bytes()).hexdigest()==h
+handoff=r/'2026-10-04-post-closeout-stage-handoff.md';text=handoff.read_text()
+assert 'The present\n   user contract' in text
+text=text.replace('The present\n   user contract','The then-recorded\n   user contract')
+text+='''
+
+## Subsequent workspace and worker-capacity clarification
+
+The user clarified that future multiple workers must remain possible and clones
+are not required. Requested proposal commit `4472672`, following `60ede28`,
+recommends linked task worktrees initially, unique
+`codex/<task-id>/<attempt-id>` branches and explicit workspace kind, Git common
+directory, seat, task and attempt identities. Capacity one is an initial rollout
+policy. A later capacity increase needs its own admission; this clarification
+does not launch multiple workers or admit a parallel scheduler.
+
+The [current design proposal](../../../docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md)
+and tickets50/52/53 replace the earlier clone-only and permanently-single-worker
+interpretation. Worktrees share ordinary refs/objects, so authority is cooperative
+and no OS-isolation claim is made. Clone support is optional later. Landing stays
+serialized: landing one candidate makes another candidate from its old base
+stale; explicit base refresh and new verification are required.
+
+[Clarification receipt](sureal-doc447-integration.json) and
+[preserved-work observation](sureal-doc447-preserved-work-observation.json)
+record the exact requested scope and later design-owner paths without adopting
+those other revisions. All ready requested documentation is reviewed for landing;
+19 blocked sources, later owner work, retained processes and historical evidence
+keep their prior dispositions. No worktree or common directory is deleted.
+Pristine mainline, written design/plan admission and required independent live
+Insula gates still precede protocol execution. Stage order remains local49–53
+before scientific models/training44–48. Sureal owns implementation; Corenius
+remains a read-only reference. Journal120 is Git-only clarification outside
+sealed HDFS113, with no new science, runtime or retention admission.
+'''
+handoff.write_text(text)
+report={'schema_version':1,'utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'scope':'prepared documentation-only integration of user-requested447; source/evidence preservation and journal bookkeeping','generation_command':'python /tmp/sureal-doc447-closeout.py (exact generator retained as journal120 evidence)','base':base,'requested_commit':source,'requested_parent':'60ede2883ffebe455cf0672ddede3fa0b7e7d4e2','integration_state':'reviewed source proposal; canonical landing/publication verified separately after final combined candidate review','source_ancestry_policy':'preserve requested447 as merge parent using current manual bootstrap workflow; no claim of executing proposed managed controller','document_audit':'sureal-doc447-document-audit.json','preserved_work_observation':'sureal-doc447-preserved-work-observation.json','reviews':{'Standards':{'path':'sureal-doc447-standards-review.json','findings':0,'sha256':hashlib.sha256((r/'sureal-doc447-standards-review.json').read_bytes()).hexdigest()},'Spec':{'path':'sureal-doc447-spec-review.json','findings':0,'sha256':hashlib.sha256((r/'sureal-doc447-spec-review.json').read_bytes()).hexdigest()}},'fresh_checks':[{'command':'python -m unittest tests.test_publication_audit -v','exit_code':0,'tests':24,'seconds':12.113,'scope':'portable host publication tests; no implementation or scientific live admission'},{'command':'python scripts/publication_audit.py --root .','exit_code':0,'status':'pass','tracked_files':3976,'errors':[],'epoch':'seven requested document changes before later bookkeeping'},{'command':'python /tmp/sureal-doc447-document-audit.py','exit_code':0,'local_links':106,'missing_local_links':0,'scope':'doc structure, source pins,119journal prefix,19blocked sources and protected original scientific host hashes'}],'clarified_contract':{'workspace':'linked task worktrees recommended initially; clones not required, optional later','branch':'codex/<task-id>/<attempt-id>','identity':'workspace kind/path/common-directory plus per-seat/task/attempt ownership','capacity':'one is rollout policy; future multiple workers remain possible, not currently implemented or admitted','authority':'cooperative shared Git refs/objects; no OS isolation claim','landing':'serialized exact-candidate fast-forward after required gates; other old-base candidates stale, explicit refresh/new verification required'},'retained_later_owner_work':{'observation_utc':pins['utc'],'head':pins['foreign_head'],'working_paths':len(pins['foreign_working_paths']),'disposition':'active foreign design-owner revisions/working edits remain preserved, not adopted/edited/staged/cleaned here; point-in-time observation is not quiescence'},'retained_implementation_blocks':{'count':19,'inventory':'sureal-comprehensive-closeout-final-inventory.json','disposition':'original source bodies and missing gate reasons preserved; no readiness promotion'},'ten_reported_old_broken_index_targets':'already landed and exact on current mainline; no new broken local links or duplicate evidence claim','stage_order':'current/full-owned-ready closeout; pristine canonical and process/resource/design-plan admission; Sureal49–53; models/training44–48','frozen_science':'full native GT, source packages, recipes, resource budgets, checkpoints, historical reports and independent verification contracts unchanged; no optimizer samples/new scores','HDFS_scope':'journal120 and new doc reports are Git-only after sealed113; original exact-readback/live-recovery evidence remains unchanged, no payload release','future_activation':'no protocol implementation, parallel scheduler, model migration, Kata setup, Corenius dependency or new daemon starts here'}
+(r/'sureal-doc447-integration.json').write_text(json.dumps(report,indent=2)+'\n')
+sys.path.insert(0,str(root/'experiments/waymo-perception'))
+from tracking.journal import append_entry,read_entries
+journal=r/'research-journal.jsonl';entries=read_entries(journal)
+assert len(entries)==119 and entries[-1]['sha256']=='02da12a5866c91f634f218a9c7adfe559aee35d8ad33744ffee1c9d289800d34'
+content='User clarified futuremultipleworkers remainpossible andclonesnotrequired. Requested4472672 documentation proposal recommends linkedtaskworktrees initially, uniquecodex/task/attemptbranches, explicitworkspacekind/Gitcommondirectory and per-seat/task/attemptownership; capacityone is rolloutpolicy, notpermanentrestriction. Sharedrefs/objects meancooperativeauthority, noOSisolation; clone supportoptional later. Landingremainsserialized; a candidate fromoldbase becomesstale afteranotherlanding andneeds explicitrefresh/newverification. Sevenrequestedpaths reviewed independentlyStandards0/Spec0;24portabletests/publicationaudit pass;106local linksresolve, tenolderreportedmissingtargets alreadylandedexact. Currenthandoffrecords thisnewcontract whilepreservingprevious snapshots/epochs. All19blockedsource bodies, original checkpoints/state/admissions/resourceidentity, journal119prefix, scientificcontracts and registrysemantics remainexact; timestamp-onlyprojection excluded.13foreign design-owner workingpaths observed/preserved withhashes; otherlatercommits remainowned/unadopted, no quiescence/cleanup claims. Documentationpreparedforfinalcombinedreview/landing viaexistingmanualbootstrap; no controllerimplementation/admission. Pristine/designplan/process/resource and independentliveInsula gates stillrequired forSureal49–53 beforemodels/training44–48. Coreniusreference-only; no mandatoryKata/daemon.120isGit-only aftersealedHDFS113; no newscientificresult, optimizerupdate, HDFStranfer, payloadrelease, protocol/migration or parallelworker execution.'
+evidence=[r/'sureal-doc447-integration.json',r/'sureal-doc447-preserved-work-observation.json',r/'sureal-doc447-document-audit.json',r/'sureal-doc447-standards-review.json',r/'sureal-doc447-spec-review.json',handoff,Path('/tmp/sureal-doc447-document-audit.py'),Path('/tmp/sureal-doc447-closeout.py')]
+entry=append_entry(journal,'decision',['research-integration-closeout','sureal-local-collaboration-protocol','models-training-architecture-migration'],content,evidence)
+entries=read_entries(journal);notes=['# Research journal','','Append-only observations, hypotheses, decisions and follow-up work. Evidence snapshots and entry hash chains preserve what was known at the time.']
+for e in entries:
+ notes+=['',f"## {e['sequence']}. {e['utc']} — {e['category']}",'',', '.join(e['experiments']),'',e['content']]
+ if e['evidence']:notes+=['','Evidence: '+', '.join(f"[{Path(x['path']).name[:12]}]({x['path']})" for x in e['evidence'])]
+(r/'research-journal.md').write_text('\n'.join(notes)+'\n')
+Path('/tmp/sureal-doc447-journal120.json').write_text(json.dumps(entry,indent=2)+'\n')
+print('Recorded journal120',entry['sha256'],'with',len(evidence),'immutable evidence bodies; no canonical publication claim')
