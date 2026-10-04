@@ -1,0 +1,42 @@
+{
+  "axis": "Spec",
+  "scope": "Seven cached documentation/evidence paths for post-closeout stage handoff; review against current direct user steering",
+  "checks": {
+    "seven_documentation_paths": true,
+    "observed_canonical_equals_published": true,
+    "canonical_explicitly_not_pristine": true,
+    "canonical_five_retained_entries": true,
+    "worker_1205_dispositioned": true,
+    "worker_nineteen_blocked": true,
+    "watcher3951814_censused": true,
+    "external_ten_docs_retained": true,
+    "journal115_append_link": true,
+    "full1279GT_and_original_samples": true,
+    "snapshot_c93d4f775bbcfe5710435aaa5898738abe1e31a0b86026391f6cef169463e3e1": true,
+    "snapshot_e898e73f5343c16646092c73ef95e2f359c3cbe385f3169d3d219df368ef6697": true,
+    "seven_final_staged_paths": true,
+    "immutable115_snapshot_names_preserved": true,
+    "retained_registry_and_stash_explicit": true
+  },
+  "findings": [],
+  "assessment": "Suitable documentation-only handoff landing; pristine-mainline admission and implementation remain blocked as stated",
+  "stage_order": [
+    "all-ready-owned closeout with explicit retained source/process/evidence disposition",
+    "independently admitted pristine published canonical transition",
+    "written serial lead/worker exact-base clone protocol and tooling-home reconciliation then gated adoption",
+    "models/training44\u201348 first scientific architecture workstream"
+  ],
+  "authority": "Current direct user serial-worker/exact-base clone contract; external newer two-worker/worktree proposal is retained owner material, not auto-adopted",
+  "evidence_limits": "Host census is an observation, not descendant shutdown/quiescence proof; later journal115/handoff are Git-only outside sealed HDFS epochs; no new scientific/cleanup/runtime/model implementation claims",
+  "repo_index_unchanged": true,
+  "final_staged_file_sha256": {
+    "experiments/waymo-perception/research/2026-10-04-comprehensive-integration-closeout.md": "5eeeed6b0b2931fa39da49acb432dcdc33de83fc027b32a314a3511af9a0d319",
+    "experiments/waymo-perception/research/2026-10-04-post-closeout-stage-handoff.md": "43bdda1b7f02a5c883853affbb0b1ab5aa6b2b1b4cce510e967b6a4ea66a65ba",
+    "experiments/waymo-perception/research/journal-evidence/c93d4f775bbcfe5710435aaa5898738abe1e31a0b86026391f6cef169463e3e1": "c93d4f775bbcfe5710435aaa5898738abe1e31a0b86026391f6cef169463e3e1",
+    "experiments/waymo-perception/research/journal-evidence/e898e73f5343c16646092c73ef95e2f359c3cbe385f3169d3d219df368ef6697": "e898e73f5343c16646092c73ef95e2f359c3cbe385f3169d3d219df368ef6697",
+    "experiments/waymo-perception/research/research-journal.jsonl": "0eaef849b96e6a400f5d674f13714caab4da0b94e001fd48dc388a3897f393e6",
+    "experiments/waymo-perception/research/research-journal.md": "6373715d0e968281c85a322ca914ab4400a3063019d6a9380839aa2f28181119",
+    "experiments/waymo-perception/research/sureal-post-closeout-stage-handoff.json": "6d4e8716c7c612aab95db8359639ffd84c88fb5493ed06e390bc6993c7fbccc2"
+  },
+  "final_metadata_qualification": "Watcher/launcher were observed only at host census; no present liveness or quiescence inference. Retained worktree/ref/stash dispositions and metadata epoch preserve immutable115 snapshots and later interpretation."
+}

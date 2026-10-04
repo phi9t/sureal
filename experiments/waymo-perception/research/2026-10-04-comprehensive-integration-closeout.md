@@ -90,8 +90,11 @@ draft stays unstaged and untouched; documentation commit `51f1b39` is already
 integrated through `a3c6955`, including tickets44–48. The committed proposal,
 working draft and later migration approval are distinct.
 
-After this closeout, preserve the approved dependency order: independently
-complete resource/continuation admission, then resume the unchanged serial
+The scientific dependencies remain recorded; the later
+[stage-order handoff](2026-10-04-post-closeout-stage-handoff.md) places pristine
+mainline admission and approved protocol adoption ahead of new implementation,
+with tickets44–48 first for scientific architecture. Independently
+complete resource/continuation admission before resuming the unchanged serial
 baseline/residual/class-balanced/prior balanced16 sweep from retained
 checkpoints. Queue ticket42's measurement-indexed failure ledger, then ticket43's
 frozen-weight normalization diagnostic; continue41.2 in isolation. Keep full
