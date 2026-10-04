@@ -208,3 +208,4 @@ node_modules/
 .vite/
 experiments/waymo-perception/viewer/web/dist/
 experiments/waymo-perception/viewer/.venv/
+.kata.local.toml
