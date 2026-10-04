@@ -4,7 +4,7 @@ Milestone: O0. Implementation home: Sureal. Status: specified, not implemented.
 
 **Goal:** let the user understand both workers, their tasks and the research queue from concise evidence-linked summaries and state views, without routinely reading raw transcripts.
 
-**Dependencies:** 49–52; read-only session/history capability admitted on the effective runtime. Collection/view design can proceed earlier; complete live acceptance precedes53. Its live exercises run under this task using admitted49–52 capabilities; they do not depend on starting or closing53.
+**Dependencies:** 49–52 and landed53.0; read-only session/history capability admitted on the effective runtime. Collection/view design can proceed earlier; complete live acceptance precedes final53. Its live exercises use admitted49–52/53.0, including actual submission, stale refresh and per-seat cleanup; they do not depend on starting or closing final53. This ordering correction follows the user's request to fix the review and preserves the required cleanup-display proof.
 
 **Runtime entity contract:** [Session/thread/turn/attempt model](../../superpowers/specs/2026-10-03-codex-runtime-domain-design.md).
 

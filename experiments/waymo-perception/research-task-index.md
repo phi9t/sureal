@@ -115,10 +115,11 @@ After the current worker's full owned integration closeout and a verified pristi
 | [50](../../docs/research/tasks/50-collaboration-worker-attempts.md) | Two concurrent sessions in distinct owned worktrees | 49 |
 | [51](../../docs/research/tasks/51-collaboration-candidate-verification.md) | Exact immutable candidate submission, verification and repair | 50 |
 | [52](../../docs/research/tasks/52-collaboration-landing-recovery.md) | Conditional exact fast-forward landing and recovery | 51 |
-| [54](../../docs/research/tasks/54-worker-program-observability.md) | Worker summaries, state graphs and queue/spec overview | 49–52 |
+| [53.0](../../docs/research/tasks/53-0-collaboration-retention-cleanup-foundation.md) | Landed retention/cleanup and pilot-check foundation | 52 |
+| [54](../../docs/research/tasks/54-worker-program-observability.md) | Worker summaries, state graphs and queue/spec overview | 49–52; landed53.0 |
 | [53](../../docs/research/tasks/53-collaboration-cleanup-closeout.md) | Retained evidence, concurrent pilot and stale-candidate refresh | 52; 54 |
 
-All implementation milestones require independent live Insula receipts. These tickets are specified, not completed. Stage order is pristine mainline → 49–52 → 54 → 53 → models/training44–48; no historical worktree or frozen scientific artifact is discarded by adopting that order.
+All implementation milestones require independent live Insula receipts. These tickets are specified, not completed. Stage order is pristine mainline → 49–52 → 53.0 → 54 → 53 → models/training44–48; no historical worktree or frozen scientific artifact is discarded by adopting that order.
 
 ## Motion native source pilot progress (2026-10-03)
 

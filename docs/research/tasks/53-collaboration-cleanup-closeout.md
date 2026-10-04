@@ -4,7 +4,7 @@ Milestone: P4. Implementation home: Sureal.
 
 **Goal:** admit the complete local lead–worker loop through two real concurrent bounded tasks, serialized exact landing, stale-candidate recovery, retained evidence and safe disposable-workspace cleanup.
 
-**Dependencies:** 52; 54; all 49–52 and worker/program overview54 receipts independently admitted.
+**Dependencies:** 52; landed53.0; 54; all49–52/53.0 and worker/program overview54 receipts independently admitted. Runtime retention/cleanup implementation lands before the pilot baseB is selected; final53 closes only after the actual concurrent C/D/E loop.
 
 **Spec:** [Sureal two-worker collaboration](../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md).
 
@@ -19,7 +19,7 @@ Milestone: P4. Implementation home: Sureal.
 
 ## Concrete pilot briefs
 
-Both briefs are committed here before dispatch; Kata links to their pinned anchors, with stable IDs53.A and53.B and `related` context to53. Their predecessor is admitted54. These are actual repository work, not practice issues. Neither modifies controller/model code, acceptance specs or shared scientific artifacts. Keep per-attempt mutable execution/evidence output paths distinct.
+Both briefs are committed here before dispatch; Kata links to their pinned anchors, with stable IDs53.A and53.B and `related` context to53. Their predecessors are landed53.0 and admitted54. These are actual repository work, not practice issues. Neither modifies controller/model code, acceptance specs or shared scientific artifacts. Keep per-attempt mutable execution/evidence output paths distinct.
 
 ### Pilot task53.A
 
@@ -41,7 +41,7 @@ Both briefs are committed here before dispatch; Kata links to their pinned ancho
 
 **Acceptance:** runbook explains operating/health distinctions, effective phase policy, missing liveness signals, scope/claim uncertainty, retained handoff and stale-base refresh. It documents actual supported diagnosis/recovery operations. Initial candidate D has parent B and is retained/refused after53.A lands; fresh attempt produces E with parent C and obtains fresh review/live verification before exact landing.
 
-These directory claims are disjoint. The accepted implementation plan supplies exact executable commands, runtime source/candidate pins and fixture preparation; it does not change either pilot goal or scope silently. The pilot runtime implementation may be under verification in an isolated candidate source package; its identity is recorded, and independent auditors—not the controller under test—decide acceptance. Bootstrap/manual integration remains available for landing protocol implementation after its gates; do not claim self-certification.
+These directory claims are disjoint. The implementation plan and committed `docs/collaboration/checks/{53.A,53.B}.json` supply executable commands/oracles;53.0 implements the helpers before pilot baseB is chosen. The complete independently fixture-verified runtime implementation must already be landed through53.0/54, so both workers can use it at B. Final53 is program admission through the real concurrent pilot, not permission to rewrite and later land an unlanded implementation candidate. Independent auditors decide acceptance. Any runtime correction suspends/restarts the pilot after a new exact verification/landing; final evidence commits have their own fresh source verification.
 
 ## Verifiers
 

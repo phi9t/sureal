@@ -1,6 +1,6 @@
 # Sureal-local two-worker collaboration — full v1 specification
 
-Status: written specification approved by the user on 2026-10-04 UTC (2026-10-03 client date), including its normative companions. User-selected scope is two concurrent workers, separate worktrees, centralized Kata operations and an evidence-linked worker overview. Code is not implemented or admitted by this document. The historical filename is retained for stable links. Dates use the client timezone.
+Status: written specification approved by the user on 2026-10-04 UTC (2026-10-03 client date), including its normative companions. User-selected scope is two concurrent workers, separate worktrees, centralized Kata operations and an evidence-linked worker overview. Code is not implemented or admitted by this document. The historical filename is retained for stable links. Dates use the client timezone. Review-fix amendment: the user requested correction of the Claude findings on2026-10-04 UTC;53.0 now lands retention/cleanup before54, preserving all final53/54 acceptance.
 
 ## Goal and end-to-end acceptance
 
@@ -108,7 +108,7 @@ Use globally unique operation/attempt IDs and canonical SHA-256 digests for admi
 
 Under the exclusive project lock, durably append a prepared/result event, fsync it, write associated records through temporary file + fsync + atomic rename + parent-directory fsync, then update the small current projection. Retain event sequence and record hashes. Torn trailing journal bytes are diagnosed/reconciled against retained records; corruption of earlier committed history blocks mutation. A crash between event/record/projection writes recovers from the durable evidence, not a guessed status. Unsupported filesystem durability/locking fails project admission.
 
-Derived overview snapshots/summaries have their own cache area and may be rebuilt. Their loss cannot change ownership or acceptance. Runtime record/queue restoration is itself independently verified before recovery is claimed.
+Derived overview snapshots/summaries have their own cache area and may be rebuilt. Their loss cannot change ownership or acceptance. Queue restoration targets a fresh isolated database from a project-only export, never overwrites the shared live daemon database; restored identities/owners require reconciliation before dispatch. Runtime record/queue restoration is itself independently verified before recovery is claimed.
 
 ## Operations and failure behavior
 
@@ -119,6 +119,7 @@ Command names below are the proposed interface, not currently available capabili
 | `init` | Admit canonical/project/runtime/Kata identity and existing-work disposition; produce project receipt; no worker launch |
 | `status` | Read-only text/JSON snapshot of both seats, tasks/queue, current states/evidence/blockers and source freshness; no source/queue mutation |
 | `task import` | Search/map committed task definitions to scoped Kata issues, idempotently create missing issues/dependency edges and link pins; never blindly mark old work done |
+| `task close` | Validate independent ticket-specific closure, retain the separate Kata-close effect/readback; manual evidence-backed closure remains the bootstrap path until this operation is admitted |
 | `task start` | Check readiness/closure/scope/capacity/B, reserve attempt intent, claim unique Kata actor, allocate owned worktree, bind exact fresh thread, obtain matching acknowledgement and start bounded work |
 | `task submit` | Match current owner/claim/thread/attempt/B, stop/freeze source, check single clean commit, retain candidate and record report; no acceptance inference |
 | `task verify` | Materialize retained C separately, run admitted checks/live Insula, independently audit artifacts and retain review disposition; never test mutable worker leftovers |
@@ -134,7 +135,7 @@ Failures carry operation identity, stable reason, retry/reconciliation requireme
 
 ## Kata admission and dispatch handshake
 
-Committed `.kata.toml` binds worktrees to one admitted Sureal project; the controller verifies actual daemon/project identity on use. A stable Git task-to-issue mapping contains task/spec paths and issue UID, without mutable owner/status. Import initially covers49–54 and44–48, then audited relevant research follow-ups. Search before create; use a project/task-derived idempotency key. Task revisions update the same logical issue through an explicit admitted revision rather than duplicating it.
+Committed `.kata.toml` binds worktrees to one admitted Sureal project; the controller verifies actual daemon/project identity on use. A stable Git task-to-issue mapping contains task/spec paths and issue UID, without mutable owner/status. Import initially covers49–54,53.0 and44–48, then audited relevant research follow-ups. Search before create; use a project/task-derived idempotency key. Task revisions update the same logical issue through an explicit admitted revision rather than duplicating it.
 
 The lead chooses up to two independent unowned ready issues. `blocked-by` edges represent prerequisites; closed predecessors are rechecked against their accepted closure evidence. Default user actor is not sufficient: each attempt uses `sureal/<attempt-id>`. A Kata claim reserves the logical owner; controller records describe the execution of that owner rather than creating another claim service.
 
@@ -215,10 +216,11 @@ Visible overview polls every 5 seconds; each source shows its own timestamp and 
 | P1 | [50](../../research/tasks/50-collaboration-worker-attempts.md) | Two actual threads actively overlap in distinct worktrees; exact claims/acknowledgements; third-start/duplicate/scope/resource refusal; explicit handoff |
 | P2 | [51](../../research/tasks/51-collaboration-candidate-verification.md) | Single exact candidate retention, separate live verification, bad-context refusal and C1/C2 evidence isolation |
 | P3 | [52](../../research/tasks/52-collaboration-landing-recovery.md) | Exact B→C landing, real interruption/refusal probes and honest local/remote reconciliation while unrelated work continues |
+| P3.5 | [53.0](../../research/tasks/53-0-collaboration-retention-cleanup-foundation.md) | Exact landed retention/cleanup/check helpers, fresh HDFS/live recovery, project-only queue restore and per-seat cleanup |
 | O0 | [54](../../research/tasks/54-worker-program-observability.md) | Live readable thread/history joins, accurate summaries/state/queue views, progress/hung false-positive tests and freshness/reconnect/no-mutation audit |
 | P4 | [53](../../research/tasks/53-collaboration-cleanup-closeout.md) | Full concurrent pilot, stale refresh/reverification, per-seat cleanup, artifact retention and independent complete-loop closeout |
 
-Order: current owned integration closeout → pristine mainline → 49 → 50 → 51 → 52 → 54 → 53 → models/training44–48. Implementation tasks can be decomposed into independent scopes in the accepted plan; admission dependencies still bind. Ticket54 owns its live observation exercises using49–52 capabilities and does not wait for53 to start.
+Order: current owned integration closeout → pristine mainline → 49 → 50 → 51 → 52 → 53.0 → 54 → 53 → models/training44–48. Implementation tasks can be decomposed into independent scopes in the accepted plan; admission dependencies still bind. Ticket54 owns its live observation exercises using49–52 and landed53.0, including submission/stale refresh/cleanup; it does not wait for final53. The full runtime implementation is already on mainline before the pilot baseB is selected. Closing53.0 is implementation-foundation acceptance, not full-loop admission.
 
 The full pilot uses two bounded real tasks from landed specs, both at B, with independent declared write scopes. Retain observed overlap and exact worker/issue/workspace identities. Land reviewed C for T1; refuse stale D for T2; preserve it; explicitly refresh T2 and independently verify E with parent C before landing E. Prove candidate/source isolation while the other worker is active, cleanup preservation, truthful summaries, resource serialization and crash recovery. The concrete pilot briefs53.A/53.B are defined in [ticket53](../../research/tasks/53-collaboration-cleanup-closeout.md#concrete-pilot-briefs). Import each with a stable subtask ID and pinned spec anchor, `related` to53; do not create a parent/dependency cycle that prevents their execution. They produce useful operating/incident documentation in disjoint directories and exercise actual worker, verifier and integration effects. Toy subprocesses, static screenshots and self-reports alone do not pass.
 

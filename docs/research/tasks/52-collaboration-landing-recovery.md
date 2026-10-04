@@ -14,6 +14,7 @@ Milestone: P3. Implementation home: Sureal.
 
 - Prepared landing record binds expected main B, candidate C, admitted brief and verified evidence under the exclusive controller lock.
 - Fast-forward-only checkout integration and exact post-effect HEAD/tree/index/working-state verification.
+- Evidence-backed `task close` with a distinct prepared/result/readback for Kata closure; manual accepted closure is available for earlier bootstrap stages. HDFS/cleanup recoverers are implemented with those effects in53.0.
 - Separate publication and cleanup outcomes; uncertain push acknowledgement is reconciled by observing the configured remote ref.
 - Recovery reads actual Git/candidate/process state rather than replaying uncertain launch/integration effects.
 

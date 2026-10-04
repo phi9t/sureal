@@ -12,6 +12,8 @@ Milestone: P1. Implementation home: Sureal.
 
 ## Deliverables
 
+V1 managed workers use bounded turns with no native goal. Exact-thread reports are corroborated by matching public item/report digest; CLI IDs alone are not authentication. Stop proof reads native goal/queue/turn and owned-process coverage twice; missing coverage holds ownership. The plan defines supervisor/approval/disconnect probes and lost-thread-creation reconciliation.
+
 - Start claims Kata ownership under a unique attempt actor, pins the landed task spec/plan and captures task/brief/base/claim-generation/seat/workspace/attempt identity durably before dispatch. Capture/reconcile actual sessionId/primary-threadId/runtime-instance and owned tool/process handles and matching worker acknowledgement before RUNNING.
 - Disposable linked worktree outside canonical source; unique `codex/<task-id>/<attempt-id>` branch. Record workspace kind/path and shared Git common-directory identity. Clone mode is an optional later implementation, not a prerequisite.
 - Initial capacity two, with distinct task/session/seat/attempt/worktree/branch and writable output/cache/log identities; retained startup, exit and process disposition. Only short controller transitions are locked; worker execution overlaps.

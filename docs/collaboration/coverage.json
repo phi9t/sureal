@@ -1,0 +1,410 @@
+{
+  "schema_version": 1,
+  "authority": "approved task/spec verifiers; review-fix coverage contract",
+  "cases": {
+    "49": [
+      {
+        "id": "exact-source-and-rootfs",
+        "oracle": "Raw retained commit/tree/source bytes and rootfs/resource wrapper proofs independently match; actual Insula log/exit required.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "real-state-fs-durability",
+        "oracle": "Host/mounted device identity matches actual configured state filesystem; lock contention and fsync boundary faults yield retained recovery or refusal.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "clean-ref-and-path-refusals",
+        "oracle": "Raw Git refs/index/status/ignored/submodule facts show dirty/wrong-ref/unpinned/alias refusals caused no launch or ref mutation.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "journal-corruption",
+        "oracle": "Torn trailing evidence diagnosed; earlier corruption/input-digest mismatch blocks mutation; failed fsync never projects success.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "queue-bootstrap-revision-status",
+        "oracle": "Actual manual bootstrap/import/map M/closure readbacks resolve one project and issue UID per task; old running brief stays pinned; status has no control effects.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "scoped-queue-restore",
+        "oracle": "Project-only actual export imported into fresh fixture DB; independently reopened projects/issues/edges contain no foreign rows.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      }
+    ],
+    "50": [
+      {
+        "id": "two-real-workers-overlap",
+        "oracle": "Actual exact-thread in-progress/tool intervals overlap at B; distinct worktrees/branches/owned outputs and matching Kata actors/acks.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "dispatch-effect-boundaries",
+        "oracle": "Distinct reserve/claim/CAS/thread/CAS-with-thread/turn/ack prepared/result records and real readbacks; ack loss produces no duplicate launch.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "capacity-scope-resource-refusal",
+        "oracle": "Third/duplicate/ancestry/alias/output conflict refusals; exact admitted scientific lock wiring and noninvasive real-lock probe plus fixture contention.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "identity-and-reports",
+        "oracle": "Public exact thread/turn/item report digests reject right-session wrong-thread/fork history/generation/PID reuse; completed turn keeps ownership.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "stop-takeover",
+        "oracle": "Two actual goal/queue/turn/process observations show quiescence before retirement/new owner; unreadable/continuing effects refuse; original work retained.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "transport-lost-thread",
+        "oracle": "Actual disconnect/approval/supervisor behavior retained; cwd/provenance readback recovers sole lost-ack thread or holds UNKNOWN; no speculative retry.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "live-worker-namespace",
+        "oracle": "Both actual workers invoke Insula probes with recorded grants/resource/runtime proofs; host access is not claimed sandboxed.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      }
+    ],
+    "51": [
+      {
+        "id": "candidate-refusals",
+        "oracle": "Real Git zero/multiple/merge/dirty/wrong-parent/task/context candidates refused; no acceptance effect.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "materialization-fidelity",
+        "oracle": "Independent raw blob/mode/symlink/gitlink-aware tree reconstruction equals exact retained C before/after; no mutable leftovers enter inputs.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "retention-and-isolation",
+        "oracle": "Retained C survives branch amendment/owned fixture removal; independent candidate check runs while other actual worker stays active and unchanged.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "repair-context",
+        "oracle": "C1 preserved; live repair or fresh terminal-attempt repair produces new C2 with fresh exact-context live proof; swapped evidence refuses.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      }
+    ],
+    "52": [
+      {
+        "id": "exact-landing",
+        "oracle": "Raw HEAD/tree/index/working/ignored facts prove exact clean B to reviewed C fast-forward; stale/dirty/wrong evidence refuses.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "all-created-effect-recovery",
+        "oracle": "Actual-state reconciliation covers claim/CAS/worktree/thread/turn/candidate/verifier/integration/publication/closure boundaries; no blind repeat.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "B-C-neither-interruption",
+        "oracle": "Faults around effect/result: B pending, C reconciled, neither blocks; unchanged unrelated active seat remains safe.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "remote-ack",
+        "oracle": "Owned actual bare remote readback after lost ack proves exact C refspec publication or retained divergence; no force/rewrite.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "evidence-backed-close",
+        "oracle": "Installed actual Kata close/readback occurs only after independent required scope accepted; landing/publication/cleanup remain separate facts.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      }
+    ],
+    "53.0": [
+      {
+        "id": "cleanup-refusal-and-recovery",
+        "oracle": "Canonical/foreign/symlink/live/unknown removal refuses; interrupted cleanup remains pending until stopped/owned/retained readback.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "work-and-other-seat-retention",
+        "oracle": "Unsubmitted bytes/candidates/raw evidence retained; removing one stopped owned worktree preserves common refs and another actual active worker.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "fresh-hdfs-and-live-rehydration",
+        "oracle": "Pinned host Waystone PUT/LS/fresh GET hashes plus actual Insula archive verify/rehydrate and independent exact union; lost ack does not overwrite.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "queue-export-restore",
+        "oracle": "Actual project-only export/restored fresh DB reconciles exact queue/owner/dependency identities; no shared daemon overwrite.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "pilot-check-contract",
+        "oracle": "Both precommitted manifests have implemented parser/link/secret/effect/raw-readback oracles; no extra model workers or historical-as-new handoff claim.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "landed-foundation",
+        "oracle": "Exact independently verified foundation X landed before54/pilot base; no full program admission claim.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      }
+    ],
+    "54": [
+      {
+        "id": "actual-two-worker-mapping",
+        "oracle": "Independent live Kata/Codex/Git/receipt reopen proves both cards and issue/spec/thread/turn/attempt/worktree identities during overlap.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "submit-refresh-cleanup-display",
+        "oracle": "Actual submitted C/D, stale refresh and53.0 per-seat cleanup transitions match cards/state graphs; other worker remains active.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "trace-and-summary",
+        "oracle": "Public anchors verify actions/failure/correction/finding/wait/next step; <=120words, observed/reported/inferred labels, no private or raw-secret body.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "history-gaps-identities",
+        "oracle": "Wrong thread/fork/PID/generation, duplicate/out-of-order/paginated/compacted/reconnect sources do not invent progress; gaps remain explicit.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "phase-health-native-goals",
+        "oracle": "Actual owned repetitive/stalled operations and separately authorized pause/block/limit/goal fixtures show native/operating/health distinctions; clocks in deterministic tests labeled.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "refresh-outage-and-no-control",
+        "oracle": "Measured live5sec view/15sec staleness, independent source2sec timeouts/restart/browser-CLI agreement; observer issues no mutation calls.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      }
+    ],
+    "53": [
+      {
+        "id": "landed-runtime-at-B",
+        "oracle": "Complete independently accepted runtime through53.0/54 and pinned pilot checks exists on clean canonical B before dispatch.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "actual-concurrent-C-D-E",
+        "oracle": "Two actual53.A/53.B workers overlap at B; C lands exact; D retained/refused stale; new claim/thread/worktree at C produces separately verified E.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "per-seat-cleanup-and-retention",
+        "oracle": "Actual other-seat unchanged cleanup, closure/publication recovery and fresh retained HDFS/queue readbacks survive final pilot.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "overview-through-pilot",
+        "oracle": "Independent public snapshots/anchors explain both workers, waits/submissions/stale refresh/cleanup and queue/spec outcomes.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      },
+      {
+        "id": "final-independent-closeout",
+        "oracle": "All required49-54/53.0 raw receipts reopen; exact final F parent E independently checks manifests/source then lands; no scientific quality claim.",
+        "required_raw_evidence": [
+          "source-context",
+          "actual-argv-exit-log",
+          "independent-readback"
+        ],
+        "absence": "refuse acceptance"
+      }
+    ]
+  }
+}

@@ -49,7 +49,7 @@ Use one existing local Kata daemon/project for all Sureal worktrees, with a comm
 
 Kata supplies ready/next queries, owner claims, priority, blocked-by edges, comments/metadata, events and human queue views. It does not launch workers, allocate GPUs or prove that a process is running. The controller provides that dispatch boundary and reports verified runtime facts back to Kata. Two worker sessions may execute concurrently, while GPU work remains serialized by the existing resource lock and each attempt has distinct writable output/cache paths. A RUNNING label without matching launch/acknowledgement evidence is a reconciliation discrepancy.
 
-A claim, metadata update, launch and issue comment are separate effects. Before them, persist a controller intent binding issue, spec, unique actor and attempt. Claim the issue, re-read owner/revision, then publish one assignment metadata object using supported revision-conditional metadata updates before launch. Use idempotency keys for issue creation and explicit event/receipt identities for updates. If a call fails or its acknowledgement is lost, inspect Kata and actual process state; retain ownership and mark pending reconciliation rather than dispatch twice or silently switch to a file-only queue. The [full v1 spec](../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md#kata-admission-and-dispatch-handshake) fixes durable ordering and readback/recovery contracts; the implementation plan supplies concrete adapter functions and executable crash tests. Raw `--force` or manual owner/metadata changes do not transfer a running process safely; the controller must detect and reconcile them.
+A claim, each pre-/post-thread metadata update, launch and issue comment are separate effects, keyed by operation ID and step. A reused ID with a different input digest is refused. Before them, persist a controller intent binding issue, spec, unique actor and attempt. Claim the issue, re-read owner/revision, then publish one assignment metadata object using supported revision-conditional metadata updates before launch. Use idempotency keys for issue creation and explicit event/receipt identities for updates. If a call fails or its acknowledgement is lost, inspect Kata and actual process state; retain ownership and mark pending reconciliation rather than dispatch twice or silently switch to a file-only queue. The [full v1 spec](../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md#kata-admission-and-dispatch-handshake) fixes durable ordering and readback/recovery contracts; the implementation plan supplies concrete adapter functions and executable crash tests. Raw `--force` or manual owner/metadata changes do not transfer a running process safely; the controller must detect and reconcile them.
 
 The installed Kata v0.14.3 supports `claim`, `ready`, `--blocked-by`, `--as`, metadata `--if-match`, events and project-scoped export. Current upstream documentation has newer flags; implement against the admitted installed version or explicitly admit an upgrade. At inspection, `kata whoami` resolves to `philip.yang`, confirming the need for distinct attempt actors.
 
@@ -90,7 +90,7 @@ The models/training architecture lane is:
 ```text
 current task + owned integration closeout
     -> pristine phi9t/mainline
-    -> local protocol 49 -> 50 -> 51 -> 52 -> 54 -> 53
+    -> local protocol 49 -> 50 -> 51 -> 52 -> 53.0 -> 54 -> 53
     -> models/training 44 -> 45 -> 46 -> 47 -> 48
 ```
 
@@ -138,3 +138,5 @@ Until tickets49–54 implement and verify the controller, the persistent lead se
 Controller records must be retained and independently restored before claiming recovery. Kata’s database is not automatically stored in Git or HDFS because `.kata.toml` is checked in. Retain a project-scoped export with the repository's established storage process when creating a recovery checkpoint; do not export unrelated projects. Independently verify restoration before claiming disaster recovery.
 
 If the operational queue and a Git spec disagree, stop that affected execution, inspect the version/evidence, and correct the queue or revise the spec explicitly. Preserve evidence and record the decision; never weaken a task's acceptance to make its queue status look complete.
+
+The user-requested review fixes introduce [53.0](tasks/53-0-collaboration-retention-cleanup-foundation.md) between52 and54. This lands retention/cleanup before54 verifies its display and before final53 launches the pilot. All final two-worker/HDFS/cleanup acceptance remains required. Task52 supplies evidence-backed closure; before its admission, the lead retains actual manual Kata close/readback evidence.
