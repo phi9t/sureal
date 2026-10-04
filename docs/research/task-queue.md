@@ -59,6 +59,8 @@ Sources: [Kata quickstart](https://github.com/kenn-io/kata/blob/main/docs/get-st
 
 [Task54](tasks/54-worker-program-observability.md) provides the read-only view of both sessions, current issue/spec/workspace mappings, concise evidence-linked trace summaries, per-worker state graphs and the centralized queue. It displays source freshness and reconciliation discrepancies, not a new scheduling authority. Detailed task/spec outcomes remain linked to landed definitions and accepted evidence; historical unaudited research items remain explicitly unknown. Full-loop admission53 depends on this overview running during the actual concurrent pilot.
 
+Worker operating state and progress health follow the [session-state contract](../superpowers/specs/2026-10-03-worker-session-state-design.md). Kata stage/owner do not substitute for native goal/runtime observation; stuck/hung suspicion preserves ownership and links to diagnostic evidence, while BLOCKED names the actual unblock condition.
+
 ## Queue lifecycle
 
 | Stage | Required condition | Scheduling representation |

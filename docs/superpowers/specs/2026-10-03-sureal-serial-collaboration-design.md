@@ -142,6 +142,7 @@ The queue shows ready/claimed/running/waiting/blocked/needs-verification/needs-l
 | View | Authority and meaning |
 | --- | --- |
 | Session runtime | Actual Codex observation: active, idle, not loaded, error or unavailable; not a task-completion claim |
+| Worker operating state / health | [Explicit session-state contract](2026-10-03-worker-session-state-design.md): PURSUING/WAITING/BLOCKED/PAUSED/etc. plus responsive-versus-progressing health and evidence; native goal status stays separate |
 | Worker attempt | Controller STARTING → RUNNING → EXITED, with UNKNOWN on uncertain effects; seat release still requires stop/retention/cleanup proof |
 | Task workflow | CREATED → ACTIVE → SUBMITTED → LANDED, with REPAIR, STALE and ABORTED branches; verification and waiting reasons are explicit facts |
 | Kata queue | Logical owner, readiness/dependency edges and reported operating stage, reconciled with actual receipts |
@@ -160,6 +161,8 @@ stateDiagram-v2
 ```
 
 This attempt graph is not the task completion graph. Task review/verification can continue after EXITED; a takeover allocates a new attempt rather than reopening the exited one.
+
+The [worker session state specification](2026-10-03-worker-session-state-design.md) defines operating states, native goal mapping, STUCK/HUNG diagnosis, phase-aware detection and transition evidence. These diagnoses cannot release ownership or mutate a goal.
 
 Render the small state graphs with each worker's current state highlighted and show why its next transition is blocked. An exited attempt may have a task awaiting verification; an idle session may still own work; a landed candidate may have pending publication/cleanup. Preserve these distinctions in both UI and machine-readable output.
 
