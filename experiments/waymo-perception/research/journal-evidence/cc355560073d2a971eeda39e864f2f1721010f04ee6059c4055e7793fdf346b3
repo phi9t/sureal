@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "scope": "restore only three entry81 evidence snapshots absent from Git integration; historical journal bytes and independently HDFS-recovered evidence unchanged",
+  "independent_receipt_sha256": "2e4271001bdcea21a88796efa7bf4a433a86867743c9f6c4458f9da5b3bc25b9",
+  "members": [
+    {
+      "sha256": "b05a1e15dc427e6018fc956a39a3086f1fd879f594f8662bbe91c021bf04b48e",
+      "bytes": 435739,
+      "source_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/b05a1e15dc427e6018fc956a39a3086f1fd879f594f8662bbe91c021bf04b48e",
+      "sequences": [
+        81
+      ],
+      "independently_recovered_members": [
+        "metadata/research/journal-evidence/b05a1e15dc427e6018fc956a39a3086f1fd879f594f8662bbe91c021bf04b48e"
+      ]
+    },
+    {
+      "sha256": "b3a88645e3aa3cb4f456716e7775a29f991f1484f7fc251d328f02d47be2ae48",
+      "bytes": 34727,
+      "source_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/b3a88645e3aa3cb4f456716e7775a29f991f1484f7fc251d328f02d47be2ae48",
+      "sequences": [
+        81
+      ],
+      "independently_recovered_members": [
+        "metadata/research/journal-evidence/b3a88645e3aa3cb4f456716e7775a29f991f1484f7fc251d328f02d47be2ae48"
+      ]
+    },
+    {
+      "sha256": "cdbba8d050b6f4ee9b478512bbd3da18ca10f64f50b276e883819cf43ec9f5d1",
+      "bytes": 4347,
+      "source_path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/journal-evidence/cdbba8d050b6f4ee9b478512bbd3da18ca10f64f50b276e883819cf43ec9f5d1",
+      "sequences": [
+        81
+      ],
+      "independently_recovered_members": [
+        "metadata/research/journal-evidence/cdbba8d050b6f4ee9b478512bbd3da18ca10f64f50b276e883819cf43ec9f5d1"
+      ]
+    }
+  ],
+  "implementation_changed": false
+}
