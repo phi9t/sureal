@@ -1,5 +1,11 @@
 # Collaboration documentation integration and open admission
 
+The later [execution authorization](2026-10-04-collaboration-execution-authorization.md)
+records the user's explicit approval of the reviewed implementation plan.
+It supersedes the historical written-plan execution hold below; actual
+capability, source, resource and independent live milestone gates remain open
+until their evidence is accepted.
+
 The user requested review and landing of the whole owned documentation branch,
 including ownership update `6b694c8`. The retained source head is
 `d5ead21fb46ddef78bed8d8ac0f8b122ca1f0c01`; its ten remaining documentation
