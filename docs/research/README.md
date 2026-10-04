@@ -57,6 +57,6 @@ All implementation and authoritative task/spec documents belong in this reposito
 
 Execution remains gated on clean mainline and written design/plan admission. These are specifications, not completed protocol capabilities. Once admitted, the local protocol carries models/training44–48. The revised proposal uses one shared Kata project for live scheduling/ownership, linked to committed specs; the controller supplies worker dispatch and exact-candidate execution receipts.
 
-The user-requested [Claude review](reviews/2026-10-03-sureal-collaboration-claude-review.md) of the implementation plan returned **changes required**. The report retains exact-source provenance and separates spec compliance from design concerns; corrections and plan admission remain open.
+The user-requested [Claude review](reviews/2026-10-03-sureal-collaboration-claude-review.md) prompted the [recorded corrections](reviews/2026-10-03-sureal-collaboration-review-resolution.md). The [final focused check](reviews/2026-10-03-sureal-collaboration-claude-role-check.md) passed the last blocker at ef0bee5. Exact-source review evidence is retained; plan admission and live implementation gates remain open.
 
 [Full research task index](../../experiments/waymo-perception/research-task-index.md) · [Existing experiment tracker](../../experiments/waymo-perception/tracking/README.md)

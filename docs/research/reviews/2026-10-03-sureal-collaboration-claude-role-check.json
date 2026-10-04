@@ -1,0 +1,19 @@
+{
+  "source_commit": "ef0bee5a01787561dcdaa9d828832e17d7ed45f1",
+  "source_files": {
+    "docs/collaboration/coverage.json": "b0943cd5e480417fc6033d8745c61d66b0baf456dc80bfc445e77971cd257ccc",
+    "docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md": "31dbe7944c4e5350cc1e5a6b24abe4f47e002b4b8f41913ec79601e13ffc07a3"
+  },
+  "source_rendering": "Exact role/phase projection, plan contract paragraph, and correction diff; full file hashes pinned",
+  "artifact_directory": "/data02/home/philip.yang/devx/tmp/sureal-collaboration-claude-role-check-0q1kaiye",
+  "tools_enabled": [],
+  "reported_models": [
+    "claude-fable-5-1"
+  ],
+  "verdict": "PASS; no B1 blocker remains",
+  "scope": "Focused text review of final role-contract correction; no runtime acceptance",
+  "request_sha256": "94d320ed87f5b33d747ea3498fcfb3787a0ceb6bac2cd008b197e094bb6fbda0",
+  "response_sha256": "a95afcb88f8291d38c7ef3946ad8db0d49cfec54f462473a01811b6f90424131",
+  "review_body_sha256": "5e1923dfea8b5d822b40f58163b13da6709b8a84cd1cb82bd5102f414aa1d21b",
+  "rendered_report_sha256": "5011ce04d80083ffd55318e67f2992d610fbfb00ca313aebf1b7c8847d9359ad"
+}

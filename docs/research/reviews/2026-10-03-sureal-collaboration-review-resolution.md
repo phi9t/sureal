@@ -105,3 +105,7 @@ The [focused Claude check](2026-10-03-sureal-collaboration-claude-focused-review
 | Finding | Correction / disposition |
 | --- | --- |
 | B1 | Added authoritative ticket_roles:49 implementation+metadata;50/51/52/53.0/54 implementation;53 pilot-state+metadata. all expands only to listed roles; unlisted roles refuse. Every listed role requires nonempty gate/post-landing/closure receipts. Shared49 gates intentionally rerun at M;53 pilot gates are E-state and F uses its metadata gate. Removed premature M clauses from X landing oracles, reconciled takeover wording, pinned probe invocation paths and recorded installed init --workspace help. |
+
+## Final documentation review result
+
+[Claude final focused check](2026-10-03-sureal-collaboration-claude-role-check.md) returned **PASS** for B1 at ef0bee5. Combined with the prior focused report, every reported documentation finding is corrected. Documentation QA validated63 cases, all27 required ticket/role/phase combinations,64 unique finding dispositions, local links and exact review source/raw/rendered hashes; the stage dependency graph is acyclic. QA artifacts remain alongside the retained review requests. These checks do not close a runtime milestone or authorize dispatch; pristine-mainline, written plan admission and live independent Insula gates still apply.
