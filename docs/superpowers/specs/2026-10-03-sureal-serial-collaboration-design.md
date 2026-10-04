@@ -129,6 +129,52 @@ The existing Sureal experiment registry and journal retain recipes, outcomes and
 
 The first research tasks can exercise the models/training workstream once this repository-local protocol is admitted. Their detailed scientific acceptance remains in tickets44–48.
 
+## Worker and program overview
+
+A read-only local overview is required for v1, implemented in Sureal and backed by the same status projection as the CLI. It combines two worker cards, the centralized Kata queue, task/spec progress and a recent-change timeline. The user can understand current work from summaries; raw transcripts are an optional evidence drilldown. [Ticket54](../../research/tasks/54-worker-program-observability.md) defines the verifier and acceptance, and blocks full-loop admission53.
+
+Each worker card shows its seat, real session/attempt/claim identities, task goal, Kata issue and pinned spec/plan links, owned workspace/branch, base/candidate, current focus, recent actions/findings, last observed activity, blocker/wait reason, next expected action and verification/landing/cleanup status. A compact narrative targets at most 120 words plus a short evidence-linked timeline. Show elapsed phase time and source refresh time; activity absence is not proof of a hung or stopped process. Historical attempts remain discoverable after takeover.
+
+The queue shows ready/claimed/running/waiting/blocked/needs-verification/needs-landing/closed groups, owners and dependency reasons. Task/spec progress separately shows draft versus reviewed/landed definitions, admission blockers, candidate evidence and verified closure. Initially index the admitted collaboration/model-training lane and discovered repository tickets; older research items with unaudited receipts display UNKNOWN/NOT AUDITED rather than invented completion. Grouping is a derived view, not another editable queue.
+
+### State views
+
+| View | Authority and meaning |
+| --- | --- |
+| Session runtime | Actual Codex observation: active, idle, not loaded, error or unavailable; not a task-completion claim |
+| Worker attempt | Controller STARTING → RUNNING → EXITED, with UNKNOWN on uncertain effects; seat release still requires stop/retention/cleanup proof |
+| Task workflow | CREATED → ACTIVE → SUBMITTED → LANDED, with REPAIR, STALE and ABORTED branches; verification and waiting reasons are explicit facts |
+| Kata queue | Logical owner, readiness/dependency edges and reported operating stage, reconciled with actual receipts |
+| Spec and outcome | Git revision/review/landing/admission state and independent acceptance/closure evidence; LANDED, publication and cleanup remain distinct |
+
+```mermaid
+stateDiagram-v2
+    [*] --> STARTING: claim reserved
+    STARTING --> RUNNING: worker acknowledged
+    RUNNING --> EXITED: exit observed
+    STARTING --> UNKNOWN: uncertain launch
+    RUNNING --> UNKNOWN: uncertain effect
+    UNKNOWN --> RUNNING: same attempt reconciled active
+    UNKNOWN --> EXITED: same attempt reconciled stopped
+    EXITED --> [*]: retention and cleanup allow seat release
+```
+
+This attempt graph is not the task completion graph. Task review/verification can continue after EXITED; a takeover allocates a new attempt rather than reopening the exited one.
+
+Render the small state graphs with each worker's current state highlighted and show why its next transition is blocked. An exited attempt may have a task awaiting verification; an idle session may still own work; a landed candidate may have pending publication/cleanup. Preserve these distinctions in both UI and machine-readable output.
+
+### Trace summaries and freshness
+
+Collect project-owned session/thread metadata, public messages, tool actions/results, worker progress checkpoints, Kata events and controller/verification receipts. Summaries state goal/current focus, actions and results, findings/decisions, blockers and next step, with supporting session/turn/item/event or artifact identities. Do not ingest private reasoning or treat worker assertions as independent proof. Distinguish OBSERVED facts, WORKER-REPORTED progress and inferred next actions; contradictory evidence remains visible until reconciled.
+
+Workers emit bounded progress checkpoints at acknowledgement, material findings/failure/wait, submission and exit. The collector incrementally reads visible transcript/tool deltas and receipts to corroborate or correct them; checkpoint-only coverage is shown explicitly when transcript access is unavailable. Generate bounded narrative checkpoints in the existing lead/worker workflow, anchored to collected visible evidence, rather than silently introducing a separate model/API service. Summaries update on completed turns and material state/result changes, coalescing noisy tool/token events. Fix the exact adapter, generation path and limits in the implementation plan.
+
+Prefer documented read-only Codex thread/status/history reads. The inspected daemon 0.160.0 schema exposes `thread/read`, `thread/list`, `thread/turns/list` and `thread/items/list`; CLI 0.159.3 differs, so record effective server/schema identity and probe actual readable session/history capabilities. Official [Codex App Server documentation](https://learn.chatgpt.com/docs/app-server) describes non-resuming reads and runtime statuses. Pagination may be unsupported by a particular thread store; schema presence alone does not prove live access. Observation never resumes/starts/interrupts a worker to obtain its history. Existing controller connections may supply notifications; read-only polling is the fallback. A capability gap remains an explicit partial-coverage condition and implementation gate, not a guessed transcript.
+
+Proposed local presentation is a small HTML/JavaScript page served by the existing Python controller, with the same JSON/text snapshot available through status. No public hosting or separate frontend framework is required. Refresh observation every 5 seconds while visible and reconcile after reconnect; source outage/staleness is shown after 15 seconds rather than silently displaying old green status. These are proposed acceptance targets, not current capabilities. Each source has its own observation timestamp/cursor; joins validate exact project/task/session/attempt/claim identities and do not imply one cross-system atomic snapshot.
+
+Incremental summaries retain covered event/item ranges, gaps, source hashes and generation time, so historical progress and incident drilldown survive compaction or attempt replacement. Restart deduplicates/reconciles from supported source cursors and retained identities; notification streams alone are not assumed replayable. Raw command/transcript details are opt-in, scoped to Sureal-owned sessions and sanitized for rendering; no credentials or unrelated session text enter the overview. The observer and summary records cannot claim/close tasks, dispatch work or authorize landing. Reader failure never mutates queue ownership or worker state.
+
 ## Repository-local implementation
 
 The proposed entrypoint is `scripts/collab.py`, implemented in this repository with Python standard-library modules and the installed Git/Kata/Codex/Insula tools. Introduce private helper modules only where they concentrate real complexity; no generic agent SDK or new daemon is required. The implementation plan will fix the exact functions and check commands.
@@ -145,6 +191,7 @@ The small command surface covers project initialization/status, task start, cand
 | P1: worker attempts | Start two fresh bounded worker sessions in distinct worktrees | Actual overlapping session/process execution, unique Kata claims, third-start/duplicate/scope refusal and live Insula audit | Both seats run concurrently; identities and write/resource ownership match; no unresolved seat released |
 | P2: candidate verification | Submit, retain, verify and repair immutable single-commit candidates | Real commit/dirty/merge probes; actual separate candidate checkout and live Insula artifact audit | C1 evidence cannot authorize C2; wrong brief/base/tree and mutation refused |
 | P3: exact landing/recovery | Advance mainline to the reviewed C and reconcile interruption | Real Git fast-forward/stale refusal plus faults before/after Git effect and publication acknowledgement | Exact reviewed commit lands; no rewrite/force; uncertainty blocks dispatch |
+| O0: worker/program overview | Make both workers, queue and task evidence understandable without raw transcript reading | Live read-only session/Kata/controller joins, summary evidence audit, freshness/reconnect/cross-attempt refusal and human view inspection | Accurate identity/state separation, concise corroborated summaries and explicit missing/stale data |
 | P4: cleanup and Sureal pilot | Run two concurrent tasks, serialize exact landing and refresh the stale candidate | Actual overlapping workers, stale refusal, fresh-attempt re-verification, per-seat cleanup/recovery and live Insula evidence | Both start at B; reviewed C lands first; D from B is refused; newly verified E with parent C lands second; other seat survives cleanup |
 
 Every stage ends with independently audited real execution. Runtime/state corruption and infrastructure failures remain implementation failures; they are not silently accepted as research negatives.
@@ -173,8 +220,9 @@ Corenius supplies ideas and inspected examples only. No Corenius code, runtime, 
 | P1 | [50 — two concurrent worker attempts](../../research/tasks/50-collaboration-worker-attempts.md) | 49 |
 | P2 | [51 — immutable candidates and verification](../../research/tasks/51-collaboration-candidate-verification.md) | 50 |
 | P3 | [52 — exact landing and recovery](../../research/tasks/52-collaboration-landing-recovery.md) | 51 |
-| P4 | [53 — cleanup and full-loop admission](../../research/tasks/53-collaboration-cleanup-closeout.md) | 52 |
+| O0 | [54 — worker/program overview](../../research/tasks/54-worker-program-observability.md) | 49–52 |
+| P4 | [53 — cleanup and full-loop admission](../../research/tasks/53-collaboration-cleanup-closeout.md) | 52; 54 |
 
-Stage order is integration closeout → pristine mainline → 49–53 → models/training44–48. The existing scientific source/evidence contracts and separately approved research execution remain preserved. Protocol bootstrap uses the existing manual workflow in an isolated workspace; do not pretend an unimplemented controller can land its own implementation.
+Stage order is integration closeout → pristine mainline → 49–52 → 54 → 53 → models/training44–48. The existing scientific source/evidence contracts and separately approved research execution remain preserved. Protocol bootstrap uses the existing manual workflow in an isolated workspace; do not pretend an unimplemented controller can land its own implementation.
 
 Implementation home is settled. Review the proposed brief/candidate/verification/landing/recovery contract, then write the exact implementation plan. Activation remains blocked until pristine mainline and the applicable design/plan and runtime gates are admitted.

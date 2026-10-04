@@ -55,6 +55,10 @@ The installed Kata v0.14.3 supports `claim`, `ready`, `--blocked-by`, `--as`, me
 
 Sources: [Kata quickstart](https://github.com/kenn-io/kata/blob/main/docs/get-started/quickstart.md), [shared-project model](https://github.com/kenn-io/kata/blob/main/docs/workflows/sharing.md), and installed `kata version`, `quickstart` and command help. Runtime inspections are configuration evidence, not completed integration gates.
 
+## User-facing worker and queue overview
+
+[Task54](tasks/54-worker-program-observability.md) provides the read-only view of both sessions, current issue/spec/workspace mappings, concise evidence-linked trace summaries, per-worker state graphs and the centralized queue. It displays source freshness and reconciliation discrepancies, not a new scheduling authority. Detailed task/spec outcomes remain linked to landed definitions and accepted evidence; historical unaudited research items remain explicitly unknown. Full-loop admission53 depends on this overview running during the actual concurrent pilot.
+
 ## Queue lifecycle
 
 | Stage | Required condition | Scheduling representation |
@@ -80,7 +84,7 @@ The models/training architecture lane is:
 ```text
 current task + owned integration closeout
     -> pristine phi9t/mainline
-    -> local protocol 49 -> 50 -> 51 -> 52 -> 53
+    -> local protocol 49 -> 50 -> 51 -> 52 -> 54 -> 53
     -> models/training 44 -> 45 -> 46 -> 47 -> 48
 ```
 

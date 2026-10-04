@@ -49,7 +49,8 @@ All implementation and authoritative task/spec documents belong in this reposito
 | [50](tasks/50-collaboration-worker-attempts.md) | Two concurrent sessions in distinct task worktrees | 49 |
 | [51](tasks/51-collaboration-candidate-verification.md) | Immutable candidates, exact verification and repair | 50 |
 | [52](tasks/52-collaboration-landing-recovery.md) | Exact fast-forward landing and interrupted-effect recovery | 51 |
-| [53](tasks/53-collaboration-cleanup-closeout.md) | Safe cleanup, concurrent pilot and stale-candidate refresh | 52 |
+| [54](tasks/54-worker-program-observability.md) | Worker summaries, state graphs and queue/spec overview | 49–52 |
+| [53](tasks/53-collaboration-cleanup-closeout.md) | Safe cleanup, concurrent pilot and stale-candidate refresh | 52; 54 |
 
 Execution remains gated on clean mainline and written design/plan admission. These are specifications, not completed protocol capabilities. Once admitted, the local protocol carries models/training44–48. The revised proposal uses one shared Kata project for live scheduling/ownership, linked to committed specs; the controller supplies worker dispatch and exact-candidate execution receipts.
 

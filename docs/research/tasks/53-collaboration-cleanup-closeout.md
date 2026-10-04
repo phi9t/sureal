@@ -4,7 +4,7 @@ Milestone: P4. Implementation home: Sureal.
 
 **Goal:** admit the complete local lead–worker loop through two real concurrent bounded tasks, serialized exact landing, stale-candidate recovery, retained evidence and safe disposable-workspace cleanup.
 
-**Dependencies:** 52; all 49–52 required receipts independently admitted.
+**Dependencies:** 52; 54; all 49–52 and worker/program overview54 receipts independently admitted.
 
 **Spec:** [Sureal two-worker collaboration](../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md).
 
@@ -21,6 +21,7 @@ Milestone: P4. Implementation home: Sureal.
 - Clean up one stopped attempt while the other worker is active; independently prove its files/branch/process remain unchanged. Interrupt cleanup after landing, retain LANDED plus pending cleanup, and resume without relaunching work or deleting foreign data. Exercise third-start, duplicate-task and shared-GPU/resource conflict refusal.
 - Export/restore only the Sureal Kata project and reconcile owners/stages with retained execution receipts before claiming recovery.
 - Retain/reopen protocol records and required research artifacts; use existing verified HDFS readback/live recovery before any scientific payload release.
+- Exercise overview54 throughout both live workers and stale refresh; retain understandable summary/state/queue snapshots anchored to actual evidence.
 - Reconcile the complete stage index and independently review the full implementation against this specification.
 
 ## Acceptance
