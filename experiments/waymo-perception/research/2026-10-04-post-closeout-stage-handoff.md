@@ -74,3 +74,17 @@ those sealed HDFS epochs. No new HDFS content, scientific result, model
 migration, protocol activation, Kata adoption or local payload release is
 claimed. Pristine-mainline admission remains blocked by the retained work
 and ownership/process reconciliation above.
+
+
+## Subsequent authorized canonical reconciliation
+
+The user identified the retained models/training draft as obsolete and
+released this path to the integration owner. The
+[canonical source reconciliation](2026-10-04-canonical-source-reconciliation.md)
+records restoration to accepted220-line HEAD, exact outside-checkout
+preservation and relocation of the four untracked note/backup files, and
+fresh empty tracked/index/untracked checks. This supersedes the earlier
+canonical-root cleanliness blocker at its recorded epoch. The prior census,
+foreign proposal/process dispositions and19 worker-source blockers remain
+historical or separately pending. No protocol or model implementation starts
+as part of this reconciliation.
