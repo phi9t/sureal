@@ -8,6 +8,8 @@ Milestone: P4. Implementation home: Sureal.
 
 **Spec:** [Sureal two-worker collaboration](../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md).
 
+**Implementation plan:** [Two-worker collaboration](../../superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md); plan review precedes execution.
+
 ## Deliverables
 
 - Cleanup retains brief/candidate/report/verification/landing history and required scientific artifacts before removing only owned disposable state.

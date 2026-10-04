@@ -81,6 +81,8 @@ Status views and issue labels describe stage; they are not independent completio
 
 ## Initial queue and ordering
 
+The full collaboration specification is user-approved. The [implementation plan](../superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md) fixes code homes, interfaces, command flags, tests and live gates for49–54; it awaits plan review. This documentation decision does not claim Kata registration, worker dispatch or a pristine canonical checkout.
+
 Preserve the existing [approved research execution order](../../experiments/waymo-perception/research/2026-10-03-approved-execution-order.md): resource admission, frozen sustained continuation, diagnostic 42 before 43, and isolated association 41.2. The new architecture lane does not silently reorder or mutate those experiments.
 
 The models/training architecture lane is:

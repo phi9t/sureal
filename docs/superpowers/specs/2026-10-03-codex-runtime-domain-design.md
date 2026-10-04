@@ -1,6 +1,6 @@
 # Codex session, thread, turn and task-attempt model
 
-Status: normative companion to the full v1 specification, pending review. Required vocabulary/identity contract for worker attempts50 and overview54; no runtime implementation is claimed.
+Status: normative companion approved with the full v1 specification on 2026-10-04 UTC (2026-10-03 client date). Required vocabulary/identity contract for worker attempts50 and overview54; no runtime implementation is claimed.
 
 ## Native entities
 

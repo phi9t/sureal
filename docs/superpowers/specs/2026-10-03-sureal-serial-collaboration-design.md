@@ -1,6 +1,6 @@
 # Sureal-local two-worker collaboration — full v1 specification
 
-Status: full written specification for review. User-selected scope is two concurrent workers, separate worktrees, centralized Kata operations and an evidence-linked worker overview. Code is not implemented or admitted by this document. The historical filename is retained for stable links. Dates use the client timezone.
+Status: written specification approved by the user on 2026-10-04 UTC (2026-10-03 client date), including its normative companions. User-selected scope is two concurrent workers, separate worktrees, centralized Kata operations and an evidence-linked worker overview. Code is not implemented or admitted by this document. The historical filename is retained for stable links. Dates use the client timezone.
 
 ## Goal and end-to-end acceptance
 

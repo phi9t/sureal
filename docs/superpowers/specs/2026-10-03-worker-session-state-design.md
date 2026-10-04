@@ -1,6 +1,6 @@
 # Explicit worker session state and progress health
 
-Status: normative companion to the full v1 specification, pending review; required part of overview54 and concurrent protocol admission53. This specifies observation/diagnosis, not an implemented watchdog or a grant to alter worker goals.
+Status: normative companion approved with the full v1 specification on 2026-10-04 UTC (2026-10-03 client date); required part of overview54 and concurrent protocol admission53. This specifies observation/diagnosis, not an implemented watchdog or a grant to alter worker goals.
 
 ## Goal and identity
 

@@ -12,6 +12,8 @@ Milestone: O0. Implementation home: Sureal. Status: specified, not implemented.
 
 **Spec:** [Worker and program overview](../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md#worker-state-and-human-overview).
 
+**Implementation plan:** [Two-worker collaboration](../../superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md); plan review precedes execution.
+
 ## Deliverables
 
 - Read-only local browser overview plus matching status JSON/text: two worker cards, centralized Kata queue, spec/task progress and recent-event timeline. Repository-owned implementation, no public deployment or separate queue authority.

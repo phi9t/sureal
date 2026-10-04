@@ -41,7 +41,7 @@ Every implementation milestone runs actual live Insula and retains independent v
 
 ## Sureal-local collaboration workstream
 
-[Full v1 specification](../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md) · [Codex runtime identities](../superpowers/specs/2026-10-03-codex-runtime-domain-design.md) · [Worker operating state and health](../superpowers/specs/2026-10-03-worker-session-state-design.md). This bundle is ready for written review; implementation remains separately gated.
+[Approved full v1 specification](../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md) · [Codex runtime identities](../superpowers/specs/2026-10-03-codex-runtime-domain-design.md) · [Worker operating state and health](../superpowers/specs/2026-10-03-worker-session-state-design.md) · [Implementation plan](../superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md). The user approved the specification; plan review and pristine-mainline/live implementation gates remain open.
 
 All implementation and authoritative task/spec documents belong in this repository. Reviewed specs/plans land on mainline before execution; the [queue policy](task-queue.md#mainline-task-definitions-and-worker-claims) binds each live claim to its worker session, attempt and workspace, including explicit takeover. The protocol uses one persistent lead, two concurrent worker seats from v1, task-scoped workspaces (recommended linked worktrees), exact candidates, conditional fast-forward landing and explicit recovery/cleanup. Runtime records and disposable workspaces stay outside canonical source to keep it pristine.
 

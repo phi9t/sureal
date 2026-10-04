@@ -8,6 +8,8 @@ Milestone: P0. Implementation home: Sureal. Corenius is a design reference only.
 
 **Spec:** [Sureal two-worker collaboration](../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md).
 
+**Implementation plan:** [Two-worker collaboration](../../superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md); plan review precedes execution.
+
 ## Deliverables
 
 - Inventory/disposition of outstanding owned code, docs, evidence, commits and mutating attempts; no work is discarded to manufacture cleanliness.

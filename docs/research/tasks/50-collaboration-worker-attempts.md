@@ -8,6 +8,8 @@ Milestone: P1. Implementation home: Sureal.
 
 **Spec:** [Sureal two-worker collaboration](../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md).
 
+**Implementation plan:** [Two-worker collaboration](../../superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md); plan review precedes execution.
+
 ## Deliverables
 
 - Start claims Kata ownership under a unique attempt actor, pins the landed task spec/plan and captures task/brief/base/claim-generation/seat/workspace/attempt identity durably before dispatch. Capture/reconcile actual sessionId/primary-threadId/runtime-instance and owned tool/process handles and matching worker acknowledgement before RUNNING.

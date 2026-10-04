@@ -8,6 +8,8 @@ Milestone: P2. Implementation home: Sureal.
 
 **Spec:** [Sureal two-worker collaboration](../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md).
 
+**Implementation plan:** [Two-worker collaboration](../../superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md); plan review precedes execution.
+
 ## Deliverables
 
 - Submission requires one candidate C with exactly one parent B and clean owned workspace state.
