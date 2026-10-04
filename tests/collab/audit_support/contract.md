@@ -101,6 +101,16 @@ completion. Each case's `execution.log` is retained actual command stdout.
   unbound auxiliary payload/credential rows are allowed.
   Only its native fresh numeric row ID and created_at/updated_at UTC timestamps
   may differ from baseline; all other identity/payload fields remain exact.
+  Native FTS5 search closure is checked separately from segment layout. Reopen
+  every exact known FTS table, retaining BLOB values as explicit hexadecimal;
+  refuse unknown search tables. Independently rebuild expected indexed title,
+  body and id-ordered comments using the declared native tokenizer. Actual
+  fts5vocab instance postings, document row IDs, document sizes and config must
+  match, including empty-text documents. Check internal FTS integrity solely
+  in an owned memory copy. Selected source/restored search facts normalize
+  numeric document IDs to stable issue UIDs and must agree. Read-only status
+  compares actual raw search-table facts too. Never execute index repair or
+  integrity writes on the observed database.
 * Map gate: raw canonical M/parent Git diff, map and binding blobs, source
   definition pins and real-project SQLite snapshot. Only `.kata.toml`, the
   `.kata.local.toml` ignore line and `docs/research/kata-task-map.json` may change;

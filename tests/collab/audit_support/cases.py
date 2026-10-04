@@ -14,6 +14,7 @@ from .raw_git import InvalidEvidence, run_git, sha256, strict_json, verify_mater
 from .runtime import bwrap_options, check_bwrap, check_measurements, rootfs_digest
 from .conditions import check_boundary, check_refusal_cause, check_source_command, option, check_ignore_change
 from .build import check_build
+from .search_index import FTS_TABLES
 
 
 REFUSALS = {
@@ -320,6 +321,8 @@ def queue_restore(case, admission=None, **_):
                 row["to_issue_uid"] in {i["uid"] for i in chosen["issues"]} for row in restored["links"]),
             "Foreign relations restored")
     check_auxiliary_closure(source,restored,baseline,uid)
+    require(scope_search_projection(source,uid)==scope_search_projection(restored,uid),
+            "Restored project search semantics differ from selected source issues/comments")
     require(restored["meta"].get("instance_uid") and restored["meta"]["instance_uid"]!=source["meta"].get("instance_uid"),
             "Restore reused source instance ownership")
     exported = artifact(data["export"]).read_bytes()
@@ -340,7 +343,21 @@ def queue_restore(case, admission=None, **_):
             import_["argv"][import_["argv"].index("--input")+1]==data["export"]["path"],
             "Actual restored input differs from retained export")
     return {"project_uid":uid,"issue_uids":sorted(row["uid"] for row in chosen["issues"]),
-            "links":actual["links"],"restored_instance_uid":restored["meta"]["instance_uid"]}
+            "links":actual["links"],"restored_instance_uid":restored["meta"]["instance_uid"],
+            "search_index_sha256":content_digest(scope_search_projection(restored,uid))}
+
+
+def scope_search_projection(database,uid):
+    facts=database["search_index"]
+    if facts is None:
+        return None
+    project=next(row for row in database["projects"] if row["uid"]==uid)
+    issues={row["id"]:row["uid"] for row in database["issues"] if row["project_id"]==project["id"]}
+    return {"documents":sorted(issues[doc] for doc in facts["documents"] if doc in issues),
+            "instances":sorted([term,issues[doc],column,offset] for term,doc,column,offset in facts["instances"]
+                               if doc in issues),
+            "document_sizes":sorted([issues[doc],size] for doc,size in facts["document_sizes"] if doc in issues),
+            "config":facts["config"]}
 
 
 def check_auxiliary_closure(source,restored,baseline,uid):
@@ -368,7 +385,10 @@ def check_auxiliary_closure(source,restored,baseline,uid):
             if result.get(key) is not None:
                 result[key]=uid if key=="project_id" else issues[result[key]]
         return result
-    ignored={"projects","issues","links","meta"}
+    # Physical FTS segments can differ after genuine export/import. Each DB's
+    # reopened postings/docsize/config were independently rebuilt and checked
+    # against all actual issue/comment text by sqlite_projection.
+    ignored={"projects","issues","links","meta"}|FTS_TABLES
     for table,rows in restored["tables"].items():
         if table in ignored:
             continue

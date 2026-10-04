@@ -8,6 +8,7 @@ import sqlite3
 
 from .facts import require, parse_record
 from .raw_git import InvalidEvidence, run_git, sha256, strict_json
+from .search_index import check_search_index, sql_value
 
 
 def artifact(reference: dict) -> Path:
@@ -125,15 +126,19 @@ def sqlite_projection(reference: dict) -> dict:
             "SELECT name,sql FROM sqlite_master WHERE sql IS NOT NULL ORDER BY name")}
         for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"):
             name = row[0]
-            if name.startswith("sqlite_") or "_fts" in name:
+            if name.startswith("sqlite_"):
                 continue
             require(name.replace("_","").isalnum(),"Unexpected SQL table identifier")
-            rows = [dict(item) for item in connection.execute('SELECT * FROM "'+name+'"')]
+            select='SELECT rowid,*' if name=="issues_fts" else 'SELECT *'
+            rows = [{key:sql_value(value) for key,value in dict(item).items()}
+                    for item in connection.execute(select+' FROM "'+name+'"')]
             if name=="api_tokens":
                 require(not rows,"Credential rows forbidden in fixture evidence")
                 continue
             all_tables[name] = sorted(rows,key=lambda item:json.dumps(item,sort_keys=True))
-        return {"projects":projects,"issues":issues,"links":links,"meta":meta,"tables":all_tables,"sql_schema":schema}
+        search=check_search_index(connection,schema,issues,all_tables.get("comments",[]))
+        return {"projects":projects,"issues":issues,"links":links,"meta":meta,"tables":all_tables,
+                "sql_schema":schema,"search_index":search}
     except sqlite3.Error as error:
         raise InvalidEvidence("Actual supported Kata fixture schema required") from error
     finally:

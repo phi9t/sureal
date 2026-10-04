@@ -1,0 +1,25 @@
+{
+  "author": "/root/collab49_independent_auditor",
+  "created_by_version": "0.1.0",
+  "exported_statement_count": 81,
+  "fixture_data": "created independently in tests, no production queue payload or credentials",
+  "installed_kata_binary": {
+    "path": "/data02/home/philip.yang/.local/bin/kata",
+    "sha256": "81d5cd58d558504f3ce326a473460e364c002a582ddbeb36f2cd53816f84841f"
+  },
+  "kind": "independently-exported-native-schema",
+  "native_schema_version": "25",
+  "omission_reason": "FTS5 generates its declared shadow tables when the native virtual-table DDL executes; no table data exported",
+  "omitted_objects": [
+    "issues_fts_config",
+    "issues_fts_data",
+    "issues_fts_docsize",
+    "issues_fts_idx"
+  ],
+  "schema_sha256": "bddd40f52a2902e152fa9301f159c69f07b1ff71100d2ae9ea8c5465b8b8e397",
+  "schema_version": 1,
+  "source_database": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/host-fixture-rehearsal-v1/host-kata-fixture/native-baseline.db",
+    "sha256": "a4d49201e82f26c4517c77d5219a7b994857854db660c449231e136427ad6ef3"
+  }
+}
