@@ -1,0 +1,404 @@
+{
+  "publication_receipt_sha256": "b05a1e15dc427e6018fc956a39a3086f1fd879f594f8662bbe91c021bf04b48e",
+  "released": [
+    {
+      "bytes": 14757,
+      "path": "update-00/check.json",
+      "sha256": "70390fb6af57f0311384ce655c156a1ee853ef2ae62c56e17dad111ff263e4b5",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-00/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/4f9e2364324e5cfdd97eba9e59d44b6b3069a037effa9d7536353f7663a71d9d/archive.tar.gz"
+    },
+    {
+      "bytes": 19460213,
+      "path": "update-00/checkpoint.pt",
+      "sha256": "e50408ffd3a91a96defe4310db2a87f17b84682f8e7ccad9924c95f46ad75f65",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-00/checkpoint.pt",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/4f9e2364324e5cfdd97eba9e59d44b6b3069a037effa9d7536353f7663a71d9d/archive.tar.gz"
+    },
+    {
+      "bytes": 24660883,
+      "path": "update-00/heads/heads-00.npz",
+      "sha256": "35f7565fc94debd6ad7fa238582089ac2457edb4e467ba21d1ecbe1df0159ba4",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-00/heads/heads-00.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/4f9e2364324e5cfdd97eba9e59d44b6b3069a037effa9d7536353f7663a71d9d/archive.tar.gz"
+    },
+    {
+      "bytes": 25044683,
+      "path": "update-00/heads/heads-01.npz",
+      "sha256": "541bfb29c4278af9071d7c8fbea116b69684035291f287e38245f216fda4302b",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-00/heads/heads-01.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/961d84eecbf43a7f6063945c64b784706fd9e2f78469fccd899c9c6db57118d2/archive.tar.gz"
+    },
+    {
+      "bytes": 25147310,
+      "path": "update-00/heads/heads-02.npz",
+      "sha256": "065a41edb46f6923a0056d0eb4f904fe5d4af829b6aad0279086ece31cfdfe42",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-00/heads/heads-02.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/961d84eecbf43a7f6063945c64b784706fd9e2f78469fccd899c9c6db57118d2/archive.tar.gz"
+    },
+    {
+      "bytes": 24903695,
+      "path": "update-00/heads/heads-03.npz",
+      "sha256": "aac887ac8f80f90250f885e79aefcdcbad57617dd47e5f70d13111d4d1510448",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-00/heads/heads-03.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/3d759afda2a3c6d9a3b95b96a5910c8f773d8c6478b6e1fae248ee0db962ad96/archive.tar.gz"
+    },
+    {
+      "bytes": 24818404,
+      "path": "update-00/heads/heads-04.npz",
+      "sha256": "02558f599b598971110f55ecef73127ccf6c6fd12ad02941d43822d9ffabfc0a",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-00/heads/heads-04.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/3d759afda2a3c6d9a3b95b96a5910c8f773d8c6478b6e1fae248ee0db962ad96/archive.tar.gz"
+    },
+    {
+      "bytes": 25235763,
+      "path": "update-00/heads/heads-05.npz",
+      "sha256": "01d6c56b9fc94fde388cbee445d90d919933e16457fbf8fbe762820fdf74c677",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-00/heads/heads-05.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/d6aec9740367fc5ad84e25e097d7e09471eff741280de448b127ed0224c86af7/archive.tar.gz"
+    },
+    {
+      "bytes": 25132686,
+      "path": "update-00/heads/heads-06.npz",
+      "sha256": "02837a5325b55ed3e6b48d55e5c613e26725a4bdf5b1cb93e8aaf88db845f9d5",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-00/heads/heads-06.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/d6aec9740367fc5ad84e25e097d7e09471eff741280de448b127ed0224c86af7/archive.tar.gz"
+    },
+    {
+      "bytes": 25013397,
+      "path": "update-00/heads/heads-07.npz",
+      "sha256": "4b2eda89fe784dd5f065820be90e566f5a06156ade2fbe3af2187e9a087b831c",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-00/heads/heads-07.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/22eda65f7fc5b4192af778f0590f29d6fc831df6ad6cd5247f358030997b46cd/archive.tar.gz"
+    },
+    {
+      "bytes": 24357132,
+      "path": "update-00/heads/heads-08.npz",
+      "sha256": "3f41614a231bb850797b1a03cf8a9d832a40cbc37055ca8d937cd2717b717aa7",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-00/heads/heads-08.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/22eda65f7fc5b4192af778f0590f29d6fc831df6ad6cd5247f358030997b46cd/archive.tar.gz"
+    },
+    {
+      "bytes": 25287606,
+      "path": "update-00/heads/heads-09.npz",
+      "sha256": "a170c4161c7f5785537c01b5c48ac023ddeb2cb08e4231d08f4948115360dfc8",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-00/heads/heads-09.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/786fb837c09c1fbe363408450c77e364d9153fa17f6c263dfffa812daa0ef960/archive.tar.gz"
+    },
+    {
+      "bytes": 23177896,
+      "path": "update-00/heads/heads-10.npz",
+      "sha256": "bf03be1872f1bae4f67a468608160bde5a4cb351d2caae8873ab735dc88a4e11",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-00/heads/heads-10.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/786fb837c09c1fbe363408450c77e364d9153fa17f6c263dfffa812daa0ef960/archive.tar.gz"
+    },
+    {
+      "bytes": 24107863,
+      "path": "update-00/heads/heads-11.npz",
+      "sha256": "14b3bd24523bfdcd2726dfd50e6c85649c95b3a5b90463e6da2d2d4486fa903d",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-00/heads/heads-11.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/6539a263d85c74adce1bcaf069ab53187151e8797fd116941414d0f47e5d96e6/archive.tar.gz"
+    },
+    {
+      "bytes": 24084752,
+      "path": "update-00/heads/heads-12.npz",
+      "sha256": "7f0ce7fee69a59b048a82f59ef1a9c2cb9ec4f089f9d76926dff69eb4ec41d72",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-00/heads/heads-12.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/6539a263d85c74adce1bcaf069ab53187151e8797fd116941414d0f47e5d96e6/archive.tar.gz"
+    },
+    {
+      "bytes": 24906623,
+      "path": "update-00/heads/heads-13.npz",
+      "sha256": "31d830e141154cc7b58f524832e5f5dee985256535e24d97f1b62f424d1d2cf0",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-00/heads/heads-13.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/63279be260408c8e4fa497b3877f2f799c35e2d4fea19201c1aff96221a7e89d/archive.tar.gz"
+    },
+    {
+      "bytes": 21828270,
+      "path": "update-00/heads/heads-14.npz",
+      "sha256": "703d68321e7177c06471405c843a2c399cc728790457f6dc6333a11f2efac890",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-00/heads/heads-14.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/63279be260408c8e4fa497b3877f2f799c35e2d4fea19201c1aff96221a7e89d/archive.tar.gz"
+    },
+    {
+      "bytes": 21437013,
+      "path": "update-00/heads/heads-15.npz",
+      "sha256": "d7f105ac4f5fe5000c324debb48fcc7d3d19724c979bbb85fb576a3f4388db36",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-00/heads/heads-15.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/36d19307bc062af9697b1b8a272ffd3fc0892004d66f79f6c56784ba1da437bf/archive.tar.gz"
+    },
+    {
+      "bytes": 37,
+      "path": "update-00/live.log",
+      "sha256": "98f998f8f52b9c2b66acf83afc9178c248c5d8e6c948255c396be97457deb155",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-00/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/36d19307bc062af9697b1b8a272ffd3fc0892004d66f79f6c56784ba1da437bf/archive.tar.gz"
+    },
+    {
+      "bytes": 21918,
+      "path": "update-19/check.json",
+      "sha256": "abce230319c854d34dbaeef17685444456cc7ad3416ffc97e9d2bd332ce431ca",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-19/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/36d19307bc062af9697b1b8a272ffd3fc0892004d66f79f6c56784ba1da437bf/archive.tar.gz"
+    },
+    {
+      "bytes": 58295775,
+      "path": "update-19/checkpoint.pt",
+      "sha256": "0acc285602d0b41962995f14bd4d6489144db92b2ecd55ed88e760f0b88596b3",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-19/checkpoint.pt",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/640268a67bec5225a59a730de7154cfd077451593a840830101245117876352a/archive.tar.gz"
+    },
+    {
+      "bytes": 23423970,
+      "path": "update-19/heads/heads-00.npz",
+      "sha256": "3f3a59c4778e5dd64018160503c94fbfbbd883da45948ba1fc21eda3cf4ef10f",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-19/heads/heads-00.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/f291226195139ea631272d2cf2dc3880dc45a12c2b24f22b56e628206db8b4d1/archive.tar.gz"
+    },
+    {
+      "bytes": 23645162,
+      "path": "update-19/heads/heads-01.npz",
+      "sha256": "76033f0ba379f5701acb0c8d3ba83a2a9aa0589acde5321b4eda354e234d5ee4",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-19/heads/heads-01.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/f291226195139ea631272d2cf2dc3880dc45a12c2b24f22b56e628206db8b4d1/archive.tar.gz"
+    },
+    {
+      "bytes": 23608354,
+      "path": "update-19/heads/heads-02.npz",
+      "sha256": "a9ab83b90f3a3f2c9eb23311eef4b568efe6131148a231f425953a45119654aa",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-19/heads/heads-02.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/a75afc97b7b75f0cda7dcd275f788fd52cbb98619649f8e581ed8b28ad877f6a/archive.tar.gz"
+    },
+    {
+      "bytes": 23676046,
+      "path": "update-19/heads/heads-03.npz",
+      "sha256": "977018c607716fc662479f9cb281e1431310d6060cf17ac02ecada41da23bce5",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-19/heads/heads-03.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/a75afc97b7b75f0cda7dcd275f788fd52cbb98619649f8e581ed8b28ad877f6a/archive.tar.gz"
+    },
+    {
+      "bytes": 23308168,
+      "path": "update-19/heads/heads-04.npz",
+      "sha256": "1615803724653d704b34122de77f1d04f8ebd69025f8485ef075a06cc8271866",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-19/heads/heads-04.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/db394a6be7fd1c9530b2c7c028bd7f35a83509b457cda319a569305bbad6a0be/archive.tar.gz"
+    },
+    {
+      "bytes": 23934710,
+      "path": "update-19/heads/heads-05.npz",
+      "sha256": "989c4bcdb73a1416cbc257ac6b07038e7bdc943e4bbddd423c0888b8274c610b",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-19/heads/heads-05.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/db394a6be7fd1c9530b2c7c028bd7f35a83509b457cda319a569305bbad6a0be/archive.tar.gz"
+    },
+    {
+      "bytes": 24299079,
+      "path": "update-19/heads/heads-06.npz",
+      "sha256": "4eebbd907d3165a95a86b7908aea70bf9d3e88724d5a4740b93e59929c29fb23",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-19/heads/heads-06.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/61be470eebe8943f5220d0b8da4a8af2542df4d29078fb852d127c37a1ba6f84/archive.tar.gz"
+    },
+    {
+      "bytes": 23647130,
+      "path": "update-19/heads/heads-07.npz",
+      "sha256": "9c0e7d2e1f3385dbb055c16c42b52e0449cfc61b61dfb597e5077c988f22cf58",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-19/heads/heads-07.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/61be470eebe8943f5220d0b8da4a8af2542df4d29078fb852d127c37a1ba6f84/archive.tar.gz"
+    },
+    {
+      "bytes": 22248875,
+      "path": "update-19/heads/heads-08.npz",
+      "sha256": "d8448fb853e9dd0944ba1253b1973876409f0af43374ebc6d9b6b3dc16ab3caa",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-19/heads/heads-08.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/4b3f2e8b88c33e888dbc7706af8ca63e257e58008decd846e12e512fc5f8f9e7/archive.tar.gz"
+    },
+    {
+      "bytes": 24455937,
+      "path": "update-19/heads/heads-09.npz",
+      "sha256": "da1df96cd21bd0f15bf180e80573219568e0150b517ee30a56ccd33e4668914a",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-19/heads/heads-09.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/4b3f2e8b88c33e888dbc7706af8ca63e257e58008decd846e12e512fc5f8f9e7/archive.tar.gz"
+    },
+    {
+      "bytes": 21489105,
+      "path": "update-19/heads/heads-10.npz",
+      "sha256": "be1ac72872201ed3f32e7401bea171b1ebfb2bb8bd4be956edf9ee97eb7032ed",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-19/heads/heads-10.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/169c4840e90508ffd370c09a4ddc5e3274f565c6b0d9a5fb567dcc3797eb8ec7/archive.tar.gz"
+    },
+    {
+      "bytes": 22193114,
+      "path": "update-19/heads/heads-11.npz",
+      "sha256": "91556cfad5b1c0a07a783971d8c457845d4db125d988b5923864f59f786a6675",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-19/heads/heads-11.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/169c4840e90508ffd370c09a4ddc5e3274f565c6b0d9a5fb567dcc3797eb8ec7/archive.tar.gz"
+    },
+    {
+      "bytes": 22076756,
+      "path": "update-19/heads/heads-12.npz",
+      "sha256": "9b935f79d1f37a067acedfd86c61b33fa85507b8c18ab87ad4f3253db4c98b25",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-19/heads/heads-12.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/169c4840e90508ffd370c09a4ddc5e3274f565c6b0d9a5fb567dcc3797eb8ec7/archive.tar.gz"
+    },
+    {
+      "bytes": 23490459,
+      "path": "update-19/heads/heads-13.npz",
+      "sha256": "df47cc0300b692490894813709d0d6067db0279e92b79e21186d35443bec017b",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-19/heads/heads-13.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/fc0a66ef13675a8c0e175c56105f6d540c6d0d87ed0c1418a336a01ae32bda6b/archive.tar.gz"
+    },
+    {
+      "bytes": 19971808,
+      "path": "update-19/heads/heads-14.npz",
+      "sha256": "f84489386b4c600e4a1e4e0b81509711ba63af65c03df8c399f1164fe52175a5",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-19/heads/heads-14.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/fc0a66ef13675a8c0e175c56105f6d540c6d0d87ed0c1418a336a01ae32bda6b/archive.tar.gz"
+    },
+    {
+      "bytes": 19263524,
+      "path": "update-19/heads/heads-15.npz",
+      "sha256": "30d6c88f03ec6847aaf8b7f085417fc4b5b45fca6ff877d2058776c3feb659a7",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-19/heads/heads-15.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/fc0a66ef13675a8c0e175c56105f6d540c6d0d87ed0c1418a336a01ae32bda6b/archive.tar.gz"
+    },
+    {
+      "bytes": 38,
+      "path": "update-19/live.log",
+      "sha256": "84cdae74c8da907ff8009af9293272dc6a58a0225eab26245a018534bbb666e2",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-19/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/fc0a66ef13675a8c0e175c56105f6d540c6d0d87ed0c1418a336a01ae32bda6b/archive.tar.gz"
+    },
+    {
+      "bytes": 20824,
+      "path": "update-35/check.json",
+      "sha256": "7afec11626784347d946d3375c3f9643ba1d74be9023d82bb7c9f00b4bb24d80",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-35/check.json",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/fc0a66ef13675a8c0e175c56105f6d540c6d0d87ed0c1418a336a01ae32bda6b/archive.tar.gz"
+    },
+    {
+      "bytes": 58296479,
+      "path": "update-35/checkpoint.pt",
+      "sha256": "3f252f8db41884b904c6e71775ced9f9ff1b556e50dff97c9b6a2477b8b24803",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-35/checkpoint.pt",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/c0d70a4aca1ae9acd363e0b5d13ff91758892d5434ef29b73dee253307de31c0/archive.tar.gz"
+    },
+    {
+      "bytes": 22835316,
+      "path": "update-35/heads/heads-00.npz",
+      "sha256": "79ba830f5a988c2bcfe3dbf9ff9e218d5c454eaebdd0850fdb611241e11c84d6",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-35/heads/heads-00.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/bd742568bb47605ef79514b3b5099048310c2f08eeb6ae46d9358a77e52e2ab5/archive.tar.gz"
+    },
+    {
+      "bytes": 22887925,
+      "path": "update-35/heads/heads-01.npz",
+      "sha256": "a87ddd1b991719956d1708ec3965fa4f871ba3e2f071cc0d6e6335ce55f7910d",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-35/heads/heads-01.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/bd742568bb47605ef79514b3b5099048310c2f08eeb6ae46d9358a77e52e2ab5/archive.tar.gz"
+    },
+    {
+      "bytes": 22751046,
+      "path": "update-35/heads/heads-02.npz",
+      "sha256": "e3b2bb7326c58c997fd8f135b170a3bf6f437ef776ed62ea2dee5c388950ff34",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-35/heads/heads-02.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/966d3b1a2b9acbd83c9eb619a3d1e742df34fe9e3989486c7854bb482e397a25/archive.tar.gz"
+    },
+    {
+      "bytes": 23144478,
+      "path": "update-35/heads/heads-03.npz",
+      "sha256": "2272e43cd045b86e749100af95832a18cd4cdccbd9b9193ca97363be41f06ab1",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-35/heads/heads-03.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/966d3b1a2b9acbd83c9eb619a3d1e742df34fe9e3989486c7854bb482e397a25/archive.tar.gz"
+    },
+    {
+      "bytes": 22555814,
+      "path": "update-35/heads/heads-04.npz",
+      "sha256": "3fa7b329dd6d74b3f16b0c806402b74492d508ecf1c6544185816c8ed6948d29",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-35/heads/heads-04.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/5284da8c738c00ac1378e5f23cde964ce340ecc3eefa33bc3108fb932ba38e2e/archive.tar.gz"
+    },
+    {
+      "bytes": 23201392,
+      "path": "update-35/heads/heads-05.npz",
+      "sha256": "c635095c564f7b0f50cc48b6643bd8abb70bb098cb8130fb65ca73baa974a334",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-35/heads/heads-05.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/5284da8c738c00ac1378e5f23cde964ce340ecc3eefa33bc3108fb932ba38e2e/archive.tar.gz"
+    },
+    {
+      "bytes": 23949056,
+      "path": "update-35/heads/heads-06.npz",
+      "sha256": "394b95873b7574a3ddc491cb2e4f741a090635709fc549e3d36184199027a3f5",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-35/heads/heads-06.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/62b48d9847995d7805e35e13a3abb3a92a3dc5795b1487b2e5f626b8663a1536/archive.tar.gz"
+    },
+    {
+      "bytes": 22885469,
+      "path": "update-35/heads/heads-07.npz",
+      "sha256": "424ce819284daafefd24dc4110aab7ed2b56472c5a6b75761afdf1904a1027f6",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-35/heads/heads-07.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/62b48d9847995d7805e35e13a3abb3a92a3dc5795b1487b2e5f626b8663a1536/archive.tar.gz"
+    },
+    {
+      "bytes": 21227832,
+      "path": "update-35/heads/heads-08.npz",
+      "sha256": "ddb90a6069dd3f18cad4ba6ad86f97b4be718cc139ef03352c01ae51d0e360d8",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-35/heads/heads-08.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/7aee36f69288fe1c1db80c937826f0520b1e99c76ac00d7d7b29269eb8e884b6/archive.tar.gz"
+    },
+    {
+      "bytes": 24086988,
+      "path": "update-35/heads/heads-09.npz",
+      "sha256": "bd051a82f05406541d96f8ee53b02b9c4bf5ce510748c370dc601e28c576f5e4",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-35/heads/heads-09.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/7aee36f69288fe1c1db80c937826f0520b1e99c76ac00d7d7b29269eb8e884b6/archive.tar.gz"
+    },
+    {
+      "bytes": 20546881,
+      "path": "update-35/heads/heads-10.npz",
+      "sha256": "927aacb9b266f2a13980eb617ca94db0105b62545203b10e5993cbd8c9e6a9db",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-35/heads/heads-10.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/7aee36f69288fe1c1db80c937826f0520b1e99c76ac00d7d7b29269eb8e884b6/archive.tar.gz"
+    },
+    {
+      "bytes": 21311743,
+      "path": "update-35/heads/heads-11.npz",
+      "sha256": "23b7e83f594f49beea22dd85e372e8fb41fc95f1539a62e4be8e5c8d3a1115af",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-35/heads/heads-11.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/5585718ff70629c43b7bf4ac1f7d503ab878ffcec4ff4d693dafb031311d25bf/archive.tar.gz"
+    },
+    {
+      "bytes": 21174927,
+      "path": "update-35/heads/heads-12.npz",
+      "sha256": "6a45cec3a28754b349f9b667c5ca64942d70bf4c320fbff0ebbb0611b30da7e8",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-35/heads/heads-12.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/5585718ff70629c43b7bf4ac1f7d503ab878ffcec4ff4d693dafb031311d25bf/archive.tar.gz"
+    },
+    {
+      "bytes": 22847375,
+      "path": "update-35/heads/heads-13.npz",
+      "sha256": "6bd49a8055f9008690d3328922494c22e76a483cbcb0ea1dac045e8817d2f0d6",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-35/heads/heads-13.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/5585718ff70629c43b7bf4ac1f7d503ab878ffcec4ff4d693dafb031311d25bf/archive.tar.gz"
+    },
+    {
+      "bytes": 19013067,
+      "path": "update-35/heads/heads-14.npz",
+      "sha256": "4ac7acc7322e57f258c56433233f1362ad1e3db397557861d807c01940e026a2",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-35/heads/heads-14.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/1fb5120634ae50b98ca459ad69554d68750a292332af63f30eac29918cac17b0/archive.tar.gz"
+    },
+    {
+      "bytes": 18265256,
+      "path": "update-35/heads/heads-15.npz",
+      "sha256": "cca5376296c960c0d4678429c4b5b3f5bf0faee3cdef8ed319b6588f25fda2f5",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-35/heads/heads-15.npz",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/1fb5120634ae50b98ca459ad69554d68750a292332af63f30eac29918cac17b0/archive.tar.gz"
+    },
+    {
+      "bytes": 38,
+      "path": "update-35/live.log",
+      "sha256": "d8822f2112f5b38be8f36ac17d952865e2f280dd338cb252897d445d935446c5",
+      "local_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-admission-native20261003a/update-35/live.log",
+      "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a-963f905d46ed43d79071b0d53d6d17f0/1fb5120634ae50b98ca459ad69554d68750a292332af63f30eac29918cac17b0/archive.tar.gz"
+    }
+  ]
+}
