@@ -12,6 +12,8 @@
 
 Status: implementation plan written after full-spec approval; awaiting plan review. No implementation milestone is closed by this document. Dates use the client timezone.
 
+Independent review: at the user's request, Claude reviewed commit `4469127` and returned **changes required**. The [retained report](../../research/reviews/2026-10-03-sureal-collaboration-claude-review.md) and provenance pin the reviewed revision. Findings require triage and plan correction before execution; this record does not revise or weaken approved spec acceptance.
+
 ## Global Constraints
 
 - Canonical integration remains `refs/heads/phi9t/mainline`.
