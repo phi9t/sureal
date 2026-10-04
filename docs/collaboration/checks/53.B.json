@@ -107,7 +107,8 @@
       ],
       "expected_outcome": "refused",
       "expected_exit": 2,
-      "oracle": "Reopen exact source/context and actual Git/Kata/Codex/raw effect/command readbacks. Prepilot receipts bind this candidate's admitted base, independently audited before its worker launches; E needs fresh C-base fixtures. Prepared-host receipts precede offline checks. Current candidate never depends on its own future acceptance/landing/closure; fixture coverage cannot certify final handoff."
+      "oracle": "Reopen exact source/context and actual Git/Kata/Codex/raw effect/command readbacks. Prepilot receipts bind this candidate's admitted base, independently audited before its worker launches; E needs fresh C-base fixtures. Prepared-host receipts precede offline checks. Current candidate never depends on its own future acceptance/landing/closure; fixture coverage cannot certify final handoff.",
+      "expected_reason": "STALE_BASE"
     },
     {
       "id": "refresh",

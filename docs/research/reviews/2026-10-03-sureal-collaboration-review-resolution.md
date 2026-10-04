@@ -14,7 +14,7 @@ The user requested correction of the [Claude review](2026-10-03-sureal-collabora
 | S8 | Corrected: report CLI/signature has exact thread/turn/item; controller corroborates public report digest. Cooperative IDs are not called authentication; missing corroboration refuses transitions. |
 | S9 | Corrected: raw Git blob/mode/link materialization, no Git pointer/filters/archive attributes; manifest-only excluded gitlinks; independent tree reconstruction/pre-post hash receipt and cooperative host ownership. |
 | S10 | Corrected: versioned meaningful-progress/equivalent-failure classifier; chatter/source toggles/CPU activity alone cannot advance progress. Owned heartbeat/process signals are scoped to operations, not daemon-wide worker proof. |
-| S11 | Corrected:44 phase-specific required oracles across7 stages committed before implementation; separately admitted independent auditor does not import producer package; raw Git/Kata/Codex/resource/source readback and separate reviewer required. |
+| S11 | Corrected:63 phase/role-specific required oracles across7 stages committed before implementation; separately admitted independent auditor does not import producer package; raw Git/Kata/Codex/resource/source readback and separate reviewer required. |
 | S12 | Corrected: distinct per-step effect keys/input digests; pre-thread and post-thread assignment each has its own revision-conditional/readback effect. |
 | S13 | Corrected: pin config/hooks/remote, disable hooks for controller effects, fixed environment, no-optional-locks reads and explicit ignored-path admission. |
 | S14 | Corrected: named scientific retention/archive references, host-only Waystone transfer adapter with pinned tool closure, independent collision-safe immutable prefix and LS/fresh GET ack recovery; dedicated protocol audit instead of scientific namespace-bound helper reuse. |
@@ -22,7 +22,7 @@ The user requested correction of the [Claude review](2026-10-03-sureal-collabora
 | S16 | Corrected: cwd-filtered read-only thread discovery plus exact provenance; unresolved/ambiguous identity holds the seat and cannot be manually force-cleared without actual stop/retention proof. |
 | S17 | Corrected: `read_status` belongs to49;54 expands it with summaries/state/UI. |
 | S18 | Corrected: public metadata/digests only by default; raw tool-result bodies excluded from retained summary/snapshot, scoped sanitized drilldown separate. |
-| S19 | Corrected: pin actual scientific lock implementation/path/inode; noninvasive busy/idle probe; fixture contention uses exact code without interfering with scientific owners. |
+| S19 | Corrected: pin actual scientific lock implementation/path/inode; read-only wiring check; fixture contention uses exact code without interfering with scientific owners. |
 | S20 | Corrected: publish exact `C:<configured-ref>` refspec, no branch-name substitution or force. |
 | S21 | Corrected: digested records reject floats; integer milliseconds; separately hashed raw resource proofs retain their native numeric format. |
 | S22 | Corrected: fresh per-ticket/per-run output paths, failed evidence never overwritten. |
@@ -43,7 +43,7 @@ The suggested raw HEAD/diff change or rising CPU-time is insufficient as meaning
 
 ## Review and execution boundaries
 
-Re-review the corrected pinned bundle with Claude. Documentation link/schema/coverage checks are useful but cannot close any live implementation stage. Pristine mainline, plan admission and current worker priority remain intact. User authorization to fix the review covers these documentation corrections; it does not assert runtime implementation already exists.
+Three pinned Claude reviews are retained below. The third confirms the original findings are resolved and requests narrow corrections; a focused diff check suffices. Documentation link/schema/coverage checks cannot close any live implementation stage. Pristine mainline, plan admission and current worker priority remain intact. User authorization to fix the review covers these documentation corrections; it does not assert runtime implementation already exists.
 
 ## Second review corrections
 
@@ -62,7 +62,7 @@ Re-review the corrected pinned bundle with Claude. Documentation link/schema/cov
 | N9 | Independently observed changed check outcome/new declared artifact digest advances progress without lead acknowledgement; new findings keep reported attribution. Added collaboration-owned heartbeat fixture wrapper; scientific wrapper has no assumed heartbeat. |
 | N10 | Gate/absolute audit argv explicitly pins candidate/materialization. Separate GateAdmission fixture schema from real ProjectAdmission. |
 | N11 | Launch commands use ack and terminal-result JSON-lines; terminal result determines exit. Supervision recovery reads/re-attaches exact retained turn and never starts another turn. |
-| N12 | Added worktree/index/canonical guard, continuation/resume/fork, long-job/idle and final-pilot capacity/resource cases, with case-specific artifact paths. Current44 required cases; no generic triple alone. |
+| N12 | Added worktree/index/canonical guard, continuation/resume/fork, long-job/idle and final-pilot capacity/resource cases, with case-specific artifact paths. The second revision's44 cases expanded to63 for every-stage landing/closure and role-specific metadata/preflight coverage; no generic triple alone. |
 | N13 | Lead creates manual isolated fork/native-goal fixtures only under retained explicit per-probe authority and native/tool rules; committed runtime-probes.json defines creator/scope/failure. No managed-goal mutation. |
 | N14 | Removed actual scientific lock acquire/release. Read-only wiring plus exact-code fixture contention; no testing interference with active jobs. |
 | N15 | FinalF is lead-owned in a dedicated metadata worktree, docs/collaboration/evidence/53 scope, parentE; fresh source audit and manual exact landing; post/closure readbacks separate. |
@@ -75,3 +75,25 @@ Re-review the corrected pinned bundle with Claude. Documentation link/schema/cov
 | N22 | task import has distinct definitions input/map output flags. Committed worker-briefs.json identifies both bounded fixture goals/scopes. |
 
 Read-only inspection additionally confirmed sources/archive helpers require Python3.11+ and the scientific resource worker emits final measurements, not a heartbeat. The additive protocol Python floor is explicit; scientific package/runtime pins remain untouched. Source freezer output is an owned collaboration snapshot outside canonical/frozen source, retained and audited.
+
+## Third review corrections
+
+[Third review](2026-10-03-sureal-collaboration-claude-rereview-3.md) inspected f32a496 and explicitly confirms S1–S22/D1–D6 resolved, with no remaining cycles. These narrow corrections preserve every live verifier; the report's verdict applies to its historical source.
+
+| Finding | Correction / disposition |
+| --- | --- |
+| R1 | Every ticket now has gate, post-landing and closure oracles; candidate roles distinguish implementation, metadata and pilot state. Zero matching cases refuses. Actual exact-X/M/F landing and evidence-bound Kata close are independently audited after their effects. |
+| R2 | Task50 owns refresh_task with runtime/context/disposition parameters, a named retain–stop–retire–fresh-context test and explicit-refresh gate case. Takeover retires only; task start launches the replacement. |
+| R3 | runtime-probes.json names the independently admitted A50 helper, non-managed fixture creator and explicit per-probe authority. The stop-capability oracle requires twice-observed native/tool/queue/goal/process evidence before producer50 code and the first managed claim. |
+| R4 | B/C preflight collection maps to two required gate cases. Explicit materialized-C invocation and partial-case audit are recorded; a partial receipt never accepts the full gate. |
+| R5 | Separate M/F metadata gates bind candidate/materialization/role, sole parent, declared diff scope and immutable reference digests. Final pilot-state gate binds E; metadata gate binds F before its landing. |
+| R6 | Task49 fixture import/revision/status checks are gate-phase. Its real-project bootstrap/map-M/close readbacks are closure-phase; no running managed attempt is required before50. |
+| R7 | Runtime manifest and launch recipe require a fresh uniquely named cgroup-v2 scope, exact reserved memory, zero swap and sole stage-controller membership before/after. Lead49 and each worker50 probe actual scope creation; unsupported delegation blocks. Read-only helper inspection corroborates the validator constraints. |
+| R8 | Usage errors return64/USAGE_ERROR; unexpected failures return1/INTERNAL_ERROR with retained evidence. Refused2 and uncertain3 remain distinct; missing/truncated envelopes remain unknown. |
+| R9 | Runtime, fixture and pilot commands use absolute admitted materialized paths; GateAdmission is explicit rather than an ambiguous installed/default admission. |
+| R10 | Resource-wrapped harness returns normally, records inner failures/exits and uses unittest exit=False. Outer0 is measurement completion only; failed oracle or missing resource proof refuses acceptance. |
+| R11 | stale-land manifest explicitly expects STALE_BASE. |
+| R12 | File map names collaboration-owned heartbeat_worker.py and final evidence/53 metadata scope. |
+| R13 | Corrected stale cross-references, clarified manifests are already committed inputs, retained read-only scientific-lock wording and added53.0 to README dependencies. |
+
+The corrected bundle is documentation only. Actual native stop coverage, cgroup delegation, isolated Kata behavior, HDFS no-overwrite/readback and live Insula acceptance remain implementation gates.

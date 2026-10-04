@@ -35,6 +35,24 @@
       "goal": "Demonstrate native goal lifecycle separately from operating/task state.",
       "output": "native-goal-state-readbacks.json",
       "constraint": "The explicit fixture authorization lists objective/status transitions; tool/native-goal rules still apply and may refuse. No managed worker goal is mutated."
+    },
+    {
+      "id": "stop-capability",
+      "ticket": "50",
+      "creator": "Lead manually using independently admitted A50 native-probe helper, before implementing50 or reserving its first managed claim.",
+      "methods": [
+        "thread/start",
+        "turn/start",
+        "thread/read",
+        "thread/turns/list",
+        "thread/items/list",
+        "thread/goal/get",
+        "thread/queue/list"
+      ],
+      "goal": "Run one bounded authorized fixture turn/tool in isolated writable fixture output; demonstrate actual twice-observed stop coverage.",
+      "output": "stop-capability-quiescence.json",
+      "oracle": "Terminal turn and every owned tool item, absent native goal, empty native queue, actual complete process incarnation/scope coverage on two reads >=5sec apart; accepted timestamp/event precedes first managed claim.",
+      "failure": "Missing API/authority/coverage blocks50 design before product code/managed dispatch; no speculative replacement or scan-only fallback."
     }
   ]
 }

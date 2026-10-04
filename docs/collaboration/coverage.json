@@ -14,7 +14,10 @@
           "cases/exact-source-and-rootfs/git-objects-and-status.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "real-state-fs-durability",
@@ -27,7 +30,10 @@
           "cases/real-state-fs-durability/fault-boundary-records.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "clean-ref-and-path-refusals",
@@ -39,7 +45,10 @@
           "cases/clean-ref-and-path-refusals/independent-oracle.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "journal-corruption",
@@ -52,20 +61,28 @@
           "cases/journal-corruption/fault-boundary-records.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "queue-bootstrap-revision-status",
-        "oracle": "Actual manual bootstrap/import/map M/closure readbacks resolve one project and issue UID per task; old running brief stays pinned; status has no control effects.",
+        "oracle": "Actual real-project manual bootstrap/init/import binding and independently gated/landed map M readbacks resolve one project/issue UID per task; sourceX and mapM pins accepted; actual49 Kata close/readback records closure. Running-brief/idempotency checks are separately gate-phase fixtures.",
         "required_raw_evidence": [
-          "cases/queue-bootstrap-revision-status/context.json",
-          "cases/queue-bootstrap-revision-status/actual-command.json",
-          "cases/queue-bootstrap-revision-status/execution.log",
-          "cases/queue-bootstrap-revision-status/independent-oracle.json",
-          "cases/queue-bootstrap-revision-status/kata-readback.json"
+          "cases/queue-bootstrap-revision-status/bootstrap-manual-intent.json",
+          "cases/queue-bootstrap-revision-status/project-readback.json",
+          "cases/queue-bootstrap-revision-status/map-M-context.json",
+          "cases/queue-bootstrap-revision-status/M-gate-audit.json",
+          "cases/queue-bootstrap-revision-status/M-landing-readback.json",
+          "cases/queue-bootstrap-revision-status/kata-close-event.json",
+          "cases/queue-bootstrap-revision-status/closure-manifest.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "closure"
+        "phase": "closure",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "scoped-queue-restore",
@@ -79,7 +96,74 @@
           "cases/scoped-queue-restore/git-objects-and-status.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
+      },
+      {
+        "id": "exact-stage-landing",
+        "phase": "post-landing",
+        "candidate_roles": [
+          "implementation"
+        ],
+        "oracle": "Independently reopen exact accepted X/current-stage candidate, sole parent, canonical ref/HEAD/tree/index/tracked/untracked/ignored disposition and configured remote; exact fast-forward, no rewrite.49 additionally records separately verified M.",
+        "required_raw_evidence": [
+          "cases/exact-stage-landing/candidate-context.json",
+          "cases/exact-stage-landing/accepted-gate-audit.json",
+          "cases/exact-stage-landing/prepared-landing.json",
+          "cases/exact-stage-landing/git-objects-and-status.json",
+          "cases/exact-stage-landing/publication-readback.json"
+        ],
+        "absence": "refuse closure"
+      },
+      {
+        "id": "fixture-import-revision-status",
+        "phase": "gate",
+        "candidate_roles": [
+          "implementation"
+        ],
+        "oracle": "Actual owned fixture import idempotency/revision/old-brief pinning and read-only status assertions before any real-project writes.",
+        "required_raw_evidence": [
+          "cases/fixture-import-revision-status/candidate-role-context.json",
+          "cases/fixture-import-revision-status/actual-command.json",
+          "cases/fixture-import-revision-status/oracle-inputs.json",
+          "cases/fixture-import-revision-status/independent-oracle.json",
+          "cases/fixture-import-revision-status/raw-state-readback.json"
+        ],
+        "absence": "refuse matching phase acceptance"
+      },
+      {
+        "id": "map-M-gate",
+        "phase": "gate",
+        "candidate_roles": [
+          "metadata"
+        ],
+        "oracle": "M has sole parent current clean bootstrap base; diff limited to .kata.toml/.gitignore binding line/docs/research/kata-task-map.json; task/spec/plan blob pins and issue UID/project/dependency readbacks match; no mutable queue owners/status in Git.",
+        "required_raw_evidence": [
+          "cases/map-M-gate/candidate-role-context.json",
+          "cases/map-M-gate/actual-command.json",
+          "cases/map-M-gate/oracle-inputs.json",
+          "cases/map-M-gate/independent-oracle.json",
+          "cases/map-M-gate/raw-state-readback.json"
+        ],
+        "absence": "refuse matching phase acceptance"
+      },
+      {
+        "id": "map-M-landing",
+        "phase": "post-landing",
+        "candidate_roles": [
+          "metadata"
+        ],
+        "oracle": "Actual canonical ref/HEAD/tree/index/working state equals exact independently gated M; codeX retained/ancestor identity and actual binding/map readback match.",
+        "required_raw_evidence": [
+          "cases/map-M-landing/candidate-role-context.json",
+          "cases/map-M-landing/actual-command.json",
+          "cases/map-M-landing/oracle-inputs.json",
+          "cases/map-M-landing/independent-oracle.json",
+          "cases/map-M-landing/raw-state-readback.json"
+        ],
+        "absence": "refuse matching phase acceptance"
       }
     ],
     "50": [
@@ -96,7 +180,10 @@
           "cases/two-real-workers-overlap/process-incarnations.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "dispatch-effect-boundaries",
@@ -109,7 +196,10 @@
           "cases/dispatch-effect-boundaries/kata-readback.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "capacity-scope-resource-refusal",
@@ -122,7 +212,10 @@
           "cases/capacity-scope-resource-refusal/git-objects-and-status.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "identity-and-reports",
@@ -136,7 +229,10 @@
           "cases/identity-and-reports/process-incarnations.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "stop-takeover",
@@ -150,7 +246,10 @@
           "cases/stop-takeover/process-incarnations.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "transport-lost-thread",
@@ -164,7 +263,10 @@
           "cases/transport-lost-thread/process-incarnations.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "live-worker-namespace",
@@ -179,7 +281,10 @@
           "cases/live-worker-namespace/process-incarnations.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "worktree-index-and-mainline-guard",
@@ -194,7 +299,10 @@
           "cases/worktree-index-and-mainline-guard/kata-readback.json",
           "cases/worktree-index-and-mainline-guard/git-objects-and-status.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "multi-turn-resume-and-fork",
@@ -209,7 +317,74 @@
           "cases/multi-turn-resume-and-fork/kata-readback.json",
           "cases/multi-turn-resume-and-fork/git-objects-and-status.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "candidate_roles": [
+          "all"
+        ]
+      },
+      {
+        "id": "exact-stage-landing",
+        "phase": "post-landing",
+        "candidate_roles": [
+          "implementation"
+        ],
+        "oracle": "Independently reopen exact accepted X/current-stage candidate, sole parent, canonical ref/HEAD/tree/index/tracked/untracked/ignored disposition and configured remote; exact fast-forward, no rewrite.49 additionally records separately verified M.",
+        "required_raw_evidence": [
+          "cases/exact-stage-landing/candidate-context.json",
+          "cases/exact-stage-landing/accepted-gate-audit.json",
+          "cases/exact-stage-landing/prepared-landing.json",
+          "cases/exact-stage-landing/git-objects-and-status.json",
+          "cases/exact-stage-landing/publication-readback.json"
+        ],
+        "absence": "refuse closure"
+      },
+      {
+        "id": "evidence-backed-stage-close",
+        "phase": "closure",
+        "candidate_roles": [
+          "all"
+        ],
+        "oracle": "Actual Kata close event/readback binds this task/spec/issue UID to accepted gate/post-landing and required retention evidence; terminal queue effect observed, no closure from worker assertion.",
+        "required_raw_evidence": [
+          "cases/evidence-backed-stage-close/pre-close-acceptance.json",
+          "cases/evidence-backed-stage-close/prepared-close.json",
+          "cases/evidence-backed-stage-close/kata-close-event.json",
+          "cases/evidence-backed-stage-close/kata-readback.json",
+          "cases/evidence-backed-stage-close/closure-manifest.json"
+        ],
+        "absence": "refuse next-stage admission"
+      },
+      {
+        "id": "stop-capability-before-first-claim",
+        "phase": "gate",
+        "candidate_roles": [
+          "implementation"
+        ],
+        "oracle": "Explicitly authorized lead-owned non-managed stop-capability fixture proves terminal turn/all tool items, native goal absent, empty queue, twice-observed complete process/scope quiescence. Independent timestamps/event sequence place its accepted receipt before first managed claim intent; failure blocks50 before implementation/dispatch.",
+        "required_raw_evidence": [
+          "cases/stop-capability-before-first-claim/candidate-role-context.json",
+          "cases/stop-capability-before-first-claim/actual-command.json",
+          "cases/stop-capability-before-first-claim/oracle-inputs.json",
+          "cases/stop-capability-before-first-claim/independent-oracle.json",
+          "cases/stop-capability-before-first-claim/raw-state-readback.json"
+        ],
+        "absence": "refuse matching phase acceptance"
+      },
+      {
+        "id": "explicit-refresh",
+        "phase": "gate",
+        "candidate_roles": [
+          "implementation"
+        ],
+        "oracle": "Actual old attempt retained/stopped/retired; new admitted base/claim/thread/worktree acknowledge; former evidence cannot authorize refreshed candidate; takeover retires only, replacement uses start.",
+        "required_raw_evidence": [
+          "cases/explicit-refresh/candidate-role-context.json",
+          "cases/explicit-refresh/actual-command.json",
+          "cases/explicit-refresh/oracle-inputs.json",
+          "cases/explicit-refresh/independent-oracle.json",
+          "cases/explicit-refresh/raw-state-readback.json"
+        ],
+        "absence": "refuse matching phase acceptance"
       }
     ],
     "51": [
@@ -224,7 +399,10 @@
           "cases/candidate-refusals/git-objects-and-status.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "materialization-fidelity",
@@ -237,7 +415,10 @@
           "cases/materialization-fidelity/git-objects-and-status.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "retention-and-isolation",
@@ -252,7 +433,10 @@
           "cases/retention-and-isolation/archive-live-resource-proof.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "repair-context",
@@ -264,7 +448,42 @@
           "cases/repair-context/independent-oracle.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
+      },
+      {
+        "id": "exact-stage-landing",
+        "phase": "post-landing",
+        "candidate_roles": [
+          "implementation"
+        ],
+        "oracle": "Independently reopen exact accepted X/current-stage candidate, sole parent, canonical ref/HEAD/tree/index/tracked/untracked/ignored disposition and configured remote; exact fast-forward, no rewrite.49 additionally records separately verified M.",
+        "required_raw_evidence": [
+          "cases/exact-stage-landing/candidate-context.json",
+          "cases/exact-stage-landing/accepted-gate-audit.json",
+          "cases/exact-stage-landing/prepared-landing.json",
+          "cases/exact-stage-landing/git-objects-and-status.json",
+          "cases/exact-stage-landing/publication-readback.json"
+        ],
+        "absence": "refuse closure"
+      },
+      {
+        "id": "evidence-backed-stage-close",
+        "phase": "closure",
+        "candidate_roles": [
+          "all"
+        ],
+        "oracle": "Actual Kata close event/readback binds this task/spec/issue UID to accepted gate/post-landing and required retention evidence; terminal queue effect observed, no closure from worker assertion.",
+        "required_raw_evidence": [
+          "cases/evidence-backed-stage-close/pre-close-acceptance.json",
+          "cases/evidence-backed-stage-close/prepared-close.json",
+          "cases/evidence-backed-stage-close/kata-close-event.json",
+          "cases/evidence-backed-stage-close/kata-readback.json",
+          "cases/evidence-backed-stage-close/closure-manifest.json"
+        ],
+        "absence": "refuse next-stage admission"
       }
     ],
     "52": [
@@ -279,7 +498,10 @@
           "cases/exact-landing/git-objects-and-status.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "all-created-effect-recovery",
@@ -291,7 +513,10 @@
           "cases/all-created-effect-recovery/independent-oracle.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "B-C-neither-interruption",
@@ -303,7 +528,10 @@
           "cases/B-C-neither-interruption/independent-oracle.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "remote-ack",
@@ -315,7 +543,10 @@
           "cases/remote-ack/independent-oracle.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "evidence-backed-close",
@@ -328,7 +559,42 @@
           "cases/evidence-backed-close/kata-readback.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
+      },
+      {
+        "id": "exact-stage-landing",
+        "phase": "post-landing",
+        "candidate_roles": [
+          "implementation"
+        ],
+        "oracle": "Independently reopen exact accepted X/current-stage candidate, sole parent, canonical ref/HEAD/tree/index/tracked/untracked/ignored disposition and configured remote; exact fast-forward, no rewrite.49 additionally records separately verified M.",
+        "required_raw_evidence": [
+          "cases/exact-stage-landing/candidate-context.json",
+          "cases/exact-stage-landing/accepted-gate-audit.json",
+          "cases/exact-stage-landing/prepared-landing.json",
+          "cases/exact-stage-landing/git-objects-and-status.json",
+          "cases/exact-stage-landing/publication-readback.json"
+        ],
+        "absence": "refuse closure"
+      },
+      {
+        "id": "evidence-backed-stage-close",
+        "phase": "closure",
+        "candidate_roles": [
+          "all"
+        ],
+        "oracle": "Actual Kata close event/readback binds this task/spec/issue UID to accepted gate/post-landing and required retention evidence; terminal queue effect observed, no closure from worker assertion.",
+        "required_raw_evidence": [
+          "cases/evidence-backed-stage-close/pre-close-acceptance.json",
+          "cases/evidence-backed-stage-close/prepared-close.json",
+          "cases/evidence-backed-stage-close/kata-close-event.json",
+          "cases/evidence-backed-stage-close/kata-readback.json",
+          "cases/evidence-backed-stage-close/closure-manifest.json"
+        ],
+        "absence": "refuse next-stage admission"
       }
     ],
     "53.0": [
@@ -342,7 +608,10 @@
           "cases/cleanup-refusal-and-recovery/independent-oracle.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "work-and-other-seat-retention",
@@ -357,7 +626,10 @@
           "cases/work-and-other-seat-retention/archive-live-resource-proof.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "fresh-hdfs-and-live-rehydration",
@@ -371,7 +643,10 @@
           "cases/fresh-hdfs-and-live-rehydration/archive-live-resource-proof.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "queue-export-restore",
@@ -384,7 +659,10 @@
           "cases/queue-export-restore/kata-readback.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "pilot-check-contract",
@@ -396,7 +674,10 @@
           "cases/pilot-check-contract/independent-oracle.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "landed-foundation",
@@ -409,7 +690,26 @@
           "cases/landed-foundation/git-objects-and-status.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "post-landing"
+        "phase": "post-landing",
+        "candidate_roles": [
+          "implementation"
+        ]
+      },
+      {
+        "id": "evidence-backed-stage-close",
+        "phase": "closure",
+        "candidate_roles": [
+          "all"
+        ],
+        "oracle": "Actual Kata close event/readback binds this task/spec/issue UID to accepted gate/post-landing and required retention evidence; terminal queue effect observed, no closure from worker assertion.",
+        "required_raw_evidence": [
+          "cases/evidence-backed-stage-close/pre-close-acceptance.json",
+          "cases/evidence-backed-stage-close/prepared-close.json",
+          "cases/evidence-backed-stage-close/kata-close-event.json",
+          "cases/evidence-backed-stage-close/kata-readback.json",
+          "cases/evidence-backed-stage-close/closure-manifest.json"
+        ],
+        "absence": "refuse next-stage admission"
       }
     ],
     "54": [
@@ -427,7 +727,10 @@
           "cases/actual-two-worker-mapping/snapshot-browser-cli-pair.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "submit-refresh-cleanup-display",
@@ -440,7 +743,10 @@
           "cases/submit-refresh-cleanup-display/snapshot-browser-cli-pair.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "trace-and-summary",
@@ -455,7 +761,10 @@
           "cases/trace-and-summary/snapshot-browser-cli-pair.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "history-gaps-identities",
@@ -467,7 +776,10 @@
           "cases/history-gaps-identities/independent-oracle.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "phase-health-native-goals",
@@ -481,7 +793,10 @@
           "cases/phase-health-native-goals/process-incarnations.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "refresh-outage-and-no-control",
@@ -494,7 +809,10 @@
           "cases/refresh-outage-and-no-control/snapshot-browser-cli-pair.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "long-job-and-idle-continuation",
@@ -509,7 +827,42 @@
           "cases/long-job-and-idle-continuation/kata-readback.json",
           "cases/long-job-and-idle-continuation/git-objects-and-status.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "candidate_roles": [
+          "all"
+        ]
+      },
+      {
+        "id": "exact-stage-landing",
+        "phase": "post-landing",
+        "candidate_roles": [
+          "implementation"
+        ],
+        "oracle": "Independently reopen exact accepted X/current-stage candidate, sole parent, canonical ref/HEAD/tree/index/tracked/untracked/ignored disposition and configured remote; exact fast-forward, no rewrite.49 additionally records separately verified M.",
+        "required_raw_evidence": [
+          "cases/exact-stage-landing/candidate-context.json",
+          "cases/exact-stage-landing/accepted-gate-audit.json",
+          "cases/exact-stage-landing/prepared-landing.json",
+          "cases/exact-stage-landing/git-objects-and-status.json",
+          "cases/exact-stage-landing/publication-readback.json"
+        ],
+        "absence": "refuse closure"
+      },
+      {
+        "id": "evidence-backed-stage-close",
+        "phase": "closure",
+        "candidate_roles": [
+          "all"
+        ],
+        "oracle": "Actual Kata close event/readback binds this task/spec/issue UID to accepted gate/post-landing and required retention evidence; terminal queue effect observed, no closure from worker assertion.",
+        "required_raw_evidence": [
+          "cases/evidence-backed-stage-close/pre-close-acceptance.json",
+          "cases/evidence-backed-stage-close/prepared-close.json",
+          "cases/evidence-backed-stage-close/kata-close-event.json",
+          "cases/evidence-backed-stage-close/kata-readback.json",
+          "cases/evidence-backed-stage-close/closure-manifest.json"
+        ],
+        "absence": "refuse next-stage admission"
       }
     ],
     "53": [
@@ -523,7 +876,10 @@
           "cases/landed-runtime-at-B/independent-oracle.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "pilot-state"
+        ]
       },
       {
         "id": "actual-concurrent-C-D-E",
@@ -536,7 +892,10 @@
           "cases/actual-concurrent-C-D-E/git-objects-and-status.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "pilot-state"
+        ]
       },
       {
         "id": "per-seat-cleanup-and-retention",
@@ -551,7 +910,10 @@
           "cases/per-seat-cleanup-and-retention/archive-live-resource-proof.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "pilot-state"
+        ]
       },
       {
         "id": "overview-through-pilot",
@@ -564,7 +926,10 @@
           "cases/overview-through-pilot/snapshot-browser-cli-pair.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "gate"
+        "phase": "gate",
+        "candidate_roles": [
+          "pilot-state"
+        ]
       },
       {
         "id": "final-independent-closeout",
@@ -578,7 +943,10 @@
           "cases/final-independent-closeout/git-objects-and-status.json"
         ],
         "absence": "refuse acceptance",
-        "phase": "closure"
+        "phase": "closure",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "final-capacity-scope-resource-refusals",
@@ -593,7 +961,10 @@
           "cases/final-capacity-scope-resource-refusals/kata-readback.json",
           "cases/final-capacity-scope-resource-refusals/git-objects-and-status.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "candidate_roles": [
+          "pilot-state"
+        ]
       },
       {
         "id": "final-F-landing",
@@ -605,9 +976,75 @@
           "cases/final-F-landing/git-objects-and-status.json",
           "cases/final-F-landing/landing-readback.json"
         ],
-        "absence": "refuse closure"
+        "absence": "refuse closure",
+        "candidate_roles": [
+          "metadata"
+        ]
+      },
+      {
+        "id": "prepilot-fixtures-at-B",
+        "phase": "gate",
+        "candidate_roles": [
+          "pilot-state"
+        ],
+        "oracle": "Actual independently audited exact-B example receipts precede both pilot launch claims; all preflight worker tools/processes quiescent before pilot dispatch.",
+        "required_raw_evidence": [
+          "cases/prepilot-fixtures-at-B/candidate-role-context.json",
+          "cases/prepilot-fixtures-at-B/actual-command.json",
+          "cases/prepilot-fixtures-at-B/oracle-inputs.json",
+          "cases/prepilot-fixtures-at-B/independent-oracle.json",
+          "cases/prepilot-fixtures-at-B/raw-state-readback.json"
+        ],
+        "absence": "refuse matching phase acceptance"
+      },
+      {
+        "id": "refresh-fixtures-at-C",
+        "phase": "gate",
+        "candidate_roles": [
+          "pilot-state"
+        ],
+        "oracle": "Actual newly audited C-base example receipts after old attempt stop and before E worker launch; no D fixture/evidence inherited; capacity2 test budget respected.",
+        "required_raw_evidence": [
+          "cases/refresh-fixtures-at-C/candidate-role-context.json",
+          "cases/refresh-fixtures-at-C/actual-command.json",
+          "cases/refresh-fixtures-at-C/oracle-inputs.json",
+          "cases/refresh-fixtures-at-C/independent-oracle.json",
+          "cases/refresh-fixtures-at-C/raw-state-readback.json"
+        ],
+        "absence": "refuse matching phase acceptance"
+      },
+      {
+        "id": "final-F-gate",
+        "phase": "gate",
+        "candidate_roles": [
+          "metadata"
+        ],
+        "oracle": "Lead-owned F has sole parent exact E; diff only docs/collaboration/evidence/53/; every immutable C/D/E/source/runtime/fixture/phase receipt reference digest independently reopened; final JSON contains no self-referential F hash or new scientific claim. F source materialization exact.",
+        "required_raw_evidence": [
+          "cases/final-F-gate/candidate-role-context.json",
+          "cases/final-F-gate/actual-command.json",
+          "cases/final-F-gate/oracle-inputs.json",
+          "cases/final-F-gate/independent-oracle.json",
+          "cases/final-F-gate/raw-state-readback.json"
+        ],
+        "absence": "refuse matching phase acceptance"
+      },
+      {
+        "id": "exact-pilot-E-state",
+        "phase": "post-landing",
+        "candidate_roles": [
+          "pilot-state"
+        ],
+        "oracle": "Reopen exact accepted E after C/D/E loop with its new source/fixture verification, canonical E state before F and independently retained53.A/53.B closures.",
+        "required_raw_evidence": [
+          "cases/exact-pilot-E-state/E-context.json",
+          "cases/exact-pilot-E-state/E-live-audit.json",
+          "cases/exact-pilot-E-state/git-objects-and-status.json",
+          "cases/exact-pilot-E-state/pilot-issue-close-readbacks.json"
+        ],
+        "absence": "refuse final metadata gate"
       }
     ]
   },
-  "phase_contract": "gate before landing; post-landing after exact ref effect; closure after required Kata-close/readback. Close preconditions use accepted gate/post and ticket retention, not that effect's own later closure readback."
+  "phase_contract": "Require every case matching ticket,phase,candidate-role. Empty matching phase refuses. Gate before landing; post-landing after exact ref effect; closure after close/readback. Close preconditions use accepted gate/post and retention, never its own later close readback. All implementation and metadata role receipts required for ticket closure."
 }

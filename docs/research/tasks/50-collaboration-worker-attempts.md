@@ -19,6 +19,7 @@ V1 managed workers use bounded turns with no native goal. Exact-thread reports a
 - Initial capacity two, with distinct task/session/seat/attempt/worktree/branch and writable output/cache/log identities; retained startup, exit and process disposition. Only short controller transitions are locked; worker execution overlaps.
 - Normative dispatch handshake: prepared intent/seat → distinct-actor Kata claim/readback → revision-checked assignment → worktree receipt/base recheck → recorded fresh thread creation → matching work-turn acknowledgement. Lost creation/start acknowledgement never permits speculative redispatch.
 - Explicit aborted/unknown attempt handling; lost launch acknowledgement never blindly starts another worker. Controlled takeover preserves old work/evidence, proves stop, invalidates the old claim, and starts a new acknowledged attempt/session/workspace.
+- Task50 owns `task continue` and `refresh_task(..., runtime: Codex)`. Refresh retains prior work, proves stop, retires the old attempt and uses a fresh admitted base/claim/thread/worktree without inherited verification. `task takeover` only retires; replacement launch is a separate `task start`. The named refresh test and live gate case must pass before54 uses it.
 
 **Runtime entity contract:** [Session/thread/turn/attempt model](../../superpowers/specs/2026-10-03-codex-runtime-domain-design.md).
 
