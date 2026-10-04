@@ -10,7 +10,7 @@ Milestone: O0. Implementation home: Sureal. Status: specified, not implemented.
 
 **Session-state contract:** [Operating state and progress health](../../superpowers/specs/2026-10-03-worker-session-state-design.md).
 
-**Spec:** [Worker and program overview](../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md#worker-and-program-overview).
+**Spec:** [Worker and program overview](../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md#worker-state-and-human-overview).
 
 ## Deliverables
 
@@ -38,6 +38,7 @@ Milestone: O0. Implementation home: Sureal. Status: specified, not implemented.
 
 - Both actual concurrent workers are identifiable by their tasks/specs and unique primary-thread/attempt/workspace with actual native session grouping; reported queue state and observed execution discrepancies remain visible.
 - Every independent completion/check/landing claim links to exact accepted evidence. Summaries distinguish observed, worker-reported and inferred content and clearly show coverage/freshness; elapsed silence is not treated as process termination.
+- Default detector profiles are pinned and tested: development 10min, long-computation 30min, equivalent-failure pattern 3, suspicion hysteresis 2 observations ≥5sec, supported non-mutating liveness probe 5sec/3 misses. Explicit task phase budgets/wait contracts override defaults; unsupported probes remain UNKNOWN and suspicion never cancels work.
 - Every operating/health transition has exact identity, reason, since/duration, source evidence, effective policy and next-event/unblock condition. Missing phase thresholds or worker-specific liveness signals are explicit gaps; no global silence timeout infers a hung process or changes scientific execution budgets.
 - State machines represent native goal, operating state/health, runtime, attempt, task workflow, Kata stage and spec/outcome as distinct views. EXITED does not imply DONE, idle does not free ownership, and LANDED does not imply publication/cleanup complete.
 - UI meets measured five-second visible refresh and fifteen-second stale-source indication under the admitted local test conditions. Missing transcript capability or unclear current work leaves this task open until resolved or the contract is explicitly revised.

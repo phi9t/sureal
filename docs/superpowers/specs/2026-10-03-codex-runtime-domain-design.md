@@ -1,6 +1,6 @@
 # Codex session, thread, turn and task-attempt model
 
-Status: design proposal. Required vocabulary/identity contract for worker attempts50 and overview54; no runtime implementation is claimed.
+Status: normative companion to the full v1 specification, pending review. Required vocabulary/identity contract for worker attempts50 and overview54; no runtime implementation is claimed.
 
 ## Native entities
 
@@ -34,7 +34,7 @@ This is the proposed managed-work relationship, not a claim that native Codex th
 
 A Task is the stable committed ticket/spec and linked Kata issue. An Attempt is one admitted execution of its pinned brief/base with one current claim generation. A Seat is capacity, reused only after safe stop/retention/cleanup. Workspace is the attempt-owned worktree/branch and mutable output paths.
 
-For v1, each admitted attempt binds exactly one primary worker thread and one workspace. A task may have multiple historical attempts, but only one active owner; there are two concurrent seats for independent tasks. The primary thread may contain many turns. Each new attempt starts a fresh primary thread; repairs within an unchanged attempt may use additional turns. A takeover, stale-base refresh or materially revised brief creates a new admitted attempt/claim/thread/workspace with explicit retained-work inputs.
+For v1, each admitted attempt binds exactly one primary worker thread and one workspace. A task may have multiple historical attempts, but only one active owner; there are two concurrent seats for independent tasks. The primary thread may contain many turns. Each new attempt starts a fresh primary thread; repairs within an unchanged still-live attempt waiting for review may use additional turns. EXITED/FINISHED attempts require a fresh claim/thread/workspace for repair, preserving the admitted brief/base and prior evidence. A takeover, stale-base refresh or materially revised brief creates a new admitted attempt/claim/thread/workspace with explicit retained-work inputs.
 
 Kata assignment metadata and controller receipts include `task_id`, spec/brief pins, `claim_generation`, `attempt_id`, `seat_id`, `session_id`, **`thread_id`**, workspace/branch/base and runtime-instance identity. Capture current/last `turn_id` and source item references for progress, not as the ownership key. `session_id` alone is insufficient to assign, message, stop, summarize or release a worker. CLI/API destinations use the exact thread ID when their installed contract expects a thread.
 

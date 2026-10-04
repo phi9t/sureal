@@ -13,6 +13,7 @@ Milestone: P1. Implementation home: Sureal.
 - Start claims Kata ownership under a unique attempt actor, pins the landed task spec/plan and captures task/brief/base/claim-generation/seat/workspace/attempt identity durably before dispatch. Capture/reconcile actual sessionId/primary-threadId/runtime-instance and owned tool/process handles and matching worker acknowledgement before RUNNING.
 - Disposable linked worktree outside canonical source; unique `codex/<task-id>/<attempt-id>` branch. Record workspace kind/path and shared Git common-directory identity. Clone mode is an optional later implementation, not a prerequisite.
 - Initial capacity two, with distinct task/session/seat/attempt/worktree/branch and writable output/cache/log identities; retained startup, exit and process disposition. Only short controller transitions are locked; worker execution overlaps.
+- Normative dispatch handshake: prepared intent/seat → distinct-actor Kata claim/readback → revision-checked assignment → worktree receipt/base recheck → recorded fresh thread creation → matching work-turn acknowledgement. Lost creation/start acknowledgement never permits speculative redispatch.
 - Explicit aborted/unknown attempt handling; lost launch acknowledgement never blindly starts another worker. Controlled takeover preserves old work/evidence, proves stop, invalidates the old claim, and starts a new acknowledged attempt/session/workspace.
 
 **Runtime entity contract:** [Session/thread/turn/attempt model](../../superpowers/specs/2026-10-03-codex-runtime-domain-design.md).

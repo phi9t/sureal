@@ -27,7 +27,7 @@ Milestone: P3. Implementation home: Sureal.
 
 - Reviewed C is the exact landed commit. Landing never rebases, merges divergent history, squashes, cherry-picks or fixes C after verification.
 - `update-ref` alone is not used to move a checked-out canonical branch and leave stale working files.
-- Unknown effects block dispatch; C already landed is reconciled without rerunning worker work or pretending cleanup/publication succeeded.
+- Shared unknown effects hold affected project mutation; demonstrably isolated attempt uncertainty holds its seat/conflicting scopes while unrelated known-safe work can continue. C already landed is reconciled without rerunning worker work or pretending cleanup/publication succeeded.
 - Existing history is preserved; no forced remote update or rollback. Advisory locking is documented as cooperative, not exclusion of every external Git process.
 
 ## Closure evidence

@@ -1,6 +1,6 @@
 # Explicit worker session state and progress health
 
-Status: design proposal; required part of overview54 and concurrent protocol admission53. This specifies observation/diagnosis, not an implemented watchdog or a grant to alter worker goals.
+Status: normative companion to the full v1 specification, pending review; required part of overview54 and concurrent protocol admission53. This specifies observation/diagnosis, not an implemented watchdog or a grant to alter worker goals.
 
 ## Goal and identity
 
@@ -59,7 +59,21 @@ Track last meaningful progress, last worker responsiveness, last job/artifact pr
 
 ## Detection policy and transition records
 
-Each admitted phase has a visible, versioned policy: meaningful-progress soft window, equivalent-failure repeat threshold, expected operation/wait identity and deadline, available heartbeat/progress signal, and worker-specific probe timeout/missed-probe threshold. Fix numeric profiles in the implementation plan with long training/scoring/acquisition phases accounted for; admission refuses an enabled detector with missing effective thresholds. The overview's five-second refresh/fifteen-second stale-source rules are observation freshness, not execution deadlines. These policies do not shorten previously admitted scientific time budgets.
+Each admitted phase has a visible, versioned policy: meaningful-progress soft window, equivalent-failure repeat threshold, expected operation/wait identity and deadline, available heartbeat/progress signal, and worker-specific probe timeout/missed-probe threshold. V1 defaults below complete the detection contract; a task/phase can override them through its pinned brief/policy. Overrides must be visible and retained, never implicit changes to scientific execution limits.
+
+| Profile / setting | V1 default | Application |
+| --- | --- | --- |
+| Development/investigation progress window | 10 minutes | Responsive PURSUING worker without meaningful progress becomes eligible for suspicion |
+| Long computation/acquisition/scoring progress window | 30 minutes | Evaluate available declared job/artifact progress; valid quiet operations remain protected by their admitted wait/deadline contract |
+| Equivalent-failure pattern | 3 consecutive equivalent failures without a new supported finding/strategy | Annotate loop pattern; no automatic stop or native blocked mutation |
+| Suspicion hysteresis | 2 qualifying observations at least 5 seconds apart | Avoid transient state changes; clear on new evidenced progress/responsiveness as appropriate |
+| Worker-specific supported probe | 5-second probe timeout; 3 successive misses | Eligible for HUNG_SUSPECTED only with fresh observer and no valid wait; absence of a supported non-mutating probe remains UNKNOWN |
+| UI/source freshness | 5-second visible refresh; 15-second stale source | Observation health, not a worker timeout |
+| Expected long-operation deadline/heartbeat | Actual admitted operation budget and declared signal contract; heartbeat may be unsupported | Required before long-operation dispatch; no default shorter cap is substituted |
+
+The progress window is a soft diagnostic threshold, not cancellation. STUCK_SUSPECTED requires a responsive worker plus overdue meaningful progress and no valid phase/wait explanation, sustained through hysteresis. Equivalent-failure count explains a loop; it cannot alone force a suspicion before the phase window. For a valid ongoing operation with no heartbeat support, show limited progress/liveness coverage, retain WAITING and its actual budget, and do not manufacture a hang from silence. Resource/dependency wait can become overdue/intervention-dependent using its explicit condition, not a universal job deadline.
+
+Admission records effective thresholds and refuses an enabled detector with missing required values. The overview's five-second refresh/fifteen-second stale-source rules are observation freshness, not execution deadlines. These policies do not shorten previously admitted scientific time budgets.
 
 A stuck condition needs the current goal/attempt/phase and a reviewed definition of equivalent failures. Hysteresis requires the configured sustained/repeated evidence; clear a suspicion only on a new meaningful progress or confirmed responsiveness event as appropriate, preserving the incident history. A live long-running operation can reset progress from declared job/artifact signals without a chat message. Exceeding an expected operation deadline is diagnostic evidence, not proof of a hang by itself.
 

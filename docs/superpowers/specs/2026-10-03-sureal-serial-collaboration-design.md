@@ -1,233 +1,233 @@
-# Sureal-local two-worker collaboration protocol
+# Sureal-local two-worker collaboration — full v1 specification
 
-Status: design proposal. Implementation home is settled: all code, specs and task definitions belong to Sureal. Corenius is a read-only design reference. Implementation starts after integration closeout, verified pristine mainline and written design/plan review.
+Status: full written specification for review. User-selected scope is two concurrent workers, separate worktrees, centralized Kata operations and an evidence-linked worker overview. Code is not implemented or admitted by this document. The historical filename is retained for stable links. Dates use the client timezone.
 
-## Goal
+## Goal and end-to-end acceptance
 
-Replace long-lived divergent implementation worktrees and conversational task handoff with one persistent lead, two concurrent worker seats from v1, bounded task briefs, task-scoped Git workspaces, immutable candidates, exact-candidate verification and conditional fast-forward landing.
+Give the user a dependable answer to who owns each research task, what each worker is doing, why progress is waiting or stalled, and which exact changes and scientific claims have passed verification and landed.
 
-Sureal is the managed project and implementation home. Its canonical ref remains `refs/heads/phi9t/mainline`; the attachment's `main` is a role, not an instruction to rename a branch. The existing models/training task specs 44–48 remain the first scientific architecture workstream after protocol adoption.
+V1 succeeds when two actual worker threads actively overlap on independent committed tasks in distinct worktrees; Kata identifies their owners/dependencies; the overview explains both workers from concise summaries; live Insula plus independent audits verify immutable candidates; mainline integrates only the exact reviewed commit; and interruption, stale bases, handoff and cleanup recover without losing work or inventing completion.
 
-## Preconditions: pristine mainline
+Corenius is read-only reference material. All implementation, specs and task definitions live in Sureal. Canonical integration remains `refs/heads/phi9t/mainline`. The existing scientific program, frozen runtimes/verifiers, experiment registry, journal and HDFS retention contracts remain authoritative for scientific work.
 
-Before starting managed execution, the current worker completes its current task and closes out integration:
+## Specification map and authority
 
-- Inventory tracked edits, untracked source/spec/evidence and outstanding commits across all owned workspaces.
-- Land verified owned contributions to `phi9t/mainline`; retain large scientific artifacts through the current exact-readback/live-recovery HDFS mechanism rather than committing raw payloads.
-- Record the disposition of every outstanding contribution. No unique work disappears through worktree deletion, ignore rules or ancestry-only accounting.
-- Reconcile the models/training documentation commit `51f1b39` and the root's earlier untracked proposal deliberately.
-- Stop/release active mutating attempts and account for any retained scientific execution. No process may continue writing the canonical checkout or a workspace being retired.
-- Verify that tracked/index/untracked state in the canonical source checkout is clean and that the expected integration revision has been published and independently re-read when publication is required.
-- Record the exact accepted transition base B and the closeout evidence. Existing history is preserved; linear one-commit managed tasks apply from B onward.
-
-“Single mainline” means one authoritative integration ref and no unaccounted divergent owned work. Historical refs and frozen source packages may remain when required by provenance. Removing existing worktrees or branches requires an explicit safe disposition; this protocol does not silently authorize historical deletion.
-
-## Roles and authority
-
-- **Lead:** persistent reasoning session; decomposes work, chooses the next admitted brief, reviews the exact candidate and requests landing. It does not repair a submitted candidate in place.
-- **Worker seat:** at most one active task attempt per seat. Initial capacity is two seats, with concurrent independent tasks required for v1 admission. Each attempt starts a fresh worker thread/process in its own mutable workspace.
-- **Controller:** a small local CLI owns state transitions, workspace identity, the exclusive protocol lock, candidate retention and integration. It does not invent task acceptance or interpret model output as proof.
-- **Human:** owns intent, architecture and applicable integration/publication authorization. Record the applicable Sureal landing delegation with the admitted task before its first managed landing. Authority never extends to another repository or branch.
-
-The [Codex runtime entity model](2026-10-03-codex-runtime-domain-design.md) fixes session/thread/turn/item/goal identities. A worker attempt binds one exact primary thread and worktree; native sessionId groups threads and is not an ownership key.
-
-The CLI and lead are distinct roles even if both are operated in the same terminal. Task acceptance remains an evidence-backed decision.
-
-## One task, one exact base, one candidate
-
-Task brief includes stable task ID, intent revision/digest, linked Git task spec, outcome, allowed scope, exclusions, required verification, resource rules and exact base B. A material brief change creates a new admitted revision; it is not a silent prompt edit.
-
-At start:
-
-1. Acquire the controller lock, verify the pinned task spec/plan is on admitted mainline B, reserve its Kata owner through a unique attempt actor and durable controller intent and allocate a free worker seat within admitted capacity. In v1 capacity is two; each active or unresolved attempt occupies its own seat. Refuse a third start and duplicate task ownership.
-2. Recheck canonical mainline equals admitted B and is clean.
-3. Create a task workspace outside the canonical source checkout, on a unique disposable `codex/<task-id>/<attempt-id>` branch at B. A linked Git worktree is the recommended initial mode.
-4. Record Kata issue/owner/revision, claim ID/generation, workspace kind/path, Git common-directory identity, branch, seat and attempt identity before launching the worker; capture/reconcile native sessionId, exact primary threadId, runtime incarnation and owned tool/process handles. Multiple threads may share the app-server PID.
-5. Launch a fresh bounded worker with the exact admitted brief and claim identities; require its matching acknowledgement before RUNNING and retain startup/exit provenance. Lost acknowledgement leaves STARTING/UNKNOWN ownership reserved.
-
-## Workspace isolation and concurrent workers
-
-A linked worktree has separate working files, index and HEAD, while sharing the repository's object store, ordinary branch refs and configuration by default. It supports multiple concurrent branches efficiently. Therefore workers must own unique branches, and only the controller may change canonical mainline under the protocol. This is a cooperative authority rule: worktrees do not technically prevent arbitrary Git commands from modifying shared refs.
-
-A clone has its own Git metadata and refs. It is an alternative when independent Git metadata is useful; it is not required for task isolation. Local clones may hardlink objects, and `--shared`/`--reference` can borrow objects from another repository. Any clone mode must record and verify its actual object dependencies before claiming independent retention. Neither mode supplies OS security isolation. Insula writable-path/process restrictions must be established by actual execution probes.
-
-Recommend implementing linked worktrees first. Retain workspace kind in records so a clone mode can be added deliberately; do not advertise an unimplemented mode or introduce a generic adapter framework. Verification may use a fresh detached worktree or source snapshot with declared output paths, independently of worker workspace kind.
-
-Record ownership per seat, task and attempt rather than using one project-wide mutable `active_task` identity. v1 runs two worker sessions concurrently, each in a distinct worktree and unique branch. Attempts also own separate writable output/cache/log directories; immutable input data may be shared. Concurrent writable attempts never share a task worktree, branch or mutable build workspace. Clone mode remains optional.
-
-The lead selects independent ready tasks with declared write scopes. The controller rejects overlapping or unresolved write/resource ownership before dispatch, including parent/child directory overlap and shared scientific outputs. Dependent tasks wait for their predecessor's verified closure; two seats do not permit bypassing the models/training44–48 chain. Each worker can develop while the other is active; global lock sections reserve/reconcile state and integrate candidates, never span a worker's whole execution or a wait for resource availability.
-
-Landing remains serialized through the controller. Only the submitted attempt must be stopped/frozen; unrelated work in the other worktree can continue. The existing exclusive GPU lock still permits only one scientific GPU execution at a time. Kata records waiting-for-resource separately from actual executing state; worker capacity two does not increase admitted GPU/RAM/storage limits.
-
-If both workers start at B, landing C makes another candidate D with parent B stale. D must explicitly refresh its base to C through a newly recorded attempt/claim and produce a newly verified candidate before landing. Preserve D, its evidence and any unsubmitted work before refreshing. The fresh attempt starts in its own worktree at C and applies explicitly retained prior work under the unchanged admitted brief; it does not silently inherit D's verification. More clones do not avoid this integration issue. No automatic rebase or reuse of old verification at landing is allowed.
-
-Worker produces one commit C with exactly one parent B. Development and repair may amend only its own disposable candidate line when the approved brief grants that operation; shared branches and historical commits are never amended.
-
-Submission requires the correct owned workspace, exact base, one task commit, no merges and a clean index/working tree/untracked state. Build outputs must follow declared paths. Submission retains C/tree/brief/attempt identities, a report and evidence, and records the frozen candidate before allowing review.
-
-Candidate identity is the commit/tree plus its exact task/brief/base/attempt context, never a mutable branch name. Preserve candidate objects in a controller-owned reference or verified bundle before amendment or workspace removal.
-
-## Verification and repair
-
-Verification materializes candidate C in a fresh read-only-source snapshot or detached verification workspace with declared output paths and fixtures. It must not test a mutable worker checkout whose ignored files or later edits can change the result.
-
-Record C, tree, B, brief digest, check commands, fixture/runtime/source identities, start/end/exit, logs, resource usage and independently reopened artifact hashes. A worker report is evidence to inspect, not an acceptance token.
-
-Sureal implementation milestones retain the existing actual live Insula requirement and independent mathematical/artifact checks. Two agent sessions do not imply that the producer and verifier should share implementations. Host unit tests complement live proof.
-
-A failed review returns bounded findings to the worker through an explicit repair transition. Retain rejected C1 and its evidence. Repair submits a new C2; C1 verification cannot authorize C2. Mainline movement makes the attempt stale; refresh B explicitly and obtain a newly verified candidate. No automatic rebase during landing.
-
-## Landing
-
-Under the exclusive controller lock:
-
-- Current mainline is clean and still exactly B.
-- Current submitted candidate is C, has one parent B and the expected tree.
-- The brief, workspace and candidate identities match the accepted verification.
-- Required checks/review and any configured landing authorization apply to C.
-- The submitted attempt is stopped/frozen and has no uncertain effect. The other seat may remain active in its distinct owned worktree, provided it cannot mutate this candidate or canonical source under the admitted write-scope policy.
-
-Persist a landing intent with expected main B and candidate C before the Git effect. For the normal checked-out canonical repository, perform fast-forward-only integration under the cooperative single-writer lock and immediately verify HEAD/tree/index/working files are exactly C and clean. Do not use update-ref alone on a checked-out branch: moving the ref without synchronizing its checkout is not a completed landing.
-
-A bare integration repository can later use `git update-ref REF C B` as a conditional-ref primitive. Do not introduce a second canonical repository in v1 just to get that primitive.
-
-Landing never rebases, creates a merge commit, squashes, cherry-picks, applies a patch or makes a tiny fix after verification. The exact reviewed C becomes canonical mainline. Unexpected mainline movement is stale/uncertain, never permission for a force operation. Advisory locking assumes all managed writers cooperate; do not claim atomic exclusion of arbitrary external Git processes.
-
-Remote publication is separately recorded from local integration. If configured, target the explicit integration ref and reconcile the observed remote head. An uncertain push acknowledgement requires re-reading the remote ref; it does not authorize a force push, local rollback or a false “published” claim. Record partial local/remote outcomes honestly.
-
-## Recovery and cleanup
-
-All state-changing operations use short controller critical sections and durable prepared/result records. Two workers execute outside that lock; candidate landing is serialized inside it. Write metadata atomically; interrupted writes, missing events or conflicting identities fail closed. The detailed implementation must specify event/record ordering and fsync before its crash tests.
-
-Recovery inspects actual Git state, candidate objects and owned attempt/process state:
-
-- Main=B with retained C: no completed integration; keep the operation prepared or resume after revalidation.
-- Main=C with matching tree: reconcile the completed Git effect, then finish receipt/cleanup/publication as applicable.
-- Main neither B nor C, or uncertain shared integration/resource state: retain uncertainty and hold affected dispatch/integration until reconciled. Unknown state confined by evidence to one owned attempt holds that seat and its conflicting scopes; an unrelated admitted attempt may continue. If confinement cannot be established, hold project mutation.
-
-Do not blindly rerun worker launch or a Git effect because its acknowledgement was lost. Unknown attempt state occupies the worker seat. An exit code alone does not prove all subprocesses stopped.
-
-Before workspace removal, retain the task brief, every candidate/report/verification/landing record and required scientific artifacts; confirm owned processes have stopped; verify the owned disposable path is neither canonical, a symlink, nor a foreign workspace. For a linked worktree, use Git worktree removal after those checks and preserve the shared Git common directory, retained refs and other worktrees. Abort/cleanup does not discard unsubmitted work without a recorded disposition and applicable authorization.
-
-Cleanup success is recorded separately from landing. A cleanup failure leaves C landed and retryable cleanup; it never implies failed work requiring relaunch. A seat can be reused only after its previous attempt/effects and owned-workspace cleanup are reconciled. The other seat can continue independently when shared state/resources are known safe. Removing one worktree must not change the other worker's files, branch, process or retained objects.
-
-## Minimum state
-
-Task states: CREATED, ACTIVE, SUBMITTED, REPAIR, STALE, LANDED, ABORTED. LANDED is an exact integration fact; pending publication or cleanup remains explicit ancillary state.
-
-Attempt states: STARTING, RUNNING, EXITED, UNKNOWN.
-
-Landing records: PREPARED, APPLYING, LANDED, FAILED, UNKNOWN, with separate publication and cleanup outcomes where applicable.
-
-Keep a small current-state projection, per-task immutable records and an ordered event history. State is stored outside the source checkout; no commit is required just to record runtime status. Events and records are recoverable protocol data, not agent-private memory.
-
-## Queue and evidence
-
-Reviewed task specs and required plans land on mainline before implementation admission; pin their revisions to B. Kata is the centralized operational queue for priorities, dependencies, logical owner and stage. Its issues link to detailed Git specs and outcome evidence rather than duplicating acceptance prose. The controller coordinates unique-attempt Kata claims with durable session/process/workspace and candidate/integration receipts; it does not maintain another separately assignable queue.
-
-[Task queue policy](../../research/task-queue.md#mainline-task-definitions-and-worker-claims) defines assignment, acknowledgement, status and explicit takeover. Claim/metadata/launch effects require prepared records, readback and recovery; no cross-system atomicity is assumed. Reserve ownership before dispatch, reject stale claim generations, and reconcile pending Kata writes before launch or reassignment. Takeover preserves prior work, confirms stop, then transfers Kata ownership to a fresh attempt/session/workspace. A closed issue does not replace live verification or authorize landing.
-
-The existing Sureal experiment registry and journal retain recipes, outcomes and scientific interpretation. Protocol task state records attempts/candidates/integration, not a second set of model metrics. Link these records by exact identities.
-
-The first research tasks can exercise the models/training workstream once this repository-local protocol is admitted. Their detailed scientific acceptance remains in tickets44–48.
-
-## Worker and program overview
-
-A read-only local overview is required for v1, implemented in Sureal and backed by the same status projection as the CLI. It combines two worker cards, the centralized Kata queue, task/spec progress and a recent-change timeline. The user can understand current work from summaries; raw transcripts are an optional evidence drilldown. [Ticket54](../../research/tasks/54-worker-program-observability.md) defines the verifier and acceptance, and blocks full-loop admission53.
-
-Each worker card shows its seat, real session/thread/current-turn/attempt/claim identities, task goal, Kata issue and pinned spec/plan links, owned workspace/branch, base/candidate, current focus, recent actions/findings, last observed activity, blocker/wait reason, next expected action and verification/landing/cleanup status. A compact narrative targets at most 120 words plus a short evidence-linked timeline. Show elapsed phase time and source refresh time; activity absence is not proof of a hung or stopped process. Historical attempts remain discoverable after takeover.
-
-The queue shows ready/claimed/running/waiting/blocked/needs-verification/needs-landing/closed groups, owners and dependency reasons. Task/spec progress separately shows draft versus reviewed/landed definitions, admission blockers, candidate evidence and verified closure. Initially index the admitted collaboration/model-training lane and discovered repository tickets; older research items with unaudited receipts display UNKNOWN/NOT AUDITED rather than invented completion. Grouping is a derived view, not another editable queue.
-
-### State views
-
-| View | Authority and meaning |
+| Document/record | Authority |
 | --- | --- |
-| Session runtime | Actual Codex observation: active, idle, not loaded, error or unavailable; not a task-completion claim |
-| Worker operating state / health | [Explicit session-state contract](2026-10-03-worker-session-state-design.md): PURSUING/WAITING/BLOCKED/PAUSED/etc. plus responsive-versus-progressing health and evidence; native goal status stays separate |
-| Worker attempt | Controller STARTING → RUNNING → EXITED, with UNKNOWN on uncertain effects; seat release still requires stop/retention/cleanup proof |
-| Task workflow | CREATED → ACTIVE → SUBMITTED → LANDED, with REPAIR, STALE and ABORTED branches; verification and waiting reasons are explicit facts |
-| Kata queue | Logical owner, readiness/dependency edges and reported operating stage, reconciled with actual receipts |
-| Spec and outcome | Git revision/review/landing/admission state and independent acceptance/closure evidence; LANDED, publication and cleanup remain distinct |
+| [Collaboration glossary](../../../CONTEXT.md) | Stable task/admission/attempt/claim/candidate/landing/closure vocabulary |
+| This spec | Components, invariants, record/operation contracts, effect ordering, recovery and whole-loop acceptance |
+| [Codex runtime model](2026-10-03-codex-runtime-domain-design.md) | Native session/thread/turn/item/goal identities and managed task-attempt bindings |
+| [Worker state contract](2026-10-03-worker-session-state-design.md) | Operating-state transitions, progress/liveness diagnosis and detector policy |
+| [Queue policy](../../research/task-queue.md) | Kata issue/spec mapping, operational procedure, current bootstrap and queue reconciliation |
+| [Tickets49–54](../../research/README.md#sureal-local-collaboration-workstream) | Individually verifiable deliverables and closure evidence |
+| Accepted implementation plan | Concrete files/functions/flags, adapter probes and executable test/live commands implementing these contracts |
+
+Definitions and state tables stay in their linked authoritative document. A conflict blocks the affected operation until explicitly reconciled. A queue label, narrative summary, worker assertion or Git ancestry alone cannot authorize acceptance or landing.
+
+## Activation and pristine-mainline gate
+
+Before managed dispatch:
+
+1. The current worker finishes its active task and inventories all owned tracked edits, untracked source/spec/evidence, outstanding commits and mutating processes/workspaces.
+2. Land all verified owned contributions, including this spec bundle, or record an explicit unresolved disposition. Preserve unique work and frozen provenance; cleanliness cannot be manufactured by ignoring or deleting it.
+3. Retain large scientific payloads through existing verified HDFS readback/live recovery. Raw data, credentials and scratch do not become incidental Git commits.
+4. Reconcile the earlier models/training draft and accepted documents deliberately. Stop/release writers of canonical source and retiring workspaces; scientific jobs and held resources remain accounted for.
+5. Independently prove canonical HEAD/ref/tree/index/tracked/untracked cleanliness and observed publication when required. Record exact transition base B and integration authority.
+6. Review the written spec and implementation plan, admit the protocol runtime and its actual tool capabilities, then activate managed execution.
+
+Existing history is preserved. One authoritative mainline does not require deleting every historical ref, frozen source or safely retained worktree. Each disposable workspace needs its own disposition.
+
+Protocol implementation bootstraps through the existing manual isolated workflow. An unimplemented controller cannot certify or land itself. The initial scientific migration remains [models/training44–48](2026-10-03-first-class-models-training-design.md) after protocol admission; its dependency chain is not parallelized by having two seats.
+
+## Components and responsibilities
 
 ```mermaid
-stateDiagram-v2
-    [*] --> STARTING: claim reserved
-    STARTING --> RUNNING: worker acknowledged
-    RUNNING --> EXITED: exit observed
-    STARTING --> UNKNOWN: uncertain launch
-    RUNNING --> UNKNOWN: uncertain effect
-    UNKNOWN --> RUNNING: same attempt reconciled active
-    UNKNOWN --> EXITED: same attempt reconciled stopped
-    EXITED --> [*]: retention and cleanup allow seat release
+flowchart LR
+    Specs[Committed specs and task definitions] --> Lead[Persistent lead]
+    Lead --> Kata[Shared Kata queue]
+    Kata --> Controller[Sureal controller]
+    Controller --> A[Worker A: thread and worktree]
+    Controller --> B[Worker B: thread and worktree]
+    A --> Candidates[Retained exact candidates]
+    B --> Candidates
+    Candidates --> Checks[Live Insula and independent audit]
+    Checks --> Landing[Serialized exact landing]
+    Landing --> Main[phi9t/mainline]
+    Kata --> Overview[Read-only worker and program overview]
+    Controller --> Overview
+    A --> Overview
+    B --> Overview
+    Checks --> Overview
 ```
 
-This attempt graph is not the task completion graph. Task review/verification can continue after EXITED; a takeover allocates a new attempt rather than reopening the exited one.
+- Lead: owns decomposition, admitted briefs, independent-task selection and evidence-backed review. It returns bounded repair findings rather than editing submitted candidates.
+- Kata: centralized operational priorities, dependency edges, logical owner and stage. One shared local daemon/project serves every Sureal worktree.
+- Controller: owns dispatch/effect receipts, workspace and thread bindings, short exclusive transition locks, candidate retention, verification/landing/recovery and scope/resource checks. It does not maintain a second assignable queue.
+- Worker: one exact admitted attempt/claim/thread/worktree. It implements its brief and emits bounded progress/report/evidence within its owned scope.
+- Verifier/reviewer: audits exact candidate and context independently. Independent mathematical/artifact checkers remain separate from producers.
+- Observer: read-only projection of queue/runtime/receipt facts plus attributed summaries. It cannot assign/close issues, steer workers or authorize landing.
+- Human: supplies intent, architecture and applicable dispatch/integration/publication authority. Authority applies only to the admitted project/ref/scope.
 
-The [worker session state specification](2026-10-03-worker-session-state-design.md) defines operating states, native goal mapping, STUCK/HUNG diagnosis, phase-aware detection and transition evidence. These diagnoses cannot release ownership or mutate a goal.
+Proposed entrypoint is `scripts/collab.py`, using standard-library Python and installed Git/Kata/Codex/Insula. A thin entrypoint may delegate to focused private helpers for actual Git, runtime, queue, record and observation complexity. No general SDK, workflow engine, custom database/daemon or public hosting is part of v1.
 
-Render the small state graphs with each worker's current state highlighted and show why its next transition is blocked. An exited attempt may have a task awaiting verification; an idle session may still own work; a landed candidate may have pending publication/cleanup. Preserve these distinctions in both UI and machine-readable output.
+## Mandatory invariants
 
-### Trace summaries and freshness
+1. At most two admitted active worker seats; one active owner per task. STARTING/UNKNOWN attempts retain occupancy.
+2. Each attempt has a distinct primary thread, worktree, unique `codex/<task-id>/<attempt-id>` branch and writable output/cache/log paths.
+3. Exact threadId addresses the worker. SessionId groups threads and a daemon PID can be shared; neither identifies an owner. At most one controller-requested in-flight turn per primary thread.
+4. Reviewed task specs and required plans are on mainline before task admission; pin exact revisions, source B, brief digest, authorized write scope and resource rules.
+5. Shared canonical refs, scientific outputs and exclusive resources have cooperative controller ownership. Workers mutate only their admitted branch/workspace/scope.
+6. Submission retains one candidate C with exactly one parent B, its tree/context and a clean owned source checkout. Retain all rejected/superseded candidates before amendment/removal.
+7. Verification/review bind exact C/tree/B/brief/claim/attempt/source/runtime/fixtures. Any changed candidate/context invalidates acceptance.
+8. Landing serializes integration, requires clean current mainline exactly B, and advances to exact reviewed C with fast-forward-only checkout integration. No post-verification rewrite, patch, fix, merge, squash or forced ref update.
+9. Prepared/result receipts and actual-state reconciliation govern uncertain effects. Lost acknowledgement never licenses duplicate launch, speculative release or false publication/completion.
+10. Native goal/runtime, worker operating state/health, attempt lifecycle, Kata stage and task acceptance stay separate. Diagnostics do not kill/restart/mutate goals or free ownership.
+11. Cleanup retains work/evidence and confirms stopped owned effects before removing only its disposable workspace. Other active workers and shared Git metadata survive.
+12. GPU/RAM/raw/local-storage limits and existing exclusive experiment lock remain unchanged; two workers do not imply two GPU jobs.
 
-Collect project-owned session/thread metadata, public messages, tool actions/results, worker progress checkpoints, Kata events and controller/verification receipts. Summaries state goal/current focus, actions and results, findings/decisions, blockers and next step, with supporting session/turn/item/event or artifact identities. Do not ingest private reasoning or treat worker assertions as independent proof. Distinguish OBSERVED facts, WORKER-REPORTED progress and inferred next actions; contradictory evidence remains visible until reconciled.
+Worktrees isolate files/index/HEAD but share refs/objects and configuration by default. This is a cooperative Git protocol, not an OS security claim. Insula restrictions must be proved on the actual invocation. Clone mode is optional later; it does not solve stale-base integration and must record object-sharing dependencies if introduced.
 
-Workers emit bounded progress checkpoints at acknowledgement, material findings/failure/wait, submission and exit. The collector incrementally reads visible transcript/tool deltas and receipts to corroborate or correct them; checkpoint-only coverage is shown explicitly when transcript access is unavailable. Generate bounded narrative checkpoints in the existing lead/worker workflow, anchored to collected visible evidence, rather than silently introducing a separate model/API service. Summaries update on completed turns and material state/result changes, coalescing noisy tool/token events. Fix the exact adapter, generation path and limits in the implementation plan.
+## Minimal records and persistence
 
-Prefer documented read-only Codex thread/status/history reads. The inspected daemon 0.160.0 schema exposes `thread/read`, `thread/list`, `thread/turns/list` and `thread/items/list`; CLI 0.159.3 differs, so record effective server/schema identity and probe actual readable session/history capabilities. Official [Codex App Server documentation](https://learn.chatgpt.com/docs/app-server) describes non-resuming reads and runtime statuses. Pagination may be unsupported by a particular thread store; schema presence alone does not prove live access. Observation never resumes/starts/interrupts a worker to obtain its history. Existing controller connections may supply notifications; read-only polling is the fallback. A capability gap remains an explicit partial-coverage condition and implementation gate, not a guessed transcript.
+Runtime state lives in configurable sibling `../.sureal-collab/<project-id>/`, on a local filesystem with admitted lock/atomic-write semantics. Canonical source stays clean. HDFS stores recovery exports/evidence, not live SQLite or controller locking files.
 
-Proposed local presentation is a small HTML/JavaScript page served by the existing Python controller, with the same JSON/text snapshot available through status. No public hosting or separate frontend framework is required. Refresh observation every 5 seconds while visible and reconcile after reconnect; source outage/staleness is shown after 15 seconds rather than silently displaying old green status. These are proposed acceptance targets, not current capabilities. Each source has its own observation timestamp/cursor; joins validate exact project/task/session/attempt/claim identities and do not imply one cross-system atomic snapshot.
+| Record | Required fields |
+| --- | --- |
+| Project | schema/project identity; canonical root/common Git directory/ref; explicit remote publication target/policy; Kata daemon/project identity; capacity 2; integration delegation; transition base; admitted tool/runtime/schema versions |
+| Admitted task | stable task ID; Kata issue UID; spec/plan paths and Git/content identities; brief revision/digest; goal/outcome; dependencies/closure pins; B; allowed writes/exclusions; resource/phase policy; verification/retention obligations |
+| Attempt | attempt/claim-generation/actor/seat; task/brief/B; workspace/branch/output paths; exact native sessionId/threadId; runtime incarnation and owned tool/process handles; acknowledgement; state; prepared operation IDs |
+| Candidate | task/brief/attempt/claim; commit/tree/sole-parent B; report/evidence identities; retention ref/bundle receipt; source cleanliness; submission timestamp |
+| Verification/review | exact candidate/context; commands/source/runtime/fixture pins; start/end/exits; logs/resource use; independently reopened artifact hashes; reviewed findings and accepted/rejected disposition |
+| Effect | operation ID/type; expected preconditions; intent sequence; exact targets/inputs; pending/observed/result state; observed external identity and error/reconciliation evidence |
+| Landing/closure | B/C/tree/accepted evidence/delegation; local integration outcome; publication, retention, cleanup and Kata-close outcomes separately; completion manifest and actual remote readback if required |
+| Observation/summary | snapshot/version; per-source timestamp/cursor/coverage; exact task/claim/session/thread/turn/item bindings; attributed narrative/source anchors; operating/health transition/incident records; gaps/staleness |
 
-Incremental summaries retain covered event/item ranges, gaps, source hashes and generation time, so historical progress and incident drilldown survive compaction or attempt replacement. Restart deduplicates/reconciles from supported source cursors and retained identities; notification streams alone are not assumed replayable. Raw command/transcript details are opt-in, scoped to Sureal-owned sessions and sanitized for rendering; no credentials or unrelated session text enter the overview. The observer and summary records cannot claim/close tasks, dispatch work or authorize landing. Reader failure never mutates queue ownership or worker state.
+Persistent organization: `project.json`, append-only `events.jsonl`, immutable operation/task/attempt/candidate/verification/landing records, owned `workspaces/`, retained `candidates/` and derived `observations/`. Exact filenames beyond these are implementation-plan choices; record content/authority are fixed here.
 
-## Repository-local implementation
+Use globally unique operation/attempt IDs and canonical SHA-256 digests for admitted content. Hashing serialization is versioned and deterministic. Native IDs remain opaque strings. Candidate refs or verified bundles pin objects against GC; a mutable branch name is not retention. Raw credentials never enter records.
 
-The proposed entrypoint is `scripts/collab.py`, implemented in this repository with Python standard-library modules and the installed Git/Kata/Codex/Insula tools. Introduce private helper modules only where they concentrate real complexity; no generic agent SDK or new daemon is required. The implementation plan will fix the exact functions and check commands.
+Under the exclusive project lock, durably append a prepared/result event, fsync it, write associated records through temporary file + fsync + atomic rename + parent-directory fsync, then update the small current projection. Retain event sequence and record hashes. Torn trailing journal bytes are diagnosed/reconciled against retained records; corruption of earlier committed history blocks mutation. A crash between event/record/projection writes recovers from the durable evidence, not a guessed status. Unsupported filesystem durability/locking fails project admission.
 
-Project runtime records and disposable task workspaces live in a configurable sibling directory, proposed as `../.sureal-collab/<project-id>/`, so canonical source remains clean. This is Sureal-owned runtime state, not a Corenius checkout or dependency. Tests use temporary fixture repositories/state directories.
+Derived overview snapshots/summaries have their own cache area and may be rebuilt. Their loss cannot change ownership or acceptance. Runtime record/queue restoration is itself independently verified before recovery is claimed.
 
-The small command surface covers project initialization/status, task start, candidate submission, verification, explicit repair/abort, exact landing and recovery. Read-only diff/report inspection can use retained files and Git rather than acquiring another stateful abstraction. Starting a task accepts a bounded Git task spec and captures its exact admitted brief, base and worker attempt.
+## Operations and failure behavior
 
-## Small implementation milestones
+Command names below are the proposed interface, not currently available capabilities. Exact argument parsing belongs in the implementation plan; these effects/preconditions are normative.
 
-| Stage | Goal | Verifier | Acceptance |
-| --- | --- | --- | --- |
-| P0: project admission | Establish the clean canonical ref and persistent record/lock contract | Real Git fixtures and live Insula identity/cleanliness/lock refusal probes | Exact admitted base; no source/runtime mutation; competing start refused |
-| P1: worker attempts | Start two fresh bounded worker sessions in distinct worktrees | Actual overlapping session/process execution, unique Kata claims, third-start/duplicate/scope refusal and live Insula audit | Both seats run concurrently; identities and write/resource ownership match; no unresolved seat released |
-| P2: candidate verification | Submit, retain, verify and repair immutable single-commit candidates | Real commit/dirty/merge probes; actual separate candidate checkout and live Insula artifact audit | C1 evidence cannot authorize C2; wrong brief/base/tree and mutation refused |
-| P3: exact landing/recovery | Advance mainline to the reviewed C and reconcile interruption | Real Git fast-forward/stale refusal plus faults before/after Git effect and publication acknowledgement | Exact reviewed commit lands; no rewrite/force; uncertainty blocks dispatch |
-| O0: worker/program overview | Make both workers, queue and task evidence understandable without raw transcript reading | Live read-only session/Kata/controller joins, summary evidence audit, freshness/reconnect/cross-attempt refusal and human view inspection | Accurate identity/state separation, concise corroborated summaries and explicit missing/stale data |
-| P4: cleanup and Sureal pilot | Run two concurrent tasks, serialize exact landing and refresh the stale candidate | Actual overlapping workers, stale refusal, fresh-attempt re-verification, per-seat cleanup/recovery and live Insula evidence | Both start at B; reviewed C lands first; D from B is refused; newly verified E with parent C lands second; other seat survives cleanup |
+| Operation | Required behavior |
+| --- | --- |
+| `init` | Admit canonical/project/runtime/Kata identity and existing-work disposition; produce project receipt; no worker launch |
+| `status` | Read-only text/JSON snapshot of both seats, tasks/queue, current states/evidence/blockers and source freshness; no source/queue mutation |
+| `task import` | Search/map committed task definitions to scoped Kata issues, idempotently create missing issues/dependency edges and link pins; never blindly mark old work done |
+| `task start` | Check readiness/closure/scope/capacity/B, reserve attempt intent, claim unique Kata actor, allocate owned worktree, bind exact fresh thread, obtain matching acknowledgement and start bounded work |
+| `task submit` | Match current owner/claim/thread/attempt/B, stop/freeze source, check single clean commit, retain candidate and record report; no acceptance inference |
+| `task verify` | Materialize retained C separately, run admitted checks/live Insula, independently audit artifacts and retain review disposition; never test mutable worker leftovers |
+| `task repair` | Preserve C1/evidence and return bounded findings. A still-live waiting attempt may receive an authorized repair turn; an EXITED/FINISHED attempt requires a fresh claim/thread/workspace at the same admitted base/brief. New C2 always needs new verification |
+| `task refresh` | Preserve old attempt/candidate/work, stop/reconcile it, admit new base/claim/attempt/thread/worktree and explicit retained inputs; no inherited verification |
+| `task takeover` / `task abort` | Retain prior work/effects, prove stop, record disposition and retire claim before releasing/transferring owner; unresolved state refuses replacement |
+| `task land` | Serialize exact conditional fast-forward checkout effect, retain local result, then configured publication/retention/closure facts; other unrelated worker can continue |
+| `recover` | Compare prepared effects with actual Kata/Git/thread/process/artifact state and reconcile; no blind launch/ref retries |
+| `cleanup` | Confirm stopped owned effects and retained work/evidence; use Git worktree removal on validated owned path; preserve shared repository/other seats |
+| `observe` | Collect scoped public/runtime/receipt facts and build summaries/overview; optional localhost HTML view; no task/runtime/goal control effects |
 
-Every stage ends with independently audited real execution. Runtime/state corruption and infrastructure failures remain implementation failures; they are not silently accepted as research negatives.
+Failures carry operation identity, stable reason, retry/reconciliation requirement and retained evidence. Refusal reasons include UNADMITTED_SPEC, DEPENDENCY_OPEN, CAPACITY_FULL, OWNER_CONFLICT, SCOPE_CONFLICT, RESOURCE_WAIT, STALE_BASE, DIRTY_SOURCE, CANDIDATE_MISMATCH, VERIFICATION_INCOMPLETE, UNKNOWN_EFFECT, RETENTION_INCOMPLETE and SOURCE_UNAVAILABLE. No force override clears these implicitly. A retry references its prior operation ID; explicit recovery determines whether the effect already happened.
 
-## Deliberate scope
+## Kata admission and dispatch handshake
 
-v1 is a task controller with initial worker capacity two, recommended Git worktrees, a shared Kata queue and file-backed execution receipts, bounded briefs, exact candidates and explicit recovery. No new general workflow engine, custom database or scheduler daemon, agent hierarchy, automatic scheduling, jj backend, unbounded persistent worker, capacity beyond two or replacement of existing research retention is part of this proposal.
+Committed `.kata.toml` binds worktrees to one admitted Sureal project; the controller verifies actual daemon/project identity on use. A stable Git task-to-issue mapping contains task/spec paths and issue UID, without mutable owner/status. Import initially covers49–54 and44–48, then audited relevant research follow-ups. Search before create; use a project/task-derived idempotency key. Task revisions update the same logical issue through an explicit admitted revision rather than duplicating it.
 
-Corenius supplies ideas and inspected examples only. No Corenius code, runtime, crate, policy synchronizer or effort is required to run this protocol. Its inspected landing helper rebases before gating, so it is not a dependency or an implementation to call. Implement the exact-candidate and expected-base contract locally in Sureal.
+The lead chooses up to two independent unowned ready issues. `blocked-by` edges represent prerequisites; closed predecessors are rechecked against their accepted closure evidence. Default user actor is not sufficient: each attempt uses `sureal/<attempt-id>`. A Kata claim reserves the logical owner; controller records describe the execution of that owner rather than creating another claim service.
 
-## Inspected sources
+Dispatch ordering:
 
-- User-provided attachment: Pasted text.txt, “one persistent lead and one serial worker”; superseded on worker capacity by the user's explicit requirement for two concurrent sessions from the start. The existing filename is retained for link continuity.
-- Sureal initially inspected at 4d0091d. At correction, mainline a3c6955 includes models/training documents51f1b39, while stale draft/scratch leftovers still prevent pristine admission. This session performed no cleanup of the active canonical checkout.
-- Corenius inspected read-only at a21316f: AGENTS.md, CONSTITUTION.md, CONTEXT.md, docs/agents/agentic-engineering.md, tools/agents/land.py, worktree-landing.md and crate documentation. This read-only inspection informs the design; implementation and authoritative records remain in Sureal.
-- [Git worktrees and shared refs](https://git-scm.com/docs/git-worktree)
-- [Git conditional update-ref](https://git-scm.com/docs/git-update-ref)
-- [Git independent cloning](https://git-scm.com/docs/git-clone)
-- [Git fast-forward behavior](https://git-scm.com/docs/git-merge)
+1. Under lock, verify current B, pinned specs/dependencies/scope/resources and available seat; persist a prepared attempt and reserved seat.
+2. Claim Kata with the unique actor; read back owner/revision. Store one revision-conditional assignment metadata object binding task/brief/claim/attempt/seat/workspace/runtime identifiers. Unknown or changed owner retains the reservation and stops dispatch.
+3. Create/validate worktree at B and write its identity receipt. Recheck mainline/task preconditions before launch. A changed B produces STALE, with explicit retention/release disposition.
+4. Create one fresh worker thread configured for the bounded brief/workspace and record returned threadId/sessionId before its work turn. If thread creation acknowledgement is lost and identity cannot be recovered safely, retain UNKNOWN; do not create another thread by retry.
+5. Send the exact assignment with claim generation, brief digest and controller identity. Record matching thread/turn acknowledgement before RUNNING. A lost work-start acknowledgement is reconciled through exact-thread observations, never by resending speculative work.
+6. Worker progress, repair, submission and control operations check current issue owner/assignment/claim/thread/attempt. Old-generation updates are rejected. Native goal mutations require the applicable admitted authority and tool rules.
 
-## Work items and activation
+Kata claim, assignment metadata, thread creation and turn launch are separate effects, not an atomic transaction. Persist prepared/result records around each boundary. External effects run with the seat reserved; short local lock sections fence local transitions and recheck identity after bounded calls, not entire worker execution. A configured unavailable Kata source blocks new mutation; no silent fallback owner queue.
 
-| Milestone | Sureal task specification | Blocked by |
+For takeover, first retain prior work, confirm actual thread/queued goal/tool effects are stopped, and record old disposition. Then retire its claim and transfer/release Kata ownership through explicit recorded effects. Missing heartbeat alone is not stop evidence. Manual/forced owner changes or stale metadata are reconciliation incidents, not automatic permission to launch.
+
+## Scope, resources and concurrent landing
+
+Concurrent tasks declare write paths with resolved project roots, directory ancestry and shared output/resource keys. Reject overlap, aliases/symlink escape or uncertain ownership before dispatch. V1 can use conservative directory-level claims; clever file-level scheduling is unnecessary. Immutable inputs may be shared; mutable caches/build outputs may not.
+
+The shared GPU lock governs producer and verifier execution. Resource waits have owner/reason/expected event and hold the task claim. Capacity2 is not a resource-cap increase. Use existing scientific budgets, including previously extended scoring time allowances. Resource or infrastructure failure is not a research negative.
+
+If T1/T2 start from B and T1 lands C, T2's D with parent B is stale, even for disjoint changes. Preserve D and its evidence, explicitly refresh T2 at C through a fresh attempt/worktree/thread, carry forward retained inputs, produce E with parent C and obtain fresh verification. Landing itself never rebases or reuses D's acceptance. Continuous rebase/concurrent merge queues are outside v1.
+
+## Candidate, verification, integration and closure
+
+Candidate identity is exact commit/tree/parent plus task/brief/claim/attempt/workspace context. Submission refuses zero/multiple commits, merges, wrong base or dirty tracked/index/untracked source. Declared ignored build paths remain explicit; verification has no access to incidental ignored worker inputs. Freeze source and reconcile outstanding writers before candidate verification/landing. A retained immutable candidate does not itself stop the worker: submission records the explicit handoff/freeze acknowledgement and outstanding-turn/tool/goal-continuation disposition. While waiting for review, a still-live attempt may remain RUNNING with operating WAITING; it is not labeled EXITED/FINISHED merely because a turn ended. A terminal attempt is never reopened for repair; retain its C1/work and allocate a fresh attempt at the admitted base/brief, then verify C2 under its new context.
+
+Retain candidate objects/report/evidence before repair or cleanup. Verification materializes exact C in a fresh detached/source workspace with immutable inputs and declared output paths. Required implementation milestones execute live Insula and independent artifact/math checks. Host tests complement this proof. A worker pass message or native goal complete state cannot authorize C.
+
+Under the integration lock, re-read clean canonical mainline=B, C's sole parent/tree/context, accepted verification/review and delegation. Persist PREPARED landing; use fast-forward-only checkout integration; independently verify HEAD/tree/index/working state=C and clean; then persist local LANDED receipt. `update-ref` alone is insufficient for a checked-out branch. Cooperative lock enforcement does not exclude arbitrary external Git processes; unexpected mutation yields uncertainty/stale refusal.
+
+Remote publication targets explicit configured ref/remote. Re-read the remote after ambiguous acknowledgement; never force-push or roll back observed local landing to invent a clean outcome. Publication may be not-required by admitted policy; required publication remains pending until observed. Retention/cleanup/Kata close are recorded separately.
+
+Close Kata only after task-specific acceptance, required integration/publication/retention/cleanup obligations and independently reopened closure evidence are satisfied. Commit reviewed closure manifests/journal findings when required by the ticket; retain large payloads through established HDFS readback/live recovery. A finite audited research negative may close its investigation; an incomplete executable gate cannot.
+
+## Recovery matrix
+
+| Interrupted/mismatched boundary | Required reconciliation |
+| --- | --- |
+| Prepared claim, Kata unowned | Recheck reservation/base/brief; retry same prepared claim only after proving no execution exists |
+| Kata owned, metadata/result absent | Read exact owner/revision, repair metadata under identity checks; hold seat until reconciled |
+| Worktree created, receipt absent | Inspect owned path/common directory/branch/B; retain or reconcile; never overwrite foreign/dirty state |
+| Thread creation acknowledgement lost | Recover exact thread binding from admitted runtime evidence or hold UNKNOWN; no blind creation retry |
+| Turn launch acknowledgement lost | Inspect bound thread/turn/queued effects; reconcile running/completed/unknown; no duplicate dispatch |
+| Candidate retained, submission projection absent | Reopen C/context/report and reconstruct submission; do not create another candidate silently |
+| Main=B, prepared C retained | No completed integration; resume only after all preconditions are revalidated |
+| Main=C and tree matches | Record observed integration; reconcile publication/closure/cleanup without repeating work |
+| Main neither B nor C, dirty checkout or mismatched tree | Hold affected project mutation and require explicit Git-state diagnosis; no reset/force/rewrite |
+| Local C landed, push acknowledgement lost | Read configured remote; distinguish published/pending/divergent/unknown and record actual outcome |
+| Kata close acknowledgement lost | Read issue close event and its evidence; reconcile already closed versus pending without fake acceptance |
+| Cleanup failed after C landed | Preserve LANDED and pending cleanup; retry only owned cleanup, not worker execution |
+| Observer/summary unavailable | Display stale/UNKNOWN coverage; no ownership or process state mutation |
+
+Unknown effects demonstrably confined to one attempt hold its seat/conflicting scopes; unrelated known-safe work may continue. Uncertain shared Git/queue/resource identity holds all affected mutation. Before release, preserve unsubmitted work, every candidate and closure/protocol history, confirm all owned effects stopped and verify disposable path ownership. Cleanup rejects canonical/foreign/symlink paths and uses Git worktree removal, preserving common Git metadata and other active attempts.
+
+## Worker state and human overview
+
+The [worker state contract](2026-10-03-worker-session-state-design.md) is normative: IDLE/PURSUING/WAITING/BLOCKED/PAUSED/LIMIT_REACHED/FINISHED/ERROR/UNKNOWN plus HEALTHY/STUCK_SUSPECTED/HUNG_SUSPECTED/HUNG_CONFIRMED/UNKNOWN health. Native goal/runtime, attempt and task states are separate. Each transition/diagnosis records identity, reason, time/duration, evidence, effective policy and next-event/unblock condition. No diagnosis grants restart, takeover, goal mutation or task closure.
+
+The browser overview and matching text/JSON status have three views:
+
+1. Two worker cards: task goal; Kata issue/pinned spec/plan; exact session/thread/current turn/claim/attempt/worktree; base/candidate; current work; recent findings/results; blocker; next action; resource and verification/integration/cleanup state.
+2. Central queue: ready, owned, running, waiting, blocked, needs-verification, needs-landing and closed groups, dependency explanations and acceptance evidence. Runtime/queue discrepancies are visible.
+3. Task/spec progress and incident timeline: draft/review/landed/admitted definitions; native/operating/health graphs with current state and transition blockers; historical attempts, stale refresh, incidents and verified outcomes. Unaudited historical research shows UNKNOWN/NOT AUDITED.
+
+Summaries target at most 120 words per current worker card. Generate narrative checkpoints in the existing lead/worker workflow from bounded public message/tool/receipt deltas; label observed, worker-reported and inferred content. Retain item/event/artifact anchors, coverage range, gaps, generation time and source hashes. Worker checkpoints occur at acknowledgement, material finding/failure/wait, submission and exit. Collector corroborates them; source absence explicitly means partial coverage, not a fabricated transcript. Raw traces are an optional scoped/sanitized drilldown. Private reasoning and credentials are excluded.
+
+Use read-only runtime metadata/history methods with actual capability probes. Do not resume/start/interrupt a thread to observe it. Existing controller notifications may supply deltas, but reconnect reads supported persisted sources and does not assume notification replay. Deduplicate by exact identity; inherited fork history cannot count as current attempt progress. Pagination/compaction/retention gaps remain explicit.
+
+Visible overview polls every 5 seconds; each source shows its own timestamp and becomes stale after 15 seconds without successful observation. Narrative generation is event/turn-coalesced, never per token or per UI poll. These freshness intervals are not worker execution caps. Status/observer errors do not mutate control state. Local HTML uses the controller's snapshot interface and escaped content; it is not publicly deployed.
+
+## Milestones and actual acceptance gates
+
+| Stage | Ticket | Required live proof |
 | --- | --- | --- |
-| P0 | [49 — project and clean-base admission](../../research/tasks/49-collaboration-project-admission.md) | Current closeout; written design/plan review |
-| P1 | [50 — two concurrent worker attempts](../../research/tasks/50-collaboration-worker-attempts.md) | 49 |
-| P2 | [51 — immutable candidates and verification](../../research/tasks/51-collaboration-candidate-verification.md) | 50 |
-| P3 | [52 — exact landing and recovery](../../research/tasks/52-collaboration-landing-recovery.md) | 51 |
-| O0 | [54 — worker/program overview](../../research/tasks/54-worker-program-observability.md) | 49–52 |
-| P4 | [53 — cleanup and full-loop admission](../../research/tasks/53-collaboration-cleanup-closeout.md) | 52; 54 |
+| P0 | [49](../../research/tasks/49-collaboration-project-admission.md) | Pristine base, project/Kata/runtime identity, durable lock/record refusals and scoped queue recovery |
+| P1 | [50](../../research/tasks/50-collaboration-worker-attempts.md) | Two actual threads actively overlap in distinct worktrees; exact claims/acknowledgements; third-start/duplicate/scope/resource refusal; explicit handoff |
+| P2 | [51](../../research/tasks/51-collaboration-candidate-verification.md) | Single exact candidate retention, separate live verification, bad-context refusal and C1/C2 evidence isolation |
+| P3 | [52](../../research/tasks/52-collaboration-landing-recovery.md) | Exact B→C landing, real interruption/refusal probes and honest local/remote reconciliation while unrelated work continues |
+| O0 | [54](../../research/tasks/54-worker-program-observability.md) | Live readable thread/history joins, accurate summaries/state/queue views, progress/hung false-positive tests and freshness/reconnect/no-mutation audit |
+| P4 | [53](../../research/tasks/53-collaboration-cleanup-closeout.md) | Full concurrent pilot, stale refresh/reverification, per-seat cleanup, artifact retention and independent complete-loop closeout |
 
-Stage order is integration closeout → pristine mainline → 49–52 → 54 → 53 → models/training44–48. The existing scientific source/evidence contracts and separately approved research execution remain preserved. Protocol bootstrap uses the existing manual workflow in an isolated workspace; do not pretend an unimplemented controller can land its own implementation.
+Order: current owned integration closeout → pristine mainline → 49 → 50 → 51 → 52 → 54 → 53 → models/training44–48. Implementation tasks can be decomposed into independent scopes in the accepted plan; admission dependencies still bind. Ticket54 owns its live observation exercises using49–52 capabilities and does not wait for53 to start.
 
-Implementation home is settled. Review the proposed brief/candidate/verification/landing/recovery contract, then write the exact implementation plan. Activation remains blocked until pristine mainline and the applicable design/plan and runtime gates are admitted.
+The full pilot uses two bounded real tasks from landed specs, both at B, with independent declared write scopes. Retain observed overlap and exact worker/issue/workspace identities. Land reviewed C for T1; refuse stale D for T2; preserve it; explicitly refresh T2 and independently verify E with parent C before landing E. Prove candidate/source isolation while the other worker is active, cleanup preservation, truthful summaries, resource serialization and crash recovery. The concrete pilot briefs53.A/53.B are defined in [ticket53](../../research/tasks/53-collaboration-cleanup-closeout.md#concrete-pilot-briefs). Import each with a stable subtask ID and pinned spec anchor, `related` to53; do not create a parent/dependency cycle that prevents their execution. They produce useful operating/incident documentation in disjoint directories and exercise actual worker, verifier and integration effects. Toy subprocesses, static screenshots and self-reports alone do not pass.
+
+Every implementation milestone retains actual live Insula commands/logs/exits, source/runtime pins, independent reopened artifacts, refusal/fault results and exact landed evidence. The research program's quality/overfit/heldout gates remain separate. Protocol completion establishes collaboration reliability, not model performance.
+
+## Limits, trust and reference baseline
+
+V1 has one lead/local controller, capacity 2, cooperative worktree/ref/scope rules, centralized local Kata and local overview. Multi-host dispatch, federation, clone implementation, capacity beyond two, auto-rebase/merge, autonomous restarts, public dashboards and generic agent frameworks are deferred. No source deletion or external messaging is authorized by a displayed status.
+
+Inspected installed capabilities: Kata v0.14.3 (claim/ready/dependencies/actor/meta revision condition/events/scoped export); Codex CLI 0.159.3 and daemon 0.160.0 with generated thread/turn/goal schema. Version/schema presence is not live runtime proof. Admit upgrades/capability changes explicitly instead of using newer flags from memory. Corenius was read-only reference; its rebase-before-gating landing helper is not this protocol's integration path.
+
+Primary references: [Git worktrees](https://git-scm.com/docs/git-worktree), [Git cloning](https://git-scm.com/docs/git-clone), [Git fast-forward integration](https://git-scm.com/docs/git-merge), [Kata quickstart](https://github.com/kenn-io/kata/blob/main/docs/get-started/quickstart.md), [Kata shared-project model](https://github.com/kenn-io/kata/blob/main/docs/workflows/sharing.md), [Codex App Server](https://learn.chatgpt.com/docs/app-server) and [Codex Goals](https://developers.openai.com/cookbook/examples/codex/using_goals_in_codex). Local schema/help inspections determine the actual admitted adapter surface.

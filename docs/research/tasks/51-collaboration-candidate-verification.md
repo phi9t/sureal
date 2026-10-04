@@ -13,7 +13,7 @@ Milestone: P2. Implementation home: Sureal.
 - Submission requires one candidate C with exactly one parent B and clean owned workspace state.
 - Immutable task/brief/base/attempt/commit/tree identity, report and controller-owned candidate-object retention.
 - Separate immutable verification materialization with declared input/output paths, runtime and artifact identities.
-- Explicit repair produces C2 and preserves C1/history; old candidate evidence never authorizes the new candidate.
+- Explicit repair produces C2 and preserves C1/history; still-live WAITING-for-review attempts can use a new authorized turn, while terminal attempts receive a fresh claim/thread/workspace at the admitted brief/base; old candidate evidence never authorizes the new candidate.
 
 ## Verifiers
 
