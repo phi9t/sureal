@@ -36,3 +36,21 @@ Local checks use `python3 -B -m unittest discover -s tests/collab -p 'test_*.py'
 The live driver is `scripts/collab_live.py`; its output retains actual commands,
 interrupted bytes and source/runtime/resource identities for the separately
 authored auditor. Local tests alone do not satisfy the live gate.
+
+
+## Build the additive runtime
+
+Use the [reviewed task49 build interface](../research/reviews/2026-10-04-collaboration-build-interface-reconciliation.md):
+
+```text
+python3 /ABS/materialized-X/scripts/collab_live.py build --materialization /ABS/materialization-X.json --packages /ABS/offline-packages --tools /ABS/tool-pins.json --output /ABS/fresh-runtime
+```
+
+Before building, independently reopen the exact retained/materialized source and
+admit its source review, actual tool pins, offline package inputs and owned
+output/resource scope. The candidate supplies Dockerfile/requirements; the
+builder checks the complete package union/hash and Docker executable, retains
+actual build/export/image/context receipts and reports `NOT_AUDITED`.
+Assemble the complete runtime GateAdmission from those actual outputs before
+running the live gate. The builder does not accept a task or start a worker.
+The earlier planned `build-runtime` command is unavailable in the task49 source.
