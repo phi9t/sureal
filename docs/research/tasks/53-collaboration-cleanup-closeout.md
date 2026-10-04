@@ -11,7 +11,7 @@ Milestone: P4. Implementation home: Sureal.
 ## Deliverables
 
 - Cleanup retains brief/candidate/report/verification/landing history and required scientific artifacts before removing only owned disposable state.
-- Confirmed stopped attempts and refusal of canonical, foreign, symlinked or unresolved workspace deletion.
+- Confirmed stopped attempts and refusal of canonical, foreign, symlinked or unresolved workspace deletion. Linked-worktree cleanup uses Git and preserves the common Git directory, retained candidate refs and other worktrees.
 - Two actual serial worker tasks: T1 starts at B and lands C; T2 starts at C and lands D; each has exact review/live verification and clean mainline.
 - Local operating guide, recovery commands and handoff into models/training tickets44–48.
 
@@ -24,7 +24,7 @@ Milestone: P4. Implementation home: Sureal.
 
 ## Acceptance
 
-- T2's base is exactly T1's reviewed landed commit; one serial seat and clean canonical source are maintained.
+- T2's base is exactly T1's reviewed landed commit; initial capacity one and clean canonical source are maintained; ownership remains per seat/task/attempt.
 - All required evidence and candidate objects survive cleanup; no unique unsubmitted work is discarded.
 - Cleanup, publication and integration remain separately recorded facts. An uncertain outcome never frees a seat or marks the task complete.
 - Sureal runs the protocol without any Corenius runtime/code/policy dependency or mandatory Kata setup.

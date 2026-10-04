@@ -4,7 +4,7 @@ Status: design proposal. Implementation home is settled: all code, specs and tas
 
 ## Goal
 
-Replace long-lived divergent implementation worktrees and conversational task handoff with one persistent lead, one serial worker seat, bounded task briefs, isolated task repositories, immutable candidates, exact-candidate verification and conditional fast-forward landing.
+Replace long-lived divergent implementation worktrees and conversational task handoff with one persistent lead, initially one worker seat, bounded task briefs, task-scoped Git workspaces, immutable candidates, exact-candidate verification and conditional fast-forward landing.
 
 Sureal is the managed project and implementation home. Its canonical ref remains `refs/heads/phi9t/mainline`; the attachment's `main` is a role, not an instruction to rename a branch. The existing models/training task specs 44–48 remain the first scientific architecture workstream after protocol adoption.
 
@@ -25,7 +25,7 @@ Before starting managed execution, the current worker completes its current task
 ## Roles and authority
 
 - **Lead:** persistent reasoning session; decomposes work, chooses the next admitted brief, reviews the exact candidate and requests landing. It does not repair a submitted candidate in place.
-- **Worker seat:** at most one active task attempt. Each task starts a fresh worker thread/process in its own mutable workspace.
+- **Worker seat:** at most one active task attempt per seat. Initial capacity is one seat; this is a rollout policy, not a permanent single-worker restriction. Each attempt starts a fresh worker thread/process in its own mutable workspace.
 - **Controller:** a small local CLI owns state transitions, workspace identity, the exclusive protocol lock, candidate retention and integration. It does not invent task acceptance or interpret model output as proof.
 - **Human:** owns intent, architecture and applicable integration/publication authorization. Record the applicable Sureal landing delegation with the admitted task before its first managed landing. Authority never extends to another repository or branch.
 
@@ -37,15 +37,23 @@ Task brief includes stable task ID, intent revision/digest, linked Git task spec
 
 At start:
 
-1. Acquire the controller lock and refuse any active or unresolved worker seat.
+1. Acquire the controller lock and allocate a free worker seat within admitted capacity. In v1 capacity is one; an active or unresolved attempt occupies it.
 2. Recheck canonical mainline equals admitted B and is clean.
-3. Create an independent local Git clone outside the canonical source checkout, on a disposable `codex/<task-id>` branch at B.
-4. Record clone identity and attempt identity before launching the worker.
+3. Create a task workspace outside the canonical source checkout, on a unique disposable `codex/<task-id>/<attempt-id>` branch at B. A linked Git worktree is the recommended initial mode.
+4. Record workspace kind/path, Git common-directory identity, branch, seat and attempt identity before launching the worker.
 5. Launch a fresh bounded worker with the exact admitted brief; retain startup/exit provenance.
 
-For v1, clone mode is the only implemented workspace mode. Linked worktrees, jj and broader VCS adapters remain later experiments. Do not add placeholder adapters for absent implementations.
+## Workspace isolation and future workers
 
-Independent Git metadata prevents worker Git commands from changing shared canonical refs. It is not an OS security guarantee. A future or existing Insula execution adapter may further restrict writable paths; any isolation claim must match the actual invocation and probes.
+A linked worktree has separate working files, index and HEAD, while sharing the repository's object store, ordinary branch refs and configuration by default. It supports multiple concurrent branches efficiently. Therefore workers must own unique branches, and only the controller may change canonical mainline under the protocol. This is a cooperative authority rule: worktrees do not technically prevent arbitrary Git commands from modifying shared refs.
+
+A clone has its own Git metadata and refs. It is an alternative when independent Git metadata is useful; it is not required for task isolation. Local clones may hardlink objects, and `--shared`/`--reference` can borrow objects from another repository. Any clone mode must record and verify its actual object dependencies before claiming independent retention. Neither mode supplies OS security isolation. Insula writable-path/process restrictions must be established by actual execution probes.
+
+Recommend implementing linked worktrees first. Retain workspace kind in records so a clone mode can be added deliberately; do not advertise an unimplemented mode or introduce a generic adapter framework. Verification may use a fresh detached worktree or source snapshot with declared output paths, independently of worker workspace kind.
+
+Record ownership per seat, task and attempt rather than using one project-wide mutable `active_task` identity. v1 still dispatches only one worker; a parallel scheduler is deferred. Future capacity increases allow one workspace and unique branch per active attempt, while landing remains serialized. Scope claims and the existing exclusive GPU lock still govern shared resources.
+
+If two future workers start at B, landing C makes another candidate D with parent B stale. D must explicitly refresh its base to C and produce a newly verified candidate before landing. More clones do not avoid this integration issue. No automatic rebase or reuse of old verification at landing is allowed.
 
 Worker produces one commit C with exactly one parent B. Development and repair may amend only its own disposable candidate line when the approved brief grants that operation; shared branches and historical commits are never amended.
 
@@ -55,7 +63,7 @@ Candidate identity is the commit/tree plus its exact task/brief/base/attempt con
 
 ## Verification and repair
 
-Verification materializes candidate C in a fresh read-only-source snapshot or detached verification clone with declared output paths and fixtures. It must not test a mutable worker checkout whose ignored files or later edits can change the result.
+Verification materializes candidate C in a fresh read-only-source snapshot or detached verification workspace with declared output paths and fixtures. It must not test a mutable worker checkout whose ignored files or later edits can change the result.
 
 Record C, tree, B, brief digest, check commands, fixture/runtime/source identities, start/end/exit, logs, resource usage and independently reopened artifact hashes. A worker report is evidence to inspect, not an acceptance token.
 
@@ -71,7 +79,7 @@ Under the exclusive controller lock:
 - Current submitted candidate is C, has one parent B and the expected tree.
 - The brief, workspace and candidate identities match the accepted verification.
 - Required checks/review and any configured landing authorization apply to C.
-- No worker mutation or uncertain attempt is active.
+- The submitted attempt is stopped/frozen and has no uncertain effect. In v1 the sole worker seat must be reconciled; future workers on other branches cannot mutate this candidate or canonical source.
 
 Persist a landing intent with expected main B and candidate C before the Git effect. For the normal checked-out canonical repository, perform fast-forward-only integration under the cooperative single-writer lock and immediately verify HEAD/tree/index/working files are exactly C and clean. Do not use update-ref alone on a checked-out branch: moving the ref without synchronizing its checkout is not a completed landing.
 
@@ -93,7 +101,7 @@ Recovery inspects actual Git state, candidate objects and owned attempt/process 
 
 Do not blindly rerun worker launch or a Git effect because its acknowledgement was lost. Unknown attempt state occupies the worker seat. An exit code alone does not prove all subprocesses stopped.
 
-Before workspace removal, retain the task brief, every candidate/report/verification/landing record and required scientific artifacts; confirm owned processes have stopped; verify the owned disposable path is neither canonical, a symlink, nor a foreign workspace. Abort/cleanup does not discard unsubmitted work without a recorded disposition and applicable authorization.
+Before workspace removal, retain the task brief, every candidate/report/verification/landing record and required scientific artifacts; confirm owned processes have stopped; verify the owned disposable path is neither canonical, a symlink, nor a foreign workspace. For a linked worktree, use Git worktree removal after those checks and preserve the shared Git common directory, retained refs and other worktrees. Abort/cleanup does not discard unsubmitted work without a recorded disposition and applicable authorization.
 
 Cleanup success is recorded separately from landing. A cleanup failure leaves C landed and retryable cleanup; it never implies failed work requiring relaunch. The next task may start only after the previous attempt/effects are reconciled and the v1 single-seat cleanup condition is satisfied.
 
@@ -119,7 +127,7 @@ The first research tasks can exercise the models/training workstream once this r
 
 The proposed entrypoint is `scripts/collab.py`, implemented in this repository with Python standard-library modules and the installed Git/Codex/Insula tools. Introduce private helper modules only where they concentrate real complexity; no generic agent SDK or new daemon is required. The implementation plan will fix the exact functions and check commands.
 
-Project runtime records and disposable task clones live in a configurable sibling directory, proposed as `../.sureal-collab/<project-id>/`, so canonical source remains clean. This is Sureal-owned runtime state, not a Corenius checkout or dependency. Tests use temporary fixture repositories/state directories.
+Project runtime records and disposable task workspaces live in a configurable sibling directory, proposed as `../.sureal-collab/<project-id>/`, so canonical source remains clean. This is Sureal-owned runtime state, not a Corenius checkout or dependency. Tests use temporary fixture repositories/state directories.
 
 The small command surface covers project initialization/status, task start, candidate submission, verification, explicit repair/abort, exact landing and recovery. Read-only diff/report inspection can use retained files and Git rather than acquiring another stateful abstraction. Starting a task accepts a bounded Git task spec and captures its exact admitted brief, base and worker attempt.
 
@@ -128,7 +136,7 @@ The small command surface covers project initialization/status, task start, cand
 | Stage | Goal | Verifier | Acceptance |
 | --- | --- | --- | --- |
 | P0: project admission | Establish the clean canonical ref and persistent record/lock contract | Real Git fixtures and live Insula identity/cleanliness/lock refusal probes | Exact admitted base; no source/runtime mutation; competing start refused |
-| P1: worker attempt | Allocate an independent task clone and start/stop one fresh bounded worker | Actual subprocess/thread handoff, namespace/process evidence and second-worker refusal | Brief/base/workspace identities match; no shared refs; no unresolved seat released |
+| P1: worker attempt | Allocate a task worktree and start/stop one fresh bounded worker | Actual subprocess/thread handoff, namespace/process evidence and second-worker refusal | Brief/base/seat/workspace identities match; owned branch policy holds; shared Git metadata is recorded; no unresolved seat released |
 | P2: candidate verification | Submit, retain, verify and repair immutable single-commit candidates | Real commit/dirty/merge probes; actual separate candidate checkout and live Insula artifact audit | C1 evidence cannot authorize C2; wrong brief/base/tree and mutation refused |
 | P3: exact landing/recovery | Advance mainline to the reviewed C and reconcile interruption | Real Git fast-forward/stale refusal plus faults before/after Git effect and publication acknowledgement | Exact reviewed commit lands; no rewrite/force; uncertainty blocks dispatch |
 | P4: cleanup and Sureal pilot | Retain records, remove only disposable owned state and run two serial tasks | Actual cleanup/recovery and two full lead→worker→verify→land cycles with live Insula evidence | Task2 starts at landed Task1 head; canonical clean; scientific evidence retained; no lost owned work |
@@ -137,7 +145,7 @@ Every stage ends with independently audited real execution. Runtime/state corrup
 
 ## Deliberate scope
 
-v1 is a serial task controller with Git clones, file-backed state, bounded briefs, exact candidates and explicit recovery. No new general workflow engine, database, agent hierarchy, automatic scheduling, jj backend, unbounded persistent worker, multi-worker concurrency or replacement of existing research retention is part of this proposal.
+v1 is a task controller with initial worker capacity one, recommended Git worktrees, file-backed state, bounded briefs, exact candidates and explicit recovery. No new general workflow engine, database, agent hierarchy, automatic scheduling, jj backend, unbounded persistent worker, multi-worker concurrency or replacement of existing research retention is part of this proposal.
 
 Corenius supplies ideas and inspected examples only. No Corenius code, runtime, crate, policy synchronizer or effort is required to run this protocol. Its inspected landing helper rebases before gating, so it is not a dependency or an implementation to call. Implement the exact-candidate and expected-base contract locally in Sureal.
 

@@ -41,12 +41,12 @@ Every implementation milestone runs actual live Insula and retains independent v
 
 ## Sureal-local collaboration workstream
 
-All implementation and authoritative task/spec documents belong in this repository. The protocol uses one persistent lead, one serial worker, task-scoped clones, exact candidates, conditional fast-forward landing and explicit recovery/cleanup. Runtime records and disposable clones stay outside canonical source to keep it pristine.
+All implementation and authoritative task/spec documents belong in this repository. The protocol uses one persistent lead, initially one worker seat, task-scoped workspaces (recommended linked worktrees), exact candidates, conditional fast-forward landing and explicit recovery/cleanup. Runtime records and disposable workspaces stay outside canonical source to keep it pristine.
 
 | Task | Deliverable | Dependency |
 | --- | --- | --- |
 | [49](tasks/49-collaboration-project-admission.md) | Clean-base admission, local state and lock | Current closeout; design/plan review |
-| [50](tasks/50-collaboration-worker-attempts.md) | One fresh bounded worker in an independent clone | 49 |
+| [50](tasks/50-collaboration-worker-attempts.md) | One fresh bounded worker in a task worktree | 49 |
 | [51](tasks/51-collaboration-candidate-verification.md) | Immutable candidates, exact verification and repair | 50 |
 | [52](tasks/52-collaboration-landing-recovery.md) | Exact fast-forward landing and interrupted-effect recovery | 51 |
 | [53](tasks/53-collaboration-cleanup-closeout.md) | Safe cleanup and two real serial-task cycles | 52 |

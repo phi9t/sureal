@@ -112,7 +112,7 @@ After the current worker's full owned integration closeout and a verified pristi
 | Ticket | Deliverable | Blocked by |
 | --- | --- | --- |
 | [49](../../docs/research/tasks/49-collaboration-project-admission.md) | Pristine canonical base, local records and exclusive controller lock | Current closeout, written design/plan review |
-| [50](../../docs/research/tasks/50-collaboration-worker-attempts.md) | One bounded worker in a private task clone | 49 |
+| [50](../../docs/research/tasks/50-collaboration-worker-attempts.md) | One bounded worker in an owned task worktree | 49 |
 | [51](../../docs/research/tasks/51-collaboration-candidate-verification.md) | Exact immutable candidate submission, verification and repair | 50 |
 | [52](../../docs/research/tasks/52-collaboration-landing-recovery.md) | Conditional exact fast-forward landing and recovery | 51 |
 | [53](../../docs/research/tasks/53-collaboration-cleanup-closeout.md) | Retained evidence, safe cleanup and two real serial tasks | 52 |
