@@ -12,6 +12,37 @@ Original milestone acceptance stays intact; comprehensive fault/guard coverage
 is deferred, not passed. Ownership, resource, live implementation/source checks,
 stop proof and scientific retention requirements remain binding.
 
+## Historical full-admission sequence, October 4, 2026
+
+The October 5 override above governs useful provisional operation now. The
+following October 4 sequence describes the remaining full-admission backlog;
+it does not require completing50–57 before using the bounded happy path.
+Closed49 remains accepted. Full ticket acceptance is unchanged.
+
+The user assigned P0 to MAC and the persistent-lead extension. Remaining
+MAC50 →51 →52 →53.0 →54 →53 and its53.A/B pilot issues retain their full
+acceptance requirements, while58 takes operational priority.
+
+[Persistent-lead design](../superpowers/specs/2026-10-04-persistent-research-lead-design.md)
+and new tickets[55](tasks/55-lead-authority-action-policy.md),
+[56](tasks/56-persistent-lead-execution.md),
+[57](tasks/57-lead-human-toil-acceptance.md) capture the next P0 lane.
+Their definitions/plans can be prepared now; execution waits for independently
+closed53, reviewed landed definitions/plans and exact map/admission. They remain
+specified rather than completed or ready merely because their priority is high.
+
+After53, first eligible capacity goes to55 →56 →57. Independent admitted
+models/training44 →45 →46 →47 →48 can use the other seat;57 is not a new
+dependency of44. Known-safe ready research can proceed when the lead lane is
+blocked. Existing scientific order, budgets and GPU exclusivity still bind.
+
+Follow [trunk development and reduced human steering](2026-10-04-trunk-and-human-steering-policy.md):
+every new assignment/scout starts from current mainline in its own temporary
+branch/worktree; scope by coherent outcome rather than LOC; the lead lands
+verified work promptly and owns routine operational coordination. This new
+direction does not erase the observation dates of historical status below or
+claim implementation of the remaining automation.
+
 **Integration admission status (2026-10-04 UTC):** centralized Kata is the user-selected scheduler/broker design, superseding optional-Kata/file-only scheduling. The documentation review corrections passed. The actual ownership transition, installed capabilities, written plan admission and clean-base/live execution gates remain open; statements below describe the proposed v1, not an active operating policy. No backend setup, worker activation or implementation is authorized by this documentation integration. See the [admission and review disposition](reviews/2026-10-04-collaboration-integration-admission.md).
 
 ## Current mechanism and roles

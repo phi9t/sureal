@@ -1,0 +1,208 @@
+# Persistent research lead: authority, execution and reduced human steering
+
+## Intent and status
+
+The user selected reduced human MTS steering as a primary MAC outcome and, on
+October 4, instructed the lead to capture the work and give it highest priority.
+The human should focus on scientific questions, interpretation and decisions
+outside existing authority. Routine dispatch, continuation, message relay,
+repair, verification, retention and landing belong to the lead.
+
+This captures the discussed architecture and sequencing as a written spec.
+Tickets55–57 are specified, not implemented or accepted. Written-spec review,
+a concrete implementation plan and its admission precede execution. Existing
+MAC49–54 approval and acceptance remain unchanged. Priority alone does not
+admit a task, change a scientific recipe or establish a capability.
+
+## Current operating priority, October 5
+
+The [user happy-path-first override](../../research/2026-10-05-mac-happy-path-first.md)
+supersedes the earlier requirement to finish all MAC gates before useful
+operation.58 authorizes the minimum lead/two-worker path, including explicitly
+manual bootstrap steps. The full-admission dependencies below remain closure
+requirements, not a blocker to that provisional use. No55–57 automation is
+implemented or accepted by this spec.
+
+## Historical full-admission sequence, October 4
+
+P0 (Kata priority0, highest) applies to the remaining MAC critical path and
+the persistent-lead extension. The October 5 override now gives58 useful operation priority; the full
+MAC/lead acceptance sequence remains recorded below.
+
+```text
+49 -> 50 -> 51 -> 52 -> 53.0 -> 54 -> 53
+                                      |-> 55 -> 56 -> 57
+                                      |-> 44 -> 45 -> 46 -> 47 -> 48 -> research
+```
+
+49 is landed at the recording base `a553645`; the other stages require their
+own proof.53.A/53.B remain the concrete concurrent pilot tasks. Drafting and
+reviewing55–57 definitions/plans can proceed during MAC implementation, with
+bounded read-only capability investigation. Full55–57 automation admission requires53 to close with independently
+accepted evidence. The explicitly manual58 provisional loop proceeds under
+the October 5 authority without claiming that automation admission.
+
+After53, lead55–57 receive first available eligible capacity. The other seat
+may carry independently admitted models/training work if write/resource scopes
+are disjoint. Lead57 completion is not an added dependency of44. If only one
+seat is available, the highest-priority eligible lead task wins; a blocked lead
+task does not prevent known-safe ready research. Preserve scientific admission,
+the approved resource/continuation/diagnostic order and the shared GPU lock.
+
+The existing persistent lead performs routine coordination now. Accepted
+automation progressively assumes those duties; finishing MAC does not itself
+prove that the automation works. Every coherent verified increment lands
+promptly. Every new assignment, including scouts, starts from current
+`phi9t/mainline` in a distinct temporary `codex/` branch/worktree. Scope follows
+goal/deliverable/verifier/stop condition, without a line-count constraint.
+
+## Architecture
+
+Extend the Sureal-local controller; Kata remains the operational queue and
+landed Git specs/plans remain acceptance authority. Reuse49–54 for claims,
+bounded native turns, exact candidates, independent verification, serialized
+landing, retained recovery, cleanup and observed status. Do not create a second
+scheduler, ownership database or scientific trainer.
+
+Proposed source homes follow the existing collaboration package:
+
+| Home | Responsibility |
+|---|---|
+| `scripts/_collab/lead_policy.py` | Versioned authority and deterministic action eligibility |
+| `scripts/_collab/lead.py` | Persistent event-driven action selection and supervised execution |
+| `scripts/_collab/lead_decisions.py` | Durable decisions, escalation reconciliation and toil accounting |
+| Existing store/adapters/observer/CLI | Owned effects, enforcement, receipt snapshots and presentation |
+| `tests/collab/` | Policy, restart, live worker and independent acceptance coverage |
+
+The implementation plan must pin concrete interfaces and installed runtime
+capabilities. An event subscription or supervisor is admitted from an actual
+probe, rather than assumed from schema/help. The lead runs from independently
+admitted source and never evaluates a mutable worker copy as its authority.
+
+## Admitted authority
+
+An immutable lead authority binds the project, actor/controller identity,
+spec/plan revisions, effective generation and validity interval; eligible task
+IDs or admitted selection scope; allowed controller operations; resource and
+publication delegation; and required review/verification contracts.
+
+Require explicit positive integer turn, retry and cumulative execution caps
+for automated continuation/repair, expressed in the admitted units. Required
+budgets, limits or scope omitted from authority cause refusal. They are not
+inferred from the user's desire for autonomy. Task-specific restrictions and
+existing budgets bind even when authority allows a broader class of action.
+
+Recheck authority against current task/claim/attempt/generation, source base,
+dependencies and observations immediately before each effect. A new authority
+generation can govern future actions; it cannot silently change the frozen
+brief, candidate verification or active scientific recipe. Record prior work
+and use the existing refresh/readmission contract for changed execution inputs.
+
+## Lead cycle
+
+Read an evidence-linked snapshot of Kata, native worker/runtime state and
+controller receipts. Preserve source-specific freshness and missing coverage.
+Then select a bounded eligible action, recording its reason and source digest.
+The model may propose the action; deterministic controller checks enforce it.
+Narrative summaries and worker reports cannot grant acceptance.
+
+| Condition | Action |
+|---|---|
+| Pending or uncertain effect | Reconcile actual effects before replay; isolate the hold when evidence permits |
+| Fresh result awaiting checks | Request the admitted independent checks and review |
+| Failed check with permitted repair | Retain C1, send bounded findings, repair through the admitted attempt contract, independently verify C2 |
+| Candidate fully accepted at current base | Serialize exact landing, then track publication/retention/closure/cleanup separately |
+| Candidate stale | Preserve it; refresh through new base/claim/attempt/worktree and obtain fresh verification |
+| Completed bounded turn, task incomplete | Continue only the same admitted brief/attempt when no conflicting turn/goal exists and caps allow |
+| Known resource wait | Retain ownership; wait and use independent eligible capacity |
+| Free seat and eligible ready task | Claim, create fresh mainline-based workspace/thread, obtain acknowledgement and dispatch |
+| Missing evidence or out-of-authority decision | Record a hold and a scoped escalation; never manufacture a pass or free ownership |
+
+A scientific negative that meets its frozen protocol is a result to report and
+land. It is not a failed implementation to repair until positive, and does not
+authorize changing loss, cohort, model, exposure or scoring thresholds.
+
+Use actual meaningful completion/checkpoint/queue/receipt events, coalesced at
+turn/action boundaries. A bounded observation fallback may recover missed
+events. Do not invoke inference per token or UI poll, or monopolize the second
+seat while supervising one long operation. Long jobs retain their admitted
+progress and wait contracts;54 health suspicion alone cannot cancel/restart.
+
+## Recovery and decisions
+
+Persist intent before each effect and the observed result afterward through
+the existing Store. Each action binds authority/observation digests, task,
+claim generation, attempt/thread and operation ID. After lead restart, reconcile
+pending effects before selecting replacements. A completed dispatch or landing
+with a lost acknowledgement must not be repeated. Unknown effects keep the
+existing occupancy and scope holds.
+
+Decision states are OPEN, RESOLVED and SUPERSEDED, separate from worker/task
+state. Record stable decision identity, reason/category, affected authority and
+task/attempt, evidence, recommendation, options and consequence of waiting.
+Retain prior decisions and resolution provenance. Only an explicit answer or
+newly sufficient admitted evidence resolves a decision; elapsed time is not an
+answer. Notifications occur on a new actionable decision or material change,
+not unchanged periodic status. Recovery preserves notification identity while
+honestly reporting uncertain delivery; no exactly-once delivery claim without
+transport proof.
+
+The human owns new scientific objectives, interpretation requests, changed
+acceptance/resource authority, genuine access and unresolved tradeoffs outside
+the admitted plan. The lead owns authorized routine repairs, resource waits,
+handoffs and landing. It must not repeatedly ask permission already provided.
+User steering is preserved as a durable decision and readmitted where needed.
+
+## Overview and toil accounting
+
+Extend54's read-only snapshot/card with lead authority, last verified outcome,
+current action, next safe action, pending effect, unresolved human decision,
+budget consumption and source freshness. Link exact receipts and scoped public
+item evidence. Label observed, worker-reported and inferred claims; preserve
+private-reasoning/credential exclusion. Observer refresh remains read-only.
+
+Record operational human interventions separately from lead-generated
+escalations: status reconstruction, relay, continuation, repair/recovery,
+landing and other operational categories. Include repeated user requests as
+separate interventions. Keep scientific judgment, initial pilot admission and
+deliberate verifier fault/decision inputs separately classified. Publish all
+counts and denominators; classification must not hide avoidable work.
+
+Measure required operational prompts per accepted task/experiment, readiness to
+landing latency and observable decision-wait intervals. Conversation duration
+does not establish human labor minutes. Compare scoped baselines only when
+coverage and workloads are comparable; no current speedup is established.
+
+## Live acceptance
+
+Each55–57 implementation milestone executes live Insula with exact candidate,
+runtime/tool/resource pins and independently reopened evidence, as the user
+requires. Actual native worker/queue effects are recorded honestly on their
+admitted transport/host boundary; Insula test execution does not imply worker
+OS isolation. Use actual workers for the lead loop, not model-free substitutes.
+
+The final pilot has two independently admitted, useful task briefs from current
+mainline, with distinct mutable scopes. It demonstrates authorized multi-turn
+continuation; a deliberately failed check and bounded repair with new candidate
+verification; current-base exact landing plus stale refresh; lead interruption
+and recovery without duplicate effects; retained HDFS evidence and safe cleanup;
+and one genuine out-of-authority decision that holds the affected work without
+blocking the other known-safe task. No extra GPU job is implied.
+
+Acceptance requires zero human operational prompts necessary to advance
+authorized pilot work. Initial authority admission and deliberate decision/fault
+inputs are reported separately, not omitted. Any additional human intervention
+is counted and investigated; it leaves this toil gate open. Independent review
+must reopen effects to prove real advancement and all original gates held.
+
+## Work items and boundaries
+
+- [55 — Lead authority and action policy](../../research/tasks/55-lead-authority-action-policy.md): deterministic eligibility and authority; execution depends on53.
+- [56 — Persistent lead execution and recovery](../../research/tasks/56-persistent-lead-execution.md): actual automatic coordination; depends on55 and its landed capabilities.
+- [57 — Decision reporting and human-toil acceptance](../../research/tasks/57-lead-human-toil-acceptance.md): readable decisions/accounting and independently accepted pilot; depends on56.
+
+Preparatory draft issues are P0 but excluded from dispatch until reviewed
+definitions/plans land and the task map/admission are refreshed. Models44–48
+retain their existing dependencies. Capacity beyond two, new scientific models,
+automatic scope expansion, unattended access setup and public dashboards are
+outside this extension.

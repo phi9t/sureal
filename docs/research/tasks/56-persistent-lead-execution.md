@@ -1,0 +1,46 @@
+# 56 — Persistent lead execution and recovery
+
+Priority: P0 (highest). Status: specified; execution not admitted.
+
+The [October 5 happy-path priority](../2026-10-05-mac-happy-path-first.md)
+permits58 provisional manual use first. Dependencies below govern this ticket's
+full automation acceptance; they do not block58 or claim runtime capability.
+
+**Goal:** automatically advance admitted work through dispatch, continuation,
+repair, independent verification and landing, retaining safe recovery.
+
+**Dependencies:**55 accepted and landed;53's controller capabilities remain
+admitted; reviewed written execution plan and per-task authority.
+
+**Spec:** [Persistent research lead](../../superpowers/specs/2026-10-04-persistent-research-lead-design.md).
+
+## Deliverables
+
+- `scripts/_collab/lead.py` coordinates existing controller operations using
+  policy55 and meaningful events. It retains intent/result and task/authority/
+  observation/claim/attempt/thread identities, supervises bounded effects and
+  reconciles pending effects before new action after restart.
+- Known resource waits retain ownership; independent eligible work uses the
+  other seat. Required independent reviews/verifiers remain authoritative.
+- All new assignments use current mainline and distinct temporary worktrees;
+  repairs, stale refresh, retention and cleanup preserve existing contracts.
+
+## Verifiers and acceptance
+
+- Use two actual native workers with independently admitted briefs and distinct
+  write scopes, alongside actual live Insula checks. Independently prove
+  multi-turn continuation, bounded failed-check repair, new-candidate acceptance,
+  exact serialized landing and stale refresh advance without human relay.
+- Interrupt the lead around dispatch and landing effects. Reopen actual state
+  and prove recovery neither duplicates execution nor discards unknown effects.
+- Prove in-flight turns, occupied seats, obsolete claims, exhausted authority
+  and missing evidence refuse;54 suspicion does not trigger automatic takeover.
+- Reopen exact candidate/runtime/tool/resource/raw receipts independently and
+  land the reviewed implementation. No new GPU concurrency or scientific recipe.
+
+## Closure evidence
+
+Actual worker timelines, authorized actions and caps, fault/recovery outcomes,
+independent review/live receipt, retained HDFS evidence and landed identity.
+Ticket57 owns the final accounting and human-toil acceptance;56 does not claim
+an unmeasured speedup or imply that all research tasks are complete.

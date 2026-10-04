@@ -6,6 +6,12 @@ two bounded perception-preparation workers, useful artifacts, live functionality
 checks and reviewed landing before complete MAC admission. Manual lead support
 is explicit. This provisional use does not close scientific or MAC milestones.
 
+The [remaining full-admission backlog](../../docs/research/task-queue.md#historical-full-admission-sequence-october-4-2026)
+retains MAC50–54/53 and persistent-lead55–57 contracts. It does not block58
+provisional use. Independently admitted models/training44–48 retain their
+scientific dependencies;57 adds none. No new lead automation is accepted by
+this index.
+
 [Overall goal and evidence policy](../../docs/research/tasks/program-goal.md). One local task specification per ticket; core execution starts at 01. Tickets 01–06 are verified complete: [R0 evidence](research/r0-geometric-insula.md). Tickets 08 and 09 are also verified complete: [single-device Torch GPU runtime](research/gpu-runtime-verified.json) and [Perception evaluators](research/perception-evaluators-verified.json). Remaining core tickets are planned or preparing scientific readiness. Per-ticket files and linked candidate-specific receipts are authoritative; previous partial implementation/evidence does not automatically satisfy later gates. Conditional tickets require a later activation decision.
 
 | Ticket | Deliverable | Blocked by | Lane |
@@ -124,6 +130,19 @@ After the current worker's full owned integration closeout and a verified pristi
 | [53.0](../../docs/research/tasks/53-0-collaboration-retention-cleanup-foundation.md) | Landed retention/cleanup and pilot-check foundation | 52 |
 | [54](../../docs/research/tasks/54-worker-program-observability.md) | Worker summaries, state graphs and queue/spec overview | 49–52; landed53.0 |
 | [53](../../docs/research/tasks/53-collaboration-cleanup-closeout.md) | Retained evidence, concurrent pilot and stale-candidate refresh | 52; 54 |
+
+## Persistent lead and human-steering reduction
+
+[Written design](../../docs/superpowers/specs/2026-10-04-persistent-research-lead-design.md).
+All three tickets have P0 priority and preserve the MAC controller as effect
+authority. Drafting/review can proceed before53; implementation waits for its
+independent closeout and new written-spec/plan admission.
+
+| Ticket | Goal and deliverable | Execution blocked by |
+|---|---|---|
+| [55](../../docs/research/tasks/55-lead-authority-action-policy.md) | Explicit authority and deterministic next-action eligibility | 53; reviewed landed spec/plan |
+| [56](../../docs/research/tasks/56-persistent-lead-execution.md) | Automatic dispatch/continuation/repair/verification/landing with recovery | 55 |
+| [57](../../docs/research/tasks/57-lead-human-toil-acceptance.md) | Clear decisions and zero required routine human prompts in the live pilot | 56 |
 
 All implementation milestones require independent live Insula receipts. These tickets are specified, not completed. Stage order is pristine mainline → 49–52 → 53.0 → 54 → 53 → models/training44–48; no historical worktree or frozen scientific artifact is discarded by adopting that order.
 
