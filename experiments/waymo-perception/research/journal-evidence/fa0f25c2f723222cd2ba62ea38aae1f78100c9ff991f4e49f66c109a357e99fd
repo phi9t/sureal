@@ -1,0 +1,277 @@
+{
+  "passed": true,
+  "scope": "author read-only final-report/raw-proof/source/original identity reconciliation; no independent execution, runner or release admission",
+  "report": {
+    "path": "/tmp/sureal-legacy-preservation-independent.json",
+    "sha256": "2e4271001bdcea21a88796efa7bf4a433a86867743c9f6c4458f9da5b3bc25b9"
+  },
+  "driver": {
+    "path": "/tmp/sureal-legacy-closeout-reconcile.py",
+    "sha256": "82d3990a67997cd1b4fd91e57bb1e2875725f0c8d9f689a7bc3394d8ed855a80"
+  },
+  "proofs_checked": [
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c0-verify/resource-admitted.json",
+      "sha256": "767f16f4d1ea33f0f6016e9d5386fc6d72a2681762c9d6ea021a8bbc03277f0b"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c0-rehydrate/resource-admitted.json",
+      "sha256": "cb42c23ae00f9a286a68732c157a27f843de6539f83760e3742c0f3249ad5d4f"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c1-verify/resource-admitted.json",
+      "sha256": "6d679ccd615ae14ccda7d32fc6b877564f4cf9fa327f7e5371995051d5d6c84c"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c1-rehydrate/resource-admitted.json",
+      "sha256": "1a3bb4fc50f280970a09b621d0e77880b26e74b3ad91ce7c684015e33bee02e9"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c2-verify/resource-admitted.json",
+      "sha256": "8dc5a5051cb8fb2e5751c20133d8b0f97257955a6ebc835c0562aba688eeb444"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c2-rehydrate/resource-admitted.json",
+      "sha256": "92d2bcb9978eba3e8ff9b9ca20034fd13ae03b4bf63ba636d51dbca933d583c5"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c3-verify/resource-admitted.json",
+      "sha256": "c275acd9f73cb9de9de69434dd33c768f90cfe8775a43a95ca568e328a9a0398"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c3-rehydrate/resource-admitted.json",
+      "sha256": "b04837e8a3253ea80fa665df9404510a2834332994076ccc7b21990eeeccc915"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c4-verify/resource-admitted.json",
+      "sha256": "0faf106222c40bbb4a5351ffed28900b41d75f4f7a8974dedf53fe5b087d5ac8"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c4-rehydrate/resource-admitted.json",
+      "sha256": "a3ed38e03ca82bfcc93e4db246e2dbeec0d85c59b40cfd1ee21f048ba5448462"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c5-verify/resource-admitted.json",
+      "sha256": "c93a1679f5b34f48c6cb6d39e4a9a090ec73855d38d30f1268b8bddba1c8a7b0"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c5-rehydrate/resource-admitted.json",
+      "sha256": "7f5ab1188172540c52ef7495b9dc1325a344863a760e40cca5e8622d2c1f737f"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c6-verify/resource-admitted.json",
+      "sha256": "f2e000ed548782d7d9b02cea42b28e98a54174c1224ef255a2aaa39c20322eb7"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c6-rehydrate/resource-admitted.json",
+      "sha256": "547f528be9ce9b47fed693829dca72ba776b3ba744cdcccb785f384ba3f908e9"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c7-verify/resource-admitted.json",
+      "sha256": "f521b2819a437f66e56ef9fe9fd929124d140477e6f73c33d167d36865d1d93b"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c7-rehydrate/resource-admitted.json",
+      "sha256": "a08244aeca92b207db4d5b2406abf2c824e9281cb7d16da37804dc81b5a4f22c"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c8-verify/resource-admitted.json",
+      "sha256": "70f185d89647ec4b0fc299365b160faf8394771b4851cbbfb2f19a414bf3f83e"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c8-rehydrate/resource-admitted.json",
+      "sha256": "972256dccad3a5d85e2508e8e0f73dae5ba17ec5bb686c993e3c3f48d0c4196f"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c9-verify/resource-admitted.json",
+      "sha256": "f6e10db6c493c3f2968335b5bf1672bed9ef9a5bfdbca25107f6dac8fdf809e1"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c9-rehydrate/resource-admitted.json",
+      "sha256": "db058a16f91606b18b2cdbad80a9cd24063736327acbbeab5eb4c8b492b112c7"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c10-verify/resource-admitted.json",
+      "sha256": "a70236aff7d2538a2425d0c2c472f39315114022b349f987674638120671a5b8"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c10-rehydrate/resource-admitted.json",
+      "sha256": "fe89802be6bc89ffd1100b2cb8934d9ff7c2cd4058a15b36d252818c08de7e5c"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c11-verify/resource-admitted.json",
+      "sha256": "d37215317455835c857906deb7c84f526e279214de97a5bb5bfa608068edf03c"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c11-rehydrate/resource-admitted.json",
+      "sha256": "25eb0f5d9bd77583407307b6efe80d8706b1817cc15e9be29f66b03936b6d360"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c12-verify/resource-admitted.json",
+      "sha256": "41cc2bd27fda567725a56e2f4250388bc7089d5b4657f7f06c64afb4a5f6f01d"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c12-rehydrate/resource-admitted.json",
+      "sha256": "bfad6172e81877a5aa5910be9753466a2d90cc7acc029f65649baba977e61101"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c13-verify/resource-admitted.json",
+      "sha256": "4ee2cb4e011ac9b933dfd6b82d61f827f56fac555d45fe3d1252118ade24a56b"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c13-rehydrate/resource-admitted.json",
+      "sha256": "262f506018e422d3a0845bd73acc70033282ad3d978272bf65b6d434957762f0"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c14-verify/resource-admitted.json",
+      "sha256": "ca38c0a146481966075179c546f0411fd22242aa6afafac11621330f73abfddf"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c14-rehydrate/resource-admitted.json",
+      "sha256": "e13a93f4bf2d3bd7da51f96034ad1ca717f32537e286c4f6e5f9de9537bd611c"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c15-verify/resource-admitted.json",
+      "sha256": "87ad9a622708cc3c946f6a1faec240bec0421073e60b8136f5de2fcab3fb10e1"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c15-rehydrate/resource-admitted.json",
+      "sha256": "cf2faba78b63df686659f0609a743933d99e577c09248cae3804601129518f8b"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c16-verify/resource-admitted.json",
+      "sha256": "44c8ceaadb548e56702ff55e37bbb46490f621679365bc14311625d03729bca5"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c16-rehydrate/resource-admitted.json",
+      "sha256": "0fd7635b6c25753ba869f663c940b3dcd086677557aff99ce7b5153dcbf7483d"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c17-verify/resource-admitted.json",
+      "sha256": "34a22cef9e402d44a975285b0434f5b151fcfe0233c984d7089a13a641529729"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c17-rehydrate/resource-admitted.json",
+      "sha256": "e282c8e5f3bb4ed19b8a47b5c0ea6c89a6622cb16293027eb7af6fed698cdd83"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c18-verify/resource-admitted.json",
+      "sha256": "b79b5aae79fc7d54bc78b0c4d23a8298265cb9dacf7c7dfc70182abb1ed41548"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c18-rehydrate/resource-admitted.json",
+      "sha256": "4f69db5e0ec9761f5040b01fad35dd74450251fa13c118ddc612bb82c9f3eee1"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c19-verify/resource-admitted.json",
+      "sha256": "3e6f042574aeb8b937514a0383c57a3facd9255329bf7cc00d2342585bd124d6"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c19-rehydrate/resource-admitted.json",
+      "sha256": "0ce76869d8fa7d55c7cd795d80c9fb2edc876129d1e6612d51d3c9fa07e940f4"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c20-verify/resource-admitted.json",
+      "sha256": "ed3fdafb1f6ea6e9f594b1768ec6a823ac8981ac1bb6a50089071584854a8e65"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c20-rehydrate/resource-admitted.json",
+      "sha256": "c1a20469f5f3d57e43b25762bbef0764aa0d87b5e9dfcf5566d4cab627e96bb3"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c21-verify/resource-admitted.json",
+      "sha256": "10fedf2d887c876e0186fa73ab7e437eefe3d6aa013b420d4a85f7d2efd4dcaf"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c21-rehydrate/resource-admitted.json",
+      "sha256": "252584ac546fe91d175dc4776f9693415b5d90470d44e2937a90a7c219cdab95"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c22-verify/resource-admitted.json",
+      "sha256": "2e6413d1d131c62eb03ba0dff7a42eabac91780d40d4d8dbcc4b1b7fac0dd15e"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c22-rehydrate/resource-admitted.json",
+      "sha256": "e8b4aa2e532161e53bc052caef02518f68c0a64eb9a4d70ff0649da80ec216fe"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c23-verify/resource-admitted.json",
+      "sha256": "f0b2c1ecf7a921bb2d0a2dc2bc7808a51faca7716d235e85b983707b2d822743"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c23-rehydrate/resource-admitted.json",
+      "sha256": "875b6d75a893243cd3a296bb7f1fa759072d224c729c571d8269aa6c81414641"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c24-verify/resource-admitted.json",
+      "sha256": "e23c765ba2416a4ed0de2cea8ccd3aeb6ea0ada07b56920affa81be2a42869f2"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c24-rehydrate/resource-admitted.json",
+      "sha256": "a5525bc97b6807d1c3fe14bfb57e6e0b0848c3ac3a8405cc82de11f1e6e11d0e"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c25-verify/resource-admitted.json",
+      "sha256": "d0d217bc8289c5284871a7ba00d8bfafb954e4ff5f13ae2e0a75599293270b58"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g0-c25-rehydrate/resource-admitted.json",
+      "sha256": "383e7a7663dce55c300a6944f7da2f071531d7bef3c67dc6b7572c196d747316"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g1-c0-verify/resource-admitted.json",
+      "sha256": "33977ff04af3e410ac4f75e7bca07ab96fef545ba62c8c68a31cdd7987328ce6"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g1-c0-rehydrate/resource-admitted.json",
+      "sha256": "7285e91bc36ab68795a1515036efa2e24bd42e754c89bfe8b42bf3135421485f"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g2-c0-verify/resource-admitted.json",
+      "sha256": "ecf40e45a7c9e7f2614d414678f098ac574aa22d6fef923e7e93819063d49f21"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g2-c0-rehydrate/resource-admitted.json",
+      "sha256": "50c9379ba1311b7210d602915b4d1cd0db1d8d5b2432fef2c976f46b38889e34"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g3-c0-verify/resource-admitted.json",
+      "sha256": "ea710780d86f1d2bf1d87d19d5c556ad0af2006bcc8dc00cd7424ea9e5aa4ecf"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g3-c0-rehydrate/resource-admitted.json",
+      "sha256": "42d87e59459b95d669bc0a9fa2238e3e8bc4b93d8b91134992096f69c57637c7"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g4-c0-verify/resource-admitted.json",
+      "sha256": "88f339349e3e097dadf2cc175e7ed014dd42fa0b628645e52a777dcf6c75b0ea"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/g4-c0-rehydrate/resource-admitted.json",
+      "sha256": "ebe835a33d82510dc734369dad09a2782b605b6d468e3be6187bdb6a9fd7d430"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/cold-gpu-0/resource-admitted.json",
+      "sha256": "3041bdbeb0a40367b355aab05f9bc826646f1d2d91b719627be5a3712d1fa987"
+    },
+    {
+      "path": "/tmp/sureal-legacy-preservation-independent/proofs/cold-gpu-1000/resource-admitted.json",
+      "sha256": "58ce12c6f02b449649af81c5cb0f24da0383ae55c3a379db5dc2f4da1a03febe"
+    }
+  ],
+  "original_six_artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/run.json": "96dc607ae8238774ca875588d65eaf463f120227e161ae792a9187c8e6635d7d",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/state.json": "dac2ce421243c4750175f98152cdc1ce4ecb7e1a493ddee7050c42fcc09e7765",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-00/checkpoint.pt": "8057a5496c4d6ec4d19b9de33034c6cca753ea39d8f03fd765ad7011cdf301ee",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-00-admitted.json": "dde09eb7e6d65e781597da82870ca6c64ea5bff1ea77d31b8b8268ec5a0ad364",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-1000/checkpoint.pt": "37de2375b0b10f92a56468bd9ffe0b2fea42f257c5949efa80fd29c621a8ff4a",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-1000-admitted.json": "b0a874b87a2541ab13b2a97e36540b458b54bb0996c6e679a8c156d0160f52d9"
+  },
+  "independent_declines_preserved": [
+    "New code review: this is supplemental artifact and cold-model recovery verification only.",
+    "Complete ContinuationBackend/checkpoint companion/shared-parent sealing, keep-two release orchestration and full runner admission: remain separate unimplemented/unadmitted gates.",
+    "Fully reconstructed execution using only HDFS-recovered sensor/runtime/driver/source parents: cold GPU worker used unchanged admitted local dependencies; all captured shared bytes were separately downloaded and verified.",
+    "New fitting sample/baseline2000, recipe sweep, diagnostics or heldout generalization: none performed.",
+    "Independent HDFS PUT or future remote availability: only fresh GET/readback was independently exercised."
+  ]
+}

@@ -1,0 +1,67 @@
+"""Same frozen asset union in bounded bundles; no original/replay release."""
+import json,shutil,sys,traceback
+from pathlib import Path
+P=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P))
+from cohort.sustained_controller_backend import NativeBackend,C,W
+from cohort.sustained_controller_lock import acquire_experiment_lock
+from resources.backend import ResourceBackend
+from resources.retention import publish_bundle,partition
+from resources.sources import sha,regular
+from resources.stage import write_new
+from tier1.storage import unique_payload_bytes
+ROOT=C/'insula/resource-legacy-preservation-controller20261003a-v2'
+REPORT=P/'research/sustained-resource-legacy-preservation-v2-verified.json'
+report={'schema_version':1,'scope':'bounded complete producer/replay/shared/raw-metadata HDFS preservation in exact disjoint bundles; no sealed companion, controller, runner or original/replay release admission','driver_path':str(Path(__file__).resolve()),'driver_sha256':sha(__file__),'bundles':[]}
+try:
+ with acquire_experiment_lock(C/'insula/architecture-experiments.lock') as lock:
+  b=NativeBackend('controller20261003a','baseline',lock,resume=True);state=json.loads((b.R/'state.json').read_text());prev=None
+  for record in state['records']:b.check_record(record,prev);prev=record
+  author=json.loads((P/'research/sustained-resource-legacy-seven-v5-verified.json').read_text());review=Path('/tmp/sureal-legacy-parity-independent-review.json')
+  if author['passed'] is not True or author['completed_legacy_stages']!=12 or sha(review)!='056b2a17dba10e474e603f2a74f84990e3475a159459a8fe14ae22e42927e050' or json.loads(review.read_text())['passed'] is not True:raise ValueError('complete unchanged independent replay admission required')
+  original=author['original_native_sha256']
+  if any(sha(p)!=h for p,h in original.items()):raise ValueError('original evidence changed')
+  shared=json.loads((P/'research/sustained-resource-shared-hdfs-live-v4-verified.json').read_text());b.__class__=ResourceBackend;b._resource_identity=None;b.attach_resources(shared['resource_identity_path'],shared['resource_identity_sha256'])
+  ROOT.mkdir(exist_ok=False)
+  inventory=json.loads((C/'insula/resource-legacy-preservation-controller20261003a-v1/expected.json').read_text())
+  for entry in inventory.values():
+   path=Path(entry['path'])
+   if not regular(path) or sha(path)!=entry['sha256'] or path.stat().st_size!=entry['bytes']:raise ValueError('immutable original frozen union changed')
+  failed=C/'insula/resource-retention-balanced16-sustained-baseline-controller20261003a-checkpoint-bf8e118ad51c4a81b903e9a6403a69ae';temp=W/failed.name
+  staging=json.loads((failed/'staging.json').read_text());expected=json.loads((failed/'expected.json').read_text())
+  if expected!=inventory or (failed/'verified-publication.json').exists() or list(failed.glob('*-completed.json')):raise ValueError('only pre-worker refused temporary aliases may retire')
+  actual={str(p.relative_to(temp/'raw')):sha(p) for p in (temp/'raw').rglob('*') if p.is_file()}
+  if actual!={n:e['sha256'] for n,e in expected.items()} or any(p.is_symlink() for p in temp.rglob('*')):raise ValueError('failed staging aliases differ from retained exact sources')
+  if set(staging)!=set(expected):raise ValueError('failed staging identity changed')
+  write_new(ROOT/'failed-staging-temporary-release.json',{'scope':'pre-worker temporary aliases/copies only; all exact original sources retained; no sensor/model/replay release','staging_root':str(temp),'expected_reference':{'path':str(failed/'expected.json'),'sha256':sha(failed/'expected.json')},'source_members':expected,'temporary_member_sha256':actual,'scientific_bytes_before':unique_payload_bytes(W)})
+  shutil.rmtree(temp)
+  if any(sha(p)!=h for p,h in original.items()):raise ValueError('original changed during temporary cleanup')
+  notes=ROOT/'refusal';notes.mkdir();shutil.copytree(failed,notes/'publisher',ignore=shutil.ignore_patterns('__pycache__'))
+  for path in [P/'research/sustained-resource-legacy-preservation-v1-failure.json',Path('/tmp/sureal-resource-legacy-preservation-v1.py'),Path(__file__),ROOT/'failed-staging-temporary-release.json']:
+   shutil.copyfile(path,notes/(path.name+'.source' if path.suffix=='.py' else path.name))
+  for path in notes.rglob('*'):
+   if path.is_file():inventory['metadata/refusal/'+path.relative_to(notes).as_posix()]={'path':str(path),'sha256':sha(path),'bytes':path.stat().st_size}
+  write_new(ROOT/'expected.json',inventory)
+  assets={n:e for n,e in inventory.items() if not n.startswith('metadata/')};names=sorted(n for n in inventory if n.startswith('metadata/'))
+  groups=[assets]+[{n:inventory[n] for n in names[i:i+5000]} for i in range(0,len(names),5000)]
+  union={n:e for group in groups for n,e in group.items()}
+  if union!=inventory or sum(map(len,groups))!=len(inventory):raise ValueError('exact disjoint complete union required')
+  before=unique_payload_bytes(W);report.update(original_native_sha256=original,source_inventory_path=str(ROOT/'expected.json'),source_inventory_sha256=sha(ROOT/'expected.json'),members=len(inventory),source_bytes=sum(e['bytes'] for e in inventory.values()),scientific_bytes_before=before)
+  for index,group in enumerate(groups):
+   print('START bounded preservation bundle',index+1,len(groups),'members',len(group),'bytes',sum(e['bytes'] for e in group.values()),flush=True)
+   publication=publish_bundle(b,'checkpoint',group);pub=json.loads(Path(publication['path']).read_text())
+   if pub['source_inventory']!=group or pub['independent_admission']['validation']['whole_member_union_exact'] is not True:raise ValueError('whole recovered bundle admission required')
+   report['bundles'].append(publication);write_new(ROOT/(str(index)+'-completed.json'),publication)
+  recovered={}
+  for ref in report['bundles']:
+   if sha(ref['path'])!=ref['sha256']:raise ValueError('bundle admission changed')
+   for n,e in json.loads(Path(ref['path']).read_text())['source_inventory'].items():
+    if n in recovered:raise ValueError('duplicate recovered member refused')
+    recovered[n]=e
+  if recovered!=inventory or any(sha(p)!=h for p,h in original.items()) or unique_payload_bytes(W)!=before:raise ValueError('complete union or original retention changed')
+  report.update(passed=True,complete_disjoint_recovered_union_exact=True,original_and_replay_payloads_retained=True,scientific_bytes_after=unique_payload_bytes(W))
+  write_new(ROOT/'verified.json',report);write_new(REPORT,report)
+except BaseException as error:
+ report.update(passed=False,error={'type':type(error).__name__,'message':str(error)},traceback=traceback.format_exc());failure=P/'research/sustained-resource-legacy-preservation-v2-failure.json'
+ if not failure.exists():write_new(failure,report)
+ raise
+print('PASS complete bounded HDFS preservation; no original or replay release',flush=True)

@@ -1,0 +1,32 @@
+"""Retain final independent closure receipt/raw evidence and journal110; no release."""
+import json,pathlib,shutil,sys
+P=pathlib.Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P));R=P/'research'
+from cohort.sustained_controller_backend import NativeBackend,C
+from cohort.sustained_controller_lock import acquire_experiment_lock
+from resources.backend import ResourceBackend
+from resources.retention import publish_bundle
+from resources.sources import sha
+from resources.stage import write_new
+from tracking.journal import read_entries
+ROOT=C/'insula/resource-legacy-closeout-final-metadata-controller20261003a-v1'
+with acquire_experiment_lock(C/'insula/architecture-experiments.lock') as lock:
+ independent=R/'sustained-resource-legacy-closeout-independent.json';x=json.loads(independent.read_text());assert x['passed'] is True and sha(independent)=='cea070fee20873713b1f475503f5d95feac9ba4320a2f4a0816ee3005b18eefc'
+ b=NativeBackend('controller20261003a','baseline',lock,resume=True);state=json.loads((b.R/'state.json').read_text());previous=None
+ for record in state['records']:b.check_record(record,previous);previous=record
+ shared=json.loads((R/'sustained-resource-shared-hdfs-live-v4-verified.json').read_text());b.__class__=ResourceBackend;b._resource_identity=None;b.attach_resources(shared['resource_identity_path'],shared['resource_identity_sha256'])
+ ROOT.mkdir(exist_ok=False);snapshot=ROOT/'snapshot';snapshot.mkdir();shutil.copytree('/tmp/sureal-legacy-closeout-independent',snapshot/'independent-raw',ignore=shutil.ignore_patterns('__pycache__'))
+ names=['sustained-resource-legacy-closeout-independent.json','sureal-legacy-closeout-independent.driver.source','sustained-resource-legacy-closeout-preservation-v2-verified.json','sureal-resource-legacy-closeout-preservation-v2.driver.source','sureal-resource-legacy-closeout-preservation-v1.driver.source','sustained-resource-legacy-closeout-preservation-v1-failure.json','sureal-legacy-closeout-postverify.json','sureal-legacy-closeout-postverify.driver.source','sureal-models-training-docs-validation.json','sureal-models-training-proposal-preservation.json','research-journal.jsonl','research-journal.md']
+ for name in names:shutil.copyfile(R/name,snapshot/name)
+ shutil.copyfile(__file__,snapshot/(pathlib.Path(__file__).name+'.source'));entries=read_entries(R/'research-journal.jsonl');assert len(entries)==110 and entries[-1]['sha256']=='2ab8ecab86ea0980473f9e5825ce930288c5c7692314c8b7a1e4ac2232a5802d'
+ for reference in entries[-1]['evidence']:
+  source=R/'journal-evidence'/reference['sha256'];assert sha(source)==reference['sha256'];target=snapshot/'journal-evidence'/reference['sha256'];target.parent.mkdir(exist_ok=True);shutil.copyfile(source,target)
+ inventory={}
+ for path in snapshot.rglob('*'):
+  if not path.is_file():continue
+  if path.is_symlink():raise ValueError('regular immutable final metadata required')
+  inventory['final-closeout/'+path.relative_to(snapshot).as_posix()]={'path':str(path),'sha256':sha(path),'bytes':path.stat().st_size}
+ write_new(ROOT/'expected.json',inventory);publication=publish_bundle(b,'checkpoint',inventory)
+ for path,h in x['original_six_artifacts'].items():assert sha(path)==h
+ value={'schema_version':1,'passed':True,'scope':'final receipt/raw/journal110 metadata preservation through existing independently reviewed bounded publisher and live independent-worker union; no new code/GPU/runner/release/science admission','publication':publication,'source_inventory_path':str(ROOT/'expected.json'),'source_inventory_sha256':sha(ROOT/'expected.json'),'members':len(inventory),'source_bytes':sum(e['bytes'] for e in inventory.values()),'journal_entries':110,'journal_head_sha256':entries[-1]['sha256'],'driver_path':str(pathlib.Path(__file__).resolve()),'driver_sha256':sha(__file__)}
+ write_new(ROOT/'verified.json',value);write_new(R/'sustained-resource-legacy-closeout-final-metadata-v1-verified.json',value)
+print('PASS final independent raw/journal110 HDFS metadata retention',flush=True)

@@ -1,0 +1,19 @@
+import hashlib,json,pathlib,sys
+P=pathlib.Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P))
+from resources.stage import validate_proof
+from resources.sources import sha
+report=pathlib.Path('/tmp/sureal-legacy-preservation-independent.json');x=json.loads(report.read_text())
+assert sha(report)=='2e4271001bdcea21a88796efa7bf4a433a86867743c9f6c4458f9da5b3bc25b9'
+assert x['passed'] is True and x['full_declared_union_transport_and_recovery'] is True and x['cold_original_gpu_recovery_passed'] is True
+assert x['full_companion_controller_release_runner_admission'] is False
+assert len(x['transfers'])==65 and len(x['archive_stages'])==60 and len(x['gpu_stages'])==2
+proofs=[]
+for stage in x['archive_stages']+x['gpu_stages']:
+ r=stage['proof'];p=pathlib.Path(r['path']);assert sha(p)==r['sha256'];v=json.loads(p.read_text());a=validate_proof(v,v['command'],P/'resources',x['resource_source_pins'],pathlib.Path(v['native_output_directory']),16*1024**3,v['timeout_seconds']);assert a==stage['resource_admission'];proofs.append(r)
+for r in (x['driver'],x['driver_snapshot'],x['cold_gpu_budget_plan'],x['resource_identity'],x['author_report']):assert sha(r['path'])==r['sha256']
+for p,h in x['original_six_artifacts'].items():assert sha(p)==h
+assert x['scientific_bytes_before']==x['scientific_bytes_after']==15329280496
+assert x['recursive_witness_reference_coverage']['all_317_references_recovered'] is True
+assert x['supplemental_journal108']['first107_entries_exact_to_primary_journal'] is True
+output={'passed':True,'scope':'author read-only final-report/raw-proof/source/original identity reconciliation; no independent execution, runner or release admission','report':{'path':str(report),'sha256':sha(report)},'driver':{'path':str(pathlib.Path(__file__).resolve()),'sha256':sha(__file__)},'proofs_checked':proofs,'original_six_artifacts':x['original_six_artifacts'],'independent_declines_preserved':x['declined_to_judge']}
+path=pathlib.Path('/tmp/sureal-legacy-closeout-reconcile.json');path.write_text(json.dumps(output,indent=2)+'\n');print('PASS 62 proof/artifact rechecks, six original identities and fixed independent receipt')

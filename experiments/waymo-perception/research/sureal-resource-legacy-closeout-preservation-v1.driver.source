@@ -1,0 +1,37 @@
+"""Preserve final raw recovery proofs and journal109 as a separate metadata bundle."""
+import json,pathlib,shutil,sys
+P=pathlib.Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P));R=P/'research'
+from cohort.sustained_controller_backend import NativeBackend,C
+from cohort.sustained_controller_lock import acquire_experiment_lock
+from resources.backend import ResourceBackend
+from resources.retention import publish_bundle
+from resources.sources import sha
+from resources.stage import write_new
+from tracking.journal import read_entries
+ROOT=C/'insula/resource-legacy-closeout-preservation-controller20261003a-v1'
+with acquire_experiment_lock(C/'insula/architecture-experiments.lock') as lock:
+ report=R/'sustained-resource-legacy-preservation-independent.json';x=json.loads(report.read_text());assert x['passed'] is True and sha(report)=='2e4271001bdcea21a88796efa7bf4a433a86867743c9f6c4458f9da5b3bc25b9'
+ b=NativeBackend('controller20261003a','baseline',lock,resume=True);state=json.loads((b.R/'state.json').read_text());previous=None
+ for record in state['records']:b.check_record(record,previous);previous=record
+ shared=json.loads((R/'sustained-resource-shared-hdfs-live-v4-verified.json').read_text());b.__class__=ResourceBackend;b._resource_identity=None;b.attach_resources(shared['resource_identity_path'],shared['resource_identity_sha256'])
+ ROOT.mkdir(exist_ok=False);snapshot=ROOT/'snapshot';snapshot.mkdir()
+ shutil.copytree('/tmp/sureal-legacy-preservation-independent',snapshot/'independent-raw',ignore=shutil.ignore_patterns('__pycache__'))
+ for source in [pathlib.Path(__file__),pathlib.Path('/tmp/sureal-legacy-closeout-record.py'),R/'sureal-legacy-preservation-independent.driver.source',R/'sureal-legacy-cold-gpu-budget-plan.json',R/'sustained-resource-legacy-preservation-independent.json',R/'sureal-legacy-closeout-reconcile.json',R/'sureal-legacy-closeout-reconcile.driver.source',R/'sureal-resource-legacy-witness-supplement-v1.driver.source',R/'2026-10-04-resource-artifact-closeout.md',R/'2026-10-04-models-training-documentation-review.md',R/'research-journal.jsonl',R/'research-journal.md',R/'sustained-resource-legacy-preservation-v2-verified.json',R/'sustained-resource-legacy-witness-supplement-v1-verified.json',R/'sustained-resource-legacy-preservation-v1-failure.json']:
+  shutil.copyfile(source,snapshot/source.name)
+ main=json.loads((R/'sustained-resource-legacy-preservation-v2-verified.json').read_text());supp=json.loads((R/'sustained-resource-legacy-witness-supplement-v1-verified.json').read_text())
+ for i,publication in enumerate(main['bundles']+[supp['publication']]):
+  source=pathlib.Path(publication['path']);assert sha(source)==publication['sha256'];shutil.copytree(source.parent,snapshot/'author-raw'/str(i),ignore=shutil.ignore_patterns('__pycache__'))
+ entries=read_entries(R/'research-journal.jsonl');assert len(entries)==109 and entries[-1]['sha256']=='f19fb1a31746f9ccd9f8aeefed31f3a5c0b20a9ca53fec62fbc17026cea872e8'
+ for reference in entries[-1]['evidence']:
+  source=R/'journal-evidence'/reference['sha256'];assert sha(source)==reference['sha256'];target=snapshot/'journal-evidence'/reference['sha256'];target.parent.mkdir(exist_ok=True);shutil.copyfile(source,target)
+ inventory={}
+ for path in snapshot.rglob('*'):
+  if not path.is_file():continue
+  if path.is_symlink():raise ValueError('regular raw preservation file required')
+  inventory['closeout/'+path.relative_to(snapshot).as_posix()]={'path':str(path),'sha256':sha(path),'bytes':path.stat().st_size}
+ write_new(ROOT/'expected.json',inventory);print('PRESERVING',len(inventory),sum(e['bytes'] for e in inventory.values()),flush=True)
+ publication=publish_bundle(b,'checkpoint',inventory)
+ for path,digest in x['original_six_artifacts'].items():assert sha(path)==digest
+ result={'schema_version':1,'passed':True,'scope':'separate final recovery raw-proof/journal109 preservation; no original/replay release, full companion/controller/runner admission or new science','source_inventory_path':str(ROOT/'expected.json'),'source_inventory_sha256':sha(ROOT/'expected.json'),'publication':publication,'members':len(inventory),'source_bytes':sum(e['bytes'] for e in inventory.values()),'independent_receipt':{'path':str(report),'sha256':sha(report)},'journal_entries':109,'journal_head_sha256':entries[-1]['sha256'],'driver_path':str(pathlib.Path(__file__).resolve()),'driver_sha256':sha(__file__)}
+ write_new(ROOT/'verified.json',result);write_new(R/'sustained-resource-legacy-closeout-preservation-v1-verified.json',result)
+print('PASS raw recovery closeout preservation',flush=True)
