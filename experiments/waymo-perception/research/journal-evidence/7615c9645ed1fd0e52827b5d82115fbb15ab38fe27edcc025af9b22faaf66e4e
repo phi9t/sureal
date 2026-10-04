@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "scope": "Complete remaining design-owner documentation branch; no runtime implementation or plan admission",
+  "base": "2873f6aa190c9179bf756921b689c54f55d9c2d7",
+  "source_head": "3e9f366c558b37ff58ea62dbe6900ffc29f1c2e1",
+  "source_commits": [
+    "3e9f366c558b37ff58ea62dbe6900ffc29f1c2e1 docs: retain passing collaboration review and validation",
+    "ef0bee5a01787561dcdaa9d828832e17d7ed45f1 docs: make collaboration candidate roles explicit",
+    "deed4aadf4ec94516674710613473c30d9d88e59 docs: close narrow collaboration review gaps",
+    "f32a4965e682e972b61dacfb0ef60d40f4774ca4 Normalize review rendering while retaining exact raw provenance",
+    "772092e1b9d99f8b5ce9483f20064b3ba27e6540 Resolve review followups with phased audits and explicit worker continuation"
+  ],
+  "source_document_paths": 19,
+  "source_worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/models-training-task-specs",
+  "integration_state": "prepared merged docs and append-only journal; final independent reviews, tests, canonical FF/push/readback still pending",
+  "Claude_documentation_reviews": [
+    {
+      "name": "rereview-2",
+      "source_commit": "d5ead21fb46ddef78bed8d8ac0f8b122ca1f0c01",
+      "verdict": "changes required",
+      "source_files": 22,
+      "raw_and_rendered_hashes_exact": true
+    },
+    {
+      "name": "rereview-3",
+      "source_commit": "f32a4965e682e972b61dacfb0ef60d40f4774ca4",
+      "verdict": "changes required (narrow)",
+      "source_files": 33,
+      "raw_and_rendered_hashes_exact": true
+    },
+    {
+      "name": "focused-review",
+      "source_commit": "deed4aadf4ec94516674710613473c30d9d88e59",
+      "verdict": "not PASS yet; B1 only",
+      "source_files": 6,
+      "raw_and_rendered_hashes_exact": true
+    },
+    {
+      "name": "role-check",
+      "source_commit": "ef0bee5a01787561dcdaa9d828832e17d7ed45f1",
+      "verdict": "PASS; no B1 blocker remains",
+      "source_files": 2,
+      "raw_and_rendered_hashes_exact": true
+    }
+  ],
+  "documentation_QA": {
+    "cases": 63,
+    "ticket_role_phase_combinations": 27,
+    "finding_dispositions": 64,
+    "local_links": 91,
+    "anchors": 4,
+    "declared_dependencies_acyclic": true,
+    "raw_source_request_response_body_and_rendered_provenance_exact": true
+  },
+  "source_overlays": "19 source paths exact except4 reconciled admission notices; additive admission/handoff documentation records newer result without altering historical reviews",
+  "future_order": "49->50->51->52->53.0->54->53->models/training44-48 after written plan/current clean-base/process/resource/live admission",
+  "scientific_preservation": "19 source hashes and protected scientific host hashes exact; accepted models contract/index/scientific registry semantics unchanged, watcher timestamp excluded",
+  "remaining_source_blockers": {
+    "association9": "whole41.2 ownership proof unadmitted; duplicate preparation caches contradict reservation override",
+    "continuation2": "whole backend/retention/runner companion and shared-parent recovery gate unadmitted",
+    "explorer7": "exact-source real generation and provenance/content closure absent",
+    "cohort_audit1": "independent exact-source live verifier absent"
+  },
+  "owned_source_disposition": "Preserve those19 bodies and their existing retained-work/archive identities; no silent omission, deletion or weaker acceptance",
+  "source_branch_disposition": "Complete pinned5-commit source branch is included; retain branch/worktree after integration and census any later owner edits separately. Observed cleanliness is dated, not process quiescence.",
+  "retention": "Docs/review metadata/journal123 Git-only after sealedHDFS113; external raw review artifacts remain exact; original HDFS exact-readback/live-recovery epochs unchanged, no transfer or payload release",
+  "authority": "64 documentation findings disposed, not64 runtime tests; final focused PASS at ef0bee5 does not admit product code, native stop/cgroup/Kata/HDFS/live capabilities or plan execution",
+  "no_mutation": "No Kata registration/issues/claim, managed dispatch, source/process cleanup, Corenius or scientific resource lock action, optimizer update/native score or milestone completion"
+}

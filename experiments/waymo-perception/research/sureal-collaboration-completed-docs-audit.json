@@ -1,0 +1,485 @@
+{
+  "schema_version": 1,
+  "utc": "2026-10-04T04:29:13.237662+00:00",
+  "base": "2873f6aa190c9179bf756921b689c54f55d9c2d7",
+  "source_head": "3e9f366c558b37ff58ea62dbe6900ffc29f1c2e1",
+  "generation_command": "python /tmp/sureal-collaboration-completed-docs-audit.py; exact generator retained in journal123 evidence",
+  "document_paths": [
+    {
+      "path": "docs/collaboration/checks/53.A.json",
+      "sha256": "38cf4a9e8819efc8186317415cd8c197dadcf8ee71ac5b85a03286bf1a53ca7b"
+    },
+    {
+      "path": "docs/collaboration/checks/53.B.json",
+      "sha256": "f36efe70ba76e7ba496c75645e156562457dbd85e1847bc06bd3ef1999033ead"
+    },
+    {
+      "path": "docs/collaboration/coverage.json",
+      "sha256": "b0943cd5e480417fc6033d8745c61d66b0baf456dc80bfc445e77971cd257ccc"
+    },
+    {
+      "path": "docs/collaboration/fixtures/runtime-probes.json",
+      "sha256": "0bb3a26f0a65fa6d7d84a7500d007d1ceebfcf34d17c107ad83cda5542241c32"
+    },
+    {
+      "path": "docs/collaboration/fixtures/worker-briefs.json",
+      "sha256": "5952486f81c9d8fe7542b754942885beb72cedcd1af9f64689edbc8ce132150b"
+    },
+    {
+      "path": "docs/research/README.md",
+      "sha256": "008d29bcb9db47333ca3560b9bc32bd92832da1eaffbf73bbae8e90126bb2da3"
+    },
+    {
+      "path": "docs/research/reviews/2026-10-03-sureal-collaboration-claude-focused-review.json",
+      "sha256": "de60e8688ad10b62aee4f91d106023fffd5b9c91b2f4547077541eb4cb75c7e7"
+    },
+    {
+      "path": "docs/research/reviews/2026-10-03-sureal-collaboration-claude-focused-review.md",
+      "sha256": "24fc725483dae5125ba2227ccc849d4d7d2f063bfc03d729b26a6c50c6e475b0"
+    },
+    {
+      "path": "docs/research/reviews/2026-10-03-sureal-collaboration-claude-rereview-2.json",
+      "sha256": "53372dbf4b17bb113ecf73bc0f9e9666b557620061e3f13d72a1b4e582810f82"
+    },
+    {
+      "path": "docs/research/reviews/2026-10-03-sureal-collaboration-claude-rereview-2.md",
+      "sha256": "e4cf49cdf7c42ef978a0bc2cd54eb89658a1c99433911ec3ff19176fcffb2b4e"
+    },
+    {
+      "path": "docs/research/reviews/2026-10-03-sureal-collaboration-claude-rereview-3.json",
+      "sha256": "0041030d33e8d36b39773d735c7024dd4ad04f69ec48f18ad78372aa4fc63b62"
+    },
+    {
+      "path": "docs/research/reviews/2026-10-03-sureal-collaboration-claude-rereview-3.md",
+      "sha256": "65c5db6ce2858042d99fe66ff5079497154db82940992ebd8e04dcca5a75f361"
+    },
+    {
+      "path": "docs/research/reviews/2026-10-03-sureal-collaboration-claude-role-check.json",
+      "sha256": "16e6fe5617cf1b0ae1015e494dbc4ca71674af08880e9a140915c93f5a31a61a"
+    },
+    {
+      "path": "docs/research/reviews/2026-10-03-sureal-collaboration-claude-role-check.md",
+      "sha256": "5011ce04d80083ffd55318e67f2992d610fbfb00ca313aebf1b7c8847d9359ad"
+    },
+    {
+      "path": "docs/research/reviews/2026-10-03-sureal-collaboration-review-resolution.md",
+      "sha256": "76eec21dc81b6be4e7dab04e77172b35883b8e6cd7a87a738b0f315e86e1134b"
+    },
+    {
+      "path": "docs/research/task-queue.md",
+      "sha256": "6166ae94cce3983fc4dc52d37d43f5f7f03efb274795ea6d3d25f0a99c2692c8"
+    },
+    {
+      "path": "docs/research/tasks/50-collaboration-worker-attempts.md",
+      "sha256": "8770f7f18e4735f4dc09f36536fed5321c2e64c06c7c8be636ca6cbbd1b49fac"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md",
+      "sha256": "f8b74add792c297b403c97a8562f7b1213adeec63f2ed7f85c7e53abc9e69af3"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "sha256": "30f8fe3f736739a2f3eb7fab979fffcbb5c6e80ae41e46d9ea4bbbb8c0d6a4c9"
+    },
+    {
+      "path": "docs/research/reviews/2026-10-04-collaboration-integration-admission.md",
+      "sha256": "7b4004a962b058a57fe45ad548138b7db8a78ad20df6b961c759c2cf449ef3f0"
+    },
+    {
+      "path": "experiments/waymo-perception/research/2026-10-04-post-closeout-stage-handoff.md",
+      "sha256": "97dac5200f4f3fb7a8443544d97a3c6963654c90160729afb069c3812a5eac35"
+    }
+  ],
+  "source19_exact_except_four_admission_notice_overlays": true,
+  "local_links_checked": 91,
+  "markdown_anchors_checked": 4,
+  "missing_links": 0,
+  "coverage_cases": 63,
+  "ticket_role_phase_combinations": [
+    {
+      "ticket": "49",
+      "role": "implementation",
+      "phase": "gate",
+      "cases": [
+        "exact-source-and-rootfs",
+        "real-state-fs-durability",
+        "clean-ref-and-path-refusals",
+        "journal-corruption",
+        "scoped-queue-restore",
+        "fixture-import-revision-status"
+      ]
+    },
+    {
+      "ticket": "49",
+      "role": "implementation",
+      "phase": "post-landing",
+      "cases": [
+        "exact-stage-landing"
+      ]
+    },
+    {
+      "ticket": "49",
+      "role": "implementation",
+      "phase": "closure",
+      "cases": [
+        "queue-bootstrap-revision-status"
+      ]
+    },
+    {
+      "ticket": "49",
+      "role": "metadata",
+      "phase": "gate",
+      "cases": [
+        "exact-source-and-rootfs",
+        "real-state-fs-durability",
+        "clean-ref-and-path-refusals",
+        "journal-corruption",
+        "scoped-queue-restore",
+        "map-M-gate"
+      ]
+    },
+    {
+      "ticket": "49",
+      "role": "metadata",
+      "phase": "post-landing",
+      "cases": [
+        "map-M-landing"
+      ]
+    },
+    {
+      "ticket": "49",
+      "role": "metadata",
+      "phase": "closure",
+      "cases": [
+        "queue-bootstrap-revision-status"
+      ]
+    },
+    {
+      "ticket": "50",
+      "role": "implementation",
+      "phase": "gate",
+      "cases": [
+        "two-real-workers-overlap",
+        "dispatch-effect-boundaries",
+        "capacity-scope-resource-refusal",
+        "identity-and-reports",
+        "stop-takeover",
+        "transport-lost-thread",
+        "live-worker-namespace",
+        "worktree-index-and-mainline-guard",
+        "multi-turn-resume-and-fork",
+        "stop-capability-before-first-claim",
+        "explicit-refresh"
+      ]
+    },
+    {
+      "ticket": "50",
+      "role": "implementation",
+      "phase": "post-landing",
+      "cases": [
+        "exact-stage-landing"
+      ]
+    },
+    {
+      "ticket": "50",
+      "role": "implementation",
+      "phase": "closure",
+      "cases": [
+        "evidence-backed-stage-close"
+      ]
+    },
+    {
+      "ticket": "51",
+      "role": "implementation",
+      "phase": "gate",
+      "cases": [
+        "candidate-refusals",
+        "materialization-fidelity",
+        "retention-and-isolation",
+        "repair-context"
+      ]
+    },
+    {
+      "ticket": "51",
+      "role": "implementation",
+      "phase": "post-landing",
+      "cases": [
+        "exact-stage-landing"
+      ]
+    },
+    {
+      "ticket": "51",
+      "role": "implementation",
+      "phase": "closure",
+      "cases": [
+        "evidence-backed-stage-close"
+      ]
+    },
+    {
+      "ticket": "52",
+      "role": "implementation",
+      "phase": "gate",
+      "cases": [
+        "exact-landing",
+        "all-created-effect-recovery",
+        "B-C-neither-interruption",
+        "remote-ack",
+        "evidence-backed-close"
+      ]
+    },
+    {
+      "ticket": "52",
+      "role": "implementation",
+      "phase": "post-landing",
+      "cases": [
+        "exact-stage-landing"
+      ]
+    },
+    {
+      "ticket": "52",
+      "role": "implementation",
+      "phase": "closure",
+      "cases": [
+        "evidence-backed-stage-close"
+      ]
+    },
+    {
+      "ticket": "53.0",
+      "role": "implementation",
+      "phase": "gate",
+      "cases": [
+        "cleanup-refusal-and-recovery",
+        "work-and-other-seat-retention",
+        "fresh-hdfs-and-live-rehydration",
+        "queue-export-restore",
+        "pilot-check-contract"
+      ]
+    },
+    {
+      "ticket": "53.0",
+      "role": "implementation",
+      "phase": "post-landing",
+      "cases": [
+        "landed-foundation"
+      ]
+    },
+    {
+      "ticket": "53.0",
+      "role": "implementation",
+      "phase": "closure",
+      "cases": [
+        "evidence-backed-stage-close"
+      ]
+    },
+    {
+      "ticket": "54",
+      "role": "implementation",
+      "phase": "gate",
+      "cases": [
+        "actual-two-worker-mapping",
+        "submit-refresh-cleanup-display",
+        "trace-and-summary",
+        "history-gaps-identities",
+        "phase-health-native-goals",
+        "refresh-outage-and-no-control",
+        "long-job-and-idle-continuation"
+      ]
+    },
+    {
+      "ticket": "54",
+      "role": "implementation",
+      "phase": "post-landing",
+      "cases": [
+        "exact-stage-landing"
+      ]
+    },
+    {
+      "ticket": "54",
+      "role": "implementation",
+      "phase": "closure",
+      "cases": [
+        "evidence-backed-stage-close"
+      ]
+    },
+    {
+      "ticket": "53",
+      "role": "pilot-state",
+      "phase": "gate",
+      "cases": [
+        "landed-runtime-at-B",
+        "actual-concurrent-C-D-E",
+        "per-seat-cleanup-and-retention",
+        "overview-through-pilot",
+        "final-capacity-scope-resource-refusals",
+        "prepilot-fixtures-at-B",
+        "refresh-fixtures-at-C"
+      ]
+    },
+    {
+      "ticket": "53",
+      "role": "pilot-state",
+      "phase": "post-landing",
+      "cases": [
+        "exact-pilot-E-state"
+      ]
+    },
+    {
+      "ticket": "53",
+      "role": "pilot-state",
+      "phase": "closure",
+      "cases": [
+        "final-independent-closeout"
+      ]
+    },
+    {
+      "ticket": "53",
+      "role": "metadata",
+      "phase": "gate",
+      "cases": [
+        "final-F-gate"
+      ]
+    },
+    {
+      "ticket": "53",
+      "role": "metadata",
+      "phase": "post-landing",
+      "cases": [
+        "final-F-landing"
+      ]
+    },
+    {
+      "ticket": "53",
+      "role": "metadata",
+      "phase": "closure",
+      "cases": [
+        "final-independent-closeout"
+      ]
+    }
+  ],
+  "coverage_is_future_proof_not_execution": true,
+  "pilot_manifest_structure": "pass, not executed",
+  "finding_dispositions": 64,
+  "review_provenance": [
+    {
+      "name": "rereview-2",
+      "source_commit": "d5ead21fb46ddef78bed8d8ac0f8b122ca1f0c01",
+      "verdict": "changes required",
+      "source_files": 22,
+      "raw_and_rendered_hashes_exact": true
+    },
+    {
+      "name": "rereview-3",
+      "source_commit": "f32a4965e682e972b61dacfb0ef60d40f4774ca4",
+      "verdict": "changes required (narrow)",
+      "source_files": 33,
+      "raw_and_rendered_hashes_exact": true
+    },
+    {
+      "name": "focused-review",
+      "source_commit": "deed4aadf4ec94516674710613473c30d9d88e59",
+      "verdict": "not PASS yet; B1 only",
+      "source_files": 6,
+      "raw_and_rendered_hashes_exact": true
+    },
+    {
+      "name": "role-check",
+      "source_commit": "ef0bee5a01787561dcdaa9d828832e17d7ed45f1",
+      "verdict": "PASS; no B1 blocker remains",
+      "source_files": 2,
+      "raw_and_rendered_hashes_exact": true
+    }
+  ],
+  "declared_dependency_graph": {
+    "49": [],
+    "50": [
+      "49"
+    ],
+    "51": [
+      "50"
+    ],
+    "52": [
+      "51"
+    ],
+    "53.0": [
+      "52"
+    ],
+    "54": [
+      "49",
+      "50",
+      "51",
+      "52",
+      "53.0"
+    ],
+    "53": [
+      "52",
+      "53.0",
+      "54"
+    ],
+    "53.A": [
+      "53.0",
+      "54"
+    ],
+    "53.B": [
+      "53.0",
+      "54"
+    ],
+    "44": [
+      "53"
+    ],
+    "45": [
+      "44"
+    ],
+    "46": [
+      "45"
+    ],
+    "47": [
+      "46"
+    ],
+    "48": [
+      "47"
+    ]
+  },
+  "declared_dependency_graph_acyclic": true,
+  "all19_blocked_source_hashes_exact": true,
+  "models_contract_and_research_index_exact": true,
+  "registry_scientific_content_exact_excluding_watcher_timestamp": true,
+  "protected_scientific_host_hash_rechecks": [
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/run.json",
+      "sha256": "96dc607ae8238774ca875588d65eaf463f120227e161ae792a9187c8e6635d7d",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/state.json",
+      "sha256": "dac2ce421243c4750175f98152cdc1ce4ecb7e1a493ddee7050c42fcc09e7765",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-00/checkpoint.pt",
+      "sha256": "8057a5496c4d6ec4d19b9de33034c6cca753ea39d8f03fd765ad7011cdf301ee",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-1000/checkpoint.pt",
+      "sha256": "37de2375b0b10f92a56468bd9ffe0b2fea42f257c5949efa80fd29c621a8ff4a",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-00-admitted.json",
+      "sha256": "dde09eb7e6d65e781597da82870ca6c64ea5bff1ea77d31b8b8268ec5a0ad364",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-1000-admitted.json",
+      "sha256": "b0a874b87a2541ab13b2a97e36540b458b54bb0996c6e679a8c156d0160f52d9",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/identity.json",
+      "sha256": "f2514b46aa6952662b35183df8db0ce9ec914b38640de2a1d24cfbf7bbe80e5d",
+      "exact_to_original": true
+    }
+  ],
+  "admission": "documentation fixes passed; written plan/current clean-base/process/resource/live gates remain open; no runtime implementation or dispatch",
+  "retention": "Git-only documentation after sealedHDFS113; no transfer, payload release or worktree removal"
+}

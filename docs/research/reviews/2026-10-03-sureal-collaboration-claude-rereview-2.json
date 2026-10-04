@@ -1,0 +1,40 @@
+{
+  "source_commit": "d5ead21fb46ddef78bed8d8ac0f8b122ca1f0c01",
+  "reported_models": [
+    "claude-fable-5-1"
+  ],
+  "session_id": "2130acf7-0f36-46b4-9f42-ffd60f3448bc",
+  "tools_enabled": [],
+  "request_sha256": "c3d74698ac29d7f731dffc896ac88ad789166934d849142689320efb0d34056b",
+  "response_sha256": "9fcf6b77862635bde2b0e6b1498df4906f701db923b5a32b071fb960019d5e16",
+  "review_body_sha256": "47e157d5a98a09a0250e176c392c1dc57fe0de0f7f5957670a7e3d5ab31ff7b6",
+  "source_files": {
+    "CONTEXT.md": "c5c06bc8eac525244e72e96dd9b583d0e368f87db3e1f491acc1e2e344696cdc",
+    "docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md": "831e2cc589a0a52d04ee10a53b503c92060e6223d4b80d7c5fdb5ed2dfe28914",
+    "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md": "016759635bb19de04e1d209c25916e08a138d5a9240797f95630139b83fd742e",
+    "docs/superpowers/specs/2026-10-03-codex-runtime-domain-design.md": "b249f898a7dab4a9ba92fbe810ed9f126d2593a37e25376f23871910b718a288",
+    "docs/superpowers/specs/2026-10-03-worker-session-state-design.md": "1729245934fabc06998fcc2beac5ff3a7ddf273b9ea13eb10e374f1a87ba4bb1",
+    "docs/research/task-queue.md": "2e27dad47c83cf01be5d8b64bd6f3a4cbe907df98548f33de3d0fe5ba5ac0c1c",
+    "docs/research/tasks/49-collaboration-project-admission.md": "cdc21bc22d2584bc7252ed790506255df46b2b38d0ddd2cf9c7b4147ead4e47f",
+    "docs/research/tasks/50-collaboration-worker-attempts.md": "1e7c56dd40156b5a84acaacab71011d4c5c27c52c5a81e1550c5678601ea4a1b",
+    "docs/research/tasks/51-collaboration-candidate-verification.md": "d6d9b0857456d8c5f618d85e24847b47452ea20a19808ebed3708c5a357543ed",
+    "docs/research/tasks/52-collaboration-landing-recovery.md": "90293f433f8fef7a177815387ce4ab9576eaa4b9bbec270bbd662b9818af9300",
+    "docs/research/tasks/53-0-collaboration-retention-cleanup-foundation.md": "61cc740644a22ba31927ad313848841a483fbeadc33c79e0f2a7d278ac67ea63",
+    "docs/research/tasks/54-worker-program-observability.md": "c42743e9fc9ceaf978c84ab63be1edbd486ae38f9e6bb3daf09d1a772092a1aa",
+    "docs/research/tasks/53-collaboration-cleanup-closeout.md": "87283dcc14f8c424df82dc016be73b452a30a24ff5d3c890a22989887d6bf127",
+    "docs/research/reviews/2026-10-03-sureal-collaboration-claude-review.md": "ce2e36b382150eee5878c3ed57ee70c9a44e30db148f48ebd59f0e8cfb948112",
+    "docs/research/reviews/2026-10-03-sureal-collaboration-review-resolution.md": "87ba54f5296be469366afd3b59f40ab8e5e98634fe8ff87b75a5891ddec96dcb",
+    "docs/collaboration/coverage.json": "b7c2024b8d897b020453ad79f6f8fd2f5206a1721890ad5505a04ce5a71ff625",
+    "docs/collaboration/checks/53.A.json": "d398d298a620719d2acc825c91568aef8c278aa83930daf943c1b54632c0cf6c",
+    "docs/collaboration/checks/53.B.json": "8e73b656da24d128c35c90da5dacbeb147ec49f50f5c65ed2fce997609eff527",
+    "experiments/waymo-perception/pipeline/insula_entry.py": "4ad731aff9057550db8a3c2d194f7b23a1447ef11b8f3d58ec7344f6132209b2",
+    "experiments/waymo-perception/resources/stage.py": "f8e8baf91d752185fd3f57ba27af3cec683540bcb0932275bdfcf4643f1d4ff9",
+    "experiments/waymo-perception/resources/command.py": "1a44bc70f62abe7ec48eea9dbf12c27b2b83816793d3ca1fc506bf22d938cc40",
+    "experiments/waymo-perception/resources/retention.py": "b9cc1380a45f064a57ef22c5ea2efd1b98384a21bf2017538307fd879dbbaf44"
+  },
+  "artifact_directory": "/data02/home/philip.yang/devx/tmp/sureal-collaboration-claude-rereview-20261004-yudqmyo0",
+  "verdict": "changes required",
+  "scope": "Documentation review only; remaining findings require triage and correction.",
+  "rendered_report_sha256": "e4cf49cdf7c42ef978a0bc2cd54eb89658a1c99433911ec3ff19176fcffb2b4e",
+  "rendering": "Trailing whitespace normalized in Markdown; raw review body and response artifacts unchanged."
+}

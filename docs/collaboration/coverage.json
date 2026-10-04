@@ -7,61 +7,163 @@
         "id": "exact-source-and-rootfs",
         "oracle": "Raw retained commit/tree/source bytes and rootfs/resource wrapper proofs independently match; actual Insula log/exit required.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/exact-source-and-rootfs/context.json",
+          "cases/exact-source-and-rootfs/actual-command.json",
+          "cases/exact-source-and-rootfs/execution.log",
+          "cases/exact-source-and-rootfs/independent-oracle.json",
+          "cases/exact-source-and-rootfs/git-objects-and-status.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "real-state-fs-durability",
         "oracle": "Host/mounted device identity matches actual configured state filesystem; lock contention and fsync boundary faults yield retained recovery or refusal.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/real-state-fs-durability/context.json",
+          "cases/real-state-fs-durability/actual-command.json",
+          "cases/real-state-fs-durability/execution.log",
+          "cases/real-state-fs-durability/independent-oracle.json",
+          "cases/real-state-fs-durability/fault-boundary-records.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "clean-ref-and-path-refusals",
         "oracle": "Raw Git refs/index/status/ignored/submodule facts show dirty/wrong-ref/unpinned/alias refusals caused no launch or ref mutation.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/clean-ref-and-path-refusals/context.json",
+          "cases/clean-ref-and-path-refusals/actual-command.json",
+          "cases/clean-ref-and-path-refusals/execution.log",
+          "cases/clean-ref-and-path-refusals/independent-oracle.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "journal-corruption",
         "oracle": "Torn trailing evidence diagnosed; earlier corruption/input-digest mismatch blocks mutation; failed fsync never projects success.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/journal-corruption/context.json",
+          "cases/journal-corruption/actual-command.json",
+          "cases/journal-corruption/execution.log",
+          "cases/journal-corruption/independent-oracle.json",
+          "cases/journal-corruption/fault-boundary-records.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "queue-bootstrap-revision-status",
-        "oracle": "Actual manual bootstrap/import/map M/closure readbacks resolve one project and issue UID per task; old running brief stays pinned; status has no control effects.",
+        "oracle": "Actual real-project manual bootstrap/init/import binding and independently gated/landed map M readbacks resolve one project/issue UID per task; sourceX and mapM pins accepted; actual49 Kata close/readback records closure. Running-brief/idempotency checks are separately gate-phase fixtures.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/queue-bootstrap-revision-status/bootstrap-manual-intent.json",
+          "cases/queue-bootstrap-revision-status/project-readback.json",
+          "cases/queue-bootstrap-revision-status/map-M-context.json",
+          "cases/queue-bootstrap-revision-status/M-gate-audit.json",
+          "cases/queue-bootstrap-revision-status/M-landing-readback.json",
+          "cases/queue-bootstrap-revision-status/kata-close-event.json",
+          "cases/queue-bootstrap-revision-status/closure-manifest.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "closure",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "scoped-queue-restore",
         "oracle": "Project-only actual export imported into fresh fixture DB; independently reopened projects/issues/edges contain no foreign rows.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/scoped-queue-restore/context.json",
+          "cases/scoped-queue-restore/actual-command.json",
+          "cases/scoped-queue-restore/execution.log",
+          "cases/scoped-queue-restore/independent-oracle.json",
+          "cases/scoped-queue-restore/kata-readback.json",
+          "cases/scoped-queue-restore/git-objects-and-status.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
+      },
+      {
+        "id": "exact-stage-landing",
+        "phase": "post-landing",
+        "candidate_roles": [
+          "implementation"
+        ],
+        "oracle": "Independently reopen exact accepted X/current-stage candidate, sole parent, canonical ref/HEAD/tree/index/tracked/untracked/ignored disposition and configured remote; exact fast-forward, no rewrite.",
+        "required_raw_evidence": [
+          "cases/exact-stage-landing/candidate-context.json",
+          "cases/exact-stage-landing/accepted-gate-audit.json",
+          "cases/exact-stage-landing/prepared-landing.json",
+          "cases/exact-stage-landing/git-objects-and-status.json",
+          "cases/exact-stage-landing/publication-readback.json"
+        ],
+        "absence": "refuse closure"
+      },
+      {
+        "id": "fixture-import-revision-status",
+        "phase": "gate",
+        "candidate_roles": [
+          "implementation"
+        ],
+        "oracle": "Actual owned fixture import idempotency/revision/old-brief pinning and read-only status assertions before any real-project writes.",
+        "required_raw_evidence": [
+          "cases/fixture-import-revision-status/candidate-role-context.json",
+          "cases/fixture-import-revision-status/actual-command.json",
+          "cases/fixture-import-revision-status/oracle-inputs.json",
+          "cases/fixture-import-revision-status/independent-oracle.json",
+          "cases/fixture-import-revision-status/raw-state-readback.json"
+        ],
+        "absence": "refuse matching phase acceptance"
+      },
+      {
+        "id": "map-M-gate",
+        "phase": "gate",
+        "candidate_roles": [
+          "metadata"
+        ],
+        "oracle": "M has sole parent current clean bootstrap base; diff limited to .kata.toml/.gitignore binding line/docs/research/kata-task-map.json; task/spec/plan blob pins and issue UID/project/dependency readbacks match; no mutable queue owners/status in Git.",
+        "required_raw_evidence": [
+          "cases/map-M-gate/candidate-role-context.json",
+          "cases/map-M-gate/actual-command.json",
+          "cases/map-M-gate/oracle-inputs.json",
+          "cases/map-M-gate/independent-oracle.json",
+          "cases/map-M-gate/raw-state-readback.json"
+        ],
+        "absence": "refuse matching phase acceptance"
+      },
+      {
+        "id": "map-M-landing",
+        "phase": "post-landing",
+        "candidate_roles": [
+          "metadata"
+        ],
+        "oracle": "Actual canonical ref/HEAD/tree/index/working state equals exact independently gated M; codeX retained/ancestor identity and actual binding/map readback match.",
+        "required_raw_evidence": [
+          "cases/map-M-landing/candidate-role-context.json",
+          "cases/map-M-landing/actual-command.json",
+          "cases/map-M-landing/oracle-inputs.json",
+          "cases/map-M-landing/independent-oracle.json",
+          "cases/map-M-landing/raw-state-readback.json"
+        ],
+        "absence": "refuse matching phase acceptance"
       }
     ],
     "50": [
@@ -69,71 +171,220 @@
         "id": "two-real-workers-overlap",
         "oracle": "Actual exact-thread in-progress/tool intervals overlap at B; distinct worktrees/branches/owned outputs and matching Kata actors/acks.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/two-real-workers-overlap/context.json",
+          "cases/two-real-workers-overlap/actual-command.json",
+          "cases/two-real-workers-overlap/execution.log",
+          "cases/two-real-workers-overlap/independent-oracle.json",
+          "cases/two-real-workers-overlap/kata-readback.json",
+          "cases/two-real-workers-overlap/native-thread-items.json",
+          "cases/two-real-workers-overlap/process-incarnations.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "dispatch-effect-boundaries",
         "oracle": "Distinct reserve/claim/CAS/thread/CAS-with-thread/turn/ack prepared/result records and real readbacks; ack loss produces no duplicate launch.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/dispatch-effect-boundaries/context.json",
+          "cases/dispatch-effect-boundaries/actual-command.json",
+          "cases/dispatch-effect-boundaries/execution.log",
+          "cases/dispatch-effect-boundaries/independent-oracle.json",
+          "cases/dispatch-effect-boundaries/kata-readback.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "capacity-scope-resource-refusal",
         "oracle": "Third/duplicate/ancestry/alias/output conflict refusals; exact admitted scientific lock wiring and noninvasive real-lock probe plus fixture contention.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/capacity-scope-resource-refusal/context.json",
+          "cases/capacity-scope-resource-refusal/actual-command.json",
+          "cases/capacity-scope-resource-refusal/execution.log",
+          "cases/capacity-scope-resource-refusal/independent-oracle.json",
+          "cases/capacity-scope-resource-refusal/git-objects-and-status.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "identity-and-reports",
         "oracle": "Public exact thread/turn/item report digests reject right-session wrong-thread/fork history/generation/PID reuse; completed turn keeps ownership.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/identity-and-reports/context.json",
+          "cases/identity-and-reports/actual-command.json",
+          "cases/identity-and-reports/execution.log",
+          "cases/identity-and-reports/independent-oracle.json",
+          "cases/identity-and-reports/native-thread-items.json",
+          "cases/identity-and-reports/process-incarnations.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "stop-takeover",
         "oracle": "Two actual goal/queue/turn/process observations show quiescence before retirement/new owner; unreadable/continuing effects refuse; original work retained.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/stop-takeover/context.json",
+          "cases/stop-takeover/actual-command.json",
+          "cases/stop-takeover/execution.log",
+          "cases/stop-takeover/independent-oracle.json",
+          "cases/stop-takeover/native-thread-items.json",
+          "cases/stop-takeover/process-incarnations.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "transport-lost-thread",
         "oracle": "Actual disconnect/approval/supervisor behavior retained; cwd/provenance readback recovers sole lost-ack thread or holds UNKNOWN; no speculative retry.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/transport-lost-thread/context.json",
+          "cases/transport-lost-thread/actual-command.json",
+          "cases/transport-lost-thread/execution.log",
+          "cases/transport-lost-thread/independent-oracle.json",
+          "cases/transport-lost-thread/native-thread-items.json",
+          "cases/transport-lost-thread/process-incarnations.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "live-worker-namespace",
         "oracle": "Both actual workers invoke Insula probes with recorded grants/resource/runtime proofs; host access is not claimed sandboxed.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/live-worker-namespace/context.json",
+          "cases/live-worker-namespace/actual-command.json",
+          "cases/live-worker-namespace/execution.log",
+          "cases/live-worker-namespace/independent-oracle.json",
+          "cases/live-worker-namespace/kata-readback.json",
+          "cases/live-worker-namespace/native-thread-items.json",
+          "cases/live-worker-namespace/process-incarnations.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
+      },
+      {
+        "id": "worktree-index-and-mainline-guard",
+        "phase": "gate",
+        "oracle": "Actual distinct index/HEAD/files and shared-ref/common-dir identities reopened; worker canonical-mainline guard refuses unauthorized write.",
+        "required_raw_evidence": [
+          "cases/worktree-index-and-mainline-guard/context.json",
+          "cases/worktree-index-and-mainline-guard/actual-command.json",
+          "cases/worktree-index-and-mainline-guard/execution.log",
+          "cases/worktree-index-and-mainline-guard/independent-oracle.json",
+          "cases/worktree-index-and-mainline-guard/native-thread-items.json",
+          "cases/worktree-index-and-mainline-guard/kata-readback.json",
+          "cases/worktree-index-and-mainline-guard/git-objects-and-status.json"
+        ],
+        "absence": "refuse acceptance",
+        "candidate_roles": [
+          "all"
+        ]
+      },
+      {
+        "id": "multi-turn-resume-and-fork",
+        "phase": "gate",
+        "oracle": "Actual same-claim continuation/resume across completed turns; old-generation continue refused; explicit fixture fork session grouping and inherited-item attribution checked.",
+        "required_raw_evidence": [
+          "cases/multi-turn-resume-and-fork/context.json",
+          "cases/multi-turn-resume-and-fork/actual-command.json",
+          "cases/multi-turn-resume-and-fork/execution.log",
+          "cases/multi-turn-resume-and-fork/independent-oracle.json",
+          "cases/multi-turn-resume-and-fork/native-thread-items.json",
+          "cases/multi-turn-resume-and-fork/kata-readback.json",
+          "cases/multi-turn-resume-and-fork/git-objects-and-status.json"
+        ],
+        "absence": "refuse acceptance",
+        "candidate_roles": [
+          "all"
+        ]
+      },
+      {
+        "id": "exact-stage-landing",
+        "phase": "post-landing",
+        "candidate_roles": [
+          "implementation"
+        ],
+        "oracle": "Independently reopen exact accepted X/current-stage candidate, sole parent, canonical ref/HEAD/tree/index/tracked/untracked/ignored disposition and configured remote; exact fast-forward, no rewrite.",
+        "required_raw_evidence": [
+          "cases/exact-stage-landing/candidate-context.json",
+          "cases/exact-stage-landing/accepted-gate-audit.json",
+          "cases/exact-stage-landing/prepared-landing.json",
+          "cases/exact-stage-landing/git-objects-and-status.json",
+          "cases/exact-stage-landing/publication-readback.json"
+        ],
+        "absence": "refuse closure"
+      },
+      {
+        "id": "evidence-backed-stage-close",
+        "phase": "closure",
+        "candidate_roles": [
+          "all"
+        ],
+        "oracle": "Actual Kata close event/readback binds this task/spec/issue UID to accepted gate/post-landing and required retention evidence; terminal queue effect observed, no closure from worker assertion.",
+        "required_raw_evidence": [
+          "cases/evidence-backed-stage-close/pre-close-acceptance.json",
+          "cases/evidence-backed-stage-close/prepared-close.json",
+          "cases/evidence-backed-stage-close/kata-close-event.json",
+          "cases/evidence-backed-stage-close/kata-readback.json",
+          "cases/evidence-backed-stage-close/closure-manifest.json"
+        ],
+        "absence": "refuse next-stage admission"
+      },
+      {
+        "id": "stop-capability-before-first-claim",
+        "phase": "gate",
+        "candidate_roles": [
+          "implementation"
+        ],
+        "oracle": "Explicitly authorized lead-owned non-managed stop-capability fixture proves terminal turn/all tool items, native goal absent, empty queue, twice-observed complete process/scope quiescence. Independent timestamps/event sequence place its accepted receipt before first managed claim intent; failure blocks50 before implementation/dispatch.",
+        "required_raw_evidence": [
+          "cases/stop-capability-before-first-claim/candidate-role-context.json",
+          "cases/stop-capability-before-first-claim/actual-command.json",
+          "cases/stop-capability-before-first-claim/oracle-inputs.json",
+          "cases/stop-capability-before-first-claim/independent-oracle.json",
+          "cases/stop-capability-before-first-claim/raw-state-readback.json"
+        ],
+        "absence": "refuse matching phase acceptance"
+      },
+      {
+        "id": "explicit-refresh",
+        "phase": "gate",
+        "candidate_roles": [
+          "implementation"
+        ],
+        "oracle": "Actual old attempt retained/stopped/retired; new admitted base/claim/thread/worktree acknowledge; former evidence cannot authorize refreshed candidate; takeover retires only, replacement uses start.",
+        "required_raw_evidence": [
+          "cases/explicit-refresh/candidate-role-context.json",
+          "cases/explicit-refresh/actual-command.json",
+          "cases/explicit-refresh/oracle-inputs.json",
+          "cases/explicit-refresh/independent-oracle.json",
+          "cases/explicit-refresh/raw-state-readback.json"
+        ],
+        "absence": "refuse matching phase acceptance"
       }
     ],
     "51": [
@@ -141,41 +392,98 @@
         "id": "candidate-refusals",
         "oracle": "Real Git zero/multiple/merge/dirty/wrong-parent/task/context candidates refused; no acceptance effect.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/candidate-refusals/context.json",
+          "cases/candidate-refusals/actual-command.json",
+          "cases/candidate-refusals/execution.log",
+          "cases/candidate-refusals/independent-oracle.json",
+          "cases/candidate-refusals/git-objects-and-status.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "materialization-fidelity",
         "oracle": "Independent raw blob/mode/symlink/gitlink-aware tree reconstruction equals exact retained C before/after; no mutable leftovers enter inputs.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/materialization-fidelity/context.json",
+          "cases/materialization-fidelity/actual-command.json",
+          "cases/materialization-fidelity/execution.log",
+          "cases/materialization-fidelity/independent-oracle.json",
+          "cases/materialization-fidelity/git-objects-and-status.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "retention-and-isolation",
         "oracle": "Retained C survives branch amendment/owned fixture removal; independent candidate check runs while other actual worker stays active and unchanged.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/retention-and-isolation/context.json",
+          "cases/retention-and-isolation/actual-command.json",
+          "cases/retention-and-isolation/execution.log",
+          "cases/retention-and-isolation/independent-oracle.json",
+          "cases/retention-and-isolation/git-objects-and-status.json",
+          "cases/retention-and-isolation/fresh-readback-inventory.json",
+          "cases/retention-and-isolation/archive-live-resource-proof.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "repair-context",
         "oracle": "C1 preserved; live repair or fresh terminal-attempt repair produces new C2 with fresh exact-context live proof; swapped evidence refuses.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/repair-context/context.json",
+          "cases/repair-context/actual-command.json",
+          "cases/repair-context/execution.log",
+          "cases/repair-context/independent-oracle.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
+      },
+      {
+        "id": "exact-stage-landing",
+        "phase": "post-landing",
+        "candidate_roles": [
+          "implementation"
+        ],
+        "oracle": "Independently reopen exact accepted X/current-stage candidate, sole parent, canonical ref/HEAD/tree/index/tracked/untracked/ignored disposition and configured remote; exact fast-forward, no rewrite.",
+        "required_raw_evidence": [
+          "cases/exact-stage-landing/candidate-context.json",
+          "cases/exact-stage-landing/accepted-gate-audit.json",
+          "cases/exact-stage-landing/prepared-landing.json",
+          "cases/exact-stage-landing/git-objects-and-status.json",
+          "cases/exact-stage-landing/publication-readback.json"
+        ],
+        "absence": "refuse closure"
+      },
+      {
+        "id": "evidence-backed-stage-close",
+        "phase": "closure",
+        "candidate_roles": [
+          "all"
+        ],
+        "oracle": "Actual Kata close event/readback binds this task/spec/issue UID to accepted gate/post-landing and required retention evidence; terminal queue effect observed, no closure from worker assertion.",
+        "required_raw_evidence": [
+          "cases/evidence-backed-stage-close/pre-close-acceptance.json",
+          "cases/evidence-backed-stage-close/prepared-close.json",
+          "cases/evidence-backed-stage-close/kata-close-event.json",
+          "cases/evidence-backed-stage-close/kata-readback.json",
+          "cases/evidence-backed-stage-close/closure-manifest.json"
+        ],
+        "absence": "refuse next-stage admission"
       }
     ],
     "52": [
@@ -183,51 +491,110 @@
         "id": "exact-landing",
         "oracle": "Raw HEAD/tree/index/working/ignored facts prove exact clean B to reviewed C fast-forward; stale/dirty/wrong evidence refuses.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/exact-landing/context.json",
+          "cases/exact-landing/actual-command.json",
+          "cases/exact-landing/execution.log",
+          "cases/exact-landing/independent-oracle.json",
+          "cases/exact-landing/git-objects-and-status.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "all-created-effect-recovery",
         "oracle": "Actual-state reconciliation covers claim/CAS/worktree/thread/turn/candidate/verifier/integration/publication/closure boundaries; no blind repeat.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/all-created-effect-recovery/context.json",
+          "cases/all-created-effect-recovery/actual-command.json",
+          "cases/all-created-effect-recovery/execution.log",
+          "cases/all-created-effect-recovery/independent-oracle.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "B-C-neither-interruption",
         "oracle": "Faults around effect/result: B pending, C reconciled, neither blocks; unchanged unrelated active seat remains safe.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/B-C-neither-interruption/context.json",
+          "cases/B-C-neither-interruption/actual-command.json",
+          "cases/B-C-neither-interruption/execution.log",
+          "cases/B-C-neither-interruption/independent-oracle.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "remote-ack",
         "oracle": "Owned actual bare remote readback after lost ack proves exact C refspec publication or retained divergence; no force/rewrite.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/remote-ack/context.json",
+          "cases/remote-ack/actual-command.json",
+          "cases/remote-ack/execution.log",
+          "cases/remote-ack/independent-oracle.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "evidence-backed-close",
         "oracle": "Installed actual Kata close/readback occurs only after independent required scope accepted; landing/publication/cleanup remain separate facts.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/evidence-backed-close/context.json",
+          "cases/evidence-backed-close/actual-command.json",
+          "cases/evidence-backed-close/execution.log",
+          "cases/evidence-backed-close/independent-oracle.json",
+          "cases/evidence-backed-close/kata-readback.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
+      },
+      {
+        "id": "exact-stage-landing",
+        "phase": "post-landing",
+        "candidate_roles": [
+          "implementation"
+        ],
+        "oracle": "Independently reopen exact accepted X/current-stage candidate, sole parent, canonical ref/HEAD/tree/index/tracked/untracked/ignored disposition and configured remote; exact fast-forward, no rewrite.",
+        "required_raw_evidence": [
+          "cases/exact-stage-landing/candidate-context.json",
+          "cases/exact-stage-landing/accepted-gate-audit.json",
+          "cases/exact-stage-landing/prepared-landing.json",
+          "cases/exact-stage-landing/git-objects-and-status.json",
+          "cases/exact-stage-landing/publication-readback.json"
+        ],
+        "absence": "refuse closure"
+      },
+      {
+        "id": "evidence-backed-stage-close",
+        "phase": "closure",
+        "candidate_roles": [
+          "all"
+        ],
+        "oracle": "Actual Kata close event/readback binds this task/spec/issue UID to accepted gate/post-landing and required retention evidence; terminal queue effect observed, no closure from worker assertion.",
+        "required_raw_evidence": [
+          "cases/evidence-backed-stage-close/pre-close-acceptance.json",
+          "cases/evidence-backed-stage-close/prepared-close.json",
+          "cases/evidence-backed-stage-close/kata-close-event.json",
+          "cases/evidence-backed-stage-close/kata-readback.json",
+          "cases/evidence-backed-stage-close/closure-manifest.json"
+        ],
+        "absence": "refuse next-stage admission"
       }
     ],
     "53.0": [
@@ -235,61 +602,114 @@
         "id": "cleanup-refusal-and-recovery",
         "oracle": "Canonical/foreign/symlink/live/unknown removal refuses; interrupted cleanup remains pending until stopped/owned/retained readback.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/cleanup-refusal-and-recovery/context.json",
+          "cases/cleanup-refusal-and-recovery/actual-command.json",
+          "cases/cleanup-refusal-and-recovery/execution.log",
+          "cases/cleanup-refusal-and-recovery/independent-oracle.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "work-and-other-seat-retention",
         "oracle": "Unsubmitted bytes/candidates/raw evidence retained; removing one stopped owned worktree preserves common refs and another actual active worker.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/work-and-other-seat-retention/context.json",
+          "cases/work-and-other-seat-retention/actual-command.json",
+          "cases/work-and-other-seat-retention/execution.log",
+          "cases/work-and-other-seat-retention/independent-oracle.json",
+          "cases/work-and-other-seat-retention/git-objects-and-status.json",
+          "cases/work-and-other-seat-retention/fresh-readback-inventory.json",
+          "cases/work-and-other-seat-retention/archive-live-resource-proof.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "fresh-hdfs-and-live-rehydration",
         "oracle": "Pinned host Waystone PUT/LS/fresh GET hashes plus actual Insula archive verify/rehydrate and independent exact union; lost ack does not overwrite.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/fresh-hdfs-and-live-rehydration/context.json",
+          "cases/fresh-hdfs-and-live-rehydration/actual-command.json",
+          "cases/fresh-hdfs-and-live-rehydration/execution.log",
+          "cases/fresh-hdfs-and-live-rehydration/independent-oracle.json",
+          "cases/fresh-hdfs-and-live-rehydration/fresh-readback-inventory.json",
+          "cases/fresh-hdfs-and-live-rehydration/archive-live-resource-proof.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "queue-export-restore",
         "oracle": "Actual project-only export/restored fresh DB reconciles exact queue/owner/dependency identities; no shared daemon overwrite.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/queue-export-restore/context.json",
+          "cases/queue-export-restore/actual-command.json",
+          "cases/queue-export-restore/execution.log",
+          "cases/queue-export-restore/independent-oracle.json",
+          "cases/queue-export-restore/kata-readback.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "pilot-check-contract",
         "oracle": "Both precommitted manifests have implemented parser/link/secret/effect/raw-readback oracles; no extra model workers or historical-as-new handoff claim.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/pilot-check-contract/context.json",
+          "cases/pilot-check-contract/actual-command.json",
+          "cases/pilot-check-contract/execution.log",
+          "cases/pilot-check-contract/independent-oracle.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "landed-foundation",
         "oracle": "Exact independently verified foundation X landed before54/pilot base; no full program admission claim.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/landed-foundation/context.json",
+          "cases/landed-foundation/actual-command.json",
+          "cases/landed-foundation/execution.log",
+          "cases/landed-foundation/independent-oracle.json",
+          "cases/landed-foundation/git-objects-and-status.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "post-landing",
+        "candidate_roles": [
+          "implementation"
+        ]
+      },
+      {
+        "id": "evidence-backed-stage-close",
+        "phase": "closure",
+        "candidate_roles": [
+          "all"
+        ],
+        "oracle": "Actual Kata close event/readback binds this task/spec/issue UID to accepted gate/post-landing and required retention evidence; terminal queue effect observed, no closure from worker assertion.",
+        "required_raw_evidence": [
+          "cases/evidence-backed-stage-close/pre-close-acceptance.json",
+          "cases/evidence-backed-stage-close/prepared-close.json",
+          "cases/evidence-backed-stage-close/kata-close-event.json",
+          "cases/evidence-backed-stage-close/kata-readback.json",
+          "cases/evidence-backed-stage-close/closure-manifest.json"
+        ],
+        "absence": "refuse next-stage admission"
       }
     ],
     "54": [
@@ -297,61 +717,152 @@
         "id": "actual-two-worker-mapping",
         "oracle": "Independent live Kata/Codex/Git/receipt reopen proves both cards and issue/spec/thread/turn/attempt/worktree identities during overlap.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/actual-two-worker-mapping/context.json",
+          "cases/actual-two-worker-mapping/actual-command.json",
+          "cases/actual-two-worker-mapping/execution.log",
+          "cases/actual-two-worker-mapping/independent-oracle.json",
+          "cases/actual-two-worker-mapping/kata-readback.json",
+          "cases/actual-two-worker-mapping/native-thread-items.json",
+          "cases/actual-two-worker-mapping/process-incarnations.json",
+          "cases/actual-two-worker-mapping/snapshot-browser-cli-pair.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "submit-refresh-cleanup-display",
         "oracle": "Actual submitted C/D, stale refresh and53.0 per-seat cleanup transitions match cards/state graphs; other worker remains active.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/submit-refresh-cleanup-display/context.json",
+          "cases/submit-refresh-cleanup-display/actual-command.json",
+          "cases/submit-refresh-cleanup-display/execution.log",
+          "cases/submit-refresh-cleanup-display/independent-oracle.json",
+          "cases/submit-refresh-cleanup-display/snapshot-browser-cli-pair.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "trace-and-summary",
         "oracle": "Public anchors verify actions/failure/correction/finding/wait/next step; <=120words, observed/reported/inferred labels, no private or raw-secret body.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/trace-and-summary/context.json",
+          "cases/trace-and-summary/actual-command.json",
+          "cases/trace-and-summary/execution.log",
+          "cases/trace-and-summary/independent-oracle.json",
+          "cases/trace-and-summary/native-thread-items.json",
+          "cases/trace-and-summary/process-incarnations.json",
+          "cases/trace-and-summary/snapshot-browser-cli-pair.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "history-gaps-identities",
         "oracle": "Wrong thread/fork/PID/generation, duplicate/out-of-order/paginated/compacted/reconnect sources do not invent progress; gaps remain explicit.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/history-gaps-identities/context.json",
+          "cases/history-gaps-identities/actual-command.json",
+          "cases/history-gaps-identities/execution.log",
+          "cases/history-gaps-identities/independent-oracle.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "phase-health-native-goals",
         "oracle": "Actual owned repetitive/stalled operations and separately authorized pause/block/limit/goal fixtures show native/operating/health distinctions; clocks in deterministic tests labeled.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/phase-health-native-goals/context.json",
+          "cases/phase-health-native-goals/actual-command.json",
+          "cases/phase-health-native-goals/execution.log",
+          "cases/phase-health-native-goals/independent-oracle.json",
+          "cases/phase-health-native-goals/native-thread-items.json",
+          "cases/phase-health-native-goals/process-incarnations.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
       },
       {
         "id": "refresh-outage-and-no-control",
         "oracle": "Measured live5sec view/15sec staleness, independent source2sec timeouts/restart/browser-CLI agreement; observer issues no mutation calls.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/refresh-outage-and-no-control/context.json",
+          "cases/refresh-outage-and-no-control/actual-command.json",
+          "cases/refresh-outage-and-no-control/execution.log",
+          "cases/refresh-outage-and-no-control/independent-oracle.json",
+          "cases/refresh-outage-and-no-control/snapshot-browser-cli-pair.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "all"
+        ]
+      },
+      {
+        "id": "long-job-and-idle-continuation",
+        "phase": "gate",
+        "oracle": "Declared healthy long-job artifact/heartbeat progress preserves actual budget; idle bounded-turn gap retains ownership and only explicit same-generation continue starts another turn.",
+        "required_raw_evidence": [
+          "cases/long-job-and-idle-continuation/context.json",
+          "cases/long-job-and-idle-continuation/actual-command.json",
+          "cases/long-job-and-idle-continuation/execution.log",
+          "cases/long-job-and-idle-continuation/independent-oracle.json",
+          "cases/long-job-and-idle-continuation/native-thread-items.json",
+          "cases/long-job-and-idle-continuation/kata-readback.json",
+          "cases/long-job-and-idle-continuation/git-objects-and-status.json"
+        ],
+        "absence": "refuse acceptance",
+        "candidate_roles": [
+          "all"
+        ]
+      },
+      {
+        "id": "exact-stage-landing",
+        "phase": "post-landing",
+        "candidate_roles": [
+          "implementation"
+        ],
+        "oracle": "Independently reopen exact accepted X/current-stage candidate, sole parent, canonical ref/HEAD/tree/index/tracked/untracked/ignored disposition and configured remote; exact fast-forward, no rewrite.",
+        "required_raw_evidence": [
+          "cases/exact-stage-landing/candidate-context.json",
+          "cases/exact-stage-landing/accepted-gate-audit.json",
+          "cases/exact-stage-landing/prepared-landing.json",
+          "cases/exact-stage-landing/git-objects-and-status.json",
+          "cases/exact-stage-landing/publication-readback.json"
+        ],
+        "absence": "refuse closure"
+      },
+      {
+        "id": "evidence-backed-stage-close",
+        "phase": "closure",
+        "candidate_roles": [
+          "all"
+        ],
+        "oracle": "Actual Kata close event/readback binds this task/spec/issue UID to accepted gate/post-landing and required retention evidence; terminal queue effect observed, no closure from worker assertion.",
+        "required_raw_evidence": [
+          "cases/evidence-backed-stage-close/pre-close-acceptance.json",
+          "cases/evidence-backed-stage-close/prepared-close.json",
+          "cases/evidence-backed-stage-close/kata-close-event.json",
+          "cases/evidence-backed-stage-close/kata-readback.json",
+          "cases/evidence-backed-stage-close/closure-manifest.json"
+        ],
+        "absence": "refuse next-stage admission"
       }
     ],
     "53": [
@@ -359,52 +870,206 @@
         "id": "landed-runtime-at-B",
         "oracle": "Complete independently accepted runtime through53.0/54 and pinned pilot checks exists on clean canonical B before dispatch.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/landed-runtime-at-B/context.json",
+          "cases/landed-runtime-at-B/actual-command.json",
+          "cases/landed-runtime-at-B/execution.log",
+          "cases/landed-runtime-at-B/independent-oracle.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "pilot-state"
+        ]
       },
       {
         "id": "actual-concurrent-C-D-E",
         "oracle": "Two actual53.A/53.B workers overlap at B; C lands exact; D retained/refused stale; new claim/thread/worktree at C produces separately verified E.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/actual-concurrent-C-D-E/context.json",
+          "cases/actual-concurrent-C-D-E/actual-command.json",
+          "cases/actual-concurrent-C-D-E/execution.log",
+          "cases/actual-concurrent-C-D-E/independent-oracle.json",
+          "cases/actual-concurrent-C-D-E/git-objects-and-status.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "pilot-state"
+        ]
       },
       {
         "id": "per-seat-cleanup-and-retention",
         "oracle": "Actual other-seat unchanged cleanup, closure/publication recovery and fresh retained HDFS/queue readbacks survive final pilot.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/per-seat-cleanup-and-retention/context.json",
+          "cases/per-seat-cleanup-and-retention/actual-command.json",
+          "cases/per-seat-cleanup-and-retention/execution.log",
+          "cases/per-seat-cleanup-and-retention/independent-oracle.json",
+          "cases/per-seat-cleanup-and-retention/git-objects-and-status.json",
+          "cases/per-seat-cleanup-and-retention/fresh-readback-inventory.json",
+          "cases/per-seat-cleanup-and-retention/archive-live-resource-proof.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "pilot-state"
+        ]
       },
       {
         "id": "overview-through-pilot",
         "oracle": "Independent public snapshots/anchors explain both workers, waits/submissions/stale refresh/cleanup and queue/spec outcomes.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/overview-through-pilot/context.json",
+          "cases/overview-through-pilot/actual-command.json",
+          "cases/overview-through-pilot/execution.log",
+          "cases/overview-through-pilot/independent-oracle.json",
+          "cases/overview-through-pilot/snapshot-browser-cli-pair.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "gate",
+        "candidate_roles": [
+          "pilot-state"
+        ]
       },
       {
         "id": "final-independent-closeout",
-        "oracle": "All required49-54/53.0 raw receipts reopen; exact final F parent E independently checks manifests/source then lands; no scientific quality claim.",
+        "oracle": "All prior stage gate/post/closure raw receipts reopen; final F accepted and exact-landed; final53 Kata close/readback reconciled. This phase runs after its close effect, never as a precondition for that same effect.",
         "required_raw_evidence": [
-          "source-context",
-          "actual-argv-exit-log",
-          "independent-readback"
+          "cases/final-independent-closeout/context.json",
+          "cases/final-independent-closeout/actual-command.json",
+          "cases/final-independent-closeout/execution.log",
+          "cases/final-independent-closeout/independent-oracle.json",
+          "cases/final-independent-closeout/kata-readback.json",
+          "cases/final-independent-closeout/git-objects-and-status.json"
         ],
-        "absence": "refuse acceptance"
+        "absence": "refuse acceptance",
+        "phase": "closure",
+        "candidate_roles": [
+          "all"
+        ]
+      },
+      {
+        "id": "final-capacity-scope-resource-refusals",
+        "phase": "gate",
+        "oracle": "Actual final pilot third-start/duplicate/scope refusals, exact-lock fixture contention and read-only real scientific lock wiring proof; no scientific lock acquisition.",
+        "required_raw_evidence": [
+          "cases/final-capacity-scope-resource-refusals/context.json",
+          "cases/final-capacity-scope-resource-refusals/actual-command.json",
+          "cases/final-capacity-scope-resource-refusals/execution.log",
+          "cases/final-capacity-scope-resource-refusals/independent-oracle.json",
+          "cases/final-capacity-scope-resource-refusals/native-thread-items.json",
+          "cases/final-capacity-scope-resource-refusals/kata-readback.json",
+          "cases/final-capacity-scope-resource-refusals/git-objects-and-status.json"
+        ],
+        "absence": "refuse acceptance",
+        "candidate_roles": [
+          "pilot-state"
+        ]
+      },
+      {
+        "id": "final-F-landing",
+        "phase": "post-landing",
+        "oracle": "Lead-owned F in docs/collaboration/evidence/53 has parent E and exact fresh source verification; manual exact landing/ref/tree/worktree readback matches F. No input to earlier C/D/E gate.",
+        "required_raw_evidence": [
+          "cases/final-F-landing/owner-and-worktree.json",
+          "cases/final-F-landing/F-gate-audit.json",
+          "cases/final-F-landing/git-objects-and-status.json",
+          "cases/final-F-landing/landing-readback.json"
+        ],
+        "absence": "refuse closure",
+        "candidate_roles": [
+          "metadata"
+        ]
+      },
+      {
+        "id": "prepilot-fixtures-at-B",
+        "phase": "gate",
+        "candidate_roles": [
+          "pilot-state"
+        ],
+        "oracle": "Actual independently audited exact-B example receipts precede both pilot launch claims; all preflight worker tools/processes quiescent before pilot dispatch.",
+        "required_raw_evidence": [
+          "cases/prepilot-fixtures-at-B/candidate-role-context.json",
+          "cases/prepilot-fixtures-at-B/actual-command.json",
+          "cases/prepilot-fixtures-at-B/oracle-inputs.json",
+          "cases/prepilot-fixtures-at-B/independent-oracle.json",
+          "cases/prepilot-fixtures-at-B/raw-state-readback.json"
+        ],
+        "absence": "refuse matching phase acceptance"
+      },
+      {
+        "id": "refresh-fixtures-at-C",
+        "phase": "gate",
+        "candidate_roles": [
+          "pilot-state"
+        ],
+        "oracle": "Actual newly audited C-base example receipts after old attempt stop and before E worker launch; no D fixture/evidence inherited; capacity2 test budget respected.",
+        "required_raw_evidence": [
+          "cases/refresh-fixtures-at-C/candidate-role-context.json",
+          "cases/refresh-fixtures-at-C/actual-command.json",
+          "cases/refresh-fixtures-at-C/oracle-inputs.json",
+          "cases/refresh-fixtures-at-C/independent-oracle.json",
+          "cases/refresh-fixtures-at-C/raw-state-readback.json"
+        ],
+        "absence": "refuse matching phase acceptance"
+      },
+      {
+        "id": "final-F-gate",
+        "phase": "gate",
+        "candidate_roles": [
+          "metadata"
+        ],
+        "oracle": "Lead-owned F has sole parent exact E; diff only docs/collaboration/evidence/53/; every immutable C/D/E/source/runtime/fixture/phase receipt reference digest independently reopened; final JSON contains no self-referential F hash or new scientific claim. F source materialization exact.",
+        "required_raw_evidence": [
+          "cases/final-F-gate/candidate-role-context.json",
+          "cases/final-F-gate/actual-command.json",
+          "cases/final-F-gate/oracle-inputs.json",
+          "cases/final-F-gate/independent-oracle.json",
+          "cases/final-F-gate/raw-state-readback.json"
+        ],
+        "absence": "refuse matching phase acceptance"
+      },
+      {
+        "id": "exact-pilot-E-state",
+        "phase": "post-landing",
+        "candidate_roles": [
+          "pilot-state"
+        ],
+        "oracle": "Reopen exact accepted E after C/D/E loop with its new source/fixture verification, canonical E state before F and independently retained53.A/53.B closures.",
+        "required_raw_evidence": [
+          "cases/exact-pilot-E-state/E-context.json",
+          "cases/exact-pilot-E-state/E-live-audit.json",
+          "cases/exact-pilot-E-state/git-objects-and-status.json",
+          "cases/exact-pilot-E-state/pilot-issue-close-readbacks.json"
+        ],
+        "absence": "refuse final metadata gate"
       }
+    ]
+  },
+  "phase_contract": "Require every case matching ticket,phase,candidate-role; reject a role outside ticket_roles. all means every role listed for that ticket. Ticket49 intentionally reruns shared all-role fixture/source gates for M; ticket53 pilot gates apply only to pilot-state and F has its own metadata gate. Empty matching phase refuses. Gate before landing; post-landing after exact ref effect; closure after close/readback. Close preconditions use accepted gate/post and retention, never its own later close readback. Ticket closure requires accepted gate and post-landing receipts for every role in ticket_roles, followed by the required closure audit for those roles; an empty phase refuses for those roles.",
+  "ticket_roles": {
+    "49": [
+      "implementation",
+      "metadata"
+    ],
+    "50": [
+      "implementation"
+    ],
+    "51": [
+      "implementation"
+    ],
+    "52": [
+      "implementation"
+    ],
+    "53.0": [
+      "implementation"
+    ],
+    "54": [
+      "implementation"
+    ],
+    "53": [
+      "pilot-state",
+      "metadata"
     ]
   }
 }

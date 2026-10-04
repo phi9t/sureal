@@ -1,6 +1,6 @@
 # Research task queue policy
 
-**Integration admission status (2026-10-04 UTC):** the user follow-up selects centralized Kata as the proposed scheduler/broker authority, superseding optional-Kata/file-only scheduling. This resolves the earlier proposal-authority conflict. The actual ownership transition, installed capabilities, design/plan and live admission gates remain open; statements below describe the proposed v1, not an active operating policy. No backend setup, worker activation or implementation is authorized by this documentation update. See the [authority reconciliation note](reviews/2026-10-04-collaboration-integration-admission.md).
+**Integration admission status (2026-10-04 UTC):** centralized Kata is the user-selected scheduler/broker design, superseding optional-Kata/file-only scheduling. The documentation review corrections passed. The actual ownership transition, installed capabilities, written plan admission and clean-base/live execution gates remain open; statements below describe the proposed v1, not an active operating policy. No backend setup, worker activation or implementation is authorized by this documentation integration. See the [admission and review disposition](reviews/2026-10-04-collaboration-integration-admission.md).
 
 ## Current mechanism and roles
 
@@ -120,11 +120,11 @@ Record assignment identities in revision-checked metadata and append worktree/br
 
 ```bash
 kata comment ISSUE_REF --body-stdin --agent < NOTE.md
-kata close ISSUE_REF --done \
+kata close ISSUE_REF --reason done \
   --message 'State the scoped deliverable and actual independent verification.' \
   --commit LANDED_SHA \
   --evidence 'reviewed-paths:docs/research/tasks/TASK.md' \
-  --evidence 'test:ACTUAL_LIVE_COMMAND' --agent
+  --test 'ACTUAL_LIVE_COMMAND' --agent
 ```
 
 Use installed supported CLI options; `kata comment --help` is authoritative for comment text input. The inspected v0.14.3 supports `--body`, `--body-file` and `--body-stdin`. A close asserts completion. The message and linked evidence must cover this ticket's live Insula, retention and landing criteria; a commit hash alone does not prove them.

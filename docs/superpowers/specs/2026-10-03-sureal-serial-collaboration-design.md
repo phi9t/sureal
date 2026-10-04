@@ -2,7 +2,7 @@
 
 Status: written specification approved by the user on 2026-10-04 UTC (2026-10-03 client date), including its normative companions. User-selected scope is two concurrent workers, separate worktrees, centralized Kata operations and an evidence-linked worker overview. Code is not implemented or admitted by this document. The historical filename is retained for stable links. Dates use the client timezone. Review-fix amendment: the user requested correction of the Claude findings on2026-10-04 UTC;53.0 now lands retention/cleanup before54, preserving all final53/54 acceptance.
 
-**Integration admission status (2026-10-04 UTC):** the user follow-up selects centralized Kata as the proposed scheduler/broker authority, superseding optional-Kata/file-only scheduling. This resolves the earlier proposal-authority conflict. The actual ownership transition, installed capabilities, design/plan and live admission gates remain open; statements below describe the proposed v1, not an active operating policy. No backend setup, worker activation or implementation is authorized by this documentation update. See the [authority reconciliation note](../../research/reviews/2026-10-04-collaboration-integration-admission.md).
+**Integration admission status (2026-10-04 UTC):** centralized Kata is the user-selected scheduler/broker design, superseding optional-Kata/file-only scheduling. The documentation review corrections passed. The actual ownership transition, installed capabilities, written plan admission and clean-base/live execution gates remain open; statements below describe the proposed v1, not an active operating policy. No backend setup, worker activation or implementation is authorized by this documentation integration. See the [admission and review disposition](../../research/reviews/2026-10-04-collaboration-integration-admission.md).
 
 ## Goal and end-to-end acceptance
 
@@ -122,6 +122,7 @@ Command names below are the proposed interface, not currently available capabili
 | `status` | Read-only text/JSON snapshot of both seats, tasks/queue, current states/evidence/blockers and source freshness; no source/queue mutation |
 | `task import` | Search/map committed task definitions to scoped Kata issues, idempotently create missing issues/dependency edges and link pins; never blindly mark old work done |
 | `task close` | Validate independent ticket-specific closure, retain the separate Kata-close effect/readback; manual evidence-backed closure remains the bootstrap path until this operation is admitted |
+| `task continue` | Start another explicitly admitted bounded turn on the same live attempt/thread/brief/generation; refuse in-flight turn/active goal or stale claim; foreground supervision and distinct launch/ack receipts |
 | `task start` | Check readiness/closure/scope/capacity/B, reserve attempt intent, claim unique Kata actor, allocate owned worktree, bind exact fresh thread, obtain matching acknowledgement and start bounded work |
 | `task submit` | Match current owner/claim/thread/attempt/B, stop/freeze source, check single clean commit, retain candidate and record report; no acceptance inference |
 | `task verify` | Materialize retained C separately, run admitted checks/live Insula, independently audit artifacts and retain review disposition; never test mutable worker leftovers |

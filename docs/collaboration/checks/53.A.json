@@ -61,11 +61,11 @@
       ],
       "expected_outcome": "ok",
       "expected_exit": 0,
-      "oracle": "Reopen exact runtime/source/context plus raw effect/log and actual Git/Kata/Codex readback. Success verify/land/close and incident scenarios use independently audited prepilot fixtures at exact B, completed before pilot dispatch; claim/submit use actual outer pilot. No candidate verification depends on its own future landing/closure. Fixture coverage cannot certify the final actual handoff."
+      "oracle": "Reopen exact source/context and actual Git/Kata/Codex/raw effect/command readbacks. Prepilot receipts bind this candidate's admitted base, independently audited before its worker launches; E needs fresh C-base fixtures. Prepared-host receipts precede offline checks. Current candidate never depends on its own future acceptance/landing/closure; fixture coverage cannot certify final handoff."
     },
     {
       "id": "status",
-      "mode": "host-fixture-execute",
+      "mode": "prepared-host-fixture-receipt",
       "argv": [
         "python3",
         "$CONTROLLER/scripts/collab.py",
@@ -77,7 +77,7 @@
       ],
       "expected_outcome": "ok",
       "expected_exit": 0,
-      "oracle": "Reopen exact runtime/source/context plus raw effect/log and actual Git/Kata/Codex readback. Success verify/land/close and incident scenarios use independently audited prepilot fixtures at exact B, completed before pilot dispatch; claim/submit use actual outer pilot. No candidate verification depends on its own future landing/closure. Fixture coverage cannot certify the final actual handoff."
+      "oracle": "Reopen exact source/context and actual Git/Kata/Codex/raw effect/command readbacks. Prepilot receipts bind this candidate's admitted base, independently audited before its worker launches; E needs fresh C-base fixtures. Prepared-host receipts precede offline checks. Current candidate never depends on its own future acceptance/landing/closure; fixture coverage cannot certify final handoff."
     },
     {
       "id": "claim-ack",
@@ -98,7 +98,14 @@
       ],
       "expected_outcome": "ok",
       "expected_exit": 0,
-      "oracle": "Reopen exact runtime/source/context plus raw effect/log and actual Git/Kata/Codex readback. Success verify/land/close and incident scenarios use independently audited prepilot fixtures at exact B, completed before pilot dispatch; claim/submit use actual outer pilot. No candidate verification depends on its own future landing/closure. Fixture coverage cannot certify the final actual handoff."
+      "oracle": "Reopen exact source/context and actual Git/Kata/Codex/raw effect/command readbacks. Prepilot receipts bind this candidate's admitted base, independently audited before its worker launches; E needs fresh C-base fixtures. Prepared-host receipts precede offline checks. Current candidate never depends on its own future acceptance/landing/closure; fixture coverage cannot certify final handoff.",
+      "expected_stream": [
+        "ack",
+        "turn-result"
+      ],
+      "exit_from": "turn-result",
+      "ack_oracle": "Exact claim/brief/thread/turn match before RUNNING",
+      "terminal_oracle": "Bounded turn and owned tools terminal, not task accepted."
     },
     {
       "id": "submit",
@@ -129,7 +136,7 @@
       ],
       "expected_outcome": "ok",
       "expected_exit": 0,
-      "oracle": "Reopen exact runtime/source/context plus raw effect/log and actual Git/Kata/Codex readback. Success verify/land/close and incident scenarios use independently audited prepilot fixtures at exact B, completed before pilot dispatch; claim/submit use actual outer pilot. No candidate verification depends on its own future landing/closure. Fixture coverage cannot certify the final actual handoff."
+      "oracle": "Reopen exact source/context and actual Git/Kata/Codex/raw effect/command readbacks. Prepilot receipts bind this candidate's admitted base, independently audited before its worker launches; E needs fresh C-base fixtures. Prepared-host receipts precede offline checks. Current candidate never depends on its own future acceptance/landing/closure; fixture coverage cannot certify final handoff."
     },
     {
       "id": "verify",
@@ -150,7 +157,7 @@
       ],
       "expected_outcome": "ok",
       "expected_exit": 0,
-      "oracle": "Reopen exact runtime/source/context plus raw effect/log and actual Git/Kata/Codex readback. Success verify/land/close and incident scenarios use independently audited prepilot fixtures at exact B, completed before pilot dispatch; claim/submit use actual outer pilot. No candidate verification depends on its own future landing/closure. Fixture coverage cannot certify the final actual handoff."
+      "oracle": "Reopen exact source/context and actual Git/Kata/Codex/raw effect/command readbacks. Prepilot receipts bind this candidate's admitted base, independently audited before its worker launches; E needs fresh C-base fixtures. Prepared-host receipts precede offline checks. Current candidate never depends on its own future acceptance/landing/closure; fixture coverage cannot certify final handoff."
     },
     {
       "id": "land",
@@ -171,7 +178,7 @@
       ],
       "expected_outcome": "ok",
       "expected_exit": 0,
-      "oracle": "Reopen exact runtime/source/context plus raw effect/log and actual Git/Kata/Codex readback. Success verify/land/close and incident scenarios use independently audited prepilot fixtures at exact B, completed before pilot dispatch; claim/submit use actual outer pilot. No candidate verification depends on its own future landing/closure. Fixture coverage cannot certify the final actual handoff."
+      "oracle": "Reopen exact source/context and actual Git/Kata/Codex/raw effect/command readbacks. Prepilot receipts bind this candidate's admitted base, independently audited before its worker launches; E needs fresh C-base fixtures. Prepared-host receipts precede offline checks. Current candidate never depends on its own future acceptance/landing/closure; fixture coverage cannot certify final handoff."
     },
     {
       "id": "close",
@@ -192,7 +199,14 @@
       ],
       "expected_outcome": "ok",
       "expected_exit": 0,
-      "oracle": "Reopen exact runtime/source/context plus raw effect/log and actual Git/Kata/Codex readback. Success verify/land/close and incident scenarios use independently audited prepilot fixtures at exact B, completed before pilot dispatch; claim/submit use actual outer pilot. No candidate verification depends on its own future landing/closure. Fixture coverage cannot certify the final actual handoff."
+      "oracle": "Reopen exact source/context and actual Git/Kata/Codex/raw effect/command readbacks. Prepilot receipts bind this candidate's admitted base, independently audited before its worker launches; E needs fresh C-base fixtures. Prepared-host receipts precede offline checks. Current candidate never depends on its own future acceptance/landing/closure; fixture coverage cannot certify final handoff."
     }
-  ]
+  ],
+  "executor_contract": {
+    "insulated-execute": "Insula candidate checker executes this pure argv.",
+    "prepared-host-fixture-receipt": "Lead executes host argv during preparation; copies immutable sanitized raw receipt bundle under the single /outputs/fixtures/<pilot> subtree. Offline checker only compares.",
+    "prepilot-live-fixture-receipt": "Lead executes actual prepilot fixture at candidate admitted base before its worker launches. Includes its entire acknowledged-turn-result stream.",
+    "actual-pilot-receipt": "Actual bound outer worker/lead operation; source/thread/turn/item provenance corroborated. No extra launch by checker."
+  },
+  "integrity_contract": "Independent auditor proves candidate diff stays in admitted document directory and helper/manifest/auditor blob IDs equal admitted base. Candidate cannot amend its own acceptance."
 }

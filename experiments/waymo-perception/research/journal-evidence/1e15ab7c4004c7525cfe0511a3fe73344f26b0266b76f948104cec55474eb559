@@ -1,0 +1,166 @@
+import datetime, hashlib, json, re, subprocess
+from pathlib import Path
+from urllib.parse import unquote
+
+root = Path.cwd()
+preservation = json.loads(Path('/tmp/sureal-collaboration-final-docs-preservation.json').read_text())
+base, source = preservation['base'], preservation['source_head']
+git = lambda *args: subprocess.check_output(['git', *args])
+sha = lambda data: hashlib.sha256(data).hexdigest()
+assert git('rev-parse', 'HEAD').decode().strip() == base
+assert git('rev-parse', 'MERGE_HEAD').decode().strip() == source
+qualifiers = {
+    'docs/research/README.md', 'docs/research/task-queue.md',
+    'docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md',
+    'docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md',
+}
+paths = [x['path'] for x in preservation['source_paths']] + [
+    'docs/research/reviews/2026-10-04-collaboration-integration-admission.md',
+    'experiments/waymo-perception/research/2026-10-04-post-closeout-stage-handoff.md',
+]
+for row in preservation['source_paths']:
+    if row['path'] not in qualifiers:
+        assert sha(Path(row['path']).read_bytes()) == row['sha256'], row['path']
+
+def anchors(path):
+    result, counts, fenced = set(), {}, False
+    for line in path.read_text().splitlines():
+        if line.startswith(('```', '~~~')):
+            fenced = not fenced
+            continue
+        if fenced:
+            continue
+        match = re.match(r'^#{1,6}\s+(.+?)\s*#*$', line)
+        if match:
+            slug = re.sub(r'[^\w\- ]', '', match[1].lower()).replace(' ', '-')
+            count = counts.get(slug, 0)
+            counts[slug] = count + 1
+            result.add(slug if not count else slug + '-' + str(count))
+    return result
+
+links, fragments = 0, 0
+for rel in paths:
+    path = root / rel
+    if path.suffix != '.md':
+        continue
+    body = path.read_text()
+    assert not any(x in body for x in ('<<<<<<< ', '=======\n', '>>>>>>> '))
+    for target in re.findall(r'\[[^\]\n]+\]\(([^)\n]+)\)', body):
+        target = target.strip('<>')
+        if target.startswith(('https://', 'http://', 'mailto:', 'app://')):
+            continue
+        href, _, fragment = target.partition('#')
+        resolved = (path.parent / unquote(href)).resolve() if href else path
+        assert resolved.exists(), (rel, target)
+        links += 1
+        if fragment and resolved.suffix == '.md':
+            assert unquote(fragment) in anchors(resolved), (rel, target)
+            fragments += 1
+
+coverage = json.loads(Path('docs/collaboration/coverage.json').read_text())
+expected_roles = {
+    '49': ['implementation', 'metadata'], '50': ['implementation'],
+    '51': ['implementation'], '52': ['implementation'],
+    '53.0': ['implementation'], '54': ['implementation'],
+    '53': ['pilot-state', 'metadata'],
+}
+assert coverage['ticket_roles'] == expected_roles
+assert set(coverage['cases']) == set(expected_roles)
+assert sum(len(rows) for rows in coverage['cases'].values()) == 63
+combinations = []
+for ticket, rows in coverage['cases'].items():
+    assert len({row['id'] for row in rows}) == len(rows)
+    for row in rows:
+        assert row['oracle'] and row['required_raw_evidence']
+        allowed_absence = {
+            'gate': {'refuse acceptance', 'refuse matching phase acceptance'},
+            'post-landing': {'refuse closure', 'refuse matching phase acceptance', 'refuse final metadata gate', 'refuse acceptance'},
+            'closure': {'refuse next-stage admission', 'refuse acceptance'},
+        }
+        assert row['absence'] in allowed_absence[row['phase']], (ticket, row['id'], row['absence'])
+        assert row['phase'] in ('gate', 'post-landing', 'closure')
+        assert row['candidate_roles'] == ['all'] or set(row['candidate_roles']) <= set(expected_roles[ticket])
+    for role in expected_roles[ticket]:
+        for phase in ('gate', 'post-landing', 'closure'):
+            matches = [row['id'] for row in rows if row['phase'] == phase and
+                       ('all' in row['candidate_roles'] or role in row['candidate_roles'])]
+            assert matches, (ticket, role, phase)
+            combinations.append({'ticket': ticket, 'role': role, 'phase': phase, 'cases': matches})
+assert len(combinations) == 27
+for pilot in ('53.A', '53.B'):
+    manifest = json.loads(Path('docs/collaboration/checks/' + pilot + '.json').read_text())
+    assert manifest['pilot'] == pilot
+    for row in manifest['checks'] + manifest['required_scenarios']:
+        assert isinstance(row['argv'], list) and all(isinstance(x, str) for x in row['argv'])
+        assert isinstance(row['expected_exit'], int) and row['oracle']
+
+ledger = Path('docs/research/reviews/2026-10-03-sureal-collaboration-review-resolution.md').read_text()
+ids = re.findall(r'^\| ((?:S|D|N|R|B)\d+) \|', ledger, re.M)
+expected = {*(f'S{i}' for i in range(1, 23)), *(f'D{i}' for i in range(1, 7)),
+            *(f'N{i}' for i in range(1, 23)), *(f'R{i}' for i in range(1, 14)), 'B1'}
+assert len(ids) == 64 and set(ids) == expected
+reviews = []
+for name in ('rereview-2', 'rereview-3', 'focused-review', 'role-check'):
+    path = Path('docs/research/reviews/2026-10-03-sureal-collaboration-claude-' + name + '.json')
+    meta = json.loads(path.read_text())
+    assert meta['tools_enabled'] == []
+    artifact = Path(meta['artifact_directory'])
+    for filename, field in (('request.txt', 'request_sha256'), ('response.json', 'response_sha256'), ('review.md', 'review_body_sha256')):
+        assert sha((artifact / filename).read_bytes()) == meta[field], (name, field)
+    assert sha(path.with_suffix('.md').read_bytes()) == meta['rendered_report_sha256'], name
+    for rel, digest in meta['source_files'].items():
+        assert sha(git('show', meta['source_commit'] + ':' + rel)) == digest, (name, rel)
+    reviews.append({'name': name, 'source_commit': meta['source_commit'], 'verdict': meta['verdict'],
+                    'source_files': len(meta['source_files']), 'raw_and_rendered_hashes_exact': True})
+assert reviews[-1]['source_commit'] == 'ef0bee5a01787561dcdaa9d828832e17d7ed45f1'
+assert reviews[-1]['verdict'] == 'PASS; no B1 blocker remains'
+
+# This is the declared dependency graph, not a live scheduler observation.
+graph = {'49': [], '50': ['49'], '51': ['50'], '52': ['51'], '53.0': ['52'],
+         '54': ['49', '50', '51', '52', '53.0'], '53': ['52', '53.0', '54'],
+         '53.A': ['53.0', '54'], '53.B': ['53.0', '54'],
+         '44': ['53'], '45': ['44'], '46': ['45'], '47': ['46'], '48': ['47']}
+visiting, done = set(), set()
+def visit(node):
+    assert node not in visiting, node
+    if node in done:
+        return
+    visiting.add(node)
+    for predecessor in graph[node]:
+        visit(predecessor)
+    visiting.remove(node)
+    done.add(node)
+for node in graph:
+    visit(node)
+for rel, digest in preservation['blocked_source_sha256'].items():
+    assert sha(Path(rel).read_bytes()) == digest, rel
+for rel in ('docs/superpowers/specs/2026-10-03-first-class-models-training-design.md',
+            'experiments/waymo-perception/research-task-index.md'):
+    assert Path(rel).read_bytes() == git('show', base + ':' + rel), rel
+registry = 'experiments/waymo-perception/research/experiments.json'
+now, old = json.loads(Path(registry).read_text()), json.loads(git('show', base + ':' + registry))
+now.pop('updated_utc'); old.pop('updated_utc'); assert now == old
+protected = json.loads(Path('experiments/waymo-perception/research/sureal-doc60-integration.json').read_text())['protected_scientific_host_hash_rechecks']
+for row in protected:
+    with Path(row['path']).open('rb') as stream:
+        assert hashlib.file_digest(stream, 'sha256').hexdigest() == row['sha256'], row['path']
+report = {
+    'schema_version': 1, 'utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    'base': base, 'source_head': source,
+    'generation_command': 'python /tmp/sureal-collaboration-completed-docs-audit.py; exact generator retained in journal123 evidence',
+    'document_paths': [{'path': p, 'sha256': sha(Path(p).read_bytes())} for p in paths],
+    'source19_exact_except_four_admission_notice_overlays': True,
+    'local_links_checked': links, 'markdown_anchors_checked': fragments, 'missing_links': 0,
+    'coverage_cases': 63, 'ticket_role_phase_combinations': combinations,
+    'coverage_is_future_proof_not_execution': True, 'pilot_manifest_structure': 'pass, not executed',
+    'finding_dispositions': 64, 'review_provenance': reviews,
+    'declared_dependency_graph': graph, 'declared_dependency_graph_acyclic': True,
+    'all19_blocked_source_hashes_exact': True, 'models_contract_and_research_index_exact': True,
+    'registry_scientific_content_exact_excluding_watcher_timestamp': True,
+    'protected_scientific_host_hash_rechecks': protected,
+    'admission': 'documentation fixes passed; written plan/current clean-base/process/resource/live gates remain open; no runtime implementation or dispatch',
+    'retention': 'Git-only documentation after sealedHDFS113; no transfer, payload release or worktree removal',
+}
+Path('/tmp/sureal-collaboration-completed-docs-audit.json').write_text(json.dumps(report, indent=2) + '\n')
+print(json.dumps({k: report[k] for k in ('base', 'source_head', 'local_links_checked', 'markdown_anchors_checked',
+                                      'coverage_cases', 'finding_dispositions', 'all19_blocked_source_hashes_exact', 'admission')}))
