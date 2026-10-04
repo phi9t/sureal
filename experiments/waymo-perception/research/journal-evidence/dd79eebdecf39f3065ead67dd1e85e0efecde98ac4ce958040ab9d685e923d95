@@ -1,0 +1,107 @@
+import datetime,hashlib,json,subprocess,sys
+from pathlib import Path
+root=Path.cwd();r=root/'experiments/waymo-perception/research'
+base='0c161dda53cde1cd50a2161523d90da88cf40bb4'
+source='60ede2883ffebe455cf0672ddede3fa0b7e7d4e2'
+landed='33105ee18edbb407b34df4ea14dbc171b6a2dc21'
+assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==landed
+assert not subprocess.check_output(['git','diff','--cached','--name-only'],text=True)
+def digest(p):
+ with Path(p).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+pins=json.loads(Path('/tmp/sureal-doc60-preserved-pins.json').read_text())
+assert all(digest(root/p)==h for p,h in pins['blocked_source_sha256'].items())
+protected_root=Path('/data02/home/philip.yang/.cache/waystone/waymo-perception')
+b=protected_root/'insula/balanced16-sustained-baseline-controller20261003a'
+w=protected_root/'scientific-processing/balanced16-sustained-baseline-controller20261003a'
+protected={b/'run.json':'96dc607ae8238774ca875588d65eaf463f120227e161ae792a9187c8e6635d7d',b/'state.json':'dac2ce421243c4750175f98152cdc1ce4ecb7e1a493ddee7050c42fcc09e7765',w/'update-00/checkpoint.pt':'8057a5496c4d6ec4d19b9de33034c6cca753ea39d8f03fd765ad7011cdf301ee',w/'update-1000/checkpoint.pt':'37de2375b0b10f92a56468bd9ffe0b2fea42f257c5949efa80fd29c621a8ff4a',b/'checkpoint-00-admitted.json':'dde09eb7e6d65e781597da82870ca6c64ea5bff1ea77d31b8b8268ec5a0ad364',b/'checkpoint-1000-admitted.json':'b0a874b87a2541ab13b2a97e36540b458b54bb0996c6e679a8c156d0160f52d9',b/'resource-layer-dependency20261003v4/identity.json':'f2514b46aa6952662b35183df8db0ce9ec914b38640de2a1d24cfbf7bbe80e5d'}
+for p,h in protected.items():assert digest(p)==h,str(p)
+print('Original checkpoints/state/admissions/resource identity and19blocked sources exact',flush=True)
+publication=json.loads(Path('/tmp/sureal-doc60-first-publication.json').read_text())
+publication['generation_command']='git merge --ff-only 33105ee18edbb407b34df4ea14dbc171b6a2dc21; git push origin HEAD:refs/heads/phi9t/mainline; git ls-remote origin refs/heads/phi9t/mainline; git status --porcelain=v1 --untracked-files=all --ignore-submodules=none'
+assert publication['head']==publication['remote_head']==landed and publication['canonical_status_empty']
+ten=json.loads(Path('/tmp/sureal-doc60-ten-targets.json').read_text())
+for row in ten:
+ p=row['path'];h=digest(root/p)
+ assert h==row['worker_sha256']==row['mainline_sha256']
+ assert hashlib.sha256(subprocess.check_output(['git','show',base+':'+p])).hexdigest()==h
+ assert hashlib.sha256(subprocess.check_output(['git','show',landed+':'+p])).hexdigest()==h
+ row['disposition']='already landed in05b9192 via b9a5a9c; retained exact original evidence role; no duplicate landing or new execution claim'
+ row['base_verified']=base;row['integration_verified']=landed
+foreign=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/models-training-task-specs')
+foreign_head=subprocess.check_output(['git','-C',str(foreign),'rev-parse','HEAD'],text=True).strip()
+foreign_commits=subprocess.check_output(['git','log','--format=%H %s',landed+'..'+foreign_head],text=True).splitlines()
+for src,dest in [('/tmp/sureal-doc60-document-audit.json','sureal-doc60-document-audit.json'),('/tmp/sureal-doc60-standards-review.json','sureal-doc60-standards-review.json'),('/tmp/sureal-doc60-spec-review.json','sureal-doc60-spec-review.json')]:
+ (r/dest).write_bytes(Path(src).read_bytes())
+(r/'sureal-doc60-ten-targets.json').write_text(json.dumps(ten,indent=2)+'\n')
+report={'schema_version':1,'utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'scope':'requested60 documentation integration and Git-only journal bookkeeping; no implementation or scientific gate promotion','generation_command':'python /tmp/sureal-doc60-closeout.py (exact script retained as immutable journal118 evidence)','base':base,'requested_commit':source,'manual_bootstrap_integration_commit':landed,'source60_ancestry_preserved':True,'publication':publication,'changed_document_audit':'sureal-doc60-document-audit.json','ten_targets':'sureal-doc60-ten-targets.json','reviews':{'Standards':{'path':'sureal-doc60-standards-review.json','findings':0,'sha256':digest(r/'sureal-doc60-standards-review.json')},'Spec':{'path':'sureal-doc60-spec-review.json','findings':0,'sha256':digest(r/'sureal-doc60-spec-review.json')}},'checks':[{'command':'python -m unittest tests.test_publication_audit -v','exit_code':0,'tests':24,'seconds':12.182,'role':'portable host checks, not live scientific or protocol admission'},{'command':'python scripts/publication_audit.py --root .','exit_code':0,'result':{'errors':[],'gitlinks':2,'max_blob_bytes':26214400,'schema_version':1,'status':'pass','tracked_files':3959},'epoch':'11-document staged candidate before this later bookkeeping'},{'command':'git diff --cached --check','exit_code':0,'epoch':'reviewed11-document merge candidate'}],'foreign_documentation':{'worktree':str(foreign),'head':foreign_head,'remaining_commits':foreign_commits,'disposition':'other design-session-owned later revisions preserved, not adopted, merged, edited or deleted in requested60 integration'},'preserved_blocked_source_sha256':pins['blocked_source_sha256'],'protected_scientific_host_hash_rechecks':[{'path':str(p),'sha256':h,'exact_to_original':True} for p,h in protected.items()],'remaining_disposition':'19 source blockers retain existing inventory reasons and HDFS retention roles; timestamp-only worker registry, scratch/caches, preview derivatives, locks, processes and later design-session commits remain retained; no retirement/quiescence claim','remaining_inventory':'sureal-comprehensive-closeout-final-inventory.json','retention_scope':'new documentation bookkeeping is Git-only after sealed HDFS113; previous exact HDFS/live recovery receipts remain unchanged; no scientific payload released','activation':'written design/plan review and implementation-specific live Insula/resource/process admission remain required for49–53;53 then gates44–48','overall_research_goal':'still active; no new optimizer samples, held-out research, segmentation/SAM or forecasting completion'}
+(r/'sureal-doc60-integration.json').write_text(json.dumps(report,indent=2)+'\n')
+(r/'2026-10-04-doc60-integration.md').write_text('''# Requested Sureal-local protocol documentation integration
+
+Original documentation commit `60ede2883ffebe455cf0672ddede3fa0b7e7d4e2`
+is preserved as an ancestor of reviewed bootstrap merge
+`33105ee18edbb407b34df4ea14dbc171b6a2dc21`, integrated from clean published
+`0c161dda53cde1cd50a2161523d90da88cf40bb4` and independently re-read on
+`origin/phi9t/mainline`. Canonical tracked/index/untracked state, including
+submodule state, was empty at this publication observation. This manual
+bootstrap does not claim execution of the proposed managed controller.
+
+[Integration receipt](sureal-doc60-integration.json),
+[document/link audit](sureal-doc60-document-audit.json),
+[Standards review](sureal-doc60-standards-review.json) and
+[Spec review](sureal-doc60-spec-review.json) pin all11 changed document bodies.
+Both independent review axes have zero findings. The118 local Markdown links
+resolve, all49–53 task contracts have their goal/dependencies/verifiers/acceptance,
+24 portable tests pass, and the publication audit passes. These host/document
+checks do not close a live Insula implementation milestone. Existing41/42/43
+index additions and the models/training MT0/MT1 sequencing correction remain.
+
+The [ten reported missing targets](sureal-doc60-ten-targets.json) were already
+landed in05b9192 via b9a5a9c. Every current mainline body and worker body matches
+its original SHA256 exactly. They retain their original design/evidence and
+previous retention roles; none is duplicated, regenerated or promoted by this
+integration.
+
+Only requested60 is integrated. The design owner's later commits and clean
+worktree are preserved for separate review. The older206-line root proposal
+was previously exactly preserved and reconciled; it is not restored or staged
+here. [Canonical provenance](sureal-canonical-source-reconciliation.json)
+and the [owned inventory](sureal-comprehensive-closeout-final-inventory.json)
+retain all19 blocked source reasons, unique unlanded work, original process
+observations and retained scratch/cache/preview/lock dispositions. Original
+checkpoint0/1000, state/admission files and resource identity were freshly
+host-hash-checked; all19 blocked source bodies remain exact. The live registry
+watcher's timestamp-only projection stays excluded and its scientific content
+matches the base. No writer is stopped, workspace retired or source guard changed.
+
+The recorded order is current task/full owned closeout → verified pristine
+mainline → design/plan/runtime-admitted local protocol49–53 → models/training44–48.
+Sureal is the sole implementation home; Corenius remains a read-only reference.
+The proposed `scripts/collab.py` uses one serial worker, exact-base clones,
+immutable candidates and file-backed state, without mandatory Kata or a new
+daemon. Neither protocol nor model migration implementation starts here.
+Required exact live Insula and independent artifact gates still apply to each
+future implementation milestone. The existing overall scientific goal remains
+active, including the frozen scientific continuation and diagnostic dependencies.
+
+This receipt, reviews and journal118 are later Git-only metadata, outside the
+sealed HDFS113 archive. Existing exact HDFS readback/live-recovery proofs remain
+in force for their recorded scopes; no new HDFS transfer, payload release,
+optimizer update, native score or scientific result is claimed.
+''')
+sys.path.insert(0,str(root/'experiments/waymo-perception'))
+from tracking.journal import append_entry,read_entries
+journal=r/'research-journal.jsonl'
+entries=read_entries(journal)
+assert len(entries)==117 and entries[-1]['sha256']=='5913d55f6cb7723ca386ff943f7bff9e811d2be4f4fe7012807bbfc3bc46175c'
+content='User-requested documentation60ede28 integrated with original ancestry through independently reviewed bootstrap merge33105ee onto clean publishedphi9t/mainline; exact remote reread and canonical tracked/index/untracked checks passed. Both review axes0findings;118local links resolve;24portable tests/publication audit/diff checks pass. Ten reported missing targets were alreadylanded05b/b9 and match mainline/worker bytes exactly; recorded existing design/evidence/retention roles without duplicate/newexecution claims. Existing41/42/43 and MT0/MT1fix preserved. Later foreign design-session commits remain owned/preserved, unadopted; obsolete206line rootbytes remain in prior exact provenance. All19blocked source bodies plus original checkpoint0/1000/state/admissions/resource identity rechecked exact; worker timestamp-only registry remains excluded without semantic overwrite. No cleanup, process stop, frozen source/runtime/recipe mutation, protocol or model migration implementation, scientific promotion or local payloadrelease. Order closeout/pristine→written design/plan/runtime/live-admitted Sureal-only49–53→models/training44–48. Corenius reference-only; no mandatoryKata/daemon. Journal118 and receipt/reviews are Git-only after sealedHDFS113; historical exactHDFS/live recovery retains its original roles. Overallresearch goal and existing scientific/retention/process blockers remain open.'
+evidence=[r/'sureal-doc60-integration.json',r/'2026-10-04-doc60-integration.md',r/'sureal-doc60-ten-targets.json',r/'sureal-doc60-document-audit.json',r/'sureal-doc60-standards-review.json',r/'sureal-doc60-spec-review.json',Path('/tmp/sureal-doc60-document-audit.py'),Path('/tmp/sureal-doc60-closeout.py')]
+entry=append_entry(journal,'decision',['research-integration-closeout','sureal-local-collaboration-protocol','models-training-architecture-migration'],content,evidence)
+entries=read_entries(journal)
+notes=['# Research journal','','Append-only observations, hypotheses, decisions and follow-up work. Evidence snapshots and entry hash chains preserve what was known at the time.']
+for e in entries:
+ notes+=['',f"## {e['sequence']}. {e['utc']} — {e['category']}",'',', '.join(e['experiments']),'',e['content']]
+ if e['evidence']:notes+=['','Evidence: '+', '.join(f"[{Path(v['path']).name[:12]}]({v['path']})" for v in e['evidence'])]
+(r/'research-journal.md').write_text('\n'.join(notes)+'\n')
+Path('/tmp/sureal-doc60-journal118.json').write_text(json.dumps(entry,indent=2)+'\n')
+print('Recorded journal',entry['sequence'],'head',entry['sha256'],flush=True)
+print('Later owner-only commits retained',len(foreign_commits),flush=True)

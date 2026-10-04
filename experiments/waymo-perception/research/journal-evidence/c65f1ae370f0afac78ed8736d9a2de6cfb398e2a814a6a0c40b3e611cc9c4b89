@@ -1,0 +1,52 @@
+# Requested Sureal-local protocol documentation integration
+
+Original documentation commit `60ede2883ffebe455cf0672ddede3fa0b7e7d4e2`
+is preserved as an ancestor of reviewed bootstrap merge
+`33105ee18edbb407b34df4ea14dbc171b6a2dc21`, integrated from clean published
+`0c161dda53cde1cd50a2161523d90da88cf40bb4` and independently re-read on
+`origin/phi9t/mainline`. Canonical tracked/index/untracked state, including
+submodule state, was empty at this publication observation. This manual
+bootstrap does not claim execution of the proposed managed controller.
+
+[Integration receipt](sureal-doc60-integration.json),
+[document/link audit](sureal-doc60-document-audit.json),
+[Standards review](sureal-doc60-standards-review.json) and
+[Spec review](sureal-doc60-spec-review.json) pin all11 changed document bodies.
+Both independent review axes have zero findings. The118 local Markdown links
+resolve, all49–53 task contracts have their goal/dependencies/verifiers/acceptance,
+24 portable tests pass, and the publication audit passes. These host/document
+checks do not close a live Insula implementation milestone. Existing41/42/43
+index additions and the models/training MT0/MT1 sequencing correction remain.
+
+The [ten reported missing targets](sureal-doc60-ten-targets.json) were already
+landed in05b9192 via b9a5a9c. Every current mainline body and worker body matches
+its original SHA256 exactly. They retain their original design/evidence and
+previous retention roles; none is duplicated, regenerated or promoted by this
+integration.
+
+Only requested60 is integrated. The design owner's later commits and clean
+worktree are preserved for separate review. The older206-line root proposal
+was previously exactly preserved and reconciled; it is not restored or staged
+here. [Canonical provenance](sureal-canonical-source-reconciliation.json)
+and the [owned inventory](sureal-comprehensive-closeout-final-inventory.json)
+retain all19 blocked source reasons, unique unlanded work, original process
+observations and retained scratch/cache/preview/lock dispositions. Original
+checkpoint0/1000, state/admission files and resource identity were freshly
+host-hash-checked; all19 blocked source bodies remain exact. The live registry
+watcher's timestamp-only projection stays excluded and its scientific content
+matches the base. No writer is stopped, workspace retired or source guard changed.
+
+The recorded order is current task/full owned closeout → verified pristine
+mainline → design/plan/runtime-admitted local protocol49–53 → models/training44–48.
+Sureal is the sole implementation home; Corenius remains a read-only reference.
+The proposed `scripts/collab.py` uses one serial worker, exact-base clones,
+immutable candidates and file-backed state, without mandatory Kata or a new
+daemon. Neither protocol nor model migration implementation starts here.
+Required exact live Insula and independent artifact gates still apply to each
+future implementation milestone. The existing overall scientific goal remains
+active, including the frozen scientific continuation and diagnostic dependencies.
+
+This receipt, reviews and journal118 are later Git-only metadata, outside the
+sealed HDFS113 archive. Existing exact HDFS readback/live-recovery proofs remain
+in force for their recorded scopes; no new HDFS transfer, payload release,
+optimizer update, native score or scientific result is claimed.

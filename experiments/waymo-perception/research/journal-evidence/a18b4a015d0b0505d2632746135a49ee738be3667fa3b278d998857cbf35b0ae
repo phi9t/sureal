@@ -1,0 +1,112 @@
+[
+  {
+    "path": "docs/superpowers/plans/2026-10-02-perception-architecture-study.md",
+    "mainline_present": true,
+    "mainline_sha256": "7faad1ecdbdac5be4a12c5e954001386c379e7af55c220092224374a5422d6e3",
+    "worker_present": true,
+    "worker_sha256": "7faad1ecdbdac5be4a12c5e954001386c379e7af55c220092224374a5422d6e3",
+    "exact_same_bytes": true,
+    "disposition": "already landed in05b9192 via b9a5a9c; retained exact original evidence role; no duplicate landing or new execution claim",
+    "base_verified": "0c161dda53cde1cd50a2161523d90da88cf40bb4",
+    "integration_verified": "33105ee18edbb407b34df4ea14dbc171b6a2dc21"
+  },
+  {
+    "path": "docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md",
+    "mainline_present": true,
+    "mainline_sha256": "fef072b2737a4fda94a029944fb999d78be482669b1cd989af953d93b5e7ecf1",
+    "worker_present": true,
+    "worker_sha256": "fef072b2737a4fda94a029944fb999d78be482669b1cd989af953d93b5e7ecf1",
+    "exact_same_bytes": true,
+    "disposition": "already landed in05b9192 via b9a5a9c; retained exact original evidence role; no duplicate landing or new execution claim",
+    "base_verified": "0c161dda53cde1cd50a2161523d90da88cf40bb4",
+    "integration_verified": "33105ee18edbb407b34df4ea14dbc171b6a2dc21"
+  },
+  {
+    "path": "experiments/waymo-perception/research/gpu-runtime-verified.json",
+    "mainline_present": true,
+    "mainline_sha256": "8ddba7959900ff761f297e6d00f2acc19315aa18ffd84898090a27d0dff4ef91",
+    "worker_present": true,
+    "worker_sha256": "8ddba7959900ff761f297e6d00f2acc19315aa18ffd84898090a27d0dff4ef91",
+    "exact_same_bytes": true,
+    "disposition": "already landed in05b9192 via b9a5a9c; retained exact original evidence role; no duplicate landing or new execution claim",
+    "base_verified": "0c161dda53cde1cd50a2161523d90da88cf40bb4",
+    "integration_verified": "33105ee18edbb407b34df4ea14dbc171b6a2dc21"
+  },
+  {
+    "path": "experiments/waymo-perception/research/perception-evaluators-verified.json",
+    "mainline_present": true,
+    "mainline_sha256": "36503c09ab411f95ecb6fb3153a3838a6875840b4d652700486edf0b48b08d12",
+    "worker_present": true,
+    "worker_sha256": "36503c09ab411f95ecb6fb3153a3838a6875840b4d652700486edf0b48b08d12",
+    "exact_same_bytes": true,
+    "disposition": "already landed in05b9192 via b9a5a9c; retained exact original evidence role; no duplicate landing or new execution claim",
+    "base_verified": "0c161dda53cde1cd50a2161523d90da88cf40bb4",
+    "integration_verified": "33105ee18edbb407b34df4ea14dbc171b6a2dc21"
+  },
+  {
+    "path": "experiments/waymo-perception/research/r0-geometric-insula.md",
+    "mainline_present": true,
+    "mainline_sha256": "7dd1d458a489cb9135028d550dc80fbf0822e369ebb4392a7b5c150738c8846f",
+    "worker_present": true,
+    "worker_sha256": "7dd1d458a489cb9135028d550dc80fbf0822e369ebb4392a7b5c150738c8846f",
+    "exact_same_bytes": true,
+    "disposition": "already landed in05b9192 via b9a5a9c; retained exact original evidence role; no duplicate landing or new execution claim",
+    "base_verified": "0c161dda53cde1cd50a2161523d90da88cf40bb4",
+    "integration_verified": "33105ee18edbb407b34df4ea14dbc171b6a2dc21"
+  },
+  {
+    "path": "experiments/waymo-perception/research/scientific-camera-full103-verified.json",
+    "mainline_present": true,
+    "mainline_sha256": "71c597b04556e489d642031c81ae799b20c1e2bde0f9d7c3186ace41b7b11ae4",
+    "worker_present": true,
+    "worker_sha256": "71c597b04556e489d642031c81ae799b20c1e2bde0f9d7c3186ace41b7b11ae4",
+    "exact_same_bytes": true,
+    "disposition": "already landed in05b9192 via b9a5a9c; retained exact original evidence role; no duplicate landing or new execution claim",
+    "base_verified": "0c161dda53cde1cd50a2161523d90da88cf40bb4",
+    "integration_verified": "33105ee18edbb407b34df4ea14dbc171b6a2dc21"
+  },
+  {
+    "path": "experiments/waymo-perception/research/scientific-native-shape-full103-retained-audit.json",
+    "mainline_present": true,
+    "mainline_sha256": "1b733e92f1ef97623d0d6e31d5747c9b82672c3d96d37f84cdc199e0b51cdbe7",
+    "worker_present": true,
+    "worker_sha256": "1b733e92f1ef97623d0d6e31d5747c9b82672c3d96d37f84cdc199e0b51cdbe7",
+    "exact_same_bytes": true,
+    "disposition": "already landed in05b9192 via b9a5a9c; retained exact original evidence role; no duplicate landing or new execution claim",
+    "base_verified": "0c161dda53cde1cd50a2161523d90da88cf40bb4",
+    "integration_verified": "33105ee18edbb407b34df4ea14dbc171b6a2dc21"
+  },
+  {
+    "path": "experiments/waymo-perception/research/scientific-semantic-full103-verified.json",
+    "mainline_present": true,
+    "mainline_sha256": "79318f6b9ad327163c45b9eb7df1369369a3adf560ba389cf1992275022ce9bf",
+    "worker_present": true,
+    "worker_sha256": "79318f6b9ad327163c45b9eb7df1369369a3adf560ba389cf1992275022ce9bf",
+    "exact_same_bytes": true,
+    "disposition": "already landed in05b9192 via b9a5a9c; retained exact original evidence role; no duplicate landing or new execution claim",
+    "base_verified": "0c161dda53cde1cd50a2161523d90da88cf40bb4",
+    "integration_verified": "33105ee18edbb407b34df4ea14dbc171b6a2dc21"
+  },
+  {
+    "path": "experiments/waymo-perception/research/tier1-batch-overfit-verifier.md",
+    "mainline_present": true,
+    "mainline_sha256": "ac34461b43b25f4617ccd7218282ccf00edf27b5c5eb0c5d989a474f2efe997a",
+    "worker_present": true,
+    "worker_sha256": "ac34461b43b25f4617ccd7218282ccf00edf27b5c5eb0c5d989a474f2efe997a",
+    "exact_same_bytes": true,
+    "disposition": "already landed in05b9192 via b9a5a9c; retained exact original evidence role; no duplicate landing or new execution claim",
+    "base_verified": "0c161dda53cde1cd50a2161523d90da88cf40bb4",
+    "integration_verified": "33105ee18edbb407b34df4ea14dbc171b6a2dc21"
+  },
+  {
+    "path": "experiments/waymo-perception/research/training-box-full64-replay-verified.json",
+    "mainline_present": true,
+    "mainline_sha256": "17cd6b26363946bb7c761bac7fa064113d345d855d51282f3a82ad2378db0e58",
+    "worker_present": true,
+    "worker_sha256": "17cd6b26363946bb7c761bac7fa064113d345d855d51282f3a82ad2378db0e58",
+    "exact_same_bytes": true,
+    "disposition": "already landed in05b9192 via b9a5a9c; retained exact original evidence role; no duplicate landing or new execution claim",
+    "base_verified": "0c161dda53cde1cd50a2161523d90da88cf40bb4",
+    "integration_verified": "33105ee18edbb407b34df4ea14dbc171b6a2dc21"
+  }
+]

@@ -1,0 +1,1092 @@
+{
+  "schema_version": 1,
+  "scope": "documentation-only integration of requested60; no implementation, runtime admission, training or new HDFS proof",
+  "generation_command": "python /tmp/sureal-doc60-document-audit.py (retained immutable script body linked by journal118)",
+  "base": "0c161dda53cde1cd50a2161523d90da88cf40bb4",
+  "source_commit": "60ede2883ffebe455cf0672ddede3fa0b7e7d4e2",
+  "paths": [
+    {
+      "path": "docs/research/README.md",
+      "sha256": "98a03ac06f37717c651e0e7af5c4ebbee1cad3c0d6dac9c39724d6cc4ce4f26a",
+      "bytes": 5276
+    },
+    {
+      "path": "docs/research/task-queue.md",
+      "sha256": "dcb74f6480a026ae12705d7450a966adac387e1f37355121a353ac2bd874827b",
+      "bytes": 7214
+    },
+    {
+      "path": "docs/research/tasks/44-models-training-reference-admission.md",
+      "sha256": "6d9b4b694db50ba40d4f75d0cfa55f4f36a317300145fae1ab763400247743dd",
+      "bytes": 3574
+    },
+    {
+      "path": "docs/research/tasks/49-collaboration-project-admission.md",
+      "sha256": "7d083c44379f85d690b03b233b2450fda23a497cace4bbdb0563eb26a9151421",
+      "bytes": 2228
+    },
+    {
+      "path": "docs/research/tasks/50-collaboration-worker-attempts.md",
+      "sha256": "2dc1f31828096ccb90d40bdf8a8d9d913982d7a7dbc74333cf5f75318996c5b8",
+      "bytes": 1830
+    },
+    {
+      "path": "docs/research/tasks/51-collaboration-candidate-verification.md",
+      "sha256": "e29849c7e29d3c19bc58800f6cfa212e43a0293848a6c33ff0c50d884647b98d",
+      "bytes": 1919
+    },
+    {
+      "path": "docs/research/tasks/52-collaboration-landing-recovery.md",
+      "sha256": "eb6d6df259506215a2c3955abc744b8c8a1fada60fb11140cf401b425efe6a4e",
+      "bytes": 2157
+    },
+    {
+      "path": "docs/research/tasks/53-collaboration-cleanup-closeout.md",
+      "sha256": "4f3bb9b1bcbb5b18b7a7fb5f5a259c50ebef395da6660d9a4bde6cfbdf816ee3",
+      "bytes": 2447
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "sha256": "458de72a263796fc01442eafff3a4a4e847b829d771de429f08be8a99e6d233a",
+      "bytes": 21707
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "sha256": "42b220b2219f33f6e5a96198dc2594211881d722e74a9335212190d1d9cd9e3b",
+      "bytes": 17073
+    },
+    {
+      "path": "experiments/waymo-perception/research-task-index.md",
+      "sha256": "43beac76a15c356c54902c4c1d6efc6a35b6ef1bc2c699a2699dde89af20bc06",
+      "bytes": 20174
+    }
+  ],
+  "local_links_checked": 118,
+  "new_or_updated_local_links_checked": 26,
+  "missing_links": [],
+  "task_structure_checked": [
+    49,
+    50,
+    51,
+    52,
+    53
+  ],
+  "original_source_docs_exact_except_additive_research_index": true,
+  "post_parent_research_index_additions_preserved": true,
+  "all19_blocked_source_bodies_preserved": true,
+  "registry_scientific_content_exact_to_base": true,
+  "registry_timestamp_is_live_excluded_projection": "2026-10-04T03:04:33.842908+00:00",
+  "journal117_prefix_preserved": true,
+  "links": [
+    {
+      "source": "docs/research/README.md",
+      "label": "Program goal",
+      "target": "tasks/program-goal.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/program-goal.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/README.md",
+      "label": "Queue policy",
+      "target": "task-queue.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/task-queue.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/README.md",
+      "label": "Sureal-local serial collaboration protocol",
+      "target": "../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/README.md",
+      "label": "Design proposal",
+      "target": "../superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/README.md",
+      "label": "44",
+      "target": "tasks/44-models-training-reference-admission.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/44-models-training-reference-admission.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/README.md",
+      "label": "45",
+      "target": "tasks/45-first-class-models-and-layers.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/45-first-class-models-and-layers.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/README.md",
+      "label": "46",
+      "target": "tasks/46-first-class-training-policy-and-state.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/46-first-class-training-policy-and-state.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/README.md",
+      "label": "47",
+      "target": "tasks/47-shared-fixed-frame-producer.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/47-shared-fixed-frame-producer.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/README.md",
+      "label": "48",
+      "target": "tasks/48-models-training-retention-and-closeout.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/48-models-training-retention-and-closeout.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/README.md",
+      "label": "49",
+      "target": "tasks/49-collaboration-project-admission.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/49-collaboration-project-admission.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/README.md",
+      "label": "50",
+      "target": "tasks/50-collaboration-worker-attempts.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/50-collaboration-worker-attempts.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/README.md",
+      "label": "51",
+      "target": "tasks/51-collaboration-candidate-verification.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/51-collaboration-candidate-verification.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/README.md",
+      "label": "52",
+      "target": "tasks/52-collaboration-landing-recovery.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/52-collaboration-landing-recovery.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/README.md",
+      "label": "53",
+      "target": "tasks/53-collaboration-cleanup-closeout.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/53-collaboration-cleanup-closeout.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/README.md",
+      "label": "Full research task index",
+      "target": "../../experiments/waymo-perception/research-task-index.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research-task-index.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/README.md",
+      "label": "Existing experiment tracker",
+      "target": "../../experiments/waymo-perception/tracking/README.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/tracking/README.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/task-queue.md",
+      "label": "approved research execution order",
+      "target": "../../experiments/waymo-perception/research/2026-10-03-approved-execution-order.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/2026-10-03-approved-execution-order.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/task-queue.md",
+      "label": "Sureal-local serial collaboration protocol",
+      "target": "../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/tasks/44-models-training-reference-admission.md",
+      "label": "53 \u2014 local protocol closeout",
+      "target": "53-collaboration-cleanup-closeout.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/53-collaboration-cleanup-closeout.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/tasks/44-models-training-reference-admission.md",
+      "label": "Models/training design",
+      "target": "../../superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/tasks/49-collaboration-project-admission.md",
+      "label": "Sureal serial collaboration",
+      "target": "../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/tasks/50-collaboration-worker-attempts.md",
+      "label": "Sureal serial collaboration",
+      "target": "../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/tasks/51-collaboration-candidate-verification.md",
+      "label": "Sureal serial collaboration",
+      "target": "../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/tasks/52-collaboration-landing-recovery.md",
+      "label": "Sureal serial collaboration",
+      "target": "../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/tasks/53-collaboration-cleanup-closeout.md",
+      "label": "Sureal serial collaboration",
+      "target": "../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "label": "Sureal-local collaboration protocol",
+      "target": "2026-10-03-sureal-serial-collaboration-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "label": "44 \u2014 reference admission",
+      "target": "../../research/tasks/44-models-training-reference-admission.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/44-models-training-reference-admission.md",
+      "exists": true
+    },
+    {
+      "source": "docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "label": "45 \u2014 models and layers",
+      "target": "../../research/tasks/45-first-class-models-and-layers.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/45-first-class-models-and-layers.md",
+      "exists": true
+    },
+    {
+      "source": "docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "label": "46 \u2014 training policy and state",
+      "target": "../../research/tasks/46-first-class-training-policy-and-state.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/46-first-class-training-policy-and-state.md",
+      "exists": true
+    },
+    {
+      "source": "docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "label": "47 \u2014 shared fixed-frame producer",
+      "target": "../../research/tasks/47-shared-fixed-frame-producer.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/47-shared-fixed-frame-producer.md",
+      "exists": true
+    },
+    {
+      "source": "docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "label": "48 \u2014 retention and closeout",
+      "target": "../../research/tasks/48-models-training-retention-and-closeout.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/48-models-training-retention-and-closeout.md",
+      "exists": true
+    },
+    {
+      "source": "docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "label": "Research work guide",
+      "target": "../../research/README.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/README.md",
+      "exists": true
+    },
+    {
+      "source": "docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "label": "Queue policy",
+      "target": "../../research/task-queue.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/task-queue.md",
+      "exists": true
+    },
+    {
+      "source": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "label": "49 \u2014 project and clean-base admission",
+      "target": "../../research/tasks/49-collaboration-project-admission.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/49-collaboration-project-admission.md",
+      "exists": true
+    },
+    {
+      "source": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "label": "50 \u2014 serial worker attempts",
+      "target": "../../research/tasks/50-collaboration-worker-attempts.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/50-collaboration-worker-attempts.md",
+      "exists": true
+    },
+    {
+      "source": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "label": "51 \u2014 immutable candidates and verification",
+      "target": "../../research/tasks/51-collaboration-candidate-verification.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/51-collaboration-candidate-verification.md",
+      "exists": true
+    },
+    {
+      "source": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "label": "52 \u2014 exact landing and recovery",
+      "target": "../../research/tasks/52-collaboration-landing-recovery.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/52-collaboration-landing-recovery.md",
+      "exists": true
+    },
+    {
+      "source": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "label": "53 \u2014 cleanup and full-loop admission",
+      "target": "../../research/tasks/53-collaboration-cleanup-closeout.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/53-collaboration-cleanup-closeout.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "Overall goal and evidence policy",
+      "target": "../../docs/research/tasks/program-goal.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/program-goal.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "R0 evidence",
+      "target": "research/r0-geometric-insula.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/r0-geometric-insula.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "single-device Torch GPU runtime",
+      "target": "research/gpu-runtime-verified.json",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/gpu-runtime-verified.json",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "Perception evaluators",
+      "target": "research/perception-evaluators-verified.json",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/perception-evaluators-verified.json",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "01",
+      "target": "../../docs/research/tasks/01-insula-runtime.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/01-insula-runtime.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "02",
+      "target": "../../docs/research/tasks/02-native-replay.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/02-native-replay.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "03",
+      "target": "../../docs/research/tasks/03-geometry-math.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/03-geometry-math.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "04",
+      "target": "../../docs/research/tasks/04-sensor-reconstruction.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/04-sensor-reconstruction.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "05",
+      "target": "../../docs/research/tasks/05-inspection-views.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/05-inspection-views.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "06",
+      "target": "../../docs/research/tasks/06-r0-closeout.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/06-r0-closeout.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "07",
+      "target": "../../docs/research/tasks/07-scientific-protocol.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/07-scientific-protocol.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "08",
+      "target": "../../docs/research/tasks/08-gpu-runtime.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/08-gpu-runtime.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "09",
+      "target": "../../docs/research/tasks/09-perception-evaluators.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/09-perception-evaluators.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "10",
+      "target": "../../docs/research/tasks/10-pointpillars-detection.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/10-pointpillars-detection.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "11",
+      "target": "../../docs/research/tasks/11-point-segmentation.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/11-point-segmentation.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "12",
+      "target": "../../docs/research/tasks/12-swformer-comparison.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/12-swformer-comparison.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "13",
+      "target": "../../docs/research/tasks/13-rsn-range-study.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/13-rsn-range-study.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "14",
+      "target": "../../docs/research/tasks/14-camera-box-mask-baselines.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/14-camera-box-mask-baselines.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "15",
+      "target": "../../docs/research/tasks/15-camera-3d-let.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/15-camera-3d-let.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "16",
+      "target": "../../docs/research/tasks/16-r4d-distance.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/16-r4d-distance.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "17",
+      "target": "../../docs/research/tasks/17-sam-mask-refinement.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/17-sam-mask-refinement.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "18",
+      "target": "../../docs/research/tasks/18-mask-to-lidar.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/18-mask-to-lidar.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "19",
+      "target": "../../docs/research/tasks/19-motion-ingestion-evaluation.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/19-motion-ingestion-evaluation.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "20",
+      "target": "../../docs/research/tasks/20-motion-baseline.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/20-motion-baseline.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "21",
+      "target": "../../docs/research/tasks/21-forecast-feature-study.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/21-forecast-feature-study.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "22",
+      "target": "../../docs/research/tasks/22-program-synthesis.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/22-program-synthesis.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "23",
+      "target": "../../docs/research/tasks/23-sam-concept-discovery.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/23-sam-concept-discovery.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "24",
+      "target": "../../docs/research/tasks/24-teacher-distillation.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/24-teacher-distillation.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "25",
+      "target": "../../docs/research/tasks/25-joint-multimodal-model.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/25-joint-multimodal-model.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "26",
+      "target": "../../docs/research/tasks/26-temporal-uncertainty.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/26-temporal-uncertainty.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "27",
+      "target": "../../docs/research/tasks/27-planning-contract.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/27-planning-contract.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "full64 receipt",
+      "target": "research/training-box-full64-replay-verified.json",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/training-box-full64-replay-verified.json",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "full103 semantics",
+      "target": "research/scientific-semantic-full103-verified.json",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/scientific-semantic-full103-verified.json",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "shape evidence",
+      "target": "research/scientific-native-shape-full103-retained-audit.json",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/scientific-native-shape-full103-retained-audit.json",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "camera evidence",
+      "target": "research/scientific-camera-full103-verified.json",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/scientific-camera-full103-verified.json",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "retained aggregate",
+      "target": "research/point-grid-full103-and-overfit-box-retained-audit.json",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/point-grid-full103-and-overfit-box-retained-audit.json",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "fixed-batch overfit verifier",
+      "target": "research/tier1-batch-overfit-verifier.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-batch-overfit-verifier.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "Study spec",
+      "target": "../../docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "execution plan",
+      "target": "../../docs/superpowers/plans/2026-10-02-perception-architecture-study.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/plans/2026-10-02-perception-architecture-study.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "33: balanced cohort fitting",
+      "target": "../../docs/research/tasks/33-balanced-cohort-fitting.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/33-balanced-cohort-fitting.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "comparison results",
+      "target": "research/balanced16-fitting-results.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-fitting-results.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "34: rare-class learning diagnosis",
+      "target": "../../docs/research/tasks/34-rare-class-learning-diagnosis.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/34-rare-class-learning-diagnosis.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "35: fixed-batch fitting sweep",
+      "target": "../../docs/research/tasks/35-all-class-single-batch-sweep.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/35-all-class-single-batch-sweep.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "closed comparison",
+      "target": "research/tier1-overfit20261002b-results.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-overfit20261002b-results.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "full curves",
+      "target": "research/tier1-overfit20261002b-results.json",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/tier1-overfit20261002b-results.json",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "36: Fine/coarse grid grouping",
+      "target": "../../docs/research/tasks/36-grid-resolution.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/36-grid-resolution.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "37: Ragged dynamic pillars",
+      "target": "../../docs/research/tasks/37-ragged-pillars.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/37-ragged-pillars.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "38: Within-pillar attention",
+      "target": "../../docs/research/tasks/38-point-attention.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/38-point-attention.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "39: Range-to-pillar feature fusion",
+      "target": "../../docs/research/tasks/39-range-fusion.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/39-range-fusion.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "40: Sparse multiscale BEV transformer",
+      "target": "../../docs/research/tasks/40-sparse-bev-transformer.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/40-sparse-bev-transformer.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "Live tracker",
+      "target": "research/experiment-tracker.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/experiment-tracker.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "Research journal",
+      "target": "research/research-journal.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/research-journal.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "Tracking CLI",
+      "target": "tracking/README.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/tracking/README.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "Design proposal",
+      "target": "../../docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "research work guide",
+      "target": "../../docs/research/README.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/README.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "44",
+      "target": "../../docs/research/tasks/44-models-training-reference-admission.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/44-models-training-reference-admission.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "45",
+      "target": "../../docs/research/tasks/45-first-class-models-and-layers.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/45-first-class-models-and-layers.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "46",
+      "target": "../../docs/research/tasks/46-first-class-training-policy-and-state.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/46-first-class-training-policy-and-state.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "47",
+      "target": "../../docs/research/tasks/47-shared-fixed-frame-producer.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/47-shared-fixed-frame-producer.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "48",
+      "target": "../../docs/research/tasks/48-models-training-retention-and-closeout.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/48-models-training-retention-and-closeout.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "Queue policy",
+      "target": "../../docs/research/task-queue.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/task-queue.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "Design proposal",
+      "target": "../../docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "queue policy",
+      "target": "../../docs/research/task-queue.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/task-queue.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "49",
+      "target": "../../docs/research/tasks/49-collaboration-project-admission.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/49-collaboration-project-admission.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "50",
+      "target": "../../docs/research/tasks/50-collaboration-worker-attempts.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/50-collaboration-worker-attempts.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "51",
+      "target": "../../docs/research/tasks/51-collaboration-candidate-verification.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/51-collaboration-candidate-verification.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "52",
+      "target": "../../docs/research/tasks/52-collaboration-landing-recovery.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/52-collaboration-landing-recovery.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "53",
+      "target": "../../docs/research/tasks/53-collaboration-cleanup-closeout.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/53-collaboration-cleanup-closeout.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "Native oracle metric handoff",
+      "target": "research/motion-real-metric-handoff-verified.json",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/motion-real-metric-handoff-verified.json",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "Expanded HDFS retention",
+      "target": "research/advanced-expanded20261002a-hdfs-retention-index.json",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/advanced-expanded20261002a-hdfs-retention-index.json",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "native input-cache retention",
+      "target": "research/native-cache-hdfs-retention-status.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/native-cache-hdfs-retention-status.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "Ideal coverage controls",
+      "target": "research/balanced16-coverage-oracle-status.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-coverage-oracle-status.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "actual live retention evidence",
+      "target": "research/sustained-checkpoint-hdfs-closeout-reconciled.json",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-checkpoint-hdfs-closeout-reconciled.json",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "41: association and supervision coverage",
+      "target": "../../docs/research/tasks/41-prediction-target-association.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/41-prediction-target-association.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "design",
+      "target": "../../docs/superpowers/specs/2026-10-03-prediction-target-association-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-prediction-target-association-design.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "implementation plan",
+      "target": "../../docs/superpowers/plans/2026-10-03-prediction-target-association.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/plans/2026-10-03-prediction-target-association.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "experiment handbook",
+      "target": "research/prediction-target-association-study.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/prediction-target-association-study.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "Ticket41 \u2014 prediction\u2013target association",
+      "target": "../../docs/research/tasks/41-prediction-target-association.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/41-prediction-target-association.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "42: object failure ledger",
+      "target": "../../docs/research/tasks/42-object-failure-ledger.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/42-object-failure-ledger.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "43: frozen normalization diagnostic",
+      "target": "../../docs/research/tasks/43-frozen-normalization-diagnostic.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/43-frozen-normalization-diagnostic.md",
+      "exists": true
+    }
+  ],
+  "new_or_updated_links": [
+    {
+      "source": "docs/research/README.md",
+      "label": "Sureal-local serial collaboration protocol",
+      "target": "../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/README.md",
+      "label": "49",
+      "target": "tasks/49-collaboration-project-admission.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/49-collaboration-project-admission.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/README.md",
+      "label": "50",
+      "target": "tasks/50-collaboration-worker-attempts.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/50-collaboration-worker-attempts.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/README.md",
+      "label": "51",
+      "target": "tasks/51-collaboration-candidate-verification.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/51-collaboration-candidate-verification.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/README.md",
+      "label": "52",
+      "target": "tasks/52-collaboration-landing-recovery.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/52-collaboration-landing-recovery.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/README.md",
+      "label": "53",
+      "target": "tasks/53-collaboration-cleanup-closeout.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/53-collaboration-cleanup-closeout.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/task-queue.md",
+      "label": "Sureal-local serial collaboration protocol",
+      "target": "../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/tasks/44-models-training-reference-admission.md",
+      "label": "53 \u2014 local protocol closeout",
+      "target": "53-collaboration-cleanup-closeout.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/53-collaboration-cleanup-closeout.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/tasks/49-collaboration-project-admission.md",
+      "label": "Sureal serial collaboration",
+      "target": "../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/tasks/50-collaboration-worker-attempts.md",
+      "label": "Sureal serial collaboration",
+      "target": "../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/tasks/51-collaboration-candidate-verification.md",
+      "label": "Sureal serial collaboration",
+      "target": "../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/tasks/52-collaboration-landing-recovery.md",
+      "label": "Sureal serial collaboration",
+      "target": "../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/research/tasks/53-collaboration-cleanup-closeout.md",
+      "label": "Sureal serial collaboration",
+      "target": "../../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "label": "Sureal-local collaboration protocol",
+      "target": "2026-10-03-sureal-serial-collaboration-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "exists": true
+    },
+    {
+      "source": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "label": "49 \u2014 project and clean-base admission",
+      "target": "../../research/tasks/49-collaboration-project-admission.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/49-collaboration-project-admission.md",
+      "exists": true
+    },
+    {
+      "source": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "label": "50 \u2014 serial worker attempts",
+      "target": "../../research/tasks/50-collaboration-worker-attempts.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/50-collaboration-worker-attempts.md",
+      "exists": true
+    },
+    {
+      "source": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "label": "51 \u2014 immutable candidates and verification",
+      "target": "../../research/tasks/51-collaboration-candidate-verification.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/51-collaboration-candidate-verification.md",
+      "exists": true
+    },
+    {
+      "source": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "label": "52 \u2014 exact landing and recovery",
+      "target": "../../research/tasks/52-collaboration-landing-recovery.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/52-collaboration-landing-recovery.md",
+      "exists": true
+    },
+    {
+      "source": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "label": "53 \u2014 cleanup and full-loop admission",
+      "target": "../../research/tasks/53-collaboration-cleanup-closeout.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/53-collaboration-cleanup-closeout.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "Design proposal",
+      "target": "../../docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "queue policy",
+      "target": "../../docs/research/task-queue.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/task-queue.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "49",
+      "target": "../../docs/research/tasks/49-collaboration-project-admission.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/49-collaboration-project-admission.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "50",
+      "target": "../../docs/research/tasks/50-collaboration-worker-attempts.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/50-collaboration-worker-attempts.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "51",
+      "target": "../../docs/research/tasks/51-collaboration-candidate-verification.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/51-collaboration-candidate-verification.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "52",
+      "target": "../../docs/research/tasks/52-collaboration-landing-recovery.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/52-collaboration-landing-recovery.md",
+      "exists": true
+    },
+    {
+      "source": "experiments/waymo-perception/research-task-index.md",
+      "label": "53",
+      "target": "../../docs/research/tasks/53-collaboration-cleanup-closeout.md",
+      "resolved": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/docs/research/tasks/53-collaboration-cleanup-closeout.md",
+      "exists": true
+    }
+  ]
+}
