@@ -4,11 +4,11 @@
 
 **Blocked by:** 01 (A new version of the CPU rootfs carries Bazel 9.2)
 
-**Status:** done
+**Status:** ready-for-agent
 
-- [x] The repository root has the Bazel module file, its committed lock file, the Bazel version file and the Bazel configuration; packages are declared only for the two research programs
-- [x] The Python toolchain is the rootfs interpreter with its installed packages; Bazel fetches no third-party Python package
-- [x] The wrapper clears the environment, sets a fixed home, mounts the rootfs read-only, and mounts the repository and one git-ignored cache directory that is also listed in the Bazel ignore file
+- [ ] The repository root has the Bazel module file, its committed lock file, the Bazel version file and the Bazel configuration; packages are declared only for the two research programs
+- [ ] The Python toolchain is the rootfs interpreter with its installed packages; Bazel fetches no third-party Python package
+- [ ] The wrapper clears the environment, sets a fixed home, mounts the rootfs read-only, and mounts the repository and one git-ignored cache directory that is also listed in the Bazel ignore file
 - [x] A second run of the same test is served from the persistent cache
 - [x] The wrapper has a mode that prints the sandbox command as data without running it, covered by a unit test
 - [x] The wrapper refuses to run, with a clear message, when the rootfs does not match its lock; covered by a unit test
