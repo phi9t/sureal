@@ -1,0 +1,108 @@
+{
+  "admission": {
+    "cpu_insula_acceptance_pending": true,
+    "managed_dispatch_accepted": false,
+    "matching_static_preparation_required": true,
+    "native_kata_or_privileged_effects_by_reviewer": false,
+    "new_native_attempt_admitted": false,
+    "old_g_retry_or_release_allowed": false,
+    "outstanding_reviewer_processes": false,
+    "shared_source_mutations": false,
+    "source_only_approved": true,
+    "stop_capability_accepted": false,
+    "task50_accepted": false
+  },
+  "author": "/root",
+  "author_native_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+  "candidate": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+  "checks": {
+    "all_source_blob_ids_modes_sha256_extras_and_commit_parent_tree_checked": true,
+    "cold_objects": 6693,
+    "cold_pack_sha256_and_git_fsck_pass": true,
+    "frozen_controls_actual_command": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-recorder-1cef-frozen-controls/actual-command.json",
+      "sha256": "a47adefab5f8c66c2fa3b335c444048e7bd201d3744e6c96adb95a9552ef7e23"
+    },
+    "frozen_tests_passed": 54,
+    "materialized_entries": 4215,
+    "raw_cold_source_identity": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-recorder1cef-cold-review-result.json",
+      "sha256": "ae8925aa84fa454f12e1d4582bc67f60af065817ce8da6ceb03cdda4ef30404c"
+    },
+    "scope_memory_max": 268435456,
+    "source_entries": 4217,
+    "swap_max": 0
+  },
+  "domain_assessment": [
+    "Channel.record retains method, exact already-matched owned thread ID, sorted parameter key names and a labeled canonical parsed-envelope SHA256; notification bodies and exception messages remain omitted.",
+    "The strict native Wire 1MiB frame ceiling bounds input metadata, and the original combined 32MiB channel/fixture output ceiling remains in force. No silent truncation or synthetic method is introduced.",
+    "Rejected lifecycle still raises the same ValueError, records unknown coverage, creates no accepted frame/event/category and yields UNKNOWN final. The independent observer still refuses any errors.",
+    "No unknown method is accepted as a lifecycle or private delta. This instrumentation can reveal the next actual rejected shape; it does not resolve capability availability or reconstruct lost g evidence."
+  ],
+  "findings": [],
+  "kind": "independent-native-fixture-source-review",
+  "materialization": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/root-channel-candidate-20261005a/materialization.json",
+    "sha256": "2d33d995a6409b39b017e1fb5e1e29022cee19838a1806b700fba4d1e0b3a086"
+  },
+  "operator_sha256": "a173a3eb5b3ab717d17305048abb39144458e4b7a37fb64d2245f2aebff6e484",
+  "parent": "b507aaf6899e84776abb420fda8264f70c0c6acc",
+  "previous_review": {
+    "path": "/data02/home/philip.yang/devx/tmp/collab50-native-fixture-review-53e4854.json",
+    "sha256": "9f0cbc49123b3a483a2f8c07cab9c9c2f9c8c851b1cc69c2b1cfa607ab844c6f"
+  },
+  "repair_contract": {
+    "path": "/data02/home/philip.yang/devx/tmp/collab50-g-channel-failure-and-instrumentation-ruling-v1.json",
+    "sha256": "98a8a6a611230fa95babab450848f0a40b873db711058d903916dc81a0efc871"
+  },
+  "retention": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/root-channel-candidate-20261005a/cold-retention/retention.json",
+    "sha256": "fb2dc11361578f44db19c841cf887173931b382149e9cd007c2b200fcf340b04"
+  },
+  "review_package": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/root-channel-candidate-20261005a/review-package.json",
+    "sha256": "9b333abd49fcab4a57093c1518d0c9af5b111b492c30d0c8ab10ece82f304c71"
+  },
+  "reviewed_ms": 1791172685903,
+  "reviewer": "/root/collab_execution_admission_review",
+  "reviewer_native_thread_id": "01a105a5-de93-74a3-adad-c5184f54a751",
+  "runner_disposition": [
+    {
+      "outcome": "First reviewer scope name lacked the existing sureal-sustained-collab prefix; one unchanged actual-scope test refused. Retained as review-runner mismatch, not source regression.",
+      "tool_chunk": "2c0719"
+    },
+    {
+      "outcome": "Correctly named review scope passed all 54 worktree controls.",
+      "tool_chunk": "0af834"
+    },
+    {
+      "actual_command": {
+        "path": "/data02/home/philip.yang/devx/tmp/collab50-recorder-1cef-frozen-controls/actual-command.json",
+        "sha256": "a47adefab5f8c66c2fa3b335c444048e7bd201d3744e6c96adb95a9552ef7e23"
+      },
+      "outcome": "Fresh exact cold snapshot passed all 54 controls under 256MiB/swap0."
+    }
+  ],
+  "schema_version": 1,
+  "scoped_delta": {
+    "change": "Only rejected owned-notification error metadata and its cause/privacy test; existing recorder/refusal/control/resource behavior unchanged.",
+    "changed": [
+      "tests/collab/fixture_support/native_stop_channel.py",
+      "tests/collab/fixture_support/test_native_stop_channel.py"
+    ],
+    "imported_root53_files": 10,
+    "unchanged": [
+      "tests/collab/fixture_support/contract.md",
+      "tests/collab/fixture_support/native_stop_fixture.py",
+      "tests/collab/fixture_support/preflight_driver.py",
+      "tests/collab/fixture_support/preflight_guards.py",
+      "tests/collab/fixture_support/python_import_profile.py",
+      "tests/collab/fixture_support/test_native_stop_fixture.py",
+      "tests/collab/fixture_support/test_preflight_driver.py",
+      "tests/collab/fixture_support/test_preflight_guards.py"
+    ]
+  },
+  "source": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/root-channel-candidate-20261005a/source",
+  "tree": "8832938c20e80f1d5884a225ac59ef8a9f2fd007",
+  "verdict": "pass"
+}

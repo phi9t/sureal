@@ -1,0 +1,140 @@
+{
+  "canonical_head": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+  "completion_not_inferred_from": "Manual58/source host tests/closed49/native empty threads do not establish full automation",
+  "goal_complete": false,
+  "goal_issue_uid": "01M450RZ7915Q76EYH0CNED2Y1",
+  "goal_task": "59",
+  "kind": "FullMacAutomationExecutionManifest",
+  "last_verified": {
+    "candidate": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+    "independent_live_review": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-recorder1cef-source-insula-result-review.json",
+      "sha256": "230b59f3a9e315765cb420eb5a8b5264cf1b988904a2d1253a6f6809abc25712"
+    },
+    "insula_result": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/root-channel-insula-v1/actual-command.json",
+      "sha256": "3098333fa56823c6176bb243d1bd3baad3c185f32e3faca5ebbe3765b078e5b6"
+    },
+    "source_landed": true,
+    "source_landed_commit": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+    "source_review": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-native-fixture-review-1cefb02.json",
+      "sha256": "5b1ca0174dd52333221aed338d82f3dc6132b0a9d394369ffce4aa433f8f72c5"
+    }
+  },
+  "live_failure": {
+    "actual_command": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-live-driver-command-v6/actual-command.json",
+      "sha256": "bf965cb447585deefb0861b0cb9cadee9307558329f19ceb41eecef2d8d3f28f"
+    },
+    "fixture_id": "stop50-20261005h",
+    "native_thread_created": false,
+    "operator_ended_ns": 588883857595584,
+    "operator_started_ns": 588881455315547,
+    "payload_launched": false,
+    "ready_ns": 588881446140363,
+    "reason": "2sec READY age expires during fullsource preparation",
+    "stopped_readback": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/h50-failure-scope-readback-v1.json",
+      "sha256": "ea58e02d5fc8fd4f8417ad44a755372580cd07636c2b1c59b576adb9b933d8c9"
+    }
+  },
+  "next": "Fix observed READY startup timing; preserve allstop/source/resource gates; then fresh native notification diagnosis",
+  "observed_ms": 1791173661886,
+  "plan_gaps": [
+    "Concrete55-57 implementation plan review/admission"
+  ],
+  "preserved": "Frozen science recipes/checkpoints/GT/resources; no GPU or optimizer effects; F/G unknown sources retained",
+  "schema_version": 1,
+  "sequence": [
+    "50",
+    "51",
+    "52",
+    "53.0",
+    "54",
+    "53",
+    "55",
+    "56",
+    "57"
+  ],
+  "source_map_admission_gaps": [
+    "55",
+    "56",
+    "57",
+    "59"
+  ],
+  "subtasks": [
+    {
+      "accepted": false,
+      "landed": false,
+      "plan_admitted": true,
+      "remaining_gate": "Fresh native stop/ownership/lifecycle proof; then two-worker contract implementation",
+      "state": "in_progress",
+      "task": "50"
+    },
+    {
+      "accepted": false,
+      "landed": false,
+      "plan_admitted": true,
+      "remaining_gate": "Predecessor admission plus own exact-source/live independent acceptance",
+      "state": "queued",
+      "task": "51"
+    },
+    {
+      "accepted": false,
+      "landed": false,
+      "plan_admitted": true,
+      "remaining_gate": "Predecessor admission plus own exact-source/live independent acceptance",
+      "state": "queued",
+      "task": "52"
+    },
+    {
+      "accepted": false,
+      "landed": false,
+      "plan_admitted": true,
+      "remaining_gate": "Predecessor admission plus own exact-source/live independent acceptance",
+      "state": "queued",
+      "task": "53.0"
+    },
+    {
+      "accepted": false,
+      "landed": false,
+      "plan_admitted": true,
+      "remaining_gate": "Predecessor admission plus own exact-source/live independent acceptance",
+      "state": "queued",
+      "task": "54"
+    },
+    {
+      "accepted": false,
+      "landed": false,
+      "plan_admitted": true,
+      "remaining_gate": "Predecessor admission plus own exact-source/live independent acceptance",
+      "state": "queued",
+      "task": "53"
+    },
+    {
+      "accepted": false,
+      "landed": false,
+      "plan_admitted": false,
+      "remaining_gate": "Predecessor admission plus own exact-source/live independent acceptance",
+      "state": "queued",
+      "task": "55"
+    },
+    {
+      "accepted": false,
+      "landed": false,
+      "plan_admitted": false,
+      "remaining_gate": "Predecessor admission plus own exact-source/live independent acceptance",
+      "state": "queued",
+      "task": "56"
+    },
+    {
+      "accepted": false,
+      "landed": false,
+      "plan_admitted": false,
+      "remaining_gate": "Predecessor admission plus own exact-source/live independent acceptance",
+      "state": "queued",
+      "task": "57"
+    }
+  ]
+}
