@@ -114,7 +114,7 @@ PROMPT = '''You are implementing one ticket of the "{effort}" effort in this git
 
 Read these first, in order:
 1. AGENTS.md and the files it points to under docs/agents/
-2. docs/adr/ (both ADRs), experiments/waymo-perception/docs/adr/, and docs/repo-structure.md
+2. docs/adr/ (both ADRs), autonomy/docs/adr/, and docs/repo-structure.md
 3. .scratch/{effort}/spec.md
 4. Your ticket: .scratch/{effort}/issues/{name}.md
 
@@ -126,10 +126,10 @@ Rules:
 - Shared state outside the repository (for example ~/.cache/waystone) is used by other work. You may
   create new versioned paths there. Never modify, move or delete anything that already exists there.
 - Files under any research/ directory are retained evidence. Never modify them.
-- Until the rename tickets land, do not add, change or remove any .py file under
-  experiments/waymo-perception/{{pipeline,gpu,tier1,cohort,resources}} unless your ticket says so; a
+- Do not add, change or remove any .py file under
+  autonomy/{{pipeline,gpu,tier1,cohort,resources}} unless your ticket requires it; a
   running guard validates their exact inventory. Run
-  `python3 experiments/waymo-perception/tools/pins.py check --base {integration}` before each commit
+  `python3 autonomy/tools/pins.py check --base {integration}` before each commit
   and record in the ticket which pinned files you changed and why.
 - Work test-first at the seams the spec names. Run the narrowest relevant tests as you go and the
   full relevant suite at the end. Report failures honestly; never weaken a check to make it pass.
