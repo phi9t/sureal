@@ -164,3 +164,14 @@ Review 1 verification:
 - `git diff --check` -> exit 0, no output.
 - `git diff --name-only work/semantic-layout/integration..HEAD -- 'autonomy/research/**' 'parallax/research/**' 'research/**'` -> no output.
 - `python3 autonomy/tools/pins.py check --base work/semantic-layout/integration` -> exit 1 with `FAIL: 86 changed file(s) pinned by retained receipts`; moved pinned files are now reported with `old -> new` paths.
+
+Review 2 follow-up:
+
+- Fixed the living-document link in `autonomy/research-task-index.md` from the moved `tracking/README.md` path to `evidence/README.md`.
+- Removed the stale `tracking/` area from `autonomy/ARCHITECTURE.md`; evidence tooling is now documented under the `evidence/` layer.
+- Searched living Markdown for stale moved paths named by the review, excluding retained `research/` and dated spec/plan directories. No `tracking/` path or moved `pipeline/insula_entry`, `pipeline/runtime_identity`, `pipeline/m0_*`, `pipeline/staging_lease`, or `pipeline/source_integrity` path remains. The documented `python3 autonomy/tools/pins.py ...` commands remain valid through the compatibility entrypoint.
+
+Review 2 verification:
+
+- `python3 -m unittest tests.test_publication_audit` -> `Ran 30 tests`, `OK`.
+- `python3 scripts/publication_audit.py --root .` -> `{"errors": [], "gitlinks": 2, "max_blob_bytes": 26214400, "schema_version": 1, "status": "pass", "tracked_files": 4981}`.
