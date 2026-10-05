@@ -4,7 +4,7 @@
 
 **Blocked by:** 02 (One wrapper command runs Bazel inside Insula)
 
-**Status:** done
+**Status:** ready-for-agent
 
 - [x] All 176 existing test modules are Bazel test targets
 - [x] The default test run passes at least the 140 modules that pass in today's baseline (532 tests)
