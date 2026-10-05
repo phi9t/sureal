@@ -7,9 +7,9 @@
 **Status:** ready-for-agent
 
 - [x] All 176 existing test modules are Bazel test targets
-- [x] The default test run passes at least the 140 modules that pass in today's baseline (532 tests)
-- [x] Modules needing torch are tagged for the GPU configuration; modules needing a live-gate mount are tagged and excluded by default
-- [x] The two modules that fail today are recorded with their cause and are either fixed without changing pinned sources or tagged as known failures
+- [ ] The default test run passes at least the 140 modules that pass in today's baseline (532 tests)
+- [ ] Modules needing torch are tagged for the GPU configuration; modules needing a live-gate mount are tagged and excluded by default
+- [ ] The two modules that fail today are recorded with their cause and are either fixed without changing pinned sources or tagged as known failures
 - [x] No `.py` file is added, changed or removed in the directories whose inventory the sustained-run guard validates
 - [x] The pin report shows no pinned file changed
 
