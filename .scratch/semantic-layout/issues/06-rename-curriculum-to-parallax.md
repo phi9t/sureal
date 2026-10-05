@@ -4,7 +4,7 @@
 
 **Blocked by:** 05 (The curriculum's tests run under Bazel, in place)
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] The move is one commit containing only renames, so history follows every file
 - [x] A following commit updates the paths that code, the publication audit and its test, and CI depend on
