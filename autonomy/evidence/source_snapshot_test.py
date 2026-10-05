@@ -98,10 +98,47 @@ class SourceSnapshotTests(unittest.TestCase):
                     str(repo / "bazelw"),
                     "query",
                     "--output=label",
-                    'filter("^//", labels("srcs", deps(//autonomy:evidence__source_snapshot_test)) union labels("data", deps(//autonomy:evidence__source_snapshot_test)))',
+                    'kind("source file", filter("^//", labels("srcs", deps(//autonomy:evidence__source_snapshot_test)) union labels("data", deps(//autonomy:evidence__source_snapshot_test))))',
                 ],
             )
             self.assertEqual(calls[0][1]["cwd"], repo)
+
+    def test_bazel_target_snapshot_ignores_rule_labels_after_expanding_data(self):
+        api = self.api()
+        with tempfile.TemporaryDirectory() as temporary:
+            repo = Path(temporary)
+            self.write_repo(repo)
+            (repo / "autonomy/support").mkdir()
+            (repo / "autonomy/support/config.json").write_text("{}\n")
+            calls = []
+
+            def run(command, **kwargs):
+                calls.append((command, kwargs))
+                labels = (
+                    [
+                        "//autonomy:evidence/source_snapshot.py",
+                        "//autonomy:support/config.json",
+                    ]
+                    if 'kind("source file",' in command[-1]
+                    else [
+                        "//autonomy:evidence/source_snapshot.py",
+                        "//autonomy:support_files",
+                        "//autonomy:support/config.json",
+                    ]
+                )
+                return types.SimpleNamespace(returncode=0, stdout="\n".join(labels) + "\n", stderr="")
+
+            snapshot = api["snapshot_bazel_target"]("//autonomy:target", api["LocalSnapshotStore"](repo / "snapshots"), repo_root=repo, runner=run)
+
+            self.assertEqual(
+                list(snapshot.source_pins),
+                [
+                    "autonomy/evidence/source_snapshot.py",
+                    "autonomy/support/config.json",
+                ],
+            )
+            self.assertNotIn("autonomy/support_files", snapshot.source_pins)
+            self.assertIn('kind("source file",', calls[0][0][-1])
 
     def test_external_bazel_source_labels_are_excluded_from_repository_snapshot(self):
         api = self.api()

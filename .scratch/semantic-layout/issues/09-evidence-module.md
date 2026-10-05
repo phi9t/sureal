@@ -16,13 +16,13 @@
 
 ## Comments
 
-Built `autonomy/evidence/source_snapshot.py` as the shared evidence module. It snapshots explicit repository-local Bazel `srcs` and `data` inputs for a target closure, writes deterministic tar.gz archives, returns source pins and digest metadata, verifies receipts against fetched snapshots without consulting the working tree, and exposes the shared SHA-256 file digest plus regular non-symlink file guard.
+Built `autonomy/evidence/source_snapshot.py` as the shared evidence module. It snapshots explicit repository-local Bazel source-file inputs reached through target `srcs` and `data` closures, writes deterministic tar.gz archives, returns source pins and digest metadata, verifies receipts against fetched snapshots without consulting the working tree, and exposes the shared SHA-256 file digest plus regular non-symlink file guard.
 
-Added `autonomy/evidence/source_snapshot_test.py` with tests for target snapshots, deterministic archive metadata/order, changed/added/removed source digests, local digest-keyed storage, missing/corrupt snapshots, receipt verification from the stored snapshot after deleting sources, and symlink rejection on source files, store reads, and store writes. Updated `autonomy/BUILD.bazel` so concept-local sibling `*_test.py` files are discovered as Bazel tests.
+Added `autonomy/evidence/source_snapshot_test.py` with tests for target snapshots, filegroup-style rule labels in data closures, deterministic archive metadata/order, changed/added/removed source digests, local digest-keyed storage, missing/corrupt snapshots, receipt verification from the stored snapshot after deleting sources, and symlink rejection on source files, store reads, and store writes. Updated `autonomy/BUILD.bazel` so concept-local sibling `*_test.py` files are discovered as Bazel tests.
 
 Verification:
 - `./bazelw test //autonomy:evidence__source_snapshot_test --test_output=errors --cache_test_results=no` -> `Executed 1 out of 1 test: 1 test passes.`
-- `./bazelw query --output=label 'filter("^//", labels("srcs", deps(//autonomy:evidence__source_snapshot_test)) union labels("data", deps(//autonomy:evidence__source_snapshot_test)))' | rg '^//autonomy:(BUILD.bazel|evidence/source_snapshot.py|evidence/source_snapshot_test.py)$'` -> printed `//autonomy:BUILD.bazel`, `//autonomy:evidence/source_snapshot.py`, and `//autonomy:evidence/source_snapshot_test.py`.
+- `./bazelw query --output=label 'kind("source file", filter("^//", labels("srcs", deps(//autonomy:evidence__source_snapshot_test)) union labels("data", deps(//autonomy:evidence__source_snapshot_test))))' | rg '^//autonomy:(BUILD.bazel|evidence/source_snapshot.py|evidence/source_snapshot_test.py)$'` -> printed `//autonomy:BUILD.bazel`, `//autonomy:evidence/source_snapshot.py`, and `//autonomy:evidence/source_snapshot_test.py`.
 - `./bazelw test //autonomy/... --cache_test_results=no` -> `Executed 139 out of 139 tests: 139 tests pass.`
 - `python3 autonomy/tools/pins.py check --base work/semantic-layout/integration` -> `PASS: 0 changed file(s) cited by retained receipts`.
 
