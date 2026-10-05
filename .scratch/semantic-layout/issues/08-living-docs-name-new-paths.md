@@ -4,7 +4,7 @@
 
 **Blocked by:** 06 (Rename the curriculum to `parallax/`), 07 (Rename the perception program to `autonomy/`)
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] Every command shown in a living document runs as written
 - [x] Every relative link in a living document resolves
