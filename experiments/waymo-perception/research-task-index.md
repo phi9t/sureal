@@ -1,5 +1,11 @@
 # Actionable research task index
 
+Current user override:[MAC happy path before comprehensive hardening](../../docs/research/2026-10-05-mac-happy-path-first.md).
+[58](../../docs/research/tasks/58-mac-happy-path-perception-pilot.md) prioritizes
+two bounded perception-preparation workers, useful artifacts, live functionality
+checks and reviewed landing before complete MAC admission. Manual lead support
+is explicit. This provisional use does not close scientific or MAC milestones.
+
 [Overall goal and evidence policy](../../docs/research/tasks/program-goal.md). One local task specification per ticket; core execution starts at 01. Tickets 01–06 are verified complete: [R0 evidence](research/r0-geometric-insula.md). Tickets 08 and 09 are also verified complete: [single-device Torch GPU runtime](research/gpu-runtime-verified.json) and [Perception evaluators](research/perception-evaluators-verified.json). Remaining core tickets are planned or preparing scientific readiness. Per-ticket files and linked candidate-specific receipts are authoritative; previous partial implementation/evidence does not automatically satisfy later gates. Conditional tickets require a later activation decision.
 
 | Ticket | Deliverable | Blocked by | Lane |

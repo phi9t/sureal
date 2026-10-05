@@ -1,5 +1,17 @@
 # Research task queue policy
 
+## Current override: useful happy path first, October 5, 2026
+
+The user directs[first useful operation, then comprehensive hardening](2026-10-05-mac-happy-path-first.md).
+[Ticket58](tasks/58-mac-happy-path-perception-pilot.md) is the P0 first eligible
+operational lane: minimum viable lifecycle →two real perception-preparation
+workers →live functional checks →prompt reviewed landing →fix observed defects.
+Full53 completion is not a prerequisite for this provisional use. The existing
+lead can operate unfinished lifecycle steps manually and records that boundary.
+Original milestone acceptance stays intact; comprehensive fault/guard coverage
+is deferred, not passed. Ownership, resource, live implementation/source checks,
+stop proof and scientific retention requirements remain binding.
+
 **Integration admission status (2026-10-04 UTC):** centralized Kata is the user-selected scheduler/broker design, superseding optional-Kata/file-only scheduling. The documentation review corrections passed. The actual ownership transition, installed capabilities, written plan admission and clean-base/live execution gates remain open; statements below describe the proposed v1, not an active operating policy. No backend setup, worker activation or implementation is authorized by this documentation integration. See the [admission and review disposition](reviews/2026-10-04-collaboration-integration-admission.md).
 
 ## Current mechanism and roles
