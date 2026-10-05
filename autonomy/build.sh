@@ -18,7 +18,7 @@ rootfs_digest() {
     PYTHONPATH="$HERE" python3 - "$1" <<'PY'
 import sys
 from pathlib import Path
-from pipeline.runtime_identity import rootfs_identity
+from insula.runtime_identity import rootfs_identity
 
 print(rootfs_identity(Path(sys.argv[1])))
 PY
@@ -139,7 +139,7 @@ validate_new_rootfs "$STAGE" "$PREVIOUS"
 PYTHONPATH="$HERE" python3 - "$STAGE" "$HERE" "$IMAGE" "$BAZEL_VERSION" "$BAZEL_LINUX_X86_64_SHA256" <<'PY'
 import hashlib, json, sys
 from pathlib import Path
-from pipeline.runtime_identity import rootfs_identity
+from insula.runtime_identity import rootfs_identity
 root, here, image, bazel_version, bazel_sha256 = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5]
 lock = {'schema_version': 1, 'platform': 'linux/amd64', 'image_id': image,
         'rootfs_sha256': rootfs_identity(root),

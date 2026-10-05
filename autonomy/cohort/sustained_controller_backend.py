@@ -2,8 +2,8 @@
 import json,os,re,shutil,subprocess,sys,time
 from pathlib import Path
 P=Path(__file__).resolve().parents[1];sys.path[:0]=[str(P),str(P/'architecture')]
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 from tier1.storage import sha,unique_payload_bytes
 from tier1.admission import reserve_write
 from cohort.sustained_contract import validate_contract

@@ -2,10 +2,10 @@
 import hashlib,json,resource,shutil,subprocess,sys,tempfile
 from pathlib import Path
 PACKAGE=Path(__file__).resolve().parents[1];sys.path.insert(0,str(PACKAGE))
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
-from pipeline.source_integrity import verify_source
-from pipeline.staging_lease import staging_lease
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
+from evidence.source_integrity import verify_source
+from insula.staging_lease import staging_lease
 from pipeline.training_box_replay import retained_raw_bytes
 from pipeline.scientific_admission import check_raw_capacity
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()

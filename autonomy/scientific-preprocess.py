@@ -5,16 +5,16 @@ from datetime import datetime,timezone
 import hashlib,json
 from pathlib import Path
 import resource,subprocess,time
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 from pipeline.scientific_admission import admit_scene
 from pipeline.staged_source import staged_source
-from pipeline.staging_lease import staging_lease
+from insula.staging_lease import staging_lease
 from pipeline.scientific_preparation import verified_sidecar_hashes
 
 HERE=Path(__file__).resolve().parent
 COMPONENTS=['lidar_calibration','camera_calibration','vehicle_pose','lidar_pose','lidar_camera_projection','lidar_segmentation','lidar_box']
-CANDIDATES=['scientific-preprocess.py','pipeline/scientific_component.py','pipeline/scientific_sidecars.py','pipeline/scientific_sidecar_validate.py','pipeline/scientific_admission.py','pipeline/staged_source.py','pipeline/source_integrity.py','pipeline/staging_lease.py','pipeline/sensor_records.py','pipeline/scientific_preparation.py','pipeline/scientific_scene_command.py','pipeline/scientific_scene_validate.py','pipeline/scientific_reconstruction.py','pipeline/scientific_sidecar_reader.py','pipeline/reconstruction_validate.py','pipeline/geometry.py','pipeline/geometry_foundation.py']
+CANDIDATES=['scientific-preprocess.py','pipeline/scientific_component.py','pipeline/scientific_sidecars.py','pipeline/scientific_sidecar_validate.py','pipeline/scientific_admission.py','pipeline/staged_source.py','evidence/source_integrity.py','insula/staging_lease.py','pipeline/sensor_records.py','pipeline/scientific_preparation.py','pipeline/scientific_scene_command.py','pipeline/scientific_scene_validate.py','pipeline/scientific_reconstruction.py','pipeline/scientific_sidecar_reader.py','pipeline/reconstruction_validate.py','pipeline/geometry.py','pipeline/geometry_foundation.py']
 
 
 def sha(path):

@@ -5,7 +5,7 @@ REQUIRED=(
  'cohort/publish_native_cache.py','cohort/cache_inventory.py',
  'cohort/cache_retention_audit.py','cohort/retention_sources.py',
  'tier1/admission.py','tier1/storage.py','advanced/archive.py',
- 'advanced/retention.py','pipeline/insula_entry.py','pipeline/runtime_identity.py',
+ 'advanced/retention.py','insula/entry.py','insula/runtime_identity.py',
 )
 SNAPSHOT_TARGET='//autonomy:native-cache-retention-host'
 def sha(path):

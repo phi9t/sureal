@@ -3,6 +3,7 @@ import hashlib
 import json
 import stat
 from pathlib import Path
+from evidence.source_snapshot import file_sha256
 
 
 def rootfs_identity(root: Path) -> str:
@@ -17,11 +18,7 @@ def rootfs_identity(root: Path) -> str:
         if stat.S_ISLNK(info.st_mode):
             record.append(str(path.readlink()))
         elif stat.S_ISREG(info.st_mode):
-            content = hashlib.sha256()
-            with path.open('rb') as source:
-                for chunk in iter(lambda: source.read(1024 * 1024), b''):
-                    content.update(chunk)
-            record.extend([info.st_size, content.hexdigest()])
+            record.extend([info.st_size, file_sha256(path)])
         elif not stat.S_ISDIR(info.st_mode):
             record.append(info.st_rdev)
         digest.update((json.dumps(record, separators=(',', ':')) + '\n').encode())

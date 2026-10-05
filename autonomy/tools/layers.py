@@ -16,6 +16,7 @@ ROOT = '(root)'
 # Lowest first.  Areas sharing a layer are peers and may not import each other.
 LAYERS = (
     ('evidence',),
+    ('insula',),
     ('pipeline',),
     ('gpu', 'evaluation', 'tracking', 'association', 'explorer', 'motion-evaluation', 'viewer'),
     ('architecture',),

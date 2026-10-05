@@ -1,10 +1,10 @@
 from pathlib import Path
 import subprocess,sys,tempfile,unittest
-from pipeline.staging_lease import staging_lease
+from insula.staging_lease import staging_lease
 
 class StagingLeaseTests(unittest.TestCase):
     def child(self,path):
-        code='from pathlib import Path; from pipeline.staging_lease import staging_lease\ntry:\n with staging_lease(Path('+repr(str(path))+')): pass\nexcept ValueError: raise SystemExit(3)'
+        code='from pathlib import Path; from insula.staging_lease import staging_lease\ntry:\n with staging_lease(Path('+repr(str(path))+')): pass\nexcept ValueError: raise SystemExit(3)'
         return subprocess.run([sys.executable,'-c',code],capture_output=True,text=True).returncode
 
     def test_exclusive_cross_process_and_release_after_exception(self):

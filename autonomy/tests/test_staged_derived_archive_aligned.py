@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from pipeline.staged_derived_archive_aligned import staged_derived_archive
-from pipeline.staging_lease import staging_lease
+from insula.staging_lease import staging_lease
 
 
 class AlignedStageTests(unittest.TestCase):

@@ -5,8 +5,8 @@ P = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(P), str(P / 'tier1')]
 from storage import sha, unique_payload_bytes
 from admission import reserve_write
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 C = Path.home() / '.cache/waystone/waymo-perception'
 W = C / 'scientific-processing'
 fpath = P / 'research/tier1-allclass-fixture-verified.json'

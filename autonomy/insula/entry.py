@@ -1,25 +1,15 @@
 """Host-side lock checking and dedicated offline rootfs entry."""
 import argparse
-import hashlib
 import json
 import os
 from pathlib import Path
-from .runtime_identity import verify_rootfs
+from evidence.source_snapshot import file_sha256
+from insula.runtime_identity import verify_rootfs
+from insula.sandbox_plan import live_gate_plan
 
 
 def launch_plan(root, experiment, source, output, command):
-    roots = [Path(x).resolve() for x in (root, experiment, source, output)]
-    root, experiment, source, output = roots
-    if any(a == b or a in b.parents or b in a.parents
-           for a, b in [(source, output),(root,output),(experiment,output)]):
-        raise ValueError('unsafe overlapping mounts')
-    return ['bwrap','--unshare-all','--die-with-parent','--ro-bind',str(root),'/',
-            '--ro-bind',str(experiment),'/experiment','--ro-bind',str(source),'/source',
-            '--bind',str(output),'/outputs','--proc','/proc','--dev','/dev',
-            '--tmpfs','/tmp','--clearenv','--setenv','HOME','/tmp/private-home',
-            '--setenv','PATH','/usr/local/bin:/usr/bin:/bin',
-            '--setenv','PYTHONNOUSERSITE','1','--setenv','PYTHONDONTWRITEBYTECODE','1',
-            '--setenv','PYTHONPATH','/experiment','--chdir','/experiment','--',*command]
+    return live_gate_plan(root, experiment, source, output, command).argv
 
 
 def main():
@@ -43,7 +33,7 @@ def main():
     lock=json.loads(lock_path.read_text())
     if lock.get('schema_version')!=1: raise ValueError('invalid runtime lock schema')
     for key,file in [('requirements_sha256',here/'requirements-tracer.lock'),('dockerfile_sha256',here/'insula/Dockerfile')]:
-        if lock[key]!=hashlib.sha256(file.read_bytes()).hexdigest(): raise ValueError('runtime recipe mismatch')
+        if lock[key]!=file_sha256(file): raise ValueError('runtime recipe mismatch')
     verify_rootfs(args.rootfs,lock['rootfs_sha256'])
     if not args.source.is_dir() or not args.output.is_dir(): raise ValueError('mount directory missing')
     os.execvp(plan[0],plan)

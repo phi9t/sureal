@@ -4,7 +4,7 @@ from datetime import datetime,timezone
 import base64,hashlib,json
 from pathlib import Path
 import subprocess,tempfile
-from pipeline.staging_lease import staging_lease
+from insula.staging_lease import staging_lease
 
 HERE=Path(__file__).resolve().parent
 CACHE=Path.home()/'.cache/waystone/waymo-perception'

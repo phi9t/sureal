@@ -10,8 +10,8 @@ import time
 
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
-from pipeline.insula_entry import launch_plan
-from pipeline.m0_receipt import validate_receipt
+from insula.entry import launch_plan
+from insula.m0_receipt import validate_receipt
 ROOT=Path.home()/'.cache/waystone/waymo-perception/insula/rootfs-v2'
 SOURCE=Path.home()/'.cache/waystone/waymo-perception/slices/validation-two-scenes-20260929'
 GEOMETRY=ROOT.parent/'m3-live-b'

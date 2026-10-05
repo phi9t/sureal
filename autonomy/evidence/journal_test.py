@@ -1,6 +1,6 @@
 import json,tempfile,unittest
 from pathlib import Path
-from tracking.journal import append_entry,read_entries
+from evidence.journal import append_entry,read_entries
 class JournalTests(unittest.TestCase):
  def test_evidence_hashes_and_history_are_preserved(self):
   with tempfile.TemporaryDirectory() as d:
@@ -10,7 +10,11 @@ class JournalTests(unittest.TestCase):
  def test_tampering_and_missing_evidence_are_rejected(self):
   with tempfile.TemporaryDirectory() as d:
    journal=Path(d)/'journal.jsonl'
-   with self.assertRaises(FileNotFoundError):append_entry(journal,'observation',['a'],'Unproven',[Path(d)/'missing'])
+   with self.assertRaises(ValueError):append_entry(journal,'observation',['a'],'Unproven',[Path(d)/'missing'])
+   proof=Path(d)/'proof.json';proof.write_text('{"passed":true}')
+   link=Path(d)/'proof-link.json';link.symlink_to(proof)
+   with self.assertRaisesRegex(ValueError,'regular non-symlinked file required'):
+    append_entry(journal,'observation',['a'],'Symlink proof',[link])
    append_entry(journal,'decision',['a'],'Keep all ground truth',[]);journal.write_text(journal.read_text().replace('Keep all ground truth','Drop ground truth'))
    with self.assertRaises(ValueError):read_entries(journal)
  def test_evidence_survives_source_replacement(self):

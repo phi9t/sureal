@@ -1,7 +1,7 @@
 import base64,hashlib,json,sys,tempfile,time,unittest
 from pathlib import Path
 from pipeline.staged_source import staged_source
-from pipeline.staging_lease import staging_lease
+from insula.staging_lease import staging_lease
 class StagingDeadlineTests(unittest.TestCase):
  def record(self,data):
   h=hashlib.sha256(data).hexdigest();return {'hdfs_uri':'hdfs://fixture/native-source','sha256':h,'hdfs_roundtrip_sha256':h,'source_metadata':{'size':len(data),'md5_hash':base64.b64encode(hashlib.md5(data).digest()).decode()}}

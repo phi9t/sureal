@@ -110,7 +110,7 @@ User requested every planned idea. The concrete written design and implementatio
 
 ## Experiment tracking and journal
 
-[Live tracker](research/experiment-tracker.md) records24 experiment definitions, goals, recipes, verifiers, acceptance and evidence-derived status. [Research journal](research/research-journal.md) separates observations, hypotheses, decisions and follow-up work. Registry and journal snapshots are retained on HDFS with exact readback receipts. [Tracking CLI](tracking/README.md) documents refresh, watch, note, verification and publication.
+[Live tracker](research/experiment-tracker.md) records24 experiment definitions, goals, recipes, verifiers, acceptance and evidence-derived status. [Research journal](research/research-journal.md) separates observations, hypotheses, decisions and follow-up work. Registry and journal snapshots are retained on HDFS with exact readback receipts. [Evidence CLI](evidence/README.md) documents refresh, watch, note, verification and publication.
 
 ## First-class models and training workstream
 
@@ -184,7 +184,7 @@ APH >=0.8 gate. HDFS exact recovery precedes any declared local release.
 
 Status is specified, not implemented or runnable. This documentation update does
 not register runs, alter active four-case optimization controls, change historical
-targets, update generated tracking/journal state or claim new execution evidence.
+targets, update generated tracker/journal state or claim new execution evidence.
 Positive quota, object-balanced loss, NMS and query-head changes are conditional
 follow-ups with separate controls; held-out and broader program goals remain open.
 

@@ -12,11 +12,11 @@ import time
 
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
-from pipeline.m0_receipt import validate_receipt
+from insula.m0_receipt import validate_receipt
 ROOT=Path.home()/'.cache/waystone/waymo-perception/insula/rootfs-v2'
 M0=ROOT.parent/'m0-live-20260930-c'
 SOURCE=Path.home()/'.cache/waystone/waymo-perception/slices/validation-two-scenes-20260929'
-FILES=['verify-reconstruction.py','enter.sh','pipeline/insula_entry.py','pipeline/runtime_identity.py',
+FILES=['verify-reconstruction.py','enter.sh','insula/entry.py','insula/runtime_identity.py',
        'pipeline/geometry.py','pipeline/geometry_foundation.py','pipeline/sensor_records.py',
        'pipeline/reconstruction_probe.py','pipeline/reconstruction_validate.py','pipeline/tracer.py',
        'pipeline/tracer_contracts.py','tests/test_geometry.py','tests/test_sensor_records.py','tests/test_reconstruction_validation.py']

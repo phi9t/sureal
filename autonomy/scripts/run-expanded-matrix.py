@@ -27,7 +27,7 @@ def main():
  stage('train',['python',str(P/'advanced/run.py'),'--run-id',args.run_id])
  extended=P/'research'/('advanced-'+args.run_id+'-results.json');matrix=json.loads(extended.read_text());assert matrix['finished'] and len(matrix['cases'])==8;assert all(case['status'] in ['sustained native overfit','failed to overfit by 10000 updates'] for case in matrix['cases'].values()),[(name,case['status']) for name,case in matrix['cases'].items()]
  stage('closure',['python',str(P/'advanced/close.py'),'--results',str(extended),'--version',args.run_id])
- stage('tracking',['python',str(P/'tracking/cli.py'),'refresh'])
- stage('journal-hdfs',['python',str(P/'tracking/publish.py')])
+ stage('tracking',['python',str(P/'evidence/tracker.py'),'refresh'])
+ stage('journal-hdfs',['python',str(P/'evidence/publish.py')])
  print('PASS expanded matrix and live closure',extended,flush=True)
 if __name__=='__main__':main()

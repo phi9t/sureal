@@ -8,7 +8,7 @@ import resource
 import stat
 import subprocess
 import tempfile
-from .staging_lease import staging_lease
+from insula.staging_lease import staging_lease
 
 WAYSTONE='/data02/home/philip.yang/workspace/waystone/scripts/waystone'
 

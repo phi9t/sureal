@@ -3,8 +3,8 @@
 import argparse,hashlib,json,subprocess,time,resource
 from pathlib import Path
 from datetime import datetime,timezone
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 HERE=Path(__file__).resolve().parent
 WAYSTONE='/data02/home/philip.yang/workspace/waystone/scripts/waystone'
 COMPONENTS=['lidar_calibration','camera_calibration','vehicle_pose','lidar_pose','lidar_camera_projection','lidar_segmentation','lidar_box']

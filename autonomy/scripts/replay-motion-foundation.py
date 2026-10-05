@@ -7,8 +7,8 @@ parser.add_argument("--run-id", required=True)
 args=parser.parse_args()
 if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,79}",args.run_id):
  parser.error("run-id must be a safe, bounded directory name")
-P=pathlib.Path(__file__).resolve().parents[1];sys.path.insert(0,str(P));from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+P=pathlib.Path(__file__).resolve().parents[1];sys.path.insert(0,str(P));from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 from advanced.archive import sha
 C=pathlib.Path.home()/'.cache/waystone/waymo-perception';R=C/'insula'/args.run_id;R.mkdir();code=R/'code';code.mkdir();(code/'tests').mkdir();(code/'motion-evaluation/pooled').mkdir(parents=True);(code/'check_tensorflow.py').write_text("import importlib.util;assert importlib.util.find_spec('tensorflow') is None;print('TensorFlow absent')\n")
 for src,dst in [('motion_causal_project.cc','project.cc'),('native_source_link_fixture.cc','prefix.cc'),('native_source_inventory.cc','native_source_inventory.cc')]:shutil.copy(P/'motion-evaluation/ingestion'/src,code/dst)

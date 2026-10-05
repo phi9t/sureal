@@ -7,8 +7,8 @@ pinned code snapshot. Training budgets, predictions, GT and metric config do not
 import argparse,fcntl,hashlib,json,shutil,subprocess,sys,time
 from pathlib import Path
 P=Path(__file__).resolve().parents[1];sys.path.insert(0,str(P))
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 C=Path.home()/'.cache/waystone/waymo-perception'
 def sha(path):
  with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()

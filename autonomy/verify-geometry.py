@@ -12,8 +12,8 @@ import time
 
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
-from pipeline.m0_receipt import validate_receipt
-from pipeline.runtime_identity import verify_rootfs
+from insula.m0_receipt import validate_receipt
+from insula.runtime_identity import verify_rootfs
 ROOT=Path.home()/'.cache/waystone/waymo-perception/insula/rootfs-v2'
 M0=ROOT.parent/'m0-live-20260930-c'
 
@@ -38,7 +38,7 @@ def main():
         assert p.returncode==0 and len(names)==11
         assert all(any(line.startswith(name+' ') and line.endswith(' ... ok') for line in log.splitlines()) for name in names)
         assert 'Ran 11 tests' in log and log.rstrip().endswith('OK')
-        files=[HERE/'verify-geometry.py',HERE/'pipeline/geometry_foundation.py',HERE/'tests/test_geometry_foundation.py',HERE/'enter.sh',HERE/'pipeline/insula_entry.py']
+        files=[HERE/'verify-geometry.py',HERE/'pipeline/geometry_foundation.py',HERE/'tests/test_geometry_foundation.py',HERE/'enter.sh',HERE/'insula/entry.py']
         hashes={str(f.relative_to(HERE)):hashlib.sha256(f.read_bytes()).hexdigest() for f in files}
         lock=json.loads(Path(str(ROOT)+'.lock.json').read_text());verify_rootfs(ROOT,lock['rootfs_sha256'])
         receipt={'schema_version':1,'milestone':'M2','command':command,'exit_code':p.returncode,'started_utc':started,

@@ -2,8 +2,8 @@
 import hashlib,json,shutil,subprocess,sys
 from pathlib import Path
 P=Path(__file__).resolve().parents[1];sys.path.insert(0,str(P))
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing';base=W/'balanced16-native-v2';base.mkdir();run=C/'insula/balanced16-native-v2';run.mkdir();snapshot=run/'source';snapshot.mkdir();shutil.copytree(P/'pipeline',snapshot/'pipeline',ignore=shutil.ignore_patterns('__pycache__'));shutil.copytree(P/'cohort',snapshot/'cohort',ignore=shutil.ignore_patterns('__pycache__'));pins={str(p):sha(p) for p in snapshot.rglob('*') if p.is_file()}
 root=C/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])

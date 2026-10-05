@@ -4,8 +4,8 @@ from pathlib import Path
 P=Path(__file__).resolve().parents[1];sys.path.insert(0,str(P));sys.path.insert(0,str(P/'tier1'))
 from catalog import select_fixture,catalog
 from storage import sha,unique_payload_bytes
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing'
 existing=P/'research/tier1-allclass-fixture-verified.json'
 if existing.exists():

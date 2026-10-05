@@ -3,8 +3,8 @@
 import hashlib,json,resource,subprocess,tempfile,time
 from datetime import datetime,timezone
 from pathlib import Path
-from pipeline.runtime_identity import rootfs_identity,verify_rootfs
-from pipeline.insula_entry import launch_plan
+from insula.runtime_identity import rootfs_identity,verify_rootfs
+from insula.entry import launch_plan
 HERE=Path(__file__).resolve().parent
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
 ROOT=CACHE/'motion-cli-rootfs'

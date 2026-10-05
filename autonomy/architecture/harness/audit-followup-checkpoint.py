@@ -1,7 +1,7 @@
 from pathlib import Path
 import hashlib,json,subprocess,sys
 code=Path('autonomy').resolve();sys.path.insert(0,str(code))
-from pipeline.runtime_identity import verify_rootfs
+from insula.runtime_identity import verify_rootfs
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 variant=sys.argv[1];cache=Path.home()/'.cache/waystone/waymo-perception';evidence=code/('research/architecture-'+variant+'-execution-verified.json');receipt=json.loads(evidence.read_text());
 def verify_producer():

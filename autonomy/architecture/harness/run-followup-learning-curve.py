@@ -1,7 +1,7 @@
 from pathlib import Path
 import datetime,hashlib,json,subprocess,sys,time
 code=Path('autonomy').resolve();sys.path.insert(0,str(code))
-from pipeline.runtime_identity import verify_rootfs
+from insula.runtime_identity import verify_rootfs
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 variant=sys.argv[1];assert variant in ['masked_pfn','window_bev','coarse_mlp']
 cache=Path.home()/'.cache/waystone/waymo-perception';native=cache/'scientific-processing/overfit-native-cache-v1'

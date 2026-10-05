@@ -7,8 +7,8 @@ import argparse,fcntl,json,os,re,shutil,sys,time
 from pathlib import Path
 P=Path(__file__).resolve().parents[1];sys.path[:0]=[str(P),str(P/'architecture')]
 from experiment_runner import run_stage
-from pipeline.runtime_identity import verify_rootfs
-from pipeline.insula_entry import launch_plan
+from insula.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
 from tier1.storage import sha,unique_payload_bytes
 from tier1.admission import reserve_write
 from cohort.sustained_contract import validate_contract

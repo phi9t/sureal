@@ -4,8 +4,8 @@ from pathlib import Path
 P=Path(__file__).resolve().parents[1];sys.path[:0]=[str(P),str(P/'tier1')]
 from storage import sha,unique_payload_bytes
 from admission import reserve_write
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing';fixture_path=P/'research/tier1-allclass-fixture-verified.json';fixture=json.loads(fixture_path.read_text());scene,timestamp=fixture['identity'].split(':');timestamp=int(timestamp);physical=Path(fixture['physical']);baseline=Path(fixture['controls']['baseline']['observations']).parent;targets=Path(fixture['targets']).parent;labels=Path(fixture['boxes']).parent
 for key in ['physical','targets','report','boxes']:assert sha(fixture[key])==fixture[key+'_sha256']
 receiptpath=P/'research/advanced-grouping-fixture-verified.json'

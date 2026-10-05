@@ -8,10 +8,10 @@ import json
 from pathlib import Path
 import subprocess
 import sys
-from .insula_entry import launch_plan
-from .runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
+from insula.staging_lease import staging_lease
 from .staged_source import staged_source
-from .staging_lease import staging_lease
 
 
 def sha(path):
@@ -46,9 +46,9 @@ def replay_shape_source(job_path,source_receipt,*,expected_job_sha256,
         names=['native_shape_source_replay.py','native_shape_transfer.py',
                'native_range_shape_worker.py','native_range_shape_file.py',
                'native_range_shapes.py','native_range_shape_reference.py',
-               'source_integrity.py','staged_source.py','staging_lease.py',
-               'insula_entry.py','runtime_identity.py']
-        pins={n:sha(code_root/'pipeline'/n) for n in names}
+               'staged_source.py','evidence/source_integrity.py','insula/staging_lease.py',
+               'insula/entry.py','insula/runtime_identity.py']
+        pins={n:sha(code_root/n if '/' in n else code_root/'pipeline'/n) for n in names}
         transfer_prefix=transfer_command if transfer_command is not None else [
             sys.executable,str(code_root/'pipeline/native_shape_transfer.py'),'--timeout-seconds','600']
         with staged_source(source,cache,retained_bytes=retained_bytes,
@@ -86,7 +86,8 @@ Path('/outputs/check.json').write_text(json.dumps(dict(checked,worker_resources=
             if result.returncode:raise ValueError('shape independent admission failed; retain audit log')
             checks.append({'command':command,'exit_code':result.returncode})
             if (sha(job_path)!=expected_job_sha256 or sha(source_receipt)!=expected_source_receipt_sha256
-                or pins!={n:sha(code_root/'pipeline'/n) for n in names} or sha(staged)!=source['sha256']):
+                or pins!={n:sha(code_root/n if '/' in n else code_root/'pipeline'/n) for n in names}
+                or sha(staged)!=source['sha256']):
                 raise ValueError('source/job/code changed during shape replay')
             evidence={'checks':checks,'runtime_lock':lock,'input_identity':job,
                 'job_sha256':expected_job_sha256,'source_receipt_sha256':expected_source_receipt_sha256,

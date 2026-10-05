@@ -10,7 +10,7 @@ import sys
 
 HERE=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(HERE))
-from pipeline.runtime_identity import verify_rootfs
+from insula.runtime_identity import verify_rootfs
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
 
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()

@@ -3,8 +3,8 @@ import argparse,json,shutil,subprocess,sys
 from pathlib import Path
 P=Path(__file__).resolve().parents[1];sys.path.insert(0,str(P))
 from tier1.storage import sha
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--results',type=Path,required=True);parser.add_argument('--version',required=True);a=parser.parse_args();assert a.version.isalnum()

@@ -4,6 +4,7 @@ import hashlib
 import os
 import re
 import stat
+from evidence.source_snapshot import require_digest, require_regular_file
 
 
 def verify_source(path, *, size_bytes, sha256, md5_base64):
@@ -11,6 +12,7 @@ def verify_source(path, *, size_bytes, sha256, md5_base64):
         raise ValueError('source size must be a positive integer')
     if not isinstance(sha256, str) or not re.fullmatch('[0-9a-f]{64}', sha256):
         raise ValueError('invalid expected source SHA256')
+    require_digest(sha256)
     try:
         md5_bytes = base64.b64decode(md5_base64, validate=True)
     except (ValueError, TypeError) as error:
@@ -18,6 +20,7 @@ def verify_source(path, *, size_bytes, sha256, md5_base64):
     if len(md5_bytes) != 16 or base64.b64encode(md5_bytes).decode() != md5_base64:
         raise ValueError('invalid expected MD5')
     try:
+        require_regular_file(path)
         descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
         with os.fdopen(descriptor, 'rb') as source:
             before = os.fstat(source.fileno())

@@ -14,7 +14,7 @@ from datetime import datetime,timezone
 
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
-from pipeline.m0_receipt import candidate_files, validate_receipt
+from insula.m0_receipt import candidate_files, validate_receipt
 ROOT=Path(os.environ.get('WAYMO_INSULA_ROOT',str(Path.home()/'.cache/waystone/waymo-perception/insula/rootfs-v2')))
 CACHE=ROOT.parent
 
@@ -47,8 +47,8 @@ def main():
             records.append({'name':'host_listener_positive_control','port':port,'passed':True})
             for number in range(2):
                 out=stage/f'run-{number}';out.mkdir()
-                run(f'producer-{number}',cmd(out,'python','-m','pipeline.m0_probe',str(port)))
-                run(f'validator-{number}',cmd(out,'python','-m','pipeline.m0_validate'))
+                run(f'producer-{number}',cmd(out,'python','-m','insula.m0_probe',str(port)))
+                run(f'validator-{number}',cmd(out,'python','-m','insula.m0_validate'))
         out=stage/'failed';out.mkdir()
         bad=stage/'wrong.lock.json';lock=json.loads(Path(str(ROOT)+'.lock.json').read_text());lock['rootfs_sha256']='0'*64;bad.write_text(json.dumps(lock))
         run('wrong-lock',cmd(out,'python','-c','pass',lock=bad),1)

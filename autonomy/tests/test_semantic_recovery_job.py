@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from pipeline.semantic_recovery_job import recover_semantic_archive
-from pipeline.staging_lease import staging_lease
+from insula.staging_lease import staging_lease
 
 class SemanticRecoveryJobGateTests(unittest.TestCase):
     def test_queue_refused_before_output_or_source_access(self):

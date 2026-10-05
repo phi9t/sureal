@@ -1,4 +1,3 @@
-load("@rules_cc//cc:cc_test.bzl", "cc_test")
 load(":bazel_tests.bzl", "perception_py_test", "perception_test_name")
 load(
     ":source_snapshot_targets.bzl",
@@ -14,7 +13,10 @@ package(default_visibility = ["//visibility:private"])
 
 filegroup(
     name = "sustained-run-sources",
-    srcs = glob(SUSTAINED_RUN_SOURCE_GLOBS, exclude = ["**/__pycache__/**"]),
+    srcs = glob(SUSTAINED_RUN_SOURCE_GLOBS, exclude = ["**/__pycache__/**"]) + [
+        "//autonomy/evidence:all_py",
+        "//autonomy/insula:all_py",
+    ],
     visibility = ["//visibility:public"],
 )
 
@@ -69,6 +71,11 @@ PERCEPTION_RUNFILES = glob(
     "research/association41-runtime-admission-20261003a/manifest.json",
 ]
 
+PERCEPTION_DEPS = [
+    "//autonomy/evidence:evidence",
+    "//autonomy/insula:insula",
+]
+
 ARCHITECTURE_EXPERIMENT_RESEARCH_INPUTS = [
     "research/architecture-all_pillars-cache-verified.json",
     "research/architecture-retain64-cache-verified.json",
@@ -86,7 +93,8 @@ filegroup(
         "architecture/experiment_runner.py",
         "architecture/harness/files.json",
         "architecture/registry.json",
-        "evidence/source_snapshot.py",
+        "//autonomy/evidence:source_snapshot_py",
+        "//autonomy/insula:all_py",
     ] + glob([
         "architecture/harness/*.py",
         "gpu/*.py",
@@ -142,20 +150,18 @@ perception_py_test(
         ":sustained_pilot_retention_host_query",
         ":sustained_run_sources_query",
     ],
+    deps = PERCEPTION_DEPS,
 )
 
 [
-    perception_py_test(src, PERCEPTION_RUNFILES)
+    perception_py_test(src, PERCEPTION_RUNFILES, deps = PERCEPTION_DEPS)
     for src in PERCEPTION_TEST_MODULES
 ]
 
-cc_test(
-    name = "rootfs_compiler_smoke_test",
-    srcs = ["insula/rootfs_compiler_smoke_test.cc"],
-)
-
 test_suite(
     name = "perception_unit_tests",
-    tests = [":source_snapshot_targets_test"] + [":" + perception_test_name(src) for src in PERCEPTION_TEST_MODULES],
+    tests = [":source_snapshot_targets_test"]
+        + [":" + perception_test_name(src) for src in PERCEPTION_TEST_MODULES]
+        + ["//autonomy/evidence:all_tests", "//autonomy/insula:all_tests"],
     visibility = ["//visibility:public"],
 )

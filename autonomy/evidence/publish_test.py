@@ -1,8 +1,8 @@
 import json,tempfile,types,unittest
 from pathlib import Path
 from unittest.mock import patch
-from tracking import publish
-from tracking.journal import append_entry
+from evidence import publish
+from evidence.journal import append_entry
 class PublicationIsolationTests(unittest.TestCase):
  def test_journal_publication_does_not_replace_experiment_result_receipt(self):
   with tempfile.TemporaryDirectory() as directory:
@@ -22,7 +22,7 @@ class PublicationIsolationTests(unittest.TestCase):
      elif 'get' in command:Path(command[-1]).write_bytes(remote[command[-2]])
     def communicate(self,timeout=None):return '',''
    layout=types.SimpleNamespace(stdout=json.dumps({'paths':{'runs':'hdfs://fixture/runs/'}}))
-   with patch.object(publish,'P',project),patch('tracking.publish.Path.home',return_value=home),patch('tracking.publish.subprocess.run',return_value=layout),patch('tracking.publish.subprocess.Popen',Process):publish.main()
+   with patch.object(publish,'P',project),patch('evidence.publish.Path.home',return_value=home),patch('evidence.publish.subprocess.run',return_value=layout),patch('evidence.publish.subprocess.Popen',Process):publish.main()
    self.assertEqual(result_receipt.read_bytes(),original)
    receipt=json.loads((research/'research-journal-hdfs-verified.json').read_text());self.assertTrue(receipt['all_results_uploaded_and_readback_exact']);self.assertEqual(len(receipt['files']),5)
 if __name__=='__main__':unittest.main()
