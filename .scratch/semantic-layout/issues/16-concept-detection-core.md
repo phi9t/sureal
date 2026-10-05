@@ -29,3 +29,15 @@ Interim implementation and verification before the first ticket commit:
 - `./bazelw test //autonomy/... --test_output=errors --cache_test_results=no --keep_going` passed 148/148.
 - `git diff --check` passed.
 - `python3 autonomy/tools/pins.py check --base work/semantic-layout/integration` reported `FAIL: 100 changed file(s) pinned by retained receipts`. This is expected for this concept batch because retained receipts pin the old source bytes while this ticket moves the detection core and import rewrites active callers. Pinned changes are: moved detection sources from `pipeline/{anchor_assignment,anchor_grid,box_coding,detection_export,detector_decode,detector_geometry,detector_loss,native_detection_adapter,packed_point_features,pillar_detector,pillar_encoder,pillar_packing,prediction_records,training_box_process,training_box_reference,training_box_replay_audit,training_box_resources,training_box_sender,training_box_sources,training_box_statistics,training_box_wire}.py` to `detection/`; moved matching tests from `tests/test_*.py` to `detection/*_test.py`; active import-only rewrites in `advanced`, `analysis`, `architecture/harness`, `association`, `cohort`, `evaluation`, `gpu`, `pipeline/range_pillar_hybrid.py`, `tests/test_range_pillar_hybrid.py`, and `tier1`; and the association provenance fixture remap needed to keep historical retained manifests untouched while the runtime contract uses `detection/*` keys.
+
+Final post-merge verification:
+
+- `git merge work/semantic-layout/integration` reported `Already up to date.`
+- `./bazelw test //autonomy/...` passed: 148/148 tests pass.
+- `./bazelw test --config=cuda --test_tag_filters=requires_gpu //autonomy/...` passed: 24/24 tests pass.
+- `./bazelw test //parallax/...` passed: 17/17 tests pass.
+- `python3 -m unittest tests.test_publication_audit` passed: `Ran 30 tests ... OK`.
+- `python3 scripts/publication_audit.py --root .` passed with `{"errors": [], "gitlinks": 2, "max_blob_bytes": 26214400, "schema_version": 1, "status": "pass", "tracked_files": 4985}`.
+- `python3 autonomy/tools/pins.py check --base work/semantic-layout/integration` still reported `FAIL: 100 changed file(s) pinned by retained receipts`; the pinned files changed for the batch reasons recorded above.
+- `git diff --name-only -- ':(glob)**/research/**' ':(glob)research/**' ':(glob)docs/research/**' ':(glob)autonomy/research/**' ':(glob)parallax/research/**'` produced no output.
+- `git diff --check` passed.
