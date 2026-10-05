@@ -2,34 +2,116 @@
 # Networked provisioning; offline execution uses enter.sh.
 set -euo pipefail
 HERE="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-DEST="${WAYMO_INSULA_ROOT:-${HOME}/.cache/waystone/waymo-perception/insula/rootfs-v2}"
-[[ ! -e "$DEST" ]] || { printf 'error: refusing to replace existing rootfs: %s\n' "$DEST" >&2; exit 1; }
+BAZEL_VERSION=9.2.0
+BAZEL_LINUX_X86_64_SHA256=7668a95db1250f12c40407251e4e203b4ec8bf39bc495d2f485b2d8c99048694
+CACHE_ROOT="${WAYMO_INSULA_CACHE_ROOT:-${HOME}/.cache/waystone/waymo-perception/insula}"
+PREVIOUS="${WAYMO_INSULA_PREVIOUS_ROOT:-${CACHE_ROOT}/rootfs-v2}"
+DEST="${WAYMO_INSULA_ROOT:-${CACHE_ROOT}/rootfs-v3}"
+IMAGE_TAG="${WAYMO_INSULA_IMAGE_TAG:-sureal-waymo-cpu:bazel-${BAZEL_VERSION}}"
+
+die() {
+    printf 'error: %s\n' "$*" >&2
+    exit 1
+}
+
+rootfs_digest() {
+    PYTHONPATH="$HERE" python3 - "$1" <<'PY'
+import sys
+from pathlib import Path
+from pipeline.runtime_identity import rootfs_identity
+
+print(rootfs_identity(Path(sys.argv[1])))
+PY
+}
+
+run_in_rootfs() {
+    local rootfs="$1"
+    shift
+    bwrap \
+        --ro-bind "$rootfs" / \
+        --proc /proc \
+        --dev /dev \
+        --tmpfs /tmp \
+        --tmpfs /run \
+        --dir /tmp/private-home \
+        --unshare-all \
+        --die-with-parent \
+        --clearenv \
+        --setenv HOME /tmp/private-home \
+        --setenv PATH /usr/local/bin:/usr/bin:/bin \
+        --setenv PYTHONNOUSERSITE 1 \
+        -- "$@"
+}
+
+validate_new_rootfs() {
+    local rootfs="$1"
+    local previous="$2"
+    local bazel_version
+    local previous_packages
+    local new_packages
+
+    command -v bwrap >/dev/null 2>&1 || die "bwrap is required to validate rootfs contents"
+    bazel_version="$(run_in_rootfs "$rootfs" bazel --version)"
+    [[ "$bazel_version" == "bazel ${BAZEL_VERSION}" ]] \
+        || die "unexpected Bazel version in new rootfs: ${bazel_version}"
+
+    previous_packages="$(mktemp)"
+    new_packages="$(mktemp)"
+    run_in_rootfs "$previous" python -m pip freeze --all | LC_ALL=C sort >"$previous_packages"
+    run_in_rootfs "$rootfs" python -m pip freeze --all | LC_ALL=C sort >"$new_packages"
+    if ! cmp -s "$previous_packages" "$new_packages"; then
+        diff -u "$previous_packages" "$new_packages" >&2 || true
+        rm -f "$previous_packages" "$new_packages"
+        die "Python package inventory differs between previous and new rootfs"
+    fi
+    rm -f "$previous_packages" "$new_packages"
+}
+
+[[ -d "$PREVIOUS" ]] || die "previous rootfs missing: $PREVIOUS"
+[[ -f "$PREVIOUS.lock.json" ]] || die "previous rootfs lock missing: $PREVIOUS.lock.json"
+[[ ! -e "$DEST" ]] || die "refusing to replace existing rootfs: $DEST"
+[[ ! -e "$DEST.lock.json" ]] || die "refusing to replace existing rootfs lock: $DEST.lock.json"
 mkdir -p -- "$(dirname -- "$DEST")"
 STAGE="$(mktemp -d "$(dirname -- "$DEST")/.rootfs.XXXXXX")"
+STAGE_LOCK="$STAGE.lock.json"
 CID=""
 cleanup() {
     if [[ -n "$CID" ]]; then docker rm -f "$CID" >/dev/null; fi
     if [[ -n "$STAGE" ]]; then rm -rf -- "$STAGE"; fi
+    if [[ -n "${STAGE_LOCK:-}" ]]; then rm -f -- "$STAGE_LOCK"; fi
 }
 trap cleanup EXIT
-docker build --platform linux/amd64 -t sureal-waymo-cpu:m0 -f "$HERE/insula/Dockerfile" "$HERE"
-IMAGE="$(docker image inspect sureal-waymo-cpu:m0 --format '{{.Id}}')"
+PREVIOUS_IDENTITY="$(rootfs_digest "$PREVIOUS")"
+PREVIOUS_LOCK_SHA256="$(sha256sum "$PREVIOUS.lock.json" | awk '{print $1}')"
+docker build --platform linux/amd64 \
+    --build-arg "BAZEL_VERSION=$BAZEL_VERSION" \
+    --build-arg "BAZEL_LINUX_X86_64_SHA256=$BAZEL_LINUX_X86_64_SHA256" \
+    -t "$IMAGE_TAG" -f "$HERE/insula/Dockerfile" "$HERE"
+IMAGE="$(docker image inspect "$IMAGE_TAG" --format '{{.Id}}')"
 CID="$(docker create "$IMAGE" /bin/true)"
 docker export "$CID" | tar -C "$STAGE" -xf -
 docker rm "$CID" >/dev/null
 CID=""
-PYTHONPATH="$HERE" python3 - "$STAGE" "$HERE" "$IMAGE" <<'PY'
+validate_new_rootfs "$STAGE" "$PREVIOUS"
+[[ "$(rootfs_digest "$PREVIOUS")" == "$PREVIOUS_IDENTITY" ]] \
+    || die "previous rootfs identity changed during build"
+[[ "$(sha256sum "$PREVIOUS.lock.json" | awk '{print $1}')" == "$PREVIOUS_LOCK_SHA256" ]] \
+    || die "previous rootfs lock changed during build"
+PYTHONPATH="$HERE" python3 - "$STAGE" "$HERE" "$IMAGE" "$BAZEL_VERSION" "$BAZEL_LINUX_X86_64_SHA256" <<'PY'
 import hashlib, json, sys
 from pathlib import Path
 from pipeline.runtime_identity import rootfs_identity
-root, here, image = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
+root, here, image, bazel_version, bazel_sha256 = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5]
 lock = {'schema_version': 1, 'platform': 'linux/amd64', 'image_id': image,
         'rootfs_sha256': rootfs_identity(root),
         'requirements_sha256': hashlib.sha256((here/'requirements-tracer.lock').read_bytes()).hexdigest(),
-        'dockerfile_sha256': hashlib.sha256((here/'insula/Dockerfile').read_bytes()).hexdigest()}
+        'dockerfile_sha256': hashlib.sha256((here/'insula/Dockerfile').read_bytes()).hexdigest(),
+        'bazel_version': bazel_version,
+        'bazel_linux_x86_64_sha256': bazel_sha256}
 (root.parent/(root.name+'.lock.json')).write_text(json.dumps(lock, indent=2)+'\n')
 PY
-mv -- "$STAGE.lock.json" "$DEST.lock.json"
 mv -- "$STAGE" "$DEST"
 STAGE=""
+mv -- "$STAGE_LOCK" "$DEST.lock.json"
+STAGE_LOCK=""
 printf 'rootfs=%s\nlock=%s\n' "$DEST" "$DEST.lock.json"
