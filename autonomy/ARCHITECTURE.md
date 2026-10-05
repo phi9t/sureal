@@ -1,14 +1,15 @@
 # Architecture
 
 How the experiment's code is arranged, what may depend on what, and which
-bytes are frozen. The three rules below are checked by `tools/`, so this file
-describes them; it does not enforce them.
+bytes are frozen. The three rules below are checked by `autonomy/tools/`, so
+this file describes them; it does not enforce them.
 
 ## Layers
 
-Each top-level directory is an *area*. An area may import its own modules and
-any area on a lower row. Areas on the same row are peers and do not import each
-other. The order is declared in [`tools/layers.py`](tools/layers.py).
+Each top-level directory under `autonomy/` is an *area*. An area may import its
+own modules and any area on a lower row. Areas on the same row are peers and do
+not import each other. The order is declared in
+[`tools/layers.py`](tools/layers.py).
 
 | Layer | Areas | Role |
 | --- | --- | --- |
@@ -45,9 +46,9 @@ defined by more than one other area.
   `publish-*.py`, the hyphenated workers in `gpu/` and `cohort/`, and the
   `_v2`/`_v3` successors beside them.
 
-Both kinds are cited by receipts. Almost every tracked file outside
+Both kinds are pinned by receipts. Almost every tracked file outside
 `research/` has the SHA-256 of its current bytes recorded in at least one
-retained receipt (`tools/pins.py status` prints the count per area). Two
+retained receipt (`autonomy/tools/pins.py status` prints the count per area). Two
 validators also require an exact file inventory, so adding a file there changes
 what they admit:
 
@@ -58,23 +59,24 @@ what they admit:
 
 This is why a changed procedure appears as a new `_v2` file instead of an edit:
 editing a cited file leaves its receipts describing bytes the tree no longer
-holds. Before changing a file, ask `tools/pins.py` what cites it.
+holds. Before changing a file, ask `autonomy/tools/pins.py` what pins it.
 
 ## Checks
 
-Run from this directory. The tools need only the standard library.
+Run from the repository root. The source-inspection tools need only the standard
+library; the Bazel component gate runs inside the recorded Insula rootfs through
+the repository wrapper.
 
 ```bash
-python3 tools/layers.py                  # import layering
-python3 tools/pins.py status [PATH ...]  # which receipts cite a file
-python3 tools/pins.py check [--base REV] # cited files a change touches
-PYTHON tools/suites.py [AREA ...] -j 8   # every unit-test module
+python3 autonomy/tools/layers.py                  # import layering
+python3 autonomy/tools/pins.py status [PATH ...]  # which receipts pin a file
+python3 autonomy/tools/pins.py check [--base REV] # source pins a change touches
+./bazelw --emit-plan test //autonomy/...          # inspect the Insula command
+./bazelw test //autonomy/...                      # default perception tests
 ```
 
-`suites.py` runs each test module in its own process and reports a module as
-*unavailable*, not failed, when it stops only on a missing third-party package
-or a missing sandbox mount. Use an interpreter with NumPy and PyArrow for
-`PYTHON`, for example the tracer environment
-(`~/.cache/waystone/waymo-perception/probe-venv/bin/python`). Torch exists only
-inside the GPU root and paths such as `/experiment` and `/outputs` only inside
-Insula, so those modules run under their live gates.
+`./bazelw test //autonomy/...` is the default component entry point. Targets
+that need Torch, CUDA or a live-gate mount are excluded from that default and
+run only through their explicit GPU or live gates. Use
+`./bazelw test --config=cuda //autonomy/...` for the GPU rootfs when the B200
+runtime is available.

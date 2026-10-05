@@ -24,7 +24,7 @@ fails if any image, point file or Parquet payload becomes tracked here.
 ## Quick start
 
 ```bash
-V=experiments/waymo-perception/viewer/run.sh
+V=autonomy/viewer/run.sh
 S=~/.cache/waystone/waymo-perception/slices/validation-two-scenes-20260929
 $V setup                                                # uv venv + npm ci
 $V test                                                 # exporter unit tests

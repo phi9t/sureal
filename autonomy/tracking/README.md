@@ -6,11 +6,11 @@ training, execution failure, scientific censoring and equivalence distinct.
 Every experiment records a goal, verifiers and acceptance criteria.
 
 ```bash
-python experiments/waymo-perception/tracking/cli.py refresh
-python experiments/waymo-perception/tracking/cli.py watch --interval 60
-python experiments/waymo-perception/tracking/cli.py note --category hypothesis --experiment expanded20261002a/range_fusion --text 'State a falsifiable hypothesis here' --evidence path/to/receipt.json
-python experiments/waymo-perception/tracking/cli.py verify-journal
-python experiments/waymo-perception/tracking/publish.py
+python autonomy/tracking/cli.py refresh
+python autonomy/tracking/cli.py watch --interval 60
+python autonomy/tracking/cli.py note --category hypothesis --experiment expanded20261002a/range_fusion --text 'State a falsifiable hypothesis here' --evidence path/to/receipt.json
+python autonomy/tracking/cli.py verify-journal
+python autonomy/tracking/publish.py
 ```
 
 Read `research/experiment-tracker.md` and `research/research-journal.md`.

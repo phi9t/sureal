@@ -6,8 +6,8 @@
 
 **Status:** ready-for-agent
 
-- [ ] Every command shown in a living document runs as written
-- [ ] Every relative link in a living document resolves
-- [ ] The contributing guide's validation tiers describe the wrapper and the Bazel test commands
-- [ ] The stale 'planned layout' section of the perception README is replaced by a pointer to the architecture note
-- [ ] No file under a `research/` directory and no dated spec or plan is modified
+- [x] Every command shown in a living document runs as written
+- [x] Every relative link in a living document resolves
+- [x] The contributing guide's validation tiers describe the wrapper and the Bazel test commands
+- [x] The stale 'planned layout' section of the perception README is replaced by a pointer to the architecture note
+- [x] No file under a `research/` directory and no dated spec or plan is modified

@@ -3,8 +3,8 @@
 Run from the repository worktree:
 
 ```bash
-python experiments/waymo-perception/tier1/prepare.py
-python experiments/waymo-perception/tier1/run.py --run-id YOURUNIQUEALPHANUMERICID
+python autonomy/tier1/prepare.py
+python autonomy/tier1/run.py --run-id YOURUNIQUEALPHANUMERICID
 ```
 
 Preparation verifies and reuses an existing admitted fixture, or creates its immutable namespace once. It needs the admitted balanced native/physical/annotation cache, not GCS auth or TensorFlow. Training requires the admitted CPU, Torch GPU and official C++ metric Insula runtimes and NVIDIA driver identity. The runner takes the existing exclusive architecture GPU lock and freezes all worker sources.
