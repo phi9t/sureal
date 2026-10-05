@@ -145,6 +145,13 @@ Keeping the ticket current (this is how progress is monitored):
   states a requirement (for example Bzlmod, `rules_python` with the rootfs interpreter, no
   `PYTHONPATH` in the sandbox), meet it; if it cannot be met, stop with `needs-info` and the exact
   error instead of substituting something else.
+- Before marking a ticket done, these repository gates must pass and be recorded: `./bazelw test //autonomy/...`,
+  `./bazelw test --config=cuda --test_tag_filters=requires_gpu //autonomy/...`, `./bazelw test //parallax/...`,
+  `python3 -m unittest tests.test_publication_audit` and `python3 scripts/publication_audit.py --root .`.
+  Moving files breaks links in living Markdown documents; fix them in the same ticket.
+- Python modules under `autonomy/` are imported with `autonomy/` as the import root (`insula.entry`,
+  `evidence.journal`), each concept is a `py_library` with declared `deps`, tests are `py_test` with `deps`,
+  and tests never assert where a module lives.
 - Run Bazel only through `./bazelw`. Keep one cache layout under `.bazel-cache/` in this worktree
   and delete any extra probe caches you create; the disk is nearly full.
 - If you cannot proceed without a decision or access you do not have, append the question under
