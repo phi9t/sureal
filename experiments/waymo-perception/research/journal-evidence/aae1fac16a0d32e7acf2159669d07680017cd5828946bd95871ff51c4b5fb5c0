@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "kind": "ManualBootstrapWorkerPublicReadback",
+  "private_reasoning_included": false,
+  "threads": [
+    {
+      "schemaVersion": 1,
+      "thread": {
+        "id": "01a109a1-c007-73f3-b9d1-ebfb2177c571",
+        "kind": "codex",
+        "title": null,
+        "preview": "",
+        "status": {
+          "type": "active",
+          "activeFlags": []
+        },
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "createdAt": 1791162957,
+        "updatedAt": 1791163039
+      },
+      "page": {
+        "order": "newest_first",
+        "limit": 1,
+        "hasMore": false,
+        "nextCursor": null
+      },
+      "turns": [
+        {
+          "id": "01a109a1-c028-7370-8ce5-62179ebbecd1",
+          "status": "inProgress",
+          "startedAt": 1791162957,
+          "completedAt": null,
+          "items": [
+            {
+              "type": "commandExecution",
+              "id": "exec-812923df-502a-46dd-b5bc-30613c2f8ffd",
+              "command": "/bin/bash -lc 'cat /data02/home/philip.yang/.codex/plugins/cache/openai-curated-remote/superpowers/6.4.2/skills/using-superpowers/SKILL.md'",
+              "cwd": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a",
+              "exitCode": 0,
+              "status": "completed",
+              "durationMs": 0
+            },
+            {
+              "type": "commandExecution",
+              "id": "exec-130045e7-226b-431f-9926-620c3cb23001",
+              "command": "/bin/bash -lc \"pwd; git status --short; git branch --show-current; git rev-parse HEAD; rg --files -g 'AGENTS.md' -g '*reservation*' -g '*ack*' . /data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-a\"",
+              "cwd": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a",
+              "exitCode": 0,
+              "status": "completed",
+              "durationMs": 183
+            },
+            {
+              "type": "agentMessage",
+              "id": "msg_0d75902f061a7a5f016ac2fa5f12e487d29886b1f5875f5586",
+              "text": "I’m confirming the reservation and native thread identity before starting the failure-ledger preparation. I’ll keep all writes in the assigned pilot directory and worker output.\n",
+              "phase": "commentary"
+            },
+            {
+              "type": "commandExecution",
+              "id": "exec-23089d08-cecb-4167-bea5-09c62436f983",
+              "command": "/bin/bash -lc \"python - <<'PY'\nimport os,json,pathlib,hashlib\nfor k,v in os.environ.items():\n if ('THREAD' in k or 'SESSION' in k or 'TASK' in k) and not any(t in k for t in ('TOKEN','SECRET','KEY')): print(k+'='+v)\np=pathlib.Path('/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-a/reservation.json');print(p.read_text());print('sha256='+hashlib.sha256(p.read_bytes()).hexdigest())\nfor p in [pathlib.Path('/data02/home/philip.yang/workspace/sureal/AGENTS.md'),pathlib.Path('AGENTS.md'),pathlib.Path('docs/research/tasks/58-mac-happy-path-perception-pilot.md'),pathlib.Path('docs/research/2026-10-05-mac-happy-path-first.md')]:\n if p.exists(): print(str(p)+'\\\\n'+p.read_text())\nPY\"",
+              "cwd": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a",
+              "exitCode": 0,
+              "status": "completed",
+              "durationMs": 0
+            },
+            {
+              "type": "commandExecution",
+              "id": "exec-ea5fa77b-86da-46bc-a3bc-bee52013482f",
+              "command": "/bin/bash -lc \"python - <<'PY'\nimport os,json,pathlib,hashlib,datetime\np=pathlib.Path('/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-a/reservation.json');r=json.loads(p.read_text());a={\\\"schema_version\\\":1,\\\"kind\\\":\\\"ManualWorkerReservationAcknowledgment\\\",\\\"native_thread_id\\\":os.environ['CODEX_THREAD_ID'],\\\"thread_identity_source\\\":\\\"CODEX_THREAD_ID environment from native worker exec\\\",\\\"canonical_task_name\\\":\\\"/root/happy58_failure_ledger\\\",\\\"task_id\\\":r['task_id'],\\\"issue_uid\\\":r['issue_uid'],\\\"actor\\\":r['actor'],\\\"base\\\":r['base'],\\\"workspace\\\":r['workspace'],\\\"branch\\\":r['branch'],\\\"output\\\":r['output'],\\\"write_scope\\\":r['write_scope'],\\\"reservation_sha256\\\":hashlib.sha256(p.read_bytes()).hexdigest(),\\\"acknowledged_utc\\\":datetime.datetime.now(datetime.timezone.utc).isoformat(),\\\"live_bounds\\\":r['live_bounds'],\\\"state\\\":\\\"ACK_WAITING_FOR_LEAD_IDENTITY_MATCH\\\"};o=p.with_name('ack.json');o.write_text(json.dumps(a,indent=2)+'\\\\n');print(json.dumps(a,indent=2));print('ack_sha256='+hashlib.sha256(o.read_bytes()).hexdigest())\nPY\"",
+              "cwd": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a",
+              "exitCode": 0,
+              "status": "completed",
+              "durationMs": 0
+            },
+            {
+              "type": "subAgentActivity",
+              "id": "call_Aw9PnFYJz4hCFC3ToTBZzzjo",
+              "kind": "interacted",
+              "agentThreadId": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+              "agentPath": "/root"
+            },
+            {
+              "type": "commandExecution",
+              "id": "exec-67ab6ca8-4d00-4573-8f0f-4ea892742f0f",
+              "command": "/bin/bash -lc 'cat /data02/home/philip.yang/.codex/plugins/cache/openai-curated-remote/superpowers/6.4.2/skills/verification-before-completion/SKILL.md'",
+              "cwd": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a",
+              "exitCode": 0,
+              "status": "completed",
+              "durationMs": 0
+            },
+            {
+              "type": "commandExecution",
+              "id": "exec-11d96a53-8c9c-4b85-810c-3cebe444c7bd",
+              "command": "/bin/bash -lc 'cat /data02/home/philip.yang/.agents/skills/research/SKILL.md'",
+              "cwd": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a",
+              "exitCode": 0,
+              "status": "completed",
+              "durationMs": 0
+            },
+            {
+              "type": "subAgentActivity",
+              "id": "call_d3SyONSRhUxLgPlCnXizBlxc",
+              "kind": "interacted",
+              "agentThreadId": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+              "agentPath": "/root"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "thread": {
+        "id": "01a109a2-1e13-7970-a00b-e97ba09f35ea",
+        "kind": "codex",
+        "title": null,
+        "preview": "",
+        "status": {
+          "type": "active",
+          "activeFlags": []
+        },
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "createdAt": 1791162981,
+        "updatedAt": 1791163037
+      },
+      "page": {
+        "order": "newest_first",
+        "limit": 1,
+        "hasMore": false,
+        "nextCursor": null
+      },
+      "turns": [
+        {
+          "id": "01a109a2-1e33-7a22-a6ab-b4b95cbd7c88",
+          "status": "inProgress",
+          "startedAt": 1791162981,
+          "completedAt": null,
+          "items": [
+            {
+              "type": "agentMessage",
+              "id": "msg_00ca6befb37d6bbd016ac2fa6b91d887d2af04cf7768fc1123",
+              "text": "I’m using the repository’s pilot instructions and verification workflow to prepare the normalization inventory. I’ll first confirm the reservation and native thread identity, then run the scoped CPU source/model check and retain its receipts.",
+              "phase": "commentary"
+            },
+            {
+              "type": "commandExecution",
+              "id": "exec-aea7f6fa-8769-4f76-8ca8-ace690ed12fc",
+              "command": "/bin/bash -lc 'pwd && cat /data02/home/philip.yang/.codex/plugins/cache/openai-curated-remote/superpowers/6.4.2/skills/using-superpowers/SKILL.md'",
+              "cwd": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a",
+              "exitCode": 0,
+              "status": "completed",
+              "durationMs": 0
+            },
+            {
+              "type": "commandExecution",
+              "id": "exec-9e513606-aa26-43b2-b6b2-026a0ca7e41d",
+              "command": "/bin/bash -lc \"python3 - <<'PY'\nimport os,json\nprint(json.dumps({k:v for k,v in os.environ.items() if ('THREAD' in k or 'SESSION' in k or 'CODEX' in k) and not any(s in k for s in ['TOKEN','KEY','SECRET'])},indent=2))\nPY\ncat /data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/reservation.json\nsha256sum /data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/reservation.json\ngit rev-parse HEAD\ngit branch --show-current\nrg --files -g 'AGENTS.md' -g 'CLAUDE.md'\nsed -n '1,260p' docs/research/tasks/58-mac-happy-path-perception-pilot.md\ncat docs/research/2026-10-05-mac-happy-path-first.md\"",
+              "cwd": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a",
+              "exitCode": 0,
+              "status": "completed",
+              "durationMs": 0
+            },
+            {
+              "type": "commandExecution",
+              "id": "exec-a95a99f3-8ad3-4d14-a000-d2dcac710db7",
+              "command": "/bin/bash -lc \"python3 - <<'PY'\nimport json,os,pathlib,hashlib,datetime,subprocess\nout=pathlib.Path('/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b')\nr=json.loads((out/'reservation.json').read_text())\nbase=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); branch=subprocess.check_output(['git','branch','--show-current'],text=True).strip()\nassert base==r['base'] and branch==r['branch'] and os.getcwd()==r['workspace']\na={ 'schema_version':1,'kind':'WorkerIdentityAck','native_thread_id':os.environ['CODEX_THREAD_ID'],'task_id':r['task_id'],'issue_uid':r['issue_uid'],'actor':r['actor'],'base':base,'workspace':os.getcwd(),'branch':branch,'output':str(out),'write_scope':r['write_scope'],'reservation_sha256':hashlib.sha256((out/'reservation.json').read_bytes()).hexdigest(),'ack_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'scientific_work_started':False }\n(out/'ack.json').write_text(json.dumps(a,sort_keys=True,indent=2)+'\\\\n')\nprint(json.dumps(a))\nPY\"",
+              "cwd": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a",
+              "exitCode": 0,
+              "status": "completed",
+              "durationMs": 0
+            },
+            {
+              "type": "subAgentActivity",
+              "id": "call_XxA4pM49lS44GaYfm8pnvwYM",
+              "kind": "interacted",
+              "agentThreadId": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+              "agentPath": "/root"
+            },
+            {
+              "type": "commandExecution",
+              "id": "exec-0d22984a-9d7d-4b72-852b-3475b0985656",
+              "command": "/bin/bash -lc 'cat /data02/home/philip.yang/.agents/skills/research/SKILL.md\ncat /data02/home/philip.yang/.codex/plugins/cache/openai-curated-remote/superpowers/6.4.2/skills/verification-before-completion/SKILL.md'",
+              "cwd": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a",
+              "exitCode": 0,
+              "status": "completed",
+              "durationMs": 0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "kind": "ManualPublicNativeCompletionReadback",
+  "observed_ms": 1791164152351,
+  "private_reasoning_included": false,
+  "scope": "completed native turn corroboration; acceptance additionally requires source/result/live/landing and kernel stop",
+  "workers": [
+    {
+      "threadId": "01a109a1-c007-73f3-b9d1-ebfb2177c571",
+      "thread": {
+        "id": "01a109a1-c007-73f3-b9d1-ebfb2177c571",
+        "status": {
+          "type": "idle"
+        }
+      },
+      "page": {
+        "order": "newest_first",
+        "limit": 1,
+        "hasMore": false,
+        "nextCursor": null
+      },
+      "turns": [
+        {
+          "id": "01a109a1-c028-7370-8ce5-62179ebbecd1",
+          "status": "completed",
+          "items": [
+            {
+              "type": "agentMessage",
+              "id": "msg_0d75902f061a7a5f016ac2fda4af9487d2ad9377d118b32366",
+              "text": "Candidate `baff4c6fe1afff73ab8ea219a9073d76734034ee`, parent `b32307da442598e192a9259d29a8650be1134589`. Clean worktree; all owned checks stopped.\n\nSeven scoped files: README, provenance, reconciliation, 30 uncovered rows, schema, verifier, and live receipt.\n\nCPU Insula passed: 53 pinned files, 16 target arrays, **1,279 native / 1,053 eligible / 30 uncovered**, and 14 document links. Exit 0; 1.605 seconds; 50,236 KiB peak RSS; 2 GiB/swap-zero; no GPU, TensorFlow, or optimizer updates.\n\nMissing physical lineage, decoded rank/NMS traces, official matches, and views remain explicit nulls. Tasks 42/50/53 remain open.\n\n[Exact handoff and 80-word summary](/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-a/handoff.json). Awaiting lead review and explicit current-base refresh.",
+              "phase": "final_answer"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "threadId": "01a109a2-1e13-7970-a00b-e97ba09f35ea",
+      "thread": {
+        "id": "01a109a2-1e13-7970-a00b-e97ba09f35ea",
+        "status": {
+          "type": "idle"
+        }
+      },
+      "page": {
+        "order": "newest_first",
+        "limit": 1,
+        "hasMore": false,
+        "nextCursor": null
+      },
+      "turns": [
+        {
+          "id": "01a109a2-1e33-7a22-a6ab-b4b95cbd7c88",
+          "status": "completed",
+          "items": [
+            {
+              "type": "agentMessage",
+              "id": "msg_00ca6befb37d6bbd016ac2feb0193087d283c4228dcf3d67bf",
+              "text": "Candidate: `404b2af870c8e3062fcd0b6b99b42c3518428e3e`  \nParent: `b32307da442598e192a9259d29a8650be1134589`\n\nTen scoped files: `README.md`, `next43.md`, `inventory_live.py`, `inventory.json`, `source-pins.json`, `archived-evidence.json`, `live-verified.json`, `provenance.json`, `stop-verified.json`, `verification.json`.\n\nLive CPU Insula check exited 0: seven fresh models and two read-only checkpoint dictionaries; baseline/residual each retain one pillar BN and nineteen GN modules. Archived total-loss ratios **3.638/4.298** and localization ratios **6.575/7.490** reconciled to producer records. No native-quality rescue claimed. Zero forwards, interventions or optimizer updates. All owned scopes stopped; worktree clean.\n\nMissing: changed-buffer native results, recalibration policy, state/mode/RNG closure, relevant task42 traces, and terminal sustained matrix.\n\nExact files, hashes and stop evidence: [candidate.json](/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/candidate.json).\n\nNext: lead-owned current-base refresh, independent review and serialized landing. Keep43/50/53 open.",
+              "phase": "final_answer"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

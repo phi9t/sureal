@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "ManualConcurrentWorkerPublicObservation",
+  "private_reasoning_included": false,
+  "recorded_ms": 1791163271761,
+  "workers": [
+    {
+      "thread": {
+        "id": "01a109a1-c007-73f3-b9d1-ebfb2177c571",
+        "status": {
+          "type": "active",
+          "activeFlags": []
+        }
+      },
+      "turns": [
+        {
+          "id": "01a109a1-c028-7370-8ce5-62179ebbecd1",
+          "status": "inProgress",
+          "public_command_count": 0,
+          "public_commands": [],
+          "public_messages": [
+            {
+              "id": "msg_0d75902f061a7a5f016ac2fb60402c87d29b81a0dde875559a",
+              "text": "Four useful examples resolve: a sign losing to another sign, an equal-IoU sign tie, a sign losing to a vehicle, and the uncovered pedestrian. The same object ID appears in multiple frames, so each row needs the full context, timestamp, and object ID. Point-lineage, rank, NMS, and native-match fields will remain explicitly null where this preparation has no measurement.\n",
+              "phase": "commentary"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "thread": {
+        "id": "01a109a2-1e13-7970-a00b-e97ba09f35ea",
+        "status": {
+          "type": "active",
+          "activeFlags": []
+        }
+      },
+      "turns": [
+        {
+          "id": "01a109a2-1e33-7a22-a6ab-b4b95cbd7c88",
+          "status": "inProgress",
+          "public_command_count": 0,
+          "public_commands": [],
+          "public_messages": [
+            {
+              "id": "msg_00ca6befb37d6bbd016ac2fb69a40887d29c676468e0d954a6",
+              "text": "Both historical terminal checkpoints are available, together with their training, checkpoint replay, and literal-loss receipts. I’ll inspect their saved tensor keys and buffer hashes read-only. The live check will construct fresh source models separately, so its module and mode checks cannot be mistaken for a replay of trained predictions.",
+              "phase": "commentary"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "scope": "native threads/turns and public tool cwd/status corroboration; not full MAC state-machine admission"
+}

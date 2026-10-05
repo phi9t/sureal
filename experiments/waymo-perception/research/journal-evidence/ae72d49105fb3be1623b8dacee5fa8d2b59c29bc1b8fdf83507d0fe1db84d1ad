@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "kind": "independent-metadata-source-review",
+  "candidate": "4c47fa13b892fa8dc96196dad0d694aa4c507657",
+  "parent": "9cd484da8c4038cf5fe6422e3cd5c63b5f148a17",
+  "tree": "bad369ca8afa18e9fc910cf7ab99562ad5609037",
+  "source": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-map-20261005b",
+  "verdict": "pass",
+  "findings": [],
+  "author": {
+    "agent": "/root",
+    "native_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24"
+  },
+  "reviewer": {
+    "agent": "/root/collab_execution_admission_review",
+    "native_thread_id": "01a105a5-de93-74a3-adad-c5184f54a751"
+  },
+  "reviewer_native_thread_id": "01a105a5-de93-74a3-adad-c5184f54a751",
+  "reviewed_ms": 1791163661807,
+  "scope": [
+    "docs/research/kata-task-map.json"
+  ],
+  "map_sha256": "8ad0a02d50d045baa67f44490e89848d3d85ad468bd3e07ef7d970dd627b4135",
+  "own_checks": {
+    "path": "/data02/home/philip.yang/devx/tmp/collab58-map-review-4c47fa1/result-v2.json",
+    "sha256": "dcc85b6b112dd92ae254d918019a8ece336a816b57aff8a25001e248528371ea"
+  },
+  "own_actual_command": {
+    "path": "/data02/home/philip.yang/devx/tmp/collab58-map-review-4c47fa1/actual-command-v2.json",
+    "sha256": "b3c1d35fb6570df162dccd9176eca3b5f36d7027d9e196ebc765c9c9572c2a4d"
+  },
+  "evidence": [
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-map-20261005b/docs/research/kata-task-map.json",
+      "sha256": "8ad0a02d50d045baa67f44490e89848d3d85ad468bd3e07ef7d970dd627b4135"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/prior-kata-task-map.json",
+      "sha256": "50b209fd3a84fb5b2ea6e863835f82f7bab4c1e103aad8af7479a5bbf6525227"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/queue-input/kata-all.json",
+      "sha256": "a150610b7eeb3e7cf55447a382d3e700c9ba08fa9435aa4b099d6b9a6f3be3b0"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/queue-native-read.json",
+      "sha256": "d3264e81b631f72488b3b8931642ab0e4a8d5755186e58bd969ba968d9307e08"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/queue-input/kata-all.json",
+      "sha256": "a150610b7eeb3e7cf55447a382d3e700c9ba08fa9435aa4b099d6b9a6f3be3b0"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/assignments-readback.json",
+      "sha256": "1922ece0ab5007e75de22f9964574ea4ea5d90dbac555731ea3d58ec7793eeeb"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-a/ack.json",
+      "sha256": "2cbba41421e561cd77c4abf340d8630f3ab8766c2b859db411ef886b8a0f17e0"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-a/lead-ack.json",
+      "sha256": "b6e009bf3a63cae8a32e73921b523e75186b22b9c008413a448f6de0a7fc763a"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-a/reservation.json",
+      "sha256": "d8d38196656d3393b054f87072b2b1a1231f16f91e8fce8bf246c98989774425"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/ack.json",
+      "sha256": "12c76e37ec8f10ce5d24f7c24dba2b943d9cfd4c82d46874c5abaef9c5bef668"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/lead-ack.json",
+      "sha256": "c90f42d129ce5a4d7284dfe9a6669e1a82de142bd4e8ebbbf37728ef1991c911"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/reservation.json",
+      "sha256": "d7708b676031ea839806b6bdc21e6c3035400b82a7aa47aa9fa5b879dbc51069"
+    }
+  ],
+  "assessment": "Exact refreshed4c47 has sole parent9cd484d and changes only the same8ad0a02d task-map blob. All14prior task entries/project/binding match exactly; only58/58.A/58.B are added, reusing58UID. All17native UIDs/project identities/dependencies/revisions match retained actual Kata all-status envelope; canonical revision digests recompute and16unique spec/plan blob+SHA pins match their exact definition sources. Fourteen original frozen definitions retain historicalc7cea5f authority; new3definitions use landedb32307da. This distinction prevents treating old pins as newly repinned definitions.",
+  "provisional_worker_context": "Captured actual assignments/49blocks edges and reservation\u2192worker ack\u2192lead ack evidence bind two distinct thread/worktree/output identities. Native assignment ack_sha256 intentionally pins lead acknowledgment, which independently pins worker acknowledgment. Workers remain on originalb323 bases; this review does not claim later stale candidates were refreshed.",
+  "stale_disposition": {
+    "original_candidate": "c3a9d7c7ada666855b92a329f85c2c64964546f5",
+    "status": "explicitly retained stale parentb323 candidate; same-blob refresh4c47 on exact9cd is reviewed"
+  },
+  "private_checker_disposition": {
+    "failed_attempt": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab58-map-review-4c47fa1/actual-command.json",
+      "sha256": "03d8f67f51e54f8f33ca6cbb3f6220287802cf13717d975319e92abd7a3aac8a"
+    },
+    "cause": "checker incorrectly treated native assignment ack pin as worker-ack hash; actual explicit chain uses lead-ack hash then worker_ack_sha256; correctedv2passed. Not a source/product finding."
+  },
+  "manual_metadata_landing_allowed": true,
+  "landing_conditions": [
+    "Lead freshly checks canonical/currentpublished9cd and serializes exactFF/nonforce publication of4c47.",
+    "Prior publication and this review are distinct; this receipt does not claim4c47alreadylanded or published.",
+    "Later worker candidate refresh/reverification remains explicit."
+  ],
+  "acceptance_scope": "Baseline metadata landing only. No new native mutation, automated MAC lifecycle, source/model training migration, task50\u201357 acceptance/closure, full refusal matrix, GPU/optimizer or live-scientific grant proof.",
+  "reviewer_disposition": "Two private bounded readonly check invocations ended; finalpass under256MiB/zero swap. No native effects, source/refs/canonical writes, worker dispatch or control."
+}

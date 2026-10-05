@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "kind": "ExactOwnedScopeStopReadback",
+  "observed_ms": 1791164169202,
+  "passed": true,
+  "scope": "only seven named pilot/lead scopes; no unrelated processes stopped",
+  "scopes": [
+    {
+      "argv": [
+        "systemctl",
+        "--user",
+        "show",
+        "sureal-sustained-mac58-a-prep-20261005a-v1.scope",
+        "--property=ActiveState,SubState,ControlGroup"
+      ],
+      "exit_code": 0,
+      "properties": {
+        "ControlGroup": "",
+        "ActiveState": "inactive",
+        "SubState": "dead"
+      }
+    },
+    {
+      "argv": [
+        "systemctl",
+        "--user",
+        "show",
+        "sureal-sustained-mac58-a-prep-20261005a-v2.scope",
+        "--property=ActiveState,SubState,ControlGroup"
+      ],
+      "exit_code": 0,
+      "properties": {
+        "ControlGroup": "",
+        "ActiveState": "inactive",
+        "SubState": "dead"
+      }
+    },
+    {
+      "argv": [
+        "systemctl",
+        "--user",
+        "show",
+        "sureal-sustained-mac58-a-prep-20261005a-v3.scope",
+        "--property=ActiveState,SubState,ControlGroup"
+      ],
+      "exit_code": 0,
+      "properties": {
+        "ControlGroup": "",
+        "ActiveState": "inactive",
+        "SubState": "dead"
+      }
+    },
+    {
+      "argv": [
+        "systemctl",
+        "--user",
+        "show",
+        "sureal-sustained-mac58-a-refresh-20261005a.scope",
+        "--property=ActiveState,SubState,ControlGroup"
+      ],
+      "exit_code": 0,
+      "properties": {
+        "ControlGroup": "",
+        "ActiveState": "inactive",
+        "SubState": "dead"
+      }
+    },
+    {
+      "argv": [
+        "systemctl",
+        "--user",
+        "show",
+        "sureal-58-b-20261005a-inventory.scope",
+        "--property=ActiveState,SubState,ControlGroup"
+      ],
+      "exit_code": 0,
+      "properties": {
+        "ControlGroup": "",
+        "ActiveState": "inactive",
+        "SubState": "dead"
+      }
+    },
+    {
+      "argv": [
+        "systemctl",
+        "--user",
+        "show",
+        "sureal-58-b-20261005a-inventory-v2.scope",
+        "--property=ActiveState,SubState,ControlGroup"
+      ],
+      "exit_code": 0,
+      "properties": {
+        "ControlGroup": "",
+        "ActiveState": "inactive",
+        "SubState": "dead"
+      }
+    },
+    {
+      "argv": [
+        "systemctl",
+        "--user",
+        "show",
+        "sureal-58-b-20261005a-inventory-v3.scope",
+        "--property=ActiveState,SubState,ControlGroup"
+      ],
+      "exit_code": 0,
+      "properties": {
+        "ControlGroup": "",
+        "ActiveState": "inactive",
+        "SubState": "dead"
+      }
+    }
+  ]
+}

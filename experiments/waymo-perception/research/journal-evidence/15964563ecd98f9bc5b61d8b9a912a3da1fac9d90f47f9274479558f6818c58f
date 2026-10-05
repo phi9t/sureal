@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "kind": "RetainedOwnedContributionDisposition",
+  "observed_ms": 1791164690975,
+  "canonical_observed": "88eb369fdb5b512f9a0e3241f6e2f3dacd6f4530",
+  "pristine_canonical_does_not_mean_all_work_accepted": true,
+  "legacy_source_worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer",
+  "legacy_head": "8466a07dcd7a51501ae69049b36d40d4fd7b57d6",
+  "source_files": [
+    {
+      "path": "experiments/waymo-perception/association/candidate_graph.py",
+      "bytes": 6293,
+      "sha256": "8e43b93ca958598ea3a6732a36a897d4576706501d06499ea13d31877e850644",
+      "disposition": "retained unlanded; independent exact-live admission/ownership review required; not part of58"
+    },
+    {
+      "path": "experiments/waymo-perception/association/matching.py",
+      "bytes": 2255,
+      "sha256": "f698f7055321ce4f35667fd9d8a59cc832de8fbfdad1f34b3f2add1b84e941f0",
+      "disposition": "retained unlanded; independent exact-live admission/ownership review required; not part of58"
+    },
+    {
+      "path": "experiments/waymo-perception/association/native.py",
+      "bytes": 2741,
+      "sha256": "a50481591f32f72c0da9405d18bab87fe4007ef217c5c49d532158100225949e",
+      "disposition": "retained unlanded; independent exact-live admission/ownership review required; not part of58"
+    },
+    {
+      "path": "experiments/waymo-perception/association/prepare.py",
+      "bytes": 9008,
+      "sha256": "b33b1730e4daffea80c051a518557ea8794698e64ef8bd3c78d334f994d0a776",
+      "disposition": "retained unlanded; independent exact-live admission/ownership review required; not part of58"
+    },
+    {
+      "path": "experiments/waymo-perception/association/targets.py",
+      "bytes": 2604,
+      "sha256": "223de7d4d1c5c9314376f0cc6cf1c7ec1f50e6e44fd54956ac09dc21d8bc9664",
+      "disposition": "retained unlanded; independent exact-live admission/ownership review required; not part of58"
+    },
+    {
+      "path": "experiments/waymo-perception/association/test_matching.py",
+      "bytes": 4460,
+      "sha256": "a565710dc35db3f6fae4ab6e72b6f7b2348453a9a88c1ebe05ef010e2e5d83fb",
+      "disposition": "retained unlanded; independent exact-live admission/ownership review required; not part of58"
+    },
+    {
+      "path": "experiments/waymo-perception/association/test_native.py",
+      "bytes": 943,
+      "sha256": "57d9d25aa64e43a7511da4c6fad030746c876028342920700ec0bcb43d701974",
+      "disposition": "retained unlanded; independent exact-live admission/ownership review required; not part of58"
+    },
+    {
+      "path": "experiments/waymo-perception/association/test_prepare.py",
+      "bytes": 1691,
+      "sha256": "c4373e05c8eed74631b718c3713e9e91ddb094e253116924a36585e4727c51cc",
+      "disposition": "retained unlanded; independent exact-live admission/ownership review required; not part of58"
+    },
+    {
+      "path": "experiments/waymo-perception/association/test_targets.py",
+      "bytes": 2836,
+      "sha256": "f42fd840b578b4c1e580dc91e9c2c8c97e65551f996eaf10d7e117d59c55c6e7",
+      "disposition": "retained unlanded; independent exact-live admission/ownership review required; not part of58"
+    },
+    {
+      "path": "experiments/waymo-perception/continuation_runtime/identity.py",
+      "bytes": 5719,
+      "sha256": "5f9155a3eaf384c0841db04480053a2227b19ad8f85e0f4c243c184f016dfe08",
+      "disposition": "retained unlanded; independent exact-live admission/ownership review required; not part of58"
+    },
+    {
+      "path": "experiments/waymo-perception/continuation_runtime/test_identity.py",
+      "bytes": 6520,
+      "sha256": "24d0b0f0a9fe7ff390ec1431752b0d63ae6ac38e377deccc76d08fd2082e7acf",
+      "disposition": "retained unlanded; independent exact-live admission/ownership review required; not part of58"
+    },
+    {
+      "path": "experiments/waymo-perception/explorer/acquire_previews.py",
+      "bytes": 3749,
+      "sha256": "35b7e8479106f6d7b023d48de0938aacf0915457b14d901780f6bbf62fcfbeaf",
+      "disposition": "retained unlanded; independent exact-live admission/ownership review required; not part of58"
+    },
+    {
+      "path": "experiments/waymo-perception/explorer/build.py",
+      "bytes": 712,
+      "sha256": "b034f3199bfcdb536e3610ce6e5d38aef0a8406b401827fbcc1186225b40992d",
+      "disposition": "retained unlanded; independent exact-live admission/ownership review required; not part of58"
+    },
+    {
+      "path": "experiments/waymo-perception/explorer/data.py",
+      "bytes": 3704,
+      "sha256": "d96efc019ad70fd41edb6e52e48afa3a375b6338f67eeb26d131fa1ecf810639",
+      "disposition": "retained unlanded; independent exact-live admission/ownership review required; not part of58"
+    },
+    {
+      "path": "experiments/waymo-perception/explorer/public-viewer.fragment.html",
+      "bytes": 10987,
+      "sha256": "b2b3d0a3ec065e90f055879f50b9b7c38f5a4ce7af4e35645f41eda612bd4066",
+      "disposition": "retained unlanded; independent exact-live admission/ownership review required; not part of58"
+    },
+    {
+      "path": "experiments/waymo-perception/explorer/run_joint_render.py",
+      "bytes": 4403,
+      "sha256": "89334ab970de2d22398a5a451f384ff6cc8febafd0a5da8ac724781418143df6",
+      "disposition": "retained unlanded; independent exact-live admission/ownership review required; not part of58"
+    },
+    {
+      "path": "experiments/waymo-perception/explorer/scene-data.json",
+      "bytes": 479427,
+      "sha256": "654a362bd0a5e3a28dc6386ce474d7f86c1360c7cf41f7c21211d63b4078a5b5",
+      "disposition": "retained unlanded; independent exact-live admission/ownership review required; not part of58"
+    },
+    {
+      "path": "experiments/waymo-perception/explorer/scene-explorer.html",
+      "bytes": 489231,
+      "sha256": "dc991ea21f121a730dcb848189c81651c66f659f4fc5f3055026fc099ee6be9e",
+      "disposition": "retained unlanded; independent exact-live admission/ownership review required; not part of58"
+    },
+    {
+      "path": "experiments/waymo-perception/explorer/scene-explorer.template.html",
+      "bytes": 9819,
+      "sha256": "5464b59c3f6ac3444e3104750d91a9fa96ecb3f8a89696421df5941125d8b079",
+      "disposition": "retained unlanded; independent exact-live admission/ownership review required; not part of58"
+    },
+    {
+      "path": "experiments/waymo-perception/explorer/test_data.py",
+      "bytes": 764,
+      "sha256": "3ed7597c75fa654aeb0e02d0bb1e80cf8009f48576d07f6f901d929a0495ecbc",
+      "disposition": "retained unlanded; independent exact-live admission/ownership review required; not part of58"
+    },
+    {
+      "path": "experiments/waymo-perception/audit-cohort-labels.py",
+      "bytes": 3291,
+      "sha256": "c9f695b596150c531bef6aceb382ca9b09e0654f05e73348d5df5277bc653a55",
+      "disposition": "retained unlanded coverage/registry snapshot; exactscope reviewer admission outstanding; no directstaging"
+    },
+    {
+      "path": "experiments/waymo-perception/research/experiments.json",
+      "bytes": 62401,
+      "sha256": "d8b4d5c90d066f49e27d7f82c11be87ac11767911329f5cdd160d056ebd15feb",
+      "disposition": "retained unlanded coverage/registry snapshot; exactscope reviewer admission outstanding; no directstaging"
+    }
+  ],
+  "scratch_locks_generated_disposition": "All .scratch/, existing lock files and generated scientific/viewer payloads remain in legacyworktree, not staged/deleted. Exclude scratch/raw/credentials/caches fromGit. No scientific payload release without exactHDFS recovery. This recordsretain, not cleanupacceptance.",
+  "deferred_source_packages": [
+    {
+      "commit": "53e4854ded75a09aed6509d101fde2c64cf0f6ae",
+      "workspace": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration50-preflight-20261004a",
+      "disposition": "independent source/staticprepPASS; NativeEneverlaunched, full50livegate open; retaineddeferred per userhappy-pathoverride, notproductaccepted"
+    },
+    {
+      "commit": "6eb6879058b7772e4d114c8d99feac44f7ecd867",
+      "workspace": "/data02/home/philip.yang/workspace/sureal/.worktrees/collab50-audit-20261004a",
+      "disposition": "independent source/staticprepPASS; same requiredactualgate open; coldsource/statics/failures remain; auditor notcanonicalmerged"
+    }
+  ],
+  "ready_pending_docs": [
+    "19c3303caff79fccbbb8a006111e81140faeaccb",
+    "4ae822b755d95df416d544ffaac131ba9a76a584"
+  ],
+  "stale_journal126_refresh": "596b3b99a5bff94d89cc19a581510ad09133c009 remains exactoriginal126bytes at obsoleteparent4c47; re-refresh afterpilot",
+  "removed_workspaces": [],
+  "changed_scientific_sources": []
+}
