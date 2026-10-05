@@ -17,6 +17,7 @@ ROOT = '(root)'
 LAYERS = (
     ('evidence',),
     ('insula',),
+    ('dataset',),
     ('geometry',),
     ('pipeline',),
     ('gpu', 'evaluation', 'tracking', 'association', 'explorer', 'motion-evaluation', 'viewer'),

@@ -2,7 +2,7 @@
 import base64,hashlib,json,sys,time
 from pathlib import Path
 import numpy as np
-from pipeline.sensor_records import select_rows,array_field
+from dataset.sensor_records import select_rows,array_field
 from geometry.geometry import range_to_points
 from pipeline.reconstruction_validate import raw,check_coordinates
 job=json.loads(Path('/tmp/input/job.json').read_text());mode=sys.argv[1];scene=job['scene'];timestamps=set(job['timestamps']);source=Path('/source');start=time.monotonic()

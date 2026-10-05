@@ -1,7 +1,7 @@
 """Evict independently mirrored and replayed native camera bytes only."""
 import json
 from pathlib import Path
-from .verified_eviction import digest
+from dataset.verified_eviction import digest
 STAGES=['pack-live','hdfs-put','hdfs-download','independent-bundle-live','manifest-put-last','manifest-download']
 def evict_camera(processing,publication,replay,*,expected_publication_sha256,expected_replay_sha256):
  processing,publication,replay=map(Path,(processing,publication,replay));record=processing/'camera-eviction.json'

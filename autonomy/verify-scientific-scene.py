@@ -7,7 +7,7 @@ from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
 
 HERE=Path(__file__).resolve().parent
-CANDIDATES=['pipeline/scientific_scene_validate.py','tests/test_scientific_scene_validate.py','tests/test_scientific_reconstruction.py','pipeline/reconstruction_validate.py','pipeline/scientific_sidecar_reader.py','pipeline/sensor_records.py','pipeline/scientific_reconstruction.py','pipeline/scientific_sidecars.py','geometry/geometry.py','verify-scientific-scene.py']
+CANDIDATES=['pipeline/scientific_scene_validate.py','tests/test_scientific_scene_validate.py','tests/test_scientific_reconstruction.py','pipeline/reconstruction_validate.py','dataset/scientific_sidecar_reader.py','dataset/sensor_records.py','pipeline/scientific_reconstruction.py','dataset/scientific_sidecars.py','geometry/geometry.py','verify-scientific-scene.py']
 
 def sha(p):
     with p.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
@@ -26,7 +26,7 @@ def main():
     # Hashes below have already been anchored to the independent sidecar receipt.
     for c,h in hashes.items():assert sha(prepared/c/'manifest.json')==h
     root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
-    source=cache/'slices/validation-two-scenes-20260929';dataset=json.loads((HERE/'dataset.lock.json').read_text());native=next(x for x in dataset['objects'] if x['component']=='lidar' and x['context']==manifest['scene']);assert sha(source/native['relative_path'])==native['sha256']==manifest['source_lidar_sha256']
+    source=cache/'slices/validation-two-scenes-20260929';dataset=json.loads((HERE/'dataset/dataset.lock.json').read_text());native=next(x for x in dataset['objects'] if x['component']=='lidar' and x['context']==manifest['scene']);assert sha(source/native['relative_path'])==native['sha256']==manifest['source_lidar_sha256']
     candidates={n:sha(HERE/n) for n in CANDIDATES};start=datetime.now(timezone.utc).isoformat();tick=time.monotonic();checks=[]
     commands=[('fixtures',['python','-m','unittest','discover','-s','tests','-p','test_scientific_scene_validate.py','-v']),('native-reconciliation',['python','-c',"import json; from pathlib import Path; from pipeline.scientific_scene_validate import validate_scene; r=validate_scene(Path('/source')/"+repr(native['relative_path'])+",Path('/opt'),Path('/srv'),verified_manifest_hashes="+repr(hashes)+"); Path('/outputs/validation.json').write_text(json.dumps(r,indent=2)); print('PASS independent native scene',r['records'],r['points'],r['scalar_max_error_m'])"])]
     for name,command in commands:

@@ -493,8 +493,8 @@ class RepositoryIdentityTests(unittest.TestCase):
     def test_living_document_repo_relative_command_entrypoints_exist(self) -> None:
         command_names = {
             "./bazelw",
-            "autonomy/gcs.sh",
-            "autonomy/setup-gcs.sh",
+            "autonomy/dataset/gcs.sh",
+            "autonomy/dataset/setup-gcs.sh",
             "parallax/run.sh",
         }
         python_names = {"python", "python3"}

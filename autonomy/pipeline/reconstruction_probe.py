@@ -7,8 +7,8 @@ import sys
 import time
 import resource
 import numpy as np
+from dataset.sensor_records import array_field,align_point_targets,select_rows,OrderedLookup
 from geometry.geometry import range_to_points
-from .sensor_records import array_field,align_point_targets,select_rows,OrderedLookup
 
 
 def main():

@@ -34,7 +34,7 @@ class ScientificSceneValidationTests(unittest.TestCase):
             self.assertEqual(validate_scene(s,d,o,verified_manifest_hashes=h)['points'],10)
 
     def test_orphan_sidecar_sensor_frame_rejected(self):
-        from pipeline.scientific_sidecars import materialize_component
+        from dataset.scientific_sidecars import materialize_component
         for component in ('lidar_pose','lidar_camera_projection','lidar_segmentation'):
             with self.subTest(component=component),tempfile.TemporaryDirectory() as tmp:
                 root=Path(tmp);source,sidecars,hashes,output=self.setup_scene(root)

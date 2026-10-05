@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 import numpy as np
 from PIL import Image
-from .sensor_records import select_rows
+from dataset.sensor_records import select_rows
 
 
 def validate(source,geometry,out):

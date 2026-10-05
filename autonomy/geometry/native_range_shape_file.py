@@ -1,7 +1,7 @@
 """Read native shape metadata only after immutable source-byte admission."""
 import re
 import pyarrow.parquet as pq
-from evidence.source_integrity import verify_source
+from dataset.source_integrity import verify_source
 from evidence.source_snapshot import require_regular_file
 from .native_range_shapes import native_range_shapes,KEYS,SHAPES
 

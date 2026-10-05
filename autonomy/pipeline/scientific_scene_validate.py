@@ -2,8 +2,8 @@
 import hashlib,json
 from pathlib import Path
 import numpy as np
-from .sensor_records import select_rows,OrderedLookup
-from .scientific_sidecar_reader import iter_sidecar_rows
+from dataset.sensor_records import select_rows,OrderedLookup
+from dataset.scientific_sidecar_reader import iter_sidecar_rows
 from .reconstruction_validate import raw,check_coordinates
 
 

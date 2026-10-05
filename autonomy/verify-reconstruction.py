@@ -17,9 +17,9 @@ ROOT=Path.home()/'.cache/waystone/waymo-perception/insula/rootfs-v2'
 M0=ROOT.parent/'m0-live-20260930-c'
 SOURCE=Path.home()/'.cache/waystone/waymo-perception/slices/validation-two-scenes-20260929'
 FILES=['verify-reconstruction.py','enter.sh','insula/entry.py','insula/runtime_identity.py',
-       'geometry/geometry.py','geometry/geometry_foundation.py','pipeline/sensor_records.py',
+       'geometry/geometry.py','geometry/geometry_foundation.py','dataset/sensor_records.py',
        'pipeline/reconstruction_probe.py','pipeline/reconstruction_validate.py','pipeline/tracer.py',
-       'pipeline/tracer_contracts.py','geometry/geometry_test.py','tests/test_sensor_records.py','tests/test_reconstruction_validation.py']
+       'pipeline/tracer_contracts.py','geometry/geometry_test.py','dataset/sensor_records_test.py','tests/test_reconstruction_validation.py']
 
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 
@@ -40,7 +40,7 @@ def main():
                   ('validator',['-m','pipeline.reconstruction_validate','/source','/outputs/reconstruction'])]
         commands +=[
             ('ray-fixtures',['-m','unittest','discover','-s','/experiment/geometry','-p','geometry_test.py','-v']),
-            ('identity-fixtures',['-m','unittest','discover','-s','/experiment/tests','-p','test_sensor_records.py','-v']),
+            ('identity-fixtures',['-m','unittest','discover','-s','/experiment/dataset','-p','sensor_records_test.py','-v']),
             ('validation-fixtures',['-m','unittest','discover','-s','/experiment/tests','-p','test_reconstruction_validation.py','-v']),
         ]
         for name,tail in commands:

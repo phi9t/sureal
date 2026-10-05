@@ -16,7 +16,7 @@ import sys
 import tempfile
 import time
 
-from .scientific_admission import admit_scene
+from dataset.scientific_admission import admit_scene
 from .training_box_wire import stream_training_box_sources
 
 

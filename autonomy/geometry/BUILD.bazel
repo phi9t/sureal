@@ -13,8 +13,11 @@ py_library(
     name = "geometry",
     srcs = LIB_MODULES,
     imports = [".."],
-    deps = ["//autonomy/evidence:evidence"],
     visibility = GEOMETRY_VISIBILITY,
+    deps = [
+        "//autonomy/dataset:dataset",
+        "//autonomy/evidence:evidence",
+    ],
 )
 
 filegroup(

@@ -14,6 +14,7 @@ package(default_visibility = ["//visibility:private"])
 filegroup(
     name = "sustained-run-sources",
     srcs = glob(SUSTAINED_RUN_SOURCE_GLOBS, exclude = ["**/__pycache__/**"]) + [
+        "//autonomy/dataset:all_py",
         "//autonomy/evidence:all_py",
         "//autonomy/geometry:all_py",
         "//autonomy/insula:all_py",
@@ -57,6 +58,7 @@ PERCEPTION_TEST_MODULES = glob(
         "**/*_test.py",
     ],
     exclude = [
+        "dataset/**",
         "research/**",
         "source_snapshot_targets_test.py",
     ],
@@ -65,18 +67,27 @@ PERCEPTION_TEST_MODULES = glob(
 PERCEPTION_RUNFILES = glob(
     ["**"],
     exclude = [
+        "dataset/**",
         "research/**",
         "**/__pycache__/**",
     ],
 ) + [
+    "//autonomy/dataset:runfiles",
     "research/association41-runtime-admission-20261003a/manifest.json",
 ]
 
 PERCEPTION_DEPS = [
+    "//autonomy/dataset:dataset",
     "//autonomy/evidence:evidence",
     "//autonomy/geometry:geometry",
     "//autonomy/insula:insula",
 ]
+
+PERCEPTION_EXTRA_DATA = {
+    "tests/test_semantic_archive_support.py": [
+        "//autonomy/dataset:scientific_dataset_test_fixture",
+    ],
+}
 
 ARCHITECTURE_EXPERIMENT_RESEARCH_INPUTS = [
     "research/architecture-all_pillars-cache-verified.json",
@@ -95,6 +106,7 @@ filegroup(
         "architecture/experiment_runner.py",
         "architecture/harness/files.json",
         "architecture/registry.json",
+        "//autonomy/dataset:all_py",
         "//autonomy/evidence:source_snapshot_py",
         "//autonomy/geometry:all_py",
         "//autonomy/insula:all_py",
@@ -157,7 +169,12 @@ perception_py_test(
 )
 
 [
-    perception_py_test(src, PERCEPTION_RUNFILES, deps = PERCEPTION_DEPS)
+    perception_py_test(
+        src,
+        PERCEPTION_RUNFILES,
+        extra_data = PERCEPTION_EXTRA_DATA.get(src, []),
+        deps = PERCEPTION_DEPS,
+    )
     for src in PERCEPTION_TEST_MODULES
 ]
 
@@ -166,6 +183,7 @@ test_suite(
     tests = [":source_snapshot_targets_test"]
         + [":" + perception_test_name(src) for src in PERCEPTION_TEST_MODULES]
         + [
+            "//autonomy/dataset:all_tests",
             "//autonomy/evidence:all_tests",
             "//autonomy/geometry:all_tests",
             "//autonomy/insula:all_tests",

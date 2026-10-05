@@ -3,7 +3,7 @@ import hashlib
 import json
 from collections.abc import Mapping
 import pyarrow.parquet as pq
-from evidence.source_integrity import verify_source
+from dataset.source_integrity import verify_source
 
 
 def verify_native_range_shapes(path,report,*,scene,source,inventory):

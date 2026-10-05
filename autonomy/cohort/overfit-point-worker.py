@@ -2,8 +2,8 @@ import sys,json,hashlib,io,tarfile,time,resource,importlib.util
 from pathlib import Path
 import numpy as np
 sys.path.insert(0,'/tmp/workers')
-from pipeline.scientific_dataset import iter_scene_records
-from pipeline.scene_archive_validate import validate_archive
+from dataset.scientific_dataset import iter_scene_records
+from dataset.scene_archive_validate import validate_archive
 assert importlib.util.find_spec('tensorflow') is None
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 job=json.loads(Path('/tmp/input/job.json').read_text());scene=job['scene'];timestamps=job['timestamps'];archive=Path('/source/scene.tar');pub=Path('/tmp/input/publication.json');publication=json.loads(pub.read_text());assert sha(pub)==job['publication_sha256'];started=time.monotonic();mode=sys.argv[1];summaries=[]

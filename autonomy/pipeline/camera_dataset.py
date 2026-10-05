@@ -1,7 +1,7 @@
 """Bounded verified camera replay, with observations and targets kept separate."""
 import hashlib,json,re,tarfile
 from pathlib import Path
-from .component_archive_validate import validate_component_archive
+from dataset.component_archive_validate import validate_component_archive
 COMPONENTS=['camera_image','camera_segmentation','camera_box']
 def iter_camera_records(archive,publication,*,expected_publication_sha256,usage,max_record_bytes=128*1024**2):
  archive,publication=Path(archive),Path(publication)

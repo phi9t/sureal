@@ -18,7 +18,7 @@ local slice, commands, coverage, unresolved associations and repeatability check
 Run from the repository root in your own interactive terminal:
 
 ```bash
-autonomy/setup-gcs.sh
+autonomy/dataset/setup-gcs.sh
 ```
 
 The wizard installs a SHA-256-pinned Google Cloud CLI with bundled Python,
@@ -31,7 +31,7 @@ Linux x86_64 and host Bash, curl, tar, sha256sum and flock are required.
 Reuse the same isolated CLI after setup:
 
 ```bash
-autonomy/gcs.sh -- storage ls gs://waymo_open_dataset_v_2_0_1/
+autonomy/dataset/gcs.sh -- storage ls gs://waymo_open_dataset_v_2_0_1/
 ```
 
 No dataset payloads are downloaded during setup. See the

@@ -5,11 +5,11 @@ from datetime import datetime,timezone
 from pathlib import Path
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
-from pipeline.scientific_admission import admit_scene
-from pipeline.staged_source import staged_source
+from dataset.scientific_admission import admit_scene
+from dataset.staged_source import staged_source
 HERE=Path(__file__).resolve().parent
 COMPONENTS=['camera_image','camera_segmentation','camera_box']
-CANDIDATES=['scientific-camera-preprocess.py','pipeline/camera_sidecars.py','pipeline/camera_sidecar_validate.py','pipeline/scientific_admission.py','pipeline/staged_source.py','insula/staging_lease.py','evidence/source_integrity.py','insula/entry.py','insula/runtime_identity.py']
+CANDIDATES=['scientific-camera-preprocess.py','pipeline/camera_sidecars.py','pipeline/camera_sidecar_validate.py','dataset/scientific_admission.py','dataset/staged_source.py','insula/staging_lease.py','dataset/source_integrity.py','insula/entry.py','insula/runtime_identity.py']
 def sha(p):
  with p.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
 def total(root):return sum(p.stat().st_size for p in root.rglob('*') if p.is_file())
@@ -17,10 +17,10 @@ def main():
  parser=argparse.ArgumentParser();parser.add_argument('--scene',required=True);parser.add_argument('--output',type=Path,required=True);args=parser.parse_args()
  cache=Path.home()/'.cache/waystone/waymo-perception';working=cache/'scientific-processing';destination=args.output.resolve()
  if working.resolve() not in destination.parents:raise ValueError('scientific camera output must remain within accounted working root')
- manifest=json.loads((HERE/'scientific-acquisition.candidate.json').read_text());manifest['excluded_engineering_segments']=json.loads((HERE/'scientific-cohort.candidate.json').read_text())['excluded_engineering_segments'];group=manifest['scenes'][args.scene]
+ manifest=json.loads((HERE/'dataset/scientific-acquisition.candidate.json').read_text());manifest['excluded_engineering_segments']=json.loads((HERE/'dataset/scientific-cohort.candidate.json').read_text())['excluded_engineering_segments'];group=manifest['scenes'][args.scene]
  paths={c:cache/'scientific-source-audit'/f"{group['official_split']}-{c}-{args.scene}.json" for c in manifest['components']};records={c:json.loads(p.read_text()) for c,p in paths.items()};admitted=admit_scene(manifest,records,args.scene)
  root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
- candidates={n:sha(HERE/n) for n in CANDIDATES};source_identities={c:sha(p) for c,p in paths.items()};retained=sum(o['size_bytes'] for o in json.loads((HERE/'dataset.lock.json').read_text())['objects']);limit=15*1024**3
+ candidates={n:sha(HERE/n) for n in CANDIDATES};source_identities={c:sha(p) for c,p in paths.items()};retained=sum(o['size_bytes'] for o in json.loads((HERE/'dataset/dataset.lock.json').read_text())['objects']);limit=15*1024**3
  destination.mkdir(parents=True,exist_ok=True)
  for component in COMPONENTS:
   base=destination/'evidence'/component;prepared=destination/'sidecars';decoded=prepared/component;receipt_path=base/'receipt.json';record=admitted['components'][component]

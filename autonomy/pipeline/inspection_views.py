@@ -8,7 +8,7 @@ import numpy as np
 import pyarrow.parquet as pq
 from PIL import Image,ImageDraw
 from .inspection import bev_raster,projection_samples,range_raster
-from .sensor_records import select_rows
+from dataset.sensor_records import select_rows
 
 
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
