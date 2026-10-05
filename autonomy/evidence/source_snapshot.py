@@ -59,11 +59,13 @@ class LocalSnapshotStore:
 
     def fetch(self, digest: str) -> bytes:
         path = self.path_for(digest)
+        if self.root.is_symlink() or path.is_symlink():
+            raise ValueError("regular snapshot object required")
         try:
             data = path.read_bytes()
         except FileNotFoundError as error:
             raise FileNotFoundError(f"source snapshot missing: {digest}") from error
-        if path.is_symlink() or hashlib.sha256(data).hexdigest() != digest:
+        if hashlib.sha256(data).hexdigest() != digest:
             raise ValueError("snapshot digest differs from requested digest")
         return data
 
