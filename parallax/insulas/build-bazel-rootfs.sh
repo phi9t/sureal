@@ -5,8 +5,9 @@ HERE="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 BAZEL_VERSION=9.2.0
 BAZEL_LINUX_X86_64_SHA256=7668a95db1250f12c40407251e4e203b4ec8bf39bc495d2f485b2d8c99048694
 CACHE_ROOT="${SURFLO_PATHWAY_BAZEL_ROOTFS_CACHE:-${HOME}/.cache/waystone/3d-pathway/insula}"
-DEST="${SURFLO_PATHWAY_BAZEL_ROOTFS:-${CACHE_ROOT}/rootfs-v1}"
-IMAGE_TAG="${SURFLO_PATHWAY_BAZEL_IMAGE_TAG:-sureal-3d-pathway-cpu:bazel-${BAZEL_VERSION}}"
+PREVIOUS="${SURFLO_PATHWAY_PREVIOUS_BAZEL_ROOTFS:-${CACHE_ROOT}/rootfs-v1}"
+DEST="${SURFLO_PATHWAY_BAZEL_ROOTFS:-${CACHE_ROOT}/rootfs-v2}"
+IMAGE_TAG="${SURFLO_PATHWAY_BAZEL_IMAGE_TAG:-sureal-3d-pathway-cpu:bazel-${BAZEL_VERSION}-rootfs-v2}"
 
 die() {
     printf 'error: %s\n' "$*" >&2
@@ -58,8 +59,12 @@ validate_rootfs() {
     git_version="$(run_in_rootfs "$rootfs" git --version)"
     [[ "$git_version" == git\ version\ * ]] \
         || die "git is unavailable in new rootfs: ${git_version}"
+    run_in_rootfs "$rootfs" sh -lc "command -v g++ >/dev/null && command -v ar >/dev/null" \
+        || die "C++ compiler or binutils unavailable in new rootfs"
 }
 
+[[ -d "$PREVIOUS" ]] || die "previous rootfs missing: $PREVIOUS"
+[[ -f "$PREVIOUS.lock.json" ]] || die "previous rootfs lock missing: $PREVIOUS.lock.json"
 [[ ! -e "$DEST" ]] || die "refusing to replace existing rootfs: $DEST"
 [[ ! -e "$DEST.lock.json" ]] || die "refusing to replace existing rootfs lock: $DEST.lock.json"
 mkdir -p -- "$(dirname -- "$DEST")"
@@ -73,6 +78,8 @@ cleanup() {
 }
 trap cleanup EXIT
 
+PREVIOUS_IDENTITY="$(rootfs_digest "$PREVIOUS")"
+PREVIOUS_LOCK_SHA256="$(sha256sum "$PREVIOUS.lock.json" | awk '{print $1}')"
 docker build --platform linux/amd64 \
     --build-arg "BAZEL_VERSION=$BAZEL_VERSION" \
     --build-arg "BAZEL_LINUX_X86_64_SHA256=$BAZEL_LINUX_X86_64_SHA256" \
@@ -83,6 +90,10 @@ docker export "$CID" | tar -C "$STAGE" -xf -
 docker rm "$CID" >/dev/null
 CID=""
 validate_rootfs "$STAGE"
+[[ "$(rootfs_digest "$PREVIOUS")" == "$PREVIOUS_IDENTITY" ]] \
+    || die "previous rootfs identity changed during build"
+[[ "$(sha256sum "$PREVIOUS.lock.json" | awk '{print $1}')" == "$PREVIOUS_LOCK_SHA256" ]] \
+    || die "previous rootfs lock changed during build"
 PYTHONPATH="${HERE}/../../autonomy" python3 - "$STAGE" "$HERE" "$IMAGE" "$BAZEL_VERSION" "$BAZEL_LINUX_X86_64_SHA256" <<'PY'
 import hashlib
 import json
@@ -109,7 +120,7 @@ lock = {
     "bazel_linux_x86_64_sha256": bazel_sha256,
     "python_version": "3.10",
     "numpy_version": "1.26.4",
-    "required_tools": ["bazel", "git", "python"],
+    "required_tools": ["ar", "bazel", "g++", "git", "python"],
 }
 (root.parent / (root.name + ".lock.json")).write_text(json.dumps(lock, indent=2) + "\n")
 PY

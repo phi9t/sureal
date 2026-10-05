@@ -10,9 +10,9 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent
 AUTONOMY = REPO / "autonomy"
 AUTONOMY_CACHE = Path.home() / ".cache/waystone/waymo-perception"
-DEFAULT_ROOTFS = AUTONOMY_CACHE / "insula/rootfs-v3"
+DEFAULT_ROOTFS = AUTONOMY_CACHE / "insula/rootfs-v4"
 GPU_ROOTFS = AUTONOMY_CACHE / "gpu-rootfs-v6"
-CURRICULUM_ROOTFS = Path.home() / ".cache/waystone/3d-pathway/insula/rootfs-v1"
+CURRICULUM_ROOTFS = Path.home() / ".cache/waystone/3d-pathway/insula/rootfs-v2"
 DEFAULT_CACHE = REPO / ".bazel-cache"
 BAZEL_VERSION = "9.2.0"
 GPU_DEVICES = ("/dev/nvidia1", "/dev/nvidiactl", "/dev/nvidia-uvm")
@@ -63,10 +63,10 @@ def uses_gpu_config(arguments):
 
 def output_base_for(rootfs, arguments):
     if uses_gpu_config(arguments) or rootfs.resolve() == GPU_ROOTFS.resolve():
-        return "/outputs/output-base-gpu"
+        return "/tmp/bazel-cache/output-base-gpu"
     if rootfs.resolve() == CURRICULUM_ROOTFS.resolve():
-        return "/outputs/output-base-3d-pathway"
-    return "/outputs/output-base"
+        return "/tmp/bazel-cache/output-base-3d-pathway"
+    return "/tmp/bazel-cache/output-base"
 
 
 def read_lock(path):
@@ -105,8 +105,8 @@ def bazel_command(arguments, output_base, update_lock=False):
         command,
         "--ignore_dev_dependency",
         f"--lockfile_mode={lockfile_mode}",
-        "--repository_cache=/outputs/repository-cache",
-        "--disk_cache=/outputs/disk-cache",
+        "--repository_cache=/tmp/bazel-cache/repository-cache",
+        "--disk_cache=/tmp/bazel-cache/disk-cache",
         *rest,
     ]
 
@@ -190,12 +190,14 @@ def sandbox_plan(rootfs, cache, arguments, update_lock=False):
         ["--ro-bind", str(rootfs), "/"],
         ["--ro-bind", "/etc/resolv.conf", "/etc/resolv.conf"],
         *repo_workspace_mounts(update_lock),
-        ["--bind", str(cache), "/outputs"],
+        ["--tmpfs", "/outputs"],
+        ["--tmpfs", "/tmp"],
+        ["--bind", str(cache), "/tmp/bazel-cache"],
     ]
     pre_dev_mounts = []
     post_dev_mounts = []
     environment = [
-        ["--setenv", "HOME", "/outputs/home"],
+        ["--setenv", "HOME", "/tmp/bazel-cache/home"],
         ["--setenv", "USER", "sureal"],
         ["--setenv", "LOGNAME", "sureal"],
         ["--setenv", "PATH", "/usr/local/bin:/usr/bin:/bin"],
@@ -225,7 +227,7 @@ def sandbox_plan(rootfs, cache, arguments, update_lock=False):
     argv.extend(["--proc", "/proc", "--dev", "/dev"])
     for mount in post_dev_mounts:
         argv.extend(mount)
-    argv.extend(["--tmpfs", "/tmp", "--clearenv"])
+    argv.extend(["--clearenv"])
     for item in environment:
         argv.extend(item)
     bazel = bazel_command(arguments, output_base_for(rootfs, arguments), update_lock)

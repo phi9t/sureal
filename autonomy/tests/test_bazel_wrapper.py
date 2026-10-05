@@ -16,6 +16,7 @@ WRAPPER = REPO / "bazelw"
 
 def write_rootfs(root):
     for name in (
+        "bazel-cache",
         "etc",
         "experiment",
         "opt/waymo/bin",
@@ -93,8 +94,8 @@ class BazelWrapperTests(unittest.TestCase):
     def run_wrapper_with_default_roots(self, temporary, *arguments, extra_env=None):
         root = Path(temporary)
         home = root / "home"
-        waymo_rootfs = home / ".cache/waystone/waymo-perception/insula/rootfs-v3"
-        curriculum_rootfs = home / ".cache/waystone/3d-pathway/insula/rootfs-v1"
+        waymo_rootfs = home / ".cache/waystone/waymo-perception/insula/rootfs-v4"
+        curriculum_rootfs = home / ".cache/waystone/3d-pathway/insula/rootfs-v2"
         gpu_rootfs = home / ".cache/waystone/waymo-perception/gpu-rootfs-v6"
         for rootfs in (waymo_rootfs, curriculum_rootfs, gpu_rootfs):
             rootfs.mkdir(parents=True)
@@ -145,21 +146,24 @@ class BazelWrapperTests(unittest.TestCase):
             self.assertIn(["--ro-bind", str((REPO / "MODULE.bazel").resolve()), "/experiment/MODULE.bazel"], plan["mounts"])
             self.assertIn(["--ro-bind", str(AUTONOMY.resolve()), "/experiment/autonomy"], plan["mounts"])
             self.assertTrue(has_mount_to(plan["mounts"], "/experiment/cohort"), plan["mounts"])
-            self.assertIn(["--bind", str(cache.resolve()), "/outputs"], plan["mounts"])
+            self.assertIn(["--bind", str(cache.resolve()), "/tmp/bazel-cache"], plan["mounts"])
+            self.assertIn(["--tmpfs", "/outputs"], plan["mounts"])
+            self.assertIn(["--tmpfs", "/tmp"], plan["mounts"])
+            self.assertNotIn(["--bind", str(cache.resolve()), "/outputs"], plan["mounts"])
             self.assertIn(["--ro-bind", "/etc/resolv.conf", "/etc/resolv.conf"], plan["mounts"])
-            self.assertIn(["--setenv", "HOME", "/outputs/home"], plan["environment"])
+            self.assertIn(["--setenv", "HOME", "/tmp/bazel-cache/home"], plan["environment"])
             self.assertNotIn(
                 ["--setenv", "PYTHONPATH", "/experiment/autonomy"],
                 plan["environment"],
             )
-            self.assertIn("--output_base=/outputs/output-base", plan["bazel"])
+            self.assertIn("--output_base=/tmp/bazel-cache/output-base", plan["bazel"])
             self.assertNotIn("--enable_workspace", plan["bazel"])
             self.assertNotIn("--noenable_bzlmod", plan["bazel"])
             self.assertNotIn("--repositories_without_autoloads=*", plan["bazel"])
             self.assertIn("--ignore_dev_dependency", plan["bazel"])
             self.assertIn("--lockfile_mode=error", plan["bazel"])
-            self.assertIn("--repository_cache=/outputs/repository-cache", plan["bazel"])
-            self.assertIn("--disk_cache=/outputs/disk-cache", plan["bazel"])
+            self.assertIn("--repository_cache=/tmp/bazel-cache/repository-cache", plan["bazel"])
+            self.assertIn("--disk_cache=/tmp/bazel-cache/disk-cache", plan["bazel"])
             self.assertEqual(plan["lock"], str(lock.resolve()))
             self.assertFalse(marker.exists())
 
@@ -216,8 +220,8 @@ class BazelWrapperTests(unittest.TestCase):
             )
             self.assertIn(["--ro-bind", str((REPO / "parallax").resolve()), "/experiment/parallax"], plan["mounts"])
             self.assertFalse(has_mount_to(plan["mounts"], "/experiment/3d-pathway"), plan["mounts"])
-            self.assertIn("--output_base=/outputs/output-base-3d-pathway", plan["bazel"])
-            self.assertNotIn("--output_base=/outputs/output-base", plan["bazel"])
+            self.assertIn("--output_base=/tmp/bazel-cache/output-base-3d-pathway", plan["bazel"])
+            self.assertNotIn("--output_base=/tmp/bazel-cache/output-base", plan["bazel"])
             self.assertFalse(marker.exists())
 
     def test_cuda_config_selects_gpu_rootfs_and_projects_driver_inputs(self):
@@ -264,7 +268,7 @@ class BazelWrapperTests(unittest.TestCase):
             self.assertIn(["--ro-bind", str(gpu_rootfs.resolve()), "/"], plan["mounts"])
             self.assertIn(["--tmpfs", "/experiment"], plan["mounts"])
             self.assertTrue(has_mount_to(plan["mounts"], "/experiment/cohort"), plan["mounts"])
-            self.assertIn("--output_base=/outputs/output-base-gpu", plan["bazel"])
+            self.assertIn("--output_base=/tmp/bazel-cache/output-base-gpu", plan["bazel"])
             self.assertIn("--config=cuda", plan["bazel"])
             self.assertIn(["--tmpfs", "/driver"], plan["mounts"])
             for pair in device_pairs:

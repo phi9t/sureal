@@ -5,12 +5,9 @@ PYTEST_MODULES = [
     "association/test_provenance.py",
 ]
 
-HOST_TOOL_MODULES = [
-    "tests/test_gcs_bootstrap.py",
+LEGACY_NATIVE_TOOL_MODULES = [
+    # Needs /outputs/motion_causal_project and /upstream/src Waymo protos.
     "tests/test_motion_causal_projection.py",
-    "tools/test_layers.py",
-    "tools/test_pins.py",
-    "viewer/tests/test_repo_hygiene.py",
 ]
 
 TORCH_MODULES = [
@@ -75,10 +72,8 @@ def _test_tags(src):
         tags.append("requires_gpu")
     if src in LIVE_GATE_MODULES:
         tags.append("requires_live_gate")
-    if src in HOST_TOOL_MODULES:
-        tags.append("requires_host_tools")
-    if src in PYTEST_MODULES:
-        tags.append("requires_pytest")
+    if src in LEGACY_NATIVE_TOOL_MODULES:
+        tags.extend(["requires_motion_causal_project_binary", "requires_upstream_protoc"])
     if src in KNOWN_FAILURE_MODULES:
         tags.append("known_failure")
     return tags
@@ -87,12 +82,13 @@ def perception_py_test(src, data):
     env = {}
     if src in TORCH_CPU_ONLY_MODULES:
         env["CUDA_VISIBLE_DEVICES"] = ""
+    args = [src]
+    if src in PYTEST_MODULES:
+        args = ["--pytest", src]
     py_test(
         name = perception_test_name(src),
         srcs = ["tools/bazel_test_runner.py"],
-        args = [
-            src,
-        ],
+        args = args,
         data = data,
         imports = ["."],
         legacy_create_init = 0,

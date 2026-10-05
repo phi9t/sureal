@@ -1,11 +1,7 @@
-load("@rules_cc//cc/toolchains:cc_toolchain.bzl", "cc_toolchain")
-load("@rules_cc//cc/toolchains:cc_toolchain_suite.bzl", "cc_toolchain_suite")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
 load(":bazel_tests.bzl", "perception_py_test", "perception_test_name")
-load(":null_cc_toolchain_config.bzl", "null_cc_toolchain_config")
 
 package(default_visibility = ["//visibility:private"])
-
-filegroup(name = "empty")
 
 PERCEPTION_TEST_MODULES = glob(
     [
@@ -32,47 +28,13 @@ PERCEPTION_RUNFILES = glob(
     for src in PERCEPTION_TEST_MODULES
 ]
 
+cc_test(
+    name = "rootfs_compiler_smoke_test",
+    srcs = ["insula/rootfs_compiler_smoke_test.cc"],
+)
+
 test_suite(
     name = "perception_unit_tests",
     tests = [":" + perception_test_name(src) for src in PERCEPTION_TEST_MODULES],
-    visibility = ["//visibility:public"],
-)
-
-null_cc_toolchain_config(name = "null_cc_toolchain_config")
-
-cc_toolchain(
-    name = "null_cc_toolchain",
-    all_files = ":empty",
-    ar_files = ":empty",
-    compiler_files = ":empty",
-    dwp_files = ":empty",
-    linker_files = ":empty",
-    objcopy_files = ":empty",
-    strip_files = ":empty",
-    supports_param_files = 0,
-    toolchain_config = ":null_cc_toolchain_config",
-    toolchain_identifier = "sureal_null_cc",
-)
-
-cc_toolchain_suite(
-    name = "null_cc_suite",
-    toolchains = {
-        "k8": ":null_cc_toolchain",
-        "k8|null": ":null_cc_toolchain",
-    },
-)
-
-toolchain(
-    name = "null_cc_toolchain_registration",
-    exec_compatible_with = [
-        "@platforms//cpu:x86_64",
-        "@platforms//os:linux",
-    ],
-    target_compatible_with = [
-        "@platforms//cpu:x86_64",
-        "@platforms//os:linux",
-    ],
-    toolchain = ":null_cc_toolchain",
-    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
     visibility = ["//visibility:public"],
 )
