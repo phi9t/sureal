@@ -100,7 +100,7 @@ Layout
 - Inside `autonomy/` the starting concept directories are `insula`, `evidence`, `dataset`, `geometry`, `detection`, `segmentation`, `range_view`, `camera`, `motion`, `resources`, `inspection` and `studies`. Names may be adjusted while moving code, but every directory must name a concept.
 - The concept reorganisation is a separate step after the rename, done one concept at a time, lowest layer first.
 - `research/` under each component is retained evidence and is moved with its component but never reorganised or rewritten.
-- Python packages are importable from the repository root (`autonomy.detection...`, `parallax.pipeline...`). Bare cross-directory imports are removed.
+- Python modules in `autonomy/` are imported with `autonomy/` as the import root (`insula.entry`, `detection.pillar_encoder`), because live gates mount the component directory as `/experiment` and import from there, and every existing caller already does. Each concept is a `py_library` with declared `deps`. Bare imports that depend on which directories a script inserted are removed. (Amended at ticket 13; the original text named the repository root.)
 - Tests are renamed to `foo_test.py` and moved beside the module they test as each concept is reorganised.
 
 Procedure records
