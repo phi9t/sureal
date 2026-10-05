@@ -4,7 +4,7 @@
 
 **Blocked by:** 09 (Evidence module: snapshot, fetch and verify)
 
-**Status:** done
+**Status:** ready-for-agent
 
 - [x] The guard and the resource-source validator accept a run whose snapshot verifies, and reject one whose snapshot is altered or missing
 - [x] Adding an unrelated source file to the tree does not change the outcome
