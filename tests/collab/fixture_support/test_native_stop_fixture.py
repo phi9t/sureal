@@ -1,0 +1,318 @@
+"""Host-only negative controls: no daemon, fixture thread, tool or goal effects."""
+import importlib.util
+from pathlib import Path
+import socket
+import threading
+import time
+import unittest
+
+
+spec = importlib.util.spec_from_file_location('fixture_operator', Path(__file__).with_name('native_stop_fixture.py'))
+fixture = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(fixture)
+
+
+class WireControls(unittest.TestCase):
+    def test_legacy_admission_refused_before_any_native_or_output_effect(self):
+        import json
+        import tempfile
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            auth = root/'authority.json'
+            auth.write_text(json.dumps({'schema_version': 1, 'kind': 'NativeFixtureLaunchAdmission'}))
+            try:
+                fixture.launch(fixture.reference(auth), root/'fresh-output')
+            except Exception as error:
+                self.assertIsInstance(error, ValueError)
+                self.assertIn('channel/static/ready', str(error))
+            else:
+                self.fail('legacy authority unexpectedly admitted')
+            self.assertFalse((root/'fresh-output').exists())
+
+    def native_command_start(self):
+        return {'method': 'item/started', 'params': {'threadId': 'owned-thread',
+                'turnId': 'owned-turn', 'startedAtMs': 1791150058587,
+                'item': {'id': 'owned-item', 'type': 'commandExecution',
+                'status': 'inProgress', 'command': '/fixed/command',
+                'cwd': '/owned/workspace', 'source': 'userShell',
+                'processId': None, 'exitCode': None}}}
+
+    def test_native_start_preserves_cwd_and_literal_null_presence(self):
+        event = self.native_command_start()
+        public = fixture.public_owned_notification(event, 'owned-thread')
+        item = public['params']['item']
+        self.assertEqual(item.get('cwd'), '/owned/workspace')
+        self.assertIn('processId', item)
+        self.assertIsNone(item['processId'])
+        self.assertIn('exitCode', item)
+        self.assertIsNone(item['exitCode'])
+        self.assertEqual(public['field_presence']['item.processId'], True)
+        del event['params']['item']['processId']
+        public = fixture.public_owned_notification(event, 'owned-thread')
+        self.assertNotIn('processId', public['params']['item'])
+        self.assertEqual(public['field_presence']['item.processId'], False)
+
+    def test_malformed_owned_lifecycle_or_unknown_tool_refuses(self):
+        import copy
+        event = self.native_command_start()
+        for key, value in [('cwd', None), ('processId', 123),
+                           ('exitCode', True), ('source', 'agent'),
+                           ('type', 'mcpToolCall')]:
+            with self.subTest(key=key):
+                bad = copy.deepcopy(event)
+                bad['params']['item'][key] = value
+                with self.assertRaises(ValueError):
+                    fixture.public_owned_notification(bad, 'owned-thread')
+        for value in (True, 1.5, None):
+            bad = copy.deepcopy(event)
+            bad['params']['startedAtMs'] = value
+            with self.subTest(timestamp=value), self.assertRaises(ValueError):
+                fixture.public_owned_notification(bad, 'owned-thread')
+
+    def test_owned_public_notifications_exclude_private_or_other_thread_data(self):
+        thread = 'owned-thread'
+        event = self.native_command_start()
+        event['params']['item'].update(aggregatedOutput='PRIVATE', reasoning='PRIVATE')
+        metadata = fixture.public_owned_notification(event, thread)
+        self.assertEqual(metadata['method'], 'item/started')
+        self.assertEqual(metadata['params']['item']['status'], 'inProgress')
+        self.assertNotIn('command', metadata['params']['item'])
+        self.assertNotIn('PRIVATE', str(metadata))
+        self.assertIsNone(fixture.public_owned_notification(event, 'other-thread'))
+        self.assertIsNone(fixture.public_owned_notification(
+            {'method': 'item/reasoning/textDelta', 'params': {'threadId': thread,
+             'delta': 'PRIVATE'}}, thread))
+        self.assertIsNone(fixture.public_owned_notification({**event, 'id': 9}, thread))
+
+    def observed_wire(self, output):
+        wire = fixture.Wire.__new__(fixture.Wire)
+        wire.connection, peer = socket.socketpair()
+        self.addCleanup(wire.connection.close)
+        self.addCleanup(peer.close)
+        wire.buffer, wire.sequence, wire.timeout = b'', 0, .1
+        wire.observe_owned('owned-thread', output, {'test': 'runtime'})
+        return wire, peer
+
+    def event_frame(self, value):
+        import json
+        import struct
+        body = json.dumps(value).encode()
+        header = bytes([0x81, len(body)]) if len(body) < 126 else b'\x81\x7e'+struct.pack('!H', len(body))
+        return header+body
+
+    def test_notification_before_rpc_ack_is_retained_without_private_content(self):
+        import json
+        import tempfile
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary)
+            wire, _ = self.observed_wire(output)
+            wire.send = lambda *args: None
+            event = self.native_command_start()
+            event['params']['item'].update(command='secret-command', aggregatedOutput='PRIVATE')
+            wire.buffer = self.event_frame(event)+self.event_frame({'id': 1, 'result': {}})
+            wire.call('owned/read', {}, output, {'test': 'runtime'})
+            event = json.loads((output/'public-event-0001.json').read_text())
+            self.assertEqual(event['notification']['params']['item']['status'], 'inProgress')
+            self.assertNotIn('secret-command', str(event))
+            self.assertNotIn('PRIVATE', str(event))
+            self.assertEqual(event['transport_incarnation'], {'test': 'runtime'})
+
+    def test_actual_rpc_keeps_monotonic_intent_send_and_reply_boundaries(self):
+        import json
+        import tempfile
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary)
+            wire, _ = self.observed_wire(output)
+            wire.send = lambda *args: None
+            wire.buffer = self.event_frame({'id': 1, 'result': {}})
+            _, ref = wire.call('owned/read', {}, output, {'test': 'runtime'})
+            receipt = json.loads(fixture.reopen(ref).read_text())
+            self.assertIn('started_ns', receipt)
+            self.assertLessEqual(receipt['started_ns'], receipt['sent_ns'])
+            self.assertLessEqual(receipt['sent_ns'], receipt['ended_ns'])
+
+    def test_passive_capture_keeps_owned_metadata_and_bounded_idle(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary)
+            wire, _ = self.observed_wire(output)
+            wire.buffer = self.event_frame({'method': 'turn/started', 'params': {
+                'threadId': 'owned-thread', 'turn': {'id': 'turn', 'status': 'inProgress',
+                'items': [{'reasoning': 'PRIVATE'}]}}})
+            started = time.monotonic()
+            wire.drain_owned_notifications(.03)
+            self.assertLess(time.monotonic()-started, .3)
+            self.assertEqual(len(list(output.glob('public-event-*.json'))), 1)
+            self.assertNotIn('PRIVATE', (output/'public-event-0001.json').read_text())
+
+    def test_passive_capture_late_buffered_frame_refuses_before_retention(self):
+        import tempfile
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary)
+            wire, _ = self.observed_wire(output)
+            wire.buffer = b'buffered'
+            clock = [100.0]
+            def late_frame():
+                clock[0] = 104.0
+                return {'method': 'turn/started', 'params': {
+                    'threadId': 'owned-thread', 'turn': {'id': 'turn', 'status': 'inProgress'}}}
+            wire.receive = late_frame
+            with patch.object(fixture.time, 'monotonic', lambda: clock[0]):
+                with self.assertRaises(TimeoutError):
+                    wire.drain_owned_notifications(1)
+            self.assertEqual(list(output.glob('public-event-*.json')), [])
+
+    def test_passive_capture_eof_and_frame_flood_refuse(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as temporary:
+            wire, peer = self.observed_wire(Path(temporary))
+            peer.close()
+            with self.assertRaises(EOFError):
+                wire.drain_owned_notifications(.03)
+        with tempfile.TemporaryDirectory() as temporary:
+            wire, _ = self.observed_wire(Path(temporary))
+            wire.buffer = self.event_frame({'method': 'unrelated/private', 'params': {}})*129
+            with self.assertRaises(ValueError):
+                wire.drain_owned_notifications(.1)
+            self.assertEqual(list(Path(temporary).glob('public-event-*.json')), [])
+
+    def test_thread_creation_does_not_disable_environment(self):
+        # Exercise the actual launch request literal: the pinned native schema
+        # distinguishes omission (default environment) from [] (disabled).
+        import ast
+        module = ast.parse(Path(fixture.__file__).read_text())
+        requests = [node for node in ast.walk(module) if isinstance(node, ast.Call)
+                    and isinstance(node.func, ast.Attribute) and node.func.attr == 'call'
+                    and node.args and isinstance(node.args[0], ast.Constant)
+                    and node.args[0].value == 'thread/start']
+        self.assertEqual(len(requests), 1)
+        params = eval(compile(ast.Expression(requests[0].args[1]), '<actual-launch>', 'eval'),
+                      {'workspace': Path('/owned/workspace'), 'output': Path('/owned/output'),
+                       'common': Path('/owned/common'), 'str': str})
+        self.assertNotIn('environments', params)
+        self.assertEqual(params['runtimeWorkspaceRoots'],
+                         ['/owned/workspace', '/owned/output', '/owned/common'])
+
+    def test_ambiguous_or_nonfinite_native_reply_refuses(self):
+        for body in (b'{"goal":{"status":"active"},"goal":null}', b'{"goal":NaN}', b'{"goal":1e400}'):
+            with self.subTest(body=body):
+                wire = fixture.Wire.__new__(fixture.Wire)
+                wire.buffer = bytes([0x81, len(body)])+body
+                with self.assertRaises(ValueError):
+                    wire.receive()
+    def test_handshake_dribble_does_not_extend_deadline(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as temporary:
+            endpoint = str(Path(temporary)/'socket')
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as server:
+                server.bind(endpoint)
+                server.listen(1)
+                server.settimeout(1)
+                def peer():
+                    with server.accept()[0] as connection:
+                        connection.recv(4096)
+                        try:
+                            for byte in b'HTTP/1.1 101 Switching Protocols':
+                                connection.sendall(bytes([byte]))
+                                time.sleep(.03)
+                        except BrokenPipeError:
+                            pass
+                worker = threading.Thread(target=peer, daemon=True)
+                worker.start()
+                try:
+                    with self.assertRaises(TimeoutError):
+                        fixture.Wire(endpoint, timeout=.2)
+                finally:
+                    worker.join(timeout=2)
+    def test_handshake_eof_is_bounded(self):
+        # A peer closes before Upgrade: the client must not spin on repeated EOF.
+        import tempfile
+        with tempfile.TemporaryDirectory() as temporary:
+            endpoint = str(Path(temporary)/'socket')
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as server:
+                server.bind(endpoint)
+                server.listen(1)
+                server.settimeout(1)
+                def peer():
+                    with server.accept()[0] as connection:
+                        connection.recv(4096)
+                worker = threading.Thread(target=peer, daemon=True)
+                worker.start()
+                try:
+                    with self.assertRaises(EOFError):
+                        fixture.Wire(endpoint)
+                finally:
+                    worker.join(timeout=2)
+
+    def test_partial_and_masked_server_frame_refuse(self):
+        for header in (b'\x01\x00', b'\x81\x80'):
+            with self.subTest(header=header):
+                left, right = socket.socketpair()
+                try:
+                    wire = fixture.Wire.__new__(fixture.Wire)
+                    wire.connection, wire.buffer = left, header
+                    with self.assertRaises(ValueError):
+                        wire.receive()
+                finally:
+                    left.close()
+                    right.close()
+
+    def test_invalid_id_cannot_inject_unit_or_command(self):
+        for value in ('../outside', 'a;pwd', 'a\nother', '', 'UPPER'):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                fixture.fixture_command(Path('/source.py'), Path('/owned'), value)
+
+    def test_shell_quoting_preserves_exact_paths(self):
+        import shlex
+        argv = shlex.split(fixture.fixture_command(Path('/space dir/$(x).py'), Path('/owned;path'), 'probe-1'))
+        self.assertEqual(argv[-6:], ['/space dir/$(x).py', 'payload', '--output', '/owned;path', '--fixture-id', 'probe-1'])
+
+    def test_explicit_tool_paths_survive_path_objects(self):
+        import shlex
+        argv = shlex.split(fixture.fixture_command(Path('/source.py'), Path('/owned'), 'probe-1',
+                  {'systemd_run': Path('/pinned/systemd-run'), 'python': Path('/pinned/python')}))
+        self.assertEqual(argv[0], '/pinned/systemd-run')
+        self.assertIn('/pinned/python', argv)
+        self.assertIn('-I', argv)
+
+    def test_actual_git_worktree_identity_and_dirty_refusal(self):
+        import os
+        import shutil
+        import subprocess
+        import tempfile
+        git = Path(shutil.which('git')).resolve()
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            canonical, workspace, common = root/'canonical', root/'worker', root/'canonical'/'.git'
+            source_root = root/'immutable_source'
+            source_root.mkdir()
+            env = {**os.environ, 'GIT_CONFIG_GLOBAL': '/dev/null', 'GIT_CONFIG_NOSYSTEM': '1'}
+            def run(*argv):
+                return subprocess.run([str(git), *map(str, argv)], env=env, check=True,
+                                      capture_output=True, timeout=2).stdout.decode().strip()
+            run('init', '-q', '-b', 'phi9t/mainline', canonical)
+            run('-C', canonical, '-c', 'user.name=fixture', '-c', 'user.email=fixture@localhost',
+                'commit', '-q', '--allow-empty', '-m', 'fixture')
+            base = run('-C', canonical, 'rev-parse', 'HEAD')
+            run('-C', canonical, 'worktree', 'add', '-q', '-b',
+                'codex/collaboration50-fixture/probe-1', workspace, base)
+            admission = {'workspace': str(workspace), 'canonical': str(canonical),
+                         'common_git': str(common), 'workspace_base': base, 'fixture_id': 'probe-1',
+                         'source_root': str(source_root)}
+            for key, path in [('workspace_identity', workspace), ('common_git_identity', common)]:
+                admission[key] = {'device': path.stat().st_dev, 'inode': path.stat().st_ino}
+            facts = fixture.workspace_identity(admission, git, source_root/'source.py', root/'output')
+            self.assertEqual(facts['head'], base)
+            with self.assertRaises(ValueError):
+                fixture.workspace_identity(admission, git, source_root/'source.py', workspace/'output')
+            for forbidden in (canonical/'output', source_root/'output'):
+                with self.subTest(forbidden=forbidden), self.assertRaises(ValueError):
+                    fixture.workspace_identity(admission, git, source_root/'source.py', forbidden)
+            (workspace/'unexpected').write_text('unretained source')
+            with self.assertRaises(ValueError):
+                fixture.workspace_identity(admission, git, source_root/'source.py', root/'output')
+
+
+if __name__ == '__main__':
+    unittest.main()
