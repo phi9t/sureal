@@ -4,9 +4,9 @@ import io
 import json
 from pathlib import Path
 import numpy as np
-from .geometry import range_to_points
 from dataset.scientific_sidecar_reader import iter_sidecar_rows
 from dataset.sensor_records import OrderedLookup, array_field, align_point_targets, select_rows
+from geometry.geometry import range_to_points
 
 REQUIRED = {'lidar_calibration', 'vehicle_pose', 'lidar_pose',
             'lidar_camera_projection', 'lidar_segmentation'}

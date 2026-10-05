@@ -1,6 +1,6 @@
 import os,sys,tempfile,time,unittest
 from pathlib import Path
-from pipeline.native_shape_transfer import bounded_transfer
+from geometry.native_shape_transfer import bounded_transfer
 class TransferTests(unittest.TestCase):
  def test_success_and_nonzero_exit_propagated(self):
   self.assertEqual(bounded_transfer([sys.executable,'-c','pass'],timeout_seconds=2)['exit_code'],0)

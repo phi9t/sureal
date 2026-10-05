@@ -19,6 +19,7 @@ DATA_FILES = glob([
 
 DATASET_VISIBILITY = [
     "//autonomy:__pkg__",
+    "//autonomy/geometry:__pkg__",
 ]
 
 TEST_EXTRA_SRCS = {

@@ -7,7 +7,7 @@ from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
 
 HERE=Path(__file__).resolve().parent
-CANDIDATES=['pipeline/scientific_scene_validate.py','tests/test_scientific_scene_validate.py','tests/test_scientific_reconstruction.py','pipeline/reconstruction_validate.py','dataset/scientific_sidecar_reader.py','dataset/sensor_records.py','pipeline/scientific_reconstruction.py','dataset/scientific_sidecars.py','pipeline/geometry.py','verify-scientific-scene.py']
+CANDIDATES=['pipeline/scientific_scene_validate.py','tests/test_scientific_scene_validate.py','tests/test_scientific_reconstruction.py','pipeline/reconstruction_validate.py','dataset/scientific_sidecar_reader.py','dataset/sensor_records.py','pipeline/scientific_reconstruction.py','dataset/scientific_sidecars.py','geometry/geometry.py','verify-scientific-scene.py']
 
 def sha(p):
     with p.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()

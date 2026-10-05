@@ -1,6 +1,6 @@
 """Inspection-only range/BEV mappings; every display keeps source identities."""
 import numpy as np
-from .geometry_foundation import bev_indices
+from geometry.geometry_foundation import bev_indices
 
 
 def bev_raster(xyz,*,lower=(-75,-75),upper=(75,75),cell=.5):

@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from pipeline.camera_coordinates import pixel_centers,box_edges
+from geometry.camera_coordinates import pixel_centers,box_edges
 class CoordinateTests(unittest.TestCase):
  def test_half_pixel_and_distinct_axis_scales(self):
   x=np.array([[0.,0.],[6.,4.]])

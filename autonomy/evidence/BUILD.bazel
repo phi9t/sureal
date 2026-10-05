@@ -8,6 +8,7 @@ LIB_MODULES = glob(
 EVIDENCE_VISIBILITY = [
     "//autonomy:__pkg__",
     "//autonomy/dataset:__pkg__",
+    "//autonomy/geometry:__pkg__",
     "//autonomy/insula:__pkg__",
 ]
 

@@ -15,7 +15,7 @@ from dataset.scientific_preparation import verified_sidecar_hashes
 
 HERE=Path(__file__).resolve().parents[1]
 COMPONENTS=['lidar_calibration','camera_calibration','vehicle_pose','lidar_pose','lidar_camera_projection','lidar_segmentation','lidar_box']
-CANDIDATES=['dataset/scientific-preprocess.py','dataset/scientific_component.py','dataset/scientific_sidecars.py','dataset/scientific_sidecar_validate.py','dataset/scientific_admission.py','dataset/staged_source.py','dataset/source_integrity.py','insula/staging_lease.py','dataset/sensor_records.py','dataset/scientific_preparation.py','pipeline/scientific_scene_command.py','pipeline/scientific_scene_validate.py','pipeline/scientific_reconstruction.py','dataset/scientific_sidecar_reader.py','pipeline/reconstruction_validate.py','pipeline/geometry.py','pipeline/geometry_foundation.py']
+CANDIDATES=['dataset/scientific-preprocess.py','dataset/scientific_component.py','dataset/scientific_sidecars.py','dataset/scientific_sidecar_validate.py','dataset/scientific_admission.py','dataset/staged_source.py','dataset/source_integrity.py','insula/staging_lease.py','dataset/sensor_records.py','dataset/scientific_preparation.py','pipeline/scientific_scene_command.py','pipeline/scientific_scene_validate.py','pipeline/scientific_reconstruction.py','dataset/scientific_sidecar_reader.py','pipeline/reconstruction_validate.py','geometry/geometry.py','geometry/geometry_foundation.py']
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--scene',required=True);parser.add_argument('--output',type=Path,required=True)
