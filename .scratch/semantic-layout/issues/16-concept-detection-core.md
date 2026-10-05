@@ -4,7 +4,7 @@
 
 **Blocked by:** 14 (Concept batch: `dataset`), 15 (Concept batch: `geometry`)
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] Scope: anchor grid and assignment, box coding, pillar packing and encoder, packed point features, the pillar detector, detector geometry, loss and decoding, prediction records, detection export, the native detection adapter, and the training-box pipeline
 - [x] Every module in scope lives in its concept directory and is imported by package path; no `sys.path` manipulation remains in the moved code
