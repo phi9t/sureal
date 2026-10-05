@@ -14,7 +14,7 @@ die() {
 }
 
 rootfs_digest() {
-    PYTHONPATH="${HERE}/../../experiments/waymo-perception" python3 - "$1" <<'PY'
+    PYTHONPATH="${HERE}/../../autonomy" python3 - "$1" <<'PY'
 import sys
 from pathlib import Path
 from pipeline.runtime_identity import rootfs_identity
@@ -83,7 +83,7 @@ docker export "$CID" | tar -C "$STAGE" -xf -
 docker rm "$CID" >/dev/null
 CID=""
 validate_rootfs "$STAGE"
-PYTHONPATH="${HERE}/../../experiments/waymo-perception" python3 - "$STAGE" "$HERE" "$IMAGE" "$BAZEL_VERSION" "$BAZEL_LINUX_X86_64_SHA256" <<'PY'
+PYTHONPATH="${HERE}/../../autonomy" python3 - "$STAGE" "$HERE" "$IMAGE" "$BAZEL_VERSION" "$BAZEL_LINUX_X86_64_SHA256" <<'PY'
 import hashlib
 import json
 import sys

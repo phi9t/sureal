@@ -61,4 +61,27 @@ class RunnerTests(unittest.TestCase):
    self.assertTrue(not state.exists() or state.read_text().split(') ',1)[1][0]=='Z')
  def test_snapshot_dependency_closure_and_no_scratch_dependency(self):
   module.check_harness_closure()
+ def test_snapshot_packages_autonomy_at_top_level(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   root=Path(tmp);repo=root/'repo';package_root=repo/'autonomy';here=package_root/'architecture'
+   for path in [package_root/'pipeline',package_root/'gpu',package_root/'research',here/'harness',repo/'docs/superpowers/specs']:
+    path.mkdir(parents=True)
+   (package_root/'pipeline/module.py').write_text('pass\n')
+   (package_root/'gpu/worker.py').write_text('pass\n')
+   (package_root/'research/evidence.json').write_text('{}\n')
+   (repo/'docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md').write_text('# spec\n')
+   (here/'registry.json').write_text(json.dumps({'residual_bev':{'status':'runnable','title':'Residual BEV'}}))
+   drivers=[stage['driver'] for stage in module.stages_for('residual_bev')]
+   (here/'harness/files.json').write_text(json.dumps(drivers))
+   for driver in drivers:
+    (here/'harness'/driver).write_text('pass\n')
+   old_here,old_package,old_repo=module.HERE,module.PACKAGE,module.REPO
+   module.HERE,module.PACKAGE,module.REPO=here,package_root,repo
+   try:
+    source,package=module.make_snapshot(root/'run','residual_bev','trial-01',root/'cache')
+   finally:
+    module.HERE,module.PACKAGE,module.REPO=old_here,old_package,old_repo
+   self.assertEqual(package,source/'autonomy')
+   self.assertTrue((package/'pipeline').is_dir())
+   self.assertFalse((source/'experiments').exists())
 if __name__=='__main__':unittest.main()

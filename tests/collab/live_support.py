@@ -542,7 +542,7 @@ def build_runtime(materialization, packages, output, tools):
     export = checked_command([docker, 'export', '--output', archive, container_id], source, output/'export', timeout=60)
     rootfs = output/'rootfs'
     members = extract_export(archive, rootfs)
-    sys.path.insert(0, str(source/'experiments/waymo-perception'))
+    sys.path.insert(0, str(source/'autonomy'))
     from pipeline.runtime_identity import rootfs_identity
     rootfs_sha = rootfs_identity(rootfs)
     inventory = write_json(output/'rootfs-inventory.json', {'schema_version': 1, 'rootfs_sha256': rootfs_sha,

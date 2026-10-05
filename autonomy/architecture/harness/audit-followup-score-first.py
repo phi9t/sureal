@@ -1,6 +1,6 @@
 from pathlib import Path
 import hashlib,json,subprocess,sys
-code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+code=Path('autonomy').resolve();sys.path.insert(0,str(code))
 from pipeline.runtime_identity import verify_rootfs
 from pipeline.insula_entry import launch_plan
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()

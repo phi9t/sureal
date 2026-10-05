@@ -14,7 +14,7 @@ def main():
  parser=argparse.ArgumentParser();parser.add_argument('variant',choices=['baseline','residual_bev']);parser.add_argument('--run-id',required=True);args=parser.parse_args()
  if not args.run_id.isalnum():raise ValueError('Alphanumeric run ID required')
  lock=(CACHE/'insula/architecture-experiments.lock').open('a');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
- run=CACHE/'insula'/f'cohort16-{args.variant}-{args.run_id}';run.mkdir();source=run/'source';source.mkdir();package=source/'experiments/waymo-perception';package.mkdir(parents=True)
+ run=CACHE/'insula'/f'cohort16-{args.variant}-{args.run_id}';run.mkdir();source=run/'source';source.mkdir();package=source/'autonomy';package.mkdir(parents=True)
  for folder in ['pipeline','gpu','research','cohort']:shutil.copytree(PACKAGE/folder,package/folder,ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
  pins={str(p.relative_to(source)):sha(p) for p in source.rglob('*') if p.is_file()};assert bytes_used(source)<64*1024**2
  native=WORK/'balanced16-native-v2';physical=WORK/'balanced16-physical-v2';boxes=WORK/'balanced16-labels-v2';progress=json.loads((package/'research/balanced16-native-progress.json').read_text());protocol=json.loads((package/'research/pointpillars-scientific-protocol.candidate.json').read_text());frames=[]

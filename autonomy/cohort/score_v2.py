@@ -8,7 +8,7 @@ from balanced import uncovered_count
 from protocol import quality_gate
 from admissions import required_fit_admissions
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
-parser=argparse.ArgumentParser();parser.add_argument('variant',choices=['baseline','residual_bev']);parser.add_argument('--run-id',required=True);a=parser.parse_args();cache=Path.home()/'.cache/waystone/waymo-perception';run=cache/'insula'/f'cohort16-{a.variant}-{a.run_id}';meta=json.loads((run/'run.json').read_text());source=run/'source';package=source/'experiments/waymo-perception';output=cache/'scientific-processing'/f'cohort16-{a.variant}-{a.run_id}';training=json.loads((run/'train-verified.json').read_text());manifest=meta['manifest'];inputs=run/'inputs';workers=run/'scoring-workers-v2';workers.mkdir();
+parser=argparse.ArgumentParser();parser.add_argument('variant',choices=['baseline','residual_bev']);parser.add_argument('--run-id',required=True);a=parser.parse_args();cache=Path.home()/'.cache/waystone/waymo-perception';run=cache/'insula'/f'cohort16-{a.variant}-{a.run_id}';meta=json.loads((run/'run.json').read_text());source=run/'source';package=source/'autonomy';output=cache/'scientific-processing'/f'cohort16-{a.variant}-{a.run_id}';training=json.loads((run/'train-verified.json').read_text());manifest=meta['manifest'];inputs=run/'inputs';workers=run/'scoring-workers-v2';workers.mkdir();
 for filename in ['prepare_v2.py','metrics.py','audit_proposals.py','audit_metrics.py','balanced.py']:(workers/filename).write_bytes((PACKAGE/'cohort'/filename).read_bytes())
 pins={str(p):sha(p) for p in workers.glob('*.py')};required_fit_admissions(run)
 def verify():

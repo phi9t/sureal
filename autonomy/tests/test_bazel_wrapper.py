@@ -9,8 +9,8 @@ from pathlib import Path
 from pipeline.runtime_identity import rootfs_identity
 
 
-REPO = Path(__file__).resolve().parents[3]
-WAYMO = REPO / "experiments" / "waymo-perception"
+REPO = Path(__file__).resolve().parents[2]
+AUTONOMY = REPO / "autonomy"
 WRAPPER = REPO / "bazelw"
 
 
@@ -128,7 +128,7 @@ class BazelWrapperTests(unittest.TestCase):
                 temporary,
                 "--emit-plan",
                 "test",
-                "//experiments/waymo-perception:tools_test_suites",
+                "//autonomy:tools_test_suites",
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             plan = json.loads(result.stdout)
@@ -143,13 +143,13 @@ class BazelWrapperTests(unittest.TestCase):
             )
             self.assertIn(["--tmpfs", "/experiment"], plan["mounts"])
             self.assertIn(["--ro-bind", str((REPO / "MODULE.bazel").resolve()), "/experiment/MODULE.bazel"], plan["mounts"])
-            self.assertIn(["--ro-bind", str((REPO / "experiments").resolve()), "/experiment/experiments"], plan["mounts"])
+            self.assertIn(["--ro-bind", str(AUTONOMY.resolve()), "/experiment/autonomy"], plan["mounts"])
             self.assertTrue(has_mount_to(plan["mounts"], "/experiment/cohort"), plan["mounts"])
             self.assertIn(["--bind", str(cache.resolve()), "/outputs"], plan["mounts"])
             self.assertIn(["--ro-bind", "/etc/resolv.conf", "/etc/resolv.conf"], plan["mounts"])
             self.assertIn(["--setenv", "HOME", "/outputs/home"], plan["environment"])
             self.assertNotIn(
-                ["--setenv", "PYTHONPATH", "/experiment/experiments/waymo-perception"],
+                ["--setenv", "PYTHONPATH", "/experiment/autonomy"],
                 plan["environment"],
             )
             self.assertIn("--output_base=/outputs/output-base", plan["bazel"])
@@ -170,7 +170,7 @@ class BazelWrapperTests(unittest.TestCase):
                 "--emit-plan",
                 "--update-lock",
                 "test",
-                "//experiments/waymo-perception:tools_test_suites",
+                "//autonomy:tools_test_suites",
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             plan = json.loads(result.stdout)
@@ -191,7 +191,7 @@ class BazelWrapperTests(unittest.TestCase):
             result, marker, _, _, _ = self.run_wrapper(
                 temporary,
                 "test",
-                "//experiments/waymo-perception:tools_test_suites",
+                "//autonomy:tools_test_suites",
                 wrong_identity=True,
             )
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -250,7 +250,7 @@ class BazelWrapperTests(unittest.TestCase):
                 "--emit-plan",
                 "test",
                 "--config=cuda",
-                "//experiments/waymo-perception:advanced__test_models",
+                "//autonomy:advanced__test_models",
                 extra_env={
                     "SUREAL_BAZEL_GPU_DEVICES": ",".join(device_pairs),
                     "SUREAL_BAZEL_GPU_DRIVER_LIBRARY_DIRS": str(driver_dir),

@@ -4,7 +4,7 @@ from pathlib import Path
 
 HERE=Path(__file__).resolve().parent
 PACKAGE=HERE.parent
-REPO=PACKAGE.parents[1]
+REPO=PACKAGE.parent
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
 
 def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -133,7 +133,7 @@ def atomic_json(path,value):
  tmp=path.with_suffix(path.suffix+'.tmp');tmp.write_text(json.dumps(value,indent=2)+'\n');tmp.replace(path)
 
 def make_snapshot(directory,name,run_id,cache):
- source=directory/'source';package=source/'experiments/waymo-perception';package.mkdir(parents=True)
+ source=directory/'source';package=source/'autonomy';package.mkdir(parents=True)
  for folder in ['pipeline','gpu','research']:
   shutil.copytree(PACKAGE/folder,package/folder,ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
  docs=source/'docs/superpowers/specs';docs.mkdir(parents=True)
@@ -192,7 +192,7 @@ def execute(name,run_id,cache,resume=False):
    if not resume:raise ValueError('Run ID already exists; choose a new ID or use --resume')
    meta=check_snapshot(directory)
    if meta['experiment']!=name or meta['cache_root']!=str(cache):raise ValueError('Resume configuration does not match frozen run')
-   source=directory/'source';package=source/'experiments/waymo-perception'
+   source=directory/'source';package=source/'autonomy'
   else:
    if resume:raise ValueError('Cannot resume a nonexistent run ID')
    preflight(cache,name);directory.mkdir();source,package=make_snapshot(directory,name,run_id,cache)
@@ -240,7 +240,7 @@ def main(argv=None):
    if args.run_id:
     directory=args.cache_root.resolve()/'insula/architecture-runs'/args.run_id;meta=check_snapshot(directory)
     if meta['experiment']!=args.experiment:raise ValueError('Run ID belongs to another experiment')
-    package=directory/'source/experiments/waymo-perception';label=run_label(args.experiment,args.run_id)
+    package=directory/'source/autonomy';label=run_label(args.experiment,args.run_id)
    print(json.dumps(summarize(package,args.experiment,label),indent=2))
   return 0
  except (ValueError,FileNotFoundError,subprocess.TimeoutExpired) as error:
