@@ -6,8 +6,8 @@
 
 **Status:** ready-for-human
 
-- [ ] An HDFS adapter implements the same storage interface as the local-directory adapter
-- [ ] Upload reads the object back and compares bytes before reporting success
-- [ ] Uploading a digest that already exists verifies the existing bytes and does not overwrite
-- [ ] A snapshot uploaded in one session is fetched and verified in a fresh session with an empty local cache; the live check is recorded
-- [ ] Authentication failure and a missing object are reported as distinct, explicit errors
+- [x] An HDFS adapter implements the same storage interface as the local-directory adapter
+- [x] Upload reads the object back and compares bytes before reporting success
+- [x] Uploading a digest that already exists verifies the existing bytes and does not overwrite
+- [x] A snapshot uploaded in one session is fetched and verified in a fresh session with an empty local cache; the live check is recorded
+- [x] Authentication failure and a missing object are reported as distinct, explicit errors
