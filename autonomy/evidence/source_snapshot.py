@@ -15,6 +15,31 @@ from typing import Mapping, Protocol
 
 REPO = Path(__file__).resolve().parents[2]
 HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
+DEFAULT_WAYSTONE = Path.home() / "workspace/waystone/scripts/waystone"
+DEFAULT_HADOOP_CONF_DIR = "/opt/tiger/yarn_deploy/hadoop/conf"
+SOURCE_SNAPSHOT_CHILD = "source-snapshots"
+AUTHENTICATION_MARKERS = (
+    "authentication",
+    "authenticate",
+    "authorization",
+    "credential",
+    "forbidden",
+    "gss",
+    "kerberos",
+    "permission denied",
+    "ticket",
+    "token",
+    "unauthorized",
+)
+MISSING_MARKERS = (
+    "does not exist",
+    "filenotfound",
+    "file not found",
+    "missing",
+    "no such file",
+    "not found",
+    "not_exist",
+)
 
 
 @dataclass(frozen=True)
@@ -28,6 +53,18 @@ class SourceSnapshot:
 class SnapshotStore(Protocol):
     def store(self, digest: str, data: bytes) -> str: ...
     def fetch(self, digest: str) -> bytes: ...
+
+
+class SnapshotStorageError(RuntimeError):
+    pass
+
+
+class SnapshotAuthenticationError(PermissionError):
+    pass
+
+
+class SnapshotMissingError(FileNotFoundError):
+    pass
 
 
 class LocalSnapshotStore:
@@ -76,6 +113,98 @@ class LocalSnapshotStore:
         if hashlib.sha256(data).hexdigest() != digest:
             raise ValueError("snapshot digest differs from requested digest")
         return data
+
+
+class HdfsSnapshotStore:
+    def __init__(
+        self,
+        waystone=DEFAULT_WAYSTONE,
+        *,
+        prefix: str | None = None,
+        runner=subprocess.run,
+        timeout: int = 90,
+    ):
+        self.waystone = str(waystone)
+        self._prefix = prefix.rstrip("/") if prefix is not None else None
+        self.runner = runner
+        self.timeout = timeout
+
+    @property
+    def prefix(self) -> str:
+        if self._prefix is None:
+            self._prefix = self._run(["storage-prefix", "--child", "sureal"]).strip().rstrip("/")
+        if not self._prefix:
+            raise ValueError("snapshot HDFS prefix required")
+        return self._prefix
+
+    def uri_for(self, digest: str) -> str:
+        require_digest(digest)
+        return f"{self.prefix}/{SOURCE_SNAPSHOT_CHILD}/{digest}"
+
+    def store(self, digest: str, data: bytes) -> str:
+        require_digest(digest)
+        if hashlib.sha256(data).hexdigest() != digest:
+            raise ValueError("snapshot digest differs from key")
+        uri = self.uri_for(digest)
+        try:
+            existing = self.fetch(digest)
+        except SnapshotMissingError:
+            existing = None
+        if existing is not None:
+            if existing != data:
+                raise ValueError("snapshot digest differs from existing snapshot")
+            return digest
+        with tempfile.NamedTemporaryFile(prefix=digest + ".", suffix=".snapshot") as source:
+            source.write(data)
+            source.flush()
+            self._run(["put", "--mkdir-parents", source.name, uri])
+        readback = self._download(uri, digest)
+        if readback != data or hashlib.sha256(readback).hexdigest() != digest:
+            raise ValueError("snapshot digest differs after readback")
+        return digest
+
+    def fetch(self, digest: str) -> bytes:
+        require_digest(digest)
+        uri = self.uri_for(digest)
+        data = self._download(uri, digest)
+        if hashlib.sha256(data).hexdigest() != digest:
+            raise ValueError("snapshot digest differs from requested digest")
+        return data
+
+    def _download(self, uri: str, digest: str) -> bytes:
+        with tempfile.TemporaryDirectory(prefix=digest + ".") as directory:
+            destination = Path(directory) / (digest + ".snapshot")
+            self._run(["get", uri, str(destination)], missing_digest=digest)
+            return destination.read_bytes()
+
+    def _run(self, args: list[str], *, missing_digest: str | None = None) -> str:
+        command = [self.waystone, "--error-format", "json", "--auth-source", "token-file", *args]
+        environment = os.environ.copy()
+        environment.setdefault("HADOOP_CONF_DIR", DEFAULT_HADOOP_CONF_DIR)
+        try:
+            result = self.runner(
+                command,
+                capture_output=True,
+                text=True,
+                timeout=self.timeout,
+                env=environment,
+                check=False,
+            )
+        except subprocess.TimeoutExpired as error:
+            raise SnapshotStorageError("snapshot storage command timed out") from error
+        output = _waystone_output(result)
+        if result.returncode == 0:
+            return result.stdout
+        lowered = output.lower()
+        if any(marker in lowered for marker in AUTHENTICATION_MARKERS):
+            raise SnapshotAuthenticationError("snapshot storage authentication failed")
+        if missing_digest is not None and any(marker in lowered for marker in MISSING_MARKERS):
+            raise SnapshotMissingError(f"source snapshot missing: {missing_digest}")
+        raise SnapshotStorageError("snapshot storage command failed: " + output.strip())
+
+
+def _waystone_output(result) -> str:
+    return "\n".join(str(part) for part in (getattr(result, "stdout", ""), getattr(result, "stderr", "")) if part)
 
 
 def require_digest(digest: str) -> str:
