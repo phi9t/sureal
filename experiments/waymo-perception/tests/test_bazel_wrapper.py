@@ -99,13 +99,40 @@ class BazelWrapperTests(unittest.TestCase):
             self.assertIn(["--bind", str(cache.resolve()), "/outputs"], plan["mounts"])
             self.assertIn(["--ro-bind", "/etc/resolv.conf", "/etc/resolv.conf"], plan["mounts"])
             self.assertIn(["--setenv", "HOME", "/outputs/home"], plan["environment"])
+            self.assertNotIn(
+                ["--setenv", "PYTHONPATH", "/experiment/experiments/waymo-perception"],
+                plan["environment"],
+            )
             self.assertIn("--output_base=/outputs/output-base", plan["bazel"])
-            self.assertIn("--enable_workspace", plan["bazel"])
-            self.assertIn("--noenable_bzlmod", plan["bazel"])
-            self.assertIn("--repositories_without_autoloads=*", plan["bazel"])
+            self.assertNotIn("--enable_workspace", plan["bazel"])
+            self.assertNotIn("--noenable_bzlmod", plan["bazel"])
+            self.assertNotIn("--repositories_without_autoloads=*", plan["bazel"])
+            self.assertIn("--ignore_dev_dependency", plan["bazel"])
+            self.assertIn("--lockfile_mode=error", plan["bazel"])
             self.assertIn("--repository_cache=/outputs/repository-cache", plan["bazel"])
             self.assertIn("--disk_cache=/outputs/disk-cache", plan["bazel"])
             self.assertEqual(plan["lock"], str(lock.resolve()))
+            self.assertFalse(marker.exists())
+
+    def test_update_lock_plan_makes_only_the_module_lock_writable(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            result, marker, _, _, _ = self.run_wrapper(
+                temporary,
+                "--emit-plan",
+                "--update-lock",
+                "test",
+                "//experiments/waymo-perception:tools_test_suites",
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            plan = json.loads(result.stdout)
+            self.assertIn("--ignore_dev_dependency", plan["bazel"])
+            self.assertIn("--lockfile_mode=update", plan["bazel"])
+            self.assertNotIn("--lockfile_mode=error", plan["bazel"])
+            self.assertIn(
+                ["--bind", str((REPO / "MODULE.bazel.lock").resolve()), "/experiment/MODULE.bazel.lock"],
+                plan["mounts"],
+            )
+            self.assertIn(["--ro-bind", str(REPO.resolve()), "/experiment"], plan["mounts"])
             self.assertFalse(marker.exists())
 
     def test_rootfs_identity_mismatch_is_rejected_before_bwrap_runs(self):

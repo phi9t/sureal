@@ -6,9 +6,9 @@
 
 **Status:** ready-for-agent
 
-- [ ] The repository root has the Bazel module file, its committed lock file, the Bazel version file and the Bazel configuration; packages are declared only for the two research programs
-- [ ] The Python toolchain is the rootfs interpreter with its installed packages; Bazel fetches no third-party Python package
-- [ ] The wrapper clears the environment, sets a fixed home, mounts the rootfs read-only, and mounts the repository and one git-ignored cache directory that is also listed in the Bazel ignore file
+- [x] The repository root has the Bazel module file, its committed lock file, the Bazel version file and the Bazel configuration; packages are declared only for the two research programs
+- [x] The Python toolchain is the rootfs interpreter with its installed packages; Bazel fetches no third-party Python package
+- [x] The wrapper clears the environment, sets a fixed home, mounts the rootfs read-only, and mounts the repository and one git-ignored cache directory that is also listed in the Bazel ignore file
 - [x] A second run of the same test is served from the persistent cache
 - [x] The wrapper has a mode that prints the sandbox command as data without running it, covered by a unit test
 - [x] The wrapper refuses to run, with a clear message, when the rootfs does not match its lock; covered by a unit test
@@ -20,37 +20,57 @@
 Built:
 
 - Added repository-level `bazelw`. It verifies `~/.cache/waystone/waymo-perception/insula/rootfs-v3` against `rootfs-v3.lock.json`, checks Bazel 9.2.0 in the lock, emits a JSON sandbox plan with `--emit-plan`, or executes Bazel through `bwrap`.
-- Added root Bazel files: `MODULE.bazel`, committed `MODULE.bazel.lock`, `.bazelversion`, `.bazelrc`, `.bazelignore`, and `WORKSPACE`.
+- Kept Bzlmod enabled. Normal wrapper runs pass `--lockfile_mode=error`; `--update-lock` runs with `--lockfile_mode=update` and bind-mounts only `MODULE.bazel.lock` writable over the read-only repository mount.
+- Removed `WORKSPACE` and the legacy workspace flags `--enable_workspace`, `--noenable_bzlmod`, and `--repositories_without_autoloads=*`.
+- Added `rules_python` as a `bazel_dep`, configured `local_runtime_repo` and `local_runtime_toolchains_repo` for `/usr/local/bin/python`, and registered that rootfs Python toolchain.
+- Converted the initial test to `py_library` plus `py_test`, and added a second `py_test` for `tests/test_anchor_grid.py`, which imports `numpy` through the rootfs interpreter and the target's declared import roots.
+- The committed Bazel files declare no `pip.parse`, PyPI, requirements, wheel, or hermetic Python-interpreter download configuration. The wrapper passes `--ignore_dev_dependency`; after regenerating the lock from a cleaned lock state, `MODULE.bazel.lock` has no `pip`, `pypi`, `pythonhosted`, requirements, or `.whl` entries.
+- Registered a local null C++ toolchain target for this pure-Python gate because the CPU rootfs has no compiler/binutils and `rules_python` analysis loads `rules_cc`. It is only to satisfy toolchain resolution for these Python targets.
 - Added `.bazel-cache/` to `.gitignore` and `.bazelignore`; the wrapper mounts it at `/outputs` and uses it for `--output_base`, `--repository_cache`, `--disk_cache`, and fixed `HOME=/outputs/home`.
-- Added package declarations only under `experiments/3d-pathway/` and `experiments/waymo-perception/`. The current Bazel graph exposes one perception target: `//experiments/waymo-perception:tools_test_suites`.
-- Added a small in-repo Starlark unit-test rule that runs `/usr/local/bin/python` from the rootfs directly. The committed Bazel sources do not declare `rules_python`, `pip_parse`, PyPI, requirements, or wheel configuration.
+- Added package declarations only under `experiments/3d-pathway/` and `experiments/waymo-perception/`.
 - Recorded the working Bazel modes in `.bazelrc`: `startup --batch` because no Bazel server has to survive the Insula process namespace, and `standalone` spawn/test strategy because `linux-sandbox` is not registered inside `rootfs-v3`.
-- The wrapper passes `--enable_workspace --noenable_bzlmod --repositories_without_autoloads=*` for this initial in-repo one-test gate. `MODULE.bazel` and `MODULE.bazel.lock` are present for the repository contract, but this target intentionally avoids external Python-package resolution.
+- Cleaned the ignored `.bazel-cache/` probe directories; the worktree cache now has one layout: `home`, `output-base`, `repository-cache`, and `disk-cache`.
 
 Verification commands and results:
 
 - Red test before implementation: `PYTHONPATH=experiments/waymo-perception python3 -m unittest experiments.waymo-perception.tests.test_bazel_wrapper -v`
   - Result: 2 failures, both reporting `repository-level Bazel wrapper is missing`.
-- Red test for the workspace-mode follow-up: `PYTHONPATH=experiments/waymo-perception python3 -m unittest experiments.waymo-perception.tests.test_bazel_wrapper -v`
-  - Result: 1 failure, `--enable_workspace` missing from the emitted Bazel command.
+- Red test for the review fix: `PYTHONPATH=experiments/waymo-perception python3 -m unittest experiments.waymo-perception.tests.test_bazel_wrapper -v`
+  - Result before changing `bazelw`: 2 failures, covering the unwanted global `PYTHONPATH` sandbox environment and missing `--update-lock` behavior.
+- `PYTHONPATH=experiments/waymo-perception python3 -m unittest experiments.waymo-perception.tests.test_bazel_wrapper -v`
+  - Result: 3 tests, 0 failures.
 - `PYTHONPATH=experiments/waymo-perception python3 -m unittest experiments.waymo-perception.tests.test_bazel_wrapper experiments.waymo-perception.tests.test_runtime_identity experiments.waymo-perception.tests.test_insula_entry experiments.waymo-perception.tests.test_cpu_rootfs_build -v`
-  - Result: 8 tests, 0 failures.
+  - Result: 9 tests, 0 failures.
+- `git diff --check`
+  - Result: passed.
 - `find . -path './.bazel-cache' -prune -o -name BUILD.bazel -print | sort`
   - Result: only `./experiments/3d-pathway/BUILD.bazel` and `./experiments/waymo-perception/BUILD.bazel`.
+- `rg -n -- "--enable_workspace|--noenable_bzlmod|--repositories_without_autoloads|\\bPYTHONPATH\\b|\\bpip\\b|pip_parse|pythonhosted|pypi|requirements|\\.whl" MODULE.bazel MODULE.bazel.lock .bazelrc experiments/waymo-perception/BUILD.bazel bazelw || true`
+  - Result: no matches.
+- `./bazelw --update-lock mod deps`
+  - Result: passed and generated the committed Bzlmod lock.
+- `jq 'keys, (.moduleExtensions // {} | keys), (.facts // {} | keys), .registryFileHashes | length' MODULE.bazel.lock`
+  - Result: lock has 6 top-level keys, 3 module extensions, 0 facts, and 188 registry file hashes.
 - `./bazelw query //...`
-  - Result: only `//experiments/waymo-perception:tools_test_suites`.
+  - Result: package targets are only under `//experiments/waymo-perception:...`.
 - `./bazelw --emit-plan test //experiments/waymo-perception:tools_test_suites`
-  - Result: JSON plan starts with `bwrap`, contains `--clearenv`, fixed `HOME=/outputs/home`, read-only rootfs and repository mounts, `/etc/resolv.conf` mounted read-only, `.bazel-cache` mounted at `/outputs`, and Bazel cache flags under `/outputs`.
+  - Result: JSON plan starts with `bwrap`, contains `--clearenv`, fixed `HOME=/outputs/home`, read-only rootfs and repository mounts, `/etc/resolv.conf` mounted read-only, `.bazel-cache` mounted at `/outputs`, no `PYTHONPATH`, Bzlmod lockfile error mode, and Bazel cache flags under `/outputs`.
+- `./bazelw --emit-plan --update-lock test //experiments/waymo-perception:tools_test_suites`
+  - Result: JSON plan uses `--lockfile_mode=update` and includes the writable bind mount for `MODULE.bazel.lock` while retaining the read-only repository mount.
 - Network probe using the emitted wrapper plan: `python3 - <<'PY' ... socket.create_connection(("bcr.bazel.build", 443), timeout=8) ... PY`
   - Result: `network-ok`.
-- `./bazelw --cache .bazel-cache/final-02-20261005T0714Z test //... --test_output=errors`
-  - Result: 1 target, `//experiments/waymo-perception:tools_test_suites`, passed; `Executed 1 out of 1 test`.
-- Second run: `./bazelw --cache .bazel-cache/final-02-20261005T0714Z test //... --test_output=errors`
-  - Result: same target passed from cache; output included `6 action cache hit`, `(cached) PASSED`, and `Executed 0 out of 1 test`.
-- Cache no-download check: `./bazelw --cache .bazel-cache/final-02-20261005T0714Z test --experimental_repository_disable_download //... --test_output=errors`
-  - Result: same target passed from the populated persistent cache; output included `6 action cache hit`, `(cached) PASSED`, and `Executed 0 out of 1 test`.
-- `rg -n "rules_python|pip_parse|pythonhosted|requirements|whl_" MODULE.bazel .bazelrc experiments/waymo-perception/BUILD.bazel experiments/waymo-perception/bazel_unittest.bzl bazelw || true`
-  - Result: no matches.
+- Stale-lock probe: temporarily restored the old empty lock, then ran `./bazelw test //experiments/waymo-perception:tools_test_suites --test_output=errors`
+  - Result: failed with status 48 and `Missing checksum ... not permitted with --lockfile_mode=error. Please run bazel mod deps --lockfile_mode=update`.
+- Stale-lock update probe: with only the temporary stale lock in place, ran `./bazelw --update-lock test //experiments/waymo-perception:tools_test_suites --test_output=errors`
+  - Result: passed and changed only `MODULE.bazel.lock` relative to the pre-probe dirty set.
+- `./bazelw --update-lock test //experiments/waymo-perception:tools_test_suites //experiments/waymo-perception:anchor_grid_test --test_output=errors`
+  - Result: both targets passed.
+- `./bazelw test //... --test_output=errors`
+  - Result: 2 test targets passed from the populated persistent cache, with `24 action cache hit`, `(cached) PASSED`, and `Executed 0 out of 2 tests`.
+- Second run: `./bazelw test //... --test_output=errors`
+  - Result: 2 test targets passed again from the persistent cache, with `24 action cache hit`, `(cached) PASSED`, and `Executed 0 out of 2 tests`.
+- Cache no-download check: `./bazelw test --repository_disable_download //... --test_output=errors`
+  - Result: 2 test targets passed from the populated persistent cache, with `24 action cache hit`, `(cached) PASSED`, and `Executed 0 out of 2 tests`.
 - `python3 experiments/waymo-perception/tools/pins.py check --base work/semantic-layout/integration`
   - Result: `PASS: 0 changed file(s) cited by retained receipts`.
 
@@ -61,4 +81,4 @@ Pinned files changed and why:
 Reviewer notes:
 
 - The rootfs network is shared with the host network namespace; the wrapper does not use `--unshare-net`. `/etc/resolv.conf` is mounted read-only because `rootfs-v3`'s resolver file is empty.
-- Bazel 9 still initializes built-in external rule repositories in its output base even for this custom in-repo test rule. This work does not configure Bazel to fetch third-party Python packages, and the checked-in module lock does not record Python-package repositories.
+- Bazel prints an OpenJDK deprecation warning from the rootfs JVM on every invocation; the tests and build targets passed despite that environment warning.

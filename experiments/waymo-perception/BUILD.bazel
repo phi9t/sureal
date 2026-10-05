@@ -1,9 +1,77 @@
-load(":bazel_unittest.bzl", "repo_python_unit_test")
+load("@rules_cc//cc/toolchains:cc_toolchain.bzl", "cc_toolchain")
+load("@rules_cc//cc/toolchains:cc_toolchain_suite.bzl", "cc_toolchain_suite")
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+load(":null_cc_toolchain_config.bzl", "null_cc_toolchain_config")
 
 package(default_visibility = ["//visibility:private"])
 
-repo_python_unit_test(
+filegroup(name = "empty")
+
+null_cc_toolchain_config(name = "null_cc_toolchain_config")
+
+cc_toolchain(
+    name = "null_cc_toolchain",
+    all_files = ":empty",
+    ar_files = ":empty",
+    compiler_files = ":empty",
+    dwp_files = ":empty",
+    linker_files = ":empty",
+    objcopy_files = ":empty",
+    strip_files = ":empty",
+    supports_param_files = 0,
+    toolchain_config = ":null_cc_toolchain_config",
+    toolchain_identifier = "sureal_null_cc",
+)
+
+cc_toolchain_suite(
+    name = "null_cc_suite",
+    toolchains = {
+        "k8": ":null_cc_toolchain",
+        "k8|null": ":null_cc_toolchain",
+    },
+)
+
+toolchain(
+    name = "null_cc_toolchain_registration",
+    exec_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+    target_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:linux",
+    ],
+    toolchain = ":null_cc_toolchain",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "tools_suites_lib",
+    srcs = ["tools/suites.py"],
+    imports = ["."],
+)
+
+py_test(
     name = "tools_test_suites",
-    src = "tools/test_suites.py",
-    deps = ["tools/suites.py"],
+    legacy_create_init = 0,
+    size = "small",
+    srcs = ["tools/test_suites.py"],
+    main = "tools/test_suites.py",
+    deps = [":tools_suites_lib"],
+)
+
+py_library(
+    name = "anchor_grid_lib",
+    srcs = ["pipeline/anchor_grid.py"],
+    imports = ["."],
+)
+
+py_test(
+    name = "anchor_grid_test",
+    legacy_create_init = 0,
+    size = "small",
+    srcs = ["tests/test_anchor_grid.py"],
+    main = "tests/test_anchor_grid.py",
+    deps = [":anchor_grid_lib"],
 )
