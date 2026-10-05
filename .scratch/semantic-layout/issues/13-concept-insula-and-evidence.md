@@ -39,7 +39,7 @@ Verification:
 
 Pin report:
 
-The pin guard reports retained historical receipts affected by this intentional concept move. The 86 changed retained-receipt-pinned paths are:
+The pin guard reports retained historical receipts affected by this intentional concept move. The 86 changed retained-receipt-pinned paths/renames are:
 
 ```text
 acquire-scientific-cohort.py
@@ -68,20 +68,20 @@ evaluation/verify-segmentation-export.py
 gpu/verify-isolation.py
 gpu/verify-live.py
 inspect-scene.py
-pipeline/insula_entry.py
-pipeline/m0_probe.py
-pipeline/m0_receipt.py
-pipeline/m0_validate.py
+pipeline/insula_entry.py -> insula/entry.py
+pipeline/m0_probe.py -> insula/m0_probe.py
+pipeline/m0_receipt.py -> insula/m0_receipt.py
+pipeline/m0_validate.py -> insula/m0_validate.py
 pipeline/native_range_shape_reference.py
 pipeline/native_shape_source_replay.py
-pipeline/runtime_identity.py
+pipeline/runtime_identity.py -> insula/runtime_identity.py
 pipeline/semantic_recovery_job.py
 pipeline/semantic_recovery_job_aligned.py
-pipeline/source_integrity.py
+pipeline/source_integrity.py -> evidence/source_integrity.py
 pipeline/staged_derived_archive.py
 pipeline/staged_derived_archive_aligned.py
 pipeline/staged_source.py
-pipeline/staging_lease.py
+pipeline/staging_lease.py -> insula/staging_lease.py
 pipeline/training_box_replay.py
 process-scientific-cohort.py
 publish-scientific-camera.py
@@ -95,28 +95,28 @@ scripts/recover-sustained-pilot-scoring-long.py
 scripts/recover-sustained-pilot-scoring.py
 scripts/replay-motion-foundation.py
 scripts/run-expanded-matrix.py
-tests/test_insula_entry.py
-tests/test_m0_receipt.py
+tests/test_insula_entry.py -> insula/entry_test.py
+tests/test_m0_receipt.py -> insula/m0_receipt_test.py
 tests/test_native_shape_staging_deadline.py
-tests/test_runtime_identity.py
+tests/test_runtime_identity.py -> insula/runtime_identity_test.py
 tests/test_semantic_recovery_job.py
-tests/test_source_integrity.py
+tests/test_source_integrity.py -> evidence/source_integrity_test.py
 tests/test_staged_derived_archive.py
 tests/test_staged_derived_archive_aligned.py
-tests/test_staging_lease.py
+tests/test_staging_lease.py -> insula/staging_lease_test.py
 tests/test_training_box_replay.py
 tier1/prepare.py
 tier1/rescore_heading.py
 tier1/run.py
 tools/pins.py
-tools/test_pins.py
-tracking/journal.py
-tracking/live_contract.py
-tracking/projection.py
-tracking/publish.py
-tracking/test_journal.py
-tracking/test_projection.py
-tracking/test_publish.py
+tools/test_pins.py -> evidence/pins_test.py
+tracking/journal.py -> evidence/journal.py
+tracking/live_contract.py -> evidence/live_contract.py
+tracking/projection.py -> evidence/projection.py
+tracking/publish.py -> evidence/publish.py
+tracking/test_journal.py -> evidence/journal_test.py
+tracking/test_projection.py -> evidence/projection_test.py
+tracking/test_publish.py -> evidence/publish_test.py
 verify-archive-dataset.py
 verify-camera-replay.py
 verify-geometry.py
@@ -141,5 +141,26 @@ Pinned/guarded file reasons:
 Reviewer notes:
 
 - No file under any `research/` directory was modified.
-- `bazelw` no longer uses `sys.path` mutation; it bootstraps `evidence` and `insula` modules through importlib and uses the shared sandbox-plan function. The live-gate worker plan still sets `PYTHONPATH=/experiment` for worker repository imports.
+- `bazelw` uses one launcher-local `sys.path.insert(0, str(AUTONOMY))` before normal `insula` imports, as requested in review 1. The no-`sys.path` rule remains enforced for moved library/test code inside the build graph. The live-gate worker plan still sets `PYTHONPATH=/experiment` for worker repository imports.
 - The retained receipts are left untouched as historical evidence under the source-pin ADR.
+
+Review 1 follow-up:
+
+- Added `py_library` exports `//autonomy/evidence:evidence` and `//autonomy/insula:insula`; concept tests and the root bridge tests now use library deps for Python imports. Filegroups remain only for source-snapshot/file-data consumers.
+- Deleted `autonomy/evidence/concept_layout_test.py` and `autonomy/insula/concept_layout_test.py`. The live-gate/shared-plan behavioral check now lives in `autonomy/insula/entry_test.py`.
+- Removed `evidence.journal.digest`; journal, tracker, and publisher digest paths use `evidence.source_snapshot.file_sha256`.
+- Replaced the wrapper's synthetic package registration with one launcher-local `autonomy/` path insertion and normal imports. The compatibility `autonomy/tools/pins.py` wrapper follows the same entrypoint pattern.
+- Made `evidence.pins.changed` rename-aware using `git diff -M20% --name-status -z`, hashing the base-revision old path and reporting moved pinned files as `old -> new`.
+- Added pin tests for deleted pinned files, pure pinned moves, pinned move plus edit, unpinned moves, and whole-package-directory renames.
+
+Review 1 verification:
+
+- `./bazelw test //autonomy/evidence:pins_test --test_output=errors --cache_test_results=no` -> `Executed 1 out of 1 test: 1 test passes.`
+- `./bazelw test //autonomy/evidence:all //autonomy/insula:all //autonomy:source_snapshot_targets_test //autonomy:tests__test_bazel_wrapper --test_output=errors --cache_test_results=no` -> `Executed 12 out of 12 tests: 12 tests pass.`
+- `./bazelw test //autonomy/... --test_output=errors --cache_test_results=no` -> `Executed 148 out of 148 tests: 148 tests pass.`
+- `./bazelw test --config=cuda --test_tag_filters=requires_gpu,-requires_live_gate,-requires_host_tools,-requires_pytest,-known_failure //autonomy/... --test_output=errors --cache_test_results=no` -> `Executed 24 out of 24 tests: 24 tests pass.`
+- `./bazelw test //parallax/... --test_output=errors --cache_test_results=no` -> `Executed 17 out of 17 tests: 17 tests pass.`
+- `python3 autonomy/tools/layers.py` -> `PASS: 0 layering problem(s) across 12 layers`.
+- `git diff --check` -> exit 0, no output.
+- `git diff --name-only work/semantic-layout/integration..HEAD -- 'autonomy/research/**' 'parallax/research/**' 'research/**'` -> no output.
+- `python3 autonomy/tools/pins.py check --base work/semantic-layout/integration` -> exit 1 with `FAIL: 86 changed file(s) pinned by retained receipts`; moved pinned files are now reported with `old -> new` paths.
