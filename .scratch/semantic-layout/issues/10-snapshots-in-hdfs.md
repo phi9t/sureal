@@ -4,7 +4,7 @@
 
 **Blocked by:** 09 (Evidence module: snapshot, fetch and verify)
 
-**Status:** ready-for-human
+**Status:** done
 
 - [x] An HDFS adapter implements the same storage interface as the local-directory adapter
 - [x] Upload reads the object back and compares bytes before reporting success
