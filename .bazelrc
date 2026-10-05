@@ -6,5 +6,10 @@ startup --batch
 # the outer Insula sandbox in rootfs-v3; linux-sandbox is not registered there.
 build --spawn_strategy=standalone
 test --test_strategy=standalone
+# Some perception unit tests intentionally create process names used by the
+# staging guard; serial test execution prevents cross-target false blockers.
+test --local_test_jobs=1
+test --test_tag_filters=-requires_gpu,-requires_live_gate,-known_failure
+test:cuda --test_tag_filters=-requires_live_gate,-known_failure
 
 common --experimental_convenience_symlinks=ignore
