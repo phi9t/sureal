@@ -1,7 +1,7 @@
 # Executable 3D reconstruction pathway
 
 This directory backs the survey in
-[`docs/3d-reconstruction-pathway.md`](../../docs/3d-reconstruction-pathway.md).
+[`docs/3d-reconstruction-pathway.md`](../docs/3d-reconstruction-pathway.md).
 It provides deterministic concept labs for all fifteen modules, machine-readable
 source and asset registries, a common controlled scene, seven local Insula
 definitions plus the reused Blender and Surflo environments, provenance-aware
