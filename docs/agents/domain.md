@@ -5,7 +5,7 @@ How the engineering skills should consume this repo's domain documentation when 
 ## Before exploring, read these
 
 - **`CONTEXT-MAP.md`** at the repo root: it points at one `CONTEXT.md` per context. Read each one relevant to the topic.
-- **`docs/adr/`**: read system-wide ADRs that touch the area you're about to work in. Also check `<context>/docs/adr/` for decisions scoped to one context, for example `experiments/waymo-perception/docs/adr/`.
+- **`docs/adr/`**: read system-wide ADRs that touch the area you're about to work in. Also check `<context>/docs/adr/` for decisions scoped to one context, for example `autonomy/docs/adr/`.
 
 If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The `/domain-modeling` skill (reached via `/grill-with-docs` and `/improve-codebase-architecture`) creates them lazily when terms or decisions actually get resolved.
 
@@ -18,10 +18,9 @@ This is a multi-context repo:
 ├── CONTEXT-MAP.md
 ├── CONTEXT.md                         ← collaboration language
 ├── docs/adr/                          ← system-wide decisions
-└── experiments/
-    └── waymo-perception/
-        ├── CONTEXT.md                 ← perception research language
-        └── docs/adr/                  ← context-specific decisions
+└── autonomy/
+    ├── CONTEXT.md                     ← perception research language
+    └── docs/adr/                      ← context-specific decisions
 ```
 
 ## Use the glossary's vocabulary

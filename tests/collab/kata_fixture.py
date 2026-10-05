@@ -18,9 +18,17 @@ class KataFixture(AbstractContextManager):
         self.root = Path(self.tmp.name)
         self.home = self.root / "kata-home"
         self.home.mkdir(mode=0o700)
-        self.env = {"PATH": os.environ["PATH"], "KATA_HOME": str(self.home), "USER": "sureal-fixture"}
+        self.runtime = self.root / "runtime"
+        self.runtime.mkdir(mode=0o700)
+        self.env = {
+            "PATH": os.environ["PATH"],
+            "HOME": str(self.home),
+            "KATA_HOME": str(self.home),
+            "XDG_RUNTIME_DIR": str(self.runtime),
+            "USER": "sureal-fixture",
+        }
         self.binary = str(Path(shutil.which("kata")).resolve())
-        started = self.call("daemon", "start")
+        started = self.call("daemon", "start", "--listen", "127.0.0.1:0")
         self.daemon_pid = started["pid"]
         self.health = self.call("health")
         if Path(self.health["db_path"]) != self.home / "kata.db":

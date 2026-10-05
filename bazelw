@@ -8,10 +8,10 @@ from pathlib import Path
 
 
 REPO = Path(__file__).resolve().parent
-WAYMO = REPO / "experiments" / "waymo-perception"
-WAYMO_CACHE = Path.home() / ".cache/waystone/waymo-perception"
-DEFAULT_ROOTFS = WAYMO_CACHE / "insula/rootfs-v3"
-GPU_ROOTFS = WAYMO_CACHE / "gpu-rootfs-v6"
+AUTONOMY = REPO / "autonomy"
+AUTONOMY_CACHE = Path.home() / ".cache/waystone/waymo-perception"
+DEFAULT_ROOTFS = AUTONOMY_CACHE / "insula/rootfs-v3"
+GPU_ROOTFS = AUTONOMY_CACHE / "gpu-rootfs-v6"
 CURRICULUM_ROOTFS = Path.home() / ".cache/waystone/3d-pathway/insula/rootfs-v1"
 DEFAULT_CACHE = REPO / ".bazel-cache"
 BAZEL_VERSION = "9.2.0"
@@ -23,7 +23,7 @@ GPU_DRIVER_PREFIXES = (
 )
 DEFAULT_GPU_DRIVER_LIBRARY_DIRS = (Path("/usr/lib/x86_64-linux-gnu"),)
 
-sys.path.insert(0, str(WAYMO))
+sys.path.insert(0, str(AUTONOMY))
 from pipeline.runtime_identity import rootfs_identity  # noqa: E402
 
 
@@ -36,12 +36,7 @@ def _is_parallax_target(argument):
 
 
 def _is_autonomy_target(argument):
-    return (
-        argument == "//experiments/waymo-perception"
-        or argument.startswith(("//experiments/waymo-perception:", "//experiments/waymo-perception/"))
-        or argument == "//autonomy"
-        or argument.startswith(("//autonomy:", "//autonomy/"))
-    )
+    return argument == "//autonomy" or argument.startswith(("//autonomy:", "//autonomy/"))
 
 
 def target_components(arguments):
@@ -129,7 +124,7 @@ def repo_workspace_mounts(update_lock=False):
         mounts.append(["--ro-bind", str(path.resolve()), "/experiment/" + path.name])
     if update_lock:
         mounts.append(["--bind", str((REPO / "MODULE.bazel.lock").resolve()), "/experiment/MODULE.bazel.lock"])
-    for path in sorted(WAYMO.iterdir(), key=lambda item: item.name):
+    for path in sorted(AUTONOMY.iterdir(), key=lambda item: item.name):
         if path.is_dir() and path.name not in root_names:
             mounts.append(["--ro-bind", str(path.resolve()), "/experiment/" + path.name])
     return mounts

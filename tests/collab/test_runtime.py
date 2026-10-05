@@ -17,7 +17,7 @@ class RuntimeTests(unittest.TestCase):
             root = Path(temporary)
             for name in ('rootfs', 'source', 'output'):
                 (root/name).mkdir()
-            reference = ROOT/'experiments/waymo-perception'
+            reference = ROOT/'autonomy'
             lock = {'schema_version': 1, 'kind': 'collaboration-runtime-lock',
                 'rootfs_sha256': hashlib.sha256(b'').hexdigest(),
                 'dockerfile_sha256': hashlib.sha256((ENTRY.parent/'Dockerfile').read_bytes()).hexdigest(),
@@ -44,7 +44,7 @@ class RuntimeTests(unittest.TestCase):
             root = Path(temporary)
             for name in ("rootfs", "source", "output"):
                 (root / name).mkdir()
-            reference = ROOT / "experiments/waymo-perception"
+            reference = ROOT / "autonomy"
             for name in ('experiment', 'source', 'outputs'):
                 (root/'rootfs'/name).mkdir()
             identity_spec = importlib.util.spec_from_file_location('fixture_runtime_identity',

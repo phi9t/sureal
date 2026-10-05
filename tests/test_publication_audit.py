@@ -372,7 +372,12 @@ class PortableAuditTests(unittest.TestCase):
 
     def test_non_git_root_fails_cleanly(self) -> None:
         with tempfile.TemporaryDirectory(prefix="not a repository ") as directory:
-            report = publication_audit.audit_repository(Path(directory))
+            root = Path(directory)
+            with mock.patch.dict(
+                "os.environ",
+                {"GIT_CEILING_DIRECTORIES": str(root.parent)},
+            ):
+                report = publication_audit.audit_repository(root)
 
         self.assertEqual(report["status"], "fail")
         self.assertEqual(report["tracked_files"], 0)
@@ -381,6 +386,15 @@ class PortableAuditTests(unittest.TestCase):
 
 
 class RepositoryIdentityTests(unittest.TestCase):
+    def test_context_map_points_at_moved_autonomy_glossary(self) -> None:
+        context_map = (REPOSITORY_ROOT / "CONTEXT-MAP.md").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("[autonomy/CONTEXT.md](autonomy/CONTEXT.md)", context_map)
+        old_glossary = "/".join(("experiments", "waymo-perception", "CONTEXT.md"))
+        self.assertNotIn(old_glossary, context_map)
+
     def test_repository_declares_sureal_identity_and_surflo_compatibility(self) -> None:
         readme = (REPOSITORY_ROOT / "README.md").read_text(encoding="utf-8")
 
@@ -535,9 +549,9 @@ class RepositoryIdentityTests(unittest.TestCase):
             "training/logs/run.log",
             "training/outputs/result.json",
             "node_modules/index.js",
-            "experiments/waymo-perception/viewer/web/node_modules/three/package.json",
-            "experiments/waymo-perception/viewer/web/dist/index.html",
-            "experiments/waymo-perception/viewer/.venv/bin/python",
+            "autonomy/viewer/web/node_modules/three/package.json",
+            "autonomy/viewer/web/dist/index.html",
+            "autonomy/viewer/.venv/bin/python",
         )
         for path in paths:
             with self.subTest(path=path):

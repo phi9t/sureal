@@ -206,9 +206,9 @@ training/jean_zay
 # Bazel wrapper cache (mounted at /outputs inside Insula)
 .bazel-cache/
 
-# Waymo viewer (experiments/waymo-perception/viewer): JS deps, builds, venv
+# Waymo viewer (autonomy/viewer): JS deps, builds, venv
 node_modules/
 .vite/
-experiments/waymo-perception/viewer/web/dist/
-experiments/waymo-perception/viewer/.venv/
+autonomy/viewer/web/dist/
+autonomy/viewer/.venv/
 .kata.local.toml

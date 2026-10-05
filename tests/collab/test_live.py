@@ -62,7 +62,7 @@ class LiveTests(unittest.TestCase):
             resource_output.mkdir()
             state = root/'state'
             worker = ROOT/'scripts/collab_live.py'
-            wrapper = ROOT/'experiments/waymo-perception/resources/execute_worker.py'
+            wrapper = ROOT/'autonomy/resources/execute_worker.py'
             argv = [str(worker), 'probe', 'prepare', '--state', str(state),
                     '--operation-id', 'accounted-success']
             result = subprocess.run([sys.executable, '-B', str(wrapper), str(resource_output), *argv],
@@ -83,7 +83,7 @@ class LiveTests(unittest.TestCase):
             resource_output.mkdir()
             state = root/'state'
             worker = ROOT/'scripts/collab_live.py'
-            wrapper = ROOT/'experiments/waymo-perception/resources/execute_worker.py'
+            wrapper = ROOT/'autonomy/resources/execute_worker.py'
             result = subprocess.run([sys.executable, '-B', str(wrapper), str(resource_output),
                 str(worker), 'probe', 'disk-full', '--state', str(state), '--operation-id', 'accounted-failure',
                 '--fault-log', str(root/'fault.jsonl')], cwd=ROOT, capture_output=True, timeout=10)
