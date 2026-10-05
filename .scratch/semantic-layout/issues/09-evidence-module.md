@@ -4,7 +4,7 @@
 
 **Blocked by:** 07 (Rename the perception program to `autonomy/`)
 
-**Status:** done
+**Status:** ready-for-agent
 
 - [x] Taking a snapshot of a Bazel target archives exactly that target's transitive sources and returns the archive's digest
 - [x] The archive is deterministic: the same sources produce the same digest regardless of timestamps, ownership or file order
