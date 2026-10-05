@@ -3,8 +3,8 @@ import hashlib,importlib.util,json
 from pathlib import Path
 import numpy as np
 import torch
-from pipeline.pillar_detector import PillarDetector
-from pipeline.detector_loss import detector_loss
+from detection.pillar_detector import PillarDetector
+from detection.detector_loss import detector_loss
 assert importlib.util.find_spec('tensorflow') is None
 manifest=json.loads(Path('/tmp/inputs/manifest.json').read_text());assert len(manifest['frames'])==1
 frame=manifest['frames'][0];directory=Path('/tmp/native')/frame['relative_directory']

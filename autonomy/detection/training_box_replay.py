@@ -1,7 +1,6 @@
 """Production full64 replay. Queue exclusion precedes all acquisition."""
 import argparse
 from contextlib import contextmanager
-import hashlib
 import json
 from pathlib import Path
 import shutil
@@ -11,12 +10,8 @@ import sys
 from insula.runtime_identity import verify_rootfs
 from insula.staging_lease import staging_lease
 from dataset.staged_source import staged_source, WAYSTONE
+from evidence.source_snapshot import file_sha256, require_regular_file
 from .training_box_process import run_source_worker
-
-
-def sha(path):
-    with Path(path).open('rb') as file:
-        return hashlib.file_digest(file, 'sha256').hexdigest()
 
 
 def save(path, value):
@@ -28,13 +23,14 @@ def retained_raw_bytes(cache, code_root):
     dataset = json.loads((Path(code_root) / 'dataset/dataset.lock.json').read_text())
     for source in dataset['objects']:
         path = slice_root / source['relative_path']
-        if path.is_symlink() or not path.is_file() or path.stat().st_size != source['size_bytes']:
+        if require_regular_file(path).stat().st_size != source['size_bytes']:
             raise ValueError('retained engineering raw source size differs')
     total = 0
     for path in (slice_root / 'raw').rglob('*'):
         if path.is_symlink():
             raise ValueError('unaccountable retained raw symlink')
         if path.is_file():
+            require_regular_file(path)
             total += path.stat().st_size
     return total
 
@@ -43,11 +39,11 @@ def replay(*, cache, output, code_root, expected_candidate_sha256):
     cache, output, code_root = map(Path, (cache, output, code_root))
     with staging_lease(cache / 'scientific-processing/cohort-queue.lock'):
         candidate_path = code_root / 'research/training-box-replay-execution.candidate.json'
-        if sha(candidate_path) != expected_candidate_sha256:
+        if file_sha256(candidate_path) != expected_candidate_sha256:
             raise ValueError('externally pinned execution candidate changed')
         candidate = json.loads(candidate_path.read_text())
         job_path = code_root / 'research/training-box-producer-job.candidate.json'
-        if sha(job_path) != candidate['job_sha256']:
+        if file_sha256(job_path) != candidate['job_sha256']:
             raise ValueError('production job identity changed')
         job = json.loads(job_path.read_text())
         root = cache / 'insula/rootfs-v2'
@@ -59,11 +55,11 @@ def replay(*, cache, output, code_root, expected_candidate_sha256):
         def revalidate():
             for key in ('acquisition', 'cohort'):
                 path = code_root / Path(job[key]['path']).name
-                if sha(path) != job[key]['sha256']:
+                if file_sha256(path) != job[key]['sha256']:
                     raise ValueError('production manifest changed')
             for scene, pins in job['source_receipt_hashes'].items():
                 for component, digest in pins.items():
-                    if sha(audit / f'training-{component}-{scene}.json') != digest:
+                    if file_sha256(audit / f'training-{component}-{scene}.json') != digest:
                         raise ValueError('production receipt changed')
         revalidate()
         retained = retained_raw_bytes(cache, code_root)
@@ -76,23 +72,23 @@ def replay(*, cache, output, code_root, expected_candidate_sha256):
             raise ValueError('execution source selection differs')
         output.mkdir(parents=True, exist_ok=False)
         inputs = output / 'inputs'; inputs.mkdir()
-        code_hashes = {str(p.relative_to(code_root)): sha(p)
-                       for p in (code_root / 'pipeline').glob('*.py')}
+        code_hashes = {str(p.relative_to(code_root)): file_sha256(p)
+                       for p in (code_root / 'detection').glob('*.py')}
         phases = []
         for role in ('producer', 'reference'):
             phase = output / role; phase.mkdir()
             report = phase / 'report.json'
             if role == 'producer':
                 worker_job = '/experiment/research/' + job_path.name
-                worker_job_sha = sha(job_path)
+                worker_job_sha = file_sha256(job_path)
             else:
                 producer_report = output / 'producer/report.json'
                 shutil.copyfile(producer_report, inputs / 'producer.json')
                 reference_job = dict(job, reported={'path': '/tmp/replay-inputs/producer.json',
-                                                    'sha256': sha(producer_report)})
+                                                    'sha256': file_sha256(producer_report)})
                 save(inputs / 'reference.json', reference_job)
                 worker_job = '/tmp/replay-inputs/reference.json'
-                worker_job_sha = sha(inputs / 'reference.json')
+                worker_job_sha = file_sha256(inputs / 'reference.json')
             base = ['bwrap', '--unshare-all', '--die-with-parent',
                     '--ro-bind', str(root), '/', '--ro-bind', str(code_root), '/experiment',
                     '--bind', str(phase), '/outputs', '--proc', '/proc', '--dev', '/dev',
@@ -100,11 +96,11 @@ def replay(*, cache, output, code_root, expected_candidate_sha256):
                     '--ro-bind', str(inputs), '/tmp/replay-inputs', '--clearenv',
                     '--setenv', 'HOME', '/tmp/private-home', '--setenv', 'PATH', '/usr/local/bin:/usr/bin:/bin',
                     '--setenv', 'PYTHONNOUSERSITE', '1', '--setenv', 'PYTHONDONTWRITEBYTECODE', '1',
-                    '--setenv', 'PYTHONPATH', '/experiment', '--chdir', '/experiment', '--']
+                    '--chdir', '/experiment', '--']
             # Fresh metadata admission occurs inside each worker before source consumption.
-            command = [sys.executable, str(code_root / 'pipeline/training_box_resources.py'),
+            command = [sys.executable, str(code_root / 'detection/training_box_resources.py'),
                        str(phase / 'resources.json'), *base, 'python', '-m',
-                       'pipeline.training_box_job', '--job', worker_job,
+                       'detection.training_box_job', '--job', worker_job,
                        '--expected-job-sha256', worker_job_sha, '--mode', role,
                        '--output', '/outputs/report.json']
             transfers = []
@@ -131,20 +127,20 @@ def replay(*, cache, output, code_root, expected_candidate_sha256):
             if (worker_resources['rss_scope'] != 'worker_process_peak'
                     or worker_resources['peak_rss_kib'] <= 0):
                 raise ValueError('worker memory measurement required')
-            result.update(report_sha256=sha(report), transfers=transfers,
+            result.update(report_sha256=file_sha256(report), transfers=transfers,
                           worker_resources=worker_resources,
                           resources=json.loads((phase / 'resources.json').read_text()))
             save(phase / 'receipt.json', result)
             phases.append(result)
         revalidate()
-        if sha(candidate_path) != expected_candidate_sha256:
+        if file_sha256(candidate_path) != expected_candidate_sha256:
             raise ValueError('execution candidate changed during replay')
-        if code_hashes != {str(p.relative_to(code_root)): sha(p)
-                           for p in (code_root / 'pipeline').glob('*.py')}:
+        if code_hashes != {str(p.relative_to(code_root)): file_sha256(p)
+                           for p in (code_root / 'detection').glob('*.py')}:
             raise ValueError('worker code changed during replay')
         save(output / 'receipt.json', dict(status='both full64 payload passes completed; independent receipt audit required',
                                           runtime_lock=lock, job_sha256=candidate['job_sha256'],
-                                          candidate_sha256=sha(candidate_path), code_hashes=code_hashes, phases=phases))
+                                          candidate_sha256=file_sha256(candidate_path), code_hashes=code_hashes, phases=phases))
 
 
 def main():

@@ -4,8 +4,8 @@ import json
 import time
 from pathlib import Path
 import torch
-from pipeline.pillar_detector import PillarDetector
-from pipeline.detector_loss import detector_loss
+from detection.pillar_detector import PillarDetector
+from detection.detector_loss import detector_loss
 
 
 def main():

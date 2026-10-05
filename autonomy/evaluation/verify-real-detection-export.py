@@ -14,7 +14,7 @@ def main():
     cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'metrics-rootfs'
     lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
     out=Path(sys.argv[1]).resolve();out.mkdir(parents=True,exist_ok=False)
-    names=['pipeline/detection_export.py','segmentation/segmentation_export.py','evaluation/real-detection-export-check.py','evaluation/verify-real-detection-export.py']
+    names=['detection/detection_export.py','segmentation/segmentation_export.py','evaluation/real-detection-export-check.py','evaluation/verify-real-detection-export.py']
     hashes={name:sha(HERE/name) for name in names};started=datetime.now(timezone.utc).isoformat();begin=time.monotonic()
     plan=launch_plan(root,HERE,cache/'real-box-preparation-a',out,['python','/experiment/evaluation/real-detection-export-check.py'])
     result=subprocess.run(plan,capture_output=True,text=True);(out/'live.log').write_text(result.stdout+result.stderr)

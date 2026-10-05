@@ -6,8 +6,8 @@ import time
 from pathlib import Path
 import numpy as np
 import torch
-from pipeline.pillar_detector import PillarDetector
-from pipeline.detector_loss import detector_loss
+from detection.pillar_detector import PillarDetector
+from detection.detector_loss import detector_loss
 
 
 def main():

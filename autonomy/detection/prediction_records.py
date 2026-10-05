@@ -1,8 +1,8 @@
 """Prediction evaluation metadata from measured points; no GT annotation fields."""
 import math
 import numpy as np
+from detection.detection_export import validate_object
 from segmentation.nlz_overlap import overlaps_nlz
-from pipeline.detection_export import validate_object
 
 
 def prediction_records(proposals,*,context,timestamp,sensor_returns):

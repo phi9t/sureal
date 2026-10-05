@@ -1,7 +1,7 @@
 """Analytic checks of source-compatible decorations and metric XY scatter."""
 import unittest
 import torch
-from pipeline.pillar_encoder import decorate, PillarFeatureNet, scatter
+from detection.pillar_encoder import decorate, PillarFeatureNet, scatter
 
 
 class PillarEncoderTests(unittest.TestCase):

@@ -1,5 +1,5 @@
 import unittest
-from pipeline import native_detection_adapter as adapter
+from detection import native_detection_adapter as adapter
 
 VALID='20 examples found.\n\nVEHICLE: [mAP 0.25] [mAPH 0.2]\n'
 

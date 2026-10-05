@@ -1,6 +1,6 @@
 import unittest,torch
 from torch.nn import functional as F
-from pipeline.pillar_encoder import PillarFeatureNet
+from detection.pillar_encoder import PillarFeatureNet
 from advanced.range_fusion import RangePillar,RangeFeatures,bilinear_resize
 
 class RangeContract(unittest.TestCase):

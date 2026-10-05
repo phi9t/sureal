@@ -1,8 +1,8 @@
 """Shared construction seam for matched, explicit one-factor treatments."""
 import math
 import torch
-from pipeline.pillar_detector import PillarDetector
-from pipeline.detector_loss import detector_loss
+from detection.pillar_detector import PillarDetector
+from detection.detector_loss import detector_loss
 from gpu.norm_variants import configure_norm
 from gpu.architecture_variants import configure_architecture
 from gpu.architecture_followups import configure_followup

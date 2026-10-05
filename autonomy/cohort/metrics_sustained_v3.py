@@ -1,7 +1,7 @@
 from cohort.sustained_scoring_budget import DEFAULT_NATIVE_SECONDS
 import importlib.util,json,math,re,subprocess,time
 from pathlib import Path
-from pipeline.detection_export import export_objects
+from detection.detection_export import export_objects
 assert importlib.util.find_spec('tensorflow') is None
 start=time.monotonic();out=Path('/outputs');records=json.loads(Path('/source/predictions.json').read_text());truth=json.loads(Path('/source/groundtruth.json').read_text());preparation=json.loads(Path('/source/preparation.json').read_text())
 if preparation.get('decoder_version')!=3 or preparation.get('groundtruth_policy')!='all native four-class boxes; native evaluator handles eligibility' or len(preparation['frames'])!=16 or len(truth)!=preparation['native_groundtruth']:raise ValueError('full16 native GT V3 preparation required')

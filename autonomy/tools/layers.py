@@ -20,6 +20,7 @@ LAYERS = (
     ('dataset',),
     ('geometry',),
     ('segmentation',),
+    ('detection',),
     ('pipeline',),
     ('gpu', 'evaluation', 'tracking', 'association', 'explorer', 'motion-evaluation', 'viewer'),
     ('architecture',),

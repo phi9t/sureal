@@ -1,6 +1,6 @@
 import importlib.util,json,re,subprocess,time
 from pathlib import Path
-from pipeline.detection_export import export_objects
+from detection.detection_export import export_objects
 assert importlib.util.find_spec('tensorflow') is None
 start=time.monotonic();out=Path('/outputs');records=json.loads(Path('/source/predictions.json').read_text());truth=json.loads(Path('/source/groundtruth.json').read_text());preparation=json.loads(Path('/source/preparation.json').read_text())
 (out/'predictions.bin').write_bytes(export_objects(records));(out/'groundtruth.bin').write_bytes(export_objects(truth))

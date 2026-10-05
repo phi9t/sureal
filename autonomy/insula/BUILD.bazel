@@ -9,6 +9,7 @@ LIB_MODULES = glob(
 INSULA_VISIBILITY = [
     "//autonomy:__pkg__",
     "//autonomy/dataset:__pkg__",
+    "//autonomy/detection:__pkg__",
     "//autonomy/segmentation:__pkg__",
 ]
 

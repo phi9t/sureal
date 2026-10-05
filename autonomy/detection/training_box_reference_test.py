@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from pipeline.training_box_reference import verify_training_box_distributions
+from detection.training_box_reference import verify_training_box_distributions
 
 
 def native(scene, timestamp, category, length, width, height, center_z):
@@ -140,7 +140,7 @@ class IndependentBoxDistributionTests(unittest.TestCase):
     def test_producer_and_reference_reopen_parquet_independently(self):
         import pyarrow as pa
         import pyarrow.parquet as pq
-        from pipeline.training_box_sources import training_box_statistics_from_sources
+        from detection.training_box_sources import training_box_statistics_from_sources
         schema = pa.schema([
             ('key.segment_context_name', pa.string()), ('key.frame_timestamp_micros', pa.int64()),
             ('key.laser_object_id', pa.string()), ('[LiDARBoxComponent].type', pa.int8()),

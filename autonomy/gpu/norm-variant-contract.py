@@ -1,5 +1,5 @@
 import torch
-from pipeline.pillar_detector import PillarDetector
+from detection.pillar_detector import PillarDetector
 from gpu.norm_variants import configure_norm
 
 def model():

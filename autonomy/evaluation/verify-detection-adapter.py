@@ -14,7 +14,7 @@ HERE=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(HERE))
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
-from pipeline.native_detection_adapter import parse_result
+from detection.native_detection_adapter import parse_result
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
 ROOT=CACHE/'metrics-rootfs'
 
@@ -31,7 +31,7 @@ def main():
     with tempfile.TemporaryDirectory(dir=CACHE,prefix='adapter-input-') as tmp:
         source=Path(tmp);(source/'malformed.bin').write_bytes(b'not a protobuf\xff')
         base='/upstream/src/waymo_open_dataset/metrics/tools/'
-        commands=[('fixtures',['python','-m','unittest','discover','-s','/experiment/tests','-p','test_native_detection_adapter.py']),
+        commands=[('fixtures',['python','-m','unittest','discover','-s','/experiment/detection','-p','native_detection_adapter_test.py']),
                   ('valid',['/metrics-build/compute_detection_metrics',base+'fake_predictions.bin',base+'fake_ground_truths.bin']),
                   ('malformed',['/metrics-build/compute_detection_metrics','/source/malformed.bin',base+'fake_ground_truths.bin'])]
         for name,command in commands:
@@ -54,7 +54,7 @@ def main():
             print(name,'verified',flush=True)
     receipt={'stage':'default-detection-adapter','runtime_lock':lock,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),
              'elapsed_seconds':time.monotonic()-begin,'checks':checks,'expected_breakdowns':sorted(expected),
-             'candidate_hashes':{str(p.relative_to(HERE)):sha(p) for p in [Path(__file__),HERE/'pipeline/native_detection_adapter.py',HERE/'tests/test_native_detection_adapter.py']},
+             'candidate_hashes':{str(p.relative_to(HERE)):sha(p) for p in [Path(__file__),HERE/'detection/native_detection_adapter.py',HERE/'detection/native_detection_adapter_test.py']},
              'reference_sha256':sha(sourcefile),'artifacts':{p.name:sha(p) for p in out.iterdir() if p.is_file()},
              'scope':'default native 3D CLI boundary only; broader ticket 09 remains open'}
     (out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')

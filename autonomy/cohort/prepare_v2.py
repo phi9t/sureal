@@ -5,10 +5,10 @@ import numpy as np
 import sys
 sys.path.insert(0,'/tmp/workers')
 from balanced import uncovered_count
-from pipeline.anchor_grid import anchor_grid
+from detection.anchor_grid import anchor_grid
 from gpu.scored_proposals_v2 import decode_scored_proposals as decode_proposals
-from pipeline.prediction_records import prediction_records
-from pipeline.detection_export import export_objects
+from detection.prediction_records import prediction_records
+from detection.detection_export import export_objects
 assert importlib.util.find_spec('tensorflow') is None
 start=time.monotonic();manifest=json.loads(Path('/tmp/inputs/manifest.json').read_text())
 anchor_candidate=json.loads(Path('/experiment/research/training-anchor-templates.candidate.json').read_text())

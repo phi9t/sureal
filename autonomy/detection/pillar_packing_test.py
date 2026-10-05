@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from pipeline.pillar_packing import pack_points
+from detection.pillar_packing import pack_points
 
 
 class PillarPackingTests(unittest.TestCase):

@@ -1,6 +1,6 @@
 import unittest
 import torch
-from pipeline.pillar_detector import PillarDetector
+from detection.pillar_detector import PillarDetector
 
 
 class PillarDetectorTests(unittest.TestCase):

@@ -1,7 +1,7 @@
 """Candidate range-augmented PFN and unchanged shared anchor detection head."""
 import torch
 from torch import nn
-from .pillar_encoder import scatter
+from detection.pillar_encoder import scatter
 
 class RangePillarFeatureNet(nn.Module):
     def __init__(self,range_channels):

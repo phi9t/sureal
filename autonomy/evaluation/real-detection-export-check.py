@@ -1,7 +1,7 @@
 """Native real-box export and independent decoded-field reconciliation."""
 import json,re,subprocess,math
 from pathlib import Path
-from pipeline.detection_export import export_objects
+from detection.detection_export import export_objects
 
 out=Path('/outputs');records=json.loads(Path('/source/real-boxes.json').read_text())
 # Replay only evaluable ground truth as predictions: zero-support targets stay

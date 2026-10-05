@@ -1,12 +1,9 @@
 """Independent retained-evidence audit; never invokes a distribution producer."""
-import hashlib
 import json
 import math
 from pathlib import Path
 
-
-def _sha(path):
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+from evidence.source_snapshot import file_sha256
 
 
 def verify_replay_receipt(root, *, expected_receipt_sha256, expected_job,
@@ -17,14 +14,14 @@ def verify_replay_receipt(root, *, expected_receipt_sha256, expected_job,
                 or [s['scene'] for s in expected_sources] != expected_job['scene_order']):
             raise ValueError('original full64 ordered source inventory required')
         receipt_path = root / 'receipt.json'
-        if _sha(receipt_path) != expected_receipt_sha256:
+        if file_sha256(receipt_path) != expected_receipt_sha256:
             raise ValueError('externally pinned replay receipt changed')
         receipt = json.loads(receipt_path.read_text())
         if receipt['runtime_lock'] != expected_runtime_lock or len(receipt['phases']) != 2:
             raise ValueError('two passes in pinned runtime required')
         for name, digest in receipt['code_hashes'].items():
             path = Path(name)
-            if path.is_absolute() or '..' in path.parts or _sha(code_root / path) != digest:
+            if path.is_absolute() or '..' in path.parts or file_sha256(code_root / path) != digest:
                 raise ValueError('retained worker code differs')
         reports = []
         for role, phase in zip(('producer', 'reference'), receipt['phases']):
@@ -32,7 +29,7 @@ def verify_replay_receipt(root, *, expected_receipt_sha256, expected_job,
             if json.loads((folder / 'receipt.json').read_text()) != phase:
                 raise ValueError('phase receipt differs from final replay evidence')
             report_path = folder / 'report.json'
-            if _sha(report_path) != phase['report_sha256'] or phase['exit_code'] != 0:
+            if file_sha256(report_path) != phase['report_sha256'] or phase['exit_code'] != 0:
                 raise ValueError('successful hash-pinned worker report required')
             report = json.loads(report_path.read_text())
             identity = report['job_identity']

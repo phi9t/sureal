@@ -1,6 +1,6 @@
 """Training-only native box statistic fixtures; no held-out parameter fitting."""
 import unittest
-from pipeline.training_box_statistics import training_box_statistics
+from detection.training_box_statistics import training_box_statistics
 class StatsTests(unittest.TestCase):
  def row(self,i,box=None,category=1):
   return {'context_name':'train-a','frame_timestamp_micros':i,'object_id':'track-a','type':category,'box':box or [0.,0.,1.,4.,2.,1.,0.]}

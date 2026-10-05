@@ -2,7 +2,7 @@
 import hashlib,json,sys
 from pathlib import Path
 import numpy as np
-from pipeline.pillar_packing import pack_points
+from detection.pillar_packing import pack_points
 job=json.loads(Path('/tmp/input/job.json').read_text());mode=sys.argv[1]
 with np.load(Path('/source')/job['physical_filename'],allow_pickle=False) as a:physical=a['physical_points']
 with (Path('/source')/job['physical_filename']).open('rb') as f:assert hashlib.file_digest(f,'sha256').hexdigest()==job['physical_sha256']

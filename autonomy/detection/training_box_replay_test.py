@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from insula.staging_lease import staging_lease
-from pipeline.training_box_replay import replay
+from detection.training_box_replay import replay
 
 class ReplayGateTests(unittest.TestCase):
     def test_busy_queue_refused_before_output_or_runtime_access(self):
@@ -26,7 +26,7 @@ class ReplayGateTests(unittest.TestCase):
 
     def test_retained_raw_size_includes_unlisted_files(self):
         import json
-        from pipeline.training_box_replay import retained_raw_bytes
+        from detection.training_box_replay import retained_raw_bytes
         with tempfile.TemporaryDirectory() as tmp:
             cache=Path(tmp);code=cache/'code';code.mkdir()
             root=cache/'slices/validation-two-scenes-20260929/raw';root.mkdir(parents=True)

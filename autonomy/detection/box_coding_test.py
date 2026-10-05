@@ -2,7 +2,7 @@
 import unittest
 import math
 import numpy as np
-from pipeline.box_coding import encode_boxes, decode_boxes, direction_correct
+from detection.box_coding import encode_boxes, decode_boxes, direction_correct
 
 
 class BoxCodingTests(unittest.TestCase):

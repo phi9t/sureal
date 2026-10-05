@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from pipeline.anchor_grid import anchor_grid
+from detection.anchor_grid import anchor_grid
 
 
 class AnchorGridTests(unittest.TestCase):

@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import numpy as np
 import torch
-from pipeline.pillar_detector import PillarDetector
+from detection.pillar_detector import PillarDetector
 manifest=json.loads(Path('/tmp/inputs/manifest.json').read_text());frame=manifest['frames'][0];directory=Path('/tmp/native')/frame['relative_directory']
 torch.manual_seed(17);torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=False;torch.backends.cudnn.deterministic=True;torch.backends.cudnn.benchmark=False;torch.use_deterministic_algorithms(True)
 with np.load(directory/'observations.npz',allow_pickle=False) as data:points=torch.from_numpy(data['points'].astype(np.float32)).cuda();counts=torch.from_numpy(data['counts']).cuda();coordinates=torch.from_numpy(data['coordinates']).cuda()

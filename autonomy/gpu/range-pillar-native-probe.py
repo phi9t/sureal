@@ -6,10 +6,10 @@ import torch
 from torch.nn import functional as F
 from geometry.native_range_grid import native_range_grid
 from pipeline.range_frontend import RangeFrontend
-from pipeline.pillar_packing import pack_points
-from pipeline.packed_point_features import packed_point_features
-from pipeline.pillar_encoder import decorate
-from pipeline.pillar_detector import PillarDetector
+from detection.pillar_packing import pack_points
+from detection.packed_point_features import packed_point_features
+from detection.pillar_encoder import decorate
+from detection.pillar_detector import PillarDetector
 from pipeline.range_pillar_hybrid import RangePillarFeatureNet,SharedPillarHead
 assert importlib.util.find_spec('tensorflow') is None
 assert torch.cuda.device_count()==1

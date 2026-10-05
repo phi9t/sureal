@@ -3,7 +3,7 @@ import json,hashlib
 from pathlib import Path
 import numpy as np
 import torch
-from pipeline.pillar_detector import PillarDetector
+from detection.pillar_detector import PillarDetector
 from gpu.norm_variants import configure_norm
 from gpu.architecture_followups import configure_followup
 manifest=json.loads(Path('/tmp/inputs/manifest.json').read_text());variant=manifest['architecture_variant'];directory=Path('/tmp/native')/manifest['frames'][0]['relative_directory']

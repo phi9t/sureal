@@ -1,10 +1,10 @@
 import json
 from pathlib import Path
 import torch
-from pipeline.pillar_detector import PillarDetector
+from detection.pillar_detector import PillarDetector
 from gpu.norm_variants import configure_norm
 from gpu.architecture_followups import configure_followup,WindowAttention,CoarseMLP
-from pipeline.pillar_encoder import decorate
+from detection.pillar_encoder import decorate
 
 def make():
  torch.manual_seed(17)

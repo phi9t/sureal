@@ -1,7 +1,7 @@
 import io
 import unittest
 from contextlib import contextmanager
-from pipeline.training_box_sender import send_training_box_sources
+from detection.training_box_sender import send_training_box_sources
 
 class SenderTests(unittest.TestCase):
     def test_lease_held_until_consumed_ack_and_footer_after_release(self):
@@ -43,7 +43,7 @@ class SenderTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             manifest=Path(tmp)/'inventory.json';manifest.write_text(json.dumps(inventory))
             code="""import json,sys
-from pipeline.training_box_wire import stream_training_box_sources
+from detection.training_box_wire import stream_training_box_sources
 inventory=json.load(open(sys.argv[1]))
 def ack(event):
  print(json.dumps(event),flush=True)
@@ -112,7 +112,7 @@ for source in stream_training_box_sources(sys.stdin.buffer,inventory=inventory,a
         import sys
         import tempfile
         from pathlib import Path
-        from pipeline.training_box_process import run_source_worker
+        from detection.training_box_process import run_source_worker
         with tempfile.TemporaryDirectory() as tmp:
             for name,script in [('failed',"import sys;sys.stdin.buffer.read();sys.exit(7)"),
                                 ('extra',"import sys;sys.stdin.buffer.read();print('unexpected')")]:

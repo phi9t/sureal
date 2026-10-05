@@ -7,15 +7,35 @@ import pytest
 from association.contract import validate_contract
 
 
+_MOVED_BASELINE_SOURCES = {
+    'pipeline/anchor_assignment.py': 'detection/anchor_assignment.py',
+    'pipeline/anchor_grid.py': 'detection/anchor_grid.py',
+    'pipeline/box_coding.py': 'detection/box_coding.py',
+    'pipeline/detector_geometry.py': 'detection/detector_geometry.py',
+    'pipeline/detector_loss.py': 'detection/detector_loss.py',
+    'pipeline/pillar_detector.py': 'detection/pillar_detector.py',
+}
+
+
+def _hash(value):
+    return hashlib.sha256(json.dumps(value, sort_keys=True,
+        separators=(',', ':'), ensure_ascii=True).encode()).hexdigest()
+
+
 def document():
     path = Path(__file__).parents[1] / 'research/association41-runtime-admission-20261003a/manifest.json'
     candidate = json.loads(path.read_text())
+    baseline = copy.deepcopy(candidate['baseline_source_hashes'])
+    for old, new in _MOVED_BASELINE_SOURCES.items():
+        baseline[new] = baseline[old]
+    candidate['baseline_source_hashes'] = baseline
+    candidate['input_hash_preimages']['baseline_sources_sha256'] = copy.deepcopy(baseline)
+    candidate['inputs']['baseline_sources_sha256'] = _hash(baseline)
     for key, field in [('association_sources_sha256', 'association_source_hashes'),
                        ('initial_model_tensors_sha256', 'initial_model_tensor_sha256')]:
         value = copy.deepcopy(candidate[field])
         candidate['input_hash_preimages'][key] = value
-        candidate['inputs'][key] = hashlib.sha256(json.dumps(value, sort_keys=True,
-            separators=(',', ':'), ensure_ascii=True).encode()).hexdigest()
+        candidate['inputs'][key] = _hash(value)
     return candidate, copy.deepcopy(candidate['inputs']), copy.deepcopy(candidate['runtime_locks'])
 
 

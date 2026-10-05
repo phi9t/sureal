@@ -1,7 +1,7 @@
 """Native box proposals; evaluation metadata must be resolved separately."""
 import numpy as np
-from pipeline.box_coding import decode_boxes,direction_correct
-from pipeline.detector_geometry import enclosing_bev_nms
+from detection.box_coding import decode_boxes,direction_correct
+from detection.detector_geometry import enclosing_bev_nms
 
 
 def decode_proposals(logits,residuals,direction_logits,anchors,*,iou_threshold,score_floor,pre_limit,post_limit):

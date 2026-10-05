@@ -2,7 +2,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from pipeline.training_box_replay_audit import verify_replay_receipt
+from detection.training_box_replay_audit import verify_replay_receipt
 
 class ReplayReceiptAuditTests(unittest.TestCase):
     def test_incomplete_selection_and_missing_pass_refused(self):

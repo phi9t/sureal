@@ -10,7 +10,7 @@ class NativeMetricGateTests(unittest.TestCase):
     if value=='/outputs':return out
     if value.startswith('/source/'):return source/value.split('/')[-1]
     return real_path(value)
-   with patch('pathlib.Path',side_effect=paths),patch('pipeline.detection_export.export_objects',return_value=b'unit fixture'),patch('subprocess.run',return_value=result):runpy.run_path('/experiment/cohort/metrics_sustained_v3.py',run_name='__main__')
+   with patch('pathlib.Path',side_effect=paths),patch('detection.detection_export.export_objects',return_value=b'unit fixture'),patch('subprocess.run',return_value=result):runpy.run_path('/experiment/cohort/metrics_sustained_v3.py',run_name='__main__')
    return json.loads((out/'check.json').read_text())
  def test_high_mean_cannot_hide_one_failed_class(self):
   report=self.execute([.99,.99,.99,.79]);self.assertGreater(report['mean_populated_class_APH'],.8);self.assertFalse(report['all_class_APH_gate_passed']);self.assertFalse(report['APH_gate_passed'])

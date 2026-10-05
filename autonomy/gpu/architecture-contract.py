@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 import torch
-from pipeline.pillar_detector import PillarDetector
+from detection.pillar_detector import PillarDetector
 from gpu.norm_variants import configure_norm
 from gpu.architecture_variants import configure_architecture,ResidualUnit
 
@@ -22,7 +22,7 @@ for variant in ['deep_pfn','context_pfn','residual_bev']:
  sum(x.square().mean() for x in out.values()).backward()
  assert all(p.grad is not None and torch.isfinite(p.grad).all() for p in model.parameters())
  if variant!='residual_bev':
-  from pipeline.pillar_encoder import decorate
+  from detection.pillar_encoder import decorate
   d=decorate(points,counts,coords,cell_size=(.25,.25),origin=(-1.,-1.))
   a=model.encoder(d,counts=counts)
   reordered=d.clone()

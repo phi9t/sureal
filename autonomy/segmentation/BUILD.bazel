@@ -34,7 +34,10 @@ KNOWN_FAILURE_TESTS = [
     "staged_derived_archive_aligned_test.py",
 ]
 
-SEGMENTATION_VISIBILITY = ["//autonomy:__pkg__"]
+SEGMENTATION_VISIBILITY = [
+    "//autonomy:__pkg__",
+    "//autonomy/detection:__pkg__",
+]
 
 py_library(
     name = "segmentation",
