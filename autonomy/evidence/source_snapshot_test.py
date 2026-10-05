@@ -6,7 +6,11 @@ import tarfile
 import tempfile
 import types
 import unittest
+from dataclasses import fields
 from pathlib import Path
+
+
+GOLDEN_SOURCE_SNAPSHOT_SHA256 = "26d7ae75a8a99ed88f3e5350159faf024a632dd3deb70f403fa664b959c6fd18"
 
 
 class SourceSnapshotTests(unittest.TestCase):
@@ -14,6 +18,7 @@ class SourceSnapshotTests(unittest.TestCase):
         try:
             from evidence.source_snapshot import (
                 LocalSnapshotStore,
+                archive_sources,
                 file_sha256,
                 require_regular_file,
                 snapshot_bazel_target,
@@ -24,6 +29,7 @@ class SourceSnapshotTests(unittest.TestCase):
             self.fail("shared evidence source snapshot module must exist")
         return {
             "LocalSnapshotStore": LocalSnapshotStore,
+            "archive_sources": archive_sources,
             "file_sha256": file_sha256,
             "require_regular_file": require_regular_file,
             "snapshot_bazel_target": snapshot_bazel_target,
@@ -47,7 +53,7 @@ class SourceSnapshotTests(unittest.TestCase):
         return run, calls
 
     def tar_members(self, archive_bytes):
-        with tarfile.open(fileobj=io.BytesIO(archive_bytes), mode="r:gz") as reader:
+        with tarfile.open(fileobj=io.BytesIO(archive_bytes), mode="r:") as reader:
             return {
                 member.name: {
                     "data": reader.extractfile(member).read(),
@@ -88,7 +94,8 @@ class SourceSnapshotTests(unittest.TestCase):
                     "autonomy/evidence/source_snapshot_test.py",
                 ],
             )
-            self.assertEqual(snapshot.archive_sha256, snapshot.digest)
+            self.assertNotIn("archive_sha256", {field.name for field in fields(snapshot)})
+            self.assertEqual(hashlib.sha256(store.fetch(snapshot.digest)).hexdigest(), snapshot.digest)
             members = self.tar_members(store.fetch(snapshot.digest))
             self.assertEqual(set(members), set(snapshot.source_pins))
             self.assertEqual(members["autonomy/evidence/source_snapshot.py"]["data"], b"module\n")
@@ -102,6 +109,37 @@ class SourceSnapshotTests(unittest.TestCase):
                 ],
             )
             self.assertEqual(calls[0][1]["cwd"], repo)
+
+    def test_source_snapshot_digest_matches_uncompressed_tar_golden(self):
+        api = self.api()
+        with tempfile.TemporaryDirectory() as temporary:
+            repo = Path(temporary)
+            self.write_repo(repo)
+
+            archive, pins = api["archive_sources"](
+                repo,
+                [
+                    "autonomy/evidence/source_snapshot.py",
+                    "autonomy/BUILD.bazel",
+                ],
+            )
+
+            self.assertEqual(hashlib.sha256(archive).hexdigest(), GOLDEN_SOURCE_SNAPSHOT_SHA256)
+            self.assertEqual(archive[:2], b"au")
+            self.assertEqual(
+                pins,
+                {
+                    "autonomy/BUILD.bazel": hashlib.sha256(b"build\n").hexdigest(),
+                    "autonomy/evidence/source_snapshot.py": hashlib.sha256(b"module\n").hexdigest(),
+                },
+            )
+            self.assertEqual(
+                sorted(self.tar_members(archive)),
+                [
+                    "autonomy/BUILD.bazel",
+                    "autonomy/evidence/source_snapshot.py",
+                ],
+            )
 
     def test_bazel_target_snapshot_ignores_rule_labels_after_expanding_data(self):
         api = self.api()
@@ -227,6 +265,20 @@ class SourceSnapshotTests(unittest.TestCase):
             with self.assertRaisesRegex(FileNotFoundError, "source snapshot missing"):
                 store.fetch("0" * 64)
 
+    def test_local_storage_uses_unique_temp_name_in_store_directory(self):
+        api = self.api()
+        with tempfile.TemporaryDirectory() as temporary:
+            store = api["LocalSnapshotStore"](Path(temporary) / "store")
+            data = b"snapshot bytes"
+            digest = hashlib.sha256(data).hexdigest()
+            store.root.mkdir()
+            stale_tmp = store.root / (digest + ".tmp")
+            stale_tmp.write_bytes(b"stale interrupted write")
+
+            self.assertEqual(store.store(digest, data), digest)
+            self.assertEqual(store.fetch(digest), data)
+            self.assertEqual(stale_tmp.read_bytes(), b"stale interrupted write")
+
     def test_local_storage_refuses_snapshot_key_symlink_before_reading(self):
         api = self.api()
         with tempfile.TemporaryDirectory() as temporary:
@@ -272,6 +324,55 @@ class SourceSnapshotTests(unittest.TestCase):
             verified = api["verify_receipt_sources"](receipt, store)
             self.assertEqual(verified["source_snapshot_sha256"], snapshot.digest)
             self.assertEqual(verified["source_pins"], snapshot.source_pins)
+
+    def test_receipt_verification_accepts_only_current_source_pin_schema(self):
+        api = self.api()
+        with tempfile.TemporaryDirectory() as temporary:
+            repo = Path(temporary) / "repo"
+            repo.mkdir()
+            self.write_repo(repo)
+            store = api["LocalSnapshotStore"](Path(temporary) / "store")
+            snapshot = api["snapshot_bazel_target"](
+                "//autonomy:target",
+                store,
+                repo_root=repo,
+                runner=self.runner_for(["//autonomy:evidence/source_snapshot.py"])[0],
+            )
+            valid_receipt = {
+                "source_snapshot_sha256": snapshot.digest,
+                "source_pins": snapshot.source_pins,
+            }
+
+            self.assertEqual(api["verify_receipt_sources"](valid_receipt, store)["source_pins"], snapshot.source_pins)
+            with self.assertRaisesRegex(ValueError, "receipt source snapshot digest required"):
+                api["verify_receipt_sources"](
+                    {
+                        "source_snapshot": {"sha256": snapshot.digest},
+                        "source_pins": snapshot.source_pins,
+                    },
+                    store,
+                )
+            for legacy_field in ("source_sha256", "source_hashes"):
+                with self.assertRaisesRegex(ValueError, "receipt source pins required"):
+                    api["verify_receipt_sources"](
+                        {
+                            "source_snapshot_sha256": snapshot.digest,
+                            legacy_field: snapshot.source_pins,
+                        },
+                        store,
+                    )
+            with self.assertRaisesRegex(ValueError, "sha256 digest required"):
+                api["verify_receipt_sources"](
+                    {
+                        "source_snapshot_sha256": snapshot.digest,
+                        "source_pins": {
+                            "autonomy/evidence/source_snapshot.py": {
+                                "sha256": snapshot.source_pins["autonomy/evidence/source_snapshot.py"],
+                            },
+                        },
+                    },
+                    store,
+                )
 
     def test_receipt_verification_rejects_altered_snapshot_member_union(self):
         api = self.api()

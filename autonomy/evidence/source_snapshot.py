@@ -1,11 +1,11 @@
 """Source snapshots for evidence receipts."""
-import gzip
 import hashlib
 import io
 import json
 import re
 import subprocess
 import tarfile
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import Mapping, Protocol
@@ -19,7 +19,6 @@ HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 class SourceSnapshot:
     target: str
     digest: str
-    archive_sha256: str
     archive_bytes: int
     source_pins: dict[str, str]
 
@@ -51,10 +50,15 @@ class LocalSnapshotStore:
             if path.read_bytes() != data:
                 raise ValueError("snapshot digest differs from existing snapshot")
             return digest
-        tmp = path.with_name(path.name + ".tmp")
-        with tmp.open("xb") as output:
-            output.write(data)
-        tmp.replace(path)
+        tmp = None
+        try:
+            with tempfile.NamedTemporaryFile(dir=self.root, prefix=path.name + ".", suffix=".tmp", delete=False) as output:
+                tmp = Path(output.name)
+                output.write(data)
+            tmp.replace(path)
+        finally:
+            if tmp is not None and tmp.exists():
+                tmp.unlink()
         if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
             raise ValueError("snapshot digest differs after readback")
         return digest
@@ -134,27 +138,26 @@ def archive_sources(repo_root, source_paths) -> tuple[bytes, dict[str, str]]:
     repo_root = Path(repo_root).resolve()
     pins = {}
     payload = io.BytesIO()
-    with gzip.GzipFile(fileobj=payload, mode="wb", filename="", mtime=0, compresslevel=6) as compressed:
-        with tarfile.open(fileobj=compressed, mode="w", format=tarfile.PAX_FORMAT) as writer:
-            for name in sorted(source_paths):
-                safe_member_name(name)
-                path = require_regular_file(repo_root / name)
-                try:
-                    path.resolve(strict=True).relative_to(repo_root)
-                except ValueError as error:
-                    raise ValueError("source path escapes repository: " + name) from error
-                data = path.read_bytes()
-                pins[name] = hashlib.sha256(data).hexdigest()
-                info = tarfile.TarInfo(name)
-                info.size = len(data)
-                info.mode = 0o444
-                info.mtime = 0
-                info.uid = 0
-                info.gid = 0
-                info.uname = ""
-                info.gname = ""
-                info.pax_headers = {}
-                writer.addfile(info, io.BytesIO(data))
+    with tarfile.open(fileobj=payload, mode="w", format=tarfile.PAX_FORMAT) as writer:
+        for name in sorted(source_paths):
+            safe_member_name(name)
+            path = require_regular_file(repo_root / name)
+            try:
+                path.resolve(strict=True).relative_to(repo_root)
+            except ValueError as error:
+                raise ValueError("source path escapes repository: " + name) from error
+            data = path.read_bytes()
+            pins[name] = hashlib.sha256(data).hexdigest()
+            info = tarfile.TarInfo(name)
+            info.size = len(data)
+            info.mode = 0o444
+            info.mtime = 0
+            info.uid = 0
+            info.gid = 0
+            info.uname = ""
+            info.gname = ""
+            info.pax_headers = {}
+            writer.addfile(info, io.BytesIO(data))
     return payload.getvalue(), pins
 
 
@@ -166,7 +169,6 @@ def snapshot_bazel_target(target: str, store: SnapshotStore, *, repo_root=REPO, 
     return SourceSnapshot(
         target=target,
         digest=digest,
-        archive_sha256=digest,
         archive_bytes=len(archive),
         source_pins=pins,
     )
@@ -175,7 +177,7 @@ def snapshot_bazel_target(target: str, store: SnapshotStore, *, repo_root=REPO, 
 def snapshot_source_pins(snapshot: bytes) -> dict[str, str]:
     pins = {}
     try:
-        with tarfile.open(fileobj=io.BytesIO(snapshot), mode="r:gz") as reader:
+        with tarfile.open(fileobj=io.BytesIO(snapshot), mode="r:") as reader:
             for member in reader:
                 name = safe_member_name(member.name)
                 if name in pins or not member.isfile() or member.linkname:
@@ -198,25 +200,19 @@ def read_receipt(receipt) -> Mapping:
 
 
 def receipt_snapshot_digest(receipt: Mapping) -> str:
-    value = receipt.get("source_snapshot_sha256")
-    if value is None and isinstance(receipt.get("source_snapshot"), Mapping):
-        value = receipt["source_snapshot"].get("sha256")
-    return require_digest(value)
+    if "source_snapshot_sha256" not in receipt:
+        raise ValueError("receipt source snapshot digest required")
+    return require_digest(receipt["source_snapshot_sha256"])
 
 
 def receipt_source_pins(receipt: Mapping) -> dict[str, str]:
-    for field in ("source_pins", "source_sha256", "source_hashes"):
-        if field in receipt:
-            raw = receipt[field]
-            break
-    else:
+    if "source_pins" not in receipt:
         raise ValueError("receipt source pins required")
+    raw = receipt["source_pins"]
     if not isinstance(raw, Mapping):
         raise ValueError("receipt source pins required")
     pins = {}
     for name, value in raw.items():
-        if isinstance(value, Mapping):
-            value = value.get("sha256")
         pins[safe_member_name(name)] = require_digest(value)
     return dict(sorted(pins.items()))
 
