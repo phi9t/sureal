@@ -4,7 +4,7 @@
 
 **Blocked by:** 13 (Concept batch: `insula` and `evidence`)
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] Scope: the TFRecord reader, sensor records, shard inventory, source integrity, staged sources, scientific dataset, components, sidecars and their readers and validators, scene and component archives, eviction policies, cohort selection, checkpoint and resume, and the cloud-storage setup commands
 - [x] Every module in scope lives in its concept directory and is imported by package path; no `sys.path` manipulation remains in the moved code
