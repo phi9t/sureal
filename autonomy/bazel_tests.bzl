@@ -31,7 +31,6 @@ TORCH_MODULES = [
     "tests/test_packed_point_features.py",
     "tests/test_pillar_detector.py",
     "tests/test_pillar_encoder.py",
-    "tests/test_point_semantic_encoder.py",
     "tests/test_range_frontend.py",
     "tests/test_range_pillar_hybrid.py",
     "tests/test_sparse_window_attention.py",
@@ -49,14 +48,10 @@ LIVE_GATE_MODULES = [
     "tests/test_motion_joint_cli.py",
     "tests/test_motion_native_cli.py",
     "tests/test_motion_pooled_cli.py",
-    "tests/test_semantic_recovery_accounting.py",
-    "tests/test_semantic_recovery_receipt.py",
-    "tests/test_semantic_recovery_receipt_aligned.py",
 ]
 
 KNOWN_FAILURE_MODULES = [
     "tests/test_motion_causal_projection.py",
-    "tests/test_staged_derived_archive_aligned.py",
 ]
 
 def perception_test_name(src):

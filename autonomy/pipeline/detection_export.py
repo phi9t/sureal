@@ -2,7 +2,7 @@
 import json,math
 from pathlib import Path
 import sys
-from .segmentation_export import encode
+from segmentation.segmentation_export import encode
 
 
 def validate_object(record):

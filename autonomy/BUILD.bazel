@@ -18,6 +18,7 @@ filegroup(
         "//autonomy/evidence:all_py",
         "//autonomy/geometry:all_py",
         "//autonomy/insula:all_py",
+        "//autonomy/segmentation:all_py",
     ],
     visibility = ["//visibility:public"],
 )
@@ -59,6 +60,7 @@ PERCEPTION_TEST_MODULES = glob(
     ],
     exclude = [
         "dataset/**",
+        "segmentation/**",
         "research/**",
         "source_snapshot_targets_test.py",
     ],
@@ -68,11 +70,13 @@ PERCEPTION_RUNFILES = glob(
     ["**"],
     exclude = [
         "dataset/**",
+        "segmentation/**",
         "research/**",
         "**/__pycache__/**",
     ],
 ) + [
     "//autonomy/dataset:runfiles",
+    "//autonomy/segmentation:runfiles",
     "research/association41-runtime-admission-20261003a/manifest.json",
 ]
 
@@ -81,13 +85,10 @@ PERCEPTION_DEPS = [
     "//autonomy/evidence:evidence",
     "//autonomy/geometry:geometry",
     "//autonomy/insula:insula",
+    "//autonomy/segmentation:segmentation",
 ]
 
-PERCEPTION_EXTRA_DATA = {
-    "tests/test_semantic_archive_support.py": [
-        "//autonomy/dataset:scientific_dataset_test_fixture",
-    ],
-}
+PERCEPTION_EXTRA_DATA = {}
 
 ARCHITECTURE_EXPERIMENT_RESEARCH_INPUTS = [
     "research/architecture-all_pillars-cache-verified.json",
@@ -110,6 +111,7 @@ filegroup(
         "//autonomy/evidence:source_snapshot_py",
         "//autonomy/geometry:all_py",
         "//autonomy/insula:all_py",
+        "//autonomy/segmentation:all_py",
     ] + glob([
         "architecture/harness/*.py",
         "gpu/*.py",
@@ -187,6 +189,7 @@ test_suite(
             "//autonomy/evidence:all_tests",
             "//autonomy/geometry:all_tests",
             "//autonomy/insula:all_tests",
+            "//autonomy/segmentation:all_tests",
         ],
     visibility = ["//visibility:public"],
 )

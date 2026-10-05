@@ -8,7 +8,7 @@ SNAPSHOT_TARGET='//autonomy:sustained-run-sources'
 
 def source_paths(root):
  root=Path(root)
- paths=sorted(str(p.relative_to(root)) for directory in ['dataset','geometry','pipeline','gpu','tier1','cohort','evidence','insula'] for p in (root/directory).rglob('*.py') if '__pycache__' not in p.parts)
+ paths=sorted(str(p.relative_to(root)) for directory in ['dataset','geometry','segmentation','pipeline','gpu','tier1','cohort','evidence','insula'] for p in (root/directory).rglob('*.py') if '__pycache__' not in p.parts)
  if not REQUIRED<=set(paths):raise ValueError('complete sustained execution source closure required')
  return paths
 
