@@ -45,8 +45,10 @@ class LocalSnapshotStore:
             raise ValueError("regular snapshot store directory required")
         self.root.mkdir(parents=True, exist_ok=True)
         path = self.path_for(digest)
+        if path.is_symlink():
+            raise ValueError("regular snapshot object required")
         if path.exists():
-            if path.is_symlink() or path.read_bytes() != data:
+            if path.read_bytes() != data:
                 raise ValueError("snapshot digest differs from existing snapshot")
             return digest
         tmp = path.with_name(path.name + ".tmp")

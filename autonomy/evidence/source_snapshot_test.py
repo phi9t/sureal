@@ -201,6 +201,18 @@ class SourceSnapshotTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "regular snapshot object required"):
                 store.fetch(digest)
 
+    def test_local_storage_refuses_snapshot_key_symlink_before_writing(self):
+        api = self.api()
+        with tempfile.TemporaryDirectory() as temporary:
+            store = api["LocalSnapshotStore"](Path(temporary) / "store")
+            data = b"snapshot bytes"
+            digest = hashlib.sha256(data).hexdigest()
+            store.root.mkdir()
+            (store.root / digest).symlink_to(Path(temporary) / "missing")
+
+            with self.assertRaisesRegex(ValueError, "regular snapshot object required"):
+                store.store(digest, data)
+
     def test_receipt_verification_uses_snapshot_not_working_tree(self):
         api = self.api()
         with tempfile.TemporaryDirectory() as temporary:
