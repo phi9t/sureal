@@ -6,9 +6,9 @@
 
 **Status:** ready-for-agent
 
-- [ ] A new run records the snapshot digest and the build target it was taken from
-- [ ] Verifying and resuming a run check the recorded snapshot and succeed after an unrelated source file is edited
-- [ ] Verifying fails when the snapshot's bytes differ from the recorded digest
-- [ ] Verification without a run identifier, which compared tracked receipts with the working tree, is removed and the user guide says so
-- [ ] The runner's own freezing code is replaced by the evidence module
-- [ ] Receipts of earlier runs are unchanged
+- [x] A new run records the snapshot digest and the build target it was taken from
+- [x] Verifying and resuming a run check the recorded snapshot and succeed after an unrelated source file is edited
+- [x] Verifying fails when the snapshot's bytes differ from the recorded digest
+- [x] Verification without a run identifier, which compared tracked receipts with the working tree, is removed and the user guide says so
+- [x] The runner's own freezing code is replaced by the evidence module
+- [x] Receipts of earlier runs are unchanged
