@@ -4,7 +4,7 @@
 
 **Blocked by:** 13 (Concept batch: `insula` and `evidence`)
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] Scope: transforms and the geometry foundation, camera coordinates, projection visibility, native range grids, range-shape references, files, workers and transfer
 - [x] Every module in scope lives in its concept directory and is imported by package path; no `sys.path` manipulation remains in the moved code
