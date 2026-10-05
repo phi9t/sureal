@@ -1,15 +1,14 @@
 """Freeze the complete external resource execution closure independently."""
-import hashlib
 from pathlib import Path
-import shutil
+from evidence.source_snapshot import LocalSnapshotStore,copy_source_snapshot,file_sha256,verify_materialized_sources
 
 REQUIRED={'sources.py','command.py','stage.py','kernel_scope.py','scoped_stage.py',
           'stage_accounting.py','execute_worker.py','process_lifecycle.py'}
+SNAPSHOT_TARGET='//autonomy:resource-source-layer'
 
 
 def sha(path):
-    with Path(path).open('rb') as stream:
-        return hashlib.file_digest(stream,'sha256').hexdigest()
+    return file_sha256(path)
 
 
 def regular(path):
@@ -33,38 +32,22 @@ def inventory(root):
 
 def freeze_sources(current,destination):
     current=Path(current);destination=Path(destination);names=inventory(current)
-    if destination==current or destination.is_relative_to(current):
-        raise ValueError('resource snapshot must be outside current source tree')
-    destination.mkdir(exist_ok=False);pins={}
-    for name in sorted(names):
-        original=current/name;snapshot=destination/name
-        snapshot.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(original,snapshot)
-        pins[name]={'original':str(original),'snapshot':str(snapshot),'sha256':sha(original)}
-    validate_sources(current,pins)
-    return pins
+    receipt=copy_source_snapshot(current,sorted(names),destination,LocalSnapshotStore(destination.parent/'source-snapshots'),target=SNAPSHOT_TARGET)
+    validate_sources(current,receipt)
+    return receipt
 
 
 def validate_sources(current,pins):
-    current=Path(current)
     try:
-        if not isinstance(pins,dict) or set(pins)!=inventory(current):
-            raise ValueError('current resource source inventory changed')
-        roots=set()
-        for name,pin in pins.items():
-            if set(pin)!={'original','snapshot','sha256'}:
-                raise ValueError('complete original/snapshot/digest binding required')
-            original=current/name;snapshot=Path(pin['snapshot'])
-            if str(original)!=pin['original'] or not snapshot.is_absolute() or not regular(original) or not regular(snapshot):
-                raise ValueError('resource source path differs or is not regular')
-            roots.add(snapshot.parents[len(Path(name).parts)-1])
-            if sha(original)!=pin['sha256'] or sha(snapshot)!=pin['sha256']:
-                raise ValueError('current or frozen resource source changed')
-        if len(roots)!=1:raise ValueError('one complete resource snapshot required')
-        root=roots.pop()
-        if root==current or root.is_relative_to(current) or inventory(root)!=set(pins):
+        root=Path(pins['source_snapshot_root'])
+        source_pins=pins['source_pins']
+        if not isinstance(source_pins,dict) or not REQUIRED<=set(source_pins):
+            raise ValueError('complete resource execution helpers required')
+        verified=verify_materialized_sources(root,pins)
+        if inventory(root)!=set(verified['source_pins']):
             raise ValueError('resource snapshot inventory differs')
-        if any(Path(pin['snapshot'])!=root/name for name,pin in pins.items()):
-            raise ValueError('resource snapshot paths differ')
+    except FileNotFoundError:
+        raise
     except (KeyError,TypeError,OSError,IndexError) as error:
         raise ValueError('complete immutable resource sources required') from error
     return root

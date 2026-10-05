@@ -26,7 +26,7 @@ class ResourceBackendTests(unittest.TestCase):
         scratch=root/'fixture';scratch.mkdir();_,_,native,proof=ResourceStageTests().fixture(scratch)
         evidence=b.resource_root/'stages'/name;shutil.move(str(scratch/'attempt'),evidence)
         worker=evidence/'worker/worker-resource.json';log=evidence/'execution.log'
-        code=Path(b.resource_identity['source_pins']['stage.py']['snapshot']).parent
+        code=Path(b.resource_identity['source_pins']['source_snapshot_root'])
         command=proof['original_command'][:proof['original_command'].index('--')]+['--ro-bind',str(code),'/tmp/resource-layer','--bind',str(worker.parent),'/tmp/resource-output','--','python','/tmp/resource-layer/execute_worker.py','/tmp/resource-output','/experiment/worker.py']
         proof['command']=command;proof['host_measurement']['command']=command.copy();proof['source_pins']=b.resource_identity['source_pins'];proof['cap_bytes']=16*1024**3;proof['timeout_seconds']=1800
         proof['host_measurement']['kernel_scope']['memory_max_bytes']=16*1024**3;proof['resource_admission']['aggregate_cap_bytes']=16*1024**3

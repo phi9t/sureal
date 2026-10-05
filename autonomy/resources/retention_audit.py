@@ -103,9 +103,9 @@ def validate_live_references(pub):
     archive=execution/'advanced/archive.py'
     if not regular(archive) or sha(archive)!=pub['archive_library']['sha256']:
         raise ValueError('executed archive helper differs from native pinned library')
-    for name,pin in pins.items():
+    for name,digest in pins['source_pins'].items():
         path=execution/'resources'/name
-        if not regular(path) or sha(path)!=pin['sha256']:raise ValueError('executed resource helper source changed')
+        if not regular(path) or sha(path)!=digest:raise ValueError('executed resource helper source changed')
     for chunk in pub['chunks']:
         for index,mode in [(0,'create'),(5,'verify'),(6,'rehydrate')]:
             check=chunk['checks'][index];path=Path(check['resource_proof_path'])
