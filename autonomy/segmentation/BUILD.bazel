@@ -1,0 +1,90 @@
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+
+package(default_visibility = ["//visibility:private"])
+
+LIB_MODULES = glob(
+    ["*.py"],
+    exclude = [
+        "*-*.py",
+        "*_test.py",
+    ],
+)
+
+TEST_MODULES = glob(["*_test.py"])
+
+COMMAND_SCRIPTS = glob(["*-*.py"])
+
+TEST_EXTRA_DATA = {
+    "semantic_archive_support_test.py": [
+        "//autonomy/dataset:scientific_dataset_test_fixture",
+    ],
+}
+
+GPU_TESTS = [
+    "point_semantic_encoder_test.py",
+]
+
+LIVE_GATE_TESTS = [
+    "semantic_recovery_accounting_test.py",
+    "semantic_recovery_receipt_test.py",
+    "semantic_recovery_receipt_aligned_test.py",
+]
+
+KNOWN_FAILURE_TESTS = [
+    "staged_derived_archive_aligned_test.py",
+]
+
+SEGMENTATION_VISIBILITY = ["//autonomy:__pkg__"]
+
+py_library(
+    name = "segmentation",
+    srcs = LIB_MODULES,
+    imports = [".."],
+    visibility = SEGMENTATION_VISIBILITY,
+    deps = [
+        "//autonomy/dataset:dataset",
+        "//autonomy/evidence:evidence",
+        "//autonomy/insula:insula",
+    ],
+)
+
+filegroup(
+    name = "commands",
+    srcs = COMMAND_SCRIPTS,
+    visibility = SEGMENTATION_VISIBILITY,
+)
+
+filegroup(
+    name = "all_py",
+    srcs = glob(["*.py"]),
+    visibility = ["//autonomy:__pkg__"],
+)
+
+filegroup(
+    name = "runfiles",
+    srcs = COMMAND_SCRIPTS,
+    visibility = SEGMENTATION_VISIBILITY,
+)
+
+[
+    py_test(
+        name = test[:-3],
+        srcs = [test],
+        data = [":runfiles"] + TEST_EXTRA_DATA.get(test, []),
+        deps = [":segmentation"],
+        imports = [".."],
+        legacy_create_init = 0,
+        size = "small",
+        tags = ["perception_unit"]
+            + (["requires_gpu"] if test in GPU_TESTS else [])
+            + (["requires_live_gate"] if test in LIVE_GATE_TESTS else [])
+            + (["known_failure"] if test in KNOWN_FAILURE_TESTS else []),
+    )
+    for test in TEST_MODULES
+]
+
+test_suite(
+    name = "all_tests",
+    tests = [test[:-3] for test in TEST_MODULES],
+    visibility = ["//autonomy:__pkg__"],
+)

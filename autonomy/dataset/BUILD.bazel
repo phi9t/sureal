@@ -20,6 +20,7 @@ DATA_FILES = glob([
 DATASET_VISIBILITY = [
     "//autonomy:__pkg__",
     "//autonomy/geometry:__pkg__",
+    "//autonomy/segmentation:__pkg__",
 ]
 
 TEST_EXTRA_SRCS = {
@@ -67,7 +68,10 @@ filegroup(
 filegroup(
     name = "scientific_dataset_test_fixture",
     srcs = ["scientific_dataset_test.py"],
-    visibility = ["//autonomy:__pkg__"],
+    visibility = [
+        "//autonomy:__pkg__",
+        "//autonomy/segmentation:__pkg__",
+    ],
 )
 
 [
