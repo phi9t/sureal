@@ -3,8 +3,6 @@ import datetime,fcntl,hashlib,json,os
 from pathlib import Path
 from evidence.source_snapshot import file_sha256, require_regular_file
 CATEGORIES={'observation','hypothesis','decision','follow_up'}
-def digest(path):
- return file_sha256(path)
 def fsync_directory(path):
  descriptor=os.open(path,os.O_RDONLY|os.O_DIRECTORY)
  try:os.fsync(descriptor)
@@ -27,8 +25,8 @@ def append_entry(path,category,experiments,content,evidence):
  for p in evidence:
   evidence_path=Path(p)
   checked=require_regular_file(evidence_path)
-  retained.append((evidence_path.resolve(),checked.read_bytes()))
- references=[{'path':str(p),'sha256':hashlib.sha256(data).hexdigest()} for p,data in retained]
+  retained.append((evidence_path.resolve(),checked.read_bytes(),file_sha256(checked)))
+ references=[{'path':str(p),'sha256':sha256} for p,_,sha256 in retained]
  path=Path(path);path.parent.mkdir(parents=True,exist_ok=True)
  with path.with_suffix('.lock').open('a') as lock:
   fcntl.flock(lock,fcntl.LOCK_EX);entries=read_entries(path)
@@ -37,10 +35,10 @@ def append_entry(path,category,experiments,content,evidence):
   snapshots=path.parent/'journal-evidence'
   if snapshots.is_symlink():raise ValueError('regular immutable evidence directory required')
   snapshots.mkdir(exist_ok=True)
-  for (_,data),reference in zip(retained,references):
+  for (_,data,_),reference in zip(retained,references):
    snapshot=snapshots/reference['sha256']
    if snapshot.exists():
-    if snapshot.is_symlink() or snapshot.read_bytes()!=data:raise ValueError('immutable journal evidence changed')
+    if snapshot.is_symlink() or file_sha256(snapshot)!=reference['sha256']:raise ValueError('immutable journal evidence changed')
    else:
     with snapshot.open('xb') as output:output.write(data);output.flush();os.fsync(output.fileno())
   fsync_directory(snapshots);fsync_directory(path.parent)

@@ -1,9 +1,9 @@
 """Evidence-derived experiment dashboard and append-only research journal CLI."""
 import argparse,datetime,fcntl,hashlib,json,os,time
 from pathlib import Path
-from evidence.journal import append_entry,read_entries,digest
+from evidence.journal import append_entry,read_entries
 from evidence.projection import project_experiments
-from evidence.source_snapshot import require_regular_file
+from evidence.source_snapshot import file_sha256 as digest,require_regular_file
 P=Path(__file__).resolve().parents[1]
 R=P/'research';REGISTRY=R/'experiment-registry.json';JOURNAL=R/'research-journal.jsonl'
 def atomic(path,value):

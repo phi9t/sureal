@@ -78,7 +78,7 @@ def _test_tags(src):
         tags.append("known_failure")
     return tags
 
-def perception_py_test(src, data, extra_data = []):
+def perception_py_test(src, data, extra_data = [], deps = []):
     env = {}
     if src in TORCH_CPU_ONLY_MODULES:
         env["CUDA_VISIBLE_DEVICES"] = ""
@@ -96,4 +96,5 @@ def perception_py_test(src, data, extra_data = []):
         size = "small",
         tags = _test_tags(src),
         env = env,
+        deps = deps,
     )

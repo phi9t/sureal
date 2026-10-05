@@ -27,6 +27,18 @@ def git(package, *arguments):
     return subprocess.run(['git', *arguments], cwd=package, check=True, capture_output=True).stdout
 
 
+def repo_root(package):
+    return Path(git(package, 'rev-parse', '--show-toplevel').decode().strip())
+
+
+def package_relative_to_repo(package):
+    root = repo_root(package)
+    try:
+        return Path(package).resolve().relative_to(root).as_posix()
+    except ValueError as error:
+        raise ValueError(f'package is outside git repository: {package}') from error
+
+
 def tracked(package, *patterns):
     return [name for name in git(package, 'ls-files', '-z', '--', *patterns).decode().split('\0') if name]
 
@@ -56,14 +68,62 @@ def status(package=PACKAGE, cited=None):
 def changed(package=PACKAGE, base='HEAD', cited=None):
     """Map each file whose bytes at ``base`` are pinned and now differ to its receipts."""
     cited = citations(package) if cited is None else cited
-    fields = git(package, 'diff', '--name-status', '--no-renames', '--relative', '-z', base, '--').decode().split('\0')
+    root = repo_root(package)
+    package_relative = package_relative_to_repo(package)
+    fields = git(
+        root,
+        'diff',
+        '--name-status',
+        '-M20%',
+        '-z',
+        base,
+    ).decode().split('\0')
+    if fields and fields[-1] == '':
+        fields.pop()
     result = {}
-    for kind, name in zip(fields[::2], fields[1::2]):
-        if kind in 'MD':
-            receipts = cited.get(hashlib.sha256(git(package, 'show', f'{base}:./{name}')).hexdigest())
+    index = 0
+    while index < len(fields):
+        kind = fields[index]
+        index += 1
+        if not kind:
+            continue
+        if kind.startswith('R'):
+            old_name = fields[index]
+            new_name = fields[index + 1]
+            index += 2
+        else:
+            old_name = fields[index]
+            new_name = None
+            index += 1
+        if not (is_under(old_name, package_relative) or (new_name is not None and is_under(new_name, package_relative))):
+            continue
+        if kind[0] in 'MDR':
+            receipts = cited.get(hashlib.sha256(git(root, 'show', f'{base}:{old_name}')).hexdigest())
             if receipts:
-                result[name] = sorted(receipts)
+                result[describe_changed_path(old_name, new_name, package_relative)] = sorted(receipts)
     return result
+
+
+def is_under(path, root):
+    return root == '.' or path == root or path.startswith(root + '/')
+
+
+def relative_to_package(path, root):
+    if root == '.':
+        return path
+    if path == root:
+        return '.'
+    return path[len(root) + 1:]
+
+
+def describe_changed_path(old_name, new_name, package_relative):
+    old_in_package = is_under(old_name, package_relative)
+    new_in_package = new_name is not None and is_under(new_name, package_relative)
+    if new_name is None:
+        return relative_to_package(old_name, package_relative) if old_in_package else old_name
+    if old_in_package and new_in_package:
+        return f'{relative_to_package(old_name, package_relative)} -> {relative_to_package(new_name, package_relative)}'
+    return f'{old_name} -> {new_name}'
 
 
 def describe(name, receipts):

@@ -1,34 +1,34 @@
-load("@rules_python//python:defs.bzl", "py_test")
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
 
 TEST_MODULES = glob(["*_test.py"])
+LIB_MODULES = glob(
+    ["*.py"],
+    exclude = ["*_test.py"],
+)
 EVIDENCE_VISIBILITY = [
     "//autonomy:__pkg__",
     "//autonomy/insula:__pkg__",
 ]
 
-package(default_visibility = EVIDENCE_VISIBILITY)
+package(default_visibility = ["//visibility:private"])
 
-exports_files([
-    "journal.py",
-    "pins.py",
-    "projection.py",
-    "publish.py",
-    "source_integrity.py",
-    "source_snapshot.py",
-    "tracker.py",
-], visibility = EVIDENCE_VISIBILITY)
-
-filegroup(
-    name = "all_files",
-    srcs = glob(
-        ["**"],
-        exclude = ["**/__pycache__/**"],
-    ),
+py_library(
+    name = "evidence",
+    srcs = LIB_MODULES,
+    imports = [".."],
+    visibility = EVIDENCE_VISIBILITY,
 )
 
 filegroup(
     name = "all_py",
     srcs = glob(["*.py"]),
+    visibility = ["//autonomy:__pkg__"],
+)
+
+filegroup(
+    name = "source_snapshot_py",
+    srcs = ["source_snapshot.py"],
+    visibility = ["//autonomy:__pkg__"],
 )
 
 filegroup(
@@ -40,8 +40,7 @@ filegroup(
     py_test(
         name = test[:-3],
         srcs = [test],
-        data = [":all_py"],
-        imports = [".."],
+        deps = [":evidence"],
         legacy_create_init = 0,
         size = "small",
         tags = ["perception_unit"],
@@ -52,4 +51,5 @@ filegroup(
 test_suite(
     name = "all_tests",
     tests = [test[:-3] for test in TEST_MODULES],
+    visibility = ["//autonomy:__pkg__"],
 )

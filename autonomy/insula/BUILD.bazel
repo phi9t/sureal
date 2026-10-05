@@ -1,43 +1,43 @@
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
-load("@rules_python//python:defs.bzl", "py_test")
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
 
 TEST_MODULES = glob(["*_test.py"])
+LIB_MODULES = glob(
+    ["*.py"],
+    exclude = ["*_test.py"],
+)
 INSULA_VISIBILITY = ["//autonomy:__pkg__"]
 
-package(default_visibility = INSULA_VISIBILITY)
+package(default_visibility = ["//visibility:private"])
 
-exports_files([
-    "entry.py",
-    "m0_probe.py",
-    "m0_receipt.py",
-    "m0_validate.py",
-    "runtime_identity.py",
-    "sandbox_plan.py",
-    "staging_lease.py",
-], visibility = INSULA_VISIBILITY)
-
-filegroup(
-    name = "all_files",
-    srcs = glob(
-        ["**"],
-        exclude = ["**/__pycache__/**"],
-    ),
+py_library(
+    name = "insula",
+    srcs = LIB_MODULES,
+    imports = [".."],
+    deps = ["//autonomy/evidence:evidence"],
+    visibility = INSULA_VISIBILITY,
 )
 
 filegroup(
     name = "all_py",
     srcs = glob(["*.py"]),
+    visibility = ["//autonomy:__pkg__"],
+)
+
+filegroup(
+    name = "host_entry_runtime_py",
+    srcs = [
+        "entry.py",
+        "runtime_identity.py",
+    ],
+    visibility = ["//autonomy:__pkg__"],
 )
 
 [
     py_test(
         name = test[:-3],
         srcs = [test],
-        data = [
-            ":all_py",
-            "//autonomy/evidence:all_py",
-        ],
-        imports = [".."],
+        deps = [":insula"],
         legacy_create_init = 0,
         size = "small",
         tags = ["perception_unit"] + (["requires_live_gate"] if test == "m0_receipt_test.py" else []),
@@ -53,4 +53,5 @@ cc_test(
 test_suite(
     name = "all_tests",
     tests = [test[:-3] for test in TEST_MODULES],
+    visibility = ["//autonomy:__pkg__"],
 )

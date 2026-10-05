@@ -1,6 +1,7 @@
 import json,os,signal,subprocess,uuid
 from pathlib import Path
-from evidence.journal import digest as sha,read_entries
+from evidence.journal import read_entries
+from evidence.source_snapshot import file_sha256 as sha
 import fcntl
 
 P=Path(__file__).resolve().parents[1]

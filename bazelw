@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 """Run repository Bazel inside an Insula rootfs."""
 import argparse
-import importlib
-import importlib.machinery
 import json
 import os
 import sys
-import types
 from pathlib import Path
 
 
@@ -26,21 +23,10 @@ GPU_DRIVER_PREFIXES = (
 )
 DEFAULT_GPU_DRIVER_LIBRARY_DIRS = (Path("/usr/lib/x86_64-linux-gnu"),)
 
-
-def _register_autonomy_package(name):
-    package = AUTONOMY / name
-    module = types.ModuleType(name)
-    module.__path__ = [str(package)]
-    spec = importlib.machinery.ModuleSpec(name, loader=None, is_package=True)
-    spec.submodule_search_locations = [str(package)]
-    module.__spec__ = spec
-    sys.modules.setdefault(name, module)
-
-
-_register_autonomy_package("evidence")
-_register_autonomy_package("insula")
-rootfs_identity = importlib.import_module("insula.runtime_identity").rootfs_identity
-compose_bwrap_plan = importlib.import_module("insula.sandbox_plan").compose_bwrap_plan
+# This root launcher imports component-local helpers before Bazel sets runfiles.
+sys.path.insert(0, str(AUTONOMY))
+from insula.runtime_identity import rootfs_identity
+from insula.sandbox_plan import compose_bwrap_plan
 
 
 def default_lock(rootfs):

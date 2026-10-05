@@ -68,9 +68,12 @@ PERCEPTION_RUNFILES = glob(
         "**/__pycache__/**",
     ],
 ) + [
-    "//autonomy/evidence:all_files",
-    "//autonomy/insula:all_files",
     "research/association41-runtime-admission-20261003a/manifest.json",
+]
+
+PERCEPTION_DEPS = [
+    "//autonomy/evidence:evidence",
+    "//autonomy/insula:insula",
 ]
 
 ARCHITECTURE_EXPERIMENT_RESEARCH_INPUTS = [
@@ -90,7 +93,7 @@ filegroup(
         "architecture/experiment_runner.py",
         "architecture/harness/files.json",
         "architecture/registry.json",
-        "//autonomy/evidence:source_snapshot.py",
+        "//autonomy/evidence:source_snapshot_py",
         "//autonomy/insula:all_py",
     ] + glob([
         "architecture/harness/*.py",
@@ -147,10 +150,11 @@ perception_py_test(
         ":sustained_pilot_retention_host_query",
         ":sustained_run_sources_query",
     ],
+    deps = PERCEPTION_DEPS,
 )
 
 [
-    perception_py_test(src, PERCEPTION_RUNFILES)
+    perception_py_test(src, PERCEPTION_RUNFILES, deps = PERCEPTION_DEPS)
     for src in PERCEPTION_TEST_MODULES
 ]
 
