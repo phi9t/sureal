@@ -4,7 +4,7 @@
 
 **Blocked by:** 02 (One wrapper command runs Bazel inside Insula)
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] The curriculum's 17 test modules are Bazel test targets
 - [x] The CPU numerical contract passes through the wrapper, or the ticket records exactly which tests fail under Python 3.12 and the newer NumPy
