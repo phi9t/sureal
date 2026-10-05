@@ -4,7 +4,7 @@
 
 **Blocked by:** 11 (The architecture runner pins a source snapshot), 12 (The sustained-run guard verifies a snapshot)
 
-**Status:** done
+**Status:** ready-for-agent
 
 - [x] Scope: the Insula entry and launch plan, rootfs identity, the M0 probe and receipt code, staging leases; the research journal, tracker, projection and publication; the pin report tool
 - [x] The wrapper and the live-gate launcher share one sandbox-plan implementation
