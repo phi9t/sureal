@@ -5,9 +5,9 @@ HERE="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 BAZEL_VERSION=9.2.0
 BAZEL_LINUX_X86_64_SHA256=7668a95db1250f12c40407251e4e203b4ec8bf39bc495d2f485b2d8c99048694
 CACHE_ROOT="${WAYMO_INSULA_CACHE_ROOT:-${HOME}/.cache/waystone/waymo-perception/insula}"
-PREVIOUS="${WAYMO_INSULA_PREVIOUS_ROOT:-${CACHE_ROOT}/rootfs-v2}"
-DEST="${WAYMO_INSULA_ROOT:-${CACHE_ROOT}/rootfs-v3}"
-IMAGE_TAG="${WAYMO_INSULA_IMAGE_TAG:-sureal-waymo-cpu:bazel-${BAZEL_VERSION}}"
+PREVIOUS="${WAYMO_INSULA_PREVIOUS_ROOT:-${CACHE_ROOT}/rootfs-v3}"
+DEST="${WAYMO_INSULA_ROOT:-${CACHE_ROOT}/rootfs-v4}"
+IMAGE_TAG="${WAYMO_INSULA_IMAGE_TAG:-sureal-waymo-cpu:bazel-${BAZEL_VERSION}-rootfs-v4}"
 
 die() {
     printf 'error: %s\n' "$*" >&2
@@ -54,12 +54,51 @@ validate_new_rootfs() {
     bazel_version="$(run_in_rootfs "$rootfs" bazel --version)"
     [[ "$bazel_version" == "bazel ${BAZEL_VERSION}" ]] \
         || die "unexpected Bazel version in new rootfs: ${bazel_version}"
+    run_in_rootfs "$rootfs" sh -lc \
+        "command -v git >/dev/null && command -v curl >/dev/null && command -v g++ >/dev/null && command -v ar >/dev/null && python -m pytest --version >/dev/null" \
+        || die "new rootfs is missing required test tools"
 
     previous_packages="$(mktemp)"
     new_packages="$(mktemp)"
     run_in_rootfs "$previous" python -m pip freeze --all | LC_ALL=C sort >"$previous_packages"
     run_in_rootfs "$rootfs" python -m pip freeze --all | LC_ALL=C sort >"$new_packages"
-    if ! cmp -s "$previous_packages" "$new_packages"; then
+    if ! python3 - "$previous_packages" "$new_packages" "$HERE/requirements-test-tools.lock" <<'PY'
+import sys
+from pathlib import Path
+
+def canonical(name):
+    return name.replace("_", "-").lower()
+
+def inventory(path):
+    result = {}
+    for line in Path(path).read_text().splitlines():
+        if "==" not in line or line.lstrip().startswith("#"):
+            continue
+        name, version = line.split("==", 1)
+        result[canonical(name)] = version.split()[0].rstrip("\\")
+    return result
+
+previous = inventory(sys.argv[1])
+new = inventory(sys.argv[2])
+allowed = inventory(sys.argv[3])
+
+errors = []
+for name, version in sorted(previous.items()):
+    if name not in new:
+        errors.append(f"removed {name}=={version}")
+    elif new[name] != version:
+        errors.append(f"changed {name}: {version} -> {new[name]}")
+for name, version in sorted(allowed.items()):
+    if new.get(name) != version:
+        errors.append(f"missing locked test tool {name}=={version}")
+for name, version in sorted(new.items()):
+    if name not in previous and name not in allowed:
+        errors.append(f"unexpected new package {name}=={version}")
+if errors:
+    print("\\n".join(errors), file=sys.stderr)
+    raise SystemExit(1)
+PY
+    then
         diff -u "$previous_packages" "$new_packages" >&2 || true
         rm -f "$previous_packages" "$new_packages"
         die "Python package inventory differs between previous and new rootfs"
@@ -105,6 +144,7 @@ root, here, image, bazel_version, bazel_sha256 = Path(sys.argv[1]), Path(sys.arg
 lock = {'schema_version': 1, 'platform': 'linux/amd64', 'image_id': image,
         'rootfs_sha256': rootfs_identity(root),
         'requirements_sha256': hashlib.sha256((here/'requirements-tracer.lock').read_bytes()).hexdigest(),
+        'test_tools_requirements_sha256': hashlib.sha256((here/'requirements-test-tools.lock').read_bytes()).hexdigest(),
         'dockerfile_sha256': hashlib.sha256((here/'insula/Dockerfile').read_bytes()).hexdigest(),
         'bazel_version': bazel_version,
         'bazel_linux_x86_64_sha256': bazel_sha256}

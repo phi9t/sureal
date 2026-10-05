@@ -203,7 +203,7 @@ training/jean_zay
 # Agent-isolated feature worktrees
 .worktrees/
 
-# Bazel wrapper cache (mounted at /outputs inside Insula)
+# Bazel wrapper cache (mounted at /tmp/bazel-cache inside Insula)
 .bazel-cache/
 
 # Waymo viewer (autonomy/viewer): JS deps, builds, venv

@@ -7,6 +7,7 @@ imports. Ticket 26 should remove this runner when tests have native Bazel deps.
 """
 import argparse
 import os
+import subprocess
 import sys
 import unittest
 from pathlib import Path
@@ -52,8 +53,17 @@ def run_unittest(test_path):
     return 0 if unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful() else 1
 
 
+def run_pytest(test_path):
+    return subprocess.run(
+        [sys.executable, "-m", "pytest", "-q", test_path.as_posix()],
+        cwd=PACKAGE,
+        env=os.environ,
+    ).returncode
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--pytest", action="store_true")
     parser.add_argument("test_path")
     args = parser.parse_args(argv)
     test_path = Path(args.test_path)
@@ -64,6 +74,8 @@ def main(argv=None):
 
     os.chdir(PACKAGE)
     add_import_roots(test_path)
+    if args.pytest:
+        return run_pytest(test_path)
     return run_unittest(test_path)
 
 

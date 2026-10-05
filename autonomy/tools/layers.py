@@ -15,6 +15,7 @@ PACKAGE = Path(__file__).resolve().parents[1]
 ROOT = '(root)'
 # Lowest first.  Areas sharing a layer are peers and may not import each other.
 LAYERS = (
+    ('evidence',),
     ('pipeline',),
     ('gpu', 'evaluation', 'tracking', 'association', 'explorer', 'motion-evaluation', 'viewer'),
     ('architecture',),
@@ -33,10 +34,30 @@ UNLAYERED = frozenset({'research'})  # retained evidence, including frozen sourc
 
 
 def sources(package=PACKAGE):
-    listed = subprocess.run(['git', 'ls-files', '-co', '--exclude-standard', '--', '*.py'], cwd=package,
-                            check=True, capture_output=True, text=True).stdout.split('\n')
+    package = Path(package)
+    listed = git_sources(package)
+    if listed is None:
+        listed = filesystem_sources(package)
     return sorted(name for name in listed if name and (Path(package) / name).is_file()
                   and area(name) not in UNLAYERED)
+
+
+def git_sources(package):
+    try:
+        return subprocess.run(['git', 'ls-files', '-co', '--exclude-standard', '--', '*.py'], cwd=package,
+                              check=True, capture_output=True, text=True).stdout.split('\n')
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        return None
+
+
+def filesystem_sources(package):
+    names = []
+    for path in Path(package).rglob('*.py'):
+        relative = path.relative_to(package)
+        if '__pycache__' in relative.parts:
+            continue
+        names.append(relative.as_posix())
+    return names
 
 
 def area(name):

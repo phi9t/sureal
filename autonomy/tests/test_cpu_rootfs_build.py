@@ -17,6 +17,13 @@ BAZEL_LINUX_X86_64_SHA256 = (
     "7668a95db1250f12c40407251e4e203b4ec8bf39bc495d2f485b2d8c99048694"
 )
 PACKAGE_INVENTORY = "numpy==2.3.2\npip==25.2\n"
+TEST_TOOL_PACKAGE_INVENTORY = (
+    "iniconfig==2.3.0\n"
+    "packaging==26.3\n"
+    "pluggy==1.6.0\n"
+    "pygments==2.21.0\n"
+    "pytest==9.1.1\n"
+)
 
 
 def sha256(path):
@@ -78,9 +85,14 @@ def write_fake_tools(fakebin):
         done
         [[ -n "${dest}" ]] || { echo 'missing -C destination' >&2; exit 2; }
         mkdir -p "${dest}/usr/bin" "${dest}/usr/local/bin" "${dest}/opt" \
-          "${dest}/etc" "${dest}/experiment" "${dest}/source" "${dest}/outputs"
+          "${dest}/etc" "${dest}/experiment" "${dest}/source" "${dest}/outputs" \
+          "${dest}/bazel-cache"
         printf '#!/bin/sh\\n' > "${dest}/usr/bin/python"
         chmod 0755 "${dest}/usr/bin/python"
+        for tool in git curl g++ ar; do
+          printf '#!/bin/sh\\n' > "${dest}/usr/bin/${tool}"
+          chmod 0755 "${dest}/usr/bin/${tool}"
+        done
         printf '#!/bin/sh\\n' > "${dest}/usr/local/bin/bazel"
         chmod 0755 "${dest}/usr/local/bin/bazel"
         printf 'schema_version=1\\n' > "${dest}/etc/surflo-insula-contract"
@@ -117,6 +129,17 @@ def write_fake_tools(fakebin):
             print((root / "opt/bazel-version.txt").read_text().strip())
         elif command == ["python", "-m", "pip", "freeze", "--all"]:
             print((root / "opt/package-list.txt").read_text(), end="")
+        elif command == ["sh", "-lc", "command -v git >/dev/null && command -v curl >/dev/null && command -v g++ >/dev/null && command -v ar >/dev/null && python -m pytest --version >/dev/null"]:
+            missing = [
+                name
+                for name in ("git", "curl", "g++", "ar")
+                if not (root / "usr/bin" / name).is_file()
+            ]
+            if "pytest==" not in (root / "opt/package-list.txt").read_text():
+                missing.append("pytest")
+            if missing:
+                print("missing " + ", ".join(missing), file=sys.stderr)
+                raise SystemExit(1)
         else:
             print(f"unexpected command: {command}", file=sys.stderr)
             raise SystemExit(2)
@@ -143,7 +166,7 @@ class CpuRootfsBuildTests(unittest.TestCase):
             write_fake_tools(fakebin)
 
             home = root / "home"
-            previous = home / ".cache/waystone/waymo-perception/insula/rootfs-v2"
+            previous = home / ".cache/waystone/waymo-perception/insula/rootfs-v3"
             previous.mkdir(parents=True)
             write_rootfs(previous)
             previous_lock = previous.with_name(previous.name + ".lock.json")
@@ -164,6 +187,7 @@ class CpuRootfsBuildTests(unittest.TestCase):
             env["HOME"] = str(home)
             env["PATH"] = f"{fakebin}{os.pathsep}{env['PATH']}"
             env["FAKE_DOCKER_LOG"] = str(root / "docker.log")
+            env["FAKE_NEW_PACKAGES"] = PACKAGE_INVENTORY + TEST_TOOL_PACKAGE_INVENTORY
             env.pop("WAYMO_INSULA_ROOT", None)
             env.pop("WAYMO_INSULA_PREVIOUS_ROOT", None)
 
@@ -176,9 +200,12 @@ class CpuRootfsBuildTests(unittest.TestCase):
             )
 
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            destination = home / ".cache/waystone/waymo-perception/insula/rootfs-v3"
+            destination = home / ".cache/waystone/waymo-perception/insula/rootfs-v4"
             self.assertIn(f"rootfs={destination}", result.stdout)
             self.assertTrue(destination.is_dir())
+            for name in ("git", "curl", "g++", "ar"):
+                self.assertTrue((destination / "usr/bin" / name).is_file(), name)
+            self.assertTrue((destination / "bazel-cache").is_dir())
             self.assertEqual(previous_identity, rootfs_identity(previous))
             self.assertEqual(previous_lock_bytes, previous_lock.read_bytes())
 
@@ -187,6 +214,10 @@ class CpuRootfsBuildTests(unittest.TestCase):
             self.assertEqual(lock["platform"], "linux/amd64")
             self.assertEqual(lock["rootfs_sha256"], rootfs_identity(destination))
             self.assertEqual(lock["requirements_sha256"], sha256(PACKAGE / "requirements-tracer.lock"))
+            self.assertEqual(
+                lock["test_tools_requirements_sha256"],
+                sha256(PACKAGE / "requirements-test-tools.lock"),
+            )
             self.assertEqual(lock["dockerfile_sha256"], sha256(PACKAGE / "insula/Dockerfile"))
             self.assertEqual(lock["bazel_version"], BAZEL_VERSION)
             self.assertEqual(
@@ -200,19 +231,19 @@ class CpuRootfsBuildTests(unittest.TestCase):
             fakebin.mkdir()
             write_fake_tools(fakebin)
 
-            previous = root / "rootfs-v2"
+            previous = root / "rootfs-v3"
             previous.mkdir()
             write_rootfs(previous, packages="numpy==2.3.2\npip==25.2\n")
             previous_lock = previous.with_name(previous.name + ".lock.json")
             previous_lock.write_text(
                 json.dumps({"rootfs_sha256": rootfs_identity(previous)}) + "\n"
             )
-            destination = root / "rootfs-v3"
+            destination = root / "rootfs-v4"
 
             env = os.environ.copy()
             env["PATH"] = f"{fakebin}{os.pathsep}{env['PATH']}"
             env["FAKE_DOCKER_LOG"] = str(root / "docker.log")
-            env["FAKE_NEW_PACKAGES"] = "numpy==2.3.3\npip==25.2\n"
+            env["FAKE_NEW_PACKAGES"] = "numpy==2.3.3\npip==25.2\n" + TEST_TOOL_PACKAGE_INVENTORY
             env["WAYMO_INSULA_PREVIOUS_ROOT"] = str(previous)
             env["WAYMO_INSULA_ROOT"] = str(destination)
 

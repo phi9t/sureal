@@ -26,6 +26,3 @@ local_runtime_toolchains_repo(
 )
 
 register_toolchains("@rootfs_python_toolchains//:all")
-register_toolchains(
-    "//autonomy:null_cc_toolchain_registration",
-)

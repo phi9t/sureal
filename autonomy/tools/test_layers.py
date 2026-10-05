@@ -1,5 +1,6 @@
 import tempfile
 import unittest
+import os
 from pathlib import Path
 
 from tools import layers
@@ -41,6 +42,28 @@ class LayerTests(unittest.TestCase):
 
     def test_undeclared_area_is_reported(self):
         self.assertEqual(self.problems({'new/thing.py': ''}), ["new/thing.py: area 'new' has no declared layer"])
+
+    def test_sources_fall_back_to_package_files_when_git_metadata_is_unavailable(self):
+        with tempfile.TemporaryDirectory() as directory, tempfile.TemporaryDirectory() as fake_bin:
+            package = Path(directory)
+            (package / 'low').mkdir()
+            (package / 'low/base.py').write_text('')
+            (package / 'top.py').write_text('')
+            (package / 'research').mkdir()
+            (package / 'research/frozen.py').write_text('')
+            (package / 'low/__pycache__').mkdir()
+            (package / 'low/__pycache__/ignored.py').write_text('')
+
+            fake_git = Path(fake_bin) / 'git'
+            fake_git.write_text('#!/bin/sh\nexit 128\n')
+            fake_git.chmod(0o755)
+
+            old_path = os.environ.get('PATH', '')
+            try:
+                os.environ['PATH'] = fake_bin
+                self.assertEqual(layers.sources(package), ['low/base.py', 'top.py'])
+            finally:
+                os.environ['PATH'] = old_path
 
     def test_current_tree_follows_the_declared_layers(self):
         self.assertEqual(layers.check(), [])
