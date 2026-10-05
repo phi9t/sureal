@@ -98,7 +98,7 @@ class SourceSnapshotTests(unittest.TestCase):
                     str(repo / "bazelw"),
                     "query",
                     "--output=label",
-                    'kind("source", deps(//autonomy:evidence__source_snapshot_test))',
+                    'filter("^//", kind("source", deps(//autonomy:evidence__source_snapshot_test)))',
                 ],
             )
             self.assertEqual(calls[0][1]["cwd"], repo)

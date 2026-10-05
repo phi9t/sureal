@@ -112,7 +112,7 @@ def bazel_source_paths(target: str, *, repo_root=REPO, bazel=None, runner=subpro
         raise ValueError("Bazel target label required")
     repo_root = Path(repo_root)
     bazel = str(repo_root / "bazelw") if bazel is None else str(bazel)
-    expression = f'kind("source", deps({target}))'
+    expression = f'filter("^//", kind("source", deps({target})))'
     result = runner(
         [bazel, "query", "--output=label", expression],
         cwd=repo_root,
