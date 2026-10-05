@@ -1,9 +1,9 @@
 """Verified, row-bounded decoded component replay for scientific reconstruction."""
-import hashlib
 import json
 from pathlib import Path
 import re
 import numpy as np
+from evidence.source_snapshot import file_sha256, require_digest
 
 
 def iter_sidecar_rows(directory, *, expected_manifest_sha256):
@@ -15,14 +15,11 @@ def iter_sidecar_rows(directory, *, expected_manifest_sha256):
     """
     directory = Path(directory)
 
-    def digest(path):
-        if path.is_symlink() or not path.is_file():
-            raise ValueError('sidecar artifact is not a regular non-symlink file')
-        with path.open('rb') as stream:
-            return hashlib.file_digest(stream, 'sha256').hexdigest()
-
-    if not isinstance(expected_manifest_sha256, str) or not re.fullmatch('[0-9a-f]{64}', expected_manifest_sha256):
+    try:
+        require_digest(expected_manifest_sha256)
+    except ValueError as error:
         raise ValueError('independent manifest SHA256 required')
+    digest=file_sha256
     manifest_path = directory/'manifest.json'
     if digest(manifest_path) != expected_manifest_sha256:
         raise ValueError('sidecar manifest changed')

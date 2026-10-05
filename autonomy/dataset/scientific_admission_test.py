@@ -1,6 +1,6 @@
 import copy
 import unittest
-from pipeline.scientific_admission import admit_scene, check_raw_capacity
+from dataset.scientific_admission import admit_scene, check_raw_capacity
 
 
 class ScientificAdmissionTests(unittest.TestCase):

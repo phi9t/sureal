@@ -10,7 +10,7 @@ import sys
 
 from insula.runtime_identity import verify_rootfs
 from insula.staging_lease import staging_lease
-from .staged_source import staged_source, WAYSTONE
+from dataset.staged_source import staged_source, WAYSTONE
 from .training_box_process import run_source_worker
 
 
@@ -25,7 +25,7 @@ def save(path, value):
 
 def retained_raw_bytes(cache, code_root):
     slice_root = Path(cache) / 'slices/validation-two-scenes-20260929'
-    dataset = json.loads((Path(code_root) / 'dataset.lock.json').read_text())
+    dataset = json.loads((Path(code_root) / 'dataset/dataset.lock.json').read_text())
     for source in dataset['objects']:
         path = slice_root / source['relative_path']
         if path.is_symlink() or not path.is_file() or path.stat().st_size != source['size_bytes']:

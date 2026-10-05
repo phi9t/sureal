@@ -3,7 +3,7 @@ import hashlib,json,sys
 from pathlib import Path
 import numpy as np
 from PIL import Image,ImageDraw
-from pipeline.sensor_records import select_rows,array_field
+from dataset.sensor_records import select_rows,array_field
 job=json.loads(Path('/tmp/input/job.json').read_text());mode=sys.argv[1];t=job['timestamp'];scene=job['scene']
 source=Path('/source/lidar_camera_projection.parquet')
 with source.open('rb') as f:assert hashlib.file_digest(f,'sha256').hexdigest()==job['source']['sha256']

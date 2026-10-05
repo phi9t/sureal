@@ -2,7 +2,7 @@
 import hashlib,json,sys
 from pathlib import Path
 import numpy as np
-from pipeline.sensor_records import select_rows,array_field
+from dataset.sensor_records import select_rows,array_field
 from advanced.packing import range_observations
 
 job=json.loads(Path('/tmp/input/job.json').read_text());mode=sys.argv[1];source=Path('/source/source.parquet')

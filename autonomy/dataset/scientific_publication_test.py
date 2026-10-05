@@ -1,5 +1,5 @@
 import copy,unittest
-from pipeline.scientific_publication import publication_manifest,COMPONENTS
+from dataset.scientific_publication import publication_manifest,COMPONENTS
 
 class ScientificPublicationTests(unittest.TestCase):
     def fixture(self):

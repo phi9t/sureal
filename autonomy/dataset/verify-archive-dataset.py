@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
 """Replay the engineering HDFS archive twice against verified native point files."""
 from datetime import datetime, timezone
-import hashlib
 import json
 from pathlib import Path
 import resource
 import subprocess
-import sys
 import time
+from evidence.source_snapshot import file_sha256 as sha
 
-HERE=Path(__file__).resolve().parent
-sys.path.insert(0,str(HERE))
+HERE=Path(__file__).resolve().parents[1]
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
 
 REPLAY = '''import json,hashlib
 from pathlib import Path
 import numpy as np
-from pipeline.scientific_dataset import iter_scene_records
+from dataset.scientific_dataset import iter_scene_records
 reference=json.loads(Path('/opt/report.json').read_text())
 expected={(r['context'],r['timestamp'],r['laser'],r['return']):r for r in reference['rows']}
 seen=set(); digest=hashlib.sha256(); points=0
@@ -41,10 +39,6 @@ Path('/outputs/replay.json').write_text(json.dumps({'records':len(seen),'points'
 print('PASS independent dataset replay',len(seen),points)
 '''
 
-
-def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
 def main():
     base=Path(sys.argv[1]).resolve();base.mkdir(parents=True,exist_ok=False)
     cache=Path.home()/'.cache/waystone/waymo-perception'
@@ -59,12 +53,12 @@ def main():
     if sha(refreceipt)!=refevidence['receipt_sha256'] or sha(reference/'report.json')!=ref['artifacts']['produced/points/report.json']:
         raise ValueError('independent reconstruction reference changed')
     root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
-    names=['verify-archive-dataset.py','pipeline/scientific_dataset.py','pipeline/scene_archive_validate.py','tests/test_scientific_dataset.py']
+    names=['dataset/verify-archive-dataset.py','dataset/scientific_dataset.py','dataset/scene_archive_validate.py','dataset/scientific_dataset_test.py']
     candidates={p:sha(HERE/p) for p in names};checks=[];outputs=[]
     start=datetime.now(timezone.utc).isoformat();tick=time.monotonic()
     for index in range(3):
         out=base/('fixtures' if index==0 else f'replay-{index}');out.mkdir();outputs.append(out)
-        command=['python','-m','unittest','discover','-s','tests','-p','test_scientific_dataset.py','-v'] if index==0 else ['python','-c','PUBLICATION_HASH='+repr(expected)+'\n'+REPLAY]
+        command=['python','-m','unittest','discover','-s','dataset','-p','scientific_dataset_test.py','-v'] if index==0 else ['python','-c','PUBLICATION_HASH='+repr(expected)+'\n'+REPLAY]
         plan=launch_plan(root,HERE,published/'packed',out,command)
         if index:
             i=plan.index('--');plan[i:i]=['--ro-bind',str(reference),'/opt']

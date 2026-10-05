@@ -1,6 +1,6 @@
 import hashlib,json,tempfile,unittest
 from pathlib import Path
-from pipeline.verified_eviction import evict_points
+from dataset.verified_eviction import evict_points
 
 class VerifiedEvictionTests(unittest.TestCase):
     def fixture(self,root):

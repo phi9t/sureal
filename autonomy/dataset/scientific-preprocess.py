@@ -2,24 +2,20 @@
 """Resumable scientific native sidecar processing; no model training or promotion."""
 import argparse
 from datetime import datetime,timezone
-import hashlib,json
+import json
 from pathlib import Path
 import resource,subprocess,time
+from evidence.source_snapshot import file_sha256 as sha
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
-from pipeline.scientific_admission import admit_scene
-from pipeline.staged_source import staged_source
+from dataset.scientific_admission import admit_scene
+from dataset.staged_source import staged_source
 from insula.staging_lease import staging_lease
-from pipeline.scientific_preparation import verified_sidecar_hashes
+from dataset.scientific_preparation import verified_sidecar_hashes
 
-HERE=Path(__file__).resolve().parent
+HERE=Path(__file__).resolve().parents[1]
 COMPONENTS=['lidar_calibration','camera_calibration','vehicle_pose','lidar_pose','lidar_camera_projection','lidar_segmentation','lidar_box']
-CANDIDATES=['scientific-preprocess.py','pipeline/scientific_component.py','pipeline/scientific_sidecars.py','pipeline/scientific_sidecar_validate.py','pipeline/scientific_admission.py','pipeline/staged_source.py','evidence/source_integrity.py','insula/staging_lease.py','pipeline/sensor_records.py','pipeline/scientific_preparation.py','pipeline/scientific_scene_command.py','pipeline/scientific_scene_validate.py','pipeline/scientific_reconstruction.py','pipeline/scientific_sidecar_reader.py','pipeline/reconstruction_validate.py','pipeline/geometry.py','pipeline/geometry_foundation.py']
-
-
-def sha(path):
-    with path.open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
-
+CANDIDATES=['dataset/scientific-preprocess.py','dataset/scientific_component.py','dataset/scientific_sidecars.py','dataset/scientific_sidecar_validate.py','dataset/scientific_admission.py','dataset/staged_source.py','dataset/source_integrity.py','insula/staging_lease.py','dataset/sensor_records.py','dataset/scientific_preparation.py','pipeline/scientific_scene_command.py','pipeline/scientific_scene_validate.py','pipeline/scientific_reconstruction.py','dataset/scientific_sidecar_reader.py','pipeline/reconstruction_validate.py','pipeline/geometry.py','pipeline/geometry_foundation.py']
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--scene',required=True);parser.add_argument('--output',type=Path,required=True)
@@ -27,15 +23,15 @@ def main():
     parser.add_argument('--reconstruct',action='store_true');args=parser.parse_args()
     if args.reconstruct and args.component:parser.error('--reconstruct requires the full default sidecar set')
     cache=Path.home()/'.cache/waystone/waymo-perception'
-    manifest=json.loads((HERE/'scientific-acquisition.candidate.json').read_text())
-    manifest['excluded_engineering_segments']=json.loads((HERE/'scientific-cohort.candidate.json').read_text())['excluded_engineering_segments']
+    manifest=json.loads((HERE/'dataset/scientific-acquisition.candidate.json').read_text())
+    manifest['excluded_engineering_segments']=json.loads((HERE/'dataset/scientific-cohort.candidate.json').read_text())['excluded_engineering_segments']
     group=manifest['scenes'][args.scene];paths={c:cache/'scientific-source-audit'/f"{group['official_split']}-{c}-{args.scene}.json" for c in manifest['components']}
     records={c:json.loads(path.read_text()) for c,path in paths.items()};admitted=admit_scene(manifest,records,args.scene)
     # Refuse the live owner before creating a partial scene directory. Individual
     # transfers reacquire this same lease for their entire processing lifetime.
     with staging_lease(cache/'raw-staging.lock'):pass
     root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
-    retained=sum(o['size_bytes'] for o in json.loads((HERE/'dataset.lock.json').read_text())['objects'])
+    retained=sum(o['size_bytes'] for o in json.loads((HERE/'dataset/dataset.lock.json').read_text())['objects'])
     destination=args.output.resolve();destination.mkdir(parents=True,exist_ok=True)
     candidate={name:sha(HERE/name) for name in CANDIDATES};components=args.component or COMPONENTS
     if len(set(components))!=len(components):raise ValueError('duplicate requested component')
@@ -55,8 +51,8 @@ def main():
         base.mkdir(parents=True);prepared=destination/'sidecars';prepared.mkdir(exist_ok=True);checked=base/'checked';checked.mkdir()
         started=datetime.now(timezone.utc).isoformat();tick=time.monotonic();checks=[]
         with staged_source(record,cache,retained_bytes=retained,limit_bytes=manifest['local_staging_limit_bytes']) as (source,transfer):
-            stages=[('decode',prepared,['python','-m','pipeline.scientific_component','decode','/source/source.parquet',component,args.scene,'/outputs/'+component,str(limit-used)]),
-                    ('independent-check',checked,['python','-m','pipeline.scientific_component','validate','/source/source.parquet','/opt/'+component,'/outputs/check.json'])]
+            stages=[('decode',prepared,['python','-m','dataset.scientific_component','decode','/source/source.parquet',component,args.scene,'/outputs/'+component,str(limit-used)]),
+                    ('independent-check',checked,['python','-m','dataset.scientific_component','validate','/source/source.parquet','/opt/'+component,'/outputs/check.json'])]
             for name,out,command in stages:
                 plan=launch_plan(root,HERE,source.parent,out,command)
                 if name=='independent-check':

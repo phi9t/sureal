@@ -1,6 +1,6 @@
 import hashlib,json,tempfile,unittest
 from pathlib import Path
-from pipeline.sidecar_eviction import evict_sidecars
+from dataset.sidecar_eviction import evict_sidecars
 
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 class SidecarEvictionTests(unittest.TestCase):

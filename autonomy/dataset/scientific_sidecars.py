@@ -5,7 +5,8 @@ import json
 from pathlib import Path
 import numpy as np
 import pyarrow.parquet as pq
-from .sensor_records import select_rows, array_field
+from evidence.source_snapshot import file_sha256
+from dataset.sensor_records import select_rows, array_field
 
 SUPPORTED = {'lidar_calibration', 'camera_calibration', 'vehicle_pose',
              'lidar_pose', 'lidar_camera_projection', 'lidar_segmentation', 'lidar_box'}
@@ -20,8 +21,7 @@ def materialize_component(source, component, scene, output, remaining_bytes):
     if output.exists():
         raise ValueError('sidecar destination already exists; never overwrite')
     output.mkdir(parents=True)
-    with source.open('rb') as stream:
-        source_sha = hashlib.file_digest(stream, 'sha256').hexdigest()
+    source_sha = file_sha256(source)
     native_schema = pq.ParquetFile(source).schema_arrow
     shaped = sorted(name[:-6] for name in native_schema.names if name.endswith('.shape'))
     rows, seen, used = [], set(), 0

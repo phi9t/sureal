@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import numpy as np
 import pyarrow.parquet as pq
+from evidence.source_snapshot import file_sha256 as digest
 
 
 def validate_component(source, output):
@@ -13,10 +14,6 @@ def validate_component(source, output):
     def require(condition, message):
         if not condition:
             raise ValueError(message)
-
-    def digest(path):
-        with path.open('rb') as stream:
-            return hashlib.file_digest(stream, 'sha256').hexdigest()
 
     native = pq.ParquetFile(source)
     require(report['schema_version'] == 1, 'unsupported sidecar schema')

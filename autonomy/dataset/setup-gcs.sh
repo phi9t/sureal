@@ -187,7 +187,7 @@ finish() {
 # CLI bootstrap and auth are deliberately separate from dataset acquisition.
 if [[ "${1:-}" == --help || "${1:-}" == -h ]]; then
   cat <<'EOF'
-Usage: setup-gcs.sh
+Usage: dataset/setup-gcs.sh
 Interactive Waymo access wizard: install a pinned CLI, log in, check access.
 GCS_TOOL_ROOT overrides the absolute tool/config root; default is
 ${XDG_CACHE_HOME:-$HOME/.cache}/sureal/gcs. Requires Linux x86_64 and a terminal.

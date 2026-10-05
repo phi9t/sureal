@@ -2,9 +2,9 @@ import hashlib,json
 from pathlib import Path
 import tempfile,unittest
 import numpy as np
-from test_scientific_sidecars import ScientificSidecarTests
-from pipeline.scientific_sidecars import materialize_component
-from pipeline.scientific_sidecar_validate import validate_component
+from dataset.scientific_sidecars_test import ScientificSidecarTests
+from dataset.scientific_sidecars import materialize_component
+from dataset.scientific_sidecar_validate import validate_component
 
 class ScientificSidecarValidationTests(unittest.TestCase):
     def test_all_rows_reconciled_and_semantic_mutations_rejected(self):

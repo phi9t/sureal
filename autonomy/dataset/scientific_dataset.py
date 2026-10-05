@@ -7,7 +7,8 @@ import re
 import tarfile
 import zipfile
 import numpy as np
-from .scene_archive_validate import validate_archive
+from evidence.source_snapshot import file_sha256, require_digest, require_regular_file
+from dataset.scene_archive_validate import validate_archive
 
 
 def iter_scene_records(archive, publication, *, expected_publication_sha256, usage,
@@ -19,13 +20,13 @@ def iter_scene_records(archive, publication, *, expected_publication_sha256, usa
     The archive is fully checked before any observation can reach a model.
     """
     archive, publication = Path(archive), Path(publication)
-    if (not isinstance(expected_publication_sha256,str)
-            or not re.fullmatch('[0-9a-f]{64}',expected_publication_sha256)
-            or type(max_record_bytes) is not int or max_record_bytes <= 0):
+    try:
+        require_digest(expected_publication_sha256);require_regular_file(publication)
+    except ValueError as error:
+        raise ValueError('verified publication identity and positive resident cap required') from error
+    if type(max_record_bytes) is not int or max_record_bytes <= 0:
         raise ValueError('verified publication identity and positive resident cap required')
-    if publication.is_symlink() or not publication.is_file():
-        raise ValueError('publication is not a regular file')
-    if hashlib.sha256(publication.read_bytes()).hexdigest()!=expected_publication_sha256:
+    if file_sha256(publication)!=expected_publication_sha256:
         raise ValueError('publication identity changed')
     pub=json.loads(publication.read_text())
     if pub['schema_version']!=1:raise ValueError('unsupported publication schema')

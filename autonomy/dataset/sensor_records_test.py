@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from pipeline.sensor_records import array_field, align_point_targets
+from dataset.sensor_records import array_field, align_point_targets
 
 class SensorRecordTests(unittest.TestCase):
     def test_shape_and_nullable_payload(self):
@@ -22,7 +22,7 @@ class SensorRecordTests(unittest.TestCase):
 
 class OrderedLookupTests(unittest.TestCase):
     def test_sparse_reuse_missing_and_backward_rejected(self):
-        from pipeline.sensor_records import OrderedLookup
+        from dataset.sensor_records import OrderedLookup
         lookup=OrderedLookup(iter([{'key.frame_timestamp_micros':2,'key.laser_name':1,'v':7}, {'key.frame_timestamp_micros':4,'key.laser_name':1,'v':9}]))
         self.assertIsNone(lookup.get((1,1)))
         self.assertEqual(lookup.get((2,1))['v'],7)

@@ -1,7 +1,7 @@
 """Remove only independently published decoded sidecar payloads."""
 import json,gzip,hashlib,os
 from pathlib import Path
-from pipeline.verified_eviction import digest
+from evidence.source_snapshot import file_sha256 as digest
 
 STAGES=['pack-live','hdfs-put','hdfs-download','independent-bundle-live','manifest-put-last','manifest-download']
 def evict_sidecars(processing,publication,*,expected_publication_sha256,expected_trusted_sha256,available_metadata_bytes):

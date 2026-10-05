@@ -1,5 +1,5 @@
 import unittest
-from pipeline.cohort_selection import select_cohorts
+from dataset.cohort_selection import select_cohorts
 
 class CohortTests(unittest.TestCase):
     def test_order_independent_whole_segments(self):

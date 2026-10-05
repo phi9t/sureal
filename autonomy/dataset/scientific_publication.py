@@ -5,13 +5,19 @@ externally supplied hashes. This contract assembles metadata; it performs no
 transfer and is not itself proof that HDFS contains the declared bytes.
 """
 import re
+from evidence.source_snapshot import require_digest
+
 COMPONENTS={'camera_box','camera_calibration','camera_hkp','camera_image','camera_segmentation','camera_to_lidar_box_association','lidar','lidar_box','lidar_calibration','lidar_camera_projection','lidar_camera_synced_box','lidar_hkp','lidar_pose','lidar_segmentation','projected_lidar_box','stats','vehicle_pose'}
 
 
 def publication_manifest(admitted,scene_receipt,archive,archive_validation,*,mirror_sha256,scene_receipt_sha256,hdfs_root):
     def require(condition,message):
         if not condition:raise ValueError(message)
-    def digest(value):return isinstance(value,str) and re.fullmatch('[0-9a-f]{64}',value) is not None
+    def digest(value):
+        try:
+            require_digest(value);return True
+        except ValueError:
+            return False
     scene=admitted['scene'];official=admitted['official_split'];splits=admitted['research_splits']
     require(isinstance(scene,str) and re.fullmatch('[A-Za-z0-9_]+',scene) is not None,'unsafe scene identity')
     legal={'train','development'} if official=='training' else {'validation','camera_validation'} if official=='validation' else set()

@@ -2,7 +2,7 @@
 import hashlib
 import json
 from pathlib import Path
-from .scientific_dataset import iter_scene_records
+from dataset.scientific_dataset import iter_scene_records
 from .semantic_support import semantic_support
 
 

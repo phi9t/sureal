@@ -1,7 +1,7 @@
 import hashlib,json,tarfile
 from pathlib import Path
 import tempfile,unittest
-from pipeline.scene_archive import create_scene_archive
+from dataset.scene_archive import create_scene_archive
 
 class SceneArchiveTests(unittest.TestCase):
     def fixture(self,root):

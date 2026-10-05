@@ -5,7 +5,7 @@ import unittest
 import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
-from pipeline.scientific_sidecars import materialize_component
+from dataset.scientific_sidecars import materialize_component
 
 
 class ScientificSidecarTests(unittest.TestCase):

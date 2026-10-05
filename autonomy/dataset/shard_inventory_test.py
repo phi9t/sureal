@@ -9,7 +9,7 @@ class ShardInventoryTests(unittest.TestCase):
             p=Path(tmp)/'input.parquet';out=Path(tmp)/'result.json'
             table=pa.table({'key.segment_context_name':[r[0] for r in rows],'key.frame_timestamp_micros':[r[1] for r in rows],'key.laser_name':[r[2] for r in rows]})
             pq.write_table(table,p)
-            run=subprocess.run([sys.executable,'-m','pipeline.shard_inventory',str(p),'scene',str(out)],capture_output=True,text=True)
+            run=subprocess.run([sys.executable,'-m','dataset.shard_inventory',str(p),'scene',str(out)],capture_output=True,text=True)
             return run.returncode,json.loads(out.read_text()) if out.exists() else None
 
     def test_native_rows_and_frame_membership_preserved(self):

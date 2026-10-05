@@ -1,7 +1,7 @@
 """Admit historical completed checkpoints against externally pinned identities."""
 import json
 from pathlib import Path
-from pipeline.cohort_checkpoint import digest, verify_checkpoint
+from dataset.cohort_checkpoint import digest, verify_checkpoint
 
 def verify_registered_checkpoint(path, *, scene, registry,
                                  expected_registry_sha256, **admission):

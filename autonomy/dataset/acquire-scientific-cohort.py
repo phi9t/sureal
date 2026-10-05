@@ -4,9 +4,10 @@ from datetime import datetime,timezone
 import base64,hashlib,json
 from pathlib import Path
 import subprocess,tempfile
+from evidence.source_snapshot import file_sha256
 from insula.staging_lease import staging_lease
 
-HERE=Path(__file__).resolve().parent
+HERE=Path(__file__).resolve().parents[1]
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
 RECORDS=CACHE/'scientific-source-audit'
 WAYSTONE='/data02/home/philip.yang/workspace/waystone/scripts/waystone'
@@ -23,8 +24,8 @@ def hashes(path):
     return sha.hexdigest(),base64.b64encode(md5.digest()).decode()
 
 def main():
-    manifest=json.loads((HERE/'scientific-acquisition.candidate.json').read_text());RECORDS.mkdir(exist_ok=True)
-    retained=sum(o['size_bytes'] for o in json.loads((HERE/'dataset.lock.json').read_text())['objects'])
+    manifest=json.loads((HERE/'dataset/scientific-acquisition.candidate.json').read_text());RECORDS.mkdir(exist_ok=True)
+    retained=sum(o['size_bytes'] for o in json.loads((HERE/'dataset/dataset.lock.json').read_text())['objects'])
     maximum=min(manifest['per_object_limit_bytes'],manifest['local_staging_limit_bytes']-retained)
     if maximum<=0:raise ValueError('no bounded raw staging capacity')
     for scene,group in manifest['scenes'].items():
@@ -34,11 +35,11 @@ def main():
             if record.exists():continue
             started=datetime.now(timezone.utc).isoformat()
             uri=f'gs://waymo_open_dataset_v_2_0_1/{official}/{component}/{scene}.parquet'
-            metadata=json.loads(call([str(HERE/'gcs.sh'),'--','storage','objects','describe',uri,'--format=json']))
+            metadata=json.loads(call([str(HERE/'dataset/gcs.sh'),'--','storage','objects','describe',uri,'--format=json']))
             if int(metadata['size'])>maximum:raise ValueError(f'{component}/{scene} exceeds remaining {maximum}-byte raw capacity; no scene dropped')
             with tempfile.TemporaryDirectory(dir=RECORDS,prefix='stage-') as tmp:
                 stage=Path(tmp);inputs=stage/'input';inputs.mkdir();out=stage/'outputs';out.mkdir();payload=inputs/'source.parquet'
-                call([str(HERE/'gcs.sh'),'--','storage','cp',metadata['storage_url'],str(payload)])
+                call([str(HERE/'dataset/gcs.sh'),'--','storage','cp',metadata['storage_url'],str(payload)])
                 sha,md5=hashes(payload)
                 if payload.stat().st_size!=int(metadata['size']) or md5!=metadata['md5_hash']:raise ValueError('source integrity')
                 target=manifest['hdfs_root']+f'/{official}/{component}/{scene}.parquet'
@@ -49,8 +50,8 @@ def main():
                 try:call([WAYSTONE,'get',target,str(payload)])
                 except RuntimeError as error:raise RuntimeError(transfer.stderr[-1000:]+'\n'+str(error))
                 if payload.stat().st_size!=int(metadata['size']) or hashes(payload)[0]!=sha:raise ValueError('HDFS download-back integrity; mirror not overwritten')
-                log=call([str(HERE/'enter.sh'),'--source',str(inputs),'--output',str(out),'--offline','--','python','-m','pipeline.shard_inventory','/source/source.parquet',scene,'/outputs/inventory.json'])
-                result={'scene':scene,'component':component,'official_split':official,'research_splits':group['research_splits'],'source_metadata':metadata,'sha256':sha,'hdfs_uri':target,'hdfs_roundtrip_sha256':sha,'inventory':json.loads((out/'inventory.json').read_text()),'live_log':log,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'inventory_code_sha256':hashlib.sha256((HERE/'pipeline/shard_inventory.py').read_bytes()).hexdigest(),'raw_peak_bytes_including_retained_engineering':retained+int(metadata['size'])}
+                log=call([str(HERE/'enter.sh'),'--source',str(inputs),'--output',str(out),'--offline','--','python','-m','dataset.shard_inventory','/source/source.parquet',scene,'/outputs/inventory.json'])
+                result={'scene':scene,'component':component,'official_split':official,'research_splits':group['research_splits'],'source_metadata':metadata,'sha256':sha,'hdfs_uri':target,'hdfs_roundtrip_sha256':sha,'inventory':json.loads((out/'inventory.json').read_text()),'live_log':log,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'inventory_code_sha256':file_sha256(HERE/'dataset/shard_inventory.py'),'raw_peak_bytes_including_retained_engineering':retained+int(metadata['size'])}
                 record.write_text(json.dumps(result,indent=2)+'\n')
             print('verified',official,component,scene,result['inventory']['rows'],flush=True)
 

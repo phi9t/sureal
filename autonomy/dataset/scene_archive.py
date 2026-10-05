@@ -1,9 +1,9 @@
 """Deterministic decoded-scene packaging with bounded local admission."""
-import hashlib
 import json
 from pathlib import Path
 import re
 import tarfile
+from evidence.source_snapshot import file_sha256, require_digest
 
 
 def create_scene_archive(points, archive, *, expected_report_sha256, sidecar_bytes, budget_bytes):
@@ -11,13 +11,11 @@ def create_scene_archive(points, archive, *, expected_report_sha256, sidecar_byt
     if (any(type(v) is not int or v < 0 for v in (sidecar_bytes,budget_bytes))
             or archive.exists() or points.resolve() in archive.resolve().parents):
         raise ValueError('invalid archive destination or derived budget')
-    if not isinstance(expected_report_sha256,str) or not re.fullmatch('[0-9a-f]{64}',expected_report_sha256):
+    try:
+        require_digest(expected_report_sha256)
+    except ValueError as error:
         raise ValueError('independent reconstruction manifest identity required')
-    def digest(path):
-        if path.is_symlink() or not path.is_file():
-            raise ValueError('scene member is not a regular file')
-        with path.open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
-    if digest(points/'report.json') != expected_report_sha256:
+    if file_sha256(points/'report.json') != expected_report_sha256:
         raise ValueError('reconstruction manifest changed')
     report = json.loads((points/'report.json').read_text()); expected = {'report.json':expected_report_sha256}
     for row in report['rows']:
@@ -33,7 +31,7 @@ def create_scene_archive(points, archive, *, expected_report_sha256, sidecar_byt
     names = ['report.json'] + sorted(set(expected)-{'report.json'})
     sizes = {}
     for name in names:
-        if digest(points/name) != expected[name]:raise ValueError('scene member changed')
+        if file_sha256(points/name) != expected[name]:raise ValueError('scene member changed')
         sizes[name] = (points/name).stat().st_size
     logical = sum(512+((size+511)//512)*512 for size in sizes.values())+1024
     archive_bytes = ((logical+10239)//10240)*10240
@@ -48,5 +46,5 @@ def create_scene_archive(points, archive, *, expected_report_sha256, sidecar_byt
                 with (points/name).open('rb') as source:tar.addfile(header,source)
     if archive.stat().st_size != archive_bytes:
         raise ValueError('archive byte accounting differs')
-    return {'sha256':digest(archive),'archive_bytes':archive_bytes,
+    return {'sha256':file_sha256(archive),'archive_bytes':archive_bytes,
             'members':len(names),'working_set_bytes':working,'report_sha256':expected_report_sha256}

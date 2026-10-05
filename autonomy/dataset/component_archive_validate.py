@@ -1,12 +1,16 @@
 """Independent streaming component bundle verification; never extracts paths."""
 import hashlib,json,re,tarfile
 from pathlib import Path
+from evidence.source_snapshot import file_sha256, require_digest, require_regular_file
 
 
 def validate_component_archive(archive,*,expected_archive_sha256,expected_manifest_sha256):
     archive=Path(archive)
-    if archive.is_symlink() or not archive.is_file() or any(not isinstance(v,str) or not re.fullmatch('[0-9a-f]{64}',v) for v in (expected_archive_sha256,expected_manifest_sha256)):raise ValueError('verified regular bundle identity required')
-    with archive.open('rb') as f:actual=hashlib.file_digest(f,'sha256').hexdigest()
+    try:
+        require_regular_file(archive);require_digest(expected_archive_sha256);require_digest(expected_manifest_sha256)
+    except ValueError as error:
+        raise ValueError('verified regular bundle identity required') from error
+    actual=file_sha256(archive)
     if actual!=expected_archive_sha256:raise ValueError('component archive digest differs')
     manifest=None;seen=set()
     with tarfile.open(archive,'r|') as tar:

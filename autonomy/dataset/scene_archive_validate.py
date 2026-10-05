@@ -4,17 +4,16 @@ import json
 from pathlib import Path
 import re
 import tarfile
+from evidence.source_snapshot import file_sha256, require_digest, require_regular_file
 
 
 def validate_archive(archive, *, expected_report_sha256, expected_archive_sha256):
     archive=Path(archive)
-    for digest in (expected_report_sha256,expected_archive_sha256):
-        if not isinstance(digest,str) or not re.fullmatch('[0-9a-f]{64}',digest):
-            raise ValueError('independent archive/manifest identities required')
-    if archive.is_symlink() or not archive.is_file():
-        raise ValueError('archive is not a regular non-symlink source')
-    with archive.open('rb') as source:
-        actual=hashlib.file_digest(source,'sha256').hexdigest()
+    try:
+        require_digest(expected_report_sha256);require_digest(expected_archive_sha256);require_regular_file(archive)
+    except ValueError as error:
+        raise ValueError('independent archive/manifest identities required') from error
+    actual=file_sha256(archive)
     if actual != expected_archive_sha256:raise ValueError('archive digest differs')
     seen=set();expected=None;size=archive.stat().st_size;payload_bytes=0
     with tarfile.open(archive,'r|') as tar:

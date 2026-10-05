@@ -6,7 +6,7 @@ umask 077
 
 usage() {
     cat <<'EOF'
-Usage: gcs.sh install|auth|check|-- GCLOUD_ARGUMENTS...
+Usage: dataset/gcs.sh install|auth|check|-- GCLOUD_ARGUMENTS...
 
   install  Download, SHA-256 verify, and stage the pinned CLI and bundled Python
   auth     Interactive Google login using a browser on another machine

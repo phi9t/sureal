@@ -1,7 +1,7 @@
 import base64,hashlib,json,sys
 from pathlib import Path
 import tempfile,unittest
-from pipeline.staged_source import staged_source
+from dataset.staged_source import staged_source
 
 class StagedSourceTests(unittest.TestCase):
     def fixture(self,root,*,corrupt=False,oversize=False):

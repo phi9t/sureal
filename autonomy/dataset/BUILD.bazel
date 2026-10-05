@@ -1,0 +1,84 @@
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+
+LIB_MODULES = glob(
+    ["*.py"],
+    exclude = [
+        "*-*.py",
+        "*_test.py",
+    ],
+)
+
+TEST_MODULES = glob(["*_test.py"])
+
+COMMAND_SCRIPTS = glob(["*-*.py"])
+
+DATA_FILES = glob([
+    "*.json",
+    "*.sh",
+])
+
+DATASET_VISIBILITY = [
+    "//autonomy:__pkg__",
+]
+
+TEST_EXTRA_SRCS = {
+    "scientific_component_test.py": ["scientific_sidecars_test.py"],
+    "scientific_sidecar_reader_test.py": ["scientific_sidecars_test.py"],
+    "scientific_sidecar_validate_test.py": ["scientific_sidecars_test.py"],
+}
+
+package(default_visibility = ["//visibility:private"])
+
+py_library(
+    name = "dataset",
+    srcs = LIB_MODULES,
+    imports = [".."],
+    visibility = DATASET_VISIBILITY,
+    deps = [
+        "//autonomy/evidence:evidence",
+        "//autonomy/insula:insula",
+    ],
+)
+
+filegroup(
+    name = "commands",
+    srcs = COMMAND_SCRIPTS + DATA_FILES,
+    visibility = DATASET_VISIBILITY,
+)
+
+filegroup(
+    name = "all_py",
+    srcs = glob(["*.py"]),
+    visibility = ["//autonomy:__pkg__"],
+)
+
+filegroup(
+    name = "runfiles",
+    srcs = COMMAND_SCRIPTS + DATA_FILES,
+    visibility = DATASET_VISIBILITY,
+)
+
+filegroup(
+    name = "tests",
+    srcs = TEST_MODULES,
+)
+
+[
+    py_test(
+        name = test[:-3],
+        srcs = [test] + TEST_EXTRA_SRCS.get(test, []),
+        data = [":runfiles"],
+        deps = [":dataset"],
+        imports = [".."],
+        legacy_create_init = 0,
+        size = "small",
+        tags = ["perception_unit"],
+    )
+    for test in TEST_MODULES
+]
+
+test_suite(
+    name = "all_tests",
+    tests = [test[:-3] for test in TEST_MODULES],
+    visibility = ["//autonomy:__pkg__"],
+)

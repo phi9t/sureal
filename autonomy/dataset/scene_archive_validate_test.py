@@ -1,7 +1,7 @@
 import hashlib,io,json,tarfile
 from pathlib import Path
 import tempfile,unittest
-from pipeline.scene_archive_validate import validate_archive
+from dataset.scene_archive_validate import validate_archive
 
 class ArchiveValidationTests(unittest.TestCase):
     def make_archive(self,root,mutation):

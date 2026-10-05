@@ -1,6 +1,6 @@
 import hashlib,json,tempfile,unittest
 from pathlib import Path
-from pipeline.cohort_checkpoint import verify_checkpoint
+from dataset.cohort_checkpoint import verify_checkpoint
 class CohortCheckpointTests(unittest.TestCase):
  def fixture(self,root):
   code=root/'code';code.mkdir();worker=code/'worker.py';worker.write_text('pass\n');base=root/'scene';base.mkdir();receipt=base/'worker-receipt.json';lock={'rootfs_sha256':'locked'}
@@ -11,7 +11,7 @@ class CohortCheckpointTests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as tmp:
    p,code,lock,h,_=self.fixture(Path(tmp));r=verify_checkpoint(p,expected_checkpoint_sha256=h,code_root=code,expected_runtime_lock=lock,expected_manifest_sha256='manifest',expected_source_hashes={'camera_image':'source'});self.assertEqual(r['scene'],'scene')
  def test_external_registry_required_and_historical_driver_preserved(self):
-  from pipeline.cohort_resume import verify_registered_checkpoint
+  from dataset.cohort_resume import verify_registered_checkpoint
   with tempfile.TemporaryDirectory() as tmp:
    p,code,lock,h,_=self.fixture(Path(tmp));registry=Path(tmp)/'trusted.json';registry.write_text(json.dumps({'scene':h}));rh=hashlib.sha256(registry.read_bytes()).hexdigest()
    kwargs=dict(code_root=code,expected_runtime_lock=lock,expected_manifest_sha256='manifest',expected_source_hashes={'camera_image':'source'})

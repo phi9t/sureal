@@ -1,7 +1,7 @@
 import hashlib,json,tempfile,unittest
 from pathlib import Path
-from pipeline.component_archive import create_component_archive
-from pipeline.component_archive_validate import validate_component_archive
+from dataset.component_archive import create_component_archive
+from dataset.component_archive_validate import validate_component_archive
 
 class ComponentArchiveTests(unittest.TestCase):
     def fixture(self,root):

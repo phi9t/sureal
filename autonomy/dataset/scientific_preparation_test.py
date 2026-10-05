@@ -1,6 +1,6 @@
 import hashlib,json,tempfile,unittest
 from pathlib import Path
-from pipeline.scientific_preparation import verified_sidecar_hashes
+from dataset.scientific_preparation import verified_sidecar_hashes
 
 class ScientificPreparationTests(unittest.TestCase):
     def fixture(self,root):

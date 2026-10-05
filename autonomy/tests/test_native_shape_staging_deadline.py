@@ -1,6 +1,6 @@
 import base64,hashlib,json,sys,tempfile,time,unittest
 from pathlib import Path
-from pipeline.staged_source import staged_source
+from dataset.staged_source import staged_source
 from insula.staging_lease import staging_lease
 class StagingDeadlineTests(unittest.TestCase):
  def record(self,data):

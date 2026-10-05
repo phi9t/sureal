@@ -14,6 +14,7 @@ package(default_visibility = ["//visibility:private"])
 filegroup(
     name = "sustained-run-sources",
     srcs = glob(SUSTAINED_RUN_SOURCE_GLOBS, exclude = ["**/__pycache__/**"]) + [
+        "//autonomy/dataset:all_py",
         "//autonomy/evidence:all_py",
         "//autonomy/insula:all_py",
     ],
@@ -56,6 +57,7 @@ PERCEPTION_TEST_MODULES = glob(
         "**/*_test.py",
     ],
     exclude = [
+        "dataset/**",
         "research/**",
         "source_snapshot_targets_test.py",
     ],
@@ -64,14 +66,17 @@ PERCEPTION_TEST_MODULES = glob(
 PERCEPTION_RUNFILES = glob(
     ["**"],
     exclude = [
+        "dataset/**",
         "research/**",
         "**/__pycache__/**",
     ],
 ) + [
+    "//autonomy/dataset:runfiles",
     "research/association41-runtime-admission-20261003a/manifest.json",
 ]
 
 PERCEPTION_DEPS = [
+    "//autonomy/dataset:dataset",
     "//autonomy/evidence:evidence",
     "//autonomy/insula:insula",
 ]
@@ -97,6 +102,7 @@ filegroup(
         "//autonomy/insula:all_py",
     ] + glob([
         "architecture/harness/*.py",
+        "dataset/*.py",
         "gpu/*.py",
         "pipeline/*.py",
     ]) + ARCHITECTURE_EXPERIMENT_RESEARCH_INPUTS,
@@ -162,6 +168,6 @@ test_suite(
     name = "perception_unit_tests",
     tests = [":source_snapshot_targets_test"]
         + [":" + perception_test_name(src) for src in PERCEPTION_TEST_MODULES]
-        + ["//autonomy/evidence:all_tests", "//autonomy/insula:all_tests"],
+        + ["//autonomy/dataset:all_tests", "//autonomy/evidence:all_tests", "//autonomy/insula:all_tests"],
     visibility = ["//visibility:public"],
 )

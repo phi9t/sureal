@@ -1,6 +1,7 @@
 """Admit geometry sidecars from successful, fully rehashed independent receipts."""
-import hashlib,json
+import json
 from pathlib import Path
+from evidence.source_snapshot import file_sha256
 
 
 def verified_sidecar_hashes(destination,components,scene,candidate_hashes):
@@ -17,7 +18,7 @@ def verified_sidecar_hashes(destination,components,scene,candidate_hashes):
         for name,expected in artifacts.items():
             relative=Path(name)
             if relative.is_absolute() or '..' in relative.parts:raise ValueError('unsafe evidence path')
-            with (root/relative).open('rb') as f:actual=hashlib.file_digest(f,'sha256').hexdigest()
+            actual=file_sha256(root/relative)
             if actual!=expected:raise ValueError('component evidence changed')
         m=json.loads((root/manifest_name).read_text());check=json.loads((root/check_name).read_text())
         if check!=receipt['validation'] or check['status']!='all native identities, scalars and shaped arrays reconciled':raise ValueError('independent validation differs')

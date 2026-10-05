@@ -1,11 +1,8 @@
 """Independently audit trusted retained lifecycle evidence after explicit eviction."""
-import hashlib,json
+import json
 from pathlib import Path
+from evidence.source_snapshot import file_sha256 as digest
 
-def digest(p):
- p=Path(p)
- if p.is_symlink() or not p.is_file():raise ValueError('regular retained artifact required')
- with p.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
 def verify_checkpoint(path,*,expected_checkpoint_sha256,code_root,expected_runtime_lock,expected_manifest_sha256,expected_source_hashes,path_remap=None):
  path=Path(path);code_root=Path(code_root)
  def relocated(name):

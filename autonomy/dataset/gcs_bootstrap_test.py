@@ -21,7 +21,7 @@ class BootstrapTests(unittest.TestCase):
     def test_help_does_not_create_cache_or_auth_state(self):
         with tempfile.TemporaryDirectory() as tmp:
             cache = Path(tmp) / "absent"
-            for script in ["gcs.sh", "setup-gcs.sh"]:
+            for script in ["dataset/gcs.sh", "dataset/setup-gcs.sh"]:
                 result = self.run_script(script, ["--help"], cache)
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertIn("GCS_TOOL_ROOT", result.stdout)
@@ -30,7 +30,7 @@ class BootstrapTests(unittest.TestCase):
     def test_auth_requires_interactive_input_before_installing(self):
         with tempfile.TemporaryDirectory() as tmp:
             cache = Path(tmp) / "absent"
-            result = self.run_script("gcs.sh", ["auth"], cache)
+            result = self.run_script("dataset/gcs.sh", ["auth"], cache)
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("terminal", result.stderr)
             self.assertFalse(cache.exists())
@@ -38,7 +38,7 @@ class BootstrapTests(unittest.TestCase):
     def test_wizard_rejects_piped_input_before_installing(self):
         with tempfile.TemporaryDirectory() as tmp:
             cache = Path(tmp) / "absent"
-            result = self.run_script("setup-gcs.sh", [], cache)
+            result = self.run_script("dataset/setup-gcs.sh", [], cache)
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("terminal", result.stderr)
             self.assertFalse(cache.exists())
@@ -50,7 +50,7 @@ class BootstrapTests(unittest.TestCase):
             downloads.mkdir(parents=True)
             archive = downloads / "google-cloud-cli-587.0.0-linux-x86_64.tar.gz"
             archive.write_bytes(b"corrupt archive")
-            result = self.run_script("gcs.sh", ["install"], cache)
+            result = self.run_script("dataset/gcs.sh", ["install"], cache)
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("checksum", result.stderr.lower())
             self.assertFalse((cache / "sdk" / "587.0.0").exists())
@@ -75,7 +75,7 @@ class BootstrapTests(unittest.TestCase):
             )
             cli.chmod(0o755)
             result = self.run_script(
-                "gcs.sh", ["--", "storage", "ls", "gs://one object/"], cache,
+                "dataset/gcs.sh", ["--", "storage", "ls", "gs://one object/"], cache,
                 CLOUDSDK_CONFIG="/wrong/config", PYTHONPATH="/injected",
                 GOOGLE_APPLICATION_CREDENTIALS="/wrong/credentials",
                 CLOUDSDK_PYTHON_SITEPACKAGES="1", VIRTUAL_ENV="/wrong/venv",

@@ -5,8 +5,8 @@ import re
 import resource
 import subprocess
 import tempfile
-from .scientific_admission import check_raw_capacity
-from evidence.source_integrity import verify_source
+from dataset.scientific_admission import check_raw_capacity
+from dataset.source_integrity import verify_source
 from insula.staging_lease import staging_lease
 
 WAYSTONE='/data02/home/philip.yang/workspace/waystone/scripts/waystone'

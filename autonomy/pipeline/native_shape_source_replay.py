@@ -11,7 +11,7 @@ import sys
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
 from insula.staging_lease import staging_lease
-from .staged_source import staged_source
+from dataset.staged_source import staged_source
 
 
 def sha(path):
@@ -46,7 +46,7 @@ def replay_shape_source(job_path,source_receipt,*,expected_job_sha256,
         names=['native_shape_source_replay.py','native_shape_transfer.py',
                'native_range_shape_worker.py','native_range_shape_file.py',
                'native_range_shapes.py','native_range_shape_reference.py',
-               'staged_source.py','evidence/source_integrity.py','insula/staging_lease.py',
+               'staged_source.py','dataset/source_integrity.py','insula/staging_lease.py',
                'insula/entry.py','insula/runtime_identity.py']
         pins={n:sha(code_root/n if '/' in n else code_root/'pipeline'/n) for n in names}
         transfer_prefix=transfer_command if transfer_command is not None else [

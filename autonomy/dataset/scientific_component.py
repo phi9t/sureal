@@ -2,8 +2,8 @@
 import json
 from pathlib import Path
 import sys
-from .scientific_sidecars import materialize_component
-from .scientific_sidecar_validate import validate_component
+from dataset.scientific_sidecars import materialize_component
+from dataset.scientific_sidecar_validate import validate_component
 
 
 def main():

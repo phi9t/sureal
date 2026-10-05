@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
 """Publish verified decoded components without retaining complete scenes locally."""
-import argparse,hashlib,json,subprocess,time,resource
+import argparse,json,subprocess,time,resource
 from pathlib import Path
 from datetime import datetime,timezone
+from evidence.source_snapshot import file_sha256 as sha
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
-HERE=Path(__file__).resolve().parent
+HERE=Path(__file__).resolve().parents[1]
 WAYSTONE='/data02/home/philip.yang/workspace/waystone/scripts/waystone'
 COMPONENTS=['lidar_calibration','camera_calibration','vehicle_pose','lidar_pose','lidar_camera_projection','lidar_segmentation','lidar_box']
-
-def sha(p):
-    with p.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
-
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('processing',type=Path);parser.add_argument('output',type=Path);parser.add_argument('--expected-scene-receipt-sha256',required=True);args=parser.parse_args()
     processing=args.processing.resolve();base=args.output.resolve();scene_receipt=processing/'evidence/reconstruction/receipt.json'
@@ -40,7 +37,7 @@ def main():
     preflight_peak=aggregate_bytes()+exact_archive_bytes+64*1024
     if preflight_peak>=15*1024**3:raise ValueError('bounded packing metadata reserve cannot fit aggregate cap')
     trusted_input_sha256=sha(inputs/'trusted.json')
-    names=['publish-scientific-sidecars-bounded.py','pipeline/component_archive.py','pipeline/component_archive_validate.py'];candidates={n:sha(HERE/n) for n in names};checks=[];started=datetime.now(timezone.utc).isoformat();tick=time.monotonic()
+    names=['dataset/publish-scientific-sidecars-bounded.py','dataset/component_archive.py','dataset/component_archive_validate.py'];candidates={n:sha(HERE/n) for n in names};checks=[];started=datetime.now(timezone.utc).isoformat();tick=time.monotonic()
     def call(stage,command):
         t=time.monotonic();r=subprocess.run(command,capture_output=True,text=True);log_data=(r.stdout+r.stderr).encode();(base/(stage+'.log')).write_bytes(log_data[:4096]);
         if len(log_data)>4096:raise ValueError('bounded stage log exceeds 4096 bytes')
@@ -48,17 +45,17 @@ def main():
         if r.returncode:raise RuntimeError(r.stderr)
         print('PASS',stage,flush=True)
     sidecar_bytes=sum(p.stat().st_size for p in (processing/'sidecars').rglob('*') if p.is_file());processing_bytes=sum(p.stat().st_size for p in processing.rglob('*') if p.is_file());other=processing_bytes-sidecar_bytes+sum(p.stat().st_size for p in base.rglob('*') if p.is_file())
-    code="import json; from pathlib import Path; from pipeline.component_archive import create_component_archive; d=json.loads(Path('/mnt/trusted.json').read_text()); r=create_component_archive('/source/sidecars','/outputs/sidecars.tar',expected_files=d['files'],provenance=d['provenance'],other_bytes="+str(other)+",budget_bytes=15*1024**3); Path('/outputs/archive.json').write_text(json.dumps(r)); print('PASS native decoded bundle',r['files'],r['archive_bytes'])"
+    code="import json; from pathlib import Path; from dataset.component_archive import create_component_archive; d=json.loads(Path('/mnt/trusted.json').read_text()); r=create_component_archive('/source/sidecars','/outputs/sidecars.tar',expected_files=d['files'],provenance=d['provenance'],other_bytes="+str(other)+",budget_bytes=15*1024**3); Path('/outputs/archive.json').write_text(json.dumps(r)); print('PASS native decoded bundle',r['files'],r['archive_bytes'])"
     plan=launch_plan(root,HERE,processing,packed,['python','-c',code]);i=plan.index('--');plan[i:i]=['--ro-bind',str(inputs),'/mnt'];call('pack-live',plan)
     if aggregate_bytes()>15*1024**3:raise ValueError('aggregate packing cap exceeded')
     if sha(inputs/'trusted.json')!=trusted_input_sha256:raise ValueError('temporary trusted input changed')
     if json.loads((packed/'archive.json').read_text())['archive_bytes']!=exact_archive_bytes:raise ValueError('exact archive preflight differs')
     (inputs/'trusted.json').unlink()
     if aggregate_bytes()+1024**2>=15*1024**3:raise ValueError('post-pack receipt reserve cannot fit aggregate cap')
-    meta=json.loads((packed/'archive.json').read_text());archive=packed/'sidecars.tar';target=json.loads((HERE/'dataset.lock.json').read_text())['hdfs_root']+'/derived/component-bundles-v1/scientific/'+scene+'/'+meta['sha256']+'.tar'
+    meta=json.loads((packed/'archive.json').read_text());archive=packed/'sidecars.tar';target=json.loads((HERE/'dataset/dataset.lock.json').read_text())['hdfs_root']+'/derived/component-bundles-v1/scientific/'+scene+'/'+meta['sha256']+'.tar'
     call('hdfs-put',[WAYSTONE,'put','--mkdir-parents',str(archive),target]);archive.unlink();call('hdfs-download',[WAYSTONE,'get',target,str(archive)])
     if sha(archive)!=meta['sha256']:raise ValueError('sidecar mirror differs')
-    code="import json; from pathlib import Path; from pipeline.component_archive_validate import validate_component_archive; r=validate_component_archive('/source/sidecars.tar',expected_archive_sha256="+repr(meta['sha256'])+",expected_manifest_sha256="+repr(meta['manifest_sha256'])+"); Path('/outputs/bundle-check.json').write_text(json.dumps(r)); print('PASS independent native sidecar bundle',r['files'])"
+    code="import json; from pathlib import Path; from dataset.component_archive_validate import validate_component_archive; r=validate_component_archive('/source/sidecars.tar',expected_archive_sha256="+repr(meta['sha256'])+",expected_manifest_sha256="+repr(meta['manifest_sha256'])+"); Path('/outputs/bundle-check.json').write_text(json.dumps(r)); print('PASS independent native sidecar bundle',r['files'])"
     call('independent-bundle-live',launch_plan(root,HERE,packed,checked,['python','-c',code]));validation=json.loads((checked/'bundle-check.json').read_text())
     if validation['provenance']!=provenance or validation['files']!=len(expected):raise ValueError('bundle source lineage differs')
     publication={'schema_version':1,'role':'scientific-decoded-components','scene':scene,'official_split':native['official_split'],'research_splits':native['research_splits'],'archive_hdfs_uri':target,'archive':meta,'provenance':provenance}

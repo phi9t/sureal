@@ -1,11 +1,7 @@
 """Evict only mirrored/replayed decoded point bytes, preserving recovery evidence."""
-import hashlib,json
+import json
 from pathlib import Path
-
-
-def digest(path):
-    if path.is_symlink() or not path.is_file():raise ValueError('regular cache artifact required')
-    with path.open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+from evidence.source_snapshot import file_sha256 as digest
 
 
 def evict_points(processing,publication,replay,*,expected_publication_sha256,expected_replay_sha256):

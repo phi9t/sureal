@@ -2,8 +2,8 @@ import hashlib,json
 from pathlib import Path
 import tempfile,unittest
 import numpy as np
-from pipeline.scene_archive import create_scene_archive
-from pipeline.scientific_dataset import iter_scene_records
+from dataset.scene_archive import create_scene_archive
+from dataset.scientific_dataset import iter_scene_records
 
 class ScientificDatasetTests(unittest.TestCase):
     def fixture(self,root,*,missing=False,bad_shape=False,projection_float=False,projection_fraction=False,instance_id=999,semantic_id=2):

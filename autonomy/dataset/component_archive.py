@@ -1,6 +1,7 @@
 """Deterministic decoded component bundle with externally verified file identities."""
 import hashlib,io,json,re,tarfile
 from pathlib import Path
+from evidence.source_snapshot import file_sha256, require_regular_file
 
 
 def create_component_archive(source,archive,*,expected_files,provenance,other_bytes,budget_bytes):
@@ -13,8 +14,8 @@ def create_component_archive(source,archive,*,expected_files,provenance,other_by
         parts=name.split('/')
         if len(parts)!=2 or any(p in ('','.', '..') for p in parts) or len(name.encode())>100 or name.startswith('/') or not re.fullmatch('[0-9a-f]{64}',expected):raise ValueError('unsafe bundle member')
         p=source/name
-        if p.is_symlink() or not p.is_file():raise ValueError('regular decoded member required')
-        with p.open('rb') as f:actual=hashlib.file_digest(f,'sha256').hexdigest()
+        require_regular_file(p)
+        actual=file_sha256(p)
         if actual!=expected:raise ValueError('decoded component changed')
         sizes[name]=p.stat().st_size
     manifest={'schema_version':1,'provenance':provenance,'files':{n:{'sha256':expected_files[n],'size_bytes':sizes[n]} for n in sorted(sizes)}}
@@ -31,5 +32,5 @@ def create_component_archive(source,archive,*,expected_files,provenance,other_by
             for name in sorted(sizes):
                 with (source/name).open('rb') as stream:tar.addfile(header(name,sizes[name]),stream)
     if archive.stat().st_size!=archive_bytes:raise ValueError('bundle byte accounting differs')
-    with archive.open('rb') as f:digest=hashlib.file_digest(f,'sha256').hexdigest()
+    digest=file_sha256(archive)
     return {'sha256':digest,'manifest_sha256':hashlib.sha256(data).hexdigest(),'archive_bytes':archive_bytes,'files':len(sizes),'working_set_bytes':working}

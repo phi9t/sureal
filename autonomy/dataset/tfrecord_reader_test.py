@@ -3,7 +3,7 @@ import hashlib
 import io
 import struct
 import unittest
-from pipeline.tfrecord_reader import crc32c, masked_crc32c, read_records
+from dataset.tfrecord_reader import crc32c, masked_crc32c, read_records
 
 
 def fixture_crc(data):

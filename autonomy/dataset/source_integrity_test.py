@@ -3,7 +3,7 @@ import hashlib
 from pathlib import Path
 import tempfile
 import unittest
-from evidence.source_integrity import verify_source
+from dataset.source_integrity import verify_source
 
 
 class SourceIntegrityTests(unittest.TestCase):
