@@ -1,14 +1,20 @@
 """Named, immutable architecture runs using the admitted live Insula harness."""
-import argparse,datetime,fcntl,hashlib,json,os,re,shutil,signal,subprocess,sys,uuid
+import argparse,datetime,fcntl,hashlib,io,json,os,re,shutil,signal,subprocess,sys,tarfile,uuid
 from pathlib import Path
 
 HERE=Path(__file__).resolve().parent
 PACKAGE=HERE.parent
 REPO=PACKAGE.parent
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
+sys.path.insert(0,str(PACKAGE))
+from evidence.source_snapshot import LocalSnapshotStore,safe_member_name,snapshot_bazel_target,verify_receipt_sources
+
+ARCHITECTURE_SOURCE_SNAPSHOT_TARGET='//autonomy:architecture_experiment_runner_snapshot'
+ARCHITECTURE_STUDY_SPEC_SHA256='fef072b2737a4fda94a029944fb999d78be482669b1cd989af953d93b5e7ecf1'
+SOURCE_SNAPSHOT_STORE_RELATIVE=Path('insula/source-snapshots-v1')
 
 def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
-def registry():return json.loads((HERE/'registry.json').read_text())
+def registry(here=None):return json.loads(((HERE if here is None else Path(here))/'registry.json').read_text())
 def run_label(name,run_id):
  if name not in registry():raise ValueError('Unknown experiment: '+name)
  if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]{0,63}',run_id):raise ValueError('Run ID must be1–64 letters/digits/underscore/hyphen, starting with a letter or digit')
@@ -50,15 +56,16 @@ def stages_for(name):
   {'name':'score','driver':'score-'+family+'-score-first.py','receipt':'score-first'},
   {'name':'score_audit','driver':'audit-'+family+'-score-first.py','receipt':'score-first-audits'}]
 
-def check_harness_closure():
- files=json.loads((HERE/'harness/files.json').read_text());available=set(files)
+def check_harness_closure(here=None,package=None):
+ here=HERE if here is None else Path(here);package=PACKAGE if package is None else Path(package)
+ files=json.loads((here/'harness/files.json').read_text());available=set(files)
  for name in files:
-  p=HERE/'harness'/name
+  p=here/'harness'/name
   if not p.is_file():raise ValueError('Missing bundled harness file: '+name)
   for referenced in re.findall(r"['\"]([a-zA-Z0-9_-]+\.py)['\"]",p.read_text()):
-   if referenced not in available and not (PACKAGE/'gpu'/referenced).exists():
+   if referenced not in available and not (package/'gpu'/referenced).exists():
     raise ValueError(f'{name} references unbundled worker {referenced}')
- for name,item in registry().items():
+ for name,item in registry(here).items():
   if item['status']=='runnable':
    for stage in stages_for(name):
     if stage['driver'] not in available:raise ValueError('Unbundled driver '+stage['driver'])
@@ -69,6 +76,7 @@ def parameterize_driver(source):
  source=source.replace("variant=sys.argv[1];", "variant=sys.argv[1];run_label=variant+'--'+os.environ['WAYMO_ARCH_RUN_ID'];")
  source=source.replace("'+variant+'", "'+run_label+'")
  source=source.replace("'architecture_variant':variant", "'run_label':run_label,'architecture_variant':variant")
+ source=source.replace("sha(Path('docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md'))", repr(ARCHITECTURE_STUDY_SPEC_SHA256))
  source=source.replace("cache=Path.home()/'.cache/waystone/waymo-perception'", "cache=Path(os.environ['WAYMO_ARCH_CACHE_ROOT'])")
  # Rebind the frozen source package and /outputs by mount target, not an old checkout/cache pathname.
  source=source.replace("separator=command.index('--');command[separator:separator]=['--setenv'", "command[command.index('/experiment')-1]=str(code)\ncommand[command.index('/outputs')-1]=str(output)\nseparator=command.index('--');command[separator:separator]=['--setenv'")
@@ -77,7 +85,10 @@ def parameterize_driver(source):
   source=source.replace("pins={", "command[command.index('/experiment')-1]=str(code)\ncommand[command.index('/outputs')-1]=str(output)\npins={",1)
  return source
 
-def verify_receipt(receipt,package):
+def verify_receipt(receipt,package,snapshot_store=None):
+ if snapshot_store is not None or 'source_snapshot_sha256' in receipt:
+  if snapshot_store is None:raise ValueError('Snapshot store required for source-pinned receipt')
+  verify_receipt_sources(receipt,snapshot_store)
  def check(path,digest):
   p=Path(path)
   if not p.is_file() or sha(p)!=digest:raise ValueError('Missing or changed evidence: '+str(p))
@@ -132,45 +143,82 @@ def preflight(cache,name):
 def atomic_json(path,value):
  tmp=path.with_suffix(path.suffix+'.tmp');tmp.write_text(json.dumps(value,indent=2)+'\n');tmp.replace(path)
 
-def make_snapshot(directory,name,run_id,cache):
- source=directory/'source';package=source/'autonomy';package.mkdir(parents=True)
- for folder in ['pipeline','gpu','research']:
-  shutil.copytree(PACKAGE/folder,package/folder,ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
- docs=source/'docs/superpowers/specs';docs.mkdir(parents=True)
- shutil.copyfile(REPO/'docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md',docs/'2026-10-02-perception-architecture-study-design.md')
+def source_snapshot_store(cache):
+ return LocalSnapshotStore(Path(cache)/SOURCE_SNAPSHOT_STORE_RELATIVE)
+
+def materialize_source_snapshot(store,digest,destination):
+ destination=Path(destination)
+ if destination.exists():raise ValueError('Run source directory already exists: '+str(destination))
+ destination.mkdir(parents=True)
+ archive=store.fetch(digest)
+ seen=set()
+ try:
+  with tarfile.open(fileobj=io.BytesIO(archive),mode='r:') as reader:
+   for member in reader:
+    name=safe_member_name(member.name)
+    if name in seen or not member.isfile() or member.linkname:raise ValueError('snapshot contains duplicate or nonregular member')
+    seen.add(name);stream=reader.extractfile(member)
+    if stream is None:raise ValueError('snapshot contains unreadable member')
+    path=destination/name;path.parent.mkdir(parents=True,exist_ok=True)
+    with path.open('wb') as output:shutil.copyfileobj(stream,output)
+ except (tarfile.TarError,OSError,EOFError) as error:
+  raise ValueError('invalid source snapshot') from error
+ if not seen:raise ValueError('source snapshot contains no files')
+
+def prepare_harness_workspace(source,name,run_id):
+ package=source/'autonomy';here=package/'architecture'
  workers=source/'.scratch';workers.mkdir()
- for filename in check_harness_closure():
-  text=(HERE/'harness'/filename).read_text()
-  if filename.startswith(('run-','audit-','score-')) and 'variant=sys.argv[1]' in text or 'label=sys.argv[1]' in text:
+ for filename in check_harness_closure(here,package):
+  text=(here/'harness'/filename).read_text()
+  if (filename.startswith(('run-','audit-','score-')) and 'variant=sys.argv[1]' in text) or 'label=sys.argv[1]' in text:
    text=parameterize_driver(text)
   for worker in ['audit-architecture-learning-curve.py','audit-architecture-score-first-proposals.py','audit-architecture-score-first-native-metrics.py']:
    if filename==worker:text=text.replace("r['manifest']['architecture_variant']", "r['manifest'].get('run_label',r['manifest']['architecture_variant'])")
   (workers/filename).write_text(text)
  for stage in stages_for(name):
   if stage.get('contract'):receipt_path(package,stage,run_label(name,run_id)).unlink(missing_ok=True)
- pins={str(p.relative_to(source)):sha(p) for p in source.rglob('*') if p.is_file()}
- if sum(p.stat().st_size for p in source.rglob('*') if p.is_file())>64*1024**2:raise ValueError('Source snapshot exceeds64MiB budget')
- atomic_json(directory/'run.json',{'experiment':name,'run_id':run_id,'label':run_label(name,run_id),'cache_root':str(cache),'source_sha256':pins,'stages':stages_for(name),'scope':'fixed training-batch diagnostic, no whole-model/heldout acceptance'})
+ return package
+
+def snapshot_receipt_fields(meta):
+ return {
+  'source_snapshot_sha256':meta['source_snapshot_sha256'],
+  'source_snapshot_target':meta['source_snapshot_target'],
+  'source_pins':meta['source_pins'],
+ }
+
+def pin_receipt_to_source_snapshot(path,meta):
+ receipt=json.loads(Path(path).read_text())
+ receipt.update(snapshot_receipt_fields(meta))
+ atomic_json(Path(path),receipt)
+ return receipt
+
+def make_snapshot(directory,name,run_id,cache):
+ store=source_snapshot_store(cache)
+ snapshot=snapshot_bazel_target(ARCHITECTURE_SOURCE_SNAPSHOT_TARGET,store,repo_root=REPO)
+ if snapshot.archive_bytes>64*1024**2:raise ValueError('Source snapshot exceeds64MiB budget')
+ source=directory/'source';materialize_source_snapshot(store,snapshot.digest,source)
+ package=prepare_harness_workspace(source,name,run_id)
+ atomic_json(directory/'run.json',{'experiment':name,'run_id':run_id,'label':run_label(name,run_id),'cache_root':str(cache),'source_snapshot_sha256':snapshot.digest,'source_snapshot_target':snapshot.target,'source_snapshot_bytes':snapshot.archive_bytes,'source_pins':snapshot.source_pins,'stages':stages_for(name),'scope':'fixed training-batch diagnostic, no whole-model/heldout acceptance'})
  return source,package
 
 def check_snapshot(directory):
  meta=json.loads((directory/'run.json').read_text());source=directory/'source'
- for p,h in meta['source_sha256'].items():
-  # Generated stage receipts replace no snapshotted inputs: contract receipts removed at creation.
-  if sha(source/p)!=h:raise ValueError('Frozen run source/input changed: '+p)
+ if 'source_snapshot_sha256' not in meta:
+  raise ValueError('Run predates source snapshots; re-run or re-admit with a source snapshot')
+ verify_receipt_sources(meta,source_snapshot_store(Path(meta['cache_root'])))
  return meta
 
-def summarize(package,name,label):
+def summarize(package,name,label,snapshot_store=None):
  for stage in stages_for(name):
   if stage.get('contract'):
    path=receipt_path(package,stage,label)
    if not path.exists():raise ValueError('Stage not admitted: '+stage['name'])
-   verify_receipt(json.loads(path.read_text()),package)
+   verify_receipt(json.loads(path.read_text()),package,snapshot_store=snapshot_store)
  values={}
  for suffix in ['execution','checkpoint-audit','loss-audit','score-first','score-first-audits']:
   p=package/'research'/f'architecture-{label}-{suffix}-verified.json'
   if not p.exists():raise ValueError('Stage not admitted: '+suffix)
-  values[suffix]=verify_receipt(json.loads(p.read_text()),package)
+  values[suffix]=verify_receipt(json.loads(p.read_text()),package,snapshot_store=snapshot_store)
  train=values['execution'];score=values['score-first'];audit=values['score-first-audits']
  if values['checkpoint-audit']['producer_evidence_sha256']!=sha(package/'research'/f'architecture-{label}-execution-verified.json'):raise ValueError('Checkpoint producer identity mismatch')
  if values['loss-audit']['producer_evidence_sha256']!=sha(package/'research'/f'architecture-{label}-execution-verified.json'):raise ValueError('Loss producer identity mismatch')
@@ -196,10 +244,14 @@ def execute(name,run_id,cache,resume=False):
   else:
    if resume:raise ValueError('Cannot resume a nonexistent run ID')
    preflight(cache,name);directory.mkdir();source,package=make_snapshot(directory,name,run_id,cache)
+  meta=check_snapshot(directory);store=source_snapshot_store(cache)
   env=dict(os.environ,WAYMO_ARCH_RUN_ID=run_id,WAYMO_ARCH_CACHE_ROOT=str(cache));logs=directory/'logs';logs.mkdir(exist_ok=True)
   for stage in stages:
    check_snapshot(directory);path=receipt_path(package,stage,run_label(name,run_id))
-   if path.exists():verify_receipt(json.loads(path.read_text()),package);print('VERIFIED skip '+stage['name'],flush=True);continue
+   if path.exists():
+    receipt=json.loads(path.read_text())
+    if 'source_snapshot_sha256' not in receipt:receipt=pin_receipt_to_source_snapshot(path,meta)
+    verify_receipt(receipt,package,snapshot_store=store);print('VERIFIED skip '+stage['name'],flush=True);continue
    log=logs/(stage['name']+'.log')
    if log.exists():raise ValueError('Incomplete stage '+stage['name']+' has retained outputs; choose a fresh run ID (no destructive retry)')
    print('RUN '+stage['name']+'; log '+str(log),flush=True)
@@ -213,9 +265,9 @@ def execute(name,run_id,cache,resume=False):
     atomic_json(directory/'failure.json',{'stage':stage['name'],'exit_code':result.returncode,'log':str(log)})
     raise ValueError('Stage failed: '+stage['name']+'; retained log '+str(log))
    if not path.exists():raise ValueError('Stage produced no admission receipt: '+stage['name'])
-   verify_receipt(json.loads(path.read_text()),package)
+   verify_receipt(pin_receipt_to_source_snapshot(path,meta),package,snapshot_store=store)
    print('ADMITTED '+stage['name'],flush=True)
-  summary=summarize(package,name,run_label(name,run_id));atomic_json(directory/'summary.json',summary);print(json.dumps(summary,indent=2))
+  summary=summarize(package,name,run_label(name,run_id),snapshot_store=store);atomic_json(directory/'summary.json',summary);print(json.dumps(summary,indent=2))
 
 def main(argv=None):
  parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--cache-root',type=Path,default=CACHE)
@@ -223,7 +275,7 @@ def main(argv=None):
  sub.add_parser('list')
  show=sub.add_parser('show');show.add_argument('experiment',choices=list(registry()))
  run=sub.add_parser('run');run.add_argument('experiment',choices=list(registry()));run.add_argument('--run-id');run.add_argument('--resume',action='store_true');run.add_argument('--dry-run',action='store_true')
- verify=sub.add_parser('verify');verify.add_argument('experiment',choices=list(registry()));verify.add_argument('--run-id')
+ verify=sub.add_parser('verify');verify.add_argument('experiment',choices=list(registry()));verify.add_argument('--run-id',required=True)
  args=parser.parse_args(argv)
  try:
   if args.command=='list':
@@ -236,12 +288,9 @@ def main(argv=None):
    if args.dry_run:print(json.dumps({'experiment':args.experiment,'run_id':run_id,'stages':stages_for(args.experiment),'output':str(args.cache_root.resolve()/'insula/architecture-runs'/run_id),'scope':'plan only; no files, GPU or runtime checks'},indent=2))
    else:execute(args.experiment,run_id,args.cache_root.resolve(),args.resume)
   else:
-   package=PACKAGE;label=args.experiment
-   if args.run_id:
-    directory=args.cache_root.resolve()/'insula/architecture-runs'/args.run_id;meta=check_snapshot(directory)
-    if meta['experiment']!=args.experiment:raise ValueError('Run ID belongs to another experiment')
-    package=directory/'source/autonomy';label=run_label(args.experiment,args.run_id)
-   print(json.dumps(summarize(package,args.experiment,label),indent=2))
+   directory=args.cache_root.resolve()/'insula/architecture-runs'/args.run_id;meta=check_snapshot(directory)
+   if meta['experiment']!=args.experiment:raise ValueError('Run ID belongs to another experiment')
+   print(json.dumps(summarize(directory/'source/autonomy',args.experiment,run_label(args.experiment,args.run_id),snapshot_store=source_snapshot_store(args.cache_root.resolve())),indent=2))
   return 0
  except (ValueError,FileNotFoundError,subprocess.TimeoutExpired) as error:
   print('ERROR: '+str(error),file=sys.stderr);return 1

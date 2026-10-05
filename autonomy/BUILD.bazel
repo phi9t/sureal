@@ -27,6 +27,32 @@ PERCEPTION_RUNFILES = glob(
     "research/association41-runtime-admission-20261003a/manifest.json",
 ]
 
+ARCHITECTURE_EXPERIMENT_RESEARCH_INPUTS = [
+    "research/architecture-all_pillars-cache-verified.json",
+    "research/architecture-retain64-cache-verified.json",
+    "research/architecture-retention-controls-spec.md",
+    "research/architecture-window-control-spec.md",
+    "research/normalization-secondary-decoder-spec.md",
+    "research/overfit-native-cache-progress.json",
+    "research/training-anchor-templates.candidate.json",
+]
+
+filegroup(
+    name = "architecture_experiment_runner_snapshot",
+    srcs = [
+        "BUILD.bazel",
+        "architecture/experiment_runner.py",
+        "architecture/harness/files.json",
+        "architecture/registry.json",
+        "evidence/source_snapshot.py",
+    ] + glob([
+        "architecture/harness/*.py",
+        "gpu/*.py",
+        "pipeline/*.py",
+    ]) + ARCHITECTURE_EXPERIMENT_RESEARCH_INPUTS,
+    visibility = ["//visibility:public"],
+)
+
 [
     perception_py_test(src, PERCEPTION_RUNFILES)
     for src in PERCEPTION_TEST_MODULES
