@@ -1,14 +1,8 @@
 """Validated native upright-3D export; annotation metadata is evaluation-only."""
 import json,math
 from pathlib import Path
-import subprocess
 import sys
-
-
-def encode(message,proto,text):
-    result=subprocess.run(['protoc','--proto_path=/upstream/src','--encode=waymo.open_dataset.'+message,'waymo_open_dataset/'+proto],input=text.encode(),capture_output=True)
-    if result.returncode:raise ValueError('native protobuf encoding failed: '+result.stderr.decode())
-    return result.stdout
+from segmentation.segmentation_export import encode
 
 
 def validate_object(record):

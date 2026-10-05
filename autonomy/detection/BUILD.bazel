@@ -26,6 +26,7 @@ py_library(
         "//autonomy/dataset:dataset",
         "//autonomy/evidence:evidence",
         "//autonomy/insula:insula",
+        "//autonomy/segmentation:segmentation",
     ],
 )
 

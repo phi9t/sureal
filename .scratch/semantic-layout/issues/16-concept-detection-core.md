@@ -4,7 +4,7 @@
 
 **Blocked by:** 14 (Concept batch: `dataset`), 15 (Concept batch: `geometry`)
 
-**Status:** done
+**Status:** ready-for-agent
 
 - [x] Scope: anchor grid and assignment, box coding, pillar packing and encoder, packed point features, the pillar detector, detector geometry, loss and decoding, prediction records, detection export, the native detection adapter, and the training-box pipeline
 - [x] Every module in scope lives in its concept directory and is imported by package path; no `sys.path` manipulation remains in the moved code
@@ -41,3 +41,18 @@ Final post-merge verification:
 - `python3 autonomy/tools/pins.py check --base work/semantic-layout/integration` still reported `FAIL: 100 changed file(s) pinned by retained receipts`; the pinned files changed for the batch reasons recorded above.
 - `git diff --name-only -- ':(glob)**/research/**' ':(glob)research/**' ':(glob)docs/research/**' ':(glob)autonomy/research/**' ':(glob)parallax/research/**'` produced no output.
 - `git diff --check` passed.
+
+Post-ticket-18 integration merge and review update:
+
+- `git merge work/semantic-layout/integration` merged ticket 18. Conflicts were resolved by keeping `detection` and the newly merged `segmentation` as separate concept packages, placing `segmentation` below `detection` in `autonomy/tools/layers.py`, and wiring detection to depend on `//autonomy/segmentation:segmentation` for protobuf encoding and NLZ overlap.
+- `autonomy/detection/training_box_replay.py` and `autonomy/detection/training_box_replay_audit.py` now call `evidence.source_snapshot.file_sha256` directly for file digests; the local production `sha`/`_sha` wrappers were removed.
+- `./bazelw test //autonomy/detection:all_tests //autonomy/segmentation:all_tests --test_output=errors --cache_test_results=no --keep_going` passed: 31/31 tests pass.
+- `python3 autonomy/tools/layers.py` passed with `PASS: 0 layering problem(s) across 16 layers`.
+- `./bazelw test //autonomy/...` passed: 148/148 tests pass.
+- `./bazelw test --config=cuda --test_tag_filters=requires_gpu //autonomy/...` passed: 24/24 tests pass.
+- `./bazelw test //parallax/...` passed: 17/17 tests pass.
+- `python3 -m unittest tests.test_publication_audit` passed: `Ran 30 tests ... OK`.
+- `python3 scripts/publication_audit.py --root .` passed with `{"errors": [], "gitlinks": 2, "max_blob_bytes": 26214400, "schema_version": 1, "status": "pass", "tracked_files": 4986}`.
+- `python3 autonomy/tools/pins.py check --base work/semantic-layout/integration` reported `FAIL: 98 changed file(s) pinned by retained receipts`; this remains expected for the detection move and import rewrites, with ticket 18 now present in the integration base.
+- `git diff --cached --name-only -- ':(glob)**/research/**' ':(glob)research/**' ':(glob)docs/research/**' ':(glob)autonomy/research/**' ':(glob)parallax/research/**'` and `git diff --name-only -- ':(glob)**/research/**' ':(glob)research/**' ':(glob)docs/research/**' ':(glob)autonomy/research/**' ':(glob)parallax/research/**'` produced no output.
+- `git diff --cached --check` and `git diff --check` passed.

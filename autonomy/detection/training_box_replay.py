@@ -14,10 +14,6 @@ from evidence.source_snapshot import file_sha256, require_regular_file
 from .training_box_process import run_source_worker
 
 
-def sha(path):
-    return file_sha256(path)
-
-
 def save(path, value):
     Path(path).write_text(json.dumps(value, indent=2) + '\n')
 
@@ -43,11 +39,11 @@ def replay(*, cache, output, code_root, expected_candidate_sha256):
     cache, output, code_root = map(Path, (cache, output, code_root))
     with staging_lease(cache / 'scientific-processing/cohort-queue.lock'):
         candidate_path = code_root / 'research/training-box-replay-execution.candidate.json'
-        if sha(candidate_path) != expected_candidate_sha256:
+        if file_sha256(candidate_path) != expected_candidate_sha256:
             raise ValueError('externally pinned execution candidate changed')
         candidate = json.loads(candidate_path.read_text())
         job_path = code_root / 'research/training-box-producer-job.candidate.json'
-        if sha(job_path) != candidate['job_sha256']:
+        if file_sha256(job_path) != candidate['job_sha256']:
             raise ValueError('production job identity changed')
         job = json.loads(job_path.read_text())
         root = cache / 'insula/rootfs-v2'
@@ -59,11 +55,11 @@ def replay(*, cache, output, code_root, expected_candidate_sha256):
         def revalidate():
             for key in ('acquisition', 'cohort'):
                 path = code_root / Path(job[key]['path']).name
-                if sha(path) != job[key]['sha256']:
+                if file_sha256(path) != job[key]['sha256']:
                     raise ValueError('production manifest changed')
             for scene, pins in job['source_receipt_hashes'].items():
                 for component, digest in pins.items():
-                    if sha(audit / f'training-{component}-{scene}.json') != digest:
+                    if file_sha256(audit / f'training-{component}-{scene}.json') != digest:
                         raise ValueError('production receipt changed')
         revalidate()
         retained = retained_raw_bytes(cache, code_root)
@@ -76,7 +72,7 @@ def replay(*, cache, output, code_root, expected_candidate_sha256):
             raise ValueError('execution source selection differs')
         output.mkdir(parents=True, exist_ok=False)
         inputs = output / 'inputs'; inputs.mkdir()
-        code_hashes = {str(p.relative_to(code_root)): sha(p)
+        code_hashes = {str(p.relative_to(code_root)): file_sha256(p)
                        for p in (code_root / 'detection').glob('*.py')}
         phases = []
         for role in ('producer', 'reference'):
@@ -84,15 +80,15 @@ def replay(*, cache, output, code_root, expected_candidate_sha256):
             report = phase / 'report.json'
             if role == 'producer':
                 worker_job = '/experiment/research/' + job_path.name
-                worker_job_sha = sha(job_path)
+                worker_job_sha = file_sha256(job_path)
             else:
                 producer_report = output / 'producer/report.json'
                 shutil.copyfile(producer_report, inputs / 'producer.json')
                 reference_job = dict(job, reported={'path': '/tmp/replay-inputs/producer.json',
-                                                    'sha256': sha(producer_report)})
+                                                    'sha256': file_sha256(producer_report)})
                 save(inputs / 'reference.json', reference_job)
                 worker_job = '/tmp/replay-inputs/reference.json'
-                worker_job_sha = sha(inputs / 'reference.json')
+                worker_job_sha = file_sha256(inputs / 'reference.json')
             base = ['bwrap', '--unshare-all', '--die-with-parent',
                     '--ro-bind', str(root), '/', '--ro-bind', str(code_root), '/experiment',
                     '--bind', str(phase), '/outputs', '--proc', '/proc', '--dev', '/dev',
@@ -131,20 +127,20 @@ def replay(*, cache, output, code_root, expected_candidate_sha256):
             if (worker_resources['rss_scope'] != 'worker_process_peak'
                     or worker_resources['peak_rss_kib'] <= 0):
                 raise ValueError('worker memory measurement required')
-            result.update(report_sha256=sha(report), transfers=transfers,
+            result.update(report_sha256=file_sha256(report), transfers=transfers,
                           worker_resources=worker_resources,
                           resources=json.loads((phase / 'resources.json').read_text()))
             save(phase / 'receipt.json', result)
             phases.append(result)
         revalidate()
-        if sha(candidate_path) != expected_candidate_sha256:
+        if file_sha256(candidate_path) != expected_candidate_sha256:
             raise ValueError('execution candidate changed during replay')
-        if code_hashes != {str(p.relative_to(code_root)): sha(p)
+        if code_hashes != {str(p.relative_to(code_root)): file_sha256(p)
                            for p in (code_root / 'detection').glob('*.py')}:
             raise ValueError('worker code changed during replay')
         save(output / 'receipt.json', dict(status='both full64 payload passes completed; independent receipt audit required',
                                           runtime_lock=lock, job_sha256=candidate['job_sha256'],
-                                          candidate_sha256=sha(candidate_path), code_hashes=code_hashes, phases=phases))
+                                          candidate_sha256=file_sha256(candidate_path), code_hashes=code_hashes, phases=phases))
 
 
 def main():
