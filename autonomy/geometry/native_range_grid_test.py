@@ -1,5 +1,5 @@
 import unittest,numpy as np
-from pipeline.native_range_grid import native_range_grid,gather_range_features
+from geometry.native_range_grid import native_range_grid,gather_range_features
 class GridTests(unittest.TestCase):
  def record(self):
   return {'identity':{'context':'scene','timestamp':1,'laser':1,'return':2,'pixels':np.array([[1,2],[0,0]])},'return_present':True,'observations':{'physical_features':np.array([[3.,.4,.5],[2.,.6,.7]]),'xyz':np.array([[1.,2.,3.],[4.,5.,6.]])},'targets':{'segmentation':np.array([[-1,14],[7,0]])},'evaluation':{'nlz':np.array([1,-1])}}

@@ -43,14 +43,14 @@ def replay_shape_source(job_path,source_receipt,*,expected_job_sha256,
         lock=json.loads(Path(str(runtime_root)+'.lock.json').read_text())
         if lock!=expected_runtime_lock:raise ValueError('external runtime lock differs')
         verify_rootfs(runtime_root,lock['rootfs_sha256'])
-        names=['native_shape_source_replay.py','native_shape_transfer.py',
-               'native_range_shape_worker.py','native_range_shape_file.py',
-               'native_range_shapes.py','native_range_shape_reference.py',
+        names=['native_shape_source_replay.py','geometry/native_shape_transfer.py',
+               'geometry/native_range_shape_worker.py','geometry/native_range_shape_file.py',
+               'geometry/native_range_shapes.py','geometry/native_range_shape_reference.py',
                'staged_source.py','evidence/source_integrity.py','insula/staging_lease.py',
                'insula/entry.py','insula/runtime_identity.py']
         pins={n:sha(code_root/n if '/' in n else code_root/'pipeline'/n) for n in names}
         transfer_prefix=transfer_command if transfer_command is not None else [
-            sys.executable,str(code_root/'pipeline/native_shape_transfer.py'),'--timeout-seconds','600']
+            sys.executable,str(code_root/'geometry/native_shape_transfer.py'),'--timeout-seconds','600']
         with staged_source(source,cache,retained_bytes=retained_bytes,
                 limit_bytes=limit_bytes,transfer_command=transfer_prefix) as (staged,transfer):
             output.mkdir(parents=True,exist_ok=False);inputs=output/'input';inputs.mkdir()
@@ -58,7 +58,7 @@ def replay_shape_source(job_path,source_receipt,*,expected_job_sha256,
             (inputs/'source-receipt.json').write_bytes(source_receipt.read_bytes())
             worker=output/'worker';worker.mkdir();audit=output/'audit';audit.mkdir();checks=[]
             command=launch_plan(runtime_root,code_root,staged.parent,worker,
-                ['python','-m','pipeline.native_range_shape_worker','/source/source.parquet',
+                ['python','-m','geometry.native_range_shape_worker','/source/source.parquet',
                  '/tmp/job/job.json','/outputs/shapes.json','--expected-job-sha256',expected_job_sha256])
             at=command.index('--');command[at:at]=['--ro-bind',str(inputs),'/tmp/job']
             result=subprocess.run(command,capture_output=True,text=True,timeout=300)
@@ -68,7 +68,7 @@ def replay_shape_source(job_path,source_receipt,*,expected_job_sha256,
             report_sha=sha(worker/'shapes.json')
             program="""import hashlib,json,math
 from pathlib import Path
-from pipeline.native_range_shape_reference import verify_native_range_shapes
+from geometry.native_range_shape_reference import verify_native_range_shapes
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 assert sha('/tmp/job/job.json')==JOBPIN
 j=json.loads(Path('/tmp/job/job.json').read_text());assert sha('/tmp/replayed/shapes.json')==OUTPUTPIN

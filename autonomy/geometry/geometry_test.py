@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from pipeline.geometry import range_to_points
+from geometry.geometry import range_to_points
 
 class NativeRangeGeometryTests(unittest.TestCase):
     def test_axial_ray_and_row_order(self):

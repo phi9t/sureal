@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import torch
 from torch.nn import functional as F
-from pipeline.native_range_grid import native_range_grid
+from geometry.native_range_grid import native_range_grid
 from pipeline.range_frontend import RangeFrontend
 from pipeline.pillar_packing import pack_points
 from pipeline.packed_point_features import packed_point_features

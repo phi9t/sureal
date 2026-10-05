@@ -4,7 +4,7 @@ import io
 import json
 from pathlib import Path
 import numpy as np
-from .geometry import range_to_points
+from geometry.geometry import range_to_points
 from .scientific_sidecar_reader import iter_sidecar_rows
 from .sensor_records import OrderedLookup, array_field, align_point_targets, select_rows
 

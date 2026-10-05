@@ -27,18 +27,18 @@ def main():
     with tempfile.TemporaryDirectory(dir=destination.parent,prefix='.m2-') as tmp:
         stage=Path(tmp)
         command=[str(HERE/'enter.sh'),'--rootfs',str(ROOT),'--source',str(M0/'input'),'--output',str(stage),
-                 '--offline','--','python','-m','unittest','discover','-s','/experiment/tests','-p','test_geometry_foundation.py','-v']
+                 '--offline','--','python','-m','unittest','discover','-s','/experiment/geometry','-p','geometry_foundation_test.py','-v']
         p=subprocess.run(command,capture_output=True,text=True)
         log=p.stdout+p.stderr
         (stage/'tests.log').write_text(log)
         # Independently enumerate actual fixture names; require each recorded test.
         import ast
-        tree=ast.parse((HERE/'tests/test_geometry_foundation.py').read_text())
+        tree=ast.parse((HERE/'geometry/geometry_foundation_test.py').read_text())
         names={node.name for node in ast.walk(tree) if isinstance(node,ast.FunctionDef) and node.name.startswith('test_')}
         assert p.returncode==0 and len(names)==11
         assert all(any(line.startswith(name+' ') and line.endswith(' ... ok') for line in log.splitlines()) for name in names)
         assert 'Ran 11 tests' in log and log.rstrip().endswith('OK')
-        files=[HERE/'verify-geometry.py',HERE/'pipeline/geometry_foundation.py',HERE/'tests/test_geometry_foundation.py',HERE/'enter.sh',HERE/'insula/entry.py']
+        files=[HERE/'verify-geometry.py',HERE/'geometry/geometry_foundation.py',HERE/'geometry/geometry_foundation_test.py',HERE/'enter.sh',HERE/'insula/entry.py']
         hashes={str(f.relative_to(HERE)):hashlib.sha256(f.read_bytes()).hexdigest() for f in files}
         lock=json.loads(Path(str(ROOT)+'.lock.json').read_text());verify_rootfs(ROOT,lock['rootfs_sha256'])
         receipt={'schema_version':1,'milestone':'M2','command':command,'exit_code':p.returncode,'started_utc':started,
