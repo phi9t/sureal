@@ -47,3 +47,5 @@ verifiers and acceptance criteria. The [overall goal](../../docs/research/tasks/
 - **Tiny-subset overfit gate:** a training-only test requiring both declared loss reduction and independently scored detection quality; it does not establish generalization.
 - **Architecture adaptation:** an explicit change to the reference model or task contract, distinguished from a faithful paper reproduction.
 - **Training improvement:** a controlled gain in the declared task metric with support and resource evidence; a lower aggregate loss alone is insufficient.
+- **Source pin:** the SHA-256 digest of one source file recorded in a receipt; the file is *pinned* by that receipt. Avoid: code hash, source hash, citation.
+- **Source snapshot:** the frozen copy of the sources taken when a gate or study stage runs, which is what a source pin refers to. The working tree is not required to keep matching it.
