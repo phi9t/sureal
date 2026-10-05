@@ -85,7 +85,7 @@ def verify_receipt(receipt,package):
  for p,h in receipt.get('candidate_hashes',{}).items():check(package/p,h)
  for p,h in receipt.get('driver_hashes',{}).items():check(p,h)
  for p,h in receipt.get('worker_hashes',{}).items():
-  path=Path(p) if Path(p).is_absolute() else package.parents[1]/'.scratch'/p
+  path=Path(p) if Path(p).is_absolute() else package.parent/'.scratch'/p
   check(path,h)
  if 'manifest_sha256' in receipt:
   manifests=set()

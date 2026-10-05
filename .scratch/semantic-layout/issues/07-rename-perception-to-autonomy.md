@@ -4,7 +4,7 @@
 
 **Blocked by:** 03 (Every perception CPU test runs under Bazel, in place), 04 (Torch tests run under Bazel in the GPU rootfs)
 
-**Status:** done
+**Status:** ready-for-agent
 
 - [x] The move is one commit containing only renames
 - [x] A following commit updates every hard-coded occurrence of the old path in code: the architecture harness drivers, the gate scripts still in use, the rootfs build script, the publication audit and its test, the collaboration tests and CI

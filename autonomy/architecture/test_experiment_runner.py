@@ -15,6 +15,13 @@ class RunnerTests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as tmp:
    p=Path(tmp)/'output';p.write_text('original');receipt={'artifacts':{str(p):module.sha(p)}};module.verify_receipt(receipt,Path(tmp));p.write_text('changed')
    with self.assertRaises(ValueError):module.verify_receipt(receipt,Path(tmp))
+ def test_relative_worker_hashes_resolve_from_snapshot_scratch_after_rename(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   source=Path(tmp)/'source';package=source/'autonomy';worker=source/'.scratch'/'worker.py'
+   worker.parent.mkdir(parents=True);package.mkdir()
+   worker.write_text('pass\n')
+   receipt={'worker_hashes':{'worker.py':module.sha(worker)},'checks':[{'exit_code':0}]}
+   module.verify_receipt(receipt,package)
  def test_worker_binding_is_not_confused_with_python_invocation(self):
   with tempfile.TemporaryDirectory() as tmp:
    p=Path(tmp)/'worker.py';p.write_text('worker')
