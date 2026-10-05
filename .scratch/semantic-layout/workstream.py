@@ -152,6 +152,9 @@ Keeping the ticket current (this is how progress is monitored):
 - Python modules under `autonomy/` are imported with `autonomy/` as the import root (`insula.entry`,
   `evidence.journal`), each concept is a `py_library` with declared `deps`, tests are `py_test` with `deps`,
   and tests never assert where a module lives.
+- Other tickets merge into `{integration}` while you work and often touch the same shared files (the
+  root build file, callers, the layering declaration). Before your final verification, run
+  `git merge {integration}` in your branch, resolve conflicts keeping both sides, and verify after it.
 - Run Bazel only through `./bazelw`. Keep one cache layout under `.bazel-cache/` in this worktree
   and delete any extra probe caches you create; the disk is nearly full.
 - If you cannot proceed without a decision or access you do not have, append the question under
