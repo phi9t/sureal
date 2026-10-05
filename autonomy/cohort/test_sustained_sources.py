@@ -1,7 +1,7 @@
 import hashlib,tempfile,unittest
 from pathlib import Path
 from evidence.source_snapshot import LocalSnapshotStore,archive_sources
-from cohort.sustained_sources import REQUIRED,validate_sources
+from cohort.sustained_sources import REQUIRED,SNAPSHOT_TARGET,validate_sources
 
 class SustainedSourceTests(unittest.TestCase):
  def fixture(self,root,store_root,names=None):
@@ -10,7 +10,7 @@ class SustainedSourceTests(unittest.TestCase):
    p=root/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(name+'\n')
   archive,pins=archive_sources(root,names)
   digest=hashlib.sha256(archive).hexdigest();LocalSnapshotStore(store_root).store(digest,archive)
-  receipt={'schema_version':1,'source_snapshot_sha256':digest,'source_snapshot_target':'//autonomy:sustained-run-snapshot','source_snapshot_store':str(store_root),'source_pins':pins}
+  receipt={'schema_version':1,'source_snapshot_sha256':digest,'source_snapshot_target':SNAPSHOT_TARGET,'source_snapshot_store':str(store_root),'source_pins':pins}
   lock={'rootfs_sha256':'a'*64,'image_id':'sha256:'+'b'*64};return receipt,lock
  def test_snapshot_verification_accepts_moved_checkout_and_ignores_unrelated_sources(self):
   with tempfile.TemporaryDirectory() as tmp:

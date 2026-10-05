@@ -26,8 +26,8 @@ class ResourceCheckpointTests(unittest.TestCase):
         from cohort.sustained_controller_backend import P
         from evidence.source_snapshot import LocalSnapshotStore,copy_source_snapshot,source_snapshot_receipt
         b.package=b.R/'code';b.package.mkdir();worker=b.package/'cohort/sustained_scoring_budget.py';worker.parent.mkdir();worker.write_bytes((P/'cohort/sustained_scoring_budget.py').read_bytes());b.pins={'cohort/sustained_scoring_budget.py':sha(worker)}
-        b.pins=source_snapshot_receipt(b.package,sorted(b.pins),LocalSnapshotStore(b.R/'source-snapshots'),target='//autonomy:sustained-run-package',materialized_root=b.package)
-        host=root/'checkout';host.mkdir();(host/'host.py').write_text('host');b.host_pins=copy_source_snapshot(host,['host.py'],b.R/'host-source',LocalSnapshotStore(b.R/'host-source-snapshots'),target='//autonomy:sustained-controller-host')
+        b.pins=source_snapshot_receipt(b.package,sorted(b.pins),LocalSnapshotStore(b.R/'source-snapshots'),target='fixture:sustained-run-package',materialized_root=b.package)
+        host=root/'checkout';host.mkdir();(host/'host.py').write_text('host');b.host_pins=copy_source_snapshot(host,['host.py'],b.R/'host-source',LocalSnapshotStore(b.R/'host-source-snapshots'),target='fixture:sustained-controller-host')
         with patch('resources.backend.NativeBackend.guard'):
             path,digest=prepare_identity(b,b.R/'resource-layer');b.attach_resources(path,digest)
         refs={}

@@ -4,11 +4,11 @@ from unittest.mock import patch
 from evidence.source_snapshot import LocalSnapshotStore,archive_sources
 from cohort.sustained_controller_backend import NativeBackend,sha
 from cohort.sustained_controller_sources import REQUIRED as HOST_REQUIRED,freeze_host_sources
-from cohort.sustained_sources import REQUIRED as PACKAGE_REQUIRED
+from cohort.sustained_sources import REQUIRED as PACKAGE_REQUIRED,SNAPSHOT_TARGET
 class ControllerGuardTests(unittest.TestCase):
  def source_snapshot(self,root,names,store_root):
   archive,pins=archive_sources(root,names);digest=hashlib.sha256(archive).hexdigest();LocalSnapshotStore(store_root).store(digest,archive)
-  return {'schema_version':1,'source_snapshot_sha256':digest,'source_snapshot_target':'//autonomy:sustained-run-package','source_snapshot_store':str(store_root),'source_pins':pins}
+  return {'schema_version':1,'source_snapshot_sha256':digest,'source_snapshot_target':SNAPSHOT_TARGET,'source_snapshot_store':str(store_root),'source_pins':pins}
  def checkout(self,root,anchor_sha):
   for name in HOST_REQUIRED:
    path=root/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text('host '+name)

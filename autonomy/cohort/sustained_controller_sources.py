@@ -10,6 +10,7 @@ REQUIRED=tuple(sorted(set(RETENTION_REQUIRED)|{
  'cohort/sustained_stage_inputs.py','cohort/sustained_sources.py',
  'architecture/experiment_runner.py',
 }))
+SNAPSHOT_TARGET='//autonomy:sustained-controller-host'
 def sha(path):
  from evidence.source_snapshot import file_sha256
  return file_sha256(path)
@@ -18,7 +19,7 @@ def regular(path):
 def freeze_host_sources(repository,destination):
  repository=Path(repository);destination=Path(destination)
  if not all(regular(repository/name) for name in REQUIRED):raise ValueError('complete regular host source closure required')
- receipt=copy_source_snapshot(repository,REQUIRED,destination,LocalSnapshotStore(destination.parent/'source-snapshots'),target='//autonomy:sustained-controller-host')
+ receipt=copy_source_snapshot(repository,REQUIRED,destination,LocalSnapshotStore(destination.parent/'source-snapshots'),target=SNAPSHOT_TARGET)
  validate_host_sources(repository,receipt)
  return receipt
 

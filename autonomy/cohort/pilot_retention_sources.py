@@ -7,6 +7,7 @@ REQUIRED=(
  'tier1/admission.py','tier1/storage.py','advanced/archive.py',
  'advanced/retention.py','pipeline/insula_entry.py','pipeline/runtime_identity.py',
 )
+SNAPSHOT_TARGET='//autonomy:sustained-pilot-retention-host'
 def sha(path):
  from evidence.source_snapshot import file_sha256
  return file_sha256(path)
@@ -15,7 +16,7 @@ def regular(path):
 def freeze_host_sources(repository,destination):
  repository=Path(repository);destination=Path(destination)
  if not all(regular(repository/name) for name in REQUIRED):raise ValueError('complete regular host source closure required')
- receipt=copy_source_snapshot(repository,REQUIRED,destination,LocalSnapshotStore(destination.parent/'source-snapshots'),target='//autonomy:sustained-pilot-retention-host')
+ receipt=copy_source_snapshot(repository,REQUIRED,destination,LocalSnapshotStore(destination.parent/'source-snapshots'),target=SNAPSHOT_TARGET)
  validate_host_sources(repository,receipt)
  return receipt
 

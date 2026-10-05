@@ -83,7 +83,7 @@ def _test_tags(src):
         tags.append("known_failure")
     return tags
 
-def perception_py_test(src, data):
+def perception_py_test(src, data, extra_data = []):
     env = {}
     if src in TORCH_CPU_ONLY_MODULES:
         env["CUDA_VISIBLE_DEVICES"] = ""
@@ -93,7 +93,7 @@ def perception_py_test(src, data):
         args = [
             src,
         ],
-        data = data,
+        data = data + extra_data,
         imports = ["."],
         legacy_create_init = 0,
         main = "tools/bazel_test_runner.py",

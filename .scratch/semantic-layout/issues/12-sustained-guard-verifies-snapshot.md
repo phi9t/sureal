@@ -55,3 +55,27 @@ Reviewer notes:
 - The requested legacy pin command under `experiments/waymo-perception/tools/pins.py` is unavailable after the rename, so the renamed `autonomy/tools/pins.py` guard was used.
 - `autonomy/evidence/source_snapshot.py` was changed to add materialized-source helpers used by this ticket. It is not listed by the pin guard output because it was introduced by ticket 09 and is not cited by retained receipts on `work/semantic-layout/integration`.
 - Ticket 10 owns HDFS snapshot storage; this ticket uses the evidence module's local snapshot store in run-owned paths.
+
+Review 1 follow-up:
+- Merged `work/semantic-layout/integration` after ticket 11, then again after ticket 10. Both merges completed without conflicts, preserving ticket 10's `HdfsSnapshotStore`, ticket 11's architecture runner snapshot target, and this ticket's materialized-source helpers.
+- Added real Bazel filegroups for every production `source_snapshot_target` this ticket can write: `//autonomy:sustained-run-sources`, `//autonomy:resource-source-layer`, `//autonomy:sustained-controller-host`, `//autonomy:sustained-checkpoint-retention-host`, `//autonomy:sustained-pilot-retention-host`, and `//autonomy:native-cache-retention-host`.
+- Added `//autonomy:source_snapshot_targets_test`, which uses Bazel `genquery` outputs to compare each declared filegroup's source files against the corresponding freezer source list.
+- These ticket-12 snapshot filegroups are selected by directory or explicit host-source lists, not by a Bazel dependency query. That matches the current freezer behaviour and avoids pretending the still-broad bridge runner has target-specific deps; ticket 13 onward should narrow these once concept-local build targets exist.
+- Test-only tiny fixture snapshots now use `fixture:` identifiers instead of fake `//autonomy:` labels.
+
+Review 1 verification:
+- `./bazelw query --output=label 'set(//autonomy:sustained-run-sources //autonomy:resource-source-layer //autonomy:sustained-controller-host //autonomy:sustained-checkpoint-retention-host //autonomy:sustained-pilot-retention-host //autonomy:native-cache-retention-host //autonomy:architecture_experiment_runner_snapshot)'` -> printed:
+  `//autonomy:architecture_experiment_runner_snapshot`
+  `//autonomy:native-cache-retention-host`
+  `//autonomy:resource-source-layer`
+  `//autonomy:sustained-checkpoint-retention-host`
+  `//autonomy:sustained-controller-host`
+  `//autonomy:sustained-pilot-retention-host`
+  `//autonomy:sustained-run-sources`
+- `./bazelw test //autonomy:source_snapshot_targets_test --test_output=errors --cache_test_results=no` -> `Executed 1 out of 1 test: 1 test passes.`
+- `./bazelw test //autonomy:source_snapshot_targets_test //autonomy:evidence__source_snapshot_test //autonomy:architecture__test_experiment_runner //autonomy:cohort__test_sustained_sources //autonomy:cohort__test_sustained_controller_guards //autonomy:resources__test_resource_sources //autonomy:resources__test_resource_stage //autonomy:resources__test_resource_backend //autonomy:resources__test_resource_retention //autonomy:resources__test_resource_checkpoint //autonomy:cohort__test_sustained_retention_sources //autonomy:cohort__test_sustained_checkpoint_retention_sources //autonomy:cohort__test_sustained_pilot_retention_sources --test_output=errors --cache_test_results=no` -> `Executed 13 out of 13 tests: 13 tests pass.`
+- `./bazelw test //autonomy/... --cache_test_results=no` -> `Executed 140 out of 140 tests: 140 tests pass.`
+- `./bazelw test --config=cuda --test_tag_filters=requires_gpu,-requires_live_gate,-requires_host_tools,-requires_pytest,-known_failure //autonomy/... --cache_test_results=no` -> `Executed 24 out of 24 tests: 24 tests pass.`
+- `./bazelw test --config=cuda //autonomy/... --cache_test_results=no` was also run after the final integration merge and this review fix; it reached `Executed 164 out of 164 tests: 160 tests pass and 4 fail locally.` The four failures were `//autonomy:tests__test_tracer`, `//autonomy:tests__test_reconstruction_validation`, `//autonomy:tests__test_scientific_scene_command`, and `//autonomy:tests__test_scientific_scene_validate`; each fails in the CUDA rootfs with `ModuleNotFoundError: No module named 'jsonschema'`. The GPU-tagged CUDA set above passes.
+- `./bazelw query --output=label //autonomy:sustained-run-sources` initially failed before this fix with `ERROR: no such target '//autonomy:sustained-run-sources'`; the set query above now resolves all production receipt labels.
+- `python3 autonomy/tools/pins.py check --base work/semantic-layout/integration` -> `FAIL: 23 changed file(s) cited by retained receipts`; this remains the intentional ticket-12 source-freezer/guard integration impact listed above.

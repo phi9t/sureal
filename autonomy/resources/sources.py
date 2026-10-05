@@ -4,6 +4,7 @@ from evidence.source_snapshot import LocalSnapshotStore,copy_source_snapshot,fil
 
 REQUIRED={'sources.py','command.py','stage.py','kernel_scope.py','scoped_stage.py',
           'stage_accounting.py','execute_worker.py','process_lifecycle.py'}
+SNAPSHOT_TARGET='//autonomy:resource-source-layer'
 
 
 def sha(path):
@@ -31,7 +32,7 @@ def inventory(root):
 
 def freeze_sources(current,destination):
     current=Path(current);destination=Path(destination);names=inventory(current)
-    receipt=copy_source_snapshot(current,sorted(names),destination,LocalSnapshotStore(destination.parent/'source-snapshots'),target='//autonomy:resource-source-layer')
+    receipt=copy_source_snapshot(current,sorted(names),destination,LocalSnapshotStore(destination.parent/'source-snapshots'),target=SNAPSHOT_TARGET)
     validate_sources(current,receipt)
     return receipt
 
