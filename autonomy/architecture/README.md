@@ -45,15 +45,21 @@ An absolute path to architecture.py works from any current directory. A run ID i
 python autonomy/architecture.py run residual_bev --run-id residual-trial01 --resume
 ```
 
-Read-only verification of the original cohort requires no new training:
-
-```bash
-python autonomy/architecture.py verify residual_bev
-```
+Verification now always names a run ID. The old read-only mode
+`python autonomy/architecture.py verify <experiment>` compared historical
+receipts with the working tree and has been retired; historical receipts remain
+records, but they are not reverified against edited source paths.
 
 Prerequisites: the acquired native caches and their admission receipts, bubblewrap, locked GPU/CPU/native-metric roots, and matching NVIDIA driver files. Default cache: `~/.cache/waystone/waymo-perception`; `--cache-root PATH` precedes the subcommand to select an already prepared cache. This runner does not download data, authenticate, build root filesystems or silently replace missing fixtures. Retention candidates additionally require their independently admitted64-point/all-pillar caches. Missing prerequisites fail with an explicit path.
 
-Each run freezes a source/input snapshot (maximum64MiB) and writes logs, run metadata and a final summary under:
+Each run takes a content-addressed source snapshot of
+`//autonomy:architecture_experiment_runner_snapshot` through the evidence
+module (maximum64MiB), records the snapshot digest and Bazel target in
+`run.json`, and adds the same source-snapshot fields to new stage receipts. The
+runnable private workspace is materialized from that snapshot, so later
+unrelated source edits do not change resume or verification. The dated study
+spec remains linked below and its SHA-256 is pinned by the runner source. Logs,
+run metadata and a final summary are written under:
 
 ```text
 <cache>/insula/architecture-runs/<run-id>/
@@ -62,6 +68,7 @@ Each run freezes a source/input snapshot (maximum64MiB) and writes logs, run met
   summary.json        # exists after every required admission passes
   failure.json        # retained stage failure when applicable
   source/             # frozen source plus new stage receipts
+  ../source-snapshots-v1/<sha256>
 ```
 
 Large model/scoring outputs remain under `<cache>/scientific-processing/architecture-<experiment>--<run-id>-...`. They retain the15GiB scientific and768MiB per-training-run caps. A nonblocking shared flock serializes runs through this entry point. Existing direct legacy invocations are outside that lock; use this entry point for new work. Dataset/runtime inputs are shared read-only, not copied; historical results are untouched.
