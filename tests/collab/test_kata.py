@@ -11,6 +11,18 @@ from test_admission import git
 
 
 class KataTests(unittest.TestCase):
+    def test_closed_prerequisite_remains_in_definition_inventory(self):
+        api = module(self, 'kata')
+        with KataFixture() as fixture:
+            client = api.Kata(fixture.project)
+            uid = client.import_tasks([fixture.definition('49')]).evidence['tasks']['49']['issue_uid']
+            fixture.call('--project', 'sureal-test49', 'close', uid,
+                         '--audit-no-change', '--evidence', 'no-change-audit:isolated fixture input inspected',
+                         '--message', 'Isolated fixture prerequisite inspected; retain its identity for dependent imports.')
+            inventory = client._definitions()
+            self.assertIn('49', inventory, 'Closed prerequisite disappeared from the stable task inventory')
+            self.assertEqual(inventory['49']['uid'], uid)
+
     def test_completed_external_write_with_result_lock_conflict_is_unknown_and_recoverable(self):
         from unittest.mock import patch
         api, wire, storage = module(self, 'kata'), module(self, 'contracts'), module(self, 'store')

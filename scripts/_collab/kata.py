@@ -219,7 +219,7 @@ class Kata:
 
     def _definitions(self) -> dict[str, JsonObject]:
         self.identity()
-        issues = self._call(["list"])["issues"]
+        issues = self._call(["list", "--status", "all", "--limit", "0"])["issues"]
         rows = {}
         for issue in issues:
             task_id = issue.get("metadata", {}).get("sureal_task")
