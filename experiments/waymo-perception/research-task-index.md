@@ -1,5 +1,12 @@
 # Actionable research task index
 
+[59 — full MAC automation goal](../../docs/research/tasks/59-full-mac-automation-goal.md)
+is the worker's immediate P0 objective, split across existing50–57 implementation
+tickets. Completion requires an actual automated two-worker lifecycle with live
+independent acceptance and zero required routine human operational prompts.
+The perception scientific program is preserved;58's manual-supported preparation
+pilot does not close full automation or the scientific questions.
+
 Current user override:[MAC happy path before comprehensive hardening](../../docs/research/2026-10-05-mac-happy-path-first.md).
 [58](../../docs/research/tasks/58-mac-happy-path-perception-pilot.md) prioritizes
 two bounded perception-preparation workers, useful artifacts, live functionality

@@ -1,5 +1,16 @@
 # Research task queue policy
 
+## Worker goal: complete full MAC automation
+
+The user's October5 instruction establishes[59](tasks/59-full-mac-automation-goal.md)
+as the P0 completion goal for `avperc-impl`. Reuse implementation tickets
+50 →51 →52 →53.0 →54 →53 →55 →56 →57 as its bounded subtasks. A real automated
+two-worker pilot, live independent acceptance, exact landing, interruption
+recovery, HDFS/cleanup, understandable overview and zero required routine human
+operational prompts are the completion contract.58's successful manual-supported
+pilot remains useful evidence, not automation acceptance. Preserve happy-path-
+first implementation and fix observed blockers before unrelated hardening.
+
 ## Current override: useful happy path first, October 5, 2026
 
 The user directs[first useful operation, then comprehensive hardening](2026-10-05-mac-happy-path-first.md).
