@@ -6,8 +6,8 @@
 
 **Status:** ready-for-agent
 
-- [ ] A new version of the GPU rootfs carries Bazel 9.2 with the same packages as the current GPU image; the current image is untouched
-- [ ] The wrapper selects the GPU rootfs when the GPU configuration is requested, and projects the host driver libraries as the existing GPU gates do
-- [ ] The 26 torch modules run under the GPU configuration and their results are recorded
-- [ ] The default configuration excludes every GPU-tagged target
-- [ ] CUDA use is opt-in; torch tests that need only the CPU run without a visible GPU
+- [x] A new version of the GPU rootfs carries Bazel 9.2 with the same packages as the current GPU image; the current image is untouched
+- [x] The wrapper selects the GPU rootfs when the GPU configuration is requested, and projects the host driver libraries as the existing GPU gates do
+- [x] The 26 torch modules run under the GPU configuration and their results are recorded
+- [x] The default configuration excludes every GPU-tagged target
+- [x] CUDA use is opt-in; torch tests that need only the CPU run without a visible GPU

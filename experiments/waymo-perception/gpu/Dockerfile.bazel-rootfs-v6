@@ -1,0 +1,18 @@
+# Local base image ID; build driver must verify this exact image exists.
+FROM surflo-insula:cuda13.2.1-locked
+ARG BAZEL_VERSION=9.2.0
+ARG BAZEL_LINUX_X86_64_SHA256=7668a95db1250f12c40407251e4e203b4ec8bf39bc495d2f485b2d8c99048694
+COPY requirements.lock /opt/waymo-requirements.lock
+RUN uv venv --python /usr/bin/python3 /opt/waymo \
+ && uv pip install --python /opt/waymo/bin/python --require-hashes \
+    --extra-index-url https://download.pytorch.org/whl/cu130 \
+    --index-strategy unsafe-best-match -r /opt/waymo-requirements.lock \
+ && mkdir -p /experiment /source /outputs /driver \
+ && printf '#!/bin/sh\nexec /opt/waymo/bin/python "$@"\n' > /usr/local/bin/python \
+ && chmod 0755 /usr/local/bin/python \
+ && printf '/opt/waymo/lib/python3.12/site-packages\n' > /usr/local/lib/python3.12/dist-packages/waymo-rootfs-site-packages.pth \
+ && /opt/waymo/bin/python -c 'import torch, importlib.util; assert torch.__version__ == "2.9.1+cu130"; assert importlib.util.find_spec("tensorflow") is None'
+RUN /opt/waymo/bin/python -c "import hashlib,pathlib,urllib.request; version='${BAZEL_VERSION}'; expected='${BAZEL_LINUX_X86_64_SHA256}'; url=f'https://github.com/bazelbuild/bazel/releases/download/{version}/bazel-{version}-linux-x86_64'; data=urllib.request.urlopen(url).read(); actual=hashlib.sha256(data).hexdigest(); assert actual == expected, f'{url} sha256 {actual} != {expected}'; path=pathlib.Path('/usr/local/bin/bazel'); path.write_bytes(data); path.chmod(0o755)"
+RUN bazel --version
+ENV PATH=/opt/waymo/bin:/usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin
+ENTRYPOINT []
