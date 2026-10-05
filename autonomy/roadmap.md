@@ -14,7 +14,7 @@ open. The statuses below describe those broader gates.
 
 ## Research charter
 
-The [research-program draft](../../docs/superpowers/specs/2026-09-29-waymo-research-program-design.md)
+The [research-program draft](../docs/superpowers/specs/2026-09-29-waymo-research-program-design.md)
 defines hypotheses and scientific acceptance gates. R0 closes the remaining
 dedicated-Insula and geometric tracer prerequisites before model training.
 The two current validation scenes remain development fixtures.

@@ -11,8 +11,8 @@ From a clean candidate commit:
 ```bash
 python -m unittest tests.test_publication_audit -v
 python scripts/publication_audit.py --root .
-python -m pip install numpy==1.26.4
-PYTHONPATH=parallax python -m unittest discover -s parallax/tests -p 'test_*.py' -v
+./bazelw test //parallax/...
+./bazelw test //autonomy/...
 python -m build
 python -m twine check dist/*
 python -m compileall -q scripts tests surflo
@@ -21,11 +21,13 @@ git diff --check HEAD
 gitleaks git --redact --no-banner --exit-code 1 .
 ```
 
-Run `bash -n` on every tracked shell script. The required CPU numerical gate is
-not evidence for a fresh B200 measurement. Verify the applicable smoke/full
-scientific tier separately; do not represent the portable checks as GPU result
-reproduction. Build output belongs in a temporary directory or an ignored
-`dist/`, never in the commit.
+Run `bash -n` on every tracked shell script. The Bazel component gates run
+inside the recorded Insula rootfs through `./bazelw`; use
+`./bazelw --emit-plan ...` to inspect the sandbox command before a release
+candidate. These gates are not evidence for a fresh B200 measurement. Verify
+the applicable smoke/full scientific tier separately; do not represent the
+portable checks as GPU result reproduction. Build output belongs in a temporary
+directory or an ignored `dist/`, never in the commit.
 
 ## Clean-clone gate
 

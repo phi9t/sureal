@@ -17,15 +17,15 @@
 From the worktree root, run a fresh, isolated experiment:
 
 ```bash
-python experiments/waymo-perception/architecture.py run masked_pfn --run-id masked_pfn-trial01
+python autonomy/architecture.py run masked_pfn --run-id masked_pfn-trial01
 ```
 
 Verify its retained evidence:
 
 ```bash
-python experiments/waymo-perception/architecture.py verify masked_pfn --run-id masked_pfn-trial01
+python autonomy/architecture.py verify masked_pfn --run-id masked_pfn-trial01
 ```
 
 **Next decision:** carry forward to broader controlled evaluation.
 
-Baseline and shared protocol: [experiment guide](../README.md), [study spec](../../../../docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md), and tickets28–32.
+Baseline and shared protocol: [experiment guide](../README.md), [study spec](../../../docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md), and tickets28–32.

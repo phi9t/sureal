@@ -1,57 +1,57 @@
-> Effective2026-10-05: local MAC implementation is parked and the native goal is paused. Await Corenius infrastructure and explicit readmission. See [closeout and source custody](../../docs/research/parking/2026-10-05/README.md). Historical research goals/results and task acceptance remain preserved.
+> Effective2026-10-05: local MAC implementation is parked and the native goal is paused. Await Corenius infrastructure and explicit readmission. See [closeout and source custody](../docs/research/parking/2026-10-05/README.md). Historical research goals/results and task acceptance remain preserved.
 
 # Actionable research task index
 
-[59 — full MAC automation goal](../../docs/research/tasks/59-full-mac-automation-goal.md)
+[59 — full MAC automation goal](../docs/research/tasks/59-full-mac-automation-goal.md)
 is the worker's immediate P0 objective, split across existing50–57 implementation
 tickets. Completion requires an actual automated two-worker lifecycle with live
 independent acceptance and zero required routine human operational prompts.
 The perception scientific program is preserved;58's manual-supported preparation
 pilot does not close full automation or the scientific questions.
 
-Current user override:[MAC happy path before comprehensive hardening](../../docs/research/2026-10-05-mac-happy-path-first.md).
-[58](../../docs/research/tasks/58-mac-happy-path-perception-pilot.md) prioritizes
+Current user override:[MAC happy path before comprehensive hardening](../docs/research/2026-10-05-mac-happy-path-first.md).
+[58](../docs/research/tasks/58-mac-happy-path-perception-pilot.md) prioritizes
 two bounded perception-preparation workers, useful artifacts, live functionality
 checks and reviewed landing before complete MAC admission. Manual lead support
 is explicit. This provisional use does not close scientific or MAC milestones.
 
-The [remaining full-admission backlog](../../docs/research/task-queue.md#historical-full-admission-sequence-october-4-2026)
+The [remaining full-admission backlog](../docs/research/task-queue.md#historical-full-admission-sequence-october-4-2026)
 retains MAC50–54/53 and persistent-lead55–57 contracts. It does not block58
 provisional use. Independently admitted models/training44–48 retain their
 scientific dependencies;57 adds none. No new lead automation is accepted by
 this index.
 
-[Overall goal and evidence policy](../../docs/research/tasks/program-goal.md). One local task specification per ticket; core execution starts at 01. Tickets 01–06 are verified complete: [R0 evidence](research/r0-geometric-insula.md). Tickets 08 and 09 are also verified complete: [single-device Torch GPU runtime](research/gpu-runtime-verified.json) and [Perception evaluators](research/perception-evaluators-verified.json). Remaining core tickets are planned or preparing scientific readiness. Per-ticket files and linked candidate-specific receipts are authoritative; previous partial implementation/evidence does not automatically satisfy later gates. Conditional tickets require a later activation decision.
+[Overall goal and evidence policy](../docs/research/tasks/program-goal.md). One local task specification per ticket; core execution starts at 01. Tickets 01–06 are verified complete: [R0 evidence](research/r0-geometric-insula.md). Tickets 08 and 09 are also verified complete: [single-device Torch GPU runtime](research/gpu-runtime-verified.json) and [Perception evaluators](research/perception-evaluators-verified.json). Remaining core tickets are planned or preparing scientific readiness. Per-ticket files and linked candidate-specific receipts are authoritative; previous partial implementation/evidence does not automatically satisfy later gates. Conditional tickets require a later activation decision.
 
 | Ticket | Deliverable | Blocked by | Lane |
 |---|---|---|---|
-| [01](../../docs/research/tasks/01-insula-runtime.md) | M0: prove the dedicated Insula runtime | — | core |
-| [02](../../docs/research/tasks/02-native-replay.md) | M1: replay the complete native slice | 01 | core |
-| [03](../../docs/research/tasks/03-geometry-math.md) | M2: verify the mathematical geometry foundation | 01 | core |
-| [04](../../docs/research/tasks/04-sensor-reconstruction.md) | M3: reconstruct real calibrated sensors | 02, 03 | core |
-| [05](../../docs/research/tasks/05-inspection-views.md) | M4: inspect range, BEV and camera scene views | 04 | core |
-| [06](../../docs/research/tasks/06-r0-closeout.md) | M5: close the reproducible sensor-to-scene tracer | 02, 03, 04, 05 | core |
-| [07](../../docs/research/tasks/07-scientific-protocol.md) | Freeze cohorts, budgets and statistical protocols | 06 | core |
-| [08](../../docs/research/tasks/08-gpu-runtime.md) | Verify a locked GPU model runtime | 01 | core |
-| [09](../../docs/research/tasks/09-perception-evaluators.md) | Verify TF-free Perception evaluation | 06 | core |
-| [10](../../docs/research/tasks/10-pointpillars-detection.md) | Establish independent PointPillars detection | 07, 08, 09 | core |
-| [11](../../docs/research/tasks/11-point-segmentation.md) | Establish independent point-semantic segmentation | 07, 08, 09 | core |
-| [12](../../docs/research/tasks/12-swformer-comparison.md) | Compare pillar encoding with SWFormer mechanisms | 10 | core |
-| [13](../../docs/research/tasks/13-rsn-range-study.md) | Evaluate the RSN range-view pathway | 10 | core |
-| [14](../../docs/research/tasks/14-camera-box-mask-baselines.md) | Establish camera box and semantic baselines | 07, 08, 09 | core |
-| [15](../../docs/research/tasks/15-camera-3d-let.md) | Establish camera-only 3D and LET evaluation | 07, 08, 09 | core |
-| [16](../../docs/research/tasks/16-r4d-distance.md) | Investigate reference-object distance estimation | 15 | core |
-| [17](../../docs/research/tasks/17-sam-mask-refinement.md) | Compare frozen SAM spatial refinement | 14 | core |
-| [18](../../docs/research/tasks/18-mask-to-lidar.md) | Test geometry-aware mask transfer | 17, 11, 04 | core |
-| [19](../../docs/research/tasks/19-motion-ingestion-evaluation.md) | Verify Motion ingestion and forecasting evaluator | 06 | core |
-| [20](../../docs/research/tasks/20-motion-baseline.md) | Establish tracks-and-map forecasting reference | 07, 08, 19 | core |
-| [21](../../docs/research/tasks/21-forecast-feature-study.md) | Measure sensor-feature forecasting utility | 20 | core |
-| [22](../../docs/research/tasks/22-program-synthesis.md) | Close the core program with an evidence-backed decision | 12, 13, 16, 18, 21 | core |
-| [23](../../docs/research/tasks/23-sam-concept-discovery.md) | Evaluate SAM 3 concept discovery | 17 | conditional |
-| [24](../../docs/research/tasks/24-teacher-distillation.md) | Test camera-teacher to LiDAR-student distillation | 18 | conditional |
-| [25](../../docs/research/tasks/25-joint-multimodal-model.md) | Test a joint multimodal detector and segmenter | 10, 11, 14, 18 | conditional |
-| [26](../../docs/research/tasks/26-temporal-uncertainty.md) | Test temporal memory and uncertainty | 11, 18 | conditional |
-| [27](../../docs/research/tasks/27-planning-contract.md) | Specify and verify the next planning study | 21 | conditional |
+| [01](../docs/research/tasks/01-insula-runtime.md) | M0: prove the dedicated Insula runtime | — | core |
+| [02](../docs/research/tasks/02-native-replay.md) | M1: replay the complete native slice | 01 | core |
+| [03](../docs/research/tasks/03-geometry-math.md) | M2: verify the mathematical geometry foundation | 01 | core |
+| [04](../docs/research/tasks/04-sensor-reconstruction.md) | M3: reconstruct real calibrated sensors | 02, 03 | core |
+| [05](../docs/research/tasks/05-inspection-views.md) | M4: inspect range, BEV and camera scene views | 04 | core |
+| [06](../docs/research/tasks/06-r0-closeout.md) | M5: close the reproducible sensor-to-scene tracer | 02, 03, 04, 05 | core |
+| [07](../docs/research/tasks/07-scientific-protocol.md) | Freeze cohorts, budgets and statistical protocols | 06 | core |
+| [08](../docs/research/tasks/08-gpu-runtime.md) | Verify a locked GPU model runtime | 01 | core |
+| [09](../docs/research/tasks/09-perception-evaluators.md) | Verify TF-free Perception evaluation | 06 | core |
+| [10](../docs/research/tasks/10-pointpillars-detection.md) | Establish independent PointPillars detection | 07, 08, 09 | core |
+| [11](../docs/research/tasks/11-point-segmentation.md) | Establish independent point-semantic segmentation | 07, 08, 09 | core |
+| [12](../docs/research/tasks/12-swformer-comparison.md) | Compare pillar encoding with SWFormer mechanisms | 10 | core |
+| [13](../docs/research/tasks/13-rsn-range-study.md) | Evaluate the RSN range-view pathway | 10 | core |
+| [14](../docs/research/tasks/14-camera-box-mask-baselines.md) | Establish camera box and semantic baselines | 07, 08, 09 | core |
+| [15](../docs/research/tasks/15-camera-3d-let.md) | Establish camera-only 3D and LET evaluation | 07, 08, 09 | core |
+| [16](../docs/research/tasks/16-r4d-distance.md) | Investigate reference-object distance estimation | 15 | core |
+| [17](../docs/research/tasks/17-sam-mask-refinement.md) | Compare frozen SAM spatial refinement | 14 | core |
+| [18](../docs/research/tasks/18-mask-to-lidar.md) | Test geometry-aware mask transfer | 17, 11, 04 | core |
+| [19](../docs/research/tasks/19-motion-ingestion-evaluation.md) | Verify Motion ingestion and forecasting evaluator | 06 | core |
+| [20](../docs/research/tasks/20-motion-baseline.md) | Establish tracks-and-map forecasting reference | 07, 08, 19 | core |
+| [21](../docs/research/tasks/21-forecast-feature-study.md) | Measure sensor-feature forecasting utility | 20 | core |
+| [22](../docs/research/tasks/22-program-synthesis.md) | Close the core program with an evidence-backed decision | 12, 13, 16, 18, 21 | core |
+| [23](../docs/research/tasks/23-sam-concept-discovery.md) | Evaluate SAM 3 concept discovery | 17 | conditional |
+| [24](../docs/research/tasks/24-teacher-distillation.md) | Test camera-teacher to LiDAR-student distillation | 18 | conditional |
+| [25](../docs/research/tasks/25-joint-multimodal-model.md) | Test a joint multimodal detector and segmenter | 10, 11, 14, 18 | conditional |
+| [26](../docs/research/tasks/26-temporal-uncertainty.md) | Test temporal memory and uncertainty | 11, 18 | conditional |
+| [27](../docs/research/tasks/27-planning-contract.md) | Specify and verify the next planning study | 21 | conditional |
 
 ## Current execution order for remaining data gates
 
@@ -88,25 +88,25 @@ Every model architecture begins with the [fixed-batch overfit verifier](research
 
 ## Architecture directions (authorized2026-10-02)
 
-[Study spec](../../docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md) and [execution plan](../../docs/superpowers/plans/2026-10-02-perception-architecture-study.md). Tickets28–32 cover pillar encoders, BEVbackbones, retention/grid, range/pointattention, and fullclass/heldoutpromotion. Firstcohort runs independent deeperPFN/contextPFN/residualBEV variants, then64pointretention. Every milestone requires liveInsula plus separate replay/admission; none closes the original detection/segmentation/forecasting goals on a single batch.
+[Study spec](../docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md) and [execution plan](../docs/superpowers/plans/2026-10-02-perception-architecture-study.md). Tickets28–32 cover pillar encoders, BEVbackbones, retention/grid, range/pointattention, and fullclass/heldoutpromotion. Firstcohort runs independent deeperPFN/contextPFN/residualBEV variants, then64pointretention. Every milestone requires liveInsula plus separate replay/admission; none closes the original detection/segmentation/forecasting goals on a single batch.
 
 ## Balanced all-class fitting continuation
 
-[33: balanced cohort fitting](../../docs/research/tasks/33-balanced-cohort-fitting.md) defines the matched baseline/residual experiment and native promotion gate. Both2000-update runs passed exact16-frame checkpoint/Adam replay and48 independent loss equations; their independently audited final native scores fail the all-class gate. All three checkpoint audits are complete; [comparison results](research/balanced16-fitting-results.md) close ticket33 with a negative result. [34: rare-class learning diagnosis](../../docs/research/tasks/34-rare-class-learning-diagnosis.md) defines the next controlled investigation. Data coverage is stronger, but it does not establish detector readiness or close the original research program.
+[33: balanced cohort fitting](../docs/research/tasks/33-balanced-cohort-fitting.md) defines the matched baseline/residual experiment and native promotion gate. Both2000-update runs passed exact16-frame checkpoint/Adam replay and48 independent loss equations; their independently audited final native scores fail the all-class gate. All three checkpoint audits are complete; [comparison results](research/balanced16-fitting-results.md) close ticket33 with a negative result. [34: rare-class learning diagnosis](../docs/research/tasks/34-rare-class-learning-diagnosis.md) defines the next controlled investigation. Data coverage is stronger, but it does not establish detector readiness or close the original research program.
 
 ## All-class single-batch sweep
 
-[35: fixed-batch fitting sweep](../../docs/research/tasks/35-all-class-single-batch-sweep.md) runs all15runnable training treatments plus a cap-equivalence control on one all-class frame. All15 treatments passed sustained all-class native overfit with exact full-trajectory/model/Adam/RNG replay. Terminal cap equivalence and final live Insula closure passed; [closed comparison](research/tier1-overfit20261002b-results.md) and [full curves](research/tier1-overfit20261002b-results.json) are authoritative. Versioned decoderV3 repairs a proven periodic-heading correction defect; preserve and distinguish historicalV2 scores. Full-cohort/heldout promotion and the original research goals remain open.
+[35: fixed-batch fitting sweep](../docs/research/tasks/35-all-class-single-batch-sweep.md) runs all15runnable training treatments plus a cap-equivalence control on one all-class frame. All15 treatments passed sustained all-class native overfit with exact full-trajectory/model/Adam/RNG replay. Terminal cap equivalence and final live Insula closure passed; [closed comparison](research/tier1-overfit20261002b-results.md) and [full curves](research/tier1-overfit20261002b-results.json) are authoritative. Versioned decoderV3 repairs a proven periodic-heading correction defect; preserve and distinguish historicalV2 scores. Full-cohort/heldout promotion and the original research goals remain open.
 
 ## Expanded fixed-batch architecture scope
 
 User requested every planned idea. The concrete written design and implementation plan are approved for inline execution; the original sweep is closed. Native grouping/range caches, CPU module contracts and all8 actual-frame CUDA gates are admitted. The independent full closure now reconciles384 stage receipts: seven cases sustain fitting, while the sparse transformer has a valid negative result at10,000 updates. Held-out comparisons remain open. Separate implementation/overfit tickets:
 
-- [36: Fine/coarse grid grouping](../../docs/research/tasks/36-grid-resolution.md)
-- [37: Ragged dynamic pillars](../../docs/research/tasks/37-ragged-pillars.md)
-- [38: Within-pillar attention](../../docs/research/tasks/38-point-attention.md)
-- [39: Range-to-pillar feature fusion](../../docs/research/tasks/39-range-fusion.md)
-- [40: Sparse multiscale BEV transformer](../../docs/research/tasks/40-sparse-bev-transformer.md)
+- [36: Fine/coarse grid grouping](../docs/research/tasks/36-grid-resolution.md)
+- [37: Ragged dynamic pillars](../docs/research/tasks/37-ragged-pillars.md)
+- [38: Within-pillar attention](../docs/research/tasks/38-point-attention.md)
+- [39: Range-to-pillar feature fusion](../docs/research/tasks/39-range-fusion.md)
+- [40: Sparse multiscale BEV transformer](../docs/research/tasks/40-sparse-bev-transformer.md)
 
 ## Experiment tracking and journal
 
@@ -114,44 +114,44 @@ User requested every planned idea. The concrete written design and implementatio
 
 ## First-class models and training workstream
 
-The user selected first-class `sureal/models/` and `sureal/training/`, starting with duplicated fixed-frame producers while preserving the specialized sustained loop. [Design proposal](../../docs/superpowers/specs/2026-10-03-first-class-models-training-design.md) and [research work guide](../../docs/research/README.md) define the scope. Implementation remains gated by written design/plan review, active implementation closeout and fresh live admission. These supporting tasks do not close the original scientific comparisons.
+The user selected first-class `sureal/models/` and `sureal/training/`, starting with duplicated fixed-frame producers while preserving the specialized sustained loop. [Design proposal](../docs/superpowers/specs/2026-10-03-first-class-models-training-design.md) and [research work guide](../docs/research/README.md) define the scope. Implementation remains gated by written design/plan review, active implementation closeout and fresh live admission. These supporting tasks do not close the original scientific comparisons.
 
 | Ticket | Deliverable | Blocked by |
 | --- | --- | --- |
-| [44](../../docs/research/tasks/44-models-training-reference-admission.md) | Frozen reference and independent migration comparison admission | Review gates, admitted local protocol 53 |
-| [45](../../docs/research/tasks/45-first-class-models-and-layers.md) | Installed scientific models, neural layers and equivalent detector assembly | 44 |
-| [46](../../docs/research/tasks/46-first-class-training-policy-and-state.md) | Losses, optimizer policy and explicit checkpoint formats | 45 |
-| [47](../../docs/research/tasks/47-shared-fixed-frame-producer.md) | One maintained fixed-frame producer and thin experiment adapters | 46 |
-| [48](../../docs/research/tasks/48-models-training-retention-and-closeout.md) | Discoverability, HDFS recovery evidence and landed closeout | 47 |
+| [44](../docs/research/tasks/44-models-training-reference-admission.md) | Frozen reference and independent migration comparison admission | Review gates, admitted local protocol 53 |
+| [45](../docs/research/tasks/45-first-class-models-and-layers.md) | Installed scientific models, neural layers and equivalent detector assembly | 44 |
+| [46](../docs/research/tasks/46-first-class-training-policy-and-state.md) | Losses, optimizer policy and explicit checkpoint formats | 45 |
+| [47](../docs/research/tasks/47-shared-fixed-frame-producer.md) | One maintained fixed-frame producer and thin experiment adapters | 46 |
+| [48](../docs/research/tasks/48-models-training-retention-and-closeout.md) | Discoverability, HDFS recovery evidence and landed closeout | 47 |
 
-[Queue policy](../../docs/research/task-queue.md) records scheduling responsibilities. Existing numbered task files define acceptance; experiment state remains evidence-derived. Preserve the prior approved research order and active frozen packages during migration.
+[Queue policy](../docs/research/task-queue.md) records scheduling responsibilities. Existing numbered task files define acceptance; experiment state remains evidence-derived. Preserve the prior approved research order and active frozen packages during migration.
 
 ## Sureal-local two-worker collaboration protocol
 
-After the current worker's full owned integration closeout and a verified pristine `phi9t/mainline`, the user selected a minimal local lead–worker protocol before models/training migration. Corenius is a design reference; no Corenius implementation or runtime is required. [Design proposal](../../docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md) and [queue policy](../../docs/research/task-queue.md) preserve existing scientific evidence and execution contracts.
+After the current worker's full owned integration closeout and a verified pristine `phi9t/mainline`, the user selected a minimal local lead–worker protocol before models/training migration. Corenius is a design reference; no Corenius implementation or runtime is required. [Design proposal](../docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md) and [queue policy](../docs/research/task-queue.md) preserve existing scientific evidence and execution contracts.
 
 | Ticket | Deliverable | Blocked by |
 | --- | --- | --- |
-| [49](../../docs/research/tasks/49-collaboration-project-admission.md) | Pristine canonical base, local records and exclusive controller lock | Current closeout, written design/plan review |
-| [50](../../docs/research/tasks/50-collaboration-worker-attempts.md) | Two concurrent sessions in distinct owned worktrees | 49 |
-| [51](../../docs/research/tasks/51-collaboration-candidate-verification.md) | Exact immutable candidate submission, verification and repair | 50 |
-| [52](../../docs/research/tasks/52-collaboration-landing-recovery.md) | Conditional exact fast-forward landing and recovery | 51 |
-| [53.0](../../docs/research/tasks/53-0-collaboration-retention-cleanup-foundation.md) | Landed retention/cleanup and pilot-check foundation | 52 |
-| [54](../../docs/research/tasks/54-worker-program-observability.md) | Worker summaries, state graphs and queue/spec overview | 49–52; landed53.0 |
-| [53](../../docs/research/tasks/53-collaboration-cleanup-closeout.md) | Retained evidence, concurrent pilot and stale-candidate refresh | 52; 54 |
+| [49](../docs/research/tasks/49-collaboration-project-admission.md) | Pristine canonical base, local records and exclusive controller lock | Current closeout, written design/plan review |
+| [50](../docs/research/tasks/50-collaboration-worker-attempts.md) | Two concurrent sessions in distinct owned worktrees | 49 |
+| [51](../docs/research/tasks/51-collaboration-candidate-verification.md) | Exact immutable candidate submission, verification and repair | 50 |
+| [52](../docs/research/tasks/52-collaboration-landing-recovery.md) | Conditional exact fast-forward landing and recovery | 51 |
+| [53.0](../docs/research/tasks/53-0-collaboration-retention-cleanup-foundation.md) | Landed retention/cleanup and pilot-check foundation | 52 |
+| [54](../docs/research/tasks/54-worker-program-observability.md) | Worker summaries, state graphs and queue/spec overview | 49–52; landed53.0 |
+| [53](../docs/research/tasks/53-collaboration-cleanup-closeout.md) | Retained evidence, concurrent pilot and stale-candidate refresh | 52; 54 |
 
 ## Persistent lead and human-steering reduction
 
-[Written design](../../docs/superpowers/specs/2026-10-04-persistent-research-lead-design.md).
+[Written design](../docs/superpowers/specs/2026-10-04-persistent-research-lead-design.md).
 All three tickets have P0 priority and preserve the MAC controller as effect
 authority. Drafting/review can proceed before53; implementation waits for its
 independent closeout and new written-spec/plan admission.
 
 | Ticket | Goal and deliverable | Execution blocked by |
 |---|---|---|
-| [55](../../docs/research/tasks/55-lead-authority-action-policy.md) | Explicit authority and deterministic next-action eligibility | 53; reviewed landed spec/plan |
-| [56](../../docs/research/tasks/56-persistent-lead-execution.md) | Automatic dispatch/continuation/repair/verification/landing with recovery | 55 |
-| [57](../../docs/research/tasks/57-lead-human-toil-acceptance.md) | Clear decisions and zero required routine human prompts in the live pilot | 56 |
+| [55](../docs/research/tasks/55-lead-authority-action-policy.md) | Explicit authority and deterministic next-action eligibility | 53; reviewed landed spec/plan |
+| [56](../docs/research/tasks/56-persistent-lead-execution.md) | Automatic dispatch/continuation/repair/verification/landing with recovery | 55 |
+| [57](../docs/research/tasks/57-lead-human-toil-acceptance.md) | Clear decisions and zero required routine human prompts in the live pilot | 56 |
 
 All implementation milestones require independent live Insula receipts. These tickets are specified, not completed. Stage order is pristine mainline → 49–52 → 53.0 → 54 → 53 → models/training44–48; no historical worktree or frozen scientific artifact is discarded by adopting that order.
 
@@ -171,9 +171,9 @@ The checkpoint-only publisher now has [actual live retention evidence](research/
 
 ## Prediction–target association study (specified 2026-10-03)
 
-[41: association and supervision coverage](../../docs/research/tasks/41-prediction-target-association.md)
-is a dedicated follow-up under ticket 34. The [design](../../docs/superpowers/specs/2026-10-03-prediction-target-association-design.md),
-[implementation plan](../../docs/superpowers/plans/2026-10-03-prediction-target-association.md)
+[41: association and supervision coverage](../docs/research/tasks/41-prediction-target-association.md)
+is a dedicated follow-up under ticket 34. The [design](../docs/superpowers/specs/2026-10-03-prediction-target-association-design.md),
+[implementation plan](../docs/superpowers/plans/2026-10-03-prediction-target-association.md)
 and [experiment handbook](research/prediction-target-association-study.md) specify
 A0 legacy, A1 globally covered nearest-BEV ownership, A2 3D-aware matching and
 A3 detached prediction-dependent matching. Each work package has live Insula
@@ -190,8 +190,8 @@ follow-ups with separate controls; held-out and broader program goals remain ope
 
 ## Separate target-coverage follow-up
 
-[Ticket41 — prediction–target association](../../docs/research/tasks/41-prediction-target-association.md) is the existing authoritative study for the independently observed missing-target problem. Its numerical design, six implementation gates and A0–A3 treatments cover ownership, geometry and detached prediction-aware matching. It is specified only; the active sustained16 optimization recipes keep their original assignment unchanged. No second ticket41 is created.
+[Ticket41 — prediction–target association](../docs/research/tasks/41-prediction-target-association.md) is the existing authoritative study for the independently observed missing-target problem. Its numerical design, six implementation gates and A0–A3 treatments cover ownership, geometry and detached prediction-aware matching. It is specified only; the active sustained16 optimization recipes keep their original assignment unchanged. No second ticket41 is created.
 
 ## User-approved initial-experiment investigation priorities
 
-Keep compact pillar/dense-GN CNN and clipped Adam as reference; complete the active four-recipe sustained16 controls unchanged. [42: object failure ledger](../../docs/research/tasks/42-object-failure-ledger.md) specifies measurement/assignment/geometry/ranking/suppression/native-match evidence. [43: frozen normalization diagnostic](../../docs/research/tasks/43-frozen-normalization-diagnostic.md) tests pillarBN state with frozen weights and identical full-native-GT decoding before any separate pillarLN treatment. Existing41 isolates supervision ownership/geometry. Residual/masked pooling and controlled point attention form the initial follow-up shortlist; range and sparse mechanisms remain exploratory. Scientific promotion requires held-out multiseed quality/resource evidence; one-frame saturation and historical reanalysis are not adoption.
+Keep compact pillar/dense-GN CNN and clipped Adam as reference; complete the active four-recipe sustained16 controls unchanged. [42: object failure ledger](../docs/research/tasks/42-object-failure-ledger.md) specifies measurement/assignment/geometry/ranking/suppression/native-match evidence. [43: frozen normalization diagnostic](../docs/research/tasks/43-frozen-normalization-diagnostic.md) tests pillarBN state with frozen weights and identical full-native-GT decoding before any separate pillarLN treatment. Existing41 isolates supervision ownership/geometry. Residual/masked pooling and controlled point attention form the initial follow-up shortlist; range and sparse mechanisms remain exploratory. Scientific promotion requires held-out multiseed quality/resource evidence; one-frame saturation and historical reanalysis are not adoption.

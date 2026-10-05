@@ -31,9 +31,16 @@ Run the narrowest relevant tests while developing, then the applicable gate:
 python -m unittest tests.test_publication_audit -v
 python scripts/publication_audit.py --root .
 
-# Required offline CPU numerical-contract gate (Python 3.10)
-python -m pip install numpy==1.26.4
-PYTHONPATH=parallax python -m unittest discover -s parallax/tests -p 'test_*.py' -v
+# Inspect the Insula sandbox command selected by the Bazel wrapper
+./bazelw --emit-plan test //parallax/...
+./bazelw --emit-plan test //autonomy/...
+
+# Required component gates, run by Bazel inside the recorded Insula rootfs
+./bazelw test //parallax/...
+./bazelw test //autonomy/...
+
+# GPU-only autonomy tests are opt-in and require the documented B200 runtime
+./bazelw test --config=cuda //autonomy/...
 
 # Containerized numerical and adapter smoke checks
 parallax/run.sh all --profile smoke
@@ -42,9 +49,9 @@ parallax/run.sh all --profile smoke
 parallax/run.sh all --profile full
 ```
 
-The required CPU numerical gate validates fixtures, evaluators, corruption
-rejection, and aggregate semantics.
-It is not evidence for a fresh B200 measurement. The portable gates do not
-claim CUDA or scientific-result
-reproduction. State which smoke or full modules you ran, and explain any
-hardware-gated checks that were not run.
+The default Bazel component gates validate fixtures, evaluators, corruption
+rejection, aggregate semantics and perception unit tests without host Python
+packages. They are not evidence for a fresh B200 measurement. The portable gates
+do not claim CUDA or scientific-result reproduction. State which smoke, full or
+GPU-configured modules you ran, and explain any hardware-gated checks that were
+not run.

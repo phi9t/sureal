@@ -4,7 +4,7 @@ A persistent catalog of tested directions and planned follow-ups. The runner use
 
 Prediction–target association is a separately specified experiment axis:
 [study handbook](../research/prediction-target-association-study.md),
-[ticket 41](../../../docs/research/tasks/41-prediction-target-association.md).
+[ticket 41](../../docs/research/tasks/41-prediction-target-association.md).
 Its A0–A3 matrix separates legacy ownership, global coverage, 3D geometry and
 prediction-dependent matching while keeping the baseline architecture/loss/decoder
 fixed. These treatments are planned and are not supported by this architecture
@@ -32,23 +32,23 @@ separate gates.
 From this worktree, use:
 
 ```bash
-python experiments/waymo-perception/architecture.py list
-python experiments/waymo-perception/architecture.py show residual_bev
-python experiments/waymo-perception/architecture.py run residual_bev --run-id residual-trial01 --dry-run
-python experiments/waymo-perception/architecture.py run residual_bev --run-id residual-trial01
-python experiments/waymo-perception/architecture.py verify residual_bev --run-id residual-trial01
+python autonomy/architecture.py list
+python autonomy/architecture.py show residual_bev
+python autonomy/architecture.py run residual_bev --run-id residual-trial01 --dry-run
+python autonomy/architecture.py run residual_bev --run-id residual-trial01
+python autonomy/architecture.py verify residual_bev --run-id residual-trial01
 ```
 
 An absolute path to architecture.py works from any current directory. A run ID is globally unique in the selected cache. Omit it to generate a UTC timestamp plus random suffix. Existing runs are preserved; reusing an ID requires `--resume`. Completed stages are skipped only after their evidence hashes are verified. If an incomplete stage already has outputs, resume stops and preserves them; select a new run ID. This runner does not erase/retry partial artifacts.
 
 ```bash
-python experiments/waymo-perception/architecture.py run residual_bev --run-id residual-trial01 --resume
+python autonomy/architecture.py run residual_bev --run-id residual-trial01 --resume
 ```
 
 Read-only verification of the original cohort requires no new training:
 
 ```bash
-python experiments/waymo-perception/architecture.py verify residual_bev
+python autonomy/architecture.py verify residual_bev
 ```
 
 Prerequisites: the acquired native caches and their admission receipts, bubblewrap, locked GPU/CPU/native-metric roots, and matching NVIDIA driver files. Default cache: `~/.cache/waystone/waymo-perception`; `--cache-root PATH` precedes the subcommand to select an already prepared cache. This runner does not download data, authenticate, build root filesystems or silently replace missing fixtures. Retention candidates additionally require their independently admitted64-point/all-pillar caches. Missing prerequisites fail with an explicit path.
@@ -70,7 +70,7 @@ The public bundled harness lives in `harness/`. New executions do not depend on 
 
 A completed run means the implementation and evaluation are admitted. It does not mean the architecture passed quality thresholds. Summaries report scores and first crossing brackets; full-class Tier1 and heldout promotion remain separate. The fixed recipe is deliberately not an unrestricted hyperparameter sweep. Additional seeds/configurations require a separately specified experiment.
 
-[First-cohort results](../research/architecture-first-cohort-results.md) · [Study spec](../../../docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md) · [Execution plan](../../../docs/superpowers/plans/2026-10-02-perception-architecture-study.md)
+[First-cohort results](../research/architecture-first-cohort-results.md) · [Study spec](../../docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md) · [Execution plan](../../docs/superpowers/plans/2026-10-02-perception-architecture-study.md)
 
 ## Verified runner evidence (2026-10-02)
 

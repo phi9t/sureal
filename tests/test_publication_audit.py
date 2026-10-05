@@ -5,6 +5,7 @@ import io
 import json
 from pathlib import Path
 import re
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -32,6 +33,35 @@ REQUIRED_PUBLIC_FILES = {
     "UPSTREAM.md",
     "pyproject.toml",
 }
+LIVING_DOCUMENTS = (
+    "README.md",
+    "CONTRIBUTING.md",
+    "RELEASING.md",
+    "AGENTS.md",
+    "CONTEXT-MAP.md",
+    "autonomy/README.md",
+    "autonomy/ARCHITECTURE.md",
+    "autonomy/advanced/README.md",
+    "autonomy/architecture/README.md",
+    "autonomy/explorer/README.md",
+    "autonomy/resources/README.md",
+    "autonomy/scripts/HDFS_AUTH.md",
+    "autonomy/tier1/README.md",
+    "autonomy/tracking/README.md",
+    "autonomy/viewer/README.md",
+    "parallax/README.md",
+)
+STALE_COMPONENT_PATHS = (
+    "experiments/waymo-perception",
+    "experiments/3d-pathway",
+)
+STALE_PATH_EXCLUDED_MARKDOWN_PREFIXES = (
+    ".scratch/",
+    "docs/adr/",
+    "docs/research/",
+    "docs/superpowers/plans/",
+    "docs/superpowers/specs/",
+)
 
 
 def run(*args: str, cwd: Path, check: bool = True) -> subprocess.CompletedProcess[str]:
@@ -386,6 +416,20 @@ class PortableAuditTests(unittest.TestCase):
 
 
 class RepositoryIdentityTests(unittest.TestCase):
+    def living_markdown(self) -> list[str]:
+        tracked_markdown = run(
+            "git",
+            "ls-files",
+            "*.md",
+            cwd=REPOSITORY_ROOT,
+        ).stdout.splitlines()
+        return [
+            path
+            for path in tracked_markdown
+            if "/research/" not in path
+            and not path.startswith(STALE_PATH_EXCLUDED_MARKDOWN_PREFIXES)
+        ]
+
     def test_context_map_points_at_moved_autonomy_glossary(self) -> None:
         context_map = (REPOSITORY_ROOT / "CONTEXT-MAP.md").read_text(
             encoding="utf-8"
@@ -409,10 +453,148 @@ class RepositoryIdentityTests(unittest.TestCase):
             "[Research mission](MISSION.md)",
             "[3D reconstruction pathway](docs/3d-reconstruction-pathway.md)",
             "[Executable pathway labs](parallax/README.md)",
+            "[Waymo perception pipeline](autonomy/README.md)",
         ):
             self.assertIn(link, readme)
         for tier in ("Portable", "Smoke", "Full B200"):
             self.assertIn(tier, readme)
+
+    def test_living_documents_name_the_current_component_paths(self) -> None:
+        living_markdown = self.living_markdown()
+        self.assertIn("autonomy/README.md", living_markdown)
+        self.assertIn("autonomy/architecture/ideas/residual_bev.md", living_markdown)
+
+        for relative_path in living_markdown:
+            with self.subTest(path=relative_path):
+                content = (REPOSITORY_ROOT / relative_path).read_text(
+                    encoding="utf-8"
+                )
+                for stale_path in STALE_COMPONENT_PATHS:
+                    self.assertNotIn(stale_path, content)
+
+    def test_living_document_relative_links_resolve(self) -> None:
+        link_pattern = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
+        living_markdown = self.living_markdown()
+        for relative_path in living_markdown:
+            document = REPOSITORY_ROOT / relative_path
+            content = document.read_text(encoding="utf-8")
+            for match in link_pattern.finditer(content):
+                target = match.group(1).strip()
+                if not target or target.startswith(("#", "http://", "https://", "mailto:")):
+                    continue
+                target = target.split("#", 1)[0].strip()
+                if not target:
+                    continue
+                target = target.removeprefix("<").removesuffix(">")
+                resolved = (document.parent / target).resolve()
+                with self.subTest(document=relative_path, target=target):
+                    self.assertTrue(resolved.exists(), f"{relative_path} -> {target}")
+
+    def test_living_document_repo_relative_command_entrypoints_exist(self) -> None:
+        command_names = {
+            "./bazelw",
+            "autonomy/gcs.sh",
+            "autonomy/setup-gcs.sh",
+            "parallax/run.sh",
+        }
+        python_names = {"python", "python3"}
+
+        def repo_path(candidate: str) -> Path | None:
+            normalized = candidate.removeprefix("./")
+            if normalized == "bazelw":
+                return REPOSITORY_ROOT / normalized
+            if normalized.startswith(
+                ("autonomy/", "parallax/", "scripts/", "install/", "examples/")
+            ):
+                return REPOSITORY_ROOT / normalized
+            return None
+
+        for relative_path in self.living_markdown():
+            content = (REPOSITORY_ROOT / relative_path).read_text(encoding="utf-8")
+            for line_number, line in enumerate(content.splitlines(), start=1):
+                stripped = line.strip()
+                if not stripped or stripped.startswith(("#", "$")):
+                    continue
+                if stripped.endswith("\\"):
+                    stripped = stripped[:-1].rstrip()
+                try:
+                    tokens = shlex.split(stripped)
+                except ValueError:
+                    continue
+
+                for token in tokens:
+                    if not re.fullmatch(r"[A-Z_][A-Z0-9_]*=.*", token):
+                        break
+                    value = token.split("=", 1)[1]
+                    path = repo_path(value)
+                    if path is not None:
+                        with self.subTest(
+                            document=relative_path,
+                            line=line_number,
+                            value=value,
+                        ):
+                            self.assertTrue(
+                                path.exists(),
+                                f"{relative_path}:{line_number}: {value}",
+                            )
+                while tokens and re.fullmatch(r"[A-Z_][A-Z0-9_]*=.*", tokens[0]):
+                    tokens.pop(0)
+                if not tokens:
+                    continue
+
+                command = tokens[0]
+                if command in command_names:
+                    path = repo_path(command)
+                    with self.subTest(
+                        document=relative_path,
+                        line=line_number,
+                        command=command,
+                    ):
+                        self.assertIsNotNone(path)
+                        self.assertTrue(
+                            path.exists(),
+                            f"{relative_path}:{line_number}: {command}",
+                        )
+                    continue
+                if command == "bash" and len(tokens) > 1:
+                    path = repo_path(tokens[1])
+                elif (
+                    command in python_names
+                    and len(tokens) > 1
+                    and not tokens[1].startswith("-")
+                ):
+                    path = repo_path(tokens[1])
+                else:
+                    path = None
+                if path is not None:
+                    with self.subTest(
+                        document=relative_path,
+                        line=line_number,
+                        command=stripped,
+                    ):
+                        self.assertTrue(
+                            path.exists(),
+                            f"{relative_path}:{line_number}: {stripped}",
+                        )
+
+    def test_contributing_validation_tiers_use_bazel_wrapper(self) -> None:
+        contributing = (REPOSITORY_ROOT / "CONTRIBUTING.md").read_text(
+            encoding="utf-8"
+        )
+        releasing = (REPOSITORY_ROOT / "RELEASING.md").read_text(
+            encoding="utf-8"
+        )
+
+        for content in (contributing, releasing):
+            self.assertIn("./bazelw test //parallax/...", content)
+            self.assertIn("./bazelw test //autonomy/...", content)
+            self.assertNotIn("PYTHONPATH=parallax python -m unittest discover", content)
+
+    def test_perception_readme_points_to_architecture_note_instead_of_planned_layout(self) -> None:
+        readme = (REPOSITORY_ROOT / "autonomy/README.md").read_text(encoding="utf-8")
+
+        self.assertNotIn("## Planned layout", readme)
+        self.assertIn("[Architecture note](ARCHITECTURE.md)", readme)
 
     def test_canonical_assessment_separates_evidence_from_research_direction(
         self,
@@ -471,8 +653,10 @@ class RepositoryIdentityTests(unittest.TestCase):
                 "pull request",
                 "non-commercial research and evaluation",
                 "python scripts/publication_audit.py --root .",
-                "numpy==1.26.4",
-                "PYTHONPATH=parallax python -m unittest discover",
+                "./bazelw --emit-plan test //parallax/...",
+                "./bazelw --emit-plan test //autonomy/...",
+                "./bazelw test //parallax/...",
+                "./bazelw test //autonomy/...",
                 "not evidence for a fresh B200 measurement",
                 "smoke",
                 "full",
@@ -485,8 +669,8 @@ class RepositoryIdentityTests(unittest.TestCase):
             ),
             "RELEASING.md": (
                 "python scripts/publication_audit.py --root .",
-                "numpy==1.26.4",
-                "PYTHONPATH=parallax python -m unittest discover",
+                "./bazelw test //parallax/...",
+                "./bazelw test //autonomy/...",
                 "not evidence for a fresh B200 measurement",
                 "python -m build",
                 "gitleaks git",

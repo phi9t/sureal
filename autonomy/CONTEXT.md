@@ -33,16 +33,16 @@ Open decisions: single-frame/history scope, operational scene-understanding
 outputs, cohort and compute budgets,
 initial models versus optional later mechanisms.
 
-[Research charter](../../docs/superpowers/specs/2026-09-29-waymo-research-program-design.md)
-[Decision map](../../docs/research/tasks/research-map.md)
+[Research charter](../docs/superpowers/specs/2026-09-29-waymo-research-program-design.md)
+[Decision map](../docs/research/tasks/research-map.md)
 
 Confirmed next directions: frozen predicted-detector-box mask refinement is the
 first SAM integration experiment; controlled forecasting improvement is the
 first downstream target. Planning follows its own later contract. See
-[experiment contracts](../../docs/superpowers/specs/2026-09-30-mask-refinement-and-forecasting-design.md).
+[experiment contracts](../docs/superpowers/specs/2026-09-30-mask-refinement-and-forecasting-design.md).
 
 [Actionable task index](research-task-index.md) records numbered goals, blockers,
-verifiers and acceptance criteria. The [overall goal](../../docs/research/tasks/program-goal.md) defines core closure and conditional follow-ons.
+verifiers and acceptance criteria. The [overall goal](../docs/research/tasks/program-goal.md) defines core closure and conditional follow-ons.
 
 - **Tiny-subset overfit gate:** a training-only test requiring both declared loss reduction and independently scored detection quality; it does not establish generalization.
 - **Architecture adaptation:** an explicit change to the reference model or task contract, distinguished from a faithful paper reproduction.

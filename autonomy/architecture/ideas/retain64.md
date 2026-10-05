@@ -17,15 +17,15 @@
 From the worktree root, run a fresh, isolated experiment:
 
 ```bash
-python experiments/waymo-perception/architecture.py run retain64 --run-id retain64-trial01
+python autonomy/architecture.py run retain64 --run-id retain64-trial01
 ```
 
 Verify its retained evidence:
 
 ```bash
-python experiments/waymo-perception/architecture.py verify retain64 --run-id retain64-trial01
+python autonomy/architecture.py verify retain64 --run-id retain64-trial01
 ```
 
 **Next decision:** do not promote from this batch; needs-more-evidence.
 
-Baseline and shared protocol: [experiment guide](../README.md), [study spec](../../../../docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md), and tickets28–32.
+Baseline and shared protocol: [experiment guide](../README.md), [study spec](../../../docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md), and tickets28–32.

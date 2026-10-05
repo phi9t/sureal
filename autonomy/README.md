@@ -18,7 +18,7 @@ local slice, commands, coverage, unresolved associations and repeatability check
 Run from the repository root in your own interactive terminal:
 
 ```bash
-experiments/waymo-perception/setup-gcs.sh
+autonomy/setup-gcs.sh
 ```
 
 The wizard installs a SHA-256-pinned Google Cloud CLI with bundled Python,
@@ -31,7 +31,7 @@ Linux x86_64 and host Bash, curl, tar, sha256sum and flock are required.
 Reuse the same isolated CLI after setup:
 
 ```bash
-experiments/waymo-perception/gcs.sh -- storage ls gs://waymo_open_dataset_v_2_0_1/
+autonomy/gcs.sh -- storage ls gs://waymo_open_dataset_v_2_0_1/
 ```
 
 No dataset payloads are downloaded during setup. See the
@@ -53,7 +53,7 @@ evidence-bounded 3D reports.
 
 ## Research program
 
-The [Perception-first research program](../../docs/superpowers/specs/2026-09-29-waymo-research-program-design.md)
+The [Perception-first research program](../docs/superpowers/specs/2026-09-29-waymo-research-program-design.md)
 turns the acquired slice into gated geometry, semantic/detection, fusion, memory
 and separate downstream-task experiments. Concrete model bases are
 [PointPillars → CenterPoint head → SWFormer](research/lidar-encoder-bases.md)
@@ -65,33 +65,17 @@ current acceptance and remaining research gates.
 
 ## Active design artifacts
 
-- [Design spec](../../docs/superpowers/specs/2026-09-29-waymo-perception-data-pipeline-design.md)
+- [Design spec](../docs/superpowers/specs/2026-09-29-waymo-perception-data-pipeline-design.md)
 - [Roadmap](roadmap.md)
 - [Upstream contract research](research/upstream-contract.md)
 - [Source and design review](research/design-review.md)
-- [Implementation plan](../../docs/superpowers/plans/2026-09-29-waymo-perception-data-pipeline.md)
+- [Implementation plan](../docs/superpowers/plans/2026-09-29-waymo-perception-data-pipeline.md)
 
-## Planned layout
+## Current layout
 
-```text
-experiments/waymo-perception/
-  README.md
-  roadmap.md
-  research/
-  recipe.json
-  dataset.lock.json
-  result.schema.json
-  report.schema.json
-  run.sh
-  enter.sh
-  verify_recipe.py
-  pipeline/
-```
-
-This layout records the original planning proposal. The tracer schemas,
-isolated runtime, processing/verifier sources and scoped runners were added
-subsequently; their retained receipts and current acceptance status are linked
-from the task index. The complete production-pipeline gate remains separate.
+The [Architecture note](ARCHITECTURE.md) records the current code areas,
+layering, source-pin impact, and repository-root check commands. Retained
+receipts keep their historical paths; current commands use `autonomy/`.
 
 ## Intended first module
 
@@ -121,9 +105,9 @@ real images, panoptic and LiDAR segmentation, keypoints, ego trajectory and
 temporal accumulation. Bundles stay outside git under the viewer cache.
 
 ```bash
-experiments/waymo-perception/viewer/run.sh setup
-experiments/waymo-perception/viewer/run.sh export SLICE_DIR CONTEXT
-experiments/waymo-perception/viewer/run.sh dev
+autonomy/viewer/run.sh setup
+autonomy/viewer/run.sh export SLICE_DIR CONTEXT
+autonomy/viewer/run.sh dev
 ```
 
 ## Current gates
@@ -155,9 +139,9 @@ those scientific measurements. The complete balanced16 resource/continuation
 gate remains open. See the closeout inventory for scoped evidence and blockers.
 
 ```bash
-python experiments/waymo-perception/architecture.py list
-python experiments/waymo-perception/architecture.py run residual_bev --run-id residual-trial01
-python experiments/waymo-perception/architecture.py verify residual_bev --run-id residual-trial01
+python autonomy/architecture.py list
+python autonomy/architecture.py run residual_bev --run-id residual-trial01
+python autonomy/architecture.py verify residual_bev --run-id residual-trial01
 ```
 
 Training, checkpoint replay and native scoring/audits run live Insula. Historical results remain unchanged; planned ideas are refused until implemented. See the guide for prerequisites, budgets, logs and acceptance gates.

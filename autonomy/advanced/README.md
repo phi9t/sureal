@@ -8,13 +8,13 @@ actual-frame CUDA admission and native overfit closure pass.
 Run from the isolated worktree:
 
 ```bash
-python -c "import sys; sys.path.insert(0,'experiments/waymo-perception'); from advanced.catalog import catalog; print('\n'.join(catalog()))"
-python experiments/waymo-perception/advanced/prepare.py
-python experiments/waymo-perception/advanced/prepare_range.py
-python experiments/waymo-perception/advanced/admit.py
-python experiments/waymo-perception/advanced/run.py --run-id UNIQUEALPHANUMERICID
-python experiments/waymo-perception/advanced/run.py --run-id SAMEID --resume
-python experiments/waymo-perception/advanced/verify_results.py experiments/waymo-perception/research/advanced-SAMEID-results.json
+PYTHONPATH=autonomy python -c "from advanced.catalog import catalog; print('\n'.join(catalog()))"
+python autonomy/advanced/prepare.py
+python autonomy/advanced/prepare_range.py
+python autonomy/advanced/admit.py
+python autonomy/advanced/run.py --run-id UNIQUEALPHANUMERICID
+python autonomy/advanced/run.py --run-id SAMEID --resume
+python autonomy/advanced/verify_results.py autonomy/research/advanced-SAMEID-results.json
 ```
 
 Preparation reuses hash-checked receipts. Range preparation needs the pinned
@@ -50,7 +50,7 @@ new-run local artifact. Human HDFS authentication is performed with
 archive a case with the bounded publisher (only new-run namespaces are eligible):
 
 ```bash
-python experiments/waymo-perception/advanced/publish.py --results RESULTS.json --closure LIVE_CLOSURE_RECEIPT.json --case CASE --release
+python autonomy/advanced/publish.py --results RESULTS.json --closure LIVE_CLOSURE_RECEIPT.json --case CASE --release
 ```
 
 The publisher partitions a complete case inventory into bounded archives,

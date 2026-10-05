@@ -14,4 +14,4 @@
 
 **Execution gate:** documented idea only. The runner refuses to execute this ID until its concrete interface, controls and live fixtures are implemented. No training or quality claim exists for this candidate. Freeze the configuration stated above, add the module/cache and verifiers, then register it as runnable.
 
-Baseline and shared protocol: [experiment guide](../README.md), [study spec](../../../../docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md), and tickets28–32.
+Baseline and shared protocol: [experiment guide](../README.md), [study spec](../../../docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md), and tickets28–32.
