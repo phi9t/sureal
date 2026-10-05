@@ -4,7 +4,7 @@
 
 **Blocked by:** 01 (A new version of the CPU rootfs carries Bazel 9.2)
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] The repository root has the Bazel module file, its committed lock file, the Bazel version file and the Bazel configuration; packages are declared only for the two research programs
 - [x] The Python toolchain is the rootfs interpreter with its installed packages; Bazel fetches no third-party Python package
