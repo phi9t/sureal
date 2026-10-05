@@ -10,6 +10,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent
 WAYMO = REPO / "experiments" / "waymo-perception"
 DEFAULT_ROOTFS = Path.home() / ".cache/waystone/waymo-perception/insula/rootfs-v3"
+CURRICULUM_ROOTFS = Path.home() / ".cache/waystone/3d-pathway/insula/rootfs-v1"
 DEFAULT_CACHE = REPO / ".bazel-cache"
 BAZEL_VERSION = "9.2.0"
 
@@ -19,6 +20,20 @@ from pipeline.runtime_identity import rootfs_identity  # noqa: E402
 
 def default_lock(rootfs):
     return Path(str(rootfs) + ".lock.json")
+
+
+def uses_curriculum_rootfs(arguments):
+    return any(
+        argument.startswith("//experiments/3d-pathway")
+        for argument in arguments
+        if not argument.startswith("-")
+    )
+
+
+def output_base_for(rootfs):
+    if rootfs.resolve() == CURRICULUM_ROOTFS.resolve():
+        return "/outputs/output-base-3d-pathway"
+    return "/outputs/output-base"
 
 
 def read_lock(path):
@@ -46,14 +61,14 @@ def verify_rootfs(rootfs, lock):
         )
 
 
-def bazel_command(arguments, update_lock=False):
+def bazel_command(arguments, output_base, update_lock=False):
     if not arguments:
         arguments = ["help"]
     command, *rest = arguments
     lockfile_mode = "update" if update_lock else "error"
     return [
         "bazel",
-        "--output_base=/outputs/output-base",
+        f"--output_base={output_base}",
         command,
         "--ignore_dev_dependency",
         f"--lockfile_mode={lockfile_mode}",
@@ -96,7 +111,7 @@ def sandbox_plan(rootfs, cache, arguments, update_lock=False):
     argv.extend(["--proc", "/proc", "--dev", "/dev", "--tmpfs", "/tmp", "--clearenv"])
     for item in environment:
         argv.extend(item)
-    bazel = bazel_command(arguments, update_lock)
+    bazel = bazel_command(arguments, output_base_for(rootfs), update_lock)
     argv.extend(["--chdir", "/experiment", "--", *bazel])
     return {
         "argv": argv,
@@ -109,7 +124,7 @@ def sandbox_plan(rootfs, cache, arguments, update_lock=False):
 
 def parse(argv):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--rootfs", type=Path, default=Path(os.environ.get("SUREAL_BAZEL_ROOTFS", DEFAULT_ROOTFS)))
+    parser.add_argument("--rootfs", type=Path, default=None)
     parser.add_argument("--lock", type=Path, default=None)
     parser.add_argument("--cache", type=Path, default=Path(os.environ.get("SUREAL_BAZEL_CACHE", DEFAULT_CACHE)))
     parser.add_argument("--emit-plan", action="store_true")
@@ -118,6 +133,14 @@ def parse(argv):
     args = parser.parse_args(argv)
     if args.bazel_args and args.bazel_args[0] == "--":
         args.bazel_args = args.bazel_args[1:]
+    if args.rootfs is None:
+        configured = os.environ.get("SUREAL_BAZEL_ROOTFS")
+        if configured:
+            args.rootfs = Path(configured)
+        elif uses_curriculum_rootfs(args.bazel_args):
+            args.rootfs = CURRICULUM_ROOTFS
+        else:
+            args.rootfs = DEFAULT_ROOTFS
     if args.lock is None:
         args.lock = Path(os.environ.get("SUREAL_BAZEL_ROOTFS_LOCK", default_lock(args.rootfs)))
     return args
@@ -138,7 +161,7 @@ def main(argv=None):
     if args.emit_plan:
         print(json.dumps(plan, sort_keys=True))
         return 0
-    for name in ("home", "output-base", "repository-cache", "disk-cache"):
+    for name in ("home", "output-base", "output-base-3d-pathway", "repository-cache", "disk-cache"):
         (args.cache / name).mkdir(parents=True, exist_ok=True)
     os.execvp(plan["argv"][0], plan["argv"])
 

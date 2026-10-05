@@ -75,6 +75,34 @@ class BazelWrapperTests(unittest.TestCase):
         )
         return result, marker, cache, rootfs, lock
 
+    def run_wrapper_with_default_roots(self, temporary, *arguments):
+        root = Path(temporary)
+        home = root / "home"
+        waymo_rootfs = home / ".cache/waystone/waymo-perception/insula/rootfs-v3"
+        curriculum_rootfs = home / ".cache/waystone/3d-pathway/insula/rootfs-v1"
+        for rootfs in (waymo_rootfs, curriculum_rootfs):
+            rootfs.mkdir(parents=True)
+            write_rootfs(rootfs)
+            write_lock(rootfs.with_name(rootfs.name + ".lock.json"), rootfs)
+        cache = root / "cache"
+        fakebin = root / "fakebin"
+        marker = root / "bwrap-ran"
+        write_fake_bwrap(fakebin, marker)
+        env = os.environ.copy()
+        env["HOME"] = str(home)
+        env["PATH"] = f"{fakebin}{os.pathsep}{env['PATH']}"
+        env["SUREAL_BAZEL_CACHE"] = str(cache)
+        env.pop("SUREAL_BAZEL_ROOTFS", None)
+        env.pop("SUREAL_BAZEL_ROOTFS_LOCK", None)
+        result = subprocess.run(
+            [str(WRAPPER), *arguments],
+            cwd=REPO,
+            env=env,
+            text=True,
+            capture_output=True,
+        )
+        return result, marker, cache, waymo_rootfs, curriculum_rootfs
+
     def test_emit_plan_prints_sandbox_command_data_without_running_bwrap(self):
         self.assertTrue(WRAPPER.is_file(), "repository-level Bazel wrapper is missing")
         with tempfile.TemporaryDirectory() as temporary:
@@ -146,6 +174,26 @@ class BazelWrapperTests(unittest.TestCase):
             )
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("rootfs content does not match rootfs lock", result.stderr)
+            self.assertFalse(marker.exists())
+
+    def test_curriculum_targets_select_the_curriculum_rootfs(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            result, marker, _, waymo_rootfs, curriculum_rootfs = self.run_wrapper_with_default_roots(
+                temporary,
+                "--emit-plan",
+                "test",
+                "//experiments/3d-pathway:test_classical",
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            plan = json.loads(result.stdout)
+            self.assertEqual(plan["rootfs"], str(curriculum_rootfs.resolve()))
+            self.assertNotEqual(plan["rootfs"], str(waymo_rootfs.resolve()))
+            self.assertIn(
+                ["--ro-bind", str(curriculum_rootfs.resolve()), "/"],
+                plan["mounts"],
+            )
+            self.assertIn("--output_base=/outputs/output-base-3d-pathway", plan["bazel"])
+            self.assertNotIn("--output_base=/outputs/output-base", plan["bazel"])
             self.assertFalse(marker.exists())
 
 
