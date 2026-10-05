@@ -17,7 +17,7 @@ from typing import Any
 
 SCOUT_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = SCOUT_ROOT.parent.parent
-PATHWAY_ROOT = REPO_ROOT / "experiments" / "3d-pathway"
+PATHWAY_ROOT = REPO_ROOT / "parallax"
 sys.path.insert(0, str(PATHWAY_ROOT / "pipeline"))
 
 from environment_manifest import environment_tree_manifest  # noqa: E402

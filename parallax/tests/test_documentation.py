@@ -11,7 +11,7 @@ from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
-REPO_ROOT = ROOT.parent.parent
+REPO_ROOT = ROOT.parent
 DOC = REPO_ROOT / "docs" / "3d-reconstruction-pathway.md"
 CANONICAL_DOC = REPO_ROOT / "docs" / "coherent-scene-hypotheses.md"
 sys.path.insert(0, str(ROOT / "pipeline"))
@@ -43,7 +43,7 @@ class SurveyContractTest(unittest.TestCase):
                     source = source_map[source_id]
                     self.assertIn(f"[{source_id}]({source['primary_url']})", section)
                 self.assertIn(
-                    f"experiments/3d-pathway/run.sh run --module {module['id']} --profile smoke",
+                    f"parallax/run.sh run --module {module['id']} --profile smoke",
                     section,
                 )
                 self.assertIn("`result.json`", section)

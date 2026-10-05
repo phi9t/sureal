@@ -23,4 +23,4 @@ FOUNDATION_GPU="$({
 })"
 CUDA_VISIBLE_DEVICES="${FOUNDATION_GPU}" \
     SURFLO_PATHWAY_CONTAINER_ENGINE="${ENGINE}" \
-    "${HERE}/../../insula-scout/build.sh"
+    "${HERE}/../../experiments/insula-scout/build.sh"

@@ -306,7 +306,7 @@ class PortableAuditTests(unittest.TestCase):
             publication_audit.IndexEntry("100644", "1" * 40, "check with space.py"),
             publication_audit.IndexEntry("100755", "2" * 40, "script with space.sh"),
             publication_audit.IndexEntry(
-                "100644", "3" * 40, "experiments/3d-pathway/pipeline/audit.py"
+                "100644", "3" * 40, "parallax/pipeline/audit.py"
             ),
         ]
 
@@ -332,7 +332,7 @@ class PortableAuditTests(unittest.TestCase):
                 "compileall",
                 "-q",
                 "check with space.py",
-                "experiments/3d-pathway/pipeline/audit.py",
+                "parallax/pipeline/audit.py",
             ],
             commands,
         )
@@ -341,7 +341,7 @@ class PortableAuditTests(unittest.TestCase):
         self.assertIn(
             [
                 sys.executable,
-                "experiments/3d-pathway/pipeline/audit.py",
+                "parallax/pipeline/audit.py",
                 "--offline",
             ],
             commands,
@@ -394,7 +394,7 @@ class RepositoryIdentityTests(unittest.TestCase):
         for link in (
             "[Research mission](MISSION.md)",
             "[3D reconstruction pathway](docs/3d-reconstruction-pathway.md)",
-            "[Executable pathway labs](experiments/3d-pathway/README.md)",
+            "[Executable pathway labs](parallax/README.md)",
         ):
             self.assertIn(link, readme)
         for tier in ("Portable", "Smoke", "Full B200"):
@@ -458,7 +458,7 @@ class RepositoryIdentityTests(unittest.TestCase):
                 "non-commercial research and evaluation",
                 "python scripts/publication_audit.py --root .",
                 "numpy==1.26.4",
-                "PYTHONPATH=experiments/3d-pathway python -m unittest discover",
+                "PYTHONPATH=parallax python -m unittest discover",
                 "not evidence for a fresh B200 measurement",
                 "smoke",
                 "full",
@@ -472,7 +472,7 @@ class RepositoryIdentityTests(unittest.TestCase):
             "RELEASING.md": (
                 "python scripts/publication_audit.py --root .",
                 "numpy==1.26.4",
-                "PYTHONPATH=experiments/3d-pathway python -m unittest discover",
+                "PYTHONPATH=parallax python -m unittest discover",
                 "not evidence for a fresh B200 measurement",
                 "python -m build",
                 "gitleaks git",
@@ -625,7 +625,7 @@ class PublicationWorkflowTests(unittest.TestCase):
             "submodules: recursive",
             'python-version: "3.10"',
             "numpy==1.26.4",
-            "PYTHONPATH=experiments/3d-pathway python -m unittest discover -s experiments/3d-pathway/tests -p 'test_*.py' -v",
+            "PYTHONPATH=parallax python -m unittest discover -s parallax/tests -p 'test_*.py' -v",
         ):
             self.assertIn(text, job)
         timeout = re.search(r"(?m)^    timeout-minutes: (\d+)$", job)

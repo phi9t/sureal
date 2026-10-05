@@ -12,11 +12,11 @@ From a clean candidate commit:
 python -m unittest tests.test_publication_audit -v
 python scripts/publication_audit.py --root .
 python -m pip install numpy==1.26.4
-PYTHONPATH=experiments/3d-pathway python -m unittest discover -s experiments/3d-pathway/tests -p 'test_*.py' -v
+PYTHONPATH=parallax python -m unittest discover -s parallax/tests -p 'test_*.py' -v
 python -m build
 python -m twine check dist/*
 python -m compileall -q scripts tests surflo
-python experiments/3d-pathway/pipeline/audit.py --offline
+python parallax/pipeline/audit.py --offline
 git diff --check HEAD
 gitleaks git --redact --no-banner --exit-code 1 .
 ```

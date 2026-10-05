@@ -19,7 +19,7 @@ import numpy as np
 
 
 ROOT = Path(__file__).resolve().parents[1]
-REPO_ROOT = ROOT.parent.parent
+REPO_ROOT = ROOT.parent
 
 
 def run_cli(*args: str, cache: Path) -> subprocess.CompletedProcess[str]:

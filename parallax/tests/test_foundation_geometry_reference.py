@@ -62,13 +62,13 @@ def fake_foundation_engine(path: Path) -> Path:
             import numpy as np
 
             evidence_root, output_root, repo = map(Path, sys.argv[1:])
-            sys.path.insert(0, str(repo / "experiments/3d-pathway/pipeline"))
+            sys.path.insert(0, str(repo / "parallax/pipeline"))
             from reference_scene import _render_implicit_sphere
 
             evidence = json.loads((evidence_root / "manifest.json").read_text())
             evaluation_root = evidence_root.parent / "evaluation"
             evaluation = json.loads((evaluation_root / "manifest.json").read_text())
-            lock = json.loads((repo / "experiments/3d-pathway/foundation-models.lock.json").read_text())
+            lock = json.loads((repo / "parallax/foundation-models.lock.json").read_text())
             environment_path = evidence_root.parent / "config/environment-manifest.json"
             environment = json.loads(environment_path.read_text())
             output_root.mkdir(parents=True, exist_ok=True)
@@ -624,7 +624,7 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
         script = ROOT / "insulas/surflo-foundation/run-foundation-models.py"
         completed = subprocess.run(
             [sys.executable, str(script), "--help"],
-            cwd=ROOT.parent.parent,
+            cwd=ROOT.parent,
             text=True,
             capture_output=True,
             check=False,
@@ -724,7 +724,7 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
                     "--run-id",
                     "foundation-plan",
                 ],
-                cwd=ROOT.parent.parent,
+                cwd=ROOT.parent,
                 env=env,
                 text=True,
                 capture_output=True,

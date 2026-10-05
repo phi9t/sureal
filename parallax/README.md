@@ -19,48 +19,48 @@ leaderboard values.
 
 ```bash
 # No network:
-experiments/3d-pathway/run.sh list
-experiments/3d-pathway/run.sh run --module 01 --profile smoke --run-id demo-01
-experiments/3d-pathway/run.sh validate --module 01 --run-id demo-01
-experiments/3d-pathway/run.sh all --profile smoke --run-id demo-all
-experiments/3d-pathway/run.sh report --run-id demo-all
+parallax/run.sh list
+parallax/run.sh run --module 01 --profile smoke --run-id demo-01
+parallax/run.sh validate --module 01 --run-id demo-01
+parallax/run.sh all --profile smoke --run-id demo-all
+parallax/run.sh report --run-id demo-all
 # B200 acceptance: all 15 full fixtures plus all eight maintained adapters.
-experiments/3d-pathway/run.sh all --profile full --run-id pathway-full-e2e
-experiments/3d-pathway/run.sh reference --adapter colmap-sfm --profile smoke --run-id colmap-demo
-experiments/3d-pathway/run.sh reference --adapter colmap-mvs --profile smoke --run-id colmap-mvs-demo
-experiments/3d-pathway/run.sh reference --adapter orb-slam --profile smoke --run-id orb-slam-demo
-experiments/3d-pathway/run.sh reference --adapter depth-anything-v2 --profile smoke --run-id dav2-demo
-experiments/3d-pathway/run.sh reference --adapter neus-facto --profile smoke --run-id neus-demo
-experiments/3d-pathway/run.sh reference --adapter nerfacto --profile smoke --run-id nerfacto-demo
-experiments/3d-pathway/run.sh reference --adapter splatfacto --profile smoke --run-id splatfacto-demo
-experiments/3d-pathway/run.sh reference --adapter foundation-geometry --profile smoke --run-id foundation-geometry-demo
-python3 experiments/3d-pathway/pipeline/audit.py --offline
+parallax/run.sh all --profile full --run-id pathway-full-e2e
+parallax/run.sh reference --adapter colmap-sfm --profile smoke --run-id colmap-demo
+parallax/run.sh reference --adapter colmap-mvs --profile smoke --run-id colmap-mvs-demo
+parallax/run.sh reference --adapter orb-slam --profile smoke --run-id orb-slam-demo
+parallax/run.sh reference --adapter depth-anything-v2 --profile smoke --run-id dav2-demo
+parallax/run.sh reference --adapter neus-facto --profile smoke --run-id neus-demo
+parallax/run.sh reference --adapter nerfacto --profile smoke --run-id nerfacto-demo
+parallax/run.sh reference --adapter splatfacto --profile smoke --run-id splatfacto-demo
+parallax/run.sh reference --adapter foundation-geometry --profile smoke --run-id foundation-geometry-demo
+python3 parallax/pipeline/audit.py --offline
 
 # Required real-container gates (the full gate is intentionally opt-in):
-(cd experiments/3d-pathway && SURFLO_REQUIRE_COLMAP_MVS_REFERENCE=1 python3 -m unittest -q tests.test_colmap_mvs_reference.ColmapMvsReferenceAdapterTest.test_real_colmap_mvs_reconstructs_and_meshes_the_smoke_scene)
-(cd experiments/3d-pathway && SURFLO_REQUIRE_COLMAP_MVS_FULL=1 python3 -m unittest -q tests.test_colmap_mvs_reference.ColmapMvsReferenceAdapterTest.test_real_colmap_mvs_full_profile_on_b200)
-(cd experiments/3d-pathway && SURFLO_REQUIRE_ORB_SLAM_REFERENCE=1 python3 -m unittest -q tests.test_orb_slam_reference.OrbSlamReferenceContractTest.test_real_orb_slam_smoke_tracks_tum_rgbd_and_exports_a_map)
-(cd experiments/3d-pathway && SURFLO_REQUIRE_ORB_SLAM_FULL=1 python3 -m unittest -q tests.test_orb_slam_reference.OrbSlamReferenceContractTest.test_real_orb_slam_full_profile)
-(cd experiments/3d-pathway && SURFLO_REQUIRE_DEPTH_ANYTHING_REFERENCE=1 python3 -m unittest -q tests.test_depth_anything_reference.DepthAnythingReferenceAdapterTest.test_real_smoke_reference_runs_when_required)
-(cd experiments/3d-pathway && SURFLO_REQUIRE_DEPTH_ANYTHING_FULL=1 python3 -m unittest -q tests.test_depth_anything_reference.DepthAnythingReferenceAdapterTest.test_real_full_reference_runs_when_required)
-(cd experiments/3d-pathway && SURFLO_REQUIRE_NEUS_FACTO_REFERENCE=1 python3 -m unittest -q tests.test_neus_facto_reference.NeuSFactoReferenceAdapterTest.test_real_profiles_are_explicit_b200_gates)
-(cd experiments/3d-pathway && SURFLO_REQUIRE_NEUS_FACTO_FULL=1 python3 -m unittest -q tests.test_neus_facto_reference.NeuSFactoReferenceAdapterTest.test_real_profiles_are_explicit_b200_gates)
-(cd experiments/3d-pathway && SURFLO_REQUIRE_NERFACTO_REFERENCE=1 python3 -m unittest -q tests.test_nerfacto_reference.NerfactoReferenceExecutionContractTest.test_real_profiles_are_explicit_b200_gates)
-(cd experiments/3d-pathway && SURFLO_REQUIRE_NERFACTO_FULL=1 python3 -m unittest -q tests.test_nerfacto_reference.NerfactoReferenceExecutionContractTest.test_real_profiles_are_explicit_b200_gates)
-(cd experiments/3d-pathway && SURFLO_REQUIRE_SPLATFACTO_REFERENCE=1 python3 -m unittest -q tests.test_splatfacto_reference.SplatfactoOutputContractTest.test_real_profiles_are_explicit_b200_gates)
-(cd experiments/3d-pathway && SURFLO_REQUIRE_SPLATFACTO_FULL=1 python3 -m unittest -q tests.test_splatfacto_reference.SplatfactoOutputContractTest.test_real_profiles_are_explicit_b200_gates)
-(cd experiments/3d-pathway && SURFLO_REQUIRE_FOUNDATION_GEOMETRY_REFERENCE=1 python3 -m unittest -q tests.test_foundation_geometry_reference.FoundationGeometryReferenceContractTest.test_real_smoke_reference_runs_when_required)
-(cd experiments/3d-pathway && SURFLO_REQUIRE_FOUNDATION_GEOMETRY_FULL=1 python3 -m unittest -q tests.test_foundation_geometry_reference.FoundationGeometryReferenceContractTest.test_real_full_reference_runs_when_required)
+(cd parallax && SURFLO_REQUIRE_COLMAP_MVS_REFERENCE=1 python3 -m unittest -q tests.test_colmap_mvs_reference.ColmapMvsReferenceAdapterTest.test_real_colmap_mvs_reconstructs_and_meshes_the_smoke_scene)
+(cd parallax && SURFLO_REQUIRE_COLMAP_MVS_FULL=1 python3 -m unittest -q tests.test_colmap_mvs_reference.ColmapMvsReferenceAdapterTest.test_real_colmap_mvs_full_profile_on_b200)
+(cd parallax && SURFLO_REQUIRE_ORB_SLAM_REFERENCE=1 python3 -m unittest -q tests.test_orb_slam_reference.OrbSlamReferenceContractTest.test_real_orb_slam_smoke_tracks_tum_rgbd_and_exports_a_map)
+(cd parallax && SURFLO_REQUIRE_ORB_SLAM_FULL=1 python3 -m unittest -q tests.test_orb_slam_reference.OrbSlamReferenceContractTest.test_real_orb_slam_full_profile)
+(cd parallax && SURFLO_REQUIRE_DEPTH_ANYTHING_REFERENCE=1 python3 -m unittest -q tests.test_depth_anything_reference.DepthAnythingReferenceAdapterTest.test_real_smoke_reference_runs_when_required)
+(cd parallax && SURFLO_REQUIRE_DEPTH_ANYTHING_FULL=1 python3 -m unittest -q tests.test_depth_anything_reference.DepthAnythingReferenceAdapterTest.test_real_full_reference_runs_when_required)
+(cd parallax && SURFLO_REQUIRE_NEUS_FACTO_REFERENCE=1 python3 -m unittest -q tests.test_neus_facto_reference.NeuSFactoReferenceAdapterTest.test_real_profiles_are_explicit_b200_gates)
+(cd parallax && SURFLO_REQUIRE_NEUS_FACTO_FULL=1 python3 -m unittest -q tests.test_neus_facto_reference.NeuSFactoReferenceAdapterTest.test_real_profiles_are_explicit_b200_gates)
+(cd parallax && SURFLO_REQUIRE_NERFACTO_REFERENCE=1 python3 -m unittest -q tests.test_nerfacto_reference.NerfactoReferenceExecutionContractTest.test_real_profiles_are_explicit_b200_gates)
+(cd parallax && SURFLO_REQUIRE_NERFACTO_FULL=1 python3 -m unittest -q tests.test_nerfacto_reference.NerfactoReferenceExecutionContractTest.test_real_profiles_are_explicit_b200_gates)
+(cd parallax && SURFLO_REQUIRE_SPLATFACTO_REFERENCE=1 python3 -m unittest -q tests.test_splatfacto_reference.SplatfactoOutputContractTest.test_real_profiles_are_explicit_b200_gates)
+(cd parallax && SURFLO_REQUIRE_SPLATFACTO_FULL=1 python3 -m unittest -q tests.test_splatfacto_reference.SplatfactoOutputContractTest.test_real_profiles_are_explicit_b200_gates)
+(cd parallax && SURFLO_REQUIRE_FOUNDATION_GEOMETRY_REFERENCE=1 python3 -m unittest -q tests.test_foundation_geometry_reference.FoundationGeometryReferenceContractTest.test_real_smoke_reference_runs_when_required)
+(cd parallax && SURFLO_REQUIRE_FOUNDATION_GEOMETRY_FULL=1 python3 -m unittest -q tests.test_foundation_geometry_reference.FoundationGeometryReferenceContractTest.test_real_full_reference_runs_when_required)
 
 # Explicit network boundaries:
-experiments/3d-pathway/run.sh build
-experiments/3d-pathway/run.sh fetch
-experiments/3d-pathway/run.sh fetch --asset controlled-suite
-experiments/3d-pathway/run.sh fetch --asset tum-rgbd
-experiments/3d-pathway/run.sh fetch --asset depth-anything-v2-metric-hypersim-small
-experiments/3d-pathway/run.sh fetch --asset nerfstudio-lpips-alexnet
-experiments/3d-pathway/run.sh fetch --asset foundation-geometry-models
-python3 experiments/3d-pathway/pipeline/audit.py --online
+parallax/run.sh build
+parallax/run.sh fetch
+parallax/run.sh fetch --asset controlled-suite
+parallax/run.sh fetch --asset tum-rgbd
+parallax/run.sh fetch --asset depth-anything-v2-metric-hypersim-small
+parallax/run.sh fetch --asset nerfstudio-lpips-alexnet
+parallax/run.sh fetch --asset foundation-geometry-models
+python3 parallax/pipeline/audit.py --online
 ```
 
 `build` also prepares the pinned Blender 4.5.14 rootfs. Fetching

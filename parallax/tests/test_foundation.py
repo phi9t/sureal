@@ -23,12 +23,55 @@ def run_cli(*args: str, cache: Path | None = None) -> subprocess.CompletedProces
         env["SURFLO_PATHWAY_CACHE_ROOT"] = str(cache)
     return subprocess.run(
         [str(ROOT / "run.sh"), *args],
-        cwd=ROOT.parent.parent,
+        cwd=ROOT.parent,
         env=env,
         text=True,
         capture_output=True,
         check=False,
     )
+
+
+class RunnerBootstrapTest(unittest.TestCase):
+    def test_run_script_launches_cli_with_pipeline_on_pythonpath(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            fakebin = Path(temporary) / "bin"
+            fakebin.mkdir()
+            capture = Path(temporary) / "capture.json"
+            fake_python = fakebin / "python3"
+            fake_python.write_text(
+                "#!" + sys.executable + "\n"
+                "import json\n"
+                "import os\n"
+                "import sys\n"
+                "from pathlib import Path\n"
+                "Path(os.environ['SURFLO_RUN_SH_CAPTURE']).write_text(\n"
+                "    json.dumps({'argv': sys.argv, 'pythonpath': os.environ.get('PYTHONPATH', '')})\n"
+                ")\n",
+                encoding="utf-8",
+            )
+            fake_python.chmod(0o755)
+            env = os.environ.copy()
+            env["PATH"] = f"{fakebin}{os.pathsep}{env['PATH']}"
+            env["PYTHONPATH"] = "/existing"
+            env["SURFLO_RUN_SH_CAPTURE"] = str(capture)
+
+            result = subprocess.run(
+                [str(ROOT / "run.sh"), "list", "--json"],
+                cwd=ROOT.parent,
+                env=env,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+            self.assertTrue(capture.is_file(), result.stdout + result.stderr)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            invocation = json.loads(capture.read_text(encoding="utf-8"))
+            self.assertEqual(invocation["argv"][1:], [str(PIPELINE / "cli.py"), "list", "--json"])
+            self.assertEqual(
+                invocation["pythonpath"],
+                f"{PIPELINE}{os.pathsep}/existing",
+            )
 
 
 class RegistryContractTest(unittest.TestCase):

@@ -30,11 +30,11 @@ def controlled_suite_record() -> dict[str, Any]:
         item["id"]: item for item in load_json(ROOT / "assets.lock.json")["assets"]
     }
     record = records.get(ASSET_ID)
-    source = ROOT / "../photoreal-scenes/recipe.json"
+    source = ROOT / "../experiments/photoreal-scenes/recipe.json"
     if (
         not isinstance(record, dict)
         or record.get("mode") != "generated"
-        or record.get("source") != "../photoreal-scenes/recipe.json"
+        or record.get("source") != "../experiments/photoreal-scenes/recipe.json"
         or record.get("sha256") != sha256_file(source)
         or record.get("episode_id") != "phase-a-v1"
         or record.get("episode_manifest_sha256")
@@ -309,14 +309,14 @@ def ensure_controlled_suite(*, render_if_missing: bool = False) -> Path:
             errors.append(f"{candidate}: {error}")
     if render_if_missing:
         command = [
-            str(ROOT.parent / "photoreal-scenes/run.sh"),
+            str(ROOT.parent / "experiments" / "photoreal-scenes" / "run.sh"),
             "render",
             "--run-id",
             "phase-a-v1",
             "--device",
             "OPTIX",
         ]
-        completed = subprocess.run(command, cwd=ROOT.parent.parent, check=False)
+        completed = subprocess.run(command, cwd=ROOT.parent, check=False)
         if completed.returncode == 0:
             return ensure_controlled_suite(render_if_missing=False)
         errors.append(f"offline Blender render failed with exit code {completed.returncode}")

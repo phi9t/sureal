@@ -13,8 +13,8 @@
     "implicit-surface": "insulas/implicit-surface/Dockerfile",
     "radiance-field": "insulas/radiance-field/Dockerfile",
     "gaussian-splatting": "insulas/gaussian-splatting/Dockerfile",
-    "blender": "../photoreal-scenes/insula/Dockerfile",
-    "surflo": "../insula-scout/insula/Dockerfile"
+    "blender": "../experiments/photoreal-scenes/insula/Dockerfile",
+    "surflo": "../experiments/insula-scout/insula/Dockerfile"
   },
   "modules": [
     {

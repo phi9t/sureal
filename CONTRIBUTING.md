@@ -33,13 +33,13 @@ python scripts/publication_audit.py --root .
 
 # Required offline CPU numerical-contract gate (Python 3.10)
 python -m pip install numpy==1.26.4
-PYTHONPATH=experiments/3d-pathway python -m unittest discover -s experiments/3d-pathway/tests -p 'test_*.py' -v
+PYTHONPATH=parallax python -m unittest discover -s parallax/tests -p 'test_*.py' -v
 
 # Containerized numerical and adapter smoke checks
-experiments/3d-pathway/run.sh all --profile smoke
+parallax/run.sh all --profile smoke
 
 # Hash-verified GPU acceptance; requires the documented NVIDIA B200 environment
-experiments/3d-pathway/run.sh all --profile full
+parallax/run.sh all --profile full
 ```
 
 The required CPU numerical gate validates fixtures, evaluators, corruption

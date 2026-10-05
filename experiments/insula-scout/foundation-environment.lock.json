@@ -70,7 +70,7 @@
     "experiments/insula-scout/insula/Dockerfile": "b8503ee6d7d7856180b8fef6e965d003fcd0c1cc46ea40b71a82bfa788f10566",
     "experiments/insula-scout/insula/enter_rootfs.sh": "3b6ce18e2edc2ebb5dbc8dc55d988a82450147bd64f6945d4d779f13d2bd0559",
     "experiments/insula-scout/insula/build_rootfs.sh": "120c499991f32e07ebf0dc0f21a7fdb6a04688c13c37370754dbd2b2172672b6",
-    "experiments/insula-scout/verify_environment_lock.py": "53ae572489a032ab17704e89c0495499a0487e5023871f97c6a59b0e65bc52b2",
+    "experiments/insula-scout/verify_environment_lock.py": "f6b5cffd6972fdcdefdebd81d533b16e5a541da325e78e67974b9c2111efc98c",
     "experiments/insula-scout/normalize_environment.py": "9b4f538ae7c844870a1346a08daeba815a612456a8397edeab53765eee082447",
     "install/build_extensions.sh": "fd0afc715bc91bdca3af1e57f3447c7d90fd8b4468111bb01387b9caa184adde",
     "install/verify_install.py": "72c537e1040cc2291fd7f097ee6ef443d5c619a76cdb36f77ca003891865c1d1"

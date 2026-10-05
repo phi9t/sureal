@@ -279,8 +279,8 @@ def _validate_module15(run_dir: Path, result: dict[str, Any]) -> None:
     endpoint_path = run_dir / "artifacts" / "surflo_endpoint.json"
     if not archive_path.is_file() or not endpoint_path.is_file():
         raise ValueError("Module 15 recomputation artifacts are missing")
-    paired_path = ROOT.parent / "photoreal-scenes" / "results.json"
-    scout_path = ROOT.parent / "insula-scout" / "results.json"
+    paired_path = ROOT.parent / "experiments" / "photoreal-scenes" / "results.json"
+    scout_path = ROOT.parent / "experiments" / "insula-scout" / "results.json"
     locks = {
         item["id"]: item for item in load_json(ROOT / "assets.lock.json")["assets"]
     }
