@@ -245,7 +245,7 @@ def execute(args: argparse.Namespace) -> int:
         status = subprocess.call([str(ROOT / "insulas" / "build.sh")])
         if status != 0:
             return status
-        return subprocess.call([str(ROOT.parent / "photoreal-scenes" / "build.sh")])
+        return subprocess.call([str(ROOT.parent / "experiments" / "photoreal-scenes" / "build.sh")])
     if args.command == "fetch":
         selected = list(args.assets or [])
         include_controlled_suite = not selected or "controlled-suite" in selected
@@ -253,7 +253,7 @@ def execute(args: argparse.Namespace) -> int:
         if include_controlled_suite:
             status = subprocess.call(
                 [
-                    str(ROOT.parent / "photoreal-scenes" / "run.sh"),
+                    str(ROOT.parent / "experiments" / "photoreal-scenes" / "run.sh"),
                     "fetch",
                 ]
             )
@@ -298,7 +298,7 @@ def execute(args: argparse.Namespace) -> int:
             for module in curriculum()["modules"]:
                 subprocess.run(
                     [str(ROOT / "run.sh"), "run", "--module", module["id"], "--profile", args.profile, "--run-id", run_id],
-                    cwd=ROOT.parent.parent,
+                    cwd=ROOT.parent,
                     env=env,
                     check=True,
                 )

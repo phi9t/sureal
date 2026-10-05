@@ -36,7 +36,7 @@ that persists across points, cameras, and time. No single scalar ranks all of
 these tasks.
 
 The machine-readable counterpart is
-[`curriculum.json`](../experiments/3d-pathway/curriculum.json). The shared scene
+[`curriculum.json`](../parallax/curriculum.json). The shared scene
 uses metres, a right-handed world frame, and OpenCV cameras
 (x right, y down, z forward). All smoke labs are deterministic and offline;
 `build` and `fetch` are the only network-capable dispatches. Each run records
@@ -50,10 +50,10 @@ rendered buffers. Full `all` also executes every adapter marked `landed` in
 `reference-adapters.json`; smoke remains the compact CI contract.
 
 ```bash
-experiments/3d-pathway/run.sh list
-experiments/3d-pathway/run.sh all --profile smoke --run-id pathway-smoke
-experiments/3d-pathway/run.sh report --run-id pathway-smoke
-python3 experiments/3d-pathway/pipeline/audit.py --offline
+parallax/run.sh list
+parallax/run.sh all --profile smoke --run-id pathway-smoke
+parallax/run.sh report --run-id pathway-smoke
+python3 parallax/pipeline/audit.py --offline
 ```
 
 ## 1. Image formation and observability
@@ -111,7 +111,7 @@ practical planar calibration in
 ### Reproduction lab
 
 ```bash
-experiments/3d-pathway/run.sh run --module 01 --profile smoke --run-id pathway-01
+parallax/run.sh run --module 01 --profile smoke --run-id pathway-01
 ```
 
 Inspect `result.json`, `report.md`, `artifacts/triangulation.svg`, and
@@ -178,7 +178,7 @@ limit in [laurentini-1994](https://doi.org/10.1109/34.273735).
 ### Reproduction lab
 
 ```bash
-experiments/3d-pathway/run.sh run --module 02 --profile smoke --run-id pathway-02
+parallax/run.sh run --module 02 --profile smoke --run-id pathway-02
 ```
 
 Inspect `result.json`, `report.md`, `artifacts/cue_failure.svg`, and
@@ -243,7 +243,7 @@ calibrated camera/LiDAR benchmark setting.
 ### Reproduction lab
 
 ```bash
-experiments/3d-pathway/run.sh run --module 03 --profile smoke --run-id pathway-03
+parallax/run.sh run --module 03 --profile smoke --run-id pathway-03
 ```
 
 Inspect `result.json`, `report.md`, `artifacts/sensor_uncertainty.svg`, and
@@ -304,7 +304,7 @@ reconstruction in [kazhdan-2006](https://doi.org/10.2312/SGP/SGP06/061-070).
 ### Reproduction lab
 
 ```bash
-experiments/3d-pathway/run.sh run --module 04 --profile smoke --run-id pathway-04
+parallax/run.sh run --module 04 --profile smoke --run-id pathway-04
 ```
 
 Inspect `result.json`, `report.md`, `artifacts/icp_convergence.svg`, and
@@ -371,8 +371,8 @@ the 2000 synthesis; that chapter organizes the method rather than inventing it.
 ### Reproduction lab
 
 ```bash
-experiments/3d-pathway/run.sh run --module 05 --profile smoke --run-id pathway-05
-experiments/3d-pathway/run.sh reference --adapter colmap-sfm --profile smoke --run-id pathway-05-colmap
+parallax/run.sh run --module 05 --profile smoke --run-id pathway-05
+parallax/run.sh reference --adapter colmap-sfm --profile smoke --run-id pathway-05-colmap
 ```
 
 Inspect `result.json`, `report.md`, `artifacts/bundle_adjustment.svg`, and
@@ -443,8 +443,8 @@ view selection in unstructured image collections.
 ### Reproduction lab
 
 ```bash
-experiments/3d-pathway/run.sh run --module 06 --profile smoke --run-id pathway-06
-experiments/3d-pathway/run.sh reference --adapter colmap-mvs --profile smoke --run-id colmap-mvs-06
+parallax/run.sh run --module 06 --profile smoke --run-id pathway-06
+parallax/run.sh reference --adapter colmap-mvs --profile smoke --run-id colmap-mvs-06
 ```
 
 Inspect `result.json`, `report.md`, `artifacts/mvs_views.svg`, and
@@ -580,7 +580,7 @@ evaluation in [sturm-2012](https://doi.org/10.1109/IROS.2012.6385773).
 The repo-owned concept lab remains the fast numerical exercise:
 
 ```bash
-experiments/3d-pathway/run.sh run --module 07 --profile smoke --run-id pathway-07
+parallax/run.sh run --module 07 --profile smoke --run-id pathway-07
 ```
 
 Inspect `result.json`, `report.md`, `artifacts/slam_drift.svg`, and
@@ -592,10 +592,10 @@ The maintained-system reproduction uses the official TUM
 commit `4452a3c4ab75b1cde34e5505a36ec3f9edcdc4c4`:
 
 ```bash
-experiments/3d-pathway/run.sh fetch --asset tum-rgbd       # network allowed
-experiments/3d-pathway/run.sh build                         # network allowed
-experiments/3d-pathway/run.sh reference --adapter orb-slam --profile smoke --run-id orb-slam-smoke
-experiments/3d-pathway/run.sh reference --adapter orb-slam --profile full --run-id orb-slam-full
+parallax/run.sh fetch --asset tum-rgbd       # network allowed
+parallax/run.sh build                         # network allowed
+parallax/run.sh reference --adapter orb-slam --profile smoke --run-id orb-slam-smoke
+parallax/run.sh reference --adapter orb-slam --profile full --run-id orb-slam-full
 ```
 
 The reference executions are offline. Smoke processes the first 300 associated
@@ -723,7 +723,7 @@ semantic scene completion in
 ### Reproduction lab
 
 ```bash
-experiments/3d-pathway/run.sh run --module 08 --profile smoke --run-id pathway-08
+parallax/run.sh run --module 08 --profile smoke --run-id pathway-08
 ```
 
 Inspect `result.json`, `report.md`, `artifacts/learned_depth.svg`, and
@@ -736,9 +736,9 @@ offline and hash-verifies the 99,222,290-byte checkpoint before mounting it
 read-only:
 
 ```bash
-experiments/3d-pathway/run.sh fetch --asset depth-anything-v2-metric-hypersim-small
-experiments/3d-pathway/run.sh build
-experiments/3d-pathway/run.sh reference --adapter depth-anything-v2 --profile smoke --run-id dav2-08
+parallax/run.sh fetch --asset depth-anything-v2-metric-hypersim-small
+parallax/run.sh build
+parallax/run.sh reference --adapter depth-anything-v2 --profile smoke --run-id dav2-08
 ```
 
 Source commit `a561b849ebae10a6f5ef49e26c83cbbcd36c71bf`, checkpoint
@@ -837,7 +837,7 @@ not an official-paper NeuS checkpoint.
 ### Reproduction lab
 
 ```bash
-experiments/3d-pathway/run.sh run --module 09 --profile smoke --run-id pathway-09
+parallax/run.sh run --module 09 --profile smoke --run-id pathway-09
 ```
 
 Inspect `result.json`, `report.md`, `artifacts/representation_scaling.svg`, and
@@ -858,9 +858,9 @@ Fetch the one initialization-only perceptual backbone during the explicit
 networked phase, then run the pinned reference offline:
 
 ```bash
-experiments/3d-pathway/run.sh fetch --asset nerfstudio-lpips-alexnet
-experiments/3d-pathway/run.sh reference --adapter neus-facto --profile smoke --run-id neus-smoke
-experiments/3d-pathway/run.sh reference --adapter neus-facto --profile full --run-id neus-full
+parallax/run.sh fetch --asset nerfstudio-lpips-alexnet
+parallax/run.sh reference --adapter neus-facto --profile smoke --run-id neus-smoke
+parallax/run.sh reference --adapter neus-facto --profile full --run-id neus-full
 ```
 
 NeuS-Facto observes calibrated context RGB only and optimizes one SDF/radiance
@@ -964,7 +964,7 @@ it is not presented as a paper-exact reproduction of the original NeRF.
 ### Reproduction lab
 
 ```bash
-experiments/3d-pathway/run.sh run --module 10 --profile smoke --run-id pathway-10
+parallax/run.sh run --module 10 --profile smoke --run-id pathway-10
 ```
 
 Inspect `result.json`, `report.md`, `artifacts/comparison.json`,
@@ -981,7 +981,7 @@ The maintained reproduction uses the pinned Nerfstudio `nerfacto` preset,
 which is a composite implementation rather than a paper-exact original NeRF:
 
 ```bash
-experiments/3d-pathway/run.sh reference --adapter nerfacto \
+parallax/run.sh reference --adapter nerfacto \
   --profile smoke --run-id nerfacto-smoke
 ```
 
@@ -1097,7 +1097,7 @@ Kerbl et al.
 ### Reproduction lab
 
 ```bash
-experiments/3d-pathway/run.sh run --module 11 --profile smoke --run-id pathway-11
+parallax/run.sh run --module 11 --profile smoke --run-id pathway-11
 ```
 
 Inspect `result.json`, `report.md`, `artifacts/gaussian_comparison.npz`,
@@ -1114,7 +1114,7 @@ Mesh extraction is explicitly unsupported.
 Run the maintained Splatfacto reproduction separately:
 
 ```bash
-experiments/3d-pathway/run.sh reference --adapter splatfacto \
+parallax/run.sh reference --adapter splatfacto \
   --profile smoke --run-id splatfacto-smoke
 ```
 
@@ -1217,7 +1217,7 @@ in [lin-da3-2025](https://arxiv.org/abs/2511.10647).
 ### Reproduction lab
 
 ```bash
-experiments/3d-pathway/run.sh run --module 12 --profile smoke --run-id pathway-12
+parallax/run.sh run --module 12 --profile smoke --run-id pathway-12
 ```
 
 Inspect `result.json`, `report.md`, `artifacts/foundation_geometry.svg`,
@@ -1232,15 +1232,15 @@ The maintained comparison is separate and checkpoint-backed:
 
 ```bash
 # Networked build. This also prepares the reused Surflo B200 Insula and venv.
-experiments/3d-pathway/run.sh build
+parallax/run.sh build
 
 # Networked, explicit, and hash verified. Restricted weights are not committed.
-experiments/3d-pathway/run.sh fetch --asset foundation-geometry-models
+parallax/run.sh fetch --asset foundation-geometry-models
 
 # Offline B200 execution after fetch.
-experiments/3d-pathway/run.sh reference --adapter foundation-geometry \
+parallax/run.sh reference --adapter foundation-geometry \
   --profile smoke --run-id module12-smoke
-experiments/3d-pathway/run.sh reference --adapter foundation-geometry \
+parallax/run.sh reference --adapter foundation-geometry \
   --profile full --run-id module12-full
 ```
 
@@ -1303,7 +1303,7 @@ creation, was 48.2 s smoke and 88.4 s full. Measured peak compute memory was
 12.25 GB and 14.04 GB. These are one controlled-scene reproduction's integrity
 baselines, not paper-table results or a general ranking. Exact source,
 checkpoint, licence, preprocessing, environment, and protocol evidence is recorded in
-`experiments/3d-pathway/research/module12-reference-selection.md`.
+`parallax/research/module12-reference-selection.md`.
 
 ### Transition
 
@@ -1424,7 +1424,7 @@ and open-set relational composition in
 ### Reproduction lab
 
 ```bash
-experiments/3d-pathway/run.sh run --module 13 --profile smoke --run-id pathway-13
+parallax/run.sh run --module 13 --profile smoke --run-id pathway-13
 ```
 
 Inspect `result.json`, `report.md`, `artifacts/scene_coherence.svg`,
@@ -1449,7 +1449,7 @@ consistency. As point count rises, the independent sample converges more
 reliably to a stable hybrid, not to a scene. This is an analytic factorization
 test, not a reproduction or quality claim for any cited model. The detailed
 source and terminology ledger is in
-`experiments/3d-pathway/research/module13-generative-scene-priors.md`.
+`parallax/research/module13-generative-scene-priors.md`.
 
 ### Transition
 
@@ -1611,7 +1611,7 @@ adapter, and a B200 smoke result must be hash-locked before that status changes.
 ### Reproduction lab
 
 ```bash
-experiments/3d-pathway/run.sh run --module 14 --profile smoke --run-id pathway-14
+parallax/run.sh run --module 14 --profile smoke --run-id pathway-14
 ```
 
 Inspect `result.json`, `report.md`, `artifacts/dynamic_sequence.npz`,
@@ -1638,7 +1638,7 @@ measured 0.478/0.318 m with 0.145 m camera ATE.
 This is an analytic observability and metric-contract experiment, not a quality
 claim for any cited system. Detailed source, maintained-reference, and
 terminology evidence is in
-`experiments/3d-pathway/research/module14-dynamic-4d.md`.
+`parallax/research/module14-dynamic-4d.md`.
 
 ### Transition
 
@@ -1709,7 +1709,7 @@ and claims in [guedon-surflo-2026](https://arxiv.org/abs/2606.13644).
 ### Reproduction lab
 
 ```bash
-experiments/3d-pathway/run.sh run --module 15 --profile smoke --run-id pathway-15
+parallax/run.sh run --module 15 --profile smoke --run-id pathway-15
 ```
 
 Inspect `result.json`, `report.md`, `artifacts/surflo_hidden_support.svg`,
@@ -1733,7 +1733,7 @@ the per-seed completion-precision values in the archive but does not aggregate
 or interpret their zeros.
 The code-level architecture, measurement boundary, and persistent-state
 interface are detailed in
-`experiments/3d-pathway/research/module15-surflo-synthesis.md`.
+`parallax/research/module15-surflo-synthesis.md`.
 
 ### Transition
 
@@ -1792,7 +1792,7 @@ An offline audit checks metadata, citations, local hashes, historical-credit
 caveats, and terminology. The optional online audit checks primary URLs:
 
 ```bash
-python3 experiments/3d-pathway/pipeline/audit.py --online
+python3 parallax/pipeline/audit.py --online
 ```
 
 Acceptance is evidence, not optimism: geometry tests cover projection,

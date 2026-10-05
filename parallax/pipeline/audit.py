@@ -152,8 +152,8 @@ def audit(online: bool) -> dict[str, object]:
     registry = load_json(ROOT / "sources.json")
     assets = load_json(ROOT / "assets.lock.json")
     terminology = load_json(ROOT / "terminology.json")
-    survey_path = ROOT.parent.parent / "docs" / "3d-reconstruction-pathway.md"
-    canonical_path = ROOT.parent.parent / "docs" / "coherent-scene-hypotheses.md"
+    survey_path = ROOT.parent / "docs" / "3d-reconstruction-pathway.md"
+    canonical_path = ROOT.parent / "docs" / "coherent-scene-hypotheses.md"
     if not survey_path.is_file():
         errors.append(f"missing survey: {survey_path}")
         survey = ""

@@ -47,9 +47,9 @@ def huggingface_snapshot_commands(lock: dict[str, object]) -> list[list[str]]:
 
 def fetch_foundation_models(pathway_cache_root: Path) -> None:
     lock = load_json(ROOT / "foundation-models.lock.json")
-    launcher = ROOT.parent / "insula-scout/enter.sh"
+    launcher = ROOT.parent / "experiments" / "insula-scout" / "enter.sh"
     for command in huggingface_snapshot_commands(lock):
-        subprocess.run([str(launcher), *command], cwd=ROOT.parent.parent, check=True)
+        subprocess.run([str(launcher), *command], cwd=ROOT.parent, check=True)
     cache_root = Path(
         os.environ.get(
             "SURFLO_INSULA_CACHE_ROOT",

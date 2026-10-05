@@ -22,12 +22,35 @@ def default_lock(rootfs):
     return Path(str(rootfs) + ".lock.json")
 
 
-def uses_curriculum_rootfs(arguments):
-    return any(
-        argument.startswith("//experiments/3d-pathway")
-        for argument in arguments
-        if not argument.startswith("-")
+def _is_parallax_target(argument):
+    return argument == "//parallax" or argument.startswith(("//parallax:", "//parallax/"))
+
+
+def _is_autonomy_target(argument):
+    return (
+        argument == "//experiments/waymo-perception"
+        or argument.startswith(("//experiments/waymo-perception:", "//experiments/waymo-perception/"))
+        or argument == "//autonomy"
+        or argument.startswith(("//autonomy:", "//autonomy/"))
     )
+
+
+def target_components(arguments):
+    components = set()
+    for argument in arguments:
+        if argument.startswith("-"):
+            continue
+        if argument == "//...":
+            components.update({"autonomy", "parallax"})
+        elif _is_parallax_target(argument):
+            components.add("parallax")
+        elif _is_autonomy_target(argument):
+            components.add("autonomy")
+    return components
+
+
+def uses_curriculum_rootfs(arguments):
+    return target_components(arguments) == {"parallax"}
 
 
 def output_base_for(rootfs):
@@ -133,6 +156,12 @@ def parse(argv):
     args = parser.parse_args(argv)
     if args.bazel_args and args.bazel_args[0] == "--":
         args.bazel_args = args.bazel_args[1:]
+    components = target_components(args.bazel_args)
+    if len(components) > 1:
+        parser.error(
+            "target pattern spans autonomy and parallax; run each component "
+            "separately so the wrapper can select the correct rootfs"
+        )
     if args.rootfs is None:
         configured = os.environ.get("SUREAL_BAZEL_ROOTFS")
         if configured:

@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
-REPO_ROOT = ROOT.parent.parent
+REPO_ROOT = ROOT.parent
 sys.path.insert(0, str(ROOT / "pipeline"))
 
 from cli import dispatch_plan, parser, stage_reference_suite  # noqa: E402

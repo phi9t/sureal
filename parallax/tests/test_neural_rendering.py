@@ -31,7 +31,7 @@ class LearnedAndRenderableLabContractTest(unittest.TestCase):
                     "--run-id",
                     "foundation-geometry",
                 ],
-                cwd=ROOT.parent.parent,
+                cwd=ROOT.parent,
                 env=env,
                 text=True,
                 capture_output=True,
@@ -93,7 +93,7 @@ class LearnedAndRenderableLabContractTest(unittest.TestCase):
                     "--run-id",
                     "splats",
                 ],
-                cwd=ROOT.parent.parent,
+                cwd=ROOT.parent,
                 env=env,
                 text=True,
                 capture_output=True,
@@ -157,7 +157,7 @@ class LearnedAndRenderableLabContractTest(unittest.TestCase):
             env["SURFLO_PATHWAY_CACHE_ROOT"] = str(cache)
             completed = subprocess.run(
                 [str(ROOT / "run.sh"), "run", "--module", "10", "--profile", "smoke", "--run-id", "fields"],
-                cwd=ROOT.parent.parent,
+                cwd=ROOT.parent,
                 env=env,
                 text=True,
                 capture_output=True,
@@ -263,7 +263,7 @@ class LearnedAndRenderableLabContractTest(unittest.TestCase):
             for module_id in ("08", "09", "10", "11"):
                 completed = subprocess.run(
                     [str(ROOT / "run.sh"), "run", "--module", module_id, "--profile", "smoke", "--run-id", "neural"],
-                    cwd=ROOT.parent.parent,
+                    cwd=ROOT.parent,
                     env=env,
                     text=True,
                     capture_output=True,
@@ -326,7 +326,7 @@ class LearnedAndRenderableLabContractTest(unittest.TestCase):
             env["SURFLO_PATHWAY_CACHE_ROOT"] = str(cache)
             completed = subprocess.run(
                 [str(ROOT / "run.sh"), "run", "--module", "08", "--profile", "smoke", "--run-id", "depth"],
-                cwd=ROOT.parent.parent,
+                cwd=ROOT.parent,
                 env=env,
                 text=True,
                 capture_output=True,

@@ -396,7 +396,7 @@ class SplatfactoReferenceFoundationTest(unittest.TestCase):
                 "--run-id",
                 "splat-plan",
             ],
-            cwd=ROOT.parent.parent,
+            cwd=ROOT.parent,
             text=True,
             capture_output=True,
             check=False,

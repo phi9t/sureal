@@ -3,7 +3,7 @@
   "assets": [
     {
       "id": "controlled-suite", "mode": "generated", "license": "repository-owned with CC0 scene assets",
-      "source": "../photoreal-scenes/recipe.json", "sha256": "9b73b5c0b1b498879209530512c93756de6f0c1130a63d81959965cf6993cd32",
+      "source": "../experiments/photoreal-scenes/recipe.json", "sha256": "9b73b5c0b1b498879209530512c93756de6f0c1130a63d81959965cf6993cd32",
       "episode_id": "phase-a-v1", "episode_manifest_sha256": "9df5874db09c15b08b708a7164531fea681a7897faf038944d359665067a92f8",
       "validation_sha256": "a62923fe8cdeb7f7217e114aa391d88acaabfb472573ba18fa451f794ca98351",
       "artifact_count": 444, "context_views": 16, "target_views_per_hypothesis": 8,
@@ -51,12 +51,12 @@
     },
     {
       "id": "surflo-paired-scenes", "mode": "repository", "license": "repository license and third-party notices",
-      "source": "../photoreal-scenes/results.json", "sha256": "1d4b82e749781aceaab51e0c127aac2363d6931c738be459b68529de546f818c",
+      "source": "../experiments/photoreal-scenes/results.json", "sha256": "1d4b82e749781aceaab51e0c127aac2363d6931c738be459b68529de546f818c",
       "inference_mode": "plain"
     },
     {
       "id": "surflo-visible-scout", "mode": "repository", "license": "repository license and dataset terms",
-      "source": "../insula-scout/results.json", "sha256": "48be64c4d647e5d48545068fe9fb19e06ea73b034bea5382697c0aac228d1ac1"
+      "source": "../experiments/insula-scout/results.json", "sha256": "48be64c4d647e5d48545068fe9fb19e06ea73b034bea5382697c0aac228d1ac1"
     }
   ]
 }

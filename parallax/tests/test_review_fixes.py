@@ -22,7 +22,7 @@ def run_cli(*args: str, cache: Path) -> subprocess.CompletedProcess[str]:
     env["SURFLO_PATHWAY_CACHE_ROOT"] = str(cache)
     return subprocess.run(
         [str(ROOT / "run.sh"), *args],
-        cwd=ROOT.parent.parent,
+        cwd=ROOT.parent,
         env=env,
         text=True,
         capture_output=True,

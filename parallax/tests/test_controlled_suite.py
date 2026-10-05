@@ -121,7 +121,7 @@ class ControlledSuiteTest(unittest.TestCase):
             for item in json.loads((ROOT / "assets.lock.json").read_text())["assets"]
         }
         record = assets["controlled-suite"]
-        self.assertEqual(record["source"], "../photoreal-scenes/recipe.json")
+        self.assertEqual(record["source"], "../experiments/photoreal-scenes/recipe.json")
         self.assertEqual(record["episode_id"], "phase-a-v1")
         self.assertEqual(record["episode_manifest_sha256"], "9df5874db09c15b08b708a7164531fea681a7897faf038944d359665067a92f8")
         self.assertEqual(record["validation_sha256"], "a62923fe8cdeb7f7217e114aa391d88acaabfb472573ba18fa451f794ca98351")
