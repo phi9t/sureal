@@ -10,15 +10,26 @@ from pipeline.runtime_identity import rootfs_identity
 
 
 REPO = Path(__file__).resolve().parents[3]
+WAYMO = REPO / "experiments" / "waymo-perception"
 WRAPPER = REPO / "bazelw"
 
 
 def write_rootfs(root):
-    for name in ("etc", "experiment", "outputs", "tmp", "usr/bin", "usr/local/bin"):
+    for name in (
+        "etc",
+        "experiment",
+        "opt/waymo/bin",
+        "outputs",
+        "tmp",
+        "usr/bin",
+        "usr/local/bin",
+    ):
         (root / name).mkdir(parents=True, exist_ok=True)
     (root / "etc/resolv.conf").write_text("nameserver 127.0.0.1\n")
     (root / "usr/local/bin/python").write_text("#!/bin/sh\n")
     (root / "usr/local/bin/python").chmod(0o755)
+    (root / "opt/waymo/bin/python").write_text("#!/bin/sh\n")
+    (root / "opt/waymo/bin/python").chmod(0o755)
     (root / "usr/local/bin/bazel").write_text("#!/bin/sh\n")
     (root / "usr/local/bin/bazel").chmod(0o755)
 
@@ -49,6 +60,10 @@ def write_fake_bwrap(fakebin, marker):
     path.chmod(0o755)
 
 
+def has_mount_to(mounts, destination):
+    return any(len(mount) == 3 and mount[0] == "--ro-bind" and mount[2] == destination for mount in mounts)
+
+
 class BazelWrapperTests(unittest.TestCase):
     def run_wrapper(self, temporary, *arguments, wrong_identity=False):
         root = Path(temporary)
@@ -75,12 +90,13 @@ class BazelWrapperTests(unittest.TestCase):
         )
         return result, marker, cache, rootfs, lock
 
-    def run_wrapper_with_default_roots(self, temporary, *arguments):
+    def run_wrapper_with_default_roots(self, temporary, *arguments, extra_env=None):
         root = Path(temporary)
         home = root / "home"
         waymo_rootfs = home / ".cache/waystone/waymo-perception/insula/rootfs-v3"
         curriculum_rootfs = home / ".cache/waystone/3d-pathway/insula/rootfs-v1"
-        for rootfs in (waymo_rootfs, curriculum_rootfs):
+        gpu_rootfs = home / ".cache/waystone/waymo-perception/gpu-rootfs-v6"
+        for rootfs in (waymo_rootfs, curriculum_rootfs, gpu_rootfs):
             rootfs.mkdir(parents=True)
             write_rootfs(rootfs)
             write_lock(rootfs.with_name(rootfs.name + ".lock.json"), rootfs)
@@ -92,6 +108,8 @@ class BazelWrapperTests(unittest.TestCase):
         env["HOME"] = str(home)
         env["PATH"] = f"{fakebin}{os.pathsep}{env['PATH']}"
         env["SUREAL_BAZEL_CACHE"] = str(cache)
+        if extra_env:
+            env.update(extra_env)
         env.pop("SUREAL_BAZEL_ROOTFS", None)
         env.pop("SUREAL_BAZEL_ROOTFS_LOCK", None)
         result = subprocess.run(
@@ -101,7 +119,7 @@ class BazelWrapperTests(unittest.TestCase):
             text=True,
             capture_output=True,
         )
-        return result, marker, cache, waymo_rootfs, curriculum_rootfs
+        return result, marker, cache, waymo_rootfs, curriculum_rootfs, gpu_rootfs
 
     def test_emit_plan_prints_sandbox_command_data_without_running_bwrap(self):
         self.assertTrue(WRAPPER.is_file(), "repository-level Bazel wrapper is missing")
@@ -123,7 +141,10 @@ class BazelWrapperTests(unittest.TestCase):
                 argv[argv.index("--ro-bind") + 1 : argv.index("--ro-bind") + 3],
                 [str(rootfs.resolve()), "/"],
             )
-            self.assertIn(["--ro-bind", str(REPO.resolve()), "/experiment"], plan["mounts"])
+            self.assertIn(["--tmpfs", "/experiment"], plan["mounts"])
+            self.assertIn(["--ro-bind", str((REPO / "MODULE.bazel").resolve()), "/experiment/MODULE.bazel"], plan["mounts"])
+            self.assertIn(["--ro-bind", str((REPO / "experiments").resolve()), "/experiment/experiments"], plan["mounts"])
+            self.assertTrue(has_mount_to(plan["mounts"], "/experiment/cohort"), plan["mounts"])
             self.assertIn(["--bind", str(cache.resolve()), "/outputs"], plan["mounts"])
             self.assertIn(["--ro-bind", "/etc/resolv.conf", "/etc/resolv.conf"], plan["mounts"])
             self.assertIn(["--setenv", "HOME", "/outputs/home"], plan["environment"])
@@ -160,7 +181,8 @@ class BazelWrapperTests(unittest.TestCase):
                 ["--bind", str((REPO / "MODULE.bazel.lock").resolve()), "/experiment/MODULE.bazel.lock"],
                 plan["mounts"],
             )
-            self.assertIn(["--ro-bind", str(REPO.resolve()), "/experiment"], plan["mounts"])
+            self.assertIn(["--tmpfs", "/experiment"], plan["mounts"])
+            self.assertIn(["--ro-bind", str((REPO / "MODULE.bazel").resolve()), "/experiment/MODULE.bazel"], plan["mounts"])
             self.assertFalse(marker.exists())
 
     def test_rootfs_identity_mismatch_is_rejected_before_bwrap_runs(self):
@@ -178,7 +200,7 @@ class BazelWrapperTests(unittest.TestCase):
 
     def test_parallax_targets_select_the_curriculum_rootfs(self):
         with tempfile.TemporaryDirectory() as temporary:
-            result, marker, _, waymo_rootfs, curriculum_rootfs = self.run_wrapper_with_default_roots(
+            result, marker, _, waymo_rootfs, curriculum_rootfs, _ = self.run_wrapper_with_default_roots(
                 temporary,
                 "--emit-plan",
                 "test",
@@ -192,13 +214,87 @@ class BazelWrapperTests(unittest.TestCase):
                 ["--ro-bind", str(curriculum_rootfs.resolve()), "/"],
                 plan["mounts"],
             )
+            self.assertIn(["--ro-bind", str((REPO / "parallax").resolve()), "/experiment/parallax"], plan["mounts"])
+            self.assertFalse(has_mount_to(plan["mounts"], "/experiment/3d-pathway"), plan["mounts"])
             self.assertIn("--output_base=/outputs/output-base-3d-pathway", plan["bazel"])
             self.assertNotIn("--output_base=/outputs/output-base", plan["bazel"])
             self.assertFalse(marker.exists())
 
+    def test_cuda_config_selects_gpu_rootfs_and_projects_driver_inputs(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            devices = root / "devices"
+            devices.mkdir()
+            device_pairs = []
+            for guest in ("/dev/nvidia1", "/dev/nvidiactl", "/dev/nvidia-uvm"):
+                host = devices / Path(guest).name
+                host.write_text("")
+                device_pairs.append(f"{host}={guest}")
+            driver_dir = root / "driver-libs"
+            driver_dir.mkdir()
+            for name in (
+                "libcuda.so",
+                "libcuda.so.1",
+                "libcuda.so.580.105.08",
+                "libnvidia-ptxjitcompiler.so",
+                "libnvidia-ptxjitcompiler.so.1",
+                "libnvidia-ptxjitcompiler.so.580.105.08",
+                "libnvidia-nvvm.so",
+                "libnvidia-nvvm.so.4",
+                "libnvidia-nvvm.so.580.105.08",
+            ):
+                (driver_dir / name).write_text(name)
+
+            result, marker, _, waymo_rootfs, _, gpu_rootfs = self.run_wrapper_with_default_roots(
+                temporary,
+                "--emit-plan",
+                "test",
+                "--config=cuda",
+                "//experiments/waymo-perception:advanced__test_models",
+                extra_env={
+                    "SUREAL_BAZEL_GPU_DEVICES": ",".join(device_pairs),
+                    "SUREAL_BAZEL_GPU_DRIVER_LIBRARY_DIRS": str(driver_dir),
+                },
+            )
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            plan = json.loads(result.stdout)
+            self.assertEqual(plan["rootfs"], str(gpu_rootfs.resolve()))
+            self.assertNotEqual(plan["rootfs"], str(waymo_rootfs.resolve()))
+            self.assertIn(["--ro-bind", str(gpu_rootfs.resolve()), "/"], plan["mounts"])
+            self.assertIn(["--tmpfs", "/experiment"], plan["mounts"])
+            self.assertTrue(has_mount_to(plan["mounts"], "/experiment/cohort"), plan["mounts"])
+            self.assertIn("--output_base=/outputs/output-base-gpu", plan["bazel"])
+            self.assertIn("--config=cuda", plan["bazel"])
+            self.assertIn(["--tmpfs", "/driver"], plan["mounts"])
+            for pair in device_pairs:
+                host, guest = pair.split("=", 1)
+                self.assertIn(["--dev-bind", host, guest], plan["mounts"])
+            self.assertIn(
+                ["--ro-bind", str((driver_dir / "libcuda.so").resolve()), "/driver/libcuda.so"],
+                plan["mounts"],
+            )
+            self.assertIn(
+                [
+                    "--ro-bind",
+                    str((driver_dir / "libnvidia-ptxjitcompiler.so.580.105.08").resolve()),
+                    "/driver/libnvidia-ptxjitcompiler.so.580.105.08",
+                ],
+                plan["mounts"],
+            )
+            self.assertIn(
+                ["--setenv", "PATH", "/opt/waymo/bin:/usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin"],
+                plan["environment"],
+            )
+            self.assertIn(
+                ["--setenv", "LD_LIBRARY_PATH", "/driver:/usr/local/cuda/lib64"],
+                plan["environment"],
+            )
+            self.assertIn(["--setenv", "CUDA_VISIBLE_DEVICES", "0"], plan["environment"])
+
     def test_broad_target_pattern_is_rejected_before_selecting_one_rootfs(self):
         with tempfile.TemporaryDirectory() as temporary:
-            result, marker, _, _, _ = self.run_wrapper_with_default_roots(
+            result, marker, _, _, _, _ = self.run_wrapper_with_default_roots(
                 temporary,
                 "--emit-plan",
                 "test",

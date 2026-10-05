@@ -40,6 +40,11 @@ TORCH_MODULES = [
     "tests/test_sparse_window_attention.py",
 ]
 
+TORCH_CPU_ONLY_MODULES = [
+    "cohort/test_sustained_transition_guard.py",
+    "cohort/test_sustained_worker_guard.py",
+]
+
 LIVE_GATE_MODULES = [
     "cohort/test_sustained_native_metric_gate.py",
     "tests/test_camera_projection_cli.py",
@@ -79,6 +84,9 @@ def _test_tags(src):
     return tags
 
 def perception_py_test(src, data):
+    env = {}
+    if src in TORCH_CPU_ONLY_MODULES:
+        env["CUDA_VISIBLE_DEVICES"] = ""
     py_test(
         name = perception_test_name(src),
         srcs = ["tools/bazel_test_runner.py"],
@@ -91,4 +99,5 @@ def perception_py_test(src, data):
         main = "tools/bazel_test_runner.py",
         size = "small",
         tags = _test_tags(src),
+        env = env,
     )
