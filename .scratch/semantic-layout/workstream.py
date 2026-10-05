@@ -138,8 +138,15 @@ Rules:
 Keeping the ticket current (this is how progress is monitored):
 - Tick each acceptance criterion in your ticket file (`- [x]`) as soon as it is verified, and commit.
 - When every criterion is ticked, append a `## Comments` section with what you built, the exact
-  verification commands and their results, and anything a reviewer must know; set the ticket's
-  status line to `**Status:** done`; commit; then stop.
+  verification commands and their results, and anything a reviewer must know, and commit. Only
+  then, in a final separate commit, set the ticket's status line to `**Status:** done`, and stop.
+  Never write `done` while the tree has uncommitted changes.
+- The lead reviews your branch against the spec and ADRs before merging. Where the spec or an ADR
+  states a requirement (for example Bzlmod, `rules_python` with the rootfs interpreter, no
+  `PYTHONPATH` in the sandbox), meet it; if it cannot be met, stop with `needs-info` and the exact
+  error instead of substituting something else.
+- Run Bazel only through `./bazelw`. Keep one cache layout under `.bazel-cache/` in this worktree
+  and delete any extra probe caches you create; the disk is nearly full.
 - If you cannot proceed without a decision or access you do not have, append the question under
   `## Comments`, set the status line to `**Status:** needs-info`, commit, and stop.
 '''
