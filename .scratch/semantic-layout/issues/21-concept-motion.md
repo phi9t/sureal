@@ -2,7 +2,7 @@
 
 **What to build:** Motion ingestion and evaluation live together under `motion`, Python and C++ side by side.
 
-**Blocked by:** 14 (Concept batch: `dataset`), 15 (Concept batch: `geometry`)
+**Blocked by:** 14 (Concept batch: `dataset`), 15 (Concept batch: `geometry`), 28 (The perception rootfs carries the tools its tests need)
 
 **Status:** ready-for-agent
 
