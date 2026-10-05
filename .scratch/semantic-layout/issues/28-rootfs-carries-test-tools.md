@@ -4,7 +4,7 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** done
+**Status:** ready-for-agent
 
 - [x] A new version of the perception CPU rootfs is built with git, curl, pytest (hash-pinned through a requirement lock) and a C++ compiler with binutils; Bazel 9.2 and every Python package of the current version are unchanged; the current and earlier rootfs versions and their locks are untouched on disk
 - [x] The wrapper selects the new version for perception targets, and its unit tests cover the selection
