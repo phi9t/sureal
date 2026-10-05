@@ -6,7 +6,7 @@
 
 **Status:** ready-for-agent
 
-- [ ] The move is one commit containing only renames
+- [x] The move is one commit containing only renames
 - [ ] A following commit updates every hard-coded occurrence of the old path in code: the architecture harness drivers, the gate scripts still in use, the rootfs build script, the publication audit and its test, the collaboration tests and CI
 - [ ] Sandbox mount points inside the rootfs are unchanged
 - [ ] The default Bazel run passes the same modules as before the move, and the GPU configuration runs the same torch modules
