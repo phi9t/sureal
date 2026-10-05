@@ -50,3 +50,12 @@ Pin and protected-file record:
 - Pinned files changed: none.
 - Protected active `.py` files changed under the moved path: `autonomy/cohort/re_admit_physical.py`, `autonomy/cohort/run.py`, `autonomy/cohort/run_balanced.py`, `autonomy/cohort/score.py`, `autonomy/cohort/score_balanced.py`, `autonomy/cohort/score_parallel.py`, and `autonomy/cohort/score_v2.py`. Reason: their frozen source-package lookup changed from `source/experiments/waymo-perception` to `source/autonomy` after the whole-directory move.
 - No protected `.py` files changed under `autonomy/pipeline`, `autonomy/gpu`, `autonomy/tier1`, or `autonomy/resources`.
+
+Post-review fix:
+
+- Clean-context review found that `autonomy/architecture/experiment_runner.py` still resolved relative `worker_hashes` from `package.parents[1]/.scratch`, which is stale after moved snapshots use `source/autonomy`. Commit `9d4695c` changes that lookup to `package.parent/.scratch` and adds a regression test for `source/autonomy` plus `source/.scratch/worker.py`.
+- The same commit updates active agent domain wayfinding from `experiments/waymo-perception/docs/adr/` to `autonomy/docs/adr/`.
+- `TMPDIR=$PWD/.bazel-cache/tmp PYTHONPATH=$PWD:$PWD/autonomy:$PWD/tests/collab python3 autonomy/architecture/test_experiment_runner.py -v` passed: 14 tests.
+- `TMPDIR=$PWD/.bazel-cache/tmp ./bazelw test //autonomy/... --test_output=errors --cache_test_results=no` passed: `Executed 138 out of 138 tests: 138 tests pass`.
+- `TMPDIR=$PWD/.bazel-cache/tmp ./bazelw test --config=cuda --test_tag_filters=requires_gpu //autonomy/... --test_output=errors --cache_test_results=no` first rerun had one flaky failure in `//autonomy:cohort__test_sustained_worker_guard` because the test compared all of `/outputs` while Bazel wrote repository-cache files there concurrently. The failed target passed alone, and a second full GPU rerun passed: `Executed 24 out of 24 tests: 24 tests pass`.
+- Final guard before this record: `python3 autonomy/tools/pins.py check --base work/semantic-layout/integration && TMPDIR=$PWD/.bazel-cache/tmp PYTHONPATH=$PWD:$PWD/autonomy:$PWD/tests/collab python3 scripts/publication_audit.py --root . && git diff --check` passed with pin guard `PASS: 0 changed file(s) cited by retained receipts` and publication audit `status: pass`.
