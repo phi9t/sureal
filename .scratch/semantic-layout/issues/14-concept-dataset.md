@@ -43,3 +43,14 @@ Post-commit autonomy gate repair before merging the updated integration branch:
 - `./bazelw test //autonomy:tests__test_training_box_replay //autonomy:tests__test_semantic_archive_support //autonomy:source_snapshot_targets_test --test_output=errors --cache_test_results=no` -> PASS, 3/3 tests.
 - `./bazelw test //autonomy/...` -> PASS, 149/149 tests.
 - Pre-commit pin check: `python3 autonomy/tools/pins.py check --base work/semantic-layout/integration` -> `FAIL: 72 changed file(s) pinned by retained receipts`. This was run after ticket 15 advanced the integration branch but before this branch merged it, so the report included the dataset batch plus seven geometry paths from integration not changed by this ticket. Pinned ticket-14 additions in this repair commit were `cohort/sustained_sources.py`, `tests/test_semantic_archive_support.py`, and `tests/test_training_box_replay.py`; each changed only to keep source snapshots and root tests aligned with the moved dataset package.
+
+Final verification after merging `work/semantic-layout/integration` at `8975fbd`:
+
+- `git merge work/semantic-layout/integration` -> committed as `a2da1f5 Merge integration after geometry concept`; conflicts were resolved by keeping both the ticket 14 dataset package and ticket 15 geometry package wiring.
+- `python3 autonomy/tools/layers.py` -> `PASS: 0 layering problem(s) across 14 layers`.
+- `./bazelw test //autonomy/...` -> PASS, 149/149 tests.
+- `./bazelw test --config=cuda --test_tag_filters=requires_gpu //autonomy/...` -> PASS, 24/24 tests.
+- `./bazelw test //parallax/...` -> PASS, 17/17 tests.
+- `python3 -m unittest tests.test_publication_audit` -> PASS, `Ran 30 tests in 16.755s`.
+- `python3 scripts/publication_audit.py --root .` -> PASS, `{"errors": [], "gitlinks": 2, "max_blob_bytes": 26214400, "schema_version": 1, "status": "pass", "tracked_files": 4985}`.
+- Final pin report: `python3 autonomy/tools/pins.py check --base work/semantic-layout/integration` -> `FAIL: 65 changed file(s) pinned by retained receipts`. The remaining pinned changes are the ticket 14 dataset moves, their moved tests, and compatibility edits already enumerated above; this is retained-receipt measurement for the concept reorg, not a weakened or skipped check.
