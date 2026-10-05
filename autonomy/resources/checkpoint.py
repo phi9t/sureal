@@ -6,7 +6,7 @@ It preserves all seven stage proofs under one digest for progression/recovery.
 import json
 from pathlib import Path
 from advanced.archive import safe_name
-from cohort.sustained_controller_backend import P
+from evidence.source_snapshot import verify_materialized_sources
 from resources.sources import regular,sha
 from resources.stage import write_new,require_separate
 
@@ -86,6 +86,17 @@ def resource_inventory(backend,record):
         if name in files or digest is not None and entry['sha256']!=digest:
             raise ValueError('unique safe resource member and unchanged digest required')
         entry['bytes']=Path(path).stat().st_size;files[name]=entry
+    def add_snapshot(prefix,receipt):
+        try:
+            root=Path(receipt['source_snapshot_root']);pins=receipt['source_pins']
+            verified=verify_materialized_sources(root,receipt)
+            if verified['source_pins']!=pins:
+                raise ValueError('source snapshot pins differ')
+            add(prefix+'/snapshot-object.tar',Path(receipt['source_snapshot_store'])/receipt['source_snapshot_sha256'],receipt['source_snapshot_sha256'])
+            for name,digest in pins.items():
+                add(prefix+'/materialized/'+name,root/name,digest)
+        except (KeyError,TypeError,OSError) as error:
+            raise ValueError('complete source snapshot receipt required') from error
     add('identity.json',backend.resource_identity_path,backend.resource_identity_sha256)
     add('checkpoint.json',record['resource_companion_path'],record['resource_companion_sha256'])
     add('native-final.json',record['final_path'],record['final_sha256'])
@@ -93,12 +104,9 @@ def resource_inventory(backend,record):
     add('native-manifest.json',backend.source/'manifest.json',backend.manifest_sha)
     add('producer-report.json',record['report_snapshot'],record['report_sha256'])
     add('native-runtime-lock.json',backend.runtime_path)
-    for name,pin in backend.resource_identity['source_pins'].items():
-        for kind in ['original','snapshot']:add('resource-'+kind+'/'+name,pin[kind],pin['sha256'])
-    for name,digest in backend.pins.items():
-        add('native-package/'+name,backend.package/name,digest);add('native-current/'+name,P/name,digest)
-    for name,pin in backend.host_pins.items():
-        for kind in ['original','snapshot']:add('native-host-'+kind+'/'+name,pin[kind],pin['sha256'])
+    add_snapshot('resource-sources',backend.resource_identity['source_pins'])
+    add_snapshot('native-package',backend.pins)
+    add_snapshot('native-host',backend.host_pins)
     for stage,refs in companion['stages'].items():
         for label,key in [('proof.json','resource_proof'),('binding.json','resource_binding'),('native-receipt.json','native_receipt')]:
             add('stages/'+stage+'/'+label,refs[key]['path'],refs[key]['sha256'])

@@ -69,3 +69,20 @@ Pinned-file record:
   - `tools/test_layers.py: cited by 1 receipt(s): research/journal-evidence/a059d4977ad3edc663115019abca6caf22fd80e1f59158eee9ecc60ef659a9b3`
   - `FAIL: 2 changed file(s) cited by retained receipts`
 - Reason: `autonomy/tools/layers.py` needed a source-discovery fallback for Bazel/rootfs sandboxes where `git` exists but linked-worktree metadata is unavailable, and `autonomy/tools/test_layers.py` covers that fallback. No `research/` files were modified. No `.py` files under `experiments/waymo-perception/{pipeline,gpu,tier1,cohort,resources}` were added, changed, or removed.
+
+Review-1 integration update:
+
+- Set the status line back to `**Status:** ready-for-agent` in commit `c38f1df` before merging.
+- Merged `work/semantic-layout/integration` and resolved conflicts by keeping integration's source snapshot filegroups/genqueries and this ticket's real rootfs compiler smoke target. `autonomy/bazel_tests.bzl` keeps integration's `extra_data` support and this ticket's pytest-mode args/data wiring.
+- Verified the cache mount move remains compatible with the merged source snapshot work: `bazelw` still binds `.bazel-cache` at `/tmp/bazel-cache`, keeps `/outputs` as tmpfs, and the merged controller stage guard checks `/tmp/source-snapshots` plus `SUREAL_SOURCE_SNAPSHOT_STORE=/tmp/source-snapshots`.
+- `./bazelw test //autonomy:source_snapshot_targets_test //autonomy:architecture__test_experiment_runner //autonomy:cohort__test_sustained_controller_guards --test_output=errors --cache_test_results=no` -> `Executed 3 out of 3 tests: 3 tests pass`.
+- `PYTHONPATH=autonomy python3 -m unittest autonomy/tests/test_bazel_wrapper.py` -> `Ran 6 tests in 0.402s`, `OK`.
+- `./bazelw test //autonomy/... --test_output=errors --cache_test_results=no` -> previous ticket-28 post-fix count 147 default, post-integration count `Executed 148 out of 148 tests: 148 tests pass`.
+- `./bazelw test --config=cuda --test_tag_filters=requires_gpu //autonomy/... --test_output=errors --cache_test_results=no` -> previous count 24 GPU, post-integration count `Executed 24 out of 24 tests: 24 tests pass`.
+- `./bazelw test //parallax/... --test_output=errors --cache_test_results=no` -> previous count 17 curriculum, post-integration count `Executed 17 out of 17 tests: 17 tests pass`.
+- `./bazelw test //autonomy:cohort__test_sustained_worker_guard --config=cuda --runs_per_test=10 --test_output=errors --cache_test_results=no` -> `Executed 1 out of 1 test: 1 test passes`, stats over 10 runs.
+- `python3 autonomy/tools/pins.py check --base work/semantic-layout/integration` before the review-1 merge/update commit reported the same retained-evidence citations:
+  - `tools/layers.py: cited by 1 receipt(s): research/journal-evidence/a059d4977ad3edc663115019abca6caf22fd80e1f59158eee9ecc60ef659a9b3`
+  - `tools/test_layers.py: cited by 1 receipt(s): research/journal-evidence/a059d4977ad3edc663115019abca6caf22fd80e1f59158eee9ecc60ef659a9b3`
+  - `FAIL: 2 changed file(s) cited by retained receipts`
+- Pinned-file reason remains unchanged: `autonomy/tools/layers.py` and `autonomy/tools/test_layers.py` carry the Bazel/rootfs linked-worktree Git metadata fallback and its test. No `research/` files were modified. No `.py` files under `experiments/waymo-perception/{pipeline,gpu,tier1,cohort,resources}` were added, changed, or removed.

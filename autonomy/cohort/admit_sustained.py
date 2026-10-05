@@ -13,7 +13,7 @@ from tier1.storage import sha,unique_payload_bytes
 from tier1.admission import reserve_write
 from cohort.sustained_contract import validate_contract
 from cohort.sustained_scoring_budget import stage_timeout
-from cohort.sustained_sources import validate_sources
+from cohort.sustained_sources import snapshot_sources,validate_sources
 from cohort.sustained_stage_inputs import freeze_inputs,bind_stage_paths
 
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing'
@@ -41,11 +41,11 @@ def main():
  for path,digest in old['driver_hashes'].items():
   if sha(path)!=digest:raise ValueError('driver changed')
  R=C/'insula'/f'balanced16-sustained-admission-{a.run_id}';R.mkdir();package=R/'code';package.mkdir()
- for folder in ['pipeline','gpu','tier1','cohort']:
+ for folder in ['pipeline','gpu','tier1','cohort','evidence']:
   for path in (P/folder).rglob('*.py'):
    if '__pycache__' in path.parts:continue
    dest=package/path.relative_to(P);dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(path,dest)
- pins={str(p.relative_to(package)):sha(p) for p in package.rglob('*.py')};validate_sources(package,pins,runtime,runtime)
+ pins=snapshot_sources(package,R/'source-snapshots');validate_sources(package,pins,runtime,runtime)
  runtime_path=R/'runtime-lock.json';runtime_path.write_text(json.dumps(runtime,indent=2)+'\n')
  anchor_path=P/'research/training-anchor-templates.candidate.json';anchor_receipt=json.loads((P/'research/training-anchor-candidate-verified.json').read_text())
  if sha(anchor_path)!=anchor_receipt['expected']['candidate_sha256']:raise ValueError('admitted anchor templates changed')
@@ -59,7 +59,7 @@ def main():
   elif metrics:command=launch_plan(C/'metrics-rootfs',package,stage_source,directory,['python','/experiment/cohort/'+worker])
   else:command=launch_plan(C/'gpu-rootfs',package,stage_source,directory,['/opt/waymo/bin/python','/experiment/cohort/'+worker])
   extra=bind_stage_paths(extra,source,stage_source)
-  index=command.index('--');command[index:index]=['--ro-bind',str(stage_source),'/tmp/inputs','--ro-bind',str(native),'/tmp/native','--ro-bind',str(W/'balanced16-physical-v2'),'/tmp/physical','--ro-bind',str(W/'balanced16-labels-v2'),'/tmp/boxes','--ro-bind',str(runtime_path),'/tmp/runtime-lock.json','--ro-bind',str(W),'/tmp/scientific','--setenv','CUBLAS_WORKSPACE_CONFIG',':4096:8',*extra]
+  index=command.index('--');command[index:index]=['--ro-bind',str(stage_source),'/tmp/inputs','--ro-bind',str(native),'/tmp/native','--ro-bind',str(W/'balanced16-physical-v2'),'/tmp/physical','--ro-bind',str(W/'balanced16-labels-v2'),'/tmp/boxes','--ro-bind',str(runtime_path),'/tmp/runtime-lock.json','--ro-bind',str(W),'/tmp/scientific','--ro-bind',str(R/'source-snapshots'),'/tmp/source-snapshots','--setenv','SUREAL_SOURCE_SNAPSHOT_STORE','/tmp/source-snapshots','--setenv','CUBLAS_WORKSPACE_CONFIG',':4096:8',*extra]
   with (directory/'live.log').open('w') as log:result=run_stage(command,package,dict(os.environ),log,timeout=stage_timeout(metrics))
   if result.returncode:raise RuntimeError(f'{name} failed; retained log: {directory}/live.log')
   validate_sources(package,pins,runtime,runtime)

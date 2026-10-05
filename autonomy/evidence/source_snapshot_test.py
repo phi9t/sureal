@@ -17,7 +17,10 @@ class SourceSnapshotTests(unittest.TestCase):
     def api(self):
         try:
             from evidence.source_snapshot import (
+                HdfsSnapshotStore,
                 LocalSnapshotStore,
+                SnapshotAuthenticationError,
+                SnapshotMissingError,
                 archive_sources,
                 file_sha256,
                 require_regular_file,
@@ -28,7 +31,10 @@ class SourceSnapshotTests(unittest.TestCase):
         except ImportError:
             self.fail("shared evidence source snapshot module must exist")
         return {
+            "HdfsSnapshotStore": HdfsSnapshotStore,
             "LocalSnapshotStore": LocalSnapshotStore,
+            "SnapshotAuthenticationError": SnapshotAuthenticationError,
+            "SnapshotMissingError": SnapshotMissingError,
             "archive_sources": archive_sources,
             "file_sha256": file_sha256,
             "require_regular_file": require_regular_file,
@@ -64,6 +70,119 @@ class SourceSnapshotTests(unittest.TestCase):
                 }
                 for member in reader
             }
+
+    def hdfs_runner(self, remote, *, fail=None):
+        calls = []
+        fail = fail or {}
+
+        def run(command, **kwargs):
+            calls.append((command, kwargs))
+            verb = command[5]
+            if verb in fail:
+                return types.SimpleNamespace(returncode=1, stdout="", stderr=fail[verb])
+            if verb == "storage-prefix":
+                return types.SimpleNamespace(returncode=0, stdout="hdfs://fixture/sureal\n", stderr="")
+            if verb == "get":
+                source = command[-2]
+                destination = Path(command[-1])
+                if source not in remote:
+                    return types.SimpleNamespace(returncode=1, stdout="", stderr='{"error":"FileNotFound: missing object"}')
+                if destination.exists():
+                    return types.SimpleNamespace(returncode=1, stdout="", stderr='{"error":"Local destination already exists"}')
+                destination.write_bytes(remote[source])
+                return types.SimpleNamespace(returncode=0, stdout="", stderr="")
+            if verb == "put":
+                source = Path(command[-2])
+                destination = command[-1]
+                if destination in remote:
+                    return types.SimpleNamespace(returncode=1, stdout="", stderr='{"error":"already exists"}')
+                remote[destination] = source.read_bytes()
+                return types.SimpleNamespace(returncode=0, stdout="", stderr="")
+            return types.SimpleNamespace(returncode=1, stdout="", stderr='{"error":"unexpected command"}')
+
+        return run, calls
+
+    def test_hdfs_storage_uploads_with_exact_readback_and_fetches_by_digest(self):
+        api = self.api()
+        remote = {}
+        runner, calls = self.hdfs_runner(remote)
+        data = b"snapshot bytes"
+        digest = hashlib.sha256(data).hexdigest()
+        store = api["HdfsSnapshotStore"]("/waystone", runner=runner)
+
+        self.assertEqual(store.store(digest, data), digest)
+        self.assertEqual(store.fetch(digest), data)
+        self.assertEqual(
+            remote,
+            {
+                "hdfs://fixture/sureal/source-snapshots/" + digest: data,
+            },
+        )
+        verbs = [call[0][5] for call in calls]
+        self.assertEqual(verbs, ["storage-prefix", "get", "put", "get", "get"])
+        for command, kwargs in calls:
+            self.assertEqual(command[:5], ["/waystone", "--error-format", "json", "--auth-source", "token-file"])
+            self.assertEqual(command[5] == "put" and command[-3] == "--mkdir-parents", command[5] == "put")
+            self.assertEqual(kwargs["env"]["HADOOP_CONF_DIR"], "/opt/tiger/yarn_deploy/hadoop/conf")
+
+    def test_hdfs_storage_rejects_upload_when_exact_readback_differs(self):
+        api = self.api()
+        remote = {}
+        runner, _ = self.hdfs_runner(remote)
+        data = b"snapshot bytes"
+        digest = hashlib.sha256(data).hexdigest()
+
+        def corrupt_readback(command, **kwargs):
+            result = runner(command, **kwargs)
+            if command[5] == "put":
+                remote[command[-1]] = b"corrupt"
+            return result
+
+        store = api["HdfsSnapshotStore"]("/waystone", runner=corrupt_readback)
+        with self.assertRaisesRegex(ValueError, "snapshot digest differs after readback"):
+            store.store(digest, data)
+
+    def test_hdfs_storage_verifies_existing_digest_without_overwriting(self):
+        api = self.api()
+        data = b"snapshot bytes"
+        digest = hashlib.sha256(data).hexdigest()
+        remote = {
+            "hdfs://fixture/sureal/source-snapshots/" + digest: data,
+        }
+        runner, calls = self.hdfs_runner(remote)
+        store = api["HdfsSnapshotStore"]("/waystone", runner=runner)
+
+        self.assertEqual(store.store(digest, data), digest)
+        self.assertNotIn("put", [call[0][5] for call in calls])
+        self.assertEqual(remote["hdfs://fixture/sureal/source-snapshots/" + digest], data)
+
+    def test_hdfs_storage_fetches_snapshot_in_fresh_session_without_local_cache(self):
+        api = self.api()
+        data = b"snapshot bytes"
+        digest = hashlib.sha256(data).hexdigest()
+        remote = {
+            "hdfs://fixture/sureal/source-snapshots/" + digest: data,
+        }
+        runner, _ = self.hdfs_runner(remote)
+
+        first = api["HdfsSnapshotStore"]("/waystone", runner=runner)
+        second = api["HdfsSnapshotStore"]("/waystone", runner=runner)
+
+        self.assertEqual(first.fetch(digest), data)
+        self.assertEqual(second.fetch(digest), data)
+
+    def test_hdfs_storage_reports_authentication_failure_and_missing_object_distinctly(self):
+        api = self.api()
+        missing_runner, _ = self.hdfs_runner({})
+        missing_store = api["HdfsSnapshotStore"]("/waystone", runner=missing_runner)
+
+        with self.assertRaisesRegex(api["SnapshotMissingError"], "source snapshot missing"):
+            missing_store.fetch("0" * 64)
+
+        auth_runner, _ = self.hdfs_runner({}, fail={"get": '{"error":"Kerberos authentication failed"}'})
+        auth_store = api["HdfsSnapshotStore"]("/waystone", runner=auth_runner)
+        with self.assertRaisesRegex(api["SnapshotAuthenticationError"], "snapshot storage authentication failed"):
+            auth_store.fetch("0" * 64)
 
     def test_bazel_target_snapshot_archives_exact_transitive_sources(self):
         api = self.api()

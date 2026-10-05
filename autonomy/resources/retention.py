@@ -47,15 +47,15 @@ def publish_bundle(backend,kind,inventory):
     root=C/'insula'/('resource-retention-'+identifier);require_separate(backend.output,root);root.mkdir()
     pins=backend.resource_identity['source_pins'];code=validate_sources(P/'resources',pins)
     execution=root/'execution';execution.mkdir();shutil.copytree(code,execution/'resources');(execution/'advanced').mkdir()
-    library=Path(backend.host_pins['advanced/archive.py']['snapshot']);library_sha=backend.host_pins['advanced/archive.py']['sha256']
+    library=Path(backend.host_pins['source_snapshot_root'])/'advanced/archive.py';library_sha=backend.host_pins['source_pins']['advanced/archive.py']
     shutil.copyfile(library,execution/'advanced/archive.py')
     temp=W/('resource-retention-'+identifier);temp.mkdir();raw=temp/'raw';raw.mkdir()
     def guard():
         backend.guard();validate_sources(P/'resources',pins)
         if not regular(library) or sha(library)!=library_sha:raise ValueError('pinned archive library changed')
         if sha(execution/'advanced/archive.py')!=library_sha:raise ValueError('executed archive helper changed')
-        for name,pin in pins.items():
-            if sha(execution/'resources'/name)!=pin['sha256']:raise ValueError('executed resource package changed')
+        for name,digest in pins['source_pins'].items():
+            if sha(execution/'resources'/name)!=digest:raise ValueError('executed resource package changed')
         for entry in inventory.values():
             if not regular(Path(entry['path'])) or sha(entry['path'])!=entry['sha256'] or Path(entry['path']).stat().st_size!=entry['bytes']:
                 raise ValueError('exact resource source inventory changed')

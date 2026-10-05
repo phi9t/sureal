@@ -1,7 +1,52 @@
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 load(":bazel_tests.bzl", "perception_py_test", "perception_test_name")
+load(
+    ":source_snapshot_targets.bzl",
+    "NATIVE_CACHE_RETENTION_HOST_SOURCES",
+    "RESOURCE_SOURCE_LAYER_GLOBS",
+    "SUSTAINED_CHECKPOINT_RETENTION_HOST_SOURCES",
+    "SUSTAINED_CONTROLLER_HOST_SOURCES",
+    "SUSTAINED_PILOT_RETENTION_HOST_SOURCES",
+    "SUSTAINED_RUN_SOURCE_GLOBS",
+)
 
 package(default_visibility = ["//visibility:private"])
+
+filegroup(
+    name = "sustained-run-sources",
+    srcs = glob(SUSTAINED_RUN_SOURCE_GLOBS, exclude = ["**/__pycache__/**"]),
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "resource-source-layer",
+    srcs = glob(RESOURCE_SOURCE_LAYER_GLOBS, exclude = ["**/__pycache__/**"]),
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "sustained-controller-host",
+    srcs = SUSTAINED_CONTROLLER_HOST_SOURCES,
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "sustained-checkpoint-retention-host",
+    srcs = SUSTAINED_CHECKPOINT_RETENTION_HOST_SOURCES,
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "sustained-pilot-retention-host",
+    srcs = SUSTAINED_PILOT_RETENTION_HOST_SOURCES,
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "native-cache-retention-host",
+    srcs = NATIVE_CACHE_RETENTION_HOST_SOURCES,
+    visibility = ["//visibility:public"],
+)
 
 PERCEPTION_TEST_MODULES = glob(
     [
@@ -10,6 +55,7 @@ PERCEPTION_TEST_MODULES = glob(
     ],
     exclude = [
         "research/**",
+        "source_snapshot_targets_test.py",
     ],
 )
 
@@ -23,6 +69,81 @@ PERCEPTION_RUNFILES = glob(
     "research/association41-runtime-admission-20261003a/manifest.json",
 ]
 
+ARCHITECTURE_EXPERIMENT_RESEARCH_INPUTS = [
+    "research/architecture-all_pillars-cache-verified.json",
+    "research/architecture-retain64-cache-verified.json",
+    "research/architecture-retention-controls-spec.md",
+    "research/architecture-window-control-spec.md",
+    "research/normalization-secondary-decoder-spec.md",
+    "research/overfit-native-cache-progress.json",
+    "research/training-anchor-templates.candidate.json",
+]
+
+filegroup(
+    name = "architecture_experiment_runner_snapshot",
+    srcs = [
+        "BUILD.bazel",
+        "architecture/experiment_runner.py",
+        "architecture/harness/files.json",
+        "architecture/registry.json",
+        "evidence/source_snapshot.py",
+    ] + glob([
+        "architecture/harness/*.py",
+        "gpu/*.py",
+        "pipeline/*.py",
+    ]) + ARCHITECTURE_EXPERIMENT_RESEARCH_INPUTS,
+    visibility = ["//visibility:public"],
+)
+
+genquery(
+    name = "sustained_run_sources_query",
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy:sustained-run-sources)) union labels("data", deps(//autonomy:sustained-run-sources))))',
+    scope = [":sustained-run-sources"],
+)
+
+genquery(
+    name = "resource_source_layer_query",
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy:resource-source-layer)) union labels("data", deps(//autonomy:resource-source-layer))))',
+    scope = [":resource-source-layer"],
+)
+
+genquery(
+    name = "sustained_controller_host_query",
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy:sustained-controller-host)) union labels("data", deps(//autonomy:sustained-controller-host))))',
+    scope = [":sustained-controller-host"],
+)
+
+genquery(
+    name = "sustained_checkpoint_retention_host_query",
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy:sustained-checkpoint-retention-host)) union labels("data", deps(//autonomy:sustained-checkpoint-retention-host))))',
+    scope = [":sustained-checkpoint-retention-host"],
+)
+
+genquery(
+    name = "sustained_pilot_retention_host_query",
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy:sustained-pilot-retention-host)) union labels("data", deps(//autonomy:sustained-pilot-retention-host))))',
+    scope = [":sustained-pilot-retention-host"],
+)
+
+genquery(
+    name = "native_cache_retention_host_query",
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy:native-cache-retention-host)) union labels("data", deps(//autonomy:native-cache-retention-host))))',
+    scope = [":native-cache-retention-host"],
+)
+
+perception_py_test(
+    "source_snapshot_targets_test.py",
+    PERCEPTION_RUNFILES,
+    extra_data = [
+        ":native_cache_retention_host_query",
+        ":resource_source_layer_query",
+        ":sustained_checkpoint_retention_host_query",
+        ":sustained_controller_host_query",
+        ":sustained_pilot_retention_host_query",
+        ":sustained_run_sources_query",
+    ],
+)
+
 [
     perception_py_test(src, PERCEPTION_RUNFILES)
     for src in PERCEPTION_TEST_MODULES
@@ -35,6 +156,6 @@ cc_test(
 
 test_suite(
     name = "perception_unit_tests",
-    tests = [":" + perception_test_name(src) for src in PERCEPTION_TEST_MODULES],
+    tests = [":source_snapshot_targets_test"] + [":" + perception_test_name(src) for src in PERCEPTION_TEST_MODULES],
     visibility = ["//visibility:public"],
 )

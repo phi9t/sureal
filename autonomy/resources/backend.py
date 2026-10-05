@@ -54,9 +54,9 @@ class ResourceBackend(NativeBackend):
             type(value['schema_version']) is not int or value['schema_version']!=1 or value['native_case_directory']!=str(self.R) or
             value['native_run_path']!=str(self.R/'run.json') or sha(self.R/'run.json')!=value['native_run_sha256'] or
             value['manifest_sha256']!=self.manifest_sha or value['anchor_templates_sha256']!=self.anchor_sha or
-            value['source_directory']!=str(CURRENT) or type(value['cap_bytes']) is not int or value['cap_bytes']!=CAP_BYTES or
+            not isinstance(value.get('source_directory'),str) or type(value['cap_bytes']) is not int or value['cap_bytes']!=CAP_BYTES or
             value['timeout_seconds']!={'ordinary':stage_timeout(False),'metrics':stage_timeout(True)} or
-            value['source_pins'].get('backend.py',{}).get('original')!=str(Path(__file__).resolve())):
+            value['source_pins'].get('source_pins',{}).get('backend.py') is None):
             raise ValueError('complete externally pinned native/resource identity required')
         require_separate(self.output,self.resource_root,CURRENT)
         validate_sources(CURRENT,value['source_pins'])
