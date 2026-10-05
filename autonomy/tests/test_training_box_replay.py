@@ -1,7 +1,7 @@
 import tempfile
 import unittest
 from pathlib import Path
-from pipeline.staging_lease import staging_lease
+from insula.staging_lease import staging_lease
 from pipeline.training_box_replay import replay
 
 class ReplayGateTests(unittest.TestCase):

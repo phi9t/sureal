@@ -8,8 +8,8 @@ import shutil
 import subprocess
 import sys
 
-from .runtime_identity import verify_rootfs
-from .staging_lease import staging_lease
+from insula.runtime_identity import verify_rootfs
+from insula.staging_lease import staging_lease
 from .staged_source import staged_source, WAYSTONE
 from .training_box_process import run_source_worker
 

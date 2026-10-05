@@ -13,16 +13,18 @@ not import each other. The order is declared in
 
 | Layer | Areas | Role |
 | --- | --- | --- |
-| 9 | top-level scripts, `scripts/`, `analysis/`, `tests/`, `tools/` | Gate runners, operations, diagnostics, development checks |
-| 8 | `continuation_control/` | Binds bounded legacy replays to their native receipts |
-| 7 | `continuation/` | Parity checks for resumed native stages |
-| 6 | `resources/` | Measured, cgroup-bounded stage execution and retention |
-| 5 | `cohort/` | 16-scene cohort studies: balanced and sustained training, scoring, audits |
-| 4 | `advanced/` | Expanded fixed-batch architecture suite |
-| 3 | `tier1/` | Fixed-batch architecture overfit suite |
-| 2 | `architecture/` | Experiment catalog and the `architecture.py` runner |
-| 1 | `gpu/`, `evaluation/`, `tracking/`, `association/`, `explorer/`, `motion-evaluation/`, `viewer/` | Model variants and GPU workers, native metric contracts, journal, standalone tools |
-| 0 | `pipeline/` | Readers, geometry, encoders, detector, archives, Insula entry; imports no other area |
+| 11 | top-level scripts, `scripts/`, `analysis/`, `tests/`, `tools/` | Gate runners, operations, diagnostics, development checks |
+| 10 | `continuation_control/` | Binds bounded legacy replays to their native receipts |
+| 9 | `continuation/` | Parity checks for resumed native stages |
+| 8 | `resources/` | Measured, cgroup-bounded stage execution and retention |
+| 7 | `cohort/` | 16-scene cohort studies: balanced and sustained training, scoring, audits |
+| 6 | `advanced/` | Expanded fixed-batch architecture suite |
+| 5 | `tier1/` | Fixed-batch architecture overfit suite |
+| 4 | `architecture/` | Experiment catalog and the `architecture.py` runner |
+| 3 | `gpu/`, `evaluation/`, `tracking/`, `association/`, `explorer/`, `motion-evaluation/`, `viewer/` | Model variants and GPU workers, native metric contracts, standalone tools |
+| 2 | `pipeline/` | Readers, geometry, encoders, detector and archives |
+| 1 | `insula/` | Sandbox entry, rootfs identity, M0 receipt checks and staging leases |
+| 0 | `evidence/` | Source snapshots, file digests, regular-file checks, journal, tracker, projection, publication and pin reports |
 
 `research/` holds retained evidence, including frozen copies of sources, and is
 outside the layering.
@@ -40,7 +42,8 @@ defined by more than one other area.
 
 - **Library code** is imported by other modules: most of `pipeline/`, the model
   and variant modules in `gpu/`, `tier1/` and `advanced/`, the stage backend in
-  `resources/`, the journal in `tracking/`.
+  `resources/`, the Insula sandbox helpers in `insula/`, and the journal and
+  snapshot tools in `evidence/`.
 - **Procedure records** are scripts that ran one gate or one study stage and
   wrote a receipt containing their own digest: the top-level `verify-*.py` and
   `publish-*.py`, the hyphenated workers in `gpu/` and `cohort/`, and the
@@ -48,18 +51,18 @@ defined by more than one other area.
 
 Both kinds are pinned by receipts. Almost every tracked file outside
 `research/` has the SHA-256 of its current bytes recorded in at least one
-retained receipt (`autonomy/tools/pins.py status` prints the count per area). Two
+retained receipt (`autonomy/evidence/pins.py status` prints the count per area). Two
 validators also require an exact file inventory, so adding a file there changes
 what they admit:
 
-- `cohort/sustained_sources.py`: every `*.py` under `pipeline/`, `gpu/`,
-  `tier1/` and `cohort/`, which `cohort/sustained_controller_backend.py`
-  freezes for each sustained run;
+- `cohort/sustained_sources.py`: every `*.py` under `pipeline/`, `insula/`,
+  `gpu/`, `tier1/` and `cohort/`, plus the source snapshot helper, which
+  `cohort/sustained_controller_backend.py` freezes for each sustained run;
 - `resources/sources.py`: every `*.py` under `resources/`.
 
 This is why a changed procedure appears as a new `_v2` file instead of an edit:
-editing a cited file leaves its receipts describing bytes the tree no longer
-holds. Before changing a file, ask `autonomy/tools/pins.py` what pins it.
+editing a pinned file leaves its receipts describing bytes the tree no longer
+holds. Before changing a file, ask `autonomy/evidence/pins.py` what pins it.
 
 ## Checks
 

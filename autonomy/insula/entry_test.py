@@ -2,7 +2,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from pipeline.insula_entry import launch_plan
+from insula.entry import launch_plan
 
 class EntryTests(unittest.TestCase):
     def test_plan_is_offline_and_readonly(self):

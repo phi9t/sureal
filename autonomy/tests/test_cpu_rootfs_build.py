@@ -7,7 +7,7 @@ import textwrap
 import unittest
 from pathlib import Path
 
-from pipeline.runtime_identity import rootfs_identity
+from insula.runtime_identity import rootfs_identity
 
 
 PACKAGE = Path(__file__).resolve().parents[1]

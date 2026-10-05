@@ -1,0 +1,55 @@
+load("@rules_python//python:defs.bzl", "py_test")
+
+TEST_MODULES = glob(["*_test.py"])
+EVIDENCE_VISIBILITY = [
+    "//autonomy:__pkg__",
+    "//autonomy/insula:__pkg__",
+]
+
+package(default_visibility = EVIDENCE_VISIBILITY)
+
+exports_files([
+    "journal.py",
+    "pins.py",
+    "projection.py",
+    "publish.py",
+    "source_integrity.py",
+    "source_snapshot.py",
+    "tracker.py",
+], visibility = EVIDENCE_VISIBILITY)
+
+filegroup(
+    name = "all_files",
+    srcs = glob(
+        ["**"],
+        exclude = ["**/__pycache__/**"],
+    ),
+)
+
+filegroup(
+    name = "all_py",
+    srcs = glob(["*.py"]),
+)
+
+filegroup(
+    name = "tests",
+    srcs = TEST_MODULES,
+)
+
+[
+    py_test(
+        name = test[:-3],
+        srcs = [test],
+        data = [":all_py"],
+        imports = [".."],
+        legacy_create_init = 0,
+        size = "small",
+        tags = ["perception_unit"],
+    )
+    for test in TEST_MODULES
+]
+
+test_suite(
+    name = "all_tests",
+    tests = [test[:-3] for test in TEST_MODULES],
+)

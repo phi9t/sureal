@@ -4,7 +4,7 @@ import shutil
 import tempfile
 import unittest
 from pathlib import Path
-from pipeline.m0_receipt import validate_receipt
+from insula.m0_receipt import validate_receipt
 
 HERE=Path(__file__).resolve().parents[1]
 ROOT=Path.home()/'.cache/waystone/waymo-perception/insula/rootfs-v2'

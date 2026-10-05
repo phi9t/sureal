@@ -4,7 +4,7 @@ from pathlib import Path
 P=Path(__file__).resolve().parents[1];sys.path[:0]=[str(P),str(P/'tier1'),str(P/'architecture')]
 from advanced.catalog import catalog
 from storage import sha,unique_payload_bytes
-from pipeline.runtime_identity import verify_rootfs
+from insula.runtime_identity import verify_rootfs
 from experiment_runner import run_stage
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing'
 def main():

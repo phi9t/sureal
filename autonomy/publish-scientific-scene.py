@@ -3,8 +3,8 @@
 import argparse,hashlib,json,subprocess,time,resource
 from pathlib import Path
 from datetime import datetime,timezone
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 from pipeline.scientific_admission import admit_scene
 from pipeline.scientific_publication import publication_manifest
 

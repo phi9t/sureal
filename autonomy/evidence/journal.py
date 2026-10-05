@@ -1,9 +1,10 @@
 """Append-only evidence-indexed research notes with a verifiable hash chain."""
 import datetime,fcntl,hashlib,json,os
 from pathlib import Path
+from evidence.source_snapshot import file_sha256, require_regular_file
 CATEGORIES={'observation','hypothesis','decision','follow_up'}
 def digest(path):
- with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+ return file_sha256(path)
 def fsync_directory(path):
  descriptor=os.open(path,os.O_RDONLY|os.O_DIRECTORY)
  try:os.fsync(descriptor)
@@ -22,7 +23,11 @@ def read_entries(path):
 
 def append_entry(path,category,experiments,content,evidence):
  if category not in CATEGORIES or not isinstance(content,str) or not content.strip() or not isinstance(experiments,list) or not experiments:raise ValueError('category, experiment IDs and nonempty content required')
- retained=[(Path(p).resolve(),Path(p).read_bytes()) for p in evidence]
+ retained=[]
+ for p in evidence:
+  evidence_path=Path(p)
+  checked=require_regular_file(evidence_path)
+  retained.append((evidence_path.resolve(),checked.read_bytes()))
  references=[{'path':str(p),'sha256':hashlib.sha256(data).hexdigest()} for p,data in retained]
  path=Path(path);path.parent.mkdir(parents=True,exist_ok=True)
  with path.with_suffix('.lock').open('a') as lock:

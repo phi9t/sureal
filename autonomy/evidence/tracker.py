@@ -1,9 +1,10 @@
 """Evidence-derived experiment dashboard and append-only research journal CLI."""
-import argparse,datetime,fcntl,hashlib,json,os,sys,time
+import argparse,datetime,fcntl,hashlib,json,os,time
 from pathlib import Path
-P=Path(__file__).resolve().parents[1];sys.path.insert(0,str(P))
-from tracking.journal import append_entry,read_entries,digest
-from tracking.projection import project_experiments
+from evidence.journal import append_entry,read_entries,digest
+from evidence.projection import project_experiments
+from evidence.source_snapshot import require_regular_file
+P=Path(__file__).resolve().parents[1]
 R=P/'research';REGISTRY=R/'experiment-registry.json';JOURNAL=R/'research-journal.jsonl'
 def atomic(path,value):
  temporary=path.with_suffix(path.suffix+'.tmp');temporary.write_text(value);os.replace(temporary,path)
@@ -11,7 +12,7 @@ def read_optional(path):
  if not path.exists():return None,None
  raw=path.read_bytes();return json.loads(raw),hashlib.sha256(raw).hexdigest()
 def snapshot(path):
- data=path.read_bytes();h=hashlib.sha256(data).hexdigest();destination=R/'journal-evidence'/h;destination.parent.mkdir(exist_ok=True)
+ path=require_regular_file(path);data=path.read_bytes();h=digest(path);destination=R/'journal-evidence'/h;destination.parent.mkdir(exist_ok=True)
  if not destination.exists():
   with destination.open('xb') as output:output.write(data)
  if digest(destination)!=h:raise ValueError('immutable journal evidence changed')
@@ -41,7 +42,7 @@ def refresh():
   lines=['# Experiment tracker','',payload['scope'],'','| Experiment | Stage | Confirmation update | Train seconds to confirmation | Worst terminal APH |','|---|---|---:|---:|---:|']
   for row in rows:
    fit=row['time_to_fit'] or {};seconds=fit.get('confirmation_train_seconds');aph=row['worst_terminal_APH'];lines.append(f"| {row['id']} | {row['stage']} | {row['confirmation_update'] or '—'} | {f'{seconds:.1f}' if seconds is not None else '—'} | {f'{aph:.3f}' if aph is not None else '—'} |")
-  lines+=['','Each row’s goal, complete recipe, verifier contract and acceptance criteria are in [experiments.json](experiments.json). Definitions are in [experiment-registry.json](experiment-registry.json). Notes are in [research-journal.md](research-journal.md).','','Refresh: `python autonomy/tracking/cli.py refresh`','Follow active runs: `python autonomy/tracking/cli.py watch`'];atomic(R/'experiment-tracker.md','\n'.join(lines)+'\n')
+  lines+=['','Each row’s goal, complete recipe, verifier contract and acceptance criteria are in [experiments.json](experiments.json). Definitions are in [experiment-registry.json](experiment-registry.json). Notes are in [research-journal.md](research-journal.md).','','Refresh: `python autonomy/evidence/tracker.py refresh`','Follow active runs: `python autonomy/evidence/tracker.py watch`'];atomic(R/'experiment-tracker.md','\n'.join(lines)+'\n')
   entries=read_entries(JOURNAL);notes=['# Research journal','','Append-only observations, hypotheses, decisions and follow-up work. Evidence snapshots and entry hash chains preserve what was known at the time.']
   for entry in entries:
    notes+=['',f"## {entry['sequence']}. {entry['utc']} — {entry['category']}",'',', '.join(entry['experiments']),'',entry['content']]

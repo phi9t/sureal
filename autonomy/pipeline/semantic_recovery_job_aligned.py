@@ -4,9 +4,9 @@ import json
 from pathlib import Path
 import subprocess
 import time
-from .insula_entry import launch_plan
-from .runtime_identity import verify_rootfs
-from .staging_lease import staging_lease
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
+from insula.staging_lease import staging_lease
 from .staged_derived_archive_aligned import staged_derived_archive
 
 
@@ -37,8 +37,8 @@ def recover_semantic_archive(record,*,cache,code_root,output,transfer_command=No
     verify_rootfs(root,lock['rootfs_sha256'])
     names=['semantic_recovery_job_aligned.py','semantic_archive_support.py','scientific_dataset.py',
            'scene_archive_validate.py','semantic_support.py','staged_derived_archive_aligned.py',
-           'staging_lease.py','insula_entry.py','runtime_identity.py']
-    pins={f'pipeline/{n}':sha(code_root/'pipeline'/n) for n in names}
+           'insula/staging_lease.py','insula/entry.py','insula/runtime_identity.py']
+    pins={n if '/' in n else f'pipeline/{n}':sha(code_root/n if '/' in n else code_root/'pipeline'/n) for n in names}
     with staged_derived_archive(record,cache,working_limit_bytes=15*1024**3,
                                 transfer_command=transfer_command) as (archive,transfer):
         output.mkdir(parents=True,exist_ok=False);inputs=output/'input';inputs.mkdir();worker_output=output/'output';worker_output.mkdir()

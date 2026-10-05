@@ -2,8 +2,8 @@
 import hashlib,json,subprocess,sys
 from pathlib import Path
 PACKAGE=Path(__file__).resolve().parents[1];sys.path.insert(0,str(PACKAGE))
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);record=PACKAGE/'research/balanced16-labels-and-anchor-coverage.json';d=json.loads(record.read_text());worker=PACKAGE/'cohort/audit_targets.py';digest=sha(worker);base=cache/'insula/balanced16-labels-audit-v2';base.mkdir();checks=[];validation=[]
 for scene in d['scene_receipts']:

@@ -3,7 +3,7 @@ import argparse,json,shutil,subprocess,sys,time
 from pathlib import Path
 P=Path(__file__).resolve().parents[1];sys.path[:0]=[str(P),str(P/'tier1')]
 from storage import sha
-from pipeline.insula_entry import launch_plan
+from insula.entry import launch_plan
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing';a=argparse.ArgumentParser();a.add_argument('--run-id',required=True);a.add_argument('--step',type=int,required=True);args=a.parse_args();R=C/'insula'/('tier1-heading-'+args.run_id);R.mkdir();source=R/'source';source.mkdir()
 for folder in ['pipeline','gpu','cohort','tier1','research']:shutil.copytree(P/folder,source/folder,ignore=shutil.ignore_patterns('__pycache__'))
 f=json.loads((P/'research/tier1-allclass-fixture-verified.json').read_text());scene,t=f['identity'].split(':');relative=f'{scene}/{t}/producer';native=W/'balanced16-native-v2';inputs=R/'inputs';inputs.mkdir();frame={'identity':f['identity'],'relative_directory':relative,'sha256':{n:sha(native/relative/n) for n in ['observations.npz','targets.npz','report.json']},'physical_sha256':f['physical_sha256'],'boxes_sha256':f['boxes_sha256']};manifest={'frames':[frame]};(inputs/'manifest.json').write_text(json.dumps(manifest));pins={str(p):sha(p) for p in source.rglob('*') if p.is_file()};heads=W/'tier1-overfit20261002a-baseline'/f'checkpoint-{args.step:04d}';headhash=sha(heads/'heads-00.npz');out=W/('tier1-heading-'+args.run_id);out.mkdir();checks=[];roots={'cpu':C/'insula/rootfs-v2','metrics':C/'metrics-rootfs'}

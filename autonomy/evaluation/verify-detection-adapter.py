@@ -12,8 +12,8 @@ import time
 
 HERE=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(HERE))
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 from pipeline.native_detection_adapter import parse_result
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
 ROOT=CACHE/'metrics-rootfs'

@@ -2,7 +2,7 @@
 import tempfile
 import unittest
 from pathlib import Path
-from pipeline.runtime_identity import rootfs_identity, verify_rootfs
+from insula.runtime_identity import rootfs_identity, verify_rootfs
 
 class RuntimeIdentityTests(unittest.TestCase):
     def test_mutation_and_symlink_change_rejected(self):

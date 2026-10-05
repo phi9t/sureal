@@ -3,8 +3,8 @@
 import hashlib,json,resource,subprocess,sys,time
 from datetime import datetime,timezone
 from pathlib import Path
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 
 HERE=Path(__file__).resolve().parent
 CANDIDATES=['pipeline/scientific_scene_validate.py','tests/test_scientific_scene_validate.py','tests/test_scientific_reconstruction.py','pipeline/reconstruction_validate.py','pipeline/scientific_sidecar_reader.py','pipeline/sensor_records.py','pipeline/scientific_reconstruction.py','pipeline/scientific_sidecars.py','pipeline/geometry.py','verify-scientific-scene.py']

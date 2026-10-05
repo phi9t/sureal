@@ -2,10 +2,10 @@
 import hashlib,json,subprocess,sys
 from pathlib import Path
 PACKAGE=Path(__file__).resolve().parents[1];sys.path.insert(0,str(PACKAGE))
-from pipeline.insula_entry import launch_plan
+from insula.entry import launch_plan
 from pipeline.staged_source import staged_source
 from pipeline.training_box_replay import retained_raw_bytes
-from pipeline.runtime_identity import verify_rootfs
+from insula.runtime_identity import verify_rootfs
 from balanced import coverage_summary
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);candidate_path=PACKAGE/'research/balanced16-selection.candidate.json';candidate=json.loads(candidate_path.read_text());candidate_sha=sha(candidate_path);workers=PACKAGE/'cohort';pins={str(p):sha(p) for p in workers.glob('*.py')};base=cache/'scientific-processing/balanced16-labels-v2';base.mkdir();retained=retained_raw_bytes(cache,PACKAGE);complete=[];coveredframes=[]

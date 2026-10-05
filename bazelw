@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Run repository Bazel inside an Insula rootfs."""
 import argparse
+import importlib
+import importlib.machinery
 import json
 import os
 import sys
+import types
 from pathlib import Path
 
 
@@ -23,8 +26,21 @@ GPU_DRIVER_PREFIXES = (
 )
 DEFAULT_GPU_DRIVER_LIBRARY_DIRS = (Path("/usr/lib/x86_64-linux-gnu"),)
 
-sys.path.insert(0, str(AUTONOMY))
-from pipeline.runtime_identity import rootfs_identity  # noqa: E402
+
+def _register_autonomy_package(name):
+    package = AUTONOMY / name
+    module = types.ModuleType(name)
+    module.__path__ = [str(package)]
+    spec = importlib.machinery.ModuleSpec(name, loader=None, is_package=True)
+    spec.submodule_search_locations = [str(package)]
+    module.__spec__ = spec
+    sys.modules.setdefault(name, module)
+
+
+_register_autonomy_package("evidence")
+_register_autonomy_package("insula")
+rootfs_identity = importlib.import_module("insula.runtime_identity").rootfs_identity
+compose_bwrap_plan = importlib.import_module("insula.sandbox_plan").compose_bwrap_plan
 
 
 def default_lock(rootfs):
@@ -212,31 +228,26 @@ def sandbox_plan(rootfs, cache, arguments, update_lock=False):
             item for item in environment if not (item[0] == "--setenv" and item[1] == "PATH")
         ]
         environment.extend(gpu_environment())
-    argv = [
-        "bwrap",
-        "--unshare-user",
-        "--unshare-pid",
-        "--unshare-ipc",
-        "--unshare-uts",
-        "--die-with-parent",
-    ]
-    for mount in mounts:
-        argv.extend(mount)
-    for mount in pre_dev_mounts:
-        argv.extend(mount)
-    argv.extend(["--proc", "/proc", "--dev", "/dev"])
-    for mount in post_dev_mounts:
-        argv.extend(mount)
-    argv.extend(["--clearenv"])
-    for item in environment:
-        argv.extend(item)
     bazel = bazel_command(arguments, output_base_for(rootfs, arguments), update_lock)
-    argv.extend(["--chdir", "/experiment", "--", *bazel])
+    plan = compose_bwrap_plan(
+        unshare_flags=[
+            "--unshare-user",
+            "--unshare-pid",
+            "--unshare-ipc",
+            "--unshare-uts",
+            "--die-with-parent",
+        ],
+        mounts_before_devices=[*mounts, *pre_dev_mounts],
+        mounts_after_devices=post_dev_mounts,
+        environment=environment,
+        chdir="/experiment",
+        command=bazel,
+    )
     return {
-        "argv": argv,
+        "argv": plan.argv,
         "bazel": bazel,
-        "environment": environment,
-        "mounts": [*mounts, *pre_dev_mounts, *post_dev_mounts],
+        "environment": plan.environment,
+        "mounts": plan.mounts,
         "update_lock": update_lock,
     }
 

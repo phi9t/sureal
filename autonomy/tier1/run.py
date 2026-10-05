@@ -7,8 +7,8 @@ from admission import reserve_write,fit_interval
 from tier1.receipt_lifecycle import load_release_records
 from catalog import catalog
 from storage import sha,unique_payload_bytes,deduplicate
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 from experiment_runner import run_stage
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing'
 def main():

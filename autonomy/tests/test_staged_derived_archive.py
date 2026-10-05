@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from pipeline.staged_derived_archive import staged_derived_archive
-from pipeline.staging_lease import staging_lease
+from insula.staging_lease import staging_lease
 
 class DerivedArchiveStageTests(unittest.TestCase):
     def fixture(self,root,corrupt=False):

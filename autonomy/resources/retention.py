@@ -2,8 +2,8 @@
 import errno,json,os,re,shutil,signal,subprocess,uuid
 from pathlib import Path
 from cohort.sustained_controller_backend import C,W,P
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 from tier1.admission import reserve_write
 from resources.sources import regular,sha,validate_sources
 from resources.stage import run_stage,validate_proof,write_new,require_separate

@@ -1,7 +1,9 @@
-import hashlib,json,os,signal,subprocess,sys,uuid
+import json,os,signal,subprocess,uuid
 from pathlib import Path
-P=Path(__file__).resolve().parents[1];sys.path.insert(0,str(P));from tracking.journal import digest as sha,read_entries
+from evidence.journal import digest as sha,read_entries
 import fcntl
+
+P=Path(__file__).resolve().parents[1]
 
 def main():
  cli=Path.home()/'workspace/waystone/scripts/waystone';C=Path.home()/'.cache/waystone/waymo-perception';R=C/'insula'/('research-journal-publication-'+uuid.uuid4().hex);R.mkdir();pins={str(cli):sha(cli)};checks=[]

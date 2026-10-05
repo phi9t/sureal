@@ -5,8 +5,8 @@ import hashlib,json
 from pathlib import Path
 import subprocess,sys,tempfile
 HERE=Path(__file__).resolve().parents[1];sys.path.insert(0,str(HERE))
-from pipeline.runtime_identity import verify_rootfs
-from pipeline.insula_entry import launch_plan
+from insula.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
 
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 

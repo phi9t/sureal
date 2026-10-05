@@ -2,8 +2,8 @@
 import hashlib,json,subprocess,sys
 from pathlib import Path
 PACKAGE=Path(__file__).resolve().parents[1];sys.path.insert(0,str(PACKAGE))
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);base=cache/'insula/cohort-coverage-verification-v2';base.mkdir();candidate=PACKAGE/'research/balanced16-selection.candidate.json';pins={str(p):sha(p) for p in (PACKAGE/'cohort').glob('*.py')};checks=[]
 def live(name,source,argv,extra=None):

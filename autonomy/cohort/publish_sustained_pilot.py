@@ -6,8 +6,8 @@ from advanced.archive import sha,DEFAULT_LIMIT
 from advanced.retention import release_plan
 from tier1.admission import reserve_write
 from tier1.storage import unique_payload_bytes
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing';CLI=Path.home()/'workspace/waystone/scripts/waystone'
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--receipt',type=Path,required=True);parser.add_argument('--receipt-sha256',required=True);parser.add_argument('--release',action='store_true');a=parser.parse_args()

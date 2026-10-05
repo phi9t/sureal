@@ -6,11 +6,11 @@
 
 **Status:** ready-for-agent
 
-- [ ] Scope: the Insula entry and launch plan, rootfs identity, the M0 probe and receipt code, staging leases; the research journal, tracker, projection and publication; the pin report tool
-- [ ] The wrapper and the live-gate launcher share one sandbox-plan implementation
-- [ ] Every module in scope lives in its concept directory and is imported by package path; no `sys.path` manipulation remains in the moved code
-- [ ] Each moved test sits beside its module as `foo_test.py` and is a Bazel test target
-- [ ] Bazel visibility lets only the concepts above this one depend on it
-- [ ] File digests and regular-file checks in the moved code come from the evidence module, not local copies
-- [ ] The same test modules pass through the wrapper as before the batch, and the pin report for the batch is attached to the ticket
-- [ ] Files under `research/` are unchanged
+- [x] Scope: the Insula entry and launch plan, rootfs identity, the M0 probe and receipt code, staging leases; the research journal, tracker, projection and publication; the pin report tool
+- [x] The wrapper and the live-gate launcher share one sandbox-plan implementation
+- [x] Every module in scope lives in its concept directory and is imported by package path; no `sys.path` manipulation remains in the moved code
+- [x] Each moved test sits beside its module as `foo_test.py` and is a Bazel test target
+- [x] Bazel visibility lets only the concepts above this one depend on it
+- [x] File digests and regular-file checks in the moved code come from the evidence module, not local copies
+- [x] The same test modules pass through the wrapper as before the batch, and the pin report for the batch is attached to the ticket
+- [x] Files under `research/` are unchanged

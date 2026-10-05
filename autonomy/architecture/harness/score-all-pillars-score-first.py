@@ -1,8 +1,8 @@
 from pathlib import Path
 import datetime,hashlib,json,subprocess,sys,time
 code=Path('autonomy').resolve();sys.path.insert(0,str(code))
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 variant=sys.argv[1];assert variant in ['all_pillars']
 cache=Path.home()/'.cache/waystone/waymo-perception';

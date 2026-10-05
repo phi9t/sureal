@@ -3,8 +3,8 @@
 import argparse,fcntl,hashlib,json,resource,subprocess,time
 from datetime import datetime,timezone
 from pathlib import Path
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 from pipeline.scientific_admission import admit_scene
 from pipeline.cohort_resume import verify_registered_checkpoint
 HERE=Path(__file__).resolve().parent

@@ -5,7 +5,7 @@ REQUIRED=(
  'cohort/publish_sustained_pilot.py','cohort/sustained_pilot_inventory.py',
  'cohort/pilot_retention_audit.py','cohort/pilot_retention_sources.py',
  'tier1/admission.py','tier1/storage.py','advanced/archive.py',
- 'advanced/retention.py','pipeline/insula_entry.py','pipeline/runtime_identity.py',
+ 'advanced/retention.py','insula/entry.py','insula/runtime_identity.py',
 )
 SNAPSHOT_TARGET='//autonomy:sustained-pilot-retention-host'
 def sha(path):

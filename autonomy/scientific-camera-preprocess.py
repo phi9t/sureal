@@ -3,13 +3,13 @@
 import argparse,hashlib,json,resource,subprocess,time
 from datetime import datetime,timezone
 from pathlib import Path
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 from pipeline.scientific_admission import admit_scene
 from pipeline.staged_source import staged_source
 HERE=Path(__file__).resolve().parent
 COMPONENTS=['camera_image','camera_segmentation','camera_box']
-CANDIDATES=['scientific-camera-preprocess.py','pipeline/camera_sidecars.py','pipeline/camera_sidecar_validate.py','pipeline/scientific_admission.py','pipeline/staged_source.py','pipeline/staging_lease.py','pipeline/source_integrity.py','pipeline/insula_entry.py','pipeline/runtime_identity.py']
+CANDIDATES=['scientific-camera-preprocess.py','pipeline/camera_sidecars.py','pipeline/camera_sidecar_validate.py','pipeline/scientific_admission.py','pipeline/staged_source.py','insula/staging_lease.py','evidence/source_integrity.py','insula/entry.py','insula/runtime_identity.py']
 def sha(p):
  with p.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
 def total(root):return sum(p.stat().st_size for p in root.rglob('*') if p.is_file())

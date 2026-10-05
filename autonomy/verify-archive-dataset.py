@@ -11,8 +11,8 @@ import time
 
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 
 REPLAY = '''import json,hashlib
 from pathlib import Path

@@ -3,8 +3,8 @@
 import argparse,hashlib,json,resource,subprocess,time
 from datetime import datetime,timezone
 from pathlib import Path
-from pipeline.insula_entry import launch_plan
-from pipeline.runtime_identity import verify_rootfs
+from insula.entry import launch_plan
+from insula.runtime_identity import verify_rootfs
 HERE=Path(__file__).resolve().parent
 WAYSTONE='/data02/home/philip.yang/workspace/waystone/scripts/waystone'
 COMPONENTS=['camera_image','camera_segmentation','camera_box']

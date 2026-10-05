@@ -20,7 +20,7 @@ rootfs_digest() {
     PYTHONPATH="$PACKAGE" python3 - "$1" <<'PY'
 import sys
 from pathlib import Path
-from pipeline.runtime_identity import rootfs_identity
+from insula.runtime_identity import rootfs_identity
 
 print(rootfs_identity(Path(sys.argv[1])))
 PY
@@ -114,7 +114,7 @@ import json
 import sys
 from pathlib import Path
 
-from pipeline.runtime_identity import rootfs_identity
+from insula.runtime_identity import rootfs_identity
 
 root = Path(sys.argv[1])
 dockerfile = Path(sys.argv[2])

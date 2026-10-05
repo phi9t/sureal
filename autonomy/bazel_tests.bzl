@@ -45,7 +45,7 @@ TORCH_CPU_ONLY_MODULES = [
 LIVE_GATE_MODULES = [
     "cohort/test_sustained_native_metric_gate.py",
     "tests/test_camera_projection_cli.py",
-    "tests/test_m0_receipt.py",
+    "insula/m0_receipt_test.py",
     "tests/test_motion_joint_cli.py",
     "tests/test_motion_native_cli.py",
     "tests/test_motion_pooled_cli.py",
