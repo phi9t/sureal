@@ -2,7 +2,9 @@
 import hashlib
 import io
 import json
+import os
 import re
+import shutil
 import subprocess
 import tarfile
 import tempfile
@@ -172,6 +174,80 @@ def snapshot_bazel_target(target: str, store: SnapshotStore, *, repo_root=REPO, 
         archive_bytes=len(archive),
         source_pins=pins,
     )
+
+
+def source_snapshot_receipt(root, source_paths, store: SnapshotStore, *, target: str, materialized_root=None) -> dict:
+    archive, pins = archive_sources(root, source_paths)
+    digest = hashlib.sha256(archive).hexdigest()
+    store.store(digest, archive)
+    receipt = {
+        "schema_version": 1,
+        "source_snapshot_sha256": digest,
+        "source_snapshot_target": target,
+        "source_pins": pins,
+    }
+    if isinstance(store, LocalSnapshotStore):
+        receipt["source_snapshot_store"] = str(store.root)
+    if materialized_root is not None:
+        receipt["source_snapshot_root"] = str(Path(materialized_root))
+    return receipt
+
+
+def copy_source_snapshot(root, source_paths, destination, store: SnapshotStore, *, target: str) -> dict:
+    root = Path(root)
+    destination = Path(destination)
+    if destination == root or destination.is_relative_to(root):
+        raise ValueError("source snapshot copy must be outside current source tree")
+    archive, pins = archive_sources(root, source_paths)
+    destination.mkdir(exist_ok=False)
+    try:
+        for name in sorted(pins):
+            source = root / name
+            target_path = destination / name
+            target_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source, target_path)
+    except BaseException:
+        shutil.rmtree(destination, ignore_errors=True)
+        raise
+    for name, digest in pins.items():
+        if file_sha256(destination / name) != digest:
+            raise ValueError("source changed while snapshot was materialized")
+    digest = hashlib.sha256(archive).hexdigest()
+    store.store(digest, archive)
+    receipt = {
+        "schema_version": 1,
+        "source_snapshot_sha256": digest,
+        "source_snapshot_target": target,
+        "source_snapshot_store": str(store.root) if isinstance(store, LocalSnapshotStore) else None,
+        "source_snapshot_root": str(destination),
+        "source_pins": pins,
+    }
+    return {key: value for key, value in receipt.items() if value is not None}
+
+
+def store_from_receipt(receipt: Mapping, *, env_var: str | None = None) -> SnapshotStore:
+    override = os.environ.get(env_var) if env_var else None
+    root = override or receipt.get("source_snapshot_store")
+    if not isinstance(root, str) or not root:
+        raise ValueError("source snapshot store required")
+    return LocalSnapshotStore(root)
+
+
+def verify_materialized_sources(root, receipt, store: SnapshotStore | None = None) -> dict:
+    receipt = read_receipt(receipt)
+    if not isinstance(receipt, Mapping):
+        raise ValueError("receipt object required")
+    store = store if store is not None else store_from_receipt(receipt, env_var="SUREAL_SOURCE_SNAPSHOT_STORE")
+    verified = verify_receipt_sources(receipt, store)
+    root = Path(root)
+    for name, digest in verified["source_pins"].items():
+        try:
+            found = file_sha256(root / name)
+        except ValueError as error:
+            raise ValueError("materialized source missing or irregular: " + name) from error
+        if found != digest:
+            raise ValueError("materialized source changed: " + name)
+    return verified
 
 
 def snapshot_source_pins(snapshot: bytes) -> dict[str, str]:

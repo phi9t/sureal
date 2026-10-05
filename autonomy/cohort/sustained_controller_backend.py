@@ -7,7 +7,7 @@ from pipeline.runtime_identity import verify_rootfs
 from tier1.storage import sha,unique_payload_bytes
 from tier1.admission import reserve_write
 from cohort.sustained_contract import validate_contract
-from cohort.sustained_sources import validate_sources
+from cohort.sustained_sources import snapshot_sources,validate_sources
 from cohort.sustained_stage_inputs import freeze_inputs,bind_stage_paths
 from cohort.sustained_scoring_budget import stage_timeout
 from cohort.sustained_checkpoint_inventory import freeze_checkpoint_inventory
@@ -43,11 +43,11 @@ class NativeBackend:
    if run['run_id']!=run_id or run['recipe']!=recipe or self.manifest['candidate']!=candidate or self.manifest['frames']!=frames or self.manifest['recipe']!=recipe or self.manifest['runtime_lock']!=self.runtime:raise ValueError('frozen resumed identity differs')
   else:
    reserve_write(W,2*1024**3);self.R.mkdir();self.output.mkdir();self.package.mkdir();self.source.mkdir();self.verifier.mkdir();self.host_pins=freeze_host_sources(P,self.R/'host-source')
-   for folder in ['pipeline','gpu','tier1','cohort']:
+   for folder in ['pipeline','gpu','tier1','cohort','evidence']:
     for path in (P/folder).rglob('*.py'):
      if '__pycache__' in path.parts:continue
      destination=self.package/path.relative_to(P);destination.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(path,destination)
-   self.pins={str(p.relative_to(self.package)):sha(p) for p in self.package.rglob('*.py')};self.manifest={'candidate':candidate,'frames':frames,'recipe':recipe,'source_hashes':self.pins,'runtime_lock':self.runtime};write(self.source/'manifest.json',self.manifest);self.manifest_sha=sha(self.source/'manifest.json');write(self.runtime_path,self.runtime)
+   self.pins=snapshot_sources(self.package,self.R/'source-snapshots');self.manifest={'candidate':candidate,'frames':frames,'recipe':recipe,'source_hashes':self.pins,'runtime_lock':self.runtime};write(self.source/'manifest.json',self.manifest);self.manifest_sha=sha(self.source/'manifest.json');write(self.runtime_path,self.runtime)
    anchors=P/'research/training-anchor-templates.candidate.json';anchor_receipt=json.loads((P/'research/training-anchor-candidate-verified.json').read_text())
    if sha(anchors)!=anchor_receipt['expected']['candidate_sha256']:raise ValueError('admitted anchor templates changed')
    self.anchor_sha=anchor_receipt['expected']['candidate_sha256'];shutil.copyfile(anchors,self.source/'anchor-templates.json')
@@ -55,10 +55,11 @@ class NativeBackend:
    write(self.R/'run.json',{'run_id':run_id,'recipe':recipe,'manifest_sha256':self.manifest_sha,'source_hashes':self.pins,'host_source_pins':self.host_pins,'anchor_templates_sha256':self.anchor_sha,'scope':'training-only fixed16 one-factor case; no heldout promotion'})
   self.verifier_pins={str(p):sha(p) for p in self.verifier.iterdir()};self.guard()
  def guard(self):
-  validate_host_sources(P,self.host_pins);validate_sources(P,self.pins,self.runtime,self.runtime);validate_sources(self.package,self.pins,self.runtime,self.runtime)
+  validate_host_sources(P,self.host_pins);validate_sources(self.package,self.pins,self.runtime,self.runtime)
   admitted_anchor=json.loads((P/'research/training-anchor-candidate-verified.json').read_text())['expected']['candidate_sha256']
   if self.anchor_sha!=admitted_anchor or sha(self.source/'anchor-templates.json')!=self.anchor_sha:raise ValueError('externally admitted decoder anchors changed')
-  if sha(self.source/'manifest.json')!=self.manifest_sha or json.loads(self.runtime_path.read_text())!=self.runtime or set(Path(p).name for p in self.verifier_pins)!={'audit_sustained_transition.py','sustained_chunk_reference.py'} or any(sha(p)!=h or h!=self.pins['cohort/'+Path(p).name] for p,h in self.verifier_pins.items()):raise ValueError('frozen manifest/runtime/verifier changed')
+  source_pins=self.pins['source_pins']
+  if sha(self.source/'manifest.json')!=self.manifest_sha or json.loads(self.runtime_path.read_text())!=self.runtime or set(Path(p).name for p in self.verifier_pins)!={'audit_sustained_transition.py','sustained_chunk_reference.py'} or any(sha(p)!=h or h!=source_pins['cohort/'+Path(p).name] for p,h in self.verifier_pins.items()):raise ValueError('frozen manifest/runtime/verifier changed')
   if unique_payload_bytes(W)>15*1024**3 or unique_payload_bytes(self.output)>2*1024**3:raise ValueError('scientific/case storage cap exceeded')
  def stage(self,name,worker,directory,extra,*,gpu=True,metrics=False,logical_step=None):
   from experiment_runner import run_stage
@@ -73,7 +74,7 @@ class NativeBackend:
    for target,path in [('/experiment',self.package),('/source',stage_source),('/outputs',directory)]:command[command.index(target)-1]=str(path)
    command[-1]='/tmp/verifier/audit_sustained_transition.py' if worker=='audit_sustained_transition.py' else '/experiment/cohort/'+worker
   else:command=launch_plan(C/('metrics-rootfs' if metrics else 'gpu-rootfs'),self.package,stage_source,directory,['python' if metrics else '/opt/waymo/bin/python','/experiment/cohort/'+worker])
-  extra=bind_stage_paths(extra,self.source,stage_source);index=command.index('--');command[index:index]=['--ro-bind',str(stage_source),'/tmp/inputs','--ro-bind',str(self.native),'/tmp/native','--ro-bind',str(W/'balanced16-physical-v2'),'/tmp/physical','--ro-bind',str(W/'balanced16-labels-v2'),'/tmp/boxes','--ro-bind',str(self.runtime_path),'/tmp/runtime-lock.json','--ro-bind',str(W),'/tmp/scientific','--setenv','CUBLAS_WORKSPACE_CONFIG',':4096:8',*extra]
+  extra=bind_stage_paths(extra,self.source,stage_source);index=command.index('--');command[index:index]=['--ro-bind',str(stage_source),'/tmp/inputs','--ro-bind',str(self.native),'/tmp/native','--ro-bind',str(W/'balanced16-physical-v2'),'/tmp/physical','--ro-bind',str(W/'balanced16-labels-v2'),'/tmp/boxes','--ro-bind',str(self.runtime_path),'/tmp/runtime-lock.json','--ro-bind',str(W),'/tmp/scientific','--ro-bind',str(self.R/'source-snapshots'),'/tmp/source-snapshots','--setenv','SUREAL_SOURCE_SNAPSHOT_STORE','/tmp/source-snapshots','--setenv','CUBLAS_WORKSPACE_CONFIG',':4096:8',*extra]
   with (directory/'live.log').open('w') as log:result=run_stage(command,self.package,dict(os.environ),log,timeout=stage_timeout(metrics))
   if result.returncode:raise RuntimeError('failed native stage retained: '+name)
   self.guard();actual_step=json.loads((directory/'check.json').read_text())['updates'] if worker=='train_sustained.py' else logical_step
@@ -86,6 +87,7 @@ class NativeBackend:
   metric=stage in {'score','metrics-audit'};gpu=stage in {'train','audit'};command=receipt['command'];entry='/tmp/verifier/'+workers[stage] if stage=='audit' else '/experiment/cohort/'+workers[stage]
   if command[-1]!=entry or receipt['runtime_lock']!=(self.metric_runtime if metric else self.runtime) or receipt['driver_hashes']!=(self.old['driver_hashes'] if gpu else {}) or receipt['verifier_source_pins']!=(self.verifier_pins if stage=='audit' else {}):raise ValueError('native worker/runtime/driver/verifier differs')
   if command[command.index('/experiment')-1]!=str(self.package) or command[command.index('/outputs')-1]!=receipt['output_directory']:raise ValueError('native code/output mount differs')
+  if command[command.index('/tmp/source-snapshots')-1]!=str(self.R/'source-snapshots') or command[command.index('SUREAL_SOURCE_SNAPSHOT_STORE')+1]!='/tmp/source-snapshots':raise ValueError('source snapshot store mount differs')
   inputs=self.R/(receipt['requested_stage']+'-input')
   if receipt['input_hashes'].get(str(inputs/'manifest.json'))!=self.manifest_sha or command[command.index('/source')-1]!=str(inputs) or command[command.index('/tmp/inputs')-1]!=str(inputs):raise ValueError('exact immutable stage manifest/input mounts required')
   for group in ['input_hashes','driver_hashes','verifier_source_pins','artifacts']:
