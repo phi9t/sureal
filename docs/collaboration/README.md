@@ -1,11 +1,15 @@
 # Sureal collaboration tooling
 
-[Highest-priority sequencing](../research/task-queue.md#highest-priority-direction-october-4-2026)
-keeps MAC50–53 on the critical path, followed by the
+[Current user priority](../research/2026-10-05-mac-happy-path-first.md)
+puts useful two-worker perception preparation before comprehensive hardening.
+Explicit manual lead bootstrap can use existing tools; unfinished controller
+commands remain unavailable. The
+[full-admission backlog](../research/task-queue.md#historical-full-admission-sequence-october-4-2026)
+retains MAC50–53 acceptance, followed by the
 [persistent-lead extension](../superpowers/specs/2026-10-04-persistent-research-lead-design.md)
-(55–57). Models/training can resume independently after53; the lead extension
-does not add a new dependency to44. New commands remain unavailable until their
-implementation and live admission pass.
+(55–57). These full-closure dependencies do not block provisional58 operation.
+Models/training retain their own admission; the lead extension adds no new
+dependency to44. See the [actual pilot record](../research/pilots/58/README.md).
 
 The [approved design](../superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md)
 and [implementation plan](../superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md)
