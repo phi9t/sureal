@@ -1,0 +1,28 @@
+from pathlib import Path
+import datetime,hashlib,json,subprocess,sys,time
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.runtime_identity import verify_rootfs
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';native=cache/'scientific-processing/overfit-native-cache-v1'
+progress_path=code/'research/overfit-native-cache-progress.json';progress=json.loads(progress_path.read_text());assert progress['admitted_frames']==progress['selected_frames']==16
+frames=[]
+for identity,item in progress['frame_evidence'].items():
+ evidence=code/'research'/item['evidence'];assert sha(evidence)==item['evidence_sha256']
+ scene,timestamp=identity.split(':');base=native/scene/timestamp;receipt=json.loads((base/'receipt.json').read_text())
+ for name,digest in receipt['artifacts'].items():assert sha(base/name)==digest
+ frames.append({'identity':identity,'relative_directory':str(Path(scene)/timestamp/'producer'),'sha256':{name:sha(base/'producer'/name) for name in ['observations.npz','targets.npz','report.json']},'receipt_sha256':sha(base/'receipt.json')})
+runroot=cache/'insula/native-optimizer-pilot-v3';runroot.mkdir();inputs=runroot/'inputs';inputs.mkdir();output=runroot/'output';output.mkdir()
+manifest={'scope':'native training diagnostic pilot; 16 updates; no acceptance score','progress_sha256':sha(progress_path),'frames':frames,'optimizer':{'lr':1e-4,'betas':[.9,.999],'eps':1e-8,'weight_decay':0,'foreach':False,'gradient_clip':10},'seed':17}
+(inputs/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+old=json.loads((cache/'detector-gpu-live-a/receipt.json').read_text());lock=old['runtime_lock']
+print('VERIFY locked GPU runtime',flush=True);verify_rootfs(cache/'gpu-rootfs',lock['rootfs_sha256'])
+for path,digest in old['driver_hashes'].items():assert sha(path)==digest
+command=old['checks'][0]['command'].copy();command=[str(output) if x==str(cache/'detector-gpu-live-a') else '/experiment/gpu/native-optimizer-pilot.py' if x=='/experiment/gpu/detector-probe.py' else x for x in command]
+separator=command.index('--');command[separator:separator]=['--ro-bind',str(native),'/tmp/native','--ro-bind',str(inputs),'/tmp/inputs']
+pins={str(p.relative_to(code)):sha(p) for p in [code/'gpu/native-optimizer-pilot.py',*sorted((code/'pipeline').glob('*.py'))]}
+started=datetime.datetime.now(datetime.timezone.utc).isoformat();tick=time.monotonic();print('RUN native pilot',flush=True)
+run=subprocess.run(command,capture_output=True,text=True,timeout=180);(output/'live.log').write_text(run.stdout+run.stderr);print(run.stdout+run.stderr,flush=True);assert run.returncode==0
+assert all(sha(code/p)==h for p,h in pins.items())
+record={'started_utc':started,'finished_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'live_seconds':time.monotonic()-tick,'checks':[{'command':command,'exit_code':run.returncode}],'runtime_lock':lock,'driver_hashes':old['driver_hashes'],'candidate_hashes':pins,'manifest_sha256':sha(inputs/'manifest.json'),'manifest':manifest,'validation':json.loads((output/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in output.iterdir()},'scope':'native diagnostic optimizer/resource pilot; independently retained verification still required; overfit/main-study gates remain open'}
+(code/'research/native-optimizer-pilot-verified.json').write_text(json.dumps(record,indent=2)+'\n')
+print('RECORDED native diagnostic pilot',flush=True)

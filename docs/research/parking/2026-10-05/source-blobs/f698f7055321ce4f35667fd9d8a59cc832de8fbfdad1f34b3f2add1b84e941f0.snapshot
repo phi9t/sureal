@@ -1,0 +1,26 @@
+"""Minimum-cost complete distinct reservations; no absent-edge fallback."""
+import numpy as np
+from scipy.optimize import linear_sum_assignment
+from association.candidate_graph import feasibility
+
+
+def reserve(graph, costs, *, n_anchors, n_targets):
+    if type(n_anchors) is not int or type(n_targets) is not int or min(n_anchors,n_targets)<0:raise ValueError('nonnegative integer cardinalities required')
+    edges=np.asarray(graph['edges']);costs=np.asarray(costs,dtype=np.float64)
+    if edges.ndim!=2 or edges.shape[1]!=2 or edges.dtype.kind not in 'iu' or costs.shape!=(len(edges),) or not np.isfinite(costs).all():raise ValueError('integer edges and finite paired costs required')
+    if len(edges) and (np.any(edges<0) or np.any(edges[:,0]>=n_anchors) or np.any(edges[:,1]>=n_targets) or len(np.unique(edges,axis=0))!=len(edges)):raise ValueError('unique in-range edges required')
+    order=np.lexsort((edges[:,1],edges[:,0]));edges=edges[order];costs=costs[order]
+    report=feasibility(edges,n_anchors,n_targets)
+    if report['status']!='feasible':return {'status':'infeasible','anchor_indices':np.empty(0,dtype=np.int64),'target_indices':np.empty(0,dtype=np.int64),'objective':None,'deficiency':report['deficiency']}
+    selected=np.empty(n_targets,dtype=np.int64);selected_costs=np.empty(n_targets,dtype=np.float64)
+    for component in report['components']:
+        targets=component['target_indices'];anchors=component['anchor_indices']
+        target_map={t:i for i,t in enumerate(targets)};anchor_map={a:i for i,a in enumerate(anchors)}
+        matrix=np.full((len(targets),len(anchors)),np.inf)
+        for (a,t),cost in zip(edges,costs):
+            if int(t) in target_map:matrix[target_map[int(t)],anchor_map[int(a)]]=cost
+        row,col=linear_sum_assignment(matrix)
+        if len(row)!=len(targets) or not np.isfinite(matrix[row,col]).all():raise RuntimeError('solver contradicted cardinality admission')
+        for r,c in zip(row,col):selected[targets[r]]=anchors[c];selected_costs[targets[r]]=matrix[r,c]
+    return {'status':'feasible','anchor_indices':selected,'target_indices':np.arange(n_targets,dtype=np.int64),
+            'objective':float(selected_costs.sum()),'costs':selected_costs,'deficiency':report['deficiency']}

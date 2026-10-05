@@ -1,0 +1,14 @@
+{
+  "sequence": 129,
+  "sha256": "9fc75b3c463aaea91c87ceb3e6fa643c70976f78e9bb58c394e4c9e042bbc431",
+  "previous_hash": "87ed7d3e01f76cd520bd22bcb72400bf295085961f54701df3606a74801394a9",
+  "prior_bytes_preserved": true,
+  "chain_reopened": true,
+  "evidence_snapshot_hashes": [
+    "2c2a19f16f2d3b3b9518afeeb1cfea76c4f8eab0179eac05f2b173d8ed7441e0",
+    "81b586fccb29ef334f44ac537f43c2a1c6a3892ecaf028b3068a72ef6983175f",
+    "fb3e922069c6f9d6fe652ff6303e997bef902ba9e3afbaec30b50462a35ce1b8",
+    "a059d4977ad3edc663115019abca6caf22fd80e1f59158eee9ecc60ef659a9b3",
+    "cc235414da71af5250e377487df13b6e1b207e809f2bda4cfb52f7cd75ee7303"
+  ]
+}

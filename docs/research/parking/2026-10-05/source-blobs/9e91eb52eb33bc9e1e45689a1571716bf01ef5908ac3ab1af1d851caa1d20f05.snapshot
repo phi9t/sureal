@@ -1,0 +1,6 @@
+from pathlib import Path
+import time,subprocess
+r=Path('experiments/waymo-perception/research');logs=Path.home()/'.cache/waystone/waymo-perception/insula/continuation-logs'
+while not (r/'architecture-coarse_mlp-checkpoint-audit-verified.json').exists():time.sleep(2)
+with (logs/'architecture-context-exclusive-checkpoint-audit.log').open('w') as f:run=subprocess.run(['python','.scratch/audit-architecture-exclusive-checkpoint.py','context_pfn'],stdout=f,stderr=subprocess.STDOUT)
+assert run.returncode==0;print('PASS exclusivecontext GPU checkpoint replay',flush=True)

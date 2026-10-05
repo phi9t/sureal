@@ -1,0 +1,277 @@
+"""Reopen immutable artifact references and actual command/result bytes."""
+from __future__ import annotations
+import hashlib
+import json
+import os
+from pathlib import Path
+import sqlite3
+import tomllib
+
+from .facts import require, parse_record
+from .raw_git import InvalidEvidence, run_git, sha256, strict_json, verify_materialization, verify_retention
+from .search_index import check_search_index, sql_value
+
+
+def artifact(reference: dict) -> Path:
+    require(isinstance(reference,dict) and "path" in reference and "sha256" in reference,
+            "Actual immutable artifact reference required")
+    path = Path(reference["path"])
+    require(path.is_absolute() and path.is_file() and not path.is_symlink(),
+            "Actual absolute regular artifact required")
+    require(sha256(path)==reference["sha256"],"Raw artifact digest changed: "+str(path))
+    return path
+
+
+def json_artifact(reference: dict) -> dict:
+    return strict_json(artifact(reference))
+
+
+def auditor_snapshot(authority: dict) -> dict:
+    """Reopen a reviewed immutable auditor, including its fresh cold recovery."""
+    auditor=authority['auditor'];authors=authority['authors']
+    require(set(authors)=={'producer','auditor','reviewer'} and len(set(authors.values()))==3 and
+            all(isinstance(value,str) and value for value in authors.values()),
+            'Independent author/reviewer identity missing')
+    source=verify_materialization(artifact(auditor['materialization']),auditor['candidate'])
+    require(auditor['source']==source['source'],'Auditor snapshot source identity differs')
+    review=json_artifact(auditor['review'])
+    require(review.get('kind')=='independent-auditor-source-review' and
+            review['candidate']==auditor['candidate'] and review['verdict']=='pass' and
+            review['reviewer']==authors['reviewer'] and review['author']==authors['auditor'] and
+            review['materialization']==auditor['materialization'] and review['source']==source['source'] and
+            all(review[key]==source[key] for key in ('candidate','parent','tree')),
+            'Independent auditor review/source provenance mismatch')
+    retained=verify_retention(artifact(review['retention']),auditor['candidate'])
+    require(retained['repository']==source['repository'] and retained['tree']==source['tree'],
+            'Reviewed auditor cold retention differs from snapshot')
+    coverage=artifact(authority['coverage'])
+    require(sha256(Path(source['source'])/'docs/collaboration/coverage.json')==sha256(coverage),
+            'Coverage differs from reviewed immutable auditor oracle')
+    return source
+
+
+def metadata_review_source_pins(review: dict) -> list[dict]:
+    """Resolve two schema-specific descriptors, never a generic relative ref."""
+    require(type(review.get('schema_version')) is int and review['schema_version']==1 and
+            review.get('candidate_role')=='metadata', 'Unsupported metadata source review schema/role')
+    source=verify_materialization(artifact(review['materialization']),review['candidate'])
+    require(all(review.get(key)==source[key] for key in ('candidate','parent','tree','source')),
+            'Metadata source review materialization identity differs')
+    retained=verify_retention(artifact(review['retention']),review['candidate'])
+    require(retained['repository']==source['repository'] and retained['tree']==source['tree'],
+            'Metadata source review cold retention differs')
+    scope=review['scope_review']
+    require(isinstance(scope,dict) and {'binding','task_map'}<=set(scope),
+            'Metadata source review pin positions missing')
+    references=[]
+    for key,relative in [('binding','.kata.toml'),('task_map','docs/research/kata-task-map.json')]:
+        pin=scope[key]
+        require(isinstance(pin,dict) and pin.get('path')==relative and
+                isinstance(pin.get('sha256'),str) and len(pin['sha256'])==64 and
+                all(char in '0123456789abcdef' for char in pin['sha256']),
+                'Malformed reviewed source pin')
+        ref={'path':str(Path(source['source'])/relative),'sha256':pin['sha256']}
+        artifact(ref);references.append(ref)
+    binding=scope['binding'];mapping=scope['task_map']
+    native_binding=tomllib.loads(Path(references[0]['path']).read_text())
+    require(type(binding.get('version')) is int and binding['version']==1 and
+            native_binding.get('version')==binding['version'] and
+            isinstance(binding.get('project_name'),str) and binding['project_name'] and
+            native_binding.get('project',{}).get('name')==binding['project_name'],
+            'Reviewed binding semantics differ from exact source')
+    native_map=strict_json(Path(references[1]['path']))
+    entry_keys=['issue_uid','definition_revision','spec','plan','dependencies']
+    require(native_map.get('schema_version')==1 and isinstance(native_map.get('tasks'),dict) and
+            type(mapping.get('task_count')) is int and mapping['task_count']>0 and
+            mapping['task_count']==len(native_map['tasks']) and mapping.get('fixed_entry_keys')==entry_keys and
+            mapping.get('no_mutable_owner_status_labels_in_git') is True and
+            all(isinstance(entry,dict) and set(entry)==set(entry_keys) for entry in native_map['tasks'].values()) and
+            native_map.get('source_commit')==mapping.get('source_commit')==source['parent'] and
+            native_map.get('binding')=={'path':'.kata.toml','sha256':binding['sha256']} and
+            native_map.get('project',{}).get('name')==binding['project_name'],
+            'Reviewed task map semantics differ from exact source')
+    return references
+
+
+def nested_references(value, *, metadata=False) -> list[dict]:
+    found = []
+    if isinstance(value,dict):
+        reviewed_pins=(value.get('kind')=='independent-metadata-source-review')
+        if reviewed_pins:
+            found.extend(metadata_review_source_pins(value))
+        # Typed descriptor fields are metadata. Any *additional* nested raw
+        # references still traverse normally and cannot hide behind that type.
+        if not metadata and "path" in value and "sha256" in value and not {"blob","oid"}.intersection(value):
+            path = artifact(value)
+            found.append({"path":str(path),"sha256":value["sha256"]})
+        else:
+            for key,child in value.items():
+                if reviewed_pins and key=='scope_review':
+                    # Only these two positions have source-relative descriptor
+                    # semantics. Additional nested raw inputs still reopen.
+                    for name,descriptor in child.items():
+                        found.extend(nested_references(descriptor,metadata=name in {'binding','task_map'}))
+                    continue
+                inventory=(key=='files' and isinstance(child,list) and isinstance(value.get('root'),str)
+                           and Path(value['root']).is_absolute())
+                binding=(key=='binding' and value.get('schema_version')==1 and
+                         {'project','source_commit','tasks'}<=set(value))
+                diagnostic=(key=='issues' and value.get('kind')=='read-only-A3-reference-shape-scan')
+                source_pin=(key in {'spec','plan'} and value.get('schema_version')==1 and
+                            {'task_id','source_commit','spec','plan','goal','dependencies'}<=set(value))
+                if inventory:
+                    for entry in child:
+                        require(isinstance(entry,dict) and entry.get('kind') in {'file','symlink'} and
+                                isinstance(entry.get('path'),str) and not Path(entry['path']).is_absolute() and
+                                '..' not in Path(entry['path']).parts and
+                                isinstance(entry.get('sha256'),str) and len(entry['sha256'])==64,
+                                'Malformed source inventory descriptor')
+                if binding:
+                    require(isinstance(child,dict) and set(child)=={'path','sha256'} and
+                            child['path']=='.kata.toml' and isinstance(child['sha256'],str) and len(child['sha256'])==64,
+                            'Malformed committed binding pin')
+                if diagnostic:
+                    require(isinstance(child,list) and all(isinstance(entry,dict) and
+                            {'owner','json_pointer','error','path','sha256'}<=set(entry) for entry in child),
+                            'Malformed reference-scan diagnostic descriptor')
+                found.extend(nested_references(child,metadata=inventory or binding or diagnostic or source_pin))
+    elif isinstance(value,list):
+        for child in value:
+            found.extend(nested_references(child,metadata=metadata))
+    return found
+
+
+def command_record(path: Path) -> dict:
+    command = strict_json(path)
+    require(isinstance(command["argv"],list) and command["argv"] and
+            all(isinstance(x,str) and x for x in command["argv"]),"Literal actual argv required")
+    require(Path(command["cwd"]).is_absolute(),"Actual absolute cwd required")
+    require(type(command["exit_code"]) is int and type(command["started_ms"]) is int and
+            type(command["ended_ms"]) is int and command["ended_ms"]>=command["started_ms"],
+            "Actual exit/time records required")
+    artifact(command["stdout"]); artifact(command["stderr"])
+    if "timeout_ms" in command:
+        require(type(command["timeout_ms"]) is int and command["timeout_ms"]>0 and
+                command["ended_ms"]-command["started_ms"]<=command["timeout_ms"],
+                "Command timeout bound exceeded")
+    return command
+
+
+def result_from_command(command: dict) -> dict:
+    path = artifact(command["stdout"])
+    lines = [line for line in path.read_text().splitlines() if line.strip()]
+    require(len(lines)==1,"One bounded operation envelope required")
+    try:
+        value = parse_record(lines[0].encode())
+    except ValueError as error:
+        raise InvalidEvidence("Actual command envelope absent") from error
+    require(isinstance(value,dict) and value.get("schema_version")==1 and
+            value.get("outcome") in {"ok","refused","unknown"},"Invalid operation result envelope")
+    expected = {"ok":0,"refused":2,"unknown":3}
+    require(command["exit_code"]==expected[value["outcome"]],"Inner actual exit/envelope disagreement")
+    return value
+
+
+def git_facts(root: Path) -> dict:
+    root = root.resolve()
+    def text(*args):
+        return run_git(root,*args).decode().strip()
+    common = text("rev-parse","--path-format=absolute","--git-common-dir")
+    index = Path(text("rev-parse","--path-format=absolute","--git-path","index"))
+    refs = {}
+    for line in text("for-each-ref","--format=%(refname) %(objectname)").splitlines():
+        name,oid = line.split(" ",1); refs[name] = oid
+    return {"schema_version":1,"root":str(root),"common_git_dir":common,
+            "ref":text("symbolic-ref","-q","HEAD"),"head":text("rev-parse","HEAD"),
+            "tree":text("rev-parse","HEAD^{tree}"),"index_sha256":sha256(index) if index.is_file() else None,
+            "refs":refs,"status_z_hex":run_git(root,"status","--porcelain=v1","-z",
+                "--untracked-files=all").hex(),"ignored_z_hex":run_git(root,"status","--porcelain=v1",
+                "-z","--untracked-files=all","--ignored").hex(),
+            "submodule_status":text("submodule","status","--recursive")}
+
+
+def directory_snapshot(reference: dict) -> Path:
+    manifest = json_artifact(reference)
+    root = Path(manifest["root"])
+    require(root.is_absolute() and root.is_dir() and not root.is_symlink(),"Regular raw snapshot root required")
+    actual = {}
+    for directory,dirs,files in os.walk(root,followlinks=False):
+        for name in dirs:
+            require(not (Path(directory)/name).is_symlink(),"Snapshot link not admitted")
+        for name in files:
+            path = Path(directory)/name
+            require(path.is_file() and not path.is_symlink(),"Regular snapshot files required")
+            actual[path.relative_to(root).as_posix()] = sha256(path)
+    require(actual==manifest["files"],"Raw snapshot file union/digests differ")
+    if "device" in manifest:
+        require(type(manifest["device"]) is int and root.stat().st_dev==manifest["device"],
+                "Raw snapshot device identity differs")
+    return root
+
+
+def sqlite_projection(reference: dict) -> dict:
+    path = artifact(reference)
+    require(not Path(str(path)+"-wal").exists(),"SQLite snapshot must include settled WAL state")
+    connection = sqlite3.connect(path.as_uri()+"?mode=ro&immutable=1",uri=True)
+    connection.row_factory = sqlite3.Row
+    try:
+        require(connection.execute("PRAGMA integrity_check").fetchone()[0]=="ok", "Corrupt fixture database")
+        projects = [dict(row) for row in connection.execute("SELECT * FROM projects ORDER BY uid")]
+        issues = [dict(row) for row in connection.execute("SELECT * FROM issues ORDER BY uid")]
+        links = [dict(row) for row in connection.execute(
+            "SELECT * FROM links ORDER BY from_issue_uid,to_issue_uid,type")]
+        meta = {row["key"]:row["value"] for row in connection.execute("SELECT * FROM meta")}
+        require(meta.get("schema_version")=="25", "Pinned installed Kata schema25 required")
+        all_tables = {}
+        schema={row[0]:row[1] for row in connection.execute(
+            "SELECT name,sql FROM sqlite_master WHERE sql IS NOT NULL ORDER BY name")}
+        for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"):
+            name = row[0]
+            if name.startswith("sqlite_"):
+                continue
+            require(name.replace("_","").isalnum(),"Unexpected SQL table identifier")
+            select='SELECT rowid,*' if name=="issues_fts" else 'SELECT *'
+            rows = [{key:sql_value(value) for key,value in dict(item).items()}
+                    for item in connection.execute(select+' FROM "'+name+'"')]
+            if name=="api_tokens":
+                require(not rows,"Credential rows forbidden in fixture evidence")
+                continue
+            all_tables[name] = sorted(rows,key=lambda item:json.dumps(item,sort_keys=True))
+        search=check_search_index(connection,schema,issues,all_tables.get("comments",[]))
+        return {"projects":projects,"issues":issues,"links":links,"meta":meta,"tables":all_tables,
+                "sql_schema":schema,"search_index":search}
+    except sqlite3.Error as error:
+        raise InvalidEvidence("Actual supported Kata fixture schema required") from error
+    finally:
+        connection.close()
+
+
+def read_live_project(path: Path, uid: str) -> dict:
+    """Read only the selected actual project; never select tokens or foreign payloads."""
+    connection=sqlite3.connect(path.as_uri()+"?mode=ro",uri=True)
+    connection.row_factory=sqlite3.Row
+    try:
+        connection.execute("BEGIN")
+        projects=[dict(row) for row in connection.execute("SELECT * FROM projects WHERE uid=?",(uid,))]
+        require(len(projects)==1,"Live admitted project UID missing or duplicate")
+        project_id=projects[0]["id"]
+        issues=[dict(row) for row in connection.execute("SELECT * FROM issues WHERE project_id=? ORDER BY uid",(project_id,))]
+        links=[dict(row) for row in connection.execute(
+            "SELECT links.* FROM links JOIN issues a ON links.from_issue_id=a.id "
+            "JOIN issues b ON links.to_issue_id=b.id WHERE a.project_id=? OR b.project_id=? "
+            "ORDER BY from_issue_uid,to_issue_uid,type",(project_id,project_id))]
+        meta={row["key"]:row["value"] for row in connection.execute(
+            "SELECT key,value FROM meta WHERE key IN ('schema_version','instance_uid','created_by_version')")}
+        return {"projects":projects,"issues":issues,"links":links,"meta":meta}
+    except sqlite3.Error as error:
+        raise InvalidEvidence("Actual live project readback failed") from error
+    finally:
+        connection.close()
+
+
+def check_native_schema(database: dict, admission: dict) -> None:
+    baseline=sqlite_projection(admission["kata"]["native_baseline_db"])
+    required={"projects","project_aliases","issues","comments","links","issue_labels","events",
+              "meta","issue_claims","pending_claim_requests","import_mappings","recurrences"}
+    require(required<=set(baseline["tables"]),"Minimal SQLite imitation is not installed Kata baseline")
+    require(database["sql_schema"]==baseline["sql_schema"],"Actual database schema differs from installed native baseline")

@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "observed_ms": 1791175510892,
+  "hold_issue": {
+    "uid": "01M4561NAHZRFP9P0N7QAFYDAD",
+    "title": "External Corenius availability and explicit Sureal readmission \u2014 operational hold",
+    "status": "open",
+    "revision": 1,
+    "external_dependency": true,
+    "requires_explicit_readmission": true
+  },
+  "parked_issues": [
+    {
+      "uid": "01M450RZ7915Q76EYH0CNED2Y1",
+      "task_id": "59",
+      "status": "open",
+      "owner": null,
+      "revision": 2,
+      "priority": 4,
+      "blocked": true,
+      "blocked_by": [
+        "01M43DWWWWY9SCZKTESXHDAQJA",
+        "01M43DX12AREC6T5YWE7DTMRYQ",
+        "01M43DX57P8APGVXBG78Z6BP9T",
+        "01M43DX9E8JKN2XFJXEYHF9H8W",
+        "01M43DXDJWPDBG2BVWTAHJ9G92",
+        "01M43FCCH7ANP20EJTDAZ6JKV9",
+        "01M44JAZ3HG2AZJJNMHZ8S0V6N",
+        "01M44JAZ79PHW9PTXY83A7E0T9",
+        "01M44JAZB9DPENQ68CKAE8XJTC",
+        "01M4561NAHZRFP9P0N7QAFYDAD"
+      ],
+      "prior_dependencies_preserved": true,
+      "definition_unchanged": true
+    },
+    {
+      "uid": "01M43DWWWWY9SCZKTESXHDAQJA",
+      "task_id": "50",
+      "status": "open",
+      "owner": null,
+      "revision": 3,
+      "priority": 4,
+      "blocked": true,
+      "blocked_by": [
+        "01M43DWSWYSB1BKWG8396HNB7S",
+        "01M4561NAHZRFP9P0N7QAFYDAD"
+      ],
+      "prior_dependencies_preserved": true,
+      "definition_unchanged": true
+    },
+    {
+      "uid": "01M44JAZB9DPENQ68CKAE8XJTC",
+      "task_id": "57",
+      "status": "open",
+      "owner": null,
+      "revision": 2,
+      "priority": 4,
+      "blocked": true,
+      "blocked_by": [
+        "01M44JAZ79PHW9PTXY83A7E0T9",
+        "01M4561NAHZRFP9P0N7QAFYDAD"
+      ],
+      "prior_dependencies_preserved": true,
+      "definition_unchanged": true
+    },
+    {
+      "uid": "01M44JAZ79PHW9PTXY83A7E0T9",
+      "task_id": "56",
+      "status": "open",
+      "owner": null,
+      "revision": 2,
+      "priority": 4,
+      "blocked": true,
+      "blocked_by": [
+        "01M44JAZ3HG2AZJJNMHZ8S0V6N",
+        "01M4561NAHZRFP9P0N7QAFYDAD"
+      ],
+      "prior_dependencies_preserved": true,
+      "definition_unchanged": true
+    },
+    {
+      "uid": "01M44JAZ3HG2AZJJNMHZ8S0V6N",
+      "task_id": "55",
+      "status": "open",
+      "owner": null,
+      "revision": 2,
+      "priority": 4,
+      "blocked": true,
+      "blocked_by": [
+        "01M43FCCH7ANP20EJTDAZ6JKV9",
+        "01M4561NAHZRFP9P0N7QAFYDAD"
+      ],
+      "prior_dependencies_preserved": true,
+      "definition_unchanged": true
+    },
+    {
+      "uid": "01M43F95RSZE8KC5WZAN5MHXFQ",
+      "task_id": "53.B",
+      "status": "open",
+      "owner": null,
+      "revision": 3,
+      "priority": 4,
+      "blocked": true,
+      "blocked_by": [
+        "01M43DX9E8JKN2XFJXEYHF9H8W",
+        "01M43DXDJWPDBG2BVWTAHJ9G92",
+        "01M4561NAHZRFP9P0N7QAFYDAD"
+      ],
+      "prior_dependencies_preserved": true,
+      "definition_unchanged": true
+    },
+    {
+      "uid": "01M43DXPDK3FTEKJBAXSECJFTA",
+      "task_id": "53.A",
+      "status": "open",
+      "owner": null,
+      "revision": 3,
+      "priority": 4,
+      "blocked": true,
+      "blocked_by": [
+        "01M43DX9E8JKN2XFJXEYHF9H8W",
+        "01M43DXDJWPDBG2BVWTAHJ9G92",
+        "01M4561NAHZRFP9P0N7QAFYDAD"
+      ],
+      "prior_dependencies_preserved": true,
+      "definition_unchanged": true
+    },
+    {
+      "uid": "01M43FCCH7ANP20EJTDAZ6JKV9",
+      "task_id": "53",
+      "status": "open",
+      "owner": null,
+      "revision": 3,
+      "priority": 4,
+      "blocked": true,
+      "blocked_by": [
+        "01M43DX57P8APGVXBG78Z6BP9T",
+        "01M43DX9E8JKN2XFJXEYHF9H8W",
+        "01M43DXDJWPDBG2BVWTAHJ9G92",
+        "01M4561NAHZRFP9P0N7QAFYDAD"
+      ],
+      "prior_dependencies_preserved": true,
+      "definition_unchanged": true
+    },
+    {
+      "uid": "01M43DXDJWPDBG2BVWTAHJ9G92",
+      "task_id": "54",
+      "status": "open",
+      "owner": null,
+      "revision": 3,
+      "priority": 4,
+      "blocked": true,
+      "blocked_by": [
+        "01M43DWSWYSB1BKWG8396HNB7S",
+        "01M43DWWWWY9SCZKTESXHDAQJA",
+        "01M43DX12AREC6T5YWE7DTMRYQ",
+        "01M43DX57P8APGVXBG78Z6BP9T",
+        "01M43DX9E8JKN2XFJXEYHF9H8W",
+        "01M4561NAHZRFP9P0N7QAFYDAD"
+      ],
+      "prior_dependencies_preserved": true,
+      "definition_unchanged": true
+    },
+    {
+      "uid": "01M43DX9E8JKN2XFJXEYHF9H8W",
+      "task_id": "53.0",
+      "status": "open",
+      "owner": null,
+      "revision": 3,
+      "priority": 4,
+      "blocked": true,
+      "blocked_by": [
+        "01M43DX57P8APGVXBG78Z6BP9T",
+        "01M4561NAHZRFP9P0N7QAFYDAD"
+      ],
+      "prior_dependencies_preserved": true,
+      "definition_unchanged": true
+    },
+    {
+      "uid": "01M43DX57P8APGVXBG78Z6BP9T",
+      "task_id": "52",
+      "status": "open",
+      "owner": null,
+      "revision": 3,
+      "priority": 4,
+      "blocked": true,
+      "blocked_by": [
+        "01M43DX12AREC6T5YWE7DTMRYQ",
+        "01M4561NAHZRFP9P0N7QAFYDAD"
+      ],
+      "prior_dependencies_preserved": true,
+      "definition_unchanged": true
+    },
+    {
+      "uid": "01M43DX12AREC6T5YWE7DTMRYQ",
+      "task_id": "51",
+      "status": "open",
+      "owner": null,
+      "revision": 3,
+      "priority": 4,
+      "blocked": true,
+      "blocked_by": [
+        "01M43DWWWWY9SCZKTESXHDAQJA",
+        "01M4561NAHZRFP9P0N7QAFYDAD"
+      ],
+      "prior_dependencies_preserved": true,
+      "definition_unchanged": true
+    }
+  ],
+  "ready_selection": {
+    "command": "kata ready --limit 0",
+    "parked_uid_intersection": [],
+    "all_twelve_excluded": true,
+    "ready_issue_uids": [
+      "01M4561NAHZRFP9P0N7QAFYDAD"
+    ]
+  },
+  "closed_any_issue": false,
+  "experiment_run": false,
+  "readback_correction": "Initial assertion read relationships from show.issue; installed Kata exposes them in show.links/list. Original failed assertion retained; existing hold and edge reconciled rather than recreated."
+}

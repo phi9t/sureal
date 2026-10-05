@@ -1,0 +1,126 @@
+"""Read-only scoped /proc and cgroup observations, with explicit coverage gaps."""
+import os
+from pathlib import Path
+
+from .facts import require
+
+
+def birth(pid):
+    require(type(pid) is int and pid>0,'Literal positive PID required')
+    root=Path('/proc')/str(pid);text=(root/'stat').read_text()
+    fields=text[text.rindex(')')+2:].split()
+    return {'boot_id':Path('/proc/sys/kernel/random/boot_id').read_text().strip(),
+            'pid':pid,'start_ticks':int(fields[19]),'parent_pid':int(fields[1]),
+            'state':fields[0],'uid':root.stat().st_uid}
+
+
+def assert_birth(pin):
+    actual=birth(pin['pid'])
+    require(all(actual[key]==pin[key] for key in ('boot_id','pid','start_ticks')),'Process incarnation changed')
+    return actual
+
+
+def scope_read(pin):
+    path=Path(pin['path'])
+    require(path.is_absolute() and path.is_relative_to('/sys/fs/cgroup') and not path.is_symlink(),
+            'Actual cgroup path required')
+    try:info=path.stat()
+    except FileNotFoundError:return {'path':str(path),'exists':False,'members':[]}
+    require(info.st_dev==pin['device'] and info.st_ino==pin['inode'],'Cgroup incarnation changed')
+    events=dict(line.split() for line in (path/'memory.events').read_text().splitlines())
+    return {'path':str(path),'device':info.st_dev,'inode':info.st_ino,'exists':True,
+            'memory_max':int((path/'memory.max').read_text()),'swap_max':int((path/'memory.swap.max').read_text()),
+            'oom_kill':int(events['oom_kill']),
+            'members':[int(pid) for pid in (path/'cgroup.procs').read_text().split()]}
+
+
+def own_scope(pin):
+    paths=[row[3:] for row in Path('/proc/self/cgroup').read_text().splitlines() if row.startswith('0::')]
+    require(len(paths)==1 and '/sys/fs/cgroup'+paths[0]==pin['path'],'Probe must run in its pinned exclusive cgroup')
+    result=scope_read(pin)
+    require(result.get('exists') and result['members']==[os.getpid()] and
+            0<result['memory_max']<=268435456 and result['swap_max']==0 and result['oom_kill']==0,
+            'Probe scope ownership/resources incomplete')
+    require(Path(pin['path']).name.startswith('sureal-sustained-collab-'),'Unsupported probe scope namespace')
+    return result
+
+
+def within(path,roots):
+    return path.is_absolute() and any(path.is_relative_to(root) for root in roots)
+
+
+def writer_scan(roots,*,only_pids=None):
+    roots=[Path(path) for path in roots]
+    require(all(root.is_absolute() and root!=Path('/') and not root.is_symlink() for root in roots),
+            'Literal scoped writer roots required')
+    pids=only_pids if only_pids is not None else [int(path.name) for path in Path('/proc').iterdir() if path.name.isdigit()]
+    hits=[];errors=[]
+    for pid in pids:
+        proc=Path('/proc')/str(pid)
+        try:
+            if proc.stat().st_uid!=os.getuid():continue
+            before=birth(pid)
+            cwd=Path(os.readlink(proc/'cwd'))
+            if within(cwd,roots):hits.append({'pid':pid,'birth':before,'kind':'cwd','path':str(cwd)})
+            for fd in (proc/'fd').iterdir():
+                try:
+                    target=Path(os.readlink(fd).removesuffix(' (deleted)'))
+                    if not within(target,roots):continue
+                    fields=dict(line.split(':',1) for line in (proc/'fdinfo'/fd.name).read_text().splitlines() if ':' in line)
+                    flags=int(fields['flags'].strip(),8)
+                    if flags&os.O_ACCMODE in {os.O_WRONLY,os.O_RDWR}:
+                        hits.append({'pid':pid,'birth':before,'kind':'write-fd','path':str(target),'fd':int(fd.name)})
+                except FileNotFoundError:
+                    continue  # A closed individual descriptor is not an unexplained writer.
+            assert_birth(before)
+        except FileNotFoundError:
+            if proc.exists():errors.append({'pid':pid,'kind':'proc-read-gap'})
+        except (OSError,ValueError,KeyError) as error:
+            errors.append({'pid':pid,'kind':type(error).__name__})
+    return {'hits':hits,'errors':errors}
+
+
+def capture_kernel(fixture,runtime,known):
+    pin=fixture['tool_scope'];scope=scope_read(pin)
+    members=[]
+    for pid in scope['members']:
+        identity=birth(pid);require(identity['uid']==os.getuid(),'Foreign process inside owned payload scope')
+        members.append(identity);known[(identity['boot_id'],pid,identity['start_ticks'])]=identity
+    written=[]
+    payload=fixture['payload_process']
+    try:
+        identity=assert_birth(payload);written.append(identity)
+    except FileNotFoundError:
+        identity=None
+    if identity is not None:
+        if 'payload_argv' in fixture:
+            actual=(Path('/proc')/str(identity['pid'])/'cmdline').read_bytes().rstrip(b'\0').split(b'\0')
+            require(actual==[value.encode() for value in fixture['payload_argv']],
+                    'Actual command-written payload argv differs')
+        # Capture actual native launch ancestors, not the shared daemon itself.
+        visited=set();current=identity
+        for _ in range(32):
+            require(current['pid'] not in visited,'Process ancestry cycle')
+            visited.add(current['pid'])
+            if current['pid']==runtime['daemon']['pid']:
+                require(all(current[key]==runtime['daemon'][key] for key in ('boot_id','pid','start_ticks')),
+                        'Native ancestry reaches different daemon incarnation')
+                break
+            require(current['uid']==os.getuid() and current['pid']>1,'Owned native-parent coverage missing')
+            known[(current['boot_id'],current['pid'],current['start_ticks'])]=current
+            parent=current['parent_pid']
+            require(parent>1,'Native launch ancestry does not reach pinned daemon')
+            try:current=birth(parent)
+            except FileNotFoundError as error:
+                raise ValueError('Live payload native-parent coverage gap') from error
+        else:raise ValueError('Native launch ancestry bound exceeded')
+    alive=[]
+    for identity in known.values():
+        try:
+            actual=birth(identity['pid'])
+            if all(actual[key]==identity[key] for key in ('boot_id','pid','start_ticks')):alive.append(actual)
+        except FileNotFoundError:pass
+    scan=writer_scan([fixture['workspace'],fixture['output'],fixture['common_git']])
+    return {'tool_scope':scope,'scope_incarnations':members,'known_incarnations':list(known.values()),
+            'owned_incarnations':alive,'command_written_incarnations':written,
+            'writer_hits':scan['hits'],'scan_errors':scan['errors']}

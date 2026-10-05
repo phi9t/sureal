@@ -1,0 +1,32 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.runtime_identity import verify_rootfs
+from pipeline.insula_entry import launch_plan
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
+r=code/'research/detector-optimizer-resource-verified.json';e=json.loads(r.read_text());source=cache/'insula/detector-optimizer-resource-v1';base=cache/'insula/detector-optimizer-resource-audit-v1';base.mkdir();out=base/'output';out.mkdir();inputs=base/'input';inputs.mkdir()
+assert e['checks'][0]['exit_code']==0
+for p,h in e['artifacts'].items():assert sha(p)==h
+expected={'receipt_sha256':sha(r),'receipt':e};(inputs/'expected.json').write_text(json.dumps(expected))
+program='''import hashlib,json,math
+from pathlib import Path
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+e=json.loads(Path('/tmp/input/expected.json').read_text());r=e['receipt'];assert sha('/experiment/research/detector-optimizer-resource-verified.json')==e['receipt_sha256']
+for p,h in r['candidate_hashes'].items():assert sha(Path('/experiment')/p)==h
+for p,h in r['artifacts'].items():assert sha(Path('/source')/Path(p).name)==h
+v=json.loads(Path('/source/check.json').read_text());assert v==r['validation']
+assert v['seed']==17 and v['grid']==[512,512] and v['classes']==4 and v['anchors_per_cell']==8 and v['pillars']==20000 and v['points_per_pillar']==32
+assert v['parameters']==4817114+(8-2)*(4+7+2)*(384+1)
+assert type(v['parameter_tensors']) is int and v['parameter_tensors']>0
+assert v['optimizer_state_bytes']==8*v['parameters']+4*v['parameter_tensors']
+assert v['synthetic_optimizer_steps']==3 and v['first_update_analytic_check'] is True and v['tf32'] is False
+assert len(v['step_seconds'])==len(v['synthetic_losses'])==3
+assert all(type(x) in (int,float) and math.isfinite(x) and x>0 for x in v['step_seconds'])
+assert all(math.isfinite(x) and x>=0 for x in v['synthetic_losses'])
+assert v['peak_reserved_bytes']>=v['peak_allocated_bytes']>v['optimizer_state_bytes']>0 and v['peak_rss_kib']>0
+Path('/outputs/check.json').write_text(json.dumps({'parameters':v['parameters'],'optimizer_state_bytes':v['optimizer_state_bytes'],'peak_allocated_bytes':v['peak_allocated_bytes'],'synthetic_steps':3,'scope':'retained resource report independently reconciled; native scientific costs and outcomes remain unverified'}));print('PASS independent retained optimizer resource audit')
+'''
+command=launch_plan(root,code,source,out,['python','-c',program]);i=command.index('--');command[i:i]=['--ro-bind',str(inputs),'/tmp/input'];run=subprocess.run(command,capture_output=True,text=True,timeout=60);(out/'live.log').write_text(run.stdout+run.stderr);print(run.stdout+run.stderr);assert run.returncode==0
+result={'checks':[{'command':command,'exit_code':0}],'runtime_lock':lock,'producer_evidence_sha256':sha(r),'validation':json.loads((out/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in [out/'check.json',out/'live.log']}}
+(code/'research/detector-optimizer-resource-audit-verified.json').write_text(json.dumps(result,indent=2)+'\n')

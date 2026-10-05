@@ -1,0 +1,36 @@
+{
+  "closed_tasks": false,
+  "dispatch_allowed": false,
+  "future_readmission": [
+    "Explicit user resumption/authorization",
+    "Inspect actual Corenius availability/interfaces and integration design",
+    "Review a scoped Sureal integration plan from then-current mainline",
+    "Reconcile all retained native/thread/process/source/resource ownership",
+    "Readmit unchanged scientific recipes/source/checkpoints and required live independent gates",
+    "Reopen parked code/source pins; do not inherit prototype acceptance"
+  ],
+  "local_tasks": [
+    "50",
+    "51",
+    "52",
+    "53.0",
+    "54",
+    "53",
+    "53.A",
+    "53.B",
+    "55",
+    "56",
+    "57",
+    "59"
+  ],
+  "native_goal_status": "paused",
+  "provider": "Corenius workstream; external dependency, no provider readiness claim",
+  "retention": "/data02/home/philip.yang/workspace/.sureal-collab/parking-20261005",
+  "schema_version": 1,
+  "scientific_payload_release": false,
+  "state": "PARKED_CORIENUS_WAIT",
+  "user_authority": "2026-10-05: land all available work and park; wait for Corenius infrastructure and leverage it",
+  "kata_external_dependency_uid": "01M4561NAHZRFP9P0N7QAFYDAD",
+  "ready_exclusion_evidence": "kata-dependency-hold-readback.json",
+  "canonical_pristine_claim": false
+}

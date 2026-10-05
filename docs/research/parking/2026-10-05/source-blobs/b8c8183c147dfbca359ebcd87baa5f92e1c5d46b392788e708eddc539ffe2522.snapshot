@@ -1,0 +1,15 @@
+import hashlib
+from pathlib import Path
+from pipeline.compressed_component_archive import create_component_archive
+from pipeline.compressed_component_archive_validate import validate_component_archive
+p=Path('/outputs');s=p/'source';(s/'lidar').mkdir(parents=True);f=s/'lidar/f.bin';f.write_bytes(b'payload'*1000);m=create_component_archive(s,p/'good.gz',expected_files={'lidar/f.bin':hashlib.sha256(f.read_bytes()).hexdigest()},provenance={'scene':'fixture'},other_bytes=0,budget_bytes=100000)
+kw=dict(expected_archive_sha256=m['sha256'],expected_manifest_sha256=m['manifest_sha256'],expected_uncompressed_sha256=m['uncompressed_sha256'],expected_uncompressed_bytes=m['uncompressed_bytes']);r=validate_component_archive(p/'good.gz',**kw);assert r['files']==1
+for name,data in [('truncated',(p/'good.gz').read_bytes()[:-4]),('crc',(p/'good.gz').read_bytes()[:-8]+bytes(8))]:
+ q=p/(name+'.gz');q.write_bytes(data)
+ try:validate_component_archive(q,**dict(kw,expected_archive_sha256=hashlib.sha256(data).hexdigest()))
+ except (ValueError,EOFError,OSError):pass
+ else:raise AssertionError(name+' admitted')
+try:validate_component_archive(p/'good.gz',**dict(kw,expected_uncompressed_bytes=m['uncompressed_bytes']-1))
+except ValueError:pass
+else:raise AssertionError('incorrect expanded bound admitted')
+print('PASS live independent compressed validation, truncation, CRC, expanded bound refusal')

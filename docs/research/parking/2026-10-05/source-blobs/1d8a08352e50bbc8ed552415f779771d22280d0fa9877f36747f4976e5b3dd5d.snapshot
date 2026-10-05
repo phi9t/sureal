@@ -1,0 +1,54 @@
+from pathlib import Path
+import json,hashlib
+r=Path('experiments/waymo-perception/research');sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+variants=['deep_pfn','context_pfn','residual_bev','retain64','masked_pfn','window_bev','coarse_mlp','all_pillars'];rows=[];evidence={};verified=0
+for variant in variants:
+ names=[f'architecture-{variant}-execution-verified.json',f'architecture-{variant}-checkpoint-audit-verified.json',f'architecture-{variant}-loss-audit-verified.json',f'architecture-{variant}-score-first-verified.json',f'architecture-{variant}-score-first-audits-verified.json']
+ receipts=[json.loads((r/name).read_text()) for name in names]
+ training,replay,loss,scoring,audit=receipts
+ assert len(scoring['validation']['curve'])==len(audit['validation'])==11
+ assert any('checkpoint-audit-strict-v2' in x for x in replay['checks'][0]['command'])
+ for path,h in training['candidate_hashes'].items():assert sha(Path('experiments/waymo-perception')/path)==h,path
+ for path,h in training['driver_hashes'].items():assert sha(Path(path))==h,path
+ for name,d in zip(names,receipts):
+  for p,h in d['artifacts'].items():assert sha(Path(p))==h,p;verified+=1
+  evidence[name]=sha(r/name)
+ assert replay['producer_evidence_sha256']==loss['producer_evidence_sha256']==sha(r/names[0])
+ assert scoring['training_evidence_sha256']==sha(r/names[0]) and audit['producer_evidence_sha256']==sha(r/names[3])
+ assert training['manifest']['spec_sha256']==sha(Path('docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md'))
+ if 'followup_spec_sha256' in training['manifest']:assert training['manifest']['followup_spec_sha256']==sha(r/'architecture-window-control-spec.md')
+ if 'retention_spec_sha256' in training['manifest']:assert training['manifest']['retention_spec_sha256']==sha(r/'architecture-retention-controls-spec.md')
+ t=training['validation'];curve=scoring['validation']['curve'];timing_scope='primary synchronized step wall'
+ if variant=='context_pfn':
+  for name in ['architecture-context_pfn-exclusive-execution-verified.json','architecture-context-exclusive-equality-verified.json','architecture-context_pfn-exclusive-checkpoint-audit-verified.json']:
+   d=json.loads((r/name).read_text());evidence[name]=sha(r/name)
+   for p,h in d['artifacts'].items():assert sha(Path(p))==h,p;verified+=1
+  t=json.loads((r/'architecture-context_pfn-exclusive-execution-verified.json').read_text())['validation'];times={x['step']:x['cumulative_train_seconds'] for x in t['checkpoint_curve']};curve=[dict(x,cumulative_train_seconds=times[x['step']]) for x in curve];timing_scope='exclusive-v2 repeat; all11 heads and all2000loss/grad records exactly equal original; original contaminated timing excluded'
+ first={}
+ for key in ['mean_gate_passed','populated_class_gate_passed']:
+  i=next((i for i,x in enumerate(curve) if x[key]),None)
+  stable=next((j for j in range(len(curve)) if all(x[key] for x in curve[j:])),None)
+  first[key]={'status':'not reached within2000updates'} if i is None else {'bracket_updates':[curve[i-1]['step'] if i else 0,curve[i]['step']],'bracket_seconds':[curve[i-1]['cumulative_train_seconds'] if i else 0,curve[i]['cumulative_train_seconds']],'sustained_at_remaining_samples':all(x[key] for x in curve[i:])}
+  first[key]['first_sustained_sampled_pass_updates']=None if stable is None else [curve[stable-1]['step'] if stable else 0,curve[stable]['step']]
+ decision='carry forward to broader controlled evaluation' if variant in ['residual_bev','masked_pfn'] else 'do not promote from this batch; needs-more-evidence'
+ rows.append({'variant':variant,'parameters':t['parameters'],'final_mean_APH':curve[-1]['mean_populated_class_APH'],'final_per_class':curve[-1]['LEVEL2_per_class'],'final_loss':t['final_mean_loss'],'train_seconds':t['cumulative_train_seconds'],'peak_allocated_bytes':t['peak_allocated_bytes'],'peak_rss_kib':t['peak_rss_kib'],'clipped_steps':t['clipped_steps'],'scoring_seconds':scoring['validation']['scoring_wall_seconds'],'timing_scope':timing_scope,'first_pass':first,'curve':curve,'decision':decision})
+cache=Path.home()/'.cache/waystone/waymo-perception';frame=receipts[0]['manifest']['frames'][0];scene,stamp=frame['identity'].split(':');native=cache/'scientific-processing/overfit-native-cache-v1'/scene/stamp
+job=json.loads((native/'input/job.json').read_text())
+assert sha(cache/'scientific-processing/overfit-point-frames-v1'/scene/'producer'/job['physical_file'])==job['physical_sha256']
+assert sha(cache/'scientific-processing/overfit-box-targets-v1'/scene/'producer/targets.json')==job['box_report_sha256']
+templates=json.loads((r/'training-anchor-templates.candidate.json').read_text())
+assert [x['values'] for x in templates['templates']]==job['templates']
+evidence['training-anchor-templates.candidate.json']=sha(r/'training-anchor-templates.candidate.json')
+original=json.loads((native/'receipt.json').read_text())
+for path,h in original['artifacts'].items():assert sha(native/path)==h,path
+reference=json.loads((r/'norm-gn_backbone-scoring-verified.json').read_text());baseline=reference['validation']['curve'][-1]['mean_populated_class_APH']
+for name in ['architecture-contract-verified.json','architecture-followup-contract-verified.json','architecture-retain64-cache-verified.json','architecture-all_pillars-cache-verified.json','architecture-guard-contract-verified.json','architecture-weight-contract-verified.json','architecture-storage-audit-verified.json','architecture-retention-support-v2-verified.json','score-first-equivalence-verified.json']:
+ d=json.loads((r/name).read_text());evidence[name]=sha(r/name)
+ for p,h in d['artifacts'].items():assert sha(Path(p))==h,p;verified+=1
+result={'baseline_GN_mean_APH':baseline,'results':rows,'evidence_sha256':evidence,'verified_artifact_hashes':verified,'scope':'one fixed training batch; full17GT retained; missingcyclist and signfailure prohibit wholemodelTier1; no heldout/segmentation/forecast claim','decoder':'versioned score-before-decode; reference exactproposal equivalence retained; original pipelines/receipts immutable','timing':'synchronized perstep wall,transfer/checks included; scoring/replay overhead separate; CPU workloads overlapped someGPU runs; engineering observations,not exclusive wholemachine benchmark'}
+(r/'architecture-first-cohort-results.json').write_text(json.dumps(result,indent=2)+'\n')
+lines=['# Architecture first-cohort results','','All8 candidates completed2000 fixed-batch updates and independent live Insula loss/checkpoint/11-checkpoint geometry/export/native-metric audits. Same frame/full17GT,seed17,Adam1e-4 and native scoring contract. GN backbone reference final meanLEVEL2APH'+f'{baseline:.6f}.','','| Candidate | Params | Final mean APH | First mean≥.8 update bracket | Step-time bracket(s) | Final signAPH |','| --- | ---: | ---: | --- | --- | ---: |']
+for row in rows:
+ f=row['first_pass']['mean_gate_passed'];steps=str(f.get('bracket_updates','Not reached'));seconds='–' if 'bracket_seconds' not in f else '('+','.join(f'{x:.3f}' for x in f['bracket_seconds'])+']';lines.append(f"| {row['variant']} | {row['parameters']:,} | {row['final_mean_APH']:.6f} | {steps} | {seconds} | {row['final_per_class']['3']['APH']:.6f} |")
+lines+=['','Decision: prioritize the residual CNN and masked-pooling baseline for broader controlled evaluation. Attention, extra pointwise/contextual complexity and retention changes are not adopted from this batch. Decisions remain training-diagnostic candidates, not heldout conclusions.','','All candidate per-class gates and cyclist coverage must be assessed separately from the mean. No whole-model admission or heldout adoption follows from these comparisons.','', 'Context timing uses exclusive-v2 repeat after a scheduler bug allowed a prior GPUreplay overlap; independent comparison proves exact equality of all11 heads/all2000loss/gradient records. Failed premature audit and original timings are retained.','', 'Retention64 keeps109842 versus101303 originalpoints; same20000pillar cap still drops44500 eligiblepoints. Native targetNPZbyteidentity confirmed. Derived object-support report identifies signs with zero retained observations; GT-conditioned diagnostics never enter modelinputs.','', 'ContextPFN versus maskedPFN addresses pooling-mask attribution. Windowattention versus coarseMLP adds exactly262656 parameters each; this is parameter-matched,not FLOP-matched. Report measured resources rather than assuming equalcompute.','', 'Full curves,resources,first/sustained gates and receipt hashes: [architecture-first-cohort-results.json](architecture-first-cohort-results.json).','', 'Remaining: ragged/grid controls,range/localpointattention,allclassfixture/signsupport,fixed16,multiseed and officialsegmentheldout decisions; tickets28–32/mainresearch goals remain open.']
+(r/'architecture-first-cohort-results.md').write_text('\n'.join(lines)+'\n');print('PASS recorded8 admitted candidates,88 checkpoint scoring audits;',verified,'artifact hashes')

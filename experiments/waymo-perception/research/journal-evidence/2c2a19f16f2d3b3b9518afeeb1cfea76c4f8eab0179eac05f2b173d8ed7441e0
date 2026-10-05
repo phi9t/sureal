@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "state": "PARKED_CORIENUS_WAIT",
+  "observed_ms": 1791175625535,
+  "canonical_base": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+  "direct_integration": [
+    "0eeb15d19c188d1ee2fad1043f88707087c16c8a"
+  ],
+  "scope": "Bounded source/evidence consolidation only; no implementation or new MAC/scientific experiment",
+  "runtime": {
+    "native_goal": "paused",
+    "owned_stop_receipt": "stopped-runtime-readback.json",
+    "independently_active_writer": "late-canonical-source-manifest.json",
+    "unknown_F_G": "Retained; no retry/cleanup/release asserted"
+  },
+  "retention": {
+    "worktree_registrations": 45,
+    "branch_references": 47,
+    "archived_divergent_revisions": 49,
+    "waymo_dirty_source_files": 399,
+    "external_lead_source_files": 13,
+    "late_canonical_source_files": 7,
+    "deduplicated_public_snapshots": 650,
+    "public_snapshot_bytes": 5175381,
+    "private_git_history": {
+      "bundle_path": "/data02/home/philip.yang/workspace/.sureal-collab/parking-20261005/all-retained-history.bundle",
+      "bundle_sha256": "56ae576dec3bab5df22c38c4c186782ba92b51eab1332392fb1e7c6d24ec9058",
+      "bytes": 25027924,
+      "command": [
+        "git",
+        "bundle",
+        "create",
+        "/data02/home/philip.yang/workspace/.sureal-collab/parking-20261005/all-retained-history.bundle",
+        "--all",
+        "6bad91db75039cb990fdd4c49f5e0f256114f663"
+      ],
+      "create_exit": 0,
+      "created_ms": 1791174900404,
+      "elapsed_ns": 3163643014,
+      "payload_release": false,
+      "retention": "All local refs plus detached pagesHEAD; private, not publicGit; no source deleted",
+      "schema_version": 1,
+      "verify_exit": 0
+    },
+    "source_private_store": "/data02/home/philip.yang/workspace/.sureal-collab/parking-20261005/working-source",
+    "originals_retained": true,
+    "deleted_worktrees_or_branches": false,
+    "scientific_payload_release": false,
+    "new_hdfs_verification": false
+  },
+  "status_boundaries": {
+    "49": "Previously accepted/closed; preserved",
+    "58": "Existing provisional manual-supported scientific preparation evidence; not full automation acceptance",
+    "50": "1cefb fixture source and CPU proof preserved; full real worker lifecycle/stop acceptance incomplete",
+    "51-57/53.0/59": "Open parked/incomplete; no closure or inherited acceptance",
+    "41.2/42/43/44-48": "Scientific work/goals and original prerequisites retained; no experiment or architecture migration authorized here",
+    "parked_source": "Text snapshots are archival; not imported, executed or installed as replacement functional code"
+  },
+  "pending_defects": [
+    "Task50 H readiness expired before bind; readiness repair contract archived but not implemented",
+    "F/G unknown unmaterialized native threads retained, not asserted stopped/releasable",
+    "Full automation lifecycle, live exact verification, landing, retention/cleanup, overview and lead acceptance remain open",
+    "Canonical independently active writer prevents global stop/cleanliness proof; late source originals left intact"
+  ],
+  "checks": {
+    "parked_python_parse_count": 544,
+    "late_python_parse_count": 6,
+    "parked_code_executed": false,
+    "kata_ready_exclusion": "kata-dependency-hold-readback.json",
+    "independent_publication_review": "Required before serialized landing; recorded separately"
+  },
+  "publication": "Final published commit is recorded in external readback/final response to avoid self-referential commit hashes",
+  "manifest_index": [
+    "revision-manifest.json",
+    "working-source-manifest.json",
+    "worktree-manifest.json",
+    "late-canonical-source-manifest.json",
+    "syntax-checks.json",
+    "kata-hold-readback.json",
+    "kata-dependency-hold-readback.json",
+    "stopped-runtime-readback.json",
+    "corenius-wait-hold.json"
+  ]
+}

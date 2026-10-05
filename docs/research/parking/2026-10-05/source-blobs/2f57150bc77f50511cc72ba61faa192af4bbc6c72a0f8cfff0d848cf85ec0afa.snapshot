@@ -1,0 +1,349 @@
+#!/usr/bin/env python3
+"""Read-only A50 stop preflight. No thread/turn/goal/tool control methods."""
+from __future__ import annotations
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import signal
+import sys
+import time
+sys.dont_write_bytecode=True
+if not __package__:
+    sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+from audit_support.facts import require
+from audit_support.raw_git import InvalidEvidence, strict_json, sha256, write_new
+
+READ_METHODS={'thread/read','thread/goal/get','thread/turns/list','thread/items/list',
+              'thread/queue/list','thread/backgroundTerminals/list'}
+PASSIVE_ITEMS={'reasoning','userMessage','agentMessage','hookPrompt','plan','contextCompaction'}
+
+
+def validate_read_request(method,params,thread_id):
+    require(method in READ_METHODS and isinstance(params,dict) and params.get('threadId')==thread_id,
+            'Unadmitted native method or wrong exact thread')
+    allowed={'threadId'}
+    if method=='thread/read':allowed|={'includeTurns'};require(params.get('includeTurns') is False,'Full history read forbidden')
+    if method.endswith('/list'):allowed|={'cursor','limit'}
+    if method in {'thread/turns/list','thread/items/list'}:allowed|={'sortDirection'}
+    if method=='thread/turns/list':allowed|={'itemsView'}
+    require(set(params)<=allowed,'Unadmitted native request field')
+    if method.endswith('/list'):
+        require(type(params.get('limit')) is int and 1<=params['limit']<=100 and
+                (params.get('cursor') is None or isinstance(params['cursor'],str)),'Invalid bounded cursor/page')
+    if method in {'thread/turns/list','thread/items/list'}:
+        require(params.get('sortDirection')=='asc','Ambiguous native pagination order')
+    if method=='thread/turns/list':require(params.get('itemsView')=='notLoaded','Turn item bodies not admitted')
+
+
+def public_response(method,result):
+    """Allowlisted public metadata only; never store reasoning or body text."""
+    require(isinstance(result,dict),'Native result object required')
+    if method=='thread/read':
+        thread=result['thread']
+        return {'thread':{key:thread[key] for key in ('id','sessionId','cwd','status')}}
+    if method=='thread/goal/get':
+        require('goal' in result,'Goal API coverage absent')
+        goal=result['goal']
+        return {'goal':None if goal is None else {key:goal[key] for key in ('status','threadId') if key in goal}}
+    require(method in READ_METHODS and method.endswith('/list') and isinstance(result.get('data'),list),
+            'Native page coverage absent')
+    cursor=result.get('nextCursor')
+    require(cursor is None or isinstance(cursor,str) and cursor,'Invalid actual native cursor')
+    out=[]
+    for entry in result['data']:
+        if method=='thread/turns/list':out.append({key:entry[key] for key in ('id','status')})
+        elif method=='thread/items/list':
+            item=entry['item'];public={key:item[key] for key in ('id','type')}
+            if item['type']=='commandExecution':
+                public.update({key:item[key] for key in ('status','cwd','processId','exitCode','source') if key in item})
+                require(isinstance(item.get('command'),str),'Actual native command identity missing')
+                public['command_sha256']=hashlib.sha256(item['command'].encode()).hexdigest()
+            elif item['type'] not in PASSIVE_ITEMS:
+                if 'status' in item:public['status']=item['status']
+            out.append({'turnId':entry['turnId'],'item':public})
+        elif method=='thread/backgroundTerminals/list':
+            out.append({key:entry[key] for key in ('itemId','processId','osPid','cwd') if key in entry})
+        else:out.append({key:entry[key] for key in ('id','status') if key in entry})
+    # The pinned native list schemas make nextCursor optional/nullable. Keep
+    # omission explicit instead of claiming the daemon emitted a null field.
+    return {'data':out,'nextCursor':cursor,**({'cursor_field_present':False} if 'nextCursor' not in result else {})}
+
+
+def native_facts(snapshot,fixture):
+    records=snapshot['records'];require(isinstance(records,list),'Native observations absent')
+    grouped={method:[] for method in READ_METHODS}
+    for record in records:
+        method=record['method'];validate_read_request(method,record['params'],fixture['thread_id'])
+        grouped[method].append(record)
+    facts={}
+    for method,entries in grouped.items():
+        require(entries,'Missing required native API: '+method)
+        if not method.endswith('/list'):
+            require(len(entries)==1,'Duplicate native singleton observation')
+            facts[method]=entries[0]['response'];continue
+        cursor=None;data=[];seen=set()
+        for entry in entries:
+            require(entry['params'].get('cursor')==cursor,'Native page/cursor chain incomplete')
+            page=entry['response'];require(isinstance(page.get('data'),list) and 'nextCursor' in page,
+                                          'Native paginated result missing coverage')
+            data.extend(page['data']);cursor=page['nextCursor']
+            require(cursor is None or isinstance(cursor,str) and cursor and cursor not in seen,
+                    'Native pagination repeats or invalid cursor')
+            if cursor is not None:seen.add(cursor)
+            else:require(entry is entries[-1],'Native pages after terminal cursor')
+        require(cursor is None,'Unread native continuation page')
+        facts[method]=data
+    thread=facts['thread/read']['thread']
+    require(thread['id']==fixture['thread_id'] and thread['cwd']==fixture['workspace'],
+            'Exact native fixture thread/workspace differs')
+    require(isinstance(thread.get('sessionId'),str) and thread['sessionId'],'Native session grouping absent')
+    require('goal' in facts['thread/goal/get'] and facts['thread/goal/get']['goal'] is None,
+            'Native goal present or coverage missing')
+    turns=facts['thread/turns/list'];ids=[turn['id'] for turn in turns]
+    require(len(ids)==len(set(ids)) and set(ids)==set(fixture['turn_ids']) and ids,
+            'Unexpected or missing actual native turn')
+    commands=[];item_ids=set()
+    for entry in facts['thread/items/list']:
+        require(entry['turnId'] in ids,'Tool item belongs to another native turn')
+        item=entry['item'];require(item['id'] not in item_ids,'Duplicate native item identity');item_ids.add(item['id'])
+        require(item['type'] in PASSIVE_ITEMS|{'commandExecution'},'Unknown native tool/item coverage')
+        if item['type']=='commandExecution':
+            require(item.get('command_sha256')==fixture['command_sha256'] and item.get('cwd')==fixture['workspace'],
+                    'Actual owned command identity differs')
+            commands.append(item)
+    require(commands,'No actual executed native tool witness')
+    return facts,commands
+
+
+def incarnation(value):
+    require(isinstance(value,dict) and isinstance(value.get('boot_id'),str) and value['boot_id'] and
+            type(value.get('pid')) is int and value['pid']>0 and
+            type(value.get('start_ticks')) is int and value['start_ticks']>0,'Missing process incarnation')
+    return (value['boot_id'],value['pid'],value['start_ticks'])
+
+
+def kernel_facts(snapshot,fixture):
+    kernel=snapshot.get('kernel')
+    require(isinstance(kernel,dict) and isinstance(kernel.get('tool_scope'),dict),'Owned kernel scope coverage absent')
+    scope=kernel['tool_scope'];pin=fixture['tool_scope']
+    if scope.get('exists') is False:
+        require(set(scope)=={'path','exists','members'} and scope['path']==pin['path'] and scope['members']==[],
+                'Disappeared scope coverage differs')
+    else:
+        require(all(scope.get(key)==pin[key] for key in ('path','device','inode')),'Owned scope incarnation changed')
+        require(type(scope.get('memory_max')) is int and 0<scope['memory_max']<=268435456 and
+                scope.get('swap_max')==0 and scope.get('oom_kill')==0,'Owned payload resource coverage differs')
+    require(isinstance(scope.get('members'),list) and all(type(pid) is int and pid>0 for pid in scope['members']),
+            'Owned scope membership coverage missing')
+    for key in ('owned_incarnations','known_incarnations','scope_incarnations','writer_hits','scan_errors'):
+        require(isinstance(kernel.get(key),list),'Process/writer coverage missing: '+key)
+    require(not kernel['scan_errors'],'Incomplete process/writer coverage')
+    require({item['pid'] for item in kernel['scope_incarnations']}==set(scope['members']),
+            'Scope membership/incarnation coverage differs')
+    for key in ('owned_incarnations','known_incarnations','scope_incarnations'):
+        for identity in kernel[key]:incarnation(identity)
+    return kernel
+
+
+def check_stop_evidence(fixture,witness,observations):
+    require(len(observations)==2 and type(witness.get('monotonic_ns')) is int,'Actual stop observations absent')
+    first,second=observations
+    require(all(type(sample.get('monotonic_ns')) is int for sample in observations) and
+            witness['monotonic_ns']<first['monotonic_ns'] and
+            second['monotonic_ns']-first['monotonic_ns']>=5000000000,'Stop samples must be separated by at least5s')
+    initial,commands=native_facts(witness,fixture);kernel=kernel_facts(witness,fixture)
+    require(any(turn['status']=='inProgress' for turn in initial['thread/turns/list']) and
+            any(item.get('status')=='inProgress' for item in commands),'Nonempty live native tool witness required')
+    known={incarnation(item) for item in kernel['known_incarnations']}
+    require(known and kernel['scope_incarnations'] and kernel['owned_incarnations'],
+            'Actual running owned payload/process witness required')
+    require({incarnation(item) for item in kernel['scope_incarnations']}<=known,'Unowned scoped payload process')
+    written={incarnation(item) for item in kernel.get('command_written_incarnations',[])}
+    for handle in initial['thread/backgroundTerminals/list']:
+        matched=[item for item in commands if item['id']==handle.get('itemId') and
+                 item.get('processId')==handle.get('processId')]
+        require(len(matched)==1 and handle.get('cwd')==fixture['workspace'],'Unbound actual native process handle')
+        if handle.get('osPid') is not None:
+            require(any(identity[1]==handle['osPid'] for identity in known),'Native PID has no observed incarnation')
+        else:require(written and written<=known,'Native PID absent without command-written independent witness')
+    require(initial['thread/backgroundTerminals/list'] or written and written<=known,
+            'No native handle or corroborated owned command process')
+    expected_items={item['id'] for item in commands};stable=None
+    for sample in observations:
+        facts,current=native_facts(sample,fixture);observed=kernel_facts(sample,fixture)
+        require(facts['thread/read']['thread']['status'].get('type')=='idle' and
+                all(turn['status'] in {'completed','interrupted','failed'} for turn in facts['thread/turns/list']),
+                'Native thread/turn still active or unknown')
+        require(not facts['thread/queue/list'] and not facts['thread/backgroundTerminals/list'],
+                'Native queued work/process handles remain')
+        require({item['id'] for item in current}==expected_items and
+                all(item.get('status') in {'completed','failed'} and type(item.get('exitCode')) is int for item in current),
+                'Native tool termination coverage incomplete')
+        require(known<={incarnation(item) for item in observed['known_incarnations']} and
+                not observed['owned_incarnations'] and not observed['tool_scope']['members'] and
+                not observed['writer_hits'],'Owned process/writer remains or coverage lost')
+        identity=(facts['thread/read']['thread']['sessionId'],
+                  sorted((turn['id'],turn['status']) for turn in facts['thread/turns/list']),
+                  sorted((item['id'],item['status'],item['exitCode']) for item in current))
+        require(stable is None or identity==stable,'Stop observations disagree');stable=identity
+    return {'thread_id':fixture['thread_id'],'turn_ids':fixture['turn_ids'],
+            'tool_item_ids':sorted(expected_items),'known_process_incarnations':sorted(known),
+            'stop_interval_ns':second['monotonic_ns']-first['monotonic_ns'],
+            'managed_dispatch_accepted':False,'task50_accepted':False}
+
+
+def collect_snapshot(client,fixture,runtime,known,limits):
+    """Complete bounded pages, then literal scoped kernel facts."""
+    from audit_support.probe_os import capture_kernel
+    require(not client.records,'Earlier unretained native records remain')
+    total=0
+    for method in ('thread/read','thread/goal/get','thread/turns/list','thread/items/list',
+                   'thread/queue/list','thread/backgroundTerminals/list'):
+        params={'threadId':fixture['thread_id']}
+        if method=='thread/read':params['includeTurns']=False
+        if not method.endswith('/list'):client.call(method,params);continue
+        params.update(cursor=None,limit=100)
+        if method in {'thread/turns/list','thread/items/list'}:params['sortDirection']='asc'
+        if method=='thread/turns/list':params['itemsView']='notLoaded'
+        cursors=set()
+        for _ in range(limits['max_pages']):
+            page=client.call(method,dict(params));total+=len(page['data'])
+            require(total<=limits['max_items'],'Native total item/page bound exceeded')
+            cursor=page['nextCursor']
+            if cursor is None:break
+            require(cursor not in cursors,'Native cursor repeats');cursors.add(cursor);params['cursor']=cursor
+        else:raise InvalidEvidence('Unread native pages exceed admitted bound')
+    # Validation/kernel failures must leave these reads available to the
+    # UNKNOWN report. Clearing belongs after durable snapshot retention.
+    records=list(client.records)
+    if 'turn_ids' not in fixture:
+        turns=[item for record in records if record['method']=='thread/turns/list' for item in record['response']['data']]
+        require(len(turns)==1 and isinstance(turns[0]['id'],str) and turns[0]['id'],
+                'Fresh shell fixture cannot be associated with exactly one actual native turn')
+        fixture['turn_ids']=[turns[0]['id']]
+    snapshot={'schema_version':1,'kind':'NativeStopObservation','records':records,
+              'observed_ms':time.time_ns()//1000000,'monotonic_ns':time.monotonic_ns()}
+    native_facts(snapshot,fixture)
+    snapshot['kernel']=capture_kernel(fixture,runtime,known)
+    return snapshot
+
+
+def terminal_candidate(snapshot,fixture):
+    facts,commands=native_facts(snapshot,fixture);kernel=kernel_facts(snapshot,fixture)
+    return (facts['thread/read']['thread']['status'].get('type')=='idle' and
+            all(turn['status'] in {'completed','interrupted','failed'} for turn in facts['thread/turns/list']) and
+            all(item.get('status') in {'completed','failed'} and type(item.get('exitCode')) is int for item in commands) and
+            not facts['thread/queue/list'] and not facts['thread/backgroundTerminals/list'] and
+            not kernel['owned_incarnations'] and not kernel['tool_scope']['members'] and
+            not kernel['writer_hits'])
+
+
+def retain_observation(output,name,snapshot,maximum):
+    raw=(json.dumps(snapshot,sort_keys=True,indent=2,ensure_ascii=False,allow_nan=False)+'\n').encode()
+    current=sum(path.stat().st_size for path in output.iterdir() if path.is_file())
+    require(current+len(raw)+131072<=maximum,'Observer retained output bound exceeded')
+    path=output/name;write_new(path,snapshot)
+    return {'path':str(path),'sha256':sha256(path)}
+
+
+def retain_snapshot(client,output,name,snapshot,maximum):
+    require(client.records==snapshot['records'],'Snapshot differs from current unretained native reads')
+    reference=retain_observation(output,name,snapshot,maximum)
+    client.records.clear()
+    return reference
+
+
+def observe(admission,output,authorization):
+    from audit_support.probe_authority import (validate_sources,validate_resources,load_fixture,checked_schema_runtime)
+    from audit_support.native_read import NativeReadClient
+    from audit_support.evidence import artifact
+    from audit_support.raw_git import verify_materialization
+    report={'schema_version':1,'kind':'IndependentNativeStopPreflight','status':'unknown','stop_capability':False,
+            'managed_dispatch_accepted':False,'task50_accepted':False,
+            'remaining_conjunctions':['isolated-Kata','model-worker-common-Git-and-nested-Insula-grants',
+                                      'shared-writer-and-resource-reconciliation'],
+            'started_ms':time.time_ns()//1000000,'observations':[]}
+    created=False;client=None;source=None;fixture=None
+    def timeout(_signum,_frame):raise TimeoutError('Observer absolute host deadline exceeded')
+    try:
+        artifact(authorization);report['authorization']=authorization
+        own=validate_resources(admission,output)
+        signal.signal(signal.SIGALRM,timeout);signal.setitimer(signal.ITIMER_REAL,admission['resources']['deadline_ms']/1000)
+        output.mkdir(mode=0o700);created=True
+        source=validate_sources(admission,Path(__file__).resolve())
+        report.update(auditor=admission['auditor'],user_authority=admission['user_authority'],observer_scope=own)
+        checked_schema_runtime(admission['runtime'])
+        fixture=load_fixture(admission)
+        protected=admission['protected_thread_ids']
+        require(isinstance(protected,list) and len(set(protected))>=3 and
+                all(isinstance(value,str) and value for value in protected) and
+                os.environ.get('CODEX_THREAD_ID') in protected,'Protected exact native identity coverage missing')
+        for path in (fixture['workspace'],fixture['output'],fixture['common_git'],source['source'],fixture['operator_source']['source']):
+            require(not output.is_relative_to(path) and not Path(path).is_relative_to(output),
+                    'Observer output overlaps fixture/source scope')
+        report.update(fixture_provenance=admission['fixture_provenance'],runtime=admission['runtime'],
+                      native_command_provenance=fixture['native_command_provenance'])
+        client=NativeReadClient(admission['runtime'],fixture['thread_id'],admission['resources']['request_timeout_ms'])
+        report['transport']=client.transport;report['initialization']=client.initialize()
+        known={};witness=collect_snapshot(client,fixture,admission['runtime'],known,admission['resources'])
+        # Require a genuine nonempty running native/payload witness before
+        # waiting for termination. An already-empty thread cannot pass.
+        facts,commands=native_facts(witness,fixture);kernel=kernel_facts(witness,fixture)
+        require(len(commands)==1 and commands[0].get('source')=='userShell' and
+                commands[0].get('status')=='inProgress' and
+                any(turn['status']=='inProgress' for turn in facts['thread/turns/list']) and
+                kernel['tool_scope']['members']==[fixture['payload_process']['pid']] and
+                kernel['known_incarnations'] and kernel['owned_incarnations'],
+                'Actual live native-tool/scoped-payload witness is absent')
+        report['witness']=retain_snapshot(client,output,'witness.json',witness,admission['resources']['max_output_bytes'])
+        first=None;counter=0
+        while first is None:
+            time.sleep(1);sample=collect_snapshot(client,fixture,admission['runtime'],known,admission['resources'])
+            name='observation-%03d.json'%counter;counter+=1
+            report['observations'].append(retain_snapshot(client,output,name,sample,admission['resources']['max_output_bytes']))
+            if terminal_candidate(sample,fixture):first=sample
+        time.sleep(5.05)
+        second=collect_snapshot(client,fixture,admission['runtime'],known,admission['resources'])
+        report['stop_second']=retain_snapshot(client,output,'stop-second.json',second,admission['resources']['max_output_bytes'])
+        report['derived_facts']=check_stop_evidence(fixture,witness,[first,second])
+        report['status']='pass';report['stop_capability']=True
+    except (OSError,ValueError,KeyError,TypeError,IndexError) as error:
+        report.update(status='unknown',stop_capability=False,error_type=type(error).__name__,reason=str(error),
+                      ownership_released=False,cleanup_permitted=False)
+    finally:
+        if client is not None:client.close()
+        if created:
+            try:
+                if client is not None and client.records:
+                    report['incomplete_native_observation']=retain_observation(output,'incomplete-native-observation.json',
+                        {'schema_version':1,'kind':'IncompleteNativeObservation','records':client.records},
+                        admission['resources']['max_output_bytes'])
+                if source is not None:verify_materialization(Path(admission['auditor']['materialization']['path']),source['candidate'])
+                if fixture is not None:verify_materialization(Path(fixture['operator_materialization']['path']),fixture['operator_source']['candidate'])
+                artifact(authorization)
+                if client is not None:checked_schema_runtime(admission['runtime'])
+                if fixture is not None:artifact(admission['native_shell']['executable'])
+            except (OSError,ValueError,KeyError,TypeError) as error:
+                report.update(status='unknown',stop_capability=False,error_type=type(error).__name__,reason=str(error))
+            report['ended_ms']=time.time_ns()//1000000;write_new(output/'report.json',report)
+        signal.setitimer(signal.ITIMER_REAL,0)
+    return report,0 if report['status']=='pass' else 3
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--probe',choices=['stop-capability'],required=True)
+    parser.add_argument('--authorization',type=Path,required=True)
+    parser.add_argument('--output',type=Path,required=True)
+    args=parser.parse_args();admission=strict_json(args.authorization)
+    report,exit_code=observe(admission,args.output,{'path':str(args.authorization),'sha256':sha256(args.authorization)})
+    print(json.dumps({'schema_version':1,'kind':report['kind'],'status':report['status'],
+                      'stop_capability':report['stop_capability'],'task50_accepted':False,
+                      'report':{'path':str(args.output/'report.json'),'sha256':sha256(args.output/'report.json')}
+                      if (args.output/'report.json').is_file() else None},sort_keys=True))
+    return exit_code
+
+
+if __name__=='__main__':raise SystemExit(main())

@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "task": "58.B",
+  "actor": "sureal/58-b-20261005a",
+  "native_thread_id": "01a109a2-1e13-7970-a00b-e97ba09f35ea",
+  "base_commit": "b32307da442598e192a9259d29a8650be1134589",
+  "branch": "codex/mac58/b-20261005a",
+  "write_scope": "docs/research/pilots/58/normalization-inventory/",
+  "external_output": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b",
+  "reservation_sha256": "d7708b676031ea839806b6bdc21e6c3035400b82a7aa47aa9fa5b879dbc51069",
+  "identity_ack_sha256": "12c76e37ec8f10ce5d24f7c24dba2b943d9cfd4c82d46874c5abaef9c5bef668",
+  "lead_ack_sha256": "c90f42d129ce5a4d7284dfe9a6669e1a82de142bd4e8ebbbf37728ef1991c911",
+  "systemd_command": [
+    "systemd-run",
+    "--user",
+    "--scope",
+    "--unit=sureal-58-b-20261005a-inventory-v3",
+    "-p",
+    "MemoryMax=2147483648",
+    "-p",
+    "MemorySwapMax=0",
+    "-p",
+    "RuntimeMaxSec=600",
+    "python3",
+    "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/run_live.py"
+  ],
+  "systemd_exit_code": 0,
+  "failed_launches": [
+    {
+      "output": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/live-output-attempt1",
+      "host_failure_receipt": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/attempt1-failure.json",
+      "inventory_executed": false,
+      "failure": "read-only root prevents /historical creation; host receipt then failed on unavailable memory.peak",
+      "child_exit_code": null
+    },
+    {
+      "output": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/live-output-v2",
+      "receipt": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/live-verified-attempt2.json",
+      "inventory_executed": false,
+      "exit_code": 1,
+      "failure": "read-only root prevents /historical creation"
+    }
+  ],
+  "operational_limit": "memory.peak is absent; sampled memory.current and CPU process peak RSS are retained separately. First commentary incorrectly inferred a produced module artifact before reading the child log; corrected before acceptance.",
+  "source_changes_during_work": "lead reported unrelated Kata reader commit advanced mainline; this candidate remains on assigned base and requires lead-owned refresh/recheck",
+  "authority": "provisional happy-path preparation; does not close43/50/53",
+  "optimizer_updates": 0,
+  "scientific_source_mutations": 0,
+  "scientific_payload_release": false,
+  "retention": "all original scientific payloads and pilot failures preserved locally; no HDFS operation",
+  "missing_inputs": [
+    "changed-buffer native prediction exports and official AP/APH",
+    "declared conditional recalibration pass order/count/momentum/counter policy",
+    "complete per-arm parameter/buffer/module-mode/RNG equality receipts",
+    "task42 object/proposal survival identities relevant to interpretation",
+    "matched terminal four-recipe sustained study checkpoints/results",
+    "named initial-experiments-evidence-audit.json absent; actual audit Markdown and analysis.json retained"
+  ]
+}

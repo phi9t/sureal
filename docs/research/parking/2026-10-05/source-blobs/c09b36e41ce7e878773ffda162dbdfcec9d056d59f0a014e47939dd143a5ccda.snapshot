@@ -1,0 +1,9 @@
+import pathlib,sys,json,hashlib,subprocess,shutil,os
+P=pathlib.Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(P));from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+C=pathlib.Path.home()/'.cache/waystone/waymo-perception';R=C/'insula/motion-real-metric-check-v1';R.mkdir();code=R/'code';code.mkdir();shutil.copy('.scratch/motion_metric_check.py',code/'check.py');inputs=R/'inputs';inputs.mkdir();out=R/'output';out.mkdir();sha=lambda p:hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()
+for split in ['training','validation']:
+ d=inputs/split;d.mkdir()
+ for offset in [0,2]:
+  os.link(C/'insula/motion-real-metric-v2'/split/f'score-{offset}.json',d/f'score-{offset}.json');os.link(C/'insula/motion-real-metric-reference-v1'/split/f'expected-{offset}.tsv',d/f'expected-{offset}.tsv')
+root=C/'insula/rootfs-v2';lock=json.loads(pathlib.Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);command=launch_plan(root,code,inputs,out,['python','/experiment/check.py']);r=subprocess.run(command,capture_output=True,text=True,timeout=30);(out/'live.log').write_text(r.stdout+r.stderr);assert r.returncode==0,r.stderr;receipt={'command':command,'exit_code':0,'runtime_lock':lock,'pins':{str(p):sha(p) for folder in [code,inputs] for p in folder.rglob('*') if p.is_file()},'parent_receipt_hashes':{name:sha(P/'research'/name) for name in ['motion-real-metric-execution.json','motion-real-metric-reference-execution.json']},'validation':json.loads((out/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in out.iterdir() if p.is_file()},'scope':'independently live-reconciled native acquired training/validation target metric handoff; oracle diagnostics only, not a forecasting baseline'};(P/'research/motion-real-metric-handoff-verified.json').write_text(json.dumps(receipt,indent=2));print(r.stdout)

@@ -1,0 +1,70 @@
+"""One read-only pre-eviction scientific support pilot; not protocol closure."""
+import sys,json,hashlib,subprocess,time,resource
+from pathlib import Path
+from datetime import datetime,timezone
+HERE=Path(__file__).resolve().parents[1]/'experiments/waymo-perception'
+sys.path.insert(0,str(HERE))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+CACHE=Path.home()/'.cache/waystone/waymo-perception'
+WORKING=CACHE/'scientific-processing'
+def sha(p):
+ with p.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+def save(p,d):p.write_text(json.dumps(d,indent=2)+'\n')
+root=CACHE/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
+orchestrator_sha=sha(Path(__file__))
+manifest=HERE/'scientific-acquisition.candidate.json';m=json.loads(manifest.read_text());started=time.monotonic();logged=-30
+while time.monotonic()-started<900:
+ found=None
+ for scene in m['scenes']:
+  if (CACHE/'insula'/f'scientific-semantic-support-{scene}').exists():continue
+  processing=WORKING/'cohort-v1'/scene/'points';receipt=processing/'evidence/reconstruction/receipt.json';report=processing/'points/report.json'
+  if not receipt.is_file() or not report.is_file() or (processing/'point-eviction.json').exists():continue
+  d=json.loads(receipt.read_text());r=json.loads(report.read_text());annotated=[x for x in r['rows'] if x['segmentation_present']]
+  if not annotated or not all((processing/'points'/x['artifact']).is_file() for x in annotated):continue
+  found=(scene,processing,receipt,report,d,r);break
+ if found:break
+ if time.monotonic()-started-logged>=30:
+  print('Waiting for a completed un-evicted scientific reconstruction',flush=True);logged=time.monotonic()-started
+ time.sleep(5)
+else:raise SystemExit('No eligible pre-eviction pilot within bounded observation interval; no sources restarted')
+scene,processing,receipt,report,d,r=found
+assert d['scene']==scene and all(x['exit_code']==0 for x in d['checks'])
+assert sha(report)==d['artifacts']['points/report.json']
+assert d['official_split']==m['scenes'][scene]['official_split'] and d['research_splits']==m['scenes'][scene]['research_splits']
+source=CACHE/'scientific-source-audit'/f"{d['official_split']}-lidar-{scene}.json"
+assert sha(source)==d['source_record_sha256']
+assert d['runtime_lock']==lock
+for n,h in d['candidate_hashes'].items():assert sha(HERE/n)==h
+base=CACHE/'insula'/f'scientific-semantic-support-{scene}'
+base.mkdir();(base/'input').mkdir();(base/'output').mkdir()
+trusted={'scene':scene,'report_sha256':sha(report),'reconstruction_receipt_sha256':sha(receipt),'membership':m['scenes'][scene],'manifest_sha256':sha(manifest),'source_record_sha256':sha(source)}
+save(base/'input/trusted.json',trusted)
+code="""import json,hashlib,numpy as np
+from pathlib import Path
+from pipeline.semantic_support import semantic_support
+d=json.loads(Path('/mnt/trusted.json').read_text());report=Path('/source/points/report.json');assert hashlib.sha256(report.read_bytes()).hexdigest()==d['report_sha256'];r=json.loads(report.read_text());reference=[0]*23;used=[]
+def records():
+ for row in r['rows']:
+  identity={k:row[k] for k in ('context','timestamp','laser','return')};entry={'identity':identity,'return_present':row['return_present'],'observations':{},'targets':{}}
+  if row['segmentation_present']:
+   path=Path('/source/points')/row['artifact'];assert path.stat().st_size<=128*1024**2;assert hashlib.sha256(path.read_bytes()).hexdigest()==row['sha256']
+   with np.load(path,allow_pickle=False) as x:
+    xyz=x['xyz'].copy();labels=x['segmentation'].copy();assert xyz.shape==(row['points'],3) and labels.shape==(row['points'],2);entry['observations']['xyz']=xyz;entry['targets']['segmentation']=labels
+   for label in labels[:,1]:reference[int(label)]+=1
+   used.append((path,row['sha256']))
+  yield entry
+result=semantic_support(records());assert result['native_counts']==reference
+for path,h in used:assert hashlib.sha256(path.read_bytes()).hexdigest()==h
+result['scene']=d['scene'];result['membership']=d['membership'];result['source_report_sha256']=d['report_sha256'];Path('/outputs/support.json').write_text(json.dumps(result,indent=2));print('PASS native valid-range semantic support',d['scene'],result['eligible_point_elements'])
+"""
+cmd=launch_plan(root,HERE,processing,base/'output',['python','-c',code]);i=cmd.index('--');cmd[i:i]=['--ro-bind',str(base/'input'),'/mnt'];tick=time.monotonic();candidate={'pipeline/semantic_support.py':sha(HERE/'pipeline/semantic_support.py')};p=subprocess.run(cmd,capture_output=True,text=True);(base/'live.log').write_text(p.stdout+p.stderr);print(p.stdout+p.stderr,flush=True)
+if p.returncode:raise SystemExit('Unpromoted support pilot failed (possibly eviction raced); preserve failure and use immutable replay later')
+assert sha(receipt)==trusted['reconstruction_receipt_sha256'] and sha(report)==trusted['report_sha256'] and sha(source)==trusted['source_record_sha256'] and sha(manifest)==trusted['manifest_sha256']
+assert all(sha(HERE/n)==h for n,h in candidate.items())
+assert sha(Path(__file__))==orchestrator_sha
+result={'checks':[{'command':cmd,'exit_code':p.returncode}],'verified_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-tick,'peak_child_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'runtime_lock':lock,'candidate_hashes':candidate,'input_identity':trusted,'orchestrator_sha256':orchestrator_sha,'artifacts':{str(p.relative_to(base)):sha(p) for p in base.rglob('*') if p.is_file()},'validation':json.loads((base/'output/support.json').read_text()),'scope':'one native scientific valid-range target support pilot only; full-cohort coverage and final checkpoint/publication reconciliation remain required'}
+save(base/'receipt.json',result);e={'receipt':str(base/'receipt.json'),'receipt_sha256':sha(base/'receipt.json'),**result};save(HERE/'research'/f'scientific-semantic-support-{scene}-verified.json',e)
+assert all(sha(base/n)==h for n,h in result['artifacts'].items())
+with (HERE/'research/r0-execution-ledger.md').open('a') as f:f.write(f"\nRead-only native scientific semantic support pilot passed for {scene}: {result['validation']['eligible_point_elements']} eligible valid-range labels; independent literal class-count loop agrees with semantic_support. No source mutation/staging/driver edits. Final lifecycle linkage/full-cohort support and protocol remain open.\n")
+print('PASS semantic support pilot receipt',scene,flush=True)

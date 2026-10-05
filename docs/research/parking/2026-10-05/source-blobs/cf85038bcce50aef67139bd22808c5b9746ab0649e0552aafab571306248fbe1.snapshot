@@ -1,0 +1,12 @@
+import subprocess,time
+from pathlib import Path
+queue=Path('/proc/4073579/cmdline');initial=Path('/proc/4087227/cmdline')
+while initial.exists():
+ if b'capture-scientific-semantic-support.py' not in initial.read_bytes():raise RuntimeError('initial capture PID changed')
+ time.sleep(5)
+while queue.exists():
+ if b'process-scientific-cohort.py' not in queue.read_bytes():raise RuntimeError('queue PID changed')
+ r=subprocess.run(['python','-u','.scratch/capture-scientific-semantic-support.py'])
+ if r.returncode not in (0,1):raise RuntimeError('unexpected capture failure')
+ time.sleep(5)
+print('TERMINAL resumed queue observation',flush=True)

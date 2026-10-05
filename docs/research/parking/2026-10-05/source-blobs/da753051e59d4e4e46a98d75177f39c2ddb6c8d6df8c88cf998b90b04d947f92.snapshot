@@ -1,0 +1,32 @@
+"""Contract tests using the retained real engineering replay and rehashed mutations."""
+import copy,hashlib,json,shutil,tempfile,unittest
+from pathlib import Path
+from native_shape_retained_audit import verify
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+class AuditTests(unittest.TestCase):
+ def test_real_receipt_and_rehashed_mutants(self):
+  original=json.loads(Path('/source/receipt.json').read_text())
+  mutations=[None,lambda r:r['checks'][0].update(exit_code=1),lambda r:r.update(code_sha256={}),lambda r:r.update(artifacts={}),lambda r:r['transfer'].update(raw_peak_bytes_including_retained=2147483649),lambda r:r['validation'].update(records_verified=1)]
+  for mutation in mutations:
+   with self.subTest(mutation=mutation),tempfile.TemporaryDirectory() as tmp:
+    root=Path(tmp)/'receipt';shutil.copytree('/source',root);r=copy.deepcopy(original)
+    if mutation:mutation(r)
+    (root/'receipt.json').write_text(json.dumps(r))
+    e={'receipt_sha256':sha(root/'receipt.json'),'job':original['input_identity'],'job_sha256':original['job_sha256'],'source_receipt_sha256':original['source_receipt_sha256'],'code_sha256':original['code_sha256'],'runtime_lock':original['runtime_lock'],'raw_limit_bytes':2147483648}
+    if mutation:
+     with self.assertRaises(ValueError):verify(root,e,Path('/experiment'))
+    else:
+     v=verify(root,e,Path('/experiment'));self.assertEqual(v['records_verified'],1980)
+ def test_rehashed_grid_and_identity_mutants(self):
+  original=json.loads(Path('/source/receipt.json').read_text())
+  mutations=[lambda s:s['records'][0].update(native_shape=[64,2650,3]),lambda s:s['records'][0].update(context='wrong'),lambda s:s['records'][1].update(**{'return':1}),lambda s:s['records'].pop(),lambda s:s.update(present_shape_records=0),lambda s:s['records'].__setitem__(slice(2,4),copy.deepcopy(s['records'][:2]))]
+  for mutation in mutations:
+   with self.subTest(mutation=mutation),tempfile.TemporaryDirectory() as tmp:
+    root=Path(tmp)/'receipt';shutil.copytree('/source',root);r=copy.deepcopy(original)
+    report=json.loads((root/'worker/shapes.json').read_text());mutation(report['shapes'])
+    (root/'worker/shapes.json').write_text(json.dumps(report))
+    r['report_sha256']=r['artifacts']['worker/shapes.json']=sha(root/'worker/shapes.json')
+    (root/'receipt.json').write_text(json.dumps(r))
+    e={'receipt_sha256':sha(root/'receipt.json'),'job':original['input_identity'],'job_sha256':original['job_sha256'],'source_receipt_sha256':original['source_receipt_sha256'],'code_sha256':original['code_sha256'],'runtime_lock':original['runtime_lock'],'raw_limit_bytes':2147483648}
+    with self.assertRaises(ValueError):verify(root,e,Path('/experiment'))
+if __name__=='__main__':unittest.main()

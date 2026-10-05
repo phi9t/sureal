@@ -1,0 +1,135 @@
+{
+  "acceptance": {
+    "all_four_seeds_complete": true,
+    "classification_outcome_gated": false,
+    "valid_measurements": true
+  },
+  "aggregate": {
+    "baseline_behavior": "no_supported_hidden_completion",
+    "mean_hidden_support_a": 0.0,
+    "mean_hidden_support_b": 0.0,
+    "mean_observed_common_recall": 0.765712258537032,
+    "mean_unobserved_common_recall": 0.0564191350822387,
+    "support_labels": [
+      "unsupported",
+      "unsupported",
+      "unsupported",
+      "unsupported"
+    ]
+  },
+  "artifacts": {
+    "raw_results_sha256": "1884761378c1ec6d9c6b819e0245d4bc04bc3b72a2037fe05d23d422038c56a3",
+    "validation_report_sha256": "a62923fe8cdeb7f7217e114aa391d88acaabfb472573ba18fa451f794ca98351"
+  },
+  "checkpoint_sha256": "55fddb5dcbb5d375ba8036ec959acd215ee8ffd89e173cdabe1199e034052662",
+  "comparison": {
+    "analytic_baseline_behavior": "at_least_one_hybrid_completion",
+    "analytic_baseline_path": "../insula-scout/synthetic_results.json",
+    "favorable_outcome_required": false,
+    "photoreal_behavior": "no_supported_hidden_completion"
+  },
+  "date_utc": "2026-09-27",
+  "episode": {
+    "device": "OPTIX",
+    "manifest_sha256": "9df5874db09c15b08b708a7164531fea681a7897faf038944d359665067a92f8",
+    "profile": "benchmark",
+    "schema_version": 2,
+    "visibility": {
+      "scene_a": {
+        "hidden_object_context_fraction": 0.0,
+        "hidden_object_target_fraction": 0.7312683131017162,
+        "target_new_surface_fraction": 0.9823546711106754,
+        "target_only_surface_fraction": 0.7312683131017162
+      },
+      "scene_b": {
+        "hidden_object_context_fraction": 0.0,
+        "hidden_object_target_fraction": 0.5971065920567763,
+        "target_new_surface_fraction": 0.9830052267534662,
+        "target_only_surface_fraction": 0.5971065920567763
+      }
+    }
+  },
+  "interpretation_guardrail": "The two ground-truth hidden scenes are observationally indistinguishable from the context. This probe measures completion support and coherence, not recovery of a uniquely correct hidden scene.",
+  "model_provenance": {
+    "checkpoint_sha256": "55fddb5dcbb5d375ba8036ec959acd215ee8ffd89e173cdabe1199e034052662",
+    "vggt": {
+      "files": {
+        "config.json": "a73e929a168b900546a84fe88cd70dfaaf2f8e39cf77355b12984eaa686f3855",
+        "model.safetensors": "f164acf60724910d8fe1578bb499d800850c7bb0948db7555c413f9fbe60467e"
+      },
+      "repository": "facebook/VGGT-1B",
+      "revision": "860abec7937da0a4c03c41d3c269c366e82abdf9"
+    }
+  },
+  "question": "Does stock Surflo express coherent scene-level alternatives under identical ambiguous context?",
+  "runs": [
+    {
+      "camera_rmse_after_observed_alignment": 0.30532750487327576,
+      "completion_candidate_precision_to_either_hypothesis": 0.0,
+      "exclusive_hidden_support_a": 0.0,
+      "exclusive_hidden_support_b": 0.0,
+      "observed_common_recall": 0.768699075345601,
+      "peak_vram_gib": 10.332441806793213,
+      "seed": 0,
+      "support_label": "unsupported",
+      "unobserved_common_recall": 0.05799992472430276,
+      "wall_seconds": 4.791229377966374
+    },
+    {
+      "camera_rmse_after_observed_alignment": 0.3103009760379791,
+      "completion_candidate_precision_to_either_hypothesis": 0.0,
+      "exclusive_hidden_support_a": 0.0,
+      "exclusive_hidden_support_b": 0.0,
+      "observed_common_recall": 0.7684244255241234,
+      "peak_vram_gib": 10.33665657043457,
+      "seed": 1,
+      "support_label": "unsupported",
+      "unobserved_common_recall": 0.05826338966464677,
+      "wall_seconds": 4.707226891070604
+    },
+    {
+      "camera_rmse_after_observed_alignment": 0.31579795479774475,
+      "completion_candidate_precision_to_either_hypothesis": 0.0,
+      "exclusive_hidden_support_a": 0.0,
+      "exclusive_hidden_support_b": 0.0,
+      "observed_common_recall": 0.7605969056120113,
+      "peak_vram_gib": 10.33665657043457,
+      "seed": 2,
+      "support_label": "unsupported",
+      "unobserved_common_recall": 0.05886559524257593,
+      "wall_seconds": 4.708410523831844
+    },
+    {
+      "camera_rmse_after_observed_alignment": 0.3094377815723419,
+      "completion_candidate_precision_to_either_hypothesis": 0.0,
+      "exclusive_hidden_support_a": 0.0,
+      "exclusive_hidden_support_b": 0.0,
+      "observed_common_recall": 0.765128627666392,
+      "peak_vram_gib": 10.33665657043457,
+      "seed": 3,
+      "support_label": "unsupported",
+      "unobserved_common_recall": 0.05054763069742933,
+      "wall_seconds": 4.706015530973673
+    }
+  ],
+  "schema_version": 2,
+  "settings": {
+    "inference_mode": "plain",
+    "num_query_points": 100000,
+    "num_steps": 100,
+    "seeds": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "tau": 0.12670738220214844,
+    "tau_scene_diagonal_fraction": 0.01
+  },
+  "source": {
+    "base_revision": "4530c070e61f67b0aa37ab079c8120a08d1f09ff",
+    "implementation_sha256": "6fc3d0fecdea2d0e46fa9981f19c4669220ed2184dc77afb6b055fe45c6b4a77",
+    "worktree_state": "uncommitted_overlay"
+  },
+  "status": "pass"
+}

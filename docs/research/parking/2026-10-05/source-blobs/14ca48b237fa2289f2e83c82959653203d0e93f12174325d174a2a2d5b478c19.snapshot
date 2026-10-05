@@ -1,0 +1,14 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.runtime_identity import verify_rootfs
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';evidence=code/'research/native-one-batch-overfit-execution-verified.json';receipt=json.loads(evidence.read_text());verify_rootfs(cache/'gpu-rootfs',receipt['runtime_lock']['rootfs_sha256'])
+base=cache/'insula/native-one-batch-overfit-training-audit-v1';base.mkdir();out=base/'output';out.mkdir();inputs=base/'input';inputs.mkdir();(inputs/'expected.json').write_text(json.dumps({'receipt':receipt,'receipt_sha256':sha(evidence)}))
+command=receipt['checks'][0]['command'].copy();command=[str(out) if x==str(cache/'scientific-processing/native-one-batch-overfit-v1') else '/tmp/workers/audit-native-one-batch-overfit-worker.py' if x=='/experiment/gpu/native-one-batch-overfit.py' else x for x in command]
+i=command.index('--');command[i:i]=['--ro-bind',str(cache/'scientific-processing/native-one-batch-overfit-v1'),'/tmp/retained','--ro-bind',str(inputs),'/tmp/audit-input','--ro-bind',str(Path('.scratch').resolve()),'/tmp/workers']
+worker=Path('.scratch/audit-native-one-batch-overfit-worker.py');digest=sha(worker)
+with (out/'live.log').open('w') as log:run=subprocess.run(command,stdout=log,stderr=subprocess.STDOUT,timeout=180)
+print((out/'live.log').read_text());assert run.returncode==0 and sha(worker)==digest
+result={'checks':[{'command':command,'exit_code':0}],'runtime_lock':receipt['runtime_lock'],'producer_evidence_sha256':sha(evidence),'worker_sha256':digest,'validation':json.loads((out/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in out.iterdir()}}
+(code/'research/native-one-batch-overfit-training-audit-verified.json').write_text(json.dumps(result,indent=2)+'\n')

@@ -1,0 +1,14 @@
+import json,gzip,hashlib
+from pathlib import Path
+from pipeline.bounded_sidecar_eviction import evict_sidecars
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+for case in ['capacity','tampered','success']:
+ b=Path('/outputs')/case;p=b/'points';q=b/'publication';(p/'sidecars/lidar_box').mkdir(parents=True);(q/'input').mkdir(parents=True);(q/'packed').mkdir();member=p/'sidecars/lidar_box/f.json';member.write_text('payload');archive=q/'packed/sidecars.tar';archive.write_bytes(b'fixture mirrored archive');prov={'scene':'fixture','scene_receipt_sha256':'a'*64,'source_receipt_hashes':{'lidar_box':'b'*64}};data=(json.dumps({'files':{'lidar_box/f.json':sha(member)},'provenance':prov},separators=(',',':'))+'\n').encode();th=hashlib.sha256(data).hexdigest();(q/'input/trusted.json.gz').write_bytes(gzip.compress(data,mtime=0));r={'scene':'fixture','checks':[{'stage':s,'exit_code':0} for s in ['pack-live','hdfs-put','hdfs-download','independent-bundle-live','manifest-put-last','manifest-download']],'artifacts':{'packed/sidecars.tar':sha(archive)},'validation':{'provenance':prov,'files':1},'scene_receipt_sha256':'a'*64,'component_receipt_hashes':prov['source_receipt_hashes'],'archive_hdfs_uri':'hdfs://fixture/archive','archive':{'sha256':sha(archive)},'bounded_recovery':{'temporary_trusted_input_sha256':th}};(q/'receipt.json').write_text(json.dumps(r));ph=sha(q/'receipt.json')
+ if case=='tampered':member.write_text('changed')
+ try:result=evict_sidecars(p,q,expected_publication_sha256=ph,expected_trusted_sha256=th,available_metadata_bytes=1 if case=='capacity' else 1024*1024)
+ except ValueError:
+  assert case!='success' and member.exists() and archive.exists() and not (p/'sidecar-eviction.json').exists()
+ else:
+  assert case=='success' and not member.exists() and not archive.exists()
+  intent=json.loads(gzip.decompress((p/'sidecar-eviction-intent.json.gz').read_bytes()));final=json.loads((p/'sidecar-eviction.json').read_text());assert intent['files']==final['files'] and final['status'].endswith('completed')
+print('PASS live bounded eviction: capacity refusal, changed source refusal, complete intent and deletion')

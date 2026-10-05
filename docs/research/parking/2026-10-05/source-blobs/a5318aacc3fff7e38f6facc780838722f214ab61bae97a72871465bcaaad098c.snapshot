@@ -1,0 +1,368 @@
+#!/usr/bin/env python3
+"""Lead-owned, separately admitted native fixture; never managed dispatch.
+
+Only launch mutates native state. It creates one no-goal thread and sends one
+bounded shell command. Each request is durable before send; uncertainty never
+retries a mutation. Payload runs in its own capped scope, separate from the
+native PTY parent. This helper does not accept any collaboration milestone.
+"""
+import argparse
+import base64
+import hashlib
+import json
+import os
+from pathlib import Path
+import shlex
+import socket
+import stat
+import struct
+import subprocess
+import time
+
+
+def digest(path):
+    with Path(path).open('rb') as stream:
+        return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def reference(path):
+    return {'path': str(Path(path).resolve()), 'sha256': digest(path)}
+
+
+def save(path, value):
+    path = Path(path)
+    data = (json.dumps(value, sort_keys=True, separators=(',', ':'))+'\n').encode()
+    with path.open('xb') as stream:
+        stream.write(data)
+        stream.flush()
+        os.fsync(stream.fileno())
+    descriptor = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+
+
+def reopen(ref):
+    path = Path(ref['path'])
+    if not path.is_absolute() or path.is_symlink() or digest(path) != ref['sha256']:
+        raise ValueError('invalid immutable file reference')
+    return path
+
+
+def incarnation(pid):
+    text = Path(f'/proc/{pid}/stat').read_text()
+    fields = text[text.rindex(')')+2:].split()
+    return {'boot_id': Path('/proc/sys/kernel/random/boot_id').read_text().strip(),
+            'pid': pid, 'start_ticks': int(fields[19]), 'parent_pid': int(fields[1]),
+            'uid': Path(f'/proc/{pid}').stat().st_uid}
+
+
+def scope(pid):
+    rows = Path(f'/proc/{pid}/cgroup').read_text().splitlines()
+    paths = [row[3:] for row in rows if row.startswith('0::')]
+    if len(paths) != 1:
+        raise ValueError('one unified cgroup required')
+    path = Path('/sys/fs/cgroup'+paths[0])
+    info = path.stat()
+    return {'path': str(path), 'device': info.st_dev, 'inode': info.st_ino,
+            'memory_max': (path/'memory.max').read_text().strip(),
+            'memory_swap_max': (path/'memory.swap.max').read_text().strip()}
+
+
+class Wire:
+    """Bounded WebSocket JSON-RPC; deliberately private to this fixture."""
+    def __init__(self, endpoint, timeout=2):
+        if not 0 < timeout <= 2:
+            raise ValueError('bounded transport timeout required')
+        self.timeout = timeout
+        self.deadline = time.monotonic()+timeout
+        self.connection = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self.buffer = b''
+        self.sequence = 0
+        try:
+            self.check_deadline()
+            self.connection.connect(str(endpoint))
+            self.peer = struct.unpack('3i', self.connection.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, 12))
+            self.upgrade()
+        except BaseException:
+            self.connection.close()
+            raise
+
+    def upgrade(self):
+        key = base64.b64encode(os.urandom(16)).decode()
+        self.connection.sendall(('GET / HTTP/1.1\r\nHost: localhost\r\nUpgrade: websocket\r\n'
+             'Connection: Upgrade\r\nSec-WebSocket-Key: '+key+
+             '\r\nSec-WebSocket-Version: 13\r\n\r\n').encode())
+        while b'\r\n\r\n' not in self.buffer:
+            self.check_deadline()
+            piece = self.connection.recv(4096)
+            if not piece:
+                self.connection.close()
+                raise EOFError('native transport closed before Upgrade')
+            self.buffer += piece
+            if len(self.buffer) > 16384:
+                raise ValueError('handshake cap')
+        header, self.buffer = self.buffer.split(b'\r\n\r\n', 1)
+        lines = header.decode().split('\r\n')
+        fields = {k.lower(): v.strip() for k, v in
+                  (line.split(':', 1) for line in lines[1:])}
+        expected = base64.b64encode(hashlib.sha1((key+
+                  '258EAFA5-E914-47DA-95CA-C5AB0DC85B11').encode()).digest()).decode()
+        if (lines[0] != 'HTTP/1.1 101 Switching Protocols' or
+            fields.get('sec-websocket-accept') != expected or
+            fields.get('upgrade', '').lower() != 'websocket' or
+            'upgrade' not in fields.get('connection', '').lower().split(', ')):
+            self.connection.close()
+            raise ValueError('invalid WebSocket upgrade')
+
+    def close(self):
+        self.connection.close()
+
+    def check_deadline(self):
+        remaining = self.deadline-time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError('absolute native I/O deadline')
+        self.connection.settimeout(min(self.timeout, remaining))
+
+    def read(self, length):
+        while len(self.buffer) < length:
+            self.check_deadline()
+            piece = self.connection.recv(min(65536, length-len(self.buffer)))
+            if not piece:
+                raise EOFError('native transport EOF')
+            self.buffer += piece
+        value, self.buffer = self.buffer[:length], self.buffer[length:]
+        return value
+
+    def send(self, value, opcode=1):
+        self.check_deadline()
+        data = json.dumps(value, separators=(',', ':')).encode() if opcode == 1 else value
+        if len(data) > 1048576:
+            raise ValueError('request cap')
+        size, mask = len(data), os.urandom(4)
+        header = bytes([0x80 | opcode, 0x80 | size]) if size < 126 else (
+            bytes([0x80 | opcode, 0x80 | 126])+struct.pack('!H', size) if size < 65536
+            else bytes([0x80 | opcode, 0x80 | 127])+struct.pack('!Q', size))
+        self.connection.sendall(header+mask+bytes(v ^ mask[i % 4] for i, v in enumerate(data)))
+
+    def receive(self):
+        first, second = self.read(2)
+        if not first & 0x80 or first & 0x70 or second & 0x80:
+            raise ValueError('unsupported frame')
+        length = second & 127
+        if length == 126:
+            length = struct.unpack('!H', self.read(2))[0]
+        elif length == 127:
+            length = struct.unpack('!Q', self.read(8))[0]
+        if length > 1048576:
+            raise ValueError('response cap')
+        value, opcode = self.read(length), first & 15
+        if opcode == 9:
+            self.send(value, 10)
+            return None
+        if opcode != 1:
+            raise ValueError('unsupported opcode or closed transport')
+        return json.loads(value)
+
+    def call(self, method, params, output, runtime):
+        self.deadline = time.monotonic()+self.timeout
+        self.sequence += 1
+        request = {'id': self.sequence, 'method': method, 'params': params}
+        started = time.time_ns()//1000000
+        save(output/f'{self.sequence:04}-intent.json',
+             {'schema_version': 1, 'kind': 'NativeFixtureIntent',
+              'request': request, 'started_ms': started, 'transport_incarnation': runtime})
+        self.send(request)
+        while time.monotonic() < self.deadline:
+            response = self.receive()
+            self.check_deadline()
+            if response is None or response.get('id') != self.sequence:
+                continue  # Never retain private/unrelated notifications.
+            path = output/f'{self.sequence:04}-result.json'
+            save(path, {'schema_version': 1, 'kind': 'NativeFixtureRPC',
+                 'method': method, 'params': params, 'response': response,
+                 'started_ms': started, 'ended_ms': time.time_ns()//1000000,
+                 'transport_incarnation': runtime})
+            if 'error' in response:
+                raise ValueError('native RPC refused; inspect retained result')
+            return response['result'], reference(path)
+        raise TimeoutError('native response deadline; no mutation retry')
+
+
+def fixture_command(source, output, fixture_id, tools=None):
+    if not fixture_id or any(c not in 'abcdefghijklmnopqrstuvwxyz0123456789-' for c in fixture_id):
+        raise ValueError('invalid fixture ID')
+    tools = tools or {'systemd_run': '/usr/bin/systemd-run', 'python': '/usr/bin/python3'}
+    argv = [str(tools['systemd_run']), '--user', '--scope', '--unit', 'sureal-sustained-collab-'+fixture_id,
+            '--property', 'MemoryMax=134217728', '--property', 'MemorySwapMax=0',
+            '--', str(tools['python']), '-I', '-B', str(source), 'payload', '--output', str(output),
+            '--fixture-id', fixture_id]
+    return shlex.join(argv)
+
+
+def workspace_identity(admission, git, source, output):
+    workspace, common, canonical = [Path(admission[key]) for key in ('workspace', 'common_git', 'canonical')]
+    source_root = Path(admission['source_root'])
+    for path in (workspace, common, canonical, source_root, output.parent):
+        if not path.is_absolute() or path.resolve() != path or path.stat().st_uid != os.getuid():
+            raise ValueError('literal owned nonsymlink workspace identity required')
+    if (workspace == canonical or common != canonical/'.git' or
+        not source.is_relative_to(source_root) or source.is_relative_to(workspace) or any(
+        output.is_relative_to(path) or path.is_relative_to(output)
+        for path in (workspace, common, canonical, source_root))):
+        raise ValueError('fixture/source/output/canonical scope conflict')
+    environment = {**os.environ, 'GIT_OPTIONAL_LOCKS': '0', 'GIT_CONFIG_GLOBAL': '/dev/null', 'GIT_CONFIG_NOSYSTEM': '1'}
+    def read(*arguments):
+        result = subprocess.run([str(git), '-C', str(workspace), *arguments],
+                                env=environment, capture_output=True, timeout=2, check=True)
+        if len(result.stdout)+len(result.stderr) > 65536:
+            raise ValueError('Git fact output cap')
+        return result.stdout.decode().strip()
+    facts = {'worktree': read('rev-parse', '--show-toplevel'),
+             'git_directory': read('rev-parse', '--absolute-git-dir'),
+             'common_git': read('rev-parse', '--path-format=absolute', '--git-common-dir'),
+             'head': read('rev-parse', 'HEAD'),
+             'branch': read('symbolic-ref', 'HEAD'),
+             'status': read('status', '--porcelain=v1', '--untracked-files=all'),
+             'superproject': read('rev-parse', '--show-superproject-working-tree')}
+    if (facts['worktree'] != str(workspace) or facts['common_git'] != str(common) or
+        facts['git_directory'] == str(common) or facts['head'] != admission['workspace_base'] or
+        facts['branch'] != 'refs/heads/codex/collaboration50-fixture/'+admission['fixture_id'] or
+        facts['status'] or facts['superproject']):
+        raise ValueError('actual clean owned linked fixture worktree required')
+    for key, path in [('workspace_identity', workspace), ('common_git_identity', common)]:
+        info = path.stat()
+        if any(admission[key][field] != value for field, value in [('device', info.st_dev), ('inode', info.st_ino)]):
+            raise ValueError('admitted directory incarnation changed')
+    return facts
+
+
+def payload(output, fixture_id):
+    output = Path(output)
+    own_scope = scope(os.getpid())
+    if own_scope['memory_max'] != '134217728' or own_scope['memory_swap_max'] != '0':
+        raise ValueError('payload resource caps required')
+    save(output/'payload-running.json', {'schema_version': 1, 'kind': 'NativeFixturePayload',
+         'fixture_id': fixture_id, 'process': incarnation(os.getpid()), 'scope': own_scope,
+         'source': reference(__file__), 'observed_ms': time.time_ns()//1000000,
+         'children_spawned': 0, 'scientific_or_source_writes': False})
+    time.sleep(60)
+    save(output/'payload-returning.json', {'fixture_id': fixture_id,
+         'process': incarnation(os.getpid()), 'observed_ms': time.time_ns()//1000000})
+
+
+def launch(authorization, output):
+    admission = json.loads(reopen(authorization).read_text())
+    if admission.get('schema_version') != 1 or admission.get('kind') != 'NativeFixtureLaunchAdmission':
+        raise ValueError('explicit fixture launch admission required')
+    source = Path(__file__).resolve()
+    if reopen(admission['operator_source']) != source:
+        raise ValueError('wrong immutable operator source')
+    for key in ('operator_review', 'operator_retention', 'operator_materialization', 'user_authority'):
+        reopen(admission[key])
+    review = json.loads(reopen(admission['operator_review']).read_text())
+    retained = json.loads(reopen(admission['operator_retention']).read_text())
+    materialization = json.loads(reopen(admission['operator_materialization']).read_text())
+    if (review.get('kind') != 'independent-native-fixture-source-review' or
+        review.get('verdict') != 'pass' or review.get('operator_sha256') != digest(source) or
+        review.get('candidate') != admission.get('candidate') or
+        retained.get('candidate') != admission.get('candidate') or
+        materialization.get('candidate') != admission.get('candidate') or
+        materialization.get('source') != admission.get('source_root') or
+        source != Path(admission['source_root'])/'tests/collab/fixture_support/native_stop_fixture.py' or
+        not review.get('reviewer_native_thread_id') or
+        review.get('reviewer_native_thread_id') == admission.get('author_native_thread_id')):
+        raise ValueError('exact independently reviewed retained operator required')
+    runtime = admission['runtime']
+    endpoint = Path(runtime['endpoint']['path'])
+    info = endpoint.stat()
+    if not stat.S_ISSOCK(info.st_mode) or info.st_uid != os.getuid() or any(
+        runtime['endpoint'][key] != value for key, value in
+        [('uid', info.st_uid), ('device', info.st_dev), ('inode', info.st_ino)]):
+        raise ValueError('socket identity changed')
+    actual = incarnation(runtime['daemon']['pid'])
+    if any(actual[key] != runtime['daemon'][key] for key in ('boot_id', 'pid', 'start_ticks')):
+        raise ValueError('daemon incarnation changed')
+    exe = Path(f"/proc/{actual['pid']}/exe").resolve()
+    if reopen(runtime['daemon']['executable']) != exe:
+        raise ValueError('daemon executable changed')
+    own_scope = scope(os.getpid())
+    if own_scope['memory_max'] == 'max' or int(own_scope['memory_max']) > 268435456 or own_scope['memory_swap_max'] != '0':
+        raise ValueError('operator bounded scope required')
+    if any(own_scope[key] != admission['operator_scope'][key] for key in ('path', 'device', 'inode')):
+        raise ValueError('operator scope identity differs from admission')
+    tools = {key: reopen(value) for key, value in admission['tools'].items()}
+    if set(tools) != {'python', 'systemd_run', 'git'} or any(not os.access(path, os.X_OK) for path in tools.values()):
+        raise ValueError('pinned executable tools required')
+    workspace, common = Path(admission['workspace']), Path(admission['common_git'])
+    if not workspace.is_absolute() or not common.is_absolute() or workspace.is_symlink() or common.is_symlink():
+        raise ValueError('literal owned workspace/commonGit paths required')
+    output = Path(output)
+    if str(output) != admission['output'] or not output.is_absolute() or output.exists() or output.parent.is_symlink():
+        raise ValueError('fresh owned absolute output required')
+    git_facts = workspace_identity(admission, tools['git'], source, output)
+    output.mkdir(mode=0o700)
+    proof = output/'payload'
+    proof.mkdir(mode=0o700)
+    command = fixture_command(source, proof, admission['fixture_id'], tools)
+    if hashlib.sha256(command.encode()).hexdigest() != admission['command_sha256']:
+        raise ValueError('command differs from reviewed authority')
+    wire = None
+    try:
+        wire = Wire(endpoint)
+        if wire.peer[:2] != (actual['pid'], os.getuid()):
+            raise ValueError('native peer PID/UID differs from admitted daemon')
+        wire.call('initialize', {'clientInfo': {'name': 'sureal_nonmanaged_stop_fixture',
+                  'version': '1'}, 'capabilities': {'experimentalApi': True}}, output, runtime)
+        wire.send({'method': 'initialized', 'params': {}})
+        started, creation = wire.call('thread/start', {'cwd': str(workspace),
+            'approvalPolicy': 'never', 'sandbox': 'danger-full-access',
+            'runtimeWorkspaceRoots': [str(workspace), str(output), str(common)],
+            'baseInstructions': 'Non-managed bounded tool fixture. Do not create a native goal.',
+            'environments': []}, output, runtime)
+        thread_id = started['thread']['id']
+        goal, _ = wire.call('thread/goal/get', {'threadId': thread_id}, output, runtime)
+        if goal.get('goal') is not None:
+            raise ValueError('fixture unexpectedly has a goal')
+        _, invocation = wire.call('thread/shellCommand', {'threadId': thread_id,
+               'command': command, 'timeoutMs': 90000}, output, runtime)
+        save(output/'fixture-launch.json', {'schema_version': 1, 'kind': 'NativeFixtureLaunch',
+             'fixture_id': admission['fixture_id'], 'thread_id': thread_id,
+             'creation': creation, 'invocation': invocation, 'command_sha256': admission['command_sha256'],
+             'workspace': str(workspace), 'output': str(output), 'common_git': str(common),
+             'operator_authorization': authorization, 'payload_output': str(proof),
+             'actual_git_identity': git_facts,
+             'claim_created': False, 'native_goal_created': False, 'host_tool_unsandboxed': True,
+             'worker_grants_or_full50_accepted': False})
+        # No terminal inference from an immediate shell acknowledgement. The
+        # independently admitted observer consumes native turn/item/process facts.
+        time.sleep(95)
+        save(output/'operator-returning.json', {'thread_id': thread_id,
+             'observed_ms': time.time_ns()//1000000, 'accepted_stop': False})
+    except Exception as error:
+        save(output/'unknown.json', {'kind': 'NativeFixtureUncertainty',
+             'error_type': type(error).__name__, 'relaunch_permitted': False,
+             'ownership_released': False, 'fixture_cleanup_permitted': False})
+        raise
+    finally:
+        if wire is not None:
+            wire.close()
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('mode', choices=['payload', 'launch'])
+    parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--fixture-id')
+    parser.add_argument('--authorization', type=Path)
+    parser.add_argument('--authorization-sha256')
+    args = parser.parse_args()
+    if args.mode == 'payload':
+        payload(args.output, args.fixture_id)
+    else:
+        launch({'path': str(args.authorization), 'sha256': args.authorization_sha256}, args.output)
+
+
+if __name__ == '__main__':
+    main()

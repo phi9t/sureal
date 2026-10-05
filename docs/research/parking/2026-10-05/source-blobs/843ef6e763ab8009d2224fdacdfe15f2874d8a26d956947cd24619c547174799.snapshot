@@ -1,0 +1,22 @@
+from pathlib import Path
+import hashlib,json,sys,subprocess
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.runtime_identity import verify_rootfs
+from pipeline.insula_entry import launch_plan
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
+candidate=code/'research/scientific-point-grid-inputs.candidate.json';base=cache/'insula/point-grid-inventory-live-v1';base.mkdir();inputs=base/'input';inputs.mkdir();output=base/'output';output.mkdir();(inputs/'candidate.json').write_bytes(candidate.read_bytes());expected={'candidate_sha256':sha(candidate),'working_root':str(cache/'scientific-processing'),'manifest_sha256':sha(code/'scientific-acquisition.candidate.json'),'progress_sha256':sha(code/'research/scientific-processing-progress.json'),'job_index_sha256':sha(code/'research/native-shape-jobs.candidate.json')};(inputs/'expected.json').write_text(json.dumps(expected,indent=2)+'\n')
+program="""import hashlib,importlib.util,json,sys,unittest
+from pathlib import Path
+sys.path.insert(0,'/tmp/checker');from point_grid_inventory import admit
+assert importlib.util.find_spec('tensorflow') is None
+e=json.loads(Path('/tmp/inputs/expected.json').read_text());sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+assert sha('/tmp/inputs/candidate.json')==e['candidate_sha256'] and sha('/experiment/scientific-acquisition.candidate.json')==e['manifest_sha256'] and sha('/experiment/research/scientific-processing-progress.json')==e['progress_sha256'] and sha('/experiment/research/native-shape-jobs.candidate.json')==e['job_index_sha256']
+s=unittest.defaultTestLoader.discover('/tmp/checker',pattern='test_point_grid_inventory.py');r=unittest.TextTestRunner(verbosity=2).run(s);assert r.wasSuccessful()
+d=json.loads(Path('/tmp/inputs/candidate.json').read_text());m=json.loads(Path('/experiment/scientific-acquisition.candidate.json').read_text());p=json.loads(Path('/experiment/research/scientific-processing-progress.json').read_text());j=json.loads(Path('/experiment/research/native-shape-jobs.candidate.json').read_text())
+v=admit(d,m,p,j,code_root='/experiment',working_root='/source',source_root='/tmp/native-sources',original_working_root=e['working_root'])
+Path('/outputs/check.json').write_text(json.dumps(v,indent=2));print('PASS all103 point/native-grid inputs independently admitted')
+"""
+command=launch_plan(root,code,cache/'scientific-processing',output,['python','-c',program]);i=command.index('--');command[i:i]=['--ro-bind',str(Path('.scratch').resolve()),'/tmp/checker','--ro-bind',str(inputs),'/tmp/inputs','--ro-bind',str(cache/'scientific-source-audit'),'/tmp/native-sources'];r=subprocess.run(command,capture_output=True,text=True,timeout=120);log=output/'live.log';log.write_text(r.stdout+r.stderr);print(log.read_text());assert r.returncode==0
+value={'checks':[{'command':command,'exit_code':0}],'runtime_lock':lock,'expected':expected,'checker_sha256':sha('.scratch/point_grid_inventory.py'),'test_sha256':sha('.scratch/test_point_grid_inventory.py'),'live_log':str(log),'live_log_sha256':sha(log),'validation':json.loads((output/'check.json').read_text()),'output':str(output),'scope':'all103 metadata admitted and seven scope mutants refused live; no actual scientific grid payload replay yet'}
+(code/'research/point-grid-inventory-live-verified.json').write_text(json.dumps(value,indent=2)+'\n')

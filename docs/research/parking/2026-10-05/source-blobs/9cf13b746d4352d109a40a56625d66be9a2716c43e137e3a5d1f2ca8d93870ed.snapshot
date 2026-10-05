@@ -1,0 +1,21 @@
+import hashlib,json,time
+from pathlib import Path
+P=Path('experiments/waymo-perception').resolve();p=P/'research/tier1-overfit20261002b-results.json';C=Path.home()/'.cache/waystone/waymo-perception';R=C/'insula/tier1-overfit20261002b';old=C/'scientific-processing/tier1-overfit20261002a-baseline'
+def sha(p):
+ with Path(p).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+while True:
+ try:
+  r=json.loads(p.read_text());b=r['cases'].get('baseline',{})
+  if b.get('status')=='sustained native overfit':
+   proof=json.loads((R/'baseline-replay-4000-verified.json').read_text());assert proof['validation']['exact_terminal_model_and_adam'] and proof['validation']['exact_all_checkpoint_heads'];assert all(sha(p)==h for p,h in proof['artifacts'].items());adopt=json.loads((R/'baseline-adoption.json').read_text());assert sha(old/'check.json')==adopt['check_sha256'];last=json.loads((old/'check.json').read_text())['updates'];releases=[]
+   for directory in old.glob('checkpoint-*'):
+    step=int(directory.name.split('-')[1]);head=directory/'heads-00.npz'
+    if step not in [0,last] and head.exists():releases.append({'path':str(head),'sha256':sha(head),'kind':'new tier1 transient adopted head'})
+   previous=old/'resume/checkpoint.pt'
+   if previous.exists():releases.append({'path':str(previous),'sha256':sha(previous),'kind':'superseded new tier1 Adam/model checkpoint'})
+   ledger=R/'adopted-original-release.json';ledger.write_text(json.dumps({'full_trajectory_replay_receipt_sha256':sha(R/'baseline-replay-4000-verified.json'),'all_corrected_native_and_literal_admissions_complete':True,'released':releases},indent=2))
+   for entry in releases:assert sha(entry['path'])==entry['sha256'];Path(entry['path']).unlink()
+   print('Adopted baseline originals released after exact replay',len(releases),flush=True);break
+  if b.get('status')=='execution failed; artifacts retained':print('Baseline admission failed; retained all originals',flush=True);break
+ except (FileNotFoundError,json.JSONDecodeError):pass
+ time.sleep(.5)

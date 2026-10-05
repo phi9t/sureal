@@ -1,0 +1,41 @@
+"""Externally sealed point/grid receipt plus independent full-pass accounting."""
+import hashlib,json,math
+from pathlib import Path
+
+def sha(p):
+ with Path(p).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+def verify(root,expected,*,code_root,workers):
+ root,code,workers=map(Path,(root,code_root,workers))
+ def require(ok):
+  if not ok:raise ValueError('retained scientific point/grid receipt differs')
+ require(sha(root/'receipt.json')==expected['receipt_sha256']);r=json.loads((root/'receipt.json').read_text())
+ require(r['input_identity']==expected['input_identity'] and r['runtime_lock']==expected['runtime_lock'])
+ require(r['pipeline_hashes']==expected['pipeline_hashes'] and len(r['pipeline_hashes'])==7 and r['worker_hashes']==expected['worker_hashes'] and len(r['worker_hashes'])==3)
+ for n,h in r['pipeline_hashes'].items():require(not Path(n).is_absolute() and '..' not in Path(n).parts and sha(code/n)==h)
+ for n,h in r['worker_hashes'].items():require(Path(n).name==n and sha(workers/n)==h)
+ artifacts={'input/publication.json','input/shapes.json','input/expected.json','producer/check.json','reference/check.json','producer.log','reference.log'}
+ require(set(r['artifacts'])==artifacts)
+ for n,h in r['artifacts'].items():require(not (root/n).is_symlink() and sha(root/n)==h)
+ e=expected['input_identity'];s=e['source'];pp=s['point_publication']
+ require(json.loads((root/'input/expected.json').read_text())==e)
+ require(sha(root/'input/publication.json')==pp['publication_manifest_sha256'] and sha(root/'input/shapes.json')==e['shape_report_sha256'])
+ pub=json.loads((root/'input/publication.json').read_text());shape=json.loads((root/'input/shapes.json').read_text())
+ require(pub['scene']==shape['shapes']['scene']==s['scene'] and pub['source_lidar_sha256']==shape['source']['sha256']==s['source_lidar_sha256'])
+ require(shape['membership']==s['membership'] and shape['job_sha256']==s['shape_job']['sha256'])
+ require(len(r['checks'])==2 and all(type(c['exit_code']) is int and c['exit_code']==0 and c['command'][0]=='bwrap' and '--unshare-all' in c['command'] and '--clearenv' in c['command'] for c in r['checks']))
+ t=r['transfer'];require(t['sha256']==pp['archive_sha256'] and t['archive_bytes']==pp['archive_bytes'] and t['hdfs_uri']==pp['archive_hdfs_uri'] and type(t['transfer_exit_code']) is int and t['transfer_exit_code']==0)
+ size=pp['archive_bytes'];aligned=((size+4095)//4096)*4096
+ for k in ['working_bytes_before','working_peak_bytes_before_consumer','working_peak_bound_bytes','file_size_limit_bytes','working_limit_bytes','transfer_padding_bytes','transfer_alignment_bytes']:require(type(t[k]) is int and t[k]>=0)
+ require(t['transfer_contract']=='native-direct-write-aligned-v1' and t['transfer_alignment_bytes']==4096 and t['transfer_padding_bytes']==aligned-size and t['file_size_limit_bytes']==aligned)
+ require(t['working_peak_bytes_before_consumer']==t['working_bytes_before']+size and t['working_peak_bound_bytes']==t['working_bytes_before']+aligned)
+ require(type(r['consumer_reserve_bytes']) is int and r['consumer_reserve_bytes']==16*1024**2 and t['working_peak_bound_bytes']<=t['working_limit_bytes']<=15*1024**3-r['consumer_reserve_bytes'])
+ producer=json.loads((root/'producer/check.json').read_text());reference=json.loads((root/'reference/check.json').read_text());require(producer==r['validation'] and reference==r['independent'])
+ common=lambda v:{k:x for k,x in v.items() if k not in ['mode','worker_resources']}
+ require(common(producer)==common(reference) and producer['mode']=='producer' and reference['mode']=='reference')
+ for v in [producer,reference]:
+  require(v['scene']==s['scene'] and v['membership']==s['membership'] and v['source_lidar_sha256']==s['source_lidar_sha256'] and v['archive_sha256']==pp['archive_sha256'] and v['shape_report_sha256']==e['shape_report_sha256'])
+  for k in ['records','points','eligible_semantic_points','present_empty_returns','absent_returns','absent_with_shape_records','native_grid_cells','annotated_returns']:require(type(v[k]) is int and v[k]>=0)
+  require(v['records']==s['records'] and v['points']==s['points'] and v['native_counts']==e['expected_native_counts'] and v['eligible_semantic_points']==e['expected_eligible_semantic_points']==sum(e['expected_native_counts'][1:]))
+  require(v['present_empty_returns']+v['absent_returns']<=v['records'] and v['absent_with_shape_records']<=v['absent_returns'] and v['annotated_returns']<=v['records']-v['absent_returns'])
+  u=v['worker_resources'];require(type(u['peak_rss_kib']) is int and u['peak_rss_kib']>0 and u['rss_scope']=='worker_process_peak' and type(u['elapsed_seconds']) in (int,float) and math.isfinite(u['elapsed_seconds']) and u['elapsed_seconds']>=0)
+ return {'scene':s['scene'],'records':s['records'],'points':s['points'],'eligible_semantic_points':producer['eligible_semantic_points'],'native_counts':producer['native_counts'],'worker_resources':{v['mode']:v['worker_resources'] for v in [producer,reference]},'scope':'retained identity and two full passes admitted; scientific model comparisons remain open'}

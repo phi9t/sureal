@@ -1,0 +1,24 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys,datetime
+code=Path('experiments/waymo-perception').resolve();workers=Path('.scratch').resolve();sys.path.insert(0,str(code))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);base=cache/'insula/yaw-correction-receipt-v1';base.mkdir();inputs=base/'input';inputs.mkdir();out=base/'output';out.mkdir()
+pins={'/tmp/workers/'+n:sha(workers/n) for n in ['overfit_detection_targets_v2.py','test_overfit_target_yaw_roundtrip_v2.py']};pins.update({'/experiment/pipeline/'+n:sha(code/'pipeline'/n) for n in ['box_coding.py','anchor_assignment.py','detector_geometry.py']});(inputs/'expected.json').write_text(json.dumps(pins,indent=2)+'\n')
+program="""import hashlib,json,runpy,importlib.util
+from pathlib import Path
+assert importlib.util.find_spec('tensorflow') is None
+for p,h in json.loads(Path('/tmp/input/expected.json').read_text()).items():assert hashlib.sha256(Path(p).read_bytes()).hexdigest()==h
+runpy.run_path('/tmp/workers/test_overfit_target_yaw_roundtrip_v2.py',run_name='__main__')
+"""
+command=launch_plan(root,code,workers,out,['python','-c',program]);i=command.index('--');command[i:i]=['--ro-bind',str(workers),'/tmp/workers','--ro-bind',str(inputs),'/tmp/input'];start=datetime.datetime.now(datetime.timezone.utc).isoformat();run=subprocess.run(command,capture_output=True,text=True,timeout=60);end=datetime.datetime.now(datetime.timezone.utc).isoformat();log=out/'live.log';log.write_text(run.stdout+run.stderr);print(log.read_text());assert run.returncode==0 and 'OK' in run.stderr
+# Reopen sealed log in a separate locked live invocation against external expectations.
+audit=base/'audit';audit.mkdir();expected={'log_sha256':sha(log),'pins':pins};(inputs/'audit.json').write_text(json.dumps(expected,indent=2)+'\n');checker="""import hashlib,json
+from pathlib import Path
+e=json.loads(Path('/tmp/input/audit.json').read_text());p=Path('/source/live.log');assert hashlib.sha256(p.read_bytes()).hexdigest()==e['log_sha256'];assert 'Ran 1 test' in p.read_text() and '\\nOK\\n' in p.read_text()
+for p,h in e['pins'].items():assert hashlib.sha256(Path(p).read_bytes()).hexdigest()==h
+Path('/outputs/check.json').write_text(json.dumps({'heading_cases':6,'anchors_per_case':2,'tolerance_radians':1e-12,'scope':'exact encoded-target heading roundtrip only; no arbitrary-prediction accuracy, training or heldout claim'}));print('PASS independent yaw correction retention and current code identities')
+"""
+auditcmd=launch_plan(root,code,out,audit,['python','-c',checker]);i=auditcmd.index('--');auditcmd[i:i]=['--ro-bind',str(workers),'/tmp/workers','--ro-bind',str(inputs),'/tmp/input'];check=subprocess.run(auditcmd,capture_output=True,text=True,timeout=60);(audit/'live.log').write_text(check.stdout+check.stderr);print(check.stdout+check.stderr);assert check.returncode==0
+record={'checks':[{'command':command,'exit_code':0,'started_utc':start,'ended_utc':end},{'command':auditcmd,'exit_code':0}],'runtime_lock':lock,'candidate_hashes':pins,'validation':json.loads((audit/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in [log,audit/'live.log',audit/'check.json',inputs/'expected.json',inputs/'audit.json']},'scope':'fresh replay and independent retained audit for corrected target heading convention; scientific optimization still open'};(code/'research/overfit-yaw-correction-live-receipt-verified.json').write_text(json.dumps(record,indent=2)+'\n')

@@ -1,0 +1,16 @@
+import json,shutil,sys
+from pathlib import Path
+P=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(P));from tier1.storage import sha
+R=Path.home()/'.cache/waystone/waymo-perception/insula/tier1-overfit20261002b';result=P/'research/tier1-overfit20261002b-results.json';s=json.loads(result.read_text());case=s['cases']['deep_pfn'];trainpath=R/'deep_pfn-train-300-verified.json';replaypath=R/'deep_pfn-replay-300-verified.json';train=json.loads(trainpath.read_text());replay=json.loads(replaypath.read_text());assert replay['validation']['exact_terminal_model_and_adam'] and replay['validation']['exact_all_checkpoint_heads'] and replay['validation']['exact_rng'];refs={e['receipt']:e['sha256'] for e in case['verification_receipts']};assert sha(trainpath)==refs[str(trainpath)] and sha(replaypath)==refs[str(replaypath)]
+ledger=R/'deep_pfn/snapshot-release.json';priorhash=sha(ledger);backup=ledger.with_name('snapshot-release-before-resume-reconciliation.json');shutil.copy(ledger,backup);data=json.loads(ledger.read_text());known={entry['path'] for entry in data['released']};added=[]
+for path,digest in train['transient_artifacts'].items():
+ p=Path(path)
+ if p.name!='heads-00.npz' or p.exists() or path in known:continue
+ step=int(p.parent.name.split('-')[1]);assert step not in [0,300]
+ for stage in ['proposal-audit','metric-audit']:
+  evidencepath=R/f'deep_pfn-{stage}-{step}-verified.json';assert sha(evidencepath)==refs[str(evidencepath)];evidence=json.loads(evidencepath.read_text());assert evidence['exit_code']==0
+  for artifact,h in evidence['artifacts'].items():assert sha(artifact)==h
+ point=next(v for v in train['validation']['checkpoint_curve'] if v['step']==step)
+ entry={'path':path,'sha256':digest,'canonical_head_sha256':point['head_sha256'],'reconciled_from_immutable_producer_and_prior_300_replay':True};data['released'].append(entry);added.append(entry)
+assert len(added)==4
+ledger.write_text(json.dumps(data,indent=2));reconciliation={'reason':'resume initialized an empty release list and overwrote the prior 300-update ledger; four earlier head releases reconciled from immutable producer hashes and successful prior native audits/exact replay','prior_ledger_sha256':priorhash,'prior_ledger_copy':str(backup),'producer_receipt_sha256':sha(trainpath),'prior_exact_replay_sha256':sha(replaypath),'reconciled_entries':added,'new_ledger_sha256':sha(ledger)};receipt=R/'deep_pfn/release-ledger-reconciliation.json';receipt.write_text(json.dumps(reconciliation,indent=2));case['snapshot_release_sha256']=sha(ledger);case['release_ledger_reconciliation_receipt']=str(receipt);case['release_ledger_reconciliation_sha256']=sha(receipt);result.write_text(json.dumps(s,indent=2));print('RECONCILED four releases with immutable original hashes/native audits/300-update replay')

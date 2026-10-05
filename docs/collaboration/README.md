@@ -1,5 +1,11 @@
 # Sureal collaboration tooling
 
+**PARKED — October5 user override:** local MAC completion is paused pending
+Corenius infrastructure. No new dispatch or readiness-handshake implementation.
+See [the consolidated closeout](../research/parking/2026-10-05/README.md). Historical criteria/status below
+remain evidence, not permission to resume.
+
+
 [Current user priority](../research/2026-10-05-mac-happy-path-first.md)
 puts useful two-worker perception preparation before comprehensive hardening.
 Explicit manual lead bootstrap can use existing tools; unfinished controller

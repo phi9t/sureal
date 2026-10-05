@@ -1,0 +1,24 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+code=Path('experiments/waymo-perception').resolve();research=code/'research';sys.path.insert(0,str(code))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
+old=json.loads((research/'scientific-semantic-support-progress.json').read_text());new=json.loads((research/'semantic-recovered-progress.json').read_text());assert len(old['scene_evidence'])==81 and new['recovered_scenes']==22 and set(old['scene_evidence']).isdisjoint(new['scene_evidence'])
+base=cache/'insula/semantic-full103-retained-audit-v2';base.mkdir();inputs=base/'input';inputs.mkdir();source=inputs/'retained';source.mkdir();output=base/'output';output.mkdir();entries=[]
+for kind,progress in [('capture',old),('recovered',new)]:
+ for scene,value in progress['scene_evidence'].items():
+  evidence=research/value['evidence'];pointer=json.loads(evidence.read_text());receipt=Path(pointer['receipt']);assert sha(receipt)==pointer['receipt_sha256']==value['receipt_sha256']
+  if kind=='capture':assert value['lifecycle_linkage']=='linked' and (research/value['linkage_evidence']).is_file()
+  r=json.loads(receipt.read_text())
+  # Only copy sealed receipt metadata, never native sensor or point payloads.
+  for p,digest in [(receipt,value['receipt_sha256']),*[(receipt.parent/n,h) for n,h in r['artifacts'].items()]]:
+   assert sha(p)==digest;relative=p.relative_to(cache);assert '..' not in relative.parts
+   target=source/relative;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(p.read_bytes());assert sha(target)==digest and sha(p)==digest
+  entries.append({'scene':scene,'kind':kind,'receipt':str(receipt),'receipt_sha256':value['receipt_sha256'],'membership':value['membership'],'native_counts':value['native_counts'],'eligible_point_elements':value['eligible_point_elements'],'evidence':value['evidence'],'evidence_sha256':sha(evidence)})
+expected={'candidate_sha256':sha(research/'scientific-point-grid-inputs.candidate.json'),'manifest_sha256':sha(code/'scientific-acquisition.candidate.json'),'runtime_lock':lock,'cache_root':str(cache),'entries':entries};(inputs/'expected.json').write_text(json.dumps(expected,indent=2)+'\n')
+command=launch_plan(root,code,source,output,['python','/tmp/auditor/semantic-full103-audit.py']);i=command.index('--');command[i:i]=['--ro-bind',str(inputs),'/tmp/input','--ro-bind',str(Path('.scratch').resolve()),'/tmp/auditor']
+r=subprocess.run(command,capture_output=True,text=True,timeout=120);log=output/'live.log';log.write_text(r.stdout+r.stderr);print(log.read_text());assert r.returncode==0
+record={'checks':[{'command':command,'exit_code':0}],'runtime_lock':lock,'expected_sha256':sha(inputs/'expected.json'),'worker_sha256':sha('.scratch/semantic-full103-audit.py'),'validation':json.loads((output/'support.json').read_text()),'live_log':str(log),'live_log_sha256':sha(log),'output':str(output),'scope':'complete103 sealed retained semantic receipts/artifacts and frame histograms reconciled live; snapshots rehashed against original files before/after copying; point-grid/models separate'}
+(research/'scientific-semantic-full103-verified.json').write_text(json.dumps(record,indent=2)+'\n');print('Complete eligible labeled points:',record['validation']['eligible_point_elements'])

@@ -1,0 +1,47 @@
+{
+  "owned_units": [
+    {
+      "command": [
+        "systemctl",
+        "--user",
+        "show",
+        "sureal-58-b-20261005a-inventory.scope",
+        "--property=ActiveState",
+        "--property=SubState",
+        "--property=ControlGroup"
+      ],
+      "exit_code": 0,
+      "stdout": "ControlGroup=\nActiveState=inactive\nSubState=dead\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "systemctl",
+        "--user",
+        "show",
+        "sureal-58-b-20261005a-inventory-v2.scope",
+        "--property=ActiveState",
+        "--property=SubState",
+        "--property=ControlGroup"
+      ],
+      "exit_code": 0,
+      "stdout": "ControlGroup=\nActiveState=inactive\nSubState=dead\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "systemctl",
+        "--user",
+        "show",
+        "sureal-58-b-20261005a-inventory-v3.scope",
+        "--property=ActiveState",
+        "--property=SubState",
+        "--property=ControlGroup"
+      ],
+      "exit_code": 0,
+      "stdout": "ControlGroup=\nActiveState=inactive\nSubState=dead\n",
+      "stderr": ""
+    }
+  ],
+  "all_inactive": true
+}

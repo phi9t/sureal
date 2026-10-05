@@ -1,3 +1,5 @@
+> Effective2026-10-05: local MAC implementation is parked and the native goal is paused. Await Corenius infrastructure and explicit readmission. See [closeout and source custody](../../docs/research/parking/2026-10-05/README.md). Historical research goals/results and task acceptance remain preserved.
+
 # Actionable research task index
 
 [59 — full MAC automation goal](../../docs/research/tasks/59-full-mac-automation-goal.md)

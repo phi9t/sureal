@@ -1,0 +1,78 @@
+"""Serial real recovery continuation; full missing-set mismatch stops admission."""
+import hashlib,json,os,subprocess,sys,time
+from pathlib import Path
+code=Path(__file__).resolve().parents[1]/'experiments/waymo-perception'
+sys.path.insert(0,str(code))
+from pipeline.semantic_recovery_job import recover_semantic_archive
+from pipeline.runtime_identity import verify_rootfs
+from pipeline.insula_entry import launch_plan
+cache=Path.home()/'.cache/waystone/waymo-perception';research=code/'research'
+def sha(p):
+ with Path(p).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+def save(p,d):
+ q=p.with_suffix('.pending.json');q.write_text(json.dumps(d,indent=2)+'\n');q.replace(p)
+def load(p):return json.loads(Path(p).read_text())
+def live(pid,identity):
+ p=Path('/proc')/str(pid)/'cmdline'
+ if not p.exists():return False
+ if identity.encode() not in p.read_bytes():raise RuntimeError('process identity changed: '+str(pid))
+ return True
+manifest=code/'scientific-acquisition.candidate.json';inventory=research/'scientific-semantic-recovery-inputs-v2.candidate.json';box_candidate=research/'training-box-replay-execution.candidate.json'
+filepins={str(p):sha(p) for p in [manifest,inventory,box_candidate,research/'training-box-producer-job.candidate.json']}
+codepins={str(p.relative_to(code)):sha(p) for p in (code/'pipeline').glob('*.py')}
+selected=load(manifest)['scenes'];assert len(selected)==103
+lock=load(cache/'insula/rootfs-v2.lock.json');root=cache/'insula/rootfs-v2'
+records=load(inventory)['sources'];assert len({r['scene'] for r in records})==len(records)
+destination=cache/'scientific-processing/semantic-recovered-v1';assert not destination.exists()
+def unchanged():
+ assert filepins=={p:sha(p) for p in filepins}
+ assert codepins=={p:sha(code/p) for p in codepins}
+def gate():
+ p=load(research/'scientific-processing-progress.json')
+ assert set(p['replayed_scene_evidence'])<=set(selected)
+ queue=live(4073579,'process-scientific-cohort.py')
+ box=live(4097563,'await-training-box-replay-after-cap.py')
+ if not queue and set(p['replayed_scene_evidence'])!=set(selected):raise RuntimeError('queue terminal before original103 admission')
+ return set(p['replayed_scene_evidence'])==set(selected) and not queue and not box
+if '--observe-once' in sys.argv:
+ unchanged();print('Gate ready:',gate(),'; original103 and all recorded missing scenes retained',flush=True);sys.exit(0)
+print('WAIT original103 processing and prior box continuation terminal; shared leases preserved',flush=True)
+while not gate():time.sleep(30)
+while live(4104010,'capture-scientific-semantic-support-after-cap.py') or live(1305902,'observe-semantic-linkage.py'):time.sleep(10)
+unchanged()
+box=cache/'scientific-processing/training-box-distributions-v1';assert (box/'receipt.json').is_file(),'box continuation terminal without completed receipt'
+# A separate scientific box audit remains required; this is serial ownership gating.
+assert load(box/'receipt.json')['candidate_sha256']==sha(box_candidate)
+support=load(research/'scientific-semantic-support-progress.json');missing=set(selected)-set(support['scene_evidence'])
+assert missing=={r['scene'] for r in records},'full missing set differs: reconcile inventory before any recovery; do not narrow'
+verify_rootfs(root,lock['rootfs_sha256'])
+for r in records:
+ assert r['membership']==selected[r['scene']]
+ for field in ['lifecycle_evidence','live_receipt','publication_receipt','publication_manifest']:
+  p=Path(r[field]);p=p if p.is_absolute() else research/p
+  assert sha(p)==r[field+'_sha256']
+destination.mkdir();admitted={}
+for record in records:
+ unchanged();scene=record['scene'];output=destination/scene
+ receipt=recover_semantic_archive(record,cache=cache,code_root=code,output=output)
+ expected_code=receipt['candidate_hashes'];assert all(codepins[n]==s for n,s in expected_code.items())
+ inputs=output/'audit-input';inputs.mkdir();audit=output/'audit-output';audit.mkdir()
+ expected={'receipt_sha256':sha(output/'receipt.json'),'record':record,'runtime':lock,'code':expected_code}
+ (inputs/'expected.json').write_text(json.dumps(expected,indent=2)+'\n')
+ program="""import json
+from pathlib import Path
+from pipeline.semantic_recovery_receipt import verify_receipt
+e=json.loads(Path('/mnt/expected.json').read_text())
+v=verify_receipt('/source',expected_sha256=e['receipt_sha256'],expected_record=e['record'],expected_runtime=e['runtime'],expected_code=e['code'],code_root='/experiment')
+Path('/outputs/check.json').write_text(json.dumps(v))
+print('PASS independent recovered semantic receipt',v)
+"""
+ command=launch_plan(root,code,output,audit,['python','-c',program]);i=command.index('--');command[i:i]=['--ro-bind',str(inputs),'/mnt']
+ result=subprocess.run(command,capture_output=True,text=True,timeout=120);(audit/'live.log').write_text(result.stdout+result.stderr)
+ assert result.returncode==0,'recovered receipt failed independent live admission'
+ unchanged();assert sha(output/'receipt.json')==expected['receipt_sha256']
+ evidence={'scene':scene,'membership':record['membership'],'receipt':str(output/'receipt.json'),'receipt_sha256':expected['receipt_sha256'],'checks':[{'command':command,'exit_code':0}],'runtime_lock':lock,'validation':receipt['validation'],'audit_artifacts':{p.name:sha(p) for p in audit.iterdir() if p.is_file()},'scope':'one real HDFS immutable archive recovered and live receipt-admitted; full-cohort aggregation separate'}
+ pointer=research/f'scientific-semantic-recovered-{scene}-verified.json';save(pointer,evidence);admitted[scene]={'evidence':pointer.name,'receipt_sha256':expected['receipt_sha256'],'membership':record['membership'],'native_counts':receipt['validation']['native_counts'],'eligible_point_elements':receipt['validation']['eligible_point_elements']}
+ save(research/'semantic-recovered-progress.json',{'selected_scenes':103,'missing_inventory_sha256':sha(inventory),'recovered_scenes':len(admitted),'scene_evidence':admitted,'scope':'separate recovered evidence; do not replace original capture aggregate until full reconciliation'})
+ print('PASS real archive recovered and independently admitted',scene,len(admitted),'/',len(records),flush=True)
+print('TERMINAL all inventoried missing archives admitted; full103 aggregate reconciliation remains',flush=True)

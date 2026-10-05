@@ -1,6 +1,27 @@
 # Research task queue policy
 
-## Worker goal: complete full MAC automation
+## Effective hold: park local implementation; await Corenius, October 5, 2026
+
+The user's latest direction supersedes the MAC/P0 completion and local-only
+infrastructure priorities below. Native goal59 is **PAUSED**. Local MAC50–57,
+53.0/53.A/53.B and59 are **PARKED_CORIENUS_WAIT**, with dispatch disabled; they
+remain open and incomplete. Actual Kata priority is withdrawn to P4 with an
+explicit operational hold and open external dependency
+`01M4561NAHZRFP9P0N7QAFYDAD`. Actual `kata ready --limit 0` excludes all twelve
+parked MAC issues; source definitions, ownership and acceptance are retained.
+49/58 and existing scientific results keep their recorded status.
+
+[Closeout and source disposition](parking/2026-10-05/README.md) preserves all
+available source and retained history on mainline or explicitly private storage.
+Corenius is now the intended future infrastructure provider, superseding the
+reference-only direction. No Corenius code, setup, access or integration is
+implemented here. Future operation requires explicit resumption, actual provider
+inspection and a reviewed Sureal integration/readmission plan. No MAC or
+scientific experiments are authorized by this parking turn. The historical
+sequence below is retained as provenance, not an active dispatch instruction.
+
+
+## Superseded worker goal: complete full MAC automation
 
 The user's October5 instruction establishes[59](tasks/59-full-mac-automation-goal.md)
 as the P0 completion goal for `avperc-impl`. Reuse implementation tickets
@@ -11,7 +32,7 @@ operational prompts are the completion contract.58's successful manual-supported
 pilot remains useful evidence, not automation acceptance. Preserve happy-path-
 first implementation and fix observed blockers before unrelated hardening.
 
-## Current override: useful happy path first, October 5, 2026
+## Superseded override: useful happy path first, October 5, 2026
 
 The user directs[first useful operation, then comprehensive hardening](2026-10-05-mac-happy-path-first.md).
 [Ticket58](tasks/58-mac-happy-path-perception-pilot.md) is the P0 first eligible

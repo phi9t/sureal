@@ -1,0 +1,12 @@
+import ast,json,subprocess,time
+from pathlib import Path
+source=Path('/experiment/publish-scientific-sidecars-bounded.py').read_text();tree=ast.parse(source);main=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='main');fn=next(n for n in main.body if isinstance(n,ast.FunctionDef) and n.name=='call');scope={'subprocess':subprocess,'time':time,'base':Path('/outputs'),'checks':[]};exec(compile(ast.Module(body=[fn],type_ignores=[]),'candidate-call','exec'),scope)
+call=scope['call'];call('success',['python','-c','print("ok")']);assert len(scope['checks'])==1
+for name,command,error in [('failure',['python','-c','raise SystemExit(7)'],RuntimeError),('oversize',['python','-c','print("x"*5000)'],ValueError)]:
+ try:call(name,command)
+ except error:pass
+ else:raise AssertionError(name+' was admitted')
+assert (Path('/outputs')/'oversize.log').stat().st_size==4096
+assert len(scope['checks'])==2 and scope['checks'][-1]['exit_code']==7
+Path('/outputs/result.json').write_text(json.dumps({'status':'PASS live candidate stage failure and retained log bounds','groups':3}))
+print('PASS actual candidate call success, nonzero refusal, oversized log refusal')

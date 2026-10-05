@@ -1,0 +1,10 @@
+import argparse,json,shutil,subprocess,sys
+from pathlib import Path
+P=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(P));sys.path.insert(0,str(P/'tier1'))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+from storage import sha
+parser=argparse.ArgumentParser();parser.add_argument('name');parser.add_argument('pattern');parser.add_argument('--red',action='store_true');parser.add_argument('--torch',action='store_true');parser.add_argument('--red-error',default='ModuleNotFoundError');a=parser.parse_args();C=Path.home()/'.cache/waystone/waymo-perception';R=C/'insula'/a.name;R.mkdir();source=R/'source';source.mkdir();shutil.copytree(P/'advanced',source/'advanced',ignore=shutil.ignore_patterns('__pycache__'));shutil.copytree(P/'pipeline',source/'pipeline',ignore=shutil.ignore_patterns('__pycache__'));
+if a.torch:
+ for folder in ['tier1','gpu']:shutil.copytree(P/folder,source/folder,ignore=shutil.ignore_patterns('__pycache__'))
+pins={str(p):sha(p) for p in source.rglob('*') if p.is_file()};root=C/'gpu-rootfs' if a.torch else C/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);out=R/'output';out.mkdir();cmd=launch_plan(root,source,source,out,['/opt/waymo/bin/python' if a.torch else 'python','-m','unittest','discover','-s','advanced','-p',a.pattern,'-v']);r=subprocess.run(cmd,capture_output=True,text=True,timeout=300);(out/'live.log').write_text(r.stdout+r.stderr);assert (r.returncode!=0 and a.red_error in r.stderr if a.red else r.returncode==0),r.stderr;assert all(sha(p)==h for p,h in pins.items());receipt={'command':cmd,'exit_code':r.returncode,'expected_red':a.red,'source_sha256':pins,'runtime_lock':lock,'artifacts':{str(out/'live.log'):sha(out/'live.log')}};(P/'research'/(a.name+'-verified.json')).write_text(json.dumps(receipt,indent=2));print((r.stdout+r.stderr)[-1800:])

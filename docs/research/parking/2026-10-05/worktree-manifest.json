@@ -1,0 +1,478 @@
+{
+  "cleanup": "NONE; all old worktrees/branches retained, including stale registrations",
+  "new_closeout_workspace": "/data02/home/philip.yang/workspace/sureal/.worktrees/park-closeout-20261005a",
+  "observed_ms": 1791175792291,
+  "registrations": [
+    {
+      "HEAD": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+      "accessible_registration": true,
+      "branch": "refs/heads/phi9t/mainline",
+      "disposition": "CANONICAL_CLOSEOUT_TARGET",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 1,
+      "worktree": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "HEAD": "841ad8f1a99c38bee9fc4f99ac24aa5e82758d62",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collab49-audit/20261004a",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collab49-audit-20261004a"
+    },
+    {
+      "HEAD": "6eb6879058b7772e4d114c8d99feac44f7ecd867",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collab50-audit/20261004a",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collab50-audit-20261004a"
+    },
+    {
+      "HEAD": "9ec21d51d71f4902b1971a59f148758f180310b5",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collab50-writer-audit/20261005a",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collab50-writer-audit-20261005a"
+    },
+    {
+      "HEAD": "982aa02dabc77a4da2a50d57fbb10c5bcb2de781",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collaboration-49/20261004a",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration-49-20261004a"
+    },
+    {
+      "HEAD": "339ed5dfb36a5baa68616f67b4d6fee304b43b8b",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collaboration-49/20261004b",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration-49-20261004b"
+    },
+    {
+      "HEAD": "6a97a52e6fc0452f0b7feb1d6cd6349a8165b813",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collaboration-49/20261004c",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration-49-20261004c"
+    },
+    {
+      "HEAD": "aa81587d06c0d7468aec34500929cc03c5be52bf",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collaboration-49/20261004d",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration-49-20261004d"
+    },
+    {
+      "HEAD": "cdc2206d482ba4b9f62ffef41a87dd6e5da5d26f",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collaboration-49/20261004e",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration-49-20261004e"
+    },
+    {
+      "HEAD": "c7cea5f1b6758ab66c6f12612324c785f279a1d3",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collaboration-49-build-docs/20261004a",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration-49-build-docs-20261004a"
+    },
+    {
+      "HEAD": "d2ebbd33f48f2b8e5f81912872fd8f832dca9b01",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collaboration-49-metadata/20261004a",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration-49-metadata-20261004a"
+    },
+    {
+      "HEAD": "a553645ef22761aa7708abf1ee109952a6cd2c38",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collaboration49-closeout/20261004a",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration49-closeout-20261004a"
+    },
+    {
+      "HEAD": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collaboration50-channel-diagnostic/20261005a",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration50-channel-diagnostic-20261005a"
+    },
+    {
+      "HEAD": "a553645ef22761aa7708abf1ee109952a6cd2c38",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collaboration50-fixture/stop50-20261004a",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration50-fixture-20261004a"
+    },
+    {
+      "HEAD": "a553645ef22761aa7708abf1ee109952a6cd2c38",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collaboration50-fixture/stop50-20261004b",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration50-fixture-20261004b"
+    },
+    {
+      "HEAD": "a553645ef22761aa7708abf1ee109952a6cd2c38",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collaboration50-fixture/stop50-20261004c",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration50-fixture-20261004c"
+    },
+    {
+      "HEAD": "a553645ef22761aa7708abf1ee109952a6cd2c38",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collaboration50-fixture/stop50-20261004d",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration50-fixture-20261004d"
+    },
+    {
+      "HEAD": "a553645ef22761aa7708abf1ee109952a6cd2c38",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collaboration50-fixture/stop50-20261004e",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration50-fixture-20261004e"
+    },
+    {
+      "HEAD": "a553645ef22761aa7708abf1ee109952a6cd2c38",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collaboration50-fixture/stop50-20261005e",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration50-fixture-20261005e"
+    },
+    {
+      "HEAD": "a553645ef22761aa7708abf1ee109952a6cd2c38",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collaboration50-fixture/stop50-20261005e2",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration50-fixture-20261005e2"
+    },
+    {
+      "HEAD": "5e65b3f75a35e578b8bc7009f6de0e50494caa15",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collaboration50-fixture/stop50-20261005f",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration50-fixture-20261005f"
+    },
+    {
+      "HEAD": "b507aaf6899e84776abb420fda8264f70c0c6acc",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collaboration50-fixture/stop50-20261005g",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration50-fixture-20261005g"
+    },
+    {
+      "HEAD": "b507aaf6899e84776abb420fda8264f70c0c6acc",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collaboration50-fixture/stop50-20261005h",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration50-fixture-20261005h"
+    },
+    {
+      "HEAD": "53e4854ded75a09aed6509d101fde2c64cf0f6ae",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/collaboration50-preflight/20261004a",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration50-preflight-20261004a"
+    },
+    {
+      "HEAD": "b507aaf6899e84776abb420fda8264f70c0c6acc",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/full-mac-automation-goal-20261005",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/full-mac-automation-goal-20261005"
+    },
+    {
+      "HEAD": "0eeb15d19c188d1ee2fad1043f88707087c16c8a",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/mac-execution-record/20261005a",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac-execution-record-20261005a"
+    },
+    {
+      "HEAD": "b32307da442598e192a9259d29a8650be1134589",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/mac-happy-path-first-20261005",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac-happy-path-first-20261005"
+    },
+    {
+      "HEAD": "baff4c6fe1afff73ab8ea219a9073d76734034ee",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/mac58/a-20261005a",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a"
+    },
+    {
+      "HEAD": "88eb369fdb5b512f9a0e3241f6e2f3dacd6f4530",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/mac58/a-integration-20261005a",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-integration-20261005a"
+    },
+    {
+      "HEAD": "404b2af870c8e3062fcd0b6b99b42c3518428e3e",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/mac58/b-20261005a",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a"
+    },
+    {
+      "HEAD": "5a1d92283c3bc8368751a508ef705a7a4f19ebd8",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/mac58/b-integration-20261005a",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-integration-20261005a"
+    },
+    {
+      "HEAD": "596b3b99a5bff94d89cc19a581510ad09133c009",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/mac58/closeout-20261005a",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-closeout-20261005a"
+    },
+    {
+      "HEAD": "5e65b3f75a35e578b8bc7009f6de0e50494caa15",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/mac58/closeout-20261005b",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-closeout-20261005b"
+    },
+    {
+      "HEAD": "9cd484da8c4038cf5fe6422e3cd5c63b5f148a17",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/mac58/lead-20261005a",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-lead-20261005a"
+    },
+    {
+      "HEAD": "c3a9d7c7ada666855b92a329f85c2c64964546f5",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/mac58/map-20261005a",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-map-20261005a"
+    },
+    {
+      "HEAD": "4c47fa13b892fa8dc96196dad0d694aa4c507657",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/mac58/map-20261005b",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-map-20261005b"
+    },
+    {
+      "HEAD": "3e9f366c558b37ff58ea62dbe6900ffc29f1c2e1",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/serial-collaboration-specs",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/models-training-task-specs"
+    },
+    {
+      "HEAD": "0eeb15d19c188d1ee2fad1043f88707087c16c8a",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/park-closeout/20261005a",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 236,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/park-closeout-20261005a"
+    },
+    {
+      "HEAD": "19c3303caff79fccbbb8a006111e81140faeaccb",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/persistent-lead-spec-20261004",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/persistent-lead-spec-20261004"
+    },
+    {
+      "HEAD": "d731551a3e4a6850d74217081d2c489e15325a08",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/trunk-mts-policy-20261004",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/trunk-mts-policy-20261004"
+    },
+    {
+      "HEAD": "4ae822b755d95df416d544ffaac131ba9a76a584",
+      "accessible_registration": true,
+      "branch": "refs/heads/codex/waymo-session-retrospective-20261004",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-session-retrospective-20261004"
+    },
+    {
+      "HEAD": "8466a07dcd7a51501ae69049b36d40d4fd7b57d6",
+      "accessible_registration": true,
+      "branch": "refs/heads/work/waymo-tracer",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [
+        "experiments/waymo-perception/research/experiments.json"
+      ],
+      "untracked_count": 1218,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer"
+    },
+    {
+      "HEAD": "6bad91db75039cb990fdd4c49f5e0f256114f663",
+      "accessible_registration": true,
+      "detached": "",
+      "disposition": "RETAINED_PARKED_NO_REMOVAL",
+      "head_status": "Accepted mainline ancestry or explicitly archived divergent revisions; no new acceptance inferred",
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.scratch/pages-deploy"
+    },
+    {
+      "HEAD": "8654f55731020d666d82cdd00c9a8e0560a63d76",
+      "accessible_registration": false,
+      "branch": "refs/heads/codex/coherent-scene-publication",
+      "disposition": "STALE_REGISTRATION_RETAINED_NOT_PRUNED",
+      "head_status": "Referenced Git history retained; physical old location not promised",
+      "prunable": "gitdir file points to non-existent location",
+      "worktree": "/data02/home/philip.yang/workspace/surflo/.worktrees/coherent-scene-publication"
+    },
+    {
+      "HEAD": "26deded44b1fe95bedab1b7b75165cbe69779475",
+      "accessible_registration": false,
+      "branch": "refs/heads/codex/classical-to-surflo-e2e-audit",
+      "disposition": "STALE_REGISTRATION_RETAINED_NOT_PRUNED",
+      "head_status": "Referenced Git history retained; physical old location not promised",
+      "prunable": "gitdir file points to non-existent location",
+      "worktree": "/data02/home/philip.yang/workspace/surflo/.worktrees/foundation-geometry-reference"
+    },
+    {
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/park-closeout-review-standards-20261005a",
+      "HEAD": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+      "branch": "refs/heads/codex/park-closeout-review-standards/20261005a",
+      "accessible_registration": true,
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "disposition": "Read-only closeout review workspace; fresh current-mainline base; retained, no experimental dispatch",
+      "head_status": "Accepted mainline base; reviewer reads immutable candidate separately"
+    },
+    {
+      "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/park-closeout-review-spec-20261005a",
+      "HEAD": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+      "branch": "refs/heads/codex/park-closeout-review-spec/20261005a",
+      "accessible_registration": true,
+      "tracked_dirty_paths": [],
+      "untracked_count": 0,
+      "disposition": "Read-only closeout review workspace; fresh current-mainline base; retained, no experimental dispatch",
+      "head_status": "Accepted mainline base; reviewer reads immutable candidate separately"
+    }
+  ],
+  "schema_version": 1
+}

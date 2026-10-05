@@ -1,0 +1,59 @@
+"""Fixed host-only driver controls; no native/application effects."""
+import importlib.util
+from pathlib import Path
+import unittest
+
+
+class DriverControls(unittest.TestCase):
+    def load(self):
+        path = Path(__file__).with_name('preflight_driver.py')
+        self.assertTrue(path.exists(), 'reviewed immediate preflight driver missing')
+        spec = importlib.util.spec_from_file_location('driver', path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+
+    def test_roles_have_literal_argv_and_no_shell_or_model_dispatch(self):
+        driver = self.load()
+        authority = {'fixture_id': 'probe-1', 'tools': {'python': '/pinned/python',
+                     'systemd_run': '/pinned/systemd-run'}, 'driver_source': '/source/preflight_driver.py'}
+        actual = driver.actor_argv(authority, 'observer', {'path': '/owned/base', 'sha256': 'a'*64},
+                                   Path('/owned/authority'), Path('/owned/run'), Path('/owned/intent'))
+        self.assertEqual(actual[:2], ['/pinned/systemd-run', '--user'])
+        self.assertIn('MemoryMax=268435456', actual)
+        self.assertIn('MemorySwapMax=0', actual)
+        self.assertNotIn('shell', actual)
+        self.assertIn('/source/preflight_driver.py', actual)
+        for role in ('model', 'managed', '../bad'):
+            with self.subTest(role=role), self.assertRaises(ValueError):
+                driver.actor_argv(authority, role, {}, Path('/a'), Path('/b'), Path('/c'))
+
+    def test_live_old_birth_is_preserved_as_alive(self):
+        driver = self.load()
+        self.assertTrue(hasattr(driver, 'post_process'), 'actual process exit readback missing')
+        import os
+        process = driver.guards.incarnation(os.getpid())
+        proof = driver.post_process(process)
+        self.assertTrue(proof['same_birth_alive'])
+        self.assertEqual(proof['actual_process']['pid'], os.getpid())
+
+    def test_actor_scope_and_original_clock_are_bound_without_reset(self):
+        import time
+        driver = self.load()
+        self.assertTrue(hasattr(driver, 'actor_binding'), 'bounded actor binding missing')
+        clock = {'started_ns': time.monotonic_ns(), 'started_ms': time.time_ns()//1000000,
+                 'deadline_ms': 120000}
+        base = {'kind': 'RuntimeProbeAdmission', 'resources': {}}
+        actual = driver.actor_binding(base, 'observer', clock)
+        self.assertEqual(actual['live_clock'], clock)
+        self.assertIn('observer_scope', actual['resources'])
+        self.assertNotIn('observer_scope', base['resources'])
+        for role, bad in [('managed', base), ('operator', base)]:
+            with self.subTest(role=role), self.assertRaises(ValueError):
+                driver.actor_binding(bad, role, clock)
+        with self.assertRaises(ValueError):
+            driver.actor_binding(base, 'observer', {**clock, 'started_ns': clock['started_ns']-120000000001})
+
+
+if __name__ == '__main__':
+    unittest.main()

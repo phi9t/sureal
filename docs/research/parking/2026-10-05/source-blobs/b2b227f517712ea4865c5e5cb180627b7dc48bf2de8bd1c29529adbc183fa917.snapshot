@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "58.A uncovered assignment preparation row, version 1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "native_evaluation_eligibility",
+    "originating_measurement_ids",
+    "raw_points_in_box",
+    "retained_points_in_box",
+    "best_decoded_iou_3d",
+    "candidate_geometry_error",
+    "candidate_heading_error",
+    "predicted_class",
+    "predicted_score",
+    "class_rank",
+    "score_floor_survived",
+    "pre_topk_survived",
+    "nms_survived",
+    "post_topk_survived",
+    "proposal_rejection_reason",
+    "native_match_id",
+    "native_match_heading_error",
+    "checkpoint_sha256",
+    "heads_sha256",
+    "decoder_identity",
+    "camera_lidar_view",
+    "schema_version",
+    "observation_kind",
+    "frame_identity",
+    "object_id",
+    "native_class",
+    "native_difficulty",
+    "native_num_lidar_points_in_box",
+    "native_gt_present",
+    "center_in_training_roi",
+    "training_eligible",
+    "positive_anchor_count",
+    "assignment_audit",
+    "source_ids",
+    "unavailable_reason"
+  ],
+  "properties": {
+    "native_evaluation_eligibility": {
+      "type": "null",
+      "const": null
+    },
+    "originating_measurement_ids": {
+      "type": "null",
+      "const": null
+    },
+    "raw_points_in_box": {
+      "type": "null",
+      "const": null
+    },
+    "retained_points_in_box": {
+      "type": "null",
+      "const": null
+    },
+    "best_decoded_iou_3d": {
+      "type": "null",
+      "const": null
+    },
+    "candidate_geometry_error": {
+      "type": "null",
+      "const": null
+    },
+    "candidate_heading_error": {
+      "type": "null",
+      "const": null
+    },
+    "predicted_class": {
+      "type": "null",
+      "const": null
+    },
+    "predicted_score": {
+      "type": "null",
+      "const": null
+    },
+    "class_rank": {
+      "type": "null",
+      "const": null
+    },
+    "score_floor_survived": {
+      "type": "null",
+      "const": null
+    },
+    "pre_topk_survived": {
+      "type": "null",
+      "const": null
+    },
+    "nms_survived": {
+      "type": "null",
+      "const": null
+    },
+    "post_topk_survived": {
+      "type": "null",
+      "const": null
+    },
+    "proposal_rejection_reason": {
+      "type": "null",
+      "const": null
+    },
+    "native_match_id": {
+      "type": "null",
+      "const": null
+    },
+    "native_match_heading_error": {
+      "type": "null",
+      "const": null
+    },
+    "checkpoint_sha256": {
+      "type": "null",
+      "const": null
+    },
+    "heads_sha256": {
+      "type": "null",
+      "const": null
+    },
+    "decoder_identity": {
+      "type": "null",
+      "const": null
+    },
+    "camera_lidar_view": {
+      "type": "null",
+      "const": null
+    },
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "observation_kind": {
+      "type": "string",
+      "const": "archived_assignment_preparation"
+    },
+    "frame_identity": {
+      "type": "string"
+    },
+    "object_id": {
+      "type": "string"
+    },
+    "native_class": {
+      "type": "integer",
+      "enum": [
+        2,
+        3
+      ]
+    },
+    "native_difficulty": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "native_num_lidar_points_in_box": {
+      "type": "integer"
+    },
+    "native_gt_present": {
+      "type": "boolean",
+      "const": true
+    },
+    "center_in_training_roi": {
+      "type": "boolean",
+      "const": true
+    },
+    "training_eligible": {
+      "type": "boolean",
+      "const": true
+    },
+    "positive_anchor_count": {
+      "type": "integer",
+      "const": 0
+    },
+    "assignment_audit": {
+      "type": "object"
+    },
+    "source_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "unavailable_reason": {
+      "type": "string"
+    }
+  }
+}

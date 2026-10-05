@@ -1,0 +1,23 @@
+import unittest,sys,copy
+import numpy as np
+sys.path.insert(0,'/tmp/workers')
+from overfit_points import assemble_frame
+def records():
+ return [{'identity':{'context':'scene','timestamp':10,'laser':l,'return':r,'motion':'compensated' if l==1 else 'uncompensated','pixels':np.array([[0,1]],dtype=np.int64)},'return_present':True,'observations':{'xyz':np.array([[l,r,3.]],dtype=np.float64),'physical_features':np.array([[5.,7.,9.]])},'targets':{'segmentation':np.array([[123,14]])},'evaluation':{'nlz':np.array([-1])},'correspondence':{}} for l in range(1,6) for r in (1,2)]
+class Frames(unittest.TestCase):
+ def test_physical_input_identity_and_order(self):
+  out=assemble_frame(list(reversed(records())),scene='scene',timestamp=10)
+  np.testing.assert_array_equal(out['physical_points'][:,3],np.full(10,7.));np.testing.assert_array_equal(out['measurement_identity'][0],[1,1,0,1]);self.assertEqual(out['physical_points'].shape,(10,4));self.assertEqual(set(out),{'physical_points','measurement_identity','evaluation_nlz','return_states'})
+ def test_absent_and_empty_remain_distinct(self):
+  rows=records();rows[0].update(return_present=False,observations={},targets={},evaluation={});rows[0]['identity'].pop('pixels')
+  rows[1]['identity']['pixels']=np.empty((0,2),dtype=np.int64);rows[1]['observations']={'xyz':np.empty((0,3)),'physical_features':np.empty((0,3))};rows[1]['evaluation']={'nlz':np.empty((0,),dtype=np.int64)}
+  out=assemble_frame(rows,scene='scene',timestamp=10);self.assertEqual(len(out['physical_points']),8);np.testing.assert_array_equal(out['return_states'][:2],[[1,1,0,0],[1,2,1,0]])
+ def test_refuse_identity_and_alignment_faults(self):
+  mutations=[];mutations.append(records()[:-1]);rows=records();rows[-1]=copy.deepcopy(rows[0]);mutations.append(rows)
+  rows=records();rows[0]['identity']['timestamp']=11;mutations.append(rows)
+  rows=records();rows[0]['observations']['xyz'][0,0]=float('nan');mutations.append(rows)
+  rows=records();rows[0]['identity']['pixels']=np.array([[.5,1.]]);mutations.append(rows)
+  rows=records();rows[0]['evaluation']['nlz']=np.array([0]);mutations.append(rows)
+  for rows in mutations:
+   with self.assertRaises(ValueError):assemble_frame(rows,scene='scene',timestamp=10)
+if __name__=='__main__':unittest.main()

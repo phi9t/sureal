@@ -1,0 +1,14 @@
+import json
+from pathlib import Path
+import numpy as np
+from pipeline.anchor_grid import anchor_grid
+from gpu.scored_proposals_v2 import decode_scored_proposals
+spec=json.loads(Path('/experiment/research/training-anchor-templates.candidate.json').read_text());anchors=anchor_grid(nx=512,ny=512,cell_size=(.25,.25),origin=(-64.,-64.),templates=[x['values'] for x in spec['templates']]);count=0
+for variant in ['bn','gn_backbone','gn_backbone_ln_pillar']:
+ heads=Path('/tmp/heads-'+variant);scored=Path('/tmp/scored-'+variant)
+ for step in [0,25,50,100,200,300,500,750,1000,1500,2000]:
+  with np.load(heads/('checkpoint-%04d'%step)/'heads-00.npz',allow_pickle=False) as data:proposal=decode_scored_proposals(data['classification'],data['box_residuals'],data['direction'],anchors,iou_threshold=.5,score_floor=.05,pre_limit=4096,post_limit=500)
+  records=json.loads((scored/str(step)/'prepared/predictions.json').read_text());assert len(records)==len(proposal['boxes'])
+  np.testing.assert_array_equal(proposal['anchor_indices'],np.array([int(x['object_id'].split('-')[-1]) for x in records],dtype=np.int64));np.testing.assert_array_equal(proposal['boxes'],np.array([x['box'] for x in records],dtype=float).reshape(-1,7));np.testing.assert_array_equal(proposal['classes'],np.array([x['type'] for x in records],dtype=np.int64));np.testing.assert_array_equal(proposal['scores'],np.array([x['score'] for x in records],dtype=float));count+=1
+  print('EXACT',variant,step,flush=True)
+Path('/outputs/check.json').write_text(json.dumps({'checkpoint_exports_exactly_matched':count,'variants':['bn','gn_backbone','gn_backbone_ln_pillar'],'scope':'live exact frozen-proposal equivalence for the versioned score-first decoder; reference metrics preserved'}));print('PASS all33 reference checkpoint proposals unchanged')

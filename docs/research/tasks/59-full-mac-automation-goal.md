@@ -1,5 +1,11 @@
 # 59 — Complete verifiable local MAC automation
 
+**PARKED — October5 user override:** local MAC completion is paused pending
+Corenius infrastructure. No new dispatch or readiness-handshake implementation.
+See [the consolidated closeout](../parking/2026-10-05/README.md). Historical criteria/status below
+remain evidence, not permission to resume.
+
+
 Priority: P0. Owner goal: `avperc-impl`, native thread
 `01a0ee75-f519-7c80-b3c2-dc39d09e0b24`.
 

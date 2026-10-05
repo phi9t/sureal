@@ -1,0 +1,16 @@
+from pathlib import Path
+import hashlib,json,sys,subprocess
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+workers=Path('.scratch').resolve();cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);source=cache/'insula/semantic-recovery-driver-fixture-a/output/source';base=cache/'insula/overfit-point-worker-fixture-v1';base.mkdir();inputs=base/'input';inputs.mkdir();checks=[]
+publication=source/'publication.json';(inputs/'publication.json').write_bytes(publication.read_bytes());job={'scene':'scene','timestamps':[10],'publication_sha256':sha(publication)};(inputs/'job.json').write_text(json.dumps(job));producer=base/'producer';producer.mkdir();reference=base/'reference';reference.mkdir()
+for mode,out in [('producer',producer),('reference',reference)]:
+ if mode=='reference':job['producer_report_sha256']=sha(producer/'report.json');(inputs/'job.json').write_text(json.dumps(job))
+ command=launch_plan(root,code,source,out,['python','/tmp/workers/overfit-point-worker.py',mode]);i=command.index('--');command[i:i]=['--ro-bind',str(workers),'/tmp/workers','--ro-bind',str(inputs),'/tmp/input']
+ if mode=='reference':i=command.index('--');command[i:i]=['--ro-bind',str(producer),'/tmp/produced']
+ run=subprocess.run(command,capture_output=True,text=True,timeout=60);(out/'live.log').write_text(run.stdout+run.stderr);print(run.stdout+run.stderr);assert run.returncode==0;checks.append({'command':command,'exit_code':0})
+assert sha(producer/'report.json')==sha(reference/'report.json');d=json.loads((producer/'report.json').read_text());assert d['native_source_records']==10 and d['native_source_points']==10 and d['frames'][0]['points']==10
+record={'checks':checks,'runtime_lock':lock,'worker_hashes':{p.name:sha(p) for p in [workers/'overfit_points.py',workers/'overfit-point-worker.py',workers/'test_overfit_points.py']},'source_hashes':{str(p):sha(p) for p in [source/'scene.tar',publication]},'validation':d,'artifacts':{str(p):sha(p) for p in base.rglob('*') if p.is_file()},'scope':'synthetic complete archive to selected physical frame, independently literal-reread; actual13 HDFS publications remain open'}
+(code/'research/overfit-point-worker-fixture-verified.json').write_text(json.dumps(record,indent=2)+'\n');print('PASS full archive/selected physical frame fixture')

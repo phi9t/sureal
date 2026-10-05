@@ -1,0 +1,347 @@
+"""Bounded independent static/ready/public-channel preflight conductor.
+
+This reads an admitted recorder. It never creates native threads, tools or goals.
+"""
+import base64
+import hashlib
+import os
+from pathlib import Path
+import signal
+import stat
+import time
+from .evidence import artifact,json_artifact,command_record
+from .facts import require
+from .raw_git import write_new,sha256,verify_materialization,verify_retention
+from . import channel_authority as authority
+from . import notification_channel as channel
+from . import runtime_probe as probe
+from .probe_authority import validate_resources,load_fixture,checked_schema_runtime
+from .probe_os import birth,assert_birth,scope_read
+from .native_read import NativeReadClient
+
+
+def ref(path):return {'path':str(path),'sha256':sha256(path)}
+
+
+def protected(admission):
+    ids=admission['protected_thread_ids']
+    require(isinstance(ids,list) and len(ids)>=3 and len(ids)==len(set(ids)) and
+            all(isinstance(value,str) and value for value in ids) and os.environ.get('CODEX_THREAD_ID') in ids,
+            'Protected exact native identity union missing')
+
+
+def arm_deadline(admission,process_start_ns):
+    remaining=authority.clock_window(admission['live_clock'],time.monotonic_ns())
+    require(type(process_start_ns) is int and admission['live_clock']['started_ns']<=process_start_ns,
+            'Host clock reset after earliest observer module start')
+    def timeout(_signum,_frame):raise TimeoutError('Original120s host deadline exceeded')
+    signal.signal(signal.SIGALRM,timeout);signal.setitimer(signal.ITIMER_REAL,remaining/1000000000)
+
+
+def base_report(kind,admission):
+    return {'schema_version':1,'kind':kind,'status':'unknown','stop_capability':False,
+        'managed_dispatch_accepted':False,'task50_accepted':False,'ownership_released':False,'cleanup_permitted':False,
+        'started_ns':time.monotonic_ns(),'started_ms':time.time_ns()//1000000,
+        'live_clock':admission.get('live_clock'),'observations':[]}
+
+
+def fail(report,error):
+    report.update(status='unknown',stop_capability=False,error_type=type(error).__name__,reason=str(error))
+
+
+def final_sources(admission,contexts):
+    if 'writer_coverage' in admission:
+        from .writer_reader import validate_admission
+        validate_admission(admission['writer_coverage'],admission)
+    for role,context in zip(('auditor','operator'),contexts):
+        verify_materialization(artifact(admission[role]['materialization']),context['candidate'])
+        verify_retention(artifact(admission[role]['retention']),context['candidate'])
+        artifact(admission[role]['review'])
+    checked_schema_runtime(admission['runtime']);authority.checked_notifications(admission)
+    authority.checked_profile(admission,contexts[1])
+    artifact(admission['user_authority']);artifact(admission['native_shell']['executable'])
+
+
+def prepare_static(admission,output,authorization,entry,process_start_ns):
+    report=base_report('IndependentStaticPreflight',admission);created=False;contexts=None
+    try:
+        arm_deadline(admission,process_start_ns);artifact(authorization);own=validate_resources(admission,output)
+        output.mkdir(mode=0o700);created=True;protected(admission)
+        contexts=authority.static_contexts(admission,entry)
+        clock=authority.actor_clock(admission,authorization,output,entry,'static',contexts[1],own)
+        closure=authority.module_closure(contexts[0],admission['source_profile'])
+        report.update(authorization=authorization,auditor_context=contexts[0],operator_context=contexts[1],
+            auditor_retention=admission['auditor']['retention'],operator_retention=admission['operator']['retention'],
+            runtime=admission['runtime'],notification_schemas=admission['notification_schemas'],
+            fixture_plan=admission['fixture_plan'],resources={**admission['resources'],'actual_scope':own},
+            exec_argv=clock['argv'],host_argv=clock['host_argv'],actor=clock,source_profile=admission['source_profile'],
+            module_closure=closure)
+        final_sources(admission,contexts);authority.clock_window(admission['live_clock'],time.monotonic_ns())
+        report['final_module_closure']=authority.module_closure(contexts[0],admission['source_profile'])
+        report['status']='pass'
+    except (OSError,ValueError,KeyError,TypeError,IndexError) as error:fail(report,error)
+    finally:
+        if created:
+            report['ended_ns']=time.monotonic_ns();report['ended_ms']=time.time_ns()//1000000
+            write_new(output/'static-report.json',report)
+        signal.setitimer(signal.ITIMER_REAL,0)
+    return report,0 if report['status']=='pass' else 3
+
+
+def wait_artifact(path,until_ns):
+    require(path.is_absolute() and path.resolve()==path,'Literal admitted handoff path required')
+    while not path.exists():
+        require(time.monotonic_ns()<until_ns,'Missing handoff/recorder exit before deadline')
+        time.sleep(.02)
+    value=ref(path);return value,json_artifact(value)
+
+
+def upgrade(opened):
+    request=artifact(opened['upgrade_request']).read_bytes();response=artifact(opened['upgrade_response']).read_bytes()
+    require(len(request)<=32768 and len(response)<=32768 and request.endswith(b'\r\n\r\n') and
+            response.endswith(b'\r\n\r\n'),'Incomplete literal HTTP upgrade proof')
+    def fields(raw):
+        lines=raw.decode('ascii').split('\r\n');values={}
+        for line in lines[1:-2]:
+            key,value=line.split(':',1);key=key.lower()
+            require(key not in values,'Duplicate upgrade header');values[key]=value.strip()
+        return lines[0],values
+    start,req=fields(request);status,res=fields(response)
+    require(start=='GET / HTTP/1.1' and status.startswith('HTTP/1.1 101 ') and
+            req.get('upgrade','').lower()=='websocket' and res.get('upgrade','').lower()=='websocket' and
+            req.get('connection','').lower()=='upgrade' and res.get('connection','').lower()=='upgrade' and
+            req.get('sec-websocket-version')=='13','Actual original WebSocket upgrade differs')
+    key=req['sec-websocket-key'];require(len(base64.b64decode(key,validate=True))==16,'Invalid native upgrade nonce')
+    accept=base64.b64encode(hashlib.sha1((key+'258EAFA5-E914-47DA-95CA-C5AB0DC85B11').encode()).digest()).decode()
+    require(res.get('sec-websocket-accept')==accept,'Upgrade response not bound to actual original request')
+
+
+def bind_channel(admission,ready_ref,bound,fixture,operator):
+    require(bound.get('kind')=='FixtureBound' and bound['observer_ready']==ready_ref and
+            bound['fixture_id']==admission['fixture_plan']['fixture_id'] and
+            bound['fixture_provenance']==admission['fixture_provenance'],'Actual fixture handoff/ready identity differs')
+    wrapper=json_artifact(bound['fixture_provenance']);launch=json_artifact(wrapper['fixture_launch'])
+    require(bound['creation']==launch['creation'] and bound['invocation']==launch['invocation'] and
+            bound['payload_running']==wrapper['payload_running'],'Handoff not bound to actual RPC/payload witnesses')
+    manifest=json_artifact(bound['channel']);fixture.update(channel_id=manifest['channel_id'],connection_id=manifest['connection_id'])
+    channel.context(manifest,fixture,'NativeObservationChannel')
+    plan=admission['fixture_plan'];require(manifest['channel_root']==plan['channel_root'] and
+        manifest['workspace']==fixture['workspace']==plan['workspace'] and
+        manifest['fixture_output']==fixture['output']==plan['fixture_output'] and
+        manifest['observer_output']==plan['observer_output'] and
+        manifest['operator']==admission['operator'] and manifest['static_preflight']==admission['static_preflight'] and
+        manifest['notification_schemas']==admission['notification_schemas'] and
+        manifest['runtime']==admission['runtime'] and manifest['expected_command_sha256']==fixture['command_sha256'] and
+        manifest['common_git']=={'path':plan['common_git'],**plan['common_git_identity']},
+        'Original capture source/runtime/command/layout differs')
+    auth=json_artifact(launch['operator_authorization'])
+    require(manifest['operator_authorization']==launch['operator_authorization'] and
+            auth['observer_ready']==ready_ref,'Capture not armed by exact admitted ready/operator')
+    opened=json_artifact(manifest['connection_open']);channel.context(opened,fixture,'ConnectionOpen');upgrade(opened)
+    require(manifest['thread_id']==fixture['thread_id'],'Capture belongs to another exact native thread')
+    require(opened['runtime']==admission['runtime'] and
+            opened['peer']=={'pid':admission['runtime']['daemon']['pid'],'uid':os.getuid(),'gid':os.getgid()} and
+            opened['operator_process']==manifest['operator_process'] and
+            0<opened['opened_ns']<=manifest['armed_ns']<=time.monotonic_ns(), 'Connection identity/time differs')
+    assert_birth(manifest['operator_process'])
+    # Source-admitted operator records wall ordering as well as the fsynced arm.
+    goal=json_artifact(wrapper['initial_goal']);invocation=json_artifact(launch['invocation'])
+    require(goal['response']['id']!=invocation['response']['id'], 'Original armed RPC identities duplicate')
+    ack=json_artifact(ref(Path(manifest['channel_root']['path'])/'observer-ready-ack.json'))
+    require(ack.get('kind')=='ObserverReadyAcknowledgement' and ack['observer_ready']==ready_ref and
+            ack['operator']==manifest['operator_process'],'Original observer acknowledgement differs')
+    chronology(json_artifact(ready_ref),ack,manifest,json_artifact(launch['creation']),goal,invocation)
+    return manifest,{goal['response']['id'],invocation['response']['id']}
+
+
+def chronology(ready,ack,manifest,creation,goal,invocation):
+    for record in (creation,goal,invocation):
+        require(all(type(record.get(key)) is int and record[key]>0 for key in ('started_ns','sent_ns','ended_ns')) and
+                record['started_ns']<=record['sent_ns']<=record['ended_ns'], 'Actual RPC start/send/end coverage missing')
+    require(type(ready['ready_ns']) is int and type(ack['acknowledged_ns']) is int and
+        ready['ready_ns']<=ack['acknowledged_ns']<=creation['started_ns']<=creation['ended_ns']<=manifest['armed_ns']<=
+        goal['started_ns']<=goal['ended_ns']<=invocation['started_ns'] and
+        0<=creation['sent_ns']-ack['acknowledged_ns']<=2000000000 and
+        0<=creation['sent_ns']-ready['ready_ns']<=2000000000 and
+        all(ack['process'][key]==ready['process'][key] for key in ('boot_id','pid','start_ticks','uid')),
+        'Ready/ack/create/arm/goal/launch chronology differs or is stale')
+
+
+def combined_output(manifest,fixture):
+    total=0
+    for root in (Path(manifest['channel_root']['path']),Path(fixture['output'])):
+        for directory,dirs,files in os.walk(root,followlinks=False):
+            for name in dirs+files:
+                info=(Path(directory)/name).lstat()
+                require(stat.S_ISREG(info.st_mode) or stat.S_ISDIR(info.st_mode), 'Unadmitted operator output type')
+                if stat.S_ISREG(info.st_mode):total+=info.st_size
+    require(total<=33554432,'Combined channel/fixture output exceeds32MiB')
+    return total
+
+
+def collect_initial_snapshot(client,fixture,runtime,known,limits):
+    from .probe_os import capture_kernel
+    start=time.monotonic_ns();snapshot=probe.collect_native_pages(client,fixture,limits)
+    snapshot['kernel']=capture_kernel(fixture,runtime,known)
+    snapshot['interval']={'started_ns':start,'ended_ns':time.monotonic_ns()}
+    return snapshot
+
+
+def collect_terminal_snapshot(client,fixture,runtime,known,limits):
+    start=time.monotonic_ns();snapshot=probe.collect_snapshot(client,fixture,runtime,known,limits)
+    snapshot['interval']={'started_ns':start,'ended_ns':time.monotonic_ns()}
+    return snapshot
+
+
+def prefix_after(manifest,fixture,replies,end,*,final_ref=None):
+    deadline=time.monotonic_ns()+2000000000;root=Path(manifest['channel_root']['path'])
+    while True:
+        paths=sorted(root.glob('checkpoint-????.json'))
+        require(all(path.name=='checkpoint-%04d.json'%int(path.stem.split('-')[1]) for path in paths),
+                'Malformed checkpoint name')
+        if final_ref is not None:reference=final_ref
+        elif paths:
+            ordinary=[path for path in paths if int(path.stem.split('-')[1])<=64]
+            reference=ref(ordinary[-1]) if ordinary else None
+        else:reference=None
+        if reference is not None:
+            checkpoint=json_artifact(reference)
+            if checkpoint['drain']['covered_through_ns']>=end:
+                combined_output(manifest,fixture)
+                return channel.read_prefix(manifest,reference,fixture,now_ns=time.monotonic_ns(),interval_end_ns=end,
+                    allowed_reply_ids=replies,final=final_ref is not None)
+        require(time.monotonic_ns()<deadline,'No actual fresh drained cutoff after observation');time.sleep(.02)
+
+
+def completions(prefix,fixture,observations):
+    for sample in observations:
+        facts,commands=probe.native_facts(sample,fixture)
+        events=[event for event in prefix['derived_events'] if event['received_ns']<=sample['interval']['ended_ns']]
+        terminal=[event['command'] for event in events if event['method']=='item/completed' and event['command']]
+        require(len(terminal)==len(commands) and {item['id'] for item in terminal}=={item['id'] for item in commands},
+                'Final native item-list lacks same-item concordant actual completion')
+        for item in commands:
+            actual=next(value for value in terminal if value['id']==item['id'])
+            require(item==actual,'Final observed completion contradicts complete native history')
+        require(any(event['method']=='turn/completed' for event in events),'Final native turn completion event missing')
+
+
+def final_channel(admission,manifest,fixture,bound,ready_ref,close_ref,observations,replies):
+    exit_ref,receipt=wait_artifact(Path(admission['recorder_exit_path']),admission['live_clock']['started_ns']+100000000000)
+    require(receipt.get('kind')=='RecorderHostExit' and receipt['fixture_id']==fixture['fixture_id'] and
+            receipt['channel']==bound['channel'] and receipt['process']==manifest['operator_process'],
+            'Actual recorder host exit identity differs')
+    final=json_artifact(receipt['final']);channel.context(final,fixture,'ChannelFinal')
+    channel.integer(final['closed_ns'],'actual channel closed_ns');channel.integer(receipt['reaped_ns'],'actual reap_ns')
+    require(final['status']=='closed' and final['errors']==[] and final['close_request']==close_ref and
+            final['closed_ns']<=receipt['reaped_ns']<=time.monotonic_ns(), 'Recorder not actually closed/reaped')
+    prefix=prefix_after(manifest,fixture,replies,observations[-1]['interval']['ended_ns'],final_ref=final['last_checkpoint'])
+    completions(prefix,fixture,observations)
+    command=command_record(artifact(receipt['command']));auth=json_artifact(manifest['operator_authorization'])
+    expected=[auth['tools']['python']['path'],'-I','-B',str(Path(fixture['operator_source']['source'])/
+        'tests/collab/fixture_support/native_stop_fixture.py'),'launch','--authorization',manifest['operator_authorization']['path'],
+        '--authorization-sha256',manifest['operator_authorization']['sha256'],'--output',fixture['output']]
+    # ActorExec pins the literal executed operator argv; the host receipt pins
+    # the enclosing scope/driver argv, with the same durable original clock.
+    actor=json_artifact(ref(Path(auth['live_clock']['actor_exec_path'])));intent=json_artifact(auth['live_clock']['command_intent'])
+    require(actor['argv']==expected and actor['authorization']==manifest['operator_authorization'] and
+            actor['process']==manifest['operator_process'] and command['argv']==intent['argv'] and
+            command['cwd']==intent['cwd'] and command['exit_code']==0 and
+            0<=command['ended_ms']-command['started_ms']<=120000,'Actual operator command/source/exit differs')
+    scope=scope_read({key:actor['scope'][key] for key in ('path','device','inode')})
+    require(scope['members']==[] and (scope.get('exists') is False or
+            0<scope['memory_max']<=268435456 and scope['swap_max']==0 and scope['oom_kill']==0),
+            'Recorder owned scope/resources not independently closed')
+    post=json_artifact(receipt['post_process']);require(post.get('kind')=='RecorderPostProcess' and
+        post['expected_process']==manifest['operator_process'] and post['same_birth_alive'] is False and
+        final['closed_ns']<=receipt['reaped_ns']<=post['observed_ns']<=time.monotonic_ns(),'Actual recorder process closure missing')
+    channel.integer(post['observed_ns'],'actual post-process observed_ns')
+    try:
+        actual=birth(manifest['operator_process']['pid'])
+        require(any(actual[key]!=manifest['operator_process'][key] for key in ('boot_id','pid','start_ticks')),
+                'Actual recorder birth still alive')
+    except FileNotFoundError:pass
+    return {'host_exit':exit_ref,'final':receipt['final'],'prefix':prefix}
+
+
+def observe_channel(admission,output,authorization,entry,process_start_ns):
+    report=base_report('IndependentNativeStopPreflight',admission);created=False;contexts=None;client=None;fixture=None
+    try:
+        arm_deadline(admission,process_start_ns);artifact(authorization);scope=validate_resources(admission,output)
+        output.mkdir(mode=0o700);created=True;protected(admission)
+        auditor,operator,fresh=authority.live_contexts(admission,entry);contexts=(auditor,operator)
+        current_closure=authority.module_closure(auditor,admission['source_profile'])
+        static=json_artifact(admission['static_preflight']['report'])
+        for item in static['module_closure']['modules']:artifact(item)
+        report['module_closure']=probe.retain_observation(output,'initial-module-closure.json',current_closure,
+                                                        admission['resources']['max_output_bytes'])
+        clock=authority.actor_clock(admission,authorization,output,entry,'observer',operator,scope)
+        manifests=[probe.retain_observation(output,'fresh-%s.json'%role,value,admission['resources']['max_output_bytes'])
+            for role,value in zip(('auditor','operator'),fresh)]
+        ready={'schema_version':1,'kind':'ObserverReady','fixture_id':admission['fixture_plan']['fixture_id'],
+            'static_preflight':admission['static_preflight'],'authorization':authorization,'process':clock['process'],
+            'source':admission['auditor'],'fresh_manifest':manifests,'argv':clock['argv'],'observer_scope':scope,
+            'output':str(output),'live_clock':admission['live_clock'],'actor_exec':clock['actor_exec'],
+            'ready_ns':time.monotonic_ns()}
+        ready_ref=probe.retain_observation(output,'observer-ready.json',ready,admission['resources']['max_output_bytes'])
+        report.update(observer_ready=ready_ref,authorization=authorization,auditor=admission['auditor'],runtime=admission['runtime'])
+        bound_ref,bound=wait_artifact(Path(admission['handoff_path']),ready['ready_ns']+11000000000)
+        require(bound['observer_ready']==ready_ref and bound['fixture_id']==admission['fixture_plan']['fixture_id'],
+                'Dynamic handoff not exact ready/fixture')
+        dynamic={**admission,'fixture_provenance':bound['fixture_provenance']}
+        fixture=load_fixture(dynamic,static_operator_context=operator)
+        from .writer_reader import configure
+        configure(admission,fixture,output,authorization)
+        manifest,replies=bind_channel(dynamic,ready_ref,bound,fixture,operator)
+        report.update(fixture_bound=bound_ref,fixture_provenance=bound['fixture_provenance'],channel=bound['channel'])
+        client=NativeReadClient(admission['runtime'],fixture['thread_id'],admission['resources']['request_timeout_ms'])
+        report['transport']=client.transport;report['initialization']=client.initialize();known={}
+        witness=collect_initial_snapshot(client,fixture,admission['runtime'],known,admission['resources'])
+        initial_prefix=prefix_after(manifest,fixture,replies,witness['interval']['ended_ns'])
+        initial,commands=channel.initial_facts(witness,fixture,initial_prefix)
+        require(witness['kernel']['tool_scope']['members']==[fixture['payload_process']['pid']], 'Live payload membership differs')
+        witness['channel_prefix']=initial_prefix['checkpoint']
+        report['witness']=probe.retain_snapshot(client,output,'witness.json',witness,admission['resources']['max_output_bytes'])
+        first=None;counter=0
+        while first is None:
+            time.sleep(1);sample=collect_initial_snapshot(client,fixture,admission['runtime'],known,admission['resources'])
+            facts,listed=probe.native_read_facts(sample,fixture)
+            prefix=prefix_after(manifest,fixture,replies,sample['interval']['ended_ns'])
+            sample['channel_prefix']=prefix['checkpoint']
+            sample_ref=probe.retain_snapshot(client,output,'observation-%03d.json'%counter,sample,admission['resources']['max_output_bytes'])
+            report['observations'].append(sample_ref);counter+=1
+            if facts['thread/read']['thread']['status'].get('type')=='idle':
+                # Terminal item history is mandatory; notifications never fill it.
+                if probe.terminal_candidate(sample,fixture):first=sample;first_ref=sample_ref;completions(prefix,fixture,[first])
+        time.sleep(5.05);second=collect_terminal_snapshot(client,fixture,admission['runtime'],known,admission['resources'])
+        prefix=prefix_after(manifest,fixture,replies,second['interval']['ended_ns']);completions(prefix,fixture,[first,second])
+        second['channel_prefix']=prefix['checkpoint']
+        second_ref=probe.retain_snapshot(client,output,'stop-second.json',second,admission['resources']['max_output_bytes'])
+        report['stop_second']=second_ref
+        report['derived_facts']=probe.check_stop_conjunction(fixture,witness,[first,second],initial,commands)
+        close={'schema_version':1,'kind':'ChannelCloseRequest','fixture_id':fixture['fixture_id'],'channel':bound['channel'],
+            'observer_ready':ready_ref,'observations':[first_ref,second_ref],
+            'intervals':[first['interval'],second['interval']],'requested_ns':time.monotonic_ns()}
+        close_ref=probe.retain_observation(output,'channel-close-request.json',close,admission['resources']['max_output_bytes'])
+        report['channel_closure']=final_channel(admission,manifest,fixture,bound,ready_ref,close_ref,[first,second],replies)
+        report.update(status='pass',stop_capability=True)
+    except (OSError,ValueError,KeyError,TypeError,IndexError) as error:fail(report,error)
+    finally:
+        if client is not None:client.close()
+        if created:
+            try:
+                if client is not None and client.records:
+                    report['incomplete_native_observation']=probe.retain_observation(output,'incomplete-native-observation.json',
+                        {'schema_version':1,'kind':'IncompleteNativeObservation','records':client.records},admission['resources']['max_output_bytes'])
+                if contexts is not None:final_sources(admission,contexts)
+                if contexts is not None:
+                    if 'module_closure' in report:
+                        for item in json_artifact(report['module_closure'])['modules']:artifact(item)
+                    report['final_module_closure']=probe.retain_observation(output,'final-module-closure.json',
+                        authority.module_closure(contexts[0],admission['source_profile']),admission['resources']['max_output_bytes'])
+                artifact(authorization);authority.clock_window(admission['live_clock'],time.monotonic_ns())
+            except (OSError,ValueError,KeyError,TypeError) as error:fail(report,error)
+            report['ended_ns']=time.monotonic_ns();report['ended_ms']=time.time_ns()//1000000
+            write_new(output/'report.json',report)
+        signal.setitimer(signal.ITIMER_REAL,0)
+    return report,0 if report['status']=='pass' else 3

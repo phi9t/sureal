@@ -1,5 +1,11 @@
 # Research work: specs, tickets, queue and evidence
 
+**PARKED — October5 user override:** local MAC completion is paused pending
+Corenius infrastructure. No new dispatch or readiness-handshake implementation.
+See [the consolidated closeout](parking/2026-10-05/README.md). Historical criteria/status below
+remain evidence, not permission to resume.
+
+
 The research program currently uses versioned Markdown task specifications, execution plans, an experiment registry and an append-only evidence journal. These are different records with different responsibilities.
 
 | Record | Question it answers | Home |

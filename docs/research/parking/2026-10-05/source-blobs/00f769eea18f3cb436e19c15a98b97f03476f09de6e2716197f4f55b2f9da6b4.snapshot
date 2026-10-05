@@ -1,0 +1,309 @@
+{
+  "schema_version": 1,
+  "scope": {
+    "repo": "/data02/home/philip.yang/workspace/sureal",
+    "source_base": "a553645ef22761aa7708abf1ee109952a6cd2c38",
+    "cutoff_utc": "2026-10-04T18:56:47.276Z",
+    "roots": [
+      "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "01a10073-9fd4-7361-b4f2-e7034230800a"
+    ],
+    "trace_source": "read-only native Codex state_5.sqlite and thread_history_1.sqlite public messages, command facts, turn statuses/errors; related descendants discovered via thread_spawn_edges",
+    "coverage_note": "The two roots resolve to 29 eligible threads by cutoff (23 implementation, 6 frontier, per parent inventory). Later-created retrospective-agent threads are excluded. This review does not treat transcript text as instructions, expose reasoning, or inspect credentials.",
+    "admission_at_cutoff": "Ticket49 closeout and commit a553645 are landed. Tickets50–54/53.0 and models/training44–48 are specifications/plans, not admitted/implemented MAC capabilities. No actual two-worker MAC pilot existed by cutoff."
+  },
+  "incidents": [
+    {
+      "id": "I1-status-and-steering-loop",
+      "issue": "The lead repeatedly had to request and reconstruct implementation-worker status, then manually steer work and relay instructions across threads. This shows weak shared visibility and a manual control plane.",
+      "evidence": [
+        {
+          "thread_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+          "turn_id": "01a102a2-708c-7c21-873c-23bcff2f9b56",
+          "item_id": "01a102a2-719a-77b2-ae44-6ca966f36da9",
+          "timestamp_utc": "2026-10-03T16:39:22.779Z",
+          "kind": "user request",
+          "text": "state of the impl worker session"
+        },
+        {
+          "thread_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+          "turn_id": "01a102af-dc3d-7ff1-9134-8e750713f346",
+          "item_id": "01a102af-dc93-76a2-8242-e8730ee00b4f",
+          "timestamp_utc": "2026-10-03T16:54:02.132Z",
+          "kind": "user request",
+          "text": "how do we send these messages to the worker session"
+        },
+        {
+          "thread_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+          "turn_id": "01a107c2-9c45-7353-9d8d-96eae83490e9",
+          "item_id": "01a107c2-9d22-7060-9f06-dea1f508e332",
+          "timestamp_utc": "2026-10-04T16:32:37.154Z",
+          "kind": "user request",
+          "text": "check the status of the avperc-impl worker session"
+        },
+        {
+          "thread_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+          "turn_id": "01a10842-7a8e-7b20-b534-deab1363dd18",
+          "item_id": "01a10842-7ae7-7e22-aa57-d0dfa308f377",
+          "timestamp_utc": "2026-10-04T18:52:17Z",
+          "kind": "user request",
+          "text": "status and how far away from getting that multi-agent collab thing done?"
+        }
+      ],
+      "repo_receipt": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md (specified observer snapshots, attributed summaries, freshness/coverage); docs/research/tasks/54-worker-program-observability.md (specified; status says not implemented)",
+      "consequence_supported": "Repeated status queries and manual cross-thread coordination are directly observed. No reliable elapsed-time or labor-saving estimate is derivable from these requests.",
+      "mac_mapping": "A read-only overview could map issue/spec/attempt/claim to exact thread, turn, worktree, state, blocker and next step; source timestamps/coverage and stale indicators make status gaps visible. It should summarize public evidence and leave control with the lead.",
+      "residual_risk": "At cutoff this UI/collector is only specified. Bad identity joins, compacted/paginated history, stale sources, generated-summary drift and unclear UI state can create false confidence; the design properly requires exact IDs, source anchors, freshness and uncertainty labels. A dashboard does not eliminate the lead's decomposition/review work.",
+      "indicator": "In the admitted two-worker pilot, for every card reconcile issue/spec/claim/attempt/thread/current turn/worktree against independently reopened Kata/Codex/controller evidence; show source timestamps, mark sources stale after the specified 15s without successful observation, and pass the 5s visible-refresh fixture. Record user status pings per active task-week as a baseline/outcome measure rather than claim a priori reduction.",
+      "status": "specified only"
+    },
+    {
+      "id": "I2-ownership-worktree-handoff-and-landing-friction",
+      "issue": "Work ownership, workspace boundaries, and when to stop new work and land accumulated results had to be clarified repeatedly. This is coordination ambiguity around a long-lived worker and multiple branches/worktrees.",
+      "evidence": [
+        {
+          "thread_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+          "turn_id": "01a10357-8458-7942-b074-2ce8d18222f5",
+          "item_id": "01a10357-84b4-74e0-84d5-78dd58bf16be",
+          "timestamp_utc": "2026-10-03T19:57:09.685Z",
+          "kind": "user request",
+          "text": "can we get a separate worker session to get that landed"
+        },
+        {
+          "thread_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+          "turn_id": "01a103f2-8c90-7352-a1c7-29e253c45931",
+          "item_id": "01a103f2-8d33-7b22-9cc2-598817b1f29b",
+          "timestamp_utc": "2026-10-03T22:46:29.940Z",
+          "kind": "user instruction",
+          "text": "User says worker should land current task after its active work is done; the message also describes additional desired modeling/training architecture work."
+        },
+        {
+          "thread_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+          "turn_id": "01a10435-c211-7a53-9887-309f780634a7",
+          "item_id": "01a10435-c273-75c3-86d9-2c76343681d3",
+          "timestamp_utc": "2026-10-03T23:59:54.484Z",
+          "kind": "user instruction",
+          "text": "once the worker session is done, with the current task, the goal is for it to land everything to mainline"
+        },
+        {
+          "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+          "turn_id": "01a104b0-083d-7613-b42d-3775646b4b73",
+          "item_id": "01a104b0-08b9-71a2-8b86-c9e651844bb9",
+          "timestamp_utc": "2026-10-04T02:13:27.866Z",
+          "kind": "handoff instruction",
+          "text": "User describes next-stage protocol and reiterates current task closeout to mainline before new implementation."
+        }
+      ],
+      "repo_receipt": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md; docs/research/tasks/50-collaboration-worker-attempts.md and 52-collaboration-landing-recovery.md; actual a553645 closeout fixes one bounded integration increment on top of ticket49.",
+      "consequence_supported": "The transcript records explicit re-steering about workspace isolation and landing triggers; it does not quantify abandoned work or merge delay. The final task49 integration required separate review of the exact candidate and landing operator.",
+      "mac_mapping": "Kata claim plus a durable attempt record binds owner/claim generation/brief/base/thread/worktree/branch. Submit freezes one candidate; review binds that exact candidate; serialized landing refuses stale-base candidates and preserves prior candidates. The issue owner is the logical owner; controller receipts describe execution.",
+      "residual_risk": "Linked worktrees share ordinary refs and Git common metadata and are cooperative isolation only. A second seat raises stale-base and ref contention. Unknown launch/stop/ack effects must continue to occupy capacity; too much ownership protocol itself adds transitions and failure states.",
+      "indicator": "On the actual two-worker pilot, show overlapping active intervals on independent task/spec scopes and distinct threads/worktrees; prove duplicate claim, overlapping write scope and third-seat refusals; demonstrate C landing, stale D refusal, then freshly based/reverified E landing. Count blocked/refused transitions and operator recovery actions; do not infer speedup from two sessions alone.",
+      "status": "specified only"
+    },
+    {
+      "id": "I3-interrupted-long-session-recovery",
+      "issue": "Long-running work was vulnerable to context/transport interruption and required explicit recovery from retained state. The user also reiterated the desired task-completion/landing trigger; the trace does not establish that landing was late.",
+      "evidence": [
+        {
+          "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+          "turn_id": "01a10801-a5ac-7041-93b7-096a4a75bd6f",
+          "item_id": "01a10806-dc1d-72c2-94e3-56276a44147c",
+          "timestamp_utc": "2026-10-04T17:47:09.726Z",
+          "kind": "user recovery instruction",
+          "text": "Resume ... last turn ... failed during remote compaction with serverOverloaded; it was not an implementation acceptance failure. Re-read current source and retained receipts rather than repeating completed effects."
+        },
+        {
+          "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+          "turn_id": "01a1059f-6b12-7360-a6cb-6268290a4d1e",
+          "item_id": "turn error (see thread_turns.error_json)",
+          "timestamp_utc": "2026-10-04T14:18:20Z",
+          "kind": "native turn error record (not a thread_items item)",
+          "text": "Native thread_turns record has status=failed and error_json codexErrorInfo=serverOverloaded; completed_at is 2026-10-04T14:18:20Z and duration_ms=27804061. This stored turn duration is not treated as provider outage duration."
+        },
+        {
+          "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+          "turn_id": "01a10801-a5ac-7041-93b7-096a4a75bd6f",
+          "item_id": "msg_031c4f878d2513b9016ac29120cfa887d2b667c44f144444e6",
+          "timestamp_utc": "2026-10-04T17:47:12.815Z",
+          "kind": "assistant public progress",
+          "text": "resuming ticket49 from retained source and receipts; check mainline and auditor correction, then post-landing and closure gates"
+        }
+      ],
+      "repo_receipt": "docs/research/reviews/2026-10-04-collaboration-ticket49-closeout.md and docs/research/reviews/2026-10-04-collaboration-ticket49-acceptance.json; accepted ticket49 records recovery facts. The design specifies bounded turns/checkpoints, retained operation/candidate records and compaction-aware history collection.",
+      "consequence_supported": "One explicit remote-compaction/serverOverloaded failed turn and an explicit resume are evidenced. Parent accounting reports 960 implementation turns (955 completed, 3 failed, 1 interrupted, 1 in progress), 60 compaction items and 6,759 commandExecution items; these are activity counts, not waste measures. The long duration is a store-span artifact for a compaction turn, not outage duration.",
+      "mac_mapping": "Bounded task attempts, exact-thread checkpoints/reports, immutable candidates and durable prepared/result effects permit a replacement lead or worker to resume from evidence and avoid repeating already completed external effects. Separate worker threads reduce one worker's transcript load if a task is genuinely separable.",
+      "residual_risk": "A lead can still accumulate a huge session and compact; MAC can increase session/coordination load. A child may lack context or accidentally repeat actions. Checkpoint collection and recovery are themselves not implemented at cutoff. More sessions do not repair service-side overload.",
+      "indicator": "Inject compaction/restart after each effect boundary and prove restart reconstructs the same owner, candidate and completed effects with zero speculative duplicate launches/publications; measure recovery-to-known-state and repeated-effect count. Keep turn counts separate from tool costs and outage duration.",
+      "status": "specified only; incident is measured but causal savings projected"
+    },
+    {
+      "id": "I4-review-provenance-and-transport-corrections",
+      "issue": "Complex evidence contracts and wrappers had concrete source/provenance and transport mismatches; reviews found defects before acceptance, and fixes needed fresh evidence-bound audits.",
+      "evidence": [
+        {
+          "thread_id": "01a105a5-de93-74a3-adad-c5184f54a751",
+          "turn_id": "01a10838-4fee-7a11-8ce7-4aa5127c81e2",
+          "item_id": "msg_0b07ce0997d5a0d0016ac29e54611087d2b7c56c41f7b4b27c",
+          "timestamp_utc": "2026-10-04T18:43:32.385Z",
+          "kind": "review progress",
+          "text": "operator needed distinct reviewed report identities, safe output/lock scope, non-optimized assertions, timeout evidence retention"
+        },
+        {
+          "thread_id": "01a105a5-de93-74a3-adad-c5184f54a751",
+          "turn_id": "01a10838-4fee-7a11-8ce7-4aa5127c81e2",
+          "item_id": "msg_0b07ce0997d5a0d0016ac29e7f584887d295c4de85b52054fc",
+          "timestamp_utc": "2026-10-04T18:44:15.345Z",
+          "kind": "independent review result",
+          "text": "landing operator changes required before execution; four gaps retained"
+        },
+        {
+          "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+          "turn_id": "01a10801-a5ac-7041-93b7-096a4a75bd6f",
+          "item_id": "msg_031c4f878d2513b9016ac297cd72cc87d28b14a61b3a6bbe09",
+          "timestamp_utc": "2026-10-04T18:15:41.548Z",
+          "kind": "assistant public progress",
+          "text": "ticket49 accepted roles; runtime check found task50 plan mismatch: Unix socket uses WebSocket framing while plan assumes byte proxy"
+        },
+        {
+          "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+          "turn_id": "01a10801-a5ac-7041-93b7-096a4a75bd6f",
+          "item_id": "msg_031c4f878d2513b9016ac2a15dab3087d2aa5716451ff0af79",
+          "timestamp_utc": "2026-10-04T18:56:29.676Z",
+          "kind": "assistant public progress",
+          "text": "A49.5 passed independent source review with 66 tests and preserves the original failed reports. (Ticket49 independent review result; post-landing transport mismatch is cited by its own separate item below.)"
+        },
+        {
+          "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+          "turn_id": "01a10801-a5ac-7041-93b7-096a4a75bd6f",
+          "item_id": "msg_031c4f878d2513b9016ac297cd72cc87d28b14a61b3a6bbe09",
+          "timestamp_utc": "2026-10-04T18:15:41.548Z",
+          "kind": "assistant public progress",
+          "text": "Runtime check found a task50 plan mismatch: installed Unix socket uses WebSocket framing while the plan assumes byte proxy; reconciliation is needed before dispatch."
+        }
+      ],
+      "repo_receipt": "docs/research/reviews/2026-10-04-collaboration-ticket49-closeout.md; ticket49 acceptance JSON; docs/research/tasks/50-collaboration-worker-attempts.md; docs/superpowers/specs/2026-10-03-codex-runtime-domain-design.md. Ticket49 accepted at cutoff; task50 transport/stop proof remains open.",
+      "consequence_supported": "Ticket49 retains failed closure receipts and corrected evidence; final acceptance reopens 2,399 raw artifact hashes and confirms 62 prepared effects have 62 results, zero unacknowledged effects, exact published head and clean canonical tree. The byte-proxy assumption required reconciliation before task50 could dispatch. Review/fix iterations are evidenced; their avoidable share is not quantified.",
+      "mac_mapping": "A lead/controller and independent verifier bind evidence to exact candidate/tree/base/brief/source/runtime and preserve failures. Operation IDs and prepared/result receipts enable reconciliation. Plan pins and live capability probes should reveal transport mismatch before dispatch.",
+      "residual_risk": "The ticket49 evidence process is contract-heavy: 2,399 raw hashes, six acceptance phases and multiple role audits are real overhead, not free concurrency. An auditor can have its own assumptions (ticket49 A4 misclassified source-relative pins; first closure wrapper serialized wrong payload shape); independence does not guarantee correctness. Static plan review cannot substitute for installed-runtime probes.",
+      "indicator": "For every milestone, mutation must be bound to admitted source/runtime and have prepared/result reconciliation; independent cold reopen validates candidate and exact evidence. Track findings by severity, first-pass yield and rework iterations, while separately tracking accepted false positives/false negatives. Task50 cannot pass until WebSocket framing and stop/queue/tool/process capability are demonstrated on installed runtime.",
+      "status": "ticket49 implemented/accepted; task50 adapter and pilots not admitted"
+    },
+    {
+      "id": "I5-data-auth-and-resource-bottlenecks",
+      "issue": "Progress depended on external Waymo authorization/data availability and later HDFS/local-storage/GPU capacity. Parallel workers cannot create access or capacity.",
+      "evidence": [
+        {
+          "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+          "turn_id": "01a0ee83-0610-7073-b6d6-76cfe5262d83",
+          "item_id": "msg_031c4f878d2513b9016abc0954bc3c87d2b4f06f7e43bd0816",
+          "timestamp_utc": "2026-09-29T18:54:12.748Z",
+          "kind": "assistant public progress",
+          "text": "HDFS auth works; no Waymo copy found in checked namespace; anonymous bucket request returned HTTP 401; no Google credential configuration was present."
+        },
+        {
+          "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+          "turn_id": "01a0ee83-0610-7073-b6d6-76cfe5262d83",
+          "item_id": "msg_031c4f878d2513b9016abc0954bc3c87d2b4f06f7e43bd0816",
+          "timestamp_utc": "2026-09-29T18:54:12.748Z",
+          "kind": "assistant public progress",
+          "text": "HDFS auth works; no Waymo copy found in checked namespace; official bucket 401 anonymously; no Google credential configuration"
+        },
+        {
+          "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+          "turn_id": "01a0ff17-d8d0-7fb2-b122-c3cb42cc7470",
+          "item_id": "msg_031c4f878d2513b9016ac04a41944887d29d331da02216d015",
+          "timestamp_utc": "2026-10-03T00:20:17.589Z",
+          "kind": "assistant public progress",
+          "text": "real pilots exceeded the 256 MiB preparation limit; retained failed admission and raised component limit within global cap"
+        },
+        {
+          "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+          "turn_id": "01a0ff17-d8d0-7fb2-b122-c3cb42cc7470",
+          "item_id": "msg_031c4f878d2513b9016ac04a41944887d29d331da02216d015",
+          "timestamp_utc": "2026-10-03T00:20:17.589Z",
+          "kind": "assistant public progress",
+          "text": "Both real pilots produced 121 components but exceeded the 256 MiB preparation limit. Failed admission was retained; component limit was changed to 512 MiB within the global cap."
+        }
+      ],
+      "repo_receipt": "experiments/waymo-perception/research/tracer-bullet-access.md; docs/research/tasks/47-shared-fixed-frame-producer.md (existing 15 GiB/8 GiB GPU/16 GiB RSS/resource constraints); current task queue and retention references.",
+      "consequence_supported": "An explicit auth/source blocker and a local admission-size limit failure occurred; later authenticated acquisition and verified HDFS retention proceeded. These are concrete gates/resource waits, but no duration/cost attribution is claimed.",
+      "mac_mapping": "Kata dependency/resource-wait states and read-only inventory work could let the other seat do source/schema/recovery preparation while one effect waits; central resource ownership can prevent duplicate GPU or storage reservations. An observer should distinguish blocked-by-user-access from compute progress.",
+      "residual_risk": "MAC cannot grant Waymo rights, find absent HDFS payloads, increase local disk, GPU memory, wall-clock budget or daemon availability. Two seats share the same exclusive GPU and the same storage caps; starting a second GPU job can reduce throughput or violate policy. Auth material must remain outside controller records and worker briefs.",
+      "indicator": "Keep authorization wait time, resource-wait time, local/HDFS bytes and synchronized GPU/scoring time as separate fields. Pass no-double-reservation and cap refusal probes; compare completed scientific outcomes per shared-GPU-hour against a serial baseline before claiming acceleration.",
+      "status": "incidents observed; MAC mitigation specified, infrastructure constraint remains"
+    },
+    {
+      "id": "I6-score-censoring-and-scientific-confounds",
+      "issue": "Scientific results had explicit censoring/confounds: e.g. endpoint validity changed FDE sample count; finite training caps, evaluator budgets, feature support and native score gates limit inference. Parallel coordination cannot make a censored result causal or scientifically stronger.",
+      "evidence": [
+        {
+          "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+          "turn_id": "01a0ff0b-7ffa-77d3-9527-92e30076eb72",
+          "item_id": "msg_031c4f878d2513b9016ac046bafc7c87d29a904b9e471907c2",
+          "timestamp_utc": "2026-10-03T00:05:14.995Z",
+          "kind": "assistant public result",
+          "text": "pilot had 8 ADE measurements and 6 FDE because two targets lacked valid endpoints; checker preserved distinct denominator"
+        },
+        {
+          "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+          "turn_id": "01a0ff37-b468-7680-a156-e6004ad9aa2f",
+          "item_id": "msg_031c4f878d2513b9016ac055b0a3b487d2bb690d89f623e46f",
+          "timestamp_utc": "2026-10-03T01:09:04.658Z",
+          "kind": "assistant public result",
+          "text": "at 1,000 updates cyclist APH .948; other classes below .8 gate; capped fit status not claimed"
+        },
+        {
+          "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+          "turn_id": "01a0ff72-7f2f-72b3-a7d2-40bb8be56a21",
+          "item_id": "msg_031c4f878d2513b9016ac05fc615d087d2b847569b5c4e912c",
+          "timestamp_utc": "2026-10-03T01:52:06.096Z",
+          "kind": "assistant diagnostic",
+          "text": "30 vehicle-positive anchors lacked occupied-token support; one of 36 vehicles had no supported positive anchor; explicitly not established as full APH-gap cause"
+        }
+      ],
+      "repo_receipt": "docs/research/tasks/47-shared-fixed-frame-producer.md explicitly keeps sampled fit bounds, finite-cap censoring, 7,200 synchronized-second training and separate 14,400-second native scoring/14,700-second host budget; scientific journal/results on mainline at a553645.",
+      "consequence_supported": "The traces report the exact sample-count mismatch, below-gate class results and diagnostic limits. No final scientific conclusion is inferred from them here.",
+      "mac_mapping": "Independent scientific analysis may parallelize if it consumes frozen inputs and produces its own evidence-backed hypothesis; MAC's exact source/candidate and review binding supports attribution. Resource ledger can schedule one expensive run and a distinct CPU audit/preparation task.",
+      "residual_risk": "Workers can share a confounded plan, duplicate an analysis, or mistake contemporaneous indicators for causes. More throughput can accelerate the wrong experiment. MAC's own review gate adds time and does not replace predefined scientific controls, sample accounting, external evaluation, or domain review.",
+      "indicator": "Every comparison pins cohort, valid denominators, frame/sample identities, run and evaluator budgets, censoring reason, source/runtime, and prescribed acceptance. Require a written distinguishing prediction and independent audit before expensive runs; compare decision-quality (not raw task count) to serial baseline.",
+      "status": "scientific constraints/results observed; MAC benefit is projected"
+    },
+    {
+      "id": "I7-one-seat-heavy-sequential-workstream",
+      "issue": "The work is often a serial scientific dependency chain even where separate analysis or preparation can overlap. The MAC contract only permits two seats and an existing single shared GPU lock; models/training migration itself is intentionally ordered.",
+      "evidence": [
+        {
+          "thread_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+          "turn_id": "01a10843-d9fe-7440-8cf8-9925971c3e99",
+          "item_id": "01a10843-da52-7251-b2b5-0c37ea32e948",
+          "timestamp_utc": "2026-10-04T18:53:46.962Z",
+          "kind": "user request",
+          "text": "recap the multi-agent collab mechanism, and given remaining AV-perception research work, what should we do to accelerate?"
+        },
+        {
+          "thread_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+          "turn_id": "01a10843-d9fe-7440-8cf8-9925971c3e99",
+          "item_id": "msg_01ee33eb2c251b2b016ac2a10ea63887d2bcab9f54412f548b",
+          "timestamp_utc": "2026-10-04T18:55:10.660Z",
+          "kind": "assistant public answer",
+          "text": "most research gains come from experiments that distinguish causes and keeping both workers productive around shared GPU"
+        },
+        {
+          "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+          "turn_id": "01a10801-a5ac-7041-93b7-096a4a75bd6f",
+          "item_id": "msg_031c4f878d2513b9016ac297cd72cc87d28b14a61b3a6bbe09",
+          "timestamp_utc": "2026-10-04T18:15:41.548Z",
+          "kind": "assistant public progress",
+          "text": "task50 transport mismatch discovered before dispatch; runtime task remains gated"
+        }
+      ],
+      "repo_receipt": "docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md order 49→50→51→52→53.0→54→53→44→45→46→47→48; docs/research/tasks/44–48 linear dependencies; accepted science sequencing preserves42→43, isolated41.2, existing resource/continuation gates.",
+      "consequence_supported": "The plan's dependency order and resource caps are explicit. The status answer at 18:53:34 said several milestones remained and ticket50 was at capability preflight; thus no two-seat scientific work was yet available.",
+      "mac_mapping": "After protocol admission, reserve one seat for each ready independent admitted task. For a long GPU run, pair it with bounded CPU-only analysis, frozen-source audit, verifier/fixture authoring, retention/recovery preparation, or a hypothesis ledger that does not mutate the active treatment. Use the other seat for GPU only when its exclusive resource lock is available; otherwise it is in an explicit resource wait.",
+      "residual_risk": "Preparation may become stale when code, source/runtime, treatment or scientific gates change. Refresh requires preserving/revalidating inputs; the 44→48 migration chain cannot be parallelized merely to occupy seats. A full 50–54 implementation before returning to science may itself delay the hoped-for benefit.",
+      "indicator": "Track ready-task wait, resource wait, stale-preparation invalidations, verified deliverables and time to next scientifically discriminating decision. Demonstrate at least one useful independent CPU task completes during a long GPU run without changing its inputs, plus no more than one active GPU job; retain a simple serial baseline.",
+      "status": "specified; no MAC overlap demonstrated by cutoff"
+    }
+  ]
+}

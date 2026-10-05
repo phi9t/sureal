@@ -1,0 +1,25 @@
+import json,math
+from pathlib import Path
+import numpy as np
+job=json.loads(Path('/tmp/input/job.json').read_text())
+with np.load(Path('/source')/job['physical_file'],allow_pickle=False) as a:points=a['physical_points'][:,:3]
+retained={};selected_cells={}
+for label,path in [('32','/tmp/original'),('64','/tmp/retained')]:
+ with np.load(Path(path)/'point-lineage.npz',allow_pickle=False) as a:ids=a['source_indices'];ids=ids[ids>=0];assert len(np.unique(ids))==len(ids);retained[label]=points[ids]
+ with np.load(Path(path)/'observations.npz',allow_pickle=False) as a:selected_cells[label]=set((a['coordinates'][:,2]*512+a['coordinates'][:,3]).tolist())
+frame=next(f for f in json.loads(Path('/tmp/boxes/targets.json').read_text())['frames'] if f['timestamp_micros']==job['timestamp_micros'])
+rows=[]
+for row in frame['rows']:
+ b=row['box']
+ if row['type'] not in [1,2,3,4] or row['num_lidar_points_in_box']<=0 or not(-64<=b[0]<64 and -64<=b[1]<64 and -4<=b[2]<6):continue
+ counts={}
+ for name,cloud in [('physical',points),*retained.items()]:
+  delta=cloud-np.array(b[:3]);c,s=math.cos(b[6]),math.sin(b[6]);inside=(np.abs(c*delta[:,0]+s*delta[:,1])<=b[3]/2)&(np.abs(-s*delta[:,0]+c*delta[:,1])<=b[4]/2)&(np.abs(delta[:,2])<=b[5]/2);counts[name]=int(inside.sum())
+ delta=points-np.array(b[:3]);c,s=math.cos(b[6]),math.sin(b[6]);inside=(np.abs(c*delta[:,0]+s*delta[:,1])<=b[3]/2)&(np.abs(-s*delta[:,0]+c*delta[:,1])<=b[4]/2)&(np.abs(delta[:,2])<=b[5]/2)
+ eligible=inside & np.all((points>=np.array([-64,-64,-4]))&(points<np.array([64,64,6])),axis=1)
+ xy=np.floor((points[eligible,:2]+64)/.25).astype(int);keys=xy[:,1]*512+xy[:,0]
+ counts['eligible_physical']=int(eligible.sum())
+ for label,cells in selected_cells.items():counts[label+'_within_selected_pillars']=sum(int(k) in cells for k in keys)
+ rows.append({'object_id':row['object_id'],'class':row['type'],'native_label_point_count':row['num_lidar_points_in_box'],'derived_oriented_box_point_support':counts})
+assert len(rows)==17
+Path('/outputs/check.json').write_text(json.dumps({'objects':rows,'scope':'GT-conditioned support diagnostic only; never model input or native annotation replacement'},indent=2));print('PASS live retained-point object support diagnostic',len(rows))

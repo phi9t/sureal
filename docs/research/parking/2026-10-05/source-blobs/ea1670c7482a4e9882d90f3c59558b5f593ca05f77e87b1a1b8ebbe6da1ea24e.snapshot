@@ -1,0 +1,134 @@
+"""Bounded, read-only WebSocket JSON-RPC over a pinned owned Unix endpoint."""
+import base64
+import hashlib
+import json
+import math
+import os
+from pathlib import Path
+import socket
+import stat
+import struct
+import time
+
+from .facts import require
+
+
+def protocol_json(body):
+    """Reject ambiguity in the entire frame before selecting public fields."""
+    def unique_pairs(items):
+        result={}
+        for key,value in items:
+            require(key not in result,'Duplicate native protocol JSON key')
+            result[key]=value
+        return result
+    def nonfinite(_literal):
+        raise ValueError('Nonfinite native protocol JSON number')
+    def finite_float(literal):
+        value=float(literal)
+        require(math.isfinite(value),'Nonfinite native protocol JSON number')
+        return value
+    return json.loads(body,object_pairs_hook=unique_pairs,parse_constant=nonfinite,parse_float=finite_float)
+
+
+class NativeReadClient:
+    def __init__(self,runtime,thread_id,timeout_ms):
+        self.runtime=runtime;self.thread_id=thread_id;self.timeout_ms=timeout_ms
+        self.sequence=0;self.buffer=b'';self.records=[]
+        require(type(timeout_ms) is int and 0<timeout_ms<=2000,'Bounded native read timeout required')
+        pin=runtime['endpoint'];endpoint=Path(pin['path']);info=endpoint.lstat()
+        require(endpoint.is_absolute() and stat.S_ISSOCK(info.st_mode) and info.st_uid==os.getuid() and
+                all(pin[key]==value for key,value in [('uid',info.st_uid),('device',info.st_dev),('inode',info.st_ino)]),
+                'Actual native socket incarnation differs')
+        self.socket=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+        try:
+            self.deadline=time.monotonic()+timeout_ms/1000
+            self._deadline();self.socket.connect(str(endpoint))
+            peer=struct.unpack('3i',self.socket.getsockopt(socket.SOL_SOCKET,socket.SO_PEERCRED,12))
+            require(peer[:2]==(runtime['daemon']['pid'],os.getuid()),'Actual native peer identity differs')
+            key=base64.b64encode(os.urandom(16)).decode()
+            self.socket.sendall(('GET / HTTP/1.1\r\nHost: localhost\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n'
+                'Sec-WebSocket-Key: '+key+'\r\nSec-WebSocket-Version: 13\r\n\r\n').encode())
+            while b'\r\n\r\n' not in self.buffer:
+                self._deadline()
+                piece=self.socket.recv(4096);require(piece,'Native Upgrade EOF');self.buffer+=piece
+                require(len(self.buffer)<=16384,'Native Upgrade size exceeded')
+            raw,self.buffer=self.buffer.split(b'\r\n\r\n',1);lines=raw.decode('ascii').split('\r\n')
+            headers={}
+            for line in lines[1:]:
+                name,value=line.split(':',1);name=name.lower();require(name not in headers,'Duplicate Upgrade header')
+                headers[name]=value.strip()
+            accept=base64.b64encode(hashlib.sha1((key+'258EAFA5-E914-47DA-95CA-C5AB0DC85B11').encode()).digest()).decode()
+            require(lines[0]=='HTTP/1.1 101 Switching Protocols' and headers.get('sec-websocket-accept')==accept and
+                    headers.get('upgrade','').lower()=='websocket' and
+                    'upgrade' in {token.strip().lower() for token in headers.get('connection','').split(',')},
+                    'Actual native WebSocket Upgrade invalid')
+            self.transport={'transport':'websocket-over-owned-unix','endpoint':pin,'peer_pid':peer[0],'peer_uid':peer[1],
+                            'status_line':lines[0]}
+        except Exception:self.socket.close();raise
+
+    def close(self):self.socket.close()
+
+    def _deadline(self):
+        remaining=self.deadline-time.monotonic()
+        require(remaining>0,'Absolute native I/O deadline')
+        self.socket.settimeout(remaining)
+
+    def _read(self,size):
+        while len(self.buffer)<size:
+            self._deadline()
+            piece=self.socket.recv(min(size-len(self.buffer),65536));require(piece,'Native frame EOF');self.buffer+=piece
+        result,self.buffer=self.buffer[:size],self.buffer[size:];return result
+
+    def _send(self,value,opcode=1):
+        self._deadline()
+        payload=json.dumps(value,separators=(',',':')).encode() if opcode==1 else value
+        require(len(payload)<=1048576,'Native request byte cap exceeded')
+        size=len(payload);mask=os.urandom(4)
+        prefix=bytes([128|opcode,128|size]) if size<126 else bytes([128|opcode,254])+struct.pack('!H',size) if size<65536 else bytes([128|opcode,255])+struct.pack('!Q',size)
+        self.socket.sendall(prefix+mask+bytes(byte^mask[i%4] for i,byte in enumerate(payload)))
+
+    def _receive(self):
+        first,second=self._read(2)
+        require(first&128 and not first&112 and not second&128,'Unsupported native frame coverage')
+        size=second&127
+        if size==126:size=struct.unpack('!H',self._read(2))[0]
+        elif size==127:size=struct.unpack('!Q',self._read(8))[0]
+        require(size<=1048576,'Native response byte cap exceeded')
+        body=self._read(size);opcode=first&15
+        if opcode==9:
+            require(size<=125,'Invalid native Ping');self._send(body,10);return None
+        require(opcode==1,'Native transport closed or unsupported frame')
+        return protocol_json(body)
+
+    def initialize(self):
+        result=self._rpc('initialize',{'clientInfo':{'name':'sureal_independent_stop_observer','version':'1'},
+                                     'capabilities':{'experimentalApi':True}})
+        self._send({'method':'initialized','params':{}})
+        return {'userAgent':result.get('userAgent')}
+
+    def _rpc(self,method,params):
+        self.sequence+=1;identifier=self.sequence;deadline=time.monotonic()+self.timeout_ms/1000
+        self.deadline=deadline
+        self._send({'id':identifier,'method':method,'params':params})
+        for _ in range(512):
+            remaining=deadline-time.monotonic();require(remaining>0,'Native response deadline')
+            self.socket.settimeout(remaining);response=self._receive()
+            self._deadline()  # Receive/parse/buffered replies must finish in the same absolute bound.
+            if response is None or response.get('id')!=identifier:continue  # Never retain unrelated/private events.
+            require('error' not in response and 'result' in response,'Native read refused or result coverage absent')
+            return response['result']
+        raise ValueError('Native unrelated-event bound exceeded')
+
+    def call(self,method,params):
+        from .runtime_probe import validate_read_request,public_response
+        validate_read_request(method,params,self.thread_id)
+        started=time.time_ns()//1000000
+        record={'method':method,'params':params,'started_ms':started}
+        try:
+            result=public_response(method,self._rpc(method,params));record['response']=result
+        except (OSError,ValueError,KeyError,TypeError) as error:
+            record['error_type']=type(error).__name__
+            raise
+        finally:
+            record.update(ended_ms=time.time_ns()//1000000,request_id=self.sequence);self.records.append(record)
+        return result

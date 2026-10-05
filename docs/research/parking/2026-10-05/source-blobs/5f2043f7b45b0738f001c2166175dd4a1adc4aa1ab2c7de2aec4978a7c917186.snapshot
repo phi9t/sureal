@@ -1,0 +1,157 @@
+"""Literal provenance counterexamples, not native fixture permission."""
+import copy
+import hashlib
+import importlib
+import json
+from pathlib import Path
+import subprocess
+import tempfile
+import unittest
+
+
+class ProvenanceTests(unittest.TestCase):
+    def setUp(self):
+        try:self.module=importlib.import_module('audit_support.probe_authority')
+        except ModuleNotFoundError:self.fail('Immutable stop probe authority checks missing')
+        runtime={'transport':'websocket-over-owned-unix','endpoint':{'path':'/native/socket','uid':7,'device':8,'inode':9},
+                 'daemon':{'boot_id':'boot','pid':100,'start_ticks':200,'executable':{'path':'/native/exe','sha256':'2'*64}}}
+        self.auth={'fixture_id':'fixture-1','runtime':runtime,'workspace':'/owned/worktree','output':'/owned/output',
+                   'common_git':'/owned/git','tools':{'systemd_run':{'path':'/usr/bin/systemd-run'},
+                       'python':{'path':'/usr/bin/python3'},'git':{'path':'/usr/bin/git'}}}
+        self.source='/owned/operator/tests/collab/fixture_support/native_stop_fixture.py'
+        import shlex
+        self.command=shlex.join(['/usr/bin/systemd-run','--user','--scope','--unit','sureal-sustained-collab-fixture-1',
+           '--property','MemoryMax=134217728','--property','MemorySwapMax=0','--','/usr/bin/python3','-I','-B',
+           self.source,'payload','--output','/owned/output/payload','--fixture-id','fixture-1'])
+        digest=hashlib.sha256(self.command.encode()).hexdigest()
+        self.auth['command_sha256']=digest
+        self.launch={'schema_version':1,'kind':'NativeFixtureLaunch','fixture_id':'fixture-1','thread_id':'fresh-thread',
+                     'workspace':'/owned/worktree','output':'/owned/output','common_git':'/owned/git',
+                     'payload_output':'/owned/output/payload','command_sha256':digest}
+        self.wrapper={'schema_version':1,'kind':'NativeStopFixture',**{k:self.launch[k] for k in
+                       ('fixture_id','workspace','output','common_git','command_sha256')}}
+        self.creation={'schema_version':1,'kind':'NativeFixtureRPC','method':'thread/start','params':{
+             'cwd':'/owned/worktree','approvalPolicy':'never','sandbox':'danger-full-access',
+             'runtimeWorkspaceRoots':['/owned/worktree','/owned/output','/owned/git'],
+             'baseInstructions':'Non-managed bounded tool fixture. Do not create a native goal.'},
+             'response':{'id':2,'result':{'thread':{'id':'fresh-thread','cwd':'/owned/worktree','turns':[]}}},
+             'started_ms':1000,'ended_ms':1100,'transport_incarnation':runtime}
+        self.invocation={'schema_version':1,'kind':'NativeFixtureRPC','method':'thread/shellCommand',
+             'params':{'threadId':'fresh-thread','command':self.command,'timeoutMs':90000},
+             'response':{'id':4,'result':{}},'started_ms':1200,'ended_ms':1300,'transport_incarnation':runtime}
+        self.goal={'schema_version':1,'kind':'NativeFixtureRPC','method':'thread/goal/get',
+             'params':{'threadId':'fresh-thread'},'response':{'id':3,'result':{'goal':None}},
+             'started_ms':1100,'ended_ms':1200,'transport_incarnation':runtime}
+
+    def check(self):
+        return self.module.fixture_rpc_identity(self.wrapper,self.launch,self.auth,self.creation,
+                                                self.invocation,self.goal,self.source,['lead-thread'])
+
+    def test_shell_ack_does_not_invent_turn_identity_or_worker_grant_acceptance(self):
+        fixture=self.check()
+        self.assertEqual(fixture['thread_id'],'fresh-thread')
+        self.assertNotIn('turn_ids',fixture)
+        self.assertFalse(fixture['worker_grants_accepted'])
+
+    def test_default_environment_omission_is_required_and_supplied_values_refuse(self):
+        self.assertNotIn('environments',self.creation['params'])
+        self.assertEqual(self.check()['thread_id'],'fresh-thread')
+        for value in ([],None,[{'id':'unadmitted-environment'}]):
+            with self.subTest(value=value):
+                self.creation['params']['environments']=value
+                with self.assertRaises(ValueError):self.check()
+        del self.creation['params']['environments']
+
+    def test_empty_environments_disable_access_and_are_refused(self):
+        self.creation['params']['environments']=[]
+        with self.assertRaises(ValueError):self.check()
+
+    def test_wrong_launch_method_timeout_command_thread_runtime_or_history_refuse(self):
+        for owner,key,value in [('invocation','method','turn/start'),('invocation','params',{
+                'threadId':'fresh-thread','command':self.command,'timeoutMs':60000}),
+            ('invocation','transport_incarnation',{}),('creation','params',{'cwd':'/owned/worktree'}),
+            ('creation','response',{'id':2,'result':{'thread':{'id':'fresh-thread','cwd':'/owned/worktree','turns':[{'id':'old'}]}}})]:
+            saved=copy.deepcopy(getattr(self,owner));getattr(self,owner)[key]=value
+            with self.assertRaises(ValueError):self.check()
+            setattr(self,owner,saved)
+        self.invocation['params']['command']='true'
+        with self.assertRaises(ValueError):self.check()
+
+    def test_protected_thread_goal_or_unrelated_fixture_refuse(self):
+        self.goal['response']['result']['goal']={'status':'active'}
+        with self.assertRaises(ValueError):self.check()
+        self.goal['response']['result']['goal']=None
+        self.wrapper['fixture_id']='different'
+        with self.assertRaises(ValueError):self.check()
+        self.wrapper['fixture_id']='fixture-1'
+        with self.assertRaises(ValueError):self.module.fixture_rpc_identity(self.wrapper,self.launch,self.auth,
+             self.creation,self.invocation,self.goal,self.source,['fresh-thread'])
+
+
+class SourceTests(unittest.TestCase):
+    def setUp(self):
+        from audit_support.raw_git import materialize,retain
+        self.temp=tempfile.TemporaryDirectory(prefix='a50-source-control-');self.addCleanup(self.temp.cleanup)
+        self.root=Path(self.temp.name);self.repo=self.root/'repo';self.repo.mkdir()
+        def git(*argv):
+            return subprocess.run(['git','-c','core.hooksPath=/dev/null','-C',str(self.repo),*argv],
+                                  check=True,capture_output=True).stdout.decode().strip()
+        git('init','-q');git('config','user.name','Auditor unit fixture');git('config','user.email','oracle@localhost')
+        (self.repo/'base').write_text('fixture');git('add','.');git('commit','-qm','base')
+        entry=self.repo/'tests/collab/audit_support/runtime_probe.py';entry.parent.mkdir(parents=True);entry.write_text('# fixture source\n')
+        coverage=self.repo/'docs/collaboration/coverage.json';coverage.parent.mkdir(parents=True);coverage.write_text('{"schema_version":1}\n')
+        git('add','.');git('commit','-qm','auditor fixture')
+        candidate=git('rev-parse','HEAD');retained=retain(self.repo,candidate,self.root/'retained','unit-auditor')
+        receipt=self.root/'materialization.json'
+        source=materialize(Path(retained['repository']),candidate,self.root/'source',receipt,'unit-auditor')
+        self.entry=Path(source['source'])/'tests/collab/audit_support/runtime_probe.py'
+        self.review=self.root/'review.json'
+        self.review.write_text(json.dumps({'schema_version':1,'kind':'independent-auditor-source-review',
+            **{key:source[key] for key in ('candidate','parent','tree','source')},'author':'unit-auditor',
+            'reviewer':'unit-reviewer','verdict':'pass','materialization':self.ref(receipt),
+            'retention':self.ref(self.root/'retained/retention.json')}))
+        authority=self.root/'user.json';authority.write_text('{"schema_version":1,"fixture_only":true}')
+        self.admission={'schema_version':1,'kind':'RuntimeProbeAdmission','probe':'stop-capability',
+            'authors':{'producer':'unit-producer','auditor':'unit-auditor','reviewer':'unit-reviewer'},
+            'auditor':{'candidate':candidate,'source':source['source'],'materialization':self.ref(receipt),
+                       'review':self.ref(self.review)},'user_authority':self.ref(authority),
+            'coverage':self.ref(Path(source['source'])/'docs/collaboration/coverage.json')}
+
+    @staticmethod
+    def ref(path):return {'path':str(path),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+
+    def check(self):
+        from audit_support.probe_authority import validate_sources
+        return validate_sources(self.admission,self.entry)
+
+    def test_reviewed_actual_source_and_fresh_cold_pack_are_bound(self):
+        self.assertEqual(self.check()['source'],str(self.entry.parents[3]))
+        self.entry.write_text('# altered source\n')
+        with self.assertRaises(ValueError):self.check()
+
+    def test_missing_coldpack_or_review_cannot_be_replaced_by_flags(self):
+        retained=json.loads((self.root/'retained/retention.json').read_text())
+        Path(retained['pack_path']).unlink()
+        self.admission['passed']=True
+        with self.assertRaises(ValueError):self.check()
+
+    def test_wrong_kind_reviewer_or_actual_execution_source_refuses(self):
+        from audit_support.probe_authority import validate_sources
+        with self.assertRaises(ValueError):validate_sources(self.admission,self.repo/'tests/collab/audit_support/runtime_probe.py')
+        self.admission['kind']='ProjectAdmission'
+        with self.assertRaises(ValueError):self.check()
+
+    def test_cli_flag_only_permission_returns_unknown_without_native_or_output_effect(self):
+        authority=self.root/'flag-only.json';authority.write_text(json.dumps({'schema_version':1,
+            'kind':'RuntimeProbeAdmission','probe':'stop-capability','passed':True}))
+        output=self.root/'not-created'
+        entry=Path(__file__).parent/'runtime_probe.py'
+        result=subprocess.run(['python3',str(entry),'--probe','stop-capability','--authorization',str(authority),
+            '--output',str(output)],capture_output=True,timeout=2)
+        self.assertEqual(result.returncode,3,result.stderr.decode())
+        self.assertFalse(output.exists())
+        envelope=json.loads(result.stdout);self.assertEqual(envelope['status'],'unknown')
+        self.assertFalse(envelope['stop_capability']);self.assertFalse(envelope['task50_accepted'])
+
+
+if __name__=='__main__':unittest.main()

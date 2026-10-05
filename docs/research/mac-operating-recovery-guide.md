@@ -1,5 +1,11 @@
 # MAC operating and recovery guide — bootstrap status
 
+**PARKED — October5 user override:** local MAC completion is paused pending
+Corenius infrastructure. No new dispatch or readiness-handshake implementation.
+See [the consolidated closeout](parking/2026-10-05/README.md). Historical criteria/status below
+remain evidence, not permission to resume.
+
+
 This guide records current operation, not full automation acceptance. The goal
 is [59](tasks/59-full-mac-automation-goal.md); inspect the
 [completion manifest](mac-automation-completion-manifest.json) before assuming

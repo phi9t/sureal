@@ -1,0 +1,93 @@
+"""Recover both original camera gaps after full native shape continuation."""
+import hashlib,json,os,subprocess,sys,time
+from pathlib import Path
+base=Path(__file__).resolve().parents[1];code=base/'experiments/waymo-perception';sys.path.insert(0,str(code))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+from pipeline.staging_lease import staging_lease
+from pipeline.staged_derived_archive import working_bytes
+cache=Path.home()/'.cache/waystone/waymo-perception';working=cache/'scientific-processing';research=code/'research'
+def sha(p):
+ with Path(p).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+def load(p):return json.loads(Path(p).read_text())
+def save(p,d):
+ q=p.with_suffix('.pending.json');q.write_text(json.dumps(d,indent=2)+'\n');q.replace(p)
+def alive(pid,name):
+ p=Path('/proc')/str(pid)/'cmdline'
+ if not p.exists():return False
+ cmd=p.read_bytes()
+ if not cmd:return False
+ if name.encode() not in cmd:raise ValueError('owner PID identity changed')
+ return True
+manifest=code/'scientific-acquisition.candidate.json';coverage=research/'camera-lifecycle-coverage-reconciled-host-audit.json';m=load(manifest);missing=load(coverage)['camera_lifecycle_missing_scenes']
+assert missing==['1730266523558914470_305_260_325_260','4759225533437988401_800_000_820_000']
+assert load(coverage)['camera_scenes_with_retained_lifecycle_evidence']==101
+filepins={str(p):sha(p) for p in [manifest,coverage,code/'scientific-cohort.candidate.json',code/'dataset.lock.json',code/'scientific-camera-preprocess.py',code/'publish-scientific-camera.py',code/'verify-camera-replay.py']}
+codepins={str(p.relative_to(code)):sha(p) for p in (code/'pipeline').glob('*.py')}
+sourcepins={scene:{c:sha(cache/'scientific-source-audit'/f"{m['scenes'][scene]['official_split']}-{c}-{scene}.json") for c in m['components']} for scene in missing}
+root=cache/'insula/rootfs-v2';lock=load(Path(str(root)+'.lock.json'))
+def unchanged():
+ assert filepins=={p:sha(p) for p in filepins}
+ assert codepins=={str(p.relative_to(code)):sha(p) for p in (code/'pipeline').glob('*.py')}
+ for scene,pins in sourcepins.items():
+  for c,h in pins.items():assert sha(cache/'scientific-source-audit'/f"{m['scenes'][scene]['official_split']}-{c}-{scene}.json")==h
+
+def gate():
+ if alive(2348064,'await-semantic-recovery-admission-v4.py'):return False
+ if alive(2350750,'await-scientific-native-shapes-v2.py'):return False
+ shape=load(research/'scientific-native-shape-progress.json')
+ assert shape['admitted_scenes']==103 and set(shape['scene_evidence'])==set(m['scenes']) and shape['records_verified']==203850,'shape owner terminal without full103 admission'
+ return True
+if '--observe-once' in sys.argv:
+ unchanged();print('PASS exact two-gap and all source/code pins; ready:',gate());sys.exit(0)
+print('WAIT semantic2348064 and shape2350750 owners; exact two camera gaps retained',flush=True)
+while not gate():time.sleep(30)
+unchanged();verify_rootfs(root,lock['rootfs_sha256'])
+with staging_lease(working/'cohort-queue.lock'):
+ destination=working/'camera-gap-recovery-v1';destination.mkdir(exist_ok=False)
+ admitted={}
+ for scene in missing:
+  unchanged();run=destination/scene;run.mkdir();camera=run/'camera';publication=run/'camera-publication';replay=run/'camera-replay';checks=[]
+  def call(stage,cmd):
+   started=time.monotonic();r=subprocess.run(cmd,capture_output=True,text=True);(run/(stage+'.log')).write_text(r.stdout+r.stderr);checks.append({'stage':stage,'command':cmd,'exit_code':r.returncode,'elapsed_seconds':time.monotonic()-started})
+   if r.returncode:raise ValueError('camera gap stage failed; preserve logs: '+stage)
+   unchanged();print('PASS camera gap',scene,stage,flush=True)
+  def audit_receipt(path,folder):
+   r=load(path);assert r.get('checks') and all(c['exit_code']==0 for c in r['checks']) and r['runtime_lock']==lock
+   for n,h in r['candidate_hashes'].items():assert sha(code/n)==h
+   for n,h in r['artifacts'].items():assert sha(folder/n)==h
+   return r
+  call('camera-preprocess',['python',str(code/'scientific-camera-preprocess.py'),'--scene',scene,'--output',str(camera)])
+  hashes={}
+  for c in ['camera_image','camera_segmentation','camera_box']:
+   p=camera/'evidence'/c/'receipt.json';r=audit_receipt(p,camera);assert r['source_record_sha256']==sourcepins[scene][c];hashes[c]=sha(p)
+  evidence=run/'camera-evidence.json';save(evidence,{'scene':scene,'processing':str(camera),'receipt_hashes':hashes})
+  call('camera-publication',['python',str(code/'publish-scientific-camera.py'),'--evidence',str(evidence),'--expected-evidence-sha256',sha(evidence),'--output',str(publication)])
+  audit_receipt(publication/'receipt.json',publication);ph=sha(publication/'receipt.json')
+  call('camera-replay',['python',str(code/'verify-camera-replay.py'),str(camera),str(publication),str(replay),'--expected-receipt-sha256',ph,'--usage',m['scenes'][scene]['research_splits'][0]])
+  audit_receipt(replay/'receipt.json',replay);rh=sha(replay/'receipt.json')
+  program="import json;from pipeline.camera_eviction import evict_camera;r=evict_camera('/outputs','/opt','/srv',expected_publication_sha256="+repr(ph)+",expected_replay_sha256="+repr(rh)+");print(json.dumps({'status':r['status'],'bytes_evicted':r['bytes_evicted']}))"
+  cmd=launch_plan(root,code,code,camera,['python','-c',program]);i=cmd.index('--');cmd[i:i]=['--bind',str(publication),'/opt','--ro-bind',str(replay),'/srv'];call('camera-eviction',cmd)
+  eviction=load(camera/'camera-eviction.json');assert eviction['status']=='verified camera eviction completed' and eviction['publication_receipt_sha256']==ph and eviction['replay_receipt_sha256']==rh
+  assert working_bytes(working)<=15*1024**3
+  retained={str(p):sha(p) for p in run.rglob('*') if p.is_file()}
+  checkpoint={'scene':scene,'manifest_sha256':sha(manifest),'source_record_hashes':sourcepins[scene],'runtime_lock':lock,'checks':checks,'retained_evidence_hashes':retained,'scope':'camera-only missing lifecycle; original point admission remains separate'}
+  cp=run/'camera-checkpoint.json';save(cp,checkpoint)
+  auditbase=cache/'insula'/('camera-gap-retained-admission-v1-'+scene);auditbase.mkdir();inputs=auditbase/'input';inputs.mkdir();out=auditbase/'output';out.mkdir()
+  expected={'scene':scene,'checkpoint_sha256':sha(cp),'manifest_sha256':sha(manifest),'source_hashes':sourcepins[scene],'runtime_lock':lock,'path_root':str(run)};save(inputs/'expected.json',expected)
+  program="""import json,importlib.util
+from pathlib import Path
+from pipeline.cohort_checkpoint import verify_checkpoint
+assert importlib.util.find_spec('tensorflow') is None
+e=json.loads(Path('/tmp/expected/expected.json').read_text())
+v=verify_checkpoint('/source/camera-checkpoint.json',expected_checkpoint_sha256=e['checkpoint_sha256'],code_root='/experiment',expected_runtime_lock=e['runtime_lock'],expected_manifest_sha256=e['manifest_sha256'],expected_source_hashes=e['source_hashes'],path_remap={e['path_root']:'/source'})
+assert v['scene']==e['scene'] and v['worker_receipts']==5 and v['verified_evictions']==1
+Path('/outputs/check.json').write_text(json.dumps(v,indent=2));print('PASS independent camera-only gap lifecycle',v)
+"""
+  cmd=launch_plan(root,code,run,out,['python','-c',program]);i=cmd.index('--');cmd[i:i]=['--ro-bind',str(inputs),'/tmp/expected'];r=subprocess.run(cmd,capture_output=True,text=True,timeout=180);(out/'live.log').write_text(r.stdout+r.stderr);assert r.returncode==0,'retain failed camera-only checkpoint admission'
+  unchanged();assert sha(cp)==expected['checkpoint_sha256'];validation=load(out/'check.json')
+  pointer=research/f'scientific-camera-gap-{scene}-verified.json';save(pointer,{'scene':scene,'membership':m['scenes'][scene],'checkpoint':str(cp),'checkpoint_sha256':sha(cp),'checks':[{'command':cmd,'exit_code':0}],'runtime_lock':lock,'expected_sha256':sha(inputs/'expected.json'),'validation':validation,'audit_artifacts':{p.name:sha(p) for p in out.iterdir() if p.is_file()},'scope':'one recovered missing camera lifecycle independently admitted; full103 camera reconciliation remains'})
+  admitted[scene]={'evidence':pointer.name,'evidence_sha256':sha(pointer),'checkpoint_sha256':sha(cp),'validation':validation}
+  save(research/'camera-gap-recovery-progress.json',{'required_scenes':missing,'admitted_scenes':len(admitted),'scene_evidence':admitted,'scope':'two original gaps only; full103 camera reconciliation separate'})
+  print('PASS independently admitted original camera gap',scene,len(admitted),'/2',flush=True)
+print('TERMINAL both camera gaps admitted; full103 aggregate audit remains',flush=True)

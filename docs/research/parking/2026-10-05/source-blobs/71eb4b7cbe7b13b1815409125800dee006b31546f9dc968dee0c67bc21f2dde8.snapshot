@@ -1,0 +1,435 @@
+"""Root-side actual source and readiness guards, without native effects."""
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import tempfile
+import time
+import unittest
+
+
+class GuardControls(unittest.TestCase):
+    def load(self):
+        path = Path(__file__).with_name('preflight_guards.py')
+        self.assertTrue(path.exists(), 'preflight fresh guards missing')
+        spec = importlib.util.spec_from_file_location('guard', path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+
+    def test_entire_source_bytes_modes_links_and_extra_entries_checked(self):
+        guard = self.load()
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root/'file').write_bytes(b'original')
+            (root/'link').symlink_to('file')
+            entries = []
+            for path, mode, data in [('file', '100644', b'original'), ('link', '120000', b'file')]:
+                entries.append({'path': path, 'kind': 'blob', 'mode': mode,
+                    'sha256': hashlib.sha256(data).hexdigest(), 'bytes': len(data),
+                    'oid': hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()})
+            context = {'source': str(root), 'entries': entries, 'gitlinks_excluded': []}
+            proof = guard.full_manifest(context)
+            self.assertEqual(proof['entries'], entries)
+            (root/'file').write_bytes(b'changed')
+            with self.assertRaises(ValueError):
+                guard.full_manifest(context)
+            (root/'file').write_bytes(b'original')
+            (root/'file').chmod(0o755)
+            with self.assertRaises(ValueError):
+                guard.full_manifest(context)
+            (root/'file').chmod(0o644)
+            (root/'extra').write_bytes(b'extra')
+            with self.assertRaises(ValueError):
+                guard.full_manifest(context)
+
+    def test_ready_wrong_or_ended_birth_old_time_or_wrong_static_ref_refuses(self):
+        guard = self.load()
+        process = guard.incarnation(os.getpid())
+        now = time.monotonic_ns()
+        scope = guard.process_scope(os.getpid())
+        argv = guard.argv(os.getpid())
+        ready = {'schema_version': 1, 'kind': 'ObserverReady', 'fixture_id': 'fixture-1',
+                 'process': process, 'argv': argv, 'ready_ns': now,
+                 'observer_scope': scope, 'static_preflight': {'report': 'static'},
+                 'output': '/owned/observer', 'source': {'candidate': 'source'}}
+        expected = {'fixture_id': 'fixture-1', 'static_preflight': {'report': 'static'},
+                    'output': '/owned/observer', 'source': {'candidate': 'source'}}
+        guard.check_ready(ready, expected, now)
+        for key, value in [('ready_ns', now-2000000001),
+                           ('process', {**process, 'start_ticks': process['start_ticks']+1}),
+                           ('static_preflight', {'report': 'other'})]:
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                guard.check_ready({**ready, key: value}, expected, now)
+
+    def test_channel_layout_has_no_writer_scan_exemptions(self):
+        guard = self.load()
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root/'channel').mkdir()
+            st = (root/'channel').stat()
+            pin = {'path': str(root/'channel'), 'uid': st.st_uid,
+                   'device': st.st_dev, 'inode': st.st_ino}
+            guard.channel_layout(pin, [str(root/'fixture'), str(root/'workspace')])
+            for path in [root/'channel'/'child', root, root/'channel']:
+                with self.subTest(path=path), self.assertRaises(ValueError):
+                    guard.channel_layout(pin, [str(path)])
+
+    def test_static_authority_binds_all_raw_context_and_current_pack_refs(self):
+        guard = self.load()
+        self.assertTrue(hasattr(guard, 'fresh_sources'), 'fresh static-source guard missing')
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            def write(name, value):
+                path = root/name
+                path.write_text(json.dumps(value))
+                return {'path': str(path), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
+            source = root/'source'
+            source.mkdir()
+            (source/'a').write_bytes(b'body')
+            entry = {'path': 'a', 'mode': '100644', 'kind': 'blob', 'bytes': 4,
+                     'oid': hashlib.sha1(b'blob 4\0body').hexdigest(),
+                     'sha256': hashlib.sha256(b'body').hexdigest()}
+            context = {'source': str(source), 'candidate': 'c'*40, 'tree': 'd'*40,
+                       'entries': [entry], 'gitlinks_excluded': []}
+            pack = root/'pack'
+            pack.write_bytes(b'private-component')
+            retention = {'candidate': context['candidate'], 'tree': context['tree'],
+                         'pack_path': str(pack), 'pack_sha256': hashlib.sha256(pack.read_bytes()).hexdigest()}
+            pin = {'candidate': context['candidate'], 'materialization': write('mat', context),
+                   'retention': write('retention', retention),
+                   'review': write('review', {'candidate': context['candidate'],
+                        'source': str(source), 'verdict': 'pass', 'reviewer_native_thread_id': 'reviewer'})}
+            authority = {'kind': 'StaticRuntimeProbeAdmission', 'auditor': pin,
+                         'operator': pin, 'runtime': {}, 'notification_schemas': {},
+                         'source_profile': write('profile', {}),
+                         'fixture_plan': {'tools': {}}, 'user_authority': write('user', {})}
+            report = {'kind': 'IndependentStaticPreflight', 'status': 'pass',
+                      'authorization': write('authority', authority),
+                      'auditor_context': context, 'operator_context': context}
+            command = {'exit_code': 0, 'started_ms': 10, 'ended_ms': 20,
+                       'stdout': write('stdout', {}), 'stderr': write('stderr', {})}
+            admission = {**authority, 'author_native_thread_id': 'author',
+                         'static_preflight': {'report': write('report', report),
+                                              'command': write('command', command)}}
+            self.assertEqual(len(guard.fresh_sources(admission)), 2)
+            for key, value in [('runtime', {'changed': True}),
+                               ('source_profile', write('wrong-profile', {})),
+                               ('fixture_plan', {'tools': {}, 'changed': True})]:
+                with self.subTest(key=key), self.assertRaises(ValueError):
+                    guard.fresh_sources({**admission, key: value})
+            bad_command = {**command, 'exit_code': False}
+            with self.assertRaises(ValueError):
+                guard.fresh_sources({**admission, 'static_preflight': {
+                    'report': admission['static_preflight']['report'],
+                    'command': write('bool-command', bad_command)}})
+            pack.write_bytes(b'changed')
+            with self.assertRaises(ValueError):
+                guard.fresh_sources(admission)
+
+    def test_import_closure_rejects_unadmitted_site_module(self):
+        import sys
+        import sysconfig
+        import types
+        from unittest.mock import patch
+        guard = self.load()
+        self.assertTrue(hasattr(guard, 'module_closure'), 'actual imported-file closure missing')
+        with tempfile.TemporaryDirectory() as temporary:
+            file = Path(temporary)/'unexpected.py'
+            file.write_bytes(b'# component')
+            module = types.ModuleType('unadmitted_component')
+            module.__file__ = str(file)
+            with patch.dict(sys.modules, {'unadmitted_component': module}):
+                with self.assertRaises(ValueError):
+                    guard.module_closure([Path(__file__).parents[3]], Path(sysconfig.get_path('stdlib')))
+
+    def test_import_closure_retains_actual_typing_namespaces_with_full_import_union(self):
+        import sys
+        import sysconfig
+        import typing
+        guard = self.load()
+        pins = []
+        for name in ('_distutils_hack', 'sitecustomize'):
+            module = sys.modules.get(name)
+            if module is not None:
+                path = Path(module.__file__).resolve()
+                pins.append({'name': name, 'path': str(path), 'observed_path': module.__file__,
+                             'sha256': hashlib.sha256(path.read_bytes()).hexdigest()})
+        proof = guard.module_closure([Path(__file__).parents[3]], Path(sysconfig.get_path('stdlib')), pins)
+        aliases = {row['name']: row for row in proof['stdlib_class_namespaces']}
+        self.assertEqual(set(aliases), {'typing.io', 'typing.re'})
+        for name, exports in [('typing.io', ['IO', 'TextIO', 'BinaryIO']),
+                              ('typing.re', ['Pattern', 'Match'])]:
+            self.assertIs(sys.modules[name], vars(typing)[name.split('.')[1]])
+            self.assertEqual(aliases[name]['owner_source'], {'path': typing.__file__,
+                'sha256': hashlib.sha256(Path(typing.__file__).read_bytes()).hexdigest()})
+            self.assertEqual(aliases[name]['exports'], exports)
+
+    def test_pathless_unknown_module_and_namespace_are_not_binary_pinned(self):
+        import sys
+        import sysconfig
+        import types
+        from unittest.mock import patch
+        guard = self.load()
+        arbitrary = types.ModuleType('unexpected_pathless')
+        namespace = types.ModuleType('unexpected_namespace')
+        namespace.__spec__ = types.SimpleNamespace(origin=None, submodule_search_locations=['/tmp'])
+        for module in (arbitrary, namespace):
+            with self.subTest(module=module.__name__), patch.dict(sys.modules, {module.__name__: module}, clear=True):
+                with self.assertRaises(ValueError):
+                    guard.module_closure([Path(__file__).parents[3]], Path(sysconfig.get_path('stdlib')))
+
+    def test_typing_namespace_counterfeit_or_wrong_export_refuses(self):
+        import sys
+        import sysconfig
+        import types
+        import typing
+        from unittest.mock import patch
+        guard = self.load()
+        for replacement in (types.SimpleNamespace(__module__='typing'),
+                            types.ModuleType('typing.io')):
+            with patch.dict(sys.modules, {'typing': typing, 'typing.io': replacement}, clear=True):
+                with self.assertRaises(ValueError):
+                    guard.module_closure([Path(__file__).parents[3]], Path(sysconfig.get_path('stdlib')))
+        with patch.dict(sys.modules, {'typing': typing, 'typing.io': typing.io}, clear=True), \
+                patch.object(typing.io, 'IO', object()):
+            with self.assertRaises(ValueError):
+                guard.module_closure([Path(__file__).parents[3]], Path(sysconfig.get_path('stdlib')))
+
+    def test_typing_namespace_wrong_origin_and_parent_refuse(self):
+        import sys
+        import sysconfig
+        import types
+        import typing
+        from unittest.mock import patch
+        guard = self.load()
+        with patch.dict(sys.modules, {'typing.io': typing.io}, clear=True):
+            with self.assertRaises(ValueError):
+                guard.module_closure([Path(__file__).parents[3]], Path(sysconfig.get_path('stdlib')))
+        with patch.dict(sys.modules, {'typing': typing, 'typing.io': typing.io}, clear=True), \
+                patch.object(typing, '__file__', '/tmp/typing.py'):
+            with self.assertRaises(ValueError):
+                guard.module_closure([Path(__file__).parents[3]], Path(sysconfig.get_path('stdlib')))
+
+    def test_pathless_origin_strings_do_not_establish_builtin_or_frozen(self):
+        import sys
+        import sysconfig
+        import types
+        from unittest.mock import patch
+        guard = self.load()
+        for origin in ('built-in', 'frozen'):
+            counterfeit = types.SimpleNamespace(__spec__=types.SimpleNamespace(origin=origin))
+            with self.subTest(origin=origin), patch.dict(sys.modules, {'counterfeit': counterfeit}, clear=True):
+                with self.assertRaises(ValueError):
+                    guard.module_closure([Path(__file__).parents[3]], Path(sysconfig.get_path('stdlib')))
+
+    def test_actual_binary_registered_pathless_module_is_classified(self):
+        import sys
+        import sysconfig
+        from unittest.mock import patch
+        guard = self.load()
+        with patch.dict(sys.modules, {'sys': sys}, clear=True):
+            proof = guard.module_closure([Path(__file__).parents[3]], Path(sysconfig.get_path('stdlib')))
+            self.assertIn({'name': 'sys', 'origin': 'built-in'}, proof['binary_modules'])
+
+    def test_copied_typing_owner_cannot_claim_original_definition_provenance(self):
+        import sys
+        import sysconfig
+        import types
+        import typing
+        from unittest.mock import patch
+        guard = self.load()
+        copied = types.ModuleType('typing')
+        vars(copied).update(vars(typing))
+        with patch.dict(sys.modules, {'typing': copied, 'typing.io': typing.io}, clear=True):
+            with self.assertRaises(ValueError):
+                guard.module_closure([Path(__file__).parents[3]], Path(sysconfig.get_path('stdlib')))
+
+    def test_counterfeit_typing_metaclass_cannot_claim_real_owner_file(self):
+        import sys
+        import sysconfig
+        import types
+        import typing
+        from unittest.mock import patch
+        guard = self.load()
+        copied = types.ModuleType('typing')
+        vars(copied).update(vars(typing))
+        fake_meta = type('_DeprecatedType', (type,), {'__module__': 'typing'})
+        fake_io = fake_meta('io', (), {'__module__': 'typing', '__all__': ['IO', 'TextIO', 'BinaryIO'],
+            'IO': typing.IO, 'TextIO': typing.TextIO, 'BinaryIO': typing.BinaryIO})
+        fake_io.__name__ = 'typing.io'
+        copied.io, copied._DeprecatedType = fake_io, fake_meta
+        with patch.dict(sys.modules, {'typing': copied, 'typing.io': fake_io}, clear=True):
+            with self.assertRaises(ValueError):
+                guard.module_closure([Path(__file__).parents[3]], Path(sysconfig.get_path('stdlib')))
+
+    def test_typing_namespace_wrong_definition_name_refuses(self):
+        import sys
+        import sysconfig
+        import types
+        import typing
+        from unittest.mock import patch
+        guard = self.load()
+        copied = types.ModuleType('typing')
+        vars(copied).update(vars(typing))
+        fake_io = typing._DeprecatedType('counterfeit', (), {'__module__': 'typing',
+            '__all__': ['IO', 'TextIO', 'BinaryIO'], 'IO': typing.IO,
+            'TextIO': typing.TextIO, 'BinaryIO': typing.BinaryIO})
+        copied.io = fake_io
+        with patch.dict(sys.modules, {'typing': copied, 'typing.io': fake_io}, clear=True):
+            with self.assertRaises(ValueError):
+                guard.module_closure([Path(__file__).parents[3]], Path(sysconfig.get_path('stdlib')))
+
+    def test_typing_namespace_method_identity_cannot_be_replaced_by_matching_metadata(self):
+        import sys
+        import sysconfig
+        import types
+        import typing
+        from unittest.mock import patch
+        guard = self.load()
+        compiled = compile('def replacement(cls, key):\n    return type.__getattribute__(cls, key)\n',
+                           typing.__file__, 'exec')
+        code = next(value for value in compiled.co_consts if isinstance(value, types.CodeType))
+        replacement = types.FunctionType(code, vars(typing), '__getattribute__')
+        replacement.__qualname__ = '_DeprecatedType.__getattribute__'
+        with patch.object(typing._DeprecatedType, '__getattribute__', replacement), \
+                patch.dict(sys.modules, {'typing': typing, 'typing.io': typing.io}, clear=True):
+            with self.assertRaises(ValueError):
+                guard.module_closure([Path(__file__).parents[3]], Path(sysconfig.get_path('stdlib')))
+
+    def test_typing_namespace_original_function_mutated_code_refuses(self):
+        import sys
+        import sysconfig
+        import types
+        import typing
+        from unittest.mock import patch
+        guard = self.load()
+        compiled = compile('def replacement(cls, key):\n    return type.__getattribute__(cls, key)\n',
+                           typing.__file__, 'exec')
+        code = next(value for value in compiled.co_consts if isinstance(value, types.CodeType))
+        original = vars(typing._DeprecatedType)['__getattribute__']
+        code = code.replace(co_freevars=original.__code__.co_freevars)
+        saved_code = original.__code__
+        try:
+            original.__code__ = code
+            with patch.dict(sys.modules, {'typing': typing, 'typing.re': typing.re}, clear=True):
+                with self.assertRaises(ValueError):
+                    guard.module_closure([Path(__file__).parents[3]], Path(sysconfig.get_path('stdlib')))
+        finally:
+            original.__code__ = saved_code
+
+    def test_exact_bootstrap_file_pin_allows_only_that_module_body(self):
+        import sys
+        import sysconfig
+        import types
+        from unittest.mock import patch
+        guard = self.load()
+        with tempfile.TemporaryDirectory() as temporary:
+            file = Path(temporary)/'bootstrap.py'
+            file.write_bytes(b'# component')
+            module = types.ModuleType('component_bootstrap')
+            module.__file__ = str(file)
+            pin = {'name': 'component_bootstrap', 'path': str(file),
+                   'observed_path': str(file),
+                   'sha256': hashlib.sha256(file.read_bytes()).hexdigest()}
+            ambient = []
+            for name in ('_distutils_hack', 'sitecustomize'):
+                loaded = sys.modules.get(name)
+                if loaded is not None:
+                    path = Path(loaded.__file__).resolve()
+                    ambient.append({'name': name, 'path': str(path),
+                        'observed_path': loaded.__file__,
+                        'sha256': hashlib.sha256(path.read_bytes()).hexdigest()})
+            try:
+                with patch.dict(sys.modules, {'component_bootstrap': module}):
+                    proof = guard.module_closure([Path(__file__).parents[3]], Path(sysconfig.get_path('stdlib')), ambient+[pin])
+                    self.assertIn(str(file), {ref['path'] for ref in proof['files']})
+                    file.write_bytes(b'changed')
+                    with self.assertRaises(ValueError):
+                        guard.module_closure([Path(__file__).parents[3]], Path(sysconfig.get_path('stdlib')), ambient+[pin])
+            except TypeError:
+                self.fail('exact bootstrap body pins unsupported')
+
+    def test_bootstrap_alias_is_exact_and_retained_not_a_symlink_allowlist(self):
+        import sys
+        import sysconfig
+        import types
+        from unittest.mock import patch
+        guard = self.load()
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            file = root/'body.py'
+            file.write_bytes(b'# exact bootstrap')
+            alias = root/'startup.py'
+            alias.symlink_to(file)
+            other = root/'other.py'
+            other.symlink_to(file)
+            module = types.ModuleType('aliased_bootstrap')
+            module.__file__ = str(alias)
+            pin = {'name': module.__name__, 'path': str(file), 'observed_path': str(alias),
+                   'sha256': hashlib.sha256(file.read_bytes()).hexdigest()}
+            # Isolate this control's module inventory; no ambient site wildcard.
+            with patch.dict(sys.modules, {'aliased_bootstrap': module}, clear=True):
+                proof = guard.module_closure([Path(__file__).parents[3]],
+                    Path(sysconfig.get_path('stdlib')), [pin])
+                imported = next(row for row in proof['files'] if row['name'] == module.__name__)
+                self.assertEqual(imported['path'], str(file))
+                self.assertEqual(imported['observed_path'], str(alias))
+                module.__file__ = str(other)
+                with self.assertRaises(ValueError):
+                    guard.module_closure([Path(__file__).parents[3]],
+                        Path(sysconfig.get_path('stdlib')), [pin])
+
+    def test_bootstrap_profile_reopens_both_exact_raw_commands(self):
+        import sysconfig
+        guard = self.load()
+        self.assertTrue(hasattr(guard, 'profile_bootstrap'), 'raw bootstrap command provenance missing')
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            def write(name, value):
+                path = root/name
+                path.write_text(json.dumps(value))
+                return {'path': str(path), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
+            python = write('python', {})
+            helper = write('helper.py', {})
+            body = write('bootstrap.py', {})
+            pin = {'name': 'bootstrap', 'observed_path': body['path'], **body}
+            stdlib = str(Path(sysconfig.get_path('stdlib')).resolve())
+            commands = []
+            for number, flags in enumerate([['-B'], ['-I', '-B']]):
+                argv = [python['path'], *flags, helper['path']]
+                sample = {'schema_version': 1, 'kind': 'PythonBootstrapSample',
+                    'interpreter': python, 'source': helper, 'argv': argv,
+                    'stdlib_root': stdlib, 'bootstrap_modules': [pin]}
+                stderr = root/f'err-{number}'
+                stderr.write_bytes(b'')
+                commands.append(write(f'command-{number}', {'schema_version': 1,
+                    'argv': argv, 'exit_code': 0, 'started_ms': 1, 'ended_ms': 2,
+                    'started_ns': 1, 'ended_ns': 2,
+                    'stdout': write(f'out-{number}', sample),
+                    'stderr': {'path': str(stderr), 'sha256': hashlib.sha256(b'').hexdigest()}}))
+            profile = {'schema_version': 1, 'kind': 'PythonBootstrapSourceProfile',
+                'interpreter': python, 'commands': commands, 'stdlib_root': stdlib,
+                'bootstrap_modules': [pin]}
+            self.assertEqual(guard.profile_bootstrap(write('good', profile), python, helper), [pin])
+            for number, changed in enumerate([
+                {**profile, 'commands': commands[:1]},
+                {**profile, 'commands': list(reversed(commands))},
+                {**profile, 'bootstrap_modules': []},
+                {**profile, 'stdlib_root': str(root)},
+            ]):
+                with self.subTest(number=number), self.assertRaises(ValueError):
+                    guard.profile_bootstrap(write(f'bad-{number}', changed), python, helper)
+            changed = json.loads(Path(commands[1]['path']).read_text())
+            changed['exit_code'] = False
+            bad = {**profile, 'commands': [commands[0], write('bool-exit', changed)]}
+            with self.assertRaises(ValueError):
+                guard.profile_bootstrap(write('bad-bool', bad), python, helper)
+            Path(body['path']).write_bytes(b'mutated')
+            with self.assertRaises(ValueError):
+                guard.profile_bootstrap(write('bad-body', profile), python, helper)
+
+
+if __name__ == '__main__':
+    unittest.main()

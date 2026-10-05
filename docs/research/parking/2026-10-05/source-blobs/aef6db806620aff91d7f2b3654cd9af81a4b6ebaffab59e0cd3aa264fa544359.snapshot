@@ -1,0 +1,20 @@
+import sys,unittest,copy
+import numpy as np
+sys.path.insert(0,'/tmp/workers')
+from overfit_detection_targets_v2 import build_targets
+def target(obj='a',typ=1,points=12,x=0.):return {'context_name':'scene','frame_timestamp_micros':10,'object_id':obj,'type':typ,'box':[x,0.,3.,2.,2.,2.,0.],'num_lidar_points_in_box':points,'detection_difficulty':None}
+A=np.array([[0.,0.,1.,2.,2.,1.,0.],[0.,0.,1.,2.,2.,1.,0.],[9.,9.,1.,2.,2.,1.,0.]])
+def build(rows):return build_targets(A,rows,scene='scene',timestamp=10,roi=[-4,-4,-4,4,4,4],positive=.5,negative=.35)
+class Targets(unittest.TestCase):
+ def test_positive_support_and_center_z(self):
+  d=build([target()]);np.testing.assert_array_equal(d['labels'],[1,1,0]);np.testing.assert_array_equal(d['target_indices'],[0,0,-1]);np.testing.assert_allclose(d['box_targets'][:2,2],2.);np.testing.assert_allclose(d['box_targets'][:2,5],np.log(2.));self.assertEqual(d['report']['positive_anchor_counts_by_class']['1'],2);self.assertEqual(d['report']['eligible_targets_without_positive_anchor'],0)
+ def test_exclusions_and_annotated_empty(self):
+  rows=[target('unknown',0),target('zero',2,0),target('outside',4,x=4.)];d=build(rows);np.testing.assert_array_equal(d['labels'],[0,0,0]);self.assertEqual(d['report']['target_reasons'],{'unknown_class':1,'zero_native_points':1,'center_outside_roi':1,'eligible':0});self.assertEqual(d['report']['native_box_rows'],3)
+ def test_zero_overlap_not_fabricated(self):
+  d=build([target(x=3.9)]);self.assertEqual(d['report']['eligible_targets_without_positive_anchor'],1);self.assertEqual(d['report']['positive_anchors'],0)
+ def test_refuse_target_identity_and_geometry(self):
+  for field,value in [('context_name','foreign'),('frame_timestamp_micros',11),('num_lidar_points_in_box',-1),('box',[0.,0.,0.,-1.,1.,1.,0.])]:
+   row=target();row[field]=value
+   with self.assertRaises(ValueError):build([row])
+  with self.assertRaises(ValueError):build([target(),target()])
+if __name__=='__main__':unittest.main()

@@ -1,0 +1,42 @@
+"""Full-support point/native-grid linkage; external callers admit source identities."""
+import numpy as np
+from pipeline.native_range_grid import native_range_grid
+
+def validate_linkage(records,shapes):
+ def require(ok):
+  if not ok:raise ValueError('point/native-grid linkage differs')
+ def key(d):
+  k=tuple(d[x] for x in ['context','timestamp','laser','return'])
+  require(isinstance(k[0],str) and bool(k[0]) and type(k[1]) is int and k[1]>=0 and type(k[2]) is int and k[2] in range(1,6) and type(k[3]) is int and k[3] in (1,2))
+  return k
+ expected={}
+ for shape in shapes:
+  k=key(shape);require(k not in expected);dims=shape['native_shape']
+  require(dims is None or (isinstance(dims,list) and len(dims)==3 and all(type(x) is int and x>0 for x in dims) and dims[2]==4))
+  expected[k]=dims
+ require(bool(expected));seen=set()
+ totals={'records':0,'points':0,'eligible_semantic_points':0,'present_empty_returns':0,'absent_returns':0,'absent_with_shape_records':0,'native_grid_cells':0,'annotated_returns':0}
+ for record in records:
+  k=key(record['identity']);require(k in expected and k not in seen);seen.add(k);totals['records']+=1
+  require(type(record['return_present']) is bool)
+  if not record['return_present']:
+   require(not record['observations'] and not record['targets'] and not record['correspondence'] and not record['evaluation'])
+   totals['absent_returns']+=1;totals['absent_with_shape_records']+=int(expected[k] is not None)
+   continue
+  require(expected[k] is not None)
+  grid=native_range_grid(record,expected[k]);pixels=record['identity']['pixels'];y,x=pixels.T;n=len(pixels)
+  # Full-array checks use original point indices; no point sampling or extent inference.
+  require(np.array_equal(grid['source_indices'][y,x],np.arange(n)))
+  require(np.array_equal(grid['measurements'][y,x],record['observations']['physical_features']))
+  require(int(grid['valid'].sum())==n and np.all(grid['source_indices'][~grid['valid']]==-1))
+  require(np.all(grid['measurements'][~grid['valid']]==0))
+  segmentation=record['targets'].get('segmentation')
+  if segmentation is not None:
+   require(grid['annotation_present'] and np.array_equal(grid['semantic_labels'][y,x],segmentation[:,1]))
+   eligible=segmentation[:,1]!=0
+   require(np.array_equal(grid['semantic_supervised'][y,x],eligible) and not np.any(grid['semantic_supervised'][~grid['valid']]))
+   totals['eligible_semantic_points']+=int(eligible.sum());totals['annotated_returns']+=1
+  else:require(not grid['annotation_present'] and not np.any(grid['semantic_supervised']))
+  totals['points']+=n;totals['present_empty_returns']+=int(n==0);totals['native_grid_cells']+=expected[k][0]*expected[k][1]
+ require(seen==set(expected))
+ return dict(totals,scope='point/native-grid full-support identity and label-mask linkage; external source/archive/shape admission required')

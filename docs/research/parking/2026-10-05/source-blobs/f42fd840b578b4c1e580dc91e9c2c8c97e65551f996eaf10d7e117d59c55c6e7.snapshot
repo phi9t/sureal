@@ -1,0 +1,48 @@
+"""Reservations replace precisely their slots, including same-class conflicts."""
+import numpy as np
+import pytest
+from association.test_matching import lattice
+
+
+def test_reserved_slot_not_overwritten_and_unreserved_legacy_exact():
+    from association.targets import assemble_targets
+    anchors=lattice(1,1)
+    boxes=np.array([[0,0,0,1,1,1,0],[0,0,2,1,1,1,-1.]])
+    legacy={'labels':np.array([3,3,0,-1,0,0,0,0]),
+            'target_indices':np.array([0,0,-1,-1,-1,-1,-1,-1]),
+            'box_targets':np.arange(56,dtype=float).reshape(8,7),
+            'direction_targets':np.array([1,1,0,0,0,0,0,0]),
+            'target_classes':np.array([3,3])}
+    result=assemble_targets(anchors,boxes,legacy,{'status':'feasible',
+        'anchor_indices':np.array([0,2]),'target_indices':np.array([1,0])})
+    assert result['target_indices'].tolist()==[1,0,0,-1,-1,-1,-1,-1]
+    assert result['labels'].tolist()==[3,3,3,-1,0,0,0,0]
+    assert result['coverage']['uncovered_target_indices']==[]
+    assert result['coverage']['covered_targets']==2
+    keep=~result['reserved_mask']
+    for key in ['labels','target_indices','box_targets','direction_targets']:
+        np.testing.assert_array_equal(result[key][keep],legacy[key][keep])
+    # Independent literal native center-Z/anchor-height and yaw rules.
+    np.testing.assert_allclose(result['box_targets'][0],[0,0,2,0,0,0,-1])
+    assert result['direction_targets'][0]==0
+    assert result['direction_targets'][2]==0  # pinned canonical heading >0
+
+
+def test_classes_for_previously_uncovered_targets_are_explicit():
+    from association.targets import assemble_targets
+    anchors=lattice(1,1);boxes=np.array([[0,0,0,1,1,1,0.]])
+    legacy={'labels':np.zeros(8,dtype=int),'target_indices':np.full(8,-1),
+            'box_targets':np.zeros((8,7)),'direction_targets':np.zeros(8,dtype=int)}
+    reservations={'status':'feasible','anchor_indices':np.array([0]),'target_indices':np.array([0])}
+    with pytest.raises(ValueError,match='target_classes'):assemble_targets(anchors,boxes,legacy,reservations)
+    legacy['target_classes']=np.array([4]);result=assemble_targets(anchors,boxes,legacy,reservations)
+    assert result['labels'][0]==4
+
+
+@pytest.mark.parametrize('anchors,targets,status', [([0,0],[0,1],'feasible'),([0],[0],'infeasible'),([0],[1],'feasible')])
+def test_invalid_or_incomplete_reservations_refuse_admission(anchors,targets,status):
+    from association.targets import assemble_targets
+    a=lattice(1,1);b=np.array([[0,0,0,1,1,1,0.]])
+    legacy={'labels':np.zeros(8,dtype=int),'target_indices':np.full(8,-1),
+        'box_targets':np.zeros((8,7)),'direction_targets':np.zeros(8,dtype=int),'target_classes':np.array([1])}
+    with pytest.raises(ValueError):assemble_targets(a,b,legacy,{'status':status,'anchor_indices':np.array(anchors),'target_indices':np.array(targets)})

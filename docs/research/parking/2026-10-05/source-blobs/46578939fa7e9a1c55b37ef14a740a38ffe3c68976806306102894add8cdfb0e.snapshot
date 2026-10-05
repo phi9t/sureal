@@ -1,0 +1,189 @@
+"""Source, runtime and native-fixture provenance for the read-only A50 seam."""
+import hashlib
+import json
+import os
+from pathlib import Path
+import shlex
+import shutil
+
+from .evidence import artifact, auditor_snapshot, command_record, git_facts, json_artifact
+from .facts import require
+from .raw_git import verify_materialization, verify_retention
+from .probe_os import assert_birth, own_scope
+
+SCHEMAS={
+ 'thread/read':'ThreadRead','thread/goal/get':'ThreadGoalGet',
+ 'thread/turns/list':'ThreadTurnsList','thread/items/list':'ThreadItemsList',
+ 'thread/queue/list':'ThreadQueueList','thread/backgroundTerminals/list':'ThreadBackgroundTerminalsList',
+ 'thread/start':'ThreadStart','thread/shellCommand':'ThreadShellCommand'}
+
+
+def native_command_provenance(shell,submitted):
+    require(isinstance(shell,dict) and set(shell)=={'rendered_prefix','executable'} and
+            shell['rendered_prefix']==['/bin/bash','-lc'] and isinstance(submitted,str) and submitted,
+            'Exact admitted native shell rendering required')
+    executable=artifact(shell['executable'])
+    require(executable==Path('/usr/bin/bash')==Path('/bin/bash').resolve() and os.access(executable,os.X_OK),
+            'Admitted native shell executable differs')
+    rendered=shlex.join([*shell['rendered_prefix'],submitted])
+    return {'submitted_command':submitted,'submitted_command_sha256':hashlib.sha256(submitted.encode()).hexdigest(),
+            'rendered_prefix':shell['rendered_prefix'],'shell_executable':shell['executable'],
+            'rendered_command':rendered,'rendered_command_sha256':hashlib.sha256(rendered.encode()).hexdigest()}
+
+
+def fixture_rpc_identity(wrapper,launch,auth,creation,invocation,goal,operator_source,protected):
+    require(wrapper.get('kind')=='NativeStopFixture' and launch.get('kind')=='NativeFixtureLaunch',
+            'Actual fixture provenance kinds missing')
+    for key in ('fixture_id','workspace','output','common_git','command_sha256'):
+        require(wrapper[key]==launch[key]==auth[key],'Fixture provenance differs: '+key)
+    identifier=wrapper['fixture_id']
+    require(isinstance(identifier,str) and identifier and
+            all(char in 'abcdefghijklmnopqrstuvwxyz0123456789-' for char in identifier),'Invalid fixed fixture ID')
+    thread=launch['thread_id'];require(isinstance(thread,str) and thread and thread not in protected,
+                                    'Protected or missing exact fixture thread')
+    runtime=auth['runtime']
+    for value,method in [(creation,'thread/start'),(invocation,'thread/shellCommand'),(goal,'thread/goal/get')]:
+        require(value.get('kind')=='NativeFixtureRPC' and value['method']==method and
+                value['transport_incarnation']==runtime and
+                type(value['started_ms']) is int and type(value['ended_ms']) is int and
+                value['started_ms']<=value['ended_ms'] and type(value['response'].get('id')) is int and
+                'error' not in value['response'] and 'result' in value['response'],
+                'Actual method/runtime/time/response provenance differs')
+    require(creation['ended_ms']<=goal['started_ms']<=goal['ended_ms']<=invocation['started_ms'],
+            'Native fixture creation/goal/launch order differs')
+    expected={'cwd':wrapper['workspace'],'approvalPolicy':'never','sandbox':'danger-full-access',
+              'runtimeWorkspaceRoots':[wrapper['workspace'],wrapper['output'],wrapper['common_git']],
+              'baseInstructions':'Non-managed bounded tool fixture. Do not create a native goal.'}
+    native=creation['response']['result']['thread']
+    require(creation['params']==expected and native['id']==thread and native['cwd']==wrapper['workspace'] and
+            native['turns']==[],'Creation not a fresh admitted cooperative fixture')
+    require(goal['params']=={'threadId':thread} and goal['response']['result']=={'goal':None},
+            'Initial native goal not proven absent')
+    command=shlex.join([auth['tools']['systemd_run']['path'],'--user','--scope','--unit',
+       'sureal-sustained-collab-'+identifier,'--property','MemoryMax=134217728','--property','MemorySwapMax=0',
+       '--',auth['tools']['python']['path'],'-I','-B',operator_source,'payload','--output',
+       str(Path(wrapper['output'])/'payload'),'--fixture-id',identifier])
+    require(hashlib.sha256(command.encode()).hexdigest()==wrapper['command_sha256'] and
+            invocation['params']=={'threadId':thread,'command':command,'timeoutMs':90000} and
+            invocation['response']['result']=={} and launch['payload_output']==str(Path(wrapper['output'])/'payload'),
+            'Actual bounded shell command/ack/source differs')
+    return {'fixture_id':identifier,'thread_id':thread,'workspace':wrapper['workspace'],
+            'output':wrapper['output'],'common_git':wrapper['common_git'],
+            'command_sha256':wrapper['command_sha256'],'worker_grants_accepted':False}
+
+
+def checked_schema_runtime(runtime):
+    require(runtime['transport']=='websocket-over-owned-unix','Unadmitted native transport')
+    executable=artifact(runtime['daemon']['executable'])
+    actual=assert_birth(runtime['daemon'])
+    require(actual['uid']==os.getuid() and Path('/proc/'+str(actual['pid'])+'/exe').resolve()==executable,
+            'Actual daemon executable/owner differs')
+    required={stem+suffix for stem in SCHEMAS.values() for suffix in ('Params','Response')}
+    require(set(runtime['schemas'])==required,'Incomplete exact native schema union')
+    schemas={name:json.loads(artifact(ref).read_text()) for name,ref in runtime['schemas'].items()}
+    provenance=json_artifact(runtime['schema_provenance'])
+    require(provenance.get('kind')=='NativeSchemaProvenance' and provenance['executable']==runtime['daemon']['executable'] and
+            provenance['schemas']==runtime['schemas'],'Native schema/tool provenance differs')
+    command=command_record(artifact(provenance['generation_command']))
+    require(command['exit_code']==0 and command['argv']==[str(executable),'app-server','generate-json-schema',
+                '--experimental','--out',provenance['output_root']],'Actual schema generation command differs')
+    version=command_record(artifact(provenance['version_command']))
+    require(version['argv']==[str(executable),'--version'] and version['exit_code']==0 and
+            artifact(version['stdout']).read_text().strip().endswith('0.160.0'),
+            'Pinned installed native version not proved')
+    for name,ref in runtime['schemas'].items():
+        require(Path(ref['path'])==Path(provenance['output_root'])/'v2'/(name+'.json'),
+                'Schema file outside actual generation output')
+    for method,stem in SCHEMAS.items():
+        response=schemas[stem+'Response'];request=schemas[stem+'Params']
+        require(request.get('type')=='object' and response.get('type')=='object','Native schema root differs')
+        if method.endswith('/list'):
+            cursor=response['properties']['nextCursor']
+            require('data' in response['required'] and 'nextCursor' not in response['required'] and
+                    set(cursor['type'])=={'string','null'} and any(text in cursor.get('description','')
+                    for text in ('no more','no submissions remain')),
+                    'Optional terminal cursor semantics not pinned')
+    return {'daemon_process':actual,'schemas':runtime['schemas'],'schema_provenance':runtime['schema_provenance']}
+
+
+def validate_sources(admission,executing_source):
+    require(admission.get('kind')=='RuntimeProbeAdmission' and admission.get('probe')=='stop-capability',
+            'Explicit stop observer admission required')
+    artifact(admission['user_authority'])
+    source=auditor_snapshot(admission)
+    require(Path(executing_source)==Path(source['source'])/'tests/collab/audit_support/runtime_probe.py',
+            'Observer must execute exact independently admitted source')
+    return source
+
+
+def load_fixture(admission):
+    wrapper=json_artifact(admission['fixture_provenance']);operator=wrapper['operator']
+    source=verify_materialization(artifact(operator['materialization']),operator['candidate'])
+    retained=verify_retention(artifact(operator['retention']),operator['candidate'])
+    review=json_artifact(operator['review']);operator_path=Path(source['source'])/'tests/collab/fixture_support/native_stop_fixture.py'
+    require(retained['repository']==source['repository'] and retained['tree']==source['tree'] and
+            review.get('kind')=='independent-native-fixture-source-review' and review['verdict']=='pass' and
+            all(review[key]==source[key] for key in ('candidate','parent','tree','source')) and
+            review['materialization']==operator['materialization'] and review['retention']==operator['retention'] and
+            review['author']==admission['authors']['producer'] and review['author']!=review['reviewer'] and
+            all(isinstance(review[key],str) and review[key] for key in ('author_native_thread_id','reviewer_native_thread_id')) and
+            review['author_native_thread_id']!=review['reviewer_native_thread_id'] and
+            review['operator_sha256']==hashlib.sha256(operator_path.read_bytes()).hexdigest(),
+            'Operator lacks independent exact source/cold review authority')
+    launch=json_artifact(wrapper['fixture_launch']);auth=json_artifact(launch['operator_authorization'])
+    require(auth.get('kind')=='NativeFixtureLaunchAdmission' and auth['candidate']==operator['candidate'] and
+            auth['source_root']==source['source'] and auth['operator_materialization']==operator['materialization'] and
+            auth['operator_retention']==operator['retention'] and auth['operator_review']==operator['review'] and
+            artifact(auth['operator_source'])==operator_path,'Operator launch/source authority differs')
+    artifact(auth['user_authority'])
+    for key in ('transport','endpoint','daemon'):
+        require(auth['runtime'][key]==admission['runtime'][key],'Observer/fixture actual runtime differs')
+    for pin in auth['tools'].values():artifact(pin)
+    require(set(auth['tools'])=={'git','python','systemd_run'} and
+            shutil.which('git')==auth['tools']['git']['path'],'Pinned fixture Git/tools differ')
+    fixture=fixture_rpc_identity(wrapper,launch,auth,json_artifact(launch['creation']),
+        json_artifact(launch['invocation']),json_artifact(wrapper['initial_goal']),str(operator_path),
+        admission['protected_thread_ids'])
+    for name in ('workspace','common_git','canonical'):
+        path=Path(auth[name]);require(path.is_absolute() and path.resolve()==path and path.stat().st_uid==os.getuid(),
+                                   'Owned literal fixture Git path required')
+    workspace=Path(fixture['workspace']);common=Path(fixture['common_git'])
+    facts=git_facts(workspace);literal=launch['actual_git_identity']
+    require(facts['root']==str(workspace) and facts['common_git_dir']==str(common) and facts['status_z_hex']=='' and
+            facts['head']==literal['head']==auth['workspace_base'] and
+            facts['ref']==literal['branch']=='refs/heads/codex/collaboration50-fixture/'+fixture['fixture_id'] and
+            literal['worktree']==str(workspace) and literal['common_git']==str(common) and
+            common==Path(auth['canonical'])/'.git' and workspace!=Path(auth['canonical']) and
+            literal['git_directory']!=str(common) and not literal['status'] and not literal['superproject'],
+            'Actual clean linked fixture Git/source identity differs')
+    for key,path in [('workspace_identity',workspace),('common_git_identity',common)]:
+        info=path.stat();require(auth[key]=={'device':info.st_dev,'inode':info.st_ino},'Git directory incarnation changed')
+    payload=json_artifact(wrapper['payload_running'])
+    require(payload.get('kind')=='NativeFixturePayload' and payload['fixture_id']==fixture['fixture_id'] and
+            artifact(payload['source'])==operator_path,'Actual command-written payload/source witness differs')
+    scope=payload['scope']
+    require(Path(scope['path']).name=='sureal-sustained-collab-'+fixture['fixture_id']+'.scope' and
+            scope['memory_max']=='134217728' and scope['memory_swap_max']=='0','Actual bounded payload scope differs')
+    fixture.update(payload_process=payload['process'],tool_scope={key:scope[key] for key in ('path','device','inode')},
+                   operator_source=source,operator_materialization=operator['materialization'],fixture_launch=wrapper['fixture_launch'],
+                   payload_argv=[auth['tools']['python']['path'],'-I','-B',str(operator_path),'payload','--output',
+                       str(Path(fixture['output'])/'payload'),'--fixture-id',fixture['fixture_id']])
+    command=json_artifact(launch['invocation'])['params']['command']
+    provenance=native_command_provenance(admission.get('native_shell'),command)
+    require(provenance['submitted_command_sha256']==fixture['command_sha256'],
+            'Native shell rendering changed submitted payload')
+    fixture.update(submitted_command_sha256=fixture['command_sha256'],
+                   command_sha256=provenance['rendered_command_sha256'],native_command_provenance=provenance)
+    return fixture
+
+
+def validate_resources(admission,output):
+    resources=admission['resources']
+    for key,maximum in [('deadline_ms',120000),('request_timeout_ms',2000),('max_pages',16),
+                         ('max_items',512),('max_output_bytes',33554432)]:
+        require(type(resources[key]) is int and 0<resources[key]<=maximum,'Observer resource bound differs: '+key)
+    root=Path(resources['output_root'])
+    require(root.is_absolute() and root.resolve()==root and root.is_dir() and root.stat().st_uid==os.getuid() and
+            output.is_absolute() and output.parent==root and not os.path.lexists(output),'Fresh owned observer output required')
+    require(Path.cwd().resolve()==root,'Observer cwd must be its owned output parent')
+    return own_scope(resources['observer_scope'])

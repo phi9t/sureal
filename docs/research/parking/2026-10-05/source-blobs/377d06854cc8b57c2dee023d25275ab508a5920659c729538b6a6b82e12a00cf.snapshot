@@ -1,0 +1,9 @@
+from pathlib import Path
+import json,subprocess,sys,time,datetime
+root=Path('experiments/waymo-perception/research');cache=Path.home()/'.cache/waystone/waymo-perception';logs=cache/'insula/continuation-logs';logs.mkdir(exist_ok=True);records=[]
+for variant in ['gn_backbone','gn_backbone_ln_pillar','no_norm']:
+ log=logs/('norm-'+variant+'-training-v1.log');print('START',variant,flush=True);start=time.monotonic()
+ with log.open('w') as handle:run=subprocess.run([sys.executable,'.scratch/run-norm-learning-curve.py',variant],stdout=handle,stderr=subprocess.STDOUT,timeout=7500)
+ record={'variant':variant,'exit_code':run.returncode,'wall_seconds':time.monotonic()-start,'log':str(log),'status':'trained; native scoring/audit pending' if run.returncode==0 else 'failed live execution; retain log; no quality claim'};records.append(record);print('TERMINAL',variant,record['status'],flush=True);print(log.read_text()[-900:],flush=True)
+ (root/'normalization-training-cohort-progress.json').write_text(json.dumps({'variants':records,'scope':'serial fixed-batch norm training; independent/native results separate'},indent=2)+'\n')
+print('TERMINAL all normalization training attempts',flush=True)

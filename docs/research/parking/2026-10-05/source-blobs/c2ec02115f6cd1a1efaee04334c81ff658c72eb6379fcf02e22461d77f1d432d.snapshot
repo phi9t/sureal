@@ -1,0 +1,10 @@
+from pathlib import Path
+import subprocess,json
+code=Path('experiments/waymo-perception');results=[]
+logs=Path.home()/'.cache/waystone/waymo-perception/insula/continuation-logs';logs.mkdir(exist_ok=True)
+for variant in ['deep_pfn','context_pfn','residual_bev']:
+ with (logs/('architecture-'+variant+'-training-v1.log')).open('w') as f:
+  run=subprocess.run(['python','.scratch/run-architecture-learning-curve.py',variant],stdout=f,stderr=subprocess.STDOUT)
+ assert run.returncode==0,(variant,run.returncode)
+ print('TRAINED',variant,flush=True);results.append(variant)
+ (code/'research/architecture-cohort-progress.json').write_text(json.dumps({'trained':results,'planned':['deep_pfn','context_pfn','residual_bev']}))

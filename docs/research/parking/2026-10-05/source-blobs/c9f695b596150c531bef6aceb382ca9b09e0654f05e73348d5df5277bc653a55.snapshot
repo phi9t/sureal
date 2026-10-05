@@ -1,0 +1,52 @@
+#!/usr/bin/env python3
+"""Generation-pinned label acquisition, HDFS mirror and live coverage audit."""
+import base64
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+
+HERE=Path(__file__).resolve().parent
+CACHE=Path.home()/'.cache/waystone/waymo-perception/cohort-label-audit'
+WAYSTONE='/data02/home/philip.yang/workspace/waystone/scripts/waystone'
+HDFS='hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw'
+
+def call(args):
+    p=subprocess.run(args,text=True,capture_output=True)
+    if p.returncode:raise RuntimeError(p.stderr[-2000:])
+    return p.stdout
+
+def main():
+    cohort_path=Path(sys.argv[2]) if len(sys.argv)>2 else HERE/'scientific-cohort.candidate.json'
+    cohort=json.loads(cohort_path.read_text());CACHE.mkdir(exist_ok=True)
+    limit=int(sys.argv[1]) if len(sys.argv)>1 else 176;done=0
+    for split,scenes in cohort['cohorts'].items():
+        official='validation' if split=='validation' else 'training'
+        for scene in scenes:
+            for component in ['lidar_segmentation','camera_segmentation']:
+                name=f'{split}-{component}-{scene}';record=CACHE/(name+'.json')
+                if record.exists():continue
+                uri=f'gs://waymo_open_dataset_v_2_0_1/{official}/{component}/{scene}.parquet'
+                meta=json.loads(call([str(HERE/'gcs.sh'),'--','storage','objects','describe',uri,'--format=json']))
+                if int(meta['size'])>1024**3:raise ValueError('single label object exceeds bounded staging budget')
+                with tempfile.TemporaryDirectory(prefix='label-',dir=CACHE) as tmp:
+                    stage=Path(tmp);inputs=stage/'input';inputs.mkdir();payload=inputs/'source.parquet';outputs=stage/'outputs';outputs.mkdir()
+                    call([str(HERE/'gcs.sh'),'--','storage','cp',meta['storage_url'],str(payload)])
+                    data=payload.read_bytes();digest=hashlib.sha256(data).hexdigest()
+                    if len(data)!=int(meta['size']) or base64.b64encode(hashlib.md5(data).digest()).decode()!=meta['md5_hash']:raise ValueError('source integrity mismatch')
+                    target=f'{HDFS}/{official}/{component}/{scene}.parquet'
+                    call([WAYSTONE,'put','--mkdir-parents',str(payload),target])
+                    roundtrip=stage/'roundtrip.parquet';call([WAYSTONE,'get',target,str(roundtrip)])
+                    if hashlib.sha256(roundtrip.read_bytes()).hexdigest()!=digest:raise ValueError('HDFS roundtrip mismatch')
+                    roundtrip.unlink()
+                    log=call([str(HERE/'enter.sh'),'--source',str(inputs),'--output',str(outputs),'--offline','--','python','-m','pipeline.label_coverage','/source/source.parquet',component,'/outputs/coverage.json'])
+                    result={'cohort_split':split,'scene':scene,'source_metadata':meta,'hdfs_uri':target,'hdfs_roundtrip_sha256':digest,
+                            'coverage':json.loads((outputs/'coverage.json').read_text()),'live_log':log}
+                    record.write_text(json.dumps(result,indent=2)+'\n')
+                print('audited',name,result['coverage']['state'],result['coverage']['native_rows'],flush=True)
+                done+=1
+                if done>=limit:return
+
+if __name__=='__main__':main()

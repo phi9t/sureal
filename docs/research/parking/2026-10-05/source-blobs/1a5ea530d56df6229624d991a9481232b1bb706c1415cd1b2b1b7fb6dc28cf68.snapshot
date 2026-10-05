@@ -1,0 +1,36 @@
+from pathlib import Path
+import copy,hashlib,json,subprocess,sys
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);workers=Path('.scratch').resolve();source=cache/'insula/overfit-point-worker-fixture-v1/producer';base=cache/'insula/native-overfit-preparation-edgecases-v2';base.mkdir();original=json.loads((cache/'insula/native-overfit-preparation-fixture-v2/input/job.json').read_text());row=copy.deepcopy(original['rows'][0]);outside=copy.deepcopy(row);outside['box'][0]=64;other=copy.deepcopy(row);other['object_id']='second';other['type']=2
+cases=[('valid_background',[outside],'native_box_rows_present',True),('uncovered_target',[row,other],'native_box_rows_present',True),('unresolved_coverage',[],'no_native_box_rows_coverage_unresolved',False)];checks=[];results=[]
+for name,rows,state,accept in cases:
+ case=base/name;case.mkdir();inputs=case/'input';inputs.mkdir();boxes=case/'boxes';boxes.mkdir();out=case/'output';out.mkdir();bp=boxes/'targets.json';bp.write_text(json.dumps({'scene':'scene','native_rows':len(rows),'frames':[{'timestamp_micros':10,'annotation_state':state,'rows':rows}]},indent=2)+'\n');job=copy.deepcopy(original);job['box_report_sha256']=sha(bp);(inputs/'job.json').write_text(json.dumps(job,indent=2)+'\n');command=launch_plan(root,code,source,out,['python','/tmp/workers/prepare-overfit-native-frame-v2.py']);i=command.index('--');command[i:i]=['--ro-bind',str(inputs),'/tmp/input','--ro-bind',str(workers),'/tmp/workers','--ro-bind',str(boxes),'/tmp/boxes'];run=subprocess.run(command,capture_output=True,text=True,timeout=120);log=out/'live.log';log.write_text(run.stdout+run.stderr)
+ if accept:
+  assert run.returncode==0;report=json.loads((out/'report.json').read_text());results.append({'case':name,'supervision_state':report['supervision_state'],'target_assignment':report['target_assignment']})
+  if name=='valid_background':assert report['supervision_state']=='no_eligible_roi_targets' and report['target_assignment']['positive_anchors']==0 and report['target_assignment']['negative_anchors']==524288 and report['target_assignment']['target_reasons']['center_outside_roi']==1
+  else:assert report['target_assignment']['eligible_targets']==2 and report['target_assignment']['eligible_targets_without_positive_anchor']==1 and report['target_assignment']['uncovered_object_ids']==['second'] and report['target_assignment']['positive_anchor_counts_by_class']['2']==0
+ else:
+  assert run.returncode!=0 and 'native annotation coverage unresolved' in run.stderr and not list(out.glob('*.npz'));results.append({'case':name,'result':'refused before observation/target cache writes'})
+ checks.append({'command':command,'exit_code':run.returncode,'expected_outcome':'accept' if accept else 'refuse unresolved annotation coverage'});print('PASS',name,'accepted' if accept else 'refused')
+# Separate live literal artifact audit of background arrays and uncovered support.
+reference=base/'reference';reference.mkdir();program="""import json
+from pathlib import Path
+import numpy as np
+root=Path('/source')
+with np.load(root/'valid_background/output/targets.npz',allow_pickle=False) as a:
+ assert a['labels'].shape==(524288,) and np.all(a['labels']==0) and np.all(a['box_targets']==0) and np.all(a['direction_targets']==0) and np.all(a['target_indices']==-1)
+r=json.loads((root/'uncovered_target/output/report.json').read_text());assert r['eligible_object_ids']==['1','second'] and r['target_assignment']['uncovered_object_ids']==['second']
+with np.load(root/'uncovered_target/output/targets.npz',allow_pickle=False) as a:
+ assert np.any(a['labels']==1) and not np.any(a['labels']==2) and np.all(a['target_indices'][a['labels']>0]==0)
+assert not list((root/'unresolved_coverage/output').glob('*.npz'))
+Path('/outputs/check.json').write_text(json.dumps({'background_arrays':'exact zero targets/-1 assignments','uncovered_target':'retained with zero positive support','unresolved_coverage':'refused before writes','scope':'synthetic guard and target-state fixtures; native overfit not established'}));print('PASS independent background/uncovered/coverage artifact audit')
+"""
+# The source mount omits its own reference output to retain mount isolation.
+sealed=base/'sealed';sealed.mkdir()
+import shutil
+for name,_,_,_ in cases:shutil.copytree(base/name,sealed/name)
+command=launch_plan(root,code,sealed,reference,['python','-c',program]);run=subprocess.run(command,capture_output=True,text=True,timeout=60);(reference/'live.log').write_text(run.stdout+run.stderr);print(run.stdout+run.stderr);assert run.returncode==0;checks.append({'command':command,'exit_code':0,'expected_outcome':'independent literal artifact audit'})
+record={'checks':checks,'runtime_lock':lock,'worker_sha256':sha(workers/'prepare-overfit-native-frame-v2.py'),'target_helper_sha256':sha(workers/'overfit_detection_targets.py'),'validation':results,'independent':json.loads((reference/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in base.rglob('*') if p.is_file()},'scope':'synthetic background, uncovered-target and missing-coverage readiness checks; no native overfit or heldout evidence'};(code/'research/native-overfit-preparation-edgecases-verified.json').write_text(json.dumps(record,indent=2)+'\n')

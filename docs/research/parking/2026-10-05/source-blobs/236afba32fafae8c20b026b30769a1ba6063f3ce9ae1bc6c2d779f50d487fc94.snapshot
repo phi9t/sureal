@@ -1,0 +1,12 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
+base=cache/'insula/native-overfit-head-diagnostics-v1';base.mkdir();out=base/'output';out.mkdir()
+worker=Path('.scratch/native-overfit-head-diagnostics.py').resolve();command=launch_plan(root,code,cache/'scientific-processing/native-overfit-v1',out,['python','/tmp/worker.py']);i=command.index('--');command[i:i]=['--ro-bind',str(worker),'/tmp/worker.py','--ro-bind',str(cache/'insula/native-overfit-v1/inputs/manifest.json'),'/tmp/manifest.json','--ro-bind',str(cache/'scientific-processing/overfit-native-cache-v1'),'/tmp/native','--ro-bind',str(cache/'scientific-processing/native-overfit-prepared-v2/predictions.json'),'/tmp/predictions.json'];digest=sha(worker)
+run=subprocess.run(command,capture_output=True,text=True,timeout=90);(out/'live.log').write_text(run.stdout+run.stderr);print(run.stdout+run.stderr);assert run.returncode==0 and sha(worker)==digest
+record={'checks':[{'command':command,'exit_code':0}],'runtime_lock':lock,'worker_sha256':digest,'training_evidence_sha256':sha(code/'research/native-overfit-execution-verified.json'),'scoring_evidence_sha256':sha(code/'research/native-overfit-scoring-verified.json'),'validation':json.loads((out/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in out.iterdir()},'scope':'observational live diagnostics, not independently audited scientific acceptance'}
+(code/'research/native-overfit-head-diagnostics.json').write_text(json.dumps(record,indent=2)+'\n')

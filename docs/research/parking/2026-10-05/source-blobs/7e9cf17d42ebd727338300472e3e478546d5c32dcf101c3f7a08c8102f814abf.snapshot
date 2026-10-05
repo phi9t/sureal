@@ -1,0 +1,15 @@
+"""Lead-operated exact admitted driver execution with retained command streams."""
+from pathlib import Path
+import argparse, hashlib, json, os, subprocess, time
+b=Path(__file__).resolve().parent
+p=argparse.ArgumentParser();p.add_argument('mode',choices=['static','live']);p.add_argument('--admission',required=True,type=Path);p.add_argument('--command-output',required=True,type=Path);a=p.parse_args()
+def ref(p):return {'path':str(p),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
+def save(p,v):
+ with p.open('x') as f:json.dump(v,f,sort_keys=True);f.write('\n');f.flush();os.fsync(f.fileno())
+value=json.loads(a.admission.read_text());assert value['fixture_id']=='stop50-20261005h' and value['stage']==a.mode
+argv=['/usr/bin/systemd-run','--user','--scope','--unit','sureal-sustained-collab-stop50-20261005h-driver-'+a.mode+'-v8','--property','MemoryMax=268435456','--property','MemorySwapMax=0','--','/usr/bin/python3.11','-I','-B',value['driver_source']['path'],a.mode,'--authorization',str(a.admission),'--authorization-sha256',ref(a.admission)['sha256'],'--output',value['output']]
+a.command_output.mkdir(mode=0o700);save(a.command_output/'intent.json',dict(argv=argv,admission=ref(a.admission),mode=a.mode,fixture_id=value['fixture_id'],boundary='lead-operated fixture; not managed dispatch/50 closure'))
+ns=time.monotonic_ns();ms=time.time_ns()//1000000
+with (a.command_output/'stdout').open('xb') as stdout,(a.command_output/'stderr').open('xb') as stderr:r=subprocess.run(argv,cwd=b,stdout=stdout,stderr=stderr,env={**os.environ,'PYTHONDONTWRITEBYTECODE':'1'},timeout=130)
+save(a.command_output/'actual-command.json',dict(schema_version=1,argv=argv,cwd=str(b),started_ms=ms,ended_ms=time.time_ns()//1000000,started_ns=ns,ended_ns=time.monotonic_ns(),exit_code=r.returncode,intent=ref(a.command_output/'intent.json'),stdout=ref(a.command_output/'stdout'),stderr=ref(a.command_output/'stderr'),environment={'PYTHONDONTWRITEBYTECODE':'1'}))
+print(json.dumps(dict(receipt=ref(a.command_output/'actual-command.json'),exit_code=r.returncode)));raise SystemExit(r.returncode)

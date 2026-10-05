@@ -1,0 +1,38 @@
+"""Native denominator and supervision eligibility are different sets."""
+import copy
+import pytest
+
+
+def row(identity, *, points=1, x=0):
+    return {'object_id':identity,'context_name':'scene','frame_timestamp_micros':1,
+            'type':3,'num_lidar_points_in_box':points,'detection_difficulty':0,
+            'box':[x,0,0,1,1,1,0]}
+
+
+def test_native_truth_preserves_outside_roi_and_zero_point_objects():
+    from association.prepare import annotation_sets
+    eligible,native=annotation_sets([row('eligible'),row('zero',points=0),row('outside',x=64)],'scene:1')
+    assert [r['object_id'] for r in eligible]==['eligible']
+    assert [r['object_id'] for r in native]==['eligible','outside','zero']
+    assert native[1]['num_lidar_points_in_box']==1
+    assert native[2]['num_lidar_points_in_box']==0
+
+
+@pytest.mark.parametrize('mutation', ['duplicate','frame','class','dimensions','nonfinite'])
+def test_annotation_sets_refuse_invalid_native_truth(mutation):
+    from association.prepare import annotation_sets
+    value=row('x');rows=[value]
+    if mutation=='duplicate':rows.append(copy.deepcopy(value))
+    if mutation=='frame':value['frame_timestamp_micros']=2
+    if mutation=='class':value['type']=0
+    if mutation=='dimensions':value['box'][3]=0
+    if mutation=='nonfinite':value['box'][0]=float('nan')
+    with pytest.raises(ValueError):annotation_sets(rows,'scene:1')
+
+
+def test_anchor_templates_are_pinned_before_graph_construction(tmp_path):
+    from association.prepare import load_templates
+    path=tmp_path/'templates.json'
+    path.write_text('{"templates": [{"values": [1,1,1,0,0]}]}')
+    with pytest.raises(ValueError,match='template'):
+        load_templates(path)

@@ -1,0 +1,78 @@
+"""One-shot selected physical-frame acquisition after the native target owner ends."""
+from pathlib import Path
+import hashlib,json,os,resource,subprocess,sys,time
+code=Path('experiments/waymo-perception').resolve();workers=Path('.scratch').resolve();sys.path.insert(0,str(code))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+from pipeline.staged_derived_archive_aligned import staged_derived_archive,working_bytes
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+r=code/'research';candidate=r/'overfit-point-extraction-inputs.candidate.json';d=json.loads(candidate.read_text());candidate_sha=sha(candidate);cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';working=cache/'scientific-processing'
+def pins():
+ assert sha(candidate)==candidate_sha
+ for p,h in d['code_hashes'].items():assert sha(code/p)==h
+ for p,h in d['worker_hashes'].items():assert sha(workers/p)==h
+ assert sha(r/'pointpillars-overfit-frames.candidate.json')==d['selection_sha256'] and sha(r/'pointpillars-scientific-protocol.candidate.json')==d['protocol_sha256']
+ assert json.loads(Path(str(root)+'.lock.json').read_text())==d['runtime_lock']
+def owner_live():
+ p=Path('/proc')/str(d['wait_pid'])
+ try:argv=(p/'cmdline').read_bytes().split(b'\0');state=(p/'stat').read_text().split(') ',1)[1].split()[0]
+ except FileNotFoundError:return False
+ if state=='Z':return False
+ assert any(Path(os.fsdecode(x)).name=='await-overfit-box-extraction.py' for x in argv if x),'wait owner identity changed'
+ return True
+started=time.monotonic()
+while owner_live():
+ pins();assert time.monotonic()-started<8*3600,'wait deadline exceeded';print('WAIT pinned native box target owner remains live',flush=True);time.sleep(30)
+pins();boxprogress=json.loads((r/'pointpillars-overfit-box-extraction-progress.json').read_text());assert boxprogress['admitted_scenes']==13 and set(boxprogress['scene_evidence'])=={s['scene'] for s in d['sources']}
+for value in boxprogress['scene_evidence'].values():assert sha(r/value['evidence'])==value['evidence_sha256']
+verify_rootfs(root,d['runtime_lock']['rootfs_sha256']);destination=working/'overfit-point-frames-v1';assert not destination.exists();complete={}
+for entry in d['sources']:
+ pins();scene=entry['scene'];pp=entry['point_publication'];publication=Path(pp['publication_manifest']);assert sha(publication)==pp['publication_manifest_sha256'];boxevidence=r/boxprogress['scene_evidence'][scene]['evidence'];be=json.loads(boxevidence.read_text());boxroot=Path(be['receipt']).parent;assert sha(boxroot/'receipt.json')==be['receipt_sha256'];boxreport=boxroot/'producer/targets.json';br=json.loads((boxroot/'receipt.json').read_text());assert sha(boxreport)==br['artifacts']['producer/targets.json'];output=destination/scene
+ with staged_derived_archive(pp,cache,working_limit_bytes=15*1024**3-256*1024**2) as (archive,transfer):
+  assert not output.exists();output.mkdir(parents=True);inputs=output/'input';inputs.mkdir();(inputs/'publication.json').write_bytes(publication.read_bytes());job={'scene':scene,'timestamps':entry['timestamps'],'publication_sha256':pp['publication_manifest_sha256']};(inputs/'job.json').write_text(json.dumps(job,indent=2)+'\n');checks=[];producer=output/'producer'
+  for mode in ('producer','reference'):
+   if mode=='reference':job['producer_report_sha256']=sha(producer/'report.json');(inputs/'job.json').write_text(json.dumps(job,indent=2)+'\n')
+   out=output/mode;out.mkdir();command=launch_plan(root,code,archive.parent,out,['python','/tmp/workers/overfit-point-worker.py',mode]);i=command.index('--');command[i:i]=['--ro-bind',str(inputs),'/tmp/input','--ro-bind',str(workers),'/tmp/workers']
+   if mode=='reference':i=command.index('--');command[i:i]=['--ro-bind',str(producer),'/tmp/produced']
+   def output_cap():resource.setrlimit(resource.RLIMIT_FSIZE,(64*1024**2,64*1024**2))
+   run=subprocess.run(command,capture_output=True,text=True,timeout=600,preexec_fn=output_cap);(output/(mode+'.log')).write_text(run.stdout+run.stderr);assert run.returncode==0,(scene,mode,run.stderr[-1000:]);checks.append({'command':command,'exit_code':0})
+  assert sha(producer/'report.json')==sha(output/'reference/report.json');report=json.loads((producer/'report.json').read_text());assert report['native_source_records']==entry['records'] and report['native_source_points']==entry['points'];pins();assert working_bytes(working)<=15*1024**3
+  total_payload=sum(p.stat().st_size for p in destination.rglob('*.npz'));assert total_payload<=1024**3,'selected detector payload cap exceeded'
+  artifacts={str(p.relative_to(output)):sha(p) for p in output.rglob('*') if p.is_file()};receipt={'scene':scene,'checks':checks,'runtime_lock':d['runtime_lock'],'candidate_sha256':candidate_sha,'selection_sha256':d['selection_sha256'],'protocol_sha256':d['protocol_sha256'],'point_publication':pp,'box_evidence_sha256':sha(boxevidence),'box_report_sha256':sha(boxreport),'transfer':transfer,'consumer_reserve_bytes':256*1024**2,'selected_payload_bytes_to_date':total_payload,'artifacts':artifacts,'scope':'selected physical frames with separate measurement/evaluation metadata; native target join audited separately; no optimizer/quality result'};(output/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+ assert not archive.exists()
+ base=cache/'insula'/f'overfit-points-retained-{scene}-v1';base.mkdir();auditinput=base/'input';auditinput.mkdir();auditout=base/'output';auditout.mkdir();expected={'receipt_sha256':sha(output/'receipt.json'),'candidate_sha256':candidate_sha,'runtime_lock':d['runtime_lock'],'entry':entry,'box_report_sha256':sha(boxreport),'box_evidence_sha256':sha(boxevidence),'code_hashes':d['code_hashes'],'worker_hashes':d['worker_hashes'],'roi':d['roi']};(auditinput/'expected.json').write_text(json.dumps(expected,indent=2)+'\n')
+ program="""import hashlib,json,math
+from pathlib import Path
+import numpy as np
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+e=json.loads(Path('/tmp/input/expected.json').read_text());assert sha('/source/receipt.json')==e['receipt_sha256'];rec=json.loads(Path('/source/receipt.json').read_text());entry=e['entry'];assert rec['scene']==entry['scene'] and rec['candidate_sha256']==e['candidate_sha256'] and rec['runtime_lock']==e['runtime_lock'] and rec['point_publication']==entry['point_publication'];assert rec['box_evidence_sha256']==e['box_evidence_sha256'] and rec['box_report_sha256']==e['box_report_sha256'];assert len(rec['checks'])==2 and all(type(x['exit_code']) is int and x['exit_code']==0 for x in rec['checks'])
+for p,h in e['code_hashes'].items():assert sha(Path('/experiment')/p)==h
+for p,h in e['worker_hashes'].items():assert sha(Path('/tmp/workers')/p)==h
+for p,h in rec['artifacts'].items():assert sha(Path('/source')/p)==h
+assert sha('/source/producer/report.json')==sha('/source/reference/report.json');report=json.loads(Path('/source/producer/report.json').read_text());assert report['scene']==entry['scene'] and report['native_source_records']==entry['records'] and report['native_source_points']==entry['points'];assert [f['timestamp_micros'] for f in report['frames']]==sorted(entry['timestamps']);assert sha('/tmp/boxes/targets.json')==e['box_report_sha256'];boxes=json.loads(Path('/tmp/boxes/targets.json').read_text());assert boxes['scene']==entry['scene'] and [f['timestamp_micros'] for f in boxes['frames']]==sorted(entry['timestamps']);results=[];roi=e['roi']
+for frame,target in zip(report['frames'],boxes['frames']):
+ path=Path('/source/producer')/frame['file'];assert sha(path)==frame['sha256'] and path.stat().st_size==frame['bytes']<=64*1024**2
+ with np.load(path,allow_pickle=False) as arrays:
+  assert set(arrays.files)=={'physical_points','measurement_identity','evaluation_nlz','return_states'};features=arrays['physical_points'];ids=arrays['measurement_identity'];nlz=arrays['evaluation_nlz'];states=arrays['return_states'];n=frame['points'];assert features.shape==(n,4) and features.dtype==np.float64 and np.isfinite(features).all();assert ids.shape==(n,4) and ids.dtype==np.int64 and np.isin(ids[:,0],range(1,6)).all() and np.isin(ids[:,1],(1,2)).all() and np.all(ids[:,2:]>=0);assert nlz.shape==(n,) and np.isin(nlz,[-1,1]).all();assert states.shape==(10,4) and states.dtype==np.int64
+  assert states[:,:2].tolist()==[[l,r] for l in range(1,6) for r in (1,2)] and np.isin(states[:,2],(0,1)).all() and np.all(states[:,3]>=0) and states[:,3].sum()==n
+  for laser,ret,present,count in states:
+   assert int(((ids[:,0]==laser)&(ids[:,1]==ret)).sum())==count and (present or count==0)
+  assert len(set(map(tuple,ids.tolist())))==n
+ reasons={k:0 for k in ('unknown_class','zero_native_points','center_outside_roi','eligible')};classes={str(k):0 for k in range(1,5)}
+ for row in target['rows']:
+  assert row['context_name']==entry['scene'] and row['frame_timestamp_micros']==frame['timestamp_micros']
+  if row['type'] not in (1,2,3,4):reason='unknown_class'
+  elif row['num_lidar_points_in_box']<=0:reason='zero_native_points'
+  elif not all(roi[i]<=row['box'][i]<roi[i+3] for i in range(3)):reason='center_outside_roi'
+  else:reason='eligible';classes[str(row['type'])]+=1
+  reasons[reason]+=1
+ assert sum(reasons.values())==len(target['rows'])
+ results.append({'timestamp_micros':frame['timestamp_micros'],'points':n,'native_box_rows':len(target['rows']),'annotation_state':target['annotation_state'],'training_target_reasons':reasons,'eligible_class_counts':classes})
+for mode in ('producer','reference'):
+ resources=json.loads((Path('/source')/mode/'resources.json').read_text());assert math.isfinite(resources['elapsed_seconds']) and resources['elapsed_seconds']>=0 and resources['peak_rss_kib']>0
+transfer=rec['transfer'];assert transfer['sha256']==entry['point_publication']['archive_sha256'] and transfer['archive_bytes']==entry['point_publication']['archive_bytes'] and transfer['working_peak_bound_bytes']<=15*1024**3-256*1024**2 and rec['consumer_reserve_bytes']==256*1024**2 and rec['selected_payload_bytes_to_date']<=1024**3
+Path('/outputs/check.json').write_text(json.dumps({'scene':entry['scene'],'selected_frames':results,'scope':'retained native physical frame/box identity join and target exclusions independently reconciled; packing, optimizer/overfit and heldout evidence remain open'}));print('PASS retained selected physical/target join',entry['scene'])
+"""
+ command=launch_plan(root,code,output,auditout,['python','-c',program]);i=command.index('--');command[i:i]=['--ro-bind',str(auditinput),'/tmp/input','--ro-bind',str(workers),'/tmp/workers','--ro-bind',str(boxreport.parent),'/tmp/boxes'];run=subprocess.run(command,capture_output=True,text=True,timeout=120);log=auditout/'live.log';log.write_text(run.stdout+run.stderr);print(log.read_text(),flush=True);assert run.returncode==0
+ value={'scene':scene,'checks':[{'command':command,'exit_code':0}],'runtime_lock':d['runtime_lock'],'receipt':str(output/'receipt.json'),'receipt_sha256':sha(output/'receipt.json'),'candidate_sha256':candidate_sha,'validation':json.loads((auditout/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in [auditout/'check.json',log]}};ep=r/f'pointpillars-overfit-points-{scene}-verified.json';ep.write_text(json.dumps(value,indent=2)+'\n');complete[scene]={'evidence':ep.name,'evidence_sha256':sha(ep),'validation':value['validation']};(r/'pointpillars-overfit-point-extraction-progress.json').write_text(json.dumps({'selected_scenes':13,'selected_frames':16,'admitted_scenes':len(complete),'candidate_sha256':candidate_sha,'scene_evidence':complete,'scope':'fixed native physical/target joins only; packing, overfit and scientific comparisons remain open'},indent=2)+'\n')
+print('PASS all selected physical frame/target joins independently admitted',len(complete),flush=True)

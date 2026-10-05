@@ -1,0 +1,111 @@
+"""Externally pinned extension sources; native and runner admission are separate.
+
+All three extension families are frozen together. The native backend must still
+admit the supplied parents, stages, checkpoints and recovery before progression.
+"""
+from pathlib import Path
+import shutil
+
+from continuation.legacy_values import read_json, require_exact
+from continuation_control.legacy_binding import read_reference
+from resources.sources import regular, sha
+from resources.stage import require_separate, write_new
+
+FAMILIES = ('continuation', 'continuation_control', 'continuation_runtime')
+REQUIRED = {
+    'continuation/legacy_values.py', 'continuation/compare_state.py',
+    'continuation/test_legacy_values.py', 'continuation/test_compare_state.py',
+    'continuation_control/legacy_binding.py',
+    'continuation_control/test_legacy_binding.py',
+    'continuation_runtime/identity.py', 'continuation_runtime/backend.py',
+    'continuation_runtime/retention.py', 'continuation_runtime/runner.py',
+}
+SCOPE = 'extension byte integrity only; native, checkpoint, recovery and full runner gates remain mandatory'
+
+
+def _regular_directory(path):
+    return (path.is_absolute() and path.is_dir()
+            and not any(p.is_symlink() for p in [path, *path.parents]))
+
+
+def _inventory(root):
+    root = Path(root)
+    if not _regular_directory(root):
+        raise ValueError('absolute regular extension source root required')
+    files = {}
+    for family in FAMILIES:
+        directory = root / family
+        if not _regular_directory(directory):
+            raise ValueError('all three complete extension families required')
+        for path in directory.rglob('*'):
+            if '__pycache__' in path.parts:
+                continue
+            if path.is_symlink():
+                raise ValueError('extension source symlink refused')
+            if path.suffix == '.py':
+                if not regular(path):
+                    raise ValueError('regular Python source required')
+                files[path.relative_to(root).as_posix()] = sha(path)
+    if not REQUIRED.issubset(files):
+        raise ValueError('complete verifier, backend, retention and runner sources required')
+    return files
+
+
+def _parents(references):
+    if type(references) is not dict or set(references) != {'native_run', 'manifest', 'resource_identity'}:
+        raise ValueError('exact trusted native/resource/manifest parents required')
+    values = {name: read_reference(ref)[1] for name, ref in references.items()}
+    native = references['native_run']; manifest = references['manifest']
+    if (values['native_run'].get('manifest_sha256') != manifest['sha256']
+            or values['resource_identity'].get('manifest_sha256') != manifest['sha256']
+            or values['resource_identity'].get('native_run_path') != native['path']
+            or values['resource_identity'].get('native_run_sha256') != native['sha256']):
+        raise ValueError('original native and resource identities must bind the same manifest/run')
+    return references
+
+
+def freeze_namespace(current_root, destination, parents):
+    current_root = Path(current_root); destination = Path(destination)
+    sources = _inventory(current_root); _parents(parents)
+    require_separate(current_root, destination)
+    if (not destination.is_absolute() or destination.exists()
+            or any(p.is_symlink() for p in [destination, *destination.parents])):
+        raise ValueError('fresh separate regular extension destination required')
+    destination.mkdir()
+    pins = {}
+    for name, digest in sources.items():
+        original = current_root / name; snapshot = destination / 'code' / name
+        snapshot.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(original, snapshot)
+        pins[name] = {'original': str(original), 'snapshot': str(snapshot), 'sha256': digest}
+    path = destination / 'identity.json'
+    write_new(path, {'schema_version': 1, 'parents': parents, 'current_root': str(current_root),
+                     'source_pins': pins, 'scope': SCOPE})
+    digest = sha(path)
+    validate_namespace(current_root, destination, path, digest, parents)
+    return path, digest
+
+
+def validate_namespace(current_root, destination, path, expected_sha256, parents):
+    current_root = Path(current_root); destination = Path(destination); path = Path(path)
+    require_separate(current_root, destination)
+    if (path != destination / 'identity.json' or not _regular_directory(destination)
+            or not regular(path) or sha(path) != expected_sha256):
+        raise ValueError('unchanged externally pinned extension identity required')
+    value = read_json(path)
+    if (type(value) is not dict
+            or set(value) != {'schema_version', 'parents', 'current_root', 'source_pins', 'scope'}
+            or type(value['schema_version']) is not int or value['schema_version'] != 1
+            or value['current_root'] != str(current_root) or value['scope'] != SCOPE):
+        raise ValueError('complete original extension schema required')
+    _parents(parents); require_exact(parents, value['parents'], 'externally trusted parents')
+    current = _inventory(current_root); snapshot = _inventory(destination / 'code')
+    require_exact(current, snapshot, 'complete current/snapshot source inventory')
+    pins = {name: {'original': str(current_root / name),
+                   'snapshot': str(destination / 'code' / name), 'sha256': digest}
+            for name, digest in current.items()}
+    require_exact(pins, value['source_pins'], 'complete frozen extension source pins')
+    if sha(path) != expected_sha256:
+        raise ValueError('extension identity changed during validation')
+    _parents(parents)
+    return value

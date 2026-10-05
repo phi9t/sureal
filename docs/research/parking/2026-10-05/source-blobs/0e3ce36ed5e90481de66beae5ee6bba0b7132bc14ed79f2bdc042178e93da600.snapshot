@@ -1,0 +1,159 @@
+"""Full loader with actual cold objects/linked Git; no native RPC is executed."""
+import hashlib
+import json
+import os
+from pathlib import Path
+import shlex
+import shutil
+import subprocess
+import tempfile
+import unittest
+
+from audit_support import probe_authority
+from audit_support.evidence import git_facts
+from audit_support.raw_git import materialize,retain
+
+
+class FullFixtureTests(unittest.TestCase):
+    def setUp(self):
+        self.temp=tempfile.TemporaryDirectory(prefix='a50-loader-');self.addCleanup(self.temp.cleanup)
+        self.root=Path(self.temp.name);self.canonical=self.root/'canonical';self.canonical.mkdir()
+        self.git(self.canonical,'init','-q');self.git(self.canonical,'config','user.name','Unit fixture')
+        self.git(self.canonical,'config','user.email','unit@localhost')
+        (self.canonical/'base').write_text('fixture')
+        self.git(self.canonical,'add','.');self.git(self.canonical,'commit','-qm','base')
+        operator=self.canonical/'tests/collab/fixture_support/native_stop_fixture.py'
+        operator.parent.mkdir(parents=True);operator.write_text('# Unit source; never executed as a native fixture\n')
+        self.git(self.canonical,'add','.');self.git(self.canonical,'commit','-qm','operator fixture')
+        candidate=self.git(self.canonical,'rev-parse','HEAD');self.workspace=self.root/'worktree'
+        branch='codex/collaboration50-fixture/unit-fixture'
+        self.git(self.canonical,'worktree','add','-q','-b',branch,str(self.workspace),candidate)
+        retained=retain(self.canonical,candidate,self.root/'retained','unit-operator')
+        receipt=self.root/'materialization.json'
+        source=materialize(Path(retained['repository']),candidate,self.root/'source',receipt,'unit-operator')
+        self.operator=Path(source['source'])/'tests/collab/fixture_support/native_stop_fixture.py'
+        review=self.root/'review.json'
+        self.write(review,{'kind':'independent-native-fixture-source-review',
+            **{key:source[key] for key in ('candidate','parent','tree','source')},'author':'unit-producer',
+            'reviewer':'unit-reviewer','author_native_thread_id':'unit-author-thread',
+            'reviewer_native_thread_id':'unit-reviewer-thread','verdict':'pass',
+            'materialization':self.ref(receipt),'retention':self.ref(self.root/'retained/retention.json'),
+            'operator_sha256':self.ref(self.operator)['sha256']})
+        runtime={'transport':'websocket-over-owned-unix','endpoint':{'path':'/unit/socket','uid':os.getuid(),'device':1,'inode':2},
+            'daemon':{'boot_id':'unit-boot','pid':123,'start_ticks':456,'executable':self.ref(Path(shutil.which('git')))}}
+        authority=self.root/'user-authority.json';self.write(authority,{'fixture_only':True,'not_native_authority':True})
+        output=self.root/'output';output.mkdir();common=self.canonical/'.git'
+        tools={name:self.ref(Path(shutil.which(exe)).resolve()) for name,exe in
+               [('git','git'),('python','python3'),('systemd_run','systemd-run')]}
+        command=shlex.join([tools['systemd_run']['path'],'--user','--scope','--unit','sureal-sustained-collab-unit-fixture',
+            '--property','MemoryMax=134217728','--property','MemorySwapMax=0','--',tools['python']['path'],'-I','-B',
+            str(self.operator),'payload','--output',str(output/'payload'),'--fixture-id','unit-fixture'])
+        self.submitted=command;command_sha=hashlib.sha256(command.encode()).hexdigest()
+        identity=lambda path:{'device':path.stat().st_dev,'inode':path.stat().st_ino}
+        auth={'kind':'NativeFixtureLaunchAdmission','candidate':candidate,'source_root':source['source'],
+            'operator_source':self.ref(self.operator),'operator_review':self.ref(review),
+            'operator_materialization':self.ref(receipt),'operator_retention':self.ref(self.root/'retained/retention.json'),
+            'user_authority':self.ref(authority),'runtime':runtime,'tools':tools,'fixture_id':'unit-fixture',
+            'workspace':str(self.workspace),'common_git':str(common),'canonical':str(self.canonical),
+            'output':str(output),'command_sha256':command_sha,'workspace_base':candidate,
+            'workspace_identity':identity(self.workspace),'common_git_identity':identity(common)}
+        authpath=self.root/'authorization.json';self.write(authpath,auth)
+        def rpc(name,method,params,result,identifier,start,end):
+            path=self.root/(name+'.json');self.write(path,{'kind':'NativeFixtureRPC','method':method,'params':params,
+                'response':{'id':identifier,'result':result},'started_ms':start,'ended_ms':end,'transport_incarnation':runtime})
+            return self.ref(path)
+        creation=rpc('creation','thread/start',{'cwd':str(self.workspace),'approvalPolicy':'never','sandbox':'danger-full-access',
+            'runtimeWorkspaceRoots':[str(self.workspace),str(output),str(common)],
+            'baseInstructions':'Non-managed bounded tool fixture. Do not create a native goal.'},
+            {'thread':{'id':'unit-thread','cwd':str(self.workspace),'turns':[]}},2,1000,1100)
+        goal=rpc('goal','thread/goal/get',{'threadId':'unit-thread'},{'goal':None},3,1100,1200)
+        invocation=rpc('invocation','thread/shellCommand',{'threadId':'unit-thread','command':command,'timeoutMs':90000},{},4,1200,1300)
+        self.launch=self.root/'launch.json'
+        self.write(self.launch,{'kind':'NativeFixtureLaunch','fixture_id':'unit-fixture','thread_id':'unit-thread',
+            'creation':creation,'invocation':invocation,'operator_authorization':self.ref(authpath),
+            'workspace':str(self.workspace),'common_git':str(common),'output':str(output),
+            'payload_output':str(output/'payload'),'command_sha256':command_sha,'actual_git_identity':{
+                'worktree':str(self.workspace),'common_git':str(common),'head':candidate,'branch':'refs/heads/'+branch,
+                'git_directory':self.git(self.workspace,'rev-parse','--absolute-git-dir'),'status':'','superproject':''}})
+        payload=self.root/'payload.json';self.write(payload,{'kind':'NativeFixturePayload','fixture_id':'unit-fixture',
+            'source':self.ref(self.operator),'process':{'boot_id':'unit-boot','pid':777,'start_ticks':888},
+            'scope':{'path':'/sys/fs/cgroup/sureal-sustained-collab-unit-fixture.scope','device':1,'inode':2,
+                     'memory_max':'134217728','memory_swap_max':'0'}})
+        self.wrapper=self.root/'wrapper.json';self.write(self.wrapper,{'kind':'NativeStopFixture',
+            'fixture_id':'unit-fixture','workspace':str(self.workspace),'common_git':str(common),'output':str(output),
+            'command_sha256':command_sha,'fixture_launch':self.ref(self.launch),'initial_goal':goal,'payload_running':self.ref(payload),
+            'operator':{'candidate':candidate,'materialization':self.ref(receipt),
+                        'retention':self.ref(self.root/'retained/retention.json'),'review':self.ref(review)}})
+        self.admission={'authors':{'producer':'unit-producer'},'runtime':runtime,'fixture_provenance':self.ref(self.wrapper),
+            'protected_thread_ids':['unit-lead','unit-author','unit-reviewer'],
+            'native_shell':{'rendered_prefix':['/bin/bash','-lc'],'executable':self.ref(Path('/bin/bash').resolve())}}
+
+    @staticmethod
+    def git(root,*argv):
+        return subprocess.run(['git','-c','core.hooksPath=/dev/null','-C',str(root),*argv],
+            check=True,capture_output=True).stdout.decode().strip()
+
+    @staticmethod
+    def ref(path):return {'path':str(path),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+
+    @staticmethod
+    def write(path,value):path.write_text(json.dumps({'schema_version':1,**value},sort_keys=True)+'\n')
+
+    def load(self):return probe_authority.load_fixture(self.admission)
+
+    def test_full_actual_clean_linked_git_loader_uses_native_status_bytes(self):
+        facts=git_facts(self.workspace)
+        self.assertNotIn('status',facts);self.assertEqual(facts['status_z_hex'],'')
+        fixture=self.load();self.assertEqual(fixture['thread_id'],'unit-thread')
+        rendered=shlex.join(['/bin/bash','-lc',self.submitted])
+        self.assertEqual(fixture['command_sha256'],hashlib.sha256(rendered.encode()).hexdigest())
+        self.assertEqual(fixture['submitted_command_sha256'],hashlib.sha256(self.submitted.encode()).hexdigest())
+        self.assertEqual(fixture['native_command_provenance']['rendered_command'],rendered)
+
+    def test_real_dirty_git_refuses_even_when_retained_status_claim_is_empty(self):
+        (self.workspace/'untracked').write_text('actual dirty work')
+        self.assertNotEqual(git_facts(self.workspace)['status_z_hex'],'')
+        with self.assertRaises(ValueError):self.load()
+
+    def test_actual_native_item_requires_exact_rendered_prefix_payload_and_arity(self):
+        from audit_support import test_runtime_probe as literal_fixtures
+        from audit_support.runtime_probe import native_facts
+        fixture=self.load();fixture['turn_ids']=['fixture-turn']
+        reference=literal_fixtures.StopProbeTests();reference.setUp();sample=reference.running
+        for entry in sample['records']:
+            entry['params']['threadId']=fixture['thread_id']
+            if entry['method']=='thread/read':entry['response']['thread'].update(id=fixture['thread_id'],cwd=fixture['workspace'])
+            if entry['method']=='thread/items/list':
+                item=entry['response']['data'][0]['item']
+                item.update(cwd=fixture['workspace'],command_sha256=fixture['command_sha256'])
+        self.assertEqual(native_facts(sample,fixture)[1][0]['command_sha256'],fixture['command_sha256'])
+        for changed in [self.submitted,shlex.join(['/bin/sh','-lc',self.submitted]),
+                        shlex.join(['/bin/bash','-lc',self.submitted,'extra']),
+                        shlex.join(['/bin/bash','-lc',self.submitted+'; true'])]:
+            item['command_sha256']=hashlib.sha256(changed.encode()).hexdigest()
+            with self.assertRaises(ValueError):native_facts(sample,fixture)
+
+    def test_missing_shell_or_unbound_prefix_executable_and_extra_args_refuse(self):
+        for shell in [None,{}, {'rendered_prefix':['/bin/sh','-lc'],'executable':self.admission['native_shell']['executable']},
+            {'rendered_prefix':['/bin/bash','-lc','extra'],'executable':self.admission['native_shell']['executable']},
+            {'rendered_prefix':['/bin/bash','-lc'],'executable':self.ref(Path(shutil.which('git')))}]:
+            with self.subTest(shell=shell):
+                saved=self.admission['native_shell'];self.admission['native_shell']=shell
+                with self.assertRaises(ValueError):self.load()
+                self.admission['native_shell']=saved
+
+
+class RenderingTests(unittest.TestCase):
+    def test_exact_literal_quoting_keeps_payload_and_shell_arguments_distinct(self):
+        shell={'rendered_prefix':['/bin/bash','-lc'],'executable':FullFixtureTests.ref(Path('/bin/bash').resolve())}
+        submitted="/tool --value 'quoted value' --output '/owned/path with space'"
+        proof=probe_authority.native_command_provenance(shell,submitted)
+        self.assertEqual(proof['rendered_command'],shlex.join(['/bin/bash','-lc',submitted]))
+        self.assertEqual(shlex.split(proof['rendered_command']),['/bin/bash','-lc',submitted])
+        for changed in [shlex.join(['/bin/sh','-lc',submitted]),
+                        shlex.join(['/bin/bash','-lc',submitted,'extra']),
+                        shlex.join(['/bin/bash','-lc',submitted+'; true']),submitted]:
+            self.assertNotEqual(proof['rendered_command_sha256'],hashlib.sha256(changed.encode()).hexdigest())
+
+
+if __name__=='__main__':unittest.main()

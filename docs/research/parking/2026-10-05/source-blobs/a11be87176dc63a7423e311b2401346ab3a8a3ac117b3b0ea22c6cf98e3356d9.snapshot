@@ -1,0 +1,69 @@
+"""One-shot native target materialization after the pinned point/grid owner ends."""
+from pathlib import Path
+import datetime,hashlib,json,os,subprocess,sys,time
+code=Path('experiments/waymo-perception').resolve();workers=Path('.scratch').resolve();sys.path.insert(0,str(code))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+from pipeline.staging_lease import staging_lease
+from pipeline.staged_source import staged_source
+from pipeline.staged_derived_archive_aligned import working_bytes
+from pipeline.training_box_replay import retained_raw_bytes
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+r=code/'research';candidate=r/'overfit-box-extraction-inputs.candidate.json';d=json.loads(candidate.read_text());candidate_sha=sha(candidate);cache=Path.home()/'.cache/waystone/waymo-perception';working=cache/'scientific-processing';root=cache/'insula/rootfs-v2'
+def pins():
+ assert sha(candidate)==candidate_sha
+ for p,h in d['code_hashes'].items():assert sha(code/p)==h
+ for p,h in d['worker_hashes'].items():assert sha(workers/p)==h
+ assert sha(r/'pointpillars-overfit-frames.candidate.json')==d['selection_sha256']
+ assert sha(r/'pointpillars-overfit-selection-verified.json')==d['selection_evidence_sha256']
+ assert json.loads(Path(str(root)+'.lock.json').read_text())==d['runtime_lock']
+def owner_live():
+ p=Path('/proc')/str(d['wait_pid'])
+ try:
+  argv=(p/'cmdline').read_bytes().split(b'\0');state=(p/'stat').read_text().split(') ',1)[1].split()[0]
+ except FileNotFoundError:return False
+ if state=='Z':return False
+ assert any(Path(os.fsdecode(x)).name=='await-scientific-point-grid.py' for x in argv if x),'wait owner identity changed'
+ return True
+started=time.monotonic()
+while owner_live():
+ pins();assert time.monotonic()-started<8*3600,'wait deadline exceeded';print('WAIT pinned point/grid owner remains live',flush=True);time.sleep(30)
+pins();progress=json.loads((r/'scientific-point-grid-progress.json').read_text());acquisition=json.loads((code/'scientific-acquisition.candidate.json').read_text());assert progress['admitted_scenes']==103 and set(progress['scene_evidence'])==set(acquisition['scenes'])
+for entry in progress['scene_evidence'].values():assert sha(r/entry['evidence'])==entry['evidence_sha256']
+verify_rootfs(root,d['runtime_lock']['rootfs_sha256']);retained=retained_raw_bytes(cache,code);destination=working/'overfit-box-targets-v1';assert not destination.exists();complete={}
+for entry in d['sources']:
+ pins();scene=entry['scene'];src=entry['source'];receipt=cache/'scientific-source-audit'/f'training-lidar_box-{scene}.json';assert sha(receipt)==entry['source_receipt_sha256'] and json.loads(receipt.read_text())==src
+ output=destination/scene
+ with staging_lease(working/'cohort-queue.lock'):
+  assert working_bytes(working)+12*1024**2<=15*1024**3,'target metadata reserve exceeds working cap'
+  with staged_source(src,cache,retained_bytes=retained,limit_bytes=2147483648) as (archive,transfer):
+   output.mkdir(parents=True);inputs=output/'input';inputs.mkdir();job={'scene':scene,'timestamps':entry['timestamps'],'source':src};(inputs/'job.json').write_text(json.dumps(job,indent=2)+'\n');checks=[];produced=output/'producer'
+   for mode in ('producer','reference'):
+    out=output/mode;out.mkdir();command=launch_plan(root,code,archive.parent,out,['python','/tmp/workers/overfit-box-worker.py',mode]);i=command.index('--');command[i:i]=['--ro-bind',str(inputs),'/tmp/input','--ro-bind',str(workers),'/tmp/workers']
+    if mode=='reference':i=command.index('--');command[i:i]=['--ro-bind',str(produced),'/tmp/produced']
+    run=subprocess.run(command,capture_output=True,text=True,timeout=120);(output/(mode+'.log')).write_text(run.stdout+run.stderr);assert run.returncode==0,(scene,mode,run.stderr[-1000:]);checks.append({'command':command,'exit_code':0})
+   assert sha(output/'producer/targets.json')==sha(output/'reference/targets.json');pins();assert working_bytes(working)<=15*1024**3
+   artifacts={str(p.relative_to(output)):sha(p) for p in output.rglob('*') if p.is_file()};record={'scene':scene,'checks':checks,'runtime_lock':d['runtime_lock'],'candidate_sha256':candidate_sha,'selection_sha256':d['selection_sha256'],'source_receipt_sha256':entry['source_receipt_sha256'],'source_sha256':src['sha256'],'transfer':transfer,'artifacts':artifacts,'scope':'native target materialization only; sensor join, optimization and scientific admission remain open'};(output/'receipt.json').write_text(json.dumps(record,indent=2)+'\n')
+ assert not archive.exists()
+ # Independently reconcile retained target artifacts and external scene/source expectations.
+ auditbase=cache/'insula'/f'overfit-box-retained-{scene}-v1';auditbase.mkdir();auditinput=auditbase/'input';auditinput.mkdir();auditout=auditbase/'output';auditout.mkdir();expected={'receipt_sha256':sha(output/'receipt.json'),'candidate_sha256':candidate_sha,'entry':entry,'runtime_lock':d['runtime_lock'],'selection_sha256':d['selection_sha256'],'code_hashes':d['code_hashes'],'worker_hashes':d['worker_hashes']};(auditinput/'expected.json').write_text(json.dumps(expected,indent=2)+'\n')
+ program="""import hashlib,json,math
+from pathlib import Path
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+e=json.loads(Path('/tmp/input/expected.json').read_text());assert sha('/source/receipt.json')==e['receipt_sha256'];rec=json.loads(Path('/source/receipt.json').read_text());entry=e['entry'];assert rec['scene']==entry['scene'] and rec['runtime_lock']==e['runtime_lock'] and rec['selection_sha256']==e['selection_sha256'] and rec['candidate_sha256']==e['candidate_sha256'];assert rec['source_receipt_sha256']==entry['source_receipt_sha256'] and rec['source_sha256']==entry['source']['sha256'];assert len(rec['checks'])==2 and all(type(x['exit_code']) is int and x['exit_code']==0 for x in rec['checks'])
+for p,h in e['code_hashes'].items():assert sha(Path('/experiment')/p)==h
+for p,h in e['worker_hashes'].items():assert sha(Path('/tmp/workers')/p)==h
+for p,h in rec['artifacts'].items():assert sha(Path('/source')/p)==h
+assert sha('/source/producer/targets.json')==sha('/source/reference/targets.json');t=json.loads(Path('/source/producer/targets.json').read_text());assert t['scene']==entry['scene'] and t['native_rows']==entry['source']['inventory']['rows'];assert [f['timestamp_micros'] for f in t['frames']]==sorted(entry['timestamps']);total=0
+for frame in t['frames']:
+ assert frame['annotation_state']==('native_box_rows_present' if frame['rows'] else 'no_native_box_rows_coverage_unresolved');seen=set()
+ for row in frame['rows']:
+  assert row['context_name']==entry['scene'] and row['frame_timestamp_micros']==frame['timestamp_micros'] and row['object_id'] not in seen;seen.add(row['object_id']);assert len(row['box'])==7 and all(math.isfinite(v) for v in row['box']) and min(row['box'][3:6])>0;total+=1
+for mode in ('producer','reference'):
+ resources=json.loads((Path('/source')/mode/'resources.json').read_text());assert math.isfinite(resources['elapsed_seconds']) and resources['elapsed_seconds']>=0 and resources['peak_rss_kib']>0
+transfer=rec['transfer'];assert transfer['sha256']==entry['source']['sha256'] and transfer['size_bytes']==int(entry['source']['source_metadata']['size']) and transfer['transfer_exit_code']==0 and transfer['raw_peak_bytes_including_retained']<=2147483648
+Path('/outputs/check.json').write_text(json.dumps({'scene':entry['scene'],'native_rows':t['native_rows'],'selected_frames':len(t['frames']),'selected_box_rows':total,'scope':'retained target/source lineage independently admitted; point join and training remain open'}));print('PASS independently retained native box targets',entry['scene'])
+"""
+ command=launch_plan(root,code,output,auditout,['python','-c',program]);i=command.index('--');command[i:i]=['--ro-bind',str(auditinput),'/tmp/input','--ro-bind',str(workers),'/tmp/workers'];run=subprocess.run(command,capture_output=True,text=True,timeout=60);log=auditout/'live.log';log.write_text(run.stdout+run.stderr);print(log.read_text(),flush=True);assert run.returncode==0
+ evidence={'scene':scene,'checks':[{'command':command,'exit_code':0}],'runtime_lock':d['runtime_lock'],'receipt':str(output/'receipt.json'),'receipt_sha256':sha(output/'receipt.json'),'candidate_sha256':candidate_sha,'validation':json.loads((auditout/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in [auditout/'check.json',log]}};ep=r/f'pointpillars-overfit-box-{scene}-verified.json';ep.write_text(json.dumps(evidence,indent=2)+'\n');complete[scene]={'evidence':ep.name,'evidence_sha256':sha(ep),'validation':evidence['validation']};(r/'pointpillars-overfit-box-extraction-progress.json').write_text(json.dumps({'selected_scenes':len(d['sources']),'admitted_scenes':len(complete),'candidate_sha256':candidate_sha,'scene_evidence':complete,'scope':'native box targets only; point join and overfit remain open'},indent=2)+'\n')
+print('PASS all fixed overfit native box targets independently admitted',len(complete),flush=True)

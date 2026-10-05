@@ -1,0 +1,53 @@
+"""Admit all original point publications against independently retained source/job evidence."""
+import hashlib,json
+from pathlib import Path
+
+def sha(p):
+ with Path(p).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+def load(p):return json.loads(Path(p).read_text())
+def admit(candidate,manifest,progress,job_index,*,code_root,working_root,source_root,original_working_root):
+ code,working,sources,original=map(Path,(code_root,working_root,source_root,original_working_root))
+ def require(ok):
+  if not ok:raise ValueError('full scientific point/grid inventory differs')
+ def relocated(name):
+  p=Path(name);require(p.is_absolute() and '..' not in p.parts and original in p.parents)
+  return working/p.relative_to(original)
+ require(candidate['acquisition_sha256']==sha(code/'scientific-acquisition.candidate.json'))
+ require(candidate['shape_job_index_sha256']==sha(code/'research/native-shape-jobs.candidate.json'))
+ selected=manifest['scenes'];entries=candidate['sources'];jobs={j['scene']:j for j in job_index['jobs']}
+ require(len(entries)==len(selected)==len(jobs)==103)
+ require(len({s['scene'] for s in entries})==103 and {s['scene'] for s in entries}==set(selected)==set(jobs)==set(progress['replayed_scene_evidence']))
+ excluded=set(load(code/'scientific-cohort.candidate.json')['excluded_engineering_segments']);require(set(selected).isdisjoint(excluded))
+ for s in entries:
+  scene=s['scene'];point=progress['replayed_scene_evidence'][scene];membership=selected[scene]
+  require(s['membership']==membership==point['membership'])
+  require(type(s['records']) is int and s['records']==point['records'] and type(s['points']) is int and s['points']==point['points'])
+  require(s['point_admission_evidence']==point['evidence'] and s['shape_job']==jobs[scene])
+  job_entry=s['shape_job'];require(Path(job_entry['source_receipt']).name==job_entry['source_receipt'])
+  job_path=code/job_entry['path'];require(not Path(job_entry['path']).is_absolute() and '..' not in Path(job_entry['path']).parts and sha(job_path)==job_entry['sha256'])
+  job=load(job_path);source_path=sources/job_entry['source_receipt'];require(sha(source_path)==s['source_receipt_sha256']==job_entry['source_receipt_sha256'])
+  native=load(source_path);require(native['scene']==scene and native['component']=='lidar' and native['official_split']==membership['official_split'] and native['research_splits']==membership['research_splits'])
+  require(native['sha256']==native['hdfs_roundtrip_sha256']==s['source_lidar_sha256']==job['source']['sha256'])
+  require(job['scene']==scene and job['membership']==membership and job_entry['expected_shape_records']==s['records']==2*job['inventory']['rows'])
+  pp=s['point_publication'];publication=relocated(pp['publication_manifest']);receipt=relocated(pp['publication_receipt'])
+  require(sha(publication)==pp['publication_manifest_sha256'] and sha(receipt)==pp['publication_receipt_sha256'])
+  pub=load(publication);r=load(receipt)
+  require(pub['scene']==r['scene']==scene and pub['role']=='scientific' and pub['official_split']==membership['official_split'] and pub['research_splits']==membership['research_splits'])
+  require(pub['source_lidar_sha256']==s['source_lidar_sha256'] and pub['archive']==r['archive'])
+  require(r['publication_manifest_sha256']==pp['publication_manifest_sha256'] and r['archive_hdfs_uri']==pp['archive_hdfs_uri'] and pp['archive_hdfs_uri'].startswith('hdfs://'))
+  for name in ['archive_bytes','report_sha256']:require(pub['archive'][name]==pp[name])
+  require(pub['archive']['sha256']==pp['archive_sha256'] and type(pp['archive_bytes']) is int and pp['archive_bytes']>0)
+  require(bool(r['checks']) and all(type(c['exit_code']) is int and c['exit_code']==0 for c in r['checks']))
+  for name,digest in r['candidate_hashes'].items():require(sha(code/name)==digest)
+  if s['checkpoint'] is not None:
+   cp=s['checkpoint'];require(sha(relocated(cp['path']))==cp['sha256']==point['checkpoint_sha256'])
+   c=load(relocated(cp['path']));require(c['scene']==scene and c['membership']==membership and c['manifest_sha256']==candidate['acquisition_sha256'])
+   require(c['retained_evidence_hashes'][pp['publication_receipt']]==pp['publication_receipt_sha256'] and c['source_record_hashes']['lidar']==s['source_receipt_sha256'])
+   require(c['point_validation']['records']==s['records'] and c['point_validation']['points']==s['points'])
+  else:
+   e=load(code/'research'/s['point_admission_evidence']);require(e['receipt_sha256']==point['receipt_sha256'] and sha(relocated(e['receipt']))==point['receipt_sha256'])
+   replay=load(relocated(e['receipt']));require(replay['scene']==scene and replay['publication_receipt_sha256']==pp['publication_receipt_sha256'] and replay['validation']['records']==s['records'] and replay['validation']['points']==s['points'])
+ require(sum(s['records'] for s in entries)==candidate['records']==203850)
+ require(sum(s['points'] for s in entries)==candidate['points']==3513295187)
+ require(sum(s['point_publication']['archive_bytes'] for s in entries)==candidate['serial_archive_bytes'])
+ return {'scenes':103,'records':203850,'points':3513295187,'serial_archive_bytes':candidate['serial_archive_bytes'],'scope':'source/publication/job metadata admission only; live scientific point-grid payload replay pending'}

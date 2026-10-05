@@ -1,0 +1,28 @@
+import fcntl,hashlib,json,subprocess,sys
+from pathlib import Path
+here=Path(__file__).resolve().parents[1]/'experiments/waymo-perception';sys.path.insert(0,str(here))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+cache=Path.home()/'.cache/waystone/waymo-perception';working=cache/'scientific-processing';scene='8331804655557290264_4351_740_4371_740';base=working/'cohort-v1'/scene;publication=base/'sidecar-publication';processing=base/'points'
+def sha(p):
+ with p.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+with (working/'cohort-queue.lock').open('a') as lease:
+ fcntl.flock(lease,fcntl.LOCK_EX|fcntl.LOCK_NB)
+ path=publication/'receipt.json';r=json.loads(path.read_text());ph=sha(path)
+ if len(r['checks'])!=6 or any(c['exit_code'] for c in r['checks']):raise ValueError('live publication checks missing')
+ for n,h in r['candidate_hashes'].items():
+  if sha(here/n)!=h:raise ValueError('code changed')
+ for n,h in r['artifacts'].items():
+  if sha(publication/n)!=h:raise ValueError('artifact changed')
+ root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
+ if r['runtime_lock']!=lock:raise ValueError('runtime changed')
+ code="import json; from pipeline.sidecar_eviction import evict_sidecars; r=evict_sidecars('/outputs','/opt',expected_publication_sha256="+repr(ph)+"); print(json.dumps({'status':r['status'],'bytes_evicted':r['bytes_evicted']}))"
+ command=launch_plan(root,here,here,processing,['python','-c',code]);i=command.index('--');command[i:i]=['--bind',str(publication),'/opt']
+ result=subprocess.run(command,capture_output=True,text=True)
+ (base/'sidecar-evict-recovery.log').write_text(result.stdout+result.stderr)
+ record={'scene':scene,'publication_receipt_sha256':ph,'checks':[{'command':command,'exit_code':result.returncode}],'runtime_lock':lock,'publication_artifacts_rehashed':len(r['artifacts']),'scope':'verified publication and live sidecar eviction; scene lifecycle not yet admitted'}
+ if result.returncode:raise RuntimeError(result.stderr)
+ ev=processing/'sidecar-eviction.json';data=json.loads(ev.read_text())
+ if not data['status'].endswith('completed'):raise ValueError('eviction incomplete')
+ record['eviction_sha256']=sha(ev);record['validation']=data['status'];record['working_end_bytes']=sum(p.stat().st_size for p in working.rglob('*') if p.is_file())
+ (here/'research/interrupted-sidecar-eviction-second-verified.json').write_text(json.dumps(record,indent=2)+'\n');print(result.stdout,flush=True)

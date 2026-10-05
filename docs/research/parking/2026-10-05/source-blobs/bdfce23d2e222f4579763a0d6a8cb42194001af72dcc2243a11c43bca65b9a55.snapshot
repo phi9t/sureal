@@ -1,0 +1,11 @@
+{
+  "cutoff_ms": 1791140207276,
+  "cutoff_utc": "2026-10-04T18:56:47.276000+00:00",
+  "source_base": "a553645ef22761aa7708abf1ee109952a6cd2c38",
+  "repo": "/data02/home/philip.yang/workspace/sureal",
+  "roots": [
+    "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+    "01a10073-9fd4-7361-b4f2-e7034230800a"
+  ],
+  "scope": "All locally discoverable related Waymo/AV-perception threads and descendant review/implementation threads through cutoff; record discovery gaps. Read-only session stores; public messages, user requests, execution metadata/errors and evidence, never publish private reasoning or credentials."
+}

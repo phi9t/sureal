@@ -1,0 +1,17 @@
+import json,hashlib
+from pathlib import Path
+from pipeline.compressed_sidecar_eviction import evict_sidecars
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+for case in ['format','identity','capacity','tamper','success']:
+ b=Path('/outputs')/case;p=b/'points';q=b/'publication';(p/'sidecars/lidar_box').mkdir(parents=True);(q/'input').mkdir(parents=True);(q/'packed').mkdir();f=p/'sidecars/lidar_box/f.json';f.write_bytes(b'payload');a=q/'packed/sidecars.tar.gz';a.write_bytes(b'mirrored compressed fixture')
+ prov={'scene':'fixture','scene_receipt_sha256':'a'*64,'source_receipt_hashes':{}};t=q/'input/trusted.json';t.write_text(json.dumps({'files':{'lidar_box/f.json':sha(f)},'provenance':prov}));meta={'format':'canonical-ustar-gzip-v1','sha256':sha(a),'archive_bytes':a.stat().st_size,'uncompressed_bytes':10240,'uncompressed_sha256':'b'*64,'manifest_sha256':'c'*64,'files':1};v=dict(meta,archive_sha256=meta['sha256'],provenance=prov);r={'format':meta['format'],'scene':'fixture','scene_receipt_sha256':'a'*64,'component_receipt_hashes':{},'archive':meta,'validation':v,'archive_hdfs_uri':'hdfs://fixture/archive.tar.gz','checks':[{'stage':s,'exit_code':0} for s in ['pack-live','hdfs-put','hdfs-download','independent-bundle-live','manifest-put-last','manifest-download']],'artifacts':{'input/trusted.json':sha(t),'packed/sidecars.tar.gz':sha(a)}}
+ if case=='format':r['format']='tar'
+ if case=='identity':v['uncompressed_sha256']='d'*64
+ receipt=q/'receipt.json';receipt.write_text(json.dumps(r));h=sha(receipt)
+ if case=='tamper':f.write_bytes(b'changed')
+ try:result=evict_sidecars(p,q,expected_publication_sha256=h,available_metadata_bytes=1 if case=='capacity' else 1000000)
+ except ValueError:
+  assert case!='success' and f.exists() and a.exists() and not (p/'sidecar-eviction.json').exists()
+ else:
+  assert case=='success' and not f.exists() and not a.exists();assert result['archive_format']=='canonical-ustar-gzip-v1'
+print('PASS compressed eviction: format, identity, capacity, tamper refusals; successful deletion')

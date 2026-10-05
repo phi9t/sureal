@@ -1,0 +1,28 @@
+import json,hashlib,subprocess,sys
+from pathlib import Path
+exp=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(exp))
+from pipeline.staging_lease import staging_lease
+from pipeline.staged_source import staged_source
+from pipeline.runtime_identity import verify_rootfs
+from pipeline.insula_entry import launch_plan
+cache=Path.home()/'.cache/waystone/waymo-perception';slice_root=cache/'slices/validation-two-scenes-20260929';manifest=json.loads((slice_root/'slice.json').read_text());obj=next(o for o in manifest['objects'] if o['component']=='lidar');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+prior=json.loads((exp/'research/native-shape-worker-cli-verified.json').read_text());old=Path(prior['receipt']).parent;assert sha(old/'receipt.json')==prior['receipt_sha256'];job=old/'input/job.json';assert sha(job)==prior['job_sha256'];original_report=old/'output/shapes.json';assert sha(original_report)==prior['artifacts']['output/shapes.json']
+run=cache/'insula/native-shape-staging-driver-fixture-a';run.mkdir(exist_ok=False);fixture_cache=run/'cache';fixture_cache.mkdir();(fixture_cache/'scientific-processing').mkdir();(run/'output').mkdir();(run/'audit').mkdir()
+root=cache/'insula/rootfs-v2';verify_rootfs(root,prior['runtime_lock']['rootfs_sha256'])
+record={'sha256':obj['sha256'],'hdfs_roundtrip_sha256':obj['sha256'],'hdfs_uri':obj['hdfs_uri'],'source_metadata':{'size':obj['size_bytes'],'md5_hash':obj['md5_base64']}}
+transfer_prefix=[sys.executable,'-c','import shutil,sys; shutil.copyfile('+repr(str(slice_root/obj['relative_path']))+',sys.argv[-1])']
+checks=[];retained=1200154353;limit=2147483648
+with staging_lease(fixture_cache/'scientific-processing/cohort-queue.lock'):
+ with staged_source(record,fixture_cache,retained_bytes=retained,limit_bytes=limit,transfer_command=transfer_prefix) as (path,transfer):
+  staged_path=path
+  # Both ownership leases must refuse another claimant while workers consume.
+  for lock in [fixture_cache/'scientific-processing/cohort-queue.lock',fixture_cache/'raw-staging.lock']:
+   try:
+    with staging_lease(lock):raise AssertionError('competing lease unexpectedly admitted')
+   except ValueError:pass
+  cmd=launch_plan(root,exp,path.parent,run/'output',['python','-m','pipeline.native_range_shape_worker','/source/source.parquet','/tmp/job/job.json','/outputs/shapes.json','--expected-job-sha256',prior['job_sha256']]);at=cmd.index('--');cmd[at:at]=['--ro-bind',str(old/'input'),'/tmp/job'];ret=subprocess.run(cmd,capture_output=True,text=True,timeout=300);(run/'worker.log').write_text(ret.stdout+ret.stderr);assert ret.returncode==0,ret.stderr;checks.append({'command':cmd,'exit_code':ret.returncode})
+  newhash=sha(run/'output/shapes.json');cmd=prior['checks'][1]['command'].copy();cmd[cmd.index(str(old/'audit'))]=str(run/'audit');cmd[cmd.index(str(old/'output'))]=str(run/'output');cmd[cmd.index(str(slice_root))]=str(path.parent);cmd[-1]=cmd[-1].replace('/source/'+obj['relative_path'],'/source/source.parquet').replace(sha(original_report),newhash)
+  ret=subprocess.run(cmd,capture_output=True,text=True,timeout=300);(run/'audit.log').write_text(ret.stdout+ret.stderr);assert ret.returncode==0,ret.stderr;checks.append({'command':cmd,'exit_code':ret.returncode});assert sha(path)==obj['sha256']
+assert not staged_path.exists() and not list((fixture_cache/'scientific-processing-staging').glob('stage-*'))
+names=['native_range_shape_worker.py','native_range_shape_file.py','native_range_shapes.py','native_range_shape_reference.py','source_integrity.py','staged_source.py','staging_lease.py','insula_entry.py']
+d={'checks':checks,'runtime_lock':prior['runtime_lock'],'job_sha256':prior['job_sha256'],'source_slice_manifest_sha256':sha(slice_root/'slice.json'),'code_sha256':{n:sha(exp/'pipeline'/n) for n in names},'script_sha256':sha(Path(__file__)),'transfer':transfer,'competing_queue_and_raw_leases_refused':True,'staging_removed_after_independent_admission':True,'validation':json.loads((run/'audit/check.json').read_text()),'artifacts':{str(p.relative_to(run)):sha(p) for p in run.rglob('*') if p.is_file()},'scope':'native engineering source bounded local-copy transfer fixture, shared leases held through two live isolated workers; no real scientific HDFS replay'};(run/'receipt.json').write_text(json.dumps(d,indent=2));d['receipt']=str(run/'receipt.json');d['receipt_sha256']=sha(run/'receipt.json');(exp/'research/native-shape-staging-driver-fixture-verified.json').write_text(json.dumps(d,indent=2));print('PASS full native staging/worker/independent admission fixture',d['validation']['records_verified'],transfer['raw_peak_bytes_including_retained'],'raw peak including retained; stage removed')

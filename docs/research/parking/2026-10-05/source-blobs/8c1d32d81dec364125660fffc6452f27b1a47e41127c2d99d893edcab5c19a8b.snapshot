@@ -1,0 +1,24 @@
+import unittest,sys
+sys.path.insert(0,'/tmp/workers')
+from overfit_box_targets import select_targets
+P='[LiDARBoxComponent].'
+def row(t=1,obj='a',kind=1):
+ d={'key.segment_context_name':'scene','key.frame_timestamp_micros':t,'key.laser_object_id':obj,P+'type':kind,P+'num_lidar_points_in_box':12,P+'difficulty_level.detection':None}
+ for k,v in zip(('center.x','center.y','center.z','size.x','size.y','size.z','heading'),(1.,2.,3.,4.,5.,6.,.2)):d[P+'box.'+k]=v
+ return d
+class Targets(unittest.TestCase):
+ def test_exact_selection_and_missing_distinction(self):
+  result=select_targets([row(),row(2,'b',0)],scene='scene',timestamps=[1,3],expected_rows=2)
+  self.assertEqual(result['native_rows'],2);self.assertEqual(result['frames'][0]['rows'][0]['box'],[1.,2.,3.,4.,5.,6.,.2]);self.assertIsNone(result['frames'][0]['rows'][0]['detection_difficulty']);self.assertEqual(result['frames'][1]['annotation_state'],'no_native_box_rows_coverage_unresolved');self.assertEqual(result['frames'][1]['rows'],[])
+ def test_refuse_full_source_faults(self):
+  mutations=[]
+  d=row();d[P+'box.size.x']=-1;mutations.append([d])
+  d=row();d['key.segment_context_name']='foreign';mutations.append([d])
+  d=row();d[P+'num_lidar_points_in_box']=-1;mutations.append([d])
+  d=row();d[P+'difficulty_level.detection']=9;mutations.append([d])
+  d=row();d[P+'box.center.x']=float('nan');mutations.append([d])
+  for rows in mutations:
+   with self.assertRaises(ValueError):select_targets(rows,scene='scene',timestamps=[1],expected_rows=len(rows))
+  with self.assertRaises(ValueError):select_targets([row(),row()],scene='scene',timestamps=[1],expected_rows=2)
+  with self.assertRaises(ValueError):select_targets([row()],scene='scene',timestamps=[1],expected_rows=2)
+if __name__=='__main__':unittest.main()

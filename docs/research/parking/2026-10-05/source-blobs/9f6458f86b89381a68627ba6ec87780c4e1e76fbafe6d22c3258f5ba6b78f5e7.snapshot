@@ -1,0 +1,23 @@
+import importlib.util,json,time,os
+from pathlib import Path
+b=Path(__file__).resolve().parent
+s=b/'fixture-operator-candidate-v12/source/tests/collab/fixture_support/native_stop_fixture.py'
+sp=importlib.util.spec_from_file_location('fixture_recovery',s);m=importlib.util.module_from_spec(sp);sp.loader.exec_module(m)
+a=json.loads((b/'operator-live-admission-final-v2.json').read_text());r=a['runtime']
+created=json.loads((b/'native-stop-fixture-v8/0002-result.json').read_text());tid=created['response']['result']['thread']['id']
+assert tid=='01a10a10-89aa-71f1-9b1a-f7d277dadca2'
+out=b/'native-f50-readonly-reconciliation-v1';out.mkdir(mode=0o700)
+w=m.Wire(Path(r['endpoint']['path']));assert w.peer[:2]==(r['daemon']['pid'],os.getuid())
+try:
+ w.call('initialize',{'clientInfo':{'name':'sureal_owned_empty_thread_reconciliation','version':'1'},'capabilities':{'experimentalApi':True}},out,r);w.send({'method':'initialized','params':{}})
+ summaries=[]
+ for round in range(2):
+  started=time.monotonic_ns();facts=[]
+  requests=[('thread/read',{'threadId':tid,'includeTurns':False}),('thread/goal/get',{'threadId':tid}),('thread/turns/list',{'threadId':tid,'limit':100,'itemsView':'notLoaded','sortDirection':'asc'}),('thread/queue/list',{'threadId':tid,'limit':100}),('thread/backgroundTerminals/list',{'threadId':tid,'limit':100})]
+  for method,params in requests:
+   result,receipt=w.call(method,params,out,r);facts.append({'method':method,'result':result,'receipt':receipt})
+  summaries.append({'started_ns':started,'ended_ns':time.monotonic_ns(),'facts':facts})
+  if round==0:time.sleep(5.1)
+ m.save(out/'reconciliation.json',{'schema_version':1,'kind':'OwnedEmptyThreadReadonlyReconciliation','thread_id':tid,'creation':m.reference(b/'native-stop-fixture-v8/0002-result.json'),'observations':summaries,'native_mutations':False,'stop_capability_accepted':False,'task50_accepted':False})
+ print(json.dumps({'result':m.reference(out/'reconciliation.json'),'thread_id':tid,'observations':2,'native_mutations':False}))
+finally:w.close()

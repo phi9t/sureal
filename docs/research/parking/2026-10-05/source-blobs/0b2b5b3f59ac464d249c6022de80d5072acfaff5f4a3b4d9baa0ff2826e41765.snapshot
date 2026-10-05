@@ -1,0 +1,15 @@
+import json,shutil,subprocess,sys
+from pathlib import Path
+P=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(P))
+from advanced.archive import sha
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+C=Path.home()/'.cache/waystone/waymo-perception';R=C/'insula/advanced-offline-archive-roundtrip-v1';R.mkdir();source=R/'source';source.mkdir()
+for name in ['advanced','pipeline']:shutil.copytree(P/name,source/name,ignore=shutil.ignore_patterns('__pycache__'))
+pins={str(p):sha(p) for p in source.rglob('*') if p.is_file()};root=C/'insula/rootfs-v2';runtime=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,runtime['rootfs_sha256']);fixture=R/'fixture';fixture.mkdir();(fixture/'checkpoint.pt').write_bytes(bytes(range(256))*100);(fixture/'heads.npz').write_bytes(b'fixture head bytes');inputs=R/'input';inputs.mkdir();job={'source_sha256':{p.name:sha(p) for p in fixture.iterdir()},'max_bytes':65536};(inputs/'job.json').write_text(json.dumps(job));checks=[]
+for mode in ['create','verify','rehydrate']:
+ out=R/mode;out.mkdir();src=fixture if mode=='create' else R/'create'
+ if mode!='create':job['manifest_sha256']=sha(R/'create/manifest.json');(inputs/'job.json').write_text(json.dumps(job))
+ command=launch_plan(root,source,src,out,['python','/experiment/advanced/archive_worker.py',mode]);index=command.index('--');command[index:index]=['--ro-bind',str(inputs),'/tmp/inputs'];result=subprocess.run(command,capture_output=True,text=True,timeout=300);(out/'live.log').write_text(result.stdout+result.stderr);assert result.returncode==0,result.stderr;checks.append({'mode':mode,'command':command,'exit_code':0,'validation':json.loads((out/'check.json').read_text())})
+for name,digest in job['source_sha256'].items():assert sha(R/'rehydrate/restored'/name)==digest
+assert all(sha(path)==digest for path,digest in pins.items());receipt={'scope':'offline producer/member verification/bounded rehydration workers only; no HDFS publication or local scientific release admitted','checks':checks,'source_pins':pins,'runtime_lock':runtime,'artifacts':{str(p):sha(p) for p in R.rglob('*') if p.is_file()}};(P/'research/advanced-offline-archive-roundtrip-verified.json').write_text(json.dumps(receipt,indent=2));print('PASS live offline archive worker roundtrip')

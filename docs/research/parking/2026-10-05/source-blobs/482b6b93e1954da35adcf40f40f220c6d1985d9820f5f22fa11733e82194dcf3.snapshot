@@ -1,0 +1,12 @@
+from pathlib import Path
+import subprocess,time
+code=Path('experiments/waymo-perception');logs=Path.home()/'.cache/waystone/waymo-perception/insula/continuation-logs'
+while not (code/'research/architecture-cohort-progress.json').exists() or 'residual_bev' not in __import__('json').loads((code/'research/architecture-cohort-progress.json').read_text())['trained']:time.sleep(2)
+for variant in ['deep_pfn','context_pfn','residual_bev']:
+ with (logs/('architecture-'+variant+'-checkpoint-audit.log')).open('w') as f:r=subprocess.run(['python','.scratch/audit-architecture-checkpoint.py',variant],stdout=f,stderr=subprocess.STDOUT)
+ assert r.returncode==0,variant
+ print('REPLAYED',variant,flush=True)
+with (logs/'architecture-retain64-training.log').open('w') as f:r=subprocess.run(['python','.scratch/run-retain64-learning-curve.py','retain64'],stdout=f,stderr=subprocess.STDOUT)
+assert r.returncode==0,'retain64train';print('TRAINED retain64',flush=True)
+with (logs/'architecture-retain64-checkpoint-audit.log').open('w') as f:r=subprocess.run(['python','.scratch/audit-retain64-checkpoint.py','retain64'],stdout=f,stderr=subprocess.STDOUT)
+assert r.returncode==0,'retain64replay';print('REPLAYED retain64',flush=True)

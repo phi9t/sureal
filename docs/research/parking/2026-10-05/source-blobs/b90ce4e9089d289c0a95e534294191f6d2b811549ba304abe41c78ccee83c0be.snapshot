@@ -1,0 +1,19 @@
+import json,sys,shutil,subprocess,fcntl
+from pathlib import Path
+P=Path('experiments/waymo-perception').resolve();sys.path[:0]=[str(P),str(P/'tier1')]
+from storage import sha
+from pipeline.runtime_identity import verify_rootfs
+C=Path.home()/'.cache/waystone/waymo-perception';R=C/'insula/tier1-overfit20261002b';W=C/'scientific-processing'
+lock=(C/'insula/architecture-experiments.lock').open('a');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+resultpath=P/'research/tier1-overfit20261002b-results.json';result=json.loads(resultpath.read_text());assert result['finished'];assert all(v['status'] in ['sustained native overfit','failed to overfit by 10000 updates','exact observation equivalence control'] for v in result['cases'].values())
+out=R/'terminal-cap-equivalence';out.mkdir();source=out/'equivalence.py';shutil.copy(P/'tier1/equivalence.py',source)
+old=json.loads((C/'detector-gpu-live-a/receipt.json').read_text());verify_rootfs(C/'gpu-rootfs',old['runtime_lock']['rootfs_sha256'])
+for p,h in old['driver_hashes'].items():assert sha(p)==h
+fixture=json.loads((P/'research/tier1-allclass-fixture-verified.json').read_text());baseline=result['cases']['baseline'];directory=Path(baseline['output_directory']);cmd=old['checks'][0]['command'].copy();cmd[cmd.index('/experiment')-1]=str(R/'source/experiment');cmd[cmd.index('/outputs')-1]=str(out);cmd[-1]='/tmp/equivalence.py'
+bindings=[(source,'/tmp/equivalence.py'),(R/'baseline/inputs','/tmp/inputs'),(Path(fixture['controls']['baseline']['observations']).parent,'/tmp/fixture'),(Path(fixture['controls']['all_pillars']['observations']).parent,'/tmp/allpillars'),(directory,'/tmp/retained'),(directory/'checkpoint-0000','/tmp/initial'),(directory/f"checkpoint-{baseline['updates']:04d}",'/tmp/terminal'),(directory/'scoring'/str(baseline['updates'])/'scored','/tmp/score')]
+extra=[]
+for p,t in bindings:extra+=['--ro-bind',str(p),t]
+i=cmd.index('--');cmd[i:i]=extra+['--setenv','CUBLAS_WORKSPACE_CONFIG',':4096:8']
+inputs={str(p):sha(p) for p in [source,directory/'checkpoint.pt',directory/'checkpoint-0000/heads-00.npz',directory/f"checkpoint-{baseline['updates']:04d}/heads-00.npz",directory/'scoring'/str(baseline['updates'])/'scored/check.json',R/'source/experiment/tier1/models.py',R/'baseline/inputs/job.json',Path(fixture['controls']['baseline']['observations']),Path(fixture['controls']['all_pillars']['observations'])]}
+r=subprocess.run(cmd,capture_output=True,text=True,timeout=300);(out/'live.log').write_text(r.stdout+r.stderr);assert r.returncode==0,r.stderr;assert all(sha(p)==h for p,h in inputs.items())
+receipt={'command':cmd,'exit_code':0,'source_and_input_sha256':inputs,'runtime_lock':old['runtime_lock'],'driver_hashes':old['driver_hashes'],'validation':json.loads((out/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in [out/'check.json',out/'live.log']}};receiptpath=R/'terminal-cap-equivalence-verified.json';receiptpath.write_text(json.dumps(receipt,indent=2));shutil.copy(receiptpath,P/'research/tier1-terminal-cap-equivalence-verified.json');result['cases']['all_pillars'].update({'terminal_GPU_equivalence_receipt':str(receiptpath),'terminal_GPU_equivalence_receipt_sha256':sha(receiptpath)});resultpath.write_text(json.dumps(result,indent=2));print(r.stdout)

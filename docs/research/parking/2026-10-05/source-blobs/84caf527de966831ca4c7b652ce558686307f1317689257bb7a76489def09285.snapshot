@@ -1,0 +1,24 @@
+from pathlib import Path
+import datetime,hashlib,json,subprocess,sys
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.runtime_identity import verify_rootfs
+from pipeline.insula_entry import launch_plan
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';source=cache/'scientific-processing/one-batch-bn-counterfactual-v1';evidence=code/'research/one-batch-bn-counterfactual-verified.json';receipt=json.loads(evidence.read_text())
+for p,h in receipt['artifacts'].items():assert sha(p)==h
+manifest=json.loads(json.dumps(receipt['manifest']))
+for frame in manifest['frames']:
+ scene,timestamp=frame['identity'].split(':');frame['physical_sha256']=sha(cache/'scientific-processing/overfit-point-frames-v1'/scene/'producer'/f'{timestamp}.npz');frame['boxes_sha256']=sha(cache/'scientific-processing/overfit-box-targets-v1'/scene/'producer/targets.json')
+base=cache/'insula/one-batch-bn-counterfactual-scoring-v1';base.mkdir();inputs=base/'input';inputs.mkdir();(inputs/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+prepared=cache/'scientific-processing/one-batch-bn-counterfactual-prepared-v1';prepared.mkdir();scored=cache/'scientific-processing/one-batch-bn-counterfactual-scoring-v1';scored.mkdir()
+workers=Path('.scratch').resolve();pins={str(p.relative_to(code)):sha(p) for p in sorted((code/'pipeline').glob('*.py'))};worker_pins={name:sha(workers/name) for name in ['prepare-native-one-batch-overfit-scoring.py','native-one-batch-overfit-metrics.py']};checks=[];locks={};started=datetime.datetime.now(datetime.timezone.utc).isoformat()
+for stage,root,src,out,worker in [('prepare',cache/'insula/rootfs-v2',source,prepared,'prepare-native-one-batch-overfit-scoring.py'),('score',cache/'metrics-rootfs',prepared,scored,'native-one-batch-overfit-metrics.py')]:
+ lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);locks[stage]=lock
+ command=launch_plan(root,code,src,out,['python','/tmp/workers/'+worker]);i=command.index('--');command[i:i]=['--ro-bind',str(workers),'/tmp/workers','--ro-bind',str(inputs),'/tmp/inputs','--ro-bind',str(cache/'scientific-processing/overfit-point-frames-v1'),'/tmp/physical','--ro-bind',str(cache/'scientific-processing/overfit-box-targets-v1'),'/tmp/boxes','--ro-bind',str(cache/'scientific-processing/overfit-native-cache-v1'),'/tmp/native']
+ print('RUN',stage,flush=True)
+ with (out/'live.log').open('w') as log:run=subprocess.run(command,stdout=log,stderr=subprocess.STDOUT,timeout=1200)
+ print((out/'live.log').read_text(),flush=True);assert run.returncode==0
+ checks.append({'name':stage,'command':command,'exit_code':0})
+assert all(sha(code/p)==h for p,h in pins.items()) and all(sha(workers/p)==h for p,h in worker_pins.items())
+result={'started_utc':started,'finished_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'checks':checks,'runtime_locks':locks,'training_evidence_sha256':sha(evidence),'worker_hashes':worker_pins,'candidate_hashes':pins,'manifest':manifest,'manifest_sha256':sha(inputs/'manifest.json'),'validation':json.loads((scored/'check.json').read_text()),'artifacts':{str(p):sha(p) for out in [prepared,scored] for p in out.iterdir()},'scope':'native training-only final-checkpoint scoring; independent retained/export/geometry audit still required'}
+(code/'research/one-batch-bn-counterfactual-scoring-verified.json').write_text(json.dumps(result,indent=2)+'\n');print('RECORDED native scoring result',flush=True)

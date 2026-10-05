@@ -1,0 +1,97 @@
+"""Global ownership behavior, including deficient-component growth."""
+import itertools
+import numpy as np
+import pytest
+
+
+def lattice(nx=5, ny=5):
+    from pipeline.anchor_grid import anchor_grid
+    return anchor_grid(nx=nx*2, ny=ny*2, cell_size=(.5,.5), origin=(-.5,-.5),
+                       templates=[[1,1,1,0,0]]*8)
+
+
+def graph_for(boxes, ids, *, anchors=None, legacy=None):
+    from association.candidate_graph import build_graph
+    anchors=lattice() if anchors is None else anchors
+    owners=np.full(len(anchors),-1,dtype=np.int64) if legacy is None else legacy
+    return build_graph(anchors,np.asarray(boxes,dtype=float).reshape(-1,7),ids,
+                       owners,owners>=0)
+
+
+def test_shared_best_slot_uses_global_minimum_not_greedy():
+    from association.matching import reserve
+    graph={'edges':np.array([[0,0],[0,1],[1,0],[1,1]],dtype=np.int64),
+           'target_ids':['a','b']}
+    result=reserve(graph,np.array([0,1,0,10.]),n_anchors=2,n_targets=2)
+    assert result['status']=='feasible'
+    assert result['anchor_indices'].tolist()==[1,0]
+    assert result['target_indices'].tolist()==[0,1]
+    assert result['objective']==1
+
+
+def test_tiny_graph_objective_matches_exhaustive_enumeration():
+    from association.matching import reserve
+    edges=np.array([[0,0],[1,0],[1,1],[2,1],[0,2],[2,2]],dtype=np.int64)
+    costs=np.array([4,2,1,0,2,5.])
+    feasible=[]
+    for selection in itertools.product(*[np.where(edges[:,1]==t)[0] for t in range(3)]):
+        if len(set(edges[list(selection),0]))==3:feasible.append(costs[list(selection)].sum())
+    result=reserve({'edges':edges},costs,n_anchors=3,n_targets=3)
+    assert result['objective']==min(feasible)
+    assert len(set(result['anchor_indices']))==3
+
+
+def test_tied_costs_and_input_permutation_have_canonical_owners():
+    from association.matching import reserve
+    boxes=[[2,2,0,1,1,1,0],[2,2,1,1,1,1,0]]
+    first=graph_for(boxes,['z','a']);second=graph_for(boxes[::-1],['a','z'])
+    assert first['target_ids']==second['target_ids']==['a','z']
+    np.testing.assert_array_equal(first['edges'],second['edges'])
+    one=reserve(first,np.zeros(len(first['edges'])),n_anchors=200,n_targets=2)
+    two=reserve(second,np.zeros(len(second['edges'])),n_anchors=200,n_targets=2)
+    np.testing.assert_array_equal(one['anchor_indices'],two['anchor_indices'])
+    assert len(set(one['anchor_indices']))==2
+
+
+def test_empty_gt_is_feasible_and_duplicate_ids_refused():
+    from association.matching import reserve
+    graph=graph_for([],[])
+    assert graph['edges'].shape==(0,2)
+    assert reserve(graph,[],n_anchors=200,n_targets=0)['status']=='feasible'
+    with pytest.raises(ValueError,match='unique'):
+        graph_for([[0,0,0,1,1,1,0]]*2,['x','x'])
+
+
+def test_insufficient_slots_has_hall_witness_and_never_drops_gt():
+    from association.matching import reserve
+    graph=graph_for([[0,0,0,1,1,1,0]]*9,[str(i) for i in range(9)],anchors=lattice(1,1))
+    assert graph['feasibility']['status']=='infeasible'
+    witness=graph['feasibility']['deficiency']
+    assert len(witness['target_indices'])>len(witness['anchor_indices'])
+    result=reserve(graph,np.zeros(len(graph['edges'])),n_anchors=8,n_targets=9)
+    assert result['status']=='infeasible'
+    assert len(result['anchor_indices'])==0
+
+
+def test_growth_joins_components_without_growing_satisfied_target():
+    graph=graph_for([[0,0,0,1,1,1,0]]*33+[[3,0,0,1,1,1,0]],
+                    [f'a{i:02d}' for i in range(33)]+['z'],anchors=lattice(5,3))
+    assert graph['feasibility']['status']=='feasible'
+    assert graph['radius_by_target'].tolist()==[2]*33+[1]
+    assert len(graph['feasibility']['components'])==1
+
+
+def test_legacy_positive_outside_neighborhood_is_declared_exception():
+    owners=np.full(200,-1,dtype=np.int64);owners[199]=0
+    graph=graph_for([[0,0,0,1,1,1,0]],['x'],legacy=owners)
+    assert [199,0] in graph['edges'].tolist()
+    assert graph['legacy_exceptions'].tolist()==[[199,0]]
+
+
+def test_absent_edge_nonfinite_cost_or_duplicate_edge_refused():
+    from association.matching import reserve
+    graph={'edges':np.array([[0,0],[1,1]],dtype=np.int64)}
+    result=reserve(graph,[1,1],n_anchors=2,n_targets=2)
+    assert list(zip(result['anchor_indices'],result['target_indices']))==[(0,0),(1,1)]
+    with pytest.raises(ValueError):reserve(graph,[1,np.nan],n_anchors=2,n_targets=2)
+    with pytest.raises(ValueError):reserve({'edges':np.array([[0,0],[0,0]])},[1,1],n_anchors=1,n_targets=1)

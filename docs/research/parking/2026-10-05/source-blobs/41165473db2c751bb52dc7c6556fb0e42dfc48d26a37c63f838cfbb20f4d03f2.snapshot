@@ -1,0 +1,53 @@
+"""One immutable scientific archive; producer or independent literal reference."""
+import hashlib,importlib.util,json,resource,sys,time
+from pathlib import Path
+import numpy as np
+sys.path.insert(0,'/tmp/worker')
+from pipeline.scientific_dataset import iter_scene_records
+from point_grid_linkage import validate_linkage
+assert importlib.util.find_spec('tensorflow') is None
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+e=json.loads(Path('/tmp/input/expected.json').read_text());source=e['source'];pp=source['point_publication']
+assert sha('/tmp/input/publication.json')==pp['publication_manifest_sha256'] and sha('/tmp/input/shapes.json')==e['shape_report_sha256']
+pub=json.loads(Path('/tmp/input/publication.json').read_text());shape_report=json.loads(Path('/tmp/input/shapes.json').read_text())
+assert pub['scene']==shape_report['shapes']['scene']==source['scene']
+assert shape_report['source']['sha256']==pub['source_lidar_sha256']==source['source_lidar_sha256']
+assert shape_report['membership']==source['membership'] and shape_report['job_sha256']==source['shape_job']['sha256']
+assert shape_report['independent']['records_verified']==source['records']
+shapes=shape_report['shapes']['records'];hist=np.zeros(23,dtype=np.int64)
+started=time.monotonic()
+def records():
+ for record in iter_scene_records('/source/scene.tar','/tmp/input/publication.json',expected_publication_sha256=pp['publication_manifest_sha256'],usage=source['membership']['research_splits'][0]):
+  labels=record['targets'].get('segmentation')
+  if labels is not None:hist[:]+=np.bincount(labels[:,1],minlength=23)
+  yield record
+if sys.argv[1]=='producer':
+ result=validate_linkage(records(),shapes)
+elif sys.argv[1]=='reference':
+ # Literal scalar key handling and direct point-array predicates; no grid helper.
+ index={};seen=set()
+ for row in shapes:
+  key=(row['context'],row['timestamp'],row['laser'],row['return']);assert key not in index;index[key]=row['native_shape']
+ result=dict(records=0,points=0,eligible_semantic_points=0,present_empty_returns=0,absent_returns=0,absent_with_shape_records=0,native_grid_cells=0,annotated_returns=0)
+ for record in records():
+  d=record['identity'];key=(d['context'],d['timestamp'],d['laser'],d['return']);assert key in index and key not in seen;seen.add(key);result['records']+=1
+  shape=index[key]
+  if record['return_present'] is False:
+   assert not record['observations'] and not record['targets'];result['absent_returns']+=1;result['absent_with_shape_records']+=int(shape is not None);continue
+  assert shape is not None and len(shape)==3 and shape[2]==4
+  pixels=d['pixels'];n=len(pixels);assert pixels.shape==(n,2) and np.issubdtype(pixels.dtype,np.integer)
+  assert np.all(pixels>=0) and np.all(pixels[:,0]<shape[0]) and np.all(pixels[:,1]<shape[1])
+  linear=pixels[:,0]*shape[1]+pixels[:,1];assert len(set(linear.tolist()))==n
+  physical=record['observations']['physical_features'];assert physical.shape==(n,3) and np.isfinite(physical).all() and np.all(physical[:,0]>0)
+  result['points']+=n;result['present_empty_returns']+=int(n==0);result['native_grid_cells']+=shape[0]*shape[1]
+  labels=record['targets'].get('segmentation')
+  if labels is not None:
+   assert d['laser']==1 and labels.shape==(n,2);result['annotated_returns']+=1;result['eligible_semantic_points']+=sum(int(label)!=0 for label in labels[:,1])
+ assert seen==set(index)
+else:raise ValueError('producer/reference mode required')
+assert result['records']==source['records'] and result['points']==source['points']
+assert result['eligible_semantic_points']==e['expected_eligible_semantic_points'] and hist.tolist()==e['expected_native_counts']
+result['native_counts']=hist.tolist();result['worker_resources']={'elapsed_seconds':time.monotonic()-started,'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'rss_scope':'worker_process_peak'}
+result['scene']=source['scene'];result['membership']=source['membership'];result['source_lidar_sha256']=source['source_lidar_sha256'];result['archive_sha256']=pp['archive_sha256'];result['shape_report_sha256']=e['shape_report_sha256'];result['mode']=sys.argv[1]
+result['scope']='one complete scientific point/native-grid linkage; no model or benchmark quality claim'
+Path('/outputs/check.json').write_text(json.dumps(result,indent=2)+'\n');print('PASS full scientific point/grid',sys.argv[1],source['scene'],result['points'],flush=True)

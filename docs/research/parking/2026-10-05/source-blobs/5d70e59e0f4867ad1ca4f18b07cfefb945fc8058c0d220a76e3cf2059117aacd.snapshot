@@ -1,0 +1,15 @@
+import json,time
+from pathlib import Path
+C=Path.home()/'.cache/waystone/waymo-perception';R=C/'insula/tier1-overfit20261002b';result=Path('experiments/waymo-perception/research/tier1-overfit20261002b-results.json')
+while True:
+ for ledger in R.glob('*/snapshot-release.json'):
+  try:entries=json.loads(ledger.read_text())['released']
+  except json.JSONDecodeError:continue
+  for e in entries:
+   parent=Path(e['path']).parent
+   if parent.exists() and not any(parent.iterdir()):
+    parent.rmdir();print('Removed declared empty transient directory',parent,flush=True)
+ try:
+  if json.loads(result.read_text()).get('finished'):break
+ except json.JSONDecodeError:pass
+ time.sleep(.05)

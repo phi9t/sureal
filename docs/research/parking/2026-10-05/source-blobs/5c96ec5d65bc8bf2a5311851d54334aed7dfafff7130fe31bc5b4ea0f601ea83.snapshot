@@ -1,0 +1,18 @@
+import pathlib,json,csv,sys,subprocess,time,resource
+P=pathlib.Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(P))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+from advanced.archive import sha
+C=pathlib.Path.home()/'.cache/waystone/waymo-perception';R=C/'insula/motion-inventory-acceptance-20261003b';R.mkdir();src=R/'inputs';src.mkdir();out=R/'output';out.mkdir();pins={}
+def receipt(name):
+ f=P/'research'/(name+'.json');pins[str(f)]=sha(f);return json.loads(f.read_text())
+inv=receipt('motion-scenario-inventory');d={'inventory':inv,'inventory_sha256':sha(P/'research/motion-scenario-inventory.json')}
+for split in ['training','validation']:
+ framing=receipt('motion-'+split+'-framing-live-verified');native=receipt('motion-'+split+'-native-inventory-verified');assert framing['exit_code']==native['exit_code']==0
+ def member(proof,suffix):
+  matches=[(path,h) for path,h in proof['artifacts'].items() if path.endswith(suffix)];assert len(matches)==1;path,h=matches[0];assert sha(path)==h;pins[path]=h;return pathlib.Path(path)
+ frames=member(framing,'/frames.json');table=member(native,'/scenarios.tsv');selected=member(native,'/selected.pb')
+ rec=receipt('motion-'+split+'-inventory-reconciliation');assert sha(frames)==rec['framing_inventory_sha256'] and sha(table)==rec['native_inventory_sha256']
+ d[split]={'source':receipt('motion-'+split+'-source-acquired'),'frames':json.loads(frames.read_text()),'native':list(csv.DictReader(table.read_text().splitlines(),delimiter='\t')),'reconciliation':rec,'selected_sha256':sha(selected)}
+inputfile=src/'input.json';inputfile.write_text(json.dumps(d));pins[str(inputfile)]=sha(inputfile);worker=P/'motion-evaluation/ingestion/inventory_acceptance_fixture.py';pins[str(worker)]=sha(worker)
+root=C/'insula/rootfs-v2';lock=json.loads(pathlib.Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);command=launch_plan(root,P,src,out,['python','/experiment/motion-evaluation/ingestion/inventory_acceptance_fixture.py']);start=time.monotonic();r=subprocess.run(command,capture_output=True,text=True,timeout=60);(out/'live.log').write_text(r.stdout+r.stderr);print(r.stdout,r.stderr);assert r.returncode==0;assert all(sha(p)==h for p,h in pins.items());record={'command':command,'exit_code':r.returncode,'runtime_lock':lock,'pins':pins,'validation':json.loads((out/'check.json').read_text()),'elapsed_seconds':time.monotonic()-start,'peak_children_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'artifacts':{str(p):sha(p) for p in out.iterdir()}};(P/'research/motion-inventory-acceptance-live-verified.json').write_text(json.dumps(record,indent=2))

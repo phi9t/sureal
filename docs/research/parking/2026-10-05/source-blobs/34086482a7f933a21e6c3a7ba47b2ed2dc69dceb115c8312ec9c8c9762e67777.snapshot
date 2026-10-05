@@ -1,0 +1,44 @@
+# Independently reviewed native stop fixture
+
+This is a lead-operated non-managed fixture, not task50 producer code. It owns
+no Kata issue, worker seat or native goal, and cannot accept a milestone.
+All runtime effects wait for an immutable source commit, cold retention,
+independent source review and explicit `NativeFixtureLaunchAdmission`.
+
+`native_stop_fixture.py launch --authorization ABS --authorization-sha256 HEX
+--output ABS` runs inside an explicitly admitted exclusive cgroup with at most
+256 MiB RAM and zero swap. The admission pins source bytes, candidate, independent
+reviewer thread, retention, user authority, socket/peer/daemon incarnation,
+operator scope, separate fixture workspace/common Git directory and fresh output.
+The fixed command digest pins its own immutable payload source and owned output.
+Launch reopens actual Git facts from a clean linked worktree on the unique
+`codex/collaboration50-fixture/<fixture-id>` branch at the admitted base,
+checks directory incarnations and rejects canonical/source/output overlap.
+Git, Python and systemd-run use absolute digest-pinned executables; payload Python
+uses isolated mode. Each Upgrade/request/frame has a whole-operation deadline,
+so a peer dribbling bytes cannot extend a request beyond its admitted timeout.
+
+Only `thread/start` and `thread/shellCommand` mutate native state. The former
+creates one fresh no-goal thread with `approvalPolicy=never`, explicit
+`danger-full-access` and cooperative workspace roots. The latter sends one fixed
+command with a 40-second native timeout. The command creates a separate 128 MiB,
+zero-swap scope; its single Python payload records an actual live process and
+cgroup witness, waits 15 seconds and returns. No subprocess, Git/source/scientific
+write, model turn or daemon stop is part of the payload. Native shell commands
+are explicitly unsandboxed; they do not prove model-worker permission grants.
+The operator keeps its connection for another 45 seconds. Every request is
+durable before send, raw matching responses are retained, unrelated/private
+notifications are discarded, and uncertainty never licenses a mutation retry.
+
+The shell RPC acknowledgement contains no returned turn ID. The independently
+admitted A50 observer must derive the actual fresh turn/item/handle identity from
+complete native lists and match the literal command digest and live process
+witness. `fixture-launch.json` is raw provenance, not a stop receipt. Neither
+the acknowledgement nor `operator-returning.json` proves terminal tools, empty
+queue, quiescence, cleanup or retirement. Missing native association/coverage is
+a retained blocker; no invented `turn/start` receipt or scan-only fallback exists.
+
+Separate model-worker/common-Git/nested-Insula capability and isolated Kata
+proofs remain required before task50 producer implementation/managed effects.
+Changing transport framing preserves the full original stop/queue/tool/process
+contract, independent Insula gates, budgets and historical authorization pins.

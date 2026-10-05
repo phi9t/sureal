@@ -1,0 +1,52 @@
+from pathlib import Path
+import hashlib,json,sys,subprocess
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
+base=cache/'insula/pointpillars-protocol-candidate-v1';base.mkdir();inputs=base/'input';inputs.mkdir();output=base/'output';output.mkdir();candidate=code/'research/pointpillars-scientific-protocol.candidate.json';(inputs/'expected.json').write_text(json.dumps({'candidate_sha256':sha(candidate)}))
+program='''import copy,hashlib,json,math,importlib.util
+from pathlib import Path
+assert importlib.util.find_spec('tensorflow') is None
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+p=Path('/experiment/research/pointpillars-scientific-protocol.candidate.json');e=json.loads(Path('/tmp/input/expected.json').read_text());assert sha(p)==e['candidate_sha256'];d=json.loads(p.read_text())
+for path,h in d['pins'].items():assert sha(Path('/experiment')/path)==h
+cohort=json.loads(Path('/experiment/scientific-cohort.candidate.json').read_text());a=json.loads(Path('/experiment/research/training-anchor-templates.candidate.json').read_text())
+def check(d):
+ assert d['cohorts']==cohort['cohorts'] and d['excluded_engineering_segments']==cohort['excluded_engineering_segments']
+ groups=[set(d['cohorts'][k]) for k in ('train','development','validation')];assert [len(g) for g in groups]==[64,8,16]
+ assert all(not groups[i]&groups[j] for i in range(3) for j in range(i+1,3))
+ assert not set.union(*groups)&set(d['excluded_engineering_segments'])
+ assert d['seeds']==[17,29,43]
+ obs=d['observations'];assert obs['features']==['vehicle_x','vehicle_y','vehicle_z','intensity'] and obs['time']=='current frame only'
+ assert obs['lasers']==[1,2,3,4,5] and obs['returns']==[1,2]
+ roi=obs['roi_half_open'];cell=obs['cell_size'];assert len(roi)==6 and all(math.isfinite(v) for v in roi) and all(roi[i]<roi[i+3] for i in range(3))
+ assert [(roi[i+3]-roi[i])/cell[i] for i in range(2)]==[512,512]
+ assert obs['max_pillars']==20000 and obs['max_points_per_pillar']==32
+ assert d['model']['classes']==[1,2,3,4] and d['model']['anchors_per_cell']==len(a['templates'])==8
+ assert d['model']['assignment']['negative']<d['model']['assignment']['positive'] and d['model']['decode']['post_limit']<=d['model']['decode']['pre_limit']
+ opt=d['optimization'];assert opt['updates']==20000 and opt['checkpoint_interval']==2000 and opt['batch_size']==1
+ assert 'development' in opt['selection'] and 'validation opened once' in opt['selection']
+ assert d['evaluation']['heldout_GT']=='all original native validation targets under pinned evaluator; do not remove GT outside model ROI or sampling support'
+ u=d['evaluation']['uncertainty'];assert u['unit']=='whole segment' and u['confidence']==.95 and u['bootstrap_replicates']==10000
+ assert d['resource_limits']['local_raw_bytes']==2147483648 and d['resource_limits']['local_scientific_working_bytes']==16106127360
+ assert d['resource_limits']['reserved_device_hours_per_seed']==24 and d['resource_limits']['peak_cuda_allocated_bytes']==8589934592
+ assert len(d['pre_execution_gates'])==6 and 'candidate' in d['status']
+check(d)
+mutants=[]
+m=copy.deepcopy(d);m['cohorts']['train'][0]=m['cohorts']['validation'][0];mutants.append(m)
+m=copy.deepcopy(d);m['observations']['features'].append('NLZ');mutants.append(m)
+m=copy.deepcopy(d);m['model']['anchors_per_cell']=2;mutants.append(m)
+m=copy.deepcopy(d);m['evaluation']['heldout_GT']='ROI filtered';mutants.append(m)
+m=copy.deepcopy(d);m['evaluation']['uncertainty']['unit']='frame';mutants.append(m)
+m=copy.deepcopy(d);m['resource_limits']['local_raw_bytes']*=2;mutants.append(m)
+for m in mutants:
+ try:check(m)
+ except AssertionError:pass
+ else:raise AssertionError('mutant admitted')
+Path('/outputs/check.json').write_text(json.dumps({'candidate_sha256':e['candidate_sha256'],'cohort_counts':[64,8,16],'refused_mutants':len(mutants),'scope':'candidate structure, hash identity and leakage/resource invariants only; native training/overfit/protocol execution admission remains open'},indent=2));print('PASS candidate structure and6 leakage/resource mutations refused')
+'''
+command=launch_plan(root,code,inputs,output,['python','-c',program]);i=command.index('--');command[i:i]=['--ro-bind',str(inputs),'/tmp/input'];run=subprocess.run(command,capture_output=True,text=True,timeout=60);log=output/'live.log';log.write_text(run.stdout+run.stderr);print(log.read_text());assert run.returncode==0
+record={'checks':[{'command':command,'exit_code':0}],'runtime_lock':lock,'candidate_sha256':sha(candidate),'validation':json.loads((output/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in [output/'check.json',log]}}
+(code/'research/pointpillars-protocol-candidate-structure-verified.json').write_text(json.dumps(record,indent=2)+'\n')

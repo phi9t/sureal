@@ -1,0 +1,76 @@
+<div id="waymo-scene-explorer">
+  <h2>Perception scene explorer</h2>
+  <div class="text-small text-muted">Balanced16 · 13 training scenes · 16 selected frames</div>
+  <div class="table-responsive">
+    <table class="table table-sm" aria-label="Verified cohort class coverage">
+      <thead><tr><th>Class</th><th class="text-end">Objects</th><th class="text-end">Tracks</th><th class="text-end">Frames</th><th class="text-end">Scenes</th><th class="text-end">Anchor-covered</th></tr></thead>
+      <tbody data-coverage></tbody>
+    </table>
+  </div>
+  <div class="viz-controls">
+    <label class="form-label">Scene<select class="form-select" data-scene aria-label="Selected training scene"></select></label>
+    <label class="form-label">Selected frame<select class="form-select" data-frame aria-label="Selected frame"></select></label>
+  </div>
+  <div data-scene-detail class="text-small" aria-live="polite"></div>
+  <div class="viz-row" data-legend aria-label="Object classes"></div>
+  <label class="form-check"><input class="form-check-input" type="checkbox" data-uncovered><span class="form-check-label">Only objects without positive anchors</span></label>
+  <figure style="margin:12px 0"><img data-camera style="display:block;width:100%;max-width:540px;height:auto" alt=""><figcaption class="text-small text-muted">FRONT camera · native frame image · camera/LiDAR timing differs</figcaption></figure>
+  <div data-plot class="scene-plot"></div>
+  <div data-object-detail class="text-small" aria-live="polite">Select a box to inspect its native LiDAR support and anchor coverage.</div>
+  <div class="text-small text-muted">Native boxes · dashed = no positive anchor · selected frames, not complete scene playback</div>
+</div>
+<style>
+#waymo-scene-explorer .scene-plot {width:100%;margin-block:12px;}
+#waymo-scene-explorer .scene-plot svg {display:block;width:100%;overflow:visible;}
+#waymo-scene-explorer .scene-plot text {fill:var(--foreground);font-size:12px;font-weight:400;}
+#waymo-scene-explorer .scene-plot .grid {stroke:var(--border);stroke-width:1;}
+#waymo-scene-explorer .legend-swatch {display:inline-block;width:12px;height:12px;margin-right:6px;}
+#waymo-scene-explorer [data-legend] button {border:0;background:transparent;color:var(--foreground);padding:4px;}
+#waymo-scene-explorer [data-scene-detail] {overflow-wrap:anywhere;}
+</style>
+<script type="application/json" id="waymo-scene-explorer-data">{"parked":true,"sensor_payload":"PRIVATE_RETAINED"}</script>
+<script>
+(()=>{
+ const root=document.getElementById('waymo-scene-explorer');
+ const data=JSON.parse(document.getElementById('waymo-scene-explorer-data').textContent);
+ const names={1:'Vehicle',2:'Pedestrian',3:'Sign',4:'Cyclist'};
+ const colors={1:'var(--viz-series-1)',2:'var(--viz-series-2)',3:'var(--viz-series-3)',4:'var(--viz-series-4)'};
+ const q=s=>root.querySelector(s); const sceneSelect=q('[data-scene]'), frameSelect=q('[data-frame]');
+ const state={scene:0,frame:0,visible:new Set([1,2,3,4]),uncovered:false};
+ const ns='http://www.w3.org/2000/svg';
+ const el=(name,attrs,text)=>{const n=document.createElementNS(ns,name);Object.entries(attrs||{}).forEach(([k,v])=>n.setAttribute(k,v));if(text!==undefined)n.textContent=text;return n;};
+ for(let c=1;c<=4;c++){
+  const v=data.coverage[c],covered=data.covered_coverage[c];const row=document.createElement('tr');
+  [names[c],v.eligible_objects,v.unique_tracks,v.frames,v.scenes,covered.eligible_objects].forEach((value,i)=>{const cell=document.createElement(i?'td':'th');cell.textContent=value;if(i)cell.className='text-end';row.append(cell);});q('[data-coverage]').append(row);
+  const button=document.createElement('button');button.type='button';button.className='cursor-interaction';button.setAttribute('aria-pressed','true');button.setAttribute('aria-label','Show '+names[c]);
+  const swatch=document.createElement('span');swatch.className='legend-swatch';swatch.style.background=colors[c];button.append(swatch,document.createTextNode(names[c]));button.onclick=()=>{state.visible.has(c)?state.visible.delete(c):state.visible.add(c);button.setAttribute('aria-pressed',String(state.visible.has(c)));draw();save();};q('[data-legend]').append(button);
+ }
+ data.scenes.forEach((scene,i)=>{const option=document.createElement('option');option.value=i;option.textContent=scene.id.slice(0,9)+'… · '+scene.frames.length+' frame'+(scene.frames.length===1?'':'s')+' · '+scene.counts[4]+' cyclists';sceneSelect.append(option);});
+ function frames(){const scene=data.scenes[state.scene];frameSelect.replaceChildren();scene.frames.forEach((frame,i)=>{const option=document.createElement('option');option.value=i;option.textContent='Frame '+(i+1)+' · t +'+((Number(frame.timestamp)-Number(scene.frames[0].timestamp))/1e6).toFixed(1)+' s';frameSelect.append(option);});state.frame=Math.min(state.frame,scene.frames.length-1);frameSelect.value=state.frame;}
+ function save(){if(window.openai?.setWidgetState)window.openai.setWidgetState({modelContent:{scene:data.scenes[state.scene].id,frame:data.scenes[state.scene].frames[state.frame].timestamp,visible_classes:[...state.visible],uncovered_only:state.uncovered},privateContent:null}).catch(()=>{});}
+ function restore(value){const saved=value?.modelContent;if(!saved)return;const index=data.scenes.findIndex(s=>s.id===saved.scene);if(index<0)return;state.scene=index;const frame=data.scenes[index].frames.findIndex(f=>f.timestamp===saved.frame);state.frame=Math.max(0,frame);if(Array.isArray(saved.visible_classes))state.visible=new Set(saved.visible_classes.filter(c=>names[c]));state.uncovered=!!saved.uncovered_only;sceneSelect.value=state.scene;q('[data-uncovered]').checked=state.uncovered;[...q('[data-legend]').children].forEach((b,i)=>b.setAttribute('aria-pressed',String(state.visible.has(i+1))));frames();draw();}
+ function draw(){
+  const scene=data.scenes[state.scene],frame=scene.frames[state.frame],plot=q('[data-plot]');const width=Math.max(280,plot.clientWidth),height=Math.min(580,width*.85+70);const margins={l:48,r:28,t:28,b:46};const size=Math.min(width-margins.l-margins.r,height-margins.t-margins.b),left=(width-size)/2,top=margins.t;
+  const x=y=>left+(64-y)*size/128;const y=x=>top+(64-x)*size/128;
+  const svg=el('svg',{viewBox:`0 0 ${width} ${size+margins.t+margins.b}`,role:'img','aria-label':`${scene.id}, frame ${frame.timestamp}: native eligible boxes in vehicle coordinates`});svg.append(el('title',{},'Native box bird’s-eye view'),el('desc',{},'Vehicle forward is up. Vehicle left is left. Dashed boxes have no positive anchors. Front-camera preview is shown separately; point clouds are not plotted.'));
+  const defs=el('defs');const clip=el('clipPath',{id:'waymo-bev-clip'});clip.append(el('rect',{x:left,y:top,width:size,height:size}));defs.append(clip);svg.append(defs);
+  svg.append(el('rect',{x:left,y:top,width:size,height:size,fill:'transparent',stroke:'var(--border)'}));
+  const ticks=width<400?[-64,0,64]:[-64,-32,0,32,64];
+  ticks.forEach(t=>{svg.append(el('line',{x1:x(t),x2:x(t),y1:top,y2:top+size,class:'grid'}));svg.append(el('line',{x1:left,x2:left+size,y1:y(t),y2:y(t),class:'grid'}));svg.append(el('text',{x:x(t),y:top+size+19,'text-anchor':t===64?'start':t===-64?'end':'middle'},t));svg.append(el('text',{x:left-8,y:y(t)+4,'text-anchor':'end'},t));});
+  svg.append(el('text',{x:left+size/2,y:top+size+40,'text-anchor':'middle',class:'axis-title','data-axis':'x'},'Vehicle Y (m) · left ←'));
+  svg.append(el('text',{x:left,y:16},'Vehicle X (m) · forward ↑'));
+  const group=el('g',{'clip-path':'url(#waymo-bev-clip)'});svg.append(group);
+  const visible=frame.objects.filter(o=>state.visible.has(o.type)&&(!state.uncovered||!o.covered));
+  visible.forEach(o=>{
+   const [cx,cy,cz,length,wid,h,angle]=o.box;const cos=Math.cos(angle),sin=Math.sin(angle);const corners=[[-length/2,-wid/2],[length/2,-wid/2],[length/2,wid/2],[-length/2,wid/2]].map(([a,b])=>[x(cy+sin*a+cos*b),y(cx+cos*a-sin*b)]);
+   const polygon=el('polygon',{points:corners.map(p=>p.join(',')).join(' '),fill:colors[o.type],'fill-opacity':'.18',stroke:colors[o.type],'stroke-width':1.4,'stroke-dasharray':o.covered?'none':'4 3'});group.append(polygon);
+   const hit=el('circle',{cx:x(cy),cy:y(cx),r:Math.max(16,Math.min(22,length*size/256)),fill:'transparent','data-chart-hit':'true'});hit.classList.add('cursor-interaction');hit.setAttribute('data-tooltip',`${names[o.type]} · ${o.native_points} native LiDAR points · ${o.covered?'anchor-covered':'no positive anchor'}`);hit.onclick=()=>{q('[data-object-detail]').textContent=`${names[o.type]} · ${o.id} · ${o.native_points} native LiDAR points · ${o.covered?'positive anchor available':'no positive anchor'} · distance ${Math.hypot(cx,cy).toFixed(1)} m`;};group.append(hit);
+  });
+  group.append(el('polygon',{points:`${x(0)},${y(1.8)} ${x(-.8)},${y(-1)} ${x(.8)},${y(-1)}`,fill:'var(--foreground)'}));svg.append(el('text',{x:x(0)+8,y:y(0)+13},'Ego'));
+  q('[data-camera]').src=frame.front_preview;q('[data-camera]').alt=`FRONT camera, scene ${scene.id}, frame ${frame.timestamp}`;
+  plot.replaceChildren(svg);q('[data-scene-detail]').textContent=scene.id+' · '+visible.length+' / '+frame.objects.length+' boxes shown · '+frame.objects.filter(o=>!o.covered).length+' without positive anchors';
+ }
+ sceneSelect.onchange=()=>{state.scene=Number(sceneSelect.value);state.frame=0;frames();draw();q('[data-object-detail]').textContent='Select a box to inspect its native LiDAR support and anchor coverage.';save();};frameSelect.onchange=()=>{state.frame=Number(frameSelect.value);draw();save();};q('[data-uncovered]').onchange=e=>{state.uncovered=e.target.checked;draw();save();};
+ frames();draw();restore(window.openai?.widgetState);window.addEventListener('openai:set_globals',e=>restore(e.detail?.globals?.widgetState));new ResizeObserver(draw).observe(q('[data-plot]'));
+})();
+</script>

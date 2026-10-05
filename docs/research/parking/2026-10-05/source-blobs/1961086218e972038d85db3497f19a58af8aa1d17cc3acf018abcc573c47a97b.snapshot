@@ -1,0 +1,13 @@
+import pathlib,sys,json,os,shutil,subprocess,time,resource
+P=pathlib.Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(P))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+from advanced.archive import sha
+C=pathlib.Path.home()/'.cache/waystone/waymo-perception';R=C/'insula/sparse-head-support-20261003c';R.mkdir();inputs=R/'inputs';inputs.mkdir();out=R/'output';out.mkdir()
+f=P/'research/tier1-allclass-fixture-verified.json';d=json.loads(f.read_text());obs=d['variants']['baseline']['observations'] if 'variants' in d else None
+obs=C/'scientific-processing/tier1-allclass-fixture-v2/baseline/producer/observations.npz';targets=pathlib.Path(d['targets']);assert sha(obs)==d['controls']['baseline']['observations_sha256'];assert sha(targets)==d['targets_sha256']
+for source,name in [(obs,'observations.npz'),(targets,'targets.npz')]:os.link(source,inputs/name)
+root=C/'gpu-rootfs';lock=json.loads(pathlib.Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
+pins={str(p):sha(p) for p in [f,P/'analysis/sparse-head-support.py',P/'advanced/spatial_modules.py',P/'advanced/models.py',P/'advanced/sparse_sets.py',P/'pipeline/pillar_detector.py',*inputs.iterdir()]}
+command=launch_plan(root,P,inputs,out,['/opt/waymo/bin/python','/experiment/analysis/sparse-head-support.py']);start=time.monotonic();r=subprocess.run(command,capture_output=True,text=True,timeout=120);(out/'live.log').write_text(r.stdout+r.stderr);print(r.stdout,r.stderr);assert r.returncode==0;assert all(sha(p)==h for p,h in pins.items())
+record={'command':command,'exit_code':r.returncode,'runtime_lock':lock,'pins':pins,'elapsed_seconds':time.monotonic()-start,'peak_children_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'validation':json.loads((out/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in out.iterdir()}};(P/'research/sparse-head-support-live-verified.json').write_text(json.dumps(record,indent=2))

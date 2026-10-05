@@ -1,0 +1,21 @@
+from pathlib import Path
+import json,hashlib,subprocess,sys
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';ref=json.loads((code/'research/norm-gn_backbone-execution-verified.json').read_text());frame=ref['manifest']['frames'][0];scene,stamp=frame['identity'].split(':');original=cache/'scientific-processing/overfit-native-cache-v1'/scene/stamp
+job=json.loads((original/'input/job.json').read_text());assert job['scene']==scene and str(job['timestamp_micros'])==stamp
+root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
+assert sum(p.stat().st_size for p in (cache/'scientific-processing').rglob('*') if p.is_file())+128*1024**2<=15*1024**3
+base=cache/'scientific-processing/architecture-all_pillars-cache-v1'/scene/stamp;base.mkdir(parents=True);inputs=base/'input';inputs.mkdir();(inputs/'job.json').write_text(json.dumps(job));producer=base/'producer';producer.mkdir();audit=cache/'insula/architecture-all_pillars-cache-audit-v1';audit.mkdir();physical=cache/'scientific-processing/overfit-point-frames-v1'/scene/'producer';boxes=cache/'scientific-processing/overfit-box-targets-v1'/scene/'producer';checks=[];pins={}
+for worker,out in [('prepare-architecture-all-pillars.py',producer),('audit-architecture-all-pillars.py',audit)]:
+ w=Path('.scratch')/worker;pins[worker]=sha(w);command=launch_plan(root,code,physical,out,['python','/tmp/workers/'+worker]);i=command.index('--');command[i:i]=['--ro-bind',str(Path('.scratch').resolve()),'/tmp/workers','--ro-bind',str(inputs),'/tmp/input','--ro-bind',str(boxes),'/tmp/boxes']
+ if out==audit:
+  i=command.index('--');command[i:i]=['--ro-bind',str(producer),'/tmp/prepared']
+ run=subprocess.run(command,capture_output=True,text=True,timeout=600);(out/'live.log').write_text(run.stdout+run.stderr);print(run.stdout+run.stderr,flush=True);assert run.returncode==0;assert sum(p.stat().st_size for p in (cache/'scientific-processing').rglob('*') if p.is_file())<=15*1024**3;checks.append({'command':command,'exit_code':0})
+# Identical anchor/target supervision bytes, independent of retained observations.
+assert sha(producer/'targets.npz')==sha(original/'producer/targets.npz')
+assert all(sha(Path('.scratch')/p)==h for p,h in pins.items())
+record={'checks':checks,'runtime_lock':lock,'worker_hashes':pins,'reference_training_evidence_sha256':sha(code/'research/norm-gn_backbone-execution-verified.json'),'validation':json.loads((audit/'check.json').read_text()),'targets_exactly_equal_baseline':True,'native_root':str(base.parents[1]),'frame':{'identity':frame['identity'],'relative_directory':frame['relative_directory'],'sha256':{name:sha(producer/name) for name in ['observations.npz','targets.npz','report.json']}},'artifacts':{str(p):sha(p) for directory in [base,audit] for p in directory.rglob('*') if p.is_file()}}
+(code/'research/architecture-all_pillars-cache-verified.json').write_text(json.dumps(record,indent=2)+'\n');print('PASS independently admitted all-pillar cache; native targets byte-identical',flush=True)

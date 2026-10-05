@@ -1,0 +1,47 @@
+"""Full-denominator native scoring; annotation controls are never model evidence."""
+import json
+import math
+import re
+import subprocess
+import time
+from pathlib import Path
+from pipeline.detection_export import export_objects
+
+
+def level2_metrics(text):
+    metrics={}
+    for category in ['VEHICLE','PEDESTRIAN','SIGN','CYCLIST']:
+        key='OBJECT_TYPE_TYPE_'+category+'_LEVEL_2'
+        matches=re.findall(re.escape(key)+r': \[mAP ([^\]]+)\] \[mAPH ([^\]]+)\]',text)
+        if len(matches)!=1:raise ValueError('exact four-class native LEVEL2 metrics required')
+        ap,aph=map(float,matches[0])
+        if not all(math.isfinite(v) and 0<=v<=1 for v in (ap,aph)):raise ValueError('finite native metric probabilities required')
+        metrics[category]={'AP':ap,'APH':aph}
+    return metrics
+
+
+def score(source, output, *, annotation_oracle=False):
+    source=Path(source);output=Path(output);start=time.monotonic()
+    truth=json.loads((source/'groundtruth.json').read_text());predictions=json.loads((source/'predictions.json').read_text())
+    if annotation_oracle:
+        if len(truth)!=1279 or len(predictions)!=1053:raise ValueError('full native oracle denominator required')
+        frames={r['context_name']+':'+str(r['frame_timestamp_micros']) for r in truth}
+        if len(frames)!=16:raise ValueError('exact16 native frames required')
+    (output/'groundtruth.bin').write_bytes(export_objects(truth));(output/'predictions.bin').write_bytes(export_objects(predictions))
+    run=subprocess.run(['/metrics-build/compute_detection_metrics',str(output/'predictions.bin'),str(output/'groundtruth.bin')],capture_output=True,text=True,timeout=14400)
+    (output/'metrics.stdout').write_text(run.stdout);(output/'metrics.stderr').write_text(run.stderr)
+    if run.returncode:raise RuntimeError('native evaluator failed')
+    metrics=level2_metrics(run.stdout)
+    if annotation_oracle:
+        for category,expected in zip(['VEHICLE','PEDESTRIAN','SIGN','CYCLIST'],[.917384,.947955,.868421,.918919]):
+            if abs(metrics[category]['APH']-expected)>1e-6:raise ValueError('annotation-only native oracle changed')
+    report={'native_groundtruth':len(truth),'predictions':len(predictions),'LEVEL2_per_class':metrics,
+            'scoring_seconds':time.monotonic()-start,'annotation_oracle':annotation_oracle,
+            'scope':'annotation-derived coverage control; NMS bypassed; no model fitting claim' if annotation_oracle else 'model candidate native score; fit admission requires full trajectory'}
+    (output/'check.json').write_text(json.dumps(report,indent=2)+'\n')
+    return report
+
+
+if __name__=='__main__':
+    import sys
+    score(sys.argv[1],sys.argv[2],annotation_oracle='--annotation-oracle' in sys.argv[3:])

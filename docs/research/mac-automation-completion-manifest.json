@@ -1,9 +1,13 @@
 {
+  "active_priority_withdrawn": true,
   "canonical_head": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
   "completion_not_inferred_from": "Manual58/source host tests/closed49/native empty threads do not establish full automation",
+  "dispatch_allowed": false,
   "goal_complete": false,
   "goal_issue_uid": "01M450RZ7915Q76EYH0CNED2Y1",
   "goal_task": "59",
+  "historical_observation_preserved": true,
+  "hold_path": "docs/research/parking/2026-10-05/corenius-wait-hold.json",
   "kind": "FullMacAutomationExecutionManifest",
   "last_verified": {
     "candidate": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
@@ -39,7 +43,8 @@
       "sha256": "ea58e02d5fc8fd4f8417ad44a755372580cd07636c2b1c59b576adb9b933d8c9"
     }
   },
-  "next": "Fix observed READY startup timing; preserve allstop/source/resource gates; then fresh native notification diagnosis",
+  "native_goal_status": "paused",
+  "next": "Await Corenius infrastructure and explicit future readmission; no implementation continuation",
   "observed_ms": 1791173661886,
   "plan_gaps": [
     "Concrete55-57 implementation plan review/admission"
@@ -63,13 +68,14 @@
     "57",
     "59"
   ],
+  "state": "PARKED_CORIENUS_WAIT",
   "subtasks": [
     {
       "accepted": false,
       "landed": false,
       "plan_admitted": true,
       "remaining_gate": "Fresh native stop/ownership/lifecycle proof; then two-worker contract implementation",
-      "state": "in_progress",
+      "state": "parked_corenius_wait",
       "task": "50"
     },
     {
@@ -77,7 +83,7 @@
       "landed": false,
       "plan_admitted": true,
       "remaining_gate": "Predecessor admission plus own exact-source/live independent acceptance",
-      "state": "queued",
+      "state": "parked_corenius_wait",
       "task": "51"
     },
     {
@@ -85,7 +91,7 @@
       "landed": false,
       "plan_admitted": true,
       "remaining_gate": "Predecessor admission plus own exact-source/live independent acceptance",
-      "state": "queued",
+      "state": "parked_corenius_wait",
       "task": "52"
     },
     {
@@ -93,7 +99,7 @@
       "landed": false,
       "plan_admitted": true,
       "remaining_gate": "Predecessor admission plus own exact-source/live independent acceptance",
-      "state": "queued",
+      "state": "parked_corenius_wait",
       "task": "53.0"
     },
     {
@@ -101,7 +107,7 @@
       "landed": false,
       "plan_admitted": true,
       "remaining_gate": "Predecessor admission plus own exact-source/live independent acceptance",
-      "state": "queued",
+      "state": "parked_corenius_wait",
       "task": "54"
     },
     {
@@ -109,7 +115,7 @@
       "landed": false,
       "plan_admitted": true,
       "remaining_gate": "Predecessor admission plus own exact-source/live independent acceptance",
-      "state": "queued",
+      "state": "parked_corenius_wait",
       "task": "53"
     },
     {
@@ -117,7 +123,7 @@
       "landed": false,
       "plan_admitted": false,
       "remaining_gate": "Predecessor admission plus own exact-source/live independent acceptance",
-      "state": "queued",
+      "state": "parked_corenius_wait",
       "task": "55"
     },
     {
@@ -125,7 +131,7 @@
       "landed": false,
       "plan_admitted": false,
       "remaining_gate": "Predecessor admission plus own exact-source/live independent acceptance",
-      "state": "queued",
+      "state": "parked_corenius_wait",
       "task": "56"
     },
     {
@@ -133,7 +139,7 @@
       "landed": false,
       "plan_admitted": false,
       "remaining_gate": "Predecessor admission plus own exact-source/live independent acceptance",
-      "state": "queued",
+      "state": "parked_corenius_wait",
       "task": "57"
     }
   ]

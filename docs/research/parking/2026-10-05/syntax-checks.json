@@ -1,0 +1,2727 @@
+{
+  "entries": [
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/native_stop_fixture.py",
+      "sha256": "dc2924f081f6012dc62e8f413efe3fa46f4af9166b00bf95cbc68341c80de015"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/test_native_stop_fixture.py",
+      "sha256": "4d4e80267d206aca1848ede5c7165bc9034ea5011c4be705f462c4ee7e9aee0a"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/test_publication_audit.py",
+      "sha256": "f7d26d3c11a31d30d30a6991b5170fd99a9212e96d0881d537b15041b56e820f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/native_stop_fixture.py",
+      "sha256": "a5318aacc3fff7e38f6facc780838722f214ab61bae97a72871465bcaaad098c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/test_native_stop_fixture.py",
+      "sha256": "5437cb8a5db30cc95eb09c4ae203dba9f106200fb4c5d5eabf7cec10d39aa9d6"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/native_stop_fixture.py",
+      "sha256": "2e0eafdb2c44e3807b0e7aa210c5bf512fb20f0fba4e8186ab85039b270d3aa6"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/test_native_stop_fixture.py",
+      "sha256": "8278f8bf557710289fd4a2261f92f6eb0d22cbe6eba305cd6541a4e88298f791"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/collaboration/runtime/entry.py",
+      "sha256": "de964bed044841b0c71e5ccb2861d9aeafdc797ea837f8a5be61631e6e5d66b4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/__init__.py",
+      "sha256": "8d534e274f04756a976bb4994fabdc98ba062827892ce7464ef26d9f0fb28b7d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/admission.py",
+      "sha256": "cb133903ea5303d271cef4aee60f86fa3c5776359149588c363270fa80615988"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/cli.py",
+      "sha256": "f23fdf93f517a52411d1f2df5d8162bc448641e2921fec04c69b82afd5b24500"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/contracts.py",
+      "sha256": "79e53f8ec045bd52fb7b7cf8d540ec585341d32c82827e5149c098cd5b0523c0"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/git_workspace.py",
+      "sha256": "2faaef7431a732100c7516208fcd4497dec9b9207c943ac917a28d6596187b5c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/kata.py",
+      "sha256": "d07def82d28e68e6a6efb5ea3cae5ce339d7d3e0d8ba59e5ef80ebe546cb57f4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/store.py",
+      "sha256": "e37d05f2e0debeb8abbd6338c1a2c83a1f13390d99804acf646fd89cffbd74b4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/collab.py",
+      "sha256": "7d7796a75e9df90536421139642a8adf7c63a1173b5314aa67a0771c884f5e87"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/collab_live.py",
+      "sha256": "2a8a958a2fccae627fe0b35220b839afc77733d99ce67968529c1bc77bdf0cb3"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/kata_fixture.py",
+      "sha256": "795e6e55aabaeea5c52df3b7d369b8c3ef18c2d9c91e3669f4d727f39f5d9f86"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/live_support.py",
+      "sha256": "6ad99da8e8c49980bebbfe2f31b42cef1fa47ca6a8164f9eb73987970731a658"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_admission.py",
+      "sha256": "06986b3e99048c5e5471318a486bf5be1060b600c43077efa7af153927dbd854"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_cli.py",
+      "sha256": "6766027f0eb18e3e91573d04bdd64c914892072f671d0f33de28b9ac3b30391c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_contracts.py",
+      "sha256": "21263426fab2a6e3540bf4c1a440256a3f653759a50dd6e4e77303767179cc5b"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_kata.py",
+      "sha256": "8d3a3fd99d49c7af1748d315404224da6170b03011a502e6ad01dfec7e34f279"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_live.py",
+      "sha256": "ac25fff070c342b28fb5b48b1902ddd09c54dc549a3a1348f7e72d2cc701c5bf"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_runtime.py",
+      "sha256": "b29e81ca475f8d8a24b2fe5e712cfb32058294d0d5cbfa30f801afbc0700e92a"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_store.py",
+      "sha256": "fa5cd2557eb829da7094355bbbd6e254bf73b7371ad1ed4ce5beecce145f1dff"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/native_read.py",
+      "sha256": "a420c20b3aec562acef8ceeb97eb1b6eb42f7c95bbf08917deceea33f01823e3"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/probe_authority.py",
+      "sha256": "907f414daaf84281f272703822644f5050846a1ec7f128d2ccc358ef99988e3e"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/probe_os.py",
+      "sha256": "a2649b88361736e9ba5271e3ff4b7760de40d57b8961612d1f87f60d77831888"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/runtime_probe.py",
+      "sha256": "872965a5b9a159cba5c343fbc4038b2e5e32dbf029dc6c76d9f8927ea661cf54"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_native_read.py",
+      "sha256": "f0c81751d990dd5f57ad528190483791c848b80c60bc1c11973495c82a10ee31"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_probe_authority.py",
+      "sha256": "e72dedae7cf1ec44993ff71b25c3e3d6bcf0d846465022804d57c3ad50ff6cd0"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_probe_collection.py",
+      "sha256": "d224bc0c99ccede23bc18b7ecea34fad4a79c6c75769393538be53d06e2a74da"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_probe_os.py",
+      "sha256": "823784236c767c596e839e849feeab5a115ca9a8b57f0d7fa92eea4c6b8e8c53"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_runtime_probe.py",
+      "sha256": "7ad316898ae52351bd03fd2b4fe32f339bfb57b2ed280cd206841fab6f74efd7"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/probe_authority.py",
+      "sha256": "233cd2afb3092cee4d4eea082cbbddb277fc7e07ba089ab1c0f54c1e840ae193"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_probe_authority.py",
+      "sha256": "5f2043f7b45b0738f001c2166175dd4a1adc4aa1ab2c7de2aec4978a7c917186"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/native_stop_fixture.py",
+      "sha256": "f204b1c2ef472d0a7522aefbc7fc653b9829eca6d1a4159db39b2cd174f76ab9"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/test_native_stop_fixture.py",
+      "sha256": "afffdb2b0042d24f34b76b92644d6c2a402596dfaeee9b2d8170232b66954f44"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "docs/research/pilots/58/normalization-inventory/inventory_live.py",
+      "sha256": "3d9e1282f88aadecc8af34073f742c417111123f947caf30109f0572f32065d4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/preflight_guards.py",
+      "sha256": "6e6b8e7a115c2a0028b4a0f01c59d963ae201a6e0d8fd38bf130592b4e9e82e4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/test_preflight_guards.py",
+      "sha256": "cfd78f2db789d6756fe33edee16320051639e1897d8a965bca7cdff1377240c5"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/preflight_guards.py",
+      "sha256": "00db5c638cd897457eeb0a8332cbe38a0d856e61ea6dee5cf2a9680bb3ada8b7"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/test_preflight_guards.py",
+      "sha256": "71eb4b7cbe7b13b1815409125800dee006b31546f9dc968dee0c67bc21f2dde8"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/probe_authority.py",
+      "sha256": "46578939fa7e9a1c55b37ef14a740a38ffe3c68976806306102894add8cdfb0e"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/runtime_probe.py",
+      "sha256": "f101a9f24945287290da453b579a5e58678a6186263741754090d4859bc771ef"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_probe_fixture.py",
+      "sha256": "0e3ce36ed5e90481de66beae5ee6bba0b7132bc14ed79f2bdc042178e93da600"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/native_stop_fixture.py",
+      "sha256": "82f774d6eb80907faaaf36eef71cabed2233f221b1b9fa58bccdd4e5895d3528"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/test_native_stop_fixture.py",
+      "sha256": "f39ede4692c031ab80220cd76ff0f7a2a7f91ca20e4de1d3e585b993fe55ff23"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/preflight_guards.py",
+      "sha256": "38c600458d4b34bb5925189279f906db847dbe104a300890ede80a92f3e9c986"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/collaboration/runtime/entry.py",
+      "sha256": "1208813e839369011ec120396bb45b12d67692a3bdb8affd884fff6d7e9ce8a9"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/__init__.py",
+      "sha256": "8d534e274f04756a976bb4994fabdc98ba062827892ce7464ef26d9f0fb28b7d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/admission.py",
+      "sha256": "cb133903ea5303d271cef4aee60f86fa3c5776359149588c363270fa80615988"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/cli.py",
+      "sha256": "f23fdf93f517a52411d1f2df5d8162bc448641e2921fec04c69b82afd5b24500"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/contracts.py",
+      "sha256": "79e53f8ec045bd52fb7b7cf8d540ec585341d32c82827e5149c098cd5b0523c0"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/git_workspace.py",
+      "sha256": "2faaef7431a732100c7516208fcd4497dec9b9207c943ac917a28d6596187b5c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/kata.py",
+      "sha256": "d07def82d28e68e6a6efb5ea3cae5ce339d7d3e0d8ba59e5ef80ebe546cb57f4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/store.py",
+      "sha256": "e37d05f2e0debeb8abbd6338c1a2c83a1f13390d99804acf646fd89cffbd74b4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/collab.py",
+      "sha256": "7d7796a75e9df90536421139642a8adf7c63a1173b5314aa67a0771c884f5e87"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/collab_live.py",
+      "sha256": "2a8a958a2fccae627fe0b35220b839afc77733d99ce67968529c1bc77bdf0cb3"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/kata_fixture.py",
+      "sha256": "795e6e55aabaeea5c52df3b7d369b8c3ef18c2d9c91e3669f4d727f39f5d9f86"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/live_support.py",
+      "sha256": "6ad99da8e8c49980bebbfe2f31b42cef1fa47ca6a8164f9eb73987970731a658"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_admission.py",
+      "sha256": "06986b3e99048c5e5471318a486bf5be1060b600c43077efa7af153927dbd854"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_cli.py",
+      "sha256": "6766027f0eb18e3e91573d04bdd64c914892072f671d0f33de28b9ac3b30391c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_contracts.py",
+      "sha256": "21263426fab2a6e3540bf4c1a440256a3f653759a50dd6e4e77303767179cc5b"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_kata.py",
+      "sha256": "8d3a3fd99d49c7af1748d315404224da6170b03011a502e6ad01dfec7e34f279"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_live.py",
+      "sha256": "ac25fff070c342b28fb5b48b1902ddd09c54dc549a3a1348f7e72d2cc701c5bf"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_runtime.py",
+      "sha256": "07f41ad5909e1f2aaa63a6dfc485337ca13c6234ad6617665f1929c744de970e"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_store.py",
+      "sha256": "fa5cd2557eb829da7094355bbbd6e254bf73b7371ad1ed4ce5beecce145f1dff"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/native_stop_fixture.py",
+      "sha256": "fad46e07fc6f3f2abe259b0badfd522a155a1ec8b61c1a594b6185537ba98093"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/test_native_stop_fixture.py",
+      "sha256": "ac4c403c6508761514fe35e5ef1a323aa8fdd4815938be52e5731fc307327d82"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/channel_authority.py",
+      "sha256": "e24b2ea910281c14cc18cd2019fd8ed1fc80eb959f56f52babeccefe326ec913"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_channel_authority.py",
+      "sha256": "d479a43c8fb58ae25e1428f48d12bfd916e0caddaad1947a5a3961eec08cf3be"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/3d-pathway/pipeline/reporting.py",
+      "sha256": "a71f9b923b09d536cd8599184c80eb29205e36814b34a1c3dcee10cdb31bc31b"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/3d-pathway/pipeline/runner.py",
+      "sha256": "16f29f6704976cf534c260ac145d9f14acde2407c71fcb495d16d93bb2dd77b4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/3d-pathway/pipeline/validator.py",
+      "sha256": "dc71eb577ec56f8c99c1c94b179be2a0e0835aa910880feacd36e8d7e3a5ba2e"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/3d-pathway/tests/test_e2e_completion.py",
+      "sha256": "5a24e663950b398170f13d95c6c2d6dc06262007ede8f10dec7ba53b6070451b"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/3d-pathway/tests/test_foundation.py",
+      "sha256": "28d99de73e8e71e3c6139dc62e453bf254052f182602e6735ba4f259ca173b2c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/3d-pathway/tests/test_review_fixes.py",
+      "sha256": "5fb8f20db3d6b538c213b5e8e5f9b170574fd50a722e874514a367f2a6d3b2db"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/native_stop_fixture.py",
+      "sha256": "249f4dbdfa0bf3dd104e22de8a20f9861bd41027b2c5e5f976c1257c047da973"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/test_native_stop_fixture.py",
+      "sha256": "02aa113750fd96a352ac657046be37f5616030a36e5580546c72562ff9b5c7e0"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/evidence.py",
+      "sha256": "178976ba6579f0aed4720c4592487a976091f825b1cb33e49d1010b6f106ade5"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_source_review_pins.py",
+      "sha256": "915eb1a649aae0a1365b2e4cebed25062f7ea48fc576c44fbe76e0d1ce0350a7"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/native_stop_fixture.py",
+      "sha256": "759740fa1f6c9cbf763cf4c75c7e07c989a1510197907afafa55084c54a8cc1f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/test_native_stop_fixture.py",
+      "sha256": "d2df805dcd5d03f5d165e83475b711ba10f94d9a5accf88d3d196424af0762d3"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/3d-pathway/tests/test_foundation.py",
+      "sha256": "0dd3c0ce6ff710532fe2dd0465072279c8ee040a60bb91823f4a443f50a18012"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/collaboration/runtime/entry.py",
+      "sha256": "de964bed044841b0c71e5ccb2861d9aeafdc797ea837f8a5be61631e6e5d66b4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/__init__.py",
+      "sha256": "8d534e274f04756a976bb4994fabdc98ba062827892ce7464ef26d9f0fb28b7d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/admission.py",
+      "sha256": "b4b07817525ff1a98b09571a15ae29e914468771bf0fb4cff67d5560dc6a94fa"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/cli.py",
+      "sha256": "46a245ed280f56e233b1cb01fbbad0c6a5e5ad1bcedf647e14bae44c8a47f77e"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/contracts.py",
+      "sha256": "79e53f8ec045bd52fb7b7cf8d540ec585341d32c82827e5149c098cd5b0523c0"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/git_workspace.py",
+      "sha256": "2faaef7431a732100c7516208fcd4497dec9b9207c943ac917a28d6596187b5c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/kata.py",
+      "sha256": "d07def82d28e68e6a6efb5ea3cae5ce339d7d3e0d8ba59e5ef80ebe546cb57f4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/store.py",
+      "sha256": "e37d05f2e0debeb8abbd6338c1a2c83a1f13390d99804acf646fd89cffbd74b4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/collab.py",
+      "sha256": "7d7796a75e9df90536421139642a8adf7c63a1173b5314aa67a0771c884f5e87"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/collab_live.py",
+      "sha256": "2a8a958a2fccae627fe0b35220b839afc77733d99ce67968529c1bc77bdf0cb3"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/kata_fixture.py",
+      "sha256": "795e6e55aabaeea5c52df3b7d369b8c3ef18c2d9c91e3669f4d727f39f5d9f86"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/live_support.py",
+      "sha256": "6ad99da8e8c49980bebbfe2f31b42cef1fa47ca6a8164f9eb73987970731a658"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_admission.py",
+      "sha256": "a341144c033475fa07ff21568cd4c2db529473311e37700b94bc3e0529b0bb4f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_cli.py",
+      "sha256": "72bd3116bea8a2d3c64358346891a0a0882604e2d433bd2048280fa7e4926880"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_contracts.py",
+      "sha256": "21263426fab2a6e3540bf4c1a440256a3f653759a50dd6e4e77303767179cc5b"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_kata.py",
+      "sha256": "8d3a3fd99d49c7af1748d315404224da6170b03011a502e6ad01dfec7e34f279"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_live.py",
+      "sha256": "ac25fff070c342b28fb5b48b1902ddd09c54dc549a3a1348f7e72d2cc701c5bf"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_runtime.py",
+      "sha256": "b29e81ca475f8d8a24b2fe5e712cfb32058294d0d5cbfa30f801afbc0700e92a"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_store.py",
+      "sha256": "fa5cd2557eb829da7094355bbbd6e254bf73b7371ad1ed4ce5beecce145f1dff"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/channel_authority.py",
+      "sha256": "67a44de1fa8bc95d0c9cfc1eaf6c048e13cf287527f8fc85529d19b4f6c09483"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/channel_observer.py",
+      "sha256": "da1f0a4584afcdd69f6076a6e81207a3135d094611aa498a7aefe27f92f25428"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/native_read.py",
+      "sha256": "ea1670c7482a4e9882d90f3c59558b5f593ca05f77e87b1a1b8ebbe6da1ea24e"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/notification_channel.py",
+      "sha256": "e48057f0c060b72c0401667fdfe7f21e0c0a0a156fed05050d8be51df8f8a5aa"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/probe_authority.py",
+      "sha256": "db71b79c1c87e02f597daea487dca37651c3b7c0a635b8c14919c7e4dec6e540"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/probe_os.py",
+      "sha256": "71686c99c806b69a956ddd6db29641eeea1402c46e39c7d6563d561b3a0fe8a7"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/runtime_probe.py",
+      "sha256": "6756f34d167d0c34d88fcc500d091b3f0f28ca21c8bdf9053fcfad367aadf87e"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_channel_authority.py",
+      "sha256": "d479a43c8fb58ae25e1428f48d12bfd916e0caddaad1947a5a3961eec08cf3be"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_channel_observer.py",
+      "sha256": "8392e7c13aafdbfc4dc193fa30e9f3d1e28ccc2191d3727334f7100d95065f0c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_native_read.py",
+      "sha256": "ee7495c4bfcf52fb23701977407b843425a612eeb95ee2cc511889cea9aef0d6"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_notification_channel.py",
+      "sha256": "09dab5dcf5276b7fe0b67e5cc5d0ff41192b61d7e6fdc9f3ce0e299a6f9d3143"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_probe_authority.py",
+      "sha256": "5f2043f7b45b0738f001c2166175dd4a1adc4aa1ab2c7de2aec4978a7c917186"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_probe_collection.py",
+      "sha256": "42e2c27568ed0ae24f1c2e56d00ad6c3713c2bdc8c60fcf60e470958427dbabb"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_probe_fixture.py",
+      "sha256": "0e3ce36ed5e90481de66beae5ee6bba0b7132bc14ed79f2bdc042178e93da600"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_probe_os.py",
+      "sha256": "823784236c767c596e839e849feeab5a115ca9a8b57f0d7fa92eea4c6b8e8c53"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_runtime_probe.py",
+      "sha256": "7ad316898ae52351bd03fd2b4fe32f339bfb57b2ed280cd206841fab6f74efd7"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_writer_reader.py",
+      "sha256": "27eea264db67f54ece2ee3228ebc88e24b3f267b03331e01fbf031008b9a04e7"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/writer_reader.py",
+      "sha256": "55ae86978ce9e830c5345a7fb141fc0f29a94480b1abf6de2fc5b664f66c7e0d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/3d-pathway/pipeline/surflo_endpoint.py",
+      "sha256": "2bd01f1f1707b06e6d88a90e1776a9af098fbf32b2ce0b7e0e831cb42a0c4c49"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/3d-pathway/tests/test_generation_dynamic_surflo.py",
+      "sha256": "650cc9d869d50843f2ff7490fb345095963971fbf5c93a49178b0370684f5001"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/photoreal-scenes/pipeline/probe_summary.py",
+      "sha256": "e07b32345879da69de28f58a1ddc5308db0f9e5dc1a44047a69b335256452718"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/photoreal-scenes/tests/test_probe_recipe.py",
+      "sha256": "67a0c6b05d9002294f6649ae6a3c0908f1e262357c5b0349c30cc658a3d5f98e"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/photoreal-scenes/verify_recipe.py",
+      "sha256": "50e362e7c4c0460fb4fba9f5a7e99805025ec3dd5523a8e26704bb451254fddd"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/native_read.py",
+      "sha256": "ea1670c7482a4e9882d90f3c59558b5f593ca05f77e87b1a1b8ebbe6da1ea24e"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_native_read.py",
+      "sha256": "ee7495c4bfcf52fb23701977407b843425a612eeb95ee2cc511889cea9aef0d6"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/channel_authority.py",
+      "sha256": "464391d96b95c4f31ccd388ff38926c38e406d0653d5826def3ddbe029a334ac"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_channel_authority.py",
+      "sha256": "e4341b7681f31878b454db03e7a5be209f3a821c68720aaacacae78f5bbe23f2"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/collaboration/runtime/entry.py",
+      "sha256": "1208813e839369011ec120396bb45b12d67692a3bdb8affd884fff6d7e9ce8a9"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/__init__.py",
+      "sha256": "8d534e274f04756a976bb4994fabdc98ba062827892ce7464ef26d9f0fb28b7d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/admission.py",
+      "sha256": "cb133903ea5303d271cef4aee60f86fa3c5776359149588c363270fa80615988"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/cli.py",
+      "sha256": "f23fdf93f517a52411d1f2df5d8162bc448641e2921fec04c69b82afd5b24500"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/contracts.py",
+      "sha256": "79e53f8ec045bd52fb7b7cf8d540ec585341d32c82827e5149c098cd5b0523c0"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/git_workspace.py",
+      "sha256": "2faaef7431a732100c7516208fcd4497dec9b9207c943ac917a28d6596187b5c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/kata.py",
+      "sha256": "d07def82d28e68e6a6efb5ea3cae5ce339d7d3e0d8ba59e5ef80ebe546cb57f4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/_collab/store.py",
+      "sha256": "e37d05f2e0debeb8abbd6338c1a2c83a1f13390d99804acf646fd89cffbd74b4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/collab.py",
+      "sha256": "7d7796a75e9df90536421139642a8adf7c63a1173b5314aa67a0771c884f5e87"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/collab_live.py",
+      "sha256": "ff1b9030616f092d8efb2b744e8a8c10dfd42a01bb2b733aba088c299971a7d2"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/kata_fixture.py",
+      "sha256": "795e6e55aabaeea5c52df3b7d369b8c3ef18c2d9c91e3669f4d727f39f5d9f86"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/live_support.py",
+      "sha256": "6ad99da8e8c49980bebbfe2f31b42cef1fa47ca6a8164f9eb73987970731a658"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_admission.py",
+      "sha256": "06986b3e99048c5e5471318a486bf5be1060b600c43077efa7af153927dbd854"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_cli.py",
+      "sha256": "6766027f0eb18e3e91573d04bdd64c914892072f671d0f33de28b9ac3b30391c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_contracts.py",
+      "sha256": "21263426fab2a6e3540bf4c1a440256a3f653759a50dd6e4e77303767179cc5b"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_kata.py",
+      "sha256": "8d3a3fd99d49c7af1748d315404224da6170b03011a502e6ad01dfec7e34f279"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_live.py",
+      "sha256": "d89a79297b0d7d425afc197be803131bb86951c66c4f25bf9b3d7ece92082b79"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_runtime.py",
+      "sha256": "07f41ad5909e1f2aaa63a6dfc485337ca13c6234ad6617665f1929c744de970e"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/test_store.py",
+      "sha256": "fa5cd2557eb829da7094355bbbd6e254bf73b7371ad1ed4ce5beecce145f1dff"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/channel_authority.py",
+      "sha256": "266c7fb09d5c535b32096f3bc14b884fc5e316bb814216a208b1f5c293aaf790"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/channel_observer.py",
+      "sha256": "513da65744aa3723ca45ca76e7cad08bf2e01abac0e45d068e5cb1d4e7dba05c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/notification_channel.py",
+      "sha256": "e48057f0c060b72c0401667fdfe7f21e0c0a0a156fed05050d8be51df8f8a5aa"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/probe_authority.py",
+      "sha256": "db71b79c1c87e02f597daea487dca37651c3b7c0a635b8c14919c7e4dec6e540"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/runtime_probe.py",
+      "sha256": "1bf9817d5f3d8b8a5313ef0e37e326bb0f5a136128b002955c81d58152423587"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_channel_authority.py",
+      "sha256": "e98c239d820446a98f8e081df24a14f522d6edce480a8cfa3ebf4fe38a062023"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_channel_observer.py",
+      "sha256": "8392e7c13aafdbfc4dc193fa30e9f3d1e28ccc2191d3727334f7100d95065f0c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_notification_channel.py",
+      "sha256": "09dab5dcf5276b7fe0b67e5cc5d0ff41192b61d7e6fdc9f3ce0e299a6f9d3143"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_probe_collection.py",
+      "sha256": "42e2c27568ed0ae24f1c2e56d00ad6c3713c2bdc8c60fcf60e470958427dbabb"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/cases.py",
+      "sha256": "d1579a2654d68b988b081049772c5849945dc9935b2291b414ed8e9826617e99"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/evidence.py",
+      "sha256": "a5fdc016019d9d00e527099f268d5d214d869a427900b75561df1e80a7b23f48"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_map_metadata.py",
+      "sha256": "0d84708577000da98693531d193e5a033e14b6035a8b4a34ce4180c7033e14e8"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_prior_authority.py",
+      "sha256": "64fd5f15d80d55057a2cdd54e4f2e126be430e2858cc046f02daf9f5b21eb07d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_references.py",
+      "sha256": "3f518a2776b80cc83eef2f01405be6333ed53db3dc8cc0210794fce173b036d8"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/verification.py",
+      "sha256": "34f0c89c99cd46977e997fbeef62ff4b9c51bc9a44e55482eb8490d9d34c0533"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/channel_authority.py",
+      "sha256": "9c29d3be5b51d66d2e882ea7d63fa5e77a82bd61ce2c7de6fe7ac55752b902e9"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_channel_authority.py",
+      "sha256": "915cf2345116d9e590a23ccf5a82390384feac9c4c853b14010ab04166bac14a"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/3d-pathway/pipeline/validator.py",
+      "sha256": "e15490d1112be685226675f94a7c11d971d80cc2b72ac2125270d44a8d8ffaa6"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/3d-pathway/tests/test_foundation.py",
+      "sha256": "db785b0f46946f8c2e730c1b31bd0be46d1982ba5c3ea9c4880b0f7fcbf440ac"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/photoreal-scenes/pipeline/probe_summary.py",
+      "sha256": "7cf50a53c44dc386f1fe0a4c9fa308f8652ccae971c44c08068f0ba88b1aafa7"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/photoreal-scenes/tests/test_probe_recipe.py",
+      "sha256": "0f9289f496997ef03d60254ea321d7cbdd8ff280cab37bbdd196ae8673020f5c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/photoreal-scenes/verify_recipe.py",
+      "sha256": "01462f42b7f1bc2ad209a37834139237b958cbfe1f8bb57f2dbdf815e8d0613e"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/test_publication_audit.py",
+      "sha256": "362cb4550fba4ea2898f1250277b9b188113256c85a8754addc0eac596a598c9"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "docs/research/pilots/58/failure-ledger/verify_preparation.py",
+      "sha256": "c5eda90004ce7bfc83c3074ab19e4b28d17661972cf233608f2a51a9cbca7cdc"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/3d-pathway/pipeline/audit.py",
+      "sha256": "21b2533ed3286f317e381fa740b6907c0aeca12d31048e9feb200feb765f63ab"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/3d-pathway/tests/test_documentation.py",
+      "sha256": "35162d0ee7f2f9df9e34a6492ddce7fb6981305418031ceaff52524b46ed183b"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "scripts/publication_audit.py",
+      "sha256": "51a419687dafee3af35106549a301e26696c65a9c568e18781e6af917c9f2130"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/test_publication_audit.py",
+      "sha256": "fc3a66c22e7f63a8b357a8ac63824338df46ff70f229bda184d6c9d05b5155d4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/native_stop_fixture.py",
+      "sha256": "a173a3eb5b3ab717d17305048abb39144458e4b7a37fb64d2245f2aebff6e484"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/preflight_driver.py",
+      "sha256": "2e2de735b3df93b4925d25f63bf343160937668ade474decab540097c12edf9e"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/preflight_guards.py",
+      "sha256": "9a1579795838448513c32c7842b7136b13bbf37acebc2bed88672c610152a79a"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/python_import_profile.py",
+      "sha256": "083b93efeffd2bcba50f1171b760336b897dd523bc3948e5b33ee3eccb63a3db"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/test_native_stop_fixture.py",
+      "sha256": "ab1bfb915611439e2dc4b3f3922721d5202ccfcdad051bb96b0e3f8eb93939f7"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/test_preflight_driver.py",
+      "sha256": "1a4b6734d05f87f25586c569d479c03283916e1465897f01fd3abec91eef406d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/test_preflight_guards.py",
+      "sha256": "532169ea04c526ae5cc40ccf879c03e2e14232fa67e6f2ddd772c65f12666a63"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/runtime_probe.py",
+      "sha256": "2f57150bc77f50511cc72ba61faa192af4bbc6c72a0f8cfff0d848cf85ec0afa"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_probe_collection.py",
+      "sha256": "6b75ba2d6ed853907e7aff337bf8c6a5f2fa8ce7a205a76e05e84d7ad43ccb7d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/native_stop_channel.py",
+      "sha256": "7b1c1b668c90743930d22dd2d87835f88b7f4de8274f24b3e7a20558292d7f15"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/native_stop_fixture.py",
+      "sha256": "c7971b9514a74930fa6f834ba278a1012cb352dee001a6c085c1071ee39b7d7c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/preflight_driver.py",
+      "sha256": "2cf969c432bccdd0c63fbab13492abeae18647d75dee41c0be556cabd7c07126"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/preflight_guards.py",
+      "sha256": "7b158079b14e46627ca76352db38eea9c4d4c611aff7223f4a80ecbb30b89783"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/test_native_stop_channel.py",
+      "sha256": "35f67f822ebbd2cf7306a00133cdfbb74eaaff8e17848fead4a9c3a2579485ee"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/test_native_stop_fixture.py",
+      "sha256": "d47f97672e2dec8ebaa70551f4cd4a40d0a8e7793c971811848d7624a0b660a7"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/test_preflight_driver.py",
+      "sha256": "705cc3c2929b51d0ec342534a090483a16e120d300ded89569acf4b809d8c94c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/test_preflight_guards.py",
+      "sha256": "cd802ce5065ea615110d98f1136db501e0d692b8cc5f33363e9bba093762724f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/channel_authority.py",
+      "sha256": "d67d7036b7eddb8c031e87806be1703a26a4af4524e26549925a2b763ac55510"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/audit_support/test_channel_authority.py",
+      "sha256": "11196f7347128e6b228ef665c90abf34d4e1bb5c6dcca437345c6d0d9740cdab"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/preflight_guards.py",
+      "sha256": "71be253b31f2b185e86dc75c99d14775272e884c236b6a5c81218eaf8ae46a2f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/test_preflight_guards.py",
+      "sha256": "d6ef5ea572fbccf1eed56e037caca1e8cb937c7443c5e91c1807493131035976"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/preflight_guards.py",
+      "sha256": "ee48ac8853a076dd228cb77eb679dd38e5fbc59ed369ccd1954e557a76374f75"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "tests/collab/fixture_support/test_preflight_guards.py",
+      "sha256": "350fa0f85afd9430f53691394876c03db55d3054d4db10d39e0bc131091345c1"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/account-fourth-sidecar-recovery.py",
+      "sha256": "60069d95c5c88ae84b218d76c2b6aec1637c297f472371490d3a3e2dcb53f878"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/acquire-motion-codebook.py",
+      "sha256": "e5d29d609e55aa2929aa3e5d5848f5405f755b24faa7487d78b0efd75ac74182"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/acquire-motion-pilot-extension.py",
+      "sha256": "292ed638eb2c0b2ba479c8df6d48f3c9bd2033fd607dece5ffba017603718f1c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/acquire-motion-pilot-training.py",
+      "sha256": "aa5724924fc732af27330aabb2f7f16fddbcc1f226d3c7b236a708a8d216ce23"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/acquire-motion-pilot-validation.py",
+      "sha256": "4662eb64a2fa9375fbce9eab9004451a664e6b7b9e5eae4a92619a4bdf8b8392"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/acquire-motion-validation-extension.py",
+      "sha256": "861fc4ebe7699f13d585d70a470698e7c81de730372b4f0caa33a0141eb3e9e8"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/admit-motion-retention.py",
+      "sha256": "70e91ca804f1978cb828a8913eb4c913499863d006790a2a42750ac20d2b499b"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/admit-recovered-scene-fifth.py",
+      "sha256": "16d8850cb973d01e3ce912210dd95a658bc12d17dec25a232bfbdaeb9f6ee932"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/admit-recovered-scene-fourth.py",
+      "sha256": "2386992ab88e419afff8188bdb8dd2fa2a3cabb5a6235a602c8fd59d02f086ed"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/admit-recovered-scene-second.py",
+      "sha256": "ee8ae4cce2441db0cbd9a78ccbb1362770ef99e11043b3177e92cf8aac1b2ee2"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/admit-recovered-scene-third.py",
+      "sha256": "eb90c8b739a82cf7f4a548eaa944545a89017e5e26fb32fd67049c14199f2234"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/admit-recovered-scene.py",
+      "sha256": "4210382de4c34f7cf3ef9229e00a481a70a7ccfad3e8d3144fa21cd90d360586"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/admit-sustained-candidate.py",
+      "sha256": "6db4fc302ef82fb588dea5a3c53022c01b9790be8ec89a7c19ea65ee33bd6d39"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/architecture-all-pillars-followthrough.py",
+      "sha256": "5f9f4f2615ab7000f894d5de0b0c666b7c4b2363c9cff5d3f3c7fb1463e80219"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/architecture-coarse-control.py",
+      "sha256": "dab10d2ff0bdb60e5957dfd21979922a5215e2fafc85e5fbd1d3627c7a4e4b20"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/architecture-cpu-cohort.py",
+      "sha256": "7c73d12dde69dd4d37eea98b3706c0369cad3a883835eff2d3a23be1004beb9c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/architecture-final-gpu-replay.py",
+      "sha256": "9e91eb52eb33bc9e1e45689a1571716bf01ef5908ac3ab1af1d851caa1d20f05"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/architecture-followup-cpu.py",
+      "sha256": "2b1acb522a31ad5c594232877e931835deec0cffdae41ea8698ad87e87f8245c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/architecture-followup-gpu.py",
+      "sha256": "79115e444452022393173fa744f9699032770a10cd8ead039df94dab2d92ef2c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/architecture-followup-red.py",
+      "sha256": "88032b878c081b21351ad8e40249b19ed38ba5af92e2e9547e0f78a8dfd47ddf"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/architecture-gpu-followthrough.py",
+      "sha256": "482b6b93e1954da35adcf40f40f220c6d1985d9820f5f22fa11733e82194dcf3"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/architecture-gpu-recovery.py",
+      "sha256": "456ead6257491b218c7360b0d4921e61312e3941013ade1bcc4713cef8be51b0"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/architecture-guard-contract.py",
+      "sha256": "1eb0707bc908e169391d050b12e3ca6c383cd56aa851d58c5edefbd1f3bc8c2e"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/architecture-retention-support-v2.py",
+      "sha256": "9a9543b45c0df640e40e322685ff78a4aa6d23d5f73b7ec0a3b3051d9e3b9658"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/architecture-retention-support.py",
+      "sha256": "e9b4b847e8f3aa2b89f6b9a919c95e7277c3cf6804a19af8c0e04e2fb246e172"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/architecture-storage-audit.py",
+      "sha256": "da324eb0cf9a283b626a01132e8847eea75932695490c02eda4ede78a4429453"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/architecture-strict-readmission.py",
+      "sha256": "612ea96d645062a7f5dc78ce126283bd388b90272100c8bac25e552a9ae6d237"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-all-pillars-checkpoint.py",
+      "sha256": "a009c9aa33389b18bd8315a3f7b0c332371b82633402b2cd5dfeaebb6647e664"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-all-pillars-score-first.py",
+      "sha256": "31fd75fab1108daf6fd46d8933596bef3af00fb60d39568bedf90c583b53b8ba"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-architecture-all-pillars.py",
+      "sha256": "0f1e1a78f1ef68eba62e0ddabf2ef477a9985f393326afa45a008f0e007ce3db"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-architecture-checkpoint.py",
+      "sha256": "a677177b9e1505213e6983879c8a45804a4fd45af4767986da4df48d6ceb75b4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-architecture-exclusive-checkpoint.py",
+      "sha256": "4fdbab2e69faea8b9acef97aec5a4bef6d1b0699f2f929749ce54a66ef2739e3"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-architecture-exclusive-equality.py",
+      "sha256": "94898c21ee4f8ec18411858d0389fccc51fd8bab817d96a9cf16551ade2777a3"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-architecture-learning-curve.py",
+      "sha256": "94e5d49ecbfd441bc729f420031d14575c63e4b59d67484941fb46aa345d1bfa"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-architecture-retain64.py",
+      "sha256": "7825a43ccf435201699ae06a92b231aed4f72101f5aaf929be96dfc8041eb70b"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-architecture-score-first-native-metrics.py",
+      "sha256": "6e39ac6026ba1fe40324178032c8ab44bf0ee229100a0411853972680c9e28d0"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-architecture-score-first-proposals.py",
+      "sha256": "8f487ad04d9cd010511c33dd163c038c27fb2b90ad46219c70a25bf27bfcf850"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-architecture-score-first.py",
+      "sha256": "e58023b0d1cefc8552a7b82811976ff3f9a601c39348b159c30be621130ccda7"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-bn-counterfactual-native-metrics.py",
+      "sha256": "192036376662de39e3a3add64fd698a7c84a34204e5b9e1f654f93158aeabc47"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-bn-counterfactual-proposals.py",
+      "sha256": "9fff00ab60d2d9b9b1e7455eb8b942ad3e9a40b2417c5426795063d0a9dc37fa"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-detector-optimizer-resource.py",
+      "sha256": "7ae5dd14a13827f6b38dd7e91ba2ae836c2a93c655c382d84f1aec7d0e3a3155"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-followup-checkpoint.py",
+      "sha256": "78ba335fe423f15c75ba299ecd7cb311c03cd579e384211f9d2752939819d8e3"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-followup-score-first.py",
+      "sha256": "391a2f36506a24c98df78cc09391f1b631cdecd049ad6a470e8194b48f6cd315"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-learning-curve-native-metrics.py",
+      "sha256": "36ad59b9e9ec2aba80f5ad7dfd90bf2ff6e71b2c836ad0d53900411677960bb7"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-learning-curve-proposals.py",
+      "sha256": "600dc0e73753c6ef6e1513769791fb1a54beb7aad4552afcecf113de2f90aac4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-native-one-batch-overfit-worker.py",
+      "sha256": "48ea4b99ec30bf82ea9520d7cfb7512d10cc34deb368821cc8e085755311aecd"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-native-optimizer-pilot.py",
+      "sha256": "09a8c63aba9e0ab65ada460e3b084b68c2a6bbf754ca89c12a4eaa9b65c6d832"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-native-overfit-worker.py",
+      "sha256": "b736dfe4cdc48d7d984ecf1685f9dbd212067fa18ddba51d8eeb7a6049dfc528"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-no-norm-decode-failure.py",
+      "sha256": "bdde7a27d7ac8d153b374a963755f3a8d20cdd1351ba2447d37a962a58a305a2"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-norm-checkpoint-cohort.py",
+      "sha256": "ccba03c5dd52d7531e6de0480710b9c4e602b495029e3731f248c3707950648a"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-norm-checkpoint.py",
+      "sha256": "a6f5927622f1b788f493df1aa1a37059122e40ab497a7b5a8d85a51e415f5ddc"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-norm-learning-curve.py",
+      "sha256": "09d63edb6ac69fc2883bbcbebd97bba8edab5170483e114ed60ee5f5399023e6"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-norm-native-metrics.py",
+      "sha256": "dee9438f913ad51134e623237bc07afc6227de5f43274ea740a745510291231f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-norm-proposals.py",
+      "sha256": "f0a5c77b24f0927d3c3f03a4d19329c38a0232168df35562b38a0bef0401a8d9"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-norm-score-first-native-metrics.py",
+      "sha256": "8e8d0264785b1ba5ce3000d6f8825414e36190006d6f5318a44050e9c5c0c0c4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-norm-score-first-proposals.py",
+      "sha256": "63e73c28b1bff7401e7d01e31e2f18a3e158db14a6e7aa8a6d27b470c4766640"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-norm-score-first.py",
+      "sha256": "98088afd4209bc63cb95690aad6b7ca11ec96fbcf640406d48d58eb1717c2e2c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-norm-scores.py",
+      "sha256": "4657ad1f5b1355464e71df527898d377ae7a968d869f302cc6dc0aca4959de9c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-one-batch-bn-counterfactual-scores.py",
+      "sha256": "7b9dec28c6fb2613740fed074d8e549a3e63a0eeff86a7b981e3afb83e9cd2ac"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-one-batch-bn-moments.py",
+      "sha256": "1299a71b6cd25d80802a35683b873730d84a20b8ae031b2e3da9437826bf349a"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-one-batch-learning-curve.py",
+      "sha256": "a3e7b8961f0eb6ee73124e762c91c988881783378401b6a3830e19e06faa48cc"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-one-batch-native-metrics.py",
+      "sha256": "afbd11e86de61f07156d17db58b27189b670b86672cb45534dab1c0e2e4c525c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-one-batch-proposals.py",
+      "sha256": "21b41d0db3ae64541c44f3c38b8d8952bb1af560cdb0a9940e596cb6d65cb949"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-pointpillars-protocol-candidate.py",
+      "sha256": "7b63b24a373f496b9593d5e452e601a398b89ed99c3b845cd6c4c72ceb4cdaab"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-retain64-checkpoint.py",
+      "sha256": "a009c9aa33389b18bd8315a3f7b0c332371b82633402b2cd5dfeaebb6647e664"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/audit-retain64-score-first.py",
+      "sha256": "3a78d9abffe8e750c623d0e3cce6c2ff52e8971893211dafbef254e7a3b4cecb"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-camera-lifecycle-gaps.py",
+      "sha256": "39eaab31216ea0f53ea7f777bd12b764c4c441a768514d44ecf92c56bd52e13f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-overfit-box-extraction.py",
+      "sha256": "a11be87176dc63a7423e311b2401346ab3a8a3ac117b3b0ea22c6cf98e3356d9"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-overfit-native-cache.py",
+      "sha256": "19beca712078dd6530dc8140c4a38fa76848beff6e818b675a5842de9ebe28b3"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-overfit-point-extraction.py",
+      "sha256": "7d3cf7c507231e9e2ad57dc8b448a504eafffd4590c51af23b5391fded07c82f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-scientific-native-shapes-v2.py",
+      "sha256": "7bb33f6a0f28b3fe51ab06cd0221aacb32a0b1c1d2d41cc2189f54f7e7547983"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-scientific-native-shapes.py",
+      "sha256": "f411a2ec52b72ccb670410390557c5475097df79a25b2bc78eaab786239ef0ef"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-scientific-point-grid.py",
+      "sha256": "9778b89abd2377be3623c6ef4558d5fe6c63a09cf08469f254c824a2ff2277ff"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-semantic-recovery-admission-v2.py",
+      "sha256": "a09b0a66d974bfcd2b2a37695e2bd21c367e5deee4163d74e3f226bc7bf7aa81"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-semantic-recovery-admission-v3.py",
+      "sha256": "5c36dcb733f01d52dca61726ba504f665c86951b060e2c84c0f2168f4ffefb18"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-semantic-recovery-admission-v4.py",
+      "sha256": "4f7f58011949abf7ea8ef99899209c1279ccf32683c3d581f343d699289d2b4f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-semantic-recovery-after-cap.py",
+      "sha256": "3c6f2a5da042a92f9458970b6f5fc9deb40ab97330a76a08a5c4f22bafe3d32c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-semantic-recovery-after-final-admission.py",
+      "sha256": "0f3d058b6d49a2284c9b56d8480060cb12e86b462aa523b6d27e2e709c0cda55"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-semantic-recovery-after-fourth-cap.py",
+      "sha256": "012c2d47cc883fa4e1cbc0691f5cc6a9044f1a317e561c5b3ebbf734a55e7d4b"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-semantic-recovery-after-second-cap.py",
+      "sha256": "88a63115992cc1941f9652d5205ff6a53936936289f7cdb03a288ebb5d26bbf6"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-semantic-recovery-after-third-cap.py",
+      "sha256": "c162405b81e916bf0e5a10930b94b43da93abc33afd383c8e97524dd4cf1dd1f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-semantic-recovery.py",
+      "sha256": "20cb5c4a18a17a43b025b04cf95fc1952ff793b5ad1b72f3ecf3e26274fc2ebd"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-training-box-replay-after-cap.py",
+      "sha256": "38ef07bdd341c58b75e2d3a5e90d46c076b7af72a7c618b7d1b219565f7ed1e3"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-training-box-replay-after-final-admission.py",
+      "sha256": "0ced5772e1ae48cf2a6ed89b96cb98da35cc513ca6ad18d8112a30dd405771e1"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-training-box-replay-after-fourth-cap.py",
+      "sha256": "0ced5772e1ae48cf2a6ed89b96cb98da35cc513ca6ad18d8112a30dd405771e1"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-training-box-replay-after-second-cap.py",
+      "sha256": "d23f3cc8bc0d497b9d4ccae32b2e229554d32238a80b29b27322f0b17c8c96fa"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-training-box-replay-after-third-cap.py",
+      "sha256": "fee6f5692ebe8ed31ef20c6022586e74f09c05313f9cf3bf24e9ef0fc7c26ea3"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/await-training-box-replay.py",
+      "sha256": "bac6b088a949467666e44236c7a3dbaf7126f121e2cede19df361d502871ddc4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/build-fifth-recovery-checkpoint.py",
+      "sha256": "1969153ac35ca0decaf466d41db4479faccc20d6ceac5a499a20d4b7fb8b4fcf"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/build-fourth-recovery-checkpoint.py",
+      "sha256": "eff3e5e4a16d28e30f8d84b8f736693fbc4a68ffcb02f42acf10a85ea8018b5d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/build-third-recovery-checkpoint.py",
+      "sha256": "8a9d4f0fc5729a4c083c533be239a54d05b40182ab29a7036172b6222e697917"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/camera-residual-structure.py",
+      "sha256": "d8163d34cdfdb97e7edc297c844eaf59f687256c51065809e60c31229c77fa8f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/capture-scientific-semantic-support-after-cap.py",
+      "sha256": "cf85038bcce50aef67139bd22808c5b9746ab0649e0552aafab571306248fbe1"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/capture-scientific-semantic-support-after-fourth-cap.py",
+      "sha256": "111d6fe1ad4365207f0322442777638da70133707f9df7959c42a2cc89b51669"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/capture-scientific-semantic-support-after-second-cap.py",
+      "sha256": "af00714db3670de17bf3759dd0bafac5f5954f889af96d72fd7f434ddef2cfa9"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/capture-scientific-semantic-support-after-third-cap.py",
+      "sha256": "7a2d884b34622efa1e7a68a369f3869c84c55f7a97a11cc3abb4dfc9b2c350b0"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/capture-scientific-semantic-support.py",
+      "sha256": "56260d915867330a280e544cf6370c54eca6b569e90e53185d0c0388ae684ad8"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/clean-declared-empty-head-dirs.py",
+      "sha256": "5d70e59e0f4867ad1ca4f18b07cfefb945fc8058c0d220a76e3cf2059117aacd"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/comprehensive-closeout-20261004-start-v2/files/experiments/waymo-perception/tests/test_gcs_bootstrap.py",
+      "sha256": "1f12648162b0b0d894c2bb5af0257cc606ea80eeda38116e530e8f88e9c28b21"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/diagnose-camera-conventions.py",
+      "sha256": "47dc8d1475eea571af72f69f0a5ed6d0af9323a609a44d18a6d7ad681dcc1ad2"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/evict-recovered-sidecars-bounded-third.py",
+      "sha256": "0d1bb8c2bbf8cd17dcf037a9769a81661c292522ca21a4ec588a3a5b78c4f181"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/evict-recovered-sidecars-bounded.py",
+      "sha256": "d7adc4b7e18985c8a04f9aaa289d3c89bb0f37eb298d4a54b2194a3e20bcdb54"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/evict-recovered-sidecars-compressed-fifth.py",
+      "sha256": "f25a7bc17136f79a71ffdd9c0a53931686e82dc40c88c2797a8372b18346b790"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/evict-recovered-sidecars-compressed-fourth.py",
+      "sha256": "7938f26b7abbccd169104249c22c69328501e1f0d2dcd977e2467be175a24e10"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/evict-recovered-sidecars-second.py",
+      "sha256": "8bc50d1ea2da7e58d73761811e6e1206406059c0c34548c33b0a03ef8d6064ce"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/evict-recovered-sidecars.py",
+      "sha256": "ae559e5883e1bf30cb41b62339e89c24ec9a2716083967e98e672c62206dbbf0"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/finish-tier1-matrix.py",
+      "sha256": "ca847df5eed30c553b76c04c8100d6a06a94ef64b300a5232a65c8e69c608f10"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/motion_codebook_fixture.py",
+      "sha256": "86cc45059aef44278fa7fe85d5ea28489822b46124cd0991e3dfdea5c6c9f413"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/motion_delta_check.py",
+      "sha256": "a01dc112a09cdb5bb71be7cf5c87b4e6a292db228f8e48030a957c9e685d2be4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/motion_geometry_producer.py",
+      "sha256": "c857ac00aea73abdc46ce2aca56713b16e73a77d4c962522c0ea62cd8c2e3fa1"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/motion_metric_check.py",
+      "sha256": "284efa22ffa9bfdd9c0bd79950f20d8b0056d2d7fa2627c960731be01ce0296d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/motion_pooled_handoff_check.py",
+      "sha256": "233df195e6b42783910e5b823ea8da0b07b882e8f2fecf6001d65142d5ad6b46"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/motion_retention_check.py",
+      "sha256": "ef234982cb01890cda2ec0a3f506d5df4db16dacbe408260bb111d6441b224b6"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/native-one-batch-overfit-metrics.py",
+      "sha256": "8ca535fd851f1822568c0e0d3959fbba7b9d8d462b3429f407cd0f365a2627fe"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/native-overfit-head-diagnostics.py",
+      "sha256": "3fc1504b6184ee6cf5525e1183e9e33c01333efec132ba6e07e670e52527e0a3"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/native-overfit-metrics-v2.py",
+      "sha256": "42561b2bfcbe2a7a74fb6557e57186303157f86081f1987e753b2c88e0cd309f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/native-shape-file-integration-worker.py",
+      "sha256": "2d59cf393cd69977aa4c956ca043563af1eea19a7f0a40445c6b28d9d72e129c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/native-shape-integration-worker.py",
+      "sha256": "bfd2d4d8ef7f229f553f5867e6c2f98046a061fdd55aa41cc0e6b4d7cf3eb09b"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/native-shape-reference-integration-worker.py",
+      "sha256": "fa10f99a87837cad24c43d6195847adbf4b1457eaa3f7bf61e0fdde599a8608b"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/native_shape_retained_audit.py",
+      "sha256": "2a623f2fdb257668ededd744267fecc5ce4617cd0dab00bb476ffed0e402ad20"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/no-norm-decode-failure.py",
+      "sha256": "15a1579acaeee4c0ad042095b43e77c78fd9780a46f71a40084be9c9c93053e1"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/observe-processing-admission-after-cap.py",
+      "sha256": "0444d387fc2b3003401817a4edf9dad5a83b3b6d1ec6ad0982023d586a6a1834"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/observe-processing-admission-after-fourth-cap.py",
+      "sha256": "c2fe0e978bb4b0ebbcbb9af8ba71ca8bba8bf18b13ac65e567366f6c486e2457"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/observe-processing-admission-after-second-cap.py",
+      "sha256": "870eb3451593aea97fb68123c8845bfddbb0c921739b469f140af97851ade800"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/observe-processing-admission-after-third-cap.py",
+      "sha256": "39b0675b08c2d02b723c98c89be5bc93ed5704fd16637b147723191fcbd8bb08"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/observe-processing-admission.py",
+      "sha256": "5dfd97a5a15bdaad5834686cbf7233f87fbba33b6d57574adb5b44136a7c4ec4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/observe-semantic-linkage.py",
+      "sha256": "39238ab556969d4ce3dd259118d88047c0d0762ad8a1c684302a52b99c580bbb"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/one-batch-sign-geometry-diagnostics.py",
+      "sha256": "5d86650261a232e5768aa027f5a3ff977e220436a31602bc4b4496f2c4327b94"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/overfit-box-worker.py",
+      "sha256": "748bf1b17471ae9f80a4a802e2bcda8b52cea84695dc7ada7cb27be1371ee25c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/overfit-native-cache-audit.py",
+      "sha256": "2e01a3f12ed6f73386f93c27036f9594200aa8f8241b543d2132c6d1a3d5bd04"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/overfit-point-worker.py",
+      "sha256": "561fa33a3594710c554d79da1d4d2960e0a230d50d554289f68186564a1f1080"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/overfit-target-fixture-worker-v3.py",
+      "sha256": "894487fd3fae42f27f4ffbf120aa45d01bbaae96a42eb78a679659f72a1ee3f6"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/overfit-target-fixture-worker.py",
+      "sha256": "23252fbcd5ac0008a8dc62fbfff1161ad2c196ae84f45bc3f29fced86a461771"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/overfit_box_targets.py",
+      "sha256": "e68fbb48741e91b4478eb53c0e3a40d43f7e816f1e73d10474adf7a4d365319a"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/overfit_detection_targets.py",
+      "sha256": "af304f790d258be3f95799d2aa94fd4ee60b7171480849d6340f1f727282e625"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/overfit_detection_targets_v2.py",
+      "sha256": "f368358b6e6c6daab577cf803634b0aa625da6547f09ee119d8d8e21b7e9aa93"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/overfit_points.py",
+      "sha256": "923bc70c0e87734082b5d6e60caed1790a1fb02069791acd7e5073fbb8258739"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/point-grid-native-worker.py",
+      "sha256": "e552820863dcc2bb1159a3d6e9300f3f262a6e4b6c0692062fec16a7570205b2"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/point_grid_inventory.py",
+      "sha256": "92c650a3e5954cc82c741f34628328e15613213dd819710eea014d311e4b80d9"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/point_grid_linkage.py",
+      "sha256": "e144cfe91073ded4141e759d06871ced2d1815b383fe6860708154ebb6494512"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/point_grid_retained_audit.py",
+      "sha256": "d6c27e0c47a13c978367704d7e6d89fb3d7d07206e5a5844fe1221626c2529bf"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/point_grid_source_replay.py",
+      "sha256": "7c414f0aa5c26647776dfbc77300b64484eff01cf0abad0ae7c15aae22807b6f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/prepare-architecture-all-pillars.py",
+      "sha256": "8b29eb827326a2c82ecd73691b998a6adaefd22436a91f115deb6d77998e1109"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/prepare-architecture-retain64.py",
+      "sha256": "a0dad0f03cced560333b04d0b1c0b4f939847ae7f1054fed9d4bf9959a90b6fd"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/prepare-native-one-batch-overfit-scoring.py",
+      "sha256": "97af48b990c064aadebe5b21b264d00621e3405cffe60a08270b6d86c496dc95"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/prepare-native-overfit-scoring-v2.py",
+      "sha256": "7c8d32a7214ffd7dd538633167aa06beb52de30ba3e5aa45d0558df4ce24a45d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/prepare-norm-score-first.py",
+      "sha256": "671f61062ec4cffb790d4d042e23393123c0c6bc0524bab6c6b15c6a529677c9"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/prepare-overfit-native-frame-v2.py",
+      "sha256": "ef0280180167f8b2cdbf5f31e3075f2b961ab2de3ab40dfe16060dc259ca7c2d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/prepare-overfit-native-frame-v3.py",
+      "sha256": "3d238d66b7f8e5559db94bfd5dff3166f306c864c4f397a1ce59b595a66ccfbd"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/prepare-overfit-native-frame.py",
+      "sha256": "dfc40e6f225ddb71c83e89821c3edb2f0931179ddf96fb6b448c41964f8bd501"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/prepare-pointpillars-protocol.py",
+      "sha256": "83bc5fcfd57d14c85fdbd023255d429c90d7bca89079341729fde0c8f4dcbe68"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/probe-native-measured-visibility.py",
+      "sha256": "5900cd64f33282b828f877dd878417d58d2a2ec83f9af85c289cf155c2f028da"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/probe-sam-boundary-support.py",
+      "sha256": "db82baedf06b360a96741edb7eac7341ccbdf42209b7696fca5373f45980309a"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/publish-research-journal.py",
+      "sha256": "115ee09a80d65421211485c87fba9485ba5ae0a6906b2449bbf8a04057b6db11"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/publish-tier1-results.py",
+      "sha256": "ced2eaca2e9276198277ed05d5f1354267cc47b34d0f1e1c4cc6a97faee7cf19"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/record-architecture-cohort.py",
+      "sha256": "1d8a08352e50bbc8ed552415f779771d22280d0fa9877f36747f4976e5b3dd5d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/release-adopted-baseline.py",
+      "sha256": "9cf13b746d4352d109a40a56625d66be9a2716c43e137e3a5d1f2ca8d93870ed"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/release-motion-training-source.py",
+      "sha256": "a5651580ee7e901f972e77ef7a377018835ef1f1914918da5eea19b7bc19e3bc"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/repair-deep-release-ledger.py",
+      "sha256": "fddda39f9f8a01ef2184b18fec069145391ecb8b1bb6b45a8303de9b69eeb6b3"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/report-tier1-matrix.py",
+      "sha256": "9bd5e188aada191e7012704aaab75b751bcd8643e9853f0ca553d534fa397f6f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/resume-interrupted-camera-fifth.py",
+      "sha256": "e096f99836441e9e5341621bc48e8c7e00e4fd2109fa88b49bb6ad8459534427"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/resume-interrupted-camera-fourth.py",
+      "sha256": "3cfcd791e04dfeb6e85de4f4cdef59484acb6d1f1501ec81be06c6011e9b617c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/resume-interrupted-camera-second.py",
+      "sha256": "7a26d1011aa2117df067ceb49ac8e4cb20996a407830d5d7f4a23953ce20a4b1"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/resume-interrupted-camera-third.py",
+      "sha256": "f2ee1cf66116d5a48a5b198764444e11e6ed31aafe7d0df8d09100f189cb759d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/resume-interrupted-camera.py",
+      "sha256": "3e9f74d26ec7b28fcdafdaa35a07ae67544c752ca8015db7170dcf054e6decbd"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/resume-interrupted-sidecar-publication-fifth.py",
+      "sha256": "a6b945c787a98f5c65fde0ff3943030ee4149c55551442b0de3e293af16bbf2c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/resume-interrupted-sidecar-publication-fourth.py",
+      "sha256": "017b5fbbf7a1b376f9afe4e60adbe41690d00f0522a7fc27e7ed5814d289a8b9"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/resume-interrupted-sidecar-publication-second.py",
+      "sha256": "94613d7d30893f2ad626c3f2b095487dd3b9cf5027d32ecda9efdde3ae2783fc"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/resume-interrupted-sidecar-publication-third.py",
+      "sha256": "367f3ad980d2931ef9055c2e8bcb3a2bc1a6a3e57d7a4ef4ce3fbfefc3ac2b80"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/resume-interrupted-sidecar-publication.py",
+      "sha256": "ec2eff3b9dc4c138036c09a24f841e72039f44164c43aecae1205521d1455b2a"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/retain-motion-geometry.py",
+      "sha256": "64b7e629813e4e2ecedb1cb5dc9eb363c60ddec870b4850938e7e710990cdbd0"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/retain64-cpu-followthrough.py",
+      "sha256": "6c0075ee990b5b6cec7569b427b19abc4da8429e537e8c84ed50176ec298f203"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-advanced-archive-roundtrip.py",
+      "sha256": "0b2b5b3f59ac464d249c6022de80d5072acfaff5f4a3b4d9baa0ff2826e41765"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-advanced-cpu-contract.py",
+      "sha256": "2797b7e24dceac7a9be1a3ca90b8e6db404b884b6d85e1f7c18685eb3616dab5"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-all-pillars-learning-curve.py",
+      "sha256": "d4a89066b712989e5519b4ebf74ca7f53c0c43c1bc74e9bdd45a05dc9f80fcd8"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-all-pillars-loss-audit.py",
+      "sha256": "df22268a8ed5e4c249f24b4960d2e1b98b06fd63c14f7e692b153a7ec880772d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-architecture-all-pillars-cache.py",
+      "sha256": "4980aaf0410ad2724064d6271096f8b3f303f1d71306325c0d7aefa002ad8cbd"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-architecture-cohort.py",
+      "sha256": "c2ec02115f6cd1a1efaee04334c81ff658c72eb6379fcf02e22461d77f1d432d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-architecture-contract.py",
+      "sha256": "4e5c63555952958a5a66723aa29666e45c707c935dabc8b6d1e6e91ed0d3e3d4"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-architecture-exclusive-equality.py",
+      "sha256": "d14e84c099955506ca5b03d96365df60d93e0c559a5459a53d0dbe0599f1b873"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-architecture-exclusive.py",
+      "sha256": "ead53f0747501a81a75ae213901a9091296d4d7cfba40a73486f62bb0b20a814"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-architecture-followup-contract.py",
+      "sha256": "3a6cc3878fe9604ffef40e5d1a3166e8d80801ed5a72c0854ca898792fdf1236"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-architecture-guard-contract.py",
+      "sha256": "5d9afb1af02aaa3ddfa9312577c2cffe8112bab2028607abad4910efadb280e2"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-architecture-learning-curve.py",
+      "sha256": "266981e50194824d030af5a22ca9da5aac51b691140991630fc54290eb5ebe3b"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-architecture-loss-audit.py",
+      "sha256": "ac58f8d667649c4bcc1b8f39dd83673469936ab32f9865b4e2f653b50ce7ff19"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-architecture-retain64-cache.py",
+      "sha256": "0af707010fa03e2d9073d47c524e829c660f8b2daeb3f6120db3540fb6dfa1e3"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-architecture-retention-support-v2.py",
+      "sha256": "caaf131cce9df148cf23112266a94224f8b6a6e9a625ec9eab7c848fcc03b635"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-architecture-retention-support.py",
+      "sha256": "d093ab8e918b4a3987c6dd687c6fc1df28af4dee440931cb7206a26e529ce199"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-architecture-storage-audit.py",
+      "sha256": "8f5561da5ee8e673bc7ad04dc1676db75af8f4a39ee8312f54f82d8742098960"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-architecture-weight-contract.py",
+      "sha256": "92bd6e8d6b233e980d2b68b03f199e3530c533e6a6d78f95652095de947c9622"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-camera-full103-audit.py",
+      "sha256": "cbfb427c0eb34131cb9bb43aefaeebb67f0036d9a283225fdc26ba815519102a"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-continuation-cpu-suite.py",
+      "sha256": "04697eaeee7b034950e20549b189b6d8233dcef6a573fb76ffb0f4f888c3e461"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-detector-optimizer-resource.py",
+      "sha256": "753d1d3580e0833508a8efe2f88de0174b51127dc822a8a681461fc64d76eeab"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-followup-learning-curve.py",
+      "sha256": "9ad3a5fabb28b46703b58ad1287d0555d4a7ff6ccd69f22eba21a2d1aa49b240"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-followup-loss-audit.py",
+      "sha256": "6c84bbe536234179b91d609cfc95a7153917d55eb933fe6d4f91630d8199cfd7"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-learning-curve-score-audits.py",
+      "sha256": "2c7f5b654c9610ec59e6992af37425e3c599d569d018cdafec6676f161bc2ad9"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-codebook-live.py",
+      "sha256": "d5cd2645864ebc511a51e71c83983aa82dcc20ee791f1e54bae4cd004a1db35c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-delta-check.py",
+      "sha256": "fc33f5400f8596868fcfadb28e0307f470d7481a22481c1282eaf4e341d12087"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-delta-contract.py",
+      "sha256": "f0f6ec4d7c465ba6624f9e297fb35c4a0df206d3c3f6112d12bc3fe938620486"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-delta-native-verify.py",
+      "sha256": "0326e67862f6e414a702e890686f5bab0195afd39124eb53c221eb3e3aac821f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-delta-native.py",
+      "sha256": "17fcc7878f58d6845017d6c6c5e527cdb0a7d56594ffa2428d8fb0a69a9c5498"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-framing.py",
+      "sha256": "45f214287408a73b5ccafbde636505d6d03fce553b0211509138811b50417bdf"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-geometry-audit.py",
+      "sha256": "318c0a45593517e0d940bd2e128feeed587d76b4c0868bf825df525c684921d8"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-geometry-metadata.py",
+      "sha256": "e670d6f3ab24cad5974d5a3d3467a96374448b184d938ad2deedcdc09e7a680c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-geometry-producer.py",
+      "sha256": "5323de21c33f8ddec370485d93c5e959c2d60bf22d3a7553ca5ea70e23f43668"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-inventory-acceptance.py",
+      "sha256": "5c96ec5d65bc8bf2a5311851d54334aed7dfafff7130fe31bc5b4ea0f601ea83"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-metric-check.py",
+      "sha256": "c09b36e41ce7e878773ffda162dbdfcec9d056d59f0a014e47939dd143a5ccda"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-metric-reference.py",
+      "sha256": "9ea5531599268456a0c8e63e6d91411c20fbf7412006698a0c14196e4a30d70e"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-native-inventory.py",
+      "sha256": "bd01dd7a5b8858735ad750d2d1e76800fb8c5429a569985a03534dd203a2d0d3"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-native-link.py",
+      "sha256": "3519f87929bfe5b25e09e85dd4fd5f3483a7566114b03d722685168079f4cf0a"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-pilot-closeout.py",
+      "sha256": "418c117ab6b17a72f48a6de3222ae88613376ba65c2883111d255584db84a1a6"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-pooled-finite-green.py",
+      "sha256": "eb7addb85ad06c41c6b8193962870336d57337aad466265acfafa9b16712131d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-pooled-finite.py",
+      "sha256": "01318f099b5666e8e799fc6acf95b563188389ae6d92cc597fb2285d4a71d847"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-real-metric.py",
+      "sha256": "4a78c1f7481b2a61b0c60196c3775b62e4a184232617665d49a58fa06e327e2d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-real-pooled.py",
+      "sha256": "da6fc0ebf57aa15089dd39c5de8e425f8893e3adb995c6c0ef986365446508b0"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-validation-codebook.py",
+      "sha256": "e406b6c6d48fa37ec2851cf2d7608fc190194ecffa215efb00f6a48091bdc3cd"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-validation-framing.py",
+      "sha256": "1add7299eabc57aef0ea6927450ff8c4dae2e086076c48e846cc7de4dde3080d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-validation-inventory.py",
+      "sha256": "fccc91fe82b087c7695151d9abfabd1c8496ef61d2fe4c5b3aa5789702a05877"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-motion-validation-link.py",
+      "sha256": "b7260a7e8e25449bd53b9050cad96258663874e79518f8d6cdbd93ec916deadf"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-native-one-batch-learning-curve.py",
+      "sha256": "8a9d96d76cfbb51006bed2854ab2c09ade2897f3d7a49969a834707ce44adfac"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-native-one-batch-overfit-scoring.py",
+      "sha256": "dd65edf44d15ab07a8784b6da930bb6d808315944a822f27554d23a78f2a38dd"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-native-one-batch-overfit-training-audit.py",
+      "sha256": "14ca48b237fa2289f2e83c82959653203d0e93f12174325d174a2a2d5b478c19"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-native-one-batch-overfit.py",
+      "sha256": "ea18c5ad352ea6d883363c3bdb97b84600084beec39e6067000c7af2e970428d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-native-optimizer-pilot.py",
+      "sha256": "dbc608a2a843967902d0619107639587f7e204a6128398e15890c77bb3b259c7"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-native-overfit-head-diagnostics.py",
+      "sha256": "236afba32fafae8c20b026b30769a1ba6063f3ce9ae1bc6c2d779f50d487fc94"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-native-overfit-preparation-edgecases-v3.py",
+      "sha256": "ef0aab0f11ebebcd09184ebfe8fe8cf9c1c61e81c649729ecd58fbb28614330e"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-native-overfit-preparation-edgecases.py",
+      "sha256": "1a5ea530d56df6229624d991a9481232b1bb706c1415cd1b2b1b7fb6dc28cf68"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-native-overfit-preparation-fixture-v2.py",
+      "sha256": "01efe1236bebde5fa1e4639964fb6461fe51b4fb4d52006e416afcd583f5ccee"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-native-overfit-preparation-fixture-v3.py",
+      "sha256": "6d72ff84bcfb04ea7f91dd8ed9dabc646c4046090cbeeb4559a2cfe331de073d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-native-overfit-preparation-fixture.py",
+      "sha256": "f70db5f235188a1ab69e45a48c88920d39c5df044843dac66e694a642a77ee41"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-native-overfit-scoring-v2.py",
+      "sha256": "035d6e5461f9b5e1509ae363f6d6078a37b87eabc4d7b9c76a6f52ac386cd9b5"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-native-overfit-scoring.py",
+      "sha256": "df6add8315308a2da1228e2d22e37a0eece53ebb48129910ee4f7823b9cbdb72"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-native-overfit-training-audit.py",
+      "sha256": "8efae7a96b80475d81bb03b7de92cb0a043c29e49fee73dbb6a92a707af6962a"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-native-overfit.py",
+      "sha256": "50460f4cc7311084c9efade5306bbe13d50f601e70179ac29eeef0a1eb76e696"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-native-shape-tests.py",
+      "sha256": "e184a427802f7df56323692b6f05384235ee30a34386e8c1297847fd4807e339"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-native-shape-worker-cli.py",
+      "sha256": "3933c2ff3b110df4ff7934c91be0b49bd88a5e47aef1c825569897980c76b473"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-norm-learning-curve.py",
+      "sha256": "9a85a3a88986195183dff961e86ca673b89e3ec9e3fecfbfdf3a6cfc89b90451"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-norm-loss-audit.py",
+      "sha256": "a6b922935afaaa308838fd62089f4155ead26e6f5cc7c0ed72dd71dcb3857dd8"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-norm-variant-contract.py",
+      "sha256": "2e786a84fde631b8a1facbb4a135e49c2878d13d770addae5ace6fa2fd95ad3e"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-normalization-training-cohort.py",
+      "sha256": "377d06854cc8b57c2dee023d25275ab508a5920659c729538b6a6b82e12a00cf"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-one-batch-bn-counterfactual.py",
+      "sha256": "2462e7cd76f0ec8c4d43a214119e9c65c1fff572ef9c7e1ab8c7d2cd8958213a"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-one-batch-learning-curve-audit.py",
+      "sha256": "5f69a675892928c096cd9259a5fc769b2d61bc88c8f4cc9016fc9e3d46337ec5"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-one-batch-score-audits.py",
+      "sha256": "ebca77c90e91e8eaf4f1c0d735bb50ed02512270b55cd691f4daaf2808d7e84b"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-one-batch-sign-geometry-diagnostics.py",
+      "sha256": "7071b346dffa1e8b587bc1f47597d96f7da6b4afc845ffb43c4171539da9b780"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-overfit-box-target-tests.py",
+      "sha256": "2d8b8dcafbdf64e69e8cf639f88b1a30271822ab620211f93962938efbc87c2a"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-overfit-box-worker-fixture.py",
+      "sha256": "7189d9520b3764972c1d502e0953a05bd32c016710ef4be1acbdf6cdddd077a6"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-overfit-detection-target-tests-v2.py",
+      "sha256": "c87c7e09374d6426112a116595f2200667880ebfcdf6fb924269d90bc304e38b"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-overfit-detection-target-tests.py",
+      "sha256": "1b5e498c7998c79012565b2a27f73fdc21825562cac90830207dc773384970cd"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-overfit-native-cache-audit-fixture.py",
+      "sha256": "2d137126133520cc74d061b363eee449a79473d4b3ad1b5529bbb44f00c211b9"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-overfit-point-tests.py",
+      "sha256": "57a55481c79b02f1bff3dc723679bb71091f82628b09b40bad07421852d2f6c5"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-overfit-point-worker-fixture.py",
+      "sha256": "c12cd37a67ea2583205c8c6f904e1b36be54835927351d25e1a19e15975d7d73"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-overfit-target-fixture-v2.py",
+      "sha256": "45f9cb9dbcccf95c1236779064d46606b11b190de69556c424c849c5a314f747"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-overfit-target-fixture.py",
+      "sha256": "c4f5d5dc6deb469321c1e2fa7d250fe15265a25f22313ad1597c5005dbfc42f0"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-overfit-yaw-roundtrip-tests-v2.py",
+      "sha256": "5f8370962fda1e3fb7895b5a05ba5f6e03204ac88d383aa08b9a5e7ee01b963c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-overfit-yaw-roundtrip-tests.py",
+      "sha256": "cfec5a29ffe56d27bffca48bba1ace62b654ee5d394fc32722fc9e8c68524869"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-point-grid-inventory-live.py",
+      "sha256": "843ef6e763ab8009d2224fdacdfe15f2874d8a26d956947cd24619c547174799"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-point-grid-native.py",
+      "sha256": "443f6be797eec22762e063753c8213d40bff8c9396798e5cc5f926214f126a45"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-point-grid-source-fixture.py",
+      "sha256": "12176155b1e485df2024c0588f882a03a8a50b7bcf3ad06e87d235759590e161"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-retain64-learning-curve.py",
+      "sha256": "cf5d78c40a788dd0e6b8a0f917addcffb5f6e2010f40a0c49b6fcddb2b983df9"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-retain64-loss-audit.py",
+      "sha256": "d3b4242c08e8745164a9b20918a213aa06b3024ee86260634feda01d55862ce5"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-score-first-equivalence.py",
+      "sha256": "daa5fb5cd5bf4f4b257f5adf7650ea6e80689044d68f4365353de95acb77fed2"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-scored-decoder-contract.py",
+      "sha256": "72bb88eb5b3b87ed7ffbfefd50d3233115ca56ed37017cbb740a1bfb737c3c24"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-semantic-full103-audit.py",
+      "sha256": "d54c3ea9916f87823b6a1aad05121514301f9cbc9b10de94672d051f46d5857b"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-sparse-support.py",
+      "sha256": "1961086218e972038d85db3497f19a58af8aa1d17cc3acf018abcc573c47a97b"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-sustained-contract-tests.py",
+      "sha256": "8291df18cefe782e4ca2fcb6733cf636c6d2bcfa4bbfe64055261bc8ba518e29"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-sustained-loop-final.py",
+      "sha256": "d2aaf5ece1c13fb45209298952281de7c0214ad89fc3d11e00cad7ecb11dcdec"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-sustained-loop.py",
+      "sha256": "12da1ad44e1e6677f0c48951bbe0dcf7877eeb578174d0ac912c2e441a21ebe7"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-sustained-loss.py",
+      "sha256": "44e4358c241ed223a10f3e890ba1d6a86aa7fb697b3290f0a519953e47b3cc7f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-sustained-sources.py",
+      "sha256": "20917480131a6b9897bcdffa69c0ba0b08e3646d4f6ca48f82d7aa9398e710dc"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-sustained-state.py",
+      "sha256": "e0019f1d8161257bba49daabbe4ac40bc82e5a68cc93c959d1e4c6aff157128f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-tier1-closure.py",
+      "sha256": "50052be43812b2463268098e203666887d16ca9102a19fff65babfbec9998f13"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-tier1-equivalence.py",
+      "sha256": "b90ce4e9089d289c0a95e534294191f6d2b811549ba304abe41c78ccee83c0be"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-tracking-contract.py",
+      "sha256": "aadbd4e3f1bebd8eb2261f966ab6275a871a3351ac9a31bdd0704844a882782f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-tracking-live.py",
+      "sha256": "22e6c33b0cd22b6ccea379080398243705c083ea347a3720b68ce8320efd98ae"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-training-anchor-candidate.py",
+      "sha256": "8fc4d2bc56e5b1b9677a11c5d9ade8f2feabbc5d2455e7cfd648d4d7920a6bb5"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-worker-preparation-suite.py",
+      "sha256": "037fd8b24de716f2a9c0621f3cbaaa0a236293dc1bc7edf329edc9288b35a720"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/run-yaw-correction-receipt.py",
+      "sha256": "2c516099800d5cc1c846229982db5751da492492e794e384e05965e37b017106"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/scientific-point-grid-worker.py",
+      "sha256": "41165473db2c751bb52dc7c6556fb0e42dfc48d26a37c63f838cfbb20f4d03f2"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/score-all-pillars-score-first.py",
+      "sha256": "2cb0e24b846d5cb1ed2285ba2bc0be6304855b885560ec09fa0894bb2ddafee6"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/score-architecture-score-first.py",
+      "sha256": "2a64f409958bfd8311f24c02c4f2fe748ad913bcb34077586e7f6ce22d6b2565"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/score-first-equivalence.py",
+      "sha256": "ed57246b2829d6d1e2d9f8157cc028e18af0cf1a44701b190bdf10ae0d6f8506"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/score-followup-score-first.py",
+      "sha256": "f3400356bbab4769c8c612b5d160e6b564251fba6a3b813be597a7bfcf476435"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/score-native-overfit.py",
+      "sha256": "0e3f30d4bd1c0acd376a30a23df520715e139b638889535bc17ef91ab145a0c7"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/score-norm-learning-curve.py",
+      "sha256": "f069eb5283f07a8fc7e6363650fb636a19477ab26c6a38a3c98ebf5eb0922b66"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/score-norm-score-first.py",
+      "sha256": "b2ba8dbd11bb4246ffd8237c5cde724214f62dd3e27e5f01cdac3d554b3308ec"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/score-one-batch-bn-counterfactual.py",
+      "sha256": "84caf527de966831ca4c7b652ce558686307f1317689257bb7a76489def09285"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/score-one-batch-learning-curve.py",
+      "sha256": "c4a306c800ead6550cf85fd08cdb7c7707b0e7f95254480608ce61eeeba40e80"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/score-retain64-score-first.py",
+      "sha256": "4090b8e31614083be602607c33162c5604c4182ec0b6233929e0ff377659b661"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/select-pointpillars-overfit-frames.py",
+      "sha256": "6e339404af029cd0df94405a5af9f4ef69b455232cdcdf09217e215a7f4e135a"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/semantic-full103-audit.py",
+      "sha256": "f10b27b3bb6a3d51d6251f2621ac956191c2faeec8a006b23757cbc31601db76"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/shape-staging-driver-fixture.py",
+      "sha256": "f04623c68a6ccac5cf1f98f6d6458476a5c9887e81be80a90070d4d870cbfe5b"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/stop-after-baseline.py",
+      "sha256": "a24c49dbb76e082cfb3fd416c4d06ac5cc4448730160bff906eb3998ba9e6070"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/test-bounded-publication-call.py",
+      "sha256": "92ed062b7b02e28ac6a9f2af4c125b1a45fa16e5c5376b85d3569abfc83c071c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/test-bounded-sidecar-eviction.py",
+      "sha256": "043ed057921bbf2edef5953ba761072bc5df3166c9c9470913617dba1c87d8cc"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/test-compressed-component-members.py",
+      "sha256": "58026deef6cd307d3cf9be31f64a93d83a06fcd4619c11580fa908054f08bc4f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/test-compressed-component-validator.py",
+      "sha256": "b8c8183c147dfbca359ebcd87baa5f92e1c5d46b392788e708eddc539ffe2522"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/test-compressed-component-writer.py",
+      "sha256": "cd08a408e14ea41fa0083bc1255c0e7e692e68b48841f5968b40440ce61b0bc0"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/test-compressed-sidecar-eviction.py",
+      "sha256": "e31246ab98a4913650e2e87c83f9ee276edf232e1e4042b4d773e5c03eab2315"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/test-native-shape-retained-audit.py",
+      "sha256": "da753051e59d4e4e46a98d75177f39c2ddb6c8d6df8c88cf998b90b04d947f92"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/test-shape-source-driver.py",
+      "sha256": "7a156fe663498ebf1b0d65a0a659c7cf05e1d7bcf74bf4368c170f55976ef6d6"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/test_motion_pooled_finite.py",
+      "sha256": "989bd1f663035e4497f57b0cd6c9a53efc5960bc456c2c3cda4ff8209453d55f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/test_overfit_box_targets.py",
+      "sha256": "8c1d32d81dec364125660fffc6452f27b1a47e41127c2d99d893edcab5c19a8b"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/test_overfit_detection_targets.py",
+      "sha256": "785c056285140cfcfe805c1bd7c990a360b2eba93bbbed8d2c29d9ae919587b3"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/test_overfit_detection_targets_v2.py",
+      "sha256": "aef6db806620aff91d7f2b3654cd9af81a4b6ebaffab59e0cd3aa264fa544359"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/test_overfit_points.py",
+      "sha256": "466ad4a91ba1193d5425376cc3da01b28a378cd7ef15fe435cdf6b1edff14bd7"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/test_overfit_target_yaw_roundtrip.py",
+      "sha256": "0180a496e5c2f89099414c90c418eb85246ce74baf46e7241406a401d230f992"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/test_overfit_target_yaw_roundtrip_v2.py",
+      "sha256": "e3c2d9ba5a42d3321ce8bbe7c13760805db136f0caabcf1473ab34fef582822e"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/test_point_grid_inventory.py",
+      "sha256": "0710f1b88fd6ca433f34d6dbe46cbc2f67942ad2587e93d136da76320dced140"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/test_point_grid_linkage.py",
+      "sha256": "1b1244acc0622700c1818640aa79c0bb2a55b05d20b566585e925566babea703"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/test_point_grid_retained_audit.py",
+      "sha256": "8e1ec4cd22ff780b205ea3f74d159931bafca12e3e0e8d502aaba134a92fee97"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/verify-compact-sidecar-input.py",
+      "sha256": "902694c8f8ab383ac1ffed4f5e04ced360f45111e3bccac397b5567fb1e393bc"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/verify-public-architecture-runner-v3.py",
+      "sha256": "893be1e0463e42f77c1e0cff83e55f5a33c0f22cbc251eba5783a00d0c3a35ce"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/verify-public-architecture-runner-v4.py",
+      "sha256": "9c40e06b463c00c78e2dc453075d8d640e8bf3d06a02a29551989f87555192f1"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/verify-public-architecture-runner.py",
+      "sha256": "3fdc41f5db25163349dfffc71ea493fc7c5b875268a1194c9d38fa27e8d72781"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": ".scratch/write-pointpillars-protocol-candidate.py",
+      "sha256": "210b5ffe0b89051aa41c69baee1679bbd9cbaf64c75f59a50f25fef3b75cd89c"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/waymo-perception/association/candidate_graph.py",
+      "sha256": "8e43b93ca958598ea3a6732a36a897d4576706501d06499ea13d31877e850644"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/waymo-perception/association/matching.py",
+      "sha256": "f698f7055321ce4f35667fd9d8a59cc832de8fbfdad1f34b3f2add1b84e941f0"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/waymo-perception/association/native.py",
+      "sha256": "a50481591f32f72c0da9405d18bab87fe4007ef217c5c49d532158100225949e"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/waymo-perception/association/prepare.py",
+      "sha256": "b33b1730e4daffea80c051a518557ea8794698e64ef8bd3c78d334f994d0a776"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/waymo-perception/association/targets.py",
+      "sha256": "223de7d4d1c5c9314376f0cc6cf1c7ec1f50e6e44fd54956ac09dc21d8bc9664"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/waymo-perception/association/test_matching.py",
+      "sha256": "a565710dc35db3f6fae4ab6e72b6f7b2348453a9a88c1ebe05ef010e2e5d83fb"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/waymo-perception/association/test_native.py",
+      "sha256": "57d9d25aa64e43a7511da4c6fad030746c876028342920700ec0bcb43d701974"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/waymo-perception/association/test_prepare.py",
+      "sha256": "c4373e05c8eed74631b718c3713e9e91ddb094e253116924a36585e4727c51cc"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/waymo-perception/association/test_targets.py",
+      "sha256": "f42fd840b578b4c1e580dc91e9c2c8c97e65551f996eaf10d7e117d59c55c6e7"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/waymo-perception/audit-cohort-labels.py",
+      "sha256": "c9f695b596150c531bef6aceb382ca9b09e0654f05e73348d5df5277bc653a55"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/waymo-perception/continuation_runtime/identity.py",
+      "sha256": "5f9155a3eaf384c0841db04480053a2227b19ad8f85e0f4c243c184f016dfe08"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/waymo-perception/continuation_runtime/test_identity.py",
+      "sha256": "24d0b0f0a9fe7ff390ec1431752b0d63ae6ac38e377deccc76d08fd2082e7acf"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/waymo-perception/explorer/acquire_previews.py",
+      "sha256": "35b7e8479106f6d7b023d48de0938aacf0915457b14d901780f6bbf62fcfbeaf"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/waymo-perception/explorer/build.py",
+      "sha256": "b034f3199bfcdb536e3610ce6e5d38aef0a8406b401827fbcc1186225b40992d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/waymo-perception/explorer/run_joint_render.py",
+      "sha256": "89334ab970de2d22398a5a451f384ff6cc8febafd0a5da8ac724781418143df6"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "experiments/waymo-perception/explorer/test_data.py",
+      "sha256": "3ed7597c75fa654aeb0e02d0bb1e80cf8009f48576d07f6f901d929a0495ecbc"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "bootstrap50-lead-helpers/bind-native-f50-live-v2.py",
+      "sha256": "f23271c76b2aa067504bd57e82a800488a64b1fca12a3e48e0ca1192e0a3be3d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "bootstrap50-lead-helpers/bind-native-f50-live.py",
+      "sha256": "d5baee14d08ee83ddf50390bac65541debbe0282ea5e52b204dbdb9b1fa8ec37"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "bootstrap50-lead-helpers/check-channel-source-insula-v1.py",
+      "sha256": "158a1509469d59ccb2a2ab372e7d5159f150b06b2231ce9bd84f6d2bc140403e"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "bootstrap50-lead-helpers/check-writer-source-insula.py",
+      "sha256": "627ddd1f0e9ca86611591bcd518b292b0de808e46db126b1178dd07efc2ca102"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "bootstrap50-lead-helpers/native-g50-full-turn-diagnostic-v1.py",
+      "sha256": "a8bc119bb24d1b56d9a1fff401b9fe6cbf879e395f23c5f3a9c5a3ec6f7e665d"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "bootstrap50-lead-helpers/native-g50-full-turn-diagnostic-v2.py",
+      "sha256": "6d235c920ded9c386670976855be3f0e9bcce1c67efbeda3877eba5d0800cd8f"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "bootstrap50-lead-helpers/prepare-native-d50.py",
+      "sha256": "297b25333385643bcb76e9e5b27b1f7156f387bc55ee36bb731e221b3bca0173"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "bootstrap50-lead-helpers/prepare-native-f50.py",
+      "sha256": "bdb28273bedb39995c1158e750b84e09017bb8692dbd0fe0f4e531e5a5c88286"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "bootstrap50-lead-helpers/reconcile-native-f50-v1.py",
+      "sha256": "9f6458f86b89381a68627ba6ec87780c4e1e76fbafe6d22c3258f5ba6b78f5e7"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "bootstrap50-lead-helpers/resolve-owned-scope50.py",
+      "sha256": "97e0db446546104063cb24decff73e9fd8a190e8c7fae2d844f7004dcdff6fc8"
+    },
+    {
+      "outcome": "syntax-pass",
+      "path": "bootstrap50-lead-helpers/run-h50-driver.py",
+      "sha256": "7e9cf17d42ebd727338300472e3e478546d5c32dcf101c3f7a08c8102f814abf"
+    }
+  ],
+  "executed_parked_code": false,
+  "experiment_run": false,
+  "kind": "SourceParsingOnly"
+}

@@ -1,0 +1,14 @@
+import sys,unittest
+import numpy as np
+sys.path.insert(0,'/tmp/workers')
+from overfit_detection_targets_v2 import build_targets
+from pipeline.box_coding import decode_boxes,direction_correct
+class Yaw(unittest.TestCase):
+ def test_physical_roundtrip_at_wrap_boundaries(self):
+  anchors=np.array([[0.,0.,1.,2.,2.,1.,0.],[0.,0.,1.,2.,2.,1.,np.pi/2]])
+  for heading in [-np.pi,np.pi,2*np.pi,-2*np.pi,np.pi/2,-np.pi/2]:
+   row={'context_name':'scene','frame_timestamp_micros':10,'object_id':'object','type':1,'box':[0.,0.,3.,2.,2.,2.,heading],'num_lidar_points_in_box':12}
+   targets=build_targets(anchors,[row],scene='scene',timestamp=10,roi=[-4,-4,-4,4,4,4],positive=.5,negative=.35);positive=targets['labels']>0;self.assertTrue(positive.all())
+   decoded=decode_boxes(targets['box_targets'][positive],anchors[positive]);decoded[:,6]=direction_correct(targets['box_targets'][positive,6]+anchors[positive,6],targets['direction_targets'][positive]);delta=decoded[:,6]-heading
+   self.assertTrue(np.all(np.abs(np.arctan2(np.sin(delta),np.cos(delta)))<1e-12),'heading must be physically equivalent: '+str(heading)+' -> '+str(decoded[:,6]))
+if __name__=='__main__':unittest.main()

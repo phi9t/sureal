@@ -1,0 +1,41 @@
+from pathlib import Path
+import hashlib,json,os,resource,subprocess,sys,time
+code=Path('experiments/waymo-perception').resolve();workers=Path('.scratch').resolve();sys.path.insert(0,str(code))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+from pipeline.staging_lease import staging_lease
+from pipeline.staged_derived_archive_aligned import working_bytes
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+r=code/'research';candidate=r/'overfit-native-cache-inputs.candidate.json';d=json.loads(candidate.read_text());candidate_sha=sha(candidate);cache=Path.home()/'.cache/waystone/waymo-perception';working=cache/'scientific-processing';root=cache/'insula/rootfs-v2'
+def pins():
+ assert sha(candidate)==candidate_sha and sha(r/'pointpillars-overfit-frames.candidate.json')==d['selection_sha256'] and sha(r/'pointpillars-scientific-protocol.candidate.json')==d['protocol_sha256']
+ for p,h in d['code_hashes'].items():assert sha(code/p)==h
+ for p,h in d['worker_hashes'].items():assert sha(workers/p)==h
+ assert json.loads(Path(str(root)+'.lock.json').read_text())==d['runtime_lock']
+def owner_live():
+ p=Path('/proc')/str(d['wait_pid'])
+ try:argv=(p/'cmdline').read_bytes().split(b'\0');state=(p/'stat').read_text().split(') ',1)[1].split()[0]
+ except FileNotFoundError:return False
+ if state=='Z':return False
+ assert any(Path(os.fsdecode(x)).name=='await-overfit-point-extraction.py' for x in argv if x),'wait owner identity changed'
+ return True
+started=time.monotonic()
+while owner_live():
+ pins();assert time.monotonic()-started<8*3600;print('WAIT pinned selected-point owner remains live',flush=True);time.sleep(30)
+pins();pp=json.loads((r/'pointpillars-overfit-point-extraction-progress.json').read_text());bp=json.loads((r/'pointpillars-overfit-box-extraction-progress.json').read_text());scenes={f['scene'] for f in d['frames']};assert pp['admitted_scenes']==bp['admitted_scenes']==13 and set(pp['scene_evidence'])==set(bp['scene_evidence'])==scenes
+verify_rootfs(root,d['runtime_lock']['rootfs_sha256']);destination=working/'overfit-native-cache-v1';assert not destination.exists();complete={}
+for frame in d['frames']:
+ pins();scene=frame['scene'];timestamp=frame['timestamp_micros'];key=f'{scene}:{timestamp}';pentry=pp['scene_evidence'][scene];bentry=bp['scene_evidence'][scene];pe=r/pentry['evidence'];be=r/bentry['evidence'];assert sha(pe)==pentry['evidence_sha256'] and sha(be)==bentry['evidence_sha256'];pv=json.loads(pe.read_text());bv=json.loads(be.read_text());pr=Path(pv['receipt']);br=Path(bv['receipt']);assert sha(pr)==pv['receipt_sha256'] and sha(br)==bv['receipt_sha256'];physicalroot=pr.parent/'producer';boxroot=br.parent/'producer';prec=json.loads(pr.read_text());brec=json.loads(br.read_text());physical=physicalroot/f'{timestamp}.npz';boxes=boxroot/'targets.json';assert sha(physical)==prec['artifacts'][f'producer/{timestamp}.npz'] and sha(boxes)==brec['artifacts']['producer/targets.json'];job={'scene':scene,'timestamp_micros':timestamp,'physical_file':physical.name,'physical_sha256':sha(physical),'box_report_sha256':sha(boxes),'packing_seed':frame['packing_seed'],'roi':d['roi'],'templates':d['templates']};output=destination/scene/str(timestamp)
+ with staging_lease(working/'cohort-queue.lock'):
+  assert working_bytes(working)+128*1024**2<=15*1024**3;output.mkdir(parents=True);inputs=output/'input';inputs.mkdir();(inputs/'job.json').write_text(json.dumps(job,indent=2)+'\n');producer=output/'producer';producer.mkdir();checks=[]
+  command=launch_plan(root,code,physicalroot,producer,['python','/tmp/workers/prepare-overfit-native-frame-v3.py']);i=command.index('--');command[i:i]=['--ro-bind',str(inputs),'/tmp/input','--ro-bind',str(workers),'/tmp/workers','--ro-bind',str(boxroot),'/tmp/boxes']
+  def cap():resource.setrlimit(resource.RLIMIT_FSIZE,(64*1024**2,64*1024**2));resource.setrlimit(resource.RLIMIT_AS,(16*1024**3,16*1024**3))
+  run=subprocess.run(command,capture_output=True,text=True,timeout=600,preexec_fn=cap);(output/'producer.log').write_text(run.stdout+run.stderr);assert run.returncode==0,(key,run.stderr[-1000:]);checks.append({'command':command,'exit_code':0});pins();assert working_bytes(working)<=15*1024**3
+  assert sum(p.stat().st_size for p in destination.rglob('*.npz'))<=d['prepared_payload_cap_bytes'];report=json.loads((producer/'report.json').read_text());resources=json.loads((producer/'resources.json').read_text());assert resources['peak_rss_kib']<=16*1024**2
+  artifacts={str(p.relative_to(output)):sha(p) for p in output.rglob('*') if p.is_file()};receipt={'checks':checks,'runtime_lock':d['runtime_lock'],'candidate_sha256':candidate_sha,'job':job,'point_evidence_sha256':sha(pe),'box_evidence_sha256':sha(be),'worker_hashes':d['worker_hashes'],'code_hashes':d['code_hashes'],'artifacts':artifacts,'validation':report,'resources':resources,'scope':'native training-only cache preparation; no optimizer or scientific acceptance'};(output/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+ # Disjoint output mount; independent literal checker reopens source and prepared artifacts.
+ base=cache/'insula'/f'overfit-cache-audit-{scene}-{timestamp}-v1';base.mkdir();auditout=base/'output';auditout.mkdir();command=launch_plan(root,code,physicalroot,auditout,['python','/tmp/workers/overfit-native-cache-audit.py']);i=command.index('--');command[i:i]=['--ro-bind',str(inputs),'/tmp/input','--ro-bind',str(workers),'/tmp/workers','--ro-bind',str(boxroot),'/tmp/boxes','--ro-bind',str(producer),'/tmp/prepared'];run=subprocess.run(command,capture_output=True,text=True,timeout=600);log=auditout/'live.log';log.write_text(run.stdout+run.stderr);print(log.read_text(),flush=True);assert run.returncode==0;validation=json.loads((auditout/'check.json').read_text());assert validation['scene']==scene and validation['timestamp_micros']==timestamp;assert validation['resources']['peak_rss_kib']<=16*1024**2
+ pins()
+ for path,h in artifacts.items():assert sha(output/path)==h
+ evidence={'checks':[{'command':command,'exit_code':0}],'runtime_lock':d['runtime_lock'],'candidate_sha256':candidate_sha,'receipt':str(output/'receipt.json'),'receipt_sha256':sha(output/'receipt.json'),'validation':validation,'artifacts':{str(p):sha(p) for p in [auditout/'check.json',log]},'scope':'native source/packing/all-anchor target equations independently admitted; optimization and overfit remain open'};ep=r/f'overfit-native-cache-{scene}-{timestamp}-verified.json';ep.write_text(json.dumps(evidence,indent=2)+'\n');complete[key]={'evidence':ep.name,'evidence_sha256':sha(ep),'validation':validation};(r/'overfit-native-cache-progress.json').write_text(json.dumps({'selected_frames':16,'admitted_frames':len(complete),'candidate_sha256':candidate_sha,'frame_evidence':complete,'scope':'native prepared inputs only; no optimization or quality result'},indent=2)+'\n')
+assert len(complete)==16;print('PASS all16 native frame caches independently admitted',flush=True)

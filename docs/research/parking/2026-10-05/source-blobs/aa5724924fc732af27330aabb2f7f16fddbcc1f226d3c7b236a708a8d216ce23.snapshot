@@ -1,0 +1,17 @@
+import json,pathlib,hashlib,base64,subprocess,sys,uuid,os,signal
+P=pathlib.Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(P));from pipeline.staging_lease import staging_lease
+C=pathlib.Path.home()/'.cache/waystone/waymo-perception';candidate=P/'research/motion-source-pilot.candidate.json';r=json.loads(candidate.read_text());inventory=P/'research/motion-scenario-inventory.json';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();assert sha(inventory)==r['inventory_sha256'];obj=r['objects']['training'];R=C/'motion-pilot'/('training-source-'+uuid.uuid4().hex);R.mkdir(parents=True);payload=R/'source.tfrecord';cli=pathlib.Path.home()/'workspace/waystone/scripts/waystone';checks=[]
+def run(command,label):
+ proc=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,start_new_session=True)
+ try:out,err=proc.communicate(timeout=180)
+ except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);out,err=proc.communicate();raise RuntimeError('bounded transfer timed out')
+ (R/(label+'.log')).write_text(out+err);assert proc.returncode==0,err[-1000:];checks.append({'command':command,'exit_code':0,'log':str(R/(label+'.log'))});return out
+with staging_lease(C/'raw-staging.lock'):
+ seen={}
+ for p in list(C.rglob('*.parquet'))+list(C.rglob('*.tfrecord')):
+  s=p.stat();seen[(s.st_dev,s.st_ino)]=s.st_size
+ retained=sum(seen.values());assert retained+int(obj['size'])<=r['combined_raw_cap_bytes']
+ source=f"gs://{obj['bucket']}/{obj['name']}#{obj['generation']}";run(['bash',str(P/'gcs.sh'),'--','storage','cp',source,str(payload)],'gcs-download');assert payload.stat().st_size==int(obj['size']);datahash=sha(payload);md5=hashlib.md5()
+ with payload.open('rb') as f:
+  for block in iter(lambda:f.read(1024*1024),b''):md5.update(block)
+ assert base64.b64encode(md5.digest()).decode()==obj['md5Hash'];layout=json.loads(run([str(cli),'layout-profile','--project','sureal','--json'],'layout'));uri=layout['paths']['datasets'].rstrip('/')+'/waymo-motion/v1.2.1/pilot/training/'+obj['generation']+'-'+datahash+'.tfrecord';prefix=[str(cli),'--error-format','json','--auth-source','token-file'];run(prefix+['--mkdir-parents','put',str(payload),uri],'hdfs-put');(R/'uploaded.json').write_text(json.dumps({'source':obj,'sha256':datahash,'hdfs_uri':uri,'candidate_sha256':sha(candidate),'raw_peak_bytes':retained+int(obj['size'])},indent=2));payload.unlink();run(prefix+['get',uri,str(payload)],'hdfs-get');assert sha(payload)==datahash;receipt={'source':obj,'source_sha256':datahash,'hdfs_uri':uri,'hdfs_readback_exact':True,'raw_peak_bytes':retained+int(obj['size']),'local_source':str(payload),'candidate_sha256':sha(candidate),'inventory_sha256':sha(inventory),'checks':checks,'scope':'acquired training pilot source only; framing/protobuf/causal ingestion gates pending'};(R/'acquired.json').write_text(json.dumps(receipt,indent=2));(P/'research/motion-training-source-acquired.json').write_text(json.dumps(receipt,indent=2));print('ACQUIRED',payload,flush=True)

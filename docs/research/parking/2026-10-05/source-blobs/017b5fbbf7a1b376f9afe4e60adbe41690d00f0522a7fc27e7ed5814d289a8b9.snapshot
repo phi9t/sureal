@@ -1,0 +1,31 @@
+"""Resume only publication; preserve old scene stages and aggregate 15 GiB cap."""
+import fcntl,hashlib,json,subprocess,time
+from pathlib import Path
+here=Path(__file__).resolve().parents[1]/'experiments/waymo-perception'
+working=Path.home()/'.cache/waystone/waymo-perception/scientific-processing'
+scene='4575389405178805994_4900_000_4920_000'
+base=working/'cohort-v1'/scene
+processing=base/'points';output=base/'sidecar-publication'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+with (working/'cohort-queue.lock').open('a') as lease:
+ fcntl.flock(lease,fcntl.LOCK_EX|fcntl.LOCK_NB)
+ if output.exists():raise ValueError('publication output already exists')
+ accounting=json.loads((here/'research/sidecar-cap-fourth-exact-accounting.json').read_text())
+ size=sum(p.stat().st_size for p in working.rglob('*') if p.is_file())
+ # Packing uses exact compact trusted JSON plus 64 KiB reserve; releases temporary input before publication.
+ peak=size+16*1024**2
+ if peak>=15*1024**3:raise ValueError('exact archive plus metadata reserve exceeds aggregate cap')
+ receipt=processing/'evidence/reconstruction/receipt.json'
+ expected='2cc7665d3398a9e28c8a5734da23780238832789496cea93d2fb223126c3d077'
+ if sha(receipt)!=expected:raise ValueError('original reconstruction receipt changed')
+ pins={n:sha(here/n) for n in ['publish-scientific-sidecars-compressed.py','pipeline/compressed_component_archive.py','pipeline/compressed_component_archive_validate.py']}
+ cmd=['python3',str(here/'publish-scientific-sidecars-compressed.py'),str(processing),str(output),'--expected-scene-receipt-sha256',expected]
+ log=working/'interrupted-sidecar-publication-fourth.log'
+ started=time.monotonic()
+ with log.open('x') as stream:result=subprocess.run(cmd,stdout=stream,stderr=subprocess.STDOUT)
+ if any(sha(here/n)!=h for n,h in pins.items()):raise ValueError('publication code changed')
+ measured=sum(p.stat().st_size for p in working.rglob('*') if p.is_file())
+ record={'scene':scene,'command':cmd,'exit_code':result.returncode,'elapsed_seconds':time.monotonic()-started,'metadata_preflight_bytes':peak,'metadata_reserve_bytes':16*1024**2,'archive_output_ceiling_enforced_by_writer':True,'cap_bytes':15*1024**3,'measured_end_bytes':measured,'candidate_hashes':pins,'scope':'publication recovery only; independent audit, eviction, camera stages and full lifecycle admission remain required'}
+ (here/'research/interrupted-sidecar-publication-fourth-execution.json').write_text(json.dumps(record,indent=2)+'\n')
+ if result.returncode or measured>15*1024**3:raise ValueError('publication failed or aggregate cap exceeded')
+ print('PASS resumed sidecar publication; lifecycle admission remains pending',flush=True)

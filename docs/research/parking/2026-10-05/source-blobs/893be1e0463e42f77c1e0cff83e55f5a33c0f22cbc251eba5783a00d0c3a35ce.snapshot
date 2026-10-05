@@ -1,0 +1,7 @@
+from pathlib import Path
+import hashlib,json,sys,subprocess
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);out=cache/'insula/architecture-public-runner-contract-v3';out.mkdir();sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();pins={str(p):sha(p) for p in (code/'architecture').rglob('*') if p.is_file() and '__pycache__' not in str(p)}
+command=launch_plan(root,code,code.parents[1],out,['python','/source/experiments/waymo-perception/architecture/test_experiment_runner.py']);run=subprocess.run(command,capture_output=True,text=True,timeout=120);(out/'live.log').write_text(run.stdout+run.stderr);print(run.stdout+run.stderr);assert run.returncode==0 and all(sha(Path(p))==h for p,h in pins.items());(code/'research/architecture-public-runner-contract-verified.json').write_text(json.dumps({'checks':[{'command':command,'exit_code':0}],'runtime_lock':lock,'source_hashes':pins,'artifacts':{str(p):sha(p) for p in out.iterdir()},'scope':'live public runner ID/planned-refusal/stage/dependency/provenance/namespace contracts; full native execution is separate'},indent=2)+'\n')

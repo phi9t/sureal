@@ -1,0 +1,29 @@
+"""Acquire two projection shards, freeze dependencies, run live Insula checks."""
+import hashlib,json,resource,shutil,subprocess,sys,tempfile
+from pathlib import Path
+P=Path(__file__).resolve().parents[1];sys.path.insert(0,str(P))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+from pipeline.source_integrity import verify_source
+from pipeline.staging_lease import staging_lease
+from pipeline.training_box_replay import retained_raw_bytes
+from pipeline.scientific_admission import check_raw_capacity
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+C=Path.home()/'.cache/waystone/waymo-perception';root=C/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
+base=C/'insula/joint-scene-render-v1';base.mkdir();snapshot=base/'source';snapshot.mkdir();shutil.copytree(P/'pipeline',snapshot/'pipeline',ignore=shutil.ignore_patterns('__pycache__'));shutil.copy(P/'explorer/joint_render.py',snapshot/'worker.py');pins={str(p):sha(p) for p in snapshot.rglob('*') if p.is_file()};scenes=json.loads((P/'explorer/scene-data.json').read_text())['scenes'][:2];retained=retained_raw_bytes(C,P);done=[]
+proofs=json.loads((P/'research/balanced16-physical-v3-progress.json').read_text())
+for scene in scenes:
+ name=scene['id'];t=int(scene['frames'][0]['timestamp']);d=base/name;d.mkdir();inp=d/'input';inp.mkdir();record=json.loads((C/'scientific-source-audit'/f'training-lidar_camera_projection-{name}.json').read_text());assert record['official_split']=='training';size=int(record['source_metadata']['size']);check_raw_capacity(retained,size,2*1024**3,active_objects=0)
+ proof=next(e for e in proofs['scene_receipts'] if e['scene']==name);assert sha(proof['receipt'])==proof['sha256'];physical=C/'scientific-processing/balanced16-physical-v2'/name/'producer'/f'{t}.npz';camera=C/'scientific-processing/balanced16-camera-previews-v2'/name/'producer'/f'{t}-front.jpg';labels=C/'scientific-processing/balanced16-labels-v2'/name/'producer/targets.json'
+ for group in ('balanced16-physical-v2','balanced16-camera-previews-v2','balanced16-labels-v2'):
+  receipt=json.loads((C/'scientific-processing'/group/name/'receipt.json').read_text())
+  for path,digest in receipt['artifacts'].items():assert sha(path)==digest
+ (inp/'job.json').write_text(json.dumps({'scene':name,'timestamp':t,'source':record}));checks=[]
+ with staging_lease(C/'raw-staging.lock'),tempfile.TemporaryDirectory(dir=C/'scientific-processing-staging',prefix='joint-') as temp:
+  stage=Path(temp);path=stage/'lidar_camera_projection.parquet';cmd=['timeout','--kill-after=5s','120s','bash',str(P/'gcs.sh'),'--','storage','cp',record['source_metadata']['storage_url'],str(path)]
+  def cap():resource.setrlimit(resource.RLIMIT_FSIZE,(2*1024**3-retained,2*1024**3-retained))
+  r=subprocess.run(cmd,capture_output=True,text=True,preexec_fn=cap);assert r.returncode==0,r.stderr;verify_source(path,size_bytes=size,sha256=record['sha256'],md5_base64=record['source_metadata']['md5_hash'])
+  for mode in ('producer','reference'):
+   out=d/mode;out.mkdir();cmd=launch_plan(root,snapshot,stage,out,['python','/experiment/worker.py',mode]);i=cmd.index('--');cmd[i:i]=['--ro-bind',str(inp),'/tmp/input','--ro-bind',str(physical),'/tmp/physical/frame.npz','--ro-bind',str(camera),'/tmp/camera/front.jpg','--ro-bind',str(labels),'/tmp/labels/targets.json',*(['--ro-bind',str(d/'producer'),'/tmp/produced'] if mode=='reference' else [])];r=subprocess.run(cmd,capture_output=True,text=True,timeout=300);(out/'live.log').write_text(r.stdout+r.stderr);assert r.returncode==0,r.stderr;checks.append({'command':cmd,'exit_code':0})
+ assert all(sha(path)==digest for path,digest in pins.items());receipt={'checks':checks,'runtime_lock':lock,'source_pins':pins,'native_projection_sha256':record['sha256'],'physical_admission':proof,'inputs':{str(p):sha(p) for p in (physical,camera,labels)},'artifacts':{str(p):sha(p) for p in d.rglob('*') if p.is_file()},'validation':json.loads((d/'reference/check.json').read_text())};(d/'receipt.json').write_text(json.dumps(receipt,indent=2));done.append({'scene':name,'timestamp':t,'receipt':str(d/'receipt.json'),'sha256':sha(d/'receipt.json')});print('ADMITTED JOINT RENDER',name,flush=True)
+(P/'research/joint-scene-render-verified.json').write_text(json.dumps({'scenes':done,'source_pins':pins},indent=2))

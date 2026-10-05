@@ -1,0 +1,12 @@
+from pathlib import Path
+import hashlib,json,sys,subprocess
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);workers=Path('.scratch').resolve();source=cache/'insula/overfit-point-worker-fixture-v1/producer';base=cache/'insula/overfit-native-cache-audit-fixtures-v1';base.mkdir();checks=[];results=[]
+fixtures=[('positive',cache/'insula/native-overfit-preparation-fixture-v3','producer'),('background',cache/'insula/native-overfit-preparation-edgecases-v3/valid_background','output'),('uncovered',cache/'insula/native-overfit-preparation-edgecases-v3/uncovered_target','output')]
+for name,fixture,folder in fixtures:
+ out=base/name;out.mkdir();command=launch_plan(root,code,source,out,['python','/tmp/workers/overfit-native-cache-audit.py']);i=command.index('--');command[i:i]=['--ro-bind',str(workers),'/tmp/workers','--ro-bind',str(fixture/'input'),'/tmp/input','--ro-bind',str(fixture/'boxes'),'/tmp/boxes','--ro-bind',str(fixture/folder),'/tmp/prepared'];run=subprocess.run(command,capture_output=True,text=True,timeout=120);(out/'live.log').write_text(run.stdout+run.stderr);print(run.stdout+run.stderr);assert run.returncode==0;checks.append({'command':command,'exit_code':0});results.append(json.loads((out/'check.json').read_text()))
+assert results[1]['eligible_targets']==0 and results[2]['uncovered_targets']==1
+record={'checks':checks,'runtime_lock':lock,'auditor_sha256':sha(workers/'overfit-native-cache-audit.py'),'validation':results,'artifacts':{str(p):sha(p) for p in base.rglob('*') if p.is_file()},'scope':'literal cache checker on positive/background/uncovered synthetic fixtures; real16-frame admission remains open'};(code/'research/overfit-native-cache-auditor-fixtures-verified.json').write_text(json.dumps(record,indent=2)+'\n')

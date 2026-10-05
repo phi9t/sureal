@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "observed_ms": 1791175535426,
+  "entries": [
+    {
+      "path": "experiments/waymo-perception/tools/layers.py",
+      "bytes": 4489,
+      "sha256": "6f3c0a739a2d2b8848ef2c387eeb40ddb40c4c288f4051a9449793c330201fa3",
+      "mtime_ns": 1791175067655182602,
+      "public_snapshot": "docs/research/parking/2026-10-05/source-blobs/6f3c0a739a2d2b8848ef2c387eeb40ddb40c4c288f4051a9449793c330201fa3.snapshot",
+      "private_content_store": "/data02/home/philip.yang/workspace/.sureal-collab/parking-20261005/working-source/6f3c0a739a2d2b8848ef2c387eeb40ddb40c4c288f4051a9449793c330201fa3",
+      "original_retained_in_place": true,
+      "disposition": "PARKED_UNREVIEWED_CONCURRENT_SOURCE; exact inert snapshot, original not edited or removed",
+      "writer_provenance": "ARCHITECTURE.md: Claude public Write item from session3cfda7be-3a34-4c1c-9dba-7c87df468f6c, uuidd68430a1-05cd-4de9-a23c-5a00c1cafd7b at2026-10-05T04:41:03.431Z. Tool source author unknown: no matching public native tool write found. OS UID1018 does not prove worker ownership."
+    },
+    {
+      "path": "experiments/waymo-perception/tools/pins.py",
+      "bytes": 4389,
+      "sha256": "e9535a43fbcc291917833580fbfa9e93b32eaea47f4e5282ef9f076fda622b8c",
+      "mtime_ns": 1791175094125182330,
+      "public_snapshot": "docs/research/parking/2026-10-05/source-blobs/e9535a43fbcc291917833580fbfa9e93b32eaea47f4e5282ef9f076fda622b8c.snapshot",
+      "private_content_store": "/data02/home/philip.yang/workspace/.sureal-collab/parking-20261005/working-source/e9535a43fbcc291917833580fbfa9e93b32eaea47f4e5282ef9f076fda622b8c",
+      "original_retained_in_place": true,
+      "disposition": "PARKED_UNREVIEWED_CONCURRENT_SOURCE; exact inert snapshot, original not edited or removed",
+      "writer_provenance": "ARCHITECTURE.md: Claude public Write item from session3cfda7be-3a34-4c1c-9dba-7c87df468f6c, uuidd68430a1-05cd-4de9-a23c-5a00c1cafd7b at2026-10-05T04:41:03.431Z. Tool source author unknown: no matching public native tool write found. OS UID1018 does not prove worker ownership."
+    },
+    {
+      "path": "experiments/waymo-perception/tools/suites.py",
+      "bytes": 5237,
+      "sha256": "b1e08e16a1b6e83f1dac542cf20bf81c7677d707fabd065cf33ab9cbeb545d34",
+      "mtime_ns": 1791175185819181402,
+      "public_snapshot": "docs/research/parking/2026-10-05/source-blobs/b1e08e16a1b6e83f1dac542cf20bf81c7677d707fabd065cf33ab9cbeb545d34.snapshot",
+      "private_content_store": "/data02/home/philip.yang/workspace/.sureal-collab/parking-20261005/working-source/b1e08e16a1b6e83f1dac542cf20bf81c7677d707fabd065cf33ab9cbeb545d34",
+      "original_retained_in_place": true,
+      "disposition": "PARKED_UNREVIEWED_CONCURRENT_SOURCE; exact inert snapshot, original not edited or removed",
+      "writer_provenance": "ARCHITECTURE.md: Claude public Write item from session3cfda7be-3a34-4c1c-9dba-7c87df468f6c, uuidd68430a1-05cd-4de9-a23c-5a00c1cafd7b at2026-10-05T04:41:03.431Z. Tool source author unknown: no matching public native tool write found. OS UID1018 does not prove worker ownership."
+    },
+    {
+      "path": "experiments/waymo-perception/tools/test_layers.py",
+      "bytes": 2288,
+      "sha256": "9069be3acc23b29d4f68657e79ef4630ce3dcabeba1dd80ae739ab95f1b39868",
+      "mtime_ns": 1791175067659182602,
+      "public_snapshot": "docs/research/parking/2026-10-05/source-blobs/9069be3acc23b29d4f68657e79ef4630ce3dcabeba1dd80ae739ab95f1b39868.snapshot",
+      "private_content_store": "/data02/home/philip.yang/workspace/.sureal-collab/parking-20261005/working-source/9069be3acc23b29d4f68657e79ef4630ce3dcabeba1dd80ae739ab95f1b39868",
+      "original_retained_in_place": true,
+      "disposition": "PARKED_UNREVIEWED_CONCURRENT_SOURCE; exact inert snapshot, original not edited or removed",
+      "writer_provenance": "ARCHITECTURE.md: Claude public Write item from session3cfda7be-3a34-4c1c-9dba-7c87df468f6c, uuidd68430a1-05cd-4de9-a23c-5a00c1cafd7b at2026-10-05T04:41:03.431Z. Tool source author unknown: no matching public native tool write found. OS UID1018 does not prove worker ownership."
+    },
+    {
+      "path": "experiments/waymo-perception/tools/test_pins.py",
+      "bytes": 2156,
+      "sha256": "7eb19bdde0f50111b1c0ae8b71d99577788afd193dcbcc229d444358af016fd9",
+      "mtime_ns": 1791175094126182330,
+      "public_snapshot": "docs/research/parking/2026-10-05/source-blobs/7eb19bdde0f50111b1c0ae8b71d99577788afd193dcbcc229d444358af016fd9.snapshot",
+      "private_content_store": "/data02/home/philip.yang/workspace/.sureal-collab/parking-20261005/working-source/7eb19bdde0f50111b1c0ae8b71d99577788afd193dcbcc229d444358af016fd9",
+      "original_retained_in_place": true,
+      "disposition": "PARKED_UNREVIEWED_CONCURRENT_SOURCE; exact inert snapshot, original not edited or removed",
+      "writer_provenance": "ARCHITECTURE.md: Claude public Write item from session3cfda7be-3a34-4c1c-9dba-7c87df468f6c, uuidd68430a1-05cd-4de9-a23c-5a00c1cafd7b at2026-10-05T04:41:03.431Z. Tool source author unknown: no matching public native tool write found. OS UID1018 does not prove worker ownership."
+    },
+    {
+      "path": "experiments/waymo-perception/tools/test_suites.py",
+      "bytes": 1653,
+      "sha256": "454795e549c3580784d47a5b5e803cfd06a413fab737cfa5e5218f80f1e1ede6",
+      "mtime_ns": 1791175185819181402,
+      "public_snapshot": "docs/research/parking/2026-10-05/source-blobs/454795e549c3580784d47a5b5e803cfd06a413fab737cfa5e5218f80f1e1ede6.snapshot",
+      "private_content_store": "/data02/home/philip.yang/workspace/.sureal-collab/parking-20261005/working-source/454795e549c3580784d47a5b5e803cfd06a413fab737cfa5e5218f80f1e1ede6",
+      "original_retained_in_place": true,
+      "disposition": "PARKED_UNREVIEWED_CONCURRENT_SOURCE; exact inert snapshot, original not edited or removed",
+      "writer_provenance": "ARCHITECTURE.md: Claude public Write item from session3cfda7be-3a34-4c1c-9dba-7c87df468f6c, uuidd68430a1-05cd-4de9-a23c-5a00c1cafd7b at2026-10-05T04:41:03.431Z. Tool source author unknown: no matching public native tool write found. OS UID1018 does not prove worker ownership."
+    },
+    {
+      "path": "experiments/waymo-perception/ARCHITECTURE.md",
+      "bytes": 4152,
+      "sha256": "e4bacf9a4fa01c879476b777984f587a34655ff3cebc06e67c8ca8bad9e6427f",
+      "mtime_ns": 1791175273873180565,
+      "public_snapshot": "docs/research/parking/2026-10-05/source-blobs/e4bacf9a4fa01c879476b777984f587a34655ff3cebc06e67c8ca8bad9e6427f.snapshot",
+      "private_content_store": "/data02/home/philip.yang/workspace/.sureal-collab/parking-20261005/working-source/e4bacf9a4fa01c879476b777984f587a34655ff3cebc06e67c8ca8bad9e6427f",
+      "original_retained_in_place": true,
+      "disposition": "PARKED_UNREVIEWED_CONCURRENT_SOURCE; exact inert snapshot, original not edited or removed",
+      "writer_provenance": "ARCHITECTURE.md: Claude public Write item from session3cfda7be-3a34-4c1c-9dba-7c87df468f6c, uuidd68430a1-05cd-4de9-a23c-5a00c1cafd7b at2026-10-05T04:41:03.431Z. Tool source author unknown: no matching public native tool write found. OS UID1018 does not prove worker ownership."
+    }
+  ],
+  "processes": [
+    {
+      "pid": 979497,
+      "comm": "claude",
+      "cwd": "/data02/home/philip.yang/workspace/sureal",
+      "owned_closeout_scope": false,
+      "stopped_by_closeout": false,
+      "authority": "Unidentified/shared or independently active runtime; do not kill or infer absence of writes from sleeping state"
+    },
+    {
+      "pid": 983597,
+      "comm": "codex",
+      "cwd": "/data02/home/philip.yang/workspace/sureal",
+      "owned_closeout_scope": false,
+      "stopped_by_closeout": false,
+      "authority": "Unidentified/shared or independently active runtime; do not kill or infer absence of writes from sleeping state"
+    },
+    {
+      "pid": 1401274,
+      "comm": "codex",
+      "cwd": "/data02/home/philip.yang/workspace/sureal",
+      "owned_closeout_scope": false,
+      "stopped_by_closeout": false,
+      "authority": "Unidentified/shared or independently active runtime; do not kill or infer absence of writes from sleeping state"
+    }
+  ],
+  "writer_stop_proven": false,
+  "canonical_pristine_blocker": "Independently active/unowned canonical writer; late originals preserved in place. Closeout publishes source snapshots without deleting/moving these originals. Final clean checkout is not claimed if they remain untracked.",
+  "native_goal": "paused",
+  "source_execution": false,
+  "originals_removed": false,
+  "private_history_or_reasoning_published": false
+}

@@ -1,0 +1,33 @@
+import hashlib,json,subprocess,sys
+from pathlib import Path
+exp=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(exp));from pipeline.runtime_identity import verify_rootfs
+cache=Path.home()/'.cache/waystone/waymo-perception/insula';base=cache/'camera-native-bridge-a';run=cache/'native-measured-visibility-a';run.mkdir(exist_ok=False);sam=cache/'sam-native-image-all-a'
+sha=lambda x:hashlib.sha256(Path(x).read_bytes()).hexdigest()
+projection=json.loads((exp/'research/camera-native-projection-executed.json').read_text());teacher=json.loads((exp/'research/sam-native-image-all-verified.json').read_text())
+for root,record in [(base,projection),(sam,teacher)]:
+ assert sha(root/'receipt.json')==record['receipt_sha256']
+ for name,h in record['artifacts'].items():assert sha(root/name)==h
+old=json.loads((exp/'research/camera-native-projection-residuals.json').read_text());cmd=old['checks'][0]['command'];cmd=cmd[:cmd.index('--')];cmd[cmd.index(str(base/'audit'))]=str(run);verify_rootfs(Path(cmd[4]),'aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e');cmd+=['--ro-bind',str(sam/'output'),'/tmp/sam']
+script="""import json,time,resource,numpy as np
+from pathlib import Path
+from pipeline.projection_visibility import measured_projection_visibility
+from pipeline.point_mask_relation import point_mask_relation
+start=time.monotonic()
+with np.load('/tmp/native-input/native.npz',allow_pickle=False) as a:cp=a['camera_projection'].astype(np.int64)
+with np.load('/tmp/sam/masks.npz',allow_pickle=False) as a:masks=a['masks'][:,0]
+p=np.loadtxt('/tmp/projected/projection.csv',delimiter=',');n=len(cp);assert p.shape==(n,5);np.testing.assert_array_equal(p[:,0],np.arange(n));slots=cp.reshape(n,2,3)
+depths=np.full((n,2),np.nan);valid=(slots[:,:,0]==1)&(slots[:,:,1]>=0)&(slots[:,:,1]<1920)&(slots[:,:,2]>=0)&(slots[:,:,2]<1280)&(p[:,1,None]==1)&(p[:,4,None]>0)
+depths[valid]=np.broadcast_to(p[:,4,None],(n,2))[valid]
+# Independent sorted pixel/depth frontier: first depth in each lexicographic group.
+ri,si=np.nonzero(valid);keys=slots[ri,si];z=depths[ri,si];order=np.lexsort((z,keys[:,2],keys[:,1],keys[:,0]));sortedkeys=keys[order];first=np.r_[True,np.any(sortedkeys[1:]!=sortedkeys[:-1],axis=1)];group=np.cumsum(first)-1;nearest=z[order][np.flatnonzero(first)][group];ref_min=np.empty(len(order));ref_min[order]=nearest
+r={'points':n,'masks':len(masks),'valid_front_slots':len(ri),'distinct_measured_pixels':int(first.sum()),'pixel_collisions_excess_slots':int(len(ri)-first.sum()),'tolerance_diagnostics':{},'scope':'sparse measured-depth diagnostic using static-world approximate depth and supplied pixels; no physical visibility promotion'}
+for tol in [0.,.1,.5,1.]:
+ actual=measured_projection_visibility(cp,depths,{1:(1280,1920)},depth_tolerance_m=tol);ref=np.zeros((n,2),bool);ref[ri,si]=z<=ref_min+tol;np.testing.assert_array_equal(actual['supported'],ref)
+ relation=point_mask_relation(cp,masks,camera=1,visibility=actual['supported']);assert relation['points']==n
+ r['tolerance_diagnostics'][str(tol)]={'nearest_measured_slots':int(ref.sum()),'behind_measured_slots':int((valid&~ref).sum()),'mask_incidence_points':int(relation['projected_hits'].any(1).sum()),'mask_nearest_measured_points':int(relation['visible_hits'].any(1).sum()),'reason_counts':{str(k):int(v) for k,v in zip(*np.unique(actual['reasons'],return_counts=True))}}
+r['elapsed_seconds']=time.monotonic()-start;r['peak_rss_kib']=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+Path('/outputs/check.json').write_text(json.dumps(r,indent=2));print(json.dumps(r))
+"""
+cmd+=['--','python','-c',script];ret=subprocess.run(cmd,capture_output=True,text=True);(run/'live.log').write_text(ret.stdout+ret.stderr);assert ret.returncode==0,ret.stderr
+d={'checks':[{'command':cmd,'exit_code':ret.returncode}],'runtime_sha256':'aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e','projection_receipt_sha256':projection['receipt_sha256'],'teacher_receipt_sha256':teacher['receipt_sha256'],'code_sha256':{n:sha(exp/'pipeline'/n) for n in ['projection_visibility.py','point_mask_relation.py']},'script_sha256':sha(__file__),'validation':json.loads((run/'check.json').read_text()),'artifacts':{p.name:sha(p) for p in run.iterdir() if p.is_file()}}
+(run/'receipt.json').write_text(json.dumps(d,indent=2));d['receipt']=str(run/'receipt.json');d['receipt_sha256']=sha(run/'receipt.json');(exp/'research/native-measured-visibility-verified.json').write_text(json.dumps(d,indent=2));print(ret.stdout)

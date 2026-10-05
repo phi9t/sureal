@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+"""Fixed non-managed preflight orchestration; no queue, model or stop oracle."""
+import importlib.util
+import copy
+import os
+from pathlib import Path
+import time
+
+spec = importlib.util.spec_from_file_location('sureal_root_preflight_guards',
+    Path(__file__).with_name('preflight_guards.py'))
+guards = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(guards)
+
+
+def actor_argv(authority, role, base, authorization, output, intent):
+    if role not in {'static', 'observer', 'operator'}:
+        raise ValueError('only fixed non-managed preflight roles admitted')
+    identifier = authority['fixture_id']
+    if not identifier or any(c not in 'abcdefghijklmnopqrstuvwxyz0123456789-' for c in identifier):
+        raise ValueError('invalid fixed fixture identifier')
+    return [authority['tools']['systemd_run'], '--user', '--scope', '--unit',
+            'sureal-sustained-collab-'+identifier+'-'+role,
+            '--property', 'MemoryMax=268435456', '--property', 'MemorySwapMax=0',
+            '--', authority['tools']['python'], '-I', '-B', authority['driver_source'],
+            'actor', '--role', role, '--authorization', base['path'],
+            '--authorization-sha256', base['sha256'], '--actual-authorization', str(authorization),
+            '--output', str(output), '--intent', str(intent)]
+
+
+def post_process(process):
+    try:
+        actual = guards.incarnation(process['pid'])
+    except FileNotFoundError:
+        actual = None
+    same = actual is not None and all(actual[key] == process[key]
+        for key in ('boot_id', 'pid', 'start_ticks'))
+    return {'schema_version': 1, 'kind': 'RecorderPostProcess',
+            'observed_ns': time.monotonic_ns(), 'expected_process': process,
+            'actual_process': actual, 'same_birth_alive': same}
+
+
+def actor_binding(base, role, clock):
+    kinds = {'operator': 'NativeFixtureLaunchAdmission', 'observer': 'RuntimeProbeAdmission',
+             'static': 'StaticRuntimeProbeAdmission'}
+    if role not in kinds or base.get('kind') != kinds[role]:
+        raise ValueError('fixed actual role/admission mismatch')
+    if (type(clock.get('started_ns')) is not int or type(clock.get('started_ms')) is not int or
+        clock.get('deadline_ms') != 120000 or
+        not 0 <= time.monotonic_ns()-clock['started_ns'] < 120000000000):
+        raise ValueError('actual original host command clock required')
+    own = guards.process_scope(os.getpid())
+    members = [int(row) for row in (Path(own['path'])/'cgroup.procs').read_text().splitlines()]
+    if (own['memory_max'] != '268435456' or own['memory_swap_max'] != '0' or
+        members != [os.getpid()] or not Path(own['path']).name.startswith('sureal-sustained-collab-')):
+        raise ValueError('bounded exclusive preflight scope required')
+    value = copy.deepcopy(base)
+    pin = {key: own[key] for key in ('path', 'device', 'inode')}
+    if role == 'operator':
+        value['operator_scope'] = pin
+    else:
+        value['resources']['observer_scope'] = pin
+    value['live_clock'] = copy.deepcopy(clock)
+    return value

@@ -1,0 +1,21 @@
+"""Bounded raw-source acquisition and independent native camera preview replay."""
+import hashlib,json,resource,subprocess,sys,tempfile
+from pathlib import Path
+PACKAGE=Path(__file__).resolve().parents[1];sys.path.insert(0,str(PACKAGE))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+from pipeline.source_integrity import verify_source
+from pipeline.staging_lease import staging_lease
+from pipeline.training_box_replay import retained_raw_bytes
+from pipeline.scientific_admission import check_raw_capacity
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);candidate=PACKAGE/'research/balanced16-selection.candidate.json';selection=json.loads(candidate.read_text());candidate_sha=sha(candidate);worker=PACKAGE/'explorer/camera_preview.py';digest=sha(worker);base=cache/'scientific-processing/balanced16-camera-previews-v2';base.mkdir();retained=retained_raw_bytes(cache,PACKAGE);complete=[]
+for scene in sorted({f['identity'].split(':')[0] for f in selection['frames']}):
+ record=json.loads((cache/'scientific-source-audit'/f'training-camera_image-{scene}.json').read_text());size=int(record['source_metadata']['size']);check_raw_capacity(retained,size,2*1024**3,active_objects=0);directory=base/scene;directory.mkdir();inputs=directory/'input';inputs.mkdir();(inputs/'job.json').write_text(json.dumps({'scene':scene,'source':record,'timestamps':[int(f['identity'].split(':')[1]) for f in selection['frames'] if f['identity'].split(':')[0]==scene]}));checks=[]
+ with staging_lease(cache/'raw-staging.lock'),tempfile.TemporaryDirectory(dir=cache/'scientific-processing-staging',prefix='stage-') as tmp:
+  staged=Path(tmp);path=staged/'camera_image.parquet';command=['timeout','--kill-after=5s','120s','bash',str(PACKAGE/'gcs.sh'),'--','storage','cp',record['source_metadata']['storage_url'],str(path)]
+  def cap():resource.setrlimit(resource.RLIMIT_FSIZE,(2*1024**3-retained,2*1024**3-retained))
+  result=subprocess.run(command,capture_output=True,text=True,preexec_fn=cap);assert result.returncode==0,(scene,result.stderr);transfer={'command':command,'exit_code':0,'verification':verify_source(path,size_bytes=size,sha256=record['sha256'],md5_base64=record['source_metadata']['md5_hash'])}
+  for mode in ['producer','reference']:
+   out=directory/mode;out.mkdir();command=launch_plan(root,PACKAGE,staged,out,['python','/tmp/worker.py',mode]);i=command.index('--');command[i:i]=['--ro-bind',str(worker),'/tmp/worker.py','--ro-bind',str(inputs),'/tmp/input',*(['--ro-bind',str(directory/'producer'),'/tmp/produced'] if mode=='reference' else [])];run=subprocess.run(command,capture_output=True,text=True,timeout=300);(out/'live.log').write_text(run.stdout+run.stderr);assert run.returncode==0,(scene,mode,run.stderr);checks.append({'command':command,'exit_code':0})
+ assert sha(worker)==digest and sha(candidate)==candidate_sha;receipt={'checks':checks,'runtime_lock':lock,'selection_sha256':candidate_sha,'worker_sha256':digest,'transfer':transfer,'artifacts':{str(p):sha(p) for p in directory.rglob('*') if p.is_file()},'validation':json.loads((directory/'reference/check.json').read_text())};(directory/'receipt.json').write_text(json.dumps(receipt,indent=2));complete.append({'scene':scene,'receipt':str(directory/'receipt.json'),'sha256':sha(directory/'receipt.json')});(PACKAGE/'research/balanced16-camera-preview-progress.json').write_text(json.dumps({'expected_scenes':13,'admitted_scenes':len(complete),'scene_receipts':complete},indent=2)+'\n');print('ADMITTED CAMERA PREVIEWS',scene,flush=True)

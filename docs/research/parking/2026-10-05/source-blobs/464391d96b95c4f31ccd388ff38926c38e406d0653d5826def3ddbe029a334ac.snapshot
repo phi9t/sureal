@@ -1,0 +1,347 @@
+"""Independent static reconstruction and fresh live source/layout seam.
+
+No application RPC is made here. A static receipt never proves native state.
+"""
+import os
+import _imp
+import typing
+from pathlib import Path
+import shutil
+import sys
+import sysconfig
+import time
+from types import ModuleType
+from importlib.machinery import ModuleSpec,BuiltinImporter,FrozenImporter,SourceFileLoader
+from .evidence import artifact, auditor_snapshot, json_artifact, command_record, git_facts
+from .facts import require
+from .raw_git import filesystem_manifest, verify_materialization, verify_retention, sha256
+from .raw_git import strict_json
+from .probe_authority import checked_schema_runtime
+from .probe_os import birth
+from .native_read import protocol_json
+
+NOTIFICATIONS = {'item/started':'ItemStartedNotification', 'item/completed':'ItemCompletedNotification',
+    'turn/started':'TurnStartedNotification', 'turn/completed':'TurnCompletedNotification',
+    'thread/status/changed':'ThreadStatusChangedNotification'}
+
+
+def clock_window(clock,now):
+    require(type(clock.get('started_ns')) is int and clock['started_ns']>0 and
+            type(clock.get('started_ms')) is int and clock['started_ms']>0 and
+            type(clock.get('deadline_ms')) is int and clock['deadline_ms']==120000 and
+            clock['started_ns']<=now<clock['started_ns']+120000000000,
+            'Actual original host120s clock missing, reset or expired')
+    return clock['started_ns']+120000000000-now
+
+
+def actor_clock(admission,authorization,output,entry,role,operator,scope):
+    clock=admission['live_clock'];remaining=clock_window(clock,time.monotonic_ns())
+    intent=json_artifact(clock['command_intent']);actor_path=Path(clock['actor_exec_path'])
+    actor=json_artifact({'path':str(actor_path),'sha256':sha256(actor_path)})
+    require(intent.get('kind')=='PreflightHostCommandIntent' and intent['role']==role and
+            all(intent[key]==clock[key] for key in ('started_ns','started_ms','deadline_ms')) and
+            actor.get('kind')=='ActorExec' and actor['command_intent']==clock['command_intent'] and
+            actor['authorization']==authorization and actor.get('role')==role and
+            actor.get('cwd')==str(Path.cwd())==str(output.parent),'Actual host/exec clock authority differs')
+    argv=[os.fsdecode(value) for value in Path('/proc/self/cmdline').read_bytes().split(b'\0') if value]
+    require(actor['argv']==argv and argv==[admission['fixture_plan']['tools']['python']['path'],'-B',str(entry),
+            '--probe','static-preflight' if role=='static' else 'stop-capability','--authorization',authorization['path'],
+            '--output',str(output)],'Actual observer/static exec argv differs')
+    actual=birth(os.getpid())
+    require(all(actor['process'][key]==actual[key] for key in ('boot_id','pid','start_ticks','uid')) and
+            all(actor['scope'][key]==scope[key] for key in ('path','device','inode')) and
+            clock['started_ns']<=actor['observed_ns']<=time.monotonic_ns(),'Actor process/scope/time differs')
+    host=intent['argv'];driver=str(Path(operator['source'])/'tests/collab/fixture_support/preflight_driver.py')
+    prefix=[admission['fixture_plan']['tools']['systemd_run']['path'],'--user','--scope','--unit',
+        'sureal-sustained-collab-'+admission['fixture_plan']['fixture_id']+'-'+role,'--property',
+        'MemoryMax=268435456','--property','MemorySwapMax=0','--',admission['fixture_plan']['tools']['python']['path'],
+        '-I','-B',driver,'actor','--role',role]
+    require(host[:len(prefix)]==prefix and len(host)==len(prefix)+10,'Host command is not exact admitted driver/role')
+    args=dict(zip(host[len(prefix)::2],host[len(prefix)+1::2]))
+    require(set(args)=={'--authorization','--authorization-sha256','--actual-authorization','--output','--intent'} and
+            args['--actual-authorization']==authorization['path'] and args['--output']==str(output) and
+            args['--intent']==clock['command_intent']['path'],
+            'Host command actual inputs/cwd differ')
+    base=json_artifact({'path':args['--authorization'],'sha256':args['--authorization-sha256']})
+    for key in ('kind','auditor','operator','runtime','notification_schemas','fixture_plan','user_authority','source_profile','python_stdlib_root'):
+        require(base[key]==admission[key],'Host base/actual authority differs: '+key)
+    driver=json_artifact(base['driver_admission'])
+    require(driver.get('kind')=='NativeFixtureDriverAdmission' and driver['stage']==('static' if role=='static' else 'live') and
+            driver['fixture_id']==admission['fixture_plan']['fixture_id'] and driver['output']==intent['cwd'] and
+            artifact(driver['driver_source'])==Path(operator['source'])/'tests/collab/fixture_support/preflight_driver.py' and
+            all(driver[key]==admission[key] for key in ('operator','auditor','runtime','notification_schemas','fixture_plan','user_authority','source_profile','python_stdlib_root')),
+            'Actual driver source/output/admission differs')
+    original=json_artifact(driver[role+'_admission']);expected_base={**original,'driver_admission':base['driver_admission']}
+    require(base==expected_base,'Host actor base is not exact independently admitted recipe')
+    return {'command_intent':clock['command_intent'],'actor_exec':{'path':str(actor_path),'sha256':sha256(actor_path)},
+            'process':actual,'argv':argv,'host_argv':host,'remaining_ns':remaining}
+
+
+def fresh_context(context):
+    started=time.monotonic_ns()
+    root=Path(context['source'])
+    require(root.is_absolute() and root.resolve()==root, 'Literal reconstructed source path required')
+    actual=filesystem_manifest(root,context['entries'])
+    require(actual==context['entries'],'Fresh whole source differs from reconstructed raw tree')
+    return {'kind':'FreshSourceManifest','source':str(root),'entries':actual,
+            'gitlinks_excluded':context['gitlinks_excluded'],
+            'started_ns':started,'ended_ns':time.monotonic_ns()}
+
+
+def native_module_fact(name,module):
+    spec=getattr(module,'__spec__',None)
+    require(type(module) is ModuleType and type(spec) is ModuleSpec and
+            spec.name==name and vars(module).get('__loader__') is spec.loader,
+            'Unclassified native module type/spec/name/loader: '+name)
+    if spec.origin=='built-in':
+        require(spec.loader is BuiltinImporter and _imp.is_builtin(name)!=0,'Unregistered builtin module')
+    else:
+        require(spec.origin=='frozen' and spec.loader is FrozenImporter and _imp.is_frozen(name),
+                'Unregistered frozen module')
+    return {'name':name,'module_name':vars(module).get('__name__'),'origin':spec.origin,'loader':spec.loader.__name__}
+
+
+def declared_namespace_fact(name,namespace,standard):
+    require(name in {'typing.io','typing.re'},'Pathless/unclassified Python module')
+    owner=sys.modules.get('typing');spec=getattr(owner,'__spec__',None);path=standard/'typing.py'
+    require(owner is typing and type(owner) is ModuleType and type(spec) is ModuleSpec and
+            spec.name=='typing' and spec.origin==str(path) and type(spec.loader) is SourceFileLoader and
+            vars(owner).get('__loader__') is spec.loader and Path(owner.__file__)==path==path.resolve(),
+            'Declared namespace owner/source/spec differs')
+    require(path.is_file() and not path.is_symlink(),'Declared namespace owner is not literal regular source')
+    export=name.split('.')[1];members=['IO','TextIO','BinaryIO'] if export=='io' else ['Pattern','Match']
+    meta=vars(owner).get('_DeprecatedType');body=vars(namespace)
+    require(type(namespace) is meta and meta.__module__=='typing' and meta.__name__=='_DeprecatedType' and
+            vars(owner).get(export) is namespace and type.__getattribute__(namespace,'__name__')==name and
+            body.get('__module__')=='typing' and body.get('__all__')==members and
+            set(body)=={'__module__','__doc__','__all__','__dict__','__weakref__',*members} and
+            all(body[member] is vars(owner)[member] for member in members),
+            'Declared namespace export/metaclass/member identity differs')
+    return {'name':name,'classification':'declared-stdlib-namespace','owner_module':'typing',
+            'owner':{'path':str(path),'sha256':sha256(path)},'export':export,'metaclass':'typing._DeprecatedType',
+            'members':members,'owner_spec':{'name':spec.name,'origin':spec.origin,'loader':'SourceFileLoader'}}
+
+
+def module_closure(context,profile_ref):
+    """Every actual import file is rehashed; site bootstrap is exact, never a root."""
+    profile=json_artifact(profile_ref)
+    require(type(profile.get('schema_version')) is int and profile['schema_version']==1 and profile.get('kind')=='PythonBootstrapSourceProfile' and
+        artifact(profile['interpreter'])==Path(sys.executable).resolve() and
+        profile['stdlib_root']==sysconfig.get_path('stdlib'), 'Actual pinned Python/source profile differs')
+    standard=Path(profile['stdlib_root']);require(standard.resolve()==standard,'Literal Python stdlib root required')
+    bootstrap={};pins={entry['path']:entry.get('sha256') for entry in context['entries']}
+    for entry in profile['bootstrap_modules']:
+        require(isinstance(entry.get('name'),str) and entry['name'] and entry['name'] not in bootstrap,
+                'Duplicate/missing bootstrap name')
+        observed=Path(entry['observed_path']);target=artifact(entry)
+        require(observed.is_absolute() and observed.resolve()==target,'Pinned bootstrap logical/physical alias differs')
+        bootstrap[entry['name']]=(observed,target)
+    modules=[];declared=[];native=[]
+    for name,module in sorted(list(sys.modules.items())):
+        path=getattr(module,'__file__',None)
+        if path is None:
+            if module is None:continue
+            if name in {'typing.io','typing.re'}:declared.append(declared_namespace_fact(name,module,standard))
+            else:native.append(native_module_fact(name,module))
+            continue
+        loaded=Path(path);path=loaded.resolve()
+        require(loaded.is_absolute() and path.is_file() and not path.is_symlink(), 'Imported physical file is not regular source')
+        require(loaded==path or (name in bootstrap and bootstrap[name]==(loaded,path)),
+                'Unprofiled imported-file alias')
+        require(name not in bootstrap or bootstrap[name]==(loaded,path),
+                'Profiled bootstrap import alias differs')
+        digest=sha256(path);source=Path(context['source'])
+        if path.is_relative_to(source):
+            require(pins.get(path.relative_to(source).as_posix())==digest,'Imported source bytes differ from raw tree')
+        elif path.is_relative_to(standard) and not {'site-packages','dist-packages'}.intersection(path.parts):pass
+        else:require(name in bootstrap and bootstrap[name]==(loaded,path),'Unlisted site/PYTHONPATH import')
+        modules.append({'name':name,'path':str(path),'loaded_path':str(loaded),'sha256':digest})
+    return {'schema_version':1,'kind':'ActualPythonModuleClosure','candidate':context['candidate'],
+            'source':context['source'],'source_profile':profile_ref,'modules':modules,
+            'declared_namespaces':declared,'native_modules':native,'observed_ns':time.monotonic_ns()}
+
+
+def checked_profile(admission,operator):
+    profile=json_artifact(admission['source_profile']);python=admission['fixture_plan']['tools']['python']
+    helper=Path(operator['source'])/'tests/collab/fixture_support/python_import_profile.py'
+    require(type(profile.get('schema_version')) is int and profile['schema_version']==1 and profile.get('kind')=='PythonBootstrapSourceProfile' and profile['interpreter']==python and
+            artifact(python)==Path(sys.executable).resolve() and len(profile['commands'])==2,
+            'Pinned Python source-profile interpreter/commands differ')
+    expected=[[python['path'],'-B',str(helper)],[python['path'],'-I','-B',str(helper)]]
+    for reference,argv in zip(profile['commands'],expected):
+        command=command_record(artifact(reference));stdout=artifact(command['stdout'])
+        require(stdout.stat().st_size<=1048576 and artifact(command['stderr']).stat().st_size==0,
+                'Readonly profile output exceeds1MiB or stderr is nonempty')
+        sample=strict_json(stdout)
+        require(all(type(command.get(key)) is int for key in ('started_ns','ended_ns')) and
+                0<=command['ended_ns']-command['started_ns']<=120000000000 and
+                command['ended_ms']-command['started_ms']<=120000 and
+                artifact(command['stderr']).stat().st_size==0 and artifact(command['stdout']).stat().st_size<=1048576 and
+                command['exit_code']==0 and command['argv']==argv and type(sample.get('schema_version')) is int and
+                sample['schema_version']==1 and sample.get('kind')=='PythonBootstrapSample' and
+                sample['argv']==argv and artifact(sample['source'])==helper and
+                all(sample[key]==profile[key] for key in ('interpreter','stdlib_root','bootstrap_modules')),
+                'Actual readonly bootstrap profile command/sample differs')
+        for entry in sample['bootstrap_modules']:
+            require(Path(entry['observed_path']).resolve()==artifact(entry), 'Profile observed/physical alias differs')
+    require(profile['stdlib_root']==admission['python_stdlib_root']==sysconfig.get_path('stdlib'),
+            'Actual stdlib root differs from profile/authority')
+    return admission['source_profile']
+
+
+def notification_shapes(schemas):
+    require(set(schemas)=={'ServerNotification',*NOTIFICATIONS.values()}, 'Exact notification schema union required')
+    server=schemas['ServerNotification']
+    for method,name in NOTIFICATIONS.items():
+        variants=[value for value in server['oneOf'] if value['properties']['method'].get('enum')==[method]]
+        require(len(variants)==1 and variants[0]['properties']['params']=={'$ref':'#/definitions/'+name} and
+                set(variants[0]['required'])=={'method','params'},'Server notification mapping differs')
+        shape=schemas[name]
+        require(shape['type']=='object' and server['definitions'][name]['properties']==shape['properties'] and
+                set(server['definitions'][name]['required'])==set(shape['required']), 'Generated notification shape differs')
+        if method.startswith('item/'):
+            stamp='startedAtMs' if method=='item/started' else 'completedAtMs'
+            require(set(shape['required'])=={'threadId','turnId','item',stamp} and
+                    shape['properties'][stamp]['type']=='integer','Actual lifecycle timestamp schema differs')
+            command=[value for value in shape['definitions']['ThreadItem']['oneOf']
+                if value['properties']['type'].get('enum')==['commandExecution']]
+            require(len(command)==1 and {'command','cwd','id','status','type'}<=set(command[0]['required']) and
+                    'processId' not in command[0]['required'] and 'exitCode' not in command[0]['required'] and
+                    set(command[0]['properties']['processId']['type'])=={'string','null'} and
+                    set(command[0]['properties']['exitCode']['type'])=={'integer','null'},
+                    'Native command required/nullable fields differ')
+
+
+def checked_notifications(admission):
+    pins=admission['notification_schemas'];provenance=json_artifact(admission['runtime']['schema_provenance'])
+    require(set(pins)=={'ServerNotification',*NOTIFICATIONS.values()}, 'Missing notification schema pins')
+    schemas={}
+    for name,ref in pins.items():
+        expected=Path(provenance['output_root'])/('ServerNotification.json' if name=='ServerNotification' else 'v2/'+name+'.json')
+        require(artifact(ref)==expected,'Notification schema outside actual experimental generation')
+        document=protocol_json(artifact(ref).read_bytes())
+        require(isinstance(document,dict) and document.get('$schema')=='http://json-schema.org/draft-07/schema#' and
+                document.get('title')==name and 'schema_version' not in document,
+                'Expected generated JSONSchema document: '+name)
+        schemas[name]=document
+    notification_shapes(schemas)
+    return pins
+
+
+def operator_context(admission, *, full):
+    pin=admission['operator']
+    context=(verify_materialization(artifact(pin['materialization']),pin['candidate']) if full
+             else json_artifact(pin['materialization']))
+    retained=(verify_retention(artifact(pin['retention']),pin['candidate']) if full
+              else json_artifact(pin['retention']))
+    artifact({'path':retained['pack_path'],'sha256':retained['pack_sha256']})
+    review=json_artifact(pin['review']);entry=Path(context['source'])/'tests/collab/fixture_support/native_stop_fixture.py'
+    require(context['candidate']==pin['candidate']==retained['candidate'] and retained['tree']==context['tree'] and
+            context['repository']==retained['repository'] and review.get('kind')=='independent-native-fixture-source-review' and
+            review.get('verdict')=='pass' and all(review.get(key)==context[key] for key in ('candidate','parent','tree','source')) and
+            review['materialization']==pin['materialization'] and review['retention']==pin['retention'] and
+            review['author']==admission['authors']['producer'] and review['reviewer']==admission['authors']['reviewer'] and
+            review['author']!=review['reviewer'] and
+            all(isinstance(review.get(key),str) and review[key] for key in ('author_native_thread_id','reviewer_native_thread_id')) and
+            review['author_native_thread_id']!=review['reviewer_native_thread_id'] and
+            review['operator_sha256']==sha256(entry),'Reviewed operator/cold source identity differs')
+    return context
+
+
+def layout(admission,contexts, *, live=False):
+    plan=admission['fixture_plan'];fixture_id=plan['fixture_id']
+    require(isinstance(fixture_id,str) and fixture_id and all(c in 'abcdefghijklmnopqrstuvwxyz0123456789-' for c in fixture_id),
+            'Prospective fixed fixture identity invalid')
+    paths={}
+    for name in ('workspace','common_git','canonical','fixture_output','observer_output'):
+        path=Path(plan[name]);require(path.is_absolute() and path.resolve()==path,'Literal prospective path required: '+name)
+        require(path.parent.is_dir() and path.parent.stat().st_uid==os.getuid(),'Owned prospective parent required')
+        paths[name]=path
+    for name in ('fixture_output','observer_output'):
+        if not live:require(not os.path.lexists(paths[name]),'Prospective output already exists')
+    workspace=paths['workspace'];common=paths['common_git'];facts=git_facts(workspace)
+    require(facts['root']==str(workspace) and facts['common_git_dir']==str(common) and facts['status_z_hex']=='' and
+            facts['head']==plan['workspace_base'] and
+            facts['ref']=='refs/heads/codex/collaboration50-fixture/'+fixture_id and
+            common==paths['canonical']/'.git' and workspace!=paths['canonical'],'Prospective linked Git identity differs')
+    for name,pin_key in [('workspace','workspace_identity'),('common_git','common_git_identity')]:
+        info=paths[name].stat();require(info.st_uid==os.getuid() and
+            plan[pin_key]=={'device':info.st_dev,'inode':info.st_ino},'Prospective Git directory changed')
+    channel=plan['channel_root'];root=Path(channel['path']);info=root.stat()
+    require(root.is_absolute() and root.resolve()==root and root.is_dir() and info.st_uid==os.getuid() and
+            channel=={'path':str(root),'uid':info.st_uid,'device':info.st_dev,'inode':info.st_ino},'Actual channel root differs')
+    if not live:require(not any(root.iterdir()),'Prospective capture root is not fresh')
+    forbidden=[*paths.values()]
+    for context in contexts:
+        forbidden.extend([Path(context['source']),Path(context['repository'])])
+    for name in ('auditor','operator'):
+        retained=json_artifact(admission[name]['retention']);forbidden.append(Path(retained['pack_path']).parent)
+    for other in forbidden:
+        require(not root.is_relative_to(other) and not other.is_relative_to(root),'Channel overlaps admitted source/writer roots')
+    require(not paths['observer_output'].is_relative_to(paths['fixture_output']) and
+            not paths['fixture_output'].is_relative_to(paths['observer_output']),'Fixture and observer outputs overlap')
+    tools=plan['tools'];require(set(tools)=={'git','python','systemd_run'},'Exact prospective tool union required')
+    for name,ref in tools.items():require(os.access(artifact(ref),os.X_OK),'Tool not executable: '+name)
+    require(shutil.which('git')==tools['git']['path'],'Actual pinned Git differs')
+    return plan
+
+
+def static_contexts(admission,entry):
+    require(admission.get('kind')=='StaticRuntimeProbeAdmission' and admission.get('probe')=='stop-capability-static',
+            'Explicit static preparation admission required')
+    artifact(admission['user_authority']);auditor=auditor_snapshot(admission)
+    require(Path(entry)==Path(auditor['source'])/'tests/collab/audit_support/runtime_probe.py',
+            'Static actor is not admitted auditor source')
+    require(admission['auditor']['retention']==json_artifact(admission['auditor']['review'])['retention'],
+            'Explicit auditor retention differs from independent review')
+    operator=operator_context(admission,full=True)
+    checked_schema_runtime(admission['runtime']);checked_notifications(admission);checked_profile(admission,operator)
+    layout(admission,[auditor,operator]);return auditor,operator
+
+
+def live_contexts(admission,entry):
+    """Reopen exact completed static command and fresh full trees before ready."""
+    require(admission.get('kind')=='RuntimeProbeAdmission' and admission.get('probe')=='stop-capability',
+            'Explicit live observer admission required')
+    static=admission['static_preflight'];report=json_artifact(static['report']);authority=json_artifact(report['authorization'])
+    command=command_record(artifact(static['command']))
+    require(report.get('kind')=='IndependentStaticPreflight' and report.get('status')=='pass' and command['exit_code']==0 and
+            0<=command['ended_ms']-command['started_ms']<=120000 and
+            authority.get('kind')=='StaticRuntimeProbeAdmission' and authority.get('probe')=='stop-capability-static',
+            'Completed bounded static preparation missing')
+    for key in ('authors','auditor','operator','runtime','native_shell','notification_schemas','fixture_plan','user_authority','coverage','protected_thread_ids','source_profile','python_stdlib_root'):
+        require(authority[key]==admission[key], 'Static/live authority differs: '+key)
+    auditor=json_artifact(admission['auditor']['materialization']);operator=operator_context(admission,full=False)
+    require(report['auditor_context']==auditor and report['operator_context']==operator and
+            report['auditor_retention']==admission['auditor']['retention'] and
+            report['operator_retention']==admission['operator']['retention'] and
+            report['runtime']==admission['runtime'] and report['notification_schemas']==admission['notification_schemas'] and
+            report['fixture_plan']==admission['fixture_plan'],'Static raw context identity differs')
+    expected=[admission['fixture_plan']['tools']['python']['path'],'-B',str(entry),'--probe','static-preflight',
+              '--authorization',report['authorization']['path'],'--output',str(Path(static['report']['path']).parent)]
+    static_actor=report['actor'];intent=json_artifact(static_actor['command_intent'])
+    require(report['exec_argv']==expected and command['argv']==report['host_argv']==intent['argv'] and
+            command['cwd']==intent['cwd'],
+            'Actual static command/source/cwd differs')
+    require(Path(entry)==Path(auditor['source'])/'tests/collab/audit_support/runtime_probe.py','Live actor source differs')
+    review=json_artifact(admission['auditor']['review']);retained=json_artifact(admission['auditor']['retention'])
+    require(review.get('kind')=='independent-auditor-source-review' and review['verdict']=='pass' and
+            all(review[key]==auditor[key] for key in ('candidate','parent','tree','source')) and
+            review['materialization']==admission['auditor']['materialization'] and
+            review['retention']==admission['auditor']['retention'] and review['author']==admission['authors']['auditor'] and
+            review['reviewer']==admission['authors']['reviewer'] and retained['candidate']==auditor['candidate'] and
+            retained['repository']==auditor['repository'] and retained['tree']==auditor['tree'],
+            'Current static auditor review/cold binding differs')
+    artifact({'path':retained['pack_path'],'sha256':retained['pack_sha256']})
+    artifact(admission['user_authority']);artifact(admission['coverage'])
+    require(sha256(Path(auditor['source'])/'docs/collaboration/coverage.json')==admission['coverage']['sha256'],
+            'Coverage differs from admitted source')
+    fresh=[fresh_context(context) for context in (auditor,operator)]
+    for module in list(sys.modules.values()):
+        name=getattr(module,'__name__','');path=getattr(module,'__file__',None)
+        if name.startswith('audit_support') and path:
+            require(Path(path).resolve().is_relative_to(Path(auditor['source'])/'tests/collab/audit_support'),
+                    'Executing auditor import closure outside admitted source')
+    checked_schema_runtime(admission['runtime']);checked_notifications(admission);checked_profile(admission,operator)
+    layout(admission,[auditor,operator],live=True)
+    return auditor,operator,fresh

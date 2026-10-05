@@ -1,0 +1,40 @@
+"""Reconcile original captures and recovered receipts without double-counting scenes."""
+import hashlib,importlib.util,json,sys
+from pathlib import Path
+assert importlib.util.find_spec('tensorflow') is None
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+e=json.loads(Path('/tmp/input/expected.json').read_text());candidate=json.loads(Path('/experiment/research/scientific-point-grid-inputs.candidate.json').read_text())
+assert sha('/experiment/research/scientific-point-grid-inputs.candidate.json')==e['candidate_sha256']
+m=json.loads(Path('/experiment/scientific-acquisition.candidate.json').read_text());assert sha('/experiment/scientific-acquisition.candidate.json')==e['manifest_sha256']
+sources={s['scene']:s for s in candidate['sources']};entries=e['entries'];assert len(entries)==103 and len({x['scene'] for x in entries})==103 and {x['scene'] for x in entries}==set(sources)==set(m['scenes'])
+def relocated(p):
+ p=Path(p);original=Path(e['cache_root']);assert p.is_absolute() and original in p.parents and '..' not in p.parts;return Path('/source')/p.relative_to(original)
+totals=[0]*23;by_split={};frames=returns=0
+for entry in entries:
+ scene=entry['scene'];s=sources[scene];path=relocated(entry['receipt']);assert sha(path)==entry['receipt_sha256']
+ r=json.loads(path.read_text());v=r['validation'];assert r['runtime_lock']==e['runtime_lock'] and r['checks'] and all(c['exit_code']==0 for c in r['checks'])
+ for n,h in r['candidate_hashes'].items():assert sha('/experiment/'+n)==h
+ for n,h in r['artifacts'].items():assert sha(path.parent/n)==h
+ assert v['scene']==scene and v['membership']==m['scenes'][scene]==entry['membership']
+ assert v['source_report_sha256']==s['point_publication']['report_sha256']
+ if entry['kind']=='capture':
+  assert r['input_identity']['source_record_sha256']==s['source_receipt_sha256'] and r['input_identity']['manifest_sha256']==e['manifest_sha256']
+ else:
+  assert entry['kind']=='recovered' and r['input_identity']['archive_sha256']==s['point_publication']['archive_sha256'] and r['input_identity']['publication_manifest_sha256']==s['point_publication']['publication_manifest_sha256']
+ h=v['native_counts'];assert len(h)==23 and all(type(n) is int and n>=0 for n in h) and h==entry['native_counts']
+ assert sum(h)==v['labeled_point_elements'] and sum(h[1:])==v['eligible_point_elements']==entry['eligible_point_elements']
+ assert v['annotated_returns']+v['unannotated_returns']==s['records'] and v['empty_annotated_returns']<=v['annotated_returns']
+ summed=[0]*23;seen=set()
+ for row in v['frame_counts']:
+  key=(row['context'],row['timestamp']);assert key[0]==scene and type(key[1]) is int and key not in seen;seen.add(key)
+  values=row['native_counts'];assert len(values)==23 and all(type(n) is int and n>=0 for n in values)
+  summed=[a+b for a,b in zip(summed,values)]
+ assert summed==h and len(seen)==v['annotated_frames'] and len(seen)<=v['annotated_returns']
+ totals=[a+b for a,b in zip(totals,h)];frames+=len(seen);returns+=v['annotated_returns']
+ for split in entry['membership']['research_splits']:
+  d=by_split.setdefault(split,{'scenes':0,'native_counts':[0]*23,'annotated_frames':0,'annotated_returns':0});d['scenes']+=1;d['native_counts']=[a+b for a,b in zip(d['native_counts'],h)];d['annotated_frames']+=len(seen);d['annotated_returns']+=v['annotated_returns']
+for d in by_split.values():d['eligible_point_elements']=sum(d['native_counts'][1:])
+assert sorted(d['scenes'] for d in by_split.values())==[8,16,16,64]
+value={'scenes':103,'original_captures':sum(x['kind']=='capture' for x in entries),'recovered_captures':sum(x['kind']=='recovered' for x in entries),'native_counts':totals,'eligible_point_elements':sum(totals[1:]),'annotated_frames':frames,'annotated_returns':returns,'by_split':by_split,'scope':'native positive-range labeled-point support only; split overlap retained; no sampling/loss/model/evaluation adoption'}
+assert value['original_captures']==81 and value['recovered_captures']==22
+Path('/outputs/support.json').write_text(json.dumps(value,indent=2)+'\n');print('PASS full103 semantic support reconciled',value['eligible_point_elements'],frames,'annotated frames')

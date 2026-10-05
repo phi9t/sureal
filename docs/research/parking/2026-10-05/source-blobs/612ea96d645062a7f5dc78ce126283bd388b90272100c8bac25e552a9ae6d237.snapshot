@@ -1,0 +1,7 @@
+from pathlib import Path
+import time,subprocess
+r=Path('experiments/waymo-perception/research');logs=Path.home()/'.cache/waystone/waymo-perception/insula/continuation-logs'
+while not (r/'architecture-context_pfn-exclusive-checkpoint-audit-verified.json').exists():time.sleep(2)
+for v in ['deep_pfn','context_pfn','residual_bev']:
+ with (logs/('architecture-'+v+'-strict-readmission.log')).open('w') as f:run=subprocess.run(['python','.scratch/audit-architecture-checkpoint.py',v],stdout=f,stderr=subprocess.STDOUT)
+ assert run.returncode==0,v;print('PASS strict replay readmission',v,flush=True)

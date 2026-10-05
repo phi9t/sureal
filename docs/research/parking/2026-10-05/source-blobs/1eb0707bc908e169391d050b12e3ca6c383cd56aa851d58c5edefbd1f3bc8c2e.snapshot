@@ -1,0 +1,27 @@
+"""Exercise actual driver guards against tampered retained artifacts and cap exhaustion."""
+from pathlib import Path
+import hashlib,json,ast,tempfile
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+base=Path('/outputs/fixture');base.mkdir();code=base/'code';code.mkdir();native=base/'native';native.mkdir();frame=native/'frame';frame.mkdir();inputs=base/'inputs';inputs.mkdir();artifact=base/'artifact';artifact.write_text('retained');source=code/'model.py';source.write_text('pinned');driver=base/'driver';driver.write_text('driver');(inputs/'manifest.json').write_text('{}');(frame/'observations.npz').write_text('observation')
+receipt={'artifacts':{str(artifact):sha(artifact)},'candidate_hashes':{'model.py':sha(source)},'driver_hashes':{str(driver):sha(driver)},'checks':[{'command':['--ro-bind',str(inputs),'/tmp/inputs','--ro-bind',str(native),'/tmp/native']}],'manifest_sha256':sha(inputs/'manifest.json'),'manifest':{'frames':[{'relative_directory':'frame','sha256':{'observations.npz':sha(frame/'observations.npz')}}]}}
+text=Path('/tmp/audit_driver.py').read_text();tree=ast.parse(text);function=next(node for node in tree.body if isinstance(node,ast.FunctionDef) and node.name=='verify_producer');scope={'Path':Path,'sha':sha,'receipt':receipt,'code':code};exec(compile(ast.Module(body=[function],type_ignores=[]),'<actual-driver-guard>','exec'),scope);scope['verify_producer']()
+for file in [artifact,source,driver,inputs/'manifest.json',frame/'observations.npz']:
+ original=file.read_bytes();file.write_bytes(original+b'corrupt')
+ try:scope['verify_producer']()
+ except AssertionError:pass
+ else:raise AssertionError('tampering admitted '+str(file))
+ file.write_bytes(original)
+# Execute actual storage guard with a test-sized cap, preserving production expression shape.
+cache=base/'cache';(cache/'scientific-processing').mkdir(parents=True);(cache/'scientific-processing/file').write_bytes(b'12345')
+text=Path('/tmp/score_driver.py').read_text();tree=ast.parse(text);function=next(node for node in tree.body if isinstance(node,ast.FunctionDef) and node.name=='enforce_storage')
+class TestCap(ast.NodeTransformer):
+ def visit_BinOp(self,node):
+  node=self.generic_visit(node)
+  if isinstance(node.op,ast.Mult) and isinstance(node.left,ast.Constant) and node.left.value==15:return ast.copy_location(ast.Constant(value=10),node)
+  return node
+function=TestCap().visit(function);ast.fix_missing_locations(function);research=code/'research';research.mkdir();scope={'Path':Path,'cache':cache,'code':code,'json':json,'variant':'fixture'};exec(compile(ast.Module(body=[function],type_ignores=[]),'<actual-storage-guard>','exec'),scope);scope['enforce_storage']()
+try:scope['enforce_storage'](6)
+except RuntimeError:pass
+else:raise AssertionError('capacity overflow admitted')
+assert (research/'architecture-fixture-storage-failure.json').exists()
+Path('/outputs/check.json').write_text(json.dumps({'artifact_source_driver_manifest_observation_tampering_rejected':True,'storage_reservation_overflow_rejected_and_recorded':True,'scope':'actual driver guard functions; storage cap reduced only inside fixture AST'}));print('PASS actual provenance and storage guard refusal fixtures')

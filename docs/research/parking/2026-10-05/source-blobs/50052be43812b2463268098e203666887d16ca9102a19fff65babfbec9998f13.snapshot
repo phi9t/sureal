@@ -1,0 +1,8 @@
+import argparse,json,sys,shutil,subprocess
+from pathlib import Path
+P=Path('experiments/waymo-perception').resolve();sys.path[:0]=[str(P),str(P/'tier1')]
+from storage import sha
+from pipeline.insula_entry import launch_plan
+parser=argparse.ArgumentParser();parser.add_argument('version');a=parser.parse_args();C=Path.home()/'.cache/waystone/waymo-perception';R=C/'insula'/('tier1-closure-live-'+a.version);R.mkdir();source=R/'source';source.mkdir()
+for folder in ['pipeline','gpu','tier1']:shutil.copytree(P/folder,source/folder,ignore=shutil.ignore_patterns('__pycache__'))
+pins={str(p):sha(p) for p in source.rglob('*') if p.is_file()};candidate=R/'candidate.json';shutil.copy(P/'research/tier1-overfit20261002b-results.json',candidate);marker=R/'marker';marker.write_text('offline');out=Path('.scratch').resolve()/('tier1-closure-live-'+a.version+'-output');out.mkdir();root=C/'insula/rootfs-v2';cmd=launch_plan(root,source,C,out,['python','/experiment/tier1/offline_closure.py']);i=cmd.index('--');cmd[i:i]=['--ro-bind',str(candidate),'/tmp/candidate.json','--ro-bind',str(marker),'/tmp/offline-verifier'];r=subprocess.run(cmd,capture_output=True,text=True,timeout=300);(out/'live.log').write_text(r.stdout+r.stderr);assert r.returncode==0,r.stderr;assert all(sha(p)==h for p,h in pins.items());receipt={'checks':[{'command':cmd,'exit_code':0}],'source_sha256':pins,'candidate_sha256':sha(candidate),'runtime_lock':json.loads(Path(str(root)+'.lock.json').read_text()),'validation':json.loads((out/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in out.iterdir() if p.is_file()}};(P/'research'/('tier1-closure-live-'+a.version+'-verified.json')).write_text(json.dumps(receipt,indent=2));print(r.stdout)

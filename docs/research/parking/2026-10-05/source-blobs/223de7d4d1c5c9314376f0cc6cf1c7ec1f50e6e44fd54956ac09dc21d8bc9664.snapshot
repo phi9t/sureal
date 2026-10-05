@@ -1,0 +1,30 @@
+"""Complete reservation overlays preserving every unreserved legacy array."""
+import numpy as np
+from pipeline.box_coding import encode_boxes
+from association.candidate_graph import _boxes
+
+
+def assemble_targets(anchors, gt_boxes, legacy, reservations):
+    anchors=_boxes(anchors,'anchors');boxes=_boxes(gt_boxes,'GT');n=len(anchors);t=len(boxes)
+    if 'target_classes' not in legacy:raise ValueError('explicit canonical target_classes required')
+    classes=np.asarray(legacy['target_classes'])
+    if classes.shape!=(t,) or classes.dtype.kind not in 'iu' or np.any((classes<1)|(classes>4)):raise ValueError('target_classes1–4 required')
+    a=np.asarray(reservations['anchor_indices']);owners=np.asarray(reservations['target_indices'])
+    if reservations['status']!='feasible' or a.shape!=(t,) or owners.shape!=(t,) or a.dtype.kind not in 'iu' or owners.dtype.kind not in 'iu' or len(set(a.tolist()))!=t or not np.array_equal(np.sort(owners),np.arange(t)) or np.any(a<0) or np.any(a>=n):raise ValueError('complete unique feasible reservations required')
+    result={}
+    for key,shape in [('labels',(n,)),('target_indices',(n,)),('box_targets',(n,7)),('direction_targets',(n,))]:
+        value=np.asarray(legacy[key])
+        if value.shape!=shape or not np.isfinite(value).all():raise ValueError('paired finite legacy '+key+' required')
+        if key!='box_targets' and value.dtype.kind not in 'iu':raise ValueError('integer legacy '+key+' required')
+        result[key]=value.copy()
+    if np.any((result['labels']<-1)|(result['labels']>4)) or np.any((result['direction_targets']<0)|(result['direction_targets']>1)) or np.any(result['target_indices']<-1) or np.any(result['target_indices']>=t) or not np.array_equal(result['labels']>0,result['target_indices']>=0):raise ValueError('legacy labels/owners/directions inconsistent')
+    result['labels'][a]=classes[owners];result['target_indices'][a]=owners
+    result['box_targets'][a]=encode_boxes(boxes[owners],anchors[a])
+    yaw=(boxes[owners,6]+np.pi)%(2*np.pi)-np.pi
+    result['direction_targets'][a]=(yaw>0).astype(np.int64)
+    mask=np.zeros(n,dtype=bool);mask[a]=True;result['reserved_mask']=mask
+    covered=np.unique(result['target_indices'][result['labels']>0]);missing=sorted(set(range(t))-set(covered.tolist()))
+    result['coverage']={'covered_targets':len(covered),'uncovered_target_indices':missing,
+                        'reserved_targets':t,'positive_counts_by_class':[int(np.sum(result['labels']==c)) for c in range(1,5)]}
+    if missing:raise RuntimeError('complete reservation lost an eligible target')
+    return result

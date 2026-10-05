@@ -1,0 +1,62 @@
+"""Lead-only fresh-D admission assembly; no API, acceptance or scope creation."""
+import copy, hashlib, importlib.util, json, os
+from pathlib import Path
+b=Path(__file__).resolve().parent
+r=Path('/data02/home/philip.yang/workspace/sureal')
+a=Path('/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5')
+x=b/'fixture-operator-candidate-v8'; source=x/'source'
+id='stop50-20261004d'; work=r/'.worktrees/collaboration50-fixture-20261004d'; out=b/'native-stop-fixture-v4'
+def ref(p):
+ p=Path(p);assert p.is_absolute() and not p.is_symlink()
+ return {'path':str(p),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
+def write(p,v):
+ data=(json.dumps(v,sort_keys=True,separators=(',',':'))+'\n').encode()
+ with p.open('xb') as f:f.write(data);f.flush();os.fsync(f.fileno())
+ fd=os.open(p.parent,os.O_DIRECTORY);os.fsync(fd);os.close(fd)
+ return ref(p)
+review=Path('/data02/home/philip.yang/devx/tmp/collab50-native-fixture-review-8441d98.json')
+ar=Path('/data02/home/philip.yang/devx/tmp/collab50-auditor-review-e07de85.json')
+for p,candidate in [(review,'8441d98b3c935ea39d048568b409efd92e261c91'),(ar,'e07de852356b1d0f7e0acee787689060dd0e4979')]:
+ v=json.loads(p.read_text());assert v['verdict']=='pass' and v['candidate']==candidate
+ assert v['reviewer_native_thread_id']=='01a105a5-de93-74a3-adad-c5184f54a751'
+ assert isinstance(v['source'],str)
+assert not out.exists()
+operator=source/'tests/collab/fixture_support/native_stop_fixture.py'
+spec=importlib.util.spec_from_file_location('source_pinned_fixture',operator)
+module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+base=json.loads((b/'fixture-launch-admission-base-v4.json').read_text())
+base.pop('operator_scope',None)
+base.update(candidate='8441d98b3c935ea39d048568b409efd92e261c91',fixture_id=id,
+ workspace=str(work),output=str(out),source_root=str(source),
+ operator_source=ref(operator),operator_review=ref(review),
+ operator_retention=ref(x/'retention.json'),operator_materialization=ref(x/'materialization.json'))
+for key,path in [('workspace_identity',work),('common_git_identity',r/'.git')]:
+ base[key]={'device':path.stat().st_dev,'inode':path.stat().st_ino}
+command=module.fixture_command(operator,out/'payload',id,{k:Path(v['path']) for k,v in base['tools'].items()})
+base['command_sha256']=hashlib.sha256(command.encode()).hexdigest()
+for tool in base['tools'].values(): assert ref(Path(tool['path']))==tool
+runtime=base['runtime'];endpoint=Path(runtime['endpoint']['path']); st=endpoint.stat()
+assert all(runtime['endpoint'][k]==v for k,v in [('uid',st.st_uid),('device',st.st_dev),('inode',st.st_ino)])
+birth=module.incarnation(runtime['daemon']['pid'])
+assert all(birth[k]==runtime['daemon'][k] for k in ['boot_id','pid','start_ticks'])
+assert Path('/proc/'+str(birth['pid'])+'/exe').resolve()==module.reopen(runtime['daemon']['executable'])
+authority=json.loads((b/'stop-preflight-user-authority-v4.json').read_text())
+authority.update(fixture_id=id,operator_candidate=base['candidate'],operator_source_review=ref(review),
+ auditor_candidate='e07de852356b1d0f7e0acee787689060dd0e4979',auditor_source_review=ref(ar),
+ independent_actual_preflight_review=ref('/data02/home/philip.yang/devx/tmp/collab50-actual-preflight-review-v3.json'),
+ previous_unknown_observer=ref(b/'native-stop-observer-v3/run/report.json'),
+ previous_executed_authority=ref(b/'stop-preflight-user-authority-v4.json'),
+ diagnostic_only_passive_owned_metadata=True,
+ scope='one fresh D separately owned nonmanaged fixture and readonly observer; retain failed six-method reads and passive own-public notifications; no stop predicate relaxation, managed dispatch, Kata claims, goals, shared daemon stop, science mutation or A/B/C retries')
+authority['source_controls']={'initial_red_chunk':'233838','green13_chunk':'867b33','deadline_red_chunk':'ef6878','green14_chunk':'10a858','v7_failed_source_review':ref('/data02/home/philip.yang/devx/tmp/collab50-native-fixture-review-80e886f.json')}
+base['user_authority']=write(b/'stop-preflight-user-authority-v5.json',authority)
+write(b/'fixture-launch-admission-base-v5.json',base)
+observer=json.loads((b/'observer-admission-template-v3.json').read_text())
+observer['auditor']={'candidate':'e07de852356b1d0f7e0acee787689060dd0e4979','source':str(a/'source-a50'),'review':ref(ar),'materialization':ref(a/'materialization.json')}
+observer['coverage']=ref(a/'source-a50/docs/collaboration/coverage.json')
+observer['user_authority']=base['user_authority']
+observer['resources']['output_root']=str(b/'native-stop-observer-v4')
+observer['resources'].pop('observer_scope',None)
+write(b/'observer-admission-template-v4.json',observer)
+Path(observer['resources']['output_root']).mkdir(mode=0o700)
+print(json.dumps({'fixture':id,'source':base['candidate'],'operator_base':ref(b/'fixture-launch-admission-base-v5.json'),'observer_template':ref(b/'observer-admission-template-v4.json'),'effects':False}))

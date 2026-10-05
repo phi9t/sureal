@@ -1,0 +1,246 @@
+"""Independent literal reader of a source-admitted public capture channel.
+
+These pure predicates do not confer source/fixture authority or run native RPCs.
+The observer must establish those separately before consuming a channel.
+"""
+from .facts import require
+from .evidence import json_artifact
+from pathlib import Path
+from collections import Counter
+import os
+
+CATEGORIES = {'owned_lifecycle', 'owned_private_delta_discarded', 'unrelated_discarded',
+              'authorized_rpc_reply', 'protocol_ping'}
+FRESH_NS = 2000000000
+
+LIFECYCLE_METHODS = {
+    'item/started', 'item/completed', 'turn/started', 'turn/completed',
+    'thread/status/changed',
+}
+PASSIVE_ITEMS = {'reasoning', 'userMessage', 'agentMessage', 'hookPrompt', 'plan', 'contextCompaction'}
+PRESENCE_KEYS = {'turnId', 'startedAtMs', 'completedAtMs', 'item.processId', 'item.exitCode'}
+
+
+def integer(value, label, minimum=1):
+    require(type(value) is int and value >= minimum, 'Literal integer required: ' + label)
+    return value
+
+
+def text(value, label):
+    require(isinstance(value, str) and 0 < len(value) <= 4096, 'Literal string required: ' + label)
+    return value
+
+
+def context(record, fixture, kind):
+    require(type(record.get('schema_version')) is int and record['schema_version'] == 1 and
+            record.get('kind') == kind, 'Unsupported channel record kind/schema')
+    for key in ('fixture_id', 'channel_id', 'connection_id'):
+        require(text(record.get(key), key) == fixture[key], 'Channel context differs: ' + key)
+
+
+def validate_event(record, fixture):
+    """Keep native values literal, bind exact identities and reject private data."""
+    context(record, fixture, 'NativeOwnedLifecycleEvent')
+    require(set(record)=={'schema_version','kind','fixture_id','channel_id','connection_id','frame_index',
+            'event_sequence','received_ms','received_ns','notification','native_fields_present'},
+            'Unknown/private event fields')
+    require(1 <= integer(record['event_sequence'], 'event_sequence') <=
+            integer(record['frame_index'], 'frame_index') <= 128, 'Event/frame sequence differs')
+    received_ms = integer(record['received_ms'], 'received_ms')
+    integer(record['received_ns'], 'received_ns')
+    notification = record['notification']
+    require(isinstance(notification, dict) and set(notification) == {'method', 'params'} and
+            notification['method'] in LIFECYCLE_METHODS, 'Unadmitted lifecycle notification')
+    method, params = notification['method'], notification['params']
+    require(isinstance(params, dict) and params.get('threadId') == fixture['thread_id'],
+            'Notification belongs to another exact thread')
+    presence = record['native_fields_present']
+    require(isinstance(presence, dict) and set(presence) == PRESENCE_KEYS and
+            all(type(value) is bool for value in presence.values()), 'Native field presence is missing/invalid')
+    item = params.get('item', {})
+    require(isinstance(item, dict), 'Native item metadata differs')
+    actual_presence = {key: key in params for key in ('turnId', 'startedAtMs', 'completedAtMs')}
+    actual_presence.update({'item.processId': 'processId' in item, 'item.exitCode': 'exitCode' in item})
+    require(presence == actual_presence, 'Native field presence contradicts retained values')
+    result = {'method': method, 'turn_id': None, 'item_id': None, 'command': None}
+    if method.startswith('item/'):
+        timestamp = 'startedAtMs' if method == 'item/started' else 'completedAtMs'
+        require(set(params) == {'threadId', 'turnId', timestamp, 'item'} and
+                params['turnId'] in fixture['turn_ids'], 'Item turn/fields differ')
+        require(integer(params[timestamp], timestamp) <= received_ms, 'Native lifecycle timestamp is in future')
+        identifier = text(item.get('id'), 'item.id')
+        result.update(turn_id=params['turnId'], item_id=identifier)
+        require(item.get('type') in PASSIVE_ITEMS | {'commandExecution'}, 'Unknown owned native tool/type')
+        if item['type'] in PASSIVE_ITEMS:
+            require(set(item) == {'id', 'type'}, 'Private passive item fields retained')
+            return result
+        allowed = {'id', 'type', 'status', 'cwd', 'source', 'command_sha256', 'processId', 'exitCode'}
+        required = {'id', 'type', 'status', 'cwd', 'source', 'command_sha256'}
+        require(required <= set(item) <= allowed, 'Required command metadata missing or private fields retained')
+        require(item['cwd'] == fixture['workspace'] and item['source'] == 'userShell' and
+                item['command_sha256'] == fixture['command_sha256'], 'Observed native command identity differs')
+        if 'processId' in item:
+            require(item['processId'] is None or isinstance(item['processId'], str) and
+                    0 < len(item['processId']) <= 4096, 'Native processId type differs')
+        if 'exitCode' in item:
+            require(item['exitCode'] is None or type(item['exitCode']) is int and
+                    -2147483648 <= item['exitCode'] <= 2147483647, 'Native exitCode type differs')
+        if method == 'item/started':
+            require(item['status'] == 'inProgress', 'Initial native item is not running')
+        else:
+            require(item['status'] in {'completed', 'failed'} and type(item.get('exitCode')) is int,
+                    'Native command termination coverage missing')
+        result['command'] = dict(item)
+    elif method.startswith('turn/'):
+        require(set(params) == {'threadId', 'turn'} and isinstance(params['turn'], dict) and
+                set(params['turn']) == {'id', 'status'}, 'Native turn metadata differs')
+        turn = params['turn']
+        require(turn['id'] in fixture['turn_ids'], 'Notification belongs to another native turn')
+        expected = {'inProgress'} if method == 'turn/started' else {'completed', 'interrupted', 'failed'}
+        require(turn['status'] in expected, 'Native turn lifecycle disagrees')
+        result['turn_id'] = turn['id']
+    else:
+        require(set(params) == {'threadId', 'status'} and isinstance(params['status'], dict) and
+                set(params['status']) == {'type'} and
+                params['status']['type'] in {'active', 'idle', 'notLoaded', 'systemError'},
+                'Native thread status metadata differs')
+    return result
+
+
+def read_prefix(manifest, checkpoint_ref, fixture, *, now_ns, interval_end_ns,
+                allowed_reply_ids, final=False):
+    """Reopen every raw prefix and derive accounting; declared counters are checks."""
+    context(manifest, fixture, 'NativeObservationChannel')
+    integer(manifest['armed_ns'],'armed_ns')
+    root_pin = manifest['channel_root']; root = Path(root_pin['path'])
+    require(root.is_absolute() and root.resolve() == root and root.is_dir(), 'Literal channel root required')
+    info = root.stat()
+    require(root_pin == {'path': str(root), 'uid': info.st_uid, 'device': info.st_dev, 'inode': info.st_ino}
+            and info.st_uid == os.getuid(), 'Channel directory incarnation differs')
+    require(not list(root.glob('error-*.json')), 'Retained capture error prevents coverage')
+    integer(now_ns, 'now_ns'); integer(interval_end_ns, 'interval_end_ns')
+    require(type(final) is bool and all(type(value) is int and value > 0 for value in allowed_reply_ids),
+            'Literal channel read/reply authority required')
+    def reopen(ref):
+        require(isinstance(ref, dict) and set(ref) == {'path', 'sha256'}, 'Exact channel artifact ref required')
+        path = Path(ref['path'])
+        require(path.is_relative_to(root) and path.resolve() == path, 'Channel record outside literal root')
+        return json_artifact(ref)
+    checkpoints = []; reference = checkpoint_ref; seen = set()
+    while reference is not None:
+        key = (reference['path'], reference['sha256'])
+        require(key not in seen and len(checkpoints) < 65, 'Checkpoint cycle/bound exceeded'); seen.add(key)
+        checkpoint = reopen(reference); context(checkpoint, fixture, 'ChannelCheckpoint')
+        require(set(checkpoint) == {'schema_version', 'kind', 'fixture_id', 'channel_id', 'connection_id',
+                'checkpoint_sequence', 'previous', 'observed_ns', 'peer', 'prefix', 'drain', 'errors'},
+                'Unknown/private checkpoint fields')
+        checkpoints.append((reference, checkpoint)); reference = checkpoint['previous']
+    checkpoints.reverse(); previous_frames = []; previous_events = []; previous_cutoff = manifest['armed_ns']
+    final_derived = []; final_methods = {}
+    for index, (_, checkpoint) in enumerate(checkpoints, 1):
+        sequence = integer(checkpoint['checkpoint_sequence'], 'checkpoint_sequence')
+        # The separately emitted final checkpoint uses reserved sequence65.
+        is_final = final and index == len(checkpoints) and sequence == 65
+        require(sequence == index and sequence <= 64 or is_final and index >= 2,
+                'Checkpoint sequence differs')
+        require(checkpoint['peer'] == {'pid': manifest['runtime']['daemon']['pid'],
+                'uid': manifest['runtime']['endpoint']['uid'], 'gid': os.getgid()}, 'Drained socket peer differs')
+        drain = checkpoint['drain']; observed = integer(checkpoint['observed_ns'], 'observed_ns')
+        require(set(drain) == {'started_ns', 'covered_through_ns', 'receive_buffer_bytes', 'socket_readable'},
+                'Drain fields differ')
+        start = integer(drain['started_ns'], 'drain.started_ns'); cutoff = integer(drain['covered_through_ns'], 'cutoff')
+        require(previous_cutoff <= start <= cutoff <= observed <= now_ns and cutoff-previous_cutoff <= FRESH_NS,
+                'Uncovered channel gap or reversed observation clock')
+        require(type(drain['receive_buffer_bytes']) is int and drain['receive_buffer_bytes'] == 0 and
+                drain['socket_readable'] is False and checkpoint['errors'] == [], 'Channel not completely drained')
+        prefix = checkpoint['prefix']
+        require(set(prefix) == {'frames', 'events', 'category_counts', 'event_method_counts'}, 'Prefix fields differ')
+        frames = prefix['frames']; events = prefix['events']
+        require(isinstance(frames, list) and isinstance(events, list) and len(frames) <= 128 and
+                frames[:len(previous_frames)] == previous_frames and events[:len(previous_events)] == previous_events,
+                'Channel prefix shrank/changed or exceeded bound')
+        categories = Counter({category: 0 for category in CATEGORIES}); methods = Counter(); derived = []
+        actual_events = []; last_time = manifest['armed_ns']; replies = set()
+        for frame_index, frame_ref in enumerate(frames, 1):
+            frame = reopen(frame_ref); context(frame, fixture, 'ChannelFrame')
+            require(set(frame) == {'schema_version', 'kind', 'fixture_id', 'channel_id', 'connection_id',
+                    'frame_index', 'received_ms', 'received_ns', 'wire_bytes', 'category', 'previous', 'event', 'reply_id'},
+                    'Unknown/private frame fields')
+            received = integer(frame['received_ns'], 'frame.received_ns'); integer(frame['received_ms'], 'received_ms')
+            require(frame['frame_index'] == frame_index and type(frame['frame_index']) is int and
+                    frame['previous'] == (frames[frame_index-2] if frame_index > 1 else None) and
+                    last_time <= received <= cutoff and 0 < integer(frame['wire_bytes'], 'wire_bytes') <= 1048590,
+                    'Raw frame chain/time/bound differs')
+            last_time = received; category = frame['category']
+            require(category in CATEGORIES, 'Unknown complete-frame category'); categories[category] += 1
+            if category == 'owned_lifecycle':
+                require(frame['reply_id'] is None and frame['event'] is not None, 'Lifecycle frame binding missing')
+                event = reopen(frame['event']); validated = validate_event(event, fixture)
+                require(event['event_sequence'] == len(actual_events)+1 and event['frame_index'] == frame_index and
+                        event['received_ms'] == frame['received_ms'] and event['received_ns'] == received,
+                        'Raw event/frame identity differs')
+                validated['received_ns'] = received
+                actual_events.append(frame['event']); derived.append(validated); methods[validated['method']] += 1
+            else:
+                require(frame['event'] is None, 'Unadmitted frame body/event retained')
+                if category == 'authorized_rpc_reply':
+                    require(type(frame['reply_id']) is int and frame['reply_id'] in allowed_reply_ids and
+                            frame['reply_id'] not in replies, 'Unadmitted/duplicate reply frame')
+                    replies.add(frame['reply_id'])
+                else: require(frame['reply_id'] is None, 'Discarded/ping frame has fabricated reply')
+        require(actual_events == events, 'Declared event order/union differs from raw frames')
+        declared = prefix['category_counts']; declared_methods = prefix['event_method_counts']
+        require(isinstance(declared, dict) and set(declared) == CATEGORIES and
+                all(type(value) is int and value >= 0 for value in declared.values()) and
+                declared == dict(categories), 'Complete-frame counters differ')
+        require(isinstance(declared_methods, dict) and set(declared_methods) <= LIFECYCLE_METHODS and
+                all(type(value) is int and value >= 0 for value in declared_methods.values()) and
+                {key: value for key, value in declared_methods.items() if value} == dict(methods),
+                'Lifecycle counters differ')
+        previous_frames, previous_events, previous_cutoff = frames, events, cutoff
+        final_derived, final_methods = derived, dict(methods)
+    require(checkpoints and now_ns-previous_cutoff <= FRESH_NS and previous_cutoff >= interval_end_ns,
+            'Channel checkpoint stale or does not cover actual observation')
+    return {'frame_count': len(previous_frames), 'event_method_counts': final_methods,
+            'derived_events': final_derived, 'events': previous_events, 'checkpoint': checkpoint_ref,
+            'covered_through_ns': previous_cutoff}
+
+
+def initial_facts(snapshot, fixture, prefix):
+    """Join actual initial pages, original-connection events and live kernel facts.
+
+    No event is inserted into the native item-list. Terminal reads retain the
+    strict native_facts path and cannot use this initial-only conjunction.
+    """
+    from .runtime_probe import native_read_facts, kernel_facts
+    start = integer(snapshot['interval']['started_ns'], 'witness start')
+    end = integer(snapshot['interval']['ended_ns'], 'witness end')
+    require(start <= end and end-start <= 5000000000 and prefix['covered_through_ns'] >= end,
+            'Initial witness exceeds5s or channel coverage')
+    facts, listed = native_read_facts(snapshot, fixture)
+    require(facts['thread/read']['thread']['status'].get('type') == 'active' and
+            len(facts['thread/turns/list']) == 1 and facts['thread/turns/list'][0]['status'] == 'inProgress',
+            'Actual initial thread/turn is not active')
+    before = [event for event in prefix['derived_events'] if event['received_ns'] <= end]
+    starts = [event for event in before if event['method'] == 'item/started' and event['command']]
+    require(len(starts) == 1 and starts[0]['received_ns'] <= start and
+            any(event['method'] == 'turn/started' and event['turn_id'] == starts[0]['turn_id'] and
+                event['received_ns'] <= starts[0]['received_ns'] for event in before) and
+            not any(event['method'] in {'item/completed','turn/completed'} for event in before),
+            'Actual active native start missing, late or contradicted by completion')
+    command = starts[0]['command']
+    require(not listed or len(listed) == 1 and listed[0] == command,
+            'Initial native item-list contradicts actual observed event')
+    kernel = kernel_facts(snapshot, fixture)
+    from .runtime_probe import incarnation
+    known = {incarnation(value) for value in kernel['known_incarnations']}
+    written = {incarnation(value) for value in kernel.get('command_written_incarnations', [])}
+    require(known and written and written <= known and kernel['owned_incarnations'] and
+            kernel['scope_incarnations'] and {incarnation(value) for value in kernel['scope_incarnations']} <= known,
+            'No contemporaneous independent native payload/process witness')
+    for handle in facts['thread/backgroundTerminals/list']:
+        require(handle.get('itemId') == command['id'] and handle.get('processId') == command.get('processId') and
+                handle.get('cwd') == fixture['workspace'] and
+                (handle.get('osPid') is None or any(identity[1] == handle['osPid'] for identity in known)),
+                'Initial native handle has no independently witnessed process')
+    return facts, [command]

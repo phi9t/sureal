@@ -1,0 +1,36 @@
+from pathlib import Path
+import hashlib,json,sys,subprocess
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+workers=Path('.scratch').resolve();cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);source=cache/'insula/overfit-point-worker-fixture-v1/producer';source_record=json.loads((code/'research/overfit-point-worker-fixture-verified.json').read_text());physical=source/'10.npz';assert sha(physical)==source_record['artifacts'][str(physical)]
+base=cache/'insula/native-overfit-preparation-fixture-v3';base.mkdir();inputs=base/'input';inputs.mkdir();boxes=base/'boxes';boxes.mkdir();original=json.loads((cache/'insula/overfit-target-layout-fixture-v2/input/job.json').read_text());rows=original['rows']
+for row in rows:row['context_name']='scene'
+boxreport=boxes/'targets.json';boxreport.write_text(json.dumps({'scene':'scene','native_rows':7,'frames':[{'timestamp_micros':10,'annotation_state':'native_box_rows_present','rows':rows}]},indent=2)+'\n')
+job={'scene':'scene','timestamp_micros':10,'physical_file':'10.npz','physical_sha256':sha(physical),'box_report_sha256':sha(boxreport),'packing_seed':17,'roi':[-64,-64,-4,64,64,6],'templates':original['templates'],'rows':rows};(inputs/'job.json').write_text(json.dumps(job,indent=2)+'\n');checks=[]
+def run(out,program,extra=()):
+ out.mkdir();command=launch_plan(root,code,source,out,program);i=command.index('--');command[i:i]=['--ro-bind',str(inputs),'/tmp/input','--ro-bind',str(workers),'/tmp/workers','--ro-bind',str(boxes),'/tmp/boxes',*extra];result=subprocess.run(command,capture_output=True,text=True,timeout=120);(out/'live.log').write_text(result.stdout+result.stderr);print(result.stdout+result.stderr);assert result.returncode==0;checks.append({'command':command,'exit_code':0})
+producer=base/'producer';run(producer,['python','/tmp/workers/prepare-overfit-native-frame-v3.py']);report=json.loads((producer/'report.json').read_text());flat=inputs/'assignment-report.json';flat.write_text(json.dumps(report['target_assignment'],indent=2)+'\n');assert json.loads(flat.read_text())==report['target_assignment']
+run(base/'target-reference',['python','/tmp/workers/overfit-target-fixture-worker-v3.py','reference'],['--ro-bind',str(producer),'/tmp/produced','--ro-bind',str(flat),'/tmp/produced/report.json'])
+program="""import json,hashlib
+from pathlib import Path
+import numpy as np
+job=json.loads(Path('/tmp/input/job.json').read_text());sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();assert sha('/source/10.npz')==job['physical_sha256'];report=json.loads(Path('/tmp/produced/report.json').read_text());assert report['physical_sha256']==job['physical_sha256'] and report['box_report_sha256']==job['box_report_sha256'] and report['packing_seed']==17
+with np.load('/source/10.npz',allow_pickle=False) as arrays:physical=arrays['physical_points'].copy()
+with np.load('/tmp/produced/point-lineage.npz',allow_pickle=False) as arrays:assert arrays.files==['source_indices'];indices=arrays['source_indices'].copy()
+with np.load('/tmp/produced/observations.npz',allow_pickle=False) as arrays:
+ assert set(arrays.files)=={'points','counts','coordinates'};points=arrays['points'].copy();counts=arrays['counts'].copy();coordinates=arrays['coordinates'].copy()
+roi=np.asarray(job['roi']);eligible=np.flatnonzero(np.all((physical[:,:3]>=roi[:3])&(physical[:,:3]<roi[3:]),axis=1));xy=np.minimum(np.floor((physical[eligible,:2]-roi[:2])/.25).astype(np.int64),511);groups={}
+for i,(x,y) in zip(eligible,xy):groups.setdefault(int(y*512+x),[]).append(int(i))
+rng=np.random.default_rng(17);keys=sorted(groups);selected=np.arange(len(keys))
+if len(selected)>20000:selected=np.sort(rng.choice(len(keys),20000,replace=False))
+assert len(selected)==len(counts) and points.shape==(len(counts),32,4) and coordinates.shape==(len(counts),4) and indices.shape==(len(counts),32)
+for row,index in enumerate(selected):
+ key=keys[index];expected=np.asarray(groups[key],dtype=np.int64)
+ if len(expected)>32:expected=expected[np.sort(rng.choice(len(expected),32,replace=False))]
+ n=len(expected);assert counts[row]==n;np.testing.assert_array_equal(indices[row,:n],expected);np.testing.assert_array_equal(points[row,:n],physical[expected]);assert np.all(points[row,n:]==0) and np.all(indices[row,n:]==-1);np.testing.assert_array_equal(coordinates[row],[0,0,key//512,key%512])
+r=report['packing'];assert r['input_points']==len(physical) and r['retained_points']==int(counts.sum()) and r['outside_roi']+r['pillar_limit_dropped_points']+r['point_limit_dropped_points']+r['retained_points']==len(physical)
+Path('/outputs/check.json').write_text(json.dumps({'source_points':len(physical),'retained_points':int(counts.sum()),'pillars':len(counts),'input_features':'physical XYZ/intensity only','source_index_alignment':'exact literal packing reference','scope':'synthetic integrated cache fixture only; actual native frames and optimization still required'}));print('PASS independent physical packing, zero padding, scatter and lineage')
+"""
+run(base/'packing-reference',['python','-c',program],['--ro-bind',str(producer),'/tmp/produced']);pins={str(p.relative_to(code)):sha(p) for p in sorted((code/'pipeline').glob('*.py'))};record={'checks':checks,'runtime_lock':lock,'pipeline_hashes':pins,'worker_hashes':{p.name:sha(p) for p in [workers/'prepare-overfit-native-frame-v3.py',workers/'overfit_detection_targets_v2.py',workers/'overfit-target-fixture-worker-v3.py']},'source_fixture_evidence_sha256':sha(code/'research/overfit-point-worker-fixture-verified.json'),'validation':{'packing':json.loads((base/'packing-reference/check.json').read_text()),'targets':json.loads((base/'target-reference/check.json').read_text())},'artifacts':{str(p):sha(p) for p in base.rglob('*') if p.is_file()},'scope':'integrated synthetic physical packing and target cache independently validated live; native16-frame execution remains open'};(code/'research/native-overfit-preparation-fixture-v3-verified.json').write_text(json.dumps(record,indent=2)+'\n');print('PASS integrated independently checked preparation fixture')

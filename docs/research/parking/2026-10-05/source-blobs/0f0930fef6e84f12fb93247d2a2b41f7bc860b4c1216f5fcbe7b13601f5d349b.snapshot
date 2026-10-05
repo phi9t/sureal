@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "kind": "local-session-retrospective-evidence",
+  "source_base": "a553645ef22761aa7708abf1ee109952a6cd2c38",
+  "cutoff_ms": 1791140207276,
+  "cutoff_utc": "2026-10-04T18:56:47.276000+00:00",
+  "agents": [
+    {
+      "id": "01a10846-f43b-7c40-98c3-8bfe746e1ee5",
+      "agent_path": "/root/luna_session_inventory",
+      "model": "gpt-6-luna"
+    },
+    {
+      "id": "01a10847-5576-7ad2-b46b-4075da2701c9",
+      "agent_path": "/root/luna_research_retrospective",
+      "model": "gpt-6-luna"
+    },
+    {
+      "id": "01a10847-adfb-7ec3-8b23-10f2827f0d96",
+      "agent_path": "/root/luna_mac_effectiveness",
+      "model": "gpt-6-luna"
+    }
+  ],
+  "report": {
+    "path": "../2026-10-04-waymo-session-retrospective.md",
+    "sha256": "b1a8da140b94dae1ebb1e37ba381b972a8f44854c3bcc9653e67f0efebc1019f"
+  },
+  "retention": "Report and compact supporting artifacts in isolated Git worktree; detailed indexed inventory remains external. No new HDFS publication or scientific execution is claimed.",
+  "limitations": [
+    "Indexed session discovery with topic/chronology sampling, not exhaustive raw transcript replay.",
+    "Workflow citation validation checks IDs and preserves native timestamps; grouped prose timestamps are not all certified.",
+    "Historic live scientific acceptance receipts were inspected, not rerun.",
+    "MAC throughput benefit is prospective and unmeasured."
+  ],
+  "artifacts": [
+    {
+      "path": "citation-validation.json",
+      "bytes": 554,
+      "sha256": "6540a506cdfa263ad6a41fa4030e32e050b03c6182bfc59b8cc5f2b824902d89"
+    },
+    {
+      "path": "consolidation-review.json",
+      "bytes": 4472,
+      "sha256": "e5b90f6fa26bb1ed4f09673f930a42bf2644845c2129b6b35e9828488cb3cd86"
+    },
+    {
+      "path": "incident-mapping.json",
+      "bytes": 27413,
+      "sha256": "00f769eea18f3cb436e19c15a98b97f03476f09de6e2716197f4f55b2f9da6b4"
+    },
+    {
+      "path": "mac-effectiveness-review.md",
+      "bytes": 11666,
+      "sha256": "edbd2d265817de4ba5aa606a34e8938c59a82d657cc2cf740bde7b018bbd4d92"
+    },
+    {
+      "path": "observation-context.json",
+      "bytes": 611,
+      "sha256": "bdfce23d2e222f4579763a0d6a8cb42194001af72dcc2243a11c43bca65b9a55"
+    },
+    {
+      "path": "research-retrospective.md",
+      "bytes": 19721,
+      "sha256": "453279853e28ccfecb0de9b40374e621e446b1be1a239776987b4f8d5b6cd7f6"
+    },
+    {
+      "path": "root-accounting.json",
+      "bytes": 2462,
+      "sha256": "e0bede4b64695cd7b2a435d72a23eee2396b093597fdcce9c6ec0ae15eaa72e2"
+    },
+    {
+      "path": "session-inventory.json",
+      "bytes": 80719,
+      "sha256": "a26a8659c3c091c78b2f5741badd0dad9d608a4f50d56cc4587cc83ceee45fed"
+    },
+    {
+      "path": "source-pins.json",
+      "bytes": 3190,
+      "sha256": "89ec6c6bdc16368ef4b97b466ccb000588266297318abd45866c68eda5dcd41c"
+    },
+    {
+      "path": "work-ledger.json",
+      "bytes": 25726,
+      "sha256": "3201be003cd779c0e2c7024337eb2f7f3b185d98f2bb2494b97ca76b61530b6d"
+    },
+    {
+      "path": "workflow-citation-validation.json",
+      "bytes": 80823,
+      "sha256": "8f9247e99825c2fa8fc15ad386228dda692f0daf3c77770f1cc2b5de43f0675d"
+    },
+    {
+      "path": "workflow-findings.md",
+      "bytes": 15488,
+      "sha256": "a6c86a4229690d60eb06669b18ed718cf0bb30af9425a91ae2864b2b712a4217"
+    }
+  ],
+  "external_artifacts": [
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/waymo-session-retrospective-20261004/inventory/session-inventory.json",
+      "bytes": 4635038,
+      "sha256": "550452a550607d1243adbdcd6b1c312589018b3b905b497d2d53136e94868138"
+    },
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/waymo-session-retrospective-20261004/root-mac-citation-check-v1.json",
+      "bytes": 1109,
+      "sha256": "458d0f604035a33c5b831277d366ca2d1c790a73047759e779aad58b63f2adb3"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+"""Explorer payload from verified training labels; uncovered GT stays visible."""
+import base64,hashlib,json
+from pathlib import Path
+
+def eligible_objects(rows,uncovered):
+ return [{'id':r['object_id'],'type':r['type'],'box':r['box'],'native_points':r['num_lidar_points_in_box'],'covered':r['object_id'] not in uncovered} for r in rows if r['type'] in range(1,5) and r['num_lidar_points_in_box']>0 and -64<=r['box'][0]<64 and -64<=r['box'][1]<64 and -4<=r['box'][2]<6]
+
+def scene_counts(frames):return {str(c):sum(o['type']==c for f in frames for o in f['objects']) for c in range(1,5)}
+def build(package,cache):
+ package,cache=map(Path,(package,cache));research=package/'research';selection=json.loads((research/'balanced16-selection.candidate.json').read_text());receipt=json.loads((research/'balanced16-labels-and-anchor-coverage-v3-verified.json').read_text());sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();producer=research/'balanced16-labels-and-anchor-coverage.json';assert sha(producer)==receipt['producer_receipt_sha256'] and receipt['label_and_anchor_coverage_gate_passed'];labels=json.loads(producer.read_text());scenes=[]
+ for entry in labels['scene_receipts']:
+  path=Path(entry['receipt']);assert sha(path)==entry['sha256'];r=json.loads(path.read_text())
+  for p,h in r['artifacts'].items():assert sha(p)==h
+  directory=path.parent;native=json.loads((directory/'producer/targets.json').read_text());frames=[]
+  for frame in native['frames']:
+   timestamp=frame['timestamp_micros'];target=json.loads((directory/'targets'/str(timestamp)/'report.json').read_text());objects=eligible_objects(frame['rows'],set(target['uncovered_object_ids']));frames.append({'timestamp':str(timestamp),'identity':f"{entry['scene']}:{timestamp}",'objects':objects,'positive_anchors':target['positive_anchor_counts_by_class']})
+  frames.sort(key=lambda f:int(f['timestamp']));scenes.append({'id':entry['scene'],'frames':frames,'counts':scene_counts(frames),'sensor_replay':'pending HDFS access'})
+ previews=json.loads((research/'balanced16-camera-preview-progress.json').read_text());assert previews['admitted_scenes']==13
+ for entry in previews['scene_receipts']:
+  path=Path(entry['receipt']);assert sha(path)==entry['sha256'];r=json.loads(path.read_text());assert all(c['exit_code']==0 for c in r['checks'])
+  for p,h in r['artifacts'].items():assert sha(p)==h
+  scene=next(s for s in scenes if s['id']==entry['scene'])
+  verified={v['identity'] for v in r['validation']['frames']}
+  for f in scene['frames']:
+   assert f['identity'] in verified
+   image=path.parent/'producer'/f"{f['timestamp']}-thumbnail.jpg";f['front_preview']='data:image/jpeg;base64,'+base64.b64encode(image.read_bytes()).decode('ascii')
+ scenes.sort(key=lambda s:(-s['counts']['4'],s['id']));assert sum(len(s['frames']) for s in scenes)==16
+ counts=scene_counts([f for s in scenes for f in s['frames']]);assert counts=={c:v['eligible_objects'] for c,v in selection['coverage'].items()}
+ return {'cohort':'Balanced16 · training only','scenes':scenes,'coverage':selection['coverage'],'covered_coverage':receipt['positive_anchor_covered_object_coverage'],'provenance':{'selection_sha256':sha(research/'balanced16-selection.candidate.json'),'label_audit_sha256':sha(research/'balanced16-labels-and-anchor-coverage-v3-verified.json')},'scope':'Native ROI-center eligible boxes in vehicle coordinates. Sensor payload/retained support and model quality are separate.'}
+if __name__=='__main__':
+ package=Path(__file__).resolve().parents[1];cache=Path.home()/'.cache/waystone/waymo-perception';out=Path(__file__).with_name('scene-data.json');out.write_text(json.dumps(build(package,cache),separators=(',',':'))+'\n');print(out)

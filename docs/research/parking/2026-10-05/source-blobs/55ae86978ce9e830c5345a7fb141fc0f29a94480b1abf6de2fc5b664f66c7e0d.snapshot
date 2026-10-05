@@ -1,0 +1,300 @@
+#!/usr/bin/env python3
+"""Source-admitted, read-only /proc coverage for literal writer-scan gaps.
+
+The privileged CLI reads only requested incarnations, emits metadata to stdout,
+and never changes processes/files. The native observer retains its original UID.
+"""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import signal
+import subprocess
+import sys
+import time
+
+
+def need(ok,reason):
+    if not ok:raise ValueError(reason)
+
+
+def digest(path):
+    with Path(path).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+
+
+def reference(path):return {'path':str(Path(path)),'sha256':digest(path)}
+
+
+def reopen(ref):
+    path=Path(ref['path'])
+    need(path.is_absolute() and path.resolve()==path and path.is_file() and not path.is_symlink(),'Literal regular artifact required')
+    need(digest(path)==ref['sha256'],'Artifact hash differs')
+    return path
+
+
+def decode(raw):
+    def pairs(items):
+        value={}
+        for key,item in items:
+            need(key not in value,'Duplicate JSON key');value[key]=item
+        return value
+    value=json.loads(raw,object_pairs_hook=pairs,parse_constant=lambda _:(_ for _ in ()).throw(ValueError('Nonfinite JSON')))
+    need(isinstance(value,dict) and type(value.get('schema_version')) is int and value['schema_version']==1,'Schema1 receipt required')
+    return value
+
+
+def artifact_json(ref):return decode(reopen(ref).read_bytes())
+
+
+def pin_key(value):return tuple(value[k] for k in ('boot_id','pid','start_ticks','uid'))
+
+
+def birth(pid):
+    root=Path('/proc')/str(pid);text=(root/'stat').read_text();parts=text[text.rindex(')')+2:].split()
+    return {'boot_id':Path('/proc/sys/kernel/random/boot_id').read_text().strip(),'pid':pid,
+            'start_ticks':int(parts[19]),'uid':root.stat().st_uid,'state':parts[0],'parent_pid':int(parts[1])}
+
+
+def validate_roots(roots,owner_uid):
+    need(isinstance(roots,list) and len(roots)==3 and len(set(roots))==3,'Exact three roots required')
+    result=[]
+    for value in roots:
+        path=Path(value)
+        need(path.is_absolute() and path!=Path('/') and path.resolve()==path,'Literal roots required')
+        owner=path if path.exists() else path.parent
+        need(owner.is_dir() and owner.stat().st_uid==owner_uid,'Owned roots required')
+        result.append(path)
+    return result
+
+
+def scoped(path,roots):
+    return path.is_absolute() and any(path.is_relative_to(root) for root in roots)
+
+
+def inventory(root,name):
+    values=[int(item.name) for item in (root/name).iterdir()]
+    need(len(values)<=4096 and len(values)==len(set(values)),'Incomplete FD inventory')
+    return sorted(values)
+
+
+def observe_target(pin,roots,owner_uid):
+    need(pin['uid']==owner_uid,'Target UID differs')
+    root=Path('/proc')/str(pin['pid'])
+    try:before=birth(pin['pid'])
+    except FileNotFoundError:
+        need(not root.exists(),'Opaque process absence')
+        try:birth(pin['pid'])
+        except FileNotFoundError:
+            need(not root.exists(),'Opaque process absence')
+            return {'target':pin,'classification':'absent','before':None,'after':None,
+                    'absence_errno':[2,2]}
+        raise ValueError('Process incarnation appeared during absence read')
+    need(pin_key(before)==pin_key(pin),'Target incarnation/UID differs')
+    try:
+        target=os.readlink(root/'cwd');cwd={'target_sha256':hashlib.sha256(target.encode()).hexdigest()}
+        path=Path(target.removesuffix(' (deleted)'))
+        if scoped(path,roots):cwd['scoped_path']=str(path)
+    except FileNotFoundError:cwd={'errno':2}
+    first=inventory(root,'fd');info_first=inventory(root,'fdinfo');fds=[]
+    need(first==info_first,'FD/fdinfo inventory differs')
+    for number in first:
+        target=os.readlink(root/'fd'/str(number))
+        text=(root/'fdinfo'/str(number)).read_text();need(len(text)<=65536,'FD metadata cap')
+        fields=dict(line.split(':',1) for line in text.splitlines() if ':' in line)
+        flags=int(fields['flags'].strip(),8)
+        need(os.readlink(root/'fd'/str(number))==target,'FD target changed during read')
+        again=(root/'fdinfo'/str(number)).read_text();again_fields=dict(line.split(':',1) for line in again.splitlines() if ':' in line)
+        need(int(again_fields['flags'].strip(),8)==flags,'FD flags changed during read')
+        row={'fd':number,'flags':flags,'target_sha256':hashlib.sha256(target.encode()).hexdigest()}
+        path=Path(target.removesuffix(' (deleted)'))
+        if scoped(path,roots):row['scoped_path']=str(path)
+        fds.append(row)
+    last=inventory(root,'fd');info_last=inventory(root,'fdinfo');after=birth(pin['pid'])
+    need(pin_key(before)==pin_key(after),'Target incarnation changed during read')
+    need(first==last==info_last,'FD inventory changed during read')
+    classification='zombie-empty' if before['state']==after['state']=='Z' else 'live-covered'
+    if classification=='zombie-empty':need(not first and cwd=={'errno':2},'Zombie FD/cwd evidence incomplete')
+    else:need('errno' not in cwd and before['state']!='Z' and after['state']!='Z','Opaque live cwd/process state')
+    return {'target':pin,'classification':classification,'before':before,'after':after,'cwd':cwd,
+            'fd_numbers_before':first,'fd_numbers_after':last,'fdinfo_numbers_before':info_first,
+            'fdinfo_numbers_after':info_last,'fds':fds}
+
+
+def verify_rows(targets,rows,roots,owner_uid):
+    need(len(rows)==len(targets) and len({p['pid'] for p in targets})==len(targets),'Coverage target union differs')
+    hits=[]
+    for pin,row in zip(targets,rows):
+        need(pin['uid']==owner_uid and row['target']==pin,'Coverage target UID/incarnation differs')
+        if row['classification']=='absent':
+            need(row['before'] is None and row['after'] is None and row['absence_errno']==[2,2],'Actual absence proof missing')
+            continue
+        need(pin_key(row['before'])==pin_key(row['after'])==pin_key(pin),'Coverage incarnation differs')
+        numbers=row['fd_numbers_before']
+        need(isinstance(numbers,list) and len(numbers)==len(set(numbers)) and numbers==sorted(numbers) and
+             all(type(n) is int and n>=0 for n in numbers),'Invalid FD inventory')
+        need(numbers==row['fd_numbers_after']==row['fdinfo_numbers_before']==row['fdinfo_numbers_after'] and
+             [fd['fd'] for fd in row['fds']]==numbers,'Incomplete FD proof')
+        if row['classification']=='zombie-empty':
+            need(row['before']['state']==row['after']['state']=='Z' and not numbers and
+                 row['cwd']=={'errno':2},'Actual zombie empty FD/cwd proof missing')
+        else:
+            need(row['classification']=='live-covered' and row['before']['state']!='Z' and row['after']['state']!='Z' and
+                 isinstance(row['cwd'].get('target_sha256'),str) and len(row['cwd']['target_sha256'])==64,'Live cwd proof missing')
+            if 'scoped_path' in row['cwd']:
+                path=Path(row['cwd']['scoped_path']);need(scoped(path,roots),'Cwd outside admitted roots')
+                hits.append({'pid':pin['pid'],'birth':row['before'],'kind':'cwd','path':str(path)})
+        for fd in row['fds']:
+            need(type(fd['flags']) is int and fd['flags']>=0 and len(fd['target_sha256'])==64,'Invalid FD metadata')
+            if 'scoped_path' in fd:
+                path=Path(fd['scoped_path']);need(scoped(path,roots),'FD outside admitted roots')
+                if fd['flags']&os.O_ACCMODE in {os.O_WRONLY,os.O_RDWR}:
+                    hits.append({'pid':pin['pid'],'birth':row['before'],'kind':'write-fd','path':str(path),'fd':fd['fd']})
+    return hits
+
+
+def merge_scan(scan,targets,rows,roots,owner_uid):
+    hits=verify_rows(targets,rows,roots,owner_uid);covered={pin_key(p) for p in targets}
+    errors=[error for error in scan['errors'] if 'birth' not in error or pin_key(error['birth']) not in covered]
+    return {'hits':[*scan['hits'],*hits],'errors':errors,'original_errors':scan['errors']}
+
+
+def validate_admission(ref,observer=None):
+    value=artifact_json(ref)
+    need(value.get('kind')=='ScopedPrivilegedWriterCoverageAdmission','Explicit readonly coverage admission required')
+    owner=value['owner_uid'];need(type(owner) is int and owner>0,'Positive observer UID required')
+    roots=validate_roots(value['roots'],owner)
+    need(value['resources']=={'deadline_ms':2000,'max_stdout_bytes':131072,'max_request_bytes':65536,'max_targets':64},'Writer reader bounds differ')
+    reader=reopen(value['reader']);need(reader.name=='writer_reader.py','Exact writer reader required')
+    for tool in value['tools'].values():need(os.access(reopen(tool),os.X_OK),'Pinned reader tool not executable')
+    need(set(value['tools'])=={'sudo','python'},'Pinned sudo/Python union differs')
+    context=artifact_json(value['auditor']['materialization']);review=artifact_json(value['auditor']['review'])
+    retained=artifact_json(value['auditor']['retention'])
+    need(context['candidate']==value['auditor']['candidate']==review['candidate']==retained['candidate'] and
+         context['source']==value['auditor']['source']==review['source'] and review['verdict']=='pass' and
+         review['kind']=='independent-auditor-source-review' and review['materialization']==value['auditor']['materialization'] and
+         review['retention']==value['auditor']['retention'],'Writer reader source/review/cold binding differs')
+    need(reader==Path(context['source'])/'tests/collab/audit_support/writer_reader.py','Reader outside exact auditor source')
+    entry=next(e for e in context['entries'] if e['path']=='tests/collab/audit_support/writer_reader.py')
+    need(entry['sha256']==value['reader']['sha256'],'Raw reader body differs')
+    user=artifact_json(value['user_authority'])
+    grant=user['privileged_writer_coverage']
+    need(user.get('kind')=='BoundedNativeStopPreflightUserAuthority' and user['auditor']==value['auditor'] and
+         all(grant[key]==value[key] for key in ('owner_uid','roots','reader','tools','resources')),
+         'Explicit readonly privilege grant differs')
+    review_grant=artifact_json(grant['design_review'])
+    need(review_grant.get('kind')=='independent-writer-coverage-design-review' and
+         review_grant.get('verdict')=='pass-design','Reviewed writer coverage design missing')
+    reopen(grant['access_feasibility'])
+    if observer is not None:
+        need(observer.get('writer_coverage')==ref and observer['auditor']==value['auditor'] and
+             observer['user_authority']==value['user_authority'] and
+             value['roots']==[observer['fixture_plan'][n] for n in ('workspace','fixture_output','common_git')] and
+             value['tools']['python']==observer['fixture_plan']['tools']['python'],'Observer coverage authority differs')
+    return value,roots
+
+
+def configure(admission,fixture,output,authorization):
+    if 'writer_coverage' not in admission:return
+    value,roots=validate_admission(admission['writer_coverage'],admission)
+    need(value['owner_uid']==os.getuid() and value['roots']==[fixture[n] for n in ('workspace','output','common_git')],
+         'Actual fixture writer roots differ')
+    fixture['writer_coverage']={'admission':admission['writer_coverage'],'observer_authorization':authorization,
+                                'roots':list(map(str,roots)),'output':str(output)}
+
+
+def save(path,value):
+    raw=(json.dumps(value,sort_keys=True,separators=(',',':'))+'\n').encode()
+    # Each writer-read directory is a subtree of the admitted observer output.
+    total=sum(p.stat().st_size for p in path.parent.parent.rglob('*') if p.is_file())
+    need(total+len(raw)<=33554432,'Observer output cap before writer metadata write')
+    with path.open('xb') as f:f.write(raw);f.flush();os.fsync(f.fileno())
+    return reference(path)
+
+
+def read_gaps(config,scan):
+    value,roots=validate_admission(config['admission'],artifact_json(config['observer_authorization']))
+    need(value['owner_uid']==os.getuid() and list(map(str,roots))==config['roots'],'Reader caller/root UID differs')
+    targets=[e['birth'] for e in scan['errors'] if 'birth' in e]
+    if not targets:return scan
+    need(len(targets)<=64,'Coverage target bound')
+    output=Path(config['output']);number=1
+    while (output/f'writer-read-{number:03d}').exists():number+=1
+    root=output/f'writer-read-{number:03d}';root.mkdir(mode=0o700)
+    original=save(root/'original-scan.json',{'schema_version':1,'kind':'OriginalScopedWriterScan',
+                                           'roots':value['roots'],**scan})
+    request={'schema_version':1,'kind':'ScopedWriterCoverageRequest','admission':config['admission'],
+             'observer_authorization':config['observer_authorization'],'requester':birth(os.getpid()),
+             'roots':value['roots'],'targets':targets,'original_scan':original,
+             'started_ns':time.monotonic_ns(),'deadline_ms':2000}
+    req=save(root/'request.json',request);need((root/'request.json').stat().st_size<=65536,'Writer request cap')
+    argv=[value['tools']['sudo']['path'],'-n','--',value['tools']['python']['path'],'-I','-B',value['reader']['path'],
+          '--authorization',config['admission']['path'],'--authorization-sha256',config['admission']['sha256'],
+          '--request',req['path'],'--request-sha256',req['sha256']]
+    started_ms=time.time_ns()//1000000;started_ns=time.monotonic_ns()
+    intent=save(root/'intent.json',{'schema_version':1,'kind':'ScopedWriterReadIntent','argv':argv,'request':req,
+             'admission':config['admission'],'started_ms':started_ms,'started_ns':started_ns})
+    child=subprocess.Popen(argv,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    try:stdout,stderr=child.communicate(timeout=max(.001,(request['started_ns']+2000000000-time.monotonic_ns())/1e9))
+    except subprocess.TimeoutExpired:
+        # A timeout never grants release or sends a signal to a privileged child.
+        save(root/'unknown.json',{'schema_version':1,'kind':'ScopedWriterReadUncertainty','child_pid':child.pid,
+                                 'intent':intent,'ownership_released':False,'reaped':False})
+        raise ValueError('Privileged writer reader timed out; child disposition unknown')
+    ended_ns=time.monotonic_ns();ended_ms=time.time_ns()//1000000
+    need(len(stdout)<=131072 and len(stderr)<=131072,'Writer raw stream cap')
+    total=sum(p.stat().st_size for p in output.rglob('*') if p.is_file())
+    need(total+len(stdout)+len(stderr)<=33554432,'Observer output cap before raw writer streams')
+    for name,data in [('stdout',stdout),('stderr',stderr)]:
+        with (root/name).open('xb') as f:f.write(data);f.flush();os.fsync(f.fileno())
+    command=save(root/'actual-command.json',{'schema_version':1,'argv':argv,'cwd':str(Path.cwd()),
+        'started_ms':started_ms,'ended_ms':ended_ms,'started_ns':started_ns,'ended_ns':ended_ns,
+        'exit_code':child.returncode,'stdout':reference(root/'stdout'),'stderr':reference(root/'stderr'),
+        'intent':intent,'child_pid':child.pid,'reaped':True})
+    need(child.returncode==0 and ended_ns<=request['started_ns']+2000000000 and not stderr and len(stdout)<=131072,
+         'Reader failed, exceeded deadline/output or produced opaque stderr')
+    facts=decode(stdout)
+    need(facts.get('kind')=='ScopedWriterCoverageReadback' and facts['request']==req and
+         facts['admission']==config['admission'] and facts['source']==value['reader'] and facts['reader_process']['uid']==0 and
+         facts['requester']==request['requester'] and request['started_ns']<=facts['started_ns']<=facts['ended_ns']<=ended_ns,
+         'Raw reader source/identity/request/timing differs')
+    merged=merge_scan(scan,targets,facts['rows'],roots,os.getuid());merged['coverage_command']=command
+    return merged
+
+
+def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--authorization',required=True);parser.add_argument('--authorization-sha256',required=True)
+    parser.add_argument('--request',required=True);parser.add_argument('--request-sha256',required=True);args=parser.parse_args()
+    admission={'path':args.authorization,'sha256':args.authorization_sha256};request_ref={'path':args.request,'sha256':args.request_sha256}
+    request_path=reopen(request_ref);need(request_path.stat().st_size<=65536,'Writer request cap');request=artifact_json(request_ref)
+    need(request['kind']=='ScopedWriterCoverageRequest' and request['admission']==admission and request['deadline_ms']==2000,'Explicit writer request required')
+    deadline=request['started_ns']+2000000000;remaining=(deadline-time.monotonic_ns())/1e9
+    need(0<remaining<=2,'Original writer deadline expired')
+    signal.signal(signal.SIGALRM,lambda *_:(_ for _ in ()).throw(TimeoutError('Writer reader deadline')));signal.setitimer(signal.ITIMER_REAL,remaining)
+    started=time.monotonic_ns();value,roots=validate_admission(admission,artifact_json(request['observer_authorization']))
+    need(os.getuid()==0 and reference(Path(__file__).resolve())==value['reader'],'Readonly root reader source/UID differs')
+    need(reference(Path('/proc/self/exe').resolve())==value['tools']['python'],'Reader interpreter differs')
+    requester=birth(request['requester']['pid']);need(pin_key(requester)==pin_key(request['requester']) and requester['uid']==value['owner_uid'],'Requester incarnation/UID differs')
+    current=birth(os.getpid());ancestors=[]
+    for _ in range(8):
+        if current['pid']==requester['pid']:break
+        ancestors.append(current['pid']);need(current['parent_pid']>1,'Reader requester ancestry missing');current=birth(current['parent_pid'])
+    else:raise ValueError('Reader requester ancestry bound')
+    need(request['roots']==value['roots'] and 0<len(request['targets'])<=64,'Reader root/target union differs')
+    original=artifact_json(request['original_scan'])
+    need(original.get('kind')=='OriginalScopedWriterScan' and original['roots']==value['roots'] and
+         [e['birth'] for e in original['errors'] if 'birth' in e]==request['targets'],
+         'Reader targets are not the literal retained scan gaps')
+    rows=[observe_target(pin,roots,value['owner_uid']) for pin in request['targets']]
+    verify_rows(request['targets'],rows,roots,value['owner_uid'])
+    facts={'schema_version':1,'kind':'ScopedWriterCoverageReadback','admission':admission,'request':request_ref,
+           'source':value['reader'],'reader_process':birth(os.getpid()),'requester':request['requester'],
+           'started_ns':started,'ended_ns':time.monotonic_ns(),'rows':rows}
+    need(facts['ended_ns']<=deadline,'Writer reader deadline crossed')
+    raw=(json.dumps(facts,sort_keys=True,separators=(',',':'))+'\n').encode();need(len(raw)<=131072,'Writer stdout cap')
+    sys.stdout.buffer.write(raw);sys.stdout.buffer.flush()
+
+if __name__=='__main__':
+    try:main()
+    except Exception as error:
+        sys.stderr.write(type(error).__name__+': '+str(error)+'\n');sys.exit(3)
