@@ -4,7 +4,7 @@
 
 **Blocked by:** 09 (Evidence module: snapshot, fetch and verify)
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] A new run records the snapshot digest and the build target it was taken from
 - [x] Verifying and resuming a run check the recorded snapshot and succeed after an unrelated source file is edited
