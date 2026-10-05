@@ -77,3 +77,14 @@ Pinned/guarded file reasons:
 - The moved test files were renamed from `tests/test_*.py` to colocated `geometry/*_test.py` Bazel targets.
 - Active callers in `cohort`, `gpu`, `motion-evaluation`, and `pipeline` were changed only to import `geometry.*` after the move.
 - `pipeline/native_shape_source_replay.py` and top-level verifier scripts were changed only so active launch commands, candidate hash lists, and test discovery paths refer to the moved geometry modules.
+
+Final post-merge verification:
+
+- `git merge work/semantic-layout/integration` -> `Already up to date.`
+- `./bazelw test //autonomy/... --test_output=errors --cache_test_results=no` -> `Executed 148 out of 148 tests: 148 tests pass.`
+- `./bazelw test --config=cuda --test_tag_filters=requires_gpu //autonomy/... --test_output=errors --cache_test_results=no` -> `Executed 24 out of 24 tests: 24 tests pass.`
+- `./bazelw test //parallax/... --test_output=errors --cache_test_results=no` -> `Executed 17 out of 17 tests: 17 tests pass.`
+- `python3 -m unittest tests.test_publication_audit` -> `Ran 30 tests in 17.979s` and `OK`.
+- `python3 scripts/publication_audit.py --root .` -> `{"errors": [], "gitlinks": 2, "max_blob_bytes": 26214400, "schema_version": 1, "status": "pass", "tracked_files": 4983}`.
+- `python3 autonomy/tools/pins.py check --base work/semantic-layout/integration` -> exit 1 with the same retained-receipt pin report above: `FAIL: 28 changed file(s) pinned by retained receipts`.
+- `git diff --name-only work/semantic-layout/integration..HEAD -- 'autonomy/research/**' 'parallax/research/**' 'research/**'` -> no output.
