@@ -1,0 +1,147 @@
+#!/usr/bin/env python3
+"""Run repository Bazel inside the Waymo CPU Insula rootfs."""
+import argparse
+import json
+import os
+import sys
+from pathlib import Path
+
+
+REPO = Path(__file__).resolve().parent
+WAYMO = REPO / "experiments" / "waymo-perception"
+DEFAULT_ROOTFS = Path.home() / ".cache/waystone/waymo-perception/insula/rootfs-v3"
+DEFAULT_CACHE = REPO / ".bazel-cache"
+BAZEL_VERSION = "9.2.0"
+
+sys.path.insert(0, str(WAYMO))
+from pipeline.runtime_identity import rootfs_identity  # noqa: E402
+
+
+def default_lock(rootfs):
+    return Path(str(rootfs) + ".lock.json")
+
+
+def read_lock(path):
+    try:
+        lock = json.loads(path.read_text())
+    except FileNotFoundError as exc:
+        raise ValueError(f"rootfs lock not found: {path}") from exc
+    if lock.get("schema_version") != 1:
+        raise ValueError("invalid rootfs lock schema")
+    return lock
+
+
+def verify_rootfs(rootfs, lock):
+    if lock.get("bazel_version") != BAZEL_VERSION:
+        raise ValueError(
+            f"rootfs lock records Bazel {lock.get('bazel_version')!r}, expected {BAZEL_VERSION}"
+        )
+    expected = lock.get("rootfs_sha256")
+    if not expected:
+        raise ValueError("rootfs lock is missing rootfs_sha256")
+    actual = rootfs_identity(rootfs)
+    if actual != expected:
+        raise ValueError(
+            f"rootfs content does not match rootfs lock: expected {expected}, found {actual}"
+        )
+
+
+def bazel_command(arguments, update_lock=False):
+    if not arguments:
+        arguments = ["help"]
+    command, *rest = arguments
+    lockfile_mode = "update" if update_lock else "error"
+    return [
+        "bazel",
+        "--output_base=/outputs/output-base",
+        command,
+        "--ignore_dev_dependency",
+        f"--lockfile_mode={lockfile_mode}",
+        "--repository_cache=/outputs/repository-cache",
+        "--disk_cache=/outputs/disk-cache",
+        *rest,
+    ]
+
+
+def sandbox_plan(rootfs, cache, arguments, update_lock=False):
+    rootfs = rootfs.resolve()
+    cache = cache.resolve()
+    mounts = [
+        ["--ro-bind", str(rootfs), "/"],
+        ["--ro-bind", "/etc/resolv.conf", "/etc/resolv.conf"],
+        ["--ro-bind", str(REPO.resolve()), "/experiment"],
+        ["--bind", str(cache), "/outputs"],
+    ]
+    if update_lock:
+        mounts.append(["--bind", str((REPO / "MODULE.bazel.lock").resolve()), "/experiment/MODULE.bazel.lock"])
+    environment = [
+        ["--setenv", "HOME", "/outputs/home"],
+        ["--setenv", "USER", "sureal"],
+        ["--setenv", "LOGNAME", "sureal"],
+        ["--setenv", "PATH", "/usr/local/bin:/usr/bin:/bin"],
+        ["--setenv", "TMPDIR", "/tmp"],
+        ["--setenv", "PYTHONNOUSERSITE", "1"],
+        ["--setenv", "PYTHONDONTWRITEBYTECODE", "1"],
+    ]
+    argv = [
+        "bwrap",
+        "--unshare-user",
+        "--unshare-pid",
+        "--unshare-ipc",
+        "--unshare-uts",
+        "--die-with-parent",
+    ]
+    for mount in mounts:
+        argv.extend(mount)
+    argv.extend(["--proc", "/proc", "--dev", "/dev", "--tmpfs", "/tmp", "--clearenv"])
+    for item in environment:
+        argv.extend(item)
+    bazel = bazel_command(arguments, update_lock)
+    argv.extend(["--chdir", "/experiment", "--", *bazel])
+    return {
+        "argv": argv,
+        "bazel": bazel,
+        "environment": environment,
+        "mounts": mounts,
+        "update_lock": update_lock,
+    }
+
+
+def parse(argv):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--rootfs", type=Path, default=Path(os.environ.get("SUREAL_BAZEL_ROOTFS", DEFAULT_ROOTFS)))
+    parser.add_argument("--lock", type=Path, default=None)
+    parser.add_argument("--cache", type=Path, default=Path(os.environ.get("SUREAL_BAZEL_CACHE", DEFAULT_CACHE)))
+    parser.add_argument("--emit-plan", action="store_true")
+    parser.add_argument("--update-lock", action="store_true")
+    parser.add_argument("bazel_args", nargs=argparse.REMAINDER)
+    args = parser.parse_args(argv)
+    if args.bazel_args and args.bazel_args[0] == "--":
+        args.bazel_args = args.bazel_args[1:]
+    if args.lock is None:
+        args.lock = Path(os.environ.get("SUREAL_BAZEL_ROOTFS_LOCK", default_lock(args.rootfs)))
+    return args
+
+
+def main(argv=None):
+    args = parse(argv)
+    try:
+        lock = read_lock(args.lock)
+        verify_rootfs(args.rootfs, lock)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
+    plan = sandbox_plan(args.rootfs, args.cache, args.bazel_args, args.update_lock)
+    plan["rootfs"] = str(args.rootfs.resolve())
+    plan["lock"] = str(args.lock.resolve())
+    plan["cache"] = str(args.cache.resolve())
+    if args.emit_plan:
+        print(json.dumps(plan, sort_keys=True))
+        return 0
+    for name in ("home", "output-base", "repository-cache", "disk-cache"):
+        (args.cache / name).mkdir(parents=True, exist_ok=True)
+    os.execvp(plan["argv"][0], plan["argv"])
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,31 @@
+module(name = "sureal", version = "0.0.0")
+
+bazel_dep(name = "rules_python", version = "2.4.0")
+bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "rules_cc", version = "0.2.17")
+
+local_runtime_repo = use_repo_rule(
+    "@rules_python//python/local_toolchains:repos.bzl",
+    "local_runtime_repo",
+)
+
+local_runtime_toolchains_repo = use_repo_rule(
+    "@rules_python//python/local_toolchains:repos.bzl",
+    "local_runtime_toolchains_repo",
+)
+
+local_runtime_repo(
+    name = "rootfs_python3",
+    interpreter_path = "/usr/local/bin/python",
+    on_failure = "fail",
+)
+
+local_runtime_toolchains_repo(
+    name = "rootfs_python_toolchains",
+    runtimes = ["rootfs_python3"],
+)
+
+register_toolchains("@rootfs_python_toolchains//:all")
+register_toolchains(
+    "//experiments/waymo-perception:null_cc_toolchain_registration",
+)

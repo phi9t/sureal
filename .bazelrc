@@ -1,0 +1,10 @@
+# Server mode: batch works inside the Insula process namespace because no
+# Bazel server has to survive after bwrap exits.
+startup --batch
+
+# Spawn strategy: standalone is the available Bazel action/test context inside
+# the outer Insula sandbox in rootfs-v3; linux-sandbox is not registered there.
+build --spawn_strategy=standalone
+test --test_strategy=standalone
+
+common --experimental_convenience_symlinks=ignore
