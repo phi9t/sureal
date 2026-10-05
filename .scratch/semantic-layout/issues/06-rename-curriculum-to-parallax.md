@@ -11,3 +11,5 @@
 - [ ] The curriculum's Bazel tests pass at the new location and its runner lists and runs a smoke module
 - [ ] The publication audit and its unit test pass
 - [ ] Files under the curriculum's `research/` are byte-identical
+- [ ] The wrapper selects the curriculum rootfs for `//parallax/...` targets, and a target pattern that spans both components (for example `//...`) either runs each component in its own rootfs or is refused with a clear message; it must not silently run curriculum tests in the perception rootfs
+- [ ] The curriculum runner script's import bootstrap (added in ticket 05 for Bazel's safe-path mode) is simplified to setting the import path, with the Bazel tests still passing
