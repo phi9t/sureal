@@ -8,7 +8,10 @@ package(default_visibility = ["//visibility:private"])
 filegroup(name = "empty")
 
 PERCEPTION_TEST_MODULES = glob(
-    ["**/test_*.py"],
+    [
+        "**/test_*.py",
+        "**/*_test.py",
+    ],
     exclude = [
         "research/**",
     ],
