@@ -105,7 +105,7 @@ class ClassicalLabContractTest(unittest.TestCase):
             for module_id in (f"{index:02d}" for index in range(1, 8)):
                 completed = subprocess.run(
                     [str(ROOT / "run.sh"), "run", "--module", module_id, "--profile", "smoke", "--run-id", "classical"],
-                    cwd=ROOT.parent.parent,
+                    cwd=ROOT.parent,
                     env=env,
                     text=True,
                     capture_output=True,
@@ -114,7 +114,7 @@ class ClassicalLabContractTest(unittest.TestCase):
                 self.assertEqual(completed.returncode, 0, f"module {module_id}: {completed.stderr}")
                 validation = subprocess.run(
                     [str(ROOT / "run.sh"), "validate", "--module", module_id, "--run-id", "classical"],
-                    cwd=ROOT.parent.parent,
+                    cwd=ROOT.parent,
                     env=env,
                     text=True,
                     capture_output=True,

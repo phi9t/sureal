@@ -1188,8 +1188,8 @@ def _dynamic_scene_lab(artifacts: Path, profile: str, scene: dict[str, Any], pro
 
 
 def _surflo_lab(artifacts: Path, profile: str, scene: dict[str, Any], profile_config: dict[str, Any]) -> dict[str, Any]:
-    paired_path = ROOT.parent / "photoreal-scenes" / "results.json"
-    scout_path = ROOT.parent / "insula-scout" / "results.json"
+    paired_path = ROOT.parent / "experiments" / "photoreal-scenes" / "results.json"
+    scout_path = ROOT.parent / "experiments" / "insula-scout" / "results.json"
     paired_hash = sha256_file(paired_path)
     scout_hash = sha256_file(scout_path)
     endpoint = build_surflo_endpoint(

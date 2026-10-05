@@ -198,13 +198,13 @@ class BazelWrapperTests(unittest.TestCase):
             self.assertIn("rootfs content does not match rootfs lock", result.stderr)
             self.assertFalse(marker.exists())
 
-    def test_curriculum_targets_select_the_curriculum_rootfs(self):
+    def test_parallax_targets_select_the_curriculum_rootfs(self):
         with tempfile.TemporaryDirectory() as temporary:
             result, marker, _, waymo_rootfs, curriculum_rootfs, _ = self.run_wrapper_with_default_roots(
                 temporary,
                 "--emit-plan",
                 "test",
-                "//experiments/3d-pathway:test_classical",
+                "//parallax:test_classical",
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             plan = json.loads(result.stdout)
@@ -214,6 +214,8 @@ class BazelWrapperTests(unittest.TestCase):
                 ["--ro-bind", str(curriculum_rootfs.resolve()), "/"],
                 plan["mounts"],
             )
+            self.assertIn(["--ro-bind", str((REPO / "parallax").resolve()), "/experiment/parallax"], plan["mounts"])
+            self.assertFalse(has_mount_to(plan["mounts"], "/experiment/3d-pathway"), plan["mounts"])
             self.assertIn("--output_base=/outputs/output-base-3d-pathway", plan["bazel"])
             self.assertNotIn("--output_base=/outputs/output-base", plan["bazel"])
             self.assertFalse(marker.exists())
@@ -289,6 +291,20 @@ class BazelWrapperTests(unittest.TestCase):
                 plan["environment"],
             )
             self.assertIn(["--setenv", "CUDA_VISIBLE_DEVICES", "0"], plan["environment"])
+
+    def test_broad_target_pattern_is_rejected_before_selecting_one_rootfs(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            result, marker, _, _, _, _ = self.run_wrapper_with_default_roots(
+                temporary,
+                "--emit-plan",
+                "test",
+                "//...",
+            )
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(
+                "target pattern spans autonomy and parallax",
+                result.stderr,
+            )
             self.assertFalse(marker.exists())
 
 

@@ -28,7 +28,7 @@ than presenting the derivation day as a new experiment.
 | Layer | Main locations | Contribution |
 |---|---|---|
 | **Inherited reconstruction system** | [`surflo/`](../surflo/), [`configs/`](../configs/), [`training/`](../training/) | Surflo's image encoding, surface flow, rendering-guided reconstruction, extraction, evaluation, and training machinery. |
-| **Sureal experimental infrastructure** | [`experiments/insula-scout/`](../experiments/insula-scout/), [`experiments/photoreal-scenes/`](../experiments/photoreal-scenes/), [`experiments/3d-pathway/`](../experiments/3d-pathway/) | B200 execution records, controlled ambiguity experiments, numerical fixtures, maintained-system adapters, provenance, and validation. |
+| **Sureal experimental infrastructure** | [`experiments/insula-scout/`](../experiments/insula-scout/), [`experiments/photoreal-scenes/`](../experiments/photoreal-scenes/), [`parallax/`](../parallax/) | B200 execution records, controlled ambiguity experiments, numerical fixtures, maintained-system adapters, provenance, and validation. |
 | **Proposed learned research** | this document and [`MISSION.md`](../MISSION.md) | A progression toward sampled scene-level uncertainty, persistent queries, appearance generation, dynamics, and grounded language. |
 
 Sureal is a fork of [Surflo](https://github.com/Anttwo/Surflo). Surflo's model,

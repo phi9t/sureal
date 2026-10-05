@@ -773,7 +773,7 @@ def _verify_model_cache(pathway_cache_root: Path) -> dict[str, Any]:
         "depth-anything-3",
     }:
         raise ValueError("foundation model lock is malformed")
-    repository = ROOT.parent.parent
+    repository = ROOT.parent
     build_lock = lock["environment"].get("build_lock", {})
     build_lock_path = repository / str(build_lock.get("path", ""))
     if (
@@ -886,14 +886,14 @@ def _container_command(
     execution_inputs: dict[str, Any],
     gpu_device: str,
 ) -> list[str]:
-    repository = ROOT.parent.parent.resolve()
+    repository = ROOT.parent.resolve()
     cache_root = Path(
         os.environ.get(
             "SURFLO_INSULA_CACHE_ROOT",
             Path.home() / ".cache" / "surflo" / "insula-scout",
         )
     ).expanduser().resolve()
-    script = "/workspace/surflo/experiments/3d-pathway/insulas/surflo-foundation/run-foundation-models.py"
+    script = "/workspace/surflo/parallax/insulas/surflo-foundation/run-foundation-models.py"
     model_paths = execution_inputs["models"]
     source_paths = execution_inputs["sources"]
     command = [
@@ -942,7 +942,7 @@ def _container_command(
         "--input /input --output /output "
         "--vggt-source /opt/vggt "
         "--da3-source /workspace/surflo/submodules/Depth-Anything-3 "
-        "--model-lock /workspace/surflo/experiments/3d-pathway/foundation-models.lock.json "
+        "--model-lock /workspace/surflo/parallax/foundation-models.lock.json "
         "--environment-manifest /config/environment-manifest.json "
         f"--vggt-model {_container_path(model_paths['vggt'], cache_root)} "
         f"--da3-model {_container_path(model_paths['depth-anything-3'], cache_root)}",

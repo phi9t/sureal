@@ -158,6 +158,8 @@ class GpuRootfsBuildTests(unittest.TestCase):
             fakebin = root / "fakebin"
             fakebin.mkdir()
             write_fake_tools(fakebin)
+            tmpdir = root / "tmp"
+            tmpdir.mkdir()
 
             home = root / "home"
             previous = home / ".cache/waystone/waymo-perception/gpu-rootfs"
@@ -174,6 +176,7 @@ class GpuRootfsBuildTests(unittest.TestCase):
             env["HOME"] = str(home)
             env["PATH"] = f"{fakebin}{os.pathsep}{env['PATH']}"
             env["FAKE_DOCKER_LOG"] = str(root / "docker.log")
+            env["TMPDIR"] = str(tmpdir)
             env.pop("WAYMO_GPU_INSULA_ROOT", None)
             env.pop("WAYMO_GPU_INSULA_PREVIOUS_ROOT", None)
 
@@ -214,6 +217,8 @@ class GpuRootfsBuildTests(unittest.TestCase):
             fakebin = root / "fakebin"
             fakebin.mkdir()
             write_fake_tools(fakebin)
+            tmpdir = root / "tmp"
+            tmpdir.mkdir()
 
             previous = root / "gpu-rootfs"
             previous.mkdir()
@@ -228,6 +233,7 @@ class GpuRootfsBuildTests(unittest.TestCase):
             env["PATH"] = f"{fakebin}{os.pathsep}{env['PATH']}"
             env["FAKE_DOCKER_LOG"] = str(root / "docker.log")
             env["FAKE_NEW_PACKAGES"] = "numpy==2.5.4\ntorch==2.9.1+cu130\n"
+            env["TMPDIR"] = str(tmpdir)
             env["WAYMO_GPU_INSULA_PREVIOUS_ROOT"] = str(previous)
             env["WAYMO_GPU_INSULA_ROOT"] = str(destination)
 

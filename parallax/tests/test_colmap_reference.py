@@ -11,7 +11,7 @@ import unittest
 
 
 ROOT = Path(__file__).resolve().parents[1]
-REPO_ROOT = ROOT.parent.parent
+REPO_ROOT = ROOT.parent
 
 
 def fake_engine(path: Path) -> Path:
