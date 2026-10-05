@@ -5,7 +5,7 @@ PACKAGE=Path(__file__).resolve().parents[1];sys.path.insert(0,str(PACKAGE))
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
 from dataset.staged_source import staged_source
-from pipeline.training_box_replay import retained_raw_bytes
+from detection.training_box_replay import retained_raw_bytes
 from balanced import select_balanced,coverage_summary
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 parser=argparse.ArgumentParser();parser.add_argument('--transport',choices=['hdfs','gcs'],default='hdfs');args=parser.parse_args()

@@ -3,7 +3,7 @@ import hashlib,json
 from pathlib import Path
 import numpy as np
 import torch
-from pipeline.pillar_detector import PillarDetector
+from detection.pillar_detector import PillarDetector
 from gpu.norm_variants import configure_norm
 from gpu.architecture_variants import configure_architecture
 manifest=json.loads(Path('/tmp/inputs/manifest.json').read_text());torch.manual_seed(17);torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=False;torch.backends.cudnn.deterministic=True;torch.backends.cudnn.benchmark=False;torch.use_deterministic_algorithms(True)

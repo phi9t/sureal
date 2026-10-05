@@ -1,9 +1,9 @@
 """Native target assignment preparation; uncovered GT is reported, never hidden."""
 import math
 import numpy as np
-from pipeline.anchor_assignment import assign_overlaps
-from pipeline.detector_geometry import nearest_bev_iou
-from pipeline.box_coding import encode_boxes
+from detection.anchor_assignment import assign_overlaps
+from detection.detector_geometry import nearest_bev_iou
+from detection.box_coding import encode_boxes
 
 def build_targets(anchors,rows,*,scene,timestamp,roi,positive,negative):
  anchors=np.asarray(anchors,dtype=np.float64);roi=np.asarray(roi,dtype=np.float64)

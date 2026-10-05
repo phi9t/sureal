@@ -1,7 +1,7 @@
 import math
 import unittest
 import torch
-from pipeline.detector_loss import detector_loss
+from detection.detector_loss import detector_loss
 
 
 class DetectorLossTests(unittest.TestCase):

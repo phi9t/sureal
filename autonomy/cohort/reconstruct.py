@@ -6,7 +6,7 @@ from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
 from dataset.source_integrity import verify_source
 from insula.staging_lease import staging_lease
-from pipeline.training_box_replay import retained_raw_bytes
+from detection.training_box_replay import retained_raw_bytes
 from dataset.scientific_admission import check_raw_capacity
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);candidate_path=PACKAGE/'research/balanced16-selection.candidate.json';candidate=json.loads(candidate_path.read_text());candidate_sha=sha(candidate_path);worker=PACKAGE/'cohort/raw_reconstruct.py';digest=sha(worker);destination=cache/'scientific-processing/balanced16-physical-v2';destination.mkdir();retained=retained_raw_bytes(cache,PACKAGE);complete=[]

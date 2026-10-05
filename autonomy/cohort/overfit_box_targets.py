@@ -1,5 +1,5 @@
 """Training-only target extraction; absence is never inferred to be annotated empty."""
-from pipeline.training_box_sources import _native_record
+from detection.training_box_sources import _native_record
 P='[LiDARBoxComponent].'
 def select_targets(rows,*,scene,timestamps,expected_rows):
  if type(expected_rows) is not int or expected_rows<0 or not timestamps or len(set(timestamps))!=len(timestamps) or any(type(t) is not int or t<0 for t in timestamps):raise ValueError('explicit unique frame selection required')

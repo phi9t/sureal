@@ -15,6 +15,7 @@ filegroup(
     name = "sustained-run-sources",
     srcs = glob(SUSTAINED_RUN_SOURCE_GLOBS, exclude = ["**/__pycache__/**"]) + [
         "//autonomy/dataset:all_py",
+        "//autonomy/detection:all_py",
         "//autonomy/evidence:all_py",
         "//autonomy/geometry:all_py",
         "//autonomy/insula:all_py",
@@ -59,6 +60,7 @@ PERCEPTION_TEST_MODULES = glob(
     ],
     exclude = [
         "dataset/**",
+        "detection/**",
         "research/**",
         "source_snapshot_targets_test.py",
     ],
@@ -68,6 +70,7 @@ PERCEPTION_RUNFILES = glob(
     ["**"],
     exclude = [
         "dataset/**",
+        "detection/**",
         "research/**",
         "**/__pycache__/**",
     ],
@@ -78,6 +81,7 @@ PERCEPTION_RUNFILES = glob(
 
 PERCEPTION_DEPS = [
     "//autonomy/dataset:dataset",
+    "//autonomy/detection:detection",
     "//autonomy/evidence:evidence",
     "//autonomy/geometry:geometry",
     "//autonomy/insula:insula",
@@ -107,6 +111,7 @@ filegroup(
         "architecture/harness/files.json",
         "architecture/registry.json",
         "//autonomy/dataset:all_py",
+        "//autonomy/detection:all_py",
         "//autonomy/evidence:source_snapshot_py",
         "//autonomy/geometry:all_py",
         "//autonomy/insula:all_py",
@@ -184,6 +189,7 @@ test_suite(
         + [":" + perception_test_name(src) for src in PERCEPTION_TEST_MODULES]
         + [
             "//autonomy/dataset:all_tests",
+            "//autonomy/detection:all_tests",
             "//autonomy/evidence:all_tests",
             "//autonomy/geometry:all_tests",
             "//autonomy/insula:all_tests",

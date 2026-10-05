@@ -1,5 +1,5 @@
 import unittest,torch,numpy as np
-from pipeline.pillar_encoder import PillarFeatureNet,decorate
+from detection.pillar_encoder import PillarFeatureNet,decorate
 from advanced.point_modules import RaggedPillar,PointAttention,PointMLP,decorate_ragged
 
 class PointContract(unittest.TestCase):

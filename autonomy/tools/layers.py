@@ -19,6 +19,7 @@ LAYERS = (
     ('insula',),
     ('dataset',),
     ('geometry',),
+    ('detection',),
     ('pipeline',),
     ('gpu', 'evaluation', 'tracking', 'association', 'explorer', 'motion-evaluation', 'viewer'),
     ('architecture',),

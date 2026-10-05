@@ -5,7 +5,6 @@ at a time. This worker owns full metadata admission, row consumption and aggrega
 publication. It never acquires data, selects a smaller cohort or adopts anchors.
 """
 import argparse
-import hashlib
 import importlib.util
 import json
 import os
@@ -17,6 +16,7 @@ import tempfile
 import time
 
 from dataset.scientific_admission import admit_scene
+from evidence.source_snapshot import file_sha256, require_regular_file
 from .training_box_wire import stream_training_box_sources
 
 
@@ -26,11 +26,11 @@ _JSON_BYTES = 32 * 1024**2
 def _pinned_json(path, expected):
     path = Path(path)
     if (not isinstance(expected, str) or not re.fullmatch('[0-9a-f]{64}', expected)
-            or path.is_symlink() or not path.is_file() or path.stat().st_size > _JSON_BYTES):
+            or require_regular_file(path).stat().st_size > _JSON_BYTES):
         raise ValueError('bounded regular hash-pinned metadata required')
     with path.open('rb') as file:
         content = file.read(_JSON_BYTES + 1)
-    if len(content) > _JSON_BYTES or hashlib.sha256(content).hexdigest() != expected:
+    if len(content) > _JSON_BYTES or file_sha256(path) != expected:
         raise ValueError('metadata identity differs')
     value = json.loads(content)
     if not isinstance(value, dict):

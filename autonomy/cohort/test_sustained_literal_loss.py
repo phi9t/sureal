@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import torch
-from pipeline.detector_loss import detector_loss
+from detection.detector_loss import detector_loss
 from cohort.sustained_loss import class_balanced_objective
 from cohort.sustained_literal_loss import literal_losses,compare_losses
 

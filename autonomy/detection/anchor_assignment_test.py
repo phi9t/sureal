@@ -1,7 +1,7 @@
 """Hand-specified target assignment thresholds, ties and missing targets."""
 import unittest
 import numpy as np
-from pipeline.anchor_assignment import assign_overlaps
+from detection.anchor_assignment import assign_overlaps
 
 
 class AnchorAssignmentTests(unittest.TestCase):

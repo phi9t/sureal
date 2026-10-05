@@ -6,7 +6,7 @@ import time
 from pathlib import Path
 import numpy as np
 import torch
-from pipeline.pillar_encoder import PillarFeatureNet, decorate, scatter
+from detection.pillar_encoder import PillarFeatureNet, decorate, scatter
 
 
 def main():

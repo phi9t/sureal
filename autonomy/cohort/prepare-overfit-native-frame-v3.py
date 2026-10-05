@@ -3,8 +3,8 @@ import hashlib,json,sys,time,resource,importlib.util
 from pathlib import Path
 import numpy as np
 sys.path.insert(0,'/tmp/workers')
-from pipeline.pillar_packing import pack_points
-from pipeline.anchor_grid import anchor_grid
+from detection.pillar_packing import pack_points
+from detection.anchor_grid import anchor_grid
 from overfit_detection_targets_v2 import build_targets
 assert importlib.util.find_spec('tensorflow') is None
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()

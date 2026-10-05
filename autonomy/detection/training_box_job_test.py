@@ -12,7 +12,7 @@ import unittest
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from pipeline.training_box_job import run_training_box_job
+from detection.training_box_job import run_training_box_job
 
 
 COMPONENTS = ['camera_box', 'camera_calibration', 'camera_hkp', 'camera_image', 'camera_segmentation',
@@ -195,7 +195,7 @@ class NativeBoxJobTests(unittest.TestCase):
     def test_cli_roles_run_in_separate_processes_without_reference_loading_producer(self):
         arguments = ['--job', str(self.job_path), '--expected-job-sha256', self.sha(self.job_path),
                      '--mode', 'producer', '--output', str(self.output)]
-        producer = subprocess.run([sys.executable, '-m', 'pipeline.training_box_job', *arguments],
+        producer = subprocess.run([sys.executable, '-m', 'detection.training_box_job', *arguments],
                                   input=self.packet(), capture_output=True)
         self.assertEqual(producer.returncode, 0, producer.stderr.decode())
         self.assertEqual(len(producer.stdout.splitlines()), 64)
@@ -206,10 +206,10 @@ class NativeBoxJobTests(unittest.TestCase):
         reference_output = self.root / 'reference-cli.json'
         arguments = ['--job', str(self.job_path), '--expected-job-sha256', self.sha(self.job_path),
                      '--mode', 'reference', '--output', str(reference_output)]
-        script = ("import runpy,sys; sys.argv=['pipeline.training_box_job',*sys.argv[1:]]; "
-                  "runpy.run_module('pipeline.training_box_job',run_name='__main__'); "
-                  "assert 'pipeline.training_box_sources' not in sys.modules; "
-                  "assert 'pipeline.training_box_statistics' not in sys.modules")
+        script = ("import runpy,sys; sys.argv=['detection.training_box_job',*sys.argv[1:]]; "
+                  "runpy.run_module('detection.training_box_job',run_name='__main__'); "
+                  "assert 'detection.training_box_sources' not in sys.modules; "
+                  "assert 'detection.training_box_statistics' not in sys.modules")
         reference = subprocess.run([sys.executable, '-c', script, *arguments],
                                    input=self.packet(), capture_output=True)
         self.assertEqual(reference.returncode, 0, reference.stderr.decode())
@@ -241,7 +241,7 @@ class NativeBoxJobTests(unittest.TestCase):
 
     def test_full_job_sender_handshake_reopens_all64_sources_per_role(self):
         from contextlib import contextmanager
-        from pipeline.training_box_sender import send_training_box_sources
+        from detection.training_box_sender import send_training_box_sources
         release_log=[]
         payload_by_scene=dict(zip(self.train,self.payloads))
         for role in ['producer','reference']:
@@ -255,13 +255,13 @@ class NativeBoxJobTests(unittest.TestCase):
                 release_log.append(('enter',role,source['scene']))
                 try:yield io.BytesIO(payload_by_scene[source['scene']])
                 finally:release_log.append(('release',role,source['scene']))
-            script=("import runpy,sys;sys.argv=['pipeline.training_box_job',*sys.argv[1:]];"
-                    "runpy.run_module('pipeline.training_box_job',run_name='__main__');"
-                    + ("assert 'pipeline.training_box_sources' not in sys.modules;"
-                       "assert 'pipeline.training_box_statistics' not in sys.modules" if role=='reference' else ""))
+            script=("import runpy,sys;sys.argv=['detection.training_box_job',*sys.argv[1:]];"
+                    "runpy.run_module('detection.training_box_job',run_name='__main__');"
+                    + ("assert 'detection.training_box_sources' not in sys.modules;"
+                       "assert 'detection.training_box_statistics' not in sys.modules" if role=='reference' else ""))
             command=[sys.executable,'-c',script,'--job',str(self.job_path),
                      '--expected-job-sha256',self.sha(self.job_path),'--mode',role,'--output',str(output)]
-            from pipeline.training_box_process import run_source_worker
+            from detection.training_box_process import run_source_worker
             result=run_source_worker(command,self.headers,stage=stage,
                                      stderr_path=self.root/(role+'-stderr.log'),
                                      ack_timeout_seconds=10,write_timeout_seconds=10,

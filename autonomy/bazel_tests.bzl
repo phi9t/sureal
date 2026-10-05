@@ -27,10 +27,6 @@ TORCH_MODULES = [
     "cohort/test_sustained_worker_guard.py",
     "continuation/test_compare_state.py",
     "tests/test_camera_interpolation_parity.py",
-    "tests/test_detector_loss.py",
-    "tests/test_packed_point_features.py",
-    "tests/test_pillar_detector.py",
-    "tests/test_pillar_encoder.py",
     "tests/test_point_semantic_encoder.py",
     "tests/test_range_frontend.py",
     "tests/test_range_pillar_hybrid.py",
@@ -60,8 +56,6 @@ KNOWN_FAILURE_MODULES = [
 ]
 
 def perception_test_name(src):
-    if src == "tests/test_anchor_grid.py":
-        return "anchor_grid_test"
     if src == "tools/test_suites.py":
         return "tools_test_suites"
     return src[:-3].replace("/", "__").replace("-", "_")

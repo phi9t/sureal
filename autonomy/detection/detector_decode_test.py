@@ -1,7 +1,7 @@
 import math
 import unittest
 import numpy as np
-from pipeline.detector_decode import decode_proposals
+from detection.detector_decode import decode_proposals
 
 
 class DetectorDecodeTests(unittest.TestCase):

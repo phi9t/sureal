@@ -3,7 +3,7 @@ from advanced.catalog import catalog
 from advanced.models import build,bind_observations
 from tier1.models import build as baseline_build
 from tier1.catalog import BASE
-from pipeline.pillar_encoder import decorate
+from detection.pillar_encoder import decorate
 
 class FactoryContract(unittest.TestCase):
  def setUp(self):torch.manual_seed(17);torch.set_num_threads(2)

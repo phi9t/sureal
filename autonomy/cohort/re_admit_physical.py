@@ -6,7 +6,7 @@ from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
 from dataset.source_integrity import verify_source
 from insula.staging_lease import staging_lease
-from pipeline.training_box_replay import retained_raw_bytes
+from detection.training_box_replay import retained_raw_bytes
 from dataset.scientific_admission import check_raw_capacity
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);progress=json.loads((PACKAGE/'research/balanced16-physical-progress.json').read_text());assert progress['admitted_scenes']==13

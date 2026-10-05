@@ -1,7 +1,7 @@
 """Versioned score-first diagnostic decoder; baseline decoder preserved."""
 import numpy as np
-from pipeline.box_coding import decode_boxes,direction_correct
-from pipeline.detector_geometry import enclosing_bev_nms
+from detection.box_coding import decode_boxes,direction_correct
+from detection.detector_geometry import enclosing_bev_nms
 
 def decode_scored_proposals(logits,residuals,direction_logits,anchors,*,iou_threshold,score_floor,pre_limit,post_limit):
     logits=np.asarray(logits,dtype=np.float64);residuals=np.asarray(residuals,dtype=np.float64);direction_logits=np.asarray(direction_logits,dtype=np.float64);anchors=np.asarray(anchors,dtype=np.float64)

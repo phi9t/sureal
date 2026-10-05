@@ -6,7 +6,7 @@ without renormalizing by the number of present classes. Negative focal, box and
 direction equations are unchanged. No observation or target is removed.
 """
 import torch
-from pipeline.detector_loss import detector_loss
+from detection.detector_loss import detector_loss
 
 def class_balanced_objective(output,targets):
  logits=output['classification']

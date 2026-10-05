@@ -1,8 +1,23 @@
 """Prediction evaluation metadata from measured points; no GT annotation fields."""
 import math
 import numpy as np
-from pipeline.nlz_overlap import overlaps_nlz
-from pipeline.detection_export import validate_object
+from detection.detection_export import validate_object
+
+
+def _overlaps_nlz(box,sensor_returns):
+    box=np.asarray(box,dtype=np.float64)
+    if box.shape!=(7,) or not np.isfinite(box).all() or np.any(box[3:6]<=0):raise ValueError('upright box contract')
+    required={(laser,ret) for laser in range(1,6) for ret in [1,2]}
+    if set(sensor_returns)!=required:raise ValueError('all sensor returns required for NLZ evaluation')
+    c,s=math.cos(box[6]),math.sin(box[6]);hit=False
+    for points,flags in sensor_returns.values():
+        points=np.asarray(points);flags=np.asarray(flags)
+        if points.ndim!=2 or points.shape[1]!=3 or flags.shape!=(len(points),):raise ValueError('aligned point/flag contract')
+        if not np.isfinite(points).all() or not np.all(np.isin(flags,[-1,1])):raise ValueError('unknown measurement or NLZ flag')
+        selected=points[flags==1]-box[:3]
+        x=c*selected[:,0]+s*selected[:,1];y=-s*selected[:,0]+c*selected[:,1]
+        hit |= bool(np.any((np.abs(x)<=box[3]/2)&(np.abs(y)<=box[4]/2)&(np.abs(selected[:,2])<=box[5]/2)))
+    return hit
 
 
 def prediction_records(proposals,*,context,timestamp,sensor_returns):
@@ -14,10 +29,10 @@ def prediction_records(proposals,*,context,timestamp,sensor_returns):
     if boxes.shape!=(n,7) or classes.shape!=(n,) or scores.shape!=(n,) or indices.shape!=(n,) or classes.dtype.kind not in 'iu' or indices.dtype.kind not in 'iu' or np.any(indices<0) or len(np.unique(indices))!=n:
         raise ValueError('paired native proposals and unique anchor indices required')
     # Validate measurement completeness even for an empty prediction catalog.
-    overlaps_nlz([0.,0.,0.,1.,1.,1.,0.],sensor_returns)
+    _overlaps_nlz([0.,0.,0.,1.,1.,1.,0.],sensor_returns)
     records=[]
     for box,category,score,index in zip(boxes,classes,scores,indices):
-        flag=overlaps_nlz(box,sensor_returns)
+        flag=_overlaps_nlz(box,sensor_returns)
         c,s=math.cos(box[6]),math.sin(box[6]);count=0
         for points,_ in sensor_returns.values():
             delta=np.asarray(points)-box[:3]

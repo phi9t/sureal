@@ -1,7 +1,7 @@
 """Single pure factory used by native training, contracts and exact replay."""
 import torch
 from torch import nn
-from pipeline.pillar_encoder import decorate,scatter
+from detection.pillar_encoder import decorate,scatter
 from tier1.models import build as build_reference,objective,optimizer,deterministic
 from advanced.point_modules import RaggedPillar,PointAttention,PointMLP,decorate_ragged
 from advanced.range_fusion import RangePillar

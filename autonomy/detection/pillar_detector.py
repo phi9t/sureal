@@ -5,7 +5,7 @@ No labels, ground-truth IDs, NLZ indicators or box metadata are model inputs.
 """
 import torch
 from torch import nn
-from pipeline.pillar_encoder import PillarFeatureNet,decorate,scatter
+from detection.pillar_encoder import PillarFeatureNet,decorate,scatter
 
 
 def norm(channels):

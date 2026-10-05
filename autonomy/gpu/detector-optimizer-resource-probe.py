@@ -2,8 +2,8 @@
 import importlib.util,json,time,resource
 from pathlib import Path
 import torch
-from pipeline.pillar_detector import PillarDetector
-from pipeline.detector_loss import detector_loss
+from detection.pillar_detector import PillarDetector
+from detection.detector_loss import detector_loss
 assert importlib.util.find_spec('tensorflow') is None
 assert torch.cuda.is_available() and torch.cuda.device_count()==1
 torch.manual_seed(17);torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=False

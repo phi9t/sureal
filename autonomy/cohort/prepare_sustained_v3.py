@@ -5,9 +5,9 @@ import numpy as np
 from cohort.balanced import uncovered_count
 from cohort.sustained_groundtruth import groundtruth_records
 from cohort.sustained_contract import validate_contract
-from pipeline.anchor_grid import anchor_grid
+from detection.anchor_grid import anchor_grid
 from gpu.scored_proposals_v3 import decode_scored_proposals as decode_proposals
-from pipeline.prediction_records import prediction_records
+from detection.prediction_records import prediction_records
 assert importlib.util.find_spec('tensorflow') is None
 start=time.monotonic();manifest=json.loads(Path('/tmp/inputs/manifest.json').read_text())
 audit=json.loads(Path('/tmp/inputs/export-audit.json').read_text());manifest_path=Path('/tmp/inputs/manifest.json');anchor_path=Path('/tmp/inputs/anchor-templates.json')

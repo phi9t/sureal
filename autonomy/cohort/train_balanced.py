@@ -3,8 +3,8 @@ import hashlib,importlib.util,json,resource,time
 from pathlib import Path
 import numpy as np
 import torch
-from pipeline.pillar_detector import PillarDetector
-from pipeline.detector_loss import detector_loss
+from detection.pillar_detector import PillarDetector
+from detection.detector_loss import detector_loss
 from gpu.norm_variants import configure_norm
 from gpu.architecture_variants import configure_architecture
 assert importlib.util.find_spec('tensorflow') is None

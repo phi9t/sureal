@@ -2,7 +2,7 @@
 import math
 import unittest
 import numpy as np
-from pipeline.detector_geometry import nearest_bev_iou
+from detection.detector_geometry import nearest_bev_iou
 
 
 class DetectorGeometryTests(unittest.TestCase):
@@ -13,7 +13,7 @@ class DetectorGeometryTests(unittest.TestCase):
         self.assertEqual(nearest_bev_iou(first,np.empty((0,7))).shape,(1,0))
 
     def test_enclosing_suppression_and_original_index_ties(self):
-        from pipeline.detector_geometry import enclosing_bev_nms
+        from detection.detector_geometry import enclosing_bev_nms
         boxes=np.array([[0.,0.,0.,4.,2.,2.,math.pi/4],
                         [0.,0.,0.,4.,2.,2.,-math.pi/4],
                         [20.,0.,0.,4.,2.,2.,0.]])
@@ -21,7 +21,7 @@ class DetectorGeometryTests(unittest.TestCase):
         np.testing.assert_array_equal(kept,[0,2])
 
     def test_suppression_caps_floor_empty_and_invalid_input(self):
-        from pipeline.detector_geometry import enclosing_bev_nms
+        from detection.detector_geometry import enclosing_bev_nms
         boxes=np.array([[0.,0.,0.,2.,2.,2.,0.],[10.,0.,0.,2.,2.,2.,0.],[20.,0.,0.,2.,2.,2.,0.]])
         params=dict(iou_threshold=.5,score_floor=.05,pre_limit=2,post_limit=1)
         np.testing.assert_array_equal(enclosing_bev_nms(boxes,np.array([.04,.8,.9]),**params),[2])

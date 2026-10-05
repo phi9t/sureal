@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from pipeline.prediction_records import prediction_records
+from detection.prediction_records import prediction_records
 
 
 class PredictionRecordTests(unittest.TestCase):

@@ -2,7 +2,7 @@
 import math
 import torch
 from torch import nn
-from pipeline.pillar_encoder import scatter
+from detection.pillar_encoder import scatter
 from advanced.sparse_sets import window_sets,pool_tokens
 
 class SparseBlock(nn.Module):

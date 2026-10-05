@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from pipeline.training_box_sources import training_box_statistics_from_sources
+from detection.training_box_sources import training_box_statistics_from_sources
 
 
 def row(scene='a', timestamp=1, category=1, box=(0., 0., 10., 4., 2., 1., 0.)):

@@ -1,7 +1,7 @@
 """Versioned score-first decoder with periodic heading correction; legacy v2 preserved."""
 import numpy as np
-from pipeline.box_coding import decode_boxes
-from pipeline.detector_geometry import enclosing_bev_nms
+from detection.box_coding import decode_boxes
+from detection.detector_geometry import enclosing_bev_nms
 
 def canonical_direction_correct(yaw,bins):
     yaw=np.asarray(yaw,dtype=np.float64);bins=np.asarray(bins)

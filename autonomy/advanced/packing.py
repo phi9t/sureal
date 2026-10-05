@@ -1,6 +1,6 @@
 """Case-specific physical-only grouping and native range observation identities."""
 import numpy as np
-from pipeline.pillar_packing import pack_points
+from detection.pillar_packing import pack_points
 
 ROI=(-64.,-64.,-4.,64.,64.,6.)
 

@@ -1,7 +1,6 @@
 """Production full64 replay. Queue exclusion precedes all acquisition."""
 import argparse
 from contextlib import contextmanager
-import hashlib
 import json
 from pathlib import Path
 import shutil
@@ -11,12 +10,12 @@ import sys
 from insula.runtime_identity import verify_rootfs
 from insula.staging_lease import staging_lease
 from dataset.staged_source import staged_source, WAYSTONE
+from evidence.source_snapshot import file_sha256, require_regular_file
 from .training_box_process import run_source_worker
 
 
 def sha(path):
-    with Path(path).open('rb') as file:
-        return hashlib.file_digest(file, 'sha256').hexdigest()
+    return file_sha256(path)
 
 
 def save(path, value):
@@ -28,13 +27,14 @@ def retained_raw_bytes(cache, code_root):
     dataset = json.loads((Path(code_root) / 'dataset/dataset.lock.json').read_text())
     for source in dataset['objects']:
         path = slice_root / source['relative_path']
-        if path.is_symlink() or not path.is_file() or path.stat().st_size != source['size_bytes']:
+        if require_regular_file(path).stat().st_size != source['size_bytes']:
             raise ValueError('retained engineering raw source size differs')
     total = 0
     for path in (slice_root / 'raw').rglob('*'):
         if path.is_symlink():
             raise ValueError('unaccountable retained raw symlink')
         if path.is_file():
+            require_regular_file(path)
             total += path.stat().st_size
     return total
 
@@ -77,7 +77,7 @@ def replay(*, cache, output, code_root, expected_candidate_sha256):
         output.mkdir(parents=True, exist_ok=False)
         inputs = output / 'inputs'; inputs.mkdir()
         code_hashes = {str(p.relative_to(code_root)): sha(p)
-                       for p in (code_root / 'pipeline').glob('*.py')}
+                       for p in (code_root / 'detection').glob('*.py')}
         phases = []
         for role in ('producer', 'reference'):
             phase = output / role; phase.mkdir()
@@ -100,11 +100,11 @@ def replay(*, cache, output, code_root, expected_candidate_sha256):
                     '--ro-bind', str(inputs), '/tmp/replay-inputs', '--clearenv',
                     '--setenv', 'HOME', '/tmp/private-home', '--setenv', 'PATH', '/usr/local/bin:/usr/bin:/bin',
                     '--setenv', 'PYTHONNOUSERSITE', '1', '--setenv', 'PYTHONDONTWRITEBYTECODE', '1',
-                    '--setenv', 'PYTHONPATH', '/experiment', '--chdir', '/experiment', '--']
+                    '--chdir', '/experiment', '--']
             # Fresh metadata admission occurs inside each worker before source consumption.
-            command = [sys.executable, str(code_root / 'pipeline/training_box_resources.py'),
+            command = [sys.executable, str(code_root / 'detection/training_box_resources.py'),
                        str(phase / 'resources.json'), *base, 'python', '-m',
-                       'pipeline.training_box_job', '--job', worker_job,
+                       'detection.training_box_job', '--job', worker_job,
                        '--expected-job-sha256', worker_job_sha, '--mode', role,
                        '--output', '/outputs/report.json']
             transfers = []
@@ -140,7 +140,7 @@ def replay(*, cache, output, code_root, expected_candidate_sha256):
         if sha(candidate_path) != expected_candidate_sha256:
             raise ValueError('execution candidate changed during replay')
         if code_hashes != {str(p.relative_to(code_root)): sha(p)
-                           for p in (code_root / 'pipeline').glob('*.py')}:
+                           for p in (code_root / 'detection').glob('*.py')}:
             raise ValueError('worker code changed during replay')
         save(output / 'receipt.json', dict(status='both full64 payload passes completed; independent receipt audit required',
                                           runtime_lock=lock, job_sha256=candidate['job_sha256'],

@@ -1,5 +1,5 @@
 import unittest,torch
-from pipeline.packed_point_features import packed_point_features
+from detection.packed_point_features import packed_point_features
 class PackedFeaturesTests(unittest.TestCase):
  def test_source_order_padding_and_gradients(self):
   features=torch.arange(15,dtype=torch.float32).reshape(5,3).requires_grad_();indices=torch.tensor([[4,0,-1],[3,2,-1]]);counts=torch.tensor([2,2]);packed=packed_point_features(features,indices,counts)

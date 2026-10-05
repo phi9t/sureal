@@ -1,12 +1,13 @@
 """Independent retained-evidence audit; never invokes a distribution producer."""
-import hashlib
 import json
 import math
 from pathlib import Path
 
+from evidence.source_snapshot import file_sha256
+
 
 def _sha(path):
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    return file_sha256(path)
 
 
 def verify_replay_receipt(root, *, expected_receipt_sha256, expected_job,

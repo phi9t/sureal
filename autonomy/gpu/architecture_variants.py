@@ -1,7 +1,7 @@
 """Isolated architecture candidates; the reference modules remain unmodified."""
 import torch
 from torch import nn
-from pipeline.pillar_encoder import decorate,scatter
+from detection.pillar_encoder import decorate,scatter
 from gpu.norm_variants import PointChannelLayerNorm
 
 class DeepPillar(nn.Module):

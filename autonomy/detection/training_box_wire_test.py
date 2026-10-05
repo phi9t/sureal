@@ -8,7 +8,7 @@ import unittest
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from pipeline.training_box_wire import stream_training_box_sources
+from detection.training_box_wire import stream_training_box_sources
 
 
 class ShortReads(io.BytesIO):
@@ -139,8 +139,8 @@ class NativeBoxWireTests(unittest.TestCase):
                 self.consume(self.packet(inventory, payloads), bad_inventory)
 
     def test_producer_and_reference_consume_separate_verified_wire_passes(self):
-        from pipeline.training_box_sources import training_box_statistics_from_sources
-        from pipeline.training_box_reference import verify_training_box_distributions
+        from detection.training_box_sources import training_box_statistics_from_sources
+        from detection.training_box_reference import verify_training_box_distributions
         inventory, payloads = self.fixture()
         packet = self.packet(inventory, payloads)
         membership = {s: {'official_split': 'training', 'research_splits': ['train']} for s in ['a', 'b']}

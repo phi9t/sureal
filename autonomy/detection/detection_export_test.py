@@ -1,5 +1,5 @@
 import copy,unittest
-from pipeline.detection_export import validate_object
+from detection.detection_export import validate_object
 
 VALID={'context_name':'scene','frame_timestamp_micros':10,'object_id':'object','type':1,'box':[1.,2.,3.,4.,2.,1.,0.],'score':0.8,'overlap_with_nlz':False,'num_lidar_points_in_box':20,'difficulty':None}
 
