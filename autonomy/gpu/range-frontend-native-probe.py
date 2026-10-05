@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import torch
 from torch.nn import functional as F
-from pipeline.native_range_grid import native_range_grid
+from geometry.native_range_grid import native_range_grid
 from pipeline.range_frontend import RangeFrontend
 assert importlib.util.find_spec('tensorflow') is None
 assert torch.cuda.device_count()==1

@@ -15,6 +15,7 @@ filegroup(
     name = "sustained-run-sources",
     srcs = glob(SUSTAINED_RUN_SOURCE_GLOBS, exclude = ["**/__pycache__/**"]) + [
         "//autonomy/evidence:all_py",
+        "//autonomy/geometry:all_py",
         "//autonomy/insula:all_py",
     ],
     visibility = ["//visibility:public"],
@@ -73,6 +74,7 @@ PERCEPTION_RUNFILES = glob(
 
 PERCEPTION_DEPS = [
     "//autonomy/evidence:evidence",
+    "//autonomy/geometry:geometry",
     "//autonomy/insula:insula",
 ]
 
@@ -94,6 +96,7 @@ filegroup(
         "architecture/harness/files.json",
         "architecture/registry.json",
         "//autonomy/evidence:source_snapshot_py",
+        "//autonomy/geometry:all_py",
         "//autonomy/insula:all_py",
     ] + glob([
         "architecture/harness/*.py",
@@ -162,6 +165,10 @@ test_suite(
     name = "perception_unit_tests",
     tests = [":source_snapshot_targets_test"]
         + [":" + perception_test_name(src) for src in PERCEPTION_TEST_MODULES]
-        + ["//autonomy/evidence:all_tests", "//autonomy/insula:all_tests"],
+        + [
+            "//autonomy/evidence:all_tests",
+            "//autonomy/geometry:all_tests",
+            "//autonomy/insula:all_tests",
+        ],
     visibility = ["//visibility:public"],
 )

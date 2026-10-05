@@ -1,12 +1,12 @@
 import copy,tempfile,unittest
 from pathlib import Path
-from test_native_range_shape_file import FileTests
-from pipeline.native_range_shape_file import read_native_range_shapes
-from pipeline.native_range_shape_reference import verify_native_range_shapes
+from geometry.native_range_shape_test_fixtures import native_range_shape_fixture
+from geometry.native_range_shape_file import read_native_range_shapes
+from geometry.native_range_shape_reference import verify_native_range_shapes
 class ReferenceTests(unittest.TestCase):
  def test_complete_native_report_and_rehashed_mutations(self):
   with tempfile.TemporaryDirectory() as tmp:
-   p=Path(tmp)/'source.parquet';source,inventory=FileTests().fixture(p);report=read_native_range_shapes(p,scene='scene',source=source,inventory=inventory)['shapes']
+   p=Path(tmp)/'source.parquet';source,inventory=native_range_shape_fixture(p);report=read_native_range_shapes(p,scene='scene',source=source,inventory=inventory)['shapes']
    result=verify_native_range_shapes(p,report,scene='scene',source=source,inventory=inventory);self.assertEqual(result['records_verified'],2)
    mutations=[('shape',None),('dimension',None),('return',None),('drop',None),('counts',None),('keyhash',None)]
    for name,_ in mutations:
@@ -20,6 +20,6 @@ class ReferenceTests(unittest.TestCase):
     with self.subTest(name=name),self.assertRaises(ValueError):verify_native_range_shapes(p,bad,scene='scene',source=source,inventory=inventory)
  def test_changed_source_refused(self):
   with tempfile.TemporaryDirectory() as tmp:
-   p=Path(tmp)/'source.parquet';source,inventory=FileTests().fixture(p);report=read_native_range_shapes(p,scene='scene',source=source,inventory=inventory)['shapes'];p.write_bytes(b'changed')
+   p=Path(tmp)/'source.parquet';source,inventory=native_range_shape_fixture(p);report=read_native_range_shapes(p,scene='scene',source=source,inventory=inventory)['shapes'];p.write_bytes(b'changed')
    with self.assertRaises(ValueError):verify_native_range_shapes(p,report,scene='scene',source=source,inventory=inventory)
 if __name__=='__main__':unittest.main()

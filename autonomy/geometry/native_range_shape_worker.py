@@ -1,12 +1,12 @@
 """Isolated byte-pinned native shape consumer and independent source reread."""
 import argparse
-import hashlib
 import importlib.util
 import json
 import os
 from pathlib import Path
 import resource
 import time
+from evidence.source_snapshot import file_sha256, require_regular_file
 from .native_range_shape_file import read_native_range_shapes
 from .native_range_shape_reference import verify_native_range_shapes
 
@@ -14,10 +14,14 @@ from .native_range_shape_reference import verify_native_range_shapes
 def run_shape_worker(source_path,job_path,*,expected_job_sha256,output):
     started=time.monotonic();job_path,output=Path(job_path),Path(output)
     if output.exists() or output.is_symlink():raise ValueError('new output required')
-    if job_path.is_symlink() or not job_path.is_file() or job_path.stat().st_size>2*1024**2:
+    try:
+        job_path=require_regular_file(job_path)
+    except ValueError as error:
+        raise ValueError('bounded regular trusted job required') from error
+    if job_path.stat().st_size>2*1024**2:
         raise ValueError('bounded regular trusted job required')
     data=job_path.read_bytes()
-    if hashlib.sha256(data).hexdigest()!=expected_job_sha256:
+    if file_sha256(job_path)!=expected_job_sha256:
         raise ValueError('externally pinned job identity differs')
     job=json.loads(data)
     if not isinstance(job,dict) or set(job)!={'scene','membership','source','inventory'}:

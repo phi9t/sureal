@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from pipeline.projection_visibility import measured_projection_visibility
+from geometry.projection_visibility import measured_projection_visibility
 
 class ProjectionVisibilityTests(unittest.TestCase):
     def test_nearest_measured_depth_and_tolerance_preserve_all_slots(self):

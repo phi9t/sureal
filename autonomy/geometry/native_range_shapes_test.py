@@ -1,5 +1,5 @@
 import copy,hashlib,json,unittest
-from pipeline.native_range_shapes import native_range_shapes
+from geometry.native_range_shapes import native_range_shapes
 class ShapeTests(unittest.TestCase):
  def rows(self):
   return [{'key.segment_context_name':'scene','key.frame_timestamp_micros':10,'key.laser_name':1,'[LiDARComponent].range_image_return1.shape':[64,2650,4],'[LiDARComponent].range_image_return2.shape':None},{'key.segment_context_name':'scene','key.frame_timestamp_micros':10,'key.laser_name':2,'[LiDARComponent].range_image_return1.shape':[8,100,4],'[LiDARComponent].range_image_return2.shape':[8,100,4]}]

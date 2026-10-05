@@ -1,8 +1,8 @@
 import pathlib,json,csv,time,resource,importlib.util
 import numpy as np
 from delta_components import decode_components
-from pipeline.geometry import range_to_points
-from pipeline.geometry_foundation import inverse,transform
+from geometry.geometry import range_to_points
+from geometry.geometry_foundation import inverse,transform
 assert importlib.util.find_spec('tensorflow') is None
 names={'TOP':1,'FRONT':2,'SIDE_LEFT':3,'SIDE_RIGHT':4,'REAR':5};start=time.monotonic();reports=[]
 def decoded(root,stem):

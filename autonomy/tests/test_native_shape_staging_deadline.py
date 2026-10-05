@@ -6,7 +6,7 @@ class StagingDeadlineTests(unittest.TestCase):
  def record(self,data):
   h=hashlib.sha256(data).hexdigest();return {'hdfs_uri':'hdfs://fixture/native-source','sha256':h,'hdfs_roundtrip_sha256':h,'source_metadata':{'size':len(data),'md5_hash':base64.b64encode(hashlib.md5(data).digest()).decode()}}
  def prefix(self,program,deadline):
-  wrapper='import sys; from pipeline.native_shape_transfer import bounded_transfer; r=bounded_transfer([sys.executable,"-c",'+repr(program)+',*sys.argv[1:]],timeout_seconds='+repr(deadline)+'); raise SystemExit(r["exit_code"])'
+  wrapper='import sys; from geometry.native_shape_transfer import bounded_transfer; r=bounded_transfer([sys.executable,"-c",'+repr(program)+',*sys.argv[1:]],timeout_seconds='+repr(deadline)+'); raise SystemExit(r["exit_code"])'
   return [sys.executable,'-c',wrapper]
  def test_timeout_partial_stage_cleanup_and_lease_reuse(self):
   with tempfile.TemporaryDirectory() as tmp:

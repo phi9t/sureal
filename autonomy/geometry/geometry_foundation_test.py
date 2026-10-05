@@ -1,7 +1,7 @@
 """Independent analytic fixtures for the project geometry convention."""
 import unittest
 import numpy as np
-from pipeline.geometry_foundation import (
+from geometry.geometry_foundation import (
     skew, so3_exp, so3_log, se3_exp, se3_log, inverse, transform,
     adjoint, point_jacobian, polar_to_cartesian, cartesian_to_polar,
     polar_jacobian, bev_indices, pinhole_project, radar_radial_velocity)
@@ -69,7 +69,7 @@ class GeometryFoundationTests(unittest.TestCase):
             radar_radial_velocity([0,0,0], [3,5,0], [1,0,0])
 
     def test_covariance_transport_and_sensor_time_chain(self):
-        from pipeline.geometry_foundation import transport_covariance, sensor_to_reference
+        from geometry.geometry_foundation import transport_covariance, sensor_to_reference
         covariance=np.diag([.01,.02,.03,.04,.05,.06])
         jacobian=np.array([[1,2,0,0,0,0],[0,0,3,0,0,0]])
         np.testing.assert_allclose(transport_covariance(jacobian,covariance), [[.09,0],[0,.27]])
@@ -90,7 +90,7 @@ class GeometryFoundationTests(unittest.TestCase):
         self.assertEqual(cells.tolist(),[[3,3]])
 
     def test_negative_covariance_cannot_be_amplified(self):
-        from pipeline.geometry_foundation import transport_covariance
+        from geometry.geometry_foundation import transport_covariance
         with self.assertRaises(ValueError):
             transport_covariance([[1e8]],[[-1e-13]])
 

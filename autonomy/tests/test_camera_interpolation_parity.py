@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 import torch
 from torch.nn import functional as F
-from pipeline.camera_coordinates import pixel_centers,box_edges
+from geometry.camera_coordinates import pixel_centers,box_edges
 class InterpolationTests(unittest.TestCase):
  def test_actual_bilinear_ramp_coordinates_and_padding(self):
   h,w=5,7

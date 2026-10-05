@@ -13,16 +13,17 @@ not import each other. The order is declared in
 
 | Layer | Areas | Role |
 | --- | --- | --- |
-| 11 | top-level scripts, `scripts/`, `analysis/`, `tests/`, `tools/` | Gate runners, operations, diagnostics, development checks |
-| 10 | `continuation_control/` | Binds bounded legacy replays to their native receipts |
-| 9 | `continuation/` | Parity checks for resumed native stages |
-| 8 | `resources/` | Measured, cgroup-bounded stage execution and retention |
-| 7 | `cohort/` | 16-scene cohort studies: balanced and sustained training, scoring, audits |
-| 6 | `advanced/` | Expanded fixed-batch architecture suite |
-| 5 | `tier1/` | Fixed-batch architecture overfit suite |
-| 4 | `architecture/` | Experiment catalog and the `architecture.py` runner |
-| 3 | `gpu/`, `evaluation/`, `association/`, `explorer/`, `motion-evaluation/`, `viewer/` | Model variants and GPU workers, native metric contracts, standalone tools |
-| 2 | `pipeline/` | Readers, geometry, encoders, detector and archives |
+| 12 | top-level scripts, `scripts/`, `analysis/`, `tests/`, `tools/` | Gate runners, operations, diagnostics, development checks |
+| 11 | `continuation_control/` | Binds bounded legacy replays to their native receipts |
+| 10 | `continuation/` | Parity checks for resumed native stages |
+| 9 | `resources/` | Measured, cgroup-bounded stage execution and retention |
+| 8 | `cohort/` | 16-scene cohort studies: balanced and sustained training, scoring, audits |
+| 7 | `advanced/` | Expanded fixed-batch architecture suite |
+| 6 | `tier1/` | Fixed-batch architecture overfit suite |
+| 5 | `architecture/` | Experiment catalog and the `architecture.py` runner |
+| 4 | `gpu/`, `evaluation/`, `association/`, `explorer/`, `motion-evaluation/`, `viewer/` | Model variants and GPU workers, native metric contracts, standalone tools |
+| 3 | `pipeline/` | Readers, encoders, detector and archives |
+| 2 | `geometry/` | Coordinate transforms, projection visibility and native range-grid shape math |
 | 1 | `insula/` | Sandbox entry, rootfs identity, M0 receipt checks and staging leases |
 | 0 | `evidence/` | Source snapshots, file digests, regular-file checks, journal, tracker, projection, publication and pin reports |
 
@@ -32,7 +33,7 @@ outside the layering.
 One upward import exists: `tier1/prepare_v3.py` imports `cohort/balanced.py`.
 It is listed as the only entry of `KNOWN_UPWARD`.
 
-Cross-area imports are qualified (`from pipeline.geometry import ...`). A bare
+Cross-area imports are qualified (`from geometry.geometry import ...`). A bare
 import (`import models`) resolves through whichever directories a script put on
 `sys.path`, and 14 module names (`models`, `catalog`, `train`, `prepare`, ...)
 exist in more than one area. The check refuses a bare import whose name is

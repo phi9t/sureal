@@ -1,0 +1,58 @@
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+
+TEST_MODULES = glob(["*_test.py"])
+LIB_MODULES = glob(
+    ["*.py"],
+    exclude = ["*_test.py", "*_test_fixtures.py"],
+)
+GEOMETRY_VISIBILITY = ["//autonomy:__pkg__"]
+
+package(default_visibility = ["//visibility:private"])
+
+py_library(
+    name = "geometry",
+    srcs = LIB_MODULES,
+    imports = [".."],
+    deps = ["//autonomy/evidence:evidence"],
+    visibility = GEOMETRY_VISIBILITY,
+)
+
+filegroup(
+    name = "all_py",
+    srcs = glob(["*.py"]),
+    visibility = ["//autonomy:__pkg__"],
+)
+
+py_library(
+    name = "native_range_shape_test_fixtures",
+    srcs = ["native_range_shape_test_fixtures.py"],
+    imports = [".."],
+    testonly = True,
+    visibility = ["//visibility:private"],
+)
+
+[
+    py_test(
+        name = test[:-3],
+        srcs = [test],
+        deps = [":geometry"] + (
+            [":native_range_shape_test_fixtures"]
+            if test in [
+                "native_range_shape_file_test.py",
+                "native_range_shape_reference_test.py",
+                "native_range_shape_worker_test.py",
+            ]
+            else []
+        ),
+        legacy_create_init = 0,
+        size = "small",
+        tags = ["perception_unit"],
+    )
+    for test in TEST_MODULES
+]
+
+test_suite(
+    name = "all_tests",
+    tests = [test[:-3] for test in TEST_MODULES],
+    visibility = ["//autonomy:__pkg__"],
+)
