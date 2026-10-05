@@ -54,3 +54,5 @@ Final verification after merging `work/semantic-layout/integration` at `8975fbd`
 - `python3 -m unittest tests.test_publication_audit` -> PASS, `Ran 30 tests in 16.755s`.
 - `python3 scripts/publication_audit.py --root .` -> PASS, `{"errors": [], "gitlinks": 2, "max_blob_bytes": 26214400, "schema_version": 1, "status": "pass", "tracked_files": 4985}`.
 - Final pin report: `python3 autonomy/tools/pins.py check --base work/semantic-layout/integration` -> `FAIL: 65 changed file(s) pinned by retained receipts`. The remaining pinned changes are the ticket 14 dataset moves, their moved tests, and compatibility edits already enumerated above; this is retained-receipt measurement for the concept reorg, not a weakened or skipped check.
+
+Lead note at merge: removed `dataset/concept_import_test.py`, a test asserting where modules live, which the spec and the worker prompt rule out (tests exercise behaviour through public entry points). No other change.
