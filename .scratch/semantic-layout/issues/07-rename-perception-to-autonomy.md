@@ -59,3 +59,9 @@ Post-review fix:
 - `TMPDIR=$PWD/.bazel-cache/tmp ./bazelw test //autonomy/... --test_output=errors --cache_test_results=no` passed: `Executed 138 out of 138 tests: 138 tests pass`.
 - `TMPDIR=$PWD/.bazel-cache/tmp ./bazelw test --config=cuda --test_tag_filters=requires_gpu //autonomy/... --test_output=errors --cache_test_results=no` first rerun had one flaky failure in `//autonomy:cohort__test_sustained_worker_guard` because the test compared all of `/outputs` while Bazel wrote repository-cache files there concurrently. The failed target passed alone, and a second full GPU rerun passed: `Executed 24 out of 24 tests: 24 tests pass`.
 - Final guard before this record: `python3 autonomy/tools/pins.py check --base work/semantic-layout/integration && TMPDIR=$PWD/.bazel-cache/tmp PYTHONPATH=$PWD:$PWD/autonomy:$PWD/tests/collab python3 scripts/publication_audit.py --root . && git diff --check` passed with pin guard `PASS: 0 changed file(s) cited by retained receipts` and publication audit `status: pass`.
+
+Lead correction to the pin record (added at merge):
+
+- "Pinned files changed: none" above is wrong, through a blind spot in the pin report and not through the worker's fault: `pins.py check` compares paths inside the package directory, so with a base from before the move every file looks newly added and nothing is reported.
+- Measured against the pure-move commit `93e64a0`, the first content-editing commit changed 34 files that retained receipts pin: the architecture experiment runner, its test and 23 harness drivers (about 102 receipts each), 7 cohort run and scoring scripts (about 218 each), the tracker CLI (12) and the viewer's generated site page (1).
+- This is the accepted cost of the rename under ADR 0001; those receipts are historical records from here on. Ticket 13 moves the pin report and must make it follow renames.
