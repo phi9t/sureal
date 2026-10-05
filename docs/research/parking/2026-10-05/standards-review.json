@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "review_axis": "Standards/publication/source custody",
+  "candidate": "5701062e8a356f925a19baefe297f5bbafe5d716",
+  "base": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+  "reviewed_commits": [
+    "0eeb15d19c188d1ee2fad1043f88707087c16c8a",
+    "5701062e8a356f925a19baefe297f5bbafe5d716"
+  ],
+  "result": "PASS_SCOPED_SOURCE_PARKING",
+  "findings": [],
+  "checks": {
+    "candidate_clean": true,
+    "publication_tests": {
+      "command": "python -m unittest tests.test_publication_audit -q",
+      "passed": 24
+    },
+    "publication_audit": {
+      "command": "python scripts/publication_audit.py --root .",
+      "tracked_files": 4900,
+      "errors": []
+    },
+    "diff_check": "git diff --check BASE...CANDIDATE: exit0",
+    "snapshot_filename_hashes": 650,
+    "private_source_readbacks": 406,
+    "git_revision_tree_checks": 49,
+    "git_blob_hash_checks": 352,
+    "manifest_snapshot_reference_hash_checks": 726,
+    "hash_errors": [],
+    "bundle_sha256": "56ae576dec3bab5df22c38c4c186782ba92b51eab1332392fb1e7c6d24ec9058",
+    "git_bundle_verify_exit": 0,
+    "secret_pattern_hits": [],
+    "actual_data_uri_payload_hits": []
+  },
+  "limits": [
+    "Publication/source custody only; no parked source was imported or executed, no MAC/scientific experiments or runtime acceptance.",
+    "Secret-pattern scan is bounded and not a comprehensive credential assurance.",
+    "Canonical writer-stop/pristine proof remains an explicitly documented blocker: seven late originals are preserved and independently active/shared processes are not claimed stopped. This does not invalidate immutable snapshot publication; do not report pristine canonical or remove those sources.",
+    "Prototype style/architecture smells are not grounds to refactor immutable archival source."
+  ],
+  "standards_read": [
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "scripts/publication_audit.py",
+    ".gitattributes"
+  ],
+  "review_source": "Read-only exact candidate source, immutable Git objects, public manifests, private source store and private verified history bundle",
+  "reviewed_at_utc": "2026-10-05T04:52:10.323449+00:00"
+}

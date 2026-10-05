@@ -1,0 +1,17 @@
+{
+  "source_candidate": "5701062e8a356f925a19baefe297f5bbafe5d716",
+  "review_reports": {
+    "standards": {
+      "sha256": "b7258db54e22b9e9077ae1e88086fa59c4f3d4bfdbcf99521218d7557f259a2e",
+      "findings": 0,
+      "result": "PASS scoped publication/custody; external cleanliness blocker retained"
+    },
+    "spec": {
+      "sha256": "bec84812e8bb7ff43655097156fd9ee20e18b20b67d39672ab70062fa4097a8f",
+      "findings": 0,
+      "result": "PASS scoped publication/custody; external cleanliness blocker retained"
+    }
+  },
+  "parked_source_changed_by_review_followup": false,
+  "external_cleanliness_blocker": true
+}
