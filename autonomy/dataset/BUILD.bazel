@@ -63,6 +63,12 @@ filegroup(
     srcs = TEST_MODULES,
 )
 
+filegroup(
+    name = "scientific_dataset_test_fixture",
+    srcs = ["scientific_dataset_test.py"],
+    visibility = ["//autonomy:__pkg__"],
+)
+
 [
     py_test(
         name = test[:-3],

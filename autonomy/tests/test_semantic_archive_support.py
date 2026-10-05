@@ -1,7 +1,7 @@
 import tempfile
 import unittest
 from pathlib import Path
-import test_scientific_dataset as fixtures
+from dataset import scientific_dataset_test as fixtures
 from pipeline.semantic_archive_support import archive_semantic_support
 
 class SemanticArchiveSupportTests(unittest.TestCase):

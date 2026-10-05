@@ -81,6 +81,12 @@ PERCEPTION_DEPS = [
     "//autonomy/insula:insula",
 ]
 
+PERCEPTION_EXTRA_DATA = {
+    "tests/test_semantic_archive_support.py": [
+        "//autonomy/dataset:scientific_dataset_test_fixture",
+    ],
+}
+
 ARCHITECTURE_EXPERIMENT_RESEARCH_INPUTS = [
     "research/architecture-all_pillars-cache-verified.json",
     "research/architecture-retain64-cache-verified.json",
@@ -98,11 +104,11 @@ filegroup(
         "architecture/experiment_runner.py",
         "architecture/harness/files.json",
         "architecture/registry.json",
+        "//autonomy/dataset:all_py",
         "//autonomy/evidence:source_snapshot_py",
         "//autonomy/insula:all_py",
     ] + glob([
         "architecture/harness/*.py",
-        "dataset/*.py",
         "gpu/*.py",
         "pipeline/*.py",
     ]) + ARCHITECTURE_EXPERIMENT_RESEARCH_INPUTS,
@@ -160,7 +166,12 @@ perception_py_test(
 )
 
 [
-    perception_py_test(src, PERCEPTION_RUNFILES, deps = PERCEPTION_DEPS)
+    perception_py_test(
+        src,
+        PERCEPTION_RUNFILES,
+        extra_data = PERCEPTION_EXTRA_DATA.get(src, []),
+        deps = PERCEPTION_DEPS,
+    )
     for src in PERCEPTION_TEST_MODULES
 ]
 
