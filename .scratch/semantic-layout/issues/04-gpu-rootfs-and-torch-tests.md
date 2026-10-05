@@ -4,7 +4,7 @@
 
 **Blocked by:** 03 (Every perception CPU test runs under Bazel, in place)
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] A new version of the GPU rootfs carries Bazel 9.2 with the same packages as the current GPU image; the current image is untouched
 - [x] The wrapper selects the GPU rootfs when the GPU configuration is requested, and projects the host driver libraries as the existing GPU gates do
