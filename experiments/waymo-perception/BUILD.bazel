@@ -1,0 +1,9 @@
+load(":bazel_unittest.bzl", "repo_python_unit_test")
+
+package(default_visibility = ["//visibility:private"])
+
+repo_python_unit_test(
+    name = "tools_test_suites",
+    src = "tools/test_suites.py",
+    deps = ["tools/suites.py"],
+)

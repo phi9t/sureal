@@ -203,6 +203,9 @@ training/jean_zay
 # Agent-isolated feature worktrees
 .worktrees/
 
+# Bazel wrapper cache (mounted at /outputs inside Insula)
+.bazel-cache/
+
 # Waymo viewer (experiments/waymo-perception/viewer): JS deps, builds, venv
 node_modules/
 .vite/
