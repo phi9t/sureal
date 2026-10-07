@@ -1,13 +1,16 @@
+import contextlib
 import hashlib
 import io
 import json
 import os
+import shutil
 import tarfile
 import tempfile
 import types
 import unittest
 from dataclasses import fields
 from pathlib import Path
+from unittest import mock
 
 
 GOLDEN_SOURCE_SNAPSHOT_SHA256 = "26d7ae75a8a99ed88f3e5350159faf024a632dd3deb70f403fa664b959c6fd18"
@@ -24,9 +27,14 @@ class SourceSnapshotTests(unittest.TestCase):
                 archive_sources,
                 file_digest,
                 file_sha256,
+                materialize_receipt_sources,
+                materialize_source_snapshot_archive,
                 require_regular_file,
                 snapshot_bazel_target,
                 snapshot_source_pins,
+                snapshot_target_and_materialize,
+                source_snapshot_store_descriptor,
+                store_from_receipt,
                 verify_receipt_sources,
             )
         except ImportError:
@@ -39,9 +47,14 @@ class SourceSnapshotTests(unittest.TestCase):
             "archive_sources": archive_sources,
             "file_digest": file_digest,
             "file_sha256": file_sha256,
+            "materialize_receipt_sources": materialize_receipt_sources,
+            "materialize_source_snapshot_archive": materialize_source_snapshot_archive,
             "require_regular_file": require_regular_file,
             "snapshot_bazel_target": snapshot_bazel_target,
             "snapshot_source_pins": snapshot_source_pins,
+            "snapshot_target_and_materialize": snapshot_target_and_materialize,
+            "source_snapshot_store_descriptor": source_snapshot_store_descriptor,
+            "store_from_receipt": store_from_receipt,
             "verify_receipt_sources": verify_receipt_sources,
         }
 
@@ -73,6 +86,19 @@ class SourceSnapshotTests(unittest.TestCase):
                 for member in reader
             }
 
+    def archive_bytes(self, members):
+        payload = io.BytesIO()
+        with tarfile.open(fileobj=payload, mode="w", format=tarfile.PAX_FORMAT) as writer:
+            for name, data in members:
+                if isinstance(data, tarfile.TarInfo):
+                    writer.addfile(data)
+                    continue
+                encoded = data if isinstance(data, bytes) else data.encode()
+                info = tarfile.TarInfo(name)
+                info.size = len(encoded)
+                writer.addfile(info, io.BytesIO(encoded))
+        return payload.getvalue()
+
     def hdfs_runner(self, remote, *, fail=None):
         calls = []
         fail = fail or {}
@@ -103,6 +129,258 @@ class SourceSnapshotTests(unittest.TestCase):
             return types.SimpleNamespace(returncode=1, stdout="", stderr='{"error":"unexpected command"}')
 
         return run, calls
+
+    def test_target_api_receipts_and_materializes_exact_bazel_closure_from_archive(self):
+        api = self.api()
+        with tempfile.TemporaryDirectory() as temporary:
+            repo = Path(temporary) / "repo"
+            repo.mkdir()
+            self.write_repo(repo)
+            (repo / "autonomy/support").mkdir()
+            (repo / "autonomy/support/config.json").write_text('{"before": true}\n')
+            destination = Path(temporary) / "materialized"
+            labels = [
+                "//autonomy:evidence/source_snapshot.py",
+                "//autonomy:evidence/source_snapshot_test.py",
+                "//autonomy:support/config.json",
+            ]
+
+            class MutatingStore(api["LocalSnapshotStore"]):
+                def store(self, digest, data):
+                    stored = super().store(digest, data)
+                    (repo / "autonomy/evidence/source_snapshot.py").write_text("mutated checkout\n")
+                    (repo / "autonomy/support/config.json").write_text('{"after": true}\n')
+                    return stored
+
+            store = MutatingStore(Path(temporary) / "store")
+            receipt = api["snapshot_target_and_materialize"](
+                "//autonomy:evidence__source_snapshot_test",
+                destination,
+                store=store,
+                repo_root=repo,
+                runner=self.runner_for(labels)[0],
+            )
+
+            self.assertEqual(receipt["schema_version"], 2)
+            self.assertEqual(receipt["source_snapshot_target"], "//autonomy:evidence__source_snapshot_test")
+            self.assertEqual(receipt["source_snapshot_root"], str(destination))
+            self.assertEqual(
+                receipt["source_snapshot_store"],
+                {"schema_version": 1, "kind": "local", "root": str(store.root)},
+            )
+            self.assertEqual(
+                list(receipt["source_pins"]),
+                [
+                    "autonomy/evidence/source_snapshot.py",
+                    "autonomy/evidence/source_snapshot_test.py",
+                    "autonomy/support/config.json",
+                ],
+            )
+            self.assertEqual((destination / "autonomy/evidence/source_snapshot.py").read_text(), "module\n")
+            self.assertEqual((destination / "autonomy/support/config.json").read_text(), '{"before": true}\n')
+            self.assertEqual(api["verify_receipt_sources"](receipt, store)["source_pins"], receipt["source_pins"])
+
+    def test_hdfs_descriptor_receipt_materializes_after_checkout_and_cache_removal(self):
+        api = self.api()
+        with tempfile.TemporaryDirectory() as temporary:
+            repo = Path(temporary) / "repo"
+            repo.mkdir()
+            self.write_repo(repo)
+            remote = {}
+            hdfs_runner, hdfs_calls = self.hdfs_runner(remote)
+            store = api["HdfsSnapshotStore"]("/local/waystone", runner=hdfs_runner)
+            first_destination = Path(temporary) / "first"
+
+            receipt = api["snapshot_target_and_materialize"](
+                "//autonomy:target",
+                first_destination,
+                store=store,
+                repo_root=repo,
+                runner=self.runner_for(["//autonomy:evidence/source_snapshot.py"])[0],
+            )
+            shutil.rmtree(repo)
+            shutil.rmtree(first_destination)
+
+            self.assertEqual(
+                receipt["source_snapshot_store"],
+                {"schema_version": 1, "kind": "hdfs", "prefix": "hdfs://fixture/sureal"},
+            )
+            self.assertNotIn("waystone", receipt["source_snapshot_store"])
+            resolved_store = api["store_from_receipt"](receipt, waystone="/local/waystone", runner=hdfs_runner)
+            self.assertEqual(api["verify_receipt_sources"](receipt, resolved_store)["source_files"], 1)
+
+            second_destination = Path(temporary) / "second"
+            materialized = api["materialize_receipt_sources"](
+                receipt,
+                second_destination,
+                waystone="/local/waystone",
+                runner=hdfs_runner,
+            )
+
+            self.assertEqual(materialized["source_snapshot_root"], str(second_destination))
+            self.assertEqual((second_destination / "autonomy/evidence/source_snapshot.py").read_text(), "module\n")
+            self.assertGreaterEqual([call[0][5] for call in hdfs_calls].count("get"), 3)
+
+    def test_descriptor_resolution_validates_shape_and_never_uses_receipt_executables(self):
+        api = self.api()
+        digest = "0" * 64
+        pins = {"autonomy/evidence/source_snapshot.py": "1" * 64}
+
+        with self.assertRaisesRegex(ValueError, "source snapshot store descriptor"):
+            api["store_from_receipt"](
+                {
+                    "source_snapshot_sha256": digest,
+                    "source_pins": pins,
+                    "source_snapshot_store": {
+                        "schema_version": 1,
+                        "kind": "hdfs",
+                        "prefix": "hdfs://fixture/sureal",
+                        "waystone": "/receipt/controlled/executable",
+                    },
+                },
+                waystone="/local/waystone",
+            )
+        with self.assertRaisesRegex(ValueError, "HDFS source snapshot prefix"):
+            api["store_from_receipt"](
+                {
+                    "source_snapshot_sha256": digest,
+                    "source_pins": pins,
+                    "source_snapshot_store": {
+                        "schema_version": 1,
+                        "kind": "hdfs",
+                        "prefix": "/tmp/local-path-is-not-hdfs",
+                    },
+                },
+                waystone="/local/waystone",
+            )
+        with self.assertRaisesRegex(ValueError, "source snapshot store kind"):
+            api["store_from_receipt"](
+                {
+                    "source_snapshot_sha256": digest,
+                    "source_pins": pins,
+                    "source_snapshot_store": {"schema_version": 1, "kind": "shell", "prefix": "hdfs://fixture/sureal"},
+                },
+                waystone="/local/waystone",
+            )
+
+    def test_descriptor_fetch_propagates_missing_authentication_and_corrupt_archive_errors(self):
+        api = self.api()
+        archive = self.archive_bytes([("autonomy/evidence/source_snapshot.py", "module\n")])
+        digest = hashlib.sha256(archive).hexdigest()
+        pins = api["snapshot_source_pins"](archive)
+        receipt = {
+            "schema_version": 2,
+            "source_snapshot_sha256": digest,
+            "source_snapshot_target": "//autonomy:target",
+            "source_snapshot_store": {"schema_version": 1, "kind": "hdfs", "prefix": "hdfs://fixture/sureal"},
+            "source_pins": pins,
+        }
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            missing_runner, _ = self.hdfs_runner({})
+            with self.assertRaisesRegex(api["SnapshotMissingError"], "source snapshot missing"):
+                api["materialize_receipt_sources"](receipt, root / "missing", waystone="/waystone", runner=missing_runner)
+
+            auth_runner, _ = self.hdfs_runner({}, fail={"get": '{"error":"Kerberos authentication failed"}'})
+            with self.assertRaisesRegex(api["SnapshotAuthenticationError"], "snapshot storage authentication failed"):
+                api["materialize_receipt_sources"](receipt, root / "auth", waystone="/waystone", runner=auth_runner)
+
+            corrupt_runner, _ = self.hdfs_runner(
+                {
+                    "hdfs://fixture/sureal/source-snapshots/" + digest: b"corrupt",
+                }
+            )
+            with self.assertRaisesRegex(ValueError, "snapshot digest differs"):
+                api["materialize_receipt_sources"](receipt, root / "corrupt", waystone="/waystone", runner=corrupt_runner)
+
+    def test_archive_materialization_rejects_unsafe_members_and_preserves_destinations(self):
+        api = self.api()
+        with tempfile.TemporaryDirectory() as temporary:
+            destination = Path(temporary) / "existing"
+            destination.mkdir()
+            (destination / "keep.txt").write_text("keep\n")
+            archive = self.archive_bytes([("autonomy/evidence/source_snapshot.py", "module\n")])
+            digest = hashlib.sha256(archive).hexdigest()
+            pins = api["snapshot_source_pins"](archive)
+
+            with self.assertRaisesRegex(FileExistsError, "source snapshot destination already exists"):
+                api["materialize_source_snapshot_archive"](archive, destination, digest=digest, source_pins=pins)
+            self.assertEqual((destination / "keep.txt").read_text(), "keep\n")
+
+            for member_name in ("../escape.py", "/absolute.py"):
+                with self.assertRaisesRegex(ValueError, "safe snapshot member name"):
+                    api["materialize_source_snapshot_archive"](
+                        self.archive_bytes([(member_name, "bad\n")]),
+                        Path(temporary) / ("unsafe-" + member_name.strip("/.").replace("/", "-")),
+                    )
+
+            duplicate = self.archive_bytes(
+                [
+                    ("autonomy/evidence/source_snapshot.py", "one\n"),
+                    ("autonomy/evidence/source_snapshot.py", "two\n"),
+                ]
+            )
+            with self.assertRaisesRegex(ValueError, "duplicate or nonregular"):
+                api["materialize_source_snapshot_archive"](duplicate, Path(temporary) / "duplicate")
+
+            link = tarfile.TarInfo("autonomy/evidence/link.py")
+            link.type = tarfile.SYMTYPE
+            link.linkname = "source_snapshot.py"
+            with self.assertRaisesRegex(ValueError, "duplicate or nonregular"):
+                api["materialize_source_snapshot_archive"](self.archive_bytes([("autonomy/evidence/link.py", link)]), Path(temporary) / "link")
+
+            self.assertFalse((Path(temporary) / "duplicate").exists())
+            self.assertFalse((Path(temporary) / "link").exists())
+
+    def test_archive_materialization_refuses_destination_created_during_publication(self):
+        api = self.api()
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            destination = root / "raced"
+            archive = self.archive_bytes([("autonomy/evidence/source_snapshot.py", "module\n")])
+            digest = hashlib.sha256(archive).hexdigest()
+            pins = api["snapshot_source_pins"](archive)
+            from evidence import source_snapshot as source_snapshot_module
+
+            original_mkdir = Path.mkdir
+            original_rename = Path.rename
+            competitor = {}
+
+            def create_competitor():
+                if "identity" not in competitor:
+                    original_mkdir(destination)
+                    competitor["identity"] = (destination.stat().st_dev, destination.stat().st_ino)
+
+            def competing_mkdir(path, *args, **kwargs):
+                if Path(path) == destination:
+                    create_competitor()
+                return original_mkdir(path, *args, **kwargs)
+
+            def competing_rename(path, target):
+                if Path(target) == destination:
+                    create_competitor()
+                return original_rename(path, target)
+
+            stack = contextlib.ExitStack()
+            stack.enter_context(mock.patch.object(Path, "mkdir", competing_mkdir))
+            stack.enter_context(mock.patch.object(Path, "rename", competing_rename))
+            if hasattr(source_snapshot_module, "_rename_no_replace"):
+                original_publish = source_snapshot_module._rename_no_replace
+
+                def competing_publish(path, target):
+                    if Path(target) == destination:
+                        create_competitor()
+                    return original_publish(path, target)
+
+                stack.enter_context(mock.patch.object(source_snapshot_module, "_rename_no_replace", competing_publish))
+            with stack:
+                with self.assertRaisesRegex(FileExistsError, "source snapshot destination already exists"):
+                    api["materialize_source_snapshot_archive"](archive, destination, digest=digest, source_pins=pins)
+
+            self.assertEqual((destination.stat().st_dev, destination.stat().st_ino), competitor["identity"])
+            self.assertEqual(list(destination.iterdir()), [])
+            self.assertEqual([path.name for path in root.iterdir() if path.name.startswith(".raced.")], [])
 
     def test_hdfs_storage_uploads_with_exact_readback_and_fetches_by_digest(self):
         api = self.api()
