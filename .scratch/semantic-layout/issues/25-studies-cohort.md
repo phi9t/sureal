@@ -4,7 +4,7 @@
 
 **Blocked by:** 22 (Concept batch: `resources`), 24 (Studies batch: the fixed-batch suites and the experiment catalog)
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] Scope: the balanced and sustained training, scoring, admission, retention and audit code of the cohort study
 - [x] The sustained controller, its workflow, state and admission remain runnable and tested
@@ -14,7 +14,7 @@
 - [x] Each moved test sits beside its module as `foo_test.py` and is a Bazel test target
 - [x] Bazel visibility lets only the concepts above this one depend on it
 - [x] File digests and regular-file checks in the moved code come from the evidence module, not local copies
-- [ ] The same test modules pass through the wrapper as before the batch, and the pin report for the batch is attached to the ticket
+- [x] The same test modules pass through the wrapper as before the batch, and the pin report for the batch is attached to the ticket
 - [x] Files under `research/` are unchanged
 
 ## Comments
@@ -42,3 +42,13 @@ Verification:
 - `git diff --check`: exit 0.
 - `git diff --quiet c2f92f85dbd15c63976a576624230b1cad0aff8e -- autonomy/research`: exit 0; retained research files unchanged.
 - `git diff --quiet c2f92f85dbd15c63976a576624230b1cad0aff8e -- parallax bazelw .bazelrc .bazelversion MODULE.bazel MODULE.bazel.lock`: exit 0; Parallax and wrapper/toolchain inputs byte-identical to base, so the recorded 17-test Parallax pass is reused and `//parallax/...` was not rerun.
+
+2026-10-07 parent acceptance after independent review:
+
+- Integrated native candidate `c4cb78245311f0c1759116249057abdbc214af3a` with the previously accepted GPU recipe move in review merge `4bedf082db4b12338f51283466b71d120e64e269`. Parent correction `be934e7e506b093a2d1bf4ddf4b5de53719d4dff` rejects a late `/tmp` mount that could hide admitted audit inputs. The regression first failed with `ValueError not raised`; the corrected validator requires one initial tmpfs mount before child mounts. The test helper now places adversarial overlays after the legitimate mounts and checks the mount-specific error. A separate order-only regression brings the controller target to 14 executed methods.
+- Parent GPU execution found two missing fixture dependencies in the moved reference tests. A private test-only library now provides the loop fixture only to those two consumers. The original 26-pass/2-fail GPU result is retained; the corrected full configured run executed all 28 targets successfully, with 84 unittest methods and zero skips. Command: `./bazelw test --config=cuda --nocache_test_results --test_output=errors //autonomy/...`. No test tags, installed images or scientific recipes changed.
+- Parent CPU verification executed all 151 default targets uncached successfully. Exact target/log reconciliation recorded 614 reported unittest methods, including two existing skips, 41 pytest passes and one C++ smoke test. After the GPU-only BUILD dependency correction, the full default command reconciled all 151 targets from valid cached results. The skipped repository-hygiene and tracer-runtime assertions remain explicit ticket26/27 obligations; target success is not claimed as execution of those assertions.
+- Parent publication tests passed all 30 methods; publication audit passed over 5,002 tracked files and two gitlinks; layering reported zero problems across 17 layers; diff checks passed. Research, Parallax, wrapper and toolchain inputs are unchanged from `c2f92f8`, so the earlier 17-test Parallax result is reused. The native exact-source metrics fixture executed three methods; this synthetic live-tagged fixture is not scientific admission.
+- Independent standards review matched all 142 inspected source hashes except the subsequently refreshed ticket evidence. Native runtime source hashes matched the reviewed candidate. The final parent runtime and BUILD corrections each received independent review with no blockers, and all three reviewed file hashes matched the committed source. Evidence: `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/25-parent-runtime-review.json`, `25-parent-build-review.json`, `25-parent-cpu-case-counts.json` and `25-parent-gpu-case-counts.json`.
+- Combined pin report `25-parent-pins.log` exits 1 for 70 changed files pinned by retained receipts: the native 66-file report plus four GPU recipe impacts. This is an impact report, not a passing legacy-tree verification; historical receipt bytes remain unchanged. Three existing test-local digest lambdas in the retention inventory tests remain listed for ticket26's final uniqueness audit.
+- Raw supervisor verdict `25-final-native-supervisor-verdict.json` remains VIOLATED because the authorized repair resumes advanced its originally pinned `7a84e4e` candidate to `c4cb782`; original interrupt stderr and branch-movement notes are retained. Separate parent acceptance records the exact reviewed and tested candidate rather than rewriting that raw verdict. Ticket25 is complete at the software migration boundary. Ticket26 cleanup/source wiring, ticket27 live re-admission and the full research experiment program remain pending.
