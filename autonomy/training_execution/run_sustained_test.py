@@ -348,7 +348,7 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
    readback_path=pubroot/'publication-readback.json';readback_path.write_text(json.dumps(value,sort_keys=True));pub['publication_manifest_sha256']=sha(readback_path)
   publication.write_text(json.dumps(pub,sort_keys=True));receipt['sha256']=sha(publication)
 
- def replace_independent_proof(self,root,receipt,worker,*,input_mount=None,overlay_alias=None):
+ def replace_independent_proof(self,root,receipt,worker,*,input_mount=None,overlay_alias=None,late_tmpfs=False):
   publication=Path(receipt['path']);pub=json.loads(publication.read_text());admission=pub['independent_admission']
   inputs=Path(admission['input_directory']);mounted=inputs if input_mount is None else Path(input_mount)
   native=publication.parent/('native-'+worker.replace('/','-'));readonly=pub['audit_runtime_namespace']['readonly_entry_bindings']
@@ -362,7 +362,11 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
                    '--ro-bind',pub['archive_library']['path'],'/tmp/resource-archive.py']
   if overlay_alias is not None:
    overlay=root/'overlay';overlay.mkdir()
-   original[at:at]=['--bind',str(overlay),overlay_alias]
+   original[original.index('--'):original.index('--')]=['--bind',str(overlay),overlay_alias]
+  if late_tmpfs:
+   temporary=original.index('--tmpfs');self.assertEqual(original[temporary+1],'/tmp')
+   del original[temporary:temporary+2]
+   original[original.index('--'):original.index('--')]=['--tmpfs','/tmp']
   proof,command=self.resource_proof(root,Path(pub['resource_source_pins']['source_snapshot_root']),pub['resource_source_pins'],native,mounted,worker,'substitution',command=original,execution=Path(pub['execution_directory']),library=Path(pub['archive_library']['path']))
   admission['resource_proof_path']=str(proof);admission['resource_proof_sha256']=sha(proof);admission['command']=command
   log=[Path(path) for path in admission['artifacts'] if Path(path).name=='live.log'][0]
@@ -370,18 +374,18 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
   self.rewrite_publication(receipt,pub,readback=False)
 
  def test_coherent_independent_worker_or_mount_substitution_refused(self):
-  cases=['wrong_worker','wrong_input_mount','protected_alias_overlay','protected_alias_descendant_overlay']
+  cases=['wrong_worker','wrong_input_mount','protected_alias_overlay','protected_alias_descendant_overlay','protected_alias_ancestor_overlay']
   for case in cases:
    with self.subTest(case=case),tempfile.TemporaryDirectory() as temp:
     root=Path(temp);backend=self.backend(root);record=self.record(root);inventory=self.inventory(root,record);receipt=self.resource_receipt(root,backend,record,inventory)
     if case=='wrong_worker':
      self.replace_independent_proof(root,receipt,'/experiment/resources/archive_worker.py')
     else:
-     if case in {'protected_alias_overlay','protected_alias_descendant_overlay'}:
-      alias='/tmp/inputs' if case=='protected_alias_overlay' else '/tmp/inputs/publication.json'
+     if case in {'protected_alias_overlay','protected_alias_descendant_overlay','protected_alias_ancestor_overlay'}:
+      alias={'protected_alias_overlay':'/tmp/inputs','protected_alias_descendant_overlay':'/tmp/inputs/publication.json','protected_alias_ancestor_overlay':'/tmp'}[case]
       self.replace_independent_proof(root,receipt,'/experiment/resources/retention_audit.py',overlay_alias=alias)
       with patch('training_execution.run_sustained.resource_inventory',return_value=inventory),patch('training_execution.run_sustained.publish_bundle',return_value=receipt),patch('training_execution.run_sustained.NativeBackend.publish_and_release') as native:
-       with self.assertRaises(ValueError):backend.publish_and_release(record)
+       with self.assertRaisesRegex(ValueError,'independent resource audit command mounts differ'):backend.publish_and_release(record)
       native.assert_not_called()
       continue
      alternate=root/'alternate-audit-input';alternate.mkdir()
@@ -391,6 +395,14 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
     with patch('training_execution.run_sustained.resource_inventory',return_value=inventory),patch('training_execution.run_sustained.publish_bundle',return_value=receipt),patch('training_execution.run_sustained.NativeBackend.publish_and_release') as native:
      with self.assertRaises(ValueError):backend.publish_and_release(record)
     native.assert_not_called()
+
+ def test_tmpfs_mount_must_precede_audit_inputs(self):
+  with tempfile.TemporaryDirectory() as temp:
+   root=Path(temp);backend=self.backend(root);record=self.record(root);inventory=self.inventory(root,record);receipt=self.resource_receipt(root,backend,record,inventory)
+   self.replace_independent_proof(root,receipt,'/experiment/resources/retention_audit.py',late_tmpfs=True)
+   with patch('training_execution.run_sustained.resource_inventory',return_value=inventory),patch('training_execution.run_sustained.publish_bundle',return_value=receipt),patch('training_execution.run_sustained.NativeBackend.publish_and_release') as native:
+    with self.assertRaisesRegex(ValueError,'independent resource audit command mounts differ'):backend.publish_and_release(record)
+   native.assert_not_called()
 
  def test_coherent_foreign_source_runtime_or_log_substitution_refused(self):
   cases=['foreign_source','foreign_runtime','rehash_log']

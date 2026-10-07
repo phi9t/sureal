@@ -63,11 +63,23 @@ filegroup(
     visibility = ["//autonomy:__pkg__"],
 )
 
+py_library(
+    name = "sustained_loop_test_fixture",
+    testonly = True,
+    srcs = ["sustained_loop_test.py"],
+    imports = [".."],
+    deps = [":training_execution"],
+)
+
 [
     py_test(
         name = test[:-3],
         srcs = [test],
-        deps = [":training_execution"],
+        deps = [":training_execution"] + (
+            [":sustained_loop_test_fixture"]
+            if test in ["sustained_reference_test.py", "sustained_chunk_reference_test.py"]
+            else []
+        ),
         imports = [".."],
         legacy_create_init = 0,
         size = "small",

@@ -134,6 +134,24 @@ def _single_mount(options,option,source,alias):
         raise ValueError('independent resource audit command mounts differ')
 
 
+def _validate_audit_mount_order(options):
+    mounts=[]
+    for index,(option,values) in enumerate(options):
+        if option not in MOUNT_OPTIONS:
+            continue
+        alias=PurePosixPath(values[-1])
+        if (not alias.is_absolute() or str(alias)!=values[-1] or
+            '..' in alias.parts or values[-1].startswith('//')):
+            raise ValueError('independent resource audit command mounts differ')
+        mounts.append((index,option,values,alias))
+    temporary=[(index,option,values) for index,option,values,alias in mounts if alias==PurePosixPath('/tmp')]
+    if len(temporary)!=1 or temporary[0][1:]!=('--tmpfs',('/tmp',)):
+        raise ValueError('independent resource audit command mounts differ')
+    if any(index<temporary[0][0] and alias!=PurePosixPath('/tmp') and alias.is_relative_to('/tmp')
+           for index,_,_,alias in mounts):
+        raise ValueError('independent resource audit command mounts differ')
+
+
 def _reject_protected_descendant_mounts(options,aliases):
     protected=[PurePosixPath(alias) for alias in aliases]
     for option,values in options:
@@ -181,6 +199,7 @@ def _validate_independent_admission(pub,inventory,readback):
         if proof['worker_argv']!=['/experiment/resources/retention_audit.py']:
             raise ValueError('independent resource audit worker required')
         _,_,options=inspect_command(command)
+        _validate_audit_mount_order(options)
         option_records=_option_records(options)
         inputs=Path(admission['input_directory'])
         required_mounts=[
