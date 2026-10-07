@@ -70,7 +70,7 @@ class ResourceBackendTests(unittest.TestCase):
     def test_failed_stage_restores_original_launcher_and_release_fails_closed(self):
         self.api()
         experiment_runner=types.SimpleNamespace(
-            __file__=str(Path(__file__).resolve().parents[1]/'architecture/experiment_runner.py'),
+            __file__=str(Path(__file__).resolve().parents[1]/'studies/architecture/experiment_runner.py'),
             run_stage=object(),
         )
         with tempfile.TemporaryDirectory() as temp:

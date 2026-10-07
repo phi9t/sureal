@@ -27,15 +27,21 @@ LAYERS = (
     ('pipeline',),
     ('motion',),
     ('gpu', 'evaluation', 'tracking', 'association', 'inspection'),
-    ('architecture',),
-    ('tier1',),
-    ('advanced',),
+    ('studies',),
     ('cohort',),
     ('analysis', 'scripts', 'tests', 'tools', ROOT),
 )
 # Existing upward imports in sources whose bytes retained receipts cite.  Keep
 # this list shrinking: a new entry needs the same justification as a new layer.
-KNOWN_UPWARD = frozenset({('tier1/prepare_v3.py', 'cohort')})
+KNOWN_UPWARD = frozenset({
+    # Retained fixed-batch procedure record; its bytes are preserved as evidence
+    # and the record is filegroup-exported rather than reused as library code.
+    ('studies/fixed_batch/procedure_records/fixed_batch_prepare_v3.py', 'cohort'),
+    # Expanded-batch model composition is a split detection target: lower-level
+    # point/sparse mechanisms stay in detection while this factory binds the
+    # range-view encoder without making range_view depend back on it.
+    ('detection/expanded_batch/models.py', 'range_view'),
+})
 UNLAYERED = frozenset({'research'})  # retained evidence, including frozen source copies
 
 

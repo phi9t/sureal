@@ -11,8 +11,6 @@ TORCH_TEST_MODULES = [
 ]
 RESOURCE_VISIBILITY = [
     "//autonomy:__pkg__",
-    "//autonomy/advanced:__pkg__",
-    "//autonomy/architecture:__pkg__",
     "//autonomy/association:__pkg__",
     "//autonomy/cohort:__pkg__",
     "//autonomy/evaluation:__pkg__",
@@ -21,13 +19,25 @@ RESOURCE_VISIBILITY = [
     "//autonomy/motion-evaluation:__pkg__",
     "//autonomy/pipeline:__pkg__",
     "//autonomy/scripts:__pkg__",
+    "//autonomy/studies:__pkg__",
     "//autonomy/tests:__pkg__",
-    "//autonomy/tier1:__pkg__",
     "//autonomy/tools:__pkg__",
     "//autonomy/viewer:__pkg__",
 ]
 
 package(default_visibility = ["//visibility:private"])
+
+exports_files(
+    [
+        "resource_archive.py",
+        "resource_archive_cli.py",
+        "resource_rehydrate.py",
+        "resource_release_plan.py",
+        "scientific_budget.py",
+        "scientific_payload.py",
+    ],
+    visibility = ["//autonomy:__pkg__"],
+)
 
 py_library(
     name = "resources",

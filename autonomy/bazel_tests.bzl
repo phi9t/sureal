@@ -8,10 +8,6 @@ PYTEST_MODULES = [
 LEGACY_NATIVE_TOOL_MODULES = []
 
 TORCH_MODULES = [
-    "advanced/test_models.py",
-    "advanced/test_observations.py",
-    "advanced/test_point_modules.py",
-    "advanced/test_sparse_sets.py",
     "cohort/test_sustained_chunk_reference.py",
     "cohort/test_sustained_literal_loss.py",
     "cohort/test_sustained_loop.py",
@@ -20,6 +16,10 @@ TORCH_MODULES = [
     "cohort/test_sustained_state.py",
     "cohort/test_sustained_transition_guard.py",
     "cohort/test_sustained_worker_guard.py",
+    "dataset/expanded_batch_observations_test.py",
+    "detection/expanded_batch/models_test.py",
+    "detection/expanded_batch/point_modules_test.py",
+    "detection/expanded_batch/sparse_sets_test.py",
     "tests/test_camera_interpolation_parity.py",
 ]
 

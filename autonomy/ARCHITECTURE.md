@@ -15,14 +15,12 @@ not import each other. The order is declared in
 | --- | --- | --- |
 | 16 | top-level scripts, `scripts/`, `analysis/`, `tests/`, `tools/` | Gate runners, operations, diagnostics, development checks |
 | 15 | `cohort/` | 16-scene cohort studies: balanced and sustained training, scoring, audits |
-| 14 | `advanced/` | Expanded fixed-batch architecture suite |
-| 13 | `tier1/` | Fixed-batch architecture overfit suite |
-| 12 | `architecture/` | Experiment catalog and runner |
-| 11 | `gpu/`, `evaluation/`, `tracking/`, `association/`, `inspection/` | Model workers, metric contracts, inspection and standalone tools |
-| 10 | `motion/` | Motion ingestion, causal projection and native metric tools |
-| 9 | `pipeline/` | Remaining readers, encoders and archives |
-| 8 | `range_view/` | Range encoders, range-pillar hybrids, sparse windows and fusion |
-| 7 | `detection/` | Pillar detection and native training-box tools |
+| 13 | `studies/` | Study runners, verifiers and closed-gate procedure records |
+| 12 | `gpu/`, `evaluation/`, `tracking/`, `association/`, `inspection/` | Model workers, metric contracts, inspection and standalone tools |
+| 11 | `motion/` | Motion ingestion, causal projection and native metric tools |
+| 10 | `pipeline/` | Remaining readers, encoders and archives |
+| 9 | `range_view/` | Range encoders, range-pillar hybrids, sparse windows and fusion |
+| 8 | `detection/` | Pillar detection, fixed-batch models and expanded-batch composition |
 | 6 | `resources/` | Measured bounded execution, retention, replay continuation and native-receipt binding |
 | 5 | `segmentation/` | Semantic and instance segmentation, masks and recovery |
 | 4 | `camera/` | Camera data, sidecars and projection tools |
@@ -34,8 +32,13 @@ not import each other. The order is declared in
 `research/` holds retained evidence, including frozen copies of sources, and is
 outside the layering.
 
-One upward import exists: `tier1/prepare_v3.py` imports `cohort/balanced.py`.
-It is listed as the only entry of `KNOWN_UPWARD`.
+Two upward imports remain listed in `KNOWN_UPWARD`: the retained
+`studies/fixed_batch/procedure_records/fixed_batch_prepare_v3.py` record imports
+the historical cohort balancer, and `detection/expanded_batch/models.py`
+imports `range_view.RangePillar`. The expanded-batch factory is a split
+detection target: lower-level point, sparse and packing mechanisms stay in
+`detection/`, while this factory composes the range-view encoder without making
+`range_view/` depend back on detection.
 
 Cross-area imports are qualified (`from geometry.geometry import ...`). A bare
 import (`import models`) resolves through whichever directories a script put on
@@ -46,7 +49,8 @@ defined by more than one other area.
 ## Two kinds of source
 
 - **Library code** is imported by other modules: most of `pipeline/`, the model
-  and variant modules in `gpu/`, `tier1/` and `advanced/`, the stage backend in
+  and variant modules in `gpu/`, fixed-batch and expanded-batch modules in
+  `detection/`, observation loaders in `dataset/`, the stage backend in
   `resources/`, the Insula sandbox helpers in `insula/`, and the journal and
   snapshot tools in `evidence/`.
 - **Procedure records** are scripts that ran one gate or one study stage and
@@ -60,8 +64,8 @@ retained receipt (`autonomy/evidence/pins.py status` prints the count per area).
 validators also require an exact file inventory, so adding a file there changes
 what they admit:
 
-- `cohort/sustained_sources.py`: every `*.py` under `dataset/`, `geometry/`,
-  `segmentation/`, `resources/`, `pipeline/`, `insula/`, `gpu/`, `tier1/`
+- `cohort/sustained_sources.py`: selected `*.py` under `dataset/`, `geometry/`,
+  `segmentation/`, `resources/`, `pipeline/`, `insula/`, `gpu/`, `detection/`
   and `cohort/`, plus the source snapshot helper, which
   `cohort/sustained_controller_backend.py` freezes for each sustained run;
 - `resources/sources.py`: every `*.py` under `resources/`.

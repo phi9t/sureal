@@ -1,11 +1,11 @@
 """Source-frozen live native backend for the four-case sustained workflow."""
 import json,os,re,shutil,subprocess,sys,time
 from pathlib import Path
-P=Path(__file__).resolve().parents[1];sys.path[:0]=[str(P),str(P/'architecture')]
+P=Path(__file__).resolve().parents[1];sys.path.insert(0,str(P))
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
-from tier1.storage import sha,unique_payload_bytes
-from tier1.admission import reserve_write
+from resources.scientific_payload import sha,unique_payload_bytes
+from resources.scientific_budget import reserve_write
 from cohort.sustained_contract import validate_contract
 from cohort.sustained_sources import snapshot_sources,validate_sources
 from cohort.sustained_stage_inputs import freeze_inputs,bind_stage_paths
@@ -62,7 +62,7 @@ class NativeBackend:
   if sha(self.source/'manifest.json')!=self.manifest_sha or json.loads(self.runtime_path.read_text())!=self.runtime or set(Path(p).name for p in self.verifier_pins)!={'audit_sustained_transition.py','sustained_chunk_reference.py'} or any(sha(p)!=h or h!=source_pins['cohort/'+Path(p).name] for p,h in self.verifier_pins.items()):raise ValueError('frozen manifest/runtime/verifier changed')
   if unique_payload_bytes(W)>15*1024**3 or unique_payload_bytes(self.output)>2*1024**3:raise ValueError('scientific/case storage cap exceeded')
  def stage(self,name,worker,directory,extra,*,gpu=True,metrics=False,logical_step=None):
-  from experiment_runner import run_stage
+  from studies.architecture.experiment_runner import run_stage
   self.guard();receipt_path=self.R/(name+'-verified.json')
   if receipt_path.exists():
    receipt=json.loads(receipt_path.read_text());self.check_stage(receipt)

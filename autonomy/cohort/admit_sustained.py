@@ -5,12 +5,12 @@ HDFS publication; never evicts another run or bypasses the scientific cap.
 """
 import argparse,fcntl,json,os,re,shutil,sys,time
 from pathlib import Path
-P=Path(__file__).resolve().parents[1];sys.path[:0]=[str(P),str(P/'architecture')]
-from experiment_runner import run_stage
+P=Path(__file__).resolve().parents[1];sys.path.insert(0,str(P))
+from studies.architecture.experiment_runner import run_stage
 from insula.runtime_identity import verify_rootfs
 from insula.entry import launch_plan
-from tier1.storage import sha,unique_payload_bytes
-from tier1.admission import reserve_write
+from resources.scientific_payload import sha,unique_payload_bytes
+from resources.scientific_budget import reserve_write
 from cohort.sustained_contract import validate_contract
 from cohort.sustained_scoring_budget import stage_timeout
 from cohort.sustained_sources import snapshot_sources,validate_sources

@@ -94,7 +94,7 @@ def validate_live_references(pub):
     from resources.stage import validate_proof
     pins=pub['resource_source_pins'];current=Path(pub['resource_source_directory'])
     execution=Path(pub['execution_directory'])
-    archive=execution/'advanced/archive.py'
+    archive=execution/'resources/resource_archive.py'
     if not regular(archive) or sha(archive)!=pub['archive_library']['sha256']:
         raise ValueError('executed archive helper differs from native pinned library')
     for name,digest in pins['source_pins'].items():

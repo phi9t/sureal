@@ -9,8 +9,8 @@ from cohort.sustained_state import restore_state,capture_state
 from resources.replay_values import require_exact_state,require_exact_heads
 from cohort.sustained_reference import reference_updates
 from cohort.sustained_loss import class_balanced_objective
-from tier1.catalog import catalog
-from tier1.models import build,optimizer,deterministic,objective
+from detection.fixed_batch_catalog import catalog
+from detection.fixed_batch_models import build,optimizer,deterministic,objective
 
 def sha(path):
  with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()

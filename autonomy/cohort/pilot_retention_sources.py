@@ -4,8 +4,10 @@ from evidence.source_snapshot import LocalSnapshotStore,copy_source_snapshot,ver
 REQUIRED=(
  'cohort/publish_sustained_pilot.py','cohort/sustained_pilot_inventory.py',
  'cohort/pilot_retention_audit.py','cohort/pilot_retention_sources.py',
- 'tier1/admission.py','tier1/storage.py','advanced/archive.py',
- 'advanced/retention.py','insula/entry.py','insula/runtime_identity.py',
+ 'resources/scientific_budget.py','resources/scientific_payload.py',
+ 'resources/resource_archive.py','resources/resource_archive_cli.py',
+ 'resources/resource_rehydrate.py','resources/resource_release_plan.py',
+ 'evidence/source_snapshot.py','insula/entry.py','insula/runtime_identity.py',
 )
 SNAPSHOT_TARGET='//autonomy:sustained-pilot-retention-host'
 def sha(path):

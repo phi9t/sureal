@@ -5,7 +5,7 @@ class JournalTests(unittest.TestCase):
  def test_evidence_hashes_and_history_are_preserved(self):
   with tempfile.TemporaryDirectory() as d:
    root=Path(d);evidence=root/'proof.json';evidence.write_text('{"passed":true}');journal=root/'journal.jsonl'
-   one=append_entry(journal,'observation',['tier1/baseline'],'Native overfit verified',[evidence]);two=append_entry(journal,'hypothesis',['tier1/baseline'],'Background imbalance may slow fitting',[])
+   one=append_entry(journal,'observation',['fixed_batch/baseline'],'Native overfit verified',[evidence]);two=append_entry(journal,'hypothesis',['fixed_batch/baseline'],'Background imbalance may slow fitting',[])
    self.assertEqual(two['previous_hash'],one['sha256']);self.assertEqual(len(read_entries(journal)),2);self.assertEqual(one['evidence'][0]['path'],str(evidence.resolve()));self.assertEqual(len(one['evidence'][0]['sha256']),64)
  def test_tampering_and_missing_evidence_are_rejected(self):
   with tempfile.TemporaryDirectory() as d:

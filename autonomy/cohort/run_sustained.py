@@ -2,7 +2,7 @@
 import argparse,json,re,sys
 from pathlib import Path
 P=Path(__file__).resolve().parents[1];sys.path.insert(0,str(P))
-from tier1.storage import sha
+from resources.scientific_payload import sha
 from cohort.sustained_controller_lock import acquire_experiment_lock
 from cohort.sustained_controller_backend import NativeBackend,write,C
 from cohort.sustained_workflow import execute_case
