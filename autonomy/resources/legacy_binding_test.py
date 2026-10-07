@@ -6,12 +6,12 @@ from pathlib import Path
 import tempfile
 import unittest
 from resources.sources import sha
-from resources import test_resource_stage
+from resources import stage_test
 
 
 class LegacyBindingTests(unittest.TestCase):
     def api(self):
-        try: return importlib.import_module('continuation_control.legacy_binding')
+        try: return importlib.import_module('resources.legacy_binding')
         except ModuleNotFoundError: self.fail('legacy execution identity binding is not implemented')
 
     def pin(self, path): return {'path': str(path), 'sha256': sha(path)}
@@ -19,7 +19,7 @@ class LegacyBindingTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
-        self.current, self.pins, self.fresh, proof = test_resource_stage.ResourceStageTests().fixture(self.root)
+        self.current, self.pins, self.fresh, proof = stage_test.ResourceStageTests().fixture(self.root)
         self.original = self.root / 'original'; self.original.mkdir()
         self.report = {'frames': 16, 'rows': [{'loss': 2.5}], 'elapsed_seconds': 1.0, 'peak_rss_kib': 10}
         (self.original / 'check.json').write_text(json.dumps(self.report))

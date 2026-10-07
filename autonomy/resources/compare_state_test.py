@@ -13,7 +13,7 @@ import torch
 class CompareStateTests(unittest.TestCase):
     def api(self):
         try:
-            return importlib.import_module('continuation.compare_state')
+            return importlib.import_module('resources.compare_state')
         except ModuleNotFoundError:
             self.fail('external-pinned state/head parity worker is not implemented')
 

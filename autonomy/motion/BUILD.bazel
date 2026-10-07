@@ -30,7 +30,6 @@ MOTION_VISIBILITY = [
     "//autonomy/architecture:__pkg__",
     "//autonomy/cohort:__pkg__",
     "//autonomy/gpu:__pkg__",
-    "//autonomy/resources:__pkg__",
 ]
 
 py_library(

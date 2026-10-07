@@ -6,7 +6,7 @@ This module alone grants neither native nor runner admission.
 """
 from pathlib import Path
 import re
-from continuation.legacy_values import read_json, require_exact, compare_stage, CONTRACTS
+from resources.legacy_values import read_json, require_exact, compare_stage, CONTRACTS
 from resources.sources import regular, sha
 from resources.stage import validate_proof, require_separate
 

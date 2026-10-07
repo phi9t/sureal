@@ -1,0 +1,104 @@
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+
+TEST_MODULES = glob(["*_test.py"])
+LIB_MODULES = glob(
+    ["*.py"],
+    exclude = ["*_test.py"],
+)
+TORCH_TEST_MODULES = [
+    "compare_state_test.py",
+    "replay_values_test.py",
+]
+RESOURCE_VISIBILITY = [
+    "//autonomy:__pkg__",
+    "//autonomy/advanced:__pkg__",
+    "//autonomy/architecture:__pkg__",
+    "//autonomy/association:__pkg__",
+    "//autonomy/cohort:__pkg__",
+    "//autonomy/evaluation:__pkg__",
+    "//autonomy/explorer:__pkg__",
+    "//autonomy/gpu:__pkg__",
+    "//autonomy/motion-evaluation:__pkg__",
+    "//autonomy/pipeline:__pkg__",
+    "//autonomy/scripts:__pkg__",
+    "//autonomy/tests:__pkg__",
+    "//autonomy/tier1:__pkg__",
+    "//autonomy/tools:__pkg__",
+    "//autonomy/viewer:__pkg__",
+]
+
+package(default_visibility = ["//visibility:private"])
+
+py_library(
+    name = "resources",
+    srcs = LIB_MODULES,
+    imports = [".."],
+    deps = [
+        "//autonomy/evidence:evidence",
+        "//autonomy/insula:insula",
+    ],
+    visibility = RESOURCE_VISIBILITY,
+)
+
+filegroup(
+    name = "all_py",
+    srcs = glob(["*.py"]),
+    visibility = ["//autonomy:__pkg__"],
+)
+
+filegroup(
+    name = "resource_source_layer",
+    srcs = glob(["*.py"]) + [
+        "//autonomy/evidence:source_snapshot_py",
+    ],
+    visibility = ["//autonomy:__pkg__"],
+)
+
+py_library(
+    name = "stage_test_fixture",
+    srcs = ["stage_test.py"],
+    imports = [".."],
+    testonly = True,
+    deps = [":resources"],
+)
+
+py_library(
+    name = "backend_test_fixture",
+    srcs = ["backend_test.py"],
+    imports = [".."],
+    testonly = True,
+    deps = [
+        ":resources",
+        ":stage_test_fixture",
+    ],
+)
+
+[
+    py_test(
+        name = test[:-3],
+        srcs = [test],
+        imports = [".."],
+        legacy_create_init = 0,
+        size = "small",
+        tags = ["perception_unit"] + (["requires_gpu"] if test in TORCH_TEST_MODULES else []),
+        deps = [":resources"] + (
+            [":stage_test_fixture"]
+            if test in [
+                "backend_test.py",
+                "legacy_binding_test.py",
+            ]
+            else []
+        ) + (
+            [":backend_test_fixture"]
+            if test == "checkpoint_test.py"
+            else []
+        ),
+    )
+    for test in TEST_MODULES
+]
+
+test_suite(
+    name = "all_tests",
+    tests = [test[:-3] for test in TEST_MODULES],
+    visibility = ["//autonomy:__pkg__"],
+)

@@ -21,7 +21,7 @@ def main():
  sys.path.insert(0,'/experiment')
  from cohort.sustained_sources import validate_sources
  from cohort.sustained_contract import validate_contract
- from cohort.sustained_replay_values import require_exact_state
+ from resources.replay_values import require_exact_state
  from cohort.sustained_loss import class_balanced_objective
  from tier1.catalog import catalog
  from tier1.models import build,optimizer,deterministic,objective

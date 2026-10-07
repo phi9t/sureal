@@ -1,13 +1,60 @@
 """Bounded, measured HDFS preservation; never deletes model checkpoints."""
 import errno,json,os,re,shutil,signal,subprocess,uuid
 from pathlib import Path
-from cohort.sustained_controller_backend import C,W,P
+from evidence.source_snapshot import safe_member_name
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
-from tier1.admission import reserve_write
 from resources.sources import regular,sha,validate_sources
 from resources.stage import run_stage,validate_proof,write_new,require_separate
 from resources.retention_audit import validate_union,LIMIT
+
+PACKAGE_ROOT=Path(__file__).resolve().parent.parent
+
+
+def reserve_write(root,maximum_new_bytes):
+    raise ValueError('resource retention requires a study write-reservation callback')
+
+
+def _context(backend):
+    cache_root=getattr(backend,'resource_cache_root',None)
+    if cache_root is None:
+        cache_root=backend.R.parent.parent
+    work_root=getattr(backend,'resource_work_root',None)
+    if work_root is None:
+        work_root=backend.output.parent
+    package_root=getattr(backend,'resource_package_root',PACKAGE_ROOT)
+    reserve=getattr(backend,'resource_reserve_write',reserve_write)
+    return Path(cache_root),Path(work_root),Path(package_root),reserve
+
+
+def materialize_execution_package(code,execution,library,library_sha,pins):
+    """Build the retained execution tree from already admitted source bytes."""
+    code=Path(code);execution=Path(execution);library=Path(library)
+    try:source_pins=pins['source_pins']
+    except (KeyError,TypeError) as error:
+        raise ValueError('complete admitted resource source pins required') from error
+    required={'resources/execute_worker.py','evidence/source_snapshot.py'}
+    if not isinstance(source_pins,dict) or not required<=set(source_pins):
+        raise ValueError('complete admitted resource source pins required')
+    if execution.exists() or execution.is_symlink():
+        raise ValueError('fresh execution package required')
+    if not regular(library) or sha(library)!=library_sha:
+        raise ValueError('pinned archive library changed')
+    execution.mkdir()
+    try:
+        for name,digest in sorted(source_pins.items()):
+            safe_member_name(name)
+            source=code/name
+            if not regular(source) or sha(source)!=digest:
+                raise ValueError('admitted resource source changed')
+            target=execution/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source,target)
+            if sha(target)!=digest:raise ValueError('executed resource package changed')
+        advanced=execution/'advanced';advanced.mkdir();shutil.copyfile(library,advanced/'archive.py')
+        if sha(advanced/'archive.py')!=library_sha:raise ValueError('executed archive helper changed')
+    except BaseException:
+        shutil.rmtree(execution,ignore_errors=True)
+        raise
+    return execution
 
 
 def partition(inventory,limit=LIMIT):
@@ -22,8 +69,9 @@ def partition(inventory,limit=LIMIT):
     return chunks
 
 
-def stage_member(entry,target,budget_root):
+def stage_member(entry,target,budget_root,*,reserve=None):
     """Copy only EXDEV inputs, charging new bytes to scientific staging."""
+    if reserve is None:reserve=reserve_write
     source=Path(entry['path']);target=Path(target);budget_root=Path(budget_root)
     if (not regular(source) or sha(source)!=entry['sha256'] or source.stat().st_size!=entry['bytes'] or
         type(entry['bytes']) is not int or not 0<=entry['bytes']<=LIMIT or target.exists() or
@@ -33,7 +81,7 @@ def stage_member(entry,target,budget_root):
     try:os.link(source,target)
     except OSError as error:
         if error.errno!=errno.EXDEV:raise
-        reserve_write(budget_root,entry['bytes']);shutil.copyfile(source,target);target.chmod(0o444);storage='copied'
+        reserve(budget_root,entry['bytes']);shutil.copyfile(source,target);target.chmod(0o444);storage='copied'
     if target.stat().st_size!=entry['bytes'] or sha(target)!=entry['sha256']:
         raise ValueError('staged resource member differs from original input')
     return {'storage':storage,'bytes':entry['bytes'],'sha256':entry['sha256']}
@@ -43,30 +91,29 @@ def publish_bundle(backend,kind,inventory):
     """Preserve a supplied exact inventory; native admission stays separate."""
     backend.guard()
     if kind not in {'shared','checkpoint'}:raise ValueError('declared resource bundle kind required')
+    cache_root,work_root,package_root,reserve=_context(backend)
     chunks=partition(inventory);identifier=backend.R.name+'-'+kind+'-'+uuid.uuid4().hex
-    root=C/'insula'/('resource-retention-'+identifier);require_separate(backend.output,root);root.mkdir()
-    pins=backend.resource_identity['source_pins'];code=validate_sources(P/'resources',pins)
-    execution=root/'execution';execution.mkdir();shutil.copytree(code,execution/'resources');(execution/'advanced').mkdir()
+    root=cache_root/'insula'/('resource-retention-'+identifier);require_separate(backend.output,root);root.mkdir()
+    pins=backend.resource_identity['source_pins'];code=validate_sources(package_root/'resources',pins)
     library=Path(backend.host_pins['source_snapshot_root'])/'advanced/archive.py';library_sha=backend.host_pins['source_pins']['advanced/archive.py']
-    shutil.copyfile(library,execution/'advanced/archive.py')
-    temp=W/('resource-retention-'+identifier);temp.mkdir();raw=temp/'raw';raw.mkdir()
+    execution=materialize_execution_package(code,root/'execution',library,library_sha,pins)
+    temp=work_root/('resource-retention-'+identifier);temp.mkdir();raw=temp/'raw';raw.mkdir()
     def guard():
-        backend.guard();validate_sources(P/'resources',pins)
+        backend.guard();validate_sources(package_root/'resources',pins)
         if not regular(library) or sha(library)!=library_sha:raise ValueError('pinned archive library changed')
         if sha(execution/'advanced/archive.py')!=library_sha:raise ValueError('executed archive helper changed')
         for name,digest in pins['source_pins'].items():
-            if sha(execution/'resources'/name)!=digest:raise ValueError('executed resource package changed')
+            if sha(execution/name)!=digest:raise ValueError('executed resource package changed')
         for entry in inventory.values():
             if not regular(Path(entry['path'])) or sha(entry['path'])!=entry['sha256'] or Path(entry['path']).stat().st_size!=entry['bytes']:
                 raise ValueError('exact resource source inventory changed')
     guard()
     staging={}
     for name,entry in inventory.items():
-        from advanced.archive import safe_name
-        safe_name(name);target=raw/name;target.parent.mkdir(parents=True,exist_ok=True);staging[name]=stage_member(entry,target,W)
+        safe_member_name(name);target=raw/name;target.parent.mkdir(parents=True,exist_ok=True);staging[name]=stage_member(entry,target,work_root,reserve=reserve)
     write_new(root/'staging.json',staging)
     expected=root/'expected.json';write_new(expected,inventory)
-    runtime_root=C/'insula/rootfs-v2';runtime=json.loads(Path(str(runtime_root)+'.lock.json').read_text());verify_rootfs(runtime_root,runtime['rootfs_sha256'])
+    runtime_root=cache_root/'insula/rootfs-v2';runtime=json.loads(Path(str(runtime_root)+'.lock.json').read_text());verify_rootfs(runtime_root,runtime['rootfs_sha256'])
     masked={'experiment','source','outputs','dev','proc','tmp'}
     entries=sorted(runtime_root.iterdir(),key=lambda p:p.name)
     audit_bindings=[item for path in entries if path.name not in masked for item in ['--ro-bind',str(path),'/'+path.name]]
@@ -97,7 +144,7 @@ def publish_bundle(backend,kind,inventory):
     proofs=root/'proofs';proofs.mkdir()
     pub={'schema_version':1,'kind':kind,'hdfs_prefix':prefix,'source_inventory':inventory,'source_inventory_sha256':sha(expected),
          'resource_identity_sha256':backend.resource_identity_sha256,'native_manifest_sha256':backend.manifest_sha,
-         'resource_source_pins':pins,'resource_source_directory':str(P/'resources'),'execution_directory':str(execution),
+         'resource_source_pins':pins,'resource_source_directory':str(package_root/'resources'),'execution_directory':str(execution),
          'runtime_lock':runtime,'rootfs_path':str(runtime_root),'audit_runtime_namespace':audit_namespace,
          'waystone_tool_sha256':tools,'archive_library':{'path':str(library),'sha256':library_sha},'chunks':[]}
     def live(script,mode,inputdir,source,out,label,extra=()):
@@ -112,13 +159,13 @@ def publish_bundle(backend,kind,inventory):
             command[index:index+3]=audit_bindings
         at=command.index('--')
         command[at:at]=['--ro-bind',str(inputdir),'/tmp/inputs','--ro-bind',str(library),'/tmp/resource-archive.py',*extra]
-        with (out/'live.log').open('w') as stream:run_stage(command,execution,dict(os.environ),stream,300,code=code,current_sources=P/'resources',source_pins=pins,evidence_directory=proofs/label,native_output=out,cap_bytes=16*1024**3)
-        proof=proofs/label/'resource-admitted.json';value=json.loads(proof.read_text());validate_proof(value,command,P/'resources',pins,out,16*1024**3,300)
+        with (out/'live.log').open('w') as stream:run_stage(command,execution,dict(os.environ),stream,300,code=code,current_sources=package_root/'resources',source_pins=pins,evidence_directory=proofs/label,native_output=out,cap_bytes=16*1024**3)
+        proof=proofs/label/'resource-admitted.json';value=json.loads(proof.read_text());validate_proof(value,command,package_root/'resources',pins,out,16*1024**3,300)
         retained=root/label;retained.mkdir()
         for filename in ['check.json','live.log']:shutil.copyfile(out/filename,retained/filename)
         guard();return {'stage':label.split('-',1)[-1] if label[0].isdigit() else label,'command':command,'exit_code':0,'resource_proof_path':str(proof),'resource_proof_sha256':sha(proof),'input_directory':str(inputdir),'input_hashes':{str(p):sha(p) for p in inputdir.iterdir()},'validation':json.loads((out/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in retained.iterdir()}}
     for index,names in enumerate(chunks):
-        total=sum(inventory[name]['bytes'] for name in names);reserve_write(W,3*(total+len(names)*4096+10240)+2*1024**2)
+        total=sum(inventory[name]['bytes'] for name in names);reserve(work_root,3*(total+len(names)*4096+10240)+2*1024**2)
         directory=temp/str(index);directory.mkdir();inputs=root/str(index);inputs.mkdir();job={'source_sha256':{name:inventory[name]['sha256'] for name in names},'max_bytes':LIMIT,'archive_module_path':'/tmp/resource-archive.py','archive_module_sha256':library_sha}
         create_inputs=inputs/'create';create_inputs.mkdir();write_new(create_inputs/'job.json',job)
         checks=[live('archive_worker.py','create',create_inputs,raw,directory/'packed',f'{index}-create-live')]
@@ -143,7 +190,7 @@ def publish_bundle(backend,kind,inventory):
     validate_union(pub,inventory,json.loads(readback.read_text()),raw)
     audit_inputs=root/'audit-input';audit_inputs.mkdir();write_new(audit_inputs/'publication.json',pub);shutil.copyfile(expected,audit_inputs/'expected.json');shutil.copyfile(readback,audit_inputs/'readback.json')
     extra=['--tmpfs','/data02','--ro-bind',str(root),str(root),'--ro-bind',str(backend.R),str(backend.R),
-           '--ro-bind',str(P/'resources'),str(P/'resources')]
+           '--ro-bind',str(package_root/'resources'),str(package_root/'resources')]
     audit=live('retention_audit.py',None,audit_inputs,raw,temp/'independent','independent',extra)
     if audit['validation']['whole_member_union_exact'] is not True:raise ValueError('independent whole resource recovery required')
     pub['independent_admission']=audit;receipt=root/'verified-publication.json';write_new(receipt,pub);guard()

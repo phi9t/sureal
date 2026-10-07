@@ -82,13 +82,45 @@ class ResourceRetentionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             root=Path(temp);source=root/'driver.so';source.write_bytes(b'driver bytes');entry={'path':str(source),'sha256':hashlib.sha256(source.read_bytes()).hexdigest(),'bytes':source.stat().st_size};destination=root/'staged.so'
             with patch('resources.retention.os.link',side_effect=OSError(errno.EXDEV,'cross-device')):
-                result=stage_member(entry,destination,root);self.assertEqual(destination.read_bytes(),source.read_bytes());self.assertEqual(result['storage'],'copied');self.assertEqual(result['bytes'],len(b'driver bytes'))
+                result=stage_member(entry,destination,root,reserve=lambda *_: None);self.assertEqual(destination.read_bytes(),source.read_bytes());self.assertEqual(result['storage'],'copied');self.assertEqual(result['bytes'],len(b'driver bytes'))
             with patch('resources.retention.os.link',side_effect=OSError(errno.EACCES,'not permitted')):
                 with self.assertRaises(OSError):stage_member(entry,root/'refused.so',root)
             self.assertFalse((root/'refused.so').exists())
-            with patch('resources.retention.os.link',side_effect=OSError(errno.EXDEV,'cross-device')),patch('resources.retention.reserve_write',side_effect=ValueError('reserve refused')):
-                with self.assertRaises(ValueError):stage_member(entry,root/'budget-refused.so',root)
+            with patch('resources.retention.os.link',side_effect=OSError(errno.EXDEV,'cross-device')):
+                with self.assertRaises(ValueError):stage_member(entry,root/'budget-refused.so',root,reserve=lambda *_: (_ for _ in ()).throw(ValueError('reserve refused')))
             self.assertFalse((root/'budget-refused.so').exists())
+
+    def test_execution_package_uses_admitted_evidence_helper_not_current_tree(self):
+        try:from resources.retention import materialize_execution_package
+        except ImportError:self.fail('retained execution must materialize helper packages from the admitted source closure')
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp);code=root/'code';execution=root/'execution';archive=root/'archive.py'
+            (code/'resources').mkdir(parents=True);(code/'evidence').mkdir()
+            (code/'resources/execute_worker.py').write_text('admitted worker')
+            (code/'evidence/source_snapshot.py').write_text('admitted helper')
+            archive.write_text('archive helper')
+            pins={'source_pins':{str(path.relative_to(code)):hashlib.sha256(path.read_bytes()).hexdigest() for path in code.rglob('*.py')}}
+            current_helper=root/'current/evidence/source_snapshot.py';current_helper.parent.mkdir(parents=True);current_helper.write_text('changed current helper')
+            materialize_execution_package(code,execution,archive,hashlib.sha256(archive.read_bytes()).hexdigest(),pins)
+            self.assertEqual((execution/'evidence/source_snapshot.py').read_text(),'admitted helper')
+            self.assertEqual((execution/'resources/execute_worker.py').read_text(),'admitted worker')
+            self.assertEqual((execution/'advanced/archive.py').read_text(),'archive helper')
+            from resources.retention_audit import validate_live_references
+            pub={'resource_source_pins':pins,'resource_source_directory':str(root/'current/resources'),
+                 'execution_directory':str(execution),'archive_library':{'sha256':hashlib.sha256(archive.read_bytes()).hexdigest()},'chunks':[]}
+            validate_live_references(pub)
+            for name in pins['source_pins']:
+                helper=execution/name;original=helper.read_bytes()
+                helper.write_bytes(b'tampered execution helper')
+                with self.assertRaises(ValueError):validate_live_references(pub)
+                helper.unlink()
+                with self.assertRaises(ValueError):validate_live_references(pub)
+                helper.write_bytes(original)
+            validate_live_references(pub)
+            (code/'evidence/source_snapshot.py').write_text('tampered admitted helper')
+            with self.assertRaises(ValueError):materialize_execution_package(code,root/'execution-2',archive,hashlib.sha256(archive.read_bytes()).hexdigest(),pins)
+            (code/'evidence/source_snapshot.py').unlink()
+            with self.assertRaises(ValueError):materialize_execution_package(code,root/'execution-3',archive,hashlib.sha256(archive.read_bytes()).hexdigest(),pins)
 
 
 if __name__=='__main__':unittest.main()

@@ -4,17 +4,14 @@ This worker does not update a model, reset RNG, or grant runner admission.
 The original native admission remains a separately required parent.
 """
 import argparse
-import hashlib
 import json
 from pathlib import Path
-import sys
 import numpy as np
 import torch
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from cohort.sustained_replay_values import require_exact_state, require_exact_heads
-from continuation.legacy_values import read_json, compare_producer_reports, measurement
-from resources.sources import regular
+from resources.replay_values import require_exact_state, require_exact_heads
+from resources.legacy_values import read_json, compare_producer_reports, measurement
+from resources.sources import regular, sha
 
 
 def pinned(reference):
@@ -23,8 +20,7 @@ def pinned(reference):
     path = Path(reference['path'])
     if not path.is_absolute() or not regular(path):
         raise ValueError('absolute regular evidence path required')
-    digest = hashlib.sha256(path.read_bytes()).hexdigest()
-    if digest != reference['sha256']:
+    if sha(path) != reference['sha256']:
         raise ValueError('externally pinned evidence bytes changed')
     return path
 

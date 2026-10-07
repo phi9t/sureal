@@ -2,34 +2,62 @@
 import json
 from pathlib import Path
 import re
-from cohort.sustained_controller_backend import NativeBackend,P
-from cohort.sustained_scoring_budget import stage_timeout
 from resources.sources import regular,sha,freeze_sources,validate_sources
 from resources.stage import run_stage,validate_proof,write_new,require_separate
 
 CAP_BYTES=16*1024**3
 CURRENT=Path(__file__).resolve().parent
+PACKAGE_ROOT=CURRENT.parent
 
 
-def prepare_identity(native,destination):
+def default_stage_timeout(metrics):
+    if type(metrics) is not bool:raise ValueError('explicit metric stage flag required')
+    return 14700 if metrics else 1800
+
+
+def _stage_timeout(owner,metrics):
+    timeout=getattr(owner,'resource_stage_timeout',default_stage_timeout)
+    return timeout(metrics)
+
+
+def _launcher(owner):
+    module=getattr(owner,'resource_launcher_module',None)
+    if module is None:
+        raise ValueError('resource launcher module required')
+    expected=getattr(owner,'resource_launcher_path',None)
+    if expected is not None and Path(module.__file__).resolve()!=Path(expected):
+        raise ValueError('original serialized native launcher required')
+    return module
+
+
+def prepare_identity(native,destination,*,source_directory=CURRENT,timeout_for_stage=default_stage_timeout):
     """Create a candidate attachment; execution needs its external digest."""
-    native.guard();destination=Path(destination)
-    require_separate(native.output,destination,CURRENT)
+    native.guard();destination=Path(destination);source_directory=Path(source_directory)
+    require_separate(native.output,destination,source_directory)
     if destination.parent!=native.R or not destination.is_absolute() or any(p.is_symlink() for p in [destination,*destination.parents]):
         raise ValueError('regular resource identity directory owned by native case required')
-    destination.mkdir(exist_ok=False);pins=freeze_sources(CURRENT,destination/'code')
+    destination.mkdir(exist_ok=False);pins=freeze_sources(source_directory,destination/'code')
     (destination/'stages').mkdir()
     identity={'schema_version':1,'native_run_path':str(native.R/'run.json'),
               'native_run_sha256':sha(native.R/'run.json'),'native_case_directory':str(native.R),
               'manifest_sha256':native.manifest_sha,'anchor_templates_sha256':native.anchor_sha,
-              'source_directory':str(CURRENT),'source_pins':pins,'cap_bytes':CAP_BYTES,
-              'timeout_seconds':{'ordinary':stage_timeout(False),'metrics':stage_timeout(True)},
+              'source_directory':str(source_directory),'source_pins':pins,'cap_bytes':CAP_BYTES,
+              'timeout_seconds':{'ordinary':timeout_for_stage(False),'metrics':timeout_for_stage(True)},
               'scope':'additive source-frozen resource layer; legacy stages and HDFS closure require separate admission'}
     path=destination/'identity.json';write_new(path,identity)
     return path,sha(path)
 
 
-class ResourceBackend(NativeBackend):
+class ResourceBackend:
+    """Mixin for native study backends that need resource-bounded stages.
+
+    Study packages provide the native superclass and may override
+    ``resource_package_root`` or ``resource_stage_timeout``. This lower-layer
+    module never imports study code.
+    """
+    resource_package_root=PACKAGE_ROOT
+    resource_stage_timeout=staticmethod(default_stage_timeout)
+
     def __init__(self,*args,resource_identity_path,resource_identity_sha256,**kwargs):
         self._resource_identity=None
         super().__init__(*args,**kwargs)
@@ -55,8 +83,8 @@ class ResourceBackend(NativeBackend):
             value['native_run_path']!=str(self.R/'run.json') or sha(self.R/'run.json')!=value['native_run_sha256'] or
             value['manifest_sha256']!=self.manifest_sha or value['anchor_templates_sha256']!=self.anchor_sha or
             not isinstance(value.get('source_directory'),str) or type(value['cap_bytes']) is not int or value['cap_bytes']!=CAP_BYTES or
-            value['timeout_seconds']!={'ordinary':stage_timeout(False),'metrics':stage_timeout(True)} or
-            value['source_pins'].get('source_pins',{}).get('backend.py') is None):
+            value['timeout_seconds']!={'ordinary':_stage_timeout(self,False),'metrics':_stage_timeout(self,True)} or
+            value['source_pins'].get('source_pins',{}).get('resources/backend.py') is None):
             raise ValueError('complete externally pinned native/resource identity required')
         require_separate(self.output,self.resource_root,CURRENT)
         validate_sources(CURRENT,value['source_pins'])
@@ -74,7 +102,7 @@ class ResourceBackend(NativeBackend):
         if (proof['artifacts']['worker_resource']['path']!=str(evidence/'worker/worker-resource.json') or
             proof['artifacts']['execution_log']['sha256']!=receipt['artifacts'].get(str(native/'live.log'))):
             raise ValueError('resource proof is not bound to this native stage log/output')
-        validate_proof(proof,receipt['command'],CURRENT,self.resource_identity['source_pins'],native,CAP_BYTES,stage_timeout(metric))
+        validate_proof(proof,receipt['command'],CURRENT,self.resource_identity['source_pins'],native,CAP_BYTES,_stage_timeout(self,metric))
         native_path=self.R/(receipt['requested_stage']+'-verified.json')
         binding={'schema_version':1,'native_receipt_path':str(native_path),'native_receipt_sha256':sha(native_path) if regular(native_path) else None,
                  'resource_identity_sha256':self.resource_identity_sha256,'resource_proof_path':str(proof_path),
@@ -92,19 +120,19 @@ class ResourceBackend(NativeBackend):
         write_new(self._evidence(receipt['requested_stage'])/'native-resource-binding.json',binding)
 
     def stage(self,name,worker,directory,extra,**kwargs):
-        import experiment_runner
+        launcher=_launcher(self)
         self.guard()
-        if Path(experiment_runner.__file__).resolve()!=P/'architecture/experiment_runner.py' or self._launching_stage is not None:
+        if self._launching_stage is not None:
             raise ValueError('original serialized native launcher required')
-        existed=(self.R/(name+'-verified.json')).exists();original=experiment_runner.run_stage
+        existed=(self.R/(name+'-verified.json')).exists();original=launcher.run_stage
         frozen=validate_sources(CURRENT,self.resource_identity['source_pins'])
         def scoped(command,cwd,env,stream,timeout):
             return run_stage(command,cwd,env,stream,timeout,code=frozen,current_sources=CURRENT,
                              source_pins=self.resource_identity['source_pins'],evidence_directory=self._evidence(name),
                              native_output=directory,cap_bytes=CAP_BYTES)
-        self._launching_stage=name;experiment_runner.run_stage=scoped
+        self._launching_stage=name;launcher.run_stage=scoped
         try:path=super().stage(name,worker,directory,extra,**kwargs)
-        finally:experiment_runner.run_stage=original;self._launching_stage=None
+        finally:launcher.run_stage=original;self._launching_stage=None
         if not existed:self.bind_completed_stage(path)
         self.check_stage(json.loads(Path(path).read_text()))
         return path

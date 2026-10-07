@@ -13,6 +13,7 @@ EVIDENCE_VISIBILITY = [
     "//autonomy/geometry:__pkg__",
     "//autonomy/inspection:__pkg__",
     "//autonomy/insula:__pkg__",
+    "//autonomy/resources:__pkg__",
     "//autonomy/motion:__pkg__",
     "//autonomy/segmentation:__pkg__",
 ]
@@ -35,7 +36,10 @@ filegroup(
 filegroup(
     name = "source_snapshot_py",
     srcs = ["source_snapshot.py"],
-    visibility = ["//autonomy:__pkg__"],
+    visibility = [
+        "//autonomy:__pkg__",
+        "//autonomy/resources:__pkg__",
+    ],
 )
 
 filegroup(

@@ -10,7 +10,7 @@ import unittest
 class LegacyValuesTests(unittest.TestCase):
     def api(self):
         try:
-            return importlib.import_module('continuation.legacy_values')
+            return importlib.import_module('resources.legacy_values')
         except ModuleNotFoundError:
             self.fail('strict legacy parity admission has not been implemented')
 

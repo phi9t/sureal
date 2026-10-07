@@ -5,7 +5,7 @@ It preserves all seven stage proofs under one digest for progression/recovery.
 """
 import json
 from pathlib import Path
-from advanced.archive import safe_name
+from evidence.source_snapshot import safe_member_name
 from evidence.source_snapshot import verify_materialized_sources
 from resources.sources import regular,sha
 from resources.stage import write_new,require_separate
@@ -82,7 +82,7 @@ def resource_inventory(backend,record):
     """Exact raw closure to archive separately from the nineteen producer files."""
     companion=validate_checkpoint(backend,record);files={}
     def add(name,path,digest=None):
-        safe_name(name);entry=reference(path)
+        safe_member_name(name);entry=reference(path)
         if name in files or digest is not None and entry['sha256']!=digest:
             raise ValueError('unique safe resource member and unchanged digest required')
         entry['bytes']=Path(path).stat().st_size;files[name]=entry

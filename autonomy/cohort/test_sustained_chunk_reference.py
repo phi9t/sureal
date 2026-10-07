@@ -4,7 +4,7 @@ from cohort import test_sustained_loop as fixtures
 objective=fixtures.objective
 from cohort.sustained_loop import advance
 from cohort.sustained_chunk_reference import reference_chunk
-from cohort.sustained_replay_values import require_exact_state
+from resources.replay_values import require_exact_state
 
 class ChunkReferenceTests(unittest.TestCase):
  def test_beyond_pilot_and_mid_cycle_restart_matches_original_loop(self):

@@ -21,6 +21,7 @@ LAYERS = (
     ('geometry',),
     ('camera',),
     ('segmentation',),
+    ('resources',),
     ('detection',),
     ('pipeline',),
     ('motion',),
@@ -29,9 +30,6 @@ LAYERS = (
     ('tier1',),
     ('advanced',),
     ('cohort',),
-    ('resources',),
-    ('continuation',),
-    ('continuation_control',),
     ('analysis', 'scripts', 'tests', 'tools', ROOT),
 )
 # Existing upward imports in sources whose bytes retained receipts cite.  Keep

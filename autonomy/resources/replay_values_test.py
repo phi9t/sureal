@@ -1,7 +1,7 @@
 import copy,unittest
 import numpy as np
 import torch
-from cohort.sustained_replay_values import require_exact_state,require_exact_heads
+from resources.replay_values import require_exact_state,require_exact_heads
 
 class ReplayValueTests(unittest.TestCase):
  def test_every_nested_state_value_is_compared(self):

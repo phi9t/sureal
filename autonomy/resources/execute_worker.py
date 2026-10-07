@@ -6,16 +6,17 @@ import resource
 import runpy
 import sys
 import time
-from process_lifecycle import enable_subreaper, completed_lifecycle
+from evidence.source_snapshot import require_regular_file
+from resources.process_lifecycle import enable_subreaper, completed_lifecycle
 
 
 def main():
     if len(sys.argv)<3:
         raise ValueError('resource output directory and original worker path required')
     output=Path(sys.argv[1]);worker=Path(sys.argv[2]);args=sys.argv[2:]
-    if not output.is_dir() or not worker.is_file():raise ValueError('existing output and regular worker required')
+    if not output.is_dir():raise ValueError('existing output and regular worker required')
+    require_regular_file(worker)
     sys.argv=args
-    sys.path[0]=str(worker.parent)
     enable_subreaper()
     completed_lifecycle()
     started=time.monotonic()

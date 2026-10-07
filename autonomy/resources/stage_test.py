@@ -12,9 +12,11 @@ class ResourceStageTests(unittest.TestCase):
         return run_stage,validate_proof
 
     def sources(self,root):
-        current=root/'current';current.mkdir()
+        current=root/'current/resources';current.mkdir(parents=True)
+        evidence=current.parent/'evidence';evidence.mkdir()
         for name in ['sources.py','command.py','stage.py','kernel_scope.py','scoped_stage.py','stage_accounting.py','execute_worker.py','process_lifecycle.py']:
             (current/name).write_text('frozen '+name)
+        (evidence/'source_snapshot.py').write_text('frozen helper')
         return current,freeze_sources(current,root/'code')
 
     def test_uncapped_attempt_is_durable_and_cannot_start_worker(self):
@@ -28,7 +30,7 @@ class ResourceStageTests(unittest.TestCase):
     def fixture(self,root,evidence_name='attempt'):
         current,pins=self.sources(root);native=root/'native';native.mkdir();log=native/'live.log';log.write_text('literal execution log');evidence=root/evidence_name;evidence.mkdir();worker_dir=evidence/'worker';worker_dir.mkdir();worker_path=worker_dir/'worker-resource.json'
         worker={'worker_argv':['/experiment/worker.py'],'worker_pid':123,'measurement':'in-runtime getrusage SELF and waited CHILDREN KiB','self_peak_rss_kib':150,'waited_child_peak_rss_kib':100,'peak_rss_kib':150,'elapsed_seconds':.8,'exit_code':0,'child_lifecycle':{'subreaper_verified':True,'remaining_children':[]}};worker_path.write_text(json.dumps(worker));retained_log=evidence/'execution.log';retained_log.write_bytes(log.read_bytes())
-        original=['bwrap','--unshare-all','--die-with-parent','--bind',str(native),'/outputs','--','python','/experiment/worker.py'];command=original[:original.index('--')]+['--ro-bind',str(root/'code'),'/tmp/resource-layer','--bind',str(worker_dir),'/tmp/resource-output','--','python','/tmp/resource-layer/execute_worker.py','/tmp/resource-output','/experiment/worker.py']
+        original=['bwrap','--unshare-all','--die-with-parent','--bind',str(native),'/outputs','--','python','/experiment/worker.py'];command=original[:original.index('--')]+['--ro-bind',str(root/'code'),'/tmp/resource-layer','--ro-bind',str(root/'code/resources'),'/experiment/resources','--ro-bind',str(root/'code/evidence'),'/experiment/evidence','--bind',str(worker_dir),'/tmp/resource-output','--','python','/tmp/resource-layer/resources/execute_worker.py','/tmp/resource-output','/experiment/worker.py']
         host={'command':command.copy(),'exit_code':0,'timed_out':False,'peak_rss_kib':100,'elapsed_seconds':1.,'measurement':'wait4.ru_maxrss_KiB_largest_waited_child','kernel_scope':{'path':'/user.slice/sureal-sustained-fixture.scope','memory_max_bytes':1024**3,'memory_swap_max_bytes':0,'oom':0,'oom_kill':0,'members_verified':True,'process_ids':[111]},'stage_lifecycle':{'caller_pid':111,'scope_members_before':[111],'scope_members_after':[111],'subreaper_verified':True,'remaining_children':[]}}
         proof={'schema_version':1,'admitted':True,'command':command,'original_command':original,'worker_argv':worker['worker_argv'],'source_pins':pins,'native_output_directory':str(native),'cap_bytes':1024**3,'timeout_seconds':10,'host_measurement':host,'worker_measurement':worker,'resource_admission':{'peak_rss_bytes':153600,'aggregate_cap_bytes':1073741824,'scope':'separate launcher and in-runtime worker/waited-child peaks under aggregate kernel cap; not summed tree RSS'},'artifacts':{'worker_resource':{'path':str(worker_path),'sha256':sha(worker_path)},'execution_log':{'path':str(retained_log),'native_path':str(log),'sha256':sha(retained_log)}}}
         return current,pins,native,proof
