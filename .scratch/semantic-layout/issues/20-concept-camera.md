@@ -4,7 +4,7 @@
 
 **Blocked by:** 14 (Concept batch: `dataset`), 15 (Concept batch: `geometry`), 28 (The perception rootfs carries the tools its tests need)
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] Scope: the camera dataset, sidecars and their validation, camera eviction, replay checks, camera semantic scoring, and the C++ camera projection tool
 - [x] The C++ projection tool is a Bazel target if it builds from sources in this repository; otherwise its existing build is kept and the reason recorded
