@@ -1,6 +1,7 @@
 import json
 import os
 import subprocess
+import sys
 import tempfile
 import textwrap
 import unittest
@@ -66,6 +67,69 @@ def has_mount_to(mounts, destination):
 
 
 class BazelWrapperTests(unittest.TestCase):
+    def test_external_cwd_and_symlink_preserve_relative_options_and_environment(self):
+        for options in ("arguments", "environment"):
+            for symlink in (False, True):
+                with self.subTest(options=options, symlink=symlink), tempfile.TemporaryDirectory() as temporary:
+                    root = Path(temporary).resolve()
+                    rootfs = root / "root fs"
+                    write_rootfs(rootfs)
+                    lock = root / "rootfs lock.json"
+                    write_lock(lock, rootfs)
+                    cache = root / "cache directory"
+                    marker = root / "bwrap-ran"
+                    fakebin = root / "fakebin"
+                    write_fake_bwrap(fakebin, marker)
+                    env = os.environ.copy()
+                    env["PATH"] = f"{fakebin}{os.pathsep}{env['PATH']}"
+                    settings = {
+                        "SUREAL_BAZEL_ROOTFS": rootfs.name,
+                        "SUREAL_BAZEL_ROOTFS_LOCK": lock.name,
+                        "SUREAL_BAZEL_CACHE": cache.name,
+                    }
+                    for name in settings:
+                        env.pop(name, None)
+                    arguments = []
+                    if options == "environment":
+                        env.update(settings)
+                    else:
+                        arguments = ["--rootfs", rootfs.name, "--lock", lock.name, "--cache", cache.name]
+                    entry = WRAPPER
+                    if symlink:
+                        entry = root / "linked-bazelw"
+                        entry.symlink_to(WRAPPER)
+                    result = subprocess.run(
+                        [str(entry), "--emit-plan", *arguments, "test", "//autonomy/..."],
+                        cwd=root, env=env, text=True, capture_output=True,
+                    )
+                    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                    plan = json.loads(result.stdout)
+                    self.assertEqual(plan["rootfs"], str(rootfs))
+                    self.assertEqual(plan["lock"], str(lock))
+                    self.assertEqual(plan["cache"], str(cache))
+                    self.assertIn(["--ro-bind", str(AUTONOMY.resolve()), "/experiment/autonomy"], plan["mounts"])
+                    self.assertFalse(marker.exists())
+                    result = subprocess.run(
+                        [str(entry), *arguments, "test", "//autonomy/..."],
+                        cwd=root, env=env, text=True, capture_output=True,
+                    )
+                    self.assertEqual(result.returncode, 19, result.stdout + result.stderr)
+                    self.assertEqual(marker.read_text(), "bwrap ran\n")
+                    self.assertTrue((cache / "output-base").is_dir())
+
+    def test_implementation_import_does_not_change_cwd_or_launch_processes(self):
+        code = """
+from unittest.mock import patch
+with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
+    with patch('os.execvp', side_effect=AssertionError('import launched a process')):
+        import insula.bazel_launcher
+"""
+        result = subprocess.run(
+            [sys.executable, "-c", code], cwd=AUTONOMY,
+            text=True, capture_output=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def run_wrapper(self, temporary, *arguments, wrong_identity=False):
         root = Path(temporary)
         rootfs = root / "rootfs"
