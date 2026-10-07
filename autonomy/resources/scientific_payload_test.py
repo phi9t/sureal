@@ -1,6 +1,6 @@
 import os,tempfile,unittest
 from pathlib import Path
-from storage import unique_payload_bytes,deduplicate
+from resources.scientific_payload import unique_payload_bytes,deduplicate
 class StorageTests(unittest.TestCase):
  def test_hardlinks_count_once(self):
   with tempfile.TemporaryDirectory() as t:

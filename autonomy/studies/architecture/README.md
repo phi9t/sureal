@@ -3,8 +3,8 @@
 A persistent catalog of tested directions and planned follow-ups. The runner uses host Python standard library only; model training and native evaluation run inside the existing locked Insula roots. Torch is inside the GPU root, not required on the host. No TensorFlow.
 
 Prediction–target association is a separately specified experiment axis:
-[study handbook](../research/prediction-target-association-study.md),
-[ticket 41](../../docs/research/tasks/41-prediction-target-association.md).
+[study handbook](../../research/prediction-target-association-study.md),
+[ticket 41](../../../docs/research/tasks/41-prediction-target-association.md).
 Its A0–A3 matrix separates legacy ownership, global coverage, 3D geometry and
 prediction-dependent matching while keeping the baseline architecture/loss/decoder
 fixed. These treatments are planned and are not supported by this architecture
@@ -77,7 +77,7 @@ The public bundled harness lives in `harness/`. New executions do not depend on 
 
 A completed run means the implementation and evaluation are admitted. It does not mean the architecture passed quality thresholds. Summaries report scores and first crossing brackets; full-class Tier1 and heldout promotion remain separate. The fixed recipe is deliberately not an unrestricted hyperparameter sweep. Additional seeds/configurations require a separately specified experiment.
 
-[First-cohort results](../research/architecture-first-cohort-results.md) · [Study spec](../../docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md) · [Execution plan](../../docs/superpowers/plans/2026-10-02-perception-architecture-study.md)
+[First-cohort results](../../research/architecture-first-cohort-results.md) · [Study spec](../../../docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md) · [Execution plan](../../../docs/superpowers/plans/2026-10-02-perception-architecture-study.md)
 
 ## Verified runner evidence (2026-10-02)
 

@@ -1,5 +1,5 @@
 import unittest
-from catalog import catalog,select_fixture
+from detection.fixed_batch_catalog import catalog,select_fixture
 class CatalogTests(unittest.TestCase):
  def test_one_axis_controls(self):
   cases=catalog();base=cases['baseline'];self.assertEqual(len(cases),16)

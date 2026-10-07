@@ -134,9 +134,7 @@ filegroup(
     name = "architecture_experiment_runner_snapshot",
     srcs = [
         "BUILD.bazel",
-        "studies/architecture/experiment_runner.py",
-        "studies/architecture/harness/files.json",
-        "studies/architecture/registry.json",
+        "//autonomy/studies:architecture/experiment_runner.py",
         "//autonomy/camera:all_py",
         "//autonomy/dataset:all_py",
         "//autonomy/detection:all_py",

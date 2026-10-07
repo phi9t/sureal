@@ -23,6 +23,11 @@ PROCEDURE_RECORDS = glob([
 
 package(default_visibility = ["//visibility:private"])
 
+exports_files(
+    ["architecture/experiment_runner.py"],
+    visibility = ["//autonomy:__pkg__"],
+)
+
 py_library(
     name = "studies",
     srcs = ACTIVE_MODULES,
@@ -67,6 +72,7 @@ filegroup(
         ],
         imports = [".."],
         legacy_create_init = 0,
+        main = test,
         size = "small",
         tags = ["perception_unit"],
     )

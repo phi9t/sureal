@@ -1,6 +1,6 @@
 import tempfile,unittest
 from pathlib import Path
-from receipt_lifecycle import admit_artifact
+from evidence.artifact_lifecycle import admit_artifact
 class LifecycleTests(unittest.TestCase):
  def test_undeclared_delete_refused(self):
   with tempfile.TemporaryDirectory() as d:

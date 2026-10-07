@@ -27,6 +27,18 @@ RESOURCE_VISIBILITY = [
 
 package(default_visibility = ["//visibility:private"])
 
+exports_files(
+    [
+        "resource_archive.py",
+        "resource_archive_cli.py",
+        "resource_rehydrate.py",
+        "resource_release_plan.py",
+        "scientific_budget.py",
+        "scientific_payload.py",
+    ],
+    visibility = ["//autonomy:__pkg__"],
+)
+
 py_library(
     name = "resources",
     srcs = LIB_MODULES,

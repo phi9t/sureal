@@ -1,6 +1,6 @@
 import tempfile,unittest
 from pathlib import Path
-from admission import reserve_write,fit_interval
+from resources.scientific_budget import reserve_write,fit_interval
 class AdmissionTests(unittest.TestCase):
  def test_refuse_before_write(self):
   with tempfile.TemporaryDirectory() as d:

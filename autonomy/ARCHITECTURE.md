@@ -32,11 +32,13 @@ not import each other. The order is declared in
 `research/` holds retained evidence, including frozen copies of sources, and is
 outside the layering.
 
-One upward import exists: `detection/expanded_batch/models.py` imports
-`range_view.RangePillar`. It is listed in `KNOWN_UPWARD` because the expanded
-batch factory is a split detection target: lower-level point, sparse and
-packing mechanisms stay in `detection/`, while this factory composes the
-range-view encoder without making `range_view/` depend back on detection.
+Two upward imports remain listed in `KNOWN_UPWARD`: the retained
+`studies/fixed_batch/procedure_records/fixed_batch_prepare_v3.py` record imports
+the historical cohort balancer, and `detection/expanded_batch/models.py`
+imports `range_view.RangePillar`. The expanded-batch factory is a split
+detection target: lower-level point, sparse and packing mechanisms stay in
+`detection/`, while this factory composes the range-view encoder without making
+`range_view/` depend back on detection.
 
 Cross-area imports are qualified (`from geometry.geometry import ...`). A bare
 import (`import models`) resolves through whichever directories a script put on
