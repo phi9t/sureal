@@ -1,5 +1,4 @@
-load(":bazel_tests.bzl", "perception_py_test", "perception_test_name")
-load("@rules_python//python:defs.bzl", "py_library")
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
 
 package(default_visibility = ["//visibility:private"])
 
@@ -74,77 +73,6 @@ py_library(
     visibility = ["//visibility:public"],
 )
 
-PERCEPTION_TEST_MODULES = glob(
-    [
-        "**/test_*.py",
-        "**/*_test.py",
-    ],
-    exclude = [
-        "camera/**",
-        "dataset/**",
-        "detection/**",
-        "evaluation/**",
-        "resources/**",
-        "retention/**",
-        "motion/**",
-        "inspection/**",
-        "range_view/**",
-        "segmentation/**",
-        "studies/**",
-        "training_execution/**",
-        "research/**",
-        "source_snapshot_targets_test.py",
-    ],
-)
-
-PERCEPTION_RUNFILES = glob(
-    ["**"],
-    exclude = [
-        "camera/**",
-        "dataset/**",
-        "detection/**",
-        "evaluation/**",
-        "resources/**",
-        "retention/**",
-        "motion/**",
-        "inspection/**",
-        "range_view/**",
-        "segmentation/**",
-        "studies/**",
-        "training_execution/**",
-        "research/**",
-        "**/__pycache__/**",
-    ],
-) + [
-    "//autonomy/camera:runfiles",
-    "//autonomy/dataset:runfiles",
-    "//autonomy/motion:runfiles",
-    "//autonomy/inspection:runfiles",
-    "//autonomy/segmentation:runfiles",
-    "research/association41-runtime-admission-20261003a/manifest.json",
-]
-
-PERCEPTION_DEPS = [
-    "//autonomy/camera:camera",
-    "//autonomy/dataset:dataset",
-    "//autonomy/detection:detection",
-    "//autonomy/detection/expanded_batch:expanded_batch",
-    "//autonomy/evidence:evidence",
-    "//autonomy/evaluation:evaluation",
-    "//autonomy/geometry:geometry",
-    "//autonomy/inspection:inspection",
-    "//autonomy/insula:insula",
-    "//autonomy/range_view:range_view",
-    "//autonomy/retention:retention",
-    "//autonomy/resources:resources",
-    "//autonomy/motion:motion",
-    "//autonomy/segmentation:segmentation",
-    "//autonomy/studies:studies",
-    "//autonomy/training_execution:training_execution",
-]
-
-PERCEPTION_EXTRA_DATA = {}
-
 ARCHITECTURE_EXPERIMENT_RESEARCH_INPUTS = [
     "research/architecture-all_pillars-cache-verified.json",
     "research/architecture-retain64-cache-verified.json",
@@ -159,6 +87,12 @@ filegroup(
     name = "architecture_experiment_research_inputs",
     srcs = ARCHITECTURE_EXPERIMENT_RESEARCH_INPUTS,
     visibility = ["//autonomy/studies:__pkg__"],
+)
+
+filegroup(
+    name = "association41_runtime_manifest",
+    srcs = ["research/association41-runtime-admission-20261003a/manifest.json"],
+    visibility = ["//autonomy/association:__pkg__"],
 )
 
 filegroup(
@@ -269,10 +203,10 @@ genquery(
     scope = ["//autonomy/studies:architecture_experiment_runner"],
 )
 
-perception_py_test(
-    "source_snapshot_targets_test.py",
-    PERCEPTION_RUNFILES,
-    extra_data = [
+py_test(
+    name = "source_snapshot_targets_test",
+    srcs = ["source_snapshot_targets_test.py"],
+    data = [
         ":native_cache_retention_host_query",
         ":architecture_experiment_runner_query",
         ":resource_source_layer_query",
@@ -281,24 +215,24 @@ perception_py_test(
         ":sustained_pilot_retention_host_query",
         ":sustained_run_sources_query",
     ],
-    deps = PERCEPTION_DEPS,
+    imports = ["."],
+    legacy_create_init = 0,
+    size = "small",
+    tags = ["perception_unit"],
+    deps = [
+        "//autonomy/evidence:evidence",
+        "//autonomy/resources:resources",
+        "//autonomy/retention:retention",
+        "//autonomy/studies:studies",
+        "//autonomy/training_execution:training_execution",
+    ],
 )
-
-[
-    perception_py_test(
-        src,
-        PERCEPTION_RUNFILES,
-        extra_data = PERCEPTION_EXTRA_DATA.get(src, []),
-        deps = PERCEPTION_DEPS,
-    )
-    for src in PERCEPTION_TEST_MODULES
-]
 
 test_suite(
     name = "perception_unit_tests",
     tests = [":source_snapshot_targets_test"]
-        + [":" + perception_test_name(src) for src in PERCEPTION_TEST_MODULES]
         + [
+            "//autonomy/association:all_tests",
             "//autonomy/camera:all_tests",
             "//autonomy/dataset:all_tests",
             "//autonomy/detection:all_tests",

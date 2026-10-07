@@ -82,6 +82,7 @@ class BazelWrapperTests(unittest.TestCase):
                     write_fake_bwrap(fakebin, marker)
                     env = os.environ.copy()
                     env["PATH"] = f"{fakebin}{os.pathsep}{env['PATH']}"
+                    env["PYTHONSAFEPATH"] = "1"
                     settings = {
                         "SUREAL_BAZEL_ROOTFS": rootfs.name,
                         "SUREAL_BAZEL_ROOTFS_LOCK": lock.name,
@@ -193,7 +194,7 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
                 temporary,
                 "--emit-plan",
                 "test",
-                "//autonomy:tools_test_suites",
+                "//autonomy:source_snapshot_targets_test",
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             plan = json.loads(result.stdout)
@@ -240,7 +241,7 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
                 "--emit-plan",
                 "--update-lock",
                 "test",
-                "//autonomy:tools_test_suites",
+                "//autonomy:source_snapshot_targets_test",
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             plan = json.loads(result.stdout)
@@ -261,7 +262,7 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
             result, marker, _, _, _ = self.run_wrapper(
                 temporary,
                 "test",
-                "//autonomy:tools_test_suites",
+                "//autonomy:source_snapshot_targets_test",
                 wrong_identity=True,
             )
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)

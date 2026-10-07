@@ -17,3 +17,7 @@ class CoordinateValidationTests(unittest.TestCase):
         pose=np.array([[[0,0,np.pi/2,10,0,0]]]);frame=np.eye(4);frame[0,3]=3
         self.assertLess(check_coordinates(np.array([[7.,2,0]]),pix,ri,cal,pose,frame),1e-6)
         with self.assertRaises(ValueError):check_coordinates(np.array([[2.,0,0]]),pix,ri,cal,pose,frame)
+
+
+if __name__ == "__main__":
+    unittest.main()

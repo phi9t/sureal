@@ -83,3 +83,7 @@ def test_primary_ceiling_is_part_of_the_accepted_fixed_batch_protocol():
 
 def test_alpha_saturates_without_integer_to_float_overflow():
     assert prediction_alpha(10**1000) == 1.0
+
+
+if __name__ == "__main__":
+    raise SystemExit(pytest.main([__file__]))

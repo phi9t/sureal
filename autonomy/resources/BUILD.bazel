@@ -17,7 +17,6 @@ RESOURCE_VISIBILITY = [
     "//autonomy/motion-evaluation:__pkg__",
     "//autonomy/retention:__pkg__",
     "//autonomy/studies:__pkg__",
-    "//autonomy/tools:__pkg__",
     "//autonomy/training_execution:__pkg__",
     "//autonomy/viewer:__pkg__",
 ]

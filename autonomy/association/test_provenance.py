@@ -55,3 +55,7 @@ def test_contradictory_metadata_cannot_inherit_verified_identity(field):
     candidate[field] = {}
     with pytest.raises(ValueError):
         validate_contract(candidate, inputs=inputs, runtime_locks=runtime)
+
+
+if __name__ == "__main__":
+    raise SystemExit(pytest.main([__file__]))

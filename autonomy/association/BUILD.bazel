@@ -1,0 +1,52 @@
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+
+package(default_visibility = ["//visibility:private"])
+
+py_library(
+    name = "association",
+    srcs = ["contract.py"],
+    imports = [".."],
+    visibility = ["//autonomy:__pkg__"],
+)
+
+filegroup(
+    name = "runtime_recipe",
+    srcs = glob(["runtime/*"]),
+    visibility = ["//autonomy:__pkg__"],
+)
+
+py_test(
+    name = "test_provenance",
+    srcs = ["test_provenance.py"],
+    data = ["//autonomy:association41_runtime_manifest"],
+    deps = [":association"],
+    imports = [".."],
+    legacy_create_init = 0,
+    main = "test_provenance.py",
+    size = "small",
+    tags = ["perception_unit"],
+)
+
+py_test(
+    name = "test_contract",
+    srcs = [
+        "test_contract.py",
+        "test_provenance.py",
+    ],
+    data = ["//autonomy:association41_runtime_manifest"],
+    deps = [":association"],
+    imports = [".."],
+    legacy_create_init = 0,
+    main = "test_contract.py",
+    size = "small",
+    tags = ["perception_unit"],
+)
+
+test_suite(
+    name = "all_tests",
+    tests = [
+        ":test_contract",
+        ":test_provenance",
+    ],
+    visibility = ["//autonomy:__pkg__"],
+)

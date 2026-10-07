@@ -12,6 +12,9 @@ def main():
     repo = Path(__file__).resolve().parent
     original_cwd = Path.cwd()
     os.chdir(repo / "autonomy")
+    # The module root is the resolved repository, never the caller's directory.
+    # rules_python exports safe-path mode, which otherwise hides this root from -m.
+    os.environ.pop("PYTHONSAFEPATH", None)
     os.execvp(
         sys.executable,
         [
