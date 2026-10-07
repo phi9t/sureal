@@ -1,19 +1,17 @@
 """Named, immutable architecture runs using the admitted live Insula harness."""
-import argparse,datetime,fcntl,hashlib,io,json,os,re,shutil,signal,subprocess,sys,tarfile,uuid
+import argparse,datetime,fcntl,io,json,os,re,shutil,signal,subprocess,sys,tarfile,uuid
 from pathlib import Path
 
 HERE=Path(__file__).resolve().parent
 PACKAGE=HERE.parents[1]
 REPO=PACKAGE.parent
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
-sys.path.insert(0,str(PACKAGE))
-from evidence.source_snapshot import LocalSnapshotStore,safe_member_name,snapshot_bazel_target,verify_receipt_sources
+from evidence.source_snapshot import LocalSnapshotStore,file_sha256 as sha,require_regular_file,safe_member_name,snapshot_bazel_target,verify_receipt_sources
 
 ARCHITECTURE_SOURCE_SNAPSHOT_TARGET='//autonomy:architecture_experiment_runner_snapshot'
 ARCHITECTURE_STUDY_SPEC_SHA256='fef072b2737a4fda94a029944fb999d78be482669b1cd989af953d93b5e7ecf1'
 SOURCE_SNAPSHOT_STORE_RELATIVE=Path('insula/source-snapshots-v1')
 
-def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 def registry(here=None):return json.loads(((HERE if here is None else Path(here))/'registry.json').read_text())
 def run_label(name,run_id):
  if name not in registry():raise ValueError('Unknown experiment: '+name)
@@ -61,7 +59,8 @@ def check_harness_closure(here=None,package=None):
  files=json.loads((here/'harness/files.json').read_text());available=set(files)
  for name in files:
   p=here/'harness'/name
-  if not p.is_file():raise ValueError('Missing bundled harness file: '+name)
+  try:require_regular_file(p)
+  except ValueError as error:raise ValueError('Missing bundled harness file: '+name) from error
   for referenced in re.findall(r"['\"]([a-zA-Z0-9_-]+\.py)['\"]",p.read_text()):
    if referenced not in available and not any((package/area/referenced).exists() for area in ['detection','gpu']):
     raise ValueError(f'{name} references unbundled worker {referenced}')
@@ -90,8 +89,9 @@ def verify_receipt(receipt,package,snapshot_store=None):
   if snapshot_store is None:raise ValueError('Snapshot store required for source-pinned receipt')
   verify_receipt_sources(receipt,snapshot_store)
  def check(path,digest):
-  p=Path(path)
-  if not p.is_file() or sha(p)!=digest:raise ValueError('Missing or changed evidence: '+str(p))
+  try:p=require_regular_file(Path(path))
+  except ValueError as error:raise ValueError('Missing or changed evidence: '+str(path)) from error
+  if sha(p)!=digest:raise ValueError('Missing or changed evidence: '+str(p))
  for p,h in receipt.get('artifacts',{}).items():check(p,h)
  for p,h in receipt.get('candidate_hashes',{}).items():check(package/p,h)
  for p,h in receipt.get('driver_hashes',{}).items():check(p,h)
@@ -245,7 +245,7 @@ def execute(name,run_id,cache,resume=False):
    if resume:raise ValueError('Cannot resume a nonexistent run ID')
    preflight(cache,name);directory.mkdir();source,package=make_snapshot(directory,name,run_id,cache)
   meta=check_snapshot(directory);store=source_snapshot_store(cache)
-  env=dict(os.environ,WAYMO_ARCH_RUN_ID=run_id,WAYMO_ARCH_CACHE_ROOT=str(cache));logs=directory/'logs';logs.mkdir(exist_ok=True)
+  env=dict(os.environ,WAYMO_ARCH_RUN_ID=run_id,WAYMO_ARCH_CACHE_ROOT=str(cache),PYTHONPATH=str(package));logs=directory/'logs';logs.mkdir(exist_ok=True)
   for stage in stages:
    check_snapshot(directory);path=receipt_path(package,stage,run_label(name,run_id))
    if path.exists():

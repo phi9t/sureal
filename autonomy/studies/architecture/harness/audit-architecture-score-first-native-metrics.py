@@ -1,6 +1,6 @@
-import hashlib,json,math,re,subprocess
+import json,math,re,subprocess
 from pathlib import Path
-sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+from evidence.source_snapshot import file_sha256 as sha
 e=json.loads(Path('/tmp/expected.json').read_text());r=e['receipt'];assert sha('/experiment/research/architecture-'+r['manifest']['architecture_variant']+'-score-first-verified.json')==e['receipt_sha256']
 for path,digest in r['artifacts'].items():
  directory=Path('/source') if 'prepared' in Path(path).parts else Path('/tmp/scored');assert sha(directory/Path(path).name)==digest

@@ -1,5 +1,6 @@
 import importlib.util,json,re,subprocess,time
 from pathlib import Path
+from evidence.source_snapshot import file_sha256 as sha
 from detection.detection_export import export_objects
 assert importlib.util.find_spec('tensorflow') is None
 start=time.monotonic();out=Path('/outputs');records=json.loads(Path('/source/predictions.json').read_text());truth=json.loads(Path('/source/groundtruth.json').read_text());preparation=json.loads(Path('/source/preparation.json').read_text())

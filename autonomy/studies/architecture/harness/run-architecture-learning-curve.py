@@ -1,8 +1,8 @@
 from pathlib import Path
-import datetime,hashlib,json,subprocess,sys,time
-code=Path('autonomy').resolve();sys.path.insert(0,str(code))
+from evidence.source_snapshot import file_sha256 as sha
+import datetime,json,subprocess,sys,time
+code=Path('autonomy').resolve()
 from insula.runtime_identity import verify_rootfs
-sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 variant=sys.argv[1];assert variant in ['deep_pfn','context_pfn','residual_bev']
 cache=Path.home()/'.cache/waystone/waymo-perception';native=cache/'scientific-processing/overfit-native-cache-v1'
 progress_path=code/'research/overfit-native-cache-progress.json';progress=json.loads(progress_path.read_text());assert progress['admitted_frames']==progress['selected_frames']==16

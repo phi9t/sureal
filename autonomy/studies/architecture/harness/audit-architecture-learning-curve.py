@@ -1,7 +1,7 @@
-import hashlib,json,math
+import json,math
 from pathlib import Path
+from evidence.source_snapshot import file_sha256 as sha
 import numpy as np
-sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 e=json.loads(Path('/tmp/expected.json').read_text());r=e['receipt'];v=r['validation'];assert sha('/experiment/research/architecture-'+r['manifest']['architecture_variant']+'-execution-verified.json')==e['receipt_sha256']
 base=Path('/source')
 for path,h in r['artifacts'].items():

@@ -32,6 +32,13 @@ Corrected disposition after review:
 
 Boundary decision: `autonomy/detection/expanded_batch` is a split detection composition package. Lower-level point, sparse, packing and model factory code belongs with detection. The expanded model factory is allowed one documented layer exception to compose `range_view.RangePillar` without making `range_view` depend back on detection. The retained fixed-batch `fixed_batch_prepare_v3.py` procedure record keeps its historical cohort import as a documented legacy exception because its bytes are evidence and it is filegroup-exported only.
 
+Review-finding follow-up:
+
+- Active architecture runner and harness drivers no longer mutate `sys.path` or carry local `hashlib` digest helpers. The runner supplies `PYTHONPATH` for frozen source-snapshot stage execution, and the runner/harness digest checks use `evidence.source_snapshot.file_sha256`; runner evidence regular-file checks now use `require_regular_file`.
+- `autonomy/detection/scored_direction_test.py` uses package imports without test-local `sys.path` manipulation.
+- `autonomy/resources/scientific_payload.py` now rejects symlink payload roots and symlink payload files instead of silently skipping them; ordinary directory traversal and hardlink inode deduplication are retained.
+- `autonomy/studies:studies` no longer grants visibility to `//autonomy/resources:__pkg__`; resources remains a lower backend and does not depend on study code.
+
 Pure structural moves preserved:
 
 - `db2a04b` kept as the original byte-identical move that placed the suite under studies, later found incomplete by review.
@@ -46,12 +53,17 @@ Closed-gate procedure records retained/deferred as records:
 
 Verification evidence:
 
-- `python3 autonomy/tools/layers.py` exited 0: `PASS: 0 layering problem(s) across 15 layers`.
-- Focused moved-module wrapper check `TMPDIR=/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/runs/workers/sureal-semantic-24-20261007T095731Z/tmp ./bazelw test //autonomy/detection/expanded_batch:all_tests //autonomy/dataset:expanded_batch_observations_test //autonomy/studies:all_tests` exited 0: 3 CPU-visible tests passed. GPU-tagged moved tests were covered by the CUDA run.
-- `TMPDIR=/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/runs/workers/sureal-semantic-24-20261007T095731Z/tmp ./bazelw test //autonomy/...` exited 0: 150 tests passed.
-- `TMPDIR=/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/runs/workers/sureal-semantic-24-20261007T095731Z/tmp ./bazelw test --config=cuda --test_tag_filters=requires_gpu //autonomy/...` exited 0: 28 tests passed, including `dataset:expanded_batch_observations_test`, `detection/expanded_batch:models_test`, `point_modules_test`, and `sparse_sets_test`.
+- Red regression: after adding the symlink-root and symlink-payload-file tests plus a direct `unittest.main()` hook, `TMPDIR=/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/runs/workers/sureal-semantic-24-20261007T095731Z/tmp ./bazelw test --nocache_test_results //autonomy/resources:scientific_payload_test` exited 1 with 2 failures because symlinks were still skipped. After the fix, the same command exited 0: 1 test target passed.
+- `python3 -m py_compile autonomy/studies/architecture/experiment_runner.py autonomy/studies/architecture/harness/*.py autonomy/detection/scored_direction_test.py autonomy/resources/scientific_payload.py autonomy/resources/scientific_payload_test.py` exited 0.
+- `TMPDIR=/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/runs/workers/sureal-semantic-24-20261007T095731Z/tmp ./bazelw test --nocache_test_results //autonomy/studies:architecture__experiment_runner_test //autonomy/studies:all_tests //autonomy/detection:scored_direction_test //autonomy/resources:scientific_payload_test` exited 0: 4 test targets passed.
+- Runner contract probes with `PYTHONPATH=autonomy` exited as expected: `python3 autonomy/architecture.py list` exited 0; `python3 autonomy/architecture.py show residual_bev` exited 0; `python3 autonomy/architecture.py run residual_bev --run-id review-dryrun --dry-run` exited 0 and printed the 7-stage plan only; `python3 autonomy/architecture.py verify residual_bev` exited 2 with argparse reporting required `--run-id`.
+- Active review scan `rg -n "sys\\.path|hashlib|lambda .*sha|def sha|sha256\\(|file_digest" autonomy/studies/architecture/experiment_runner.py autonomy/studies/architecture/harness autonomy/detection/scored_direction_test.py` returned no matches. Visibility scan confirmed `//autonomy/resources:__pkg__` is absent from `autonomy/studies/BUILD.bazel`.
+- `TMPDIR=/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/runs/workers/sureal-semantic-24-20261007T095731Z/tmp python3 autonomy/tools/layers.py` exited 0: `PASS: 0 layering problem(s) across 15 layers`.
+- `TMPDIR=/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/runs/workers/sureal-semantic-24-20261007T095731Z/tmp ./bazelw test //autonomy/...` exited 0: 150 test targets passed.
+- `TMPDIR=/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/runs/workers/sureal-semantic-24-20261007T095731Z/tmp ./bazelw test --config=cuda --test_tag_filters=requires_gpu //autonomy/...` exited 0: 28 GPU-tagged test targets passed.
 - `git diff --quiet 247ae52 -- parallax bazelw MODULE.bazel MODULE.bazel.lock .bazelrc BUILD.bazel` exited 0, so Parallax and wrapper/toolchain inputs are byte-identical to base and the recorded 17-test Parallax pass is reused.
 - `python3 scripts/publication_audit.py --root .` exited 0: `{"errors": [], "gitlinks": 2, "max_blob_bytes": 26214400, "schema_version": 1, "status": "pass", "tracked_files": 4998}`.
+- `python3 -m unittest tests.test_publication_audit` exited 1 after running 30 tests: 29 passed and the one known read-only path assertion failed at `tests/test_publication_audit.py:465`.
 - `git diff --check` exited 0.
 - `git diff --quiet 247ae52 -- autonomy/research` exited 0; research files are unchanged.
 - `python3 autonomy/tools/pins.py check --base 247ae52` exited 1 with expected retained-receipt impact: `FAIL: 52 changed file(s) pinned by retained receipts`. This is the pin impact report, not a green verification.
