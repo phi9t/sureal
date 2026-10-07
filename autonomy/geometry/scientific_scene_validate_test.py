@@ -4,9 +4,9 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import shutil
 import numpy as np
-from test_scientific_reconstruction import ScientificReconstructionTests
-from pipeline.scientific_reconstruction import reconstruct_scene
-from pipeline.scientific_scene_validate import validate_scene
+from geometry.scientific_reconstruction_test import ScientificReconstructionTests
+from geometry.scientific_reconstruction import reconstruct_scene
+from geometry.scientific_scene_validate import validate_scene
 
 class ScientificSceneValidationTests(unittest.TestCase):
     def setup_scene(self,root,**kwargs):

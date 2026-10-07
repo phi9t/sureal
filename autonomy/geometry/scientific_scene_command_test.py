@@ -1,13 +1,13 @@
 import json,subprocess,sys,tempfile,unittest
 from pathlib import Path
-from test_scientific_reconstruction import ScientificReconstructionTests as Fixture
+from geometry.scientific_reconstruction_test import ScientificReconstructionTests as Fixture
 
 class ScientificSceneCommandTests(unittest.TestCase):
     def test_separate_commands_and_no_failed_validation_receipt(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);source,sidecars,hashes=Fixture().fixture(root)
             provenance=root/'trusted.json';provenance.write_text(json.dumps(hashes));points=root/'points';check=root/'checked.json'
-            command=[sys.executable,'-m','pipeline.scientific_scene_command']
+            command=[sys.executable,'-m','geometry.scientific_scene_command']
             p=subprocess.run(command+['reconstruct',str(source),str(sidecars),str(provenance),str(points),'10000000'],capture_output=True,text=True)
             self.assertEqual(p.returncode,0,p.stderr)
             p=subprocess.run(command+['validate',str(source),str(sidecars),str(provenance),str(points),str(check)],capture_output=True,text=True)

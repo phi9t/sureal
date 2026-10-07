@@ -9,7 +9,6 @@ DETECTION_VISIBILITY = [
     "//autonomy:__pkg__",
     "//autonomy/detection/expanded_batch:__pkg__",
     "//autonomy/evaluation:__pkg__",
-    "//autonomy/pipeline:__pkg__",
     "//autonomy/range_view:__pkg__",
     "//autonomy/studies:__pkg__",
     "//autonomy/training_execution:__pkg__",

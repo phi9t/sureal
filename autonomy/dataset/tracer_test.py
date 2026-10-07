@@ -9,8 +9,8 @@ import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from pipeline.tracer_contracts import validate_transform, summarize_array, native_keys
-from pipeline.tracer import inspect_slice, validate_run, _joins
+from dataset.tracer_contracts import validate_transform, summarize_array, native_keys
+from dataset.tracer import inspect_slice, validate_run, _joins
 
 
 def fixture(root, duplicate=False):
@@ -135,7 +135,7 @@ class TracerTests(unittest.TestCase):
                     rows[0]["source_sha256"] = "0" * 64
                 else:
                     rows[1]["key"]["key.frame_timestamp_micros"] = 30
-                    from pipeline.tracer_contracts import canonical
+                    from dataset.tracer_contracts import canonical
                     rows[1]["id"] = hashlib.sha256(canonical([
                         rows[1]["release"], rows[1]["split"], "vehicle_pose", "scene", 30])).hexdigest()
                 path.write_text("".join(json.dumps(row) + "\n" for row in rows))

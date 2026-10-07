@@ -10,7 +10,6 @@ import sys
 import time
 
 HERE=Path(__file__).resolve().parent
-sys.path.insert(0,str(HERE))
 from insula.m0_receipt import validate_receipt
 ROOT=Path.home()/'.cache/waystone/waymo-perception/insula/rootfs-v2'
 M0=ROOT.parent/'m0-live-20260930-c'
@@ -22,9 +21,9 @@ def main():
     validate_receipt(M0,ROOT,HERE)
     start=datetime.now(timezone.utc).isoformat();begin=time.monotonic();checks=[]
     base=[str(HERE/'enter.sh'),'--source',str(SOURCE),'--output',str(out),'--offline','--','python']
-    for name,tail in [('inspect',['-m','pipeline.tracer','inspect','--sample','/source','--output','/outputs/native']),
-                      ('validate',['-m','pipeline.tracer','validate','--sample','/source','--output','/outputs/native']),
-                      ('adversarial-tests',['-m','unittest','discover','-s','/experiment/tests','-p','test_tracer.py','-v'])]:
+    for name,tail in [('inspect',['-m','dataset.tracer','inspect','--sample','/source','--output','/outputs/native']),
+                      ('validate',['-m','dataset.tracer','validate','--sample','/source','--output','/outputs/native']),
+                      ('adversarial-tests',['-m','unittest','discover','-s','/experiment/dataset','-p','tracer_test.py','-v'])]:
         command=base+tail;p=subprocess.run(command,text=True,capture_output=True)
         (out/(name+'.log')).write_text(p.stdout+p.stderr)
         print(name,p.returncode,flush=True)
@@ -36,7 +35,7 @@ def main():
     receipt={'schema_version':1,'milestone':'M1','started_utc':start,'ended_utc':datetime.now(timezone.utc).isoformat(),
              'runtime_lock':json.loads(Path(str(ROOT)+'.lock.json').read_text()),'m0_receipt_sha256':sha(M0/'receipt.json'),
              'checks':checks,'source_receipt_sha256':sha(SOURCE/'slice.json'),
-             'code_hashes':{str(p.relative_to(HERE)):sha(p) for p in [HERE/'verify-native.py',HERE/'enter.sh',HERE/'insula/entry.py',HERE/'tests/test_tracer.py']},
+             'code_hashes':{str(p.relative_to(HERE)):sha(p) for p in [HERE/'verify-native.py',HERE/'enter.sh',HERE/'insula/entry.py',HERE/'dataset/tracer_test.py']},
              'artifacts':{str(p.relative_to(out)):sha(p) for p in out.rglob('*') if p.is_file()},
              'elapsed_seconds':time.monotonic()-begin,'child_peak_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss}
     (out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')

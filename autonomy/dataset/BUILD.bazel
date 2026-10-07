@@ -35,6 +35,11 @@ TEST_EXTRA_SRCS = {
     "scientific_sidecar_validate_test.py": ["scientific_sidecars_test.py"],
 }
 
+TEST_EXTRA_DATA = {
+    "tracer_runtime_test.py": ["//autonomy:tracer_runtime_files"],
+    "tracer_test.py": ["//autonomy:tracer_runtime_files"],
+}
+
 package(default_visibility = ["//visibility:private"])
 
 py_library(
@@ -84,7 +89,7 @@ filegroup(
     py_test(
         name = test[:-3],
         srcs = [test] + TEST_EXTRA_SRCS.get(test, []),
-        data = [":runfiles"],
+        data = [":runfiles"] + TEST_EXTRA_DATA.get(test, []),
         deps = [":dataset"],
         imports = [".."],
         legacy_create_init = 0,

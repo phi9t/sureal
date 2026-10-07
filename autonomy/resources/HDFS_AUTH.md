@@ -3,13 +3,13 @@
 Initial interactive login:
 
 ```bash
-autonomy/scripts/refresh-hdfs-auth.sh
+autonomy/resources/refresh-hdfs-auth.sh
 ```
 
 Install the password-free user timer after that succeeds:
 
 ```bash
-python autonomy/scripts/install-hdfs-auth-keepalive.py
+python autonomy/resources/install-hdfs-auth-keepalive.py
 systemctl --user list-timers sureal-hdfs-auth.timer
 cat ~/.local/state/sureal/hdfs-auth/status.json
 ```

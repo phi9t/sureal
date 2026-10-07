@@ -1,5 +1,6 @@
 SUSTAINED_RUN_SOURCE_GLOBS = [
-    "pipeline/**/*.py",
+    "dataset/**/*.py",
+    "geometry/**/*.py",
 ]
 
 SUSTAINED_CHECKPOINT_RETENTION_HOST_SOURCES = [

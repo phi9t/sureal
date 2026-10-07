@@ -32,7 +32,7 @@ args=(
     --ro-bind "$HERE" /experiment
     --proc /proc --dev /dev --tmpfs /tmp
     --clearenv --setenv PATH /usr/bin:/bin --setenv HOME /tmp
-    --setenv PYTHONNOUSERSITE 1 --setenv PYTHONPATH /experiment
+    --setenv PYTHONNOUSERSITE 1
     --setenv WAYMO_TRACER_OFFLINE 1
     --setenv WAYMO_HOST_NETNS "$(readlink /proc/self/ns/net)"
     --chdir /experiment
@@ -66,5 +66,5 @@ fi
     || { printf 'error: unsafe output run name\n' >&2; exit 1; }
 mkdir -p -- "$(dirname -- "$OUTPUT")"
 args+=(--ro-bind "$SAMPLE" /source --bind "$(dirname -- "$OUTPUT")" /outputs)
-exec bwrap "${args[@]}" "${VENV}/bin/python" -m pipeline.tracer "$COMMAND" \
+exec bwrap "${args[@]}" "${VENV}/bin/python" -m dataset.tracer "$COMMAND" \
     --sample /source --output "/outputs/$(basename -- "$OUTPUT")"
