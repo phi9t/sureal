@@ -4,7 +4,7 @@
 
 **Blocked by:** 14 (Concept batch: `dataset`), 15 (Concept batch: `geometry`), 28 (The perception rootfs carries the tools its tests need)
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] Scope: motion ingestion, the causal projection, and the native, pooled and joint motion metric tools with their Python drivers and verifiers
 - [x] C++ that needs the upstream Waymo sources keeps its existing build inside its dedicated rootfs; C++ that builds from this repository gets Bazel targets
