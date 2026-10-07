@@ -30,7 +30,6 @@ MOTION_VISIBILITY = [
     "//autonomy/architecture:__pkg__",
     "//autonomy/cohort:__pkg__",
     "//autonomy/gpu:__pkg__",
-    "//autonomy/pipeline:__pkg__",
     "//autonomy/resources:__pkg__",
 ]
 
@@ -57,6 +56,13 @@ py_library(
 cc_binary(
     name = "fnv_bytes_fixture",
     srcs = ["ingestion/fnv_bytes_fixture.cc"],
+    visibility = MOTION_VISIBILITY,
+)
+
+cc_binary(
+    name = "native_geometry_corruption_fixture",
+    srcs = ["ingestion/native_geometry_corruption_fixture.cc"],
+    copts = ["-std=c++17"],
     visibility = MOTION_VISIBILITY,
 )
 

@@ -4,12 +4,12 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
-from motion.cli.motion_native_cli_test import MotionNativeCliTests
+from motion.cli import motion_native_cli_test as single_cli
 
 
 class MotionJointCliTests(unittest.TestCase):
     def fixture(self, root):
-        command = MotionNativeCliTests().fixture(root)
+        command = single_cli.MotionNativeCliTests().fixture(root)
         scene = root / 'scenario.textproto'
         original = scene.read_text()
         track = original.split(' tracks { ', 1)[1].split(' } tracks_to_predict', 1)[0]
