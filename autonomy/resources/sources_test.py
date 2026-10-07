@@ -89,6 +89,14 @@ class ResourceSourceTests(unittest.TestCase):
             with self.assertRaises(ValueError):freeze(current,root/'snapshot',store=LocalSnapshotStore(root/'store'),repo_root=repo,bazel=repo/'bazelw',runner=self.query_runner(names))
             self.assertFalse((root/'snapshot').exists())
 
+    def test_new_creation_without_target_context_is_refused(self):
+        freeze, _ = self.api()
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp);resources=root/'legacy/resources';resources.mkdir(parents=True);evidence=root/'legacy/evidence';evidence.mkdir()
+            self.write_current(resources);(evidence/'source_snapshot.py').write_text('helper')
+            with self.assertRaises(ValueError):freeze(resources,root/'snapshot')
+            self.assertFalse((root/'snapshot').exists())
+
     def test_legacy_component_relative_receipts_remain_valid(self):
         _, validate = self.api()
         with tempfile.TemporaryDirectory() as temp:

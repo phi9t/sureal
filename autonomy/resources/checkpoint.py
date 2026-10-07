@@ -386,15 +386,20 @@ def resource_inventory(backend,record):
     for receipt in [getattr(backend,'resource_identity',{}).get('source_pins'),getattr(backend,'pins',None),getattr(backend,'host_pins',None),getattr(backend,'checkpoint_publisher_pins',None)]:
         if isinstance(receipt,dict) and receipt.get('source_snapshot_root') is not None:
             verify_or_materialize_receipt_sources(receipt,receipt['source_snapshot_root'],env_var='SUREAL_SOURCE_SNAPSHOT_STORE')
-    companion=validate_checkpoint(backend,record);files={};archive_cache=backend.resource_root/'source-snapshot-archives'
+    companion=validate_checkpoint(backend,record);files={}
     reserve=getattr(backend,'resource_reserve_write',None)
     accounting_root=getattr(backend,'resource_work_root',None)
+    if accounting_root is not None:
+        archive_cache=Path(accounting_root)/'source-snapshot-archives'
+    else:
+        archive_cache=None
     def add(name,path,digest=None):
         safe_member_name(name);entry=reference(path)
         if name in files or digest is not None and entry['sha256']!=digest:
             raise ValueError('unique safe resource member and unchanged digest required')
         entry['bytes']=Path(path).stat().st_size;files[name]=entry
     def stage_archive(prefix,receipt):
+        if reserve is None or accounting_root is None or archive_cache is None:raise ValueError('resource accounting reservation required')
         digest=receipt_snapshot_digest(receipt);archive=archive_cache/(prefix.replace('/','-')+'-'+digest+'.tar')
         if archive.exists() or archive.is_symlink():
             if not regular(archive) or sha(archive)!=digest:raise ValueError('source snapshot archive sidecar changed')
@@ -404,7 +409,6 @@ def resource_inventory(backend,record):
         data=store_from_receipt(receipt,env_var='SUREAL_SOURCE_SNAPSHOT_STORE').fetch(digest)
         if hashlib.sha256(data).hexdigest()!=digest:
             raise ValueError('snapshot digest differs from receipt')
-        if reserve is None or accounting_root is None:raise ValueError('resource accounting reservation required')
         reserve(Path(accounting_root),len(data))
         fd,temporary_name=tempfile.mkstemp(prefix='.'+archive.name+'.',suffix='.tmp',dir=archive_cache)
         temporary=Path(temporary_name)

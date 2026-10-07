@@ -1,8 +1,6 @@
 """Freeze the complete external resource execution closure independently."""
 from pathlib import Path
 from evidence.source_snapshot import (
-    LocalSnapshotStore,
-    copy_source_snapshot,
     file_sha256,
     require_regular_file,
     snapshot_target_and_materialize,
@@ -71,13 +69,6 @@ def _repo_root_for(current):
     return current.parents[1]
 
 
-def _legacy_freeze_sources(current,destination,store):
-    names=source_paths(current)
-    receipt=copy_source_snapshot(current.parent,names,destination,store,target=SNAPSHOT_TARGET)
-    validate_sources(current,receipt)
-    return receipt
-
-
 def freeze_sources(current,destination,*,store=None,repo_root=None,bazel=None,runner=None):
     current=Path(current);destination=Path(destination)
     inventory(current)
@@ -88,14 +79,13 @@ def freeze_sources(current,destination,*,store=None,repo_root=None,bazel=None,ru
         repo_root=_repo_root_for(current)
     if repo_root is not None:
         repo_root=Path(repo_root)
-    if repo_root is not None and repo_root != current.parent:
-        kwargs={'repo_root':repo_root}
-        if store is not None:kwargs['store']=store
-        if bazel is not None:kwargs['bazel']=bazel
-        if runner is not None:kwargs['runner']=runner
-        receipt=snapshot_target_and_materialize(SNAPSHOT_TARGET,destination,**kwargs)
-    else:
-        receipt=_legacy_freeze_sources(current,destination,store or LocalSnapshotStore(destination.parent/'source-snapshots'))
+    if repo_root is None:
+        raise ValueError('Bazel target source snapshot context required')
+    kwargs={'repo_root':repo_root}
+    if store is not None:kwargs['store']=store
+    if bazel is not None:kwargs['bazel']=bazel
+    if runner is not None:kwargs['runner']=runner
+    receipt=snapshot_target_and_materialize(SNAPSHOT_TARGET,destination,**kwargs)
     validate_sources(current,receipt)
     return receipt
 

@@ -689,6 +689,72 @@ def materialize_receipt_sources(
     }
 
 
+def _materialize_missing_receipt_sources(
+    receipt,
+    destination,
+    store: SnapshotStore,
+) -> dict:
+    receipt = read_receipt(receipt)
+    if not isinstance(receipt, Mapping):
+        raise ValueError("receipt object required")
+    root = Path(destination)
+    if root.is_symlink() or not root.is_dir():
+        raise ValueError("regular source snapshot root required")
+    digest, archive, pins = _verified_receipt_archive(receipt, store)
+    actual, entries = _snapshot_entries(archive)
+    if actual != pins:
+        raise ValueError("receipt source pins differ from snapshot")
+    root_resolved = root.resolve(strict=True)
+    for name, data in entries:
+        target = root / name
+        parent = root
+        for part in PurePosixPath(name).parent.parts:
+            parent = parent / part
+            if parent.exists():
+                if parent.is_symlink() or not parent.is_dir():
+                    raise ValueError("source snapshot materialization conflict: " + name)
+            else:
+                parent.mkdir()
+        if target.is_symlink():
+            raise ValueError("materialized source missing or irregular: " + name)
+        try:
+            target.resolve(strict=False).relative_to(root_resolved)
+        except ValueError as error:
+            raise ValueError("source snapshot member escapes destination: " + name) from error
+        if target.exists() or target.is_symlink():
+            if target.is_symlink() or not target.is_file():
+                raise ValueError("materialized source missing or irregular: " + name)
+            if file_sha256(target) != pins[name]:
+                raise ValueError("materialized source changed: " + name)
+            continue
+        temporary = None
+        try:
+            with tempfile.NamedTemporaryFile(dir=parent, prefix="." + target.name + ".", suffix=".tmp", delete=False) as output:
+                temporary = Path(output.name)
+                output.write(data)
+                output.flush()
+                os.fsync(output.fileno())
+            if temporary.is_symlink():
+                raise ValueError("regular source snapshot temporary required")
+            temporary.chmod(0o444)
+            _rename_no_replace(temporary, target)
+            temporary = None
+        finally:
+            if temporary is not None and temporary.exists():
+                temporary.unlink()
+    for name, expected_digest in pins.items():
+        if file_sha256(root / name) != expected_digest:
+            raise ValueError("materialized source differs from snapshot: " + name)
+    return {
+        "source_snapshot_sha256": digest,
+        "source_snapshot_target": receipt.get("source_snapshot_target"),
+        "source_snapshot_store": receipt.get("source_snapshot_store"),
+        "source_snapshot_root": str(root),
+        "source_pins": pins,
+        "source_files": len(pins),
+    }
+
+
 def verify_or_materialize_receipt_sources(
     receipt,
     destination=None,
@@ -714,7 +780,12 @@ def verify_or_materialize_receipt_sources(
         timeout=timeout,
     )
     if root.exists():
-        return verify_materialized_sources(root, receipt, resolved_store)
+        try:
+            return verify_materialized_sources(root, receipt, resolved_store)
+        except ValueError as error:
+            if not str(error).startswith("materialized source missing or irregular: "):
+                raise
+            return _materialize_missing_receipt_sources(receipt, root, resolved_store)
     return materialize_receipt_sources(
         receipt,
         root,

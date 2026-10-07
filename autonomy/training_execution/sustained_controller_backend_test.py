@@ -4,17 +4,29 @@ from unittest.mock import patch
 from evidence.source_snapshot import LocalSnapshotStore,archive_sources
 from training_execution.sustained_controller_backend import NativeBackend,sha
 from training_execution.sustained_controller_sources import REQUIRED as HOST_REQUIRED,freeze_host_sources
+from retention.checkpoint_retention_sources import REQUIRED as CHECKPOINT_PUBLISHER_REQUIRED
 from retention.checkpoint_retention_sources import freeze_host_sources as freeze_checkpoint_publisher_sources
 from training_execution.sustained_sources import REQUIRED as PACKAGE_REQUIRED,SNAPSHOT_TARGET
 class ControllerGuardTests(unittest.TestCase):
  def source_snapshot(self,root,names,store_root):
   archive,pins=archive_sources(root,names);digest=hashlib.sha256(archive).hexdigest();LocalSnapshotStore(store_root).store(digest,archive)
   return {'schema_version':1,'source_snapshot_sha256':digest,'source_snapshot_target':SNAPSHOT_TARGET,'source_snapshot_store':str(store_root),'source_pins':pins}
+ def query_runner(self,names):
+  def run(command,**kwargs):
+   self.assertIn('query',command)
+   class Result:pass
+   result=Result()
+   result.stdout=''.join('//'+name.rsplit('/',1)[0]+':'+name.rsplit('/',1)[1]+'\n' for name in sorted(names))
+   return result
+  return run
  def checkout(self,root,anchor_sha):
+  repo=Path(root)
+  autonomy=repo if repo.name=='autonomy' else repo/'autonomy'
   for name in HOST_REQUIRED:
-   path=root/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text('host '+name)
-  (root/'research').mkdir(exist_ok=True)
-  (root/'research/training-anchor-candidate-verified.json').write_text(json.dumps({'expected':{'candidate_sha256':anchor_sha}}))
+   path=autonomy/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text('host '+name)
+  (autonomy/'research').mkdir(exist_ok=True)
+  (autonomy/'research/training-anchor-candidate-verified.json').write_text(json.dumps({'expected':{'candidate_sha256':anchor_sha}}))
+  return autonomy
  def backend(self,root,checkout=None):
   root.mkdir(parents=True,exist_ok=True)
   b=NativeBackend.__new__(NativeBackend);b.R=root;b.package=root/'code';b.package.mkdir();b.verifier=root/'verifier';b.verifier.mkdir();b.source=root/'input';b.source.mkdir();(b.source/'manifest.json').write_text('{}');b.manifest_sha=sha(b.source/'manifest.json');b.runtime={'rootfs_sha256':'1'*64,'image_id':'gpu'};b.cpu_runtime={'rootfs_sha256':'3'*64,'image_id':'cpu'};b.metric_runtime={'rootfs_sha256':'2'*64,'image_id':'metrics'};b.runtime_path=root/'runtime.json';b.runtime_path.write_text(json.dumps(b.runtime));b.output=root/'payload';b.output.mkdir();b.host_pins={};b.old={'driver_hashes':{}};b.pins={}
@@ -25,26 +37,29 @@ class ControllerGuardTests(unittest.TestCase):
   b.pins=self.source_snapshot(b.package,sorted(str(p.relative_to(b.package)) for p in b.package.rglob('*.py')),root/'source-snapshots')
   (b.source/'anchor-templates.json').write_text('admitted anchors');b.anchor_sha=sha(b.source/'anchor-templates.json');b.verifier_pins={str(p):sha(p) for p in b.verifier.iterdir()}
   checkout=root/'checkout' if checkout is None else checkout
-  self.checkout(checkout,b.anchor_sha);b.checkout_path=checkout;b.host_pins=freeze_host_sources(checkout,root/'host-source');b.checkpoint_publisher_pins=freeze_checkpoint_publisher_sources(checkout,root/'checkpoint-publisher-source')
+  autonomy=self.checkout(checkout,b.anchor_sha);repo=autonomy.parent
+  b.checkout_path=autonomy
+  b.host_pins=freeze_host_sources(autonomy,root/'host-source',store=LocalSnapshotStore(root/'host-source-snapshots'),repo_root=repo,bazel=repo/'bazelw',runner=self.query_runner(['autonomy/'+name for name in HOST_REQUIRED]))
+  b.checkpoint_publisher_pins=freeze_checkpoint_publisher_sources(autonomy,root/'checkpoint-publisher-source',store=LocalSnapshotStore(root/'checkpoint-publisher-source-snapshots'),repo_root=repo,bazel=repo/'bazelw',runner=self.query_runner(['autonomy/'+name for name in CHECKPOINT_PUBLISHER_REQUIRED]))
   return b
  def guard(self,b):
   with patch('training_execution.sustained_controller_backend.P',b.checkout_path),patch('training_execution.sustained_controller_backend.unique_payload_bytes',return_value=0):b.guard()
  def test_current_checkout_edit_and_path_change_do_not_invalidate_snapshot_guard(self):
   with tempfile.TemporaryDirectory() as temp:
    root=Path(temp);checkout_a=root/'checkout-a';b=self.backend(root/'run',checkout_a)
-   with patch('training_execution.sustained_controller_backend.P',checkout_a),patch('training_execution.sustained_controller_backend.unique_payload_bytes',return_value=0):
-    b.guard();(checkout_a/'training_execution/unrelated.py').write_text('new checkout helper\n');b.guard()
-   checkout_b=root/'checkout-b';shutil.copytree(checkout_a,checkout_b)
-   with patch('training_execution.sustained_controller_backend.P',checkout_b),patch('training_execution.sustained_controller_backend.unique_payload_bytes',return_value=0):b.guard()
+   with patch('training_execution.sustained_controller_backend.P',b.checkout_path),patch('training_execution.sustained_controller_backend.unique_payload_bytes',return_value=0):
+    b.guard();(b.checkout_path/'training_execution/unrelated.py').write_text('new checkout helper\n');b.guard()
+   checkout_b=root/'checkout-b';shutil.copytree(checkout_a,checkout_b);moved=checkout_b/'autonomy'
+   with patch('training_execution.sustained_controller_backend.P',moved),patch('training_execution.sustained_controller_backend.unique_payload_bytes',return_value=0):b.guard()
  def test_altered_or_missing_source_snapshot_invalidates_guard(self):
   with tempfile.TemporaryDirectory() as temp:
    root=Path(temp);b=self.backend(root/'run',root/'checkout')
    snapshot=Path(b.pins['source_snapshot_store'])/b.pins['source_snapshot_sha256']
-   with patch('training_execution.sustained_controller_backend.P',root/'checkout'),patch('training_execution.sustained_controller_backend.unique_payload_bytes',return_value=0):b.guard()
+   with patch('training_execution.sustained_controller_backend.P',b.checkout_path),patch('training_execution.sustained_controller_backend.unique_payload_bytes',return_value=0):b.guard()
    snapshot.write_bytes(b'not the admitted snapshot')
-   with patch('training_execution.sustained_controller_backend.P',root/'checkout'),patch('training_execution.sustained_controller_backend.unique_payload_bytes',return_value=0),self.assertRaises(ValueError):b.guard()
+   with patch('training_execution.sustained_controller_backend.P',b.checkout_path),patch('training_execution.sustained_controller_backend.unique_payload_bytes',return_value=0),self.assertRaises(ValueError):b.guard()
    snapshot.unlink()
-   with patch('training_execution.sustained_controller_backend.P',root/'checkout'),patch('training_execution.sustained_controller_backend.unique_payload_bytes',return_value=0),self.assertRaises(FileNotFoundError):b.guard()
+   with patch('training_execution.sustained_controller_backend.P',b.checkout_path),patch('training_execution.sustained_controller_backend.unique_payload_bytes',return_value=0),self.assertRaises(FileNotFoundError):b.guard()
  def test_guard_restores_missing_native_host_and_publisher_snapshots_from_receipts(self):
   with tempfile.TemporaryDirectory() as temp:
    root=Path(temp);b=self.backend(root/'run',root/'checkout')
@@ -53,7 +68,7 @@ class ControllerGuardTests(unittest.TestCase):
    for materialized in roots:
     shutil.rmtree(materialized)
     self.assertFalse(materialized.exists())
-   with patch('training_execution.sustained_controller_backend.P',root/'checkout'),patch('training_execution.sustained_controller_backend.unique_payload_bytes',return_value=0):
+   with patch('training_execution.sustained_controller_backend.P',b.checkout_path),patch('training_execution.sustained_controller_backend.unique_payload_bytes',return_value=0):
     b.guard()
    for materialized in roots:
     self.assertTrue(materialized.is_dir())
@@ -100,7 +115,7 @@ class ControllerGuardTests(unittest.TestCase):
      self.assertIn('--host-source-receipt',command)
      receipt_path=Path(command[command.index('--host-source-receipt')+1])
      self.assertEqual(json.loads(receipt_path.read_text()),b.checkpoint_publisher_pins)
-     self.assertEqual(kwargs['cwd'],Path(b.checkpoint_publisher_pins['source_snapshot_root']))
+     self.assertEqual(kwargs['cwd'],Path(b.checkpoint_publisher_pins['source_snapshot_root'])/'autonomy')
      self.assertNotIn('PYTHONPATH',kwargs['env'])
      self.assertEqual(kwargs['pass_fds'],(lock.fileno(),))
      self.assertEqual(kwargs['timeout'],3600)
@@ -112,7 +127,7 @@ class ControllerGuardTests(unittest.TestCase):
      release=directory/'release-completed.json';release.write_text(json.dumps({'publication_receipt_sha256':sha(publication),'released':plan},indent=2))
      class Result:returncode=0
      return Result()
-    with patch('training_execution.sustained_controller_backend.C',cache),patch('training_execution.sustained_controller_backend.P',root/'checkout'),patch.object(b,'guard'),patch.dict(os.environ,{'PYTHONPATH':'unexpected'},clear=False),patch('training_execution.sustained_controller_backend.subprocess.run',side_effect=run):
+    with patch('training_execution.sustained_controller_backend.C',cache),patch('training_execution.sustained_controller_backend.P',b.checkout_path),patch.object(b,'guard'),patch.dict(os.environ,{'PYTHONPATH':'unexpected'},clear=False),patch('training_execution.sustained_controller_backend.subprocess.run',side_effect=run):
      result=b.publish_and_release(record)
     self.assertEqual(result['command'][:3],[os.sys.executable,'-m','retention.publish_sustained_checkpoint'])
     self.assertIn('--host-source-receipt',result['command'])

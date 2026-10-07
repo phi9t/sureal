@@ -1,7 +1,7 @@
 """Execution package source-snapshot and externally admitted runtime-lock binding."""
 import re
 from pathlib import Path
-from evidence.source_snapshot import LocalSnapshotStore,receipt_snapshot_digest,snapshot_target_and_materialize,source_snapshot_receipt,store_from_receipt,verify_or_materialize_receipt_sources
+from evidence.source_snapshot import receipt_snapshot_digest,snapshot_target_and_materialize,store_from_receipt,verify_or_materialize_receipt_sources
 
 REQUIRED=frozenset('''training_execution/train_sustained.py detection/sustained_contract.py training_execution/sustained_loop.py detection/sustained_loss.py training_execution/sustained_state.py training_execution/sustained_sources.py evidence/source_snapshot.py insula/entry.py insula/runtime_identity.py detection/fixed_batch_catalog.py detection/fixed_batch_models.py resources/scientific_budget.py resources/scientific_payload.py resources/sustained_scoring_budget.py detection/pillar_detector.py detection/pillar_encoder.py detection/detector_loss.py geometry/geometry.py geometry/geometry_foundation.py detection/norm_variants.py detection/architecture_variants.py detection/architecture_followups.py resources/replay_values.py range_view/range_frontend.py range_view/range_pillar_hybrid.py range_view/sparse_window_attention.py range_view/sparse_windows.py'''.split())
 SNAPSHOT_TARGET='//autonomy/training_execution:train_sustained'
@@ -14,17 +14,15 @@ def source_paths(root):
 
 def snapshot_sources(root,store_root=None,*,destination=None,store=None,repo_root=None,bazel=None,runner=None):
  root=Path(root)
- if destination is not None or root.name=='autonomy':
-  if destination is None:raise ValueError('source snapshot destination required')
-  kwargs={'repo_root':Path(repo_root) if repo_root is not None else root.parent}
-  if store is not None:kwargs['store']=store
-  if bazel is not None:kwargs['bazel']=bazel
-  if runner is not None:kwargs['runner']=runner
-  receipt=snapshot_target_and_materialize(SNAPSHOT_TARGET,destination,**kwargs)
-  validate_sources(Path(destination)/'autonomy',receipt,{'rootfs_sha256':'0'*64,'image_id':'snapshot-fixture'},{'rootfs_sha256':'0'*64,'image_id':'snapshot-fixture'})
-  return receipt
- if store_root is None:raise ValueError('source snapshot store required')
- return source_snapshot_receipt(root,source_paths(root),store or LocalSnapshotStore(store_root),target=SNAPSHOT_TARGET,materialized_root=root)
+ if destination is None:raise ValueError('source snapshot destination required')
+ if root.name!='autonomy':raise ValueError('Bazel target source snapshot context required')
+ kwargs={'repo_root':Path(repo_root) if repo_root is not None else root.parent}
+ if store is not None:kwargs['store']=store
+ if bazel is not None:kwargs['bazel']=bazel
+ if runner is not None:kwargs['runner']=runner
+ receipt=snapshot_target_and_materialize(SNAPSHOT_TARGET,destination,**kwargs)
+ validate_sources(Path(destination)/'autonomy',receipt,{'rootfs_sha256':'0'*64,'image_id':'snapshot-fixture'},{'rootfs_sha256':'0'*64,'image_id':'snapshot-fixture'})
+ return receipt
 
 def cache_snapshot_for_runtime(receipt,store_root):
  digest=receipt_snapshot_digest(receipt)
