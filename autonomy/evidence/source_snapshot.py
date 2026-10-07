@@ -1,4 +1,6 @@
 """Source snapshots for evidence receipts."""
+import ctypes
+import errno
 import hashlib
 import io
 import json
@@ -20,6 +22,12 @@ DEFAULT_HADOOP_CONF_DIR = "/opt/tiger/yarn_deploy/hadoop/conf"
 SOURCE_SNAPSHOT_CHILD = "source-snapshots"
 STORE_DESCRIPTOR_VERSION = 1
 TARGET_RECEIPT_SCHEMA_VERSION = 2
+AT_FDCWD = -100
+RENAME_NOREPLACE = 1
+RENAMEAT2_SYSCALLS = {
+    "x86_64": 316,
+    "aarch64": 276,
+}
 AUTHENTICATION_MARKERS = (
     "authentication",
     "authenticate",
@@ -241,6 +249,53 @@ def file_digest(path, algorithm: str) -> str:
 
 def file_sha256(path) -> str:
     return file_digest(path, "sha256")
+
+
+def _renameat2_syscall_number() -> int:
+    machine = os.uname().machine
+    try:
+        return RENAMEAT2_SYSCALLS[machine]
+    except KeyError as error:
+        raise OSError(errno.ENOSYS, "renameat2 syscall number unknown for " + machine) from error
+
+
+def _rename_no_replace(source: Path, destination: Path) -> None:
+    libc = ctypes.CDLL(None, use_errno=True)
+    source_bytes = os.fsencode(source)
+    destination_bytes = os.fsencode(destination)
+    try:
+        renameat2 = libc.renameat2
+    except AttributeError:
+        result = libc.syscall(
+            _renameat2_syscall_number(),
+            AT_FDCWD,
+            ctypes.c_char_p(source_bytes),
+            AT_FDCWD,
+            ctypes.c_char_p(destination_bytes),
+            RENAME_NOREPLACE,
+        )
+    else:
+        renameat2.argtypes = [
+            ctypes.c_int,
+            ctypes.c_char_p,
+            ctypes.c_int,
+            ctypes.c_char_p,
+            ctypes.c_uint,
+        ]
+        renameat2.restype = ctypes.c_int
+        result = renameat2(
+            AT_FDCWD,
+            ctypes.c_char_p(source_bytes),
+            AT_FDCWD,
+            ctypes.c_char_p(destination_bytes),
+            RENAME_NOREPLACE,
+        )
+    if result == 0:
+        return
+    found = ctypes.get_errno()
+    if found == errno.EEXIST:
+        raise FileExistsError("source snapshot destination already exists: " + str(destination))
+    raise OSError(found, os.strerror(found), str(destination))
 
 
 def safe_member_name(name: str) -> str:
@@ -555,9 +610,7 @@ def materialize_source_snapshot_archive(snapshot: bytes, destination, *, digest:
         for name, expected_digest in actual.items():
             if file_sha256(temporary / name) != expected_digest:
                 raise ValueError("materialized source differs from snapshot: " + name)
-        if destination.exists():
-            raise FileExistsError("source snapshot destination already exists: " + str(destination))
-        temporary.rename(destination)
+        _rename_no_replace(temporary, destination)
         temporary = None
     finally:
         if temporary is not None and temporary.exists():

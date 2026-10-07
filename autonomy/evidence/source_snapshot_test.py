@@ -1,3 +1,4 @@
+import contextlib
 import hashlib
 import io
 import json
@@ -9,6 +10,7 @@ import types
 import unittest
 from dataclasses import fields
 from pathlib import Path
+from unittest import mock
 
 
 GOLDEN_SOURCE_SNAPSHOT_SHA256 = "26d7ae75a8a99ed88f3e5350159faf024a632dd3deb70f403fa664b959c6fd18"
@@ -330,6 +332,55 @@ class SourceSnapshotTests(unittest.TestCase):
 
             self.assertFalse((Path(temporary) / "duplicate").exists())
             self.assertFalse((Path(temporary) / "link").exists())
+
+    def test_archive_materialization_refuses_destination_created_during_publication(self):
+        api = self.api()
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            destination = root / "raced"
+            archive = self.archive_bytes([("autonomy/evidence/source_snapshot.py", "module\n")])
+            digest = hashlib.sha256(archive).hexdigest()
+            pins = api["snapshot_source_pins"](archive)
+            from evidence import source_snapshot as source_snapshot_module
+
+            original_mkdir = Path.mkdir
+            original_rename = Path.rename
+            competitor = {}
+
+            def create_competitor():
+                if "identity" not in competitor:
+                    original_mkdir(destination)
+                    competitor["identity"] = (destination.stat().st_dev, destination.stat().st_ino)
+
+            def competing_mkdir(path, *args, **kwargs):
+                if Path(path) == destination:
+                    create_competitor()
+                return original_mkdir(path, *args, **kwargs)
+
+            def competing_rename(path, target):
+                if Path(target) == destination:
+                    create_competitor()
+                return original_rename(path, target)
+
+            stack = contextlib.ExitStack()
+            stack.enter_context(mock.patch.object(Path, "mkdir", competing_mkdir))
+            stack.enter_context(mock.patch.object(Path, "rename", competing_rename))
+            if hasattr(source_snapshot_module, "_rename_no_replace"):
+                original_publish = source_snapshot_module._rename_no_replace
+
+                def competing_publish(path, target):
+                    if Path(target) == destination:
+                        create_competitor()
+                    return original_publish(path, target)
+
+                stack.enter_context(mock.patch.object(source_snapshot_module, "_rename_no_replace", competing_publish))
+            with stack:
+                with self.assertRaisesRegex(FileExistsError, "source snapshot destination already exists"):
+                    api["materialize_source_snapshot_archive"](archive, destination, digest=digest, source_pins=pins)
+
+            self.assertEqual((destination.stat().st_dev, destination.stat().st_ino), competitor["identity"])
+            self.assertEqual(list(destination.iterdir()), [])
+            self.assertEqual([path.name for path in root.iterdir() if path.name.startswith(".raced.")], [])
 
     def test_hdfs_storage_uploads_with_exact_readback_and_fetches_by_digest(self):
         api = self.api()
