@@ -4,7 +4,7 @@
 
 **Blocked by:** 16 (Concept batch: `detection` core)
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] Scope: normalisation and architecture variants and follow-ups, weight and decoder contracts, scored-proposal code, checkpoint value comparison, and the learning-curve, overfit and probe workers still in use
 - [x] Workers that only a closed gate used are left for the studies batches and listed in the ticket's comments
