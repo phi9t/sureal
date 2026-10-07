@@ -2,11 +2,12 @@
 import hashlib,json,re,tarfile
 from pathlib import Path
 from dataset.component_archive_validate import validate_component_archive
+from evidence.source_snapshot import file_sha256
 COMPONENTS=['camera_image','camera_segmentation','camera_box']
 def iter_camera_records(archive,publication,*,expected_publication_sha256,usage,max_record_bytes=128*1024**2):
  archive,publication=Path(archive),Path(publication)
  if not isinstance(expected_publication_sha256,str) or not re.fullmatch('[0-9a-f]{64}',expected_publication_sha256) or type(max_record_bytes) is not int or max_record_bytes<=0:raise ValueError('trusted publication and positive resident limit required')
- if publication.is_symlink() or not publication.is_file() or hashlib.sha256(publication.read_bytes()).hexdigest()!=expected_publication_sha256:raise ValueError('camera publication differs')
+ if file_sha256(publication)!=expected_publication_sha256:raise ValueError('camera publication differs')
  pub=json.loads(publication.read_text());allowed=pub['research_splits'];official=pub['official_split'];legal={'train','development'} if official=='training' else {'validation','camera_validation'} if official=='validation' else set()
  if pub['schema_version']!=1 or pub['role']!='scientific-native-camera-components' or not isinstance(allowed,list) or not allowed or any(not isinstance(v,str) for v in allowed) or len(set(allowed))!=len(allowed) or usage not in allowed or not set(allowed)<=legal or {'train','development'}<=set(allowed):raise ValueError('camera scientific partition conflict')
  meta=pub['archive'];checked=validate_component_archive(archive,expected_archive_sha256=meta['sha256'],expected_manifest_sha256=meta['manifest_sha256'])

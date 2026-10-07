@@ -2,8 +2,8 @@ import tempfile,unittest
 from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as pq
-from pipeline.camera_sidecars import materialize_camera_component
-from pipeline.camera_sidecar_validate import validate_camera_component
+from camera.camera_sidecars import materialize_camera_component
+from camera.camera_sidecar_validate import validate_camera_component
 class CameraSidecarTests(unittest.TestCase):
  def fixture(self,root):
   source=root/'source.parquet';pq.write_table(pa.table({'key.segment_context_name':['scene','scene'],'key.frame_timestamp_micros':pa.array([10,20],type=pa.int64()),'key.camera_name':pa.array([1,1],type=pa.int8()),'[CameraImageComponent].image':pa.array([b'jpeg-bytes',b'second'],type=pa.binary()),'optional':pa.array([None,[]],type=pa.list_(pa.int32()))}),source);return source

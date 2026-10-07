@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 """Stage scientific camera sources and independently retain original native rows."""
-import argparse,hashlib,json,resource,subprocess,time
+import argparse,json,resource,subprocess,time
 from datetime import datetime,timezone
 from pathlib import Path
+from evidence.source_snapshot import file_sha256 as sha
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
 from dataset.scientific_admission import admit_scene
 from dataset.staged_source import staged_source
-HERE=Path(__file__).resolve().parent
+HERE=Path(__file__).resolve().parents[1]
 COMPONENTS=['camera_image','camera_segmentation','camera_box']
-CANDIDATES=['scientific-camera-preprocess.py','pipeline/camera_sidecars.py','pipeline/camera_sidecar_validate.py','dataset/scientific_admission.py','dataset/staged_source.py','insula/staging_lease.py','dataset/source_integrity.py','insula/entry.py','insula/runtime_identity.py']
-def sha(p):
- with p.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+CANDIDATES=['camera/scientific-camera-preprocess.py','camera/camera_sidecars.py','camera/camera_sidecar_validate.py','dataset/scientific_admission.py','dataset/staged_source.py','insula/staging_lease.py','dataset/source_integrity.py','insula/entry.py','insula/runtime_identity.py']
 def total(root):return sum(p.stat().st_size for p in root.rglob('*') if p.is_file())
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--scene',required=True);parser.add_argument('--output',type=Path,required=True);args=parser.parse_args()
@@ -35,8 +34,8 @@ def main():
   if remaining<=0:raise ValueError('combined scientific working-set exhausted')
   base.mkdir(parents=True);prepared.mkdir(exist_ok=True);checked=base/'checked';checked.mkdir();checks=[];started=datetime.now(timezone.utc).isoformat();tick=time.monotonic()
   with staged_source(record,cache,retained_bytes=retained,limit_bytes=manifest['local_staging_limit_bytes']) as (source,transfer):
-   produce="from pipeline.camera_sidecars import materialize_camera_component; r=materialize_camera_component('/source/source.parquet',"+repr(component)+","+repr(args.scene)+",'/outputs/"+component+"',"+str(remaining)+"); print('PASS native camera rows',len(r['rows']))"
-   check="import json; from pathlib import Path; from pipeline.camera_sidecar_validate import validate_camera_component; r=validate_camera_component('/source/source.parquet','/opt/"+component+"'); Path('/outputs/check.json').write_text(json.dumps(r)); print('PASS independent native camera rows',r['rows'])"
+   produce="from camera.camera_sidecars import materialize_camera_component; r=materialize_camera_component('/source/source.parquet',"+repr(component)+","+repr(args.scene)+",'/outputs/"+component+"',"+str(remaining)+"); print('PASS native camera rows',len(r['rows']))"
+   check="import json; from pathlib import Path; from camera.camera_sidecar_validate import validate_camera_component; r=validate_camera_component('/source/source.parquet','/opt/"+component+"'); Path('/outputs/check.json').write_text(json.dumps(r)); print('PASS independent native camera rows',r['rows'])"
    for name,out,code in [('decode',prepared,produce),('independent-check',checked,check)]:
     plan=launch_plan(root,HERE,source.parent,out,['python','-c',code])
     if name=='independent-check':i=plan.index('--');plan[i:i]=['--ro-bind',str(prepared),'/opt']

@@ -2,6 +2,7 @@
 import argparse,hashlib,io,json
 from pathlib import Path
 import numpy as np
+from evidence.source_snapshot import file_sha256
 from PIL import Image
 from .camera_dataset import iter_camera_records
 
@@ -10,16 +11,16 @@ def main():
  trusted=json.loads(Path('/mnt/reference.json').read_text());catalogs={};indexes={};counts={};dimensions={};digest=hashlib.sha256();eligible=0;mask_pixels=0
  for component,h in trusted.items():
   path=Path('/opt')/component/'manifest.json';data=path.read_bytes()
-  if hashlib.sha256(data).hexdigest()!=h:raise ValueError('independent reference manifest differs')
+  if file_sha256(path)!=h:raise ValueError('independent reference manifest differs')
   catalogs[component]=json.loads(data);indexes[component]=0;counts[component]=0
  for record in iter_camera_records('/source/camera.tar','/source/publication.json',expected_publication_sha256=args.publication_sha,usage=args.usage):
   component=record['component'];native=catalogs[component];row=native['rows'][indexes[component]];indexes[component]+=1
   path=Path('/opt')/component/row['metadata'];data=path.read_bytes()
-  if hashlib.sha256(data).hexdigest()!=row['metadata_sha256']:raise ValueError('independent native row changed')
+  if file_sha256(path)!=row['metadata_sha256']:raise ValueError('independent native row changed')
   original=json.loads(data);fields=dict(original['fields'])
   for field,meta in original['binary_fields'].items():
-   value=(Path('/opt')/component/meta['artifact']).read_bytes()
-   if len(value)!=meta['size_bytes'] or hashlib.sha256(value).hexdigest()!=meta['sha256']:raise ValueError('independent original binary changed')
+   path=Path('/opt')/component/meta['artifact'];value=path.read_bytes()
+   if len(value)!=meta['size_bytes'] or file_sha256(path)!=meta['sha256']:raise ValueError('independent original binary changed')
    fields[field]=value
   if record['identity']!=row['key'] or {k:v for k,v in fields.items() if k.startswith('key.')}!=record['identity']:raise ValueError('original camera keys differ')
   expected={k:v for k,v in fields.items() if not k.startswith('key.')};actual=record['observations'] if component=='camera_image' else record['targets']

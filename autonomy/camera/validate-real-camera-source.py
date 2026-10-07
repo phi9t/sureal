@@ -1,6 +1,7 @@
 """Independent native panoptic payload and camera coverage reconciliation."""
-import hashlib,io,json
+import io,json
 from pathlib import Path
+from evidence.source_snapshot import file_sha256
 import numpy as np
 import pyarrow.parquet as pq
 from PIL import Image
@@ -8,7 +9,7 @@ from PIL import Image
 root=Path('/source/raw/validation');report=json.loads(Path('/opt/camera-report.json').read_text())
 expected={(r['context'],r['timestamp'],r['camera']):r for r in report['rows']};seen=set();eligible=0
 for path in sorted((root/'camera_segmentation').glob('*.parquet')):
-    assert hashlib.sha256(path.read_bytes()).hexdigest()==report['source_hashes'][path.name]
+    assert file_sha256(path)==report['source_hashes'][path.name]
     for batch in pq.ParquetFile(path).iter_batches(batch_size=1):
         row=batch.to_pylist()[0];key=(row['key.segment_context_name'],row['key.frame_timestamp_micros'],row['key.camera_name'])
         assert key in expected and key not in seen;seen.add(key)

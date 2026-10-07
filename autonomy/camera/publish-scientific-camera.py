@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 """Publish externally audited native camera sidecars through immutable HDFS bundles."""
-import argparse,hashlib,json,resource,subprocess,time
+import argparse,json,resource,subprocess,time
 from datetime import datetime,timezone
 from pathlib import Path
+from evidence.source_snapshot import file_sha256 as sha
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
-HERE=Path(__file__).resolve().parent
+HERE=Path(__file__).resolve().parents[1]
 WAYSTONE='/data02/home/philip.yang/workspace/waystone/scripts/waystone'
 COMPONENTS=['camera_image','camera_segmentation','camera_box']
-def sha(p):
- with p.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
 def total(p):return sum(f.stat().st_size for f in p.rglob('*') if f.is_file())
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--evidence',type=Path,required=True);parser.add_argument('--expected-evidence-sha256',required=True);parser.add_argument('--output',type=Path,required=True);args=parser.parse_args()
@@ -33,7 +32,7 @@ def main():
  root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);base.mkdir(parents=True,exist_ok=False);inputs=base/'input';packed=base/'packed';checked=base/'checked'
  for p in (inputs,packed,checked):p.mkdir()
  provenance={'scene':scene,'official_split':membership[0],'research_splits':membership[1],'camera_evidence_sha256':args.expected_evidence_sha256,'source_receipt_hashes':evidence['receipt_hashes'],'sources':sources}
- (inputs/'trusted.json').write_text(json.dumps({'files':expected,'provenance':provenance},indent=2)+'\n');names=['publish-scientific-camera.py','dataset/component_archive.py','dataset/component_archive_validate.py'];candidates={n:sha(HERE/n) for n in names};checks=[];started=datetime.now(timezone.utc).isoformat();tick=time.monotonic()
+ (inputs/'trusted.json').write_text(json.dumps({'files':expected,'provenance':provenance},indent=2)+'\n');names=['camera/publish-scientific-camera.py','dataset/component_archive.py','dataset/component_archive_validate.py'];candidates={n:sha(HERE/n) for n in names};checks=[];started=datetime.now(timezone.utc).isoformat();tick=time.monotonic()
  def call(stage,cmd):
   t=time.monotonic();r=subprocess.run(cmd,capture_output=True,text=True);(base/(stage+'.log')).write_text(r.stdout+r.stderr);checks.append({'stage':stage,'command':cmd,'exit_code':r.returncode,'elapsed_seconds':time.monotonic()-t})
   if r.returncode:raise RuntimeError(r.stderr)

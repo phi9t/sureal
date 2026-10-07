@@ -10,5 +10,5 @@ target_link_libraries(wod_camera PUBLIC /motion-build/libwod_motion_proto.a prot
 add_executable(camera_model_test /tmp/camera-source/camera_model_test.cc)
 target_include_directories(camera_model_test PRIVATE /usr/src/googletest/googlemock/include)
 target_link_libraries(camera_model_test PRIVATE wod_camera /motion-build/lib/libgmock.a /motion-build/lib/libgtest_main.a /motion-build/lib/libgtest.a pthread)
-add_executable(project_camera /experiment/camera-evaluation/project_camera.cc)
+add_executable(project_camera /experiment/camera/project_camera.cc)
 target_link_libraries(project_camera PRIVATE wod_camera)

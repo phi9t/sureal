@@ -1,15 +1,13 @@
 """Independent Arrow reconciliation of original camera binary/scalar fields."""
 import hashlib,json
 from pathlib import Path
+from evidence.source_snapshot import file_sha256 as digest
 import pyarrow.parquet as pq
 
 def validate_camera_component(source,output):
  source,output=Path(source),Path(output)
  def require(ok,message):
   if not ok:raise ValueError(message)
- def digest(p):
-  require(p.is_file() and not p.is_symlink(),'regular artifact required')
-  with p.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
  report=json.loads((output/'manifest.json').read_text());native=pq.ParquetFile(source)
  require(report['schema_version']==1 and report['source_sha256']==digest(source),'source identity differs')
  require(report['native_schema_sha256']==hashlib.sha256(str(native.schema_arrow).encode()).hexdigest(),'schema differs')

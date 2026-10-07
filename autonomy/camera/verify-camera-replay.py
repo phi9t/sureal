@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 """Two live scientific camera replays against externally verified native sidecars."""
-import argparse,hashlib,json,resource,subprocess,time
+import argparse,json,resource,subprocess,time
 from datetime import datetime,timezone
 from pathlib import Path
+from evidence.source_snapshot import file_sha256 as sha
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
-HERE=Path(__file__).resolve().parent
-
-def sha(p):
- with p.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+HERE=Path(__file__).resolve().parents[1]
 def main():
  p=argparse.ArgumentParser();p.add_argument('processing',type=Path);p.add_argument('publication',type=Path);p.add_argument('output',type=Path);p.add_argument('--expected-receipt-sha256',required=True);p.add_argument('--usage',required=True);args=p.parse_args();processing=args.processing.resolve();publication=args.publication.resolve();base=args.output.resolve();pp=publication/'receipt.json'
  if sha(pp)!=args.expected_receipt_sha256:raise ValueError('trusted camera publication receipt differs')
@@ -25,9 +23,9 @@ def main():
   for n,v in r['artifacts'].items():
    if sha(processing/n)!=v:raise ValueError('original camera artifact differs')
   references[component]=r['artifacts']['sidecars/'+component+'/manifest.json']
- cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);base.mkdir(parents=True,exist_ok=False);inputs=base/'input';inputs.mkdir();(inputs/'reference.json').write_text(json.dumps(references)+'\n');checks=[];results=[];started=datetime.now(timezone.utc).isoformat();tick=time.monotonic();names=['verify-camera-replay.py','pipeline/camera_replay_check.py','pipeline/camera_dataset.py','dataset/component_archive_validate.py'];candidates={n:sha(HERE/n) for n in names}
+ cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);base.mkdir(parents=True,exist_ok=False);inputs=base/'input';inputs.mkdir();(inputs/'reference.json').write_text(json.dumps(references)+'\n');checks=[];results=[];started=datetime.now(timezone.utc).isoformat();tick=time.monotonic();names=['camera/verify-camera-replay.py','camera/camera_replay_check.py','camera/camera_dataset.py','dataset/component_archive_validate.py'];candidates={n:sha(HERE/n) for n in names}
  for index in (1,2):
-  out=base/f'replay-{index}';out.mkdir();cmd=['python','-m','pipeline.camera_replay_check','--publication-sha',pub['publication_manifest_sha256'],'--usage',args.usage];plan=launch_plan(root,HERE,publication/'packed',out,cmd);i=plan.index('--');plan[i:i]=['--ro-bind',str(processing/'sidecars'),'/opt','--ro-bind',str(inputs),'/mnt'];t=time.monotonic();r=subprocess.run(plan,capture_output=True,text=True);(base/f'replay-{index}.log').write_text(r.stdout+r.stderr);checks.append({'stage':f'replay-{index}','command':plan,'exit_code':r.returncode,'elapsed_seconds':time.monotonic()-t})
+  out=base/f'replay-{index}';out.mkdir();cmd=['python','-m','camera.camera_replay_check','--publication-sha',pub['publication_manifest_sha256'],'--usage',args.usage];plan=launch_plan(root,HERE,publication/'packed',out,cmd);i=plan.index('--');plan[i:i]=['--ro-bind',str(processing/'sidecars'),'/opt','--ro-bind',str(inputs),'/mnt'];t=time.monotonic();r=subprocess.run(plan,capture_output=True,text=True);(base/f'replay-{index}.log').write_text(r.stdout+r.stderr);checks.append({'stage':f'replay-{index}','command':plan,'exit_code':r.returncode,'elapsed_seconds':time.monotonic()-t})
   if r.returncode:raise RuntimeError(r.stderr)
   results.append(json.loads((out/'replay.json').read_text()));print('PASS scientific camera replay',index,results[-1]['rows'],flush=True)
  if results[0]!=results[1]:raise ValueError('camera replays differ')

@@ -1,6 +1,6 @@
 import hashlib,json,tempfile,unittest
 from pathlib import Path
-from pipeline.camera_eviction import evict_camera
+from camera.camera_eviction import evict_camera
 class CameraEvictionTests(unittest.TestCase):
  def fixture(self,root):
   processing=root/'processing';source=processing/'sidecars/camera_image';source.mkdir(parents=True);payload=source/'row.bin';payload.write_bytes(b'jpeg');publication=root/'publication';(publication/'packed').mkdir(parents=True);(publication/'input').mkdir();archive=publication/'packed/camera.tar';archive.write_bytes(b'archive');replay=root/'replay';replay.mkdir()

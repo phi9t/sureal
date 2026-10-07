@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from segmentation.camera_semantic_scoring import score
+from camera.camera_semantic_scoring import score
 
 class CameraScoringTests(unittest.TestCase):
     def test_native_camera_classes_and_ignored_pixels_have_exact_denominators(self):

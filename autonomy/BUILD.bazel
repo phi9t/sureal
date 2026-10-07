@@ -14,6 +14,7 @@ package(default_visibility = ["//visibility:private"])
 filegroup(
     name = "sustained-run-sources",
     srcs = glob(SUSTAINED_RUN_SOURCE_GLOBS, exclude = ["**/__pycache__/**"]) + [
+        "//autonomy/camera:all_py",
         "//autonomy/dataset:all_py",
         "//autonomy/detection:all_py",
         "//autonomy/evidence:all_py",
@@ -61,6 +62,7 @@ PERCEPTION_TEST_MODULES = glob(
         "**/*_test.py",
     ],
     exclude = [
+        "camera/**",
         "dataset/**",
         "detection/**",
         "inspection/**",
@@ -73,6 +75,7 @@ PERCEPTION_TEST_MODULES = glob(
 PERCEPTION_RUNFILES = glob(
     ["**"],
     exclude = [
+        "camera/**",
         "dataset/**",
         "detection/**",
         "inspection/**",
@@ -81,6 +84,7 @@ PERCEPTION_RUNFILES = glob(
         "**/__pycache__/**",
     ],
 ) + [
+    "//autonomy/camera:runfiles",
     "//autonomy/dataset:runfiles",
     "//autonomy/inspection:runfiles",
     "//autonomy/segmentation:runfiles",
@@ -88,6 +92,7 @@ PERCEPTION_RUNFILES = glob(
 ]
 
 PERCEPTION_DEPS = [
+    "//autonomy/camera:camera",
     "//autonomy/dataset:dataset",
     "//autonomy/detection:detection",
     "//autonomy/evidence:evidence",
@@ -116,6 +121,7 @@ filegroup(
         "architecture/experiment_runner.py",
         "architecture/harness/files.json",
         "architecture/registry.json",
+        "//autonomy/camera:all_py",
         "//autonomy/dataset:all_py",
         "//autonomy/detection:all_py",
         "//autonomy/evidence:source_snapshot_py",
@@ -196,6 +202,7 @@ test_suite(
     tests = [":source_snapshot_targets_test"]
         + [":" + perception_test_name(src) for src in PERCEPTION_TEST_MODULES]
         + [
+            "//autonomy/camera:all_tests",
             "//autonomy/dataset:all_tests",
             "//autonomy/detection:all_tests",
             "//autonomy/evidence:all_tests",

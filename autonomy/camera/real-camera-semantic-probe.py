@@ -5,7 +5,7 @@ from evidence.source_snapshot import file_sha256
 import numpy as np
 import pyarrow.parquet as pq
 from PIL import Image
-from segmentation.camera_semantic_scoring import score
+from camera.camera_semantic_scoring import score
 
 root=Path('/source/raw/validation');camera_keys=set();label_keys=set();rows=[];hashes={};started=time.monotonic();eligible=0
 for path in sorted((root/'camera_image').glob('*.parquet')):

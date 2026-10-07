@@ -2,9 +2,9 @@ import hashlib,json,tempfile,unittest
 from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as pq
-from pipeline.camera_sidecars import materialize_camera_component
+from camera.camera_sidecars import materialize_camera_component
 from dataset.component_archive import create_component_archive
-from pipeline.camera_dataset import iter_camera_records
+from camera.camera_dataset import iter_camera_records
 class CameraDatasetTests(unittest.TestCase):
  def fixture(self,root):
   source=root/'source';source.mkdir();scene='scene'

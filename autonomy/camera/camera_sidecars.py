@@ -1,6 +1,7 @@
 """Bounded native camera rows with lossless binary payload retention."""
 import hashlib,json
 from pathlib import Path
+from evidence.source_snapshot import file_sha256
 import pyarrow.parquet as pq
 SUPPORTED={'camera_image','camera_segmentation','camera_box'}
 def materialize_camera_component(source,component,scene,output,remaining_bytes):
@@ -28,7 +29,7 @@ def materialize_camera_component(source,component,scene,output,remaining_bytes):
   if used+len(metadata)+sum(map(len,blobs.values()))>remaining_bytes:raise ValueError('camera row exceeds remaining capacity')
   for artifact,value in blobs.items():write(artifact,value)
   rows.append({'key':keys,'metadata':name,'metadata_sha256':write(name,metadata)})
- with source.open('rb') as stream:source_hash=hashlib.file_digest(stream,'sha256').hexdigest()
+ source_hash=file_sha256(source)
  report={'schema_version':1,'component':component,'scene':scene,'source_sha256':source_hash,'native_schema_sha256':hashlib.sha256(str(native.schema_arrow).encode()).hexdigest(),'rows':rows,'output_bytes':used,'scope':'native bytes/scalars retained; missing box rows do not establish annotated-empty camera coverage'}
  while True:
   data=encode(report);total=used+len(data)

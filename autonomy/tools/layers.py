@@ -19,6 +19,7 @@ LAYERS = (
     ('insula',),
     ('dataset',),
     ('geometry',),
+    ('camera',),
     ('segmentation',),
     ('detection',),
     ('pipeline',),
