@@ -9,7 +9,6 @@ import subprocess
 import sys
 
 HERE=Path(__file__).resolve().parents[1]
-sys.path.insert(0,str(HERE))
 from insula.runtime_identity import verify_rootfs
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
 
@@ -46,7 +45,7 @@ try:s.connect(('127.0.0.1',{port}))
 except OSError:pass
 else:raise AssertionError('host network reachable')
 finally:s.close()
-validator=['/opt/waymo/bin/python','/experiment/gpu/validate-probe.py']
+validator=['/opt/waymo/bin/python','/experiment/insula/validate_gpu_probe.py']
 p=subprocess.run(validator+['/outputs/gpu-probe.json','/outputs/numeric-verified.json'],capture_output=True,text=True)
 assert p.returncode==0,p.stderr
 original=json.loads(Path('/outputs/gpu-probe.json').read_text())
@@ -65,7 +64,7 @@ print('PASS isolation and numerical failure injections')
     (out/'live.stdout').write_text(result.stdout);(out/'live.stderr').write_text(result.stderr)
     record={'stage':'gpu-independent-isolation','candidate_receipt_sha256':sha(candidate/'receipt.json'),
             'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'command':plan,'exit_code':result.returncode,
-            'code_hashes':{str(p.relative_to(HERE)):sha(p) for p in [Path(__file__),HERE/'gpu/validate-probe.py']},
+            'code_hashes':{str(p.relative_to(HERE)):sha(p) for p in [Path(__file__),HERE/'insula/validate_gpu_probe.py']},
             'runtime_lock':receipt['runtime_lock'],'artifacts':{p.name:sha(p) for p in out.iterdir() if p.is_file()}}
     (out/'receipt.json').write_text(json.dumps(record,indent=2)+'\n')
     print(result.stdout,result.stderr,flush=True)

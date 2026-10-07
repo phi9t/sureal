@@ -9,7 +9,6 @@ import sys
 import time
 
 HERE=Path(__file__).resolve().parents[1]
-sys.path.insert(0,str(HERE))
 from insula.runtime_identity import rootfs_identity,verify_rootfs
 from insula.entry import launch_plan
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
@@ -32,13 +31,14 @@ def main():
             process.stdout.close()
             assert process.wait()==0 and unpack.returncode==0
         finally:subprocess.run(['docker','rm',cid],check=True,capture_output=True)
+        recipes=['Dockerfile.gpu','gpu-requirements.lock','build_gpu.sh']
         lock={'image_id':EXPECTED,'rootfs_sha256':rootfs_identity(stage),
-              'recipe_hashes':{name:sha(HERE/'gpu'/name) for name in ['Dockerfile','requirements.lock','build.sh']}}
+              'recipe_hashes':{name:sha(HERE/'insula'/name) for name in recipes}}
         stage.rename(ROOT);lockpath.write_text(json.dumps(lock,indent=2)+'\n')
     lock=json.loads(lockpath.read_text());verify_rootfs(ROOT,lock['rootfs_sha256'])
-    for name,h in lock['recipe_hashes'].items():assert sha(HERE/'gpu'/name)==h
+    for name,h in lock['recipe_hashes'].items():assert sha(HERE/'insula'/name)==h
     source=CACHE/'insula/m0-live-20260930-c/input'
-    command=['/opt/waymo/bin/python','/experiment/gpu/probe.py']
+    command=['/opt/waymo/bin/python','/experiment/insula/gpu_probe.py']
     plan=launch_plan(ROOT,HERE,source,out,command)
     extra=['--tmpfs','/driver'];driver={}
     for device in ['/dev/nvidia1','/dev/nvidiactl','/dev/nvidia-uvm']:
@@ -57,7 +57,7 @@ def main():
     (out/'probe.stdout').write_text(result.stdout);(out/'probe.stderr').write_text(result.stderr)
     receipt={'stage':'gpu-runtime-probe','runtime_lock':lock,'driver_hashes':driver,'command':plan,'exit_code':result.returncode,
              'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-begin,
-             'candidate_hashes':{str(p.relative_to(HERE)):sha(p) for p in [Path(__file__),HERE/'gpu/probe.py']},
+             'candidate_hashes':{str(p.relative_to(HERE)):sha(p) for p in [Path(__file__),HERE/'insula/gpu_probe.py']},
              'artifacts':{p.name:sha(p) for p in out.iterdir() if p.is_file()},
              'scope':'computation probe only; isolation and independent receipt verification pending'}
     (out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
