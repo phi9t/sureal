@@ -66,3 +66,12 @@ Diagnostic command notes:
 Unresolved limitations:
 
 - No live scientific training/gate was launched, and no retained receipts or research artifacts were rewritten. Historical receipts remain historical records and still explain the pin impact above.
+
+Integration review, 2026-10-07:
+
+- Native Corenius worker completed at `2889473`, exit 0, clean and ready for review. Supervisor DEGRADED notes concern event attribution for computed-path edits, parent integration branch movements, and the optional root BUILD.bazel allow-path having no output. No boundary violation was reported; reviewed code changes remain within the ticket. The pure-move commit `8377e3f` contains 18 byte-identical renames.
+- Independent standards and spec reviews found no code blocker. The final ticket records the deferred closed-gate scripts and pin impact. The four added GPU-tagged tests use CPU tensors inside the GPU rootfs; their result verifies Torch availability and model behavior, not new CUDA kernel coverage.
+- Merged reviewed camera, motion, resources and inspection integration `e5942d2` into candidate `b8e29b0`. The sole conflict was the sustained source inventory: resolution retains resources, inspection and camera while selecting the moved detection helper paths and excluding the deferred gpu procedure directory.
+- The combined candidate passed both focused snapshot/architecture tests, all 150 CPU targets, all 28 GPU-tagged targets, 30 publication unit tests, publication audit, layer audit and whitespace check. Relative to ticket16's 148/24 baseline, the two added CPU targets are resource boundary and scored proposals; the four Torch test modules account for 24 to 28. Existing module coverage was preserved.
+- Parallax and wrapper/toolchain inputs are byte-identical to the prior integration; the native worker's 17 passing Parallax targets remain applicable. Retained research is unchanged. The legacy pin check still reports expected retained-receipt impact and is not claimed as passing. No scientific experiment run or new live receipt is claimed.
+- Exact integration command results and raw logs are retained under `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/detection-verification/`; native candidate and supervision records are under the sibling `runs/workers/sureal-semantic-17-20261007T085844Z/`.
