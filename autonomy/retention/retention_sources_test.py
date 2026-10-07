@@ -1,11 +1,24 @@
-import shutil,tempfile,unittest
+import copy,shutil,tempfile,unittest
 from pathlib import Path
-from evidence.source_snapshot import LocalSnapshotStore
+from evidence.source_snapshot import LocalSnapshotStore,copy_source_snapshot,file_sha256
 from retention.retention_sources import REQUIRED,SNAPSHOT_TARGET,freeze_host_sources,validate_host_sources
+HISTORICAL_REQUIRED=(
+ 'retention/publish_native_cache.py','retention/cache_inventory.py',
+ 'retention/cache_retention_audit.py','retention/retention_sources.py',
+ 'resources/scientific_budget.py','resources/scientific_payload.py',
+ 'resources/resource_archive.py','resources/resource_archive_cli.py',
+ 'resources/resource_rehydrate.py','resources/resource_release_plan.py',
+ 'evidence/source_snapshot.py','insula/entry.py','insula/runtime_identity.py',
+)
+HISTORICAL_TARGET='//autonomy:native-cache-retention-host'
 class RetentionSourcesTests(unittest.TestCase):
- def fixture(self,root):
-  for name in REQUIRED:
+ def fixture(self,root,names=REQUIRED):
+  for name in names:
    p=root/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(name)
+ def historical_receipt(self,base):
+  root=base/'legacy';self.fixture(root,HISTORICAL_REQUIRED)
+  receipt=copy_source_snapshot(root,HISTORICAL_REQUIRED,base/'legacy-host',LocalSnapshotStore(base/'legacy-store'),target=HISTORICAL_TARGET)
+  return root,receipt
  def query_runner(self,names):
   def run(command,**kwargs):
    self.assertIn('query',command)
@@ -25,23 +38,41 @@ class RetentionSourcesTests(unittest.TestCase):
    self.assertTrue((Path(pins['source_snapshot_root'])/'autonomy/retention/publish_native_cache.py').is_file())
  def test_snapshot_verifies_after_current_edit_extra_file_and_checkout_move(self):
   with tempfile.TemporaryDirectory() as temp:
-   root=Path(temp)/'repo';self.fixture(root);pins=freeze_host_sources(root,Path(temp)/'frozen');validate_host_sources(root,pins);self.assertEqual(set(pins['source_pins']),set(REQUIRED))
-   (root/REQUIRED[0]).write_text('changed current checkout')
+   base=Path(temp);root,pins=self.historical_receipt(base);validate_host_sources(root,pins);self.assertEqual(set(pins['source_pins']),set(HISTORICAL_REQUIRED))
+   (root/HISTORICAL_REQUIRED[0]).write_text('changed current checkout')
    (root/'retention/unrelated.py').write_text('new helper')
    validate_host_sources(root,pins)
-   moved=Path(temp)/'moved';self.fixture(moved);validate_host_sources(moved,pins)
+   moved=base/'moved';self.fixture(moved,HISTORICAL_REQUIRED);validate_host_sources(moved,pins)
  def test_missing_or_altered_snapshot_refused(self):
   with tempfile.TemporaryDirectory() as temp:
-   root=Path(temp)/'repo';self.fixture(root);pins=freeze_host_sources(root,Path(temp)/'frozen')
+   root,pins=self.historical_receipt(Path(temp))
    snapshot=Path(pins['source_snapshot_store'])/pins['source_snapshot_sha256'];snapshot.write_bytes(b'altered snapshot')
    with self.assertRaises(ValueError):validate_host_sources(root,pins)
    snapshot.unlink()
    with self.assertRaises(FileNotFoundError):validate_host_sources(root,pins)
  def test_changed_materialized_snapshot_source_refused(self):
   with tempfile.TemporaryDirectory() as temp:
-   root=Path(temp)/'repo';self.fixture(root);pins=freeze_host_sources(root,Path(temp)/'frozen')
-   (Path(pins['source_snapshot_root'])/REQUIRED[0]).write_text('changed frozen source')
+   root,pins=self.historical_receipt(Path(temp))
+   (Path(pins['source_snapshot_root'])/HISTORICAL_REQUIRED[0]).write_text('changed frozen source')
    with self.assertRaises(ValueError):validate_host_sources(root,pins)
+ def test_historical_schema1_receipt_omits_publisher_runtime_and_rehydrates_unchanged(self):
+  with tempfile.TemporaryDirectory() as temp:
+   root,pins=self.historical_receipt(Path(temp));before=copy.deepcopy(pins)
+   archive=Path(pins['source_snapshot_store'])/pins['source_snapshot_sha256'];archive_before=file_sha256(archive)
+   shutil.rmtree(pins['source_snapshot_root'])
+   result=validate_host_sources(root,pins)
+   self.assertEqual(result['source_files'],len(HISTORICAL_REQUIRED))
+   self.assertNotIn('retention/publisher_runtime.py',pins['source_pins'])
+   self.assertTrue((Path(pins['source_snapshot_root'])/'retention/publish_native_cache.py').is_file())
+   self.assertEqual(pins,before);self.assertEqual(file_sha256(archive),archive_before)
+ def test_malformed_historical_schema1_receipt_still_refused(self):
+  with tempfile.TemporaryDirectory() as temp:
+   root,pins=self.historical_receipt(Path(temp));bad=copy.deepcopy(pins);bad['source_pins'].pop(HISTORICAL_REQUIRED[0])
+   with self.assertRaises(ValueError):validate_host_sources(root,bad)
+ def test_new_creation_without_target_context_is_refused(self):
+  with tempfile.TemporaryDirectory() as temp:
+   root=Path(temp)/'repo';self.fixture(root)
+   with self.assertRaises(ValueError):freeze_host_sources(root,Path(temp)/'frozen')
  def test_missing_or_symlinked_source_refused(self):
   with tempfile.TemporaryDirectory() as temp:
    root=Path(temp)/'repo';self.fixture(root);p=root/REQUIRED[0];p.unlink()

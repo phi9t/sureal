@@ -135,7 +135,7 @@ class ResourceCheckpointTests(unittest.TestCase):
             native_base=type(b).__mro__[2]
             with patch.object(native_base,'guard'),patch.object(native_base,'check_stage'):
                 seal(b,record)
-                archive_cache=b.resource_root/'source-snapshot-archives';archive_cache.mkdir(parents=True)
+                archive_cache=b.resource_work_root/'source-snapshot-archives';archive_cache.mkdir(parents=True)
                 digest=b.resource_identity['source_pins']['source_snapshot_sha256']
                 archive=archive_cache/('resource-sources-'+digest+'.tar')
                 deterministic_tmp=archive.with_suffix(archive.suffix+'.tmp')
@@ -152,7 +152,7 @@ class ResourceCheckpointTests(unittest.TestCase):
             native_base=type(b).__mro__[2]
             with patch.object(native_base,'guard'),patch.object(native_base,'check_stage'):
                 seal(b,record)
-                archive_cache=b.resource_root/'source-snapshot-archives';archive_cache.mkdir(parents=True)
+                archive_cache=b.resource_work_root/'source-snapshot-archives';archive_cache.mkdir(parents=True)
                 digest=b.resource_identity['source_pins']['source_snapshot_sha256']
                 archive=archive_cache/('resource-sources-'+digest+'.tar')
                 deterministic_tmp=archive.with_suffix(archive.suffix+'.tmp')
@@ -174,7 +174,7 @@ class ResourceCheckpointTests(unittest.TestCase):
             with patch.object(native_base,'guard'),patch.object(native_base,'check_stage'):
                 seal(b,record)
                 digest=b.resource_identity['source_pins']['source_snapshot_sha256']
-                archive=b.resource_root/'source-snapshot-archives'/('resource-sources-'+digest+'.tar')
+                archive=b.resource_work_root/'source-snapshot-archives'/('resource-sources-'+digest+'.tar')
                 with self.assertRaisesRegex(ValueError,'cap'):
                     inventory(b,record)
                 self.assertFalse(archive.exists())
@@ -188,6 +188,33 @@ class ResourceCheckpointTests(unittest.TestCase):
                 seal(b,record)
                 with self.assertRaisesRegex(ValueError,'resource accounting reservation required'):
                     inventory(b,record)
+
+    def test_snapshot_archive_staging_counts_cumulative_work_root_bytes(self):
+        seal,_,inventory=self.api()
+        from evidence.source_snapshot import receipt_snapshot_digest,store_from_receipt
+        from resources.scientific_budget import reserve_write
+        from resources.scientific_payload import unique_payload_bytes
+        with tempfile.TemporaryDirectory() as temp:
+            b,record=self.fixture(Path(temp))
+            receipts=[b.resource_identity['source_pins'],b.pins]
+            sizes=[len(store_from_receipt(receipt).fetch(receipt_snapshot_digest(receipt))) for receipt in receipts]
+            self.assertNotEqual(receipts[0]['source_snapshot_sha256'],receipts[1]['source_snapshot_sha256'])
+            initial=unique_payload_bytes(b.resource_work_root)
+            limit=initial+max(sizes)+1
+            reservations=[]
+            def capped(path,maximum_new_bytes):
+                self.assertEqual(Path(path),b.resource_work_root)
+                reservations.append((unique_payload_bytes(path),maximum_new_bytes))
+                return reserve_write(path,maximum_new_bytes,limit=limit)
+            b.resource_reserve_write=capped
+            native_base=type(b).__mro__[2]
+            with patch.object(native_base,'guard'),patch.object(native_base,'check_stage'):
+                seal(b,record)
+                with self.assertRaisesRegex(ValueError,'Scientific write refused before allocation'):
+                    inventory(b,record)
+            self.assertGreater(unique_payload_bytes(b.resource_work_root),initial)
+            self.assertEqual(len(list(b.resource_work_root.rglob('*.tar'))),1)
+            self.assertEqual(len(reservations),2)
 
     def test_existing_snapshot_archive_retry_reuses_verified_object_without_reservation(self):
         seal,_,inventory=self.api()
