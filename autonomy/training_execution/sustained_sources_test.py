@@ -1,7 +1,7 @@
-import hashlib,tempfile,unittest
+import hashlib,json,tempfile,unittest
 from pathlib import Path
 from evidence.source_snapshot import LocalSnapshotStore,archive_sources
-from training_execution.sustained_sources import REQUIRED,SNAPSHOT_TARGET,snapshot_sources,validate_sources
+from training_execution.sustained_sources import REQUIRED,SNAPSHOT_TARGET,cache_snapshot_for_runtime,snapshot_sources,validate_sources
 
 class SustainedSourceTests(unittest.TestCase):
  def fixture(self,root,store_root,names=None):
@@ -20,6 +20,18 @@ class SustainedSourceTests(unittest.TestCase):
    result.stdout=''.join('//'+name.rsplit('/',1)[0]+':'+name.rsplit('/',1)[1]+'\n' for name in sorted(names))
    return result
   return run
+ def test_runtime_cache_preserves_admitted_archive_and_receipt(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   root=Path(tmp);store=root/'admitted';receipt,_=self.fixture(root/'source',store)
+   digest=receipt['source_snapshot_sha256'];archive=(store/digest).read_bytes()
+   for index,descriptor in enumerate([str(store),{'schema_version':1,'kind':'local','root':str(store)}]):
+    with self.subTest(descriptor=descriptor):
+     receipt['source_snapshot_store']=descriptor;original=json.dumps(receipt,sort_keys=True)
+     cache=root/('runtime-cache-'+str(index))
+     cache_snapshot_for_runtime(receipt,cache)
+     self.assertEqual(LocalSnapshotStore(cache).fetch(digest),archive)
+     self.assertEqual((store/digest).read_bytes(),archive)
+     self.assertEqual(json.dumps(receipt,sort_keys=True),original)
  def test_new_snapshot_creation_uses_target_query_and_explicit_destination(self):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp);repo=root/'repo';package=repo/'autonomy'

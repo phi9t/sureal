@@ -1,7 +1,7 @@
 """Execution package source-snapshot and externally admitted runtime-lock binding."""
 import re
 from pathlib import Path
-from evidence.source_snapshot import receipt_snapshot_digest,snapshot_target_and_materialize,store_from_receipt,verify_or_materialize_receipt_sources
+from evidence.source_snapshot import LocalSnapshotStore,receipt_snapshot_digest,snapshot_target_and_materialize,store_from_receipt,verify_or_materialize_receipt_sources
 
 REQUIRED=frozenset('''training_execution/train_sustained.py detection/sustained_contract.py training_execution/sustained_loop.py detection/sustained_loss.py training_execution/sustained_state.py training_execution/sustained_sources.py evidence/source_snapshot.py insula/entry.py insula/runtime_identity.py detection/fixed_batch_catalog.py detection/fixed_batch_models.py resources/scientific_budget.py resources/scientific_payload.py resources/sustained_scoring_budget.py detection/pillar_detector.py detection/pillar_encoder.py detection/detector_loss.py geometry/geometry.py geometry/geometry_foundation.py detection/norm_variants.py detection/architecture_variants.py detection/architecture_followups.py resources/replay_values.py range_view/range_frontend.py range_view/range_pillar_hybrid.py range_view/sparse_window_attention.py range_view/sparse_windows.py'''.split())
 SNAPSHOT_TARGET='//autonomy/training_execution:train_sustained'

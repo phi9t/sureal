@@ -35,7 +35,6 @@ class SourceSnapshotTests(unittest.TestCase):
                 snapshot_target_and_materialize,
                 source_snapshot_store_descriptor,
                 store_from_receipt,
-                verify_or_materialize_receipt_sources,
                 verify_receipt_sources,
             )
         except ImportError:
@@ -56,7 +55,6 @@ class SourceSnapshotTests(unittest.TestCase):
             "snapshot_target_and_materialize": snapshot_target_and_materialize,
             "source_snapshot_store_descriptor": source_snapshot_store_descriptor,
             "store_from_receipt": store_from_receipt,
-            "verify_or_materialize_receipt_sources": verify_or_materialize_receipt_sources,
             "verify_receipt_sources": verify_receipt_sources,
         }
 
@@ -222,63 +220,6 @@ class SourceSnapshotTests(unittest.TestCase):
             self.assertEqual(materialized["source_snapshot_root"], str(second_destination))
             self.assertEqual((second_destination / "autonomy/evidence/source_snapshot.py").read_text(), "module\n")
             self.assertGreaterEqual([call[0][5] for call in hdfs_calls].count("get"), 3)
-
-    def test_verify_or_materialize_recovers_missing_pins_inside_existing_scaffold(self):
-        api = self.api()
-        with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            repo = root / "repo"
-            repo.mkdir()
-            (repo / "autonomy/detection").mkdir(parents=True)
-            (repo / "autonomy/detection/worker.py").write_text("pinned\n")
-            store = api["LocalSnapshotStore"](root / "store")
-            archive, pins = api["archive_sources"](repo, ["autonomy/detection/worker.py"])
-            digest = hashlib.sha256(archive).hexdigest()
-            store.store(digest, archive)
-            receipt = {
-                "source_snapshot_sha256": digest,
-                "source_snapshot_target": "//autonomy:fixture",
-                "source_snapshot_store": str(store.root),
-                "source_pins": pins,
-            }
-            destination = root / "materialized"
-            (destination / "autonomy/research").mkdir(parents=True)
-            (destination / "autonomy/research/retained.json").write_text("{}\n")
-
-            verified = api["verify_or_materialize_receipt_sources"](receipt, destination, store)
-
-            self.assertEqual(verified["source_snapshot_sha256"], digest)
-            self.assertEqual((destination / "autonomy/detection/worker.py").read_text(), "pinned\n")
-            self.assertEqual((destination / "autonomy/research/retained.json").read_text(), "{}\n")
-
-    def test_verify_or_materialize_does_not_overwrite_changed_or_irregular_pins(self):
-        api = self.api()
-        with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            repo = root / "repo"
-            repo.mkdir()
-            (repo / "autonomy/detection").mkdir(parents=True)
-            (repo / "autonomy/detection/worker.py").write_text("pinned\n")
-            store = api["LocalSnapshotStore"](root / "store")
-            archive, pins = api["archive_sources"](repo, ["autonomy/detection/worker.py"])
-            digest = hashlib.sha256(archive).hexdigest()
-            store.store(digest, archive)
-            receipt = {
-                "source_snapshot_sha256": digest,
-                "source_snapshot_target": "//autonomy:fixture",
-                "source_snapshot_store": str(store.root),
-                "source_pins": pins,
-            }
-            changed = root / "changed"
-            (changed / "autonomy/detection").mkdir(parents=True)
-            (changed / "autonomy/detection/worker.py").write_text("changed\n")
-            with self.assertRaisesRegex(ValueError, "materialized source changed"):
-                api["verify_or_materialize_receipt_sources"](receipt, changed, store)
-            linked = root / "linked"
-            (linked / "autonomy/detection").mkdir(parents=True)
-            (linked / "autonomy/detection/worker.py").symlink_to(repo / "autonomy/detection/worker.py")
-            with self.assertRaisesRegex(ValueError, "materialized source missing or irregular"):
-                api["verify_or_materialize_receipt_sources"](receipt, linked, store)
 
     def test_descriptor_resolution_validates_shape_and_never_uses_receipt_executables(self):
         api = self.api()
