@@ -4,13 +4,13 @@ Mount this worker and sustained_chunk_reference.py at /tmp/verifier; the origina
 source-frozen producer package stays at /experiment. External host admission
 must pin both verifier files, all inputs, checkpoint bytes and live outputs.
 """
-import hashlib,importlib.util,json,math,random,resource,sys,time
+import importlib.util,json,math,random,resource,sys,time
 from pathlib import Path
 import numpy as np
 import torch
+from evidence.source_snapshot import file_sha256
 
-def sha(path):
- with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+sha=file_sha256
 def safe(root,name):
  relative=Path(name)
  if relative.is_absolute() or '..' in relative.parts:raise ValueError('safe native path required')
@@ -18,15 +18,14 @@ def safe(root,name):
 
 def main():
  if importlib.util.find_spec('tensorflow') is not None or not torch.cuda.is_available() or torch.cuda.device_count()!=1:raise ValueError('one native GPU and TensorFlow absence required')
- sys.path.insert(0,'/experiment')
- from cohort.sustained_sources import validate_sources
- from cohort.sustained_contract import validate_contract
+ from training_execution.sustained_sources import validate_sources
+ from sustained.sustained_contract import validate_contract
  from resources.replay_values import require_exact_state
- from cohort.sustained_loss import class_balanced_objective
+ from detection.sustained_loss import class_balanced_objective
  from detection.fixed_batch_catalog import catalog
  from detection.fixed_batch_models import build,optimizer,deterministic,objective
  from sustained_chunk_reference import reference_chunk
- from cohort.replay_sustained import main as replay_heads
+ from training_execution.replay_sustained import main as replay_heads
  torch.cuda.reset_peak_memory_stats();started=time.monotonic()
  manifestpath=Path('/source/manifest.json');manifest=json.loads(manifestpath.read_text());expected=json.loads(Path('/source/transition.json').read_text())
  if set(expected)!={'manifest_sha256','checkpoint_sha256','previous_checkpoint_sha256','report_sha256','start_step','terminal_step'} or sha(manifestpath)!=expected['manifest_sha256']:raise ValueError('complete external transition identity required')

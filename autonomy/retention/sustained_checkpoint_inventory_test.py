@@ -1,6 +1,6 @@
 import hashlib,json,tempfile,unittest
 from pathlib import Path
-from cohort.sustained_checkpoint_inventory import freeze_checkpoint_inventory
+from retention.sustained_checkpoint_inventory import freeze_checkpoint_inventory
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 class CheckpointInventoryTests(unittest.TestCase):
  def fixture(self,base,step=1000,reason='sample',requested=None):

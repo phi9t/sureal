@@ -1,5 +1,5 @@
 import unittest
-from protocol import validate_cohort,quality_gate
+from training_execution.protocol import validate_cohort,quality_gate
 class ProtocolTests(unittest.TestCase):
  def frames(self):return [{'identity':f's{i}:100','split':'training','positive_anchors':{str(k):1 for k in range(1,5)}} for i in range(16)]
  def test_full_class_training_fixture(self):self.assertEqual(validate_cohort(self.frames())['frames'],16)

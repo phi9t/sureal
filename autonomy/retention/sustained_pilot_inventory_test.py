@@ -1,6 +1,6 @@
 import tempfile,json,hashlib,unittest
 from pathlib import Path
-from cohort.sustained_pilot_inventory import freeze_pilot_inventory
+from retention.sustained_pilot_inventory import freeze_pilot_inventory
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 class PilotInventoryTests(unittest.TestCase):
  def fixture(self,base):

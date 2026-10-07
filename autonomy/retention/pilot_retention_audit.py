@@ -1,8 +1,9 @@
 """Independent whole-pilot membership/readback/live-recovery admission."""
-import copy,hashlib,json,resource,time
+import copy,json,resource,time
 from pathlib import Path,PurePosixPath
+from evidence.source_snapshot import file_sha256,require_regular_file
 start=time.monotonic()
-sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+sha=file_sha256
 base=Path('/tmp/inputs')
 pub=json.loads((base/'publication.json').read_text());original=json.loads((base/'readback.json').read_text());expected=json.loads((base/'expected.json').read_text())
 assert sha(base/'readback.json')==pub['publication_manifest_sha256']
@@ -29,7 +30,10 @@ def validate(candidate,check_local=True):
    name=member['path'];path=PurePosixPath(name)
    if path.is_absolute() or '..' in path.parts or str(path)!=name or name in union or name not in expected['source_sha256']:raise ValueError('foreign or duplicate pilot member')
    local=Path('/source')/name
-   if check_local and (local.is_symlink() or not local.is_file() or local.stat().st_size!=member['bytes'] or sha(local)!=member['sha256']):raise ValueError('original pilot bytes differ')
+   if check_local:
+    try:local=require_regular_file(local)
+    except ValueError as error:raise ValueError('original pilot bytes differ') from error
+    if local.stat().st_size!=member['bytes'] or sha(local)!=member['sha256']:raise ValueError('original pilot bytes differ')
    union[name]=member['sha256']
   payload+=size
  if union!=expected['source_sha256']:raise ValueError('incomplete pilot recovery')

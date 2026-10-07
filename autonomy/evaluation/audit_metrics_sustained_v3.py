@@ -1,7 +1,8 @@
-from cohort.sustained_scoring_budget import DEFAULT_NATIVE_SECONDS
-import hashlib,json,math,re,subprocess
+from sustained.sustained_scoring_budget import DEFAULT_NATIVE_SECONDS
+import json,math,re,subprocess
 from pathlib import Path
-sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+from evidence.source_snapshot import file_sha256
+sha=file_sha256
 e=json.loads(Path('/tmp/expected.json').read_text());r=e['receipt'];assert sha('/tmp/score-receipt.json')==e['receipt_sha256']
 for key,directory in [('parent_artifacts',Path('/source')),('artifacts',Path('/tmp/scored'))]:
  for path,digest in r[key].items():assert sha(directory/Path(path).name)==digest

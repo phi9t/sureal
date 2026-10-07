@@ -5,13 +5,16 @@ The final receipt must first be independently admitted; expected_sha256 is its
 external pin. Publication still requires full HDFS readback/live recovery and
 independent whole-member-union verification before any release.
 """
-import hashlib,json
+import json
 from pathlib import Path
+from evidence.source_snapshot import file_sha256,require_regular_file
 STEPS=(0,19,35)
 STAGES=('train','audit','literal-loss','export','proposals','score','metrics-audit')
-def sha(path):
- with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
-def regular(path):return path.is_file() and not any(p.is_symlink() for p in [path,*path.parents])
+sha=file_sha256
+def regular(path):
+ try:require_regular_file(path)
+ except ValueError:return False
+ return True
 def freeze_pilot_inventory(root,final_path,expected_sha256):
  root=Path(root);final_path=Path(final_path)
  if root.is_symlink() or not root.is_dir() or not regular(final_path) or sha(final_path)!=expected_sha256:raise ValueError('regular pilot root and externally pinned final receipt required')

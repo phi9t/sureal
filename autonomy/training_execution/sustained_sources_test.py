@@ -1,7 +1,7 @@
 import hashlib,tempfile,unittest
 from pathlib import Path
 from evidence.source_snapshot import LocalSnapshotStore,archive_sources
-from cohort.sustained_sources import REQUIRED,SNAPSHOT_TARGET,validate_sources
+from training_execution.sustained_sources import REQUIRED,SNAPSHOT_TARGET,validate_sources
 
 class SustainedSourceTests(unittest.TestCase):
  def fixture(self,root,store_root,names=None):
@@ -16,7 +16,7 @@ class SustainedSourceTests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp)/'checkout-a';store=Path(tmp)/'snapshots';receipt,lock=self.fixture(root,store)
    self.assertEqual(validate_sources(root,receipt,lock,lock)['source_files'],len(REQUIRED))
-   (root/'cohort/new_unrelated_helper.py').write_text('not in the admitted snapshot\n')
+   (root/'training_execution/new_unrelated_helper.py').write_text('not in the admitted snapshot\n')
    self.assertEqual(validate_sources(root,receipt,lock,lock)['source_snapshot_sha256'],receipt['source_snapshot_sha256'])
    moved=Path(tmp)/'checkout-b'
    for name in receipt['source_pins']:
@@ -24,7 +24,7 @@ class SustainedSourceTests(unittest.TestCase):
    self.assertEqual(validate_sources(moved,receipt,lock,lock)['source_pins'],receipt['source_pins'])
  def test_snapshot_without_required_sustained_file_refused(self):
   with tempfile.TemporaryDirectory() as tmp:
-   names=sorted(name for name in REQUIRED if name!='cohort/train_sustained.py')
+   names=sorted(name for name in REQUIRED if name!='training_execution/train_sustained.py')
    root=Path(tmp)/'repo';store=Path(tmp)/'snapshots';receipt,lock=self.fixture(root,store,names)
    with self.assertRaises(ValueError):validate_sources(root,receipt,lock,lock)
  def test_altered_or_missing_snapshot_refused(self):
@@ -37,7 +37,7 @@ class SustainedSourceTests(unittest.TestCase):
  def test_changed_frozen_package_source_refused(self):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp)/'repo';store=Path(tmp)/'snapshots';receipt,lock=self.fixture(root,store)
-   (root/'cohort/train_sustained.py').write_text('tampered execution package\n')
+   (root/'training_execution/train_sustained.py').write_text('tampered execution package\n')
    with self.assertRaises(ValueError):validate_sources(root,receipt,lock,lock)
  def test_runtime_admission_cannot_be_recorded_without_matching(self):
   with tempfile.TemporaryDirectory() as tmp:

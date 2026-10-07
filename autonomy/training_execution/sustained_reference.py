@@ -5,7 +5,7 @@ its separately admitted bounded controller and full native score gates.
 """
 import resource
 import torch
-from cohort.sustained_state import capture_state,restore_state
+from training_execution.sustained_state import capture_state,restore_state
 
 def reference_updates(model,optimizer,frames,objective,identity,target_step,*,checkpoint=None):
  start=0 if checkpoint is None else checkpoint.get('steps')

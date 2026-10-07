@@ -1,6 +1,6 @@
 import json,tempfile,unittest
 from pathlib import Path
-from admissions import validate_coverage_claim,required_fit_admissions
+from training_execution.admissions import validate_coverage_claim,required_fit_admissions
 class AdmissionTests(unittest.TestCase):
  def test_inflated_coverage_is_rejected(self):
   frames=[{'identity':f's{i}:100','covered_objects':{str(c):[f'obj{i}'] for c in range(1,5)}} for i in range(16)]

@@ -1,5 +1,5 @@
 import unittest
-from cohort.sustained_scoring_budget import scoring_budget,stage_timeout
+from sustained.sustained_scoring_budget import scoring_budget,stage_timeout
 class NativeScoringBudgetTests(unittest.TestCase):
  def test_four_hour_native_limit_and_separate_host_grace(self):
   native,host=scoring_budget();self.assertEqual(native,4*60*60);self.assertEqual(host-native,300)

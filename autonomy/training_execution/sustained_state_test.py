@@ -1,7 +1,7 @@
 import copy,io,random,unittest
 import numpy as np
 import torch
-from cohort.sustained_state import capture_state,restore_state
+from training_execution.sustained_state import capture_state,restore_state
 
 class SustainedStateTests(unittest.TestCase):
  def setup_model(self):

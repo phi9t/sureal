@@ -1,5 +1,5 @@
 import copy,unittest
-from cohort.sustained_control import decide_next
+from training_execution.sustained_control import decide_next
 
 def sample(step,passed=False):return {'step':step,'APH':{str(i):(.9 if passed else .1) for i in range(1,5)}}
 def report(step,requested=None,reason='sample',seconds=1.,admitted=True):return {'updates':step,'requested_updates':step if requested is None else requested,'stop_reason':reason,'cumulative_train_seconds':seconds,'resource_gate_passed':admitted}

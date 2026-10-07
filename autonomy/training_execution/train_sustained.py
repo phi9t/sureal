@@ -1,19 +1,19 @@
 """GPU-only frozen balanced16 chunk worker; no scientific admission by itself."""
-import hashlib,importlib.util,json,random,resource,time
+import importlib.util,json,random,resource,time
 from pathlib import Path
 import numpy as np
 import torch
-from cohort.sustained_contract import validate_contract
-from cohort.sustained_loop import advance
-from cohort.sustained_loss import class_balanced_objective
-from cohort.sustained_state import restore_state
-from cohort.sustained_sources import validate_sources
+from sustained.sustained_contract import validate_contract
+from training_execution.sustained_loop import advance
+from detection.sustained_loss import class_balanced_objective
+from training_execution.sustained_state import restore_state
+from training_execution.sustained_sources import validate_sources
 from detection.fixed_batch_catalog import catalog
 from detection.fixed_batch_models import build,objective,optimizer,deterministic
 from resources.scientific_budget import reserve_write
+from evidence.source_snapshot import file_sha256
 
-def sha(path):
- with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+sha=file_sha256
 
 def relative(root,name):
  p=Path(name)

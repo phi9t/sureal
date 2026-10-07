@@ -1,6 +1,6 @@
 import copy
 import unittest
-from cohort.sustained_catalog import validate_catalog
+from detection.sustained_catalog import validate_catalog
 
 class CatalogTests(unittest.TestCase):
     def fixture(self):
@@ -31,3 +31,6 @@ class CatalogTests(unittest.TestCase):
         with self.assertRaises(ValueError):validate_catalog(*values)
         values=list(self.fixture());values[0]['frames'][1]['identity']='scene:1'
         with self.assertRaises(ValueError):validate_catalog(*values)
+
+if __name__ == '__main__':
+    unittest.main()

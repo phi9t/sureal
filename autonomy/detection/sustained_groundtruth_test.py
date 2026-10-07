@@ -1,5 +1,5 @@
 import copy,unittest
-from cohort.sustained_groundtruth import groundtruth_records
+from detection.sustained_groundtruth import groundtruth_records
 class FullGroundtruthTests(unittest.TestCase):
  def rows(self):
   return [{'object_id':str(i),'type':cls,'box':box,'num_lidar_points_in_box':points,'detection_difficulty':0} for i,(cls,box,points) in enumerate([(1,[0.,0.,0.,4.,2.,1.,0.],10),(2,[70.,0.,0.,1.,1.,2.,7.],6),(3,[0.,0.,0.,1.,1.,1.,0.],0),(4,[0.,0.,7.,2.,1.,1.,0.],2)])]

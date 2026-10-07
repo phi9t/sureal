@@ -1,12 +1,12 @@
 import fcntl,os,subprocess,sys,tempfile,unittest
 from pathlib import Path
-from cohort.sustained_controller_lock import acquire_experiment_lock
+from retention.sustained_controller_lock import acquire_experiment_lock
 class ControllerLockTests(unittest.TestCase):
  def test_shared_descriptor_keeps_lock_after_child_releases_copy(self):
   with tempfile.TemporaryDirectory() as temp:
    p=Path(temp)/'experiment.lock'
    with acquire_experiment_lock(p) as held:
-    command=[sys.executable,'-c',"from cohort.sustained_controller_lock import acquire_experiment_lock; import sys; acquire_experiment_lock(sys.argv[1],int(sys.argv[2])).close()",str(p),str(held.fileno())]
+    command=[sys.executable,'-c',"from retention.sustained_controller_lock import acquire_experiment_lock; import sys; acquire_experiment_lock(sys.argv[1],int(sys.argv[2])).close()",str(p),str(held.fileno())]
     subprocess.run(command,pass_fds=(held.fileno(),),check=True)
     with p.open('a') as other:
      with self.assertRaises(BlockingIOError):fcntl.flock(other,fcntl.LOCK_EX|fcntl.LOCK_NB)

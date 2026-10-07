@@ -1,6 +1,6 @@
 import tempfile,json,hashlib,unittest
 from pathlib import Path
-from cohort.cache_inventory import freeze_cache_inventory
+from retention.cache_inventory import freeze_cache_inventory
 sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
 class CacheInventoryTests(unittest.TestCase):
  def fixture(self,root):
@@ -28,3 +28,6 @@ class CacheInventoryTests(unittest.TestCase):
     else:(root/'link').symlink_to(root/'scene/1/data.bin')
     admission.write_text(json.dumps(r))
     with self.assertRaises(ValueError):freeze_cache_inventory(root,[admission])
+
+if __name__ == '__main__':
+ unittest.main()

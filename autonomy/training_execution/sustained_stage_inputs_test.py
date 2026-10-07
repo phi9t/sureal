@@ -1,6 +1,6 @@
 import json,tempfile,unittest
 from pathlib import Path
-from cohort.sustained_stage_inputs import freeze_inputs,bind_stage_paths
+from training_execution.sustained_stage_inputs import freeze_inputs,bind_stage_paths
 class StageInputTests(unittest.TestCase):
  def test_old_stage_replay_keeps_original_target_and_audit(self):
   with tempfile.TemporaryDirectory() as temp:

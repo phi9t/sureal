@@ -1,7 +1,7 @@
 """Retain the independently admitted balanced16 pilot; historical cases stay intact."""
-import argparse,fcntl,json,os,shutil,signal,subprocess,sys,uuid
+import argparse,fcntl,json,os,shutil,signal,subprocess,uuid
 from pathlib import Path
-P=Path(__file__).resolve().parents[1];sys.path.insert(0,str(P))
+P=Path(__file__).resolve().parents[1]
 from resources.resource_archive import sha,DEFAULT_LIMIT
 from resources.resource_release_plan import release_plan
 from resources.scientific_budget import reserve_write
@@ -12,8 +12,8 @@ C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing';CLI
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--receipt',type=Path,required=True);parser.add_argument('--receipt-sha256',required=True);parser.add_argument('--release',action='store_true');a=parser.parse_args()
  lock=(C/'insula/architecture-experiments.lock').open('a');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
- from cohort.sustained_pilot_inventory import freeze_pilot_inventory
- from cohort.pilot_retention_sources import freeze_host_sources,validate_host_sources
+ from retention.sustained_pilot_inventory import freeze_pilot_inventory
+ from retention.pilot_retention_sources import freeze_host_sources,validate_host_sources
  final=json.loads(a.receipt.read_text());payload=Path(final['output_directory']);a.case=payload.name
  if payload.parent!=W or not a.case.startswith('balanced16-sustained-admission-'):raise ValueError('pilot-only scientific payload required')
  inventory=freeze_pilot_inventory(payload,a.receipt,a.receipt_sha256)
@@ -66,8 +66,8 @@ def main():
  assert freeze_pilot_inventory(payload,a.receipt,a.receipt_sha256)==inventory
  plan=release_plan(payload,publication);publication['release_plan']=plan;receipt=R/'verified-publication.json';receipt.write_text(json.dumps(publication,indent=2))
  # A separate independent full-inventory live gate is mandatory before release.
- independent=R/'independent';independent.mkdir();proof_inputs=R/'admission-input';proof_inputs.mkdir();(proof_inputs/'publication.json').write_text(json.dumps(publication));shutil.copyfile(readback,proof_inputs/'readback.json');shutil.copyfile(R/'expected.json',proof_inputs/'expected.json');shutil.copyfile(Path(host_pins['source_snapshot_root'])/'cohort/pilot_retention_audit.py',source/'pilot_retention_audit.py')
- command=launch_plan(root,source,payload,independent,['python','/experiment/pilot_retention_audit.py']);at=command.index('--');command[at:at]=['--ro-bind',str(proof_inputs),'/tmp/inputs'];audit=subprocess.run(command,capture_output=True,text=True,timeout=300);(independent/'live.log').write_text(audit.stdout+audit.stderr);assert audit.returncode==0,str(independent/'live.log');publication['independent_admission']={'command':command,'exit_code':0,'source_sha256':sha(source/'pilot_retention_audit.py'),'inputs':{str(p):sha(p) for p in proof_inputs.iterdir()},'artifacts':{str(p):sha(p) for p in independent.iterdir()},'validation':json.loads((independent/'check.json').read_text())};receipt.write_text(json.dumps(publication,indent=2))
+ independent=R/'independent';independent.mkdir();proof_inputs=R/'admission-input';proof_inputs.mkdir();(proof_inputs/'publication.json').write_text(json.dumps(publication));shutil.copyfile(readback,proof_inputs/'readback.json');shutil.copyfile(R/'expected.json',proof_inputs/'expected.json');(source/'retention').mkdir(exist_ok=True);shutil.copyfile(Path(host_pins['source_snapshot_root'])/'retention/pilot_retention_audit.py',source/'retention/pilot_retention_audit.py')
+ command=launch_plan(root,source,payload,independent,['python','/experiment/retention/pilot_retention_audit.py']);at=command.index('--');command[at:at]=['--ro-bind',str(proof_inputs),'/tmp/inputs','--setenv','PYTHONPATH','/experiment'];audit=subprocess.run(command,capture_output=True,text=True,timeout=300);(independent/'live.log').write_text(audit.stdout+audit.stderr);assert audit.returncode==0,str(independent/'live.log');publication['independent_admission']={'command':command,'exit_code':0,'source_sha256':sha(source/'retention/pilot_retention_audit.py'),'inputs':{str(p):sha(p) for p in proof_inputs.iterdir()},'artifacts':{str(p):sha(p) for p in independent.iterdir()},'validation':json.loads((independent/'check.json').read_text())};receipt.write_text(json.dumps(publication,indent=2))
  if a.release:
   validate_host_sources(P,host_pins)
   for entry in plan:assert sha(entry['local_path'])==entry['sha256'];Path(entry['local_path']).unlink()

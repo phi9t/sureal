@@ -1,5 +1,5 @@
 import unittest,torch
-from cohort.sustained_loss import class_balanced_objective
+from detection.sustained_loss import class_balanced_objective
 from detection.fixed_batch_models import objective
 
 class SustainedLossTests(unittest.TestCase):

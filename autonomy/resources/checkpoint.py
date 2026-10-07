@@ -3,12 +3,13 @@
 This companion never substitutes for native math, model-state or metric gates.
 It preserves all seven stage proofs under one digest for progression/recovery.
 """
-import json
+import hashlib,json
 from pathlib import Path
 from evidence.source_snapshot import safe_member_name
 from evidence.source_snapshot import verify_materialized_sources
 from resources.sources import regular,sha
 from resources.stage import write_new,require_separate
+from resources.retention_audit import EXTRA as PUBLICATION_EXTRA,validate_union
 
 STAGES=('train','audit','literal-loss','export','proposals','score','metrics-audit')
 
@@ -56,6 +57,129 @@ def _path(backend,record):
     path=backend.resource_root/'checkpoints'/f'checkpoint-{record["target_step"]:02d}.json'
     require_separate(Path(record['root']),path)
     return path
+
+
+def _stable_digest(value):
+    data=json.dumps(value,sort_keys=True,separators=(',',':')).encode()
+    return hashlib.sha256(data).hexdigest()
+
+
+def publication_record_path(backend,record):
+    path=backend.resource_root/'checkpoints'/f'checkpoint-{record["target_step"]:02d}-resource-publication.json'
+    require_separate(Path(record['root']),path)
+    return path
+
+
+def _publication_readback(pub):
+    return {key:value for key,value in pub.items() if key not in PUBLICATION_EXTRA}
+
+
+def _publication_identity(path):
+    path=Path(path)
+    value=json.loads(path.read_text())
+    receipt=value['resource_receipt']
+    return {'sidecar_path':str(path),'sidecar_sha256':sha(path),
+            'receipt_path':receipt['path'],'receipt_sha256':receipt['sha256'],
+            'hdfs_manifest_uri':receipt['hdfs_manifest_uri'],'kind':receipt['kind']}
+
+
+def _receipt_from_identity(identity):
+    return {'path':identity['receipt_path'],'sha256':identity['receipt_sha256'],
+            'hdfs_manifest_uri':identity['hdfs_manifest_uri'],'kind':identity['kind']}
+
+
+def validate_publication_receipt(backend,record,receipt,expected_inventory=None):
+    """Validate resource publication from retained immutable admission evidence."""
+    try:
+        if receipt['kind']!='checkpoint':raise ValueError('checkpoint resource publication required')
+        path=Path(receipt['path'])
+        if not regular(path) or sha(path)!=receipt['sha256']:raise ValueError('resource publication receipt changed')
+        pub=json.loads(path.read_text())
+        if (pub['kind']!='checkpoint' or pub['resource_identity_sha256']!=backend.resource_identity_sha256 or
+            pub['native_manifest_sha256']!=backend.manifest_sha or
+            receipt['hdfs_manifest_uri']!=pub['publication_manifest_hdfs_uri']):
+            raise ValueError('resource publication identity differs')
+        root=path.parent;expected_path=root/'expected.json';readback_path=root/'publication-readback.json'
+        if (not regular(expected_path) or sha(expected_path)!=pub['source_inventory_sha256'] or
+            json.loads(expected_path.read_text())!=pub['source_inventory'] or
+            not regular(readback_path) or sha(readback_path)!=pub['publication_manifest_sha256'] or
+            json.loads(readback_path.read_text())!=_publication_readback(pub)):
+            raise ValueError('resource publication exact readback evidence changed')
+        result=validate_union(pub,pub['source_inventory'],json.loads(readback_path.read_text()))
+        admission=pub['independent_admission']
+        if (admission['exit_code']!=0 or admission['validation']['whole_member_union_exact'] is not True or
+            result['whole_member_union_exact'] is not True):
+            raise ValueError('independent resource recovery admission required')
+        inventory=pub['source_inventory']
+        required={'identity.json':backend.resource_identity_sha256,
+                  'checkpoint.json':record['resource_companion_sha256'],
+                  'native-final.json':record['final_sha256'],
+                  'producer-report.json':record['report_sha256'],
+                  'native-manifest.json':backend.manifest_sha}
+        for name,digest in required.items():
+            if inventory.get(name,{}).get('sha256')!=digest:
+                raise ValueError('resource publication retained wrong checkpoint identity')
+        if expected_inventory is not None and (inventory!=expected_inventory or _stable_digest(inventory)!=_stable_digest(expected_inventory)):
+            raise ValueError('resource publication inventory differs from live companion closure')
+    except (KeyError,TypeError,OSError,AttributeError) as error:
+        raise ValueError('complete resource publication receipt required') from error
+    return pub
+
+
+def write_publication_record(backend,record,receipt,expected_inventory):
+    validate_publication_receipt(backend,record,receipt,expected_inventory)
+    path=publication_record_path(backend,record)
+    value={'schema_version':1,'record_final_path':record['final_path'],
+           'record_final_sha256':record['final_sha256'],'target_step':record['target_step'],
+           'resource_identity_sha256':backend.resource_identity_sha256,
+           'resource_companion_path':record['resource_companion_path'],
+           'resource_companion_sha256':record['resource_companion_sha256'],
+           'source_inventory_digest':_stable_digest(expected_inventory),
+           'resource_receipt':receipt,
+           'scope':'durable resource publication identity required before native release'}
+    if path.exists():
+        if not regular(path) or json.loads(path.read_text())!=value:
+            raise ValueError('resource publication sidecar identity changed')
+    else:
+        path.parent.mkdir(exist_ok=True);write_new(path,value)
+    identity=_publication_identity(path);record['resource_publication']=identity
+    return identity
+
+
+def recover_publication_record(backend,record,expected_inventory=None):
+    path=publication_record_path(backend,record)
+    if not path.exists():return None
+    if not regular(path):raise ValueError('resource publication sidecar changed')
+    value=json.loads(path.read_text())
+    if (value.get('schema_version')!=1 or value.get('record_final_path')!=record['final_path'] or
+        value.get('record_final_sha256')!=record['final_sha256'] or
+        value.get('target_step')!=record['target_step'] or
+        value.get('resource_identity_sha256')!=backend.resource_identity_sha256 or
+        value.get('resource_companion_sha256')!=record['resource_companion_sha256']):
+        raise ValueError('resource publication sidecar identity differs')
+    if expected_inventory is not None and value.get('source_inventory_digest')!=_stable_digest(expected_inventory):
+        raise ValueError('resource publication sidecar inventory differs')
+    identity=_publication_identity(path)
+    validate_publication_receipt(backend,record,_receipt_from_identity(identity),expected_inventory)
+    record['resource_publication']=identity
+    return identity
+
+
+def validate_publication_record(backend,record):
+    identity=record.get('resource_publication')
+    if identity is None:
+        identity=recover_publication_record(backend,record)
+        if identity is None:raise ValueError('resource publication identity required before native release')
+    path=Path(identity['sidecar_path'])
+    if path!=publication_record_path(backend,record) or not regular(path) or sha(path)!=identity['sidecar_sha256']:
+        raise ValueError('resource publication sidecar changed')
+    value=json.loads(path.read_text())
+    if value['source_inventory_digest']!=_stable_digest(json.loads(Path(value['resource_receipt']['path']).read_text())['source_inventory']):
+        raise ValueError('resource publication inventory digest changed')
+    receipt=_receipt_from_identity(identity)
+    if receipt!=value['resource_receipt']:raise ValueError('resource publication receipt identity changed')
+    validate_publication_receipt(backend,record,receipt)
+    return identity
 
 
 def seal_checkpoint(backend,record):

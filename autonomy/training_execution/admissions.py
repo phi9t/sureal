@@ -1,8 +1,9 @@
 """Require independent identity coverage and all mandatory live fit admissions."""
-import hashlib,json
+import json
 from pathlib import Path
-from balanced import coverage_summary
-sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+from detection.balanced import coverage_summary
+from evidence.source_snapshot import file_sha256,require_regular_file
+sha=file_sha256
 def validate_coverage_claim(claim,frames):
  if set(claim)!={'1','2','3','4'}:raise ValueError('Exactly all four classes required')
  literal=coverage_summary([dict(f,objects=f['covered_objects']) for f in frames])
@@ -19,7 +20,9 @@ def required_fit_admissions(run):
   if not r.get('checks') or any(c['exit_code']!=0 for c in r['checks']):raise ValueError('Failed admission: '+name)
   if r['manifest_sha256']!=meta['manifest_sha256'] or r['source_sha256']!=meta['source_sha256']:raise ValueError('Admission source/manifest mismatch: '+name)
   for p,h in r['artifacts'].items():
-   if not Path(p).is_file() or sha(p)!=h:raise ValueError('Changed admission artifact: '+p)
+   try:artifact=require_regular_file(p)
+   except ValueError as error:raise ValueError('Changed admission artifact: '+p) from error
+   if sha(artifact)!=h:raise ValueError('Changed admission artifact: '+p)
   result[name]={'sha256':sha(path),'validation':r.get('validation')}
  cp=result['checkpoint']['validation'];loss=result['loss']['validation']
  if cp.get('frames_exactly_replayed')!=16 or not cp.get('initial_and_final_heads_exact') or cp.get('optimizer_updates')!=2000 or not cp.get('optimizer_state_validated'):raise ValueError('Incomplete checkpoint replay')

@@ -5,7 +5,7 @@ full HDFS recovery/union before release, and durable state. This module never
 turns loss or an unverified producer report into model-quality evidence.
 """
 import copy
-from cohort.sustained_control import decide_next
+from training_execution.sustained_control import decide_next
 
 def execute_case(backend,records=None):
  records=copy.deepcopy(records or []);backend.validate_resume(records)

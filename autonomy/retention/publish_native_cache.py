@@ -1,7 +1,7 @@
 """Retain the independently admitted native input cache; model cases stay intact."""
-import argparse,fcntl,json,os,shutil,signal,subprocess,sys,uuid
+import argparse,fcntl,json,os,shutil,signal,subprocess,uuid
 from pathlib import Path
-P=Path(__file__).resolve().parents[1];sys.path.insert(0,str(P))
+P=Path(__file__).resolve().parents[1]
 from resources.resource_archive import sha,DEFAULT_LIMIT
 from resources.resource_release_plan import release_plan
 from resources.scientific_budget import reserve_write
@@ -12,8 +12,8 @@ C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing';CLI
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--release',action='store_true');a=parser.parse_args();a.case='overfit-native-cache-v1'
  lock=(C/'insula/architecture-experiments.lock').open('a');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
- from cohort.cache_inventory import freeze_cache_inventory
- from cohort.retention_sources import freeze_host_sources,validate_host_sources
+ from retention.cache_inventory import freeze_cache_inventory
+ from retention.retention_sources import freeze_host_sources,validate_host_sources
  payload=W/a.case
  admissions=sorted((P/'research').glob('overfit-native-cache-*-verified.json'))
  admissions=[p for p in admissions if 'receipt' in json.loads(p.read_text()) and Path(json.loads(p.read_text())['receipt']).is_relative_to(payload)]
@@ -71,8 +71,8 @@ def main():
  assert freeze_cache_inventory(payload,admissions)==inventory
  plan=release_plan(payload,publication);publication['release_plan']=plan;receipt=R/'verified-publication.json';receipt.write_text(json.dumps(publication,indent=2))
  # A separate independent full-inventory live gate is mandatory before release.
- independent=R/'independent';independent.mkdir();proof_inputs=R/'admission-input';proof_inputs.mkdir();(proof_inputs/'publication.json').write_text(json.dumps(publication));shutil.copyfile(readback,proof_inputs/'readback.json');shutil.copyfile(R/'expected.json',proof_inputs/'expected.json');shutil.copyfile(Path(host_pins['source_snapshot_root'])/'cohort/cache_retention_audit.py',source/'cache_retention_audit.py')
- command=launch_plan(root,source,payload,independent,['python','/experiment/cache_retention_audit.py']);at=command.index('--');command[at:at]=['--ro-bind',str(proof_inputs),'/tmp/inputs'];audit=subprocess.run(command,capture_output=True,text=True,timeout=300);(independent/'live.log').write_text(audit.stdout+audit.stderr);assert audit.returncode==0,str(independent/'live.log');publication['independent_admission']={'command':command,'exit_code':0,'source_sha256':sha(source/'cache_retention_audit.py'),'inputs':{str(p):sha(p) for p in proof_inputs.iterdir()},'artifacts':{str(p):sha(p) for p in independent.iterdir()},'validation':json.loads((independent/'check.json').read_text())};receipt.write_text(json.dumps(publication,indent=2))
+ independent=R/'independent';independent.mkdir();proof_inputs=R/'admission-input';proof_inputs.mkdir();(proof_inputs/'publication.json').write_text(json.dumps(publication));shutil.copyfile(readback,proof_inputs/'readback.json');shutil.copyfile(R/'expected.json',proof_inputs/'expected.json');(source/'retention').mkdir(exist_ok=True);shutil.copyfile(Path(host_pins['source_snapshot_root'])/'retention/cache_retention_audit.py',source/'retention/cache_retention_audit.py')
+ command=launch_plan(root,source,payload,independent,['python','/experiment/retention/cache_retention_audit.py']);at=command.index('--');command[at:at]=['--ro-bind',str(proof_inputs),'/tmp/inputs','--setenv','PYTHONPATH','/experiment'];audit=subprocess.run(command,capture_output=True,text=True,timeout=300);(independent/'live.log').write_text(audit.stdout+audit.stderr);assert audit.returncode==0,str(independent/'live.log');publication['independent_admission']={'command':command,'exit_code':0,'source_sha256':sha(source/'retention/cache_retention_audit.py'),'inputs':{str(p):sha(p) for p in proof_inputs.iterdir()},'artifacts':{str(p):sha(p) for p in independent.iterdir()},'validation':json.loads((independent/'check.json').read_text())};receipt.write_text(json.dumps(publication,indent=2))
  if a.release:
   validate_host_sources(P,host_pins)
   for entry in plan:assert sha(entry['local_path'])==entry['sha256'];Path(entry['local_path']).unlink()

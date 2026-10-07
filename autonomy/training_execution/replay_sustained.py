@@ -1,19 +1,19 @@
 """Independent checkpoint/head audit. This does not certify native APH or fit."""
-import hashlib,importlib.util,json,random,resource,time
+import importlib.util,json,random,resource,time
 from pathlib import Path
 import numpy as np
 import torch
-from cohort.sustained_contract import validate_contract
-from cohort.sustained_sources import validate_sources
-from cohort.sustained_state import restore_state,capture_state
+from sustained.sustained_contract import validate_contract
+from training_execution.sustained_sources import validate_sources
+from training_execution.sustained_state import restore_state,capture_state
 from resources.replay_values import require_exact_state,require_exact_heads
-from cohort.sustained_reference import reference_updates
-from cohort.sustained_loss import class_balanced_objective
+from training_execution.sustained_reference import reference_updates
+from detection.sustained_loss import class_balanced_objective
 from detection.fixed_batch_catalog import catalog
 from detection.fixed_batch_models import build,optimizer,deterministic,objective
+from evidence.source_snapshot import file_sha256
 
-def sha(path):
- with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+sha=file_sha256
 def safe(root,name):
  p=Path(name)
  if p.is_absolute() or '..' in p.parts:raise ValueError('safe relative path required')

@@ -1,6 +1,6 @@
 import tempfile,unittest
 from pathlib import Path
-from cohort.checkpoint_retention_policy import checkpoint_case
+from retention.checkpoint_retention_policy import checkpoint_case
 class CheckpointRetentionPolicyTests(unittest.TestCase):
  def test_exact_scientific_case_step_directory(self):
   with tempfile.TemporaryDirectory() as temp:

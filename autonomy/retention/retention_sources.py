@@ -1,9 +1,9 @@
 """Freeze the host closure that admits, archives and releases native cache bytes."""
 from pathlib import Path
-from evidence.source_snapshot import LocalSnapshotStore,copy_source_snapshot,verify_materialized_sources
+from evidence.source_snapshot import LocalSnapshotStore,copy_source_snapshot,require_regular_file,verify_materialized_sources
 REQUIRED=(
- 'cohort/publish_native_cache.py','cohort/cache_inventory.py',
- 'cohort/cache_retention_audit.py','cohort/retention_sources.py',
+ 'retention/publish_native_cache.py','retention/cache_inventory.py',
+ 'retention/cache_retention_audit.py','retention/retention_sources.py',
  'resources/scientific_budget.py','resources/scientific_payload.py',
  'resources/resource_archive.py','resources/resource_archive_cli.py',
  'resources/resource_rehydrate.py','resources/resource_release_plan.py',
@@ -14,7 +14,9 @@ def sha(path):
  from evidence.source_snapshot import file_sha256
  return file_sha256(path)
 def regular(path):
- return path.is_file() and not any(p.is_symlink() for p in [path,*path.parents])
+ try:require_regular_file(path)
+ except ValueError:return False
+ return True
 def freeze_host_sources(repository,destination):
  repository=Path(repository);destination=Path(destination)
  if not all(regular(repository/name) for name in REQUIRED):raise ValueError('complete regular host source closure required')

@@ -1,5 +1,5 @@
 """Bind each run to the independently covered balanced selection."""
-from admissions import validate_coverage_claim
+from training_execution.admissions import validate_coverage_claim
 
 def validate_balanced_fixture(frames,selection,audit):
  identities=[f['identity'] for f in frames];selected=[f['identity'] for f in selection['frames']];audited={f['identity']:f for f in audit['validation']}

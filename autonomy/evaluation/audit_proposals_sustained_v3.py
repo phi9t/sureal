@@ -1,8 +1,9 @@
-import hashlib,json,math
+import json,math
 from pathlib import Path
 import numpy as np
-from cohort.sustained_catalog import validate_catalog
-sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+from detection.sustained_catalog import validate_catalog
+from evidence.source_snapshot import file_sha256
+sha=file_sha256
 e=json.loads(Path('/tmp/expected.json').read_text());r=e['receipt']
 assert sha('/tmp/score-receipt.json')==e['receipt_sha256']
 for path,digest in r['artifacts'].items():assert sha(Path('/source')/Path(path).name)==digest

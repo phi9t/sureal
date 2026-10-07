@@ -4,12 +4,15 @@ The seven stage receipts must already be independently admitted. This helper
 checks the exact retained inventory, never stage mathematics or native quality.
 HDFS readback, live recovery and separate union admission still precede release.
 """
-import hashlib,json
+import json
 from pathlib import Path
+from evidence.source_snapshot import file_sha256,require_regular_file
 STAGES=('train','audit','literal-loss','export','proposals','score','metrics-audit')
-def sha(path):
- with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
-def regular(path):return path.is_file() and not any(p.is_symlink() for p in [path,*path.parents])
+sha=file_sha256
+def regular(path):
+ try:require_regular_file(path)
+ except ValueError:return False
+ return True
 def freeze_checkpoint_inventory(root,final_path,expected_sha256):
  root=Path(root);final_path=Path(final_path)
  if not root.is_dir() or any(p.is_symlink() for p in [root,*root.parents]) or not regular(final_path) or sha(final_path)!=expected_sha256:raise ValueError('regular checkpoint root and externally pinned admission required')

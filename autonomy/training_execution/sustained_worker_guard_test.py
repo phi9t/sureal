@@ -8,7 +8,7 @@ class SustainedWorkerGuardTests(unittest.TestCase):
   before=sorted(str(p) for p in Path('/outputs').rglob('*'))
   for worker in ['train_sustained.py','replay_sustained.py']:
    with self.assertRaisesRegex(ValueError,'one native GPU'):
-    runpy.run_path('/experiment/cohort/'+worker,run_name='__main__')
+    runpy.run_path(str(Path(__file__).with_name(worker)),run_name='__main__')
   self.assertEqual(before,sorted(str(p) for p in Path('/outputs').rglob('*')))
 
 if __name__=='__main__':unittest.main()

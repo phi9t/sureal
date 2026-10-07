@@ -1,7 +1,7 @@
 """Bounded deterministic one-frame-per-update loop for the fixed16 cohort."""
 import math,resource,time
 import torch
-from cohort.sustained_state import capture_state,restore_state
+from training_execution.sustained_state import capture_state,restore_state
 
 
 def advance(model,optimizer,frames,objective,identity,target_step,*,checkpoint=None,clock=time.perf_counter):

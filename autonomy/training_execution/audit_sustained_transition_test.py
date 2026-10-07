@@ -6,6 +6,6 @@ class TransitionWorkerGuardTests(unittest.TestCase):
   self.assertFalse(torch.cuda.is_available())
   before=sorted(str(p) for p in Path('/outputs').rglob('*'))
   with self.assertRaisesRegex(ValueError,'one native GPU'):
-   runpy.run_path('/experiment/cohort/audit_sustained_transition.py',run_name='__main__')
+   runpy.run_path(str(Path(__file__).with_name('audit_sustained_transition.py')),run_name='__main__')
   self.assertEqual(before,sorted(str(p) for p in Path('/outputs').rglob('*')))
 if __name__=='__main__':unittest.main()

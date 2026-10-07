@@ -1,19 +1,32 @@
 """Source-frozen live native backend for the four-case sustained workflow."""
 import json,os,re,shutil,subprocess,sys,time
 from pathlib import Path
-P=Path(__file__).resolve().parents[1];sys.path.insert(0,str(P))
+P=Path(__file__).resolve().parents[1]
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
 from resources.scientific_payload import sha,unique_payload_bytes
 from resources.scientific_budget import reserve_write
-from cohort.sustained_contract import validate_contract
-from cohort.sustained_sources import snapshot_sources,validate_sources
-from cohort.sustained_stage_inputs import freeze_inputs,bind_stage_paths
-from cohort.sustained_scoring_budget import stage_timeout
-from cohort.sustained_checkpoint_inventory import freeze_checkpoint_inventory
-from cohort.sustained_admission import admit_sample
-from cohort.sustained_controller_sources import freeze_host_sources,validate_host_sources
+from sustained.sustained_contract import validate_contract
+from training_execution.sustained_sources import snapshot_sources,source_paths,validate_sources
+from training_execution.sustained_stage_inputs import freeze_inputs,bind_stage_paths
+from sustained.sustained_scoring_budget import stage_timeout
+from retention.sustained_checkpoint_inventory import freeze_checkpoint_inventory
+from training_execution.sustained_admission import admit_sample
+from training_execution.sustained_controller_sources import freeze_host_sources,validate_host_sources
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing'
+GPU_ROOT=C/'gpu-rootfs';CPU_ROOT=C/'insula/rootfs-v2';METRICS_ROOT=C/'metrics-rootfs'
+WORKER_ENTRIES={
+ 'train_sustained.py':'/experiment/training_execution/train_sustained.py',
+ 'audit_sustained_loss.py':'/experiment/training_execution/audit_sustained_loss.py',
+ 'prepare_sustained_v3.py':'/experiment/evaluation/prepare_sustained_v3.py',
+ 'audit_proposals_sustained_v3.py':'/experiment/evaluation/audit_proposals_sustained_v3.py',
+ 'metrics_sustained_v3.py':'/experiment/evaluation/metrics_sustained_v3.py',
+ 'audit_metrics_sustained_v3.py':'/experiment/evaluation/audit_metrics_sustained_v3.py',
+}
+
+def worker_entry(worker):
+ try:return WORKER_ENTRIES[worker]
+ except KeyError as error:raise ValueError('declared sustained worker required') from error
 
 def write(path,value):
  path=Path(path);temporary=path.with_suffix(path.suffix+'.tmp')
@@ -33,8 +46,8 @@ class NativeBackend:
    if directory.is_absolute() or '..' in directory.parts:raise ValueError('safe native frame required')
    for name,digest in frame['sha256'].items():
     if sha(self.native/directory/name)!=digest:raise ValueError('original native frame changed')
-  self.old=json.loads((C/'detector-gpu-live-a/receipt.json').read_text());self.runtime=self.old['runtime_lock'];self.metric_runtime=json.loads(Path(str(C/'metrics-rootfs')+'.lock.json').read_text())
-  verify_rootfs(C/'gpu-rootfs',self.runtime['rootfs_sha256']);verify_rootfs(C/'metrics-rootfs',self.metric_runtime['rootfs_sha256'])
+  self.old=json.loads((C/'detector-gpu-live-a/receipt.json').read_text());self.runtime=self.old['runtime_lock'];self.cpu_runtime=json.loads(Path(str(CPU_ROOT)+'.lock.json').read_text());self.metric_runtime=json.loads(Path(str(METRICS_ROOT)+'.lock.json').read_text())
+  verify_rootfs(GPU_ROOT,self.runtime['rootfs_sha256']);verify_rootfs(CPU_ROOT,self.cpu_runtime['rootfs_sha256']);verify_rootfs(METRICS_ROOT,self.metric_runtime['rootfs_sha256'])
   for path,digest in self.old['driver_hashes'].items():
    if sha(path)!=digest:raise ValueError('original GPU driver changed')
   self.package=self.R/'code';self.source=self.R/'input';self.runtime_path=self.R/'runtime-lock.json';self.verifier=self.R/'verifier'
@@ -43,15 +56,13 @@ class NativeBackend:
    if run['run_id']!=run_id or run['recipe']!=recipe or self.manifest['candidate']!=candidate or self.manifest['frames']!=frames or self.manifest['recipe']!=recipe or self.manifest['runtime_lock']!=self.runtime:raise ValueError('frozen resumed identity differs')
   else:
    reserve_write(W,2*1024**3);self.R.mkdir();self.output.mkdir();self.package.mkdir();self.source.mkdir();self.verifier.mkdir();self.host_pins=freeze_host_sources(P,self.R/'host-source')
-   for folder in ['pipeline','gpu','tier1','cohort','evidence']:
-    for path in (P/folder).rglob('*.py'):
-     if '__pycache__' in path.parts:continue
-     destination=self.package/path.relative_to(P);destination.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(path,destination)
+   for name in source_paths(P):
+    path=P/name;destination=self.package/name;destination.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(path,destination)
    self.pins=snapshot_sources(self.package,self.R/'source-snapshots');self.manifest={'candidate':candidate,'frames':frames,'recipe':recipe,'source_hashes':self.pins,'runtime_lock':self.runtime};write(self.source/'manifest.json',self.manifest);self.manifest_sha=sha(self.source/'manifest.json');write(self.runtime_path,self.runtime)
    anchors=P/'research/training-anchor-templates.candidate.json';anchor_receipt=json.loads((P/'research/training-anchor-candidate-verified.json').read_text())
    if sha(anchors)!=anchor_receipt['expected']['candidate_sha256']:raise ValueError('admitted anchor templates changed')
    self.anchor_sha=anchor_receipt['expected']['candidate_sha256'];shutil.copyfile(anchors,self.source/'anchor-templates.json')
-   for name in ['audit_sustained_transition.py','sustained_chunk_reference.py']:shutil.copyfile(self.package/'cohort'/name,self.verifier/name)
+   for name in ['audit_sustained_transition.py','sustained_chunk_reference.py']:shutil.copyfile(self.package/'training_execution'/name,self.verifier/name)
    write(self.R/'run.json',{'run_id':run_id,'recipe':recipe,'manifest_sha256':self.manifest_sha,'source_hashes':self.pins,'host_source_pins':self.host_pins,'anchor_templates_sha256':self.anchor_sha,'scope':'training-only fixed16 one-factor case; no heldout promotion'})
   self.verifier_pins={str(p):sha(p) for p in self.verifier.iterdir()};self.guard()
  def guard(self):
@@ -59,7 +70,7 @@ class NativeBackend:
   admitted_anchor=json.loads((P/'research/training-anchor-candidate-verified.json').read_text())['expected']['candidate_sha256']
   if self.anchor_sha!=admitted_anchor or sha(self.source/'anchor-templates.json')!=self.anchor_sha:raise ValueError('externally admitted decoder anchors changed')
   source_pins=self.pins['source_pins']
-  if sha(self.source/'manifest.json')!=self.manifest_sha or json.loads(self.runtime_path.read_text())!=self.runtime or set(Path(p).name for p in self.verifier_pins)!={'audit_sustained_transition.py','sustained_chunk_reference.py'} or any(sha(p)!=h or h!=source_pins['cohort/'+Path(p).name] for p,h in self.verifier_pins.items()):raise ValueError('frozen manifest/runtime/verifier changed')
+  if sha(self.source/'manifest.json')!=self.manifest_sha or json.loads(self.runtime_path.read_text())!=self.runtime or set(Path(p).name for p in self.verifier_pins)!={'audit_sustained_transition.py','sustained_chunk_reference.py'} or any(sha(p)!=h or h!=source_pins['training_execution/'+Path(p).name] for p,h in self.verifier_pins.items()):raise ValueError('frozen manifest/runtime/verifier changed')
   if unique_payload_bytes(W)>15*1024**3 or unique_payload_bytes(self.output)>2*1024**3:raise ValueError('scientific/case storage cap exceeded')
  def stage(self,name,worker,directory,extra,*,gpu=True,metrics=False,logical_step=None):
   from studies.architecture.experiment_runner import run_stage
@@ -72,20 +83,21 @@ class NativeBackend:
   directory.mkdir();stage_source,input_hashes=freeze_inputs(self.source,self.R/(name+'-input'));command=self.old['checks'][0]['command'].copy()
   if gpu:
    for target,path in [('/experiment',self.package),('/source',stage_source),('/outputs',directory)]:command[command.index(target)-1]=str(path)
-   command[-1]='/tmp/verifier/audit_sustained_transition.py' if worker=='audit_sustained_transition.py' else '/experiment/cohort/'+worker
-  else:command=launch_plan(C/('metrics-rootfs' if metrics else 'gpu-rootfs'),self.package,stage_source,directory,['python' if metrics else '/opt/waymo/bin/python','/experiment/cohort/'+worker])
-  extra=bind_stage_paths(extra,self.source,stage_source);index=command.index('--');command[index:index]=['--ro-bind',str(stage_source),'/tmp/inputs','--ro-bind',str(self.native),'/tmp/native','--ro-bind',str(W/'balanced16-physical-v2'),'/tmp/physical','--ro-bind',str(W/'balanced16-labels-v2'),'/tmp/boxes','--ro-bind',str(self.runtime_path),'/tmp/runtime-lock.json','--ro-bind',str(W),'/tmp/scientific','--ro-bind',str(self.R/'source-snapshots'),'/tmp/source-snapshots','--setenv','SUREAL_SOURCE_SNAPSHOT_STORE','/tmp/source-snapshots','--setenv','CUBLAS_WORKSPACE_CONFIG',':4096:8',*extra]
+   command[-1]='/tmp/verifier/audit_sustained_transition.py' if worker=='audit_sustained_transition.py' else worker_entry(worker)
+  else:command=launch_plan(METRICS_ROOT if metrics else CPU_ROOT,self.package,stage_source,directory,['python',worker_entry(worker)])
+  extra=bind_stage_paths(extra,self.source,stage_source);pythonpath=[] if 'PYTHONPATH' in command else ['--setenv','PYTHONPATH','/experiment'];index=command.index('--');command[index:index]=['--ro-bind',str(stage_source),'/tmp/inputs','--ro-bind',str(self.native),'/tmp/native','--ro-bind',str(W/'balanced16-physical-v2'),'/tmp/physical','--ro-bind',str(W/'balanced16-labels-v2'),'/tmp/boxes','--ro-bind',str(self.runtime_path),'/tmp/runtime-lock.json','--ro-bind',str(W),'/tmp/scientific','--ro-bind',str(self.R/'source-snapshots'),'/tmp/source-snapshots','--setenv','SUREAL_SOURCE_SNAPSHOT_STORE','/tmp/source-snapshots','--setenv','CUBLAS_WORKSPACE_CONFIG',':4096:8',*pythonpath,*extra]
   with (directory/'live.log').open('w') as log:result=run_stage(command,self.package,dict(os.environ),log,timeout=stage_timeout(metrics))
   if result.returncode:raise RuntimeError('failed native stage retained: '+name)
   self.guard();actual_step=json.loads((directory/'check.json').read_text())['updates'] if worker=='train_sustained.py' else logical_step
   semantic=name if actual_step is None else name.rsplit('-',1)[0]+'-'+str(actual_step)
-  receipt={'stage':semantic,'requested_stage':name,'command':command,'output_directory':str(directory),'exit_code':0,'source_hashes':self.pins,'runtime_lock':self.metric_runtime if metrics else self.runtime,'driver_hashes':self.old['driver_hashes'] if gpu else {},'verifier_source_pins':self.verifier_pins if worker=='audit_sustained_transition.py' else {},'manifest_sha256':self.manifest_sha,'input_hashes':input_hashes,'artifacts':{str(p):sha(p) for p in directory.rglob('*') if p.is_file()},'scope':'source-frozen live checkpoint stage; full downstream admission required'};self.check_stage(receipt);write(receipt_path,receipt);print('ADMITTED',self.recipe,name,flush=True);return receipt_path
+  stage_runtime=self.metric_runtime if metrics else self.runtime if gpu else self.cpu_runtime
+  receipt={'stage':semantic,'requested_stage':name,'command':command,'output_directory':str(directory),'exit_code':0,'source_hashes':self.pins,'runtime_lock':stage_runtime,'driver_hashes':self.old['driver_hashes'] if gpu else {},'verifier_source_pins':self.verifier_pins if worker=='audit_sustained_transition.py' else {},'manifest_sha256':self.manifest_sha,'input_hashes':input_hashes,'artifacts':{str(p):sha(p) for p in directory.rglob('*') if p.is_file()},'scope':'source-frozen live checkpoint stage; full downstream admission required'};self.check_stage(receipt);write(receipt_path,receipt);print('ADMITTED',self.recipe,name,flush=True);return receipt_path
  def check_stage(self,receipt,*,released_root=None):
   if type(receipt['exit_code']) is not int or receipt['exit_code']!=0 or receipt['manifest_sha256']!=self.manifest_sha or receipt['source_hashes']!=self.pins or not receipt['artifacts'] or not receipt['input_hashes']:raise ValueError('complete stage identity/input/output bindings required')
   stage=receipt['stage'].rsplit('-',1)[0];workers={'train':'train_sustained.py','audit':'audit_sustained_transition.py','literal-loss':'audit_sustained_loss.py','export':'prepare_sustained_v3.py','proposals':'audit_proposals_sustained_v3.py','score':'metrics_sustained_v3.py','metrics-audit':'audit_metrics_sustained_v3.py'}
   if stage not in workers:raise ValueError('unknown native stage')
-  metric=stage in {'score','metrics-audit'};gpu=stage in {'train','audit'};command=receipt['command'];entry='/tmp/verifier/'+workers[stage] if stage=='audit' else '/experiment/cohort/'+workers[stage]
-  if command[-1]!=entry or receipt['runtime_lock']!=(self.metric_runtime if metric else self.runtime) or receipt['driver_hashes']!=(self.old['driver_hashes'] if gpu else {}) or receipt['verifier_source_pins']!=(self.verifier_pins if stage=='audit' else {}):raise ValueError('native worker/runtime/driver/verifier differs')
+  metric=stage in {'score','metrics-audit'};gpu=stage in {'train','audit'};command=receipt['command'];entry='/tmp/verifier/'+workers[stage] if stage=='audit' else worker_entry(workers[stage]);stage_runtime=self.metric_runtime if metric else self.runtime if gpu else self.cpu_runtime
+  if command[-1]!=entry or receipt['runtime_lock']!=stage_runtime or receipt['driver_hashes']!=(self.old['driver_hashes'] if gpu else {}) or receipt['verifier_source_pins']!=(self.verifier_pins if stage=='audit' else {}):raise ValueError('native worker/runtime/driver/verifier differs')
   if command[command.index('/experiment')-1]!=str(self.package) or command[command.index('/outputs')-1]!=receipt['output_directory']:raise ValueError('native code/output mount differs')
   if command[command.index('/tmp/source-snapshots')-1]!=str(self.R/'source-snapshots') or command[command.index('SUREAL_SOURCE_SNAPSHOT_STORE')+1]!='/tmp/source-snapshots':raise ValueError('source snapshot store mount differs')
   inputs=self.R/(receipt['requested_stage']+'-input')
@@ -143,8 +155,8 @@ class NativeBackend:
    pub=record['publication'];release=json.loads(Path(pub['release_path']).read_text());publication=json.loads(Path(pub['publication_path']).read_text())
    if sha(pub['publication_path'])!=pub['publication_sha256'] or sha(pub['release_path'])!=pub['release_sha256'] or release['publication_receipt_sha256']!=pub['publication_sha256'] or publication['parent_receipts'].get(record['final_path'])!=record['final_sha256'] or publication['independent_admission']['exit_code']!=0 or publication['independent_admission']['validation']['whole_member_union_exact'] is not True or any(Path(e['local_path']).exists() for e in release['released']):raise ValueError('resumed retention/release changed')
  def publish_and_release(self,record):
-  self.guard();before={p for p in (C/'insula').glob('hdfs-retention-*')};command=[sys.executable,str(P/'cohort/publish_sustained_checkpoint.py'),'--receipt',record['final_path'],'--receipt-sha256',record['final_sha256'],'--release','--lock-fd',str(self.lock.fileno())];log=self.R/f'retention-{record["step"]:02d}.log'
-  with log.open('w') as stream:result=subprocess.run(command,stdout=stream,stderr=subprocess.STDOUT,pass_fds=(self.lock.fileno(),),timeout=3600)
+  self.guard();before={p for p in (C/'insula').glob('hdfs-retention-*')};command=[sys.executable,'-m','retention.publish_sustained_checkpoint','--receipt',record['final_path'],'--receipt-sha256',record['final_sha256'],'--release','--lock-fd',str(self.lock.fileno())];log=self.R/f'retention-{record["step"]:02d}.log';env={k:v for k,v in os.environ.items() if k!='PYTHONPATH'}
+  with log.open('w') as stream:result=subprocess.run(command,cwd=P,env=env,stdout=stream,stderr=subprocess.STDOUT,pass_fds=(self.lock.fileno(),),timeout=3600)
   if result.returncode:raise RuntimeError('checkpoint HDFS preservation failed; next training forbidden')
   new={p for p in (C/'insula').glob('hdfs-retention-*')}-before
   if len(new)!=1:raise ValueError('unique current checkpoint publication required')

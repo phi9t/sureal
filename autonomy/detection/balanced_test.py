@@ -1,5 +1,5 @@
 import unittest
-from balanced import select_balanced,coverage_summary,uncovered_count
+from detection.balanced import select_balanced,coverage_summary,uncovered_count
 class BalancedTests(unittest.TestCase):
  def test_tracks_are_scene_namespaced(self):
   rows=[{'identity':f's{i}:1','objects':{'1':['same'],'2':[],'3':[],'4':[]}} for i in range(2)]

@@ -1,8 +1,8 @@
 import random,unittest
 import numpy as np
 import torch
-from cohort.sustained_loop import advance
-from cohort.sustained_state import capture_state
+from training_execution.sustained_loop import advance
+from training_execution.sustained_state import capture_state
 
 class Toy(torch.nn.Module):
  def __init__(self):super().__init__();self.layer=torch.nn.Linear(2,1)

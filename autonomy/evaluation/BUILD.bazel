@@ -1,0 +1,66 @@
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+
+TEST_MODULES = glob(["*_test.py"])
+LIB_MODULES = glob(
+    ["*.py"],
+    exclude = [
+        "*-*.py",
+        "*_test.py",
+    ],
+)
+COMMAND_SCRIPTS = glob(["*-*.py"])
+LIVE_GATE_TESTS = [
+    "metrics_sustained_v3_test.py",
+]
+
+package(default_visibility = ["//visibility:private"])
+
+py_library(
+    name = "evaluation",
+    srcs = LIB_MODULES,
+    imports = [".."],
+    visibility = ["//autonomy:__pkg__"],
+    deps = [
+        "//autonomy/detection:detection",
+        "//autonomy/evidence:evidence",
+        "//autonomy/insula:insula",
+        "//autonomy/sustained:sustained",
+    ],
+)
+
+filegroup(
+    name = "commands",
+    srcs = COMMAND_SCRIPTS,
+    visibility = ["//autonomy:__pkg__"],
+)
+
+filegroup(
+    name = "all_py",
+    srcs = glob(["*.py"]),
+    visibility = ["//autonomy:__pkg__"],
+)
+
+filegroup(
+    name = "runfiles",
+    srcs = glob(["*.py"]),
+    visibility = ["//autonomy:__pkg__"],
+)
+
+[
+    py_test(
+        name = test[:-3],
+        srcs = [test],
+        deps = [":evaluation"],
+        imports = [".."],
+        legacy_create_init = 0,
+        size = "small",
+        tags = ["perception_unit"] + (["requires_live_gate"] if test in LIVE_GATE_TESTS else []),
+    )
+    for test in TEST_MODULES
+]
+
+test_suite(
+    name = "all_tests",
+    tests = [test[:-3] for test in TEST_MODULES],
+    visibility = ["//autonomy:__pkg__"],
+)

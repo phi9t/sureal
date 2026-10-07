@@ -22,21 +22,33 @@ LAYERS = (
     ('camera',),
     ('segmentation',),
     ('resources',),
+    ('retention',),
+    ('sustained',),
     ('detection',),
     ('range_view',),
+    ('evaluation',),
     ('pipeline',),
     ('motion',),
-    ('gpu', 'evaluation', 'tracking', 'association', 'inspection'),
+    ('gpu', 'tracking', 'association', 'inspection'),
     ('studies',),
-    ('cohort',),
+    ('training_execution',),
     ('analysis', 'scripts', 'tests', 'tools', ROOT),
 )
 # Existing upward imports in sources whose bytes retained receipts cite.  Keep
 # this list shrinking: a new entry needs the same justification as a new layer.
 KNOWN_UPWARD = frozenset({
-    # Retained fixed-batch procedure record; its bytes are preserved as evidence
-    # and the record is filegroup-exported rather than reused as library code.
-    ('studies/fixed_batch/procedure_records/fixed_batch_prepare_v3.py', 'cohort'),
+    # Retained balanced16 procedure records; their bytes are preserved as
+    # evidence and filegroup-exported rather than reused as library code.
+    ('studies/balanced16/procedure_records/close_balanced_study.py', 'training_execution'),
+    ('studies/balanced16/procedure_records/coverage.py', 'training_execution'),
+    ('studies/balanced16/procedure_records/finish_balanced_study.py', 'training_execution'),
+    ('studies/balanced16/procedure_records/run.py', 'training_execution'),
+    ('studies/balanced16/procedure_records/run_balanced.py', 'training_execution'),
+    ('studies/balanced16/procedure_records/score.py', 'training_execution'),
+    ('studies/balanced16/procedure_records/score_balanced.py', 'training_execution'),
+    ('studies/balanced16/procedure_records/score_parallel.py', 'training_execution'),
+    ('studies/balanced16/procedure_records/score_v2.py', 'training_execution'),
+    ('studies/balanced16/procedure_records/verify_labels_v3.py', 'training_execution'),
     # Expanded-batch model composition is a split detection target: lower-level
     # point/sparse mechanisms stay in detection while this factory binds the
     # range-view encoder without making range_view depend back on it.

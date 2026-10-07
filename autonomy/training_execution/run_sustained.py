@@ -1,12 +1,73 @@
 """Execute the approved fixed16 one-factor comparison, with live gates throughout."""
-import argparse,json,re,sys
+import argparse,json,re
 from pathlib import Path
-P=Path(__file__).resolve().parents[1];sys.path.insert(0,str(P))
+P=Path(__file__).resolve().parents[1]
 from resources.scientific_payload import sha
-from cohort.sustained_controller_lock import acquire_experiment_lock
-from cohort.sustained_controller_backend import NativeBackend,write,C
-from cohort.sustained_workflow import execute_case
-from cohort.sustained_contract import RECIPES
+from resources.scientific_budget import reserve_write
+from resources.backend import ResourceBackend,prepare_identity
+from resources.checkpoint import recover_publication_record,resource_inventory,validate_publication_record,write_publication_record
+from resources.retention import publish_bundle
+from retention.sustained_controller_lock import acquire_experiment_lock
+from training_execution.sustained_controller_backend import NativeBackend,write,C,W
+from training_execution.sustained_workflow import execute_case
+from sustained.sustained_contract import RECIPES
+from sustained.sustained_scoring_budget import stage_timeout
+from studies.architecture import experiment_runner
+
+class ResourceNativeBackend(ResourceBackend,NativeBackend):
+ resource_launcher_module=experiment_runner
+ resource_launcher_path=Path(experiment_runner.__file__).resolve()
+ resource_stage_timeout=staticmethod(stage_timeout)
+ resource_reserve_write=staticmethod(reserve_write)
+ resource_cache_root=C
+ resource_work_root=W
+
+ def _recover_native_release(self,record):
+  if record.get('released'):return
+  if Path(record['root']).exists():return
+  candidates=[]
+  for directory in (C/'insula').glob('hdfs-retention-*'):
+   publication=directory/'verified-publication.json';release=directory/'release-completed.json'
+   if not publication.exists() or not release.exists():continue
+   try:
+    value=json.loads(publication.read_text());released=json.loads(release.read_text())
+    if value['parent_receipts'].get(record['final_path'])==record['final_sha256'] and released['publication_receipt_sha256']==sha(publication):
+     candidates.append((publication,release,value,released))
+   except (KeyError,ValueError,OSError,json.JSONDecodeError):
+    continue
+  if len(candidates)!=1:return
+  publication,release,value,released=candidates[0]
+  if value['independent_admission']['exit_code']!=0 or value['independent_admission']['validation']['whole_member_union_exact'] is not True or any(Path(e['local_path']).exists() for e in released['released']):raise ValueError('resumed native release evidence changed')
+  record['publication']={'publication_path':str(publication),'publication_sha256':sha(publication),'release_path':str(release),'release_sha256':sha(release),'hdfs_manifest_uri':value['publication_manifest_hdfs_uri'],'command':value.get('command'),'log_sha256':None}
+  record['released']=True
+
+ def check_record(self,record,previous):
+  self._recover_native_release(record)
+  super().check_record(record,previous)
+  if record.get('released') or record.get('resource_publication') is not None or (self.resource_root/'checkpoints'/f'checkpoint-{record["target_step"]:02d}-resource-publication.json').exists():
+   validate_publication_record(self,record)
+
+ def _ensure_resource_publication(self,record):
+  inventory=resource_inventory(self,record)
+  recovered=recover_publication_record(self,record,inventory)
+  if recovered is not None:return recovered
+  receipt=publish_bundle(self,'checkpoint',inventory)
+  return write_publication_record(self,record,receipt,inventory)
+
+ def publish_and_release(self,record):
+  self.guard();self._ensure_resource_publication(record);validate_publication_record(self,record)
+  publication=NativeBackend.publish_and_release(self,record)
+  validate_publication_record(self,record)
+  return publication
+
+def open_backend(run_id,recipe,lock,*,resume):
+ backend=ResourceNativeBackend.__new__(ResourceNativeBackend);backend._resource_identity=None
+ NativeBackend.__init__(backend,run_id,recipe,lock,resume=resume)
+ identity=backend.R/'resource-layer/identity.json'
+ if identity.exists():path,digest=identity,sha(identity)
+ else:path,digest=prepare_identity(backend,backend.R/'resource-layer',timeout_for_stage=stage_timeout)
+ backend.attach_resources(path,digest)
+ return backend
 
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--run-id',required=True);parser.add_argument('--resume',action='store_true');parser.add_argument('--admission-only',action='store_true');args=parser.parse_args()
@@ -17,7 +78,7 @@ def main():
   outcomes=[]
   for recipe in RECIPES:
    if args.admission_only and recipe!='baseline':break
-   backend=NativeBackend(args.run_id,recipe,lock,resume=args.resume and (C/'insula'/('balanced16-sustained-'+recipe.replace('_','-')+'-'+args.run_id)).exists());statepath=backend.R/'state.json';records=json.loads(statepath.read_text())['records'] if statepath.exists() else []
+   backend=open_backend(args.run_id,recipe,lock,resume=args.resume and (C/'insula'/('balanced16-sustained-'+recipe.replace('_','-')+'-'+args.run_id)).exists());statepath=backend.R/'state.json';records=json.loads(statepath.read_text())['records'] if statepath.exists() else []
    if args.admission_only:
     backend.validate_resume(records)
     if len(records)>2 or records and records[-1]['step']>1000:raise ValueError('admission probe never restarts or extends an established trajectory')

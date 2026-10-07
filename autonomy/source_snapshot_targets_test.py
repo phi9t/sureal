@@ -2,24 +2,24 @@ import unittest
 import os
 from pathlib import Path
 
-from cohort.checkpoint_retention_sources import (
+from retention.checkpoint_retention_sources import (
     REQUIRED as CHECKPOINT_RETENTION_REQUIRED,
     SNAPSHOT_TARGET as CHECKPOINT_RETENTION_TARGET,
 )
-from cohort.pilot_retention_sources import (
+from retention.pilot_retention_sources import (
     REQUIRED as PILOT_RETENTION_REQUIRED,
     SNAPSHOT_TARGET as PILOT_RETENTION_TARGET,
 )
-from cohort.retention_sources import (
+from retention.retention_sources import (
     REQUIRED as NATIVE_CACHE_RETENTION_REQUIRED,
     SNAPSHOT_TARGET as NATIVE_CACHE_RETENTION_TARGET,
 )
-from cohort.sustained_controller_sources import (
+from training_execution.sustained_controller_sources import (
     REQUIRED as CONTROLLER_REQUIRED,
     SNAPSHOT_TARGET as CONTROLLER_TARGET,
 )
-from cohort.sustained_sources import SNAPSHOT_TARGET as SUSTAINED_RUN_TARGET
-from cohort.sustained_sources import source_paths as sustained_source_paths
+from training_execution.sustained_sources import SNAPSHOT_TARGET as SUSTAINED_RUN_TARGET
+from training_execution.sustained_sources import source_paths as sustained_source_paths
 from evidence.source_snapshot import label_to_path
 from resources.sources import SNAPSHOT_TARGET as RESOURCE_TARGET
 from resources.sources import source_paths as resource_source_paths

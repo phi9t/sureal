@@ -1,12 +1,12 @@
 """Read-only full16 checkpoint literal loss audit, with external file pins."""
-import hashlib,json,resource,time
+import json,resource,time
 from pathlib import Path
 import numpy as np
-from cohort.sustained_contract import validate_contract
-from cohort.sustained_literal_loss import literal_losses,compare_losses
+from sustained.sustained_contract import validate_contract
+from detection.sustained_literal_loss import literal_losses,compare_losses
+from evidence.source_snapshot import file_sha256
 
-def sha(path):
- with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+sha=file_sha256
 def relative(root,name):
  path=Path(name)
  if path.is_absolute() or '..' in path.parts:raise ValueError('safe relative native input required')

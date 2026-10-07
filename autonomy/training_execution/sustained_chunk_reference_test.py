@@ -1,9 +1,9 @@
 import unittest
 import torch
-from cohort import test_sustained_loop as fixtures
+from training_execution import sustained_loop_test as fixtures
 objective=fixtures.objective
-from cohort.sustained_loop import advance
-from cohort.sustained_chunk_reference import reference_chunk
+from training_execution.sustained_loop import advance
+from training_execution.sustained_chunk_reference import reference_chunk
 from resources.replay_values import require_exact_state
 
 class ChunkReferenceTests(unittest.TestCase):

@@ -31,7 +31,7 @@ class ResourceCheckpointTests(unittest.TestCase):
         driver=root/'libcuda.fixture.so';driver.write_text('driver bytes');b.old={'driver_hashes':{str(driver):sha(driver)}}
         b.runtime_path=b.R/'runtime-lock.json';b.runtime_path.write_text('{"rootfs_sha256":"runtime fixture"}')
         from evidence.source_snapshot import LocalSnapshotStore,copy_source_snapshot,source_snapshot_receipt
-        b.package=b.R/'code';b.package.mkdir();worker=b.package/'cohort/sustained_scoring_budget.py';worker.parent.mkdir();worker.write_text('def stage_timeout(metrics): return 14700 if metrics else 1800\n');b.pins={'cohort/sustained_scoring_budget.py':sha(worker)}
+        b.package=b.R/'code';b.package.mkdir();worker=b.package/'sustained/sustained_scoring_budget.py';worker.parent.mkdir(parents=True);worker.write_text('def stage_timeout(metrics): return 14700 if metrics else 1800\n');b.pins={'sustained/sustained_scoring_budget.py':sha(worker)}
         b.pins=source_snapshot_receipt(b.package,sorted(b.pins),LocalSnapshotStore(b.R/'source-snapshots'),target='fixture:sustained-run-package',materialized_root=b.package)
         host=root/'checkout';host.mkdir();(host/'host.py').write_text('host');b.host_pins=copy_source_snapshot(host,['host.py'],b.R/'host-source',LocalSnapshotStore(b.R/'host-source-snapshots'),target='fixture:sustained-controller-host')
         path,digest=prepare_identity(b,b.R/'resource-layer');b.attach_resources(path,digest)
@@ -83,8 +83,8 @@ class ResourceCheckpointTests(unittest.TestCase):
                 seal(b,record);files=inventory(b,record)
                 self.assertIn('resource-sources/snapshot-object.tar',files);self.assertIn('resource-sources/materialized/resources/sources.py',files)
                 self.assertIn('resource-sources/materialized/evidence/source_snapshot.py',files)
-                self.assertIn('native-package/snapshot-object.tar',files);self.assertIn('native-package/materialized/cohort/sustained_scoring_budget.py',files)
-                self.assertIn('native-host/snapshot-object.tar',files);self.assertIn('native-host/materialized/host.py',files);self.assertNotIn('native-current/cohort/sustained_scoring_budget.py',files)
+                self.assertIn('native-package/snapshot-object.tar',files);self.assertIn('native-package/materialized/sustained/sustained_scoring_budget.py',files)
+                self.assertIn('native-host/snapshot-object.tar',files);self.assertIn('native-host/materialized/host.py',files);self.assertNotIn('native-current/sustained/sustained_scoring_budget.py',files)
                 for stage in ['train','audit','literal-loss','export','proposals','score','metrics-audit']:
                     for name in ['proof.json','binding.json','worker.json','execution.log','native-receipt.json']:self.assertIn('stages/'+stage+'/'+name,files)
                 for name,entry in files.items():self.assertEqual(sha(entry['path']),entry['sha256'])

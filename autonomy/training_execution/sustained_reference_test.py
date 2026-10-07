@@ -1,9 +1,9 @@
 import unittest
 import torch
-from cohort import test_sustained_loop as fixture_module
+from training_execution import sustained_loop_test as fixture_module
 objective=fixture_module.objective
-from cohort.sustained_loop import advance
-from cohort.sustained_reference import reference_updates
+from training_execution.sustained_loop import advance
+from training_execution.sustained_reference import reference_updates
 from resources.replay_values import require_exact_state
 
 class IndependentContinuationTests(unittest.TestCase):

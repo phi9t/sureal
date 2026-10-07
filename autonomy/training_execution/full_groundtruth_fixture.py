@@ -1,10 +1,10 @@
 """Live original16 native GT export, with independent direct row comparison."""
-import hashlib,json,math,resource,time
+import json,math,resource,time
 from pathlib import Path
-from cohort.sustained_groundtruth import groundtruth_records
+from detection.sustained_groundtruth import groundtruth_records
+from evidence.source_snapshot import file_sha256
 
-def sha(p):
- with Path(p).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+sha=file_sha256
 
 def main():
  started=time.monotonic();manifest=json.loads(Path('/source/manifest.json').read_text());all_records=[];rows=[];totals={str(c):{'native':0,'positive_points':0,'training_roi':0} for c in range(1,5)}

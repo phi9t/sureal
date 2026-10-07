@@ -3,20 +3,34 @@
 No native fit or research promotion. Retains all payloads for later verified
 HDFS publication; never evicts another run or bypasses the scientific cap.
 """
-import argparse,fcntl,json,os,re,shutil,sys,time
+import argparse,fcntl,json,os,re,shutil,time
 from pathlib import Path
-P=Path(__file__).resolve().parents[1];sys.path.insert(0,str(P))
+P=Path(__file__).resolve().parents[1]
 from studies.architecture.experiment_runner import run_stage
 from insula.runtime_identity import verify_rootfs
 from insula.entry import launch_plan
 from resources.scientific_payload import sha,unique_payload_bytes
 from resources.scientific_budget import reserve_write
-from cohort.sustained_contract import validate_contract
-from cohort.sustained_scoring_budget import stage_timeout
-from cohort.sustained_sources import snapshot_sources,validate_sources
-from cohort.sustained_stage_inputs import freeze_inputs,bind_stage_paths
+from sustained.sustained_contract import validate_contract
+from sustained.sustained_scoring_budget import stage_timeout
+from training_execution.sustained_sources import snapshot_sources,source_paths,validate_sources
+from training_execution.sustained_stage_inputs import freeze_inputs,bind_stage_paths
 
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing'
+GPU_ROOT=C/'gpu-rootfs';CPU_ROOT=C/'insula/rootfs-v2';METRICS_ROOT=C/'metrics-rootfs'
+WORKER_ENTRIES={
+ 'train_sustained.py':'/experiment/training_execution/train_sustained.py',
+ 'replay_sustained.py':'/experiment/training_execution/replay_sustained.py',
+ 'audit_sustained_loss.py':'/experiment/training_execution/audit_sustained_loss.py',
+ 'prepare_sustained_v3.py':'/experiment/evaluation/prepare_sustained_v3.py',
+ 'audit_proposals_sustained_v3.py':'/experiment/evaluation/audit_proposals_sustained_v3.py',
+ 'metrics_sustained_v3.py':'/experiment/evaluation/metrics_sustained_v3.py',
+ 'audit_metrics_sustained_v3.py':'/experiment/evaluation/audit_metrics_sustained_v3.py',
+}
+
+def worker_entry(worker):
+ try:return WORKER_ENTRIES[worker]
+ except KeyError as error:raise ValueError('declared sustained worker required') from error
 
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--run-id',required=True);parser.add_argument('--expanded-run-id',default='expanded20261002a');a=parser.parse_args()
@@ -36,15 +50,14 @@ def main():
   if parts.is_absolute() or '..' in parts.parts:raise ValueError('unsafe native frame path')
   for name,digest in frame['sha256'].items():
    if sha(native/parts/name)!=digest:raise ValueError('original native frame changed')
- old=json.loads((C/'detector-gpu-live-a/receipt.json').read_text());runtime=old['runtime_lock'];verify_rootfs(C/'gpu-rootfs',runtime['rootfs_sha256'])
- metric_runtime=json.loads(Path(str(C/'metrics-rootfs')+'.lock.json').read_text());verify_rootfs(C/'metrics-rootfs',metric_runtime['rootfs_sha256'])
+ old=json.loads((C/'detector-gpu-live-a/receipt.json').read_text());runtime=old['runtime_lock'];verify_rootfs(GPU_ROOT,runtime['rootfs_sha256'])
+ cpu_runtime=json.loads(Path(str(CPU_ROOT)+'.lock.json').read_text());verify_rootfs(CPU_ROOT,cpu_runtime['rootfs_sha256'])
+ metric_runtime=json.loads(Path(str(METRICS_ROOT)+'.lock.json').read_text());verify_rootfs(METRICS_ROOT,metric_runtime['rootfs_sha256'])
  for path,digest in old['driver_hashes'].items():
   if sha(path)!=digest:raise ValueError('driver changed')
  R=C/'insula'/f'balanced16-sustained-admission-{a.run_id}';R.mkdir();package=R/'code';package.mkdir()
- for folder in ['pipeline','gpu','tier1','cohort','evidence']:
-  for path in (P/folder).rglob('*.py'):
-   if '__pycache__' in path.parts:continue
-   dest=package/path.relative_to(P);dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(path,dest)
+ for name in source_paths(P):
+  path=P/name;dest=package/name;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(path,dest)
  pins=snapshot_sources(package,R/'source-snapshots');validate_sources(package,pins,runtime,runtime)
  runtime_path=R/'runtime-lock.json';runtime_path.write_text(json.dumps(runtime,indent=2)+'\n')
  anchor_path=P/'research/training-anchor-templates.candidate.json';anchor_receipt=json.loads((P/'research/training-anchor-candidate-verified.json').read_text())
@@ -55,17 +68,18 @@ def main():
   directory.mkdir();stage_source,input_hashes=freeze_inputs(source,R/(name+'-input'));command=old['checks'][0]['command'].copy()
   if gpu:
    for target,path in [('/experiment',package),('/source',stage_source),('/outputs',directory)]:command[command.index(target)-1]=str(path)
-   command[-1]='/experiment/cohort/'+worker
-  elif metrics:command=launch_plan(C/'metrics-rootfs',package,stage_source,directory,['python','/experiment/cohort/'+worker])
-  else:command=launch_plan(C/'gpu-rootfs',package,stage_source,directory,['/opt/waymo/bin/python','/experiment/cohort/'+worker])
-  extra=bind_stage_paths(extra,source,stage_source)
-  index=command.index('--');command[index:index]=['--ro-bind',str(stage_source),'/tmp/inputs','--ro-bind',str(native),'/tmp/native','--ro-bind',str(W/'balanced16-physical-v2'),'/tmp/physical','--ro-bind',str(W/'balanced16-labels-v2'),'/tmp/boxes','--ro-bind',str(runtime_path),'/tmp/runtime-lock.json','--ro-bind',str(W),'/tmp/scientific','--ro-bind',str(R/'source-snapshots'),'/tmp/source-snapshots','--setenv','SUREAL_SOURCE_SNAPSHOT_STORE','/tmp/source-snapshots','--setenv','CUBLAS_WORKSPACE_CONFIG',':4096:8',*extra]
+   command[-1]=worker_entry(worker)
+  elif metrics:command=launch_plan(METRICS_ROOT,package,stage_source,directory,['python',worker_entry(worker)])
+  else:command=launch_plan(CPU_ROOT,package,stage_source,directory,['python',worker_entry(worker)])
+  extra=bind_stage_paths(extra,source,stage_source);pythonpath=[] if 'PYTHONPATH' in command else ['--setenv','PYTHONPATH','/experiment']
+  index=command.index('--');command[index:index]=['--ro-bind',str(stage_source),'/tmp/inputs','--ro-bind',str(native),'/tmp/native','--ro-bind',str(W/'balanced16-physical-v2'),'/tmp/physical','--ro-bind',str(W/'balanced16-labels-v2'),'/tmp/boxes','--ro-bind',str(runtime_path),'/tmp/runtime-lock.json','--ro-bind',str(W),'/tmp/scientific','--ro-bind',str(R/'source-snapshots'),'/tmp/source-snapshots','--setenv','SUREAL_SOURCE_SNAPSHOT_STORE','/tmp/source-snapshots','--setenv','CUBLAS_WORKSPACE_CONFIG',':4096:8',*pythonpath,*extra]
   with (directory/'live.log').open('w') as log:result=run_stage(command,package,dict(os.environ),log,timeout=stage_timeout(metrics))
   if result.returncode:raise RuntimeError(f'{name} failed; retained log: {directory}/live.log')
   validate_sources(package,pins,runtime,runtime)
   if any(sha(path)!=digest for path,digest in input_hashes.items()):raise ValueError('immutable stage inputs changed')
   if sha(manifest_path)!=manifest_sha or unique_payload_bytes(W)>15*1024**3 or unique_payload_bytes(output)>2*1024**3:raise ValueError('manifest or storage admission violated')
-  receipt={'stage':name,'command':command,'exit_code':0,'source_hashes':pins,'runtime_lock':metric_runtime if metrics else runtime,'driver_hashes':old['driver_hashes'] if gpu else {},'manifest_sha256':manifest_sha,'expanded_closure_sha256':sha(closure),'historical_manifest_sha256':sha(historical),'input_hashes':input_hashes,'job_sha256':sha(stage_source/'job.json') if worker=='train_sustained.py' else None,'artifacts':{str(p):sha(p) for p in directory.rglob('*') if p.is_file()},'scope':'native engineering pilot only; sustained fitting/science/native APH pending'}
+  stage_runtime=metric_runtime if metrics else runtime if gpu else cpu_runtime
+  receipt={'stage':name,'command':command,'exit_code':0,'source_hashes':pins,'runtime_lock':stage_runtime,'driver_hashes':old['driver_hashes'] if gpu else {},'manifest_sha256':manifest_sha,'expanded_closure_sha256':sha(closure),'historical_manifest_sha256':sha(historical),'input_hashes':input_hashes,'job_sha256':sha(stage_source/'job.json') if worker=='train_sustained.py' else None,'artifacts':{str(p):sha(p) for p in directory.rglob('*') if p.is_file()},'scope':'native engineering pilot only; sustained fitting/science/native APH pending'}
   receipt_path=R/(name+'-verified.json');receipt_path.write_text(json.dumps(receipt,indent=2)+'\n');receipts[name]={'path':str(receipt_path),'sha256':sha(receipt_path)};print('ADMITTED',name,flush=True)
  previous=None
  for step in [0,19,35]:

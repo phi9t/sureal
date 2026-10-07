@@ -4,7 +4,7 @@ This module never validates stage receipts, publishes checkpoints or promotes
 scientific training. The controller must complete those separate gates first.
 """
 import math
-from cohort.sustained_contract import next_checkpoint,fit_status
+from sustained.sustained_contract import next_checkpoint,fit_status
 
 def decide_next(samples,report):
  if not isinstance(samples,list) or not samples:raise ValueError('scored initial checkpoint required')

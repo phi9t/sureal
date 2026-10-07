@@ -1,5 +1,5 @@
 import unittest
-from cohort.sustained_workflow import execute_case
+from training_execution.sustained_workflow import execute_case
 class Backend:
  def __init__(self,*,passing=False,fail_stage=None,fail_publication=False,time_cap=False):self.events=[];self.passing=passing;self.fail_stage=fail_stage;self.fail_publication=fail_publication;self.time_cap=time_cap
  def validate_resume(self,records):self.events.append(('validate',len(records)))

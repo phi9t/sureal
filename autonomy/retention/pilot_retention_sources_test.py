@@ -1,6 +1,6 @@
 import tempfile,unittest
 from pathlib import Path
-from cohort.pilot_retention_sources import REQUIRED,freeze_host_sources,validate_host_sources
+from retention.pilot_retention_sources import REQUIRED,freeze_host_sources,validate_host_sources
 class PilotRetentionSourcesTests(unittest.TestCase):
  def fixture(self,root):
   for name in REQUIRED:
@@ -9,7 +9,7 @@ class PilotRetentionSourcesTests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as temp:
    root=Path(temp)/'repo';self.fixture(root);pins=freeze_host_sources(root,Path(temp)/'frozen');validate_host_sources(root,pins);self.assertEqual(set(pins['source_pins']),set(REQUIRED))
    (root/REQUIRED[0]).write_text('changed current checkout')
-   (root/'cohort/unrelated.py').write_text('new helper')
+   (root/'retention/unrelated.py').write_text('new helper')
    validate_host_sources(root,pins)
    moved=Path(temp)/'moved';self.fixture(moved);validate_host_sources(moved,pins)
  def test_missing_or_altered_snapshot_refused(self):
@@ -30,3 +30,6 @@ class PilotRetentionSourcesTests(unittest.TestCase):
    with self.assertRaises(ValueError):freeze_host_sources(root,Path(temp)/'missing')
    p.symlink_to(root/REQUIRED[1])
    with self.assertRaises(ValueError):freeze_host_sources(root,Path(temp)/'symlinked')
+
+if __name__ == '__main__':
+ unittest.main()
