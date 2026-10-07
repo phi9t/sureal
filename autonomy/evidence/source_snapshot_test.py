@@ -22,6 +22,7 @@ class SourceSnapshotTests(unittest.TestCase):
                 SnapshotAuthenticationError,
                 SnapshotMissingError,
                 archive_sources,
+                file_digest,
                 file_sha256,
                 require_regular_file,
                 snapshot_bazel_target,
@@ -36,6 +37,7 @@ class SourceSnapshotTests(unittest.TestCase):
             "SnapshotAuthenticationError": SnapshotAuthenticationError,
             "SnapshotMissingError": SnapshotMissingError,
             "archive_sources": archive_sources,
+            "file_digest": file_digest,
             "file_sha256": file_sha256,
             "require_regular_file": require_regular_file,
             "snapshot_bazel_target": snapshot_bazel_target,
@@ -554,6 +556,7 @@ class SourceSnapshotTests(unittest.TestCase):
             nested.symlink_to(root, target_is_directory=True)
 
             self.assertEqual(api["file_sha256"](source), hashlib.sha256(b"contents").hexdigest())
+            self.assertEqual(api["file_digest"](source, "md5"), hashlib.md5(b"contents").hexdigest())
             self.assertEqual(api["require_regular_file"](source), source)
             with self.assertRaisesRegex(ValueError, "regular non-symlinked file required"):
                 api["require_regular_file"](link)

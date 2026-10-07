@@ -7,9 +7,11 @@ LIB_MODULES = glob(
 )
 EVIDENCE_VISIBILITY = [
     "//autonomy:__pkg__",
+    "//autonomy/camera:__pkg__",
     "//autonomy/dataset:__pkg__",
     "//autonomy/detection:__pkg__",
     "//autonomy/geometry:__pkg__",
+    "//autonomy/inspection:__pkg__",
     "//autonomy/insula:__pkg__",
     "//autonomy/motion:__pkg__",
     "//autonomy/segmentation:__pkg__",

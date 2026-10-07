@@ -43,12 +43,12 @@ LIVING_DOCUMENTS = (
     "autonomy/ARCHITECTURE.md",
     "autonomy/advanced/README.md",
     "autonomy/architecture/README.md",
-    "autonomy/explorer/README.md",
+    "autonomy/inspection/explorer/README.md",
     "autonomy/resources/README.md",
     "autonomy/scripts/HDFS_AUTH.md",
     "autonomy/tier1/README.md",
     "autonomy/tracking/README.md",
-    "autonomy/viewer/README.md",
+    "autonomy/inspection/viewer/README.md",
     "parallax/README.md",
 )
 STALE_COMPONENT_PATHS = (
@@ -733,9 +733,9 @@ class RepositoryIdentityTests(unittest.TestCase):
             "training/logs/run.log",
             "training/outputs/result.json",
             "node_modules/index.js",
-            "autonomy/viewer/web/node_modules/three/package.json",
-            "autonomy/viewer/web/dist/index.html",
-            "autonomy/viewer/.venv/bin/python",
+            "autonomy/inspection/viewer/web/node_modules/three/package.json",
+            "autonomy/inspection/viewer/web/dist/index.html",
+            "autonomy/inspection/viewer/.venv/bin/python",
         )
         for path in paths:
             with self.subTest(path=path):

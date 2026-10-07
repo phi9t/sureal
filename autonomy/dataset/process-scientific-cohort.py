@@ -43,9 +43,9 @@ def main():
    print('verified completed queue scene',scene,flush=True);continue
   scene_base.mkdir(exist_ok=True);checks=[];retained={};started=datetime.now(timezone.utc).isoformat();tick=time.monotonic()
   def call(stage,cmd):
-   t=time.monotonic();r=subprocess.run(cmd,capture_output=True,text=True);log=scene_base/(stage+'.log');log.write_text(r.stdout+r.stderr);checks.append({'stage':stage,'command':cmd,'exit_code':r.returncode,'elapsed_seconds':time.monotonic()-t});print(stage,r.returncode,scene,flush=True)
+   t=time.monotonic();r=subprocess.run(cmd,capture_output=True,text=True,cwd=HERE);log=scene_base/(stage+'.log');log.write_text(r.stdout+r.stderr);checks.append({'stage':stage,'command':cmd,'exit_code':r.returncode,'elapsed_seconds':time.monotonic()-t});print(stage,r.returncode,scene,flush=True)
    if r.returncode:raise RuntimeError(r.stderr[-2000:])
-  def python(stage,name,*values):call(stage,['python3',str(HERE/'dataset'/name),*map(str,values)])
+  def python(stage,name,*values):call(stage,['python3','-m','dataset.'+Path(name).stem,*map(str,values)])
   def remember(p):retained[str(p)]=sha(p)
   def bundle_cap(processing):
    files=[p for p in (processing/'sidecars').rglob('*') if p.is_file()];upper=sum(p.stat().st_size for p in files)+len(files)*1024+16*1024**2
@@ -71,12 +71,12 @@ def main():
   if point_replay['publication_receipt_sha256']!=ph or len(point_replay['checks'])!=2:raise ValueError('point replay linkage differs')
   evict('point-evict','dataset.verified_eviction','evict_points',processing,publication,replay,ph,rh)
   bundle_cap(processing);side_pub=scene_base/'sidecar-publication';python('sidecar-publication','publish-scientific-sidecars.py',processing,side_pub,'--expected-scene-receipt-sha256',reconstruction_sha);audit(side_pub/'receipt.json');sh=sha(side_pub/'receipt.json');remember(side_pub/'receipt.json');evict('sidecar-evict','dataset.sidecar_eviction','evict_sidecars',processing,side_pub,None,sh)
-  camera=scene_base/'camera';call('camera-preprocess',['python3',str(HERE/'scientific-camera-preprocess.py'),'--scene',scene,'--output',str(camera)]);camera_hashes={}
+  camera=scene_base/'camera';call('camera-preprocess',['python3','-m','camera.scientific-camera-preprocess','--scene',scene,'--output',str(camera)]);camera_hashes={}
   for c in CAMERA_COMPONENTS:
    p=camera/'evidence'/c/'receipt.json';audit(p,camera);remember(p);camera_hashes[c]=sha(p)
-  evidence=scene_base/'camera-evidence.json';save(evidence,{'scene':scene,'processing':str(camera),'receipt_hashes':camera_hashes});remember(evidence);camera_pub=scene_base/'camera-publication';call('camera-publication',['python3',str(HERE/'publish-scientific-camera.py'),'--evidence',str(evidence),'--expected-evidence-sha256',sha(evidence),'--output',str(camera_pub)]);audit(camera_pub/'receipt.json');ch=sha(camera_pub/'receipt.json');remember(camera_pub/'receipt.json');camera_replay=scene_base/'camera-replay';call('camera-replay',['python3',str(HERE/'verify-camera-replay.py'),str(camera),str(camera_pub),str(camera_replay),'--expected-receipt-sha256',ch,'--usage',usage]);camera_result=audit(camera_replay/'receipt.json');crh=sha(camera_replay/'receipt.json');remember(camera_replay/'receipt.json')
+  evidence=scene_base/'camera-evidence.json';save(evidence,{'scene':scene,'processing':str(camera),'receipt_hashes':camera_hashes});remember(evidence);camera_pub=scene_base/'camera-publication';call('camera-publication',['python3','-m','camera.publish-scientific-camera','--evidence',str(evidence),'--expected-evidence-sha256',sha(evidence),'--output',str(camera_pub)]);audit(camera_pub/'receipt.json');ch=sha(camera_pub/'receipt.json');remember(camera_pub/'receipt.json');camera_replay=scene_base/'camera-replay';call('camera-replay',['python3','-m','camera.verify-camera-replay',str(camera),str(camera_pub),str(camera_replay),'--expected-receipt-sha256',ch,'--usage',usage]);camera_result=audit(camera_replay/'receipt.json');crh=sha(camera_replay/'receipt.json');remember(camera_replay/'receipt.json')
   if camera_result['publication_receipt_sha256']!=ch or len(camera_result['checks'])!=2:raise ValueError('camera replay linkage differs')
-  evict('camera-evict','pipeline.camera_eviction','evict_camera',camera,camera_pub,camera_replay,ch,crh)
+  evict('camera-evict','camera.camera_eviction','evict_camera',camera,camera_pub,camera_replay,ch,crh)
   for c,p in paths.items():
    if sha(p)!=source_hashes[c]:raise ValueError('source admission changed during lifecycle')
   if sha(Path(__file__))!=driver_sha or sha(manifest_path)!=manifest_sha or total(WORKING)>15*1024**3:raise ValueError('driver/cohort/cap changed')

@@ -98,16 +98,16 @@ The manifest should preserve:
 
 ## Web 3D viewer
 
-[`viewer/`](viewer/README.md) exports a Waystone slice into static scene
+[`inspection/viewer/`](inspection/viewer/README.md) exports a Waystone slice into static scene
 bundles (PyArrow + NumPy, no TensorFlow) and renders them in the browser with
 Three.js: fused LiDAR points, 3D/2D labels, calibrated camera frusta with the
 real images, panoptic and LiDAR segmentation, keypoints, ego trajectory and
 temporal accumulation. Bundles stay outside git under the viewer cache.
 
 ```bash
-autonomy/viewer/run.sh setup
-autonomy/viewer/run.sh export SLICE_DIR CONTEXT
-autonomy/viewer/run.sh dev
+autonomy/inspection/viewer/run.sh setup
+autonomy/inspection/viewer/run.sh export SLICE_DIR CONTEXT
+autonomy/inspection/viewer/run.sh dev
 ```
 
 ## Current gates
