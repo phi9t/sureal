@@ -1,10 +1,17 @@
 """Freeze the complete external resource execution closure independently."""
 from pathlib import Path
-from evidence.source_snapshot import LocalSnapshotStore,copy_source_snapshot,file_sha256,verify_materialized_sources
+from evidence.source_snapshot import (
+    LocalSnapshotStore,
+    copy_source_snapshot,
+    file_sha256,
+    require_regular_file,
+    verify_materialized_sources,
+)
 
-REQUIRED={'sources.py','command.py','stage.py','kernel_scope.py','scoped_stage.py',
-          'stage_accounting.py','execute_worker.py','process_lifecycle.py'}
-SNAPSHOT_TARGET='//autonomy:resource-source-layer'
+REQUIRED=frozenset({'sources.py','command.py','stage.py','kernel_scope.py','scoped_stage.py',
+                    'stage_accounting.py','execute_worker.py','process_lifecycle.py'})
+EVIDENCE_REQUIRED=frozenset({'evidence/source_snapshot.py'})
+SNAPSHOT_TARGET='//autonomy/resources:resource_source_layer'
 
 
 def sha(path):
@@ -12,7 +19,11 @@ def sha(path):
 
 
 def regular(path):
-    return path.is_file() and not any(p.is_symlink() for p in [path,*path.parents])
+    try:
+        require_regular_file(path)
+    except (OSError, ValueError):
+        return False
+    return True
 
 
 def inventory(root):
@@ -30,9 +41,29 @@ def inventory(root):
     return names
 
 
+def source_paths(current):
+    current=Path(current)
+    if current.name!='resources':
+        raise ValueError('resource source directory required')
+    names={'resources/'+name for name in inventory(current)}
+    helper=current.parent/'evidence/source_snapshot.py'
+    if not regular(helper):
+        raise ValueError('complete resource evidence helpers required')
+    return sorted(names|EVIDENCE_REQUIRED)
+
+
+def _materialized_paths(root):
+    root=Path(root)
+    names={'resources/'+name for name in inventory(root/'resources')}
+    helper=root/'evidence/source_snapshot.py'
+    if not regular(helper):
+        raise ValueError('complete resource evidence helpers required')
+    return names|EVIDENCE_REQUIRED
+
+
 def freeze_sources(current,destination):
-    current=Path(current);destination=Path(destination);names=inventory(current)
-    receipt=copy_source_snapshot(current,sorted(names),destination,LocalSnapshotStore(destination.parent/'source-snapshots'),target=SNAPSHOT_TARGET)
+    current=Path(current);destination=Path(destination);names=source_paths(current)
+    receipt=copy_source_snapshot(current.parent,names,destination,LocalSnapshotStore(destination.parent/'source-snapshots'),target=SNAPSHOT_TARGET)
     validate_sources(current,receipt)
     return receipt
 
@@ -41,10 +72,11 @@ def validate_sources(current,pins):
     try:
         root=Path(pins['source_snapshot_root'])
         source_pins=pins['source_pins']
-        if not isinstance(source_pins,dict) or not REQUIRED<=set(source_pins):
+        required={'resources/'+name for name in REQUIRED}|EVIDENCE_REQUIRED
+        if not isinstance(source_pins,dict) or not required<=set(source_pins):
             raise ValueError('complete resource execution helpers required')
         verified=verify_materialized_sources(root,pins)
-        if inventory(root)!=set(verified['source_pins']):
+        if _materialized_paths(root)!=set(verified['source_pins']):
             raise ValueError('resource snapshot inventory differs')
     except FileNotFoundError:
         raise

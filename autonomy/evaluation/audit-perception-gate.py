@@ -24,8 +24,8 @@ def main():
             verifier={'metrics-live-a':'verify-native-metrics.py','detection-contract-live-b':'verify-detection-contract.py'}[name]
             assert sha(HERE/'evaluation'/verifier)==record['verifier_sha256']
         if 'checker_sha256' in record:
-            checker={'real-camera-source-check-a':'validate-real-camera-source.py','real-box-source-check-a':'validate-real-box-source.py'}[name]
-            assert sha(HERE/'evaluation'/checker)==record['checker_sha256']
+            checker={'real-camera-source-check-a':'camera/validate-real-camera-source.py','real-box-source-check-a':'evaluation/validate-real-box-source.py'}[name]
+            assert sha(HERE/checker)==record['checker_sha256']
         receipts[name]={'receipt_sha256':sha(folder/'receipt.json'),'path':str(folder/'receipt.json')}
     cpu=cache/'insula/rootfs-v2';metrics=cache/'metrics-rootfs'
     cpulock=json.loads(Path(str(cpu)+'.lock.json').read_text());metriclock=json.loads(Path(str(metrics)+'.lock.json').read_text())

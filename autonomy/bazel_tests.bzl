@@ -5,10 +5,7 @@ PYTEST_MODULES = [
     "association/test_provenance.py",
 ]
 
-LEGACY_NATIVE_TOOL_MODULES = [
-    # Needs /outputs/motion_causal_project and /upstream/src Waymo protos.
-    "tests/test_motion_causal_projection.py",
-]
+LEGACY_NATIVE_TOOL_MODULES = []
 
 TORCH_MODULES = [
     "advanced/test_models.py",
@@ -21,11 +18,9 @@ TORCH_MODULES = [
     "cohort/test_sustained_loop.py",
     "cohort/test_sustained_loss.py",
     "cohort/test_sustained_reference.py",
-    "cohort/test_sustained_replay_values.py",
     "cohort/test_sustained_state.py",
     "cohort/test_sustained_transition_guard.py",
     "cohort/test_sustained_worker_guard.py",
-    "continuation/test_compare_state.py",
     "tests/test_camera_interpolation_parity.py",
     "tests/test_range_frontend.py",
     "tests/test_range_pillar_hybrid.py",
@@ -39,16 +34,10 @@ TORCH_CPU_ONLY_MODULES = [
 
 LIVE_GATE_MODULES = [
     "cohort/test_sustained_native_metric_gate.py",
-    "tests/test_camera_projection_cli.py",
     "insula/m0_receipt_test.py",
-    "tests/test_motion_joint_cli.py",
-    "tests/test_motion_native_cli.py",
-    "tests/test_motion_pooled_cli.py",
 ]
 
-KNOWN_FAILURE_MODULES = [
-    "tests/test_motion_causal_projection.py",
-]
+KNOWN_FAILURE_MODULES = []
 
 def perception_test_name(src):
     if src == "tools/test_suites.py":

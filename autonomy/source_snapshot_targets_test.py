@@ -22,7 +22,7 @@ from cohort.sustained_sources import SNAPSHOT_TARGET as SUSTAINED_RUN_TARGET
 from cohort.sustained_sources import source_paths as sustained_source_paths
 from evidence.source_snapshot import label_to_path
 from resources.sources import SNAPSHOT_TARGET as RESOURCE_TARGET
-from resources.sources import inventory as resource_inventory
+from resources.sources import source_paths as resource_source_paths
 
 
 PACKAGE = Path(__file__).resolve().parent
@@ -58,7 +58,7 @@ class SourceSnapshotTargetTests(unittest.TestCase):
         return candidates[0]
 
     def assert_target_paths(self, target, query_filename, expected):
-        self.assertTrue(target.startswith("//autonomy:"), target)
+        self.assertTrue(target.startswith("//autonomy"), target)
         self.assertEqual(self.query_paths(query_filename), sorted(expected))
 
     def test_sustained_run_sources_filegroup_matches_freezer_sources(self):
@@ -72,7 +72,7 @@ class SourceSnapshotTargetTests(unittest.TestCase):
         self.assert_target_paths(
             RESOURCE_TARGET,
             "resource_source_layer_query",
-            ["resources/" + name for name in resource_inventory(PACKAGE / "resources")],
+            resource_source_paths(PACKAGE / "resources"),
         )
 
     def test_sustained_controller_host_filegroup_matches_freezer_sources(self):

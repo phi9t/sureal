@@ -1,15 +1,16 @@
 """Bounded resource/input archive using the separately pinned admitted library."""
-import hashlib,importlib.util,json,shutil,sys,tarfile
+import importlib.util,json,shutil,sys,tarfile
 from pathlib import Path
+from evidence.source_snapshot import file_sha256, require_regular_file
 
 
 def sha(path):
-    with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+    return file_sha256(path)
 
 
 def process(job,mode,source,output):
     source=Path(source);output=Path(output);module=Path(job['archive_module_path'])
-    if (not module.is_absolute() or not module.is_file() or any(p.is_symlink() for p in [module,*module.parents]) or
+    if (not module.is_absolute() or require_regular_file(module)!=module or
         sha(module)!=job['archive_module_sha256'] or type(job['max_bytes']) is not int or not 0<job['max_bytes']<=128*1024**2):
         raise ValueError('pinned archive library and bounded resource payload required')
     spec=importlib.util.spec_from_file_location('resource_archive_library',module);library=importlib.util.module_from_spec(spec);spec.loader.exec_module(library)

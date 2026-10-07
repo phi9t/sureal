@@ -13,19 +13,22 @@ not import each other. The order is declared in
 
 | Layer | Areas | Role |
 | --- | --- | --- |
-| 12 | top-level scripts, `scripts/`, `analysis/`, `tests/`, `tools/` | Gate runners, operations, diagnostics, development checks |
-| 11 | `continuation_control/` | Binds bounded legacy replays to their native receipts |
-| 10 | `continuation/` | Parity checks for resumed native stages |
-| 9 | `resources/` | Measured, cgroup-bounded stage execution and retention |
-| 8 | `cohort/` | 16-scene cohort studies: balanced and sustained training, scoring, audits |
-| 7 | `advanced/` | Expanded fixed-batch architecture suite |
-| 6 | `tier1/` | Fixed-batch architecture overfit suite |
-| 5 | `architecture/` | Experiment catalog and the `architecture.py` runner |
-| 4 | `gpu/`, `evaluation/`, `association/`, `explorer/`, `motion-evaluation/`, `viewer/` | Model variants and GPU workers, native metric contracts, standalone tools |
-| 3 | `pipeline/` | Readers, encoders, detector and archives |
-| 2 | `geometry/` | Coordinate transforms, projection visibility and native range-grid shape math |
-| 1 | `insula/` | Sandbox entry, rootfs identity, M0 receipt checks and staging leases |
-| 0 | `evidence/` | Source snapshots, file digests, regular-file checks, journal, tracker, projection, publication and pin reports |
+| 15 | top-level scripts, `scripts/`, `analysis/`, `tests/`, `tools/` | Gate runners, operations, diagnostics, development checks |
+| 14 | `cohort/` | 16-scene cohort studies: balanced and sustained training, scoring, audits |
+| 13 | `advanced/` | Expanded fixed-batch architecture suite |
+| 12 | `tier1/` | Fixed-batch architecture overfit suite |
+| 11 | `architecture/` | Experiment catalog and runner |
+| 10 | `gpu/`, `evaluation/`, `tracking/`, `association/`, `inspection/` | Model workers, metric contracts, inspection and standalone tools |
+| 9 | `motion/` | Motion ingestion, causal projection and native metric tools |
+| 8 | `pipeline/` | Remaining readers, encoders and archives |
+| 7 | `detection/` | Pillar detection and native training-box tools |
+| 6 | `resources/` | Measured bounded execution, retention, replay continuation and native-receipt binding |
+| 5 | `segmentation/` | Semantic and instance segmentation, masks and recovery |
+| 4 | `camera/` | Camera data, sidecars and projection tools |
+| 3 | `geometry/` | Coordinate transforms, visibility and native range-grid shape math |
+| 2 | `dataset/` | Scientific dataset components, archives, eviction and cloud setup |
+| 1 | `insula/` | Sandbox entry, rootfs identity, M0 checks and staging leases |
+| 0 | `evidence/` | Snapshots, digests, regular-file checks, journal, tracker and publication |
 
 `research/` holds retained evidence, including frozen copies of sources, and is
 outside the layering.
@@ -56,8 +59,9 @@ retained receipt (`autonomy/evidence/pins.py status` prints the count per area).
 validators also require an exact file inventory, so adding a file there changes
 what they admit:
 
-- `cohort/sustained_sources.py`: every `*.py` under `pipeline/`, `insula/`,
-  `gpu/`, `tier1/` and `cohort/`, plus the source snapshot helper, which
+- `cohort/sustained_sources.py`: every `*.py` under `dataset/`, `geometry/`,
+  `segmentation/`, `resources/`, `pipeline/`, `insula/`, `gpu/`, `tier1/`
+  and `cohort/`, plus the source snapshot helper, which
   `cohort/sustained_controller_backend.py` freezes for each sustained run;
 - `resources/sources.py`: every `*.py` under `resources/`.
 

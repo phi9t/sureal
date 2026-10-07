@@ -4,10 +4,6 @@ SUSTAINED_RUN_SOURCE_GLOBS = [
     "tier1/**/*.py",
 ]
 
-RESOURCE_SOURCE_LAYER_GLOBS = [
-    "resources/**/*.py",
-]
-
 SUSTAINED_CHECKPOINT_RETENTION_HOST_SOURCES = [
     "advanced/archive.py",
     "advanced/retention.py",

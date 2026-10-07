@@ -4,7 +4,7 @@ from pathlib import Path
 discoveries=[('/experiment/tests','test_native_detection_adapter.py'),
              ('/experiment/tests','test_detection_export.py'),
              ('/experiment/segmentation','segmentation_export_test.py'),
-             ('/experiment/segmentation','camera_semantic_scoring_test.py'),
+             ('/experiment/camera','camera_semantic_scoring_test.py'),
              ('/experiment/segmentation','nlz_overlap_test.py')]
 suite=unittest.TestSuite()
 for start,pattern in discoveries:suite.addTests(unittest.defaultTestLoader.discover(start,pattern=pattern))

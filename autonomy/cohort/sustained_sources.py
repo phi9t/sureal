@@ -3,12 +3,12 @@ import re
 from pathlib import Path
 from evidence.source_snapshot import LocalSnapshotStore,source_snapshot_receipt,verify_materialized_sources
 
-REQUIRED=frozenset('''cohort/train_sustained.py cohort/sustained_contract.py cohort/sustained_loop.py cohort/sustained_loss.py cohort/sustained_state.py cohort/sustained_sources.py evidence/source_snapshot.py insula/entry.py insula/runtime_identity.py tier1/catalog.py tier1/models.py tier1/admission.py tier1/storage.py detection/pillar_detector.py detection/pillar_encoder.py detection/detector_loss.py geometry/geometry.py geometry/geometry_foundation.py detection/norm_variants.py detection/architecture_variants.py detection/architecture_followups.py'''.split())
+REQUIRED=frozenset('''cohort/train_sustained.py cohort/sustained_contract.py cohort/sustained_loop.py cohort/sustained_loss.py cohort/sustained_state.py cohort/sustained_sources.py evidence/source_snapshot.py insula/entry.py insula/runtime_identity.py tier1/catalog.py tier1/models.py tier1/admission.py tier1/storage.py detection/pillar_detector.py detection/pillar_encoder.py detection/detector_loss.py geometry/geometry.py geometry/geometry_foundation.py detection/norm_variants.py detection/architecture_variants.py detection/architecture_followups.py resources/replay_values.py'''.split())
 SNAPSHOT_TARGET='//autonomy:sustained-run-sources'
 
 def source_paths(root):
  root=Path(root)
- paths=sorted(str(p.relative_to(root)) for directory in ['dataset','geometry','segmentation','detection','pipeline','tier1','cohort','evidence','insula'] for p in (root/directory).rglob('*.py') if '__pycache__' not in p.parts)
+ paths=sorted(str(p.relative_to(root)) for directory in ['dataset','geometry','segmentation','resources','detection','inspection','camera','pipeline','tier1','cohort','evidence','insula'] for p in (root/directory).rglob('*.py') if '__pycache__' not in p.parts)
  if not REQUIRED<=set(paths):raise ValueError('complete sustained execution source closure required')
  return paths
 

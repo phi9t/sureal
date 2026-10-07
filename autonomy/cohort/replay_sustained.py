@@ -6,7 +6,7 @@ import torch
 from cohort.sustained_contract import validate_contract
 from cohort.sustained_sources import validate_sources
 from cohort.sustained_state import restore_state,capture_state
-from cohort.sustained_replay_values import require_exact_state,require_exact_heads
+from resources.replay_values import require_exact_state,require_exact_heads
 from cohort.sustained_reference import reference_updates
 from cohort.sustained_loss import class_balanced_objective
 from tier1.catalog import catalog

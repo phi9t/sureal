@@ -1,21 +1,16 @@
 """Separate exact-inventory admission for resource HDFS readback/recovery."""
-import hashlib,json,re
+import json,re
 from pathlib import Path
-from advanced.archive import safe_name
+from evidence.source_snapshot import safe_member_name
+from resources.sources import regular,sha
 
 LIMIT=128*1024**2
 EXTRA={'manifest_readback_exact','publication_manifest_hdfs_uri','publication_manifest_sha256','independent_admission'}
 ORDER=['create-live','archive-put','archive-get','manifest-put','manifest-get','verify-live','rehydrate-live']
 
-
-def sha(path):
-    with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
-
-
 def validate_archive_snapshot(pub,chunk,check,mode):
     """Reconcile retained worker inputs/results with its exact chunk contract."""
     from resources.command import inspect_command
-    from resources.sources import regular
     try:
         inputs=Path(check['input_directory']);job=inputs/'job.json'
         if not regular(job) or check['input_hashes']!={str(job):sha(job)}:
@@ -76,13 +71,13 @@ def validate_union(pub,expected,readback,source=None):
                     index==6 and value.get('verified_rehydration') is not True):
                     raise ValueError('complete live archive recovery required')
             for member in members:
-                name=safe_name(member['path'])
+                name=safe_member_name(member['path'])
                 if (name in union or name not in expected or type(member['bytes']) is not int or member['bytes']<0 or
                     member['sha256']!=expected[name]['sha256'] or member['bytes']!=expected[name]['bytes']):
                     raise ValueError('unique complete resource member bytes required')
                 if source is not None:
                     local=Path(source)/name
-                    if (not local.is_file() or any(p.is_symlink() for p in [local,*local.parents]) or
+                    if (not regular(local) or
                         local.stat().st_size!=member['bytes'] or sha(local)!=member['sha256']):
                         raise ValueError('original resource source bytes differ')
                 union[name]=member['sha256']
@@ -97,14 +92,13 @@ def validate_union(pub,expected,readback,source=None):
 
 def validate_live_references(pub):
     from resources.stage import validate_proof
-    from resources.sources import regular
     pins=pub['resource_source_pins'];current=Path(pub['resource_source_directory'])
     execution=Path(pub['execution_directory'])
     archive=execution/'advanced/archive.py'
     if not regular(archive) or sha(archive)!=pub['archive_library']['sha256']:
         raise ValueError('executed archive helper differs from native pinned library')
     for name,digest in pins['source_pins'].items():
-        path=execution/'resources'/name
+        path=execution/name
         if not regular(path) or sha(path)!=digest:raise ValueError('executed resource helper source changed')
     for chunk in pub['chunks']:
         for index,mode in [(0,'create'),(5,'verify'),(6,'rehydrate')]:
