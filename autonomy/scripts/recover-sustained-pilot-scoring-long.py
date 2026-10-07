@@ -9,7 +9,7 @@ from pathlib import Path
 P=Path(__file__).resolve().parents[1];sys.path.insert(0,str(P))
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
-from cohort.sustained_scoring_budget import scoring_budget
+from resources.sustained_scoring_budget import scoring_budget
 C=Path.home()/'.cache/waystone/waymo-perception'
 def sha(path):
  with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
@@ -39,7 +39,7 @@ def main():
   if before.count('timeout=600')!=1:raise ValueError('exact native timeout site required')
   path.write_text(before.replace('timeout=600',f'timeout={native_seconds}'))
   changes[name]={'original_sha256':sha(oldcode/'cohort'/name),'recovery_sha256':sha(path),'only_change':f'native subprocess timeout=600 -> timeout={native_seconds}'}
- pins={str(p.relative_to(code)):sha(p) for p in code.rglob('*.py')};host_pins={str(Path(__file__).resolve()):sha(__file__),str(P/'cohort/sustained_scoring_budget.py'):sha(P/'cohort/sustained_scoring_budget.py'),str(P/'insula/entry.py'):sha(P/'insula/entry.py'),str(P/'insula/runtime_identity.py'):sha(P/'insula/runtime_identity.py')}
+ pins={str(p.relative_to(code)):sha(p) for p in code.rglob('*.py')};host_pins={str(Path(__file__).resolve()):sha(__file__),str(P/'resources/sustained_scoring_budget.py'):sha(P/'resources/sustained_scoring_budget.py'),str(P/'insula/entry.py'):sha(P/'insula/entry.py'),str(P/'insula/runtime_identity.py'):sha(P/'insula/runtime_identity.py')}
  root=C/'metrics-rootfs';runtime=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,runtime['rootfs_sha256']);prepared=original/'prepared-35';export=json.loads((original/'export-35-verified.json').read_text());source=R/'input';source.mkdir();shutil.copyfile(manifest,source/'manifest.json')
  def stage(name,worker,extra):
   inputdir=R/(name+'-input');shutil.copytree(source,inputdir);inputpins={str(p):sha(p) for p in inputdir.iterdir()};out=R/name;out.mkdir();command=launch_plan(root,code,prepared,out,['python','/experiment/cohort/'+worker]);at=command.index('--');command[at:at]=extra(inputdir);started=time.monotonic()

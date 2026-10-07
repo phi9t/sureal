@@ -17,6 +17,7 @@ ARCHITECTURE_RUNFILES = glob([
 ])
 
 PROCEDURE_RECORDS = glob([
+    "balanced16/procedure_records/*.py",
     "expanded_batch/procedure_records/*.py",
     "fixed_batch/procedure_records/*.py",
 ])
@@ -34,7 +35,7 @@ py_library(
     imports = [".."],
     visibility = [
         "//autonomy:__pkg__",
-        "//autonomy/cohort:__pkg__",
+        "//autonomy/training_execution:__pkg__",
     ],
     deps = [
         "//autonomy/evidence:evidence",

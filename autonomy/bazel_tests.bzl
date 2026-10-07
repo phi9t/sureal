@@ -8,28 +8,28 @@ PYTEST_MODULES = [
 LEGACY_NATIVE_TOOL_MODULES = []
 
 TORCH_MODULES = [
-    "cohort/test_sustained_chunk_reference.py",
-    "cohort/test_sustained_literal_loss.py",
-    "cohort/test_sustained_loop.py",
-    "cohort/test_sustained_loss.py",
-    "cohort/test_sustained_reference.py",
-    "cohort/test_sustained_state.py",
-    "cohort/test_sustained_transition_guard.py",
-    "cohort/test_sustained_worker_guard.py",
     "dataset/expanded_batch_observations_test.py",
     "detection/expanded_batch/models_test.py",
     "detection/expanded_batch/point_modules_test.py",
     "detection/expanded_batch/sparse_sets_test.py",
+    "detection/sustained_literal_loss_test.py",
+    "detection/sustained_loss_test.py",
     "tests/test_camera_interpolation_parity.py",
+    "training_execution/audit_sustained_transition_test.py",
+    "training_execution/sustained_chunk_reference_test.py",
+    "training_execution/sustained_loop_test.py",
+    "training_execution/sustained_reference_test.py",
+    "training_execution/sustained_state_test.py",
+    "training_execution/sustained_worker_guard_test.py",
 ]
 
 TORCH_CPU_ONLY_MODULES = [
-    "cohort/test_sustained_transition_guard.py",
-    "cohort/test_sustained_worker_guard.py",
+    "training_execution/audit_sustained_transition_test.py",
+    "training_execution/sustained_worker_guard_test.py",
 ]
 
 LIVE_GATE_MODULES = [
-    "cohort/test_sustained_native_metric_gate.py",
+    "evaluation/metrics_sustained_v3_test.py",
     "insula/m0_receipt_test.py",
 ]
 

@@ -3,12 +3,15 @@
 This companion never substitutes for native math, model-state or metric gates.
 It preserves all seven stage proofs under one digest for progression/recovery.
 """
-import json
-from pathlib import Path
+import hashlib,json,os
+from pathlib import Path,PurePosixPath
 from evidence.source_snapshot import safe_member_name
 from evidence.source_snapshot import verify_materialized_sources
+from resources.command import inspect_command
 from resources.sources import regular,sha
 from resources.stage import write_new,require_separate
+from resources.retention_audit import EXTRA as PUBLICATION_EXTRA,validate_live_references,validate_union
+from resources.stage import validate_proof
 
 STAGES=('train','audit','literal-loss','export','proposals','score','metrics-audit')
 
@@ -56,6 +59,275 @@ def _path(backend,record):
     path=backend.resource_root/'checkpoints'/f'checkpoint-{record["target_step"]:02d}.json'
     require_separate(Path(record['root']),path)
     return path
+
+
+def _stable_digest(value):
+    data=json.dumps(value,sort_keys=True,separators=(',',':')).encode()
+    return hashlib.sha256(data).hexdigest()
+
+
+def publication_record_path(backend,record):
+    path=backend.resource_root/'checkpoints'/f'checkpoint-{record["target_step"]:02d}-resource-publication.json'
+    require_separate(Path(record['root']),path)
+    return path
+
+
+def _publication_readback(pub):
+    return {key:value for key,value in pub.items() if key not in PUBLICATION_EXTRA}
+
+
+def _publication_identity(path):
+    path=Path(path)
+    value=json.loads(path.read_text())
+    receipt=value['resource_receipt']
+    return {'sidecar_path':str(path),'sidecar_sha256':sha(path),
+            'receipt_path':receipt['path'],'receipt_sha256':receipt['sha256'],
+            'hdfs_manifest_uri':receipt['hdfs_manifest_uri'],'kind':receipt['kind']}
+
+
+def _receipt_from_identity(identity):
+    return {'path':identity['receipt_path'],'sha256':identity['receipt_sha256'],
+            'hdfs_manifest_uri':identity['hdfs_manifest_uri'],'kind':identity['kind']}
+
+
+def _without_independent(pub):
+    return {key:value for key,value in pub.items() if key!='independent_admission'}
+
+
+def _option_records(options):
+    return [tuple([option,*values]) for option,values in options]
+
+
+MOUNT_OPTIONS={'--ro-bind','--bind','--dev-bind','--proc','--dev','--tmpfs'}
+
+
+def _mounts(options,alias,option=None):
+    return [(found,values) for found,values in options
+            if found in MOUNT_OPTIONS and values and (option is None or found==option) and values[-1]==alias]
+
+
+MASKED_AUDIT_ROOT_ENTRIES={'dev','experiment','outputs','proc','source','tmp'}
+
+
+def _rootfs_entry_types(entries):
+    return {path.name:{'kind':'symlink' if path.is_symlink() else 'directory' if path.is_dir() else 'file',
+                       'symlink_target':os.readlink(path) if path.is_symlink() else None}
+            for path in entries}
+
+
+def _expected_audit_namespace(pub):
+    root=Path(pub['rootfs_path'])
+    if not root.is_dir() or root.is_symlink():
+        raise ValueError('regular admitted resource rootfs required')
+    entries=sorted(root.iterdir(),key=lambda p:p.name)
+    readonly=[item for path in entries if path.name not in MASKED_AUDIT_ROOT_ENTRIES
+              for item in ['--ro-bind',str(path),'/'+path.name]]
+    masked=[path.name for path in entries if path.name in MASKED_AUDIT_ROOT_ENTRIES]
+    return {'private_tmpfs_root':True,'source_rootfs_sha256':pub['runtime_lock']['rootfs_sha256'],
+            'readonly_entry_bindings':readonly,'masked_role_entries':masked,
+            'source_entry_types':_rootfs_entry_types(entries),
+            'scope':'readonly rootfs source entries over a private root; symlink source entries dereference to mounts; native roles override their original stubs'}
+
+
+def _single_mount(options,option,source,alias):
+    if _mounts(options,alias)!=[(option,(source,alias))]:
+        raise ValueError('independent resource audit command mounts differ')
+
+
+def _reject_protected_descendant_mounts(options,aliases):
+    protected=[PurePosixPath(alias) for alias in aliases]
+    for option,values in options:
+        if option not in MOUNT_OPTIONS or not values:
+            continue
+        target=PurePosixPath(values[-1])
+        for alias in protected:
+            if target!=alias and target.is_relative_to(alias):
+                raise ValueError('independent resource audit command mounts differ')
+
+
+def _validate_publication_external_bindings(backend,pub):
+    try:
+        identity=getattr(backend,'resource_identity',{})
+        if pub['resource_source_pins']!=identity['source_pins']:
+            raise ValueError('resource publication source identity differs from backend')
+        cpu_runtime=getattr(backend,'cpu_runtime',None)
+        if cpu_runtime is not None and pub['runtime_lock']!=cpu_runtime:
+            raise ValueError('resource publication runtime identity differs from backend')
+        cpu_root=getattr(backend,'resource_cpu_root',None)
+        if cpu_root is None and getattr(backend,'resource_cache_root',None) is not None:
+            cpu_root=Path(backend.resource_cache_root)/'insula/rootfs-v2'
+        if cpu_root is not None and Path(pub['rootfs_path'])!=Path(cpu_root):
+            raise ValueError('resource publication rootfs identity differs from backend')
+        host=getattr(backend,'host_pins',None)
+        if host is not None and 'resources/resource_archive.py' in host.get('source_pins',{}):
+            archive=Path(host['source_snapshot_root'])/'resources/resource_archive.py'
+            if pub['archive_library']!={'path':str(archive),'sha256':host['source_pins']['resources/resource_archive.py']}:
+                raise ValueError('resource publication archive helper differs from admitted host source')
+    except (KeyError,TypeError,AttributeError) as error:
+        raise ValueError('complete backend-bound resource publication identity required') from error
+
+
+def _validate_independent_admission(pub,inventory,readback):
+    try:
+        admission=pub['independent_admission'];command=admission['command']
+        if admission['exit_code']!=0 or admission['validation']['whole_member_union_exact'] is not True:
+            raise ValueError('independent resource recovery admission required')
+        proof_path=Path(admission['resource_proof_path'])
+        if not regular(proof_path) or sha(proof_path)!=admission['resource_proof_sha256']:
+            raise ValueError('independent resource proof changed')
+        proof=json.loads(proof_path.read_text())
+        validate_proof(proof,command,Path(pub['resource_source_directory']),pub['resource_source_pins'],
+                       Path(proof['native_output_directory']),16*1024**3,300)
+        if proof['worker_argv']!=['/experiment/resources/retention_audit.py']:
+            raise ValueError('independent resource audit worker required')
+        _,_,options=inspect_command(command)
+        option_records=_option_records(options)
+        inputs=Path(admission['input_directory'])
+        required_mounts=[
+            ('--ro-bind',pub['execution_directory'],'/experiment'),
+            ('--ro-bind',str(inputs),'/tmp/inputs'),
+            ('--ro-bind',pub['archive_library']['path'],'/tmp/resource-archive.py'),
+            ('--bind',proof['native_output_directory'],'/outputs'),
+        ]
+        for option,source,alias in required_mounts:
+            _single_mount(options,option,source,alias)
+        source_mounts=_mounts(options,'/source')
+        if len(source_mounts)!=1 or source_mounts[0][0]!='--ro-bind':
+            raise ValueError('independent resource audit source mount differs')
+        source_root=Path(source_mounts[0][1][0])
+        if source_root.exists():
+            result=validate_union(pub,inventory,readback,source_root)
+        else:
+            result=validate_union(pub,inventory,readback)
+        namespace=pub['audit_runtime_namespace']
+        if namespace!=_expected_audit_namespace(pub):
+            raise ValueError('independent resource audit runtime namespace differs')
+        readonly=namespace['readonly_entry_bindings']
+        for index in range(0,len(readonly),3):
+            _single_mount(options,readonly[index],readonly[index+1],readonly[index+2])
+        protected=['/source','/tmp/inputs','/tmp/resource-archive.py','/outputs']
+        protected.extend(readonly[index+2] for index in range(0,len(readonly),3))
+        _reject_protected_descendant_mounts(options,protected)
+        if _mounts(options,'/') or ('--ro-bind',pub['rootfs_path'],'/') in option_records:
+            raise ValueError('independent audit must use private root with readonly runtime entries')
+        expected_inputs={str(inputs/name):sha(inputs/name) for name in ['publication.json','expected.json','readback.json']}
+        if admission['input_hashes']!=expected_inputs:
+            raise ValueError('independent resource audit inputs changed')
+        if (json.loads((inputs/'publication.json').read_text())!=_without_independent(pub) or
+            json.loads((inputs/'expected.json').read_text())!=inventory or
+            json.loads((inputs/'readback.json').read_text())!=readback):
+            raise ValueError('independent resource audit input identities differ')
+        artifacts=admission['artifacts'];names={Path(path).name:path for path in artifacts}
+        if set(names)!={'check.json','live.log'} or len(artifacts)!=2:
+            raise ValueError('independent resource audit outputs required')
+        for path,digest in artifacts.items():
+            if not regular(Path(path)) or sha(path)!=digest:
+                raise ValueError('independent resource audit output changed')
+        expected_validation={**result,'corrupt_resource_copies_refused':5}
+        if admission['validation']!=expected_validation or json.loads(Path(names['check.json']).read_text())!=expected_validation:
+            raise ValueError('independent resource audit output differs from receipt')
+        if artifacts[names['live.log']]!=proof['artifacts']['execution_log']['sha256']:
+            raise ValueError('independent resource audit log differs from execution proof')
+    except (KeyError,TypeError,OSError,AttributeError) as error:
+        raise ValueError('complete independent resource admission evidence required') from error
+
+
+def validate_publication_receipt(backend,record,receipt,expected_inventory=None):
+    """Validate resource publication from retained immutable admission evidence."""
+    try:
+        if receipt['kind']!='checkpoint':raise ValueError('checkpoint resource publication required')
+        path=Path(receipt['path'])
+        if not regular(path) or sha(path)!=receipt['sha256']:raise ValueError('resource publication receipt changed')
+        pub=json.loads(path.read_text())
+        if (pub['kind']!='checkpoint' or pub['resource_identity_sha256']!=backend.resource_identity_sha256 or
+            pub['native_manifest_sha256']!=backend.manifest_sha or
+            receipt['hdfs_manifest_uri']!=pub['publication_manifest_hdfs_uri']):
+            raise ValueError('resource publication identity differs')
+        _validate_publication_external_bindings(backend,pub)
+        root=path.parent;expected_path=root/'expected.json';readback_path=root/'publication-readback.json'
+        if (not regular(expected_path) or sha(expected_path)!=pub['source_inventory_sha256'] or
+            json.loads(expected_path.read_text())!=pub['source_inventory'] or
+            not regular(readback_path) or sha(readback_path)!=pub['publication_manifest_sha256'] or
+            json.loads(readback_path.read_text())!=_publication_readback(pub)):
+            raise ValueError('resource publication exact readback evidence changed')
+        readback=json.loads(readback_path.read_text())
+        validate_live_references(pub)
+        result=validate_union(pub,pub['source_inventory'],readback)
+        admission=pub['independent_admission']
+        _validate_independent_admission(pub,pub['source_inventory'],readback)
+        if (admission['exit_code']!=0 or admission['validation']['whole_member_union_exact'] is not True or
+            result['whole_member_union_exact'] is not True):
+            raise ValueError('independent resource recovery admission required')
+        inventory=pub['source_inventory']
+        required={'identity.json':backend.resource_identity_sha256,
+                  'checkpoint.json':record['resource_companion_sha256'],
+                  'native-final.json':record['final_sha256'],
+                  'producer-report.json':record['report_sha256'],
+                  'native-manifest.json':backend.manifest_sha}
+        for name,digest in required.items():
+            if inventory.get(name,{}).get('sha256')!=digest:
+                raise ValueError('resource publication retained wrong checkpoint identity')
+        if expected_inventory is not None and (inventory!=expected_inventory or _stable_digest(inventory)!=_stable_digest(expected_inventory)):
+            raise ValueError('resource publication inventory differs from live companion closure')
+    except (KeyError,TypeError,OSError,AttributeError) as error:
+        raise ValueError('complete resource publication receipt required') from error
+    return pub
+
+
+def write_publication_record(backend,record,receipt,expected_inventory):
+    validate_publication_receipt(backend,record,receipt,expected_inventory)
+    path=publication_record_path(backend,record)
+    value={'schema_version':1,'record_final_path':record['final_path'],
+           'record_final_sha256':record['final_sha256'],'target_step':record['target_step'],
+           'resource_identity_sha256':backend.resource_identity_sha256,
+           'resource_companion_path':record['resource_companion_path'],
+           'resource_companion_sha256':record['resource_companion_sha256'],
+           'source_inventory_digest':_stable_digest(expected_inventory),
+           'resource_receipt':receipt,
+           'scope':'durable resource publication identity required before native release'}
+    if path.exists():
+        if not regular(path) or json.loads(path.read_text())!=value:
+            raise ValueError('resource publication sidecar identity changed')
+    else:
+        path.parent.mkdir(exist_ok=True);write_new(path,value)
+    identity=_publication_identity(path);record['resource_publication']=identity
+    return identity
+
+
+def recover_publication_record(backend,record,expected_inventory=None):
+    path=publication_record_path(backend,record)
+    if not path.exists():return None
+    if not regular(path):raise ValueError('resource publication sidecar changed')
+    value=json.loads(path.read_text())
+    if (value.get('schema_version')!=1 or value.get('record_final_path')!=record['final_path'] or
+        value.get('record_final_sha256')!=record['final_sha256'] or
+        value.get('target_step')!=record['target_step'] or
+        value.get('resource_identity_sha256')!=backend.resource_identity_sha256 or
+        value.get('resource_companion_sha256')!=record['resource_companion_sha256']):
+        raise ValueError('resource publication sidecar identity differs')
+    if expected_inventory is not None and value.get('source_inventory_digest')!=_stable_digest(expected_inventory):
+        raise ValueError('resource publication sidecar inventory differs')
+    identity=_publication_identity(path)
+    validate_publication_receipt(backend,record,_receipt_from_identity(identity),expected_inventory)
+    record['resource_publication']=identity
+    return identity
+
+
+def validate_publication_record(backend,record):
+    identity=record.get('resource_publication')
+    if identity is None:
+        identity=recover_publication_record(backend,record)
+        if identity is None:raise ValueError('resource publication identity required before native release')
+    path=Path(identity['sidecar_path'])
+    if path!=publication_record_path(backend,record) or not regular(path) or sha(path)!=identity['sidecar_sha256']:
+        raise ValueError('resource publication sidecar changed')
+    value=json.loads(path.read_text())
+    if value['source_inventory_digest']!=_stable_digest(json.loads(Path(value['resource_receipt']['path']).read_text())['source_inventory']):
+        raise ValueError('resource publication inventory digest changed')
+    receipt=_receipt_from_identity(identity)
+    if receipt!=value['resource_receipt']:raise ValueError('resource publication receipt identity changed')
+    validate_publication_receipt(backend,record,receipt)
+    return identity
 
 
 def seal_checkpoint(backend,record):

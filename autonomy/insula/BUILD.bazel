@@ -16,10 +16,13 @@ INSULA_VISIBILITY = [
     "//autonomy/camera:__pkg__",
     "//autonomy/dataset:__pkg__",
     "//autonomy/detection:__pkg__",
+    "//autonomy/evaluation:__pkg__",
     "//autonomy/resources:__pkg__",
+    "//autonomy/retention:__pkg__",
     "//autonomy/motion:__pkg__",
     "//autonomy/inspection:__pkg__",
     "//autonomy/segmentation:__pkg__",
+    "//autonomy/training_execution:__pkg__",
 ]
 
 package(default_visibility = ["//visibility:private"])

@@ -7,15 +7,20 @@ LIB_MODULES = glob(
 )
 DETECTION_VISIBILITY = [
     "//autonomy:__pkg__",
-    "//autonomy/cohort:__pkg__",
     "//autonomy/detection/expanded_batch:__pkg__",
     "//autonomy/evaluation:__pkg__",
     "//autonomy/pipeline:__pkg__",
     "//autonomy/range_view:__pkg__",
     "//autonomy/studies:__pkg__",
+    "//autonomy/training_execution:__pkg__",
 ]
 
 package(default_visibility = ["//visibility:private"])
+
+exports_files(
+    ["sustained_contract.py"],
+    visibility = ["//autonomy:__pkg__"],
+)
 
 py_library(
     name = "detection",
@@ -57,6 +62,8 @@ filegroup(
                 "packed_point_features_test.py",
                 "pillar_detector_test.py",
                 "pillar_encoder_test.py",
+                "sustained_literal_loss_test.py",
+                "sustained_loss_test.py",
             ]
             else []
         ),
