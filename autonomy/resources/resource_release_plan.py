@@ -1,6 +1,7 @@
 """A complete verified HDFS publication is necessary before planning release."""
 from pathlib import Path
-from advanced.archive import safe_name,sha
+from evidence.source_snapshot import require_regular_file
+from resources.resource_archive import safe_name,sha
 STAGES=['create-live','archive-put','archive-get','manifest-put','manifest-get','verify-live','rehydrate-live']
 def release_plan(root,publication):
  root=Path(root)
@@ -15,6 +16,8 @@ def release_plan(root,publication):
    if name in records:raise ValueError('duplicate inventory member')
    records[name]=member;path=root/name
    if not path.is_file() or any(p.is_symlink() for p in [path,*path.parents] if p!=root and root in p.parents):raise ValueError('regular payload without symlinks required')
+   try:require_regular_file(path)
+   except ValueError as error:raise ValueError('regular payload without symlinks required') from error
    if path.stat().st_size!=member['bytes'] or sha(path)!=member['sha256']:raise ValueError('source payload differs')
    plan.append({**member,'local_path':str(path),'archive_hdfs_uri':chunk['archive_hdfs_uri']})
  inventory={str(p.relative_to(root)) for p in root.rglob('*') if p.is_file() or p.is_symlink()}

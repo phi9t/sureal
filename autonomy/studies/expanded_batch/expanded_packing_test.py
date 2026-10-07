@@ -1,5 +1,5 @@
 import unittest,numpy as np
-from advanced.packing import pack_case,range_observations
+from studies.expanded_batch.expanded_packing import pack_case,range_observations
 
 class PackingContract(unittest.TestCase):
  def test_grid_boundaries_and_physical_source_lineage(self):

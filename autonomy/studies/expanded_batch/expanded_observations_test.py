@@ -2,7 +2,7 @@ import tempfile,unittest
 from pathlib import Path
 import numpy as np
 import torch
-from advanced.observations import load_observations
+from studies.expanded_batch.expanded_observations import load_observations
 class ObservationTests(unittest.TestCase):
  def test_ragged_and_auxiliary_are_preserved_without_float_casting_ids(self):
   with tempfile.TemporaryDirectory() as directory:

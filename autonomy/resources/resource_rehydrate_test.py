@@ -1,7 +1,7 @@
 import tempfile,unittest
 from pathlib import Path
-from advanced.archive import create_archive,sha
-from advanced.rehydrate import rehydrate_archive
+from resources.resource_archive import create_archive,sha
+from resources.resource_rehydrate import rehydrate_archive
 class RehydrateTests(unittest.TestCase):
  def test_exact_regular_members_and_existing_destination_rejection(self):
   with tempfile.TemporaryDirectory() as directory:

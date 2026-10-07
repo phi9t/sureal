@@ -1,6 +1,6 @@
 import copy,hashlib,tempfile,unittest
 from pathlib import Path
-from advanced.retention import release_plan
+from resources.resource_release_plan import release_plan
 class RetentionTests(unittest.TestCase):
  def fixture(self,root):
   (root/'checkpoint.pt').write_bytes(b'Adam state')

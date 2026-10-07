@@ -1,5 +1,5 @@
 """Frozen planned-idea recipes and explicit mechanism controls."""
-from tier1.catalog import BASE
+from detection.fixed_batch_catalog import BASE
 
 def catalog():
  names=['grid_fine','grid_coarse','ragged_pillars','point_attention','point_mlp_control','range_fusion','zero_range_control','sparse_bev_transformer']

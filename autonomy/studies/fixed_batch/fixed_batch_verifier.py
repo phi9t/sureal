@@ -1,9 +1,9 @@
 """Read-only release-aware closure of native curves, source pins and replay receipts."""
 import hashlib,json,sys
 from pathlib import Path
-from tier1.admission import fit_interval
-from tier1.receipt_lifecycle import admit_artifact
-from tier1.storage import unique_payload_bytes
+from resources.scientific_budget import fit_interval
+from evidence.artifact_lifecycle import admit_artifact
+from resources.scientific_payload import unique_payload_bytes
 
 HOST_CACHE=None
 def resolved(p):

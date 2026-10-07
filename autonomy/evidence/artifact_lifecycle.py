@@ -1,11 +1,10 @@
 """Immutable artifact hashes and explicit transient release/supersession."""
 from pathlib import Path
-try:from tier1.storage import sha
-except ImportError:from storage import sha
+from evidence.source_snapshot import file_sha256
 
 def admit_artifact(path,digest,releases,superseded,physical_path=None):
  p=Path(physical_path or path)
- if p.exists() and sha(p)==digest:return 'retained immutable'
+ if p.exists() and file_sha256(p)==digest:return 'retained immutable'
  if releases.get(str(path))==digest:return 'declared release'
  if digest in superseded:return 'declared supersession'
  raise ValueError(f'Undeclared artifact mutation/removal: {path}')

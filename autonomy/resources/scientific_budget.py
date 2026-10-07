@@ -1,7 +1,5 @@
 """Pre-write scientific budget admission and sampled sustained-fit timing."""
-from pathlib import Path
-try:from tier1.storage import unique_payload_bytes
-except ImportError:from storage import unique_payload_bytes
+from resources.scientific_payload import unique_payload_bytes
 
 def reserve_write(root,maximum_new_bytes,limit=15*1024**3):
  used=unique_payload_bytes(root)

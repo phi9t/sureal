@@ -1,6 +1,6 @@
 import hashlib,json,tarfile,tempfile,unittest
 from pathlib import Path
-from advanced.archive import create_archive,verify_archive
+from resources.resource_archive import create_archive,verify_archive
 
 class ArchiveContract(unittest.TestCase):
  def test_roundtrip_manifest_and_deterministic_bytes(self):

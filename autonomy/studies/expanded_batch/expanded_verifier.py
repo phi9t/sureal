@@ -1,7 +1,7 @@
 """Extend the shared literal/native/replay closure with architecture admission."""
 import json,sys
 from pathlib import Path
-from tier1 import verify_results as native
+from studies.fixed_batch import fixed_batch_verifier as native
 
 def verify(path):
  closure=native.verify(path)

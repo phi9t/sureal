@@ -1,7 +1,7 @@
 import tempfile,unittest,json
 from pathlib import Path
-from advanced.recovery import restore_curve,retain_admission,recover_checkpoint
-from tier1.storage import sha
+from resources.study_recovery import restore_curve,retain_admission,recover_checkpoint
+from resources.scientific_payload import sha
 class RecoveryTests(unittest.TestCase):
  def test_historical_scored_steps_survive_resuming_released_heads(self):
   case={'curve':[{'step':0,'all_class_quality_passed':False},{'step':300,'all_class_quality_passed':False}]}

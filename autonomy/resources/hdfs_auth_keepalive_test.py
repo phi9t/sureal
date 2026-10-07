@@ -1,5 +1,5 @@
 import unittest
-from advanced.auth_keepalive import refresh_once
+from resources.hdfs_auth_keepalive import refresh_once
 class KeepaliveTests(unittest.TestCase):
  def test_valid_renewable_ticket_refreshes_without_interactive_kinit(self):
   calls=[]

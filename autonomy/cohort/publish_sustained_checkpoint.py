@@ -2,10 +2,10 @@
 import argparse,fcntl,json,os,shutil,signal,subprocess,sys,uuid
 from pathlib import Path
 P=Path(__file__).resolve().parents[1];sys.path[:0]=[str(P),str(P/'tier1')]
-from advanced.archive import sha,DEFAULT_LIMIT
-from advanced.retention import release_plan
-from tier1.admission import reserve_write
-from tier1.storage import unique_payload_bytes
+from resources.resource_archive import sha,DEFAULT_LIMIT
+from resources.resource_release_plan import release_plan
+from resources.scientific_budget import reserve_write
+from resources.scientific_payload import unique_payload_bytes
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing';CLI=Path.home()/'workspace/waystone/scripts/waystone'

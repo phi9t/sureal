@@ -1,8 +1,8 @@
 import unittest,torch
-from advanced.catalog import catalog
-from advanced.models import build,bind_observations
-from tier1.models import build as baseline_build
-from tier1.catalog import BASE
+from studies.expanded_batch.expanded_catalog import catalog
+from studies.expanded_batch.expanded_models import build,bind_observations
+from detection.fixed_batch_models import build as baseline_build
+from detection.fixed_batch_catalog import BASE
 from detection.pillar_encoder import decorate
 
 class FactoryContract(unittest.TestCase):

@@ -1,6 +1,6 @@
 import unittest,torch
 from cohort.sustained_loss import class_balanced_objective
-from tier1.models import objective
+from detection.fixed_batch_models import objective
 
 class SustainedLossTests(unittest.TestCase):
  def fixture(self,labels):

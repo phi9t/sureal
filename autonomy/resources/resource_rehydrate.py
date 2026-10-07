@@ -1,7 +1,7 @@
 """Bounded verified recovery to a fresh directory; no general tar extraction."""
 import shutil,tarfile
 from pathlib import Path
-from advanced.archive import verify_archive,sha
+from resources.resource_archive import verify_archive,sha
 
 def rehydrate_archive(archive,manifest,destination,*,max_bytes):
  check=verify_archive(archive,manifest,max_bytes=max_bytes)

@@ -8,9 +8,9 @@ from cohort.sustained_loop import advance
 from cohort.sustained_loss import class_balanced_objective
 from cohort.sustained_state import restore_state
 from cohort.sustained_sources import validate_sources
-from tier1.catalog import catalog
-from tier1.models import build,objective,optimizer,deterministic
-from tier1.admission import reserve_write
+from detection.fixed_batch_catalog import catalog
+from detection.fixed_batch_models import build,objective,optimizer,deterministic
+from resources.scientific_budget import reserve_write
 
 def sha(path):
  with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()

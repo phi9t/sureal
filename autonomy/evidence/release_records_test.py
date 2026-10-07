@@ -1,6 +1,6 @@
 import json,tempfile,unittest
 from pathlib import Path
-from tier1.receipt_lifecycle import load_release_records
+from evidence.artifact_lifecycle import load_release_records
 class ResumeReleaseTests(unittest.TestCase):
  def test_resume_keeps_previously_admitted_release_records(self):
   with tempfile.TemporaryDirectory() as d:

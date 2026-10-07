@@ -1,11 +1,12 @@
 """Deterministic, bounded archives with independent member/hash verification."""
 import gzip,hashlib,tarfile
 from pathlib import Path,PurePosixPath
+from evidence.source_snapshot import file_sha256,require_regular_file
 
 DEFAULT_LIMIT=768*1024**2
 
 def sha(path):
- with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+ return file_sha256(path)
 
 def safe_name(name):
  if not isinstance(name,str) or not name or any(c in name for c in ['\\','\x00','\n','\r']):raise ValueError('unsafe archive member')
@@ -19,7 +20,8 @@ def create_archive(root,paths,archive,*,max_bytes=DEFAULT_LIMIT):
  records=[];sources=[];total=0
  for name in sorted(paths):
   safe_name(name);path=root/name
-  if not path.is_file() or any(p.is_symlink() for p in [path,*path.parents] if p!=root and root in p.parents):raise ValueError('regular source files without symlinks required')
+  try:require_regular_file(path)
+  except ValueError as error:raise ValueError('regular source files without symlinks required') from error
   if root not in path.resolve().parents:raise ValueError('source outside archive root')
   size=path.stat().st_size;total+=size
   if total>max_bytes:raise ValueError('archive payload exceeds bound')
@@ -30,7 +32,7 @@ def create_archive(root,paths,archive,*,max_bytes=DEFAULT_LIMIT):
    with tarfile.open(fileobj=compressed,mode='w',format=tarfile.PAX_FORMAT) as writer:
     for record,path in zip(records,sources):
      info=tarfile.TarInfo(record['path']);info.size=record['bytes'];info.mode=0o444;info.mtime=0;info.uid=info.gid=0
-     with path.open('rb') as stream:writer.addfile(info,stream)
+   with require_regular_file(path).open('rb') as stream:writer.addfile(info,stream)
  manifest={'schema_version':1,'members':records,'payload_bytes':total,'archive_bytes':archive.stat().st_size,'archive_sha256':sha(archive)}
  verify_archive(archive,manifest,max_bytes=max_bytes)
  return manifest

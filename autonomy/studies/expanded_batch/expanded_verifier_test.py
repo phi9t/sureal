@@ -1,8 +1,8 @@
 import json,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch
-from advanced.verify_results import verify
-from tier1.storage import sha
+from studies.expanded_batch.expanded_verifier import verify
+from resources.scientific_payload import sha
 class AdmissionVerifierTests(unittest.TestCase):
  def test_swapping_architecture_identity_is_rejected(self):
   with tempfile.TemporaryDirectory() as directory:

@@ -1,7 +1,7 @@
 """Preserve admitted history and cache-local evidence across interruptions."""
 import json,shutil
 from pathlib import Path
-from tier1.storage import sha
+from resources.scientific_payload import sha
 
 def restore_curve(previous):
  curve=json.loads(json.dumps(previous.get('curve',[])))

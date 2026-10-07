@@ -23,8 +23,8 @@ def main():
  from cohort.sustained_contract import validate_contract
  from resources.replay_values import require_exact_state
  from cohort.sustained_loss import class_balanced_objective
- from tier1.catalog import catalog
- from tier1.models import build,optimizer,deterministic,objective
+ from detection.fixed_batch_catalog import catalog
+ from detection.fixed_batch_models import build,optimizer,deterministic,objective
  from sustained_chunk_reference import reference_chunk
  from cohort.replay_sustained import main as replay_heads
  torch.cuda.reset_peak_memory_stats();started=time.monotonic()
