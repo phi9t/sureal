@@ -1,5 +1,4 @@
 """Deterministic sensor-to-scene views with retained overlay point identities."""
-import hashlib
 import io
 import json
 from pathlib import Path
@@ -7,11 +6,10 @@ import sys
 import numpy as np
 import pyarrow.parquet as pq
 from PIL import Image,ImageDraw
+from evidence.source_snapshot import file_sha256
 from .inspection import bev_raster,projection_samples,range_raster
 from dataset.sensor_records import select_rows
 
-
-def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 
 def scalar_image(values):
     valid=np.isfinite(values);gray=np.zeros(values.shape,dtype=np.uint8)
@@ -39,7 +37,7 @@ def main():
             name=f'{context}-{stamp}';frameout=out/name;frameout.mkdir();xyzs=[];sensorrows=[]
             for r in reconstruction['rows']:
                 if r['context']!=context or r['timestamp']!=stamp:continue
-                if sha(geometry/r['artifact'])!=r['sha256']:raise ValueError('geometry artifact changed')
+                if file_sha256(geometry/r['artifact'])!=r['sha256']:raise ValueError('geometry artifact changed')
                 with np.load(geometry/r['artifact']) as a:
                     xyzs.append(a['xyz']);shape=shapes[(stamp,r['laser'],r['return'])]
                     values=range_raster(a['pixels'],a['physical_features'][:,0],shape)
@@ -79,11 +77,11 @@ def main():
                         p='[CameraSegmentationLabelComponent]';pan=np.asarray(Image.open(io.BytesIO(label[p+'.panoptic_label'])));sem=pan//label[p+'.panoptic_label_divisor']
                         np.save(frameout/f'camera-{camera}-semantic.npy',sem)
                     cameras.append({'camera':camera,'samples':len(indexes),'width':image.width,'height':image.height,'segmentation_present':label is not None,
-                                    'source_image_sha256':hashlib.sha256(image_bytes).hexdigest()})
+                                    'source_image_sha256':file_sha256(frameout/f'camera-{camera}.jpg')})
             records.append({'context':context,'timestamp':stamp,'directory':name,'sensors':sensorrows,'cameras':cameras,'points':len(xyz),'bev':counts,
                             'top_segmentation_present':toprow['segmentation_present']})
-    artifacts={str(p.relative_to(out)):sha(p) for p in out.rglob('*') if p.is_file()}
-    report={'schema_version':1,'frames':records,'artifacts':artifacts,'geometry_report_sha256':sha(geometry/'report.json'),
+    artifacts={str(p.relative_to(out)):file_sha256(p) for p in out.rglob('*') if p.is_file()}
+    report={'schema_version':1,'frames':records,'artifacts':artifacts,'geometry_report_sha256':file_sha256(geometry/'report.json'),
             'display_contract':{'bev':'x horizontal, y upward; [-75,75) meters; 0.5m cells; density is observation support, not free-space truth',
                                 'range':'gray=clipped 2*meters; purple=unobserved/invalid range','camera':'native original-image pixels; TOP return1; up to 5000 samples per camera',
                                 'semantic':'native category IDs; visualization colors carry no learned predictions'},

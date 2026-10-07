@@ -2,8 +2,8 @@ import unittest
 
 import numpy as np
 
-from export.quantize import (decode_elongation, decode_intensity, dequantize_xyz, encode_elongation,
-                             encode_intensity, pack_flags, quantize_xyz, unpack_flags)
+from inspection.viewer.export.quantize import (decode_elongation, decode_intensity, dequantize_xyz, encode_elongation,
+                                               encode_intensity, pack_flags, quantize_xyz, unpack_flags)
 
 
 class QuantizeTest(unittest.TestCase):

@@ -37,7 +37,7 @@
   <p class="lede">A browser-based 3D viewer for Waymo Open Dataset Perception v2.0.1 scenes: five LiDARs fused into one point cloud, five calibrated cameras with their images in place, 3D and 2D labels, panoptic and LiDAR segmentation, human keypoints, the ego trajectory, and temporal accumulation, rendered with Three.js from bundles exported by a small PyArrow/NumPy pipeline. No TensorFlow, no Waymo SDK.</p>
   <div class="cta">
     <a class="primary" href="viewer/">Open the viewer</a>
-    <a href="https://github.com/phi9t/sureal/tree/main/autonomy/viewer">Source on GitHub</a>
+    <a href="https://github.com/phi9t/sureal/tree/main/autonomy/inspection/viewer">Source on GitHub</a>
   </div>
 
   <div class="shots">
@@ -53,7 +53,7 @@
 
   <h2>Run it on your data</h2>
 <pre>git clone git@github.com:phi9t/sureal.git && cd sureal
-V=autonomy/viewer/run.sh
+V=autonomy/inspection/viewer/run.sh
 $V setup                                   # uv venv + npm ci
 $V export "$SLICE_DIR" "$CONTEXT"          # ~40 s and ~1 GB per 20 s scene
 $V verify "$SLICE_DIR" "$CONTEXT"          # independent geometry and hash checks

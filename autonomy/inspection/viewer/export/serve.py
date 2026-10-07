@@ -1,6 +1,6 @@
 """Serve the built viewer (web/dist) and the bundle cache from one local origin.
 
-Usage: python -m export.serve --dist DIR --bundles DIR [--port 8420] [--host 127.0.0.1]
+Usage: python -m inspection.viewer.export.serve --dist DIR --bundles DIR [--port 8420] [--host 127.0.0.1]
 
 Bundles are Waymo-derived data under the Waymo Open Dataset terms: keep this
 server bound to localhost or a trusted network. Supports HTTP Range requests and

@@ -8,8 +8,8 @@ remain outside Git. The command below describes the preserved local candidate,
 and is not yet available in a clean mainline checkout.
 
 Candidate refresh has no clean-mainline command yet. The admitted explorer
-workers are `autonomy/explorer/camera_preview.py` and
-`autonomy/explorer/joint_render.py`; retained receipts own their invocation and
+workers are `autonomy/inspection/explorer/camera_preview.py` and
+`autonomy/inspection/explorer/joint_render.py`; retained receipts own their invocation and
 source-bound artifact checks.
 
 The explorer includes 16 selected training frames from 13 scenes, native FRONT-camera previews, eligible upright boxes in vehicle coordinates, class coverage, and positive-anchor coverage. It preserves uncovered ground truth. This is selected-frame inspection, not full-scene playback, calibrated camera/LiDAR projection, or a model-quality claim.

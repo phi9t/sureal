@@ -1,6 +1,6 @@
 """Export one Waymo Perception v2 context from a Waystone slice into a viewer bundle.
 
-Usage: python -m export.export --slice SLICE_DIR --context NAME --out CACHE_DIR
+Usage: python -m inspection.viewer.export.export --slice SLICE_DIR --context NAME --out CACHE_DIR
        [--frames N] [--no-proj] [--force]
 
 Output: CACHE_DIR/bundles/{slice_id}/{context}/ (written to a .partial dir, then renamed).

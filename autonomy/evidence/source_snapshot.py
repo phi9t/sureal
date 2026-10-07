@@ -220,9 +220,13 @@ def require_regular_file(path):
     return path
 
 
-def file_sha256(path) -> str:
+def file_digest(path, algorithm: str) -> str:
     with require_regular_file(path).open("rb") as stream:
-        return hashlib.file_digest(stream, "sha256").hexdigest()
+        return hashlib.file_digest(stream, algorithm).hexdigest()
+
+
+def file_sha256(path) -> str:
+    return file_digest(path, "sha256")
 
 
 def safe_member_name(name: str) -> str:

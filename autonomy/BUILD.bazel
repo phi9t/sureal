@@ -18,6 +18,7 @@ filegroup(
         "//autonomy/detection:all_py",
         "//autonomy/evidence:all_py",
         "//autonomy/geometry:all_py",
+        "//autonomy/inspection:all_py",
         "//autonomy/insula:all_py",
         "//autonomy/segmentation:all_py",
     ],
@@ -62,6 +63,7 @@ PERCEPTION_TEST_MODULES = glob(
     exclude = [
         "dataset/**",
         "detection/**",
+        "inspection/**",
         "segmentation/**",
         "research/**",
         "source_snapshot_targets_test.py",
@@ -73,12 +75,14 @@ PERCEPTION_RUNFILES = glob(
     exclude = [
         "dataset/**",
         "detection/**",
+        "inspection/**",
         "segmentation/**",
         "research/**",
         "**/__pycache__/**",
     ],
 ) + [
     "//autonomy/dataset:runfiles",
+    "//autonomy/inspection:runfiles",
     "//autonomy/segmentation:runfiles",
     "research/association41-runtime-admission-20261003a/manifest.json",
 ]
@@ -88,6 +92,7 @@ PERCEPTION_DEPS = [
     "//autonomy/detection:detection",
     "//autonomy/evidence:evidence",
     "//autonomy/geometry:geometry",
+    "//autonomy/inspection:inspection",
     "//autonomy/insula:insula",
     "//autonomy/segmentation:segmentation",
 ]
@@ -115,6 +120,7 @@ filegroup(
         "//autonomy/detection:all_py",
         "//autonomy/evidence:source_snapshot_py",
         "//autonomy/geometry:all_py",
+        "//autonomy/inspection:all_py",
         "//autonomy/insula:all_py",
         "//autonomy/segmentation:all_py",
     ] + glob([
@@ -194,6 +200,7 @@ test_suite(
             "//autonomy/detection:all_tests",
             "//autonomy/evidence:all_tests",
             "//autonomy/geometry:all_tests",
+            "//autonomy/inspection:all_tests",
             "//autonomy/insula:all_tests",
             "//autonomy/segmentation:all_tests",
         ],

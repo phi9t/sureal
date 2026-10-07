@@ -5,7 +5,7 @@
 (c) every manifest hash and lineage entry;
 (d) informational: which frame the box `speed` field lives in.
 
-Usage: python -m export.verify --slice DIR --context NAME --bundle DIR [--sample 20] [--frame-stride 10]
+Usage: python -m inspection.viewer.export.verify --slice DIR --context NAME --bundle DIR [--sample 20] [--frame-stride 10]
 """
 import argparse
 import json

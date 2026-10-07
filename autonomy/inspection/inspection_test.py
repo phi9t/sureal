@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from pipeline.inspection import bev_raster, projection_samples, range_raster
+from inspection.inspection import bev_raster, projection_samples, range_raster
 
 class InspectionTests(unittest.TestCase):
     def test_bev_half_open_and_display_axes(self):

@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import numpy as np
+from evidence.source_snapshot import file_sha256 as sha256_file
 
 
 def canonical_json(value):
@@ -33,14 +34,6 @@ def dump_json(value, path):
     data = canonical_json(value)
     Path(path).write_bytes(data)
     return data
-
-
-def sha256_file(path, chunk=1 << 20):
-    h = hashlib.sha256()
-    with open(path, "rb") as f:
-        for block in iter(lambda: f.read(chunk), b""):
-            h.update(block)
-    return h.hexdigest()
 
 
 def sha256_bytes(data):

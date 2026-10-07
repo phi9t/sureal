@@ -4,8 +4,8 @@ from pathlib import Path
 
 import numpy as np
 
-from export.constants import KIND_FLAGS, KIND_RGB, KIND_XYZ
-from export.wpc import Section, read_wpc, write_wpc
+from inspection.viewer.export.constants import KIND_FLAGS, KIND_RGB, KIND_XYZ
+from inspection.viewer.export.wpc import Section, read_wpc, write_wpc
 
 
 class WpcTest(unittest.TestCase):

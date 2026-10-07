@@ -3,6 +3,7 @@
 set -euo pipefail
 
 HERE="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(cd -- "$HERE/../.." && pwd)"
 VENV="${WAYMO_VIEWER_VENV:-$HERE/.venv}"
 CACHE="${WAYMO_VIEWER_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/waystone/waymo-perception/viewer}"
 PY="$VENV/bin/python"
@@ -12,7 +13,7 @@ usage() {
 Usage: run.sh COMMAND [ARGS]
 
   setup                         create .venv with uv, install pinned deps, npm ci
-  test                          run the exporter unit tests (synthetic data only)
+  test                          run inspection/exporter tests through Bazel in Insula
   export SLICE CONTEXT [ARGS]   export one context into $WAYMO_VIEWER_CACHE/bundles
   verify SLICE CONTEXT [ARGS]   independently verify an exported bundle
   dev                           vite dev server serving bundles from the cache
@@ -40,21 +41,20 @@ case "$cmd" in
         (cd "$HERE/web" && npm ci)
         ;;
     test)
-        need_venv
-        (cd "$HERE" && "$PY" -m unittest discover -s tests -t "$HERE" -v)
+        "$ROOT/../bazelw" test //autonomy/inspection:all_tests "$@"
         ;;
     export)
         need_venv
         [[ $# -ge 2 ]] || { usage >&2; exit 2; }
         slice="$1"; context="$2"; shift 2
-        (cd "$HERE" && "$PY" -m export.export --slice "$slice" --context "$context" --out "$CACHE" "$@")
+        (cd "$ROOT" && "$PY" -m inspection.viewer.export.export --slice "$slice" --context "$context" --out "$CACHE" "$@")
         ;;
     verify)
         need_venv
         [[ $# -ge 2 ]] || { usage >&2; exit 2; }
         slice="$1"; context="$2"; shift 2
         bundle="$CACHE/bundles/$(slice_id "$slice")/$context"
-        (cd "$HERE" && "$PY" -m export.verify --slice "$slice" --context "$context" --bundle "$bundle" "$@")
+        (cd "$ROOT" && "$PY" -m inspection.viewer.export.verify --slice "$slice" --context "$context" --bundle "$bundle" "$@")
         ;;
     dev)
         (cd "$HERE/web" && WAYMO_VIEWER_BUNDLES="$CACHE/bundles" npx vite "$@")
@@ -75,7 +75,7 @@ case "$cmd" in
         ;;
     serve)
         need_venv
-        (cd "$HERE" && "$PY" -m export.serve --dist "$HERE/web/dist" --bundles "$CACHE/bundles" --port "${1:-8420}")
+        (cd "$ROOT" && "$PY" -m inspection.viewer.export.serve --dist "$HERE/web/dist" --bundles "$CACHE/bundles" --port "${1:-8420}")
         ;;
     *) usage >&2; exit 2 ;;
 esac

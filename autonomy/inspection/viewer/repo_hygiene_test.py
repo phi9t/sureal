@@ -3,7 +3,7 @@ import subprocess
 import unittest
 from pathlib import Path
 
-HERE = Path(__file__).resolve().parents[1]
+HERE = Path(__file__).resolve().parent
 FORBIDDEN_SUFFIXES = (".jpg", ".jpeg", ".png", ".wpc", ".parquet", ".ply", ".log")
 FORBIDDEN_PARTS = ("node_modules", "dist", ".venv", "tmp", "__pycache__", "bundles")
 

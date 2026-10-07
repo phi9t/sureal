@@ -18,16 +18,16 @@ bundle URL it prints into the hosted splash.
 Waymo Open Dataset data is licensed for non-commercial use and may not be
 redistributed. Bundles are derived data under the same terms: they are written
 outside git under `$WAYMO_VIEWER_CACHE`, are never committed, and should only
-be served on localhost or a trusted network. `tests/test_repo_hygiene.py`
+be served on localhost or a trusted network. `repo_hygiene_test.py`
 fails if any image, point file or Parquet payload becomes tracked here.
 
 ## Quick start
 
 ```bash
-V=autonomy/viewer/run.sh
+V=autonomy/inspection/viewer/run.sh
 S=~/.cache/waystone/waymo-perception/slices/validation-two-scenes-20260929
 $V setup                                                # uv venv + npm ci
-$V test                                                 # exporter unit tests
+$V test                                                 # inspection/exporter tests in Insula
 $V export "$S" 5847910688643719375_180_000_200_000      # ~40 s, ~955 MB
 $V verify "$S" 5847910688643719375_180_000_200_000      # independent checks
 $V dev                                                  # http://127.0.0.1:5173/
@@ -40,6 +40,9 @@ Environment: `WAYMO_VIEWER_CACHE` (default
 `./.venv`). Requirements: `uv`, Python 3.12 (downloaded by `uv` if absent),
 Node 20+, a WebGL2 browser.
 
+The `test` command uses the repository Bazel wrapper and locked Insula rootfs.
+It does not require the viewer virtual environment.
+
 ## Layout
 
 ```
@@ -51,8 +54,8 @@ export/           exporter package (numpy, pyarrow, pillow)
   images.py       JPEG/PNG passthrough, camera colour baked per point
   export.py       CLI: slice -> bundle (staging dir, atomic rename)
   verify.py       CLI: scalar re-derivation, box-count agreement, hashes
-  serve.py        static server for web/dist + bundles
-tests/            stdlib unittest, synthetic data only
+  *_test.py      stdlib unittest, synthetic data only
+repo_hygiene_test.py  generated-data guard
 web/              Vite + TypeScript + Three.js app
 ```
 

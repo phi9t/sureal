@@ -3,7 +3,7 @@ import unittest
 
 import numpy as np
 
-from export.range_image import azimuths, inclinations, range_image_to_vehicle, rotation_rpy
+from inspection.viewer.export.range_image import azimuths, inclinations, range_image_to_vehicle, rotation_rpy
 
 
 def rz(t):

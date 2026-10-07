@@ -1,10 +1,12 @@
 import math
+import tempfile
 import unittest
+from pathlib import Path
 
 import numpy as np
 
-from export.boxes import lidar_boxes_to_tracks, points_in_box
-from export.manifest import canonical_json, inverse_rigid, mat4
+from inspection.viewer.export.boxes import lidar_boxes_to_tracks, points_in_box
+from inspection.viewer.export.manifest import canonical_json, inverse_rigid, mat4, sha256_file
 
 
 class ManifestTest(unittest.TestCase):
@@ -23,6 +25,17 @@ class ManifestTest(unittest.TestCase):
         bad[0, 0] = 2.0
         with self.assertRaises(ValueError):
             mat4(list(bad.reshape(16)))
+
+    def test_file_digest_rejects_symlinked_inputs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "source.bin"
+            source.write_bytes(b"viewer")
+            link = root / "link.bin"
+            link.symlink_to(source)
+
+            with self.assertRaisesRegex(ValueError, "regular non-symlinked file required"):
+                sha256_file(link)
 
 
 class BoxesTest(unittest.TestCase):

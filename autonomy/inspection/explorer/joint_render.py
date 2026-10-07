@@ -1,12 +1,13 @@
 """Native identity-indexed camera/LiDAR illustration; offline producer/reference."""
-import hashlib,json,sys
+import json,sys
 from pathlib import Path
 import numpy as np
 from PIL import Image,ImageDraw
 from dataset.sensor_records import select_rows,array_field
+from evidence.source_snapshot import file_sha256
 job=json.loads(Path('/tmp/input/job.json').read_text());mode=sys.argv[1];t=job['timestamp'];scene=job['scene']
 source=Path('/source/lidar_camera_projection.parquet')
-with source.open('rb') as f:assert hashlib.file_digest(f,'sha256').hexdigest()==job['source']['sha256']
+assert file_sha256(source)==job['source']['sha256']
 with np.load('/tmp/physical/frame.npz',allow_pickle=False) as a:xyz=a['physical_points'][:,:3];ids=a['measurement_identity']
 assert len(ids)==len(xyz) and len(np.unique(ids,axis=0))==len(ids)
 rows={r['key.laser_name']:r for r in select_rows(source,timestamps={t})};assert set(rows)==set(range(1,6))

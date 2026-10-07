@@ -22,7 +22,7 @@ LAYERS = (
     ('segmentation',),
     ('detection',),
     ('pipeline',),
-    ('gpu', 'evaluation', 'tracking', 'association', 'explorer', 'motion-evaluation', 'viewer'),
+    ('gpu', 'evaluation', 'tracking', 'association', 'inspection', 'motion-evaluation'),
     ('architecture',),
     ('tier1',),
     ('advanced',),

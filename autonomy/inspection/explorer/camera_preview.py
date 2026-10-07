@@ -3,9 +3,10 @@ import base64,hashlib,io,json,sys
 from pathlib import Path
 import pyarrow.parquet as pq
 from PIL import Image
-job=json.loads(Path('/tmp/input/job.json').read_text());record=job['source'];source=Path('/source/camera_image.parquet');assert source.stat().st_size==int(record['source_metadata']['size'])
-with source.open('rb') as f:assert hashlib.file_digest(f,'sha256').hexdigest()==record['sha256']==record['hdfs_roundtrip_sha256']
-with source.open('rb') as f:assert base64.b64encode(hashlib.file_digest(f,'md5').digest()).decode()==record['source_metadata']['md5_hash']
+from evidence.source_snapshot import file_digest,file_sha256,require_regular_file
+job=json.loads(Path('/tmp/input/job.json').read_text());record=job['source'];source=require_regular_file(Path('/source/camera_image.parquet'));assert source.stat().st_size==int(record['source_metadata']['size'])
+assert file_sha256(source)==record['sha256']==record['hdfs_roundtrip_sha256']
+assert base64.b64encode(bytes.fromhex(file_digest(source,'md5'))).decode()==record['source_metadata']['md5_hash']
 assert record['official_split']=='training' and record['research_splits']==['train'];timestamps=set(job['timestamps']);seen=set();report=[]
 columns=['key.segment_context_name','key.frame_timestamp_micros','key.camera_name','[CameraImageComponent].image']
 for batch in pq.ParquetFile(source).iter_batches(batch_size=1,columns=columns):

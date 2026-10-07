@@ -1,18 +1,18 @@
 """Independently reconcile saved views, point samples and native image bytes."""
-import hashlib
 import json
 from pathlib import Path
 import sys
 import numpy as np
 from PIL import Image
+from evidence.source_snapshot import file_sha256
 from dataset.sensor_records import select_rows
 
 
 def validate(source,geometry,out):
     report=json.loads((out/'report.json').read_text());dataset=json.loads((source/'slice.json').read_text())
-    if hashlib.sha256((geometry/'report.json').read_bytes()).hexdigest()!=report['geometry_report_sha256']:raise ValueError('geometry report changed')
+    if file_sha256(geometry/'report.json')!=report['geometry_report_sha256']:raise ValueError('geometry report changed')
     for name,digest in report['artifacts'].items():
-        if hashlib.sha256((out/name).read_bytes()).hexdigest()!=digest:raise ValueError('view artifact changed')
+        if file_sha256(out/name)!=digest:raise ValueError('view artifact changed')
     if len(report['frames'])!=4:raise ValueError('frame coverage')
     actual={};camera_semantics={}
     for context in dataset['contexts']:
@@ -30,7 +30,7 @@ def validate(source,geometry,out):
         if len(frame['sensors'])!=10 or {r['camera'] for r in frame['cameras']}!={1,2,3,4,5}:raise ValueError('sensor coverage')
         for sensor in frame['sensors']:
             path=geometry/sensor['geometry_artifact']
-            if hashlib.sha256(path.read_bytes()).hexdigest()!=sensor['geometry_sha256']:raise ValueError('source geometry changed')
+            if file_sha256(path)!=sensor['geometry_sha256']:raise ValueError('source geometry changed')
             with np.load(path) as a:
                 xyz.append(a['xyz'])
                 if len(a['pixels'])!=sensor['points']:raise ValueError('sensor support count')
