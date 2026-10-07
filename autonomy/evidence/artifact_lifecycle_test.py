@@ -15,3 +15,6 @@ class LifecycleTests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as d:
    p=Path(d)/'head';p.write_bytes(b'bad')
    with self.assertRaises(ValueError):admit_artifact(p,'wrong',{},set())
+
+if __name__ == "__main__":
+ unittest.main()

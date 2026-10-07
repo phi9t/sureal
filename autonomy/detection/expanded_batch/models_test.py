@@ -24,3 +24,6 @@ class FactoryContract(unittest.TestCase):
  def test_ragged_and_sparse_factories_produce_pillar_features(self):
   points=torch.rand(6,4);counts=torch.tensor([3,3]);coords=torch.tensor([[0,0,255,255],[0,0,256,256]]);model=build(catalog()['ragged_pillars']).eval();decorated=model.decorate_points(points,counts,coords);self.assertEqual(model.encoder(decorated,counts).shape,(2,64))
   model=build(catalog()['sparse_bev_transformer']).eval();images=model.spatial(torch.rand(2,64),coords,batch_size=1);self.assertEqual([tuple(x.shape) for x in images],[(1,64,256,256),(1,128,128,128),(1,256,64,64)])
+
+if __name__ == "__main__":
+ unittest.main()
