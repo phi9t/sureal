@@ -22,6 +22,7 @@ not import each other. The order is declared in
 | 6 | `tier1/` | Fixed-batch architecture overfit suite |
 | 5 | `architecture/` | Experiment catalog and the `architecture.py` runner |
 | 4 | `gpu/`, `evaluation/`, `association/`, `explorer/`, `motion-evaluation/`, `viewer/` | Model variants and GPU workers, native metric contracts, standalone tools |
+| 3.5 | `range_view/` | Range-image frontend, range-pillar fusion, sparse windows and range fusion |
 | 3 | `pipeline/` | Readers, encoders, detector and archives |
 | 2 | `geometry/` | Coordinate transforms, projection visibility and native range-grid shape math |
 | 1 | `insula/` | Sandbox entry, rootfs identity, M0 receipt checks and staging leases |
@@ -41,10 +42,11 @@ defined by more than one other area.
 
 ## Two kinds of source
 
-- **Library code** is imported by other modules: most of `pipeline/`, the model
-  and variant modules in `gpu/`, `tier1/` and `advanced/`, the stage backend in
-  `resources/`, the Insula sandbox helpers in `insula/`, and the journal and
-  snapshot tools in `evidence/`.
+- **Library code** is imported by other modules: most of `pipeline/`, the
+  range-image modules in `range_view/`, the model and variant modules in
+  `gpu/`, `tier1/` and `advanced/`, the stage backend in `resources/`, the
+  Insula sandbox helpers in `insula/`, and the journal and snapshot tools in
+  `evidence/`.
 - **Procedure records** are scripts that ran one gate or one study stage and
   wrote a receipt containing their own digest: the top-level `verify-*.py` and
   `publish-*.py`, the hyphenated workers in `gpu/` and `cohort/`, and the
@@ -56,8 +58,9 @@ retained receipt (`autonomy/evidence/pins.py status` prints the count per area).
 validators also require an exact file inventory, so adding a file there changes
 what they admit:
 
-- `cohort/sustained_sources.py`: every `*.py` under `pipeline/`, `insula/`,
-  `gpu/`, `tier1/` and `cohort/`, plus the source snapshot helper, which
+- `cohort/sustained_sources.py`: every `*.py` under `pipeline/`,
+  `range_view/`, `insula/`, `gpu/`, `tier1/` and `cohort/`, plus the source
+  snapshot helper, which
   `cohort/sustained_controller_backend.py` freezes for each sustained run;
 - `resources/sources.py`: every `*.py` under `resources/`.
 

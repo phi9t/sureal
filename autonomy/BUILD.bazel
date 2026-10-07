@@ -21,6 +21,7 @@ filegroup(
         "//autonomy/geometry:all_py",
         "//autonomy/inspection:all_py",
         "//autonomy/insula:all_py",
+        "//autonomy/range_view:all_py",
         "//autonomy/segmentation:all_py",
     ],
     visibility = ["//visibility:public"],
@@ -66,6 +67,7 @@ PERCEPTION_TEST_MODULES = glob(
         "dataset/**",
         "detection/**",
         "inspection/**",
+        "range_view/**",
         "segmentation/**",
         "research/**",
         "source_snapshot_targets_test.py",
@@ -79,6 +81,7 @@ PERCEPTION_RUNFILES = glob(
         "dataset/**",
         "detection/**",
         "inspection/**",
+        "range_view/**",
         "segmentation/**",
         "research/**",
         "**/__pycache__/**",
@@ -99,6 +102,7 @@ PERCEPTION_DEPS = [
     "//autonomy/geometry:geometry",
     "//autonomy/inspection:inspection",
     "//autonomy/insula:insula",
+    "//autonomy/range_view:range_view",
     "//autonomy/segmentation:segmentation",
 ]
 
@@ -128,6 +132,7 @@ filegroup(
         "//autonomy/geometry:all_py",
         "//autonomy/inspection:all_py",
         "//autonomy/insula:all_py",
+        "//autonomy/range_view:all_py",
         "//autonomy/segmentation:all_py",
     ] + glob([
         "architecture/harness/*.py",
@@ -209,6 +214,7 @@ test_suite(
             "//autonomy/geometry:all_tests",
             "//autonomy/inspection:all_tests",
             "//autonomy/insula:all_tests",
+            "//autonomy/range_view:all_tests",
             "//autonomy/segmentation:all_tests",
         ],
     visibility = ["//visibility:public"],

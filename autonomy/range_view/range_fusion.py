@@ -2,7 +2,7 @@
 import torch
 from torch import nn
 from torch.nn import functional as F
-from pipeline.range_frontend import Block
+from range_view.range_frontend import Block
 
 
 def bilinear_resize(values,size):

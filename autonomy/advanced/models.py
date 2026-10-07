@@ -4,8 +4,8 @@ from torch import nn
 from detection.pillar_encoder import decorate,scatter
 from tier1.models import build as build_reference,objective,optimizer,deterministic
 from advanced.point_modules import RaggedPillar,PointAttention,PointMLP,decorate_ragged
-from advanced.range_fusion import RangePillar
 from advanced.spatial_modules import configure_grid,SparseBackbone
+from range_view.range_fusion import RangePillar
 
 class AdvancedDetector(nn.Module):
  def __init__(self,base,encoder,*,ragged=False,sparse=False):

@@ -14,7 +14,6 @@ TORCH_MODULES = [
     "advanced/test_models.py",
     "advanced/test_observations.py",
     "advanced/test_point_modules.py",
-    "advanced/test_range_fusion.py",
     "advanced/test_sparse_sets.py",
     "cohort/test_sustained_chunk_reference.py",
     "cohort/test_sustained_literal_loss.py",
@@ -27,9 +26,6 @@ TORCH_MODULES = [
     "cohort/test_sustained_worker_guard.py",
     "continuation/test_compare_state.py",
     "tests/test_camera_interpolation_parity.py",
-    "tests/test_range_frontend.py",
-    "tests/test_range_pillar_hybrid.py",
-    "tests/test_sparse_window_attention.py",
 ]
 
 TORCH_CPU_ONLY_MODULES = [

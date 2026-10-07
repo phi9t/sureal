@@ -1,7 +1,7 @@
 import unittest,torch
 from torch.nn import functional as F
 from detection.pillar_encoder import PillarFeatureNet
-from advanced.range_fusion import RangePillar,RangeFeatures,bilinear_resize
+from range_view.range_fusion import RangePillar,RangeFeatures,bilinear_resize
 
 class RangeContract(unittest.TestCase):
  def setUp(self):torch.manual_seed(17);torch.set_num_threads(2)

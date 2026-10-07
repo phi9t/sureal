@@ -1,7 +1,7 @@
 """Masked Torch self-attention operator over lossless sparse BEV buckets."""
 import torch
 from torch import nn
-from .sparse_windows import partition_sparse_windows
+from range_view.sparse_windows import partition_sparse_windows
 
 
 class SparseWindowAttention(nn.Module):

@@ -4,8 +4,8 @@ from pathlib import Path
 import numpy as np
 import torch
 from detection.pillar_encoder import PillarFeatureNet,decorate,scatter
-from pipeline.sparse_window_attention import SparseWindowAttention
-from pipeline.sparse_windows import partition_sparse_windows
+from range_view.sparse_window_attention import SparseWindowAttention
+from range_view.sparse_windows import partition_sparse_windows
 
 trusted=json.loads(Path('/mnt/trusted.json').read_text());source=Path('/source/output/packed.npz')
 assert hashlib.sha256(source.read_bytes()).hexdigest()==trusted['packed_sha256']

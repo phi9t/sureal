@@ -1,7 +1,7 @@
 import unittest,torch
 from detection.pillar_detector import PillarDetector
 from detection.pillar_encoder import decorate
-from pipeline.range_pillar_hybrid import SharedPillarHead,RangePillarFeatureNet
+from range_view.range_pillar_hybrid import SharedPillarHead,RangePillarFeatureNet
 class HybridTests(unittest.TestCase):
  def test_shared_head_matches_original(self):
   torch.manual_seed(17);original=PillarDetector(nx=16,ny=16,classes=3,anchors_per_cell=2,cell_size=(.25,.25),origin=(-2.,-2.)).eval();head=SharedPillarHead(original).eval()

@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import torch
-from pipeline.sparse_window_attention import SparseWindowAttention
+from range_view.sparse_window_attention import SparseWindowAttention
 
 class SparseWindowAttentionTests(unittest.TestCase):
     def test_uniform_attention_ignores_padding_and_other_windows(self):

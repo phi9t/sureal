@@ -22,6 +22,7 @@ LAYERS = (
     ('camera',),
     ('segmentation',),
     ('detection',),
+    ('range_view',),
     ('pipeline',),
     ('gpu', 'evaluation', 'tracking', 'association', 'inspection', 'motion-evaluation'),
     ('architecture',),

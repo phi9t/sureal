@@ -1,5 +1,5 @@
 import unittest,torch
-from pipeline.range_frontend import RangeFrontend
+from range_view.range_frontend import RangeFrontend
 class FrontendTests(unittest.TestCase):
  def test_odd_shape_full_support_backward(self):
   torch.manual_seed(17);model=RangeFrontend();raw=torch.rand(2,3,7,13,requires_grad=True);valid=torch.ones(2,7,13,dtype=torch.bool);valid[:,0,0]=False

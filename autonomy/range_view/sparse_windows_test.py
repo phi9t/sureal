@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from pipeline.sparse_windows import partition_sparse_windows
+from range_view.sparse_windows import partition_sparse_windows
 
 class SparseWindowTests(unittest.TestCase):
     def test_boundaries_batches_and_padding_retain_every_voxel_once(self):
