@@ -62,6 +62,10 @@ STALE_PATH_EXCLUDED_MARKDOWN_PREFIXES = (
     "docs/superpowers/plans/",
     "docs/superpowers/specs/",
 )
+HISTORICAL_MARKDOWN_FILES = {
+    # This assessment records main at 4ff0ab8; preserve that commit's paths.
+    "docs/coherent-scene-hypotheses.md",
+}
 
 
 def run(*args: str, cwd: Path, check: bool = True) -> subprocess.CompletedProcess[str]:
@@ -428,6 +432,7 @@ class RepositoryIdentityTests(unittest.TestCase):
             for path in tracked_markdown
             if "/research/" not in path
             and not path.startswith(STALE_PATH_EXCLUDED_MARKDOWN_PREFIXES)
+            and path not in HISTORICAL_MARKDOWN_FILES
         ]
 
     def test_context_map_points_at_moved_autonomy_glossary(self) -> None:
@@ -462,7 +467,7 @@ class RepositoryIdentityTests(unittest.TestCase):
     def test_living_documents_name_the_current_component_paths(self) -> None:
         living_markdown = self.living_markdown()
         self.assertIn("autonomy/README.md", living_markdown)
-        self.assertIn("autonomy/architecture/ideas/residual_bev.md", living_markdown)
+        self.assertIn("autonomy/studies/architecture/ideas/residual_bev.md", living_markdown)
 
         for relative_path in living_markdown:
             with self.subTest(path=relative_path):
