@@ -33,3 +33,6 @@ class NativeRangeGeometryTests(unittest.TestCase):
         ri[...,0]=0
         r=range_to_points(ri,{'extrinsic':np.eye(4),'inclinations':[0,0]},return_index=1,motion_policy='uncompensated')
         self.assertEqual(r['xyz'].shape,(0,3))
+
+if __name__ == '__main__':
+    unittest.main()

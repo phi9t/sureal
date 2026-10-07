@@ -32,3 +32,6 @@ class RuntimeIdentityTests(unittest.TestCase):
                 verify_rootfs(root, expected)
             with self.assertRaises(ValueError):
                 verify_rootfs(root / 'missing', expected)
+
+if __name__ == '__main__':
+    unittest.main()

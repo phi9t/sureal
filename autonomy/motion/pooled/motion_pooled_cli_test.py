@@ -126,3 +126,6 @@ class MotionPooledCliTests(unittest.TestCase):
                 vehicle=next(b for b in report['metrics']['metricsBundles'] if b.get('objectFilter')=='TYPE_VEHICLE')
                 self.assertAlmostEqual(float(vehicle['minFde']),0,places=5)
                 self.assertAlmostEqual(float(vehicle['overlapRate']),1 if collision_confidence>.5 else 0,places=5)
+
+if __name__ == '__main__':
+    unittest.main()

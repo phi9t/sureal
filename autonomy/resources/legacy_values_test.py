@@ -164,3 +164,6 @@ class LegacyValuesTests(unittest.TestCase):
             if change == 'checkpoint-hash': changed['checkpoint_sha256'] = 'invalid'
             with self.subTest(change=change), self.assertRaises(ValueError):
                 api.compare_producer_reports(old, changed)
+
+if __name__ == '__main__':
+    unittest.main()

@@ -18,3 +18,6 @@ class RangeContract(unittest.TestCase):
  def test_padded_or_unknown_range_id_is_rejected(self):
   module=RangePillar(PillarFeatureNet());aux={'range_pixels':torch.tensor([[[10,0,0]]])}
   with self.assertRaises(ValueError):module.set_observations(aux)
+
+if __name__ == '__main__':
+    unittest.main()

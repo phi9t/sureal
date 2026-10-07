@@ -72,3 +72,6 @@ class LegacyBindingTests(unittest.TestCase):
         self.native_path.write_text(json.dumps(native)); self.entry['native_parent'] = self.pin(self.native_path)
         self.save_entry()
         with self.assertRaises(ValueError): self.validate()
+
+if __name__ == '__main__':
+    unittest.main()

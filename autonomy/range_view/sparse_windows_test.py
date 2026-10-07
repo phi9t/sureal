@@ -30,3 +30,6 @@ class SparseWindowTests(unittest.TestCase):
         self.assertEqual(partition_sparse_windows(np.empty((0,3),dtype=np.int64),window_shape=(2,2),shift=(0,0))['buckets'],{})
         for c in [np.array([[0,0,0],[0,0,0]]),np.array([[0.,0.,0.]]),np.array([[0,-1,0]])]:
             with self.assertRaises(ValueError):partition_sparse_windows(c,window_shape=(2,2),shift=(0,0))
+
+if __name__ == '__main__':
+    unittest.main()

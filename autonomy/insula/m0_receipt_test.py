@@ -35,3 +35,6 @@ class ReceiptTests(unittest.TestCase):
 
     def test_omitted_expected_artifact(self):
         self.check_mutation(lambda r,p:r['artifacts']['0'].pop('matrix.npy'))
+
+if __name__ == '__main__':
+    unittest.main()

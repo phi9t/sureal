@@ -12,3 +12,6 @@ class CohortTests(unittest.TestCase):
     def test_overlap_duplicate_and_insufficient_fail(self):
         for train,val in [(['a','a'],['b']),(['a'],['a']),(['a'],['b'])]:
             with self.assertRaises(ValueError):select_cohorts(train,val,excluded=set(),train_count=2,dev_count=1,validation_count=1)
+
+if __name__ == '__main__':
+    unittest.main()

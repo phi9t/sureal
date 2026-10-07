@@ -29,3 +29,6 @@ class SemanticArchiveSupportTests(unittest.TestCase):
             archive.write_bytes(b'changed')
             with self.assertRaises(ValueError):
                 archive_semantic_support(archive,pub,expected_publication_sha256=digest,usage='engineering')
+
+if __name__ == '__main__':
+    unittest.main()

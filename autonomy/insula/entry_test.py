@@ -30,3 +30,6 @@ class EntryTests(unittest.TestCase):
     def test_overlap_rejected(self):
         with self.assertRaises(ValueError):
             launch_plan(Path('/rootfs'),Path('/experiment'),Path('/input'),Path('/input/out'),['true'])
+
+if __name__ == '__main__':
+    unittest.main()
