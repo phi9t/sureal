@@ -14,6 +14,10 @@ _MOVED_BASELINE_SOURCES = {
     'pipeline/detector_geometry.py': 'detection/detector_geometry.py',
     'pipeline/detector_loss.py': 'detection/detector_loss.py',
     'pipeline/pillar_detector.py': 'detection/pillar_detector.py',
+    'gpu/architecture_followups.py': 'detection/architecture_followups.py',
+    'gpu/architecture_variants.py': 'detection/architecture_variants.py',
+    'gpu/norm_variants.py': 'detection/norm_variants.py',
+    'gpu/scored_proposals_v3.py': 'detection/scored_proposals_v3.py',
 }
 
 
