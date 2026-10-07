@@ -1,6 +1,7 @@
 """Native one-batch final-checkpoint training-only diagnostic scoring; never heldout."""
-import hashlib,importlib.util,json,math,re,subprocess,time,resource
+import importlib.util,json,math,re,subprocess,time,resource
 from pathlib import Path
+from evidence.source_snapshot import file_sha256 as sha
 import numpy as np
 from detection.anchor_grid import anchor_grid
 from detection.scored_proposals_v2 import decode_scored_proposals as decode_proposals
@@ -16,7 +17,7 @@ for index,frame in enumerate(manifest['frames']):
  with np.load(Path('/source')/('heads-%02d.npz'%index),allow_pickle=False) as data:
   proposals=decode_proposals(data['classification'],data['box_residuals'],data['direction'],anchors,iou_threshold=.5,score_floor=.05,pre_limit=4096,post_limit=500)
  source=Path('/tmp/physical')/scene/'producer'/f'{timestamp}.npz'
- assert hashlib.sha256(source.read_bytes()).hexdigest()==frame['physical_sha256']
+ assert sha(source)==frame['physical_sha256']
  with np.load(source,allow_pickle=False) as data:
   points=data['physical_points'][:,:3];identity=data['measurement_identity'];flags=data['evaluation_nlz'];states=data['return_states']
   assert states.shape==(10,4) and np.all(states[:,2]==1)
@@ -26,7 +27,7 @@ for index,frame in enumerate(manifest['frames']):
    mask=(identity[:,0]==laser)&(identity[:,1]==ret);assert mask.sum()==count
    returns[key]=(points[mask],flags[mask])
  records=prediction_records(proposals,context=scene,timestamp=timestamp,sensor_returns=returns);predictions.extend(records)
- boxes_path=Path('/tmp/boxes')/scene/'producer/targets.json';assert hashlib.sha256(boxes_path.read_bytes()).hexdigest()==frame['boxes_sha256']
+ boxes_path=Path('/tmp/boxes')/scene/'producer/targets.json';assert sha(boxes_path)==frame['boxes_sha256']
  frames=json.loads(boxes_path.read_text())['frames'];matching=[x for x in frames if x['timestamp_micros']==timestamp] if frames and 'timestamp_micros' in frames[0] else [x for x in frames if x['rows'] and x['rows'][0]['frame_timestamp_micros']==timestamp]
  assert len(matching)==1
  eligible=[]

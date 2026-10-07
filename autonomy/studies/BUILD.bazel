@@ -35,7 +35,6 @@ py_library(
     visibility = [
         "//autonomy:__pkg__",
         "//autonomy/cohort:__pkg__",
-        "//autonomy/resources:__pkg__",
     ],
     deps = [
         "//autonomy/evidence:evidence",

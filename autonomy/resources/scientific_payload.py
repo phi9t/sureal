@@ -6,10 +6,14 @@ from evidence.source_snapshot import file_sha256,require_regular_file
 def sha(path):
  return file_sha256(path)
 def unique_payload_bytes(root):
+ root=Path(root)
+ if root.is_symlink():raise ValueError('scientific payload root must not be a symlink: '+str(root))
+ if not root.is_dir():raise ValueError('scientific payload root must be a directory: '+str(root))
  seen=set();total=0
- for p in Path(root).rglob('*'):
-  try:require_regular_file(p)
-  except ValueError:continue
+ for p in root.rglob('*'):
+  if p.is_symlink():raise ValueError('scientific payload entries must not be symlinks: '+str(p))
+  if not p.is_file():continue
+  require_regular_file(p)
   s=p.stat();key=(s.st_dev,s.st_ino)
   if key not in seen:seen.add(key);total+=s.st_size
  return total

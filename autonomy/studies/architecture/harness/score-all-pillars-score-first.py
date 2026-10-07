@@ -1,9 +1,9 @@
 from pathlib import Path
-import datetime,hashlib,json,subprocess,sys,time
-code=Path('autonomy').resolve();sys.path.insert(0,str(code))
+from evidence.source_snapshot import file_sha256 as sha
+import datetime,json,subprocess,sys,time
+code=Path('autonomy').resolve()
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
-sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 variant=sys.argv[1];assert variant in ['all_pillars']
 cache=Path.home()/'.cache/waystone/waymo-perception';
 def enforce_storage(reserve=0):

@@ -1,9 +1,9 @@
 from pathlib import Path
-import hashlib,json,subprocess,sys
-code=Path('autonomy').resolve();sys.path.insert(0,str(code))
+from evidence.source_snapshot import file_sha256 as sha
+import json,subprocess,sys
+code=Path('autonomy').resolve()
 from insula.runtime_identity import verify_rootfs
 from insula.entry import launch_plan
-sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 variant=sys.argv[1];assert variant in ['retain64']
 cache=Path.home()/'.cache/waystone/waymo-perception';evidence=code/('research/architecture-'+variant+'-execution-verified.json');receipt=json.loads(evidence.read_text());source=cache/('scientific-processing/architecture-'+variant+'-v1');base=cache/('insula/architecture-'+variant+'-loss-audit-v2');base.mkdir();inputs=base/'input';inputs.mkdir();out=base/'output';out.mkdir();(inputs/'expected.json').write_text(json.dumps({'receipt':receipt,'receipt_sha256':sha(evidence),'source_directory':str(source)}))
 root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);worker=Path('.scratch/audit-architecture-learning-curve.py').resolve();digest=sha(worker)
