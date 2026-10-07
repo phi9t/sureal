@@ -4,8 +4,8 @@ from pathlib import Path
 import numpy as np
 import torch
 from detection.pillar_detector import PillarDetector
-from gpu.norm_variants import configure_norm
-from gpu.architecture_variants import configure_architecture
+from detection.norm_variants import configure_norm
+from detection.architecture_variants import configure_architecture
 manifest=json.loads(Path('/tmp/inputs/manifest.json').read_text());torch.manual_seed(17);torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=False;torch.backends.cudnn.deterministic=True;torch.backends.cudnn.benchmark=False;torch.use_deterministic_algorithms(True)
 def model():
  m=configure_norm(PillarDetector(nx=512,ny=512,classes=4,anchors_per_cell=8,cell_size=(.25,.25),origin=(-64.,-64.)),'gn_backbone')

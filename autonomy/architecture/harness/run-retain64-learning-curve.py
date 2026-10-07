@@ -24,9 +24,9 @@ manifest={'architecture_variant':variant,'spec_sha256':sha(Path('docs/superpower
 old=json.loads((cache/'detector-gpu-live-a/receipt.json').read_text());lock=old['runtime_lock']
 print('VERIFY locked GPU runtime',flush=True);verify_rootfs(cache/'gpu-rootfs',lock['rootfs_sha256'])
 for path,digest in old['driver_hashes'].items():assert sha(path)==digest
-command=old['checks'][0]['command'].copy();command=[str(output) if x==str(cache/'detector-gpu-live-a') else '/experiment/gpu/native-retain64-learning-curve.py' if x=='/experiment/gpu/detector-probe.py' else x for x in command]
+command=old['checks'][0]['command'].copy();command=[str(output) if x==str(cache/'detector-gpu-live-a') else '/experiment/detection/native-retain64-learning-curve.py' if x in ['/experiment/gpu/detector-probe.py','/experiment/detection/detector-probe.py'] else x for x in command]
 separator=command.index('--');command[separator:separator]=['--setenv','CUBLAS_WORKSPACE_CONFIG',':4096:8'];separator=command.index('--');command[separator:separator]=['--ro-bind',str(native),'/tmp/native','--ro-bind',str(inputs),'/tmp/inputs']
-pins={str(p.relative_to(code)):sha(p) for p in [code/'gpu/native-retain64-learning-curve.py',code/'gpu/architecture_variants.py',code/'gpu/norm_variants.py',*sorted((code/'pipeline').glob('*.py'))]}
+pins={str(p.relative_to(code)):sha(p) for p in [code/'detection/native-retain64-learning-curve.py',code/'detection/architecture_variants.py',code/'detection/norm_variants.py',*sorted((code/'pipeline').glob('*.py'))]}
 started=datetime.datetime.now(datetime.timezone.utc).isoformat();tick=time.monotonic();print('RUN fixed native overfit',flush=True)
 (code/('research/architecture-'+variant+'-execution-pending.json')).write_text(json.dumps({'started_utc':started,'command':command,'candidate_hashes':pins,'manifest':manifest,'manifest_sha256':sha(inputs/'manifest.json'),'scope':'preregistered single fixed training-batch overfit only; no heldout comparison'},indent=2)+'\n')
 with (output/'live.log').open('w') as log:run=subprocess.run(command,stdout=log,stderr=subprocess.STDOUT,text=True,timeout=7200)

@@ -1,12 +1,7 @@
 SUSTAINED_RUN_SOURCE_GLOBS = [
     "cohort/**/*.py",
-    "gpu/**/*.py",
     "pipeline/**/*.py",
     "tier1/**/*.py",
-]
-
-RESOURCE_SOURCE_LAYER_GLOBS = [
-    "resources/**/*.py",
 ]
 
 SUSTAINED_CHECKPOINT_RETENTION_HOST_SOURCES = [

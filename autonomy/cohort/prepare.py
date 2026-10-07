@@ -3,7 +3,7 @@ import hashlib,importlib.util,json,math,re,subprocess,time,resource
 from pathlib import Path
 import numpy as np
 from detection.anchor_grid import anchor_grid
-from gpu.scored_proposals_v2 import decode_scored_proposals as decode_proposals
+from detection.scored_proposals_v2 import decode_scored_proposals as decode_proposals
 from detection.prediction_records import prediction_records
 from detection.detection_export import export_objects
 assert importlib.util.find_spec('tensorflow') is None

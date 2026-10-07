@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import torch
 from tier1.admission import reserve_write
-from gpu.checkpoint_values import same_tensor_values
+from detection.checkpoint_values import same_tensor_values
 from tier1.models import build,objective,optimizer,deterministic
 assert importlib.util.find_spec('tensorflow') is None and torch.cuda.is_available()
 job=json.loads(Path('/tmp/inputs/job.json').read_text());case=job['case'];target=job['target'];replay=job.get('replay',False)

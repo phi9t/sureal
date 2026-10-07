@@ -6,7 +6,7 @@ from cohort.balanced import uncovered_count
 from cohort.sustained_groundtruth import groundtruth_records
 from cohort.sustained_contract import validate_contract
 from detection.anchor_grid import anchor_grid
-from gpu.scored_proposals_v3 import decode_scored_proposals as decode_proposals
+from detection.scored_proposals_v3 import decode_scored_proposals as decode_proposals
 from detection.prediction_records import prediction_records
 assert importlib.util.find_spec('tensorflow') is None
 start=time.monotonic();manifest=json.loads(Path('/tmp/inputs/manifest.json').read_text())

@@ -3,9 +3,9 @@ import math
 import torch
 from detection.pillar_detector import PillarDetector
 from detection.detector_loss import detector_loss
-from gpu.norm_variants import configure_norm
-from gpu.architecture_variants import configure_architecture
-from gpu.architecture_followups import configure_followup
+from detection.norm_variants import configure_norm
+from detection.architecture_variants import configure_architecture
+from detection.architecture_followups import configure_followup
 
 def build(case):
  m=configure_norm(PillarDetector(nx=512,ny=512,classes=4,anchors_per_cell=8,cell_size=(.25,.25),origin=(-64.,-64.)),case['norm'])

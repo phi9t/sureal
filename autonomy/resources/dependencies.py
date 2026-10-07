@@ -5,7 +5,7 @@ their identities are in the native manifests/receipts, not checkpoint payloads.
 """
 import json
 from pathlib import Path
-from advanced.archive import safe_name
+from evidence.source_snapshot import safe_member_name
 from resources.sources import regular,sha
 
 
@@ -16,7 +16,7 @@ def shared_inventory(backend):
         not backend.manifest['frames']):
         raise ValueError('unchanged native cohort manifest required')
     def add(name,path,digest):
-        safe_name(name);path=Path(path)
+        safe_member_name(name);path=Path(path)
         if not regular(path) or sha(path)!=digest:
             raise ValueError('unchanged shared dependency bytes required')
         value={'path':str(path),'sha256':digest,'bytes':path.stat().st_size}
@@ -25,10 +25,10 @@ def shared_inventory(backend):
     try:
         for frame in backend.manifest['frames']:
             identity=frame['identity'];scene,timestamp=identity.split(':')
-            safe_name(scene)
+            safe_member_name(scene)
             if '/' in scene or not timestamp.isdecimal() or identity in identities:
                 raise ValueError('unique native measurement identity required')
-            identities.add(identity);relative=frame['relative_directory'];safe_name(relative)
+            identities.add(identity);relative=frame['relative_directory'];safe_member_name(relative)
             if set(frame['sha256'])!={'observations.npz','targets.npz','report.json'}:
                 raise ValueError('complete native observation/target/report inputs required')
             for name,digest in frame['sha256'].items():

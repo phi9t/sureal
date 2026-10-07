@@ -14,7 +14,7 @@ def enforce_storage(reserve=0):
 enforce_storage(64*1024**2)
 evidence=code/('research/architecture-'+variant+'-execution-verified.json');training=json.loads(evidence.read_text())
 for p,h in training['artifacts'].items():assert sha(p)==h
-manifest=json.loads(json.dumps(training['manifest']));manifest['decoder_candidate']='score-first-v2';manifest['decoder_sha256']=sha(code/'gpu/scored_proposals_v2.py');manifest['secondary_spec_sha256']=sha(code/'research/normalization-secondary-decoder-spec.md');frame=manifest['frames'][0];scene,timestamp=frame['identity'].split(':');frame['physical_sha256']=sha(cache/'scientific-processing/overfit-point-frames-v1'/scene/'producer'/f'{timestamp}.npz');frame['boxes_sha256']=sha(cache/'scientific-processing/overfit-box-targets-v1'/scene/'producer/targets.json')
+manifest=json.loads(json.dumps(training['manifest']));manifest['decoder_candidate']='score-first-v2';manifest['decoder_sha256']=sha(code/'detection/scored_proposals_v2.py');manifest['secondary_spec_sha256']=sha(code/'research/normalization-secondary-decoder-spec.md');frame=manifest['frames'][0];scene,timestamp=frame['identity'].split(':');frame['physical_sha256']=sha(cache/'scientific-processing/overfit-point-frames-v1'/scene/'producer'/f'{timestamp}.npz');frame['boxes_sha256']=sha(cache/'scientific-processing/overfit-box-targets-v1'/scene/'producer/targets.json')
 base=cache/('insula/architecture-'+variant+'-score-first-v1');base.mkdir();inputs=base/'input';inputs.mkdir();(inputs/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
 output=cache/('scientific-processing/architecture-'+variant+'-score-first-v1');output.mkdir();workers=Path('.scratch').resolve();worker_pins={name:sha(workers/name) for name in ['prepare-norm-score-first.py','native-one-batch-overfit-metrics.py']};locks={}
 for name,root in [('prepare',cache/'insula/rootfs-v2'),('score',cache/'metrics-rootfs')]:
@@ -31,7 +31,7 @@ for curve in training['validation']['checkpoint_curve']:
  score=json.loads((scored/'check.json').read_text());quality=score['LEVEL2_per_class'];minimum=min(x['APH'] for x in quality.values());row={'step':step,'cumulative_train_seconds':curve['cumulative_train_seconds'],'evaluation_losses':curve['evaluation_losses'],'LEVEL2_per_class':quality,'mean_populated_class_APH':score['mean_populated_class_APH'],'mean_gate_passed':score['APH_gate_passed'],'populated_class_gate_passed':minimum>=.8,'minimum_populated_class_APH':minimum};results.append(row)
  print('SCORED',step,'meanAPH',row['mean_populated_class_APH'],'minimum',minimum,flush=True)
  (code/('research/architecture-'+variant+'-score-first-progress.json')).write_text(json.dumps({'expected_checkpoints':len(training['validation']['checkpoint_curve']),'scored_checkpoints':len(results),'curve':results},indent=2)+'\n')
-assert all(sha(workers/name)==h for name,h in worker_pins.items()) and sha(code/'gpu/scored_proposals_v2.py')==manifest['decoder_sha256']
+assert all(sha(workers/name)==h for name,h in worker_pins.items()) and sha(code/'detection/scored_proposals_v2.py')==manifest['decoder_sha256']
 first={}
 for key in ['mean_gate_passed','populated_class_gate_passed']:
  passed=[i for i,x in enumerate(results) if x[key]]

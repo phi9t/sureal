@@ -1,9 +1,9 @@
 # External resource verification
 
 This layer measures the actual processes without changing the frozen model,
-loss, decoder or evaluator source bytes. It is preparation for the sustained
-controller; controller integration and equivalent native GPU state replay are
-still required before continuation.
+loss, decoder or evaluator source bytes. It also owns the bounded replay
+continuation comparators that bind fresh executions back to their native
+receipts.
 
 `run_scoped` requires an existing, exclusive `sureal-sustained-*.scope` with
 the exact requested `memory.max`, zero swap, and zero OOM counters. It refuses
@@ -15,8 +15,8 @@ same cleanup applies to detached children surviving a timeout. Failed stages
 never receive `resource_admission`.
 
 `execute_worker.py OUTPUT_DIR ORIGINAL_WORKER [ARGS...]` runs the unchanged
-worker script with its original argv and script directory. It also becomes a
-subreaper. All worker-created processes must complete and be waited for;
+worker script with its original argv. It also becomes a subreaper. All
+worker-created processes must complete and be waited for;
 running children and completed double-fork orphans both prevent a successful
 `worker-resource.json`. This contract intentionally excludes detached model
 workers and persistent multiprocessing loaders. The frozen workers use

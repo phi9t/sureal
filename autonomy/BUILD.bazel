@@ -2,7 +2,6 @@ load(":bazel_tests.bzl", "perception_py_test", "perception_test_name")
 load(
     ":source_snapshot_targets.bzl",
     "NATIVE_CACHE_RETENTION_HOST_SOURCES",
-    "RESOURCE_SOURCE_LAYER_GLOBS",
     "SUSTAINED_CHECKPOINT_RETENTION_HOST_SOURCES",
     "SUSTAINED_CONTROLLER_HOST_SOURCES",
     "SUSTAINED_PILOT_RETENTION_HOST_SOURCES",
@@ -22,6 +21,7 @@ filegroup(
         "//autonomy/inspection:all_py",
         "//autonomy/insula:all_py",
         "//autonomy/range_view:all_py",
+        "//autonomy/resources:all_py",
         "//autonomy/segmentation:all_py",
     ],
     visibility = ["//visibility:public"],
@@ -29,7 +29,7 @@ filegroup(
 
 filegroup(
     name = "resource-source-layer",
-    srcs = glob(RESOURCE_SOURCE_LAYER_GLOBS, exclude = ["**/__pycache__/**"]),
+    srcs = ["//autonomy/resources:resource_source_layer"],
     visibility = ["//visibility:public"],
 )
 
@@ -66,6 +66,8 @@ PERCEPTION_TEST_MODULES = glob(
         "camera/**",
         "dataset/**",
         "detection/**",
+        "resources/**",
+        "motion/**",
         "inspection/**",
         "range_view/**",
         "segmentation/**",
@@ -80,6 +82,8 @@ PERCEPTION_RUNFILES = glob(
         "camera/**",
         "dataset/**",
         "detection/**",
+        "resources/**",
+        "motion/**",
         "inspection/**",
         "range_view/**",
         "segmentation/**",
@@ -89,6 +93,7 @@ PERCEPTION_RUNFILES = glob(
 ) + [
     "//autonomy/camera:runfiles",
     "//autonomy/dataset:runfiles",
+    "//autonomy/motion:runfiles",
     "//autonomy/inspection:runfiles",
     "//autonomy/segmentation:runfiles",
     "research/association41-runtime-admission-20261003a/manifest.json",
@@ -103,6 +108,8 @@ PERCEPTION_DEPS = [
     "//autonomy/inspection:inspection",
     "//autonomy/insula:insula",
     "//autonomy/range_view:range_view",
+    "//autonomy/resources:resources",
+    "//autonomy/motion:motion",
     "//autonomy/segmentation:segmentation",
 ]
 
@@ -133,10 +140,10 @@ filegroup(
         "//autonomy/inspection:all_py",
         "//autonomy/insula:all_py",
         "//autonomy/range_view:all_py",
+        "//autonomy/motion:all_py",
         "//autonomy/segmentation:all_py",
     ] + glob([
         "architecture/harness/*.py",
-        "gpu/*.py",
         "pipeline/*.py",
     ]) + ARCHITECTURE_EXPERIMENT_RESEARCH_INPUTS,
     visibility = ["//visibility:public"],
@@ -150,8 +157,8 @@ genquery(
 
 genquery(
     name = "resource_source_layer_query",
-    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy:resource-source-layer)) union labels("data", deps(//autonomy:resource-source-layer))))',
-    scope = [":resource-source-layer"],
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy/resources:resource_source_layer)) union labels("data", deps(//autonomy/resources:resource_source_layer))))',
+    scope = ["//autonomy/resources:resource_source_layer"],
 )
 
 genquery(
@@ -215,6 +222,8 @@ test_suite(
             "//autonomy/inspection:all_tests",
             "//autonomy/insula:all_tests",
             "//autonomy/range_view:all_tests",
+            "//autonomy/resources:all_tests",
+            "//autonomy/motion:all_tests",
             "//autonomy/segmentation:all_tests",
         ],
     visibility = ["//visibility:public"],

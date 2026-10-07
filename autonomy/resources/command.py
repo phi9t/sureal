@@ -1,10 +1,11 @@
 """Record the actual bwrap command; never pretend an unwrapped argv executed."""
 from pathlib import Path
+from resources.sources import regular
 
 ARITY={'--unshare-all':0,'--die-with-parent':0,'--clearenv':0,
        '--proc':1,'--dev':1,'--tmpfs':1,'--chdir':1,
        '--ro-bind':2,'--bind':2,'--dev-bind':2,'--setenv':2}
-ALIASES={'/tmp/resource-layer','/tmp/resource-output'}
+ALIASES={'/tmp/resource-layer','/tmp/resource-output','/experiment/resources','/experiment/evidence'}
 
 
 def inspect_command(command):
@@ -33,15 +34,20 @@ def wrapped_command(command,code,output):
     if any(option in {'--ro-bind','--bind','--dev-bind','--proc','--dev','--tmpfs'} and
            values[-1] in ALIASES for option,values in options):
         raise ValueError('resource mount aliases must be unused')
-    bindings=['--ro-bind',str(code),'/tmp/resource-layer','--bind',str(output),'/tmp/resource-output']
-    return command[:separator]+bindings+['--',argv[0],'/tmp/resource-layer/execute_worker.py','/tmp/resource-output',*argv[1:]],argv[1:]
+    bindings=['--ro-bind',str(code),'/tmp/resource-layer',
+              '--ro-bind',str(code/'resources'),'/experiment/resources',
+              '--ro-bind',str(code/'evidence'),'/experiment/evidence',
+              '--bind',str(output),'/tmp/resource-output']
+    return command[:separator]+bindings+['--',argv[0],'/tmp/resource-layer/resources/execute_worker.py','/tmp/resource-output',*argv[1:]],argv[1:]
 
 
 def wrap_command(command,code,output):
     code=Path(code);output=Path(output)
     actual,worker_argv=wrapped_command(command,code,output)
     if (any(not p.is_absolute() or not p.is_dir() or any(q.is_symlink() for q in [p,*p.parents]) for p in [code,output]) or
-        not (code/'execute_worker.py').is_file() or (code/'execute_worker.py').is_symlink() or
+        not (code/'resources').is_dir() or not (code/'evidence').is_dir() or
+        not regular(code/'resources/execute_worker.py') or
+        not regular(code/'evidence/source_snapshot.py') or
         any(output.iterdir())):
         raise ValueError('regular code and empty resource output required')
     command[:]=actual

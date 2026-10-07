@@ -63,7 +63,7 @@ def check_harness_closure(here=None,package=None):
   p=here/'harness'/name
   if not p.is_file():raise ValueError('Missing bundled harness file: '+name)
   for referenced in re.findall(r"['\"]([a-zA-Z0-9_-]+\.py)['\"]",p.read_text()):
-   if referenced not in available and not (package/'gpu'/referenced).exists():
+   if referenced not in available and not any((package/area/referenced).exists() for area in ['detection','gpu']):
     raise ValueError(f'{name} references unbundled worker {referenced}')
  for name,item in registry(here).items():
   if item['status']=='runnable':
@@ -115,10 +115,10 @@ def verify_receipt(receipt,package,snapshot_store=None):
    for i,value in enumerate(command):
     if value=='/tmp/worker.py' and i>=2 and command[i-2]=='--ro-bind':
      check(command[i-1],receipt['worker_sha256']);found=True
-   # GPU checkpoint worker lives in the source package.
+   # Legacy GPU receipts and current detection receipts both pin source workers.
    if not found:
     for value in command:
-     if value.startswith('/experiment/gpu/') and value.endswith('.py'):
+     if value.startswith(('/experiment/gpu/','/experiment/detection/')) and value.endswith('.py'):
       check(package/value.removeprefix('/experiment/'),receipt['worker_sha256']);found=True
   if not found:raise ValueError('Cannot locate pinned receipt worker')
  if any(row.get('exit_code')!=0 for row in receipt.get('checks',[])):raise ValueError('Receipt has failed checks')
