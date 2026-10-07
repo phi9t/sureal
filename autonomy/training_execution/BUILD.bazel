@@ -43,6 +43,7 @@ py_library(
     ],
     deps = [
         "//autonomy/detection:detection",
+        "//autonomy/evaluation:evaluation",
         "//autonomy/evidence:evidence",
         "//autonomy/geometry:geometry",
         "//autonomy/insula:insula",

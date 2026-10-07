@@ -28,6 +28,12 @@ from studies.scientific_cohort import SCIENTIFIC_COHORT_TARGET
 
 
 PACKAGE = Path(__file__).resolve().parent
+SUSTAINED_EVALUATION_WORKERS = {
+    "evaluation/prepare_sustained_v3.py",
+    "evaluation/audit_proposals_sustained_v3.py",
+    "evaluation/metrics_sustained_v3.py",
+    "evaluation/audit_metrics_sustained_v3.py",
+}
 
 
 class SourceSnapshotTargetTests(unittest.TestCase):
@@ -82,7 +88,7 @@ class SourceSnapshotTargetTests(unittest.TestCase):
         self.assert_target_contains_required_sources(
             SUSTAINED_RUN_TARGET,
             "sustained_run_sources_query",
-            sustained_source_paths(PACKAGE),
+            set(sustained_source_paths(PACKAGE)) | SUSTAINED_EVALUATION_WORKERS,
         )
 
     def test_resource_source_layer_target_declares_required_execution_sources(self):
@@ -104,7 +110,7 @@ class SourceSnapshotTargetTests(unittest.TestCase):
         self.assert_target_contains_required_sources(
             CONTROLLER_TARGET,
             "sustained_controller_host_query",
-            CONTROLLER_REQUIRED,
+            set(CONTROLLER_REQUIRED) | SUSTAINED_EVALUATION_WORKERS,
         )
 
     def test_sustained_checkpoint_retention_host_target_declares_required_execution_sources(self):
@@ -169,6 +175,12 @@ class SourceSnapshotTargetTests(unittest.TestCase):
             "scientific_cohort_query",
             {
                 "studies/scientific_cohort.py",
+                "geometry/scientific_scene_command.py",
+                "geometry/scientific_scene_validate.py",
+                "geometry/scientific_reconstruction.py",
+                "geometry/reconstruction_validate.py",
+                "geometry/geometry.py",
+                "geometry/geometry_foundation.py",
                 "dataset/scientific-preprocess.py",
                 "dataset/publish-scientific-scene.py",
                 "dataset/verify-scientific-replay.py",

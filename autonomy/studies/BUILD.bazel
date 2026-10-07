@@ -42,6 +42,7 @@ py_library(
     deps = [
         "//autonomy/camera:camera",
         "//autonomy/dataset:dataset",
+        "//autonomy/geometry:geometry",
         "//autonomy/evidence:evidence",
         "//autonomy/insula:insula",
         "//autonomy/resources:resources",

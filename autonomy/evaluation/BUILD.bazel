@@ -19,7 +19,10 @@ py_library(
     name = "evaluation",
     srcs = LIB_MODULES,
     imports = [".."],
-    visibility = ["//autonomy:__pkg__"],
+    visibility = [
+        "//autonomy:__pkg__",
+        "//autonomy/training_execution:__pkg__",
+    ],
     deps = [
         "//autonomy/detection:detection",
         "//autonomy/evidence:evidence",
