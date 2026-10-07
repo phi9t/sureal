@@ -26,3 +26,6 @@ class PackingContract(unittest.TestCase):
   grids={(l,r):np.array([[[1.,2.,3.,0.]]]) for l in range(1,6) for r in (1,2)};identity=np.array([[l,r,0,0] for l in range(1,6) for r in (1,2)]);points=np.zeros((10,4));points[:,3]=2.
   bad=points.copy();bad[3,3]=7
   with self.assertRaises(ValueError):range_observations(grids,bad,identity,np.arange(10)[None])
+
+if __name__ == "__main__":
+ unittest.main()

@@ -33,3 +33,6 @@ class ArchiveContract(unittest.TestCase):
   with tempfile.TemporaryDirectory() as d:
    root=Path(d)/'source';root.mkdir();(root/'checkpoint.pt').write_bytes(b'x'*20)
    with self.assertRaises(ValueError):create_archive(root,['checkpoint.pt'],Path(d)/'a.tar.gz',max_bytes=10)
+
+if __name__ == "__main__":
+ unittest.main()

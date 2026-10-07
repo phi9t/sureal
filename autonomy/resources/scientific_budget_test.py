@@ -12,3 +12,6 @@ class AdmissionTests(unittest.TestCase):
   r=fit_interval(curve);self.assertEqual(r['first_stable_fit_update_interval'],[50,100]);self.assertEqual(r['confirmation_update'],200)
  def test_censored(self):
   r=fit_interval([{'step':0,'cumulative_train_seconds':0,'all_class_quality_passed':False},{'step':10000,'cumulative_train_seconds':500,'all_class_quality_passed':False}]);self.assertTrue(r['right_censored']);self.assertEqual(r['observed_updates'],10000)
+
+if __name__ == "__main__":
+ unittest.main()

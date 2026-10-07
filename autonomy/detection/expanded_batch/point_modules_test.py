@@ -22,3 +22,6 @@ class PointContract(unittest.TestCase):
   a=PointAttention(PillarFeatureNet());b=PointMLP(PillarFeatureNet());self.assertEqual(sum(p.numel() for p in a.parameters()),sum(p.numel() for p in b.parameters()))
  def test_ragged_invalid_lengths_rejected(self):
   with self.assertRaises(ValueError):decorate_ragged(torch.zeros(3,4),torch.tensor([2,2]),torch.zeros(2,4,dtype=torch.long),cell_size=(.25,.25),origin=(-64.,-64.))
+
+if __name__ == "__main__":
+ unittest.main()

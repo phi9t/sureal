@@ -12,3 +12,6 @@ class CatalogTests(unittest.TestCase):
  def test_fixture_uses_coverage_then_size(self):
   def row(name,n,uncovered):return {'identity':name,'eligible_GT':n,'uncovered_GT':uncovered,'covered_objects':{str(c):list('abcde') for c in range(1,5)}}
   self.assertEqual(select_fixture({'validation':[row('b',20,0),row('a',19,1),row('c',15,0)]})['identity'],'c')
+
+if __name__ == "__main__":
+ unittest.main()
