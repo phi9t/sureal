@@ -44,15 +44,15 @@ retained expanded-batch composition still imports `range_view.RangePillar`;
 that exception is modeled as an explicit BUILD dependency rather than a hidden
 path rewrite.
 
-## Two kinds of source
+## Active code and retained records
 
-- **Library code** is imported by other modules and belongs to one concept
-  package. Its cross-concept imports must match the package's BUILD deps and
-  visibility.
-- **Procedure records** are scripts that ran one gate or one study stage and
-  wrote receipts containing their own digest. Closed records remain in
-  `procedure_records/` or `research/` and are retained as evidence, not active
-  package structure.
+- **Active code** includes libraries, command entrypoints and controllers. Each
+  belongs to the concept it implements. Its imports and subprocess inputs must
+  be covered by the executable target's declared dependencies and data.
+- **Closed procedure records** preserve historical study procedures, including
+  unused contingency scripts. A retained file alone does not prove execution;
+  the corresponding receipt supplies that evidence. These records remain in
+  `procedure_records/` or `research/` and do not define active package edges.
 
 Both kinds can be pinned by receipts. A source pin is the SHA-256 digest of a
 source file recorded in a receipt; the file is *pinned* by that receipt. New
@@ -61,6 +61,18 @@ the executable Bazel target. Historical schema 1 receipts use
 component-relative paths; schema 2 source snapshot receipts use repository
 paths rooted at `autonomy/`. The working tree is allowed to move forward even
 when old receipts still pin earlier source bytes.
+
+Production snapshot creation archives the executable target's transitive source
+closure in content-addressed HDFS storage and verifies exact readback. Receipts
+bind the archive digest, source pins and store descriptor. Offline tests inject
+a local store explicitly; a failed HDFS operation does not become local-only
+success.
+
+Recovery verifies the admitted archive and materializes its original bytes.
+An existing materialization must match the receipt; verification does not fill
+in or overwrite a partial or altered tree. Historical receipts retain their
+original schema, path interpretation and store contract. They are checked
+against their admitted sources, not today's checkout or dependency inventory.
 
 `evidence/source_snapshot.py` owns the shared file digest implementation, the
 regular-file check, source snapshot creation and source pin verification.

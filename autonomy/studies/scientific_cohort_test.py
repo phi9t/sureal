@@ -138,17 +138,10 @@ class ScientificCohortWorkflowTests(unittest.TestCase):
             def fake_launch_plan(_root, _experiment, _source, output_directory, command):
                 return ["bwrap", "--bind", str(output_directory), "/outputs", "--", *command]
 
-            def fake_sha(path):
-                try:
-                    return file_sha256(path)
-                except ValueError:
-                    return "d" * 64
-
             with (
                 patch.object(scientific_cohort, "HERE", package),
                 patch.object(scientific_cohort, "CACHE", cache),
                 patch.object(scientific_cohort, "WORKING", working),
-                patch.object(scientific_cohort, "sha", side_effect=fake_sha),
                 patch.object(scientific_cohort, "verify_rootfs"),
                 patch.object(scientific_cohort, "admit_scene"),
                 patch.object(scientific_cohort, "launch_plan", side_effect=fake_launch_plan),

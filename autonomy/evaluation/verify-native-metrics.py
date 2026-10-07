@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Materialize native metrics image and run pinned upstream tests offline."""
+import sys
 from datetime import datetime,timezone
 import json
 from pathlib import Path

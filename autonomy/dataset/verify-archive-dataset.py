@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Replay the engineering HDFS archive twice against verified native point files."""
+import sys
 from datetime import datetime, timezone
 import json
 from pathlib import Path

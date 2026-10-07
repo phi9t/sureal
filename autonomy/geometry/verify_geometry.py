@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Candidate-specific live mathematical geometry gate, following verified M0."""
+import sys
 from datetime import datetime,timezone
 import json
 from pathlib import Path

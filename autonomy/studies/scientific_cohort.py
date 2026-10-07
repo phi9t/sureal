@@ -8,7 +8,8 @@ from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
 from dataset.scientific_admission import admit_scene
 from dataset.cohort_resume import verify_registered_checkpoint
-HERE=Path(__file__).resolve().parents[1]
+DRIVER=Path(__file__).resolve()
+HERE=DRIVER.parents[1]
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
 WORKING=CACHE/'scientific-processing'
 POINT_COMPONENTS=['lidar_calibration','camera_calibration','vehicle_pose','lidar_pose','lidar_camera_projection','lidar_segmentation','lidar_box','reconstruction']
@@ -35,7 +36,7 @@ def main():
  try:fcntl.flock(owner,fcntl.LOCK_EX|fcntl.LOCK_NB)
  except BlockingIOError:raise ValueError('another cohort driver is live')
  manifest_path=HERE/'dataset/scientific-acquisition.candidate.json';manifest=json.loads(manifest_path.read_text());manifest['excluded_engineering_segments']=json.loads((HERE/'dataset/scientific-cohort.candidate.json').read_text())['excluded_engineering_segments']
- root=CACHE/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);driver_sha=sha(Path(__file__));manifest_sha=sha(manifest_path)
+ root=CACHE/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);driver_sha=sha(DRIVER);manifest_sha=sha(manifest_path)
  for index,scene in enumerate(args.scene):
   membership=manifest['scenes'][scene];paths={c:CACHE/'scientific-source-audit'/f"{membership['official_split']}-{c}-{scene}.json" for c in manifest['components']};records={c:json.loads(p.read_text()) for c,p in paths.items()};admit_scene(manifest,records,scene);source_hashes={c:sha(p) for c,p in paths.items()}
   scene_base=base/scene;checkpoint=scene_base/'receipt.json'
@@ -80,7 +81,7 @@ def main():
   evict('camera-evict','camera.camera_eviction','evict_camera',camera,camera_pub,camera_replay,ch,crh)
   for c,p in paths.items():
    if sha(p)!=source_hashes[c]:raise ValueError('source admission changed during lifecycle')
-  if sha(Path(__file__))!=driver_sha or sha(manifest_path)!=manifest_sha or total(WORKING)>15*1024**3:raise ValueError('driver/cohort/cap changed')
+  if sha(DRIVER)!=driver_sha or sha(manifest_path)!=manifest_sha or total(WORKING)>15*1024**3:raise ValueError('driver/cohort/cap changed')
   for p in scene_base.glob('*.log'):remember(p)
   save(checkpoint,{'status':'native scientific scene point/camera lifecycle independently verified; protocol remains open','scene':scene,'membership':membership,'checks':checks,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-tick,'peak_child_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'driver_sha256':driver_sha,'manifest_sha256':manifest_sha,'source_record_hashes':source_hashes,'runtime_lock':lock,'retained_evidence_hashes':retained,'point_validation':point_replay['validation'],'camera_validation':camera_result['validation'],'point_hdfs_uri':pub['archive_hdfs_uri'],'camera_hdfs_uri':json.loads((camera_pub/'receipt.json').read_text())['archive_hdfs_uri'],'scope':'native preprocessing only; independent full queue audit, class maps, full task/cohort/scientific protocol/model comparisons remain open'})
   print('PASS complete queued native scene',scene,flush=True)

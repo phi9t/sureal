@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Live default-metric boundary check, including upstream exit-zero failure."""
+import sys
 from datetime import datetime, timezone
 import json
 from pathlib import Path

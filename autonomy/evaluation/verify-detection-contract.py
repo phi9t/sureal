@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Native schema export and hand-derived default detection metric fixtures."""
+import sys
 from datetime import datetime,timezone
 import json
 from pathlib import Path

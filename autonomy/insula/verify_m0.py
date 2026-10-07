@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Run and record live M0 checks; promote receipt only after every check passes."""
+import sys
 import json
 import os
 from pathlib import Path
