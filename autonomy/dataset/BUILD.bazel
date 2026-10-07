@@ -27,6 +27,7 @@ DATASET_VISIBILITY = [
     "//autonomy/geometry:__pkg__",
     "//autonomy/inspection:__pkg__",
     "//autonomy/segmentation:__pkg__",
+    "//autonomy/studies:__pkg__",
 ]
 
 TEST_EXTRA_SRCS = {

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Independent offline GPU entry checks and analytic artifact failure injections."""
 from datetime import datetime, timezone
-import hashlib
 import json
 from pathlib import Path
 import socket
@@ -9,10 +8,9 @@ import subprocess
 import sys
 
 HERE=Path(__file__).resolve().parents[1]
+from evidence.source_snapshot import file_sha256 as sha
 from insula.runtime_identity import verify_rootfs
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
-
-def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 
 def main():
     candidate=CACHE/'gpu-live-d'

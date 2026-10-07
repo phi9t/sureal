@@ -1,20 +1,21 @@
-import hashlib,json,tempfile,unittest
+import json,tempfile,unittest
 from pathlib import Path
 from dataset.scientific_preparation import verified_sidecar_hashes
+from evidence.source_snapshot import file_sha256
 
 class ScientificPreparationTests(unittest.TestCase):
     def fixture(self,root):
         sidecar=root/'sidecars/lidar_pose';sidecar.mkdir(parents=True);evidence=root/'evidence/lidar_pose';(evidence/'checked').mkdir(parents=True)
         manifest=sidecar/'manifest.json';manifest.write_text(json.dumps({'component':'lidar_pose','scene':'scene','source_sha256':'a'*64}))
         check=evidence/'checked/check.json';check.write_text(json.dumps({'source_sha256':'a'*64,'status':'all native identities, scalars and shaped arrays reconciled'}))
-        sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+        sha=lambda p:file_sha256(p)
         r={'scene':'scene','component':'lidar_pose','source_sha256':'a'*64,'candidate_hashes':{'worker':'b'*64},'checks':[{'stage':'decode','exit_code':0},{'stage':'independent-check','exit_code':0}],'validation':json.loads(check.read_text()),'artifacts':{str(p.relative_to(root)):sha(p) for p in [manifest,check]}}
         receipt=evidence/'receipt.json';receipt.write_text(json.dumps(r));return manifest,check,receipt
 
     def test_hashes_anchored_to_successful_independent_receipts(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);manifest,_,_=self.fixture(root)
-            self.assertEqual(verified_sidecar_hashes(root,['lidar_pose'],'scene',{'worker':'b'*64}),{'lidar_pose':hashlib.sha256(manifest.read_bytes()).hexdigest()})
+            self.assertEqual(verified_sidecar_hashes(root,['lidar_pose'],'scene',{'worker':'b'*64}),{'lidar_pose':file_sha256(manifest)})
 
     def test_changed_missing_or_failed_evidence_refused(self):
         for mutation in ('manifest','checker','failure','candidate','scene','source','missing'):

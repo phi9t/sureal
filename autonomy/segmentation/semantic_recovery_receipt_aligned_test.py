@@ -1,12 +1,12 @@
 """Aligned transfer receipt contract; rehash mutations to test semantics."""
 import copy
-import hashlib
 import json
 import os
 from pathlib import Path
 import shutil
 import tempfile
 import unittest
+from evidence.source_snapshot import file_sha256
 from segmentation.semantic_recovery_receipt_aligned import verify_receipt
 
 
@@ -31,12 +31,12 @@ class AlignedReceiptTests(unittest.TestCase):
                     pub=json.loads((root/'input/publication.json').read_text())
                     pub['archive']['archive_bytes']=size
                     (root/'input/publication.json').write_text(json.dumps(pub))
-                    expected['publication_manifest_sha256']=hashlib.sha256((root/'input/publication.json').read_bytes()).hexdigest()
+                    expected['publication_manifest_sha256']=file_sha256(root/'input/publication.json')
                     r['input_identity']=expected
                     (root/'input/trusted.json').write_text(json.dumps(expected))
                     r['validation']['publication_sha256']=expected['publication_manifest_sha256']
                     (root/'output/support.json').write_text(json.dumps(r['validation']))
-                    for n in r['artifacts']:r['artifacts'][n]=hashlib.sha256((root/n).read_bytes()).hexdigest()
+                    for n in r['artifacts']:r['artifacts'][n]=file_sha256(root/n)
                     t=r['transfer'];t['archive_bytes']=size
                     # Hand-sized cases: original archive is aligned; 2048 reserves 4096.
                     limit=size if size!=2048 else 4096
@@ -46,7 +46,7 @@ class AlignedReceiptTests(unittest.TestCase):
                              working_peak_bound_bytes=t['working_bytes_before']+limit)
                     if mutation:mutation(t)
                     (root/'receipt.json').write_text(json.dumps(r))
-                    args=dict(expected_sha256=hashlib.sha256((root/'receipt.json').read_bytes()).hexdigest(),
+                    args=dict(expected_sha256=file_sha256(root/'receipt.json'),
                               expected_record=expected,expected_runtime=original['runtime_lock'],
                               expected_code=original['candidate_hashes'],code_root=code)
                     if mutation:

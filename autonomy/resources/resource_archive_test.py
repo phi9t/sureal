@@ -1,5 +1,6 @@
 import hashlib,json,tarfile,tempfile,unittest
 from pathlib import Path
+from evidence.source_snapshot import file_sha256
 from resources.resource_archive import create_archive,verify_archive
 
 class ArchiveContract(unittest.TestCase):
@@ -27,7 +28,7 @@ class ArchiveContract(unittest.TestCase):
    a=Path(d)/'bad.tar'
    with tarfile.open(a,'w') as tar:
     m=tarfile.TarInfo('checkpoint.pt');m.type=tarfile.SYMTYPE;m.linkname='/etc/passwd';tar.addfile(m)
-   manifest={'archive_sha256':hashlib.sha256(a.read_bytes()).hexdigest(),'archive_bytes':a.stat().st_size,'members':[{'path':'checkpoint.pt','bytes':0,'sha256':hashlib.sha256(b'').hexdigest()}]}
+   manifest={'archive_sha256':file_sha256(a),'archive_bytes':a.stat().st_size,'members':[{'path':'checkpoint.pt','bytes':0,'sha256':hashlib.sha256(b'').hexdigest()}]}
    with self.assertRaises(ValueError):verify_archive(a,manifest)
  def test_admission_bounds_are_enforced(self):
   with tempfile.TemporaryDirectory() as d:

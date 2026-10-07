@@ -1,8 +1,9 @@
 """Literal whole-grid assignment reconciliation and uncovered-GT collision audit."""
-import hashlib,json,resource,time
+import json,resource,time
 from pathlib import Path
 import numpy as np
-start=time.monotonic();sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+from evidence.source_snapshot import file_sha256
+start=time.monotonic();sha=lambda p:file_sha256(p)
 e=json.loads(Path('/tmp/inputs/expected.json').read_text())
 for name,key in [('manifest.json','manifest_sha256'),('anchor-templates.json','anchors_sha256')]:assert sha(Path('/tmp/inputs')/name)==e[key]
 assert sha('/source/groundtruth.json')==e['groundtruth_sha256']

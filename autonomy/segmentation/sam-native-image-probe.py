@@ -1,15 +1,16 @@
 """Frozen official SAM native-image engineering probe; oracle prompts explicit."""
-import hashlib,importlib.util,json,time
+import importlib.util,json,time
 from pathlib import Path
 import numpy as np
 from PIL import Image
 import torch
 from segment_anything import SamPredictor,sam_model_registry
+from evidence.source_snapshot import file_sha256
 assert importlib.util.find_spec('tensorflow') is None and torch.cuda.device_count()==1
 d=json.loads(Path('/mnt/trusted.json').read_text());teacher=json.loads(Path('/mnt/teacher.json').read_text())
 assert d['prompt_origin']=='native_camera_box_oracle_engineering_only'
-assert hashlib.file_digest(Path('/tmp/sam-checkpoint.pth').open('rb'),'sha256').hexdigest()==teacher['checkpoint_sha256']
-assert hashlib.sha256(Path('/mnt/image.png').read_bytes()).hexdigest()==d['png_sha256']
+assert file_sha256('/tmp/sam-checkpoint.pth')==teacher['checkpoint_sha256']
+assert file_sha256('/mnt/image.png')==d['png_sha256']
 image=np.asarray(Image.open('/mnt/image.png').convert('RGB'));assert list(image.shape[:2])==d['image_size']
 torch.manual_seed(17);torch.cuda.manual_seed_all(17);torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=False
 started=time.monotonic();model=sam_model_registry['vit_b'](checkpoint='/tmp/sam-checkpoint.pth').cuda().eval();model.requires_grad_(False);predictor=SamPredictor(model);torch.cuda.synchronize();model_load_seconds=time.monotonic()-started

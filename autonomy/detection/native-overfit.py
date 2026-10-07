@@ -1,10 +1,11 @@
 """Preregistered fixed training-frame overfit; final heads require native scoring."""
-import hashlib,importlib.util,json,resource,time
+import importlib.util,json,resource,time
 from pathlib import Path
 import numpy as np
 import torch
 from detection.pillar_detector import PillarDetector
 from detection.detector_loss import detector_loss
+from evidence.source_snapshot import file_sha256 as sha
 assert importlib.util.find_spec('tensorflow') is None
 assert torch.cuda.is_available() and torch.cuda.device_count()==1
 manifest=json.loads(Path('/tmp/inputs/manifest.json').read_text())
@@ -16,7 +17,7 @@ torch.use_deterministic_algorithms(True)
 frames=[]
 for frame in manifest['frames']:
  directory=Path('/tmp/native')/frame['relative_directory']
- for name,digest in frame['sha256'].items():assert hashlib.sha256((directory/name).read_bytes()).hexdigest()==digest
+ for name,digest in frame['sha256'].items():assert sha(directory/name)==digest
  with np.load(directory/'observations.npz',allow_pickle=False) as data:
   assert set(data.files)=={'points','counts','coordinates'}
   observations=tuple(torch.from_numpy(data[key].astype(np.float32) if key=='points' else data[key]).pin_memory() for key in ['points','counts','coordinates'])
@@ -59,7 +60,7 @@ for step in range(2000):
  if (step+1)%100==0:print('UPDATE',step+1,'loss',step_records[-1]['loss'],'seconds',time.monotonic()-train_start,flush=True)
 final=evaluate(save=True);torch.cuda.synchronize()
 checkpoint=Path('/outputs/checkpoint.pt')
-torch.save({'model':model.state_dict(),'optimizer':optimizer.state_dict(),'steps':2000,'manifest_sha256':hashlib.sha256(Path('/tmp/inputs/manifest.json').read_bytes()).hexdigest(),'torch_rng':torch.get_rng_state(),'cuda_rng':torch.cuda.get_rng_state(),'sampling_rng':rng.bit_generator.state,'remaining_frame_order':order},checkpoint)
+torch.save({'model':model.state_dict(),'optimizer':optimizer.state_dict(),'steps':2000,'manifest_sha256':sha(Path('/tmp/inputs/manifest.json')),'torch_rng':torch.get_rng_state(),'cuda_rng':torch.cuda.get_rng_state(),'sampling_rng':rng.bit_generator.state,'remaining_frame_order':order},checkpoint)
 a=sum(x['total'] for x in initial)/16;b=sum(x['total'] for x in final)/16
-report={'scope':'training-only fixed16-frame overfit execution; APH/export acceptance still requires independent native scoring','updates':2000,'initial_eval_losses':initial,'final_eval_losses':final,'initial_mean_loss':a,'final_mean_loss':b,'loss_reduction_fraction':1-b/a,'loss_gate_passed':1-b/a>=.8,'step_records':step_records,'peak_allocated_bytes':torch.cuda.max_memory_allocated(),'peak_reserved_bytes':torch.cuda.max_memory_reserved(),'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'elapsed_seconds':time.monotonic()-start,'torch':torch.__version__,'device':torch.cuda.get_device_name(0),'deterministic_algorithms':True,'tf32':False,'seed':17,'checkpoint_sha256':hashlib.sha256(checkpoint.read_bytes()).hexdigest()}
+report={'scope':'training-only fixed16-frame overfit execution; APH/export acceptance still requires independent native scoring','updates':2000,'initial_eval_losses':initial,'final_eval_losses':final,'initial_mean_loss':a,'final_mean_loss':b,'loss_reduction_fraction':1-b/a,'loss_gate_passed':1-b/a>=.8,'step_records':step_records,'peak_allocated_bytes':torch.cuda.max_memory_allocated(),'peak_reserved_bytes':torch.cuda.max_memory_reserved(),'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'elapsed_seconds':time.monotonic()-start,'torch':torch.__version__,'device':torch.cuda.get_device_name(0),'deterministic_algorithms':True,'tf32':False,'seed':17,'checkpoint_sha256':sha(checkpoint)}
 Path('/outputs/check.json').write_text(json.dumps(report,indent=2)+'\n');print('TERMINAL native overfit execution; loss gate',report['loss_gate_passed'],'reduction',report['loss_reduction_fraction'],flush=True)

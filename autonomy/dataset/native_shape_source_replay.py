@@ -3,19 +3,15 @@
 Expectations come from the caller's admitted source/job inventory. This one-source
 module does not authorize scientific membership or close the full cohort.
 """
-import hashlib
 import json
 from pathlib import Path
 import subprocess
 import sys
+from evidence.source_snapshot import file_sha256 as sha
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
 from insula.staging_lease import staging_lease
 from dataset.staged_source import staged_source
-
-
-def sha(path):
-    with Path(path).open('rb') as handle:return hashlib.file_digest(handle,'sha256').hexdigest()
 
 
 def replay_shape_source(job_path,source_receipt,*,expected_job_sha256,
@@ -66,10 +62,11 @@ def replay_shape_source(job_path,source_receipt,*,expected_job_sha256,
             if result.returncode:raise ValueError('shape producer failed; retain worker log')
             checks.append({'command':command,'exit_code':result.returncode})
             report_sha=sha(worker/'shapes.json')
-            program="""import hashlib,json,math
+            program="""import json,math
 from pathlib import Path
+from evidence.source_snapshot import file_sha256
 from geometry.native_range_shape_reference import verify_native_range_shapes
-sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+sha=lambda p:file_sha256(p)
 assert sha('/tmp/job/job.json')==JOBPIN
 j=json.loads(Path('/tmp/job/job.json').read_text());assert sha('/tmp/replayed/shapes.json')==OUTPUTPIN
 r=json.loads(Path('/tmp/replayed/shapes.json').read_text())

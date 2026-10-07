@@ -16,6 +16,7 @@ REPLAY = '''import json,hashlib
 from pathlib import Path
 import numpy as np
 from dataset.scientific_dataset import iter_scene_records
+from evidence.source_snapshot import file_sha256
 reference=json.loads(Path('/opt/report.json').read_text())
 expected={(r['context'],r['timestamp'],r['laser'],r['return']):r for r in reference['rows']}
 seen=set(); digest=hashlib.sha256(); points=0
@@ -23,7 +24,7 @@ for row in iter_scene_records(Path('/source/scene.tar'),Path('/source/publicatio
  identity=row['identity']; key=tuple(identity[k] for k in ('context','timestamp','laser','return'))
  assert key in expected and key not in seen; seen.add(key); r=expected[key]
  assert row['return_present']==r['return_present']
- path=Path('/opt')/r['artifact']; assert hashlib.sha256(path.read_bytes()).hexdigest()==r['sha256']
+ path=Path('/opt')/r['artifact']; assert file_sha256(path)==r['sha256']
  assert set(row['observations'])=={'xyz','physical_features'}
  assert set(row['evaluation'])=={'nlz'} and set(row['correspondence'])=={'camera_projection'}
  assert ('segmentation' in row['targets'])==r['segmentation_present'] and identity['motion']==r['motion']

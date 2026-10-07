@@ -1,6 +1,6 @@
 """Freeze the host closure for sustained controller execution and retention."""
 from pathlib import Path
-from evidence.source_snapshot import require_regular_file,snapshot_target_and_materialize,verify_or_materialize_receipt_sources
+from evidence.source_snapshot import file_sha256 as sha,require_regular_file,snapshot_target_and_materialize,verify_or_materialize_receipt_sources
 from retention.checkpoint_retention_sources import HISTORICAL_REQUIRED as RETENTION_HISTORICAL_REQUIRED
 from retention.checkpoint_retention_sources import REQUIRED as RETENTION_REQUIRED
 REQUIRED=tuple(sorted(set(RETENTION_REQUIRED)|{
@@ -28,9 +28,6 @@ HISTORICAL_REQUIRED=tuple(sorted(set(RETENTION_HISTORICAL_REQUIRED)|{
  'studies/architecture/experiment_runner.py',
 }))
 SNAPSHOT_TARGET='//autonomy/training_execution:run_sustained'
-def sha(path):
- from evidence.source_snapshot import file_sha256
- return file_sha256(path)
 def regular(path):
  try:require_regular_file(path)
  except ValueError:return False

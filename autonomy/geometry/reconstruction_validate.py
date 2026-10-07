@@ -1,5 +1,4 @@
 """Separate source reconciliation; never trusts producer target/key flags."""
-import hashlib
 import json
 import math
 from pathlib import Path
@@ -7,6 +6,7 @@ import sys
 import numpy as np
 from dataset.sensor_records import select_rows, OrderedLookup
 from dataset.tracer import _verify_sources
+from evidence.source_snapshot import file_sha256
 
 
 def raw(row,prefix):
@@ -70,7 +70,7 @@ def validate(source,out):
                 key=(context,stamp,laser,ret);expected_keys.add(key)
                 if key not in records:raise ValueError('missing sensor/return')
                 r=records[key];path=out/r['artifact']
-                if hashlib.sha256(path.read_bytes()).hexdigest()!=r['sha256']:raise ValueError('artifact digest')
+                if file_sha256(path)!=r['sha256']:raise ValueError('artifact digest')
                 pixels=np.argwhere(np.isfinite(ri[...,0])&(ri[...,0]>0));y,x=pixels.T
                 projection=raw(pr,f'[LiDARCameraProjectionComponent].range_image_return{ret}')
                 seg=raw(sr,f'[LiDARSegmentationLabelComponent].range_image_return{ret}') if sr else None

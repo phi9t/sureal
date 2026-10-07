@@ -1,5 +1,4 @@
 """Trusted engineering frame to GPU model; diagnostic targets, no optimizer."""
-import hashlib
 import importlib.util
 import json
 import time
@@ -8,12 +7,13 @@ import numpy as np
 import torch
 from detection.pillar_detector import PillarDetector
 from detection.detector_loss import detector_loss
+from evidence.source_snapshot import file_sha256
 
 
 def main():
     trusted=json.loads(Path('/mnt/trusted.json').read_text())
     payload=Path('/source/output/packed.npz')
-    assert hashlib.sha256(payload.read_bytes()).hexdigest()==trusted['packed_sha256']
+    assert file_sha256(payload)==trusted['packed_sha256']
     assert importlib.util.find_spec('tensorflow') is None
     assert torch.cuda.is_available() and torch.cuda.device_count()==1
     torch.manual_seed(17)

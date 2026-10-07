@@ -3,6 +3,7 @@ import hashlib
 import json
 
 import numpy as np
+from evidence.source_snapshot import file_sha256 as sha256_file
 
 
 FRAME = ("key.segment_context_name", "key.frame_timestamp_micros")
@@ -33,14 +34,6 @@ def native_keys(component):
 def canonical(value):
     return (json.dumps(value, sort_keys=True, separators=(",", ":"),
                        allow_nan=False) + "\n").encode()
-
-
-def sha256_file(path):
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(8 * 1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
 
 
 def validate_transform(values):

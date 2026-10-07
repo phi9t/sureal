@@ -4,11 +4,10 @@ from datetime import datetime,timezone
 import hashlib,json
 from pathlib import Path
 import subprocess,sys,time
-HERE=Path(__file__).resolve().parents[1];sys.path.insert(0,str(HERE))
+HERE=Path(__file__).resolve().parents[1]
+from evidence.source_snapshot import file_sha256 as sha
 from insula.runtime_identity import verify_rootfs
 from insula.entry import launch_plan
-
-def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 
 def main():
     cache=Path.home()/'.cache/waystone/waymo-perception';out=Path(sys.argv[1]).resolve();out.mkdir(parents=True,exist_ok=False)

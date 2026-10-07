@@ -123,22 +123,16 @@ def bazel_command(arguments, output_base, update_lock=False):
     ]
 
 
-# Bridge legacy absolute /experiment/<waymo-child> paths until ticket 26 removes them.
 def repo_workspace_mounts(update_lock=False):
     mounts = [["--tmpfs", "/experiment"]]
-    root_names = set()
     for path in sorted(REPO.iterdir(), key=lambda item: item.name):
         if path.name == ".bazel-cache":
             continue
-        root_names.add(path.name)
         if update_lock and path.name == "MODULE.bazel.lock":
             continue
         mounts.append(["--ro-bind", str(path.resolve()), "/experiment/" + path.name])
     if update_lock:
         mounts.append(["--bind", str((REPO / "MODULE.bazel.lock").resolve()), "/experiment/MODULE.bazel.lock"])
-    for path in sorted(AUTONOMY.iterdir(), key=lambda item: item.name):
-        if path.is_dir() and path.name not in root_names:
-            mounts.append(["--ro-bind", str(path.resolve()), "/experiment/" + path.name])
     return mounts
 
 

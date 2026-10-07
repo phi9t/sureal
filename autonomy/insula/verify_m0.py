@@ -1,24 +1,20 @@
 #!/usr/bin/env python3
 """Run and record live M0 checks; promote receipt only after every check passes."""
-import hashlib
 import json
 import os
 from pathlib import Path
 import resource
 import socket
 import subprocess
-import sys
 import tempfile
 import time
 from datetime import datetime,timezone
 
-HERE=Path(__file__).resolve().parent
-sys.path.insert(0,str(HERE))
+HERE=Path(__file__).resolve().parents[1]
+from evidence.source_snapshot import file_sha256 as sha
 from insula.m0_receipt import candidate_files, validate_receipt
 ROOT=Path(os.environ.get('WAYMO_INSULA_ROOT',str(Path.home()/'.cache/waystone/waymo-perception/insula/rootfs-v2')))
 CACHE=ROOT.parent
-
-def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 
 def main():
     destination=Path(sys.argv[1])

@@ -1,4 +1,3 @@
-import hashlib
 import json
 import os
 import subprocess
@@ -7,11 +6,12 @@ import textwrap
 import unittest
 from pathlib import Path
 
+from evidence.source_snapshot import file_sha256
 from insula.runtime_identity import rootfs_identity
 
 
 PACKAGE = Path(__file__).resolve().parents[1]
-BUILD = PACKAGE / "build.sh"
+BUILD = PACKAGE / "insula/build_cpu_rootfs.sh"
 BAZEL_VERSION = "9.2.0"
 BAZEL_LINUX_X86_64_SHA256 = (
     "7668a95db1250f12c40407251e4e203b4ec8bf39bc495d2f485b2d8c99048694"
@@ -27,7 +27,7 @@ TEST_TOOL_PACKAGE_INVENTORY = (
 
 
 def sha256(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    return file_sha256(path)
 
 
 def write_executable(path, body):
@@ -216,7 +216,7 @@ class CpuRootfsBuildTests(unittest.TestCase):
             self.assertEqual(lock["requirements_sha256"], sha256(PACKAGE / "requirements-tracer.lock"))
             self.assertEqual(
                 lock["test_tools_requirements_sha256"],
-                sha256(PACKAGE / "requirements-test-tools.lock"),
+                sha256(PACKAGE / "insula/cpu-test-tools-requirements.lock"),
             )
             self.assertEqual(lock["dockerfile_sha256"], sha256(PACKAGE / "insula/Dockerfile"))
             self.assertEqual(lock["bazel_version"], BAZEL_VERSION)

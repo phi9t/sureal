@@ -1,11 +1,12 @@
 """Prepare native ground-truth box replay for evaluator verification only."""
 from pathlib import Path
-import hashlib,json
+import json
+from evidence.source_snapshot import file_sha256
 import pyarrow.parquet as pq
 
 root=Path('/source/raw/validation/lidar_box');records=[];sources={};seen=set()
 for p in sorted(root.glob('*.parquet')):
-    sources[p.name]=hashlib.sha256(p.read_bytes()).hexdigest()
+    sources[p.name]=file_sha256(p)
     for batch in pq.ParquetFile(p).iter_batches(batch_size=128):
         for row in batch.to_pylist():
             prefix='[LiDARBoxComponent].'

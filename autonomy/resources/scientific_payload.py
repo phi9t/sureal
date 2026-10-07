@@ -1,10 +1,8 @@
 """Count unique scientific payloads; atomically link byte-identical immutable files."""
 import os,uuid
 from pathlib import Path
-from evidence.source_snapshot import file_sha256,require_regular_file
+from evidence.source_snapshot import file_sha256 as sha,require_regular_file
 
-def sha(path):
- return file_sha256(path)
 def unique_payload_bytes(root):
  root=Path(root)
  if root.is_symlink():raise ValueError('scientific payload root must not be a symlink: '+str(root))

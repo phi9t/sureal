@@ -1,6 +1,6 @@
 """Freeze the host closure that admits, archives and releases sustained pilot bytes."""
 from pathlib import Path
-from evidence.source_snapshot import require_regular_file,snapshot_target_and_materialize,verify_or_materialize_receipt_sources
+from evidence.source_snapshot import file_sha256 as sha,require_regular_file,snapshot_target_and_materialize,verify_or_materialize_receipt_sources
 REQUIRED=(
  'retention/publish_sustained_pilot.py','retention/sustained_pilot_inventory.py',
  'retention/pilot_retention_audit.py','retention/pilot_retention_sources.py','retention/publisher_runtime.py',
@@ -18,9 +18,6 @@ HISTORICAL_REQUIRED=(
  'evidence/source_snapshot.py','insula/entry.py','insula/runtime_identity.py',
 )
 SNAPSHOT_TARGET='//autonomy/retention:publish_sustained_pilot'
-def sha(path):
- from evidence.source_snapshot import file_sha256
- return file_sha256(path)
 def regular(path):
  try:require_regular_file(path)
  except ValueError:return False

@@ -1,9 +1,10 @@
 """One-frame native untrained range frontend verification."""
-import hashlib,importlib.util,json,time
+import importlib.util,json,time
 from pathlib import Path
 import numpy as np
 import torch
 from torch.nn import functional as F
+from evidence.source_snapshot import file_sha256
 from geometry.native_range_grid import native_range_grid
 from range_view.range_frontend import RangeFrontend
 assert importlib.util.find_spec('tensorflow') is None
@@ -13,7 +14,7 @@ torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=Fals
 d=json.loads(Path('/mnt/trusted.json').read_text());grids=[];points=eligible=0
 started=time.monotonic()
 for r in d['rows']:
- p=Path('/source/reconstruction')/r['artifact'];assert hashlib.file_digest(p.open('rb'),'sha256').hexdigest()==r['sha256']
+ p=Path('/source/reconstruction')/r['artifact'];assert file_sha256(p)==r['sha256']
  with np.load(p,allow_pickle=False) as a:
   identity={k:r[k] for k in ['context','timestamp','laser','return','motion']};identity['pixels']=a['pixels']
   record={'identity':identity,'return_present':True,'observations':{'physical_features':a['physical_features'],'xyz':a['xyz']},'targets':{'segmentation':a['segmentation']},'evaluation':{'nlz':a['nlz']}}

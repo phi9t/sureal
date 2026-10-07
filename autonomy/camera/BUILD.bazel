@@ -28,6 +28,7 @@ LIVE_GATE_TESTS = [
 CAMERA_VISIBILITY = [
     "//autonomy:__pkg__",
     "//autonomy/segmentation:__pkg__",
+    "//autonomy/studies:__pkg__",
 ]
 
 py_library(

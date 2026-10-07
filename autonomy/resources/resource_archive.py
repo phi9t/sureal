@@ -1,12 +1,9 @@
 """Deterministic, bounded archives with independent member/hash verification."""
 import gzip,hashlib,tarfile
 from pathlib import Path,PurePosixPath
-from evidence.source_snapshot import file_sha256,require_regular_file
+from evidence.source_snapshot import file_sha256 as sha,require_regular_file
 
 DEFAULT_LIMIT=768*1024**2
-
-def sha(path):
- return file_sha256(path)
 
 def safe_name(name):
  if not isinstance(name,str) or not name or any(c in name for c in ['\\','\x00','\n','\r']):raise ValueError('unsafe archive member')

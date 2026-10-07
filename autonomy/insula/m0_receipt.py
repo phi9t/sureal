@@ -6,7 +6,7 @@ from insula.runtime_identity import verify_rootfs
 
 
 def candidate_files(experiment):
-    names=['enter.sh','verify-m0.py','insula/entry.py','insula/runtime_identity.py',
+    names=['enter.sh','insula/verify_m0.py','insula/entry.py','insula/runtime_identity.py',
            'insula/m0_probe.py','insula/m0_validate.py','insula/m0_receipt.py']
     return [experiment/name for name in names]
 

@@ -1,89 +1,82 @@
 # Architecture
 
 How the experiment's code is arranged, what may depend on what, and which
-bytes are frozen. The three rules below are checked by `autonomy/tools/`, so
-this file describes them; it does not enforce them.
+bytes are frozen. Bazel package visibility enforces cross-concept imports, and
+the evidence package records the source pins described below.
 
-## Layers
+## Concept Packages
 
-Each top-level directory under `autonomy/` is an *area*. An area may import its
-own modules and any area on a lower row. Areas on the same row are peers and do
-not import each other. The order is declared in
-[`tools/layers.py`](tools/layers.py).
+Each top-level directory under `autonomy/` is a concept package. Active imports
+are package-qualified and declared in BUILD deps; packages are private by
+default and grant visibility only to actual consumers.
 
-| Layer | Areas | Role |
-| --- | --- | --- |
-| 16 | top-level scripts, `scripts/`, `analysis/`, `tests/`, `tools/` | Gate runners, operations, diagnostics, development checks |
-| 15 | `cohort/` | 16-scene cohort studies: balanced and sustained training, scoring, audits |
-| 13 | `studies/` | Study runners, verifiers and closed-gate procedure records |
-| 12 | `gpu/`, `evaluation/`, `tracking/`, `association/`, `inspection/` | Model workers, metric contracts, inspection and standalone tools |
-| 11 | `motion/` | Motion ingestion, causal projection and native metric tools |
-| 10 | `pipeline/` | Remaining readers, encoders and archives |
-| 9 | `range_view/` | Range encoders, range-pillar hybrids, sparse windows and fusion |
-| 8 | `detection/` | Pillar detection, fixed-batch models and expanded-batch composition |
-| 6 | `resources/` | Measured bounded execution, retention, replay continuation and native-receipt binding |
-| 5 | `segmentation/` | Semantic and instance segmentation, masks and recovery |
-| 4 | `camera/` | Camera data, sidecars and projection tools |
-| 3 | `geometry/` | Coordinate transforms, visibility and native range-grid shape math |
-| 2 | `dataset/` | Scientific dataset components, archives, eviction and cloud setup |
-| 1 | `insula/` | Sandbox entry, rootfs identity, M0 checks and staging leases |
-| 0 | `evidence/` | Snapshots, digests, regular-file checks, journal, tracker and publication |
+| Concept | Owns |
+| --- | --- |
+| top-level entrypoints | Repository wrapper, tracer shell entrypoint and schema files |
+| `training_execution/` | Balanced and sustained training execution, scoring, admission and controller workflows |
+| `studies/` | Cross-concept study orchestration, study verifiers and closed procedure records |
+| `association/` | Association runtime contracts and provenance |
+| `evaluation/` | Metric/evaluator checks and perception gate audits |
+| `inspection/` | Viewer/export tooling |
+| `motion/` | Motion ingestion, causal projection and native metric tools |
+| `range_view/` | Range frontend, range-pillar probes, sparse windows and fusion |
+| `detection/` | Detector models, native box jobs, exports and diagnostics |
+| `resources/` | Resource staging, archive, retention primitives and bounded worker admission |
+| `retention/` | Sustained and native-cache publication and retention workflows |
+| `segmentation/` | Semantic/SAM support, mask supervision and recovery checks |
+| `camera/` | Camera data, sidecars, publication, replay and eviction |
+| `geometry/` | Coordinate transforms, reconstruction, visibility and native range-grid shape math |
+| `dataset/` | Scientific source admission, point/sidecar data, archives, tracer contracts and cloud setup |
+| `insula/` | Sandbox entry, rootfs recipes, Bazel launcher planning, M0 checks and staging leases |
+| `evidence/` | Source snapshots, digests, regular-file checks, journal, tracker and publication |
+
+Cross-concept workflows live at the concept level that owns the workflow. A
+study that dispatches both `dataset` and `camera` commands belongs in
+`studies/`; `dataset/` does not depend upward on `camera/` to run it. The
+active range probes stay in `range_view/` and declare their downward
+`geometry/` and `evidence/` dependencies.
 
 `research/` holds retained evidence, including frozen copies of sources, and is
-outside the layering.
-
-Two upward imports remain listed in `KNOWN_UPWARD`: the retained
-`studies/fixed_batch/procedure_records/fixed_batch_prepare_v3.py` record imports
-the historical cohort balancer, and `detection/expanded_batch/models.py`
-imports `range_view.RangePillar`. The expanded-batch factory is a split
-detection target: lower-level point, sparse and packing mechanisms stay in
-`detection/`, while this factory composes the range-view encoder without making
-`range_view/` depend back on detection.
-
-Cross-area imports are qualified (`from geometry.geometry import ...`). A bare
-import (`import models`) resolves through whichever directories a script put on
-`sys.path`, and 14 module names (`models`, `catalog`, `train`, `prepare`, ...)
-exist in more than one area. The check refuses a bare import whose name is
-defined by more than one other area.
+outside the active import graph. `studies/*/procedure_records/` holds closed
+procedure records: they remain byte-for-byte evidence, may contain historical
+imports, and are not a reason to recreate old active package edges. The
+retained expanded-batch composition still imports `range_view.RangePillar`;
+that exception is modeled as an explicit BUILD dependency rather than a hidden
+path rewrite.
 
 ## Two kinds of source
 
-- **Library code** is imported by other modules: most of `pipeline/`, the model
-  and variant modules in `gpu/`, fixed-batch and expanded-batch modules in
-  `detection/`, observation loaders in `dataset/`, the stage backend in
-  `resources/`, the Insula sandbox helpers in `insula/`, and the journal and
-  snapshot tools in `evidence/`.
+- **Library code** is imported by other modules and belongs to one concept
+  package. Its cross-concept imports must match the package's BUILD deps and
+  visibility.
 - **Procedure records** are scripts that ran one gate or one study stage and
-  wrote a receipt containing their own digest: the top-level `verify-*.py` and
-  `publish-*.py`, the hyphenated workers in `gpu/` and `cohort/`, and the
-  `_v2`/`_v3` successors beside them.
+  wrote receipts containing their own digest. Closed records remain in
+  `procedure_records/` or `research/` and are retained as evidence, not active
+  package structure.
 
-Both kinds are pinned by receipts. Almost every tracked file outside
-`research/` has the SHA-256 of its current bytes recorded in at least one
-retained receipt (`autonomy/evidence/pins.py status` prints the count per area). Two
-validators also require an exact file inventory, so adding a file there changes
-what they admit:
+Both kinds can be pinned by receipts. A source pin is the SHA-256 digest of a
+source file recorded in a receipt; the file is *pinned* by that receipt. New
+gate receipts bind a source snapshot, which is the frozen source/data closure of
+the executable Bazel target. Historical schema 1 receipts use
+component-relative paths; schema 2 source snapshot receipts use repository
+paths rooted at `autonomy/`. The working tree is allowed to move forward even
+when old receipts still pin earlier source bytes.
 
-- `cohort/sustained_sources.py`: selected `*.py` under `dataset/`, `geometry/`,
-  `segmentation/`, `resources/`, `pipeline/`, `insula/`, `gpu/`, `detection/`
-  and `cohort/`, plus the source snapshot helper, which
-  `cohort/sustained_controller_backend.py` freezes for each sustained run;
-- `resources/sources.py`: every `*.py` under `resources/`.
-
-This is why a changed procedure appears as a new `_v2` file instead of an edit:
-editing a pinned file leaves its receipts describing bytes the tree no longer
-holds. Before changing a file, ask `autonomy/evidence/pins.py` what pins it.
+`evidence/source_snapshot.py` owns the shared file digest implementation, the
+regular-file check, source snapshot creation and source pin verification.
+Source closure tests assert behavior for executable targets; one-time migration
+audits, not unit tests, check for old path hacks and duplicate helpers.
 
 ## Checks
 
-Run from the repository root. The source-inspection tools need only the standard
-library; the Bazel component gate runs inside the recorded Insula rootfs through
-the repository wrapper.
+Run source-pin commands from the `autonomy/` package root. Run Bazel component
+checks from the repository root; the wrapper enters the recorded Insula rootfs.
 
 ```bash
-python3 autonomy/tools/layers.py                  # import layering
-python3 autonomy/tools/pins.py status [PATH ...]  # which receipts pin a file
-python3 autonomy/tools/pins.py check [--base REV] # source pins a change touches
+cd autonomy
+python3 -m evidence.pins status [PATH ...]  # which receipts pin a file
+python3 -m evidence.pins check [--base REV] # source pins a change touches
+cd ..
 ./bazelw --emit-plan test //autonomy/...          # inspect the Insula command
 ./bazelw test //autonomy/...                      # default perception tests
 ```

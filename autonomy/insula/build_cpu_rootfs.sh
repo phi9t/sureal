@@ -2,6 +2,7 @@
 # Networked provisioning; offline execution uses enter.sh.
 set -euo pipefail
 HERE="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+PACKAGE="$(cd -- "${HERE}/.." && pwd)"
 BAZEL_VERSION=9.2.0
 BAZEL_LINUX_X86_64_SHA256=7668a95db1250f12c40407251e4e203b4ec8bf39bc495d2f485b2d8c99048694
 CACHE_ROOT="${WAYMO_INSULA_CACHE_ROOT:-${HOME}/.cache/waystone/waymo-perception/insula}"
@@ -15,7 +16,7 @@ die() {
 }
 
 rootfs_digest() {
-    PYTHONPATH="$HERE" python3 - "$1" <<'PY'
+    PYTHONPATH="$PACKAGE" python3 - "$1" <<'PY'
 import sys
 from pathlib import Path
 from insula.runtime_identity import rootfs_identity
@@ -62,7 +63,7 @@ validate_new_rootfs() {
     new_packages="$(mktemp)"
     run_in_rootfs "$previous" python -m pip freeze --all | LC_ALL=C sort >"$previous_packages"
     run_in_rootfs "$rootfs" python -m pip freeze --all | LC_ALL=C sort >"$new_packages"
-    if ! python3 - "$previous_packages" "$new_packages" "$HERE/requirements-test-tools.lock" <<'PY'
+    if ! python3 - "$previous_packages" "$new_packages" "$HERE/cpu-test-tools-requirements.lock" <<'PY'
 import sys
 from pathlib import Path
 
@@ -125,7 +126,7 @@ PREVIOUS_LOCK_SHA256="$(sha256sum "$PREVIOUS.lock.json" | awk '{print $1}')"
 docker build --platform linux/amd64 \
     --build-arg "BAZEL_VERSION=$BAZEL_VERSION" \
     --build-arg "BAZEL_LINUX_X86_64_SHA256=$BAZEL_LINUX_X86_64_SHA256" \
-    -t "$IMAGE_TAG" -f "$HERE/insula/Dockerfile" "$HERE"
+    -t "$IMAGE_TAG" -f "$HERE/Dockerfile" "$PACKAGE"
 IMAGE="$(docker image inspect "$IMAGE_TAG" --format '{{.Id}}')"
 CID="$(docker create "$IMAGE" /bin/true)"
 docker export "$CID" | tar -C "$STAGE" -xf -
@@ -136,16 +137,17 @@ validate_new_rootfs "$STAGE" "$PREVIOUS"
     || die "previous rootfs identity changed during build"
 [[ "$(sha256sum "$PREVIOUS.lock.json" | awk '{print $1}')" == "$PREVIOUS_LOCK_SHA256" ]] \
     || die "previous rootfs lock changed during build"
-PYTHONPATH="$HERE" python3 - "$STAGE" "$HERE" "$IMAGE" "$BAZEL_VERSION" "$BAZEL_LINUX_X86_64_SHA256" <<'PY'
-import hashlib, json, sys
+PYTHONPATH="$PACKAGE" python3 - "$STAGE" "$PACKAGE" "$HERE" "$IMAGE" "$BAZEL_VERSION" "$BAZEL_LINUX_X86_64_SHA256" <<'PY'
+import json, sys
 from pathlib import Path
+from evidence.source_snapshot import file_sha256
 from insula.runtime_identity import rootfs_identity
-root, here, image, bazel_version, bazel_sha256 = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5]
+root, package, script_dir, image, bazel_version, bazel_sha256 = Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3]), sys.argv[4], sys.argv[5], sys.argv[6]
 lock = {'schema_version': 1, 'platform': 'linux/amd64', 'image_id': image,
         'rootfs_sha256': rootfs_identity(root),
-        'requirements_sha256': hashlib.sha256((here/'requirements-tracer.lock').read_bytes()).hexdigest(),
-        'test_tools_requirements_sha256': hashlib.sha256((here/'requirements-test-tools.lock').read_bytes()).hexdigest(),
-        'dockerfile_sha256': hashlib.sha256((here/'insula/Dockerfile').read_bytes()).hexdigest(),
+        'requirements_sha256': file_sha256(package/'requirements-tracer.lock'),
+        'test_tools_requirements_sha256': file_sha256(script_dir/'cpu-test-tools-requirements.lock'),
+        'dockerfile_sha256': file_sha256(script_dir/'Dockerfile'),
         'bazel_version': bazel_version,
         'bazel_linux_x86_64_sha256': bazel_sha256}
 (root.parent/(root.name+'.lock.json')).write_text(json.dumps(lock, indent=2)+'\n')

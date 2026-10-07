@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 """Live independent native-scene checker on the retained engineering scene."""
-import hashlib,json,resource,subprocess,sys,time
+import json,resource,subprocess,sys,time
 from datetime import datetime,timezone
 from pathlib import Path
+from evidence.source_snapshot import file_sha256 as sha
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
 
-HERE=Path(__file__).resolve().parent
-CANDIDATES=['geometry/scientific_scene_validate.py','geometry/scientific_scene_validate_test.py','geometry/scientific_reconstruction_test.py','geometry/reconstruction_validate.py','dataset/scientific_sidecar_reader.py','dataset/sensor_records.py','geometry/scientific_reconstruction.py','dataset/scientific_sidecars.py','geometry/geometry.py','verify-scientific-scene.py']
-
-def sha(p):
-    with p.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+HERE=Path(__file__).resolve().parents[1]
+CANDIDATES=['geometry/scientific_scene_validate.py','geometry/scientific_scene_validate_test.py','geometry/scientific_reconstruction_test.py','geometry/reconstruction_validate.py','dataset/scientific_sidecar_reader.py','dataset/sensor_records.py','geometry/scientific_reconstruction.py','dataset/scientific_sidecars.py','geometry/geometry.py','geometry/verify_scientific_scene.py']
 
 def main():
     destination=Path(sys.argv[1]).resolve();destination.mkdir(parents=True,exist_ok=False)

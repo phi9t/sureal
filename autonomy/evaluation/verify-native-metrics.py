@@ -1,23 +1,19 @@
 #!/usr/bin/env python3
 """Materialize native metrics image and run pinned upstream tests offline."""
 from datetime import datetime,timezone
-import hashlib
 import json
 from pathlib import Path
 import subprocess
-import sys
 import tempfile
 import time
 
 HERE=Path(__file__).resolve().parents[1]
-sys.path.insert(0,str(HERE))
+from evidence.source_snapshot import file_sha256 as sha
 from insula.runtime_identity import rootfs_identity,verify_rootfs
 from insula.entry import launch_plan
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
 ROOT=CACHE/'metrics-rootfs'
 IMAGE='sureal-waymo-metrics:source-pinned'
-
-def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 
 def materialize():
     lockpath=Path(str(ROOT)+'.lock.json')

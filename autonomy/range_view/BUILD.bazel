@@ -35,6 +35,8 @@ py_library(
     visibility = RANGE_VIEW_VISIBILITY,
     deps = [
         "//autonomy/detection:detection",
+        "//autonomy/evidence:evidence",
+        "//autonomy/geometry:geometry",
     ],
 )
 

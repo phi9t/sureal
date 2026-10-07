@@ -11,7 +11,12 @@ py_library(
 
 filegroup(
     name = "runtime_recipe",
-    srcs = glob(["runtime/*"]),
+    srcs = [
+        "runtime_cpu.Dockerfile",
+        "runtime_requirements.in",
+        "runtime_requirements.lock",
+        "runtime_training.Dockerfile",
+    ],
     visibility = ["//autonomy:__pkg__"],
 )
 

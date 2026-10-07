@@ -1,6 +1,7 @@
 """Independent exact native Parquet row reconciliation for detection replay."""
 from pathlib import Path
-import hashlib,json
+import json
+from evidence.source_snapshot import file_sha256
 import pyarrow.parquet as pq
 
 records=json.loads(Path('/opt/real-boxes.json').read_text())
@@ -8,7 +9,7 @@ expected={(r['context_name'],r['frame_timestamp_micros'],r['object_id']):r for r
 assert len(expected)==len(records)==38363
 seen=set();counts={}
 for path in sorted(Path('/source/raw/validation/lidar_box').glob('*.parquet')):
-    counts[path.name]={'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'rows':0}
+    counts[path.name]={'sha256':file_sha256(path),'rows':0}
     for batch in pq.ParquetFile(path).iter_batches(batch_size=1):
         row=batch.to_pylist()[0];key=(row['key.segment_context_name'],row['key.frame_timestamp_micros'],row['key.laser_object_id'])
         assert key not in seen and key in expected;seen.add(key);record=expected[key]

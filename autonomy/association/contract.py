@@ -58,8 +58,8 @@ _BASELINE_REQUIRED = {"detection/fixed_batch_models.py", "detection/fixed_batch_
     "detection/anchor_assignment.py", "detection/box_coding.py", "detection/detector_geometry.py",
     "detection/norm_variants.py", "detection/architecture_variants.py",
     "detection/architecture_followups.py", "detection/scored_proposals_v3.py"}
-_ASSOCIATION_REQUIRED = {"contract.py", "runtime/requirements.lock",
-    "runtime/Dockerfile.cpu", "runtime/Dockerfile.training"}
+_ASSOCIATION_REQUIRED = {"contract.py", "runtime_requirements.lock",
+    "runtime_cpu.Dockerfile", "runtime_training.Dockerfile"}
 
 
 def _canonical(value):

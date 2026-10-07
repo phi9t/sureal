@@ -24,6 +24,7 @@ from evidence.source_snapshot import label_to_path
 from resources.sources import SNAPSHOT_TARGET as RESOURCE_TARGET
 from resources.sources import source_paths as resource_source_paths
 from studies.architecture.experiment_runner import ARCHITECTURE_SOURCE_SNAPSHOT_TARGET
+from studies.scientific_cohort import SCIENTIFIC_COHORT_TARGET
 
 
 PACKAGE = Path(__file__).resolve().parent
@@ -157,6 +158,34 @@ class SourceSnapshotTargetTests(unittest.TestCase):
             },
         )
         self.assertIn("studies/architecture/harness/run-architecture-learning-curve.py", paths)
+
+    def test_scientific_cohort_target_declares_point_and_camera_execution_sources(self):
+        self.assert_executable_target(
+            SCIENTIFIC_COHORT_TARGET,
+            "//autonomy/studies:scientific_cohort",
+        )
+        self.assert_target_contains_required_sources(
+            SCIENTIFIC_COHORT_TARGET,
+            "scientific_cohort_query",
+            {
+                "studies/scientific_cohort.py",
+                "dataset/scientific-preprocess.py",
+                "dataset/publish-scientific-scene.py",
+                "dataset/verify-scientific-replay.py",
+                "dataset/publish-scientific-sidecars.py",
+                "dataset/scientific-acquisition.candidate.json",
+                "dataset/scientific-cohort.candidate.json",
+                "dataset/scientific_admission.py",
+                "dataset/cohort_resume.py",
+                "dataset/verified_eviction.py",
+                "dataset/sidecar_eviction.py",
+                "camera/scientific-camera-preprocess.py",
+                "camera/publish-scientific-camera.py",
+                "camera/verify-camera-replay.py",
+                "camera/camera_eviction.py",
+                "insula/entry.py",
+            },
+        )
 
 
 if __name__ == "__main__":

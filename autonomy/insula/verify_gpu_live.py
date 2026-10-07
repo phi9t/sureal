@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Materialize locked GPU rootfs and execute one-device offline probe."""
 from datetime import datetime, timezone
-import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -9,14 +8,13 @@ import sys
 import time
 
 HERE=Path(__file__).resolve().parents[1]
+from evidence.source_snapshot import file_sha256 as sha
 from insula.runtime_identity import rootfs_identity,verify_rootfs
 from insula.entry import launch_plan
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
 ROOT=CACHE/'gpu-rootfs'
 IMAGE='sureal-waymo-gpu:torch291-cu130'
 EXPECTED='sha256:46bdaa6e8d9058d7e09419085dfcf9a4527e801330045ae8e0f387f454413b86'
-
-def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 
 def main():
     out=Path(sys.argv[1]).resolve();out.mkdir(parents=True,exist_ok=False)

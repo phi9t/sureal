@@ -6,6 +6,7 @@ from pathlib import Path
 import numpy as np
 from dataset.scientific_sidecar_reader import iter_sidecar_rows
 from dataset.sensor_records import OrderedLookup, array_field, align_point_targets, select_rows
+from evidence.source_snapshot import file_sha256
 from geometry.geometry import range_to_points
 
 REQUIRED = {'lidar_calibration', 'vehicle_pose', 'lidar_pose',
@@ -23,7 +24,7 @@ def reconstruct_scene(lidar_source, sidecars, output, budget_bytes, *, verified_
         if not isinstance(component, str) or Path(component).name != component:
             raise ValueError('unsafe component identity')
         path = sidecars/component/'manifest.json'
-        if hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+        if file_sha256(path) != expected:
             raise ValueError('sidecar provenance changed')
         manifests[component] = json.loads(path.read_text())
         if manifests[component]['component'] != component:
@@ -103,7 +104,7 @@ def reconstruct_scene(lidar_source, sidecars, output, budget_bytes, *, verified_
     # Exhaust every native cursor so terminal artifact/inventory checks execute.
     for lookup in (poses,projections,labels):
         while lookup.current is not None:lookup._advance()
-    with lidar_source.open('rb') as stream:source_sha = hashlib.file_digest(stream,'sha256').hexdigest()
+    source_sha = file_sha256(lidar_source)
     report = {'schema_version':1,'scene':scene,'rows':rows,'points':sum(r['points'] for r in rows),
               'source_lidar_sha256':source_sha,'sidecar_manifest_hashes':verified_manifest_hashes,
               'sidecar_bytes':sidecar_bytes,'output_bytes':used,'working_set_bytes':sidecar_bytes+used}

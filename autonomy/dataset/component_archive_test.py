@@ -1,13 +1,14 @@
-import hashlib,json,tempfile,unittest
+import json,tempfile,unittest
 from pathlib import Path
 from dataset.component_archive import create_component_archive
 from dataset.component_archive_validate import validate_component_archive
+from evidence.source_snapshot import file_sha256
 
 class ComponentArchiveTests(unittest.TestCase):
     def fixture(self,root):
         source=root/'sidecars';(source/'lidar_pose').mkdir(parents=True)
         (source/'lidar_pose/manifest.json').write_text('{}');(source/'lidar_pose/000000.npz').write_bytes(b'decoded-array')
-        expected={str(p.relative_to(source)):hashlib.sha256(p.read_bytes()).hexdigest() for p in source.rglob('*') if p.is_file()}
+        expected={str(p.relative_to(source)):file_sha256(p) for p in source.rglob('*') if p.is_file()}
         return source,expected
 
     def test_exact_members_provenance_and_deterministic_bytes(self):

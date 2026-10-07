@@ -1,5 +1,6 @@
 import json,tempfile,unittest
 from pathlib import Path
+from evidence.source_snapshot import file_sha256
 from evidence.journal import append_entry,read_entries
 class JournalTests(unittest.TestCase):
  def test_evidence_hashes_and_history_are_preserved(self):
@@ -23,8 +24,7 @@ class JournalTests(unittest.TestCase):
    self.assertEqual(snapshot.read_bytes(),b'original evidence');self.assertEqual(read_entries(journal)[0],entry)
  def test_corrupt_existing_snapshot_refuses_append(self):
   with tempfile.TemporaryDirectory() as d:
-   import hashlib
-   root=Path(d);proof=root/'proof.json';proof.write_bytes(b'evidence');journal=root/'journal.jsonl';snapshots=root/'journal-evidence';snapshots.mkdir();(snapshots/hashlib.sha256(proof.read_bytes()).hexdigest()).write_bytes(b'corrupted')
+   root=Path(d);proof=root/'proof.json';proof.write_bytes(b'evidence');journal=root/'journal.jsonl';snapshots=root/'journal-evidence';snapshots.mkdir();(snapshots/file_sha256(proof)).write_bytes(b'corrupted')
    with self.assertRaises(ValueError):append_entry(journal,'observation',['a'],'Must not cite corrupted snapshot',[proof])
    self.assertFalse(journal.exists())
  def test_unknown_entry_category_is_rejected(self):

@@ -4,11 +4,13 @@ ACTIVE_MODULES = [
     "architecture/experiment_runner.py",
     "expanded_batch/expanded_verifier.py",
     "fixed_batch/fixed_batch_verifier.py",
+    "scientific_cohort.py",
 ]
 
 ACTIVE_TESTS = [
     "architecture/experiment_runner_test.py",
     "expanded_batch/expanded_verifier_test.py",
+    "scientific_cohort_test.py",
 ]
 
 ARCHITECTURE_RUNFILES = glob([
@@ -38,7 +40,10 @@ py_library(
         "//autonomy/training_execution:__pkg__",
     ],
     deps = [
+        "//autonomy/camera:camera",
+        "//autonomy/dataset:dataset",
         "//autonomy/evidence:evidence",
+        "//autonomy/insula:insula",
         "//autonomy/resources:resources",
     ],
 )
@@ -73,6 +78,24 @@ py_binary(
     deps = [
         ":studies",
         "//autonomy:architecture_experiment_runner_snapshot",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "scientific_cohort",
+    srcs = ["scientific_cohort.py"],
+    data = [
+        "//autonomy/camera:commands",
+        "//autonomy/dataset:commands",
+    ],
+    imports = [".."],
+    main = "scientific_cohort.py",
+    deps = [
+        ":studies",
+        "//autonomy/camera:camera",
+        "//autonomy/dataset:dataset",
+        "//autonomy/insula:insula",
     ],
     visibility = ["//visibility:public"],
 )

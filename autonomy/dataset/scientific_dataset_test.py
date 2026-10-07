@@ -1,9 +1,10 @@
-import hashlib,json
+import json
 from pathlib import Path
 import tempfile,unittest
 import numpy as np
 from dataset.scene_archive import create_scene_archive
 from dataset.scientific_dataset import iter_scene_records
+from evidence.source_snapshot import file_sha256
 
 class ScientificDatasetTests(unittest.TestCase):
     def fixture(self,root,*,missing=False,bad_shape=False,projection_float=False,projection_fraction=False,instance_id=999,semantic_id=2):
@@ -18,11 +19,11 @@ class ScientificDatasetTests(unittest.TestCase):
                     if projection_fraction:arrays['camera_projection'][0,1]=0.5
                     if laser==1:arrays['segmentation']=np.array([[instance_id,semantic_id]],dtype=np.int32)
                     if bad_shape and laser==1 and ret==1:arrays['physical_features']=np.zeros((1,4))
-                    np.savez(points/name,**arrays);r['sha256']=hashlib.sha256((points/name).read_bytes()).hexdigest()
+                    np.savez(points/name,**arrays);r['sha256']=file_sha256(points/name)
                 rows.append(r)
-        report={'schema_version':1,'scene':'scene','rows':rows,'points':sum(r['points'] for r in rows),'source_lidar_sha256':'a'*64};(points/'report.json').write_text(json.dumps(report));digest=hashlib.sha256((points/'report.json').read_bytes()).hexdigest()
+        report={'schema_version':1,'scene':'scene','rows':rows,'points':sum(r['points'] for r in rows),'source_lidar_sha256':'a'*64};(points/'report.json').write_text(json.dumps(report));digest=file_sha256(points/'report.json')
         archive=root/'scene.tar';meta=create_scene_archive(points,archive,expected_report_sha256=digest,sidecar_bytes=0,budget_bytes=10**7)
-        publication={'schema_version':1,'role':'engineering-only','scene':'scene','archive':meta,'source_lidar_sha256':'a'*64};pub=root/'publication.json';pub.write_text(json.dumps(publication));return archive,pub,hashlib.sha256(pub.read_bytes()).hexdigest()
+        publication={'schema_version':1,'role':'engineering-only','scene':'scene','archive':meta,'source_lidar_sha256':'a'*64};pub=root/'publication.json';pub.write_text(json.dumps(publication));return archive,pub,file_sha256(pub)
 
     def test_exact_observations_and_separate_supervision(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -47,7 +48,7 @@ class ScientificDatasetTests(unittest.TestCase):
     def test_scientific_whole_scene_partitions_and_cross_usage_rejection(self):
         for official,splits in [('training',['train']),('training',['development']),('validation',['validation']),('validation',['camera_validation']),('validation',['validation','camera_validation'])]:
             with self.subTest(official=official,splits=splits),tempfile.TemporaryDirectory() as tmp:
-                archive,pub,_=self.fixture(Path(tmp));m=json.loads(pub.read_text());m.update(role='scientific',official_split=official,research_splits=splits);pub.write_text(json.dumps(m));digest=hashlib.sha256(pub.read_bytes()).hexdigest()
+                archive,pub,_=self.fixture(Path(tmp));m=json.loads(pub.read_text());m.update(role='scientific',official_split=official,research_splits=splits);pub.write_text(json.dumps(m));digest=file_sha256(pub)
                 for usage in splits:self.assertEqual(len(list(iter_scene_records(archive,pub,expected_publication_sha256=digest,usage=usage))),10)
                 for usage in {'train','development','validation','camera_validation','engineering'}-set(splits):
                     with self.assertRaises(ValueError):list(iter_scene_records(archive,pub,expected_publication_sha256=digest,usage=usage))
@@ -55,7 +56,7 @@ class ScientificDatasetTests(unittest.TestCase):
     def test_malformed_or_duplicate_scientific_partition_rejected(self):
         for official,splits,usage in [('training',['train','train'],'train'),('training',['train','development'],'train'),('validation',['train'],'train'),('training','train','train'),('training',[],'train'),('unknown',['train'],'train')]:
             with self.subTest(official=official,splits=splits),tempfile.TemporaryDirectory() as tmp:
-                archive,pub,_=self.fixture(Path(tmp));m=json.loads(pub.read_text());m.update(role='scientific',official_split=official,research_splits=splits);pub.write_text(json.dumps(m));digest=hashlib.sha256(pub.read_bytes()).hexdigest()
+                archive,pub,_=self.fixture(Path(tmp));m=json.loads(pub.read_text());m.update(role='scientific',official_split=official,research_splits=splits);pub.write_text(json.dumps(m));digest=file_sha256(pub)
                 with self.assertRaises(ValueError):list(iter_scene_records(archive,pub,expected_publication_sha256=digest,usage=usage))
 
     def test_missing_return_bad_payload_and_resident_limit(self):

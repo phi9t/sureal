@@ -11,6 +11,7 @@ import pyarrow.parquet as pq
 
 from dataset.tracer_contracts import validate_transform, summarize_array, native_keys
 from dataset.tracer import inspect_slice, validate_run, _joins
+from evidence.source_snapshot import file_sha256
 
 
 def fixture(root, duplicate=False):
@@ -29,7 +30,7 @@ def fixture(root, duplicate=False):
         "objects": [{"component": "vehicle_pose", "context": "scene",
                      "relative_path": "raw/validation/vehicle_pose/scene.parquet",
                      "size_bytes": path.stat().st_size,
-                     "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}],
+                     "sha256": file_sha256(path)}],
     }
     (root / "slice.json").write_text(json.dumps(receipt))
     return receipt
@@ -114,7 +115,7 @@ class TracerTests(unittest.TestCase):
             path.write_text("".join(json.dumps(row) + "\n" for row in rows))
             result = json.loads((out / "result.json").read_text())
             result["artifacts"]["manifest.jsonl"] = {
-                "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                "sha256": file_sha256(path),
                 "bytes": path.stat().st_size}
             (out / "result.json").write_text(json.dumps(result))
             with self.assertRaises(ValueError):
@@ -141,7 +142,7 @@ class TracerTests(unittest.TestCase):
                 path.write_text("".join(json.dumps(row) + "\n" for row in rows))
                 result = json.loads((out / "result.json").read_text())
                 result["artifacts"]["manifest.jsonl"] = {
-                    "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                    "sha256": file_sha256(path),
                     "bytes": path.stat().st_size}
                 (out / "result.json").write_text(json.dumps(result))
                 with self.assertRaises(ValueError):

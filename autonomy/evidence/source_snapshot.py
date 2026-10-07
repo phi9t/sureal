@@ -108,7 +108,7 @@ class LocalSnapshotStore:
         finally:
             if tmp is not None and tmp.exists():
                 tmp.unlink()
-        if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+        if file_sha256(path) != digest:
             raise ValueError("snapshot digest differs after readback")
         return digest
 

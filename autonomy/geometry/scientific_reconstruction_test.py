@@ -1,10 +1,11 @@
-import hashlib,json
+import json
 from pathlib import Path
 import tempfile,unittest
 import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
 from dataset.scientific_sidecars import materialize_component
+from evidence.source_snapshot import file_sha256
 from geometry.scientific_reconstruction import reconstruct_scene
 
 class ScientificReconstructionTests(unittest.TestCase):
@@ -35,7 +36,7 @@ class ScientificReconstructionTests(unittest.TestCase):
             if c=='lidar_pose' and missing_pose:table=table.slice(0,0)
             source=root/(c+'.parquet');pq.write_table(table,source)
             materialize_component(source,c,'scene',sidecars/c,10**7)
-            hashes[c]=hashlib.sha256((sidecars/c/'manifest.json').read_bytes()).hexdigest()
+            hashes[c]=file_sha256(sidecars/c/'manifest.json')
         rows=[]
         for laser in range(1,5 if missing_sensor else 6):
             d=key(laser)

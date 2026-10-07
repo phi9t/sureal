@@ -1,7 +1,8 @@
-import hashlib,json,tempfile,unittest
+import json,tempfile,unittest
 from pathlib import Path
+from evidence.source_snapshot import file_sha256
 from retention.sustained_checkpoint_inventory import freeze_checkpoint_inventory
-sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+sha=lambda p:file_sha256(p)
 class CheckpointInventoryTests(unittest.TestCase):
  def fixture(self,base,step=1000,reason='sample',requested=None):
   manifest=base/'manifest.json';manifest.write_text('{}')

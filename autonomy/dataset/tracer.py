@@ -252,7 +252,7 @@ def inspect_slice(root, output, *, output_byte_limit=512 * 1024 * 1024):
         implementation = [*Path(__file__).parent.glob("tracer*.py"),
                           *experiment.glob("tracer-*.schema.json"),
                           experiment / "tracer.sh", experiment / "requirements-tracer.lock"]
-        code_hashes = {str(p.relative_to(experiment)): sha256_file(p) for p in implementation}
+        code_hashes = {str(p.relative_to(experiment)): sha256_file(p.resolve(strict=True)) for p in implementation}
         (staging / "result.json").write_bytes(canonical({"schema_version": 1,
             "source_receipt_sha256": receipt_digest, "artifacts": artifacts,
             "implementation_hashes": code_hashes, "environment": environment}))

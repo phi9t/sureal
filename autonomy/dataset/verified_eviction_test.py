@@ -1,12 +1,13 @@
-import hashlib,json,tempfile,unittest
+import json,tempfile,unittest
 from pathlib import Path
 from dataset.verified_eviction import evict_points
+from evidence.source_snapshot import file_sha256
 
 class VerifiedEvictionTests(unittest.TestCase):
     def fixture(self,root):
         processing=root/'processing';points=processing/'points';points.mkdir(parents=True);publication=root/'publication';(publication/'packed').mkdir(parents=True);replay=root/'replay';replay.mkdir()
         payload=points/'scene-10-1-1.npz';payload.write_bytes(b'payload');archive=publication/'packed/scene.tar';archive.write_bytes(b'archive')
-        sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+        sha=lambda p:file_sha256(p)
         report=points/'report.json';report.write_text(json.dumps({'scene':'scene','rows':[{'artifact':payload.name,'sha256':sha(payload),'return_present':True}]}))
         pub={'scene':'scene','archive_hdfs_uri':'hdfs://host/scene.tar','archive':{'sha256':sha(archive),'report_sha256':sha(report)},'checks':[{'exit_code':0}]};pp=publication/'receipt.json';pp.write_text(json.dumps(pub))
         rr={'scene':'scene','publication_receipt_sha256':sha(pp),'checks':[{'exit_code':0},{'exit_code':0}],'validation':{'records':1}};rp=replay/'receipt.json';rp.write_text(json.dumps(rr))

@@ -1,5 +1,5 @@
 """Evidence-derived experiment dashboard and append-only research journal CLI."""
-import argparse,datetime,fcntl,hashlib,json,os,time
+import argparse,datetime,fcntl,json,os,time
 from pathlib import Path
 from evidence.journal import append_entry,read_entries
 from evidence.projection import project_experiments
@@ -10,7 +10,7 @@ def atomic(path,value):
  temporary=path.with_suffix(path.suffix+'.tmp');temporary.write_text(value);os.replace(temporary,path)
 def read_optional(path):
  if not path.exists():return None,None
- raw=path.read_bytes();return json.loads(raw),hashlib.sha256(raw).hexdigest()
+ raw=path.read_bytes();return json.loads(raw),digest(path)
 def snapshot(path):
  path=require_regular_file(path);data=path.read_bytes();h=digest(path);destination=R/'journal-evidence'/h;destination.parent.mkdir(exist_ok=True)
  if not destination.exists():

@@ -66,6 +66,31 @@ def has_mount_to(mounts, destination):
     return any(len(mount) == 3 and mount[0] == "--ro-bind" and mount[2] == destination for mount in mounts)
 
 
+LEGACY_AUTONOMY_ALIAS_DESTINATIONS = {
+    "/experiment/association",
+    "/experiment/camera",
+    "/experiment/dataset",
+    "/experiment/detection",
+    "/experiment/evaluation",
+    "/experiment/evidence",
+    "/experiment/geometry",
+    "/experiment/inspection",
+    "/experiment/insula",
+    "/experiment/motion",
+    "/experiment/range_view",
+    "/experiment/research",
+    "/experiment/resources",
+    "/experiment/retention",
+    "/experiment/segmentation",
+    "/experiment/studies",
+    "/experiment/training_execution",
+}
+
+
+def mount_destinations(mounts):
+    return {mount[2] for mount in mounts if len(mount) == 3}
+
+
 class BazelWrapperTests(unittest.TestCase):
     def test_external_cwd_and_symlink_preserve_relative_options_and_environment(self):
         for options in ("arguments", "environment"):
@@ -109,6 +134,10 @@ class BazelWrapperTests(unittest.TestCase):
                     self.assertEqual(plan["lock"], str(lock))
                     self.assertEqual(plan["cache"], str(cache))
                     self.assertIn(["--ro-bind", str(AUTONOMY.resolve()), "/experiment/autonomy"], plan["mounts"])
+                    self.assertFalse(
+                        LEGACY_AUTONOMY_ALIAS_DESTINATIONS & mount_destinations(plan["mounts"]),
+                        plan["mounts"],
+                    )
                     self.assertFalse(marker.exists())
                     result = subprocess.run(
                         [str(entry), *arguments, "test", "//autonomy/..."],
@@ -210,9 +239,10 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
             self.assertIn(["--tmpfs", "/experiment"], plan["mounts"])
             self.assertIn(["--ro-bind", str((REPO / "MODULE.bazel").resolve()), "/experiment/MODULE.bazel"], plan["mounts"])
             self.assertIn(["--ro-bind", str(AUTONOMY.resolve()), "/experiment/autonomy"], plan["mounts"])
-            self.assertTrue(has_mount_to(plan["mounts"], "/experiment/training_execution"), plan["mounts"])
-            self.assertTrue(has_mount_to(plan["mounts"], "/experiment/evaluation"), plan["mounts"])
-            self.assertTrue(has_mount_to(plan["mounts"], "/experiment/retention"), plan["mounts"])
+            self.assertFalse(
+                LEGACY_AUTONOMY_ALIAS_DESTINATIONS & mount_destinations(plan["mounts"]),
+                plan["mounts"],
+            )
             self.assertIn(["--bind", str(cache.resolve()), "/tmp/bazel-cache"], plan["mounts"])
             self.assertIn(["--tmpfs", "/outputs"], plan["mounts"])
             self.assertIn(["--tmpfs", "/tmp"], plan["mounts"])
@@ -334,9 +364,10 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
             self.assertNotEqual(plan["rootfs"], str(waymo_rootfs.resolve()))
             self.assertIn(["--ro-bind", str(gpu_rootfs.resolve()), "/"], plan["mounts"])
             self.assertIn(["--tmpfs", "/experiment"], plan["mounts"])
-            self.assertTrue(has_mount_to(plan["mounts"], "/experiment/training_execution"), plan["mounts"])
-            self.assertTrue(has_mount_to(plan["mounts"], "/experiment/evaluation"), plan["mounts"])
-            self.assertTrue(has_mount_to(plan["mounts"], "/experiment/retention"), plan["mounts"])
+            self.assertFalse(
+                LEGACY_AUTONOMY_ALIAS_DESTINATIONS & mount_destinations(plan["mounts"]),
+                plan["mounts"],
+            )
             self.assertIn("--output_base=/tmp/bazel-cache/output-base-gpu", plan["bazel"])
             self.assertIn("--config=cuda", plan["bazel"])
             self.assertIn(["--tmpfs", "/driver"], plan["mounts"])

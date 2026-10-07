@@ -1,8 +1,9 @@
 """Annotation-only target-coverage diagnostic; never a model prediction."""
-import hashlib,json,resource,time
+import json,resource,time
 from pathlib import Path
 import numpy as np
-sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+from evidence.source_snapshot import file_sha256
+sha=lambda p:file_sha256(p)
 start=time.monotonic();e=json.loads(Path('/tmp/inputs/expected.json').read_text())
 assert sha('/tmp/inputs/manifest.json')==e['manifest_sha256']
 manifest=json.loads(Path('/tmp/inputs/manifest.json').read_text());assert len(manifest['frames'])==16

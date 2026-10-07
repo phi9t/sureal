@@ -1,6 +1,5 @@
 """Serialization is admissible only with all-state/head equality and time math."""
 import copy
-import hashlib
 import importlib
 import json
 from pathlib import Path
@@ -8,6 +7,7 @@ import tempfile
 import unittest
 import numpy as np
 import torch
+from evidence.source_snapshot import file_sha256
 
 
 class CompareStateTests(unittest.TestCase):
@@ -18,7 +18,7 @@ class CompareStateTests(unittest.TestCase):
             self.fail('external-pinned state/head parity worker is not implemented')
 
     def pin(self, path):
-        return {'path': str(path), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
+        return {'path': str(path), 'sha256': file_sha256(path)}
 
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)

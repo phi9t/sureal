@@ -1,4 +1,4 @@
-import hashlib,json,tempfile,unittest
+import json,tempfile,unittest
 from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -7,6 +7,7 @@ import numpy as np
 from geometry.scientific_reconstruction_test import ScientificReconstructionTests
 from geometry.scientific_reconstruction import reconstruct_scene
 from geometry.scientific_scene_validate import validate_scene
+from evidence.source_snapshot import file_sha256
 
 class ScientificSceneValidationTests(unittest.TestCase):
     def setup_scene(self,root,**kwargs):
@@ -42,7 +43,7 @@ class ScientificSceneValidationTests(unittest.TestCase):
                 index=extra.schema.get_field_index('key.frame_timestamp_micros');extra=extra.set_column(index,'key.frame_timestamp_micros',pa.array([20],type=pa.int64()))
                 pq.write_table(pa.concat_tables([table,extra]),native);shutil.rmtree(sidecars/component)
                 materialize_component(native,component,'scene',sidecars/component,10**7)
-                hashes[component]=hashlib.sha256((sidecars/component/'manifest.json').read_bytes()).hexdigest()
+                hashes[component]=file_sha256(sidecars/component/'manifest.json')
                 report=output/'report.json';r=json.loads(report.read_text());r['sidecar_manifest_hashes']=hashes;report.write_text(json.dumps(r))
                 with self.assertRaises(ValueError):validate_scene(source,sidecars,output,verified_manifest_hashes=hashes)
 
@@ -52,7 +53,7 @@ class ScientificSceneValidationTests(unittest.TestCase):
                 s,d,h,o=self.setup_scene(Path(tmp));p=o/'report.json';r=json.loads(p.read_text());row=r['rows'][0];artifact=o/row['artifact']
                 with np.load(artifact,allow_pickle=False) as a:payload={k:a[k].copy() for k in a.files}
                 payload[field].flat[0]+=1;np.savez(artifact,**payload)
-                row['sha256']=hashlib.sha256(artifact.read_bytes()).hexdigest();p.write_text(json.dumps(r))
+                row['sha256']=file_sha256(artifact);p.write_text(json.dumps(r))
                 with self.assertRaises(ValueError):validate_scene(s,d,o,verified_manifest_hashes=h)
 
     def test_manifest_identity_inventory_and_provenance_mutations_rejected(self):

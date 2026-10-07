@@ -1,24 +1,20 @@
 #!/usr/bin/env python3
 """Live default-metric boundary check, including upstream exit-zero failure."""
 from datetime import datetime, timezone
-import hashlib
 import json
 from pathlib import Path
 import re
 import subprocess
-import sys
 import tempfile
 import time
 
 HERE=Path(__file__).resolve().parents[1]
-sys.path.insert(0,str(HERE))
+from evidence.source_snapshot import file_sha256 as sha
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
 from detection.native_detection_adapter import parse_result
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
 ROOT=CACHE/'metrics-rootfs'
-
-def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 
 def main():
     out=Path(sys.argv[1]).resolve();out.mkdir(parents=True,exist_ok=False)

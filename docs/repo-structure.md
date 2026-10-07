@@ -1,5 +1,47 @@
 # Semantic Polyglot Repository Layout
 
+## Sureal Final Concept Map
+
+Sureal follows the semantic layout directly under `autonomy/`. Active code is
+owned by concept, not by language, runtime, file kind, or temporary study stage:
+
+```text
+autonomy/
+├── association/         association runtime contracts and provenance
+├── camera/              native camera components, publication, replay, eviction
+├── dataset/             source admission, point/sidecar data, tracer contracts
+├── detection/           detector models, native box jobs, exports, diagnostics
+├── evidence/            source snapshots, pins, journals, release evidence
+├── evaluation/          metric/evaluator checks and perception gate audits
+├── geometry/            reconstruction, native ranges, scene validation
+├── inspection/          viewer/export tooling
+├── insula/              rootfs recipes, sandbox planning, Bazel wrapper launch
+├── motion/              motion ingestion, metrics, and command recipes
+├── range_view/          range frontend and range/pillar probes
+├── resources/           resource staging, archive, retention primitives
+├── retention/           sustained/native-cache publication and retention
+├── segmentation/        semantic/SAM support and recovery checks
+├── studies/             cross-concept study orchestration and study records
+└── training_execution/  sustained training controller and admissions
+```
+
+Cross-concept workflows live at the concept level that owns the workflow. For
+example, a sequential scientific cohort lifecycle that dispatches both
+`dataset` and `camera` commands is a `studies` workflow, not a `dataset`
+command. A lower concept must not depend upward merely to run a higher-level
+orchestration.
+
+Source pins are snapshot bindings. They identify the source bytes captured for a
+receipt, not a promise that the current working tree still matches the historical
+receipt. Historical schema 1 receipts use component-relative paths; schema 2
+source snapshot receipts use repository paths rooted at `autonomy/`. New
+receipts should bind the executable Bazel target and its source/data closure.
+
+`bazelw` is the root entrypoint for tests and builds. It resolves the `autonomy`
+root, reexecutes `insula.bazel_launcher`, preserves the caller working
+directory through the internal argument, and does not require legacy child
+directory mounts under `/experiment`.
+
 ## 1. Primary rule: directories express concepts, not languages
 
 Do **not** structure the repository as:

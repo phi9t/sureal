@@ -1,21 +1,18 @@
 #!/usr/bin/env python3
 """Native schema export and hand-derived default detection metric fixtures."""
 from datetime import datetime,timezone
-import hashlib
 import json
 from pathlib import Path
 import subprocess
-import sys
 import tempfile
 
-HERE=Path(__file__).resolve().parents[1];sys.path.insert(0,str(HERE))
+HERE=Path(__file__).resolve().parents[1]
+from evidence.source_snapshot import file_sha256 as sha
 from insula.runtime_identity import verify_rootfs
 from insula.entry import launch_plan
 from detection.native_detection_adapter import parse_result
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
 ROOT=CACHE/'metrics-rootfs'
-
-def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 
 def object_text(category='TYPE_VEHICLE',x=10,heading=0,points=20):
     return f'''objects {{ context_name: "analytic-scene" frame_timestamp_micros: 100

@@ -2,6 +2,7 @@ import hashlib,io,json,tarfile
 from pathlib import Path
 import tempfile,unittest
 from dataset.scene_archive_validate import validate_archive
+from evidence.source_snapshot import file_sha256
 
 class ArchiveValidationTests(unittest.TestCase):
     def make_archive(self,root,mutation):
@@ -15,7 +16,7 @@ class ArchiveValidationTests(unittest.TestCase):
                 if mutation=='time':header.mtime=7
                 if mutation=='link' and name=='a.npz':header.type=tarfile.SYMTYPE;header.linkname='/outside';header.size=0
                 tar.addfile(header,io.BytesIO(payload))
-        return archive,hashlib.sha256(report).hexdigest(),hashlib.sha256(archive.read_bytes()).hexdigest()
+        return archive,hashlib.sha256(report).hexdigest(),file_sha256(archive)
 
     def test_valid_stream_and_adversarial_members(self):
         for mutation in ('none','content','missing','duplicate','path','dotdot','link','time'):

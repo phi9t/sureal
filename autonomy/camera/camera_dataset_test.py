@@ -1,10 +1,11 @@
-import hashlib,json,tempfile,unittest
+import json,tempfile,unittest
 from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as pq
 from camera.camera_sidecars import materialize_camera_component
 from dataset.component_archive import create_component_archive
 from camera.camera_dataset import iter_camera_records
+from evidence.source_snapshot import file_sha256
 class CameraDatasetTests(unittest.TestCase):
  def fixture(self,root):
   source=root/'source';source.mkdir();scene='scene'
@@ -14,8 +15,8 @@ class CameraDatasetTests(unittest.TestCase):
    elif component=='camera_segmentation':fields['label']=pa.array([b'png'],type=pa.binary());fields['divisor']=[1000]
    else:fields['key.camera_object_id']=['object'];fields['type']=[2]
    p=root/(component+'.parquet');pq.write_table(pa.table(fields),p);materialize_camera_component(p,component,scene,source/component,100000)
-  files={str(p.relative_to(source)):hashlib.sha256(p.read_bytes()).hexdigest() for p in source.rglob('*') if p.is_file()};archive=root/'camera.tar';meta=create_component_archive(source,archive,expected_files=files,provenance={'scene':scene},other_bytes=0,budget_bytes=1000000)
-  pub=root/'publication.json';pub.write_text(json.dumps({'schema_version':1,'role':'scientific-native-camera-components','scene':scene,'official_split':'training','research_splits':['train'],'archive':meta,'provenance':{'scene':scene}}));return archive,pub,hashlib.sha256(pub.read_bytes()).hexdigest()
+  files={str(p.relative_to(source)):file_sha256(p) for p in source.rglob('*') if p.is_file()};archive=root/'camera.tar';meta=create_component_archive(source,archive,expected_files=files,provenance={'scene':scene},other_bytes=0,budget_bytes=1000000)
+  pub=root/'publication.json';pub.write_text(json.dumps({'schema_version':1,'role':'scientific-native-camera-components','scene':scene,'official_split':'training','research_splits':['train'],'archive':meta,'provenance':{'scene':scene}}));return archive,pub,file_sha256(pub)
  def test_original_bytes_keys_and_observation_target_separation(self):
   with tempfile.TemporaryDirectory() as tmp:
    a,p,h=self.fixture(Path(tmp));records=list(iter_camera_records(a,p,expected_publication_sha256=h,usage='train'));self.assertEqual(len(records),3)

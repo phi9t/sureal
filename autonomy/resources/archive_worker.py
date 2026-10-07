@@ -1,11 +1,7 @@
 """Bounded resource/input archive using the separately pinned admitted library."""
 import importlib.util,json,shutil,sys,tarfile
 from pathlib import Path
-from evidence.source_snapshot import file_sha256, require_regular_file
-
-
-def sha(path):
-    return file_sha256(path)
+from evidence.source_snapshot import file_sha256 as sha, require_regular_file
 
 
 def process(job,mode,source,output):

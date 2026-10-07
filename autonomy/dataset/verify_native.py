@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Live native replay, independent source reconciliation, and M1 receipt."""
 from datetime import datetime, timezone
-import hashlib
 import json
 from pathlib import Path
 import resource
@@ -9,13 +8,12 @@ import subprocess
 import sys
 import time
 
-HERE=Path(__file__).resolve().parent
+HERE=Path(__file__).resolve().parents[1]
+from evidence.source_snapshot import file_sha256 as sha
 from insula.m0_receipt import validate_receipt
 ROOT=Path.home()/'.cache/waystone/waymo-perception/insula/rootfs-v2'
 M0=ROOT.parent/'m0-live-20260930-c'
 SOURCE=Path.home()/'.cache/waystone/waymo-perception/slices/validation-two-scenes-20260929'
-def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
-
 def main():
     out=Path(sys.argv[1]);out.mkdir(parents=True,exist_ok=False)
     validate_receipt(M0,ROOT,HERE)
@@ -35,7 +33,7 @@ def main():
     receipt={'schema_version':1,'milestone':'M1','started_utc':start,'ended_utc':datetime.now(timezone.utc).isoformat(),
              'runtime_lock':json.loads(Path(str(ROOT)+'.lock.json').read_text()),'m0_receipt_sha256':sha(M0/'receipt.json'),
              'checks':checks,'source_receipt_sha256':sha(SOURCE/'slice.json'),
-             'code_hashes':{str(p.relative_to(HERE)):sha(p) for p in [HERE/'verify-native.py',HERE/'enter.sh',HERE/'insula/entry.py',HERE/'dataset/tracer_test.py']},
+             'code_hashes':{str(p.relative_to(HERE)):sha(p) for p in [HERE/'dataset/verify_native.py',HERE/'enter.sh',HERE/'insula/entry.py',HERE/'dataset/tracer_test.py']},
              'artifacts':{str(p.relative_to(out)):sha(p) for p in out.rglob('*') if p.is_file()},
              'elapsed_seconds':time.monotonic()-begin,'child_peak_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss}
     (out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')

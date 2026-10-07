@@ -107,6 +107,7 @@ filegroup(
     name = "tracer_runtime_files",
     srcs = [
         "requirements-tracer.lock",
+        "//autonomy/insula:cpu-test-tools-requirements.lock",
         "tracer-manifest.schema.json",
         "tracer-report.schema.json",
         "tracer-result.schema.json",
@@ -120,9 +121,9 @@ filegroup(
 filegroup(
     name = "cpu_rootfs_recipe",
     srcs = [
-        "build.sh",
-        "requirements-test-tools.in",
-        "requirements-test-tools.lock",
+        "//autonomy/insula:build_cpu_rootfs.sh",
+        "//autonomy/insula:cpu-test-tools-requirements.in",
+        "//autonomy/insula:cpu-test-tools-requirements.lock",
         "requirements-tracer.in",
         "requirements-tracer.lock",
         "//autonomy/insula:cpu_rootfs_dockerfile",
@@ -203,6 +204,12 @@ genquery(
     scope = ["//autonomy/studies:architecture_experiment_runner"],
 )
 
+genquery(
+    name = "scientific_cohort_query",
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy/studies:scientific_cohort)) union labels("data", deps(//autonomy/studies:scientific_cohort))))',
+    scope = ["//autonomy/studies:scientific_cohort"],
+)
+
 py_test(
     name = "source_snapshot_targets_test",
     srcs = ["source_snapshot_targets_test.py"],
@@ -210,6 +217,7 @@ py_test(
         ":native_cache_retention_host_query",
         ":architecture_experiment_runner_query",
         ":resource_source_layer_query",
+        ":scientific_cohort_query",
         ":sustained_checkpoint_retention_host_query",
         ":sustained_controller_host_query",
         ":sustained_pilot_retention_host_query",

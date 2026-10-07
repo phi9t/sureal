@@ -1,5 +1,4 @@
 """Real-frame reconstruction pilot; independent scalar rays verify outputs."""
-import hashlib
 import json
 import math
 from pathlib import Path
@@ -8,6 +7,7 @@ import time
 import resource
 import numpy as np
 from dataset.sensor_records import array_field,align_point_targets,select_rows,OrderedLookup
+from evidence.source_snapshot import file_sha256
 from geometry.geometry import range_to_points
 
 
@@ -73,7 +73,7 @@ def main():
                     for k,v in targets.items():
                         if v is not None:assert np.array_equal(stored[k],v)
                 rows.append({'context':context,'timestamp':stamp,'laser':laser,'return':ret,'motion':motion,'points':len(pix),'segmentation_present':seg is not None,
-                             'scalar_max_error_m':max(errors,default=0),'artifact':name,'sha256':hashlib.sha256((out/name).read_bytes()).hexdigest()})
+                             'scalar_max_error_m':max(errors,default=0),'artifact':name,'sha256':file_sha256(out/name)})
         print('reconstructed',context,len(chosen),'frames',flush=True)
     assert len(rows)==expected_records
     report={'schema_version':1,'rows':rows,'points':sum(r['points'] for r in rows),'elapsed_seconds':time.monotonic()-started,

@@ -1,7 +1,8 @@
-import tempfile,json,hashlib,unittest
+import tempfile,json,unittest
 from pathlib import Path
+from evidence.source_snapshot import file_sha256
 from retention.sustained_pilot_inventory import freeze_pilot_inventory
-sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+sha=lambda p:file_sha256(p)
 class PilotInventoryTests(unittest.TestCase):
  def fixture(self,base):
   root=base/'payload';root.mkdir();run=base/'run';run.mkdir();manifest=run/'input/manifest.json';manifest.parent.mkdir();manifest.write_text('{}');refs={}

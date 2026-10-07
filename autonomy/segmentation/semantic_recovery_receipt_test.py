@@ -1,5 +1,6 @@
-import copy,json,tempfile,shutil,hashlib,unittest
+import copy,json,tempfile,shutil,unittest
 from pathlib import Path
+from evidence.source_snapshot import file_sha256
 from segmentation.semantic_recovery_receipt import verify_receipt
 class ReceiptTests(unittest.TestCase):
  def test_fixture_and_rehashed_mutants(self):
@@ -9,7 +10,7 @@ class ReceiptTests(unittest.TestCase):
    with self.subTest(mutation=mutation),tempfile.TemporaryDirectory() as tmp:
     root=Path(tmp)/'receipt';shutil.copytree('/source',root);r=copy.deepcopy(original)
     if mutation:mutation(r)
-    (root/'receipt.json').write_text(json.dumps(r));digest=hashlib.sha256((root/'receipt.json').read_bytes()).hexdigest()
+    (root/'receipt.json').write_text(json.dumps(r));digest=file_sha256(root/'receipt.json')
     args=dict(expected_sha256=digest,expected_record=expected,expected_runtime=runtime,expected_code=pins,code_root=Path('/experiment'))
     if mutation:
      with self.assertRaises(ValueError):verify_receipt(root,**args)

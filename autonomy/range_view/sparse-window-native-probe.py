@@ -1,14 +1,15 @@
 """Untrained native pillar→masked attention→BEV integration; no optimizer."""
-import hashlib,importlib.util,json,time
+import importlib.util,json,time
 from pathlib import Path
 import numpy as np
 import torch
 from detection.pillar_encoder import PillarFeatureNet,decorate,scatter
+from evidence.source_snapshot import file_sha256
 from range_view.sparse_window_attention import SparseWindowAttention
 from range_view.sparse_windows import partition_sparse_windows
 
 trusted=json.loads(Path('/mnt/trusted.json').read_text());source=Path('/source/output/packed.npz')
-assert hashlib.sha256(source.read_bytes()).hexdigest()==trusted['packed_sha256']
+assert file_sha256(source)==trusted['packed_sha256']
 assert importlib.util.find_spec('tensorflow') is None
 assert torch.cuda.is_available() and torch.cuda.device_count()==1
 torch.manual_seed(17);torch.backends.cuda.matmul.allow_tf32=False

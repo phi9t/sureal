@@ -1,7 +1,8 @@
-import tempfile,json,hashlib,unittest
+import tempfile,json,unittest
 from pathlib import Path
+from evidence.source_snapshot import file_sha256
 from retention.cache_inventory import freeze_cache_inventory
-sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+sha=lambda p:file_sha256(p)
 class CacheInventoryTests(unittest.TestCase):
  def fixture(self,root):
   frame=root/'scene/1';frame.mkdir(parents=True);(frame/'data.bin').write_bytes(b'data')

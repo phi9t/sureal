@@ -1,11 +1,8 @@
 """Live independently rehashed reproducibility comparison across R0 runs."""
-import hashlib
 import json
 from pathlib import Path
 import sys
-
-
-def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+from evidence.source_snapshot import file_sha256 as sha
 
 
 def read_run(root,expected_milestone):

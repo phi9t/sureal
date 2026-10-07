@@ -1,6 +1,7 @@
 """Renew existing tickets and cached tokens; never obtain passwords unattended."""
 import argparse,json,os,signal,subprocess,time
 from pathlib import Path
+from evidence.source_snapshot import file_sha256
 
 def refresh_once(waystone,run):
  valid=run(['/usr/bin/klist','-s'],'ticket-validity')==0
@@ -14,10 +15,8 @@ def refresh_once(waystone,run):
 
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--config',type=Path,required=True);a=parser.parse_args();config=json.loads(a.config.read_text())
- import hashlib
  for path,digest in config['tool_sha256'].items():
-  with Path(path).open('rb') as stream:
-   if hashlib.file_digest(stream,'sha256').hexdigest()!=digest:raise RuntimeError('Pinned HDFS tool changed; reinstall keepalive after verification')
+  if file_sha256(path)!=digest:raise RuntimeError('Pinned HDFS tool changed; reinstall keepalive after verification')
  def run(command,label):
   process=subprocess.Popen(command,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
   try:return process.wait(timeout=75)

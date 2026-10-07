@@ -2,7 +2,7 @@ FROM python:3.12-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e6
 ARG BAZEL_VERSION=9.2.0
 ARG BAZEL_LINUX_X86_64_SHA256=7668a95db1250f12c40407251e4e203b4ec8bf39bc495d2f485b2d8c99048694
 COPY requirements-tracer.lock /opt/requirements-tracer.lock
-COPY requirements-test-tools.lock /opt/requirements-test-tools.lock
+COPY insula/cpu-test-tools-requirements.lock /opt/requirements-test-tools.lock
 RUN apt-get update \
  && apt-get install -y --no-install-recommends binutils curl g++ git \
  && rm -rf /var/lib/apt/lists/*

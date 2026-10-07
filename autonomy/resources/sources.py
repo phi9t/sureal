@@ -1,7 +1,7 @@
 """Freeze the complete external resource execution closure independently."""
 from pathlib import Path
 from evidence.source_snapshot import (
-    file_sha256,
+    file_sha256 as sha,
     require_regular_file,
     snapshot_target_and_materialize,
     verify_or_materialize_receipt_sources,
@@ -11,10 +11,6 @@ REQUIRED=frozenset({'sources.py','command.py','stage.py','kernel_scope.py','scop
                     'stage_accounting.py','execute_worker.py','process_lifecycle.py'})
 EVIDENCE_REQUIRED=frozenset({'evidence/source_snapshot.py'})
 SNAPSHOT_TARGET='//autonomy/resources:execute_worker'
-
-
-def sha(path):
-    return file_sha256(path)
 
 
 def regular(path):

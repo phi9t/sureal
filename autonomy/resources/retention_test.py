@@ -1,7 +1,12 @@
 """Recovery membership is checked against an external exact input inventory."""
-import copy,errno,hashlib,json,tempfile,unittest
+import copy,errno,json,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch
+from evidence.source_snapshot import file_sha256
+
+
+def sha(path):
+    return file_sha256(path)
 
 
 class ResourceRetentionTests(unittest.TestCase):
@@ -11,7 +16,7 @@ class ResourceRetentionTests(unittest.TestCase):
         return validate_union
 
     def fixture(self,root):
-        raw=root/'raw';raw.mkdir();asset=raw/'input.json';asset.write_text('frozen input');digest=hashlib.sha256(asset.read_bytes()).hexdigest();expected={'input.json':{'path':str(asset),'sha256':digest,'bytes':asset.stat().st_size}}
+        raw=root/'raw';raw.mkdir();asset=raw/'input.json';asset.write_text('frozen input');digest=sha(asset);expected={'input.json':{'path':str(asset),'sha256':digest,'bytes':asset.stat().st_size}}
         member={'path':'input.json','sha256':digest,'bytes':asset.stat().st_size};archive='a'*64
         validation={'archive_sha256':archive,'exact_members_and_hashes':True,'members':1,'payload_bytes':member['bytes']}
         checks=[]
@@ -54,22 +59,22 @@ class ResourceRetentionTests(unittest.TestCase):
         except ImportError:self.fail('live recovery admission must bind actual retained jobs, results and downloaded manifests')
         with tempfile.TemporaryDirectory() as temp:
             root=Path(temp);pub,expected,original,raw=self.fixture(root);chunk=pub['chunks'][0]
-            library=root/'archive.py';library.write_text('pinned archive');pub['archive_library']={'path':str(library),'sha256':hashlib.sha256(library.read_bytes()).hexdigest()}
+            library=root/'archive.py';library.write_text('pinned archive');pub['archive_library']={'path':str(library),'sha256':sha(library)}
             pub['execution_directory']=str(root/'execution');pub['runtime_lock']={'rootfs_sha256':'r'*64};pub['rootfs_path']=str(root/'rootfs')
             for suffix in ['manifest','readback']:
                 path=root/(suffix+'.json');path.write_text(json.dumps(chunk['manifest'],sort_keys=True,indent=2)+'\n')
                 chunk[suffix+'_path']=str(path)
-            chunk['manifest_sha256']=hashlib.sha256(path.read_bytes()).hexdigest()
+            chunk['manifest_sha256']=sha(path)
             inputs=root/'inputs';inputs.mkdir();job={'source_sha256':{'input.json':expected['input.json']['sha256']},'max_bytes':128*1024**2,'archive_module_path':'/tmp/resource-archive.py','archive_module_sha256':pub['archive_library']['sha256'],'manifest_sha256':chunk['manifest_sha256']}
             jobpath=inputs/'job.json';jobpath.write_text(json.dumps(job));out=root/'result';out.mkdir();checkpath=out/'check.json';log=out/'live.log';log.write_text('PASS archive recovery\n')
             check=chunk['checks'][6];checkpath.write_text(json.dumps(check['validation']))
-            check.update({'input_directory':str(inputs),'input_hashes':{str(jobpath):hashlib.sha256(jobpath.read_bytes()).hexdigest()},'artifacts':{str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in out.iterdir()},'command':['bwrap','--unshare-all','--die-with-parent','--ro-bind',pub['rootfs_path'],'/','--ro-bind',pub['execution_directory'],'/experiment','--ro-bind',str(inputs),'/tmp/inputs','--ro-bind',str(library),'/tmp/resource-archive.py','--','python','/experiment/resources/archive_worker.py','rehydrate']})
+            check.update({'input_directory':str(inputs),'input_hashes':{str(jobpath):sha(jobpath)},'artifacts':{str(p):sha(p) for p in out.iterdir()},'command':['bwrap','--unshare-all','--die-with-parent','--ro-bind',pub['rootfs_path'],'/','--ro-bind',pub['execution_directory'],'/experiment','--ro-bind',str(inputs),'/tmp/inputs','--ro-bind',str(library),'/tmp/resource-archive.py','--','python','/experiment/resources/archive_worker.py','rehydrate']})
             validate_archive_snapshot(pub,chunk,check,'rehydrate')
             for fault in ['result','job','library','mount','manifest','input_inventory']:
                 bad=copy.deepcopy(check);candidate=copy.deepcopy(chunk)
                 if fault=='result':bad['validation']['payload_bytes']+=1
                 elif fault=='job':
-                    altered=root/'bad-job';altered.mkdir();changed={**job,'source_sha256':{}};file=altered/'job.json';file.write_text(json.dumps(changed));bad['input_directory']=str(altered);bad['input_hashes']={str(file):hashlib.sha256(file.read_bytes()).hexdigest()};bad['command'][bad['command'].index('/tmp/inputs')-1]=str(altered)
+                    altered=root/'bad-job';altered.mkdir();changed={**job,'source_sha256':{}};file=altered/'job.json';file.write_text(json.dumps(changed));bad['input_directory']=str(altered);bad['input_hashes']={str(file):sha(file)};bad['command'][bad['command'].index('/tmp/inputs')-1]=str(altered)
                 elif fault=='library':bad['command'][bad['command'].index('/tmp/resource-archive.py')-1]=str(root/'foreign.py')
                 elif fault=='mount':bad['command'][bad['command'].index('/experiment')-1]=str(root/'foreign')
                 elif fault=='manifest':candidate['manifest']['archive_bytes']+=1
@@ -80,7 +85,7 @@ class ResourceRetentionTests(unittest.TestCase):
         try:from resources.retention import stage_member
         except ImportError:self.fail('driver inputs on another filesystem require bounded verified staging')
         with tempfile.TemporaryDirectory() as temp:
-            root=Path(temp);source=root/'driver.so';source.write_bytes(b'driver bytes');entry={'path':str(source),'sha256':hashlib.sha256(source.read_bytes()).hexdigest(),'bytes':source.stat().st_size};destination=root/'staged.so'
+            root=Path(temp);source=root/'driver.so';source.write_bytes(b'driver bytes');entry={'path':str(source),'sha256':sha(source),'bytes':source.stat().st_size};destination=root/'staged.so'
             with patch('resources.retention.os.link',side_effect=OSError(errno.EXDEV,'cross-device')):
                 result=stage_member(entry,destination,root,reserve=lambda *_: None);self.assertEqual(destination.read_bytes(),source.read_bytes());self.assertEqual(result['storage'],'copied');self.assertEqual(result['bytes'],len(b'driver bytes'))
             with patch('resources.retention.os.link',side_effect=OSError(errno.EACCES,'not permitted')):
@@ -99,15 +104,15 @@ class ResourceRetentionTests(unittest.TestCase):
             (code/'resources/execute_worker.py').write_text('admitted worker')
             (code/'evidence/source_snapshot.py').write_text('admitted helper')
             archive.write_text('archive helper')
-            pins={'source_pins':{str(path.relative_to(code)):hashlib.sha256(path.read_bytes()).hexdigest() for path in code.rglob('*.py')}}
+            pins={'source_pins':{str(path.relative_to(code)):sha(path) for path in code.rglob('*.py')}}
             current_helper=root/'current/evidence/source_snapshot.py';current_helper.parent.mkdir(parents=True);current_helper.write_text('changed current helper')
-            materialize_execution_package(code,execution,archive,hashlib.sha256(archive.read_bytes()).hexdigest(),pins)
+            materialize_execution_package(code,execution,archive,sha(archive),pins)
             self.assertEqual((execution/'evidence/source_snapshot.py').read_text(),'admitted helper')
             self.assertEqual((execution/'resources/execute_worker.py').read_text(),'admitted worker')
             self.assertEqual((execution/'resources/resource_archive.py').read_text(),'archive helper')
             from resources.retention_audit import validate_live_references
             pub={'resource_source_pins':pins,'resource_source_directory':str(root/'current/resources'),
-                 'execution_directory':str(execution),'archive_library':{'sha256':hashlib.sha256(archive.read_bytes()).hexdigest()},'chunks':[]}
+                 'execution_directory':str(execution),'archive_library':{'sha256':sha(archive)},'chunks':[]}
             validate_live_references(pub)
             for name in pins['source_pins']:
                 helper=execution/name;original=helper.read_bytes()
@@ -118,9 +123,9 @@ class ResourceRetentionTests(unittest.TestCase):
                 helper.write_bytes(original)
             validate_live_references(pub)
             (code/'evidence/source_snapshot.py').write_text('tampered admitted helper')
-            with self.assertRaises(ValueError):materialize_execution_package(code,root/'execution-2',archive,hashlib.sha256(archive.read_bytes()).hexdigest(),pins)
+            with self.assertRaises(ValueError):materialize_execution_package(code,root/'execution-2',archive,sha(archive),pins)
             (code/'evidence/source_snapshot.py').unlink()
-            with self.assertRaises(ValueError):materialize_execution_package(code,root/'execution-3',archive,hashlib.sha256(archive.read_bytes()).hexdigest(),pins)
+            with self.assertRaises(ValueError):materialize_execution_package(code,root/'execution-3',archive,sha(archive),pins)
 
 
 if __name__=='__main__':unittest.main()

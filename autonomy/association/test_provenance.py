@@ -22,6 +22,12 @@ _MOVED_BASELINE_SOURCES = {
     'tier1/models.py': 'detection/fixed_batch_models.py',
 }
 
+_MOVED_ASSOCIATION_SOURCES = {
+    'runtime/requirements.lock': 'runtime_requirements.lock',
+    'runtime/Dockerfile.cpu': 'runtime_cpu.Dockerfile',
+    'runtime/Dockerfile.training': 'runtime_training.Dockerfile',
+}
+
 
 def _hash(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True,
@@ -37,8 +43,13 @@ def document():
     candidate['baseline_source_hashes'] = baseline
     candidate['input_hash_preimages']['baseline_sources_sha256'] = copy.deepcopy(baseline)
     candidate['inputs']['baseline_sources_sha256'] = _hash(baseline)
-    for key, field in [('association_sources_sha256', 'association_source_hashes'),
-                       ('initial_model_tensors_sha256', 'initial_model_tensor_sha256')]:
+    association = copy.deepcopy(candidate['association_source_hashes'])
+    for old, new in _MOVED_ASSOCIATION_SOURCES.items():
+        association[new] = association[old]
+    candidate['association_source_hashes'] = association
+    candidate['input_hash_preimages']['association_sources_sha256'] = copy.deepcopy(association)
+    candidate['inputs']['association_sources_sha256'] = _hash(association)
+    for key, field in [('initial_model_tensors_sha256', 'initial_model_tensor_sha256')]:
         value = copy.deepcopy(candidate[field])
         candidate['input_hash_preimages'][key] = value
         candidate['inputs'][key] = _hash(value)

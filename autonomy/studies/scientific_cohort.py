@@ -13,6 +13,7 @@ CACHE=Path.home()/'.cache/waystone/waymo-perception'
 WORKING=CACHE/'scientific-processing'
 POINT_COMPONENTS=['lidar_calibration','camera_calibration','vehicle_pose','lidar_pose','lidar_camera_projection','lidar_segmentation','lidar_box','reconstruction']
 CAMERA_COMPONENTS=['camera_image','camera_segmentation','camera_box']
+SCIENTIFIC_COHORT_TARGET='//autonomy/studies:scientific_cohort'
 def save(p,data):
  p.write_text(json.dumps(data,indent=2)+'\n')
 def total(p):return sum(f.stat().st_size for f in p.rglob('*') if f.is_file())

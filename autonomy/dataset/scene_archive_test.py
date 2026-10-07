@@ -2,12 +2,13 @@ import hashlib,json,tarfile
 from pathlib import Path
 import tempfile,unittest
 from dataset.scene_archive import create_scene_archive
+from evidence.source_snapshot import file_sha256
 
 class SceneArchiveTests(unittest.TestCase):
     def fixture(self,root):
         points=root/'points';points.mkdir();data=b'point-record-fixture';(points/'a.npz').write_bytes(data)
         report={'schema_version':1,'rows':[{'artifact':'a.npz','sha256':hashlib.sha256(data).hexdigest(),'return_present':True,'points':1}]}
-        (points/'report.json').write_text(json.dumps(report));digest=hashlib.sha256((points/'report.json').read_bytes()).hexdigest()
+        (points/'report.json').write_text(json.dumps(report));digest=file_sha256(points/'report.json')
         return points,digest
 
     def test_deterministic_members_and_working_set_accounting(self):

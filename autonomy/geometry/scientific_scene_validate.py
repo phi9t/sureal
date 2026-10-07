@@ -1,14 +1,11 @@
 """Independent reconciliation against staged native LiDAR and verified sidecars."""
-import hashlib,json
+import json
 from pathlib import Path
 import numpy as np
 from dataset.sensor_records import select_rows,OrderedLookup
 from dataset.scientific_sidecar_reader import iter_sidecar_rows
+from evidence.source_snapshot import file_sha256 as digest
 from .reconstruction_validate import raw,check_coordinates
-
-
-def digest(path):
-    with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
 
 
 def validate_scene(lidar_source,sidecars,records,*,verified_manifest_hashes):

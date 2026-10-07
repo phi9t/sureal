@@ -13,6 +13,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from detection.training_box_job import run_training_box_job
+from evidence.source_snapshot import file_sha256
 
 
 COMPONENTS = ['camera_box', 'camera_calibration', 'camera_hkp', 'camera_image', 'camera_segmentation',
@@ -84,7 +85,7 @@ class NativeBoxJobTests(unittest.TestCase):
         self.save(self.job_path, self.job)
 
     def sha(self, path):
-        return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+        return file_sha256(path)
 
     def save(self, path, value):
         Path(path).write_text(json.dumps(value, indent=2) + '\n')

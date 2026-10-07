@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """M3 live full-cohort reconstruction and independent validation receipt."""
 from datetime import datetime,timezone
-import hashlib
 import json
 from pathlib import Path
 import resource
@@ -10,17 +9,16 @@ import sys
 import tempfile
 import time
 
-HERE=Path(__file__).resolve().parent
+HERE=Path(__file__).resolve().parents[1]
+from evidence.source_snapshot import file_sha256 as sha
 from insula.m0_receipt import validate_receipt
 ROOT=Path.home()/'.cache/waystone/waymo-perception/insula/rootfs-v2'
 M0=ROOT.parent/'m0-live-20260930-c'
 SOURCE=Path.home()/'.cache/waystone/waymo-perception/slices/validation-two-scenes-20260929'
-FILES=['verify-reconstruction.py','enter.sh','insula/entry.py','insula/runtime_identity.py',
+FILES=['geometry/verify_reconstruction.py','enter.sh','insula/entry.py','insula/runtime_identity.py',
        'geometry/geometry.py','geometry/geometry_foundation.py','dataset/sensor_records.py',
        'geometry/reconstruction_probe.py','geometry/reconstruction_validate.py','dataset/tracer.py',
        'dataset/tracer_contracts.py','geometry/geometry_test.py','dataset/sensor_records_test.py','geometry/reconstruction_validate_test.py']
-
-def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 
 def main():
     destination=Path(sys.argv[1])
