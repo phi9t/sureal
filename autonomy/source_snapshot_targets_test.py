@@ -23,12 +23,20 @@ from training_execution.sustained_sources import source_paths as sustained_sourc
 from evidence.source_snapshot import label_to_path
 from resources.sources import SNAPSHOT_TARGET as RESOURCE_TARGET
 from resources.sources import source_paths as resource_source_paths
+from studies.architecture.experiment_runner import ARCHITECTURE_SOURCE_SNAPSHOT_TARGET
 
 
 PACKAGE = Path(__file__).resolve().parent
 
 
 class SourceSnapshotTargetTests(unittest.TestCase):
+    def assert_executable_target(self, actual, expected):
+        self.assertEqual(
+            actual,
+            expected,
+            "new source receipts must bind to the executable target, not a helper library",
+        )
+
     def query_paths(self, filename):
         path = self.query_file(filename)
         self.assertTrue(path.is_file(), f"missing genquery output: {filename}")
@@ -57,51 +65,98 @@ class SourceSnapshotTargetTests(unittest.TestCase):
                 return path
         return candidates[0]
 
-    def assert_target_paths(self, target, query_filename, expected):
+    def assert_target_contains_required_sources(self, target, query_filename, required):
         self.assertTrue(target.startswith("//autonomy"), target)
-        self.assertEqual(self.query_paths(query_filename), sorted(expected))
+        paths = self.query_paths(query_filename)
+        missing = sorted(set(required) - set(paths))
+        self.assertEqual(missing, [])
+        self.assertFalse([name for name in paths if name.endswith("_test.py") or name.startswith("tests/")])
+        return paths
 
-    def test_sustained_run_sources_filegroup_matches_freezer_sources(self):
-        self.assert_target_paths(
+    def test_sustained_run_sources_target_declares_required_execution_sources(self):
+        self.assert_executable_target(
+            SUSTAINED_RUN_TARGET,
+            "//autonomy/training_execution:train_sustained",
+        )
+        self.assert_target_contains_required_sources(
             SUSTAINED_RUN_TARGET,
             "sustained_run_sources_query",
             sustained_source_paths(PACKAGE),
         )
 
-    def test_resource_source_layer_filegroup_matches_freezer_sources(self):
-        self.assert_target_paths(
+    def test_resource_source_layer_target_declares_required_execution_sources(self):
+        self.assert_executable_target(
+            RESOURCE_TARGET,
+            "//autonomy/resources:execute_worker",
+        )
+        self.assert_target_contains_required_sources(
             RESOURCE_TARGET,
             "resource_source_layer_query",
             resource_source_paths(PACKAGE / "resources"),
         )
 
-    def test_sustained_controller_host_filegroup_matches_freezer_sources(self):
-        self.assert_target_paths(
+    def test_sustained_controller_host_target_declares_required_execution_sources(self):
+        self.assert_executable_target(
+            CONTROLLER_TARGET,
+            "//autonomy/training_execution:run_sustained",
+        )
+        self.assert_target_contains_required_sources(
             CONTROLLER_TARGET,
             "sustained_controller_host_query",
             CONTROLLER_REQUIRED,
         )
 
-    def test_sustained_checkpoint_retention_host_filegroup_matches_freezer_sources(self):
-        self.assert_target_paths(
+    def test_sustained_checkpoint_retention_host_target_declares_required_execution_sources(self):
+        self.assert_executable_target(
+            CHECKPOINT_RETENTION_TARGET,
+            "//autonomy/retention:publish_sustained_checkpoint",
+        )
+        self.assert_target_contains_required_sources(
             CHECKPOINT_RETENTION_TARGET,
             "sustained_checkpoint_retention_host_query",
             CHECKPOINT_RETENTION_REQUIRED,
         )
 
-    def test_sustained_pilot_retention_host_filegroup_matches_freezer_sources(self):
-        self.assert_target_paths(
+    def test_sustained_pilot_retention_host_target_declares_required_execution_sources(self):
+        self.assert_executable_target(
+            PILOT_RETENTION_TARGET,
+            "//autonomy/retention:publish_sustained_pilot",
+        )
+        self.assert_target_contains_required_sources(
             PILOT_RETENTION_TARGET,
             "sustained_pilot_retention_host_query",
             PILOT_RETENTION_REQUIRED,
         )
 
-    def test_native_cache_retention_host_filegroup_matches_freezer_sources(self):
-        self.assert_target_paths(
+    def test_native_cache_retention_host_target_declares_required_execution_sources(self):
+        self.assert_executable_target(
+            NATIVE_CACHE_RETENTION_TARGET,
+            "//autonomy/retention:publish_native_cache",
+        )
+        self.assert_target_contains_required_sources(
             NATIVE_CACHE_RETENTION_TARGET,
             "native_cache_retention_host_query",
             NATIVE_CACHE_RETENTION_REQUIRED,
         )
+
+    def test_architecture_runner_target_declares_required_execution_sources(self):
+        self.assert_executable_target(
+            ARCHITECTURE_SOURCE_SNAPSHOT_TARGET,
+            "//autonomy/studies:architecture_experiment_runner",
+        )
+        paths = self.assert_target_contains_required_sources(
+            ARCHITECTURE_SOURCE_SNAPSHOT_TARGET,
+            "architecture_experiment_runner_query",
+            {
+                "studies/architecture/experiment_runner.py",
+                "studies/architecture/registry.json",
+                "studies/architecture/harness/files.json",
+                "research/architecture-retention-controls-spec.md",
+                "detection/pillar_detector.py",
+                "evaluation/prepare_sustained_v3.py",
+            },
+        )
+        self.assertIn("studies/architecture/harness/run-architecture-learning-curve.py", paths)
 
 
 if __name__ == "__main__":

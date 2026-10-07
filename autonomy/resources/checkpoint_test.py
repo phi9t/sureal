@@ -23,6 +23,8 @@ class ResourceCheckpointTests(unittest.TestCase):
             def train_and_admit(self,*args,**kwargs): raise NotImplementedError
         class BoundBackend(ResourceBackend,NativeBackend): pass
         b=BoundBackend.__new__(BoundBackend);b.R=root/'run';b.R.mkdir();b.output=root/'payload';b.output.mkdir();b.source=b.R/'input';b.source.mkdir();b.anchor_sha='b'*64;b._resource_identity=None;(b.R/'run.json').write_text('{"fixture":"native"}')
+        b.resource_work_root=root/'scientific';b.resource_reservations=[]
+        b.resource_reserve_write=lambda path,maximum_new_bytes:b.resource_reservations.append((Path(path),maximum_new_bytes)) or {'used_bytes_before':0,'maximum_new_bytes':maximum_new_bytes}
         b.native=root/'scientific/balanced16-native-v2';native=b.native/'scene/100/producer';native.mkdir(parents=True)
         for name in ['observations.npz','targets.npz','report.json']:(native/name).write_text(name)
         physical=b.native.parent/'balanced16-physical-v2/scene/producer/100.npz';physical.parent.mkdir(parents=True);physical.write_text('physical')
@@ -34,7 +36,8 @@ class ResourceCheckpointTests(unittest.TestCase):
         b.package=b.R/'code';b.package.mkdir();worker=b.package/'resources/sustained_scoring_budget.py';worker.parent.mkdir(parents=True);worker.write_text('def stage_timeout(metrics): return 14700 if metrics else 1800\n');b.pins={'resources/sustained_scoring_budget.py':sha(worker)}
         b.pins=source_snapshot_receipt(b.package,sorted(b.pins),LocalSnapshotStore(b.R/'source-snapshots'),target='fixture:sustained-run-package',materialized_root=b.package)
         host=root/'checkout';host.mkdir();(host/'host.py').write_text('host');b.host_pins=copy_source_snapshot(host,['host.py'],b.R/'host-source',LocalSnapshotStore(b.R/'host-source-snapshots'),target='fixture:sustained-controller-host')
-        path,digest=prepare_identity(b,b.R/'resource-layer');b.attach_resources(path,digest)
+        repo,runner=backend_test.ResourceBackendTests().resource_source_query()
+        path,digest=prepare_identity(b,b.R/'resource-layer',source_snapshot_store=LocalSnapshotStore(b.R/'resource-source-snapshots'),repo_root=repo,bazel=repo/'bazelw',runner=runner);b.attach_resources(path,digest)
         refs={}
         for stage in ['train','audit','literal-loss','export','proposals','score','metrics-audit']:
             child=root/stage;child.mkdir();receipt,path,evidence=backend_test.ResourceBackendTests().stage_fixture(child,b,stage+'-1000')
@@ -81,8 +84,8 @@ class ResourceCheckpointTests(unittest.TestCase):
             native_base=type(b).__mro__[2]
             with patch.object(native_base,'guard'),patch.object(native_base,'check_stage'):
                 seal(b,record);files=inventory(b,record)
-                self.assertIn('resource-sources/snapshot-object.tar',files);self.assertIn('resource-sources/materialized/resources/sources.py',files)
-                self.assertIn('resource-sources/materialized/evidence/source_snapshot.py',files)
+                self.assertIn('resource-sources/snapshot-object.tar',files);self.assertIn('resource-sources/materialized/autonomy/resources/sources.py',files)
+                self.assertIn('resource-sources/materialized/autonomy/evidence/source_snapshot.py',files)
                 self.assertIn('native-package/snapshot-object.tar',files);self.assertIn('native-package/materialized/resources/sustained_scoring_budget.py',files)
                 self.assertIn('native-host/snapshot-object.tar',files);self.assertIn('native-host/materialized/host.py',files);self.assertNotIn('native-current/resources/sustained_scoring_budget.py',files)
                 for stage in ['train','audit','literal-loss','export','proposals','score','metrics-audit']:
@@ -90,6 +93,135 @@ class ResourceCheckpointTests(unittest.TestCase):
                 for name,entry in files.items():self.assertEqual(sha(entry['path']),entry['sha256'])
                 log=Path(files['stages/train/execution.log']['path']);log.write_text('changed archived evidence')
                 with self.assertRaises(ValueError):inventory(b,record)
+
+    def test_inventory_restores_source_snapshots_but_not_missing_stage_proofs(self):
+        seal,_,inventory=self.api()
+        with tempfile.TemporaryDirectory() as temp:
+            b,record=self.fixture(Path(temp))
+            native_base=type(b).__mro__[2]
+            with patch.object(native_base,'guard'),patch.object(native_base,'check_stage'):
+                seal(b,record)
+                roots=[
+                    Path(b.resource_identity['source_pins']['source_snapshot_root']),
+                    Path(b.pins['source_snapshot_root']),
+                    Path(b.host_pins['source_snapshot_root']),
+                ]
+                missing_proof=b.resource_root/'stages/train-1000/resource-admitted.json'
+                missing_proof.unlink()
+                for root in roots:
+                    import shutil
+                    shutil.rmtree(root)
+                with self.assertRaises(ValueError):
+                    inventory(b,record)
+                self.assertTrue(all(root.is_dir() for root in roots))
+                self.assertFalse(missing_proof.exists())
+
+    def test_inventory_refuses_corrupt_snapshot_archive_sidecar_without_overwrite(self):
+        seal,_,inventory=self.api()
+        with tempfile.TemporaryDirectory() as temp:
+            b,record=self.fixture(Path(temp))
+            native_base=type(b).__mro__[2]
+            with patch.object(native_base,'guard'),patch.object(native_base,'check_stage'):
+                seal(b,record);files=inventory(b,record)
+                archive=Path(files['resource-sources/snapshot-object.tar']['path'])
+                archive.chmod(0o644);archive.write_text('corrupt sidecar')
+                with self.assertRaises(ValueError):inventory(b,record)
+                self.assertEqual(archive.read_text(),'corrupt sidecar')
+
+    def test_snapshot_archive_staging_reserves_shared_root_and_keeps_retry_temps(self):
+        seal,_,inventory=self.api()
+        with tempfile.TemporaryDirectory() as temp:
+            b,record=self.fixture(Path(temp))
+            native_base=type(b).__mro__[2]
+            with patch.object(native_base,'guard'),patch.object(native_base,'check_stage'):
+                seal(b,record)
+                archive_cache=b.resource_root/'source-snapshot-archives';archive_cache.mkdir(parents=True)
+                digest=b.resource_identity['source_pins']['source_snapshot_sha256']
+                archive=archive_cache/('resource-sources-'+digest+'.tar')
+                deterministic_tmp=archive.with_suffix(archive.suffix+'.tmp')
+                deterministic_tmp.write_text('preexisting retry state')
+                inventory(b,record)
+                self.assertEqual(deterministic_tmp.read_text(),'preexisting retry state')
+                self.assertTrue(b.resource_reservations)
+                self.assertTrue(all(path==b.resource_work_root for path,_ in b.resource_reservations))
+
+    def test_snapshot_archive_staging_does_not_follow_dangling_retry_symlink(self):
+        seal,_,inventory=self.api()
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp);b,record=self.fixture(root)
+            native_base=type(b).__mro__[2]
+            with patch.object(native_base,'guard'),patch.object(native_base,'check_stage'):
+                seal(b,record)
+                archive_cache=b.resource_root/'source-snapshot-archives';archive_cache.mkdir(parents=True)
+                digest=b.resource_identity['source_pins']['source_snapshot_sha256']
+                archive=archive_cache/('resource-sources-'+digest+'.tar')
+                deterministic_tmp=archive.with_suffix(archive.suffix+'.tmp')
+                escaped=root/'escaped-snapshot.tar'
+                deterministic_tmp.symlink_to(escaped)
+                inventory(b,record)
+                self.assertTrue(deterministic_tmp.is_symlink())
+                self.assertFalse(escaped.exists())
+
+    def test_snapshot_archive_staging_requires_reservation_before_write(self):
+        seal,_,inventory=self.api()
+        with tempfile.TemporaryDirectory() as temp:
+            b,record=self.fixture(Path(temp))
+            native_base=type(b).__mro__[2]
+            def refuse(path,maximum_new_bytes):
+                self.assertEqual(Path(path),b.resource_work_root)
+                raise ValueError('cap')
+            b.resource_reserve_write=refuse
+            with patch.object(native_base,'guard'),patch.object(native_base,'check_stage'):
+                seal(b,record)
+                digest=b.resource_identity['source_pins']['source_snapshot_sha256']
+                archive=b.resource_root/'source-snapshot-archives'/('resource-sources-'+digest+'.tar')
+                with self.assertRaisesRegex(ValueError,'cap'):
+                    inventory(b,record)
+                self.assertFalse(archive.exists())
+
+    def test_snapshot_archive_staging_requires_accounting_hook(self):
+        seal,_,inventory=self.api()
+        with tempfile.TemporaryDirectory() as temp:
+            b,record=self.fixture(Path(temp));del b.resource_reserve_write
+            native_base=type(b).__mro__[2]
+            with patch.object(native_base,'guard'),patch.object(native_base,'check_stage'):
+                seal(b,record)
+                with self.assertRaisesRegex(ValueError,'resource accounting reservation required'):
+                    inventory(b,record)
+
+    def test_existing_snapshot_archive_retry_reuses_verified_object_without_reservation(self):
+        seal,_,inventory=self.api()
+        with tempfile.TemporaryDirectory() as temp:
+            b,record=self.fixture(Path(temp))
+            native_base=type(b).__mro__[2]
+            with patch.object(native_base,'guard'),patch.object(native_base,'check_stage'):
+                seal(b,record);files=inventory(b,record)
+                archive=Path(files['resource-sources/snapshot-object.tar']['path'])
+                first_reservations=list(b.resource_reservations)
+                def fail_if_called(path,maximum_new_bytes):
+                    raise AssertionError('published content-addressed archive should be reused')
+                b.resource_reserve_write=fail_if_called
+                files=inventory(b,record)
+                self.assertEqual(Path(files['resource-sources/snapshot-object.tar']['path']),archive)
+                self.assertEqual(sha(archive),b.resource_identity['source_pins']['source_snapshot_sha256'])
+                self.assertEqual(b.resource_reservations,first_reservations)
+
+    def test_schema2_publication_binding_requires_canonical_host_archive_helper(self):
+        from resources.checkpoint import _validate_publication_external_bindings
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp);source=root/'host-source';(source/'autonomy/resources').mkdir(parents=True)
+            archive=source/'autonomy/resources/resource_archive.py';archive.write_text('archive helper')
+            backend=type('Backend',(),{})()
+            backend.resource_identity={'source_pins':{'source':'identity'}}
+            backend.host_pins={'schema_version':2,'source_snapshot_root':str(source),'source_pins':{
+                'autonomy/resources/command.py':'a'*64,
+            }}
+            pub={'resource_source_pins':backend.resource_identity['source_pins'],
+                 'archive_library':{'path':str(archive),'sha256':sha(archive)}}
+            with self.assertRaises(ValueError):
+                _validate_publication_external_bindings(backend,pub)
+            backend.host_pins['source_pins']['autonomy/resources/resource_archive.py']=sha(archive)
+            _validate_publication_external_bindings(backend,pub)
 
     def test_inventory_covers_raw_stage_inputs_nonproducer_outputs_and_verifiers(self):
         seal,_,inventory=self.api()

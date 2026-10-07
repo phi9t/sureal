@@ -2,7 +2,7 @@
 import json,re
 from pathlib import Path
 from evidence.source_snapshot import safe_member_name
-from resources.sources import regular,sha
+from resources.sources import package_member_path,regular,sha
 
 LIMIT=128*1024**2
 EXTRA={'manifest_readback_exact','publication_manifest_hdfs_uri','publication_manifest_sha256','independent_admission'}
@@ -98,7 +98,7 @@ def validate_live_references(pub):
     if not regular(archive) or sha(archive)!=pub['archive_library']['sha256']:
         raise ValueError('executed archive helper differs from native pinned library')
     for name,digest in pins['source_pins'].items():
-        path=execution/name
+        path=package_member_path(execution,name)
         if not regular(path) or sha(path)!=digest:raise ValueError('executed resource helper source changed')
     for chunk in pub['chunks']:
         for index,mode in [(0,'create'),(5,'verify'),(6,'rehydrate')]:

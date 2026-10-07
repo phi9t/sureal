@@ -9,6 +9,7 @@ GEOMETRY_VISIBILITY = [
     "//autonomy:__pkg__",
     "//autonomy/motion:__pkg__",
     "//autonomy/inspection:__pkg__",
+    "//autonomy/training_execution:__pkg__",
 ]
 
 package(default_visibility = ["//visibility:private"])

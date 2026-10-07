@@ -2,10 +2,23 @@
 import copy,json,shutil,tempfile,types,unittest
 from pathlib import Path
 from unittest.mock import patch
-from resources.sources import sha
+from evidence.source_snapshot import LocalSnapshotStore
+from resources.sources import sha,validate_sources
 
 
 class ResourceBackendTests(unittest.TestCase):
+    def resource_source_query(self):
+        repo=Path(__file__).resolve().parents[2]
+        names=sorted(str(path.relative_to(repo)) for path in (repo/'autonomy/resources').glob('*.py') if not path.name.endswith('_test.py'))
+        names.append('autonomy/evidence/source_snapshot.py')
+        def run(command,**kwargs):
+            self.assertIn('query',command)
+            class Result:pass
+            result=Result()
+            result.stdout=''.join('//'+name.rsplit('/',1)[0]+':'+name.rsplit('/',1)[1]+'\n' for name in names)
+            return result
+        return repo,run
+
     def api(self):
         try:
             from resources.backend import ResourceBackend,prepare_identity
@@ -27,7 +40,8 @@ class ResourceBackendTests(unittest.TestCase):
         b=BoundBackend.__new__(BoundBackend)
         b.R=root/'native-run';b.R.mkdir();(b.R/'run.json').write_text('{"fixture":"native identity"}')
         b.manifest_sha='a'*64;b.anchor_sha='b'*64;b._resource_identity=None;b.output=root/'payload';b.output.mkdir()
-        path,digest=prepare(b,b.R/'resource-layer');b.attach_resources(path,digest)
+        repo,runner=self.resource_source_query()
+        path,digest=prepare(b,b.R/'resource-layer',source_snapshot_store=LocalSnapshotStore(b.R/'resource-source-snapshots'),repo_root=repo,bazel=repo/'bazelw',runner=runner);b.attach_resources(path,digest)
         return b,path,digest
 
     def stage_fixture(self,root,b,name='literal-loss-1000'):
@@ -35,7 +49,7 @@ class ResourceBackendTests(unittest.TestCase):
         scratch=root/'fixture';scratch.mkdir();_,_,native,proof=ResourceStageTests().fixture(scratch)
         evidence=b.resource_root/'stages'/name;shutil.move(str(scratch/'attempt'),evidence)
         worker=evidence/'worker/worker-resource.json';log=evidence/'execution.log'
-        code=Path(b.resource_identity['source_pins']['source_snapshot_root'])
+        code=validate_sources(Path(__file__).resolve().parent,b.resource_identity['source_pins'])
         command=proof['original_command'][:proof['original_command'].index('--')]+['--ro-bind',str(code),'/tmp/resource-layer','--ro-bind',str(code/'resources'),'/experiment/resources','--ro-bind',str(code/'evidence'),'/experiment/evidence','--bind',str(worker.parent),'/tmp/resource-output','--','python','/tmp/resource-layer/resources/execute_worker.py','/tmp/resource-output','/experiment/worker.py']
         proof['command']=command;proof['host_measurement']['command']=command.copy();proof['source_pins']=b.resource_identity['source_pins'];proof['cap_bytes']=16*1024**3;proof['timeout_seconds']=1800
         proof['host_measurement']['kernel_scope']['memory_max_bytes']=16*1024**3;proof['resource_admission']['aggregate_cap_bytes']=16*1024**3

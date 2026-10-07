@@ -4,7 +4,7 @@ from pathlib import Path
 from evidence.source_snapshot import safe_member_name
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
-from resources.sources import regular,sha,validate_sources
+from resources.sources import package_member_name,package_member_path,regular,sha,validate_sources
 from resources.stage import run_stage,validate_proof,write_new,require_separate
 from resources.retention_audit import validate_union,LIMIT
 
@@ -34,7 +34,7 @@ def materialize_execution_package(code,execution,library,library_sha,pins):
     except (KeyError,TypeError) as error:
         raise ValueError('complete admitted resource source pins required') from error
     required={'resources/execute_worker.py','evidence/source_snapshot.py'}
-    if not isinstance(source_pins,dict) or not required<=set(source_pins):
+    if not isinstance(source_pins,dict) or not required<={package_member_name(name) for name in source_pins}:
         raise ValueError('complete admitted resource source pins required')
     if execution.exists() or execution.is_symlink():
         raise ValueError('fresh execution package required')
@@ -44,10 +44,10 @@ def materialize_execution_package(code,execution,library,library_sha,pins):
     try:
         for name,digest in sorted(source_pins.items()):
             safe_member_name(name)
-            source=code/name
+            source=package_member_path(code,name)
             if not regular(source) or sha(source)!=digest:
                 raise ValueError('admitted resource source changed')
-            target=execution/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source,target)
+            target=package_member_path(execution,name);target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source,target)
             if sha(target)!=digest:raise ValueError('executed resource package changed')
         resources=execution/'resources';resources.mkdir(exist_ok=True);shutil.copyfile(library,resources/'resource_archive.py')
         if sha(resources/'resource_archive.py')!=library_sha:raise ValueError('executed archive helper changed')
@@ -95,7 +95,9 @@ def publish_bundle(backend,kind,inventory):
     chunks=partition(inventory);identifier=backend.R.name+'-'+kind+'-'+uuid.uuid4().hex
     root=cache_root/'insula'/('resource-retention-'+identifier);require_separate(backend.output,root);root.mkdir()
     pins=backend.resource_identity['source_pins'];code=validate_sources(package_root/'resources',pins)
-    library=Path(backend.host_pins['source_snapshot_root'])/'resources/resource_archive.py';library_sha=backend.host_pins['source_pins']['resources/resource_archive.py']
+    library_key='resources/resource_archive.py' if 'resources/resource_archive.py' in backend.host_pins['source_pins'] else 'autonomy/resources/resource_archive.py'
+    library=Path(backend.host_pins['source_snapshot_root'])/library_key
+    library_sha=backend.host_pins['source_pins'][library_key]
     execution=materialize_execution_package(code,root/'execution',library,library_sha,pins)
     temp=work_root/('resource-retention-'+identifier);temp.mkdir();raw=temp/'raw';raw.mkdir()
     def guard():
@@ -103,7 +105,7 @@ def publish_bundle(backend,kind,inventory):
         if not regular(library) or sha(library)!=library_sha:raise ValueError('pinned archive library changed')
         if sha(execution/'resources/resource_archive.py')!=library_sha:raise ValueError('executed archive helper changed')
         for name,digest in pins['source_pins'].items():
-            if sha(execution/name)!=digest:raise ValueError('executed resource package changed')
+            if sha(package_member_path(execution,name))!=digest:raise ValueError('executed resource package changed')
         for entry in inventory.values():
             if not regular(Path(entry['path'])) or sha(entry['path'])!=entry['sha256'] or Path(entry['path']).stat().st_size!=entry['bytes']:
                 raise ValueError('exact resource source inventory changed')

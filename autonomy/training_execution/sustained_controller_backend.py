@@ -7,12 +7,14 @@ from insula.runtime_identity import verify_rootfs
 from resources.scientific_payload import sha,unique_payload_bytes
 from resources.scientific_budget import reserve_write
 from detection.sustained_contract import validate_contract
-from training_execution.sustained_sources import snapshot_sources,source_paths,validate_sources
+from training_execution.sustained_sources import cache_snapshot_for_runtime,snapshot_sources,source_pin,validate_sources
 from training_execution.sustained_stage_inputs import freeze_inputs,bind_stage_paths
 from resources.sustained_scoring_budget import stage_timeout
 from retention.sustained_checkpoint_inventory import freeze_checkpoint_inventory
 from training_execution.sustained_admission import admit_sample
 from training_execution.sustained_controller_sources import freeze_host_sources,validate_host_sources
+from retention.checkpoint_retention_sources import freeze_host_sources as freeze_checkpoint_publisher_sources,validate_host_sources as validate_checkpoint_publisher_sources
+from evidence.source_snapshot import source_snapshot_package_root
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing'
 GPU_ROOT=C/'gpu-rootfs';CPU_ROOT=C/'insula/rootfs-v2';METRICS_ROOT=C/'metrics-rootfs'
 WORKER_ENTRIES={
@@ -146,25 +148,23 @@ class NativeBackend:
    if sha(path)!=digest:raise ValueError('original GPU driver changed')
   self.package=self.R/'code';self.source=self.R/'input';self.runtime_path=self.R/'runtime-lock.json';self.verifier=self.R/'verifier'
   if resume:
-   run=json.loads((self.R/'run.json').read_text());self.host_pins=run['host_source_pins'];self.pins=run['source_hashes'];self.manifest=json.loads((self.source/'manifest.json').read_text());self.manifest_sha=run['manifest_sha256'];self.anchor_sha=run['anchor_templates_sha256']
+   run=json.loads((self.R/'run.json').read_text());self.package=Path(run.get('source_package_root',str(self.package)));self.host_pins=run['host_source_pins'];self.checkpoint_publisher_pins=run.get('checkpoint_publisher_source_pins',self.host_pins);self.pins=run['source_hashes'];self.manifest=json.loads((self.source/'manifest.json').read_text());self.manifest_sha=run['manifest_sha256'];self.anchor_sha=run['anchor_templates_sha256']
    if run['run_id']!=run_id or run['recipe']!=recipe or self.manifest['candidate']!=candidate or self.manifest['frames']!=frames or self.manifest['recipe']!=recipe or self.manifest['runtime_lock']!=self.runtime:raise ValueError('frozen resumed identity differs')
   else:
-   reserve_write(W,2*1024**3);self.R.mkdir();self.output.mkdir();self.package.mkdir();self.source.mkdir();self.verifier.mkdir();self.host_pins=freeze_host_sources(P,self.R/'host-source')
-   for name in source_paths(P):
-    path=P/name;destination=self.package/name;destination.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(path,destination)
-   self.pins=snapshot_sources(self.package,self.R/'source-snapshots');self.manifest={'candidate':candidate,'frames':frames,'recipe':recipe,'source_hashes':self.pins,'runtime_lock':self.runtime};write(self.source/'manifest.json',self.manifest);self.manifest_sha=sha(self.source/'manifest.json');write(self.runtime_path,self.runtime)
+   reserve_write(W,2*1024**3);self.R.mkdir();self.output.mkdir();self.source.mkdir();self.verifier.mkdir();self.host_pins=freeze_host_sources(P,self.R/'host-source');self.checkpoint_publisher_pins=freeze_checkpoint_publisher_sources(P,self.R/'checkpoint-publisher-source')
+   self.pins=snapshot_sources(P,destination=self.R/'code');self.package=Path(self.pins['source_snapshot_root'])/'autonomy';cache_snapshot_for_runtime(self.pins,self.R/'source-snapshots');self.manifest={'candidate':candidate,'frames':frames,'recipe':recipe,'source_hashes':self.pins,'runtime_lock':self.runtime};write(self.source/'manifest.json',self.manifest);self.manifest_sha=sha(self.source/'manifest.json');write(self.runtime_path,self.runtime)
    anchors=P/'research/training-anchor-templates.candidate.json';anchor_receipt=json.loads((P/'research/training-anchor-candidate-verified.json').read_text())
    if sha(anchors)!=anchor_receipt['expected']['candidate_sha256']:raise ValueError('admitted anchor templates changed')
    self.anchor_sha=anchor_receipt['expected']['candidate_sha256'];shutil.copyfile(anchors,self.source/'anchor-templates.json')
    for name in ['audit_sustained_transition.py','sustained_chunk_reference.py']:shutil.copyfile(self.package/'training_execution'/name,self.verifier/name)
-   write(self.R/'run.json',{'run_id':run_id,'recipe':recipe,'manifest_sha256':self.manifest_sha,'source_hashes':self.pins,'host_source_pins':self.host_pins,'anchor_templates_sha256':self.anchor_sha,'scope':'training-only fixed16 one-factor case; no heldout promotion'})
+   write(self.R/'run.json',{'run_id':run_id,'recipe':recipe,'manifest_sha256':self.manifest_sha,'source_hashes':self.pins,'host_source_pins':self.host_pins,'checkpoint_publisher_source_pins':self.checkpoint_publisher_pins,'source_package_root':str(self.package),'anchor_templates_sha256':self.anchor_sha,'scope':'training-only fixed16 one-factor case; no heldout promotion'})
   self.verifier_pins={str(p):sha(p) for p in self.verifier.iterdir()};self.guard()
  def guard(self):
-  validate_host_sources(P,self.host_pins);validate_sources(self.package,self.pins,self.runtime,self.runtime)
+  validate_host_sources(P,self.host_pins);validate_checkpoint_publisher_sources(P,self.checkpoint_publisher_pins);validate_sources(self.package,self.pins,self.runtime,self.runtime)
   admitted_anchor=json.loads((P/'research/training-anchor-candidate-verified.json').read_text())['expected']['candidate_sha256']
   if self.anchor_sha!=admitted_anchor or sha(self.source/'anchor-templates.json')!=self.anchor_sha:raise ValueError('externally admitted decoder anchors changed')
   source_pins=self.pins['source_pins']
-  if sha(self.source/'manifest.json')!=self.manifest_sha or json.loads(self.runtime_path.read_text())!=self.runtime or set(Path(p).name for p in self.verifier_pins)!={'audit_sustained_transition.py','sustained_chunk_reference.py'} or any(sha(p)!=h or h!=source_pins['training_execution/'+Path(p).name] for p,h in self.verifier_pins.items()):raise ValueError('frozen manifest/runtime/verifier changed')
+  if sha(self.source/'manifest.json')!=self.manifest_sha or json.loads(self.runtime_path.read_text())!=self.runtime or set(Path(p).name for p in self.verifier_pins)!={'audit_sustained_transition.py','sustained_chunk_reference.py'} or any(sha(p)!=h or h!=source_pin(self.pins,'training_execution/'+Path(p).name) for p,h in self.verifier_pins.items()):raise ValueError('frozen manifest/runtime/verifier changed')
   if unique_payload_bytes(W)>15*1024**3 or unique_payload_bytes(self.output)>2*1024**3:raise ValueError('scientific/case storage cap exceeded')
  def stage(self,name,worker,directory,extra,*,gpu=True,metrics=False,logical_step=None):
   from studies.architecture.experiment_runner import run_stage
@@ -250,8 +250,8 @@ class NativeBackend:
    if sha(pub['publication_path'])!=pub['publication_sha256'] or sha(pub['release_path'])!=pub['release_sha256']:raise ValueError('resumed retention/release changed')
    validate_native_publication_release(record,pub['publication_path'],pub['release_path'],completed=True)
  def publish_and_release(self,record):
-  self.guard();before={p for p in (C/'insula').glob('hdfs-retention-*')};command=[sys.executable,'-m','retention.publish_sustained_checkpoint','--receipt',record['final_path'],'--receipt-sha256',record['final_sha256'],'--release','--lock-fd',str(self.lock.fileno())];log=self.R/f'retention-{record["step"]:02d}.log';env={k:v for k,v in os.environ.items() if k!='PYTHONPATH'}
-  with log.open('w') as stream:result=subprocess.run(command,cwd=P,env=env,stdout=stream,stderr=subprocess.STDOUT,pass_fds=(self.lock.fileno(),),timeout=3600)
+  self.guard();publisher_package=source_snapshot_package_root(self.checkpoint_publisher_pins);validate_checkpoint_publisher_sources(publisher_package,self.checkpoint_publisher_pins);publisher_receipt=self.R/'checkpoint-publisher-source-receipt.json';write(publisher_receipt,self.checkpoint_publisher_pins);before={p for p in (C/'insula').glob('hdfs-retention-*')};command=[sys.executable,'-m','retention.publish_sustained_checkpoint','--receipt',record['final_path'],'--receipt-sha256',record['final_sha256'],'--host-source-receipt',str(publisher_receipt),'--release','--lock-fd',str(self.lock.fileno())];log=self.R/f'retention-{record["step"]:02d}.log';env={k:v for k,v in os.environ.items() if k!='PYTHONPATH'}
+  with log.open('w') as stream:result=subprocess.run(command,cwd=publisher_package,env=env,stdout=stream,stderr=subprocess.STDOUT,pass_fds=(self.lock.fileno(),),timeout=3600)
   if result.returncode:raise RuntimeError('checkpoint HDFS preservation failed; next training forbidden')
   new={p for p in (C/'insula').glob('hdfs-retention-*')}-before
   if len(new)!=1:raise ValueError('unique current checkpoint publication required')

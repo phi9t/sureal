@@ -5,18 +5,31 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from evidence.source_snapshot import LocalSnapshotStore
 from insula.entry import launch_plan
 from resources.backend import ResourceBackend
 from resources.command import wrapped_command
 from resources.retention import materialize_execution_package
 from resources.retention_audit import LIMIT, validate_union
-from resources.sources import sha
+from resources.sources import sha,validate_sources as validate_resource_sources
 from resources.stage import validate_proof
 from resources.stage_accounting import MEASUREMENT, admit_worker
 from training_execution.run_sustained import ResourceNativeBackend, open_backend
 
 
 class RunSustainedBackendBindingTests(unittest.TestCase):
+ def resource_snapshot_query(self):
+  repo=Path(__file__).resolve().parents[2]
+  names=sorted(str(path.relative_to(repo)) for path in (repo/'autonomy/resources').glob('*.py') if not path.name.endswith('_test.py'))
+  names.append('autonomy/evidence/source_snapshot.py')
+  def run(command,**kwargs):
+   self.assertIn('query',command)
+   class Result:pass
+   result=Result()
+   result.stdout=''.join('//'+name.rsplit('/',1)[0]+':'+name.rsplit('/',1)[1]+'\n' for name in names)
+   return result
+  return repo,run
+
  def inventory(self,root,record):
   root=Path(root);members={}
   for name in ['identity.json','native-manifest.json']:
@@ -41,6 +54,9 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
   backend=ResourceNativeBackend.__new__(ResourceNativeBackend)
   backend.R=root/'case';backend.R.mkdir(parents=True);backend.output=root/'payload';backend.output.mkdir()
   backend.resource_root=backend.R/'resource-layer';(backend.resource_root/'checkpoints').mkdir(parents=True)
+  backend.resource_work_root=root/'scientific';backend.resource_work_root.mkdir()
+  backend.resource_reservations=[]
+  backend.resource_reserve_write=lambda path,maximum_new_bytes:backend.resource_reservations.append((Path(path),maximum_new_bytes)) or {'used_bytes_before':0,'maximum_new_bytes':maximum_new_bytes}
   identity=root/'identity.json';identity.write_text('identity.json')
   manifest=root/'native-manifest.json';manifest.write_text('native-manifest.json')
   backend._resource_identity=None;backend.resource_identity_sha256=sha(identity);backend.manifest_sha=sha(manifest)
@@ -60,8 +76,9 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
   from resources.sources import freeze_sources
   root=Path(root);root.mkdir(parents=True,exist_ok=True)
   package=Path(__file__).resolve().parents[1];source=package/'resources'
-  pins=freeze_sources(source,root/'resource-source-receipt')
-  code=Path(pins['source_snapshot_root']);execution=root/'execution';library=source/'resource_archive.py'
+  repo,runner=self.resource_snapshot_query()
+  pins=freeze_sources(source,root/'resource-source-receipt',store=LocalSnapshotStore(root/'resource-source-snapshots'),repo_root=repo,bazel=repo/'bazelw',runner=runner)
+  code=validate_resource_sources(source,pins);execution=root/'execution';library=source/'resource_archive.py'
   materialize_execution_package(code,execution,library,sha(library),pins)
   return source,pins,code,execution,library
 
@@ -154,7 +171,7 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
   source=Path(__file__).resolve().parents[1]/'resources'
   identity=getattr(backend,'_resource_identity',None)
   if identity is not None and identity.get('source_pins'):
-   pins=identity['source_pins'];code=Path(pins['source_snapshot_root']);execution=root/'execution'
+   pins=identity['source_pins'];code=validate_resource_sources(source,pins);execution=root/'execution'
    library=source/'resource_archive.py';materialize_execution_package(code,execution,library,sha(library),pins)
   else:
    source,pins,code,execution,library=self.resource_source_fixture(root);backend._resource_identity={'source_pins':pins}
@@ -215,7 +232,8 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
 
  def add_resource_binding(self,root,backend,receipt_path,receipt):
   evidence=backend.resource_root/'stages'/receipt['requested_stage'];evidence.mkdir(parents=True)
-  source=Path(backend.resource_identity['source_pins']['source_snapshot_root'])
+  resource_source=Path(__file__).resolve().parents[1]/'resources'
+  source=validate_resource_sources(resource_source,backend.resource_identity['source_pins'])
   native=Path(receipt['output_directory'])
   metric=receipt['stage'].rsplit('-',1)[0] in {'score','metrics-audit'}
   timeout=backend.resource_stage_timeout(metric)
@@ -224,7 +242,7 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
   proof_target=evidence/'resource-admitted.json';value=json.loads(proof_target.read_text())
   from resources.backend import CAP_BYTES
   from resources.stage import validate_proof
-  validate_proof(value,receipt['command'],Path(__file__).resolve().parents[1]/'resources',backend.resource_identity['source_pins'],native,CAP_BYTES,timeout)
+  validate_proof(value,receipt['command'],resource_source,backend.resource_identity['source_pins'],native,CAP_BYTES,timeout)
   backend.bind_completed_stage(receipt_path)
 
  def full_resume_backend_and_record(self,root):
@@ -242,7 +260,8 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
   frames=[{'identity':str(i)} for i in range(16)];backend.manifest={'frames':frames,'recipe':'baseline'};(backend.source/'manifest.json').write_text(json.dumps(backend.manifest,sort_keys=True));backend.manifest_sha=sha(backend.source/'manifest.json')
   (backend.R/'run.json').write_text(json.dumps({'run':'fixture'},sort_keys=True))
   backend.runtime_path=backend.R/'runtime-lock.json';backend.runtime_path.write_text(json.dumps(backend.runtime,sort_keys=True))
-  path,digest=prepare_identity(backend,backend.R/'resource-layer-full');backend.attach_resources(path,digest)
+  repo,runner=self.resource_snapshot_query()
+  path,digest=prepare_identity(backend,backend.R/'resource-layer-full',source_snapshot_store=LocalSnapshotStore(backend.R/'resource-source-snapshots'),repo_root=repo,bazel=repo/'bazelw',runner=runner);backend.attach_resources(path,digest)
   step=1000;target=1000;payload=backend.output/f'update-{target:02d}';(payload/'heads').mkdir(parents=True)
   (payload/'checkpoint.pt').write_text('checkpoint\n');(payload/'live.log').write_text('train log\n')
   heads={}
@@ -335,7 +354,7 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
   elif fault=='independent_input':
    (Path(pub['independent_admission']['input_directory'])/'expected.json').write_text('{}')
   elif fault=='source':
-   source=Path(pub['resource_source_pins']['source_snapshot_root'])/'resources/stage.py';source.chmod(0o644);source.write_text(source.read_text()+'\n# tampered\n')
+   source=Path(pub['resource_source_pins']['source_snapshot_root'])/'autonomy/resources/stage.py';source.chmod(0o644);source.write_text(source.read_text()+'\n# tampered\n')
   elif fault=='missing_command':
    del pub['independent_admission']['command'];publication.write_text(json.dumps(pub,sort_keys=True));receipt['sha256']=sha(publication)
   else:
@@ -367,7 +386,8 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
    temporary=original.index('--tmpfs');self.assertEqual(original[temporary+1],'/tmp')
    del original[temporary:temporary+2]
    original[original.index('--'):original.index('--')]=['--tmpfs','/tmp']
-  proof,command=self.resource_proof(root,Path(pub['resource_source_pins']['source_snapshot_root']),pub['resource_source_pins'],native,mounted,worker,'substitution',command=original,execution=Path(pub['execution_directory']),library=Path(pub['archive_library']['path']))
+  resource_source=Path(pub['resource_source_directory'])
+  proof,command=self.resource_proof(root,validate_resource_sources(resource_source,pub['resource_source_pins']),pub['resource_source_pins'],native,mounted,worker,'substitution',command=original,execution=Path(pub['execution_directory']),library=Path(pub['archive_library']['path']))
   admission['resource_proof_path']=str(proof);admission['resource_proof_sha256']=sha(proof);admission['command']=command
   log=[Path(path) for path in admission['artifacts'] if Path(path).name=='live.log'][0]
   log.write_text((native/'live.log').read_text());admission['artifacts'][str(log)]=sha(log)

@@ -1,4 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_library", "py_test")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library", "py_test")
 
 TEST_MODULES = glob(["*_test.py"])
 LIB_MODULES = glob(
@@ -44,7 +44,9 @@ py_library(
     deps = [
         "//autonomy/detection:detection",
         "//autonomy/evidence:evidence",
+        "//autonomy/geometry:geometry",
         "//autonomy/insula:insula",
+        "//autonomy/range_view:range_view",
         "//autonomy/resources:resources",
         "//autonomy/retention:retention",
         "//autonomy/studies:studies",
@@ -61,6 +63,30 @@ filegroup(
     name = "runfiles",
     srcs = glob(["*.py"]),
     visibility = ["//autonomy:__pkg__"],
+)
+
+py_binary(
+    name = "run_sustained",
+    srcs = ["run_sustained.py"],
+    data = [
+        "//autonomy:evaluation_commands",
+    ],
+    imports = [".."],
+    main = "run_sustained.py",
+    deps = [":training_execution"],
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "train_sustained",
+    srcs = ["train_sustained.py"],
+    data = [
+        "//autonomy:evaluation_commands",
+    ],
+    imports = [".."],
+    main = "train_sustained.py",
+    deps = [":training_execution"],
+    visibility = ["//visibility:public"],
 )
 
 py_library(

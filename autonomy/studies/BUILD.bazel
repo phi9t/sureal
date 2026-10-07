@@ -1,4 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_library", "py_test")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library", "py_test")
 
 ACTIVE_MODULES = [
     "architecture/experiment_runner.py",
@@ -59,6 +59,22 @@ filegroup(
     name = "runfiles",
     srcs = ARCHITECTURE_RUNFILES + PROCEDURE_RECORDS + glob(["**/*.md"]),
     visibility = ["//autonomy:__pkg__"],
+)
+
+py_binary(
+    name = "architecture_experiment_runner",
+    srcs = ["architecture/experiment_runner.py"],
+    data = [
+        ":architecture_runfiles",
+        "//autonomy:architecture_experiment_research_inputs",
+    ],
+    imports = [".."],
+    main = "architecture/experiment_runner.py",
+    deps = [
+        ":studies",
+        "//autonomy:architecture_experiment_runner_snapshot",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 [
