@@ -34,3 +34,6 @@ class ReplayGateTests(unittest.TestCase):
             (code/'dataset').mkdir()
             (code/'dataset/dataset.lock.json').write_text(json.dumps({'objects':[{'relative_path':'raw/known.parquet','size_bytes':3}]}))
             self.assertEqual(retained_raw_bytes(cache,code),8)
+
+if __name__ == '__main__':
+    unittest.main()

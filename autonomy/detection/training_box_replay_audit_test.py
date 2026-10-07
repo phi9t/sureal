@@ -13,3 +13,6 @@ class ReplayReceiptAuditTests(unittest.TestCase):
                     verify_replay_receipt(root,expected_receipt_sha256='0'*64,
                                           expected_job={},expected_sources=sources,
                                           expected_runtime_lock={},code_root=root)
+
+if __name__ == '__main__':
+    unittest.main()

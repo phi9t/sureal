@@ -19,3 +19,6 @@ class InspectionTests(unittest.TestCase):
         image=range_raster(np.array([[0,1]]),np.array([5.]),(2,3))
         self.assertEqual(image[0,1],5)
         self.assertTrue(np.isnan(image[0,0]))
+
+if __name__ == '__main__':
+    unittest.main()

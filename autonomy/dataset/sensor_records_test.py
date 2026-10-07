@@ -30,3 +30,6 @@ class OrderedLookupTests(unittest.TestCase):
         self.assertIsNone(lookup.get((3,1)))
         self.assertEqual(lookup.get((4,1))['v'],9)
         with self.assertRaises(ValueError):lookup.get((2,1))
+
+if __name__ == '__main__':
+    unittest.main()

@@ -112,3 +112,6 @@ class CompareStateTests(unittest.TestCase):
         prior = self.root / 'prior.json'; prior.write_text('{"cumulative_train_seconds":1.0}')
         self.job['prior_report'] = self.pin(prior)
         with self.assertRaises(ValueError): self.api().compare(self.job)
+
+if __name__ == '__main__':
+    unittest.main()

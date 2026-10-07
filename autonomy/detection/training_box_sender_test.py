@@ -1,9 +1,34 @@
+import base64
+import hashlib
 import io
 import unittest
 from contextlib import contextmanager
 from detection.training_box_sender import send_training_box_sources
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 class SenderTests(unittest.TestCase):
+    def table(self, scene='a'):
+        return pa.table({'key.segment_context_name': [scene], 'key.frame_timestamp_micros': [123],
+                         'key.laser_object_id': ['actor'], '[LiDARBoxComponent].type': [1],
+                         '[LiDARBoxComponent].box.center.x': [0.], '[LiDARBoxComponent].box.center.y': [0.],
+                         '[LiDARBoxComponent].box.center.z': [12.], '[LiDARBoxComponent].box.size.x': [6.],
+                         '[LiDARBoxComponent].box.size.y': [3.], '[LiDARBoxComponent].box.size.z': [2.],
+                         '[LiDARBoxComponent].box.heading': [.1]})
+
+    def fixture(self, tables=None):
+        tables = [('a', self.table()), ('b', self.table('b').slice(0, 0))] if tables is None else tables
+        inventory, payloads = [], []
+        for scene, table in tables:
+            buffer = pa.BufferOutputStream()
+            pq.write_table(table, buffer)
+            payload = buffer.getvalue().to_pybytes()
+            inventory.append({'scene': scene, 'bytes': len(payload), 'native_rows': table.num_rows,
+                              'sha256': hashlib.sha256(payload).hexdigest(),
+                              'md5_base64': base64.b64encode(hashlib.md5(payload).digest()).decode()})
+            payloads.append(payload)
+        return inventory, payloads
+
     def test_lease_held_until_consumed_ack_and_footer_after_release(self):
         events=[]
         source={'scene':'s','bytes':3,'native_rows':0,'sha256':'a'*64,'md5_base64':'x'}
@@ -38,8 +63,7 @@ class SenderTests(unittest.TestCase):
         import sys
         import tempfile
         from pathlib import Path
-        from test_training_box_wire import NativeBoxWireTests
-        inventory,payloads=NativeBoxWireTests().fixture()
+        inventory,payloads=self.fixture()
         with tempfile.TemporaryDirectory() as tmp:
             manifest=Path(tmp)/'inventory.json';manifest.write_text(json.dumps(inventory))
             code="""import json,sys
@@ -121,3 +145,6 @@ for source in stream_training_box_sources(sys.stdin.buffer,inventory=inventory,a
                                       stderr_path=Path(tmp)/(name+'.log'),
                                       ack_timeout_seconds=1,write_timeout_seconds=1,
                                       exit_timeout_seconds=1)
+
+if __name__ == '__main__':
+    unittest.main()

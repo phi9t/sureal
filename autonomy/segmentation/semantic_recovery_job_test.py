@@ -13,3 +13,6 @@ class SemanticRecoveryJobGateTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     recover_semantic_archive({},cache=cache,code_root=cache/'missing',output=output)
             self.assertFalse(output.exists())
+
+if __name__ == '__main__':
+    unittest.main()

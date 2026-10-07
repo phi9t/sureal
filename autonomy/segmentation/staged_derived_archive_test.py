@@ -50,3 +50,6 @@ class DerivedArchiveStageTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 with staged_derived_archive(record,cache,working_limit_bytes=10000,transfer_command=command):pass
             self.assertFalse(list((cache/'scientific-processing/semantic-recovery-staging').glob('stage-*')))
+
+if __name__ == '__main__':
+    unittest.main()

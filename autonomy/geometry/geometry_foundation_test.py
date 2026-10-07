@@ -99,3 +99,6 @@ class GeometryFoundationTests(unittest.TestCase):
                           lambda: polar_to_cartesian([-1,0,0]),
                           lambda: bev_indices([[0,0]], [0,0],[1,1],[0,1])]:
             with self.assertRaises(ValueError): operation()
+
+if __name__ == '__main__':
+    unittest.main()

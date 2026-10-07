@@ -27,3 +27,6 @@ class ProjectionVisibilityTests(unittest.TestCase):
         self.assertEqual(result['reasons'][0,0],'invalid_forward_depth')
         with self.assertRaises(ValueError):
             measured_projection_visibility(projection,np.ones((2,2)),{1:(2,2)},depth_tolerance_m=-1)
+
+if __name__ == '__main__':
+    unittest.main()

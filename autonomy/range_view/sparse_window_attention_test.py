@@ -27,3 +27,6 @@ class SparseWindowAttentionTests(unittest.TestCase):
         layer=SparseWindowAttention(8,2,window_shape=(2,2),shift=(0,0))
         self.assertEqual(layer(torch.empty((0,8)),np.empty((0,3),dtype=np.int64)).shape,(0,8))
         with self.assertRaises(ValueError):layer(torch.ones(2,7),np.array([[0,0,0],[0,0,1]]))
+
+if __name__ == '__main__':
+    unittest.main()
