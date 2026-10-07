@@ -4,7 +4,7 @@
 
 **Blocked by:** 14 (Concept batch: `dataset`), 15 (Concept batch: `geometry`)
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] Scope: the viewer's exporter and its tests, the explorer's preview and render workers, scene inspection and inspection views
 - [x] The viewer's web front end keeps its own npm toolchain and its run script works from the new location
@@ -49,3 +49,5 @@ Recovery and independent review, 2026-10-07:
 - `bash -n autonomy/inspection/viewer/run.sh` and the viewer production build passed. The build transformed 42 modules. Retained `research/` files have no diff against `5ba7237`.
 - The pin report against `5ba7237` exited 1 and lists 54 inspection/viewer paths pinned by retained receipts, matching the ticket's inspection-only inventory above. This is recorded migration impact, not a passing legacy receipt check. The final two-line dispatcher correction changes bytes of a path already in that inventory.
 - Preserve the original mixed move/edit commit and recovery branch. The landing branch `work/semantic-layout/23-reviewed` begins with `f5c3225`: exactly 61 byte-identical renames, zero inserted/deleted lines. Apply the verified final tree in a separate wiring commit. Check tree identity before integration; do not rewrite the original branch.
+
+- Final wiring commit `7ae5229` has the exact reviewed recovery tree `5de5cc902667517406adcd12311bc9292f2fd3bb` (identical to `215e189`). The move commit remains separate. All ticket criteria are verified; this status-only commit records completion.
