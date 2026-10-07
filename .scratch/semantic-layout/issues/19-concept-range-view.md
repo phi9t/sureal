@@ -80,3 +80,10 @@ Review:
 Integration refresh:
 
 - No merge was performed in this worker because the hard rules for this run forbid merge/rebase/reset/switch operations, and this private workspace started from integration commit `a5cf66c`.
+
+Lead integration verification, 2026-10-07:
+
+- Independent standards and spec reviews found no code blocker. The architecture table ordering issue is corrected: range_view is above detection and below pipeline, consistent with the declared layer graph. The ten-file move commit `0b1a2ab` contains only byte-identical renames.
+- Merged reviewed integration `653889e` into candidate `f971ce1`. Resolution preserves resource, motion, camera and inspection declarations, the relocated detection helper requirements, and range_view in the sustained freezer. Native worker's subsequent `3f4ef2f` changes only ticket evidence/status and was merged without changing the tested code.
+- Integrated verification passed: three focused CPU range/snapshot/architecture targets; all 150 CPU targets; all 28 GPU-tagged targets; 30 publication unit tests; publication audit; layer audit; whitespace check. Parallax and wrapper/toolchain inputs are byte-identical to the native worker's candidate, whose 17 Parallax targets passed. Historical research files remain unchanged.
+- Legacy tree-pin check reports expected migration impact and is not a passing historical receipt validation. Exact command/exit records and raw logs are in `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/range-verification/`. Native worker records remain in the sibling `runs/workers/sureal-semantic-19-20261007T092814Z/` directory. No new live scientific run is claimed.
