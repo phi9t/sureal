@@ -2,7 +2,8 @@
 set -euo pipefail
 HERE="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 PACKAGE="$(cd -- "$HERE/.." && pwd)"
-DOCKERFILE="$HERE/Dockerfile.bazel-rootfs-v6"
+DOCKERFILE="$HERE/Dockerfile.gpu-bazel-rootfs-v6"
+REQUIREMENTS="$HERE/gpu-requirements.lock"
 BAZEL_VERSION=9.2.0
 BAZEL_LINUX_X86_64_SHA256=7668a95db1250f12c40407251e4e203b4ec8bf39bc495d2f485b2d8c99048694
 BASE_IMAGE_EXPECTED=sha256:eaf68603ced6f9abb5ee401522a07774183a8412ff3d9de61278f09c0738749d
@@ -108,12 +109,12 @@ validate_new_rootfs "$STAGE" "$PREVIOUS"
 [[ "$(sha256sum "$PREVIOUS.lock.json" | awk '{print $1}')" == "$PREVIOUS_LOCK_SHA256" ]] \
     || die "previous GPU rootfs lock changed during build"
 
-PYTHONPATH="$PACKAGE" python3 - "$STAGE" "$DOCKERFILE" "$HERE/requirements.lock" "$IMAGE" "$BAZEL_VERSION" "$BAZEL_LINUX_X86_64_SHA256" <<'PY'
-import hashlib
+PYTHONPATH="$PACKAGE" python3 - "$STAGE" "$DOCKERFILE" "$REQUIREMENTS" "$IMAGE" "$BAZEL_VERSION" "$BAZEL_LINUX_X86_64_SHA256" <<'PY'
 import json
 import sys
 from pathlib import Path
 
+from evidence.source_snapshot import file_sha256
 from insula.runtime_identity import rootfs_identity
 
 root = Path(sys.argv[1])
@@ -127,8 +128,8 @@ lock = {
     "platform": "linux/amd64",
     "image_id": image,
     "rootfs_sha256": rootfs_identity(root),
-    "requirements_sha256": hashlib.sha256(requirements.read_bytes()).hexdigest(),
-    "dockerfile_sha256": hashlib.sha256(dockerfile.read_bytes()).hexdigest(),
+    "requirements_sha256": file_sha256(requirements),
+    "dockerfile_sha256": file_sha256(dockerfile),
     "bazel_version": bazel_version,
     "bazel_linux_x86_64_sha256": bazel_sha256,
 }

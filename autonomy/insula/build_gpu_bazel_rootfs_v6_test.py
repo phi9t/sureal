@@ -1,4 +1,3 @@
-import hashlib
 import json
 import os
 import subprocess
@@ -7,21 +6,20 @@ import textwrap
 import unittest
 from pathlib import Path
 
+from evidence.source_snapshot import file_sha256
 from insula.runtime_identity import rootfs_identity
 
 
 PACKAGE = Path(__file__).resolve().parents[1]
-BUILD = PACKAGE / "gpu" / "build_bazel_rootfs_v6.sh"
-DOCKERFILE = PACKAGE / "gpu" / "Dockerfile.bazel-rootfs-v6"
+INSULA = PACKAGE / "insula"
+BUILD = INSULA / "build_gpu_bazel_rootfs_v6.sh"
+DOCKERFILE = INSULA / "Dockerfile.gpu-bazel-rootfs-v6"
+REQUIREMENTS = INSULA / "gpu-requirements.lock"
 BAZEL_VERSION = "9.2.0"
 BAZEL_LINUX_X86_64_SHA256 = (
     "7668a95db1250f12c40407251e4e203b4ec8bf39bc495d2f485b2d8c99048694"
 )
 PACKAGE_INVENTORY = "numpy==2.5.3\ntorch==2.9.1+cu130\n"
-
-
-def sha256(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def write_executable(path, body):
@@ -182,7 +180,7 @@ class GpuRootfsBuildTests(unittest.TestCase):
 
             result = subprocess.run(
                 ["bash", str(BUILD)],
-                cwd=PACKAGE / "gpu",
+                cwd=INSULA,
                 env=env,
                 text=True,
                 capture_output=True,
@@ -204,8 +202,8 @@ class GpuRootfsBuildTests(unittest.TestCase):
             self.assertEqual(lock["schema_version"], 1)
             self.assertEqual(lock["platform"], "linux/amd64")
             self.assertEqual(lock["rootfs_sha256"], rootfs_identity(destination))
-            self.assertEqual(lock["requirements_sha256"], sha256(PACKAGE / "gpu/requirements.lock"))
-            self.assertEqual(lock["dockerfile_sha256"], sha256(DOCKERFILE))
+            self.assertEqual(lock["requirements_sha256"], file_sha256(REQUIREMENTS))
+            self.assertEqual(lock["dockerfile_sha256"], file_sha256(DOCKERFILE))
             self.assertEqual(lock["bazel_version"], BAZEL_VERSION)
             self.assertEqual(
                 lock["bazel_linux_x86_64_sha256"], BAZEL_LINUX_X86_64_SHA256
@@ -239,7 +237,7 @@ class GpuRootfsBuildTests(unittest.TestCase):
 
             result = subprocess.run(
                 ["bash", str(BUILD)],
-                cwd=PACKAGE / "gpu",
+                cwd=INSULA,
                 env=env,
                 text=True,
                 capture_output=True,

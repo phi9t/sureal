@@ -1,7 +1,12 @@
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 load("@rules_python//python:defs.bzl", "py_library", "py_test")
 
-TEST_MODULES = glob(["*_test.py"])
+GPU_ROOTFS_BUILD_TEST = "build_gpu_bazel_rootfs_v6_test.py"
+
+TEST_MODULES = glob(
+    ["*_test.py"],
+    exclude = [GPU_ROOTFS_BUILD_TEST],
+)
 LIB_MODULES = glob(
     ["*.py"],
     exclude = ["*_test.py"],
@@ -42,6 +47,19 @@ filegroup(
     visibility = ["//autonomy:__pkg__"],
 )
 
+filegroup(
+    name = "gpu_runtime_recipe",
+    srcs = [
+        "Dockerfile.gpu",
+        "Dockerfile.gpu-bazel-rootfs-v6",
+        "build_gpu.sh",
+        "build_gpu_bazel_rootfs_v6.sh",
+        "gpu-requirements.in",
+        "gpu-requirements.lock",
+    ],
+    visibility = ["//autonomy:__pkg__"],
+)
+
 [
     py_test(
         name = test[:-3],
@@ -54,6 +72,19 @@ filegroup(
     for test in TEST_MODULES
 ]
 
+py_test(
+    name = GPU_ROOTFS_BUILD_TEST[:-3],
+    srcs = [GPU_ROOTFS_BUILD_TEST],
+    data = [":gpu_runtime_recipe"],
+    deps = [
+        ":insula",
+        "//autonomy/evidence:evidence",
+    ],
+    legacy_create_init = 0,
+    size = "small",
+    tags = ["perception_unit"],
+)
+
 cc_test(
     name = "rootfs_compiler_smoke_test",
     srcs = ["rootfs_compiler_smoke_test.cc"],
@@ -61,6 +92,6 @@ cc_test(
 
 test_suite(
     name = "all_tests",
-    tests = [test[:-3] for test in TEST_MODULES],
+    tests = [test[:-3] for test in TEST_MODULES] + [GPU_ROOTFS_BUILD_TEST[:-3]],
     visibility = ["//autonomy:__pkg__"],
 )

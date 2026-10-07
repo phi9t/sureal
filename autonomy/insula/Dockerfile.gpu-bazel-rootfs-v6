@@ -2,7 +2,7 @@
 FROM surflo-insula:cuda13.2.1-locked
 ARG BAZEL_VERSION=9.2.0
 ARG BAZEL_LINUX_X86_64_SHA256=7668a95db1250f12c40407251e4e203b4ec8bf39bc495d2f485b2d8c99048694
-COPY requirements.lock /opt/waymo-requirements.lock
+COPY gpu-requirements.lock /opt/waymo-requirements.lock
 RUN uv venv --python /usr/bin/python3 /opt/waymo \
  && uv pip install --python /opt/waymo/bin/python --require-hashes \
     --extra-index-url https://download.pytorch.org/whl/cu130 \

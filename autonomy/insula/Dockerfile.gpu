@@ -1,6 +1,6 @@
 # Local base image ID; build driver must verify this exact image exists.
 FROM surflo-insula:cuda13.2.1-locked
-COPY requirements.lock /opt/waymo-requirements.lock
+COPY gpu-requirements.lock /opt/waymo-requirements.lock
 RUN uv venv --python /usr/bin/python3 /opt/waymo \
  && uv pip install --python /opt/waymo/bin/python --require-hashes \
     --extra-index-url https://download.pytorch.org/whl/cu130 \
