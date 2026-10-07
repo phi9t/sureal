@@ -18,6 +18,8 @@ HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 DEFAULT_WAYSTONE = Path.home() / "workspace/waystone/scripts/waystone"
 DEFAULT_HADOOP_CONF_DIR = "/opt/tiger/yarn_deploy/hadoop/conf"
 SOURCE_SNAPSHOT_CHILD = "source-snapshots"
+STORE_DESCRIPTOR_VERSION = 1
+TARGET_RECEIPT_SCHEMA_VERSION = 2
 AUTHENTICATION_MARKERS = (
     "authentication",
     "authenticate",
@@ -133,9 +135,7 @@ class HdfsSnapshotStore:
     def prefix(self) -> str:
         if self._prefix is None:
             self._prefix = self._run(["storage-prefix", "--child", "sureal"]).strip().rstrip("/")
-        if not self._prefix:
-            raise ValueError("snapshot HDFS prefix required")
-        return self._prefix
+        return require_hdfs_prefix(self._prefix)
 
     def uri_for(self, digest: str) -> str:
         require_digest(digest)
@@ -211,6 +211,20 @@ def require_digest(digest: str) -> str:
     if not isinstance(digest, str) or not HEX_SHA256.fullmatch(digest):
         raise ValueError("sha256 digest required")
     return digest
+
+
+def require_hdfs_prefix(prefix: str) -> str:
+    if not isinstance(prefix, str):
+        raise ValueError("HDFS source snapshot prefix required")
+    prefix = prefix.rstrip("/")
+    if (
+        not prefix
+        or not prefix.startswith("hdfs://")
+        or any(character in prefix for character in ("\x00", "\n", "\r"))
+        or "@" in prefix.split("://", 1)[1].split("/", 1)[0]
+    ):
+        raise ValueError("HDFS source snapshot prefix required")
+    return prefix
 
 
 def require_regular_file(path):
@@ -309,6 +323,22 @@ def snapshot_bazel_target(target: str, store: SnapshotStore, *, repo_root=REPO, 
     )
 
 
+def source_snapshot_store_descriptor(store: SnapshotStore) -> dict:
+    if isinstance(store, LocalSnapshotStore):
+        return {
+            "schema_version": STORE_DESCRIPTOR_VERSION,
+            "kind": "local",
+            "root": str(store.root),
+        }
+    if isinstance(store, HdfsSnapshotStore):
+        return {
+            "schema_version": STORE_DESCRIPTOR_VERSION,
+            "kind": "hdfs",
+            "prefix": store.prefix,
+        }
+    raise ValueError("source snapshot store descriptor required")
+
+
 def source_snapshot_receipt(root, source_paths, store: SnapshotStore, *, target: str, materialized_root=None) -> dict:
     archive, pins = archive_sources(root, source_paths)
     digest = hashlib.sha256(archive).hexdigest()
@@ -358,12 +388,46 @@ def copy_source_snapshot(root, source_paths, destination, store: SnapshotStore, 
     return {key: value for key, value in receipt.items() if value is not None}
 
 
-def store_from_receipt(receipt: Mapping, *, env_var: str | None = None) -> SnapshotStore:
+def _store_from_descriptor(descriptor, *, waystone=DEFAULT_WAYSTONE, runner=subprocess.run, timeout: int = 90) -> SnapshotStore:
+    if isinstance(descriptor, str):
+        if not descriptor:
+            raise ValueError("source snapshot store required")
+        return LocalSnapshotStore(descriptor)
+    if not isinstance(descriptor, Mapping):
+        raise ValueError("source snapshot store descriptor required")
+    schema_version = descriptor.get("schema_version")
+    kind = descriptor.get("kind")
+    if schema_version != STORE_DESCRIPTOR_VERSION:
+        raise ValueError("source snapshot store descriptor schema required")
+    if kind == "local":
+        if set(descriptor) != {"schema_version", "kind", "root"}:
+            raise ValueError("source snapshot store descriptor fields required")
+        root = descriptor.get("root")
+        if not isinstance(root, str) or not root:
+            raise ValueError("local source snapshot root required")
+        return LocalSnapshotStore(root)
+    if kind == "hdfs":
+        if set(descriptor) != {"schema_version", "kind", "prefix"}:
+            raise ValueError("source snapshot store descriptor fields required")
+        return HdfsSnapshotStore(waystone, prefix=require_hdfs_prefix(descriptor.get("prefix")), runner=runner, timeout=timeout)
+    raise ValueError("source snapshot store kind required")
+
+
+def store_from_receipt(
+    receipt: Mapping,
+    *,
+    env_var: str | None = None,
+    waystone=DEFAULT_WAYSTONE,
+    runner=subprocess.run,
+    timeout: int = 90,
+) -> SnapshotStore:
     override = os.environ.get(env_var) if env_var else None
-    root = override or receipt.get("source_snapshot_store")
-    if not isinstance(root, str) or not root:
+    if override:
+        return LocalSnapshotStore(override)
+    descriptor = receipt.get("source_snapshot_store")
+    if descriptor is None:
         raise ValueError("source snapshot store required")
-    return LocalSnapshotStore(root)
+    return _store_from_descriptor(descriptor, waystone=waystone, runner=runner, timeout=timeout)
 
 
 def verify_materialized_sources(root, receipt, store: SnapshotStore | None = None) -> dict:
@@ -383,8 +447,9 @@ def verify_materialized_sources(root, receipt, store: SnapshotStore | None = Non
     return verified
 
 
-def snapshot_source_pins(snapshot: bytes) -> dict[str, str]:
+def _snapshot_entries(snapshot: bytes) -> tuple[dict[str, str], list[tuple[str, bytes]]]:
     pins = {}
+    entries = []
     try:
         with tarfile.open(fileobj=io.BytesIO(snapshot), mode="r:") as reader:
             for member in reader:
@@ -394,12 +459,19 @@ def snapshot_source_pins(snapshot: bytes) -> dict[str, str]:
                 stream = reader.extractfile(member)
                 if stream is None:
                     raise ValueError("snapshot contains unreadable member")
-                pins[name] = hashlib.file_digest(stream, "sha256").hexdigest()
+                data = stream.read()
+                pins[name] = hashlib.sha256(data).hexdigest()
+                entries.append((name, data))
     except (tarfile.TarError, OSError, EOFError) as error:
         raise ValueError("invalid source snapshot") from error
     if not pins:
         raise ValueError("source snapshot contains no files")
-    return dict(sorted(pins.items()))
+    return dict(sorted(pins.items())), sorted(entries)
+
+
+def snapshot_source_pins(snapshot: bytes) -> dict[str, str]:
+    pins, _ = _snapshot_entries(snapshot)
+    return pins
 
 
 def read_receipt(receipt) -> Mapping:
@@ -426,10 +498,7 @@ def receipt_source_pins(receipt: Mapping) -> dict[str, str]:
     return dict(sorted(pins.items()))
 
 
-def verify_receipt_sources(receipt, store: SnapshotStore) -> dict:
-    receipt = read_receipt(receipt)
-    if not isinstance(receipt, Mapping):
-        raise ValueError("receipt object required")
+def _verified_receipt_archive(receipt: Mapping, store: SnapshotStore) -> tuple[str, bytes, dict[str, str]]:
     digest = receipt_snapshot_digest(receipt)
     archive = store.fetch(digest)
     if hashlib.sha256(archive).hexdigest() != digest:
@@ -438,9 +507,125 @@ def verify_receipt_sources(receipt, store: SnapshotStore) -> dict:
     expected = receipt_source_pins(receipt)
     if actual != expected:
         raise ValueError("receipt source pins differ from snapshot")
+    return digest, archive, actual
+
+
+def verify_receipt_sources(receipt, store: SnapshotStore) -> dict:
+    receipt = read_receipt(receipt)
+    if not isinstance(receipt, Mapping):
+        raise ValueError("receipt object required")
+    digest, _, actual = _verified_receipt_archive(receipt, store)
     return {
         "source_snapshot_sha256": digest,
         "source_snapshot_target": receipt.get("source_snapshot_target"),
         "source_pins": actual,
         "source_files": len(actual),
+    }
+
+
+def materialize_source_snapshot_archive(snapshot: bytes, destination, *, digest: str | None = None, source_pins: Mapping | None = None) -> dict:
+    if digest is not None:
+        digest = require_digest(digest)
+        if hashlib.sha256(snapshot).hexdigest() != digest:
+            raise ValueError("snapshot digest differs from receipt")
+    actual, entries = _snapshot_entries(snapshot)
+    if source_pins is not None:
+        expected = {}
+        for name, value in source_pins.items():
+            expected[safe_member_name(name)] = require_digest(value)
+        if actual != dict(sorted(expected.items())):
+            raise ValueError("source pins differ from snapshot")
+    destination = Path(destination)
+    if destination.exists():
+        raise FileExistsError("source snapshot destination already exists: " + str(destination))
+    temporary = None
+    try:
+        temporary = Path(tempfile.mkdtemp(prefix="." + destination.name + ".", suffix=".tmp", dir=destination.parent))
+        for name, data in entries:
+            target = temporary / name
+            try:
+                target.resolve().relative_to(temporary.resolve())
+            except ValueError as error:
+                raise ValueError("source snapshot member escapes destination: " + name) from error
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if target.exists():
+                raise ValueError("source snapshot materialization conflict: " + name)
+            target.write_bytes(data)
+            target.chmod(0o444)
+        for name, expected_digest in actual.items():
+            if file_sha256(temporary / name) != expected_digest:
+                raise ValueError("materialized source differs from snapshot: " + name)
+        if destination.exists():
+            raise FileExistsError("source snapshot destination already exists: " + str(destination))
+        temporary.rename(destination)
+        temporary = None
+    finally:
+        if temporary is not None and temporary.exists():
+            shutil.rmtree(temporary, ignore_errors=True)
+    return {
+        "source_snapshot_sha256": digest or hashlib.sha256(snapshot).hexdigest(),
+        "source_snapshot_root": str(destination),
+        "source_pins": actual,
+        "source_files": len(actual),
+    }
+
+
+def materialize_receipt_sources(
+    receipt,
+    destination,
+    store: SnapshotStore | None = None,
+    *,
+    env_var: str | None = None,
+    waystone=DEFAULT_WAYSTONE,
+    runner=subprocess.run,
+    timeout: int = 90,
+) -> dict:
+    receipt = read_receipt(receipt)
+    if not isinstance(receipt, Mapping):
+        raise ValueError("receipt object required")
+    store = store if store is not None else store_from_receipt(
+        receipt,
+        env_var=env_var,
+        waystone=waystone,
+        runner=runner,
+        timeout=timeout,
+    )
+    digest, archive, pins = _verified_receipt_archive(receipt, store)
+    materialized = materialize_source_snapshot_archive(archive, destination, digest=digest, source_pins=pins)
+    return {
+        "source_snapshot_sha256": digest,
+        "source_snapshot_target": receipt.get("source_snapshot_target"),
+        "source_snapshot_store": receipt.get("source_snapshot_store"),
+        "source_snapshot_root": materialized["source_snapshot_root"],
+        "source_pins": pins,
+        "source_files": len(pins),
+    }
+
+
+def snapshot_target_and_materialize(
+    target: str,
+    destination,
+    *,
+    store: SnapshotStore | None = None,
+    repo_root=REPO,
+    bazel=None,
+    runner=subprocess.run,
+) -> dict:
+    store = HdfsSnapshotStore() if store is None else store
+    snapshot = snapshot_bazel_target(target, store, repo_root=repo_root, bazel=bazel, runner=runner)
+    archive = store.fetch(snapshot.digest)
+    materialized = materialize_source_snapshot_archive(
+        archive,
+        destination,
+        digest=snapshot.digest,
+        source_pins=snapshot.source_pins,
+    )
+    return {
+        "schema_version": TARGET_RECEIPT_SCHEMA_VERSION,
+        "source_snapshot_sha256": snapshot.digest,
+        "source_snapshot_target": snapshot.target,
+        "source_snapshot_archive_bytes": snapshot.archive_bytes,
+        "source_snapshot_store": source_snapshot_store_descriptor(store),
+        "source_snapshot_root": materialized["source_snapshot_root"],
+        "source_pins": snapshot.source_pins,
     }
