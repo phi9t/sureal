@@ -18,11 +18,10 @@ GPU_TESTS = [
 
 RANGE_VIEW_VISIBILITY = [
     "//autonomy:__pkg__",
-    "//autonomy/advanced:__pkg__",
-    "//autonomy/architecture:__pkg__",
     "//autonomy/cohort:__pkg__",
+    "//autonomy/detection/expanded_batch:__pkg__",
     "//autonomy/gpu:__pkg__",
-    "//autonomy/tier1:__pkg__",
+    "//autonomy/studies:__pkg__",
 ]
 
 TEST_EXTRA_DEPS = {

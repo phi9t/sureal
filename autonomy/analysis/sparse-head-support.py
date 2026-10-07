@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import torch
 from detection.pillar_detector import PillarDetector
-from studies.expanded_batch.spatial_modules import SparseBackbone
+from detection.expanded_batch.spatial_modules import SparseBackbone
 model=PillarDetector(nx=512,ny=512,classes=4,anchors_per_cell=8,cell_size=(.25,.25),origin=(-64.,-64.))
 assert [layer[0].stride for layer in model.upsample]==[(1,1),(2,2),(4,4)]
 assert [layer[0].kernel_size for layer in model.upsample]==[(1,1),(2,2),(4,4)]

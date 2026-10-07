@@ -9,6 +9,9 @@ LIB_MODULES = glob(
 )
 
 TEST_MODULES = glob(["*_test.py"])
+GPU_TESTS = [
+    "expanded_batch_observations_test.py",
+]
 
 COMMAND_SCRIPTS = glob(["*-*.py"])
 
@@ -86,7 +89,7 @@ filegroup(
         imports = [".."],
         legacy_create_init = 0,
         size = "small",
-        tags = ["perception_unit"],
+        tags = ["perception_unit"] + (["requires_gpu"] if test in GPU_TESTS else []),
     )
     for test in TEST_MODULES
 ]

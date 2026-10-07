@@ -1,6 +1,6 @@
 import unittest,torch
-from studies.expanded_batch.expanded_catalog import catalog
-from studies.expanded_batch.expanded_models import build,bind_observations
+from detection.expanded_batch.catalog import catalog
+from detection.expanded_batch.models import build,bind_observations
 from detection.fixed_batch_models import build as baseline_build
 from detection.fixed_batch_catalog import BASE
 from detection.pillar_encoder import decorate

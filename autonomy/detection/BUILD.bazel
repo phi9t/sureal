@@ -7,12 +7,12 @@ LIB_MODULES = glob(
 )
 DETECTION_VISIBILITY = [
     "//autonomy:__pkg__",
-    "//autonomy/architecture:__pkg__",
     "//autonomy/cohort:__pkg__",
+    "//autonomy/detection/expanded_batch:__pkg__",
     "//autonomy/evaluation:__pkg__",
     "//autonomy/pipeline:__pkg__",
     "//autonomy/range_view:__pkg__",
-    "//autonomy/tier1:__pkg__",
+    "//autonomy/studies:__pkg__",
 ]
 
 package(default_visibility = ["//visibility:private"])
@@ -33,7 +33,10 @@ py_library(
 filegroup(
     name = "all_py",
     srcs = glob(["*.py"]),
-    visibility = ["//autonomy:__pkg__"],
+    visibility = [
+        "//autonomy:__pkg__",
+        "//autonomy/studies:__pkg__",
+    ],
 )
 
 [

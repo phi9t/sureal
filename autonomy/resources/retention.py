@@ -49,8 +49,8 @@ def materialize_execution_package(code,execution,library,library_sha,pins):
                 raise ValueError('admitted resource source changed')
             target=execution/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source,target)
             if sha(target)!=digest:raise ValueError('executed resource package changed')
-        advanced=execution/'advanced';advanced.mkdir();shutil.copyfile(library,advanced/'archive.py')
-        if sha(advanced/'archive.py')!=library_sha:raise ValueError('executed archive helper changed')
+        resources=execution/'resources';resources.mkdir(exist_ok=True);shutil.copyfile(library,resources/'resource_archive.py')
+        if sha(resources/'resource_archive.py')!=library_sha:raise ValueError('executed archive helper changed')
     except BaseException:
         shutil.rmtree(execution,ignore_errors=True)
         raise
@@ -95,13 +95,13 @@ def publish_bundle(backend,kind,inventory):
     chunks=partition(inventory);identifier=backend.R.name+'-'+kind+'-'+uuid.uuid4().hex
     root=cache_root/'insula'/('resource-retention-'+identifier);require_separate(backend.output,root);root.mkdir()
     pins=backend.resource_identity['source_pins'];code=validate_sources(package_root/'resources',pins)
-    library=Path(backend.host_pins['source_snapshot_root'])/'advanced/archive.py';library_sha=backend.host_pins['source_pins']['advanced/archive.py']
+    library=Path(backend.host_pins['source_snapshot_root'])/'resources/resource_archive.py';library_sha=backend.host_pins['source_pins']['resources/resource_archive.py']
     execution=materialize_execution_package(code,root/'execution',library,library_sha,pins)
     temp=work_root/('resource-retention-'+identifier);temp.mkdir();raw=temp/'raw';raw.mkdir()
     def guard():
         backend.guard();validate_sources(package_root/'resources',pins)
         if not regular(library) or sha(library)!=library_sha:raise ValueError('pinned archive library changed')
-        if sha(execution/'advanced/archive.py')!=library_sha:raise ValueError('executed archive helper changed')
+        if sha(execution/'resources/resource_archive.py')!=library_sha:raise ValueError('executed archive helper changed')
         for name,digest in pins['source_pins'].items():
             if sha(execution/name)!=digest:raise ValueError('executed resource package changed')
         for entry in inventory.values():

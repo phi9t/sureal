@@ -3,7 +3,7 @@ import argparse,datetime,fcntl,hashlib,io,json,os,re,shutil,signal,subprocess,sy
 from pathlib import Path
 
 HERE=Path(__file__).resolve().parent
-PACKAGE=HERE.parent
+PACKAGE=HERE.parents[1]
 REPO=PACKAGE.parent
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
 sys.path.insert(0,str(PACKAGE))
@@ -130,7 +130,7 @@ def receipt_path(package,stage,label):
 def preflight(cache,name):
  required=['detector-gpu-live-a/receipt.json','gpu-rootfs','insula/rootfs-v2','metrics-rootfs','scientific-processing/overfit-native-cache-v1','scientific-processing/overfit-point-frames-v1','scientific-processing/overfit-box-targets-v1']
  for relative in required:
-  if not (cache/relative).exists():raise ValueError('Missing admitted runtime/data prerequisite: '+str(cache/relative)+'; see architecture/README.md')
+  if not (cache/relative).exists():raise ValueError('Missing admitted runtime/data prerequisite: '+str(cache/relative)+'; see studies/architecture/README.md')
  if not shutil.which('bwrap'):raise ValueError('bubblewrap (bwrap) is required for live Insula')
  if name in ['retain64','all_pillars']:
   record=PACKAGE/'research'/f'architecture-{name}-cache-verified.json'
@@ -166,7 +166,7 @@ def materialize_source_snapshot(store,digest,destination):
  if not seen:raise ValueError('source snapshot contains no files')
 
 def prepare_harness_workspace(source,name,run_id):
- package=source/'autonomy';here=package/'architecture'
+ package=source/'autonomy';here=package/'studies/architecture'
  workers=source/'.scratch';workers.mkdir()
  for filename in check_harness_closure(here,package):
   text=(here/'harness'/filename).read_text()

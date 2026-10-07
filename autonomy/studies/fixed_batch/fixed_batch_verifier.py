@@ -1,6 +1,7 @@
 """Read-only release-aware closure of native curves, source pins and replay receipts."""
-import hashlib,json,sys
+import json,sys
 from pathlib import Path
+from evidence.source_snapshot import file_sha256
 from resources.scientific_budget import fit_interval
 from evidence.artifact_lifecycle import admit_artifact
 from resources.scientific_payload import unique_payload_bytes
@@ -10,8 +11,7 @@ def resolved(p):
  p=Path(p)
  return Path('/source')/p.relative_to(HOST_CACHE) if HOST_CACHE is not None and (p==HOST_CACHE or HOST_CACHE in p.parents) else p
 def read(p):return resolved(p).read_text()
-def sha(p):
- with resolved(p).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+def sha(p):return file_sha256(resolved(p))
 def verify(result_path):
  global HOST_CACHE
  result=json.loads(Path(result_path).read_text());run=Path(result['run_directory'])

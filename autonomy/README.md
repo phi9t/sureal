@@ -131,7 +131,7 @@ autonomy/inspection/viewer/run.sh dev
 
 ## Run architecture experiments
 
-Each tested direction and planned follow-up has its own [experiment document](architecture/README.md).
+Each tested direction and planned follow-up has its own [experiment document](studies/architecture/README.md).
 The dispatcher has a source-bound live CPU admission for `list` and
 `show residual_bev`. The underlying historical seven-stage experiment runners
 retain their separate live receipts; catalog checks do not repeat or extend

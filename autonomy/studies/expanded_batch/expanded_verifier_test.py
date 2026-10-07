@@ -12,6 +12,6 @@ class AdmissionVerifierTests(unittest.TestCase):
    (run/'run.json').write_text(json.dumps({'matrix':{'point_attention':case}}))
    (run/'admission-reference.json').write_text(json.dumps({'path':str(admission),'sha256':sha(admission)}))
    result.write_text(json.dumps({'run_directory':str(run)}))
-   with patch('advanced.verify_results.native.verify',return_value={'rows':[]}):
+   with patch('studies.expanded_batch.expanded_verifier.native.verify',return_value={'rows':[]}):
     with self.assertRaises(AssertionError):verify(result)
 if __name__=='__main__':unittest.main()

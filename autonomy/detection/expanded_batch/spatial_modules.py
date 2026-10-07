@@ -3,7 +3,7 @@ import math
 import torch
 from torch import nn
 from detection.pillar_encoder import scatter
-from studies.expanded_batch.sparse_sets import window_sets,pool_tokens
+from detection.expanded_batch.sparse_sets import window_sets,pool_tokens
 
 class SparseBlock(nn.Module):
  def __init__(self,width,*,spacing,axis,shift):

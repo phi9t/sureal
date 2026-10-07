@@ -3,7 +3,7 @@ from pathlib import Path
 p=Path(__file__).with_name('experiment_runner.py');spec=importlib.util.spec_from_file_location('experiment_runner',p);module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
 class RunnerTests(unittest.TestCase):
  def write_runner_fixture(self,repo):
-  package_root=repo/'autonomy';here=package_root/'architecture'
+  package_root=repo/'autonomy';here=package_root/'studies/architecture'
   for path in [package_root/'pipeline',package_root/'detection',package_root/'research',here/'harness',repo/'docs/superpowers/specs']:
    path.mkdir(parents=True)
   (package_root/'pipeline/module.py').write_text('pass\n')
@@ -115,15 +115,15 @@ class RunnerTests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp);repo=root/'repo';package_root,here=self.write_runner_fixture(repo)
    archive,digest,pins=self.archive({
-    'autonomy/architecture/harness/files.json':(here/'harness/files.json').read_text(),
-    'autonomy/architecture/harness/run-architecture-contract.py':'pass\n',
-    'autonomy/architecture/harness/run-architecture-weight-contract.py':'pass\n',
-    'autonomy/architecture/harness/run-architecture-learning-curve.py':'pass\n',
-    'autonomy/architecture/harness/audit-architecture-checkpoint.py':'pass\n',
-    'autonomy/architecture/harness/run-architecture-loss-audit.py':'pass\n',
-    'autonomy/architecture/harness/score-architecture-score-first.py':'pass\n',
-    'autonomy/architecture/harness/audit-architecture-score-first.py':'pass\n',
-    'autonomy/architecture/registry.json':(here/'registry.json').read_text(),
+    'autonomy/studies/architecture/harness/files.json':(here/'harness/files.json').read_text(),
+    'autonomy/studies/architecture/harness/run-architecture-contract.py':'pass\n',
+    'autonomy/studies/architecture/harness/run-architecture-weight-contract.py':'pass\n',
+    'autonomy/studies/architecture/harness/run-architecture-learning-curve.py':'pass\n',
+    'autonomy/studies/architecture/harness/audit-architecture-checkpoint.py':'pass\n',
+    'autonomy/studies/architecture/harness/run-architecture-loss-audit.py':'pass\n',
+    'autonomy/studies/architecture/harness/score-architecture-score-first.py':'pass\n',
+    'autonomy/studies/architecture/harness/audit-architecture-score-first.py':'pass\n',
+    'autonomy/studies/architecture/registry.json':(here/'registry.json').read_text(),
     'autonomy/pipeline/module.py':'pass\n',
     'autonomy/detection/worker.py':'pass\n',
     'autonomy/research/overfit-native-cache-progress.json':'{"admitted_frames":16,"selected_frames":16,"frame_evidence":{}}\n',
@@ -154,15 +154,15 @@ class RunnerTests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp);repo=root/'repo';package_root,here=self.write_runner_fixture(repo)
    archive,digest,pins=self.archive({
-    'autonomy/architecture/harness/files.json':(here/'harness/files.json').read_text(),
-    'autonomy/architecture/harness/run-architecture-contract.py':'pass\n',
-    'autonomy/architecture/harness/run-architecture-weight-contract.py':'pass\n',
-    'autonomy/architecture/harness/run-architecture-learning-curve.py':'pass\n',
-    'autonomy/architecture/harness/audit-architecture-checkpoint.py':'pass\n',
-    'autonomy/architecture/harness/run-architecture-loss-audit.py':'pass\n',
-    'autonomy/architecture/harness/score-architecture-score-first.py':'pass\n',
-    'autonomy/architecture/harness/audit-architecture-score-first.py':'pass\n',
-    'autonomy/architecture/registry.json':(here/'registry.json').read_text(),
+    'autonomy/studies/architecture/harness/files.json':(here/'harness/files.json').read_text(),
+    'autonomy/studies/architecture/harness/run-architecture-contract.py':'pass\n',
+    'autonomy/studies/architecture/harness/run-architecture-weight-contract.py':'pass\n',
+    'autonomy/studies/architecture/harness/run-architecture-learning-curve.py':'pass\n',
+    'autonomy/studies/architecture/harness/audit-architecture-checkpoint.py':'pass\n',
+    'autonomy/studies/architecture/harness/run-architecture-loss-audit.py':'pass\n',
+    'autonomy/studies/architecture/harness/score-architecture-score-first.py':'pass\n',
+    'autonomy/studies/architecture/harness/audit-architecture-score-first.py':'pass\n',
+    'autonomy/studies/architecture/registry.json':(here/'registry.json').read_text(),
     'autonomy/pipeline/module.py':'pass\n',
     'autonomy/detection/worker.py':'pass\n',
     'autonomy/research/overfit-native-cache-progress.json':'{"admitted_frames":16,"selected_frames":16,"frame_evidence":{}}\n',

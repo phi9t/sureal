@@ -8,7 +8,7 @@ REQUIRED=tuple(sorted(set(RETENTION_REQUIRED)|{
  'cohort/sustained_control.py','cohort/sustained_admission.py',
  'cohort/sustained_contract.py','cohort/sustained_scoring_budget.py',
  'cohort/sustained_stage_inputs.py','cohort/sustained_sources.py',
- 'architecture/experiment_runner.py',
+ 'studies/architecture/experiment_runner.py',
 }))
 SNAPSHOT_TARGET='//autonomy:sustained-controller-host'
 def sha(path):

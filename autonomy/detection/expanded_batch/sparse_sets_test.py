@@ -1,6 +1,6 @@
 import unittest,torch
-from studies.expanded_batch.sparse_sets import window_sets,pool_tokens
-from studies.expanded_batch.spatial_modules import SparseBlock
+from detection.expanded_batch.sparse_sets import window_sets,pool_tokens
+from detection.expanded_batch.spatial_modules import SparseBlock
 
 class SparseContract(unittest.TestCase):
  def setUp(self):torch.manual_seed(17);torch.set_num_threads(2)

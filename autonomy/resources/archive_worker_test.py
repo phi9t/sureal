@@ -13,7 +13,7 @@ class ResourceArchiveTests(unittest.TestCase):
         process=self.api()
         with tempfile.TemporaryDirectory() as temp:
             root=Path(temp);source=root/'source';source.mkdir();(source/'proof.json').write_text('literal resource proof');packed=root/'packed';packed.mkdir()
-            module=Path(__file__).resolve().parents[1]/'advanced/archive.py'
+            module=Path(__file__).resolve().parent/'resource_archive.py'
             job={'source_sha256':{'proof.json':sha(source/'proof.json')},'max_bytes':1024**2,'archive_module_path':str(module),'archive_module_sha256':sha(module)}
             created=process(job,'create',source,packed);self.assertEqual(created['members'],1)
             job['manifest_sha256']=sha(packed/'manifest.json');restored=root/'restored';restored.mkdir();result=process(job,'rehydrate',packed,restored)
@@ -25,7 +25,7 @@ class ResourceArchiveTests(unittest.TestCase):
     def test_unpinned_archive_module_and_changed_source_refused(self):
         process=self.api()
         with tempfile.TemporaryDirectory() as temp:
-            root=Path(temp);source=root/'source';source.mkdir();(source/'proof').write_text('source');out=root/'out';out.mkdir();module=Path(__file__).resolve().parents[1]/'advanced/archive.py'
+            root=Path(temp);source=root/'source';source.mkdir();(source/'proof').write_text('source');out=root/'out';out.mkdir();module=Path(__file__).resolve().parent/'resource_archive.py'
             job={'source_sha256':{'proof':sha(source/'proof')},'max_bytes':1024**2,'archive_module_path':str(module),'archive_module_sha256':'0'*64}
             with self.assertRaises(ValueError):process(job,'create',source,out)
             job['archive_module_sha256']=sha(module);(source/'proof').write_text('changed')
@@ -35,7 +35,7 @@ class ResourceArchiveTests(unittest.TestCase):
     def test_bounded_driver_sized_chunks_and_over_limit_refusal(self):
         process=self.api()
         with tempfile.TemporaryDirectory() as temp:
-            root=Path(temp);source=root/'source';source.mkdir();(source/'driver').write_text('driver fixture');module=Path(__file__).resolve().parents[1]/'advanced/archive.py'
+            root=Path(temp);source=root/'source';source.mkdir();(source/'driver').write_text('driver fixture');module=Path(__file__).resolve().parent/'resource_archive.py'
             job={'source_sha256':{'driver':sha(source/'driver')},'max_bytes':128*1024**2,'archive_module_path':str(module),'archive_module_sha256':sha(module)}
             good=root/'good';good.mkdir()
             try:result=process(job,'create',source,good)

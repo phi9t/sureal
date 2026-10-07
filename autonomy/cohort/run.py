@@ -1,10 +1,10 @@
 """Bounded, source-frozen 16-frame fitting study in live Insula."""
 import argparse,fcntl,hashlib,json,os,shutil,sys,time
 from pathlib import Path
-PACKAGE=Path(__file__).resolve().parents[1];sys.path.insert(0,str(PACKAGE));sys.path.insert(0,str(PACKAGE/'architecture'))
+PACKAGE=Path(__file__).resolve().parents[1];sys.path.insert(0,str(PACKAGE))
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
-from experiment_runner import run_stage
+from studies.architecture.experiment_runner import run_stage
 from protocol import validate_cohort
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 CACHE=Path.home()/'.cache/waystone/waymo-perception';WORK=CACHE/'scientific-processing'

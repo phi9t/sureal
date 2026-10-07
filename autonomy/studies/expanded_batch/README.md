@@ -5,16 +5,17 @@ range-fusion and sparse-BEV ideas, with matched-parameter point-MLP and
 zero-range mechanism controls. These remain **experimental recipes** until
 actual-frame CUDA admission and native overfit closure pass.
 
-Run from the isolated worktree:
+The reusable code lives in its concepts: the expanded catalog, models, packing
+and point/sparse/spatial modules are in `detection/expanded_batch/`, while
+observation loading is in `dataset/expanded_batch_observations.py`. The closed
+CUDA and HDFS gate scripts that produced retained receipts are preserved as
+byte records in `procedure_records/`; they are not active library entrypoints.
+
+Inspect the current catalog from the isolated worktree:
 
 ```bash
-PYTHONPATH=autonomy python -c "from advanced.catalog import catalog; print('\n'.join(catalog()))"
-python autonomy/advanced/prepare.py
-python autonomy/advanced/prepare_range.py
-python autonomy/advanced/admit.py
-python autonomy/advanced/run.py --run-id UNIQUEALPHANUMERICID
-python autonomy/advanced/run.py --run-id SAMEID --resume
-python autonomy/advanced/verify_results.py autonomy/research/advanced-SAMEID-results.json
+PYTHONPATH=autonomy python -c "from detection.expanded_batch.catalog import catalog; print('\n'.join(catalog()))"
+PYTHONPATH=autonomy python autonomy/studies/expanded_batch/expanded_verifier.py autonomy/research/advanced-SAMEID-results.json
 ```
 
 Preparation reuses hash-checked receipts. Range preparation needs the pinned
@@ -46,12 +47,10 @@ memory within8 GiB and worker RSS within16 GiB. The expanded training matrix
 must have sufficient admitted headroom; verified HDFS upload, independent
 readback/member checks and retention lineage must precede release of any
 new-run local artifact. Human HDFS authentication is performed with
-`../scripts/refresh-hdfs-auth.sh`. Historical evidence is retained. After an entire new-run matrix has live closure,
-archive a case with the bounded publisher (only new-run namespaces are eligible):
-
-```bash
-python autonomy/advanced/publish.py --results RESULTS.json --closure LIVE_CLOSURE_RECEIPT.json --case CASE --release
-```
+`../scripts/refresh-hdfs-auth.sh`. Historical evidence is retained. After an
+entire new-run matrix has live closure, the retained expanded publication
+procedure record describes the bounded publisher run; active reusable archive
+helpers now live under `resources/`.
 
 The publisher partitions a complete case inventory into bounded archives,
 resolves the Sureal runs prefix through Waystone, pins the native tools, and

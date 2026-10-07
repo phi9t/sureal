@@ -1,10 +1,14 @@
 # Fixed-batch architecture overfit suite
 
-Run from the repository worktree:
+The reusable fixed-batch catalog and model code lives in `detection/`. The
+closed preparation and run scripts that produced retained receipts are preserved
+as byte records in `procedure_records/`; they are not active library
+entrypoints.
+
+Run the retained-result verifier from the repository worktree:
 
 ```bash
-python autonomy/tier1/prepare.py
-python autonomy/tier1/run.py --run-id YOURUNIQUEALPHANUMERICID
+PYTHONPATH=autonomy python autonomy/studies/fixed_batch/fixed_batch_verifier.py autonomy/research/tier1-overfit20261002b-results.json
 ```
 
 Preparation verifies and reuses an existing admitted fixture, or creates its immutable namespace once. It needs the admitted balanced native/physical/annotation cache, not GCS auth or TensorFlow. Training requires the admitted CPU, Torch GPU and official C++ metric Insula runtimes and NVIDIA driver identity. The runner takes the existing exclusive architecture GPU lock and freezes all worker sources.

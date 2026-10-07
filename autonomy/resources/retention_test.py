@@ -104,7 +104,7 @@ class ResourceRetentionTests(unittest.TestCase):
             materialize_execution_package(code,execution,archive,hashlib.sha256(archive.read_bytes()).hexdigest(),pins)
             self.assertEqual((execution/'evidence/source_snapshot.py').read_text(),'admitted helper')
             self.assertEqual((execution/'resources/execute_worker.py').read_text(),'admitted worker')
-            self.assertEqual((execution/'advanced/archive.py').read_text(),'archive helper')
+            self.assertEqual((execution/'resources/resource_archive.py').read_text(),'archive helper')
             from resources.retention_audit import validate_live_references
             pub={'resource_source_pins':pins,'resource_source_directory':str(root/'current/resources'),
                  'execution_directory':str(execution),'archive_library':{'sha256':hashlib.sha256(archive.read_bytes()).hexdigest()},'chunks':[]}

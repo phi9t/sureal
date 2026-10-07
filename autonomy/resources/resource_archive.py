@@ -32,7 +32,7 @@ def create_archive(root,paths,archive,*,max_bytes=DEFAULT_LIMIT):
    with tarfile.open(fileobj=compressed,mode='w',format=tarfile.PAX_FORMAT) as writer:
     for record,path in zip(records,sources):
      info=tarfile.TarInfo(record['path']);info.size=record['bytes'];info.mode=0o444;info.mtime=0;info.uid=info.gid=0
-   with require_regular_file(path).open('rb') as stream:writer.addfile(info,stream)
+     with require_regular_file(path).open('rb') as stream:writer.addfile(info,stream)
  manifest={'schema_version':1,'members':records,'payload_bytes':total,'archive_bytes':archive.stat().st_size,'archive_sha256':sha(archive)}
  verify_archive(archive,manifest,max_bytes=max_bytes)
  return manifest
