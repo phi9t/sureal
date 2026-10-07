@@ -1,5 +1,6 @@
 import ast,hashlib,importlib.util,io,json,os,subprocess,sys,tarfile,tempfile,types,unittest
 from pathlib import Path
+from evidence.source_snapshot import materialize_receipt_sources
 p=Path(__file__).with_name('experiment_runner.py');spec=importlib.util.spec_from_file_location('experiment_runner',p);module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
 class RunnerTests(unittest.TestCase):
  def write_runner_fixture(self,repo):
@@ -188,17 +189,19 @@ class RunnerTests(unittest.TestCase):
    archive,digest,pins=self.archive({'autonomy/detection/worker.py':'pinned\n'})
    atomic={'experiment':'residual_bev','run_id':'trial-01','label':'residual_bev--trial-01','cache_root':str(cache),'source_snapshot_sha256':digest,'source_snapshot_target':'//autonomy:architecture_experiment_runner_snapshot','source_pins':pins,'stages':[]}
    (directory/'run.json').write_text(json.dumps(atomic))
+   original_receipt=(directory/'run.json').read_bytes()
+   store=cache/'insula/source-snapshots-v1';store.mkdir(parents=True);(store/digest).write_bytes(archive)
    (root/'repo/autonomy/detection').mkdir(parents=True);(root/'repo/autonomy/detection/worker.py').write_text('changed after snapshot\n')
-   verified=[]
-   def fake_verify(receipt,store):
-    verified.append(receipt);return {'source_snapshot_sha256':receipt['source_snapshot_sha256'],'source_pins':receipt['source_pins']}
-   old_verify=getattr(module,'verify_receipt_sources',None);module.verify_receipt_sources=fake_verify
-   try:
-    self.assertEqual(module.check_snapshot(directory)['source_snapshot_sha256'],digest)
-   finally:
-    if old_verify is None:delattr(module,'verify_receipt_sources')
-    else:module.verify_receipt_sources=old_verify
-   self.assertEqual(verified,[atomic])
+   self.assertEqual(module.check_snapshot(directory),atomic)
+   materialized=directory/'source/autonomy/detection/worker.py'
+   self.assertEqual(materialized.read_text(),'pinned\n')
+   self.assertEqual((directory/'run.json').read_bytes(),original_receipt)
+   self.assertEqual((store/digest).read_bytes(),archive)
+   materialized.chmod(0o600)
+   materialized.write_text('tampered materialization\n')
+   with self.assertRaisesRegex(ValueError,'materialized source changed'):
+    module.check_snapshot(directory)
+   self.assertEqual(materialized.read_text(),'tampered materialization\n')
  def test_check_snapshot_rejects_corrupt_snapshot_object(self):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp);directory=root/'run';cache=root/'cache';directory.mkdir()
@@ -219,11 +222,13 @@ class RunnerTests(unittest.TestCase):
  def test_cli_verify_uses_run_store_for_legacy_stage_receipts(self):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp);cache=root/'cache';directory=cache/'insula/architecture-runs/trial-01';package=directory/'source/autonomy';research=package/'research'
-   research.mkdir(parents=True)
+   directory.mkdir(parents=True)
    archive,digest,pins=self.archive({'autonomy/detection/worker.py':'pinned\n'})
    store=cache/'insula/source-snapshots-v1';store.mkdir(parents=True);(store/digest).write_bytes(archive)
    meta={'experiment':'residual_bev','run_id':'trial-01','label':'residual_bev--trial-01','cache_root':str(cache),'source_snapshot_sha256':digest,'source_snapshot_target':module.ARCHITECTURE_SOURCE_SNAPSHOT_TARGET,'source_pins':pins,'stages':module.stages_for('residual_bev')}
    (directory/'run.json').write_text(json.dumps(meta))
+   materialize_receipt_sources(meta,directory/'source',module.LocalSnapshotStore(store))
+   research.mkdir()
    for stage in module.stages_for('residual_bev'):
     path=module.receipt_path(package,stage,'residual_bev--trial-01')
     path.write_text(json.dumps({'checks':[{'exit_code':0}],'artifacts':{},'source_snapshot_sha256':digest,'source_snapshot_target':module.ARCHITECTURE_SOURCE_SNAPSHOT_TARGET,'source_pins':pins}))
@@ -241,11 +246,13 @@ class RunnerTests(unittest.TestCase):
  def test_existing_stage_receipt_is_pinned_before_resume_skip_verifies_it(self):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp);cache=root/'cache';run=cache/'insula/architecture-runs/trial-01';package=run/'source/autonomy';research=package/'research';logs=run/'logs'
-   research.mkdir(parents=True);logs.mkdir(parents=True)
+   logs.mkdir(parents=True)
    archive,digest,pins=self.archive({'autonomy/detection/worker.py':'pinned\n'})
    store=cache/'insula/source-snapshots-v1';store.mkdir(parents=True);(store/digest).write_bytes(archive)
    meta={'experiment':'residual_bev','run_id':'trial-01','label':'residual_bev--trial-01','cache_root':str(cache),'source_snapshot_sha256':digest,'source_snapshot_target':module.ARCHITECTURE_SOURCE_SNAPSHOT_TARGET,'source_pins':pins,'stages':module.stages_for('residual_bev')}
    (run/'run.json').write_text(json.dumps(meta))
+   materialize_receipt_sources(meta,run/'source',module.LocalSnapshotStore(store))
+   research.mkdir()
    for stage in module.stages_for('residual_bev'):
     if stage['name']=='contract':(research/'architecture-contract-verified.json').write_text(json.dumps({'checks':[{'exit_code':0}],'artifacts':{}}))
     else:(logs/(stage['name']+'.log')).write_text('stop before later stages\n')
