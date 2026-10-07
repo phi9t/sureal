@@ -30,13 +30,15 @@ def _launcher(owner):
     return module
 
 
-def prepare_identity(native,destination,*,source_directory=CURRENT,timeout_for_stage=default_stage_timeout):
+def prepare_identity(native,destination,*,source_directory=CURRENT,timeout_for_stage=default_stage_timeout,
+                     source_snapshot_store=None,repo_root=None,bazel=None,runner=None):
     """Create a candidate attachment; execution needs its external digest."""
     native.guard();destination=Path(destination);source_directory=Path(source_directory)
     require_separate(native.output,destination,source_directory)
     if destination.parent!=native.R or not destination.is_absolute() or any(p.is_symlink() for p in [destination,*destination.parents]):
         raise ValueError('regular resource identity directory owned by native case required')
-    destination.mkdir(exist_ok=False);pins=freeze_sources(source_directory,destination/'code')
+    destination.mkdir(exist_ok=False)
+    pins=freeze_sources(source_directory,destination/'code',store=source_snapshot_store,repo_root=repo_root,bazel=bazel,runner=runner)
     (destination/'stages').mkdir()
     identity={'schema_version':1,'native_run_path':str(native.R/'run.json'),
               'native_run_sha256':sha(native.R/'run.json'),'native_case_directory':str(native.R),
@@ -84,7 +86,7 @@ class ResourceBackend:
             value['manifest_sha256']!=self.manifest_sha or value['anchor_templates_sha256']!=self.anchor_sha or
             not isinstance(value.get('source_directory'),str) or type(value['cap_bytes']) is not int or value['cap_bytes']!=CAP_BYTES or
             value['timeout_seconds']!={'ordinary':_stage_timeout(self,False),'metrics':_stage_timeout(self,True)} or
-            value['source_pins'].get('source_pins',{}).get('resources/backend.py') is None):
+            not any(value['source_pins'].get('source_pins',{}).get(name) for name in ['resources/backend.py','autonomy/resources/backend.py'])):
             raise ValueError('complete externally pinned native/resource identity required')
         require_separate(self.output,self.resource_root,CURRENT)
         validate_sources(CURRENT,value['source_pins'])

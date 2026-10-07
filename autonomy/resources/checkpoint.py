@@ -3,10 +3,10 @@
 This companion never substitutes for native math, model-state or metric gates.
 It preserves all seven stage proofs under one digest for progression/recovery.
 """
-import hashlib,json,os
+import hashlib,json,os,tempfile
 from pathlib import Path,PurePosixPath
 from evidence.source_snapshot import safe_member_name
-from evidence.source_snapshot import verify_materialized_sources
+from evidence.source_snapshot import receipt_snapshot_digest,store_from_receipt,verify_or_materialize_receipt_sources
 from resources.command import inspect_command
 from resources.sources import regular,sha
 from resources.stage import write_new,require_separate
@@ -177,10 +177,22 @@ def _validate_publication_external_bindings(backend,pub):
         if cpu_root is not None and Path(pub['rootfs_path'])!=Path(cpu_root):
             raise ValueError('resource publication rootfs identity differs from backend')
         host=getattr(backend,'host_pins',None)
-        if host is not None and 'resources/resource_archive.py' in host.get('source_pins',{}):
-            archive=Path(host['source_snapshot_root'])/'resources/resource_archive.py'
-            if pub['archive_library']!={'path':str(archive),'sha256':host['source_pins']['resources/resource_archive.py']}:
-                raise ValueError('resource publication archive helper differs from admitted host source')
+        if host is not None:
+            source_pins=host.get('source_pins',{})
+            if host.get('schema_version')==2:
+                key='autonomy/resources/resource_archive.py'
+                if key not in source_pins:
+                    raise ValueError('resource publication archive helper differs from admitted host source')
+            elif 'resources/resource_archive.py' in source_pins:
+                key='resources/resource_archive.py'
+            elif 'autonomy/resources/resource_archive.py' in source_pins:
+                key='autonomy/resources/resource_archive.py'
+            else:
+                key=None
+            if key is not None:
+                archive=Path(host['source_snapshot_root'])/key
+                if pub['archive_library']!={'path':str(archive),'sha256':source_pins[key]}:
+                    raise ValueError('resource publication archive helper differs from admitted host source')
     except (KeyError,TypeError,AttributeError) as error:
         raise ValueError('complete backend-bound resource publication identity required') from error
 
@@ -371,19 +383,49 @@ def validate_checkpoint(backend,record):
 
 def resource_inventory(backend,record):
     """Exact raw closure to archive separately from the nineteen producer files."""
-    companion=validate_checkpoint(backend,record);files={}
+    for receipt in [getattr(backend,'resource_identity',{}).get('source_pins'),getattr(backend,'pins',None),getattr(backend,'host_pins',None),getattr(backend,'checkpoint_publisher_pins',None)]:
+        if isinstance(receipt,dict) and receipt.get('source_snapshot_root') is not None:
+            verify_or_materialize_receipt_sources(receipt,receipt['source_snapshot_root'],env_var='SUREAL_SOURCE_SNAPSHOT_STORE')
+    companion=validate_checkpoint(backend,record);files={};archive_cache=backend.resource_root/'source-snapshot-archives'
+    reserve=getattr(backend,'resource_reserve_write',None)
+    accounting_root=getattr(backend,'resource_work_root',None)
     def add(name,path,digest=None):
         safe_member_name(name);entry=reference(path)
         if name in files or digest is not None and entry['sha256']!=digest:
             raise ValueError('unique safe resource member and unchanged digest required')
         entry['bytes']=Path(path).stat().st_size;files[name]=entry
+    def stage_archive(prefix,receipt):
+        digest=receipt_snapshot_digest(receipt);archive=archive_cache/(prefix.replace('/','-')+'-'+digest+'.tar')
+        if archive.exists() or archive.is_symlink():
+            if not regular(archive) or sha(archive)!=digest:raise ValueError('source snapshot archive sidecar changed')
+            add(prefix+'/snapshot-object.tar',archive,digest);return
+        archive_cache.mkdir(parents=True,exist_ok=True)
+        if archive_cache.is_symlink():raise ValueError('regular source snapshot archive cache required')
+        data=store_from_receipt(receipt,env_var='SUREAL_SOURCE_SNAPSHOT_STORE').fetch(digest)
+        if hashlib.sha256(data).hexdigest()!=digest:
+            raise ValueError('snapshot digest differs from receipt')
+        if reserve is None or accounting_root is None:raise ValueError('resource accounting reservation required')
+        reserve(Path(accounting_root),len(data))
+        fd,temporary_name=tempfile.mkstemp(prefix='.'+archive.name+'.',suffix='.tmp',dir=archive_cache)
+        temporary=Path(temporary_name)
+        try:
+            with os.fdopen(fd,'wb') as output:
+                output.write(data);output.flush();os.fsync(output.fileno())
+            if temporary.is_symlink():raise ValueError('regular source snapshot archive temporary required')
+            temporary.chmod(0o444)
+            try:os.link(temporary,archive)
+            except FileExistsError:
+                if not regular(archive) or sha(archive)!=digest:raise ValueError('source snapshot archive sidecar changed')
+        finally:
+            if temporary.exists():temporary.unlink()
+        add(prefix+'/snapshot-object.tar',archive,digest)
     def add_snapshot(prefix,receipt):
         try:
             root=Path(receipt['source_snapshot_root']);pins=receipt['source_pins']
-            verified=verify_materialized_sources(root,receipt)
+            verified=verify_or_materialize_receipt_sources(receipt,root,env_var='SUREAL_SOURCE_SNAPSHOT_STORE')
             if verified['source_pins']!=pins:
                 raise ValueError('source snapshot pins differ')
-            add(prefix+'/snapshot-object.tar',Path(receipt['source_snapshot_store'])/receipt['source_snapshot_sha256'],receipt['source_snapshot_sha256'])
+            stage_archive(prefix,receipt)
             for name,digest in pins.items():
                 add(prefix+'/materialized/'+name,root/name,digest)
         except (KeyError,TypeError,OSError) as error:

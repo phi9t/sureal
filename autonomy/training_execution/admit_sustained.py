@@ -13,7 +13,7 @@ from resources.scientific_payload import sha,unique_payload_bytes
 from resources.scientific_budget import reserve_write
 from detection.sustained_contract import validate_contract
 from resources.sustained_scoring_budget import stage_timeout
-from training_execution.sustained_sources import snapshot_sources,source_paths,validate_sources
+from training_execution.sustained_sources import cache_snapshot_for_runtime,snapshot_sources,validate_sources
 from training_execution.sustained_stage_inputs import freeze_inputs,bind_stage_paths
 
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing'
@@ -55,10 +55,8 @@ def main():
  metric_runtime=json.loads(Path(str(METRICS_ROOT)+'.lock.json').read_text());verify_rootfs(METRICS_ROOT,metric_runtime['rootfs_sha256'])
  for path,digest in old['driver_hashes'].items():
   if sha(path)!=digest:raise ValueError('driver changed')
- R=C/'insula'/f'balanced16-sustained-admission-{a.run_id}';R.mkdir();package=R/'code';package.mkdir()
- for name in source_paths(P):
-  path=P/name;dest=package/name;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(path,dest)
- pins=snapshot_sources(package,R/'source-snapshots');validate_sources(package,pins,runtime,runtime)
+ R=C/'insula'/f'balanced16-sustained-admission-{a.run_id}';R.mkdir()
+ pins=snapshot_sources(P,destination=R/'code');cache_snapshot_for_runtime(pins,R/'source-snapshots');package=Path(pins['source_snapshot_root'])/'autonomy';validate_sources(package,pins,runtime,runtime)
  runtime_path=R/'runtime-lock.json';runtime_path.write_text(json.dumps(runtime,indent=2)+'\n')
  anchor_path=P/'research/training-anchor-templates.candidate.json';anchor_receipt=json.loads((P/'research/training-anchor-candidate-verified.json').read_text())
  if sha(anchor_path)!=anchor_receipt['expected']['candidate_sha256']:raise ValueError('admitted anchor templates changed')

@@ -27,6 +27,14 @@ class RunnerTests(unittest.TestCase):
     writer.addfile(info,io.BytesIO(raw))
   archive=payload.getvalue()
   return archive,hashlib.sha256(archive).hexdigest(),pins
+ def query_runner(self,names):
+  def run(command,**kwargs):
+   self.assertIn('query',command)
+   class Result:pass
+   result=Result()
+   result.stdout=''.join('//'+name.rsplit('/',1)[0]+':'+name.rsplit('/',1)[1]+'\n' for name in sorted(names))
+   return result
+  return run
  def patch_module_paths(self,here,package,repo):
   old_here,old_package,old_repo=module.HERE,module.PACKAGE,module.REPO
   module.HERE,module.PACKAGE,module.REPO=here,package,repo
@@ -128,25 +136,12 @@ class RunnerTests(unittest.TestCase):
     'autonomy/detection/worker.py':'pass\n',
     'autonomy/research/overfit-native-cache-progress.json':'{"admitted_frames":16,"selected_frames":16,"frame_evidence":{}}\n',
    })
-   class Store:
-    def __init__(self):self.objects={}
-    def store(self,key,data):self.objects[key]=data;return key
-    def fetch(self,key):return self.objects[key]
-   store=Store()
-   def fake_snapshot(target,store_arg,**kwargs):
-    store_arg.store(digest,archive)
-    return types.SimpleNamespace(target=target,digest=digest,archive_bytes=len(archive),source_pins=pins)
+   store=module.LocalSnapshotStore(root/'store')
    old=self.patch_module_paths(here,package_root,repo)
-   old_snapshot=getattr(module,'snapshot_bazel_target',None);old_store=getattr(module,'LocalSnapshotStore',None)
-   module.snapshot_bazel_target=fake_snapshot;module.LocalSnapshotStore=lambda path: store
    try:
-    source,package=module.make_snapshot(root/'run','residual_bev','trial-01',root/'cache')
+    source,package=module.make_snapshot(root/'run','residual_bev','trial-01',root/'cache',store=store,bazel=repo/'bazelw',runner=self.query_runner(pins))
    finally:
     self.restore_module_paths(old)
-    if old_snapshot is None:delattr(module,'snapshot_bazel_target')
-    else:module.snapshot_bazel_target=old_snapshot
-    if old_store is None:delattr(module,'LocalSnapshotStore')
-    else:module.LocalSnapshotStore=old_store
    self.assertEqual(package,source/'autonomy')
    self.assertTrue((package/'pipeline').is_dir())
    self.assertFalse((source/'experiments').exists())
@@ -167,31 +162,23 @@ class RunnerTests(unittest.TestCase):
     'autonomy/detection/worker.py':'pass\n',
     'autonomy/research/overfit-native-cache-progress.json':'{"admitted_frames":16,"selected_frames":16,"frame_evidence":{}}\n',
    })
-   class Store:
-    def __init__(self):self.root=root/'cache/insula/source-snapshots-v1';self.objects={}
-    def store(self,key,data):self.objects[key]=data;return key
-    def fetch(self,key):return self.objects[key]
-   store=Store();called=[]
-   def fake_snapshot(target,store_arg,**kwargs):
-    called.append((target,store_arg,kwargs));store_arg.store(digest,archive)
-    return types.SimpleNamespace(target=target,digest=digest,archive_bytes=len(archive),source_pins=pins)
+   store=module.LocalSnapshotStore(root/'store');called=[]
+   def runner(command,**kwargs):
+    called.append(command)
+    return self.query_runner(pins)(command,**kwargs)
    old=self.patch_module_paths(here,package_root,repo)
-   old_snapshot=getattr(module,'snapshot_bazel_target',None);old_store=getattr(module,'LocalSnapshotStore',None)
-   module.snapshot_bazel_target=fake_snapshot;module.LocalSnapshotStore=lambda path: store
    try:
-    source,package=module.make_snapshot(root/'run','residual_bev','trial-01',root/'cache')
+    source,package=module.make_snapshot(root/'run','residual_bev','trial-01',root/'cache',store=store,bazel=repo/'bazelw',runner=runner)
    finally:
     self.restore_module_paths(old)
-    if old_snapshot is None:delattr(module,'snapshot_bazel_target')
-    else:module.snapshot_bazel_target=old_snapshot
-    if old_store is None:delattr(module,'LocalSnapshotStore')
-    else:module.LocalSnapshotStore=old_store
    meta=json.loads((root/'run/run.json').read_text())
    self.assertEqual(meta['source_snapshot_sha256'],digest)
    self.assertEqual(meta['source_snapshot_target'],module.ARCHITECTURE_SOURCE_SNAPSHOT_TARGET)
+   self.assertEqual(meta['source_snapshot_store'],{'schema_version':1,'kind':'local','root':str(root/'store')})
+   self.assertEqual(meta['source_snapshot_archive_bytes'],len(archive))
    self.assertEqual(meta['source_pins'],pins)
    self.assertNotIn('source_sha256',meta)
-   self.assertEqual(called[0][0],module.ARCHITECTURE_SOURCE_SNAPSHOT_TARGET)
+   self.assertIn(module.ARCHITECTURE_SOURCE_SNAPSHOT_TARGET,called[0][-1])
    self.assertEqual(package,source/'autonomy')
    self.assertTrue((source/'.scratch/run-architecture-learning-curve.py').is_file())
    self.assertFalse((package/'research/unrelated-retained-evidence.json').exists())
@@ -229,6 +216,28 @@ class RunnerTests(unittest.TestCase):
    (store/digest).write_bytes(b'corrupt')
    with self.assertRaisesRegex(ValueError,'snapshot digest differs'):
     module.verify_receipt(receipt,root,snapshot_store=module.LocalSnapshotStore(store))
+ def test_cli_verify_uses_run_store_for_legacy_stage_receipts(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   root=Path(tmp);cache=root/'cache';directory=cache/'insula/architecture-runs/trial-01';package=directory/'source/autonomy';research=package/'research'
+   research.mkdir(parents=True)
+   archive,digest,pins=self.archive({'autonomy/detection/worker.py':'pinned\n'})
+   store=cache/'insula/source-snapshots-v1';store.mkdir(parents=True);(store/digest).write_bytes(archive)
+   meta={'experiment':'residual_bev','run_id':'trial-01','label':'residual_bev--trial-01','cache_root':str(cache),'source_snapshot_sha256':digest,'source_snapshot_target':module.ARCHITECTURE_SOURCE_SNAPSHOT_TARGET,'source_pins':pins,'stages':module.stages_for('residual_bev')}
+   (directory/'run.json').write_text(json.dumps(meta))
+   for stage in module.stages_for('residual_bev'):
+    path=module.receipt_path(package,stage,'residual_bev--trial-01')
+    path.write_text(json.dumps({'checks':[{'exit_code':0}],'artifacts':{},'source_snapshot_sha256':digest,'source_snapshot_target':module.ARCHITECTURE_SOURCE_SNAPSHOT_TARGET,'source_pins':pins}))
+   def fake_summary(package_arg,name,label,snapshot_store=None):
+    self.assertIsNotNone(snapshot_store)
+    for stage in module.stages_for(name):
+     module.verify_receipt(json.loads(module.receipt_path(package_arg,stage,label).read_text()),package_arg,snapshot_store=snapshot_store)
+    return {'verified':True}
+   old=module.summarize
+   module.summarize=fake_summary
+   try:
+    self.assertEqual(module.main(['--cache-root',str(cache),'verify','residual_bev','--run-id','trial-01']),0)
+   finally:
+    module.summarize=old
  def test_existing_stage_receipt_is_pinned_before_resume_skip_verifies_it(self):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp);cache=root/'cache';run=cache/'insula/architecture-runs/trial-01';package=run/'source/autonomy';research=package/'research';logs=run/'logs'

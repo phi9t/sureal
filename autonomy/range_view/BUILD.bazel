@@ -21,6 +21,7 @@ RANGE_VIEW_VISIBILITY = [
     "//autonomy/detection/expanded_batch:__pkg__",
     "//autonomy/gpu:__pkg__",
     "//autonomy/studies:__pkg__",
+    "//autonomy/training_execution:__pkg__",
 ]
 
 TEST_EXTRA_DEPS = {

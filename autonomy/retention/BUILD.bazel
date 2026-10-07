@@ -1,4 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_library", "py_test")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library", "py_test")
 
 TEST_MODULES = glob(["*_test.py"])
 LIB_MODULES = glob(
@@ -20,6 +20,7 @@ exports_files(
         "publish_native_cache.py",
         "publish_sustained_checkpoint.py",
         "publish_sustained_pilot.py",
+        "publisher_runtime.py",
         "retention_sources.py",
         "sustained_checkpoint_inventory.py",
         "sustained_controller_lock.py",
@@ -54,6 +55,22 @@ filegroup(
     srcs = glob(["*.py"]),
     visibility = ["//autonomy:__pkg__"],
 )
+
+[
+    py_binary(
+        name = publisher[:-3],
+        srcs = [publisher],
+        imports = [".."],
+        main = publisher,
+        deps = [":retention"],
+        visibility = ["//visibility:public"],
+    )
+    for publisher in [
+        "publish_native_cache.py",
+        "publish_sustained_checkpoint.py",
+        "publish_sustained_pilot.py",
+    ]
+]
 
 [
     py_test(

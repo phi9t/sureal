@@ -1,4 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_library", "py_test")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library", "py_test")
 
 TEST_MODULES = glob(["*_test.py"])
 LIB_MODULES = glob(
@@ -68,12 +68,29 @@ filegroup(
     visibility = ["//autonomy:__pkg__"],
 )
 
-filegroup(
+py_library(
     name = "resource_source_layer",
-    srcs = glob(["*.py"]) + [
-        "//autonomy/evidence:source_snapshot_py",
+    srcs = LIB_MODULES,
+    data = ["//autonomy/evidence:source_snapshot_py"],
+    imports = [".."],
+    deps = [
+        "//autonomy/evidence:evidence",
+        "//autonomy/insula:insula",
     ],
     visibility = ["//autonomy:__pkg__"],
+)
+
+py_binary(
+    name = "execute_worker",
+    srcs = ["execute_worker.py"],
+    data = [
+        "archive_worker.py",
+        "retention_audit.py",
+    ],
+    imports = [".."],
+    main = "execute_worker.py",
+    deps = [":resource_source_layer"],
+    visibility = ["//visibility:public"],
 )
 
 py_library(

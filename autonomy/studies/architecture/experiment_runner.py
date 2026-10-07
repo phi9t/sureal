@@ -1,14 +1,14 @@
 """Named, immutable architecture runs using the admitted live Insula harness."""
-import argparse,datetime,fcntl,io,json,os,re,shutil,signal,subprocess,sys,tarfile,uuid
+import argparse,datetime,fcntl,json,os,re,shutil,signal,subprocess,sys,uuid
 from pathlib import Path
 
 HERE=Path(__file__).resolve().parent
 PACKAGE=HERE.parents[1]
 REPO=PACKAGE.parent
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
-from evidence.source_snapshot import LocalSnapshotStore,file_sha256 as sha,require_regular_file,safe_member_name,snapshot_bazel_target,verify_receipt_sources
+from evidence.source_snapshot import LocalSnapshotStore,file_sha256 as sha,require_regular_file,snapshot_target_and_materialize,store_from_receipt,verify_or_materialize_receipt_sources,verify_receipt_sources
 
-ARCHITECTURE_SOURCE_SNAPSHOT_TARGET='//autonomy:architecture_experiment_runner_snapshot'
+ARCHITECTURE_SOURCE_SNAPSHOT_TARGET='//autonomy/studies:architecture_experiment_runner'
 ARCHITECTURE_STUDY_SPEC_SHA256='fef072b2737a4fda94a029944fb999d78be482669b1cd989af953d93b5e7ecf1'
 SOURCE_SNAPSHOT_STORE_RELATIVE=Path('insula/source-snapshots-v1')
 
@@ -86,7 +86,7 @@ def parameterize_driver(source):
 
 def verify_receipt(receipt,package,snapshot_store=None):
  if snapshot_store is not None or 'source_snapshot_sha256' in receipt:
-  if snapshot_store is None:raise ValueError('Snapshot store required for source-pinned receipt')
+  if snapshot_store is None:snapshot_store=snapshot_store_for_receipt(receipt)
   verify_receipt_sources(receipt,snapshot_store)
  def check(path,digest):
   try:p=require_regular_file(Path(path))
@@ -146,24 +146,11 @@ def atomic_json(path,value):
 def source_snapshot_store(cache):
  return LocalSnapshotStore(Path(cache)/SOURCE_SNAPSHOT_STORE_RELATIVE)
 
-def materialize_source_snapshot(store,digest,destination):
- destination=Path(destination)
- if destination.exists():raise ValueError('Run source directory already exists: '+str(destination))
- destination.mkdir(parents=True)
- archive=store.fetch(digest)
- seen=set()
- try:
-  with tarfile.open(fileobj=io.BytesIO(archive),mode='r:') as reader:
-   for member in reader:
-    name=safe_member_name(member.name)
-    if name in seen or not member.isfile() or member.linkname:raise ValueError('snapshot contains duplicate or nonregular member')
-    seen.add(name);stream=reader.extractfile(member)
-    if stream is None:raise ValueError('snapshot contains unreadable member')
-    path=destination/name;path.parent.mkdir(parents=True,exist_ok=True)
-    with path.open('wb') as output:shutil.copyfileobj(stream,output)
- except (tarfile.TarError,OSError,EOFError) as error:
-  raise ValueError('invalid source snapshot') from error
- if not seen:raise ValueError('source snapshot contains no files')
+def snapshot_store_for_receipt(receipt,snapshot_store=None):
+ if snapshot_store is not None:return snapshot_store
+ if 'source_snapshot_store' in receipt:return store_from_receipt(receipt,env_var='SUREAL_SOURCE_SNAPSHOT_STORE')
+ if 'cache_root' in receipt:return source_snapshot_store(Path(receipt['cache_root']))
+ raise ValueError('Snapshot store required for source-pinned receipt')
 
 def prepare_harness_workspace(source,name,run_id):
  package=source/'autonomy';here=package/'studies/architecture'
@@ -180,11 +167,14 @@ def prepare_harness_workspace(source,name,run_id):
  return package
 
 def snapshot_receipt_fields(meta):
- return {
+ fields={
   'source_snapshot_sha256':meta['source_snapshot_sha256'],
   'source_snapshot_target':meta['source_snapshot_target'],
   'source_pins':meta['source_pins'],
  }
+ for key in ['schema_version','source_snapshot_archive_bytes','source_snapshot_bytes','source_snapshot_store']:
+  if key in meta:fields[key]=meta[key]
+ return fields
 
 def pin_receipt_to_source_snapshot(path,meta):
  receipt=json.loads(Path(path).read_text())
@@ -192,20 +182,28 @@ def pin_receipt_to_source_snapshot(path,meta):
  atomic_json(Path(path),receipt)
  return receipt
 
-def make_snapshot(directory,name,run_id,cache):
- store=source_snapshot_store(cache)
- snapshot=snapshot_bazel_target(ARCHITECTURE_SOURCE_SNAPSHOT_TARGET,store,repo_root=REPO)
- if snapshot.archive_bytes>64*1024**2:raise ValueError('Source snapshot exceeds64MiB budget')
- source=directory/'source';materialize_source_snapshot(store,snapshot.digest,source)
+def make_snapshot(directory,name,run_id,cache,*,store=None,bazel=None,runner=subprocess.run):
+ directory=Path(directory);directory.mkdir(parents=True,exist_ok=True)
+ source=directory/'source'
+ kwargs={'repo_root':REPO}
+ if store is not None:kwargs['store']=store
+ if bazel is not None:kwargs['bazel']=bazel
+ if runner is not None:kwargs['runner']=runner
+ receipt=snapshot_target_and_materialize(ARCHITECTURE_SOURCE_SNAPSHOT_TARGET,source,**kwargs)
+ if receipt['source_snapshot_archive_bytes']>64*1024**2:raise ValueError('Source snapshot exceeds64MiB budget')
  package=prepare_harness_workspace(source,name,run_id)
- atomic_json(directory/'run.json',{'experiment':name,'run_id':run_id,'label':run_label(name,run_id),'cache_root':str(cache),'source_snapshot_sha256':snapshot.digest,'source_snapshot_target':snapshot.target,'source_snapshot_bytes':snapshot.archive_bytes,'source_pins':snapshot.source_pins,'stages':stages_for(name),'scope':'fixed training-batch diagnostic, no whole-model/heldout acceptance'})
+ meta={'experiment':name,'run_id':run_id,'label':run_label(name,run_id),'cache_root':str(cache),
+       'source_snapshot_bytes':receipt['source_snapshot_archive_bytes'],
+       'stages':stages_for(name),'scope':'fixed training-batch diagnostic, no whole-model/heldout acceptance'}
+ meta.update(receipt)
+ atomic_json(directory/'run.json',meta)
  return source,package
 
 def check_snapshot(directory):
  meta=json.loads((directory/'run.json').read_text());source=directory/'source'
  if 'source_snapshot_sha256' not in meta:
   raise ValueError('Run predates source snapshots; re-run or re-admit with a source snapshot')
- verify_receipt_sources(meta,source_snapshot_store(Path(meta['cache_root'])))
+ verify_or_materialize_receipt_sources(meta,source,snapshot_store_for_receipt(meta))
  return meta
 
 def summarize(package,name,label,snapshot_store=None):
@@ -244,7 +242,7 @@ def execute(name,run_id,cache,resume=False):
   else:
    if resume:raise ValueError('Cannot resume a nonexistent run ID')
    preflight(cache,name);directory.mkdir();source,package=make_snapshot(directory,name,run_id,cache)
-  meta=check_snapshot(directory);store=source_snapshot_store(cache)
+  meta=check_snapshot(directory);store=snapshot_store_for_receipt(meta)
   env=dict(os.environ,WAYMO_ARCH_RUN_ID=run_id,WAYMO_ARCH_CACHE_ROOT=str(cache),PYTHONPATH=str(package));logs=directory/'logs';logs.mkdir(exist_ok=True)
   for stage in stages:
    check_snapshot(directory);path=receipt_path(package,stage,run_label(name,run_id))
@@ -290,7 +288,7 @@ def main(argv=None):
   else:
    directory=args.cache_root.resolve()/'insula/architecture-runs'/args.run_id;meta=check_snapshot(directory)
    if meta['experiment']!=args.experiment:raise ValueError('Run ID belongs to another experiment')
-   print(json.dumps(summarize(directory/'source/autonomy',args.experiment,run_label(args.experiment,args.run_id),snapshot_store=source_snapshot_store(args.cache_root.resolve())),indent=2))
+   print(json.dumps(summarize(directory/'source/autonomy',args.experiment,run_label(args.experiment,args.run_id),snapshot_store=snapshot_store_for_receipt(meta)),indent=2))
   return 0
  except (ValueError,FileNotFoundError,subprocess.TimeoutExpired) as error:
   print('ERROR: '+str(error),file=sys.stderr);return 1

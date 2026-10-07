@@ -8,9 +8,10 @@ from resources.scientific_budget import reserve_write
 from resources.scientific_payload import unique_payload_bytes
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
+from retention.publisher_runtime import admitted_host_sources,stage_audit_source
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing';CLI=Path.home()/'workspace/waystone/scripts/waystone'
 def main():
- parser=argparse.ArgumentParser();parser.add_argument('--receipt',type=Path,required=True);parser.add_argument('--receipt-sha256',required=True);parser.add_argument('--release',action='store_true');parser.add_argument('--lock-fd',type=int);a=parser.parse_args()
+ parser=argparse.ArgumentParser();parser.add_argument('--receipt',type=Path,required=True);parser.add_argument('--receipt-sha256',required=True);parser.add_argument('--host-source-receipt',type=Path);parser.add_argument('--release',action='store_true');parser.add_argument('--lock-fd',type=int);a=parser.parse_args()
  from retention.sustained_controller_lock import acquire_experiment_lock
  lock=acquire_experiment_lock(C/'insula/architecture-experiments.lock',a.lock_fd)
  from retention.sustained_checkpoint_inventory import freeze_checkpoint_inventory
@@ -26,7 +27,7 @@ def main():
   if current and size+length>limit:chunks.append(current);current=[];size=0
   current.append(name);size+=length
  if current:chunks.append(current)
- identifier=a.case+'-step'+str(final['step'])+'-'+uuid.uuid4().hex;R=C/'insula'/('hdfs-retention-'+identifier);R.mkdir();host_pins=freeze_host_sources(P,R/'host-source');source=R/'source';source.mkdir()
+ identifier=a.case+'-step'+str(final['step'])+'-'+uuid.uuid4().hex;R=C/'insula'/('hdfs-retention-'+identifier);R.mkdir();host_pins,_=admitted_host_sources(a.host_source_receipt,P,R/'host-source',freeze_host_sources,validate_host_sources);source=R/'source';source.mkdir()
  for folder in ('resources','evidence'):
   shutil.copytree(P/folder,source/folder,ignore=shutil.ignore_patterns('__pycache__'))
  pins={str(p):sha(p) for p in source.rglob('*') if p.is_file()};root=C/'insula/rootfs-v2';runtime=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,runtime['rootfs_sha256'])
@@ -68,8 +69,8 @@ def main():
  assert freeze_checkpoint_inventory(payload,a.receipt,a.receipt_sha256)==inventory
  plan=release_plan(payload,publication);publication['release_plan']=plan;receipt=R/'verified-publication.json';receipt.write_text(json.dumps(publication,indent=2))
  # A separate independent full-inventory live gate is mandatory before release.
- independent=R/'independent';independent.mkdir();proof_inputs=R/'admission-input';proof_inputs.mkdir();(proof_inputs/'publication.json').write_text(json.dumps(publication));shutil.copyfile(readback,proof_inputs/'readback.json');shutil.copyfile(R/'expected.json',proof_inputs/'expected.json');(source/'retention').mkdir(exist_ok=True);shutil.copyfile(Path(host_pins['source_snapshot_root'])/'retention/checkpoint_retention_audit.py',source/'retention/checkpoint_retention_audit.py')
- command=launch_plan(root,source,payload,independent,['python','/experiment/retention/checkpoint_retention_audit.py']);at=command.index('--');command[at:at]=['--ro-bind',str(proof_inputs),'/tmp/inputs','--setenv','PYTHONPATH','/experiment'];audit=subprocess.run(command,capture_output=True,text=True,timeout=300);(independent/'live.log').write_text(audit.stdout+audit.stderr);assert audit.returncode==0,str(independent/'live.log');publication['independent_admission']={'command':command,'exit_code':0,'source_sha256':sha(source/'retention/checkpoint_retention_audit.py'),'inputs':{str(p):sha(p) for p in proof_inputs.iterdir()},'artifacts':{str(p):sha(p) for p in independent.iterdir()},'validation':json.loads((independent/'check.json').read_text())};receipt.write_text(json.dumps(publication,indent=2))
+ independent=R/'independent';independent.mkdir();proof_inputs=R/'admission-input';proof_inputs.mkdir();(proof_inputs/'publication.json').write_text(json.dumps(publication));shutil.copyfile(readback,proof_inputs/'readback.json');shutil.copyfile(R/'expected.json',proof_inputs/'expected.json');audit_source=stage_audit_source(host_pins,source,'retention/checkpoint_retention_audit.py')
+ command=launch_plan(root,source,payload,independent,['python','/experiment/retention/checkpoint_retention_audit.py']);at=command.index('--');command[at:at]=['--ro-bind',str(proof_inputs),'/tmp/inputs','--setenv','PYTHONPATH','/experiment'];audit=subprocess.run(command,capture_output=True,text=True,timeout=300);(independent/'live.log').write_text(audit.stdout+audit.stderr);assert audit.returncode==0,str(independent/'live.log');publication['independent_admission']={'command':command,'exit_code':0,'source_sha256':sha(audit_source),'inputs':{str(p):sha(p) for p in proof_inputs.iterdir()},'artifacts':{str(p):sha(p) for p in independent.iterdir()},'validation':json.loads((independent/'check.json').read_text())};receipt.write_text(json.dumps(publication,indent=2))
  if a.release:
   validate_host_sources(P,host_pins)
   for entry in plan:assert sha(entry['local_path'])==entry['sha256'];Path(entry['local_path']).unlink()

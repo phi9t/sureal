@@ -4,6 +4,7 @@ from unittest.mock import patch
 from evidence.source_snapshot import LocalSnapshotStore,archive_sources
 from training_execution.sustained_controller_backend import NativeBackend,sha
 from training_execution.sustained_controller_sources import REQUIRED as HOST_REQUIRED,freeze_host_sources
+from retention.checkpoint_retention_sources import freeze_host_sources as freeze_checkpoint_publisher_sources
 from training_execution.sustained_sources import REQUIRED as PACKAGE_REQUIRED,SNAPSHOT_TARGET
 class ControllerGuardTests(unittest.TestCase):
  def source_snapshot(self,root,names,store_root):
@@ -24,7 +25,7 @@ class ControllerGuardTests(unittest.TestCase):
   b.pins=self.source_snapshot(b.package,sorted(str(p.relative_to(b.package)) for p in b.package.rglob('*.py')),root/'source-snapshots')
   (b.source/'anchor-templates.json').write_text('admitted anchors');b.anchor_sha=sha(b.source/'anchor-templates.json');b.verifier_pins={str(p):sha(p) for p in b.verifier.iterdir()}
   checkout=root/'checkout' if checkout is None else checkout
-  self.checkout(checkout,b.anchor_sha);b.checkout_path=checkout;b.host_pins=freeze_host_sources(checkout,root/'host-source')
+  self.checkout(checkout,b.anchor_sha);b.checkout_path=checkout;b.host_pins=freeze_host_sources(checkout,root/'host-source');b.checkpoint_publisher_pins=freeze_checkpoint_publisher_sources(checkout,root/'checkpoint-publisher-source')
   return b
  def guard(self,b):
   with patch('training_execution.sustained_controller_backend.P',b.checkout_path),patch('training_execution.sustained_controller_backend.unique_payload_bytes',return_value=0):b.guard()
@@ -44,6 +45,21 @@ class ControllerGuardTests(unittest.TestCase):
    with patch('training_execution.sustained_controller_backend.P',root/'checkout'),patch('training_execution.sustained_controller_backend.unique_payload_bytes',return_value=0),self.assertRaises(ValueError):b.guard()
    snapshot.unlink()
    with patch('training_execution.sustained_controller_backend.P',root/'checkout'),patch('training_execution.sustained_controller_backend.unique_payload_bytes',return_value=0),self.assertRaises(FileNotFoundError):b.guard()
+ def test_guard_restores_missing_native_host_and_publisher_snapshots_from_receipts(self):
+  with tempfile.TemporaryDirectory() as temp:
+   root=Path(temp);b=self.backend(root/'run',root/'checkout')
+   original={'native':copy.deepcopy(b.pins),'host':copy.deepcopy(b.host_pins),'publisher':copy.deepcopy(b.checkpoint_publisher_pins)}
+   roots=[b.package,Path(b.host_pins['source_snapshot_root']),Path(b.checkpoint_publisher_pins['source_snapshot_root'])]
+   for materialized in roots:
+    shutil.rmtree(materialized)
+    self.assertFalse(materialized.exists())
+   with patch('training_execution.sustained_controller_backend.P',root/'checkout'),patch('training_execution.sustained_controller_backend.unique_payload_bytes',return_value=0):
+    b.guard()
+   for materialized in roots:
+    self.assertTrue(materialized.is_dir())
+   self.assertEqual(b.pins,original['native'])
+   self.assertEqual(b.host_pins,original['host'])
+   self.assertEqual(b.checkpoint_publisher_pins,original['publisher'])
  def test_changed_decoder_anchors_refused_before_stage_or_resume(self):
   with tempfile.TemporaryDirectory() as temp:
    b=self.backend(Path(temp));self.guard(b);(b.source/'anchor-templates.json').write_text('different decoder')
@@ -81,7 +97,10 @@ class ControllerGuardTests(unittest.TestCase):
    try:
     def run(command,**kwargs):
      self.assertEqual(command[:3],[os.sys.executable,'-m','retention.publish_sustained_checkpoint'])
-     self.assertEqual(kwargs['cwd'],root/'checkout')
+     self.assertIn('--host-source-receipt',command)
+     receipt_path=Path(command[command.index('--host-source-receipt')+1])
+     self.assertEqual(json.loads(receipt_path.read_text()),b.checkpoint_publisher_pins)
+     self.assertEqual(kwargs['cwd'],Path(b.checkpoint_publisher_pins['source_snapshot_root']))
      self.assertNotIn('PYTHONPATH',kwargs['env'])
      self.assertEqual(kwargs['pass_fds'],(lock.fileno(),))
      self.assertEqual(kwargs['timeout'],3600)
@@ -96,6 +115,7 @@ class ControllerGuardTests(unittest.TestCase):
     with patch('training_execution.sustained_controller_backend.C',cache),patch('training_execution.sustained_controller_backend.P',root/'checkout'),patch.object(b,'guard'),patch.dict(os.environ,{'PYTHONPATH':'unexpected'},clear=False),patch('training_execution.sustained_controller_backend.subprocess.run',side_effect=run):
      result=b.publish_and_release(record)
     self.assertEqual(result['command'][:3],[os.sys.executable,'-m','retention.publish_sustained_checkpoint'])
+    self.assertIn('--host-source-receipt',result['command'])
     self.assertEqual(result['publication_sha256'],sha(result['publication_path']))
    finally:
     lock.close()

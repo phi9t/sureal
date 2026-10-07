@@ -1,32 +1,26 @@
 load(":bazel_tests.bzl", "perception_py_test", "perception_test_name")
-load(
-    ":source_snapshot_targets.bzl",
-    "NATIVE_CACHE_RETENTION_HOST_SOURCES",
-    "SUSTAINED_CHECKPOINT_RETENTION_HOST_SOURCES",
-    "SUSTAINED_CONTROLLER_HOST_SOURCES",
-    "SUSTAINED_PILOT_RETENTION_HOST_SOURCES",
-    "SUSTAINED_RUN_SOURCE_GLOBS",
-)
+load("@rules_python//python:defs.bzl", "py_library")
 
 package(default_visibility = ["//visibility:private"])
 
-filegroup(
+py_library(
     name = "sustained-run-sources",
-    srcs = glob(SUSTAINED_RUN_SOURCE_GLOBS, exclude = ["**/__pycache__/**"]) + [
-        "//autonomy/camera:all_py",
-        "//autonomy/dataset:all_py",
-        "//autonomy/detection:all_py",
-        "//autonomy/detection/expanded_batch:all_py",
-        "//autonomy/evidence:all_py",
-        "//autonomy/evaluation:all_py",
-        "//autonomy/geometry:all_py",
-        "//autonomy/inspection:all_py",
-        "//autonomy/insula:all_py",
-        "//autonomy/range_view:all_py",
-        "//autonomy/retention:all_py",
-        "//autonomy/resources:all_py",
-        "//autonomy/segmentation:all_py",
-        "//autonomy/training_execution:all_py",
+    srcs = [],
+    deps = [
+        "//autonomy/camera:camera",
+        "//autonomy/dataset:dataset",
+        "//autonomy/detection:detection",
+        "//autonomy/detection/expanded_batch:expanded_batch",
+        "//autonomy/evidence:evidence",
+        "//autonomy/evaluation:evaluation",
+        "//autonomy/geometry:geometry",
+        "//autonomy/inspection:inspection",
+        "//autonomy/insula:insula",
+        "//autonomy/range_view:range_view",
+        "//autonomy/resources:resource_source_layer",
+        "//autonomy/retention:retention",
+        "//autonomy/segmentation:segmentation",
+        "//autonomy/training_execution:training_execution",
     ],
     visibility = ["//visibility:public"],
 )
@@ -37,27 +31,46 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
-filegroup(
+py_library(
     name = "sustained-controller-host",
-    srcs = SUSTAINED_CONTROLLER_HOST_SOURCES,
+    srcs = [],
+    deps = [
+        "//autonomy/evaluation:evaluation",
+        "//autonomy/resources:resource_source_layer",
+        "//autonomy/retention:retention",
+        "//autonomy/studies:studies",
+        "//autonomy/training_execution:training_execution",
+    ],
     visibility = ["//visibility:public"],
 )
 
-filegroup(
+py_library(
     name = "sustained-checkpoint-retention-host",
-    srcs = SUSTAINED_CHECKPOINT_RETENTION_HOST_SOURCES,
+    srcs = [],
+    deps = [
+        "//autonomy/resources:resource_source_layer",
+        "//autonomy/retention:retention",
+    ],
     visibility = ["//visibility:public"],
 )
 
-filegroup(
+py_library(
     name = "sustained-pilot-retention-host",
-    srcs = SUSTAINED_PILOT_RETENTION_HOST_SOURCES,
+    srcs = [],
+    deps = [
+        "//autonomy/resources:resource_source_layer",
+        "//autonomy/retention:retention",
+    ],
     visibility = ["//visibility:public"],
 )
 
-filegroup(
+py_library(
     name = "native-cache-retention-host",
-    srcs = NATIVE_CACHE_RETENTION_HOST_SOURCES,
+    srcs = [],
+    deps = [
+        "//autonomy/resources:resource_source_layer",
+        "//autonomy/retention:retention",
+    ],
     visibility = ["//visibility:public"],
 )
 
@@ -143,62 +156,88 @@ ARCHITECTURE_EXPERIMENT_RESEARCH_INPUTS = [
 ]
 
 filegroup(
+    name = "architecture_experiment_research_inputs",
+    srcs = ARCHITECTURE_EXPERIMENT_RESEARCH_INPUTS,
+    visibility = ["//autonomy/studies:__pkg__"],
+)
+
+filegroup(
+    name = "evaluation_commands",
+    srcs = ["//autonomy/evaluation:commands"],
+    visibility = [
+        "//autonomy/training_execution:__pkg__",
+    ],
+)
+
+py_library(
     name = "architecture_experiment_runner_snapshot",
     srcs = [
+    ],
+    data = [
         "BUILD.bazel",
-        "//autonomy/studies:architecture/experiment_runner.py",
-        "//autonomy/camera:all_py",
-        "//autonomy/dataset:all_py",
-        "//autonomy/detection:all_py",
-        "//autonomy/detection/expanded_batch:all_py",
-        "//autonomy/evidence:source_snapshot_py",
-        "//autonomy/geometry:all_py",
-        "//autonomy/inspection:all_py",
-        "//autonomy/insula:all_py",
-        "//autonomy/range_view:all_py",
-        "//autonomy/motion:all_py",
-        "//autonomy/segmentation:all_py",
+        ":architecture_experiment_research_inputs",
         "//autonomy/studies:architecture_runfiles",
-    ] + glob([
-        "pipeline/*.py",
-    ]) + ARCHITECTURE_EXPERIMENT_RESEARCH_INPUTS,
+    ],
+    deps = [
+        "//autonomy/camera:camera",
+        "//autonomy/dataset:dataset",
+        "//autonomy/detection:detection",
+        "//autonomy/detection/expanded_batch:expanded_batch",
+        "//autonomy/evidence:evidence",
+        "//autonomy/evaluation:evaluation",
+        "//autonomy/geometry:geometry",
+        "//autonomy/inspection:inspection",
+        "//autonomy/insula:insula",
+        "//autonomy/motion:motion",
+        "//autonomy/range_view:range_view",
+        "//autonomy/resources:resources",
+        "//autonomy/segmentation:segmentation",
+        "//autonomy/studies:studies",
+        "//autonomy/training_execution:training_execution",
+    ],
     visibility = ["//visibility:public"],
 )
 
 genquery(
     name = "sustained_run_sources_query",
-    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy:sustained-run-sources)) union labels("data", deps(//autonomy:sustained-run-sources))))',
-    scope = [":sustained-run-sources"],
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy/training_execution:train_sustained)) union labels("data", deps(//autonomy/training_execution:train_sustained))))',
+    scope = ["//autonomy/training_execution:train_sustained"],
 )
 
 genquery(
     name = "resource_source_layer_query",
-    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy/resources:resource_source_layer)) union labels("data", deps(//autonomy/resources:resource_source_layer))))',
-    scope = ["//autonomy/resources:resource_source_layer"],
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy/resources:execute_worker)) union labels("data", deps(//autonomy/resources:execute_worker))))',
+    scope = ["//autonomy/resources:execute_worker"],
 )
 
 genquery(
     name = "sustained_controller_host_query",
-    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy:sustained-controller-host)) union labels("data", deps(//autonomy:sustained-controller-host))))',
-    scope = [":sustained-controller-host"],
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy/training_execution:run_sustained)) union labels("data", deps(//autonomy/training_execution:run_sustained))))',
+    scope = ["//autonomy/training_execution:run_sustained"],
 )
 
 genquery(
     name = "sustained_checkpoint_retention_host_query",
-    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy:sustained-checkpoint-retention-host)) union labels("data", deps(//autonomy:sustained-checkpoint-retention-host))))',
-    scope = [":sustained-checkpoint-retention-host"],
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy/retention:publish_sustained_checkpoint)) union labels("data", deps(//autonomy/retention:publish_sustained_checkpoint))))',
+    scope = ["//autonomy/retention:publish_sustained_checkpoint"],
 )
 
 genquery(
     name = "sustained_pilot_retention_host_query",
-    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy:sustained-pilot-retention-host)) union labels("data", deps(//autonomy:sustained-pilot-retention-host))))',
-    scope = [":sustained-pilot-retention-host"],
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy/retention:publish_sustained_pilot)) union labels("data", deps(//autonomy/retention:publish_sustained_pilot))))',
+    scope = ["//autonomy/retention:publish_sustained_pilot"],
 )
 
 genquery(
     name = "native_cache_retention_host_query",
-    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy:native-cache-retention-host)) union labels("data", deps(//autonomy:native-cache-retention-host))))',
-    scope = [":native-cache-retention-host"],
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy/retention:publish_native_cache)) union labels("data", deps(//autonomy/retention:publish_native_cache))))',
+    scope = ["//autonomy/retention:publish_native_cache"],
+)
+
+genquery(
+    name = "architecture_experiment_runner_query",
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy/studies:architecture_experiment_runner)) union labels("data", deps(//autonomy/studies:architecture_experiment_runner))))',
+    scope = ["//autonomy/studies:architecture_experiment_runner"],
 )
 
 perception_py_test(
@@ -206,6 +245,7 @@ perception_py_test(
     PERCEPTION_RUNFILES,
     extra_data = [
         ":native_cache_retention_host_query",
+        ":architecture_experiment_runner_query",
         ":resource_source_layer_query",
         ":sustained_checkpoint_retention_host_query",
         ":sustained_controller_host_query",

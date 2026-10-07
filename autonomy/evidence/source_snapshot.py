@@ -535,6 +535,40 @@ def read_receipt(receipt) -> Mapping:
     return receipt
 
 
+def source_snapshot_package_root(receipt, *, package: str = "autonomy") -> Path:
+    receipt = read_receipt(receipt)
+    if not isinstance(receipt, Mapping):
+        raise ValueError("receipt object required")
+    root_value = receipt.get("source_snapshot_root")
+    if not isinstance(root_value, str) or not root_value:
+        raise ValueError("source snapshot root required")
+    root = Path(root_value)
+    if receipt.get("schema_version") == TARGET_RECEIPT_SCHEMA_VERSION:
+        safe_member_name(package)
+        if "/" in package:
+            raise ValueError("top-level source package required")
+        return root / package
+    return root
+
+
+def source_snapshot_member_path(receipt, relative: str, *, package: str = "autonomy") -> Path:
+    receipt = read_receipt(receipt)
+    if not isinstance(receipt, Mapping):
+        raise ValueError("receipt object required")
+    relative = safe_member_name(relative)
+    pins = receipt_source_pins(receipt)
+    if receipt.get("schema_version") == TARGET_RECEIPT_SCHEMA_VERSION:
+        safe_member_name(package)
+        if "/" in package:
+            raise ValueError("top-level source package required")
+        member = f"{package}/{relative}"
+    else:
+        member = relative
+    if member not in pins:
+        raise ValueError("receipt source member required: " + member)
+    return Path(receipt["source_snapshot_root"]) / member
+
+
 def receipt_snapshot_digest(receipt: Mapping) -> str:
     if "source_snapshot_sha256" not in receipt:
         raise ValueError("receipt source snapshot digest required")
@@ -653,6 +687,43 @@ def materialize_receipt_sources(
         "source_pins": pins,
         "source_files": len(pins),
     }
+
+
+def verify_or_materialize_receipt_sources(
+    receipt,
+    destination=None,
+    store: SnapshotStore | None = None,
+    *,
+    env_var: str | None = None,
+    waystone=DEFAULT_WAYSTONE,
+    runner=subprocess.run,
+    timeout: int = 90,
+) -> dict:
+    receipt = read_receipt(receipt)
+    if not isinstance(receipt, Mapping):
+        raise ValueError("receipt object required")
+    root_value = destination if destination is not None else receipt.get("source_snapshot_root")
+    if root_value is None:
+        raise ValueError("source snapshot root required")
+    root = Path(root_value)
+    resolved_store = store if store is not None else store_from_receipt(
+        receipt,
+        env_var=env_var,
+        waystone=waystone,
+        runner=runner,
+        timeout=timeout,
+    )
+    if root.exists():
+        return verify_materialized_sources(root, receipt, resolved_store)
+    return materialize_receipt_sources(
+        receipt,
+        root,
+        resolved_store,
+        env_var=env_var,
+        waystone=waystone,
+        runner=runner,
+        timeout=timeout,
+    )
 
 
 def snapshot_target_and_materialize(
