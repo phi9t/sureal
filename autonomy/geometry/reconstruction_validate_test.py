@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from pipeline.reconstruction_validate import check_coordinates
+from geometry.reconstruction_validate import check_coordinates
 
 class CoordinateValidationTests(unittest.TestCase):
     def test_independent_ray_and_wrong_extrinsic_detection(self):

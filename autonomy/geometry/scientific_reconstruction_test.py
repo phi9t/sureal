@@ -5,7 +5,7 @@ import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
 from dataset.scientific_sidecars import materialize_component
-from pipeline.scientific_reconstruction import reconstruct_scene
+from geometry.scientific_reconstruction import reconstruct_scene
 
 class ScientificReconstructionTests(unittest.TestCase):
     def fixture(self,root,*,missing_pose=False,missing_sensor=False,missing_return=False):

@@ -169,6 +169,35 @@ filegroup(
     ],
 )
 
+filegroup(
+    name = "tracer_runtime_files",
+    srcs = [
+        "requirements-tracer.lock",
+        "tracer-manifest.schema.json",
+        "tracer-report.schema.json",
+        "tracer-result.schema.json",
+        "tracer.sh",
+    ],
+    visibility = [
+        "//autonomy/dataset:__pkg__",
+    ],
+)
+
+filegroup(
+    name = "cpu_rootfs_recipe",
+    srcs = [
+        "build.sh",
+        "requirements-test-tools.in",
+        "requirements-test-tools.lock",
+        "requirements-tracer.in",
+        "requirements-tracer.lock",
+        "//autonomy/insula:cpu_rootfs_dockerfile",
+    ],
+    visibility = [
+        "//autonomy/insula:__pkg__",
+    ],
+)
+
 py_library(
     name = "architecture_experiment_runner_snapshot",
     srcs = [

@@ -15,7 +15,7 @@ from dataset.scientific_preparation import verified_sidecar_hashes
 
 HERE=Path(__file__).resolve().parents[1]
 COMPONENTS=['lidar_calibration','camera_calibration','vehicle_pose','lidar_pose','lidar_camera_projection','lidar_segmentation','lidar_box']
-CANDIDATES=['dataset/scientific-preprocess.py','dataset/scientific_component.py','dataset/scientific_sidecars.py','dataset/scientific_sidecar_validate.py','dataset/scientific_admission.py','dataset/staged_source.py','dataset/source_integrity.py','insula/staging_lease.py','dataset/sensor_records.py','dataset/scientific_preparation.py','pipeline/scientific_scene_command.py','pipeline/scientific_scene_validate.py','pipeline/scientific_reconstruction.py','dataset/scientific_sidecar_reader.py','pipeline/reconstruction_validate.py','geometry/geometry.py','geometry/geometry_foundation.py']
+CANDIDATES=['dataset/scientific-preprocess.py','dataset/scientific_component.py','dataset/scientific_sidecars.py','dataset/scientific_sidecar_validate.py','dataset/scientific_admission.py','dataset/staged_source.py','dataset/source_integrity.py','insula/staging_lease.py','dataset/sensor_records.py','dataset/scientific_preparation.py','geometry/scientific_scene_command.py','geometry/scientific_scene_validate.py','geometry/scientific_reconstruction.py','dataset/scientific_sidecar_reader.py','geometry/reconstruction_validate.py','geometry/geometry.py','geometry/geometry_foundation.py']
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--scene',required=True);parser.add_argument('--output',type=Path,required=True)
@@ -91,8 +91,8 @@ def reconstruct(admitted,paths,scene,destination,candidate,cache,root,lock,retai
     if budget<=sidecar_bytes:raise ValueError('no remaining reconstruction capacity')
     started=datetime.now(timezone.utc).isoformat();tick=time.monotonic();checks=[]
     with staged_source(record,cache,retained_bytes=retained,limit_bytes=raw_limit) as (source,transfer):
-        stages=[('reconstruct',destination,['python','-m','pipeline.scientific_scene_command','reconstruct','/source/source.parquet','/opt','/mnt/trusted-sidecar-hashes.json','/outputs/points',str(budget)]),
-                ('independent-scene-check',checked,['python','-m','pipeline.scientific_scene_command','validate','/source/source.parquet','/opt','/mnt/trusted-sidecar-hashes.json','/srv','/outputs/check.json'])]
+        stages=[('reconstruct',destination,['python','-m','geometry.scientific_scene_command','reconstruct','/source/source.parquet','/opt','/mnt/trusted-sidecar-hashes.json','/outputs/points',str(budget)]),
+                ('independent-scene-check',checked,['python','-m','geometry.scientific_scene_command','validate','/source/source.parquet','/opt','/mnt/trusted-sidecar-hashes.json','/srv','/outputs/check.json'])]
         for name,out,command in stages:
             plan=launch_plan(root,HERE,source.parent,out,command);i=plan.index('--')
             extra=['--ro-bind',str(prepared),'/opt','--ro-bind',str(base),'/mnt']

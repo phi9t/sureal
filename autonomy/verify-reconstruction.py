@@ -11,15 +11,14 @@ import tempfile
 import time
 
 HERE=Path(__file__).resolve().parent
-sys.path.insert(0,str(HERE))
 from insula.m0_receipt import validate_receipt
 ROOT=Path.home()/'.cache/waystone/waymo-perception/insula/rootfs-v2'
 M0=ROOT.parent/'m0-live-20260930-c'
 SOURCE=Path.home()/'.cache/waystone/waymo-perception/slices/validation-two-scenes-20260929'
 FILES=['verify-reconstruction.py','enter.sh','insula/entry.py','insula/runtime_identity.py',
        'geometry/geometry.py','geometry/geometry_foundation.py','dataset/sensor_records.py',
-       'pipeline/reconstruction_probe.py','pipeline/reconstruction_validate.py','pipeline/tracer.py',
-       'pipeline/tracer_contracts.py','geometry/geometry_test.py','dataset/sensor_records_test.py','tests/test_reconstruction_validation.py']
+       'geometry/reconstruction_probe.py','geometry/reconstruction_validate.py','dataset/tracer.py',
+       'dataset/tracer_contracts.py','geometry/geometry_test.py','dataset/sensor_records_test.py','geometry/reconstruction_validate_test.py']
 
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 
@@ -36,12 +35,12 @@ def main():
     with tempfile.TemporaryDirectory(prefix='.m3-stage-',dir=destination.parent) as tmp:
         stage=Path(tmp);records=[]
         base=[str(HERE/'enter.sh'),'--source',str(SOURCE),'--output',str(stage),'--offline','--','python']
-        commands=[('producer',['-m','pipeline.reconstruction_probe','/source','/outputs/reconstruction','--full']),
-                  ('validator',['-m','pipeline.reconstruction_validate','/source','/outputs/reconstruction'])]
+        commands=[('producer',['-m','geometry.reconstruction_probe','/source','/outputs/reconstruction','--full']),
+                  ('validator',['-m','geometry.reconstruction_validate','/source','/outputs/reconstruction'])]
         commands +=[
             ('ray-fixtures',['-m','unittest','discover','-s','/experiment/geometry','-p','geometry_test.py','-v']),
             ('identity-fixtures',['-m','unittest','discover','-s','/experiment/dataset','-p','sensor_records_test.py','-v']),
-            ('validation-fixtures',['-m','unittest','discover','-s','/experiment/tests','-p','test_reconstruction_validation.py','-v']),
+            ('validation-fixtures',['-m','unittest','discover','-s','/experiment/geometry','-p','reconstruction_validate_test.py','-v']),
         ]
         for name,tail in commands:
             command=base+tail;p=subprocess.run(command,text=True,capture_output=True)

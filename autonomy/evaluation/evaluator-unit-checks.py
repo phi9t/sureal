@@ -1,8 +1,8 @@
 """Evaluator boundary fixtures inside locked CPU Insula; host setup tests separate."""
 import json,unittest
 from pathlib import Path
-discoveries=[('/experiment/tests','test_native_detection_adapter.py'),
-             ('/experiment/tests','test_detection_export.py'),
+discoveries=[('/experiment/detection','native_detection_adapter_test.py'),
+             ('/experiment/detection','detection_export_test.py'),
              ('/experiment/segmentation','segmentation_export_test.py'),
              ('/experiment/camera','camera_semantic_scoring_test.py'),
              ('/experiment/segmentation','nlz_overlap_test.py')]

@@ -25,6 +25,15 @@ INSULA_VISIBILITY = [
     "//autonomy/training_execution:__pkg__",
 ]
 
+TEST_EXTRA_DATA = {
+    "bazel_wrapper_test.py": [
+        "//:MODULE.bazel",
+        "//:MODULE.bazel.lock",
+        "//:bazelw",
+    ],
+    "cpu_rootfs_build_test.py": ["//autonomy:cpu_rootfs_recipe"],
+}
+
 package(default_visibility = ["//visibility:private"])
 
 py_library(
@@ -63,10 +72,17 @@ filegroup(
     visibility = ["//autonomy:__pkg__"],
 )
 
+filegroup(
+    name = "cpu_rootfs_dockerfile",
+    srcs = ["Dockerfile"],
+    visibility = ["//autonomy:__pkg__"],
+)
+
 [
     py_test(
         name = test[:-3],
         srcs = [test],
+        data = TEST_EXTRA_DATA.get(test, []),
         deps = [":insula"],
         legacy_create_init = 0,
         size = "small",
