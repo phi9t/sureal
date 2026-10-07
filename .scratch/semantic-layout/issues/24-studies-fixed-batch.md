@@ -4,7 +4,7 @@
 
 **Blocked by:** 17 (Concept batch: `detection` variants and GPU workers), 18 (Concept batch: `segmentation`), 19 (Concept batch: `range_view`)
 
-**Status:** ready-for-human
+**Status:** done
 
 - [x] Scope: the fixed-batch overfit suite, the expanded suite, and the architecture catalog, runner and harness
 - [x] Reusable models, catalogs, packing, contracts and losses move to their concept; the experiment runner stays a runnable, tested tool
@@ -71,3 +71,60 @@ Verification evidence:
 Unresolved limitation:
 
 - `python3 -m unittest tests.test_publication_audit` exited 1 after running 30 tests, with one remaining failure at `tests/test_publication_audit.py:465`: the read-only test still asserts `autonomy/architecture/ideas/residual_bev.md` is a living markdown path. The corrected semantic location is `autonomy/studies/architecture/ideas/residual_bev.md`. Adding a compatibility living document under the old `autonomy/architecture` path would conflict with the approved semantic-layout disposition, and `tests/test_publication_audit.py` is outside this worker's allowed edit paths. The standalone publication audit script passes.
+
+### 2026-10-07 parent integration acceptance
+
+Accepted the reviewed implementation `903fb2b`, baseline test-entrypoint repair
+`7e6a766`, and study test-entrypoint repair `bdec9a2` together at `a5d9a92`.
+Independent spec and standards reviews found no remaining blockers. The study
+repair worker exited 0 with a CLEAN supervisor verdict and a clean tree at the
+exact reviewed commit. The earlier authorized-resume candidate-moved verdict
+and baseline worker read-only `git merge-base` false positive remain preserved
+with separate parent acceptance records; neither raw verdict was rewritten.
+
+The publication assertion limitation above is resolved by `c18076a`: the test
+uses the current architecture idea path, and the explicitly dated historical
+assessment retains its original source paths. Historical source documents were
+restored byte-for-byte in `1a1bacf`; living documents use current paths.
+
+Earlier target-only passes did not establish assertion execution. An audit found
+33 direct test modules containing 130 original methods without executable test
+entrypoints. Repairs preserve those methods and their assertions, add ordinary
+entrypoints, and repair two exposed fixture/import failures. On the combined
+candidate, inspected uncached logs prove 25 restored CPU modules executed 94
+methods and 31 restored modules in the broader GPU diagnostic executed 120
+methods, all passing without skips. The latter includes two new symlink tests.
+Two live-gated modules containing 12 original methods remain explicitly unrun
+until live admission; they are not counted as passed.
+
+Combined verification at `a5d9a92`:
+
+- `./bazelw test --nocache_test_results --test_output=errors //autonomy/...`:
+  exit 0, 150 fresh target passes.
+- `./bazelw test --config=cuda --test_output=errors //autonomy/...`: exit 0,
+  28 cached GPU-tagged target passes. All 28 also passed fresh in the broader
+  diagnostic immediately before this check.
+- The additional diagnostic using
+  `--config=cuda --test_tag_filters=-requires_live_gate,-known_failure
+  --nocache_test_results --test_output=errors //autonomy/...` exited nonzero:
+  172/178 passed. Six CPU-only targets require pytest/jsonschema absent from GPU
+  rootfs v6. This failure is retained, not relabeled a pass. Ticket 28 explicitly
+  specifies the default CPU suite plus the GPU-tagged CUDA suite; the diagnostic
+  does not alter that approved runtime split or justify changing locked images.
+- `python3 -m unittest tests.test_publication_audit`: exit 0, 30 tests passed.
+- `python3 scripts/publication_audit.py --root .`: exit 0, no errors.
+- `python3 autonomy/tools/layers.py`: exit 0, zero problems across 15 layers.
+- `git diff --check` and `git diff --exit-code 247ae52 -- autonomy/research`:
+  exit 0.
+- Study repair worker additionally ran uncached `./bazelw test //parallax/...`:
+  exit 0, 17/17 passed. Parallax and wrapper inputs remain unchanged.
+
+Detailed command logs, exact reviewed blob maps, testcase-count audit, original
+supervisor verdicts, runtime-scope audit and parent acceptance records are retained
+under `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/` in
+`studies-verification/`, `test-execution-*-review.json`,
+`24-parent-candidate-acceptance.json`, `test-execution-parent-acceptance.json`,
+`study-test-execution-parent-review.json`, and `gpu-runtime-scope.json`.
+The retained-receipt pin impact above remains expected and is not a successful
+readmission. Production snapshot caller wiring and live readmission remain
+separate tickets 26 and 27. No research experiment was launched by this ticket.
