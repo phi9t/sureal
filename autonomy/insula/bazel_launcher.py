@@ -7,8 +7,9 @@ import sys
 from pathlib import Path
 
 
-REPO = Path(__file__).resolve().parent
-AUTONOMY = REPO / "autonomy"
+_THIS_FILE = Path(__file__).resolve()
+AUTONOMY = _THIS_FILE.parents[1]
+REPO = AUTONOMY.parent
 AUTONOMY_CACHE = Path.home() / ".cache/waystone/waymo-perception"
 DEFAULT_ROOTFS = AUTONOMY_CACHE / "insula/rootfs-v4"
 GPU_ROOTFS = AUTONOMY_CACHE / "gpu-rootfs-v6"
@@ -22,11 +23,20 @@ GPU_DRIVER_PREFIXES = (
     "libnvidia-nvvm.so",
 )
 DEFAULT_GPU_DRIVER_LIBRARY_DIRS = (Path("/usr/lib/x86_64-linux-gnu"),)
-
-# This root launcher imports component-local helpers before Bazel sets runfiles.
-sys.path.insert(0, str(AUTONOMY))
+ORIGINAL_CWD_FLAG = "--__sureal-bazelw-original-cwd"
 from insula.runtime_identity import rootfs_identity
 from insula.sandbox_plan import compose_bwrap_plan
+
+
+def restore_original_cwd(argv):
+    if argv is None:
+        argv = sys.argv[1:]
+    else:
+        argv = list(argv)
+    if len(argv) >= 2 and argv[0] == ORIGINAL_CWD_FLAG:
+        os.chdir(argv[1])
+        argv = argv[2:]
+    return argv
 
 
 def default_lock(rootfs):
@@ -239,7 +249,7 @@ def sandbox_plan(rootfs, cache, arguments, update_lock=False):
 
 
 def parse(argv):
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(prog="bazelw", description=__doc__)
     parser.add_argument("--rootfs", type=Path, default=None)
     parser.add_argument("--lock", type=Path, default=None)
     parser.add_argument("--cache", type=Path, default=Path(os.environ.get("SUREAL_BAZEL_CACHE", DEFAULT_CACHE)))
@@ -271,6 +281,7 @@ def parse(argv):
 
 
 def main(argv=None):
+    argv = restore_original_cwd(argv)
     args = parse(argv)
     try:
         lock = read_lock(args.lock)

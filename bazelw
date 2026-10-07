@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+"""Launch the component-local Bazel wrapper module."""
+import os
+import sys
+from pathlib import Path
+
+
+ORIGINAL_CWD_FLAG = "--__sureal-bazelw-original-cwd"
+
+
+def main():
+    repo = Path(__file__).resolve().parent
+    original_cwd = Path.cwd()
+    os.chdir(repo / "autonomy")
+    os.execvp(
+        sys.executable,
+        [
+            sys.executable,
+            "-m",
+            "insula.bazel_launcher",
+            ORIGINAL_CWD_FLAG,
+            str(original_cwd),
+            *sys.argv[1:],
+        ],
+    )
+
+
+if __name__ == "__main__":
+    main()
