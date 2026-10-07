@@ -4,7 +4,7 @@
 
 **Blocked by:** 16 (Concept batch: `detection` core)
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] Scope: the range frontend, the range-pillar hybrid, sparse windows and sparse window attention, and range fusion
 - [x] Every module in scope lives in its concept directory and is imported by package path; no `sys.path` manipulation remains in the moved code
