@@ -21,7 +21,7 @@ not import each other. The order is declared in
 | 7 | `advanced/` | Expanded fixed-batch architecture suite |
 | 6 | `tier1/` | Fixed-batch architecture overfit suite |
 | 5 | `architecture/` | Experiment catalog and the `architecture.py` runner |
-| 4 | `gpu/`, `evaluation/`, `association/`, `explorer/`, `motion-evaluation/`, `viewer/` | Model variants and GPU workers, native metric contracts, standalone tools |
+| 4 | `gpu/`, `evaluation/`, `association/`, `explorer/`, `motion/`, `viewer/` | Model variants and GPU workers, native metric contracts, standalone tools |
 | 3 | `pipeline/` | Readers, encoders, detector and archives |
 | 2 | `geometry/` | Coordinate transforms, projection visibility and native range-grid shape math |
 | 1 | `insula/` | Sandbox entry, rootfs identity, M0 receipt checks and staging leases |

@@ -1,20 +1,25 @@
 #!/usr/bin/env python3
 """Locked offline execution of pinned upstream Motion metric regressions."""
-import hashlib,json,resource,subprocess,tempfile,time
+import json,resource,subprocess,tempfile,time
 from datetime import datetime,timezone
 from pathlib import Path
+from evidence.source_snapshot import file_sha256 as sha
+from evidence.source_snapshot import require_regular_file
 from insula.runtime_identity import rootfs_identity,verify_rootfs
 from insula.entry import launch_plan
 HERE=Path(__file__).resolve().parent
+AUTONOMY=HERE.parent
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
 ROOT=CACHE/'motion-cli-rootfs-v2'
 PARENT='sha256:84fb83dd874d0cfff8e9ee3df0759d89f9ad85e9538c0071c9eb606a13d8c233'
-def sha(p):
- with p.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+def regular_children(path):
+ for candidate in path.iterdir():
+  try:yield require_regular_file(candidate)
+  except ValueError:pass
 def main():
  import argparse
  parser=argparse.ArgumentParser();parser.add_argument('output',type=Path);args=parser.parse_args()
- recipes={n:sha(HERE/'motion-evaluation/cli'/n) for n in ['Dockerfile','CMakeLists.txt','motion_metrics_main.cc']}
+ recipes={n:sha(HERE/'cli'/n) for n in ['Dockerfile','CMakeLists.txt','motion_metrics_main.cc']}
  lockpath=Path(str(ROOT)+'.lock.json')
  if ROOT.exists():
   lock=json.loads(lockpath.read_text());verify_rootfs(ROOT,lock['rootfs_sha256'])
@@ -31,13 +36,13 @@ def main():
    finally:subprocess.run(['docker','rm',cid],check=True,capture_output=True)
    lock={'schema_version':1,'image_id':image,'parent_image_id':PARENT,'upstream_commit':parent['upstream_commit'],'rootfs_sha256':rootfs_identity(stage),'recipe_hashes':recipes};stage.rename(ROOT);lockpath.write_text(json.dumps(lock,indent=2)+'\n')
  out=args.output.resolve();out.mkdir(parents=True,exist_ok=False);started=datetime.now(timezone.utc).isoformat();tick=time.monotonic();checks=[]
- commands=[('analytic-fixtures',['python','-m','unittest','discover','-s','tests','-p','test_motion_native_cli.py','-v']),('dependencies',['python','-c',"import importlib.util,subprocess; assert importlib.util.find_spec('tensorflow') is None; x=subprocess.check_output(['ldd','/motion-cli-build/compute_motion_metrics'],text=True); assert 'tensorflow' not in x.lower(); print(x)"])]
+ commands=[('analytic-fixtures',['python','-m','unittest','discover','-s','motion/cli','-p','motion_native_cli_test.py','-v']),('dependencies',['python','-c',"import importlib.util,subprocess; assert importlib.util.find_spec('tensorflow') is None; x=subprocess.check_output(['ldd','/motion-cli-build/compute_motion_metrics'],text=True); assert 'tensorflow' not in x.lower(); print(x)"])]
  for name,cmd in commands:
-  plan=launch_plan(ROOT,HERE,HERE,out,cmd);r=subprocess.run(plan,capture_output=True,text=True);(out/(name+'.log')).write_text(r.stdout+r.stderr);checks.append({'name':name,'command':plan,'exit_code':r.returncode})
+  plan=launch_plan(ROOT,AUTONOMY,AUTONOMY,out,cmd);r=subprocess.run(plan,capture_output=True,text=True);(out/(name+'.log')).write_text(r.stdout+r.stderr);checks.append({'name':name,'command':plan,'exit_code':r.returncode})
   if r.returncode:raise RuntimeError(r.stderr)
   print('PASS',name,flush=True)
  for n,h in recipes.items():
-  if sha(HERE/'motion-evaluation/cli'/n)!=h:raise ValueError('Motion recipe changed')
- receipt={'status':'native Motion CLI expanded analytic fixtures passed live; full parity and ingestion remain open','started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-tick,'peak_child_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'checks':checks,'runtime_lock':lock,'verifier_sha256':sha(Path(__file__)),'test_sha256':sha(HERE/'tests/test_motion_native_cli.py'),'artifacts':{p.name:sha(p) for p in out.iterdir() if p.is_file()}}
+  if sha(HERE/'cli'/n)!=h:raise ValueError('Motion recipe changed')
+ receipt={'status':'native Motion CLI expanded analytic fixtures passed live; full parity and ingestion remain open','started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-tick,'peak_child_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'checks':checks,'runtime_lock':lock,'verifier_sha256':sha(Path(__file__)),'test_sha256':sha(HERE/'cli/motion_native_cli_test.py'),'artifacts':{p.name:sha(p) for p in regular_children(out)}}
  (out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print('PASS native Motion regression receipt',out,flush=True)
 if __name__=='__main__':main()

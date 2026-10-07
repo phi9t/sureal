@@ -1,7 +1,6 @@
-import pathlib,json,hashlib,copy,time,resource
+import pathlib,json,copy,time,resource
+from evidence.source_snapshot import file_sha256 as sha
 start=time.monotonic();base=pathlib.Path('/source')
-def sha(path):
- with pathlib.Path(path).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
 def validate(pub,original,expected,check_local=True):
  if not pub['manifest_readback_exact'] or pub['chunk_limit_bytes']!=32*1024**2:raise ValueError('readback/chunk admission')
  for key in ['chunks','source_sha256','parent_receipts','runtime_lock','source_pins','tool_pins','hdfs_prefix']:

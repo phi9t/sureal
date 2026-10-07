@@ -3,7 +3,7 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
-import test_motion_native_cli as single_cli
+from motion.cli import motion_native_cli_test as single_cli
 
 BINARY='/outputs/pooled-build/compute_motion_metrics_pooled'
 

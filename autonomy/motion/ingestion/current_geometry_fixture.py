@@ -1,6 +1,6 @@
 import pathlib,json,csv,time,resource,importlib.util
 import numpy as np
-from delta_components import decode_components
+from motion.ingestion.delta_components import decode_components
 from geometry.geometry import range_to_points
 from geometry.geometry_foundation import inverse,transform
 assert importlib.util.find_spec('tensorflow') is None

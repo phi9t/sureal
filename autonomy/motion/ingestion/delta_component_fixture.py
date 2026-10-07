@@ -1,6 +1,6 @@
 import pathlib,json,csv,subprocess,time,resource,sys,importlib.util
 import numpy as np
-from delta_components import decode_components
+from motion.ingestion.delta_components import decode_components
 assert importlib.util.find_spec('tensorflow') is None
 start=time.monotonic();records=[]
 def digest(data):return int(subprocess.run(['/experiment/hash'],input=data,capture_output=True,check=True).stdout)

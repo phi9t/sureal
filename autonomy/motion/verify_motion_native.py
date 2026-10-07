@@ -1,20 +1,25 @@
 #!/usr/bin/env python3
 """Locked offline execution of pinned upstream Motion metric regressions."""
-import hashlib,json,resource,subprocess,tempfile,time
+import json,resource,subprocess,tempfile,time
 from datetime import datetime,timezone
 from pathlib import Path
+from evidence.source_snapshot import file_sha256 as sha
+from evidence.source_snapshot import require_regular_file
 from insula.runtime_identity import rootfs_identity,verify_rootfs
 from insula.entry import launch_plan
 HERE=Path(__file__).resolve().parent
+AUTONOMY=HERE.parent
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
 ROOT=CACHE/'motion-metrics-rootfs'
 PARENT='sha256:c0018cf57e482c6a9e6623ea32f29c6039f22f5dafb0f3311bad6d411a7bb135'
-def sha(p):
- with p.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+def regular_children(path):
+ for candidate in path.iterdir():
+  try:yield require_regular_file(candidate)
+  except ValueError:pass
 def main():
  import argparse
  parser=argparse.ArgumentParser();parser.add_argument('output',type=Path);args=parser.parse_args()
- recipes={n:sha(HERE/'motion-evaluation'/n) for n in ['Dockerfile','CMakeLists.txt']}
+ recipes={n:sha(HERE/n) for n in ['Dockerfile','CMakeLists.txt']}
  lockpath=Path(str(ROOT)+'.lock.json')
  if ROOT.exists():
   lock=json.loads(lockpath.read_text());verify_rootfs(ROOT,lock['rootfs_sha256'])
@@ -34,7 +39,7 @@ def main():
  commands=[(n,['/motion-build/'+n+'_test','--gtest_output=json:/outputs/'+n+'.json']) for n in ['motion_metrics','motion_metrics_utils']]
  commands.append(('dependencies',['python','-c',"import importlib.util,subprocess; assert importlib.util.find_spec('tensorflow') is None; [(lambda x: (print(x),exec(\"assert 'tensorflow' not in x.lower()\")))(subprocess.check_output(['ldd','/motion-build/'+n+'_test'],text=True)) for n in ['motion_metrics','motion_metrics_utils']]"]))
  for name,cmd in commands:
-  plan=launch_plan(ROOT,HERE,HERE,out,cmd);r=subprocess.run(plan,capture_output=True,text=True);(out/(name+'.log')).write_text(r.stdout+r.stderr);checks.append({'name':name,'command':plan,'exit_code':r.returncode})
+  plan=launch_plan(ROOT,AUTONOMY,AUTONOMY,out,cmd);r=subprocess.run(plan,capture_output=True,text=True);(out/(name+'.log')).write_text(r.stdout+r.stderr);checks.append({'name':name,'command':plan,'exit_code':r.returncode})
   if r.returncode:raise RuntimeError(r.stderr)
   print('PASS',name,flush=True)
  for name in ['motion_metrics','motion_metrics_utils']:
@@ -44,7 +49,7 @@ def main():
    for test in suite['testsuite']:
     if test['status']!='RUN' or test['result']!='COMPLETED' or test.get('failures'):raise ValueError('skipped/failed native regression')
  for n,h in recipes.items():
-  if sha(HERE/'motion-evaluation'/n)!=h:raise ValueError('Motion recipe changed')
- receipt={'status':'pinned upstream Motion regression suites passed live; ingestion/analytic parity remain open','started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-tick,'peak_child_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'checks':checks,'runtime_lock':lock,'verifier_sha256':sha(Path(__file__)),'artifacts':{p.name:sha(p) for p in out.iterdir() if p.is_file()}}
+  if sha(HERE/n)!=h:raise ValueError('Motion recipe changed')
+ receipt={'status':'pinned upstream Motion regression suites passed live; ingestion/analytic parity remain open','started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-tick,'peak_child_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'checks':checks,'runtime_lock':lock,'verifier_sha256':sha(Path(__file__)),'artifacts':{p.name:sha(p) for p in regular_children(out)}}
  (out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print('PASS native Motion regression receipt',out,flush=True)
 if __name__=='__main__':main()

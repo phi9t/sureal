@@ -11,6 +11,7 @@ EVIDENCE_VISIBILITY = [
     "//autonomy/detection:__pkg__",
     "//autonomy/geometry:__pkg__",
     "//autonomy/insula:__pkg__",
+    "//autonomy/motion:__pkg__",
     "//autonomy/segmentation:__pkg__",
 ]
 

@@ -4,7 +4,7 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
-from test_motion_native_cli import MotionNativeCliTests
+from motion.cli.motion_native_cli_test import MotionNativeCliTests
 
 
 class MotionJointCliTests(unittest.TestCase):

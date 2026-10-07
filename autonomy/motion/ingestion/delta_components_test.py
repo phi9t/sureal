@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from delta_components import decode_components
+from motion.ingestion.delta_components import decode_components
 class DeltaTests(unittest.TestCase):
  def test_channel_major_cross_channel_delta_and_zero_leading_run(self):
   out=decode_components([2,2,2],[.5,2],[0,1,2,1,1,1,1,1],[2,0,-5,7]);np.testing.assert_array_equal(out,np.array([[[0,-6],[1,0]],[[1,8],[0,0]]],dtype=float))
