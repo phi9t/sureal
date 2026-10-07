@@ -5,8 +5,8 @@ import numpy as np
 import torch
 from detection.pillar_detector import PillarDetector
 from detection.detector_loss import detector_loss
-from gpu.norm_variants import configure_norm
-from gpu.architecture_variants import configure_architecture
+from detection.norm_variants import configure_norm
+from detection.architecture_variants import configure_architecture
 assert importlib.util.find_spec('tensorflow') is None
 assert torch.cuda.is_available() and torch.cuda.device_count()==1
 manifest=json.loads(Path('/tmp/inputs/manifest.json').read_text())

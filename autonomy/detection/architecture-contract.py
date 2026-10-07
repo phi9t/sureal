@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 import torch
 from detection.pillar_detector import PillarDetector
-from gpu.norm_variants import configure_norm
-from gpu.architecture_variants import configure_architecture,ResidualUnit
+from detection.norm_variants import configure_norm
+from detection.architecture_variants import configure_architecture,ResidualUnit
 
 def make():
  torch.manual_seed(17)

@@ -1,6 +1,5 @@
 SUSTAINED_RUN_SOURCE_GLOBS = [
     "cohort/**/*.py",
-    "gpu/**/*.py",
     "pipeline/**/*.py",
     "tier1/**/*.py",
 ]

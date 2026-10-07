@@ -1,5 +1,5 @@
 import numpy as np
-from gpu.scored_proposals_v2 import decode_scored_proposals
+from detection.scored_proposals_v2 import decode_scored_proposals
 from detection.detector_decode import decode_proposals
 anchors=np.array([[0,0,0,2,2,2,0],[10,0,0,2,2,2,0],[20,0,0,2,2,2,0]],float)
 logits=np.array([[5,-5,-5,-5],[-100,-100,-100,-100],[4,-5,-5,-5]],float);boxes=np.zeros((3,7));directions=np.array([[3,-3]]*3,float)

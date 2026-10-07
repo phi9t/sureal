@@ -2,7 +2,7 @@
 import torch
 from torch import nn
 from detection.pillar_encoder import decorate,scatter
-from gpu.norm_variants import PointChannelLayerNorm
+from detection.norm_variants import PointChannelLayerNorm
 
 class DeepPillar(nn.Module):
  def __init__(self,encoder):

@@ -14,7 +14,7 @@ def verify_producer():
   for path,h in frame['sha256'].items():assert sha(native/frame['relative_directory']/path)==h,path
 verify_producer()
 verify_rootfs(cache/'gpu-rootfs',receipt['runtime_lock']['rootfs_sha256']);base=cache/'insula'/('architecture-'+variant+'-checkpoint-audit-strict-v2');base.mkdir();out=base/'output';out.mkdir()
-command=receipt['checks'][0]['command'].copy();command=[str(out) if x==str(cache/'scientific-processing'/('architecture-'+variant+'-v1')) else '/experiment/gpu/audit-followup-checkpoint.py' if x=='/experiment/gpu/native-followup-learning-curve.py' else x for x in command];i=command.index('--');command[i:i]=['--ro-bind',str(cache/'scientific-processing'/('architecture-'+variant+'-v1')),'/tmp/retained'];worker=code/'gpu/audit-followup-checkpoint.py';digest=sha(worker)
+command=receipt['checks'][0]['command'].copy();command=[str(out) if x==str(cache/'scientific-processing'/('architecture-'+variant+'-v1')) else '/experiment/detection/audit-followup-checkpoint.py' if x in ['/experiment/gpu/native-followup-learning-curve.py','/experiment/detection/native-followup-learning-curve.py'] else x for x in command];i=command.index('--');command[i:i]=['--ro-bind',str(cache/'scientific-processing'/('architecture-'+variant+'-v1')),'/tmp/retained'];worker=code/'detection/audit-followup-checkpoint.py';digest=sha(worker)
 run=subprocess.run(command,capture_output=True,text=True,timeout=120);(out/'live.log').write_text(run.stdout+run.stderr);print(run.stdout+run.stderr);assert run.returncode==0 and sha(worker)==digest
 verify_producer()
 previous=code/('research/architecture-'+variant+'-checkpoint-audit-verified.json')

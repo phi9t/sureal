@@ -19,7 +19,7 @@ def main():
   assert run.is_dir();source=run/'source';package=source/'experiment';original_metadata=json.loads((run/'run.json').read_text());pins=original_metadata['source_sha256'];assert all(sha(source/p)==h for p,h in pins.items())
   version=1
   while (run/f'replay-control-v{version}').exists():version+=1
-  override=run/f'replay-control-v{version}';override.mkdir();shutil.copy(P/'gpu/checkpoint_values.py',override/'checkpoint_values.py');shutil.copy(P/'tier1/state_contract.py',override/'state_contract.py')
+  override=run/f'replay-control-v{version}';override.mkdir();shutil.copy(P/'detection/checkpoint_values.py',override/'checkpoint_values.py');shutil.copy(P/'tier1/state_contract.py',override/'state_contract.py')
   fixed=(package/'tier1/train.py').read_text().replace('from tier1.models import','from checkpoint_values import same_tensor_values\nfrom tier1.models import').replace('assert torch.equal(a,b)','assert same_tensor_values(a,b)');(override/'train.py').write_text(fixed);override_pins={str(p):sha(p) for p in override.iterdir()};shutil.copy(Path(__file__),override/'driver.py');override_pins[str(override/'driver.py')]=sha(override/'driver.py');(run/f'replay-control-identity-v{version}.json').write_text(json.dumps({'original_metadata_sha256':sha(run/'run.json'),'override_source_sha256':override_pins,'scope':'placement-neutral exact Adam/model comparison; model/optimizer execution unchanged'},indent=2))
  else:
   run.mkdir();source=run/'source';source.mkdir();package=source/'experiment';package.mkdir()

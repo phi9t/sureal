@@ -4,10 +4,10 @@ p=Path(__file__).with_name('experiment_runner.py');spec=importlib.util.spec_from
 class RunnerTests(unittest.TestCase):
  def write_runner_fixture(self,repo):
   package_root=repo/'autonomy';here=package_root/'architecture'
-  for path in [package_root/'pipeline',package_root/'gpu',package_root/'research',here/'harness',repo/'docs/superpowers/specs']:
+  for path in [package_root/'pipeline',package_root/'detection',package_root/'research',here/'harness',repo/'docs/superpowers/specs']:
    path.mkdir(parents=True)
   (package_root/'pipeline/module.py').write_text('pass\n')
-  (package_root/'gpu/worker.py').write_text('pass\n')
+  (package_root/'detection/worker.py').write_text('pass\n')
   (package_root/'research/overfit-native-cache-progress.json').write_text('{"admitted_frames":16,"selected_frames":16,"frame_evidence":{}}\n')
   (package_root/'research/unrelated-retained-evidence.json').write_text('not a run input\n')
   (repo/'docs/superpowers/specs/2026-10-02-perception-architecture-study-design.md').write_text('# spec\n')
@@ -58,6 +58,13 @@ class RunnerTests(unittest.TestCase):
    p=Path(tmp)/'worker.py';p.write_text('worker')
    receipt={'artifacts':{},'worker_sha256':module.sha(p),'checks':[{'exit_code':0,'command':['--ro-bind',str(p),'/tmp/worker.py','--','python','/tmp/worker.py']}]}
    module.verify_receipt(receipt,Path(tmp))
+ def test_source_worker_hashes_accept_detection_and_legacy_gpu_paths(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   package=Path(tmp)/'autonomy';(package/'detection').mkdir(parents=True);(package/'gpu').mkdir()
+   for area in ['detection','gpu']:
+    worker=package/area/'worker.py';worker.write_text(area)
+    receipt={'artifacts':{},'worker_sha256':module.sha(worker),'checks':[{'exit_code':0,'command':['python','/experiment/'+area+'/worker.py']}]}
+    module.verify_receipt(receipt,package)
  def test_namespacing_changes_receipts_but_not_model_variant(self):
   source="variant=sys.argv[1];assert variant in ['residual_bev']\nevidence=code/('research/architecture-'+variant+'-execution-verified.json')\nmanifest={'architecture_variant':variant}\n"
   patched=module.parameterize_driver(source)
@@ -118,7 +125,7 @@ class RunnerTests(unittest.TestCase):
     'autonomy/architecture/harness/audit-architecture-score-first.py':'pass\n',
     'autonomy/architecture/registry.json':(here/'registry.json').read_text(),
     'autonomy/pipeline/module.py':'pass\n',
-    'autonomy/gpu/worker.py':'pass\n',
+    'autonomy/detection/worker.py':'pass\n',
     'autonomy/research/overfit-native-cache-progress.json':'{"admitted_frames":16,"selected_frames":16,"frame_evidence":{}}\n',
    })
    class Store:
@@ -157,7 +164,7 @@ class RunnerTests(unittest.TestCase):
     'autonomy/architecture/harness/audit-architecture-score-first.py':'pass\n',
     'autonomy/architecture/registry.json':(here/'registry.json').read_text(),
     'autonomy/pipeline/module.py':'pass\n',
-    'autonomy/gpu/worker.py':'pass\n',
+    'autonomy/detection/worker.py':'pass\n',
     'autonomy/research/overfit-native-cache-progress.json':'{"admitted_frames":16,"selected_frames":16,"frame_evidence":{}}\n',
    })
    class Store:
@@ -191,10 +198,10 @@ class RunnerTests(unittest.TestCase):
  def test_check_snapshot_uses_recorded_snapshot_after_working_tree_changes(self):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp);directory=root/'run';directory.mkdir();cache=root/'cache'
-   archive,digest,pins=self.archive({'autonomy/gpu/worker.py':'pinned\n'})
+   archive,digest,pins=self.archive({'autonomy/detection/worker.py':'pinned\n'})
    atomic={'experiment':'residual_bev','run_id':'trial-01','label':'residual_bev--trial-01','cache_root':str(cache),'source_snapshot_sha256':digest,'source_snapshot_target':'//autonomy:architecture_experiment_runner_snapshot','source_pins':pins,'stages':[]}
    (directory/'run.json').write_text(json.dumps(atomic))
-   (root/'repo/autonomy/gpu').mkdir(parents=True);(root/'repo/autonomy/gpu/worker.py').write_text('changed after snapshot\n')
+   (root/'repo/autonomy/detection').mkdir(parents=True);(root/'repo/autonomy/detection/worker.py').write_text('changed after snapshot\n')
    verified=[]
    def fake_verify(receipt,store):
     verified.append(receipt);return {'source_snapshot_sha256':receipt['source_snapshot_sha256'],'source_pins':receipt['source_pins']}
@@ -208,7 +215,7 @@ class RunnerTests(unittest.TestCase):
  def test_check_snapshot_rejects_corrupt_snapshot_object(self):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp);directory=root/'run';cache=root/'cache';directory.mkdir()
-   archive,digest,pins=self.archive({'autonomy/gpu/worker.py':'pinned\n'})
+   archive,digest,pins=self.archive({'autonomy/detection/worker.py':'pinned\n'})
    store=cache/'insula/source-snapshots-v1';store.mkdir(parents=True);(store/digest).write_bytes(b'corrupt')
    (directory/'run.json').write_text(json.dumps({'experiment':'residual_bev','run_id':'trial-01','label':'residual_bev--trial-01','cache_root':str(cache),'source_snapshot_sha256':digest,'source_snapshot_target':'//autonomy:architecture_experiment_runner_snapshot','source_pins':pins,'stages':[]}))
    with self.assertRaisesRegex(ValueError,'snapshot digest differs'):
@@ -216,7 +223,7 @@ class RunnerTests(unittest.TestCase):
  def test_stage_receipt_verification_checks_recorded_source_snapshot(self):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp);store=root/'cache/insula/source-snapshots-v1';store.mkdir(parents=True)
-   archive,digest,pins=self.archive({'autonomy/gpu/worker.py':'pinned\n'});(store/digest).write_bytes(archive)
+   archive,digest,pins=self.archive({'autonomy/detection/worker.py':'pinned\n'});(store/digest).write_bytes(archive)
    receipt={'checks':[{'exit_code':0}],'artifacts':{},'source_snapshot_sha256':digest,'source_snapshot_target':'//autonomy:architecture_experiment_runner_snapshot','source_pins':pins}
    module.verify_receipt(receipt,root,snapshot_store=module.LocalSnapshotStore(store))
    (store/digest).write_bytes(b'corrupt')
@@ -226,7 +233,7 @@ class RunnerTests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp);cache=root/'cache';run=cache/'insula/architecture-runs/trial-01';package=run/'source/autonomy';research=package/'research';logs=run/'logs'
    research.mkdir(parents=True);logs.mkdir(parents=True)
-   archive,digest,pins=self.archive({'autonomy/gpu/worker.py':'pinned\n'})
+   archive,digest,pins=self.archive({'autonomy/detection/worker.py':'pinned\n'})
    store=cache/'insula/source-snapshots-v1';store.mkdir(parents=True);(store/digest).write_bytes(archive)
    meta={'experiment':'residual_bev','run_id':'trial-01','label':'residual_bev--trial-01','cache_root':str(cache),'source_snapshot_sha256':digest,'source_snapshot_target':module.ARCHITECTURE_SOURCE_SNAPSHOT_TARGET,'source_pins':pins,'stages':module.stages_for('residual_bev')}
    (run/'run.json').write_text(json.dumps(meta))

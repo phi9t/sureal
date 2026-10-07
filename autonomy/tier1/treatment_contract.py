@@ -6,9 +6,9 @@ import torch
 from torch import nn
 from tier1.models import build,optimizer
 from tier1.catalog import catalog
-from gpu.norm_variants import PointChannelLayerNorm
-from gpu.architecture_variants import DeepPillar,ContextPillar,ResidualUnit
-from gpu.architecture_followups import MaskedPillar,WindowAttention,CoarseMLP
+from detection.norm_variants import PointChannelLayerNorm
+from detection.architecture_variants import DeepPillar,ContextPillar,ResidualUnit
+from detection.architecture_followups import MaskedPillar,WindowAttention,CoarseMLP
 cases=catalog();torch.manual_seed(17);reference=build(cases['baseline']);results=[]
 base_conv=[m.weight.detach().clone() for m in reference.modules() if isinstance(m,nn.Conv2d) and m.kernel_size==(3,3)]
 for name,case in cases.items():

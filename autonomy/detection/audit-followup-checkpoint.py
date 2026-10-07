@@ -1,13 +1,14 @@
 """Separate native norm checkpoint/head and optimizer-state replay."""
-import json,hashlib
+import json
 from pathlib import Path
 import numpy as np
 import torch
 from detection.pillar_detector import PillarDetector
-from gpu.norm_variants import configure_norm
-from gpu.architecture_followups import configure_followup
+from detection.norm_variants import configure_norm
+from detection.architecture_followups import configure_followup
+from evidence.source_snapshot import file_sha256
 manifest=json.loads(Path('/tmp/inputs/manifest.json').read_text());variant=manifest['architecture_variant'];directory=Path('/tmp/native')/manifest['frames'][0]['relative_directory']
-for name,h in manifest['frames'][0]['sha256'].items():assert hashlib.sha256((directory/name).read_bytes()).hexdigest()==h
+for name,h in manifest['frames'][0]['sha256'].items():assert file_sha256(directory/name)==h
 torch.manual_seed(17);torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=False;torch.backends.cudnn.deterministic=True;torch.backends.cudnn.benchmark=False;torch.use_deterministic_algorithms(True)
 with np.load(directory/'observations.npz',allow_pickle=False) as data:points=torch.from_numpy(data['points'].astype(np.float32)).cuda();counts=torch.from_numpy(data['counts']).cuda();coordinates=torch.from_numpy(data['coordinates']).cuda()
 def model():return configure_followup(configure_norm(PillarDetector(nx=512,ny=512,classes=4,anchors_per_cell=8,cell_size=(.25,.25),origin=(-64.,-64.)),'gn_backbone'),variant).cuda().eval()
@@ -17,7 +18,7 @@ with torch.no_grad():
  with np.load('/tmp/retained/checkpoint-0000/heads-00.npz',allow_pickle=False) as data:
   for key,value in heads.items():np.testing.assert_array_equal(value[0].cpu().numpy(),data[key])
 checkpoint=torch.load('/tmp/retained/checkpoint.pt',weights_only=True,map_location='cpu');assert checkpoint['steps']==2000
-assert checkpoint['manifest_sha256']==hashlib.sha256(Path('/tmp/inputs/manifest.json').read_bytes()).hexdigest()
+assert checkpoint['manifest_sha256']==file_sha256('/tmp/inputs/manifest.json')
 final=model();final.load_state_dict(checkpoint['model'])
 with torch.no_grad():
  heads=final(points,counts,coordinates,batch_size=1)

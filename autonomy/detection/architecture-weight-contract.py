@@ -2,9 +2,9 @@ import json
 from pathlib import Path
 import torch
 from detection.pillar_detector import PillarDetector
-from gpu.norm_variants import configure_norm
-from gpu.architecture_variants import configure_architecture
-from gpu.architecture_weight_contract import verify_shared_weights
+from detection.norm_variants import configure_norm
+from detection.architecture_variants import configure_architecture
+from detection.architecture_weight_contract import verify_shared_weights
 
 def make():
  torch.manual_seed(17)

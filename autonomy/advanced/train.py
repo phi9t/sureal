@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import torch
 from tier1.admission import reserve_write
-from gpu.checkpoint_values import same_tensor_values
+from detection.checkpoint_values import same_tensor_values
 from advanced.models import build,objective,optimizer,deterministic,bind_observations
 from advanced.observations import load_observations
 assert importlib.util.find_spec('tensorflow') is None and torch.cuda.is_available()

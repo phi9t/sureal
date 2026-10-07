@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 import torch
 from detection.pillar_detector import PillarDetector
-from gpu.norm_variants import configure_norm
-from gpu.architecture_followups import configure_followup,WindowAttention,CoarseMLP
+from detection.norm_variants import configure_norm
+from detection.architecture_followups import configure_followup,WindowAttention,CoarseMLP
 from detection.pillar_encoder import decorate
 
 def make():

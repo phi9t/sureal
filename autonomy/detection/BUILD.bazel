@@ -10,7 +10,6 @@ DETECTION_VISIBILITY = [
     "//autonomy/architecture:__pkg__",
     "//autonomy/cohort:__pkg__",
     "//autonomy/evaluation:__pkg__",
-    "//autonomy/gpu:__pkg__",
     "//autonomy/pipeline:__pkg__",
     "//autonomy/tier1:__pkg__",
 ]
@@ -46,7 +45,11 @@ filegroup(
         tags = ["perception_unit"] + (
             ["requires_gpu"]
             if test in [
+                "architecture_followups_test.py",
+                "architecture_variants_test.py",
+                "checkpoint_values_test.py",
                 "detector_loss_test.py",
+                "norm_variants_test.py",
                 "packed_point_features_test.py",
                 "pillar_detector_test.py",
                 "pillar_encoder_test.py",

@@ -119,7 +119,6 @@ filegroup(
         "//autonomy/segmentation:all_py",
     ] + glob([
         "architecture/harness/*.py",
-        "gpu/*.py",
         "pipeline/*.py",
     ]) + ARCHITECTURE_EXPERIMENT_RESEARCH_INPUTS,
     visibility = ["//visibility:public"],

@@ -2,7 +2,7 @@
 import math
 import torch
 from torch import nn
-from gpu.architecture_variants import EncodedDetector
+from detection.architecture_variants import EncodedDetector
 
 class MaskedPillar(nn.Module):
  def __init__(self,encoder):super().__init__();self.linear,self.norm=encoder.linear,encoder.norm

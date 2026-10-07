@@ -56,8 +56,8 @@ _INPUT_HASHES = ("frames_sha256", "eligible_gt_sha256", "native_gt_sha256",
 _BASELINE_REQUIRED = {"tier1/models.py", "tier1/catalog.py",
     "detection/pillar_detector.py", "detection/detector_loss.py", "detection/anchor_grid.py",
     "detection/anchor_assignment.py", "detection/box_coding.py", "detection/detector_geometry.py",
-    "gpu/norm_variants.py", "gpu/architecture_variants.py", "gpu/architecture_followups.py",
-    "gpu/scored_proposals_v3.py"}
+    "detection/norm_variants.py", "detection/architecture_variants.py",
+    "detection/architecture_followups.py", "detection/scored_proposals_v3.py"}
 _ASSOCIATION_REQUIRED = {"contract.py", "runtime/requirements.lock",
     "runtime/Dockerfile.cpu", "runtime/Dockerfile.training"}
 
