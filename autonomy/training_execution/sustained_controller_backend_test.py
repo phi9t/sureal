@@ -68,7 +68,14 @@ class ControllerGuardTests(unittest.TestCase):
     with self.assertRaises(ValueError):b.check_stage(bad)
  def test_checkpoint_publisher_runs_as_module_without_inherited_pythonpath(self):
   with tempfile.TemporaryDirectory() as temp:
-   root=Path(temp);b=self.backend(root/'run',root/'checkout');cache=root/'cache';(cache/'insula').mkdir(parents=True);final=b.R/'final.json';final.write_text('final');record={'step':1000,'final_path':str(final),'final_sha256':sha(final)}
+   root=Path(temp);b=self.backend(root/'run',root/'checkout');cache=root/'cache';(cache/'insula').mkdir(parents=True);payload=root/'payload-root';heads=payload/'heads';heads.mkdir(parents=True);native=payload/'checkpoint.pt';native.write_text('native bytes');report=payload/'check.json';head_hashes={}
+   for index in range(16):
+    head=heads/f'heads-{index:02d}.npz';head.write_text(f'head {index}');head_hashes[head.name]=sha(head)
+   live=payload/'live.log';live.write_text('train log')
+   producer={'head_hashes':head_hashes};report.write_text(json.dumps(producer))
+   train_receipt=b.R/'train-1000-verified.json';train_receipt.write_text(json.dumps({'stage':'train-1000','artifacts':{str(native):sha(native),str(report):sha(report),str(live):sha(live),**{str(heads/name):digest for name,digest in head_hashes.items()}}}))
+   final=b.R/'final.json';final.write_text(json.dumps({'stage_receipts':{'train':{'path':str(train_receipt),'sha256':sha(train_receipt)}}}))
+   record={'step':1000,'root':str(payload),'checkpoint_sha256':sha(native),'report_sha256':sha(report),'report':producer,'final_path':str(final),'final_sha256':sha(final)}
    lock=(root/'lock').open('w')
    b.lock=lock
    try:
@@ -79,8 +86,11 @@ class ControllerGuardTests(unittest.TestCase):
      self.assertEqual(kwargs['pass_fds'],(lock.fileno(),))
      self.assertEqual(kwargs['timeout'],3600)
      directory=cache/'insula/hdfs-retention-fixture';directory.mkdir()
-     publication=directory/'verified-publication.json';publication.write_text(json.dumps({'parent_receipts':{str(final):sha(final)},'independent_admission':{'exit_code':0,'validation':{'whole_member_union_exact':True}},'publication_manifest_hdfs_uri':'hdfs://native/manifest'}))
-     release=directory/'release-completed.json';release.write_text(json.dumps({'publication_receipt_sha256':sha(publication),'released':[{'local_path':str(root/'released-native')}]},indent=2))
+     plan=[{'path':str(p.relative_to(payload)),'local_path':str(p),'sha256':sha(p),'bytes':p.stat().st_size,'archive_hdfs_uri':'hdfs://native/archive.tar.gz'} for p in sorted(payload.rglob('*')) if p.is_file()]
+     manifest={'members':[{key:entry[key] for key in ['path','sha256','bytes']} for entry in plan],'payload_bytes':sum(entry['bytes'] for entry in plan),'archive_sha256':'a'*64}
+     publication=directory/'verified-publication.json';publication.write_text(json.dumps({'parent_receipts':{str(final):sha(final)},'source_sha256':{entry['path']:entry['sha256'] for entry in plan},'chunks':[{'archive_hdfs_uri':'hdfs://native/archive.tar.gz','manifest':manifest}],'independent_admission':{'exit_code':0,'validation':{'whole_member_union_exact':True}},'publication_manifest_hdfs_uri':'hdfs://native/manifest','release_plan':plan}))
+     for entry in plan:Path(entry['local_path']).unlink()
+     release=directory/'release-completed.json';release.write_text(json.dumps({'publication_receipt_sha256':sha(publication),'released':plan},indent=2))
      class Result:returncode=0
      return Result()
     with patch('training_execution.sustained_controller_backend.C',cache),patch('training_execution.sustained_controller_backend.P',root/'checkout'),patch.object(b,'guard'),patch.dict(os.environ,{'PYTHONPATH':'unexpected'},clear=False),patch('training_execution.sustained_controller_backend.subprocess.run',side_effect=run):

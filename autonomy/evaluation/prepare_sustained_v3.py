@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 from detection.balanced import uncovered_count
 from detection.sustained_groundtruth import groundtruth_records
-from sustained.sustained_contract import validate_contract
+from detection.sustained_contract import validate_contract
 from detection.anchor_grid import anchor_grid
 from detection.scored_proposals_v3 import decode_scored_proposals as decode_proposals
 from detection.prediction_records import prediction_records

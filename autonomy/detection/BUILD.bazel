@@ -17,6 +17,11 @@ DETECTION_VISIBILITY = [
 
 package(default_visibility = ["//visibility:private"])
 
+exports_files(
+    ["sustained_contract.py"],
+    visibility = ["//autonomy:__pkg__"],
+)
+
 py_library(
     name = "detection",
     srcs = LIB_MODULES,

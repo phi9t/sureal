@@ -1,4 +1,4 @@
-from sustained.sustained_scoring_budget import DEFAULT_NATIVE_SECONDS
+from resources.sustained_scoring_budget import DEFAULT_NATIVE_SECONDS
 import importlib.util,json,math,re,subprocess,time
 from pathlib import Path
 from detection.detection_export import export_objects

@@ -11,8 +11,8 @@ from insula.runtime_identity import verify_rootfs
 from insula.entry import launch_plan
 from resources.scientific_payload import sha,unique_payload_bytes
 from resources.scientific_budget import reserve_write
-from sustained.sustained_contract import validate_contract
-from sustained.sustained_scoring_budget import stage_timeout
+from detection.sustained_contract import validate_contract
+from resources.sustained_scoring_budget import stage_timeout
 from training_execution.sustained_sources import snapshot_sources,source_paths,validate_sources
 from training_execution.sustained_stage_inputs import freeze_inputs,bind_stage_paths
 

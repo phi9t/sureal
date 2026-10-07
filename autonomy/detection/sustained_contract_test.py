@@ -1,5 +1,5 @@
 import copy,math,unittest
-from sustained.sustained_contract import validate_contract,next_checkpoint,fit_status
+from detection.sustained_contract import validate_contract,next_checkpoint,fit_status
 
 def fixture():
  frames=[{'identity':str(i),'split':'training','sha256':{'observations.npz':format(i,'064x'),'targets.npz':format(i+16,'064x'),'report.json':format(i+32,'064x')}} for i in range(16)]

@@ -6,7 +6,7 @@ REQUIRED=tuple(sorted(set(RETENTION_REQUIRED)|{
  'training_execution/run_sustained.py','training_execution/sustained_controller_backend.py',
  'training_execution/sustained_controller_sources.py','training_execution/sustained_workflow.py',
  'training_execution/sustained_control.py','training_execution/sustained_admission.py',
- 'sustained/sustained_contract.py','sustained/sustained_scoring_budget.py',
+ 'detection/sustained_contract.py','resources/sustained_scoring_budget.py',
  'training_execution/sustained_stage_inputs.py','training_execution/sustained_sources.py',
  'resources/backend.py','resources/checkpoint.py','resources/command.py',
  'resources/execute_worker.py','resources/kernel_scope.py','resources/process_lifecycle.py',

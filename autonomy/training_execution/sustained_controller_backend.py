@@ -6,10 +6,10 @@ from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
 from resources.scientific_payload import sha,unique_payload_bytes
 from resources.scientific_budget import reserve_write
-from sustained.sustained_contract import validate_contract
+from detection.sustained_contract import validate_contract
 from training_execution.sustained_sources import snapshot_sources,source_paths,validate_sources
 from training_execution.sustained_stage_inputs import freeze_inputs,bind_stage_paths
-from sustained.sustained_scoring_budget import stage_timeout
+from resources.sustained_scoring_budget import stage_timeout
 from retention.sustained_checkpoint_inventory import freeze_checkpoint_inventory
 from training_execution.sustained_admission import admit_sample
 from training_execution.sustained_controller_sources import freeze_host_sources,validate_host_sources
@@ -23,6 +23,100 @@ WORKER_ENTRIES={
  'metrics_sustained_v3.py':'/experiment/evaluation/metrics_sustained_v3.py',
  'audit_metrics_sustained_v3.py':'/experiment/evaluation/audit_metrics_sustained_v3.py',
 }
+
+def _native_release_plan(publication,release=None):
+ plan=publication.get('release_plan')
+ if plan is None and release is not None:plan=release.get('released')
+ if not isinstance(plan,list) or not plan:raise ValueError('complete native release plan required')
+ return plan
+
+def publication_matches_record(record,publication):
+ try:return publication['parent_receipts'].get(record['final_path'])==record['final_sha256']
+ except (KeyError,TypeError,AttributeError):return False
+
+def _expected_release_members(record):
+ try:
+  root=Path(record['root']);final=json.loads(Path(record['final_path']).read_text())
+  train_ref=final['stage_receipts']['train'];train=json.loads(Path(train_ref['path']).read_text())
+  if sha(train_ref['path'])!=train_ref['sha256'] or train['stage']!=f'train-{record["step"]}':
+   raise ValueError('train receipt changed')
+  members={}
+  for path,digest in train['artifacts'].items():
+   path=Path(path)
+   if path.is_relative_to(root):members[path.relative_to(root).as_posix()]=digest
+  required={'checkpoint.pt':record['checkpoint_sha256'],'check.json':record['report_sha256'],'live.log':train['artifacts'][str(root/'live.log')]}
+  required.update({'heads/'+name:digest for name,digest in record['report']['head_hashes'].items()})
+  expected_names={'checkpoint.pt','check.json','live.log'}|{f'heads/heads-{i:02d}.npz' for i in range(16)}
+  if set(required)!=expected_names:
+   raise ValueError('complete native release member set required')
+  if members!=required:raise ValueError('native release member digests differ from admitted train receipt')
+  return members
+ except (KeyError,TypeError,OSError,AttributeError,json.JSONDecodeError) as error:
+  raise ValueError('complete admitted native release inventory required') from error
+
+def _publication_release_members(publication,expected):
+ try:
+  if publication['source_sha256']!=expected:
+   raise ValueError('native publication inventory differs from admitted train receipt')
+  members={}
+  for chunk in publication['chunks']:
+   archive=chunk['archive_hdfs_uri']
+   if not isinstance(archive,str) or not archive.startswith('hdfs://'):
+    raise ValueError('native publication archive URI required')
+   for member in chunk['manifest']['members']:
+    name=member['path']
+    if (name in members or expected.get(name)!=member['sha256'] or
+        type(member.get('bytes')) is not int or member['bytes']<0):
+     raise ValueError('native publication chunk inventory differs from admitted train receipt')
+    members[name]={'path':name,'sha256':member['sha256'],'bytes':member['bytes'],'archive_hdfs_uri':archive}
+  if set(members)!=set(expected):
+   raise ValueError('native publication chunk inventory incomplete')
+  return members
+ except (KeyError,TypeError,AttributeError) as error:
+  raise ValueError('complete native publication chunk inventory required') from error
+
+def validate_native_publication_release(record,publication_path,release_path=None,*,completed):
+ publication_path=Path(publication_path);release_path=Path(release_path) if release_path is not None else None
+ try:
+  if not publication_path.is_file() or publication_path.is_symlink():raise ValueError('regular native publication evidence required')
+  publication=json.loads(publication_path.read_text())
+  if not publication_matches_record(record,publication):raise ValueError('native publication parent differs')
+  admission=publication['independent_admission']
+  if admission['exit_code']!=0 or admission['validation']['whole_member_union_exact'] is not True:raise ValueError('independent native recovery admission required')
+  release=None
+  if completed:
+   if release_path is None or not release_path.is_file() or release_path.is_symlink():raise ValueError('regular native release completion evidence required')
+   release=json.loads(release_path.read_text())
+   if release['publication_receipt_sha256']!=sha(publication_path):raise ValueError('native release does not bind publication bytes')
+  plan=_native_release_plan(publication,release)
+  if completed and release['released']!=plan:raise ValueError('native release plan changed')
+  root=Path(record['root'])
+  if root.is_symlink():raise ValueError('regular native release root required')
+  expected=_expected_release_members(record)
+  published=_publication_release_members(publication,expected)
+  seen=set()
+  for entry in plan:
+   local=Path(entry['local_path'])
+   if not local.is_absolute() or any(p.is_symlink() for p in [local,*local.parents]):raise ValueError('regular native release member path required')
+   try:relative=local.relative_to(root).as_posix()
+   except ValueError as error:raise ValueError('native release member outside checkpoint root') from error
+   required=published.get(relative)
+   if (entry.get('path',relative)!=relative or relative in seen or required is None or
+       {key:entry.get(key) for key in ['path','sha256','bytes','archive_hdfs_uri']}!=required or
+       re.fullmatch('[0-9a-f]{64}',entry['sha256']) is None):
+    raise ValueError('exact native release member identity required')
+   seen.add(relative)
+   if completed:
+    if local.exists():raise ValueError('released native payload member still exists')
+   else:
+    if not local.is_file() or local.is_symlink() or sha(local)!=entry['sha256']:raise ValueError('native release member changed before completion')
+    if 'bytes' in entry and local.stat().st_size!=entry['bytes']:raise ValueError('native release member size changed')
+  if seen!=set(expected):raise ValueError('complete native release inventory required')
+  if completed and root.exists() and any(path.is_file() or path.is_symlink() for path in root.rglob('*')):
+   raise ValueError('released native payload root retains files')
+ except (KeyError,TypeError,OSError,AttributeError,json.JSONDecodeError) as error:
+  raise ValueError('complete native publication/release evidence required') from error
+ return publication,release,plan
 
 def worker_entry(worker):
  try:return WORKER_ENTRIES[worker]
@@ -152,14 +246,14 @@ class NativeBackend:
   if sample!=record['sample']:raise ValueError('resumed native sample differs from actual admitted reports')
   if not record['released']:freeze_checkpoint_inventory(root,record['final_path'],record['final_sha256'])
   else:
-   pub=record['publication'];release=json.loads(Path(pub['release_path']).read_text());publication=json.loads(Path(pub['publication_path']).read_text())
-   if sha(pub['publication_path'])!=pub['publication_sha256'] or sha(pub['release_path'])!=pub['release_sha256'] or release['publication_receipt_sha256']!=pub['publication_sha256'] or publication['parent_receipts'].get(record['final_path'])!=record['final_sha256'] or publication['independent_admission']['exit_code']!=0 or publication['independent_admission']['validation']['whole_member_union_exact'] is not True or any(Path(e['local_path']).exists() for e in release['released']):raise ValueError('resumed retention/release changed')
+   pub=record['publication']
+   if sha(pub['publication_path'])!=pub['publication_sha256'] or sha(pub['release_path'])!=pub['release_sha256']:raise ValueError('resumed retention/release changed')
+   validate_native_publication_release(record,pub['publication_path'],pub['release_path'],completed=True)
  def publish_and_release(self,record):
   self.guard();before={p for p in (C/'insula').glob('hdfs-retention-*')};command=[sys.executable,'-m','retention.publish_sustained_checkpoint','--receipt',record['final_path'],'--receipt-sha256',record['final_sha256'],'--release','--lock-fd',str(self.lock.fileno())];log=self.R/f'retention-{record["step"]:02d}.log';env={k:v for k,v in os.environ.items() if k!='PYTHONPATH'}
   with log.open('w') as stream:result=subprocess.run(command,cwd=P,env=env,stdout=stream,stderr=subprocess.STDOUT,pass_fds=(self.lock.fileno(),),timeout=3600)
   if result.returncode:raise RuntimeError('checkpoint HDFS preservation failed; next training forbidden')
   new={p for p in (C/'insula').glob('hdfs-retention-*')}-before
   if len(new)!=1:raise ValueError('unique current checkpoint publication required')
-  directory=new.pop();publication=directory/'verified-publication.json';release=directory/'release-completed.json';value=json.loads(publication.read_text());released=json.loads(release.read_text())
-  if released['publication_receipt_sha256']!=sha(publication) or value['parent_receipts'].get(record['final_path'])!=record['final_sha256'] or value['independent_admission']['exit_code']!=0 or value['independent_admission']['validation']['whole_member_union_exact'] is not True or any(Path(e['local_path']).exists() for e in released['released']):raise ValueError('exact checkpoint release/independent union required')
+  directory=new.pop();publication=directory/'verified-publication.json';release=directory/'release-completed.json';value,_,_=validate_native_publication_release(record,publication,release,completed=True)
   self.guard();return {'publication_path':str(publication),'publication_sha256':sha(publication),'release_path':str(release),'release_sha256':sha(release),'hdfs_manifest_uri':value['publication_manifest_hdfs_uri'],'command':command,'log_sha256':sha(log)}

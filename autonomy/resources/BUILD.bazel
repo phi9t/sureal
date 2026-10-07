@@ -46,6 +46,7 @@ exports_files(
         "sources.py",
         "stage.py",
         "stage_accounting.py",
+        "sustained_scoring_budget.py",
     ],
     visibility = ["//autonomy:__pkg__"],
 )

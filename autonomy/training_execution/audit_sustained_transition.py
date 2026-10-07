@@ -19,7 +19,7 @@ def safe(root,name):
 def main():
  if importlib.util.find_spec('tensorflow') is not None or not torch.cuda.is_available() or torch.cuda.device_count()!=1:raise ValueError('one native GPU and TensorFlow absence required')
  from training_execution.sustained_sources import validate_sources
- from sustained.sustained_contract import validate_contract
+ from detection.sustained_contract import validate_contract
  from resources.replay_values import require_exact_state
  from detection.sustained_loss import class_balanced_objective
  from detection.fixed_batch_catalog import catalog

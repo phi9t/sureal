@@ -2,7 +2,7 @@
 import json,resource,time
 from pathlib import Path
 import numpy as np
-from sustained.sustained_contract import validate_contract
+from detection.sustained_contract import validate_contract
 from detection.sustained_literal_loss import literal_losses,compare_losses
 from evidence.source_snapshot import file_sha256
 

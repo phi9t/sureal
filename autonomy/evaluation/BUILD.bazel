@@ -24,7 +24,7 @@ py_library(
         "//autonomy/detection:detection",
         "//autonomy/evidence:evidence",
         "//autonomy/insula:insula",
-        "//autonomy/sustained:sustained",
+        "//autonomy/resources:resources",
     ],
 )
 

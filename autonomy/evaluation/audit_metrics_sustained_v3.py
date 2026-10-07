@@ -1,4 +1,4 @@
-from sustained.sustained_scoring_budget import DEFAULT_NATIVE_SECONDS
+from resources.sustained_scoring_budget import DEFAULT_NATIVE_SECONDS
 import json,math,re,subprocess
 from pathlib import Path
 from evidence.source_snapshot import file_sha256

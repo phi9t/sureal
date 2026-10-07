@@ -8,10 +8,10 @@ from resources.backend import ResourceBackend,prepare_identity
 from resources.checkpoint import recover_publication_record,resource_inventory,validate_publication_record,write_publication_record
 from resources.retention import publish_bundle
 from retention.sustained_controller_lock import acquire_experiment_lock
-from training_execution.sustained_controller_backend import NativeBackend,write,C,W
+from training_execution.sustained_controller_backend import NativeBackend,publication_matches_record,validate_native_publication_release,write,C,W
 from training_execution.sustained_workflow import execute_case
-from sustained.sustained_contract import RECIPES
-from sustained.sustained_scoring_budget import stage_timeout
+from detection.sustained_contract import RECIPES
+from resources.sustained_scoring_budget import stage_timeout
 from studies.architecture import experiment_runner
 
 class ResourceNativeBackend(ResourceBackend,NativeBackend):
@@ -24,20 +24,27 @@ class ResourceNativeBackend(ResourceBackend,NativeBackend):
 
  def _recover_native_release(self,record):
   if record.get('released'):return
-  if Path(record['root']).exists():return
-  candidates=[]
+  candidates=[];incomplete=[]
   for directory in (C/'insula').glob('hdfs-retention-*'):
    publication=directory/'verified-publication.json';release=directory/'release-completed.json'
-   if not publication.exists() or not release.exists():continue
+   if not publication.exists():continue
    try:
-    value=json.loads(publication.read_text());released=json.loads(release.read_text())
-    if value['parent_receipts'].get(record['final_path'])==record['final_sha256'] and released['publication_receipt_sha256']==sha(publication):
-     candidates.append((publication,release,value,released))
+    value=json.loads(publication.read_text())
+    if not publication_matches_record(record,value):continue
+    if release.exists():
+     validate_native_publication_release(record,publication,release,completed=True)
+     candidates.append((publication,release,value))
+    else:
+     if isinstance(value.get('release_plan'),list):
+      try:validate_native_publication_release(record,publication,None,completed=False)
+      except ValueError:incomplete.append(publication)
    except (KeyError,ValueError,OSError,json.JSONDecodeError):
     continue
-  if len(candidates)!=1:return
-  publication,release,value,released=candidates[0]
-  if value['independent_admission']['exit_code']!=0 or value['independent_admission']['validation']['whole_member_union_exact'] is not True or any(Path(e['local_path']).exists() for e in released['released']):raise ValueError('resumed native release evidence changed')
+  if incomplete:raise ValueError('partial native release without durable completion evidence')
+  if not candidates:return
+  if len(candidates)!=1:raise ValueError('ambiguous native release evidence for resumed record')
+  publication,release,value=candidates[0]
+  validate_publication_record(self,record)
   record['publication']={'publication_path':str(publication),'publication_sha256':sha(publication),'release_path':str(release),'release_sha256':sha(release),'hdfs_manifest_uri':value['publication_manifest_hdfs_uri'],'command':value.get('command'),'log_sha256':None}
   record['released']=True
 

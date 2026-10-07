@@ -3,7 +3,7 @@ import importlib.util,json,random,resource,time
 from pathlib import Path
 import numpy as np
 import torch
-from sustained.sustained_contract import validate_contract
+from detection.sustained_contract import validate_contract
 from training_execution.sustained_sources import validate_sources
 from training_execution.sustained_state import restore_state,capture_state
 from resources.replay_values import require_exact_state,require_exact_heads

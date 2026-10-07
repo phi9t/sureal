@@ -26,7 +26,6 @@ filegroup(
         "//autonomy/retention:all_py",
         "//autonomy/resources:all_py",
         "//autonomy/segmentation:all_py",
-        "//autonomy/sustained:all_py",
         "//autonomy/training_execution:all_py",
     ],
     visibility = ["//visibility:public"],
@@ -79,7 +78,6 @@ PERCEPTION_TEST_MODULES = glob(
         "range_view/**",
         "segmentation/**",
         "studies/**",
-        "sustained/**",
         "training_execution/**",
         "research/**",
         "source_snapshot_targets_test.py",
@@ -100,7 +98,6 @@ PERCEPTION_RUNFILES = glob(
         "range_view/**",
         "segmentation/**",
         "studies/**",
-        "sustained/**",
         "training_execution/**",
         "research/**",
         "**/__pycache__/**",
@@ -111,7 +108,6 @@ PERCEPTION_RUNFILES = glob(
     "//autonomy/motion:runfiles",
     "//autonomy/inspection:runfiles",
     "//autonomy/segmentation:runfiles",
-    "//autonomy/sustained:runfiles",
     "research/association41-runtime-admission-20261003a/manifest.json",
 ]
 
@@ -131,7 +127,6 @@ PERCEPTION_DEPS = [
     "//autonomy/motion:motion",
     "//autonomy/segmentation:segmentation",
     "//autonomy/studies:studies",
-    "//autonomy/sustained:sustained",
     "//autonomy/training_execution:training_execution",
 ]
 
@@ -250,7 +245,6 @@ test_suite(
             "//autonomy/motion:all_tests",
             "//autonomy/segmentation:all_tests",
             "//autonomy/studies:all_tests",
-            "//autonomy/sustained:all_tests",
             "//autonomy/training_execution:all_tests",
         ],
     visibility = ["//visibility:public"],

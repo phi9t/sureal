@@ -48,7 +48,6 @@ py_library(
         "//autonomy/resources:resources",
         "//autonomy/retention:retention",
         "//autonomy/studies:studies",
-        "//autonomy/sustained:sustained",
     ],
 )
 

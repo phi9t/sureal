@@ -23,7 +23,6 @@ LAYERS = (
     ('segmentation',),
     ('resources',),
     ('retention',),
-    ('sustained',),
     ('detection',),
     ('range_view',),
     ('evaluation',),
