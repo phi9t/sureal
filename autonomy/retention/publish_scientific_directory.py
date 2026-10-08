@@ -77,16 +77,29 @@ HOST_SOURCE_REQUIRED = (
     "insula/entry.py",
     "insula/runtime_identity.py",
 )
+AUTHENTICATION_MARKERS = (
+    "authentication",
+    "authenticate",
+    "authorization",
+    "credential",
+    "forbidden",
+    "gss",
+    "kerberos",
+    "permission denied",
+    "ticket",
+    "token",
+    "unauthorized",
+)
 MISSING_MARKERS = (
     "does not exist",
     "filenotfound",
     "file not found",
-    "missing",
     "no such file",
     "not found",
     "not_exist",
 )
 SAFE_COMPONENT = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
+FOUND_ITEMS = re.compile(r"\bFound\s+([0-9]+)\s+items\b")
 
 
 def _safe_component(value, what):
@@ -126,6 +139,30 @@ def _require_evidence_root(evidence, scientific_processing):
     if evidence.is_symlink() or not evidence.is_dir():
         raise ValueError("regular evidence directory required")
     return evidence
+
+
+def _line_names_uri(line, uri):
+    stripped = line.strip()
+    if not stripped or stripped.startswith("Found "):
+        return False
+    parts = stripped.split()
+    return bool(parts and parts[-1] == uri)
+
+
+def _hdfs_ls_indicates_existing_object(uri, exit_code, output):
+    if exit_code == 0:
+        counts = [int(match.group(1)) for match in FOUND_ITEMS.finditer(output)]
+        if counts:
+            return any(count >= 1 for count in counts)
+        if any(_line_names_uri(line, uri) for line in output.splitlines()):
+            return True
+        raise RuntimeError("could not parse HDFS object preflight listing: " + uri)
+    lowered = output.lower()
+    if any(marker in lowered for marker in AUTHENTICATION_MARKERS):
+        raise RuntimeError("could not prove HDFS object absence: " + uri)
+    if any(marker in lowered for marker in MISSING_MARKERS):
+        return False
+    raise RuntimeError("could not prove HDFS object absence: " + uri)
 
 
 def _source_inventory(root):
@@ -278,15 +315,11 @@ class WaystoneClient:
 
     def _exists(self, uri, evidence_dir, label):
         stdout, receipt = self._run(["ls", uri], label, evidence_dir, timeout=30, check=False)
-        if receipt["exit_code"] == 0:
-            return True
-        lowered = stdout.lower()
         log = Path(evidence_dir) / (label + ".log")
+        output = stdout
         if log.exists():
-            lowered = (lowered + "\n" + log.read_text().lower()).strip()
-        if any(marker in lowered for marker in MISSING_MARKERS):
-            return False
-        raise RuntimeError("could not prove HDFS object absence: " + uri)
+            output = (output + "\n" + log.read_text()).strip()
+        return _hdfs_ls_indicates_existing_object(uri, receipt["exit_code"], output)
 
     def put_new(self, source, uri, stage, evidence_dir):
         if self._exists(uri, evidence_dir, stage + "-preflight"):

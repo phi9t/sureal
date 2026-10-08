@@ -1,9 +1,16 @@
 import json
 import tempfile
+import types
 import unittest
 from pathlib import Path
 
 from evidence.source_snapshot import file_sha256
+
+REAL_ARCHIVE_PUT_PREFLIGHT_FOUND_ZERO = (
+    "Found 0 items in hdfs://harunava/user/tiger/waystone/sureal/runs/"
+    "perception-closed-scientific-processing/cohort16-baseline-fit20261002a-dec4ce2778a4401d8b42734f397823d5/"
+    "63f21a24760fe02f61129273b3f2a7bb1ff466b0eacd95fe53f28ff162167561/archive.tar.gz\n"
+)
 
 
 class FakeWaystone:
@@ -259,6 +266,108 @@ class ScientificDirectoryPublisherTests(unittest.TestCase):
             )
 
             self.assertEqual(calls, [(payload, "independent")])
+
+    def test_waystone_put_new_treats_found_zero_preflight_as_absent(self):
+        from retention.publish_scientific_directory import WaystoneClient
+
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "archive.tar.gz"
+            source.write_bytes(b"archive")
+            calls = []
+
+            def runner(command, **kwargs):
+                del kwargs
+                calls.append(command)
+                if command[-2:] == ["ls", "hdfs://example/archive.tar.gz"]:
+                    return types.SimpleNamespace(returncode=0, stdout=REAL_ARCHIVE_PUT_PREFLIGHT_FOUND_ZERO, stderr="")
+                if command[-4:-2] == ["put", "--mkdir-parents"]:
+                    return types.SimpleNamespace(returncode=0, stdout="", stderr="")
+                return types.SimpleNamespace(returncode=1, stdout="", stderr="unexpected command")
+
+            receipt = WaystoneClient(cli="/waystone", runner=runner, tool_pins={}).put_new(
+                source,
+                "hdfs://example/archive.tar.gz",
+                "archive-put",
+                Path(directory) / "evidence",
+            )
+
+            self.assertEqual(receipt["stage"], "archive-put")
+            self.assertEqual([command for command in calls if command[-4:-2] == ["put", "--mkdir-parents"]], [receipt["command"]])
+
+    def test_waystone_put_new_refuses_found_one_preflight(self):
+        from retention.publish_scientific_directory import WaystoneClient
+
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "archive.tar.gz"
+            source.write_bytes(b"archive")
+            uri = "hdfs://example/archive.tar.gz"
+            calls = []
+
+            def runner(command, **kwargs):
+                del kwargs
+                calls.append(command)
+                if command[-2:] == ["ls", uri]:
+                    return types.SimpleNamespace(returncode=0, stdout="Found 1 items in hdfs://example/archive.tar.gz\nhdfs://example/archive.tar.gz\n", stderr="")
+                if command[-4:-2] == ["put", "--mkdir-parents"]:
+                    return types.SimpleNamespace(returncode=0, stdout="", stderr="")
+                return types.SimpleNamespace(returncode=1, stdout="", stderr="unexpected command")
+
+            with self.assertRaisesRegex(FileExistsError, "HDFS object already exists"):
+                WaystoneClient(cli="/waystone", runner=runner, tool_pins={}).put_new(
+                    source,
+                    uri,
+                    "archive-put",
+                    Path(directory) / "evidence",
+                )
+
+            self.assertEqual([command for command in calls if command[-4:-2] == ["put", "--mkdir-parents"]], [])
+
+    def test_waystone_put_new_treats_nonzero_not_found_as_absent(self):
+        from retention.publish_scientific_directory import WaystoneClient
+
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "archive.tar.gz"
+            source.write_bytes(b"archive")
+
+            def runner(command, **kwargs):
+                del kwargs
+                if command[-2:] == ["ls", "hdfs://example/archive.tar.gz"]:
+                    return types.SimpleNamespace(returncode=1, stdout="", stderr='{"error":"FileNotFound: object does not exist"}')
+                if command[-4:-2] == ["put", "--mkdir-parents"]:
+                    return types.SimpleNamespace(returncode=0, stdout="", stderr="")
+                return types.SimpleNamespace(returncode=1, stdout="", stderr="unexpected command")
+
+            receipt = WaystoneClient(cli="/waystone", runner=runner, tool_pins={}).put_new(
+                source,
+                "hdfs://example/archive.tar.gz",
+                "archive-put",
+                Path(directory) / "evidence",
+            )
+
+            self.assertEqual(receipt["stage"], "archive-put")
+
+    def test_waystone_put_new_raises_on_auth_error_with_missing_text(self):
+        from retention.publish_scientific_directory import WaystoneClient
+
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "archive.tar.gz"
+            source.write_bytes(b"archive")
+
+            def runner(command, **kwargs):
+                del kwargs
+                if command[-2:] == ["ls", "hdfs://example/archive.tar.gz"]:
+                    return types.SimpleNamespace(returncode=1, stdout="", stderr='{"error":"auth token missing"}')
+                if command[-4:-2] == ["put", "--mkdir-parents"]:
+                    return types.SimpleNamespace(returncode=0, stdout="", stderr="")
+                return types.SimpleNamespace(returncode=1, stdout="", stderr="unexpected command")
+
+            with self.assertRaisesRegex(RuntimeError, "could not prove HDFS object absence"):
+                WaystoneClient(cli="/waystone", runner=runner, tool_pins={}).put_new(
+                    source,
+                    "hdfs://example/archive.tar.gz",
+                    "archive-put",
+                    Path(directory) / "evidence",
+                )
 
 
 if __name__ == "__main__":
