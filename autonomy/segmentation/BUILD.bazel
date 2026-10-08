@@ -20,6 +20,12 @@ TEST_EXTRA_DATA = {
     ],
 }
 
+TEST_EXTRA_DEPS = {
+    "oriented_box_parity_test.py": [
+        "//autonomy/geometry:oriented_box_parity_harness",
+    ],
+}
+
 GPU_TESTS = [
     "point_semantic_encoder_test.py",
 ]
@@ -74,7 +80,7 @@ filegroup(
         name = test[:-3],
         srcs = [test],
         data = [":runfiles"] + TEST_EXTRA_DATA.get(test, []),
-        deps = [":segmentation"],
+        deps = [":segmentation"] + TEST_EXTRA_DEPS.get(test, []),
         imports = [".."],
         legacy_create_init = 0,
         size = "small",

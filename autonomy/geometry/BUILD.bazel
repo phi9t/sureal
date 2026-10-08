@@ -6,7 +6,7 @@ GPU_TESTS = [
 ]
 LIB_MODULES = glob(
     ["*.py"],
-    exclude = ["*_test.py", "*_test_fixtures.py"],
+    exclude = ["*_test.py", "*_test_fixtures.py", "*_test_support.py", "oriented_box.py"],
 )
 GEOMETRY_VISIBILITY = [
     "//autonomy:__pkg__",
@@ -16,10 +16,18 @@ GEOMETRY_VISIBILITY = [
     "//autonomy/inspection:__pkg__",
     "//autonomy/training_execution:__pkg__",
 ]
+ORIENTED_BOX_VISIBILITY = GEOMETRY_VISIBILITY + [
+    "//autonomy/detection:__pkg__",
+    "//autonomy/evaluation:__pkg__",
+    "//autonomy/segmentation:__pkg__",
+]
 
 TEST_EXTRA_SRCS = {
     "scientific_scene_command_test.py": ["scientific_reconstruction_test.py"],
     "scientific_scene_validate_test.py": ["scientific_reconstruction_test.py"],
+}
+TEST_DEPS = {
+    "oriented_box_test.py": [":oriented_box"],
 }
 
 package(default_visibility = ["//visibility:private"])
@@ -33,6 +41,22 @@ py_library(
         "//autonomy/dataset:dataset",
         "//autonomy/evidence:evidence",
     ],
+)
+
+py_library(
+    name = "oriented_box",
+    srcs = ["oriented_box.py"],
+    imports = [".."],
+    visibility = ORIENTED_BOX_VISIBILITY,
+)
+
+py_library(
+    name = "oriented_box_parity_harness",
+    srcs = ["oriented_box_test_support.py"],
+    imports = [".."],
+    testonly = True,
+    visibility = ORIENTED_BOX_VISIBILITY,
+    deps = [":oriented_box"],
 )
 
 filegroup(
@@ -53,7 +77,7 @@ py_library(
     py_test(
         name = test[:-3],
         srcs = [test] + TEST_EXTRA_SRCS.get(test, []),
-        deps = [":geometry"] + (
+        deps = TEST_DEPS.get(test, [":geometry"] + (
             [":native_range_shape_test_fixtures"]
             if test in [
                 "native_range_shape_file_test.py",
@@ -61,7 +85,7 @@ py_library(
                 "native_range_shape_worker_test.py",
             ]
             else []
-        ),
+        )),
         legacy_create_init = 0,
         size = "small",
         tags = ["perception_unit"] + (["requires_gpu"] if test in GPU_TESTS else []),
