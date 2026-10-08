@@ -5,16 +5,17 @@ range-fusion and sparse-BEV ideas, with matched-parameter point-MLP and
 zero-range mechanism controls. These remain **experimental recipes** until
 actual-frame CUDA admission and native overfit closure pass.
 
-The reusable code lives in its concepts: the expanded catalog, models, packing
-and point/sparse/spatial modules are in `detection/expanded_batch/`, while
-observation loading is in `dataset/expanded_batch_observations.py`. The closed
+The reusable code lives in its concepts: the architecture-adaptation catalog,
+models, packing and point/sparse/spatial modules are in
+`detection/architecture_adaptations/`, while observation loading is in
+`dataset/detector_observations.py`. The closed
 CUDA and HDFS gate scripts that produced retained receipts are preserved as
 byte records in `procedure_records/`; they are not active library entrypoints.
 
 Inspect the current catalog from the isolated worktree:
 
 ```bash
-PYTHONPATH=autonomy python -c "from detection.expanded_batch.catalog import catalog; print('\n'.join(catalog()))"
+PYTHONPATH=autonomy python -c "from detection.architecture_adaptations.catalog import catalog; print('\n'.join(catalog()))"
 PYTHONPATH=autonomy python autonomy/studies/expanded_batch/expanded_verifier.py autonomy/research/advanced-SAMEID-results.json
 ```
 

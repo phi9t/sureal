@@ -177,3 +177,45 @@ Pin impact:
   unavailable and the coordinator explicitly said not to retry or bypass it.
 - Pin-impact reporting against `work/semantic-layout/integration` could not run
   because that ref is absent in this private workspace.
+
+## Follow-up
+
+Worker branch: `worker/t26-closeout-followup`
+
+Base: `38bdd76f09262e611ea27b7a4daf53d8d7b6efe3`
+
+Changes:
+
+- Updated the association contract's active baseline source requirements from
+  `detection/fixed_batch_catalog.py` and `detection/fixed_batch_models.py` to
+  `detection/detector_recipe_catalog.py` and
+  `detection/detector_recipe_models.py`.
+- Updated the provenance test's historical manifest reconciliation map so
+  `tier1/catalog.py` and `tier1/models.py` now map directly to the current
+  detector recipe paths. The frozen research manifest was not edited.
+- Updated the expanded-batch study README's active library prose and catalog
+  import example to reference `detection/architecture_adaptations/` and
+  `dataset/detector_observations.py`.
+
+Residual-reference audit:
+
+- Command:
+  `rg -n "(detection/(fixed_batch_(models|catalog)\\.py|expanded_batch)|dataset/expanded_batch_observations\\.py|//autonomy/detection/expanded_batch|fixed_batch_catalog|fixed_batch_models|expanded_batch_observations|detection\\.expanded_batch)" . -g '!autonomy/research/**' -g '!autonomy/studies/*/procedure_records/**' -g '!docs/research/**' -g '!docs/refactor-finish/**' -g '!.scratch/**' -g '!.bazel-cache/**'`
+- Exit code: 1.
+- Result: no active-tree references to the old detector/dataset paths or the
+  old `//autonomy/detection/expanded_batch` label.
+
+Verification:
+
+- Cache seed:
+  `cp -a /data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-review/.bazel-cache .bazel-cache`
+  was already present for this follow-up workspace as a single local cache copy.
+- Focused command:
+  `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/association/... //autonomy:source_snapshot_targets_test`
+- Focused exit code: 0.
+- Focused result: `Executed 3 out of 3 tests: 3 tests pass.`
+- Full default command:
+  `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...`
+- Full default exit code: 0.
+- Full default result: `Executed 152 out of 152 tests: 152 tests pass.`
+- Baseline comparison: baseline was 152; delta is 0.

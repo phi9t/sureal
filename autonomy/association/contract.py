@@ -53,7 +53,7 @@ _SCOPE = {"eligible_count": 1053, "native_count": 1279,
 _INPUT_HASHES = ("frames_sha256", "eligible_gt_sha256", "native_gt_sha256",
                  "fixed_frame_sha256", "baseline_sources_sha256",
                  "association_sources_sha256", "initial_model_tensors_sha256")
-_BASELINE_REQUIRED = {"detection/fixed_batch_models.py", "detection/fixed_batch_catalog.py",
+_BASELINE_REQUIRED = {"detection/detector_recipe_models.py", "detection/detector_recipe_catalog.py",
     "detection/pillar_detector.py", "detection/detector_loss.py", "detection/anchor_grid.py",
     "detection/anchor_assignment.py", "detection/box_coding.py", "detection/detector_geometry.py",
     "detection/norm_variants.py", "detection/architecture_variants.py",

@@ -18,8 +18,8 @@ _MOVED_BASELINE_SOURCES = {
     'gpu/architecture_variants.py': 'detection/architecture_variants.py',
     'gpu/norm_variants.py': 'detection/norm_variants.py',
     'gpu/scored_proposals_v3.py': 'detection/scored_proposals_v3.py',
-    'tier1/catalog.py': 'detection/fixed_batch_catalog.py',
-    'tier1/models.py': 'detection/fixed_batch_models.py',
+    'tier1/catalog.py': 'detection/detector_recipe_catalog.py',
+    'tier1/models.py': 'detection/detector_recipe_models.py',
 }
 
 _MOVED_ASSOCIATION_SOURCES = {
