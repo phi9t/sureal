@@ -18,8 +18,10 @@ exports_files(
         "pilot_retention_audit.py",
         "pilot_retention_sources.py",
         "publish_native_cache.py",
+        "publish_scientific_directory.py",
         "publish_sustained_checkpoint.py",
         "publish_sustained_pilot.py",
+        "publish_symlink_audit.py",
         "publisher_runtime.py",
         "retention_sources.py",
         "sustained_checkpoint_inventory.py",
@@ -67,8 +69,10 @@ filegroup(
     )
     for publisher in [
         "publish_native_cache.py",
+        "publish_scientific_directory.py",
         "publish_sustained_checkpoint.py",
         "publish_sustained_pilot.py",
+        "publish_symlink_audit.py",
     ]
 ]
 

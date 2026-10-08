@@ -137,17 +137,15 @@ historical `cohort-v1` restoration path.
 
 ## Future Commands
 
-No command below was run by this worker. The current checkout lacks an
-arbitrary-directory regular-file publisher and a symlink-preserving audit
-publisher, so the exact runnable command for the selected candidates does not
-exist yet. The following commands are the required reviewed command surfaces
-before execution. They must use the same existing retention primitives and
-Waystone `--auth-source token-file` HDFS access pattern as the current
-publishers.
+No command below was run by the storage-plan worker. This branch adds the
+reviewable command surfaces for an arbitrary regular-file scientific directory
+publisher and a symlink-preserving audit publisher. They use the same existing
+retention primitives and Waystone `--auth-source token-file` HDFS access
+pattern as the current publishers.
 
 ### Regular-file closed directories
 
-Required wrapper, not present in this checkout:
+Readback-only publication, with no local release:
 
 ```bash
 PYTHONPATH=autonomy python3 -m retention.publish_scientific_directory \
@@ -156,6 +154,20 @@ PYTHONPATH=autonomy python3 -m retention.publish_scientific_directory \
   --hdfs-namespace perception-closed-scientific-processing \
   --auth-source token-file \
   --host-source-receipt <admitted-publisher-source-receipt.json> \
+  --evidence <evidence-directory-outside-scientific-processing>
+```
+
+Release is a separate explicit flag, after verified readback, rehydrate,
+independent restore and release-plan gates:
+
+```bash
+PYTHONPATH=autonomy python3 -m retention.publish_scientific_directory \
+  --case cohort16-baseline-fit20261002a \
+  --root /data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort16-baseline-fit20261002a \
+  --hdfs-namespace perception-closed-scientific-processing \
+  --auth-source token-file \
+  --host-source-receipt <admitted-publisher-source-receipt.json> \
+  --evidence <evidence-directory-outside-scientific-processing> \
   --release
 ```
 
@@ -196,7 +208,8 @@ Implementation requirements for that wrapper:
 5. Download both files with `waystone --auth-source token-file get`.
 6. Require exact archive and manifest hash readback.
 7. Run live `verify` and `rehydrate` gates in the locked resource CPU rootfs.
-8. Write a verified publication receipt under `insula/hdfs-retention-<case>-<uuid>/verified-publication.json`.
+8. Write a verified publication receipt under
+   `<evidence>/hdfs-retention-<case>-<uuid>/verified-publication.json`.
 9. Call `resources.resource_release_plan.release_plan(root, publication)`.
 10. Unlink only paths returned by the release plan, then write
     `release-completed.json`.
@@ -227,7 +240,7 @@ PYTHONPATH=autonomy python3 -m retention.publish_sustained_pilot \
 
 ### `motion-current-geometry-audit-v3`
 
-Required wrapper, not present in this checkout:
+Readback-only publication, with no local move:
 
 ```bash
 PYTHONPATH=autonomy python3 -m retention.publish_symlink_audit \
@@ -236,6 +249,7 @@ PYTHONPATH=autonomy python3 -m retention.publish_symlink_audit \
   --hdfs-namespace perception-motion \
   --auth-source token-file \
   --host-source-receipt <admitted-publisher-source-receipt.json> \
+  --evidence <evidence-directory-outside-scientific-processing> \
   --preserve-symlinks \
   --readback \
   --receipt
@@ -246,12 +260,22 @@ bytes and sha256 and symlinks by link text, type, and relative path. The
 readback gate must prove that restored symlink entries are symlinks with the
 same link text and that restored regular files match bytes and sha256.
 
-Only after that verified receipt exists, move the audit out of `W`:
+Only with the explicit `--move-to` flag, move the audit out of `W` after the
+verified readback and extracted listing checks:
 
 ```bash
 mkdir -p /data02/home/philip.yang/.cache/waystone/waymo-perception/retired-audits
-mv /data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/motion-current-geometry-audit-v3 \
-  /data02/home/philip.yang/.cache/waystone/waymo-perception/retired-audits/motion-current-geometry-audit-v3
+PYTHONPATH=autonomy python3 -m retention.publish_symlink_audit \
+  --case motion-current-geometry-audit-v3 \
+  --root /data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/motion-current-geometry-audit-v3 \
+  --hdfs-namespace perception-motion \
+  --auth-source token-file \
+  --host-source-receipt <admitted-publisher-source-receipt.json> \
+  --evidence <evidence-directory-outside-scientific-processing> \
+  --preserve-symlinks \
+  --readback \
+  --receipt \
+  --move-to /data02/home/philip.yang/.cache/waystone/waymo-perception/retired-audits/motion-current-geometry-audit-v3
 ```
 
 The symlink targets sampled in ticket 27b are absolute `/source/...` targets,
