@@ -8,13 +8,20 @@ import importlib.util,json,math,random,resource,sys,time
 from pathlib import Path
 import numpy as np
 import torch
-from evidence.source_snapshot import file_sha256
+from evidence.source_snapshot import file_sha256,require_regular_file
 
 sha=file_sha256
 def safe(root,name):
  relative=Path(name)
  if relative.is_absolute() or '..' in relative.parts:raise ValueError('safe native path required')
  return Path(root)/relative
+
+def sibling_reference_chunk():
+ path=require_regular_file(Path(__file__).resolve().with_name('sustained_chunk_reference.py'))
+ spec=importlib.util.spec_from_file_location('sustained_chunk_reference',path)
+ if spec is None or spec.loader is None:raise ValueError('loadable verifier reference module required')
+ module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+ return module.reference_chunk
 
 def main():
  if importlib.util.find_spec('tensorflow') is not None or not torch.cuda.is_available() or torch.cuda.device_count()!=1:raise ValueError('one native GPU and TensorFlow absence required')
@@ -24,7 +31,7 @@ def main():
  from detection.sustained_loss import class_balanced_objective
  from detection.detector_recipe_catalog import catalog
  from detection.detector_recipe_models import build,optimizer,deterministic,objective
- from sustained_chunk_reference import reference_chunk
+ reference_chunk=sibling_reference_chunk()
  from training_execution.replay_sustained import main as replay_heads
  torch.cuda.reset_peak_memory_stats();started=time.monotonic()
  manifestpath=Path('/source/manifest.json');manifest=json.loads(manifestpath.read_text());expected=json.loads(Path('/source/transition.json').read_text())
