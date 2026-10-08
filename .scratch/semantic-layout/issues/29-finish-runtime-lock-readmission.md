@@ -4,7 +4,7 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** needs-triage
+**Status:** ready-for-agent
 
 - [ ] `//autonomy/insula:m0_receipt_test` passes in a rebuilt rootfs whose lock records the current Dockerfile digest (ticket 27 found the lock at `61a783f4…` against the committed Dockerfile's `8e6c2a38…`)
 - [ ] `//autonomy/segmentation:semantic_recovery_accounting_test`, `semantic_recovery_receipt_test` and `semantic_recovery_receipt_aligned_test` run on real semantic-recovery receipts, not the synthesized receipts ticket 27 used for its contract-only check
@@ -13,3 +13,5 @@
 ## Comments
 
 Split from ticket 27's third box. See `docs/ticket27/readmission-report.md` (rows marked `prerequisite_missing`) and `docs/ticket27/execution-report.md` ("Ticket 27 Box Verdicts").
+
+Triaged 2026-10-08: ready-for-agent. Land this before blob-store ticket 12, because a rootfs rebuild here may change the lock that ticket 12's balanced16 re-admission binds; first establish whether the M0 image and the balanced16 image share a rootfs. The unmerged branch `worker/t27c-live-gate-harness` (7720795) shows how these live gates mount their fixtures; use it as reference only. Do not land a ticket-named module such as `autonomy/ticket27/`; live-gate support belongs in a concept module. GPU 1 only, and only when free.

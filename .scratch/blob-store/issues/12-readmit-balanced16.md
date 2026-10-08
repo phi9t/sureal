@@ -2,7 +2,7 @@
 
 **What to build:** The balanced16 sweep's admission binds the code it will actually run after the migration: a live implementation gate whose receipts cite blob keys and the new store descriptor, recorded in the journal.
 
-**Blocked by:** 11
+**Blocked by:** 11, and semantic-layout ticket 29 (its rootfs rebuild may change the lock this admission binds)
 
 **Status:** ready-for-human
 
