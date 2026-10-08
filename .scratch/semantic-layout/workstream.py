@@ -129,7 +129,7 @@ Rules:
 - Do not add, change or remove any .py file under
   autonomy/{{pipeline,gpu,tier1,cohort,resources}} unless your ticket requires it; a
   running guard validates their exact inventory. Run
-  `python3 autonomy/tools/pins.py check --base {integration}` before each commit
+  `(cd autonomy && python3 -m evidence.pins check --base {integration})` before each commit
   and record in the ticket which pinned files you changed and why.
 - Work test-first at the seams the spec names. Run the narrowest relevant tests as you go and the
   full relevant suite at the end. Report failures honestly; never weaken a check to make it pass.
