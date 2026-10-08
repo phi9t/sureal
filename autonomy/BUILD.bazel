@@ -241,6 +241,7 @@ test_suite(
     tests = [":source_snapshot_targets_test"]
         + [
             "//autonomy/association:all_tests",
+            "//autonomy/blob_store:all_tests",
             "//autonomy/camera:all_tests",
             "//autonomy/dataset:all_tests",
             "//autonomy/detection:all_tests",
