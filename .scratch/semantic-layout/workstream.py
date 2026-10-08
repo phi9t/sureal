@@ -114,7 +114,7 @@ PROMPT = '''You are implementing one ticket of the "{effort}" effort in this git
 
 Read these first, in order:
 1. AGENTS.md and the files it points to under docs/agents/
-2. docs/adr/ (both ADRs), experiments/waymo-perception/docs/adr/, and docs/repo-structure.md
+2. docs/adr/ (both ADRs), autonomy/docs/adr/, and docs/repo-structure.md
 3. .scratch/{effort}/spec.md
 4. Your ticket: .scratch/{effort}/issues/{name}.md
 
@@ -126,10 +126,10 @@ Rules:
 - Shared state outside the repository (for example ~/.cache/waystone) is used by other work. You may
   create new versioned paths there. Never modify, move or delete anything that already exists there.
 - Files under any research/ directory are retained evidence. Never modify them.
-- Until the rename tickets land, do not add, change or remove any .py file under
-  experiments/waymo-perception/{{pipeline,gpu,tier1,cohort,resources}} unless your ticket says so; a
+- Do not add, change or remove any .py file under
+  autonomy/{{pipeline,gpu,tier1,cohort,resources}} unless your ticket requires it; a
   running guard validates their exact inventory. Run
-  `python3 experiments/waymo-perception/tools/pins.py check --base {integration}` before each commit
+  `python3 autonomy/tools/pins.py check --base {integration}` before each commit
   and record in the ticket which pinned files you changed and why.
 - Work test-first at the seams the spec names. Run the narrowest relevant tests as you go and the
   full relevant suite at the end. Report failures honestly; never weaken a check to make it pass.
@@ -138,8 +138,25 @@ Rules:
 Keeping the ticket current (this is how progress is monitored):
 - Tick each acceptance criterion in your ticket file (`- [x]`) as soon as it is verified, and commit.
 - When every criterion is ticked, append a `## Comments` section with what you built, the exact
-  verification commands and their results, and anything a reviewer must know; set the ticket's
-  status line to `**Status:** done`; commit; then stop.
+  verification commands and their results, and anything a reviewer must know, and commit. Only
+  then, in a final separate commit, set the ticket's status line to `**Status:** done`, and stop.
+  Never write `done` while the tree has uncommitted changes.
+- The lead reviews your branch against the spec and ADRs before merging. Where the spec or an ADR
+  states a requirement (for example Bzlmod, `rules_python` with the rootfs interpreter, no
+  `PYTHONPATH` in the sandbox), meet it; if it cannot be met, stop with `needs-info` and the exact
+  error instead of substituting something else.
+- Before marking a ticket done, these repository gates must pass and be recorded: `./bazelw test //autonomy/...`,
+  `./bazelw test --config=cuda --test_tag_filters=requires_gpu //autonomy/...`, `./bazelw test //parallax/...`,
+  `python3 -m unittest tests.test_publication_audit` and `python3 scripts/publication_audit.py --root .`.
+  Moving files breaks links in living Markdown documents; fix them in the same ticket.
+- Python modules under `autonomy/` are imported with `autonomy/` as the import root (`insula.entry`,
+  `evidence.journal`), each concept is a `py_library` with declared `deps`, tests are `py_test` with `deps`,
+  and tests never assert where a module lives.
+- Other tickets merge into `{integration}` while you work and often touch the same shared files (the
+  root build file, callers, the layering declaration). Before your final verification, run
+  `git merge {integration}` in your branch, resolve conflicts keeping both sides, and verify after it.
+- Run Bazel only through `./bazelw`. Keep one cache layout under `.bazel-cache/` in this worktree
+  and delete any extra probe caches you create; the disk is nearly full.
 - If you cannot proceed without a decision or access you do not have, append the question under
   `## Comments`, set the status line to `**Status:** needs-info`, commit, and stop.
 '''
