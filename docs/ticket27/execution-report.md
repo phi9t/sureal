@@ -1,11 +1,11 @@
 # Ticket 27 Storage And Admission Execution Report
 
-Generated: 2026-10-08T10:17:15Z
+Generated: 2026-10-08T16:15:00Z
 
-Status: Phase E live balanced16 admission retry `t27f20261008T081353Z` completed with `passed_with_gpu_sharing`. The command exited 0 and the receipt replay audits passed, but GPU 1 sharing was observed mid-run, so Phase F is held pending user decision on whether a GPU-shared run counts. Storage recovery remains passed. No scientific result is claimed.
+Status: Phase E live balanced16 admission retry `t27f20261008T081353Z` completed with `passed_with_gpu_sharing` and was accepted by the user with the GPU-sharing caveat recorded. Phase F passed: the accepted readmission decision entry was appended, the journal verified at 130 entries, and the journal/evidence snapshot was published to HDFS with independent manifest readback. Storage recovery remains passed. No scientific result is claimed.
 
-Worker branch: `worker/t27f4-live-admission`
-HEAD before this report commit: `b7221f8db9092d42e467922c145bcc1014a924bb`
+Worker branch: `worker/t27j-journal-publish`
+HEAD before this report commit: `5af7d3ee8c201cb829bd52124b9444b7439c898b`
 Evidence root: `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution`
 
 ## Phase Verdicts
@@ -16,8 +16,8 @@ Evidence root: `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-
 | B | `pass` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/phase-B-summary.json` | `8d9cf0ca53a50cd0bcfc27910661569ad1d9b3391033854bfe9a1515698f6fe5` |
 | C | `pass` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-C/phase-C-summary.json` | `c64613a08eefc1e6d5100f8e68dca22e685f07a7d9f6e1a00b5076fa1e4271c1` |
 | D | `pass` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/storage-gate.json` | `a98f8a47d91c25f6504a247ae4bfe2521aac14f31329d49afd90a7aea9167541` |
-| E | `passed_with_gpu_sharing` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/admission-summary.json` | `df8e5c8f579b17a686f0c2b31316be35d209f44539c4e5c52c5e66e26db7d737` |
-| F | `held_pending_user_decision_on_gpu_sharing` | Coordinator HOLD at `2026-10-08T09:57:15Z`; no Phase F journal publication is committed |  |
+| E | `accepted_with_gpu_sharing_caveat` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/admission-summary.json` | `df8e5c8f579b17a686f0c2b31316be35d209f44539c4e5c52c5e66e26db7d737` |
+| F | `pass` | `hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-4b54270c65fd46aab5776824c4a20f98` | `manifest 52516d9f69261a83f2589c0633a782a48754af34aa9faa8aa815cb95dc12c654` |
 
 ## Storage Accounting
 
@@ -65,7 +65,7 @@ Earlier aborted/failed run directories were left in place and are part of the at
 | `t27f20261008T071007Z` | `failed_scoped_before_resource_admission` | `train-0` failed with the sandbox source-root defect later fixed by `d3499e1`. |
 | `t27f20261008T073704Z` | `guard_refused` | Preflight passed; immediate guard found GPU1 compute PID `1874488`, so nothing launched. Summary sha256 `ed0c94754e76f43b3005847fc9d00b1115d07c84e1775bbc7086c4eed59e1c84`. |
 | `t27f20261008T074202Z` | `failed_after_train0_before_audit_resource_admission` | Scoped retry ran, admitted `train-0`, then failed before `audit-1000` resource admission. |
-| `t27f20261008T081353Z` | `passed_with_gpu_sharing` | Scoped retry exited 0 and receipt replay audits passed; GPU 1 sharing was observed mid-run and Phase F is held pending user decision. |
+| `t27f20261008T081353Z` | `accepted_with_gpu_sharing_caveat` | Scoped retry exited 0 and receipt replay audits passed; GPU 1 sharing was observed mid-run and accepted by the user as a caveat for ticket-27 closeout. |
 
 ### t27f20261008T081353Z
 
@@ -115,7 +115,17 @@ Controller-written run records to commit:
 
 Post-run storage: strict `unique_payload_bytes(W)` is `12182779587`; with the 2 GiB reservation this is `14330263235`, still under the 15 GiB cap. `/data02` free at summary time was `161911095296` bytes.
 
-Phase F is held pending user decision on GPU sharing. The coordinator issued a HOLD at `2026-10-08T09:57:15Z` before publication should proceed. A premature local journal append was reverted from the repo, and the attempted publisher did not emit a committed publication receipt; no Phase F journal change or `research-journal-hdfs-verified.json` update is included in this commit.
+## Phase F Journal Publication
+
+The user accepted the GPU-shared Phase E run as sufficient for ticket-27 closeout while preserving the GPU-sharing caveat. The accepted readmission decision note was appended under experiment `balanced16-readmission-t27f20261008T081353Z`; `verify-journal` reported 129 entries before the append and 130 entries after the append and after publication.
+
+The previous Phase F attempt in `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF.MQ6PMD/` appended the note locally but was discarded after the HOLD. Its publisher attempted snapshot `hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-4cd6a72f800f4075aa4306d35ac6a24a` and failed with `RuntimeError: bounded transfer timed out`; evidence includes `evidence-publish.stderr.log` sha256 `b91f9818b4c23f0b01fdb4e0807d2a6394317a3bf0daf8bf9cafe4a8a46e4231` and cache `229-get.log` sha256 `d5ec982f8172a29b11a3e1c045c0ccc002f8d6415b3985f3cc6787fe0dc24d90`. The committed journal stayed at 129 entries after that attempt.
+
+The retry evidence directory is `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF-retry.0NbG7P/`. Before publication it preserved the previous `research-journal-hdfs-verified.json` bytes with sha256 `bbb5827f61954bd1b48aa5c79f05602400f57c16249ca61c014a4996a489b19d`.
+
+Publication attempt 1 ran from `2026-10-08T15:39:41Z` to `2026-10-08T16:05:21Z` and exited 0. It published snapshot `hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-4b54270c65fd46aab5776824c4a20f98`. The committed receipt `autonomy/research/research-journal-hdfs-verified.json` has sha256 `48ad366dcabf69bd2d9ce5ad8cc891e6afaac659400455cc2fa2169e6de81333`, manifest URI `hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-4b54270c65fd46aab5776824c4a20f98/manifest.json`, manifest sha256 `52516d9f69261a83f2589c0633a782a48754af34aa9faa8aa815cb95dc12c654`, 392 manifest files, and `research-journal.jsonl` sha256 `3dea56f16a3392f7de7710a502267db455e06e61c96f3f1eac14e8b8cc8d09d8`.
+
+Independent waystone readback of the published `manifest.json` into the retry evidence directory produced the same manifest sha256 `52516d9f69261a83f2589c0633a782a48754af34aa9faa8aa815cb95dc12c654`; the manifest's `research-journal.jsonl` sha256 matched the local journal sha256 `3dea56f16a3392f7de7710a502267db455e06e61c96f3f1eac14e8b8cc8d09d8`.
 
 ## Ticket 27 Box Verdicts
 
@@ -124,13 +134,13 @@ Phase F is held pending user decision on GPU sharing. The coordinator issued a H
 | The sweep recipes, frames and anchor templates are unchanged from the preregistration | `pass` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/preflight-summary.json sha256 cdece39aa8aaf36946154815c4d4e8040eeec9f68891c6669f9a707c15ac0f87` | t27f4 Phase E preflight repeated preregistration/rootfs/source checks before launch; candidate, anchors, recipes, seed, frame count and input digest count matched. |
 | Each recipe admission pins a source snapshot stored in HDFS and the new rootfs digest | `pass_with_gpu_sharing_caveat` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/source-snapshot-readback-summary.json sha256 30f0d6e3a34a4bf3459b31f41ae15a5a20201fc1cc32de5cd5ed53c977912592` | All emitted receipts replayed against read-back source snapshots and rootfs locks; the live command itself had GPU-sharing caveat. |
 | Every runtime-lock check listed in ticket 01 is re-admitted on the new images | `not_fully_admitted` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission/docs/ticket27/readmission-report.md sha256 16da877604277e2c3cb6d937f27c6fe7d86f07eff2686cf74cc8de9f9062d424` | Box 3: 7 real live-gate passes, 3 semantic rows contract-only on synthesized receipts, M0 blocked on a rootfs rebuild. This is not counted as full ticket admission. |
-| A live gate executes the admitted candidate in the new rootfs and its receipt verifies against the snapshot | `passed_with_gpu_sharing` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/admission-summary.json sha256 df8e5c8f579b17a686f0c2b31316be35d209f44539c4e5c52c5e66e26db7d737` | The scoped live command exited 0 after 3903.866 seconds and replay verification passed for all 14 stages, records 0 and 1000, and both 16-head sets. GPU 1 sharing was observed, so user decision is required before journal publication or unqualified acceptance. |
-| The journal records the re-admission and what changed since the original admission | `held_pending_user_decision_on_gpu_sharing` | Coordinator HOLD at `2026-10-08T09:57:15Z` | Phase F is held; no journal append, `evidence.publish` receipt, or HDFS journal publication is committed. |
+| A live gate executes the admitted candidate in the new rootfs and its receipt verifies against the snapshot | `accepted_with_gpu_sharing_caveat` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/admission-summary.json sha256 df8e5c8f579b17a686f0c2b31316be35d209f44539c4e5c52c5e66e26db7d737` | The scoped live command exited 0 after 3903.866 seconds and replay verification passed for all 14 stages, records 0 and 1000, and both 16-head sets. GPU 1 sharing was observed and accepted by the user as a caveat; this is not an unqualified clean-GPU admission. |
+| The journal records the re-admission and what changed since the original admission | `pass` | `autonomy/research/research-journal-hdfs-verified.json sha256 48ad366dcabf69bd2d9ce5ad8cc891e6afaac659400455cc2fa2169e6de81333`; manifest sha256 `52516d9f69261a83f2589c0633a782a48754af34aa9faa8aa815cb95dc12c654`; entry count 130 | Phase F appended the accepted readmission decision note, verified the journal at 130 entries, published the full journal/evidence snapshot to HDFS, and independently read back `manifest.json` with matching manifest and `research-journal.jsonl` sha256 values. |
 | The task index states the sweep new status | `not_changed_by_worker` | `.scratch/semantic-layout/issues/27-readmit-balanced16.md (not edited by worker)` | The task explicitly forbade editing the ticket file or task index. |
 
 ## Command Ledger
 
-The structured JSON report preserves the inherited t27f2 `64`-record command ledger for phases A-D and the earlier Phase E attempts. The t27f4 retry evidence is recorded directly under `phase_results.E` and `current_worker_evidence`, with raw files under `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/`. Inherited ledger: `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/command-ledger.jsonl` sha256 `54a8bc7ef56ee006770707463900edc0f8f076ca1b961a61e18677c3bae3da41`.
+The structured JSON report preserves the inherited t27f2 `64`-record command ledger for phases A-D and the earlier Phase E attempts. The t27f4 retry evidence is recorded directly under `phase_results.E`, and the Phase F journal publication evidence is recorded under `phase_results.F` and `current_worker_evidence`. Inherited ledger: `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/command-ledger.jsonl` sha256 `54a8bc7ef56ee006770707463900edc0f8f076ca1b961a61e18677c3bae3da41`.
 
 | # | Phase | Label | Command | Cwd | Exit | Wall seconds | Evidence | sha256 |
 | ---: | --- | --- | --- | --- | ---: | ---: | --- | --- |
@@ -203,9 +213,8 @@ The structured JSON report preserves the inherited t27f2 `64`-record command led
 
 - No scientific result is claimed.
 - No full balanced16 sweep was run.
-- No unqualified clean-GPU ticket-27 admission is claimed; Phase E is `passed_with_gpu_sharing` and awaits user decision.
-- No Phase F journal entry or `evidence.publish` receipt is committed; Phase F is held pending user decision on GPU sharing.
+- No unqualified clean-GPU ticket-27 admission is claimed; Phase E is `accepted_with_gpu_sharing_caveat`.
 - No issue file or task index was edited.
 - No push, merge, rebase, reset, stash, or branch switch was performed.
 
-JSON report: `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f4-live-admission/docs/ticket27/execution-report.json` sha256 `c83ea7fbb013453ed10811185d552c706bd28eb07b8a0a6a9d9c00d18fcdb30f`.
+JSON report: `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/docs/ticket27/execution-report.json` sha256 `3a46a32879885bedfe9fd65c19c7f351b8c4383cf849b8b0b5aa6ecd03c6905d`.

@@ -21,8 +21,8 @@
     "phase_e_t27f4_after_run_data02_free_bytes": 161911095296,
     "phase_e_t27f4_within_cap_after_run": true
   },
-  "base_context": "started at b7221f8 per coordinator; includes reviewed verifier sibling-import fix 3e50f6a, t27f3 report, and reviewed sandbox source-root fix d3499e1; this report update was generated before the final worker commit",
-  "branch": "worker/t27f4-live-admission",
+  "base_context": "started at 9625607 per coordinator; includes accepted Phase E live run t27f20261008T081353Z with GPU-sharing caveat and journal publication commit 5af7d3e before this report commit",
+  "branch": "worker/t27j-journal-publish",
   "commands": {
     "count": 64,
     "ledger": {
@@ -1655,8 +1655,8 @@
       }
     ]
   },
-  "generated_utc": "2026-10-08T10:17:15Z",
-  "head": "b7221f8db9092d42e467922c145bcc1014a924bb",
+  "generated_utc": "2026-10-08T16:15:00Z",
+  "head": "5af7d3ee8c201cb829bd52124b9444b7439c898b",
   "input_documents": {
     "admission_plan": {
       "exists": true,
@@ -1680,8 +1680,7 @@
   "not_checked": [
     "No scientific result is claimed.",
     "No full balanced16 sweep was run.",
-    "No unqualified clean-GPU ticket-27 admission is claimed; Phase E is passed_with_gpu_sharing and awaits user decision.",
-    "No Phase F journal entry or evidence.publish receipt is committed; Phase F is held pending user decision on GPU sharing.",
+    "No unqualified clean-GPU ticket-27 admission is claimed; Phase E is accepted_with_gpu_sharing_caveat.",
     "No issue file or task index was edited.",
     "No push, merge, rebase, reset, stash, or branch switch was performed."
   ],
@@ -1855,7 +1854,7 @@
       "unique_payload_bytes": 10939980061
     },
     "E": {
-      "status": "passed_with_gpu_sharing",
+      "status": "accepted_with_gpu_sharing_caveat",
       "worker": "t27f4-live-admission",
       "run_id": "t27f20261008T081353Z",
       "admission_summary": {
@@ -1908,8 +1907,8 @@
         },
         {
           "run_id": "t27f20261008T081353Z",
-          "status": "passed_with_gpu_sharing",
-          "reason": "scoped command exited 0 and replay audits passed; GPU 1 sharing observed mid-run"
+          "status": "accepted_with_gpu_sharing_caveat",
+          "reason": "scoped command exited 0 and replay audits passed; GPU 1 sharing observed mid-run and accepted by the user as a caveated ticket-27 engineering admission"
         }
       ],
       "preflight": {
@@ -2213,16 +2212,165 @@
         "live_admission_receipts_verified": true,
         "scientific_result_claimed": false
       },
-      "receipts_verified": "all 14 emitted stage receipts plus source snapshot readback and backend resume validation passed; GPU sharing remains a caveat"
+      "receipts_verified": "all 14 emitted stage receipts plus source snapshot readback and backend resume validation passed; GPU sharing remains a caveat",
+      "run_status": "passed_with_gpu_sharing",
+      "user_acceptance": {
+        "accepted_by_user": true,
+        "acceptance_source": "Coordinator task states the user accepted t27f20261008T081353Z with GPU sharing recorded as a caveat.",
+        "caveat": "GPU 1 sharing was observed mid-run; this is not an unqualified clean-GPU admission and no scientific result is claimed."
+      }
     },
     "F": {
-      "status": "held_pending_user_decision_on_gpu_sharing",
-      "reason": "Coordinator HOLD at 2026-10-08T09:57:15Z: user must decide whether the GPU-shared run counts before anything is published to the append-only journal.",
-      "coordinator_reply": {
-        "utc": "2026-10-08T09:57:15Z",
-        "priority": "HOLD"
+      "status": "pass",
+      "worker": "t27j-journal-publish",
+      "entry_count_before_append": 129,
+      "entry_count_after_append": 130,
+      "journal_append": {
+        "category": "decision",
+        "experiment": "balanced16-readmission-t27f20261008T081353Z",
+        "user_acceptance_recorded": true,
+        "verify_before": {
+          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF-retry.0NbG7P/verify-journal-before.stdout.log",
+          "exists": true,
+          "sha256": "96c419ac8161b2abdc0ba146feaa4ab29834704f16753bd5c1de8b55f80d9c47",
+          "size_bytes": 29
+        },
+        "tracker_note_stdout": {
+          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF-retry.0NbG7P/tracker-note.stdout.log",
+          "exists": true,
+          "sha256": "70b83f9d41866191d84e76ebfad1762ffb49ec2a84e4d57f1d497baf78c4ffda",
+          "size_bytes": 44
+        },
+        "tracker_note_stderr": {
+          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF-retry.0NbG7P/tracker-note.stderr.log",
+          "exists": true,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        "verify_after_note": {
+          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF-retry.0NbG7P/verify-journal-after-note.stdout.log",
+          "exists": true,
+          "sha256": "57dae808c599e68139eb714cc2c3098155e14a64f49e25d719024dae0fd200b7",
+          "size_bytes": 29
+        }
       },
-      "repo_effect": "No Phase F journal append, evidence.publish receipt, or research-journal-hdfs-verified update is committed. A premature local append was reverted before commit; the attempted publisher did not complete a receipt."
+      "publication": {
+        "published_snapshot_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-4b54270c65fd46aab5776824c4a20f98",
+        "manifest_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-4b54270c65fd46aab5776824c4a20f98/manifest.json",
+        "manifest_sha256": "52516d9f69261a83f2589c0633a782a48754af34aa9faa8aa815cb95dc12c654",
+        "manifest_file_count": 392,
+        "journal_sha256": "3dea56f16a3392f7de7710a502267db455e06e61c96f3f1eac14e8b8cc8d09d8",
+        "journal_bytes": 224510,
+        "receipt": {
+          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/research-journal-hdfs-verified.json",
+          "exists": true,
+          "sha256": "48ad366dcabf69bd2d9ce5ad8cc891e6afaac659400455cc2fa2169e6de81333",
+          "size_bytes": 859415
+        },
+        "verify_after_publish": {
+          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF-retry.0NbG7P/verify-journal-after-publish.stdout.log",
+          "exists": true,
+          "sha256": "57dae808c599e68139eb714cc2c3098155e14a64f49e25d719024dae0fd200b7",
+          "size_bytes": 29
+        }
+      },
+      "attempt_history": [
+        {
+          "attempt": "previous_phaseF_attempt",
+          "evidence_dir": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF.MQ6PMD",
+          "status": "bounded_transfer_timed_out",
+          "snapshot_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-4cd6a72f800f4075aa4306d35ac6a24a",
+          "stderr_log": {
+            "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF.MQ6PMD/evidence-publish.stderr.log",
+            "exists": true,
+            "sha256": "b91f9818b4c23f0b01fdb4e0807d2a6394317a3bf0daf8bf9cafe4a8a46e4231",
+            "size_bytes": 3611
+          },
+          "hung_get_log": {
+            "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/research-journal-publication-4cd6a72f800f4075aa4306d35ac6a24a/229-get.log",
+            "exists": true,
+            "sha256": "d5ec982f8172a29b11a3e1c045c0ccc002f8d6415b3985f3cc6787fe0dc24d90",
+            "size_bytes": 253
+          },
+          "note_stdout": {
+            "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF.MQ6PMD/tracker-note.stdout.log",
+            "exists": true,
+            "sha256": "70b83f9d41866191d84e76ebfad1762ffb49ec2a84e4d57f1d497baf78c4ffda",
+            "size_bytes": 44
+          },
+          "note_stderr": {
+            "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF.MQ6PMD/tracker-note.stderr.log",
+            "exists": true,
+            "sha256": "d2fa9527962d5993cc8da3c03aa0de77bd720b0ff47f22e2494b3d1d5cc362a3",
+            "size_bytes": 2746
+          },
+          "committed_effect": "The local append from this attempt was discarded after the HOLD; committed journal remained at 129 entries and the previous publication receipt bytes were preserved."
+        },
+        {
+          "attempt": "retry_attempt_1",
+          "evidence_dir": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF-retry.0NbG7P",
+          "status": "pass",
+          "started_utc": "2026-10-08T15:39:41Z",
+          "ended_utc": "2026-10-08T16:05:21Z",
+          "snapshot_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-4b54270c65fd46aab5776824c4a20f98",
+          "attempt_log": {
+            "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF-retry.0NbG7P/evidence-publish-attempts.log",
+            "exists": true,
+            "sha256": "83b31c4664b20565dbeece894708ea78c95f8402ae65d63039a5e5a07a62a2b0",
+            "size_bytes": 77
+          },
+          "stdout_log": {
+            "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF-retry.0NbG7P/evidence-publish-attempt1.stdout.log",
+            "exists": true,
+            "sha256": "503cab5ff25b34bbbc38662ea6739323d7f3dee66da53b6649375d4437c74f31",
+            "size_bytes": 187
+          },
+          "stderr_log": {
+            "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF-retry.0NbG7P/evidence-publish-attempt1.stderr.log",
+            "exists": true,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "size_bytes": 0
+          }
+        }
+      ],
+      "independent_manifest_readback": {
+        "command": "~/workspace/waystone/scripts/waystone --error-format json --auth-source token-file get <manifest_hdfs_uri> <evidence_dir>/manifest-independent-readback.json",
+        "manifest_readback": {
+          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF-retry.0NbG7P/manifest-independent-readback.json",
+          "exists": true,
+          "sha256": "52516d9f69261a83f2589c0633a782a48754af34aa9faa8aa815cb95dc12c654",
+          "size_bytes": 172871
+        },
+        "manifest_sha256_matches_receipt": true,
+        "manifest_journal_sha256": "3dea56f16a3392f7de7710a502267db455e06e61c96f3f1eac14e8b8cc8d09d8",
+        "local_journal_sha256": "3dea56f16a3392f7de7710a502267db455e06e61c96f3f1eac14e8b8cc8d09d8",
+        "journal_sha256_matches_local": true,
+        "check_log": {
+          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF-retry.0NbG7P/manifest-independent-check.txt",
+          "exists": true,
+          "sha256": "cc59ddd6b18916196dc4ad80ec5b9e689fd98b6c0c7a784e5346d91f8def37b9",
+          "size_bytes": 425
+        },
+        "stdout_log": {
+          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF-retry.0NbG7P/manifest-independent-get.stdout.log",
+          "exists": true,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        },
+        "stderr_log": {
+          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF-retry.0NbG7P/manifest-independent-get.stderr.log",
+          "exists": true,
+          "sha256": "208a0a4173d1869437a1e25722ee62799031ce3bad7d42019cd28393a7e3537a",
+          "size_bytes": 202
+        }
+      },
+      "preserved_previous_receipt": {
+        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF-retry.0NbG7P/research-journal-hdfs-verified.before.json",
+        "exists": true,
+        "sha256": "bbb5827f61954bd1b48aa5c79f05602400f57c16249ca61c014a4996a489b19d",
+        "size_bytes": 381908
+      },
+      "fresh_evidence_dir": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF-retry.0NbG7P"
     },
     "G": {
       "status": "reported",
@@ -2236,10 +2384,10 @@
   "scope": {
     "evidence_root": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution",
     "not_a_scientific_result": true,
-    "repo_root": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+    "repo_root": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish",
     "scientific_root": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing"
   },
-  "status": "phase_e_passed_with_gpu_sharing_phase_f_held_pending_user_decision",
+  "status": "phase_e_accepted_with_gpu_sharing_caveat_phase_f_passed",
   "ticket27_box_verdicts": [
     {
       "box": "The sweep recipes, frames and anchor templates are unchanged from the preregistration",
@@ -2276,23 +2424,26 @@
     },
     {
       "box": "A live gate executes the admitted candidate in the new rootfs and its receipt verifies against the snapshot",
-      "verdict": "passed_with_gpu_sharing",
+      "verdict": "accepted_with_gpu_sharing_caveat",
       "evidence": {
         "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/admission-summary.json",
         "exists": true,
         "sha256": "df8e5c8f579b17a686f0c2b31316be35d209f44539c4e5c52c5e66e26db7d737",
         "size_bytes": 226402
       },
-      "note": "Scoped live command exited 0 after 3903.866 seconds and replay verification passed for all 14 stages, records 0 and 1000, and both 16-head sets. GPU 1 sharing was observed, so user decision is required before journal publication or unqualified acceptance."
+      "note": "The scoped live command exited 0 after 3903.866 seconds and replay verification passed for all 14 stages, records 0 and 1000, and both 16-head sets. GPU 1 sharing was observed and accepted by the user as a caveat; this is not an unqualified clean-GPU admission."
     },
     {
       "box": "The journal records the re-admission and what changed since the original admission",
-      "verdict": "held_pending_user_decision_on_gpu_sharing",
+      "verdict": "pass",
       "evidence": {
-        "coordinator_reply_utc": "2026-10-08T09:57:15Z",
-        "priority": "HOLD"
+        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/research-journal-hdfs-verified.json",
+        "sha256": "48ad366dcabf69bd2d9ce5ad8cc891e6afaac659400455cc2fa2169e6de81333",
+        "hdfs_prefix": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-research-journal/snapshot-research-journal-publication-4b54270c65fd46aab5776824c4a20f98",
+        "manifest_sha256": "52516d9f69261a83f2589c0633a782a48754af34aa9faa8aa815cb95dc12c654",
+        "entry_count": 130
       },
-      "note": "Phase F is held; no journal append, evidence.publish receipt, or HDFS journal publication is committed."
+      "note": "Phase F appended the accepted readmission decision note, verified the journal at 130 entries, published the full journal/evidence snapshot to HDFS, and independently read back manifest.json with matching manifest and research-journal.jsonl sha256 values."
     },
     {
       "box": "The task index states the sweep new status",
@@ -2304,7 +2455,7 @@
       "note": "The task explicitly forbade editing the ticket file or task index."
     }
   ],
-  "worker": "t27f4-live-admission",
+  "worker": "t27j-journal-publish",
   "current_worker_evidence": {
     "t27f20261008T081353Z_admission_summary": {
       "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/admission-summary.json",
@@ -2354,6 +2505,32 @@
       "sha256": "868866e8a73baa9cee9c6601bd21c331e004ca3695eb72ff9f739e8a183ff23a",
       "size_bytes": 550283
     },
-    "phase_e_issue_channel": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/claude-worker-runs/workers/t27f4-live-admission-20261008T081103Z/tmp/claude-issues.jsonl"
+    "phase_e_issue_channel": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/claude-worker-runs/workers/t27f4-live-admission-20261008T081103Z/tmp/claude-issues.jsonl",
+    "phaseF_retry_evidence_dir": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF-retry.0NbG7P",
+    "phaseF_publication_receipt": {
+      "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/research-journal-hdfs-verified.json",
+      "exists": true,
+      "sha256": "48ad366dcabf69bd2d9ce5ad8cc891e6afaac659400455cc2fa2169e6de81333",
+      "size_bytes": 859415
+    },
+    "phaseF_publish_attempt_log": {
+      "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF-retry.0NbG7P/evidence-publish-attempts.log",
+      "exists": true,
+      "sha256": "83b31c4664b20565dbeece894708ea78c95f8402ae65d63039a5e5a07a62a2b0",
+      "size_bytes": 77
+    },
+    "phaseF_independent_manifest_readback": {
+      "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF-retry.0NbG7P/manifest-independent-readback.json",
+      "exists": true,
+      "sha256": "52516d9f69261a83f2589c0633a782a48754af34aa9faa8aa815cb95dc12c654",
+      "size_bytes": 172871
+    },
+    "phaseF_independent_manifest_check": {
+      "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/journal/t27f20261008T081353Z-phaseF-retry.0NbG7P/manifest-independent-check.txt",
+      "exists": true,
+      "sha256": "cc59ddd6b18916196dc4ad80ec5b9e689fd98b6c0c7a784e5346d91f8def37b9",
+      "size_bytes": 425
+    },
+    "phaseF_issue_channel": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/claude-worker-runs/workers/t27j-journal-publish-20261008T153605Z/tmp/claude-issues.jsonl"
   }
 }
