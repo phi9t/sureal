@@ -9,8 +9,8 @@ from training_execution.sustained_state import restore_state,capture_state
 from resources.replay_values import require_exact_state,require_exact_heads
 from training_execution.sustained_reference import reference_updates
 from detection.sustained_loss import class_balanced_objective
-from detection.fixed_batch_catalog import catalog
-from detection.fixed_batch_models import build,optimizer,deterministic,objective
+from detection.detector_recipe_catalog import catalog
+from detection.detector_recipe_models import build,optimizer,deterministic,objective
 from evidence.source_snapshot import file_sha256
 
 sha=file_sha256

@@ -10,7 +10,7 @@ LIB_MODULES = glob(
 
 TEST_MODULES = glob(["*_test.py"])
 GPU_TESTS = [
-    "expanded_batch_observations_test.py",
+    "detector_observations_test.py",
 ]
 
 COMMAND_SCRIPTS = glob(["*-*.py"])

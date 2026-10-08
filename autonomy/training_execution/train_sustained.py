@@ -8,8 +8,8 @@ from training_execution.sustained_loop import advance
 from detection.sustained_loss import class_balanced_objective
 from training_execution.sustained_state import restore_state
 from training_execution.sustained_sources import validate_sources
-from detection.fixed_batch_catalog import catalog
-from detection.fixed_batch_models import build,objective,optimizer,deterministic
+from detection.detector_recipe_catalog import catalog
+from detection.detector_recipe_models import build,objective,optimizer,deterministic
 from resources.scientific_budget import reserve_write
 from evidence.source_snapshot import file_sha256
 

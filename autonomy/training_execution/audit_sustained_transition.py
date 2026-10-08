@@ -22,8 +22,8 @@ def main():
  from detection.sustained_contract import validate_contract
  from resources.replay_values import require_exact_state
  from detection.sustained_loss import class_balanced_objective
- from detection.fixed_batch_catalog import catalog
- from detection.fixed_batch_models import build,optimizer,deterministic,objective
+ from detection.detector_recipe_catalog import catalog
+ from detection.detector_recipe_models import build,optimizer,deterministic,objective
  from sustained_chunk_reference import reference_chunk
  from training_execution.replay_sustained import main as replay_heads
  torch.cuda.reset_peak_memory_stats();started=time.monotonic()

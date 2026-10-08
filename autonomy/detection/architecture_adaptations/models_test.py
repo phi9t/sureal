@@ -1,8 +1,8 @@
 import unittest,torch
-from detection.expanded_batch.catalog import catalog
-from detection.expanded_batch.models import build,bind_observations
-from detection.fixed_batch_models import build as baseline_build
-from detection.fixed_batch_catalog import BASE
+from detection.architecture_adaptations.catalog import catalog
+from detection.architecture_adaptations.models import build,bind_observations
+from detection.detector_recipe_models import build as baseline_build
+from detection.detector_recipe_catalog import BASE
 from detection.pillar_encoder import decorate
 
 class FactoryContract(unittest.TestCase):

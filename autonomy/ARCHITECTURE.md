@@ -40,7 +40,7 @@ active range probes stay in `range_view/` and declare their downward
 outside the active import graph. `studies/*/procedure_records/` holds closed
 procedure records: they remain byte-for-byte evidence, may contain historical
 imports, and are not a reason to recreate old active package edges. The
-retained expanded-batch composition still imports `range_view.RangePillar`;
+retained architecture-adaptation composition still imports `range_view.RangePillar`;
 that exception is modeled as an explicit BUILD dependency rather than a hidden
 path rewrite.
 

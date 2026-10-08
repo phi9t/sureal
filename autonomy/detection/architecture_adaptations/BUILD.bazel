@@ -16,7 +16,7 @@ GPU_TESTS = [
 package(default_visibility = ["//visibility:private"])
 
 py_library(
-    name = "expanded_batch",
+    name = "architecture_adaptations",
     srcs = LIB_MODULES,
     imports = ["../.."],
     visibility = [
@@ -42,7 +42,7 @@ filegroup(
     py_test(
         name = test[:-3],
         srcs = [test],
-        deps = [":expanded_batch"],
+        deps = [":architecture_adaptations"],
         imports = ["../.."],
         legacy_create_init = 0,
         size = "small",

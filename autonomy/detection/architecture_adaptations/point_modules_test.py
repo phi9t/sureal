@@ -1,6 +1,6 @@
 import unittest,torch,numpy as np
 from detection.pillar_encoder import PillarFeatureNet,decorate
-from detection.expanded_batch.point_modules import RaggedPillar,PointAttention,PointMLP,decorate_ragged
+from detection.architecture_adaptations.point_modules import RaggedPillar,PointAttention,PointMLP,decorate_ragged
 
 class PointContract(unittest.TestCase):
  def setUp(self):torch.manual_seed(17);torch.set_num_threads(2)

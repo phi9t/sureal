@@ -2,9 +2,9 @@
 import torch
 from torch import nn
 from detection.pillar_encoder import decorate,scatter
-from detection.fixed_batch_models import build as build_reference,objective,optimizer,deterministic
-from detection.expanded_batch.point_modules import RaggedPillar,PointAttention,PointMLP,decorate_ragged
-from detection.expanded_batch.spatial_modules import configure_grid,SparseBackbone
+from detection.detector_recipe_models import build as build_reference,objective,optimizer,deterministic
+from detection.architecture_adaptations.point_modules import RaggedPillar,PointAttention,PointMLP,decorate_ragged
+from detection.architecture_adaptations.spatial_modules import configure_grid,SparseBackbone
 from range_view.range_fusion import RangePillar
 
 class AdvancedDetector(nn.Module):
