@@ -1,0 +1,270 @@
+{
+  "scope": "explicit evidence-only landing inventory; excludes external dirty files, unreviewed runtime sources and old untracked work",
+  "paths": [
+    {
+      "path": "experiments/waymo-perception/research/2026-10-03-models-training-closeout-handoff.md",
+      "sha256": "bd9fd5603e8fd845338c5eb22ecaff7b533e286dcac9431b15cdc7535e4f4827",
+      "bytes": 3743
+    },
+    {
+      "path": "experiments/waymo-perception/research/2026-10-04-models-training-documentation-review.md",
+      "sha256": "856d852df5b6c6308e27726022e6837a4570748d4af84f6c0bf71bf3cc1bdeaa",
+      "bytes": 3071
+    },
+    {
+      "path": "experiments/waymo-perception/research/2026-10-04-resource-artifact-closeout.md",
+      "sha256": "7c3336babd24323822a7c99f0b7ba5f435b6a5478466b1bbf720fef21b74a127",
+      "bytes": 5454
+    },
+    {
+      "path": "experiments/waymo-perception/research/research-journal.jsonl",
+      "sha256": "b3710faceb1257b0b715066228afe73b3e1e02b02c26e5fce1f4998ce7e3fdae",
+      "bytes": 158242
+    },
+    {
+      "path": "experiments/waymo-perception/research/research-journal.md",
+      "sha256": "d898cee1a1ae97f35cd1ae12b85b8406a3eed742de824889334d24fc4329a84a",
+      "bytes": 112814
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-continuation-merged-tests-verified.json",
+      "sha256": "8e85724d2f07e82bcbd223524008655a284b0a7fa4b26789db0655103a1eb39f",
+      "bytes": 61486
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-continuation-merged-gate.driver.source",
+      "sha256": "4d5d3a8ed48c43e77843f246d9b544dece99c9d3331849f3f868b88c24c03733",
+      "bytes": 2322
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-continuation-namespace-red1-verified.json",
+      "sha256": "75353a5b35740b64b7d5219c6de7a6be83e041176ddf3bd979662e480bbca74d",
+      "bytes": 62477
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-continuation-namespace-green1-verified.json",
+      "sha256": "1570355e2b725c6b6d4284e0abccfc7b564920e00d5af0ad42dbe66a1500694f",
+      "bytes": 63447
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-continuation-runtime-gate.driver.source",
+      "sha256": "35f0dd360d3430a8d2e5318987539ef8eec48bf299fe427e45851606d511c5c0",
+      "bytes": 2268
+    },
+    {
+      "path": "experiments/waymo-perception/research/sustained-resource-legacy-preservation-v1-failure.json",
+      "sha256": "6a6afa99f19a29f18d631b9bfbef8a4c8d3625bf857ef815cb5083d1df1f9597",
+      "bytes": 3223
+    },
+    {
+      "path": "experiments/waymo-perception/research/sustained-resource-legacy-preservation-v2-verified.json",
+      "sha256": "ff75ebf2e22297eb54c50990e25eb54e1b9ca4d3a3bf92719b82c46da04c88d3",
+      "bytes": 4517
+    },
+    {
+      "path": "experiments/waymo-perception/research/sustained-resource-legacy-witness-supplement-v1-verified.json",
+      "sha256": "29625edf50fb45676957300df1f6130c00e9085fd9d66ed68512c7c368db1f44",
+      "bytes": 3489
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-resource-legacy-preservation-v1.driver.source",
+      "sha256": "5e22d811197ff17da6f852a1dee6b7bbd93eb6c829c426d7e47f919645195d41",
+      "bytes": 7687
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-resource-legacy-preservation-v2.driver.source",
+      "sha256": "c51928166393fc02cdf2355acc592beaf556e9fdb18f4d894666a4682818829e",
+      "bytes": 6933
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-legacy-witness-reference-audit.json",
+      "sha256": "49b5520fd9d37b9d544df61cabf5d2bc0adb569580b6a193a76ca8383954974a",
+      "bytes": 167396
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-legacy-witness-reference-audit.driver.source",
+      "sha256": "0a0240c4b507cd88e6d1e07db55ab48ec64a8116b5722fd97e0c43166dd4ad6c",
+      "bytes": 2233
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-legacy-extra-paired-witness-reference.json",
+      "sha256": "76a5990705f989aa8091f968939158623effb71c65de366b4d349a668f082f24",
+      "bytes": 251
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-resource-legacy-witness-supplement-v1.driver.source",
+      "sha256": "8c25ce2f78f168260676e31f3b554f769034401bb60f693348e27e7b2b15710e",
+      "bytes": 5355
+    },
+    {
+      "path": "experiments/waymo-perception/research/sustained-resource-legacy-preservation-independent.json",
+      "sha256": "2e4271001bdcea21a88796efa7bf4a433a86867743c9f6c4458f9da5b3bc25b9",
+      "bytes": 2561469
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-legacy-preservation-independent.driver.source",
+      "sha256": "b92ba2cfe61b1a5d26280dc6ad41972013482aff2d6a9452c81cfeccfedc22ab",
+      "bytes": 26464
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-legacy-cold-gpu-budget-plan.json",
+      "sha256": "584cb017a23863a89b0458f280ce68b9a23cc9a422f691d5538ae65a2a60032c",
+      "bytes": 1140
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-legacy-closeout-reconcile.json",
+      "sha256": "fa0f25c2f723222cd2ba62ea38aae1f78100c9ff991f4e49f66c109a357e99fd",
+      "bytes": 15143
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-legacy-closeout-reconcile.driver.source",
+      "sha256": "82d3990a67997cd1b4fd91e57bb1e2875725f0c8d9f689a7bc3394d8ed855a80",
+      "bytes": 2212
+    },
+    {
+      "path": "experiments/waymo-perception/research/journal-evidence/bd9fd5603e8fd845338c5eb22ecaff7b533e286dcac9431b15cdc7535e4f4827",
+      "sha256": "bd9fd5603e8fd845338c5eb22ecaff7b533e286dcac9431b15cdc7535e4f4827",
+      "bytes": 3743
+    },
+    {
+      "path": "experiments/waymo-perception/research/journal-evidence/056b2a17dba10e474e603f2a74f84990e3475a159459a8fe14ae22e42927e050",
+      "sha256": "056b2a17dba10e474e603f2a74f84990e3475a159459a8fe14ae22e42927e050",
+      "bytes": 105661
+    },
+    {
+      "path": "experiments/waymo-perception/research/journal-evidence/8e85724d2f07e82bcbd223524008655a284b0a7fa4b26789db0655103a1eb39f",
+      "sha256": "8e85724d2f07e82bcbd223524008655a284b0a7fa4b26789db0655103a1eb39f",
+      "bytes": 61486
+    },
+    {
+      "path": "experiments/waymo-perception/research/journal-evidence/75353a5b35740b64b7d5219c6de7a6be83e041176ddf3bd979662e480bbca74d",
+      "sha256": "75353a5b35740b64b7d5219c6de7a6be83e041176ddf3bd979662e480bbca74d",
+      "bytes": 62477
+    },
+    {
+      "path": "experiments/waymo-perception/research/journal-evidence/1570355e2b725c6b6d4284e0abccfc7b564920e00d5af0ad42dbe66a1500694f",
+      "sha256": "1570355e2b725c6b6d4284e0abccfc7b564920e00d5af0ad42dbe66a1500694f",
+      "bytes": 63447
+    },
+    {
+      "path": "experiments/waymo-perception/research/journal-evidence/6a6afa99f19a29f18d631b9bfbef8a4c8d3625bf857ef815cb5083d1df1f9597",
+      "sha256": "6a6afa99f19a29f18d631b9bfbef8a4c8d3625bf857ef815cb5083d1df1f9597",
+      "bytes": 3223
+    },
+    {
+      "path": "experiments/waymo-perception/research/journal-evidence/7c3336babd24323822a7c99f0b7ba5f435b6a5478466b1bbf720fef21b74a127",
+      "sha256": "7c3336babd24323822a7c99f0b7ba5f435b6a5478466b1bbf720fef21b74a127",
+      "bytes": 5454
+    },
+    {
+      "path": "experiments/waymo-perception/research/journal-evidence/2e4271001bdcea21a88796efa7bf4a433a86867743c9f6c4458f9da5b3bc25b9",
+      "sha256": "2e4271001bdcea21a88796efa7bf4a433a86867743c9f6c4458f9da5b3bc25b9",
+      "bytes": 2561469
+    },
+    {
+      "path": "experiments/waymo-perception/research/journal-evidence/ff75ebf2e22297eb54c50990e25eb54e1b9ca4d3a3bf92719b82c46da04c88d3",
+      "sha256": "ff75ebf2e22297eb54c50990e25eb54e1b9ca4d3a3bf92719b82c46da04c88d3",
+      "bytes": 4517
+    },
+    {
+      "path": "experiments/waymo-perception/research/journal-evidence/29625edf50fb45676957300df1f6130c00e9085fd9d66ed68512c7c368db1f44",
+      "sha256": "29625edf50fb45676957300df1f6130c00e9085fd9d66ed68512c7c368db1f44",
+      "bytes": 3489
+    },
+    {
+      "path": "experiments/waymo-perception/research/journal-evidence/fa0f25c2f723222cd2ba62ea38aae1f78100c9ff991f4e49f66c109a357e99fd",
+      "sha256": "fa0f25c2f723222cd2ba62ea38aae1f78100c9ff991f4e49f66c109a357e99fd",
+      "bytes": 15143
+    },
+    {
+      "path": "experiments/waymo-perception/research/journal-evidence/856d852df5b6c6308e27726022e6837a4570748d4af84f6c0bf71bf3cc1bdeaa",
+      "sha256": "856d852df5b6c6308e27726022e6837a4570748d4af84f6c0bf71bf3cc1bdeaa",
+      "bytes": 3071
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-models-training-docs-validation.json",
+      "sha256": "c3ba1e2ca4e3b99d232388b6cbb674ca705fcfebf71c45c3d4d903dc14469258",
+      "bytes": 6694
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-resource-legacy-closeout-preservation-v1.driver.source",
+      "sha256": "7d20e98fcc36a010402a5282df2c1f3b7e2b0938ecde3e3e09512abbb2cfd46e",
+      "bytes": 4669
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-resource-legacy-closeout-preservation-v2.driver.source",
+      "sha256": "74ae55cf9fdeced0e64fa715a70974efb64d2e9fcb08e46aa8f9fe8d8c9e63d8",
+      "bytes": 5057
+    },
+    {
+      "path": "experiments/waymo-perception/research/sustained-resource-legacy-closeout-preservation-v1-failure.json",
+      "sha256": "24190683f677f699944589dec381027475852eb473ff959eee2ed5ff5f5d5534",
+      "bytes": 17267
+    },
+    {
+      "path": "experiments/waymo-perception/research/sustained-resource-legacy-closeout-preservation-v2-verified.json",
+      "sha256": "686378988fb2428f4e38326c3be600ac8cd935df5793a1a3ca2c580718f4ec61",
+      "bytes": 1663
+    },
+    {
+      "path": "experiments/waymo-perception/research/sustained-resource-legacy-closeout-independent.json",
+      "sha256": "cea070fee20873713b1f475503f5d95feac9ba4320a2f4a0816ee3005b18eefc",
+      "bytes": 232981
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-legacy-closeout-postverify.json",
+      "sha256": "bd70d335d57877cc18e912aaae86a8492754e92539cfbbaecaa7cc02d79b9a2c",
+      "bytes": 2417
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-models-training-proposal-preservation.json",
+      "sha256": "35427abb24446b183d6c648cd7dab814c3d18a6833cce042332c958c7e6016d9",
+      "bytes": 1097
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-legacy-closeout-independent.driver.source",
+      "sha256": "d09dfb5fc6d066b8b858ffafa68d96adf0730ab406085d5d96f3c1b2d8ca7aa0",
+      "bytes": 14735
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-legacy-closeout-postverify.driver.source",
+      "sha256": "3c538a8448f208c17f4d349489c52e679463bf305898721a43e9738ea2a67db9",
+      "bytes": 3623
+    },
+    {
+      "path": "experiments/waymo-perception/research/journal-evidence/686378988fb2428f4e38326c3be600ac8cd935df5793a1a3ca2c580718f4ec61",
+      "sha256": "686378988fb2428f4e38326c3be600ac8cd935df5793a1a3ca2c580718f4ec61",
+      "bytes": 1663
+    },
+    {
+      "path": "experiments/waymo-perception/research/journal-evidence/cea070fee20873713b1f475503f5d95feac9ba4320a2f4a0816ee3005b18eefc",
+      "sha256": "cea070fee20873713b1f475503f5d95feac9ba4320a2f4a0816ee3005b18eefc",
+      "bytes": 232981
+    },
+    {
+      "path": "experiments/waymo-perception/research/journal-evidence/bd70d335d57877cc18e912aaae86a8492754e92539cfbbaecaa7cc02d79b9a2c",
+      "sha256": "bd70d335d57877cc18e912aaae86a8492754e92539cfbbaecaa7cc02d79b9a2c",
+      "bytes": 2417
+    },
+    {
+      "path": "experiments/waymo-perception/research/journal-evidence/c3ba1e2ca4e3b99d232388b6cbb674ca705fcfebf71c45c3d4d903dc14469258",
+      "sha256": "c3ba1e2ca4e3b99d232388b6cbb674ca705fcfebf71c45c3d4d903dc14469258",
+      "bytes": 6694
+    },
+    {
+      "path": "experiments/waymo-perception/research/journal-evidence/35427abb24446b183d6c648cd7dab814c3d18a6833cce042332c958c7e6016d9",
+      "sha256": "35427abb24446b183d6c648cd7dab814c3d18a6833cce042332c958c7e6016d9",
+      "bytes": 1097
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-resource-legacy-closeout-final-metadata-v1.driver.source",
+      "sha256": "1e026f67a41e5b080260970bd2ef209e106e2fbcc56b577e6b0c7bcedad70cc8",
+      "bytes": 4088
+    },
+    {
+      "path": "experiments/waymo-perception/research/sustained-resource-legacy-closeout-final-metadata-v1-verified.json",
+      "sha256": "85c26868c020a90d74cdd71183e8772f12f29f5dee89efdb65b77a256115f13c",
+      "bytes": 1423
+    }
+  ]
+}

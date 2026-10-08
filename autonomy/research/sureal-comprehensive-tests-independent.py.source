@@ -1,0 +1,49 @@
+"""Read-only reconciliation of admitted v7 suites plus separate v9 dispatch."""
+import json,hashlib,subprocess,sys
+from pathlib import Path
+sys.dont_write_bytecode=True
+ROOT=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer');P=ROOT/'experiments/waymo-perception';sys.path.insert(0,str(P))
+from resources.stage import validate_proof
+from resources.sources import validate_sources
+A=Path('/tmp/sureal-comprehensive-closeout-passing-tests-dispatch.json');OUT=Path('/tmp/sureal-comprehensive-closeout-independent-supplement.json')
+def read(p):return json.loads(Path(p).read_text())
+def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def ref(p):return {'path':str(p),'sha256':sha(p)}
+a=read(A);assert a['passed'] is True;assert sha(a['driver']['path'])==a['driver']['sha256'];assert sha(a['worker']['path'])==a['worker']['sha256']
+assert sha(a['suite_attempt']['path'])==a['suite_attempt']['sha256'];attempt=read(a['suite_attempt']['path']);assert attempt['passed'] is False and attempt['failure'];assert a['passing_suites']==attempt['stages'][1:3];assert a['source_snapshot']==attempt['source_snapshot']
+assert sha(attempt['worker']['path'])==attempt['worker']['sha256'];assert sha(attempt['driver']['path'])==attempt['driver']['sha256']
+legacy=read('/tmp/sureal-legacy-parity-independent-review.json');candidatepath=Path('/tmp/sureal-comprehensive-closeout-candidates.json');candidate=read(candidatepath);candidates={e['path']:e['sha256'] for e in candidate['candidates']}
+stages=[];modulefiles=[];summaries=[];executed=[];packages=[]
+for stage in [*a['passing_suites'],{'name':'dispatcher-list-show','proof':a['proof']}]:
+ p=Path(stage['proof']['path']);assert sha(p)==stage['proof']['sha256'];v=read(p);pins=v['source_pins'];assert {n:x['sha256'] for n,x in pins.items()}=={n:x['sha256'] for n,x in legacy['resource_source_pins'].items()};validate_sources(P/'resources',pins)
+ out=Path(v['native_output_directory']);admission=validate_proof(v,v['command'],P/'resources',pins,out,16*1024**3,300);cmd=v['original_command'];k=v['host_measurement']['kernel_scope'];assert k['memory_max_bytes']==16*1024**3 and k['memory_swap_max_bytes']==0 and k['oom']==k['oom_kill']==0 and k['members_verified']
+ for r in v['artifacts'].values():assert sha(r['path'])==r['sha256']
+ if 'log' in stage:assert sha(stage['log']['path'])==stage['log']['sha256']
+ package=Path(cmd[cmd.index('/experiment')-1]);assert cmd[cmd.index('/experiment')-2]=='--ro-bind'
+ for name,pin in a['source_snapshot'].items():assert sha(P/name)==sha(package/name)==pin['sha256']
+ packages.append({'stage':stage['name'],'package':str(package),'members':len(a['source_snapshot'])})
+ if stage['name'] in ['cpu','torch']:
+  i=cmd.index('/tmp/closeout-worker.py');assert cmd[i-2]=='--ro-bind' and sha(cmd[i-1])==attempt['worker']['sha256'];src=Path(cmd[cmd.index('/source')-1]);mp=src/'modules.json';selected=read(mp);summary=read(out/'test-summary.json');assert summary['modules']==selected and summary['failures']==summary['errors']==0 and summary['tests_run']>0;modulefiles.append(ref(mp));summaries.append({'stage':stage['name'],'summary':summary,'body':ref(out/'test-summary.json')});executed.extend(selected)
+ else:
+  assert cmd==a['original_command'];i=cmd.index('/tmp/dispatch-worker.py');assert cmd[i-2]=='--ro-bind' and sha(cmd[i-1])==a['worker']['sha256'];i=cmd.index('/tmp/repo/experiments/waymo-perception');assert cmd[i-2]=='--ro-bind' and Path(cmd[i-1])==package
+  registry=a['registry'];assert sha(registry['path'])==sha(registry['original_path'])==registry['sha256'];assert read(out/'dispatch.json')['checks']==['list','show residual_bev'];dispatch=ref(out/'dispatch.json')
+ stages.append({'name':stage['name'],'proof':stage['proof'],'kernel_scope':k,'artifacts':v['artifacts'],'resource_admission':admission})
+assert sorted(executed)==sorted(attempt['selected_modules']);assert sum(s['summary']['tests_run'] for s in summaries)==312
+modulepins=[]
+for module in executed:
+ rel='experiments/waymo-perception/'+module.replace('.','/')+'.py';path=ROOT/rel;digest=sha(path)
+ if rel in candidates:assert digest==candidates[rel];origin={'candidate_manifest':ref(candidatepath)}
+ else:
+  body=subprocess.check_output(['git','show',candidate['base']+':'+rel],cwd=ROOT);assert hashlib.sha256(body).hexdigest()==digest;origin={'git_baseline':candidate['base']}
+ modulepins.append({'module':module,'source':ref(path),'externally_pinned_origin':origin})
+assert sha(a['dispatcher_source']['path'])==a['dispatcher_source']['sha256']==candidates['experiments/waymo-perception/architecture.py']
+for n,d in legacy['native_source_pins'].items():assert sha(P/n)==d
+for n,v in legacy['host_source_pins'].items():assert sha(v['original'])==v['sha256']
+for p,d in legacy['original_six_artifacts'].items():assert sha(p)==d
+history=[]
+for p in [Path('/tmp/sureal-comprehensive-closeout-live-tests.json'),*sorted(Path('/tmp').glob('sureal-comprehensive-closeout-live-tests-v*.json'))]:
+ if not p.is_file():continue
+ h=read(p);v=p.stem.rsplit('-v',1)[-1];role='prelaunch_refusal' if v in ['2','3','4'] or p.name=='sureal-comprehensive-closeout-live-tests.json' else ('admitted_cpu_torch_suites_but_failed_dispatcher' if v=='7' else 'executed_failed_suite');history.append({'report':ref(p),'passed':h['passed'],'admitted_stages':[s['name'] for s in h.get('stages',[])],'role':role,'failure':h.get('failure')})
+extra=Path('/tmp/sureal-comprehensive-closeout-dispatch-v8.py');failed=Path('/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/comprehensive-closeout-dispatch-v8/proofs/dispatcher/attempt.json');failure=read(failed);assert failure['admitted'] is False and 'worker_measurement' not in failure and not (failed.parent/'worker/worker-resource.json').exists();history.append({'driver':ref(extra),'attempt':ref(failed),'execution_log':ref(failed.parent/'execution.log'),'role':'binding_prelaunch_refusal_no_dispatch_worker_admission'})
+x={'schema_version':1,'passed':True,'scope':'independent read-only reconciliation of312 actual v7 CPU/Torch test invocations and v9 dispatch list/show; separate archive verification pending','prior_audit':ref('/tmp/sureal-comprehensive-closeout-live-evidence-audit.json'),'author_receipt':ref(A),'driver':ref(__file__),'workers':[attempt['worker'],a['worker']],'module_jsons':modulefiles,'source_snapshot':a['source_snapshot'],'snapshot_reconciliation':packages,'selected_test_bodies':modulepins,'suite_summaries':summaries,'stages':stages,'architecture_entrypoint':{'source':a['dispatcher_source'],'registry':a['registry'],'result':dispatch,'admitted_scope':'list/show residual_bev bootstrap/catalog wiring only; no training or additional runner behavior'},'acquisition_scope':'existing exact source lease/preflight only; no new full103 acquisition','historical_attempts':history,'original_sources_and_six_artifacts_exact':True,'scientific_bytes':a['scientific_bytes'],'remaining_blockers':['association9 exact real-input ownership/native-equation gate and separately reviewed storage-contract mismatch','explorer7 generator/template/test_data and audit-cohort readiness beyond fixture tests','complete continuation namespace/backend/retention/sealed companions/shared-parent recovery/keep-two/full runner'],'new_GPU_execution':False,'HDFS_execution_in_this_step':False,'no_new_scientific_admission':True}
+OUT.write_text(json.dumps(x,indent=2)+'\n');print(OUT,sha(OUT));print('tests',sum(s['summary']['tests_run'] for s in summaries),'modules',len(executed),'source snapshot',len(a['source_snapshot']))

@@ -1,0 +1,9 @@
+{
+  "status": "camera-validation native sidecar bundle independently audited after successful live publication",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/camera-validation-sidecar-publication-a/receipt.json",
+  "receipt_sha256": "152c8ba1bdb195bb3a2af91fe8f5bab59568b70d88c03d4623ae820392069c33",
+  "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/component-bundles-v1/scientific/4759225533437988401_800_000_820_000/d2844f923e3057dbc987cbe71b6eec46ba586bfa0d0c631adadd57c82cb8a05d.tar",
+  "files": 39523,
+  "working_set_bytes": 14241742791,
+  "scope": "one held-out scene native sidecars; verified eviction and camera task assembly pending"
+}

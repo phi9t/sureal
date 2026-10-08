@@ -1,0 +1,113 @@
+"""Source-bound A0/A1 preparation; full native truth stays separate from inputs."""
+import hashlib
+import json
+import math
+import time
+from pathlib import Path
+import numpy as np
+from pipeline.anchor_grid import anchor_grid
+from pipeline.detector_geometry import nearest_bev_iou
+from pipeline.detection_export import validate_object
+from association.candidate_graph import build_graph
+from association.matching import reserve
+from association.targets import assemble_targets
+
+
+def digest(path):
+    with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+
+
+ANCHOR_TEMPLATE_SHA256='4bcc69590d664b32ff1ece5e8f00345c76f9564f419b091bf05f6482a5c56d52'
+
+
+def load_templates(path):
+    if digest(path)!=ANCHOR_TEMPLATE_SHA256:raise ValueError('anchor template identity changed')
+    return [t['values'] for t in json.loads(Path(path).read_text())['templates']]
+
+
+def annotation_sets(rows, identity):
+    scene,timestamp=identity.rsplit(':',1);timestamp=int(timestamp);seen=set();eligible=[];native=[]
+    for row in rows:
+        record={'context_name':row['context_name'],'frame_timestamp_micros':row['frame_timestamp_micros'],
+                'object_id':row['object_id'],'type':row['type'],'box':list(row['box']),
+                'score':1.,'overlap_with_nlz':False,'num_lidar_points_in_box':row['num_lidar_points_in_box'],
+                'difficulty':row['detection_difficulty']}
+        if record['context_name']!=scene or record['frame_timestamp_micros']!=timestamp or record['object_id'] in seen:raise ValueError('invalid/duplicate native frame identity')
+        seen.add(record['object_id'])
+        if len(record['box'])!=7 or not all(type(v) in (int,float) and math.isfinite(v) for v in record['box']):raise ValueError('finite native boxes required')
+        record['box'][6]=(record['box'][6]+math.pi)%(2*math.pi)-math.pi
+        validate_object(record);native.append(record)
+        b=record['box']
+        if record['num_lidar_points_in_box']>0 and -64<=b[0]<64 and -64<=b[1]<64 and -4<=b[2]<6:eligible.append(record)
+    return sorted(eligible,key=lambda r:r['object_id']),sorted(native,key=lambda r:r['object_id'])
+
+
+def prepare_static(manifest_path, cache_root, output, experiment):
+    """All mounts are read-only except a new output directory, supplied by Insula."""
+    start=time.monotonic();manifest_path=Path(manifest_path);cache_root=Path(cache_root);output=Path(output);experiment=Path(experiment)
+    manifest=json.loads(manifest_path.read_text());source_map={**manifest['baseline_source_hashes'],**{'association/'+k:v for k,v in manifest['association_source_hashes'].items()}}
+    for name,sha in source_map.items():
+        # Only the independently admitted baseline model/input/runtime scope.
+        if name.startswith(('tier1/','pipeline/','gpu/','association/')):
+            if digest(experiment/name)!=sha:raise ValueError('source identity changed: '+name)
+    anchors=anchor_grid(nx=512,ny=512,cell_size=(.25,.25),origin=(-64.,-64.),
+        templates=load_templates(experiment/'research/training-anchor-templates.candidate.json'))
+    reports=[];truth=[];predictions=[];eligible_count=0;native_count=0;missing=[]
+    for index,binding in enumerate(manifest['frame_bindings']):
+        scene,timestamp=binding['identity'].rsplit(':',1);timestamp=int(timestamp)
+        box_path=cache_root/'scientific-processing/balanced16-labels-v2'/scene/'producer/targets.json'
+        if digest(box_path)!=binding['boxes_sha256']:raise ValueError('native annotation hash changed')
+        frames=json.loads(box_path.read_text())['frames']
+        selected=[f for f in frames if f.get('timestamp_micros',f['rows'][0]['frame_timestamp_micros'] if f['rows'] else None)==timestamp]
+        if len(selected)!=1:raise ValueError('exact native annotation frame required')
+        eligible,native=annotation_sets(selected[0]['rows'],binding['identity']);ids=[r['object_id'] for r in eligible]
+        if sorted(ids)!=sorted(binding['eligible_ids']) or sorted(r['object_id'] for r in native)!=sorted(binding['native_ids']):raise ValueError('GT scope changed')
+        directory=cache_root/'scientific-processing/balanced16-native-v2'/binding['relative_directory']
+        for name,sha in binding['input_hashes'].items():
+            if digest(directory/name)!=sha:raise ValueError('native observation/target source changed')
+        report=json.loads((directory/'report.json').read_text())
+        if report['eligible_object_ids']!=ids:raise ValueError('legacy target index order changed')
+        with np.load(directory/'targets.npz',allow_pickle=False) as data:legacy={key:data[key].copy() for key in data.files}
+        classes=np.array([r['type'] for r in eligible],dtype=np.int64);boxes=np.array([r['box'] for r in eligible],dtype=np.float64).reshape(-1,7)
+        graph=build_graph(anchors,boxes,ids,legacy['target_indices'],legacy['labels']>0,gt_classes=classes)
+        if graph['feasibility']['status']!='feasible':raise ValueError('bounded graph infeasible; target preparation refused')
+        # Pairwise geometry only within one target's declared sparse edges.
+        edges=graph['edges'];costs=np.empty(len(edges),dtype=np.float64)
+        canonical_boxes=boxes[graph['canonical_to_input']]
+        for t in range(len(boxes)):
+            positions=np.flatnonzero(edges[:,1]==t)
+            costs[positions]=1-nearest_bev_iou(anchors[edges[positions,0]],canonical_boxes[t:t+1])[:,0]
+        reservations=reserve(graph,costs,n_anchors=len(anchors),n_targets=len(boxes))
+        canonical_legacy={k:v.copy() for k,v in legacy.items()};inverse=np.empty(len(boxes),dtype=np.int64);inverse[graph['canonical_to_input']]=np.arange(len(boxes))
+        positive=canonical_legacy['labels']>0;canonical_legacy['target_indices'][positive]=inverse[canonical_legacy['target_indices'][positive]]
+        canonical_legacy['target_classes']=graph['target_classes']
+        targets=assemble_targets(anchors,canonical_boxes,canonical_legacy,reservations)
+        frame_output=output/f'frame-{index:02d}';frame_output.mkdir(exist_ok=False)
+        np.savez_compressed(frame_output/'graph.npz',**{k:graph[k] for k in ['edges','canonical_to_input','radius_by_target','legacy_exceptions','target_classes']},gt_boxes=canonical_boxes,target_ids=np.array(graph['target_ids']))
+        np.savez_compressed(frame_output/'reservations-A1.npz',anchor_indices=reservations['anchor_indices'],target_indices=reservations['target_indices'],costs=costs,reservation_costs=reservations['costs'])
+        np.savez_compressed(frame_output/'targets-A0.npz',**legacy)
+        np.savez_compressed(frame_output/'targets-A1.npz',**{k:targets[k] for k in ['labels','target_indices','box_targets','direction_targets','reserved_mask']})
+        covered=set(np.unique(legacy['target_indices'][legacy['labels']>0]).tolist());uncovered=[ids[t] for t in range(len(ids)) if t not in covered]
+        missing.extend({'identity':binding['identity'],'object_id':i} for i in uncovered)
+        row={'index':index,'identity':binding['identity'],'eligible':len(eligible),'native':len(native),
+             'A0_uncovered_ids':uncovered,'A1_coverage':targets['coverage'],'edges':len(edges),
+             'radius_counts':{str(r):int(np.sum(graph['radius_by_target']==r)) for r in range(1,4)},
+             'legacy_exceptions':len(graph['legacy_exceptions']),'objective':reservations['objective'],
+             'zero_overlap_reservations':int(np.sum(reservations['costs']==1)),
+             'artifacts':{p.name:digest(p) for p in sorted(frame_output.iterdir())}}
+        (frame_output/'check.json').write_text(json.dumps(row,indent=2)+'\n');reports.append(row)
+        truth.extend(native);predictions.extend({**r,'difficulty':None} for r in eligible);eligible_count+=len(eligible);native_count+=len(native)
+        print('PREPARED',index,len(eligible),len(native),len(uncovered),flush=True)
+    if (eligible_count,native_count,len(reports),len(missing))!=(1053,1279,16,30):raise ValueError('full study/legacy scope mismatch')
+    oracle=output/'annotation-oracle';oracle.mkdir(exist_ok=False)
+    (oracle/'groundtruth.json').write_text(json.dumps(truth,indent=2)+'\n');(oracle/'predictions.json').write_text(json.dumps(predictions,indent=2)+'\n')
+    summary={'stage':'41.2-static','manifest_sha256':digest(manifest_path),'anchor_template_sha256':ANCHOR_TEMPLATE_SHA256,'frames':reports,'eligible':eligible_count,'native':native_count,
+             'fixed_eligible':reports[7]['eligible'],'A0_uncovered':missing,'source_hashes':{str(p.relative_to(experiment)):digest(p) for p in sorted((experiment/'association').rglob('*')) if p.is_file() and '__pycache__' not in p.parts},
+             'elapsed_seconds':time.monotonic()-start,'scope':'A0/A1 target preparation and annotation-only oracle; zero optimizer updates; no model/NMS/fit admission'}
+    (output/'check.json').write_text(json.dumps(summary,indent=2)+'\n')
+    return summary
+
+
+if __name__=='__main__':
+    import sys
+    prepare_static(*sys.argv[1:])

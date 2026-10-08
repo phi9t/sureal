@@ -1,0 +1,48 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+code=Path('experiments/waymo-perception').resolve();research=code/'research';sys.path.insert(0,str(code))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';working=cache/'scientific-processing';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
+manifest=code/'scientific-acquisition.candidate.json';m=json.loads(manifest.read_text());progress=json.loads((research/'scientific-processing-progress.json').read_text());gaps=json.loads((research/'camera-gap-recovery-progress.json').read_text());pilot=json.loads((research/'camera-only-checkpoint-pilot-verified.json').read_text())
+base=cache/'insula/camera-full103-retained-audit-v1';base.mkdir();inputs=base/'input';inputs.mkdir();output=base/'output';output.mkdir();entries=[]
+for scene,value in progress['replayed_scene_evidence'].items():
+ if 'checkpoint_sha256' not in value:continue
+ cp=working/'cohort-v1'/scene/'receipt.json';assert sha(cp)==value['checkpoint_sha256'];entries.append({'scene':scene,'kind':'full','checkpoint':str(cp),'checkpoint_sha256':value['checkpoint_sha256']})
+assert len(entries)==100
+p=Path(pilot['checkpoint']);assert sha(p)==pilot['checkpoint_sha256'];(inputs/'pilot-checkpoint.json').write_bytes(p.read_bytes());assert sha(inputs/'pilot-checkpoint.json')==pilot['checkpoint_sha256'];entries.append({'scene':pilot['scene'],'kind':'pilot','checkpoint':'/tmp/input/pilot-checkpoint.json','checkpoint_sha256':pilot['checkpoint_sha256']})
+for scene,v in gaps['scene_evidence'].items():
+ e=json.loads((research/v['evidence']).read_text());assert sha(e['checkpoint'])==v['checkpoint_sha256']==e['checkpoint_sha256'];entries.append({'scene':scene,'kind':'gap','checkpoint':e['checkpoint'],'checkpoint_sha256':e['checkpoint_sha256']})
+assert len(entries)==103 and {x['scene'] for x in entries}==set(m['scenes'])
+for e in entries:
+ group=m['scenes'][e['scene']];e['membership']=group;e['source_hashes']={c:sha(cache/'scientific-source-audit'/f"{group['official_split']}-{c}-{e['scene']}.json") for c in m['components']}
+expected={'manifest_sha256':sha(manifest),'runtime_lock':lock,'working_root':str(working),'entries':entries};(inputs/'expected.json').write_text(json.dumps(expected,indent=2)+'\n')
+program="""import hashlib,json,importlib.util,time,resource
+from pathlib import Path
+from pipeline.cohort_checkpoint import verify_checkpoint
+assert importlib.util.find_spec('tensorflow') is None
+e=json.loads(Path('/tmp/input/expected.json').read_text());sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+assert sha('/experiment/scientific-acquisition.candidate.json')==e['manifest_sha256'];m=json.loads(Path('/experiment/scientific-acquisition.candidate.json').read_text());seen=set();result=[];started=time.monotonic()
+for entry in e['entries']:
+ scene=entry['scene'];assert scene not in seen and entry['membership']==m['scenes'][scene];seen.add(scene)
+ if entry['kind']=='pilot':path=Path(entry['checkpoint'])
+ else:
+  original=Path(entry['checkpoint']);root=Path(e['working_root']);assert root in original.parents and '..' not in original.parts;path=Path('/source')/original.relative_to(root)
+ v=verify_checkpoint(path,expected_checkpoint_sha256=entry['checkpoint_sha256'],code_root='/experiment',expected_runtime_lock=e['runtime_lock'],expected_manifest_sha256=e['manifest_sha256'],expected_source_hashes=entry['source_hashes'],path_remap={e['working_root']:'/source'})
+ assert v['scene']==scene
+ if entry['kind']=='full':assert v['worker_receipts']==16 and v['verified_evictions']==3
+ else:assert entry['kind'] in ('pilot','gap') and v['worker_receipts']==5 and v['verified_evictions']==1
+ # Reopen the camera replay attached to each retained checkpoint explicitly.
+ checkpoint=json.loads(path.read_text());replay_paths=[p for p in checkpoint['retained_evidence_hashes'] if p.endswith('/camera-replay/receipt.json') or '/camera-replay-' in p and p.endswith('/receipt.json')]
+ assert len(replay_paths)==1
+ original=Path(replay_paths[0]);relative=original.relative_to(Path(e['working_root']));replay=json.loads((Path('/source')/relative).read_text())
+ assert replay['scene']==scene and len(replay['checks'])==2 and all(type(c['exit_code']) is int and c['exit_code']==0 for c in replay['checks'])
+ result.append({'scene':scene,'membership':entry['membership'],'kind':entry['kind'],'checkpoint_sha256':entry['checkpoint_sha256'],'camera_validation':replay['validation'],'lifecycle':v})
+assert seen==set(m['scenes']) and len(result)==103
+value={'scenes':103,'full_checkpoint_scenes':100,'separate_pilot_scenes':1,'recovered_gap_scenes':2,'entries':result,'worker_resources':{'elapsed_seconds':time.monotonic()-started,'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'rss_scope':'worker_process_peak'},'scope':'complete native camera measurement/annotation publication, two native replays and eviction lineage; model/geometry/protocol scientific comparisons remain open'}
+Path('/outputs/check.json').write_text(json.dumps(value,indent=2)+'\\n');print('PASS all103 original camera lifecycles independently reconciled',flush=True)
+"""
+command=launch_plan(root,code,working,output,['python','-c',program]);at=command.index('--');command[at:at]=['--ro-bind',str(inputs),'/tmp/input'];r=subprocess.run(command,capture_output=True,text=True,timeout=600);log=output/'live.log';log.write_text(r.stdout+r.stderr);print(log.read_text());assert r.returncode==0
+record={'checks':[{'command':command,'exit_code':0}],'runtime_lock':lock,'expected_sha256':sha(inputs/'expected.json'),'checker_sha256':sha(code/'pipeline/cohort_checkpoint.py'),'manifest_sha256':sha(manifest),'validation':json.loads((output/'check.json').read_text()),'live_log':str(log),'live_log_sha256':sha(log),'output':str(output),'scope':'all103 original camera lifecycle native evidence independently admitted live; point-grid/train/eval remain separate'}
+(research/'scientific-camera-full103-verified.json').write_text(json.dumps(record,indent=2)+'\n');print('PASS full camera coverage:',record['validation']['scenes'])

@@ -1,0 +1,8 @@
+{
+  "status": "camera-validation scientific point archive independently mirrored and audited",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/camera-validation-publication-a/receipt.json",
+  "receipt_sha256": "6125a8bd2dcb1263f736e6c9ef66071d870da4e40a8bad1ad152d344d6fd08f4",
+  "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/4759225533437988401_800_000_820_000/600b95f7ca09fb4b75f17d8a7ed11c786aee6ecc0f6ead83d93c3cf2ea04d178.tar",
+  "working_set_bytes": 13602780736,
+  "scope": "one held-out camera cohort scene point records only; two live replay passes and camera task assembly pending"
+}

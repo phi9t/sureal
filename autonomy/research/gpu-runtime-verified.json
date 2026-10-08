@@ -1,0 +1,31 @@
+{
+  "ticket": "08",
+  "status": "verified-complete",
+  "receipts": {
+    "gpu-live-d": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/gpu-live-d/receipt.json",
+      "sha256": "3f7f72cec83faf408b3fba07c3ed8951c4cc10d3a4a4abc8d91993b2fc5e5220"
+    },
+    "gpu-isolation-live-a": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/gpu-isolation-live-a/receipt.json",
+      "sha256": "4cfabde4a96ad1bc9ca8c2875bce108560d8b3d7d09b778351d87071d404cc4d"
+    }
+  },
+  "runtime": {
+    "torch": "2.9.1+cu130",
+    "cuda": "13.0",
+    "device": "NVIDIA B200",
+    "capability": [
+      10,
+      0
+    ],
+    "elapsed_seconds": 0.7236710930010304,
+    "peak_allocated_bytes": 21667328
+  },
+  "limitations": [
+    "Runtime readiness only; no trained checkpoint or model-quality evidence.",
+    "Host driver libraries are explicit hashed read-only inputs.",
+    "Only host GPU device 1 is mounted; namespace CUDA ordinal is 0.",
+    "One device is verified; multi-GPU and custom sparse kernels require separate gates."
+  ]
+}

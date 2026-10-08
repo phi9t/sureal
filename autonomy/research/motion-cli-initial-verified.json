@@ -1,0 +1,7 @@
+{
+  "status": "initial native Motion scoring CLI analytic boundary independently verified live",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-cli-live-a/receipt.json",
+  "receipt_sha256": "33c02208aa0a2d91e366283b92914abd94f31596888547aa2c83a0e1dc5243ea",
+  "fixture_groups": 3,
+  "scope": "single-scenario perfect/2m-offset counts, serialized K order and malformed/identity/endpoint rejection; confidence/validity/joint fixtures, pooled scoring and acquired ingestion remain open"
+}

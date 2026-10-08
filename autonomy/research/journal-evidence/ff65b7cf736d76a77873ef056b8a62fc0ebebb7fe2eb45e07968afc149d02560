@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "utc": "2026-10-04T03:24:12.074038+00:00",
+  "scope": "prepared documentation-only integration of user-requested447; source/evidence preservation and journal bookkeeping",
+  "generation_command": "python /tmp/sureal-doc447-closeout.py (exact generator retained as journal120 evidence)",
+  "base": "19854df4b54769b394a0390d7c92867df6964316",
+  "requested_commit": "447267246d08d20747ea21fac99bda33bfeed311",
+  "requested_parent": "60ede2883ffebe455cf0672ddede3fa0b7e7d4e2",
+  "integration_state": "reviewed source proposal; canonical landing/publication verified separately after final combined candidate review",
+  "source_ancestry_policy": "preserve requested447 as merge parent using current manual bootstrap workflow; no claim of executing proposed managed controller",
+  "document_audit": "sureal-doc447-document-audit.json",
+  "preserved_work_observation": "sureal-doc447-preserved-work-observation.json",
+  "reviews": {
+    "Standards": {
+      "path": "sureal-doc447-standards-review.json",
+      "findings": 0,
+      "sha256": "e9d61018795e96bfc4b4decc2070b85674f2f875228fbc1ff09c8f99ae3e9ae5"
+    },
+    "Spec": {
+      "path": "sureal-doc447-spec-review.json",
+      "findings": 0,
+      "sha256": "46b17519843579f11a6a585a28fff68df02e1099f89da736f366f086306bc7d6"
+    }
+  },
+  "fresh_checks": [
+    {
+      "command": "python -m unittest tests.test_publication_audit -v",
+      "exit_code": 0,
+      "tests": 24,
+      "seconds": 12.113,
+      "scope": "portable host publication tests; no implementation or scientific live admission"
+    },
+    {
+      "command": "python scripts/publication_audit.py --root .",
+      "exit_code": 0,
+      "status": "pass",
+      "tracked_files": 3976,
+      "errors": [],
+      "epoch": "seven requested document changes before later bookkeeping"
+    },
+    {
+      "command": "python /tmp/sureal-doc447-document-audit.py",
+      "exit_code": 0,
+      "local_links": 106,
+      "missing_local_links": 0,
+      "scope": "doc structure, source pins,119journal prefix,19blocked sources and protected original scientific host hashes"
+    }
+  ],
+  "clarified_contract": {
+    "workspace": "linked task worktrees recommended initially; clones not required, optional later",
+    "branch": "codex/<task-id>/<attempt-id>",
+    "identity": "workspace kind/path/common-directory plus per-seat/task/attempt ownership",
+    "capacity": "one is rollout policy; future multiple workers remain possible, not currently implemented or admitted",
+    "authority": "cooperative shared Git refs/objects; no OS isolation claim",
+    "landing": "serialized exact-candidate fast-forward after required gates; other old-base candidates stale, explicit refresh/new verification required"
+  },
+  "retained_later_owner_work": {
+    "observation_utc": "2026-10-04T03:19:50.958689+00:00",
+    "head": "f9fbd5be5b632798f409aa65fb9743588606d701",
+    "working_paths": 13,
+    "disposition": "active foreign design-owner revisions/working edits remain preserved, not adopted/edited/staged/cleaned here; point-in-time observation is not quiescence"
+  },
+  "retained_implementation_blocks": {
+    "count": 19,
+    "inventory": "sureal-comprehensive-closeout-final-inventory.json",
+    "disposition": "original source bodies and missing gate reasons preserved; no readiness promotion"
+  },
+  "ten_reported_old_broken_index_targets": "already landed and exact on current mainline; no new broken local links or duplicate evidence claim",
+  "stage_order": "current/full-owned-ready closeout; pristine canonical and process/resource/design-plan admission; Sureal49\u201353; models/training44\u201348",
+  "frozen_science": "full native GT, source packages, recipes, resource budgets, checkpoints, historical reports and independent verification contracts unchanged; no optimizer samples/new scores",
+  "HDFS_scope": "journal120 and new doc reports are Git-only after sealed113; original exact-readback/live-recovery evidence remains unchanged, no payload release",
+  "future_activation": "no protocol implementation, parallel scheduler, model migration, Kata setup, Corenius dependency or new daemon starts here"
+}

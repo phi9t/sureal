@@ -1,0 +1,31 @@
+{
+  "scanned_scenes": 64,
+  "expected_scenes": 64,
+  "frame_count": 12633,
+  "coverage": {
+    "1": {
+      "eligible_objects": 323038,
+      "unique_tracks": 3416,
+      "frames": 12436,
+      "scenes": 64
+    },
+    "2": {
+      "eligible_objects": 100197,
+      "unique_tracks": 960,
+      "frames": 9143,
+      "scenes": 55
+    },
+    "3": {
+      "eligible_objects": 165279,
+      "unique_tracks": 1687,
+      "frames": 12243,
+      "scenes": 64
+    },
+    "4": {
+      "eligible_objects": 4113,
+      "unique_tracks": 35,
+      "frames": 1657,
+      "scenes": 17
+    }
+  }
+}

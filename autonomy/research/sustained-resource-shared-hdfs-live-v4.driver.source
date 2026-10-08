@@ -1,0 +1,29 @@
+"""Preserve exact shared inputs without changing the retained sweep state."""
+import json,sys,traceback
+from pathlib import Path
+P=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P))
+from cohort.sustained_controller_backend import NativeBackend,C
+from cohort.sustained_controller_lock import acquire_experiment_lock
+from resources.backend import ResourceBackend,prepare_identity
+from resources.sources import sha
+from resources.dependencies import shared_inventory
+from resources.retention import publish_bundle
+report={'scope':'actual shared cohort/driver input HDFS readback and measured live archive recovery; not full checkpoint/native resource admission, training or local payload release','driver_sha256':sha(__file__)}
+try:
+ with acquire_experiment_lock(C/'insula/architecture-experiments.lock') as lock:
+  b=NativeBackend('controller20261003a','baseline',lock,resume=True)
+  original={str(b.R/name):sha(b.R/name) for name in ['state.json','run.json']}
+  for record in json.loads((b.R/'state.json').read_text())['records']:
+   path=Path(record['root'])/'checkpoint.pt';original[str(path)]=sha(path)
+  identity,digest=prepare_identity(b,b.R/'resource-layer-dependency20261003v4')
+  b.__class__=ResourceBackend;b._resource_identity=None;b.attach_resources(identity,digest)
+  inventory=shared_inventory(b);report.update({'resource_identity_path':str(identity),'resource_identity_sha256':digest,'source_pins':b.resource_identity['source_pins'],'original_native_sha256':original,'inventory_files':len(inventory),'inventory_bytes':sum(v['bytes'] for v in inventory.values())})
+  print('PRESERVING shared cohort and drivers',report['inventory_files'],report['inventory_bytes'],flush=True)
+  result=publish_bundle(b,'shared',inventory)
+  assert all(sha(path)==value for path,value in original.items())
+  report.update({'passed':True,'publication':result,'native_state_and_checkpoints_unchanged':True})
+except BaseException as error:
+ report.update({'passed':False,'error':{'type':type(error).__name__,'message':str(error)},'traceback':traceback.format_exc()})
+ (P/'research/sustained-resource-shared-hdfs-live-v4-failure.json').write_text(json.dumps(report,indent=2)+'\n');raise
+(P/'research/sustained-resource-shared-hdfs-live-v4-verified.json').write_text(json.dumps(report,indent=2)+'\n')
+print('PASS shared HDFS exact readback/live recovery; native state/checkpoints unchanged',flush=True)

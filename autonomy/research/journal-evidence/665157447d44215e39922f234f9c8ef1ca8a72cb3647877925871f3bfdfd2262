@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "scope": "fresh current-base source/model/checkpoint inventory equal original substantive results; timing/RSS separately measured",
+  "fields_checked": [
+    "cuda_available",
+    "forward_calls",
+    "fresh_models",
+    "gpu_devices_present",
+    "interventions",
+    "optimizer_updates",
+    "retained_state",
+    "scope",
+    "source_snapshot_sha256",
+    "tensorflow_available",
+    "torch",
+    "torch_source_sha256"
+  ],
+  "candidate": "5a1d92283c3bc8368751a508ef705a7a4f19ebd8",
+  "parent": "88eb369fdb5b512f9a0e3241f6e2f3dacd6f4530",
+  "new_inventory_sha256": "1abd368dfb4eaaaa8536c0e237199cdaea3dde563abbdc2ac159be4b81476b8b",
+  "observed_ms": 1791164555619
+}

@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "base": "8285a0993ea6e1293614f335c62f7e88c06e299f",
+  "source_head": "d5ead21fb46ddef78bed8d8ac0f8b122ca1f0c01",
+  "generation_command": "python /tmp/sureal-doc-branch-document-audit.py; exact generator retained in journal121 evidence",
+  "scope": "wholecommitteddocumentation branch plus explicit open-authority qualifications; no implementation/live gate promotion",
+  "paths": [
+    {
+      "path": "CONTEXT.md",
+      "sha256": "c5c06bc8eac525244e72e96dd9b583d0e368f87db3e1f491acc1e2e344696cdc"
+    },
+    {
+      "path": "docs/collaboration/checks/53.A.json",
+      "sha256": "d398d298a620719d2acc825c91568aef8c278aa83930daf943c1b54632c0cf6c"
+    },
+    {
+      "path": "docs/collaboration/checks/53.B.json",
+      "sha256": "8e73b656da24d128c35c90da5dacbeb147ec49f50f5c65ed2fce997609eff527"
+    },
+    {
+      "path": "docs/collaboration/coverage.json",
+      "sha256": "b7c2024b8d897b020453ad79f6f8fd2f5206a1721890ad5505a04ce5a71ff625"
+    },
+    {
+      "path": "docs/research/README.md",
+      "sha256": "188087d2dc3fbb8bc5f8baebc4d5e9b4411218d1d2edced1cebb60891377e229"
+    },
+    {
+      "path": "docs/research/reviews/2026-10-03-sureal-collaboration-claude-review.json",
+      "sha256": "7bcb1dad81ebba4e1edde4efe88a883c331394b9e0681dcd8f36bba5efe25519"
+    },
+    {
+      "path": "docs/research/reviews/2026-10-03-sureal-collaboration-claude-review.md",
+      "sha256": "ce2e36b382150eee5878c3ed57ee70c9a44e30db148f48ebd59f0e8cfb948112"
+    },
+    {
+      "path": "docs/research/reviews/2026-10-03-sureal-collaboration-review-resolution.md",
+      "sha256": "87ba54f5296be469366afd3b59f40ab8e5e98634fe8ff87b75a5891ddec96dcb"
+    },
+    {
+      "path": "docs/research/reviews/2026-10-04-collaboration-integration-admission.md",
+      "sha256": "8d6060822c6fefa038491dd0f1aeb9294a23bb98c8d6f8302898e56570c2eb7c"
+    },
+    {
+      "path": "docs/research/task-queue.md",
+      "sha256": "1c8c8c747db6cdc79258bad1cf00aa76ae1b20797ae9b99c2cb3225015017bac"
+    },
+    {
+      "path": "docs/research/tasks/49-collaboration-project-admission.md",
+      "sha256": "cdc21bc22d2584bc7252ed790506255df46b2b38d0ddd2cf9c7b4147ead4e47f"
+    },
+    {
+      "path": "docs/research/tasks/50-collaboration-worker-attempts.md",
+      "sha256": "1e7c56dd40156b5a84acaacab71011d4c5c27c52c5a81e1550c5678601ea4a1b"
+    },
+    {
+      "path": "docs/research/tasks/51-collaboration-candidate-verification.md",
+      "sha256": "d6d9b0857456d8c5f618d85e24847b47452ea20a19808ebed3708c5a357543ed"
+    },
+    {
+      "path": "docs/research/tasks/52-collaboration-landing-recovery.md",
+      "sha256": "90293f433f8fef7a177815387ce4ab9576eaa4b9bbec270bbd662b9818af9300"
+    },
+    {
+      "path": "docs/research/tasks/53-0-collaboration-retention-cleanup-foundation.md",
+      "sha256": "61cc740644a22ba31927ad313848841a483fbeadc33c79e0f2a7d278ac67ea63"
+    },
+    {
+      "path": "docs/research/tasks/53-collaboration-cleanup-closeout.md",
+      "sha256": "87283dcc14f8c424df82dc016be73b452a30a24ff5d3c890a22989887d6bf127"
+    },
+    {
+      "path": "docs/research/tasks/54-worker-program-observability.md",
+      "sha256": "c42743e9fc9ceaf978c84ab63be1edbd486ae38f9e6bb3daf09d1a772092a1aa"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md",
+      "sha256": "66b26423db83d05d6898ba1e7ce23d0a46d558f2049a5336ce7db721710b5d35"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-codex-runtime-domain-design.md",
+      "sha256": "b249f898a7dab4a9ba92fbe810ed9f126d2593a37e25376f23871910b718a288"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "sha256": "3a6f967ec111e2e3d396153b42775dd4bab97e414af8d20ac391cde711b468d6"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-worker-session-state-design.md",
+      "sha256": "1729245934fabc06998fcc2beac5ff3a7ddf273b9ea13eb10e374f1a87ba4bb1"
+    },
+    {
+      "path": "experiments/waymo-perception/research-task-index.md",
+      "sha256": "3fcdc8ad336c32fcc040d432f1f859de75648b7da74711cb72ae586394823062"
+    }
+  ],
+  "local_links_checked": 170,
+  "local_MD_anchors_checked": 6,
+  "missing_links_or_anchors": [],
+  "source_docs_exact_except_four_qualification_overlays_and_additive_research_index": true,
+  "coverage_oracles": 39,
+  "coverage_is_future_required_checks_not_run_receipts": true,
+  "pilot_manifests_valid_argv_oracle_structure": true,
+  "original_Claude15source_pins_and_verbatim_body_exact": true,
+  "original_Claude_verdict_preserved": "changes required",
+  "research41_42_43_suffix_exact": true,
+  "seven_task_goal_dependency_verifier_acceptance_closure_contracts_present": true,
+  "all19_blocked_sources_exact": true,
+  "journal120_prefix_exact_before121_append": true,
+  "registry_science_semantics_exact_excluded_timestamp_projection": true,
+  "protected_scientific_host_hash_rechecks": [
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/run.json",
+      "sha256": "96dc607ae8238774ca875588d65eaf463f120227e161ae792a9187c8e6635d7d",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/state.json",
+      "sha256": "dac2ce421243c4750175f98152cdc1ce4ecb7e1a493ddee7050c42fcc09e7765",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-00/checkpoint.pt",
+      "sha256": "8057a5496c4d6ec4d19b9de33034c6cca753ea39d8f03fd765ad7011cdf301ee",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-1000/checkpoint.pt",
+      "sha256": "37de2375b0b10f92a56468bd9ffe0b2fea42f257c5949efa80fd29c621a8ff4a",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-00-admitted.json",
+      "sha256": "dde09eb7e6d65e781597da82870ca6c64ea5bff1ea77d31b8b8268ec5a0ad364",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-1000-admitted.json",
+      "sha256": "b0a874b87a2541ab13b2a97e36540b458b54bb0996c6e679a8c156d0160f52d9",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/identity.json",
+      "sha256": "f2514b46aa6952662b35183df8db0ce9ec914b38640de2a1d24cfbf7bbe80e5d",
+      "exact_to_original": true
+    }
+  ],
+  "SPEC_1_ownership_authority": "open; qualified proposal retention, no backend selection, Kata registration, two-seat or plan/runtime activation"
+}

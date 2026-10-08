@@ -1,0 +1,12 @@
+{
+  "cap_bytes": 16106127360,
+  "data02_floor_bytes": 48318382080,
+  "data02_floor_pass": true,
+  "data02_free_bytes": 132802387968,
+  "reservation_bytes": 2147483648,
+  "reservation_under_cap": true,
+  "root": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing",
+  "target_bytes": 11811160064,
+  "under_target": true,
+  "unique_payload_bytes": 10939980061
+}

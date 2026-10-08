@@ -1,0 +1,61 @@
+{
+  "status": "partial raw-staging capacity evidence",
+  "audited_utc": "2026-09-30T11:52:35.214832+00:00",
+  "source_records_checked": 1574,
+  "retained_engineering_raw_bytes": 1200154353,
+  "combined_raw_cap_bytes": 2147483648,
+  "remaining_staging_bytes": 947329295,
+  "largest_available_sources": [
+    {
+      "scene": "10734565072045778791_440_000_460_000",
+      "component": "camera_image",
+      "size_bytes": 486226770
+    },
+    {
+      "scene": "16473613811052081539_1060_000_1080_000",
+      "component": "camera_image",
+      "size_bytes": 478444866
+    },
+    {
+      "scene": "13807633218762107566_6625_000_6645_000",
+      "component": "camera_image",
+      "size_bytes": 461741657
+    },
+    {
+      "scene": "6161542573106757148_585_030_605_030",
+      "component": "camera_image",
+      "size_bytes": 445303064
+    },
+    {
+      "scene": "14081240615915270380_4399_000_4419_000",
+      "component": "camera_image",
+      "size_bytes": 439340697
+    },
+    {
+      "scene": "16646502593577530501_4878_080_4898_080",
+      "component": "camera_image",
+      "size_bytes": 434642736
+    },
+    {
+      "scene": "809159138284604331_3355_840_3375_840",
+      "component": "camera_image",
+      "size_bytes": 429148021
+    },
+    {
+      "scene": "13830510593707564159_5575_000_5595_000",
+      "component": "camera_image",
+      "size_bytes": 421575076
+    },
+    {
+      "scene": "5468483805452515080_4540_000_4560_000",
+      "component": "camera_image",
+      "size_bytes": 420634882
+    },
+    {
+      "scene": "17962792089966876718_2210_933_2230_933",
+      "component": "camera_image",
+      "size_bytes": 414118184
+    }
+  ],
+  "scope": "recorded source sizes; active transfer limits and source payload hashes are separate gates; missing sources remain untested"
+}

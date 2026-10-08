@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "scope": "Explicit reviewed source/doc/report and bounded proof-metadata allowlist only. No raw sensor payload, generated viewer, credentials, cache tree, globbed temporary tree, model weights or dataset arrays.;19blocked candidate sources preserved but not runtime-admitted; previews/cache trees omitted; no model/rawsensor payload export, checkpoint release or fullrunner admission",
+  "publication": {
+    "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-checkpoint-4abdf20929914fce90a6349fb95376ed/verified-publication.json",
+    "sha256": "c2b0ae2bca92580fc6c0d7bc5a4ca2a918c299f02e8e7fb0092751cf733b5c5e",
+    "hdfs_manifest_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-sustained-baseline-controller20261003a-checkpoint-4abdf20929914fce90a6349fb95376ed/publication-manifest.json",
+    "kind": "checkpoint"
+  },
+  "source_inventory_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/comprehensive-closeout-retention-v2/expected.json",
+  "source_inventory_sha256": "28302cccda7346c1e40f3cfd8fd985c27a76e77c976eac9de33f3c93cb90b7c2",
+  "members": 1381,
+  "source_bytes": 32812875,
+  "journal_entries": 112,
+  "scientific_bytes_before": 15329280496,
+  "scientific_bytes_after": 15329280496,
+  "original_six_artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/run.json": "96dc607ae8238774ca875588d65eaf463f120227e161ae792a9187c8e6635d7d",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/state.json": "dac2ce421243c4750175f98152cdc1ce4ecb7e1a493ddee7050c42fcc09e7765",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-00/checkpoint.pt": "8057a5496c4d6ec4d19b9de33034c6cca753ea39d8f03fd765ad7011cdf301ee",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-00-admitted.json": "dde09eb7e6d65e781597da82870ca6c64ea5bff1ea77d31b8b8268ec5a0ad364",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-1000/checkpoint.pt": "37de2375b0b10f92a56468bd9ffe0b2fea42f257c5949efa80fd29c621a8ff4a",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-1000-admitted.json": "b0a874b87a2541ab13b2a97e36540b458b54bb0996c6e679a8c156d0160f52d9"
+  },
+  "driver": {
+    "path": "/tmp/sureal-comprehensive-closeout-hdfs-v2.py",
+    "sha256": "b8c9eeeac65a0fec8ad49681d0cf59fda0d7b21af0562fe72ad24e76e877e374"
+  },
+  "allowlist": {
+    "path": "/tmp/sureal-comprehensive-closeout-hdfs-allowlist.json",
+    "sha256": "f4b11630b4debf28a63a86664a74d6e32a131964a2b9cb9d9586c9a87b288a85"
+  }
+}

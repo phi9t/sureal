@@ -1,0 +1,42 @@
+"""Bounded observer collection controls. Fake transport is not native proof."""
+import copy
+import unittest
+from unittest.mock import patch
+
+from audit_support import test_runtime_probe as literal_fixtures
+from audit_support import runtime_probe
+
+
+class Client:
+    def __init__(self,records):self.input=records;self.records=[]
+    def call(self,method,params):
+        record=next(entry for entry in self.input if entry['method']==method and
+                    entry['params'].get('cursor')==params.get('cursor'))
+        self.records.append(copy.deepcopy(record));return record['response']
+
+
+class CollectionTests(unittest.TestCase):
+    def setUp(self):
+        reference=literal_fixtures.StopProbeTests();reference.setUp()
+        self.fixture=reference.fixture;self.running=reference.running
+        self.limits={'max_pages':2,'max_items':10}
+
+    def test_actual_fresh_turn_is_derived_from_complete_native_pages(self):
+        fixture={key:value for key,value in self.fixture.items() if key!='turn_ids'}
+        with patch('audit_support.probe_os.capture_kernel',return_value=self.running['kernel']):
+            snapshot=runtime_probe.collect_snapshot(Client(self.running['records']),fixture,{}, {},self.limits)
+        self.assertEqual(fixture['turn_ids'],['fixture-turn'])
+        self.assertEqual(len(snapshot['records']),6)
+
+    def test_unread_pages_bound_and_extra_fresh_turn_refuse(self):
+        records=copy.deepcopy(self.running['records'])
+        records[2]['response']['data'].append({'id':'another-turn','status':'inProgress'})
+        fixture={key:value for key,value in self.fixture.items() if key!='turn_ids'}
+        with patch('audit_support.probe_os.capture_kernel',return_value=self.running['kernel']):
+            with self.assertRaises(ValueError):runtime_probe.collect_snapshot(Client(records),fixture,{}, {},self.limits)
+        records=copy.deepcopy(self.running['records'])
+        records[2]['response']['nextCursor']='unread';self.limits['max_pages']=1
+        with self.assertRaises(ValueError):runtime_probe.collect_snapshot(Client(records),fixture,{}, {},self.limits)
+
+
+if __name__=='__main__':unittest.main()

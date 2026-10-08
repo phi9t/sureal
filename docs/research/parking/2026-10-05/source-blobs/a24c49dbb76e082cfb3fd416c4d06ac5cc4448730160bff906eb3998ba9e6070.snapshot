@@ -1,0 +1,22 @@
+import json,os,signal,time
+from pathlib import Path
+p=Path('experiments/waymo-perception/research/tier1-overfit20261002a-results.json')
+while True:
+ try:
+  r=json.loads(p.read_text());b=r['cases'].get('baseline',{})
+  if b.get('status') in ['sustained native overfit','failed to overfit by 10000 updates','execution failed; artifacts retained']:
+   os.kill(2972552,signal.SIGSTOP)
+   # New-case worker could have started in the short summary-write race. Stop only this controller's descendant stage.
+   import subprocess
+   listing=subprocess.check_output(['ps','-eo','pid,ppid']).decode().splitlines()[1:];children={}
+   for line in listing:
+    pid,ppid=map(int,line.split());children.setdefault(ppid,[]).append(pid)
+   stack=children.get(2972552,[])[:];desc=[]
+   while stack:
+    pid=stack.pop();desc.append(pid);stack.extend(children.get(pid,[]))
+   for pid in reversed(desc):
+    try:os.kill(pid,signal.SIGTERM)
+    except ProcessLookupError:pass
+   os.kill(2972552,signal.SIGTERM);os.kill(2972552,signal.SIGCONT);print('Baseline retained; old controller stopped at case boundary',b['status'],flush=True);break
+ except (FileNotFoundError,json.JSONDecodeError):pass
+ time.sleep(.1)

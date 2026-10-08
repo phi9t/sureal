@@ -1,0 +1,14 @@
+import pathlib,json,sys,subprocess,shutil
+P=pathlib.Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(P))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+from advanced.archive import sha
+phase=sys.argv[1];C=pathlib.Path.home()/'.cache/waystone/waymo-perception';R=C/'insula'/('balanced16-sustained-contract-'+phase);R.mkdir();code=R/'code';(code/'cohort').mkdir(parents=True);out=R/'output';out.mkdir();inputs=R/'input';inputs.mkdir()
+for name in ['test_sustained_contract.py','sustained_contract.py']:
+ source=P/'cohort'/name
+ if source.exists():shutil.copyfile(source,code/'cohort'/name)
+root=C/'insula/rootfs-v2';lock=json.loads(pathlib.Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);pins={str(p):sha(p) for p in code.rglob('*') if p.is_file()};command=launch_plan(root,code,inputs,out,['python','-m','unittest','discover','-s','/experiment/cohort','-p','test_sustained_contract.py','-v']);r=subprocess.run(command,capture_output=True,text=True,timeout=60);(out/'live.log').write_text(r.stdout+r.stderr);print(r.stdout,r.stderr);expected=1 if phase.startswith('red') else 0;assert r.returncode==expected
+if phase=='red':assert "No module named 'cohort.sustained_contract'" in r.stderr
+elif phase.startswith('red'):assert 'FAILED' in r.stderr
+else:assert 'Ran 7 tests' in r.stderr and '\nOK\n' in r.stderr
+record={'command':command,'exit_code':r.returncode,'expected_exit_code':expected,'runtime_lock':lock,'pins':pins,'artifacts':{str(p):sha(p) for p in out.iterdir()},'scope':'isolated balanced16 execution contract unit fixtures only; no GPU training or scientific admission'};(P/'research'/('balanced16-sustained-contract-'+phase+'-verified.json')).write_text(json.dumps(record,indent=2))

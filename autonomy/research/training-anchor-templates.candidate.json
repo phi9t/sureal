@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "status": "training-only anchor candidate; scientific protocol not frozen",
+  "summary_sha256": "78b33cad1c61adf54c393293f9ee846962809fa0aa9d640c35f82f0f899903a6",
+  "audit_evidence_sha256": "17cd6b26363946bb7c761bac7fa064113d345d855d51282f3a82ad2378db0e58",
+  "weighting": "one equally weighted native box row per frame/object; repeated track observations retained",
+  "geometry": "native length,width,height,center_z in vehicle reference; no ROI clipping or heading-template inference",
+  "ordering": "class ascending, then yaw 0 and pi/2; template L,W,H,center_z,yaw",
+  "templates": [
+    {
+      "class_id": 1,
+      "values": [
+        4.602356074314182,
+        2.0612393366017967,
+        1.6899999999999977,
+        0.8063550173531269,
+        0.0
+      ]
+    },
+    {
+      "class_id": 1,
+      "values": [
+        4.602356074314182,
+        2.0612393366017967,
+        1.6899999999999977,
+        0.8063550173531269,
+        1.5707963267948966
+      ]
+    },
+    {
+      "class_id": 2,
+      "values": [
+        0.9189979312599498,
+        0.8516948112350944,
+        1.7501082414562603,
+        0.9227371272875118,
+        0.0
+      ]
+    },
+    {
+      "class_id": 2,
+      "values": [
+        0.9189979312599498,
+        0.8516948112350944,
+        1.7501082414562603,
+        0.9227371272875118,
+        1.5707963267948966
+      ]
+    },
+    {
+      "class_id": 3,
+      "values": [
+        0.0940283458942961,
+        0.554649192009059,
+        0.6100000000000101,
+        2.3163501756481537,
+        0.0
+      ]
+    },
+    {
+      "class_id": 3,
+      "values": [
+        0.0940283458942961,
+        0.554649192009059,
+        0.6100000000000101,
+        2.3163501756481537,
+        1.5707963267948966
+      ]
+    },
+    {
+      "class_id": 4,
+      "values": [
+        1.8135049750960714,
+        0.8085331046703855,
+        1.75,
+        0.713728670040922,
+        0.0
+      ]
+    },
+    {
+      "class_id": 4,
+      "values": [
+        1.8135049750960714,
+        0.8085331046703855,
+        1.75,
+        0.713728670040922,
+        1.5707963267948966
+      ]
+    }
+  ],
+  "scope": "all four native box classes retained; no ROI, sampling, assignment threshold, loss, budget or adoption implied"
+}

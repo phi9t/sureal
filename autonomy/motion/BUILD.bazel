@@ -1,0 +1,143 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+
+package(default_visibility = ["//visibility:private"])
+
+LIB_MODULES = glob(
+    ["**/*.py"],
+    exclude = ["**/*_test.py"],
+)
+
+TEST_MODULES = glob(["**/*_test.py"])
+
+LIVE_GATE_TESTS = [
+    "cli/motion_joint_cli_test.py",
+    "cli/motion_native_cli_test.py",
+    "pooled/motion_pooled_cli_test.py",
+]
+
+KNOWN_FAILURE_TESTS = [
+    "ingestion/motion_causal_projection_test.py",
+]
+
+LEGACY_NATIVE_TOOL_TESTS = [
+    "ingestion/motion_causal_projection_test.py",
+]
+
+MOTION_VISIBILITY = [
+    "//autonomy:__pkg__",
+    "//autonomy/studies:__pkg__",
+]
+
+py_library(
+    name = "motion",
+    srcs = LIB_MODULES,
+    imports = [".."],
+    visibility = MOTION_VISIBILITY,
+    deps = [
+        "//autonomy/evidence:evidence",
+        "//autonomy/geometry:geometry",
+        "//autonomy/insula:insula",
+    ],
+)
+
+py_library(
+    name = "motion_native_cli_test_fixture",
+    srcs = ["cli/motion_native_cli_test.py"],
+    imports = [".."],
+    testonly = True,
+    deps = [":motion"],
+)
+
+cc_binary(
+    name = "fnv_bytes_fixture",
+    srcs = ["ingestion/fnv_bytes_fixture.cc"],
+    visibility = MOTION_VISIBILITY,
+)
+
+cc_binary(
+    name = "native_geometry_corruption_fixture",
+    srcs = ["ingestion/native_geometry_corruption_fixture.cc"],
+    copts = ["-std=c++17"],
+    visibility = MOTION_VISIBILITY,
+)
+
+filegroup(
+    name = "native_metric_recipe",
+    srcs = [
+        "CMakeLists.txt",
+        "ingestion/native_metric.Dockerfile",
+    ],
+    visibility = MOTION_VISIBILITY,
+)
+
+filegroup(
+    name = "motion_cli_recipe",
+    srcs = [
+        "cli/CMakeLists.txt",
+        "cli/motion_cli.Dockerfile",
+        "cli/motion_metrics_main.cc",
+    ],
+    visibility = MOTION_VISIBILITY,
+)
+
+filegroup(
+    name = "motion_pooled_recipe",
+    srcs = [
+        "pooled/CMakeLists.txt",
+        "pooled/motion_metrics_pooled_main.cc",
+    ],
+    visibility = MOTION_VISIBILITY,
+)
+
+filegroup(
+    name = "native_ingestion_sources",
+    srcs = glob(["ingestion/*.cc"]),
+    visibility = MOTION_VISIBILITY,
+)
+
+filegroup(
+    name = "all_py",
+    srcs = glob(["**/*.py"]),
+    visibility = ["//autonomy:__pkg__"],
+)
+
+filegroup(
+    name = "runfiles",
+    srcs = glob(["**"], exclude = ["**/__pycache__/**"]),
+    visibility = ["//autonomy:__pkg__"],
+)
+
+[
+    py_test(
+        name = test[:-3].replace("/", "__"),
+        srcs = [test],
+        main = test,
+        deps = [":motion"] + (
+            [":motion_native_cli_test_fixture"]
+            if test in [
+                "cli/motion_joint_cli_test.py",
+                "pooled/motion_pooled_cli_test.py",
+            ]
+            else []
+        ),
+        imports = [".."],
+        legacy_create_init = 0,
+        size = "small",
+        tags = ["perception_unit"]
+            + (["requires_live_gate"] if test in LIVE_GATE_TESTS else [])
+            + (
+                ["requires_motion_causal_project_binary", "requires_upstream_protoc"]
+                if test in LEGACY_NATIVE_TOOL_TESTS
+                else []
+            )
+            + (["known_failure"] if test in KNOWN_FAILURE_TESTS else []),
+    )
+    for test in TEST_MODULES
+]
+
+test_suite(
+    name = "all_tests",
+    tests = [test[:-3].replace("/", "__") for test in TEST_MODULES],
+    visibility = ["//autonomy:__pkg__"],
+)

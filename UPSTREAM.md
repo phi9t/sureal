@@ -22,7 +22,7 @@ Work developed on this fork includes:
 
 - the [research mission](MISSION.md) around persistent sampled scene states;
 - the sourced [3D reconstruction pathway](docs/3d-reconstruction-pathway.md);
-- repo-owned, controlled [pathway labs](experiments/3d-pathway/README.md), source
+- repo-owned, controlled [pathway labs](parallax/README.md), source
   locks, reference adapters, reports, and acceptance tests; and
 - publication, reproducibility, and release-safety tooling.
 

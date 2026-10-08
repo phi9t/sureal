@@ -1,0 +1,18 @@
+import json,hashlib,time,resource,pyarrow.parquet as pq
+from pathlib import Path
+from pipeline.native_range_shapes import KEYS,SHAPES
+from pipeline.native_range_shape_file import read_native_range_shapes
+from pipeline.native_range_shape_reference import verify_native_range_shapes
+start=time.monotonic();reference=json.loads(Path('/tmp/reference/shapes.json').read_text());manifest=json.loads(Path('/source/slice.json').read_text());reports=[]
+for obj in manifest['objects']:
+ if obj['component']!='lidar':continue
+ p=Path('/source')/obj['relative_path']
+ with p.open('rb') as f:assert hashlib.file_digest(f,'sha256').hexdigest()==obj['sha256']
+ expected=[r for r in reference['rows'] if r['context']==obj['context']];digest=hashlib.sha256()
+ for r in expected:
+  if r['return']==1:digest.update((json.dumps(dict(zip(KEYS,[r['context'],r['timestamp'],r['laser']])),sort_keys=True,separators=(',',':'))+'\n').encode())
+ def rows():
+  for b in pq.ParquetFile(p).iter_batches(batch_size=64,columns=list(KEYS+SHAPES)):yield from b.to_pylist()
+ result=read_native_range_shapes(p,scene=obj['context'],source={k:obj[k] for k in ['size_bytes','sha256','md5_base64']},inventory={'rows':len(expected)//2,'key_sha256':digest.hexdigest()})['shapes'];assert result['records']==expected;verified=verify_native_range_shapes(p,result,scene=obj['context'],source={k:obj[k] for k in ['size_bytes','sha256','md5_base64']},inventory={'rows':len(expected)//2,'key_sha256':digest.hexdigest()});assert verified['records_verified']==len(expected);reports.append({'scene':obj['context'],'source_sha256':obj['sha256'],'native_rows':result['native_rows'],'records':len(result['records']),'null_shape_records':result['null_shape_records']})
+assert len(reports)==2 and sum(r['records'] for r in reports)==3970
+r={'sources':reports,'records':3970,'elapsed_seconds':time.monotonic()-start,'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'scope':'engineering two-source exact native metadata comparison; scientific103 pending'};Path('/outputs/check.json').write_text(json.dumps(r,indent=2));print(json.dumps(r))

@@ -1,0 +1,22 @@
+{
+  "producer_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/real-nlz-live-a/receipt.json",
+  "producer_receipt_sha256": "0d4ad55b8a34979792964b83ea65409d3f8bc24d41041b230dff591ccd8304b0",
+  "checker_sha256": "f5ae03bf0ea1d0c4a8d80e12d28c8694ea66580abfa75890b37a9abf1c3c400b",
+  "checker_artifact_hashes": {
+    "command.json": "cca502c99ddbc8dd3797288f9a9418149d8a7a67a9dcd0adaba1acf0ea15b001",
+    "live.log": "f983e125a1ce12547c5dff2133dfd48c285e5f338cdf6df8eda46d12b3529125",
+    "nlz-validation.json": "3923e5b98d00cd7e95b4a085d5b55c903a6d50f95595ab99c3ba924939434797"
+  },
+  "objects": 38363,
+  "frames": 397,
+  "nlz_points": 0,
+  "overlap_boxes": 0,
+  "elapsed_seconds": 34.62750217501889,
+  "peak_rss_kib": 99700,
+  "limitations": [
+    "The engineering scenes contain no NLZ-positive measurements; positive containment is covered by analytic fixtures, not this real slice.",
+    "Native metric suppression of NLZ false positives still needs an explicit integration fixture.",
+    "M3 non-TOP measurements retain uncompensated timing policy."
+  ],
+  "ticket_09": "open"
+}

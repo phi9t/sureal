@@ -1,0 +1,18 @@
+import json,os,shutil,sys
+from pathlib import Path
+P=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P))
+from resources.sources import sha,freeze_sources,validate_sources
+from resources.stage import run_stage,validate_proof,write_new
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import rootfs_identity
+R=Path('/tmp/sureal-resource-independent-live-20261003a');R.mkdir();pins=freeze_sources(P/'resources',R/'code');(R/'experiment').mkdir();shutil.copyfile(R/'code/archive_worker.py',R/'experiment/archive_worker.py');(R/'proofs').mkdir()
+old=json.loads((P/'research/sustained-resource-archive-live-v2-verified.json').read_text());root=Path(old['rootfs']);actual=rootfs_identity(root);assert actual==old['runtime_lock']['rootfs_sha256'];library=Path(old['archive_library']['path']);assert sha(library)==old['archive_library']['sha256'];source=Path(old['archive_path']).parent;assert sha(source/'archive.tar.gz')==old['archive_sha256'] and sha(source/'manifest.json')==old['manifest_sha256'];inventory=json.loads(Path(old['expected_inventory_path']).read_text());assert sha(old['expected_inventory_path'])==old['expected_inventory_sha256']
+job={'source_sha256':{name:entry['sha256'] for name,entry in inventory.items()},'max_bytes':64*1024**2,'archive_module_path':'/tmp/resource-archive.py','archive_module_sha256':sha(library),'manifest_sha256':sha(source/'manifest.json')}
+results=[]
+for mode in ['verify','rehydrate']:
+ task=R/(mode+'-input');task.mkdir();write_new(task/'job.json',job);out=R/mode;out.mkdir();command=launch_plan(root,R/'experiment',source,out,['python','/experiment/archive_worker.py',mode]);at=command.index('--');command[at:at]=['--ro-bind',str(task),'/tmp/inputs','--ro-bind',str(library),'/tmp/resource-archive.py']
+ with (out/'live.log').open('w') as stream:run_stage(command,R/'experiment',dict(os.environ),stream,300,code=R/'code',current_sources=P/'resources',source_pins=pins,evidence_directory=R/'proofs'/mode,native_output=out,cap_bytes=16*1024**3)
+ path=R/'proofs'/mode/'resource-admitted.json';proof=json.loads(path.read_text());validate_proof(proof,command,P/'resources',pins,out,16*1024**3,300);results.append({'mode':mode,'proof_path':str(path),'proof_sha256':sha(path),'host':proof['host_measurement'],'worker':proof['worker_measurement'],'result':json.loads((out/'check.json').read_text())})
+for name,entry in inventory.items():
+ p=R/'rehydrate/restored'/name;assert p.stat().st_size==entry['bytes'] and sha(p)==entry['sha256'] and not p.is_symlink()
+report={'passed':True,'scope':'independently observed bounded Insula archive verification/recovery; original downloaded HDFS bytes; no native checkpoint admission','driver_sha256':sha(__file__),'rootfs_actual_sha256':actual,'source_pins':pins,'inventory_count':len(inventory),'archive_sha256':sha(source/'archive.tar.gz'),'manifest_sha256':sha(source/'manifest.json'),'results':results};write_new(R/'report.json',report);print('PASS independent capped verify and recovery',len(inventory),'files',flush=True)

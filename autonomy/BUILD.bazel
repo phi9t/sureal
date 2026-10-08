@@ -1,0 +1,262 @@
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+
+package(default_visibility = ["//visibility:private"])
+
+py_library(
+    name = "sustained-run-sources",
+    srcs = [],
+    deps = [
+        "//autonomy/camera:camera",
+        "//autonomy/dataset:dataset",
+        "//autonomy/detection:detection",
+        "//autonomy/detection/architecture_adaptations:architecture_adaptations",
+        "//autonomy/evidence:evidence",
+        "//autonomy/evaluation:evaluation",
+        "//autonomy/geometry:geometry",
+        "//autonomy/inspection:inspection",
+        "//autonomy/insula:insula",
+        "//autonomy/range_view:range_view",
+        "//autonomy/resources:resource_source_layer",
+        "//autonomy/retention:retention",
+        "//autonomy/segmentation:segmentation",
+        "//autonomy/training_execution:training_execution",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "resource-source-layer",
+    srcs = ["//autonomy/resources:resource_source_layer"],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "sustained-controller-host",
+    srcs = [],
+    deps = [
+        "//autonomy/evaluation:evaluation",
+        "//autonomy/resources:resource_source_layer",
+        "//autonomy/retention:retention",
+        "//autonomy/studies:studies",
+        "//autonomy/training_execution:training_execution",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "sustained-checkpoint-retention-host",
+    srcs = [],
+    deps = [
+        "//autonomy/resources:resource_source_layer",
+        "//autonomy/retention:retention",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "sustained-pilot-retention-host",
+    srcs = [],
+    deps = [
+        "//autonomy/resources:resource_source_layer",
+        "//autonomy/retention:retention",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "native-cache-retention-host",
+    srcs = [],
+    deps = [
+        "//autonomy/resources:resource_source_layer",
+        "//autonomy/retention:retention",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+ARCHITECTURE_EXPERIMENT_RESEARCH_INPUTS = [
+    "research/architecture-all_pillars-cache-verified.json",
+    "research/architecture-retain64-cache-verified.json",
+    "research/architecture-retention-controls-spec.md",
+    "research/architecture-window-control-spec.md",
+    "research/normalization-secondary-decoder-spec.md",
+    "research/overfit-native-cache-progress.json",
+    "research/training-anchor-templates.candidate.json",
+]
+
+filegroup(
+    name = "architecture_experiment_research_inputs",
+    srcs = ARCHITECTURE_EXPERIMENT_RESEARCH_INPUTS,
+    visibility = ["//autonomy/studies:__pkg__"],
+)
+
+filegroup(
+    name = "association41_runtime_manifest",
+    srcs = ["research/association41-runtime-admission-20261003a/manifest.json"],
+    visibility = ["//autonomy/association:__pkg__"],
+)
+
+filegroup(
+    name = "evaluation_commands",
+    srcs = ["//autonomy/evaluation:commands"],
+    visibility = [
+        "//autonomy/training_execution:__pkg__",
+    ],
+)
+
+filegroup(
+    name = "tracer_runtime_files",
+    srcs = [
+        "requirements-tracer.lock",
+        "//autonomy/insula:cpu-test-tools-requirements.lock",
+        "tracer-manifest.schema.json",
+        "tracer-report.schema.json",
+        "tracer-result.schema.json",
+        "tracer.sh",
+    ],
+    visibility = [
+        "//autonomy/dataset:__pkg__",
+    ],
+)
+
+filegroup(
+    name = "cpu_rootfs_recipe",
+    srcs = [
+        "//autonomy/insula:build_cpu_rootfs.sh",
+        "//autonomy/insula:cpu-test-tools-requirements.in",
+        "//autonomy/insula:cpu-test-tools-requirements.lock",
+        "requirements-tracer.in",
+        "requirements-tracer.lock",
+        "//autonomy/insula:cpu_rootfs_dockerfile",
+    ],
+    visibility = [
+        "//autonomy/insula:__pkg__",
+    ],
+)
+
+py_library(
+    name = "architecture_experiment_runner_snapshot",
+    srcs = [
+    ],
+    data = [
+        "BUILD.bazel",
+        ":architecture_experiment_research_inputs",
+        "//autonomy/studies:architecture_runfiles",
+    ],
+    deps = [
+        "//autonomy/camera:camera",
+        "//autonomy/dataset:dataset",
+        "//autonomy/detection:detection",
+        "//autonomy/detection/architecture_adaptations:architecture_adaptations",
+        "//autonomy/evidence:evidence",
+        "//autonomy/evaluation:evaluation",
+        "//autonomy/geometry:geometry",
+        "//autonomy/inspection:inspection",
+        "//autonomy/insula:insula",
+        "//autonomy/motion:motion",
+        "//autonomy/range_view:range_view",
+        "//autonomy/resources:resources",
+        "//autonomy/segmentation:segmentation",
+        "//autonomy/studies:studies",
+        "//autonomy/training_execution:training_execution",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+genquery(
+    name = "sustained_run_sources_query",
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy/training_execution:train_sustained)) union labels("data", deps(//autonomy/training_execution:train_sustained))))',
+    scope = ["//autonomy/training_execution:train_sustained"],
+)
+
+genquery(
+    name = "resource_source_layer_query",
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy/resources:execute_worker)) union labels("data", deps(//autonomy/resources:execute_worker))))',
+    scope = ["//autonomy/resources:execute_worker"],
+)
+
+genquery(
+    name = "sustained_controller_host_query",
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy/training_execution:run_sustained)) union labels("data", deps(//autonomy/training_execution:run_sustained))))',
+    scope = ["//autonomy/training_execution:run_sustained"],
+)
+
+genquery(
+    name = "sustained_checkpoint_retention_host_query",
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy/retention:publish_sustained_checkpoint)) union labels("data", deps(//autonomy/retention:publish_sustained_checkpoint))))',
+    scope = ["//autonomy/retention:publish_sustained_checkpoint"],
+)
+
+genquery(
+    name = "sustained_pilot_retention_host_query",
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy/retention:publish_sustained_pilot)) union labels("data", deps(//autonomy/retention:publish_sustained_pilot))))',
+    scope = ["//autonomy/retention:publish_sustained_pilot"],
+)
+
+genquery(
+    name = "native_cache_retention_host_query",
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy/retention:publish_native_cache)) union labels("data", deps(//autonomy/retention:publish_native_cache))))',
+    scope = ["//autonomy/retention:publish_native_cache"],
+)
+
+genquery(
+    name = "architecture_experiment_runner_query",
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy/studies:architecture_experiment_runner)) union labels("data", deps(//autonomy/studies:architecture_experiment_runner))))',
+    scope = ["//autonomy/studies:architecture_experiment_runner"],
+)
+
+genquery(
+    name = "scientific_cohort_query",
+    expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy/studies:scientific_cohort)) union labels("data", deps(//autonomy/studies:scientific_cohort))))',
+    scope = ["//autonomy/studies:scientific_cohort"],
+)
+
+py_test(
+    name = "source_snapshot_targets_test",
+    srcs = ["source_snapshot_targets_test.py"],
+    data = [
+        ":native_cache_retention_host_query",
+        ":architecture_experiment_runner_query",
+        ":resource_source_layer_query",
+        ":scientific_cohort_query",
+        ":sustained_checkpoint_retention_host_query",
+        ":sustained_controller_host_query",
+        ":sustained_pilot_retention_host_query",
+        ":sustained_run_sources_query",
+    ],
+    imports = ["."],
+    legacy_create_init = 0,
+    size = "small",
+    tags = ["perception_unit"],
+    deps = [
+        "//autonomy/evidence:evidence",
+        "//autonomy/resources:resources",
+        "//autonomy/retention:retention",
+        "//autonomy/studies:studies",
+        "//autonomy/training_execution:training_execution",
+    ],
+)
+
+test_suite(
+    name = "perception_unit_tests",
+    tests = [":source_snapshot_targets_test"]
+        + [
+            "//autonomy/association:all_tests",
+            "//autonomy/camera:all_tests",
+            "//autonomy/dataset:all_tests",
+            "//autonomy/detection:all_tests",
+            "//autonomy/detection/architecture_adaptations:all_tests",
+            "//autonomy/evidence:all_tests",
+            "//autonomy/evaluation:all_tests",
+            "//autonomy/geometry:all_tests",
+            "//autonomy/inspection:all_tests",
+            "//autonomy/insula:all_tests",
+            "//autonomy/range_view:all_tests",
+            "//autonomy/retention:all_tests",
+            "//autonomy/resources:all_tests",
+            "//autonomy/motion:all_tests",
+            "//autonomy/segmentation:all_tests",
+            "//autonomy/studies:all_tests",
+            "//autonomy/training_execution:all_tests",
+        ],
+    visibility = ["//visibility:public"],
+)

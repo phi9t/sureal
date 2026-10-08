@@ -1,0 +1,76 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-box-target-check-a/receipt.json",
+  "receipt_sha256": "f053dc311356bffeeb00107f6a92483ec9bb334d647912dc0401c52aecf13dca",
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/slices/validation-two-scenes-20260929",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-box-target-check-a",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/native-box-targets-a",
+        "/mnt",
+        "--",
+        "python",
+        "-c",
+        "import json,numpy as np,hashlib;from pathlib import Path;from pipeline.sensor_records import select_rows\nreport=json.loads(Path('/mnt/check.json').read_text());src=report['source'];p=Path('/source')/src['relative_path'];assert hashlib.sha256(p.read_bytes()).hexdigest()==src['sha256'];rows=list(select_rows(p,timestamps={report['frame_timestamp']}));assert len(rows)==report['native_rows'];by_id={r['key.laser_object_id']:r for r in rows};assert len(by_id)==len(rows);fields=['box.center.x','box.center.y','box.center.z','box.size.x','box.size.y','box.size.z','box.heading'];prefix='[LiDARBoxComponent].';native=[];classes=[]\nfor target in report['eligible_rows']:\n context,stamp,obj=target['identity'];r=by_id[obj];assert context==r['key.segment_context_name']==src['context'] and stamp==r['key.frame_timestamp_micros']==report['frame_timestamp'];box=np.array([r[prefix+f] for f in fields]);np.testing.assert_array_equal(box,target['box']);assert target['class']==r[prefix+'type'];native.append(box);classes.append(target['class'])\nnative=np.array(native);classes=np.array(classes)\nwith np.load('/mnt/targets.npz',allow_pickle=False) as p:\n labels=p['labels'];ids=p['target_indices'];anchors=p['anchors'];encoded=p['box_targets'];directions=p['direction_targets'];positive=labels>0;assert len(labels)==131072;assert np.all(ids[~positive]==-1);assert np.all(encoded[~positive]==0);assert np.all((ids[positive]>=0)&(ids[positive]<len(native)));target=native[ids[positive]];a=anchors[positive];delta=encoded[positive]\n decoded=np.empty_like(target);decoded[:,:2]=a[:,:2]+delta[:,:2]*np.sqrt(a[:,3:4]**2+a[:,4:5]**2);decoded[:,2]=a[:,2]+delta[:,2]*a[:,5];decoded[:,3:6]=a[:,3:6]*np.exp(delta[:,3:6]);decoded[:,6]=a[:,6]+delta[:,6]\n np.testing.assert_allclose(decoded[:,:6],target[:,:6],rtol=1e-12,atol=1e-10);np.testing.assert_allclose(np.sin(decoded[:,6]),np.sin(target[:,6]),atol=1e-12);np.testing.assert_allclose(np.cos(decoded[:,6]),np.cos(target[:,6]),atol=1e-12);np.testing.assert_array_equal(labels[positive],classes[ids[positive]]);np.testing.assert_array_equal(directions[positive],(target[:,6]>0).astype(np.int64));assert int(positive.sum())==report['positive_anchors']\ncheck={'status':'independent native-frame identity/class/geometry/direction target check passed','native_rows':len(rows),'eligible_boxes':len(native),'positive_anchors':int(positive.sum()),'targets_sha256':hashlib.sha256(Path('/mnt/targets.npz').read_bytes()).hexdigest(),'source_sha256':src['sha256'],'scope':'engineering target provenance only; assignment geometry fixtures separately verified, scientific protocol open'};Path('/outputs/check.json').write_text(json.dumps(check,indent=2));print('PASS independent native targets',check)\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "elapsed_seconds": 2.8092216820223257,
+  "peak_child_rss_kib": 44940,
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "source_targets_receipt_sha256": "9fc4e65396b99d8002ce22fc68ecd02e6642b27ad1dc914687b62aeba0502fec",
+  "targets_sha256": "d2c2e7a938653146e8731c6d98431346d0dea3a60dfe2865580523c401fb4d68",
+  "artifacts": {
+    "live.log": "19a8adcb2b3b527a1b9d550a26c9233a1d53858c04ba536d289e6911ec288b8d",
+    "check.json": "a6b72f112419d5dc6dcd5256c8847bfba48a371bcadb894690033be510a07089"
+  },
+  "candidate_hashes": {
+    "pipeline/sensor_records.py": "60ff664871791ad7e620d90706c28fb18fc66040eca3675a7e7c7d1a7e2a20d9"
+  }
+}

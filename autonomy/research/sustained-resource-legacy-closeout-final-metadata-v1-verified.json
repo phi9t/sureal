@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "scope": "final receipt/raw/journal110 metadata preservation through existing independently reviewed bounded publisher and live independent-worker union; no new code/GPU/runner/release/science admission",
+  "publication": {
+    "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-checkpoint-1f5953b198714655908188716adf1bbe/verified-publication.json",
+    "sha256": "cab26abf1341925845ab5bf58c31a2d432e87f67a869a15988bcbfdcd572634d",
+    "hdfs_manifest_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-sustained-baseline-controller20261003a-checkpoint-1f5953b198714655908188716adf1bbe/publication-manifest.json",
+    "kind": "checkpoint"
+  },
+  "source_inventory_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-closeout-final-metadata-controller20261003a-v1/expected.json",
+  "source_inventory_sha256": "e760bca1fca99d759b09b74e188d7c56c83289db158a94a50d6d906cfd31fce5",
+  "members": 91,
+  "source_bytes": 3278190,
+  "journal_entries": 110,
+  "journal_head_sha256": "2ab8ecab86ea0980473f9e5825ce930288c5c7692314c8b7a1e4ac2232a5802d",
+  "driver_path": "/tmp/sureal-resource-legacy-closeout-final-metadata-v1.py",
+  "driver_sha256": "1e026f67a41e5b080260970bd2ef209e106e2fbcc56b577e6b0c7bcedad70cc8"
+}

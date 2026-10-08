@@ -1,0 +1,16 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+code=Path('experiments/waymo-perception').resolve();workers=Path('.scratch').resolve();sys.path.insert(0,str(code))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);base=cache/'insula/overfit-target-layout-fixture-v2';base.mkdir();inputs=base/'input';inputs.mkdir();candidate=code/'research/training-anchor-templates.candidate.json';c=json.loads(candidate.read_text());rows=[]
+for cls,x in [(1,0),(2,10),(3,20),(4,30)]:
+ t=c['templates'][(cls-1)*2]['values'];rows.append({'context_name':'fixture','frame_timestamp_micros':10,'object_id':str(cls),'type':cls,'box':[x,0,t[3],*t[:3],{1:.3,2:-1.5707963267948966,3:1.5707963267948966,4:6.283185307179586}[cls]],'num_lidar_points_in_box':12,'detection_difficulty':None})
+for obj,typ,points,x in [('unknown',0,12,0),('zero',2,0,0),('outside',4,12,64)]:rows.append({'context_name':'fixture','frame_timestamp_micros':10,'object_id':obj,'type':typ,'box':[x,0,1,2,1,1,0.],'num_lidar_points_in_box':points,'detection_difficulty':None})
+(inputs/'job.json').write_text(json.dumps({'scene':'fixture','templates':[t['values'] for t in c['templates']],'rows':rows},indent=2)+'\n');checks=[];producer=base/'producer';producer.mkdir();reference=base/'reference';reference.mkdir()
+for mode,out in [('producer',producer),('reference',reference)]:
+ command=launch_plan(root,code,inputs,out,['python','/tmp/workers/overfit-target-fixture-worker.py',mode]);i=command.index('--');command[i:i]=['--ro-bind',str(inputs),'/tmp/input','--ro-bind',str(workers),'/tmp/workers']
+ if mode=='reference':i=command.index('--');command[i:i]=['--ro-bind',str(producer),'/tmp/produced']
+ run=subprocess.run(command,capture_output=True,text=True,timeout=120);(out/'live.log').write_text(run.stdout+run.stderr);print(run.stdout+run.stderr);assert run.returncode==0;checks.append({'command':command,'exit_code':0})
+record={'checks':checks,'runtime_lock':lock,'anchor_candidate_sha256':sha(candidate),'worker_hashes':{p.name:sha(p) for p in [workers/'overfit_detection_targets.py',workers/'overfit-target-fixture-worker.py',workers/'test_overfit_detection_targets.py']},'validation':json.loads((reference/'check.json').read_text()),'resources':{mode:json.loads((base/mode/'resources.json').read_text()) for mode in ('producer','reference')},'artifacts':{str(p):sha(p) for p in base.rglob('*') if p.is_file()},'scope':'full-grid target/geometry fixture only; native target preparation, packing and overfit remain open'};(code/'research/overfit-target-layout-fixture-v2-verified.json').write_text(json.dumps(record,indent=2)+'\n');print('PASS full524288-anchor independently verified target fixture')

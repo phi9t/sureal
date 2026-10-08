@@ -1,0 +1,29 @@
+import hashlib,json,sys,time,resource
+from pathlib import Path
+import numpy as np
+sys.path.insert(0,'/tmp/workers')
+job=json.loads(Path('/tmp/input/job.json').read_text());scene=job['scene'];rows=job['rows'];templates=np.asarray(job['templates']);started=time.monotonic();nx=ny=512
+if sys.argv[1]=='producer':
+ from pipeline.anchor_grid import anchor_grid
+ from overfit_detection_targets_v2 import build_targets
+ anchors=anchor_grid(nx=nx,ny=ny,cell_size=(.25,.25),origin=(-64.,-64.),templates=templates)
+ result=build_targets(anchors,rows,scene=scene,timestamp=10,roi=[-64,-64,-4,64,64,6],positive=.5,negative=.35)
+ np.savez('/outputs/targets.npz',**{k:result[k] for k in ('labels','box_targets','direction_targets','target_indices')});Path('/outputs/report.json').write_text(json.dumps(result['report'],indent=2)+'\n');print('PASS full-grid target producer',result['report']['positive_anchor_counts_by_class'])
+elif sys.argv[1]=='reference':
+ # Literal reference does not import grid, IoU, assignment, or box-coding helpers.
+ count=(nx//2)*(ny//2)*8;i=np.arange(count);cell=i//8;template=templates[i%8];anchors=np.column_stack((-64+(2*(cell%256)+1)*.25,-64+(2*(cell//256)+1)*.25,template[:,3],template[:,:3],template[:,4]))
+ eligible=sorted([r for r in rows if r['type'] in (1,2,3,4) and r['num_lidar_points_in_box']>0 and all([-64,-64,-4][j]<=r['box'][j]<[64,64,6][j] for j in range(3))],key=lambda r:r['object_id']);gt=np.asarray([r['box'] for r in eligible]);original_gt=gt.copy();gt[:,6]=(gt[:,6]+np.pi)%(2*np.pi)-np.pi;classes=np.asarray([r['type'] for r in eligible])
+ def rectangles(boxes):
+  reduced=boxes[:,6]%np.pi;angle=np.minimum(reduced,np.pi-reduced);swapped=angle>np.pi/4
+  width_x=np.where(swapped,boxes[:,4],boxes[:,3]);width_y=np.where(swapped,boxes[:,3],boxes[:,4]);return np.column_stack((boxes[:,0]-width_x/2,boxes[:,1]-width_y/2,boxes[:,0]+width_x/2,boxes[:,1]+width_y/2))
+ a=rectangles(anchors);b=rectangles(gt);width=np.maximum(0,np.minimum(a[:,None,2],b[None,:,2])-np.maximum(a[:,None,0],b[None,:,0]));height=np.maximum(0,np.minimum(a[:,None,3],b[None,:,3])-np.maximum(a[:,None,1],b[None,:,1]));intersection=width*height;area_a=(a[:,2]-a[:,0])*(a[:,3]-a[:,1]);area_b=(b[:,2]-b[:,0])*(b[:,3]-b[:,1]);overlap=intersection/(area_a[:,None]+area_b[None,:]-intersection);best=overlap.argmax(axis=1);max_anchor=overlap[np.arange(count),best];max_target=overlap.max(axis=0);forced=np.any((overlap==max_target[None,:])&(max_target[None,:]>0),axis=1);positive=(max_anchor>=.5)|forced;labels=np.full(count,-1,dtype=np.int64);labels[max_anchor<.35]=0;labels[positive]=classes[best[positive]];indices=np.full(count,-1,dtype=np.int64);indices[positive]=best[positive]
+ residuals=np.zeros((count,7));directions=np.zeros(count,dtype=np.int64);matched=gt[best[positive]];anc=anchors[positive];diagonal=np.sqrt(anc[:,3]**2+anc[:,4]**2);residuals[positive,0]=(matched[:,0]-anc[:,0])/diagonal;residuals[positive,1]=(matched[:,1]-anc[:,1])/diagonal;residuals[positive,2]=(matched[:,2]-anc[:,2])/anc[:,5];residuals[positive,3:6]=np.log(matched[:,3:6]/anc[:,3:6]);residuals[positive,6]=matched[:,6]-anc[:,6];directions[positive]=(((matched[:,6]+np.pi)%(2*np.pi)-np.pi)>0).astype(np.int64)
+ raw=residuals[positive,6]+anchors[positive,6];decoded=(raw+np.where((raw>0)!=(directions[positive]==1),np.pi,0)+np.pi)%(2*np.pi)-np.pi;delta=decoded-original_gt[best[positive],6];assert np.all(np.abs(np.arctan2(np.sin(delta),np.cos(delta)))<1e-12)
+ with np.load('/tmp/produced/targets.npz',allow_pickle=False) as arrays:
+  assert set(arrays.files)=={'labels','box_targets','direction_targets','target_indices'}
+  for name,value in [('labels',labels),('target_indices',indices),('direction_targets',directions)]:np.testing.assert_array_equal(arrays[name],value)
+  np.testing.assert_allclose(arrays['box_targets'],residuals,rtol=1e-13,atol=1e-13)
+ report=json.loads(Path('/tmp/produced/report.json').read_text());expected={str(c):int((labels==c).sum()) for c in range(1,5)};assert report['positive_anchor_counts_by_class']==expected and all(v>0 for v in expected.values());assert report['eligible_targets_without_positive_anchor']==0 and report['native_box_rows']==7 and report['target_reasons']=={'unknown_class':1,'zero_native_points':1,'center_outside_roi':1,'eligible':4}
+ Path('/outputs/check.json').write_text(json.dumps({'anchors':count,'positive_anchor_counts_by_class':expected,'native_fixture_rows':7,'eligible_fixture_targets':4,'residual_tolerance':1e-13,'decoded_heading_roundtrip':True,'scope':'synthetic full-layout assignment/residual validation; no real training-frame support or overfit claim'},indent=2));print('PASS independent literal full-grid assignment, residuals and direction',expected)
+else:raise ValueError('producer/reference required')
+Path('/outputs/resources.json').write_text(json.dumps({'elapsed_seconds':time.monotonic()-started,'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}))

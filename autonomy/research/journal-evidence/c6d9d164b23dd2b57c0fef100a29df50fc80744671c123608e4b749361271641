@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "kind": "independent-kata-inventory-live-review",
+  "verdict": "pass",
+  "findings": [],
+  "candidate": "9cd484da8c4038cf5fe6422e3cd5c63b5f148a17",
+  "parent": "b32307da442598e192a9259d29a8650be1134589",
+  "tree": "922568b2e6294dff2e4bea8d65a5b6923d08f508",
+  "source": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-lead-20261005a",
+  "reviewer": {
+    "agent": "/root/collab_execution_admission_review",
+    "native_thread_id": "01a105a5-de93-74a3-adad-c5184f54a751"
+  },
+  "reviewer_native_thread_id": "01a105a5-de93-74a3-adad-c5184f54a751",
+  "author": {
+    "agent": "/root",
+    "native_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24"
+  },
+  "reviewed_ms": 1791163355756,
+  "source_review": {
+    "path": "/data02/home/philip.yang/devx/tmp/collab58-kata-inventory-source-review-9cd484d.json",
+    "sha256": "0f1be44488c1759a3103ab6554945aa30625627b423050dac3cc391f7f06e70a"
+  },
+  "own_checks": {
+    "path": "/data02/home/philip.yang/devx/tmp/collab58-kata-live-review-9cd484d/result.json",
+    "sha256": "df4305a3315e66e9c1a98a0ade033d0e095bb05117bd26c42dd468dd02828abd"
+  },
+  "own_actual_command": {
+    "path": "/data02/home/philip.yang/devx/tmp/collab58-kata-live-review-9cd484d/actual-command.json",
+    "sha256": "28aa0355d1dd406be9923692449a9cf133ebb00c8945ab095a5e453c43bb0869"
+  },
+  "evidence": [
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/queue-insula-command.json",
+      "sha256": "ca3dc8ae21b2084f629212f145e5cf4eb6e9f6c659e5588a07f2e6ffd408e7bd"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/queue-live/result.json",
+      "sha256": "20e894b9b64529cabd57aa740ede2c362f447595b971b5b034b8ea13a73cfdaa"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/queue-native-read.json",
+      "sha256": "d3264e81b631f72488b3b8931642ab0e4a8d5755186e58bd969ba968d9307e08"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/queue-input/kata-all.json",
+      "sha256": "a150610b7eeb3e7cf55447a382d3e700c9ba08fa9435aa4b099d6b9a6f3be3b0"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/queue-input/kata-all.json",
+      "sha256": "a150610b7eeb3e7cf55447a382d3e700c9ba08fa9435aa4b099d6b9a6f3be3b0"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/queue-input/kata-open.json",
+      "sha256": "48066a768c30995eb6fc3e69044d24ef2ea82b76c92120bd0bbff8e8fb6cd0fe"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/queue-insula-stdout",
+      "sha256": "20e894b9b64529cabd57aa740ede2c362f447595b971b5b034b8ea13a73cfdaa"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/queue-insula-stderr",
+      "sha256": "8414204bdfb62dfe081e60d7879e9c437173cf3c2e99bdb50b99553e2557399d"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/queue-insula-stdout",
+      "sha256": "20e894b9b64529cabd57aa740ede2c362f447595b971b5b034b8ea13a73cfdaa"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-lead-20261005a/scripts/_collab/kata.py",
+      "sha256": "4227929c80fe1290deb72af738d706dd7f445e6ed840eb978b7f347891307003"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/queue-input/check.py",
+      "sha256": "592ae533a05f79fb4ea2082fb9ee9eeaf8f12aea02aa79d08ac599e529dc1ca8"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/run49-implementation-v5/runtime-lock.json",
+      "sha256": "cc591ad9a5fb7fc0db9e71efa3dd45ebf2254ec563e02be2124c6bb390abe389"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/run49-implementation-v5/runtime-lock.json",
+      "sha256": "cc591ad9a5fb7fc0db9e71efa3dd45ebf2254ec563e02be2124c6bb390abe389"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/runtime-build49-v5/build-manifest.json",
+      "sha256": "5f24b47c925ccc84a737f86b7e4eed0a096d9188a439629280a9977feb85cd6e"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-map-20261005a/docs/research/kata-task-map.json",
+      "sha256": "8ad0a02d50d045baa67f44490e89848d3d85ad468bd3e07ef7d970dd627b4135"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/prior-kata-task-map.json",
+      "sha256": "50b209fd3a84fb5b2ea6e863835f82f7bab4c1e103aad8af7479a5bbf6525227"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/import-v2-command.json",
+      "sha256": "8e6d936d5c1ad873b1d75c94221afc872fdfb09332a33c23f6d89459ffd075ce"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/import-v2-stdout",
+      "sha256": "14d94879e397b71e4ffe9514ca01fa146274dbde851c22e89470aa98ac81ef00"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-map-20261005a/docs/research/kata-task-map.json",
+      "sha256": "8ad0a02d50d045baa67f44490e89848d3d85ad468bd3e07ef7d970dd627b4135"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/worker-public-readback.json",
+      "sha256": "aae1fac16a0d32e7acf2159669d07680017cd5828946bd95871ff51c4b5fb5c0"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/assignments-readback.json",
+      "sha256": "1922ece0ab5007e75de22f9964574ea4ea5d90dbac555731ea3d58ec7793eeeb"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-a/reservation.json",
+      "sha256": "d8d38196656d3393b054f87072b2b1a1231f16f91e8fce8bf246c98989774425"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-a/ack.json",
+      "sha256": "2cbba41421e561cd77c4abf340d8630f3ab8766c2b859db411ef886b8a0f17e0"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-a/lead-ack.json",
+      "sha256": "b6e009bf3a63cae8a32e73921b523e75186b22b9c008413a448f6de0a7fc763a"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/reservation.json",
+      "sha256": "d7708b676031ea839806b6bdc21e6c3035400b82a7aa47aa9fa5b879dbc51069"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/ack.json",
+      "sha256": "12c76e37ec8f10ce5d24f7c24dba2b943d9cfd4c82d46874c5abaef9c5bef668"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/lead-ack.json",
+      "sha256": "c90f42d129ce5a4d7284dfe9a6669e1a82de142bd4e8ebbbf37728ef1991c911"
+    }
+  ],
+  "assessment": "Exact9cd reader projection ran successfully in live isolated Insula, exit0/318ms, against actual project-scoped host native Kata all-status and default-open envelopes. Literal command read-only mounts exact source and raw inputs, binds only output, unshares network/other namespaces, specifies512MiB/zero swap, and retains actual scope-start stderr/stdout. Fixed source hash, observed exact query, closed49UID and20same-project rows match raw input/output. Reused verified root49runtime identity09f248 and lock/build pins agree. No measured peak or new full rootfs reconstruction is claimed.",
+  "broker_mapping": "Fresh-base task import exit0 uses existing58UID; map8ad0a02d preserves all14old mapping records and adds only58/58.A/58.B, each blocked by49. Prior STALE_BASE attempt remains separately retained. Worker reservation/ack/lead acknowledgment/public tool cwd pins identify two distinct real threads, worktrees and outputs under provisional manual task58 authority.",
+  "acceptance_limits": [
+    "Insula exercised real fixed inventory reader; constructor identity and native transport were deliberately stubbed to the retained actual host response. Native broker transport inside Insula was not tested.",
+    "This accepts the bounded inventory patch live proof for landing, with prior exact source PASS. It does not close50/53 or accept their managed lifecycle/grant/stop matrices.",
+    "Worker acknowledgments are contextual evidence of provisional manual operation, not implementation acceptance of automated MAC dispatch.",
+    "Replay reports zero optimizer updates and no /dev/nvidia0; no training, optimizer, GPU permission or model efficacy claim.",
+    "Existing scientific/native evidence and prior failed/refused receipts remain retained. Map metadata is contextual evidence, not part of the two-file9cd candidate scope."
+  ],
+  "manual_patch_landing_allowed": true,
+  "landing_conditions": [
+    "Canonical/current exact parent must be freshly checked by the lead before serialized exact fast-forward and nonforce publication.",
+    "Do not reuse this receipt as verification of later stale worker candidates; refresh their base explicitly."
+  ],
+  "scope_flags": {
+    "bounded_inventory_live_proof_accepted": true,
+    "native_broker_transport_inside_insula_accepted": false,
+    "task50_closed": false,
+    "task53_closed": false,
+    "automated_worker_dispatch_accepted": false,
+    "native_stop_accepted": false,
+    "training_or_gpu_grants_accepted": false
+  },
+  "reviewer_process_disposition": "Own read-only checks ended under256MiB/zero swap; no native calls, shared source/refs/process mutations, worker dispatch or broader refusal matrix."
+}

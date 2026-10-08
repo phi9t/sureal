@@ -1,0 +1,66 @@
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+
+package(default_visibility = ["//visibility:private"])
+
+py_library(
+    name = "pipeline_lib",
+    srcs = glob(["pipeline/*.py"]),
+    imports = ["pipeline"],
+)
+
+filegroup(
+    name = "runtime_data",
+    srcs = glob([
+        "*.json",
+        "insulas/**",
+        "pipeline/*.py",
+    ]) + [
+        "README.md",
+        "run.sh",
+    ],
+)
+
+filegroup(
+    name = "test_support",
+    srcs = ["tests/test_colmap_reference.py"],
+)
+
+_CURRICULUM_TESTS = [
+    "test_classical",
+    "test_colmap_mvs_reference",
+    "test_colmap_reference",
+    "test_controlled_suite",
+    "test_depth_anything_reference",
+    "test_documentation",
+    "test_e2e_completion",
+    "test_fetch",
+    "test_foundation",
+    "test_foundation_geometry_reference",
+    "test_generation_dynamic_surflo",
+    "test_nerfacto_reference",
+    "test_neural_rendering",
+    "test_neus_facto_reference",
+    "test_orb_slam_reference",
+    "test_review_fixes",
+    "test_splatfacto_reference",
+]
+
+[
+    py_test(
+        name = module,
+        srcs = ["tests/%s.py" % module],
+        data = [
+            ":runtime_data",
+            ":test_support",
+        ],
+        imports = [
+            ".",
+            "pipeline",
+        ],
+        legacy_create_init = 0,
+        main = "tests/%s.py" % module,
+        size = "medium",
+        deps = [":pipeline_lib"],
+    )
+    for module in _CURRICULUM_TESTS
+]

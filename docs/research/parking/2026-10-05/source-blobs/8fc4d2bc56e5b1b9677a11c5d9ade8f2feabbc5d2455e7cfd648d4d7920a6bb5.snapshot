@@ -1,0 +1,46 @@
+from pathlib import Path
+import hashlib,json,math,subprocess,sys
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.runtime_identity import verify_rootfs
+from pipeline.insula_entry import launch_plan
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+research=code/'research';summary=research/'training-box-audited-distribution-summary.json';d=json.loads(summary.read_text())
+candidate={'schema_version':1,'status':'training-only anchor candidate; scientific protocol not frozen','summary_sha256':sha(summary),'audit_evidence_sha256':d['audit_evidence_sha256'],'weighting':d['weighting'],'geometry':d['geometry'],'ordering':'class ascending, then yaw 0 and pi/2; template L,W,H,center_z,yaw','templates':[],'scope':'all four native box classes retained; no ROI, sampling, assignment threshold, loss, budget or adoption implied'}
+for cls in ('1','2','3','4'):
+ for yaw in (0.0,math.pi/2):candidate['templates'].append({'class_id':int(cls),'values':d['classes'][cls]['median_length_width_height_center_z']+[yaw]})
+cp=research/'training-anchor-templates.candidate.json';assert not cp.exists();cp.write_text(json.dumps(candidate,indent=2)+'\n')
+cache=Path.home()/'.cache/waystone/waymo-perception';runtime=cache/'insula/rootfs-v2';lock=json.loads(Path(str(runtime)+'.lock.json').read_text());verify_rootfs(runtime,lock['rootfs_sha256'])
+base=cache/'insula/training-anchor-candidate-v1';base.mkdir();inputs=base/'input';inputs.mkdir();out=base/'output';out.mkdir()
+expected={'candidate_sha256':sha(cp),'summary_sha256':sha(summary),'audit_sha256':sha(research/'training-box-full64-replay-verified.json'),'grid_code_sha256':sha(code/'pipeline/anchor_grid.py')};(inputs/'expected.json').write_text(json.dumps(expected))
+program='''import hashlib,json,math,importlib.util
+from pathlib import Path
+import numpy as np
+from pipeline.anchor_grid import anchor_grid
+assert importlib.util.find_spec("tensorflow") is None
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+e=json.loads(Path('/tmp/input/expected.json').read_text());r=Path('/experiment/research')
+assert sha(r/'training-anchor-templates.candidate.json')==e['candidate_sha256']
+assert sha(r/'training-box-audited-distribution-summary.json')==e['summary_sha256']
+assert sha(r/'training-box-full64-replay-verified.json')==e['audit_sha256']
+assert sha('/experiment/pipeline/anchor_grid.py')==e['grid_code_sha256']
+c=json.loads((r/'training-anchor-templates.candidate.json').read_text());s=json.loads((r/'training-box-audited-distribution-summary.json').read_text());audit=json.loads((r/'training-box-full64-replay-verified.json').read_text())
+assert s['audit_evidence_sha256']==e['audit_sha256']==c['audit_evidence_sha256']
+assert c['summary_sha256']==e['summary_sha256'] and s['native_rows']==726715
+assert audit['checks'] and all(x['exit_code']==0 for x in audit['checks'])
+assert len(c['templates'])==8
+for i,t in enumerate(c['templates']):
+ cls=i//2+1;assert t['class_id']==cls
+ expected=s['classes'][str(cls)]['median_length_width_height_center_z']+[0.0 if i%2==0 else math.pi/2]
+ assert t['values']==expected and all(math.isfinite(x) for x in expected) and min(expected[:3])>0
+# Analytic non-square grid probes center-Z and flatten orientation independently.
+g=anchor_grid(nx=4,ny=2,cell_size=[.2,.3],origin=[-1,-2],templates=[x['values'] for x in c['templates']])
+assert g.shape==(16,7)
+for i,row in enumerate(g):
+ cell=i//8;t=c['templates'][i%8]['values']
+ np.testing.assert_allclose(row,[-1+(2*cell+1)*.2,-2+.3,t[3],*t[:3],t[4]],rtol=0,atol=1e-14)
+value={'classes':4,'templates':8,'analytic_anchors':16,'cyclist_unique_training_tracks':s['classes']['4']['unique_tracks'],'scope':'training-only median derivation and analytic layout; no training or heldout quality claim'}
+Path('/outputs/check.json').write_text(json.dumps(value,indent=2));print('PASS training-only medians, lineage, native center-Z, class/yaw and XY order')
+'''
+command=launch_plan(runtime,code,inputs,out,['python','-c',program]);i=command.index('--');command[i:i]=['--ro-bind',str(inputs),'/tmp/input'];run=subprocess.run(command,capture_output=True,text=True,timeout=60);(out/'live.log').write_text(run.stdout+run.stderr);print(run.stdout+run.stderr);assert run.returncode==0
+record={'checks':[{'command':command,'exit_code':run.returncode}],'runtime_lock':lock,'expected':expected,'validation':json.loads((out/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in (out/'check.json',out/'live.log')},'scope':'candidate preparation only; ticket07 and10 remain open'}
+(research/'training-anchor-candidate-verified.json').write_text(json.dumps(record,indent=2)+'\n')

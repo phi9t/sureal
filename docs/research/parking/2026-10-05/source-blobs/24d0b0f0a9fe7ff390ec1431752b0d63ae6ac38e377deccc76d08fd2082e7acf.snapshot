@@ -1,0 +1,140 @@
+"""Real filesystem tests of source and trusted-parent integrity only."""
+import hashlib
+import importlib
+import json
+from pathlib import Path
+import tempfile
+import unittest
+
+
+NAMES = (
+    'continuation/legacy_values.py', 'continuation/compare_state.py',
+    'continuation/test_legacy_values.py', 'continuation/test_compare_state.py',
+    'continuation_control/legacy_binding.py',
+    'continuation_control/test_legacy_binding.py',
+    'continuation_runtime/identity.py', 'continuation_runtime/backend.py',
+    'continuation_runtime/retention.py', 'continuation_runtime/runner.py',
+)
+
+
+def digest(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+class IdentityTests(unittest.TestCase):
+    def setUp(self):
+        try:
+            self.api = importlib.import_module('continuation_runtime.identity')
+        except ModuleNotFoundError:
+            self.fail('complete extension namespace identity is not implemented')
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.current = self.root / 'current'
+        self.destination = self.root / 'case' / 'extension'
+        self.destination.parent.mkdir()
+        for name in NAMES:
+            path = self.current / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text('# controlled byte-integrity fixture\n')
+        manifest = self.root / 'manifest.json'
+        manifest.write_text('{"recipe":"baseline"}\n')
+        native = self.root / 'run.json'
+        native.write_text(json.dumps({'manifest_sha256': digest(manifest)}))
+        resource = self.root / 'resource.json'
+        resource.write_text(json.dumps({'manifest_sha256': digest(manifest),
+                                       'native_run_path': str(native),
+                                       'native_run_sha256': digest(native)}))
+        self.parents = {name: {'path': str(path), 'sha256': digest(path)}
+                        for name, path in [('native_run', native),
+                                           ('manifest', manifest),
+                                           ('resource_identity', resource)]}
+
+    def freeze(self):
+        path, sha = self.api.freeze_namespace(self.current, self.destination, self.parents)
+        return path, sha
+
+    def check(self, path, sha):
+        return self.api.validate_namespace(self.current, self.destination, path, sha, self.parents)
+
+    def test_complete_current_and_snapshot_sources_are_bound(self):
+        path, sha = self.freeze()
+        identity = self.check(path, sha)
+        self.assertEqual(set(identity['source_pins']), set(NAMES))
+        self.assertEqual(identity['parents'], self.parents)
+        for name in NAMES:
+            self.assertEqual((self.destination / 'code' / name).read_bytes(),
+                             b'# controlled byte-integrity fixture\n')
+
+    def test_added_removed_or_changed_current_code_refuses(self):
+        path, sha = self.freeze()
+        source = self.current / 'continuation_runtime/backend.py'
+        for operation in ['change', 'remove', 'add']:
+            with self.subTest(operation=operation):
+                original = source.read_bytes()
+                extra = self.current / 'continuation_runtime/unadmitted.py'
+                try:
+                    if operation == 'change': source.write_text('changed\n')
+                    elif operation == 'remove': source.unlink()
+                    else: extra.write_text('new\n')
+                    with self.assertRaises(ValueError): self.check(path, sha)
+                finally:
+                    source.write_bytes(original)
+                    if extra.exists(): extra.unlink()
+
+    def test_changed_snapshot_refuses_even_if_current_code_is_unchanged(self):
+        path, sha = self.freeze()
+        (self.destination / 'code/continuation/compare_state.py').write_text('changed\n')
+        with self.assertRaises(ValueError): self.check(path, sha)
+
+    def test_identity_repin_cannot_replace_externally_trusted_parent(self):
+        path, sha = self.freeze()
+        alternate = self.root / 'foreign-run.json'
+        alternate.write_bytes(Path(self.parents['native_run']['path']).read_bytes())
+        value = json.loads(path.read_text())
+        value['parents']['native_run']['path'] = str(alternate)
+        path.write_text(json.dumps(value))
+        with self.assertRaises(ValueError): self.check(path, digest(path))
+
+    def test_parent_changes_refuse_before_and_after_freeze(self):
+        native = Path(self.parents['native_run']['path'])
+        path, sha = self.freeze()
+        native.write_text('{"changed":true}')
+        with self.assertRaises(ValueError): self.check(path, sha)
+        with self.assertRaises(ValueError):
+            self.api.freeze_namespace(self.current, self.root / 'new', self.parents)
+
+    def test_symlinked_source_or_snapshot_refuses(self):
+        path, sha = self.freeze()
+        for base in [self.current, self.destination / 'code']:
+            source = base / 'continuation_runtime/backend.py'
+            source.unlink()
+            source.symlink_to(self.current / 'continuation/compare_state.py')
+            with self.assertRaises(ValueError): self.check(path, sha)
+            source.unlink(); source.write_text('# controlled byte-integrity fixture\n')
+
+    def test_missing_required_runner_prevents_freeze(self):
+        (self.current / 'continuation_runtime/runner.py').unlink()
+        with self.assertRaises(ValueError): self.freeze()
+        self.assertFalse(self.destination.exists())
+
+    def test_nested_or_reused_destination_refuses(self):
+        with self.assertRaises(ValueError):
+            self.api.freeze_namespace(self.current, self.current / 'extension', self.parents)
+        self.freeze()
+        with self.assertRaises(ValueError): self.freeze()
+
+    def test_duplicate_identity_keys_and_foreign_manifest_refuse(self):
+        path, sha = self.freeze()
+        path.write_text('{"schema_version":1,"schema_version":1}')
+        with self.assertRaises(ValueError): self.check(path, digest(path))
+        manifest = Path(self.parents['manifest']['path'])
+        manifest.write_text('{"recipe":"other"}')
+        altered = {k: dict(v) for k, v in self.parents.items()}
+        altered['manifest']['sha256'] = digest(manifest)
+        with self.assertRaises(ValueError):
+            self.api.freeze_namespace(self.current, self.root / 'other', altered)
+
+
+if __name__ == '__main__':
+    unittest.main()

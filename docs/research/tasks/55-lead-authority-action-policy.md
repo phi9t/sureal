@@ -1,0 +1,44 @@
+# 55 — Lead authority and action policy
+
+Priority: P0 (highest). Status: specified; execution not admitted.
+
+The [October 5 happy-path priority](../2026-10-05-mac-happy-path-first.md)
+permits58 provisional manual use first. Dependencies below govern this ticket's
+full automation acceptance; they do not block58 or claim runtime capability.
+
+**Goal:** let the lead choose routine actions within explicit authority without
+requiring repeated human permission or weakening controller acceptance.
+
+**Dependencies:** independently closed53; this written spec reviewed; a concrete
+implementation plan reviewed and admitted. Drafting/review can proceed earlier.
+
+**Spec:** [Persistent research lead](../../superpowers/specs/2026-10-04-persistent-research-lead-design.md).
+
+## Deliverables
+
+- Versioned authority binding task selection, allowed operations, resource/
+  publication delegation, effective generation/validity, and explicit turn,
+  retry and cumulative budgets. Deterministic action eligibility uses actual
+  task/claim/attempt/base/evidence and refuses missing or stale authority.
+- Source-pinned policy implementation in `scripts/_collab/lead_policy.py`,
+  using the existing controller store/contracts and enforcement boundaries.
+- Reviewed plan with concrete interfaces, runtime probes, check manifests and
+  independent verifier coverage for55–57; future interface choices are not
+  delegated to unrelated worker discretion.
+
+## Verifiers and acceptance
+
+- Run real policy/controller fixtures in live Insula from exact candidate
+  source. Independently prove eligible actions pass and changed acceptance,
+  missing budget, expired authority, changed generation/claim, stale source,
+  dependency/resource conflicts and unsupported operation refuse.
+- Prove model proposals, worker summaries and negative scientific results cannot
+  grant acceptance or authorize a new experiment recipe. Preserve old briefs.
+- Independently review and reopen raw outputs/source/runtime/resource pins;
+  land the coherent verified candidate promptly on current mainline.
+
+## Closure evidence
+
+Exact source and authority records, actual commands/logs/exits, refusal cases,
+independent review/live receipt, landed identity and admitted follow-up inputs.
+Host-only tests, a draft authority or high priority do not close this ticket.

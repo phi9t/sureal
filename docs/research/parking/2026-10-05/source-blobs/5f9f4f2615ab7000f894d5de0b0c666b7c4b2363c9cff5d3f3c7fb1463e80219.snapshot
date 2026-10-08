@@ -1,0 +1,12 @@
+from pathlib import Path
+import time,subprocess,json
+r=Path('experiments/waymo-perception/research');logs=Path.home()/'.cache/waystone/waymo-perception/insula/continuation-logs'
+while True:
+ p=r/'architecture-residual_bev-checkpoint-audit-verified.json'
+ try:ready=p.exists() and 'checkpoint-audit-strict-v2' in p.read_text()
+ except OSError:ready=False
+ if ready:break
+ time.sleep(2)
+for worker in ['run-all-pillars-learning-curve.py','audit-all-pillars-checkpoint.py','run-all-pillars-loss-audit.py','score-all-pillars-score-first.py','audit-all-pillars-score-first.py']:
+ with (logs/('architecture-all_pillars-'+worker+'.log')).open('w') as f:run=subprocess.run(['python','.scratch/'+worker,'all_pillars'],stdout=f,stderr=subprocess.STDOUT)
+ assert run.returncode==0,worker;print('PASS all_pillars',worker,flush=True)

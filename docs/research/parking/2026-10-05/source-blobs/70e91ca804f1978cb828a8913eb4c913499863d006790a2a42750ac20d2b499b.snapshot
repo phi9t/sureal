@@ -1,0 +1,12 @@
+import pathlib,json,sys,subprocess,hashlib,shutil,time
+P=pathlib.Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(P));from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+from tier1.storage import unique_payload_bytes
+from advanced.archive import sha
+C=pathlib.Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing';R=C/'insula/motion-geometry-retention-admission-v1';R.mkdir();code=R/'code';code.mkdir();publication=P/'research/motion-geometry-hdfs-retention-verified.json';pub=json.loads(publication.read_text());shutil.copy(publication,code/'publication.json');(code/'readback.json').write_bytes((pathlib.Path(pub['checks'][-1]['log_sha256']).parent/'unavailable').read_bytes()) if False else None
+# Resolve the retained downloader from the immutable global get command.
+readback=pathlib.Path(pub['checks'][-1]['command'][-1]);assert sha(readback)==pub['publication_manifest_sha256'];shutil.copy(readback,code/'readback.json');shutil.copy('.scratch/motion_retention_check.py',code/'verify.py');expected={}
+for name,key in [('motion-delta-native-components-verified.json','artifacts'),('motion-current-geometry-producer-verified.json','artifacts')]:
+ r=json.loads((P/'research'/name).read_text())
+ for file,h in r[key].items():expected[str(pathlib.Path(file).relative_to(W))]=h
+(code/'expected.json').write_text(json.dumps(expected));pins={str(p):sha(p) for p in code.iterdir()};root=C/'insula/rootfs-v2';lock=json.loads(pathlib.Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);out=R/'output';out.mkdir();cmd=launch_plan(root,code,W,out,['python','/experiment/verify.py']);r=subprocess.run(cmd,capture_output=True,text=True,timeout=120);(out/'live.log').write_text(r.stdout+r.stderr);assert r.returncode==0,r.stderr;assert all(sha(p)==h for p,h in pins.items());assert sha(publication)==sha(code/'publication.json');assert unique_payload_bytes(W)<15*1024**3;receipt={'command':cmd,'exit_code':0,'runtime_lock':lock,'pins':pins,'publication_receipt_sha256':sha(publication),'validation':json.loads((out/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in out.iterdir()},'scientific_payload_bytes':unique_payload_bytes(W),'scientific_cap_bytes':15*1024**3};(P/'research/motion-geometry-retention-admission-verified.json').write_text(json.dumps(receipt,indent=2));print(r.stdout)

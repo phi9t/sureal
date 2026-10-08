@@ -1,0 +1,16 @@
+import json,hashlib,sys
+from pathlib import Path
+exp=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(exp))
+from pipeline.native_shape_source_replay import replay_shape_source
+from pipeline.staging_lease import staging_lease
+cache=Path.home()/'.cache/waystone/waymo-perception';prior=json.loads((exp/'research/native-shape-worker-cli-verified.json').read_text());original=Path(prior['receipt']).parent;job=original/'input/job.json';j=json.loads(job.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();slice_root=cache/'slices/validation-two-scenes-20260929';obj=next(o for o in json.loads((slice_root/'slice.json').read_text())['objects'] if o['component']=='lidar' and o['context']==j['scene'])
+run=cache/'insula/native-shape-source-driver-fixture-a';run.mkdir(exist_ok=False);fixture=run/'cache';(fixture/'scientific-processing').mkdir(parents=True);record={'scene':j['scene'],'component':'lidar','official_split':j['membership']['official_split'],'research_splits':j['membership']['research_splits'],'sha256':obj['sha256'],'hdfs_roundtrip_sha256':obj['sha256'],'hdfs_uri':obj['hdfs_uri'],'source_metadata':{'size':obj['size_bytes'],'md5_hash':obj['md5_base64']},'inventory':j['inventory']};receipt=run/'source-receipt.json';receipt.write_text(json.dumps(record,indent=2));output=fixture/'scientific-processing/shape-source'
+kwargs=dict(expected_job_sha256=prior['job_sha256'],expected_source_receipt_sha256=sha(receipt),cache=fixture,code_root=exp,output=output,runtime_root=cache/'insula/rootfs-v2',expected_runtime_lock=prior['runtime_lock'],retained_bytes=1200154353,limit_bytes=2147483648,transfer_command=[sys.executable,'-c','import shutil,sys; shutil.copyfile('+repr(str(slice_root/obj['relative_path']))+',sys.argv[-1])'])
+with staging_lease(fixture/'scientific-processing/cohort-queue.lock'):
+ try:replay_shape_source(job,receipt,**kwargs)
+ except ValueError:pass
+ else:raise AssertionError('competing queue admitted')
+ assert not output.exists()
+result=replay_shape_source(job,receipt,**kwargs);assert result['validation']['records_verified']==1980;assert not list((fixture/'scientific-processing-staging').glob('stage-*'));assert all(c['exit_code']==0 for c in result['checks']);assert result['input_identity']['scene']==j['scene']
+for n,h in result['artifacts'].items():assert sha(output/n)==h
+summary={'receipt':str(output/'receipt.json'),'receipt_sha256':sha(output/'receipt.json'),'validation':result['validation'],'scope':'actual native one-source driver and independent live worker under fixture transfer; real103 HDFS execution pending'};(exp/'research/native-shape-source-driver-fixture-verified.json').write_text(json.dumps(summary,indent=2));print('PASS reusable source driver, actual native1980records, competing queue refused, staged source removed')

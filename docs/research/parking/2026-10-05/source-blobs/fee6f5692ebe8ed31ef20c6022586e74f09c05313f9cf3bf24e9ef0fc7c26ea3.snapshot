@@ -1,0 +1,50 @@
+"""One-shot continuation: never restart the queue or bypass its lease."""
+import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import time
+
+code=Path(__file__).resolve().parents[1]/'experiments/waymo-perception'
+cache=Path.home()/'.cache/waystone/waymo-perception'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+candidate=code/'research/training-box-replay-execution.candidate.json'
+expected_candidate=sha(candidate)
+names=['training_box_replay.py','training_box_resources.py','training_box_process.py',
+       'training_box_sender.py','training_box_job.py','training_box_wire.py',
+       'training_box_sources.py','training_box_statistics.py','training_box_reference.py',
+       'scientific_admission.py','source_integrity.py','staged_source.py',
+       'staging_lease.py','runtime_identity.py']
+pins={n:sha(code/'pipeline'/n) for n in names}
+manifest=code/'scientific-acquisition.candidate.json'
+manifest_sha=sha(manifest);expected_scenes=set(json.loads(manifest.read_text())['scenes'])
+assert len(expected_scenes)==103
+destination=cache/'scientific-processing/training-box-distributions-v1'
+assert not destination.exists()
+print('WAIT original103 independently admitted scenes and queue PID1021324 completion',flush=True)
+while True:
+    state=json.loads((code/'research/scientific-processing-progress.json').read_text())
+    admitted=set(state['replayed_scene_evidence'])
+    if state['point_scenes_replayed']==103 and admitted==expected_scenes:
+        break
+    if not Path('/proc/1021324/cmdline').exists():
+        raise RuntimeError('queue handle missing before full admission; inspect queue and observer, do not restart')
+    args=Path('/proc/1021324/cmdline').read_bytes()
+    if b'process-scientific-cohort.py' not in args:
+        raise RuntimeError('queue PID identity differs; inspect authoritative state')
+    time.sleep(30)
+while Path('/proc/1021324/cmdline').exists():
+    args=Path('/proc/1021324/cmdline').read_bytes()
+    if b'process-scientific-cohort.py' not in args:break
+    time.sleep(10)
+assert sha(candidate)==expected_candidate and sha(manifest)==manifest_sha
+assert pins=={n:sha(code/'pipeline'/n) for n in names}
+command=[sys.executable,'-m','pipeline.training_box_replay','--output',str(destination),
+         '--expected-candidate-sha256',expected_candidate]
+environment=dict(os.environ,PYTHONPATH=str(code))
+print('RUN one-shot original64 real HDFS producer/reference replay',flush=True)
+result=subprocess.run(command,env=environment)
+print('TERMINAL replay exit',result.returncode,flush=True)
+sys.exit(result.returncode)

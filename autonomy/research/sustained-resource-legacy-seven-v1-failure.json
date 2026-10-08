@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "scope": "bounded legacy producer and five CPU/native stage replay evidence; no checkpoint companion, full runner admission, new fitting sample or release",
+  "driver_path": "/tmp/sureal-resource-legacy-seven-v1.py",
+  "driver_sha256": "0fa38ef0db5dd5cfc3ce7aa710c995d9a9aa22cfb6656615222f3bbbd644655b",
+  "stages": [],
+  "original_native_sha256": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/run.json": "96dc607ae8238774ca875588d65eaf463f120227e161ae792a9187c8e6635d7d",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/state.json": "dac2ce421243c4750175f98152cdc1ce4ecb7e1a493ddee7050c42fcc09e7765",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-00/checkpoint.pt": "8057a5496c4d6ec4d19b9de33034c6cca753ea39d8f03fd765ad7011cdf301ee",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-00-admitted.json": "dde09eb7e6d65e781597da82870ca6c64ea5bff1ea77d31b8b8268ec5a0ad364",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-1000/checkpoint.pt": "37de2375b0b10f92a56468bd9ffe0b2fea42f257c5949efa80fd29c621a8ff4a",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-1000-admitted.json": "b0a874b87a2541ab13b2a97e36540b458b54bb0996c6e679a8c156d0160f52d9"
+  },
+  "resource_identity": {
+    "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/identity.json",
+    "sha256": "f2514b46aa6952662b35183df8db0ce9ec914b38640de2a1d24cfbf7bbe80e5d"
+  },
+  "parity_sources": {
+    "compare_state.py": {
+      "original": {
+        "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/continuation/compare_state.py",
+        "sha256": "03aa6dbf1cb1b9f0c687859643cf7c1922ace44c2782ed76e8a6d5980f916d50"
+      },
+      "snapshot": {
+        "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-seven-controller20261003a-v1/continuation/compare_state.py",
+        "sha256": "03aa6dbf1cb1b9f0c687859643cf7c1922ace44c2782ed76e8a6d5980f916d50"
+      }
+    },
+    "test_legacy_values.py": {
+      "original": {
+        "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/continuation/test_legacy_values.py",
+        "sha256": "32a22ba0299bc184228e734bd92b5e86b3aadb8bc88cddf7a9400cd8a1f2c86f"
+      },
+      "snapshot": {
+        "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-seven-controller20261003a-v1/continuation/test_legacy_values.py",
+        "sha256": "32a22ba0299bc184228e734bd92b5e86b3aadb8bc88cddf7a9400cd8a1f2c86f"
+      }
+    },
+    "test_compare_state.py": {
+      "original": {
+        "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/continuation/test_compare_state.py",
+        "sha256": "b8aa5141e6d7b7931131dbacc27da878f2abdea9af44aef9dff66e2531ad6dd3"
+      },
+      "snapshot": {
+        "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-seven-controller20261003a-v1/continuation/test_compare_state.py",
+        "sha256": "b8aa5141e6d7b7931131dbacc27da878f2abdea9af44aef9dff66e2531ad6dd3"
+      }
+    },
+    "legacy_values.py": {
+      "original": {
+        "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/continuation/legacy_values.py",
+        "sha256": "33f3dcf324a88785713d33942ec8e9aa1d39e8ba5883a73af46556b13ffbdb8b"
+      },
+      "snapshot": {
+        "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-seven-controller20261003a-v1/continuation/legacy_values.py",
+        "sha256": "33f3dcf324a88785713d33942ec8e9aa1d39e8ba5883a73af46556b13ffbdb8b"
+      }
+    }
+  },
+  "manifest_sha256": "70360cd3206b7d9d9eb06659e7ab1bd05f60998eda2740879ac63526e06d181f",
+  "passed": false,
+  "error": {
+    "type": "ValueError",
+    "message": "failed or incomplete scoped stage cannot be admitted"
+  },
+  "traceback": "Traceback (most recent call last):\n  File \"/tmp/sureal-resource-legacy-seven-v1.py\", line 58, in <module>\n    stateproof=execute('state-'+str(step),None,comparison,cmd);entry.update(state_comparison=stateproof,state_comparison_job=ref(inputs/'job.json'),state_comparison_result=ref(comparison/'check.json'),complete_state_and_all16head_parity=True,only_original_output_mount_replaced_before_resource_wrapping=True)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/tmp/sureal-resource-legacy-seven-v1.py\", line 39, in execute\n    run_stage(command,b.package,dict(os.environ),stream,stage_timeout(metric),code=code,current_sources=P/'resources',source_pins=b.resource_identity['source_pins'],evidence_directory=proofroot,native_output=output,cap_bytes=CAP_BYTES)\n  File \"/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/stage.py\", line 111, in run_stage\n    if 'resource_admission' not in host:raise ValueError('failed or incomplete scoped stage cannot be admitted')\n                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: failed or incomplete scoped stage cannot be admitted\n"
+}

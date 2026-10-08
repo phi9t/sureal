@@ -1,0 +1,608 @@
+{
+  "schema_version": 1,
+  "base_commit": "b32307da442598e192a9259d29a8650be1134589",
+  "write_scope": "docs/research/pilots/58/failure-ledger/",
+  "native_root": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2",
+  "verified_files": [
+    {
+      "id": "native_groundtruth",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-export-v1/output/groundtruth.json",
+      "live_path": "/tmp/retained/insula/balanced16-historical-v3-fullgt-export-v1/output/groundtruth.json",
+      "sha256": "63c3ae4827ae88cd1d77e4ad34017fd1e564e4087c502d7ca255bf5c72f63143",
+      "bytes": 502729,
+      "role": "retained evidence"
+    },
+    {
+      "id": "cause_check",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-causes-v1/output/check.json",
+      "live_path": "/tmp/retained/insula/balanced16-coverage-causes-v1/output/check.json",
+      "sha256": "051948447cafda82cf58e3432ab597a8e0d117c74ba5a7b53d1cad58d2d4f82b",
+      "bytes": 19581,
+      "role": "retained evidence"
+    },
+    {
+      "id": "native_manifest",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-causes-v1/input/manifest.json",
+      "live_path": "/tmp/retained/insula/balanced16-coverage-causes-v1/input/manifest.json",
+      "sha256": "ab2ffa9c3652c24118ad3f52a0011f7e2895b3f3b82b64b86903dde51f84a675",
+      "bytes": 13095,
+      "role": "retained evidence"
+    },
+    {
+      "id": "anchor_templates",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-causes-v1/input/anchor-templates.json",
+      "live_path": "/tmp/retained/insula/balanced16-coverage-causes-v1/input/anchor-templates.json",
+      "sha256": "4bcc69590d664b32ff1ece5e8f00345c76f9564f419b091bf05f6482a5c56d52",
+      "bytes": 2244,
+      "role": "retained evidence"
+    },
+    {
+      "id": "archived_literal_worker",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-causes-v1/code/worker.py",
+      "live_path": "/tmp/retained/insula/balanced16-coverage-causes-v1/code/worker.py",
+      "sha256": "0b1958df15b9f2f107ebba67f483ef52f4383927a01bc4ad9524d0647caf39ed",
+      "bytes": 5125,
+      "role": "exact archived assignment-audit implementation"
+    },
+    {
+      "id": "oracle_check",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/prepared/check.json",
+      "live_path": "/tmp/retained/insula/balanced16-coverage-oracle-native-v1/prepared/check.json",
+      "sha256": "e566171ce68d0c958369fc369a7e822e67d71ab9255200694d8da11c7b075c30",
+      "bytes": 9319,
+      "role": "retained evidence"
+    },
+    {
+      "id": "cause_receipt",
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/research/balanced16-coverage-causes-verified.json",
+      "live_path": "/tmp/repository/experiments/waymo-perception/research/balanced16-coverage-causes-verified.json",
+      "sha256": "4f4a111755a24e41e8069ac98ec6e3d480c5181ec56f0dce7d7552489854730b",
+      "bytes": 24209,
+      "role": "immutable repository report/source at base B"
+    },
+    {
+      "id": "native_metrics_receipt",
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/research/balanced16-historical-v3-fullgt-metrics-verified.json",
+      "live_path": "/tmp/repository/experiments/waymo-perception/research/balanced16-historical-v3-fullgt-metrics-verified.json",
+      "sha256": "6a59512f16a9cbc927f53f71f0cb75470e3e5dfe8bd62c882b0329c590cb0f50",
+      "bytes": 13130,
+      "role": "immutable repository report/source at base B"
+    },
+    {
+      "id": "oracle_receipt",
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/research/balanced16-coverage-oracle-native-verified.json",
+      "live_path": "/tmp/repository/experiments/waymo-perception/research/balanced16-coverage-oracle-native-verified.json",
+      "sha256": "509b526abb9936434388ca78a5c7d69344db2e27ad248c73b5e1a14a72ec4f7d",
+      "bytes": 26104,
+      "role": "immutable repository report/source at base B"
+    },
+    {
+      "id": "oracle_audit_receipt",
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/research/balanced16-coverage-oracle-audit-verified.json",
+      "live_path": "/tmp/repository/experiments/waymo-perception/research/balanced16-coverage-oracle-audit-verified.json",
+      "sha256": "731b3a4bf442bbb65a9a12a10bc9292ff95fe5afcd2d9fcd6d6b45d06483ce0f",
+      "bytes": 11425,
+      "role": "immutable repository report/source at base B"
+    },
+    {
+      "id": "analysis_report",
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.md",
+      "live_path": "/tmp/repository/experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.md",
+      "sha256": "9811738e5e819da4708a36c7abf00bd655287d3bb9fe7d3e7fe8ee441803ecde",
+      "bytes": 14363,
+      "role": "immutable repository report/source at base B"
+    },
+    {
+      "id": "analysis_values",
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.json",
+      "live_path": "/tmp/repository/experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.json",
+      "sha256": "7cca76e837ee4b54994fd8760a41c96ee4796a1dfe6a399aaf68630dc23b6616",
+      "bytes": 21704,
+      "role": "immutable repository report/source at base B"
+    },
+    {
+      "id": "analysis_source",
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.py",
+      "live_path": "/tmp/repository/experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.py",
+      "sha256": "a71bcc23281a09c7a5d4c9e20889b16a4027eb8bdeecc7a36476133380eaf96d",
+      "bytes": 11620,
+      "role": "immutable repository report/source at base B"
+    },
+    {
+      "id": "evidence_audit",
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/research/2026-10-03-initial-experiments-evidence-audit.md",
+      "live_path": "/tmp/repository/experiments/waymo-perception/research/2026-10-03-initial-experiments-evidence-audit.md",
+      "sha256": "9b4dfcf36dacae5ccbe6a7e21267891ac56766e77e3a7db5221034d27d353473",
+      "bytes": 24426,
+      "role": "immutable repository report/source at base B"
+    },
+    {
+      "id": "source:analysis/balanced16-coverage-causes.py",
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/analysis/balanced16-coverage-causes.py",
+      "live_path": "/tmp/repository/experiments/waymo-perception/analysis/balanced16-coverage-causes.py",
+      "sha256": "0b1958df15b9f2f107ebba67f483ef52f4383927a01bc4ad9524d0647caf39ed",
+      "bytes": 5125,
+      "role": "read-only current source at base B"
+    },
+    {
+      "id": "source:pipeline/anchor_assignment.py",
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/pipeline/anchor_assignment.py",
+      "live_path": "/tmp/repository/experiments/waymo-perception/pipeline/anchor_assignment.py",
+      "sha256": "f8c5e2cefdd69ab25428d39474ab2b2e89ae17d469de3d89ac1a4143ce5d2464",
+      "bytes": 1656,
+      "role": "read-only current source at base B"
+    },
+    {
+      "id": "source:pipeline/anchor_grid.py",
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/pipeline/anchor_grid.py",
+      "live_path": "/tmp/repository/experiments/waymo-perception/pipeline/anchor_grid.py",
+      "sha256": "2846a69b632483f9553523954ab72fd9af4672edf1c628d79333333cc762b60e",
+      "bytes": 1340,
+      "role": "read-only current source at base B"
+    },
+    {
+      "id": "source:cohort/overfit_detection_targets_v2.py",
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/cohort/overfit_detection_targets_v2.py",
+      "live_path": "/tmp/repository/experiments/waymo-perception/cohort/overfit_detection_targets_v2.py",
+      "sha256": "f368358b6e6c6daab577cf803634b0aa625da6547f09ee119d8d8e21b7e9aa93",
+      "bytes": 3388,
+      "role": "read-only current source at base B"
+    },
+    {
+      "id": "source:pipeline/detector_decode.py",
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/pipeline/detector_decode.py",
+      "live_path": "/tmp/repository/experiments/waymo-perception/pipeline/detector_decode.py",
+      "sha256": "8e1927dd072df3752021561ba0ac9ffe14b95405995a3f4c1f29d4088935dade",
+      "bytes": 1824,
+      "role": "read-only current source at base B"
+    },
+    {
+      "id": "source:pipeline/insula_entry.py",
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/pipeline/insula_entry.py",
+      "live_path": "/tmp/repository/experiments/waymo-perception/pipeline/insula_entry.py",
+      "sha256": "4ad731aff9057550db8a3c2d194f7b23a1447ef11b8f3d58ec7344f6132209b2",
+      "bytes": 2626,
+      "role": "read-only current source at base B"
+    },
+    {
+      "id": "source:pipeline/runtime_identity.py",
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/pipeline/runtime_identity.py",
+      "live_path": "/tmp/repository/experiments/waymo-perception/pipeline/runtime_identity.py",
+      "sha256": "fbecd514661535d32cbd7c25cc208a60d50728e9d9469d1a82b9979d1261adf2",
+      "bytes": 1289,
+      "role": "read-only current source at base B"
+    },
+    {
+      "id": "report:13840133134545942567_1060_000_1080_000:1558402354862835",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13840133134545942567_1060_000_1080_000/1558402354862835/producer/report.json",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/13840133134545942567_1060_000_1080_000/1558402354862835/producer/report.json",
+      "sha256": "2c75baeb739ffdc4e452b8403216a91f38052bc288220b9e490cc637801a7e6d",
+      "bytes": 4949,
+      "role": "retained evidence"
+    },
+    {
+      "id": "targets:13840133134545942567_1060_000_1080_000:1558402354862835",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13840133134545942567_1060_000_1080_000/1558402354862835/producer/targets.npz",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/13840133134545942567_1060_000_1080_000/1558402354862835/producer/targets.npz",
+      "sha256": "e466ddafa4f8a532635f23e994f82a2cf5a5a873d980570443f0cfe3f43d5eee",
+      "bytes": 41944086,
+      "role": "retained evidence"
+    },
+    {
+      "id": "report:16977844994272847523_2140_000_2160_000:1557450680964094",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450680964094/producer/report.json",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450680964094/producer/report.json",
+      "sha256": "a82bd72c0d22006e2cfc99a95c34ff0803b48ebab086543dc30cffc8c574815b",
+      "bytes": 3944,
+      "role": "retained evidence"
+    },
+    {
+      "id": "targets:16977844994272847523_2140_000_2160_000:1557450680964094",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450680964094/producer/targets.npz",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450680964094/producer/targets.npz",
+      "sha256": "31154e86a66091de71e79e241b0c059f22997cc3c6fef4083c89e1b0b6ac4f89",
+      "bytes": 41944086,
+      "role": "retained evidence"
+    },
+    {
+      "id": "report:17885096890374683162_755_580_775_580:1506906083489022",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/17885096890374683162_755_580_775_580/1506906083489022/producer/report.json",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/17885096890374683162_755_580_775_580/1506906083489022/producer/report.json",
+      "sha256": "905d9de37d5aff7224e85b53107a2bcb689723ca7c6cb55880afc2e287c5eb1d",
+      "bytes": 3013,
+      "role": "retained evidence"
+    },
+    {
+      "id": "targets:17885096890374683162_755_580_775_580:1506906083489022",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/17885096890374683162_755_580_775_580/1506906083489022/producer/targets.npz",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/17885096890374683162_755_580_775_580/1506906083489022/producer/targets.npz",
+      "sha256": "cf367ef39f254971e289e25277d9e5dfff48e6306c4c4a9f86d31c98a0eb12f3",
+      "bytes": 41944086,
+      "role": "retained evidence"
+    },
+    {
+      "id": "report:4575961016807404107_880_000_900_000:1544656166412547",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/4575961016807404107_880_000_900_000/1544656166412547/producer/report.json",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/4575961016807404107_880_000_900_000/1544656166412547/producer/report.json",
+      "sha256": "0860b38f1c8abc859f7fbe3b570340ca1edf955ddcef1f26ed631f3ff52dec08",
+      "bytes": 3140,
+      "role": "retained evidence"
+    },
+    {
+      "id": "targets:4575961016807404107_880_000_900_000:1544656166412547",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/4575961016807404107_880_000_900_000/1544656166412547/producer/targets.npz",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/4575961016807404107_880_000_900_000/1544656166412547/producer/targets.npz",
+      "sha256": "87f75e117a13feb7d017fed2cab5175ee0aba70c8150595b3519e143e3453e52",
+      "bytes": 41944086,
+      "role": "retained evidence"
+    },
+    {
+      "id": "report:13506499849906169066_120_000_140_000:1552353849872908",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13506499849906169066_120_000_140_000/1552353849872908/producer/report.json",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/13506499849906169066_120_000_140_000/1552353849872908/producer/report.json",
+      "sha256": "bc6114752ed55e86dfcdc290342f3bb4e22d4d3ee1fb3eb242a5c31dd4a167dc",
+      "bytes": 4855,
+      "role": "retained evidence"
+    },
+    {
+      "id": "targets:13506499849906169066_120_000_140_000:1552353849872908",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13506499849906169066_120_000_140_000/1552353849872908/producer/targets.npz",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/13506499849906169066_120_000_140_000/1552353849872908/producer/targets.npz",
+      "sha256": "77f5d5301ac4dffa06f1f51b8467ea0bced7a4877ba464998d758df3540afb91",
+      "bytes": 41944086,
+      "role": "retained evidence"
+    },
+    {
+      "id": "report:16977844994272847523_2140_000_2160_000:1557450685964257",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450685964257/producer/report.json",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450685964257/producer/report.json",
+      "sha256": "000c3bf495fdd40c2fe7b6dd2c1234f46f3b16f9c9236c9a29889dac6d3cea49",
+      "bytes": 4214,
+      "role": "retained evidence"
+    },
+    {
+      "id": "targets:16977844994272847523_2140_000_2160_000:1557450685964257",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450685964257/producer/targets.npz",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450685964257/producer/targets.npz",
+      "sha256": "f457453de529ebe27f84e0b2b2e96a4cc697eb2fe5ce5b5ad4cc6e3bdb8a1d15",
+      "bytes": 41944086,
+      "role": "retained evidence"
+    },
+    {
+      "id": "report:15696964848687303249_4615_200_4635_200:1507241626220091",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/15696964848687303249_4615_200_4635_200/1507241626220091/producer/report.json",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/15696964848687303249_4615_200_4635_200/1507241626220091/producer/report.json",
+      "sha256": "d77f0224ddf9be0339138e930113842a04877cdaf6fc5bdc797c41613d9afb38",
+      "bytes": 4380,
+      "role": "retained evidence"
+    },
+    {
+      "id": "targets:15696964848687303249_4615_200_4635_200:1507241626220091",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/15696964848687303249_4615_200_4635_200/1507241626220091/producer/targets.npz",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/15696964848687303249_4615_200_4635_200/1507241626220091/producer/targets.npz",
+      "sha256": "5b651ebb7b8a8c4a70d61c64ff3b085e90fb5cc45338512ebb8dc667d1898227",
+      "bytes": 41944086,
+      "role": "retained evidence"
+    },
+    {
+      "id": "report:16977844994272847523_2140_000_2160_000:1557450679864286",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450679864286/producer/report.json",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450679864286/producer/report.json",
+      "sha256": "e671e3f2bbe59489357e1a789d6ce5e97796366692237eb6378727407aa08c76",
+      "bytes": 3702,
+      "role": "retained evidence"
+    },
+    {
+      "id": "targets:16977844994272847523_2140_000_2160_000:1557450679864286",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450679864286/producer/targets.npz",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450679864286/producer/targets.npz",
+      "sha256": "f18bbd165a1ab973913dd61ef14d7a6aa4e13e705daec6f581fe9c7e56fde892",
+      "bytes": 41944086,
+      "role": "retained evidence"
+    },
+    {
+      "id": "report:12856053589272984699_1020_000_1040_000:1552658368873652",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/12856053589272984699_1020_000_1040_000/1552658368873652/producer/report.json",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/12856053589272984699_1020_000_1040_000/1552658368873652/producer/report.json",
+      "sha256": "bdca1e5495f4a7606a9444cee21cb9f7b2fbf5f49a39afeee4b0466ec5517dbc",
+      "bytes": 3387,
+      "role": "retained evidence"
+    },
+    {
+      "id": "targets:12856053589272984699_1020_000_1040_000:1552658368873652",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/12856053589272984699_1020_000_1040_000/1552658368873652/producer/targets.npz",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/12856053589272984699_1020_000_1040_000/1552658368873652/producer/targets.npz",
+      "sha256": "757f613ac6cb4c796953df26d69e4aaefada3f14c1565793da22c522250ad9f1",
+      "bytes": 41944086,
+      "role": "retained evidence"
+    },
+    {
+      "id": "report:15628918650068847391_8077_670_8097_670:1508889335260598",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/15628918650068847391_8077_670_8097_670/1508889335260598/producer/report.json",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/15628918650068847391_8077_670_8097_670/1508889335260598/producer/report.json",
+      "sha256": "894074d630dbdc9c040b4ce26727c5abb06270be471919aa6d69828ce971d50c",
+      "bytes": 2903,
+      "role": "retained evidence"
+    },
+    {
+      "id": "targets:15628918650068847391_8077_670_8097_670:1508889335260598",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/15628918650068847391_8077_670_8097_670/1508889335260598/producer/targets.npz",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/15628918650068847391_8077_670_8097_670/1508889335260598/producer/targets.npz",
+      "sha256": "667360615a440664252a23aa2373351467276488a8585ae2d02fa051dd2a49cf",
+      "bytes": 41944086,
+      "role": "retained evidence"
+    },
+    {
+      "id": "report:7850521592343484282_4576_090_4596_090:1520908476792400",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7850521592343484282_4576_090_4596_090/1520908476792400/producer/report.json",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/7850521592343484282_4576_090_4596_090/1520908476792400/producer/report.json",
+      "sha256": "f2f7de09677be596e0b4ad0ebbfe2f631df082f1aedacdc2db061523ead9b259",
+      "bytes": 2148,
+      "role": "retained evidence"
+    },
+    {
+      "id": "targets:7850521592343484282_4576_090_4596_090:1520908476792400",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7850521592343484282_4576_090_4596_090/1520908476792400/producer/targets.npz",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/7850521592343484282_4576_090_4596_090/1520908476792400/producer/targets.npz",
+      "sha256": "8d3d56f93ac33cd673f1e866f9f3f0c23e2a9c8ed2909a52a8d196ce030983cf",
+      "bytes": 41944086,
+      "role": "retained evidence"
+    },
+    {
+      "id": "report:7921369793217703814_1060_000_1080_000:1557159628222386",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7921369793217703814_1060_000_1080_000/1557159628222386/producer/report.json",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/7921369793217703814_1060_000_1080_000/1557159628222386/producer/report.json",
+      "sha256": "aa39c096d3b7c38966c354ebe491c81d9dc3c784d3f287ac3725fa81e1eaeeff",
+      "bytes": 4254,
+      "role": "retained evidence"
+    },
+    {
+      "id": "targets:7921369793217703814_1060_000_1080_000:1557159628222386",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7921369793217703814_1060_000_1080_000/1557159628222386/producer/targets.npz",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/7921369793217703814_1060_000_1080_000/1557159628222386/producer/targets.npz",
+      "sha256": "c045c0035938a6defb515d46414b4c2b97a4e93fc48328e4e48ee956f7ebb3cb",
+      "bytes": 41944086,
+      "role": "retained evidence"
+    },
+    {
+      "id": "report:7921369793217703814_1060_000_1080_000:1557159618222385",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7921369793217703814_1060_000_1080_000/1557159618222385/producer/report.json",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/7921369793217703814_1060_000_1080_000/1557159618222385/producer/report.json",
+      "sha256": "fe85ad826d173523a3a870e2dd4e02cd54095398e75841cdb2504a8d6de4547d",
+      "bytes": 4162,
+      "role": "retained evidence"
+    },
+    {
+      "id": "targets:7921369793217703814_1060_000_1080_000:1557159618222385",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7921369793217703814_1060_000_1080_000/1557159618222385/producer/targets.npz",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/7921369793217703814_1060_000_1080_000/1557159618222385/producer/targets.npz",
+      "sha256": "4ba94168b2a2dfd186e786c393efea572b501671bc93d831afccca676390fe20",
+      "bytes": 41944086,
+      "role": "retained evidence"
+    },
+    {
+      "id": "report:13830510593707564159_5575_000_5595_000:1518657072511849",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13830510593707564159_5575_000_5595_000/1518657072511849/producer/report.json",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/13830510593707564159_5575_000_5595_000/1518657072511849/producer/report.json",
+      "sha256": "9ac14d4f4b250a62e092788855d63d209d183028040ff5dad63ba684b3325325",
+      "bytes": 1657,
+      "role": "retained evidence"
+    },
+    {
+      "id": "targets:13830510593707564159_5575_000_5595_000:1518657072511849",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13830510593707564159_5575_000_5595_000/1518657072511849/producer/targets.npz",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/13830510593707564159_5575_000_5595_000/1518657072511849/producer/targets.npz",
+      "sha256": "293a9e0304860f0ca557f2b9f0afb91299ab24f4d130c3821269d2a2ea04dd6f",
+      "bytes": 41944086,
+      "role": "retained evidence"
+    },
+    {
+      "id": "report:11004685739714500220_2300_000_2320_000:1553640277306703",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/11004685739714500220_2300_000_2320_000/1553640277306703/producer/report.json",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/11004685739714500220_2300_000_2320_000/1553640277306703/producer/report.json",
+      "sha256": "c53bec18d813a920ee31ba7dd2278e7c87e413095a165c06b34efbf0b28c702e",
+      "bytes": 2959,
+      "role": "retained evidence"
+    },
+    {
+      "id": "targets:11004685739714500220_2300_000_2320_000:1553640277306703",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/11004685739714500220_2300_000_2320_000/1553640277306703/producer/targets.npz",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/11004685739714500220_2300_000_2320_000/1553640277306703/producer/targets.npz",
+      "sha256": "16dcae515fd4926ccd03c95135cd887b1f7f63f27d56b64b064189461cb17c7a",
+      "bytes": 41944086,
+      "role": "retained evidence"
+    },
+    {
+      "id": "report:3966447614090524826_320_000_340_000:1553023288374080",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/3966447614090524826_320_000_340_000/1553023288374080/producer/report.json",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/3966447614090524826_320_000_340_000/1553023288374080/producer/report.json",
+      "sha256": "3bac20161995c774046fd36ae11e15bb3106a9b49b3cbb97c5f1298cb497ee5b",
+      "bytes": 3142,
+      "role": "retained evidence"
+    },
+    {
+      "id": "targets:3966447614090524826_320_000_340_000:1553023288374080",
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/3966447614090524826_320_000_340_000/1553023288374080/producer/targets.npz",
+      "live_path": "/tmp/retained/scientific-processing/balanced16-native-v2/3966447614090524826_320_000_340_000/1553023288374080/producer/targets.npz",
+      "sha256": "c9250a56cb91e276ed74880f282dd504966941f7cefd31535bdb857d3fbb4527",
+      "bytes": 41944086,
+      "role": "retained evidence"
+    }
+  ],
+  "unavailable_file": "2026-10-03-initial-experiments-evidence-audit.json does not exist at base B",
+  "referenced_not_opened": [
+    {
+      "identity": "13840133134545942567_1060_000_1080_000:1558402354862835",
+      "observations_sha256": "797626a15f9d3f8004e6db69e93f7dcebd0ec5fcd50784bed1a31ac62e6f2622",
+      "physical_sha256": "86eae056b8864b94b967fbdafd5c85e08b90829dd81f2c6d9ce96663cba7f568",
+      "boxes_sha256": "c09c006bc726a2f05b146366d16492ceecdd8b8bf7b73b8f124dffd109cddc8e",
+      "reason": "manifest references retained; no per-object physical/retained lineage measured in this preparation"
+    },
+    {
+      "identity": "16977844994272847523_2140_000_2160_000:1557450680964094",
+      "observations_sha256": "dd6ff759f819826bfc72e5ae120e6341375db8f2ee2ec51f39e6807edd5e2d33",
+      "physical_sha256": "4bf55f5be81e3e7a3e70ac45b5cd9fd3081efa476e66ba3fdf794934c3c63091",
+      "boxes_sha256": "d1ebccc61cdc9335c86f1f411dbe70e6daea513ef9d13ac1b40b3e8c13560488",
+      "reason": "manifest references retained; no per-object physical/retained lineage measured in this preparation"
+    },
+    {
+      "identity": "17885096890374683162_755_580_775_580:1506906083489022",
+      "observations_sha256": "fa819cef81a3f4b05eefa7334e117a09c372af8c80a7ad5110808784343c9b72",
+      "physical_sha256": "58e570a0a1f648335e74355a105c3f393430a8b8bbc59426358f4793762bf14f",
+      "boxes_sha256": "ee1e3d0ee89f5db6c4e5b772333166de0515beeed5953b2dda2ab7ce9b65c4a9",
+      "reason": "manifest references retained; no per-object physical/retained lineage measured in this preparation"
+    },
+    {
+      "identity": "4575961016807404107_880_000_900_000:1544656166412547",
+      "observations_sha256": "92d3dd038214b94a9a34abf950967839d1e9841b439bad2efecbf1612f05f9d5",
+      "physical_sha256": "18c61e6567e5cedb54b8c6dbc00260354915cee304e962bc8befe929af39f4ea",
+      "boxes_sha256": "5c3fbceaafa73bfc92b60222388cca87699549779b2261b38e5c87e5c8990b4f",
+      "reason": "manifest references retained; no per-object physical/retained lineage measured in this preparation"
+    },
+    {
+      "identity": "13506499849906169066_120_000_140_000:1552353849872908",
+      "observations_sha256": "20a8db28b7c5a3f121150f7153c2ebf396a9100ff3bd1b238ff929b40579d127",
+      "physical_sha256": "5cffbf4a06d173f243c0d42f2675a554b8e80768c5740304a37ed0e86d2abfba",
+      "boxes_sha256": "74947bb62c826ff74c278d54fba69e15d370533ff446db7ee69e610de5045abd",
+      "reason": "manifest references retained; no per-object physical/retained lineage measured in this preparation"
+    },
+    {
+      "identity": "16977844994272847523_2140_000_2160_000:1557450685964257",
+      "observations_sha256": "7f1eee1a189821c9e6990c2cebce0ec2371450470fb5904cfbea8c9c2a52aa75",
+      "physical_sha256": "d6b440332d8cecf78356dac3fb243ab1fd1ea6ccae0fce8233ab5ff9fbbc0362",
+      "boxes_sha256": "d1ebccc61cdc9335c86f1f411dbe70e6daea513ef9d13ac1b40b3e8c13560488",
+      "reason": "manifest references retained; no per-object physical/retained lineage measured in this preparation"
+    },
+    {
+      "identity": "15696964848687303249_4615_200_4635_200:1507241626220091",
+      "observations_sha256": "0c44681654cdb47f5561300cb58e65a2696b09b85ba719063a136f50f7d8d599",
+      "physical_sha256": "3b1c63df36a86c4e80bbea09d6714f9a0b0d08dc498f6167fc576791e1258d42",
+      "boxes_sha256": "f8c1dde3b3077566d271ca8b119603f5bf401559c4b1b0b0eaf89756aa5b27f3",
+      "reason": "manifest references retained; no per-object physical/retained lineage measured in this preparation"
+    },
+    {
+      "identity": "16977844994272847523_2140_000_2160_000:1557450679864286",
+      "observations_sha256": "f196017de187b97b0847e509d760237215a3000210b2ad519e5976256daaec89",
+      "physical_sha256": "5cb6855c2ba757b4057cbd46b35dc0d95eaf192160e7a6cdc97da02d6b0458db",
+      "boxes_sha256": "d1ebccc61cdc9335c86f1f411dbe70e6daea513ef9d13ac1b40b3e8c13560488",
+      "reason": "manifest references retained; no per-object physical/retained lineage measured in this preparation"
+    },
+    {
+      "identity": "12856053589272984699_1020_000_1040_000:1552658368873652",
+      "observations_sha256": "20fa31191e4d2ca7e79263fcaf5052cbc93f878c3e7123b091e2adf602b33b5e",
+      "physical_sha256": "e212b45ad99861c84b87943b567d2d8dcc1d8b596219b50801c6cf423d6d426b",
+      "boxes_sha256": "237c676b45ea413d56199208f7e96e19b88c4fc4f6e1ead17f6ff0a7a0848e81",
+      "reason": "manifest references retained; no per-object physical/retained lineage measured in this preparation"
+    },
+    {
+      "identity": "15628918650068847391_8077_670_8097_670:1508889335260598",
+      "observations_sha256": "651e3527456dbb882f42b050cce886cfe954a5978182ea9a0631e63e56094990",
+      "physical_sha256": "4501ea0c4f80cf6f245f28ba345d1ff1c754603c1b9025d48ae1adbcbd3fff2a",
+      "boxes_sha256": "931fc8219e267737956ac249b7eb3b771ccff2360c082d719dd1731c15d6b6d1",
+      "reason": "manifest references retained; no per-object physical/retained lineage measured in this preparation"
+    },
+    {
+      "identity": "7850521592343484282_4576_090_4596_090:1520908476792400",
+      "observations_sha256": "42747ea4ebda1c398c5179bfd1769fd455ef0da2216a16278488dc810ff2fd09",
+      "physical_sha256": "7e1d356cab4411f8a5adaebc463497c483b504e6935fa4e81b9cb6dde7333f3f",
+      "boxes_sha256": "0d4ba54354fabfa74d05a376e7fd564cc2b02ff92f1e4b29094222d1a386d7b2",
+      "reason": "manifest references retained; no per-object physical/retained lineage measured in this preparation"
+    },
+    {
+      "identity": "7921369793217703814_1060_000_1080_000:1557159628222386",
+      "observations_sha256": "1ace85baf023ec8b112582d54139f1fe11fa34c09d62e81017187bf8d580fa6d",
+      "physical_sha256": "12970c0494bb05d3d8a99fe443237c5d3163a65749c54dbfc68314b72bb03ea9",
+      "boxes_sha256": "8ab02a9a861b776451f277070a518b007c19ab2b0e613b86234f581a661ac116",
+      "reason": "manifest references retained; no per-object physical/retained lineage measured in this preparation"
+    },
+    {
+      "identity": "7921369793217703814_1060_000_1080_000:1557159618222385",
+      "observations_sha256": "6368f46f20559901d04aaf4f64f7c9b1d6438fbb9c01cc62cc0a73c516cb2bce",
+      "physical_sha256": "9c54efe52e4a62a1ec6af690b5a09c45f18176a091f7dd5763031c77ee46c8e0",
+      "boxes_sha256": "8ab02a9a861b776451f277070a518b007c19ab2b0e613b86234f581a661ac116",
+      "reason": "manifest references retained; no per-object physical/retained lineage measured in this preparation"
+    },
+    {
+      "identity": "13830510593707564159_5575_000_5595_000:1518657072511849",
+      "observations_sha256": "9182edc60e33b60c7449e3ded8be2264f37f6b304b95793bfe91883d667a88a8",
+      "physical_sha256": "02051fb135638d013096fc314c43ba25861f45dbf5d5bc5d674384914e8087f7",
+      "boxes_sha256": "9a9ecf37b69bee09027b29c81d5ac59ce1448172d0606977ba4696fab9db78a9",
+      "reason": "manifest references retained; no per-object physical/retained lineage measured in this preparation"
+    },
+    {
+      "identity": "11004685739714500220_2300_000_2320_000:1553640277306703",
+      "observations_sha256": "fe78d7a8400199a814c73a901f34e6db4b36ea61ffd13b0fcc27a6415c9163ef",
+      "physical_sha256": "89b9563e693ebec28a4978c72fe1b4a21b60285d73d4de7d480495fdea901fca",
+      "boxes_sha256": "a92b5737c731ec3557e2e95e93884521ba6acf63e7724965ff0ca3c1d0a4a8cf",
+      "reason": "manifest references retained; no per-object physical/retained lineage measured in this preparation"
+    },
+    {
+      "identity": "3966447614090524826_320_000_340_000:1553023288374080",
+      "observations_sha256": "c60a52330dbc49a94e5cc438c71e62c2ebc99aff98842fc7c00d98be6d79b79e",
+      "physical_sha256": "9fd65781e6bffa2c95a0d0ca2cb2e58a434e9fc146402eb8541ad926f83d54d4",
+      "boxes_sha256": "e18860016102919c108dae5a09771538a5eb06088f3839d347bde503276b5a59",
+      "reason": "manifest references retained; no per-object physical/retained lineage measured in this preparation"
+    }
+  ],
+  "archived_measurements": {
+    "cause_seconds": 74.43596501497086,
+    "cause_peak_rss_kib": 229428,
+    "cause_scope": "independent literal existing nearest-BEV assignment/forced-match conflicts; no replacement targets, architecture or model inference",
+    "oracle_LEVEL2_per_class": {
+      "positive_native": {
+        "1": {
+          "AP": 1.0,
+          "APH": 1.0
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 1.0
+        },
+        "3": {
+          "AP": 1.0,
+          "APH": 1.0
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 1.0
+        }
+      },
+      "training_roi": {
+        "1": {
+          "AP": 0.917384,
+          "APH": 0.917384
+        },
+        "2": {
+          "AP": 0.947955,
+          "APH": 0.947955
+        },
+        "3": {
+          "AP": 0.868421,
+          "APH": 0.868421
+        },
+        "4": {
+          "AP": 0.918919,
+          "APH": 0.918919
+        }
+      },
+      "anchor_covered": {
+        "1": {
+          "AP": 0.917384,
+          "APH": 0.917384
+        },
+        "2": {
+          "AP": 0.944238,
+          "APH": 0.944238
+        },
+        "3": {
+          "AP": 0.759399,
+          "APH": 0.759399
+        },
+        "4": {
+          "AP": 0.918919,
+          "APH": 0.918919
+        }
+      }
+    }
+  }
+}

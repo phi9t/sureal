@@ -340,7 +340,7 @@ def portable_command_errors(root: Path) -> list[str]:
         commands.append([sys.executable, "-m", "compileall", "-q", *python_paths])
     commands.extend(["bash", "-n", path] for path in shell_paths)
     commands.append(["git", "diff", "--check", "HEAD"])
-    pathway_audit = "experiments/3d-pathway/pipeline/audit.py"
+    pathway_audit = "parallax/pipeline/audit.py"
     if pathway_audit in regular_paths:
         commands.append([sys.executable, pathway_audit, "--offline"])
 

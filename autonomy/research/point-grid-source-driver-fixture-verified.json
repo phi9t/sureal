@@ -1,0 +1,57 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/point-grid-source-fixture-v2/cache/scientific-processing/scene/receipt.json",
+  "receipt_sha256": "722876695cee268a0ed8510037fa1cd0fca46114954b913754ea0de898d9c935",
+  "validation": {
+    "records": 10,
+    "points": 10,
+    "eligible_semantic_points": 2,
+    "present_empty_returns": 0,
+    "absent_returns": 0,
+    "absent_with_shape_records": 0,
+    "native_grid_cells": 150,
+    "annotated_returns": 2,
+    "scope": "one complete scientific point/native-grid linkage; no model or benchmark quality claim",
+    "native_counts": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "worker_resources": {
+      "elapsed_seconds": 0.017350519017782062,
+      "peak_rss_kib": 34460,
+      "rss_scope": "worker_process_peak"
+    },
+    "scene": "scene",
+    "membership": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    },
+    "source_lidar_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "archive_sha256": "cdf3daf2a54b59a8ecd5d8355e94dbb7a56ff5db128ef3c4e577e124fa29748e",
+    "shape_report_sha256": "2646eb32f74707c0062bd682ae0c6d6f881ee2ff7fcfcd13fb80d7e4c22dbd1d",
+    "mode": "producer"
+  },
+  "scope": "controlled copy of10-record synthetic archive plus declared synthetic dimensions; producer and independent literal reference live, stage removed; actual103 HDFS gate remains"
+}

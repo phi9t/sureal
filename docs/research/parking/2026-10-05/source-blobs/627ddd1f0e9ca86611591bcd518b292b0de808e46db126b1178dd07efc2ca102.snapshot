@@ -1,0 +1,53 @@
+"""Lead-operated focused CPU check; the privileged reader is not invoked here."""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import time
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--source', type=Path, required=True)
+parser.add_argument('--output', type=Path, required=True)
+args = parser.parse_args()
+assert args.source.resolve() == args.source and args.output.resolve() == args.output
+scope_path = Path('/sys/fs/cgroup' + next(row[3:] for row in Path('/proc/self/cgroup').read_text().splitlines() if row.startswith('0::')))
+def scope_facts():
+    return {'path': str(scope_path), 'device': scope_path.stat().st_dev, 'inode': scope_path.stat().st_ino,
+        'members': [int(value) for value in (scope_path / 'cgroup.procs').read_text().split()],
+        'memory_max': int((scope_path / 'memory.max').read_text()), 'swap_max': int((scope_path / 'memory.swap.max').read_text()),
+        'events': dict(row.split() for row in (scope_path / 'memory.events').read_text().splitlines())}
+before = scope_facts()
+assert before['members'] == [os.getpid()] and before['memory_max'] == 268435456 and before['swap_max'] == 0
+args.output.mkdir(mode=0o700)
+entry = args.source / 'experiments/waymo-perception/pipeline/insula_entry.py'
+sys.path.insert(0, str(args.source / 'experiments/waymo-perception'))
+from pipeline import insula_entry as module
+assert Path(module.__file__).resolve() == entry
+rootfs = Path('/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/runtime-build49-v5/rootfs')
+rootfs_sha256 = '09f248703f9b99dfb60b91e7fdfbe8ee42f2895c604bde65afafc05a767396b0'
+module.verify_rootfs(rootfs, rootfs_sha256)
+command = ['/usr/local/bin/python3.12', '-B', '-m', 'unittest', 'discover', '-s', 'tests/collab/audit_support', '-t', 'tests/collab', '-p', 'test_writer_reader.py', '-v']
+argv = module.launch_plan(rootfs, args.source, args.source, args.output, command)
+started_ms = time.time_ns() // 1000000
+started_ns = time.monotonic_ns()
+result = subprocess.run(argv, capture_output=True, timeout=60)
+(args.output / 'stdout').write_bytes(result.stdout)
+(args.output / 'stderr').write_bytes(result.stderr)
+def ref(path):
+    return {'path': str(path), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
+receipt = {'schema_version': 1, 'kind': 'FocusedWriterCoverageInsulaCheck', 'argv': argv,
+    'host_argv': sys.argv, 'launcher': ref(Path(__file__)), 'cwd': str(Path.cwd()),
+    'started_ms': started_ms, 'ended_ms': time.time_ns() // 1000000, 'elapsed_ns': time.monotonic_ns() - started_ns,
+    'exit_code': result.returncode, 'source': str(args.source), 'entry': ref(entry), 'rootfs': str(rootfs), 'rootfs_sha256': rootfs_sha256,
+    'stdout': ref(args.output / 'stdout'), 'stderr': ref(args.output / 'stderr'),
+    'scope_before': before, 'scope_after': scope_facts(),
+    'boundary': 'Focused frozen-source controls in actual CPU Insula; no privileged helper, native dispatch, science data or optimizer updates'}
+with (args.output / 'actual-command.json').open('xb') as stream:
+    stream.write((json.dumps(receipt, sort_keys=True) + '\n').encode())
+    stream.flush()
+    os.fsync(stream.fileno())
+print(json.dumps({'receipt': ref(args.output / 'actual-command.json'), 'exit_code': result.returncode}))
+raise SystemExit(result.returncode)

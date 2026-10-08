@@ -1,0 +1,96 @@
+"""Raw conductor seams and strict final history controls; no native effects."""
+import base64
+import copy
+import hashlib
+import json
+from pathlib import Path
+import tempfile
+import unittest
+from . import channel_observer as observer
+from . import test_runtime_probe
+
+
+class FinalHistoryTests(unittest.TestCase):
+    def setUp(self):
+        source=test_runtime_probe.StopProbeTests();source.setUp()
+        self.fixture=source.fixture;self.sample=source.first
+        self.sample['interval']={'started_ns':1900000000,'ended_ns':2100000000}
+        item=self.sample['records'][3]['response']['data'][0]['item']
+        self.prefix={'derived_events':[
+            {'method':'item/completed','command':copy.deepcopy(item),'received_ns':1800000000},
+            {'method':'turn/completed','command':None,'received_ns':1800000001}]}
+
+    def test_actual_completion_agrees_with_full_terminal_native_history(self):
+        observer.completions(self.prefix,self.fixture,[self.sample])
+
+    def test_completion_event_never_replaces_missing_history(self):
+        self.sample['records'][3]['response']['data']=[]
+        with self.assertRaisesRegex(ValueError,'No actual executed'):observer.completions(self.prefix,self.fixture,[self.sample])
+
+    def test_mismatched_exit_item_turn_or_completion_after_read_refuses(self):
+        for mutate in (lambda p:p['derived_events'][0]['command'].update(exitCode=7),
+                       lambda p:p['derived_events'][0]['command'].update(id='other'),
+                       lambda p:p['derived_events'].pop(),
+                       lambda p:p['derived_events'][0].update(received_ns=2200000000)):
+            original=copy.deepcopy(self.prefix);mutate(self.prefix)
+            with self.subTest(prefix=self.prefix),self.assertRaises(ValueError):observer.completions(self.prefix,self.fixture,[self.sample])
+            self.prefix=original
+
+
+class UpgradeTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp=tempfile.TemporaryDirectory(prefix='a50-http-proof-');self.addCleanup(self.tmp.cleanup)
+        self.root=Path(self.tmp.name)
+        self.key=base64.b64encode(bytes(range(16))).decode()
+        self.request=('GET / HTTP/1.1\r\nHost: localhost\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n'
+            'Sec-WebSocket-Key: '+self.key+'\r\nSec-WebSocket-Version: 13\r\n\r\n').encode()
+        accept=base64.b64encode(hashlib.sha1((self.key+'258EAFA5-E914-47DA-95CA-C5AB0DC85B11').encode()).digest()).decode()
+        self.response=('HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n'
+            'Sec-WebSocket-Accept: '+accept+'\r\n\r\n').encode()
+
+    def save(self,name,data):
+        path=self.root/name;path.write_bytes(data)
+        return {'path':str(path),'sha256':hashlib.sha256(data).hexdigest()}
+
+    def check(self,request=None,response=None):
+        observer.upgrade({'upgrade_request':self.save('request.http',self.request if request is None else request),
+            'upgrade_response':self.save('response.http',self.response if response is None else response)})
+
+    def test_actual_original_nonce_is_bound_to_literal_101_response(self):self.check()
+
+    def test_missing_corrupt_wrong_status_nonce_or_duplicate_headers_refuse(self):
+        for request,response in ((self.request,self.response.replace(b'101',b'200')),
+            (self.request.replace(self.key.encode(),base64.b64encode(bytes(range(1,17)))),self.response),
+            (self.request+self.request,self.response),
+            (self.request,self.response[:-2])):
+            with self.subTest(request=request,response=response),self.assertRaises(ValueError):self.check(request,response)
+        opened={'upgrade_request':self.save('request.http',self.request),'upgrade_response':self.save('response.http',self.response)}
+        Path(opened['upgrade_response']['path']).unlink()
+        with self.assertRaises(ValueError):observer.upgrade(opened)
+
+
+class ChronologyTests(unittest.TestCase):
+    def setUp(self):
+        self.assertTrue(callable(getattr(observer,'chronology',None)), 'Actual arm/send chronology check missing')
+        self.ready={'ready_ns':1000,'process':{'boot_id':'boot','pid':7,'start_ticks':8,'uid':9}}
+        self.ack={'acknowledged_ns':1500,'process':copy.deepcopy(self.ready['process'])}
+        self.manifest={'armed_ns':4000}
+        self.creation={'started_ns':2000,'sent_ns':2500,'ended_ns':3500}
+        self.goal={'started_ns':5000,'sent_ns':5500,'ended_ns':6000}
+        self.invocation={'started_ns':7000,'sent_ns':7500,'ended_ns':9000}
+
+    def check(self):observer.chronology(self.ready,self.ack,self.manifest,self.creation,self.goal,self.invocation)
+
+    def test_actual_armed_boundary_is_between_creation_and_goal_send(self):self.check()
+
+    def test_missing_reset_late_ready_or_arm_after_send_refuses(self):
+        for owner,key,value in [('creation','sent_ns',2000002501),('goal','started_ns',3999),
+            ('invocation','ended_ns',6000),('ack','acknowledged_ns',999),('manifest','armed_ns',8000)]:
+            original=copy.deepcopy(getattr(self,owner));getattr(self,owner)[key]=value
+            with self.subTest(owner=owner,key=key),self.assertRaises(ValueError):self.check()
+            setattr(self,owner,original)
+        del self.creation['sent_ns']
+        with self.assertRaises((ValueError,KeyError)):self.check()
+
+
+if __name__=='__main__':unittest.main()

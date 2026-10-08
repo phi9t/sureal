@@ -1,0 +1,112 @@
+"""Focused process-metadata controls for the admitted writer-gap repair."""
+import copy
+import importlib
+import os
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+import time
+import unittest
+from unittest.mock import patch
+from audit_support import probe_os
+
+class WriterReader(unittest.TestCase):
+    def setUp(self):
+        try:self.reader=importlib.import_module('audit_support.writer_reader')
+        except ModuleNotFoundError:self.fail('Scoped writer-gap reader is missing')
+
+    def writer(self, root):
+        child=subprocess.Popen([sys.executable,'-I','-B','-c',
+            'import sys; f=open(sys.argv[1],"w"); f.write("private-content-must-not-leak"); f.flush(); print("ready",flush=True); sys.stdin.readline()',
+            str(root/'held')],stdin=subprocess.PIPE,stdout=subprocess.PIPE,text=True)
+        def cleanup():
+            if child.poll() is None:
+                child.stdin.write('\n');child.stdin.flush();child.wait(timeout=3)
+            child.stdin.close();child.stdout.close()
+        self.addCleanup(cleanup)
+        self.assertEqual(child.stdout.readline().strip(),'ready')
+        return child
+
+    def test_actual_live_metadata_preserves_scoped_writer_without_file_contents(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);child=self.writer(root);pin=probe_os.birth(child.pid)
+            row=self.reader.observe_target(pin,[root],os.getuid())
+            hits=self.reader.verify_rows([pin],[row],[root],os.getuid())
+            self.assertTrue(any(h['kind']=='write-fd' and h['path']==str(root/'held') for h in hits))
+            self.assertNotIn('private-content-must-not-leak',str(row))
+
+    def test_wrong_birth_refuses_actual_live_target(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            child=self.writer(Path(tmp));pin=probe_os.birth(child.pid)
+            with self.assertRaisesRegex(ValueError,'incarnation'):
+                self.reader.observe_target({**pin,'start_ticks':pin['start_ticks']+1},[Path(tmp)],os.getuid())
+
+    def test_foreign_uid_refuses_actual_target(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            child=self.writer(Path(tmp));pin=probe_os.birth(child.pid)
+            with self.assertRaisesRegex(ValueError,'UID'):
+                self.reader.observe_target(pin,[Path(tmp)],os.getuid()+1)
+
+    def test_incomplete_fd_proof_does_not_clear_live_gap(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);child=self.writer(root);pin=probe_os.birth(child.pid)
+            row=self.reader.observe_target(pin,[root],os.getuid());row['fds']=[]
+            with self.assertRaisesRegex(ValueError,'FD'):
+                self.reader.verify_rows([pin],[row],[root],os.getuid())
+
+    def test_gap_merge_preserves_original_hits_and_uncovered_error(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);child=self.writer(root);pin=probe_os.birth(child.pid)
+            row=self.reader.observe_target(pin,[root],os.getuid())
+            old={'hits':[{'pid':99,'kind':'write-fd','path':str(root/'original')}],
+                 'errors':[{'pid':child.pid,'kind':'PermissionError','birth':pin},{'pid':999,'kind':'opaque-no-birth'}]}
+            merged=self.reader.merge_scan(old,[pin],[row],[root],os.getuid())
+            self.assertEqual(merged['hits'][0],old['hits'][0]);self.assertEqual(merged['errors'],[old['errors'][1]])
+            self.assertEqual(merged['original_errors'],old['errors'])
+            self.assertTrue(any(h.get('path')==str(root/'held') for h in merged['hits']))
+
+    def test_root_union_or_relative_root_is_refused(self):
+        with self.assertRaisesRegex(ValueError,'roots'):
+            self.reader.validate_roots(['/owned/work','relative','/owned/git'],os.getuid())
+
+    def test_changed_or_missing_static_live_coverage_ref_is_refused(self):
+        from audit_support import channel_authority
+        check=getattr(channel_authority,'same_writer_coverage',None)
+        self.assertTrue(callable(check),'Explicit static/live writer coverage binding is missing')
+        first={'path':'/fixed/coverage.json','sha256':'a'*64}
+        for changed in ({}, {'writer_coverage':{**first,'sha256':'b'*64}}):
+            with self.assertRaisesRegex(ValueError,'Static/live writer coverage'):
+                check({'writer_coverage':first},changed)
+        check({'writer_coverage':first},{'writer_coverage':first})
+
+    def test_actual_zombie_remains_owned_with_explicit_privileged_empty_fd_fixture(self):
+        pid=os.fork()
+        if pid==0:os._exit(0)
+        try:
+            deadline=time.monotonic()+2
+            while probe_os.birth(pid)['state']!='Z':
+                self.assertLess(time.monotonic(),deadline);time.sleep(.005)
+            pin=probe_os.birth(pid)
+            with tempfile.TemporaryDirectory() as tmp:
+                root=Path(tmp)
+                # The actual Z/cwd/fdinfo facts are unprivileged observations.
+                # fd enumeration is the explicit unavailable-privilege fixture;
+                # an actual sudo read is gated on immutable source review.
+                self.assertEqual(list((Path('/proc')/str(pid)/'fdinfo').iterdir()),[])
+                original=self.reader.inventory
+                def inventory(path,name):
+                    return [] if name=='fd' else original(path,name)
+                with patch.object(self.reader,'inventory',side_effect=inventory):
+                    row=self.reader.observe_target(pin,[root],os.getuid())
+                self.assertEqual(row['classification'],'zombie-empty')
+                self.assertEqual(self.reader.verify_rows([pin],[row],[root],os.getuid()),[])
+                fixture={'tool_scope':{},'payload_process':pin,'workspace':str(root),'output':str(root/'out'),'common_git':str(root/'git')}
+                own=probe_os.birth(os.getpid());known={(pin['boot_id'],pid,pin['start_ticks']):pin}
+                with patch.object(probe_os,'scope_read',return_value={'members':[]}),\
+                     patch.object(probe_os,'writer_scan',return_value={'hits':[],'errors':[]}):
+                    snapshot=probe_os.capture_kernel(fixture,{'daemon':own},known)
+                self.assertTrue(any(p['pid']==pid and p['state']=='Z' for p in snapshot['owned_incarnations']))
+        finally:os.waitpid(pid,0)
+
+if __name__=='__main__':unittest.main()

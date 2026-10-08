@@ -1,0 +1,4 @@
+
+# Inert, hash-addressed archival source keeps original bytes and historical spacing.
+# Active source and all other publication files retain normal whitespace checks.
+docs/research/parking/2026-10-05/source-blobs/*.snapshot -text whitespace=-blank-at-eol

@@ -1,0 +1,95 @@
+{
+  "scene": "14503113925613619599_975_506_995_506",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/native-shape-sources-v1/14503113925613619599_975_506_995_506/receipt.json",
+  "receipt_sha256": "5a24d9435b8bb85450d00e7d8509b8817fec266fb40a2cea7fdf19f0b3946a42",
+  "membership": {
+    "official_split": "training",
+    "research_splits": [
+      "train"
+    ]
+  },
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/native-shape-sources-v1/14503113925613619599_975_506_995_506",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/scientific-native-shape-retained-v1-14503113925613619599_975_506_995_506/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.scratch",
+        "/tmp/auditor",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/scientific-native-shape-retained-v1-14503113925613619599_975_506_995_506/input",
+        "/tmp/expected",
+        "--",
+        "python",
+        "-c",
+        "import json,sys,importlib.util\nfrom pathlib import Path\nsys.path.insert(0,'/tmp/auditor');from native_shape_retained_audit import verify\nassert importlib.util.find_spec('tensorflow') is None\ne=json.loads(Path('/tmp/expected/expected.json').read_text())\nv=verify('/source',e,'/experiment')\nPath('/outputs/check.json').write_text(json.dumps(v,indent=2));print('PASS independently retained shape receipt',v['scene'],v['records_verified'])\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "auditor_sha256": "2a623f2fdb257668ededd744267fecc5ce4617cd0dab00bb476ffed0e402ad20",
+  "expected_sha256": "34e3641978f2eae819391fa9f88bd0e91f2a706fc0f3d4891c5a4aecfc3d2b73",
+  "validation": {
+    "scene": "14503113925613619599_975_506_995_506",
+    "records_verified": 1980,
+    "present_shape_records": 1980,
+    "null_shape_records": 0,
+    "source_sha256": "30e32bcf58430d65ac7dabbcbb9e78fdc62839521ed3b8b5f528eba2ac59e714",
+    "membership": {
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ]
+    }
+  },
+  "audit_artifacts": {
+    "live.log": "bf657ef8c15524fb7bd05dc6c02edb1cc76129b6c6a2f7d090ac59a7d84492e6",
+    "check.json": "84d293b8614f916fc6524d669976ebe181483ae594fdf940d8b27a773ac4bb27"
+  },
+  "scope": "actual immutable HDFS native shape replay and independent retained live receipt admission; point-grid linkage still separate"
+}

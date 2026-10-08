@@ -1,0 +1,290 @@
+{
+  "schema_version": 1,
+  "axis": "Standards",
+  "utc": "2026-10-04T03:46:04.433667+00:00",
+  "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer",
+  "base": "8285a0993ea6e1293614f335c62f7e88c06e299f",
+  "requested_source_head": "d5ead21fb46ddef78bed8d8ac0f8b122ca1f0c01",
+  "review_command": "git diff --cached 8285a0993ea6e1293614f335c62f7e88c06e299f",
+  "review_epoch": "Qualified22-path current staged documentation bundle; includes ten pinned source commits, retained mainline index and five explicit integration/admission amendments.",
+  "source_commits": [
+    "d5ead21fb46ddef78bed8d8ac0f8b122ca1f0c01 Fix collaboration review contracts and land cleanup before concurrent pilot",
+    "f9fbd5be5b632798f409aa65fb9743588606d701 Retain Claude collaboration plan review and hold execution gate",
+    "4469127623350ad5a644ae8c4dd0f8f21ab7c990 Record collaboration spec approval and concrete implementation plan",
+    "5ab76b3a0efb2970e2762f657fb60ee38b3226f6 Complete full v1 collaboration specification and concrete live gates",
+    "3321bb8556e40105a2d0f188ba24101b35d74a77 Model native Codex session trees threads turns and task bindings",
+    "fa257289c5c722fca4572e685c90657cdcd47be1 Define worker operating states and evidence-based stuck/hung health",
+    "c093595a956dc13ef1866ce17947b0371921eea6 Specify worker summaries and read-only program overview as a v1 gate",
+    "9c4c6a7c1454c3a042e9fa1f86aadd3bb10021c2 Require two concurrent worker sessions and live concurrency pilot in v1",
+    "c22865fcb12f110d713311025bc5afdac7723025 Specify Kata as centralized queue linked to committed task contracts",
+    "6b694c8a434387b6be190fa2b87952957766bd20 Specify mainline task admission and explicit worker ownership handoff"
+  ],
+  "passed": true,
+  "summary": "No hard Standards violations or meaningful Fowler documentation/contract smells. All22 current staged paths match the qualified manifest against8285a099;17 initial source bodies remain exact, and four notices plus one new admission note were independently reviewed. These amendments distinguish historical approval/proposals from active operating policy, leave file-backed versus centralized-Kata authority unresolved, and make supersession conditional. The note retains landed task/plan pins, durable one-owner reservation and ack, unknown-startup holds, stop/reconcile takeover and obsolete-generation rejection. Fresh plan/pristine/live capability gates remain open;39 coverage cases and pilot manifests are future obligations. Historical review/provenance bodies, mainline41\u201343/model contracts,19 blocked sources and journal120 remain unchanged. Repeated notices are justified entry-point safety context rather than duplicated implementation logic. Suitable for the exact authorized qualified documentation landing only; this result does not select a backend, admit implementation, activate workers/Kata/runtime or establish scientific/training/HDFS/cleanup acceptance.",
+  "hard_standards_violations": [],
+  "judgment_smells": [],
+  "standards_sources": [
+    {
+      "path": "CONTRIBUTING.md",
+      "lines": "3-19",
+      "rule": "Preserve reproducibility, compatibility and source/artifact locks; document assumptions/provenance for compact selected reports."
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "lines": "45-50",
+      "rule": "Portable checks are not fresh GPU or scientific acceptance."
+    }
+  ],
+  "smell_baseline_considered": [
+    "Mysterious Name",
+    "Duplicated Code",
+    "Feature Envy",
+    "Data Clumps",
+    "Primitive Obsession",
+    "Repeated Switches",
+    "Shotgun Surgery",
+    "Divergent Change",
+    "Speculative Generality",
+    "Message Chains",
+    "Middle Man",
+    "Refused Bequest"
+  ],
+  "scope_manifest": {
+    "path": "/tmp/sureal-doc-branch-qualified-scope.json",
+    "sha256": "f439044f0d10814c69742db771bcb1dd3d30eabca7fb2e6c9cef9962f077cbf4",
+    "exact22_staged_paths_and_digests_valid": true
+  },
+  "reviewed_paths": [
+    {
+      "path": "CONTEXT.md",
+      "sha256": "c5c06bc8eac525244e72e96dd9b583d0e368f87db3e1f491acc1e2e344696cdc",
+      "bytes": 1866,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": true
+    },
+    {
+      "path": "docs/collaboration/checks/53.A.json",
+      "sha256": "d398d298a620719d2acc825c91568aef8c278aa83930daf943c1b54632c0cf6c",
+      "bytes": 7321,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": true
+    },
+    {
+      "path": "docs/collaboration/checks/53.B.json",
+      "sha256": "8e73b656da24d128c35c90da5dacbeb147ec49f50f5c65ed2fce997609eff527",
+      "bytes": 6556,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": true
+    },
+    {
+      "path": "docs/collaboration/coverage.json",
+      "sha256": "b7c2024b8d897b020453ad79f6f8fd2f5206a1721890ad5505a04ce5a71ff625",
+      "bytes": 15703,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": true
+    },
+    {
+      "path": "docs/research/README.md",
+      "sha256": "188087d2dc3fbb8bc5f8baebc4d5e9b4411218d1d2edced1cebb60891377e229",
+      "bytes": 6870,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": false
+    },
+    {
+      "path": "docs/research/reviews/2026-10-03-sureal-collaboration-claude-review.json",
+      "sha256": "7bcb1dad81ebba4e1edde4efe88a883c331394b9e0681dcd8f36bba5efe25519",
+      "bytes": 2903,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": true
+    },
+    {
+      "path": "docs/research/reviews/2026-10-03-sureal-collaboration-claude-review.md",
+      "sha256": "ce2e36b382150eee5878c3ed57ee70c9a44e30db148f48ebd59f0e8cfb948112",
+      "bytes": 20361,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": true
+    },
+    {
+      "path": "docs/research/reviews/2026-10-03-sureal-collaboration-review-resolution.md",
+      "sha256": "87ba54f5296be469366afd3b59f40ab8e5e98634fe8ff87b75a5891ddec96dcb",
+      "bytes": 7439,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": true
+    },
+    {
+      "path": "docs/research/reviews/2026-10-04-collaboration-integration-admission.md",
+      "sha256": "8d6060822c6fefa038491dd0f1aeb9294a23bb98c8d6f8302898e56570c2eb7c",
+      "bytes": 3864,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": false
+    },
+    {
+      "path": "docs/research/task-queue.md",
+      "sha256": "1c8c8c747db6cdc79258bad1cf00aa76ae1b20797ae9b99c2cb3225015017bac",
+      "bytes": 19449,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": false
+    },
+    {
+      "path": "docs/research/tasks/49-collaboration-project-admission.md",
+      "sha256": "cdc21bc22d2584bc7252ed790506255df46b2b38d0ddd2cf9c7b4147ead4e47f",
+      "bytes": 3494,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": true
+    },
+    {
+      "path": "docs/research/tasks/50-collaboration-worker-attempts.md",
+      "sha256": "1e7c56dd40156b5a84acaacab71011d4c5c27c52c5a81e1550c5678601ea4a1b",
+      "bytes": 5556,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": true
+    },
+    {
+      "path": "docs/research/tasks/51-collaboration-candidate-verification.md",
+      "sha256": "d6d9b0857456d8c5f618d85e24847b47452ea20a19808ebed3708c5a357543ed",
+      "bytes": 2402,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": true
+    },
+    {
+      "path": "docs/research/tasks/52-collaboration-landing-recovery.md",
+      "sha256": "90293f433f8fef7a177815387ce4ab9576eaa4b9bbec270bbd662b9818af9300",
+      "bytes": 3026,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": true
+    },
+    {
+      "path": "docs/research/tasks/53-0-collaboration-retention-cleanup-foundation.md",
+      "sha256": "61cc740644a22ba31927ad313848841a483fbeadc33c79e0f2a7d278ac67ea63",
+      "bytes": 3197,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": true
+    },
+    {
+      "path": "docs/research/tasks/53-collaboration-cleanup-closeout.md",
+      "sha256": "87283dcc14f8c424df82dc016be73b452a30a24ff5d3c890a22989887d6bf127",
+      "bytes": 7343,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": true
+    },
+    {
+      "path": "docs/research/tasks/54-worker-program-observability.md",
+      "sha256": "c42743e9fc9ceaf978c84ab63be1edbd486ae38f9e6bb3daf09d1a772092a1aa",
+      "bytes": 8253,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": true
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md",
+      "sha256": "66b26423db83d05d6898ba1e7ce23d0a46d558f2049a5336ce7db721710b5d35",
+      "bytes": 60462,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": false
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-codex-runtime-domain-design.md",
+      "sha256": "b249f898a7dab4a9ba92fbe810ed9f126d2593a37e25376f23871910b718a288",
+      "bytes": 7760,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": true
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "sha256": "3a6f967ec111e2e3d396153b42775dd4bab97e414af8d20ac391cde711b468d6",
+      "bytes": 33895,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": false
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-worker-session-state-design.md",
+      "sha256": "1729245934fabc06998fcc2beac5ff3a7ddf273b9ea13eb10e374f1a87ba4bb1",
+      "bytes": 12903,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": true
+    },
+    {
+      "path": "experiments/waymo-perception/research-task-index.md",
+      "sha256": "3fcdc8ad336c32fcc040d432f1f859de75648b7da74711cb72ae586394823062",
+      "bytes": 20518,
+      "working_bytes_match_index": true,
+      "initial_source_review_unchanged": true
+    }
+  ],
+  "initial_source_review": {
+    "path": "/tmp/sureal-doc-branch-standards-review.json",
+    "sha256": "d48554037593ff9fe16a20122967a4e24b20a7a12a37aa62ae304f1b43478b0d",
+    "original21_byte_pins_retained": true,
+    "unchanged_initial_bodies": 17,
+    "amended_or_new_paths": [
+      "docs/research/README.md",
+      "docs/research/reviews/2026-10-04-collaboration-integration-admission.md",
+      "docs/research/task-queue.md",
+      "docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md",
+      "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md"
+    ],
+    "role": "Initial source-only Standards result; no separate Spec findings reranked."
+  },
+  "claims_review": [
+    {
+      "path": "docs/research/task-queue.md",
+      "lines": "3,11",
+      "conclusion": "Centralized Kata and proposed supersession require explicit authority reconciliation/admission; historical approvals do not activate implementation or seats."
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "lines": "3-5",
+      "conclusion": "Historical approval header retained with explicit current unresolved-authority qualification; broad requirements remain proposals."
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md",
+      "lines": "14-17",
+      "conclusion": "Original changes-required review and pending fresh plan review retained; qualification prevents execution/backend/two-seat admission by documentation integration."
+    },
+    {
+      "path": "docs/research/README.md",
+      "lines": "44-46",
+      "conclusion": "Retained full specification is linked to current reconciliation and open plan/pristine/live gates; overview describes that proposal."
+    },
+    {
+      "path": "docs/research/reviews/2026-10-04-collaboration-integration-admission.md",
+      "lines": "10-25,27-65",
+      "conclusion": "Explicit common ownership/evidence contract and future stage order preserve authority choice, identities, unknown ownership, stop/reconcile and scientific separation. Git-only closeout does not mutate HDFS113 or retire sources/workspaces/processes."
+    }
+  ],
+  "preservation_checks": {
+    "nineteen_blocked_sources_exact": {
+      "experiments/waymo-perception/association/candidate_graph.py": true,
+      "experiments/waymo-perception/association/matching.py": true,
+      "experiments/waymo-perception/association/native.py": true,
+      "experiments/waymo-perception/association/prepare.py": true,
+      "experiments/waymo-perception/association/targets.py": true,
+      "experiments/waymo-perception/association/test_matching.py": true,
+      "experiments/waymo-perception/association/test_native.py": true,
+      "experiments/waymo-perception/association/test_prepare.py": true,
+      "experiments/waymo-perception/association/test_targets.py": true,
+      "experiments/waymo-perception/audit-cohort-labels.py": true,
+      "experiments/waymo-perception/continuation_runtime/identity.py": true,
+      "experiments/waymo-perception/continuation_runtime/test_identity.py": true,
+      "experiments/waymo-perception/explorer/acquire_previews.py": true,
+      "experiments/waymo-perception/explorer/build.py": true,
+      "experiments/waymo-perception/explorer/data.py": true,
+      "experiments/waymo-perception/explorer/public-viewer.fragment.html": true,
+      "experiments/waymo-perception/explorer/run_joint_render.py": true,
+      "experiments/waymo-perception/explorer/scene-explorer.template.html": true,
+      "experiments/waymo-perception/explorer/test_data.py": true
+    },
+    "journal120_sha256": "f7d02ad75dd80bbadc126f49e2529715d0e8cc43f178d384146e4d4466c7b1e4",
+    "journal120_exact_base": true,
+    "mainline41_42_43_and_scientific_index_outside_collaboration_section_exact_base": true,
+    "accepted_models_training_spec_exact_base": true,
+    "historical_claude_review_provenance_and_manifests_exact_initial": true,
+    "foreign_observation_role": "Previously pinned source/datetime census only; later moving owner HEAD/body/worktree not read or adopted."
+  },
+  "scope_limits": [
+    "Documentation Standards only; unresolved authority remains a future gate rather than admitted policy.",
+    "No tests, live/capability checks, scientific audits or new external reads/runs performed in this bounded re-review.",
+    "No implementation/source/index/queue/process/worktree/runtime/Corenius/HDFS changes.",
+    "No cross-axis aggregation or reranking."
+  ],
+  "landing_suitability": "Suitable for exact qualified22-document integration within this Standards axis, subject to separate Spec review and the documented open future admission gates."
+}

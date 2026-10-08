@@ -1,0 +1,58 @@
+"""Independent lifecycle admission; semantic capture coverage stays separate."""
+import hashlib,json,subprocess,time,sys
+from pathlib import Path
+from datetime import datetime,timezone
+HERE=Path(__file__).resolve().parents[1]/'experiments/waymo-perception'
+CACHE=Path.home()/'.cache/waystone/waymo-perception'
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def save(path,value):
+ temporary=path.with_suffix('.pending.json')
+ temporary.write_text(json.dumps(value,indent=2)+'\n');temporary.replace(path)
+manifest=HERE/'scientific-acquisition.candidate.json';manifest_sha=sha(manifest);m=json.loads(manifest.read_text())
+progress_path=HERE/'research/scientific-processing-progress.json'
+registry_path=HERE/'research/cohort-trusted-checkpoints.json'
+template=json.loads((HERE/'research/cohort-checkpoint-9465500459680839281_1100_000_1120_000-verified.json').read_text())
+lock=template['runtime_lock'];helper=HERE/'pipeline/cohort_checkpoint.py';helper_sha=sha(helper)
+initial=json.loads(progress_path.read_text());remaining=[s for s in m['scenes'] if s not in initial['replayed_scene_evidence']]
+for scene in remaining:
+ checkpoint=CACHE/'scientific-processing/cohort-v1'/scene/'receipt.json'
+ while not checkpoint.is_file():
+  process=Path('/proc/1241409/cmdline')
+  if not process.exists() or b'process-scientific-cohort.py' not in process.read_bytes():
+   raise RuntimeError('queue terminal before scene checkpoint; inspect without restarting')
+  time.sleep(10)
+ cp=json.loads(checkpoint.read_text());cp_sha=sha(checkpoint)
+ membership=m['scenes'][scene]
+ source_paths={c:CACHE/'scientific-source-audit'/f"{membership['official_split']}-{c}-{scene}.json" for c in m['components']}
+ pins={c:sha(p) for c,p in source_paths.items()}
+ assert cp['scene']==scene and cp['membership']==membership and cp['source_record_hashes']==pins
+ assert cp['runtime_lock']==lock and cp['manifest_sha256']==manifest_sha
+ base=CACHE/'insula'/('cohort-checkpoint-admission-after-fourth-'+scene)
+ base.mkdir();(base/'input').mkdir();(base/'output').mkdir()
+ trusted={'checkpoint_sha256':cp_sha,'runtime_lock':lock,'manifest_sha256':manifest_sha,'source_hashes':pins,'host_working':str(CACHE/'scientific-processing')}
+ save(base/'input/trusted.json',trusted)
+ command=template['checks'][0]['command']
+ old='9465500459680839281_1100_000_1120_000'
+ command=[v.replace(str(CACHE/'insula'/('cohort-checkpoint-'+old)),str(base)).replace(old,scene) for v in command]
+ command=[str(base/Path(v).name) if '/insula/cohort-checkpoint-' in v else v for v in command]
+ started=time.monotonic();result=subprocess.run(command,capture_output=True,text=True)
+ (base/'live.log').write_text(result.stdout+result.stderr)
+ assert result.returncode==0,result.stderr
+ check=json.loads((base/'output/check.json').read_text())
+ assert check['scene']==scene and check['retained_files']==30 and check['worker_receipts']==16 and check['verified_evictions']==3
+ assert sha(checkpoint)==cp_sha and sha(manifest)==manifest_sha and sha(helper)==helper_sha
+ assert pins=={c:sha(p) for c,p in source_paths.items()}
+ receipt={'checks':[{'command':command,'exit_code':0}],'verified_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-started,'runtime_lock':lock,'checkpoint_sha256':cp_sha,'candidate_hashes':{'pipeline/cohort_checkpoint.py':helper_sha},'artifacts':{str(p.relative_to(base)):sha(p) for p in base.rglob('*') if p.is_file()},'validation':check}
+ save(base/'receipt.json',receipt)
+ pointer=HERE/'research'/('cohort-checkpoint-'+scene+'-verified.json')
+ save(pointer,dict(receipt,receipt=str(base/'receipt.json'),receipt_sha256=sha(base/'receipt.json')))
+ registry=json.loads(registry_path.read_text());registry[scene]=cp_sha;save(registry_path,registry)
+ progress=json.loads(progress_path.read_text())
+ progress['replayed_scene_evidence'][scene]={'evidence':pointer.name,'checkpoint_sha256':cp_sha,'membership':membership,'records':cp['point_validation']['records'],'points':cp['point_validation']['points']}
+ entries=progress['replayed_scene_evidence'];progress.update(point_scenes_replayed=len(entries),point_scenes_pending=103-len(entries),records_replayed=sum(e['records'] for e in entries.values()),points_replayed=sum(e['points'] for e in entries.values()))
+ # Preserve the two original point-only pilots in the full cohort denominator.
+ progress['camera_scenes_replayed']=sum('cohort-checkpoint-' in e['evidence'] for e in entries.values())
+ save(progress_path,progress)
+ missing=[s for s in entries if not (HERE/'research'/('scientific-semantic-support-'+s+'-verified.json')).is_file()]
+ save(HERE/'research/semantic-capture-recovery-pending.json',{'status':'all missing support remains pending immutable replay','scenes':missing,'count':len(missing),'scope':'no missing semantic capture is admitted as observed support'})
+ print('PASS independently admitted lifecycle',scene,'count',len(entries),'missing semantic captures',len(missing),flush=True)

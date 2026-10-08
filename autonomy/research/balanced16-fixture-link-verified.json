@@ -1,0 +1,246 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/input",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/tests",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/input",
+        "/tmp/input",
+        "--",
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "/experiment/cohort",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/input",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/admission",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/input",
+        "/tmp/input",
+        "--",
+        "python",
+        "/experiment/cohort/balanced_gate.py"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "source_pins": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/score_parallel.py": "0da5a8217b98916e22524047587f4ff3ce413f8d2ef6902f32b98e4ceffe7b6e",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/raw_reconstruct_v3.py": "41b5b2c49015a6084fe7c88f83d94f91fb7895fb3d4446cdb1d5d2d68460d5ca",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/loss_balanced.py": "9ad211bd790a2db5310afed5cd9fc6b7ba5570d77d3be4161541874ce05232b3",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/overfit-point-worker.py": "561fa33a3594710c554d79da1d4d2960e0a230d50d554289f68186564a1f1080",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/score_v2.py": "c57fb6f09d1a64a6fd1bf241bfadfbb3ff4ea0beb91f0e3ba963f4e77e6336dd",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/verify_labels.py": "54f93d2b5c6fbe520380a9782359a973e699c9b30e23371867abc84ea6b83592",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/test_admissions.py": "37558e52f191ae556b647382abcc1452bb666cf0e99eabe28e0af8f81ab360f9",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/prepare_v2.py": "f891192cc70d0f187166677ae6a143dbaa08f3367b63e5dabbdfc7e1cb98451e",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/scan_boxes.py": "86a8effd579512db7262326936ee539cd4b1558b7143eaf11cf45f6b27794f58",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/re_admit_physical.py": "f6729f15499fd5ae9ca4e3ace7a09f087e2a69525b205e59b7a333c046c445f4",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/prepare_balanced_native.py": "e4e7f0db48b43c70a94796a3b0858fe3224af5a6d6cb024a4cd3066fca57482d",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/balanced.py": "8126499b907d581cda926b265c6c22890a925736621b54a069229bdb41285d0a",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/balanced_gate.py": "3ecdb7acdd9583ce9aa1e946ab8ce2518333955691b2073707ed47fc2a7d0ffe",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/launch_balanced_study.py": "553e4d6a1e57256f9535380d754c6dacb5b3328711bde3e8474ed9df3d5e113b",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/test_balanced.py": "b251257a4114f615cd713317a867a33ddcf7b452f98aa85f73a06e10b358dc54",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/score.py": "54bbf567ae4259f3914118bfaac4c584aac0c1bbea041a190ca8324ecc8e7ce1",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/metrics.py": "232492f8cd91f153e38d61165e61c1a320afa0e592d58af54b44877859c186ae",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/test_protocol.py": "b487579996bc4064437523ee279e96859482d1787d9ce0bd333e091be96a2484",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/loss.py": "df9b0ac388d4e7b0f2ba33e42020e609c7e7e2c00429d0047d3f4f1b2b5a451b",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/prepare-overfit-native-frame-v3.py": "3d238d66b7f8e5559db94bfd5dff3166f306c864c4f397a1ce59b595a66ccfbd",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/diagnose_fit.py": "7927dcaad731d17ea21b165c3198ec7239f44110b89cbaad60e67963145b5ea5",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/audit_metrics.py": "263042dd77b2a790102ab3f0574006d49b858e58b6f590e9745d488c6dcca7fa",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/audit_targets.py": "742ce7b65cab1aa79278ff924c5a4700c5675b26fd18c4b7b36b359d45da919c",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/overfit_points.py": "923bc70c0e87734082b5d6e60caed1790a1fb02069791acd7e5073fbb8258739",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/reconstruct.py": "1c2be56abab6eb17b6176d96e01e5475a75a78d2c0a7ebb2d5b5ba2a8beef7e2",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/verify_labels_v3.py": "e031d03b866b4c7be7c4b0aecfa84a5485f681e5bf80ef159e6267bab0504c27",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/train.py": "dee3fc9c9b1e921d1291b201552a9d2635b48977878cece815e9788f02c419a4",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/protocol.py": "537e96bbfd4f021941ecea13cae57a471e67bf2f19e281d535b6d33751cf9f98",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/overfit-box-worker.py": "748bf1b17471ae9f80a4a802e2bcda8b52cea84695dc7ada7cb27be1371ee25c",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/finish_balanced_study.py": "8df2351113113de3032cd4313976a5b9473cb11bb38244f39c9b2bf564d9dbbd",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/test_balanced_gate.py": "3fd4cc8d0585e2c33811dcee2c8816c2000d585cd30c416cba52bb3a54a9a243",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/coverage.py": "d5c9205156bf9b85f29dcd864a8e0358a89cabaab98a27871d19c16114fda6ba",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/overfit_detection_targets_v2.py": "f368358b6e6c6daab577cf803634b0aa625da6547f09ee119d8d8e21b7e9aa93",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/overfit_box_targets.py": "e68fbb48741e91b4478eb53c0e3a40d43f7e816f1e73d10474adf7a4d365319a",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/audit_proposals.py": "627ff4f7bbf4cf8525ac42a99d30a39c1d294fc3d20a89446291536e79807838",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/scan.py": "8a0a7e40c37752b948b5ede8fa570f91a1210c2c31367340e1315327231401b6",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/audit_selection.py": "196d5a866dbb9db6ba6add005d9a746cd40f1122395b3610d59fb4e930f9100f",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/prepare.py": "9d4b0b8bb92f9aea1e9917711957a1870d04a71c29e4bc6b3784b10a67a8c877",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/train_balanced.py": "9fc83b930086dd8870dcc167e4e5264e92b94fd99a8871aaf5857ff19b3a94fb",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/audit_targets_v2.py": "3b034d845cbb30b8659b868e6ac503dd55ec74fdd6442925a28579cf9cfd7457",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/overfit-native-cache-audit.py": "2e01a3f12ed6f73386f93c27036f9594200aa8f8241b543d2132c6d1a3d5bd04",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/verify_coverage.py": "5e340540a1e59567a1fdbf3b1189f363574fbc9c33a819f601b627351acd4748",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/targets.py": "8e4258455305d7eabccbee438b768146e3476f94891630057107d05124627f78",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/run.py": "2ba87d9aee1323b34db132419eb036d6d8e4fefda1b26f92b8eb40b539b978a6",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/prepare_labels.py": "26c8773f143ea8ee1b591878872cc936842b0700175025514098e019a791b84e",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/raw_reconstruct.py": "6fc6c4592251cc24a207862956e86ff3aab777c904be812ea17796ef0f159c38",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/score_balanced.py": "170690ba283f60fa912297bae936f2bb74fd3360a03af1d2e05e9adae20551e5",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/gcs_metadata_get.py": "dd819bd968cd5d54e88ce2fb4f34bbd1ca211e5e5210c2c08bd694e8d6e0c0e5",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/run_balanced.py": "7b07a7b4d7901c30e2ba90e677635e2b7cc65b6462c32c1eab0345dd62d43947",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/admissions.py": "d3cc1ed87caa981d18cf19c38e0a1d3b70a94357499fc4e39771abdda9ad3240",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced-fixture-link-v1/source/cohort/checkpoint.py": "258063d52a7245830b306509f2f7a655f607446aa645c9692248711e36784e51"
+  },
+  "payload_sha256": "ca4f7c1a9d4f8f8acdec704c631615e567923cf773ab24cdabb7a5b084c342e4",
+  "parents": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort16-baseline-balanced20261002a/run.json": "7e36ef6c43492e69e9d846b008d382ed694b4f5b795cc72208262a8b246c9873",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort16-residual_bev-balanced20261002b/run.json": "24c2ebb034d2e9e3543128549d36b4416a2dddb7cbcf8b949216ee6d158875da"
+  },
+  "upstream_receipts": {
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-selection.candidate.json": "76f8c4ef54a06d8a1970df3356cc5c933041d9ad92c930377a41caf25dbe0f60",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-labels-and-anchor-coverage-v3-verified.json": "97fba5e25dabf6d8b2902f7c07fee8ea61daeff44eef33c6d6d9807686e3472c",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/balanced16-selection-verified.json": "d6f4fe1c43dd7678b99df9248d7d605f5ae3656eb2a7fe0b793ea138019d494c"
+  },
+  "validation": {
+    "candidates": {
+      "baseline": {
+        "frames": 16,
+        "exact_selection_and_independent_coverage_link": true,
+        "covered_coverage": {
+          "1": {
+            "eligible_objects": 533,
+            "unique_tracks": 434,
+            "frames": 16,
+            "scenes": 13
+          },
+          "2": {
+            "eligible_objects": 254,
+            "unique_tracks": 191,
+            "frames": 14,
+            "scenes": 11
+          },
+          "3": {
+            "eligible_objects": 202,
+            "unique_tracks": 161,
+            "frames": 16,
+            "scenes": 13
+          },
+          "4": {
+            "eligible_objects": 34,
+            "unique_tracks": 22,
+            "frames": 8,
+            "scenes": 6
+          }
+        }
+      },
+      "residual_bev": {
+        "frames": 16,
+        "exact_selection_and_independent_coverage_link": true,
+        "covered_coverage": {
+          "1": {
+            "eligible_objects": 533,
+            "unique_tracks": 434,
+            "frames": 16,
+            "scenes": 13
+          },
+          "2": {
+            "eligible_objects": 254,
+            "unique_tracks": 191,
+            "frames": 14,
+            "scenes": 11
+          },
+          "3": {
+            "eligible_objects": 202,
+            "unique_tracks": 161,
+            "frames": 16,
+            "scenes": 13
+          },
+          "4": {
+            "eligible_objects": 34,
+            "unique_tracks": 22,
+            "frames": 8,
+            "scenes": 6
+          }
+        }
+      }
+    },
+    "identical_inputs_and_recipe": true
+  }
+}

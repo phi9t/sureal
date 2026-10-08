@@ -1,0 +1,77 @@
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+
+TEST_MODULES = glob(["*_test.py"])
+LIB_MODULES = glob(
+    ["*.py"],
+    exclude = ["*_test.py"],
+)
+DETECTION_VISIBILITY = [
+    "//autonomy:__pkg__",
+    "//autonomy/detection/architecture_adaptations:__pkg__",
+    "//autonomy/evaluation:__pkg__",
+    "//autonomy/range_view:__pkg__",
+    "//autonomy/studies:__pkg__",
+    "//autonomy/training_execution:__pkg__",
+]
+
+package(default_visibility = ["//visibility:private"])
+
+exports_files(
+    ["sustained_contract.py"],
+    visibility = ["//autonomy:__pkg__"],
+)
+
+py_library(
+    name = "detection",
+    srcs = LIB_MODULES,
+    imports = [".."],
+    visibility = DETECTION_VISIBILITY,
+    deps = [
+        "//autonomy/dataset:dataset",
+        "//autonomy/evidence:evidence",
+        "//autonomy/insula:insula",
+        "//autonomy/segmentation:segmentation",
+    ],
+)
+
+filegroup(
+    name = "all_py",
+    srcs = glob(["*.py"]),
+    visibility = [
+        "//autonomy:__pkg__",
+        "//autonomy/studies:__pkg__",
+    ],
+)
+
+[
+    py_test(
+        name = test[:-3],
+        srcs = [test],
+        deps = [":detection"],
+        legacy_create_init = 0,
+        size = "small",
+        tags = ["perception_unit"] + (
+            ["requires_gpu"]
+            if test in [
+                "architecture_followups_test.py",
+                "architecture_variants_test.py",
+                "checkpoint_values_test.py",
+                "detector_loss_test.py",
+                "norm_variants_test.py",
+                "packed_point_features_test.py",
+                "pillar_detector_test.py",
+                "pillar_encoder_test.py",
+                "sustained_literal_loss_test.py",
+                "sustained_loss_test.py",
+            ]
+            else []
+        ),
+    )
+    for test in TEST_MODULES
+]
+
+test_suite(
+    name = "all_tests",
+    tests = [test[:-3] for test in TEST_MODULES],
+    visibility = ["//autonomy:__pkg__"],
+)

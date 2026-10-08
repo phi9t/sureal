@@ -1,0 +1,690 @@
+{
+  "schema_version": 1,
+  "scope": "fresh capped execution of original independent GPU transition/head audits for retained0/1000; not producer continuation, legacy companion policy, checkpoint release or full runner admission",
+  "driver_path": "/tmp/sureal-resource-legacy-gpu-v2.py",
+  "driver_sha256": "23a313097721560d101fced19cd549dbf55fa247cff218cea0f0ad0629530ca8",
+  "stages": [
+    {
+      "step": 0,
+      "native_parent": {
+        "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-0-verified.json",
+        "sha256": "50ca56124de90aabbcc02f2e1e32ef186b7d99a0e781ae3e34c53be10b02c2df"
+      },
+      "native_input_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-0-input/job.json": "ae831fcd07fce50d681b2629f8d78774fc42b06584a97c33c93081f8739919a9",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-0-input/audit.json": "c845c54d55a658cb00544c8c720e3b4987226e43e0957e803df3b2fb7eb34ed6",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-0-input/transition.json": "908bfc29a3b8b67880da3c1d4e52953733024eb8a9896a7c1769d9725ff73137",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-0-input/anchor-templates.json": "4bcc69590d664b32ff1ece5e8f00345c76f9564f419b091bf05f6482a5c56d52",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-0-input/manifest.json": "70360cd3206b7d9d9eb06659e7ab1bd05f60998eda2740879ac63526e06d181f"
+      },
+      "native_verifier_source_pins": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/verifier/audit_sustained_transition.py": "0dfad8cbc1abdeb3a0c98f9ed81873b13c40d59cc6cbc35dec2224b8e818c379",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/verifier/sustained_chunk_reference.py": "dae5d9da655c3d6589cba61b4bb9a5db225e89ed3e89e9c768ea6a6431208a61"
+      },
+      "proof": {
+        "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-0-resources/resource-admitted.json",
+        "sha256": "28c16563e37801303a36e6e0d1919e681a51c0b7193c9bfdf33ac76559fa4719"
+      },
+      "actual_command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/gpu-rootfs",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/code",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-0-input",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-0-outputs",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--tmpfs",
+        "/driver",
+        "--dev-bind",
+        "/dev/nvidia1",
+        "/dev/nvidia1",
+        "--dev-bind",
+        "/dev/nvidiactl",
+        "/dev/nvidiactl",
+        "--dev-bind",
+        "/dev/nvidia-uvm",
+        "/dev/nvidia-uvm",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libcuda.so.580.105.08",
+        "/driver/libcuda.so",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libcuda.so.580.105.08",
+        "/driver/libcuda.so.1",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libcuda.so.580.105.08",
+        "/driver/libcuda.so.580.105.08",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libnvidia-ptxjitcompiler.so.580.105.08",
+        "/driver/libnvidia-ptxjitcompiler.so",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libnvidia-ptxjitcompiler.so.580.105.08",
+        "/driver/libnvidia-ptxjitcompiler.so.1",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libnvidia-ptxjitcompiler.so.580.105.08",
+        "/driver/libnvidia-ptxjitcompiler.so.580.105.08",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libnvidia-nvvm.so.580.105.08",
+        "/driver/libnvidia-nvvm.so",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libnvidia-nvvm.so.580.105.08",
+        "/driver/libnvidia-nvvm.so.4",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libnvidia-nvvm.so.580.105.08",
+        "/driver/libnvidia-nvvm.so.580.105.08",
+        "--setenv",
+        "PATH",
+        "/opt/waymo/bin:/usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "LD_LIBRARY_PATH",
+        "/driver:/usr/local/cuda/lib64",
+        "--setenv",
+        "CUDA_VISIBLE_DEVICES",
+        "0",
+        "--setenv",
+        "OMP_NUM_THREADS",
+        "2",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-0-input",
+        "/tmp/inputs",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2",
+        "/tmp/native",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-physical-v2",
+        "/tmp/physical",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-labels-v2",
+        "/tmp/boxes",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/runtime-lock.json",
+        "/tmp/runtime-lock.json",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing",
+        "/tmp/scientific",
+        "--setenv",
+        "CUBLAS_WORKSPACE_CONFIG",
+        ":4096:8",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/verifier",
+        "/tmp/verifier",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-00",
+        "/tmp/retained",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code",
+        "/tmp/resource-layer",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-0-resources/worker",
+        "/tmp/resource-output",
+        "--",
+        "/opt/waymo/bin/python",
+        "/tmp/resource-layer/execute_worker.py",
+        "/tmp/resource-output",
+        "/tmp/verifier/audit_sustained_transition.py"
+      ],
+      "only_original_output_mount_replaced_before_resource_wrapping": true,
+      "comparisons": {
+        "replay.json": {
+          "original": {
+            "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-00/replay.json",
+            "sha256": "2fc591feea1a3684baf20b811ba5257cc514787364fe25a4e6f4cd5ba7c44fb2"
+          },
+          "fresh": {
+            "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-0-outputs/replay.json",
+            "sha256": "47e97a78ed3b03f2d9f962a8e7b65736330306a512f580a05c19c76fb38afd62"
+          },
+          "excluded_measurements": [
+            "elapsed_seconds",
+            "peak_allocated_bytes",
+            "peak_rss_kib"
+          ],
+          "all_other_fields_exact": true,
+          "fresh_report": {
+            "checkpoint_sha256": "8057a5496c4d6ec4d19b9de33034c6cca753ea39d8f03fd765ad7011cdf301ee",
+            "manifest_sha256": "70360cd3206b7d9d9eb06659e7ab1bd05f60998eda2740879ac63526e06d181f",
+            "updates": 0,
+            "checked_frames": [
+              "13840133134545942567_1060_000_1080_000:1558402354862835",
+              "16977844994272847523_2140_000_2160_000:1557450680964094",
+              "17885096890374683162_755_580_775_580:1506906083489022",
+              "4575961016807404107_880_000_900_000:1544656166412547",
+              "13506499849906169066_120_000_140_000:1552353849872908",
+              "16977844994272847523_2140_000_2160_000:1557450685964257",
+              "15696964848687303249_4615_200_4635_200:1507241626220091",
+              "16977844994272847523_2140_000_2160_000:1557450679864286",
+              "12856053589272984699_1020_000_1040_000:1552658368873652",
+              "15628918650068847391_8077_670_8097_670:1508889335260598",
+              "7850521592343484282_4576_090_4596_090:1520908476792400",
+              "7921369793217703814_1060_000_1080_000:1557159628222386",
+              "7921369793217703814_1060_000_1080_000:1557159618222385",
+              "13830510593707564159_5575_000_5595_000:1518657072511849",
+              "11004685739714500220_2300_000_2320_000:1553640277306703",
+              "3966447614090524826_320_000_340_000:1553023288374080"
+            ],
+            "pilot_reference_checks": [],
+            "head_hashes": {
+              "heads-11.npz": "14b3bd24523bfdcd2726dfd50e6c85649c95b3a5b90463e6da2d2d4486fa903d",
+              "heads-04.npz": "02558f599b598971110f55ecef73127ccf6c6fd12ad02941d43822d9ffabfc0a",
+              "heads-15.npz": "d7f105ac4f5fe5000c324debb48fcc7d3d19724c979bbb85fb576a3f4388db36",
+              "heads-08.npz": "3f41614a231bb850797b1a03cf8a9d832a40cbc37055ca8d937cd2717b717aa7",
+              "heads-02.npz": "065a41edb46f6923a0056d0eb4f904fe5d4af829b6aad0279086ece31cfdfe42",
+              "heads-00.npz": "35f7565fc94debd6ad7fa238582089ac2457edb4e467ba21d1ecbe1df0159ba4",
+              "heads-03.npz": "aac887ac8f80f90250f885e79aefcdcbad57617dd47e5f70d13111d4d1510448",
+              "heads-14.npz": "703d68321e7177c06471405c843a2c399cc728790457f6dc6333a11f2efac890",
+              "heads-13.npz": "31d830e141154cc7b58f524832e5f5dee985256535e24d97f1b62f424d1d2cf0",
+              "heads-06.npz": "02837a5325b55ed3e6b48d55e5c613e26725a4bdf5b1cb93e8aaf88db845f9d5",
+              "heads-05.npz": "01d6c56b9fc94fde388cbee445d90d919933e16457fbf8fbe762820fdf74c677",
+              "heads-07.npz": "4b2eda89fe784dd5f065820be90e566f5a06156ade2fbe3af2187e9a087b831c",
+              "heads-12.npz": "7f0ce7fee69a59b048a82f59ef1a9c2cb9ec4f089f9d76926dff69eb4ec41d72",
+              "heads-01.npz": "541bfb29c4278af9071d7c8fbea116b69684035291f287e38245f216fda4302b",
+              "heads-10.npz": "bf03be1872f1bae4f67a468608160bde5a4cb351d2caae8873ab735dc88a4e11",
+              "heads-09.npz": "a170c4161c7f5785537c01b5c48ac023ddeb2cb08e4231d08f4948115360dfc8"
+            },
+            "peak_allocated_bytes": 625548288,
+            "peak_rss_kib": 2541764,
+            "elapsed_seconds": 5.6624901900067925,
+            "scope": "exact restored model/Adam/RNG/cursor and all16 inference heads; independent continuation, literal losses and native metrics still required"
+          }
+        },
+        "transition.json": {
+          "original": {
+            "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-00/transition.json",
+            "sha256": "2fec73abcc715a50d8acbec5dac1324e31923839fff4ea5d47d8ffe22c8c7ce1"
+          },
+          "fresh": {
+            "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-0-outputs/transition.json",
+            "sha256": "408fb613bd09c681b465d08c895dfd4c65aa3d32fa7d66cb6d2f3e83fe2ff6ed"
+          },
+          "excluded_measurements": [
+            "elapsed_seconds",
+            "peak_allocated_bytes",
+            "peak_rss_kib"
+          ],
+          "all_other_fields_exact": true,
+          "fresh_report": {
+            "manifest_sha256": "70360cd3206b7d9d9eb06659e7ab1bd05f60998eda2740879ac63526e06d181f",
+            "checkpoint_sha256": "8057a5496c4d6ec4d19b9de33034c6cca753ea39d8f03fd765ad7011cdf301ee",
+            "previous_checkpoint_sha256": null,
+            "start_step": 0,
+            "terminal_step": 0,
+            "literal_updates": 0,
+            "state_exact_excluding_training_seconds": true,
+            "producer_synchronized_seconds_reconciled": true,
+            "peak_allocated_bytes": 62321664,
+            "peak_rss_kib": 1528128,
+            "elapsed_seconds": 10.630900999996811,
+            "scope": "independent literal complete model/Adam/RNG/cursor transition and exact restored all16 heads; native loss/export/metrics and retention still required"
+          }
+        }
+      },
+      "output_artifacts": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-0-outputs/live.log": "dc1011d7c1092e5dc9420cd837cddc39dd8133ed817d2fa80014787824effa62",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-0-outputs/replay.json": "47e97a78ed3b03f2d9f962a8e7b65736330306a512f580a05c19c76fb38afd62",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-0-outputs/transition.json": "408fb613bd09c681b465d08c895dfd4c65aa3d32fa7d66cb6d2f3e83fe2ff6ed"
+      },
+      "resource_admission": {
+        "peak_rss_bytes": 2660761600,
+        "aggregate_cap_bytes": 17179869184,
+        "scope": "separate launcher and in-runtime worker/waited-child peaks under aggregate kernel cap; not summed tree RSS"
+      }
+    },
+    {
+      "step": 1000,
+      "native_parent": {
+        "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-1000-verified.json",
+        "sha256": "6b49d17e630df90f682131f7c7ee4b6463f9e1aeddd47923ad9193c46e19b0e8"
+      },
+      "native_input_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-1000-input/export-audit.json": "1d6c831c29ff3531db7a425eaf8076b264953b5d39f55a68cb78399567590aec",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-1000-input/expected.json": "122eac2e96bbdba23c13f9ea958ce7fca08400a9a9ccd513ebf2ba51ae51681c",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-1000-input/job.json": "b0214ac11277d83d5ad6cd56704a0158e88a2d9aad89b47f91198a2e0c033188",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-1000-input/audit.json": "db2fddda24914a6d3ba575f8dad4c0cea0473d59bbcc9bb2a6df7bc83a76fdc3",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-1000-input/score-receipt.json": "db07f6fb20d86b858a1b71c86bcd1af78fd1280993f18498aa4127e6ce08670e",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-1000-input/transition.json": "dd58d3518e3d910ff78f0b0662ec42e3a59d5f5ecbd8e3abd8c947062978cf79",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-1000-input/anchor-templates.json": "4bcc69590d664b32ff1ece5e8f00345c76f9564f419b091bf05f6482a5c56d52",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-1000-input/loss-audit.json": "3727b231e699560953767327fdfbcae8d157545f1c0964d17f7b194476e33ad7",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-1000-input/manifest.json": "70360cd3206b7d9d9eb06659e7ab1bd05f60998eda2740879ac63526e06d181f"
+      },
+      "native_verifier_source_pins": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/verifier/audit_sustained_transition.py": "0dfad8cbc1abdeb3a0c98f9ed81873b13c40d59cc6cbc35dec2224b8e818c379",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/verifier/sustained_chunk_reference.py": "dae5d9da655c3d6589cba61b4bb9a5db225e89ed3e89e9c768ea6a6431208a61"
+      },
+      "proof": {
+        "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-1000-resources/resource-admitted.json",
+        "sha256": "2a2fdf18c436798ecd709fca99d7bac57b684de4757eb3dec2559f288662bed0"
+      },
+      "actual_command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/gpu-rootfs",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/code",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-1000-input",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-1000-outputs",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--tmpfs",
+        "/driver",
+        "--dev-bind",
+        "/dev/nvidia1",
+        "/dev/nvidia1",
+        "--dev-bind",
+        "/dev/nvidiactl",
+        "/dev/nvidiactl",
+        "--dev-bind",
+        "/dev/nvidia-uvm",
+        "/dev/nvidia-uvm",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libcuda.so.580.105.08",
+        "/driver/libcuda.so",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libcuda.so.580.105.08",
+        "/driver/libcuda.so.1",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libcuda.so.580.105.08",
+        "/driver/libcuda.so.580.105.08",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libnvidia-ptxjitcompiler.so.580.105.08",
+        "/driver/libnvidia-ptxjitcompiler.so",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libnvidia-ptxjitcompiler.so.580.105.08",
+        "/driver/libnvidia-ptxjitcompiler.so.1",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libnvidia-ptxjitcompiler.so.580.105.08",
+        "/driver/libnvidia-ptxjitcompiler.so.580.105.08",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libnvidia-nvvm.so.580.105.08",
+        "/driver/libnvidia-nvvm.so",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libnvidia-nvvm.so.580.105.08",
+        "/driver/libnvidia-nvvm.so.4",
+        "--ro-bind",
+        "/usr/lib/x86_64-linux-gnu/libnvidia-nvvm.so.580.105.08",
+        "/driver/libnvidia-nvvm.so.580.105.08",
+        "--setenv",
+        "PATH",
+        "/opt/waymo/bin:/usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "LD_LIBRARY_PATH",
+        "/driver:/usr/local/cuda/lib64",
+        "--setenv",
+        "CUDA_VISIBLE_DEVICES",
+        "0",
+        "--setenv",
+        "OMP_NUM_THREADS",
+        "2",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-1000-input",
+        "/tmp/inputs",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2",
+        "/tmp/native",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-physical-v2",
+        "/tmp/physical",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-labels-v2",
+        "/tmp/boxes",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/runtime-lock.json",
+        "/tmp/runtime-lock.json",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing",
+        "/tmp/scientific",
+        "--setenv",
+        "CUBLAS_WORKSPACE_CONFIG",
+        ":4096:8",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/verifier",
+        "/tmp/verifier",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-1000",
+        "/tmp/retained",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-00",
+        "/tmp/previous",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code",
+        "/tmp/resource-layer",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-1000-resources/worker",
+        "/tmp/resource-output",
+        "--",
+        "/opt/waymo/bin/python",
+        "/tmp/resource-layer/execute_worker.py",
+        "/tmp/resource-output",
+        "/tmp/verifier/audit_sustained_transition.py"
+      ],
+      "only_original_output_mount_replaced_before_resource_wrapping": true,
+      "comparisons": {
+        "replay.json": {
+          "original": {
+            "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-1000/replay.json",
+            "sha256": "27c2deaf3fe14fb395efd7db63f3618d6ffc7e48d29b7b5fd64c3e7642d05257"
+          },
+          "fresh": {
+            "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-1000-outputs/replay.json",
+            "sha256": "a905dad3b495e5b99b244f259920ffc2b380b36ec058f102ebea8241c1b367fb"
+          },
+          "excluded_measurements": [
+            "elapsed_seconds",
+            "peak_allocated_bytes",
+            "peak_rss_kib"
+          ],
+          "all_other_fields_exact": true,
+          "fresh_report": {
+            "checkpoint_sha256": "37de2375b0b10f92a56468bd9ffe0b2fea42f257c5949efa80fd29c621a8ff4a",
+            "manifest_sha256": "70360cd3206b7d9d9eb06659e7ab1bd05f60998eda2740879ac63526e06d181f",
+            "updates": 1000,
+            "checked_frames": [
+              "13840133134545942567_1060_000_1080_000:1558402354862835",
+              "16977844994272847523_2140_000_2160_000:1557450680964094",
+              "17885096890374683162_755_580_775_580:1506906083489022",
+              "4575961016807404107_880_000_900_000:1544656166412547",
+              "13506499849906169066_120_000_140_000:1552353849872908",
+              "16977844994272847523_2140_000_2160_000:1557450685964257",
+              "15696964848687303249_4615_200_4635_200:1507241626220091",
+              "16977844994272847523_2140_000_2160_000:1557450679864286",
+              "12856053589272984699_1020_000_1040_000:1552658368873652",
+              "15628918650068847391_8077_670_8097_670:1508889335260598",
+              "7850521592343484282_4576_090_4596_090:1520908476792400",
+              "7921369793217703814_1060_000_1080_000:1557159628222386",
+              "7921369793217703814_1060_000_1080_000:1557159618222385",
+              "13830510593707564159_5575_000_5595_000:1518657072511849",
+              "11004685739714500220_2300_000_2320_000:1553640277306703",
+              "3966447614090524826_320_000_340_000:1553023288374080"
+            ],
+            "pilot_reference_checks": [],
+            "head_hashes": {
+              "heads-11.npz": "3e90e2010124b7d8385636128758231bc21968ab1be4d021550f0960f55eee41",
+              "heads-04.npz": "4a4cb2f9a0976d0419e93c0faba11a89ce5374650a4a119390df5168cd6c53d8",
+              "heads-15.npz": "df3c30ae0998bc869bb57bc5333af909499be6cd15eb97a8e455a7a6b2b2b381",
+              "heads-08.npz": "7bb20bd9c2a1bf062498a95acc267e19cc2f57c5702e087212c37de303f98907",
+              "heads-02.npz": "0e3e9ac2d358c77e3156729d7405cfc349f454caca77db0d8301e53fd7333183",
+              "heads-00.npz": "c20832fa0e2384993d854e66bf1682fb1ee680a903ff501e1b6bfc5c283eeb1b",
+              "heads-03.npz": "7e7be8f47079b4d0b8e19a7f23a6179517a99fee529bf94df9f01c3e3ecab634",
+              "heads-14.npz": "45217da8b4180adb120d95569d1fbfdffa042ec6d8d343a4daa5ed7a2e3348dc",
+              "heads-13.npz": "aa5db88c2bbe42c2cd587049bd4c46486b35e345493f8bc182ff2b79e00b3969",
+              "heads-06.npz": "b5a2dd1dd1e5e5c68d77f6dc73c9e6a7bb1dac00496434a15ef201435157f997",
+              "heads-05.npz": "97aff74cd2cd56c25a8c175e2bfb2371ce40e710dee323842520cc5e4746abd9",
+              "heads-07.npz": "472aa61a563b44a825e882cbf416bb59f297267f625a1d2f5bc88c456fcead23",
+              "heads-12.npz": "537cb025b05e9885b8c889c95ef33821e7bc02b079e6985ae247157c8d9fe0f0",
+              "heads-01.npz": "3f950b479788a09cb8440da10d88b8abe4e10c3271dc80bf7cc32561b02a35a9",
+              "heads-10.npz": "7f3b01072c19e9874fd17306a9f8d17fb3443ef515e7c7d462e11ebe9e3adc7f",
+              "heads-09.npz": "1993f912ceb8314d02499fcb39d3cb3f9eaae47086bd4a4dbde965331e245ebf"
+            },
+            "peak_allocated_bytes": 740860928,
+            "peak_rss_kib": 3143592,
+            "elapsed_seconds": 5.283910373982508,
+            "scope": "exact restored model/Adam/RNG/cursor and all16 inference heads; independent continuation, literal losses and native metrics still required"
+          }
+        },
+        "transition.json": {
+          "original": {
+            "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/audit-1000/transition.json",
+            "sha256": "b2cbcbb3e0b1d56a82d2a2ed5057d3d3328e31183509193c37f1f368a877fa6c"
+          },
+          "fresh": {
+            "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-1000-outputs/transition.json",
+            "sha256": "632cfea9e50c709cda3b8fc99b92b273749dca6b636328b4f86e2080484f2437"
+          },
+          "excluded_measurements": [
+            "elapsed_seconds",
+            "peak_allocated_bytes",
+            "peak_rss_kib"
+          ],
+          "all_other_fields_exact": true,
+          "fresh_report": {
+            "manifest_sha256": "70360cd3206b7d9d9eb06659e7ab1bd05f60998eda2740879ac63526e06d181f",
+            "checkpoint_sha256": "37de2375b0b10f92a56468bd9ffe0b2fea42f257c5949efa80fd29c621a8ff4a",
+            "previous_checkpoint_sha256": "8057a5496c4d6ec4d19b9de33034c6cca753ea39d8f03fd765ad7011cdf301ee",
+            "start_step": 0,
+            "terminal_step": 1000,
+            "literal_updates": 1000,
+            "state_exact_excluding_training_seconds": true,
+            "producer_synchronized_seconds_reconciled": true,
+            "peak_allocated_bytes": 1805349888,
+            "peak_rss_kib": 3049260,
+            "elapsed_seconds": 76.92640301701613,
+            "scope": "independent literal complete model/Adam/RNG/cursor transition and exact restored all16 heads; native loss/export/metrics and retention still required"
+          }
+        }
+      },
+      "output_artifacts": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-1000-outputs/live.log": "07b59fcd02b9e510421e6710ef26a711fdabf21f655d4a01d19e7ea999010535",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-1000-outputs/replay.json": "a905dad3b495e5b99b244f259920ffc2b380b36ec058f102ebea8241c1b367fb",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-gpu-controller20261003a-v2/audit-1000-outputs/transition.json": "632cfea9e50c709cda3b8fc99b92b273749dca6b636328b4f86e2080484f2437"
+      },
+      "resource_admission": {
+        "peak_rss_bytes": 3274792960,
+        "aggregate_cap_bytes": 17179869184,
+        "scope": "separate launcher and in-runtime worker/waited-child peaks under aggregate kernel cap; not summed tree RSS"
+      }
+    }
+  ],
+  "original_native_sha256": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/run.json": "96dc607ae8238774ca875588d65eaf463f120227e161ae792a9187c8e6635d7d",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/state.json": "dac2ce421243c4750175f98152cdc1ce4ecb7e1a493ddee7050c42fcc09e7765",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-00/checkpoint.pt": "8057a5496c4d6ec4d19b9de33034c6cca753ea39d8f03fd765ad7011cdf301ee",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-00-admitted.json": "dde09eb7e6d65e781597da82870ca6c64ea5bff1ea77d31b8b8268ec5a0ad364",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-1000/checkpoint.pt": "37de2375b0b10f92a56468bd9ffe0b2fea42f257c5949efa80fd29c621a8ff4a",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-1000-admitted.json": "b0a874b87a2541ab13b2a97e36540b458b54bb0996c6e679a8c156d0160f52d9"
+  },
+  "resource_identity_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/identity.json",
+  "resource_identity_sha256": "f2514b46aa6952662b35183df8db0ce9ec914b38640de2a1d24cfbf7bbe80e5d",
+  "source_pins": {
+    "archive_worker.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/archive_worker.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/archive_worker.py",
+      "sha256": "f110e1a57ebbe9c4d62f9d4d88ba577ac5da5526c1c536b1c84663386126d94e"
+    },
+    "backend.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/backend.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/backend.py",
+      "sha256": "c2889cf53abb335211eb10321df7329e21248cca727cb64224f1b6dd90333662"
+    },
+    "checkpoint.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/checkpoint.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/checkpoint.py",
+      "sha256": "cbc21df64f9674ee728c5574b1b18a5be19d1f81d84acd2077377a83c5a45449"
+    },
+    "command.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/command.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/command.py",
+      "sha256": "1a44bc70f62abe7ec48eea9dbf12c27b2b83816793d3ca1fc506bf22d938cc40"
+    },
+    "dependencies.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/dependencies.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/dependencies.py",
+      "sha256": "d00b0a6233e8a76855d8e81fe081f7e77168bb53224dc2312db1b2aa31496b31"
+    },
+    "execute_worker.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/execute_worker.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/execute_worker.py",
+      "sha256": "b4a746f941944d4342ade71f7338498b06f96e21bc56141eb90d40276508add8"
+    },
+    "kernel_scope.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/kernel_scope.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/kernel_scope.py",
+      "sha256": "4a9f8440b91ce8203e3f9bbc25dbe25dad83a33378544e4ede61412f9e1f2e89"
+    },
+    "process_lifecycle.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/process_lifecycle.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/process_lifecycle.py",
+      "sha256": "bfde67be0f66296565dca964c8a2ca3e6bb733e31016fbc87c78f57dd49b09f0"
+    },
+    "retention.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/retention.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/retention.py",
+      "sha256": "b9cc1380a45f064a57ef22c5ea2efd1b98384a21bf2017538307fd879dbbaf44"
+    },
+    "retention_audit.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/retention_audit.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/retention_audit.py",
+      "sha256": "26b8d2907f023af4c3745ae2dbad0d2de442f26b3d4297ffa519851958829116"
+    },
+    "scoped_stage.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/scoped_stage.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/scoped_stage.py",
+      "sha256": "d753f2df936496cddb76f9bd09215100552f56a5d7754d52e54434b9ee042738"
+    },
+    "sources.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/sources.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/sources.py",
+      "sha256": "2f1eef953bd39e40b49e7fc18e906c4b0ea11d17266c5822aae842966179d5af"
+    },
+    "stage.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/stage.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/stage.py",
+      "sha256": "f8e8baf91d752185fd3f57ba27af3cec683540bcb0932275bdfcf4643f1d4ff9"
+    },
+    "stage_accounting.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/stage_accounting.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/stage_accounting.py",
+      "sha256": "baef4b065f9ebb3aa7a2296ccaede595e2514c8144b18bace315f3a805b3716b"
+    },
+    "test_execute_worker.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_execute_worker.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/test_execute_worker.py",
+      "sha256": "26c1e44dacf7056498c5f4deb2c8a06b91830848aeb5d63f0819380bc98ae2d3"
+    },
+    "test_kernel_scope.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_kernel_scope.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/test_kernel_scope.py",
+      "sha256": "e5ff0b3b67a3b85a5799da096078ac7e07454d6230e16cace99282b96285f9a8"
+    },
+    "test_resource_archive.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_archive.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/test_resource_archive.py",
+      "sha256": "513d7b839ccd37619919ed78a38943e09db97c0a222524f24e661e29e8ce6de8"
+    },
+    "test_resource_backend.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_backend.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/test_resource_backend.py",
+      "sha256": "021938bd33c74fe31300672995aaf9471cd9b2b81fbdaecd7305253bac3ae425"
+    },
+    "test_resource_checkpoint.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_checkpoint.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/test_resource_checkpoint.py",
+      "sha256": "7f6119ce1fa662c6d624fdb6b7e801b6249f3066a8a82bd7809e0f50e780faaa"
+    },
+    "test_resource_command.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_command.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/test_resource_command.py",
+      "sha256": "98255f18a16799ca18e7a32e6087e8d3b39de44c38d44a2fc0d8e0b60aba32c6"
+    },
+    "test_resource_retention.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_retention.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/test_resource_retention.py",
+      "sha256": "023ba4bec0a3f06a0f254ebdbcbf67736b2c04c50948ee0b7e10e1080b5248ef"
+    },
+    "test_resource_sources.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_sources.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/test_resource_sources.py",
+      "sha256": "08b06457df38c99413e33aaf1bce5afbd703a5628b22d5e29c54f6265fa253bf"
+    },
+    "test_resource_stage.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_stage.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/test_resource_stage.py",
+      "sha256": "4aafb2d74de5075e9ab1c4d8147a772ea991604452fa85f817747c136296720b"
+    },
+    "test_scoped_stage.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_scoped_stage.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/test_scoped_stage.py",
+      "sha256": "30b81ad6cf79248e6d83b4021f38a0aff22c0604f0f2c071d6c8e34cc7b40835"
+    },
+    "test_stage_accounting.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_stage_accounting.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/test_stage_accounting.py",
+      "sha256": "8a28c803161b28318b23a6caea03024d6ceff782d187f81a54850d4d22da8a86"
+    },
+    "test_worker_admission.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_worker_admission.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/code/test_worker_admission.py",
+      "sha256": "816a6ab4d7cb891e97ed279e46a2fea491ce8865f3dd30f2c6ea7bff825f4bb7"
+    }
+  },
+  "manifest_sha256": "70360cd3206b7d9d9eb06659e7ab1bd05f60998eda2740879ac63526e06d181f",
+  "comparison_excluded_measurements": {
+    "replay.json": [
+      "elapsed_seconds",
+      "peak_allocated_bytes",
+      "peak_rss_kib"
+    ],
+    "transition.json": [
+      "elapsed_seconds",
+      "peak_allocated_bytes",
+      "peak_rss_kib"
+    ]
+  },
+  "passed": true,
+  "native_state_and_checkpoints_unchanged": true,
+  "fresh_gpu_audits": 2,
+  "literal_updates_revalidated": [
+    0,
+    1000
+  ],
+  "original_training_seconds_unchanged": 66.17723006749293
+}

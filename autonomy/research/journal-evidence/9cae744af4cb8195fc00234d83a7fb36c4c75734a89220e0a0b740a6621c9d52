@@ -1,0 +1,303 @@
+{
+  "schema_version": 1,
+  "kind": "independent-exact-source-result-review",
+  "review_axis": "bounded58.B exact refreshed source/result/claims",
+  "author": "sureal/58-b-20261005a",
+  "refresh_operator": "/root manual lead",
+  "reviewer": "/root/models_training_docs_standards",
+  "reviewer_native_thread_id": "01a10439-6fee-7491-8fac-aedf263f5ba6",
+  "reviewed_utc": "2026-10-05T01:45:58.430792+00:00",
+  "candidate": "5a1d92283c3bc8368751a508ef705a7a4f19ebd8",
+  "parent": "88eb369fdb5b512f9a0e3241f6e2f3dacd6f4530",
+  "base": "88eb369fdb5b512f9a0e3241f6e2f3dacd6f4530",
+  "tree": "706d77252fdba63e94ab1be41f53ae9ac617d8e6",
+  "source": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-integration-20261005a",
+  "original_candidate": "404b2af870c8e3062fcd0b6b99b42c3518428e3e",
+  "original_independent_review": {
+    "path": "/data02/home/philip.yang/devx/tmp/mac58-b-original-source-result-review-404b2af.json",
+    "sha256": "0634f59f754f37425f79db12b7979458f29414c293bd78eaa4356f451b865c3e"
+  },
+  "contract": {
+    "path": "docs/research/tasks/58-mac-happy-path-perception-pilot.md",
+    "source_commit": "b32307da442598e192a9259d29a8650be1134589",
+    "sha256": "ccafd7dc2a28a7b2f71ba96e7e1f4f459cabdcb264e6dbf624cf0f737c268497",
+    "scope": "58.B normalization preparation plus explicit lead-owned current-mainline refresh/fresh live check."
+  },
+  "verdict": "pass",
+  "findings": [],
+  "landing_allowed": true,
+  "landing_conditions": [
+    "Only exact candidate5a1d92283c3bc8368751a508ef705a7a4f19ebd8 at parent88eb369fdb5b512f9a0e3241f6e2f3dacd6f4530 is covered.",
+    "Operator confirms clean canonical/current-mainline parent immediately before serialized FF and exact publication/readback.",
+    "Changed source, further refreshed parent or changed result requires narrow candidate/evidence reconciliation; old acceptance cannot silently transfer."
+  ],
+  "narrative": "PASS and landing allowed for exact5a1d922 at sole parent88eb369, subject to the operator’s immediate clean/current-base and serialized-publication checks. Its ten-file patch is byte/mode identical to original404b2af. The original independent review reopened actual normalization/build source, two checkpoint dictionaries and BN storage hashes, archived loss/visit records,102 train artifacts and the full runtime digest; no source/result blocker was found. The explicit refresh preserves original-base receipts as history and supplies separate new-candidate evidence. All17 fresh regular source/script files match5a Git blobs and the exact mounted/input dictionary. Actual fresh live Insula driver/input/source-origin/log/output hashes reopen correctly: exit0, seven fresh source-model inventories and two read-only trained dictionaries, zero forward/optimizer/intervention calls, no GPU/TensorFlow,2GiB/swap0 and zeroOOM. All12 substantive fields independently equal the reviewed original, including every module/buffer and retained-checkpoint/library pin; timing/RSS are separately fresh measurements. Kernel peak remains unavailable and sampled memory is labeled honestly. The refreshed owned scope was freshly observed inactive/dead with empty ControlGroup. Deliverables retain normalization axes/eval/buffer contracts, historical-versus-fresh distinctions and missing next43 inputs. No43/50/53 or fullMAC/native-quality/HDFS-release acceptance is granted. No broad matrix or scientific execution was added by this reviewer.",
+  "reviewed_path_pins": [
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/README.md",
+      "mode": "100644",
+      "git_blob": "c13c38107b4ece7d613f080a936f1dd44360503f",
+      "sha256": "24ba10901d68a71b49fdf392b4817e0994a90f515e20d6f89754a2338c242b6d",
+      "bytes": 9164,
+      "matches_original_body_mode": true
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/archived-evidence.json",
+      "mode": "100644",
+      "git_blob": "0173fc20b8b19993020485429bd37cfd99f2aad0",
+      "sha256": "1555dad92933b59a010c8371fd3a30776f1f59d2b3999dd3271efd42eee73ee1",
+      "bytes": 168055,
+      "matches_original_body_mode": true
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/inventory.json",
+      "mode": "100644",
+      "git_blob": "1f63ad1e81f39c7cc007f349c55608f1b72042db",
+      "sha256": "8fa0e64e7065064949943d871f2c828e1bc3d02b7f9136f5935d0dae973a0569",
+      "bytes": 82200,
+      "matches_original_body_mode": true
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/inventory_live.py",
+      "mode": "100644",
+      "git_blob": "02a8f70dddc57ed8ee54a50d6f4d5a9129c1ea5d",
+      "sha256": "3d9e1282f88aadecc8af34073f742c417111123f947caf30109f0572f32065d4",
+      "bytes": 7052,
+      "matches_original_body_mode": true
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/live-verified.json",
+      "mode": "100644",
+      "git_blob": "b1943096ccabce4599dd400f3630133a47dac7c9",
+      "sha256": "2d8cac94ce381a6c6f47dd2e7fadeeb0107a2f507c7dc48f21afdb0b1ebc54ec",
+      "bytes": 3763,
+      "matches_original_body_mode": true
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/next43.md",
+      "mode": "100644",
+      "git_blob": "84cf12fba1d61868db178f81a9a2b3cbdfce3e0f",
+      "sha256": "3fb611a57600e856cf229e3a2f8f3fd2cec8c821c14986f4c1997b22fc8d4ba7",
+      "bytes": 2455,
+      "matches_original_body_mode": true
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/provenance.json",
+      "mode": "100644",
+      "git_blob": "46916faea0a0a5084c6ae6c9f208dbc99295ff78",
+      "sha256": "e9cb4bd801cc80a9cdf1b593df67e41cd6b16df7e64ef383f2f4f330bdfc0346",
+      "bytes": 3114,
+      "matches_original_body_mode": true
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/source-pins.json",
+      "mode": "100644",
+      "git_blob": "e0d3606ae238923e8f345e44bc62f0c981a73e85",
+      "sha256": "0deecd3aec70cd91c399f86e27284519b55258c8f588eee1bc0d4fd97481a290",
+      "bytes": 4433,
+      "matches_original_body_mode": true
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/stop-verified.json",
+      "mode": "100644",
+      "git_blob": "c9930024153e54ec94950286d815bf09b8f75bbe",
+      "sha256": "7bdedec3c2b0342a5d649678171505e40dddb9a4d22a4fc30d45e611f67214b1",
+      "bytes": 1127,
+      "matches_original_body_mode": true
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/verification.json",
+      "mode": "100644",
+      "git_blob": "b16cd9ac2299f81a167e3a75d5a0ae87ca8a1215",
+      "sha256": "0ab02b9223023f11ee36c57f9495a88ff7ec4378ffab03b4cb6b059f6ba8b1d8",
+      "bytes": 3430,
+      "matches_original_body_mode": true
+    }
+  ],
+  "verification_receipt": {
+    "path": "/data02/home/philip.yang/devx/tmp/mac58-b-refreshed-5a1d922-independent-checks.json",
+    "sha256": "8654aa3c61467f35fc3d15e398eaa9a738fd56043cf3f9da54eda7e12c6ac927"
+  },
+  "source_origin": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/b-refresh-live-v1/refresh-source.json",
+    "sha256": "0f5b99aed6a72ea6327e517d609a0719ca60295a157a8abc0b1035d4243067e7"
+  },
+  "fresh_source_pins": [
+    {
+      "path": "experiments/waymo-perception/pipeline/__init__.py",
+      "sha256": "7b886bfeed8fa484027b4c70be755996e3e04019a56c072966818a7d9bc7906e",
+      "candidate_blob": true,
+      "fresh_snapshot_equal": true
+    },
+    {
+      "path": "experiments/waymo-perception/pipeline/pillar_detector.py",
+      "sha256": "0aef80adb63784844782871745262d15144c36831714c8607b9a91be787936cc",
+      "candidate_blob": true,
+      "fresh_snapshot_equal": true
+    },
+    {
+      "path": "experiments/waymo-perception/pipeline/pillar_encoder.py",
+      "sha256": "0bd5aabd2ebef1d65c84fe0ad89a6ccc642af5308183e608e4ce703cf7bcc192",
+      "candidate_blob": true,
+      "fresh_snapshot_equal": true
+    },
+    {
+      "path": "experiments/waymo-perception/pipeline/detector_loss.py",
+      "sha256": "4b439109a08fae64a652a4b6545239e35c181fdc92018ac112df7d37a0224b87",
+      "candidate_blob": true,
+      "fresh_snapshot_equal": true
+    },
+    {
+      "path": "experiments/waymo-perception/pipeline/insula_entry.py",
+      "sha256": "4ad731aff9057550db8a3c2d194f7b23a1447ef11b8f3d58ec7344f6132209b2",
+      "candidate_blob": true,
+      "fresh_snapshot_equal": true
+    },
+    {
+      "path": "experiments/waymo-perception/pipeline/runtime_identity.py",
+      "sha256": "fbecd514661535d32cbd7c25cc208a60d50728e9d9469d1a82b9979d1261adf2",
+      "candidate_blob": true,
+      "fresh_snapshot_equal": true
+    },
+    {
+      "path": "experiments/waymo-perception/gpu/norm_variants.py",
+      "sha256": "c90ee1004dbb79d66895c72be8d5dad1f0b2a4e731ee77ddfcd19ff6bf120f8b",
+      "candidate_blob": true,
+      "fresh_snapshot_equal": true
+    },
+    {
+      "path": "experiments/waymo-perception/gpu/architecture_variants.py",
+      "sha256": "c42042ed95cca74d519026149d3fe7e0f681c42da060f4a5b9d5428efd70eb35",
+      "candidate_blob": true,
+      "fresh_snapshot_equal": true
+    },
+    {
+      "path": "experiments/waymo-perception/gpu/architecture_followups.py",
+      "sha256": "679e89728e059bace5a373ba50b73978ec1c1741c53492d6a89badc18d844368",
+      "candidate_blob": true,
+      "fresh_snapshot_equal": true
+    },
+    {
+      "path": "experiments/waymo-perception/tier1/catalog.py",
+      "sha256": "4a33cc1719c4a32203ee6574301854c7c2cab8a51fc09b3cdd9cb3fcb90f550f",
+      "candidate_blob": true,
+      "fresh_snapshot_equal": true
+    },
+    {
+      "path": "experiments/waymo-perception/tier1/models.py",
+      "sha256": "66f11059442396bb757a40ef619f28932126337188696ae439b8101faf723733",
+      "candidate_blob": true,
+      "fresh_snapshot_equal": true
+    },
+    {
+      "path": "experiments/waymo-perception/cohort/train_balanced.py",
+      "sha256": "9fc83b930086dd8870dcc167e4e5264e92b94fd99a8871aaf5857ff19b3a94fb",
+      "candidate_blob": true,
+      "fresh_snapshot_equal": true
+    },
+    {
+      "path": "experiments/waymo-perception/cohort/sustained_contract.py",
+      "sha256": "12b662e2a1ef033f0c4b58473cc10fe586e906134a73eda007621c23fdbdae5f",
+      "candidate_blob": true,
+      "fresh_snapshot_equal": true
+    },
+    {
+      "path": "experiments/waymo-perception/cohort/sustained_loop.py",
+      "sha256": "987d72307d28bea570c2e9fd39b126f7931c31ec294bcbb3de80d5de3499ffa8",
+      "candidate_blob": true,
+      "fresh_snapshot_equal": true
+    },
+    {
+      "path": "experiments/waymo-perception/cohort/sustained_state.py",
+      "sha256": "9712748c0073a7c6a9a01fea9530709baf37e28be9754e9c356287a2e61a71c6",
+      "candidate_blob": true,
+      "fresh_snapshot_equal": true
+    },
+    {
+      "path": "experiments/waymo-perception/cohort/train_sustained.py",
+      "sha256": "aaa0e08458a337416221f6743606804b3fd114cc38816bf294062a8fc5d55be9",
+      "candidate_blob": true,
+      "fresh_snapshot_equal": true
+    }
+  ],
+  "fresh_script_sha256": "3d9e1282f88aadecc8af34073f742c417111123f947caf30109f0572f32065d4",
+  "actual_fresh_live_receipt": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/b-refresh-live-v1/live-verified.json",
+    "sha256": "c113fe91e429d563064c13735f5a179fdaf8b8639a86d64f437de654502b4209"
+  },
+  "actual_fresh_inputs": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/b-refresh-live-v1/input/inputs.json",
+    "sha256": "8babc9510fa50f8c7932620a3e2aae93ba47e8a543513e1f268d1441d1f34737"
+  },
+  "actual_fresh_driver": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/b-refresh-live-v1/run_live.py",
+    "sha256": "3e90c0cc593a4de37ae1cf57e37cdcc9bb120b87013589e850780430683a426b"
+  },
+  "actual_fresh_log": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/b-refresh-live-v1/live-output-v3/live.log",
+    "sha256": "6d0a40f47e08ae126aea02f48d8365098d2d80f044e6e86d564be5fd13008128"
+  },
+  "actual_fresh_inventory": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/b-refresh-live-v1/live-output-v3/inventory.json",
+    "sha256": "1abd368dfb4eaaaa8536c0e237199cdaea3dde563abbdc2ac159be4b81476b8b"
+  },
+  "substantive_result_fields_independently_compared": [
+    "cuda_available",
+    "forward_calls",
+    "fresh_models",
+    "gpu_devices_present",
+    "interventions",
+    "optimizer_updates",
+    "retained_state",
+    "scope",
+    "source_snapshot_sha256",
+    "tensorflow_available",
+    "torch",
+    "torch_source_sha256"
+  ],
+  "only_measurement_fields_differ": [
+    "elapsed_seconds",
+    "peak_rss_kib"
+  ],
+  "rootfs_full_digest_readback": {
+    "path": "/data02/home/philip.yang/devx/tmp/mac58-b-original-404b2af-rootfs-readback.json",
+    "sha256": "236a499cbf658cfe9a6e0f966104eec0b85954a7f3afaf396f71625614e8ed23"
+  },
+  "stop_receipt": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/b-refresh-stop.json",
+    "sha256": "13727f2e3d0f827ce399e80bb9040a1104f860b05869f7338084b8bd832011d3"
+  },
+  "fresh_independent_stop_observation": {
+    "observed_utc": "2026-10-05T01:44:34.110350+00:00",
+    "argv": [
+      "systemctl",
+      "--user",
+      "show",
+      "sureal-sustained-mac58-b-refresh-20261005a.scope",
+      "--property=ActiveState,SubState,ControlGroup"
+    ],
+    "exit_code": 0,
+    "stdout": "ControlGroup=\nActiveState=inactive\nSubState=dead\n",
+    "stderr": ""
+  },
+  "preservation": {
+    "all10_patch_bodies_and_modes_equal_original": true,
+    "exact17_regular_file_snapshot_union_no_symlinks": true,
+    "original_sources_checkpoints_artifacts_failures_and_receipts_retained": true,
+    "frozen_scientific_source_and_GT_outside_additive_preparation_diff": true,
+    "no_local_scientific_payload_release": true,
+    "original_candidate_worktree_evidence_retained": true,
+    "old_receipts_not_relabelled_as_new_execution": true
+  },
+  "scope_limits": [
+    "Bounded useful58.B preparation acceptance only; no43/50/53/fullMAC or native-quality/optimizer/GT/normalization-intervention acceptance.",
+    "No implementation/refactor/native/Kata/goal/Git index/ref/process control/HDFS mutations by this reviewer.",
+    "No new model/runtime/scientific job, native scorer, adversarial matrix or comprehensive fault coverage requested or executed by this reviewer.",
+    "Independent evidence/hash/source/checkpoint decoding and read-only owned-scope observations only; fresh live execution was performed by the operator and independently reopened here.",
+    "Stop census concerns only explicitly named owned units, not global process quiescence.",
+    "No landing/publication performed by this reviewer; review permits the operator’s exact bounded integration after stated base checks."
+  ],
+  "NOT_TASK43_OR_FULL_MAC_ACCEPTANCE": true,
+  "NOT_NATIVE_QUALITY_OR_HDFS_RELEASE_ACCEPTANCE": true,
+  "integration_or_publication_performed_by_this_review": false
+}

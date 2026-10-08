@@ -1,0 +1,9 @@
+{
+  "milestone": "M5",
+  "status": "verified-complete",
+  "receipt_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/m5-live-compare/receipt.json",
+  "receipt_sha256": "9149f4d23c0c81418fb57fce7d84df3e4c3927dcf0fa4e2a3f9bdfa04332d219",
+  "geometry_artifacts": 3970,
+  "points": 71891534,
+  "bytewise_geometry_and_native_match": true
+}

@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "kind": "independent-original-source-result-review",
+  "review_axis": "bounded58.B source/result",
+  "author": "sureal/58-b-20261005a",
+  "reviewer": "/root/models_training_docs_standards",
+  "reviewer_native_thread_id": "01a10439-6fee-7491-8fac-aedf263f5ba6",
+  "worker_native_thread_id": "01a109a2-1e13-7970-a00b-e97ba09f35ea",
+  "reviewed_utc": "2026-10-05T01:43:08.623208+00:00",
+  "candidate": "404b2af870c8e3062fcd0b6b99b42c3518428e3e",
+  "parent": "b32307da442598e192a9259d29a8650be1134589",
+  "base": "b32307da442598e192a9259d29a8650be1134589",
+  "tree": "6fcefcd3f432752c70373b4361972a474fb38355",
+  "source": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a",
+  "contract": {
+    "path": "docs/research/tasks/58-mac-happy-path-perception-pilot.md",
+    "git_commit": "b32307da442598e192a9259d29a8650be1134589",
+    "sha256": "ccafd7dc2a28a7b2f71ba96e7e1f4f459cabdcb264e6dbf624cf0f737c268497"
+  },
+  "candidate_handoff": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/candidate.json",
+    "sha256": "f49c8dede8618d44c2cc87b457859268338c40fa677e8e64d2b89cb5ed543def"
+  },
+  "verdict": "pass",
+  "findings": [],
+  "narrative": "PASS for original404b2af at sole parentb32307d. All10 scoped files and handoff hashes match immutable Git;16 scientific source pins and the live script match actual mounted snapshots. Source/build and installed Torch inspection support one pillar BN1d plus19 backbone GN modules for the four frozen recipes, with the documented full-BN/point-LN/no-norm controls and eval-mode/buffer limits. Restricted raw checkpoint decoding independently verified two step2000 dictionaries,69 model tensors each, exactly three BN buffers each and counter2000; all buffer hashes match the inventory. Reopened102 archived train artifacts,10 original admissions,20 source comparisons and14 sustained-stage receipts. Recomputed16 terminal rows per arm: total-loss ratios3.638/4.298, localization6.575/7.490;2000 records give125 visits/frame. Original single-frame sampled500/750 passes imply8000/12000 equal-visit updates, without predicting fit. Actual live-v3 script/input/log/output hashes and full60894-member rootfs digest match; exit0, CPU-only/no forward/optimizer/intervention,2GiB/swap0/noOOM, and explicitly sampled memory rather than invented kernel peak. Three original owned scopes were freshly observed inactive/dead with empty control groups. Historical losses and sustained0/1000 interface status remain distinct from fresh inventory or quality acceptance; missing task43 inputs remain explicit. No original-source/result blocker found. This report does not authorize a refreshed candidate to land.",
+  "reviewed_path_pins": [
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/README.md",
+      "mode": "100644",
+      "git_blob": "c13c38107b4ece7d613f080a936f1dd44360503f",
+      "sha256": "24ba10901d68a71b49fdf392b4817e0994a90f515e20d6f89754a2338c242b6d",
+      "bytes": 9164
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/archived-evidence.json",
+      "mode": "100644",
+      "git_blob": "0173fc20b8b19993020485429bd37cfd99f2aad0",
+      "sha256": "1555dad92933b59a010c8371fd3a30776f1f59d2b3999dd3271efd42eee73ee1",
+      "bytes": 168055
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/inventory.json",
+      "mode": "100644",
+      "git_blob": "1f63ad1e81f39c7cc007f349c55608f1b72042db",
+      "sha256": "8fa0e64e7065064949943d871f2c828e1bc3d02b7f9136f5935d0dae973a0569",
+      "bytes": 82200
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/inventory_live.py",
+      "mode": "100644",
+      "git_blob": "02a8f70dddc57ed8ee54a50d6f4d5a9129c1ea5d",
+      "sha256": "3d9e1282f88aadecc8af34073f742c417111123f947caf30109f0572f32065d4",
+      "bytes": 7052
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/live-verified.json",
+      "mode": "100644",
+      "git_blob": "b1943096ccabce4599dd400f3630133a47dac7c9",
+      "sha256": "2d8cac94ce381a6c6f47dd2e7fadeeb0107a2f507c7dc48f21afdb0b1ebc54ec",
+      "bytes": 3763
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/next43.md",
+      "mode": "100644",
+      "git_blob": "84cf12fba1d61868db178f81a9a2b3cbdfce3e0f",
+      "sha256": "3fb611a57600e856cf229e3a2f8f3fd2cec8c821c14986f4c1997b22fc8d4ba7",
+      "bytes": 2455
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/provenance.json",
+      "mode": "100644",
+      "git_blob": "46916faea0a0a5084c6ae6c9f208dbc99295ff78",
+      "sha256": "e9cb4bd801cc80a9cdf1b593df67e41cd6b16df7e64ef383f2f4f330bdfc0346",
+      "bytes": 3114
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/source-pins.json",
+      "mode": "100644",
+      "git_blob": "e0d3606ae238923e8f345e44bc62f0c981a73e85",
+      "sha256": "0deecd3aec70cd91c399f86e27284519b55258c8f588eee1bc0d4fd97481a290",
+      "bytes": 4433
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/stop-verified.json",
+      "mode": "100644",
+      "git_blob": "c9930024153e54ec94950286d815bf09b8f75bbe",
+      "sha256": "7bdedec3c2b0342a5d649678171505e40dddb9a4d22a4fc30d45e611f67214b1",
+      "bytes": 1127
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/verification.json",
+      "mode": "100644",
+      "git_blob": "b16cd9ac2299f81a167e3a75d5a0ae87ca8a1215",
+      "sha256": "0ab02b9223023f11ee36c57f9495a88ff7ec4378ffab03b4cb6b059f6ba8b1d8",
+      "bytes": 3430
+    }
+  ],
+  "verification_receipt": {
+    "path": "/data02/home/philip.yang/devx/tmp/mac58-b-original-404b2af-independent-checks.json",
+    "sha256": "29edd28ff819ab965f3e051ecdec539390363cfbfd3287f865321960f8b94171"
+  },
+  "full_rootfs_readback": {
+    "path": "/data02/home/philip.yang/devx/tmp/mac58-b-original-404b2af-rootfs-readback.json",
+    "sha256": "236a499cbf658cfe9a6e0f966104eec0b85954a7f3afaf396f71625614e8ed23"
+  },
+  "actual_live_receipt": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/live-verified.json",
+    "sha256": "2d8cac94ce381a6c6f47dd2e7fadeeb0107a2f507c7dc48f21afdb0b1ebc54ec"
+  },
+  "original_candidate_worktree_clean_verified": true,
+  "scope_limits": [
+    "Original immutable source/result only; refreshed source, parent, runtime/input evidence must be separately reconciled.",
+    "Read-only raw Git/source/artifact/hash checks, restricted non-executing checkpoint decoding and three scoped read-only systemctl observations; no new scientific/model execution or matrix.",
+    "No scientific source/checkpoint/dataset/runtime mutation, training/GPU/optimizer/GT/HDFS/native-goal/Kata/Git-ref/index operations.",
+    "Preparation does not close43/50/53, establish native quality rescue, accept full MAC, or release any scientific payload.",
+    "Stop observations cover only three owned units at the recorded review census; no global process quiescence claim."
+  ],
+  "landing_allowed": false,
+  "NOT_REFRESHED_LANDING_AUTHORIZATION": true,
+  "NOT_TASK43_OR_FULL_MAC_ACCEPTANCE": true
+}

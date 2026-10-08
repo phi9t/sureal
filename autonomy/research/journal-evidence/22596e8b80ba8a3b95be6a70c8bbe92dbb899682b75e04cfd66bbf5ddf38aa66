@@ -1,0 +1,25 @@
+{
+  "authorizing_user_message": "approved for all actions",
+  "kind": "user-execution-authorization",
+  "live_acceptance_claimed": false,
+  "observed_base": "8466a07dcd7a51501ae69049b36d40d4fd7b57d6",
+  "plan": "docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md",
+  "plan_sha256": "f8b74add792c297b403c97a8562f7b1213adeec63f2ed7f85c7e53abc9e69af3",
+  "schema_version": 1,
+  "scope": "Reviewed Sureal-local collaboration plan inline execution with every independent live gate preserved; subsequent approved models/training migration follows its own gates.",
+  "shared_runtime_mutated": false,
+  "stage_order": [
+    "49",
+    "50",
+    "51",
+    "52",
+    "53.0",
+    "54",
+    "53",
+    "44",
+    "45",
+    "46",
+    "47",
+    "48"
+  ]
+}

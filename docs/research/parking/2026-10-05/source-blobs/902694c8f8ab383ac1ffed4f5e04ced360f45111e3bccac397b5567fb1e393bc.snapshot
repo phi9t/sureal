@@ -1,0 +1,18 @@
+import hashlib,json
+from pathlib import Path
+from pipeline.component_archive import create_component_archive
+from pipeline.component_archive_validate import validate_component_archive
+p=Path('/outputs');s=p/'source';(s/'lidar_box').mkdir(parents=True)
+f=s/'lidar_box/frame.json';f.write_text('{"boxes":[]}\n');digest=hashlib.sha256(f.read_bytes()).hexdigest()
+d={'files':{'lidar_box/frame.json':digest},'provenance':{'scene':'fixture','source_sha256':'a'*64}}
+a=json.loads(json.dumps(d,indent=2));b=json.loads(json.dumps(d,separators=(',',':')))
+assert a==b
+results=[]
+for i,v in enumerate((a,b)):
+ results.append(create_component_archive(s,p/f'{i}.tar',expected_files=v['files'],provenance=v['provenance'],other_bytes=0,budget_bytes=1024*1024))
+assert results[0]==results[1]
+assert (p/'0.tar').read_bytes()==(p/'1.tar').read_bytes()
+v=validate_component_archive(p/'1.tar',expected_archive_sha256=results[1]['sha256'],expected_manifest_sha256=results[1]['manifest_sha256'])
+assert v['files']==1 and v['provenance']==d['provenance']
+(p/'result.json').write_text(json.dumps({'status':'PASS live compact trusted input archive equivalence','archive':results[1],'independent_validation':v},indent=2)+'\n')
+print('PASS compact/pretty same trusted values, byte-identical archives, independent validation')

@@ -1,0 +1,108 @@
+{
+  "scope": "supplementary host reconciliation; does not replace live Insula check",
+  "command": [
+    "python3",
+    "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/verify.py"
+  ],
+  "exit_code": 0,
+  "base_commit": "b32307da442598e192a9259d29a8650be1134589",
+  "checked_document_links": [
+    {
+      "document": "next43.md",
+      "target": "archived-evidence.json"
+    },
+    {
+      "document": "README.md",
+      "target": "../../../tasks/43-frozen-normalization-diagnostic.md"
+    },
+    {
+      "document": "README.md",
+      "target": "provenance.json"
+    },
+    {
+      "document": "README.md",
+      "target": "source-pins.json"
+    },
+    {
+      "document": "README.md",
+      "target": "archived-evidence.json"
+    },
+    {
+      "document": "README.md",
+      "target": "inventory.json"
+    },
+    {
+      "document": "README.md",
+      "target": "../../../../../experiments/waymo-perception/tier1/catalog.py"
+    },
+    {
+      "document": "README.md",
+      "target": "../../../../../experiments/waymo-perception/tier1/models.py"
+    },
+    {
+      "document": "README.md",
+      "target": "../../../../../experiments/waymo-perception/pipeline/pillar_encoder.py"
+    },
+    {
+      "document": "README.md",
+      "target": "inventory.json"
+    },
+    {
+      "document": "README.md",
+      "target": "../../../../../experiments/waymo-perception/gpu/norm_variants.py"
+    },
+    {
+      "document": "README.md",
+      "target": "../../../../../experiments/waymo-perception/cohort/train_balanced.py"
+    },
+    {
+      "document": "README.md",
+      "target": "archived-evidence.json"
+    },
+    {
+      "document": "README.md",
+      "target": "../../../../../experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.md"
+    },
+    {
+      "document": "README.md",
+      "target": "../../../../../experiments/waymo-perception/cohort/sustained_loop.py"
+    },
+    {
+      "document": "README.md",
+      "target": "live-verified.json"
+    },
+    {
+      "document": "README.md",
+      "target": "stop-verified.json"
+    },
+    {
+      "document": "README.md",
+      "target": "next43.md"
+    }
+  ],
+  "parsed_json_files": [
+    "archived-evidence.json",
+    "inventory.json",
+    "live-verified.json",
+    "provenance.json",
+    "source-pins.json",
+    "stop-verified.json"
+  ],
+  "archived_train_artifacts_reopened": 102,
+  "sustained_stage_receipts_reopened": 14,
+  "model_cases_checked": 7,
+  "source_files_checked_against_base_blob": 16,
+  "owned_scopes_inactive": 3,
+  "evidence_sha256": {
+    "source-pins.json": "0deecd3aec70cd91c399f86e27284519b55258c8f588eee1bc0d4fd97481a290",
+    "next43.md": "3fb611a57600e856cf229e3a2f8f3fd2cec8c821c14986f4c1997b22fc8d4ba7",
+    "inventory.json": "8fa0e64e7065064949943d871f2c828e1bc3d02b7f9136f5935d0dae973a0569",
+    "archived-evidence.json": "1555dad92933b59a010c8371fd3a30776f1f59d2b3999dd3271efd42eee73ee1",
+    "stop-verified.json": "7bdedec3c2b0342a5d649678171505e40dddb9a4d22a4fc30d45e611f67214b1",
+    "inventory_live.py": "3d9e1282f88aadecc8af34073f742c417111123f947caf30109f0572f32065d4",
+    "provenance.json": "e9cb4bd801cc80a9cdf1b593df67e41cd6b16df7e64ef383f2f4f330bdfc0346",
+    "README.md": "24ba10901d68a71b49fdf392b4817e0994a90f515e20d6f89754a2338c242b6d",
+    "live-verified.json": "2d8cac94ce381a6c6f47dd2e7fadeeb0107a2f507c7dc48f21afdb0b1ebc54ec"
+  },
+  "elapsed_seconds": 2.617086211917922
+}

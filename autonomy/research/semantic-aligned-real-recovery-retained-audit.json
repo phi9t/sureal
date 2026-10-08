@@ -1,0 +1,36 @@
+{
+  "scene": "4759225533437988401_800_000_820_000",
+  "receipt_sha256": "c89474702cc5149e1ac922ba9898c54d6caffd28a812e4bd9c86730e61483c29",
+  "admission_pointer_sha256": "50a44368bc8c703e385c8677a557e047c196e2c8406de738dec898462fb03541",
+  "transfer": {
+    "sha256": "600b95f7ca09fb4b75f17d8a7ed11c786aee6ecc0f6ead83d93c3cf2ea04d178",
+    "archive_bytes": 3251701760,
+    "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/4759225533437988401_800_000_820_000/600b95f7ca09fb4b75f17d8a7ed11c786aee6ecc0f6ead83d93c3cf2ea04d178.tar",
+    "working_bytes_before": 1905901248,
+    "working_peak_bytes_before_consumer": 5157603008,
+    "working_limit_bytes": 16106127360,
+    "file_size_limit_bytes": 3251703808,
+    "transfer_contract": "native-direct-write-aligned-v1",
+    "transfer_alignment_bytes": 4096,
+    "transfer_padding_bytes": 2048,
+    "working_peak_bound_bytes": 5157605056,
+    "transfer_command": [
+      "timeout",
+      "--kill-after=10s",
+      "600s",
+      "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+      "get",
+      "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/4759225533437988401_800_000_820_000/600b95f7ca09fb4b75f17d8a7ed11c786aee6ecc0f6ead83d93c3cf2ea04d178.tar",
+      "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/semantic-recovery-staging/stage-xxtzhkev/scene.tar"
+    ],
+    "transfer_exit_code": 0,
+    "scope": "derived archive staging; not raw sensor reacquisition"
+  },
+  "independent_live_validation": {
+    "records": 1980,
+    "eligible_point_elements": 4626851,
+    "annotated_frames": 30
+  },
+  "status": "formerly failing real HDFS archive transferred, live semantic worker passed, separately live receipt-admitted, retained artifacts and code rehashed",
+  "scope": "one recovered scene; remaining20 and full103 reconciliation open"
+}

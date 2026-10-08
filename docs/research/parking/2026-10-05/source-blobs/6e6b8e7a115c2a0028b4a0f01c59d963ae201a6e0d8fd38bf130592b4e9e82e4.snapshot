@@ -1,0 +1,286 @@
+"""Root-owned literal live guards; independently authored observer does not import.
+
+These helpers preserve actual source equality and readiness identities. They
+neither reconstruct static Git authority nor grant native stop acceptance.
+"""
+import hashlib
+import json
+import os
+from pathlib import Path, PurePosixPath
+import stat
+import sys
+import sysconfig
+import time
+import types
+
+
+def digest(path):
+    with Path(path).open('rb') as stream:
+        return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def reopen(ref):
+    path = Path(ref['path'])
+    if (not path.is_absolute() or path.resolve() != path or
+        not stat.S_ISREG(path.lstat().st_mode) or digest(path) != ref['sha256']):
+        raise ValueError('literal exact artifact required')
+    return path
+
+
+def incarnation(pid):
+    text = Path(f'/proc/{pid}/stat').read_text()
+    values = text[text.rindex(')')+2:].split()
+    return {'boot_id': Path('/proc/sys/kernel/random/boot_id').read_text().strip(),
+            'pid': pid, 'start_ticks': int(values[19]), 'parent_pid': int(values[1]),
+            'uid': Path(f'/proc/{pid}').stat().st_uid}
+
+
+def argv(pid):
+    return [os.fsdecode(value) for value in Path(f'/proc/{pid}/cmdline').read_bytes().split(b'\0') if value]
+
+
+def process_scope(pid):
+    paths = [row[3:] for row in Path(f'/proc/{pid}/cgroup').read_text().splitlines() if row.startswith('0::')]
+    if len(paths) != 1:
+        raise ValueError('one actual unified scope required')
+    root = Path('/sys/fs/cgroup'+paths[0])
+    info = root.stat()
+    events = dict(row.split() for row in (root/'memory.events').read_text().splitlines())
+    return {'path': str(root), 'device': info.st_dev, 'inode': info.st_ino,
+            'memory_max': (root/'memory.max').read_text().strip(),
+            'memory_swap_max': (root/'memory.swap.max').read_text().strip(),
+            'oom_kill': int(events['oom_kill'])}
+
+
+def full_manifest(context):
+    started = time.monotonic_ns()
+    root = Path(context['source'])
+    if not root.is_absolute() or root.resolve() != root or not root.is_dir():
+        raise ValueError('literal reconstructed source root required')
+    expected, directories, entries = set(), set(), []
+    for entry in context['entries']:
+        rel = PurePosixPath(entry['path'])
+        if rel.is_absolute() or '..' in rel.parts or rel.as_posix() != entry['path']:
+            raise ValueError('unsafe raw source entry')
+        path = root/entry['path']
+        if entry['kind'] == 'commit':
+            if (entry['mode'] != '160000' or not entry.get('excluded') or
+                entry['path'] not in context['gitlinks_excluded'] or os.path.lexists(path)):
+                raise ValueError('excluded Gitlink changed')
+            entries.append(entry)
+            continue
+        if entry['kind'] != 'blob' or entry['path'] in expected:
+            raise ValueError('duplicate or unknown source entry')
+        expected.add(entry['path'])
+        directories.update(str(parent) for parent in rel.parents if str(parent) != '.')
+        info = path.lstat()
+        if entry['mode'] == '120000':
+            if not stat.S_ISLNK(info.st_mode):
+                raise ValueError('source link type changed')
+            data = os.fsencode(os.readlink(path))
+        elif entry['mode'] in {'100644', '100755'}:
+            if (not stat.S_ISREG(info.st_mode) or
+                stat.S_IMODE(info.st_mode) != (0o755 if entry['mode'] == '100755' else 0o644)):
+                raise ValueError('source file type/mode changed')
+            data = path.read_bytes()
+        else:
+            raise ValueError('unadmitted source mode')
+        if (len(data) != entry['bytes'] or hashlib.sha256(data).hexdigest() != entry['sha256'] or
+            hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest() != entry['oid']):
+            raise ValueError('actual source bytes changed')
+        entries.append(entry)
+    actual_files, actual_dirs = set(), set()
+    for directory, dirs, files in os.walk(root, followlinks=False):
+        for name in dirs+files:
+            path = Path(directory)/name
+            rel = path.relative_to(root).as_posix()
+            info = path.lstat()
+            if stat.S_ISDIR(info.st_mode):
+                actual_dirs.add(rel)
+            elif stat.S_ISREG(info.st_mode) or stat.S_ISLNK(info.st_mode):
+                actual_files.add(rel)
+            else:
+                raise ValueError('unsupported source entry')
+    if actual_files != expected or actual_dirs != directories:
+        raise ValueError('source entry union changed')
+    return {'schema_version': 1, 'kind': 'FreshSourceManifest', 'source': str(root), 'entries': entries,
+            'gitlinks_excluded': context['gitlinks_excluded'],
+            'started_ns': started, 'ended_ns': time.monotonic_ns()}
+
+
+def channel_layout(pin, forbidden):
+    root = Path(pin['path'])
+    info = root.lstat()
+    if (not root.is_absolute() or root.resolve() != root or not stat.S_ISDIR(info.st_mode) or
+        any(pin[key] != value for key, value in [('uid', info.st_uid), ('device', info.st_dev), ('inode', info.st_ino)]) or
+        info.st_uid != os.getuid()):
+        raise ValueError('channel directory incarnation changed')
+    for name in forbidden:
+        other = Path(name)
+        if not other.is_absolute() or other.resolve() != other:
+            raise ValueError('literal forbidden root required')
+        if root.is_relative_to(other) or other.is_relative_to(root):
+            raise ValueError('channel overlaps admitted source/writer roots')
+
+
+def check_ready(ready, expected, now):
+    if (ready.get('schema_version') != 1 or ready.get('kind') != 'ObserverReady' or type(ready.get('ready_ns')) is not int or
+        not 0 <= now-ready['ready_ns'] <= 2000000000 or any(
+        ready.get(key) != expected[key] for key in ('fixture_id', 'static_preflight', 'output', 'source'))):
+        raise ValueError('ready authority/identity/freshness differs')
+    process = ready['process']
+    actual = incarnation(process['pid'])
+    if any(actual[key] != process[key] for key in ('boot_id', 'pid', 'start_ticks', 'uid')):
+        raise ValueError('observer birth changed')
+    if argv(process['pid']) != ready['argv']:
+        raise ValueError('observer argv changed')
+    own = process_scope(process['pid'])
+    pin = ready['observer_scope']
+    if any(own[key] != pin[key] for key in ('path', 'device', 'inode')):
+        raise ValueError('observer scope identity changed')
+    if own['memory_max'] != '268435456' or own['memory_swap_max'] != '0' or own['oom_kill'] != 0:
+        raise ValueError('observer capped scope required')
+    members = [int(row) for row in (Path(own['path'])/'cgroup.procs').read_text().splitlines()]
+    if members != [process['pid']]:
+        raise ValueError('observer scope is not exclusive')
+    return actual
+
+
+def fresh_sources(admission):
+    """Reopen exact static authority, current raw packs and entire source trees."""
+    static = admission['static_preflight']
+    report = json.loads(reopen(static['report']).read_text())
+    command = json.loads(reopen(static['command']).read_text())
+    if (report.get('kind') != 'IndependentStaticPreflight' or report.get('status') != 'pass' or
+        type(command.get('exit_code')) is not int or command['exit_code'] != 0 or type(command.get('started_ms')) is not int or
+        type(command.get('ended_ms')) is not int or
+        not 0 <= command['ended_ms']-command['started_ms'] <= 120000):
+        raise ValueError('completed bounded static command/report required')
+    for name in ('stdout', 'stderr'):
+        reopen(command[name])
+    authority = json.loads(reopen(report['authorization']).read_text())
+    if authority.get('kind') != 'StaticRuntimeProbeAdmission' or any(
+        authority.get(key) != admission[key] for key in
+        ('auditor', 'operator', 'runtime', 'notification_schemas', 'fixture_plan', 'user_authority', 'source_profile')):
+        raise ValueError('static source/runtime/layout/authority differs')
+    results = []
+    for role in ('auditor', 'operator'):
+        pin = admission[role]
+        context = json.loads(reopen(pin['materialization']).read_text())
+        retention = json.loads(reopen(pin['retention']).read_text())
+        review = json.loads(reopen(pin['review']).read_text())
+        if (context != report[role+'_context'] or context['candidate'] != pin['candidate'] or
+            retention['candidate'] != pin['candidate'] or retention['tree'] != context['tree'] or
+            review.get('candidate') != pin['candidate'] or review.get('source') != context['source'] or
+            review.get('verdict') != 'pass' or not review.get('reviewer_native_thread_id') or
+            review['reviewer_native_thread_id'] == admission['author_native_thread_id']):
+            raise ValueError('raw context/review binding differs')
+        reopen({'path': retention['pack_path'], 'sha256': retention['pack_sha256']})
+        results.append(full_manifest(context))
+    for ref in admission['notification_schemas'].values():
+        reopen(ref)
+    for ref in admission['fixture_plan']['tools'].values():
+        reopen(ref)
+    reopen(admission['user_authority'])
+    return results
+
+
+def profile_bootstrap(profile_ref, interpreter_ref, helper_ref):
+    """Derive exact startup exceptions from both retained readonly executions."""
+    profile = json.loads(reopen(profile_ref).read_text())
+    reopen(interpreter_ref)
+    reopen(helper_ref)
+    if (profile.get('schema_version') != 1 or profile.get('kind') != 'PythonBootstrapSourceProfile' or
+        profile.get('interpreter') != interpreter_ref or
+        profile.get('stdlib_root') != str(Path(sysconfig.get_path('stdlib')).resolve()) or
+        type(profile.get('commands')) is not list or len(profile['commands']) != 2 or
+        type(profile.get('bootstrap_modules')) is not list):
+        raise ValueError('exact actual Python bootstrap profile required')
+    pins = profile['bootstrap_modules']
+    names = set()
+    for pin in pins:
+        if (set(pin) != {'name', 'path', 'sha256', 'observed_path'} or
+            type(pin['name']) is not str or not pin['name'] or pin['name'] in names):
+            raise ValueError('unique exact bootstrap identities required')
+        names.add(pin['name'])
+        target = reopen({'path': pin['path'], 'sha256': pin['sha256']})
+        observed = Path(pin['observed_path'])
+        if not observed.is_absolute() or observed.resolve() != target:
+            raise ValueError('profiled import alias changed')
+    for command_ref, flags in zip(profile['commands'], [('-B',), ('-I', '-B')]):
+        command = json.loads(reopen(command_ref).read_text())
+        expected = [interpreter_ref['path'], *flags, helper_ref['path']]
+        if (command.get('schema_version') != 1 or command.get('argv') != expected or
+            type(command.get('exit_code')) is not int or command['exit_code'] != 0 or
+            any(type(command.get(key)) is not int for key in
+                ('started_ms', 'ended_ms', 'started_ns', 'ended_ns')) or
+            not 0 <= command['ended_ms']-command['started_ms'] <= 120000 or
+            not 0 <= command['ended_ns']-command['started_ns'] <= 120000000000):
+            raise ValueError('two bounded actual readonly profile commands required')
+        stderr = reopen(command['stderr'])
+        stdout = reopen(command['stdout'])
+        if stderr.stat().st_size != 0 or stdout.stat().st_size > 1048576:
+            raise ValueError('clean bounded actual profile output required')
+        sample = json.loads(stdout.read_text())
+        if (sample.get('schema_version') != 1 or sample.get('kind') != 'PythonBootstrapSample' or
+            sample.get('interpreter') != interpreter_ref or sample.get('source') != helper_ref or
+            sample.get('argv') != expected or sample.get('stdlib_root') != profile['stdlib_root'] or
+            sample.get('bootstrap_modules') != pins):
+            raise ValueError('raw startup samples disagree with admitted profile')
+    return pins
+
+
+def module_closure(source_roots, stdlib_root, bootstrap_modules=()):
+    """Actual files; only profiled bootstrap names may have an exact import alias."""
+    roots = [Path(path) for path in source_roots]+[Path(stdlib_root)]
+    if (Path(stdlib_root) != Path(sysconfig.get_path('stdlib')).resolve() or
+        any(not path.is_absolute() or path.resolve() != path for path in roots)):
+        raise ValueError('literal pinned source/stdlib import roots required')
+    bootstrap = {entry['name']: entry for entry in bootstrap_modules}
+    if len(bootstrap) != len(bootstrap_modules):
+        raise ValueError('duplicate bootstrap module pin')
+    for entry in bootstrap.values():
+        reopen({'path': entry['path'], 'sha256': entry['sha256']})
+        alias = Path(entry['observed_path'])
+        if not alias.is_absolute() or alias.resolve() != Path(entry['path']):
+            raise ValueError('bootstrap import alias differs from exact target')
+    files, namespaces = {}, []
+    for name, module in list(sys.modules.items()):
+        file = getattr(module, '__file__', None)
+        if file is None:
+            if module is None or getattr(getattr(module, '__spec__', None), 'origin', None) in {'built-in', 'frozen'}:
+                continue  # Classified builtin/frozen modules are binary-pinned.
+            exports = {'typing.io': ['IO', 'TextIO', 'BinaryIO'],
+                       'typing.re': ['Pattern', 'Match']}.get(name)
+            parent = sys.modules.get('typing')
+            owner_file = Path(getattr(parent, '__file__', ''))
+            if (exports is None or not isinstance(parent, types.ModuleType) or
+                owner_file != Path(stdlib_root)/'typing.py' or owner_file.resolve() != owner_file or
+                not stat.S_ISREG(owner_file.lstat().st_mode) or
+                getattr(getattr(parent, '__spec__', None), 'origin', None) != str(owner_file) or
+                module is not vars(parent).get(name.split('.')[1]) or
+                type(module) is not vars(parent).get('_DeprecatedType') or
+                vars(module).get('__module__') != 'typing' or
+                vars(module).get('__all__') != exports or
+                any(vars(module).get(key) is not vars(parent).get(key) for key in exports)):
+                raise ValueError('unclassified pathless import: '+name)
+            namespaces.append({'name': name, 'classification': 'stdlib-class-namespace',
+                'owner_name': 'typing', 'owner_source': {'path': str(owner_file), 'sha256': digest(owner_file)},
+                'exports': exports})
+            continue
+        observed = Path(file)
+        path = observed.resolve()
+        exact_bootstrap = (name in bootstrap and str(observed) == bootstrap[name]['observed_path'] and
+                           str(path) == bootstrap[name]['path'])
+        if (not observed.is_absolute() or (observed != path and not exact_bootstrap) or
+            not (exact_bootstrap or any(path.is_relative_to(root) for root in roots)) or
+            (not exact_bootstrap and any(part in {'site-packages', 'dist-packages'} for part in path.parts)) or
+            not stat.S_ISREG(path.lstat().st_mode)):
+            raise ValueError('unadmitted imported-file body')
+        if name in bootstrap and not exact_bootstrap:
+            raise ValueError('bootstrap module import identity changed')
+        files[name] = {'name': name, 'path': str(path), 'observed_path': str(observed),
+                       'sha256': digest(path)}
+    return {'schema_version': 1, 'kind': 'ActualPythonImportClosure', 'files': [files[key] for key in sorted(files)],
+            'stdlib_class_namespaces': sorted(namespaces, key=lambda value: value['name']),
+            'roots': [str(path) for path in roots], 'observed_ns': time.monotonic_ns()}

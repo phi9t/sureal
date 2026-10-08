@@ -1,0 +1,38 @@
+{
+  "required_scenes": [
+    "1730266523558914470_305_260_325_260",
+    "4759225533437988401_800_000_820_000"
+  ],
+  "admitted_scenes": 2,
+  "scene_evidence": {
+    "1730266523558914470_305_260_325_260": {
+      "evidence": "scientific-camera-gap-1730266523558914470_305_260_325_260-verified.json",
+      "evidence_sha256": "b67ca27eb614d0f38c47e8fd45aaac99beb461e47d9815915300a296358e836a",
+      "checkpoint_sha256": "cbf1905d2ea8dfb91ce6fbc130072d6da770a5ddd0a8b9c8694d95a400624063",
+      "validation": {
+        "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+        "scene": "1730266523558914470_305_260_325_260",
+        "retained_files": 36,
+        "worker_receipts": 5,
+        "verified_evictions": 1,
+        "evicted_artifacts": 12459,
+        "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+      }
+    },
+    "4759225533437988401_800_000_820_000": {
+      "evidence": "scientific-camera-gap-4759225533437988401_800_000_820_000-verified.json",
+      "evidence_sha256": "2358fd41bae55c1d44a2ad25a2b1674a6b2b58a7760f30d70449d17bb8d1df97",
+      "checkpoint_sha256": "d59be9ac9708072f6655685420f0f06664e21d23c4a311b961dcf001e9e04621",
+      "validation": {
+        "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+        "scene": "4759225533437988401_800_000_820_000",
+        "retained_files": 36,
+        "worker_receipts": 5,
+        "verified_evictions": 1,
+        "evicted_artifacts": 14430,
+        "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+      }
+    }
+  },
+  "scope": "two original gaps only; full103 camera reconciliation separate"
+}

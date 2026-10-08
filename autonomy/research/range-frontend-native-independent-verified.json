@@ -1,0 +1,96 @@
+{
+  "receipt_sha256": "f47463101af55ee2db992bd3664a618a3afdff32950edd9eacf99a464f1a442f",
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/range-frontend-native-gpu-a/independent-audit",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/m3-live-b",
+        "/source",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/range-frontend-native-gpu-a/input",
+        "/mnt",
+        "--",
+        "python",
+        "-c",
+        "import json,hashlib,numpy as np\nfrom pathlib import Path\nd=json.loads(Path('/mnt/trusted.json').read_text());points=eligible=0\nfor r in d['rows']:\n p=Path('/source/reconstruction')/r['artifact'];assert hashlib.file_digest(p.open('rb'),'sha256').hexdigest()==r['sha256']\n with np.load(p,allow_pickle=False) as a:\n  assert r['laser']==1 and a['xyz'].shape[0]==r['points'];points+=len(a['xyz'])\n  eligible+=sum(int(label)>0 for label in a['segmentation'][:,1])\n  assert len(np.unique(a['pixels'],axis=0))==len(a['pixels'])\n  assert np.all(a['pixels']>=0) and np.all(a['pixels'][:,0]<r['native_shape'][0]) and np.all(a['pixels'][:,1]<r['native_shape'][1])\nassert points==157870 and eligible==152773 and {r['return'] for r in d['rows']}=={1,2}\nprint('PASS independent native support and original source hashes',points,eligible)\n"
+      ],
+      "exit_code": 0,
+      "stdout": "PASS independent native support and original source hashes 157870 152773\n",
+      "stderr": ""
+    }
+  ],
+  "validation": {
+    "status": "native both-return full-support range frontend forward/backward passed",
+    "frame": {
+      "context": "5847910688643719375_180_000_200_000",
+      "timestamp": 1548722489547369
+    },
+    "sensor": "TOP",
+    "returns": [
+      1,
+      2
+    ],
+    "native_shapes": [
+      [
+        64,
+        2650,
+        4
+      ],
+      [
+        64,
+        2650,
+        4
+      ]
+    ],
+    "points": 157870,
+    "eligible_point_elements": 152773,
+    "gathered_features": 157870,
+    "channels": 32,
+    "parameter_count": 472952,
+    "load_and_grid_seconds": 0.431271662004292,
+    "forward_backward_seconds": 0.8417931080039125,
+    "gather_seconds": 0.001672212005360052,
+    "peak_allocated_bytes": 2479648768,
+    "seed": 17,
+    "optimizer_steps": 0,
+    "device": "NVIDIA B200",
+    "scope": "engineering frame; native semantics backward and synthetic foreground square objective only; no trained gate, detector, or held-out accuracy claim"
+  },
+  "scope": "retained live GPU receipt/code/artifact identity and independent live source/support accounting; untrained engineering integration only"
+}

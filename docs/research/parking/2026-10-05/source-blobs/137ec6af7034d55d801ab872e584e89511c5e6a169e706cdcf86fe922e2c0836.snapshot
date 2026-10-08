@@ -1,0 +1,157 @@
+# Ticket50 native observation reconciliation
+
+This is a bounded correction to the admitted collaboration implementation plan,
+before ticket50 producer implementation or managed dispatch. The existing native
+research goal remains active. Canonical base is
+`a553645ef22761aa7708abf1ee109952a6cd2c38`; root fixture source starts at
+`8441d98b3c935ea39d048568b409efd92e261c91`, independent observer starts at
+`e07de852356b1d0f7e0acee787689060dd0e4979`. Journal126 is committed separately
+at `2da162926471b9fc941f330274b2b8ff9cfe9466` and awaiting integration.
+
+The normative [revision2 contract](</data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/observation-surface-proposal-2/proposal.md>)
+has SHA256 `b2016ee302a34dc7e787892c00c29872857c0675053b73b3894da476b82803d0`.
+Its [independent passing review](</data02/home/philip.yang/devx/tmp/collab50-observation-contract-review-proposal2.json>)
+has SHA256 `3b70ed6fcb1061b3041cbc1eb999420f3f7e126874e99362b47af18f579680dc`.
+The jointly declared [artifact interface](</data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/observation-surface-interface-1/interface.json>)
+has SHA256 `d44014cc2dd6eee9672a5e3641aadb1fe354f0711134191247e4c5d32d97c1a7`.
+Reopen these exact bytes before execution. A source test or review cannot accept
+ticket50 or retroactively repair fixtures A/B/C/D.
+
+## Source ownership and steps
+
+1. Root implements the public projection and capture in
+   `tests/collab/fixture_support/native_stop_fixture.py` and
+   `native_stop_channel.py`, with private component controls. Preserve literal
+   cwd, optional null versus omission, source=userShell, real lifecycle timestamps
+   and IDs. Account every complete original-connection frame from arm through
+   closing, retain consecutive hash-linked raw prefixes, checkpoints from actual
+   empty-buffer/nonreadable socket drain, real peer and monotonic cutoffs. Every
+   unsupported owned tool or partial/gap/write/cap condition remains UNKNOWN.
+2. Root implements a preflight-only immediate driver and source guards in this
+   same fixture-support package. The independent A50 author implements static
+   reconstruction, fresh whole-source equality, ObserverReady, channel reading,
+   initial event/read/kernel conjunction and close request in `audit_support`.
+   The independent reader must not import fixture-support or product-controller
+   modules. The driver records actual bounded command/process/resource exits;
+   it does not own the acceptance oracle or another queue. Both implementations
+   use the pinned interface above; changes require a recorded shared ruling.
+3. Freeze each immutable candidate before cold retention/materialization and
+   independent source review. Profile the exact new sources and actual source
+   guard/ready/closure path before admitting effects. Separate static preparation
+   has its own <=120s/256MiB/zero-swap clock. Live operator and observer clocks
+   each start at actual launch and remain <=120s. Source preparations count
+   against those clocks. The proposed115.05s schedule is a bound to verify, not
+   observed runtime evidence. Keep payload60s/128MiB, native timeout90s,
+   capture<=95s, requests<=2s, frames<=128, ordinary checkpoints<=64, complete
+   final checkpoint permitted as65, and combined fixture+channel output<=32MiB.
+4. Only after exact source, timing, resource, layout and shared-writer admission,
+   run one fresh non-managed E. Fresh sibling channel output is outside every
+   original writer-scan/source/canonical/commonGit/observer root. No PID or FD
+   exemptions. Static reconstruction precedes effects; fresh source guards and
+   an actual acknowledged ObserverReady precede sole creation. Arm original
+   connection before one shell request; the driver binds actual returned
+   creation/invocation/channel/payload receipts before immediate observer reads.
+   Initial <=5s interval requires real start event, all six native read methods
+   and independent contemporaneous live kernel facts. Both terminal observations
+   >=5s apart still require full terminal native item history, idle thread,
+   terminal exact turn, absent goal, empty queue/handles, all known births gone,
+   scope quiescence, no unexplained writers/gaps and unchanged source/caps.
+   After retaining both observations the observer requests capture-only close;
+   driver retains actual reaped recorder exit and the observer fully reconstructs
+   sources again before sealing. Independent live reinspection is mandatory.
+
+## Verification and retention
+
+Run RED-to-GREEN controls for every required corruption/refusal in the normative
+contract, plus the literal positive private component conjunction. Component
+fixtures have no native effects or milestone authority. Initial projection
+controls observed16tests with9 failing assertions before the correction and16
+passing afterwards. Continuous-frame controls observed6tests with7 failing
+assertions before source existed, then all22 projection/channel controls pass.
+These counts describe component verification only; source freeze/review and live
+E remain pending.
+
+Preserve all failed reports, raw reads, events, authority/source packages,
+worktrees and process dispositions. No release, cleanup, mutation retry or
+scientific job/checkpoint/trajectory/budget change follows UNKNOWN. Land verified
+owned work as ready; record unlanded contributions and blockers explicitly.
+The remaining order is50 ->51 ->52 ->53.0 ->54 ->53, then models/training44–48
+after their own plan admission. Every implementation milestone retains its
+independent live Insula gate. No managed dispatch before ticket50 admission.
+
+## Recovery and source rulings
+
+The compaction interruption did not reject implementation acceptance. On
+recovery, canonical remains clean at the base above and the same native goal
+is active. Partial root source is retained at `e1ebf9f`; independently authored
+observer source continues from `e07de852`. No native or Kata effect was repeated.
+
+Ruling: explicitly profile Python's installed startup files rather than admit a
+site directory or change interpreter flags. Actual `sitecustomize.__file__` is
+`/usr/lib/python3.11/sitecustomize.py`, resolving to
+`/etc/python3.11/sitecustomize.py`. Both readonly profile executions must return
+the same exact module name, observed alias, regular target and SHA256. The
+raw helper source and command outputs, interpreter, flags, exit codes, dual
+clocks and stdlib root are reopened before effects. A second alias to even the
+same target refuses. This preserves the approved literal import closure and
+records the machine's installed alias explicitly. Independent reader and root
+fixture implementations share the data contract, never implementation code.
+
+Root's42 private controls pass after observed alias/profile/static-binding
+failures followed by corrections. These controls exercise exact-file admission,
+retained raw command provenance, source mutations, wrong aliases, readiness,
+fixed actor roles, kernel birth and failed-command retention. They are source
+verification only; fresh-source independent review, actual profiles and live
+E remain pending. Prior A/B/C/D UNKNOWN reports retain their original meaning.
+
+Ruling: classify Python3.11's actual `typing.io` and `typing.re` class namespaces
+through their defining literal stdlib `typing.py` body, exact parent export,
+metaclass and exported-member identities. They have no `__file__` or `__spec__`;
+do not pretend they are imported files or builtin modules. Record their owner
+file/hash and classification separately. Unknown pathless objects, namespaces
+and counterfeit aliases refuse. The independent staticv2 preparation exposed
+this seam and remains UNKNOWN, with no native socket/thread/tool effects.
+Root's prior unconditional pathless skip was too broad and is tightened by the
+same data contract, using independently implemented code. New controls include
+the actual full import inventory rather than only small mocked maps: bounded
+RED had four failing tests (five assertions including namespace subcases), then
+all46 root controls passed at256MiB/zero swap. The earlier unbounded RED also
+hit the intentionally required readiness cgroup; the bounded reproduction
+separates that environment refusal from the import defect. Source freeze,
+independent review and a fresh actual static/live admission still follow.
+
+The same review found that an arbitrary object with a forged `spec.origin`
+string could claim builtin/frozen classification. Root's second bounded RED
+reproduced both cases. Require an actual ModuleType/ModuleSpec, the installed
+BuiltinImporter/FrozenImporter loader and a native registered builtin/frozen
+name; retain the classification. The complete48-control suite passes after
+this tightening. Its real-sys control initially overconstrained the whole
+inventory to one entry, while Python legitimately loads `_io` during source
+reads; it now asserts real `sys` classification without inventing a complete
+one-entry import union. No native effects occurred during any component run.
+
+R3.1 review then reproduced copied-owner, arbitrary-metaclass and wrong-definition
+counterfeits against frozen `fadad077`; the raw owner-file hash alone attributed
+those objects incorrectly. Their three root controls failed before correction.
+Bind to the actual owner/namespace/member objects at trusted guard load and
+verify definition names/qualnames plus metaclass method globals and literal
+owner-code filename. All51 bounded controls pass after this correction. The
+prior source candidate remains retained and is superseded for new admission;
+its positive component suite never accepted runtime or ticket50.
+
+An intermediate root commit `f562b961` was mistakenly made while two genuine
+positive controls still failed: class name/qualname live in type slots rather
+than `vars(class)`. Its suite failure and unadmitted source remain retained.
+Read those attributes through `type.__getattribute__`; the complete51 tests
+then pass (`8736fd`) at256MiB/zero swap before the corrected commit. This
+corrects the source claim; it does not rewrite any prior test/report or admit
+effects from the intermediate candidate.
+
+R3.2 review reproduced a replacement metaclass method with forged but matching
+filename/globals/qualname metadata. Capture and require the original function
+and immutable code objects too. Method-replacement RED `f23b5a` and corrected
+in-place-code RED `73ac96` precede53 GREEN `bdebe0`. The in-place control's
+initial setup was invalid (closure free-variable mismatch, then mock deletion
+of a code descriptor); those outputs remain retained. Its final control uses
+compatible closure layout and explicit finally restoration in a private test
+process. No source, native state or shared interpreter was mutated by it.

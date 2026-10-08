@@ -1,0 +1,9 @@
+{
+  "status": "first scientific point archive independently mirrored; replay pending",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/training-publication-a/receipt.json",
+  "receipt_sha256": "248dfa385a5d540e2d7863e22777f5f439d77a4e13c1e74533a7b7682c07407f",
+  "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/1730266523558914470_305_260_325_260/fae12ded2bb31c2e87a5d91811e09f9c45234a249a44f103bf82cf730abd1a6f.tar",
+  "working_set_bytes": 13060255069,
+  "archive_bytes": 3022008320,
+  "scope": "decoded point records only; camera images/native detector box assembly and full cohort acceptance remain open"
+}

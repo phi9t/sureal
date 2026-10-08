@@ -1,0 +1,18 @@
+# Bounded native GPU revalidation — 2026-10-03
+
+The retained balanced16 baseline checkpoints at 0 and 1,000 updates pass fresh resource-capped execution of the original independent literal transition and all-16-head auditors. A separate verifier repeated both executions. This admits bounded GPU revalidation evidence; full resource continuation remains open.
+
+| Retained step | Author elapsed | Author peak RSS | Independent elapsed | Independent peak RSS | GPU component maximum |
+|---|---:|---:|---:|---:|---:|
+| 0 | 12.70 s | 2,660,761,600 B | 12.69 s | 2,648,096,768 B | 625,548,288 B |
+| 1,000 | 79.06 s | 3,274,792,960 B | 78.71 s | 3,251,347,456 B | 1,805,349,888 B |
+
+Each execution used the existing exclusive experiment lock, the frozen 26-file resource layer, the original 295 native source files, genuine 16 GiB aggregate memory enforcement, zero swap, no OOM and complete process cleanup. GPU maxima are the maximum across the transition and head-replay component reports. RSS is the maximum of the separately measured launcher/worker/waited-child peaks under the aggregate kernel cap; it is not a sum of process RSS.
+
+All nonmeasurement fields match the historical and author results exactly: complete model, Adam, Python/NumPy/Torch/CUDA RNG, frame cursor, synchronized-time accounting, checkpoint identity and all sixteen inference heads. The 1,000-update literal reference recomputes the historical transition in transient memory; it does not advance or persist the producer trajectory. Only fresh `peak_allocated_bytes`, `peak_rss_kib` and `elapsed_seconds` differ. Original run/state/checkpoints/finals remain byte-identical. Scientific storage remains 14,495,101,235 bytes.
+
+Evidence: [author](sustained-resource-legacy-gpu-v2-verified.json), [author driver](sustained-resource-legacy-gpu-v2.driver.source), [independent verifier](sustained-resource-legacy-gpu-independent.json), [independent driver](sustained-resource-legacy-gpu-independent.driver.source). Independent report SHA256: `5b152a2235927d73009a3623fcf0bd296ab5a9a34a8cdca94494292937182181`.
+
+Two launch refusals remain retained: an unsupported systemd property and a scope name rejected by the frozen resource contract. Both stopped before a GPU worker started; neither counts as a passed live stage. Historical commands and evidence were preserved. Fresh commands replace only the output mount before the existing resource wrapper; the actual executed argv and every original parent remain bound.
+
+Still required before producer continuation: explicit legacy companion policy, actual complete seven-stage resource companions, checkpoint/resource/shared/parent recovery, production retention and keep-two release integration, and independently admitted full runner execution. Existing release still refuses. Original full native GT, V3, recipes, training/scoring/storage caps and class-complete fitting gates remain unchanged. The approved order remains resource admission, frozen four-case sweep, diagnostics 42 then 43, and isolated 41.2 ownership.

@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "scope": "bounded complete producer/replay/shared/raw-metadata HDFS preservation in exact disjoint bundles; no sealed companion, controller, runner or original/replay release admission",
+  "driver_path": "/tmp/sureal-resource-legacy-preservation-v2.py",
+  "driver_sha256": "c51928166393fc02cdf2355acc592beaf556e9fdb18f4d894666a4682818829e",
+  "bundles": [
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-checkpoint-a570042b0bb346998d80d8c9e64e9eab/verified-publication.json",
+      "sha256": "feda6ef5d10d5814f0d7e7a09cafff347e9a1c8c8fec1c27c48b87ee38c56e72",
+      "hdfs_manifest_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-sustained-baseline-controller20261003a-checkpoint-a570042b0bb346998d80d8c9e64e9eab/publication-manifest.json",
+      "kind": "checkpoint"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-checkpoint-a4c9151cec0046e298d649f4d7c73da3/verified-publication.json",
+      "sha256": "c15dab401fc7e06ec498a31db8f7f684918860e8d75eb8ab8cac52eaadee35d2",
+      "hdfs_manifest_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-sustained-baseline-controller20261003a-checkpoint-a4c9151cec0046e298d649f4d7c73da3/publication-manifest.json",
+      "kind": "checkpoint"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-checkpoint-4d9703a24b6e4cdfbf717fc4279e7c30/verified-publication.json",
+      "sha256": "a5d25792ef9d1f78c966d41b3454a1d80f2066fe02caafcdeb225e2430a277d7",
+      "hdfs_manifest_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-sustained-baseline-controller20261003a-checkpoint-4d9703a24b6e4cdfbf717fc4279e7c30/publication-manifest.json",
+      "kind": "checkpoint"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-checkpoint-2cce88e5aec944eaaf36374cc3c1a766/verified-publication.json",
+      "sha256": "45cae71d736f678880918d3a1995dda1fe099efebdc9934a3a7e79cbe5cf9aab",
+      "hdfs_manifest_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-sustained-baseline-controller20261003a-checkpoint-2cce88e5aec944eaaf36374cc3c1a766/publication-manifest.json",
+      "kind": "checkpoint"
+    }
+  ],
+  "original_native_sha256": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/run.json": "96dc607ae8238774ca875588d65eaf463f120227e161ae792a9187c8e6635d7d",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/state.json": "dac2ce421243c4750175f98152cdc1ce4ecb7e1a493ddee7050c42fcc09e7765",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-00/checkpoint.pt": "8057a5496c4d6ec4d19b9de33034c6cca753ea39d8f03fd765ad7011cdf301ee",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-00-admitted.json": "dde09eb7e6d65e781597da82870ca6c64ea5bff1ea77d31b8b8268ec5a0ad364",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-1000/checkpoint.pt": "37de2375b0b10f92a56468bd9ffe0b2fea42f257c5949efa80fd29c621a8ff4a",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-1000-admitted.json": "b0a874b87a2541ab13b2a97e36540b458b54bb0996c6e679a8c156d0160f52d9"
+  },
+  "source_inventory_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-preservation-controller20261003a-v2/expected.json",
+  "source_inventory_sha256": "abba01b883d20326c785b30748df6bfa367db4b98877f65d63aacb9c234fad5e",
+  "members": 10617,
+  "source_bytes": 3142088107,
+  "scientific_bytes_before": 15329280496,
+  "passed": true,
+  "complete_disjoint_recovered_union_exact": true,
+  "original_and_replay_payloads_retained": true,
+  "scientific_bytes_after": 15329280496
+}

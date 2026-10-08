@@ -1,0 +1,86 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sam-point-relation-all-a/coverage",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/m3-live-b",
+        "/source",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/range-frontend-native-gpu-a/input",
+        "/tmp/point-input",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sam-native-image-all-a/input",
+        "/tmp/image-input",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sam-native-image-all-a/output",
+        "/tmp/teacher",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sam-point-relation-all-a/output",
+        "/tmp/relations",
+        "--",
+        "python",
+        "-c",
+        "import json,numpy as np\nfrom pathlib import Path\nimage=json.loads(Path('/tmp/image-input/trusted.json').read_text())\nwith np.load('/tmp/relations/relation.npz',allow_pickle=False) as a:\n hits=a['projected_hits'];union=hits.any(axis=1);overlap=hits.sum(axis=1)>1\n groups={}\n for category in sorted({p['native_box_type'] for p in image['prompts']}):\n  indices=[i for i,p in enumerate(image['prompts']) if p['native_box_type']==category]\n  groups[str(category)]={'oracle_prompts':len(indices),'with_projected_points':sum(bool(hits[:,i].any()) for i in indices),'union_projected_points':int(hits[:,indices].any(axis=1).sum())}\n result={'oracle_prompts':hits.shape[1],'masks_with_projected_points':int(hits.any(axis=0).sum()),'masks_without_projected_points':int((~hits.any(axis=0)).sum()),'unique_points_in_any_mask':int(union.sum()),'points_in_multiple_masks':int(overlap.sum()),'by_native_box_type':groups,'scope':'whole-frame oracle teacher mask/native projection incidence; overlaps and zero support retained; no visibility or semantic improvement claim'}\n Path('/outputs/check.json').write_text(json.dumps(result,indent=2));print(json.dumps(result))\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "relation_receipt_sha256": "264524daa8bb8d810515c645bf20351117cc351ab63a161239ecbf883ce741eb",
+  "artifact_sha256": "a510eb02c6affb9aa34d6b93b28f0b7b7be06791606d4fb09801df5239884e95",
+  "validation": {
+    "oracle_prompts": 63,
+    "masks_with_projected_points": 26,
+    "masks_without_projected_points": 37,
+    "unique_points_in_any_mask": 1486,
+    "points_in_multiple_masks": 47,
+    "by_native_box_type": {
+      "1": {
+        "oracle_prompts": 60,
+        "with_projected_points": 23,
+        "union_projected_points": 1168
+      },
+      "2": {
+        "oracle_prompts": 3,
+        "with_projected_points": 3,
+        "union_projected_points": 318
+      }
+    },
+    "scope": "whole-frame oracle teacher mask/native projection incidence; overlaps and zero support retained; no visibility or semantic improvement claim"
+  }
+}

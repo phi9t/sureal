@@ -1,0 +1,8 @@
+from pathlib import Path
+import time,subprocess
+code=Path('experiments/waymo-perception/research');logs=Path.home()/'.cache/waystone/waymo-perception/insula/continuation-logs'
+for variant in ['masked_pfn','window_bev','coarse_mlp']:
+ while not (code/('architecture-'+variant+'-execution-verified.json')).exists():time.sleep(2)
+ for worker in ['run-followup-loss-audit.py','score-followup-score-first.py','audit-followup-score-first.py']:
+  with (logs/('architecture-'+variant+'-'+worker+'.log')).open('w') as f:r=subprocess.run(['python','.scratch/'+worker,variant],stdout=f,stderr=subprocess.STDOUT)
+  assert r.returncode==0,(variant,worker);print('PASS',variant,worker,flush=True)

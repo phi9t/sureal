@@ -1,0 +1,18 @@
+{
+  "status": "two scientific camera native-record replays independently checked live",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/camera-replay-15036582848618865396_3752_830_3772_830/receipt.json",
+  "receipt_sha256": "6cdd501e3aa3f8cd8d1a408bb3183ac839de5b1a666b8aa30a50818d1f71c50b",
+  "validation": {
+    "status": "all native camera fields/bytes match independent references; JPEG/PNG support decoded",
+    "rows": {
+      "camera_image": 990,
+      "camera_segmentation": 100,
+      "camera_box": 9198
+    },
+    "identity_field_digest": "617157e605957314e6198abbb44643f615cb185e29a8340ac4d14b0e801c5d82",
+    "camera_mask_pixels": 215500800,
+    "eligible_camera_mask_pixels": 215500240,
+    "scope": "native payload replay/geometry only; predicted task quality, semantic class mapping and global identity associations remain unevaluated"
+  },
+  "scope": "one scientific camera scene; task models, class mapping, full cohort and protocol remain open"
+}

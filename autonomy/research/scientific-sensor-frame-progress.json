@@ -1,0 +1,1333 @@
+{
+  "status": "partial frame-catalog/count reconciliation; full native enum/payload validation remains required",
+  "audited_utc": "2026-09-30T11:43:09.613217+00:00",
+  "scenes_checked": 87,
+  "pending_scenes": [
+    "447576862407975570_4360_000_4380_000",
+    "4759225533437988401_800_000_820_000",
+    "1024360143612057520_3580_000_3600_000",
+    "11048712972908676520_545_000_565_000",
+    "9243656068381062947_1297_428_1317_428",
+    "14081240615915270380_4399_000_4419_000",
+    "933621182106051783_4160_000_4180_000",
+    "12831741023324393102_2673_230_2693_230",
+    "6680764940003341232_2260_000_2280_000",
+    "18024188333634186656_1566_600_1586_600",
+    "8331804655557290264_4351_740_4371_740",
+    "2094681306939952000_2972_300_2992_300",
+    "4575389405178805994_4900_000_4920_000",
+    "7119831293178745002_1094_720_1114_720",
+    "5372281728627437618_2005_000_2025_000",
+    "13982731384839979987_1680_000_1700_000"
+  ],
+  "frames_checked": 17211,
+  "rows": [
+    {
+      "scene": "1730266523558914470_305_260_325_260",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 197,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-1730266523558914470_305_260_325_260.json": "82939a3842d1a421edca79835ecbca546164fea4895ddc1ba8a162a8aa27ba33",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-1730266523558914470_305_260_325_260.json": "56623cf07392e7a78a8cebe8978571524162f5c9a8c5996267855fe6cac3957c",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-1730266523558914470_305_260_325_260.json": "1931d061af896e95692e48a77cd28a2128397ed8b671f0e34fd1626a329ab32a",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-1730266523558914470_305_260_325_260.json": "ca67372f7da3af6d9aba3e8f54cc043d14cd284d4f7a34682bfd8217db52cade",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-1730266523558914470_305_260_325_260.json": "853c1c42e86cc385c13ad06cfa4db92b90e0885d6078bf11846cc623f4c9efe4"
+      }
+    },
+    {
+      "scene": "15036582848618865396_3752_830_3772_830",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-15036582848618865396_3752_830_3772_830.json": "aba284629b2e5367ee406bb4ae4ae1a13f9544c586a30e8cbe309e2936b5bdd5",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-15036582848618865396_3752_830_3772_830.json": "bf7da9ee53987ce4e1827d3498e50948ddb2338e452ffb3f169cf041f4f67202",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-15036582848618865396_3752_830_3772_830.json": "36332a2a9a18ddaa4283a83dda01dad708e7d61ba66d88ab7fdd8c0ce1bc9904",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-15036582848618865396_3752_830_3772_830.json": "dcc77e13966e68440d0e092f02ae34a999c6105c1106531ee38a99bff467f74e",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-15036582848618865396_3752_830_3772_830.json": "086c0b42f866bcde2e16f1f6eb40c62937a719d649354160262bcb01eb6ca174"
+      }
+    },
+    {
+      "scene": "11343624116265195592_5910_530_5930_530",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-11343624116265195592_5910_530_5930_530.json": "a52256cecee7d7e10ee2b93092f62e10b84ef84be4b629cc0202417119f2a0b6",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-11343624116265195592_5910_530_5930_530.json": "d57f73e796b51a13aac5104f713dbc0979f11aa786b488af836320d1a2b5137a",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-11343624116265195592_5910_530_5930_530.json": "a20daf5eaedd6d3195fd226ad028d1404eb62762063c292e9885bc2983f742fa",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-11343624116265195592_5910_530_5930_530.json": "65dcf6456f4edb11e3bf86470d026fc5e4f44aa5b7e49c54e872dfc7918d02a9",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-11343624116265195592_5910_530_5930_530.json": "2aeb24e625cffee266b27b9a48d2eea1d3024109204aa430ad5354227f1b0193"
+      }
+    },
+    {
+      "scene": "4447423683538547117_536_022_556_022",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-4447423683538547117_536_022_556_022.json": "936c53d3123cf0a10e0d401a63b8a512d52882827723c8c2cda462d9fcd5e877",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-4447423683538547117_536_022_556_022.json": "e8fe8048094f925e0b36bd1e03336b12ecf6dddb018a493fc9988bf306bad94d",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-4447423683538547117_536_022_556_022.json": "d745b7757da9d192c6bb2ef15634bd657dd1410e40ebc8feb153f4ec31563a6a",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-4447423683538547117_536_022_556_022.json": "4afb93d7b1e5a5195bb0b7bda4cfe5a426d2828ce466f9c5a273757436fbaa5c",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-4447423683538547117_536_022_556_022.json": "9d97486a3edc87de9a27f832c7f5863f3345b4048bdecdfacda4bf23f6af4b3f"
+      }
+    },
+    {
+      "scene": "14503113925613619599_975_506_995_506",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-14503113925613619599_975_506_995_506.json": "544ccf3e8a1d10b5f62e06ac021db4c31c867886154e6843e7a4fb108517c385",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-14503113925613619599_975_506_995_506.json": "a81e2149b0814f5ce19e0d6c6728e2bfa30043369bde01db06979c9470a20ce5",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-14503113925613619599_975_506_995_506.json": "5ccf9f694de1104f9bf4513db4bafbad140016c1d8c763ad356c5c20e3008de8",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-14503113925613619599_975_506_995_506.json": "a1d6504fabc09386e8e35e008d064b65e80d32f37cb22c8b71b725761bac14fc",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-14503113925613619599_975_506_995_506.json": "bff8ffee2d168f1731cbc1e62cd2adc7bd07ec0669a05748dbe9feb6d8138563"
+      }
+    },
+    {
+      "scene": "3375636961848927657_1942_000_1962_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-3375636961848927657_1942_000_1962_000.json": "b1cf0c427e369945423ff0c876bf6c213705f3d48b22a4d57a7ab325fe4b687d",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-3375636961848927657_1942_000_1962_000.json": "d9b4351dccd428db0da8ba42de24467be905c095c1170aa6402dee79ffe00f10",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-3375636961848927657_1942_000_1962_000.json": "7870139279cb4df427115254e4487132cd1fe4e21dadb01c6d9a2833ab3491af",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-3375636961848927657_1942_000_1962_000.json": "4dfdf7f257db76ace1c39731d19706129d7f6d305dd90f7a333970753d52b025",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-3375636961848927657_1942_000_1962_000.json": "22adaf8afbdd3e5c193434dd143b2fd95065e0c36d5181d50b20288f8fb53ee2"
+      }
+    },
+    {
+      "scene": "6813611334239274394_535_000_555_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 195,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-6813611334239274394_535_000_555_000.json": "20440d685e47572cd40b52dbcc00ff8c2c372bcd82551aec52ead20f109f25fd",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-6813611334239274394_535_000_555_000.json": "d739675c2f48a0d0baef25227a8708bbaeb2d4d8ff202c028de284b89b807992",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-6813611334239274394_535_000_555_000.json": "26cac80ee7de3b7ecd91c8fd51bb611d62011b2bd69ca616e9d487571208f602",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-6813611334239274394_535_000_555_000.json": "4c0f287d8ac2cc2f74e9a9bd5025c6745224228560e8cdd060ef7efb8c630761",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-6813611334239274394_535_000_555_000.json": "66d5884cf8a1fff5c09bf956c26c146ebbb83db0ef18376d53382d2b1a4de50d"
+      }
+    },
+    {
+      "scene": "990914685337955114_980_000_1000_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-990914685337955114_980_000_1000_000.json": "5deffb9eca6d3a183e5318b8565a3348a221c8827e0839d262a8cd43073a731e",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-990914685337955114_980_000_1000_000.json": "6e0818be70d0c34fe1504ab822aff92120c86e166b41bd0759efc6456bcae150",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-990914685337955114_980_000_1000_000.json": "cedd5e44bd1a0f693743931384f11737943eb8b5f75c5af162b985f858d54cdd",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-990914685337955114_980_000_1000_000.json": "16cbf6c05e7756941597eae701b0cac0818391377c1df1720c081bc2e4a96a4e",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-990914685337955114_980_000_1000_000.json": "ec5a3cf4844bc0af147c2d47f40dbfbfd644e2ba779036eb37ba41e715861b51"
+      }
+    },
+    {
+      "scene": "8796914080594559459_4284_170_4304_170",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-8796914080594559459_4284_170_4304_170.json": "48f264c17cfee07f8551f9d8c60ee23755b56f4247f32c5957fc83acd167ebc5",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-8796914080594559459_4284_170_4304_170.json": "73e6c9d7ed7f3d2ed9d54a87cfcaa45fa1aa7025116aed66ac415fa4dcd138f8",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-8796914080594559459_4284_170_4304_170.json": "cf16a07e58a7782b577a78521f36161dcd721de87e6dd3dbc995774557e9778f",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-8796914080594559459_4284_170_4304_170.json": "a7d871b7c0510a4ee29708c3b15e459b2d3404459057068a4d39b9b79cbac050",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-8796914080594559459_4284_170_4304_170.json": "2c7e1b40915bc0f19a186997230b961fb7bd0d41191a0cf758de944e26495683"
+      }
+    },
+    {
+      "scene": "12257951615341726923_2196_690_2216_690",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-12257951615341726923_2196_690_2216_690.json": "b29fe28a45e191cde76d26b3daaac96192348a2def4d95a7a30aeee4a028155e",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-12257951615341726923_2196_690_2216_690.json": "2979d526e236e31c3e92110fb7d2e3f6a299d6d5fca3e5cb633f3d3fb978410b",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-12257951615341726923_2196_690_2216_690.json": "d0603056f0b7d498709ba170f1e5cd0d0336c4ab1bd78dee5ef64bcd258be0a6",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-12257951615341726923_2196_690_2216_690.json": "47f2c97ccd212382dcaecee1a94f142791568da9365a56f20d77f5308b681bc8",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-12257951615341726923_2196_690_2216_690.json": "54c3c73c368615150cdd23ef83d23170fbbce1545d001eb984e8efa932f36f36"
+      }
+    },
+    {
+      "scene": "13186511704021307558_2000_000_2020_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-13186511704021307558_2000_000_2020_000.json": "698f3af3f95309081a8a803915e1d5ac51f57b3df27a4f0c9e27858945a27e85",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-13186511704021307558_2000_000_2020_000.json": "4985bddebba39b0de44c2860f230ef67e7516c2b758e77a1af2ea41964794ca1",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-13186511704021307558_2000_000_2020_000.json": "3ae13b525e48e434a1a963c7ffaf7e72571b046447285b68c53b1be3836ae03c",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-13186511704021307558_2000_000_2020_000.json": "55e94a35d54629dde2a2c20fcba8b45bdfd3dcec81feb7424879d136236751e8",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-13186511704021307558_2000_000_2020_000.json": "db1b0bf9f3e5ef2588fac55130931d587a222b50b8bac726517dd2361899faa0"
+      }
+    },
+    {
+      "scene": "17885096890374683162_755_580_775_580",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-17885096890374683162_755_580_775_580.json": "980fc50b5ed96a6770eb4009a37635e15a6025a7c7066baf80b2e27687a960a4",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-17885096890374683162_755_580_775_580.json": "b15500a3e80bc790cce78b189b3b62d254edd645a76f506d440e5a065cef8400",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-17885096890374683162_755_580_775_580.json": "5aecab1b340377e32d1edd2185bc0e1ba45fce8b9c94bb9fd13a10aa7f6e8a43",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-17885096890374683162_755_580_775_580.json": "4d51679e6c9e68d7123bb29f2e735c807793dc0e0addad4344c39f7d80fc4e06",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-17885096890374683162_755_580_775_580.json": "df27e6f0efd1ae72f639666292cbbb35d89c0aad9bdfb11d6b483dde7cc96228"
+      }
+    },
+    {
+      "scene": "7912728502266478772_1202_200_1222_200",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 196,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-7912728502266478772_1202_200_1222_200.json": "7759b7dbd7cfed3ac1ae4b922ced71127f8a5437a512c6b38940e6661f9976ad",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-7912728502266478772_1202_200_1222_200.json": "4da3f09466f2b2fa12de2fb0d43b4dffc953adee774ab562ec60d2c5e029f240",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-7912728502266478772_1202_200_1222_200.json": "44ce10898491b0d627f691c87bbb8704cdf9db1339ab50661c60a0a2f99ce1b4",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-7912728502266478772_1202_200_1222_200.json": "d03fadcffce88510c7d32abeadc498eadfc015cd47a61a37895e048a6822e5ca",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-7912728502266478772_1202_200_1222_200.json": "5dbcae2f28833ed0fe81cccc804cd0be4d61c26ea80462ab28d27f31b0b283bd"
+      }
+    },
+    {
+      "scene": "4723255145958809564_741_350_761_350",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-4723255145958809564_741_350_761_350.json": "a2865d112e886284bba12ca1778eb83fd49f92bd6aef70cc238c74b6ee0b97ff",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-4723255145958809564_741_350_761_350.json": "74e676b1f87d58739600cb90d6eccb0c53fbcf9dacb564f240a72a9d7c5b7b5f",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-4723255145958809564_741_350_761_350.json": "99cc1e2a6020caa0813baff96635a9b91e026389a403d08c78086e416cb4379c",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-4723255145958809564_741_350_761_350.json": "cddc306949d06ab354f89173b08c88628c79cbc25691134941a37a5e3011b713",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-4723255145958809564_741_350_761_350.json": "6ed640d976fd339a6f8d208b34257260dcfbab463462dada3a3de173fa70b6ac"
+      }
+    },
+    {
+      "scene": "8454755173123314088_3202_000_3222_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-8454755173123314088_3202_000_3222_000.json": "739ccad818c5a60cb12b2134198f0792bd22f2f900e1933708491de6d0f6be17",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-8454755173123314088_3202_000_3222_000.json": "38f5aa737284b2ad8cb99bed98c4166cf3f179cfe2f2645589864a72e72cd4c4",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-8454755173123314088_3202_000_3222_000.json": "0f11e793700b8273cb9fd807891905b164679893c2c76c7a7a15db97a615c796",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-8454755173123314088_3202_000_3222_000.json": "1ea08c6e5a8d454db14b791f6d22c6170daf165f9c4f4a0ab32b73a2c2881704",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-8454755173123314088_3202_000_3222_000.json": "f73bd2303ce27dc6b221fe6a7c6979cfc7f5a258f0e889ec1203b2a15d959ace"
+      }
+    },
+    {
+      "scene": "3894883757914505116_1840_000_1860_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 197,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-3894883757914505116_1840_000_1860_000.json": "0a2a475dd567359dba380d79de0389901677f6387ed30587d83b8c6ea1883ce4",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-3894883757914505116_1840_000_1860_000.json": "5cbeaf791f6705dac1e9ffa4ea0d049bf08d8d80d1f43d80103ca1b2147a640c",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-3894883757914505116_1840_000_1860_000.json": "9b9b38db17871e352ef06fe0a0912b91b8e0cac31638587a1c436d20495facf6",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-3894883757914505116_1840_000_1860_000.json": "00376cd6c324c2315f120008ada9e79a45615579f41fa011b5c3ee1cbb7c44f5",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-3894883757914505116_1840_000_1860_000.json": "3e55cc7e445bec96377b5e11091d2f1543c0605db7682d53aa5b8f304e3f2281"
+      }
+    },
+    {
+      "scene": "13271285919570645382_5320_000_5340_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-13271285919570645382_5320_000_5340_000.json": "19105f412db6fb15451679e21454f2ebd80a52c5e211b69d27fc67a338d49fa7",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-13271285919570645382_5320_000_5340_000.json": "9d549297de175ec2456867bc3d2cd57538899324573de06926ea182a313c4731",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-13271285919570645382_5320_000_5340_000.json": "0b7d1e37f928cc1f0176b0378ed9e7c0fa34c6d5ea3c05369f835d4c61cb233d",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-13271285919570645382_5320_000_5340_000.json": "ee22205b8265ab5b0a1cd9a952d300ea4821ed63d67aa9f0247e6c417faae776",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-13271285919570645382_5320_000_5340_000.json": "2cf27e92272b742f326c439c55cb6ccfa902a5d0a400da0397df4c83b2500b26"
+      }
+    },
+    {
+      "scene": "8345535260120974350_1980_000_2000_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-8345535260120974350_1980_000_2000_000.json": "ad5a668d037d96e5fff68ea5f5dab2bd30eaa198cfa70892279a500df8980909",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-8345535260120974350_1980_000_2000_000.json": "e3c690423fe33b6948c4dba9a0515093c22c81501b670833847e753f479c63ae",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-8345535260120974350_1980_000_2000_000.json": "966b43344914d6eaedd16d7e51706f662f9a4159133d17f344e173565af14447",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-8345535260120974350_1980_000_2000_000.json": "b23226471428a1f950a9d887f111cb3750877dbdc78718130ce10f97e98cbf09",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-8345535260120974350_1980_000_2000_000.json": "43a72c515058d58d0109cbb87b168856c82a7e1c346cd9e1a4205ccb834a8a29"
+      }
+    },
+    {
+      "scene": "1357883579772440606_2365_000_2385_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-1357883579772440606_2365_000_2385_000.json": "3d4e27b3ad82488695843dc2222602eff83de7ee92a86c9ccb58d81dd028bcdd",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-1357883579772440606_2365_000_2385_000.json": "44e883cc6ef3fef43137996054dd77dee6ef33ec46914a47f305abeca63ee956",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-1357883579772440606_2365_000_2385_000.json": "1384b3fc49abb830bf3acba12873e9b072d7d722ed36c280f1d7238eafdddc43",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-1357883579772440606_2365_000_2385_000.json": "0b13319ddad220decf5468650e862f31f8b338a2908107533cb881ec5a5c6281",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-1357883579772440606_2365_000_2385_000.json": "2d3146d7cc2e4d7dfe18485715045e31f5161e8c385b25a98846fc7874e80d9a"
+      }
+    },
+    {
+      "scene": "16977844994272847523_2140_000_2160_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-16977844994272847523_2140_000_2160_000.json": "84174394dbdce1b0efc62c1636efcf8dadc8ca32e983633867148c33c1bfaf36",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-16977844994272847523_2140_000_2160_000.json": "4600513c09fe8b348947dbc8cbae838472a290200bbb672216c2e3c596d9b00a",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-16977844994272847523_2140_000_2160_000.json": "9db1fab8c596403b7ff7bd09c72a6888a531a88f1685d08bdf9b4e9382c95eb2",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-16977844994272847523_2140_000_2160_000.json": "9a6e34decdbd86550daf98c4d91f2962b496569a0e17081d3d3928ae067c41a4",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-16977844994272847523_2140_000_2160_000.json": "2b944956979562ab35cafdc76f6140f2decdd9dca4f70ec980c0cf6c0199bca8"
+      }
+    },
+    {
+      "scene": "4487677815262010875_4940_000_4960_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-4487677815262010875_4940_000_4960_000.json": "148c8ea23a5d9f7499a8cf89e24296cce3b2008adac700bb22ce6bc8a1163775",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-4487677815262010875_4940_000_4960_000.json": "07af71e00f191520ab262c16a75745339aee75d0964f7ef67d9bcf65b13a21f9",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-4487677815262010875_4940_000_4960_000.json": "5824078902a87c373fe08746543f6d4d7632ac07ec9fec71dba033e5fe5fc709",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-4487677815262010875_4940_000_4960_000.json": "5bc8febf65868fc016de4209d66b5bba38fbfec2b4a502c8a9b56834739a4bb8",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-4487677815262010875_4940_000_4960_000.json": "9fba8548ef6b3e881d83148ea1edb6ec0a3ad0e3aebf005e95377127570ff880"
+      }
+    },
+    {
+      "scene": "809159138284604331_3355_840_3375_840",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-809159138284604331_3355_840_3375_840.json": "606be856bbe3cf7684d2a09fc356e89c61da1e5163de2777f9515b22d7680a53",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-809159138284604331_3355_840_3375_840.json": "753c80007b05a1c917c0056a88d551ce19aa411c9a535521454b2574576e378e",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-809159138284604331_3355_840_3375_840.json": "c68e611a1e85c0c614ed7726cade2770dfceb00054fba04316bd3bcfecd1be3f",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-809159138284604331_3355_840_3375_840.json": "96333c12c01fae4c968c0a1e822e1bc09b30f8b669112884c50666e39e02182f",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-809159138284604331_3355_840_3375_840.json": "6682ac4ad4a7c01738ba3ffa87a2b416bbdd991e3de98a9382b0e7e61c4417bb"
+      }
+    },
+    {
+      "scene": "3966447614090524826_320_000_340_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-3966447614090524826_320_000_340_000.json": "0d2e96d40aad7f8c13a29b2dff12404c2a93afccf059eb8af0c2f86db0419ae8",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-3966447614090524826_320_000_340_000.json": "4f072ff374e1779b9bdcd17efdaf2dcfab3449928069db50a407fcca42e36dbd",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-3966447614090524826_320_000_340_000.json": "e83f3e9fd1fdf59e00515cd28459bef51b9155a6f087f156887bbb39b055a468",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-3966447614090524826_320_000_340_000.json": "715141feb3089750ab8be84669e807b12cd24d8a1f5fca60c1129b4e2bb3910d",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-3966447614090524826_320_000_340_000.json": "844fa3f87b020c78a4869a86de26bedccf806bf0d738015e0040b6d13e8bbf0c"
+      }
+    },
+    {
+      "scene": "5083516879091912247_3600_000_3620_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 197,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-5083516879091912247_3600_000_3620_000.json": "22f102c5641b324282a2bd6880f17fabe4e1afd409b736008a91b67509514e1e",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-5083516879091912247_3600_000_3620_000.json": "39991bd087ca937939413447fe09014bacbe79fb8d9879f84fd76815b946efcb",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-5083516879091912247_3600_000_3620_000.json": "2088fd11bc334c39f0ef775652b6369b9cb65423d529f6bc1192bf6b0c686809",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-5083516879091912247_3600_000_3620_000.json": "54a2918793bb51769237a2ec86622bb8353bb3d80b5b8c7d59a7b0c4db155c33",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-5083516879091912247_3600_000_3620_000.json": "1773c07c25f7550fe9e1eae1f6a471b037362e89e3d738629b092be19ad7e671"
+      }
+    },
+    {
+      "scene": "6142170920525844857_2080_000_2100_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-6142170920525844857_2080_000_2100_000.json": "22572e396730b899055f74ce16859856dbe21f5f68e945f2d8b312693662758c",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-6142170920525844857_2080_000_2100_000.json": "884c262adc7ea91b694bf474bf63c6c003c1646d1623cdee640b6d23f25ee274",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-6142170920525844857_2080_000_2100_000.json": "c12a87ba7641aee6d3704f82e4be004559acd4e777a473467018e1d38faa3575",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-6142170920525844857_2080_000_2100_000.json": "a0accaa6f576a1f8cbddaa1c4eb370dcb0be522b689114f54afb6c0b01e62292",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-6142170920525844857_2080_000_2100_000.json": "5f56c4f2b38730410ab4763224a371232ec15e5dd67c529190ee09043ef12861"
+      }
+    },
+    {
+      "scene": "17782258508241656695_1354_000_1374_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-17782258508241656695_1354_000_1374_000.json": "c1fc40c0fd29316426ca4f6893cc2832467a42c1e540d9846be02db37afabc37",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-17782258508241656695_1354_000_1374_000.json": "f802c730fd47e5c7f77f6ae678df32fdd083977d1879026be21626702981eff7",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-17782258508241656695_1354_000_1374_000.json": "87cce409319eac3dd14d493fcdd3688b705eb38aaf5fc102e6146a0506ed0190",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-17782258508241656695_1354_000_1374_000.json": "b9c14d3ebf1d0a93d55eb4a9a05f510d38749fa7a66f6200fe2749900f8d856a",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-17782258508241656695_1354_000_1374_000.json": "93adbbd4e1926cb3db30547e5ad1829972e4707e829bbb50488532e7a83d54f0"
+      }
+    },
+    {
+      "scene": "13830510593707564159_5575_000_5595_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-13830510593707564159_5575_000_5595_000.json": "effb876a9746e3823e9d93b0dccdbcdb0e963a682dfefc4d3dbc20b93760f8da",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-13830510593707564159_5575_000_5595_000.json": "304dd906206b5477bc2e08baf47a76a40d51ba152779173bf3101fa1c250dc57",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-13830510593707564159_5575_000_5595_000.json": "a4f946fff1054b0928cbb278fee6a43feb8566153addfc2cb71cac65b8402c3e",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-13830510593707564159_5575_000_5595_000.json": "df179ebcae7647ff4c5b9bf5e5d60eec3bca655d703810ae946970e41870a582",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-13830510593707564159_5575_000_5595_000.json": "58f2b0621f8f5f6387dcfe37b98ef7284ed80f34ceda3131cf119a63f97e5731"
+      }
+    },
+    {
+      "scene": "14369250836076988112_7249_040_7269_040",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-14369250836076988112_7249_040_7269_040.json": "3d7fe75ba3499a741e64789b927320bf6c4f8719ea55c0acfc0e5753c10e5feb",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-14369250836076988112_7249_040_7269_040.json": "3e25b40da125a544c018bb129429598b9ba7cbfbb42ee4e0db6955ff931a7b79",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-14369250836076988112_7249_040_7269_040.json": "e08c0edf4dc991a31424f5a81f72762b06e673ef769e208cb7ddea6788589858",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-14369250836076988112_7249_040_7269_040.json": "314fecf2e65a84d2bd3941a5bbe005b38b0438c7165b073a437b00df40e0d04e",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-14369250836076988112_7249_040_7269_040.json": "c8d180fc5e4c55e3a767d898f66df23baefaa66500aae0a8d2cc6cd50e8fd58a"
+      }
+    },
+    {
+      "scene": "11004685739714500220_2300_000_2320_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-11004685739714500220_2300_000_2320_000.json": "10aef7017c499d35de89a678860fafb33c7be9b42a877e1747772fa9e85e4eb0",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-11004685739714500220_2300_000_2320_000.json": "57766cc02690b38b15246485e2b1b871b2dfff3579777a37046b15dfbd952cc8",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-11004685739714500220_2300_000_2320_000.json": "12855fc60ff9595cdd8fd463eb8a49caceb51b58c3c03bfb3ec85964c76cb556",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-11004685739714500220_2300_000_2320_000.json": "aa815ac76178cc1beb00f0c754b7547018972ed50beb2aac8f31e896f87cf65d",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-11004685739714500220_2300_000_2320_000.json": "3b2438c528eb21ae0c4f6d615b237badcb418839b8a197371a291b1b80045438"
+      }
+    },
+    {
+      "scene": "15539619898625779290_760_000_780_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-15539619898625779290_760_000_780_000.json": "27809e1acf7806f8c41f28399a28ca4afc06b20217f46b3767ed338ffaf3bf93",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-15539619898625779290_760_000_780_000.json": "b0fb00f0e5de15f43bb34f06f1d764a5fb6a19549a45a27d25d3dcc4e1b2c8a5",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-15539619898625779290_760_000_780_000.json": "f475dda124b1e994c093c01d959c29e323a9a5c3a3fa1cd5ae15da879787743d",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-15539619898625779290_760_000_780_000.json": "1a239d46d31a6bcd82d81dafbbb30dd4dd1e0825082559c661d804e11fb87d55",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-15539619898625779290_760_000_780_000.json": "1ce8463ead350c8fb405065607ae656d0d161b29dbce9acd5d2032a04f3497ae"
+      }
+    },
+    {
+      "scene": "14004546003548947884_2331_861_2351_861",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-14004546003548947884_2331_861_2351_861.json": "3b9b210e8985ea6301fc3b4a17621f855248e305c4c98cd04414225917b59d22",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-14004546003548947884_2331_861_2351_861.json": "3e7e32921a4c35319054d73f516a7f1788145df61eb1917e47c3d1c5e6b63207",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-14004546003548947884_2331_861_2351_861.json": "dce2a3bc38ebed287aa668dace3b4378d3ccdf8f3bba379aaa87afb72f00d7a5",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-14004546003548947884_2331_861_2351_861.json": "913d99bab4ca526ab426033746700e08989f54b3ef303694ee8cd378d1e1be5d",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-14004546003548947884_2331_861_2351_861.json": "fae27b07264deed0a1a52b582a3aac87b232cbcaf54780bd113d27e22cc31e79"
+      }
+    },
+    {
+      "scene": "1005081002024129653_5313_150_5333_150",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-1005081002024129653_5313_150_5333_150.json": "3d6d20169a82c2b69957740201dca338ab25a9869e0456f79e3c294ea94ab873",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-1005081002024129653_5313_150_5333_150.json": "93a486dfaa7f1583c16da5d29ea89da6f3e7365dda1011ff231d6b9938658f7d",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-1005081002024129653_5313_150_5333_150.json": "b2e9c57ac110c8e3cb22b65a396e072e560041440d90375463f404628a61bb08",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-1005081002024129653_5313_150_5333_150.json": "3f7b8fd8b1044da708274b80aa6b61040dfda8050792ff979f48f784a4d234ab",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-1005081002024129653_5313_150_5333_150.json": "0972c6d9ccd336c12daba7fd04f80061ed32a83c278d01d62341140ae9d50c62"
+      }
+    },
+    {
+      "scene": "13506499849906169066_120_000_140_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-13506499849906169066_120_000_140_000.json": "688170abccb0c13a86de4365af2c32d25e8e8a284bf95a1fd6428ce0bc6b319d",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-13506499849906169066_120_000_140_000.json": "f1266d7915e3c44f2f51f821075ce9932f11c6a8803aaae3d5ce1943148ab5ab",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-13506499849906169066_120_000_140_000.json": "b1d332f768d64b69dcfebc510892abd4a73cd06fa62a926340d099f541095e27",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-13506499849906169066_120_000_140_000.json": "fe48c5fac6552e68195306e5e1f6d4d333edffe2c0726b71ab895175bf48c245",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-13506499849906169066_120_000_140_000.json": "cddaaa33e5bc0dc613bd8b9ca8b28c4a35b585426a98534ac30d3faba9c5eb64"
+      }
+    },
+    {
+      "scene": "6559997992780479765_1039_000_1059_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-6559997992780479765_1039_000_1059_000.json": "6c6c1bbc8d17157587f59ba26e307e0611c7761a286c82c77e0b17869500c3bf",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-6559997992780479765_1039_000_1059_000.json": "d07cc2bbdfba7300473446fd1a41dce2f411eb34d17e19207aba0a52a5395c68",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-6559997992780479765_1039_000_1059_000.json": "1934f7225fffea510f1cc7957039119c577aea54b441c4264f0c8a7c35358b45",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-6559997992780479765_1039_000_1059_000.json": "74a47056024fe7cc4d1f92c549f6e212000b7c49d2b7b4e6ee23f62ece6915f6",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-6559997992780479765_1039_000_1059_000.json": "a4ad020021edfad0e3f6abab6c08dfbe0a47e93b9b527a938c00b79f004508d8"
+      }
+    },
+    {
+      "scene": "3224923476345749285_4480_000_4500_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 197,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-3224923476345749285_4480_000_4500_000.json": "7469f611253c804648a720ada855ad72c06624150eedd46508c8d98e1ffade25",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-3224923476345749285_4480_000_4500_000.json": "99a11c115bc9763b212f752ca88fbfd7840ca4f34c635244d83c4c7389db46a5",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-3224923476345749285_4480_000_4500_000.json": "d8a7145495e097efbc6779dbd1ab47021c6e04b8289eec8f113369118118302f",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-3224923476345749285_4480_000_4500_000.json": "e6407a3705257c119f3375a4b21e7a0d8d380d3ec1e5b8969fd6ae2bcc1f1049",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-3224923476345749285_4480_000_4500_000.json": "ccf5bb3c6f35ace8ddcb7bd5905cc79a974f14126047e6db991c708412d71122"
+      }
+    },
+    {
+      "scene": "14250544550818363063_880_000_900_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-14250544550818363063_880_000_900_000.json": "3413f781705ade558245fab68ae51f525ef0f08374250a6aec4f3bb15ecd3ba8",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-14250544550818363063_880_000_900_000.json": "32d42f7c9ef17efef188614e9d4ae2f999983cec1bda186cb0ace3929bf73fec",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-14250544550818363063_880_000_900_000.json": "cdce0515a44c8a12206a98d30fec30650375b178c66563f9fc06033db83ca173",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-14250544550818363063_880_000_900_000.json": "da82bdbbbaf2010cdd71f1308b51ffa55e70efe8e127f9096d1b0875394ad147",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-14250544550818363063_880_000_900_000.json": "f7afc80f2d458f1da4f905bad67f4d0004992b257468ffe47abb75d2e56210d6"
+      }
+    },
+    {
+      "scene": "2088865281951278665_4460_000_4480_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-2088865281951278665_4460_000_4480_000.json": "9d848e072abc46e19407b0eb2fda45650ae51fdf6ff8a3e477a5a13e420da7af",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-2088865281951278665_4460_000_4480_000.json": "0c58d1dd99a6e74e1fd5aec77ae28ec5338312ad72e56dbc9bbc0c2597f4ffbc",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-2088865281951278665_4460_000_4480_000.json": "a0a9582e98fc6efbb43a0ef99563e9245435494ec884bf9422984d25a1a94ad8",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-2088865281951278665_4460_000_4480_000.json": "0c24d95e450a8446fa15db753289813dfddb8d67c6f7a05cbd0d71eca4d51bc2",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-2088865281951278665_4460_000_4480_000.json": "e2ed1a10e00fa516871d1312d093ea8c3f2347376dd17126327b59ee3e839f2c"
+      }
+    },
+    {
+      "scene": "12856053589272984699_1020_000_1040_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-12856053589272984699_1020_000_1040_000.json": "bbd6210eea86f91f0749d036b0c3eeca49bc898adf1c1d451e4efb700c03c509",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-12856053589272984699_1020_000_1040_000.json": "fbf0bd1294b95a1701f4feb1ab112710df5f1dc85f666df80abc26a9820caedd",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-12856053589272984699_1020_000_1040_000.json": "58e0faa9e8bff737cc95708722688b0a0069c2f8f953f07b499d1d3ab259e375",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-12856053589272984699_1020_000_1040_000.json": "2ddc4839f8db70f37394325b33d3062ebd308953f9a2b6fe5ad1524956a14624",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-12856053589272984699_1020_000_1040_000.json": "f65d93d3a32e995a7c6ae4df0ca48bac7602c4728c89da940363d0a9b59a2e82"
+      }
+    },
+    {
+      "scene": "11489533038039664633_4820_000_4840_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-11489533038039664633_4820_000_4840_000.json": "acc3b00d247f9edb225ac09c37d9f0e603ed02de5c803e80f8d494a81d1a6fed",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-11489533038039664633_4820_000_4840_000.json": "f7a69297046e78b32dde2e71bc1d6a4b25931167391b3a3888152477e4716920",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-11489533038039664633_4820_000_4840_000.json": "16a1f04f2787382174cba3ce417bef2f68ce4869b669b4bc305e9c128187cf1a",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-11489533038039664633_4820_000_4840_000.json": "52066b8cc331802a17830df045f980824565446c4ac065e9000ace76e3dbfe94",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-11489533038039664633_4820_000_4840_000.json": "1c125db36b7cea1273009c08e05bf9700e0c26dcd6ec0aec4ed01a1b87339c7f"
+      }
+    },
+    {
+      "scene": "13619063687271391084_1519_680_1539_680",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-13619063687271391084_1519_680_1539_680.json": "76e577282a65c319b2539b8d9bd79c54a9829b8af3fd1ad92421274ad4a719d7",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-13619063687271391084_1519_680_1539_680.json": "82243206992d779ae62b52343761ed1aa4873e0e7c3402a87f8d7fd2ca0666bd",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-13619063687271391084_1519_680_1539_680.json": "ab8fd1f4801ed03154810832b28f09a99ed118b3a8a5698c902f6721803628a2",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-13619063687271391084_1519_680_1539_680.json": "db1d02363dd0ba3503b359509037717ab3ca73960b8668580b0ae6c225b04f3e",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-13619063687271391084_1519_680_1539_680.json": "eaf5ddc0a94ca1573a54653e6a1954594900fbbf204098fd3fa857c142bbb107"
+      }
+    },
+    {
+      "scene": "15628918650068847391_8077_670_8097_670",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 197,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-15628918650068847391_8077_670_8097_670.json": "104b38a35f74acf529157a4f993308f394cd324382e9c3167a20262e24a379d1",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-15628918650068847391_8077_670_8097_670.json": "0e3abcd045e5542265d6d70114ae82d6cb2faf2fd0758a94fd82431b87b99c3c",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-15628918650068847391_8077_670_8097_670.json": "4f361571e0726408b7048f41cb32cb5b3960bda744ea83a1eb1be3fb70239634",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-15628918650068847391_8077_670_8097_670.json": "a5652ddc8a240ee91ae543da552641150521c6bcd6bbcfd883c3e54ea46b8596",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-15628918650068847391_8077_670_8097_670.json": "aac8c737056b7d41e170361dd165aaf187e2c4432262fd473ba3419255085304"
+      }
+    },
+    {
+      "scene": "14098575914252965554_511_000_531_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 190,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-14098575914252965554_511_000_531_000.json": "a291e7d452c2693d96aceb89aadd4d17a5f37396bb5a7968be8b296ea1865262",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-14098575914252965554_511_000_531_000.json": "906ba630141c97a08fb31b3feb941ba9dcc4702928319ca9ce564d36b8c28b7d",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-14098575914252965554_511_000_531_000.json": "11eb774ab1a47a1e8e83e5f6d39973ebd4540ffc51f02e4450fbe312d4388d02",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-14098575914252965554_511_000_531_000.json": "866cd7c2ec11a56f9f1729ba79bfc5b5df06ff6d7eafea8a5512e3dc74ab9e1e",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-14098575914252965554_511_000_531_000.json": "36b21aebbc06dab83931ca4e5e7195501f4ade2e1074ebd6674140f6fce0ef53"
+      }
+    },
+    {
+      "scene": "10734565072045778791_440_000_460_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-10734565072045778791_440_000_460_000.json": "915a584d6eb7938b575e4675f45b6907d081b67ff475e52420f2851349ca82b9",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-10734565072045778791_440_000_460_000.json": "60fc7329e19b6016f3409718b49069ca2e9400a4176dc35a2e163caaa2f67ed5",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-10734565072045778791_440_000_460_000.json": "49b695c26d8f1997e725d1c4d5c0e425e90e5ee86d2ad667ad0973fa69fd789b",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-10734565072045778791_440_000_460_000.json": "191af260c6dceee860dc6718ea431dbaf4b6b584cbfca0045ba54ef457e0d291",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-10734565072045778791_440_000_460_000.json": "1897ed69afa9611ef889566c5f49eee8c890b80329e7d555140aa84bf75e1f49"
+      }
+    },
+    {
+      "scene": "2681180680221317256_1144_000_1164_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-2681180680221317256_1144_000_1164_000.json": "ea063a6b25081fefafc024e9fcdc1ac59efc6530ae1b3ab02353485ed63995e2",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-2681180680221317256_1144_000_1164_000.json": "275f61d1caa7383954feaf7230269eae186510a4e4ae227945668763c016a687",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-2681180680221317256_1144_000_1164_000.json": "6bd9a354aee1dff569192cba5ce5bb3264753ce8b3981fba8fdabebbc1956b42",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-2681180680221317256_1144_000_1164_000.json": "30978648c741ceb2d840098e223640943b7c7a4364f98ae687aaac8c787ab30d",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-2681180680221317256_1144_000_1164_000.json": "5dd65ef69c60400d8fcd19adfd14639b3e4addc6bf07157f7313bca2df434be5"
+      }
+    },
+    {
+      "scene": "8722413665055769182_2840_000_2860_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 197,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-8722413665055769182_2840_000_2860_000.json": "3e6746045a87b6c815223116252dc6622b619286b8c7466339ca4b5fb508bed5",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-8722413665055769182_2840_000_2860_000.json": "09f3619a946c394c880277a3fa3ab658b17cfd74ba39b53e1e3ec1bce73d0ed0",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-8722413665055769182_2840_000_2860_000.json": "86a45c0968e7fd34e4e88a27afc9c46b2bfc95e8b31e2dd402882d3ed7a9d5e8",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-8722413665055769182_2840_000_2860_000.json": "e5add7265a7e96f5d3d858b6e21d7659c1d04e89964ed3a0cf6d5f98ee880779",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-8722413665055769182_2840_000_2860_000.json": "a9e1cd017ea1f8898cc99959262c78302a2d0c4bcbc4fd3d487c02c9f096d497"
+      }
+    },
+    {
+      "scene": "12012663867578114640_820_000_840_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-12012663867578114640_820_000_840_000.json": "da14683c02a8115512b87aaaab320ca11238da4b991fa710aca5568c2a6e20f0",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-12012663867578114640_820_000_840_000.json": "d280391e1103d0319d2a7bdb864706a357a69596562bb384769e5a4c9c48d856",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-12012663867578114640_820_000_840_000.json": "a481b7fe333357de85717cce1e1a62e54a16ce8573a06a6a709274abf0a60a88",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-12012663867578114640_820_000_840_000.json": "ba72338f31d7fd49dda3821a9a21774e7e53d0209ab485a2453f428c5b7aedd2",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-12012663867578114640_820_000_840_000.json": "4b578e376c0c9acba002ac6c7575025fca38c6cb2da97119d32a12d206c8f0ff"
+      }
+    },
+    {
+      "scene": "9907794657177651763_1126_570_1146_570",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-9907794657177651763_1126_570_1146_570.json": "15a63ea768f3e2ad941270440cd531782a1c25930458c7b4f2d204570a683623",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-9907794657177651763_1126_570_1146_570.json": "0b8014eb87a46cf53aa9a78e3b3864ec6fe186a8948cf0ad86abb45700588286",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-9907794657177651763_1126_570_1146_570.json": "de9d0975ee108ceee1b6476ba7e4d874c86e585b90e0cf8b2b617b2fb55c3a88",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-9907794657177651763_1126_570_1146_570.json": "d14ed613cfc566637fed09fa2c78f80c9c1e978b6b763c13026c6494533fec03",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-9907794657177651763_1126_570_1146_570.json": "07918e923d4d639c323aaa445fcc314d0cda65cea43ae166ad26ea6b1b7b7992"
+      }
+    },
+    {
+      "scene": "13807633218762107566_6625_000_6645_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-13807633218762107566_6625_000_6645_000.json": "388b5ab7df7d96602611689fa95fc13f38b1efff1e9fd09bb3e492c617b93ad6",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-13807633218762107566_6625_000_6645_000.json": "714ba8107def756f68e2d1e8b91fb17aa3b99d227eea4f84184461d35da644c9",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-13807633218762107566_6625_000_6645_000.json": "efee0f49e4e00a6434e46876be42d2126bb276c08cb375a300d44a582407bece",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-13807633218762107566_6625_000_6645_000.json": "0f10d163b3d5e0e0f87c86074a4f045e50c92e0f02952cc33dfdc6923e7ab86c",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-13807633218762107566_6625_000_6645_000.json": "a76394262a23aeaff711914cec1c3392ba84f6935ce6e6632853b4a0a467e475"
+      }
+    },
+    {
+      "scene": "7850521592343484282_4576_090_4596_090",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 197,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-7850521592343484282_4576_090_4596_090.json": "3e3d0813cf4beec59ada3d0b62fc5439da95e77cfd6c85f97164f942bfd89bbf",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-7850521592343484282_4576_090_4596_090.json": "aa09de1db5d0755e79bd91fd95732f3cd9ebe28b917871cc72144c83d8c79783",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-7850521592343484282_4576_090_4596_090.json": "efcca7eb993c6dd25302115da6d67f15dafca7a0b108f666dbfe8905a34ac4be",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-7850521592343484282_4576_090_4596_090.json": "c462946b6756b122908ce7947bfb02e90a6c93306c482cb8ea2b12a033e55c16",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-7850521592343484282_4576_090_4596_090.json": "4c3d104ed5d4d5927b863942220b5d181683827ee483160d40c107b75f605f2b"
+      }
+    },
+    {
+      "scene": "12303641360375776820_4378_000_4398_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-12303641360375776820_4378_000_4398_000.json": "3ade18d8e718f7513c3b9412102735af28fffc162ffca42462ec17d06720af96",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-12303641360375776820_4378_000_4398_000.json": "aa3e24813c268ef99b4bd6cfee273b2e17e258b7820b9d87dc56830e7c15f52d",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-12303641360375776820_4378_000_4398_000.json": "04970d555c0654d2197114f232967ac0c0fa4adf57206f26011cb2f45aaf0564",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-12303641360375776820_4378_000_4398_000.json": "e0ec8c537983d8316224eac3bca4580a635864a74aa97c0eb1608ff025848f42",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-12303641360375776820_4378_000_4398_000.json": "ecc34b15488af01ea9b0fc2ed84d49fae4e40bc10c08feed794b5b0572679417"
+      }
+    },
+    {
+      "scene": "2415873247906962761_5460_000_5480_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-2415873247906962761_5460_000_5480_000.json": "cbe1233f385ce7a6b2d90f32017b64f370446d6b4d987b923fe954240bca05fa",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-2415873247906962761_5460_000_5480_000.json": "e627553a8faa500c9d623924769d22c435bdc74c128407b51af17f56d2108993",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-2415873247906962761_5460_000_5480_000.json": "0108edd5f88d331e23e17914ca84ee160851a966f02113d92e57e36d7483c0bb",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-2415873247906962761_5460_000_5480_000.json": "10cd6e689543bf061c8219db57d4a8a1b5e3e04fffa7b188a9af59372f3b9d38",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-2415873247906962761_5460_000_5480_000.json": "7cac11e23816bddc426145e721231becbb3bf36eb519c177d66a5ba975b77b9e"
+      }
+    },
+    {
+      "scene": "2656110181316327570_940_000_960_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-2656110181316327570_940_000_960_000.json": "097b110c66bbd5596e5ffd8b3b3f33fddf9a31aa98cba60411ed97ee950a438f",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-2656110181316327570_940_000_960_000.json": "42b1fdbb30cc8b2af8d686cc03c848ac3049d26bf4e4cc677599a7d1cb14edf4",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-2656110181316327570_940_000_960_000.json": "c665a6654ccf1a2598302c06e21e2ce846bf8074b86aa3fe8bce4c9c3913f7d4",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-2656110181316327570_940_000_960_000.json": "cd91b03144ad65f02f892516b44c52bccdd9919edcbac8d2fed60cd977adf835",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-2656110181316327570_940_000_960_000.json": "64098dab7ecef948ca9efaa730fd5fa8289780fb81e8f96cd7943ddc89ca77fc"
+      }
+    },
+    {
+      "scene": "16473613811052081539_1060_000_1080_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 197,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-16473613811052081539_1060_000_1080_000.json": "293345bf04acbeb1ab2d05414c6289225d537316bc8dc8ccd2f120855a4b2508",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-16473613811052081539_1060_000_1080_000.json": "f34cde602ccb1180d40645c27519386b278760ebb2c230aae7b38a47168f4fe2",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-16473613811052081539_1060_000_1080_000.json": "b330a078fb0fe94d484fe812042f40657d68b1a2f72450dafcaa4dca3a057ca6",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-16473613811052081539_1060_000_1080_000.json": "41bf6591dbb311d117e4e13bcf68b22f4568216bcbbd281d2f5f655d2309f014",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-16473613811052081539_1060_000_1080_000.json": "320180b2aa300ad4cbcb32ab9c0d390e5b30d2ff3928295352aefec36a5cb318"
+      }
+    },
+    {
+      "scene": "16646502593577530501_4878_080_4898_080",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-16646502593577530501_4878_080_4898_080.json": "c8a9ecdc6db0f33ea27ed387cec2f9ca8bebd4ff9514410748b442b565d41952",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-16646502593577530501_4878_080_4898_080.json": "5c871d8fbbd71429806f1b94d5a435f7bcd667514cd06afec270506cdddf20dd",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-16646502593577530501_4878_080_4898_080.json": "41c8ae9f1245b88372999921ad5929adfdd3a77726788de676aa246b99673a80",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-16646502593577530501_4878_080_4898_080.json": "cb66b5a61e3b4758a3e25725927707d349dfa34d733d6a5ef1ccbb051319cc1c",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-16646502593577530501_4878_080_4898_080.json": "9592355f1bd10f24926dff943cf4209804d3d059dc7dab01e77c34786cb61c38"
+      }
+    },
+    {
+      "scene": "7921369793217703814_1060_000_1080_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-7921369793217703814_1060_000_1080_000.json": "e307de795b1a8f38ee56a9cb3a54dcc6fa4b5219e16d162863430b3921d185fa",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-7921369793217703814_1060_000_1080_000.json": "e6bf6f6191b16f7379dbce7137ad261ef3fe0bddd43cb2291453fea472d653d0",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-7921369793217703814_1060_000_1080_000.json": "a4752b70bfd4589604b5299372feae11fe5492d36e8f0495ec7b03cafe8e7b73",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-7921369793217703814_1060_000_1080_000.json": "e6c7ad831dae3b58f3f2015e4d67bdfa0a916c9b4feb707f87892bec1e1670ce",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-7921369793217703814_1060_000_1080_000.json": "f3d2e7ece64cb7f7d356c4b2cde6a946e49fbcc51c55f0e3f725d7db1cc0db8f"
+      }
+    },
+    {
+      "scene": "9385013624094020582_2547_650_2567_650",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-9385013624094020582_2547_650_2567_650.json": "6a2c6b423aa4ada968ecc7aeed46e311330bba1eddd23343290ebc3d7d6a05c6",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-9385013624094020582_2547_650_2567_650.json": "5c839c82e93565d1cda55476e29efa180f325af0063b3f8e1724a5fe569810fa",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-9385013624094020582_2547_650_2567_650.json": "38ef5a9ade4f45dec1a72697a2785732974fcdb6eeefef46826bafb656e31c2e",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-9385013624094020582_2547_650_2567_650.json": "f8b583cc6fa3cfa4caf236286d0cfebf31821e8ce4937f70aa3ba3b26af6b0ce",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-9385013624094020582_2547_650_2567_650.json": "230a1f96c2a156fdd6bf3ecda02a19cadafc9b725bb08eae336e950b0c2ba230"
+      }
+    },
+    {
+      "scene": "1191788760630624072_3880_000_3900_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-1191788760630624072_3880_000_3900_000.json": "fbcf1d08d1d757d06f0c0eac4b91e90b2c94319cd81be6b5ba8f321db51fdf12",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-1191788760630624072_3880_000_3900_000.json": "fcf24be2caec1676edbe1585e79726fea6bfb06313596faac2d80c3927ef7064",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-1191788760630624072_3880_000_3900_000.json": "9935696849adeaced5f75eefcf78e4f3152441d314438f6864c59b629bfb0571",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-1191788760630624072_3880_000_3900_000.json": "979eb4e0938cabf5e4d2f871c08c4806a588dfaa933af44930a7e2b444f154b4",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-1191788760630624072_3880_000_3900_000.json": "23d9b50d10ae8379052492d765de0fd7ea80b0a4a4b14c9fe5e0556718617290"
+      }
+    },
+    {
+      "scene": "6390847454531723238_6000_000_6020_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-6390847454531723238_6000_000_6020_000.json": "02bb0f670d90dee8837841ba9c3c3752d98fb9c1039ec0f4373d9d63b798de0c",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-6390847454531723238_6000_000_6020_000.json": "f2e7946e4e20abd20495c00478af4fad83d7a752a49dacdecd7ba8abc32e624f",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-6390847454531723238_6000_000_6020_000.json": "1cce09e06ae76aaf04625a9782d6f8ce8447d1af9ae92d6bc9e9acac9c4cd710",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-6390847454531723238_6000_000_6020_000.json": "b52a50f41107119c9b4adb9c0dca68d7246e25a7cb602885f0c05f6e1400b967",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-6390847454531723238_6000_000_6020_000.json": "c6c5afa59c827850913748c579bf3281a2876b1fb7b92155d4a43e03051603c5"
+      }
+    },
+    {
+      "scene": "13840133134545942567_1060_000_1080_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-13840133134545942567_1060_000_1080_000.json": "c86c9f5cd88a5646781f5c05ad9a77fd290d11fb18c065bcf164023fbbd61bff",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-13840133134545942567_1060_000_1080_000.json": "85608b2f9b993831934204a4d097cad63a8739e2de17b7041ee80bbed097a408",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-13840133134545942567_1060_000_1080_000.json": "222c88ff4ea9b93f31fddfb2677df993c1d7652f2334282102281e3620161d96",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-13840133134545942567_1060_000_1080_000.json": "1d29e59c844f40ab5e75ae18270112022fe03ab97e2218e13d74a31abf7d38c3",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-13840133134545942567_1060_000_1080_000.json": "a0f72315aaa8301bc766829bb12580e3d89b2224bfa0ae9facf8f25747665036"
+      }
+    },
+    {
+      "scene": "5525943706123287091_4100_000_4120_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-5525943706123287091_4100_000_4120_000.json": "76554076dad98a358b7f2a1e5439e2bc519d3dbff64fcc133ee1e44e1dd796be",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-5525943706123287091_4100_000_4120_000.json": "5037472faa0fff0bf61735271e1e933ebe985ab42123364ec41c5f8c2796a90b",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-5525943706123287091_4100_000_4120_000.json": "be49222389d51910803a48146c6b90f0f58380f178f0ea37eb002a4e3fc7cb8f",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-5525943706123287091_4100_000_4120_000.json": "a9f97cfeb19c7f964c3c5780ee2d6643cae3244d0698d6d55912c526c8d8c136",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-5525943706123287091_4100_000_4120_000.json": "8254fd258803eb0cbc663cdfc01aa13b1454d91d64668b7d9bf07e3bd159a15d"
+      }
+    },
+    {
+      "scene": "5200186706748209867_80_000_100_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-5200186706748209867_80_000_100_000.json": "047b257acb326d755f13844393e12dc468c2c3acd5e3330af8bf9f917addbe95",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-5200186706748209867_80_000_100_000.json": "dc06fa7e546ad152fdca8782106094b2f90b7dbeb7be398ec4b15fcebbea0665",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-5200186706748209867_80_000_100_000.json": "bf8a7b5c260bd4bdf4c7d80314e3fc8b4df8a6d00c81aca978fcd0e81a2b6b41",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-5200186706748209867_80_000_100_000.json": "c66778e79627dd53241c506750367f141f80517ffe99490eb119ee41650dabff",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-5200186706748209867_80_000_100_000.json": "54dd4e509578e76e5c07eac2633fff32c29f1e8856feb38d5d4418d5c97004d2"
+      }
+    },
+    {
+      "scene": "15696964848687303249_4615_200_4635_200",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-15696964848687303249_4615_200_4635_200.json": "0764751fe17e597a1e3aefce00df64706aa6a536f0fa77051f4513bbaf00db8a",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-15696964848687303249_4615_200_4635_200.json": "bd87d75cd9010d30ab9f5fb7b0d9afa425f75fc63fa009e0916429b10781deb7",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-15696964848687303249_4615_200_4635_200.json": "40691fd4baf7c6aa9d70bbb5d8f4e4b9c368f888f73ac016ca5af0563d605e46",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-15696964848687303249_4615_200_4635_200.json": "29a58d26e92d268df1b97c971c7723087e3dc584e76e0fb3f282e8f0f3afe991",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-15696964848687303249_4615_200_4635_200.json": "07f0bb73631555d581fdf918a81577af6e4e410592ca8179adf621f87a948cf5"
+      }
+    },
+    {
+      "scene": "10599748131695282446_1380_000_1400_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-10599748131695282446_1380_000_1400_000.json": "b390b44760cb1ceac5279977e56a0bedf995b06c7a1eb3d84eb4431b63ceede2",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-10599748131695282446_1380_000_1400_000.json": "f0b473e5c7235c936f4533c53792d08ca357a5a7ca5b58d8df2b37b9ce31c061",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-10599748131695282446_1380_000_1400_000.json": "dc2f419c3eb2ba045f01ce7d561e17a513b8af4f6ccd986289a27ede895d142e",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-10599748131695282446_1380_000_1400_000.json": "0ab035448af42f4efb1b1e3055f6de63cc93222806f267d6ba87fe313133cdc3",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-10599748131695282446_1380_000_1400_000.json": "1bc581a3ac5f3abab12493693d7a0009bfe5983b8b919b2c213d625d9c42f4df"
+      }
+    },
+    {
+      "scene": "4575961016807404107_880_000_900_000",
+      "official_split": "training",
+      "research_splits": [
+        "train"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-4575961016807404107_880_000_900_000.json": "fe58f6097591bb6b6c88077ebbc93c2ee83cd2c33f62ea68f38d39e3648f623c",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-4575961016807404107_880_000_900_000.json": "5c7313b87d07dd56dcdb2fd5b0cce20d6734af603058b20d93b15cf08a50a058",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-4575961016807404107_880_000_900_000.json": "2bddf5615f8309f9b4307726d8aba4956e9de5cc49ed5d8c58388c15ec2b4dc9",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-4575961016807404107_880_000_900_000.json": "d0738ddfb6a0f11bec29e41041233e989638b5cb2246c69a06379da231409a4e",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-4575961016807404107_880_000_900_000.json": "34386fdeee14822f5a2828148046d6b74cb5bcd43defe8bccf967a55d71767a2"
+      }
+    },
+    {
+      "scene": "10082223140073588526_6140_000_6160_000",
+      "official_split": "training",
+      "research_splits": [
+        "development"
+      ],
+      "frames": 197,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-10082223140073588526_6140_000_6160_000.json": "afdcffe297e2587bea15cb31f8bafa2c7d5b20bbfe46ef5bdc18db79bbc8fd5f",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-10082223140073588526_6140_000_6160_000.json": "bd042cc64d77d874f484548f2f6c0e37655529f91645da788645d9374145196d",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-10082223140073588526_6140_000_6160_000.json": "2ee42f79e941bfa159d2c8ae00ae43f570c2db43b81d7c3c96ffde5ddccae651",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-10082223140073588526_6140_000_6160_000.json": "69958bff50127f5fac8d5313d658f5e057c6b4a815507a2a0ba162c7b61165b5",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-10082223140073588526_6140_000_6160_000.json": "907ec899535d2104c00d9da4772280daccdd06671867d4ccd8aaaddab64e7796"
+      }
+    },
+    {
+      "scene": "3657581213864582252_340_000_360_000",
+      "official_split": "training",
+      "research_splits": [
+        "development"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-3657581213864582252_340_000_360_000.json": "e056f01665bc5c967581682c5162e74abe9677b078ec89e604d927ecb30b8639",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-3657581213864582252_340_000_360_000.json": "c1043634a82fac2d22dd18e3f2ec99d3e48fa2a9a846fe1be376c5689caa71d5",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-3657581213864582252_340_000_360_000.json": "aa72d5be2aee070f352afb4676eac2722d5cc2316028ce5d4e3c818496292869",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-3657581213864582252_340_000_360_000.json": "ea042e0fb5e64f0df734dfdfd4493bc5c78c3f42aa6ede83722a7e313fd43be9",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-3657581213864582252_340_000_360_000.json": "1a388d35cfb92c47376340b25c7e5cbc8f6a57b725eac148e54b16a805e62579"
+      }
+    },
+    {
+      "scene": "5468483805452515080_4540_000_4560_000",
+      "official_split": "training",
+      "research_splits": [
+        "development"
+      ],
+      "frames": 171,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-5468483805452515080_4540_000_4560_000.json": "03bf6c8a20591f460501a4f93463fd31734006095d4d055bd8ec47f05ab5b044",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-5468483805452515080_4540_000_4560_000.json": "41bb69cfaea57806220e851ec62f670dd856bf3bd8cd60d99474dcec8f6fc956",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-5468483805452515080_4540_000_4560_000.json": "898ed43867a8044f9c273134a102538e4de772674ea8a7528a0c5d2db21c17b3",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-5468483805452515080_4540_000_4560_000.json": "f0afc0ed5645235601797823dd4291ae70057adeeb1805ed3f896c44e6325914",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-5468483805452515080_4540_000_4560_000.json": "5886b000f410db479595f0357054702e33b4e3c435ca622ab039d3012719261d"
+      }
+    },
+    {
+      "scene": "4427374597960783085_4168_000_4188_000",
+      "official_split": "training",
+      "research_splits": [
+        "development"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-4427374597960783085_4168_000_4188_000.json": "94502c11bfe4ba5f36596ea479dd6bb2480f1563b675bc07d30875558634dd84",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-4427374597960783085_4168_000_4188_000.json": "369d74fae44a85b2e58f83a03209d7c4cebf3eb92066e7db9c6c5eee515ad523",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-4427374597960783085_4168_000_4188_000.json": "9c40a8c4796c20c76dac275c0c18528d4922c7cba9d77805918cc80ed33f095c",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-4427374597960783085_4168_000_4188_000.json": "007b5de1ffd987e01679f63c75f0f9ede5bb9ca45a698ae9e034c9b2a9fb79e8",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-4427374597960783085_4168_000_4188_000.json": "1628bb10d6db42f8208601514ae2fd7ff5c03a57aa76dabc2b981039b76fd766"
+      }
+    },
+    {
+      "scene": "183829460855609442_430_000_450_000",
+      "official_split": "training",
+      "research_splits": [
+        "development"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-183829460855609442_430_000_450_000.json": "75dc55cf462ae80e4489f7c07159ff069ae9244463af2ce73bc82e25cd95a843",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-183829460855609442_430_000_450_000.json": "edd793c9755c05be9fcd2c2fc4d8e3704fc9137f643b2b1a8035ec902c32db53",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-183829460855609442_430_000_450_000.json": "ad67c3d97be78d8f97ac3990b40b80afe358b9e9eea51e66e70a640eca0d92c8",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-183829460855609442_430_000_450_000.json": "3b3b55b3a22f0c081788aa3113e4375a316e7cd706093e4c60956f3f95e2ecbd",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-183829460855609442_430_000_450_000.json": "037e8d6e3e4facf18ae8b9a3403069ed0a435f8b2e529f6fcba275bf0cae5836"
+      }
+    },
+    {
+      "scene": "3437741670889149170_1411_550_1431_550",
+      "official_split": "training",
+      "research_splits": [
+        "development"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-3437741670889149170_1411_550_1431_550.json": "24ce831f113205db5af4a31777bdb3616fb949fce56a2630bb01dc7e4585fb7a",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-3437741670889149170_1411_550_1431_550.json": "b88389067e8a40ad7e1c28338d26b4c6a76b5a32bcc3a86e4dda336c4e9772a9",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-3437741670889149170_1411_550_1431_550.json": "e064aad4d73f96676953a9b0d19c6a479061b2383986a3cd4c7e2aac57c1f6ba",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-3437741670889149170_1411_550_1431_550.json": "0b1a5cf058b228acee7027dc870941821e2c38eb0dc16ce7edcec0e45a629891",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-3437741670889149170_1411_550_1431_550.json": "dbbf4849521c06430117890f33d0a38a0f26c201c7441cc694642055e7a933a0"
+      }
+    },
+    {
+      "scene": "9465500459680839281_1100_000_1120_000",
+      "official_split": "training",
+      "research_splits": [
+        "development"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-9465500459680839281_1100_000_1120_000.json": "141e22f9cdfcc8fea66a0975fedba8ccb8e45c53451eddf2118ed5508c0c2d4b",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-9465500459680839281_1100_000_1120_000.json": "b19a68a49a91724ecd4909ac4e17d99553b93d858cbd469bb60f935e69d0735d",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-9465500459680839281_1100_000_1120_000.json": "aabb9d08d8792c06f09a058240d95395d27baeec1713242a8503e69421536542",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-9465500459680839281_1100_000_1120_000.json": "f8e06f6244ea868ae70adadf9a3509c7eb9e47e9c36fc94347037cf65f3fe0ba",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-9465500459680839281_1100_000_1120_000.json": "c3ef50c62380d1fed6c9d14463e027c5a8a26ebddf70b38fe78292acb28091b0"
+      }
+    },
+    {
+      "scene": "18295766828140813622_6775_000_6795_000",
+      "official_split": "training",
+      "research_splits": [
+        "development"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-camera_image-18295766828140813622_6775_000_6795_000.json": "dde78acf2364dabd399157babfe501b45e099906a56caa9bed1bbc64dcb6e29e",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar-18295766828140813622_6775_000_6795_000.json": "629dd754f5e82f6ddaad8782e6a40c658533f2d3baf6cbc763be72f3fd39b0c9",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-vehicle_pose-18295766828140813622_6775_000_6795_000.json": "659bd1efc0210006a9053a38fe80ca6dac93ed60e7b9009a11681ba9fed7e2c0",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_pose-18295766828140813622_6775_000_6795_000.json": "92253e157e40c49f65e2ad6f65d8a7442662f1485a76e0e565977718b4211047",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/training-lidar_camera_projection-18295766828140813622_6775_000_6795_000.json": "bcb61feb781258303b260eba66bd569e42d4f1e1f2e48e1276a6ef1dab04f0b9"
+      }
+    },
+    {
+      "scene": "14262448332225315249_1280_000_1300_000",
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-camera_image-14262448332225315249_1280_000_1300_000.json": "0c4d86f7e2bd6bfb1d54841b60048352324d8a387859e89593d3ef65a1a42462",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar-14262448332225315249_1280_000_1300_000.json": "d6a2a371e57352a40cc113229b0ba4144d46d6a585a6180ce0daf3631bc30d12",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-vehicle_pose-14262448332225315249_1280_000_1300_000.json": "1d4126e5f74f258f0c9b9c01ca080d9f2587e1bae2d4c645eb1671ed403d4bf8",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_pose-14262448332225315249_1280_000_1300_000.json": "a7a193369c6abb8e1a7c12208a62387705584f87ac6133cda5af177a174bc7ce",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_camera_projection-14262448332225315249_1280_000_1300_000.json": "bb0fb43ccae6e4451ff5c2576884c40ddc3788fd094408631465440a9e725e84"
+      }
+    },
+    {
+      "scene": "18446264979321894359_3700_000_3720_000",
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-camera_image-18446264979321894359_3700_000_3720_000.json": "258e2cb351d4f2143ac22e0469870fe7a0eb62332455d604e0aaaee88032cc06",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar-18446264979321894359_3700_000_3720_000.json": "6890cfe73ff704e95f265f0137e3414e689bb62a762af7c07911cf40d5ed90e7",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-vehicle_pose-18446264979321894359_3700_000_3720_000.json": "a1d808dda830a64ba3af4f7457ce86b7951fa5f4493cf822251ff292691cc42e",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_pose-18446264979321894359_3700_000_3720_000.json": "67049e1a408790215219a392833e7132a8207f82d72209f2b9d0d57de825fc28",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_camera_projection-18446264979321894359_3700_000_3720_000.json": "6852e4336926c95b64deed2bd817dabbabcb65d077dc1c5b812472ee1f8b9836"
+      }
+    },
+    {
+      "scene": "14687328292438466674_892_000_912_000",
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-camera_image-14687328292438466674_892_000_912_000.json": "70ad47af8e96eb6e3bff9078515e38eceef8392206d1b6e0ff0093dbb0af8764",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar-14687328292438466674_892_000_912_000.json": "af2a5b01509c9df00b296f97961b9ba356cb752c7ab10ea0cc669c7ac0047ce3",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-vehicle_pose-14687328292438466674_892_000_912_000.json": "9a6eadca987807f0667439c11baec595921d20ce56d7859adbbd53783ada25f5",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_pose-14687328292438466674_892_000_912_000.json": "b002ccec976c6bee6733f572089883b10bd3b969371a7f4cd8d8b97806151d29",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_camera_projection-14687328292438466674_892_000_912_000.json": "b26e0d612f9d33ae87d0899e1d5aba02940994c759dab375d1f116469232eae0"
+      }
+    },
+    {
+      "scene": "6161542573106757148_585_030_605_030",
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-camera_image-6161542573106757148_585_030_605_030.json": "3150aaf965a58db2ea5cd4fbf9dff2594b1cb7af4ddf9d293a8da6f49c6d0377",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar-6161542573106757148_585_030_605_030.json": "c1b49db9edf798a15521a269a084fef264c1fbab20941d915ab75fa1acc82464",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-vehicle_pose-6161542573106757148_585_030_605_030.json": "b57d2207a9896f490c13f74a5cfcf3dc73d14dd856887344237e6266f5380056",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_pose-6161542573106757148_585_030_605_030.json": "383c616dabb9b6fba1def1e58bb21331600b2abed44f7c124e998bdce0699024",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_camera_projection-6161542573106757148_585_030_605_030.json": "35775b594f54608566847cdb7b9b6fb7d58d088e58acbea521b8bf5db41a9fe1"
+      }
+    },
+    {
+      "scene": "6183008573786657189_5414_000_5434_000",
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-camera_image-6183008573786657189_5414_000_5434_000.json": "ab3decfa7054bae6e59b370044d70ba0abc37f30d04e1709264e1cb8dd92dea9",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar-6183008573786657189_5414_000_5434_000.json": "7072539cf074d76f208621200ddcad8f7cb84c0c4f029b4e8a07664ba83fe8d3",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-vehicle_pose-6183008573786657189_5414_000_5434_000.json": "9a0c0a037cd335c9446140b2f04f84d7fb615730d745e5a8b6ce277ae01b3346",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_pose-6183008573786657189_5414_000_5434_000.json": "78222bd01e35bb526025141095a7a1bbc5ef4903dcc26ed7b776e5a967bf0a10",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_camera_projection-6183008573786657189_5414_000_5434_000.json": "9f0251b1f5c9d50df73d137f31740c80b70d4eed8c8cf8b60c7cd815802e8f93"
+      }
+    },
+    {
+      "scene": "15611747084548773814_3740_000_3760_000",
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-camera_image-15611747084548773814_3740_000_3760_000.json": "70f7e8ff2b7d3f56a54803117d85c81e746fed9e7e22a4e66a8197b2d1f05dff",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar-15611747084548773814_3740_000_3760_000.json": "f11335a545577b2553870cdb78fdba87929d1f6ab025baf48e9bdb519bb3fdb6",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-vehicle_pose-15611747084548773814_3740_000_3760_000.json": "20ee76ef6ca06223d526db7fd8b7d094961de2bbd4cdfcb83ec530be2f2c0ebb",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_pose-15611747084548773814_3740_000_3760_000.json": "ef91d5aaaf0bc413b2d1d5bb68c4169b024e7ee645036b47761ce34a6037cdfd",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_camera_projection-15611747084548773814_3740_000_3760_000.json": "26d3c052346e439cfcfe39fc07d6ed070e23330df1bee69e9b5c2fac6e09fb7d"
+      }
+    },
+    {
+      "scene": "30779396576054160_1880_000_1900_000",
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-camera_image-30779396576054160_1880_000_1900_000.json": "55361b3c1883e481b3158eca449cbdb52bb95ac16a8923fcab5802ff2cb98ee2",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar-30779396576054160_1880_000_1900_000.json": "e0c64ec8647d0100775dd6b56779a026d7b15f4dd8ba51d7fce7ee1f4e2875e9",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-vehicle_pose-30779396576054160_1880_000_1900_000.json": "1727e7c7658f825ee5d5c466162aa032071464719180aef6f1efe70999d100b2",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_pose-30779396576054160_1880_000_1900_000.json": "cdb137bb63495ad80f8bf7aa851151925bb7f2e87dd106da6df27e1a98362e95",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_camera_projection-30779396576054160_1880_000_1900_000.json": "a71e8bb120ae08c3be5a5898736a0d9593eaf4697d335285564b4bdf86ef9ab8"
+      }
+    },
+    {
+      "scene": "1457696187335927618_595_027_615_027",
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-camera_image-1457696187335927618_595_027_615_027.json": "a5ffbfa24b66c66d45aa9cd1fdd45e93d1a09410a140f561e1b39339de4396a7",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar-1457696187335927618_595_027_615_027.json": "40b53e9f01ca9ab384da29ba47788a6b31bacff99490e880a831d1c62e9a062e",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-vehicle_pose-1457696187335927618_595_027_615_027.json": "e8775ce8ef025e2c175001c4be001677b43608f8a32d53d320a7ce2a38c46cb2",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_pose-1457696187335927618_595_027_615_027.json": "55a61171d720eedf66d3c2816145473daa4511abe27a1f9d91e16d14ea7b367b",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_camera_projection-1457696187335927618_595_027_615_027.json": "a1d99434c76478d0c06fd2729e10c13d40b7bb2e50526527005dd5a761e354fc"
+      }
+    },
+    {
+      "scene": "17962792089966876718_2210_933_2230_933",
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-camera_image-17962792089966876718_2210_933_2230_933.json": "66e2dbebd41f27eb8f2159f4a8b78ec4fc696d1f776ad0a85aab1e53f44bc1af",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar-17962792089966876718_2210_933_2230_933.json": "8477af7b746bb2130e675a91981e0afe296d02e80648ddbd4ad8ad0a312142cd",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-vehicle_pose-17962792089966876718_2210_933_2230_933.json": "da79422bf316f5ee46a040e3ffd8df97c16efa6849c04c8cb893076def0b8c85",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_pose-17962792089966876718_2210_933_2230_933.json": "71f5f48b96607829da54988ad07eb7f717f98f09e45d90064568fd06d6aeb0f1",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_camera_projection-17962792089966876718_2210_933_2230_933.json": "96138ce43040ba3f0d9619decefaeff90186eb16978f51154005f4faf0e98ed9"
+      }
+    },
+    {
+      "scene": "18331704533904883545_1560_000_1580_000",
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-camera_image-18331704533904883545_1560_000_1580_000.json": "bf9bb247d07b8dc0d266d8a26bcaf01138a59d9c01deb1adbccecbb41db04230",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar-18331704533904883545_1560_000_1580_000.json": "79c5e5e0e99a497cf4034696161fa564157326fae6f2615872bf549e63774d5c",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-vehicle_pose-18331704533904883545_1560_000_1580_000.json": "4ab54c42e60879ca9e0e002ff4a4fcd7267c9352a037fba9f4a7302ebfc06a8c",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_pose-18331704533904883545_1560_000_1580_000.json": "ace480e3ffd47c0c8f622df2067b0cd8a0c38380a6b3afe26b87c6c6c3cc4ed3",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_camera_projection-18331704533904883545_1560_000_1580_000.json": "fb2362f23ecacec38b39522f55856a1100e398ccbcd3fae372a5763bf5ec570a"
+      }
+    },
+    {
+      "scene": "17626999143001784258_2760_000_2780_000",
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-camera_image-17626999143001784258_2760_000_2780_000.json": "0910eb29028e40952ac895bccd9ca4e1fdce5b88f8dbc002cdfb8fba719359e9",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar-17626999143001784258_2760_000_2780_000.json": "dbf3074dbd8d7b703d0d72fc71c487abd069515694a238be1463f51719986d8f",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-vehicle_pose-17626999143001784258_2760_000_2780_000.json": "b19d5c6cf8d3fa7655fd0d6992c6a55e9223e1b018a54e11a03984c05c74b636",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_pose-17626999143001784258_2760_000_2780_000.json": "1535e8d171b5f38bbdedea77e401f6ca3d82e342abd40fe5070f7217b8ca0190",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_camera_projection-17626999143001784258_2760_000_2780_000.json": "ae09c21bc698f5e34c45f0dc76b8adb998deb86d5f219937d03406b7159cecb1"
+      }
+    },
+    {
+      "scene": "7650923902987369309_2380_000_2400_000",
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-camera_image-7650923902987369309_2380_000_2400_000.json": "60ca33cc68f7ee86dcac8223716a23f3ef7cea47599f37308ca3fb0bf851d2f3",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar-7650923902987369309_2380_000_2400_000.json": "894b2e8369ba2b4108c2253f3d7da726339c759b1da988fec01716f5335240ee",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-vehicle_pose-7650923902987369309_2380_000_2400_000.json": "6f29e38e7f4aad0e2fa07da0ce17ebacea3409a999db5eda5e4a7b4caaf3f537",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_pose-7650923902987369309_2380_000_2400_000.json": "b2d2484b3f3a977941d84028d8e3a35d807d488bc146e6f33a9e95a9a363e3ff",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_camera_projection-7650923902987369309_2380_000_2400_000.json": "749b2bae5bb6614608ba935f86e2785a84f323a73c212eb2c5d95588da484356"
+      }
+    },
+    {
+      "scene": "1071392229495085036_1844_790_1864_790",
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ],
+      "frames": 198,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-camera_image-1071392229495085036_1844_790_1864_790.json": "548c2cc77130a6ef4fdff19bc994757fecf6e6d473007c1ae36a828bf8887a55",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar-1071392229495085036_1844_790_1864_790.json": "e43ea29de5c56357b6eb062c00e4ca0a1455bd09603946b467ca3a56ad5b6fb0",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-vehicle_pose-1071392229495085036_1844_790_1864_790.json": "53ee2e67c9d275574b4d33e7ac1415d9ad383b8ab425f42fe5428cfc760263f6",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_pose-1071392229495085036_1844_790_1864_790.json": "e6b307fc0f95673dc2bb26123edff631c8649cc79eeef65bdc48e82dfafaffbd",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_camera_projection-1071392229495085036_1844_790_1864_790.json": "26225b8de56a784fe2b6d96a1740c7e5a0324567686c6206e0b163acf14f93e6"
+      }
+    },
+    {
+      "scene": "8956556778987472864_3404_790_3424_790",
+      "official_split": "validation",
+      "research_splits": [
+        "validation",
+        "camera_validation"
+      ],
+      "frames": 197,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-camera_image-8956556778987472864_3404_790_3424_790.json": "82cf164d3cfe6cd3122680a0e64cdaeeea3f9eaec4da373b740d9672f5b9872b",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar-8956556778987472864_3404_790_3424_790.json": "177842099ea5f880a0b631e4e822d5e8f0e817840ece32a97f7767613dafa42f",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-vehicle_pose-8956556778987472864_3404_790_3424_790.json": "e8ecb91296a22cb3cd9c5e3703812572249ea6284501ece3f819f6d8cb3fcc8a",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_pose-8956556778987472864_3404_790_3424_790.json": "73d26ed34c842443d699c8f3dee402d204099ab7a59bd61fde90fbec0bef20a5",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_camera_projection-8956556778987472864_3404_790_3424_790.json": "a13864cfee5c2ed0cb1fb1995691f2ae39279560bd189fdf6892a87d5ad113f0"
+      }
+    },
+    {
+      "scene": "15959580576639476066_5087_580_5107_580",
+      "official_split": "validation",
+      "research_splits": [
+        "validation"
+      ],
+      "frames": 199,
+      "record_hashes": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-camera_image-15959580576639476066_5087_580_5107_580.json": "2e37b3f5e23e00a4f77762a4c46d23d3f0992a8455193f98d0dda8120f947ac7",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar-15959580576639476066_5087_580_5107_580.json": "63dbd6234ba3eed64bb596d709e7bb57f40189bd4723e052eb45ac3b10995241",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-vehicle_pose-15959580576639476066_5087_580_5107_580.json": "17e776c83636c7666a9dc718883d3ae0f5396e2617b458c5e61de403bfd2c3ee",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_pose-15959580576639476066_5087_580_5107_580.json": "a284e1d58a9ab6d8c6931ff6a535010316d7f87222620a734870220940f5935e",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-source-audit/validation-lidar_camera_projection-15959580576639476066_5087_580_5107_580.json": "9d3bb96c03ad1f5755dd08ecfcb6a4599d3cb4d40f9de7a184e90f40454869e4"
+      }
+    }
+  ],
+  "scope": "native inventory timestamps and row counts, not proof of exact sensor enum membership or payload correctness"
+}

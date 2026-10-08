@@ -1,0 +1,47 @@
+import hashlib,json,sys
+from pathlib import Path
+P=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P))
+from resources.sources import sha,inventory,validate_sources
+from resources.stage import validate_proof
+from pipeline.runtime_identity import rootfs_identity
+checks=[]
+def check(path,digest):
+ p=Path(path);assert p.is_file() and not any(v.is_symlink() for v in [p,*p.parents]),str(p);actual=sha(p);assert actual==digest,(str(p),actual,digest);checks.append({'path':str(p),'sha256':actual});return p
+research=P/'research';a=json.loads((research/'sustained-resource-archive-live-v2-verified.json').read_text());validate_sources(P/'resources',a['source_pins']);assert len(a['source_pins'])==22
+for pin in a['source_pins'].values():
+ for kind in ('original','snapshot'):check(pin[kind],pin['sha256'])
+check(research/'sustained-resource-archive-live-v2.driver.source',a['driver_sha256']);files=json.loads(check(a['expected_inventory_path'],a['expected_inventory_sha256']).read_text());assert len(files)==691
+for name,e in files.items():
+ p=check(e['path'],e['sha256']);assert p.stat().st_size==e['bytes'];q=check(Path(a['recovered_directory'])/name,e['sha256']);assert q.stat().st_size==e['bytes'];check(Path(a['expected_inventory_path']).parent/'raw'/name,e['sha256'])
+check(a['manifest_path'],a['manifest_sha256']);check(a['archive_path'],a['archive_sha256']);check(Path(a['archive_path']).parent.parent/'create-live/archive.tar.gz',a['archive_sha256']);check(Path(a['archive_path']).parent.parent/'create-live/manifest.json',a['manifest_sha256']);manifest=json.loads(Path(a['manifest_path']).read_text());assert {x['path']:(x['sha256'],x['bytes']) for x in manifest['members']}=={n:(v['sha256'],v['bytes']) for n,v in files.items()};assert sum(v['bytes'] for v in files.values())==3166162
+for p,d in a['tool_pins'].items():check(p,d)
+for transfer in a['transfers']:check(transfer['log_path'],transfer['log_sha256']);assert transfer['exit_code']==0
+for stage in a['live_stages']:
+ proof=json.loads(check(stage['proof']['path'],stage['proof']['sha256']).read_text());validate_proof(proof,stage['command'],P/'resources',a['source_pins'],Path(proof['native_output_directory']),16*1024**3,300)
+ for p,d in stage['artifacts'].items():check(p,d)
+failure=json.loads((research/'sustained-resource-archive-live-v1-failure.json').read_text());attempt=json.loads(check(failure['failure_proof']['path'],failure['failure_proof']['sha256']).read_text());assert attempt['admitted'] is False and attempt['host_measurement']['exit_code']==0 and attempt['host_measurement']['lifecycle_violation'] and attempt['host_measurement']['cleanup']['complete'];check(failure['driver_path'],failure['driver_sha256']);diagnostic=json.loads(check(failure['diagnostic']['path'],failure['diagnostic']['sha256']).read_text());check(research/'sustained-resource-helper-diagnostic-v3.driver.source',diagnostic['driver_sha256']);assert any(x['pid']==996182 and x['comm']=='bwrap\n' and 'Z (zombie)' in x['status'] for x in diagnostic['observed'])
+corrupt=json.loads(check(a['corrupt_manifest_refusal']['path'],a['corrupt_manifest_refusal']['sha256']).read_text());assert corrupt['admitted'] is False and not (Path(corrupt['native_output_directory'])/'restored').exists()
+C=Path.home()/'.cache/waystone/waymo-perception';native=C/'insula/balanced16-sustained-baseline-controller20261003a';backend=json.loads((research/'sustained-resource-backend-live-v1-verified.json').read_text());check(native/'run.json',backend['original_native_run_sha256']);check(native/'state.json',backend['state_sha256']);run=json.loads((native/'run.json').read_text());assert len(run['source_hashes'])==295 and len(run['host_source_pins'])==23
+for name,digest in run['source_hashes'].items():check(P/name,digest);check(native/'code'/name,digest)
+for pin in run['host_source_pins'].values():
+ for kind in ('original','snapshot'):check(pin[kind],pin['sha256'])
+for p,d in backend['checkpoint_sha256'].items():check(p,d)
+state=json.loads((native/'state.json').read_text())
+for record in state['records']:
+ check(record['final_path'],record['final_sha256']);check(record['report_snapshot'],record['report_sha256']);final=json.loads(Path(record['final_path']).read_text());assert len(final['stage_receipts'])==7
+ for ref in final['stage_receipts'].values():
+  receipt=json.loads(check(ref['path'],ref['sha256']).read_text())
+  for group in ['input_hashes','artifacts','driver_hashes','verifier_source_pins']:
+   for p,d in receipt[group].items():check(p,d)
+history=[]
+for label in ['checkpoint-red','checkpoint-green','checkpoint-backend-red','checkpoint-backend-green','archive-worker-red','archive-worker-green','helper-settle-red','helper-settle-green']:
+ name='sustained-resource-'+label+'-v1-verified.json';receipt=json.loads((research/name).read_text());logs=[]
+ for p,d in receipt['source_pins'].items():check(p,d)
+ for p,d in receipt['artifacts'].items():
+  log=check(p,d).read_text();logs.append(log[-1500:]);assert ('FAILED' in log if '-red' in label else '\nOK\n' in log)
+ assert receipt['exit_code']==(1 if '-red' in label else 0);history.append({'receipt':name,'exit_code':receipt['exit_code'],'log_tail':logs})
+suite=json.loads((research/'sustained-resource-review-independent-20261003a-verified.json').read_text());assert suite['exit_code']==0
+for p,d in suite['source_pins'].items():check(p,d)
+for p,d in suite['artifacts'].items():assert 'Ran 36 tests' in check(p,d).read_text()
+root=Path(suite['command'][suite['command'].index('/')-1]);actual=rootfs_identity(root);assert actual==suite['runtime_lock']['rootfs_sha256']
+report={'passed':True,'hash_bindings_checked':len(checks),'unique_files_checked':len({x['path'] for x in checks}),'resource_closure':22,'native_workers_original_and_frozen':295,'native_hosts_original_and_frozen':23,'archive_files':691,'archive_payload_bytes':3166162,'original_run_sha256':backend['original_native_run_sha256'],'original_state_sha256':backend['state_sha256'],'original_checkpoint_sha256':backend['checkpoint_sha256'],'suite_rootfs':str(root),'suite_rootfs_actual_sha256':actual,'historical_red_green':history,'checked_files':checks};Path('/tmp/sureal-resource-independent-audit.json').write_text(json.dumps(report,indent=2)+'\n');print('PASS independent hash/source/state/raw-evidence audit',len(checks),'bindings',flush=True)

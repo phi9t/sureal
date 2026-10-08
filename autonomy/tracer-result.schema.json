@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "artifacts": {
+      "additionalProperties": {
+        "properties": {
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sha256",
+          "bytes"
+        ],
+        "type": "object"
+      },
+      "required": [
+        "manifest.jsonl",
+        "sources.json",
+        "report.json"
+      ],
+      "type": "object"
+    },
+    "environment": {
+      "type": "object"
+    },
+    "implementation_hashes": {
+      "type": "object"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "source_receipt_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "source_receipt_sha256",
+    "artifacts",
+    "implementation_hashes",
+    "environment"
+  ],
+  "type": "object"
+}

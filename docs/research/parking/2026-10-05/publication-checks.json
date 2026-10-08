@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "portable_tests": {
+    "command": "python -B -m unittest discover -s tests -p test_publication_audit.py",
+    "tests": 24,
+    "exit_code": 0
+  },
+  "publication_audit": {
+    "command": "python scripts/publication_audit.py --root .",
+    "status": "pass",
+    "indexed_files": 4899,
+    "errors": []
+  },
+  "diff_check": {
+    "command": "git diff --cached --check",
+    "exit_code": 0
+  },
+  "historical_archive_spacing": "Path-scoped .gitattributes preserves snapshot bytes; all active source retains normal whitespace checks",
+  "source_parsing": "544 retained Python versions plus6 late Python files; parsed only",
+  "native_or_scientific_experiment": false
+}

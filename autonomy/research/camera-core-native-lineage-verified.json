@@ -1,0 +1,8 @@
+{
+  "receipt_sha256": "b1ee321fe7cbe4a92e8e0c0c9fdc4c8a5d859a2ea329516e8dace97e68e9b20c",
+  "compiled_header_sha256": "31f22d10a0c7ec84b8771bcd8f1a029518b1f08b85c8d458d3c2e56fc086538c",
+  "upstream_commit": "99a4cb3ff07e2fe06c2ce73da001f850f628e45a",
+  "test_count": 10,
+  "failures": 0,
+  "scope": "upstream source, actual include header, all Eigen headers, native test binary/report/log integrity and successful no-TensorFlow dependency linkage verified; native v2 bridge pending"
+}

@@ -1,0 +1,37 @@
+{
+  "milestone": "M2",
+  "status": "verified-complete",
+  "validated_utc": "2026-09-30T06:23:43.800707+00:00",
+  "receipt_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/m2-live-b/receipt.json",
+  "receipt_sha256": "bd4fe72c0fdb453df76e9f467ec5e771afcc0abb4a5fa53dc905ec434c098530",
+  "code_hashes": {
+    "verify-geometry.py": "b41ed5b44d818b9f45b63e7177df1ff3f9d4c3c66d02d4eda82bf0d660e91e39",
+    "pipeline/geometry_foundation.py": "0895aaf92b18d452c50a64e51eee2cbf4fc792a11e8d5642c752f128b9b4ec37",
+    "tests/test_geometry_foundation.py": "9fdbd73fd4892ef6ed2ffe236a85340a1e7fa76ba47fb5500cd96f5b398613b5",
+    "enter.sh": "cf44368faedd98be31271e02d2a4182a02ea10f0cafc854174fd1b33ad36e24e",
+    "pipeline/insula_entry.py": "4ad731aff9057550db8a3c2d194f7b23a1447ef11b8f3d58ec7344f6132209b2"
+  },
+  "tests": [
+    "test_bev_half_open_edges_and_projection",
+    "test_bev_nextafter_upper_edge_stays_inside_last_cell",
+    "test_coupled_se3_exponential",
+    "test_covariance_transport_and_sensor_time_chain",
+    "test_negative_covariance_cannot_be_amplified",
+    "test_noncommuting_transform_and_inverse",
+    "test_nonfinite_inputs_fail",
+    "test_polar_axes_singularities_and_jacobian",
+    "test_radar_is_relative_radial_velocity",
+    "test_right_perturbation_jacobian_and_adjoint",
+    "test_rotation_log_near_pi"
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "elapsed_seconds": 1.563801244017668,
+  "child_peak_rss_kib": 47704
+}

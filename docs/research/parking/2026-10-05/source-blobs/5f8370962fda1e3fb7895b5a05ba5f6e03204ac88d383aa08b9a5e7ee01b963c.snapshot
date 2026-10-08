@@ -1,0 +1,7 @@
+from pathlib import Path
+import json,sys,subprocess
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
+mode=sys.argv[1];out=cache/'insula'/('overfit-yaw-roundtrip-tests-'+mode);out.mkdir();workers=Path('.scratch').resolve();command=launch_plan(root,code,workers,out,['python','/tmp/workers/test_overfit_target_yaw_roundtrip_v2.py']);i=command.index('--');command[i:i]=['--ro-bind',str(workers),'/tmp/workers'];run=subprocess.run(command,capture_output=True,text=True,timeout=60);(out/'live.log').write_text(run.stdout+run.stderr);print(run.stdout+run.stderr);assert (run.returncode!=0 if mode=='red' else run.returncode==0)

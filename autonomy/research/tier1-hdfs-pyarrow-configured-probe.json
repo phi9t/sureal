@@ -1,0 +1,9 @@
+{
+  "command": [
+    "/data02/home/philip.yang/workspace/waystone/.venv/bin/python",
+    "-c",
+    "from waystone.fineweb.hdfs_cli import HdfsCli; v=HdfsCli().ls('hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/engineering/5847910688643719375_180_000_200_000/6b9ce27c0ec88aa33bd0bc7487967b6fc189c304c8104d483bf6fd6329148702.tar'); print('readable entries',len(v))"
+  ],
+  "status": "timeout",
+  "elapsed_seconds": 30.051315304997843
+}

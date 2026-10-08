@@ -1,0 +1,18 @@
+import pathlib,json,sys,hashlib,subprocess,shutil
+P=pathlib.Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(P));from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+sha=lambda p:hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest();C=pathlib.Path.home()/'.cache/waystone/waymo-perception';a=json.loads((P/'research/motion-validation-source-acquired.json').read_text());source=pathlib.Path(a['local_source']);assert sha(source)==a['source_sha256'];R=C/'insula/motion-validation-framing-v1';R.mkdir();code=R/'code';code.mkdir();(code/'pipeline').mkdir();shutil.copy(P/'pipeline/tfrecord_reader.py',code/'pipeline/tfrecord_reader.py');worker=code/'framing.py';worker.write_text('''import json,time,resource,hashlib,importlib.util
+from pathlib import Path
+from pipeline.tfrecord_reader import read_records
+assert importlib.util.find_spec('tensorflow') is None
+start=time.monotonic();rows=[];end=0
+with Path('/source/source.tfrecord').open('rb') as f:
+ for r in read_records(f,max_record_bytes=64*1024*1024):
+  assert r['index']==len(rows) and r['offset']==end
+  rows.append({k:v for k,v in r.items() if k!='payload'}|{'payload_bytes':len(r['payload'])});end=r['offset']+16+len(r['payload'])
+ assert f.tell()==end==Path('/source/source.tfrecord').stat().st_size
+assert rows
+Path('/outputs/frames.json').write_text(json.dumps(rows,indent=2))
+Path('/outputs/check.json').write_text(json.dumps({'records':len(rows),'complete_source_bytes':end,'maximum_record_bytes':max(r['payload_bytes'] for r in rows),'all_frame_crc32c_verified':True,'tensorflow_absent':True,'elapsed_seconds':time.monotonic()-start,'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'scope':'native file framing only; protobuf/scenario/causal gates pending'},indent=2))
+print('FRAMED',len(rows),end,flush=True)
+''');out=R/'output';out.mkdir();root=C/'insula/rootfs-v2';lock=json.loads(pathlib.Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);pins={str(p):sha(p) for p in code.rglob('*.py')};command=launch_plan(root,code,source.parent,out,['python','/experiment/framing.py']);proc=subprocess.run(command,capture_output=True,text=True,timeout=600);(out/'live.log').write_text(proc.stdout+proc.stderr);assert proc.returncode==0,proc.stderr;assert sha(source)==a['source_sha256'];assert all(sha(p)==h for p,h in pins.items());receipt={'command':command,'exit_code':0,'source_pins':pins,'runtime_lock':lock,'input_sha256':a['source_sha256'],'validation':json.loads((out/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in out.iterdir() if p.is_file()}};(P/'research/motion-validation-framing-live-verified.json').write_text(json.dumps(receipt,indent=2));print(proc.stdout)

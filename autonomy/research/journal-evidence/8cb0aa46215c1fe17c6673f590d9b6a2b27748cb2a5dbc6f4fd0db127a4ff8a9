@@ -1,0 +1,66 @@
+"""Independent all-leaf checkpoint/head reference; never imports parity comparator."""
+import hashlib,json,math
+from pathlib import Path
+import numpy as np
+import torch
+
+def digest(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def ref(x):
+ p=Path(x['path']); assert p.is_absolute() and p.is_file() and not any(q.is_symlink() for q in [p,*p.parents]); assert digest(p)==x['sha256']; return p
+def read(x): return json.loads(ref(x).read_text())
+leaves=0;tensors=0
+
+def equal(a,b,path):
+ global leaves,tensors
+ assert type(a) is type(b),path
+ if isinstance(a,torch.Tensor):
+  assert a.dtype==b.dtype and a.shape==b.shape and bool(torch.isfinite(a).all()) and bool(torch.isfinite(b).all()) and torch.equal(a,b),path
+  tensors+=1
+ elif isinstance(a,np.ndarray):
+  assert a.dtype==b.dtype and a.shape==b.shape and np.isfinite(a).all() and np.isfinite(b).all() and np.array_equal(a,b),path
+ elif isinstance(a,dict):
+  assert a.keys()==b.keys(),path
+  for k in a: equal(a[k],b[k],path+'.'+str(k))
+ elif isinstance(a,(list,tuple)):
+  assert len(a)==len(b),path
+  for i,(x,y) in enumerate(zip(a,b)):equal(x,y,path+'.'+str(i))
+ else:
+  if isinstance(a,float):assert math.isfinite(a) and math.isfinite(b),path
+  assert a==b,path
+ leaves+=1
+
+def measurement(x): assert type(x) in (int,float) and math.isfinite(x) and x>=0
+job=json.loads(Path('/source/job.json').read_text())
+a=read(job['original_report']);b=read(job['fresh_report']); assert a.keys()==b.keys()
+allowed={'checkpoint_sha256','cumulative_train_seconds','elapsed_seconds','peak_allocated_bytes','peak_rss_kib','step_records'}
+assert allowed<=a.keys()
+for k in allowed-{'checkpoint_sha256','step_records'}:measurement(a[k]);measurement(b[k])
+equal({k:v for k,v in a.items() if k not in allowed},{k:v for k,v in b.items() if k not in allowed},'producer')
+assert len(a['step_records'])==len(b['step_records'])
+for x,y in zip(a['step_records'],b['step_records']):
+ assert x.keys()==y.keys() and 'synchronized_seconds' in x
+ measurement(x['synchronized_seconds']);measurement(y['synchronized_seconds'])
+ equal({k:v for k,v in x.items() if k!='synchronized_seconds'},{k:v for k,v in y.items() if k!='synchronized_seconds'},'updates')
+prior=0.0 if job['prior_report'] is None else read(job['prior_report'])['cumulative_train_seconds'];measurement(prior)
+states=[]
+for side,report in [('original',a),('fresh',b)]:
+ assert report['checkpoint_sha256']==job[side+'_checkpoint']['sha256']
+ state=torch.load(ref(job[side+'_checkpoint']),map_location='cpu',weights_only=True);states.append(state)
+ total=prior
+ for row in report['step_records']:total+=row['synchronized_seconds']
+ assert total==state['training_seconds']==report['cumulative_train_seconds']
+ assert state['steps']==report['updates'] and state['frame_cursor']==report['frame_cursor']
+ assert len(job[side+'_heads'])==16 and job[side+'_heads'].keys()==report['head_hashes'].keys()
+ for name,pin in job[side+'_heads'].items():assert pin['sha256']==report['head_hashes'][name] and ref(pin).name==name
+assert states[0].keys()==states[1].keys() and 'training_seconds' in states[0]
+equal({k:v for k,v in states[0].items() if k!='training_seconds'},{k:v for k,v in states[1].items() if k!='training_seconds'},'state')
+for name in job['original_heads']:
+ with np.load(ref(job['original_heads'][name]),allow_pickle=False) as x,np.load(ref(job['fresh_heads'][name]),allow_pickle=False) as y:
+  equal({k:x[k] for k in x.files},{k:y[k] for k in y.files},'heads.'+name)
+for k in ['original_checkpoint','fresh_checkpoint','original_report','fresh_report']:ref(job[k])
+for k in ['original_heads','fresh_heads']:
+ for v in job[k].values():ref(v)
+if job['prior_report'] is not None:ref(job['prior_report'])
+result={'passed':True,'state_tensors':tensors,'recursive_nodes_checked':leaves,'heads':16,'updates':a['updates'],'frame_cursor':a['frame_cursor'],'original_training_seconds':states[0]['training_seconds'],'fresh_training_seconds':states[1]['training_seconds'],'scope':'independent CPU reference comparison; no GPU, producer, HDFS or runner admission'}
+Path('/outputs/check.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result))

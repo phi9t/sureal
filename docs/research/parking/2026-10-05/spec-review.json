@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "review_axis": "Spec",
+  "candidate": "5701062",
+  "candidate_exact": "5701062e8a356f925a19baefe297f5bbafe5d716",
+  "base": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+  "observed_ms": 1791175990457,
+  "verdict": "PASS_SCOPED_SOURCE_PARKING_WITH_EXTERNAL_CLEANLINESS_BLOCKER",
+  "findings": [],
+  "checks": {
+    "source_blob_snapshot_private_late_readbacks": 1491,
+    "source_readback_errors": [],
+    "divergent_revisions_covered": 49,
+    "working_source_manifest_entries": 399,
+    "external_lead_source_entries": 13,
+    "late_source_exact_original_readbacks": 7,
+    "actual_Kata_issue_readbacks": 12,
+    "actual_Kata_status_owner_definition_and_prior_dependencies_preserved": true,
+    "actual_Kata_ready_only_uid": "01M4561NAHZRFP9P0N7QAFYDAD",
+    "actual_Kata_parked_MAC_ready_intersection": [],
+    "private_git_bundle_verify": true,
+    "private_git_bundle_sha256": "56ae576dec3bab5df22c38c4c186782ba92b51eab1332392fb1e7c6d24ec9058",
+    "parked_source_or_scientific_code_executed": false,
+    "review_runtime_mutations": false
+  },
+  "requirements_assessed": [
+    "Bounded consolidation and source parking only; no readiness/product/Corenius implementation changes",
+    "Incomplete snapshots remain inert and explicitly PARKED; full MAC acceptance/closures not inferred",
+    "Scientific goals and accepted results preserved; no payload release or new HDFS claim",
+    "Owned stopped scopes and retained unknown/unowned runtime states distinguished",
+    "Late canonical source preserved exact with honest unproven six-tool writer provenance",
+    "Actual open operational hold blocks all twelve MAC issues, rather than relying on P4 labels",
+    "Revision/working-source/worktree manifests retain unique work and explicit private dispositions"
+  ],
+  "external_blockers": [
+    {
+      "requirement": "Canonical checkout clean after publication; writer quiescence",
+      "evidence": "Canonical remains at1cefb02333dd6846f9fd24f9ea51260e03399c7d with7 untracked concurrent-source originals; exact hashes match candidate late-source manifest. Unknown/unowned Claude/shared Codex processes retained. Candidate explicitly refuses global writer-stop/pristine claims.",
+      "disposition": "Scoped exact-source publication may proceed only with immediate unchanged-mainline/path checks and no manipulation of concurrent originals. Report canonical untracked cleanliness as unresolved; do not claim full pristine closeout."
+    }
+  ],
+  "scope_caveats": [
+    "Observed inventory/source hashes are time-bound; fresh canonical/ref/late-write checks required at serialized publication.",
+    "Native goal belongs to parent thread; child get_goal has no native goal. Parent must retain supported paused readback and must not resume it.",
+    "Independent Spec review verifies custody and scope, not scientific efficacy or MAC live acceptance."
+  ]
+}

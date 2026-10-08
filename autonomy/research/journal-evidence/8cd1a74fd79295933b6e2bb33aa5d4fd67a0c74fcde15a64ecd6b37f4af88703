@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "utc": "2026-10-04T03:09:59.137357+00:00",
+  "scope": "requested60 documentation integration and Git-only journal bookkeeping; no implementation or scientific gate promotion",
+  "generation_command": "python /tmp/sureal-doc60-closeout.py (exact script retained as immutable journal118 evidence)",
+  "base": "0c161dda53cde1cd50a2161523d90da88cf40bb4",
+  "requested_commit": "60ede2883ffebe455cf0672ddede3fa0b7e7d4e2",
+  "manual_bootstrap_integration_commit": "33105ee18edbb407b34df4ea14dbc171b6a2dc21",
+  "source60_ancestry_preserved": true,
+  "publication": {
+    "utc": "2026-10-04T03:07:57.098792+00:00",
+    "head": "33105ee18edbb407b34df4ea14dbc171b6a2dc21",
+    "remote_head": "33105ee18edbb407b34df4ea14dbc171b6a2dc21",
+    "canonical_branch": "phi9t/mainline",
+    "canonical_status_empty": true,
+    "requested60_ancestor": true,
+    "bootstrap_manual_merge_only_not_managed_protocol_execution": true,
+    "generation_command": "git merge --ff-only 33105ee18edbb407b34df4ea14dbc171b6a2dc21; git push origin HEAD:refs/heads/phi9t/mainline; git ls-remote origin refs/heads/phi9t/mainline; git status --porcelain=v1 --untracked-files=all --ignore-submodules=none"
+  },
+  "changed_document_audit": "sureal-doc60-document-audit.json",
+  "ten_targets": "sureal-doc60-ten-targets.json",
+  "reviews": {
+    "Standards": {
+      "path": "sureal-doc60-standards-review.json",
+      "findings": 0,
+      "sha256": "7e304546166dd56d98c4e844215dda2fd517ab84475dc6d20b7d7613dc66653b"
+    },
+    "Spec": {
+      "path": "sureal-doc60-spec-review.json",
+      "findings": 0,
+      "sha256": "479b6391fc93cb1f53f3d5778cd4e48d936e67a4a9dfa38c4ada02a04db9474c"
+    }
+  },
+  "checks": [
+    {
+      "command": "python -m unittest tests.test_publication_audit -v",
+      "exit_code": 0,
+      "tests": 24,
+      "seconds": 12.182,
+      "role": "portable host checks, not live scientific or protocol admission"
+    },
+    {
+      "command": "python scripts/publication_audit.py --root .",
+      "exit_code": 0,
+      "result": {
+        "errors": [],
+        "gitlinks": 2,
+        "max_blob_bytes": 26214400,
+        "schema_version": 1,
+        "status": "pass",
+        "tracked_files": 3959
+      },
+      "epoch": "11-document staged candidate before this later bookkeeping"
+    },
+    {
+      "command": "git diff --cached --check",
+      "exit_code": 0,
+      "epoch": "reviewed11-document merge candidate"
+    }
+  ],
+  "foreign_documentation": {
+    "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/models-training-task-specs",
+    "head": "f9fbd5be5b632798f409aa65fb9743588606d701",
+    "remaining_commits": [
+      "f9fbd5be5b632798f409aa65fb9743588606d701 Retain Claude collaboration plan review and hold execution gate",
+      "4469127623350ad5a644ae8c4dd0f8f21ab7c990 Record collaboration spec approval and concrete implementation plan",
+      "5ab76b3a0efb2970e2762f657fb60ee38b3226f6 Complete full v1 collaboration specification and concrete live gates",
+      "3321bb8556e40105a2d0f188ba24101b35d74a77 Model native Codex session trees threads turns and task bindings",
+      "fa257289c5c722fca4572e685c90657cdcd47be1 Define worker operating states and evidence-based stuck/hung health",
+      "c093595a956dc13ef1866ce17947b0371921eea6 Specify worker summaries and read-only program overview as a v1 gate",
+      "9c4c6a7c1454c3a042e9fa1f86aadd3bb10021c2 Require two concurrent worker sessions and live concurrency pilot in v1",
+      "c22865fcb12f110d713311025bc5afdac7723025 Specify Kata as centralized queue linked to committed task contracts",
+      "6b694c8a434387b6be190fa2b87952957766bd20 Specify mainline task admission and explicit worker ownership handoff",
+      "447267246d08d20747ea21fac99bda33bfeed311 Recommend task worktrees and preserve future worker capacity"
+    ],
+    "disposition": "other design-session-owned later revisions preserved, not adopted, merged, edited or deleted in requested60 integration"
+  },
+  "preserved_blocked_source_sha256": {
+    "experiments/waymo-perception/association/candidate_graph.py": "8e43b93ca958598ea3a6732a36a897d4576706501d06499ea13d31877e850644",
+    "experiments/waymo-perception/association/matching.py": "f698f7055321ce4f35667fd9d8a59cc832de8fbfdad1f34b3f2add1b84e941f0",
+    "experiments/waymo-perception/association/native.py": "a50481591f32f72c0da9405d18bab87fe4007ef217c5c49d532158100225949e",
+    "experiments/waymo-perception/association/prepare.py": "b33b1730e4daffea80c051a518557ea8794698e64ef8bd3c78d334f994d0a776",
+    "experiments/waymo-perception/association/targets.py": "223de7d4d1c5c9314376f0cc6cf1c7ec1f50e6e44fd54956ac09dc21d8bc9664",
+    "experiments/waymo-perception/association/test_matching.py": "a565710dc35db3f6fae4ab6e72b6f7b2348453a9a88c1ebe05ef010e2e5d83fb",
+    "experiments/waymo-perception/association/test_native.py": "57d9d25aa64e43a7511da4c6fad030746c876028342920700ec0bcb43d701974",
+    "experiments/waymo-perception/association/test_prepare.py": "c4373e05c8eed74631b718c3713e9e91ddb094e253116924a36585e4727c51cc",
+    "experiments/waymo-perception/association/test_targets.py": "f42fd840b578b4c1e580dc91e9c2c8c97e65551f996eaf10d7e117d59c55c6e7",
+    "experiments/waymo-perception/audit-cohort-labels.py": "c9f695b596150c531bef6aceb382ca9b09e0654f05e73348d5df5277bc653a55",
+    "experiments/waymo-perception/continuation_runtime/identity.py": "5f9155a3eaf384c0841db04480053a2227b19ad8f85e0f4c243c184f016dfe08",
+    "experiments/waymo-perception/continuation_runtime/test_identity.py": "24d0b0f0a9fe7ff390ec1431752b0d63ae6ac38e377deccc76d08fd2082e7acf",
+    "experiments/waymo-perception/explorer/acquire_previews.py": "35b7e8479106f6d7b023d48de0938aacf0915457b14d901780f6bbf62fcfbeaf",
+    "experiments/waymo-perception/explorer/build.py": "b034f3199bfcdb536e3610ce6e5d38aef0a8406b401827fbcc1186225b40992d",
+    "experiments/waymo-perception/explorer/data.py": "d96efc019ad70fd41edb6e52e48afa3a375b6338f67eeb26d131fa1ecf810639",
+    "experiments/waymo-perception/explorer/public-viewer.fragment.html": "b2b3d0a3ec065e90f055879f50b9b7c38f5a4ce7af4e35645f41eda612bd4066",
+    "experiments/waymo-perception/explorer/run_joint_render.py": "89334ab970de2d22398a5a451f384ff6cc8febafd0a5da8ac724781418143df6",
+    "experiments/waymo-perception/explorer/scene-explorer.template.html": "5464b59c3f6ac3444e3104750d91a9fa96ecb3f8a89696421df5941125d8b079",
+    "experiments/waymo-perception/explorer/test_data.py": "3ed7597c75fa654aeb0e02d0bb1e80cf8009f48576d07f6f901d929a0495ecbc"
+  },
+  "protected_scientific_host_hash_rechecks": [
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/run.json",
+      "sha256": "96dc607ae8238774ca875588d65eaf463f120227e161ae792a9187c8e6635d7d",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/state.json",
+      "sha256": "dac2ce421243c4750175f98152cdc1ce4ecb7e1a493ddee7050c42fcc09e7765",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-00/checkpoint.pt",
+      "sha256": "8057a5496c4d6ec4d19b9de33034c6cca753ea39d8f03fd765ad7011cdf301ee",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-1000/checkpoint.pt",
+      "sha256": "37de2375b0b10f92a56468bd9ffe0b2fea42f257c5949efa80fd29c621a8ff4a",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-00-admitted.json",
+      "sha256": "dde09eb7e6d65e781597da82870ca6c64ea5bff1ea77d31b8b8268ec5a0ad364",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-1000-admitted.json",
+      "sha256": "b0a874b87a2541ab13b2a97e36540b458b54bb0996c6e679a8c156d0160f52d9",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/identity.json",
+      "sha256": "f2514b46aa6952662b35183df8db0ce9ec914b38640de2a1d24cfbf7bbe80e5d",
+      "exact_to_original": true
+    }
+  ],
+  "remaining_disposition": "19 source blockers retain existing inventory reasons and HDFS retention roles; timestamp-only worker registry, scratch/caches, preview derivatives, locks, processes and later design-session commits remain retained; no retirement/quiescence claim",
+  "remaining_inventory": "sureal-comprehensive-closeout-final-inventory.json",
+  "retention_scope": "new documentation bookkeeping is Git-only after sealed HDFS113; previous exact HDFS/live recovery receipts remain unchanged; no scientific payload released",
+  "activation": "written design/plan review and implementation-specific live Insula/resource/process admission remain required for49\u201353;53 then gates44\u201348",
+  "overall_research_goal": "still active; no new optimizer samples, held-out research, segmentation/SAM or forecasting completion"
+}

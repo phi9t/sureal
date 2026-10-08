@@ -1,0 +1,58 @@
+{
+  "native_F_G": "Retained UNKNOWN empty/unmaterialized threads; no release/retry/cleanup asserted",
+  "native_H": "No native creation/effects; stopped host scopes",
+  "native_goal": "paused per user supportedgoalreadback",
+  "observed_ms": 1791174768380,
+  "reads": [
+    {
+      "exit_code": 0,
+      "scope": "sureal-sustained-collab-stop50-20261005h-driver-live-v8.scope",
+      "stderr": "",
+      "stdout": "ControlGroup=\nActiveState=inactive\nSubState=dead\n"
+    },
+    {
+      "exit_code": 0,
+      "scope": "sureal-sustained-collab-stop50-20261005h-operator.scope",
+      "stderr": "",
+      "stdout": "ControlGroup=\nActiveState=inactive\nSubState=dead\n"
+    },
+    {
+      "exit_code": 0,
+      "scope": "sureal-sustained-collab-stop50-20261005h-observer.scope",
+      "stderr": "",
+      "stdout": "ControlGroup=\nActiveState=inactive\nSubState=dead\n"
+    },
+    {
+      "exit_code": 0,
+      "scope": "sureal-sustained-collab-stop50-20261005g-operator.scope",
+      "stderr": "",
+      "stdout": "ControlGroup=\nActiveState=inactive\nSubState=dead\n"
+    },
+    {
+      "exit_code": 0,
+      "scope": "sureal-sustained-collab-stop50-20261005g-observer.scope",
+      "stderr": "",
+      "stdout": "ControlGroup=\nActiveState=inactive\nSubState=dead\n"
+    },
+    {
+      "exit_code": 0,
+      "scope": "sureal-sustained-collab-channel-header-insula-v1.scope",
+      "stderr": "",
+      "stdout": "ControlGroup=\nActiveState=inactive\nSubState=dead\n"
+    },
+    {
+      "argv": [
+        "systemctl",
+        "--user",
+        "list-units",
+        "--all",
+        "--plain",
+        "--no-legend",
+        "sureal-sustained*"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "sureal-sustained-collab-root-suite-20261004a.scope            loaded failed failed /usr/bin/python3 -B -m unittest discover -s tests/collab -p test_*.py\nsureal-sustained-collab-root-suite-diagnostic-20261004a.scope loaded failed failed /usr/bin/python3 -B -m unittest discover -v -s tests/collab -p test_*.py\n"
+    }
+  ]
+}

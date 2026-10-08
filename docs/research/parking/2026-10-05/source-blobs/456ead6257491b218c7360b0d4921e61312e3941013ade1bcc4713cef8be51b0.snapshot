@@ -1,0 +1,7 @@
+from pathlib import Path
+import subprocess,json
+logs=Path.home()/'.cache/waystone/waymo-perception/insula/continuation-logs'
+steps=[('run-architecture-exclusive.py','context_pfn'),('audit-architecture-checkpoint.py','context_pfn'),('audit-architecture-checkpoint.py','residual_bev'),('run-retain64-learning-curve.py','retain64'),('audit-retain64-checkpoint.py','retain64')]
+for worker,variant in steps:
+ with (logs/('recovery-'+variant+'-'+worker+'.log')).open('w') as f:r=subprocess.run(['python','.scratch/'+worker,variant],stdout=f,stderr=subprocess.STDOUT)
+ assert r.returncode==0,(worker,variant);print('PASS recovery',variant,worker,flush=True)

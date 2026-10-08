@@ -1,0 +1,57 @@
+import hashlib,json,re,subprocess
+from pathlib import Path
+from urllib.parse import unquote
+root=Path.cwd();scope=json.loads(Path('/tmp/sureal-doc-branch-qualified-scope.json').read_text());pins=json.loads(Path('/tmp/sureal-doc-branch-preserved-pins.json').read_text());base=scope['base'];source=scope['source_head']
+paths=subprocess.check_output(['git','diff','--cached','--name-only',base],text=True).splitlines();assert len(paths)==22 and set(paths)=={x['path'] for x in scope['paths']}
+def digest(data):return hashlib.sha256(data).hexdigest()
+def anchors(p):
+ names=set();counts={};fence=False
+ for line in p.read_text().splitlines():
+  if line.startswith(('```','~~~')):fence=not fence;continue
+  if fence:continue
+  m=re.match(r'^#{1,6}\s+(.+?)\s*#*$',line)
+  if not m:continue
+  slug=re.sub(r'[^\w\- ]','',m.group(1).lower()).replace(' ','-');n=counts.get(slug,0);counts[slug]=n+1;names.add(slug if not n else slug+'-'+str(n))
+ return names
+links=0;anchor_checks=0;missing=[]
+for row in scope['paths']:
+ p=Path(row['path']);data=p.read_bytes();assert digest(data)==row['sha256'] and digest(subprocess.check_output(['git','show',':'+row['path']]))==row['sha256']
+ if p.suffix!='.md':continue
+ text=data.decode()
+ for target in re.findall(r'\[[^\]\n]+\]\(([^)\n]+)\)',text):
+  target=target.strip('<>')
+  if target.startswith(('https://','http://','mailto:','app://')):continue
+  href,_,fragment=target.partition('#');resolved=(p.parent/unquote(href)).resolve() if href else p.resolve();links+=1
+  if not resolved.exists():missing.append({'source':str(p),'target':target,'reason':'missing_path'});continue
+  if fragment and resolved.suffix=='.md':
+   anchor_checks+=1
+   if unquote(fragment) not in anchors(resolved):missing.append({'source':str(p),'target':target,'reason':'missing_anchor'})
+ for marker in ('<<<<<<< ','=======\n','>>>>>>> '):assert marker not in text
+assert not missing,missing
+qualifiers={'docs/research/README.md','docs/research/task-queue.md','docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md','docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md'}
+for p in pins['expected_source_paths']:
+ if p in qualifiers or p=='experiments/waymo-perception/research-task-index.md':continue
+ assert Path(p).read_bytes()==subprocess.check_output(['git','show',source+':'+p]),p
+idx='experiments/waymo-perception/research-task-index.md';old=subprocess.check_output(['git','show',base+':'+idx],text=True);new=Path(idx).read_text();assert new[new.index('## Prediction–target association study'):] == old[old.index('## Prediction–target association study'):]
+for n in ('49','50','51','52','53-0','53','54'):
+ candidates=[p for p in paths if p.startswith('docs/research/tasks/'+n+'-')];p=next(p for p in candidates if n=='53-0' or not p.startswith('docs/research/tasks/53-0-'))
+ for heading in ('**Goal:**','**Dependencies:**','## Deliverables','## Verifiers','## Acceptance','## Closure evidence'):assert heading in Path(p).read_text(),(p,heading)
+coverage=json.loads(Path('docs/collaboration/coverage.json').read_text());assert set(coverage['cases'])=={'49','50','51','52','53.0','54','53'};assert sum(len(x) for x in coverage['cases'].values())==39
+for stage,rows in coverage['cases'].items():
+ assert len({x['id'] for x in rows})==len(rows)
+ for row in rows:assert row['oracle'] and row['required_raw_evidence'] and row['absence']=='refuse acceptance'
+for pilot in ('53.A','53.B'):
+ v=json.loads(Path('docs/collaboration/checks/'+pilot+'.json').read_text());assert v['pilot']==pilot
+ for row in v['checks']+v['required_scenarios']:
+  assert row['oracle'] and isinstance(row['argv'],list) and all(isinstance(x,str) for x in row['argv']) and isinstance(row['expected_exit'],int)
+provenance=json.loads(Path('docs/research/reviews/2026-10-03-sureal-collaboration-claude-review.json').read_text());assert provenance['verdict']=='changes required'
+for p,h in provenance['source_files'].items():assert digest(subprocess.check_output(['git','show',provenance['source_commit']+':'+p]))==h,p
+review=Path('docs/research/reviews/2026-10-03-sureal-collaboration-claude-review.md').read_text();body=review.split('\n---\n',1)[1].lstrip('\n');assert digest(body.encode())==provenance['review_body_sha256']
+for p,h in pins['blocked_source_sha256'].items():assert digest(Path(p).read_bytes())==h
+journal='experiments/waymo-perception/research/research-journal.jsonl';assert digest(Path(journal).read_bytes())==pins['journal120_prefix_sha256']
+registry='experiments/waymo-perception/research/experiments.json';current=json.loads(Path(registry).read_text());original=json.loads(subprocess.check_output(['git','show',base+':'+registry],text=True));current.pop('updated_utc');original.pop('updated_utc');assert current==original
+protected=json.loads(Path('experiments/waymo-perception/research/sureal-doc60-integration.json').read_text())['protected_scientific_host_hash_rechecks']
+for row in protected:
+ with Path(row['path']).open('rb') as f:assert hashlib.file_digest(f,'sha256').hexdigest()==row['sha256']
+report={'schema_version':1,'base':base,'source_head':source,'generation_command':'python /tmp/sureal-doc-branch-document-audit.py; exact generator retained in journal121 evidence','scope':'wholecommitteddocumentation branch plus explicit open-authority qualifications; no implementation/live gate promotion','paths':scope['paths'],'local_links_checked':links,'local_MD_anchors_checked':anchor_checks,'missing_links_or_anchors':missing,'source_docs_exact_except_four_qualification_overlays_and_additive_research_index':True,'coverage_oracles':39,'coverage_is_future_required_checks_not_run_receipts':True,'pilot_manifests_valid_argv_oracle_structure':True,'original_Claude15source_pins_and_verbatim_body_exact':True,'original_Claude_verdict_preserved':'changes required','research41_42_43_suffix_exact':True,'seven_task_goal_dependency_verifier_acceptance_closure_contracts_present':True,'all19_blocked_sources_exact':True,'journal120_prefix_exact_before121_append':True,'registry_science_semantics_exact_excluded_timestamp_projection':True,'protected_scientific_host_hash_rechecks':protected,'SPEC_1_ownership_authority':'open; qualified proposal retention, no backend selection, Kata registration, two-seat or plan/runtime activation'}
+Path('/tmp/sureal-doc-branch-document-audit.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps({k:v for k,v in report.items() if k not in ('paths','protected_scientific_host_hash_rechecks')},indent=2))

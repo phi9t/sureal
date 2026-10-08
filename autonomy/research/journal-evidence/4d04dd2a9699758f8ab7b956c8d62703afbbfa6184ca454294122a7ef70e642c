@@ -1,0 +1,266 @@
+{
+  "admission": {
+    "journal_source_review_only": true,
+    "native_stop_capability": false,
+    "new_HDFS_release_or_scientific_acceptance": false,
+    "no_native_source_cleanup_or_gate_effect_by_reviewer": true,
+    "task50_accepted": false
+  },
+  "author": "/root",
+  "author_native_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+  "candidate": "2da162926471b9fc941f330274b2b8ff9cfe9466",
+  "checks": {
+    "all126_entry_hashes_and_sequence_verified": true,
+    "all21_original_and_snapshot_bytes_and_hashes_verified": [
+      {
+        "bytes": 13062,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/2f14a7915a6b939143dfd13adbcf4a7b05493f386b95e7690a124ac6060bcdf4",
+        "source": {
+          "path": "/data02/home/philip.yang/devx/tmp/collab49-final-pristine-review-a553645.json",
+          "sha256": "2f14a7915a6b939143dfd13adbcf4a7b05493f386b95e7690a124ac6060bcdf4"
+        }
+      },
+      {
+        "bytes": 6171,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/66677faca1ce71b59fc2dea4d3ef39235f8e8ceeb3143a196eaf89a312eeaf69",
+        "source": {
+          "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/review-package.json",
+          "sha256": "66677faca1ce71b59fc2dea4d3ef39235f8e8ceeb3143a196eaf89a312eeaf69"
+        }
+      },
+      {
+        "bytes": 5861,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/4c10a69d14ef071d44acdf595ba5a66291f24fffe4e70bf69f2adb2b2d76208e",
+        "source": {
+          "path": "/data02/home/philip.yang/devx/tmp/collab50-auditor-review-e07de85.json",
+          "sha256": "4c10a69d14ef071d44acdf595ba5a66291f24fffe4e70bf69f2adb2b2d76208e"
+        }
+      },
+      {
+        "bytes": 5105,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/91e2e5d890d7a908f86a2eb5ed9f78d1fe4fe743f18a2437681a74cf651e0bb6",
+        "source": {
+          "path": "/data02/home/philip.yang/devx/tmp/collab50-native-fixture-review-80e886f.json",
+          "sha256": "91e2e5d890d7a908f86a2eb5ed9f78d1fe4fe743f18a2437681a74cf651e0bb6"
+        }
+      },
+      {
+        "bytes": 629,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/f7e8b7665c21642b26d9216138d93387ba40df36f860acba2cfae87035b3ee42",
+        "source": {
+          "path": "/data02/home/philip.yang/devx/tmp/collab50-review-80e886f-deadline-control.json",
+          "sha256": "f7e8b7665c21642b26d9216138d93387ba40df36f860acba2cfae87035b3ee42"
+        }
+      },
+      {
+        "bytes": 5387,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/57fe6a577fd4ace8c7362eb273bb71dd092a74b4337826b0161f5fedb3fb133e",
+        "source": {
+          "path": "/data02/home/philip.yang/devx/tmp/collab50-native-fixture-review-8441d98.json",
+          "sha256": "57fe6a577fd4ace8c7362eb273bb71dd092a74b4337826b0161f5fedb3fb133e"
+        }
+      },
+      {
+        "bytes": 13071,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/e62bf1312915d187195eb1a6e08761a72becafc0ded3ae224cd13e1c512619fd",
+        "source": {
+          "path": "/data02/home/philip.yang/devx/tmp/collab50-actual-preflight-channel-review-v4.json",
+          "sha256": "e62bf1312915d187195eb1a6e08761a72becafc0ded3ae224cd13e1c512619fd"
+        }
+      },
+      {
+        "bytes": 12104,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/4fb7dd13bc763eddbe340d28086220a13bb96d0aadf87a77067d4566ebab3374",
+        "source": {
+          "path": "/data02/home/philip.yang/devx/tmp/collab50-actual-preflight-review-v2.json",
+          "sha256": "4fb7dd13bc763eddbe340d28086220a13bb96d0aadf87a77067d4566ebab3374"
+        }
+      },
+      {
+        "bytes": 3747,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/fb4657725d81045bc44a9c8c8607f2e9c9b5d7614471123aee54c4a1e4cf11d8",
+        "source": {
+          "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/stop-preflight-user-authority-v5.json",
+          "sha256": "fb4657725d81045bc44a9c8c8607f2e9c9b5d7614471123aee54c4a1e4cf11d8"
+        }
+      },
+      {
+        "bytes": 1781,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/32fc8e9980735a56dbbf4e9eb69da751130d2127628b9cfb71c61d9cd5d01007",
+        "source": {
+          "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-provenance-v4.json",
+          "sha256": "32fc8e9980735a56dbbf4e9eb69da751130d2127628b9cfb71c61d9cd5d01007"
+        }
+      },
+      {
+        "bytes": 1538,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/6526f9c345c53e5fdd5e4d42303c6d7fd49808545706d2a590295645469523b0",
+        "source": {
+          "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-operator-command-v4/actual-command.json",
+          "sha256": "6526f9c345c53e5fdd5e4d42303c6d7fd49808545706d2a590295645469523b0"
+        }
+      },
+      {
+        "bytes": 1545,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/581b56f442a34ea3f759e1ca2b2ad013ff77a73104fccadfd13a92b1518a9d19",
+        "source": {
+          "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-observer-command-v4/actual-command.json",
+          "sha256": "581b56f442a34ea3f759e1ca2b2ad013ff77a73104fccadfd13a92b1518a9d19"
+        }
+      },
+      {
+        "bytes": 9932,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/d8a96341a9623474f5b7a5772103ef9ff424eae9d92a9fd06fd4cd4ff54fb152",
+        "source": {
+          "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-observer-v4/run/report.json",
+          "sha256": "d8a96341a9623474f5b7a5772103ef9ff424eae9d92a9fd06fd4cd4ff54fb152"
+        }
+      },
+      {
+        "bytes": 2620,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/1c8fc9df7eaa94e99da1335b6ffd3335402c86602fcd1b7639d9dab527309b3f",
+        "source": {
+          "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-observer-v4/run/incomplete-native-observation.json",
+          "sha256": "1c8fc9df7eaa94e99da1335b6ffd3335402c86602fcd1b7639d9dab527309b3f"
+        }
+      },
+      {
+        "bytes": 132,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/036a50d6467d820423c7cf84067eb22f877eca9f2c30520e523a2beeebfc99d8",
+        "source": {
+          "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/operator-returning.json",
+          "sha256": "036a50d6467d820423c7cf84067eb22f877eca9f2c30520e523a2beeebfc99d8"
+        }
+      },
+      {
+        "bytes": 4999,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/3786649fc51a138fd786c69195ff3ff872594975e46ff9cf510704b9ae978058",
+        "source": {
+          "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/public-event-0001.json",
+          "sha256": "3786649fc51a138fd786c69195ff3ff872594975e46ff9cf510704b9ae978058"
+        }
+      },
+      {
+        "bytes": 5038,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/a626a06b8ade64912d54d330cf1ef21ae628a6c9418599ceaf03ee5e7afbdd28",
+        "source": {
+          "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/public-event-0002.json",
+          "sha256": "a626a06b8ade64912d54d330cf1ef21ae628a6c9418599ceaf03ee5e7afbdd28"
+        }
+      },
+      {
+        "bytes": 5245,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/5832d5c59f6fd5362fec90743a486ceae8a57f42ce6ce6031ba3385174a16e27",
+        "source": {
+          "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/public-event-0003.json",
+          "sha256": "5832d5c59f6fd5362fec90743a486ceae8a57f42ce6ce6031ba3385174a16e27"
+        }
+      },
+      {
+        "bytes": 5261,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/4834bea450f5ab60022c54a1a44f7d65ab044ec7eb8c6452263bf499fab16881",
+        "source": {
+          "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/public-event-0004.json",
+          "sha256": "4834bea450f5ab60022c54a1a44f7d65ab044ec7eb8c6452263bf499fab16881"
+        }
+      },
+      {
+        "bytes": 4997,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/dbdc7a6f7a04953924ba024f07fad06e542f0657bd1257710056140712a9354e",
+        "source": {
+          "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/public-event-0005.json",
+          "sha256": "dbdc7a6f7a04953924ba024f07fad06e542f0657bd1257710056140712a9354e"
+        }
+      },
+      {
+        "bytes": 5039,
+        "snapshot_git_path": "experiments/waymo-perception/research/journal-evidence/5d883206969d56ab181598395b4fa56e6f7ba0ad63cdd4f489a2186d20cd822d",
+        "source": {
+          "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/public-event-0006.json",
+          "sha256": "5d883206969d56ab181598395b4fa56e6f7ba0ad63cdd4f489a2186d20cd822d"
+        }
+      }
+    ],
+    "canonical_readonly_observation": {
+      "head": "a553645ef22761aa7708abf1ee109952a6cd2c38",
+      "origin_tracking_mainline": "a553645ef22761aa7708abf1ee109952a6cd2c38",
+      "ref": "refs/heads/phi9t/mainline",
+      "status_z_hex": ""
+    },
+    "claims": "Matches sealed e62bf131 D assessment and4c10a69/57fe6a57 source reviews: observed channel gap, missing cwd/processId/kernel witness, no stop/ticket50/managed acceptance, no HDFS epoch extension/local release or new scientific result. Forward next contract/source/live gates remain explicit.",
+    "entry126_head": "80ad6c4b5e7bba0fca28d53f3c656dd2f4620c42697adf07bf37013f72b3f3d0",
+    "exact_journal_only_scope": [
+      "experiments/waymo-perception/research/journal-evidence/036a50d6467d820423c7cf84067eb22f877eca9f2c30520e523a2beeebfc99d8",
+      "experiments/waymo-perception/research/journal-evidence/1c8fc9df7eaa94e99da1335b6ffd3335402c86602fcd1b7639d9dab527309b3f",
+      "experiments/waymo-perception/research/journal-evidence/2f14a7915a6b939143dfd13adbcf4a7b05493f386b95e7690a124ac6060bcdf4",
+      "experiments/waymo-perception/research/journal-evidence/32fc8e9980735a56dbbf4e9eb69da751130d2127628b9cfb71c61d9cd5d01007",
+      "experiments/waymo-perception/research/journal-evidence/3786649fc51a138fd786c69195ff3ff872594975e46ff9cf510704b9ae978058",
+      "experiments/waymo-perception/research/journal-evidence/4834bea450f5ab60022c54a1a44f7d65ab044ec7eb8c6452263bf499fab16881",
+      "experiments/waymo-perception/research/journal-evidence/4c10a69d14ef071d44acdf595ba5a66291f24fffe4e70bf69f2adb2b2d76208e",
+      "experiments/waymo-perception/research/journal-evidence/4fb7dd13bc763eddbe340d28086220a13bb96d0aadf87a77067d4566ebab3374",
+      "experiments/waymo-perception/research/journal-evidence/57fe6a577fd4ace8c7362eb273bb71dd092a74b4337826b0161f5fedb3fb133e",
+      "experiments/waymo-perception/research/journal-evidence/581b56f442a34ea3f759e1ca2b2ad013ff77a73104fccadfd13a92b1518a9d19",
+      "experiments/waymo-perception/research/journal-evidence/5832d5c59f6fd5362fec90743a486ceae8a57f42ce6ce6031ba3385174a16e27",
+      "experiments/waymo-perception/research/journal-evidence/5d883206969d56ab181598395b4fa56e6f7ba0ad63cdd4f489a2186d20cd822d",
+      "experiments/waymo-perception/research/journal-evidence/6526f9c345c53e5fdd5e4d42303c6d7fd49808545706d2a590295645469523b0",
+      "experiments/waymo-perception/research/journal-evidence/66677faca1ce71b59fc2dea4d3ef39235f8e8ceeb3143a196eaf89a312eeaf69",
+      "experiments/waymo-perception/research/journal-evidence/91e2e5d890d7a908f86a2eb5ed9f78d1fe4fe743f18a2437681a74cf651e0bb6",
+      "experiments/waymo-perception/research/journal-evidence/a626a06b8ade64912d54d330cf1ef21ae628a6c9418599ceaf03ee5e7afbdd28",
+      "experiments/waymo-perception/research/journal-evidence/d8a96341a9623474f5b7a5772103ef9ff424eae9d92a9fd06fd4cd4ff54fb152",
+      "experiments/waymo-perception/research/journal-evidence/dbdc7a6f7a04953924ba024f07fad06e542f0657bd1257710056140712a9354e",
+      "experiments/waymo-perception/research/journal-evidence/e62bf1312915d187195eb1a6e08761a72becafc0ded3ae224cd13e1c512619fd",
+      "experiments/waymo-perception/research/journal-evidence/f7e8b7665c21642b26d9216138d93387ba40df36f860acba2cfae87035b3ee42",
+      "experiments/waymo-perception/research/journal-evidence/fb4657725d81045bc44a9c8c8607f2e9c9b5d7614471123aee54c4a1e4cf11d8",
+      "experiments/waymo-perception/research/research-journal.jsonl",
+      "experiments/waymo-perception/research/research-journal.md"
+    ],
+    "external_publication_limit": "Current canonical HEAD/ref/status and origin tracking pin corroborate entry context. No remote mutation or repeated external publication performed; accepted R publication authority remains the original final-pristine report.",
+    "prefix1_through125_byte_identical": true,
+    "previous_head": "b2120655f6ecd606b17a17d9891d5fa1d342ba400dc13fb3a00e5d486633af7d",
+    "privacy": "New snapshots contain owned fixture public metadata, command paths/digests, source review packages and receipts. No message transcript/private reasoning/credentials/raw sensor payload is included.",
+    "rendered_MD_prefix_and_appended_entry_links_match": true,
+    "retained_runtime_lock": {
+      "disposition": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/journal126-runtime-lock-disposition.json",
+        "sha256": "efcb2f6acb2f01d15dd4779141b00dfcf4b5b2ff5bfd0870d5d2db1b2e083a16"
+      },
+      "empty_regular_file": true,
+      "file": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/retained-journal126-runtime-lock",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "source_worktree_clean_at_exact_candidate": true
+  },
+  "findings": [],
+  "kind": "independent-research-journal-source-review",
+  "parent": "8441d98b3c935ea39d048568b409efd92e261c91",
+  "references": [
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-actual-preflight-channel-review-v4.json",
+      "sha256": "e62bf1312915d187195eb1a6e08761a72becafc0ded3ae224cd13e1c512619fd"
+    },
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-auditor-review-e07de85.json",
+      "sha256": "4c10a69d14ef071d44acdf595ba5a66291f24fffe4e70bf69f2adb2b2d76208e"
+    },
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-native-fixture-review-8441d98.json",
+      "sha256": "57fe6a577fd4ace8c7362eb273bb71dd092a74b4337826b0161f5fedb3fb133e"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/journal126-runtime-lock-disposition.json",
+      "sha256": "efcb2f6acb2f01d15dd4779141b00dfcf4b5b2ff5bfd0870d5d2db1b2e083a16"
+    }
+  ],
+  "reviewed_ms": 1791150847264,
+  "reviewer": "/root/collab_execution_admission_review",
+  "reviewer_control_notes": [
+    "The retained runtime-lock path was initially assumed to be a directory; it is the exact retained empty regular file. Literal filesystem inspection and its separate disposition corrected that reviewer assumption. No source or retention defect."
+  ],
+  "reviewer_native_thread_id": "01a105a5-de93-74a3-adad-c5184f54a751",
+  "schema_version": 1,
+  "source": "/data02/home/philip.yang/workspace/sureal/.worktrees/collaboration50-preflight-20261004a",
+  "tree": "0c4ee679e5d37151903d59690f04de324df1449d",
+  "verdict": "pass"
+}

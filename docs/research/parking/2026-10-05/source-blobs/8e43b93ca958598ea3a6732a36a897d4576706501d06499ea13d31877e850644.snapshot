@@ -1,0 +1,101 @@
+"""Prediction-independent bounded eight-slot graphs with Hall diagnostics."""
+from collections import deque
+import numpy as np
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import maximum_bipartite_matching
+
+
+def _boxes(value, name):
+    array=np.asarray(value,dtype=np.float64)
+    if array.ndim!=2 or array.shape[1]!=7 or not np.isfinite(array).all() or np.any(array[:,3:6]<=0):
+        raise ValueError(f'{name}: finite native Nx7 boxes with positive dimensions required')
+    return array
+
+
+def feasibility(edges, n_anchors, n_targets):
+    """Maximum cardinality plus an alternating-reachability Hall witness."""
+    by_target=[[] for _ in range(n_targets)];by_anchor={}
+    for anchor,target in edges:
+        a=int(anchor);t=int(target);by_target[t].append(a);by_anchor.setdefault(a,[]).append(t)
+    compact=sorted(by_anchor);lookup={a:i for i,a in enumerate(compact)}
+    rows=[];cols=[]
+    for t,neighbors in enumerate(by_target):
+        rows.extend([t]*len(neighbors));cols.extend(lookup[a] for a in neighbors)
+    matrix=csr_matrix((np.ones(len(rows),dtype=np.int8),(rows,cols)),shape=(n_targets,len(compact)))
+    matching=maximum_bipartite_matching(matrix,perm_type='column') if n_targets else np.empty(0,dtype=np.int64)
+    matched_anchor={compact[int(a)]:t for t,a in enumerate(matching) if a>=0}
+    cardinality=int(np.count_nonzero(matching>=0))
+    unseen=set(range(n_targets));components=[]
+    while unseen:
+        start=min(unseen);targets={start};anchors=set();queue=deque([start]);unseen.remove(start)
+        while queue:
+            t=queue.popleft()
+            for a in by_target[t]:
+                if a in anchors:continue
+                anchors.add(a)
+                for other in by_anchor[a]:
+                    if other in unseen:unseen.remove(other);targets.add(other);queue.append(other)
+        count=sum(matching[t]>=0 for t in targets)
+        components.append({'target_indices':sorted(targets),'anchor_indices':sorted(anchors),
+                           'cardinality':int(count),'deficient':count<len(targets)})
+    reachable_t=set(np.flatnonzero(matching<0).tolist());reachable_a=set();queue=deque(sorted(reachable_t))
+    while queue:
+        t=queue.popleft()
+        for a in by_target[t]:
+            if a in reachable_a:continue
+            reachable_a.add(a);owner=matched_anchor.get(a)
+            if owner is not None and owner not in reachable_t:reachable_t.add(owner);queue.append(owner)
+    return {'status':'feasible' if cardinality==n_targets else 'infeasible',
+            'cardinality':cardinality,'components':components,
+            'deficiency':{'target_indices':sorted(reachable_t),'anchor_indices':sorted(reachable_a),
+                          'deficit':len(reachable_t)-len(reachable_a)}}
+
+
+def build_graph(anchors, gt_boxes, gt_ids, legacy_target_indices, legacy_positive_mask,
+                *, initial_radius=1, max_radius=3, gt_classes=None):
+    anchors=_boxes(anchors,'anchors');boxes=_boxes(gt_boxes,'GT')
+    if initial_radius!=1 or max_radius!=3 or type(initial_radius) is not int or type(max_radius) is not int:
+        raise ValueError('frozen radius1→3 policy required')
+    if len(gt_ids)!=len(boxes) or any(not isinstance(i,str) or not i for i in gt_ids) or len(set(gt_ids))!=len(gt_ids):
+        raise ValueError('unique nonempty target IDs required')
+    n=len(anchors);owners=np.asarray(legacy_target_indices);positive=np.asarray(legacy_positive_mask)
+    if n==0 or n%8 or owners.shape!=(n,) or owners.dtype.kind not in 'iu' or positive.shape!=(n,) or positive.dtype.kind!='b':
+        raise ValueError('eight-slot lattice and paired integer owners/bool positives required')
+    if np.any(owners[positive]<0) or np.any(owners[positive]>=len(boxes)) or np.any(owners[~positive]!=-1):
+        raise ValueError('legacy positive ownership inconsistent')
+    cells=anchors.reshape(-1,8,7)
+    if not np.all(cells[:,:,:2]==cells[:,0:1,:2]):raise ValueError('eight co-centered slots per cell required')
+    xs=np.unique(cells[:,0,0]);ys=np.unique(cells[:,0,1]);nx=len(xs);ny=len(ys)
+    if nx*ny!=len(cells) or not np.array_equal(cells[:,0,0],np.tile(xs,ny)) or not np.array_equal(cells[:,0,1],np.repeat(ys,nx)):
+        raise ValueError('complete row-major anchor lattice required')
+    for axis in (xs,ys):
+        if len(axis)>2 and not np.allclose(np.diff(axis),axis[1]-axis[0],rtol=0,atol=1e-10):raise ValueError('regular lattice required')
+    canonical=np.array(sorted(range(len(boxes)),key=lambda i:gt_ids[i]),dtype=np.int64)
+    inverse=np.empty(len(boxes),dtype=np.int64);inverse[canonical]=np.arange(len(boxes))
+    boxes=boxes[canonical];ids=[gt_ids[i] for i in canonical]
+    centers=[(int(np.argmin(np.abs(ys-b[1]))),int(np.argmin(np.abs(xs-b[0])))) for b in boxes]
+    inherited=[set() for _ in boxes]
+    for a in np.flatnonzero(positive):inherited[int(inverse[owners[a]])].add(int(a))
+    radii=np.full(len(boxes),initial_radius,dtype=np.int64)
+
+    def neighbors(target,radius):
+        y,x=centers[target]
+        return {8*(row*nx+col)+slot for row in range(max(0,y-radius),min(ny,y+radius+1))
+                for col in range(max(0,x-radius),min(nx,x+radius+1)) for slot in range(8)}
+
+    def materialize():
+        return np.array(sorted((a,t) for t,r in enumerate(radii) for a in neighbors(t,int(r))|inherited[t]),dtype=np.int64).reshape(-1,2)
+
+    while True:
+        edges=materialize();report=feasibility(edges,n,len(boxes))
+        grow=[t for component in report['components'] if component['deficient'] for t in component['target_indices'] if radii[t]<max_radius]
+        if not grow:break
+        radii[grow]+=1
+    exceptions=np.array(sorted((a,t) for t,r in enumerate(radii) for a in inherited[t]-neighbors(t,int(r))),dtype=np.int64).reshape(-1,2)
+    result={'edges':edges,'target_ids':ids,'canonical_to_input':canonical,'radius_by_target':radii,
+            'legacy_exceptions':exceptions,'feasibility':report,'n_anchors':n,'n_targets':len(boxes)}
+    if gt_classes is not None:
+        classes=np.asarray(gt_classes)
+        if classes.shape!=(len(boxes),) or classes.dtype.kind not in 'iu' or np.any((classes<1)|(classes>4)):raise ValueError('native target classes1–4 required')
+        result['target_classes']=classes[canonical].copy()
+    return result

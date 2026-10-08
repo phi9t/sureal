@@ -1,0 +1,96 @@
+load("@rules_python//python:defs.bzl", "py_binary", "py_library", "py_test")
+
+TEST_MODULES = glob(["*_test.py"])
+LIB_MODULES = glob(
+    ["*.py"],
+    exclude = ["*_test.py"],
+)
+
+package(default_visibility = ["//visibility:private"])
+
+exports_files(
+    [
+        "cache_inventory.py",
+        "cache_retention_audit.py",
+        "checkpoint_retention_audit.py",
+        "checkpoint_retention_policy.py",
+        "checkpoint_retention_sources.py",
+        "pilot_retention_audit.py",
+        "pilot_retention_sources.py",
+        "publish_native_cache.py",
+        "publish_scientific_directory.py",
+        "publish_sustained_checkpoint.py",
+        "publish_sustained_pilot.py",
+        "publish_symlink_audit.py",
+        "publisher_runtime.py",
+        "retention_sources.py",
+        "sustained_checkpoint_inventory.py",
+        "sustained_controller_lock.py",
+        "sustained_pilot_inventory.py",
+    ],
+    visibility = ["//autonomy:__pkg__"],
+)
+
+py_library(
+    name = "retention",
+    srcs = LIB_MODULES,
+    imports = [".."],
+    visibility = [
+        "//autonomy:__pkg__",
+        "//autonomy/training_execution:__pkg__",
+    ],
+    deps = [
+        "//autonomy/evidence:evidence",
+        "//autonomy/insula:insula",
+        "//autonomy/resources:resources",
+    ],
+)
+
+filegroup(
+    name = "all_py",
+    srcs = glob(["*.py"]),
+    visibility = ["//autonomy:__pkg__"],
+)
+
+filegroup(
+    name = "runfiles",
+    srcs = glob(["*.py"]),
+    visibility = ["//autonomy:__pkg__"],
+)
+
+[
+    py_binary(
+        name = publisher[:-3],
+        srcs = [publisher],
+        imports = [".."],
+        main = publisher,
+        deps = [":retention"],
+        visibility = ["//visibility:public"],
+    )
+    for publisher in [
+        "publish_native_cache.py",
+        "publish_scientific_directory.py",
+        "publish_sustained_checkpoint.py",
+        "publish_sustained_pilot.py",
+        "publish_symlink_audit.py",
+    ]
+]
+
+[
+    py_test(
+        name = test[:-3],
+        srcs = [test],
+        deps = [":retention"],
+        imports = [".."],
+        legacy_create_init = 0,
+        size = "small",
+        tags = ["perception_unit"],
+    )
+    for test in TEST_MODULES
+]
+
+test_suite(
+    name = "all_tests",
+    tests = [test[:-3] for test in TEST_MODULES],
+    visibility = ["//autonomy:__pkg__"],
+)

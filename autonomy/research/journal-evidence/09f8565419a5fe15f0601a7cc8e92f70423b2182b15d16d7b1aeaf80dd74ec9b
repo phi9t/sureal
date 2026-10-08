@@ -1,0 +1,597 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "scope": "fresh GET and capped archive recovery of explicit comprehensive closeout metadata allowlist; blocked code remains blocked; no new GPU/model/runner/release claim",
+  "driver": {
+    "path": "/tmp/sureal-comprehensive-final-metadata-independent.py",
+    "sha256": "112f5e556d1b3eeb6093c9fa4efc0f6d899d34cd85c147d0d7c5b5e305770823"
+  },
+  "transfers": [
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--command-timeout-secs",
+        "300",
+        "--auth-source",
+        "token-file",
+        "get",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-sustained-baseline-controller20261003a-checkpoint-5a9e87d9e3114b63b6a0ee8aa5faf49e/publication-manifest.json",
+        "/tmp/sureal-comprehensive-final-metadata-independent/global.json"
+      ],
+      "exit_code": 0,
+      "seconds": 1.6176625230000354,
+      "log": {
+        "path": "/tmp/sureal-comprehensive-final-metadata-independent/transfers/global.log",
+        "sha256": "39f8b7b3294202063bd0794f1544feff2c267b9ec98222ca841a5adb9a177f03"
+      }
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--command-timeout-secs",
+        "300",
+        "--auth-source",
+        "token-file",
+        "get",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-sustained-baseline-controller20261003a-checkpoint-5a9e87d9e3114b63b6a0ee8aa5faf49e/4de6668d029127eff18993895b64b9b5aa2c89c0afda84437a9773ef77530778/manifest.json",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/comprehensive-final-metadata-independent-recovery/chunk-0/download/manifest.json"
+      ],
+      "exit_code": 0,
+      "seconds": 1.6195397850242443,
+      "log": {
+        "path": "/tmp/sureal-comprehensive-final-metadata-independent/transfers/chunk-0-manifest.json.log",
+        "sha256": "f5bc0c5c1ca7f72800bb376642e669119d17143bb6c869ace3a4b771d9e10bb2"
+      }
+    },
+    {
+      "command": [
+        "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+        "--error-format",
+        "json",
+        "--command-timeout-secs",
+        "300",
+        "--auth-source",
+        "token-file",
+        "get",
+        "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-sustained-baseline-controller20261003a-checkpoint-5a9e87d9e3114b63b6a0ee8aa5faf49e/4de6668d029127eff18993895b64b9b5aa2c89c0afda84437a9773ef77530778/archive.tar.gz",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/comprehensive-final-metadata-independent-recovery/chunk-0/download/archive.tar.gz"
+      ],
+      "exit_code": 0,
+      "seconds": 1.716740874981042,
+      "log": {
+        "path": "/tmp/sureal-comprehensive-final-metadata-independent/transfers/chunk-0-archive.tar.gz.log",
+        "sha256": "cdaf56bdadee74e8dc7262b8da66b5264d24ea8ba2b7c7bf580c1bbc8019c0fc"
+      }
+    }
+  ],
+  "archive_stages": [
+    {
+      "group": 0,
+      "chunk": 0,
+      "mode": "verify",
+      "proof": {
+        "path": "/tmp/sureal-comprehensive-final-metadata-independent/proofs/g0-c0-verify/resource-admitted.json",
+        "sha256": "04202f5e65dcced4c2ea347e4035906e4aacbdd79712ace5816558ad7c265c51"
+      },
+      "job": {
+        "path": "/tmp/sureal-comprehensive-final-metadata-independent/jobs/g0-c0-verify/job.json",
+        "sha256": "1c3409194ed37068a86417d1abff7f74f9a3b52d5b29cc7ada252f09349bc524"
+      },
+      "outputs": {
+        "check.json": {
+          "path": "/tmp/sureal-comprehensive-final-metadata-independent/outputs/g0-c0-verify/check.json",
+          "sha256": "12a1d70c55319571cc9df0acb0345256c7800109ab9a7f744ea09ca3c0655330"
+        },
+        "live.log": {
+          "path": "/tmp/sureal-comprehensive-final-metadata-independent/outputs/g0-c0-verify/live.log",
+          "sha256": "487c0b4fc189fbc9d2a602d5d1829d4fcfcf251eb61a132c8619db9bb6f721e9"
+        }
+      },
+      "result": {
+        "exact_members_and_hashes": true,
+        "members": 65,
+        "payload_bytes": 13566658,
+        "archive_sha256": "4de6668d029127eff18993895b64b9b5aa2c89c0afda84437a9773ef77530778"
+      },
+      "resource_admission": {
+        "peak_rss_bytes": 219820032,
+        "aggregate_cap_bytes": 17179869184,
+        "scope": "separate launcher and in-runtime worker/waited-child peaks under aggregate kernel cap; not summed tree RSS"
+      },
+      "kernel_scope": {
+        "path": "/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-comprehensive-final-metadata-independent.scope",
+        "memory_max_bytes": 17179869184,
+        "memory_swap_max_bytes": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "members_verified": true,
+        "kernel_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "process_ids": [
+          1759510
+        ]
+      }
+    },
+    {
+      "group": 0,
+      "chunk": 0,
+      "mode": "rehydrate",
+      "proof": {
+        "path": "/tmp/sureal-comprehensive-final-metadata-independent/proofs/g0-c0-rehydrate/resource-admitted.json",
+        "sha256": "a4a2df8bf2ca89227d5c80925904cd569c6679ec5ad65268e6e42ae16bc0cbef"
+      },
+      "job": {
+        "path": "/tmp/sureal-comprehensive-final-metadata-independent/jobs/g0-c0-rehydrate/job.json",
+        "sha256": "1c3409194ed37068a86417d1abff7f74f9a3b52d5b29cc7ada252f09349bc524"
+      },
+      "outputs": {
+        "check.json": {
+          "path": "/tmp/sureal-comprehensive-final-metadata-independent/outputs/g0-c0-rehydrate/check.json",
+          "sha256": "11493f222dc3ed0aa194ff68f70c19d3883809809575f5ea78e60c5dbd5fa528"
+        },
+        "live.log": {
+          "path": "/tmp/sureal-comprehensive-final-metadata-independent/outputs/g0-c0-rehydrate/live.log",
+          "sha256": "85c60d494752f984dbae51b10c6d5c405f7cda9be79072451481d4a3f20f149d"
+        }
+      },
+      "result": {
+        "exact_members_and_hashes": true,
+        "members": 65,
+        "payload_bytes": 13566658,
+        "archive_sha256": "4de6668d029127eff18993895b64b9b5aa2c89c0afda84437a9773ef77530778",
+        "verified_rehydration": true
+      },
+      "resource_admission": {
+        "peak_rss_bytes": 219820032,
+        "aggregate_cap_bytes": 17179869184,
+        "scope": "separate launcher and in-runtime worker/waited-child peaks under aggregate kernel cap; not summed tree RSS"
+      },
+      "kernel_scope": {
+        "path": "/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-comprehensive-final-metadata-independent.scope",
+        "memory_max_bytes": 17179869184,
+        "memory_swap_max_bytes": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "members_verified": true,
+        "kernel_events": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "process_ids": [
+          1759510
+        ]
+      }
+    }
+  ],
+  "gpu_stages": [],
+  "budget_checks": [
+    {
+      "label": "initial",
+      "scientific_bytes": 15329280496,
+      "additional_reserve_bytes": 0,
+      "scientific_cap_bytes": 16106127360,
+      "original_case_bytes": 1668358495,
+      "separate_recovery_scratch_bytes": 0,
+      "per_case_cap_bytes": 2147483648
+    },
+    {
+      "label": "chunk-0-reserve",
+      "scientific_bytes": 15329280496,
+      "additional_reserve_bytes": 31871089,
+      "scientific_cap_bytes": 16106127360,
+      "original_case_bytes": 1668358495,
+      "separate_recovery_scratch_bytes": 0,
+      "per_case_cap_bytes": 2147483648
+    },
+    {
+      "label": "chunk-0-complete",
+      "scientific_bytes": 15342847154,
+      "additional_reserve_bytes": 0,
+      "scientific_cap_bytes": 16106127360,
+      "original_case_bytes": 1668358495,
+      "separate_recovery_scratch_bytes": 13566658,
+      "per_case_cap_bytes": 2147483648
+    },
+    {
+      "label": "final",
+      "scientific_bytes": 15329280496,
+      "additional_reserve_bytes": 0,
+      "scientific_cap_bytes": 16106127360,
+      "original_case_bytes": 1668358495,
+      "separate_recovery_scratch_bytes": 0,
+      "per_case_cap_bytes": 2147483648
+    }
+  ],
+  "groups": [],
+  "driver_snapshot": {
+    "path": "/tmp/sureal-comprehensive-final-metadata-independent/driver.source",
+    "sha256": "112f5e556d1b3eeb6093c9fa4efc0f6d899d34cd85c147d0d7c5b5e305770823"
+  },
+  "author_report": {
+    "path": "/tmp/sureal-comprehensive-closeout-final-metadata.json",
+    "sha256": "6945581db9181f6f0d873f0e6bc63d0845da3cf41aa6023f26c0ee676da8a6d5"
+  },
+  "original_six_artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/run.json": "96dc607ae8238774ca875588d65eaf463f120227e161ae792a9187c8e6635d7d",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/state.json": "dac2ce421243c4750175f98152cdc1ce4ecb7e1a493ddee7050c42fcc09e7765",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-00/checkpoint.pt": "8057a5496c4d6ec4d19b9de33034c6cca753ea39d8f03fd765ad7011cdf301ee",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-00-admitted.json": "dde09eb7e6d65e781597da82870ca6c64ea5bff1ea77d31b8b8268ec5a0ad364",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-1000/checkpoint.pt": "37de2375b0b10f92a56468bd9ffe0b2fea42f257c5949efa80fd29c621a8ff4a",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-1000-admitted.json": "b0a874b87a2541ab13b2a97e36540b458b54bb0996c6e679a8c156d0160f52d9"
+  },
+  "source_counts": {
+    "native": 295,
+    "host": 23,
+    "resources": 26,
+    "parity_extensions": 6
+  },
+  "resource_source_pins": {
+    "archive_worker.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/archive_worker.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/archive_worker.py",
+      "sha256": "f110e1a57ebbe9c4d62f9d4d88ba577ac5da5526c1c536b1c84663386126d94e"
+    },
+    "backend.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/backend.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/backend.py",
+      "sha256": "c2889cf53abb335211eb10321df7329e21248cca727cb64224f1b6dd90333662"
+    },
+    "checkpoint.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/checkpoint.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/checkpoint.py",
+      "sha256": "cbc21df64f9674ee728c5574b1b18a5be19d1f81d84acd2077377a83c5a45449"
+    },
+    "command.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/command.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/command.py",
+      "sha256": "1a44bc70f62abe7ec48eea9dbf12c27b2b83816793d3ca1fc506bf22d938cc40"
+    },
+    "dependencies.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/dependencies.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/dependencies.py",
+      "sha256": "d00b0a6233e8a76855d8e81fe081f7e77168bb53224dc2312db1b2aa31496b31"
+    },
+    "execute_worker.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/execute_worker.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/execute_worker.py",
+      "sha256": "b4a746f941944d4342ade71f7338498b06f96e21bc56141eb90d40276508add8"
+    },
+    "kernel_scope.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/kernel_scope.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/kernel_scope.py",
+      "sha256": "4a9f8440b91ce8203e3f9bbc25dbe25dad83a33378544e4ede61412f9e1f2e89"
+    },
+    "process_lifecycle.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/process_lifecycle.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/process_lifecycle.py",
+      "sha256": "bfde67be0f66296565dca964c8a2ca3e6bb733e31016fbc87c78f57dd49b09f0"
+    },
+    "retention.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/retention.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/retention.py",
+      "sha256": "b9cc1380a45f064a57ef22c5ea2efd1b98384a21bf2017538307fd879dbbaf44"
+    },
+    "retention_audit.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/retention_audit.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/retention_audit.py",
+      "sha256": "26b8d2907f023af4c3745ae2dbad0d2de442f26b3d4297ffa519851958829116"
+    },
+    "scoped_stage.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/scoped_stage.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/scoped_stage.py",
+      "sha256": "d753f2df936496cddb76f9bd09215100552f56a5d7754d52e54434b9ee042738"
+    },
+    "sources.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/sources.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/sources.py",
+      "sha256": "2f1eef953bd39e40b49e7fc18e906c4b0ea11d17266c5822aae842966179d5af"
+    },
+    "stage.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/stage.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/stage.py",
+      "sha256": "f8e8baf91d752185fd3f57ba27af3cec683540bcb0932275bdfcf4643f1d4ff9"
+    },
+    "stage_accounting.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/stage_accounting.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/stage_accounting.py",
+      "sha256": "baef4b065f9ebb3aa7a2296ccaede595e2514c8144b18bace315f3a805b3716b"
+    },
+    "test_execute_worker.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_execute_worker.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/test_execute_worker.py",
+      "sha256": "26c1e44dacf7056498c5f4deb2c8a06b91830848aeb5d63f0819380bc98ae2d3"
+    },
+    "test_kernel_scope.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_kernel_scope.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/test_kernel_scope.py",
+      "sha256": "e5ff0b3b67a3b85a5799da096078ac7e07454d6230e16cace99282b96285f9a8"
+    },
+    "test_resource_archive.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_archive.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/test_resource_archive.py",
+      "sha256": "513d7b839ccd37619919ed78a38943e09db97c0a222524f24e661e29e8ce6de8"
+    },
+    "test_resource_backend.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_backend.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/test_resource_backend.py",
+      "sha256": "021938bd33c74fe31300672995aaf9471cd9b2b81fbdaecd7305253bac3ae425"
+    },
+    "test_resource_checkpoint.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_checkpoint.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/test_resource_checkpoint.py",
+      "sha256": "7f6119ce1fa662c6d624fdb6b7e801b6249f3066a8a82bd7809e0f50e780faaa"
+    },
+    "test_resource_command.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_command.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/test_resource_command.py",
+      "sha256": "98255f18a16799ca18e7a32e6087e8d3b39de44c38d44a2fc0d8e0b60aba32c6"
+    },
+    "test_resource_retention.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_retention.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/test_resource_retention.py",
+      "sha256": "023ba4bec0a3f06a0f254ebdbcbf67736b2c04c50948ee0b7e10e1080b5248ef"
+    },
+    "test_resource_sources.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_sources.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/test_resource_sources.py",
+      "sha256": "08b06457df38c99413e33aaf1bce5afbd703a5628b22d5e29c54f6265fa253bf"
+    },
+    "test_resource_stage.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_stage.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/test_resource_stage.py",
+      "sha256": "4aafb2d74de5075e9ab1c4d8147a772ea991604452fa85f817747c136296720b"
+    },
+    "test_scoped_stage.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_scoped_stage.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/test_scoped_stage.py",
+      "sha256": "30b81ad6cf79248e6d83b4021f38a0aff22c0604f0f2c071d6c8e34cc7b40835"
+    },
+    "test_stage_accounting.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_stage_accounting.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/test_stage_accounting.py",
+      "sha256": "8a28c803161b28318b23a6caea03024d6ceff782d187f81a54850d4d22da8a86"
+    },
+    "test_worker_admission.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_worker_admission.py",
+      "snapshot": "/tmp/sureal-comprehensive-final-metadata-independent/code/test_worker_admission.py",
+      "sha256": "816a6ab4d7cb891e97ed279e46a2fea491ce8865f3dd30f2c6ea7bff825f4bb7"
+    }
+  },
+  "scientific_bytes_before": 15329280496,
+  "lock": {
+    "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/architecture-experiments.lock",
+    "inode": 163461002,
+    "exclusive": true
+  },
+  "union_validation": {
+    "files": 65,
+    "chunks": 1,
+    "payload_bytes": 13566658,
+    "whole_member_union_exact": true,
+    "all_chunks_live_rehydrated": true
+  },
+  "recovered_union": {
+    "final-metadata/canonical-cpu/numerical-py310.log": "aecf872a867861b74bd3e139fd27b201a97c97a3f7df4583bfa15586fc11a1db",
+    "final-metadata/final-docs/experiments/waymo-perception/CONTEXT.md": "ea788b5c88fb4450b5c8b5e989b8f6df709fbc1fe1dc9fb396ac0275c662fc8d",
+    "final-metadata/final-docs/experiments/waymo-perception/README.md": "a2df270314e48d56e4fb36dd128ad7c627ef08a01df2fc0509cb20641a687c9d",
+    "final-metadata/final-docs/experiments/waymo-perception/explorer/README.md": "df526316972235b48803453a66489f3c7c6532d1ae30e44f1597aee959a944d6",
+    "final-metadata/final-docs/experiments/waymo-perception/research-task-index.md": "646b0003aebe383bd5228952077b200ba654df57e75ffff801ce3f44b0988b97",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/2026-10-04-comprehensive-integration-closeout.md": "0f6e19ff96aa78655fc0fb2ecc34e0bb2f053a244e35be7e1d452dd8b68c9920",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/journal-evidence/0cd8aa61d3575e86512f1951295554dc1516ea4a9744557f379a049fb91c5c68": "0cd8aa61d3575e86512f1951295554dc1516ea4a9744557f379a049fb91c5c68",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/journal-evidence/54782f267b3c7435802ee329391dd7284382e0736d2efef931c76cea98c53a49": "54782f267b3c7435802ee329391dd7284382e0736d2efef931c76cea98c53a49",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/journal-evidence/7fa59b111b2fcfba3dd4f3282d16734145912035de7e4e38cd956e61a62384bd": "7fa59b111b2fcfba3dd4f3282d16734145912035de7e4e38cd956e61a62384bd",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/journal-evidence/8a1091377e1108340b1ff3e5d6cbb5470bfaff54fa901a0fdfe3d5c404f9178f": "8a1091377e1108340b1ff3e5d6cbb5470bfaff54fa901a0fdfe3d5c404f9178f",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/journal-evidence/a40247475ec8dfd5d79b506951cbeed43c4c3efc164e7c644cb7dbedd6c10198": "a40247475ec8dfd5d79b506951cbeed43c4c3efc164e7c644cb7dbedd6c10198",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/journal-evidence/f9ab5e91c717d75ad75650bbfcb2e3a2de64d0f463f671c612e865377d6a5205": "f9ab5e91c717d75ad75650bbfcb2e3a2de64d0f463f671c612e865377d6a5205",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/journal-evidence/ff4ca8d96e00783883a171c4f2343c2deaceeb00131cc1d788398b7d7ef0be80": "ff4ca8d96e00783883a171c4f2343c2deaceeb00131cc1d788398b7d7ef0be80",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/research-journal.jsonl": "021e44822c62de58bd8b81b42008e1696d8c61f1359594963b2c37d8f62598c0",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/research-journal.md": "8c5334b94dc13cb169a9f73358e5640055f32e64221208520ecc6aa08f6d391a",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-archive-review-refusal.json": "0cd8aa61d3575e86512f1951295554dc1516ea4a9744557f379a049fb91c5c68",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-dispatch-v9.py.source": "d0f33dc495ae08a5caea2055cf4cd38c59ebe5fa0072032dbf3a6b08db939bc8",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-dispositions.py.source": "2db0b083a6f4c5c42399edb8212b290cb3949089f5e7f97222e3b01173be5efd",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-final-docs-spec.json": "da79decc0cfad056961bbb38866788bd95144edb025bba8937b1ff928bf466db",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-final-docs-standards.json": "fd0d29e09a35213329d5e954e6049547cde9eaea0140c2a4636502823b63c7d6",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-final-inventory.json": "4f314cfb23f83d890d819d85265b6de252a7ace75c24363a444ed6e5845964a6",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-final-record.py.source": "0a68370e58a6c960ee6084c4639c5bb1a30452d058ca47d9e0efacdd018b3d86",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-hdfs-allowlist.py.source": "58e30e5c7ff41b327b8b252b8a78536926f5c4d278b3770a4de91bfc8f5b2168",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-hdfs-independent.json": "54782f267b3c7435802ee329391dd7284382e0736d2efef931c76cea98c53a49",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-hdfs-v2.py.source": "b8c9eeeac65a0fec8ad49681d0cf59fda0d7b21af0562fe72ad24e76e877e374",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-hdfs.json": "5d1f082d587877b11cc97073e7e7f668e26389dd60f0ea69d19577dfd1021a6d",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-independent-supplement.json": "a40247475ec8dfd5d79b506951cbeed43c4c3efc164e7c644cb7dbedd6c10198",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-inventory.json": "7fa59b111b2fcfba3dd4f3282d16734145912035de7e4e38cd956e61a62384bd",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-journal-start.py.source": "cb419159a4d14479a21f464bc2f1c830bee35cbafd6be62640f194e350473916",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-live-evidence-audit.json": "15911c2d0b9d66ccc52a8121d838039f12c7670c6728d269c05a7ba2db67a9f2",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-live-tests-v7.py.source": "eed0728ba31776b6d36fcee18c1e38c72bc4a826980074eeb47ea3f332faf76a",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-numerical-py310.log": "aecf872a867861b74bd3e139fd27b201a97c97a3f7df4583bfa15586fc11a1db",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-passing-tests-dispatch.json": "13b502bf21c03ff95bde9731e251750f625a08b8b4dae8a816684de4c3c4cea6",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-reconcile.json": "f9ab5e91c717d75ad75650bbfcb2e3a2de64d0f463f671c612e865377d6a5205",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-spec-review.json": "588cb9930b7d5a87db5f170cf190e4dcdcb13e6ca460bb62343b4724e8111c29",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-standards-review.json": "dce7dc82e0232e9603e464d62db274191e62485a88b35a8de4176819e4085a0f",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-v3-prelaunch-attempt.json": "f70c9885d90a7a44f087076748b023e7d7afab9b2ba39f0e53e9420ebc5f4159",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-v4-prelaunch-attempt.json": "05bc09b6868dc1e2453148e042d6736c77c842dc5fd27a7ff4f8c1b441fc4140",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-verification.json": "ff4ca8d96e00783883a171c4f2343c2deaceeb00131cc1d788398b7d7ef0be80",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-hdfs-independent.py.source": "7efeafa16913e204a7cc74be4f15501bbedd99d9b4091b687b8c86912124a7fd",
+    "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-tests-independent.py.source": "fcbc889d06e38486161d27a0c490e486e06d380f8b475927eee77a7401ca5b21",
+    "final-metadata/independent-driver.source": "7efeafa16913e204a7cc74be4f15501bbedd99d9b4091b687b8c86912124a7fd",
+    "final-metadata/independent-raw/0/artifact-0-worker-resource.json": "6c3d63af1806379d604a0ba3cb9652f527b08b9cdc9cad28c217eeb26a53ffc6",
+    "final-metadata/independent-raw/0/artifact-1-execution.log": "487c0b4fc189fbc9d2a602d5d1829d4fcfcf251eb61a132c8619db9bb6f721e9",
+    "final-metadata/independent-raw/0/job.json": "d634eaaf5c3ac2ca963ebcb9e66293081e5caac8ff1471a9ce7bbe4979345c2b",
+    "final-metadata/independent-raw/0/output-check.json": "2398d358ab51ef834161448bfeef66018eb953b04d94db8a5ed9a3e0883e782e",
+    "final-metadata/independent-raw/0/output-live.log": "487c0b4fc189fbc9d2a602d5d1829d4fcfcf251eb61a132c8619db9bb6f721e9",
+    "final-metadata/independent-raw/0/proof.json": "0d686bb0be95ebce24bca35f1beb0444b930d1c04d6693eeaac64d2853e7639a",
+    "final-metadata/independent-raw/1/artifact-0-worker-resource.json": "f03d3d2a5326fe07d63647001aaec63bfbeb2dc6955c9504c33399005dd745a8",
+    "final-metadata/independent-raw/1/artifact-1-execution.log": "85c60d494752f984dbae51b10c6d5c405f7cda9be79072451481d4a3f20f149d",
+    "final-metadata/independent-raw/1/job.json": "d634eaaf5c3ac2ca963ebcb9e66293081e5caac8ff1471a9ce7bbe4979345c2b",
+    "final-metadata/independent-raw/1/output-check.json": "9bd9850f2b502e0d576cb8e0d167decb39fed80e95ae4eefb091697d1b47a9e8",
+    "final-metadata/independent-raw/1/output-live.log": "85c60d494752f984dbae51b10c6d5c405f7cda9be79072451481d4a3f20f149d",
+    "final-metadata/independent-raw/1/proof.json": "300ed99268ce8560c6ce5b11d8ff58cde4279923191994bb616ab1025b98c17e",
+    "final-metadata/independent-transfers/0.log": "8ff42d46075480edc39d92c21d3d376660805785865968d0d5ee8c4a323ca385",
+    "final-metadata/independent-transfers/1.log": "62be0c21a134fbcaa702dec1d712584768e20d46e8cf365bc8c6a8add4f0c262",
+    "final-metadata/independent-transfers/2.log": "f9ff9be9da15be510a5f0572a02efb9943367f6ff5452ae35f84b3bbd043247a",
+    "final-metadata/journal-evidence/0cd8aa61d3575e86512f1951295554dc1516ea4a9744557f379a049fb91c5c68": "0cd8aa61d3575e86512f1951295554dc1516ea4a9744557f379a049fb91c5c68",
+    "final-metadata/journal-evidence/54782f267b3c7435802ee329391dd7284382e0736d2efef931c76cea98c53a49": "54782f267b3c7435802ee329391dd7284382e0736d2efef931c76cea98c53a49",
+    "final-metadata/journal-evidence/7fa59b111b2fcfba3dd4f3282d16734145912035de7e4e38cd956e61a62384bd": "7fa59b111b2fcfba3dd4f3282d16734145912035de7e4e38cd956e61a62384bd",
+    "final-metadata/journal-evidence/8a1091377e1108340b1ff3e5d6cbb5470bfaff54fa901a0fdfe3d5c404f9178f": "8a1091377e1108340b1ff3e5d6cbb5470bfaff54fa901a0fdfe3d5c404f9178f",
+    "final-metadata/journal-evidence/a40247475ec8dfd5d79b506951cbeed43c4c3efc164e7c644cb7dbedd6c10198": "a40247475ec8dfd5d79b506951cbeed43c4c3efc164e7c644cb7dbedd6c10198",
+    "final-metadata/journal-evidence/f9ab5e91c717d75ad75650bbfcb2e3a2de64d0f463f671c612e865377d6a5205": "f9ab5e91c717d75ad75650bbfcb2e3a2de64d0f463f671c612e865377d6a5205",
+    "final-metadata/journal-evidence/ff4ca8d96e00783883a171c4f2343c2deaceeb00131cc1d788398b7d7ef0be80": "ff4ca8d96e00783883a171c4f2343c2deaceeb00131cc1d788398b7d7ef0be80",
+    "final-metadata/publisher.source": "9311a650b3e3a23f5e3c9bc30db677caba5b8f5622dea854631ca37febef99c7"
+  },
+  "members": 65,
+  "source_bytes": 13566658,
+  "chunks": 1,
+  "journal_entries": 113,
+  "journal_head_sha256": "636a0b1a482c1a76309d6b2f4ed5e272b6e39cd4eb3262740260fb6ad5fd3992",
+  "latest_journal_evidence_count": 5,
+  "first112_journal_bytes_exact": true,
+  "prior_archive_report": {
+    "path": "/tmp/sureal-comprehensive-closeout-hdfs-independent.json",
+    "sha256": "54782f267b3c7435802ee329391dd7284382e0736d2efef931c76cea98c53a49"
+  },
+  "document_epoch_mapping": {
+    "experiments/waymo-perception/README.md": {
+      "current_sha256": "a2df270314e48d56e4fb36dd128ad7c627ef08a01df2fc0509cb20641a687c9d",
+      "final_supplement_member": "final-metadata/final-docs/experiments/waymo-perception/README.md",
+      "first_archive_member": "comprehensive-closeout/backlog/experiments/waymo-perception/README.md",
+      "first_archive_sha256": "dac54f35aa86c0cfe320c86dec163cf9b7bee0801de777b507d5092b45a662ad",
+      "initial_inventory_sha256": "bb40c66b6f0e07d348c7616bb165b53904da9524e401632c46f3632a0b5b08d0",
+      "note": "entry hdfs_member retains first archive namespace; current doc hash is bound by the separate final supplement member and archive_epochs ruling"
+    },
+    "experiments/waymo-perception/CONTEXT.md": {
+      "current_sha256": "ea788b5c88fb4450b5c8b5e989b8f6df709fbc1fe1dc9fb396ac0275c662fc8d",
+      "final_supplement_member": "final-metadata/final-docs/experiments/waymo-perception/CONTEXT.md",
+      "first_archive_member": "comprehensive-closeout/backlog/experiments/waymo-perception/CONTEXT.md",
+      "first_archive_sha256": "ea788b5c88fb4450b5c8b5e989b8f6df709fbc1fe1dc9fb396ac0275c662fc8d",
+      "initial_inventory_sha256": "19ff4f50c514e569e0f2d68dbc3f22e38e196c59a2fbf7ae7e0aa1178bc9d4d7",
+      "note": "entry hdfs_member retains first archive namespace; current doc hash is bound by the separate final supplement member and archive_epochs ruling"
+    },
+    "experiments/waymo-perception/explorer/README.md": {
+      "current_sha256": "df526316972235b48803453a66489f3c7c6532d1ae30e44f1597aee959a944d6",
+      "final_supplement_member": "final-metadata/final-docs/experiments/waymo-perception/explorer/README.md",
+      "first_archive_member": "comprehensive-closeout/backlog/experiments/waymo-perception/explorer/README.md",
+      "first_archive_sha256": "df526316972235b48803453a66489f3c7c6532d1ae30e44f1597aee959a944d6",
+      "initial_inventory_sha256": "519176cab6cac01b685b8d66fbb76e9b62f696b2cf2856b1535b0682172c7de9",
+      "note": "entry hdfs_member retains first archive namespace; current doc hash is bound by the separate final supplement member and archive_epochs ruling"
+    },
+    "experiments/waymo-perception/research-task-index.md": {
+      "current_sha256": "646b0003aebe383bd5228952077b200ba654df57e75ffff801ce3f44b0988b97",
+      "final_supplement_member": "final-metadata/final-docs/experiments/waymo-perception/research-task-index.md",
+      "first_archive_member": "comprehensive-closeout/backlog/experiments/waymo-perception/research-task-index.md",
+      "first_archive_sha256": "646b0003aebe383bd5228952077b200ba654df57e75ffff801ce3f44b0988b97",
+      "initial_inventory_sha256": "56d4c195104e5620c5f889d19fa03813aa5bd90033ba4ea7f5082bbb250cb807",
+      "note": "entry hdfs_member retains first archive namespace; current doc hash is bound by the separate final supplement member and archive_epochs ruling"
+    }
+  },
+  "closed_missing_prelaunch_witnesses": {
+    "3": {
+      "member": "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-v3-prelaunch-attempt.json",
+      "sha256": "f70c9885d90a7a44f087076748b023e7d7afab9b2ba39f0e53e9420ebc5f4159",
+      "role": "prelaunch refusal; no worker execution admitted"
+    },
+    "4": {
+      "member": "final-metadata/git-closeout/experiments/waymo-perception/research/sureal-comprehensive-closeout-v4-prelaunch-attempt.json",
+      "sha256": "05bc09b6868dc1e2453148e042d6736c77c842dc5fd27a7ff4f8c1b441fc4140",
+      "role": "prelaunch refusal; no worker execution admitted"
+    }
+  },
+  "prior_independent_proof_metadata_recovered": [
+    {
+      "path": "/tmp/sureal-comprehensive-hdfs-independent/proofs/g0-c0-verify/resource-admitted.json",
+      "sha256": "0d686bb0be95ebce24bca35f1beb0444b930d1c04d6693eeaac64d2853e7639a"
+    },
+    {
+      "path": "/tmp/sureal-comprehensive-hdfs-independent/jobs/g0-c0-verify/job.json",
+      "sha256": "d634eaaf5c3ac2ca963ebcb9e66293081e5caac8ff1471a9ce7bbe4979345c2b"
+    },
+    {
+      "path": "/tmp/sureal-comprehensive-hdfs-independent/proofs/g0-c0-verify/worker/worker-resource.json",
+      "sha256": "6c3d63af1806379d604a0ba3cb9652f527b08b9cdc9cad28c217eeb26a53ffc6"
+    },
+    {
+      "path": "/tmp/sureal-comprehensive-hdfs-independent/proofs/g0-c0-verify/execution.log",
+      "sha256": "487c0b4fc189fbc9d2a602d5d1829d4fcfcf251eb61a132c8619db9bb6f721e9",
+      "native_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/comprehensive-closeout-independent-recovery/g0-c0-verify/live.log"
+    },
+    {
+      "path": "/tmp/sureal-comprehensive-hdfs-independent/outputs/g0-c0-verify/check.json",
+      "sha256": "2398d358ab51ef834161448bfeef66018eb953b04d94db8a5ed9a3e0883e782e"
+    },
+    {
+      "path": "/tmp/sureal-comprehensive-hdfs-independent/outputs/g0-c0-verify/live.log",
+      "sha256": "487c0b4fc189fbc9d2a602d5d1829d4fcfcf251eb61a132c8619db9bb6f721e9"
+    },
+    {
+      "path": "/tmp/sureal-comprehensive-hdfs-independent/proofs/g0-c0-rehydrate/resource-admitted.json",
+      "sha256": "300ed99268ce8560c6ce5b11d8ff58cde4279923191994bb616ab1025b98c17e"
+    },
+    {
+      "path": "/tmp/sureal-comprehensive-hdfs-independent/jobs/g0-c0-rehydrate/job.json",
+      "sha256": "d634eaaf5c3ac2ca963ebcb9e66293081e5caac8ff1471a9ce7bbe4979345c2b"
+    },
+    {
+      "path": "/tmp/sureal-comprehensive-hdfs-independent/proofs/g0-c0-rehydrate/worker/worker-resource.json",
+      "sha256": "f03d3d2a5326fe07d63647001aaec63bfbeb2dc6955c9504c33399005dd745a8"
+    },
+    {
+      "path": "/tmp/sureal-comprehensive-hdfs-independent/proofs/g0-c0-rehydrate/execution.log",
+      "sha256": "85c60d494752f984dbae51b10c6d5c405f7cda9be79072451481d4a3f20f149d",
+      "native_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/comprehensive-closeout-independent-recovery/g0-c0-rehydrate/live.log"
+    },
+    {
+      "path": "/tmp/sureal-comprehensive-hdfs-independent/outputs/g0-c0-rehydrate/check.json",
+      "sha256": "9bd9850f2b502e0d576cb8e0d167decb39fed80e95ae4eefb091697d1b47a9e8"
+    },
+    {
+      "path": "/tmp/sureal-comprehensive-hdfs-independent/outputs/g0-c0-rehydrate/live.log",
+      "sha256": "85c60d494752f984dbae51b10c6d5c405f7cda9be79072451481d4a3f20f149d"
+    },
+    {
+      "path": "/tmp/sureal-comprehensive-hdfs-independent/transfers/global.log",
+      "sha256": "8ff42d46075480edc39d92c21d3d376660805785865968d0d5ee8c4a323ca385"
+    },
+    {
+      "path": "/tmp/sureal-comprehensive-hdfs-independent/transfers/chunk-0-manifest.json.log",
+      "sha256": "62be0c21a134fbcaa702dec1d712584768e20d46e8cf365bc8c6a8add4f0c262"
+    },
+    {
+      "path": "/tmp/sureal-comprehensive-hdfs-independent/transfers/chunk-0-archive.tar.gz.log",
+      "sha256": "f9ff9be9da15be510a5f0572a02efb9943367f6ff5452ae35f84b3bbd043247a"
+    }
+  ],
+  "canonical_numerical_scope": {
+    "tests": 209,
+    "skips": 10,
+    "interpreter": "CPython3.10.21",
+    "log_sha256": "aecf872a867861b74bd3e139fd27b201a97c97a3f7df4583bfa15586fc11a1db",
+    "claim": "retained log/receipt reconciliation only, no fresh numerical rerun"
+  },
+  "final_inventory_sha256": "4f314cfb23f83d890d819d85265b6de252a7ace75c24363a444ed6e5845964a6",
+  "blocked19_still_unadmitted": true,
+  "scientific_bytes_after": 15329280496,
+  "independent_HDFS_GET": true,
+  "independent_HDFS_PUT": false,
+  "new_GPU_execution": false,
+  "original_and_replay_payloads_unchanged": true,
+  "prior_witnesses_unmodified": true,
+  "full_runner_or_release_admission": false,
+  "declined_to_judge": [
+    "No new implementation/code review/training/GPU/scientific or resource-integration admission.",
+    "Blocked association9, runtime2, explorer7 and cohort-audit1 remain unadmitted.",
+    "No complete backend/companion/shared-parent/keep-two/retention/full-runner gate.",
+    "No fresh numerical test execution, only canonical retained evidence reconciliation.",
+    "No dataset/model/rawsensor/preview/cache-tree export or local checkpoint release.",
+    "Only this final65-member supplement was freshly GET; first1381 archive retains its previously verified immutable epoch."
+  ]
+}

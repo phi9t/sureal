@@ -1,0 +1,16 @@
+{
+  "old": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/scored-00/metrics.stderr",
+  "fresh": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-seven-controller20261003a-v3/score-0-outputs/metrics.stderr",
+  "old_sha256": "f3476c50d34de5711ac28b02bfa8529e6fbacb2cb2828f060241715dd6c116bc",
+  "fresh_sha256": "b89a9fdd74fafdba40f70996a8b3e2c7a3b343e48e1ee7b5d934772e16205a1c",
+  "headers": [
+    46,
+    46
+  ],
+  "diagnostic_only_equal_after_timestamp_replacement": true,
+  "other_payloads_byte_exact": {
+    "predictions.bin": true,
+    "groundtruth.bin": true,
+    "metrics.stdout": true
+  }
+}

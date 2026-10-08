@@ -1,0 +1,13 @@
+import hashlib,json,os,signal,subprocess,sys,uuid
+from pathlib import Path
+P=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(P));from tier1.storage import sha
+cli=Path.home()/'workspace/waystone/scripts/waystone';C=Path.home()/'.cache/waystone/waymo-perception';R=C/'insula'/('tier1-results-publication-'+uuid.uuid4().hex);R.mkdir();pins={str(cli):sha(cli)};checks=[]
+def io(args,label):
+ command=[str(cli),'--error-format','json','--auth-source','token-file',*args];process=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,start_new_session=True)
+ try:out,error=process.communicate(timeout=90)
+ except subprocess.TimeoutExpired:os.killpg(process.pid,signal.SIGKILL);out,error=process.communicate();raise RuntimeError('bounded transfer timed out')
+ (R/(label+'.log')).write_text(out+error);assert process.returncode==0,error;checks.append({'command':command,'exit_code':0,'log':str(R/(label+'.log'))});assert sha(cli)==pins[str(cli)];return out
+layout=json.loads(subprocess.run([str(cli),'layout-profile','--project','sureal','--json'],capture_output=True,text=True,check=True,timeout=15).stdout);uri=layout['paths']['runs'].rstrip('/')+'/perception-overfit/results-'+R.name;files=['tier1-overfit20261002b-results.json','tier1-overfit20261002b-closed.json','tier1-overfit20261002b-results.md','tier1-closure-live-final-v4-verified.json','tier1-terminal-cap-equivalence-verified.json'];manifest={}
+for index,name in enumerate(files):
+ source=P/'research'/name;digest=sha(source);remote=uri+'/'+name;io(['--mkdir-parents','put',str(source),remote],f'{index}-put');copy=R/name;io(['get',remote,str(copy)],f'{index}-get');assert sha(copy)==digest;manifest[name]={'hdfs_uri':remote,'sha256':digest,'bytes':source.stat().st_size}
+indexpath=R/'manifest.json';indexpath.write_text(json.dumps(manifest,indent=2));io(['--mkdir-parents','put',str(indexpath),uri+'/manifest.json'],'manifest-put');readback=R/'manifest-readback.json';io(['get',uri+'/manifest.json',str(readback)],'manifest-get');assert sha(readback)==sha(indexpath);receipt={'all_results_uploaded_and_readback_exact':True,'hdfs_prefix':uri,'files':manifest,'manifest_hdfs_uri':uri+'/manifest.json','manifest_sha256':sha(indexpath),'checks':checks,'tool_pins':pins,'scope':'full original fixed-batch curves/table/closed results/final Insula and cap receipts; model/proposal payloads archived separately'};(P/'research/tier1-results-hdfs-verified.json').write_text(json.dumps(receipt,indent=2));print('ADMITTED full results HDFS publication',uri,flush=True)

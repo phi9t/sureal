@@ -1,0 +1,44 @@
+"""One source under queue/raw leases with two live point-grid passes."""
+import hashlib,json,subprocess
+from pathlib import Path
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+from pipeline.staged_derived_archive_aligned import staged_derived_archive
+from pipeline.staging_lease import staging_lease
+
+def sha(p):
+ with Path(p).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+def replay(source,*,shape_path,expected_shape_sha256,semantic_counts,cache,code_root,workers,output,expected_runtime_lock,runtime_root=None,transfer_command=None):
+ cache,code,workers,output,shape_path=map(Path,(cache,code_root,workers,output,shape_path));working=cache/'scientific-processing'
+ with staging_lease(working/'cohort-queue.lock'):
+  if output.exists() or output.is_symlink() or working.resolve() not in output.resolve().parents:raise ValueError('new accounted point-grid output required')
+ pp=source['point_publication'];pub=Path(pp['publication_manifest'])
+ if sha(pub)!=pp['publication_manifest_sha256'] or sha(shape_path)!=expected_shape_sha256:raise ValueError('external point/shape identity differs')
+ if shape_path.stat().st_size>8*1024**2 or pub.stat().st_size>1024**2:raise ValueError('bounded shape/publication metadata required')
+ if not isinstance(semantic_counts,list) or len(semantic_counts)!=23 or any(type(x) is not int or x<0 for x in semantic_counts):raise ValueError('native semantic histogram required')
+ root=Path(runtime_root) if runtime_root is not None else cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text())
+ if lock!=expected_runtime_lock:raise ValueError('external runtime lock differs')
+ verify_rootfs(root,lock['rootfs_sha256'])
+ pipeline_names=['scientific_dataset.py','scene_archive_validate.py','native_range_grid.py','staged_derived_archive_aligned.py','staging_lease.py','insula_entry.py','runtime_identity.py']
+ pins={f'pipeline/{n}':sha(code/'pipeline'/n) for n in pipeline_names}
+ workerpins={n:sha(workers/n) for n in ['point_grid_linkage.py','scientific-point-grid-worker.py','point_grid_source_replay.py']}
+ with staged_derived_archive(pp,cache,working_limit_bytes=15*1024**3-16*1024**2,transfer_command=transfer_command) as (archive,transfer):
+  output.mkdir(parents=True,exist_ok=False);inputs=output/'input';inputs.mkdir();checks=[]
+  (inputs/'publication.json').write_bytes(pub.read_bytes());(inputs/'shapes.json').write_bytes(shape_path.read_bytes())
+  expected={'source':source,'shape_report_sha256':expected_shape_sha256,'expected_eligible_semantic_points':sum(semantic_counts[1:]),'expected_native_counts':semantic_counts}
+  (inputs/'expected.json').write_text(json.dumps(expected,indent=2)+'\n')
+  results=[]
+  for mode in ['producer','reference']:
+   out=output/mode;out.mkdir()
+   command=launch_plan(root,code,archive.parent,out,['python','/tmp/worker/scientific-point-grid-worker.py',mode]);i=command.index('--');command[i:i]=['--ro-bind',str(inputs),'/tmp/input','--ro-bind',str(workers),'/tmp/worker']
+   result=subprocess.run(command,capture_output=True,text=True,timeout=600);(output/(mode+'.log')).write_text(result.stdout+result.stderr)
+   if result.returncode:raise ValueError('point-grid '+mode+' failed; preserve log')
+   checks.append({'command':command,'exit_code':0});results.append(json.loads((out/'check.json').read_text()))
+  def common(r):return {k:v for k,v in r.items() if k not in ['worker_resources','mode']}
+  if common(results[0])!=common(results[1]):raise ValueError('independent point/grid passes differ')
+  if sha(pub)!=pp['publication_manifest_sha256'] or sha(shape_path)!=expected_shape_sha256 or pins!={n:sha(code/n) for n in pins} or workerpins!={n:sha(workers/n) for n in workerpins}:raise ValueError('point/grid inputs/code changed')
+  artifacts={str(p.relative_to(output)):sha(p) for p in output.rglob('*') if p.is_file()}
+  receipt={'checks':checks,'runtime_lock':lock,'pipeline_hashes':pins,'worker_hashes':workerpins,'input_identity':expected,'transfer':transfer,'validation':results[0],'independent':results[1],'artifacts':artifacts,'consumer_reserve_bytes':16*1024**2,'scope':'one immutable archive full point/grid replay; caller separately admits retained receipt and full cohort'}
+  (output/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+ assert not archive.exists()
+ return receipt

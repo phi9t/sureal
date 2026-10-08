@@ -1,0 +1,8 @@
+{
+  "status": "verified sidecar eviction completed",
+  "manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/training-pilot-a/sidecar-eviction.json",
+  "manifest_sha256": "d8af6628c528cd987faf3d756f65f216bebde5843f36b88b79f1be019d3a55d0",
+  "bytes_evicted": 14051493845,
+  "publication_receipt_sha256": "b5c883426125f99eb1e9c2c88a2a95a18462339f9278dcdd628793e5ece1bce2",
+  "scope": "one scientific scene; all listed payloads absent, publication receipt and point report preserved"
+}

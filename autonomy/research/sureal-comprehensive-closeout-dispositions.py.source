@@ -1,0 +1,32 @@
+import pathlib,json,hashlib,collections,subprocess
+T=pathlib.Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer');P=T/'experiments/waymo-perception';R=P/'research'
+inv=json.load(open('/tmp/sureal-comprehensive-closeout-inventory.json'));c=json.load(open('/tmp/sureal-comprehensive-closeout-candidates.json'))
+blocked={}
+for r in c['candidates']:
+ name=r['path']
+ if name.startswith('experiments/waymo-perception/association/'):
+  blocked[name]='Ticket41.2: no candidate-specific independently rebuilt16-grid/native-oracle live gate; prepare.py also duplicates full A0/A1 target grids contrary to spec78. Preserve existing41.1 admission separately; correct and admit isolated41.2 after closeout.'
+ elif name.startswith('experiments/waymo-perception/continuation_runtime/'):
+  blocked[name]='Complete continuation runtime remains unimplemented/unadmitted: required backend.py/retention.py/runner.py absent, no sealed7-stage companions/shared-parent recovery/keep-two/full-runner gate. Byte-integrity fixture tests alone do not close this increment.'
+ elif name=='experiments/waymo-perception/audit-cohort-labels.py':
+  blocked[name]='No exact-source live gate located for this standalone cohort-label audit; independently execute on declared native sources and retain coverage/target/source identity before landing.'
+ elif name in ['experiments/waymo-perception/explorer/'+s for s in ['acquire_previews.py','build.py','data.py','run_joint_render.py','scene-explorer.template.html','public-viewer.fragment.html','test_data.py']]:
+  blocked[name]='Source-bound real-viewer generation/provenance/content gate missing for current builder/assembly/template/orchestration closure. Preview and joint-render workers have separate admitted scopes; three data fixtures do not admit the generator. Preserve this complete candidate for later isolated gate.'
+for row in inv['entries']:
+ name=row['path']
+ if row['scope']=='scratch_or_generated_cache':row.update(disposition='excluded_local_scratch_or_cache',remaining_blocker='Not publication material; retain locally and do not archive credentials/caches or bulk-stage scratch.')
+ elif row['scope']=='already_integrated_identical':row.update(disposition='already_integrated',remaining_blocker=None,integration_commit=inv['base_mainline'])
+ elif name in blocked:row.update(disposition='blocked_preserved',remaining_blocker=blocked[name],preserved_local_path=str(T/name),hdfs_member='comprehensive-closeout/backlog/'+name)
+ elif name.endswith('-tracker.lock') or name.endswith('research-journal.lock'):row.update(disposition='excluded_synchronization_lock',remaining_blocker='Empty local synchronization state; preserve locally, not source or evidence.')
+ elif name.endswith('research/experiments.json'):row.update(disposition='excluded_timestamp_only_projection',remaining_blocker='Live watcher updates only updated_utc relative to mainline; retain current projection, do not commit timestamp churn or overwrite registry.')
+ elif name in [r['path'] for r in c['excluded_payload_previews']]:row.update(disposition='excluded_generated_sensor_payload',remaining_blocker='Embedded base64 native camera previews; keep generated visualization local/HDFS, outside source commits.',preserved_local_path=str(T/name),hdfs_member='comprehensive-closeout/generated-previews/'+pathlib.Path(name).name)
+ else:row.update(disposition='selected_for_integration_after_verification',remaining_blocker=None,hdfs_member='comprehensive-closeout/backlog/'+name)
+inv['reconciliation']={'original_work_head':inv['worktree_head'],'reconciled_work_head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=T,text=True).strip(),'retained_stash':'5a67cda5fd2d8e6c2000fbc78d9bca46d0b05195','backup':str(T/'.scratch/comprehensive-closeout-20261004-start-v2'),'details':'sureal-comprehensive-closeout-reconcile.json'}
+inv['protected_external_draft']={'path':str(T.parent.parent/'docs/superpowers/specs/2026-10-03-first-class-models-training-design.md'),'owner':'architecture-review session','disposition':'keep unstaged, preserve exact bytes; committed51 proposal already integrated viaa3c6955; no migration or Kata activation'}
+inv['missing_implementation_gates']=['continuation_runtime/backend.py','continuation_runtime/retention.py','continuation_runtime/runner.py','all-seven-stage resource companions and exact shared-parent checkpoint recovery','keep-two/retire-older/full-runner independent live admission']
+inv['readiness_policy']='Exact historical live evidence plus independent source/role audit and applicable fresh scoped verification; no failed, pending, diagnostic or partial receipt promoted. selected_for_integration records intended transaction until final Git landing receipt resolves it.'
+inv['counts']=dict(collections.Counter(r['disposition'] for r in inv['entries']));inv['blocked_paths']=blocked
+(R/'sureal-comprehensive-closeout-final-inventory.json').write_text(json.dumps(inv,indent=2)+'\n')
+pathlib.Path('/tmp/sureal-comprehensive-closeout-blocked-paths.nul').write_bytes(b''.join(n.encode()+b'\0' for n in blocked))
+pathlib.Path('/tmp/sureal-comprehensive-closeout-ready-paths.json').write_text(json.dumps([r['path'] for r in inv['entries'] if r['disposition']=='selected_for_integration_after_verification'],indent=2)+'\n')
+print('Disposition counts',inv['counts'],'blocked',len(blocked))

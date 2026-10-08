@@ -1,0 +1,1955 @@
+{
+  "schema_version": 1,
+  "cutoff_ms": 1791140207276,
+  "cutoff_utc": "2026-10-04T18:56:47.276Z",
+  "source_base": "a553645ef22761aa7708abf1ee109952a6cd2c38",
+  "counts": {
+    "full_descendant_threads": 29,
+    "sureal_cwd_seed_threads": 51,
+    "root_or_descendant_seed_threads": 29,
+    "guardian_review_satellite_threads": 22,
+    "unlinked_same_cwd_excluded_threads": 0,
+    "post_cutoff_descendants_excluded": 3
+  },
+  "coverage": {
+    "thread_history_source": "thread_history_1.sqlite via mode=ro",
+    "metadata_source": "state_5.sqlite via mode=ro",
+    "full_transcripts_read": "No entire transcript was read end-to-end. Indexed histories were enumerated to compute per-thread counts and item references through cutoff; root public messages were sampled across the full timeline; Guardian decision payloads were exhaustively enumerated; descendant transcripts were not exhaustively text-read. Raw rollouts were not replayed.",
+    "public_text_retention": "Full thread inventory stores public message references and command summaries (no transcript text except first user/final answer excerpts; Guardian rationale snippets are in Guardian metadata). Reasoning items are never included.",
+    "indexed_projection_caveat": "thread_history projection is paginated/indexed storage. Current projection_state next ordinal may exceed cutoff; per-thread max included ordinal and number rows included through cutoff are recorded. No raw rollout JSONL full-replay fallback performed. Rollouts were not exhaustively parsed independently, so projection omissions, legacy/history-mode gaps, and duplicate semantics cannot be ruled out.",
+    "metrics_caveat": "Turn duration is stored turn wall time, command duration is tool-reported duration, and overlapping child threads may run concurrently. Neither metric, summed tokens, nor goal time estimates productive human or model effort. Counts describe persisted workflow events only.",
+    "accounting_crosscheck": "Fresh query at the exact cutoff agrees with root-accounting.json for root turn, compaction, and command counts; impl commands 6,759 and frontier commands 502. The historical first inventory query overcounted by one per root, which was corrected after re-query; no unresolved discrepancy remains.",
+    "cutoff_discrepancy": "None after fresh read-only query at created_at_ms <= 1791140207276: impl root has 6,759 commandExecution items; frontier root has 502, matching root-accounting.json. Events created after cutoff are excluded."
+  },
+  "root_stats": {
+    "avperc-impl": {
+      "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "turn_counts_by_status": {
+        "completed": 955,
+        "failed": 3,
+        "interrupted": 1,
+        "inProgress": 1
+      },
+      "item_counts_through_cutoff": {
+        "userMessage": 88,
+        "commandExecution": 6759,
+        "agentMessage": 2852,
+        "reasoning": 6607,
+        "subAgentActivity": 462,
+        "fileChange": 245,
+        "webSearch": 57,
+        "contextCompaction": 60,
+        "sleep": 418,
+        "collabAgentToolCall": 64,
+        "imageView": 7
+      },
+      "command_execution_summary": {
+        "count": 6759,
+        "status_counts": {
+          "completed": 6275,
+          "failed": 484
+        },
+        "nonzero_exit_count": 484
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 62027,
+        "max_included_ordinal": 62005,
+        "projected_items_through_cutoff": 17619,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      }
+    },
+    "avperc-frontier": {
+      "thread_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+      "turn_counts_by_status": {
+        "completed": 40,
+        "inProgress": 1
+      },
+      "item_counts_through_cutoff": {
+        "contextCompaction": 8,
+        "userMessage": 39,
+        "agentMessage": 152,
+        "commandExecution": 502,
+        "reasoning": 416,
+        "subAgentActivity": 23,
+        "fileChange": 21,
+        "imageView": 1,
+        "collabAgentToolCall": 5,
+        "webSearch": 17,
+        "sleep": 5
+      },
+      "command_execution_summary": {
+        "count": 502,
+        "status_counts": {
+          "completed": 475,
+          "failed": 27
+        },
+        "nonzero_exit_count": 27
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 48663,
+        "max_included_ordinal": 48572,
+        "projected_items_through_cutoff": 1189,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      }
+    }
+  },
+  "seed_counts_by_category": {
+    "query": "all indexed threads with cwd exactly /data02/home/philip.yang/workspace/sureal and created_at_ms <= observation cutoff",
+    "seed_count": 51,
+    "root_or_descendant_count": 29,
+    "guardian_satellite_count": 22,
+    "unlinked_same_cwd_excluded_count": 0,
+    "seed_threads": "See full session-inventory.json seed_reconciliation.seed_threads",
+    "guardian_review_metadata": [
+      {
+        "thread_id": "01a100a3-44cb-7140-b379-a9edaf98380a",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791012062411,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/03/rollout-2026-10-03T07-21-02-01a100a3-44cb-7140-b379-a9edaf98380a.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 1
+        },
+        "outcome_counts": {
+          "allow": 1
+        },
+        "first_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac0ace1d56c87d2a0ebd56832805d85",
+          "turn_id": "01a100a3-44e0-7f42-8f5e-8a88d9cc6c6d",
+          "ordinal": 14,
+          "created_at_ms": 1791012065836,
+          "outcome": "allow",
+          "risk_level": null,
+          "user_authorization": null,
+          "rationale": ""
+        },
+        "last_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac0ace1d56c87d2a0ebd56832805d85",
+          "turn_id": "01a100a3-44e0-7f42-8f5e-8a88d9cc6c6d",
+          "ordinal": 14,
+          "created_at_ms": 1791012065836,
+          "outcome": "allow",
+          "risk_level": null,
+          "user_authorization": null,
+          "rationale": ""
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a1029f-02ad-74d0-a785-198b4577b86d",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791045337773,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/03/rollout-2026-10-03T16-35-37-01a1029f-02ad-74d0-a785-198b4577b86d.jsonl",
+        "archived": false,
+        "turn_status_counts": {},
+        "outcome_counts": {},
+        "first_decision": null,
+        "last_decision": null,
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a102a5-55e2-7723-8ed4-fe66a154c613",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791045752290,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/03/rollout-2026-10-03T16-42-32-01a102a5-55e2-7723-8ed4-fe66a154c613.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 15
+        },
+        "outcome_counts": {
+          "allow": 15
+        },
+        "first_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac1307d34ec87d289aea3dd6833ccca",
+          "turn_id": "01a102a5-55f8-7422-b7c0-f19b7db71c87",
+          "ordinal": 14,
+          "created_at_ms": 1791045757214,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "The bounded live Insula memory-cap probe is explicitly authorized, uses isolated temporary fixtures and 64 MiB scopes, and does not access secrets, export data, or modify admitted checkpoints."
+        },
+        "last_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac1385099e087d2b3a2228330fc704a",
+          "turn_id": "01a102c3-ed98-7133-abb9-bdfe7da56289",
+          "ordinal": 171,
+          "created_at_ms": 1791047760610,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "This explicitly reproduces the reviewed descendant-lifecycle gap in an isolated Insula fixture, with a narrowly targeted child cleanup and no production, data, or network side effects."
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a102ca-55d1-7cc2-b9bf-5b0c85b65f52",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791048177105,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/03/rollout-2026-10-03T17-22-57-01a102ca-55d1-7cc2-b9bf-5b0c85b65f52.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 32
+        },
+        "outcome_counts": {
+          "allow": 32
+        },
+        "first_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac139f54a9087d2b0b25421347dbd1c",
+          "turn_id": "01a102ca-55e6-7663-bdb6-b853f8f3f291",
+          "ordinal": 12,
+          "created_at_ms": 1791048181306,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "This runs the explicitly approved, bounded live Insula regression using temporary fixtures to validate the resource verifier; it has no destructive or external-data side effects."
+        },
+        "last_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac1486a4b2487d29fc4ae8a87389966",
+          "turn_id": "01a10302-d7ba-7ad0-8987-b773df383541",
+          "ordinal": 354,
+          "created_at_ms": 1791051882314,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "This bounded live Insula run verifies the current launcher and retained resource-log closure under a 128 MiB cap, with no destructive or external-data side effects."
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a1030c-b6ef-7951-827a-f94288963095",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791052527344,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/03/rollout-2026-10-03T18-35-27-01a1030c-b6ef-7951-827a-f94288963095.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 28
+        },
+        "outcome_counts": {
+          "allow": 28
+        },
+        "first_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac14af403e887d289733f080c2ed7de",
+          "turn_id": "01a1030c-b704-7260-a545-be3fbf46c1cb",
+          "ordinal": 14,
+          "created_at_ms": 1791052532034,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "This runs the explicitly authorized live Insula regression suite for the resource gate, with bounded test artifacts and no training launch or destructive operation."
+        },
+        "last_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac1567a32cc87d2a6f2da0f5bf46b1a",
+          "turn_id": "01a10339-c594-73f1-9a30-55355d6d306a",
+          "ordinal": 314,
+          "created_at_ms": 1791055482217,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "This runs bounded live-Insula archive/recovery tests, including corruption refusals, without training or destructive side effects."
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a10341-c435-7f32-b0aa-7ceeecf4b06f",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791056004149,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/03/rollout-2026-10-03T19-33-24-01a10341-c435-7f32-b0aa-7ceeecf4b06f.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 20
+        },
+        "outcome_counts": {
+          "allow": 20
+        },
+        "first_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac15888ec0487d2855435cd2309796e",
+          "turn_id": "01a10341-c44a-7813-8ba8-249d06315540",
+          "ordinal": 12,
+          "created_at_ms": 1791056008954,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "The user explicitly authorized HDFS retention and live recovery of raw proof, source, and log evidence before release; this bounded archival action does not release or delete checkpoints."
+        },
+        "last_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac16570809c87d28414d4faa0076b52",
+          "turn_id": "01a10374-30e3-7cc3-9d99-59fe3f2e5e33",
+          "ordinal": 222,
+          "created_at_ms": 1791059312512,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "The user authorized bounded HDFS transport and exact independent recovery; this live 42-test gate is scoped to that resource-admission path and does not resume training or release checkpoints."
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a10349-5e1c-7f02-9582-4ea947c199ba",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791056502300,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/03/rollout-2026-10-03T19-41-42-01a10349-5e1c-7f02-9582-4ea947c199ba.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 4
+        },
+        "outcome_counts": {
+          "allow": 4
+        },
+        "first_decision": {
+          "item_id": "msg_0ecdf6919e245041016ac15aab067087d2894427e123068893",
+          "turn_id": "01a1034a-20bb-7ec2-9fa7-1b59f64ff60b",
+          "ordinal": 11,
+          "created_at_ms": 1791056555036,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "The user explicitly authorized an independent live Insula preparation gate; this bounded command runs the specified harness and writes only a uniquely named verification receipt, with no training, release, merge, or push."
+        },
+        "last_decision": {
+          "item_id": "msg_0ecdf6919e245041016ac15be3e46087d28439eaaf376f82cc",
+          "turn_id": "01a1034e-e963-7130-8500-5cc172787508",
+          "ordinal": 48,
+          "created_at_ms": 1791056867900,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "This is an explicitly authorized retry of bounded malformed-archive probes after a temporary test-directory collision; it uses copied code and synthetic /tmp inputs and does not alter project or production data."
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a10378-da8a-7792-84a3-0e38afce4f64",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791059614346,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/03/rollout-2026-10-03T20-33-34-01a10378-da8a-7792-84a3-0e38afce4f64.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 13
+        },
+        "outcome_counts": {
+          "allow": 13
+        },
+        "first_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac166a348d087d2961e3c72217e8d04",
+          "turn_id": "01a10378-daa3-7cf3-8dea-513aea570f4d",
+          "ordinal": 12,
+          "created_at_ms": 1791059619301,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "This is a bounded, user-authorized live Insula regression test for recovery-admission validation; it does not launch training or intentionally alter checkpoints, and its local test artifacts are reversible."
+        },
+        "last_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac173d74fe887d2ab3a08834c182044",
+          "turn_id": "01a103ac-73ad-7941-abcc-030c672adf74",
+          "ordinal": 175,
+          "created_at_ms": 1791062999321,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "This is an explicitly authorized bounded HDFS preservation of the research journal and selected internal resource evidence, with original checkpoints/models and sensor payloads excluded and integrity checks retained."
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a10380-b80b-7da3-94cc-516c748fadf8",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791060129803,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/03/rollout-2026-10-03T20-42-09-01a10380-b80b-7da3-94cc-516c748fadf8.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 8
+        },
+        "outcome_counts": {
+          "allow": 8
+        },
+        "first_decision": {
+          "item_id": "msg_058bfaf49b51bae5016ac168df775c8191be861bd19cb2e307",
+          "turn_id": "01a10381-9be8-7921-81cf-6cb054708116",
+          "ordinal": 11,
+          "created_at_ms": 1791060191475,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "The user explicitly authorized the independent full44 live Insula resource suite; the command is bounded to the review harness and temporary artifacts, with no intended source, checkpoint, or production mutation."
+        },
+        "last_decision": {
+          "item_id": "msg_058bfaf49b51bae5016ac17b9018c88191a6e13742e04e6a7b",
+          "turn_id": "01a103ca-9cc4-71e0-aeef-2cdbd00c5371",
+          "ordinal": 112,
+          "created_at_ms": 1791064976163,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "This is the explicitly authorized supplemental journal105 verification: bounded HDFS reads and metadata recovery under a 16 GiB zero-swap scope, with the serialized lock and only temporary local artifacts, not source, checkpoint, or remote-data mutation."
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a103b6-0594-7021-8e9a-6b94ebb7c70c",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791063623061,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/03/rollout-2026-10-03T21-40-23-01a103b6-0594-7021-8e9a-6b94ebb7c70c.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 18
+        },
+        "outcome_counts": {
+          "allow": 18
+        },
+        "first_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac1764ae8d487d296c478ae0718053e",
+          "turn_id": "01a103b6-05b2-7511-9b8b-e398aa374933",
+          "ordinal": 12,
+          "created_at_ms": 1791063626929,
+          "outcome": "allow",
+          "risk_level": "low",
+          "user_authorization": "high",
+          "rationale": "Stages only explicitly enumerated, independently verified files for the user-authorized landing; this is a reversible local index change with no deletion, network transfer, or destructive history rewrite."
+        },
+        "last_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac17cdeca4087d2b19df56110bdfdfa",
+          "turn_id": "01a103cf-bed6-7f21-9ac8-09ed37aed26f",
+          "ordinal": 208,
+          "created_at_ms": 1791065310813,
+          "outcome": "allow",
+          "risk_level": "low",
+          "user_authorization": "high",
+          "rationale": "Pushes the merged, independently verified GPU/HDFS evidence milestone to the explicitly authorized mainline branch via a narrow non-force ref update."
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a103e2-999b-7343-92b6-966771a5e67b",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791066544539,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/03/rollout-2026-10-03T22-29-04-01a103e2-999b-7343-92b6-966771a5e67b.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 22
+        },
+        "outcome_counts": {
+          "allow": 22
+        },
+        "first_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac181b4d7dc87d2bf3213a6ee76f79d",
+          "turn_id": "01a103e2-99b0-7262-a2f7-d313018d3de3",
+          "ordinal": 12,
+          "created_at_ms": 1791066548860,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "This runs the explicitly authorized fail-first parity tests in a bounded 16 GiB Insula scope, using temporary copied code and outputs without modifying retained checkpoints, frozen sources, or releasing data."
+        },
+        "last_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac189b4006487d2a65fd8e89f4b4173",
+          "turn_id": "01a10401-df61-7213-b903-3f7cd9834bca",
+          "ordinal": 264,
+          "created_at_ms": 1791068596011,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "This authorized bounded replay resumes only after the corrected parser epoch, reuses completed evidence, and preserves original checkpoints, sources, and trajectory."
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a103f2-e19c-7693-af5b-be13c829d61b",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791067611548,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/03/rollout-2026-10-03T22-46-51-01a103f2-e19c-7693-af5b-be13c829d61b.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 6
+        },
+        "outcome_counts": {
+          "allow": 6
+        },
+        "first_decision": {
+          "item_id": "msg_07b42f27b46a0f50016ac18610c36487d28759087f89c0d03e",
+          "turn_id": "01a103f3-9eff-7b41-babf-8f48e3170948",
+          "ordinal": 11,
+          "created_at_ms": 1791067664775,
+          "outcome": "allow",
+          "risk_level": "low",
+          "user_authorization": "high",
+          "rationale": "This is an explicitly authorized, bounded read-only parity test using fresh /tmp outputs under a 16 GiB/zero-swap scope, with no credential, network, deletion, or persistent production side effects."
+        },
+        "last_decision": {
+          "item_id": "msg_07b42f27b46a0f50016ac18a832f8c87d2b183b4cacd5d9183",
+          "turn_id": "01a10405-0650-71f1-9523-4a32b976ddd9",
+          "ordinal": 76,
+          "created_at_ms": 1791068803193,
+          "outcome": "allow",
+          "risk_level": "low",
+          "user_authorization": "high",
+          "rationale": "This is an explicitly authorized, bounded CPU state/all-head parity reference using pinned original and v5 inputs under capped Insula resources, with fresh temporary outputs and no destructive or external side effects."
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a1041b-7d48-79f3-aa09-492e7fac2195",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791070272840,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/03/rollout-2026-10-03T23-31-12-01a1041b-7d48-79f3-aa09-492e7fac2195.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 11
+        },
+        "outcome_counts": {
+          "allow": 11
+        },
+        "first_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac190449aec87d2abdad006c75302f0",
+          "turn_id": "01a1041b-7d5e-7e90-9b0d-1f7230e64502",
+          "ordinal": 14,
+          "created_at_ms": 1791070276609,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "This is a bounded, explicitly authorized preservation of specified artifacts to the trusted HDFS workflow, with resource caps and no deletion or release of original data."
+        },
+        "last_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac19946d1f887d2ae3d6a36ed947bcc",
+          "turn_id": "01a1043e-a95d-7f32-94be-8b920c7b2de5",
+          "ordinal": 141,
+          "created_at_ms": 1791072582825,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "This is a bounded, user-authorized HDFS preservation of identified witness metadata and exact proposal bytes through the existing publisher, without releasing or modifying original/replay models."
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a10440-eb60-72c3-ac3b-d6b334c27a2e",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791072725856,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/04/rollout-2026-10-04T00-12-05-01a10440-eb60-72c3-ac3b-d6b334c27a2e.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 1
+        },
+        "outcome_counts": {
+          "allow": 1
+        },
+        "first_decision": {
+          "item_id": "msg_00facd44b495780b016ac199da9ffc87d291b22355dcfafcf8",
+          "turn_id": "01a10440-eb81-72d1-a9c3-f49aca075bc1",
+          "ordinal": 13,
+          "created_at_ms": 1791072730632,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "The user explicitly authorized HDFS-backed research verification, and this bounded script performs fresh reads, recovery, and GPU checks while preserving existing state under resource limits."
+        },
+        "last_decision": {
+          "item_id": "msg_00facd44b495780b016ac199da9ffc87d291b22355dcfafcf8",
+          "turn_id": "01a10440-eb81-72d1-a9c3-f49aca075bc1",
+          "ordinal": 13,
+          "created_at_ms": 1791072730632,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "The user explicitly authorized HDFS-backed research verification, and this bounded script performs fresh reads, recovery, and GPU checks while preserving existing state under resource limits."
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a1044c-cbe1-7653-abb4-084428748639",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791073504225,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/04/rollout-2026-10-04T00-25-04-01a1044c-cbe1-7653-abb4-084428748639.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 20
+        },
+        "outcome_counts": {
+          "allow": 20
+        },
+        "first_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac19ce570a087d2a56193a6d111ab36",
+          "turn_id": "01a1044c-cbfd-7f01-8182-45e298fe5173",
+          "ordinal": 19,
+          "created_at_ms": 1791073509456,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "This performs a bounded, user-authorized archival of verified recovery proofs and journal evidence to the approved HDFS workflow, while explicitly preserving primary/replay data and refusing release or runner admission."
+        },
+        "last_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac1a6761d3087d28a340f9d041cde36",
+          "turn_id": "01a10472-293e-7c81-9e3d-ded625091b88",
+          "ordinal": 233,
+          "created_at_ms": 1791075958132,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "low",
+          "rationale": "This creates a reversible staging candidate for closeout review, excludes scratch/cache, locks, embedded previews, and detected credential material, and does not commit or push the unreviewed paths."
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a10452-2050-7e70-981c-6c2fa31c8370",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791073853520,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/04/rollout-2026-10-04T00-30-53-01a10452-2050-7e70-981c-6c2fa31c8370.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 1
+        },
+        "outcome_counts": {
+          "allow": 1
+        },
+        "first_decision": {
+          "item_id": "msg_0af1abacc7ddacbd016ac19e41c15487d2b3ef20ccc057ebe6",
+          "turn_id": "01a10452-2067-7130-a2f9-db613f6d8f5a",
+          "ordinal": 18,
+          "created_at_ms": 1791073857809,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "The user explicitly authorized this independent HDFS read, bounded live rehydration audit, and zero-swap 16 GiB execution; it preserves originals and replays while limiting effects to scratch evidence."
+        },
+        "last_decision": {
+          "item_id": "msg_0af1abacc7ddacbd016ac19e41c15487d2b3ef20ccc057ebe6",
+          "turn_id": "01a10452-2067-7130-a2f9-db613f6d8f5a",
+          "ordinal": 18,
+          "created_at_ms": 1791073857809,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "The user explicitly authorized this independent HDFS read, bounded live rehydration audit, and zero-swap 16 GiB execution; it preserves originals and replays while limiting effects to scratch evidence."
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a10479-379c-76e0-9cc9-e97d89489c30",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791076415388,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/04/rollout-2026-10-04T01-13-35-01a10479-379c-76e0-9cc9-e97d89489c30.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 19
+        },
+        "outcome_counts": {
+          "allow": 18,
+          "deny": 1
+        },
+        "first_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac1a844579c87d2bd47d1d93c288934",
+          "turn_id": "01a10479-37b2-76d0-ae94-9767361f7ad9",
+          "ordinal": 20,
+          "created_at_ms": 1791076420355,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "This is a bounded, user-authorized closeout verification that runs offline CPU tests in the admitted runtime, writes temporary evidence under /tmp, and explicitly guards frozen artifacts and scientific storage without training, migration, deletion, or external data export."
+        },
+        "last_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac1b19bf20087d2a53e54d6864c421b",
+          "turn_id": "01a1049d-bee3-7043-9769-7163d5335aa7",
+          "ordinal": 259,
+          "created_at_ms": 1791078811952,
+          "outcome": "allow",
+          "risk_level": "low",
+          "user_authorization": "high",
+          "rationale": "This is a read-only remote-branch metadata check before the explicitly authorized merge and does not modify or push anything."
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a10493-2227-73d0-9c39-593ded443414",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791078113831,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/04/rollout-2026-10-04T01-41-53-01a10493-2227-73d0-9c39-593ded443414.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 2
+        },
+        "outcome_counts": {
+          "allow": 2
+        },
+        "first_decision": {
+          "item_id": "msg_0af1abacc7ddacbd016ac1aee704dc87d28f41fe64828a4bdb",
+          "turn_id": "01a10493-223e-72a3-b5d7-a3cc146b0f87",
+          "ordinal": 16,
+          "created_at_ms": 1791078119030,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "The user explicitly authorized this narrowly scoped fresh HDFS retrieval and 16-GiB live metadata recovery; it preserves originals and excludes payloads, checkpoints, releases, and migration."
+        },
+        "last_decision": {
+          "item_id": "msg_0af1abacc7ddacbd016ac1b199959087d28c0078dbf0700c00",
+          "turn_id": "01a1049d-b6b1-7b31-8552-cc70dcc4d725",
+          "ordinal": 32,
+          "created_at_ms": 1791078809593,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "This is an explicitly authorized, narrowly scoped fresh HDFS retrieval and bounded verification of 65 metadata members, with original/replay payloads preserved and no release or scientific admission."
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a104a4-d557-7752-b9f1-92b790376b81",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791079273815,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/04/rollout-2026-10-04T02-01-13-01a104a4-d557-7752-b9f1-92b790376b81.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 27
+        },
+        "outcome_counts": {
+          "allow": 27
+        },
+        "first_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac1b36d434487d2a0e1e62ca0268475",
+          "turn_id": "01a104a4-d56d-7d40-870f-73804d45772d",
+          "ordinal": 14,
+          "created_at_ms": 1791079277272,
+          "outcome": "allow",
+          "risk_level": "low",
+          "user_authorization": "high",
+          "rationale": "The user explicitly authorized landing all verified owned work to phi9t/mainline, and this action only stages an exact audited allowlist while verifying hashes and excluding blocked files and the protected draft."
+        },
+        "last_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac1c0de434c87d2b3e3ff4f88efd75d",
+          "turn_id": "01a104d9-5aff-7a90-aa37-860988419442",
+          "ordinal": 307,
+          "created_at_ms": 1791082718269,
+          "outcome": "allow",
+          "risk_level": "low",
+          "user_authorization": "high",
+          "rationale": "This is a read-only verification of the retained worker, staged index, and published mainline before reviewing the explicitly requested documentation commit."
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a104dd-1001-75d0-a471-7ed60682e978",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791082958850,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/04/rollout-2026-10-04T03-02-38-01a104dd-1001-75d0-a471-7ed60682e978.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 15
+        },
+        "outcome_counts": {
+          "allow": 15
+        },
+        "first_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac1c1d3accc87d2aef69c82fadc7d88",
+          "turn_id": "01a104dd-1017-7462-8348-4c1a44a0ce46",
+          "ordinal": 12,
+          "created_at_ms": 1791082963732,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "This performs a scoped, non-committing merge of the explicitly requested documentation commit into the designated worker worktree after integrity checks; it does not delete data or alter the canonical branch."
+        },
+        "last_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac1ccc45d8887d29fb69938c253f9df",
+          "turn_id": "01a10507-d5a9-7cd1-8a37-881d6e084dd4",
+          "ordinal": 182,
+          "created_at_ms": 1791085764374,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "This stages the explicitly requested qualified documentation bundle and append-only evidence/journal closeout after exact scope checks, while excluding runtime ownership, scientific sources, and the live registry."
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a1050c-ac5a-7cf0-8fe3-b80f5fa6c7dd",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791086079066,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/04/rollout-2026-10-04T03-54-39-01a1050c-ac5a-7cf0-8fe3-b80f5fa6c7dd.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 18
+        },
+        "outcome_counts": {
+          "allow": 18
+        },
+        "first_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac1ce06b5b087d291b03f2660a028fe",
+          "turn_id": "01a1050c-ac6f-70f3-b929-01aa8f523b25",
+          "ordinal": 14,
+          "created_at_ms": 1791086086719,
+          "outcome": "allow",
+          "risk_level": "low",
+          "user_authorization": "high",
+          "rationale": "This is a read-only remote-ref verification for the explicitly authorized phi9t/mainline documentation integration, with no mutation or data export."
+        },
+        "last_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac1d69c269087d296375c4a9835bfd8",
+          "turn_id": "01a1052e-46b4-7e43-a489-134a6331d2e2",
+          "ordinal": 204,
+          "created_at_ms": 1791088284157,
+          "outcome": "allow",
+          "risk_level": "medium",
+          "user_authorization": "high",
+          "rationale": "This stages the explicitly authorized completed documentation branch and append-only evidence after exact base, merge, path-count, and diff checks; the stated scope excludes runtime, scientific, and plan-admission mutations."
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      },
+      {
+        "thread_id": "01a10535-4d3b-7850-8727-0bc01c1506a2",
+        "seed_category": "Guardian auto-review satellite",
+        "created_at_ms": 1791088741691,
+        "cwd": "/data02/home/philip.yang/workspace/sureal",
+        "rollout_path": "/data02/home/philip.yang/.codex/sessions/2026/10/04/rollout-2026-10-04T04-39-01-01a10535-4d3b-7850-8727-0bc01c1506a2.jsonl",
+        "archived": false,
+        "turn_status_counts": {
+          "completed": 10
+        },
+        "outcome_counts": {
+          "allow": 10
+        },
+        "first_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac1d86c07f087d2a46029a1d9a1cea5",
+          "turn_id": "01a10535-4d54-7da2-9511-4d201978e26a",
+          "ordinal": 14,
+          "created_at_ms": 1791088748041,
+          "outcome": "allow",
+          "risk_level": "low",
+          "user_authorization": "high",
+          "rationale": "This read-only remote-ref check retrieves repository metadata to verify phi9t/mainline before the explicitly authorized documentation integration and push; it sends no sensitive payload or mutations."
+        },
+        "last_decision": {
+          "item_id": "msg_031c4f878d2513b9016ac1dc24b8c887d291fbf66d07debc9e",
+          "turn_id": "01a10543-e358-7421-9fe1-0109639f214e",
+          "ordinal": 114,
+          "created_at_ms": 1791089700791,
+          "outcome": "allow",
+          "risk_level": "low",
+          "user_authorization": "high",
+          "rationale": "This retains read-only admission evidence and tool identities externally, verifies the published ref and clean checkout, and makes no repository, job, queue, runtime, or resource changes."
+        },
+        "coverage": "Indexed public decision payloads only; approval rationale retained, no command payload/credentials."
+      }
+    ],
+    "notes": "This reconciles the 51 Sureal-cwd seeds as 29 root/descendant threads + 22 Guardian reviews. The broad metadata text search finds only the two roots, because Guardian title/name says Guardian; repository cwd expansion is needed to discover them. No other unlinked Sureal-cwd thread remains in this seed set."
+  },
+  "threads": [
+    {
+      "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": "avperc-impl",
+      "nickname": null,
+      "parent_thread_id": null,
+      "created_at_ms": 1790707103009,
+      "updated_at_ms": 1791140207276,
+      "turn_counts_by_status": {
+        "completed": 955,
+        "failed": 3,
+        "interrupted": 1,
+        "inProgress": 1
+      },
+      "item_counts_through_cutoff": {
+        "userMessage": 88,
+        "commandExecution": 6759,
+        "agentMessage": 2852,
+        "reasoning": 6607,
+        "subAgentActivity": 462,
+        "fileChange": 245,
+        "webSearch": 57,
+        "contextCompaction": 60,
+        "sleep": 418,
+        "collabAgentToolCall": 64,
+        "imageView": 7
+      },
+      "command_execution_summary": {
+        "count": 6759,
+        "status_counts": {
+          "completed": 6275,
+          "failed": 484
+        },
+        "nonzero_exit_count": 484
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 62027,
+        "max_included_ordinal": 62005,
+        "projected_items_through_cutoff": 17619,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a0ee76-d6f7-75c3-a727-432ce7c7b738",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Goodall",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1790707160823,
+      "updated_at_ms": 1790707311957,
+      "turn_counts_by_status": {
+        "completed": 1
+      },
+      "item_counts_through_cutoff": {
+        "commandExecution": 2,
+        "webSearch": 7,
+        "reasoning": 5,
+        "subAgentActivity": 1,
+        "fileChange": 1,
+        "agentMessage": 1
+      },
+      "command_execution_summary": {
+        "count": 2,
+        "status_counts": {
+          "completed": 2
+        },
+        "nonzero_exit_count": 0
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 83,
+        "max_included_ordinal": 78,
+        "projected_items_through_cutoff": 17,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a0eea3-dfa4-7241-bd5c-77fe6792d6b3",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Jason",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1790710112169,
+      "updated_at_ms": 1790725834063,
+      "turn_counts_by_status": {
+        "completed": 2
+      },
+      "item_counts_through_cutoff": {
+        "commandExecution": 9,
+        "reasoning": 3,
+        "subAgentActivity": 1,
+        "agentMessage": 2
+      },
+      "command_execution_summary": {
+        "count": 9,
+        "status_counts": {
+          "completed": 9
+        },
+        "nonzero_exit_count": 0
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 72,
+        "max_included_ordinal": 67,
+        "projected_items_through_cutoff": 15,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a0eead-0ad0-71d3-9b39-146aff49f9f7",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "James",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1790710713045,
+      "updated_at_ms": 1790732185128,
+      "turn_counts_by_status": {
+        "completed": 2
+      },
+      "item_counts_through_cutoff": {
+        "commandExecution": 12,
+        "webSearch": 9,
+        "subAgentActivity": 2,
+        "reasoning": 3,
+        "agentMessage": 4
+      },
+      "command_execution_summary": {
+        "count": 12,
+        "status_counts": {
+          "completed": 12
+        },
+        "nonzero_exit_count": 0
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 131,
+        "max_included_ordinal": 126,
+        "projected_items_through_cutoff": 30,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a0ef18-a192-71f0-8bdb-2b95dc666d26",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Galileo",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1790717763991,
+      "updated_at_ms": 1790732217873,
+      "turn_counts_by_status": {
+        "completed": 5
+      },
+      "item_counts_through_cutoff": {
+        "agentMessage": 12,
+        "commandExecution": 26,
+        "webSearch": 22,
+        "reasoning": 16,
+        "subAgentActivity": 10,
+        "contextCompaction": 1
+      },
+      "command_execution_summary": {
+        "count": 26,
+        "status_counts": {
+          "completed": 26
+        },
+        "nonzero_exit_count": 0
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 358,
+        "max_included_ordinal": 353,
+        "projected_items_through_cutoff": 87,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a0f187-d8f3-7053-a1dd-1649af6eeeb2",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Plato",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1790758607092,
+      "updated_at_ms": 1790758958585,
+      "turn_counts_by_status": {
+        "completed": 1
+      },
+      "item_counts_through_cutoff": {
+        "commandExecution": 9,
+        "webSearch": 3,
+        "reasoning": 9,
+        "subAgentActivity": 1,
+        "fileChange": 1,
+        "agentMessage": 1
+      },
+      "command_execution_summary": {
+        "count": 9,
+        "status_counts": {
+          "failed": 1,
+          "completed": 8
+        },
+        "nonzero_exit_count": 1
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 230,
+        "max_included_ordinal": 225,
+        "projected_items_through_cutoff": 24,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a0f26a-0fe7-72f0-b267-32a73cca9c34",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Mencius",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1790773432295,
+      "updated_at_ms": 1790790827198,
+      "turn_counts_by_status": {
+        "completed": 2
+      },
+      "item_counts_through_cutoff": {
+        "commandExecution": 19,
+        "reasoning": 7,
+        "subAgentActivity": 3,
+        "agentMessage": 2,
+        "webSearch": 7
+      },
+      "command_execution_summary": {
+        "count": 19,
+        "status_counts": {
+          "completed": 19
+        },
+        "nonzero_exit_count": 0
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 165,
+        "max_included_ordinal": 160,
+        "projected_items_through_cutoff": 38,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a0f937-92c1-7e23-98a1-fc47d9f58676",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Ramanujan",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1790887563969,
+      "updated_at_ms": 1790887697375,
+      "turn_counts_by_status": {
+        "completed": 1
+      },
+      "item_counts_through_cutoff": {
+        "commandExecution": 7,
+        "webSearch": 2,
+        "reasoning": 2,
+        "subAgentActivity": 2,
+        "agentMessage": 1
+      },
+      "command_execution_summary": {
+        "count": 7,
+        "status_counts": {
+          "completed": 7
+        },
+        "nonzero_exit_count": 0
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 95,
+        "max_included_ordinal": 90,
+        "projected_items_through_cutoff": 14,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a0fa62-a97e-7520-876f-f25e5f801c1f",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Pasteur",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1790907165054,
+      "updated_at_ms": 1790907246722,
+      "turn_counts_by_status": {
+        "completed": 1
+      },
+      "item_counts_through_cutoff": {
+        "commandExecution": 8,
+        "reasoning": 5,
+        "subAgentActivity": 1,
+        "agentMessage": 1
+      },
+      "command_execution_summary": {
+        "count": 8,
+        "status_counts": {
+          "completed": 7,
+          "failed": 1
+        },
+        "nonzero_exit_count": 1
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 70,
+        "max_included_ordinal": 65,
+        "projected_items_through_cutoff": 15,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a0fab8-2250-7f11-8349-090a273e94c1",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Averroes",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1790912766544,
+      "updated_at_ms": 1790912857894,
+      "turn_counts_by_status": {
+        "completed": 1
+      },
+      "item_counts_through_cutoff": {
+        "commandExecution": 5,
+        "reasoning": 4,
+        "subAgentActivity": 2,
+        "agentMessage": 1
+      },
+      "command_execution_summary": {
+        "count": 5,
+        "status_counts": {
+          "completed": 5
+        },
+        "nonzero_exit_count": 0
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 58,
+        "max_included_ordinal": 53,
+        "projected_items_through_cutoff": 12,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a0fb35-ddfa-79f3-96c4-880cfdfa01fb",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Wegener",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1790921006586,
+      "updated_at_ms": 1791088455007,
+      "turn_counts_by_status": {
+        "completed": 23
+      },
+      "item_counts_through_cutoff": {
+        "commandExecution": 73,
+        "reasoning": 48,
+        "subAgentActivity": 7,
+        "agentMessage": 32,
+        "contextCompaction": 1
+      },
+      "command_execution_summary": {
+        "count": 73,
+        "status_counts": {
+          "completed": 73
+        },
+        "nonzero_exit_count": 0
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 739,
+        "max_included_ordinal": 734,
+        "projected_items_through_cutoff": 161,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a0fd8c-b512-79b0-b3fa-3a1199a48e8d",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Turing",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1790960252178,
+      "updated_at_ms": 1790968994991,
+      "turn_counts_by_status": {
+        "completed": 3
+      },
+      "item_counts_through_cutoff": {
+        "commandExecution": 13,
+        "reasoning": 15,
+        "subAgentActivity": 5,
+        "agentMessage": 3
+      },
+      "command_execution_summary": {
+        "count": 13,
+        "status_counts": {
+          "completed": 13
+        },
+        "nonzero_exit_count": 0
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 158,
+        "max_included_ordinal": 153,
+        "projected_items_through_cutoff": 36,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a0fec4-bd22-7c31-88db-5e79f8796587",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Heisenberg",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1790980701474,
+      "updated_at_ms": 1790981822159,
+      "turn_counts_by_status": {
+        "completed": 2
+      },
+      "item_counts_through_cutoff": {
+        "commandExecution": 12,
+        "reasoning": 10,
+        "subAgentActivity": 3,
+        "agentMessage": 2
+      },
+      "command_execution_summary": {
+        "count": 12,
+        "status_counts": {
+          "completed": 12
+        },
+        "nonzero_exit_count": 0
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 121,
+        "max_included_ordinal": 116,
+        "projected_items_through_cutoff": 27,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a0ff3e-2daf-7531-939a-f211573b4bef",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Hypatia",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1790988660143,
+      "updated_at_ms": 1791007585160,
+      "turn_counts_by_status": {
+        "completed": 39
+      },
+      "item_counts_through_cutoff": {
+        "reasoning": 160,
+        "agentMessage": 96,
+        "commandExecution": 161,
+        "subAgentActivity": 30,
+        "contextCompaction": 2
+      },
+      "command_execution_summary": {
+        "count": 161,
+        "status_counts": {
+          "completed": 146,
+          "failed": 15
+        },
+        "nonzero_exit_count": 15
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 1821,
+        "max_included_ordinal": 1816,
+        "projected_items_through_cutoff": 449,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+      "root_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+      "name": "avperc-frontier",
+      "nickname": null,
+      "parent_thread_id": null,
+      "created_at_ms": 1791008939993,
+      "updated_at_ms": 1791140207276,
+      "turn_counts_by_status": {
+        "completed": 40,
+        "inProgress": 1
+      },
+      "item_counts_through_cutoff": {
+        "contextCompaction": 8,
+        "userMessage": 39,
+        "agentMessage": 152,
+        "commandExecution": 502,
+        "reasoning": 416,
+        "subAgentActivity": 23,
+        "fileChange": 21,
+        "imageView": 1,
+        "collabAgentToolCall": 5,
+        "webSearch": 17,
+        "sleep": 5
+      },
+      "command_execution_summary": {
+        "count": 502,
+        "status_counts": {
+          "completed": 475,
+          "failed": 27
+        },
+        "nonzero_exit_count": 27
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 48663,
+        "max_included_ordinal": 48572,
+        "projected_items_through_cutoff": 1189,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a10077-65ff-79b0-a957-b1c4196593b5",
+      "root_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+      "name": null,
+      "nickname": "Jason",
+      "parent_thread_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+      "created_at_ms": 1791009187328,
+      "updated_at_ms": 1791009766763,
+      "turn_counts_by_status": {
+        "completed": 2
+      },
+      "item_counts_through_cutoff": {
+        "commandExecution": 37,
+        "reasoning": 14,
+        "subAgentActivity": 4,
+        "fileChange": 2,
+        "agentMessage": 2
+      },
+      "command_execution_summary": {
+        "count": 37,
+        "status_counts": {
+          "completed": 34,
+          "failed": 3
+        },
+        "nonzero_exit_count": 3
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 195,
+        "max_included_ordinal": 190,
+        "projected_items_through_cutoff": 59,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a10082-b8ce-7172-a83d-6cd96e156f8a",
+      "root_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+      "name": null,
+      "nickname": "Lovelace",
+      "parent_thread_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+      "created_at_ms": 1791009929422,
+      "updated_at_ms": 1791011019828,
+      "turn_counts_by_status": {
+        "completed": 2
+      },
+      "item_counts_through_cutoff": {
+        "reasoning": 23,
+        "agentMessage": 7,
+        "commandExecution": 42,
+        "subAgentActivity": 4,
+        "imageView": 1,
+        "collabAgentToolCall": 1
+      },
+      "command_execution_summary": {
+        "count": 42,
+        "status_counts": {
+          "completed": 40,
+          "failed": 2
+        },
+        "nonzero_exit_count": 2
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 224,
+        "max_included_ordinal": 219,
+        "projected_items_through_cutoff": 78,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a10095-13c7-7e30-9f5a-bda105ce8321",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Arendt",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1791011132359,
+      "updated_at_ms": 1791049035998,
+      "turn_counts_by_status": {
+        "completed": 4
+      },
+      "item_counts_through_cutoff": {
+        "commandExecution": 22,
+        "reasoning": 22,
+        "subAgentActivity": 5,
+        "agentMessage": 4
+      },
+      "command_execution_summary": {
+        "count": 22,
+        "status_counts": {
+          "completed": 21,
+          "failed": 1
+        },
+        "nonzero_exit_count": 1
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 225,
+        "max_included_ordinal": 220,
+        "projected_items_through_cutoff": 53,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a10305-cd23-7353-96fb-c9942e5b9aeb",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Pauli",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1791052074275,
+      "updated_at_ms": 1791052266882,
+      "turn_counts_by_status": {
+        "completed": 1
+      },
+      "item_counts_through_cutoff": {
+        "reasoning": 8,
+        "agentMessage": 4,
+        "commandExecution": 9,
+        "subAgentActivity": 2
+      },
+      "command_execution_summary": {
+        "count": 9,
+        "status_counts": {
+          "completed": 9
+        },
+        "nonzero_exit_count": 0
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 92,
+        "max_included_ordinal": 87,
+        "projected_items_through_cutoff": 23,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a1031f-5482-75a1-a248-3fcfa297317b",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Singer",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1791053747330,
+      "updated_at_ms": 1791054014933,
+      "turn_counts_by_status": {
+        "completed": 1
+      },
+      "item_counts_through_cutoff": {
+        "reasoning": 10,
+        "agentMessage": 4,
+        "commandExecution": 16,
+        "subAgentActivity": 1
+      },
+      "command_execution_summary": {
+        "count": 16,
+        "status_counts": {
+          "completed": 15,
+          "failed": 1
+        },
+        "nonzero_exit_count": 1
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 106,
+        "max_included_ordinal": 101,
+        "projected_items_through_cutoff": 31,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a10341-0103-7b63-9785-946df6db15af",
+      "root_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+      "name": null,
+      "nickname": "Fermat",
+      "parent_thread_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+      "created_at_ms": 1791055954179,
+      "updated_at_ms": 1791056038637,
+      "turn_counts_by_status": {
+        "completed": 1
+      },
+      "item_counts_through_cutoff": {
+        "commandExecution": 9,
+        "reasoning": 2,
+        "agentMessage": 1
+      },
+      "command_execution_summary": {
+        "count": 9,
+        "status_counts": {
+          "completed": 9
+        },
+        "nonzero_exit_count": 0
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 48,
+        "max_included_ordinal": 43,
+        "projected_items_through_cutoff": 12,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a10349-5dee-73d3-a20e-3b43225e1d4a",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Leibniz",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1791056502254,
+      "updated_at_ms": 1791056987756,
+      "turn_counts_by_status": {
+        "completed": 1
+      },
+      "item_counts_through_cutoff": {
+        "reasoning": 13,
+        "agentMessage": 4,
+        "commandExecution": 20,
+        "subAgentActivity": 1
+      },
+      "command_execution_summary": {
+        "count": 20,
+        "status_counts": {
+          "completed": 19,
+          "failed": 1
+        },
+        "nonzero_exit_count": 1
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 130,
+        "max_included_ordinal": 125,
+        "projected_items_through_cutoff": 38,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a10357-cd69-7512-85e1-f95e9ac45a20",
+      "root_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+      "name": null,
+      "nickname": "Goodall",
+      "parent_thread_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+      "created_at_ms": 1791057448297,
+      "updated_at_ms": 1791057946135,
+      "turn_counts_by_status": {
+        "completed": 2
+      },
+      "item_counts_through_cutoff": {
+        "reasoning": 9,
+        "agentMessage": 6,
+        "subAgentActivity": 5,
+        "commandExecution": 40,
+        "sleep": 5
+      },
+      "command_execution_summary": {
+        "count": 40,
+        "status_counts": {
+          "completed": 37,
+          "failed": 3
+        },
+        "nonzero_exit_count": 3
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 206,
+        "max_included_ordinal": 201,
+        "projected_items_through_cutoff": 65,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a10380-b7e1-7e13-a8b8-381d8146cd98",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Euler",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1791060129761,
+      "updated_at_ms": 1791065041085,
+      "turn_counts_by_status": {
+        "completed": 4
+      },
+      "item_counts_through_cutoff": {
+        "reasoning": 103,
+        "agentMessage": 25,
+        "commandExecution": 73,
+        "subAgentActivity": 21,
+        "collabAgentToolCall": 14
+      },
+      "command_execution_summary": {
+        "count": 73,
+        "status_counts": {
+          "completed": 70,
+          "failed": 3
+        },
+        "nonzero_exit_count": 3
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 854,
+        "max_included_ordinal": 849,
+        "projected_items_through_cutoff": 236,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a103f2-e169-7751-a5ec-0eb7050d7da7",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Rawls",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1791067611497,
+      "updated_at_ms": 1791078910669,
+      "turn_counts_by_status": {
+        "completed": 6
+      },
+      "item_counts_through_cutoff": {
+        "commandExecution": 191,
+        "reasoning": 251,
+        "subAgentActivity": 53,
+        "collabAgentToolCall": 18,
+        "agentMessage": 12,
+        "contextCompaction": 1,
+        "sleep": 12
+      },
+      "command_execution_summary": {
+        "count": 191,
+        "status_counts": {
+          "completed": 184,
+          "failed": 7
+        },
+        "nonzero_exit_count": 7
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 1966,
+        "max_included_ordinal": 1961,
+        "projected_items_through_cutoff": 538,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a103f4-2b78-75c3-909c-174276e24d5d",
+      "root_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+      "name": null,
+      "nickname": "Darwin",
+      "parent_thread_id": "01a10073-9fd4-7361-b4f2-e7034230800a",
+      "created_at_ms": 1791067695992,
+      "updated_at_ms": 1791069487808,
+      "turn_counts_by_status": {
+        "completed": 2
+      },
+      "item_counts_through_cutoff": {
+        "commandExecution": 91,
+        "subAgentActivity": 3,
+        "reasoning": 11,
+        "agentMessage": 2
+      },
+      "command_execution_summary": {
+        "count": 91,
+        "status_counts": {
+          "completed": 87,
+          "failed": 4
+        },
+        "nonzero_exit_count": 4
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 224,
+        "max_included_ordinal": 219,
+        "projected_items_through_cutoff": 107,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a10439-6fee-7491-8fac-aedf263f5ba6",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Copernicus",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1791072235503,
+      "updated_at_ms": 1791139638000,
+      "turn_counts_by_status": {
+        "completed": 29
+      },
+      "item_counts_through_cutoff": {
+        "commandExecution": 387,
+        "reasoning": 373,
+        "agentMessage": 94,
+        "subAgentActivity": 54,
+        "collabAgentToolCall": 2,
+        "contextCompaction": 6
+      },
+      "command_execution_summary": {
+        "count": 387,
+        "status_counts": {
+          "completed": 368,
+          "failed": 19
+        },
+        "nonzero_exit_count": 19
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 2964,
+        "max_included_ordinal": 2959,
+        "projected_items_through_cutoff": 916,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a105a4-cdbd-7400-9824-20e8dbb615bb",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Gauss",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1791096049085,
+      "updated_at_ms": 1791124567061,
+      "turn_counts_by_status": {
+        "completed": 5,
+        "failed": 1
+      },
+      "item_counts_through_cutoff": {
+        "reasoning": 320,
+        "agentMessage": 24,
+        "commandExecution": 275,
+        "subAgentActivity": 62,
+        "fileChange": 87,
+        "contextCompaction": 3,
+        "collabAgentToolCall": 4
+      },
+      "command_execution_summary": {
+        "count": 275,
+        "status_counts": {
+          "completed": 231,
+          "failed": 44
+        },
+        "nonzero_exit_count": 44
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 2325,
+        "max_included_ordinal": 2324,
+        "projected_items_through_cutoff": 775,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    },
+    {
+      "thread_id": "01a105a5-de93-74a3-adad-c5184f54a751",
+      "root_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "name": null,
+      "nickname": "Kuhn",
+      "parent_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "created_at_ms": 1791096118931,
+      "updated_at_ms": 1791140207276,
+      "turn_counts_by_status": {
+        "completed": 22,
+        "inProgress": 1
+      },
+      "item_counts_through_cutoff": {
+        "reasoning": 465,
+        "agentMessage": 84,
+        "commandExecution": 351,
+        "subAgentActivity": 92,
+        "collabAgentToolCall": 22,
+        "contextCompaction": 5
+      },
+      "command_execution_summary": {
+        "count": 351,
+        "status_counts": {
+          "completed": 324,
+          "failed": 27
+        },
+        "nonzero_exit_count": 27
+      },
+      "history_coverage": {
+        "projection_next_rollout_ordinal": 3421,
+        "max_included_ordinal": 3402,
+        "projected_items_through_cutoff": 1019,
+        "projection_state_present": true,
+        "note": "History counts include indexed rows created by cutoff. Projection state is current and may extend past cutoff; max included ordinal is cutoff-bounded."
+      },
+      "archived": false,
+      "cwd": "/data02/home/philip.yang/workspace/sureal"
+    }
+  ],
+  "failed_or_interrupted_turns": [
+    {
+      "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "turn_id": "01a0f2a7-a0e4-7a30-a065-2f2ed5c571ac",
+      "status": "failed",
+      "started_at": 1790777467,
+      "completed_at": 1790777984,
+      "duration_ms": 517075,
+      "error_present": true
+    },
+    {
+      "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "turn_id": "01a0f837-6a62-78f3-ba9a-9276659ba5fc",
+      "status": "interrupted",
+      "started_at": 1790870776,
+      "completed_at": 1790871348,
+      "duration_ms": 572335,
+      "error_present": false
+    },
+    {
+      "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "turn_id": "01a100a7-6692-7743-9ce9-62ac701afc7d",
+      "status": "failed",
+      "started_at": 1791012333,
+      "completed_at": 1791012691,
+      "duration_ms": 358382,
+      "error_present": true
+    },
+    {
+      "thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+      "turn_id": "01a1059f-6b12-7360-a6cb-6268290a4d1e",
+      "status": "failed",
+      "started_at": 1791095696,
+      "completed_at": 1791123500,
+      "duration_ms": 27804061,
+      "error_present": true
+    },
+    {
+      "thread_id": "01a105a4-cdbd-7400-9824-20e8dbb615bb",
+      "turn_id": "01a10740-8032-7f00-9a1d-fd2e31b9cfe9",
+      "status": "failed",
+      "started_at": 1791123030,
+      "completed_at": 1791123247,
+      "duration_ms": 217337,
+      "error_present": true
+    }
+  ]
+}

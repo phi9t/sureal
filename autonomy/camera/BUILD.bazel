@@ -1,0 +1,83 @@
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+
+package(default_visibility = ["//visibility:private"])
+
+LIB_MODULES = glob(
+    ["*.py"],
+    exclude = [
+        "*-*.py",
+        "*_test.py",
+    ],
+)
+
+TEST_MODULES = glob(["*_test.py"])
+
+COMMAND_SCRIPTS = glob(["*-*.py"])
+
+DATA_FILES = glob(["*.json"])
+
+PROJECTION_TOOL_SOURCES = [
+    "CMakeLists.txt",
+    "project_camera.cc",
+]
+
+LIVE_GATE_TESTS = [
+    "project_camera_test.py",
+]
+
+CAMERA_VISIBILITY = [
+    "//autonomy:__pkg__",
+    "//autonomy/segmentation:__pkg__",
+    "//autonomy/studies:__pkg__",
+]
+
+py_library(
+    name = "camera",
+    srcs = LIB_MODULES,
+    imports = [".."],
+    visibility = CAMERA_VISIBILITY,
+    deps = [
+        "//autonomy/dataset:dataset",
+        "//autonomy/evidence:evidence",
+        "//autonomy/insula:insula",
+    ],
+)
+
+filegroup(
+    name = "commands",
+    srcs = COMMAND_SCRIPTS + DATA_FILES + PROJECTION_TOOL_SOURCES,
+    visibility = CAMERA_VISIBILITY,
+)
+
+filegroup(
+    name = "all_py",
+    srcs = glob(["*.py"]),
+    visibility = ["//autonomy:__pkg__"],
+)
+
+filegroup(
+    name = "runfiles",
+    srcs = COMMAND_SCRIPTS + DATA_FILES + PROJECTION_TOOL_SOURCES,
+    visibility = CAMERA_VISIBILITY,
+)
+
+[
+    py_test(
+        name = test[:-3],
+        srcs = [test],
+        data = [":runfiles"],
+        deps = [":camera"],
+        imports = [".."],
+        legacy_create_init = 0,
+        size = "small",
+        tags = ["perception_unit"]
+            + (["requires_live_gate"] if test in LIVE_GATE_TESTS else []),
+    )
+    for test in TEST_MODULES
+]
+
+test_suite(
+    name = "all_tests",
+    tests = [test[:-3] for test in TEST_MODULES],
+    visibility = ["//autonomy:__pkg__"],
+)

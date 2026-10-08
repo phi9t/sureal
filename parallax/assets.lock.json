@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "assets": [
+    {
+      "id": "controlled-suite", "mode": "generated", "license": "repository-owned with CC0 scene assets",
+      "source": "../experiments/photoreal-scenes/recipe.json", "sha256": "9b73b5c0b1b498879209530512c93756de6f0c1130a63d81959965cf6993cd32",
+      "episode_id": "phase-a-v1", "episode_manifest_sha256": "9df5874db09c15b08b708a7164531fea681a7897faf038944d359665067a92f8",
+      "validation_sha256": "a62923fe8cdeb7f7217e114aa391d88acaabfb472573ba18fa451f794ca98351",
+      "artifact_count": 444, "context_views": 16, "target_views_per_hypothesis": 8,
+      "surface_points_per_hypothesis": 250000, "blender_version": "4.5.14 LTS",
+      "profile": "benchmark", "samples": 256,
+      "consumers": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15"]
+    },
+    {
+      "id": "middlebury-mvs", "mode": "download", "license": "research dataset terms",
+      "source": "https://grail.cs.washington.edu/projects/mview/templeSparseRing_update.zip", "sha256": "b4684adcfda53b47b0964355b4142c53cb28940bbb448e0e974f92748e428de9",
+      "byte_size": 4004383, "digest_status": "verified_2026-09-27", "archive_format": "zip", "extraction": {"mode": "zip", "roots": ["templeSparseRing"]},
+      "tree_sha256": "44eff8468fb2f807397f02449ae20b67262ec23c30b71477ee09d2532134acc5", "tree_file_count": 19, "tree_byte_size": 4009956,
+      "consumers": ["colmap-mvs-reference"]
+    },
+    {
+      "id": "tum-rgbd", "mode": "download", "license": "TUM dataset terms",
+      "source": "https://cvg.cit.tum.de/rgbd/dataset/freiburg1/rgbd_dataset_freiburg1_xyz.tgz", "sha256": "a0236d97b8c30cd93b653656d2b6c293ff7c982a4130ef2a1a8beecdb124ef98",
+      "digest_status": "verified_2026-09-26", "archive_format": "tar.gz", "extraction": {"mode": "tar", "root": "rgbd_dataset_freiburg1_xyz"}, "consumers": ["orb-slam-reference"]
+    },
+    {
+      "id": "depth-anything-v2-metric-hypersim-small", "mode": "download", "license": "Apache-2.0",
+      "source": "https://huggingface.co/depth-anything/Depth-Anything-V2-Metric-Hypersim-Small/resolve/3bc65d4e14a6786a61acec16453c50e12bf5f338/depth_anything_v2_metric_hypersim_vits.pth?download=true",
+      "sha256": "b782898d8a3e8be1f639de33837ed85e9b4b73e40f8f5e5cd99067588d722545",
+      "byte_size": 99222290, "digest_status": "verified_2026-09-26", "archive_format": "pytorch-state-dict",
+      "extraction": "not-required", "consumers": ["depth-anything-v2-reference"]
+    },
+    {
+      "id": "nerfstudio-lpips-alexnet", "mode": "download", "license": "BSD-3-Clause",
+      "source": "https://download.pytorch.org/models/alexnet-owt-7be5be79.pth",
+      "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+      "byte_size": 244408911, "digest_status": "verified_2026-09-26", "archive_format": "pytorch-state-dict",
+      "extraction": "not-required", "consumers": ["nerfstudio-neus-facto-reference", "nerfstudio-nerfacto-reference", "nerfstudio-splatfacto-reference"]
+    },
+    {
+      "id": "foundation-geometry-models", "mode": "huggingface_snapshot", "license": "mixed: VGGT-1B CC-BY-NC-4.0; DA3-BASE Apache-2.0",
+      "source": "foundation-models.lock.json", "sha256": "fb7bf9bfcfb7ff5136297dd9183355ec9c7b7461d9c4ecbafb77e2d6bd2a3cf1",
+      "digest_status": "verified_2026-09-27", "consumers": ["foundation-geometry-reference"]
+    },
+    {
+      "id": "nerf-synthetic", "mode": "download", "license": "NeRF dataset terms",
+      "source": "https://cseweb.ucsd.edu/~viscomp/projects/LF/papers/ECCV20/nerf/nerf_example_data.zip", "sha256": "ce4e94e031c099a19ef04cfb6c71f1e47225d97d365be610b476e379a386c25f",
+      "byte_size": 370385516, "digest_status": "verified_2026-09-26", "archive_format": "zip", "extraction": {"mode": "zip", "roots": ["nerf_llff_data", "nerf_synthetic"]},
+      "tree_sha256": "b98a082b13d4b099d54cbcbea474d967cb3f448e9304494ba0749bde874936fe", "tree_file_count": 873, "tree_byte_size": 385357718,
+      "consumers": ["nerfstudio-nerfacto-reference"]
+    },
+    {
+      "id": "surflo-paired-scenes", "mode": "repository", "license": "repository license and third-party notices",
+      "source": "../experiments/photoreal-scenes/results.json", "sha256": "1d4b82e749781aceaab51e0c127aac2363d6931c738be459b68529de546f818c",
+      "inference_mode": "plain"
+    },
+    {
+      "id": "surflo-visible-scout", "mode": "repository", "license": "repository license and dataset terms",
+      "source": "../experiments/insula-scout/results.json", "sha256": "48be64c4d647e5d48545068fe9fb19e06ea73b034bea5382697c0aac228d1ac1"
+    }
+  ]
+}

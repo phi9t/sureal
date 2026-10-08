@@ -1,0 +1,6 @@
+{
+  "action": "broad archive with generated sensor previews and temporary-record globs",
+  "executed": false,
+  "automatic_review_reason": "Unacceptable risk: user authorized closeout evidence but not sensitive raw-payload export; narrow the action first.",
+  "resolution": "Publish this explicit reviewed UTF-8 source/doc/report/proof allowlist only; omit generated preview payloads and all broad temporary/cache trees; no bypass or alternate route for the rejected payload."
+}

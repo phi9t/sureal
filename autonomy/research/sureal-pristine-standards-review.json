@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "axis": "Standards",
+  "utc": "2026-10-04T02:43:38.221952+00:00",
+  "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer",
+  "base": "c5679f6140836cb7e3ed46df559290590961119e",
+  "review_command": "git diff --cached c5679f6140836cb7e3ed46df559290590961119e",
+  "scope": "Exact eight staged metadata/evidence paths only; read-only standards and bounded preservation review. No implementation, tests, process census, queue, GPU, HDFS or branch/index mutation.",
+  "passed": true,
+  "documented_standards_violations": [],
+  "judgment_smells": [],
+  "standards_sources": [
+    {
+      "path": "CONTRIBUTING.md",
+      "lines": "3-4,8-13",
+      "rule": "Preserve reproducibility/compatibility, focused changes, source/artifact locks, evidence/assumptions/failure modes/commands."
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "lines": "15-19",
+      "rule": "Exclude checkpoints/datasets/generated runs/credentials/local caches; selected reports document inputs and provenance."
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "lines": "45-50",
+      "rule": "Portable evidence does not claim fresh GPU or scientific reproduction."
+    }
+  ],
+  "reviewed_paths": [
+    {
+      "path": "experiments/waymo-perception/research/2026-10-04-canonical-source-reconciliation.md",
+      "sha256": "31ced250de71e279db9e3985468a42cbcb93158fb86972cb7cd324b29e09ac7e",
+      "bytes": 3096,
+      "working_matches_index": true
+    },
+    {
+      "path": "experiments/waymo-perception/research/2026-10-04-post-closeout-stage-handoff.md",
+      "sha256": "ecab16ec9f6252de3ca85c72d8dc4595c51792f1c18535cae19d49e1a1949635",
+      "bytes": 5532,
+      "working_matches_index": true
+    },
+    {
+      "path": "experiments/waymo-perception/research/journal-evidence/31ced250de71e279db9e3985468a42cbcb93158fb86972cb7cd324b29e09ac7e",
+      "sha256": "31ced250de71e279db9e3985468a42cbcb93158fb86972cb7cd324b29e09ac7e",
+      "bytes": 3096,
+      "working_matches_index": true
+    },
+    {
+      "path": "experiments/waymo-perception/research/journal-evidence/517aaf1d99184164048df000ebd3958abc64de59f0e55b285452e3f40d5983bc",
+      "sha256": "517aaf1d99184164048df000ebd3958abc64de59f0e55b285452e3f40d5983bc",
+      "bytes": 1319,
+      "working_matches_index": true
+    },
+    {
+      "path": "experiments/waymo-perception/research/journal-evidence/8b3d1feae72d421e4bb2ae1082a78fb0fa631b6c42ae5ac10a149ee6f8cc18d1",
+      "sha256": "8b3d1feae72d421e4bb2ae1082a78fb0fa631b6c42ae5ac10a149ee6f8cc18d1",
+      "bytes": 5676,
+      "working_matches_index": true
+    },
+    {
+      "path": "experiments/waymo-perception/research/research-journal.jsonl",
+      "sha256": "2c53c39781c751ffa1e3047b9138015b32a3d3696e0cec69faec9dc9be791ecc",
+      "bytes": 174236,
+      "working_matches_index": true
+    },
+    {
+      "path": "experiments/waymo-perception/research/research-journal.md",
+      "sha256": "121c61e5d060671fb8e28f0e0a6d1532a796860f0469aaeafb44ca2e85794f02",
+      "bytes": 126112,
+      "working_matches_index": true
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-canonical-source-reconciliation.json",
+      "sha256": "8b3d1feae72d421e4bb2ae1082a78fb0fa631b6c42ae5ac10a149ee6f8cc18d1",
+      "bytes": 5676,
+      "working_matches_index": true
+    }
+  ],
+  "independent_checks": {
+    "canonical": {
+      "HEAD": "c5679f6140836cb7e3ed46df559290590961119e",
+      "branch": "phi9t/mainline",
+      "status": "",
+      "index_diff": "",
+      "tracked_diff": "",
+      "accepted_spec_sha256": "b7f371663e658958b4031ba1eefeca786985f5fbd520d17abd11b3ee14e866d2",
+      "expected_spec_sha256": "b7f371663e658958b4031ba1eefeca786985f5fbd520d17abd11b3ee14e866d2",
+      "accepted_spec_lines": 220,
+      "accepted_spec_matches_HEAD": true,
+      "scratch_preservation_dir_exists": false,
+      "scratch_parent_exists": false
+    },
+    "archive_manifest": {
+      "sha256": "eeec4cbbe3060258f9d69e1eea6c8f2d41a2927d90be55f36a0e41300e0adfab",
+      "expected_sha256": "eeec4cbbe3060258f9d69e1eea6c8f2d41a2927d90be55f36a0e41300e0adfab",
+      "matches": true,
+      "same_file_records": true
+    },
+    "archive_five_pins": [
+      {
+        "original_path": "docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+        "archive_path": "/data02/home/philip.yang/devx/tmp/sureal-pristine-provenance-20261004-c5679f6/original-paths/docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+        "bytes": 20094,
+        "sha256": "32fd3ea749a55463a9806c583e2ebb5086aed57a8ef9f920127c14620c04d364",
+        "matches_record": true,
+        "original_exists": true
+      },
+      {
+        "original_path": ".scratch/models-training-proposal-preservation-20261004-32fd3ea7/held-root-design-during-docs-merge.md",
+        "archive_path": "/data02/home/philip.yang/devx/tmp/sureal-pristine-provenance-20261004-c5679f6/original-paths/.scratch/models-training-proposal-preservation-20261004-32fd3ea7/held-root-design-during-docs-merge.md",
+        "bytes": 20094,
+        "sha256": "32fd3ea749a55463a9806c583e2ebb5086aed57a8ef9f920127c14620c04d364",
+        "matches_record": true,
+        "original_exists": false
+      },
+      {
+        "original_path": ".scratch/models-training-proposal-preservation-20261004-32fd3ea7/owned-root-design.md",
+        "archive_path": "/data02/home/philip.yang/devx/tmp/sureal-pristine-provenance-20261004-c5679f6/original-paths/.scratch/models-training-proposal-preservation-20261004-32fd3ea7/owned-root-design.md",
+        "bytes": 20094,
+        "sha256": "32fd3ea749a55463a9806c583e2ebb5086aed57a8ef9f920127c14620c04d364",
+        "matches_record": true,
+        "original_exists": false
+      },
+      {
+        "original_path": ".scratch/models-training-proposal-preservation-20261004-32fd3ea7/preservation.json",
+        "archive_path": "/data02/home/philip.yang/devx/tmp/sureal-pristine-provenance-20261004-c5679f6/original-paths/.scratch/models-training-proposal-preservation-20261004-32fd3ea7/preservation.json",
+        "bytes": 1097,
+        "sha256": "35427abb24446b183d6c648cd7dab814c3d18a6833cce042332c958c7e6016d9",
+        "matches_record": true,
+        "original_exists": false
+      },
+      {
+        "original_path": "experiments/waymo-perception/resources.tmp-design.md",
+        "archive_path": "/data02/home/philip.yang/devx/tmp/sureal-pristine-provenance-20261004-c5679f6/original-paths/experiments/waymo-perception/resources.tmp-design.md",
+        "bytes": 1319,
+        "sha256": "517aaf1d99184164048df000ebd3958abc64de59f0e55b285452e3f40d5983bc",
+        "matches_record": true,
+        "original_exists": false
+      }
+    ],
+    "raw_operator_receipt": {
+      "path": "/tmp/sureal-pristine-reconciliation.json",
+      "sha256": "3c0cd8167bfcf5774406f3959539295330c8bfac1a188f819d6968647d11ee56",
+      "expected_sha256": "3c0cd8167bfcf5774406f3959539295330c8bfac1a188f819d6968647d11ee56",
+      "matches": true
+    },
+    "journal": {
+      "entries": 116,
+      "all_chain_hashes_valid": true,
+      "base115_prefix_unchanged": true,
+      "sequence": 116,
+      "head": "529c9f828c1ae1eb2068e434c10b042b402a02e47c87159acd3030f382544866",
+      "previous": "4e91de5f9298c16d53de171d5ad0351af7df8652e18e6a1434ec5db0d1689bd9",
+      "evidence": [
+        {
+          "snapshot_path": "experiments/waymo-perception/research/journal-evidence/8b3d1feae72d421e4bb2ae1082a78fb0fa631b6c42ae5ac10a149ee6f8cc18d1",
+          "sha256": "8b3d1feae72d421e4bb2ae1082a78fb0fa631b6c42ae5ac10a149ee6f8cc18d1",
+          "bytes": 5676,
+          "filename_matches_digest": true,
+          "original_matches": true
+        },
+        {
+          "snapshot_path": "experiments/waymo-perception/research/journal-evidence/31ced250de71e279db9e3985468a42cbcb93158fb86972cb7cd324b29e09ac7e",
+          "sha256": "31ced250de71e279db9e3985468a42cbcb93158fb86972cb7cd324b29e09ac7e",
+          "bytes": 3096,
+          "filename_matches_digest": true,
+          "original_matches": true
+        },
+        {
+          "snapshot_path": "experiments/waymo-perception/research/journal-evidence/517aaf1d99184164048df000ebd3958abc64de59f0e55b285452e3f40d5983bc",
+          "sha256": "517aaf1d99184164048df000ebd3958abc64de59f0e55b285452e3f40d5983bc",
+          "bytes": 1319,
+          "filename_matches_digest": true,
+          "original_matches": true
+        }
+      ]
+    },
+    "stale_32fd_proposal_blob_in_staged_candidate": false
+  },
+  "claims_review": [
+    {
+      "path": "experiments/waymo-perception/research/2026-10-04-canonical-source-reconciliation.md",
+      "lines": "3-19",
+      "conclusion": "User-authorized obsolete206-line source restoration matches accepted220-line HEAD; exact archived32fd bytes remain outside Git candidate."
+    },
+    {
+      "path": "experiments/waymo-perception/research/2026-10-04-canonical-source-reconciliation.md",
+      "lines": "21-35",
+      "conclusion": "Four untracked provenance files relocated after retention; clean canonical tracked/index/untracked Git state independently observed at unchangedc567. Fsync operation is operator attestation, with archive bytes independently reopened and hashed."
+    },
+    {
+      "path": "experiments/waymo-perception/research/2026-10-04-canonical-source-reconciliation.md",
+      "lines": "37-51",
+      "conclusion": "Worker19 blockers, frozen sources/checkpoints/resource/HDFS identities and foreign-design/process boundaries remain; no protocol/model/fullproject/process/HDFS116/science admission."
+    },
+    {
+      "path": "experiments/waymo-perception/research/2026-10-04-post-closeout-stage-handoff.md",
+      "lines": "79-92",
+      "conclusion": "Dated subsequent reconciliation supersedes only historical canonical-root cleanliness blocker; prior census and separately pending19/foreign/process matters are preserved."
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-canonical-source-reconciliation.json",
+      "lines": "6-81",
+      "conclusion": "Five exact archive pins, historical resource-note role and current accepted spec identity match independent readback; raw receipt key scope clarification does not hide four untracked relocations."
+    },
+    {
+      "path": "experiments/waymo-perception/research/research-journal.jsonl",
+      "lines": "116",
+      "conclusion": "Append-only Git-only116 follows115 and retains three exact evidence bodies, including unique1319-byte517a historical resource note; sealedHDFS113 unchanged."
+    }
+  ],
+  "heuristic_assessment": "Fowler smell baseline considered for meaningful documentation/contract implications; no finding. Immutable evidence copies and journal renditions are intentional preservation, not duplicated mutable domain logic. Tooling-enforced whitespace/link issues excluded.",
+  "limitations": "No host liveness/quiescence inference. No full implementation/HDFS/source admission repeated. Readback verifies current exact archived bytes and Git cleanliness, not independent execution of earlier copy/fsync/relocation commands. Author-reported portable24/publication gates were not rerun by this reviewer.",
+  "landing_suitability": "Suitable for the authorized documentation-only transaction on the exact eight reviewed staged paths; protocol design/adoption remains next, models/training44-48 first scientific architecture afterward."
+}

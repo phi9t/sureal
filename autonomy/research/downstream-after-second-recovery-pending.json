@@ -1,0 +1,12 @@
+{
+  "queue_pid": 815702,
+  "box_waiter_pid": 834358,
+  "semantic_recovery_waiter_pid": 834361,
+  "capture_pid": 815704,
+  "linkage_pid": 1305902,
+  "candidate_pins": {
+    "training-box-replay-execution.candidate.json": "e3d56055681b30b226bc1826b90a96d7459fa97887ab641c311e37d75382e62b",
+    "scientific-semantic-recovery-inputs-v2.candidate.json": "49767cc6c0d1a3d309e025ea563c4f1fa88883846d2664d76838e12de2810a80"
+  },
+  "scope": "rearmed original full-cohort downstream tasks; no replay has yet executed"
+}

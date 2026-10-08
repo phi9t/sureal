@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "pilot": "53.B",
+  "document": "docs/collaboration/incidents/README.md",
+  "helper_source": "landed53.0 pinned base source",
+  "placeholder_resolution": "fixture preparation admits absolute paths/IDs; argv substitution only, never shell evaluation",
+  "checks": [
+    {
+      "id": "links",
+      "argv": [
+        "python",
+        "/source/tests/collab/pilot_checks.py",
+        "links",
+        "--document",
+        "$DOCUMENT",
+        "--source",
+        "/source"
+      ],
+      "expected_exit": 0,
+      "oracle": "Every local link resolves in candidate C/tree; external active URL schemes refused; source unchanged."
+    },
+    {
+      "id": "hygiene",
+      "argv": [
+        "python",
+        "/source/tests/collab/pilot_checks.py",
+        "hygiene",
+        "--document",
+        "$DOCUMENT",
+        "--fixture",
+        "$FIXTURE"
+      ],
+      "expected_exit": 0,
+      "oracle": "Document/snapshot excludes randomized fixture secret and private-trace canaries; no raw transcript body; HTML escaping fixtures pass."
+    },
+    {
+      "id": "commands",
+      "argv": [
+        "python",
+        "/source/tests/collab/pilot_checks.py",
+        "commands",
+        "--document",
+        "$DOCUMENT",
+        "--fixture",
+        "$FIXTURE",
+        "--manifest",
+        "$MANIFEST"
+      ],
+      "expected_exit": 0,
+      "oracle": "Every collab-example scenario is present, exact admitted argv parses, and expected outcome matches independently reopened actual fixture or outer-pilot effect/readback; every required scenario covered."
+    }
+  ],
+  "required_scenarios": [
+    {
+      "id": "observe",
+      "mode": "prepared-host-fixture-receipt",
+      "argv": [
+        "python3",
+        "$CONTROLLER/scripts/collab.py",
+        "--project-state",
+        "$STATE",
+        "observe",
+        "--once"
+      ],
+      "expected_outcome": "ok",
+      "expected_exit": 0,
+      "oracle": "Reopen exact source/context and actual Git/Kata/Codex/raw effect/command readbacks. Prepilot receipts bind this candidate's admitted base, independently audited before its worker launches; E needs fresh C-base fixtures. Prepared-host receipts precede offline checks. Current candidate never depends on its own future acceptance/landing/closure; fixture coverage cannot certify final handoff."
+    },
+    {
+      "id": "unknown-stop",
+      "mode": "prepared-host-fixture-receipt",
+      "argv": [
+        "python3",
+        "$CONTROLLER/scripts/collab.py",
+        "--project-state",
+        "$STATE",
+        "--operation-id",
+        "$OP",
+        "task",
+        "takeover",
+        "--attempt",
+        "$UNKNOWN_ATTEMPT",
+        "--disposition",
+        "$DISPOSITION"
+      ],
+      "expected_outcome": "refused",
+      "expected_exit": 2,
+      "oracle": "Reopen exact source/context and actual Git/Kata/Codex/raw effect/command readbacks. Prepilot receipts bind this candidate's admitted base, independently audited before its worker launches; E needs fresh C-base fixtures. Prepared-host receipts precede offline checks. Current candidate never depends on its own future acceptance/landing/closure; fixture coverage cannot certify final handoff.",
+      "expected_reason": "UNKNOWN_EFFECT"
+    },
+    {
+      "id": "stale-land",
+      "mode": "prepilot-live-fixture-receipt",
+      "argv": [
+        "python3",
+        "$CONTROLLER/scripts/collab.py",
+        "--project-state",
+        "$STATE",
+        "--operation-id",
+        "$OP",
+        "task",
+        "land",
+        "--candidate",
+        "$STALE_CANDIDATE",
+        "--review",
+        "$OLD_REVIEW"
+      ],
+      "expected_outcome": "refused",
+      "expected_exit": 2,
+      "oracle": "Reopen exact source/context and actual Git/Kata/Codex/raw effect/command readbacks. Prepilot receipts bind this candidate's admitted base, independently audited before its worker launches; E needs fresh C-base fixtures. Prepared-host receipts precede offline checks. Current candidate never depends on its own future acceptance/landing/closure; fixture coverage cannot certify final handoff.",
+      "expected_reason": "STALE_BASE"
+    },
+    {
+      "id": "refresh",
+      "mode": "prepilot-live-fixture-receipt",
+      "argv": [
+        "python3",
+        "$CONTROLLER/scripts/collab.py",
+        "--project-state",
+        "$STATE",
+        "--operation-id",
+        "$OP",
+        "task",
+        "refresh",
+        "--attempt",
+        "$OLD_ATTEMPT",
+        "--disposition",
+        "$DISPOSITION",
+        "--brief",
+        "$NEW_BRIEF"
+      ],
+      "expected_outcome": "ok",
+      "expected_exit": 0,
+      "oracle": "Reopen exact source/context and actual Git/Kata/Codex/raw effect/command readbacks. Prepilot receipts bind this candidate's admitted base, independently audited before its worker launches; E needs fresh C-base fixtures. Prepared-host receipts precede offline checks. Current candidate never depends on its own future acceptance/landing/closure; fixture coverage cannot certify final handoff."
+    },
+    {
+      "id": "recover",
+      "mode": "prepared-host-fixture-receipt",
+      "argv": [
+        "python3",
+        "$CONTROLLER/scripts/collab.py",
+        "--project-state",
+        "$STATE",
+        "--operation-id",
+        "$OP",
+        "recover",
+        "--effect",
+        "$PENDING_EFFECT"
+      ],
+      "expected_outcome": "ok",
+      "expected_exit": 0,
+      "oracle": "Reopen exact source/context and actual Git/Kata/Codex/raw effect/command readbacks. Prepilot receipts bind this candidate's admitted base, independently audited before its worker launches; E needs fresh C-base fixtures. Prepared-host receipts precede offline checks. Current candidate never depends on its own future acceptance/landing/closure; fixture coverage cannot certify final handoff."
+    },
+    {
+      "id": "cleanup",
+      "mode": "prepilot-live-fixture-receipt",
+      "argv": [
+        "python3",
+        "$CONTROLLER/scripts/collab.py",
+        "--project-state",
+        "$STATE",
+        "--operation-id",
+        "$OP",
+        "cleanup",
+        "--attempt",
+        "$STOPPED_ATTEMPT",
+        "--retention",
+        "$RETENTION"
+      ],
+      "expected_outcome": "ok",
+      "expected_exit": 0,
+      "oracle": "Reopen exact source/context and actual Git/Kata/Codex/raw effect/command readbacks. Prepilot receipts bind this candidate's admitted base, independently audited before its worker launches; E needs fresh C-base fixtures. Prepared-host receipts precede offline checks. Current candidate never depends on its own future acceptance/landing/closure; fixture coverage cannot certify final handoff."
+    }
+  ],
+  "executor_contract": {
+    "insulated-execute": "Insula candidate checker executes this pure argv.",
+    "prepared-host-fixture-receipt": "Lead executes host argv during preparation; copies immutable sanitized raw receipt bundle under the single /outputs/fixtures/<pilot> subtree. Offline checker only compares.",
+    "prepilot-live-fixture-receipt": "Lead executes actual prepilot fixture at candidate admitted base before its worker launches. Includes its entire acknowledged-turn-result stream.",
+    "actual-pilot-receipt": "Actual bound outer worker/lead operation; source/thread/turn/item provenance corroborated. No extra launch by checker."
+  },
+  "integrity_contract": "Independent auditor proves candidate diff stays in admitted document directory and helper/manifest/auditor blob IDs equal admitted base. Candidate cannot amend its own acceptance."
+}

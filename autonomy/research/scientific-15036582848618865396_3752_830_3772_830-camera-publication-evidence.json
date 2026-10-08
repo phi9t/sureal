@@ -1,0 +1,8 @@
+{
+  "status": "scientific camera bundle publication independently audited",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/camera-publication-15036582848618865396_3752_830_3772_830/receipt.json",
+  "receipt_sha256": "5063e4ca3d8ba010ad12407da634d106ce05740e2a8028f646a7b527482b0ddb",
+  "files": 11481,
+  "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/camera-bundles-v1/scientific/15036582848618865396_3752_830_3772_830/3687de8359304693bf999282702285c9264343672fb4ec23c24eae3240342b52.tar",
+  "scope": "one training scene; camera replay/decoding and sidecar/cache lifecycle/full cohort/protocol remain open"
+}

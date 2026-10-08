@@ -1,0 +1,51 @@
+"""Use the already live-verified bounded archive worker for admitted Motion outputs."""
+import pathlib,json,sys,subprocess,hashlib,shutil,time,os,signal,uuid
+P=pathlib.Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(P))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+from tier1.storage import unique_payload_bytes
+from tier1.admission import reserve_write
+from advanced.archive import sha
+C=pathlib.Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing';R=C/'insula'/('motion-geometry-hdfs-'+uuid.uuid4().hex);R.mkdir();code=R/'code';code.mkdir()
+for folder in ['advanced','pipeline']:shutil.copytree(P/folder,code/folder,ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
+sourcepins={str(p):sha(p) for p in code.rglob('*') if p.is_file()};native=json.loads((P/'research/motion-delta-native-components-verified.json').read_text());geometry=json.loads((P/'research/motion-current-geometry-audit-live-verified.json').read_text());producer=json.loads((P/'research/motion-current-geometry-producer-verified.json').read_text());files={}
+for folder,record in [('motion-delta-components-v1',native['artifacts']),('motion-current-geometry-v1',producer['artifacts'])]:
+ payload=W/folder
+ for p in payload.rglob('*'):
+  if p.is_file():assert str(p) in record and sha(p)==record[str(p)];files[str(p.relative_to(W))]=sha(p)
+ assert set(str(p) for p in payload.rglob('*') if p.is_file())==set(record)
+assert geometry['producer_receipt_sha256']==sha(P/'research/motion-current-geometry-producer-verified.json')
+for p,h in geometry['artifacts'].items():assert sha(p)==h
+root=C/'insula/rootfs-v2';lock=json.loads(pathlib.Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);CLI=pathlib.Path.home()/'workspace/waystone/scripts/waystone';toolpins={str(CLI):sha(CLI)}
+for relative in ['rust/target/debug/waystone','native/libhdfs_client/dist/lib/libhdfs_client.so','native/libhdfs_client/dist/bin/hdfs.bin']:toolpins[str(CLI.parents[1]/relative)]=sha(CLI.parents[1]/relative)
+checks=[]
+def external(args,name,timeout=90):
+ assert all(sha(p)==h for p,h in toolpins.items());cmd=[str(CLI),'--error-format','json','--auth-source','token-file',*args];process=subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,start_new_session=True)
+ try:output,error=process.communicate(timeout=timeout)
+ except subprocess.TimeoutExpired:os.killpg(process.pid,signal.SIGKILL);output,error=process.communicate();raise RuntimeError('bounded HDFS timeout: '+name)
+ (R/(name+'.log')).write_text(output+error);assert process.returncode==0,(name,error);checks.append({'name':name,'command':cmd,'exit_code':0,'log_sha256':sha(R/(name+'.log'))});return output
+layout=json.loads(external(['layout-profile','--project','sureal','--json'],'layout',30));assert layout['project']=='sureal';external(['ls',layout['project_root']],'authenticated-read',30);remote=layout['paths']['runs'].rstrip('/')+'/perception-motion/'+R.name
+chunks=[];current=[];n=0;limit=32*1024**2
+for name in sorted(files):
+ length=(W/name).stat().st_size;assert length<=limit
+ if current and n+length>limit:chunks.append(current);current=[];n=0
+ current.append(name);n+=length
+if current:chunks.append(current)
+publication={'scope':'admitted native Motion delta components and current-reference XYZ/keys/physical features; raw observations and codebook remain locally available','source_sha256':files,'parent_receipts':{str(P/'research'/name):sha(P/'research'/name) for name in ['motion-delta-native-components-verified.json','motion-delta-complete-live-verified.json','motion-current-geometry-producer-verified.json','motion-current-geometry-audit-live-verified.json']},'source_pins':sourcepins,'runtime_lock':lock,'tool_pins':toolpins,'chunks':[],'chunk_limit_bytes':limit,'manifest_readback_exact':False,'hdfs_prefix':remote};temporary=W/R.name;temporary.mkdir();start=time.monotonic()
+def live(mode,inputs,source,out):
+ out.mkdir();cmd=launch_plan(root,code,source,out,['python','/experiment/advanced/archive_worker.py',mode]);i=cmd.index('--');cmd[i:i]=['--ro-bind',str(inputs),'/tmp/inputs'];r=subprocess.run(cmd,capture_output=True,text=True,timeout=120);(out/'live.log').write_text(r.stdout+r.stderr);assert r.returncode==0,r.stderr;assert all(sha(p)==h for p,h in sourcepins.items());return {'mode':mode,'command':cmd,'exit_code':0,'validation':json.loads((out/'check.json').read_text())}
+for index,names in enumerate(chunks):
+ reserve_write(W,3*(sum((W/name).stat().st_size for name in names)+len(names)*4096+10240)+2*1024**2)
+ directory=temporary/str(index);directory.mkdir();inputs=R/str(index)/'inputs';inputs.mkdir(parents=True);job={'source_sha256':{name:files[name] for name in names},'max_bytes':limit};(inputs/'job.json').write_text(json.dumps(job));links=R/str(index)/'source-links';links.mkdir();
+ for name in names:
+  target=links/name;target.parent.mkdir(parents=True,exist_ok=True);os.link(W/name,target)
+ proofs=[live('create',inputs,links,directory/'packed')];manifest=json.loads((directory/'packed/manifest.json').read_text());uri=remote+'/chunk-'+str(index).zfill(3)+'/'+manifest['archive_sha256'];download=directory/'download';download.mkdir()
+ for name in ['archive.tar.gz','manifest.json']:
+  external(['put','--mkdir-parents',str(directory/'packed'/name),uri+'/'+name],str(index)+'-'+name+'-put');external(['get',uri+'/'+name,str(download/name)],str(index)+'-'+name+'-get')
+ job['manifest_sha256']=sha(directory/'packed/manifest.json');(inputs/'job.json').write_text(json.dumps(job));proofs.append(live('verify',inputs,download,directory/'verify'));proofs.append(live('rehydrate',inputs,download,directory/'rehydrate'))
+ for mode in ['packed','verify','rehydrate']:
+  proofdir=R/str(index)/mode;proofdir.mkdir();shutil.copy(directory/mode/'check.json',proofdir/'check.json');shutil.copy(directory/mode/'live.log',proofdir/'live.log')
+ chunk={'index':index,'archive_hdfs_uri':uri+'/archive.tar.gz','manifest_hdfs_uri':uri+'/manifest.json','manifest_sha256':job['manifest_sha256'],'manifest':manifest,'live_proofs':proofs};publication['chunks'].append(chunk);(R/'in-progress.json').write_text(json.dumps(publication,indent=2));release={str(p):sha(p) for p in directory.rglob('*') if p.is_file()};(R/str(index)/'temporary-release.json').write_text(json.dumps(release,indent=2));shutil.rmtree(directory);shutil.rmtree(links);print('HDFS exact readback and live recovery',index+1,'/',len(chunks),flush=True)
+assert {member['path']:member['sha256'] for chunk in publication['chunks'] for member in chunk['manifest']['members']}==files
+manifest=R/'publication-manifest.json';manifest.write_text(json.dumps(publication,indent=2));external(['put','--mkdir-parents',str(manifest),remote+'/publication-manifest.json'],'global-manifest-put');readback=R/'publication-manifest-readback.json';external(['get',remote+'/publication-manifest.json',str(readback)],'global-manifest-get');assert sha(readback)==sha(manifest)
+publication.update({'manifest_readback_exact':True,'publication_manifest_hdfs_uri':remote+'/publication-manifest.json','publication_manifest_sha256':sha(manifest),'checks':checks,'elapsed_seconds':time.monotonic()-start,'scientific_payload_bytes':unique_payload_bytes(W),'scientific_cap_bytes':15*1024**3});assert unique_payload_bytes(W)<15*1024**3;assert all(sha(W/name)==h for name,h in files.items());(R/'verified-publication.json').write_text(json.dumps(publication,indent=2));(P/'research/motion-geometry-hdfs-retention-verified.json').write_text(json.dumps(publication,indent=2));print('PASS complete verified HDFS retention; local source release still requires separate admission',R,flush=True)

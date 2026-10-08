@@ -1,0 +1,7 @@
+from pathlib import Path
+import time,subprocess
+code=Path('experiments/waymo-perception/research');logs=Path.home()/'.cache/waystone/waymo-perception/insula/continuation-logs'
+while not (code/'architecture-window_bev-checkpoint-audit-verified.json').exists():time.sleep(2)
+for worker in ['run-followup-learning-curve.py','audit-followup-checkpoint.py','run-followup-loss-audit.py','score-followup-score-first.py','audit-followup-score-first.py']:
+ with (logs/('architecture-coarse_mlp-'+worker+'.log')).open('w') as f:r=subprocess.run(['python','.scratch/'+worker,'coarse_mlp'],stdout=f,stderr=subprocess.STDOUT)
+ assert r.returncode==0,worker;print('PASS coarse_mlp',worker,flush=True)

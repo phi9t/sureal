@@ -1,0 +1,95 @@
+"""Bounded replay evidence for native producer and five CPU stages, no continuation."""
+import json,os,shutil,sys,traceback
+from pathlib import Path
+P=Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');sys.path.insert(0,str(P))
+from cohort.sustained_controller_backend import NativeBackend,C
+from cohort.sustained_controller_lock import acquire_experiment_lock
+from resources.backend import ResourceBackend,CAP_BYTES
+from resources.sources import sha,validate_sources
+from resources.stage import run_stage,validate_proof,write_new
+from cohort.sustained_scoring_budget import stage_timeout
+from pipeline.insula_entry import launch_plan
+from continuation.legacy_values import compare_stage,compare_producer_reports
+ROOT=C/'insula/resource-legacy-seven-controller20261003a-v5'
+REPORT=P/'research/sustained-resource-legacy-seven-v5-verified.json'
+report={'schema_version':1,'scope':'bounded legacy producer and five CPU/native stage replay evidence; no checkpoint companion, full runner admission, new fitting sample or release','driver_path':str(Path(__file__).resolve()),'driver_sha256':sha(__file__),'stages':[]}
+def ref(p):return {'path':str(p),'sha256':sha(p)}
+try:
+ with acquire_experiment_lock(C/'insula/architecture-experiments.lock') as lock:
+  b=NativeBackend('controller20261003a','baseline',lock,resume=True)
+  state=json.loads((b.R/'state.json').read_text());prev=None
+  for record in state['records']:b.check_record(record,prev);prev=record
+  original={str(b.R/n):sha(b.R/n) for n in ('run.json','state.json')}
+  for record in state['records']:
+   original[str(Path(record['root'])/'checkpoint.pt')]=record['checkpoint_sha256'];original[record['final_path']]=record['final_sha256']
+  shared=json.loads((P/'research/sustained-resource-shared-hdfs-live-v4-verified.json').read_text())
+  b.__class__=ResourceBackend;b._resource_identity=None;b.attach_resources(shared['resource_identity_path'],shared['resource_identity_sha256'])
+  code=validate_sources(P/'resources',b.resource_identity['source_pins']);ROOT.mkdir(exist_ok=False)
+  shutil.copytree(P/'continuation',ROOT/'continuation',ignore=shutil.ignore_patterns('__pycache__'))
+  shutil.copytree(b.package,ROOT/'compare-code');shutil.copytree(P/'continuation',ROOT/'compare-code/continuation',ignore=shutil.ignore_patterns('__pycache__'))
+  shutil.copytree(code,ROOT/'compare-code/resources')
+  parity_pins={str(p.relative_to(P/'continuation')):sha(p) for p in (P/'continuation').rglob('*.py')}
+  report['stderr_measurement_exception']='valid glog YYYYMMDD HH:MM:SS.ffffff timestamp only; PID/severity/spacing/source/warnings/box values remain byte-exact; raw files preserved'
+  report.update(original_native_sha256=original,resource_identity=ref(b.resource_identity_path),parity_sources={name:{'original':ref(P/'continuation'/name),'snapshot':ref(ROOT/'continuation'/name)} for name in parity_pins},manifest_sha256=b.manifest_sha)
+  def guard():
+   b.guard()
+   assert all(sha(path)==digest for path,digest in original.items())
+   assert {str(p.relative_to(P/'continuation')):sha(p) for p in (P/'continuation').rglob('*.py')}==parity_pins
+   assert all(sha(ROOT/'continuation'/name)==digest and sha(ROOT/'compare-code/continuation'/name)==digest for name,digest in parity_pins.items())
+   assert all(sha(ROOT/'compare-code'/name)==digest for name,digest in b.pins.items())
+   assert all(sha(ROOT/'compare-code/resources'/name)==pin['sha256'] for name,pin in b.resource_identity['source_pins'].items())
+   assert {p.relative_to(ROOT/'compare-code').as_posix() for p in (ROOT/'compare-code').rglob('*.py')}==set(b.pins)|{'continuation/'+n for n in parity_pins}|{'resources/'+n for n in b.resource_identity['source_pins']}
+  def execute(name,native,output,command,metric=False):
+   guard();unwrapped=command.copy();proofroot=ROOT/(name+'-resources')
+   with (output/'live.log').open('w') as stream:
+    run_stage(command,b.package,dict(os.environ),stream,stage_timeout(metric),code=code,current_sources=P/'resources',source_pins=b.resource_identity['source_pins'],evidence_directory=proofroot,native_output=output,cap_bytes=CAP_BYTES)
+   proofpath=proofroot/'resource-admitted.json';proof=json.loads(proofpath.read_text())
+   validate_proof(proof,command,P/'resources',b.resource_identity['source_pins'],output,CAP_BYTES,stage_timeout(metric));assert proof['original_command']==unwrapped
+   guard();return {'requested_stage':name,'native_parent':ref(b.R/(name+'-verified.json')) if native else None,'proof':ref(proofpath),'actual_command':command,'output_artifacts':{str(p):sha(p) for p in output.rglob('*') if p.is_file()},'resource_admission':proof['resource_admission']}
+  previous=None
+  for record in state['records']:
+   step=record['step'];name='train-'+str(step);native_path=b.R/(name+'-verified.json');native=json.loads(native_path.read_text());NativeBackend.check_stage(b,native)
+   output=b.output/('resource-replay-v1-0' if step==0 else 'resource-replay-v5-'+str(step));cmd=native['command'].copy();cmd[cmd.index('/outputs')-1]=str(output)
+   if step==0:
+    proofpath=C/'insula/resource-legacy-seven-controller20261003a-v1/train-0-resources/resource-admitted.json';proof=json.loads(proofpath.read_text());assert proof['original_command']==cmd
+    validate_proof(proof,proof['command'],P/'resources',b.resource_identity['source_pins'],output,CAP_BYTES,stage_timeout(False))
+    entry={'requested_stage':name,'native_parent':ref(native_path),'proof':ref(proofpath),'actual_command':proof['command'],'output_artifacts':{str(p):sha(p) for p in output.rglob('*') if p.is_file()},'resource_admission':proof['resource_admission'],'retained_successful_v1_producer_execution_reused':True}
+    print('REUSE exact bounded producer0',flush=True)
+   else:
+    output.mkdir();print('START bounded producer replay',step,flush=True);entry=execute(name,native,output,cmd)
+   compare_producer_reports(record['report'],json.loads((output/'check.json').read_text()))
+   job={'schema_version':1,'prior_report':None,'original_checkpoint':{'path':'/tmp/original-producer/checkpoint.pt','sha256':record['checkpoint_sha256']},'fresh_checkpoint':{'path':'/tmp/fresh-producer/checkpoint.pt','sha256':sha(output/'checkpoint.pt')},'original_report':{'path':'/tmp/original-producer/check.json','sha256':record['report_sha256']},'fresh_report':{'path':'/tmp/fresh-producer/check.json','sha256':sha(output/'check.json')},'original_heads':{},'fresh_heads':{}}
+   for filename,digest in record['report']['head_hashes'].items():
+    job['original_heads'][filename]={'path':'/tmp/original-producer/heads/'+filename,'sha256':digest}
+    job['fresh_heads'][filename]={'path':'/tmp/fresh-producer/heads/'+filename,'sha256':sha(output/'heads'/filename)}
+   inputs=ROOT/('state-'+str(step)+'-input');inputs.mkdir();comparison=ROOT/('state-'+str(step)+'-outputs');comparison.mkdir()
+   if previous:job['prior_report']={'path':'/tmp/prior-report.json','sha256':previous['report_sha256']}
+   write_new(inputs/'job.json',job)
+   cmd=launch_plan(C/'gpu-rootfs',ROOT/'compare-code',inputs,comparison,['/opt/waymo/bin/python','/experiment/continuation/compare_state.py','--job','/source/job.json','--job-sha256',sha(inputs/'job.json'),'--output','/outputs/check.json'])
+   i=cmd.index('--');cmd[i:i]=['--ro-bind',record['root'],'/tmp/original-producer','--ro-bind',str(output),'/tmp/fresh-producer',*(['--ro-bind',previous['report_snapshot'],'/tmp/prior-report.json'] if previous else [])]
+   stateproof=execute('state-'+str(step),None,comparison,cmd);entry.update(state_comparison=stateproof,state_comparison_job=ref(inputs/'job.json'),state_comparison_result=ref(comparison/'check.json'),complete_state_and_all16head_parity=True,only_original_output_mount_replaced_before_resource_wrapping=True)
+   report['stages'].append(entry);write_new(ROOT/(name+'-comparison.json'),entry);print('PASS producer state/heads',step,flush=True)
+   previous=record
+   for stage in ['literal-loss','export','proposals','score','metrics-audit']:
+    name=stage+'-'+str(step);native_path=b.R/(name+'-verified.json');native=json.loads(native_path.read_text());NativeBackend.check_stage(b,native)
+    if step==0:
+     prior_root=C/'insula'/('resource-legacy-seven-controller20261003a-v4' if stage=='metrics-audit' else 'resource-legacy-seven-controller20261003a-v3')
+     out=prior_root/(name+'-outputs');cmd=native['command'].copy();cmd[cmd.index('/outputs')-1]=str(out)
+     proofpath=prior_root/(name+'-resources/resource-admitted.json');proof=json.loads(proofpath.read_text());assert proof['original_command']==cmd
+     validate_proof(proof,proof['command'],P/'resources',b.resource_identity['source_pins'],out,CAP_BYTES,stage_timeout(stage in {'score','metrics-audit'}));guard()
+     entry={'requested_stage':name,'native_parent':ref(native_path),'proof':ref(proofpath),'actual_command':proof['command'],'output_artifacts':{str(p):sha(p) for p in out.rglob('*') if p.is_file()},'resource_admission':proof['resource_admission'],'retained_successful_bounded_native_execution_reused':True}
+     print('REUSE bounded original',name,flush=True)
+    else:
+     out=ROOT/(name+'-outputs');out.mkdir();cmd=native['command'].copy();cmd[cmd.index('/outputs')-1]=str(out)
+     print('START bounded original',name,flush=True);entry=execute(name,native,out,cmd,stage in {'score','metrics-audit'})
+    compare_stage(stage,Path(native['output_directory']),out)
+    entry.update(only_original_output_mount_replaced_before_resource_wrapping=True,all_nonmeasurement_fields_and_native_payloads_exact=True)
+    report['stages'].append(entry);write_new(ROOT/(name+'-comparison.json'),entry);print('PASS bounded original',name,flush=True)
+  guard();report.update(passed=True,completed_legacy_stages=len(report['stages']),native_state_and_checkpoints_unchanged=True)
+  write_new(ROOT/'verified.json',report);write_new(REPORT,report)
+except BaseException as error:
+ report.update(passed=False,error={'type':type(error).__name__,'message':str(error)},traceback=traceback.format_exc())
+ failure=P/'research/sustained-resource-legacy-seven-v5-failure.json'
+ if not failure.exists():write_new(failure,report)
+ raise
+print('PASS legacy revalidation evidence; no producer continuation or release',flush=True)

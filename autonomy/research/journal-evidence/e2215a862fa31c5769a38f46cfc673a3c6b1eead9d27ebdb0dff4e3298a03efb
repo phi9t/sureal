@@ -1,0 +1,49 @@
+import hashlib,json,re,subprocess
+from pathlib import Path
+from urllib.parse import unquote
+root=Path.cwd()
+base='0c161dda53cde1cd50a2161523d90da88cf40bb4'
+source='60ede2883ffebe455cf0672ddede3fa0b7e7d4e2'
+paths=subprocess.check_output(['git','diff','--cached','--name-only',base],text=True).splitlines()
+assert len(paths)==11
+expected=subprocess.check_output(['git','diff','--name-only',source+'^',source],text=True).splitlines()
+assert paths==expected
+links=[];updated=[];issues=[]
+for p in paths:
+ text=Path(p).read_text()
+ old=subprocess.run(['git','show',base+':'+p],capture_output=True,text=True).stdout
+ for label,target in re.findall(r'\[([^\]\n]+)\]\(([^)\n]+)\)',text):
+  target=target.strip('<>')
+  if target.startswith(('https://','http://','mailto:','#','app://')):continue
+  resolved=(root/Path(p).parent/unquote(target.split('#')[0])).resolve()
+  row={'source':p,'label':label,'target':target,'resolved':str(resolved),'exists':resolved.exists()}
+  links.append(row)
+  if (label,target) not in re.findall(r'\[([^\]\n]+)\]\(([^)\n]+)\)',old):updated.append(row)
+  if not resolved.exists():issues.append(row)
+ for marker in ('<<<<<<< ','=======\n','>>>>>>> '):assert marker not in text,(p,marker)
+for n in range(49,54):
+ p=next(p for p in paths if p.startswith('docs/research/tasks/'+str(n)+'-'))
+ text=Path(p).read_text()
+ for heading in ('**Goal:**','**Dependencies:**','## Deliverables','## Verifiers','## Acceptance','## Closure evidence'):assert heading in text,(p,heading)
+assert not issues,issues
+pins=json.loads(Path('/tmp/sureal-doc60-preserved-pins.json').read_text())
+assert all(hashlib.sha256(Path(p).read_bytes()).hexdigest()==h for p,h in pins['blocked_source_sha256'].items())
+registry_path='experiments/waymo-perception/research/experiments.json'
+registry=json.loads(Path(registry_path).read_text())
+registry_base=json.loads(subprocess.check_output(['git','show',base+':'+registry_path],text=True))
+registry_timestamp=registry.pop('updated_utc')
+registry_base.pop('updated_utc')
+assert registry==registry_base,'registry scientific content changed'
+assert registry_path not in paths,'live projection must not be staged'
+for p in paths:
+ if p=='experiments/waymo-perception/research-task-index.md':continue
+ assert Path(p).read_bytes()==subprocess.check_output(['git','show',source+':'+p]),p
+merged=Path('experiments/waymo-perception/research-task-index.md').read_text()
+original=subprocess.check_output(['git','show',base+':experiments/waymo-perception/research-task-index.md'],text=True)
+assert merged[merged.index('## Prediction–target association study'):] == original[original.index('## Prediction–target association study'):]
+# The entire append-only prefix is unchanged during documentation-only integration.
+journal_path='experiments/waymo-perception/research/research-journal.jsonl'
+assert hashlib.sha256(Path(journal_path).read_bytes()).hexdigest()==pins['journal_prefix_sha256']
+report={'schema_version':1,'scope':'documentation-only integration of requested60; no implementation, runtime admission, training or new HDFS proof','generation_command':'python /tmp/sureal-doc60-document-audit.py (retained immutable script body linked by journal118)','base':base,'source_commit':source,'paths':[{ 'path':p,'sha256':hashlib.sha256(Path(p).read_bytes()).hexdigest(),'bytes':Path(p).stat().st_size} for p in paths], 'local_links_checked':len(links),'new_or_updated_local_links_checked':len(updated),'missing_links':issues,'task_structure_checked':list(range(49,54)),'original_source_docs_exact_except_additive_research_index':True,'post_parent_research_index_additions_preserved':True,'all19_blocked_source_bodies_preserved':True,'registry_scientific_content_exact_to_base':True,'registry_timestamp_is_live_excluded_projection':registry_timestamp,'journal117_prefix_preserved':True,'links':links,'new_or_updated_links':updated}
+Path('/tmp/sureal-doc60-document-audit.json').write_text(json.dumps(report,indent=2)+'\n')
+print(json.dumps({k:v for k,v in report.items() if k not in ('links','new_or_updated_links','paths')},indent=2))

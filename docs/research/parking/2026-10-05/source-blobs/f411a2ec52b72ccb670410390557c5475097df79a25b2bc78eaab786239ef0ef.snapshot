@@ -1,0 +1,88 @@
+"""Full103 shape replay, serialized after semantic recovery, with live retained admission."""
+import hashlib,json,os,subprocess,sys,time
+from pathlib import Path
+base=Path(__file__).resolve().parents[1];code=base/'experiments/waymo-perception';sys.path.insert(0,str(code));sys.path.insert(0,str(base/'.scratch'))
+from pipeline.native_shape_source_replay import replay_shape_source
+from pipeline.runtime_identity import verify_rootfs
+from pipeline.insula_entry import launch_plan
+from pipeline.staged_derived_archive import working_bytes
+cache=Path.home()/'.cache/waystone/waymo-perception';research=code/'research'
+def sha(p):
+ with Path(p).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+def load(p):return json.loads(Path(p).read_text())
+def save(p,d):
+ q=p.with_suffix('.pending.json');q.write_text(json.dumps(d,indent=2)+'\n');q.replace(p)
+def process_alive(pid,name):
+ path=Path('/proc')/str(pid)/'cmdline'
+ if not path.exists():return False
+ cmd=path.read_bytes()
+ if not cmd:return False
+ if name.encode() not in cmd:raise ValueError('recorded owner PID changed')
+ return True
+manifest=code/'scientific-acquisition.candidate.json';index_path=research/'native-shape-jobs.candidate.json';inventory=research/'scientific-native-range-shape-sources.candidate.json';auditor=base/'.scratch/native_shape_retained_audit.py'
+filepins={str(p):sha(p) for p in [manifest,index_path,inventory,auditor]}
+codepins={p.name:sha(p) for p in (code/'pipeline').glob('*.py')}
+selected=load(manifest)['scenes'];index=load(index_path);jobs=index['jobs'];sources={r['scene']:r for r in load(inventory)['sources']}
+assert len(jobs)==len(sources)==len(selected)==103 and {j['scene'] for j in jobs}==set(sources)==set(selected)
+assert sha(inventory)==index['source_inventory_sha256'] and load(inventory)['acquisition_sha256']==sha(manifest)
+root=cache/'insula/rootfs-v2';lock=load(Path(str(root)+'.lock.json'));source_root=cache/'scientific-source-audit'
+for item in jobs:
+ j=load(code/item['path']);r=load(source_root/item['source_receipt']);s=sources[item['scene']]
+ assert sha(code/item['path'])==item['sha256'] and sha(source_root/item['source_receipt'])==item['source_receipt_sha256']==s['source_receipt_sha256']
+ assert j['scene']==item['scene'] and j['membership']==selected[j['scene']]==s['membership']
+ assert r['hdfs_uri']==item['hdfs_uri']==s['hdfs_uri'] and r['sha256']==s['source_sha256']
+ assert j['source']['size_bytes']==s['source_bytes']==int(r['source_metadata']['size'])
+ assert j['inventory']['rows']==s['native_rows']==r['inventory']['rows'] and j['inventory']['key_sha256']==s['native_key_sha256']==r['inventory']['key_sha256']
+ assert item['expected_shape_records']==2*j['inventory']['rows']
+assert sum(j['expected_shape_records'] for j in jobs)==203850
+names=['native_shape_source_replay.py','native_shape_transfer.py','native_range_shape_worker.py','native_range_shape_file.py','native_range_shapes.py','native_range_shape_reference.py','source_integrity.py','staged_source.py','staging_lease.py','insula_entry.py','runtime_identity.py']
+expected_code={n:codepins[n] for n in names}
+def unchanged():
+ assert filepins=={p:sha(p) for p in filepins}
+ assert codepins=={p.name:sha(p) for p in (code/'pipeline').glob('*.py')}
+def gate():
+ p=load(research/'scientific-processing-progress.json');assert set(p['replayed_scene_evidence'])==set(selected)
+ alive=process_alive(2230074,'await-semantic-recovery-admission-v3.py')
+ if alive:return False
+ sem=load(research/'semantic-recovered-progress.json');old=load(research/'scientific-semantic-support-progress.json')
+ required={r['scene'] for r in load(research/'scientific-semantic-recovery-inputs-v2.candidate.json')['sources']}
+ assert sem['recovered_scenes']==len(required)==22 and set(sem['scene_evidence'])==required,'semantic owner terminal before full22 admission'
+ assert set(old['scene_evidence']).isdisjoint(required) and set(old['scene_evidence'])|required==set(selected)
+ return True
+if '--observe-once' in sys.argv:
+ unchanged();print('PASS full103 source/job preflight; ready:',gate());sys.exit(0)
+print('WAIT confirmed semantic owner2230074; full103 shape inventory retained',flush=True)
+while not gate():time.sleep(30)
+unchanged();verify_rootfs(root,lock['rootfs_sha256'])
+destination=cache/'scientific-processing/native-shape-sources-v1';destination.mkdir(exist_ok=False)
+admitted={}
+for item in jobs:
+ unchanged();scene=item['scene'];job=load(code/item['path']);source_receipt=source_root/item['source_receipt'];source=load(source_receipt)
+ retained=0
+ for raw in (cache/'slices').glob('*/raw'):
+  retained+=working_bytes(raw)
+ assert retained<=2147483648
+ # Include the transient raw transfer allowance and bounded metadata/receipt reserve.
+ assert working_bytes(cache/'scientific-processing')+int(source['source_metadata']['size'])+16*1024**2<=15*1024**3
+ output=destination/scene
+ receipt=replay_shape_source(code/item['path'],source_receipt,expected_job_sha256=item['sha256'],expected_source_receipt_sha256=item['source_receipt_sha256'],cache=cache,code_root=code,output=output,runtime_root=root,expected_runtime_lock=lock,retained_bytes=retained,limit_bytes=2147483648)
+ expected={'receipt_sha256':sha(output/'receipt.json'),'job':job,'job_sha256':item['sha256'],'source_receipt_sha256':item['source_receipt_sha256'],'code_sha256':expected_code,'runtime_lock':lock,'raw_limit_bytes':2147483648}
+ auditbase=cache/'insula'/('scientific-native-shape-retained-v1-'+scene);auditbase.mkdir();inputs=auditbase/'input';inputs.mkdir();audit=auditbase/'output';audit.mkdir();(inputs/'expected.json').write_text(json.dumps(expected,indent=2)+'\n')
+ program="""import json,sys,importlib.util
+from pathlib import Path
+sys.path.insert(0,'/tmp/auditor');from native_shape_retained_audit import verify
+assert importlib.util.find_spec('tensorflow') is None
+e=json.loads(Path('/tmp/expected/expected.json').read_text())
+v=verify('/source',e,'/experiment')
+Path('/outputs/check.json').write_text(json.dumps(v,indent=2));print('PASS independently retained shape receipt',v['scene'],v['records_verified'])
+"""
+ command=launch_plan(root,code,output,audit,['python','-c',program]);i=command.index('--');command[i:i]=['--ro-bind',str(base/'.scratch'),'/tmp/auditor','--ro-bind',str(inputs),'/tmp/expected']
+ r=subprocess.run(command,capture_output=True,text=True,timeout=120);(audit/'live.log').write_text(r.stdout+r.stderr);assert r.returncode==0,'retain failed independent shape audit'
+ unchanged();assert sha(output/'receipt.json')==expected['receipt_sha256'];validation=load(audit/'check.json');assert validation['records_verified']==item['expected_shape_records']
+ evidence={'scene':scene,'receipt':str(output/'receipt.json'),'receipt_sha256':expected['receipt_sha256'],'membership':selected[scene],'checks':[{'command':command,'exit_code':0}],'runtime_lock':lock,'auditor_sha256':sha(auditor),'expected_sha256':sha(inputs/'expected.json'),'validation':validation,'audit_artifacts':{p.name:sha(p) for p in audit.iterdir() if p.is_file()},'scope':'actual immutable HDFS native shape replay and independent retained live receipt admission; point-grid linkage still separate'}
+ pointer=research/f'scientific-native-shape-{scene}-verified.json';save(pointer,evidence)
+ admitted[scene]={'evidence':pointer.name,'evidence_sha256':sha(pointer),'receipt_sha256':expected['receipt_sha256'],'validation':validation}
+ save(research/'scientific-native-shape-progress.json',{'selected_scenes':103,'job_index_sha256':sha(index_path),'source_inventory_sha256':sha(inventory),'admitted_scenes':len(admitted),'records_verified':sum(e['validation']['records_verified'] for e in admitted.values()),'scene_evidence':admitted,'scope':'shape metadata only; native point-grid linkage and scientific comparisons remain open'})
+ print('PASS original native shape scene',scene,len(admitted),'/103',flush=True)
+assert set(admitted)==set(selected) and sum(e['validation']['records_verified'] for e in admitted.values())==203850
+print('TERMINAL all103 native shape sources independently admitted; point-grid linkage remains',flush=True)

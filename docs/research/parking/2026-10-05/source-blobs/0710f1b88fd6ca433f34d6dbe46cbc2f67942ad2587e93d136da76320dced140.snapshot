@@ -1,0 +1,17 @@
+import copy,json,unittest
+from pathlib import Path
+from point_grid_inventory import admit
+class InventoryTests(unittest.TestCase):
+ def test_full103_and_rehashed_scope_mutants(self):
+  d=json.loads(Path('/tmp/inputs/candidate.json').read_text());m=json.loads(Path('/experiment/scientific-acquisition.candidate.json').read_text());p=json.loads(Path('/experiment/research/scientific-processing-progress.json').read_text());j=json.loads(Path('/experiment/research/native-shape-jobs.candidate.json').read_text());e=json.loads(Path('/tmp/inputs/expected.json').read_text())
+  changes=[None,lambda d:d['sources'].pop(),lambda d:d['sources'].append(copy.deepcopy(d['sources'][0])),lambda d:d['sources'][0].update(points=0),lambda d:d['sources'][0].update(source_lidar_sha256='0'*64),lambda d:d['sources'][0]['membership'].update(official_split='validation'),lambda d:d['sources'][0]['shape_job'].update(sha256='0'*64),lambda d:d['sources'][0]['point_publication'].update(archive_sha256='0'*64)]
+  for change in changes:
+   with self.subTest(change=change):
+    v=copy.deepcopy(d)
+    if change:change(v)
+    args=dict(code_root='/experiment',working_root='/source',source_root='/tmp/native-sources',original_working_root=e['working_root'])
+    if change:
+     with self.assertRaises(ValueError):admit(v,m,p,j,**args)
+    else:
+     result=admit(v,m,p,j,**args);self.assertEqual(result['scenes'],103);self.assertEqual(result['records'],203850)
+if __name__=='__main__':unittest.main()

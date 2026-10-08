@@ -1,0 +1,120 @@
+{
+  "admission": {
+    "all_three_original_failed_probes_preserved_unknown": true,
+    "live_stop_capability_proved": false,
+    "managed_dispatch_accepted": false,
+    "no_native_application_Kata_scientific_or_shared_source_effect_by_reviewer": true,
+    "old_thread_mutation_retry_release_cleanup_authorized": false,
+    "requires_fresh_separately_admitted_fixture_and_explicit_RuntimeProbeAdmission": true,
+    "source_snapshot_review_pass_only": true,
+    "task50_accepted": false
+  },
+  "author": "/root/collab49_independent_auditor",
+  "author_native_thread_id": "01a105a4-cdbd-7400-9824-20e8dbb615bb",
+  "candidate": "e07de852356b1d0f7e0acee787689060dd0e4979",
+  "findings": [],
+  "kind": "independent-auditor-source-review",
+  "materialization": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/materialization.json",
+    "sha256": "1228dfcd5c73e6fed46858097df4de818d56660637755a60b9e20ef7d52d5044"
+  },
+  "parent": "58bb73246e5f9ae102748394cca946d113e68fc9",
+  "references": [
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/review-package.json",
+      "sha256": "66677faca1ce71b59fc2dea4d3ef39235f8e8ceeb3143a196eaf89a312eeaf69"
+    },
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-auditor-review-58bb732.json",
+      "sha256": "94851bc2eddcef2f56d45cee374306a41cb71e8ec61d27d28c3832b6782c1800"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-4/review-package.json",
+      "sha256": "7234fa8729bf03ae996103c2bffab494fde011ffdf0f4624058b7c45a2997db2"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/source-a50/tests/collab/audit_support/runtime_probe.py",
+      "sha256": "2f57150bc77f50511cc72ba61faa192af4bbc6c72a0f8cfff0d848cf85ec0afa"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/source-a50/tests/collab/audit_support/runtime-probe-contract.md",
+      "sha256": "6696574e32f19744cedeb0a900004b9b2bce208e9d0aafa742d9d13b0e2bfff5"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-observer-v3/run/report.json",
+      "sha256": "53b54de374c0f7b7675a13e7cd722f89ee8b87a190f5d1bae8dcb38b77ab192b"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-fixture-public-rollout-diagnostic-v3.json",
+      "sha256": "3a4b97b2a8f7f87ded89ea07e12cfc395efe5a917dfeff995ca65b371486268f"
+    },
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-auditor-review-e07de85-facts.json",
+      "sha256": "d46d3e03b158b00d7c25c450cebb83b6339bbaa2a041a216d22f6c8f1c7232f2"
+    },
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-review-e07de85-hosttests/actual-command.json",
+      "sha256": "598d21a96964767145e6ea1564ec957ce0a4efc9e5ba8768563b33ae0c7abdb1"
+    }
+  ],
+  "retention": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/cold-retention/retention.json",
+    "sha256": "4df9c7d58f783d400513bc0edb2217f56a4cc3daebd98666f275d4b3ba21dbd1"
+  },
+  "reviewed_ms": 1791149621478,
+  "reviewer": "/root/collab_execution_admission_review",
+  "reviewer_native_thread_id": "01a105a5-de93-74a3-adad-c5184f54a751",
+  "schema_version": 1,
+  "scope_review": {
+    "actual_client_setup_checked": "NativeReadClient.initialize does not append application-read records; the new empty-record precondition therefore matches the real client initialization seam.",
+    "cold_objects": 6547,
+    "exact3_changed_paths": [
+      "tests/collab/audit_support/runtime-probe-contract.md",
+      "tests/collab/audit_support/runtime_probe.py",
+      "tests/collab/audit_support/test_probe_collection.py"
+    ],
+    "fixed_bounds": {
+      "native_shell_timeout_ms": 90000,
+      "observer_max_ms": 120000,
+      "observer_memory_max_bytes": 268435456,
+      "operator_foreground_seconds": 95,
+      "payload_seconds": 60,
+      "swap_max_bytes": 0
+    },
+    "mandatory_predicates_ast_identical": [
+      "validate_read_request",
+      "public_response",
+      "native_facts",
+      "kernel_facts",
+      "check_stop_evidence",
+      "terminal_candidate"
+    ],
+    "retention_semantics": "collect_snapshot preserves bounded allowlisted RPC records across native validation/kernel failures. retain_snapshot requires records equality and clears only after successful write_new/fsync/hash retention. Output-budget failure preserves records and UNKNOWN; no reconstructed historical reads.",
+    "sole_parent_tree_and_scope_reopened": true,
+    "source_entries": 4128,
+    "unchanged_modules": [
+      "native_read.py",
+      "probe_os.py",
+      "probe_authority.py",
+      "evidence.py",
+      "raw_git.py"
+    ],
+    "whole_source_union_and_fresh_cold_reconstruction": true
+  },
+  "source": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/source-a50",
+  "tests": {
+    "command": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-review-e07de85-hosttests/actual-command.json",
+      "sha256": "598d21a96964767145e6ea1564ec957ce0a4efc9e5ba8768563b33ae0c7abdb1"
+    },
+    "facts": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-auditor-review-e07de85-facts.json",
+      "sha256": "d46d3e03b158b00d7c25c450cebb83b6339bbaa2a041a216d22f6c8f1c7232f2"
+    },
+    "host_component_tests": 107,
+    "new_controls": "All six empty-tool reads retained; kernel gap retained; failed durable write does not clear; successful durable write clears; actual component UNKNOWN report reopens all six read records and preserves no-release/no-cleanup.",
+    "verdict": "pass"
+  },
+  "tree": "af7a9ce34215f2f72a7f3d7171a2f69edac6ee42",
+  "verdict": "pass"
+}

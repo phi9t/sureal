@@ -1,0 +1,231 @@
+{
+  "assessment": "At exact daemon0.160.0 and userShell path, complete items/list omitted the running command while same-thread original-connection notification metadata reported it inProgress. This is an observed channel gap. It does not prove stop capability unavailable, or that every list API is universally historical. Observation-channel reconciliation is a concrete implementation direction, still requiring written contract/source admission and fresh live evidence.",
+  "candidate": "e07de852356b1d0f7e0acee787689060dd0e4979",
+  "cleanup_permitted": false,
+  "facts": {
+    "all_six_actual_read_records_retained": true,
+    "independent_kernel_running_witness_captured": false,
+    "item_complete_metadata": {
+      "command_sha256": "e17d16b527695bb2d114e55696c4b170da7b06075d321ccc9587875cc9703ed7",
+      "exitCode": 0,
+      "id": "829a41f3-b876-4157-a3da-8bdcf95bfc87",
+      "source": "userShell",
+      "status": "completed",
+      "type": "commandExecution"
+    },
+    "item_id": "829a41f3-b876-4157-a3da-8bdcf95bfc87",
+    "item_start_metadata": {
+      "command_sha256": "e17d16b527695bb2d114e55696c4b170da7b06075d321ccc9587875cc9703ed7",
+      "id": "829a41f3-b876-4157-a3da-8bdcf95bfc87",
+      "source": "userShell",
+      "status": "inProgress",
+      "type": "commandExecution"
+    },
+    "native_command_sha256": "e17d16b527695bb2d114e55696c4b170da7b06075d321ccc9587875cc9703ed7",
+    "notification_metadata_only": true,
+    "observer_actual_exit": 3,
+    "omission_semantics": "Both fields are absent from this diagnostic projection. No cwd value or processId:null is reconstructed or accepted. Payload PID is separately recorded and not invented as native processId.",
+    "omitted_projection_fields": [
+      "cwd",
+      "processId"
+    ],
+    "operator_actual_exit": 0,
+    "own_notification_interval_ms": [
+      1791150058714,
+      1791150118770
+    ],
+    "payload_record": {
+      "birth_ticks": 56563893,
+      "memory_max": "134217728",
+      "pid": 2654250,
+      "swap_max": "0"
+    },
+    "poll_interval_ms": [
+      1791150116040,
+      1791150116045
+    ],
+    "poll_items_goal_queue_handles": {
+      "goal": null,
+      "handles": [],
+      "items": [],
+      "queue": []
+    },
+    "poll_thread_state": "active",
+    "poll_turn_state": "inProgress",
+    "source_and_native_identity_bound": true,
+    "thread_id": "01a108dc-eb20-7bb3-a9d9-8678fd287671",
+    "turn_id": "01a108dc-ec4e-7e93-8798-7bcee48e7814",
+    "two_stop_observations_captured": false
+  },
+  "kind": "IndependentNativeObservationChannelAssessment",
+  "managed_dispatch_accepted": false,
+  "native_stop_status": "unknown",
+  "observed_ms": 1791150415329,
+  "ownership_released": false,
+  "references": [
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-observer-v4/run/report.json",
+      "sha256": "d8a96341a9623474f5b7a5772103ef9ff424eae9d92a9fd06fd4cd4ff54fb152"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-observer-v4/run/incomplete-native-observation.json",
+      "sha256": "1c8fc9df7eaa94e99da1335b6ffd3335402c86602fcd1b7639d9dab527309b3f"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-observer-command-v4/actual-command.json",
+      "sha256": "581b56f442a34ea3f759e1ca2b2ad013ff77a73104fccadfd13a92b1518a9d19"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-operator-command-v4/actual-command.json",
+      "sha256": "6526f9c345c53e5fdd5e4d42303c6d7fd49808545706d2a590295645469523b0"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-provenance-v4.json",
+      "sha256": "32fc8e9980735a56dbbf4e9eb69da751130d2127628b9cfb71c61d9cd5d01007"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/fixture-launch.json",
+      "sha256": "fd6b1d7bee941d19ff0de890d579b448e28ad8f26b81c46173b6f433cb6078dd"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/observer-launch-admission-v4.json",
+      "sha256": "ea6a67f1af27a450d095cb7ea0e686064582c0e9d3104bb937761db5988cb986"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/fixture-launch-admission-v5.json",
+      "sha256": "7297260d7ea2f298935719b948a9946078f2b9d5c88f54d367a46af983a3c0e1"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/payload/payload-running.json",
+      "sha256": "9d7a79c703dfdcf904bd5be34a3cb8ee47e87f49fe65b729d67915bbff380bd3"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/payload/payload-returning.json",
+      "sha256": "f5ca6cea79c6f1c00dae34b1484d409b74851958d3421cb3eb01588ea1e76432"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/operator-returning.json",
+      "sha256": "036a50d6467d820423c7cf84067eb22f877eca9f2c30520e523a2beeebfc99d8"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-observer-command-v4/stdout",
+      "sha256": "8f6092419a33c25afef8582e1604dc934a4abe26e3f14eac5f36a4b369836161"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-observer-command-v4/stderr",
+      "sha256": "123c3caa79ef4f0903888ef665280b983f09d83d2c31bce5c19effc2181c584f"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-operator-command-v4/stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-operator-command-v4/stderr",
+      "sha256": "2edd8b45757b655a810ba057fe4030d88ea58e937c136b3cb847ebfd88cb33e5"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/observer-launch-admission-v4.json",
+      "sha256": "ea6a67f1af27a450d095cb7ea0e686064582c0e9d3104bb937761db5988cb986"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-provenance-v4.json",
+      "sha256": "32fc8e9980735a56dbbf4e9eb69da751130d2127628b9cfb71c61d9cd5d01007"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-5/materialization.json",
+      "sha256": "1228dfcd5c73e6fed46858097df4de818d56660637755a60b9e20ef7d52d5044"
+    },
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-auditor-review-e07de85.json",
+      "sha256": "4c10a69d14ef071d44acdf595ba5a66291f24fffe4e70bf69f2adb2b2d76208e"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/fixture-launch-admission-v5.json",
+      "sha256": "7297260d7ea2f298935719b948a9946078f2b9d5c88f54d367a46af983a3c0e1"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/0002-result.json",
+      "sha256": "5ddd5ff1dd4428959e49f6683b66a9baf2ffb04ac88b92d2ea495df61a7966f8"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/0004-result.json",
+      "sha256": "1ef29b44401ae461bfd3896cc95cef0905c78381701c7e98007687b0965947f1"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/0003-result.json",
+      "sha256": "b6150917f53c074eaadefdbd62cf7f0280b93726b286da2096204740a6c9f558"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/payload/payload-running.json",
+      "sha256": "9d7a79c703dfdcf904bd5be34a3cb8ee47e87f49fe65b729d67915bbff380bd3"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/fixture-operator-candidate-v8/materialization.json",
+      "sha256": "455c73c6357d0957eb0cff05a6a374e7d8bd05b37c6bbda5f5f88641a4e43fd0"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/fixture-operator-candidate-v8/retention.json",
+      "sha256": "8db81c4e5233aa84c63f9c2506e921ed12291a1f3dcf0dcce09b1cf5f45900db"
+    },
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-native-fixture-review-8441d98.json",
+      "sha256": "57fe6a577fd4ace8c7362eb273bb71dd092a74b4337826b0161f5fedb3fb133e"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/0002-result.json",
+      "sha256": "5ddd5ff1dd4428959e49f6683b66a9baf2ffb04ac88b92d2ea495df61a7966f8"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/0004-result.json",
+      "sha256": "1ef29b44401ae461bfd3896cc95cef0905c78381701c7e98007687b0965947f1"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/0003-result.json",
+      "sha256": "b6150917f53c074eaadefdbd62cf7f0280b93726b286da2096204740a6c9f558"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/public-event-0001.json",
+      "sha256": "3786649fc51a138fd786c69195ff3ff872594975e46ff9cf510704b9ae978058"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/public-event-0002.json",
+      "sha256": "a626a06b8ade64912d54d330cf1ef21ae628a6c9418599ceaf03ee5e7afbdd28"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/public-event-0003.json",
+      "sha256": "5832d5c59f6fd5362fec90743a486ceae8a57f42ce6ce6031ba3385174a16e27"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/public-event-0004.json",
+      "sha256": "4834bea450f5ab60022c54a1a44f7d65ab044ec7eb8c6452263bf499fab16881"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/public-event-0005.json",
+      "sha256": "dbdc7a6f7a04953924ba024f07fad06e542f0657bd1257710056140712a9354e"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-fixture-v4/public-event-0006.json",
+      "sha256": "5d883206969d56ab181598395b4fa56e6f7ba0ad63cdd4f489a2186d20cd822d"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/fixture-operator-candidate-v8/source/tests/collab/fixture_support/native_stop_fixture.py",
+      "sha256": "759740fa1f6c9cbf763cf4c75c7e07c989a1510197907afafa55084c54a8cc1f"
+    }
+  ],
+  "required_before_producer50": [
+    "Review and commit an explicit observation-channel contract/amendment: authoritative exact own-thread native public notification path, supported pinned native schemas, causal thread/turn/item/digest/source/cwd binding, explicit nullable process-handle semantics, durable bounded sequence/coverage/gaps/outage handling and privacy. Missing/contradictory/ambiguous evidence remains UNKNOWN.",
+    "Implement and independently exact-source-review the bounded metadata producer/independent reader changes. Preserve command hash provenance, six paginated goal/turn/item/queue/background read coverage, kernel process births/ancestry/scope and writer coverage, resource limits and no retries. No flag/name-only notification acceptance.",
+    "Run a fresh separately admitted fixture and independent live observer. Capture an actual running native/tool plus kernel witness while it runs; then demonstrate the complete unchanged terminal conjunction twice >=5s apart. Notifications alone cannot replace kernel absence, queue/goal/handles/turn closure or missing scan coverage.",
+    "Keep original A/B/C/D UNKNOWNs and discarded/missing facts historical, retain all sources/receipts. Producer50/model-worker grants/shared writer-resource admission remain separate open gates."
+  ],
+  "reviewer": "/root/collab_execution_admission_review",
+  "reviewer_effects": "Only file/hash/literal metadata inspection; no native RPC, process control, source/shared refs, goals, claims, relaunch, release or cleanup.",
+  "reviewer_native_thread_id": "01a105a5-de93-74a3-adad-c5184f54a751",
+  "schema_version": 1,
+  "stop_capability": false,
+  "task50_accepted": false,
+  "unchanged_partial_preflight": {
+    "isolated_kata": "Previously reviewed private start/health/project-create/list/same-daemon-stop partial PASS remains separately scoped. It does not close task50 or prove model grants."
+  },
+  "verdict": "changes-required"
+}

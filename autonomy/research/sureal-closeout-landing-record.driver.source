@@ -1,0 +1,24 @@
+import hashlib,json,pathlib,sys
+P=pathlib.Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');R=P/'research';sys.path.insert(0,str(P))
+from tracking.journal import append_entry,read_entries,digest
+x=json.loads((R/'sustained-resource-legacy-preservation-independent.json').read_text());union=x['groups'][0]['recovered_union'];gaps=json.loads(pathlib.Path('/tmp/sureal-root-historical-journal-evidence-gaps.json').read_text());assert len(gaps)==3
+recovered=[]
+for h,e in gaps.items():
+ source=pathlib.Path(e['source']);assert digest(source)==h
+ matches=[name for name,value in union.items() if value==h];assert matches
+ recovered.append({'sha256':h,'bytes':e['bytes'],'source_path':str(source),'sequences':e['sequences'],'independently_recovered_members':matches})
+report=R/'sureal-root-historical-journal-evidence-repair.json';report.write_text(json.dumps({'passed':True,'scope':'restore only three entry81 evidence snapshots absent from Git integration; historical journal bytes and independently HDFS-recovered evidence unchanged','independent_receipt_sha256':'2e4271001bdcea21a88796efa7bf4a433a86867743c9f6c4458f9da5b3bc25b9','members':recovered,'implementation_changed':False},indent=2)+'\n')
+entries=read_entries(R/'research-journal.jsonl');assert len(entries)==110
+entry=append_entry(R/'research-journal.jsonl','decision',['balanced16-sustained-baseline-controller20261003a','models-training-migration-design'],
+ 'Ready evidence-only closeoutee0d4dd merged53c90ff064699546cfa9de42330c6a7ef5b9504f; reviewed documentation51f1b39 mergeda3c6955de0fa8b06d9cd2f99797fe928a900b261. Root32fd owner draft restored exact as unstaged edit, retained local backups and independently recovered HDFS copy; its bytes were never staged. No architecture migration/Kata activation. Journal110/raw final independent receipt preserved by final metadata HDFS publisher exactreadback/live union. Merged validation found3historical entry81 snapshots absent Git but present in unchanged activeworktree and independently recovered mainHDFS union; restore those exact435739/34727/4347byte snapshots without altering historical journal. All54owned closeout files match integration; full110-entry hashchain valid. Original6/sourceclosures/checkpoints remain exact, scientific15329280496bytes. Next fullnamespace/legacycatalog/sevenstagecompanions/sharedparent/archivedpolicy/keep2/fullrunner independent live admission; only then baseline2000 and unchanged4recipe sweep,42→43, isolated41.2. Unreviewed runtime identity2files remain unlanded; external4dirtyfiles/olduntracked unchanged. Keep active branch/worktree/ledger. Full research goal remains active/incomplete; this is incremental landing, no heldout/segmentation/SAM/forecasting or newfit claim.',
+ [report,R/'sustained-resource-legacy-closeout-final-metadata-v1-verified.json',R/'2026-10-04-models-training-documentation-review.md',R/'sureal-models-training-proposal-preservation.json'])
+entries=read_entries(R/'research-journal.jsonl');notes=['# Research journal','','Append-only observations, hypotheses, decisions and follow-up work. Evidence snapshots and entry hash chains preserve what was known at the time.']
+for e in entries:
+ notes+=['',f"## {e['sequence']}. {e['utc']} — {e['category']}",'',', '.join(e['experiments']),'',e['content']]
+ if e['evidence']:notes+=['','Evidence: '+', '.join(f"[{pathlib.Path(a['path']).name[:12]}]({a['path']})" for a in e['evidence'])]
+(R/'research-journal.md').write_text('\n'.join(notes)+'\n')
+paths=[str(report),str(R/'research-journal.jsonl'),str(R/'research-journal.md')]+[str(R/'journal-evidence'/h) for h in gaps]+[str(R/'journal-evidence'/e['sha256']) for e in entry['evidence']];paths=list(dict.fromkeys(paths));pathlib.Path('/tmp/sureal-closeout-landing-owned-paths.json').write_text(json.dumps(paths,indent=2)+'\n')
+ledger=P.parents[1]/'.superpowers/sdd/2026-10-03-balanced16-sustained-overfit/progress.md'
+with ledger.open('a') as f:
+ f.write('\nEvidenceee0d4dd merged53c90ff; docs51f1b39 mergeda3c6955. Exact54ownedbytes, source/original6 andjournal110 unchanged; rootowner32fd draft restored unstaged. Full-root journal body check surfaced3pre-existing entry81 Git gaps (474813bytes) although activeworktree/HDFS recovered bodies are exact. Restore only those3verified snapshots; no historical entry changes or currentimplementation/test modifications. Journal111 head'+entry['sha256']+'. Full110journal/finalraw receipt HDFS preserved,111 records landing interpretation not a new experiment. Fullresource gate and broadgoal remain open; do not release primary/replays or run2000 yet.\n')
+print('RECORDED',entry['sequence'],entry['sha256'],'verified historical3 paths')

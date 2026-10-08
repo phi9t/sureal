@@ -1,0 +1,38 @@
+{
+  "axis": "Spec",
+  "base": "19854df4b54769b394a0390d7c92867df6964316",
+  "requested_commit": "447267246d08d20747ea21fac99bda33bfeed311",
+  "diff": "git diff --cached 19854df4b54769b394a0390d7c92867df6964316",
+  "findings": [],
+  "assessment": "Suitable documentation-only447 integration; expands future capability without claiming multiworker implementation or weakening exact candidate/live evidence/cleanup gates",
+  "checks": {
+    "seven_doc_paths": true,
+    "requested447_only_commit": true,
+    "six_source447_bodies_exact_except_additive_index": true,
+    "workspace_kind_common_directory_unique_branch": true,
+    "capacity_one_rollout_not_permanent": true,
+    "perseat_ownership_and_serial_landing": true,
+    "cooperative_shared_metadata_noOSisolation": true,
+    "oldbase_stale_refresh_reverify": true,
+    "future_design_plan_pristine_live_gates": true,
+    "Sureal_only_Corenius_reference_optionalKata_no_daemon": true,
+    "no_later_foreignHEAD_adoption_or_implementation_claim": true,
+    "nineteen_blocked_bodies_exact": true,
+    "foreign_owner_paths_explicit": true,
+    "journal119prefix_exact": true
+  },
+  "staged_sha256": {
+    "docs/research/README.md": "668fbd196defa8ecaea7b03578ce0675a1a646043c290d44a68aa9222dbbb19e",
+    "docs/research/task-queue.md": "5bb472806944ba1202ebb655dd2dc01a32e2e3b1108c5f858e0af953ec19c65b",
+    "docs/research/tasks/50-collaboration-worker-attempts.md": "866a3abf509030e74ed1672fc7aa2b80ec77abb488d29b6ba9ae7937230ddcab",
+    "docs/research/tasks/52-collaboration-landing-recovery.md": "d46a0b6d618485c26229d883cec499fb6b1688e58e94f4d730cf2956dc5da9dd",
+    "docs/research/tasks/53-collaboration-cleanup-closeout.md": "f3223700fa70d0f4609ff69f3b980218361047752cf4ceb73e6e7ebb0574354c",
+    "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md": "df811e4e8187c60e85c552a03ae6f597be7574c472d34d56a9fb6b7e3b4aa25e",
+    "experiments/waymo-perception/research-task-index.md": "947b0aad52ef837e2ee85b0d233e4675097cfa61b826ec428fad7fbd503a3136"
+  },
+  "preserved_input": {
+    "path": "/tmp/sureal-doc447-preserved-pins.json",
+    "sha256": "ef9e151c3b9326015e9f06f085e94f217cb4a79909de86cbe52871f2e946ae1e"
+  },
+  "limits": "Exact447plus binding user clarification reviewed; laterforeignHEAD not adopted. Existing scientific contracts,41/42/43 and19blocked dispositions unchanged. Reviewer made no repository/index/runtime/process mutations."
+}

@@ -1,0 +1,42 @@
+import json,math
+from pathlib import Path
+import numpy as np
+
+def corners(b):
+ xy=np.array([[-b[3]/2,-b[4]/2],[b[3]/2,-b[4]/2],[b[3]/2,b[4]/2],[-b[3]/2,b[4]/2]])
+ c,s=math.cos(b[6]),math.sin(b[6]);return xy@np.array([[c,s],[-s,c]])+b[:2]
+def area(poly):
+ if len(poly)<3:return 0.
+ p=np.array(poly);return abs(float(np.sum(p[:,0]*np.roll(p[:,1],-1)-p[:,1]*np.roll(p[:,0],-1))))/2
+
+def intersection(a,b):
+ poly=list(corners(a));clip=corners(b)
+ for j in range(4):
+  if not poly:return 0.
+  origin=clip[j];edge=clip[(j+1)%4]-origin;result=[]
+  def signed(point):d=point-origin;return edge[0]*d[1]-edge[1]*d[0]
+  previous=poly[-1];dp=signed(previous)
+  for current in poly:
+   dc=signed(current)
+   if (dc>=0)!=(dp>=0):result.append(previous+(current-previous)*(dp/(dp-dc)))
+   if dc>=0:result.append(current)
+   previous=current;dp=dc
+  poly=result
+ return area(poly)
+
+def iou3d(a,b):
+ height=max(0,min(a[2]+a[5]/2,b[2]+b[5]/2)-max(a[2]-a[5]/2,b[2]-b[5]/2));inter=intersection(a,b)*height;union=np.prod(a[3:6])+np.prod(b[3:6])-inter;return inter/union if union>0 else 0
+unit=np.array([0,0,0,2,2,2,0.]);assert abs(iou3d(unit,unit)-1)<1e-12
+shift=unit.copy();shift[0]=1;assert abs(iou3d(unit,shift)-1/3)<1e-12
+shift[0]=3;assert iou3d(unit,shift)==0
+rotation=unit.copy();rotation[6]=math.pi/2;assert abs(iou3d(unit,rotation)-1)<1e-12
+truth=json.loads(Path('/source/groundtruth.json').read_text());predictions=json.loads(Path('/source/predictions.json').read_text());report=json.loads(Path('/tmp/native-report.json').read_text());uncovered=set(report['target_assignment']['uncovered_object_ids'])
+rows=[]
+for gt in truth:
+ if gt['type']!=3:continue
+ b=np.array(gt['box']);same=[p for p in predictions if p['type']==3];best=max(same,key=lambda p:iou3d(b,np.array(p['box']))) if same else None
+ if best:
+  p=np.array(best['box']);delta=p[:3]-b[:3];c,s=math.cos(b[6]),math.sin(b[6]);local=np.array([c*delta[0]+s*delta[1],-s*delta[0]+c*delta[1],delta[2]])
+ else:p=None;local=None
+ rows.append({'object_id':gt['object_id'],'native_point_count':gt['num_lidar_points_in_box'],'target_uncovered':gt['object_id'] in uncovered,'dimensions_m':b[3:6].tolist(),'thin_axis_center_tolerance_m_for_aligned_IoU_half':float(b[3]/3),'best_same_class_exported_iou3d_diagnostic':iou3d(b,p) if p is not None else 0.,'best_prediction_score':best['score'] if best else None,'center_error_GT_local_m':local.tolist() if local is not None else None,'dimension_error_m':(p[3:6]-b[3:6]).tolist() if p is not None else None,'absolute_heading_error_rad':abs(float((p[6]-b[6]+math.pi)%(2*math.pi)-math.pi)) if p is not None else None})
+Path('/outputs/check.json').write_text(json.dumps({'scope':'observational literal polygon-intersection diagnostics; independent geometry calculation with analytic fixtures, not native evaluator match assignments or separately audited scientific acceptance','signs':rows},indent=2)+'\n');print('PASS sign diagnostics',len(rows),'uncovered',sum(x['target_uncovered'] for x in rows),'best IoU>=.5',sum(x['best_same_class_exported_iou3d_diagnostic']>=.5 for x in rows))

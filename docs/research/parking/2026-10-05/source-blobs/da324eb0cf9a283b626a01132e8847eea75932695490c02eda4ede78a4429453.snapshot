@@ -1,0 +1,9 @@
+import json
+from pathlib import Path
+root=Path('/source');files=[p for p in root.rglob('*') if p.is_file()];size=sum(p.stat().st_size for p in files);assert size<=15*1024**3
+families={}
+for name in ['architecture-deep_pfn-v1','architecture-context_pfn-v1','architecture-context_pfn-exclusive-v2','architecture-residual_bev-v1','architecture-retain64-v1','architecture-masked_pfn-v1','architecture-window_bev-v1','architecture-coarse_mlp-v1','architecture-all_pillars-v1']:
+ path=root/name
+ if path.exists():
+  amount=sum(p.stat().st_size for p in path.rglob('*') if p.is_file());assert amount<=768*1024**2;families[name]=amount
+Path('/outputs/check.json').write_text(json.dumps({'scientific_bytes':size,'cap_bytes':15*1024**3,'families_bytes':families,'per_training_cap_bytes':768*1024**2,'scope':'live retained current storage reconciliation; does not estimate unmeasured transient peak'},indent=2));print('PASS retained scientific storage and per-run caps',size)

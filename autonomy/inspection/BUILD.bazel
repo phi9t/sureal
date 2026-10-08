@@ -1,0 +1,92 @@
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+
+package(default_visibility = ["//visibility:private"])
+
+LIB_MODULES = glob(
+    [
+        "*.py",
+        "explorer/*.py",
+        "viewer/export/*.py",
+    ],
+    exclude = [
+        "*-*.py",
+        "*_test.py",
+        "viewer/**/*_test.py",
+    ],
+)
+
+COMMAND_SCRIPTS = ["inspect_scene.py"] + glob(["explorer/*.py"])
+
+TEST_MODULES = glob([
+    "*_test.py",
+    "viewer/*_test.py",
+    "viewer/**/*_test.py",
+])
+
+VIEWER_DATA = glob([
+    "viewer/run.sh",
+    "viewer/site/**",
+    "viewer/web/**",
+    "viewer/export/requirements.in",
+    "viewer/export/requirements.lock",
+])
+
+INSPECTION_VISIBILITY = ["//autonomy:__pkg__"]
+
+py_library(
+    name = "inspection",
+    srcs = LIB_MODULES,
+    imports = [".."],
+    visibility = INSPECTION_VISIBILITY,
+    deps = [
+        "//autonomy/dataset:dataset",
+        "//autonomy/evidence:evidence",
+        "//autonomy/geometry:geometry",
+        "//autonomy/insula:insula",
+    ],
+)
+
+filegroup(
+    name = "commands",
+    srcs = COMMAND_SCRIPTS,
+    visibility = INSPECTION_VISIBILITY,
+)
+
+filegroup(
+    name = "runfiles",
+    srcs = COMMAND_SCRIPTS + VIEWER_DATA,
+    visibility = INSPECTION_VISIBILITY,
+)
+
+filegroup(
+    name = "all_py",
+    srcs = glob([
+        "*.py",
+        "explorer/*.py",
+        "viewer/export/*.py",
+        "viewer/*_test.py",
+        "viewer/**/*_test.py",
+    ]),
+    visibility = ["//autonomy:__pkg__"],
+)
+
+[
+    py_test(
+        name = test[:-3].replace("/", "__").replace("-", "_"),
+        srcs = [test],
+        data = [":runfiles"],
+        deps = [":inspection"],
+        imports = [".."],
+        legacy_create_init = 0,
+        main = test,
+        size = "small",
+        tags = ["perception_unit"],
+    )
+    for test in TEST_MODULES
+]
+
+test_suite(
+    name = "all_tests",
+    tests = [test[:-3].replace("/", "__").replace("-", "_") for test in TEST_MODULES],
+    visibility = ["//autonomy:__pkg__"],
+)

@@ -1,0 +1,84 @@
+"""Reconcile complete captures without treating absent captures as empty labels."""
+import hashlib,json,time
+from pathlib import Path
+from datetime import datetime,timezone
+HERE=Path(__file__).resolve().parents[1]/'experiments/waymo-perception'
+RESEARCH=HERE/'research';CACHE=Path.home()/'.cache/waystone/waymo-perception'
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def save(path,value):
+ temp=path.with_suffix('.pending.json');temp.write_text(json.dumps(value,indent=2)+'\n');temp.replace(path)
+manifest=HERE/'scientific-acquisition.candidate.json';manifest_sha=sha(manifest);m=json.loads(manifest.read_text())
+lock=json.loads((CACHE/'insula/rootfs-v2.lock.json').read_text())
+support_path=RESEARCH/'scientific-semantic-support-progress.json'
+orchestrator=HERE.parents[1]/'.scratch/capture-scientific-semantic-support.py'
+orchestrator_sha=sha(orchestrator)
+consumer_sha=sha(HERE/'pipeline/semantic_support.py')
+while True:
+ processing=json.loads((RESEARCH/'scientific-processing-progress.json').read_text())
+ snapshot=json.loads(support_path.read_text());entries=snapshot['scene_evidence'];changed=False
+ for scene,membership in m['scenes'].items():
+  pointer=RESEARCH/('scientific-semantic-support-'+scene+'-verified.json')
+  if not pointer.is_file():continue
+  e=json.loads(pointer.read_text());receipt_path=Path(e['receipt'])
+  assert sha(receipt_path)==e['receipt_sha256']
+  receipt=json.loads(receipt_path.read_text());base=receipt_path.parent
+  assert receipt['runtime_lock']==lock
+  if 'orchestrator_sha256' in receipt:
+   assert receipt['orchestrator_sha256']==orchestrator_sha
+  else:
+   # Preserve the one independently admitted original pilot schema; do not
+   # extend this compatibility to newly captured evidence.
+   assert scene=='4487677815262010875_4940_000_4960_000'
+   assert entries[scene]['receipt_sha256']==e['receipt_sha256']
+  assert receipt['candidate_hashes']=={'pipeline/semantic_support.py':consumer_sha}
+  assert receipt['checks'] and all(c['exit_code']==0 for c in receipt['checks'])
+  for name,digest in receipt['artifacts'].items():assert sha(base/name)==digest
+  trusted=receipt['input_identity'];v=receipt['validation'];counts=v['native_counts']
+  assert trusted['scene']==v['scene']==scene and trusted['membership']==v['membership']==membership
+  assert trusted['manifest_sha256']==manifest_sha
+  source=CACHE/'scientific-source-audit'/f"{membership['official_split']}-lidar-{scene}.json"
+  assert sha(source)==trusted['source_record_sha256']
+  assert len(counts)==23 and all(type(c) is int and c>=0 for c in counts)
+  assert v['eligible_point_elements']==sum(counts[1:])
+  linkage='pending';linkage_name=None
+  if scene in processing['replayed_scene_evidence']:
+   cp_path=CACHE/'scientific-processing/cohort-v1'/scene/'receipt.json'
+   if cp_path.is_file():
+    cp=json.loads(cp_path.read_text());point=processing['replayed_scene_evidence'][scene]
+    assert sha(cp_path)==point['checkpoint_sha256']
+    assert cp['membership']==membership and cp['runtime_lock']==lock and cp['manifest_sha256']==manifest_sha
+    assert cp['source_record_hashes']['lidar']==trusted['source_record_sha256']
+    retained=cp['retained_evidence_hashes']
+    reconstruction=CACHE/'scientific-processing/cohort-v1'/scene/'points/evidence/reconstruction/receipt.json'
+    assert retained[str(reconstruction)]==trusted['reconstruction_receipt_sha256']
+    publication=CACHE/'scientific-processing/cohort-v1'/scene/'point-publication/receipt.json'
+    assert sha(publication)==retained[str(publication)]
+    pub=json.loads(publication.read_text());assert pub['archive']['report_sha256']==trusted['report_sha256']
+    linkage='linked';linkage_name='scientific-semantic-support-'+scene+'-lifecycle-linked.json'
+    save(RESEARCH/linkage_name,{'scene':scene,'membership':membership,'manifest_sha256':manifest_sha,
+         'capture_receipt_sha256':e['receipt_sha256'],'checkpoint_sha256':point['checkpoint_sha256'],
+         'publication_receipt_sha256':sha(publication),'report_sha256':trusted['report_sha256'],
+         'scope':'retained capture and independently admitted publication identities agree'})
+  entry={'evidence':pointer.name,'receipt_sha256':e['receipt_sha256'],'membership':membership,
+         'native_counts':counts,'eligible_point_elements':v['eligible_point_elements'],
+         'annotated_frames':v['annotated_frames'],'lifecycle_linkage':linkage,'linkage_evidence':linkage_name}
+  if entries.get(scene)!=entry:entries[scene]=entry;changed=True
+ if changed:
+  assert sha(manifest)==manifest_sha and sha(orchestrator)==orchestrator_sha and sha(HERE/'pipeline/semantic_support.py')==consumer_sha
+  totals=[sum(e['native_counts'][i] for e in entries.values()) for i in range(23)]
+  snapshot.update(scenes_observed=len(entries),scenes_pending=103-len(entries),native_counts=totals,eligible_point_elements=sum(totals[1:]))
+  save(support_path,snapshot);groups={}
+  for official,research in [('training','train'),('training','development'),('validation','validation'),('validation','camera_validation')]:
+   selected=[s for s,g in m['scenes'].items() if g['official_split']==official and research in g['research_splits']]
+   observed=[entries[s] for s in selected if s in entries]
+   counts=[sum(e['native_counts'][i] for e in observed) for i in range(23)]
+   groups[official+'/'+research]={'selected_scenes':len(selected),'observed_scenes':len(observed),
+      'lifecycle_linked_scenes':sum(e['lifecycle_linkage']=='linked' for e in observed),
+      'eligible_point_elements':sum(counts[1:]),'native_counts':counts,'pending_scenes':len(selected)-len(observed)}
+  save(RESEARCH/'scientific-semantic-support-by-split.json',{'status':'partial split-separated native valid-range semantic coverage',
+       'observed_utc':datetime.now(timezone.utc).isoformat(),'support_snapshot_sha256':sha(support_path),
+       'manifest_sha256':manifest_sha,'groups':groups})
+  print('PASS reconciled captures',len(entries),'linked',sum(e['lifecycle_linkage']=='linked' for e in entries.values()),'eligible',sum(totals[1:]),flush=True)
+ process=Path('/proc/1609839/cmdline')
+ if not process.exists() and processing['point_scenes_replayed']==103:break
+ time.sleep(20)

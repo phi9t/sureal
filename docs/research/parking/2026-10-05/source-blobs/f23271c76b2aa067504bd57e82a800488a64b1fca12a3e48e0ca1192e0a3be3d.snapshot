@@ -1,0 +1,30 @@
+"""Bind completed matching static facts; prepare only, never dispatch."""
+import copy
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+
+BASE = Path(__file__).resolve().parent
+spec = importlib.util.spec_from_file_location('lead_f50_prepare', BASE / 'prepare-native-f50.py')
+prepare = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(prepare)
+result = prepare.read(BASE / 'native-stop-static-driver-v6/driver-result.json')
+static = {'command': result['static_command'], 'report': result['static_report']}
+for pin in static.values():
+    assert prepare.ref(pin['path']) == pin
+assert prepare.read(static['command']['path'])['exit_code'] == 0
+assert prepare.read(static['report']['path'])['status'] == 'pass'
+refs = {}
+for role in ('observer', 'operator'):
+    value = prepare.read(BASE / (role + '-live-admission-base-v2.json'))
+    value['static_preflight'] = copy.deepcopy(static)
+    refs[role] = prepare.save(role + '-live-admission-final-v2.json', value)
+driver = prepare.read(BASE / 'live-preflight-driver-admission-v1.json')
+base = prepare.read(BASE / 'static-preflight-driver-admission-v6.json')
+for key in ('auditor', 'coverage', 'fixture_id', 'fixture_plan', 'user_authority'):
+    driver[key] = copy.deepcopy(base[key])
+driver.update(output=str(BASE / 'native-stop-live-driver-v4'), static_preflight=static,
+    observer_admission=refs['observer'], operator_admission=refs['operator'])
+print(json.dumps({'live_driver': prepare.save('live-preflight-driver-admission-v2.json', driver),
+    'native_effects': False, 'managed_dispatch': False}))

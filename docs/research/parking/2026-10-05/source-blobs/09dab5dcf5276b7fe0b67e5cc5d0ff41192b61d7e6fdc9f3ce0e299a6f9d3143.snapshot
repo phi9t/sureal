@@ -1,0 +1,235 @@
+"""Literal notification controls; private files are not live native proof."""
+import copy
+import hashlib
+import importlib
+import json
+import os
+from pathlib import Path
+import tempfile
+import unittest
+
+
+def event_fixture():
+    fixture = {
+        'fixture_id': 'test-E', 'channel_id': 'channel-E', 'connection_id': 'connection-E',
+        'thread_id': 'thread-E', 'turn_ids': ['turn-E'], 'workspace': '/private/worktree-E',
+        'command_sha256': 'a' * 64,
+    }
+    event = {
+        'schema_version': 1, 'kind': 'NativeOwnedLifecycleEvent',
+        'fixture_id': 'test-E', 'channel_id': 'channel-E', 'connection_id': 'connection-E',
+        'frame_index': 3, 'event_sequence': 2, 'received_ms': 1010, 'received_ns': 1000000,
+        'notification': {'method': 'item/started', 'params': {
+            'threadId': 'thread-E', 'turnId': 'turn-E', 'startedAtMs': 1000,
+            'item': {'id': 'item-E', 'type': 'commandExecution', 'status': 'inProgress',
+                     'cwd': '/private/worktree-E', 'source': 'userShell',
+                     'command_sha256': 'a' * 64, 'processId': None, 'exitCode': None},
+        }},
+        'native_fields_present': {'turnId': True, 'startedAtMs': True, 'completedAtMs': False,
+                                  'item.processId': True, 'item.exitCode': True},
+    }
+    return fixture, event
+
+
+class NotificationTests(unittest.TestCase):
+    def setUp(self):
+        try:
+            self.reader = importlib.import_module('audit_support.notification_channel')
+        except ModuleNotFoundError:
+            self.fail('Independent notification validation is absent')
+        self.fixture, self.event = event_fixture()
+
+    def test_actual_cwd_and_supplied_nulls_are_preserved(self):
+        result = self.reader.validate_event(self.event, self.fixture)
+        self.assertEqual(result['turn_id'], 'turn-E')
+        self.assertEqual(result['command']['cwd'], '/private/worktree-E')
+        self.assertIn('processId', result['command'])
+        self.assertIsNone(result['command']['processId'])
+        self.assertIsNone(result['command']['exitCode'])
+
+    def test_absence_is_distinct_from_null_and_is_not_filled(self):
+        del self.event['notification']['params']['item']['processId']
+        self.event['native_fields_present']['item.processId'] = False
+        result = self.reader.validate_event(self.event, self.fixture)
+        self.assertNotIn('processId', result['command'])
+
+    def test_context_command_cwd_source_and_turn_mismatches_refuse(self):
+        mutations = [
+            ('fixture_id', 'another-fixture'), ('connection_id', 'another-connection'),
+            ('channel_id', 'another-channel'),
+        ]
+        for key, value in mutations:
+            changed = copy.deepcopy(self.event); changed[key] = value
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                self.reader.validate_event(changed, self.fixture)
+        for key, value in [('cwd', '/other'), ('source', 'agent'), ('command_sha256', 'b' * 64)]:
+            changed = copy.deepcopy(self.event); changed['notification']['params']['item'][key] = value
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                self.reader.validate_event(changed, self.fixture)
+        changed = copy.deepcopy(self.event); changed['notification']['params']['turnId'] = 'other-turn'
+        with self.assertRaises(ValueError): self.reader.validate_event(changed, self.fixture)
+        for key in ('cwd', 'source'):
+            changed = copy.deepcopy(self.event); del changed['notification']['params']['item'][key]
+            with self.subTest(missing=key), self.assertRaises(ValueError):
+                self.reader.validate_event(changed, self.fixture)
+
+    def test_literal_integer_timestamps_and_honest_presence_are_required(self):
+        for invalid in (True, 1.5, -1):
+            changed = copy.deepcopy(self.event); changed['notification']['params']['startedAtMs'] = invalid
+            with self.subTest(value=invalid), self.assertRaises(ValueError):
+                self.reader.validate_event(changed, self.fixture)
+        changed = copy.deepcopy(self.event); changed['native_fields_present']['item.processId'] = False
+        with self.assertRaises(ValueError): self.reader.validate_event(changed, self.fixture)
+
+    def test_private_body_unknown_type_and_boolean_exit_are_rejected(self):
+        for key, value in [('aggregatedOutput', 'PRIVATE'), ('type', 'dynamicToolCall')]:
+            changed = copy.deepcopy(self.event); changed['notification']['params']['item'][key] = value
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                self.reader.validate_event(changed, self.fixture)
+        changed = copy.deepcopy(self.event)
+        changed['notification']['method'] = 'item/completed'
+        params = changed['notification']['params']; params['completedAtMs'] = params.pop('startedAtMs')
+        params['item'].update(status='completed', exitCode=True)
+        changed['native_fields_present'].update(startedAtMs=False, completedAtMs=True)
+        with self.assertRaises(ValueError): self.reader.validate_event(changed, self.fixture)
+
+    def test_private_top_level_field_is_rejected(self):
+        self.event['private_reasoning']='must never enter retained channel'
+        with self.assertRaises(ValueError): self.reader.validate_event(self.event,self.fixture)
+
+
+class PrefixTests(unittest.TestCase):
+    def setUp(self):
+        self.reader = importlib.import_module('audit_support.notification_channel')
+        self.assertTrue(callable(getattr(self.reader, 'read_prefix', None)),
+                        'Independent raw prefix/checkpoint validation is absent')
+        self.tmp = tempfile.TemporaryDirectory(prefix='a50-private-channel-')
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.fixture, self.event = event_fixture()
+        info = self.root.stat()
+        self.manifest = {**{key: self.fixture[key] for key in ('fixture_id', 'channel_id', 'connection_id')},
+            'schema_version': 1, 'kind': 'NativeObservationChannel', 'armed_ns': 400000,
+            'channel_root': {'path': str(self.root), 'uid': info.st_uid, 'device': info.st_dev, 'inode': info.st_ino},
+            'runtime': {'daemon': {'pid': 7}, 'endpoint': {'uid': os.getuid()}}}
+        self.peer = {'pid': 7, 'uid': os.getuid(), 'gid': os.getgid()}
+        self.base = {key: self.fixture[key] for key in ('fixture_id', 'channel_id', 'connection_id')}
+        self.category_counts = {key: 0 for key in ('owned_lifecycle', 'owned_private_delta_discarded',
+                                                  'unrelated_discarded', 'authorized_rpc_reply', 'protocol_ping')}
+        self.cp1 = {**self.base, 'schema_version': 1, 'kind': 'ChannelCheckpoint',
+            'checkpoint_sequence': 1, 'previous': None, 'observed_ns': 520000, 'peer': self.peer,
+            'prefix': {'frames': [], 'events': [], 'category_counts': self.category_counts.copy(), 'event_method_counts': {}},
+            'drain': {'started_ns': 450000, 'covered_through_ns': 500000,
+                      'receive_buffer_bytes': 0, 'socket_readable': False}, 'errors': []}
+        previous_cp = self.save('checkpoint-1.json', self.cp1)
+        self.frames = []; self.events = []
+        for index, category in enumerate(('authorized_rpc_reply', 'owned_lifecycle', 'owned_lifecycle',
+                                          'authorized_rpc_reply'), start=1):
+            event_ref = None
+            if index in (2, 3):
+                value = copy.deepcopy(self.event)
+                value.update(frame_index=index, event_sequence=index-1, received_ns=600000+index*50000)
+                if index == 2:
+                    value['notification'] = {'method': 'turn/started', 'params': {
+                        'threadId': 'thread-E', 'turn': {'id': 'turn-E', 'status': 'inProgress'}}}
+                    value['native_fields_present'] = {key: False for key in value['native_fields_present']}
+                event_ref = self.save('event-%d.json' % (index-1), value); self.events.append(event_ref)
+            frame = {**self.base, 'schema_version': 1, 'kind': 'ChannelFrame',
+                'frame_index': index, 'received_ms': 1010, 'received_ns': 600000+index*50000,
+                'wire_bytes': 100, 'category': category, 'previous': self.frames[-1] if self.frames else None,
+                'event': event_ref, 'reply_id': {1: 3, 4: 4}.get(index)}
+            self.frames.append(self.save('frame-%d.json' % index, frame))
+        self.cp2 = {**self.base, 'schema_version': 1, 'kind': 'ChannelCheckpoint',
+            'checkpoint_sequence': 2, 'previous': previous_cp, 'observed_ns': 1000000, 'peer': self.peer,
+            'prefix': {'frames': self.frames, 'events': self.events,
+                'category_counts': {**self.category_counts, 'owned_lifecycle': 2, 'authorized_rpc_reply': 2},
+                'event_method_counts': {'turn/started': 1, 'item/started': 1}},
+            'drain': {'started_ns': 900000, 'covered_through_ns': 950000,
+                      'receive_buffer_bytes': 0, 'socket_readable': False}, 'errors': []}
+        self.reference = self.save('checkpoint-2.json', self.cp2)
+
+    def save(self, name, value):
+        path = self.root/name
+        path.write_text(json.dumps(value, sort_keys=True)+'\n')
+        return {'path': str(path), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
+
+    def read(self, reference=None, **kwargs):
+        return self.reader.read_prefix(self.manifest, reference or self.reference, self.fixture,
+            now_ns=kwargs.pop('now_ns', 1100000), interval_end_ns=940000,
+            allowed_reply_ids={3, 4}, **kwargs)
+
+    def test_reopens_every_raw_frame_event_and_derives_counts(self):
+        result = self.read()
+        self.assertEqual(result['frame_count'], 4)
+        self.assertEqual(result['event_method_counts'], {'turn/started': 1, 'item/started': 1})
+        self.assertEqual([entry['command']['id'] for entry in result['derived_events'] if entry['command']], ['item-E'])
+
+    def test_flags_hashes_or_counters_cannot_replace_raw_prefix(self):
+        for mutator in (
+            lambda value: value['prefix']['category_counts'].update(owned_lifecycle=1),
+            lambda value: value['prefix']['frames'].pop(1),
+            lambda value: value['prefix']['events'].reverse(),
+            lambda value: value['drain'].update(receive_buffer_bytes=1),
+            lambda value: value['drain'].update(socket_readable=True),
+            lambda value: value['peer'].update(pid=99),
+        ):
+            changed = copy.deepcopy(self.cp2); mutator(changed)
+            with self.subTest(value=changed), self.assertRaises(ValueError):
+                self.read(self.save('mutated.json', changed))
+        Path(self.frames[0]['path']).write_text('{}')
+        with self.assertRaises(ValueError): self.read()
+
+
+class InitialWitnessTests(PrefixTests):
+    def setUp(self):
+        super().setUp()
+        from audit_support import runtime_probe, test_runtime_probe
+        self.probe = runtime_probe
+        self.assertTrue(callable(getattr(self.reader, 'initial_facts', None)), 'Initial channel join is absent')
+        source = test_runtime_probe.StopProbeTests(); source.setUp()
+        self.sample = copy.deepcopy(source.running)
+        self.sample.update(interval={'started_ns': 810000, 'ended_ns': 940000}, monotonic_ns=940000)
+        self.sample['records'][0]['response']['thread'].update(id='thread-E', cwd='/private/worktree-E')
+        for record in self.sample['records']: record['params']['threadId'] = 'thread-E'
+        self.sample['records'][2]['response']['data'] = [{'id': 'turn-E', 'status': 'inProgress'}]
+        self.sample['records'][3]['response']['data'] = []
+        self.sample['records'][5]['response']['data'] = []
+        self.fixture.update(tool_scope=source.fixture['tool_scope'])
+        self.sample['kernel']['command_written_incarnations'] = [source.identity]
+
+    def initial(self):
+        return self.reader.initial_facts(self.sample, self.fixture, self.read())
+
+    def test_empty_initial_native_list_stays_empty_with_actual_event_and_kernel_conjunction(self):
+        facts, commands = self.initial()
+        self.assertEqual(facts['thread/items/list'], [])
+        self.assertEqual(self.sample['records'][3]['response']['data'], [])
+        self.assertEqual(commands[0]['id'], 'item-E')
+
+    def test_missing_kernel_inactive_turn_goal_or_late_interval_refuse(self):
+        for mutate in (lambda s: s.pop('kernel'),
+                       lambda s: s['records'][2]['response']['data'][0].update(status='completed'),
+                       lambda s: s['records'][1]['response'].update(goal={'status': 'active'}),
+                       lambda s: s['interval'].update(ended_ns=5000810001)):
+            original = copy.deepcopy(self.sample); mutate(self.sample)
+            with self.subTest(sample=self.sample), self.assertRaises(ValueError): self.initial()
+            self.sample = original
+
+    def test_list_contradiction_missing_turn_start_or_early_completion_refuse(self):
+        self.sample['records'][3]['response']['data'] = [{'turnId':'turn-E', 'item': {
+            'id':'another-item','type':'commandExecution','status':'inProgress','source':'userShell',
+            'cwd':self.fixture['workspace'],'command_sha256':self.fixture['command_sha256']}}]
+        with self.assertRaises(ValueError): self.initial()
+        self.sample['records'][3]['response']['data'] = []
+        prefix = self.read(); prefix['derived_events'] = prefix['derived_events'][1:]
+        with self.assertRaises(ValueError): self.reader.initial_facts(self.sample,self.fixture,prefix)
+
+    def test_missing_raw_file_stale_or_undrained_cutoffs_are_unknown(self):
+        with self.assertRaises(ValueError): self.read(now_ns=3000000000)
+        changed = copy.deepcopy(self.cp2); changed['drain']['covered_through_ns'] = 930000
+        with self.assertRaises(ValueError): self.read(self.save('too-early.json', changed))
+        Path(self.events[0]['path']).unlink()
+        with self.assertRaises(ValueError): self.read()
+
+
+if __name__ == '__main__': unittest.main()

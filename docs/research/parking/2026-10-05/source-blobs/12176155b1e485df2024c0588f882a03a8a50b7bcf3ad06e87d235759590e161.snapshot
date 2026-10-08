@@ -1,0 +1,19 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+code=Path('experiments/waymo-perception').resolve();workers=Path('.scratch').resolve();sys.path.insert(0,str(code));sys.path.insert(0,str(workers))
+from point_grid_source_replay import replay
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';source=cache/'insula/semantic-recovery-driver-fixture-a/output/source';pub=json.loads((source/'publication.json').read_text());base=cache/'insula/point-grid-source-fixture-v2';base.mkdir();fixture=base/'cache';(fixture/'scientific-processing').mkdir(parents=True)
+lock=json.loads((cache/'insula/rootfs-v2.lock.json').read_text())
+shape={'source':{'sha256':pub['source_lidar_sha256']},'membership':{'official_split':'training','research_splits':['train']},'job_sha256':'f'*64,'shapes':{'scene':'scene','records':[dict(context='scene',timestamp=10,laser=l,**{'return':r},native_shape=[3,5,4]) for l in range(1,6) for r in [1,2]]},'independent':{'records_verified':10}}
+shape_path=base/'shapes.json';shape_path.write_text(json.dumps(shape,indent=2)+'\n')
+s={'scene':'scene','membership':shape['membership'],'records':10,'points':10,'source_lidar_sha256':pub['source_lidar_sha256'],'shape_job':{'sha256':'f'*64},'point_publication':{'publication_manifest':str(source/'publication.json'),'publication_manifest_sha256':sha(source/'publication.json'),'archive_hdfs_uri':'hdfs://fixture/scene.tar','archive_sha256':pub['archive']['sha256'],'archive_bytes':pub['archive']['archive_bytes'],'report_sha256':pub['archive']['report_sha256']}}
+counts=[0]*23;counts[14]=2;output=fixture/'scientific-processing/scene'
+r=replay(s,shape_path=shape_path,expected_shape_sha256=sha(shape_path),semantic_counts=counts,cache=fixture,code_root=code,workers=workers,output=output,expected_runtime_lock=lock,runtime_root=cache/'insula/rootfs-v2',transfer_command=[sys.executable,'-c','import shutil,sys;shutil.copyfile('+repr(str(source/'scene.tar'))+',sys.argv[-1])'])
+assert all(c['exit_code']==0 for c in r['checks']) and r['validation']['records']==10 and r['validation']['points']==10 and r['validation']['native_grid_cells']==150
+for n,h in r['artifacts'].items():assert sha(output/n)==h
+assert not list((fixture/'scientific-processing/semantic-recovery-staging').glob('stage-*'))
+e={'receipt':str(output/'receipt.json'),'receipt_sha256':sha(output/'receipt.json'),'validation':r['validation'],'scope':'controlled copy of10-record synthetic archive plus declared synthetic dimensions; producer and independent literal reference live, stage removed; actual103 HDFS gate remains'}
+(code/'research/point-grid-source-driver-fixture-verified.json').write_text(json.dumps(e,indent=2)+'\n');print('PASS two live full point/grid passes, exact source fixture and staging cleanup')

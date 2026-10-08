@@ -1,0 +1,19 @@
+{
+  "worker_argv": [
+    "/experiment/resources/archive_worker.py",
+    "rehydrate"
+  ],
+  "worker_pid": 2,
+  "measurement": "in-runtime getrusage SELF and waited CHILDREN KiB",
+  "self_peak_rss_kib": 21624,
+  "waited_child_peak_rss_kib": 0,
+  "peak_rss_kib": 21624,
+  "elapsed_seconds": 0.11743827600730583,
+  "exit_code": 0,
+  "child_lifecycle": {
+    "subreaper_verified": true,
+    "remaining_children": [],
+    "contract": "all created descendants completed and waited; detached children unsupported"
+  },
+  "scope": "worker process and largest waited child; not simultaneous tree RSS sum"
+}

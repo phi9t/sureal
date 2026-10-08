@@ -1,0 +1,10 @@
+from pathlib import Path
+import time,subprocess
+code=Path('experiments/waymo-perception/research');logs=Path.home()/'.cache/waystone/waymo-perception/insula/continuation-logs'
+while not (code/'architecture-retain64-checkpoint-audit-verified.json').exists():time.sleep(2)
+with (logs/'architecture-followup-contract-green.log').open('w') as f:r=subprocess.run(['python','.scratch/run-architecture-followup-contract.py','green'],stdout=f,stderr=subprocess.STDOUT)
+assert r.returncode==0,'followupcontract';print('PASS followup live contract',flush=True)
+for variant in ['masked_pfn','window_bev','coarse_mlp']:
+ for worker in ['run-followup-learning-curve.py','audit-followup-checkpoint.py']:
+  with (logs/('architecture-'+variant+'-'+worker+'.log')).open('w') as f:r=subprocess.run(['python','.scratch/'+worker,variant],stdout=f,stderr=subprocess.STDOUT)
+  assert r.returncode==0,(variant,worker);print('PASS',variant,worker,flush=True)

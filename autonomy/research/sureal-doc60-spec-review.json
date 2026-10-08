@@ -1,0 +1,71 @@
+{
+  "axis": "Spec",
+  "base": "0c161dda53cde1cd50a2161523d90da88cf40bb4",
+  "requested_commit": "60ede2883ffebe455cf0672ddede3fa0b7e7d4e2",
+  "review_diff": "git diff --cached 0c161dda53cde1cd50a2161523d90da88cf40bb4",
+  "commits_reviewed": [
+    "60ede28 Specify Sureal-local serial collaboration protocol and work items"
+  ],
+  "paths": {
+    "docs/research/README.md": {
+      "staged_sha256": "98a03ac06f37717c651e0e7af5c4ebbee1cad3c0d6dac9c39724d6cc4ce4f26a",
+      "staged_blob": "254094c22b623c412526fb12a570ca0763d2d7cd"
+    },
+    "docs/research/task-queue.md": {
+      "staged_sha256": "dcb74f6480a026ae12705d7450a966adac387e1f37355121a353ac2bd874827b",
+      "staged_blob": "6a24489dfac250259c60abe134792691c605aab5"
+    },
+    "docs/research/tasks/44-models-training-reference-admission.md": {
+      "staged_sha256": "6d9b4b694db50ba40d4f75d0cfa55f4f36a317300145fae1ab763400247743dd",
+      "staged_blob": "90c14f89f1af9ad5febd1edc10cec3a3b3f06f63"
+    },
+    "docs/research/tasks/49-collaboration-project-admission.md": {
+      "staged_sha256": "7d083c44379f85d690b03b233b2450fda23a497cace4bbdb0563eb26a9151421",
+      "staged_blob": "88a825fd58015ed5505a551806c39b96a7d076b1"
+    },
+    "docs/research/tasks/50-collaboration-worker-attempts.md": {
+      "staged_sha256": "2dc1f31828096ccb90d40bdf8a8d9d913982d7a7dbc74333cf5f75318996c5b8",
+      "staged_blob": "80c9e21a86225deb5749d11298f128037444e78e"
+    },
+    "docs/research/tasks/51-collaboration-candidate-verification.md": {
+      "staged_sha256": "e29849c7e29d3c19bc58800f6cfa212e43a0293848a6c33ff0c50d884647b98d",
+      "staged_blob": "f7d1bbef2cc7456ffe8f727f75ca924865098bd7"
+    },
+    "docs/research/tasks/52-collaboration-landing-recovery.md": {
+      "staged_sha256": "eb6d6df259506215a2c3955abc744b8c8a1fada60fb11140cf401b425efe6a4e",
+      "staged_blob": "44d4d31aa884e3e4dfc62e5e4d9ec13b412668f4"
+    },
+    "docs/research/tasks/53-collaboration-cleanup-closeout.md": {
+      "staged_sha256": "4f3bb9b1bcbb5b18b7a7fb5f5a259c50ebef395da6660d9a4bde6cfbdf816ee3",
+      "staged_blob": "a7607ea18455c1b66fdbe2e4e73d5fe396e595ed"
+    },
+    "docs/superpowers/specs/2026-10-03-first-class-models-training-design.md": {
+      "staged_sha256": "458de72a263796fc01442eafff3a4a4e847b829d771de429f08be8a99e6d233a",
+      "staged_blob": "b455de561abfc17a8e9b4b943fef3cbf55fa8417"
+    },
+    "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md": {
+      "staged_sha256": "42b220b2219f33f6e5a96198dc2594211881d722e74a9335212190d1d9cd9e3b",
+      "staged_blob": "9b7059857bdc5a614dc923277da5a1bd94946799"
+    },
+    "experiments/waymo-perception/research-task-index.md": {
+      "staged_sha256": "43beac76a15c356c54902c4c1d6efc6a35b6ef1bc2c699a2699dde89af20bc06",
+      "staged_blob": "44c0af24fcfe240232baba041c6c4c9a91ca7e5b"
+    }
+  },
+  "findings": [],
+  "assessment": "Suitable requested60 documentation-only integration; protocol remains proposed, implementation/runtime admission not claimed",
+  "checks": {
+    "eleven_doc_only_paths": true,
+    "exact_requested_only_one_commit": true,
+    "MT0_MT1_staging_fix_retained": true,
+    "index_association41_retained": true,
+    "Sureal_sole_home_no_Corenius_dependency": true,
+    "serial_onelead_oneworker_exactbase_clones": true,
+    "immutable_exact_reviewed_candidate_FF_recovery": true,
+    "independent_live_milestone_gates_retention_safe_cleanup": true,
+    "closeout_pristine49_53_models44_48_order": true,
+    "local_proposed_scripts_collab_file_state_no_mandatoryKata_daemon": true,
+    "no_later4469127_adoption": true
+  },
+  "limits": "Docs completeness reviewed against requested60 and binding user requirements. No source/runtime/evidence scientific acceptance inferred; no repo/index/queue/branch mutation."
+}

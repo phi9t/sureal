@@ -1,0 +1,201 @@
+# Post-closeout stage handoff
+
+The ready backlog was integrated and published at
+`b9a5a9c4f2723f0b4ceda4e5a4c6ab01abcf35c2` (`05b9192` ready commit).
+This document records subsequent user steering. It introduces no protocol,
+model, training, runtime, retention or cleanup implementation. The
+[per-path/source/process census](sureal-post-closeout-stage-handoff.json)
+records the observed revision and working states before this documentation
+addition; its observation is not a pristine-mainline admission.
+
+At that census, canonical `phi9t/mainline` matched the independently reread
+remote revision. Its index was empty, but tracked and untracked state were
+not clean: the external review session's `32fd3ea7` models/training draft,
+the untracked resource-admission note (`517aaf1d`, ownership unresolved),
+and three exact preservation backup files remain. None was moved, deleted,
+ignored, staged or overwritten here. Unique source requires explicit
+owner/disposition reconciliation before a pristine transition can be admitted.
+
+The retained worker had an empty index, one timestamp-only registry change,
+19 blocked source files, two raw-preview derivatives, two synchronization
+locks and 1,181 retained scratch/cache paths. All 1,205 census entries have
+individual dispositions. The 19 blockers retain the previous exact per-file
+reasons and verified HDFS source inventory. The worker was then fast-forwarded
+to its already-published integration revision without changing its source tree.
+The registry watcher PID3951814 and its launcher were observed retained at
+the host census. No process was terminated by this handoff. Browser, viewer,
+editor, language-server and Codex processes were also observed. No workspace was
+retired and no writer-quiescence claim is made. A host process census is a
+point-in-time observation, not proof that every descendant has stopped.
+
+The separate review worktree is clean at `4469127` on
+`codex/serial-collaboration-specs`, with ten documentation commits not in the
+observed mainline. They remain owned by that design session. The referenced
+`devx/tmp/minimal-serial-collaboration-protocol-20261003-174233.md` now marks
+itself superseded and points to a newer proposal recommending worktrees and
+two workers. That differs from this message's serial-worker/exact-base clone
+steering. Neither proposal is adopted or changed by this closeout. Its owner
+must reconcile the written design and implementation home with the user
+before implementation; a commit title saying approval is not a new grant to
+this worker to begin a competing protocol.
+
+The stage order is:
+
+1. Finish current work; inventory and land every independently reviewed and
+   verified ready owned contribution on `phi9t/mainline`. Retain and explicitly
+   disposition all remaining unique source, processes and evidence.
+2. Reconcile the outstanding contributions and writers, then independently
+   verify a single pristine canonical mainline, published transition revision
+   and retained-evidence dispositions. Do not obtain cleanliness by deleting
+   worktrees or ignoring source.
+3. Admit the written Sureal-local minimalist collaboration protocol through
+   tickets49–53, then implement/adopt it through its own gates. All protocol
+   code, documentation, specifications and tasks belong in Sureal. Corenius
+   is a read-only design reference; no Corenius effort, modification, control
+   plane import or runtime dependency is part of this work. The proposed
+   local CLI is `scripts/collab.py`, using Git/Codex/Insula and file-backed
+   state, without mandatory Kata or a new daemon. The then-recorded
+   user contract is one persistent lead, one serial worker, exact-base task
+   clones, one immutable candidate, lead review/live verification, exact
+   fast-forward landing, retained evidence and safe disposable cleanup.
+4. After protocol adoption, models/training tickets44–48 are the first
+   scientific architecture workstream. Preserve parameter registration,
+   seeded draws, observation binding, optimizer/checkpoint formats, frozen
+   scientific identities and independent live Insula gates.
+
+Other approved scientific dependencies remain recorded: full resource and
+continuation admission before unchanged balanced16 checkpoint continuation;
+ticket42 measurement-indexed failure ledger, then ticket43 frozen-weight
+normalization; isolated41.2 ownership. These do not preempt closeout or the
+new protocol/adoption ordering. Conditional pillarLN and exploratory range/
+sparse research retain their existing evidence boundaries.
+
+Original checkpoint0/1000, full1279GT, frozen resource identity, recipes,
+source packages, resource limits and original HDFS evidence remain intact.
+The previous 1,381-member source/report archive and 65-member metadata
+supplement retain their independent exact-readback/live-recovery roles.
+This later handoff and journal entry115 are Git-only bookkeeping outside
+those sealed HDFS epochs. No new HDFS content, scientific result, model
+migration, protocol activation, Kata adoption or local payload release is
+claimed. Pristine-mainline admission remains blocked by the retained work
+and ownership/process reconciliation above.
+
+
+## Subsequent authorized canonical reconciliation
+
+The user identified the retained models/training draft as obsolete and
+released this path to the integration owner. The
+[canonical source reconciliation](2026-10-04-canonical-source-reconciliation.md)
+records restoration to accepted220-line HEAD, exact outside-checkout
+preservation and relocation of the four untracked note/backup files, and
+fresh empty tracked/index/untracked checks. This supersedes the earlier
+canonical-root cleanliness blocker at its recorded epoch. The prior census,
+foreign proposal/process dispositions and19 worker-source blockers remain
+historical or separately pending. No protocol or model implementation starts
+as part of this reconciliation.
+
+
+## Tooling-home correction
+
+The user explicitly corrected the tooling home: the protocol belongs entirely
+in Sureal, with Corenius used only as a read-only reference. The design session
+owns revisions to the Sureal specification and tickets49–53 on
+`codex/serial-collaboration-specs` in the existing models-training-task-specs
+worktree. This handoff records the direction; it does not edit that session's
+proposal or start a competing implementation.
+
+The proposed `scripts/collab.py` is not created by this transaction. Git,
+Codex, Insula and file-backed state are the local design primitives; neither
+Kata nor a new daemon is mandatory. No Corenius efforts, imports of its control
+plane, changes to its repository or dependency on its runtime are authorized.
+The order stays current task plus full owned integration closeout → verified
+pristine `phi9t/mainline` → admitted local protocol49–53 → models/training44–48.
+The existing clean-canonical receipt, historical census, preserved sources and
+scientific/live-evidence boundaries remain unchanged. This correction and
+journal117 are Git-only bookkeeping, not new protocol or scientific execution.
+
+
+## Subsequent workspace and worker-capacity clarification
+
+The user clarified that future multiple workers must remain possible and clones
+are not required. Requested proposal commit `4472672`, following `60ede28`,
+recommends linked task worktrees initially, unique
+`codex/<task-id>/<attempt-id>` branches and explicit workspace kind, Git common
+directory, seat, task and attempt identities. Capacity one is an initial rollout
+policy. A later capacity increase needs its own admission; this clarification
+does not launch multiple workers or admit a parallel scheduler.
+
+The [current design proposal](../../../docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md)
+and tickets50/52/53 replace the earlier clone-only and permanently-single-worker
+interpretation. Worktrees share ordinary refs/objects, so authority is cooperative
+and no OS-isolation claim is made. Clone support is optional later. Landing stays
+serialized: landing one candidate makes another candidate from its old base
+stale; explicit base refresh and new verification are required.
+
+[Clarification receipt](sureal-doc447-integration.json) and
+[preserved-work observation](sureal-doc447-preserved-work-observation.json)
+record the exact requested scope and later design-owner paths without adopting
+those other revisions. All ready requested documentation is reviewed for landing;
+19 blocked sources, later owner work, retained processes and historical evidence
+keep their prior dispositions. No worktree or common directory is deleted.
+Pristine mainline, written design/plan admission and required independent live
+Insula gates still precede protocol execution. Stage order remains local49–53
+before scientific models/training44–48. Sureal owns implementation; Corenius
+remains a read-only reference. Journal120 is Git-only clarification outside
+sealed HDFS113, with no new science, runtime or retention admission.
+
+
+## Whole owned documentation branch and task ownership
+
+The user requested landing the whole owned documentation branch, rather than
+leaving task definitions on a side branch. The reviewed source head is
+`d5ead21fb46ddef78bed8d8ac0f8b122ca1f0c01`, including ownership update
+`6b694c8` and all ten remaining committed documentation revisions after the
+already-landed447/60 proposals. The bundle retains runtime/health companions,
+tasks49–54 and53.0, the concrete plan, Claude review/resolution,39 required
+coverage oracles and both pilot-check manifests. These are documentation and
+future proof obligations, not completed runtime or scientific gates.
+
+Task specs and required plans land on `phi9t/mainline` before managed admission.
+Pin their exact base/blob/content identities. Runtime ownership identifies one
+current task owner through claim generation, seat, actual primary thread/session,
+process/runtime identity, attempt, workspace/branch, scope/resources and evidence.
+Durable reservation precedes dispatch; matching acknowledgement precedes RUNNING;
+unknown startup retains ownership. Retained-work handoff, confirmed stop and
+fresh identities precede takeover; obsolete submissions are refused. This
+specifies the mechanism but does not create live claims or assign queued tasks.
+
+[Admission qualifications](../../../docs/research/reviews/2026-10-04-collaboration-integration-admission.md)
+retain an open ownership-authority decision: latest steering describes file-backed
+claims and optional backend views, while later branch proposals make Kata the
+logical owner. The broader proposal is retained with explicit status notices,
+not adopted as active backend or two-seat policy. Historical approval headers do
+not close this decision, plan review or pristine/process/resource/live gates.
+The recorded proposed order includes53.0 cleanup foundation before54 overview
+and final53 pilot; models/training44–48 still follow full protocol admission.
+
+[Branch receipt](sureal-collaboration-docs-branch-integration.json) records exact
+source/review epochs and the [retained-work census](sureal-collaboration-docs-branch-preserved-work.json).
+All19 blocked source bodies, original scientific hashes, full native GT, budgets,
+recipes and HDFS retention roles remain. No cleanup/process stop, backend setup,
+worker dispatch, protocol/model implementation or scientific promotion occurs.
+New reports and journal121 are Git-only after sealed HDFS113.
+
+## Later steering: Kata scheduler authority
+
+The user explicitly selected the centralized Kata proposal in `c22865f`, which
+is already an ancestor of published mainline `dca14888df5f5101a532a5fdf14b92cefbd184d9`.
+This resolves the proposal-authority conflict previously recorded as SPEC-1;
+initial review reports and journal121 retain their historical open status.
+Kata owns operational scheduling/logical ownership, committed specs/plans own
+acceptance, and the Sureal controller owns dispatch and exact execution receipts.
+The controller must not create a competing owner queue. One shared project and
+distinct attempt actors, durable intent/readback/CAS, acknowledgement and
+partial-effect recovery remain implementation obligations.
+
+This is design steering only. Sureal registration, task creation/assignment,
+worker launch, implementation and live milestone admission are not performed.
+Keep the existing source/process/resource, written design/plan and independent
+live Insula gates. Later design-session contributions and all19 blocked source
+bodies remain retained with their prior dispositions. Journal122 records this
+Git-only clarification without new HDFS coverage or scientific execution.

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "scope": "separate final recovery raw-proof/journal109 preservation; no original/replay release, full companion/controller/runner admission or new science",
+  "source_inventory_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-legacy-closeout-preservation-controller20261003a-v2/expected.json",
+  "source_inventory_sha256": "6563e0da3ce7cda2c9d964d2d3f1aa58506443d6821777fc95eddc5a619a852b",
+  "publication": {
+    "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-checkpoint-f486020259ff4f6a97f74dc94de046a6/verified-publication.json",
+    "sha256": "f16f70c07306e332798186f73f9a7388206bda440afce5214ed42fa2f4b21e4b",
+    "hdfs_manifest_uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-sustained-baseline-controller20261003a-checkpoint-f486020259ff4f6a97f74dc94de046a6/publication-manifest.json",
+    "kind": "checkpoint"
+  },
+  "members": 1621,
+  "source_bytes": 115049073,
+  "independent_receipt": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-legacy-preservation-independent.json",
+    "sha256": "2e4271001bdcea21a88796efa7bf4a433a86867743c9f6c4458f9da5b3bc25b9"
+  },
+  "journal_entries": 109,
+  "journal_head_sha256": "f19fb1a31746f9ccd9f8aeefed31f3a5c0b20a9ca53fec62fbc17026cea872e8",
+  "driver_path": "/tmp/sureal-resource-legacy-closeout-preservation-v2.py",
+  "driver_sha256": "74ae55cf9fdeced0e64fa715a70974efb64d2e9fcb08e46aa8f9fe8d8c9e63d8"
+}

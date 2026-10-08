@@ -1,0 +1,28 @@
+import hashlib,importlib.util,json,resource,sys,time,unittest
+from pathlib import Path
+import numpy as np
+sys.path.insert(0,'/tmp/linkage')
+from point_grid_linkage import validate_linkage
+assert importlib.util.find_spec('tensorflow') is None
+suite=unittest.defaultTestLoader.discover('/tmp/linkage',pattern='test_point_grid_linkage.py')
+result=unittest.TextTestRunner(verbosity=2).run(suite);assert result.wasSuccessful() and result.testsRun==3
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+e=json.loads(Path('/tmp/expected/expected.json').read_text())
+assert sha('/source/reconstruction/report.json')==e['report_sha256']
+assert sha('/tmp/native-shapes/shapes.json')==e['shapes_sha256']
+report=json.loads(Path('/source/reconstruction/report.json').read_text());shapes=json.loads(Path('/tmp/native-shapes/shapes.json').read_text())['rows']
+def records():
+ for r in report['rows']:
+  identity={k:r[k] for k in ['context','timestamp','laser','return','motion']}
+  # This legacy engineering report explicitly lists only materialized returns.
+  assert r['artifact'] is not None and r['sha256'] is not None
+  p=Path('/source/reconstruction')/r['artifact']
+  with p.open('rb') as f:assert hashlib.file_digest(f,'sha256').hexdigest()==r['sha256']
+  with np.load(p,allow_pickle=False) as a:
+   identity['pixels']=a['pixels'];assert len(identity['pixels'])==r['points']
+   yield dict(identity=identity,return_present=True,observations={'physical_features':a['physical_features'],'xyz':a['xyz']},targets={'segmentation':a['segmentation']} if r['segmentation_present'] else {},evaluation={'nlz':a['nlz']},correspondence={'camera_projection':a['camera_projection']})
+started=time.monotonic();v=validate_linkage(records(),shapes)
+assert v['records']==3970 and v['points']==report['points']==71891534 and v['eligible_semantic_points']==9204259
+v['worker_resources']={'elapsed_seconds':time.monotonic()-started,'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'rss_scope':'worker_process_peak'}
+v['scope']='two complete engineering scenes; full-support point/native-grid linkage; scientific103 and scientific metrics remain open'
+Path('/outputs/check.json').write_text(json.dumps(v,indent=2));print('PASS complete native point/grid linkage',v,flush=True)

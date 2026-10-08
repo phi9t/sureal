@@ -1,0 +1,9 @@
+import subprocess,time
+from pathlib import Path
+queue=Path('/proc/1241409/cmdline')
+while queue.exists():
+ if b'process-scientific-cohort.py' not in queue.read_bytes():raise RuntimeError('queue PID changed')
+ r=subprocess.run(['python3','-u','.scratch/capture-scientific-semantic-support.py'])
+ if r.returncode not in (0,1):raise RuntimeError('capture failure')
+ time.sleep(5)
+print('TERMINAL resumed queue observation',flush=True)

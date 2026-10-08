@@ -1,0 +1,56 @@
+# Independently reviewed native stop fixture
+
+This is a lead-operated non-managed fixture, not task50 producer code. It owns
+no Kata issue, worker seat or native goal, and cannot accept a milestone.
+All runtime effects wait for an immutable source commit, cold retention,
+independent source review and explicit `NativeFixtureLaunchAdmission`.
+
+`native_stop_fixture.py launch --authorization ABS --authorization-sha256 HEX
+--output ABS` runs inside an explicitly admitted exclusive cgroup with at most
+256 MiB RAM and zero swap. The admission pins source bytes, candidate, independent
+reviewer thread, retention, user authority, socket/peer/daemon incarnation,
+operator scope, separate fixture workspace/common Git directory and fresh output.
+The fixed command digest pins its own immutable payload source and owned output.
+Launch reopens actual Git facts from a clean linked worktree on the unique
+`codex/collaboration50-fixture/<fixture-id>` branch at the admitted base,
+checks directory incarnations and rejects canonical/source/output overlap.
+Git, Python and systemd-run use absolute digest-pinned executables; payload Python
+uses isolated mode. Each Upgrade/request/frame has a whole-operation deadline,
+so a peer dribbling bytes cannot extend a request beyond its admitted timeout.
+
+Only `thread/start` and `thread/shellCommand` mutate native state. The former
+creates one fresh no-goal thread with `approvalPolicy=never`, explicit
+`danger-full-access` and cooperative workspace roots.
+`environments` is omitted: the pinned native `ThreadStartParams` schema says
+omission selects the default execution environment, while an empty array
+disables environment access. The first live fixture used that empty array and
+entered `systemError` without a command or payload witness; its original effects
+and failed readbacks remain retained. A correction uses a fresh separately
+admitted fixture, never a retry or cleanup of that original thread.
+The latter sends one fixed
+command with a 90-second native timeout. The command creates a separate 128 MiB,
+zero-swap scope; its single Python payload records an actual live process and
+cgroup witness, waits 60 seconds and returns. No subprocess, Git/source/scientific
+write, model turn or daemon stop is part of the payload. Native shell commands
+are explicitly unsandboxed; they do not prove model-worker permission grants.
+The operator keeps its connection for another 95 seconds. Every request is
+durable before send, raw matching responses are retained, unrelated/private
+notifications are discarded, and uncertainty never licenses a mutation retry.
+The longer bounded live interval allows the observer to reopen both cold source
+packages before collecting its nonempty witness: measured operator materialization
+and retention checks took 7.620 and 1.340 seconds. Observer/host deadline remains
+120 seconds; resource caps and the two observations at least five seconds apart
+remain unchanged.
+
+The shell RPC acknowledgement contains no returned turn ID. The independently
+admitted A50 observer must derive the actual fresh turn/item/handle identity from
+complete native lists and match the literal command digest and live process
+witness. `fixture-launch.json` is raw provenance, not a stop receipt. Neither
+the acknowledgement nor `operator-returning.json` proves terminal tools, empty
+queue, quiescence, cleanup or retirement. Missing native association/coverage is
+a retained blocker; no invented `turn/start` receipt or scan-only fallback exists.
+
+Separate model-worker/common-Git/nested-Insula capability and isolated Kata
+proofs remain required before task50 producer implementation/managed effects.
+Changing transport framing preserves the full original stop/queue/tool/process
+contract, independent Insula gates, budgets and historical authorization pins.

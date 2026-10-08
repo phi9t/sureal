@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "base": "19854df4b54769b394a0390d7c92867df6964316",
+  "requested_source_commit": "447267246d08d20747ea21fac99bda33bfeed311",
+  "generation_command": "python /tmp/sureal-doc447-document-audit.py; exact generator retained in journal120 evidence",
+  "scope": "documentation-only linked-worktree and future-capacity clarification; no implementation/gate promotion",
+  "paths": [
+    {
+      "path": "docs/research/README.md",
+      "sha256": "668fbd196defa8ecaea7b03578ce0675a1a646043c290d44a68aa9222dbbb19e"
+    },
+    {
+      "path": "docs/research/task-queue.md",
+      "sha256": "5bb472806944ba1202ebb655dd2dc01a32e2e3b1108c5f858e0af953ec19c65b"
+    },
+    {
+      "path": "docs/research/tasks/50-collaboration-worker-attempts.md",
+      "sha256": "866a3abf509030e74ed1672fc7aa2b80ec77abb488d29b6ba9ae7937230ddcab"
+    },
+    {
+      "path": "docs/research/tasks/52-collaboration-landing-recovery.md",
+      "sha256": "d46a0b6d618485c26229d883cec499fb6b1688e58e94f4d730cf2956dc5da9dd"
+    },
+    {
+      "path": "docs/research/tasks/53-collaboration-cleanup-closeout.md",
+      "sha256": "f3223700fa70d0f4609ff69f3b980218361047752cf4ceb73e6e7ebb0574354c"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "sha256": "df811e4e8187c60e85c552a03ae6f597be7574c472d34d56a9fb6b7e3b4aa25e"
+    },
+    {
+      "path": "experiments/waymo-perception/research-task-index.md",
+      "sha256": "947b0aad52ef837e2ee85b0d233e4675097cfa61b826ec428fad7fbd503a3136"
+    }
+  ],
+  "local_links_checked": 106,
+  "missing_local_links": [],
+  "source_docs_exact_except_additive_mainline_research_index": true,
+  "research41_42_43_mainline_suffix_preserved": true,
+  "model_MT0_MT1_reference_unchanged": true,
+  "all19_blocked_source_sha256_exact": true,
+  "journal119_prefix_exact_before120_append": true,
+  "registry_semantics_exact_excluded_timestamp_projection": true,
+  "ten_old_index_targets_already_landed_exact": true,
+  "protected_scientific_host_hash_rechecks": [
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/run.json",
+      "sha256": "96dc607ae8238774ca875588d65eaf463f120227e161ae792a9187c8e6635d7d",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/state.json",
+      "sha256": "dac2ce421243c4750175f98152cdc1ce4ecb7e1a493ddee7050c42fcc09e7765",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-00/checkpoint.pt",
+      "sha256": "8057a5496c4d6ec4d19b9de33034c6cca753ea39d8f03fd765ad7011cdf301ee",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-1000/checkpoint.pt",
+      "sha256": "37de2375b0b10f92a56468bd9ffe0b2fea42f257c5949efa80fd29c621a8ff4a",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-00-admitted.json",
+      "sha256": "dde09eb7e6d65e781597da82870ca6c64ea5bff1ea77d31b8b8268ec5a0ad364",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/checkpoint-1000-admitted.json",
+      "sha256": "b0a874b87a2541ab13b2a97e36540b458b54bb0996c6e679a8c156d0160f52d9",
+      "exact_to_original": true
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v4/identity.json",
+      "sha256": "f2514b46aa6952662b35183df8db0ce9ec914b38640de2a1d24cfbf7bbe80e5d",
+      "exact_to_original": true
+    }
+  ],
+  "future_gates": "pristine canonical/source/process/resource and written design/plan/live milestones required; Sureal-only49\u201353 precede scientific44\u201348"
+}

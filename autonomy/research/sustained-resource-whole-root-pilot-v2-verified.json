@@ -1,0 +1,425 @@
+{
+  "scope": "retained v3 byte-identical resource whole-union launcher pilot; no new transfer/training/release",
+  "driver_sha256": "1f9319c6243fd9f028578e625f24b164873e78c045cbb9f5c5fcc6f27cc838e7",
+  "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+  "rootfs_top_level_readonly_bindings": [
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/.dockerenv",
+    "/.dockerenv",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/bin",
+    "/bin",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/boot",
+    "/boot",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/etc",
+    "/etc",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/home",
+    "/home",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/lib",
+    "/lib",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/lib64",
+    "/lib64",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/media",
+    "/media",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/mnt",
+    "/mnt",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/opt",
+    "/opt",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/root",
+    "/root",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/run",
+    "/run",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/sbin",
+    "/sbin",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/srv",
+    "/srv",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/sys",
+    "/sys",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/usr",
+    "/usr",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/var",
+    "/var"
+  ],
+  "source_pins": {
+    "archive_worker.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/archive_worker.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/archive_worker.py",
+      "sha256": "f110e1a57ebbe9c4d62f9d4d88ba577ac5da5526c1c536b1c84663386126d94e"
+    },
+    "backend.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/backend.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/backend.py",
+      "sha256": "c2889cf53abb335211eb10321df7329e21248cca727cb64224f1b6dd90333662"
+    },
+    "checkpoint.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/checkpoint.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/checkpoint.py",
+      "sha256": "cbc21df64f9674ee728c5574b1b18a5be19d1f81d84acd2077377a83c5a45449"
+    },
+    "command.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/command.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/command.py",
+      "sha256": "1a44bc70f62abe7ec48eea9dbf12c27b2b83816793d3ca1fc506bf22d938cc40"
+    },
+    "dependencies.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/dependencies.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/dependencies.py",
+      "sha256": "d00b0a6233e8a76855d8e81fe081f7e77168bb53224dc2312db1b2aa31496b31"
+    },
+    "execute_worker.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/execute_worker.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/execute_worker.py",
+      "sha256": "b4a746f941944d4342ade71f7338498b06f96e21bc56141eb90d40276508add8"
+    },
+    "kernel_scope.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/kernel_scope.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/kernel_scope.py",
+      "sha256": "4a9f8440b91ce8203e3f9bbc25dbe25dad83a33378544e4ede61412f9e1f2e89"
+    },
+    "process_lifecycle.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/process_lifecycle.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/process_lifecycle.py",
+      "sha256": "bfde67be0f66296565dca964c8a2ca3e6bb733e31016fbc87c78f57dd49b09f0"
+    },
+    "retention.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/retention.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/retention.py",
+      "sha256": "67cfc952d78abdcf56b01ff9d8b9e78b7abcdfb91ff365b012397472d4b57471"
+    },
+    "retention_audit.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/retention_audit.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/retention_audit.py",
+      "sha256": "26b8d2907f023af4c3745ae2dbad0d2de442f26b3d4297ffa519851958829116"
+    },
+    "scoped_stage.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/scoped_stage.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/scoped_stage.py",
+      "sha256": "d753f2df936496cddb76f9bd09215100552f56a5d7754d52e54434b9ee042738"
+    },
+    "sources.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/sources.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/sources.py",
+      "sha256": "2f1eef953bd39e40b49e7fc18e906c4b0ea11d17266c5822aae842966179d5af"
+    },
+    "stage.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/stage.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/stage.py",
+      "sha256": "f8e8baf91d752185fd3f57ba27af3cec683540bcb0932275bdfcf4643f1d4ff9"
+    },
+    "stage_accounting.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/stage_accounting.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/stage_accounting.py",
+      "sha256": "baef4b065f9ebb3aa7a2296ccaede595e2514c8144b18bace315f3a805b3716b"
+    },
+    "test_execute_worker.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_execute_worker.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/test_execute_worker.py",
+      "sha256": "26c1e44dacf7056498c5f4deb2c8a06b91830848aeb5d63f0819380bc98ae2d3"
+    },
+    "test_kernel_scope.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_kernel_scope.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/test_kernel_scope.py",
+      "sha256": "e5ff0b3b67a3b85a5799da096078ac7e07454d6230e16cace99282b96285f9a8"
+    },
+    "test_resource_archive.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_archive.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/test_resource_archive.py",
+      "sha256": "513d7b839ccd37619919ed78a38943e09db97c0a222524f24e661e29e8ce6de8"
+    },
+    "test_resource_backend.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_backend.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/test_resource_backend.py",
+      "sha256": "021938bd33c74fe31300672995aaf9471cd9b2b81fbdaecd7305253bac3ae425"
+    },
+    "test_resource_checkpoint.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_checkpoint.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/test_resource_checkpoint.py",
+      "sha256": "7f6119ce1fa662c6d624fdb6b7e801b6249f3066a8a82bd7809e0f50e780faaa"
+    },
+    "test_resource_command.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_command.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/test_resource_command.py",
+      "sha256": "98255f18a16799ca18e7a32e6087e8d3b39de44c38d44a2fc0d8e0b60aba32c6"
+    },
+    "test_resource_retention.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_retention.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/test_resource_retention.py",
+      "sha256": "023ba4bec0a3f06a0f254ebdbcbf67736b2c04c50948ee0b7e10e1080b5248ef"
+    },
+    "test_resource_sources.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_sources.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/test_resource_sources.py",
+      "sha256": "08b06457df38c99413e33aaf1bce5afbd703a5628b22d5e29c54f6265fa253bf"
+    },
+    "test_resource_stage.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_resource_stage.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/test_resource_stage.py",
+      "sha256": "4aafb2d74de5075e9ab1c4d8147a772ea991604452fa85f817747c136296720b"
+    },
+    "test_scoped_stage.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_scoped_stage.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/test_scoped_stage.py",
+      "sha256": "30b81ad6cf79248e6d83b4021f38a0aff22c0604f0f2c071d6c8e34cc7b40835"
+    },
+    "test_stage_accounting.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_stage_accounting.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/test_stage_accounting.py",
+      "sha256": "8a28c803161b28318b23a6caea03024d6ceff782d187f81a54850d4d22da8a86"
+    },
+    "test_worker_admission.py": {
+      "original": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources/test_worker_admission.py",
+      "snapshot": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code/test_worker_admission.py",
+      "sha256": "816a6ab4d7cb891e97ed279e46a2fea491ce8865f3dd30f2c6ea7bff825f4bb7"
+    }
+  },
+  "input_sha256": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-shared-5a74e356862244deb88a264e48f82908/audit-input/expected.json": "3ed1c79b1a5abd59055a5b647dcc95e5a59c3597160b408bfa46998671669d81",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-shared-5a74e356862244deb88a264e48f82908/audit-input/readback.json": "4d183e96f87c4a1dd01c690765584b3b2dea99a71ae4671c26feeba7ccd42a20",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-shared-5a74e356862244deb88a264e48f82908/audit-input/publication.json": "6c1cba84d58861b0a1834b01d4486949cd02088906908a5f509ce46f22b8ed8e"
+  },
+  "masked_runtime_role_entries": [
+    "dev",
+    "experiment",
+    "outputs",
+    "proc",
+    "source",
+    "tmp"
+  ],
+  "runtime_source_entry_types": {
+    ".dockerenv": {
+      "kind": "file",
+      "symlink_target": null
+    },
+    "bin": {
+      "kind": "symlink",
+      "symlink_target": "usr/bin"
+    },
+    "boot": {
+      "kind": "directory",
+      "symlink_target": null
+    },
+    "dev": {
+      "kind": "directory",
+      "symlink_target": null
+    },
+    "etc": {
+      "kind": "directory",
+      "symlink_target": null
+    },
+    "experiment": {
+      "kind": "directory",
+      "symlink_target": null
+    },
+    "home": {
+      "kind": "directory",
+      "symlink_target": null
+    },
+    "lib": {
+      "kind": "symlink",
+      "symlink_target": "usr/lib"
+    },
+    "lib64": {
+      "kind": "symlink",
+      "symlink_target": "usr/lib64"
+    },
+    "media": {
+      "kind": "directory",
+      "symlink_target": null
+    },
+    "mnt": {
+      "kind": "directory",
+      "symlink_target": null
+    },
+    "opt": {
+      "kind": "directory",
+      "symlink_target": null
+    },
+    "outputs": {
+      "kind": "directory",
+      "symlink_target": null
+    },
+    "proc": {
+      "kind": "directory",
+      "symlink_target": null
+    },
+    "root": {
+      "kind": "directory",
+      "symlink_target": null
+    },
+    "run": {
+      "kind": "directory",
+      "symlink_target": null
+    },
+    "sbin": {
+      "kind": "symlink",
+      "symlink_target": "usr/sbin"
+    },
+    "source": {
+      "kind": "directory",
+      "symlink_target": null
+    },
+    "srv": {
+      "kind": "directory",
+      "symlink_target": null
+    },
+    "sys": {
+      "kind": "directory",
+      "symlink_target": null
+    },
+    "tmp": {
+      "kind": "directory",
+      "symlink_target": null
+    },
+    "usr": {
+      "kind": "directory",
+      "symlink_target": null
+    },
+    "var": {
+      "kind": "directory",
+      "symlink_target": null
+    }
+  },
+  "passed": true,
+  "command": [
+    "bwrap",
+    "--unshare-all",
+    "--die-with-parent",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/.dockerenv",
+    "/.dockerenv",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/bin",
+    "/bin",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/boot",
+    "/boot",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/etc",
+    "/etc",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/home",
+    "/home",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/lib",
+    "/lib",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/lib64",
+    "/lib64",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/media",
+    "/media",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/mnt",
+    "/mnt",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/opt",
+    "/opt",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/root",
+    "/root",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/run",
+    "/run",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/sbin",
+    "/sbin",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/srv",
+    "/srv",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/sys",
+    "/sys",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/usr",
+    "/usr",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2/var",
+    "/var",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-shared-5a74e356862244deb88a264e48f82908/execution",
+    "/experiment",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/resource-retention-balanced16-sustained-baseline-controller20261003a-shared-5a74e356862244deb88a264e48f82908/raw",
+    "/source",
+    "--bind",
+    "/tmp/sureal-resource-whole-root-pilot-v2/output",
+    "/outputs",
+    "--proc",
+    "/proc",
+    "--dev",
+    "/dev",
+    "--tmpfs",
+    "/tmp",
+    "--clearenv",
+    "--setenv",
+    "HOME",
+    "/tmp/private-home",
+    "--setenv",
+    "PATH",
+    "/usr/local/bin:/usr/bin:/bin",
+    "--setenv",
+    "PYTHONNOUSERSITE",
+    "1",
+    "--setenv",
+    "PYTHONDONTWRITEBYTECODE",
+    "1",
+    "--setenv",
+    "PYTHONPATH",
+    "/experiment",
+    "--chdir",
+    "/experiment",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-shared-5a74e356862244deb88a264e48f82908/audit-input",
+    "/tmp/inputs",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/host-source/advanced/archive.py",
+    "/tmp/resource-archive.py",
+    "--tmpfs",
+    "/data02",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-shared-5a74e356862244deb88a264e48f82908",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-shared-5a74e356862244deb88a264e48f82908",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a",
+    "--ro-bind",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/resources",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/resource-layer-dependency20261003v3/code",
+    "/tmp/resource-layer",
+    "--bind",
+    "/tmp/sureal-resource-whole-root-pilot-v2/proofs/whole/worker",
+    "/tmp/resource-output",
+    "--",
+    "python",
+    "/tmp/resource-layer/execute_worker.py",
+    "/tmp/resource-output",
+    "/experiment/resources/retention_audit.py"
+  ],
+  "resource_proof_path": "/tmp/sureal-resource-whole-root-pilot-v2/proofs/whole/resource-admitted.json",
+  "resource_proof_sha256": "53708d8d63cf5a5182e78fcb863d6e8d689eca46b3a0d09b9dc7e2108c20aa98",
+  "validation": {
+    "files": 80,
+    "chunks": 12,
+    "payload_bytes": 1381569242,
+    "whole_member_union_exact": true,
+    "all_chunks_live_rehydrated": true,
+    "corrupt_resource_copies_refused": 5
+  }
+}

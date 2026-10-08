@@ -1,0 +1,5 @@
+from pathlib import Path
+import time,subprocess
+code=Path('experiments/waymo-perception/research')
+while not (code/'architecture-retain64-checkpoint-audit-verified.json').exists():time.sleep(2)
+r=subprocess.run(['python','.scratch/run-architecture-followup-contract.py','red']);assert r.returncode==0

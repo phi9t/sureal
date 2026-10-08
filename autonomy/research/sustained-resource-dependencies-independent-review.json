@@ -1,0 +1,165 @@
+{
+  "review_role": "single fresh whole-increment independent read-only reviewer, continued through live finding correction",
+  "base": "168e1ee0afb6a369bab6e1d68d33dcd983f29301",
+  "checkout": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer",
+  "ready_to_merge": "Yes, preparation only",
+  "verdict": "preparation-only ready",
+  "critical": [],
+  "important": [],
+  "minor": [],
+  "resolved_findings": [
+    {
+      "severity": "Important",
+      "status": "resolved by audited final mount decomposition and completely fresh v4 publication plus independent recovery",
+      "file": "resources/retention.py",
+      "line": 126,
+      "finding": "Whole-union audit cannot launch absolute evidence mounts under readonly rootfs without private parent scaffolding",
+      "evidence": {
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-shared-ac7ee99e41b54b5d9b54b1a24e64d95d/proofs/independent/attempt.json": "bcae410a41737c309ef039935ac1cd536693c91e1cfbe4dbeff3cd8f05c2be3d",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-shared-ac7ee99e41b54b5d9b54b1a24e64d95d/proofs/independent/execution.log": "c7fdfde95587b7846d7776ea52c7102a3c03891513d476958b3bd04c282a6065",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-shared-hdfs-live-v2-failure.json": "86b7575d3ea9ba672508eea261a80db3dd22508d340992a8758c9fdc32aaf64d"
+      },
+      "actual_error": "bwrap: Can't mkdir parents for /data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-shared-ac7ee99e41b54b5d9b54b1a24e64d95d: Read-only file system",
+      "failed_before_worker": true,
+      "completed_chunks": 12,
+      "data_preserved": true,
+      "v3_followup": {
+        "status": "first correction insufficient; audit worker did not start",
+        "evidence": {
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-shared-5a74e356862244deb88a264e48f82908/proofs/independent/attempt.json": "715c683be17077f10d74f6ed3f304bb2689fe3daada906bb0b26dcbf150dd813",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-shared-5a74e356862244deb88a264e48f82908/proofs/independent/execution.log": "b91b247e946f8602abf8419a312d97a1969fab59dd0386e7425cb7a4396a8384"
+        },
+        "actual_error": "bwrap: Can't mkdir /data02: Read-only file system",
+        "completed_chunks": 12
+      },
+      "intermediate_pilot_refusal": {
+        "reason": "whole union worker passed but duplicate outputs mounts correctly failed resource proof",
+        "artifacts": {
+          "/tmp/sureal-resource-whole-root-pilot-v1/failure.json": "cf644958a9e4ccb958eab794bd95527f62e52f5179a8176bfc4021e2fc42a2fc",
+          "/tmp/sureal-resource-whole-root-pilot-v1/proofs/whole/attempt.json": "00bf8225a092cbfdd3e5c950aaca87ec239513bd0fea537d1fd20dff08821591",
+          "/tmp/sureal-resource-whole-root-pilot-v1/proofs/whole/execution.log": "f0170f17208616db8ae730b9b4ef25805f1299e6be3b29d7c182a33a17db1cbd",
+          "/tmp/sureal-resource-whole-root-pilot-v1/proofs/whole/worker/worker-resource.json": "3bbfb018cb845ae9d7549b0a8c7eaf865c94af7663d401d40ead705ff5885ffb",
+          "/tmp/sureal-resource-whole-root-pilot-v1/output/check.json": "db78b97b1d819751eb5f22639664cda2df0e6115e1eff0d54636c6b05152c773"
+        }
+      },
+      "corrected_pilot": {
+        "path": "/tmp/sureal-resource-whole-root-pilot-v2/verified.json",
+        "sha256": "74b40746f3763442745f5e5f4e6435c1bc177e632512e221cdc15ea81aad147a"
+      },
+      "resolution_evidence": {
+        "path": "/tmp/sureal-resource-dependencies-independent-transport-20261003/report.json",
+        "sha256": "e844b70131826f7b031d4af302707dd3ce6b6944b3f961c694c04dbd424ca1f8"
+      }
+    }
+  ],
+  "owned_source_sha256": {
+    "checkpoint.py": "cbc21df64f9674ee728c5574b1b18a5be19d1f81d84acd2077377a83c5a45449",
+    "test_resource_checkpoint.py": "7f6119ce1fa662c6d624fdb6b7e801b6249f3066a8a82bd7809e0f50e780faaa",
+    "archive_worker.py": "f110e1a57ebbe9c4d62f9d4d88ba577ac5da5526c1c536b1c84663386126d94e",
+    "test_resource_archive.py": "513d7b839ccd37619919ed78a38943e09db97c0a222524f24e661e29e8ce6de8",
+    "dependencies.py": "d00b0a6233e8a76855d8e81fe081f7e77168bb53224dc2312db1b2aa31496b31",
+    "retention.py": "b9cc1380a45f064a57ef22c5ea2efd1b98384a21bf2017538307fd879dbbaf44",
+    "retention_audit.py": "26b8d2907f023af4c3745ae2dbad0d2de442f26b3d4297ffa519851958829116",
+    "test_resource_retention.py": "023ba4bec0a3f06a0f254ebdbcbf67736b2c04c50948ee0b7e10e1080b5248ef"
+  },
+  "complete_resource_helper_count": 26,
+  "strengths": [
+    "The raw checkpoint inventory now carries all seven stages input snapshots, nonproducer outputs, verifier sources, producer report and runtime lock alongside existing exact resource/native parents. Separate shared inventory reconciles 77 cohort files and 3 driver files against the immutable manifest and historical driver receipt.",
+    "The complete resource source freeze is enforced before/after publication stages; changed helpers invalidate previous epochs. Archive jobs/results/downloaded manifests are bound to exact per-chunk contracts and the independent expected whole inventory.",
+    "Publication uses bounded chunks, genuine kernel-capped live workers, exact HDFS readback and a separate whole-union gate. EXDEV alone selects bounded verified copy; other link failures propagate. All original inputs and retained model state remain intact; failed attempts and old epochs remain explicit.",
+    "The live mount failure was reproduced and kept, fixed with an explicit private runtime namespace, then revalidated under a fresh source epoch. Runtime source SHA remains exact and symlink-to-mount transformation is honestly recorded."
+  ],
+  "validation": {
+    "fresh_live_suite": {
+      "path": "/tmp/sureal-resource-dependencies-review-sourceonly-v4-live-20261003/receipt.json",
+      "sha256": "ec37af0412f7a05a35406edace736d13477435bc0d99ab32c350cfadab66746a",
+      "groups": 44,
+      "exit_code": 0,
+      "raw_log": {
+        "path": "/tmp/sureal-resource-dependencies-review-sourceonly-v4-live-20261003/output/live.log",
+        "sha256": "57944753bd5d0e081aacda9191396ff0cc19c2220da1fd1e8ebaac3db77bf344"
+      },
+      "source_only_snapshot": true
+    },
+    "independent_fresh_hdfs_and_live_recovery": {
+      "path": "/tmp/sureal-resource-dependencies-independent-transport-20261003/report.json",
+      "sha256": "e844b70131826f7b031d4af302707dd3ce6b6944b3f961c694c04dbd424ca1f8",
+      "driver": {
+        "path": "/tmp/sureal-resource-dependencies-independent-live.py",
+        "sha256": "cd4e150b7bee14d4e682d8577845735060ead960b1a60d41508a8be0b08580c8"
+      },
+      "fresh_gets": 25,
+      "live_verify_rehydrate_stages": 24,
+      "original_inventory": {
+        "files": 80,
+        "bytes": 1381569242,
+        "by_kind": {
+          "native": 48,
+          "physical": 16,
+          "boxes": 13,
+          "drivers": 3
+        }
+      },
+      "recovered_files": 80,
+      "max_chunk_payload_bytes": 132952699,
+      "maximum_host_peak_rss_kib": 69884,
+      "kernel_memory_max_bytes": 17179869184,
+      "kernel_memory_swap_max_bytes": 0,
+      "all_kernel_oom_counts_zero": true,
+      "scientific_bytes_before": 14495101235,
+      "scientific_bytes_after": 14495101235,
+      "logical_temporary_headroom_checked_before_each_chunk": true,
+      "raw_jobs_proofs_logs_results_source_snapshots_retained": true,
+      "only_new_temporary_archive_and_restored_bytes_deleted_after_exact_recovery": true
+    },
+    "author_v4_report": {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sustained-resource-shared-hdfs-live-v4-verified.json",
+      "sha256": "6c06e03b03f4154f8a57958df6cdef4ddb3ec225c82acdac3fc1af6d93ccf875"
+    },
+    "author_v4_publication": {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-shared-8f07f93610c84e0d904dc27f07373e1d/verified-publication.json",
+      "sha256": "315e088c9123334841b99afedb43da49490aa99b1a42fe5256830de12637fc6c"
+    },
+    "retained_author_job_proof_result_manifest_transfer_log_validation": true,
+    "audit_runtime_namespace_and_actual_command_independently_reconciled": true,
+    "original_native_sha256": {
+      "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/run.json": "96dc607ae8238774ca875588d65eaf463f120227e161ae792a9187c8e6635d7d",
+      "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-controller20261003a/state.json": "dac2ce421243c4750175f98152cdc1ce4ecb7e1a493ddee7050c42fcc09e7765",
+      "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-00/checkpoint.pt": "8057a5496c4d6ec4d19b9de33034c6cca753ea39d8f03fd765ad7011cdf301ee",
+      "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-controller20261003a/update-1000/checkpoint.pt": "37de2375b0b10f92a56468bd9ffe0b2fea42f257c5949efa80fd29c621a8ff4a"
+    },
+    "rootfs_recomputation": {
+      "path": "/tmp/sureal-resource-dependencies-independent-runtime.json",
+      "sha256": "717db57d2e0fc01ed2d870b9e6a400ecbb56624a9ec8779db2d8b0000b6f81df"
+    },
+    "historical_increment_red_green_audit": {
+      "path": "/tmp/sureal-resource-dependencies-evidence-audit.json",
+      "sha256": "c23853592a9f0a3132c065cedb1eab3db5b11bd6465d165e6f11efef1f96dec5"
+    }
+  },
+  "review_focus": {
+    "changed_sources_helpers": "Current26 helper closure and source-only live44 suite enforce changes invalidating previous resumable resource identities; v2/v3 are not admitted under v4 sources.",
+    "frame_cycle_and_rng": "Original native run/state/0+1000 checkpoints remain exact; no optimizer update or restoration executed by this increment/review. Native restart proof remains a future gate.",
+    "missing_metric_class": "No metric parsing or class-average code changes in owned scope; this resource preparation does not establish a new native score.",
+    "hdfs_failure_and_budget": "Exceptions stop publication before successful receipt or source-stage cleanup; originals are never deleted. Real failed attempts remain retained. Independent recovery reserves conservative temporary headroom under15GiB; current backend still unconditionally refuses checkpoint release.",
+    "single_passing_terminal_checkpoint": "No scientific checkpoint decision made; current preparation cannot confirm sustained fit."
+  },
+  "declined_to_judge": [
+    "Full Task2/3 resource/controller admission, readiness to resume baseline at update2000, or completion of the four-case sweep; this is shared-input/archive and inventory preparation only.",
+    "Actual seven-stage resource companion execution on retained native0/1000 checkpoints. Seam fixtures intentionally mock NativeBackend/kernel state; they do not constitute native stage execution.",
+    "Whole checkpoint recovery combining its19 producer members, the enlarged per-checkpoint raw resource inventory, the shared dependency bundle and parent checkpoint chain. Only the shared80-file bundle received this fresh production transport and independent network/recovery audit.",
+    "Checkpoint-kind production publication, model/head/checkpoint release, keep-two lifecycle integration or a successful ResourceBackend.publish_and_release implementation; the backend still refuses release.",
+    "New native GPU model/Adam/all RNG restart equivalence, frame-cycle continuation, uninterrupted versus resumed updates, or legacy stage RSS re-admission; preserved hashes establish unchanged historical bytes only.",
+    "New literal loss/proposal/export/official metric correctness, all1279GT scoring, missing-class behavior in a fresh native result, two-consecutive-terminal-pass fitting, or scientific promotion; no training/scoring was run and these owned changes do not modify those algorithms.",
+    "Complete sustained-runner end-to-end source freeze and execution admission under the new resource epoch; it remains a mandatory later gate.",
+    "Independent repetition of archive creation or HDFS PUT. Author retained create/PUT/GET/live-recovery evidence was independently reconciled; this reviewer freshly repeated HDFS GET and live verify/rehydrate for every chunk.",
+    "A deliberately injected live HDFS outage, credential expiry, remote corruption or network timeout recovery experiment. Fail-closed source behavior, retained failures and refusal fixtures were reviewed; no new destructive/remote fault injection was performed.",
+    "Permanent future HDFS availability, remote retention guarantees or portability to another cluster/host. Fresh exact downloads establish availability at review time.",
+    "Archival reconstruction of the entire rootfs, host kernel or GPU hardware. They are pinned environmental identities per the approved ruling. Exact shared driver bytes were recovered separately; the whole-union audit uses the explicitly recorded decomposed namespace, not a symlink-identical root tree.",
+    "Retroactive resource admission of historical native/scoring workloads or claims that their prior peaks meet current caps. Genuine16GiB/zeroSwap/noOOM claims here apply to the newly measured archive and union stages only.",
+    "Personally witnessing historical RED execution as it originally occurred. Raw source snapshots, logs, exit codes and3507hash bindings were checked; current44suite and fresh recovery were executed independently now.",
+    "Other sessions dirty task34, architecture README, task index, experiments JSON, ticket41.2/42/43 work, new architectures/targets/recipes, heldout results or downstream scientific readiness; these were outside owned review scope."
+  ],
+  "checkout_mutation": "None by reviewer. No repository source, index, branch or commit changes; all reviewer writes are under /tmp. No subagents, training, scoring, GPU use, original scientific deletion, or HDFS writes.",
+  "cost_and_scope": "Reviewer performed fresh source-only44group live suite on each corrected epoch as needed, two rootfs content digests, retained-evidence hashing,25fresh HDFS GETs and24sequential bounded verify/rehydrate stages. All reports retain raw provenance; no full-controller admission is inferred."
+}

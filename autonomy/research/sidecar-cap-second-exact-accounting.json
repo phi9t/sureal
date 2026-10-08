@@ -1,0 +1,12 @@
+{
+  "scene": "8331804655557290264_4351_740_4371_740",
+  "files": 24611,
+  "manifest_bytes": 3618917,
+  "archive_bytes": 7169351680,
+  "working_bytes": 8934441178,
+  "metadata_reserve_bytes": 16777216,
+  "projected_peak_bytes": 16120570074,
+  "cap_bytes": 16106127360,
+  "scope": "read-only exact accounting; publication and recovery not executed",
+  "headroom_bytes": -14442714
+}

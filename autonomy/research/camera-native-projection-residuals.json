@@ -1,0 +1,83 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-native-bridge-a/audit",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-native-bridge-a/input",
+        "/tmp/native-input",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/camera-native-bridge-a/output",
+        "/tmp/projected",
+        "--",
+        "python",
+        "-c",
+        "import json,numpy as np\nfrom pathlib import Path\nmeta=json.loads(Path('/tmp/native-input/bridge.json').read_text());actual=np.loadtxt('/tmp/projected/projection.csv',delimiter=',');n=meta['points'];assert actual.shape==(n,5);np.testing.assert_array_equal(actual[:,0],np.arange(n));assert np.isin(actual[:,1],[0,1]).all() and np.isfinite(actual).all()\nwith np.load('/tmp/native-input/native.npz',allow_pickle=False) as a:cp=a['camera_projection'];world=a['world_xyz'];assert len(cp)==len(world)==n\nslots=cp.reshape(n,2,3);errors=[];provided=invalid=0\nfor slot in range(2):\n camera,u,v=slots[:,slot,:].T;valid=(camera==1)&(u>=0)&(u<1920)&(v>=0)&(v<1280);provided+=int(valid.sum());invalid+=int((valid&(actual[:,1]==0)).sum());valid&=actual[:,1]==1;delta=actual[valid,2:4]-slots[valid,slot,1:3];errors.extend(delta.tolist())\nerrors=np.array(errors);norm=np.linalg.norm(errors,axis=1)\nr={'frame':meta['frame'],'points':n,'provided_camera_slots':provided,'provided_slots_model_invalid':invalid,'compared_slots':len(errors),'pixel_l2_quantiles':dict(zip(['p50','p90','p95','p99','max'],map(float,np.quantile(norm,[.5,.9,.95,.99,1])))),'within_one_pixel_each_axis':int((np.abs(errors)<=1).all(axis=1).sum()),'positive_forward_depth_compared':bool((actual[(slots[:,:,0]==1).any(axis=1),4]>0).all()),'point_motion_assumption':meta['point_motion_assumption'],'angular_velocity_convention':meta['angular_velocity_convention'],'scope':'native full point-order and supplied projection diagnostic; correspondence differences measured, not accepted as visibility or moving-actor compensation'}\nPath('/outputs/check.json').write_text(json.dumps(r,indent=2));print(json.dumps(r))\n"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "projection_receipt_sha256": "4e05f9ca420da688259b80738ebd47661c1498292198628a9aac8a0f1d08596d",
+  "input_preparation_sha256": "e72bc378af4bb1cc98c57e211645c50aecb1acedb0244f20dd7922bc29cd3392",
+  "validation": {
+    "frame": {
+      "context": "5847910688643719375_180_000_200_000",
+      "timestamp": 1548722489547369
+    },
+    "points": 157870,
+    "provided_camera_slots": 21234,
+    "provided_slots_model_invalid": 0,
+    "compared_slots": 21234,
+    "pixel_l2_quantiles": {
+      "p50": 1.2939815613169672,
+      "p90": 2.480024433892868,
+      "p95": 2.7899726723660927,
+      "p99": 3.2459493562736186,
+      "max": 3.7210533682717504
+    },
+    "within_one_pixel_each_axis": 9372,
+    "positive_forward_depth_compared": true,
+    "point_motion_assumption": "static-world-landmark; actor motion is not supplied",
+    "angular_velocity_convention": "native components copied verbatim; schema global wording versus upstream body-frame interpretation unresolved",
+    "scope": "native full point-order and supplied projection diagnostic; correspondence differences measured, not accepted as visibility or moving-actor compensation"
+  },
+  "artifacts": {
+    "check.json": "a5e1e7cb243df126b2fa65cfb7027ecb7ce46e5023ef8eab877c017143e20df1",
+    "live.log": "d124899feda239f28a4e7590e34b254f9a61d902f01b34f625099d406762d0e2"
+  }
+}

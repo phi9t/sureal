@@ -1,0 +1,73 @@
+"""Private Unix-socket protocol controls, not the Codex daemon/live acceptance."""
+import base64
+import hashlib
+import importlib
+import json
+import os
+from pathlib import Path
+import socket
+import struct
+import tempfile
+import threading
+import unittest
+
+
+class NativeReadTests(unittest.TestCase):
+    def setUp(self):
+        try:self.module=importlib.import_module('audit_support.native_read')
+        except ModuleNotFoundError:self.fail('Read-only native socket observer missing')
+
+    def exercise(self,bad_upgrade=False):
+        with tempfile.TemporaryDirectory(prefix='a50-wire-') as tmp:
+            endpoint=Path(tmp)/'native.sock';server=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+            self.addCleanup(server.close);server.bind(str(endpoint));server.listen(1)
+            info=endpoint.stat();requests=[];errors=[]
+            def serve():
+                try:
+                    peer,_=server.accept();peer.settimeout(2)
+                    with peer:
+                        header=b''
+                        while not header.endswith(b'\r\n\r\n'):header+=peer.recv(1)
+                        fields=dict(line.split(': ',1) for line in header.decode().split('\r\n')[1:] if ': ' in line)
+                        accept=base64.b64encode(hashlib.sha1((fields['Sec-WebSocket-Key']+
+                            '258EAFA5-E914-47DA-95CA-C5AB0DC85B11').encode()).digest()).decode()
+                        if bad_upgrade:accept='invalid'
+                        peer.sendall(('HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\n'
+                            'Connection: Upgrade\r\nSec-WebSocket-Accept: '+accept+'\r\n\r\n').encode())
+                        if bad_upgrade:return
+                        while True:
+                            header=peer.recv(2)
+                            if not header:return
+                            self.assertEqual(header[0],129);self.assertTrue(header[1]&128)
+                            n=header[1]&127
+                            if n==126:n=struct.unpack('!H',peer.recv(2))[0]
+                            mask=peer.recv(4);data=b''
+                            while len(data)<n:data+=peer.recv(n-len(data))
+                            request=json.loads(bytes(byte^mask[i%4] for i,byte in enumerate(data)))
+                            if 'id' not in request:continue
+                            requests.append(request)
+                            result={'userAgent':'private-component-fixture'} if request['method']=='initialize' else {'goal':None}
+                            body=json.dumps({'id':request['id'],'result':result}).encode()
+                            peer.sendall(bytes([129,len(body)])+body)
+                except Exception as error:errors.append(error)
+            thread=threading.Thread(target=serve);thread.start()
+            runtime={'endpoint':{'path':str(endpoint),'uid':os.getuid(),'device':info.st_dev,'inode':info.st_ino},
+                     'daemon':{'pid':os.getpid()}}
+            if bad_upgrade:
+                with self.assertRaises(ValueError):self.module.NativeReadClient(runtime,'fixture-thread',2000)
+            else:
+                client=self.module.NativeReadClient(runtime,'fixture-thread',2000)
+                try:
+                    client.initialize()
+                    self.assertEqual(client.call('thread/goal/get',{'threadId':'fixture-thread'}),{'goal':None})
+                    with self.assertRaises(ValueError):client.call('turn/start',{'threadId':'fixture-thread'})
+                    with self.assertRaises(ValueError):client.call('thread/goal/get',{'threadId':'other-thread'})
+                finally:client.close()
+            thread.join(3);self.assertFalse(thread.is_alive());self.assertEqual(errors,[])
+            if not bad_upgrade:self.assertEqual([r['method'] for r in requests],['initialize','thread/goal/get'])
+
+    def test_exact_websocket_and_read_only_method_guard(self):self.exercise()
+    def test_invalid_upgrade_accept_is_not_native_proof(self):self.exercise(True)
+
+
+if __name__=='__main__':unittest.main()

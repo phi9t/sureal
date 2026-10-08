@@ -1,0 +1,12 @@
+from pathlib import Path
+import subprocess,time,json
+code=Path('experiments/waymo-perception');logs=Path.home()/'.cache/waystone/waymo-perception/insula/continuation-logs';done=[]
+for variant in ['deep_pfn','context_pfn','residual_bev']:
+ receipt=code/('research/architecture-'+variant+'-execution-verified.json')
+ while not receipt.exists():time.sleep(2)
+ for worker in ['run-architecture-loss-audit.py','score-architecture-score-first.py','audit-architecture-score-first.py']:
+  with (logs/('architecture-'+variant+'-'+worker+'.log')).open('w') as f:
+   result=subprocess.run(['python','.scratch/'+worker,variant],stdout=f,stderr=subprocess.STDOUT)
+  assert result.returncode==0,(variant,worker)
+  print('ADMITTED',variant,worker,flush=True)
+ done.append(variant);(code/'research/architecture-cpu-cohort-progress.json').write_text(json.dumps({'admitted':done}))

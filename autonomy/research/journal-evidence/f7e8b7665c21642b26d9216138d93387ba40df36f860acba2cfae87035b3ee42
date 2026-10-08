@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "candidate": "80e886fee5e5f4ab5bd308a156222c1fa1c1f4a9",
+  "control": "host-only receive completion advances monotonic time beyond absolute drain deadline",
+  "started": 100,
+  "admitted_deadline": 101,
+  "receive_finished": 104,
+  "timeout_refused": false,
+  "events_saved_after_deadline": 1,
+  "new_native_effects": false,
+  "source": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/fixture-operator-candidate-v7/source/tests/collab/fixture_support/native_stop_fixture.py",
+    "sha256": "249f4dbdfa0bf3dd104e22de8a20f9861bd41027b2c5e5f976c1257c047da973"
+  }
+}

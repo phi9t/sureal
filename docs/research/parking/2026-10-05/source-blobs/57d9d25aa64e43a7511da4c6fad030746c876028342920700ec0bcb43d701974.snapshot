@@ -1,0 +1,19 @@
+"""Native all-class metrics cannot be replaced by a populated-class mean."""
+import pytest
+
+
+def test_native_parser_requires_all_four_level2_classes():
+    from association.native import level2_metrics
+    names=['VEHICLE','PEDESTRIAN','SIGN','CYCLIST']
+    text='\n'.join(f'OBJECT_TYPE_TYPE_{n}_LEVEL_2: [mAP 0.9] [mAPH {v}]' for n,v in zip(names,[.9,.9,.7,.9]))
+    report=level2_metrics(text)
+    assert report['SIGN']['APH']==.7
+    assert not all(r['APH']>=.8 for r in report.values())
+    with pytest.raises(ValueError):level2_metrics('\n'.join(text.splitlines()[:3]))
+
+
+@pytest.mark.parametrize('value',['nan','inf','1.1','-0.1'])
+def test_native_parser_refuses_nonfinite_or_out_of_range_values(value):
+    from association.native import level2_metrics
+    text='\n'.join(f'OBJECT_TYPE_TYPE_{n}_LEVEL_2: [mAP 1] [mAPH {value}]' for n in ['VEHICLE','PEDESTRIAN','SIGN','CYCLIST'])
+    with pytest.raises(ValueError):level2_metrics(text)

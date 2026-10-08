@@ -1,0 +1,6 @@
+{
+  "status": "preparation evidence; scientific processing gate open",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/scientific-component-live-a/receipt.json",
+  "receipt_sha256": "92aa61158deb2bb1bd03bd07cd98cf239f6ffafc392ac85ea98186305a674003",
+  "scope": "native retained engineering calibration/pose tables and live fixtures; scientific orchestrator transfer/resume processing remains unverified because acquisition owns staging"
+}

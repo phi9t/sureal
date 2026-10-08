@@ -1,0 +1,12 @@
+import gzip,hashlib
+from pathlib import Path
+from pipeline.component_archive import create_component_archive as plain
+from pipeline.compressed_component_archive import create_component_archive as compressed
+p=Path('/outputs');s=p/'source';(s/'lidar').mkdir(parents=True);f=s/'lidar/f.bin';f.write_bytes(bytes(range(256))*100);expected={'lidar/f.bin':hashlib.sha256(f.read_bytes()).hexdigest()};kw=dict(expected_files=expected,provenance={'scene':'fixture'},other_bytes=0,budget_bytes=200000)
+a=plain(s,p/'plain.tar',**kw);b=compressed(s,p/'a.tar.gz',**kw);c=compressed(s,p/'b.tar.gz',**kw)
+assert (p/'a.tar.gz').read_bytes()==(p/'b.tar.gz').read_bytes()
+expanded=gzip.decompress((p/'a.tar.gz').read_bytes());assert expanded==(p/'plain.tar').read_bytes();assert hashlib.sha256(expanded).hexdigest()==b['uncompressed_sha256'] and len(expanded)==b['uncompressed_bytes']
+try:compressed(s,p/'limited.tar.gz',**dict(kw,budget_bytes=f.stat().st_size+30))
+except ValueError:assert (p/'limited.tar.gz').stat().st_size<=30
+else:raise AssertionError('output ceiling accepted')
+print('PASS live deterministic compression, exact original archive bytes, hard output ceiling')

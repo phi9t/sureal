@@ -1,0 +1,386 @@
+{
+  "schema_version": 1,
+  "phase": "ticket27-storage-plan",
+  "generated_utc": "2026-10-08T05:15:45Z",
+  "worker": "t27d-storage-plan",
+  "worker_branch": "worker/t27d-storage-plan",
+  "bound_start": "8eda504",
+  "plan_only": true,
+  "no_actions_performed": [
+    "hdfs_upload",
+    "local_release",
+    "move",
+    "delete"
+  ],
+  "roots": {
+    "scientific_processing": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing",
+    "evidence_root": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007",
+    "allowed_worker_scratch": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27d-storage"
+  },
+  "limits": {
+    "cap_bytes": 16106127360,
+    "target_unique_payload_bytes": 11811160064,
+    "reservation_bytes": 2147483648,
+    "required_release_bytes_from_diagnostic": 3490543008
+  },
+  "current_accounting": {
+    "strict_unique_payload_bytes_status": "raises_on_symlink",
+    "strict_error": "ValueError: scientific payload entries must not be symlinks: /data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/motion-current-geometry-audit-v3/red/mutants/xyz_shift/6-5-1-range.features.bin",
+    "diagnostic_method": "same hardlink-aware regular-file accounting as autonomy/resources/scientific_payload.py, excluding only W/motion-current-geometry-audit-v3 because all current symlinks are there",
+    "unique_payload_bytes_excluding_motion_current_geometry_audit_v3": 15301703072,
+    "symlink_counts": {
+      "under_scientific_processing": 2970,
+      "under_motion_current_geometry_audit_v3": 2970,
+      "outside_motion_current_geometry_audit_v3": 0
+    },
+    "audit_sample_symlink_target_kind": "absolute /source/... target"
+  },
+  "tooling_disposition": [
+    {
+      "path": "autonomy/retention/publish_native_cache.py",
+      "supports": "overfit-native-cache-v1",
+      "supports_release": true,
+      "disposition": "valid precedent, not a publisher for selected top-level candidate directories"
+    },
+    {
+      "path": "autonomy/retention/publish_sustained_checkpoint.py",
+      "supports": "sustained checkpoint receipts",
+      "supports_release": true,
+      "disposition": "valid precedent for checkpoint receipts, not arbitrary closed directories"
+    },
+    {
+      "path": "autonomy/retention/publish_sustained_pilot.py",
+      "supports": "balanced16-sustained-admission-*",
+      "supports_release": true,
+      "disposition": "current sustained pilot path; protected from this release plan"
+    },
+    {
+      "path": "autonomy/resources/retention.py",
+      "supports": "backend shared/checkpoint resource inventories",
+      "supports_release": false,
+      "disposition": "publishes and verifies resource bundles; releases only new temp/staging, not original model inputs"
+    },
+    {
+      "path": "autonomy/resources/resource_archive.py",
+      "supports": "regular-file deterministic archives",
+      "supports_release": false,
+      "disposition": "useful primitive; refuses symlinks"
+    },
+    {
+      "path": "autonomy/resources/resource_release_plan.py",
+      "supports": "complete regular-file publication receipts",
+      "supports_release": "returns unlink plan",
+      "disposition": "must be used before release; refuses symlinks and incomplete inventories"
+    }
+  ],
+  "protected_exclusions": [
+    {
+      "name": "balanced16-native-v2",
+      "reason": "current ticket 27 admission binds it as /tmp/native",
+      "evidence": [
+        "autonomy/training_execution/sustained_controller_backend.py:149",
+        "autonomy/training_execution/sustained_controller_backend.py:193",
+        "autonomy/training_execution/admit_sustained.py:57",
+        "autonomy/training_execution/admit_sustained.py:84"
+      ]
+    },
+    {
+      "name": "balanced16-physical-v2",
+      "reason": "current resource dependency and admission input",
+      "evidence": [
+        "autonomy/resources/dependencies.py:36",
+        "autonomy/training_execution/sustained_controller_backend.py:193",
+        "autonomy/training_execution/admit_sustained.py:84"
+      ]
+    },
+    {
+      "name": "balanced16-labels-v2",
+      "reason": "current resource dependency and admission input",
+      "evidence": [
+        "autonomy/resources/dependencies.py:37",
+        "autonomy/training_execution/sustained_controller_backend.py:193",
+        "autonomy/training_execution/admit_sustained.py:84"
+      ]
+    },
+    {
+      "name": "cohort16-baseline-balanced20261002a",
+      "reason": "current frames manifest source",
+      "evidence": [
+        "autonomy/training_execution/sustained_controller_backend.py:149",
+        "autonomy/training_execution/admit_sustained.py:55"
+      ]
+    },
+    {
+      "name": "balanced16-sustained-baseline-controller20261003a",
+      "reason": "current sustained controller state and explicitly protected by instruction",
+      "evidence": [
+        "autonomy/training_execution/run_sustained.py:88",
+        "user task instruction"
+      ]
+    },
+    {
+      "name": "resource-retention-balanced16-sustained-baseline-controller20261003a-shared-*",
+      "reason": "prior balanced16 retention examples and explicitly protected by instruction",
+      "evidence": [
+        "read-only HDFS listing of perception-resource-closures",
+        "user task instruction"
+      ]
+    }
+  ],
+  "candidate_order": [
+    {
+      "rank": 1,
+      "name": "cohort16-baseline-fit20261002a",
+      "unique_bytes": 1803535619,
+      "release_bytes": 1776271853,
+      "files": 67,
+      "symlinks": 0,
+      "mtime_utc": "2026-10-02T06:01:44Z",
+      "producer_or_procedure": "insula/cohort16-baseline-fit20261002a with run.json and train/loss/coverage/checkpoint/protocol verified evidence",
+      "current_consumer": "none found by bounded current-code grep excluding research, studies, and tests",
+      "retention_receipt_or_hdfs_copy": "no exact direct-name local retention receipt or HDFS listing found",
+      "selected_for_planned_release": true,
+      "tooling_status": "requires reviewed general regular-file scientific directory publisher"
+    },
+    {
+      "rank": 2,
+      "name": "cohort16-residual_bev-balanced20261002b",
+      "unique_bytes": 1367303352,
+      "release_bytes": 1367303352,
+      "files": 51,
+      "symlinks": 0,
+      "mtime_utc": "2026-10-02T15:49:12Z",
+      "producer_or_procedure": "insula/cohort16-residual_bev-balanced20261002b with verified training/loss/coverage/checkpoint evidence and scoring/audit diagnostics",
+      "current_consumer": "none found by bounded current-code grep excluding research, studies, and tests",
+      "retention_receipt_or_hdfs_copy": "no exact direct-name local retention receipt or HDFS listing found",
+      "selected_for_planned_release": true,
+      "tooling_status": "requires reviewed general regular-file scientific directory publisher"
+    },
+    {
+      "rank": 3,
+      "name": "native-overfit-v1",
+      "unique_bytes": 494810466,
+      "release_bytes": 494810466,
+      "files": 19,
+      "symlinks": 0,
+      "mtime_utc": "2026-10-01T16:11:14Z",
+      "producer_or_procedure": "insula/native-overfit-v1 inputs manifest; older native overfit output",
+      "current_consumer": "none found by bounded current-code grep excluding research, studies, and tests",
+      "retention_receipt_or_hdfs_copy": "no exact direct-name local retention receipt or HDFS listing found; overfit-native-cache-v1 HDFS copies are not this directory",
+      "selected_for_planned_release": true,
+      "tooling_status": "requires reviewed general regular-file scientific directory publisher"
+    },
+    {
+      "rank": 4,
+      "name": "architecture-window_bev-v1",
+      "unique_bytes": 361668688,
+      "release_bytes": 361668688,
+      "files": 15,
+      "symlinks": 0,
+      "mtime_utc": "2026-10-02T02:20:51Z",
+      "producer_or_procedure": "insula/architecture-window_bev-v1 inputs manifest; closed architecture experiment output",
+      "current_consumer": "none found by bounded current-code grep excluding research, studies, and tests",
+      "retention_receipt_or_hdfs_copy": "no exact direct-name local retention receipt or HDFS listing found",
+      "selected_for_planned_release": true,
+      "tooling_status": "requires reviewed general regular-file scientific directory publisher"
+    },
+    {
+      "rank": 5,
+      "name": "architecture-coarse_mlp-v1",
+      "unique_bytes": 361668652,
+      "release_bytes": 361668652,
+      "files": 15,
+      "symlinks": 0,
+      "mtime_utc": "2026-10-02T02:23:59Z",
+      "producer_or_procedure": "insula/architecture-coarse_mlp-v1 inputs manifest; closed architecture experiment output",
+      "current_consumer": "none found by bounded current-code grep excluding research, studies, and tests",
+      "retention_receipt_or_hdfs_copy": "no exact direct-name local retention receipt or HDFS listing found",
+      "selected_for_planned_release": true,
+      "tooling_status": "requires reviewed general regular-file scientific directory publisher"
+    },
+    {
+      "rank": 6,
+      "name": "architecture-deep_pfn-v1",
+      "unique_bytes": 358566392,
+      "release_bytes": 358566392,
+      "files": 15,
+      "symlinks": 0,
+      "mtime_utc": "2026-10-02T02:00:17Z",
+      "producer_or_procedure": "insula/architecture-deep_pfn-v1 inputs manifest; closed architecture experiment output",
+      "current_consumer": "none found by bounded current-code grep excluding research, studies, and tests",
+      "retention_receipt_or_hdfs_copy": "no exact direct-name local retention receipt or HDFS listing found",
+      "selected_for_planned_release": false,
+      "tooling_status": "fallback; requires reviewed general regular-file scientific directory publisher"
+    },
+    {
+      "rank": 7,
+      "name": "norm-gn_backbone-v1",
+      "unique_bytes": 358512202,
+      "release_bytes": 331248436,
+      "files": 15,
+      "symlinks": 0,
+      "mtime_utc": "2026-10-01T22:54:53Z",
+      "producer_or_procedure": "insula/norm-gn_backbone-v1 inputs manifest; closed normalization experiment output",
+      "current_consumer": "none found by bounded current-code grep excluding research, studies, and tests",
+      "retention_receipt_or_hdfs_copy": "no exact direct-name local retention receipt or HDFS listing found",
+      "selected_for_planned_release": false,
+      "tooling_status": "fallback; one shared inode reduces release effect"
+    },
+    {
+      "rank": 8,
+      "name": "norm-no_norm-v1",
+      "unique_bytes": 358387358,
+      "release_bytes": 358387358,
+      "files": 15,
+      "symlinks": 0,
+      "mtime_utc": "2026-10-01T22:59:32Z",
+      "producer_or_procedure": "insula/norm-no_norm-v1 inputs manifest; closed normalization experiment output",
+      "current_consumer": "none found by bounded current-code grep excluding research, studies, and tests",
+      "retention_receipt_or_hdfs_copy": "no exact direct-name local retention receipt or HDFS listing found",
+      "selected_for_planned_release": false,
+      "tooling_status": "fallback; requires reviewed general regular-file scientific directory publisher"
+    },
+    {
+      "rank": 9,
+      "name": "cohort-v1",
+      "unique_bytes": 1835747595,
+      "release_bytes": 1835747595,
+      "files": 10690,
+      "symlinks": 0,
+      "mtime_utc": "2026-10-01T10:55:45Z",
+      "producer_or_procedure": "historical cohort generation referenced by older fixed/overfit procedure records and research receipts",
+      "current_consumer": "none found by bounded current-code grep excluding research, studies, and tests",
+      "retention_receipt_or_hdfs_copy": "no exact direct-name local retention receipt or HDFS listing found",
+      "selected_for_planned_release": false,
+      "tooling_status": "high-byte fallback; broader historical references make it less safe than ranks 1-5"
+    }
+  ],
+  "planned_regular_file_release_set": [
+    "cohort16-baseline-fit20261002a",
+    "cohort16-residual_bev-balanced20261002b",
+    "native-overfit-v1",
+    "architecture-window_bev-v1",
+    "architecture-coarse_mlp-v1"
+  ],
+  "planned_regular_file_release_bytes": 4361723011,
+  "planned_regular_file_hdfs_payload_upper_bound_bytes": 4388986777,
+  "high_cushion_alternative": {
+    "entries": [
+      "cohort16-baseline-fit20261002a",
+      "cohort16-residual_bev-balanced20261002b",
+      "cohort-v1"
+    ],
+    "release_bytes": 4979322800,
+    "projected_unique_payload_bytes": 10322380272,
+    "note": "fewer local entries but depends on accepting cohort-v1's broader historical restoration path"
+  },
+  "future_regular_file_command_surface": {
+    "exists_in_current_checkout": false,
+    "required_module": "retention.publish_scientific_directory",
+    "example_command": "PYTHONPATH=autonomy python3 -m retention.publish_scientific_directory --case <case> --root /data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/<case> --hdfs-namespace perception-closed-scientific-processing --auth-source token-file --host-source-receipt <admitted-publisher-source-receipt.json> --release",
+    "required_stages": [
+      "create-live",
+      "archive-put",
+      "archive-get",
+      "manifest-put",
+      "manifest-get",
+      "verify-live",
+      "rehydrate-live",
+      "independent",
+      "release-plan",
+      "release-completed"
+    ],
+    "must_use_existing_primitives": [
+      "resources.resource_archive.create_archive",
+      "waystone --auth-source token-file put",
+      "waystone --auth-source token-file get",
+      "resources.resource_archive.verify_archive",
+      "resources.resource_rehydrate.rehydrate_archive",
+      "resources.resource_release_plan.release_plan"
+    ]
+  },
+  "motion_current_geometry_audit_v3": {
+    "unique_regular_bytes": 27577424,
+    "files": 31,
+    "symlinks": 2970,
+    "mtime_utc": "2026-10-03T00:49:27Z",
+    "current_archive_tool_support": "not supported by resources.resource_archive or resource_release_plan because both refuse symlinks",
+    "required_future_module": "retention.publish_symlink_audit",
+    "example_command": "PYTHONPATH=autonomy python3 -m retention.publish_symlink_audit --case motion-current-geometry-audit-v3 --root /data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/motion-current-geometry-audit-v3 --hdfs-namespace perception-motion --auth-source token-file --host-source-receipt <admitted-publisher-source-receipt.json> --preserve-symlinks --readback --receipt",
+    "move_command_after_verified_receipt": "mkdir -p /data02/home/philip.yang/.cache/waystone/waymo-perception/retired-audits && mv /data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/motion-current-geometry-audit-v3 /data02/home/philip.yang/.cache/waystone/waymo-perception/retired-audits/motion-current-geometry-audit-v3",
+    "symlink_target_policy": "targets are absolute /source/... strings; moving the directory preserves link text and remains valid only in namespaces with the same /source binding"
+  },
+  "dry_run_after_planned_actions": {
+    "starting_unique_payload_bytes_excluding_audit": 15301703072,
+    "planned_release_bytes": 4361723011,
+    "projected_unique_payload_bytes_after_release_and_audit_move": 10939980061,
+    "target_unique_payload_bytes": 11811160064,
+    "margin_below_target_bytes": 871180003,
+    "cap_bytes": 16106127360,
+    "margin_below_cap_bytes": 5166147299,
+    "reservation_bytes": 2147483648,
+    "margin_after_reservation_bytes": 3018663651
+  },
+  "hdfs_and_local_effect_estimate": {
+    "recommended_regular_file_hdfs_payload_upper_bound_bytes_before_compression": 4388986777,
+    "recommended_regular_file_local_release_effect_bytes": 4361723011,
+    "motion_audit_regular_payload_upper_bound_bytes": 27577424,
+    "motion_audit_local_regular_byte_effect_in_diagnostic_count": 0,
+    "motion_audit_gate_effect": "removes all 2970 symlink entries from W so unchanged strict unique_payload_bytes can run"
+  },
+  "rollback": {
+    "regular_file_restore_command_surface_exists": false,
+    "required_regular_file_restore_command": "PYTHONPATH=autonomy python3 -m retention.restore_scientific_directory --receipt /data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-<case>-<uuid>/verified-publication.json --destination /data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/<case> --auth-source token-file --require-empty-destination --verify",
+    "required_symlink_audit_restore_command": "PYTHONPATH=autonomy python3 -m retention.restore_symlink_audit --receipt /data02/home/philip.yang/.cache/waystone/waymo-perception/insula/hdfs-retention-motion-current-geometry-audit-v3-<uuid>/verified-publication.json --destination /data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/motion-current-geometry-audit-v3 --auth-source token-file --require-empty-destination --verify-symlinks",
+    "regular_file_steps": [
+      "confirm destination is absent or explicitly empty",
+      "download every archive and manifest named by the verified receipt",
+      "verify archive bytes, archive sha256, manifest sha256, member names, member sizes, and member sha256 values",
+      "rehydrate into a fresh temporary directory",
+      "atomically install restored directory at W/<case>",
+      "run a second full inventory comparison against the receipt"
+    ],
+    "motion_audit_steps": [
+      "move back from retired-audits if the retired local directory still exists and W target is absent",
+      "otherwise restore from HDFS symlink-audit receipt",
+      "verify all 2970 symlink entries and regular file entries against the receipt"
+    ]
+  },
+  "acceptance_gates_before_ticket27_retry": [
+    "reviewed regular-file publisher or approved restored legacy procedure exists",
+    "each selected regular-file candidate has verified HDFS publication receipt with exact readback and live rehydrate proof",
+    "resource_release_plan.release_plan has approved every path to unlink",
+    "local release unlinks only release-plan paths and writes release-completed.json",
+    "reviewed symlink-audit publisher archives motion-current-geometry-audit-v3 with symlinks preserved and exact readback verified",
+    "motion-current-geometry-audit-v3 is moved, not deleted, to retired-audits",
+    "fresh unique_payload_bytes(W) succeeds without symlink exception",
+    "fresh accounting is <= 11811160064 and value + 2147483648 <= 16106127360"
+  ],
+  "read_only_hdfs_observations": [
+    {
+      "uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-overfit",
+      "items": 24,
+      "note": "historical tier1 and advanced publications, not exact selected candidate names"
+    },
+    {
+      "uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures",
+      "items": 14,
+      "note": "balanced16 shared/checkpoint resource closure examples"
+    },
+    {
+      "uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-motion",
+      "items": 1,
+      "note": "existing motion-geometry HDFS precedent, not symlink-audit-v3"
+    },
+    {
+      "uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-native-cache",
+      "items": 2,
+      "note": "overfit-native-cache-v1 publications"
+    },
+    {
+      "uri": "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-checkpoints",
+      "items": 1,
+      "note": "balanced16 sustained admission checkpoint publication"
+    }
+  ]
+}

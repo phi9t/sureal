@@ -1,0 +1,20 @@
+import copy,hashlib,json,shutil,tempfile,unittest
+from pathlib import Path
+from point_grid_retained_audit import verify
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+class ReceiptTests(unittest.TestCase):
+ def test_live_receipt_and_rehashed_mutants(self):
+  original=json.loads(Path('/source/receipt.json').read_text())
+  changes=[None,lambda r:r['checks'][0].update(exit_code=1),lambda r:r.update(pipeline_hashes={}),lambda r:r.update(artifacts={}),lambda r:r['transfer'].update(transfer_padding_bytes=0),lambda r:r['independent'].update(points=0),lambda r:r['validation'].update(eligible_semantic_points=0),lambda r:r.update(consumer_reserve_bytes=0)]
+  for change in changes:
+   with self.subTest(change=change),tempfile.TemporaryDirectory() as tmp:
+    root=Path(tmp)/'receipt';shutil.copytree('/source',root);r=copy.deepcopy(original)
+    if change:change(r)
+    # Rehash changed report artifacts too, so semantic mutations reach accounting.
+    (root/'producer/check.json').write_text(json.dumps(r['validation']));(root/'reference/check.json').write_text(json.dumps(r['independent']))
+    for n in ['producer/check.json','reference/check.json']:r['artifacts'][n]=sha(root/n)
+    (root/'receipt.json').write_text(json.dumps(r));e={'receipt_sha256':sha(root/'receipt.json'),'input_identity':original['input_identity'],'runtime_lock':original['runtime_lock'],'pipeline_hashes':original['pipeline_hashes'],'worker_hashes':original['worker_hashes']}
+    if change:
+     with self.assertRaises(ValueError):verify(root,e,code_root='/experiment',workers='/tmp/checker')
+    else:self.assertEqual(verify(root,e,code_root='/experiment',workers='/tmp/checker')['points'],10)
+if __name__=='__main__':unittest.main()

@@ -1,0 +1,432 @@
+{
+  "release": "v1.2.1",
+  "bucket": "waymo_open_dataset_motion_v_1_2_1",
+  "observed_utc": "2026-09-30T18:04:44.281029+00:00",
+  "scope": "authenticated bounded metadata only; no object payload acquisition or cohort selection",
+  "gcs_wrapper_sha256": "7d7d55132c5a93c76386ab40bd6ee6a7a2c69283c221c94a07ae3e9c7fb425e5",
+  "listings": {
+    "": {
+      "request": "https://storage.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o?prefix=&delimiter=%2F&maxResults=25",
+      "http_status": 200,
+      "response": {
+        "kind": "storage#objects",
+        "prefixes": [
+          "uncompressed/"
+        ],
+        "items": [
+          {
+            "kind": "storage#object",
+            "id": "waymo_open_dataset_motion_v_1_2_1/test.txt/1706566285054471",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/test.txt",
+            "mediaLink": "https://storage.googleapis.com/download/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/test.txt?generation=1706566285054471&alt=media",
+            "name": "test.txt",
+            "bucket": "waymo_open_dataset_motion_v_1_2_1",
+            "generation": "1706566285054471",
+            "metageneration": "1",
+            "contentType": "text/plain",
+            "storageClass": "STANDARD",
+            "size": "5",
+            "md5Hash": "IgXkjeX5PHhHM//MqEHStQ==",
+            "crc32c": "4TxIiA==",
+            "etag": "CIek0+nOg4QDEAE=",
+            "timeCreated": "2024-01-29T22:11:25.097Z",
+            "updated": "2024-01-29T22:11:25.097Z",
+            "timeStorageClassUpdated": "2024-01-29T22:11:25.097Z",
+            "timeFinalized": "2024-01-29T22:11:25.097Z"
+          }
+        ]
+      }
+    },
+    "uncompressed/": {
+      "request": "https://storage.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o?prefix=uncompressed%2F&delimiter=%2F&maxResults=25",
+      "http_status": 200,
+      "response": {
+        "kind": "storage#objects",
+        "prefixes": [
+          "uncompressed/lidar_and_camera/",
+          "uncompressed/scenario/",
+          "uncompressed/tf_example/"
+        ],
+        "items": [
+          {
+            "kind": "storage#object",
+            "id": "waymo_open_dataset_motion_v_1_2_1/uncompressed//1706566411669068",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2F",
+            "mediaLink": "https://storage.googleapis.com/download/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2F?generation=1706566411669068&alt=media",
+            "name": "uncompressed/",
+            "bucket": "waymo_open_dataset_motion_v_1_2_1",
+            "generation": "1706566411669068",
+            "metageneration": "1",
+            "contentType": "text/plain",
+            "storageClass": "STANDARD",
+            "size": "0",
+            "md5Hash": "1B2M2Y8AsgTpgAmY7PhCfg==",
+            "crc32c": "AAAAAA==",
+            "etag": "CMycg6bPg4QDEAE=",
+            "temporaryHold": false,
+            "eventBasedHold": false,
+            "timeCreated": "2024-01-29T22:13:31.691Z",
+            "updated": "2024-01-29T22:13:31.691Z",
+            "timeStorageClassUpdated": "2024-01-29T22:13:31.691Z",
+            "timeFinalized": "2024-01-29T22:13:31.691Z"
+          }
+        ]
+      }
+    },
+    "uncompressed/scenario/": {
+      "request": "https://storage.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o?prefix=uncompressed%2Fscenario%2F&delimiter=%2F&maxResults=25",
+      "http_status": 200,
+      "response": {
+        "kind": "storage#objects",
+        "prefixes": [
+          "uncompressed/scenario/testing/",
+          "uncompressed/scenario/testing_interactive/",
+          "uncompressed/scenario/training/",
+          "uncompressed/scenario/training_20s/",
+          "uncompressed/scenario/validation/",
+          "uncompressed/scenario/validation_interactive/"
+        ],
+        "items": [
+          {
+            "kind": "storage#object",
+            "id": "waymo_open_dataset_motion_v_1_2_1/uncompressed/scenario//1706566431806744",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Fscenario%2F",
+            "mediaLink": "https://storage.googleapis.com/download/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Fscenario%2F?generation=1706566431806744&alt=media",
+            "name": "uncompressed/scenario/",
+            "bucket": "waymo_open_dataset_motion_v_1_2_1",
+            "generation": "1706566431806744",
+            "metageneration": "1",
+            "contentType": "text/plain",
+            "storageClass": "STANDARD",
+            "size": "0",
+            "md5Hash": "1B2M2Y8AsgTpgAmY7PhCfg==",
+            "crc32c": "AAAAAA==",
+            "etag": "CJiq0K/Pg4QDEAE=",
+            "temporaryHold": false,
+            "eventBasedHold": false,
+            "timeCreated": "2024-01-29T22:13:51.829Z",
+            "updated": "2024-01-29T22:13:51.829Z",
+            "timeStorageClassUpdated": "2024-01-29T22:13:51.829Z",
+            "timeFinalized": "2024-01-29T22:13:51.829Z"
+          }
+        ]
+      }
+    },
+    "uncompressed/lidar_and_camera/": {
+      "request": "https://storage.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o?prefix=uncompressed%2Flidar_and_camera%2F&delimiter=%2F&maxResults=25",
+      "http_status": 200,
+      "response": {
+        "kind": "storage#objects",
+        "prefixes": [
+          "uncompressed/lidar_and_camera/testing/",
+          "uncompressed/lidar_and_camera/training/",
+          "uncompressed/lidar_and_camera/validation/"
+        ],
+        "items": [
+          {
+            "kind": "storage#object",
+            "id": "waymo_open_dataset_motion_v_1_2_1/uncompressed/lidar_and_camera//1706566445819638",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Flidar_and_camera%2F",
+            "mediaLink": "https://storage.googleapis.com/download/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Flidar_and_camera%2F?generation=1706566445819638&alt=media",
+            "name": "uncompressed/lidar_and_camera/",
+            "bucket": "waymo_open_dataset_motion_v_1_2_1",
+            "generation": "1706566445819638",
+            "metageneration": "1",
+            "contentType": "text/plain",
+            "storageClass": "STANDARD",
+            "size": "0",
+            "md5Hash": "1B2M2Y8AsgTpgAmY7PhCfg==",
+            "crc32c": "AAAAAA==",
+            "etag": "CPbNp7bPg4QDEAE=",
+            "temporaryHold": false,
+            "eventBasedHold": false,
+            "timeCreated": "2024-01-29T22:14:05.844Z",
+            "updated": "2024-01-29T22:14:05.844Z",
+            "timeStorageClassUpdated": "2024-01-29T22:14:05.844Z",
+            "timeFinalized": "2024-01-29T22:14:05.844Z"
+          }
+        ]
+      }
+    },
+    "uncompressed/scenario/training/": {
+      "request": "https://storage.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o?prefix=uncompressed%2Fscenario%2Ftraining%2F&delimiter=%2F&maxResults=3",
+      "http_status": 200,
+      "response": {
+        "kind": "storage#objects",
+        "nextPageToken": "Cj91bmNvbXByZXNzZWQvc2NlbmFyaW8vdHJhaW5pbmcvdHJhaW5pbmcudGZyZWNvcmQtMDAwMDItb2YtMDEwMDA=",
+        "items": [
+          {
+            "kind": "storage#object",
+            "id": "waymo_open_dataset_motion_v_1_2_1/uncompressed/scenario/training/training.tfrecord-00000-of-01000/1706572783766122",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Fscenario%2Ftraining%2Ftraining.tfrecord-00000-of-01000",
+            "mediaLink": "https://storage.googleapis.com/download/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Fscenario%2Ftraining%2Ftraining.tfrecord-00000-of-01000?generation=1706572783766122&alt=media",
+            "name": "uncompressed/scenario/training/training.tfrecord-00000-of-01000",
+            "bucket": "waymo_open_dataset_motion_v_1_2_1",
+            "generation": "1706572783766122",
+            "metageneration": "1",
+            "contentType": "application/octet-stream",
+            "storageClass": "STANDARD",
+            "size": "448622357",
+            "md5Hash": "uObNvAAlbQfl0M1NJzAOPw==",
+            "crc32c": "ovv/yg==",
+            "etag": "COqUvYTng4QDEAE=",
+            "timeCreated": "2024-01-29T23:59:43.863Z",
+            "updated": "2024-01-29T23:59:43.863Z",
+            "timeStorageClassUpdated": "2024-01-29T23:59:43.863Z",
+            "timeFinalized": "2024-01-29T23:59:43.863Z"
+          },
+          {
+            "kind": "storage#object",
+            "id": "waymo_open_dataset_motion_v_1_2_1/uncompressed/scenario/training/training.tfrecord-00001-of-01000/1706572757915577",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Fscenario%2Ftraining%2Ftraining.tfrecord-00001-of-01000",
+            "mediaLink": "https://storage.googleapis.com/download/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Fscenario%2Ftraining%2Ftraining.tfrecord-00001-of-01000?generation=1706572757915577&alt=media",
+            "name": "uncompressed/scenario/training/training.tfrecord-00001-of-01000",
+            "bucket": "waymo_open_dataset_motion_v_1_2_1",
+            "generation": "1706572757915577",
+            "metageneration": "1",
+            "contentType": "application/octet-stream",
+            "storageClass": "STANDARD",
+            "size": "480215651",
+            "md5Hash": "9UtWpwHNQf0MNnym9EWqRA==",
+            "crc32c": "0Xsn+Q==",
+            "etag": "CLmvk/jmg4QDEAE=",
+            "timeCreated": "2024-01-29T23:59:18.013Z",
+            "updated": "2024-01-29T23:59:18.013Z",
+            "timeStorageClassUpdated": "2024-01-29T23:59:18.013Z",
+            "timeFinalized": "2024-01-29T23:59:18.013Z"
+          },
+          {
+            "kind": "storage#object",
+            "id": "waymo_open_dataset_motion_v_1_2_1/uncompressed/scenario/training/training.tfrecord-00002-of-01000/1706572692922663",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Fscenario%2Ftraining%2Ftraining.tfrecord-00002-of-01000",
+            "mediaLink": "https://storage.googleapis.com/download/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Fscenario%2Ftraining%2Ftraining.tfrecord-00002-of-01000?generation=1706572692922663&alt=media",
+            "name": "uncompressed/scenario/training/training.tfrecord-00002-of-01000",
+            "bucket": "waymo_open_dataset_motion_v_1_2_1",
+            "generation": "1706572692922663",
+            "metageneration": "1",
+            "contentType": "application/octet-stream",
+            "storageClass": "STANDARD",
+            "size": "482018642",
+            "md5Hash": "NSX9H8edM3k1/2UMUF48JA==",
+            "crc32c": "sYh8xg==",
+            "etag": "CKfClNnmg4QDEAE=",
+            "timeCreated": "2024-01-29T23:58:13.020Z",
+            "updated": "2024-01-29T23:58:13.020Z",
+            "timeStorageClassUpdated": "2024-01-29T23:58:13.020Z",
+            "timeFinalized": "2024-01-29T23:58:13.020Z"
+          }
+        ]
+      }
+    },
+    "uncompressed/scenario/validation/": {
+      "request": "https://storage.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o?prefix=uncompressed%2Fscenario%2Fvalidation%2F&delimiter=%2F&maxResults=3",
+      "http_status": 200,
+      "response": {
+        "kind": "storage#objects",
+        "nextPageToken": "CkN1bmNvbXByZXNzZWQvc2NlbmFyaW8vdmFsaWRhdGlvbi92YWxpZGF0aW9uLnRmcmVjb3JkLTAwMDAyLW9mLTAwMTUw",
+        "items": [
+          {
+            "kind": "storage#object",
+            "id": "waymo_open_dataset_motion_v_1_2_1/uncompressed/scenario/validation/validation.tfrecord-00000-of-00150/1706585154034912",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Fscenario%2Fvalidation%2Fvalidation.tfrecord-00000-of-00150",
+            "mediaLink": "https://storage.googleapis.com/download/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Fscenario%2Fvalidation%2Fvalidation.tfrecord-00000-of-00150?generation=1706585154034912&alt=media",
+            "name": "uncompressed/scenario/validation/validation.tfrecord-00000-of-00150",
+            "bucket": "waymo_open_dataset_motion_v_1_2_1",
+            "generation": "1706585154034912",
+            "metageneration": "1",
+            "contentType": "application/octet-stream",
+            "storageClass": "STANDARD",
+            "size": "273686917",
+            "md5Hash": "DkLTAOR7tjxe3ZSK3Fb0xQ==",
+            "crc32c": "rASJ4g==",
+            "etag": "COC5io+VhIQDEAE=",
+            "timeCreated": "2024-01-30T03:25:54.127Z",
+            "updated": "2024-01-30T03:25:54.127Z",
+            "timeStorageClassUpdated": "2024-01-30T03:25:54.127Z",
+            "timeFinalized": "2024-01-30T03:25:54.127Z"
+          },
+          {
+            "kind": "storage#object",
+            "id": "waymo_open_dataset_motion_v_1_2_1/uncompressed/scenario/validation/validation.tfrecord-00001-of-00150/1706585179413885",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Fscenario%2Fvalidation%2Fvalidation.tfrecord-00001-of-00150",
+            "mediaLink": "https://storage.googleapis.com/download/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Fscenario%2Fvalidation%2Fvalidation.tfrecord-00001-of-00150?generation=1706585179413885&alt=media",
+            "name": "uncompressed/scenario/validation/validation.tfrecord-00001-of-00150",
+            "bucket": "waymo_open_dataset_motion_v_1_2_1",
+            "generation": "1706585179413885",
+            "metageneration": "1",
+            "contentType": "application/octet-stream",
+            "storageClass": "STANDARD",
+            "size": "272253722",
+            "md5Hash": "fbzpB0V0y0v2YHHWOTOhLw==",
+            "crc32c": "8lyeQw==",
+            "etag": "CP26l5uVhIQDEAE=",
+            "timeCreated": "2024-01-30T03:26:19.505Z",
+            "updated": "2024-01-30T03:26:19.505Z",
+            "timeStorageClassUpdated": "2024-01-30T03:26:19.505Z",
+            "timeFinalized": "2024-01-30T03:26:19.505Z"
+          },
+          {
+            "kind": "storage#object",
+            "id": "waymo_open_dataset_motion_v_1_2_1/uncompressed/scenario/validation/validation.tfrecord-00002-of-00150/1706585220402082",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Fscenario%2Fvalidation%2Fvalidation.tfrecord-00002-of-00150",
+            "mediaLink": "https://storage.googleapis.com/download/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Fscenario%2Fvalidation%2Fvalidation.tfrecord-00002-of-00150?generation=1706585220402082&alt=media",
+            "name": "uncompressed/scenario/validation/validation.tfrecord-00002-of-00150",
+            "bucket": "waymo_open_dataset_motion_v_1_2_1",
+            "generation": "1706585220402082",
+            "metageneration": "1",
+            "contentType": "application/octet-stream",
+            "storageClass": "STANDARD",
+            "size": "281894961",
+            "md5Hash": "MJmFjfQVCu51C+P4xs3bAQ==",
+            "crc32c": "kwAQKA==",
+            "etag": "CKKX3a6VhIQDEAE=",
+            "timeCreated": "2024-01-30T03:27:00.492Z",
+            "updated": "2024-01-30T03:27:00.492Z",
+            "timeStorageClassUpdated": "2024-01-30T03:27:00.492Z",
+            "timeFinalized": "2024-01-30T03:27:00.492Z"
+          }
+        ]
+      }
+    },
+    "uncompressed/lidar_and_camera/training/": {
+      "request": "https://storage.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o?prefix=uncompressed%2Flidar_and_camera%2Ftraining%2F&delimiter=%2F&maxResults=3",
+      "http_status": 200,
+      "response": {
+        "kind": "storage#objects",
+        "nextPageToken": "CkB1bmNvbXByZXNzZWQvbGlkYXJfYW5kX2NhbWVyYS90cmFpbmluZy8xMDAwOGVlYTk1YWYyN2IwLnRmcmVjb3Jk",
+        "items": [
+          {
+            "kind": "storage#object",
+            "id": "waymo_open_dataset_motion_v_1_2_1/uncompressed/lidar_and_camera/training/100006d9c3e93b6e.tfrecord/1706642347506775",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Flidar_and_camera%2Ftraining%2F100006d9c3e93b6e.tfrecord",
+            "mediaLink": "https://storage.googleapis.com/download/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Flidar_and_camera%2Ftraining%2F100006d9c3e93b6e.tfrecord?generation=1706642347506775&alt=media",
+            "name": "uncompressed/lidar_and_camera/training/100006d9c3e93b6e.tfrecord",
+            "bucket": "waymo_open_dataset_motion_v_1_2_1",
+            "generation": "1706642347506775",
+            "metageneration": "1",
+            "contentType": "application/octet-stream",
+            "storageClass": "STANDARD",
+            "size": "4945526",
+            "md5Hash": "TVuGIQM+Ct/C4sFF3drUJQ==",
+            "crc32c": "cx9iRQ==",
+            "etag": "CNf4hpfqhYQDEAE=",
+            "timeCreated": "2024-01-30T19:19:07.626Z",
+            "updated": "2024-01-30T19:19:07.626Z",
+            "timeStorageClassUpdated": "2024-01-30T19:19:07.626Z",
+            "timeFinalized": "2024-01-30T19:19:07.626Z"
+          },
+          {
+            "kind": "storage#object",
+            "id": "waymo_open_dataset_motion_v_1_2_1/uncompressed/lidar_and_camera/training/1000780c94572ed3.tfrecord/1706642192925135",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Flidar_and_camera%2Ftraining%2F1000780c94572ed3.tfrecord",
+            "mediaLink": "https://storage.googleapis.com/download/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Flidar_and_camera%2Ftraining%2F1000780c94572ed3.tfrecord?generation=1706642192925135&alt=media",
+            "name": "uncompressed/lidar_and_camera/training/1000780c94572ed3.tfrecord",
+            "bucket": "waymo_open_dataset_motion_v_1_2_1",
+            "generation": "1706642192925135",
+            "metageneration": "1",
+            "contentType": "application/octet-stream",
+            "storageClass": "STANDARD",
+            "size": "6158484",
+            "md5Hash": "QoSuPg1VlWZBvU+zH0qiRQ==",
+            "crc32c": "37FXxg==",
+            "etag": "CM+DrM3phYQDEAE=",
+            "timeCreated": "2024-01-30T19:16:33.043Z",
+            "updated": "2024-01-30T19:16:33.043Z",
+            "timeStorageClassUpdated": "2024-01-30T19:16:33.043Z",
+            "timeFinalized": "2024-01-30T19:16:33.043Z"
+          },
+          {
+            "kind": "storage#object",
+            "id": "waymo_open_dataset_motion_v_1_2_1/uncompressed/lidar_and_camera/training/10008eea95af27b0.tfrecord/1706642357241626",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Flidar_and_camera%2Ftraining%2F10008eea95af27b0.tfrecord",
+            "mediaLink": "https://storage.googleapis.com/download/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Flidar_and_camera%2Ftraining%2F10008eea95af27b0.tfrecord?generation=1706642357241626&alt=media",
+            "name": "uncompressed/lidar_and_camera/training/10008eea95af27b0.tfrecord",
+            "bucket": "waymo_open_dataset_motion_v_1_2_1",
+            "generation": "1706642357241626",
+            "metageneration": "1",
+            "contentType": "application/octet-stream",
+            "storageClass": "STANDARD",
+            "size": "5106179",
+            "md5Hash": "yTEGqDatAA8oyToEOzwRIw==",
+            "crc32c": "Q3vgWA==",
+            "etag": "CJqO2ZvqhYQDEAE=",
+            "timeCreated": "2024-01-30T19:19:17.358Z",
+            "updated": "2024-01-30T19:19:17.358Z",
+            "timeStorageClassUpdated": "2024-01-30T19:19:17.358Z",
+            "timeFinalized": "2024-01-30T19:19:17.358Z"
+          }
+        ]
+      }
+    },
+    "uncompressed/lidar_and_camera/validation/": {
+      "request": "https://storage.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o?prefix=uncompressed%2Flidar_and_camera%2Fvalidation%2F&delimiter=%2F&maxResults=3",
+      "http_status": 200,
+      "response": {
+        "kind": "storage#objects",
+        "nextPageToken": "CkJ1bmNvbXByZXNzZWQvbGlkYXJfYW5kX2NhbWVyYS92YWxpZGF0aW9uLzEwMDFlYmI2ZDM5MDVkOTIudGZyZWNvcmQ=",
+        "items": [
+          {
+            "kind": "storage#object",
+            "id": "waymo_open_dataset_motion_v_1_2_1/uncompressed/lidar_and_camera/validation/1000a444aa94927d.tfrecord/1706641261789622",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Flidar_and_camera%2Fvalidation%2F1000a444aa94927d.tfrecord",
+            "mediaLink": "https://storage.googleapis.com/download/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Flidar_and_camera%2Fvalidation%2F1000a444aa94927d.tfrecord?generation=1706641261789622&alt=media",
+            "name": "uncompressed/lidar_and_camera/validation/1000a444aa94927d.tfrecord",
+            "bucket": "waymo_open_dataset_motion_v_1_2_1",
+            "generation": "1706641261789622",
+            "metageneration": "1",
+            "contentType": "application/octet-stream",
+            "storageClass": "STANDARD",
+            "size": "5355562",
+            "md5Hash": "fFR5kl+nMLQSOry0FsKBWA==",
+            "crc32c": "9mMCaw==",
+            "etag": "CLaDrJHmhYQDEAE=",
+            "timeCreated": "2024-01-30T19:01:01.925Z",
+            "updated": "2024-01-30T19:01:01.925Z",
+            "timeStorageClassUpdated": "2024-01-30T19:01:01.925Z",
+            "timeFinalized": "2024-01-30T19:01:01.925Z"
+          },
+          {
+            "kind": "storage#object",
+            "id": "waymo_open_dataset_motion_v_1_2_1/uncompressed/lidar_and_camera/validation/1001824289d8eed3.tfrecord/1706641291884222",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Flidar_and_camera%2Fvalidation%2F1001824289d8eed3.tfrecord",
+            "mediaLink": "https://storage.googleapis.com/download/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Flidar_and_camera%2Fvalidation%2F1001824289d8eed3.tfrecord?generation=1706641291884222&alt=media",
+            "name": "uncompressed/lidar_and_camera/validation/1001824289d8eed3.tfrecord",
+            "bucket": "waymo_open_dataset_motion_v_1_2_1",
+            "generation": "1706641291884222",
+            "metageneration": "1",
+            "contentType": "application/octet-stream",
+            "storageClass": "STANDARD",
+            "size": "4570768",
+            "md5Hash": "sUXg4qMJ7mKJcFpZDfpYzA==",
+            "crc32c": "1yTmKQ==",
+            "etag": "CL7t2J/mhYQDEAE=",
+            "timeCreated": "2024-01-30T19:01:32.006Z",
+            "updated": "2024-01-30T19:01:32.006Z",
+            "timeStorageClassUpdated": "2024-01-30T19:01:32.006Z",
+            "timeFinalized": "2024-01-30T19:01:32.006Z"
+          },
+          {
+            "kind": "storage#object",
+            "id": "waymo_open_dataset_motion_v_1_2_1/uncompressed/lidar_and_camera/validation/1001ebb6d3905d92.tfrecord/1706641310150230",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Flidar_and_camera%2Fvalidation%2F1001ebb6d3905d92.tfrecord",
+            "mediaLink": "https://storage.googleapis.com/download/storage/v1/b/waymo_open_dataset_motion_v_1_2_1/o/uncompressed%2Flidar_and_camera%2Fvalidation%2F1001ebb6d3905d92.tfrecord?generation=1706641310150230&alt=media",
+            "name": "uncompressed/lidar_and_camera/validation/1001ebb6d3905d92.tfrecord",
+            "bucket": "waymo_open_dataset_motion_v_1_2_1",
+            "generation": "1706641310150230",
+            "metageneration": "1",
+            "contentType": "application/octet-stream",
+            "storageClass": "STANDARD",
+            "size": "4502909",
+            "md5Hash": "lB6G+MBXkhSDjocWLodunw==",
+            "crc32c": "4wQrXw==",
+            "etag": "CNbcs6jmhYQDEAE=",
+            "timeCreated": "2024-01-30T19:01:50.201Z",
+            "updated": "2024-01-30T19:01:50.201Z",
+            "timeStorageClassUpdated": "2024-01-30T19:01:50.201Z",
+            "timeFinalized": "2024-01-30T19:01:50.201Z"
+          }
+        ]
+      }
+    }
+  }
+}

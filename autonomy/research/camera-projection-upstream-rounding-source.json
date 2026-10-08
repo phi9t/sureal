@@ -1,0 +1,48 @@
+{
+  "source": "https://api.github.com/repos/waymo-research/waymo-open-dataset/issues/146/comments",
+  "response_sha256": "63026815b65e467470c9c8fc82be1b9538422e7e7cbef726a33bcc9f78e11b33",
+  "retrieved_date": "2026-10-01",
+  "comments": [
+    {
+      "id": 620284060,
+      "html_url": "https://github.com/waymo-research/waymo-open-dataset/issues/146#issuecomment-620284060",
+      "created_at": "2020-04-27T23:14:51Z",
+      "updated_at": "2020-04-27T23:14:51Z",
+      "body": "@ltskv \r\n\r\nThey should be identical. \r\n\r\n1. Yes, something like\r\n    matmul(pose.transform[0:3, 0:3]), points) + pose.transform[0:3, 3]\r\n\r\n2. no. The data should be sufficient. We produced the projection with the exactly same code.\r\n\r\nIf you have an example to reproduce your error, i can help with debugging.",
+      "author": "peisun1115"
+    },
+    {
+      "id": 620842025,
+      "html_url": "https://github.com/waymo-research/waymo-open-dataset/issues/146#issuecomment-620842025",
+      "created_at": "2020-04-28T20:38:59Z",
+      "updated_at": "2020-04-28T20:38:59Z",
+      "body": "That looks correct me to. Do you think you can try one experiment? Replace all float with double or float64. DT_FLOAT with DT_DOUBLE ?\r\n\r\nI was using the c++ api directly and was using double. ",
+      "author": "peisun1115"
+    },
+    {
+      "id": 621223164,
+      "html_url": "https://github.com/waymo-research/waymo-open-dataset/issues/146#issuecomment-621223164",
+      "created_at": "2020-04-29T13:52:31Z",
+      "updated_at": "2020-04-29T13:55:16Z",
+      "body": "@ltskv Thanks for trying it. I think the remaining \"error\" you are seeing is because of rounding error. What we provide in  RangeImage.camera_projection_compressed are rounded integers (std::floor) while you  are using float points as your final result. Can you help to try that?  ",
+      "author": "peisun1115"
+    },
+    {
+      "id": 621376464,
+      "html_url": "https://github.com/waymo-research/waymo-open-dataset/issues/146#issuecomment-621376464",
+      "created_at": "2020-04-29T18:12:26Z",
+      "updated_at": "2020-04-29T18:12:26Z",
+      "body": "@ltskv Thanks for the analysis. I've taken another look and played on my own. I found that there is another source of rounding error when I construct the range image. It should be very small in LiDAR space (cartesian vehicle frame). But it can be a couple of pixels in images in the worst case as you can see which is totally expected as image has much higher resolution than LiDAR. ",
+      "author": "peisun1115"
+    },
+    {
+      "id": 621684991,
+      "html_url": "https://github.com/waymo-research/waymo-open-dataset/issues/146#issuecomment-621684991",
+      "created_at": "2020-04-30T08:13:26Z",
+      "updated_at": "2020-04-30T08:13:46Z",
+      "body": "> @ltskv Thanks for the analysis. I've taken another look and played on my own. I found that there is another source of rounding error when I construct the range image. It should be very small in LiDAR space (cartesian vehicle frame). But it can be a couple of pixels in images in the worst case as you can see which is totally expected as image has much higher resolution than LiDAR.\r\n\r\nDo you mean this rounding error is due to the lidar coordinates being encoded by their pixel positions in the range image? If this is the case, then I guess there's no way to eliminate the remaining discrepancy without changing the dataset format. Would you then say that the data in `RangeImage.camera_projections_compressed` is more accurate and \"true\" than what I obtain when projecting from lidar, or does it have an uncertainty of few pixels, so that for the practical purposes both ways of obtaining the projections are equally good?",
+      "author": "ltskv"
+    }
+  ],
+  "scope": "upstream first-person implementation explanation, not proof for our frame"
+}

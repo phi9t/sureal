@@ -1,0 +1,59 @@
+"""Host-only negative controls: no daemon, fixture thread, tool or goal effects."""
+import importlib.util
+from pathlib import Path
+import socket
+import threading
+import unittest
+
+
+spec = importlib.util.spec_from_file_location('fixture_operator', Path(__file__).with_name('native_stop_fixture.py'))
+fixture = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(fixture)
+
+
+class WireControls(unittest.TestCase):
+    def test_handshake_eof_is_bounded(self):
+        # A peer closes before Upgrade: the client must not spin on repeated EOF.
+        import tempfile
+        with tempfile.TemporaryDirectory() as temporary:
+            endpoint = str(Path(temporary)/'socket')
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as server:
+                server.bind(endpoint)
+                server.listen(1)
+                def peer():
+                    with server.accept()[0] as connection:
+                        connection.recv(4096)
+                worker = threading.Thread(target=peer)
+                worker.start()
+                try:
+                    with self.assertRaises(EOFError):
+                        fixture.Wire(endpoint)
+                finally:
+                    worker.join(timeout=2)
+
+    def test_partial_and_masked_server_frame_refuse(self):
+        for header in (b'\x01\x00', b'\x81\x80'):
+            with self.subTest(header=header):
+                left, right = socket.socketpair()
+                try:
+                    wire = fixture.Wire.__new__(fixture.Wire)
+                    wire.connection, wire.buffer = left, header
+                    with self.assertRaises(ValueError):
+                        wire.receive()
+                finally:
+                    left.close()
+                    right.close()
+
+    def test_invalid_id_cannot_inject_unit_or_command(self):
+        for value in ('../outside', 'a;pwd', 'a\nother', '', 'UPPER'):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                fixture.fixture_command(Path('/source.py'), Path('/owned'), value)
+
+    def test_shell_quoting_preserves_exact_paths(self):
+        import shlex
+        argv = shlex.split(fixture.fixture_command(Path('/space dir/$(x).py'), Path('/owned;path'), 'probe-1'))
+        self.assertEqual(argv[-7:], ['--', 'python3', '/space dir/$(x).py', 'payload', '--output', '/owned;path', '--fixture-id', 'probe-1'][-7:])
+
+
+if __name__ == '__main__':
+    unittest.main()

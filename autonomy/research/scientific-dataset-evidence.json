@@ -1,0 +1,12 @@
+{
+  "status": "preparation evidence; no scientific gate closure",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/scientific-dataset-live-d/receipt.json",
+  "receipt_sha256": "d27fa1605ff20369c3b85dc702a0fb48c19f3fe12f493c7bdcbd3a0c47313d56",
+  "validation": {
+    "records": 1980,
+    "points": 36214548,
+    "identity_array_digest": "0c0db9eeeb288fee37870b78024a7e05f05c1cf4efefeb4a7608867f6536f256",
+    "status": "all returned arrays independently match verified source point records"
+  },
+  "scope": "two full engineering-scene archive replays; scientific cohort loader admission/protocol and model outcomes remain open"
+}

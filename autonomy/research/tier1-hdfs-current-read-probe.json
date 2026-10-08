@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+    "--error-format",
+    "json",
+    "ls",
+    "hdfs://harunava/user/tiger/waystone/sureal/"
+  ],
+  "status": "timeout",
+  "elapsed_seconds": 20.029841387004126
+}

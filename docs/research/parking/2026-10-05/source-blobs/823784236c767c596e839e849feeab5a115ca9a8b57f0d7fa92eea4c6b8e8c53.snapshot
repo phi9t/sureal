@@ -1,0 +1,46 @@
+"""Actual read-only /proc and private-file boundaries, never native fixtures."""
+import importlib
+import os
+from pathlib import Path
+import tempfile
+import unittest
+from unittest.mock import patch
+
+
+class ProbeOS(unittest.TestCase):
+    def setUp(self):
+        try:self.module=importlib.import_module('audit_support.probe_os')
+        except ModuleNotFoundError:self.fail('Independent kernel/process coverage helper missing')
+
+    def test_pid_reuse_or_wrong_boot_refuses_actual_identity(self):
+        own=self.module.birth(os.getpid())
+        for key,bad in [('boot_id','wrong-boot'),('start_ticks',own['start_ticks']+1)]:
+            pin={**own,key:bad}
+            with self.assertRaises(ValueError):self.module.assert_birth(pin)
+
+    def test_owned_write_fd_is_observed_without_unrelated_path_or_contents(self):
+        with tempfile.TemporaryDirectory(prefix='a50-fd-') as tmp:
+            root=Path(tmp);path=root/'private-data'
+            with path.open('w') as handle:
+                handle.write('not retained');handle.flush()
+                facts=self.module.writer_scan([root],only_pids=[os.getpid()])
+                self.assertEqual(facts['errors'],[])
+                self.assertTrue(any(hit['kind']=='write-fd' and hit['path']==str(path) for hit in facts['hits']))
+                self.assertNotIn('not retained',str(facts))
+            self.assertEqual(self.module.writer_scan([root],only_pids=[os.getpid()])['hits'],[])
+
+    def test_live_payload_with_missing_native_parent_is_a_coverage_gap(self):
+        identity={'boot_id':'boot','pid':123,'start_ticks':456,'parent_pid':222,'uid':os.getuid()}
+        fixture={'tool_scope':{},'payload_process':identity,'workspace':'/owned/worktree',
+                 'output':'/owned/output','common_git':'/owned/git'}
+        def actual(pid):
+            if pid==123:return identity
+            raise FileNotFoundError('missing actual parent')
+        with patch.object(self.module,'scope_read',return_value={'members':[123]}),\
+             patch.object(self.module,'birth',side_effect=actual),\
+             patch.object(self.module,'writer_scan',return_value={'hits':[],'errors':[]}):
+            with self.assertRaises(ValueError):
+                self.module.capture_kernel(fixture,{'daemon':{'pid':999}}, {})
+
+
+if __name__=='__main__':unittest.main()

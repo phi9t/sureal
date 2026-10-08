@@ -1,0 +1,21 @@
+import json,hashlib
+from pathlib import Path
+import numpy as np
+from pipeline.anchor_grid import anchor_grid
+from pipeline.detector_decode import decode_proposals
+spec=json.loads(Path('/experiment/research/training-anchor-templates.candidate.json').read_text());templates=np.array([x['values'] for x in spec['templates']]);anchors=anchor_grid(nx=512,ny=512,cell_size=(.25,.25),origin=(-64.,-64.),templates=templates)
+reports=[]
+for step in [25,2000]:
+ file=Path('/source')/('checkpoint-%04d'%step)/'heads-00.npz'
+ with np.load(file,allow_pickle=False) as data:logits=data['classification'].astype(float);residuals=data['box_residuals'].astype(float);direction=data['direction'].astype(float)
+ assert np.isfinite(logits).all() and np.isfinite(residuals).all() and np.isfinite(direction).all()
+ probability=np.exp(-np.logaddexp(0,-logits));scores=probability.max(1);indices=np.arange(len(scores));candidate=indices[scores>=.05];chosen=candidate[np.lexsort((candidate,-scores[candidate]))][:4096]
+ with np.errstate(over='ignore',under='ignore'):
+  dims=np.exp(residuals[:,3:6])*templates[indices%8,:3]
+ invalid=(~np.isfinite(dims)).any(1)|(dims<=0).any(1)
+ error=None
+ try:decode_proposals(logits,residuals,direction,anchors,iou_threshold=.5,score_floor=.05,pre_limit=4096,post_limit=500)
+ except ValueError as e:error=str(e)
+ assert (error is not None)==bool(invalid.any())
+ reports.append({'step':step,'heads_sha256':hashlib.sha256(file.read_bytes()).hexdigest(),'head_values_finite':True,'log_dimension_residual_range':[float(residuals[:,3:6].min()),float(residuals[:,3:6].max())],'invalid_decoded_dimensions_all_anchors':int(invalid.sum()),'invalid_above_score_floor':int(np.count_nonzero(invalid&(scores>=.05))),'invalid_in_preNMS4096':int(invalid[chosen].sum()),'decoder_error':error})
+Path('/outputs/check.json').write_text(json.dumps({'variant':'no_norm','scope':'independent literal decoded-dimension failure count plus original decoder refusal; no native quality claim','checkpoints':reports},indent=2)+'\n');print('PASS independent no-norm decoder failure diagnosis',reports)

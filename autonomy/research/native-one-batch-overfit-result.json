@@ -1,0 +1,33 @@
+{
+  "scope": "one fixed training batch from first preregistered frame; all17 eligible native boxes retained; no heldout claim",
+  "identity": "7912728502266478772_1202_200_1222_200:1506905332721474",
+  "updates": 2000,
+  "loss_gate_passed": true,
+  "initial_loss": 5954.59423828125,
+  "final_loss": 0.05814296752214432,
+  "LEVEL2_per_class": {
+    "1": {
+      "AP": 1.0,
+      "APH": 0.998079
+    },
+    "2": {
+      "AP": 1.0,
+      "APH": 0.988051
+    },
+    "3": {
+      "AP": 0.284091,
+      "APH": 0.226459
+    }
+  },
+  "mean_populated_class_APH": 0.7375296666666666,
+  "APH_gate_passed": false,
+  "overall_one_batch_gate_passed": false,
+  "independent_checkpoint_loss_decode_nms_geometry_export_and_metric_audits": true,
+  "evidence": {
+    "native-one-batch-overfit-execution-verified.json": "0a62da5aae69954c42b2d4d49de866c33d4498e2bc358d51c6fb621b26971f28",
+    "native-one-batch-overfit-training-audit-verified.json": "2075a4849cac4bb68ee488ed300d825fd95ca211209d83ab45ec282918f5368f",
+    "native-one-batch-overfit-scoring-verified.json": "8c6769f17fc4c8d7ab5d86ec90d27c3a8450b8f44cc240a4dce74c0852856bb8",
+    "native-one-batch-score-audits-verified.json": "12a8a9ccb8b6367879cfa63e2c44370c4cb54c746790d7b52663eb771f90cdd8"
+  },
+  "decision": "needs-more-evidence: near-perfect vehicle/pedestrian memorization, signs fail; diagnose thin-box assignment/localization and uncovered GT before changing recipe"
+}

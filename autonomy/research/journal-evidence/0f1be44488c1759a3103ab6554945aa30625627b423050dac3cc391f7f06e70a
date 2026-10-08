@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "kind": "independent-kata-inventory-source-review",
+  "candidate": "9cd484da8c4038cf5fe6422e3cd5c63b5f148a17",
+  "parent": "b32307da442598e192a9259d29a8650be1134589",
+  "tree": "922568b2e6294dff2e4bea8d65a5b6923d08f508",
+  "source": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-lead-20261005a",
+  "verdict": "pass",
+  "findings": [],
+  "author": {
+    "agent": "/root",
+    "native_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24"
+  },
+  "reviewer": {
+    "agent": "/root/collab_execution_admission_review",
+    "native_thread_id": "01a105a5-de93-74a3-adad-c5184f54a751"
+  },
+  "reviewer_native_thread_id": "01a105a5-de93-74a3-adad-c5184f54a751",
+  "reviewed_ms": 1791162943051,
+  "scope": [
+    "scripts/_collab/kata.py",
+    "tests/collab/test_kata.py"
+  ],
+  "source_pins": [
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-lead-20261005a/scripts/_collab/kata.py",
+      "sha256": "4227929c80fe1290deb72af738d706dd7f445e6ed840eb978b7f347891307003"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-lead-20261005a/tests/collab/test_kata.py",
+      "sha256": "2e9dcf2674dc71a0b2b0e7b0b6755bf33775c746d7c7d317f8e5396a61fd8a93"
+    }
+  ],
+  "assessment": "Exact one-line change uses project-scoped list --status all --limit0. _argv still binds exact project/workspace/actor; it does not use cross-project --all. Closed prerequisite49 retains its native UID in the stable inventory, so dependent task import can resolve it. Existing duplicate-stable-task and foreign-project guards remain unchanged. The added real isolated-Kata regression imports49, closes it, then verifies the same UID is still enumerated.",
+  "verification": {
+    "own_host_checks": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab58-kata-inventory-review-9cd484d/result.json",
+      "sha256": "8d517de3b535d3cb396849bffcee9631134511f6a2fb31b4438d92fc309c542e"
+    },
+    "own_actual_command": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab58-kata-inventory-review-9cd484d/actual-command.json",
+      "sha256": "6cf53e8f27d66c69b3f32f42cfebd12f29535e45d4e74c7664e65bd48d1cb6da"
+    },
+    "own_controls_passed": 2,
+    "own_native_effects": false,
+    "git_diff_check": "passed",
+    "frozen_source_reopened": "both changed files bytes match exact candidate Git blobs",
+    "author_native_regression": "Author reports original missing-closed49 RED then all12test_kata tests GREEN49.525s at512MiB/swap0 (tool03be65/tool3b84d0); this review inspected the real fixture/test source and did not rerun native effects or independently claim that tool execution."
+  },
+  "baseline_verification_scope": "Bounded source correctness plus two own host-only controls of literal production methods. Parent/source base b32307da; no broader suite, new adversarial matrix or independent liveInsula execution.",
+  "acceptance_scope": {
+    "source_patch_accepted": true,
+    "worker_dispatch_accepted": false,
+    "live_insula_accepted": false,
+    "task50_closed": false,
+    "task53_closed": false,
+    "native_E_launched": false,
+    "scientific_training_or_grants_accepted": false
+  },
+  "disposition": "No canonical/source/native writes. Own scoped host controls ended; reviewer idle. Original stale-base import refusal and separate successful fresh-base import chronology remain unchanged; no old issue reopen/claim was performed by reviewer."
+}

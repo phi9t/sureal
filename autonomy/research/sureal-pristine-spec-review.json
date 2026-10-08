@@ -1,0 +1,42 @@
+{
+  "axis": "Spec",
+  "base": "c5679f6140836cb7e3ed46df559290590961119e",
+  "scope": "Eight cached metadata paths; user-authorized obsolete proposal/provenance reconciliation",
+  "findings": [],
+  "checks": {
+    "accepted_root_sha": true,
+    "accepted_root220lines": true,
+    "accepted_base_identical": true,
+    "root_status_empty": true,
+    "archive_docs/superpowers/specs/2026-10-03-first-class-models-training-design.md": true,
+    "archive_.scratch/models-training-proposal-preservation-20261004-32fd3ea7/held-root-design-during-docs-merge.md": true,
+    "archive_.scratch/models-training-proposal-preservation-20261004-32fd3ea7/owned-root-design.md": true,
+    "archive_.scratch/models-training-proposal-preservation-20261004-32fd3ea7/preservation.json": true,
+    "archive_experiments/waymo-perception/resources.tmp-design.md": true,
+    "note_snapshot_exact": true,
+    "116_chain": true,
+    "eight_metadata_paths": true,
+    "no_stale_proposal_staged": true,
+    "archive_manifest_exact": true,
+    "all116_evidence_snapshots_exact": true
+  },
+  "staged_sha256": {
+    "experiments/waymo-perception/research/2026-10-04-canonical-source-reconciliation.md": "31ced250de71e279db9e3985468a42cbcb93158fb86972cb7cd324b29e09ac7e",
+    "experiments/waymo-perception/research/2026-10-04-post-closeout-stage-handoff.md": "ecab16ec9f6252de3ca85c72d8dc4595c51792f1c18535cae19d49e1a1949635",
+    "experiments/waymo-perception/research/journal-evidence/31ced250de71e279db9e3985468a42cbcb93158fb86972cb7cd324b29e09ac7e": "31ced250de71e279db9e3985468a42cbcb93158fb86972cb7cd324b29e09ac7e",
+    "experiments/waymo-perception/research/journal-evidence/517aaf1d99184164048df000ebd3958abc64de59f0e55b285452e3f40d5983bc": "517aaf1d99184164048df000ebd3958abc64de59f0e55b285452e3f40d5983bc",
+    "experiments/waymo-perception/research/journal-evidence/8b3d1feae72d421e4bb2ae1082a78fb0fa631b6c42ae5ac10a149ee6f8cc18d1": "8b3d1feae72d421e4bb2ae1082a78fb0fa631b6c42ae5ac10a149ee6f8cc18d1",
+    "experiments/waymo-perception/research/research-journal.jsonl": "2c53c39781c751ffa1e3047b9138015b32a3d3696e0cec69faec9dc9be791ecc",
+    "experiments/waymo-perception/research/research-journal.md": "121c61e5d060671fb8e28f0e0a6d1532a796860f0469aaeafb44ca2e85794f02",
+    "experiments/waymo-perception/research/sureal-canonical-source-reconciliation.json": "8b3d1feae72d421e4bb2ae1082a78fb0fa631b6c42ae5ac10a149ee6f8cc18d1"
+  },
+  "assessment": "Suitable documentation/evidence landing; authorized canonical-source restoration and exact preserved relocation correctly scoped. No full protocol/process/worker/runtime/scientific admission follows.",
+  "remaining_gates": [
+    "retained worker19 implementation blockers",
+    "foreign design/user reconciliation",
+    "retained process/writer disposition and quiescence admission",
+    "published transition recheck before protocol activation"
+  ],
+  "evidence_role": "Journal116 and reconciliation are Git-only bookkeeping, not sealed HDFS epoch extension. Unique resource-note snapshot is historical scratch evidence, not accepted implementation.",
+  "repo_index_unchanged_by_reviewer": true
+}

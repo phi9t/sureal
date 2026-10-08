@@ -1,0 +1,16 @@
+import pathlib,sys,json,shutil
+P=pathlib.Path('/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception');R=P/'research';sys.path.insert(0,str(P))
+from tracking.journal import append_entry,read_entries
+for name in ['sureal-comprehensive-closeout-inventory.json','sureal-comprehensive-closeout-reconcile.json']:
+ shutil.copyfile(pathlib.Path('/tmp')/name,R/name)
+entry=append_entry(R/'research-journal.jsonl','decision',['balanced16-sustained-baseline-controller20261003a','research-integration-closeout'],
+ 'User explicitly requests comprehensive closeout immediately after the current task: no new implementation before landing all ready owned tracked/untracked work to phi9t/mainline. Inventory2486outstanding paths includes1161scratch/cache excluded,157support,1138reports/docs,21specs/plans,9already-integrated identical. Reconcile work09365ac onto integration0823cbbb without discarding any owned bytes: exact collision backups and retained stash5a67cda5; nine identical paths restored from mainline, two divergent old README/roadmap retained for deliberate review, three dirty research docs reapplied with no conflicts, only timestamp-view churn excluded. Root32fd models/training owner draft remains unstaged and untouched; documentation51 already integrated viaa3c6955. Independent Standards/Spec/live-evidence reviews now gate scoped readiness, not a blanket admission. Raw embedded image previews, credential/cache/scratch and synchronizationlocks stay outsideGit; preserve any blocked source locally plus bounded HDFS snapshot. Current resource integration remains partial, native295/host23/resource26, original0/1000 checkpoints/state/GT/gates unchanged; no newfit/relaunch/migration/Kataactivation. After closeout, execution dependency order remains fullresource admission then frozen serial four-recipe sweep,42measurementledger→43frozen-weightnorm diagnostics, isolated41.2 ownership; do not start these during integration. Every unlanded item will have exact path/blocker/disposition in final inventory.',
+ [R/'sureal-comprehensive-closeout-inventory.json',R/'sureal-comprehensive-closeout-reconcile.json'])
+entries=read_entries(R/'research-journal.jsonl');notes=['# Research journal','','Append-only observations, hypotheses, decisions and follow-up work. Evidence snapshots and entry hash chains preserve what was known at the time.']
+for e in entries:
+ notes+=['',f"## {e['sequence']}. {e['utc']} — {e['category']}",'',', '.join(e['experiments']),'',e['content']]
+ if e['evidence']:notes+=['','Evidence: '+', '.join(f"[{pathlib.Path(a['path']).name[:12]}]({a['path']})" for a in e['evidence'])]
+(R/'research-journal.md').write_text('\n'.join(notes)+'\n')
+ledger=P.parents[1]/'.superpowers/sdd/2026-10-03-balanced16-sustained-overfit/progress.md'
+with ledger.open('a') as stream:stream.write('\nComprehensive closeout overrides the earlier narrow exclusion ruling: inventory all2486owned outstanding paths, independently review/live-verify every ready scope, land tophi9t/mainline before more implementation. Work FF0823preserves ownedtracked/untracked, collisionbackup/stash retained. Unready41.2/runtime/fullrunner work gets exact blocker/disposition; no new optimizer updates or migration. Journal'+str(entry['sequence'])+' head'+entry['sha256']+'.\n')
+print('RECORDED',entry['sequence'],entry['sha256'])

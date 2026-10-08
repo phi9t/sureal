@@ -1,0 +1,15 @@
+{
+  "scene": "10082223140073588526_6140_000_6160_000",
+  "membership": {
+    "official_split": "training",
+    "research_splits": [
+      "development"
+    ]
+  },
+  "manifest_sha256": "c181a07edc21731a3e1b74a2274e286c9bc4207e6e0c46e6a1f2403978608370",
+  "capture_receipt_sha256": "4f8447372622496abfb84c796f315ab938c838ca7da874b0e61c8a919ae10e1a",
+  "checkpoint_sha256": "6c4df0d46837d8298465d56a0c0c1299579feaf6cc4a24e29c72401c3e597afc",
+  "publication_receipt_sha256": "b4934eca14892bd65ba26ec7d62097cc041fe09400a9f5a524f50bb41470f51f",
+  "report_sha256": "1bff033ecf0397141515b8e59d52ed375fbc663f70682d7b38e177f2fca164d9",
+  "scope": "retained capture and independently admitted publication identities agree"
+}

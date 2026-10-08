@@ -1,0 +1,430 @@
+{
+  "schema_version": 1,
+  "kind": "independent-perception-preparation-source-result-review",
+  "candidate": "88eb369fdb5b512f9a0e3241f6e2f3dacd6f4530",
+  "parent": "4c47fa13b892fa8dc96196dad0d694aa4c507657",
+  "tree": "34cbdcfc115cb03138a8df8eca42b38672f6574f",
+  "source": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-integration-20261005a",
+  "verdict": "pass",
+  "findings": [],
+  "author": {
+    "agent": "/root/happy58_failure_ledger",
+    "native_thread_id": "01a109a1-c007-73f3-b9d1-ebfb2177c571"
+  },
+  "refresh_operator": {
+    "agent": "/root",
+    "native_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24"
+  },
+  "reviewer": {
+    "agent": "/root/collab_execution_admission_review",
+    "native_thread_id": "01a105a5-de93-74a3-adad-c5184f54a751"
+  },
+  "reviewer_native_thread_id": "01a105a5-de93-74a3-adad-c5184f54a751",
+  "reviewed_ms": 1791164365100,
+  "normative_ticket": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-integration-20261005a/docs/research/tasks/58-mac-happy-path-perception-pilot.md",
+    "sha256": "ccafd7dc2a28a7b2f71ba96e7e1f4f459cabdcb264e6dbf624cf0f737c268497"
+  },
+  "own_result": {
+    "path": "/data02/home/philip.yang/devx/tmp/mac58-a-review-88eb369-controls/result.json",
+    "sha256": "8c034d245811d4bbcc05e4d22be364e82c472f8dadb4df41f89461e62e3d0e29"
+  },
+  "own_actual_command": {
+    "path": "/data02/home/philip.yang/devx/tmp/mac58-a-review-88eb369-controls/actual-command.json",
+    "sha256": "e4a67cb00052438aca94c35996e08dd37866c9dff5abea2d4b0c28e69ee0a5a3"
+  },
+  "fresh_live_receipt": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/a-refresh-live-v1/live-receipt.json",
+    "sha256": "93b0f506cfd48e8fe28294088a7ba0374dc4883503e17b715e17139cf63147d7"
+  },
+  "handoff": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-a/handoff.json",
+    "sha256": "8051d8f740cc07ae89b48d3a7a7955e81e661dd812716faf4bcb3cf20872cf61"
+  },
+  "runtime_lock": {
+    "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2.lock.json",
+    "sha256": "a8cc19c5f448b5b54cb4f09f0991688be1fe74a748387feb1a6bb99a52137030"
+  },
+  "evidence": [
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-integration-20261005a/docs/research/pilots/58/failure-ledger/README.md",
+      "sha256": "29ddc7df1aacf5c920dfcf38a6b840500ad36289b6fbf03c70c1ec6dc64948c3"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-integration-20261005a/docs/research/pilots/58/failure-ledger/live-receipt.json",
+      "sha256": "cd4d26dde02b16c64cc6d93c32132246e7d142f2a45001de7f2286f6bc1b6eb9"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-integration-20261005a/docs/research/pilots/58/failure-ledger/provenance.json",
+      "sha256": "b2f2fb4022697c2eba00cff27a4571b2fe72c2473270614cb31f6e51b8552feb"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-integration-20261005a/docs/research/pilots/58/failure-ledger/reconciliation.json",
+      "sha256": "c37ed8638d08b844e9f8c9cb45fe6bae65b0c8c95b834387442c2c9cca474f37"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-integration-20261005a/docs/research/pilots/58/failure-ledger/row-schema.json",
+      "sha256": "b2b227f517712ea4865c5e5cb180627b7dc48bf2de8bd1c29529adbc183fa917"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-integration-20261005a/docs/research/pilots/58/failure-ledger/uncovered-rows.json",
+      "sha256": "eddbabf4f199a898103590a36abc7bb41f1233c15eb4b2fabd52dbf7e8ff50a7"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-integration-20261005a/docs/research/pilots/58/failure-ledger/verify_preparation.py",
+      "sha256": "c5eda90004ce7bfc83c3074ab19e4b28d17661972cf233608f2a51a9cbca7cdc"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-integration-20261005a/docs/research/pilots/58/failure-ledger/provenance.json",
+      "sha256": "b2f2fb4022697c2eba00cff27a4571b2fe72c2473270614cb31f6e51b8552feb"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-export-v1/output/groundtruth.json",
+      "sha256": "63c3ae4827ae88cd1d77e4ad34017fd1e564e4087c502d7ca255bf5c72f63143"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-causes-v1/output/check.json",
+      "sha256": "051948447cafda82cf58e3432ab597a8e0d117c74ba5a7b53d1cad58d2d4f82b"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-causes-v1/input/manifest.json",
+      "sha256": "ab2ffa9c3652c24118ad3f52a0011f7e2895b3f3b82b64b86903dde51f84a675"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-causes-v1/input/anchor-templates.json",
+      "sha256": "4bcc69590d664b32ff1ece5e8f00345c76f9564f419b091bf05f6482a5c56d52"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-causes-v1/code/worker.py",
+      "sha256": "0b1958df15b9f2f107ebba67f483ef52f4383927a01bc4ad9524d0647caf39ed"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-oracle-native-v1/prepared/check.json",
+      "sha256": "e566171ce68d0c958369fc369a7e822e67d71ab9255200694d8da11c7b075c30"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/research/balanced16-coverage-causes-verified.json",
+      "sha256": "4f4a111755a24e41e8069ac98ec6e3d480c5181ec56f0dce7d7552489854730b"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/research/balanced16-historical-v3-fullgt-metrics-verified.json",
+      "sha256": "6a59512f16a9cbc927f53f71f0cb75470e3e5dfe8bd62c882b0329c590cb0f50"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/research/balanced16-coverage-oracle-native-verified.json",
+      "sha256": "509b526abb9936434388ca78a5c7d69344db2e27ad248c73b5e1a14a72ec4f7d"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/research/balanced16-coverage-oracle-audit-verified.json",
+      "sha256": "731b3a4bf442bbb65a9a12a10bc9292ff95fe5afcd2d9fcd6d6b45d06483ce0f"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.md",
+      "sha256": "9811738e5e819da4708a36c7abf00bd655287d3bb9fe7d3e7fe8ee441803ecde"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.json",
+      "sha256": "7cca76e837ee4b54994fd8760a41c96ee4796a1dfe6a399aaf68630dc23b6616"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.py",
+      "sha256": "a71bcc23281a09c7a5d4c9e20889b16a4027eb8bdeecc7a36476133380eaf96d"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/research/2026-10-03-initial-experiments-evidence-audit.md",
+      "sha256": "9b4dfcf36dacae5ccbe6a7e21267891ac56766e77e3a7db5221034d27d353473"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/analysis/balanced16-coverage-causes.py",
+      "sha256": "0b1958df15b9f2f107ebba67f483ef52f4383927a01bc4ad9524d0647caf39ed"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/pipeline/anchor_assignment.py",
+      "sha256": "f8c5e2cefdd69ab25428d39474ab2b2e89ae17d469de3d89ac1a4143ce5d2464"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/pipeline/anchor_grid.py",
+      "sha256": "2846a69b632483f9553523954ab72fd9af4672edf1c628d79333333cc762b60e"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/cohort/overfit_detection_targets_v2.py",
+      "sha256": "f368358b6e6c6daab577cf803634b0aa625da6547f09ee119d8d8e21b7e9aa93"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/pipeline/detector_decode.py",
+      "sha256": "8e1927dd072df3752021561ba0ac9ffe14b95405995a3f4c1f29d4088935dade"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/pipeline/insula_entry.py",
+      "sha256": "4ad731aff9057550db8a3c2d194f7b23a1447ef11b8f3d58ec7344f6132209b2"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-20261005a/experiments/waymo-perception/pipeline/runtime_identity.py",
+      "sha256": "fbecd514661535d32cbd7c25cc208a60d50728e9d9469d1a82b9979d1261adf2"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13840133134545942567_1060_000_1080_000/1558402354862835/producer/report.json",
+      "sha256": "2c75baeb739ffdc4e452b8403216a91f38052bc288220b9e490cc637801a7e6d"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13840133134545942567_1060_000_1080_000/1558402354862835/producer/targets.npz",
+      "sha256": "e466ddafa4f8a532635f23e994f82a2cf5a5a873d980570443f0cfe3f43d5eee"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450680964094/producer/report.json",
+      "sha256": "a82bd72c0d22006e2cfc99a95c34ff0803b48ebab086543dc30cffc8c574815b"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450680964094/producer/targets.npz",
+      "sha256": "31154e86a66091de71e79e241b0c059f22997cc3c6fef4083c89e1b0b6ac4f89"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/17885096890374683162_755_580_775_580/1506906083489022/producer/report.json",
+      "sha256": "905d9de37d5aff7224e85b53107a2bcb689723ca7c6cb55880afc2e287c5eb1d"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/17885096890374683162_755_580_775_580/1506906083489022/producer/targets.npz",
+      "sha256": "cf367ef39f254971e289e25277d9e5dfff48e6306c4c4a9f86d31c98a0eb12f3"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/4575961016807404107_880_000_900_000/1544656166412547/producer/report.json",
+      "sha256": "0860b38f1c8abc859f7fbe3b570340ca1edf955ddcef1f26ed631f3ff52dec08"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/4575961016807404107_880_000_900_000/1544656166412547/producer/targets.npz",
+      "sha256": "87f75e117a13feb7d017fed2cab5175ee0aba70c8150595b3519e143e3453e52"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13506499849906169066_120_000_140_000/1552353849872908/producer/report.json",
+      "sha256": "bc6114752ed55e86dfcdc290342f3bb4e22d4d3ee1fb3eb242a5c31dd4a167dc"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13506499849906169066_120_000_140_000/1552353849872908/producer/targets.npz",
+      "sha256": "77f5d5301ac4dffa06f1f51b8467ea0bced7a4877ba464998d758df3540afb91"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450685964257/producer/report.json",
+      "sha256": "000c3bf495fdd40c2fe7b6dd2c1234f46f3b16f9c9236c9a29889dac6d3cea49"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450685964257/producer/targets.npz",
+      "sha256": "f457453de529ebe27f84e0b2b2e96a4cc697eb2fe5ce5b5ad4cc6e3bdb8a1d15"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/15696964848687303249_4615_200_4635_200/1507241626220091/producer/report.json",
+      "sha256": "d77f0224ddf9be0339138e930113842a04877cdaf6fc5bdc797c41613d9afb38"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/15696964848687303249_4615_200_4635_200/1507241626220091/producer/targets.npz",
+      "sha256": "5b651ebb7b8a8c4a70d61c64ff3b085e90fb5cc45338512ebb8dc667d1898227"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450679864286/producer/report.json",
+      "sha256": "e671e3f2bbe59489357e1a789d6ce5e97796366692237eb6378727407aa08c76"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450679864286/producer/targets.npz",
+      "sha256": "f18bbd165a1ab973913dd61ef14d7a6aa4e13e705daec6f581fe9c7e56fde892"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/12856053589272984699_1020_000_1040_000/1552658368873652/producer/report.json",
+      "sha256": "bdca1e5495f4a7606a9444cee21cb9f7b2fbf5f49a39afeee4b0466ec5517dbc"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/12856053589272984699_1020_000_1040_000/1552658368873652/producer/targets.npz",
+      "sha256": "757f613ac6cb4c796953df26d69e4aaefada3f14c1565793da22c522250ad9f1"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/15628918650068847391_8077_670_8097_670/1508889335260598/producer/report.json",
+      "sha256": "894074d630dbdc9c040b4ce26727c5abb06270be471919aa6d69828ce971d50c"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/15628918650068847391_8077_670_8097_670/1508889335260598/producer/targets.npz",
+      "sha256": "667360615a440664252a23aa2373351467276488a8585ae2d02fa051dd2a49cf"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7850521592343484282_4576_090_4596_090/1520908476792400/producer/report.json",
+      "sha256": "f2f7de09677be596e0b4ad0ebbfe2f631df082f1aedacdc2db061523ead9b259"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7850521592343484282_4576_090_4596_090/1520908476792400/producer/targets.npz",
+      "sha256": "8d3d56f93ac33cd673f1e866f9f3f0c23e2a9c8ed2909a52a8d196ce030983cf"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7921369793217703814_1060_000_1080_000/1557159628222386/producer/report.json",
+      "sha256": "aa39c096d3b7c38966c354ebe491c81d9dc3c784d3f287ac3725fa81e1eaeeff"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7921369793217703814_1060_000_1080_000/1557159628222386/producer/targets.npz",
+      "sha256": "c045c0035938a6defb515d46414b4c2b97a4e93fc48328e4e48ee956f7ebb3cb"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7921369793217703814_1060_000_1080_000/1557159618222385/producer/report.json",
+      "sha256": "fe85ad826d173523a3a870e2dd4e02cd54095398e75841cdb2504a8d6de4547d"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7921369793217703814_1060_000_1080_000/1557159618222385/producer/targets.npz",
+      "sha256": "4ba94168b2a2dfd186e786c393efea572b501671bc93d831afccca676390fe20"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13830510593707564159_5575_000_5595_000/1518657072511849/producer/report.json",
+      "sha256": "9ac14d4f4b250a62e092788855d63d209d183028040ff5dad63ba684b3325325"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13830510593707564159_5575_000_5595_000/1518657072511849/producer/targets.npz",
+      "sha256": "293a9e0304860f0ca557f2b9f0afb91299ab24f4d130c3821269d2a2ea04dd6f"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/11004685739714500220_2300_000_2320_000/1553640277306703/producer/report.json",
+      "sha256": "c53bec18d813a920ee31ba7dd2278e7c87e413095a165c06b34efbf0b28c702e"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/11004685739714500220_2300_000_2320_000/1553640277306703/producer/targets.npz",
+      "sha256": "16dcae515fd4926ccd03c95135cd887b1f7f63f27d56b64b064189461cb17c7a"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/3966447614090524826_320_000_340_000/1553023288374080/producer/report.json",
+      "sha256": "3bac20161995c774046fd36ae11e15bb3106a9b49b3cbb97c5f1298cb497ee5b"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/3966447614090524826_320_000_340_000/1553023288374080/producer/targets.npz",
+      "sha256": "c9250a56cb91e276ed74880f282dd504966941f7cefd31535bdb857d3fbb4527"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-historical-v3-fullgt-export-v1/output/groundtruth.json",
+      "sha256": "63c3ae4827ae88cd1d77e4ad34017fd1e564e4087c502d7ca255bf5c72f63143"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-causes-v1/input/manifest.json",
+      "sha256": "ab2ffa9c3652c24118ad3f52a0011f7e2895b3f3b82b64b86903dde51f84a675"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-coverage-causes-v1/output/check.json",
+      "sha256": "051948447cafda82cf58e3432ab597a8e0d117c74ba5a7b53d1cad58d2d4f82b"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-integration-20261005a/docs/research/pilots/58/failure-ledger/reconciliation.json",
+      "sha256": "c37ed8638d08b844e9f8c9cb45fe6bae65b0c8c95b834387442c2c9cca474f37"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-integration-20261005a/docs/research/pilots/58/failure-ledger/row-schema.json",
+      "sha256": "b2b227f517712ea4865c5e5cb180627b7dc48bf2de8bd1c29529adbc183fa917"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-a-integration-20261005a/docs/research/pilots/58/failure-ledger/uncovered-rows.json",
+      "sha256": "eddbabf4f199a898103590a36abc7bb41f1233c15eb4b2fabd52dbf7e8ff50a7"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13840133134545942567_1060_000_1080_000/1558402354862835/producer/report.json",
+      "sha256": "2c75baeb739ffdc4e452b8403216a91f38052bc288220b9e490cc637801a7e6d"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450680964094/producer/report.json",
+      "sha256": "a82bd72c0d22006e2cfc99a95c34ff0803b48ebab086543dc30cffc8c574815b"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/17885096890374683162_755_580_775_580/1506906083489022/producer/report.json",
+      "sha256": "905d9de37d5aff7224e85b53107a2bcb689723ca7c6cb55880afc2e287c5eb1d"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/4575961016807404107_880_000_900_000/1544656166412547/producer/report.json",
+      "sha256": "0860b38f1c8abc859f7fbe3b570340ca1edf955ddcef1f26ed631f3ff52dec08"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13506499849906169066_120_000_140_000/1552353849872908/producer/report.json",
+      "sha256": "bc6114752ed55e86dfcdc290342f3bb4e22d4d3ee1fb3eb242a5c31dd4a167dc"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450685964257/producer/report.json",
+      "sha256": "000c3bf495fdd40c2fe7b6dd2c1234f46f3b16f9c9236c9a29889dac6d3cea49"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/15696964848687303249_4615_200_4635_200/1507241626220091/producer/report.json",
+      "sha256": "d77f0224ddf9be0339138e930113842a04877cdaf6fc5bdc797c41613d9afb38"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450679864286/producer/report.json",
+      "sha256": "e671e3f2bbe59489357e1a789d6ce5e97796366692237eb6378727407aa08c76"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/12856053589272984699_1020_000_1040_000/1552658368873652/producer/report.json",
+      "sha256": "bdca1e5495f4a7606a9444cee21cb9f7b2fbf5f49a39afeee4b0466ec5517dbc"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/15628918650068847391_8077_670_8097_670/1508889335260598/producer/report.json",
+      "sha256": "894074d630dbdc9c040b4ce26727c5abb06270be471919aa6d69828ce971d50c"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7850521592343484282_4576_090_4596_090/1520908476792400/producer/report.json",
+      "sha256": "f2f7de09677be596e0b4ad0ebbfe2f631df082f1aedacdc2db061523ead9b259"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7921369793217703814_1060_000_1080_000/1557159628222386/producer/report.json",
+      "sha256": "aa39c096d3b7c38966c354ebe491c81d9dc3c784d3f287ac3725fa81e1eaeeff"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7921369793217703814_1060_000_1080_000/1557159618222385/producer/report.json",
+      "sha256": "fe85ad826d173523a3a870e2dd4e02cd54095398e75841cdb2504a8d6de4547d"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13830510593707564159_5575_000_5595_000/1518657072511849/producer/report.json",
+      "sha256": "9ac14d4f4b250a62e092788855d63d209d183028040ff5dad63ba684b3325325"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/11004685739714500220_2300_000_2320_000/1553640277306703/producer/report.json",
+      "sha256": "c53bec18d813a920ee31ba7dd2278e7c87e413095a165c06b34efbf0b28c702e"
+    },
+    {
+      "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/3966447614090524826_320_000_340_000/1553023288374080/producer/report.json",
+      "sha256": "3bac20161995c774046fd36ae11e15bb3106a9b49b3cbb97c5f1298cb497ee5b"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/a-refresh-live-v1/live-receipt.json",
+      "sha256": "93b0f506cfd48e8fe28294088a7ba0374dc4883503e17b715e17139cf63147d7"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/a-refresh-live-v1/output/check.json",
+      "sha256": "7563e6ea117bd80bb6ffc2d7400a264b50a3e558156a8438fadb6bc90032d59b"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/a-refresh-live-v1/output/live.log",
+      "sha256": "7563e6ea117bd80bb6ffc2d7400a264b50a3e558156a8438fadb6bc90032d59b"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/a-refresh-live-v1/output/check.json",
+      "sha256": "7563e6ea117bd80bb6ffc2d7400a264b50a3e558156a8438fadb6bc90032d59b"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/a-refresh-live-v1/driver.source",
+      "sha256": "63abc69a928e34a5ede57b644b5095177843908f39e73c3432a838e149c3d150"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/a-refresh-driver.py",
+      "sha256": "63abc69a928e34a5ede57b644b5095177843908f39e73c3432a838e149c3d150"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-a/stop-and-final-digest-check.json",
+      "sha256": "23011861ab36554468861962ab6680891d8c0d2b54992cc5cd5b7937618bed78"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-a/handoff.json",
+      "sha256": "8051d8f740cc07ae89b48d3a7a7955e81e661dd812716faf4bcb3cf20872cf61"
+    }
+  ],
+  "assessment": "Seven-file scoped88eb refresh is byte-identical to retained originalbaff4c6 patch, now parent4c47. Independently reopened53pinned inputs and parsed original16NPZ label/target-index arrays with stdlib, resolving all30unique frame/object tuples and competing native winners. Reconciled1279native/1153positive-point/1053eligible/1023covered/30uncovered across16frames/13scenes; uncovered29signs/1pedestrian, archived28strict+2tie causes. Twenty-one unavailable downstream fields are explicitly null; native annotation counts and archived nearest-BEV IoU are correctly distinguished from physical lineage, decoded geometry and official native matches. Fourteen document links resolve; original scope/receipt remains truthful historical evidence.",
+  "live_assessment": "Fresh exact-current-base CPU Insula output/check/source/input hashes agree; driver uses original launch_plan, fresh verify_rootfs and run_scoped. Exit0, total1.5922386s, actual2GiB/zero-swap/noOOM checked scope, largest waited-child RSS50192KiB, verified launcher membership and no remaining children. No GPU bindings/devices, TensorFlow or optimizer updates. Rootfs-v2 lockaa18eaac pins match actual retained lock. Original owncheck scopes are retained inactive/dead; fresh refresh scope independently read inactive/dead. This proves scoped check/process stop, not the full native goal/worker-grant protocol.",
+  "practical_limits": [
+    "58.A preparation only; complete1279-row42ledger, measurement lineage, decoded score/filter/native-match traces and views remain outstanding.",
+    "Archived cause and oracle metric claims are reopened history; no geometric assignment rerun, learned-model inference, official metric replay or training was performed.",
+    "No50/53closure, comprehensive fault matrix, HDFS retention/recovery/release or model efficacy acceptance.",
+    "Largest waited-child RSS is reported honestly, alongside aggregate kernel cap; no summed process-tree RSS/peak claim."
+  ],
+  "landing_allowed": true,
+  "landing_conditions": [
+    "Lead checks exactcurrent4c47 and serializes exactFF/nonforce publication; receipt does not claimcandidatealreadylanded."
+  ],
+  "original_candidate": "baff4c6fe1afff73ab8ea219a9073d76734034ee",
+  "source_refresh": "explicit retained identical patch + fresh applicable live execution; oldreceipt not used as changed-source authority",
+  "diagnostic_disposition": "One read-only exploratory probe initially asked provenance for nonexistent original_path; actual schema uses path. It was corrected before the frozen independent control. Not a product finding.",
+  "reviewer_disposition": "Own bounded readonly controls finished under256MiB/zero swap, with no Native/Kata/Git writes, GPU/training, shared source edits or broad tests."
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "component": {
+      "type": "string"
+    },
+    "id": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "key": {
+      "minProperties": 1,
+      "type": "object"
+    },
+    "payloads": {
+      "type": "object"
+    },
+    "release": {
+      "const": "v2.0.1"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "source_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "split": {
+      "enum": [
+        "training",
+        "validation",
+        "testing"
+      ]
+    },
+    "values": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "component",
+    "release",
+    "split",
+    "key",
+    "id",
+    "source_sha256",
+    "values",
+    "payloads"
+  ],
+  "type": "object"
+}

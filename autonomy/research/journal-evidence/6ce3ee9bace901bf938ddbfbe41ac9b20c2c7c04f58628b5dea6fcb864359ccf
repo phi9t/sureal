@@ -1,0 +1,803 @@
+{
+  "schema_version": 1,
+  "kind": "independent-actual-static-preflight-review",
+  "verdict": "pass",
+  "findings": [],
+  "reviewer": {
+    "agent": "/root/collab_execution_admission_review",
+    "native_thread_id": "01a105a5-de93-74a3-adad-c5184f54a751"
+  },
+  "author": {
+    "agent": "/root",
+    "native_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24"
+  },
+  "reviewer_native_thread_id": "01a105a5-de93-74a3-adad-c5184f54a751",
+  "reviewed_ms": 1791162580274,
+  "operator_candidate": "53e4854ded75a09aed6509d101fde2c64cf0f6ae",
+  "auditor_candidate": "6eb6879058b7772e4d114c8d99feac44f7ecd867",
+  "actual_static_report": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-static-v3/run/static-report.json",
+    "sha256": "f2410fac14506f6570cdd0be6afb1372c48717b391aa6cd503c56b6c4b81c442"
+  },
+  "actual_outer_command": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-static-driver-command-v3/actual-command.json",
+    "sha256": "24cf1cd97100808378cfa51aca01afa396779f9942b4debe2375a9b6bc3974ca"
+  },
+  "actual_child_command": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-static-driver-v3/host-static/actual-command.json",
+    "sha256": "229d86f5ae1984d2fb1b7ece6478145a84a7369181ea60267bbdbb880545f392"
+  },
+  "actual_driver_result": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-static-driver-v3/driver-result.json",
+    "sha256": "46c1cdfbd4b94cbc8cc8aa53c6a1c3b03b95da4238388fae096978f41a76f9d8"
+  },
+  "actor_exec": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-static-driver-v3/static-authority.json.exec.json",
+    "sha256": "62e5067cb999a17bcbbc6b505b57023ce46c6608a7e107b164ae831f9b7c6089"
+  },
+  "authority": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-static-driver-v3/static-authority.json",
+    "sha256": "a506d9ca6de48f27f7b3299df9752dc21c08833f8d6e0d31995ca788c4bba276"
+  },
+  "source_reviews": [
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-native-fixture-review-53e4854.json",
+      "sha256": "9f0cbc49123b3a483a2f8c07cab9c9c2f9c8c851b1cc69c2b1cfa607ab844c6f"
+    },
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-auditor-review-6eb6879.json",
+      "sha256": "ef86f54dea4b43cbe35a1402a46ef961206c2903f347bd5d9ed843efcad4dc0d"
+    }
+  ],
+  "independent_checks": {
+    "path": "/data02/home/philip.yang/devx/tmp/collab50-static-v3-independent-readback/result-v4.json",
+    "sha256": "83ed4214ecccb9f442af7d8d506863af2482eda8678cf4e5d3f843dd51cfe826"
+  },
+  "independent_actual_command": {
+    "path": "/data02/home/philip.yang/devx/tmp/collab50-static-v3-independent-readback/actual-command-v4.json",
+    "sha256": "8561751fd66beaf515287c73889878d519323bf9ef36b183738effa71d9bd770"
+  },
+  "evidence": [
+    {
+      "path": "/data02/home/philip.yang/.codex/packages/app-server-daemon/releases/0.160.0-x86_64-unknown-linux-musl/bin/codex",
+      "sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad"
+    },
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-auditor-review-6eb6879.json",
+      "sha256": "ef86f54dea4b43cbe35a1402a46ef961206c2903f347bd5d9ed843efcad4dc0d"
+    },
+    {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-native-fixture-review-53e4854.json",
+      "sha256": "9f0cbc49123b3a483a2f8c07cab9c9c2f9c8c851b1cc69c2b1cfa607ab844c6f"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-10/cold-retention/objects.pack",
+      "sha256": "4d42168b2f9314fe10b0e2211f3cbb7c5e97f24307e1fb45748a67d078b8285e"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-10/cold-retention/retention.json",
+      "sha256": "f89273d73d29857f94016487c341a52ce31cf767867c5e4f66fa8a86b7608def"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-10/materialization.json",
+      "sha256": "70e1588490667dc892c2d871b78217d04eb3a802ee75079a2e641893db9fc9a7"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-10/source-a50/tests/collab/audit_support/__init__.py",
+      "sha256": "1069a06d2058335cf41687716253ee25d037c90c1cba11f1a75c141a7346f7e6"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-10/source-a50/tests/collab/audit_support/channel_authority.py",
+      "sha256": "e24b2ea910281c14cc18cd2019fd8ed1fc80eb959f56f52babeccefe326ec913"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-10/source-a50/tests/collab/audit_support/channel_observer.py",
+      "sha256": "513da65744aa3723ca45ca76e7cad08bf2e01abac0e45d068e5cb1d4e7dba05c"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-10/source-a50/tests/collab/audit_support/evidence.py",
+      "sha256": "178976ba6579f0aed4720c4592487a976091f825b1cb33e49d1010b6f106ade5"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-10/source-a50/tests/collab/audit_support/facts.py",
+      "sha256": "40ccfdf467d80a02a64f01f6cfc3b102cda550591f87fed3cae2d014eaec2709"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-10/source-a50/tests/collab/audit_support/native_read.py",
+      "sha256": "ea1670c7482a4e9882d90f3c59558b5f593ca05f77e87b1a1b8ebbe6da1ea24e"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-10/source-a50/tests/collab/audit_support/notification_channel.py",
+      "sha256": "e48057f0c060b72c0401667fdfe7f21e0c0a0a156fed05050d8be51df8f8a5aa"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-10/source-a50/tests/collab/audit_support/probe_authority.py",
+      "sha256": "db71b79c1c87e02f597daea487dca37651c3b7c0a635b8c14919c7e4dec6e540"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-10/source-a50/tests/collab/audit_support/probe_os.py",
+      "sha256": "a2649b88361736e9ba5271e3ff4b7760de40d57b8961612d1f87f60d77831888"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-10/source-a50/tests/collab/audit_support/raw_git.py",
+      "sha256": "93cbc154f916163c4a9801f94052af1685fb0718a252ccbea3c0f0ea15714b2b"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-10/source-a50/tests/collab/audit_support/runtime_probe.py",
+      "sha256": "1bf9817d5f3d8b8a5313ef0e37e326bb0f5a136128b002955c81d58152423587"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor50-20261004a/preflight-10/source-a50/tests/collab/audit_support/search_index.py",
+      "sha256": "4953be2c8d36f946648834f9834499cfe5450922d8eacb2a2f26cd5042ed0564"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/fixture-operator-candidate-v12/materialization.json",
+      "sha256": "84d3f736b72ddc3e5865278338be6cd38021c1846bfd950105dd26c1acbf23d4"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/fixture-operator-candidate-v12/objects.pack",
+      "sha256": "bf44e7bdd61f3b7bbf24f41d6bc9714a98598a58a4f75329f5a04a213dcbd6ee"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/fixture-operator-candidate-v12/retention.json",
+      "sha256": "0fc2c1bcf34739edc5af7267ea2489a33bf154e3691355813a5afe7929a0e8c2"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/fixture-operator-candidate-v12/source/tests/collab/fixture_support/preflight_driver.py",
+      "sha256": "2e2de735b3df93b4925d25f63bf343160937668ade474decab540097c12edf9e"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema-provenance-v2-experimental.json",
+      "sha256": "0ff346a90128074979b897434625769b32be778b10faccac14d80924e6d77404"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-command-v2-experimental/actual-command.json",
+      "sha256": "45ae3aa9fe33cabd32b52383fc451380978a0afc8b27a2dc3117b9bea181eac1"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-command-v2-experimental/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-command-v2-experimental/stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/ServerNotification.json",
+      "sha256": "28a42039eee1c3f45c92b6cf07111bacf6de2716f4d3365ff53ad65507fef00c"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ItemCompletedNotification.json",
+      "sha256": "d04b9153de38cd8302a2a418a44a65e8265d4c7586d46ea2cc801b594c6acf5b"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ItemStartedNotification.json",
+      "sha256": "7574788d2a352747f50d44be3ef649011cb8de8069da4c655faff14d0aee32c4"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadBackgroundTerminalsListParams.json",
+      "sha256": "7ac232410d59afd308dca04f8c0b08f20fa6e87f00bd0d3b5892b7ce8b31d2ee"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadBackgroundTerminalsListResponse.json",
+      "sha256": "b56b1cbcb1d60079ee9f9caaeef29cad869a25b4a6d356566f7c9f672faa7bf4"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadGoalGetParams.json",
+      "sha256": "1a5de89b3c5c49528af404a65411a73ef05dc7c9c49c3f00c90d9926dfe34137"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadGoalGetResponse.json",
+      "sha256": "f610000963194731c96ce2b45e46722ca700f1b6ccc1fc55a2fd95e526018fd9"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadItemsListParams.json",
+      "sha256": "d5cf9784413f1d1abba756e04e48b273a9d12ab2c5675442e91b6a4ee55e19f0"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadItemsListResponse.json",
+      "sha256": "bc8a8dcb9a48d9ca38b0a5faa89b80ec2fd57398cd3a8dcc15097776153f6c74"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadQueueListParams.json",
+      "sha256": "b4c889089eee8a0f785ff85e0128a4d3f347353870fa848221096a472223773b"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadQueueListResponse.json",
+      "sha256": "be4e0bfa6fc776101f96582543605d2eff6186309a08903203512b99c5005926"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadReadParams.json",
+      "sha256": "dfe040c6ac71d30795b8be3f3ff232e66f362a37f883b491e5d1ea367f470db4"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadReadResponse.json",
+      "sha256": "2af6b987644cfb23e6f408f3cfb29e73ad6255ba2294366d36d56aeabe3854da"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadShellCommandParams.json",
+      "sha256": "dc646457ca36be601c8c3d15c44d14907d9a165ccf2b9635a8e9a878f0ca0727"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadShellCommandResponse.json",
+      "sha256": "fd4911613f6a6da2ca13b75342501d4d61f64e00a1083c6d60038369b8caeefe"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadStartParams.json",
+      "sha256": "80a40a7fac15b4bf70efb7f893fb353acc0a0d30c68f54aee4f01923deca85de"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadStartResponse.json",
+      "sha256": "92f5ddc37717b922de1dc0b0405e9a6d463f370554e2091610c6e595bc2616d4"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadStatusChangedNotification.json",
+      "sha256": "26f3c60c1b73f7fa2d31c74429cdc36f8746c76c33e3d314b3fb61d3661f05f6"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadTurnsListParams.json",
+      "sha256": "2a8b93d7d4437cc25e16a1dde16d8db3c338d39e16c5eece2a56e943a21577d7"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/ThreadTurnsListResponse.json",
+      "sha256": "8db83d38553204a223cf349680c59b0cc674ba95a4637e1995bfeabd73c80219"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/TurnCompletedNotification.json",
+      "sha256": "016870158603b0f84bd9f8f65f927161c9fd5128e5ec632087616462dc44e085"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental/v2/TurnStartedNotification.json",
+      "sha256": "2e9a109ee549c1e266223304c9e0580075cda03feb65473363b124f18e9a3769"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-prospective-layout-v7.json",
+      "sha256": "e15e8c832cd6d5c4a9ce0ec8c8b14efac0f00b9115f2416b0966ec41a89e30ca"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-static-driver-command-v3/actual-command.json",
+      "sha256": "24cf1cd97100808378cfa51aca01afa396779f9942b4debe2375a9b6bc3974ca"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-static-driver-command-v3/intent.json",
+      "sha256": "3e29637745fb3f12362df33a3aa9a57d7d93b397eae5ffc96ba717fe98b50b02"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-static-driver-command-v3/stderr",
+      "sha256": "0300d41ebb62c69409f6b96ffb2b695ab72026560b6c85c968b3589b54bd0de1"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-static-driver-command-v3/stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-static-driver-v3/driver-result.json",
+      "sha256": "46c1cdfbd4b94cbc8cc8aa53c6a1c3b03b95da4238388fae096978f41a76f9d8"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-static-driver-v3/host-static/actual-command.json",
+      "sha256": "229d86f5ae1984d2fb1b7ece6478145a84a7369181ea60267bbdbb880545f392"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-static-driver-v3/host-static/intent.json",
+      "sha256": "9c07d314f7298d8b066d0b7acee430d4c0e982ad18d88a1d8d611c8d483844b6"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-static-driver-v3/host-static/stderr",
+      "sha256": "258e59475a83e6b157228a54626a3cb4f917b7060f60151f1074597fb2a124aa"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-static-driver-v3/host-static/stdout",
+      "sha256": "139c2b78e9a753a82d4852a77cb2276715861d5a5ab63e3dcb734cd0a05e5c1e"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-static-driver-v3/static-authority.json",
+      "sha256": "a506d9ca6de48f27f7b3299df9752dc21c08833f8d6e0d31995ca788c4bba276"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-static-driver-v3/static-authority.json.exec.json",
+      "sha256": "62e5067cb999a17bcbbc6b505b57023ce46c6608a7e107b164ae831f9b7c6089"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-static-v1/run/static-report.json",
+      "sha256": "c8b6e87d726cdcc90877235cf5a6cbfe9bc030ca766aa9b1c2831dc3e0d60575"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-static-v2/run/static-report.json",
+      "sha256": "3830ee90ff348f159b650135e8119524c788e214e97d1f61e241a3b4ef617e1b"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-static-v3/run/static-report.json",
+      "sha256": "f2410fac14506f6570cdd0be6afb1372c48717b391aa6cd503c56b6c4b81c442"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-version50-command-v1/actual-command.json",
+      "sha256": "f0684b5c89260cba279102d2aae831d540e6534a2cae06310b50fc13ecc9072d"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-version50-command-v1/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-version50-command-v1/stdout",
+      "sha256": "f6464b8cc67af75deb2589fe1dbcde152fc15ffb76a91de1cf0686b4623afb1e"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/python-startup-profile-v4/command-1/actual-command.json",
+      "sha256": "106b0a6d0b7741b812d6fedd3344c7b100132736aa19b8291a4b6285ebc9bf11"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/python-startup-profile-v4/command-1/intent.json",
+      "sha256": "58b398adec897bc44fe4effed221505d239837f670186e73186943f0d9841bbb"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/python-startup-profile-v4/command-1/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/python-startup-profile-v4/command-1/stdout",
+      "sha256": "a32f6b813391a98430558aa17ec18093881f645379bc5669253823caad323f91"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/python-startup-profile-v4/command-2/actual-command.json",
+      "sha256": "92a4dc23f79f863433564d60a27f2aaf0ae5a6c5f1402c87585a743555fe33de"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/python-startup-profile-v4/command-2/intent.json",
+      "sha256": "3226a850eabdad496307685cb07ab06b6ad0fe40dff9945e113b741ad3059c98"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/python-startup-profile-v4/command-2/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/python-startup-profile-v4/command-2/stdout",
+      "sha256": "66bf40c8121009301255dc87d9d58eb4c821566f6b62fca330440b69970f3353"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/python-startup-profile-v4/profile.json",
+      "sha256": "c77569b1edfa89dd00bb3e03b599e51c68c0fd06edad62d8e96441a2e2591b26"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/static-preflight-admission-base-v3.json",
+      "sha256": "dbe6d9f39fe8f5b316867e8d9a140a7f22b6760be7a03c6ecc48810712e742d4"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/static-preflight-driver-admission-v3.json",
+      "sha256": "e50fe3eed9bbbcea1ec4da7150cb38fccc29c29c58036901a794b872c30d05e7"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/stop-preflight-user-authority-v8.json",
+      "sha256": "9237d9bf20d72a72ab6104435625127ff292ba73ec3f501e09b405c4d27fdf80"
+    },
+    {
+      "path": "/etc/python3.11/sitecustomize.py",
+      "sha256": "43d81125d92376b1a69d53a71126a041cc9a18d8080e92dea0a2ae23be138b1e"
+    },
+    {
+      "path": "/usr/bin/bash",
+      "sha256": "a4b895f98db75079f2af6e510c95db0d5c5d596e448bf3fe689d0bfdd182e28e"
+    },
+    {
+      "path": "/usr/bin/git",
+      "sha256": "00c84136d8294294580daa32f25b3e83ddb8341e9b5b70722e4c9a973ba5f749"
+    },
+    {
+      "path": "/usr/bin/python3.11",
+      "sha256": "44e5a74ce34ac8837cfbaa6273a9a2cb7542d7d5495781cc4bf48e7de7abe8ed"
+    },
+    {
+      "path": "/usr/bin/systemd-run",
+      "sha256": "fbeb3633f4d78b3692f69a79b2cd353916b1b53f275b0728cc1b58ec3e994789"
+    },
+    {
+      "path": "/usr/lib/python3.11/__future__.py",
+      "sha256": "981d4c398849f9ebcab72300d9c1fe288fd6d7f28957b3b3fa3a493a5836d95c"
+    },
+    {
+      "path": "/usr/lib/python3.11/_collections_abc.py",
+      "sha256": "ec646ef7e27aae261adef3c57b9d18822c6526b3e9562dabb9f3cb4e6803066c"
+    },
+    {
+      "path": "/usr/lib/python3.11/_compression.py",
+      "sha256": "3ad5d60627477a60939ee44fc1bb3a05dbe8fb52f0f75039b8f5d8f1a278b981"
+    },
+    {
+      "path": "/usr/lib/python3.11/_sitebuiltins.py",
+      "sha256": "b9388bc1d6d12ed6be12da420ab1feca40f99c0e33ec315d92b1e01cb69b25bc"
+    },
+    {
+      "path": "/usr/lib/python3.11/_sysconfigdata__x86_64-linux-gnu.py",
+      "sha256": "5f922b9b3b0e186c0008ebc0e9b5367a0f0a6c0069cf368e00bf51a0228f73c5"
+    },
+    {
+      "path": "/usr/lib/python3.11/_weakrefset.py",
+      "sha256": "91895a451d06e9f521a1171b31b9b19bc9740f35af00d4fa106338ab7167c9ac"
+    },
+    {
+      "path": "/usr/lib/python3.11/abc.py",
+      "sha256": "16a41c547e7c10342698791f0ad01f427f953e90217c5a45f71e8caea26e43cd"
+    },
+    {
+      "path": "/usr/lib/python3.11/argparse.py",
+      "sha256": "9cad2261a804a55d7aca32790c999cb11bb546ce13a1c93e584ae57d5f8ea2a1"
+    },
+    {
+      "path": "/usr/lib/python3.11/base64.py",
+      "sha256": "0d101f8c41458cb5666b7d34556ae577212a9a971e451a0132043be524079318"
+    },
+    {
+      "path": "/usr/lib/python3.11/bisect.py",
+      "sha256": "e5b2ff166f48a06e70ae831d8c9b47283fcd0c254306eee12d3dae9c55e11526"
+    },
+    {
+      "path": "/usr/lib/python3.11/bz2.py",
+      "sha256": "76ab3252924e71e859d7d90e8d3db13b6554975cfcac0fdadced4de7f8779330"
+    },
+    {
+      "path": "/usr/lib/python3.11/codecs.py",
+      "sha256": "166ffd0f0fe40631bb7adef898ebfe59c7fb9efeb25f635b0fd50b68e9353b6a"
+    },
+    {
+      "path": "/usr/lib/python3.11/collections/__init__.py",
+      "sha256": "4ed0ec040e0d7d725b4e60b01597d7d010dc06ccbc2ebe93943cc1205b909bb3"
+    },
+    {
+      "path": "/usr/lib/python3.11/collections/abc.py",
+      "sha256": "9cb4208f99128a0489b6c8e6c61637617dd7d4250c59e065491957eda084dd10"
+    },
+    {
+      "path": "/usr/lib/python3.11/contextlib.py",
+      "sha256": "a907c5d2151782ac1253dc9eade52fd834a1db43f52cc2b5094dcc4b359de18e"
+    },
+    {
+      "path": "/usr/lib/python3.11/copyreg.py",
+      "sha256": "5499e1be7ba52d4715a911ae65ef2d703db9379d21fff2a07fad8877c318e070"
+    },
+    {
+      "path": "/usr/lib/python3.11/datetime.py",
+      "sha256": "e77455fc9f87c3f29ec4f57fbae33a58c47fae11695f76365d96e183b3b14fc4"
+    },
+    {
+      "path": "/usr/lib/python3.11/encodings/__init__.py",
+      "sha256": "78c4744d407690f321565488710b5aaf6486b5afa8d185637aa1e7633ab59cd8"
+    },
+    {
+      "path": "/usr/lib/python3.11/encodings/aliases.py",
+      "sha256": "6fdcc49ba23a0203ae6cf28e608f8e6297d7c4d77d52e651db3cb49b9564c6d2"
+    },
+    {
+      "path": "/usr/lib/python3.11/encodings/utf_8.py",
+      "sha256": "ba0cac060269583523ca9506473a755203037c57d466a11aa89a30a5f6756f3d"
+    },
+    {
+      "path": "/usr/lib/python3.11/enum.py",
+      "sha256": "6efea6ce783dccb371d931fd0d4108f84a7ade0314c1987467bd4d077b99314a"
+    },
+    {
+      "path": "/usr/lib/python3.11/fnmatch.py",
+      "sha256": "6683da36e47af523f3f41e18ad244d837783e19e98911cc0b7415dea81494ebc"
+    },
+    {
+      "path": "/usr/lib/python3.11/functools.py",
+      "sha256": "6d80018a3fa9fed44c5b78f881987ee3ab3fb1238b077b4e6dcb4b76da7db73b"
+    },
+    {
+      "path": "/usr/lib/python3.11/genericpath.py",
+      "sha256": "9d58ad64056a89f12258a62596c2073cd9e52b459dde152f710edc0cffcd865b"
+    },
+    {
+      "path": "/usr/lib/python3.11/gettext.py",
+      "sha256": "fd9619b387784959ced699853cf633fbbeaff376804dc922598fce4065cca290"
+    },
+    {
+      "path": "/usr/lib/python3.11/hashlib.py",
+      "sha256": "e2bffb462e4d43e6637b9450e259e8ba2a56626ba3037d68aa1cee68b3f61d4a"
+    },
+    {
+      "path": "/usr/lib/python3.11/importlib/__init__.py",
+      "sha256": "49ad4fdc8139026f7f3773e3f50f09207ff6bd8e92a2c382545525235448e525"
+    },
+    {
+      "path": "/usr/lib/python3.11/importlib/_bootstrap.py",
+      "sha256": "a06d09f359d9880b2289f0d60958b33a0ddd0767042dcf978c13d684da8a051e"
+    },
+    {
+      "path": "/usr/lib/python3.11/importlib/_bootstrap_external.py",
+      "sha256": "5b7f704fd3198cb474fea0e74cb21df2d159ceb6bde78aad5db3eb5efa883ccf"
+    },
+    {
+      "path": "/usr/lib/python3.11/importlib/machinery.py",
+      "sha256": "d045cd7ecf2a12b6ecbfbef79eb114e87ef2ebd756f5b705f73e6f3266e3dede"
+    },
+    {
+      "path": "/usr/lib/python3.11/io.py",
+      "sha256": "0bb3f9ba75c78b4ad69dedcfb0b360b4503188cf17a632579a70d398bd9ca0e4"
+    },
+    {
+      "path": "/usr/lib/python3.11/ipaddress.py",
+      "sha256": "8fc7549ef3ea782afc6dd9215e61baa72c8cf1047399bf60c221241f5f5355e1"
+    },
+    {
+      "path": "/usr/lib/python3.11/json/__init__.py",
+      "sha256": "d5d41e2c29049515d295d81a6d40b4890fbec8d8482cfb401630f8ef2f77e4d5"
+    },
+    {
+      "path": "/usr/lib/python3.11/json/decoder.py",
+      "sha256": "9f02654649816145bc76f8c210a5fe3ba1de142d4d97a1c93105732e747c285b"
+    },
+    {
+      "path": "/usr/lib/python3.11/json/encoder.py",
+      "sha256": "7c358788fbb2a6a07f66f1f8446c52396f35fc201108f666d5be002d86f31af2"
+    },
+    {
+      "path": "/usr/lib/python3.11/json/scanner.py",
+      "sha256": "8604d9d03786d0d509abb49e9f069337278ea988c244069ae8ca2c89acc2cb08"
+    },
+    {
+      "path": "/usr/lib/python3.11/keyword.py",
+      "sha256": "afbe73afb68d32fa998e5ff3d081090deec457152470f5331cc2bd430a0e9d2a"
+    },
+    {
+      "path": "/usr/lib/python3.11/lib-dynload/_bz2.cpython-311-x86_64-linux-gnu.so",
+      "sha256": "0afbe9c6f93bc5f9a43837631840187f59278f80da9aa88ca4237b071d76daab"
+    },
+    {
+      "path": "/usr/lib/python3.11/lib-dynload/_hashlib.cpython-311-x86_64-linux-gnu.so",
+      "sha256": "a2342ff26b450b884e9afbd57f0a3b431eec1bdd42fe225c6cab76a42818c076"
+    },
+    {
+      "path": "/usr/lib/python3.11/lib-dynload/_json.cpython-311-x86_64-linux-gnu.so",
+      "sha256": "c40e22957db5b3db5f85e5fe6f5a2b59fd321b6209fb7a060686da83c2360ebd"
+    },
+    {
+      "path": "/usr/lib/python3.11/lib-dynload/_lzma.cpython-311-x86_64-linux-gnu.so",
+      "sha256": "f5c96dddee41f4b866f8363548803dd71baee184fb401bfe90fe7305c1ca76d9"
+    },
+    {
+      "path": "/usr/lib/python3.11/lib-dynload/_sqlite3.cpython-311-x86_64-linux-gnu.so",
+      "sha256": "6498dbfe71148c2a2d9aaa28e302acce68b3c1a53580b84174fa32faf002911b"
+    },
+    {
+      "path": "/usr/lib/python3.11/lib-dynload/_typing.cpython-311-x86_64-linux-gnu.so",
+      "sha256": "816525c14ed3f4de5ff984e0cb29ab432872de05c14835f00200f6d0bd88cdd6"
+    },
+    {
+      "path": "/usr/lib/python3.11/locale.py",
+      "sha256": "a9a649fae8f8dfaa37ec16e1c728f46f81d8eca62c7f8673e41e83145be27373"
+    },
+    {
+      "path": "/usr/lib/python3.11/lzma.py",
+      "sha256": "58fb9d2fdc8a8af7b25e218f17ea3b51bdfa53bdf40f440ab33c605974ca5c2e"
+    },
+    {
+      "path": "/usr/lib/python3.11/ntpath.py",
+      "sha256": "6dcebd56222c03c4c897938d0a153b3f164bbd2edf7474aaebf0fff7aee7d504"
+    },
+    {
+      "path": "/usr/lib/python3.11/operator.py",
+      "sha256": "b2af20f67667203c1730e686cc5d0427becc94db4c97f1d3efe3ed2158473f6a"
+    },
+    {
+      "path": "/usr/lib/python3.11/os.py",
+      "sha256": "021bfb21a96fdaac4b2c034d40636f5e18148a8a95282661a9bc14f3fa979a99"
+    },
+    {
+      "path": "/usr/lib/python3.11/pathlib.py",
+      "sha256": "fbb77652e1c4046ce41b512c0d993b592e35a85d43ef2c2fb40cd8e150c59a63"
+    },
+    {
+      "path": "/usr/lib/python3.11/posixpath.py",
+      "sha256": "115bb3d2051318ee3d951cdb13c60f118f15cea837cb69fb52cf543c12fe25c3"
+    },
+    {
+      "path": "/usr/lib/python3.11/random.py",
+      "sha256": "b931a2d452db89ab9e1f79d59b66ce194dbd6748049cfe44699726da52b9c956"
+    },
+    {
+      "path": "/usr/lib/python3.11/re/__init__.py",
+      "sha256": "029ead61f362489e9bb034f4c2503abee95462056541e9ad07715de3c353b0da"
+    },
+    {
+      "path": "/usr/lib/python3.11/re/_casefix.py",
+      "sha256": "41572ac50cf96b04496e676d8a6708898bb8e752e06dad34ed4c50c5d8f1fe40"
+    },
+    {
+      "path": "/usr/lib/python3.11/re/_compiler.py",
+      "sha256": "23b13f6c11c3343aff2b701b5844a6c82a1a0add70e5aa839d6855d57f691af7"
+    },
+    {
+      "path": "/usr/lib/python3.11/re/_constants.py",
+      "sha256": "3e4463dc8ba87c4a3563be46d2d593e82ca9a0fb91768cfe5a07554ed3de82c5"
+    },
+    {
+      "path": "/usr/lib/python3.11/re/_parser.py",
+      "sha256": "39f05acf256a475c6405a1b3c0ee20ab8ffe489485603005a0088e3d59e08fa0"
+    },
+    {
+      "path": "/usr/lib/python3.11/reprlib.py",
+      "sha256": "264433cc232332db871666b3bb6e4c2cb97b092cb8d5056a45ec2e53daea2b1c"
+    },
+    {
+      "path": "/usr/lib/python3.11/selectors.py",
+      "sha256": "bcdaf1820f606726f9d8b03c95d6471edf4d578fb77d90fa5fc44f337c370775"
+    },
+    {
+      "path": "/usr/lib/python3.11/shlex.py",
+      "sha256": "42ab6060f316e121e374e6621d8c1c98b8db323903c3df289a810c45a8ae46a7"
+    },
+    {
+      "path": "/usr/lib/python3.11/shutil.py",
+      "sha256": "b9599d3ce4e706f1c89bfc422349537e17cb9b893fdf81c60e732caf2e4b80db"
+    },
+    {
+      "path": "/usr/lib/python3.11/signal.py",
+      "sha256": "6ae9e49fe09b607bc161fc80067de9763aa48f523567a34992f00be06057f00a"
+    },
+    {
+      "path": "/usr/lib/python3.11/site.py",
+      "sha256": "2779ae9ccd216f70e554fe47dbd1089ff53c7188093baeddcaba0f7c2127ba08"
+    },
+    {
+      "path": "/usr/lib/python3.11/socket.py",
+      "sha256": "6adf8b776dce1c1001865cdab0a336fbc9a149b82b017ad4dc7fcfd319599c06"
+    },
+    {
+      "path": "/usr/lib/python3.11/sqlite3/__init__.py",
+      "sha256": "29878411a7bcefcd56a3751fe689dea2c99bda75a13a485d78898834a323f0c0"
+    },
+    {
+      "path": "/usr/lib/python3.11/sqlite3/dbapi2.py",
+      "sha256": "e49882f895bbbdad7e5af6a9079edffaae9b82bba3fd664281acb607db56c346"
+    },
+    {
+      "path": "/usr/lib/python3.11/stat.py",
+      "sha256": "052af0327eae6941b69b05c088b3e748f79995635f80ac4cc7125eb333eb4c77"
+    },
+    {
+      "path": "/usr/lib/python3.11/string.py",
+      "sha256": "24aeae1f0526250f442022022bf98df9a823b1cb330543ee79e70e44907462e9"
+    },
+    {
+      "path": "/usr/lib/python3.11/struct.py",
+      "sha256": "9c231f9497caf513a22dee8f790b07f969b0e45854a0bdd6dd84b492e08c2856"
+    },
+    {
+      "path": "/usr/lib/python3.11/subprocess.py",
+      "sha256": "79a359dcb411ca6c49da51a46e1bfc4fbcb6173d12e3f3ce6a5d99acfbdf3ba7"
+    },
+    {
+      "path": "/usr/lib/python3.11/sysconfig.py",
+      "sha256": "d6d0c387a0f64ec7d20f2208c85dbd2b884d1212614e7189adb33c4f3bd54ec0"
+    },
+    {
+      "path": "/usr/lib/python3.11/tempfile.py",
+      "sha256": "23d61f2d6a153aa27c466df38dc94ef14a90a1ac18dc422672dc16c01eac678a"
+    },
+    {
+      "path": "/usr/lib/python3.11/threading.py",
+      "sha256": "570b087160a413ba50a02fd823f1faa3a8dfcecdc9411ece80d28d4b93741b57"
+    },
+    {
+      "path": "/usr/lib/python3.11/tomllib/__init__.py",
+      "sha256": "71f67036895f4c5acab942618af0cbd3d814451ba61e967f358d0f341a5b8f51"
+    },
+    {
+      "path": "/usr/lib/python3.11/tomllib/_parser.py",
+      "sha256": "4579b04a7566452304781ccce37d3ebc1c36e810b058bdb1f33c0e51ddab0397"
+    },
+    {
+      "path": "/usr/lib/python3.11/tomllib/_re.py",
+      "sha256": "75b8e0e428594f6dca6bdcfd0c73977ddb52a4fc147dd80c5e78fc34ea25cbec"
+    },
+    {
+      "path": "/usr/lib/python3.11/tomllib/_types.py",
+      "sha256": "f864c6d9552a929c7032ace654ee05ef26ca75d21b027b801d77e65907138b74"
+    },
+    {
+      "path": "/usr/lib/python3.11/types.py",
+      "sha256": "0c08fbb650c37535a7d8361fc12029e3f4c72a418cf564e8779dae14b979e5ba"
+    },
+    {
+      "path": "/usr/lib/python3.11/typing.py",
+      "sha256": "ed0a1062b1d0a0c846c5c794d266470b88cac646d873543e861a3720a3b830e6"
+    },
+    {
+      "path": "/usr/lib/python3.11/urllib/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/usr/lib/python3.11/urllib/parse.py",
+      "sha256": "c73efbe1783ce07497f2d475712189205c67ead9e86d9cb3296425c9499c6435"
+    },
+    {
+      "path": "/usr/lib/python3.11/warnings.py",
+      "sha256": "3c36ff80a66718e3fc8449f06730e9d7bcef87d1e7f91b626b42ca4d1f30eab0"
+    },
+    {
+      "path": "/usr/lib/python3.11/weakref.py",
+      "sha256": "56f8d313fb74019e53eb9287400702fbce788b7fe30e097b0b6e06296f3f080c"
+    },
+    {
+      "path": "/usr/lib/python3.11/zipimport.py",
+      "sha256": "e84b98dd13d3a8ae3ff2094ef2889dcead41d754f0531686f0b70b8d225676cc"
+    },
+    {
+      "path": "/usr/lib/python3/dist-packages/_distutils_hack/__init__.py",
+      "sha256": "4d27a48545b57dd137ae35376fcf326d2064271084a487960686f8704b94de4a"
+    }
+  ],
+  "checks": {
+    "literal_actor_identity": "same boot/PID/start_ticks/UID across preexec and audited actor; exact fixed argv and static role",
+    "clock": "original child intent/start time retained; ordered outer/child/exec/start/initial closure/final closure/end; no reset",
+    "actual_static_elapsed_seconds": 37.386800696,
+    "actual_outer_elapsed_seconds": 37.967867502,
+    "resources": "actual driver and auditor argv individually specify256MiB/zero swap; auditor scope incarnation, caller-only membership and zeroOOM recorded at actor check; no measured peak or aggregate256MiB claim",
+    "source": "4149root+4134auditor materialized entries reopened byte/mode/blob/union, exact current pack hashes and original independent full cold reviews retained; no new cold-recovery run claimed in this readback",
+    "module_closure": "101file-backed/37classified binary/2exact typing namespace facts, matching initial/final rows; file hashes/literal loaded aliases reopened; in-process object-identity guards established by frozen source and independent source controls",
+    "runtime_and_schemas": "actual pinned0.160 binary, original generation/version argv+streams and all16API+6notification rawJSONSchema docs reopened unchanged",
+    "layout": "prepared worktree exactRbase/clean; workspace/commonGit/channel device-inode pins match; empty channel root disjoint native/source/static outputs",
+    "native_execution": "static code path does not construct NativeReadClient or create/launch/stop threads; observations empty and all live/managed/acceptance flags false"
+  },
+  "acceptance_scope": {
+    "actual_static_preparation_accepted": true,
+    "native_E_invocation_admitted": false,
+    "native_E_launched": false,
+    "native_stop_capability_accepted": false,
+    "task50_accepted": false,
+    "task53_accepted": false,
+    "managed_dispatch_accepted": false,
+    "ownership_released": false,
+    "cleanup_permitted": false,
+    "future_resource_grants_accepted": false,
+    "future_controller_accepted": false
+  },
+  "user_override": "Happy-path-first steering received during this review. Finish only active read-only assessment then idle; Native E deferred. This report does not impose the comprehensive50\u201354/53 matrix on provisional task58.",
+  "historical_disposition": {
+    "static_v1_v2": "both original UNKNOWN reports remain byte-pinned in independent checks; no retroacceptance",
+    "A_D": "retained UNKNOWN; no native retry/release/cleanup by reviewer"
+  },
+  "reviewer_checker_disposition": [
+    {
+      "actual_command": {
+        "path": "/data02/home/philip.yang/devx/tmp/collab50-static-v3-independent-readback/actual-command.json",
+        "sha256": "fd124bdf4ec9f2bf64c35213fbc7953653e866255e630d1f329f964dccd65096"
+      },
+      "status": "private checker failed",
+      "cause": "incorrect equality assumption: resources legitimately adds actual observer-scope pin; not a product finding"
+    },
+    {
+      "actual_command": {
+        "path": "/data02/home/philip.yang/devx/tmp/collab50-static-v3-independent-readback/actual-command-v2.json",
+        "sha256": "07dd8d450cdf5b9743160e708a9bb90f44ee1317f43551f09e454148978ce799"
+      },
+      "status": "private checker failed",
+      "cause": "wrong systemd unit argv index; failed before check execution; not a product finding"
+    },
+    {
+      "actual_command": {
+        "path": "/data02/home/philip.yang/devx/tmp/collab50-static-v3-independent-readback/actual-command-v3.json",
+        "sha256": "7493149d0afe2346d2e2759b69dd3e8fcff0c7132df916a3e9cd22680a02cd0b"
+      },
+      "status": "private checker failed",
+      "cause": "incorrectly applied newer HostCommand intent fields to original read-only schema/version receipts; raw older domain retained; not a product finding"
+    },
+    {
+      "actual_command": {
+        "path": "/data02/home/philip.yang/devx/tmp/collab50-static-v3-independent-readback/actual-command-v4.json",
+        "sha256": "8561751fd66beaf515287c73889878d519323bf9ef36b183738effa71d9bd770"
+      },
+      "status": "pass",
+      "cause": "domain-corrected bounded retrospective checks"
+    }
+  ],
+  "process_and_writer_disposition": {
+    "reviewer_jobs_running": false,
+    "reviewer_native_or_Kata_calls": false,
+    "shared_source_or_refs_written": false,
+    "private_evidence_only": true,
+    "canonical_commonGit_hold": "released after sealed assessment, at parent instruction for serialized task58 docs landing",
+    "cold_source_worktrees": "remain held and retained; no edits by reviewer",
+    "global_writer_quiescence_proven": false
+  }
+}

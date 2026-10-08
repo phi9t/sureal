@@ -1,0 +1,127 @@
+{
+  "author": "/root",
+  "author_native_thread_id": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+  "failure": {
+    "channel_contains_only_fresh_manifest_and_import_closure": true,
+    "driver_unknown": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-live-driver-v6/driver-unknown.json",
+      "sha256": "bee21b41c9a4d5610f73adb09875c729eac8735f3d984d7c36315c3f9e9e912c"
+    },
+    "exact_failed_check_timestamp": "Not retained; literal first guard and matching identity/schema fields prove age exceeded2sec at the check, bounded above by host completion.",
+    "fixture_directory_absent": true,
+    "fixture_id": "stop50-20261005h",
+    "identity_static_source_and_argv_match": true,
+    "native_connection_thread_tool_or_goal_effects": false,
+    "operator_command": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-live-driver-v6/host-operator/actual-command.json",
+      "sha256": "55e0f7a36f6610222a9067e5d5abbccd44b0a5a922d4162ad39da73d5b31260a"
+    },
+    "operator_host_duration_ns": 2402280037,
+    "operator_host_ended_ns": 588883857595584,
+    "operator_host_started_ns": 588881455315547,
+    "operator_stderr": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-live-driver-v6/host-operator/stderr",
+      "sha256": "d1b1e096c94a4f1fc2338e4cf804630fc9b6101e5d0b5b29e82fba9fdafc780c"
+    },
+    "outer_command": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-live-driver-command-v6/actual-command.json",
+      "sha256": "bf965cb447585deefb0861b0cb9cadee9307558329f19ceb41eecef2d8d3f28f"
+    },
+    "ready": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-stop-observer-v10/run/observer-ready.json",
+      "sha256": "ed20abbce32532b67261a214eda72187e699670cd93db9bf7be86c8f8dcccd80"
+    },
+    "ready_age_at_host_end_ns": 2411455221,
+    "ready_age_at_host_start_ns": 9175184,
+    "ready_ns": 588881446140363,
+    "stopped_readback": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/h50-failure-scope-readback-v1.json",
+      "sha256": "ea58e02d5fc8fd4f8417ad44a755372580cd07636c2b1c59b576adb9b933d8c9"
+    },
+    "unsupported_event_method_observed": false
+  },
+  "findings": [
+    {
+      "detail": "Expensive current source/pack/role/import validation follows one initial ObserverReady receipt, so valid readiness can expire before the unchanged <=2sec pre-Native freshness gate. This is a readiness preparation seam, not actual unsupported native lifecycle evidence.",
+      "id": "H-R1",
+      "priority": "P1",
+      "source": "tests/collab/fixture_support/native_stop_fixture.py:588-600"
+    }
+  ],
+  "human_policy_waiver_required": false,
+  "kind": "independent-readiness-refresh-repair-contract",
+  "managed_dispatch_accepted": false,
+  "native_privileged_kata_effects_by_reviewer": false,
+  "native_stop_capability_accepted": false,
+  "next_admission": "Fresh current-base root and independent observer companion source reviews plus matching live CPU/static/pre-Native authority required before one new attempt; original G/H evidence remains untouched.",
+  "outstanding_reviewer_processes": false,
+  "ownership_release_or_cleanup_allowed": false,
+  "repair_contract": {
+    "binding_required_fields": [
+      "exact original operator authorization and initial READY refs",
+      "exact request and fresh READY response refs",
+      "fixture/source/static/process/scope/clock identity and original source validation evidence",
+      "bounded actual requested/refreshed/acknowledged chronology"
+    ],
+    "cli_flags": "Keep existing --probe/--authorization/--output and fixed role CLI. Declare only matching ready_refresh request_path,response_path,binding_path in both role admissions; no new runtime control flag is needed.",
+    "missing_or_stale_or_mismatched_reply": "UNKNOWN before owned thread/tool creation; no duplicate old H attempt, release or retry.",
+    "publication_and_chronology": [
+      "Fsync request before observer reads it; observer alone emits its immutable response. Producer cannot refresh an observer timestamp or sign for it.",
+      "Preserve original READY and all actual actor authorization bytes. Use a separately hashed binding; never overwrite original admission, READY, source proof or clock.",
+      "Auth/manifest/ack/handoff must explicitly carry original and refreshed refs; independent observer reopens and derives the chain rather than accepting a producer asserted refresh flag.",
+      "Initial READY <= actual request <= actual fresh reply <= actual ack <= creation; fresh READY and ack remain <=2sec before actual thread/start send. No challenge or response reuse between attempts.",
+      "Place refresh after expensive preparation, immediately before the existing freshness/creation checks; remaining initialization overrun still refuses UNKNOWN. No random warm-cache relaunches or fabricated now argument.",
+      "All original120s whole-process clocks, original Native request limits, observation two-sample>=5sec predicates, full item/goal/queue/process/writer coverage and final capture/exit proof remain unchanged.",
+      "Existing initial handoff/deadline and output budgets remain tied to original clock. Refresh is not continuation permission or another native launch."
+    ],
+    "request_required_fields": [
+      "schema_version=1",
+      "kind=ObserverReadyRefreshRequest",
+      "fixture_id",
+      "original_ready (exact immutable FileRef)",
+      "operator_authorization (exact original immutable FileRef)",
+      "operator_process incarnation and operator_scope identity",
+      "current completed source/import validation proof FileRefs",
+      "requested_ns from actual monotonic clock"
+    ],
+    "response_required_fields": [
+      "schema_version=1, kind=ObserverReady, retaining existing check_ready semantics",
+      "refresh_request (exact immutable FileRef)",
+      "original_ready (exact immutable FileRef)",
+      "same fixture_id/static_preflight/source/output/live_clock",
+      "same actual observer process birth/UID/argv/scope/ActorExec",
+      "ready_ns newly sampled by the still-running independently sourced observer after matching request"
+    ],
+    "scope": "One immutable file-based request/response and binding on already admitted separate channel/observer output roots after expensive operator validation; no new native methods/transport, general worker dispatch or stop predicate relaxation."
+  },
+  "reviewed_ms": 1791173930922,
+  "reviewer": "/root/collab_execution_admission_review",
+  "reviewer_native_thread_id": "01a105a5-de93-74a3-adad-c5184f54a751",
+  "schema_version": 1,
+  "shared_source_mutations": false,
+  "source_only_landing_disposition": {
+    "actual_cpu_insula_review": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-recorder1cef-source-insula-result-review.json",
+      "sha256": "230b59f3a9e315765cb420eb5a8b5264cf1b988904a2d1253a6f6809abc25712"
+    },
+    "actual_h_roles_stopped": true,
+    "admissible": true,
+    "candidate": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+    "chronology": "Lead landed/pushed exact1cef after the prior independent source/CPU approvals and stopped H readback, before this final repair/landing disposition was sealed. Historical H static/live evidence remains bound to b507.",
+    "kind": "Fixture preparation/diagnostic support, not task50 producer implementation or acceptance",
+    "publication_observed": {
+      "canonical_head": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+      "canonical_status": "",
+      "fresh_remote": "1cefb02333dd6846f9fd24f9ea51260e03399c7d\trefs/heads/phi9t/mainline"
+    },
+    "publication_test_and_static_audit_status": "Lead reported24tests/publication audit passed; those are outside this failure contract review. No full50 acceptance is inferred.",
+    "remaining_known_defect": "The initial-readiness age seam remains a recorded blocker to the next native attempt until separately sourced/reviewed correction.",
+    "source_review": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab50-native-fixture-review-1cefb02.json",
+      "sha256": "5b1ca0174dd52333221aed338d82f3dc6132b0a9d394369ffce4aa433f8f72c5"
+    },
+    "source_scope": "Exactly10 fixture-support files; eight retained Root53 imports unchanged and two rejected-header diagnostic files changed; no scientific/controller producer/grant/coverage changes."
+  },
+  "task50_accepted": false,
+  "verdict": "compatible-explicit-fresh-ready-chain"
+}

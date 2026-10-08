@@ -1,0 +1,5 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/component-archive-live-a/receipt.json",
+  "receipt_sha256": "34cb0efb53a0e5a4b15bef7ff75614c2912013abd5342242ed345f8e3947fe72",
+  "scope": "deterministic bundle/capacity/provenance/corruption fixtures only; native sidecar publication remains open"
+}

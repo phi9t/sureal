@@ -1,0 +1,6 @@
+{
+  "status": "preparation evidence; no scientific gate closure",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/source-integrity-live-a/receipt.json",
+  "receipt_sha256": "7a32f00294c33f6bc598d334609efa03bc14aa721a8b191fe0bd7cb24c33d443",
+  "scope": "byte verifier checked on retained engineering sources; scientific HDFS transfer locking and payload preprocessing remain open"
+}

@@ -1,0 +1,165 @@
+"""Lead-only owned-thread read diagnostic; not stop proof or product implementation."""
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import signal
+import time
+
+BASE = Path(__file__).resolve().parent
+SOURCE = BASE / 'fixture-operator-candidate-v12/source/tests/collab/fixture_support/native_stop_fixture.py'
+spec = importlib.util.spec_from_file_location('native_fixture_diagnostic', SOURCE)
+m = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(m)
+OUT = BASE / 'native-g-fullturn-diagnostic-v1'
+OUT.mkdir(mode=0o700)
+start = time.monotonic_ns()
+limit = start + 95000000000
+admission = json.loads((BASE / 'operator-live-admission-final-v3.json').read_text())
+runtime = admission['runtime']
+wire = None
+results = []
+
+def expire(*_):
+    raise TimeoutError('original95s bounded read-only diagnostic')
+
+signal.signal(signal.SIGALRM, expire)
+signal.setitimer(signal.ITIMER_REAL, 95)
+
+def item_public(value):
+    result = {key: value[key] for key in ('id', 'type', 'status', 'cwd', 'processId', 'exitCode') if key in value}
+    command = value.get('command')
+    if isinstance(command, str):
+        result['command_sha256'] = hashlib.sha256(command.encode()).hexdigest()
+    return result
+
+
+def public(method, value):
+    if method == 'thread/read':
+        thread = value['thread']
+        return {'thread': {k: thread[k] for k in ('id', 'sessionId', 'cwd', 'status') if k in thread}}
+    if method == 'thread/goal/get':
+        goal = value.get('goal', 'MISSING')
+        return {'goal': None if goal is None else {'present': True}}
+    result = {'data': [], 'nextCursor': value.get('nextCursor'), 'cursor_field_present': 'nextCursor' in value}
+    for entry in value['data']:
+        if method == 'thread/turns/list':
+            turn = {k: entry[k] for k in ('id', 'status', 'itemsView') if k in entry}
+            turn['items'] = [item_public(x) for x in entry.get('items', [])]
+            turn['items_field_present'] = 'items' in entry
+            turn['item_count'] = len(entry.get('items', []))
+            result['data'].append(turn)
+        else:
+            result['data'].append({k: entry[k] for k in ('id', 'status', 'itemId', 'processId', 'osPid', 'cwd') if k in entry})
+    return result
+
+
+def read(method, params):
+    wire.deadline = time.monotonic() + 2
+    wire.sequence += 1
+    number = wire.sequence
+    wire.pending_reply_id = number
+    started = time.monotonic_ns()
+    request = {'id': number, 'method': method, 'params': params}
+    intent = m.save(OUT / f'{number:04}-intent.json', {'request': request, 'started_ns': started, 'runtime': runtime})
+    wire.send(request)
+    while time.monotonic() < wire.deadline:
+        response = wire.receive()
+        if response is None or response.get('id') != number:
+            continue
+        raw_digest = hashlib.sha256(json.dumps(response, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+        record = {'method': method, 'params': params, 'intent': intent, 'started_ns': started,
+                  'ended_ns': time.monotonic_ns(), 'parsed_response_canonical_sha256': raw_digest,
+                  'private_bodies_retained': False}
+        if 'error' in response:
+            record['error'] = response['error']
+        else:
+            record['response'] = public(method, response['result'])
+        wire.pending_reply_id = None
+        ref = m.save(OUT / f'{number:04}-public-result.json', record)
+        return record, ref
+    raise TimeoutError('original2s native read deadline')
+
+
+def paged(method, params):
+    cursor = None
+    records = []
+    data = []
+    seen = set()
+    for _ in range(16):
+        record, ref = read(method, {**params, 'cursor': cursor})
+        records.append(ref)
+        if 'error' in record:
+            return {'error': record['error'], 'records': records}
+        page = record['response']
+        data.extend(page['data'])
+        if len(data) > 512:
+            raise ValueError('original512 entry bound')
+        cursor = page['nextCursor']
+        if cursor is None:
+            return {'data': data, 'records': records, 'complete_cursor_chain': True}
+        if not isinstance(cursor, str) or not cursor or cursor in seen:
+            raise ValueError('invalid/repeated cursor')
+        seen.add(cursor)
+    raise ValueError('original16 page bound')
+
+try:
+    launch_path = Path(admission['output']) / 'fixture-launch.json'
+    while not launch_path.exists():
+        if (Path(admission['notification_channel']['channel_root']['path']) / 'operator-unknown.json').exists():
+            raise ValueError('operator unknown before fixture launch; no invented thread')
+        if time.monotonic_ns() >= limit:
+            raise TimeoutError('no fixture launch within original bound')
+        time.sleep(.1)
+    launch = json.loads(launch_path.read_text())
+    tid = launch['thread_id']
+    assert launch['fixture_id'] == 'stop50-20261005g' and launch['workspace'] == admission['workspace']
+    wire = m.Wire(Path(runtime['endpoint']['path']))
+    assert wire.peer[:2] == (runtime['daemon']['pid'], os.getuid())
+    wire.call('initialize', {'clientInfo': {'name': 'sureal_owned_full_turn_diagnostic', 'version': '1'},
+                            'capabilities': {'experimentalApi': True}}, OUT, runtime)
+    wire.send({'method': 'initialized', 'params': {}})
+    terminal = 0
+    previous_terminal_ns = None
+    while time.monotonic_ns() < limit:
+        phase = {'started_ns': time.monotonic_ns(), 'thread_id': tid, 'facts': {}}
+        for method, params in [('thread/read', {'threadId': tid, 'includeTurns': False}),
+                               ('thread/read', {'threadId': tid, 'includeTurns': True}),
+                               ('thread/goal/get', {'threadId': tid})]:
+            record, ref = read(method, params)
+            phase['facts'][method + ('/full' if params.get('includeTurns') else '')] = {'record': ref, **{k: record[k] for k in ('response', 'error') if k in record}}
+        for method, params in [('thread/turns/list', {'threadId': tid, 'limit': 100, 'itemsView': 'full', 'sortDirection': 'asc'}),
+                               ('thread/queue/list', {'threadId': tid, 'limit': 100}),
+                               ('thread/backgroundTerminals/list', {'threadId': tid, 'limit': 100})]:
+            phase['facts'][method] = paged(method, params)
+        phase['ended_ns'] = time.monotonic_ns()
+        results.append(phase)
+        m.save(OUT / f'observation-{len(results):02}.json', phase)
+        turns = phase['facts']['thread/turns/list'].get('data', [])
+        is_terminal = bool(turns) and all(t['status'] != 'inProgress' for t in turns)
+        if is_terminal:
+            if previous_terminal_ns is None or phase['started_ns'] - previous_terminal_ns >= 5000000000:
+                terminal += 1
+                previous_terminal_ns = phase['started_ns']
+            if terminal >= 2:
+                break
+        else:
+            terminal = 0
+            previous_terminal_ns = None
+        time.sleep(5.1)
+    m.save(OUT / 'diagnostic-result.json', {'schema_version': 1, 'kind': 'OwnedFullTurnReadDiagnostic',
+        'thread_id': tid, 'launch': m.reference(launch_path), 'source': m.reference(Path(__file__)),
+        'observations': len(results), 'terminal_samples': terminal, 'started_ns': start, 'ended_ns': time.monotonic_ns(),
+        'native_mutations': False, 'stop_capability_accepted': False, 'task50_accepted': False,
+        'private_bodies_retained': False, 'purpose': 'Actual full-turn capability evidence only; original independent stop gates remain required.'})
+    print(json.dumps(m.reference(OUT / 'diagnostic-result.json')))
+except Exception as error:
+    m.save(OUT / 'diagnostic-unknown.json', {'kind': 'OwnedFullTurnDiagnosticUncertainty', 'error_type': type(error).__name__,
+        'reason': str(error), 'observations': len(results), 'stop_capability_accepted': False, 'task50_accepted': False,
+        'native_mutations': False, 'ownership_released': False})
+    raise
+finally:
+    if wire is not None:
+        wire.close()
+    signal.setitimer(signal.ITIMER_REAL, 0)

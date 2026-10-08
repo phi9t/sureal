@@ -1,0 +1,11 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.runtime_identity import verify_rootfs
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';evidence=code/'research/native-one-batch-overfit-execution-verified.json';old=json.loads(evidence.read_text());verify_rootfs(cache/'gpu-rootfs',old['runtime_lock']['rootfs_sha256'])
+for p,h in old['driver_hashes'].items():assert sha(p)==h
+output=cache/'scientific-processing/one-batch-bn-counterfactual-v1';output.mkdir();command=old['checks'][0]['command'].copy();command=[str(output) if x==str(cache/'scientific-processing/native-one-batch-overfit-v1') else '/experiment/gpu/one-batch-bn-counterfactual.py' if x=='/experiment/gpu/native-one-batch-overfit.py' else x for x in command];i=command.index('--');command[i:i]=['--ro-bind',str(cache/'scientific-processing/native-one-batch-overfit-v1'),'/tmp/baseline'];worker=code/'gpu/one-batch-bn-counterfactual.py';digest=sha(worker)
+manifest=old['manifest'];prereg={'hypothesis':'lagged BN running statistics degrade inference despite fixed learned weights','treatment':'one physical-only frame, BN momentum1, zero optimizer updates','quality':'unchanged native all17GT/score/NMS contract; no heldout claim','baseline_evidence_sha256':sha(evidence),'command':command,'worker_sha256':digest};(code/'research/one-batch-bn-counterfactual-pending.json').write_text(json.dumps(prereg,indent=2)+'\n')
+run=subprocess.run(command,capture_output=True,text=True,timeout=120);(output/'live.log').write_text(run.stdout+run.stderr);print(run.stdout+run.stderr);assert run.returncode==0 and sha(worker)==digest
+record={'checks':[{'command':command,'exit_code':0}],'runtime_lock':old['runtime_lock'],'driver_hashes':old['driver_hashes'],'baseline_evidence_sha256':sha(evidence),'worker_sha256':digest,'manifest':manifest,'validation':json.loads((output/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in output.iterdir()},'scope':'observational frozen-weight BN-statistics treatment; independent/native admission separate'};(code/'research/one-batch-bn-counterfactual-verified.json').write_text(json.dumps(record,indent=2)+'\n')

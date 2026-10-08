@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "axis": "Standards final documentation/inventory supplement",
+  "reviewed_utc": "2026-10-04T01:42:19.042661+00:00",
+  "worktree": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer",
+  "base": "0823cbbb77ffa3923ff51bd4067678a7dbdaa533",
+  "scope": "Recheck of final README, CONTEXT, explorer README, inventory dispositions and scoped dispatcher/test evidence only. The earlier 1311-path source structural review was retained and not repeated.",
+  "prior_review": "/tmp/sureal-comprehensive-closeout-standards-review.json",
+  "standards_source": "CONTRIBUTING.md: reproducibility/attribution, source/artifact locks, evidence-based scope and applicable validation tiers",
+  "documents": [
+    {
+      "path": "experiments/waymo-perception/README.md",
+      "sha256": "a2df270314e48d56e4fb36dd128ad7c627ef08a01df2fc0509cb20641a687c9d",
+      "bytes": 6984,
+      "inventory_sha256": "a2df270314e48d56e4fb36dd128ad7c627ef08a01df2fc0509cb20641a687c9d",
+      "inventory_bytes": 6984,
+      "inventory_exact": true,
+      "index_matches_reviewed_doc": false
+    },
+    {
+      "path": "experiments/waymo-perception/CONTEXT.md",
+      "sha256": "ea788b5c88fb4450b5c8b5e989b8f6df709fbc1fe1dc9fb396ac0275c662fc8d",
+      "bytes": 3280,
+      "inventory_sha256": "ea788b5c88fb4450b5c8b5e989b8f6df709fbc1fe1dc9fb396ac0275c662fc8d",
+      "inventory_bytes": 3280,
+      "inventory_exact": true,
+      "index_matches_reviewed_doc": false
+    },
+    {
+      "path": "experiments/waymo-perception/explorer/README.md",
+      "sha256": "df526316972235b48803453a66489f3c7c6532d1ae30e44f1597aee959a944d6",
+      "bytes": 1602,
+      "inventory_sha256": "df526316972235b48803453a66489f3c7c6532d1ae30e44f1597aee959a944d6",
+      "inventory_bytes": 1602,
+      "inventory_exact": true,
+      "index_matches_reviewed_doc": false
+    }
+  ],
+  "inventory": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/research/sureal-comprehensive-closeout-final-inventory.json",
+    "sha256": "e4bbd15922c4e6a60714df7f90433a19300e0a1bb4e6f9fc7ae045cbbff71935",
+    "entries": 2486,
+    "recorded_counts": {
+      "selected_for_integration_after_verification": 1292,
+      "excluded_timestamp_only_projection": 1,
+      "excluded_local_scratch_or_cache": 1161,
+      "already_integrated": 9,
+      "blocked_preserved": 19,
+      "excluded_generated_sensor_payload": 2,
+      "excluded_synchronization_lock": 2
+    },
+    "calculated_counts": {
+      "selected_for_integration_after_verification": 1292,
+      "excluded_timestamp_only_projection": 1,
+      "excluded_local_scratch_or_cache": 1161,
+      "already_integrated": 9,
+      "blocked_preserved": 19,
+      "excluded_generated_sensor_payload": 2,
+      "excluded_synchronization_lock": 2
+    },
+    "count_equality": true,
+    "unique_paths": true,
+    "blocked_map_matches_entries": true,
+    "selected_blocked_disjoint": true,
+    "selected_plus_blocked_equals_original_1311_candidates": true,
+    "selected_with_blockers": [],
+    "blocked_missing_reason": [],
+    "blocked_groups": {
+      "association": 9,
+      "continuation_runtime": 2,
+      "standalone_cohort_label_audit": 1,
+      "explorer_generator_closure": 7
+    },
+    "archive_policy": "Explicit reviewed source/doc/report and bounded proof-metadata allowlist only. No raw sensor payload, generated viewer, credentials, cache tree, globbed temporary tree, model weights or dataset arrays.",
+    "protected_external_draft": {
+      "path": "/data02/home/philip.yang/workspace/sureal/docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "owner": "architecture-review session",
+      "disposition": "keep unstaged, preserve exact bytes; committed51 proposal already integrated viaa3c6955; no migration or Kata activation"
+    },
+    "readiness_policy": "Exact historical live evidence plus independent source/role audit and applicable fresh scoped verification; no failed, pending, diagnostic or partial receipt promoted. selected_for_integration records intended transaction until final Git landing receipt resolves it.",
+    "selected_archive_member_prefix_valid": true
+  },
+  "evidence": {
+    "passing_tests_dispatch": {
+      "path": "/tmp/sureal-comprehensive-closeout-passing-tests-dispatch.json",
+      "sha256": "13b502bf21c03ff95bde9731e251750f625a08b8b4dae8a816684de4c3c4cea6",
+      "passed": true,
+      "scope": "312 actual successful CPU/Torch test invocations from v7 plus fresh v9 dispatch-only gate; v7 whole attempt failed in dispatcher and remains retained, no complete runner/training/resource admission"
+    },
+    "independent_supplement": {
+      "path": "/tmp/sureal-comprehensive-closeout-independent-supplement.json",
+      "sha256": "a40247475ec8dfd5d79b506951cbeed43c4c3efc164e7c644cb7dbedd6c10198",
+      "passed": true,
+      "scope": "independent read-only reconciliation of312 actual v7 CPU/Torch test invocations and v9 dispatch list/show; separate archive verification pending"
+    },
+    "reopened_dispatch_reference_hashes": [
+      {
+        "role": "proof",
+        "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/comprehensive-closeout-dispatch-v9/proofs/dispatcher/resource-admitted.json",
+        "expected_sha256": "964f5098f610e9396e01eb7dd0d7047a2eec142cebad281b2dd4953f0245a3d8",
+        "readback_matches": true
+      },
+      {
+        "role": "worker",
+        "path": "/tmp/sureal-comprehensive-closeout-dispatch-worker-v8.py",
+        "expected_sha256": "d6b20744e97bea7d90803c6390b4f43c205fe51a17c875f52e205be04684effe",
+        "readback_matches": true
+      },
+      {
+        "role": "driver",
+        "path": "/tmp/sureal-comprehensive-closeout-dispatch-v9.py",
+        "expected_sha256": "d0f33dc495ae08a5caea2055cf4cd38c59ebe5fa0072032dbf3a6b08db939bc8",
+        "readback_matches": true
+      },
+      {
+        "role": "dispatcher_source",
+        "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/architecture.py",
+        "expected_sha256": "21187b77c33e1528740d85e8cf2fe0810b9a3feed5a58603d4eda130efb058b3",
+        "readback_matches": true
+      },
+      {
+        "role": "registry",
+        "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/comprehensive-closeout-dispatch-v9/experiment/architecture/registry.json",
+        "expected_sha256": "0865049a938ce35a849faba95748f46a4647797fde0f8b57e0a79e6b22e3e5f0",
+        "readback_matches": true
+      }
+    ],
+    "actual_dispatch_checks": {
+      "checks": [
+        "list",
+        "show residual_bev"
+      ],
+      "scope": "entrypoint/bootstrap plus catalog reads; no runner/training behavior added or rerun"
+    }
+  },
+  "hard_standard_violations": [],
+  "new_heuristic_smells": [],
+  "resolved_observations": [
+    {
+      "id": "STD-DOC-001",
+      "status": "resolved",
+      "reference": "README current gates preserve established slice/runtime evidence while full balanced16/resource/scientific gates remain open"
+    },
+    {
+      "id": "FINAL-DOC-PINS-001",
+      "status": "resolved",
+      "reference": "Initial final-inventory entries did not match the three working doc amendments. Parent refreshed them during review; all three byte counts and SHA256 pins match final reviewed bytes."
+    }
+  ],
+  "truthfulness_checks": [
+    {
+      "path": "experiments/waymo-perception/README.md",
+      "lines": [
+        91,
+        94
+      ],
+      "result": "Original planning layout now explicitly historical; implementation status points to retained scoped receipts and task acceptance"
+    },
+    {
+      "path": "experiments/waymo-perception/README.md",
+      "lines": [
+        130,
+        137
+      ],
+      "result": "Delivered two-scene and live reader evidence distinguished from complete resource/backend/retention/runner and scientific acceptance"
+    },
+    {
+      "path": "experiments/waymo-perception/README.md",
+      "lines": [
+        151,
+        155
+      ],
+      "result": "New source-bound CPU dispatcher proof explicitly limited to list/show residual_bev; existing historical seven-stage receipts remain separate"
+    },
+    {
+      "path": "experiments/waymo-perception/CONTEXT.md",
+      "lines": [
+        36,
+        45
+      ],
+      "result": "Decision map and goal point to committed task documentation; no models/training migration or Kata activation asserted"
+    },
+    {
+      "path": "experiments/waymo-perception/explorer/README.md",
+      "lines": [
+        3,
+        8
+      ],
+      "result": "Local generator/assembly/template/orchestration declared pending; generated sensor-image previews excluded from Git; clean-mainline availability not claimed"
+    },
+    {
+      "path": "experiments/waymo-perception/explorer/README.md",
+      "lines": [
+        20,
+        24
+      ],
+      "result": "Historical browser/payload observations explicitly do not admit current generator closure"
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-comprehensive-closeout-final-inventory.json",
+      "field": "readiness_policy",
+      "result": "Selection identifies intended integration transaction until final Git landing receipt; blocked gate reasons and all exclusions retained"
+    },
+    {
+      "path": "experiments/waymo-perception/research/sureal-comprehensive-closeout-final-inventory.json",
+      "field": "archive_policy",
+      "result": "Explicit source/doc/report/bounded proof metadata allowlist; no raw preview, credential, cache/temp-glob, weight or dataset-array publication claimed"
+    }
+  ],
+  "deferred_followup": "Prior possible duplication observation remains deferred; preserve frozen source modules and independent verifiers. No source change proposed or performed.",
+  "landing_assessment": "No remaining Standards finding in final reviewed documentation/dispositions. Include these exact doc bytes and refresh/stage the integration transaction consistently. HDFS exact readback/live recovery, final Git landing and complete runner/scientific admission must retain their separate actual evidence. This review does not certify the publisher currently running or claim those gates completed.",
+  "no_new_auth_or_forward_scope_claim": true,
+  "actions": {
+    "repository_edits": false,
+    "index_mutations": false,
+    "source_structural_review_repeated": false,
+    "gpu_execution": false,
+    "hdfs_mutations": false,
+    "authentication_mutations": false
+  }
+}

@@ -1,0 +1,75 @@
+# Post-closeout stage handoff
+
+The ready backlog was integrated and published at
+`b9a5a9c4f2723f0b4ceda4e5a4c6ab01abcf35c2` (`05b9192` ready commit).
+This document records subsequent user steering. It introduces no protocol,
+model, training, runtime, retention or cleanup implementation. The
+[per-path/source/process census](sureal-post-closeout-stage-handoff.json)
+records the observed revision and working states before this documentation
+addition; its observation is not a pristine-mainline admission.
+
+At that census, canonical `phi9t/mainline` matched the independently reread
+remote revision. Its index was empty, but tracked and untracked state were
+not clean: the external review session's `32fd3ea7` models/training draft,
+the untracked resource-admission note (`517aaf1d`, ownership unresolved),
+and three exact preservation backup files remain. None was moved, deleted,
+ignored, staged or overwritten here. Unique source requires explicit
+owner/disposition reconciliation before a pristine transition can be admitted.
+
+The retained worker had an empty index, one timestamp-only registry change,
+19 blocked source files, two raw-preview derivatives, two synchronization
+locks and 1,181 retained scratch/cache paths. All 1,205 census entries have
+individual dispositions. The 19 blockers retain the previous exact per-file
+reasons and verified HDFS source inventory. The worker was then fast-forwarded
+to its already-published integration revision without changing its source tree.
+The registry watcher PID3951814 and its launcher remain; the browser, viewer,
+editor, language-server and Codex processes were preserved. No workspace was
+retired and no writer-quiescence claim is made. A host process census is a
+point-in-time observation, not proof that every descendant has stopped.
+
+The separate review worktree is clean at `4469127` on
+`codex/serial-collaboration-specs`, with ten documentation commits not in the
+observed mainline. They remain owned by that design session. The referenced
+`devx/tmp/minimal-serial-collaboration-protocol-20261003-174233.md` now marks
+itself superseded and points to a newer proposal recommending worktrees and
+two workers. That differs from this message's serial-worker/exact-base clone
+steering. Neither proposal is adopted or changed by this closeout. Its owner
+must reconcile the written design and implementation home with the user
+before implementation; a commit title saying approval is not a new grant to
+this worker to begin a competing protocol.
+
+The stage order is:
+
+1. Finish current work; inventory and land every independently reviewed and
+   verified ready owned contribution on `phi9t/mainline`. Retain and explicitly
+   disposition all remaining unique source, processes and evidence.
+2. Reconcile the outstanding contributions and writers, then independently
+   verify a single pristine canonical mainline, published transition revision
+   and retained-evidence dispositions. Do not obtain cleanliness by deleting
+   worktrees or ignoring source.
+3. Resolve and approve the written minimalist collaboration design and its
+   tooling home, then implement/adopt it through its own gates. The present
+   user contract is one persistent lead, one serial worker, exact-base task
+   clones, one immutable candidate, lead review/live verification, exact
+   fast-forward landing, retained evidence and safe disposable cleanup.
+4. After protocol adoption, models/training tickets44–48 are the first
+   scientific architecture workstream. Preserve parameter registration,
+   seeded draws, observation binding, optimizer/checkpoint formats, frozen
+   scientific identities and independent live Insula gates.
+
+Other approved scientific dependencies remain recorded: full resource and
+continuation admission before unchanged balanced16 checkpoint continuation;
+ticket42 measurement-indexed failure ledger, then ticket43 frozen-weight
+normalization; isolated41.2 ownership. These do not preempt closeout or the
+new protocol/adoption ordering. Conditional pillarLN and exploratory range/
+sparse research retain their existing evidence boundaries.
+
+Original checkpoint0/1000, full1279GT, frozen resource identity, recipes,
+source packages, resource limits and original HDFS evidence remain intact.
+The previous 1,381-member source/report archive and 65-member metadata
+supplement retain their independent exact-readback/live-recovery roles.
+This later handoff and journal entry115 are Git-only bookkeeping outside
+those sealed HDFS epochs. No new HDFS content, scientific result, model
+migration, protocol activation, Kata adoption or local payload release is
+claimed. Pristine-mainline admission remains blocked by the retained work
+and ownership/process reconciliation above.

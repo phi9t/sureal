@@ -1,0 +1,149 @@
+"""Parse commands and emit explicit operation results; no dispatch before50."""
+import argparse
+from dataclasses import asdict
+import json
+from pathlib import Path
+import sys
+import tomllib
+
+from .admission import admit_project, load_project, read_task_definition
+from .contracts import Refusal, Result, Snapshot, canonical, digest, loads
+from .git_workspace import GitWorkspace, physical, sha
+from .kata import Kata, definition_record
+from .store import Store, _write
+
+
+class Parser(argparse.ArgumentParser):
+    def error(self, message):
+        raise Refusal("USAGE_ERROR", message)
+
+
+def parser():
+    root = Parser(description="Sureal collaboration; operation success is not task acceptance")
+    commands = root.add_subparsers(dest="command", required=True, parser_class=Parser)
+    initialize = commands.add_parser("init")
+    initialize.add_argument("--canonical", type=Path, required=True)
+    initialize.add_argument("--state", type=Path, required=True)
+    initialize.add_argument("--admission", type=Path, required=True)
+    initialize.add_argument("--operation-id", required=True)
+    status = commands.add_parser("status")
+    status.add_argument("--project-state", type=Path, required=True)
+    status.add_argument("--format", choices=("json", "text"), default="json")
+    task = commands.add_parser("task")
+    tasks = task.add_subparsers(dest="task_command", required=True, parser_class=Parser)
+    importing = tasks.add_parser("import")
+    importing.add_argument("--project-state", type=Path, required=True)
+    importing.add_argument("--definitions", type=Path, required=True)
+    importing.add_argument("--task-map-output", type=Path, required=True)
+    importing.add_argument("--operation-id", required=True)
+    return root
+
+
+def read_status(project) -> Snapshot:
+    from time import time_ns
+    client = Kata(project)
+    issues = client._definitions()
+    return Snapshot(project.project_id, time_ns() // 1_000_000,
+                    {"kata": {"state": "observed", "identity": client.identity()},
+                     "codex": {"state": "UNKNOWN", "reason": "native adapter is not admitted before50"}},
+                    {}, {task_id: {"issue_uid": issue["uid"], "owner": issue.get("owner"),
+                        "queue_status": issue["status"], "acceptance": "NOT_AUDITED"} for task_id, issue in issues.items()}, {})
+
+
+def _import(args, project):
+    manifest = loads(args.definitions.read_bytes())
+    rows = manifest.get("tasks")
+    if isinstance(rows, dict):
+        rows = list(rows.values())
+    if not isinstance(rows, list) or not rows or any(not isinstance(row, dict)
+            or not row.get("task_id") or not row.get("source_commit") for row in rows):
+        raise Refusal("UNADMITTED_SPEC", "reviewed source-pinned task definitions required")
+    definitions = [read_task_definition(project, item["task_id"], item["source_commit"], item) for item in rows]
+    output = physical(args.task_map_output)
+    if output.name != "kata-task-map.json" or output.parent.parts[-2:] != ("docs", "research"):
+        raise Refusal("SCOPE_CONFLICT", "task map output must be docs/research/kata-task-map.json")
+    metadata_root = output.parents[2]
+    facts = GitWorkspace.inspect(metadata_root, tool_pin=project.tools.get("git"))
+    if metadata_root == project.canonical or facts["common_git_dir"] != str(project.common_git_dir):
+        raise Refusal("SCOPE_CONFLICT", "task map output requires a separate owned metadata worktree")
+    canonical_facts = GitWorkspace.inspect(project.canonical, tool_pin=project.tools.get("git"))
+    if facts["head"] != canonical_facts["head"]:
+        raise Refusal("STALE_BASE", "metadata worktree must start at current canonical mainline")
+    binding = metadata_root / ".kata.toml"
+    if not binding.is_file():
+        raise Refusal("UNADMITTED_SPEC", "manually bootstrapped Kata binding required")
+    try:
+        parsed_binding = tomllib.loads(binding.read_text())
+    except (ValueError, UnicodeError) as error:
+        raise Refusal("UNADMITTED_SPEC", "native Kata binding is invalid") from error
+    if (parsed_binding.get("version") != 1 or
+            parsed_binding.get("project", {}).get("name") != project.kata["name"]):
+        raise Refusal("UNADMITTED_SPEC", "metadata binding identifies a different project")
+    inputs = {"schema_version": 1, "definitions_sha256": sha(args.definitions), "output": str(output),
+              "base": canonical_facts["head"], "binding_sha256": sha(binding)}
+    store = Store(project.state)
+    effect = store.prepare("task-import", inputs, args.operation_id)
+    imported = Kata(project).import_tasks(definitions)
+    try:
+        current = GitWorkspace.inspect(project.canonical, tool_pin=project.tools.get("git"))
+        metadata = GitWorkspace.inspect(metadata_root, tool_pin=project.tools.get("git"))
+        if (current["head"] != inputs["base"] or current["ref"] != project.ref or current["status_z_hex"]
+                or any(metadata[key] != facts[key] for key in ("head", "ref", "common_git_dir"))
+                or sha(binding) != inputs["binding_sha256"]
+                or sha(args.definitions) != inputs["definitions_sha256"] or physical(output) != output):
+            raise Refusal("STALE_BASE", "task import inputs or mainline changed")
+        for definition in definitions:
+            read_task_definition(project, definition.task_id, definition.source_commit,
+                                 definition_record(definition))
+    except (Refusal, OSError) as error:
+        raise Refusal("UNKNOWN_EFFECT", "native import completed but map source must be reconciled",
+                      {"record_id": effect.record_id, "cause": getattr(error, "reason", type(error).__name__)},
+                      outcome="unknown") from error
+    mapping = {"schema_version": 1, "project": {"id": project.kata["project_id"], "uid": project.kata["project_uid"],
+              "name": project.kata["name"]}, "binding": {"path": ".kata.toml", "sha256": sha(binding)},
+              "source_commit": inputs["base"], "tasks": imported.evidence["tasks"]}
+    output.parent.mkdir(parents=True, exist_ok=True)
+    _write(output, canonical(mapping) + b"\n", immutable=True)
+    return store.record(effect, {"schema_version": 1, "outcome": "ok", "evidence": {
+        "map": {"path": str(output), "sha256": sha(output)}, "tasks": imported.evidence["tasks"]}})
+
+
+def main(argv=None):
+    args = None
+    try:
+        args = parser().parse_args(argv)
+        if args.command == "init":
+            project = admit_project(args.canonical, args.state, loads(args.admission.read_bytes()), operation_id=args.operation_id)
+            result = Result(args.operation_id, "ok", evidence={"project_id": project.project_id,
+                            "transition_base": project.transition_base, "admission_digest": project.admission_digest})
+        else:
+            if not (args.project_state / "project.json").is_file():
+                raise Refusal("SOURCE_UNAVAILABLE", "admitted project state unavailable")
+            project = load_project(args.project_state)
+            if args.command == "status":
+                snapshot = asdict(read_status(project))
+                if args.format == "text":
+                    print("Project " + project.project_id + ": Kata observed; Codex UNKNOWN; task acceptance NOT_AUDITED")
+                    for task_id, task in snapshot["tasks"].items():
+                        print(task_id + ": " + task["queue_status"] + ", owner=" + str(task["owner"]))
+                    return 0
+                result = Result("status", "ok", evidence={"snapshot": snapshot})
+            else:
+                result = _import(args, project)
+        print(canonical(result.wire()).decode(), flush=True)
+        return {"ok": 0, "refused": 2, "unknown": 3}[result.outcome]
+    except Refusal as error:
+        result = Result(getattr(args, "operation_id", "unassigned") if args else "unassigned",
+                        error.outcome, reason=error.reason, evidence={"detail": error.detail, **error.evidence})
+        print(canonical(result.wire()).decode(), flush=True)
+        return 64 if error.reason == "USAGE_ERROR" else 3 if error.outcome == "unknown" else 2
+    except OSError as error:
+        result = Result(getattr(args, "operation_id", "unassigned") if args else "unassigned",
+                        "unknown", reason="UNKNOWN_EFFECT", evidence={"error_type": type(error).__name__})
+        print(canonical(result.wire()).decode(), flush=True)
+        return 3
+    except Exception as error:
+        result = Result(getattr(args, "operation_id", "unassigned") if args else "unassigned",
+                        "unknown", reason="INTERNAL_ERROR", evidence={"error_type": type(error).__name__})
+        print(canonical(result.wire()).decode(), flush=True)
+        return 1

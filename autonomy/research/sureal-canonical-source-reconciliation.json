@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "base": "c5679f6140836cb7e3ed46df559290590961119e",
+  "utc": "2026-10-04T02:36:35.684933+00:00",
+  "authorization": "User identified obsolete206-line duplicate, granted reconciliation to acceptedmainline under singlewriter, requested inventory/disposition of scratch/resourcesnote; no unique work deletion or ignoring.",
+  "archive_root": "/data02/home/philip.yang/devx/tmp/sureal-pristine-provenance-20261004-c5679f6",
+  "files": [
+    {
+      "status": " M",
+      "relative_path": "docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "bytes": 20094,
+      "sha256": "32fd3ea749a55463a9806c583e2ebb5086aed57a8ef9f920127c14620c04d364",
+      "archive_path": "/data02/home/philip.yang/devx/tmp/sureal-pristine-provenance-20261004-c5679f6/original-paths/docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "disposition": "obsolete duplicate retained outside canonical; accepted220-line spec restored, never staged stale text"
+    },
+    {
+      "status": "??",
+      "relative_path": ".scratch/models-training-proposal-preservation-20261004-32fd3ea7/held-root-design-during-docs-merge.md",
+      "bytes": 20094,
+      "sha256": "32fd3ea749a55463a9806c583e2ebb5086aed57a8ef9f920127c14620c04d364",
+      "archive_path": "/data02/home/philip.yang/devx/tmp/sureal-pristine-provenance-20261004-c5679f6/original-paths/.scratch/models-training-proposal-preservation-20261004-32fd3ea7/held-root-design-during-docs-merge.md",
+      "disposition": "exact retained provenance/scratch note moved outside canonical; not adopted as accepted design or implementation"
+    },
+    {
+      "status": "??",
+      "relative_path": ".scratch/models-training-proposal-preservation-20261004-32fd3ea7/owned-root-design.md",
+      "bytes": 20094,
+      "sha256": "32fd3ea749a55463a9806c583e2ebb5086aed57a8ef9f920127c14620c04d364",
+      "archive_path": "/data02/home/philip.yang/devx/tmp/sureal-pristine-provenance-20261004-c5679f6/original-paths/.scratch/models-training-proposal-preservation-20261004-32fd3ea7/owned-root-design.md",
+      "disposition": "exact retained provenance/scratch note moved outside canonical; not adopted as accepted design or implementation"
+    },
+    {
+      "status": "??",
+      "relative_path": ".scratch/models-training-proposal-preservation-20261004-32fd3ea7/preservation.json",
+      "bytes": 1097,
+      "sha256": "35427abb24446b183d6c648cd7dab814c3d18a6833cce042332c958c7e6016d9",
+      "archive_path": "/data02/home/philip.yang/devx/tmp/sureal-pristine-provenance-20261004-c5679f6/original-paths/.scratch/models-training-proposal-preservation-20261004-32fd3ea7/preservation.json",
+      "disposition": "exact retained provenance/scratch note moved outside canonical; not adopted as accepted design or implementation"
+    },
+    {
+      "status": "??",
+      "relative_path": "experiments/waymo-perception/resources.tmp-design.md",
+      "bytes": 1319,
+      "sha256": "517aaf1d99184164048df000ebd3958abc64de59f0e55b285452e3f40d5983bc",
+      "archive_path": "/data02/home/philip.yang/devx/tmp/sureal-pristine-provenance-20261004-c5679f6/original-paths/experiments/waymo-perception/resources.tmp-design.md",
+      "disposition": "exact retained provenance/scratch note moved outside canonical; not adopted as accepted design or implementation"
+    }
+  ],
+  "accepted_spec_sha256": "b7f371663e658958b4031ba1eefeca786985f5fbd520d17abd11b3ee14e866d2",
+  "stale_spec_sha256": "32fd3ea749a55463a9806c583e2ebb5086aed57a8ef9f920127c14620c04d364",
+  "scope": "exact source/provenance preservation and canonical source reconciliation only; no protocol/migration/scientific changes",
+  "old_proposal_not_staged": true,
+  "note_role": "Historical resource-admission scratch note; distinct from accepted resources implementation and future complete-controller admission.",
+  "passed": true,
+  "canonical_HEAD": "c5679f6140836cb7e3ed46df559290590961119e",
+  "canonical_tracked_clean": true,
+  "canonical_index_clean": true,
+  "canonical_untracked_clean": true,
+  "archive_manifest_sha256": "eeec4cbbe3060258f9d69e1eea6c8f2d41a2927d90be55f36a0e41300e0adfab",
+  "accepted_spec_lines": 220,
+  "stale_spec_lines": 206,
+  "stale_proposal_not_committed": true,
+  "unique_contents_discarded": false,
+  "worktrees_deleted": false,
+  "ignore_rules_changed": false,
+  "source_file_reconciled": "docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+  "new_scientific_execution": false,
+  "protocol_or_migration_implemented": false,
+  "no_scientific_payload_release": true,
+  "processes_terminated": false,
+  "full_protocol_admission": "No protocol implementation, activation or full controller/workspace/process admission. Clean canonical Git source state is verified separately from retained worker19blocked sources and foreign design reconciliation.",
+  "accepted_tracked_sources_changed_beyond_restore": false,
+  "relocated_untracked_source_or_backup_files": 4,
+  "raw_operator_receipt": {
+    "path": "/tmp/sureal-pristine-reconciliation.json",
+    "sha256": "3c0cd8167bfcf5774406f3959539295330c8bfac1a188f819d6968647d11ee56",
+    "scope": "Raw source_path_changed_beyond_accepted_restore key describes accepted tracked sources only; four untracked provenance files were explicitly relocated. Published field name clarifies that scope."
+  },
+  "unique_resource_note_snapshot": "experiments/waymo-perception/research/journal-evidence/517aaf1d99184164048df000ebd3958abc64de59f0e55b285452e3f40d5983bc",
+  "unique_resource_note_role": "Historical resource-admission scratch note preserved as immutable evidence; not an accepted new spec or proof of complete-controller admission."
+}

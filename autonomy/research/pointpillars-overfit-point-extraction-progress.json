@@ -1,0 +1,427 @@
+{
+  "selected_scenes": 13,
+  "selected_frames": 16,
+  "admitted_scenes": 13,
+  "candidate_sha256": "11a8e88d55cae10826b67e3079173d22260dd4c730a0e679c71fe84a7b91722e",
+  "scene_evidence": {
+    "10599748131695282446_1380_000_1400_000": {
+      "evidence": "pointpillars-overfit-points-10599748131695282446_1380_000_1400_000-verified.json",
+      "evidence_sha256": "607370aa3c4c6075a88be457ef9a48c9372f82a236d25834f981249a44504e54",
+      "validation": {
+        "scene": "10599748131695282446_1380_000_1400_000",
+        "selected_frames": [
+          {
+            "timestamp_micros": 1558033878647442,
+            "points": 172334,
+            "native_box_rows": 83,
+            "annotation_state": "native_box_rows_present",
+            "training_target_reasons": {
+              "unknown_class": 0,
+              "zero_native_points": 5,
+              "center_outside_roi": 6,
+              "eligible": 72
+            },
+            "eligible_class_counts": {
+              "1": 39,
+              "2": 25,
+              "3": 8,
+              "4": 0
+            }
+          }
+        ],
+        "scope": "retained native physical frame/box identity join and target exclusions independently reconciled; packing, optimizer/overfit and heldout evidence remain open"
+      }
+    },
+    "13271285919570645382_5320_000_5340_000": {
+      "evidence": "pointpillars-overfit-points-13271285919570645382_5320_000_5340_000-verified.json",
+      "evidence_sha256": "83dd81adb901c9010dbd2385492ac1256d17e98d087351025ad50428beb00fe7",
+      "validation": {
+        "scene": "13271285919570645382_5320_000_5340_000",
+        "selected_frames": [
+          {
+            "timestamp_micros": 1544465669937500,
+            "points": 186237,
+            "native_box_rows": 89,
+            "annotation_state": "native_box_rows_present",
+            "training_target_reasons": {
+              "unknown_class": 0,
+              "zero_native_points": 11,
+              "center_outside_roi": 6,
+              "eligible": 72
+            },
+            "eligible_class_counts": {
+              "1": 34,
+              "2": 6,
+              "3": 32,
+              "4": 0
+            }
+          },
+          {
+            "timestamp_micros": 1544465679337513,
+            "points": 186806,
+            "native_box_rows": 89,
+            "annotation_state": "native_box_rows_present",
+            "training_target_reasons": {
+              "unknown_class": 0,
+              "zero_native_points": 6,
+              "center_outside_roi": 5,
+              "eligible": 78
+            },
+            "eligible_class_counts": {
+              "1": 37,
+              "2": 7,
+              "3": 33,
+              "4": 1
+            }
+          }
+        ],
+        "scope": "retained native physical frame/box identity join and target exclusions independently reconciled; packing, optimizer/overfit and heldout evidence remain open"
+      }
+    },
+    "14369250836076988112_7249_040_7269_040": {
+      "evidence": "pointpillars-overfit-points-14369250836076988112_7249_040_7269_040-verified.json",
+      "evidence_sha256": "096319ebd07321a010e5c09068e72e92839578be6ea6653f06715f9047e6196b",
+      "validation": {
+        "scene": "14369250836076988112_7249_040_7269_040",
+        "selected_frames": [
+          {
+            "timestamp_micros": 1507658201233279,
+            "points": 174751,
+            "native_box_rows": 9,
+            "annotation_state": "native_box_rows_present",
+            "training_target_reasons": {
+              "unknown_class": 0,
+              "zero_native_points": 2,
+              "center_outside_roi": 2,
+              "eligible": 5
+            },
+            "eligible_class_counts": {
+              "1": 1,
+              "2": 0,
+              "3": 4,
+              "4": 0
+            }
+          }
+        ],
+        "scope": "retained native physical frame/box identity join and target exclusions independently reconciled; packing, optimizer/overfit and heldout evidence remain open"
+      }
+    },
+    "2415873247906962761_5460_000_5480_000": {
+      "evidence": "pointpillars-overfit-points-2415873247906962761_5460_000_5480_000-verified.json",
+      "evidence_sha256": "e417b31e1f707be7be74fa93f579ad15c6d2c4168e4d625311cad7b9b57ba85c",
+      "validation": {
+        "scene": "2415873247906962761_5460_000_5480_000",
+        "selected_frames": [
+          {
+            "timestamp_micros": 1542756269548778,
+            "points": 182908,
+            "native_box_rows": 64,
+            "annotation_state": "native_box_rows_present",
+            "training_target_reasons": {
+              "unknown_class": 0,
+              "zero_native_points": 2,
+              "center_outside_roi": 6,
+              "eligible": 56
+            },
+            "eligible_class_counts": {
+              "1": 32,
+              "2": 13,
+              "3": 11,
+              "4": 0
+            }
+          },
+          {
+            "timestamp_micros": 1542756270248731,
+            "points": 183174,
+            "native_box_rows": 64,
+            "annotation_state": "native_box_rows_present",
+            "training_target_reasons": {
+              "unknown_class": 0,
+              "zero_native_points": 1,
+              "center_outside_roi": 6,
+              "eligible": 57
+            },
+            "eligible_class_counts": {
+              "1": 32,
+              "2": 14,
+              "3": 11,
+              "4": 0
+            }
+          }
+        ],
+        "scope": "retained native physical frame/box identity join and target exclusions independently reconciled; packing, optimizer/overfit and heldout evidence remain open"
+      }
+    },
+    "3224923476345749285_4480_000_4500_000": {
+      "evidence": "pointpillars-overfit-points-3224923476345749285_4480_000_4500_000-verified.json",
+      "evidence_sha256": "538e1b6316708f1128e6ee6b93ae8377355ae563dcf870c3ec7428eb293eb791",
+      "validation": {
+        "scene": "3224923476345749285_4480_000_4500_000",
+        "selected_frames": [
+          {
+            "timestamp_micros": 1549501331198565,
+            "points": 196577,
+            "native_box_rows": 27,
+            "annotation_state": "native_box_rows_present",
+            "training_target_reasons": {
+              "unknown_class": 0,
+              "zero_native_points": 2,
+              "center_outside_roi": 2,
+              "eligible": 23
+            },
+            "eligible_class_counts": {
+              "1": 8,
+              "2": 1,
+              "3": 14,
+              "4": 0
+            }
+          }
+        ],
+        "scope": "retained native physical frame/box identity join and target exclusions independently reconciled; packing, optimizer/overfit and heldout evidence remain open"
+      }
+    },
+    "3375636961848927657_1942_000_1962_000": {
+      "evidence": "pointpillars-overfit-points-3375636961848927657_1942_000_1962_000-verified.json",
+      "evidence_sha256": "9256fa0d1f51576a75c189faf7bbdc618b3cae1c6585cefa4cf5fb4fc4c96254",
+      "validation": {
+        "scene": "3375636961848927657_1942_000_1962_000",
+        "selected_frames": [
+          {
+            "timestamp_micros": 1520979236788944,
+            "points": 150026,
+            "native_box_rows": 68,
+            "annotation_state": "native_box_rows_present",
+            "training_target_reasons": {
+              "unknown_class": 0,
+              "zero_native_points": 9,
+              "center_outside_roi": 3,
+              "eligible": 56
+            },
+            "eligible_class_counts": {
+              "1": 30,
+              "2": 3,
+              "3": 23,
+              "4": 0
+            }
+          }
+        ],
+        "scope": "retained native physical frame/box identity join and target exclusions independently reconciled; packing, optimizer/overfit and heldout evidence remain open"
+      }
+    },
+    "4447423683538547117_536_022_556_022": {
+      "evidence": "pointpillars-overfit-points-4447423683538547117_536_022_556_022-verified.json",
+      "evidence_sha256": "cf01cdfd404f35b8f5cfb9908df77c2e50bcf49916c3d3fca0c1c09f27a68e0c",
+      "validation": {
+        "scene": "4447423683538547117_536_022_556_022",
+        "selected_frames": [
+          {
+            "timestamp_micros": 1509377835676730,
+            "points": 164318,
+            "native_box_rows": 50,
+            "annotation_state": "native_box_rows_present",
+            "training_target_reasons": {
+              "unknown_class": 0,
+              "zero_native_points": 5,
+              "center_outside_roi": 3,
+              "eligible": 42
+            },
+            "eligible_class_counts": {
+              "1": 38,
+              "2": 1,
+              "3": 3,
+              "4": 0
+            }
+          }
+        ],
+        "scope": "retained native physical frame/box identity join and target exclusions independently reconciled; packing, optimizer/overfit and heldout evidence remain open"
+      }
+    },
+    "4487677815262010875_4940_000_4960_000": {
+      "evidence": "pointpillars-overfit-points-4487677815262010875_4940_000_4960_000-verified.json",
+      "evidence_sha256": "1af048ba6b26d7a86ce30568558dc7d7677c82e8850b3999fe36398ff760577b",
+      "validation": {
+        "scene": "4487677815262010875_4940_000_4960_000",
+        "selected_frames": [
+          {
+            "timestamp_micros": 1557326022347111,
+            "points": 176787,
+            "native_box_rows": 100,
+            "annotation_state": "native_box_rows_present",
+            "training_target_reasons": {
+              "unknown_class": 0,
+              "zero_native_points": 5,
+              "center_outside_roi": 6,
+              "eligible": 89
+            },
+            "eligible_class_counts": {
+              "1": 18,
+              "2": 48,
+              "3": 23,
+              "4": 0
+            }
+          }
+        ],
+        "scope": "retained native physical frame/box identity join and target exclusions independently reconciled; packing, optimizer/overfit and heldout evidence remain open"
+      }
+    },
+    "5525943706123287091_4100_000_4120_000": {
+      "evidence": "pointpillars-overfit-points-5525943706123287091_4100_000_4120_000-verified.json",
+      "evidence_sha256": "e97e5807f2cab02418ed0cdb483a5320a936791e875db95c7c68d7df60bb1989",
+      "validation": {
+        "scene": "5525943706123287091_4100_000_4120_000",
+        "selected_frames": [
+          {
+            "timestamp_micros": 1507730158608059,
+            "points": 171125,
+            "native_box_rows": 61,
+            "annotation_state": "native_box_rows_present",
+            "training_target_reasons": {
+              "unknown_class": 0,
+              "zero_native_points": 1,
+              "center_outside_roi": 5,
+              "eligible": 55
+            },
+            "eligible_class_counts": {
+              "1": 21,
+              "2": 3,
+              "3": 29,
+              "4": 2
+            }
+          }
+        ],
+        "scope": "retained native physical frame/box identity join and target exclusions independently reconciled; packing, optimizer/overfit and heldout evidence remain open"
+      }
+    },
+    "7912728502266478772_1202_200_1222_200": {
+      "evidence": "pointpillars-overfit-points-7912728502266478772_1202_200_1222_200-verified.json",
+      "evidence_sha256": "58eb5d605606dc7c75ab65391a034ce30fa320dc3a7d3ece25c5f4cb75229aa7",
+      "validation": {
+        "scene": "7912728502266478772_1202_200_1222_200",
+        "selected_frames": [
+          {
+            "timestamp_micros": 1506905332721474,
+            "points": 183738,
+            "native_box_rows": 19,
+            "annotation_state": "native_box_rows_present",
+            "training_target_reasons": {
+              "unknown_class": 0,
+              "zero_native_points": 2,
+              "center_outside_roi": 0,
+              "eligible": 17
+            },
+            "eligible_class_counts": {
+              "1": 3,
+              "2": 3,
+              "3": 11,
+              "4": 0
+            }
+          }
+        ],
+        "scope": "retained native physical frame/box identity join and target exclusions independently reconciled; packing, optimizer/overfit and heldout evidence remain open"
+      }
+    },
+    "8454755173123314088_3202_000_3222_000": {
+      "evidence": "pointpillars-overfit-points-8454755173123314088_3202_000_3222_000-verified.json",
+      "evidence_sha256": "a54c3442ca047503627c38abe10537506e066776e1c0ae177f27c477f0332425",
+      "validation": {
+        "scene": "8454755173123314088_3202_000_3222_000",
+        "selected_frames": [
+          {
+            "timestamp_micros": 1518654686741547,
+            "points": 159726,
+            "native_box_rows": 34,
+            "annotation_state": "native_box_rows_present",
+            "training_target_reasons": {
+              "unknown_class": 0,
+              "zero_native_points": 4,
+              "center_outside_roi": 5,
+              "eligible": 25
+            },
+            "eligible_class_counts": {
+              "1": 25,
+              "2": 0,
+              "3": 0,
+              "4": 0
+            }
+          },
+          {
+            "timestamp_micros": 1518654700641367,
+            "points": 157425,
+            "native_box_rows": 29,
+            "annotation_state": "native_box_rows_present",
+            "training_target_reasons": {
+              "unknown_class": 0,
+              "zero_native_points": 4,
+              "center_outside_roi": 2,
+              "eligible": 23
+            },
+            "eligible_class_counts": {
+              "1": 22,
+              "2": 0,
+              "3": 1,
+              "4": 0
+            }
+          }
+        ],
+        "scope": "retained native physical frame/box identity join and target exclusions independently reconciled; packing, optimizer/overfit and heldout evidence remain open"
+      }
+    },
+    "8722413665055769182_2840_000_2860_000": {
+      "evidence": "pointpillars-overfit-points-8722413665055769182_2840_000_2860_000-verified.json",
+      "evidence_sha256": "90a50db9ac6091ab99ef9b23a60ca494ca0025133a38cad9340d10347670eb4a",
+      "validation": {
+        "scene": "8722413665055769182_2840_000_2860_000",
+        "selected_frames": [
+          {
+            "timestamp_micros": 1557958509325722,
+            "points": 204368,
+            "native_box_rows": 80,
+            "annotation_state": "native_box_rows_present",
+            "training_target_reasons": {
+              "unknown_class": 0,
+              "zero_native_points": 9,
+              "center_outside_roi": 7,
+              "eligible": 64
+            },
+            "eligible_class_counts": {
+              "1": 50,
+              "2": 5,
+              "3": 9,
+              "4": 0
+            }
+          }
+        ],
+        "scope": "retained native physical frame/box identity join and target exclusions independently reconciled; packing, optimizer/overfit and heldout evidence remain open"
+      }
+    },
+    "8796914080594559459_4284_170_4304_170": {
+      "evidence": "pointpillars-overfit-points-8796914080594559459_4284_170_4304_170-verified.json",
+      "evidence_sha256": "10a21e873800e89869cdffec1153b18aa6dd2060d4ddcb560614704dc41c8e3c",
+      "validation": {
+        "scene": "8796914080594559459_4284_170_4304_170",
+        "selected_frames": [
+          {
+            "timestamp_micros": 1507681730263098,
+            "points": 184383,
+            "native_box_rows": 17,
+            "annotation_state": "native_box_rows_present",
+            "training_target_reasons": {
+              "unknown_class": 0,
+              "zero_native_points": 0,
+              "center_outside_roi": 1,
+              "eligible": 16
+            },
+            "eligible_class_counts": {
+              "1": 5,
+              "2": 0,
+              "3": 11,
+              "4": 0
+            }
+          }
+        ],
+        "scope": "retained native physical frame/box identity join and target exclusions independently reconciled; packing, optimizer/overfit and heldout evidence remain open"
+      }
+    }
+  },
+  "scope": "fixed native physical/target joins only; packing, overfit and scientific comparisons remain open"
+}

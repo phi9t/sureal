@@ -1,0 +1,11 @@
+{
+  "scope": "preserve external architecture-session draft; never stage its bytes as closeout or migration",
+  "root_path": "/data02/home/philip.yang/workspace/sureal/docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+  "root_sha256": "32fd3ea749a55463a9806c583e2ebb5086aed57a8ef9f920127c14620c04d364",
+  "observed_status": "?? docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+  "backup_path": "/data02/home/philip.yang/workspace/sureal/.scratch/models-training-proposal-preservation-20261004-32fd3ea7/owned-root-design.md",
+  "backup_sha256": "32fd3ea749a55463a9806c583e2ebb5086aed57a8ef9f920127c14620c04d364",
+  "committed51_design_sha256": "b7f371663e658958b4031ba1eefeca786985f5fbd520d17abd11b3ee14e866d2",
+  "independently_verified_HDFS_supplement_receipt_sha256": "bc8ec545bd49dfb220046334847fe7907ca024ab7c19b382e9d29c4251821649",
+  "planned_handling": "temporarily remove only exact backed-up root draft to permit merge of documentation51, then restore identical owned bytes as unstaged working edit; no owner draft changes are committed"
+}

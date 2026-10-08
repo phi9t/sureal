@@ -1,0 +1,13 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.runtime_identity import verify_rootfs
+from pipeline.insula_entry import launch_plan
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';evidence=code/'research/one-batch-bn-counterfactual-scoring-verified.json';receipt=json.loads(evidence.read_text());base=cache/'insula/one-batch-bn-counterfactual-score-audits-v1';base.mkdir();inputs=base/'input';inputs.mkdir();(inputs/'expected.json').write_text(json.dumps({'receipt':receipt,'receipt_sha256':sha(evidence)}));checks=[];locks={};artifacts={};validations={}
+for stage,root,worker in [('geometry',cache/'insula/rootfs-v2','audit-bn-counterfactual-proposals.py'),('metrics',cache/'metrics-rootfs','audit-bn-counterfactual-native-metrics.py')]:
+ lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);locks[stage]=lock;out=base/stage;out.mkdir();w=Path('.scratch')/worker;digest=sha(w)
+ command=launch_plan(root,code,cache/'scientific-processing/one-batch-bn-counterfactual-prepared-v1',out,['python','/tmp/worker.py']);i=command.index('--');command[i:i]=['--ro-bind',str(w.resolve()),'/tmp/worker.py','--ro-bind',str(inputs/'expected.json'),'/tmp/expected.json','--ro-bind',str(cache/'scientific-processing/one-batch-bn-counterfactual-scoring-v1'),'/tmp/scored','--ro-bind',str(cache/'scientific-processing/one-batch-bn-counterfactual-v1'),'/tmp/heads','--ro-bind',str(cache/'scientific-processing/overfit-point-frames-v1'),'/tmp/physical','--ro-bind',str(cache/'scientific-processing/overfit-box-targets-v1'),'/tmp/boxes']
+ run=subprocess.run(command,capture_output=True,text=True,timeout=700);(out/'live.log').write_text(run.stdout+run.stderr);print(run.stdout+run.stderr,flush=True);assert run.returncode==0 and sha(w)==digest
+ checks.append({'name':stage,'command':command,'exit_code':0,'worker_sha256':digest});artifacts.update({str(p):sha(p) for p in out.iterdir()});validations[stage]=json.loads((out/'check.json').read_text())
+result={'checks':checks,'runtime_locks':locks,'producer_evidence_sha256':sha(evidence),'validation':validations,'artifacts':artifacts};(code/'research/one-batch-bn-counterfactual-score-audits-verified.json').write_text(json.dumps(result,indent=2)+'\n')

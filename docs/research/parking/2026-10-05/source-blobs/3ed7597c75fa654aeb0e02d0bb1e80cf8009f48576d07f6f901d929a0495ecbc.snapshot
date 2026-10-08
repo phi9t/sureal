@@ -1,0 +1,11 @@
+import unittest
+from data import eligible_objects,scene_counts
+class ExplorerDataTests(unittest.TestCase):
+ def row(self):return {'object_id':'a','type':4,'num_lidar_points_in_box':4,'box':[1,2,0,2,1,1,.2]}
+ def test_uncovered_gt_is_retained(self):
+  rows=eligible_objects([self.row()],{'a'});self.assertEqual(len(rows),1);self.assertFalse(rows[0]['covered'])
+ def test_native_support_and_roi(self):
+  row=self.row();row['num_lidar_points_in_box']=0;self.assertEqual(eligible_objects([row],set()),[])
+  row=self.row();row['box'][0]=64;self.assertEqual(eligible_objects([row],set()),[])
+ def test_class_counts(self):self.assertEqual(scene_counts([{'objects':eligible_objects([self.row()],set())}]),{'1':0,'2':0,'3':0,'4':1})
+if __name__=='__main__':unittest.main()

@@ -1,0 +1,8 @@
+{
+  "pid": 350971,
+  "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/continuation-logs/overfit-native-cache-v1.log",
+  "candidate_sha256": "c38c93b505f9a1e0f02ff23a8d3666669c1f92a79b95de04301d4ac77083c22a",
+  "wait_owner_pid": 3736668,
+  "started_utc": "2026-10-01T15:11:24.403496+00:00",
+  "scope": "armed preparation; pending is not native cache admission"
+}

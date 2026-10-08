@@ -1,0 +1,800 @@
+{
+  "selected_scenes": 103,
+  "missing_inventory_sha256": "49767cc6c0d1a3d309e025ea563c4f1fa88883846d2664d76838e12de2810a80",
+  "recovered_scenes": 22,
+  "scene_evidence": {
+    "1730266523558914470_305_260_325_260": {
+      "evidence": "scientific-semantic-recovered-1730266523558914470_305_260_325_260-admission-v4-verified.json",
+      "receipt_sha256": "389641ff4c1c02df7afc5931f2272cb962d8fcc973c80f4becd2995d3d69a50c",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        117066,
+        250789,
+        138252,
+        15306,
+        0,
+        0,
+        0,
+        7094,
+        2744,
+        831,
+        12560,
+        0,
+        0,
+        0,
+        542239,
+        490213,
+        98341,
+        28146,
+        736348,
+        35521,
+        22572,
+        203568,
+        136447
+      ],
+      "eligible_point_elements": 2720971
+    },
+    "4759225533437988401_800_000_820_000": {
+      "evidence": "scientific-semantic-recovered-4759225533437988401_800_000_820_000-admission-v4-verified.json",
+      "receipt_sha256": "c89474702cc5149e1ac922ba9898c54d6caffd28a812e4bd9c86730e61483c29",
+      "membership": {
+        "official_split": "validation",
+        "research_splits": [
+          "camera_validation"
+        ]
+      },
+      "native_counts": [
+        75521,
+        807345,
+        10823,
+        3947,
+        0,
+        0,
+        0,
+        40310,
+        30140,
+        9185,
+        79842,
+        1848,
+        0,
+        0,
+        2587629,
+        87771,
+        49400,
+        34026,
+        480236,
+        5225,
+        3285,
+        20456,
+        375383
+      ],
+      "eligible_point_elements": 4626851
+    },
+    "15036582848618865396_3752_830_3772_830": {
+      "evidence": "scientific-semantic-recovered-15036582848618865396_3752_830_3772_830-admission-v4-verified.json",
+      "receipt_sha256": "bb9b69a03f7820480e17a110bdc4fb1daafe0e53f26a33606db0a616ae835a97",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        13833,
+        577588,
+        0,
+        0,
+        0,
+        0,
+        0,
+        3967,
+        13430,
+        0,
+        21060,
+        0,
+        0,
+        0,
+        1201292,
+        1002152,
+        98528,
+        65049,
+        1056805,
+        0,
+        0,
+        628676,
+        183735
+      ],
+      "eligible_point_elements": 4852282
+    },
+    "11343624116265195592_5910_530_5930_530": {
+      "evidence": "scientific-semantic-recovered-11343624116265195592_5910_530_5930_530-admission-v4-verified.json",
+      "receipt_sha256": "5f2215549afbb093e851c01aed723bb7cecea4c0e2ce2a3fcec4bdbd8dcc7ca1",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        8647,
+        520244,
+        0,
+        0,
+        0,
+        0,
+        0,
+        18,
+        50917,
+        14058,
+        63487,
+        0,
+        0,
+        0,
+        445281,
+        1543514,
+        214176,
+        141464,
+        2437920,
+        56116,
+        94920,
+        717269,
+        279692
+      ],
+      "eligible_point_elements": 6579076
+    },
+    "4447423683538547117_536_022_556_022": {
+      "evidence": "scientific-semantic-recovered-4447423683538547117_536_022_556_022-admission-v4-verified.json",
+      "receipt_sha256": "9e30d41c166797f4d56a1c1aae3d88d07716064cb621470d64e218007c33027e",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        14456,
+        476348,
+        77191,
+        0,
+        0,
+        0,
+        0,
+        103,
+        15139,
+        361,
+        17166,
+        0,
+        0,
+        0,
+        407776,
+        1538751,
+        47275,
+        82661,
+        1382314,
+        49346,
+        1404,
+        166942,
+        172542
+      ],
+      "eligible_point_elements": 4435319
+    },
+    "14503113925613619599_975_506_995_506": {
+      "evidence": "scientific-semantic-recovered-14503113925613619599_975_506_995_506-admission-v4-verified.json",
+      "receipt_sha256": "66a09de96072b3850ceb07ac275c8cc97b987d6621e1549f563edd7b97ddd149",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        13993,
+        292625,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1288,
+        2566,
+        0,
+        22772,
+        0,
+        0,
+        0,
+        2448158,
+        1665973,
+        126080,
+        40043,
+        1335553,
+        0,
+        148,
+        733146,
+        321664
+      ],
+      "eligible_point_elements": 6990016
+    },
+    "3375636961848927657_1942_000_1962_000": {
+      "evidence": "scientific-semantic-recovered-3375636961848927657_1942_000_1962_000-admission-v4-verified.json",
+      "receipt_sha256": "b25fe87129da4b38b5e574141c838e7e0d57784abaa0e61ff3f6a086d82efad6",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        84518,
+        348881,
+        0,
+        0,
+        98199,
+        0,
+        0,
+        11066,
+        82263,
+        8910,
+        61642,
+        1130,
+        0,
+        0,
+        3148013,
+        350513,
+        41652,
+        38293,
+        280672,
+        4680,
+        54070,
+        13456,
+        313917
+      ],
+      "eligible_point_elements": 4857357
+    },
+    "6813611334239274394_535_000_555_000": {
+      "evidence": "scientific-semantic-recovered-6813611334239274394_535_000_555_000-admission-v4-verified.json",
+      "receipt_sha256": "2d2a92ec3b3d92581638a8667243fbb7b046635552dc4536681cd4b3abc4a917",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        251168,
+        361792,
+        281390,
+        0,
+        0,
+        0,
+        0,
+        0,
+        30317,
+        0,
+        95035,
+        669,
+        0,
+        0,
+        1558905,
+        1676746,
+        144948,
+        42972,
+        664606,
+        4924,
+        53910,
+        271993,
+        289898
+      ],
+      "eligible_point_elements": 5478105
+    },
+    "990914685337955114_980_000_1000_000": {
+      "evidence": "scientific-semantic-recovered-990914685337955114_980_000_1000_000-admission-v4-verified.json",
+      "receipt_sha256": "49af0e72f139dbacb5c364d95ea919fc26885d322d62e9f1c9d0ffd45bda3577",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        68510,
+        449482,
+        519611,
+        12672,
+        2705,
+        0,
+        142,
+        120482,
+        31309,
+        2706,
+        67416,
+        463,
+        618,
+        0,
+        1898657,
+        86004,
+        27281,
+        47032,
+        895928,
+        10408,
+        86733,
+        6234,
+        440058
+      ],
+      "eligible_point_elements": 4705941
+    },
+    "8796914080594559459_4284_170_4304_170": {
+      "evidence": "scientific-semantic-recovered-8796914080594559459_4284_170_4304_170-admission-v4-verified.json",
+      "receipt_sha256": "e4181183ea10bd533891ea8fff7bc9e683b7382998760f7eed0e78eb987b0517",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        6047,
+        63955,
+        1546,
+        0,
+        0,
+        0,
+        0,
+        1313,
+        6328,
+        0,
+        11951,
+        0,
+        0,
+        0,
+        1499536,
+        1055820,
+        107815,
+        77498,
+        1266481,
+        80127,
+        0,
+        731616,
+        222756
+      ],
+      "eligible_point_elements": 5126742
+    },
+    "12257951615341726923_2196_690_2216_690": {
+      "evidence": "scientific-semantic-recovered-12257951615341726923_2196_690_2216_690-admission-v4-verified.json",
+      "receipt_sha256": "835e81e8e8aa367ee605326a80e9355d262b716fda44a6022498edcbfacf4058",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        41388,
+        308844,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1623,
+        112078,
+        0,
+        55836,
+        16119,
+        0,
+        0,
+        1390559,
+        1101884,
+        145039,
+        124338,
+        1872019,
+        68361,
+        1267,
+        428016,
+        326306
+      ],
+      "eligible_point_elements": 5952289
+    },
+    "13186511704021307558_2000_000_2020_000": {
+      "evidence": "scientific-semantic-recovered-13186511704021307558_2000_000_2020_000-admission-v4-verified.json",
+      "receipt_sha256": "99e9db37d823434929064fa456cf8fb0432750b49be5bf5df9dc42a5b9c6e128",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        179140,
+        44112,
+        785881,
+        42813,
+        0,
+        0,
+        470,
+        7861,
+        36005,
+        2593,
+        33680,
+        2159,
+        0,
+        0,
+        1840240,
+        232967,
+        83075,
+        37349,
+        453265,
+        8319,
+        36349,
+        107698,
+        350477
+      ],
+      "eligible_point_elements": 4105313
+    },
+    "17885096890374683162_755_580_775_580": {
+      "evidence": "scientific-semantic-recovered-17885096890374683162_755_580_775_580-admission-v4-verified.json",
+      "receipt_sha256": "2084d24427054d92e6a32bc15582c1e3082ddba37a9c2d230533add765ea2369",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        44022,
+        288690,
+        0,
+        0,
+        0,
+        0,
+        15865,
+        39775,
+        36210,
+        0,
+        53977,
+        0,
+        0,
+        0,
+        1852094,
+        2560367,
+        303938,
+        59126,
+        676930,
+        1038,
+        23070,
+        955496,
+        385415
+      ],
+      "eligible_point_elements": 7251991
+    },
+    "7912728502266478772_1202_200_1222_200": {
+      "evidence": "scientific-semantic-recovered-7912728502266478772_1202_200_1222_200-admission-v4-verified.json",
+      "receipt_sha256": "4596aaf24b72bfefcb0bec40b1796005a7706f0ddcd4065fe93a9febce171748",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        4222,
+        46969,
+        0,
+        0,
+        0,
+        0,
+        0,
+        975,
+        19233,
+        0,
+        16851,
+        0,
+        0,
+        0,
+        471323,
+        853691,
+        100582,
+        46734,
+        655329,
+        33453,
+        2363,
+        694875,
+        150282
+      ],
+      "eligible_point_elements": 3092660
+    },
+    "4723255145958809564_741_350_761_350": {
+      "evidence": "scientific-semantic-recovered-4723255145958809564_741_350_761_350-admission-v4-verified.json",
+      "receipt_sha256": "7bf92de1c022536ec7d2cc680812d02f15a246982ad0310ff16e792951a6ef29",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        57874,
+        511184,
+        0,
+        0,
+        58,
+        0,
+        5,
+        6478,
+        40285,
+        8860,
+        68041,
+        0,
+        0,
+        0,
+        1005306,
+        2421618,
+        188405,
+        155199,
+        2418143,
+        86656,
+        115137,
+        800510,
+        190571
+      ],
+      "eligible_point_elements": 8016456
+    },
+    "8454755173123314088_3202_000_3222_000": {
+      "evidence": "scientific-semantic-recovered-8454755173123314088_3202_000_3222_000-admission-v4-verified.json",
+      "receipt_sha256": "7d7e8b426525cf78aae2a415220be01ac50d9b2a266d741c431d693c74357f8d",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        11162,
+        628527,
+        5704,
+        0,
+        873,
+        0,
+        0,
+        0,
+        1351,
+        0,
+        6468,
+        0,
+        0,
+        0,
+        1436943,
+        156640,
+        207,
+        8819,
+        1345639,
+        77441,
+        739,
+        575385,
+        38612
+      ],
+      "eligible_point_elements": 4283348
+    },
+    "3894883757914505116_1840_000_1860_000": {
+      "evidence": "scientific-semantic-recovered-3894883757914505116_1840_000_1860_000-admission-v4-verified.json",
+      "receipt_sha256": "93143822a0ede1bac62d70e3c6ba9ac71854f32104a79a362145b39eb3e723f5",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        35196,
+        544610,
+        3380,
+        0,
+        0,
+        8,
+        0,
+        4717,
+        29852,
+        0,
+        60333,
+        83,
+        0,
+        12884,
+        2345032,
+        633322,
+        66374,
+        28580,
+        594764,
+        7601,
+        40388,
+        2655,
+        263939
+      ],
+      "eligible_point_elements": 4638522
+    },
+    "13271285919570645382_5320_000_5340_000": {
+      "evidence": "scientific-semantic-recovered-13271285919570645382_5320_000_5340_000-admission-v4-verified.json",
+      "receipt_sha256": "0f0352f3fc61cd2051f96827f266a81285dd809c04e5e063ee3252a94479843b",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        62744,
+        612416,
+        53937,
+        1144,
+        2671,
+        0,
+        2517,
+        24519,
+        43119,
+        15135,
+        71345,
+        0,
+        0,
+        1,
+        2615536,
+        69824,
+        193967,
+        28814,
+        601554,
+        1751,
+        76990,
+        105200,
+        466251
+      ],
+      "eligible_point_elements": 4986691
+    },
+    "8345535260120974350_1980_000_2000_000": {
+      "evidence": "scientific-semantic-recovered-8345535260120974350_1980_000_2000_000-admission-v4-verified.json",
+      "receipt_sha256": "bcf970e5da376b743daf61d69a98b91701695cad7c6a09873ff6f96b71042f55",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        27693,
+        306934,
+        0,
+        0,
+        0,
+        0,
+        0,
+        9095,
+        7606,
+        0,
+        22546,
+        0,
+        0,
+        0,
+        1585533,
+        1998647,
+        3858,
+        45129,
+        767753,
+        12452,
+        19955,
+        53839,
+        150317
+      ],
+      "eligible_point_elements": 4983664
+    },
+    "1357883579772440606_2365_000_2385_000": {
+      "evidence": "scientific-semantic-recovered-1357883579772440606_2365_000_2385_000-admission-v4-verified.json",
+      "receipt_sha256": "cfe647169ea3cad6686d05647439b759be42d33cc6023437ceb12f426eef2641",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        5756,
+        166051,
+        7125,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1782,
+        0,
+        55580,
+        0,
+        0,
+        0,
+        2302100,
+        1356,
+        0,
+        0,
+        1694273,
+        152030,
+        12217,
+        103118,
+        0
+      ],
+      "eligible_point_elements": 4495632
+    },
+    "16977844994272847523_2140_000_2160_000": {
+      "evidence": "scientific-semantic-recovered-16977844994272847523_2140_000_2160_000-admission-v4-verified.json",
+      "receipt_sha256": "50667d3aa7ff506145e0b9dbfce77a8a1179d320293784d57993f1f13698a5dc",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "train"
+        ]
+      },
+      "native_counts": [
+        141670,
+        558207,
+        3411,
+        0,
+        201726,
+        0,
+        20475,
+        64222,
+        40763,
+        2669,
+        135235,
+        28,
+        824,
+        0,
+        1750756,
+        144129,
+        31393,
+        63429,
+        317048,
+        2450,
+        2166,
+        250295,
+        495694
+      ],
+      "eligible_point_elements": 4084920
+    },
+    "9465500459680839281_1100_000_1120_000": {
+      "evidence": "scientific-semantic-recovered-9465500459680839281_1100_000_1120_000-admission-v4-verified.json",
+      "receipt_sha256": "8462fbe47e774defc9fc5ac72800240fafd3c2903e86aa556caaf3ec1a941eff",
+      "membership": {
+        "official_split": "training",
+        "research_splits": [
+          "development"
+        ]
+      },
+      "native_counts": [
+        14404,
+        326316,
+        25810,
+        1031,
+        0,
+        0,
+        0,
+        3199,
+        36816,
+        9286,
+        29671,
+        0,
+        0,
+        0,
+        1063231,
+        762571,
+        114602,
+        16097,
+        438296,
+        7083,
+        16087,
+        51567,
+        216441
+      ],
+      "eligible_point_elements": 3118104
+    }
+  },
+  "scope": "separate recovered evidence; do not replace original capture aggregate until full reconciliation"
+}

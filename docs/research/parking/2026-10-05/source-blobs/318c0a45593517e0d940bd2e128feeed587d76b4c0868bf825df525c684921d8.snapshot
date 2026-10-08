@@ -1,0 +1,22 @@
+import pathlib,json,sys,subprocess,hashlib,shutil,os,time,resource
+P=pathlib.Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(P))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+from tier1.storage import unique_payload_bytes
+C=pathlib.Path.home()/'.cache/waystone/waymo-perception';R=C/'insula/motion-current-geometry-audit-v3';R.mkdir();code=R/'code';code.mkdir()
+for src,dst in [('motion_geometry_native.cc','audit.cc'),('motion_geometry_corrupt.cc','corrupt.cc'),('motion_inventory.cc','inventory.cc')]:shutil.copy('.scratch/'+src,code/dst)
+for split,parent in [('training','motion-native-link-v5'),('validation','motion-validation-native-link-v1')]:os.link(C/'insula'/parent/'output/observations.pb',code/(split+'.pb'))
+W=C/'scientific-processing';print('SCIENTIFIC BEFORE',unique_payload_bytes(W),flush=True);assert unique_payload_bytes(W)+64*1024**2<15*1024**3;out=W/'motion-current-geometry-audit-v3';out.mkdir();root=C/'motion-cli-rootfs-v2';lock=json.loads(pathlib.Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);sha=lambda p:hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest();producer=json.loads((P/'research/motion-current-geometry-producer-verified.json').read_text());pins={str(p):sha(p) for p in code.iterdir()};assert all(sha(p)==h for p,h in producer['artifacts'].items());checks=[];start=time.monotonic()
+def run(name,shell,expected=0):
+ output=out/name;output.mkdir();command=launch_plan(root,code,W/'motion-current-geometry-v1',output,['/bin/sh','-c',shell]);r=subprocess.run(command,capture_output=True,text=True,timeout=300);(output/'live.log').write_text(r.stdout+r.stderr);checks.append({'name':name,'command':command,'exit_code':r.returncode,'expected_exit_code':expected});print(name,r.returncode,r.stdout[-500:],r.stderr[-500:],flush=True);assert r.returncode==expected,r.stderr;return output
+compile='g++ -std=c++17 -O2 -I/generated /experiment/audit.cc /motion-build/libwod_motion_proto.a -lprotobuf -lz -pthread '
+mutant='g++ -std=c++17 -O2 /experiment/corrupt.cc -o /outputs/corrupt'
+red=run('red',compile+'-DOMIT_GEOMETRY_CHECK -o /outputs/audit && '+mutant+' && /outputs/corrupt /outputs/audit /experiment/training.pb /source/training /outputs/mutants',1)
+assert 'corrupt serialized stream accepted: xyz_shift' in (red/'live.log').read_text()
+(P/'research/motion-current-geometry-audit-red-verified.json').write_text(json.dumps({'checks':checks,'runtime_lock':lock,'pins':pins,'scope':'live deliberate omission of XYZ comparison admits shifted serialized XYZ; corruption contract fails as expected'},indent=2))
+for split in ['training','validation']:
+ run(split,compile+'-o /outputs/audit && /outputs/audit --self-test && /outputs/audit /experiment/'+split+'.pb /source/'+split+' /outputs/audit.tsv')
+run('green-corruptions',compile+'-o /outputs/audit && '+mutant+' && /outputs/corrupt /outputs/audit /experiment/training.pb /source/training /outputs/mutants')
+assert all(sha(p)==h for p,h in pins.items());assert all(sha(p)==h for p,h in producer['artifacts'].items());assert unique_payload_bytes(W)<15*1024**3
+receipt={'checks':checks,'runtime_lock':lock,'pins':pins,'producer_receipt_sha256':sha(P/'research/motion-current-geometry-producer-verified.json'),'producer_artifacts':producer['artifacts'],'artifacts':{str(p):sha(p) for p in out.rglob('*') if p.is_file() and not p.is_symlink()},'elapsed_seconds':time.monotonic()-start,'peak_children_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'scientific_payload_bytes':unique_payload_bytes(W),'scientific_cap_bytes':15*1024**3,'absolute_coordinate_tolerance_m':1e-6,'scope':'all native positive returns, direct current-reference geometry, exact pixel/physical-feature parity and 8 serialized corruption refusals; engineering pilots only, no forecasting-model claim'}
+(P/'research/motion-current-geometry-audit-live-verified.json').write_text(json.dumps(receipt,indent=2));print('PASS complete native Motion geometry parity',flush=True)

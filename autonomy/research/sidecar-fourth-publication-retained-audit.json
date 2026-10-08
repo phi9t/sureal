@@ -1,0 +1,11 @@
+{
+  "scene": "4575389405178805994_4900_000_4920_000",
+  "status": "retained compressed publication artifacts and code independently rehashed",
+  "publication_receipt_sha256": "5d15770d28d328231276f088372f231b668a1f96d7b3bb9b5a6f97ec32d7ac5e",
+  "execution_sha256": "d8a9e8c0a0f5f46919bbd63664d5e72a8bc22966e37fcdbc201a110ceffad06a",
+  "artifact_count": 12,
+  "files": 45641,
+  "compressed_bytes": 491722411,
+  "uncompressed_bytes": 7182551040,
+  "scope": "publication only; eviction, camera lifecycle, checkpoint admission and research comparisons remain open"
+}

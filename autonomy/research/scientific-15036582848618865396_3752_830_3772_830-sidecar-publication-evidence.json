@@ -1,0 +1,8 @@
+{
+  "status": "scientific sidecar bundle publication independently audited",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/sidecar-publication-15036582848618865396_3752_830_3772_830/receipt.json",
+  "receipt_sha256": "5af02ea12d69a27c98b8c35710803056449a5781807c0f7c517f5399aa1cce40",
+  "files": 23581,
+  "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/component-bundles-v1/scientific/15036582848618865396_3752_830_3772_830/831c25b93355e5981f452df10748a841c697c4e57a1c7b1a5f67813e82327fdb.tar",
+  "scope": "one training scene; camera replay/decoding and sidecar/cache lifecycle/full cohort/protocol remain open"
+}

@@ -1,0 +1,78 @@
+"""All103 actual archive linkages, after current serial owners, with live receipt audit."""
+import hashlib,json,os,subprocess,sys,time
+from pathlib import Path
+base=Path(__file__).resolve().parents[1];code=base/'experiments/waymo-perception';workers=base/'.scratch';sys.path.insert(0,str(code));sys.path.insert(0,str(workers))
+from point_grid_source_replay import replay
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+cache=Path.home()/'.cache/waystone/waymo-perception';research=code/'research'
+def sha(p):
+ with Path(p).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+def load(p):return json.loads(Path(p).read_text())
+def save(p,d):
+ q=p.with_suffix('.pending.json');q.write_text(json.dumps(d,indent=2)+'\n');q.replace(p)
+def alive(pid,name):
+ p=Path('/proc')/str(pid)/'cmdline'
+ if not p.exists():return False
+ cmd=p.read_bytes()
+ if not cmd:return False
+ if name.encode() not in cmd:raise ValueError('recorded owner PID reused')
+ return True
+candidate=research/'scientific-point-grid-inputs.candidate.json';d=load(candidate);manifest=code/'scientific-acquisition.candidate.json';selected=load(manifest)['scenes']
+assert len(d['sources'])==103 and {s['scene'] for s in d['sources']}==set(selected)
+inventory_evidence=load(research/'point-grid-inventory-live-verified.json');assert inventory_evidence['expected']['candidate_sha256']==sha(candidate) and all(c['exit_code']==0 for c in inventory_evidence['checks'])
+assert sha(inventory_evidence['live_log'])==inventory_evidence['live_log_sha256']
+filepins={str(p):sha(p) for p in [candidate,manifest,research/'native-shape-jobs.candidate.json',research/'point-grid-inventory-live-verified.json']}
+codepins={str(p.relative_to(code)):sha(p) for p in (code/'pipeline').glob('*.py')}
+worker_names=['point_grid_linkage.py','scientific-point-grid-worker.py','point_grid_source_replay.py','point_grid_retained_audit.py']
+workerpins={n:sha(workers/n) for n in worker_names}
+root=cache/'insula/rootfs-v2';lock=load(Path(str(root)+'.lock.json'))
+def unchanged():
+ assert filepins=={p:sha(p) for p in filepins}
+ assert codepins=={str(p.relative_to(code)):sha(p) for p in (code/'pipeline').glob('*.py')}
+ assert workerpins=={n:sha(workers/n) for n in worker_names}
+
+def gate():
+ for pid,name in [(2348064,'await-semantic-recovery-admission-v4.py'),(2350750,'await-scientific-native-shapes-v2.py'),(2371235,'await-camera-lifecycle-gaps.py')]:
+  if alive(pid,name):return False
+ shape=load(research/'scientific-native-shape-progress.json');camera=load(research/'camera-gap-recovery-progress.json');sem=load(research/'semantic-recovered-progress.json')
+ assert shape['admitted_scenes']==103 and shape['records_verified']==203850 and set(shape['scene_evidence'])==set(selected)
+ assert camera['admitted_scenes']==2 and set(camera['scene_evidence'])=={'1730266523558914470_305_260_325_260','4759225533437988401_800_000_820_000'}
+ assert sem['recovered_scenes']==22
+ return True
+if '--observe-once' in sys.argv:
+ unchanged();print('PASS full103 candidate live-admission/current code; ready:',gate());sys.exit(0)
+print('WAIT actual semantic/shape/camera owners; full103 point-grid scope retained',flush=True)
+while not gate():time.sleep(30)
+unchanged();verify_rootfs(root,lock['rootfs_sha256'])
+shapes=load(research/'scientific-native-shape-progress.json');old=load(research/'scientific-semantic-support-progress.json');recovered=load(research/'semantic-recovered-progress.json')
+assert len(old['scene_evidence'])==81 and set(old['scene_evidence']).isdisjoint(recovered['scene_evidence']) and set(old['scene_evidence'])|set(recovered['scene_evidence'])==set(selected)
+assert all(v['lifecycle_linkage']=='linked' for v in old['scene_evidence'].values())
+semantic={**old['scene_evidence'],**recovered['scene_evidence']}
+destination=cache/'scientific-processing/point-grid-sources-v1';destination.mkdir(exist_ok=False);admitted={}
+for source in d['sources']:
+ unchanged();scene=source['scene'];entry=shapes['scene_evidence'][scene];pointer=research/entry['evidence'];assert sha(pointer)==entry['evidence_sha256'];shape_evidence=load(pointer);shape_receipt=Path(shape_evidence['receipt']);assert sha(shape_receipt)==entry['receipt_sha256']==shape_evidence['receipt_sha256']
+ shape=load(shape_receipt);job=load(code/source['shape_job']['path']);assert shape['input_identity']==job and shape['job_sha256']==source['shape_job']['sha256'] and shape['source_receipt_sha256']==source['source_receipt_sha256']
+ assert shape['runtime_lock']==lock and all(c['exit_code']==0 for c in shape['checks']+shape_evidence['checks'])
+ for n,h in shape['code_sha256'].items():assert sha(code/'pipeline'/n)==h
+ for n,h in shape['artifacts'].items():assert sha(shape_receipt.parent/n)==h
+ shape_path=shape_receipt.parent/'worker/shapes.json';shape_sha=shape['report_sha256'];assert sha(shape_path)==shape_sha
+ counts=semantic[scene]['native_counts'];assert semantic[scene]['membership']==source['membership'] and sum(counts[1:])==semantic[scene]['eligible_point_elements']
+ output=destination/scene;r=replay(source,shape_path=shape_path,expected_shape_sha256=shape_sha,semantic_counts=counts,cache=cache,code_root=code,workers=workers,output=output,expected_runtime_lock=lock)
+ expected={'receipt_sha256':sha(output/'receipt.json'),'input_identity':{'source':source,'shape_report_sha256':shape_sha,'expected_eligible_semantic_points':sum(counts[1:]),'expected_native_counts':counts},'runtime_lock':lock,'pipeline_hashes':{f'pipeline/{n}':codepins[f'pipeline/{n}'] for n in ['scientific_dataset.py','scene_archive_validate.py','native_range_grid.py','staged_derived_archive_aligned.py','staging_lease.py','insula_entry.py','runtime_identity.py']},'worker_hashes':{n:workerpins[n] for n in ['point_grid_linkage.py','scientific-point-grid-worker.py','point_grid_source_replay.py']}}
+ auditbase=cache/'insula'/('scientific-point-grid-retained-v1-'+scene);auditbase.mkdir();inputs=auditbase/'input';inputs.mkdir();audit=auditbase/'output';audit.mkdir();save(inputs/'expected.json',expected)
+ program="""import json,sys,importlib.util
+from pathlib import Path
+sys.path.insert(0,'/tmp/worker');from point_grid_retained_audit import verify
+assert importlib.util.find_spec('tensorflow') is None
+e=json.loads(Path('/tmp/input/expected.json').read_text());v=verify('/source',e,code_root='/experiment',workers='/tmp/worker')
+Path('/outputs/check.json').write_text(json.dumps(v,indent=2));print('PASS retained full scientific point/grid',v['scene'],v['points'])
+"""
+ cmd=launch_plan(root,code,output,audit,['python','-c',program]);i=cmd.index('--');cmd[i:i]=['--ro-bind',str(inputs),'/tmp/input','--ro-bind',str(workers),'/tmp/worker'];result=subprocess.run(cmd,capture_output=True,text=True,timeout=120);(audit/'live.log').write_text(result.stdout+result.stderr);assert result.returncode==0,'preserve refused point-grid receipt'
+ unchanged();assert sha(output/'receipt.json')==expected['receipt_sha256'];validation=load(audit/'check.json');assert validation['records']==source['records'] and validation['points']==source['points']
+ evidence=research/f'scientific-point-grid-{scene}-verified.json';save(evidence,{'scene':scene,'membership':source['membership'],'receipt':str(output/'receipt.json'),'receipt_sha256':expected['receipt_sha256'],'shape_admission_sha256':sha(pointer),'candidate_sha256':sha(candidate),'checks':[{'command':cmd,'exit_code':0}],'runtime_lock':lock,'expected_sha256':sha(inputs/'expected.json'),'auditor_sha256':workerpins['point_grid_retained_audit.py'],'validation':validation,'audit_artifacts':{p.name:sha(p) for p in audit.iterdir() if p.is_file()},'scope':'actual immutable HDFS point/native-grid full support and independent live receipt admission; no model evaluation claim'})
+ admitted[scene]={'evidence':evidence.name,'evidence_sha256':sha(evidence),'receipt_sha256':expected['receipt_sha256'],'validation':validation}
+ save(research/'scientific-point-grid-progress.json',{'selected_scenes':103,'candidate_sha256':sha(candidate),'admitted_scenes':len(admitted),'records':sum(e['validation']['records'] for e in admitted.values()),'points':sum(e['validation']['points'] for e in admitted.values()),'eligible_semantic_points':sum(e['validation']['eligible_semantic_points'] for e in admitted.values()),'scene_evidence':admitted,'scope':'point/grid metadata and full-support replay only; scientific protocol/model comparisons remain open'})
+ print('PASS original scientific point/grid scene',scene,len(admitted),'/103',flush=True)
+assert set(admitted)==set(selected) and sum(e['validation']['records'] for e in admitted.values())==203850 and sum(e['validation']['points'] for e in admitted.values())==3513295187
+print('TERMINAL all103 full point/native-grid support admitted; protocol and models remain',flush=True)

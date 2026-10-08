@@ -1,0 +1,507 @@
+{
+  "schema_version": 1,
+  "cutoff_utc": "2026-10-04T18:56:47.276Z",
+  "source_commit": "a553645ef22761aa7708abf1ee109952a6cd2c38",
+  "scope": "Scientific and engineering reconstruction; not a claim of exhaustive raw-rollout parsing. Session coverage and caveats are in research-retrospective.md.",
+  "lanes": [
+    {
+      "lane": "acquisition-and-ingestion-tracer",
+      "tickets": [
+        "pre-01"
+      ],
+      "goal": "Acquire a complete small multimodal slice; verify source/HDFS integrity; process native tables deterministically without TensorFlow.",
+      "status_at_cutoff": "complete for two-scene ingestion/schema tracer; distinct from later geometric reconstruction.",
+      "source_receipts": [
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research/tracer-bullet-e2e.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research/r0-geometric-insula.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "session",
+          "thread": "01a0ee75-f519-7c80-b3c2-dc39d09e0b24",
+          "turn": "01a0ee93-ac19-7c81-8ebe-c438d6f904e3",
+          "item": "msg_031c4f878d2513b9016ac13964e7887d28bfaba74e83bc02d",
+          "timestamp_utc": "2026-09-29T19:37:58.312Z"
+        }
+      ],
+      "finding": "Two scenes / 34 files / all 17 available component families, ~1.2 GB; HDFS SHA readback; 397 frames and 143,625 component records; reproducible offline output. 337 same-frame camera-to-LiDAR targets remained explicitly unresolved. This stage established ingestion and keys, not point reconstruction.",
+      "next_discriminating_experiment": "None for ingestion gate; continue with sensor reconstruction under M3 while retaining unresolved-association semantics."
+    },
+    {
+      "lane": "R0-live-runtime-geometry-and-inspection",
+      "tickets": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06"
+      ],
+      "goal": "Prove locked Insula, native replay, analytic geometry, calibrated sensor reconstruction, inspection views, and reproducible sensor-to-scene tracer.",
+      "status_at_cutoff": "verified complete on acquired two-scene validation fixture; engineering evidence only.",
+      "source_receipts": [
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/program-goal.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research/r0-geometric-insula.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research/r0-execution-ledger.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        }
+      ],
+      "finding": "M0\u2013M5 independently verified. M3 reconstructed 397 frames, 3,970 sensor/return records and 71,891,534 positive finite range points; sampled scalar coordinate error max 1.58e-11 m. M4 validated 131 artifacts over 20 camera and 40 LiDAR-return views; repeated native/geometry artifacts match bytewise. Supplied camera projections do not prove independent rolling-shutter/moving-point projection; other LiDARs are uncompensated.",
+      "next_discriminating_experiment": "No R0 extension needed for its scoped gate. Use separate camera-geometry and Motion causal-ingestion gates for those claims."
+    },
+    {
+      "lane": "full-cohort-sensor-data-admission",
+      "tickets": [
+        "data prerequisites for 07\u201321"
+      ],
+      "goal": "Extend independently admitted training labels, native sensor shapes, semantics, point-grid correspondence and camera lifecycle beyond the two-scene tracer.",
+      "status_at_cutoff": "specified data gates complete; aggregate semantics/shape/point-grid receipts are rehashes of individual live admissions where declared.",
+      "source_receipts": [
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research-task-index.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research/training-box-full64-replay-verified.json",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research/scientific-semantic-full103-verified.json",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research/scientific-native-shape-full103-retained-audit.json",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research/scientific-camera-full103-verified.json",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research/point-grid-full103-and-overfit-box-retained-audit.json",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        }
+      ],
+      "finding": "Full64 training boxes; 103-scene semantics with 478,579,462 eligible point labels; 203,850 shape records; 3,513,295,187 point-grid points; and all103 camera lifecycles have supporting receipts. These satisfy data prerequisites but neither close ticket07 nor show model quality.",
+      "next_discriminating_experiment": "Freeze protocol and model data contracts, including camera visibility/projection and causal Motion inputs, before new model comparisons."
+    },
+    {
+      "lane": "protocol-runtime-and-evaluator",
+      "tickets": [
+        "07",
+        "08",
+        "09"
+      ],
+      "goal": "Freeze cohorts/statistics/resources before training; prove locked Torch GPU runtime and independent TensorFlow-free native evaluation.",
+      "status_at_cutoff": "07 open; 08 and 09 verified complete.",
+      "source_receipts": [
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/program-goal.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research-task-index.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/07-scientific-protocol.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        }
+      ],
+      "finding": "GPU/runtime and 3D AP/APH plus LiDAR semantic evaluator are verified; camera2D, LET and panoptic tracking are still later gates. Protocol freeze and original program acceptance remain open.",
+      "next_discriminating_experiment": "Complete ticket07 admission before any affected new training: fixed cohort, sampling/loss, class/eligibility, metric, budget, thresholds and comparison plan."
+    },
+    {
+      "lane": "core-perception-baselines-and-encoding-studies",
+      "tickets": [
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18"
+      ],
+      "goal": "Establish independent LiDAR detection/segmentation, camera box/semantic/3D distance, SAM refinement and mask-to-LiDAR baselines under task-specific protocols.",
+      "status_at_cutoff": "program acceptance open. Some engineering and exploratory/oracle diagnostics exist; no acceptance-equivalent held-out comparisons close these tickets.",
+      "source_receipts": [
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/program-goal.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research-task-index.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/10-pointpillars-detection.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/14-camera-box-mask-baselines.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/17-sam-mask-refinement.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        }
+      ],
+      "finding": "Initial task readiness audit found PointPillars' draft mean-populated-class APH criterion inconsistent with the later all-class/two-sample gate. Retained SAM runs use oracle prompts and projection-incidence evidence; they do not establish predicted-prompt mask quality or same-prompt mask-vs-box gains. Do not label geometry/data prerequisites as these baselines.",
+      "next_discriminating_experiment": "Reconcile and freeze detector gate, then held-out matched detection/segmentation/camera runs; for SAM, compare predicted prompts to box transfer on identical eligible support and native GT."
+    },
+    {
+      "lane": "balanced16-mixed-scene-detector",
+      "tickets": [
+        "33",
+        "34"
+      ],
+      "goal": "Compare matched baseline/residual on 16 frames and diagnose rare-class learning and failure causes under native metrics.",
+      "status_at_cutoff": "33 closed with negative all-class result; 34 diagnosis specified/open; later sustained four-recipe continuation still gated.",
+      "source_receipts": [
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/33-balanced-cohort-fitting.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/34-rare-class-learning-diagnosis.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research/balanced16-fitting-results.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research/balanced16-coverage-causes-verified.json",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        }
+      ],
+      "finding": "Matched baseline/residual ran to 2,000 updates with exact replay/loss checks but failed all-class native gate. Historical exposure was 125 visits/frame vs 500\u2013750 on one-frame controls. Missing assignment is measured separately: 29 signs and one pedestrian; covered-target ideal sign APH .759399.",
+      "next_discriminating_experiment": "After continuation admission, resume frozen baseline/residual/class-balanced/prior-bias recipe comparisons with visits/frame and forgetting; diagnose object-level failures and target assignment without altering frozen recipes."
+    },
+    {
+      "lane": "fixed-frame-model-fit-and-architecture",
+      "tickets": [
+        "28",
+        "29",
+        "30",
+        "31",
+        "32",
+        "35",
+        "36",
+        "37",
+        "38",
+        "39",
+        "40"
+      ],
+      "goal": "Compare pillar/BEV encoders and controlled grid, ragged, attention, range and sparse mechanisms, with exact fitting/replay gates.",
+      "status_at_cutoff": "fixed-frame fitting/engineering closures complete: 15/15 tier1 treatments fit selected all-class frame; expanded seven treatments fit and sparse-transformer recipe is negative/censored at 10,000 updates. Held-out selection open.",
+      "source_receipts": [
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/35-all-class-single-batch-sweep.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/36-grid-resolution.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/38-point-attention.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/39-range-fusion.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/40-sparse-bev-transformer.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        }
+      ],
+      "finding": "23 trained rows = 15 tier1 + 8 expanded; expanded seven fit, one sparse recipe censored/negative at cap. Baseline selected-frame gate passes 500/750. Point attention beat equal-parameter MLP on this frame at 750 updates; range fusion did not beat zero-range. Sparse recipe changes both capacity and propagation, preventing a clean causal attribution. No held-out winner.",
+      "next_discriminating_experiment": "Use the approved same-exposure controls, multi-seed segment-held-out scenes and class/distance/support/resource slices; separate support, capacity, normalization and spatial-propagation hypotheses."
+    },
+    {
+      "lane": "normalization-and-association-diagnostics",
+      "tickets": [
+        "41",
+        "42",
+        "43"
+      ],
+      "goal": "Isolate prediction-target ownership, object-level failure stages, and frozen-weight normalization effects from architecture changes.",
+      "status_at_cutoff": "41\u201343 specified with admission prerequisites; no claim of completed proposed experiments. 41.1 had engineering contract/runtime progress but no fitting/native-oracle result; 42/43 are next in approved order.",
+      "source_receipts": [
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/41-prediction-target-association.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/42-object-failure-ledger.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/43-frozen-normalization-diagnostic.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research/2026-10-03-approved-execution-order.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        }
+      ],
+      "finding": "These tickets encode the most discriminating causes inferred from current results. Older frozen-weight BN causal evidence is limited to the earlier 17-object case; current balanced16 counterfactual loss records do not establish native quality.",
+      "next_discriminating_experiment": "Run 42 measurement-indexed failure attribution, then 43 identical frozen weights/full-native-GT decode with BN buffer intervention; conditional pillar-LN only after separate control. Complete 41 target-association treatments in isolation."
+    },
+    {
+      "lane": "motion-ingestion-and-forecasting",
+      "tickets": [
+        "19",
+        "20",
+        "21"
+      ],
+      "goal": "Verify causal Motion data ingestion/evaluation, then compare tracks-and-map baseline and sensor-feature forecasting utility.",
+      "status_at_cutoff": "19 has substantial separately admitted foundation and oracle/evaluator diagnostics; aggregate acceptance remains open. 20\u201321 open; no learned forecasting efficacy result.",
+      "source_receipts": [
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/19-motion-ingestion-evaluation.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/20-motion-baseline.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/21-forecast-feature-study.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research-task-index.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        }
+      ],
+      "finding": "Separate generation-pinned shards/extensions, 11-step causal prefixes, future/key/duplicate refusal, observation-only camera-codebook features, calibrated LiDAR decoding and native oracle metric handoff have evidence. Oracle diagnostics validate measurement/evaluator paths, not learned forecasts. Retained geometry references have archive/release lineage but fresh chunk recovery and aggregate ticket19 acceptance remain distinct gates.",
+      "next_discriminating_experiment": "Close ticket19 by reconciling all aggregate live/retention gates; then freeze and run tracks-and-map baseline and matched causal sensor-feature comparison on held-out scenarios with paired uncertainty."
+    },
+    {
+      "lane": "program-synthesis-and-conditional-work",
+      "tickets": [
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27"
+      ],
+      "goal": "Synthesize primary comparisons and decide adopt/reject/needs-more-evidence; activate only conditional SAM3, distillation, joint, memory or planning studies when criteria are met.",
+      "status_at_cutoff": "22 open; 23\u201327 conditional, not activated as core evidence.",
+      "source_receipts": [
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/program-goal.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research-task-index.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        }
+      ],
+      "finding": "The program explicitly requires primary comparison audit/replay, uncertainty, coverage, runtime/memory and explicit decisions; no amount of engineering closure alone satisfies it.",
+      "next_discriminating_experiment": "Do not activate conditional branches without written hypothesis, activation rationale, task-specific protocol and verified dependencies; synthesize only after required comparisons."
+    },
+    {
+      "lane": "scientific-experiment-tracking",
+      "tickets": [
+        "tracker/journal support"
+      ],
+      "goal": "Track 24 experiment definitions and append-only observations/hypotheses/decisions with evidence-derived status and retention.",
+      "status_at_cutoff": "supporting system implemented; not itself a scientific result.",
+      "source_receipts": [
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research-task-index.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research/research-journal.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "experiments/waymo-perception/research/research-journal.jsonl",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        }
+      ],
+      "finding": "Journal distinguishes verified overfit, GPU-admitted, preparation-only, negative/censored and decisions. Session/productive effort cannot be inferred from turn duration or command counts; the audit only reports workflow receipts.",
+      "next_discriminating_experiment": "Continue evidence-derived refreshes with immutable inputs, independent receipt reopening and explicit role of every summary; do not infer model adoption from tracker stage."
+    },
+    {
+      "lane": "models-and-training-ownership-migration",
+      "tickets": [
+        "44",
+        "45",
+        "46",
+        "47",
+        "48"
+      ],
+      "goal": "Move scientific model/layer and training policy/state ownership to installable sureal packages, share fixed-frame producer, retain specialized sustained path, prove exact compatibility and recover evidence.",
+      "status_at_cutoff": "design and tasks exist; implementation remains gated/not started at cutoff; migration cannot close scientific comparisons.",
+      "source_receipts": [
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/44-models-training-reference-admission.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/45-first-class-models-and-layers.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/46-first-class-training-policy-and-state.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/47-shared-fixed-frame-producer.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/48-models-training-retention-and-closeout.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        }
+      ],
+      "finding": "Migration is a valuable reproducibility/maintainability workstream but should preserve exact model registration, RNG, loss, optimizer, checkpoint and sampler contracts. It is not evidence of a new model improvement.",
+      "next_discriminating_experiment": "Complete prerequisites and independent exact old/new live comparisons, continuation/state replay, resource/retention and HDFS readback gates before declaring the migration accepted."
+    },
+    {
+      "lane": "collaboration-foundation-context",
+      "tickets": [
+        "49"
+      ],
+      "goal": "Provide local project/task admission and evidence closeout prerequisites before future worker control and model/trainer migration.",
+      "status_at_cutoff": "ticket49 accepted/closed under its own independent gates; it does not imply tickets 50\u201354 or 44\u201348 are complete and is outside scientific adoption.",
+      "source_receipts": [
+        {
+          "kind": "repo",
+          "path": "docs/research/reviews/2026-10-04-collaboration-ticket49-closeout.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/49-collaboration-project-admission.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        }
+      ],
+      "finding": "Closeout says 49 alone closed with accepted implementation/metadata and independent gate/post/closure proofs; model holds preserved; scientific jobs, checkpoints, full GT, recipes and HDFS epoch unchanged.",
+      "next_discriminating_experiment": "Complete independently admitted future collaboration stages only under their separate plans; keep science execution and migration gates explicit."
+    },
+    {
+      "lane": "future-collaboration-execution-retention-and-observability",
+      "tickets": [
+        "50",
+        "51",
+        "52",
+        "53.0",
+        "54",
+        "53"
+      ],
+      "goal": "Specify concurrent worker attempts, candidate verification, landing/recovery, retention/cleanup, observability and final pilot/closeout before scientific migration.",
+      "status_at_cutoff": "tasks specified and staged in order; not complete/implemented as a whole. Ticket49 alone is closed. The 2026-10-04 closeout preserves transport, stop/queue/process, full export/restore and later live gates.",
+      "source_receipts": [
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/50-collaboration-worker-attempts.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/51-collaboration-candidate-verification.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/52-collaboration-landing-recovery.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/53-0-collaboration-retention-cleanup-foundation.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/54-worker-program-observability.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/tasks/53-collaboration-cleanup-closeout.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        },
+        {
+          "kind": "repo",
+          "path": "docs/research/reviews/2026-10-04-collaboration-ticket49-closeout.md",
+          "commit": "a553645ef22761aa7708abf1ee109952a6cd2c38"
+        }
+      ],
+      "finding": "These are enabling workflow tasks, not scientific results. Ticket49 closeout keeps later milestones gated and states that scientific jobs, checkpoints, full native GT, recipes, budgets and HDFS epoch were unchanged.",
+      "next_discriminating_experiment": "Complete the exact specified live admission for each staged protocol gate before worker execution or migration; preserve current scientific evidence and candidate freshness requirements."
+    }
+  ]
+}

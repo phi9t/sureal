@@ -1,0 +1,126 @@
+"""Root-side actual source and readiness guards, without native effects."""
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import tempfile
+import time
+import unittest
+
+
+class GuardControls(unittest.TestCase):
+    def load(self):
+        path = Path(__file__).with_name('preflight_guards.py')
+        self.assertTrue(path.exists(), 'preflight fresh guards missing')
+        spec = importlib.util.spec_from_file_location('guard', path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+
+    def test_entire_source_bytes_modes_links_and_extra_entries_checked(self):
+        guard = self.load()
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root/'file').write_bytes(b'original')
+            (root/'link').symlink_to('file')
+            entries = []
+            for path, mode, data in [('file', '100644', b'original'), ('link', '120000', b'file')]:
+                entries.append({'path': path, 'kind': 'blob', 'mode': mode,
+                    'sha256': hashlib.sha256(data).hexdigest(), 'bytes': len(data),
+                    'oid': hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()})
+            context = {'source': str(root), 'entries': entries, 'gitlinks_excluded': []}
+            proof = guard.full_manifest(context)
+            self.assertEqual(proof['entries'], entries)
+            (root/'file').write_bytes(b'changed')
+            with self.assertRaises(ValueError):
+                guard.full_manifest(context)
+            (root/'file').write_bytes(b'original')
+            (root/'file').chmod(0o755)
+            with self.assertRaises(ValueError):
+                guard.full_manifest(context)
+            (root/'file').chmod(0o644)
+            (root/'extra').write_bytes(b'extra')
+            with self.assertRaises(ValueError):
+                guard.full_manifest(context)
+
+    def test_ready_wrong_or_ended_birth_old_time_or_wrong_static_ref_refuses(self):
+        guard = self.load()
+        process = guard.incarnation(os.getpid())
+        now = time.monotonic_ns()
+        scope = guard.process_scope(os.getpid())
+        argv = guard.argv(os.getpid())
+        ready = {'kind': 'ObserverReady', 'fixture_id': 'fixture-1',
+                 'process': process, 'argv': argv, 'ready_ns': now,
+                 'observer_scope': scope, 'static_preflight': {'report': 'static'},
+                 'output': '/owned/observer', 'source': {'candidate': 'source'}}
+        expected = {'fixture_id': 'fixture-1', 'static_preflight': {'report': 'static'},
+                    'output': '/owned/observer', 'source': {'candidate': 'source'}}
+        guard.check_ready(ready, expected, now)
+        for key, value in [('ready_ns', now-2000000001),
+                           ('process', {**process, 'start_ticks': process['start_ticks']+1}),
+                           ('static_preflight', {'report': 'other'})]:
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                guard.check_ready({**ready, key: value}, expected, now)
+
+    def test_channel_layout_has_no_writer_scan_exemptions(self):
+        guard = self.load()
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root/'channel').mkdir()
+            st = (root/'channel').stat()
+            pin = {'path': str(root/'channel'), 'uid': st.st_uid,
+                   'device': st.st_dev, 'inode': st.st_ino}
+            guard.channel_layout(pin, [str(root/'fixture'), str(root/'workspace')])
+            for path in [root/'channel'/'child', root, root/'channel']:
+                with self.subTest(path=path), self.assertRaises(ValueError):
+                    guard.channel_layout(pin, [str(path)])
+
+    def test_static_authority_binds_all_raw_context_and_current_pack_refs(self):
+        guard = self.load()
+        self.assertTrue(hasattr(guard, 'fresh_sources'), 'fresh static-source guard missing')
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            def write(name, value):
+                path = root/name
+                path.write_text(json.dumps(value))
+                return {'path': str(path), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
+            source = root/'source'
+            source.mkdir()
+            (source/'a').write_bytes(b'body')
+            entry = {'path': 'a', 'mode': '100644', 'kind': 'blob', 'bytes': 4,
+                     'oid': hashlib.sha1(b'blob 4\0body').hexdigest(),
+                     'sha256': hashlib.sha256(b'body').hexdigest()}
+            context = {'source': str(source), 'candidate': 'c'*40, 'tree': 'd'*40,
+                       'entries': [entry], 'gitlinks_excluded': []}
+            pack = root/'pack'
+            pack.write_bytes(b'private-component')
+            retention = {'candidate': context['candidate'], 'tree': context['tree'],
+                         'pack_path': str(pack), 'pack_sha256': hashlib.sha256(pack.read_bytes()).hexdigest()}
+            pin = {'candidate': context['candidate'], 'materialization': write('mat', context),
+                   'retention': write('retention', retention),
+                   'review': write('review', {'candidate': context['candidate'],
+                        'source': str(source), 'verdict': 'pass', 'reviewer_native_thread_id': 'reviewer'})}
+            authority = {'kind': 'StaticRuntimeProbeAdmission', 'auditor': pin,
+                         'operator': pin, 'runtime': {}, 'notification_schemas': {},
+                         'fixture_plan': {'tools': {}}, 'user_authority': write('user', {})}
+            report = {'kind': 'IndependentStaticPreflight', 'status': 'pass',
+                      'authorization': write('authority', authority),
+                      'auditor_context': context, 'operator_context': context}
+            command = {'exit_code': 0, 'started_ms': 10, 'ended_ms': 20,
+                       'stdout': write('stdout', {}), 'stderr': write('stderr', {})}
+            admission = {**authority, 'author_native_thread_id': 'author',
+                         'static_preflight': {'report': write('report', report),
+                                              'command': write('command', command)}}
+            self.assertEqual(len(guard.fresh_sources(admission)), 2)
+            for key, value in [('runtime', {'changed': True}),
+                               ('fixture_plan', {'tools': {}, 'changed': True})]:
+                with self.subTest(key=key), self.assertRaises(ValueError):
+                    guard.fresh_sources({**admission, key: value})
+            pack.write_bytes(b'changed')
+            with self.assertRaises(ValueError):
+                guard.fresh_sources(admission)
+
+
+if __name__ == '__main__':
+    unittest.main()

@@ -1,0 +1,18 @@
+import gzip,hashlib,io,json,tarfile
+from pathlib import Path
+from pipeline.compressed_component_archive_validate import validate_component_archive
+sha=lambda b:hashlib.sha256(b).hexdigest()
+for case,reason in [('valid',None),('missing','missing component'),('duplicate','duplicate or undeclared'),('undeclared','duplicate or undeclared'),('unsafe','unsafe component inventory')]:
+ name='../escape' if case=='unsafe' else 'lidar/f.bin';payload=b'payload';manifest=json.dumps({'schema_version':1,'files':{name:{'size_bytes':len(payload),'sha256':sha(payload)}},'provenance':{'scene':'fixture'}},sort_keys=True).encode();buf=io.BytesIO()
+ with tarfile.open(fileobj=buf,mode='w',format=tarfile.USTAR_FORMAT) as tar:
+  def add(n,data):
+   t=tarfile.TarInfo(n);t.size=len(data);t.mode=0o644;tar.addfile(t,io.BytesIO(data))
+  add('bundle.json',manifest)
+  if case!='missing':add(name,payload)
+  if case=='duplicate':add(name,payload)
+  if case=='undeclared':add('camera/unlisted.bin',payload)
+ raw=buf.getvalue();data=gzip.compress(raw,mtime=0);p=Path('/outputs')/(case+'.tar.gz');p.write_bytes(data)
+ try:r=validate_component_archive(p,expected_archive_sha256=sha(data),expected_manifest_sha256=sha(manifest),expected_uncompressed_sha256=sha(raw),expected_uncompressed_bytes=len(raw))
+ except ValueError as e:assert reason is not None and reason in str(e),(case,str(e));print('PASS refusal',case,str(e))
+ else:assert case=='valid' and r['files']==1
+print('PASS live compressed member inventory: valid, missing, duplicate, undeclared, unsafe')

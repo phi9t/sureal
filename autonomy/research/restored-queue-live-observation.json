@@ -1,0 +1,18 @@
+{
+  "observed_utc": "2026-10-01T01:18:26.804024+00:00",
+  "classification": "verified wait",
+  "scene": "16646502593577530501_4878_080_4898_080",
+  "live_processes": [
+    {
+      "pid": 1609839,
+      "command": [
+        "python3",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/process-scientific-cohort.py",
+        "--output",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1",
+        "--scene"
+      ]
+    }
+  ],
+  "scope": "Native processing active; no missing receipt promoted."
+}

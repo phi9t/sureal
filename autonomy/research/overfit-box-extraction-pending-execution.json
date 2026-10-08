@@ -1,0 +1,8 @@
+{
+  "pid": 3645336,
+  "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/continuation-logs/overfit-box-extraction-v1.log",
+  "candidate_sha256": "a899058a9045a2dc318f50f6de36a9bd56e6092f4ed70a21bd19a8ead220f3f0",
+  "started_utc": "2026-10-01T13:49:25.014103+00:00",
+  "wait_owner_pid": 2585329,
+  "scope": "armed execution; pending is not source admission"
+}

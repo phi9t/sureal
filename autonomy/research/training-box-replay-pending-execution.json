@@ -1,0 +1,14 @@
+{
+  "status": "real full64 replay armed; waiting original103 admissions and queue completion",
+  "session_id": 34090,
+  "queue_pid": 1609839,
+  "command": [
+    "python3",
+    "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.scratch/await-training-box-replay.py"
+  ],
+  "runner_sha256": "bac6b088a949467666e44236c7a3dbaf7126f121e2cede19df361d502871ddc4",
+  "execution_candidate_sha256": "e3d56055681b30b226bc1826b90a96d7459fa97887ab641c311e37d75382e62b",
+  "destination": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/training-box-distributions-v1",
+  "armed_utc": "2026-10-01T04:31:05.256312+00:00",
+  "scope": "pending execution only; no payload result"
+}

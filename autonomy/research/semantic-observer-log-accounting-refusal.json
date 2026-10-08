@@ -1,0 +1,11 @@
+{
+  "scene": "3375636961848927657_1942_000_1962_000",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/semantic-recovered-v1/3375636961848927657_1942_000_1962_000/receipt.json",
+  "receipt_sha256": "071a630ca3e351de2a2466b1c665243ba7a84e318975d3cbf22dbda17f5b5f2e",
+  "observed_working_growth_beyond_archive": 71,
+  "waiting_log_first_line_bytes": 71,
+  "waiting_log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/native-shape-continuation-v1.log",
+  "waiting_log_sha256": "d84123c84fc0a7dac10811b5786adbd21717317b0fbaff09b25cd8e003ef3efe",
+  "cause": "waiting continuation logs wrote into working root outside queue ownership, violating zero-growth staging receipt contract",
+  "scope": "failed original receipt preserved and remains unadmitted; use fresh output and place continuation logs outside accounted staging root"
+}

@@ -1,0 +1,18 @@
+{
+  "scene": "8722413665055769182_2840_000_2860_000",
+  "membership": {
+    "official_split": "training",
+    "research_splits": [
+      "train"
+    ]
+  },
+  "source": {
+    "size_bytes": 199519176,
+    "sha256": "d8cadba7300ad96d1413dcfcb71134e16245d23d3e578912011ae537921f32ad",
+    "md5_base64": "D1q0XtQKZN6zAVXTYAq4LA=="
+  },
+  "inventory": {
+    "rows": 985,
+    "key_sha256": "ceb41ca3413edf6557cf5ce64aa7adfc8dd4416636a82d9c41402325d1c770c1"
+  }
+}

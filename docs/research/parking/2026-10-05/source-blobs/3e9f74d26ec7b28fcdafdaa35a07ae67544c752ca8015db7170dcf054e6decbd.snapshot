@@ -1,0 +1,40 @@
+import fcntl,hashlib,json,subprocess,sys
+from pathlib import Path
+here=Path(__file__).resolve().parents[1]/'experiments/waymo-perception';sys.path.insert(0,str(here))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+cache=Path.home()/'.cache/waystone/waymo-perception';working=cache/'scientific-processing';scene='9243656068381062947_1297_428_1317_428';base=working/'cohort-v1'/scene
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+checks=[]
+def call(stage,command):
+ r=subprocess.run(command,capture_output=True,text=True);(base/(stage+'-recovery.log')).write_text(r.stdout+r.stderr);checks.append({'stage':stage,'command':command,'exit_code':r.returncode})
+ if r.returncode:raise RuntimeError(r.stderr)
+ print('PASS',stage,flush=True)
+def audit(p,root):
+ r=json.loads(p.read_text())
+ if not r.get('checks') or any(c['exit_code'] for c in r['checks']):raise ValueError('live checks missing')
+ for n,h in r['candidate_hashes'].items():
+  if sha(here/n)!=h:raise ValueError('code changed')
+ for n,h in r['artifacts'].items():
+  if sha(root/n)!=h:raise ValueError('artifact changed')
+ return r
+with (working/'cohort-queue.lock').open('a') as lease:
+ fcntl.flock(lease,fcntl.LOCK_EX|fcntl.LOCK_NB)
+ ev=json.loads((base/'points/sidecar-eviction.json').read_text())
+ if not ev['status'].endswith('completed'):raise ValueError('sidecar eviction incomplete')
+ root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
+ camera=base/'camera';publication=base/'camera-publication';replay=base/'camera-replay'
+ if any(p.exists() for p in [camera,publication,replay]):raise ValueError('camera recovery output already exists')
+ call('camera-preprocess',['python3',str(here/'scientific-camera-preprocess.py'),'--scene',scene,'--output',str(camera)])
+ hashes={}
+ for c in ['camera_image','camera_segmentation','camera_box']:
+  p=camera/'evidence'/c/'receipt.json';audit(p,camera);hashes[c]=sha(p)
+ evidence=base/'camera-evidence.json';evidence.write_text(json.dumps({'scene':scene,'processing':str(camera),'receipt_hashes':hashes},indent=2)+'\n')
+ call('camera-publication',['python3',str(here/'publish-scientific-camera.py'),'--evidence',str(evidence),'--expected-evidence-sha256',sha(evidence),'--output',str(publication)])
+ audit(publication/'receipt.json',publication);ph=sha(publication/'receipt.json')
+ call('camera-replay',['python3',str(here/'verify-camera-replay.py'),str(camera),str(publication),str(replay),'--expected-receipt-sha256',ph,'--usage','camera_validation'])
+ audit(replay/'receipt.json',replay);rh=sha(replay/'receipt.json')
+ code="import json; from pipeline.camera_eviction import evict_camera; r=evict_camera('/outputs','/opt','/srv',expected_publication_sha256="+repr(ph)+",expected_replay_sha256="+repr(rh)+"); print(json.dumps({'status':r['status'],'bytes_evicted':r['bytes_evicted']}))"
+ command=launch_plan(root,here,here,camera,['python','-c',code]);i=command.index('--');command[i:i]=['--bind',str(publication),'/opt','--ro-bind',str(replay),'/srv'];call('camera-evict',command)
+ if not json.loads((camera/'camera-eviction.json').read_text())['status'].endswith('completed'):raise ValueError('camera eviction incomplete')
+ (here/'research/interrupted-camera-lifecycle-executed.json').write_text(json.dumps({'scene':scene,'checks':checks,'runtime_lock':lock,'publication_receipt_sha256':ph,'replay_receipt_sha256':rh,'scope':'recovered camera stages; full scene checkpoint and independent admission remain required'},indent=2)+'\n')

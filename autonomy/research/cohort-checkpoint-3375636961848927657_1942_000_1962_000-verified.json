@@ -1,0 +1,86 @@
+{
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-3375636961848927657_1942_000_1962_000/receipt.json",
+  "receipt_sha256": "2976bf79e62b4c17a3670c7f261eb5d5138a089464e7a9426a024f0b4ffdbd8f",
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-3375636961848927657_1942_000_1962_000/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/cohort-checkpoint-3375636961848927657_1942_000_1962_000/input",
+        "/mnt",
+        "--",
+        "python",
+        "-c",
+        "import json; from pathlib import Path; from pipeline.cohort_checkpoint import verify_checkpoint; d=json.loads(Path('/mnt/trusted.json').read_text()); r=verify_checkpoint('/source/cohort-v1/3375636961848927657_1942_000_1962_000/receipt.json',expected_checkpoint_sha256=d['checkpoint_sha256'],code_root='/experiment',expected_runtime_lock=d['runtime_lock'],expected_manifest_sha256=d['manifest_sha256'],expected_source_hashes=d['source_hashes'],path_remap={d['host_working']:'/source'}); Path('/outputs/check.json').write_text(json.dumps(r)); print('PASS independent checkpoint',r)"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "verified_utc": "2026-09-30T17:16:39.059032+00:00",
+  "elapsed_seconds": 2.9853069369855803,
+  "peak_child_rss_kib": 45228,
+  "checkpoint_sha256": "16b4d55ab407e73a6abbb47054c230167f396a8303a29512aa0477835931ea18",
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "candidate_hashes": {
+    "pipeline/cohort_checkpoint.py": "2b95483af7f637689e6f3f67b94b134342e127d2a5ff5aadf968275253abb844"
+  },
+  "artifacts": {
+    "input/trusted.json": "c3d158178ffacbdccabc52a9d441d6b57516a070a98e478df9a818550d361451",
+    "live.log": "3a2cab683178b7267e9e018b1c290841a38eb1b70bcbeda41eeb633a8ca69f1f",
+    "output/check.json": "ce77e043b62b66314d7e93f7ef010cc535bcdd19c2963f7b18a99151975a32fe"
+  },
+  "validation": {
+    "status": "trusted lifecycle retained evidence/current candidates independently reconciled",
+    "scene": "3375636961848927657_1942_000_1962_000",
+    "retained_files": 30,
+    "worker_receipts": 16,
+    "verified_evictions": 3,
+    "evicted_artifacts": 43708,
+    "scope": "native lifecycle evidence only; protocol/models/generalization remain open"
+  }
+}

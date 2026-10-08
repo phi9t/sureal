@@ -1,0 +1,13 @@
+"""Build the self-contained explorer from hash-verified native artifacts."""
+import json
+from pathlib import Path
+from data import build
+
+folder=Path(__file__).resolve().parent
+payload=build(folder.parent,Path.home()/'.cache/waystone/waymo-perception')
+serialized=json.dumps(payload,separators=(',',':')).replace('<','\\u003c')
+(folder/'scene-data.json').write_text(serialized+'\n')
+fragment=(folder/'scene-explorer.template.html').read_text().replace('__SCENE_DATA__',serialized)
+assert len(fragment.encode())<1_000_000
+(folder/'scene-explorer.html').write_text(fragment)
+print(f"Built {len(payload['scenes'])} scenes, {sum(len(s['frames']) for s in payload['scenes'])} frames, {len(fragment.encode())} bytes")

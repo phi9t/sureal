@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "manifest_identical": true,
+  "sources_identical": true,
+  "implementation_identical": true,
+  "manifest": {
+    "bytes": 142876483,
+    "sha256": "70190074c7d443632523a5c3273d5ead74f4fcddea653addee3a2fa2efa01bcf"
+  },
+  "runs": [
+    {
+      "run": "tracer-final-a",
+      "passed": true,
+      "manifest_rows": 143625,
+      "scan_report_duration_seconds": 104.66205248699407,
+      "peak_rss_bytes": 1064357888
+    },
+    {
+      "run": "tracer-final-b",
+      "passed": true,
+      "manifest_rows": 143625,
+      "scan_report_duration_seconds": 106.65086161599902,
+      "peak_rss_bytes": 1071968256
+    }
+  ],
+  "timing_scope": "reported inspection duration excludes subsequent independent validation",
+  "note": "report/result metrics vary; only manifest and source receipts are byte-deterministic"
+}

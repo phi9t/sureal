@@ -1,0 +1,18 @@
+import json,time,fcntl,subprocess
+from pathlib import Path
+P=Path('experiments/waymo-perception');C=Path.home()/'.cache/waystone/waymo-perception';result=P/'research/tier1-overfit20261002b-results.json'
+while True:
+ r=json.loads(result.read_text())
+ if r.get('finished'):
+  lock=(C/'insula/architecture-experiments.lock').open('a')
+  try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+  except BlockingIOError:lock.close();time.sleep(10);continue
+  lock.close();break
+ time.sleep(20)
+if any(v['status']=='execution failed; artifacts retained' for v in r['cases'].values()):
+ with open('.scratch/tier1-overfit20261002b-recovery.log','w') as log:
+  subprocess.run(['python',str(P/'tier1/run.py'),'--run-id','overfit20261002b','--resume'],stdout=log,stderr=subprocess.STDOUT,check=True)
+r=json.loads(result.read_text());assert r['finished'];assert all(v['status'] in ['sustained native overfit','failed to overfit by 10000 updates','exact observation equivalence control'] for v in r['cases'].values()),[(k,v['status']) for k,v in r['cases'].items()]
+subprocess.run(['python','.scratch/run-tier1-equivalence.py'],check=True)
+subprocess.run(['python','.scratch/run-tier1-closure.py','final-v3'],check=True)
+print('PASS complete matrix, terminal cap equivalence and live closure',flush=True)

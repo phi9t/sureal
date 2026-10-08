@@ -1,0 +1,11 @@
+{
+  "scope": "pilot: two frames per scene, not full M3 closure",
+  "points": 715060,
+  "elapsed_seconds": 30.384365377016366,
+  "peak_rss_kib": 1659628,
+  "records": 40,
+  "segmentation_records": 4,
+  "report_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/m1-output/reconstruction-pilot-a/report.json",
+  "report_sha256": "7118b1c7e8ec08cfadf43641b2edd439e1d865376f0352bce37120d6f4a950b5",
+  "status": "pilot-passed; M3 not complete"
+}

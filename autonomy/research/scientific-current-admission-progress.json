@@ -1,0 +1,8 @@
+{
+  "status": "partial live source admission; no scientific protocol closure",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/scientific-admission-live-b/receipt.json",
+  "receipt_sha256": "c426512fd514d9fb283814448b40b170dcf28b1d48ef4e1c0cafdc93ff0138c5",
+  "scenes_admitted": 90,
+  "scenes_pending": 13,
+  "scope": "complete-scene admission against source receipts; pending scenes, native payload preprocessing and final protocol acceptance remain open"
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Surflo 3D pathway lab result",
+  "type": "object",
+  "required": ["schema_version", "module_id", "profile", "status", "network_mode", "measurement_kind", "metrics", "metric_provenance", "failure_sweep", "failure_sweep_provenance", "resources", "provenance"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "module_id": {"pattern": "^[0-9]{2}$"},
+    "profile": {"enum": ["smoke", "full"]},
+    "status": {"const": "complete"},
+    "network_mode": {"const": "offline"},
+    "measurement_kind": {"enum": ["controlled_fixture", "reused_measured_result"]},
+    "metrics": {"type": "object"},
+    "metric_provenance": {"type": "object"},
+    "failure_sweep": {"type": "array", "minItems": 2},
+    "failure_sweep_provenance": {"enum": ["controlled_fixture", "reused_measured_result"]},
+    "controlled_suite": {},
+    "resources": {
+      "type": "object",
+      "required": ["runtime_seconds", "peak_cpu_bytes", "peak_gpu_bytes", "network_isolation", "cpu_memory_scope"],
+      "properties": {
+        "runtime_seconds": {"type": "number"},
+        "peak_cpu_bytes": {"type": "integer"},
+        "peak_gpu_bytes": {"type": "integer"},
+        "network_isolation": {"type": "string"},
+        "cpu_memory_scope": {"type": "string"}
+      }
+    },
+    "provenance": {"type": "object"}
+  }
+}

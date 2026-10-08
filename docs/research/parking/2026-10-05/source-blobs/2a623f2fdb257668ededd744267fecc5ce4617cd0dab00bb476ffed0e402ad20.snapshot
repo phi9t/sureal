@@ -1,0 +1,64 @@
+"""Independent retained shape receipt and literal grid/key accounting."""
+import hashlib,json,math
+from pathlib import Path
+
+def sha(path):
+ with Path(path).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+
+def verify(root,expected,code):
+ root,code=Path(root),Path(code)
+ def require(ok):
+  if not ok:raise ValueError('retained native shape receipt differs')
+ require(sha(root/'receipt.json')==expected['receipt_sha256'])
+ r=json.loads((root/'receipt.json').read_text());job=expected['job']
+ require(r['input_identity']==job and r['runtime_lock']==expected['runtime_lock'])
+ require(r['job_sha256']==expected['job_sha256'] and r['source_receipt_sha256']==expected['source_receipt_sha256'])
+ require(len(expected['code_sha256'])==11 and r['code_sha256']==expected['code_sha256'])
+ for name,digest in expected['code_sha256'].items():
+  require(Path(name).name==name and sha(code/'pipeline'/name)==digest)
+ required={'worker.log','audit.log','worker/shapes.json','audit/check.json','input/job.json','input/source-receipt.json'}
+ require(set(r['artifacts'])==required)
+ for name,digest in r['artifacts'].items():
+  p=root/name;require(not p.is_symlink() and p.is_file() and sha(p)==digest)
+ require(sha(root/'input/job.json')==expected['job_sha256'] and json.loads((root/'input/job.json').read_text())==job)
+ require(sha(root/'input/source-receipt.json')==expected['source_receipt_sha256'])
+ source=json.loads((root/'input/source-receipt.json').read_text())
+ require(source['scene']==job['scene'] and source['component']=='lidar')
+ require(job['membership']=={'official_split':source['official_split'],'research_splits':source['research_splits']})
+ require(job['source']=={'size_bytes':int(source['source_metadata']['size']),'sha256':source['sha256'],'md5_base64':source['source_metadata']['md5_hash']})
+ require(source['hdfs_roundtrip_sha256']==source['sha256'] and source['inventory']['rows']==job['inventory']['rows'] and source['inventory']['key_sha256']==job['inventory']['key_sha256'])
+ require(len(r['checks'])==2)
+ for check in r['checks']:
+  require(type(check['exit_code']) is int and check['exit_code']==0)
+  cmd=check['command'];require(cmd[0]=='bwrap' and '--unshare-all' in cmd and '--clearenv' in cmd)
+ t=r['transfer'];require(type(t['transfer_exit_code']) is int and t['transfer_exit_code']==0)
+ for k in ['size_bytes','sha256','md5_base64']:require(t[k]==job['source'][k])
+ require(t['hdfs_uri']==source['hdfs_uri'])
+ for k in ['file_size_limit_bytes','raw_peak_bytes_including_retained']:require(type(t[k]) is int and t[k]>=job['source']['size_bytes'])
+ require(t['raw_peak_bytes_including_retained']<=expected['raw_limit_bytes']<=2*1024**3)
+ require(t['file_size_limit_bytes']<=expected['raw_limit_bytes'])
+ report=json.loads((root/'worker/shapes.json').read_text())
+ require(sha(root/'worker/shapes.json')==r['report_sha256'])
+ require(report['source']==job['source'] and report['membership']==job['membership'] and report['job_sha256']==expected['job_sha256'])
+ shape=report['shapes'];records=shape['records'];require(len(records)==2*job['inventory']['rows'])
+ digest=hashlib.sha256();seen=set();present=null=0
+ for i in range(0,len(records),2):
+  a,b=records[i:i+2];key=(a['context'],a['timestamp'],a['laser'])
+  require(key[0]==job['scene'] and type(key[1]) is int and 0<=key[1]<2**63 and type(key[2]) is int and key[2] in range(1,6))
+  require(key not in seen);seen.add(key)
+  identity={'key.segment_context_name':key[0],'key.frame_timestamp_micros':key[1],'key.laser_name':key[2]}
+  digest.update((json.dumps(identity,sort_keys=True,separators=(',',':'))+'\n').encode())
+  for ret,record in [(1,a),(2,b)]:
+   require((record['context'],record['timestamp'],record['laser'])==key and type(record['return']) is int and record['return']==ret)
+   dims=record['native_shape']
+   if dims is None:null+=1
+   else:
+    require(isinstance(dims,list) and len(dims)==3 and all(type(x) is int and x>0 for x in dims) and dims[2]==4);present+=1
+ require(shape['scene']==job['scene'] and shape['native_rows']==job['inventory']['rows'] and shape['key_sha256']==digest.hexdigest()==job['inventory']['key_sha256'])
+ require(shape['present_shape_records']==present and shape['null_shape_records']==null)
+ validation=json.loads((root/'audit/check.json').read_text());require(validation==r['validation'])
+ for k,v in {'scene':job['scene'],'records_verified':len(records),'native_rows':job['inventory']['rows'],'present_shape_records':present,'null_shape_records':null,'source_sha256':job['source']['sha256']}.items():require(validation[k]==v and report['independent'][k]==v)
+ usage=report['worker_resources'];require(validation['worker_resources']==usage)
+ require(type(usage['peak_rss_kib']) is int and usage['peak_rss_kib']>0 and usage['rss_scope']=='worker_process_peak')
+ require(type(usage['elapsed_seconds']) in (int,float) and math.isfinite(usage['elapsed_seconds']) and usage['elapsed_seconds']>=0)
+ return {'scene':job['scene'],'records_verified':len(records),'present_shape_records':present,'null_shape_records':null,'source_sha256':job['source']['sha256'],'membership':job['membership']}

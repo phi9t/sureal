@@ -1,0 +1,289 @@
+{
+  "accepted": true,
+  "accepted_role_phases": [
+    {
+      "auditor_candidate": "c4a7a13b7cc31400c208fe43369e1bb651f26847",
+      "candidate": "cdc2206d482ba4b9f62ffef41a87dd6e5da5d26f",
+      "case_count": 6,
+      "ended_ms": 1791111195052,
+      "phase": "gate",
+      "raw_artifacts": 611,
+      "report": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/run49-implementation-v5/audit-gate-v1.json",
+        "sha256": "eda48904a9332e50e1bfe615f8194050712bf8f40a95ff71ac9e72864ce34926"
+      },
+      "role": "implementation",
+      "started_ms": 1791111158270
+    },
+    {
+      "auditor_candidate": "b043b3eb33381f4c9c0effa66f447b64c6f9b222",
+      "candidate": "cdc2206d482ba4b9f62ffef41a87dd6e5da5d26f",
+      "case_count": 1,
+      "ended_ms": 1791115429863,
+      "phase": "post-landing",
+      "raw_artifacts": 1531,
+      "report": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/post49-implementation-v2-a4/audit-post-v1.json",
+        "sha256": "bb8ee2a0e928b40d2651284441fe14efcd3bf5d756e5d52c58a00fb15b9035db"
+      },
+      "role": "implementation",
+      "started_ms": 1791115359625
+    },
+    {
+      "auditor_candidate": "b043b3eb33381f4c9c0effa66f447b64c6f9b222",
+      "candidate": "d2ebbd33f48f2b8e5f81912872fd8f832dca9b01",
+      "case_count": 6,
+      "ended_ms": 1791121676470,
+      "phase": "gate",
+      "raw_artifacts": 309,
+      "report": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/run49-metadata-v1/audit-gate-v1.json",
+        "sha256": "e82e4fc37151b1c03d7a6d3e046fcc147d774de7f491875d28f828b55654ea4d"
+      },
+      "role": "metadata",
+      "started_ms": 1791121638892
+    },
+    {
+      "auditor_candidate": "841ad8f1a99c38bee9fc4f99ac24aa5e82758d62",
+      "candidate": "d2ebbd33f48f2b8e5f81912872fd8f832dca9b01",
+      "case_count": 1,
+      "ended_ms": 1791136349275,
+      "phase": "post-landing",
+      "raw_artifacts": 2280,
+      "report": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/post49-metadata-v2-a5/audit-post-v1.json",
+        "sha256": "f9ab92aae698e785e243e51bbf445c45d731486b762918e7232e985bc7490d44"
+      },
+      "role": "metadata",
+      "started_ms": 1791136201007
+    },
+    {
+      "auditor_candidate": "841ad8f1a99c38bee9fc4f99ac24aa5e82758d62",
+      "candidate": "cdc2206d482ba4b9f62ffef41a87dd6e5da5d26f",
+      "case_count": 1,
+      "ended_ms": 1791137311728,
+      "phase": "closure",
+      "raw_artifacts": 2388,
+      "report": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/closure49-v2-a5/implementation/audit-closure-v1.json",
+        "sha256": "fa3de683ca21123b8cbaa7961b9da600a37fbcf92f96d6c64faaa85c1eb66da0"
+      },
+      "role": "implementation",
+      "started_ms": 1791137072330
+    },
+    {
+      "auditor_candidate": "841ad8f1a99c38bee9fc4f99ac24aa5e82758d62",
+      "candidate": "d2ebbd33f48f2b8e5f81912872fd8f832dca9b01",
+      "case_count": 1,
+      "ended_ms": 1791137311725,
+      "phase": "closure",
+      "raw_artifacts": 2388,
+      "report": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/closure49-v2-a5/metadata/audit-closure-v1.json",
+        "sha256": "ebbb1046933e8cb7a671a84b20be132d8c5b3304c7b32808859f20404017cf33"
+      },
+      "role": "metadata",
+      "started_ms": 1791137072331
+    }
+  ],
+  "actual_native": {
+    "canonical_init_command": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/canonical-bootstrap49-v1/native-init/actual-command.json",
+      "sha256": "2df1f8b15c7b7a3cdf9f95075cfb1f7ff4b60d4bfd9ca5bb27a7643edab6c2a5"
+    },
+    "canonical_readback": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/canonical-bootstrap49-v1/canonical-readback.json",
+      "sha256": "98f979c994b51be0faf79bf181be898d9b63257c21c4ce88a83ea513fe2ddbb2"
+    },
+    "close_commit_argument": "d2ebbd33f48f2b8e5f81912872fd8f832dca9b01",
+    "close_commit_provenance": "Actual native --commit records the accepted final metadata commit M containing accepted code X. It does not claim an X-only argument. Both immutable accepted code/map phases and closures bind the two exact candidates.",
+    "closed_at": "2026-10-04T17:57:25.709Z",
+    "native_hold_readbacks": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/metadata-bootstrap49-v1/final-native14-related-v2/readback.json",
+      "sha256": "4e3526d54ab82f114b4c1b04e6cf9e2aae36bf492111d8e99a525a11d45db22d"
+    },
+    "project_uid": "01M43DVB2CMABHV3RY43PNR5BM",
+    "selected_database": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/canonical-close49-v1/selected-project.db",
+      "sha256": "d1e6bda50275dbd4ac21deee853ea56f4417effc46d09fad9f281be2fc27eb36"
+    },
+    "show_command": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/canonical-close49-v1/show/actual-command.json",
+      "sha256": "d55d5d63b2e02b7bf4c916cfa848513f4fe505dbd7b212340336d0e6f4ba9397"
+    },
+    "show_stdout": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/canonical-close49-v1/show/stdout",
+      "sha256": "88a2977eb653c4de670dac77b643aed4b61808ca700cee8933b343b81d32f4b0"
+    },
+    "single_close_command": {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/canonical-close49-v1/native-close/actual-command.json",
+      "sha256": "5dc6e48d333392580594b773bb9cde9c68fecb62fd3612ace7cd7b13cfc9b6b1"
+    },
+    "ticket49_uid": "01M43DWSWYSB1BKWG8396HNB7S"
+  },
+  "auditor_candidate": "841ad8f1a99c38bee9fc4f99ac24aa5e82758d62",
+  "author": {
+    "identity": "/root"
+  },
+  "candidate": "d2ebbd33f48f2b8e5f81912872fd8f832dca9b01",
+  "code_candidate": "cdc2206d482ba4b9f62ffef41a87dd6e5da5d26f",
+  "findings": [],
+  "independent_auditor_author": {
+    "identity": "/root/collab49_independent_auditor",
+    "native_thread_id": "01a105a4-cdbd-7400-9824-20e8dbb615bb"
+  },
+  "kind": "independent-ticket49-closeout-review",
+  "metadata_candidate": "d2ebbd33f48f2b8e5f81912872fd8f832dca9b01",
+  "preserved_failures": [
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/post49-implementation-v1/audit-post-v1.json",
+      "sha256": "f68de111d29bb1e55d23adfe5e1d6fb808b9f914869da092d2437f2dcfc7207e"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/post49-metadata-v1/audit-post-v1.json",
+      "sha256": "d5199b25cf35ed211a4ea2628936fc21377f16c9c25a18c93ab246ef7304c790"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/closure49-v1-a5/implementation/audit-closure-v1.json",
+      "sha256": "37fe5137378ad693e4b17cbed7d1a1caf622bdec5158785a8ca76adc0f223b0b"
+    },
+    {
+      "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/closure49-v1-a5/metadata/audit-closure-v1.json",
+      "sha256": "d0d42ef165570dd1d61c317ddaa39711d53fe3203a93c34ad295ae1692faa130"
+    }
+  ],
+  "reviewed_ms": 1791138267926,
+  "reviewer": {
+    "identity": "/root/collab_execution_admission_review",
+    "native_thread_id": "01a105a5-de93-74a3-adad-c5184f54a751"
+  },
+  "reviewer_provenance": {
+    "bounded_review": "Reviewed the sealed actual gate/post/closure evidence and original authority, not a new current map gate. Historical metadata gate remains bound to its pre-close open49 snapshot; current closed49 is separately proven by both closure roles.",
+    "private_preflight_correction": "Initial reviewer query assumed scoped selected DB carried issue_labels and stopped with assertion. A fresh read-only inspection characterized its actual scope and verified required labels against current native rows plus retained actual shows. No product or auditor acceptance was weakened and no source or historical receipt was rewritten."
+  },
+  "schema_version": 1,
+  "scope": {
+    "description": "Sureal shared-project bootstrap and clean-base/source admission foundation, durable effect journal, immutable source/runtime provenance, initial14 committed task-definition registration, additive CPU Insula implementation/metadata gates, exact publication and both-role actual native closeout. Acceptance is derived from live evidence and independent oracles; native closed status alone is insufficient.",
+    "frozen_scientific_resources_and_jobs_untouched_by_review": true,
+    "hdfs_epoch113_retention_release_not_authorized_or_performed_by_review": true,
+    "integration": "This review completes bounded49 acceptance before owned A4/A5 auditor and closeout/journal integration. It does not itself edit, land, publish, clean workspaces, release retention or accept a not-yet-frozen integration candidate.",
+    "next_stage_order": [
+      "50",
+      "51",
+      "52",
+      "53.0",
+      "54",
+      "53",
+      "44",
+      "45",
+      "46",
+      "47",
+      "48"
+    ],
+    "no_managed_worker_or_task50_runtime_acceptance": true,
+    "no_model_implementation_plan_or_scientific_training_quality_acceptance": true,
+    "original_goal_resume": "Lead reported explicitly user-requested original native goal resume via supported owned WebSocket transport. No native-goal control, thread creation or dispatch was performed by this reviewer; this separate operational event is not scientific or task50 acceptance.",
+    "snapshot_coverage": "The selected closure snapshot carries project/issues/links/meta only. Its issue_labels table is empty by installed scoped-export behavior. All five required holds are independently proven from current read-only user DB label rows and the retained actual native-show label payloads. This is not a full-project/claims/labels backup or task53.0 export acceptance.",
+    "ticket49_accepted": true
+  },
+  "sources": {
+    "auditor": {
+      "independent_source_review": {
+        "path": "/data02/home/philip.yang/devx/tmp/collab49-auditor-review-20261004a-r5.json",
+        "sha256": "f3eed4f76db7fc53533c720b7ee583ee9b58c5e4f4aab1cdecb322d77f8c7649"
+      },
+      "materialization": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor49-20261004a/revision-5/materialization-a49-5.json",
+        "sha256": "39c86cbabaae2ca8d0c70504ed4c2c90fee8ca471bdabaa852781bb4666d8139"
+      },
+      "retention": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor49-20261004a/revision-5/retained-a49-5/retention.json",
+        "sha256": "89883da42a34775bb579b9cd4906c3f9b780f561b29e6d5356ac3377778b723f"
+      },
+      "source": "/data02/home/philip.yang/workspace/.sureal-collab/auditor49-20261004a/revision-5/source-a49-5"
+    },
+    "code": {
+      "materialization": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/candidate-runtime49e-v1/materialization.json",
+        "sha256": "6432d4b39a2277afd899adf16727d7f97a2f5810a36a5379e55aca357a421434"
+      },
+      "retention": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/candidate-runtime49e-v1/retained/retention.json",
+        "sha256": "0b074066642b8d9af7894e0426b8f58d3fa97e9edac9e3edb08bae26f2d21c00"
+      },
+      "source": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/candidate-runtime49e-v1/source"
+    },
+    "metadata": {
+      "materialization": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/candidate-runtime49m-v1/materialization.json",
+        "sha256": "3e1df532d3bd0c508acd48ee1bf79e5f42a462a92a1593088fed449d7c4fb81a"
+      },
+      "retention": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/candidate-runtime49m-v1/retained/retention.json",
+        "sha256": "ef815b8a8fe77fcde22aaf7110179e0713dfd73e4ababda3ff078fdfc6539470"
+      },
+      "source": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/candidate-runtime49m-v1/source"
+    }
+  },
+  "ticket": "49",
+  "verdict": "pass",
+  "verification": {
+    "actual_native14_map_definitions_uids_and_edges_match": true,
+    "actual_native_five_model_needs_human_holds_match_retained_native_shows": true,
+    "actual_native_only49_closed_other13_open_unowned": true,
+    "both_closure_roles_complete": true,
+    "canonical_and_actual_published_head": "d2ebbd33f48f2b8e5f81912872fd8f832dca9b01",
+    "case_instances": 16,
+    "durable_effects": 62,
+    "durable_results": 62,
+    "exact_original_prior_authority_reopened": true,
+    "facts": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab49-final-acceptance-review-20261004-evidence/facts.json",
+      "sha256": "6e1756493f5868f1c5cb95bf24aa1973cd58c7001cf2ba4789c1049087c59729"
+    },
+    "fresh_actual_selected_project_matches_retained": true,
+    "fresh_whole_source_reconstruction": [
+      {
+        "candidate": "cdc2206d482ba4b9f62ffef41a87dd6e5da5d26f",
+        "entry_count": 4095,
+        "materialization": {
+          "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/candidate-runtime49e-v1/materialization.json",
+          "sha256": "6432d4b39a2277afd899adf16727d7f97a2f5810a36a5379e55aca357a421434"
+        },
+        "source": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/candidate-runtime49e-v1/source",
+        "tree": "8a835e8f52cf94178367904ae52f1fb40e398ae5"
+      },
+      {
+        "candidate": "d2ebbd33f48f2b8e5f81912872fd8f832dca9b01",
+        "entry_count": 4098,
+        "materialization": {
+          "path": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/candidate-runtime49m-v1/materialization.json",
+          "sha256": "3e1df532d3bd0c508acd48ee1bf79e5f42a462a92a1593088fed449d7c4fb81a"
+        },
+        "source": "/data02/home/philip.yang/workspace/.sureal-collab/bootstrap49-20261004a/candidate-runtime49m-v1/source",
+        "tree": "1ff89a14189d4066933d380e9d9508a738cf070f"
+      },
+      {
+        "candidate": "841ad8f1a99c38bee9fc4f99ac24aa5e82758d62",
+        "entry_count": 4073,
+        "materialization": {
+          "path": "/data02/home/philip.yang/workspace/.sureal-collab/auditor49-20261004a/revision-5/materialization-a49-5.json",
+          "sha256": "39c86cbabaae2ca8d0c70504ed4c2c90fee8ca471bdabaa852781bb4666d8139"
+        },
+        "source": "/data02/home/philip.yang/workspace/.sureal-collab/auditor49-20261004a/revision-5/source-a49-5",
+        "tree": "0410eee8c1bbbaffe89290447ec4729110f6ee71"
+      }
+    ],
+    "native_commands_not_repeated": true,
+    "original_failed_receipts_and_unknown_records_unchanged": true,
+    "raw_artifact_union_reopened": 2399,
+    "script": {
+      "path": "/data02/home/philip.yang/devx/tmp/collab49-final-acceptance-review-20261004-evidence/verify_final.py",
+      "sha256": "154b364245ee90eac2728cdb219ce2992628cc99ae159c4fffc60052f84a3d9a"
+    },
+    "source_shared_refs_native_goal_and_runtime_not_mutated": true,
+    "tracked_index_untracked_clean": true,
+    "unacknowledged_prepared_effects": 0,
+    "unique_cases": 10
+  }
+}

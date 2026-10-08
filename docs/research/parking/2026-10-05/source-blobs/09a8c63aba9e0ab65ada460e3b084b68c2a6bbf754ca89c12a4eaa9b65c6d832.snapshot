@@ -1,0 +1,55 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.runtime_identity import verify_rootfs
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';evidence=code/'research/native-optimizer-pilot-verified.json';receipt=json.loads(evidence.read_text())
+for p,h in receipt['artifacts'].items():assert sha(p)==h
+verify_rootfs(cache/'gpu-rootfs',receipt['runtime_lock']['rootfs_sha256'])
+base=cache/'insula/native-optimizer-pilot-audit-v1';base.mkdir();out=base/'output';out.mkdir();inputs=base/'input';inputs.mkdir()
+(inputs/'expected.json').write_text(json.dumps({'receipt':receipt,'receipt_sha256':sha(evidence)}))
+program='''import hashlib,json,math
+from pathlib import Path
+import numpy as np
+import torch
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+e=json.loads(Path('/tmp/audit-input/expected.json').read_text());r=e['receipt']
+assert sha('/experiment/research/native-optimizer-pilot-verified.json')==e['receipt_sha256']
+for p,h in r['candidate_hashes'].items():assert sha(Path('/experiment')/p)==h
+for p,h in r['artifacts'].items():assert sha(Path('/tmp/retained')/Path(p).name)==h
+v=json.loads(Path('/tmp/retained/check.json').read_text());assert v==r['validation']
+manifest=json.loads(Path('/tmp/inputs/manifest.json').read_text());assert manifest==r['manifest'];assert sha('/tmp/inputs/manifest.json')==r['manifest_sha256']
+assert len(manifest['frames'])==len(v['steps'])==v['native_optimizer_updates']==16
+for frame,step in zip(manifest['frames'],v['steps']):
+ assert frame['identity']==step['identity']
+ directory=Path('/tmp/native')/frame['relative_directory']
+ for name,h in frame['sha256'].items():assert sha(directory/name)==h
+ with np.load(directory/'targets.npz',allow_pickle=False) as data:assert step['positive_anchors']==int((data['labels']>0).sum())
+ assert all(math.isfinite(x) and x>=0 for x in step['loss'].values())
+ assert math.isclose(step['loss']['total'],step['loss']['classification']+2*step['loss']['localization']+.2*step['loss']['direction'],rel_tol=1e-6,abs_tol=1e-5)
+ assert math.isfinite(step['gradient_norm_before_clip']) and step['gradient_norm_before_clip']>0
+ assert math.isfinite(step['io_and_step_seconds']) and step['io_and_step_seconds']>0
+checkpoint=torch.load('/tmp/retained/checkpoint.pt',weights_only=True,map_location='cpu')
+assert checkpoint['steps']==16 and checkpoint['manifest_sha256']==r['manifest_sha256']
+assert sha('/tmp/retained/checkpoint.pt')==v['checkpoint_sha256']
+assert all(torch.isfinite(x).all() for x in checkpoint['model'].values())
+state=checkpoint['optimizer']['state'];assert len(state)>0
+state_bytes=0
+for entry in state.values():
+ assert set(entry)=={'step','exp_avg','exp_avg_sq'} and entry['step'].item()==16
+ assert entry['exp_avg'].shape==entry['exp_avg_sq'].shape
+ assert all(torch.isfinite(x).all() for x in entry.values())
+ state_bytes+=sum(x.numel()*x.element_size() for x in entry.values())
+assert state_bytes==v['optimizer_state_bytes']
+for group in checkpoint['optimizer']['param_groups']:
+ assert group['lr']==1e-4 and group['betas']==(.9,.999) and group['eps']==1e-8 and group['weight_decay']==0 and group['foreach'] is False
+assert v['tf32'] is False and v['gradient_clip']==10 and v['checkpoint_exact_output_and_optimizer_roundtrip'] is True
+assert 0<v['peak_allocated_bytes']<=8*1024**3 and 0<v['peak_rss_kib']<=16*1024**2
+Path('/outputs/check.json').write_text(json.dumps({'native_diagnostic_updates':16,'independently_reconciled_native_target_support':True,'checkpoint_optimizer_steps':16,'optimizer_state_bytes':state_bytes,'scope':'independent retained native-input, loss arithmetic and checkpoint-state audit; no retraining, overfit score or heldout comparison'}));print('PASS independent native pilot checkpoint and input audit')
+'''
+command=receipt['checks'][0]['command'].copy();command=[str(out) if x==str(cache/'insula/native-optimizer-pilot-v3/output') else x for x in command]
+separator=command.index('--');command[separator:separator]=['--ro-bind',str(cache/'insula/native-optimizer-pilot-v3/output'),'/tmp/retained','--ro-bind',str(inputs),'/tmp/audit-input']
+command[command.index('--')+1:]=['/opt/waymo/bin/python','-c',program]
+run=subprocess.run(command,capture_output=True,text=True,timeout=90);(out/'live.log').write_text(run.stdout+run.stderr);print(run.stdout+run.stderr);assert run.returncode==0
+result={'checks':[{'command':command,'exit_code':0}],'runtime_lock':receipt['runtime_lock'],'producer_evidence_sha256':sha(evidence),'validation':json.loads((out/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in out.iterdir()}}
+(code/'research/native-optimizer-pilot-audit-verified.json').write_text(json.dumps(result,indent=2)+'\n')

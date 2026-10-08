@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/data02/home/philip.yang/workspace/waystone/.venv/bin/python",
+    "-c",
+    "from waystone.fineweb.hdfs_cli import HdfsCli; v=HdfsCli().ls('hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/engineering/5847910688643719375_180_000_200_000/6b9ce27c0ec88aa33bd0bc7487967b6fc189c304c8104d483bf6fd6329148702.tar'); print('readable entries',len(v))"
+  ],
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n  File \"/data02/home/philip.yang/workspace/waystone/python/waystone/fineweb/hdfs_cli.py\", line 55, in __init__\n    self._runtime = build_hdfs_runtime()\n                    ^^^^^^^^^^^^^^^^^^^^\n  File \"/data02/home/philip.yang/workspace/waystone/python/waystone/fineweb/hdfs_stream.py\", line 121, in build_hdfs_runtime\n    raise RuntimeError(\"HADOOP_CONF_DIR is required for HDFS streaming\")\nRuntimeError: HADOOP_CONF_DIR is required for HDFS streaming\n",
+  "elapsed_seconds": 0.25262068898882717
+}

@@ -1,0 +1,9 @@
+{
+  "pid": 3736668,
+  "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/continuation-logs/overfit-point-extraction-v1.log",
+  "candidate_sha256": "11a8e88d55cae10826b67e3079173d22260dd4c730a0e679c71fe84a7b91722e",
+  "wait_owner_pid": 3645336,
+  "started_utc": "2026-10-01T13:58:32.625371+00:00",
+  "serial_archive_bytes": 42230835200,
+  "scope": "armed target-dependent point acquisition; pending is not source admission"
+}

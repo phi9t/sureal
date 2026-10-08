@@ -1,0 +1,1595 @@
+{
+  "updated_utc": "2026-10-08T15:38:58.928054+00:00",
+  "scope": "fixed all-class training batch; no heldout, segmentation or full-dataset completion claim",
+  "experiments": [
+    {
+      "id": "overfit20261002b/baseline",
+      "run_id": "overfit20261002b",
+      "name": "baseline",
+      "goal": "Fit the fixed 73-object all-class frame; measure updates and synchronized training time under the declared recipe.",
+      "recipe": {
+        "architecture": "baseline",
+        "norm": "gn_backbone",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 4000,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          32.310343475372065,
+          77.30945189524209
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 133.63048808620078,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 482.6635688919923,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.971524
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.999002
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.92688
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.999221
+        }
+      },
+      "worst_terminal_APH": 0.92688,
+      "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-results-hdfs-verified.json"
+    },
+    {
+      "id": "overfit20261002b/deep_pfn",
+      "run_id": "overfit20261002b",
+      "name": "deep_pfn",
+      "goal": "Fit the fixed 73-object all-class frame; measure updates and synchronized training time under the declared recipe.",
+      "recipe": {
+        "architecture": "deep_pfn",
+        "norm": "gn_backbone",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          64.77117270277813,
+          131.7580552274012
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 150.56321854400449,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 150.56321854400449,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.984784
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.998935
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.927862
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.998708
+        }
+      },
+      "worst_terminal_APH": 0.927862,
+      "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-results-hdfs-verified.json"
+    },
+    {
+      "id": "overfit20261002b/context_pfn",
+      "run_id": "overfit20261002b",
+      "name": "context_pfn",
+      "goal": "Fit the fixed 73-object all-class frame; measure updates and synchronized training time under the declared recipe.",
+      "recipe": {
+        "architecture": "context_pfn",
+        "norm": "gn_backbone",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          21.74377358291531,
+          37.41012646857416
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 60.57330483919941,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 60.57330483919941,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.998372
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.982694
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.926738
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.998541
+        }
+      },
+      "worst_terminal_APH": 0.926738,
+      "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-results-hdfs-verified.json"
+    },
+    {
+      "id": "overfit20261002b/masked_pfn",
+      "run_id": "overfit20261002b",
+      "name": "masked_pfn",
+      "goal": "Fit the fixed 73-object all-class frame; measure updates and synchronized training time under the declared recipe.",
+      "recipe": {
+        "architecture": "masked_pfn",
+        "norm": "gn_backbone",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          20.4680840986548,
+          35.22118620254332
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 53.46621083759237,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 53.46621083759237,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.99866
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.998549
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.926735
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.998554
+        }
+      },
+      "worst_terminal_APH": 0.926735,
+      "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-results-hdfs-verified.json"
+    },
+    {
+      "id": "overfit20261002b/residual_bev",
+      "run_id": "overfit20261002b",
+      "name": "residual_bev",
+      "goal": "Fit the fixed 73-object all-class frame; measure updates and synchronized training time under the declared recipe.",
+      "recipe": {
+        "architecture": "residual_bev",
+        "norm": "gn_backbone",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          32.5289193362114,
+          47.388605506683234
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 65.57020326063503,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 65.57020326063503,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.9989
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.99818
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.927404
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.999647
+        }
+      },
+      "worst_terminal_APH": 0.927404,
+      "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-results-hdfs-verified.json"
+    },
+    {
+      "id": "overfit20261002b/window_bev",
+      "run_id": "overfit20261002b",
+      "name": "window_bev",
+      "goal": "Fit the fixed 73-object all-class frame; measure updates and synchronized training time under the declared recipe.",
+      "recipe": {
+        "architecture": "window_bev",
+        "norm": "gn_backbone",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          28.40744778997032,
+          43.847877541033085
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 64.89854338910664,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 64.89854338910664,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.999467
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.999287
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.928069
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.999142
+        }
+      },
+      "worst_terminal_APH": 0.928069,
+      "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-results-hdfs-verified.json"
+    },
+    {
+      "id": "overfit20261002b/coarse_mlp",
+      "run_id": "overfit20261002b",
+      "name": "coarse_mlp",
+      "goal": "Fit the fixed 73-object all-class frame; measure updates and synchronized training time under the declared recipe.",
+      "recipe": {
+        "architecture": "coarse_mlp",
+        "norm": "gn_backbone",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          58.32463690423174,
+          126.92416246439097
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 146.4527927809395,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 146.4527927809395,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.998261
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.997501
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.926117
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.997525
+        }
+      },
+      "worst_terminal_APH": 0.926117,
+      "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-results-hdfs-verified.json"
+    },
+    {
+      "id": "overfit20261002b/retain64",
+      "run_id": "overfit20261002b",
+      "name": "retain64",
+      "goal": "Fit the fixed 73-object all-class frame; measure updates and synchronized training time under the declared recipe.",
+      "recipe": {
+        "architecture": "baseline",
+        "norm": "gn_backbone",
+        "max_points": 64,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          35.19190595205873,
+          155.24854425137164
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 173.6372897209949,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 173.6372897209949,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 0.996697,
+          "APH": 0.975576
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.998878
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.927294
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.998936
+        }
+      },
+      "worst_terminal_APH": 0.927294,
+      "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-results-hdfs-verified.json"
+    },
+    {
+      "id": "overfit20261002b/all_pillars",
+      "run_id": "overfit20261002b",
+      "name": "all_pillars",
+      "goal": "Fit the fixed 73-object all-class frame; measure updates and synchronized training time under the declared recipe.",
+      "recipe": {
+        "architecture": "baseline",
+        "norm": "gn_backbone",
+        "max_points": 32,
+        "pillar_cap": 30000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference",
+        "equivalence_control": true
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_equivalence_control",
+      "trained": false,
+      "updates": null,
+      "confirmation_update": null,
+      "time_to_fit": null,
+      "cumulative_train_seconds": null,
+      "terminal_LEVEL2_per_class": {},
+      "worst_terminal_APH": null,
+      "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-results-hdfs-verified.json"
+    },
+    {
+      "id": "overfit20261002b/full_bn",
+      "run_id": "overfit20261002b",
+      "name": "full_bn",
+      "goal": "Measure dense BatchNorm effects on fitting and evaluation-time statistics.",
+      "recipe": {
+        "architecture": "baseline",
+        "norm": "bn",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 3000,
+      "confirmation_update": 3000,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          1500,
+          2000
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          99.65144158370094,
+          155.12687947286759
+        ],
+        "confirmation_update": 3000,
+        "confirmation_train_seconds": 218.66393289418193,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 218.66393289418193,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.998832
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.997852
+        },
+        "3": {
+          "AP": 0.928572,
+          "APH": 0.924655
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.998157
+        }
+      },
+      "worst_terminal_APH": 0.924655,
+      "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-results-hdfs-verified.json"
+    },
+    {
+      "id": "overfit20261002b/point_ln",
+      "run_id": "overfit20261002b",
+      "name": "point_ln",
+      "goal": "Fit the fixed 73-object all-class frame; measure updates and synchronized training time under the declared recipe.",
+      "recipe": {
+        "architecture": "baseline",
+        "norm": "gn_backbone_ln_pillar",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          19.80275004717987,
+          85.65327525895555
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 103.25395156489685,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 103.25395156489685,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.980994
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.998391
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.927689
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.998468
+        }
+      },
+      "worst_terminal_APH": 0.927689,
+      "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-results-hdfs-verified.json"
+    },
+    {
+      "id": "overfit20261002b/no_norm",
+      "run_id": "overfit20261002b",
+      "name": "no_norm",
+      "goal": "Measure whether removing normalization changes fit iterations and stability.",
+      "recipe": {
+        "architecture": "baseline",
+        "norm": "no_norm",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 8000,
+      "confirmation_update": 8000,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          4000,
+          6000
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          237.33000772848027,
+          333.5755673516542
+        ],
+        "confirmation_update": 8000,
+        "confirmation_train_seconds": 434.8188971193158,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 434.8188971193158,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 0.944246,
+          "APH": 0.830212
+        },
+        "2": {
+          "AP": 0.959211,
+          "APH": 0.910012
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.90165
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.984013
+        }
+      },
+      "worst_terminal_APH": 0.830212,
+      "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-results-hdfs-verified.json"
+    },
+    {
+      "id": "overfit20261002b/foreground_prior",
+      "run_id": "overfit20261002b",
+      "name": "foreground_prior",
+      "goal": "Fit the fixed 73-object all-class frame; measure updates and synchronized training time under the declared recipe.",
+      "recipe": {
+        "architecture": "baseline",
+        "norm": "gn_backbone",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": 0.01,
+        "loss": "reference"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 1000,
+      "confirmation_update": 1000,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          500,
+          750
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          35.83718497265363,
+          53.79956354148453
+        ],
+        "confirmation_update": 1000,
+        "confirmation_train_seconds": 72.59372828627238,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 72.59372828627238,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.998638
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.998884
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.927387
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.999439
+        }
+      },
+      "worst_terminal_APH": 0.927387,
+      "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-results-hdfs-verified.json"
+    },
+    {
+      "id": "overfit20261002b/lr3e4",
+      "run_id": "overfit20261002b",
+      "name": "lr3e4",
+      "goal": "Fit the fixed 73-object all-class frame; measure updates and synchronized training time under the declared recipe.",
+      "recipe": {
+        "architecture": "baseline",
+        "norm": "gn_backbone",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0003,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          21.70222347107483,
+          36.31316500820685
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 54.2528485035873,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 54.2528485035873,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 0.936292,
+          "APH": 0.93417
+        },
+        "2": {
+          "AP": 0.991636,
+          "APH": 0.98972
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.926955
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.996813
+        }
+      },
+      "worst_terminal_APH": 0.926955,
+      "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-results-hdfs-verified.json"
+    },
+    {
+      "id": "overfit20261002b/no_clip",
+      "run_id": "overfit20261002b",
+      "name": "no_clip",
+      "goal": "Measure whether removing clipping speeds or destabilizes the fixed-batch trajectory.",
+      "recipe": {
+        "architecture": "baseline",
+        "norm": "gn_backbone",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": null,
+        "foreground_prior": null,
+        "loss": "reference"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 4000,
+      "confirmation_update": 4000,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          2000,
+          3000
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          138.25857130164513,
+          206.30417250061873
+        ],
+        "confirmation_update": 4000,
+        "confirmation_train_seconds": 273.8454443717492,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 273.8454443717492,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 0.998932,
+          "APH": 0.997886
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.997716
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.925742
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.999231
+        }
+      },
+      "worst_terminal_APH": 0.925742,
+      "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-results-hdfs-verified.json"
+    },
+    {
+      "id": "overfit20261002b/class_balanced_focal",
+      "run_id": "overfit20261002b",
+      "name": "class_balanced_focal",
+      "goal": "Measure whether balancing positive class contributions accelerates all-class fitting.",
+      "recipe": {
+        "architecture": "baseline",
+        "norm": "gn_backbone",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "class_balanced_positive"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          20.34045762126334,
+          35.034784869872965
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 53.30203852476552,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 53.30203852476552,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.999104
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.999041
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.92757
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.999186
+        }
+      },
+      "worst_terminal_APH": 0.92757,
+      "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-results-hdfs-verified.json"
+    },
+    {
+      "id": "expanded20261002a/grid_fine",
+      "run_id": "expanded20261002a",
+      "name": "grid_fine",
+      "goal": "Measure fine-grid retention and learning with unchanged physical detection anchors.",
+      "recipe": {
+        "architecture": "grid_fine",
+        "norm": "gn_backbone",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference",
+        "observation": "grid_fine"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          22.07741769956192,
+          37.95106626022607
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 57.37348473793827,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 57.37348473793827,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.978169
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.998992
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.927627
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.999547
+        }
+      },
+      "worst_terminal_APH": 0.927627,
+      "result_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
+      "closure_candidate_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/advanced-expanded20261002a-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/advanced-closure-expanded20261002a-verified.json",
+      "results_hdfs_receipt": null
+    },
+    {
+      "id": "expanded20261002a/grid_coarse",
+      "run_id": "expanded20261002a",
+      "name": "grid_coarse",
+      "goal": "Measure coarse-grid retention and learning with unchanged physical detection anchors.",
+      "recipe": {
+        "architecture": "grid_coarse",
+        "norm": "gn_backbone",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference",
+        "observation": "grid_coarse"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          18.54637504252605,
+          32.12174880312523
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 48.79892970103538,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 48.79892970103538,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.986726
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.999121
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.926807
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.999561
+        }
+      },
+      "worst_terminal_APH": 0.926807,
+      "result_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
+      "closure_candidate_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/advanced-expanded20261002a-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/advanced-closure-expanded20261002a-verified.json",
+      "results_hdfs_receipt": null
+    },
+    {
+      "id": "expanded20261002a/ragged_pillars",
+      "run_id": "expanded20261002a",
+      "name": "ragged_pillars",
+      "goal": "Test all-point pillar encoding without the32-point cutoff.",
+      "recipe": {
+        "architecture": "ragged_pillars",
+        "norm": "gn_backbone",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference",
+        "observation": "ragged_pillars"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          19.545064764562994,
+          33.86449509119848
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 51.27499999460997,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 51.27499999460997,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.998744
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.99788
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.927527
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.999431
+        }
+      },
+      "worst_terminal_APH": 0.927527,
+      "result_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
+      "closure_candidate_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/advanced-expanded20261002a-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/advanced-closure-expanded20261002a-verified.json",
+      "results_hdfs_receipt": null
+    },
+    {
+      "id": "expanded20261002a/point_attention",
+      "run_id": "expanded20261002a",
+      "name": "point_attention",
+      "goal": "Test learned point interaction against the matched-parameter point-MLP control.",
+      "recipe": {
+        "architecture": "point_attention",
+        "norm": "gn_backbone",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference",
+        "observation": "baseline"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          43.194750747061335,
+          73.26095212518703
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 110.58177473011892,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 110.58177473011892,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.984122
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.998716
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.926812
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.997981
+        }
+      },
+      "worst_terminal_APH": 0.926812,
+      "result_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
+      "closure_candidate_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/advanced-expanded20261002a-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/advanced-closure-expanded20261002a-verified.json",
+      "results_hdfs_receipt": null
+    },
+    {
+      "id": "expanded20261002a/point_mlp_control",
+      "run_id": "expanded20261002a",
+      "name": "point_mlp_control",
+      "goal": "Isolate added point-feature capacity from point attention.",
+      "recipe": {
+        "architecture": "point_mlp_control",
+        "norm": "gn_backbone",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference",
+        "observation": "baseline"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          34.8594728949829,
+          58.550918615597766
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 87.57246883586049,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 87.57246883586049,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 0.99512,
+          "APH": 0.880378
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.996736
+        },
+        "3": {
+          "AP": 0.813736,
+          "APH": 0.811483
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.998172
+        }
+      },
+      "worst_terminal_APH": 0.811483,
+      "result_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
+      "closure_candidate_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/advanced-expanded20261002a-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/advanced-closure-expanded20261002a-verified.json",
+      "results_hdfs_receipt": null
+    },
+    {
+      "id": "expanded20261002a/range_fusion",
+      "run_id": "expanded20261002a",
+      "name": "range_fusion",
+      "goal": "Test native range-view context against zero-range ablation.",
+      "recipe": {
+        "architecture": "range_fusion",
+        "norm": "gn_backbone",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference",
+        "observation": "range_fusion"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          88.7809785430436,
+          149.74099597986788
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 224.76139738614438,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 224.76139738614438,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 0.988814,
+          "APH": 0.946316
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.99799
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.926328
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.995888
+        }
+      },
+      "worst_terminal_APH": 0.926328,
+      "result_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
+      "closure_candidate_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/advanced-expanded20261002a-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/advanced-closure-expanded20261002a-verified.json",
+      "results_hdfs_receipt": null
+    },
+    {
+      "id": "expanded20261002a/zero_range_control",
+      "run_id": "expanded20261002a",
+      "name": "zero_range_control",
+      "goal": "Isolate range-context information from the added frontend topology.",
+      "recipe": {
+        "architecture": "zero_range_control",
+        "norm": "gn_backbone",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference",
+        "observation": "range_fusion"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_overfit",
+      "trained": true,
+      "updates": 750,
+      "confirmation_update": 750,
+      "time_to_fit": {
+        "right_censored": false,
+        "first_stable_fit_update_interval": [
+          300,
+          500
+        ],
+        "first_stable_fit_train_seconds_interval": [
+          88.3006609727745,
+          148.56673440651502
+        ],
+        "confirmation_update": 750,
+        "confirmation_train_seconds": 223.68377439532196,
+        "terminal_pair_passed": true
+      },
+      "cumulative_train_seconds": 223.68377439532196,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.999391
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.999123
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.92697
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.99891
+        }
+      },
+      "worst_terminal_APH": 0.92697,
+      "result_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
+      "closure_candidate_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/advanced-expanded20261002a-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/advanced-closure-expanded20261002a-verified.json",
+      "results_hdfs_receipt": null
+    },
+    {
+      "id": "expanded20261002a/sparse_bev_transformer",
+      "run_id": "expanded20261002a",
+      "name": "sparse_bev_transformer",
+      "goal": "Test occupied-token spatial processing against dense BEV convolution.",
+      "recipe": {
+        "architecture": "sparse_bev_transformer",
+        "norm": "gn_backbone",
+        "max_points": 32,
+        "pillar_cap": 20000,
+        "learning_rate": 0.0001,
+        "clip": 10.0,
+        "foreground_prior": null,
+        "loss": "reference",
+        "observation": "baseline"
+      },
+      "verifiers": [
+        "live actual-frame architecture gradient/resource admission",
+        "independent literal losses",
+        "native proposal/GT/export/metric audits",
+        "exact model/Adam/RNG/head replay",
+        "final live Insula closure"
+      ],
+      "acceptance": "All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.",
+      "stage": "verified_censored",
+      "trained": true,
+      "updates": 10000,
+      "confirmation_update": null,
+      "time_to_fit": {
+        "right_censored": true,
+        "observed_updates": 10000,
+        "observed_train_seconds": 1925.6026484444155,
+        "terminal_pair_passed": false
+      },
+      "cumulative_train_seconds": 1925.6026484444155,
+      "terminal_LEVEL2_per_class": {
+        "1": {
+          "AP": 0.771797,
+          "APH": 0.741925
+        },
+        "2": {
+          "AP": 0.991521,
+          "APH": 0.990472
+        },
+        "3": {
+          "AP": 0.928571,
+          "APH": 0.92684
+        },
+        "4": {
+          "AP": 1.0,
+          "APH": 0.998926
+        }
+      },
+      "worst_terminal_APH": 0.741925,
+      "result_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
+      "closure_candidate_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/advanced-expanded20261002a-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/advanced-closure-expanded20261002a-verified.json",
+      "results_hdfs_receipt": null
+    }
+  ],
+  "sources": {
+    "overfit20261002b": {
+      "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/tier1-overfit20261002b-results.json"
+    },
+    "expanded20261002a": {
+      "result_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27j-journal-publish/autonomy/research/advanced-expanded20261002a-results.json"
+    }
+  }
+}

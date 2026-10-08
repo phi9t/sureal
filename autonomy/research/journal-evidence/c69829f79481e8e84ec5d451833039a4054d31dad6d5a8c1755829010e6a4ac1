@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "kind": "ProvisionalHappyPathFunctionalEvidence",
+  "observed_ms": 1791164964596,
+  "canonical_published": "5a1d92283c3bc8368751a508ef705a7a4f19ebd8",
+  "workers": [
+    {
+      "task": "58.A",
+      "primary_thread_id": "01a109a1-c007-73f3-b9d1-ebfb2177c571",
+      "original_candidate": "baff4c6fe1afff73ab8ea219a9073d76734034ee",
+      "landed_commit": "88eb369fdb5b512f9a0e3241f6e2f3dacd6f4530",
+      "reservation": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-a/reservation.json",
+        "sha256": "d8d38196656d3393b054f87072b2b1a1231f16f91e8fce8bf246c98989774425"
+      },
+      "ack": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-a/ack.json",
+        "sha256": "2cbba41421e561cd77c4abf340d8630f3ab8766c2b859db411ef886b8a0f17e0"
+      },
+      "lead_ack": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-a/lead-ack.json",
+        "sha256": "b6e009bf3a63cae8a32e73921b523e75186b22b9c008413a448f6de0a7fc763a"
+      },
+      "independent_review": {
+        "path": "/data02/home/philip.yang/devx/tmp/mac58-a-exact-source-result-review-88eb369.json",
+        "sha256": "ff1766e72a1b5950c3932f6ee7d1df5a5cb729bfabbeba1baff6a8105e2deb44"
+      },
+      "fresh_insula": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/a-refresh-live-v1/live-receipt.json",
+        "sha256": "93b0f506cfd48e8fe28294088a7ba0374dc4883503e17b715e17139cf63147d7"
+      },
+      "kata_closure": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/58-A-closure-readback.json",
+        "sha256": "423745ed63ae954957055da3a5367161a4c9f81a026e0b2f8d07eb7ade487127"
+      },
+      "summary": "Reconciles1279 native objects,1053 trainingeligible and30 uncovered tuple IDs:29signs and1pedestrian. Original targets and winningIDs resolve; unavailable lineage, decodedrank/NMS/native-match/views staynull. Preparationonly;42open.",
+      "evidence_label": "observed reopened exactsource/result; summary interpretation bounded",
+      "original_candidate_worktree_retained": true
+    },
+    {
+      "task": "58.B",
+      "primary_thread_id": "01a109a2-1e13-7970-a00b-e97ba09f35ea",
+      "original_candidate": "404b2af870c8e3062fcd0b6b99b42c3518428e3e",
+      "landed_commit": "5a1d92283c3bc8368751a508ef705a7a4f19ebd8",
+      "reservation": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/reservation.json",
+        "sha256": "d7708b676031ea839806b6bdc21e6c3035400b82a7aa47aa9fa5b879dbc51069"
+      },
+      "ack": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/ack.json",
+        "sha256": "12c76e37ec8f10ce5d24f7c24dba2b943d9cfd4c82d46874c5abaef9c5bef668"
+      },
+      "lead_ack": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/lead-ack.json",
+        "sha256": "c90f42d129ce5a4d7284dfe9a6669e1a82de142bd4e8ebbbf37728ef1991c911"
+      },
+      "independent_review": {
+        "path": "/data02/home/philip.yang/devx/tmp/mac58-b-exact-source-result-review-5a1d922.json",
+        "sha256": "9cae744af4cb8195fc00234d83a7fb36c4c75734a89220e0a0b740a6621c9d52"
+      },
+      "fresh_insula": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/b-refresh-live-v1/live-verified.json",
+        "sha256": "c113fe91e429d563064c13735f5a179fdaf8b8639a86d64f437de654502b4209"
+      },
+      "kata_closure": {
+        "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/58-B-closure-readback.json",
+        "sha256": "eba0ac9bd0c71525ba445b0deb4d81c49783a443da6da1cda45b4f340abc103a"
+      },
+      "summary": "Seven fresh CPU models and two read-only terminalcheckpoint dictionaries confirm onepillarBNplusnineteendenseGN baseline/residual. SavedBNcounter2000. Archivedlossratios3.638/4.298 notnativequality. Zero forwards/interventions/optimizerupdates;43open.",
+      "evidence_label": "observed reopened exactsource/result; summary interpretation bounded",
+      "original_candidate_worktree_retained": true
+    }
+  ],
+  "actual_overlap": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/concurrent-observation-v1.json",
+    "sha256": "097f15a4e6dea3a83e11c777d84318b0985e8b6b3ea7fa51f39e380767d20ea3"
+  },
+  "launch_readback": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/worker-public-readback.json",
+    "sha256": "aae1fac16a0d32e7acf2159669d07680017cd5828946bd95871ff51c4b5fb5c0"
+  },
+  "completion_readback": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/worker-terminal-public-readback.json",
+    "sha256": "feaac904bb6d7e7cc6e4b07b3326d1e07f8988def21822f816a0baf24681217c"
+  },
+  "stop_readback": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/pilot-stop-readback-v1.json",
+    "sha256": "38e318138efb4d947dd0eacb9cf539ecac0649907a0bd512c85c623a8dab0699"
+  },
+  "b_refresh_stop": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/b-refresh-stop.json",
+    "sha256": "13727f2e3d0f827ce399e80bb9040a1104f860b05869f7338084b8bd832011d3"
+  },
+  "source_fix": "9cd484da8c4038cf5fe6422e3cd5c63b5f148a17",
+  "mapping": "4c47fa13b892fa8dc96196dad0d694aa4c507657",
+  "source_fix_independent_review": {
+    "path": "/data02/home/philip.yang/devx/tmp/collab58-kata-inventory-live-review-9cd484d.json",
+    "sha256": "c6d9d164b23dd2b57c0fef100a29df50fc80744671c123608e4b749361271641"
+  },
+  "mapping_independent_review": {
+    "path": "/data02/home/philip.yang/devx/tmp/collab58-metadata-source-review-4c47fa1.json",
+    "sha256": "ae72d49105fb3be1623b8dacee5fa8d2b59c29bc1b8fdf83507d0fe1db84d1ad"
+  },
+  "deferred_owned_work": {
+    "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/retained-work-disposition-v1.json",
+    "sha256": "15964563ecd98f9bc5b61d8b9a912a3da1fac9d90f47f9274479558f6818c58f"
+  },
+  "manual_steps": [
+    "lead spawn/ack/native status projection through existing tools",
+    "CPU launcher staging and verification",
+    "bounded independent review assignment",
+    "explicit current-base candidate refresh",
+    "serialized FF Git landing/publication",
+    "Kata closure with durable admitted49effect receipts"
+  ],
+  "implemented_steps": [
+    "accepted49sharedKata binding/import/claim/assignment/effect retention",
+    "projectscoped closed-task inventory fix9cd",
+    "existing scientific Insula launch/rootfs/resource primitives"
+  ],
+  "not_accepted": [
+    "50",
+    "51",
+    "52",
+    "53.0",
+    "54",
+    "53",
+    "55",
+    "56",
+    "57",
+    "42",
+    "43"
+  ],
+  "zero_optimizer_updates": true,
+  "no_gpu_requested": true,
+  "scientific_recipes_gt_budgets_unchanged": true,
+  "new_hdfs_publication": false,
+  "local_scientific_payloads_released": false,
+  "whole_pilot_closure": "pending independent closeout review and journal landing, not fullMAC admission"
+}

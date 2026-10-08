@@ -1,0 +1,10 @@
+{
+  "scene": "9907794657177651763_1126_570_1146_570",
+  "status": "redundant archive removed; interrupted evidence preserved",
+  "archive_sha256": "8f49152157c40e473a0326c3f00138842b51fd88db21d705b731965389752c7a",
+  "bytes": 7176837120,
+  "source_files_verified": 56807,
+  "fresh_live_evidence_sha256": "619214680eb3b53e6ef816156a64a4dbd46fb5e1ad61a8d5ffd8702f08d80d64",
+  "recovery_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/component-bundles-v1/scientific/9907794657177651763_1126_570_1146_570/8f49152157c40e473a0326c3f00138842b51fd88db21d705b731965389752c7a.tar",
+  "scope": "Decoded sources and all interrupted publication metadata preserved; complete publisher is rerun."
+}

@@ -1,0 +1,107 @@
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+
+LIB_MODULES = glob(
+    ["*.py"],
+    exclude = [
+        "*-*.py",
+        "*_test.py",
+    ],
+)
+
+TEST_MODULES = glob(["*_test.py"])
+GPU_TESTS = [
+    "detector_observations_test.py",
+]
+
+COMMAND_SCRIPTS = glob(["*-*.py"])
+
+DATA_FILES = glob([
+    "*.json",
+    "*.sh",
+])
+
+DATASET_VISIBILITY = [
+    "//autonomy:__pkg__",
+    "//autonomy/camera:__pkg__",
+    "//autonomy/detection:__pkg__",
+    "//autonomy/geometry:__pkg__",
+    "//autonomy/inspection:__pkg__",
+    "//autonomy/segmentation:__pkg__",
+    "//autonomy/studies:__pkg__",
+]
+
+TEST_EXTRA_SRCS = {
+    "scientific_component_test.py": ["scientific_sidecars_test.py"],
+    "scientific_sidecar_reader_test.py": ["scientific_sidecars_test.py"],
+    "scientific_sidecar_validate_test.py": ["scientific_sidecars_test.py"],
+}
+
+TEST_EXTRA_DATA = {
+    "tracer_runtime_test.py": ["//autonomy:tracer_runtime_files"],
+    "tracer_test.py": ["//autonomy:tracer_runtime_files"],
+}
+
+package(default_visibility = ["//visibility:private"])
+
+py_library(
+    name = "dataset",
+    srcs = LIB_MODULES,
+    imports = [".."],
+    visibility = DATASET_VISIBILITY,
+    deps = [
+        "//autonomy/evidence:evidence",
+        "//autonomy/insula:insula",
+    ],
+)
+
+filegroup(
+    name = "commands",
+    srcs = COMMAND_SCRIPTS + DATA_FILES,
+    visibility = DATASET_VISIBILITY,
+)
+
+filegroup(
+    name = "all_py",
+    srcs = glob(["*.py"]),
+    visibility = ["//autonomy:__pkg__"],
+)
+
+filegroup(
+    name = "runfiles",
+    srcs = COMMAND_SCRIPTS + DATA_FILES,
+    visibility = DATASET_VISIBILITY,
+)
+
+filegroup(
+    name = "tests",
+    srcs = TEST_MODULES,
+)
+
+filegroup(
+    name = "scientific_dataset_test_fixture",
+    srcs = ["scientific_dataset_test.py"],
+    visibility = [
+        "//autonomy:__pkg__",
+        "//autonomy/segmentation:__pkg__",
+    ],
+)
+
+[
+    py_test(
+        name = test[:-3],
+        srcs = [test] + TEST_EXTRA_SRCS.get(test, []),
+        data = [":runfiles"] + TEST_EXTRA_DATA.get(test, []),
+        deps = [":dataset"],
+        imports = [".."],
+        legacy_create_init = 0,
+        size = "small",
+        tags = ["perception_unit"] + (["requires_gpu"] if test in GPU_TESTS else []),
+    )
+    for test in TEST_MODULES
+]
+
+test_suite(
+    name = "all_tests",
+    tests = [test[:-3] for test in TEST_MODULES],
+    visibility = ["//autonomy:__pkg__"],
+)

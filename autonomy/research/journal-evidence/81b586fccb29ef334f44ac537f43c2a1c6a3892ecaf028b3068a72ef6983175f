@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "observed_ms": 1791175672471,
+  "pass": true,
+  "snapshot_reference_hash_checks": 726,
+  "private_source_readback_checks": 406,
+  "git_revision_blob_hash_checks": true,
+  "divergent_commit_coverage": true,
+  "private_bundle_readback_and_verify": true,
+  "late_source_stable_readback": true,
+  "canonical_base_unchanged": true,
+  "hold_relationship_receipt_checks": true,
+  "experiment_or_parked_code_executed": false,
+  "live_MAC_acceptance": false,
+  "scientific_acceptance": false
+}

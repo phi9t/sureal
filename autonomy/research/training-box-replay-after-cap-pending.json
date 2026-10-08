@@ -1,0 +1,8 @@
+{
+  "pid": 4097563,
+  "queue_pid": 4073579,
+  "runner": ".scratch/await-training-box-replay-after-cap.py",
+  "runner_sha256": "38ef07bdd341c58b75e2d3a5e90d46c076b7af72a7c618b7d1b219565f7ed1e3",
+  "candidate_sha256": "e3d56055681b30b226bc1826b90a96d7459fa97887ab641c311e37d75382e62b",
+  "scope": "same full64 replay rearmed after explicit old queue termination; no payload result"
+}

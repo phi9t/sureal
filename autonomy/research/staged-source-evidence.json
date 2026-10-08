@@ -1,0 +1,6 @@
+{
+  "status": "preparation evidence; actual source processing remains open",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/staged-source-live-a/receipt.json",
+  "receipt_sha256": "4fd0891075295396b57fc1b8174cc4d894532cb6230cbf0cb198f7be828634dd",
+  "scope": "controlled transfer fixtures ran live in Insula; actual scientific HDFS transfer was refused because confirmed acquisition remains live; no production source processing claim"
+}

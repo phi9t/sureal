@@ -27,9 +27,9 @@ the original Surflo project. The public repository is
   would test the proposed persistent scene state.
 - [3D reconstruction pathway](docs/3d-reconstruction-pathway.md) — a sourced,
   reproduction-oriented route from cameras and surfaces to generative scenes.
-- [Executable pathway labs](experiments/3d-pathway/README.md) — locked inputs,
+- [Executable pathway labs](parallax/README.md) — locked inputs,
   maintained references, controlled failures, and cross-era reports.
-- [Waymo perception pipeline](experiments/waymo-perception/README.md) — draft
+- [Waymo perception pipeline](autonomy/README.md) — draft
   scene-centric data processing line for calibrated Waymo Perception inputs.
 - [Surflo lineage](UPSTREAM.md) — upstream provenance and the compatibility
   boundary between inherited Surflo code and Sureal additions.
@@ -38,14 +38,13 @@ Validation has four intentionally separate tiers:
 
 - **Portable:** CPU-only publication, metadata, syntax, and offline source
   checks run by GitHub Actions and `python scripts/publication_audit.py --root .`.
-- **Numerical contracts:** the complete deterministic CPU pathway suite runs as
-  a required GitHub Actions job, covering concept fixtures, evaluator
-  recomputation, corruption rejection, and aggregate semantics. It does not run
-  the maintained GPU/container references.
+- **Bazel component tests:** `./bazelw test //parallax/...` and
+  `./bazelw test //autonomy/...` run inside their recorded Insula rootfs
+  images. The default runs exclude GPU and live-gate targets.
 - **Smoke:** local/container numerical contracts and small adapter checks,
-  dispatched with `experiments/3d-pathway/run.sh all --profile smoke`.
+  dispatched with `parallax/run.sh all --profile smoke`.
 - **Full B200:** hash-verified all-module experiments on the NVIDIA B200,
-  dispatched with `experiments/3d-pathway/run.sh all --profile full`.
+  dispatched with `parallax/run.sh all --profile full`.
 
 The sections below retain the Surflo reference implementation and its original
 technical instructions.

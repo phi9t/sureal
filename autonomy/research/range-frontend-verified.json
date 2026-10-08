@@ -1,0 +1,79 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/gpu-rootfs",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/point-semantic-live-a/input",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/point-semantic-live-a/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--",
+        "/opt/waymo/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_range_frontend.py"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "...\n----------------------------------------------------------------------\nRan 3 tests in 0.178s\n\nOK\n"
+    }
+  ],
+  "candidate_hashes": {
+    "pipeline/range_frontend.py": "d43c4499036db5bebfdd856a2274d8b60703f733828bceb05c8f96c99f9ca743",
+    "tests/test_range_frontend.py": "bc890156679402582cd1ab169f6b6705e0a8f487431c353a6df16ae88e6e5867"
+  },
+  "architecture": {
+    "widths": [
+      32,
+      64,
+      128
+    ],
+    "semantic_channels": 23,
+    "foreground_channels": 1,
+    "boundary": "zero padding; no cyclic wrap",
+    "normalization_maxima": [
+      79.5,
+      2,
+      2
+    ]
+  },
+  "scope": "three live Torch CPU fixture groups; finite backward, odd-size full support, invalid-measurement exclusion, separate heads; zero optimizer steps; no native GPU resource or scientific accuracy result"
+}

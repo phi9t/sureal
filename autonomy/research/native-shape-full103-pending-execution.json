@@ -1,0 +1,9 @@
+{
+  "pid": 2300693,
+  "script": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.scratch/await-scientific-native-shapes.py",
+  "script_sha256": "f411a2ec52b72ccb670410390557c5475097df79a25b2bc78eaab786239ef0ef",
+  "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/native-shape-continuation-v1.log",
+  "job_index_sha256": "71a7c084e1124ab30b90bb3f19f17a2705188559ac3082008ee9a3b592b422da",
+  "status": "armed; waits for actual semantic owner terminal and exact22 admission before full103 HDFS execution",
+  "scope": "no scientific shape payload admitted yet"
+}

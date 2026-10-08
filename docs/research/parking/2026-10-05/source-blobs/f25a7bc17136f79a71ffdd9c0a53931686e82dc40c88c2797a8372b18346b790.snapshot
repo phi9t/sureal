@@ -1,0 +1,34 @@
+import fcntl,hashlib,json,subprocess,sys
+from pathlib import Path
+here=Path(__file__).resolve().parents[1]/'experiments/waymo-perception';sys.path.insert(0,str(here))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+cache=Path.home()/'.cache/waystone/waymo-perception';working=cache/'scientific-processing';scene='13982731384839979987_1680_000_1700_000';base=working/'cohort-v1'/scene;publication=base/'sidecar-publication';processing=base/'points'
+def sha(p):
+ with p.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+with (working/'cohort-queue.lock').open('a') as lease:
+ fcntl.flock(lease,fcntl.LOCK_EX|fcntl.LOCK_NB)
+ receipt=publication/'receipt.json';r=json.loads(receipt.read_text());ph=sha(receipt)
+ audit=json.loads((here/'research/sidecar-fifth-publication-retained-audit.json').read_text())
+ if ph!=audit['publication_receipt_sha256']:raise ValueError('audited publication changed')
+ for n,h in r['candidate_hashes'].items():
+  if sha(here/n)!=h:raise ValueError('publication code changed')
+ for n,h in r['artifacts'].items():
+  if sha(publication/n)!=h:raise ValueError('publication artifact changed')
+ fixture=json.loads((here/'research/compressed-sidecar-eviction-live-verified.json').read_text())
+ candidate=sha(here/'pipeline/compressed_sidecar_eviction.py')
+ if candidate!=fixture['candidate_sha256'] or fixture['exit_code']!=0:raise ValueError('live fixture code differs')
+ root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
+ if lock!=r['runtime_lock'] or lock!=fixture['runtime_lock']:raise ValueError('runtime changed')
+ before=sum(p.stat().st_size for p in working.rglob('*') if p.is_file());available=15*1024**3-before
+ if available<=65536:raise ValueError('no metadata capacity')
+ code="import json; from pipeline.compressed_sidecar_eviction import evict_sidecars; r=evict_sidecars('/outputs','/opt',expected_publication_sha256="+repr(ph)+",available_metadata_bytes="+str(available)+"); print(json.dumps({'status':r['status'],'bytes_evicted':r['bytes_evicted']}))"
+ command=launch_plan(root,here,here,processing,['python','-c',code]);i=command.index('--');command[i:i]=['--bind',str(publication),'/opt']
+ result=subprocess.run(command,capture_output=True,text=True);(base/'sidecar-evict-compressed-recovery.log').write_text(result.stdout+result.stderr)
+ if result.returncode:raise RuntimeError(result.stderr)
+ ev=processing/'sidecar-eviction.json';data=json.loads(ev.read_text())
+ if not data['status'].endswith('completed'):raise ValueError('eviction incomplete')
+ after=sum(p.stat().st_size for p in working.rglob('*') if p.is_file())
+ if after>15*1024**3:raise ValueError('aggregate capacity exceeded')
+ record={'scene':scene,'publication_receipt_sha256':ph,'checks':[{'command':command,'exit_code':result.returncode}],'runtime_lock':lock,'compressed_eviction_candidate_sha256':candidate,'eviction_sha256':sha(ev),'bytes_evicted':data['bytes_evicted'],'working_before_bytes':before,'working_end_bytes':after,'scope':'actual live compressed sidecar eviction; camera lifecycle and checkpoint admission remain open'}
+ (here/'research/interrupted-sidecar-eviction-fifth-verified.json').write_text(json.dumps(record,indent=2)+'\n');print(result.stdout,flush=True)

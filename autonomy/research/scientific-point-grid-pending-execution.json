@@ -1,0 +1,9 @@
+{
+  "pid": 2585329,
+  "script": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.scratch/await-scientific-point-grid.py",
+  "script_sha256": "9778b89abd2377be3623c6ef4558d5fe6c63a09cf08469f254c824a2ff2277ff",
+  "log": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/continuation-logs/scientific-point-grid-v1.log",
+  "candidate_sha256": "393220a85c198d61eba135e95a5888997fd9ec50cae16ef50025ae16ff0d3233",
+  "status": "armed; waits for full103 shape and both camera gaps before actual full103 point-grid replay",
+  "scope": "no original scientific point-grid archive has yet been admitted"
+}

@@ -1,0 +1,394 @@
+"""Independent source/schema/layout controls; no native application effects."""
+import copy
+import hashlib
+import importlib
+import json
+import os
+from pathlib import Path
+import tempfile
+import unittest
+from unittest.mock import patch
+import sys
+import sysconfig
+from types import SimpleNamespace
+import typing
+from types import ModuleType
+from importlib.machinery import ModuleSpec,BuiltinImporter,FrozenImporter
+from audit_support.test_probe_authority import SourceTests
+
+
+class FreshSourceTests(SourceTests):
+    def setUp(self):
+        super().setUp()
+        try: self.reader = importlib.import_module('audit_support.channel_authority')
+        except ModuleNotFoundError: self.fail('Static/fresh source seam absent')
+        self.context = json.loads(Path(self.admission['auditor']['materialization']['path']).read_text())
+
+    def test_entire_current_manifest_matches_reconstructed_raw_context(self):
+        result = self.reader.fresh_context(self.context)
+        self.assertEqual(result['entries'], self.context['entries'])
+        self.assertEqual(result['source'], self.context['source'])
+
+    def test_changed_source_extra_entry_or_mode_cannot_use_static_flag(self):
+        self.entry.write_text('# changed even with pass static\n')
+        with self.assertRaises(ValueError): self.reader.fresh_context(self.context)
+        self.entry.write_text('# fixture source\n'); self.entry.chmod(0o755)
+        with self.assertRaises(ValueError): self.reader.fresh_context(self.context)
+        self.entry.chmod(0o644)
+        extra=self.entry.parent/'extra.py'; extra.write_text('# extra')
+        with self.assertRaises(ValueError): self.reader.fresh_context(self.context)
+
+
+class NotificationSchemaTests(unittest.TestCase):
+    def setUp(self):
+        try: self.reader = importlib.import_module('audit_support.channel_authority')
+        except ModuleNotFoundError: self.fail('Literal generated notification schema check absent')
+        self.root=Path('/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/native-schema50-v2-experimental')
+        self.schemas={name:json.loads((self.root/('ServerNotification.json' if name=='ServerNotification' else 'v2/'+name+'.json')).read_text())
+            for name in ('ServerNotification','ItemStartedNotification','ItemCompletedNotification',
+                         'TurnStartedNotification','TurnCompletedNotification','ThreadStatusChangedNotification')}
+        provenance=self.root.parent/'native-schema-provenance-v2-experimental.json'
+        self.admission={'runtime':{'schema_provenance':self.ref(provenance)},'notification_schemas':{
+            name:self.ref(self.root/('ServerNotification.json' if name=='ServerNotification' else 'v2/'+name+'.json'))
+            for name in self.schemas}}
+
+    @staticmethod
+    def ref(path):return {'path':str(path),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+
+    def private_admission(self):
+        tmp=tempfile.TemporaryDirectory(prefix='a50-schema-domain-');self.addCleanup(tmp.cleanup)
+        root=Path(tmp.name);(root/'v2').mkdir();pins={}
+        for name,value in self.schemas.items():
+            path=root/('ServerNotification.json' if name=='ServerNotification' else 'v2/'+name+'.json')
+            path.write_text(json.dumps(value));pins[name]=self.ref(path)
+        path=root/'provenance.json';path.write_text(json.dumps({'schema_version':1,'kind':'NativeSchemaProvenance','output_root':str(root)}))
+        return {'runtime':{'schema_provenance':self.ref(path)},'notification_schemas':pins}
+
+    def test_checked_real_generated_schema_refs_are_documents_without_receipt_header(self):
+        self.assertTrue(all('schema_version' not in value for value in self.schemas.values()))
+        self.assertEqual(self.reader.checked_notifications(self.admission),self.admission['notification_schemas'])
+
+    def test_checked_wrong_path_missing_or_changed_actual_schema_refuses(self):
+        admission=self.private_admission();reference=admission['notification_schemas']['ItemStartedNotification']
+        actual=Path(reference['path']);outside=actual.parent.parent/'copied.json';outside.write_bytes(actual.read_bytes())
+        admission['notification_schemas']['ItemStartedNotification']=self.ref(outside)
+        with self.assertRaises(ValueError):self.reader.checked_notifications(admission)
+        admission['notification_schemas']['ItemStartedNotification']=reference;actual.write_text('{}')
+        with self.assertRaises(ValueError):self.reader.checked_notifications(admission)
+        actual.unlink()
+        with self.assertRaises((ValueError,FileNotFoundError)):self.reader.checked_notifications(admission)
+
+    def test_checked_schema_domain_header_and_native_shape_refuse(self):
+        for mutate in (lambda d:d.update({'$schema':'receipt://schema-version1'}),
+                       lambda d:d.update(title='DifferentNotification'),lambda d:d.update(schema_version=1),
+                       lambda d:d['required'].remove('item')):
+            admission=self.private_admission();path=Path(admission['notification_schemas']['ItemStartedNotification']['path'])
+            changed=copy.deepcopy(self.schemas['ItemStartedNotification']);mutate(changed);path.write_text(json.dumps(changed))
+            admission['notification_schemas']['ItemStartedNotification']=self.ref(path)
+            with self.subTest(schema=changed),self.assertRaises(ValueError):self.reader.checked_notifications(admission)
+
+    def test_checked_duplicate_nonfinite_overflow_or_nonobject_schema_refuses(self):
+        for body in ('{"title":"ItemStartedNotification","title":"DifferentNotification"}',
+                     '{"unsafe":NaN}','{"unsafe":1e10000}','[]'):
+            admission=self.private_admission();path=Path(admission['notification_schemas']['ItemStartedNotification']['path'])
+            path.write_text(body);admission['notification_schemas']['ItemStartedNotification']=self.ref(path)
+            with self.subTest(body=body),self.assertRaises(ValueError):self.reader.checked_notifications(admission)
+
+    def test_actual_generated_server_envelope_and_required_command_fields(self):
+        self.reader.notification_shapes(self.schemas)
+
+    def test_invented_envelope_or_optional_cwd_or_wrong_null_types_refuse(self):
+        changed=copy.deepcopy(self.schemas)
+        variant=next(v for v in changed['ItemStartedNotification']['definitions']['ThreadItem']['oneOf']
+                     if v['properties']['type'].get('enum')==['commandExecution'])
+        variant['required'].remove('cwd')
+        with self.assertRaises(ValueError):self.reader.notification_shapes(changed)
+        changed=copy.deepcopy(self.schemas)
+        changed['ServerNotification']['oneOf']=[v for v in changed['ServerNotification']['oneOf']
+            if v['properties']['method']['enum']!=['item/started']]
+        with self.assertRaises(ValueError):self.reader.notification_shapes(changed)
+
+
+class ClockTests(unittest.TestCase):
+    def test_clock_starts_at_actual_host_intent_not_ready(self):
+        from audit_support import channel_authority as reader
+        self.assertTrue(callable(getattr(reader,'clock_window',None)), 'Host-clock check missing')
+        clock={'started_ms':1000,'started_ns':1000000,'deadline_ms':120000}
+        self.assertEqual(reader.clock_window(clock,2000000),119999000000)
+        for changed in ({**clock,'started_ns':3000000},{**clock,'deadline_ms':120001},
+                        {**clock,'started_ns':True}):
+            with self.subTest(changed=changed),self.assertRaises(ValueError):reader.clock_window(changed,2000000)
+        with self.assertRaises(ValueError):reader.clock_window(clock,120001000001)
+
+
+class ActorClockTests(unittest.TestCase):
+    """Only /proc argv is a literal component seam; files and birth are real."""
+    def setUp(self):
+        from audit_support import channel_authority,probe_os
+        self.reader=channel_authority
+        self.tmp=tempfile.TemporaryDirectory(prefix='a50-actor-clock-');self.addCleanup(self.tmp.cleanup)
+        self.root=Path(self.tmp.name);self.output=self.root/'run';self.entry=self.root/'source/tests/collab/audit_support/runtime_probe.py'
+        self.operator={'source':str(self.root/'operator')};now=__import__('time').monotonic_ns()
+        self.admission={'schema_version':1,'kind':'RuntimeProbeAdmission','auditor':{'fixture':'private-source-control'},
+            'operator':{'fixture':'private-operator-control'},'runtime':{},'notification_schemas':{},'source_profile':{'fixture_only':True},
+            'python_stdlib_root':sysconfig.get_path('stdlib'),
+            'fixture_plan':{'fixture_id':'test-e','tools':{'python':{'path':'/usr/bin/python3'},
+                'systemd_run':{'path':'/usr/bin/systemd-run'}}},'user_authority':{'fixture_only':True}}
+        original=self.save('original.json',self.admission)
+        driver_path=self.root/'operator/tests/collab/fixture_support/preflight_driver.py'
+        driver_path.parent.mkdir(parents=True);driver_path.write_text('# component fixture driver\n')
+        driver=self.save('driver.json',{'schema_version':1,'kind':'NativeFixtureDriverAdmission','stage':'live',
+            'fixture_id':'test-e','output':str(self.root),'driver_source':self.ref(driver_path),
+            'observer_admission':original,**{key:self.admission[key] for key in
+                ('operator','auditor','runtime','notification_schemas','fixture_plan','user_authority','source_profile','python_stdlib_root')}})
+        self.admission['driver_admission']=driver
+        base=self.save('base.json',self.admission)
+        intent_path=self.root/'intent.json';auth_path=self.root/'actual.json'
+        self.argv=['/usr/bin/python3','-B',str(self.entry),'--probe','stop-capability','--authorization',str(auth_path),'--output',str(self.output)]
+        self.host=['/usr/bin/systemd-run','--user','--scope','--unit','sureal-sustained-collab-test-e-observer',
+            '--property','MemoryMax=268435456','--property','MemorySwapMax=0','--','/usr/bin/python3','-I','-B',
+            str(self.root/'operator/tests/collab/fixture_support/preflight_driver.py'),'actor','--role','observer',
+            '--authorization',base['path'],'--authorization-sha256',base['sha256'],'--actual-authorization',str(auth_path),
+            '--output',str(self.output),'--intent',str(intent_path)]
+        intent=self.save('intent.json',{'schema_version':1,'kind':'PreflightHostCommandIntent','role':'observer',
+            'argv':self.host,'cwd':str(self.root),'started_ms':1000,'started_ns':now-1000000,'deadline_ms':120000})
+        self.admission['live_clock']={'started_ms':1000,'started_ns':now-1000000,'deadline_ms':120000,
+            'command_intent':intent,'actor_exec_path':str(self.root/'actor.json')}
+        self.authorization=self.save('actual.json',self.admission)
+        self.scope={'path':'/component-only/cgroup','device':2,'inode':3}
+        self.actor={'schema_version':1,'kind':'ActorExec','command_intent':intent,'authorization':self.authorization,
+            'role':'observer','cwd':str(self.root),
+            'process':probe_os.birth(os.getpid()),'scope':self.scope,'argv':self.argv,'observed_ns':now}
+        self.save('actor.json',self.actor)
+
+    def save(self,name,value):
+        path=self.root/name;path.write_text(json.dumps(value,sort_keys=True)+'\n')
+        return {'path':str(path),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+
+    def check(self):
+        original=Path.read_bytes
+        def read(path):
+            return b'\0'.join(value.encode() for value in self.argv)+b'\0' if path==Path('/proc/self/cmdline') else original(path)
+        with patch.object(Path,'read_bytes',read):
+            with patch.object(Path,'cwd',return_value=self.root):
+                return self.reader.actor_clock(self.admission,self.authorization,self.output,self.entry,'observer',self.operator,self.scope)
+
+    @staticmethod
+    def ref(path):return {'path':str(path),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+
+    def test_exact_host_actor_and_exec_roles_are_distinct_but_bound(self):
+        self.assertEqual(self.check()['argv'],self.argv)
+        self.assertEqual(self.check()['host_argv'],self.host)
+
+    def test_changed_birth_literal_argv_scope_clock_or_actual_auth_refuses(self):
+        for mutate in (lambda v:v['process'].update(start_ticks=1),lambda v:v['argv'].append('--extra'),
+                       lambda v:v['scope'].update(inode=4),lambda v:v.update(observed_ns=1),
+                       lambda v:v['authorization'].update(sha256='0'*64)):
+            changed=copy.deepcopy(self.actor);mutate(changed);self.save('actor.json',changed)
+            with self.subTest(actor=changed),self.assertRaises(ValueError):self.check()
+
+    def test_missing_intent_or_actor_refuses_before_any_future_effect(self):
+        (self.root/'actor.json').unlink()
+        with self.assertRaises((ValueError,FileNotFoundError)):self.check()
+
+
+class ModuleClosureTests(unittest.TestCase):
+    def setUp(self):
+        from audit_support import channel_authority
+        self.reader=channel_authority
+        self.assertTrue(callable(getattr(self.reader,'module_closure',None)), 'Literal imported-file closure absent')
+        self.tmp=tempfile.TemporaryDirectory(prefix='a50-import-closure-');self.addCleanup(self.tmp.cleanup)
+        self.root=Path(self.tmp.name);(self.root/'source').mkdir()
+        self.source=self.root/'source/module.py';self.source.write_text('# fixture source\n')
+        self.bootstrap=self.root/'site/startup.py';self.bootstrap.parent.mkdir();self.bootstrap.write_text('# exact startup fixture\n')
+        self.context={'source':str(self.root/'source'),'candidate':'component-only',
+            'entries':[{'path':'module.py','sha256':self.ref(self.source)['sha256']}]}
+        self.profile={'schema_version':1,'kind':'PythonBootstrapSourceProfile',
+            'interpreter':self.ref(Path(sys.executable).resolve()),'stdlib_root':sysconfig.get_path('stdlib'),
+            'bootstrap_modules':[{'name':'startup_fixture','observed_path':str(self.bootstrap),**self.ref(self.bootstrap)}],'commands':[]}
+        self.path=self.root/'profile.json';self.save_profile()
+        self.modules={'audit_support.fixture':SimpleNamespace(__file__=str(self.source)),
+            'startup_fixture':SimpleNamespace(__file__=str(self.bootstrap))}
+
+    @staticmethod
+    def ref(path):return {'path':str(path),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+
+    def save_profile(self):self.path.write_text(json.dumps(self.profile,sort_keys=True)+'\n')
+
+    def check(self):
+        with patch.dict(sys.modules,self.modules,clear=True):
+            return self.reader.module_closure(self.context,self.ref(self.path))
+
+    def test_exact_bootstrap_file_allowed_without_site_directory_wildcard(self):
+        result=self.check()
+        self.assertEqual({entry['name'] for entry in result['modules']},{'audit_support.fixture','startup_fixture'})
+
+    def test_unlisted_site_module_changed_file_or_wrong_name_refuses(self):
+        self.modules['unexpected_site']=SimpleNamespace(__file__=str(self.bootstrap))
+        with self.assertRaises(ValueError):self.check()
+        del self.modules['unexpected_site'];self.bootstrap.write_text('# mutated startup\n')
+        with self.assertRaises(ValueError):self.check()
+
+    def test_raw_auditor_module_pin_is_checked_not_only_path(self):
+        self.source.write_text('# changed source\n')
+        with self.assertRaises(ValueError):self.check()
+
+    def test_observed_bootstrap_logical_symlink_resolves_only_exact_pinned_file(self):
+        alias=self.root/'startup-link.py';alias.symlink_to(self.bootstrap)
+        self.modules['startup_fixture'].__file__=str(alias)
+        self.profile['bootstrap_modules'][0]['observed_path']=str(alias);self.save_profile()
+        result=self.check()
+        entry=next(value for value in result['modules'] if value['name']=='startup_fixture')
+        self.assertEqual(entry['path'],str(self.bootstrap))
+        self.assertEqual(entry['loaded_path'],str(alias))
+        other=self.root/'other.py';other.write_text(self.bootstrap.read_text());alias.unlink();alias.symlink_to(other)
+        with self.assertRaises(ValueError):self.check()
+
+    def test_same_bootstrap_target_via_unpinned_alias_refuses(self):
+        alias=self.root/'unadmitted-link.py';alias.symlink_to(self.bootstrap)
+        self.modules['startup_fixture'].__file__=str(alias)
+        with self.assertRaises(ValueError):self.check()
+
+    def test_digest_matching_source_via_unprofiled_symlink_refuses(self):
+        alias=self.root/'unadmitted-source-link.py';alias.symlink_to(self.source)
+        self.modules['audit_support.fixture'].__file__=str(alias)
+        with self.assertRaisesRegex(ValueError,'Unprofiled imported-file alias'):self.check()
+        self.profile['bootstrap_modules'].append({'name':'audit_support.fixture','observed_path':str(alias),**self.ref(self.source)})
+        self.save_profile();self.modules['audit_support.fixture'].__file__=str(self.source)
+        with self.assertRaisesRegex(ValueError,'Profiled bootstrap import alias differs'):self.check()
+
+    def test_ordinary_stdlib_via_unprofiled_symlink_refuses(self):
+        standard=Path(sysconfig.get_path('stdlib'))/'pathlib.py'
+        self.assertTrue(standard.is_file())
+        alias=self.root/'unadmitted-stdlib-link.py';alias.symlink_to(standard)
+        self.modules['pathlib']=SimpleNamespace(__file__=str(alias))
+        with self.assertRaisesRegex(ValueError,'Unprofiled imported-file alias'):self.check()
+        self.profile['bootstrap_modules'].append({'name':'pathlib','observed_path':str(alias),**self.ref(standard)})
+        self.save_profile();self.modules['pathlib'].__file__=str(standard)
+        with self.assertRaisesRegex(ValueError,'Profiled bootstrap import alias differs'):self.check()
+
+    def typing_modules(self):
+        return {**self.modules,'typing':typing,'typing.io':typing.io,'typing.re':typing.re}
+
+    def test_genuine_typing_namespaces_keep_explicit_owner_source_facts(self):
+        self.modules=self.typing_modules();result=self.check()
+        facts={value['name']:value for value in result['declared_namespaces']}
+        self.assertEqual(set(facts),{'typing.io','typing.re'})
+        self.assertEqual({value['owner']['path'] for value in facts.values()},{str(Path(typing.__file__).resolve())})
+        self.assertEqual({value['owner']['sha256'] for value in facts.values()},{self.ref(Path(typing.__file__))['sha256']})
+        self.assertTrue(all('path' not in value and 'loaded_path' not in value for value in facts.values()))
+        self.assertTrue(all({'path','loaded_path','sha256'}<=set(value) for value in result['modules']))
+
+    def test_complete_actual_import_union_is_classified(self):
+        importlib.import_module('audit_support.channel_observer')
+        importlib.import_module('audit_support.runtime_probe')
+        source=Path(__file__).resolve().parents[3];entries=[]
+        for module in list(sys.modules.values()):
+            path=getattr(module,'__file__',None)
+            if path is not None and Path(path).resolve().is_relative_to(source):
+                entries.append({'path':Path(path).resolve().relative_to(source).as_posix(),
+                                'sha256':self.ref(Path(path).resolve())['sha256']})
+        context={'source':str(source),'candidate':'component-actual-import-union','entries':entries}
+        profile=Path('/data02/home/philip.yang/workspace/.sureal-collab/bootstrap50-20261004a/python-startup-profile-v1/profile.json')
+        result=self.reader.module_closure(context,self.ref(profile))
+        self.assertEqual({value['name'] for value in result['declared_namespaces']},{'typing.io','typing.re'})
+        self.assertGreater(len(result['modules']),50)
+
+    def test_unknown_pathless_entries_and_counterfeit_typing_name_refuse(self):
+        for name,value in [('unknown',ModuleType('unknown')),('unknown',SimpleNamespace()),('unknown',object()),
+                           ('typing.io',SimpleNamespace()),('typing.io',typing._DeprecatedType('typing.io',(),{}))]:
+            self.modules={**self.typing_modules(),name:value}
+            with self.subTest(name=name,type=type(value)),self.assertRaises(ValueError):self.check()
+
+    def test_origin_string_cannot_admit_counterfeit_native_module(self):
+        original=dict(self.modules)
+        for value in (SimpleNamespace(__spec__=SimpleNamespace(origin='built-in')),
+                      SimpleNamespace(__spec__=SimpleNamespace(origin='frozen')),
+                      ModuleType('unregistered')):
+            if isinstance(value,ModuleType):
+                value.__spec__=ModuleSpec('unregistered',BuiltinImporter,origin='built-in')
+                value.__loader__=BuiltinImporter
+            self.modules={**original,'unregistered':value}
+            with self.subTest(type=type(value)),self.assertRaises(ValueError):self.check()
+
+    def test_registered_builtin_and_frozen_module_types_keep_native_facts(self):
+        self.assertEqual(self.reader.native_module_fact('sys',sys)['origin'],'built-in')
+        frozen=sys.modules['_frozen_importlib']
+        self.assertEqual(self.reader.native_module_fact('_frozen_importlib',frozen)['origin'],'frozen')
+        for spec in (SimpleNamespace(origin='built-in'),ModuleSpec('sys',object(),origin='built-in'),
+                     ModuleSpec('wrong-name',BuiltinImporter,origin='built-in')):
+            fake=ModuleType('sys');fake.__spec__=spec;fake.__loader__=BuiltinImporter
+            with self.subTest(spec=spec),self.assertRaises(ValueError):self.reader.native_module_fact('sys',fake)
+
+    def test_wrong_typing_parent_export_metaclass_or_origin_refuses(self):
+        original=self.typing_modules()
+        for change in ('parent','export','metaclass','origin'):
+            self.modules=dict(original)
+            if change=='parent':
+                self.modules['typing']=SimpleNamespace(__file__=typing.__file__,__spec__=typing.__spec__)
+                with self.assertRaises(ValueError):self.check()
+            elif change=='export':
+                with patch.object(typing,'io',object()),self.assertRaises(ValueError):self.check()
+            elif change=='metaclass':
+                counterfeit=type('typing.io',(),dict(vars(typing.io)))
+                self.modules['typing.io']=counterfeit
+                with patch.object(typing,'io',counterfeit),self.assertRaises(ValueError):self.check()
+            else:
+                with patch.object(typing,'__file__',str(self.source)),self.assertRaises(ValueError):self.check()
+
+    def test_changed_typing_namespace_members_or_spec_refuse(self):
+        self.modules=self.typing_modules()
+        for owner,member in [(typing.io,'IO'),(typing.re,'Pattern')]:
+            with patch.object(owner,member,object()),self.assertRaises(ValueError):self.check()
+        wrong=copy.copy(typing.__spec__);wrong.origin=str(self.source)
+        with patch.object(typing,'__spec__',wrong),self.assertRaises(ValueError):self.check()
+
+
+class ProfileCommandTests(unittest.TestCase):
+    """Private literal command records test parsing, never live source authority."""
+    def setUp(self):
+        from audit_support import channel_authority
+        self.reader=channel_authority
+        self.tmp=tempfile.TemporaryDirectory(prefix='a50-profile-raw-');self.addCleanup(self.tmp.cleanup)
+        self.root=Path(self.tmp.name);self.operator={'source':str(self.root/'operator')}
+        self.helper=self.root/'operator/tests/collab/fixture_support/python_import_profile.py'
+        self.helper.parent.mkdir(parents=True);self.helper.write_text('# literal private profile parser fixture\n')
+        python=ModuleClosureTests.ref(Path(sys.executable).resolve())
+        self.profile={'schema_version':1,'kind':'PythonBootstrapSourceProfile','interpreter':python,
+            'stdlib_root':sysconfig.get_path('stdlib'),'bootstrap_modules':[],'commands':[]}
+        self.commands=[]
+        for index,flags in enumerate((['-B'],['-I','-B'])):
+            argv=[python['path'],*flags,str(self.helper)]
+            sample={**self.profile,'kind':'PythonBootstrapSample','argv':argv,'source':ModuleClosureTests.ref(self.helper)}
+            sample.pop('commands')
+            stdout=self.save('stdout%d.json'%index,sample)
+            stderr=self.root/('stderr%d'%index);stderr.write_text('')
+            command={'schema_version':1,'argv':argv,'cwd':str(self.root),'started_ms':1000,'ended_ms':1001,
+                'started_ns':1000000,'ended_ns':2000000,
+                'exit_code':0,'stdout':stdout,'stderr':ModuleClosureTests.ref(stderr)}
+            self.commands.append(command)
+            self.profile['commands'].append(self.save('command%d.json'%index,command))
+        self.admission={'source_profile':self.save('profile.json',self.profile),'fixture_plan':{'tools':{'python':python}},
+            'python_stdlib_root':sysconfig.get_path('stdlib')}
+
+    def save(self,name,value):
+        path=self.root/name;path.write_text(json.dumps(value,sort_keys=True)+'\n')
+        return ModuleClosureTests.ref(path)
+
+    def check(self):return self.reader.checked_profile(self.admission,self.operator)
+
+    def test_two_exact_flags_and_literal_stdout_source_fields_are_reopened(self):self.check()
+
+    def test_wrong_command_exit_source_missing_or_changed_raw_proof_refuses(self):
+        for mutate in (lambda c:c.update(exit_code=3),lambda c:c['argv'].append('--extra'),
+                       lambda c:c.update(argv=c['argv'][1:])):
+            changed=copy.deepcopy(self.commands[0]);mutate(changed)
+            self.profile['commands'][0]=self.save('command0.json',changed)
+            self.admission['source_profile']=self.save('profile.json',self.profile)
+            with self.subTest(command=changed),self.assertRaises(ValueError):self.check()
+        self.profile['commands'][0]=self.save('command0.json',self.commands[0]);self.admission['source_profile']=self.save('profile.json',self.profile)
+        Path(self.commands[0]['stdout']['path']).write_text('{}')
+        with self.assertRaises(ValueError):self.check()
+
+
+if __name__=='__main__':unittest.main()

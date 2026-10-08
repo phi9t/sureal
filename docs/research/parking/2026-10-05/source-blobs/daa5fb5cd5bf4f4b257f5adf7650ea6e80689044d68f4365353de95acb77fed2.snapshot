@@ -1,0 +1,10 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.insula_entry import launch_plan
+from pipeline.runtime_identity import verify_rootfs
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);base=cache/'insula/score-first-equivalence-v1';base.mkdir();out=base/'output';out.mkdir();worker=Path('.scratch/score-first-equivalence.py').resolve();digest=sha(worker);command=launch_plan(root,code,cache/'scientific-processing/native-one-batch-learning-curve-v1',out,['python','/tmp/worker.py']);i=command.index('--');mounts=['--ro-bind',str(worker),'/tmp/worker.py']
+for variant,heads,scored in [('bn','native-one-batch-learning-curve-v1','native-one-batch-learning-curve-scoring-v1'),('gn_backbone','norm-gn_backbone-v1','norm-gn_backbone-scoring-v1'),('gn_backbone_ln_pillar','norm-gn_backbone_ln_pillar-v1','norm-gn_backbone_ln_pillar-scoring-v1')]:mounts.extend(['--ro-bind',str(cache/'scientific-processing'/heads),'/tmp/heads-'+variant,'--ro-bind',str(cache/'scientific-processing'/scored),'/tmp/scored-'+variant])
+command[i:i]=mounts;run=subprocess.run(command,capture_output=True,text=True,timeout=150);(out/'live.log').write_text(run.stdout+run.stderr);print(run.stdout+run.stderr);assert run.returncode==0 and sha(worker)==digest
+record={'checks':[{'command':command,'exit_code':0}],'runtime_lock':lock,'worker_sha256':digest,'decoder_sha256':sha(code/'gpu/scored_proposals_v2.py'),'validation':json.loads((out/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in out.iterdir()}};(code/'research/score-first-equivalence-verified.json').write_text(json.dumps(record,indent=2)+'\n')

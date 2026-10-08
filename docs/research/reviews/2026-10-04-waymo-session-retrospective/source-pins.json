@@ -1,0 +1,77 @@
+{
+  "source_base": "a553645ef22761aa7708abf1ee109952a6cd2c38",
+  "sources": [
+    {
+      "path": "docs/research/tasks/program-goal.md",
+      "git_blob": "f78b374e8919e38cc24a73b9283d60e5fb6a1959",
+      "sha256": "cd647645ef0e668f322fa411bf5c84ac39d113507bcaf7dfde1e01c2fa713e2d",
+      "bytes": 5196
+    },
+    {
+      "path": "docs/research/task-queue.md",
+      "git_blob": "1364f35fa9f7e802ecf8812f3ea96ffe8da2e994",
+      "sha256": "6166ae94cce3983fc4dc52d37d43f5f7f03efb274795ea6d3d25f0a99c2692c8",
+      "bytes": 19555
+    },
+    {
+      "path": "experiments/waymo-perception/research-task-index.md",
+      "git_blob": "4cc5216ef4a3d5fe4551d1e2babe86fa17c54bdc",
+      "sha256": "3fcdc8ad336c32fcc040d432f1f859de75648b7da74711cb72ae586394823062",
+      "bytes": 20518
+    },
+    {
+      "path": "experiments/waymo-perception/research/research-journal.jsonl",
+      "git_blob": "4d2554b5c1323323ea4e4cae2132c892af488b46",
+      "sha256": "d7bdb43087947a43044b9d5dbf19cd8d4429d28ad7d54452f260e59eedbee326",
+      "bytes": 198947
+    },
+    {
+      "path": "experiments/waymo-perception/research/2026-10-03-initial-experiments-analysis.md",
+      "git_blob": "b88d339e3e411baff48f75869d634c63bd4e5a27",
+      "sha256": "9811738e5e819da4708a36c7abf00bd655287d3bb9fe7d3e7fe8ee441803ecde",
+      "bytes": 14363
+    },
+    {
+      "path": "experiments/waymo-perception/research/2026-10-03-approved-execution-order.md",
+      "git_blob": "1e2901d268ae8f71be07ad8fa1cb2c8a17540a36",
+      "sha256": "b71d425fed8153edca8defe604ba300aa40661e966a4a02d3710e6a827a032c5",
+      "bytes": 2994
+    },
+    {
+      "path": "docs/research/reviews/2026-10-04-collaboration-ticket49-closeout.md",
+      "git_blob": "d3858b779e5f54b270a8d6f7d0ed5c2b96c6820f",
+      "sha256": "7e9aba8e9555ca80f95fb27414471f396732466435aa21a05ea4c6a53293ac1d",
+      "bytes": 6763
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-sureal-serial-collaboration-design.md",
+      "git_blob": "7316f4c9e4dde192a4f203195d0b741a0ff8ea1d",
+      "sha256": "30f8fe3f736739a2f3eb7fab979fffcbb5c6e80ae41e46d9ea4bbbb8c0d6a4c9",
+      "bytes": 34152
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-codex-runtime-domain-design.md",
+      "git_blob": "df9219d53f4ea369f619a826f2ac1546d42b51b0",
+      "sha256": "b249f898a7dab4a9ba92fbe810ed9f126d2593a37e25376f23871910b718a288",
+      "bytes": 7760
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-worker-session-state-design.md",
+      "git_blob": "9317341670c862834f196ca649923196b9d2653b",
+      "sha256": "1729245934fabc06998fcc2beac5ff3a7ddf273b9ea13eb10e374f1a87ba4bb1",
+      "bytes": 12903
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-03-sureal-two-worker-collaboration.md",
+      "git_blob": "b16f322b5414a3cd3d05c9a972662486e6b3e9a1",
+      "sha256": "7dd638f180d041c585c35a1a5e68b65cc220bcc0033353456a8df5623562d868",
+      "bytes": 75275
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-03-first-class-models-training-design.md",
+      "git_blob": "b455de561abfc17a8e9b4b943fef3cbf55fa8417",
+      "sha256": "458de72a263796fc01442eafff3a4a4e847b829d771de429f08be8a99e6d233a",
+      "bytes": 21707
+    }
+  ]
+}

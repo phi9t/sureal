@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "observed_ms": 1791164528305,
+  "argv": [
+    "systemctl",
+    "--user",
+    "show",
+    "sureal-sustained-mac58-b-refresh-20261005a.scope",
+    "--property=ActiveState,SubState,ControlGroup"
+  ],
+  "exit_code": 0,
+  "properties": {
+    "ControlGroup": "",
+    "ActiveState": "inactive",
+    "SubState": "dead"
+  }
+}

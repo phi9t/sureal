@@ -1,0 +1,123 @@
+load("@rules_python//python:defs.bzl", "py_binary", "py_library", "py_test")
+
+TEST_MODULES = glob(["*_test.py"])
+LIB_MODULES = glob(
+    ["*.py"],
+    exclude = ["*_test.py"],
+)
+GPU_TESTS = [
+    "audit_sustained_transition_test.py",
+    "sustained_chunk_reference_test.py",
+    "sustained_loop_test.py",
+    "sustained_reference_test.py",
+    "sustained_state_test.py",
+    "sustained_worker_guard_test.py",
+]
+CPU_ONLY_GPU_GUARD_TESTS = [
+    "audit_sustained_transition_test.py",
+    "sustained_worker_guard_test.py",
+]
+
+package(default_visibility = ["//visibility:private"])
+
+exports_files(
+    [
+        "run_sustained.py",
+        "sustained_admission.py",
+        "sustained_control.py",
+        "sustained_controller_backend.py",
+        "sustained_controller_sources.py",
+        "sustained_sources.py",
+        "sustained_stage_inputs.py",
+        "sustained_workflow.py",
+    ],
+    visibility = ["//autonomy:__pkg__"],
+)
+
+py_library(
+    name = "training_execution",
+    srcs = LIB_MODULES,
+    imports = [".."],
+    visibility = [
+        "//autonomy:__pkg__",
+    ],
+    deps = [
+        "//autonomy/detection:detection",
+        "//autonomy/evaluation:evaluation",
+        "//autonomy/evidence:evidence",
+        "//autonomy/geometry:geometry",
+        "//autonomy/insula:insula",
+        "//autonomy/range_view:range_view",
+        "//autonomy/resources:resources",
+        "//autonomy/retention:retention",
+        "//autonomy/studies:studies",
+    ],
+)
+
+filegroup(
+    name = "all_py",
+    srcs = glob(["*.py"]),
+    visibility = ["//autonomy:__pkg__"],
+)
+
+filegroup(
+    name = "runfiles",
+    srcs = glob(["*.py"]),
+    visibility = ["//autonomy:__pkg__"],
+)
+
+py_binary(
+    name = "run_sustained",
+    srcs = ["run_sustained.py"],
+    data = [
+        "//autonomy:evaluation_commands",
+    ],
+    imports = [".."],
+    main = "run_sustained.py",
+    deps = [":training_execution"],
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "train_sustained",
+    srcs = ["train_sustained.py"],
+    data = [
+        "//autonomy:evaluation_commands",
+    ],
+    imports = [".."],
+    main = "train_sustained.py",
+    deps = [":training_execution"],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "sustained_loop_test_fixture",
+    testonly = True,
+    srcs = ["sustained_loop_test.py"],
+    imports = [".."],
+    deps = [":training_execution"],
+)
+
+[
+    py_test(
+        name = test[:-3],
+        srcs = [test],
+        deps = [":training_execution"] + (
+            [":sustained_loop_test_fixture"]
+            if test in ["sustained_reference_test.py", "sustained_chunk_reference_test.py"]
+            else []
+        ),
+        imports = [".."],
+        legacy_create_init = 0,
+        size = "small",
+        tags = ["perception_unit"] + (["requires_gpu"] if test in GPU_TESTS else []),
+        env = {"CUDA_VISIBLE_DEVICES": ""} if test in CPU_ONLY_GPU_GUARD_TESTS else {},
+    )
+    for test in TEST_MODULES
+]
+
+test_suite(
+    name = "all_tests",
+    tests = [test[:-3] for test in TEST_MODULES],
+    visibility = ["//autonomy:__pkg__"],
+)

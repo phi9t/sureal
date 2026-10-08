@@ -1,0 +1,138 @@
+load("@rules_python//python:defs.bzl", "py_binary", "py_library", "py_test")
+
+TEST_MODULES = glob(["*_test.py"])
+LIB_MODULES = glob(
+    ["*.py"],
+    exclude = ["*_test.py"],
+)
+TORCH_TEST_MODULES = [
+    "compare_state_test.py",
+    "replay_values_test.py",
+]
+RESOURCE_VISIBILITY = [
+    "//autonomy:__pkg__",
+    "//autonomy/association:__pkg__",
+    "//autonomy/evaluation:__pkg__",
+    "//autonomy/explorer:__pkg__",
+    "//autonomy/motion-evaluation:__pkg__",
+    "//autonomy/retention:__pkg__",
+    "//autonomy/studies:__pkg__",
+    "//autonomy/training_execution:__pkg__",
+    "//autonomy/viewer:__pkg__",
+]
+
+package(default_visibility = ["//visibility:private"])
+
+exports_files(
+    [
+        "resource_archive.py",
+        "resource_archive_cli.py",
+        "resource_rehydrate.py",
+        "resource_release_plan.py",
+        "scientific_budget.py",
+        "scientific_payload.py",
+        "backend.py",
+        "checkpoint.py",
+        "command.py",
+        "execute_worker.py",
+        "kernel_scope.py",
+        "process_lifecycle.py",
+        "scoped_stage.py",
+        "sources.py",
+        "stage.py",
+        "stage_accounting.py",
+        "sustained_scoring_budget.py",
+    ],
+    visibility = ["//autonomy:__pkg__"],
+)
+
+py_library(
+    name = "resources",
+    srcs = LIB_MODULES,
+    imports = [".."],
+    deps = [
+        "//autonomy/evidence:evidence",
+        "//autonomy/insula:insula",
+    ],
+    visibility = RESOURCE_VISIBILITY,
+)
+
+filegroup(
+    name = "all_py",
+    srcs = glob(["*.py"]),
+    visibility = ["//autonomy:__pkg__"],
+)
+
+py_library(
+    name = "resource_source_layer",
+    srcs = LIB_MODULES,
+    data = ["//autonomy/evidence:source_snapshot_py"],
+    imports = [".."],
+    deps = [
+        "//autonomy/evidence:evidence",
+        "//autonomy/insula:insula",
+    ],
+    visibility = ["//autonomy:__pkg__"],
+)
+
+py_binary(
+    name = "execute_worker",
+    srcs = ["execute_worker.py"],
+    data = [
+        "archive_worker.py",
+        "retention_audit.py",
+    ],
+    imports = [".."],
+    main = "execute_worker.py",
+    deps = [":resource_source_layer"],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "stage_test_fixture",
+    srcs = ["stage_test.py"],
+    imports = [".."],
+    testonly = True,
+    deps = [":resources"],
+)
+
+py_library(
+    name = "backend_test_fixture",
+    srcs = ["backend_test.py"],
+    imports = [".."],
+    testonly = True,
+    deps = [
+        ":resources",
+        ":stage_test_fixture",
+    ],
+)
+
+[
+    py_test(
+        name = test[:-3],
+        srcs = [test],
+        imports = [".."],
+        legacy_create_init = 0,
+        size = "small",
+        tags = ["perception_unit"] + (["requires_gpu"] if test in TORCH_TEST_MODULES else []),
+        deps = [":resources"] + (
+            [":stage_test_fixture"]
+            if test in [
+                "backend_test.py",
+                "legacy_binding_test.py",
+            ]
+            else []
+        ) + (
+            [":backend_test_fixture"]
+            if test == "checkpoint_test.py"
+            else []
+        ),
+    )
+    for test in TEST_MODULES
+]
+
+test_suite(
+    name = "all_tests",
+    tests = [test[:-3] for test in TEST_MODULES],
+    visibility = ["//autonomy:__pkg__"],
+)

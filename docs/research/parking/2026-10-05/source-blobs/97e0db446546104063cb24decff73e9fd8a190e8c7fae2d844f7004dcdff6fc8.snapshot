@@ -1,0 +1,36 @@
+"""Lead admission assembler; execs only the already reviewed immutable helper.
+
+No application RPC or acceptance oracle lives here. Cgroup identity exists only
+at invocation; retain it before replacing this process with the source-pinned
+operator/observer. This is manual preflight plumbing, never managed dispatch.
+"""
+import hashlib,json,os,sys
+from pathlib import Path
+sys.dont_write_bytecode=True
+mode,base_file,base_sha,out_file,program,run_output=sys.argv[1:]
+p=Path(base_file)
+assert p.is_absolute() and not p.is_symlink() and hashlib.sha256(p.read_bytes()).hexdigest()==base_sha
+value=json.loads(p.read_text())
+rows=Path('/proc/self/cgroup').read_text().splitlines();paths=[row[3:] for row in rows if row.startswith('0::')]
+assert len(paths)==1
+scope=Path('/sys/fs/cgroup'+paths[0]);info=scope.stat()
+assert (scope/'memory.max').read_text().strip()=='268435456'
+assert (scope/'memory.swap.max').read_text().strip()=='0'
+pin={'path':str(scope),'device':info.st_dev,'inode':info.st_ino}
+if mode=='operator':
+ assert value['kind']=='NativeFixtureLaunchAdmission'
+ value['operator_scope']=pin
+ argv=[value['tools']['python']['path'],'-I','-B',program,'launch','--authorization',out_file,'--authorization-sha256','HASH','--output',run_output]
+elif mode=='observer':
+ assert value['kind']=='RuntimeProbeAdmission'
+ value['resources']['observer_scope']=pin
+ os.chdir(value['resources']['output_root'])
+ argv=['/usr/bin/python3','-B',program,'--probe','stop-capability','--authorization',out_file,'--output',run_output]
+else:raise ValueError('fixed helper role required')
+output=Path(out_file);assert output.is_absolute() and not output.exists()
+data=(json.dumps(value,sort_keys=True,separators=(',',':'))+'\n').encode()
+with output.open('xb') as stream:stream.write(data);stream.flush();os.fsync(stream.fileno())
+fd=os.open(output.parent,os.O_RDONLY|os.O_DIRECTORY);os.fsync(fd);os.close(fd)
+if mode=='operator':argv[argv.index('HASH')]=hashlib.sha256(data).hexdigest()
+# Replacing this process ensures the observer has no concurrent parent in its scope.
+os.execv(argv[0],argv)

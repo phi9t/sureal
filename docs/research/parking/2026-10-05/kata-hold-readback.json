@@ -1,0 +1,260 @@
+{
+  "closed_any_issue": false,
+  "issues": [
+    {
+      "after_priority": 4,
+      "after_revision": 2,
+      "before_priority": 0,
+      "before_revision": 1,
+      "hold": {
+        "acceptance": "unchanged; not completed",
+        "authority": "Explicit user bounded consolidation/parking instruction2026-10-05",
+        "dispatch_allowed": false,
+        "effective_ms": 1791174962448,
+        "reason": "User pauses local MAC completion; await Corenius infra availability and explicit future readmission",
+        "schema_version": 1,
+        "source_base": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+        "state": "PARKED_CORIENUS_WAIT"
+      },
+      "owner": null,
+      "source_definition_unchanged": true,
+      "status": "open",
+      "title": "59 \u2014 Complete verifiable local MAC automation [59]",
+      "uid": "01M450RZ7915Q76EYH0CNED2Y1"
+    },
+    {
+      "after_priority": 4,
+      "after_revision": 3,
+      "before_priority": 0,
+      "before_revision": 2,
+      "hold": {
+        "acceptance": "unchanged; not completed",
+        "authority": "Explicit user bounded consolidation/parking instruction2026-10-05",
+        "dispatch_allowed": false,
+        "effective_ms": 1791174962622,
+        "reason": "User pauses local MAC completion; await Corenius infra availability and explicit future readmission",
+        "schema_version": 1,
+        "source_base": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+        "state": "PARKED_CORIENUS_WAIT"
+      },
+      "owner": null,
+      "source_definition_unchanged": true,
+      "status": "open",
+      "title": "50 \u2014 Two concurrent task-scoped worker attempts [50]",
+      "uid": "01M43DWWWWY9SCZKTESXHDAQJA"
+    },
+    {
+      "after_priority": 4,
+      "after_revision": 2,
+      "before_priority": 0,
+      "before_revision": 1,
+      "hold": {
+        "acceptance": "unchanged; not completed",
+        "authority": "Explicit user bounded consolidation/parking instruction2026-10-05",
+        "dispatch_allowed": false,
+        "effective_ms": 1791174962803,
+        "reason": "User pauses local MAC completion; await Corenius infra availability and explicit future readmission",
+        "schema_version": 1,
+        "source_base": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+        "state": "PARKED_CORIENUS_WAIT"
+      },
+      "owner": null,
+      "source_definition_unchanged": true,
+      "status": "open",
+      "title": "57 \u2014 Decision reporting and human-toil acceptance [57]",
+      "uid": "01M44JAZB9DPENQ68CKAE8XJTC"
+    },
+    {
+      "after_priority": 4,
+      "after_revision": 2,
+      "before_priority": 0,
+      "before_revision": 1,
+      "hold": {
+        "acceptance": "unchanged; not completed",
+        "authority": "Explicit user bounded consolidation/parking instruction2026-10-05",
+        "dispatch_allowed": false,
+        "effective_ms": 1791174962977,
+        "reason": "User pauses local MAC completion; await Corenius infra availability and explicit future readmission",
+        "schema_version": 1,
+        "source_base": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+        "state": "PARKED_CORIENUS_WAIT"
+      },
+      "owner": null,
+      "source_definition_unchanged": true,
+      "status": "open",
+      "title": "56 \u2014 Persistent lead execution and recovery [56]",
+      "uid": "01M44JAZ79PHW9PTXY83A7E0T9"
+    },
+    {
+      "after_priority": 4,
+      "after_revision": 2,
+      "before_priority": 0,
+      "before_revision": 1,
+      "hold": {
+        "acceptance": "unchanged; not completed",
+        "authority": "Explicit user bounded consolidation/parking instruction2026-10-05",
+        "dispatch_allowed": false,
+        "effective_ms": 1791174963153,
+        "reason": "User pauses local MAC completion; await Corenius infra availability and explicit future readmission",
+        "schema_version": 1,
+        "source_base": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+        "state": "PARKED_CORIENUS_WAIT"
+      },
+      "owner": null,
+      "source_definition_unchanged": true,
+      "status": "open",
+      "title": "55 \u2014 Lead authority and action policy [55]",
+      "uid": "01M44JAZ3HG2AZJJNMHZ8S0V6N"
+    },
+    {
+      "after_priority": 4,
+      "after_revision": 3,
+      "before_priority": 0,
+      "before_revision": 2,
+      "hold": {
+        "acceptance": "unchanged; not completed",
+        "authority": "Explicit user bounded consolidation/parking instruction2026-10-05",
+        "dispatch_allowed": false,
+        "effective_ms": 1791174963324,
+        "reason": "User pauses local MAC completion; await Corenius infra availability and explicit future readmission",
+        "schema_version": 1,
+        "source_base": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+        "state": "PARKED_CORIENUS_WAIT"
+      },
+      "owner": null,
+      "source_definition_unchanged": true,
+      "status": "open",
+      "title": "53.B \u2014 Incident and stale-base recovery guide; exact pilot subsection in pinned task53 specification; no dispatch before admitted53.0/54. [53.B]",
+      "uid": "01M43F95RSZE8KC5WZAN5MHXFQ"
+    },
+    {
+      "after_priority": 4,
+      "after_revision": 3,
+      "before_priority": 0,
+      "before_revision": 2,
+      "hold": {
+        "acceptance": "unchanged; not completed",
+        "authority": "Explicit user bounded consolidation/parking instruction2026-10-05",
+        "dispatch_allowed": false,
+        "effective_ms": 1791174963496,
+        "reason": "User pauses local MAC completion; await Corenius infra availability and explicit future readmission",
+        "schema_version": 1,
+        "source_base": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+        "state": "PARKED_CORIENUS_WAIT"
+      },
+      "owner": null,
+      "source_definition_unchanged": true,
+      "status": "open",
+      "title": "53.A \u2014 Operator lifecycle guide; exact pilot subsection in pinned task53 specification; no dispatch before admitted53.0/54. [53.A]",
+      "uid": "01M43DXPDK3FTEKJBAXSECJFTA"
+    },
+    {
+      "after_priority": 4,
+      "after_revision": 3,
+      "before_priority": 0,
+      "before_revision": 2,
+      "hold": {
+        "acceptance": "unchanged; not completed",
+        "authority": "Explicit user bounded consolidation/parking instruction2026-10-05",
+        "dispatch_allowed": false,
+        "effective_ms": 1791174963670,
+        "reason": "User pauses local MAC completion; await Corenius infra availability and explicit future readmission",
+        "schema_version": 1,
+        "source_base": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+        "state": "PARKED_CORIENUS_WAIT"
+      },
+      "owner": null,
+      "source_definition_unchanged": true,
+      "status": "open",
+      "title": "53 \u2014 Safe cleanup and concurrent-loop admission [53]",
+      "uid": "01M43FCCH7ANP20EJTDAZ6JKV9"
+    },
+    {
+      "after_priority": 4,
+      "after_revision": 3,
+      "before_priority": 0,
+      "before_revision": 2,
+      "hold": {
+        "acceptance": "unchanged; not completed",
+        "authority": "Explicit user bounded consolidation/parking instruction2026-10-05",
+        "dispatch_allowed": false,
+        "effective_ms": 1791174963840,
+        "reason": "User pauses local MAC completion; await Corenius infra availability and explicit future readmission",
+        "schema_version": 1,
+        "source_base": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+        "state": "PARKED_CORIENUS_WAIT"
+      },
+      "owner": null,
+      "source_definition_unchanged": true,
+      "status": "open",
+      "title": "54 \u2014 Worker summaries and program overview [54]",
+      "uid": "01M43DXDJWPDBG2BVWTAHJ9G92"
+    },
+    {
+      "after_priority": 4,
+      "after_revision": 3,
+      "before_priority": 0,
+      "before_revision": 2,
+      "hold": {
+        "acceptance": "unchanged; not completed",
+        "authority": "Explicit user bounded consolidation/parking instruction2026-10-05",
+        "dispatch_allowed": false,
+        "effective_ms": 1791174964010,
+        "reason": "User pauses local MAC completion; await Corenius infra availability and explicit future readmission",
+        "schema_version": 1,
+        "source_base": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+        "state": "PARKED_CORIENUS_WAIT"
+      },
+      "owner": null,
+      "source_definition_unchanged": true,
+      "status": "open",
+      "title": "53.0 \u2014 Landed retention and cleanup foundation [53.0]",
+      "uid": "01M43DX9E8JKN2XFJXEYHF9H8W"
+    },
+    {
+      "after_priority": 4,
+      "after_revision": 3,
+      "before_priority": 0,
+      "before_revision": 2,
+      "hold": {
+        "acceptance": "unchanged; not completed",
+        "authority": "Explicit user bounded consolidation/parking instruction2026-10-05",
+        "dispatch_allowed": false,
+        "effective_ms": 1791174964183,
+        "reason": "User pauses local MAC completion; await Corenius infra availability and explicit future readmission",
+        "schema_version": 1,
+        "source_base": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+        "state": "PARKED_CORIENUS_WAIT"
+      },
+      "owner": null,
+      "source_definition_unchanged": true,
+      "status": "open",
+      "title": "52 \u2014 Exact fast-forward landing and recovery [52]",
+      "uid": "01M43DX57P8APGVXBG78Z6BP9T"
+    },
+    {
+      "after_priority": 4,
+      "after_revision": 3,
+      "before_priority": 0,
+      "before_revision": 2,
+      "hold": {
+        "acceptance": "unchanged; not completed",
+        "authority": "Explicit user bounded consolidation/parking instruction2026-10-05",
+        "dispatch_allowed": false,
+        "effective_ms": 1791174964359,
+        "reason": "User pauses local MAC completion; await Corenius infra availability and explicit future readmission",
+        "schema_version": 1,
+        "source_base": "1cefb02333dd6846f9fd24f9ea51260e03399c7d",
+        "state": "PARKED_CORIENUS_WAIT"
+      },
+      "owner": null,
+      "source_definition_unchanged": true,
+      "status": "open",
+      "title": "51 \u2014 Immutable candidates and exact verification [51]",
+      "uid": "01M43DX12AREC6T5YWE7DTMRYQ"
+    }
+  ],
+  "observed_ms": 1791174964497,
+  "schema_version": 1,
+  "updated_native_goal": false
+}

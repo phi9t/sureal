@@ -1,0 +1,9 @@
+from pathlib import Path
+import subprocess,sys,json
+cache=Path.home()/'.cache/waystone/waymo-perception';records=[]
+for variant in ['gn_backbone','gn_backbone_ln_pillar','no_norm']:
+ print('REPLAY',variant,flush=True);log=cache/'insula/continuation-logs'/('norm-'+variant+'-checkpoint-audit.log')
+ with log.open('w') as handle:run=subprocess.run([sys.executable,'.scratch/audit-norm-checkpoint.py',variant],stdout=handle,stderr=subprocess.STDOUT,timeout=240)
+ print(log.read_text(),flush=True);assert run.returncode==0;records.append(variant)
+ Path('experiments/waymo-perception/research/norm-checkpoint-cohort-progress.json').write_text(json.dumps({'admitted':records})+'\n')
+print('PASS all native normalization checkpoints replayed',flush=True)

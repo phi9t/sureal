@@ -1,0 +1,82 @@
+{
+  "pipeline/__init__.py": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a/experiments/waymo-perception/pipeline/__init__.py",
+    "sha256": "7b886bfeed8fa484027b4c70be755996e3e04019a56c072966818a7d9bc7906e",
+    "bytes": 64
+  },
+  "pipeline/pillar_detector.py": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a/experiments/waymo-perception/pipeline/pillar_detector.py",
+    "sha256": "0aef80adb63784844782871745262d15144c36831714c8607b9a91be787936cc",
+    "bytes": 2542
+  },
+  "pipeline/pillar_encoder.py": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a/experiments/waymo-perception/pipeline/pillar_encoder.py",
+    "sha256": "0bd5aabd2ebef1d65c84fe0ad89a6ccc642af5308183e608e4ce703cf7bcc192",
+    "bytes": 3520
+  },
+  "pipeline/detector_loss.py": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a/experiments/waymo-perception/pipeline/detector_loss.py",
+    "sha256": "4b439109a08fae64a652a4b6545239e35c181fdc92018ac112df7d37a0224b87",
+    "bytes": 2648
+  },
+  "pipeline/insula_entry.py": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a/experiments/waymo-perception/pipeline/insula_entry.py",
+    "sha256": "4ad731aff9057550db8a3c2d194f7b23a1447ef11b8f3d58ec7344f6132209b2",
+    "bytes": 2626
+  },
+  "pipeline/runtime_identity.py": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a/experiments/waymo-perception/pipeline/runtime_identity.py",
+    "sha256": "fbecd514661535d32cbd7c25cc208a60d50728e9d9469d1a82b9979d1261adf2",
+    "bytes": 1289
+  },
+  "gpu/norm_variants.py": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a/experiments/waymo-perception/gpu/norm_variants.py",
+    "sha256": "c90ee1004dbb79d66895c72be8d5dad1f0b2a4e731ee77ddfcd19ff6bf120f8b",
+    "bytes": 1374
+  },
+  "gpu/architecture_variants.py": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a/experiments/waymo-perception/gpu/architecture_variants.py",
+    "sha256": "c42042ed95cca74d519026149d3fe7e0f681c42da060f4a5b9d5428efd70eb35",
+    "bytes": 3285
+  },
+  "gpu/architecture_followups.py": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a/experiments/waymo-perception/gpu/architecture_followups.py",
+    "sha256": "679e89728e059bace5a373ba50b73978ec1c1741c53492d6a89badc18d844368",
+    "bytes": 2607
+  },
+  "tier1/catalog.py": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a/experiments/waymo-perception/tier1/catalog.py",
+    "sha256": "4a33cc1719c4a32203ee6574301854c7c2cab8a51fc09b3cdd9cb3fcb90f550f",
+    "bytes": 1257
+  },
+  "tier1/models.py": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a/experiments/waymo-perception/tier1/models.py",
+    "sha256": "66f11059442396bb757a40ef619f28932126337188696ae439b8101faf723733",
+    "bytes": 2308
+  },
+  "cohort/train_balanced.py": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a/experiments/waymo-perception/cohort/train_balanced.py",
+    "sha256": "9fc83b930086dd8870dcc167e4e5264e92b94fd99a8871aaf5857ff19b3a94fb",
+    "bytes": 8685
+  },
+  "cohort/sustained_contract.py": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a/experiments/waymo-perception/cohort/sustained_contract.py",
+    "sha256": "12b662e2a1ef033f0c4b58473cc10fe586e906134a73eda007621c23fdbdae5f",
+    "bytes": 3855
+  },
+  "cohort/sustained_loop.py": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a/experiments/waymo-perception/cohort/sustained_loop.py",
+    "sha256": "987d72307d28bea570c2e9fd39b126f7931c31ec294bcbb3de80d5de3499ffa8",
+    "bytes": 3054
+  },
+  "cohort/sustained_state.py": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a/experiments/waymo-perception/cohort/sustained_state.py",
+    "sha256": "9712748c0073a7c6a9a01fea9530709baf37e28be9754e9c356287a2e61a71c6",
+    "bytes": 5150
+  },
+  "cohort/train_sustained.py": {
+    "path": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a/experiments/waymo-perception/cohort/train_sustained.py",
+    "sha256": "aaa0e08458a337416221f6743606804b3fd114cc38816bf294062a8fc5d55be9",
+    "bytes": 6126
+  }
+}

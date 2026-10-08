@@ -1,0 +1,112 @@
+{
+  "scene": "4575389405178805994_4900_000_4920_000",
+  "checks": [
+    {
+      "stage": "camera-preprocess",
+      "command": [
+        "python3",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/scientific-camera-preprocess.py",
+        "--scene",
+        "4575389405178805994_4900_000_4920_000",
+        "--output",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/4575389405178805994_4900_000_4920_000/camera"
+      ],
+      "exit_code": 0
+    },
+    {
+      "stage": "camera-publication",
+      "command": [
+        "python3",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/publish-scientific-camera.py",
+        "--evidence",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/4575389405178805994_4900_000_4920_000/camera-evidence.json",
+        "--expected-evidence-sha256",
+        "fb7833e4c31bb21c4d095c1df9d39da170dcbf450140b4a4a57109fc3b58f88d",
+        "--output",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/4575389405178805994_4900_000_4920_000/camera-publication"
+      ],
+      "exit_code": 0
+    },
+    {
+      "stage": "camera-replay",
+      "command": [
+        "python3",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/verify-camera-replay.py",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/4575389405178805994_4900_000_4920_000/camera",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/4575389405178805994_4900_000_4920_000/camera-publication",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/4575389405178805994_4900_000_4920_000/camera-replay",
+        "--expected-receipt-sha256",
+        "12be98e6dc6d28493b1d0a3d599b1bb442034c535bad5118b6cfe1eacb9b3e62",
+        "--usage",
+        "camera_validation"
+      ],
+      "exit_code": 0
+    },
+    {
+      "stage": "camera-evict",
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/4575389405178805994_4900_000_4920_000/camera",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/4575389405178805994_4900_000_4920_000/camera-publication",
+        "/opt",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort-v1/4575389405178805994_4900_000_4920_000/camera-replay",
+        "/srv",
+        "--",
+        "python",
+        "-c",
+        "import json; from pipeline.camera_eviction import evict_camera; r=evict_camera('/outputs','/opt','/srv',expected_publication_sha256='12be98e6dc6d28493b1d0a3d599b1bb442034c535bad5118b6cfe1eacb9b3e62',expected_replay_sha256='3ca63abe991208043f11c97b386cf6789f268e5379e89afbaad78da41949891a'); print(json.dumps({'status':r['status'],'bytes_evicted':r['bytes_evicted']}))"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "publication_receipt_sha256": "12be98e6dc6d28493b1d0a3d599b1bb442034c535bad5118b6cfe1eacb9b3e62",
+  "replay_receipt_sha256": "3ca63abe991208043f11c97b386cf6789f268e5379e89afbaad78da41949891a",
+  "scope": "recovered camera stages; full scene checkpoint and independent admission remain required"
+}

@@ -1,0 +1,26 @@
+{
+  "status": "preparation evidence; scientific protocol remains open",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/scientific-scene-validation-live-c/receipt.json",
+  "receipt_sha256": "0c398bcddcebdc281d7ca2b8f828bb5d4e8766d622125aaf2def470c5e2a1118",
+  "validation": {
+    "passed": true,
+    "scene": "5847910688643719375_180_000_200_000",
+    "records": 1980,
+    "frames": 198,
+    "points": 36214548,
+    "source_lidar_sha256": "22e9ee98f67e14fb9990aebac58671835739585d719342a4dcb7212b554b6f46",
+    "report_sha256": "2ac4144e7cab3d5a90c990d0edb50168577f58c8f1f8ef66cf9b1c2e549e780f",
+    "sidecar_manifest_hashes": {
+      "camera_calibration": "7e0ae4d729e6f0b41f996395223034bf1916cc7542cefdb11ac3731842d2c91b",
+      "lidar_box": "3d048654582461feb5f68fe3a7a289aab232299f62173f7fdaac7c2a743cf148",
+      "lidar_calibration": "7124864625cbc87011995ce77add69643ed8c6b42850db7e285cb39adcd6cf42",
+      "lidar_camera_projection": "5fa876665fabbf67cac3962837eb8e246d7f3daf88b1d3f9630026baf40d1e44",
+      "lidar_pose": "0d88bdcc51c19b3ce0d4bea78b682346cc6b50ef4020e6b4537da73ea8af9501",
+      "lidar_segmentation": "72091742f70e1696bd966713a568f23b962021fc042adfbff9ffc7f21c8bab05",
+      "vehicle_pose": "f8e3add3ff68ccb0499f35c9e074d06fc491d9369121f4565af6c727908053ce"
+    },
+    "scalar_max_error_m": 1.2434497875801753e-12,
+    "scope": "all native point identities/features/targets exact; physical features losslessly promoted to float64, target dtypes preserved; up to 17 independent scalar coordinate checks per nonempty record"
+  },
+  "scope": "engineering-scene validation of scientific checker; full scientific scene transfer, publication and model comparisons remain open"
+}

@@ -1,0 +1,470 @@
+{
+  "frame_evidence": {
+    "13840133134545942567_1060_000_1080_000:1558402354862835": {
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13840133134545942567_1060_000_1080_000/1558402354862835/receipt.json",
+      "sha256": "977cc56b42291f7c9825f47f0be7916850e9e8f67b0902bf927b80ef3df31aaf",
+      "validation": {
+        "scene": "13840133134545942567_1060_000_1080_000",
+        "timestamp_micros": 1558402354862835,
+        "input_points": 163120,
+        "retained_points": 118834,
+        "positive_anchor_counts_by_class": {
+          "1": 210,
+          "2": 138,
+          "3": 27,
+          "4": 17
+        },
+        "eligible_targets": 113,
+        "uncovered_targets": 1,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 9,
+          "center_outside_roi": 10,
+          "eligible": 113
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 3.4812264480278827,
+          "peak_rss_kib": 248300
+        }
+      }
+    },
+    "16977844994272847523_2140_000_2160_000:1557450680964094": {
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450680964094/receipt.json",
+      "sha256": "010b410a33b0e10af8de0cf55f3cec5701091b286d82934373f8bace976dcfad",
+      "validation": {
+        "scene": "16977844994272847523_2140_000_2160_000",
+        "timestamp_micros": 1557450680964094,
+        "input_points": 161859,
+        "retained_points": 100714,
+        "positive_anchor_counts_by_class": {
+          "1": 349,
+          "2": 37,
+          "3": 19,
+          "4": 10
+        },
+        "eligible_targets": 81,
+        "uncovered_targets": 0,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 10,
+          "center_outside_roi": 6,
+          "eligible": 81
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.728186619002372,
+          "peak_rss_kib": 229440
+        }
+      }
+    },
+    "17885096890374683162_755_580_775_580:1506906083489022": {
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/17885096890374683162_755_580_775_580/1506906083489022/receipt.json",
+      "sha256": "91ca70f30489bdc8a29a04e620b4d71d0feb8a134d6a33db1058f4a81a68237c",
+      "validation": {
+        "scene": "17885096890374683162_755_580_775_580",
+        "timestamp_micros": 1506906083489022,
+        "input_points": 200237,
+        "retained_points": 138559,
+        "positive_anchor_counts_by_class": {
+          "1": 256,
+          "2": 17,
+          "3": 18,
+          "4": 4
+        },
+        "eligible_targets": 50,
+        "uncovered_targets": 0,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 6,
+          "center_outside_roi": 4,
+          "eligible": 50
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.6679594760062173,
+          "peak_rss_kib": 228636
+        }
+      }
+    },
+    "4575961016807404107_880_000_900_000:1544656166412547": {
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/4575961016807404107_880_000_900_000/1544656166412547/receipt.json",
+      "sha256": "17dae68f6ed3cd7ac8b5e1842467f44386ce185e921e4145bf168b7040461e96",
+      "validation": {
+        "scene": "4575961016807404107_880_000_900_000",
+        "timestamp_micros": 1544656166412547,
+        "input_points": 182041,
+        "retained_points": 123101,
+        "positive_anchor_counts_by_class": {
+          "1": 272,
+          "2": 21,
+          "3": 12,
+          "4": 2
+        },
+        "eligible_targets": 53,
+        "uncovered_targets": 1,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 2,
+          "center_outside_roi": 8,
+          "eligible": 53
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.8070046990178525,
+          "peak_rss_kib": 227992
+        }
+      }
+    },
+    "13506499849906169066_120_000_140_000:1552353849872908": {
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13506499849906169066_120_000_140_000/1552353849872908/receipt.json",
+      "sha256": "4ef17a3e21ad80696a6b1da53baa75dc7c0e02507c7d65bd99130ad451053805",
+      "validation": {
+        "scene": "13506499849906169066_120_000_140_000",
+        "timestamp_micros": 1552353849872908,
+        "input_points": 165604,
+        "retained_points": 112628,
+        "positive_anchor_counts_by_class": {
+          "1": 764,
+          "2": 20,
+          "3": 16,
+          "4": 2
+        },
+        "eligible_targets": 109,
+        "uncovered_targets": 2,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 14,
+          "center_outside_roi": 12,
+          "eligible": 109
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 3.2722600109991618,
+          "peak_rss_kib": 244524
+        }
+      }
+    },
+    "16977844994272847523_2140_000_2160_000:1557450685964257": {
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450685964257/receipt.json",
+      "sha256": "4f16db3665743c6619d21979e534bc9f74acaeefb3e1005c6f5aa76d7f674e22",
+      "validation": {
+        "scene": "16977844994272847523_2140_000_2160_000",
+        "timestamp_micros": 1557450685964257,
+        "input_points": 156644,
+        "retained_points": 99085,
+        "positive_anchor_counts_by_class": {
+          "1": 383,
+          "2": 40,
+          "3": 20,
+          "4": 13
+        },
+        "eligible_targets": 90,
+        "uncovered_targets": 0,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 13,
+          "center_outside_roi": 5,
+          "eligible": 90
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.8639693619916216,
+          "peak_rss_kib": 232608
+        }
+      }
+    },
+    "15696964848687303249_4615_200_4635_200:1507241626220091": {
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/15696964848687303249_4615_200_4635_200/1507241626220091/receipt.json",
+      "sha256": "47e3975800a5d4c2982fc6d2b216360db34054e6b20a2ff11501b812c63e568b",
+      "validation": {
+        "scene": "15696964848687303249_4615_200_4635_200",
+        "timestamp_micros": 1507241626220091,
+        "input_points": 177850,
+        "retained_points": 97251,
+        "positive_anchor_counts_by_class": {
+          "1": 473,
+          "2": 20,
+          "3": 29,
+          "4": 2
+        },
+        "eligible_targets": 90,
+        "uncovered_targets": 5,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 8,
+          "center_outside_roi": 11,
+          "eligible": 90
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 3.1691438360139728,
+          "peak_rss_kib": 242336
+        }
+      }
+    },
+    "16977844994272847523_2140_000_2160_000:1557450679864286": {
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/16977844994272847523_2140_000_2160_000/1557450679864286/receipt.json",
+      "sha256": "f9f619bf19b42d4d4b58563305d0df40c1838f9dd1500edf28e347c8d3f82be7",
+      "validation": {
+        "scene": "16977844994272847523_2140_000_2160_000",
+        "timestamp_micros": 1557450679864286,
+        "input_points": 161232,
+        "retained_points": 98070,
+        "positive_anchor_counts_by_class": {
+          "1": 338,
+          "2": 30,
+          "3": 16,
+          "4": 6
+        },
+        "eligible_targets": 73,
+        "uncovered_targets": 0,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 17,
+          "center_outside_roi": 6,
+          "eligible": 73
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.5701335290214047,
+          "peak_rss_kib": 227324
+        }
+      }
+    },
+    "12856053589272984699_1020_000_1040_000:1552658368873652": {
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/12856053589272984699_1020_000_1040_000/1552658368873652/receipt.json",
+      "sha256": "3e58975d163e019fda57aa6425eb5f55fa6164716f21e24fbf0df51d05e65cd0",
+      "validation": {
+        "scene": "12856053589272984699_1020_000_1040_000",
+        "timestamp_micros": 1552658368873652,
+        "input_points": 186811,
+        "retained_points": 132616,
+        "positive_anchor_counts_by_class": {
+          "1": 353,
+          "2": 3,
+          "3": 17,
+          "4": 0
+        },
+        "eligible_targets": 58,
+        "uncovered_targets": 4,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 15,
+          "center_outside_roi": 2,
+          "eligible": 58
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.8108248979551718,
+          "peak_rss_kib": 230504
+        }
+      }
+    },
+    "15628918650068847391_8077_670_8097_670:1508889335260598": {
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/15628918650068847391_8077_670_8097_670/1508889335260598/receipt.json",
+      "sha256": "3342707e3bbc8be9f028970ff7efc5b92a9aa9a8425e94911fdb01c077513b3a",
+      "validation": {
+        "scene": "15628918650068847391_8077_670_8097_670",
+        "timestamp_micros": 1508889335260598,
+        "input_points": 165789,
+        "retained_points": 96016,
+        "positive_anchor_counts_by_class": {
+          "1": 243,
+          "2": 4,
+          "3": 15,
+          "4": 0
+        },
+        "eligible_targets": 43,
+        "uncovered_targets": 3,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 5,
+          "center_outside_roi": 4,
+          "eligible": 43
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.505754507961683,
+          "peak_rss_kib": 222984
+        }
+      }
+    },
+    "7850521592343484282_4576_090_4596_090:1520908476792400": {
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7850521592343484282_4576_090_4596_090/1520908476792400/receipt.json",
+      "sha256": "bef7c92ea9273e4519167a54c71a3f5e8cd1d05884f6154c1b5e9a3ad17676f6",
+      "validation": {
+        "scene": "7850521592343484282_4576_090_4596_090",
+        "timestamp_micros": 1520908476792400,
+        "input_points": 198010,
+        "retained_points": 144746,
+        "positive_anchor_counts_by_class": {
+          "1": 91,
+          "2": 0,
+          "3": 13,
+          "4": 0
+        },
+        "eligible_targets": 20,
+        "uncovered_targets": 1,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 5,
+          "center_outside_roi": 1,
+          "eligible": 20
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.221445568022318,
+          "peak_rss_kib": 214328
+        }
+      }
+    },
+    "7921369793217703814_1060_000_1080_000:1557159628222386": {
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7921369793217703814_1060_000_1080_000/1557159628222386/receipt.json",
+      "sha256": "a389b615343c3453e273c6a3bad2a2f36b7d79fee7ab0193f9058f20b968ab2a",
+      "validation": {
+        "scene": "7921369793217703814_1060_000_1080_000",
+        "timestamp_micros": 1557159628222386,
+        "input_points": 191875,
+        "retained_points": 112812,
+        "positive_anchor_counts_by_class": {
+          "1": 319,
+          "2": 82,
+          "3": 18,
+          "4": 0
+        },
+        "eligible_targets": 88,
+        "uncovered_targets": 3,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 6,
+          "center_outside_roi": 11,
+          "eligible": 88
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.8207912369980477,
+          "peak_rss_kib": 226736
+        }
+      }
+    },
+    "7921369793217703814_1060_000_1080_000:1557159618222385": {
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/7921369793217703814_1060_000_1080_000/1557159618222385/receipt.json",
+      "sha256": "06d7b6a5ef0939074effe7660f9d3ea09abc364bd963f1146057b5814ba4338f",
+      "validation": {
+        "scene": "7921369793217703814_1060_000_1080_000",
+        "timestamp_micros": 1557159618222385,
+        "input_points": 192057,
+        "retained_points": 112852,
+        "positive_anchor_counts_by_class": {
+          "1": 272,
+          "2": 77,
+          "3": 19,
+          "4": 0
+        },
+        "eligible_targets": 86,
+        "uncovered_targets": 2,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 13,
+          "center_outside_roi": 13,
+          "eligible": 86
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.7963418569997884,
+          "peak_rss_kib": 227276
+        }
+      }
+    },
+    "13830510593707564159_5575_000_5595_000:1518657072511849": {
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/13830510593707564159_5575_000_5595_000/1518657072511849/receipt.json",
+      "sha256": "2ec00e1e43abb55bf483554d48b16acfc55fefd8d52bff0444ef72ef2448a3b0",
+      "validation": {
+        "scene": "13830510593707564159_5575_000_5595_000",
+        "timestamp_micros": 1518657072511849,
+        "input_points": 122504,
+        "retained_points": 97200,
+        "positive_anchor_counts_by_class": {
+          "1": 34,
+          "2": 0,
+          "3": 1,
+          "4": 0
+        },
+        "eligible_targets": 5,
+        "uncovered_targets": 0,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 1,
+          "center_outside_roi": 2,
+          "eligible": 5
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 1.8870704270084389,
+          "peak_rss_kib": 201400
+        }
+      }
+    },
+    "11004685739714500220_2300_000_2320_000:1553640277306703": {
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/11004685739714500220_2300_000_2320_000/1553640277306703/receipt.json",
+      "sha256": "48de391ebd8cfd58d7a897e77f7567ed011506f1b69306a6470879f0db0cdf53",
+      "validation": {
+        "scene": "11004685739714500220_2300_000_2320_000",
+        "timestamp_micros": 1553640277306703,
+        "input_points": 135887,
+        "retained_points": 101984,
+        "positive_anchor_counts_by_class": {
+          "1": 123,
+          "2": 32,
+          "3": 8,
+          "4": 0
+        },
+        "eligible_targets": 45,
+        "uncovered_targets": 3,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 2,
+          "center_outside_roi": 0,
+          "eligible": 45
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.1505485539673828,
+          "peak_rss_kib": 210080
+        }
+      }
+    },
+    "3966447614090524826_320_000_340_000:1553023288374080": {
+      "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-native-v2/3966447614090524826_320_000_340_000/1553023288374080/receipt.json",
+      "sha256": "bada6b6c19bd23d297954de9ef4abf1ea14aac508c7cfd7197ccb79ab18212c3",
+      "validation": {
+        "scene": "3966447614090524826_320_000_340_000",
+        "timestamp_micros": 1553023288374080,
+        "input_points": 183632,
+        "retained_points": 126328,
+        "positive_anchor_counts_by_class": {
+          "1": 308,
+          "2": 3,
+          "3": 10,
+          "4": 0
+        },
+        "eligible_targets": 49,
+        "uncovered_targets": 5,
+        "target_reasons": {
+          "unknown_class": 0,
+          "zero_native_points": 0,
+          "center_outside_roi": 5,
+          "eligible": 49
+        },
+        "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+        "resources": {
+          "elapsed_seconds": 2.411718913994264,
+          "peak_rss_kib": 220688
+        }
+      }
+    }
+  },
+  "expected_frames": 16,
+  "admitted_frames": 16
+}

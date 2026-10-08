@@ -1,0 +1,15 @@
+{
+  "scene": "1457696187335927618_595_027_615_027",
+  "membership": {
+    "official_split": "validation",
+    "research_splits": [
+      "validation"
+    ]
+  },
+  "manifest_sha256": "c181a07edc21731a3e1b74a2274e286c9bc4207e6e0c46e6a1f2403978608370",
+  "capture_receipt_sha256": "43d467e976beb8c990f7d2ef4e0786469a8c3bd44f3b2859416e171048a49731",
+  "checkpoint_sha256": "70b5eb38f799dacc21f3b7113c472c5981c0dfbfb1766049cfac9921330d6401",
+  "publication_receipt_sha256": "b4541f25e3c9ee44664efa97b229a44af089c7bb13d309b9147a1698ca741c90",
+  "report_sha256": "03321f452c747bc48809aede920390bd2f6178f0f39db508ace20febd4b2260f",
+  "scope": "retained capture and independently admitted publication identities agree"
+}

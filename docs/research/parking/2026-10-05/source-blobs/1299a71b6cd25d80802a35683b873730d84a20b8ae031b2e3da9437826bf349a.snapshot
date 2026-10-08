@@ -1,0 +1,9 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.runtime_identity import verify_rootfs
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';evidence=code/'research/one-batch-bn-counterfactual-verified.json';old=json.loads(evidence.read_text());verify_rootfs(cache/'gpu-rootfs',old['runtime_lock']['rootfs_sha256'])
+base=cache/'insula/one-batch-bn-moment-audit-v1';base.mkdir();out=base/'output';out.mkdir();command=old['checks'][0]['command'].copy();command=[str(out) if x==str(cache/'scientific-processing/one-batch-bn-counterfactual-v1') else '/experiment/gpu/audit-one-batch-bn-counterfactual.py' if x=='/experiment/gpu/one-batch-bn-counterfactual.py' else x for x in command];i=command.index('--');command[i:i]=['--ro-bind',str(cache/'scientific-processing/one-batch-bn-counterfactual-v1'),'/tmp/treatment'];worker=code/'gpu/audit-one-batch-bn-counterfactual.py';digest=sha(worker)
+run=subprocess.run(command,capture_output=True,text=True,timeout=120);(out/'live.log').write_text(run.stdout+run.stderr);print(run.stdout+run.stderr);assert run.returncode==0 and sha(worker)==digest
+record={'checks':[{'command':command,'exit_code':0}],'runtime_lock':old['runtime_lock'],'producer_evidence_sha256':sha(evidence),'worker_sha256':digest,'validation':json.loads((out/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in out.iterdir()}};(code/'research/one-batch-bn-moment-audit-verified.json').write_text(json.dumps(record,indent=2)+'\n')

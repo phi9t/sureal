@@ -1,0 +1,22 @@
+{
+  "queue_pid": 1241409,
+  "observers": {
+    "admission": {
+      "pid": 1241411,
+      "script": ".scratch/observe-processing-admission-after-fourth-cap.py"
+    },
+    "capture": {
+      "pid": 1241412,
+      "script": ".scratch/capture-scientific-semantic-support-after-fourth-cap.py"
+    },
+    "box": {
+      "pid": 1263037,
+      "script": ".scratch/await-training-box-replay-after-fourth-cap.py"
+    },
+    "semantic_recovery": {
+      "pid": 1263038,
+      "script": ".scratch/await-semantic-recovery-after-fourth-cap.py"
+    }
+  },
+  "scope": "original full cohort gates; serial box replay then missing semantic recovery; fresh process identities and unchanged source scope"
+}

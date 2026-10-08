@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "creator": "Lead manually, under retained explicit per-probe authorization; no implicit native-goal authority from a health label.",
+  "execution_role": "Non-managed isolated runtime fixture with no task claim or scientific writes; all concurrently executing fixture/managed worker threads count toward shared capacity2 test budget.",
+  "authorization_required": [
+    "objective",
+    "fixture_root",
+    "native_methods",
+    "write_scope",
+    "allowed_goal_statuses",
+    "resource_budget",
+    "authorizing_user_message"
+  ],
+  "failure": "Missing explicit authorization/capability blocks relevant fixture gate before dispatch; no auto-create on an unrelated thread.",
+  "probes": [
+    {
+      "id": "fork",
+      "ticket": "50",
+      "methods": [
+        "thread/start",
+        "thread/fork",
+        "thread/read"
+      ],
+      "goal": "Demonstrate shared session grouping without inherited task/progress ownership.",
+      "output": "fork-native-identities.json"
+    },
+    {
+      "id": "native-goal-states",
+      "ticket": "54",
+      "methods": [
+        "thread/start",
+        "thread/goal/set",
+        "thread/goal/get"
+      ],
+      "goal": "Demonstrate native goal lifecycle separately from operating/task state.",
+      "output": "native-goal-state-readbacks.json",
+      "constraint": "The explicit fixture authorization lists objective/status transitions; tool/native-goal rules still apply and may refuse. No managed worker goal is mutated."
+    },
+    {
+      "id": "stop-capability",
+      "ticket": "50",
+      "creator": "Lead manually using independently admitted A50 native-probe helper, before implementing50 or reserving its first managed claim.",
+      "methods": [
+        "thread/start",
+        "turn/start",
+        "thread/read",
+        "thread/turns/list",
+        "thread/items/list",
+        "thread/goal/get",
+        "thread/queue/list"
+      ],
+      "goal": "Run one bounded authorized fixture turn/tool in isolated writable fixture output; demonstrate actual twice-observed stop coverage.",
+      "output": "stop-capability-quiescence.json",
+      "oracle": "Terminal turn and every owned tool item, absent native goal, empty native queue, actual complete process incarnation/scope coverage on two reads >=5sec apart; accepted timestamp/event precedes first managed claim.",
+      "failure": "Missing API/authority/coverage blocks50 design before product code/managed dispatch; no speculative replacement or scan-only fallback."
+    }
+  ]
+}

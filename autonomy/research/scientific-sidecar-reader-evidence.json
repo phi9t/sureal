@@ -1,0 +1,7 @@
+{
+  "status": "preparation evidence; no gate closure",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/sidecar-reader-live-a/receipt.json",
+  "receipt_sha256": "9115d663538bf8d4e65d42d619cdf3b7262bb4079fda46d1424a46c3a956a46e",
+  "rows": 20495,
+  "scope": "native-compatible sidecar reader on one retained engineering scene; reconstruction and scientific cohort processing remain open"
+}

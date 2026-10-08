@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "observed_ms": 1791164811395,
+  "inputs": {
+    "schema_version": 1,
+    "task_id": "58.B",
+    "uid": "01M44SYJ7V2HA6TH5TEG40C3VB",
+    "actor": "sureal/58-b-20261005a",
+    "landed_commit": "5a1d92283c3bc8368751a508ef705a7a4f19ebd8",
+    "review": "/data02/home/philip.yang/devx/tmp/mac58-b-exact-source-result-review-5a1d922.json",
+    "live_check": "fresh current-base CPU Insula b-refresh-live-v1 exit0;17sourcepins7models2checkpointdicts;2GiB swap0 stopped",
+    "message": "58.B normalization-state preparation independently reviewed and FFlanded/pushed5a1d922. Original404b2af retained; fresh current-source CPU Insula sevenmodels/twocheckpointdicts agrees allsubstantive fields and scopes stopped. Baseline/residual eachonepillarBNplusnineteenGN; archivedlossratios3.638/4.298 notnativegain. Zero forwards/interventions/optimizerupdates. Closes only58.B preparation;43/fullMAC50-57 andnativequality/HDFSrelease remainopen. Manual lead operation retained.",
+    "review_sha256": "9cae744af4cb8195fc00234d83a7fb36c4c75734a89220e0a0b740a6621c9d52",
+    "mode": "manual lead exactreadback plus admitted49effect retention"
+  },
+  "actual": {
+    "kata_api_version": 1,
+    "issue": {
+      "id": 425,
+      "uid": "01M44SYJ7V2HA6TH5TEG40C3VB",
+      "project_id": 15,
+      "project_uid": "01M43DVB2CMABHV3RY43PNR5BM",
+      "short_id": "c3vb",
+      "title": "Normalization-state preparation [58.B]",
+      "body": "Acceptance is pinned in sureal_definition; task labels do not prove completion.",
+      "status": "closed",
+      "closed_reason": "done",
+      "owner": "sureal/58-b-20261005a",
+      "author": "sureal/bootstrap49-20261004f",
+      "metadata": {
+        "sureal_assignment": {
+          "acceptance": "provisional58 preparation only; full42/43/50-57acceptance unchanged",
+          "ack_sha256": "c90f42d129ce5a4d7284dfe9a6669e1a82de142bd4e8ebbbf37728ef1991c911",
+          "actor": "sureal/58-b-20261005a",
+          "attempt_id": "58-b-20261005a",
+          "base": "b32307da442598e192a9259d29a8650be1134589",
+          "branch": "codex/mac58/b-20261005a",
+          "handoff": {
+            "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b/candidate.json",
+            "sha256": "f49c8dede8618d44c2cc87b457859268338c40fa677e8e64d2b89cb5ed543def"
+          },
+          "independent_review": {
+            "path": "/data02/home/philip.yang/devx/tmp/mac58-b-exact-source-result-review-5a1d922.json",
+            "sha256": "9cae744af4cb8195fc00234d83a7fb36c4c75734a89220e0a0b740a6621c9d52"
+          },
+          "landed_commit": "5a1d92283c3bc8368751a508ef705a7a4f19ebd8",
+          "native_completion": {
+            "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/worker-terminal-public-readback.json",
+            "sha256": "feaac904bb6d7e7cc6e4b07b3326d1e07f8988def21822f816a0baf24681217c"
+          },
+          "operation_mode": "manual lead-operated provisional bootstrap; MAC50runtime notaccepted",
+          "original_candidate": "404b2af870c8e3062fcd0b6b99b42c3518428e3e",
+          "output": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/worker-b",
+          "primary_thread_id": "01a109a2-1e13-7970-a00b-e97ba09f35ea",
+          "reservation_sha256": "d7708b676031ea839806b6bdc21e6c3035400b82a7aa47aa9fa5b879dbc51069",
+          "schema_version": 1,
+          "seat": "worker-b",
+          "state": "LANDED_VERIFIED_STOPPED",
+          "stop_evidence": {
+            "path": "/data02/home/philip.yang/workspace/.sureal-collab/pilot58-20261005a/lead/pilot-stop-readback-v1.json",
+            "sha256": "38e318138efb4d947dd0eacb9cf539ecac0649907a0bd512c85c623a8dab0699"
+          },
+          "task_id": "58.B",
+          "workspace": "/data02/home/philip.yang/workspace/sureal/.worktrees/mac58-b-20261005a",
+          "write_scope": "docs/research/pilots/58/normalization-inventory/"
+        },
+        "sureal_definition": {
+          "dependencies": [
+            "49"
+          ],
+          "goal": "Normalization-state preparation",
+          "plan": {
+            "blob": "5b0660c76896f7ca6d2e4a85918726eb154c72bb",
+            "path": "docs/research/2026-10-05-mac-happy-path-first.md",
+            "sha256": "e394a268223f0bc3c31a1f3ca1e4aa4ee0626a6924dd9b73687b179471a999d0"
+          },
+          "revision": "eaa88f98f2976db830466aa2c7cf8ab2ac660bb3a80ad5868f63bf79a0a497d7",
+          "schema_version": 1,
+          "source_commit": "b32307da442598e192a9259d29a8650be1134589",
+          "spec": {
+            "blob": "8522241e4ffdd89a6cae61373c6ea1a5bbb06ab6",
+            "path": "docs/research/tasks/58-mac-happy-path-perception-pilot.md",
+            "sha256": "ccafd7dc2a28a7b2f71ba96e7e1f4f459cabdcb264e6dbf624cf0f737c268497"
+          },
+          "task_id": "58.B"
+        },
+        "sureal_task": "58.B"
+      },
+      "revision": 5,
+      "created_at": "2026-10-05T01:13:16.283Z",
+      "updated_at": "2026-10-05T01:46:50.852Z",
+      "closed_at": "2026-10-05T01:46:50.852Z"
+    },
+    "comments": null,
+    "links": [
+      {
+        "id": 131,
+        "from": {
+          "uid": "01M43DWSWYSB1BKWG8396HNB7S",
+          "short_id": "nb7s",
+          "project": "sureal",
+          "qualified_id": "sureal#nb7s",
+          "status": "closed"
+        },
+        "to": {
+          "uid": "01M44SYJ7V2HA6TH5TEG40C3VB",
+          "short_id": "c3vb",
+          "project": "sureal",
+          "qualified_id": "sureal#c3vb",
+          "status": "closed"
+        },
+        "type": "blocks",
+        "author": "sureal/bootstrap49-20261004f",
+        "created_at": "2026-10-05T01:13:19.815Z"
+      }
+    ],
+    "labels": null
+  }
+}

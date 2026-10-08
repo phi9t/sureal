@@ -1,0 +1,10 @@
+{
+  "capture_pid": 4104010,
+  "recovery_pid": 4107864,
+  "queue_pid": 4073579,
+  "box_waiter_pid": 4097563,
+  "runner_sha256": "3c6f2a5da042a92f9458970b6f5fc9deb40ab97330a76a08a5c4f22bafe3d32c",
+  "inventory_sha256": "49767cc6c0d1a3d309e025ea563c4f1fa88883846d2664d76838e12de2810a80",
+  "scope": "same exact22 recovery rearmed; no payload recovered",
+  "initial_rearm_failure": "renamed waiter process identity mismatch; terminal failure retained"
+}

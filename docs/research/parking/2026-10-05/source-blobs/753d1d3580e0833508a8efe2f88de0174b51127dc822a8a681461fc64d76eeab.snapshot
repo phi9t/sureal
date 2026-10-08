@@ -1,0 +1,15 @@
+from pathlib import Path
+import hashlib,json,sys,subprocess
+code=Path('experiments/waymo-perception').resolve();sys.path.insert(0,str(code))
+from pipeline.runtime_identity import verify_rootfs
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+cache=Path.home()/'.cache/waystone/waymo-perception';old=json.loads((cache/'detector-gpu-live-a/receipt.json').read_text());lock=old['runtime_lock'];root=cache/'gpu-rootfs';verify_rootfs(root,lock['rootfs_sha256'])
+output=cache/'insula/detector-optimizer-resource-v1';output.mkdir()
+command=old['checks'][0]['command'].copy()
+command=[str(output) if x==str(cache/'detector-gpu-live-a') else '/experiment/gpu/detector-optimizer-resource-probe.py' if x=='/experiment/gpu/detector-probe.py' else x for x in command]
+pins={str(p.relative_to(code)):sha(p) for p in [code/'gpu/detector-optimizer-resource-probe.py',*sorted((code/'pipeline').glob('*.py'))]}
+for p,h in old['driver_hashes'].items():assert sha(p)==h
+run=subprocess.run(command,capture_output=True,text=True,timeout=120);log=output/'live.log';log.write_text(run.stdout+run.stderr);print(log.read_text());assert run.returncode==0
+assert all(sha(code/p)==h for p,h in pins.items())
+record={'checks':[{'command':command,'exit_code':0}],'runtime_lock':lock,'driver_hashes':old['driver_hashes'],'candidate_hashes':pins,'validation':json.loads((output/'check.json').read_text()),'artifacts':{str(p):sha(p) for p in [output/'check.json',log]},'scope':'engineering optimizer/resource fixture only; scientific optimizer updates and heldout comparisons remain open'}
+(code/'research/detector-optimizer-resource-verified.json').write_text(json.dumps(record,indent=2)+'\n')

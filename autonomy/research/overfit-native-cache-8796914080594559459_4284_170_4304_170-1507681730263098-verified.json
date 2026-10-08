@@ -1,0 +1,104 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v2",
+        "/",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/overfit-point-frames-v1/8796914080594559459_4284_170_4304_170/producer",
+        "/source",
+        "--bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/overfit-cache-audit-8796914080594559459_4284_170_4304_170-1507681730263098-v1/output",
+        "/outputs",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "HOME",
+        "/tmp/private-home",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "PYTHONNOUSERSITE",
+        "1",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--setenv",
+        "PYTHONPATH",
+        "/experiment",
+        "--chdir",
+        "/experiment",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/overfit-native-cache-v1/8796914080594559459_4284_170_4304_170/1507681730263098/input",
+        "/tmp/input",
+        "--ro-bind",
+        "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/.scratch",
+        "/tmp/workers",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/overfit-box-targets-v1/8796914080594559459_4284_170_4304_170/producer",
+        "/tmp/boxes",
+        "--ro-bind",
+        "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/overfit-native-cache-v1/8796914080594559459_4284_170_4304_170/1507681730263098/producer",
+        "/tmp/prepared",
+        "--",
+        "python",
+        "/tmp/workers/overfit-native-cache-audit.py"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "runtime_lock": {
+    "schema_version": 1,
+    "platform": "linux/amd64",
+    "image_id": "sha256:e796dd50d0067485ca3fb4d729737e33edab9bee62a6644ee97c809112bef2c0",
+    "rootfs_sha256": "aa18eaaca3c65821d1febcbafefa9d0d0a2a6dae03aa9bc55c7d9e19e769246e",
+    "requirements_sha256": "8a3f2531023537db5abc7efa54842c958ac25aa32c62f1ff0b487adaf80c9e65",
+    "dockerfile_sha256": "7de7da03d2f9f160e05ce1d8c9ed539654815885e7bc292755d1bee2d59bccc7"
+  },
+  "candidate_sha256": "c38c93b505f9a1e0f02ff23a8d3666669c1f92a79b95de04301d4ac77083c22a",
+  "receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/overfit-native-cache-v1/8796914080594559459_4284_170_4304_170/1507681730263098/receipt.json",
+  "receipt_sha256": "a195ea8e82b9422760a602283bbed20aa2694b9aeaa9459a3cace1347080cd6d",
+  "validation": {
+    "scene": "8796914080594559459_4284_170_4304_170",
+    "timestamp_micros": 1507681730263098,
+    "input_points": 184383,
+    "retained_points": 105767,
+    "positive_anchor_counts_by_class": {
+      "1": 45,
+      "2": 0,
+      "3": 13,
+      "4": 0
+    },
+    "eligible_targets": 16,
+    "uncovered_targets": 1,
+    "target_reasons": {
+      "unknown_class": 0,
+      "zero_native_points": 0,
+      "center_outside_roi": 1,
+      "eligible": 16
+    },
+    "scope": "native physical packing and all-anchor target equations independently reconciled; no optimizer/overfit or heldout quality",
+    "resources": {
+      "elapsed_seconds": 2.10081790399272,
+      "peak_rss_kib": 212652
+    }
+  },
+  "artifacts": {
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/overfit-cache-audit-8796914080594559459_4284_170_4304_170-1507681730263098-v1/output/check.json": "81c54953336a25f2e82f881c15d0e00206129818d3b6c34f98c232c1933a4ba1",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/overfit-cache-audit-8796914080594559459_4284_170_4304_170-1507681730263098-v1/output/live.log": "e1796f2b2631a65019fb843345fa1d834a76c643cccb1ec24a4af2e17570c4d9"
+  },
+  "scope": "native source/packing/all-anchor target equations independently admitted; optimization and overfit remain open"
+}

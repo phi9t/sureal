@@ -1,0 +1,171 @@
+# A50.1 independent read-only stop-capability observer
+
+This is a partial task50 preflight seam, not task50 acceptance. It observes one
+separately admitted, explicitly authorized cooperative host fixture. It cannot
+create a thread/turn/goal, queue work, interrupt tools, stop processes, release a
+claim, clean a workspace, repair source or modify Kata. The `thread/shellCommand`
+fixture is unsandboxed by native contract; its success does not establish model
+worker sandbox, common-Git or nested-Insula grants. Those proofs, isolated Kata,
+and shared writer/resource reconciliation remain prerequisites to managed work.
+
+## Invocation and authority
+
+Invoke the immutable materialized helper from the owned output parent:
+
+```
+python3 /ABS/admitted-A50/tests/collab/audit_support/runtime_probe.py \
+  --probe stop-capability --authorization /ABS/admission.json --output /ABS/new-run
+```
+
+The enclosing admitted host command must enforce the same wall-time bound and
+retain its actual argv, cwd, exit, stdout/stderr and resource receipt. The helper
+also arms its own wall deadline. Its only runtime mutations are protocol
+`initialize`/`initialized` and WebSocket Pong; application methods are restricted
+before send to six exact-thread reads. No managed launch permission follows.
+
+Every artifact reference is `{path: absolute regular nonsymlink file,
+sha256: literal SHA256}`; changed/missing bytes refuse. JSON protocol objects have
+integer `schema_version:1`, no duplicate keys or nonfinite numbers. Original
+source/review/proof artifacts are never rewritten.
+
+`RuntimeProbeAdmission` has these required fields:
+
+- `kind:"RuntimeProbeAdmission"`, `probe:"stop-capability"`.
+- `authors:{producer,auditor,reviewer}`: three distinct canonical identities.
+- `auditor:{candidate,source,materialization,review}`: exact single-parent commit,
+  source path and references. `coverage` pins the unchanged committed oracle
+  coverage. A formal `independent-auditor-source-review` must bind its candidate,
+  parent, tree, source, materialization, retention, author and reviewer; verdict
+  alone is insufficient. Fresh cold-pack reconstruction and complete filesystem
+  tree equality are independently repeated before opening the socket and source
+  union checks repeated before report publication.
+- `user_authority`: retained explicit admission record for this bounded probe.
+- `runtime:{transport:"websocket-over-owned-unix",endpoint:{path,uid,device,inode},
+  daemon:{boot_id,pid,start_ticks,executable},schemas,schema_provenance}`.
+  Actual socket type/incarnation, UID/SO_PEERCRED, daemon birth and `/proc/PID/exe`
+  are checked. Shared daemon identity never establishes worker ownership.
+- `resources:{observer_scope:{path,device,inode},deadline_ms,request_timeout_ms,
+  max_pages,max_items,max_output_bytes,output_root}`. Bounds are respectively
+  <=120000ms, <=2000ms, <=16 pages per list, <=512 total entries per snapshot,
+  <=33554432 retained bytes. The observer scope is exclusive to its own PID,
+  <=256MiB RAM, zero swap, zero observed OOM kills, named
+  `sureal-sustained-collab-*.scope`. The output parent/cwd is an owned absolute
+  nonsymlink directory; output is fresh and separate from fixture/source roots.
+- `fixture_provenance`: reference to the wrapper below.
+- `native_shell:{rendered_prefix:["/bin/bash","-lc"],executable:REF}`: exact
+  observed native public-command rendering. The regular executable reference
+  must reopen resolved `/usr/bin/bash`, matching `/bin/bash`; no alternate prefix,
+  additional wrapper argument or unpinned executable is accepted.
+- `protected_thread_ids`: at least three distinct nonempty exact native thread
+  IDs, including the invoking process's `CODEX_THREAD_ID` and lead/author/reviewer
+  conversations. The fixture exact thread must not be any of them. Session IDs
+  remain grouping metadata; neither those nor daemon PID substitute thread IDs.
+
+`schemas` contains exactly the sixteen generated v2 schema references for
+`Thread{Read,GoalGet,TurnsList,ItemsList,QueueList,BackgroundTerminalsList,Start,
+ShellCommand}{Params,Response}`. `NativeSchemaProvenance` binds the same schemas,
+executable, output_root, generation_command and version_command references.
+Literal generation argv is `EXE app-server generate-json-schema --experimental
+--out ROOT`; version argv is `EXE --version` with observed `0.160.0`. These
+retained command records reopen actual exits/stdout/stderr; they do not rerun
+generation. The experimental flag is necessary for the queue/process schemas.
+Optional absent `nextCursor` is normalized to terminal null only after reopening
+its optional/nullable native schema; observations retain
+`cursor_field_present:false`. Explicit non-null cursors are traversed completely.
+
+## NativeStopFixture wrapper and literal proofs
+
+The separately admitted lead fixture operator emits raw proofs; the lead can
+assemble this wrapper without asserting stop acceptance:
+
+```
+{schema_version:1, kind:"NativeStopFixture", fixture_id,
+ fixture_launch:REF, initial_goal:REF, payload_running:REF,
+ operator:{candidate,materialization:REF,retention:REF,review:REF},
+ workspace,output,common_git,command_sha256}
+```
+
+The operator review kind is `independent-native-fixture-source-review`, binding
+exact candidate/parent/tree/source/materialization/retention, author/reviewer,
+distinct nonempty `author_native_thread_id`/`reviewer_native_thread_id`, and
+`operator_sha256` of `tests/collab/fixture_support/native_stop_fixture.py`.
+Source is independently reconstructed from retained raw Git, not the mutable
+author checkout. Operator author equals the admission's producer identity.
+
+`fixture_launch` is the original `NativeFixtureLaunch` with creation, invocation,
+operator_authorization, payload_output and actual_git_identity. The authorization
+is `NativeFixtureLaunchAdmission` and pins the same source/review/runtime/tools,
+workspace/base/branch, workspace/common Git device+inode and fixed command hash.
+The observer reopens actual clean linked-worktree Git facts at its exact admitted
+base; it must be separate from canonical, sharing the declared canonical `.git`.
+Its actual NUL-delimited status is `git_facts.status_z_hex`, which must be empty;
+an old literal `status:""` claim cannot substitute for this real readback.
+
+Creation and invocation are literal `NativeFixtureRPC` records: kind/schema,
+method, params, response, started_ms, ended_ms, transport_incarnation. Creation
+is `thread/start` with never approval, danger-full-access, the exact three write
+roots and fixed no-goal fixture instructions, with `environments` **omitted**. The
+pinned native `ThreadStartParams.properties.environments` distinguishes omission
+(default environment when access is enabled), an empty list (access disabled)
+and a supplied nonempty list (first environment selected). This fixture permits
+only exact default omission; `[]`, null or any supplied list refuses. The first
+failed fixture with disabled environment access remains retained; this correction
+does not retry its mutation, release its ownership or authorize cleanup. Its actual
+returned thread must be fresh (`turns:[]`) with exact cwd. `initial_goal` is the
+actual ordered `thread/goal/get` response `{goal:null}` between creation/launch.
+Invocation is **one** `thread/shellCommand` with exact thread/command and
+`timeoutMs:90000`; its immediate empty result does not imply termination or
+invent a turn ID. The observer derives and freezes the sole actual fresh turn
+from complete native paginated reads and binds its command item by command SHA.
+The launch/wrapper `command_sha256` pins the submitted inner command. The native
+public command is independently rendered as
+`shlex.join(["/bin/bash","-lc",submitted_command])`; the tool item must match this
+exact rendered digest. Bare equality, fuzzy matching, changed payloads, alternate
+prefixes or trailing arguments refuse. Both literal commands, their distinct
+digests and the shell executable reference are retained in the observer report's
+`native_command_provenance`. A rendering match never substitutes for the real
+payload/process/ancestry/terminal-tool proof. Both original unsuccessful preflight
+attempts remain UNKNOWN and retained, without retry, release or cleanup authority.
+
+The command is reconstructed independently with `shlex.join`: pinned systemd-run
+`--user --scope --unit sureal-sustained-collab-ID --property MemoryMax=134217728
+--property MemorySwapMax=0 --` pinned Python `-I -B` pinned operator `payload
+--output OUTPUT/payload --fixture-id ID`.
+
+`payload_running` is original `NativeFixturePayload`: fixture_id, source ref,
+actual `{boot_id,pid,start_ticks,parent_pid,uid}` and actual scope
+`{path,device,inode,memory_max:"134217728",memory_swap_max:"0"}`. Flags such as
+`children_spawned` or `scientific_or_source_writes` are not accepted as oracles.
+The reviewed payload lasts60s and the operator keeps its foreground connection
+for95s. These fixed bounds accommodate measured source/cold verification startup
+cost while retaining the observer120s limit; they permit no general timeout widening.
+The observer independently reads actual payload argv/birth, scope members/caps
+and native launch ancestry, stopping before the pinned shared daemon. Missing
+parent/process coverage refuses; it never enrolls the daemon as an owned tool.
+The native launch parent may lie outside the payload scope. A native null PID or
+absent PTY handle is legitimate only with exact executed command item and this
+corroborated command-written process/ancestry/scope evidence.
+
+## Stop proof, privacy and disposition
+
+First retain a nonempty in-progress native turn+single userShell command with
+actual running payload/process witness. Empty history/schema/scan cannot pass.
+Then retain two consistent observations at least5s apart: exact thread idle,
+all actual turns terminal, all command items terminal with actual exit codes,
+goal absent, complete submission queue empty, all native background handles
+empty, original known process births gone, scoped membership empty and no
+unexplained writer to workspace/output/common Git. Scan gaps refuse. If the
+original scope disappears, retain its actual absence, not invented current
+inode/caps. Unexpected turns/tools/history, active goal, incomplete pages,
+changed source/runtime or missing facts remain explicit UNKNOWN.
+
+Only public allowlisted metadata is retained: IDs, statuses, cwd, process handles,
+exit codes and command digest. Private reasoning/message/tool output, credentials,
+unrelated notifications and unrelated session bodies are discarded. Kernel scans
+retain only relevant scoped path/FD hits and coverage gaps, not unrelated data.
+
+`report.json` kind `IndependentNativeStopPreflight` returns exit0 only for
+`status:"pass",stop_capability:true`; exit3 is UNKNOWN. Every result explicitly
+sets `task50_accepted:false` and `managed_dispatch_accepted:false`. Failures grant
+neither ownership release nor cleanup. Retain all original witnesses, command
+records and failures. Live proof and independent audit still follow source review.

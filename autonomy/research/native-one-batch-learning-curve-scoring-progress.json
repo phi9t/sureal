@@ -1,0 +1,336 @@
+{
+  "expected_checkpoints": 11,
+  "scored_checkpoints": 11,
+  "curve": [
+    {
+      "step": 0,
+      "cumulative_train_seconds": 0.0,
+      "evaluation_losses": [
+        {
+          "classification": 5950.1650390625,
+          "localization": 2.1403348445892334,
+          "direction": 0.7410449385643005,
+          "total": 5954.59423828125
+        }
+      ],
+      "LEVEL2_per_class": {
+        "1": {
+          "AP": 0.0,
+          "APH": 0.0
+        },
+        "2": {
+          "AP": 0.0,
+          "APH": 0.0
+        },
+        "3": {
+          "AP": 0.0,
+          "APH": 0.0
+        }
+      },
+      "mean_populated_class_APH": 0.0,
+      "mean_gate_passed": false,
+      "populated_class_gate_passed": false,
+      "minimum_populated_class_APH": 0.0
+    },
+    {
+      "step": 25,
+      "cumulative_train_seconds": 1.7947806931333616,
+      "evaluation_losses": [
+        {
+          "classification": 5770.68212890625,
+          "localization": 1.5220259428024292,
+          "direction": 0.6914917230606079,
+          "total": 5773.8642578125
+        }
+      ],
+      "LEVEL2_per_class": {
+        "1": {
+          "AP": 0.0,
+          "APH": 0.0
+        },
+        "2": {
+          "AP": 0.0,
+          "APH": 0.0
+        },
+        "3": {
+          "AP": 0.0,
+          "APH": 0.0
+        }
+      },
+      "mean_populated_class_APH": 0.0,
+      "mean_gate_passed": false,
+      "populated_class_gate_passed": false,
+      "minimum_populated_class_APH": 0.0
+    },
+    {
+      "step": 50,
+      "cumulative_train_seconds": 3.2929181038052775,
+      "evaluation_losses": [
+        {
+          "classification": 5226.650390625,
+          "localization": 1.4876198768615723,
+          "direction": 0.6803126335144043,
+          "total": 5229.76171875
+        }
+      ],
+      "LEVEL2_per_class": {
+        "1": {
+          "AP": 0.0,
+          "APH": 0.0
+        },
+        "2": {
+          "AP": 0.0,
+          "APH": 0.0
+        },
+        "3": {
+          "AP": 0.0,
+          "APH": 0.0
+        }
+      },
+      "mean_populated_class_APH": 0.0,
+      "mean_gate_passed": false,
+      "populated_class_gate_passed": false,
+      "minimum_populated_class_APH": 0.0
+    },
+    {
+      "step": 100,
+      "cumulative_train_seconds": 7.448721727763768,
+      "evaluation_losses": [
+        {
+          "classification": 2971.0654296875,
+          "localization": 1.3880573511123657,
+          "direction": 0.6404292583465576,
+          "total": 2973.9697265625
+        }
+      ],
+      "LEVEL2_per_class": {
+        "1": {
+          "AP": 0.0,
+          "APH": 0.0
+        },
+        "2": {
+          "AP": 0.0,
+          "APH": 0.0
+        },
+        "3": {
+          "AP": 0.0,
+          "APH": 0.0
+        }
+      },
+      "mean_populated_class_APH": 0.0,
+      "mean_gate_passed": false,
+      "populated_class_gate_passed": false,
+      "minimum_populated_class_APH": 0.0
+    },
+    {
+      "step": 200,
+      "cumulative_train_seconds": 16.465641107875854,
+      "evaluation_losses": [
+        {
+          "classification": 97.46642303466797,
+          "localization": 1.2900909185409546,
+          "direction": 0.4619590938091278,
+          "total": 100.13899993896484
+        }
+      ],
+      "LEVEL2_per_class": {
+        "1": {
+          "AP": 0.0,
+          "APH": 0.0
+        },
+        "2": {
+          "AP": 0.0,
+          "APH": 0.0
+        },
+        "3": {
+          "AP": 0.0,
+          "APH": 0.0
+        }
+      },
+      "mean_populated_class_APH": 0.0,
+      "mean_gate_passed": false,
+      "populated_class_gate_passed": false,
+      "minimum_populated_class_APH": 0.0
+    },
+    {
+      "step": 300,
+      "cumulative_train_seconds": 22.54192353686085,
+      "evaluation_losses": [
+        {
+          "classification": 2.963606595993042,
+          "localization": 1.1256130933761597,
+          "direction": 0.37545645236968994,
+          "total": 5.289924144744873
+        }
+      ],
+      "LEVEL2_per_class": {
+        "1": {
+          "AP": 0.0,
+          "APH": 0.0
+        },
+        "2": {
+          "AP": 0.0,
+          "APH": 0.0
+        },
+        "3": {
+          "AP": 0.0,
+          "APH": 0.0
+        }
+      },
+      "mean_populated_class_APH": 0.0,
+      "mean_gate_passed": false,
+      "populated_class_gate_passed": false,
+      "minimum_populated_class_APH": 0.0
+    },
+    {
+      "step": 500,
+      "cumulative_train_seconds": 38.00575275591109,
+      "evaluation_losses": [
+        {
+          "classification": 0.3448605537414551,
+          "localization": 0.5102525949478149,
+          "direction": 0.03847481682896614,
+          "total": 1.373060703277588
+        }
+      ],
+      "LEVEL2_per_class": {
+        "1": {
+          "AP": 0.0,
+          "APH": 0.0
+        },
+        "2": {
+          "AP": 0.333333,
+          "APH": 0.309299
+        },
+        "3": {
+          "AP": 0.0,
+          "APH": 0.0
+        }
+      },
+      "mean_populated_class_APH": 0.10309966666666666,
+      "mean_gate_passed": false,
+      "populated_class_gate_passed": false,
+      "minimum_populated_class_APH": 0.0
+    },
+    {
+      "step": 750,
+      "cumulative_train_seconds": 53.71825398952933,
+      "evaluation_losses": [
+        {
+          "classification": 0.029319657012820244,
+          "localization": 0.038240037858486176,
+          "direction": 0.0013629583409056067,
+          "total": 0.1060723289847374
+        }
+      ],
+      "LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.997262
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.981423
+        },
+        "3": {
+          "AP": 0.449659,
+          "APH": 0.27108
+        }
+      },
+      "mean_populated_class_APH": 0.7499216666666667,
+      "mean_gate_passed": false,
+      "populated_class_gate_passed": false,
+      "minimum_populated_class_APH": 0.27108
+    },
+    {
+      "step": 1000,
+      "cumulative_train_seconds": 72.92246173642343,
+      "evaluation_losses": [
+        {
+          "classification": 0.015634868294000626,
+          "localization": 0.006099728401750326,
+          "direction": 0.0005983867449685931,
+          "total": 0.02795400284230709
+        }
+      ],
+      "LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.997944
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.995068
+        },
+        "3": {
+          "AP": 0.57017,
+          "APH": 0.395675
+        }
+      },
+      "mean_populated_class_APH": 0.796229,
+      "mean_gate_passed": false,
+      "populated_class_gate_passed": false,
+      "minimum_populated_class_APH": 0.395675
+    },
+    {
+      "step": 1500,
+      "cumulative_train_seconds": 107.30235505336896,
+      "evaluation_losses": [
+        {
+          "classification": 0.007880954071879387,
+          "localization": 0.015547973103821278,
+          "direction": 0.00032861882937140763,
+          "total": 0.039042625576257706
+        }
+      ],
+      "LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.998832
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.986211
+        },
+        "3": {
+          "AP": 0.727273,
+          "APH": 0.538453
+        }
+      },
+      "mean_populated_class_APH": 0.8411653333333332,
+      "mean_gate_passed": true,
+      "populated_class_gate_passed": false,
+      "minimum_populated_class_APH": 0.538453
+    },
+    {
+      "step": 2000,
+      "cumulative_train_seconds": 146.44826879474567,
+      "evaluation_losses": [
+        {
+          "classification": 0.004672369919717312,
+          "localization": 0.026704320684075356,
+          "direction": 0.00030978251015767455,
+          "total": 0.05814296752214432
+        }
+      ],
+      "LEVEL2_per_class": {
+        "1": {
+          "AP": 1.0,
+          "APH": 0.998079
+        },
+        "2": {
+          "AP": 1.0,
+          "APH": 0.988051
+        },
+        "3": {
+          "AP": 0.284091,
+          "APH": 0.226459
+        }
+      },
+      "mean_populated_class_APH": 0.7375296666666666,
+      "mean_gate_passed": false,
+      "populated_class_gate_passed": false,
+      "minimum_populated_class_APH": 0.226459
+    }
+  ]
+}

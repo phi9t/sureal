@@ -1,0 +1,143 @@
+"""Literal runtime/proc controls; component fixtures are never live admission."""
+import copy
+import importlib
+import unittest
+
+
+class StopProbeTests(unittest.TestCase):
+    def setUp(self):
+        try:self.probe=importlib.import_module('audit_support.runtime_probe')
+        except ModuleNotFoundError:self.fail('Independent stop-capability observer is missing')
+        self.fixture={'thread_id':'fixture-thread','turn_ids':['fixture-turn'],'workspace':'/owned/worktree',
+                      'command_sha256':'1'*64,'tool_scope':{'path':'/owned/cgroup','device':5,'inode':7}}
+        self.identity={'boot_id':'boot','pid':123,'start_ticks':456}
+        self.running=self.observation(1000000000,False)
+        self.first=self.observation(2000000000,True)
+        self.second=self.observation(7000000000,True)
+
+    def observation(self,stamp,stopped):
+        def call(method,response,**params):
+            return {'method':method,'params':{'threadId':'fixture-thread',**params},'response':response}
+        item={'id':'fixture-command','type':'commandExecution','status':'completed' if stopped else 'inProgress',
+              'command_sha256':'1'*64,'cwd':'/owned/worktree','processId':'native-handle',
+              'exitCode':0 if stopped else None,'source':'userShell'}
+        return {'schema_version':1,'monotonic_ns':stamp,'records':[
+            call('thread/read',{'thread':{'id':'fixture-thread','sessionId':'shared-session',
+                  'cwd':'/owned/worktree','status':{'type':'idle' if stopped else 'active'}}},includeTurns=False),
+            call('thread/goal/get',{'goal':None}),
+            call('thread/turns/list',{'data':[{'id':'fixture-turn','status':'completed' if stopped else 'inProgress'}],
+                  'nextCursor':None},cursor=None,limit=100,sortDirection='asc',itemsView='notLoaded'),
+            call('thread/items/list',{'data':[{'turnId':'fixture-turn','item':item}], 'nextCursor':None},
+                  cursor=None,limit=100,sortDirection='asc'),
+            call('thread/queue/list',{'data':[],'nextCursor':None},cursor=None,limit=100),
+            call('thread/backgroundTerminals/list',{'data':[] if stopped else [{
+                  'itemId':'fixture-command','processId':'native-handle','osPid':123,'cwd':'/owned/worktree'}],
+                  'nextCursor':None},cursor=None,limit=100)],
+            'kernel':{'tool_scope':{'path':'/owned/cgroup','device':5,'inode':7,
+                        'memory_max':268435456,'swap_max':0,'oom_kill':0,'members':[] if stopped else [123]},
+                'owned_incarnations':[] if stopped else [self.identity],
+                'known_incarnations':[self.identity],
+                'scope_incarnations':[] if stopped else [self.identity],
+                'writer_hits':[],'scan_errors':[]}}
+
+    def check(self):return self.probe.check_stop_evidence(self.fixture,self.running,[self.first,self.second])
+
+    def test_nonempty_actual_running_witness_and_two_stopped_observations_are_required(self):
+        self.assertEqual(self.check()['thread_id'],'fixture-thread')
+
+    def test_shared_session_or_pid_cannot_substitute_exact_thread(self):
+        self.first['records'][0]['response']['thread']['id']='other-thread'
+        with self.assertRaises(ValueError):self.check()
+
+    def test_two_samples_less_than_five_seconds_apart_are_refused(self):
+        self.second['monotonic_ns']=6999999999
+        with self.assertRaises(ValueError):self.check()
+
+    def test_native_goal_queue_tool_and_background_process_hold_stop(self):
+        for index,payload in [(1,{'goal':{'status':'active'}}),
+            (4,{'data':[{'id':'queued'}],'nextCursor':None}),
+            (5,{'data':[{'processId':'still-running'}],'nextCursor':None})]:
+            before=copy.deepcopy(self.first)
+            self.first['records'][index]['response']=payload
+            with self.assertRaises(ValueError):self.check()
+            self.first=before
+        self.first['records'][3]['response']['data'][0]['item']['status']='inProgress'
+        with self.assertRaises(ValueError):self.check()
+
+    def test_empty_or_unexecuted_witness_never_proves_process_coverage(self):
+        for field,empty in [('records',[]),('kernel',{})]:
+            before=copy.deepcopy(self.running);self.running[field]=empty
+            with self.assertRaises(ValueError):self.check()
+            self.running=before
+        self.running['kernel']['scope_incarnations']=[]
+        with self.assertRaises(ValueError):self.check()
+
+    def test_missing_api_or_incomplete_cursor_and_wrong_request_binding_refuse(self):
+        for mutation in ['missing','cursor','thread']:
+            before=copy.deepcopy(self.first)
+            if mutation=='missing':self.first['records'].pop()
+            elif mutation=='cursor':self.first['records'][3]['response']['nextCursor']='unread-page'
+            else:self.first['records'][3]['params']['threadId']='other-thread'
+            with self.assertRaises(ValueError):self.check()
+            self.first=before
+
+    def test_unknown_item_or_terminal_command_without_exit_refuses(self):
+        item=self.first['records'][3]['response']['data'][0]['item']
+        item['type']='dynamicToolCall'
+        with self.assertRaises(ValueError):self.check()
+        item['type']='commandExecution';item['exitCode']=None
+        with self.assertRaises(ValueError):self.check()
+
+    def test_alive_process_unknown_writer_missing_scan_and_changed_scope_refuse(self):
+        for key,bad in [('owned_incarnations',[self.identity]),('writer_hits',[{'pid':999}]),
+                        ('scan_errors',['permission-denied']),('known_incarnations',[])]:
+            before=copy.deepcopy(self.first);self.first['kernel'][key]=bad
+            with self.assertRaises(ValueError):self.check()
+            self.first=before
+        self.first['kernel']['tool_scope']['inode']=8
+        with self.assertRaises(ValueError):self.check()
+
+    def test_absent_native_os_pid_requires_independent_corroborated_kernel_identity(self):
+        self.running['records'][5]['response']['data'][0]['osPid']=None
+        self.running['kernel']['command_written_incarnations']=[self.identity]
+        self.assertEqual(self.check()['thread_id'],'fixture-thread')
+        del self.running['kernel']['command_written_incarnations']
+        with self.assertRaises(ValueError):self.check()
+
+    def test_private_reasoning_and_message_text_are_never_retained(self):
+        value={'data':[{'turnId':'t','item':{'id':'r','type':'reasoning','content':['private'],
+            'summary':['private-summary']}},{'turnId':'t','item':{'id':'m','type':'agentMessage','text':'secret'}}],
+            'nextCursor':None}
+        projected=self.probe.public_response('thread/items/list',value)
+        self.assertEqual(projected,{'data':[{'turnId':'t','item':{'id':'r','type':'reasoning'}},
+            {'turnId':'t','item':{'id':'m','type':'agentMessage'}}],'nextCursor':None})
+
+    def test_mutation_methods_and_other_thread_reads_refuse_before_transport(self):
+        for method,params in [('turn/start',{'threadId':'fixture-thread'}),
+            ('thread/goal/set',{'threadId':'fixture-thread'}),
+            ('thread/read',{'threadId':'other-thread'})]:
+            with self.assertRaises(ValueError):self.probe.validate_read_request(method,params,'fixture-thread')
+
+    def test_shell_command_without_native_pid_can_use_real_command_written_payload_witness(self):
+        self.running['records'][5]['response']['data']=[]
+        self.running['records'][3]['response']['data'][0]['item']['processId']=None
+        self.first['records'][3]['response']['data'][0]['item']['processId']=None
+        self.second['records'][3]['response']['data'][0]['item']['processId']=None
+        self.running['kernel']['command_written_incarnations']=[self.identity]
+        self.assertEqual(self.check()['tool_item_ids'],['fixture-command'])
+
+    def test_disappeared_scope_is_distinct_from_changed_scope_and_keeps_birth_coverage(self):
+        for sample in [self.first,self.second]:
+            sample['kernel']['tool_scope']={'path':'/owned/cgroup','exists':False,'members':[]}
+        self.assertEqual(self.check()['thread_id'],'fixture-thread')
+        self.first['kernel']['tool_scope']['members']=[123]
+        with self.assertRaises(ValueError):self.check()
+
+    def test_optional_absent_native_cursor_is_preserved_and_terminal(self):
+        projected=self.probe.public_response('thread/items/list',{'data':[]})
+        self.assertEqual(projected,{'data':[],'nextCursor':None,'cursor_field_present':False})
+        with self.assertRaises(ValueError):
+            self.probe.public_response('thread/items/list',{'data':[],'nextCursor':4})
+
+
+if __name__=='__main__':unittest.main()
