@@ -39,14 +39,19 @@ class BlobStoreCoreTests(unittest.TestCase):
             with self.assertRaises(Corrupt):
                 store.put("runs/readback/run-20261008/output/blob.bin", source)
 
-    def test_unexpected_adapter_errors_retry_and_hide_backend_text(self):
+    def test_unexpected_adapter_errors_are_not_retried_and_chain_the_cause(self):
         class ExplodingAdapter:
+            def __init__(self):
+                self.calls = 0
+
             def _blob_exists(self, key, context):
+                self.calls += 1
                 raise RuntimeError("backend exit code 13: secret stderr")
 
         clock = ManualClock()
+        adapter = ExplodingAdapter()
         store = BlobStore(
-            ExplodingAdapter(),
+            adapter,
             backoff_seconds=(0.1, 0.2),
             clock=clock.time,
             sleep=clock.sleep,
@@ -56,7 +61,9 @@ class BlobStoreCoreTests(unittest.TestCase):
             store.exists("runs/wrapped/run-20261008/output/blob.bin")
 
         self.assertNotIn("secret stderr", str(caught.exception))
-        self.assertEqual(clock.sleeps, [0.1, 0.2])
+        self.assertIsInstance(caught.exception.__cause__, RuntimeError)
+        self.assertEqual(adapter.calls, 1)
+        self.assertEqual(clock.sleeps, [])
 
 
 if __name__ == "__main__":

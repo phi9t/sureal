@@ -155,6 +155,27 @@ class BlobStoreContractTests(unittest.TestCase):
                     with self.assertRaises(api["Missing"]):
                         store.get(key, root / name / "missing.bin", "0" * 64)
 
+    def test_source_and_destination_under_symlinked_caller_directories_succeed(self):
+        api = self.api()
+        with tempfile.TemporaryDirectory() as directory, self.store_cases(api) as stores:
+            root = Path(directory)
+            real_caller = root / "real-caller"
+            real_caller.mkdir()
+            caller = root / "caller-link"
+            caller.symlink_to(real_caller, target_is_directory=True)
+            source = self.write_file(caller, "source.bin", b"symlinked caller bytes")
+            expected_sha = hashlib.sha256(b"symlinked caller bytes").hexdigest()
+            key = "runs/symlinked-caller/run-20261008/output/blob.bin"
+
+            for name, store in stores:
+                with self.subTest(adapter=name):
+                    result = store.put(key, source)
+                    destination = caller / name / "dest.bin"
+                    store.get(key, destination, expected_sha)
+
+                    self.assertEqual(result["sha256"], expected_sha)
+                    self.assertEqual(destination.read_bytes(), b"symlinked caller bytes")
+
     def test_exists_reports_true_only_after_put(self):
         api = self.api()
         with tempfile.TemporaryDirectory() as directory, self.store_cases(api) as stores:
@@ -279,7 +300,10 @@ class BlobStoreContractTests(unittest.TestCase):
         api = self.api()
         clock = ManualClock()
         store = api["BlobStore"](
-            api["InMemoryBlobAdapter"](unauthenticated=True),
+            api["InMemoryBlobAdapter"](
+                unauthenticated=True,
+                authentication_action="run fixture-blob-auth-refresh",
+            ),
             backoff_seconds=(0.1, 0.2),
             clock=clock.time,
             sleep=clock.sleep,
@@ -288,7 +312,8 @@ class BlobStoreContractTests(unittest.TestCase):
         with self.assertRaises(api["Unauthenticated"]) as caught:
             store.exists("runs/auth/run-20261008/output/blob.bin")
 
-        self.assertIn("autonomy/resources/refresh-hdfs-auth.sh", str(caught.exception))
+        self.assertIn("run fixture-blob-auth-refresh", str(caught.exception))
+        self.assertIsNotNone(caught.exception.__cause__)
         self.assertEqual(clock.sleeps, [])
 
 if __name__ == "__main__":

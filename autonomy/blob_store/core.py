@@ -1,7 +1,5 @@
 """Backend-neutral, write-once storage for evidence blobs."""
 
-import ctypes
-import errno
 import hashlib
 import os
 import re
@@ -10,22 +8,15 @@ import tempfile
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Mapping
+from typing import Callable, Mapping, Protocol
 
 
-CREDENTIAL_REFRESH_SCRIPT = "autonomy/resources/refresh-hdfs-auth.sh"
 MAX_ATTEMPTS = 3
 DEFAULT_DEADLINE_BASE_SECONDS = 5.0
 DEFAULT_MINIMUM_THROUGHPUT_BYTES_PER_SECOND = 1024 * 1024
 DEFAULT_BACKOFF_SECONDS = (0.25, 1.0)
 HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 BLOB_KEY_SEGMENT = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._=-]*$")
-AT_FDCWD = -100
-RENAME_NOREPLACE = 1
-RENAMEAT2_SYSCALLS = {
-    "x86_64": 316,
-    "aarch64": 276,
-}
 
 
 class BlobStoreError(RuntimeError):
@@ -102,10 +93,24 @@ class _OperationContext:
         self.check_deadline()
 
 
+class _BlobAdapter(Protocol):
+    """Primitive adapter seam beneath the three-operation blob store.
+
+    Adapters whose primitives can block must enforce ``context.deadline_at``
+    themselves; ticket 02's Waystone adapter will pass it as a subprocess
+    timeout and kill the process group on expiry.
+    """
+
+    def _upload_blob(self, key: str, source: Path, context: _OperationContext) -> None: ...
+    def _download_blob(self, key: str, destination: Path, context: _OperationContext) -> None: ...
+    def _blob_size(self, key: str, context: _OperationContext) -> int: ...
+    def _blob_exists(self, key: str, context: _OperationContext) -> bool: ...
+
+
 class BlobStore:
     def __init__(
         self,
-        adapter,
+        adapter: _BlobAdapter,
         *,
         deadline_base_seconds: float = DEFAULT_DEADLINE_BASE_SECONDS,
         minimum_throughput_bytes_per_second: float = DEFAULT_MINIMUM_THROUGHPUT_BYTES_PER_SECOND,
@@ -134,14 +139,14 @@ class BlobStore:
         source_sha256, source_bytes = _file_sha256_and_size(source)
 
         def attempt():
-            existing = False
+            existing_error = None
             try:
                 self._call_primitive(
                     source_bytes,
                     lambda context: self._adapter._upload_blob(key, source, context),
                 )
-            except _PrimitiveConflict:
-                existing = True
+            except _PrimitiveConflict as error:
+                existing_error = error
 
             with tempfile.TemporaryDirectory(prefix="blob-store-readback.") as directory:
                 readback = Path(directory) / "blob"
@@ -155,8 +160,8 @@ class BlobStore:
                 readback_sha256, readback_bytes = _file_sha256_and_size(readback)
 
             if readback_sha256 != source_sha256 or readback_bytes != source_bytes:
-                if existing:
-                    raise Conflict("blob key already holds different bytes: " + key)
+                if existing_error is not None:
+                    raise Conflict("blob key already holds different bytes: " + key) from existing_error
                 raise _PrimitiveCorrupt("blob readback digest mismatch")
             return {"key": key, "sha256": source_sha256, "bytes": source_bytes}
 
@@ -227,19 +232,17 @@ class BlobStore:
                 return operation()
             except BlobStoreError:
                 raise
-            except _PrimitiveMissing:
-                raise Missing("blob missing: " + key) from None
-            except _PrimitiveConflict:
-                raise Conflict("blob key already exists: " + key) from None
-            except _PrimitiveCorrupt:
-                raise Corrupt("blob bytes failed verification: " + key) from None
-            except _PrimitiveUnauthenticated:
+            except _PrimitiveMissing as error:
+                raise Missing("blob missing: " + key) from error
+            except _PrimitiveConflict as error:
+                raise Conflict("blob key already exists: " + key) from error
+            except _PrimitiveCorrupt as error:
+                raise Corrupt("blob bytes failed verification: " + key) from error
+            except _PrimitiveUnauthenticated as error:
                 raise Unauthenticated(
-                    "blob store authentication failed; run "
-                    + CREDENTIAL_REFRESH_SCRIPT
-                    + " to refresh credentials"
-                ) from None
-            except (_PrimitiveTransient, TimeoutError, OSError, Exception):
+                    "blob store authentication failed; " + self._authentication_action()
+                ) from error
+            except (_PrimitiveTransient, TimeoutError, OSError) as error:
                 if attempt == self._max_attempts:
                     raise Unavailable(
                         "blob store "
@@ -247,9 +250,19 @@ class BlobStore:
                         + " unavailable after "
                         + str(self._max_attempts)
                         + " attempts"
-                    ) from None
+                    ) from error
                 self._sleep(self._backoff_for_attempt(attempt))
-        raise Unavailable("blob store " + operation_name + " unavailable") from None
+            except Exception as error:
+                raise Unavailable("blob store " + operation_name + " unavailable") from error
+        raise Unavailable("blob store " + operation_name + " unavailable")
+
+    def _authentication_action(self) -> str:
+        action = getattr(self._adapter, "authentication_action", None)
+        if callable(action):
+            action = action()
+        if isinstance(action, str) and action.strip():
+            return action.strip()
+        return "refresh blob store credentials"
 
     def _backoff_for_attempt(self, attempt: int) -> float:
         if not self._backoff_seconds:
@@ -266,11 +279,13 @@ class InMemoryBlobAdapter:
         delay_seconds: float = 0.0,
         transient_failures: int = 0,
         unauthenticated: bool = False,
+        authentication_action: str = "refresh in-memory blob store credentials",
     ):
         self._blobs = {validate_blob_key(key): bytes(value) for key, value in (blobs or {}).items()}
         self._delay_seconds = float(delay_seconds)
         self._transient_failures = int(transient_failures)
         self._unauthenticated = bool(unauthenticated)
+        self.authentication_action = authentication_action
 
     def _upload_blob(self, key: str, source: Path, context: _OperationContext) -> None:
         self._before_operation(context)
@@ -329,7 +344,8 @@ class LocalFileBlobAdapter:
                     shutil.copyfileobj(input_file, output)
             context.check_deadline()
             self._reject_symlink_ancestry(path.parent)
-            _rename_no_replace(temporary, path)
+            _link_no_replace(temporary, path)
+            temporary.unlink()
             temporary = None
             context.check_deadline()
         except FileExistsError as error:
@@ -405,7 +421,7 @@ class LocalFileBlobAdapter:
             context.check_deadline()
 
     def _reject_symlink_ancestry(self, path: Path) -> None:
-        for candidate in _path_ancestry(path):
+        for candidate in _path_ancestry(self.root, path):
             if candidate.is_symlink():
                 raise _PrimitiveUnavailable("local blob path uses a symlink")
 
@@ -431,7 +447,7 @@ def _require_sha256(value: str) -> str:
 
 def _require_regular_file(path) -> Path:
     candidate = Path(path)
-    if not candidate.is_file() or any(item.is_symlink() for item in [candidate, *candidate.parents]):
+    if not candidate.is_file() or candidate.is_symlink():
         raise ValueError("regular non-symlinked file required: " + str(candidate))
     return candidate
 
@@ -449,53 +465,23 @@ def _file_sha256_and_size(path: Path) -> tuple[str, int]:
     return digest.hexdigest(), size
 
 
-def _path_ancestry(path: Path) -> list[Path]:
-    absolute = path.absolute()
-    return [*reversed(absolute.parents), absolute]
-
-
-def _renameat2_syscall_number() -> int:
-    machine = os.uname().machine
+def _path_ancestry(root: Path, path: Path) -> list[Path]:
+    root_absolute = root.absolute()
+    path_absolute = path.absolute()
     try:
-        return RENAMEAT2_SYSCALLS[machine]
-    except KeyError as error:
-        raise OSError(errno.ENOSYS, "renameat2 syscall number unknown for " + machine) from error
+        relative = path_absolute.relative_to(root_absolute)
+    except ValueError as error:
+        raise _PrimitiveUnavailable("local blob path escapes root") from error
+    current = root_absolute
+    ancestry = [current]
+    for segment in relative.parts:
+        current = current / segment
+        ancestry.append(current)
+    return ancestry
 
 
-def _rename_no_replace(source: Path, destination: Path) -> None:
-    libc = ctypes.CDLL(None, use_errno=True)
-    source_bytes = os.fsencode(source)
-    destination_bytes = os.fsencode(destination)
+def _link_no_replace(source: Path, destination: Path) -> None:
     try:
-        renameat2 = libc.renameat2
-    except AttributeError:
-        result = libc.syscall(
-            _renameat2_syscall_number(),
-            AT_FDCWD,
-            ctypes.c_char_p(source_bytes),
-            AT_FDCWD,
-            ctypes.c_char_p(destination_bytes),
-            RENAME_NOREPLACE,
-        )
-    else:
-        renameat2.argtypes = [
-            ctypes.c_int,
-            ctypes.c_char_p,
-            ctypes.c_int,
-            ctypes.c_char_p,
-            ctypes.c_uint,
-        ]
-        renameat2.restype = ctypes.c_int
-        result = renameat2(
-            AT_FDCWD,
-            ctypes.c_char_p(source_bytes),
-            AT_FDCWD,
-            ctypes.c_char_p(destination_bytes),
-            RENAME_NOREPLACE,
-        )
-    if result == 0:
-        return
-    found = ctypes.get_errno()
-    if found == errno.EEXIST:
-        raise FileExistsError("blob destination already exists: " + str(destination))
-    raise OSError(found, os.strerror(found), str(destination))
+        os.link(source, destination)
+    except FileExistsError as error:
+        raise FileExistsError("blob destination already exists: " + str(destination)) from error
