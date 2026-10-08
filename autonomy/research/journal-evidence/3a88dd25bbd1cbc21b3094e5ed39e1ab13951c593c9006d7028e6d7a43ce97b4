@@ -1,0 +1,472 @@
+{
+  "cap_bytes": 17179869184,
+  "command": [
+    "systemd-run",
+    "--user",
+    "--scope",
+    "--unit=sureal-sustained-t27f20261008T081353Z",
+    "-p",
+    "MemoryMax=17179869184",
+    "-p",
+    "MemorySwapMax=0",
+    "-p",
+    "MemoryAccounting=yes",
+    "env",
+    "HADOOP_CONF_DIR=/opt/tiger/yarn_deploy/hadoop/conf",
+    "PYTHONPATH=autonomy",
+    "python3",
+    "-m",
+    "training_execution.run_sustained",
+    "--run-id",
+    "t27f20261008T081353Z",
+    "--admission-only"
+  ],
+  "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f4-live-admission",
+  "end_utc": "2026-10-08T09:39:52.621502Z",
+  "exit_code": 0,
+  "foreign_gpu1_processes_seen": [
+    {
+      "first_seen_utc": "2026-10-08T08:36:49.787698Z",
+      "last_seen_utc": "2026-10-08T08:37:19.969941Z",
+      "owner": {
+        "uid": 1030,
+        "user": "ziqi.yin"
+      },
+      "pid": "2828287",
+      "process_name": "/data01/home/ziqi.yin/compact-opt-20260922/patches/pr40764-checktrim/e2e-envs/sglang-5c18780c/bin/python",
+      "samples": 2,
+      "used_gpu_memory_mib_values": [
+        "612",
+        "786"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T08:38:20.412753Z",
+      "last_seen_utc": "2026-10-08T08:39:20.905253Z",
+      "owner": {
+        "uid": 0,
+        "user": "root"
+      },
+      "pid": "2858210",
+      "process_name": "/data01/home/ziqi.yin/vllm-split-20261006/.venv/bin/python",
+      "samples": 3,
+      "used_gpu_memory_mib_values": [
+        "612",
+        "612",
+        "2710"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T08:39:51.679224Z",
+      "last_seen_utc": "2026-10-08T08:39:51.679224Z",
+      "owner": {
+        "uid": 0,
+        "user": "root"
+      },
+      "pid": "2897643",
+      "process_name": "/home/tiger/Automodel/.venv/bin/python3",
+      "samples": 1,
+      "used_gpu_memory_mib_values": [
+        "1554"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T08:41:22.352330Z",
+      "last_seen_utc": "2026-10-08T08:41:22.352330Z",
+      "owner": {
+        "uid": 0,
+        "user": "root"
+      },
+      "pid": "2923178",
+      "process_name": "/home/tiger/Automodel/.venv/bin/python3",
+      "samples": 1,
+      "used_gpu_memory_mib_values": [
+        "117840"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T08:42:52.900288Z",
+      "last_seen_utc": "2026-10-08T08:44:53.703565Z",
+      "owner": {
+        "uid": 1030,
+        "user": "ziqi.yin"
+      },
+      "pid": "2953186",
+      "process_name": "/data01/home/ziqi.yin/compact-opt-20260922/patches/pr40764-checktrim/e2e-envs/sglang-5c18780c/bin/python",
+      "samples": 5,
+      "used_gpu_memory_mib_values": [
+        "18372",
+        "18372",
+        "18372",
+        "25786",
+        "20200"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T08:42:52.900288Z",
+      "last_seen_utc": "2026-10-08T08:43:23.106989Z",
+      "owner": {
+        "uid": 0,
+        "user": "root"
+      },
+      "pid": "2954348",
+      "process_name": "/data01/home/ziqi.yin/vllm-split-20261006/.venv/bin/python",
+      "samples": 2,
+      "used_gpu_memory_mib_values": [
+        "612",
+        "612"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T08:45:54.067822Z",
+      "last_seen_utc": "2026-10-08T08:47:24.678402Z",
+      "owner": {
+        "uid": 1030,
+        "user": "ziqi.yin"
+      },
+      "pid": "2991929",
+      "process_name": "/data01/home/ziqi.yin/compact-opt-20260922/patches/pr40764-checktrim/e2e-envs/sglang-5c18780c/bin/python",
+      "samples": 4,
+      "used_gpu_memory_mib_values": [
+        "18372",
+        "18372",
+        "18372",
+        "20200"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T08:49:55.798973Z",
+      "last_seen_utc": "2026-10-08T08:50:25.980967Z",
+      "owner": {
+        "uid": 1030,
+        "user": "ziqi.yin"
+      },
+      "pid": "3038851",
+      "process_name": "/data01/home/ziqi.yin/compact-opt-20260922/patches/pr40764-checktrim/e2e-envs/sglang-5c18780c/bin/python",
+      "samples": 2,
+      "used_gpu_memory_mib_values": [
+        "612",
+        "786"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T08:52:27.276218Z",
+      "last_seen_utc": "2026-10-08T08:53:27.699073Z",
+      "owner": {
+        "uid": 1030,
+        "user": "ziqi.yin"
+      },
+      "pid": "3062914",
+      "process_name": "/data01/home/ziqi.yin/compact-opt-20260922/patches/pr40764-checktrim/e2e-envs/sglang-5c18780c/bin/python",
+      "samples": 3,
+      "used_gpu_memory_mib_values": [
+        "612",
+        "710",
+        "786"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T08:54:28.108134Z",
+      "last_seen_utc": "2026-10-08T08:54:58.286921Z",
+      "owner": {
+        "uid": 1030,
+        "user": "ziqi.yin"
+      },
+      "pid": "3074623",
+      "process_name": "/data01/home/ziqi.yin/compact-opt-20260922/patches/pr40764-checktrim/e2e-envs/sglang-5c18780c/bin/python",
+      "samples": 2,
+      "used_gpu_memory_mib_values": [
+        "18372",
+        "22576"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T08:55:58.669539Z",
+      "last_seen_utc": "2026-10-08T08:57:59.427448Z",
+      "owner": {
+        "uid": 1030,
+        "user": "ziqi.yin"
+      },
+      "pid": "3105045",
+      "process_name": "/data01/home/ziqi.yin/compact-opt-20260922/patches/pr40764-checktrim/e2e-envs/sglang-5c18780c/bin/python",
+      "samples": 5,
+      "used_gpu_memory_mib_values": [
+        "614",
+        "18372",
+        "18372",
+        "18372",
+        "19420"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T08:58:59.794618Z",
+      "last_seen_utc": "2026-10-08T08:58:59.794618Z",
+      "owner": {
+        "uid": 1030,
+        "user": "ziqi.yin"
+      },
+      "pid": "3186310",
+      "process_name": "/data01/home/ziqi.yin/compact-opt-20260922/patches/pr40764-checktrim/e2e-envs/sglang-5c18780c/bin/python",
+      "samples": 1,
+      "used_gpu_memory_mib_values": [
+        "18388"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T09:02:00.898282Z",
+      "last_seen_utc": "2026-10-08T09:04:31.854040Z",
+      "owner": {
+        "uid": 1030,
+        "user": "ziqi.yin"
+      },
+      "pid": "3236037",
+      "process_name": "/data01/home/ziqi.yin/compact-opt-20260922/patches/pr40764-checktrim/e2e-envs/sglang-5c18780c/bin/python",
+      "samples": 6,
+      "used_gpu_memory_mib_values": [
+        "18372",
+        "18372",
+        "18372",
+        "18372",
+        "18372",
+        "20200"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T09:09:03.760899Z",
+      "last_seen_utc": "2026-10-08T09:10:34.337867Z",
+      "owner": {
+        "uid": 1030,
+        "user": "ziqi.yin"
+      },
+      "pid": "3369383",
+      "process_name": "/data01/home/ziqi.yin/compact-opt-20260922/patches/pr40764-checktrim/e2e-envs/sglang-5c18780c/bin/python",
+      "samples": 4,
+      "used_gpu_memory_mib_values": [
+        "18372",
+        "18372",
+        "18372",
+        "25778"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T09:11:34.700561Z",
+      "last_seen_utc": "2026-10-08T09:12:04.915244Z",
+      "owner": {
+        "uid": 1030,
+        "user": "ziqi.yin"
+      },
+      "pid": "3386464",
+      "process_name": "/data01/home/ziqi.yin/compact-opt-20260922/patches/pr40764-checktrim/e2e-envs/sglang-5c18780c/bin/python",
+      "samples": 2,
+      "used_gpu_memory_mib_values": [
+        "18372",
+        "18372"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T09:14:35.865518Z",
+      "last_seen_utc": "2026-10-08T09:15:06.044222Z",
+      "owner": {
+        "uid": 1030,
+        "user": "ziqi.yin"
+      },
+      "pid": "3404445",
+      "process_name": "/data01/home/ziqi.yin/compact-opt-20260922/patches/pr40764-checktrim/e2e-envs/sglang-5c18780c/bin/python",
+      "samples": 2,
+      "used_gpu_memory_mib_values": [
+        "18372",
+        "19412"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T09:16:36.628769Z",
+      "last_seen_utc": "2026-10-08T09:17:06.809214Z",
+      "owner": {
+        "uid": 1030,
+        "user": "ziqi.yin"
+      },
+      "pid": "3416357",
+      "process_name": "/data01/home/ziqi.yin/compact-opt-20260922/patches/pr40764-checktrim/e2e-envs/sglang-5c18780c/bin/python",
+      "samples": 2,
+      "used_gpu_memory_mib_values": [
+        "18372",
+        "19420"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T09:21:38.441212Z",
+      "last_seen_utc": "2026-10-08T09:22:08.810983Z",
+      "owner": {
+        "uid": 1030,
+        "user": "ziqi.yin"
+      },
+      "pid": "3463313",
+      "process_name": "/data01/home/ziqi.yin/compact-opt-20260922/patches/pr40764-checktrim/e2e-envs/sglang-5c18780c/bin/python",
+      "samples": 2,
+      "used_gpu_memory_mib_values": [
+        "18372",
+        "22576"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T09:24:39.861122Z",
+      "last_seen_utc": "2026-10-08T09:24:39.861122Z",
+      "owner": {
+        "uid": 1018,
+        "user": "philip.yang"
+      },
+      "pid": "3491315",
+      "process_name": "/vaso-bazel-ob/external/+python_native+python_313_native/prefix/bin/python3",
+      "samples": 1,
+      "used_gpu_memory_mib_values": [
+        "2184"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T09:25:10.069713Z",
+      "last_seen_utc": "2026-10-08T09:26:10.542158Z",
+      "owner": {
+        "uid": 1030,
+        "user": "ziqi.yin"
+      },
+      "pid": "3494438",
+      "process_name": "/data01/home/ziqi.yin/compact-opt-20260922/patches/pr40764-checktrim/e2e-envs/sglang-5c18780c/bin/python",
+      "samples": 3,
+      "used_gpu_memory_mib_values": [
+        "18372",
+        "19412",
+        "19420"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T09:25:40.354543Z",
+      "last_seen_utc": "2026-10-08T09:25:40.354543Z",
+      "owner": {
+        "uid": 1018,
+        "user": "philip.yang"
+      },
+      "pid": "3499961",
+      "process_name": "/vaso-bazel-ob/external/+python_native+python_313_native/prefix/bin/python3",
+      "samples": 1,
+      "used_gpu_memory_mib_values": [
+        "616"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T09:27:10.906463Z",
+      "last_seen_utc": "2026-10-08T09:27:41.102018Z",
+      "owner": {
+        "uid": 1030,
+        "user": "ziqi.yin"
+      },
+      "pid": "3510385",
+      "process_name": "/data01/home/ziqi.yin/compact-opt-20260922/patches/pr40764-checktrim/e2e-envs/sglang-5c18780c/bin/python",
+      "samples": 2,
+      "used_gpu_memory_mib_values": [
+        "18372",
+        "19744"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T09:29:11.662579Z",
+      "last_seen_utc": "2026-10-08T09:30:42.039478Z",
+      "owner": {
+        "uid": 1030,
+        "user": "ziqi.yin"
+      },
+      "pid": "3524272",
+      "process_name": "/data01/home/ziqi.yin/compact-opt-20260922/patches/pr40764-checktrim/e2e-envs/sglang-5c18780c/bin/python",
+      "samples": 4,
+      "used_gpu_memory_mib_values": [
+        "18372",
+        "18372",
+        "20996",
+        "23594"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T09:30:12.853230Z",
+      "last_seen_utc": "2026-10-08T09:30:12.853230Z",
+      "owner": {
+        "uid": 1018,
+        "user": "philip.yang"
+      },
+      "pid": "3560512",
+      "process_name": "/run/vaso/run/venv/bin/python3",
+      "samples": 1,
+      "used_gpu_memory_mib_values": [
+        "1050"
+      ]
+    },
+    {
+      "first_seen_utc": "2026-10-08T09:34:13.327301Z",
+      "last_seen_utc": "2026-10-08T09:39:52.800765Z",
+      "owner": {
+        "uid": 1030,
+        "user": "ziqi.yin"
+      },
+      "pid": "3655459",
+      "process_name": "/data01/home/ziqi.yin/compact-opt-20260922/patches/pr40764-checktrim/e2e-envs/sglang-5c18780c/bin/python",
+      "samples": 13,
+      "used_gpu_memory_mib_values": [
+        "18372",
+        "24664",
+        "23596",
+        "23594",
+        "19416",
+        "21514",
+        "19422",
+        "19940",
+        "20722",
+        "19650",
+        "20070",
+        "19418",
+        "19418"
+      ]
+    }
+  ],
+  "foreign_gpu1_processes_seen_count": 74,
+  "gpu1_occupancy": {
+    "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/gpu1-occupancy.jsonl",
+    "samples": 132,
+    "sha256": "2b24ed5297264f4259f023906db2ce3acdae2a6f127c22bc40d146caae9fc1a8"
+  },
+  "hadoop_conf_dir_set": "/opt/tiger/yarn_deploy/hadoop/conf",
+  "run_id": "t27f20261008T081353Z",
+  "schema_version": 1,
+  "scope_limits_after_exit": {
+    "cgroup.procs_error": "[Errno 2] No such file or directory: '/sys/fs/cgroup/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-t27f20261008T081353Z.scope/cgroup.procs'",
+    "memory.current_error": "[Errno 2] No such file or directory: '/sys/fs/cgroup/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-t27f20261008T081353Z.scope/memory.current'",
+    "memory.max_error": "[Errno 2] No such file or directory: '/sys/fs/cgroup/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-t27f20261008T081353Z.scope/memory.max'",
+    "memory.peak_error": "[Errno 2] No such file or directory: '/sys/fs/cgroup/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-t27f20261008T081353Z.scope/memory.peak'",
+    "memory.swap.max_error": "[Errno 2] No such file or directory: '/sys/fs/cgroup/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-t27f20261008T081353Z.scope/memory.swap.max'",
+    "path": "/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-t27f20261008T081353Z.scope"
+  },
+  "scope_limits_at_launch": {
+    "cgroup.procs": [
+      "2802576"
+    ],
+    "memory.current": "30961664",
+    "memory.max": "17179869184",
+    "memory.peak_error": "[Errno 2] No such file or directory: '/sys/fs/cgroup/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-t27f20261008T081353Z.scope/memory.peak'",
+    "memory.swap.max": "0",
+    "path": "/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-t27f20261008T081353Z.scope"
+  },
+  "scope_path": "/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-t27f20261008T081353Z.scope",
+  "start_utc": "2026-10-08T08:34:48.755687Z",
+  "stderr": {
+    "exists": true,
+    "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/systemd-run.stderr.log",
+    "sha256": "cfc32b2d318cec3c2ec5d66a350fefdf5812882e3673190802453993c0c59f69",
+    "size_bytes": 67
+  },
+  "stdout": {
+    "exists": true,
+    "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/systemd-run.stdout.log",
+    "sha256": "c60cdb2855704ff0b84a3dd27b40b0a8905f4201443842bb0435b9c4fd5d5b9f",
+    "size_bytes": 567
+  },
+  "unit": "sureal-sustained-t27f20261008T081353Z",
+  "unit_scope": "sureal-sustained-t27f20261008T081353Z.scope",
+  "wall_seconds": 3903.866
+}

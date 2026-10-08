@@ -31,5 +31,5 @@ fixed all-class training batch; no heldout, segmentation or full-dataset complet
 
 Each row’s goal, complete recipe, verifier contract and acceptance criteria are in [experiments.json](experiments.json). Definitions are in [experiment-registry.json](experiment-registry.json). Notes are in [research-journal.md](research-journal.md).
 
-Refresh: `python experiments/waymo-perception/tracking/cli.py refresh`
-Follow active runs: `python experiments/waymo-perception/tracking/cli.py watch`
+Refresh: `python autonomy/evidence/tracker.py refresh`
+Follow active runs: `python autonomy/evidence/tracker.py watch`
