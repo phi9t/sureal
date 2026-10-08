@@ -61,4 +61,17 @@ class StrictMetricReplayTests(unittest.TestCase):
             self.assertEqual(len(report['rejections']),1)
             self.assertEqual(report['rejections'][0]['kind'],'detection')
 
+    def test_paths_are_reported_relative_to_named_roots(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp)
+            bad=root/'bad';bad.mkdir()
+            (bad/'metrics.stdout').write_text(DETECTION.replace('OBJECT_TYPE_TYPE_SIGN_LEVEL_2: [mAP 0] [mAPH 0]\n',''))
+            (bad/'metrics.stderr').write_text('')
+            nested=root/'nested';nested.mkdir()
+            (nested/'check.json').write_text(json.dumps({'metrics':{'30)_LEVEL_1':{'AP':0,'APH':0}}}))
+            report=replay_roots([root],root_labels=['<cache>'])
+            self.assertEqual(report['roots'],['<cache>'])
+            self.assertEqual(report['rejections'][0]['path'],'<cache>/bad/metrics.stdout')
+            self.assertEqual(report['miskeyed_check_json_paths'],['<cache>/nested/check.json'])
+
 if __name__=='__main__':unittest.main()

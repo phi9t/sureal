@@ -39,6 +39,20 @@ class SegmentationStrictMetricReaderTests(unittest.TestCase):
         self.assertAlmostEqual(parsed['classes']['TYPE_VEGETATION'],0.0237512)
         self.assertAlmostEqual(parsed['miou'],0.228352)
 
+    def test_progress_lines_cover_each_frame_in_order(self):
+        two_frame=REAL_REPORT.replace('1 frames found in prediction.','2 frames found in prediction.')
+        two_frame=two_frame.replace('1 frames found in groundtruth.','2 frames found in groundtruth.')
+        complete=two_frame.replace('Processing example 0 out of 1','Processing example 0 out of 2\nProcessing example 1 out of 2')
+        self.assertEqual(parse_result(complete)['examples_processed'],[0,1])
+        cases=[
+            two_frame.replace('Processing example 0 out of 1','Processing example 0 out of 2'),
+            complete.replace('Processing example 0 out of 2\nProcessing example 1 out of 2','Processing example 1 out of 2\nProcessing example 0 out of 2'),
+            complete.replace('Processing example 1 out of 2','Processing example 1 out of 3'),
+        ]
+        for report in cases:
+            with self.subTest(report=report),self.assertRaises(ValueError):
+                parse_result(report)
+
     def test_unknown_preamble_missing_duplicate_and_unknown_classes_fail(self):
         cases=[
             REAL_REPORT.replace('1 frames found in prediction.','native metric banner'),

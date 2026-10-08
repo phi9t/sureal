@@ -31,3 +31,13 @@ Verification:
 - CPU gate: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...` passed, 158/158 tests.
 - Parallax gate: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //parallax/...` passed, 17/17 tests.
 - CUDA gate: GPU 1 was free (`nvidia-smi`: GPU 1 at 4 MiB used, 0% util, no compute app on GPU 1); `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...` passed, 28/28 tests.
+
+Review follow-up: replay paths now report relative to named roots (`<cache>/...` and `autonomy/research/...`), and the segmentation reader now requires progress lines exactly `0..n-1` in order with `n` equal to the frame count. Regenerated replay report still found 379 detection reports, 1 segmentation report, 16 motion reports, 0 rejections, and 407 retained `check.json` files with mis-keyed range entries.
+
+Review verification:
+- Red tests first: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/evaluation:strict_metric_replay_test //autonomy/segmentation:strict_metric_reader_test` failed for the new relative-path and ordered-progress expectations.
+- Focused review tests after fix: same command passed, 2/2 tests.
+- Replay: `python3 -m autonomy.evaluation.strict_metric_replay` passed with 0 rejections; JSON report roots are `<cache>` and `autonomy/research`, no stored report path starts with `/`, and no stored report path mentions the worker temp path.
+- CPU gate: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...` passed, 158/158 tests.
+- Parallax gate: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //parallax/...` passed, 17/17 tests.
+- CUDA gate: GPU 1 was free (`nvidia-smi`: GPU 1 at 4 MiB used, 0% util, no compute app on GPU 1); `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...` passed, 28/28 tests.

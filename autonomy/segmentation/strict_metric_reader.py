@@ -60,7 +60,7 @@ def parse_result(stdout, expected_classes=EXPECTED_CLASSES):
         if match:
             current,total=(int(match.group(1)),int(match.group(2)))
             if current<0 or total<=0 or current>=total:raise ValueError('invalid segmentation progress line')
-            processed.append(current);continue
+            processed.append((current,total));continue
         match=re.fullmatch(fr'(TYPE_[A-Z_]+):({_NUMBER})',line)
         if match:
             name,value=match.groups()
@@ -74,10 +74,11 @@ def parse_result(stdout, expected_classes=EXPECTED_CLASSES):
         raise ValueError('unrecognized segmentation metric output')
     if frames.keys()!={'prediction','groundtruth'} or frames['prediction']!=frames['groundtruth']:
         raise ValueError('missing or inconsistent segmentation frame counts')
-    if not processed:
-        raise ValueError('missing segmentation progress line')
+    if processed != [(index,frames['prediction']) for index in range(frames['prediction'])]:
+        raise ValueError('segmentation progress must cover every frame in order')
     if set(classes)!=expected:
         raise ValueError('incomplete segmentation class metrics')
     if miou is None:
         raise ValueError('missing segmentation miou')
-    return {'frames':frames,'examples_processed':processed,'classes':classes,'miou':miou}
+    return {'frames':frames,'examples_processed':[index for index,_ in processed],
+            'classes':classes,'miou':miou}
