@@ -1,0 +1,1672 @@
+{
+  "accounting": {
+    "cap_bytes": 16106127360,
+    "phase_a_before_release_unique_payload_bytes_excluding_audit": 15301703072,
+    "phase_b_after_release_unique_payload_bytes_excluding_audit": 10939980061,
+    "phase_d_strict_unique_payload_bytes": 10939980061,
+    "phase_e_after_failure_unique_payload_bytes": 10939980061,
+    "reservation_bytes": 2147483648,
+    "target_bytes": 11811160064
+  },
+  "base_context": "ab6d460 start per coordinator; branch head at report generation is recorded separately",
+  "branch": "worker/t27f2-storage-and-admission",
+  "commands": {
+    "count": 50,
+    "ledger": {
+      "exists": true,
+      "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/command-ledger.jsonl",
+      "sha256": "1d61c4503747df3741f3d22021c42251040017998d4db3c7023a6085fc819306",
+      "size_bytes": 68895
+    },
+    "phase_counts": {
+      "A": 3,
+      "B": 30,
+      "C": 4,
+      "D": 1,
+      "E": 11,
+      "setup": 1
+    },
+    "records": [
+      {
+        "command": [
+          "python3",
+          "-c",
+          "print(\"runner ok\")"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:07:01.408058Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T060701Z-a518b448-helper-self-check/record.json",
+        "evidence_sha256": "d683c5585a0c2d900da627ff5caba01a92c4890566244ec0c44b5d2133f53ccf",
+        "exit_code": 0,
+        "id": "20261008T060701Z-a518b448-helper-self-check",
+        "label": "helper-self-check",
+        "phase": "setup",
+        "start_utc": "2026-10-08T06:07:01.393557Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T060701Z-a518b448-helper-self-check/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T060701Z-a518b448-helper-self-check/stdout.log",
+        "stdout_sha256": "2f71ef7ac3453ac1d3069c1c45f293d08a7de25c83354527d98cc9468cc79347",
+        "timed_out": false,
+        "wall_seconds": 0.014
+      },
+      {
+        "command": [
+          "df",
+          "-B1",
+          "/data02"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:07:18.710569Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T060718Z-21b7bd9e-phaseA-df-data02/record.json",
+        "evidence_sha256": "31baac7af8294c6e75094484fd54c4e779cd2f9d0b3f9b40d985f27580997e2d",
+        "exit_code": 0,
+        "id": "20261008T060718Z-21b7bd9e-phaseA-df-data02",
+        "label": "phaseA-df-data02",
+        "phase": "A",
+        "start_utc": "2026-10-08T06:07:18.707385Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T060718Z-21b7bd9e-phaseA-df-data02/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T060718Z-21b7bd9e-phaseA-df-data02/stdout.log",
+        "stdout_sha256": "a729aed92a1065f59c5d23f3ab0be9c0de9e53b2259e3c47a673a885d852345c",
+        "timed_out": false,
+        "wall_seconds": 0.003
+      },
+      {
+        "command": [
+          "/data02/home/philip.yang/workspace/waystone/scripts/waystone",
+          "--error-format",
+          "json",
+          "--auth-source",
+          "token-file",
+          "ls",
+          "hdfs://harunava/user/tiger/waystone/sureal/source-snapshots/"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:07:18.988881Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T060718Z-6d8c156a-phaseA-hdfs-list-source-snapshots/record.json",
+        "evidence_sha256": "d1ef872001c9e3f2421faaec663cce605a64bb73c80d311b4e2cf0238e28068b",
+        "exit_code": 0,
+        "id": "20261008T060718Z-6d8c156a-phaseA-hdfs-list-source-snapshots",
+        "label": "phaseA-hdfs-list-source-snapshots",
+        "phase": "A",
+        "start_utc": "2026-10-08T06:07:18.773945Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T060718Z-6d8c156a-phaseA-hdfs-list-source-snapshots/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T060718Z-6d8c156a-phaseA-hdfs-list-source-snapshots/stdout.log",
+        "stdout_sha256": "cc9cba1a27e85e6d998afe92a349f748d4cb50be4661eaaeeeb7f78a961bbd2d",
+        "timed_out": false,
+        "wall_seconds": 0.215
+      },
+      {
+        "command": [
+          "python3",
+          "-"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:07:19.544770Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T060719Z-414e23e2-phaseA-accounting-excluding-audit/record.json",
+        "evidence_sha256": "7813e5c00574d7103acfac90af03bef75d1e91c5a596be6ee716e9846f5487ae",
+        "exit_code": 0,
+        "id": "20261008T060719Z-414e23e2-phaseA-accounting-excluding-audit",
+        "label": "phaseA-accounting-excluding-audit",
+        "phase": "A",
+        "start_utc": "2026-10-08T06:07:19.055589Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T060719Z-414e23e2-phaseA-accounting-excluding-audit/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T060719Z-414e23e2-phaseA-accounting-excluding-audit/stdout.log",
+        "stdout_sha256": "d7e66d09fcaccd2e4ca03fc5e2dada35b13e885a7b9acb0017564c78a667c60b",
+        "timed_out": false,
+        "wall_seconds": 0.489
+      },
+      {
+        "command": [
+          "python3",
+          "-m",
+          "retention.publish_scientific_directory",
+          "--case",
+          "cohort16-baseline-fit20261002a",
+          "--root",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort16-baseline-fit20261002a",
+          "--hdfs-namespace",
+          "perception-closed-scientific-processing",
+          "--auth-source",
+          "token-file",
+          "--evidence",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/cohort16-baseline-fit20261002a/publish-only"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:13:38.218594Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T060909Z-5d62e261-phaseB-publish-cohort16-baseline-fit20261002a/record.json",
+        "evidence_sha256": "461d630c18d2f9889b419f7021c8b3e9dcccb1aac83e4aa4aff2a324e80af088",
+        "exit_code": 0,
+        "id": "20261008T060909Z-5d62e261-phaseB-publish-cohort16-baseline-fit20261002a",
+        "label": "phaseB-publish-cohort16-baseline-fit20261002a",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:09:09.655269Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T060909Z-5d62e261-phaseB-publish-cohort16-baseline-fit20261002a/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T060909Z-5d62e261-phaseB-publish-cohort16-baseline-fit20261002a/stdout.log",
+        "stdout_sha256": "d45014d1ce3563b0ab0b96f25be4fefcd33e135e694287f1901344605f04c219",
+        "timed_out": false,
+        "wall_seconds": 268.563
+      },
+      {
+        "command": [
+          "python3",
+          "-",
+          "cohort16-baseline-fit20261002a",
+          "publish-only",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/cohort16-baseline-fit20261002a/publish-only"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:14:05.966516Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T061405Z-a8460b12-phaseB-verify-cohort16-baseline-fit20261002a-publish-only/record.json",
+        "evidence_sha256": "4aed08c19ae6211442a56d01a35acae372c761a73d28ded99075153a9b44ecc9",
+        "exit_code": 0,
+        "id": "20261008T061405Z-a8460b12-phaseB-verify-cohort16-baseline-fit20261002a-publish-only",
+        "label": "phaseB-verify-cohort16-baseline-fit20261002a-publish-only",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:14:05.933512Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T061405Z-a8460b12-phaseB-verify-cohort16-baseline-fit20261002a-publish-only/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T061405Z-a8460b12-phaseB-verify-cohort16-baseline-fit20261002a-publish-only/stdout.log",
+        "stdout_sha256": "fb3cb32a424182f9bd1c3e4938e894258a8882d4a72591ed3fc6c2f25167aa8b",
+        "timed_out": false,
+        "wall_seconds": 0.033
+      },
+      {
+        "command": [
+          "python3",
+          "-m",
+          "retention.publish_scientific_directory",
+          "--case",
+          "cohort16-baseline-fit20261002a",
+          "--root",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort16-baseline-fit20261002a",
+          "--hdfs-namespace",
+          "perception-closed-scientific-processing",
+          "--auth-source",
+          "token-file",
+          "--evidence",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/cohort16-baseline-fit20261002a/release",
+          "--release"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:19:02.505008Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T061406Z-ec469d70-phaseB-release-cohort16-baseline-fit20261002a/record.json",
+        "evidence_sha256": "b091a9bbb95f51521d4850b17d0bc9b066dda81b58e0acbb8348d94027cb2898",
+        "exit_code": 0,
+        "id": "20261008T061406Z-ec469d70-phaseB-release-cohort16-baseline-fit20261002a",
+        "label": "phaseB-release-cohort16-baseline-fit20261002a",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:14:06.033647Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T061406Z-ec469d70-phaseB-release-cohort16-baseline-fit20261002a/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T061406Z-ec469d70-phaseB-release-cohort16-baseline-fit20261002a/stdout.log",
+        "stdout_sha256": "cf992bbaba67c718763814977302091910ac719b3bc02cfa43dc7e0b782ed57a",
+        "timed_out": false,
+        "wall_seconds": 296.471
+      },
+      {
+        "command": [
+          "python3",
+          "-",
+          "cohort16-baseline-fit20261002a",
+          "release",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/cohort16-baseline-fit20261002a/release"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:19:02.609454Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T061902Z-4315414c-phaseB-verify-cohort16-baseline-fit20261002a-release/record.json",
+        "evidence_sha256": "30cf2d358faa62278bf58374997e30a695ced1920a6e0b9092d2591138a1b8fd",
+        "exit_code": 0,
+        "id": "20261008T061902Z-4315414c-phaseB-verify-cohort16-baseline-fit20261002a-release",
+        "label": "phaseB-verify-cohort16-baseline-fit20261002a-release",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:19:02.576018Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T061902Z-4315414c-phaseB-verify-cohort16-baseline-fit20261002a-release/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T061902Z-4315414c-phaseB-verify-cohort16-baseline-fit20261002a-release/stdout.log",
+        "stdout_sha256": "66134b91eeb20f5681da3b8ed5a2c45f0d66ba22d98e53c08a9912bf9a80df04",
+        "timed_out": false,
+        "wall_seconds": 0.033
+      },
+      {
+        "command": [
+          "df",
+          "-B1",
+          "/data02"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:19:02.676208Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T061902Z-97e4b223-phaseB-measure-after-cohort16-baseline-fit20261002a-df/record.json",
+        "evidence_sha256": "859017d4afbf49e2d57ef1dfb1d7bd54942d50c93462ec55b1281fb38b3709b5",
+        "exit_code": 0,
+        "id": "20261008T061902Z-97e4b223-phaseB-measure-after-cohort16-baseline-fit20261002a-df",
+        "label": "phaseB-measure-after-cohort16-baseline-fit20261002a-df",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:19:02.673253Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T061902Z-97e4b223-phaseB-measure-after-cohort16-baseline-fit20261002a-df/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T061902Z-97e4b223-phaseB-measure-after-cohort16-baseline-fit20261002a-df/stdout.log",
+        "stdout_sha256": "47237c8605686b0c6f302c82dcce3d4e05f175e3a259c464ed1732ab3ded4356",
+        "timed_out": false,
+        "wall_seconds": 0.003
+      },
+      {
+        "command": [
+          "python3",
+          "-",
+          "cohort16-baseline-fit20261002a",
+          "13525431219"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:19:03.216484Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T061902Z-17466864-phaseB-measure-after-cohort16-baseline-fit20261002a/record.json",
+        "evidence_sha256": "2df9d304ced64a6d8e18397a85b36622024ca744ee484c4ebddb686d188a6bb5",
+        "exit_code": 0,
+        "id": "20261008T061902Z-17466864-phaseB-measure-after-cohort16-baseline-fit20261002a",
+        "label": "phaseB-measure-after-cohort16-baseline-fit20261002a",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:19:02.740584Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T061902Z-17466864-phaseB-measure-after-cohort16-baseline-fit20261002a/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T061902Z-17466864-phaseB-measure-after-cohort16-baseline-fit20261002a/stdout.log",
+        "stdout_sha256": "33870d2b4d5a76dc9237584b336fd7721d7d0fdce3b941d28d0e252953a11737",
+        "timed_out": false,
+        "wall_seconds": 0.476
+      },
+      {
+        "command": [
+          "python3",
+          "-m",
+          "retention.publish_scientific_directory",
+          "--case",
+          "cohort16-residual_bev-balanced20261002b",
+          "--root",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort16-residual_bev-balanced20261002b",
+          "--hdfs-namespace",
+          "perception-closed-scientific-processing",
+          "--auth-source",
+          "token-file",
+          "--evidence",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/cohort16-residual_bev-balanced20261002b/publish-only"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:22:23.331095Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T061903Z-527c44a2-phaseB-publish-cohort16-residual_bev-balanced20261002b/record.json",
+        "evidence_sha256": "b99256c3715d83e6028d2049ca3d94739858199727e864c8376327451ab8d52d",
+        "exit_code": 0,
+        "id": "20261008T061903Z-527c44a2-phaseB-publish-cohort16-residual_bev-balanced20261002b",
+        "label": "phaseB-publish-cohort16-residual_bev-balanced20261002b",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:19:03.284343Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T061903Z-527c44a2-phaseB-publish-cohort16-residual_bev-balanced20261002b/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T061903Z-527c44a2-phaseB-publish-cohort16-residual_bev-balanced20261002b/stdout.log",
+        "stdout_sha256": "1246dc9d95f1c6d4c2bfbcc1a13a867fd1a6b71af21545347d7e1561faa0dd70",
+        "timed_out": false,
+        "wall_seconds": 200.047
+      },
+      {
+        "command": [
+          "python3",
+          "-",
+          "cohort16-residual_bev-balanced20261002b",
+          "publish-only",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/cohort16-residual_bev-balanced20261002b/publish-only"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:22:23.433453Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062223Z-b93e3dfb-phaseB-verify-cohort16-residual_bev-balanced20261002b-publish-only/record.json",
+        "evidence_sha256": "45d0cc06134fd6b7592fcf757203930ec57b2197fe1e2f18aaf5343580b28d76",
+        "exit_code": 0,
+        "id": "20261008T062223Z-b93e3dfb-phaseB-verify-cohort16-residual_bev-balanced20261002b-publish-only",
+        "label": "phaseB-verify-cohort16-residual_bev-balanced20261002b-publish-only",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:22:23.401253Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062223Z-b93e3dfb-phaseB-verify-cohort16-residual_bev-balanced20261002b-publish-only/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062223Z-b93e3dfb-phaseB-verify-cohort16-residual_bev-balanced20261002b-publish-only/stdout.log",
+        "stdout_sha256": "49db28c6fb2bc14043cb40c2738cc5514b2138ca5a85924ac19d417e16c6106d",
+        "timed_out": false,
+        "wall_seconds": 0.032
+      },
+      {
+        "command": [
+          "python3",
+          "-m",
+          "retention.publish_scientific_directory",
+          "--case",
+          "cohort16-residual_bev-balanced20261002b",
+          "--root",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/cohort16-residual_bev-balanced20261002b",
+          "--hdfs-namespace",
+          "perception-closed-scientific-processing",
+          "--auth-source",
+          "token-file",
+          "--evidence",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/cohort16-residual_bev-balanced20261002b/release",
+          "--release"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:26:09.547057Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062223Z-f8c53c03-phaseB-release-cohort16-residual_bev-balanced20261002b/record.json",
+        "evidence_sha256": "2606786f467649b985e8bf2470020cb75f6c8e52fc0dcce659c475495bf51e1c",
+        "exit_code": 0,
+        "id": "20261008T062223Z-f8c53c03-phaseB-release-cohort16-residual_bev-balanced20261002b",
+        "label": "phaseB-release-cohort16-residual_bev-balanced20261002b",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:22:23.499047Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062223Z-f8c53c03-phaseB-release-cohort16-residual_bev-balanced20261002b/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062223Z-f8c53c03-phaseB-release-cohort16-residual_bev-balanced20261002b/stdout.log",
+        "stdout_sha256": "5a41844af23be653a9541c75be2015b7ea3e3545f1c9cb9e18c7751b45ebd1d3",
+        "timed_out": false,
+        "wall_seconds": 226.048
+      },
+      {
+        "command": [
+          "python3",
+          "-",
+          "cohort16-residual_bev-balanced20261002b",
+          "release",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/cohort16-residual_bev-balanced20261002b/release"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:26:09.650593Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062609Z-85568f21-phaseB-verify-cohort16-residual_bev-balanced20261002b-release/record.json",
+        "evidence_sha256": "c94240aef5094b14f04ccc94f443b8f0ff6feb74a82ff8abbf9d4451918ca38a",
+        "exit_code": 0,
+        "id": "20261008T062609Z-85568f21-phaseB-verify-cohort16-residual_bev-balanced20261002b-release",
+        "label": "phaseB-verify-cohort16-residual_bev-balanced20261002b-release",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:26:09.616983Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062609Z-85568f21-phaseB-verify-cohort16-residual_bev-balanced20261002b-release/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062609Z-85568f21-phaseB-verify-cohort16-residual_bev-balanced20261002b-release/stdout.log",
+        "stdout_sha256": "f54b831a5a16f9c60c894907345d3232da893d46e90babf67fa2b3c19696db4b",
+        "timed_out": false,
+        "wall_seconds": 0.034
+      },
+      {
+        "command": [
+          "df",
+          "-B1",
+          "/data02"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:26:09.717745Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062609Z-528ad98c-phaseB-measure-after-cohort16-residual_bev-balanced20261002b-df/record.json",
+        "evidence_sha256": "ad0d1712c2d23aa0fd518ecaad5aab2c24b8426bf1b9322892fc5ac2344f6263",
+        "exit_code": 0,
+        "id": "20261008T062609Z-528ad98c-phaseB-measure-after-cohort16-residual_bev-balanced20261002b-df",
+        "label": "phaseB-measure-after-cohort16-residual_bev-balanced20261002b-df",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:26:09.714572Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062609Z-528ad98c-phaseB-measure-after-cohort16-residual_bev-balanced20261002b-df/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062609Z-528ad98c-phaseB-measure-after-cohort16-residual_bev-balanced20261002b-df/stdout.log",
+        "stdout_sha256": "e87ec3171ad6ed28b72fad266aa58b2b0b4afab44bfa44a511d18fdbe61bb2e3",
+        "timed_out": false,
+        "wall_seconds": 0.003
+      },
+      {
+        "command": [
+          "python3",
+          "-",
+          "cohort16-residual_bev-balanced20261002b",
+          "12158127867"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:26:10.256734Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062609Z-17c9297b-phaseB-measure-after-cohort16-residual_bev-balanced20261002b/record.json",
+        "evidence_sha256": "f6abf729c28fac4ed680a897d6e02baa5cb4b51a8fe034390141a387682d67f3",
+        "exit_code": 0,
+        "id": "20261008T062609Z-17c9297b-phaseB-measure-after-cohort16-residual_bev-balanced20261002b",
+        "label": "phaseB-measure-after-cohort16-residual_bev-balanced20261002b",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:26:09.781489Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062609Z-17c9297b-phaseB-measure-after-cohort16-residual_bev-balanced20261002b/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062609Z-17c9297b-phaseB-measure-after-cohort16-residual_bev-balanced20261002b/stdout.log",
+        "stdout_sha256": "62c2cc1f92bb88bd3d4967d45cd533d7fe473ff66c5f9244eba15c565e03baf9",
+        "timed_out": false,
+        "wall_seconds": 0.475
+      },
+      {
+        "command": [
+          "python3",
+          "-m",
+          "retention.publish_scientific_directory",
+          "--case",
+          "native-overfit-v1",
+          "--root",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/native-overfit-v1",
+          "--hdfs-namespace",
+          "perception-closed-scientific-processing",
+          "--auth-source",
+          "token-file",
+          "--evidence",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/native-overfit-v1/publish-only"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:27:37.049398Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062610Z-da9cd69a-phaseB-publish-native-overfit-v1/record.json",
+        "evidence_sha256": "db62f8ff95479f57e3d66295d24136c64a27ef6fdedda75827091a389f4bfa55",
+        "exit_code": 0,
+        "id": "20261008T062610Z-da9cd69a-phaseB-publish-native-overfit-v1",
+        "label": "phaseB-publish-native-overfit-v1",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:26:10.324257Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062610Z-da9cd69a-phaseB-publish-native-overfit-v1/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062610Z-da9cd69a-phaseB-publish-native-overfit-v1/stdout.log",
+        "stdout_sha256": "0ae0282af26e5a33a93522172d0e3a8706673941cf83d5c403ddb328304c1391",
+        "timed_out": false,
+        "wall_seconds": 86.725
+      },
+      {
+        "command": [
+          "python3",
+          "-",
+          "native-overfit-v1",
+          "publish-only",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/native-overfit-v1/publish-only"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:27:37.151752Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062737Z-ab5d4da3-phaseB-verify-native-overfit-v1-publish-only/record.json",
+        "evidence_sha256": "318dd9de38f7ed5c1454cc58cddf33312bc2a6b0963fbb92b08f46e8c79a9e8d",
+        "exit_code": 0,
+        "id": "20261008T062737Z-ab5d4da3-phaseB-verify-native-overfit-v1-publish-only",
+        "label": "phaseB-verify-native-overfit-v1-publish-only",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:27:37.119733Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062737Z-ab5d4da3-phaseB-verify-native-overfit-v1-publish-only/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062737Z-ab5d4da3-phaseB-verify-native-overfit-v1-publish-only/stdout.log",
+        "stdout_sha256": "f0596151e89809ba6650ca2848b1f9e7bf7f17f6d6efad7e63c7d4bf5a570979",
+        "timed_out": false,
+        "wall_seconds": 0.032
+      },
+      {
+        "command": [
+          "python3",
+          "-m",
+          "retention.publish_scientific_directory",
+          "--case",
+          "native-overfit-v1",
+          "--root",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/native-overfit-v1",
+          "--hdfs-namespace",
+          "perception-closed-scientific-processing",
+          "--auth-source",
+          "token-file",
+          "--evidence",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/native-overfit-v1/release",
+          "--release"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:29:17.066732Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062737Z-f28bf02f-phaseB-release-native-overfit-v1/record.json",
+        "evidence_sha256": "428aadfe7593ace1c3f3da2d8e7aa286903fe1b6369a10c2737be4ed1e6e381f",
+        "exit_code": 0,
+        "id": "20261008T062737Z-f28bf02f-phaseB-release-native-overfit-v1",
+        "label": "phaseB-release-native-overfit-v1",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:27:37.217841Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062737Z-f28bf02f-phaseB-release-native-overfit-v1/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062737Z-f28bf02f-phaseB-release-native-overfit-v1/stdout.log",
+        "stdout_sha256": "972bcfdd2d7e2a881cf1caecf3af7442cbb4de3e8722d637d39a892a0ec121ef",
+        "timed_out": false,
+        "wall_seconds": 99.849
+      },
+      {
+        "command": [
+          "python3",
+          "-",
+          "native-overfit-v1",
+          "release",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/native-overfit-v1/release"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:29:17.169988Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062917Z-003ace23-phaseB-verify-native-overfit-v1-release/record.json",
+        "evidence_sha256": "7b0d0941a480a6c3736eb4076af8f1bbb79c32846be43662b0f463f0c192cb7d",
+        "exit_code": 0,
+        "id": "20261008T062917Z-003ace23-phaseB-verify-native-overfit-v1-release",
+        "label": "phaseB-verify-native-overfit-v1-release",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:29:17.136699Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062917Z-003ace23-phaseB-verify-native-overfit-v1-release/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062917Z-003ace23-phaseB-verify-native-overfit-v1-release/stdout.log",
+        "stdout_sha256": "444d519889e29ec0ca1c54a4413446f69ff8389963ed61d20ade6cd8330533c9",
+        "timed_out": false,
+        "wall_seconds": 0.033
+      },
+      {
+        "command": [
+          "df",
+          "-B1",
+          "/data02"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:29:17.240661Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062917Z-39cd5026-phaseB-measure-after-native-overfit-v1-df/record.json",
+        "evidence_sha256": "fb56a5a96ac23f6f9f2d61a697d0f780482f0c970fb98cb84e37091794740afc",
+        "exit_code": 0,
+        "id": "20261008T062917Z-39cd5026-phaseB-measure-after-native-overfit-v1-df",
+        "label": "phaseB-measure-after-native-overfit-v1-df",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:29:17.236261Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062917Z-39cd5026-phaseB-measure-after-native-overfit-v1-df/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062917Z-39cd5026-phaseB-measure-after-native-overfit-v1-df/stdout.log",
+        "stdout_sha256": "5c974ec27c00c647058d693ab8509822854fb6bc88a9d776a062a97171e6f021",
+        "timed_out": false,
+        "wall_seconds": 0.004
+      },
+      {
+        "command": [
+          "python3",
+          "-",
+          "native-overfit-v1",
+          "11663317401"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:29:17.786424Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062917Z-5faf110d-phaseB-measure-after-native-overfit-v1/record.json",
+        "evidence_sha256": "a5b68884ef78022f6adc1ea8d7cc3b3209a0b5e83b92135f52290d064fb94027",
+        "exit_code": 0,
+        "id": "20261008T062917Z-5faf110d-phaseB-measure-after-native-overfit-v1",
+        "label": "phaseB-measure-after-native-overfit-v1",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:29:17.306407Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062917Z-5faf110d-phaseB-measure-after-native-overfit-v1/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062917Z-5faf110d-phaseB-measure-after-native-overfit-v1/stdout.log",
+        "stdout_sha256": "7156667253897db1b2f71a21a8d0da64c2a6e8d8e2e7402d25b5d0234ba93996",
+        "timed_out": false,
+        "wall_seconds": 0.48
+      },
+      {
+        "command": [
+          "python3",
+          "-m",
+          "retention.publish_scientific_directory",
+          "--case",
+          "architecture-window_bev-v1",
+          "--root",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-window_bev-v1",
+          "--hdfs-namespace",
+          "perception-closed-scientific-processing",
+          "--auth-source",
+          "token-file",
+          "--evidence",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/architecture-window_bev-v1/publish-only"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:30:36.434411Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062917Z-117d7b3b-phaseB-publish-architecture-window_bev-v1/record.json",
+        "evidence_sha256": "4e7ebbddce594fd6a696c6adda4751a0c80c473da59c27c1df3dc21e475a5526",
+        "exit_code": 0,
+        "id": "20261008T062917Z-117d7b3b-phaseB-publish-architecture-window_bev-v1",
+        "label": "phaseB-publish-architecture-window_bev-v1",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:29:17.854566Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062917Z-117d7b3b-phaseB-publish-architecture-window_bev-v1/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T062917Z-117d7b3b-phaseB-publish-architecture-window_bev-v1/stdout.log",
+        "stdout_sha256": "2c959058469801fd36d4c44b3d9dd74253595e3a9f14a7a31592ba383a2406f2",
+        "timed_out": false,
+        "wall_seconds": 78.58
+      },
+      {
+        "command": [
+          "python3",
+          "-",
+          "architecture-window_bev-v1",
+          "publish-only",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/architecture-window_bev-v1/publish-only"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:30:36.536506Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063036Z-639dddfe-phaseB-verify-architecture-window_bev-v1-publish-only/record.json",
+        "evidence_sha256": "a92414b49a05e57f3e32e9679573d236fbb5bba9837b16d9b4b7ef437ad2a396",
+        "exit_code": 0,
+        "id": "20261008T063036Z-639dddfe-phaseB-verify-architecture-window_bev-v1-publish-only",
+        "label": "phaseB-verify-architecture-window_bev-v1-publish-only",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:30:36.504032Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063036Z-639dddfe-phaseB-verify-architecture-window_bev-v1-publish-only/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063036Z-639dddfe-phaseB-verify-architecture-window_bev-v1-publish-only/stdout.log",
+        "stdout_sha256": "8a04c7c63d4d62687f9ad6c5059a479768a73bc5db1f0a648a0833453f2e289b",
+        "timed_out": false,
+        "wall_seconds": 0.032
+      },
+      {
+        "command": [
+          "python3",
+          "-m",
+          "retention.publish_scientific_directory",
+          "--case",
+          "architecture-window_bev-v1",
+          "--root",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-window_bev-v1",
+          "--hdfs-namespace",
+          "perception-closed-scientific-processing",
+          "--auth-source",
+          "token-file",
+          "--evidence",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/architecture-window_bev-v1/release",
+          "--release"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:32:04.806329Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063036Z-ce6603c5-phaseB-release-architecture-window_bev-v1/record.json",
+        "evidence_sha256": "b9cd1a0f641a35f817f914c25a25ffbe54dc5dc8c62d7e9881a20d6a77646f02",
+        "exit_code": 0,
+        "id": "20261008T063036Z-ce6603c5-phaseB-release-architecture-window_bev-v1",
+        "label": "phaseB-release-architecture-window_bev-v1",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:30:36.602431Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063036Z-ce6603c5-phaseB-release-architecture-window_bev-v1/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063036Z-ce6603c5-phaseB-release-architecture-window_bev-v1/stdout.log",
+        "stdout_sha256": "c611b0584fc804968e0bee8d33990f42378827399e57e7ef5c9fd902a5ee4b6e",
+        "timed_out": false,
+        "wall_seconds": 88.204
+      },
+      {
+        "command": [
+          "python3",
+          "-",
+          "architecture-window_bev-v1",
+          "release",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/architecture-window_bev-v1/release"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:32:04.909121Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063204Z-e5895e2a-phaseB-verify-architecture-window_bev-v1-release/record.json",
+        "evidence_sha256": "50faf0160733ba65f6c944518c9e3a068eba05ce9cea548874893d38b842b962",
+        "exit_code": 0,
+        "id": "20261008T063204Z-e5895e2a-phaseB-verify-architecture-window_bev-v1-release",
+        "label": "phaseB-verify-architecture-window_bev-v1-release",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:32:04.875913Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063204Z-e5895e2a-phaseB-verify-architecture-window_bev-v1-release/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063204Z-e5895e2a-phaseB-verify-architecture-window_bev-v1-release/stdout.log",
+        "stdout_sha256": "ffbb0cd35ed08fc23b40e475e3b91cf33f45981e4f6e5e5c67efeef994aedfd8",
+        "timed_out": false,
+        "wall_seconds": 0.033
+      },
+      {
+        "command": [
+          "df",
+          "-B1",
+          "/data02"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:32:04.981810Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063204Z-c8070fb2-phaseB-measure-after-architecture-window_bev-v1-df/record.json",
+        "evidence_sha256": "ce21ab5994a8576ac6e8ec9c29acd9fc175b2b6b3e528eda8bca472d7c17ccdc",
+        "exit_code": 0,
+        "id": "20261008T063204Z-c8070fb2-phaseB-measure-after-architecture-window_bev-v1-df",
+        "label": "phaseB-measure-after-architecture-window_bev-v1-df",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:32:04.977474Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063204Z-c8070fb2-phaseB-measure-after-architecture-window_bev-v1-df/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063204Z-c8070fb2-phaseB-measure-after-architecture-window_bev-v1-df/stdout.log",
+        "stdout_sha256": "21491a59e21d7a25a03e4d74f05cdc54438b900bd872c1872270c654241f7b33",
+        "timed_out": false,
+        "wall_seconds": 0.004
+      },
+      {
+        "command": [
+          "python3",
+          "-",
+          "architecture-window_bev-v1",
+          "11301648713"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:32:05.530059Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063205Z-3eeecccd-phaseB-measure-after-architecture-window_bev-v1/record.json",
+        "evidence_sha256": "dec50c67918c97eb4fe604f3b16d164d95fa5a510639e03a87690a4212cab848",
+        "exit_code": 0,
+        "id": "20261008T063205Z-3eeecccd-phaseB-measure-after-architecture-window_bev-v1",
+        "label": "phaseB-measure-after-architecture-window_bev-v1",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:32:05.048687Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063205Z-3eeecccd-phaseB-measure-after-architecture-window_bev-v1/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063205Z-3eeecccd-phaseB-measure-after-architecture-window_bev-v1/stdout.log",
+        "stdout_sha256": "19d204a314c85de826ddbd009e1c65f009ae9b3c3a0914dab0f16f518ecf9ab2",
+        "timed_out": false,
+        "wall_seconds": 0.481
+      },
+      {
+        "command": [
+          "python3",
+          "-m",
+          "retention.publish_scientific_directory",
+          "--case",
+          "architecture-coarse_mlp-v1",
+          "--root",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-coarse_mlp-v1",
+          "--hdfs-namespace",
+          "perception-closed-scientific-processing",
+          "--auth-source",
+          "token-file",
+          "--evidence",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/architecture-coarse_mlp-v1/publish-only"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:33:22.829931Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063205Z-c17856c9-phaseB-publish-architecture-coarse_mlp-v1/record.json",
+        "evidence_sha256": "fe46e98f14706f0eab42a7a43f7d1ade0982aaa80cbf4324a0bbbe0c30c82e01",
+        "exit_code": 0,
+        "id": "20261008T063205Z-c17856c9-phaseB-publish-architecture-coarse_mlp-v1",
+        "label": "phaseB-publish-architecture-coarse_mlp-v1",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:32:05.601620Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063205Z-c17856c9-phaseB-publish-architecture-coarse_mlp-v1/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063205Z-c17856c9-phaseB-publish-architecture-coarse_mlp-v1/stdout.log",
+        "stdout_sha256": "226a14ba32a0129503f9d2b42ffc5aad71786857043b0aab8db9824aaec130e7",
+        "timed_out": false,
+        "wall_seconds": 77.228
+      },
+      {
+        "command": [
+          "python3",
+          "-",
+          "architecture-coarse_mlp-v1",
+          "publish-only",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/architecture-coarse_mlp-v1/publish-only"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:33:22.933157Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063322Z-ad2a5d61-phaseB-verify-architecture-coarse_mlp-v1-publish-only/record.json",
+        "evidence_sha256": "2a1d3fd3b8320aa9d2ebc760cb50beebab0df84dad9546c035dcebc550592a12",
+        "exit_code": 0,
+        "id": "20261008T063322Z-ad2a5d61-phaseB-verify-architecture-coarse_mlp-v1-publish-only",
+        "label": "phaseB-verify-architecture-coarse_mlp-v1-publish-only",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:33:22.900096Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063322Z-ad2a5d61-phaseB-verify-architecture-coarse_mlp-v1-publish-only/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063322Z-ad2a5d61-phaseB-verify-architecture-coarse_mlp-v1-publish-only/stdout.log",
+        "stdout_sha256": "59eeff8ea48ffa4716c4b6b18d309f696fddb15a22d9665b49061170a583da0b",
+        "timed_out": false,
+        "wall_seconds": 0.033
+      },
+      {
+        "command": [
+          "python3",
+          "-m",
+          "retention.publish_scientific_directory",
+          "--case",
+          "architecture-coarse_mlp-v1",
+          "--root",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/architecture-coarse_mlp-v1",
+          "--hdfs-namespace",
+          "perception-closed-scientific-processing",
+          "--auth-source",
+          "token-file",
+          "--evidence",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/architecture-coarse_mlp-v1/release",
+          "--release"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:34:50.603137Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063322Z-f48104fb-phaseB-release-architecture-coarse_mlp-v1/record.json",
+        "evidence_sha256": "6ecdf1fbd19fac4f5fb10ee0bc870c13c52598264f8491859895d8d3c2269b85",
+        "exit_code": 0,
+        "id": "20261008T063322Z-f48104fb-phaseB-release-architecture-coarse_mlp-v1",
+        "label": "phaseB-release-architecture-coarse_mlp-v1",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:33:22.999315Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063322Z-f48104fb-phaseB-release-architecture-coarse_mlp-v1/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063322Z-f48104fb-phaseB-release-architecture-coarse_mlp-v1/stdout.log",
+        "stdout_sha256": "3b36e3728bf957e3d176c58aa3ac689415ff6651ef97f48cc411d3fedc1479d5",
+        "timed_out": false,
+        "wall_seconds": 87.604
+      },
+      {
+        "command": [
+          "python3",
+          "-",
+          "architecture-coarse_mlp-v1",
+          "release",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/architecture-coarse_mlp-v1/release"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:34:50.706087Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063450Z-ad0327cd-phaseB-verify-architecture-coarse_mlp-v1-release/record.json",
+        "evidence_sha256": "2778d98f8a230ca0dc3017049f6f67d0658eb3a5ae9e8972ab03fe566f9b9455",
+        "exit_code": 0,
+        "id": "20261008T063450Z-ad0327cd-phaseB-verify-architecture-coarse_mlp-v1-release",
+        "label": "phaseB-verify-architecture-coarse_mlp-v1-release",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:34:50.673416Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063450Z-ad0327cd-phaseB-verify-architecture-coarse_mlp-v1-release/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063450Z-ad0327cd-phaseB-verify-architecture-coarse_mlp-v1-release/stdout.log",
+        "stdout_sha256": "eff4db10f35131430e01d95dc92820d47e52edd12f50e31526944e0077acf264",
+        "timed_out": false,
+        "wall_seconds": 0.033
+      },
+      {
+        "command": [
+          "df",
+          "-B1",
+          "/data02"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:34:50.776163Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063450Z-00009c04-phaseB-measure-after-architecture-coarse_mlp-v1-df/record.json",
+        "evidence_sha256": "cbc9ac22be216113abc5a583f11b1fe77559b2131830128554b48d9fedc2d429",
+        "exit_code": 0,
+        "id": "20261008T063450Z-00009c04-phaseB-measure-after-architecture-coarse_mlp-v1-df",
+        "label": "phaseB-measure-after-architecture-coarse_mlp-v1-df",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:34:50.772878Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063450Z-00009c04-phaseB-measure-after-architecture-coarse_mlp-v1-df/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063450Z-00009c04-phaseB-measure-after-architecture-coarse_mlp-v1-df/stdout.log",
+        "stdout_sha256": "62505b777ca0153bbf1f1f5c830e6515a251ee8abfec69d61038c039dc7ed6ee",
+        "timed_out": false,
+        "wall_seconds": 0.003
+      },
+      {
+        "command": [
+          "python3",
+          "-",
+          "architecture-coarse_mlp-v1",
+          "10939980061"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:34:51.318945Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063450Z-6601a2e6-phaseB-measure-after-architecture-coarse_mlp-v1/record.json",
+        "evidence_sha256": "626410a5beb3abf64a72b546f7209c11fd11c2428c70e476fa335e4f88c8e1e6",
+        "exit_code": 0,
+        "id": "20261008T063450Z-6601a2e6-phaseB-measure-after-architecture-coarse_mlp-v1",
+        "label": "phaseB-measure-after-architecture-coarse_mlp-v1",
+        "phase": "B",
+        "start_utc": "2026-10-08T06:34:50.840960Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063450Z-6601a2e6-phaseB-measure-after-architecture-coarse_mlp-v1/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063450Z-6601a2e6-phaseB-measure-after-architecture-coarse_mlp-v1/stdout.log",
+        "stdout_sha256": "146095c488c0f57d287b9aad17ad2d9a771a7cf99c34c6d0278d35936988eeb2",
+        "timed_out": false,
+        "wall_seconds": 0.478
+      },
+      {
+        "command": [
+          "df",
+          "-B1",
+          "/data02"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:35:29.189984Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063529Z-f9e68fad-phaseC-df-before/record.json",
+        "evidence_sha256": "279ceb801e200250fd732755d3c28c2c008446af44c981d3542850d12f95ea5c",
+        "exit_code": 0,
+        "id": "20261008T063529Z-f9e68fad-phaseC-df-before",
+        "label": "phaseC-df-before",
+        "phase": "C",
+        "start_utc": "2026-10-08T06:35:29.186583Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063529Z-f9e68fad-phaseC-df-before/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063529Z-f9e68fad-phaseC-df-before/stdout.log",
+        "stdout_sha256": "c1171433d5c4892532e05b98b1a9dcd1ca4b1088c6b84b103d8f1baaf0277c04",
+        "timed_out": false,
+        "wall_seconds": 0.003
+      },
+      {
+        "command": [
+          "python3",
+          "-m",
+          "retention.publish_symlink_audit",
+          "--case",
+          "motion-current-geometry-audit-v3",
+          "--root",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/motion-current-geometry-audit-v3",
+          "--hdfs-namespace",
+          "perception-motion",
+          "--auth-source",
+          "token-file",
+          "--evidence",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-C",
+          "--preserve-symlinks",
+          "--readback",
+          "--receipt",
+          "--move-to",
+          "/data02/home/philip.yang/.cache/waystone/waymo-perception/retired-audits/motion-current-geometry-audit-v3"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:36:01.394786Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063529Z-883d60bb-phaseC-publish-and-move-motion-current-geometry-audit-v3/record.json",
+        "evidence_sha256": "36683bd1a1088ac967dfb6cc37fb0efe6c44f9209f2a6a7a7564d9c378ea4d6d",
+        "exit_code": 0,
+        "id": "20261008T063529Z-883d60bb-phaseC-publish-and-move-motion-current-geometry-audit-v3",
+        "label": "phaseC-publish-and-move-motion-current-geometry-audit-v3",
+        "phase": "C",
+        "start_utc": "2026-10-08T06:35:29.258334Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063529Z-883d60bb-phaseC-publish-and-move-motion-current-geometry-audit-v3/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063529Z-883d60bb-phaseC-publish-and-move-motion-current-geometry-audit-v3/stdout.log",
+        "stdout_sha256": "ecdfa12a9db2d4372d9ba02365959545dc22992104a7d15baf35c76955bc262c",
+        "timed_out": false,
+        "wall_seconds": 32.136
+      },
+      {
+        "command": [
+          "python3",
+          "-"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:36:01.515372Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063601Z-073bee8b-phaseC-verify-moved-listing/record.json",
+        "evidence_sha256": "6e2ec6b9409a8552df9a30877e4fa5ec4389b42e00ea1f0e149b4b2e504485a2",
+        "exit_code": 0,
+        "id": "20261008T063601Z-073bee8b-phaseC-verify-moved-listing",
+        "label": "phaseC-verify-moved-listing",
+        "phase": "C",
+        "start_utc": "2026-10-08T06:36:01.468143Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063601Z-073bee8b-phaseC-verify-moved-listing/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063601Z-073bee8b-phaseC-verify-moved-listing/stdout.log",
+        "stdout_sha256": "c64613a08eefc1e6d5100f8e68dca22e685f07a7d9f6e1a00b5076fa1e4271c1",
+        "timed_out": false,
+        "wall_seconds": 0.047
+      },
+      {
+        "command": [
+          "df",
+          "-B1",
+          "/data02"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:36:01.585335Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063601Z-ce8bcbc8-phaseC-df-after/record.json",
+        "evidence_sha256": "ba9e172c4cc8c8eb04d65b578380b48db5a554bbde820ad5891b60b49c0c71c7",
+        "exit_code": 0,
+        "id": "20261008T063601Z-ce8bcbc8-phaseC-df-after",
+        "label": "phaseC-df-after",
+        "phase": "C",
+        "start_utc": "2026-10-08T06:36:01.582100Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063601Z-ce8bcbc8-phaseC-df-after/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063601Z-ce8bcbc8-phaseC-df-after/stdout.log",
+        "stdout_sha256": "f16677d10827b8d0893685c5e228bc39a952c2f178a9f9c95c374f78bd0bf21b",
+        "timed_out": false,
+        "wall_seconds": 0.003
+      },
+      {
+        "command": [
+          "python3",
+          "-"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:36:23.243861Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063621Z-78a86830-phaseD-storage-gate/record.json",
+        "evidence_sha256": "541d2830ef96a32981f09b4751306e32600aa406ec0f667eabe95b9f8e235793",
+        "exit_code": 0,
+        "id": "20261008T063621Z-78a86830-phaseD-storage-gate",
+        "label": "phaseD-storage-gate",
+        "phase": "D",
+        "start_utc": "2026-10-08T06:36:21.864507Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063621Z-78a86830-phaseD-storage-gate/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063621Z-78a86830-phaseD-storage-gate/stdout.log",
+        "stdout_sha256": "a0a49e8b48477ef2e4ba3e385e256743ede9715032d91cff7c0530ce129af53c",
+        "timed_out": false,
+        "wall_seconds": 1.379
+      },
+      {
+        "command": [
+          "python3",
+          "-"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:39:36.766213Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063836Z-f6a543e0-phaseE-gpu1-wait/record.json",
+        "evidence_sha256": "468f96b11979de521d4e853b6676a36fe4056e15d27fe5c6441d0de7b11862a5",
+        "exit_code": 0,
+        "id": "20261008T063836Z-f6a543e0-phaseE-gpu1-wait",
+        "label": "phaseE-gpu1-wait",
+        "phase": "E",
+        "start_utc": "2026-10-08T06:38:36.292609Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063836Z-f6a543e0-phaseE-gpu1-wait/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063836Z-f6a543e0-phaseE-gpu1-wait/stdout.log",
+        "stdout_sha256": "e53059ea0f81d37ac5fd8aeaf9049cf3415d32002854bd02d2f94e3bdbf570fc",
+        "timed_out": false,
+        "wall_seconds": 60.474
+      },
+      {
+        "command": [
+          "python3",
+          "-"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:41:25.502310Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063936Z-9a433a80-phaseE-preflight/record.json",
+        "evidence_sha256": "0d955976c260a27a9d65fcace6e06ed83b72942b26a126ca857ce6bf493f9584",
+        "exit_code": 0,
+        "id": "20261008T063936Z-9a433a80-phaseE-preflight",
+        "label": "phaseE-preflight",
+        "phase": "E",
+        "start_utc": "2026-10-08T06:39:36.833588Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063936Z-9a433a80-phaseE-preflight/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T063936Z-9a433a80-phaseE-preflight/stdout.log",
+        "stdout_sha256": "27621654a815895820c08b8e64df692350eb31e9fb6c7bc52ca9e4e5b891ce89",
+        "timed_out": false,
+        "wall_seconds": 108.669
+      },
+      {
+        "command": [
+          "python3",
+          "-"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:41:25.790696Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064125Z-29f1c38f-phaseE-gpu1-immediate-before-admission/record.json",
+        "evidence_sha256": "a34017d8bd4358d98d2fc6871bf461ade750238e6f6476f4db2a5d5ebefbff7d",
+        "exit_code": 1,
+        "id": "20261008T064125Z-29f1c38f-phaseE-gpu1-immediate-before-admission",
+        "label": "phaseE-gpu1-immediate-before-admission",
+        "phase": "E",
+        "start_utc": "2026-10-08T06:41:25.579249Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064125Z-29f1c38f-phaseE-gpu1-immediate-before-admission/stderr.log",
+        "stderr_sha256": "03b0c650302c217c5e3e7b8ca000859445ebf840911a0bbfd14f759fa3c2bcad",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064125Z-29f1c38f-phaseE-gpu1-immediate-before-admission/stdout.log",
+        "stdout_sha256": "a53f52d54ac28f38dd9cfe344101932bad190abd2ff501b1074ad85e13cea760",
+        "timed_out": false,
+        "wall_seconds": 0.211
+      },
+      {
+        "command": [
+          "python3",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-E/scripts/gpu1_check.py",
+          "--mode",
+          "wait",
+          "--deadline-epoch",
+          "1791463116.0",
+          "--out",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-E/gpu1-wait-attempt2.json"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:44:27.210214Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064426Z-8c3fe382-phaseE-attempt2-gpu1-wait/record.json",
+        "evidence_sha256": "ae19f5fee2a154b0c5fdbb43d687ba5d4f37b01693f4543592a4062ebe39a3df",
+        "exit_code": 0,
+        "id": "20261008T064426Z-8c3fe382-phaseE-attempt2-gpu1-wait",
+        "label": "phaseE-attempt2-gpu1-wait",
+        "phase": "E",
+        "start_utc": "2026-10-08T06:44:26.969315Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064426Z-8c3fe382-phaseE-attempt2-gpu1-wait/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064426Z-8c3fe382-phaseE-attempt2-gpu1-wait/stdout.log",
+        "stdout_sha256": "feb2bff2b88fd5703dfd420976cb639afa80fd909283389969926b3ffbf003d4",
+        "timed_out": false,
+        "wall_seconds": 0.241
+      },
+      {
+        "command": [
+          "python3",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-E/scripts/preflight.py",
+          "--out",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-E/preflight-attempt2.json"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:46:14.158109Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064427Z-8f1b3fbe-phaseE-attempt2-preflight/record.json",
+        "evidence_sha256": "18f8783d91333a5e256c723b8c1c640cd7bb622c75a56dc7a12bd04d660219fc",
+        "exit_code": 0,
+        "id": "20261008T064427Z-8f1b3fbe-phaseE-attempt2-preflight",
+        "label": "phaseE-attempt2-preflight",
+        "phase": "E",
+        "start_utc": "2026-10-08T06:44:27.277985Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064427Z-8f1b3fbe-phaseE-attempt2-preflight/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064427Z-8f1b3fbe-phaseE-attempt2-preflight/stdout.log",
+        "stdout_sha256": "8a7fea2bbd28bb4722c780b63fce524dabf3bef6e0747db027833cf9b552f8f5",
+        "timed_out": false,
+        "wall_seconds": 106.88
+      },
+      {
+        "command": [
+          "python3",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-E/scripts/gpu1_check.py",
+          "--mode",
+          "guard",
+          "--out",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-E/gpu1-guard-attempt2.json"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:46:14.471967Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064614Z-dffeceeb-phaseE-attempt2-gpu1-guard/record.json",
+        "evidence_sha256": "c8cd644ac323085637e892726c6f3280ed94b31f9a0e10f5e3590006f1083619",
+        "exit_code": 1,
+        "id": "20261008T064614Z-dffeceeb-phaseE-attempt2-gpu1-guard",
+        "label": "phaseE-attempt2-gpu1-guard",
+        "phase": "E",
+        "start_utc": "2026-10-08T06:46:14.229574Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064614Z-dffeceeb-phaseE-attempt2-gpu1-guard/stderr.log",
+        "stderr_sha256": "80fa14af432447f0293829048ca3752fe6e50dcaf5a9be2afa6115002432e60e",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064614Z-dffeceeb-phaseE-attempt2-gpu1-guard/stdout.log",
+        "stdout_sha256": "a54bd3a9fd322d517343c739f29e32bb4efdd51dc46df55dc0de760bb0320ead",
+        "timed_out": false,
+        "wall_seconds": 0.242
+      },
+      {
+        "command": [
+          "python3",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-E/scripts/gpu1_check.py",
+          "--mode",
+          "wait",
+          "--deadline-epoch",
+          "1791463116.0",
+          "--out",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-E/gpu1-wait-attempt3.json"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:47:14.998558Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064614Z-edefbe95-phaseE-attempt3-gpu1-wait/record.json",
+        "evidence_sha256": "3343afc62482577212fb2a878d4e6acacadbb2457cac86a54875c57d69323fff",
+        "exit_code": 0,
+        "id": "20261008T064614Z-edefbe95-phaseE-attempt3-gpu1-wait",
+        "label": "phaseE-attempt3-gpu1-wait",
+        "phase": "E",
+        "start_utc": "2026-10-08T06:46:14.580310Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064614Z-edefbe95-phaseE-attempt3-gpu1-wait/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064614Z-edefbe95-phaseE-attempt3-gpu1-wait/stdout.log",
+        "stdout_sha256": "19eb7851537c34aa23809a0be6cdb7af35e02e85831b113737102b5cb255dfe8",
+        "timed_out": false,
+        "wall_seconds": 60.418
+      },
+      {
+        "command": [
+          "python3",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-E/scripts/preflight.py",
+          "--out",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-E/preflight-attempt3.json"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:49:01.590911Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064715Z-18d1dcaf-phaseE-attempt3-preflight/record.json",
+        "evidence_sha256": "506ae1a25c3a49e154998ce1dfe3e03d2f8ca9d06f058092d1964bf808871f27",
+        "exit_code": 0,
+        "id": "20261008T064715Z-18d1dcaf-phaseE-attempt3-preflight",
+        "label": "phaseE-attempt3-preflight",
+        "phase": "E",
+        "start_utc": "2026-10-08T06:47:15.067917Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064715Z-18d1dcaf-phaseE-attempt3-preflight/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064715Z-18d1dcaf-phaseE-attempt3-preflight/stdout.log",
+        "stdout_sha256": "4cbf24b3107ec7d309b4733b6b9de342cff804d2f95f35ec69bac3b230bbcca1",
+        "timed_out": false,
+        "wall_seconds": 106.523
+      },
+      {
+        "command": [
+          "python3",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-E/scripts/gpu1_check.py",
+          "--mode",
+          "guard",
+          "--out",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-E/gpu1-guard-attempt3.json"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:49:01.921623Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064901Z-45a4cefc-phaseE-attempt3-gpu1-guard/record.json",
+        "evidence_sha256": "4750ce9e6a03def19c33837a3ad0914afe9aa52172a514000a2e5c2a4abcd68c",
+        "exit_code": 0,
+        "id": "20261008T064901Z-45a4cefc-phaseE-attempt3-gpu1-guard",
+        "label": "phaseE-attempt3-gpu1-guard",
+        "phase": "E",
+        "start_utc": "2026-10-08T06:49:01.662160Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064901Z-45a4cefc-phaseE-attempt3-gpu1-guard/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064901Z-45a4cefc-phaseE-attempt3-gpu1-guard/stdout.log",
+        "stdout_sha256": "912379201bf3c43d984c0eab88a3de854c2ab7b0ce403c27993e3a8780fc8ea5",
+        "timed_out": false,
+        "wall_seconds": 0.259
+      },
+      {
+        "command": [
+          "python3",
+          "-m",
+          "training_execution.run_sustained",
+          "--run-id",
+          "t27f20261008T064901Z",
+          "--admission-only"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:51:00.586028Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064901Z-97d8bd13-phaseE-live-admission-t27f20261008T064901Z/record.json",
+        "evidence_sha256": "a5b5262ac26f8eb997f35905ce22c80de31036b1dcd4ff159c6684226130900f",
+        "exit_code": 1,
+        "id": "20261008T064901Z-97d8bd13-phaseE-live-admission-t27f20261008T064901Z",
+        "label": "phaseE-live-admission-t27f20261008T064901Z",
+        "phase": "E",
+        "start_utc": "2026-10-08T06:49:01.991860Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064901Z-97d8bd13-phaseE-live-admission-t27f20261008T064901Z/stderr.log",
+        "stderr_sha256": "642460d0a3f15ff943ee022f1d6440a3a8bb73c5d39df1bb8fc796fb9643d35b",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T064901Z-97d8bd13-phaseE-live-admission-t27f20261008T064901Z/stdout.log",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "timed_out": false,
+        "wall_seconds": 118.594
+      },
+      {
+        "command": [
+          "python3",
+          "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-E/scripts/capture_failure_summary.py"
+        ],
+        "cwd": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+        "end_utc": "2026-10-08T06:55:04.300864Z",
+        "evidence_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T065502Z-f3aa03f8-phaseE-capture-failure-summary/record.json",
+        "evidence_sha256": "75fc3656845cc914f8db6022047d23675a6a081d4de15c5d2381356acd7f47d8",
+        "exit_code": 0,
+        "id": "20261008T065502Z-f3aa03f8-phaseE-capture-failure-summary",
+        "label": "phaseE-capture-failure-summary",
+        "phase": "E",
+        "start_utc": "2026-10-08T06:55:02.762197Z",
+        "stderr_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T065502Z-f3aa03f8-phaseE-capture-failure-summary/stderr.log",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/commands/20261008T065502Z-f3aa03f8-phaseE-capture-failure-summary/stdout.log",
+        "stdout_sha256": "db3bd3b15e5952704f65d72f0a4e9b3d14369c650ad411699033fa91d91da9f7",
+        "timed_out": false,
+        "wall_seconds": 1.539
+      }
+    ]
+  },
+  "generated_utc": "2026-10-08T06:57:41.587734Z",
+  "head": "ab6d4605c822b74ecf25a37afde745967c1c2650",
+  "input_documents": {
+    "admission_plan": {
+      "exists": true,
+      "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission/docs/ticket27/admission-plan.md",
+      "sha256": "463c9d7d1ee2b544a207d3e76287690507eec43527ed8211f5224f6dd156975c",
+      "size_bytes": 27531
+    },
+    "readmission_report": {
+      "exists": true,
+      "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission/docs/ticket27/readmission-report.md",
+      "sha256": "16da877604277e2c3cb6d937f27c6fe7d86f07eff2686cf74cc8de9f9062d424",
+      "size_bytes": 16888
+    },
+    "storage_plan": {
+      "exists": true,
+      "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission/docs/ticket27/storage-plan.md",
+      "sha256": "f69151842b90916af48028aa71d3cc45ca080d7f4123bc1358e403988e4428c6",
+      "size_bytes": 22212
+    }
+  },
+  "not_checked": [
+    "No scientific result is claimed.",
+    "No full balanced16 sweep was run.",
+    "No live admission receipt was emitted or verified after the resource-scope failure.",
+    "No journal entry was appended and evidence.publish was not run.",
+    "No issue file or task index was edited.",
+    "No push, merge, rebase, reset, stash, or branch switch was performed."
+  ],
+  "phase_results": {
+    "A": {
+      "data02_free_bytes": 101532680192,
+      "evidence": {
+        "exists": true,
+        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-A/preflight-summary.json",
+        "sha256": "0dd56f9fe4d1724ed5438ca408e3cdf86b1318e85cb5ce2ba0091f38fcb16f57",
+        "size_bytes": 4946
+      },
+      "hdfs_listing": "pass",
+      "status": "pass",
+      "unique_payload_bytes_excluding_audit": 15301703072
+    },
+    "B": {
+      "entries": [
+        {
+          "case": "cohort16-baseline-fit20261002a",
+          "post_release_data02_free_bytes": 80163033088,
+          "post_release_unique_payload_bytes": 13525431219,
+          "publish_only_verified_publication": {
+            "exists": true,
+            "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/cohort16-baseline-fit20261002a/publish-only/hdfs-retention-cohort16-baseline-fit20261002a-ccc02a8959894f1c9a0f9e23aa91744d/verified-publication.json",
+            "sha256": "f96af3eed70d7b3d06f63bb7a82e9e8dfb13163b3f27eaef1005affddb4331ef",
+            "size_bytes": 108823
+          },
+          "release_stage_receipts": [
+            "independent",
+            "release-plan",
+            "release-completed"
+          ],
+          "release_verified_publication": {
+            "exists": true,
+            "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/cohort16-baseline-fit20261002a/release/hdfs-retention-cohort16-baseline-fit20261002a-de503bf51c5f4aa9bb63c2db0f922727/verified-publication.json",
+            "sha256": "3779f2c29a9ec31c2c47b641c9a142a51f044e1d79789735bd6b60089a4136a5",
+            "size_bytes": 152836
+          }
+        },
+        {
+          "case": "cohort16-residual_bev-balanced20261002b",
+          "post_release_data02_free_bytes": 144498577408,
+          "post_release_unique_payload_bytes": 12158127867,
+          "publish_only_verified_publication": {
+            "exists": true,
+            "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/cohort16-residual_bev-balanced20261002b/publish-only/hdfs-retention-cohort16-residual_bev-balanced20261002b-b3705e16abff407cbb68b2e87e98f5b0/verified-publication.json",
+            "sha256": "cbc1fe57951bd198ee4013511f99f2f38129e48eb5f57e93eb8fa82f6a717e27",
+            "size_bytes": 95069
+          },
+          "release_stage_receipts": [
+            "independent",
+            "release-plan",
+            "release-completed"
+          ],
+          "release_verified_publication": {
+            "exists": true,
+            "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/cohort16-residual_bev-balanced20261002b/release/hdfs-retention-cohort16-residual_bev-balanced20261002b-27355efc9ad54fa8b7947141bcd27f51/verified-publication.json",
+            "sha256": "c3e900100dfcbed701e1c954ad6c789231f99718d3b7f897a36e1a0439803fc8",
+            "size_bytes": 130206
+          }
+        },
+        {
+          "case": "native-overfit-v1",
+          "post_release_data02_free_bytes": 142140329984,
+          "post_release_unique_payload_bytes": 11663317401,
+          "publish_only_verified_publication": {
+            "exists": true,
+            "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/native-overfit-v1/publish-only/hdfs-retention-native-overfit-v1-788f553a767847c1a713fb2124eaa86c/verified-publication.json",
+            "sha256": "dd1af724e95e99e97ece8b1a3aa66283b0a2fc4022152987be3b7f5c1a1d9b0d",
+            "size_bytes": 66947
+          },
+          "release_stage_receipts": [
+            "independent",
+            "release-plan",
+            "release-completed"
+          ],
+          "release_verified_publication": {
+            "exists": true,
+            "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/native-overfit-v1/release/hdfs-retention-native-overfit-v1-4f42058050c74ce4a1d9c5eca5c5128b/verified-publication.json",
+            "sha256": "7cc28846e139c20e2710e5af1924245eaf4346a8caa17ebe3c0c2d11f28e7194",
+            "size_bytes": 80279
+          }
+        },
+        {
+          "case": "architecture-window_bev-v1",
+          "post_release_data02_free_bytes": 137763770368,
+          "post_release_unique_payload_bytes": 11301648713,
+          "publish_only_verified_publication": {
+            "exists": true,
+            "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/architecture-window_bev-v1/publish-only/hdfs-retention-architecture-window_bev-v1-0af0c3dc51d2448c9c6fe13d4ea13b95/verified-publication.json",
+            "sha256": "9592887db64eaf02b97da31f993ea40c18e1b87eb0fded5627b087aa1b42c1a6",
+            "size_bytes": 69324
+          },
+          "release_stage_receipts": [
+            "independent",
+            "release-plan",
+            "release-completed"
+          ],
+          "release_verified_publication": {
+            "exists": true,
+            "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/architecture-window_bev-v1/release/hdfs-retention-architecture-window_bev-v1-402f5fa5508a466687f31852a3215edb/verified-publication.json",
+            "sha256": "a1376d234bf740c9027b5009d1c724855206306b1a76bb2b304f5db4e74be195",
+            "size_bytes": 81308
+          }
+        },
+        {
+          "case": "architecture-coarse_mlp-v1",
+          "post_release_data02_free_bytes": 134092500992,
+          "post_release_unique_payload_bytes": 10939980061,
+          "publish_only_verified_publication": {
+            "exists": true,
+            "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/architecture-coarse_mlp-v1/publish-only/hdfs-retention-architecture-coarse_mlp-v1-ce7d79b9f4ac4a1080d808fb3957b28c/verified-publication.json",
+            "sha256": "a30ba305d1bb10de20e5cd99a4c6b6aa35f178a73f685a3a33fac750241f58c2",
+            "size_bytes": 69324
+          },
+          "release_stage_receipts": [
+            "independent",
+            "release-plan",
+            "release-completed"
+          ],
+          "release_verified_publication": {
+            "exists": true,
+            "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/architecture-coarse_mlp-v1/release/hdfs-retention-architecture-coarse_mlp-v1-a5800b11247644dbb85c22db9079234d/verified-publication.json",
+            "sha256": "82a07f35ae3acd8a4547b1bd1ce4108edb71204019e438afba4e9b762b708917",
+            "size_bytes": 81308
+          }
+        }
+      ],
+      "evidence": {
+        "exists": true,
+        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/phase-B-summary.json",
+        "sha256": "8d9cf0ca53a50cd0bcfc27910661569ad1d9b3391033854bfe9a1515698f6fe5",
+        "size_bytes": 11053
+      },
+      "final_unique_payload_bytes_excluding_audit": 10939980061,
+      "status": "pass"
+    },
+    "C": {
+      "evidence": {
+        "exists": true,
+        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-C/phase-C-summary.json",
+        "sha256": "c64613a08eefc1e6d5100f8e68dca22e685f07a7d9f6e1a00b5076fa1e4271c1",
+        "size_bytes": 1214
+      },
+      "listing_entries": 3016,
+      "moved_to": "/data02/home/philip.yang/.cache/waystone/waymo-perception/retired-audits/motion-current-geometry-audit-v3",
+      "source_files": 31,
+      "source_symlinks": 2970,
+      "status": "pass",
+      "verified_publication": {
+        "exists": true,
+        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-C/hdfs-retention-motion-current-geometry-audit-v3-d5fd35f8837942c4a94f7e4ed4654e91/verified-publication.json",
+        "sha256": "8d43bc3e32f9de6ffe241b393b7ffc900dde31b6a451b5df8bf5b3b027b23a34",
+        "size_bytes": 1601004
+      }
+    },
+    "D": {
+      "cap_bytes": 16106127360,
+      "evidence": {
+        "exists": true,
+        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/storage-gate.json",
+        "sha256": "a98f8a47d91c25f6504a247ae4bfe2521aac14f31329d49afd90a7aea9167541",
+        "size_bytes": 389
+      },
+      "reservation_bytes": 2147483648,
+      "reservation_under_cap": true,
+      "status": "pass",
+      "target_bytes": 11811160064,
+      "under_target": true,
+      "unique_payload_bytes": 10939980061
+    },
+    "E": {
+      "admission_summary": {
+        "exists": true,
+        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T064901Z/admission-summary.json",
+        "sha256": "9adbea6f65627a9e80e44bf420dea327551b6c47c7f89f64ec826927cdbb96fc",
+        "size_bytes": 7107
+      },
+      "blocking_error": "ValueError: declared sustained resource scope required",
+      "diagnosis": {
+        "kernel_scope_contract": "autonomy/resources/kernel_scope.py lines 5-13 reject cgroup paths that do not match sureal-sustained-*.scope",
+        "observed_current_proc_cgroup": "0::/user.slice/user-1018.slice/session-28743.scope",
+        "root_cause": "the worker process was launched outside the required cgroup-v2 scope whose basename starts sureal-sustained- and ends .scope",
+        "stage_call_path": [
+          "training_execution.run_sustained --admission-only",
+          "resources.backend wrapped stage",
+          "resources.stage.run_stage",
+          "resources.scoped_stage.run_scoped",
+          "resources.kernel_scope.read_scope"
+        ]
+      },
+      "evidence": {
+        "exists": true,
+        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-E/phase-E-failure-summary.json",
+        "sha256": "da85a1d57b1ebfbed519c385c95bdb50c41e3f8a8c45f9e1ef557ab2210a2443",
+        "size_bytes": 3794
+      },
+      "exit_code": 1,
+      "failed_command": "PYTHONPATH=autonomy python3 -m training_execution.run_sustained --run-id t27f20261008T064901Z --admission-only",
+      "receipts_verified": 0,
+      "resource_attempt": {
+        "attempt_json": {
+          "exists": true,
+          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-t27f20261008T064901Z/resource-layer/stages/train-0/attempt.json",
+          "sha256": "bcc40318208f88bf170c935da747b63b8164921f354ee3be17b09160ba756672",
+          "size_bytes": 15948
+        },
+        "identity_json": {
+          "exists": true,
+          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-t27f20261008T064901Z/resource-layer/identity.json",
+          "sha256": "a299ea6f10cdf2a26578aa40ca96b72e21b31aebcfdec8b347b68cebf63de885",
+          "size_bytes": 7070
+        },
+        "summary": {
+          "admitted": false,
+          "cap_bytes": 17179869184,
+          "command_contains_cuda_visible_devices_zero": true,
+          "command_contains_gpu1": true,
+          "command_prefix": [
+            "bwrap",
+            "--unshare-all",
+            "--die-with-parent",
+            "--ro-bind",
+            "/data02/home/philip.yang/.cache/waystone/waymo-perception/gpu-rootfs-v6",
+            "/",
+            "--ro-bind",
+            "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-t27f20261008T064901Z/code/autonomy",
+            "/experiment",
+            "--ro-bind",
+            "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-t27f20261008T064901Z/train-0-input",
+            "/source",
+            "--bind",
+            "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-t27f20261008T064901Z/update-00",
+            "/outputs",
+            "--proc"
+          ],
+          "error": {
+            "message": "declared sustained resource scope required",
+            "type": "ValueError"
+          },
+          "native_output_directory": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-t27f20261008T064901Z/update-00",
+          "retained_failure_log": {
+            "native_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-t27f20261008T064901Z/update-00/live.log",
+            "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-t27f20261008T064901Z/resource-layer/stages/train-0/execution.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "timeout_seconds": 1800
+        }
+      },
+      "run_id": "t27f20261008T064901Z",
+      "status": "failed_before_training",
+      "storage_gate_after_failure": {
+        "cap_bytes": 16106127360,
+        "reservation_bytes": 2147483648,
+        "reservation_under_cap": true,
+        "root": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing",
+        "target_bytes": 11811160064,
+        "under_target": true,
+        "unique_payload_bytes": 10939980061
+      },
+      "wall_seconds": 118.594
+    },
+    "F": {
+      "reason": "Phase F was conditional on Phase E passing; live admission failed before training.",
+      "status": "skipped"
+    },
+    "G": {
+      "evidence": {
+        "json": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission/docs/ticket27/execution-report.json",
+        "markdown": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission/docs/ticket27/execution-report.md"
+      },
+      "status": "reported"
+    }
+  },
+  "schema_version": 1,
+  "scope": {
+    "evidence_root": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution",
+    "not_a_scientific_result": true,
+    "repo_root": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
+    "scientific_root": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing"
+  },
+  "status": "stopped_at_phase_e_failure",
+  "ticket27_box_verdicts": [
+    {
+      "box": "The sweep recipes, frames and anchor templates are unchanged from the preregistration",
+      "evidence": {
+        "exists": true,
+        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-E/preflight-attempt3.json",
+        "sha256": "fde17ded25b3cd9e70ea1a97aea80c86f29db6e264b1d943dc3fab8898cb14df",
+        "size_bytes": 76706
+      },
+      "note": "Phase E preflight repeated preregistration checks before the final live attempt.",
+      "verdict": "pass"
+    },
+    {
+      "box": "Each recipe admission pins a source snapshot stored in HDFS and the new rootfs digest",
+      "evidence": {
+        "exists": true,
+        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission/docs/ticket27/readmission-report.md",
+        "sha256": "16da877604277e2c3cb6d937f27c6fe7d86f07eff2686cf74cc8de9f9062d424",
+        "size_bytes": 16888
+      },
+      "note": "Inherited 27b source publication/readback and final check remain recorded; this t27f run emitted no new live receipt because the final admission failed before training.",
+      "verdict": "partial"
+    },
+    {
+      "box": "Every runtime-lock check listed in ticket 01 is re-admitted on the new images",
+      "evidence": {
+        "exists": true,
+        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission/docs/ticket27/readmission-report.md",
+        "sha256": "16da877604277e2c3cb6d937f27c6fe7d86f07eff2686cf74cc8de9f9062d424",
+        "size_bytes": 16888
+      },
+      "note": "Required live-gate status: 7 real passes, 3 semantic rows contract-only on synthesized receipts, M0 blocked on a rootfs rebuild. This is not counted as full ticket admission.",
+      "verdict": "not_fully_admitted"
+    },
+    {
+      "box": "A live gate executes the admitted candidate in the new rootfs and its receipt verifies against the snapshot",
+      "evidence": {
+        "exists": true,
+        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T064901Z/admission-summary.json",
+        "sha256": "9adbea6f65627a9e80e44bf420dea327551b6c47c7f89f64ec826927cdbb96fc",
+        "size_bytes": 7107
+      },
+      "note": "The final live command exited 1 after 118.594 seconds with no accepted receipt and no training result.",
+      "verdict": "failed_before_training"
+    },
+    {
+      "box": "The journal records the re-admission and what changed since the original admission",
+      "evidence": {
+        "exists": true,
+        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-E/phase-E-failure-summary.json",
+        "sha256": "da85a1d57b1ebfbed519c385c95bdb50c41e3f8a8c45f9e1ef557ab2210a2443",
+        "size_bytes": 3794
+      },
+      "note": "Phase F was skipped because Phase E did not pass.",
+      "verdict": "not_run"
+    },
+    {
+      "box": "The task index states the sweep new status",
+      "evidence": {
+        "not_edited_by_worker": true,
+        "path": ".scratch/semantic-layout/issues/27-readmit-balanced16.md"
+      },
+      "note": "The task explicitly forbade editing the ticket file or task index.",
+      "verdict": "not_changed_by_worker"
+    }
+  ],
+  "worker": "t27f2-storage-and-admission"
+}
