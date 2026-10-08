@@ -37,6 +37,7 @@ KNOWN_FAILURE_TESTS = [
 SEGMENTATION_VISIBILITY = [
     "//autonomy:__pkg__",
     "//autonomy/detection:__pkg__",
+    "//autonomy/evaluation:__pkg__",
 ]
 
 py_library(
