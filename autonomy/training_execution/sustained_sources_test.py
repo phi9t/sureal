@@ -1,5 +1,6 @@
 import hashlib,json,tempfile,unittest
 from pathlib import Path
+from unittest import mock
 from evidence.source_snapshot import LocalSnapshotStore,archive_sources
 from training_execution.sustained_sources import REQUIRED,SNAPSHOT_TARGET,cache_snapshot_for_runtime,snapshot_sources,validate_sources
 
@@ -11,6 +12,17 @@ class SustainedSourceTests(unittest.TestCase):
   archive,pins=archive_sources(root,names)
   digest=hashlib.sha256(archive).hexdigest();LocalSnapshotStore(store_root).store(digest,archive)
   receipt={'schema_version':1,'source_snapshot_sha256':digest,'source_snapshot_target':SNAPSHOT_TARGET,'source_snapshot_store':str(store_root),'source_pins':pins}
+  lock={'rootfs_sha256':'a'*64,'image_id':'sha256:'+'b'*64};return receipt,lock
+ def schema2_fixture(self,mounted,store_root,names=None):
+  names=sorted(REQUIRED) if names is None else names
+  archive_root=Path(mounted).parent/'admitted-code'
+  for name in names:
+   for root in [Path(mounted),archive_root/'autonomy']:
+    p=root/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(name+'\n')
+  members=['autonomy/'+name for name in names]
+  archive,pins=archive_sources(archive_root,members)
+  digest=hashlib.sha256(archive).hexdigest();LocalSnapshotStore(store_root).store(digest,archive)
+  receipt={'schema_version':2,'source_snapshot_sha256':digest,'source_snapshot_target':SNAPSHOT_TARGET,'source_snapshot_store':str(store_root),'source_snapshot_root':str(archive_root),'source_pins':pins}
   lock={'rootfs_sha256':'a'*64,'image_id':'sha256:'+'b'*64};return receipt,lock
  def query_runner(self,names):
   def run(command,**kwargs):
@@ -60,6 +72,35 @@ class SustainedSourceTests(unittest.TestCase):
    for name in receipt['source_pins']:
     destination=moved/name;destination.parent.mkdir(parents=True,exist_ok=True);destination.write_bytes((root/name).read_bytes())
    self.assertEqual(validate_sources(moved,receipt,lock,lock)['source_pins'],receipt['source_pins'])
+ def test_sandbox_validation_uses_mounted_root_and_runtime_snapshot_store(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   base=Path(tmp);mounted=base/'experiment';runtime_store=base/'runtime-source-snapshots';receipt,lock=self.schema2_fixture(mounted,runtime_store)
+   host_root=base/'host-case/code';host_root.parent.mkdir()
+   receipt['source_snapshot_root']=str(host_root)
+   receipt['source_snapshot_store']=str(base/'host-store-not-mounted')
+   with mock.patch.dict('os.environ',{'SUREAL_SOURCE_SNAPSHOT_STORE':str(runtime_store)}):
+    result=validate_sources(mounted,receipt,lock,lock)
+   self.assertEqual(result['source_snapshot_sha256'],receipt['source_snapshot_sha256'])
+   self.assertFalse(host_root.exists())
+ def test_sandbox_validation_rejects_tampered_mounted_root_without_materializing_host_root(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   base=Path(tmp);mounted=base/'experiment';runtime_store=base/'runtime-source-snapshots';receipt,lock=self.schema2_fixture(mounted,runtime_store)
+   host_root=base/'host-case/code';host_root.parent.mkdir()
+   receipt['source_snapshot_root']=str(host_root)
+   receipt['source_snapshot_store']=str(base/'host-store-not-mounted')
+   (mounted/'training_execution/train_sustained.py').write_text('tampered mounted worker\n')
+   with mock.patch.dict('os.environ',{'SUREAL_SOURCE_SNAPSHOT_STORE':str(runtime_store)}):
+    with self.assertRaises(ValueError):validate_sources(mounted,receipt,lock,lock)
+   self.assertFalse(host_root.exists())
+ def test_sandbox_validation_rejects_missing_mounted_root_without_materializing_host_root(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   base=Path(tmp);source=base/'admitted-source';runtime_store=base/'runtime-source-snapshots';receipt,lock=self.schema2_fixture(source,runtime_store)
+   mounted=base/'missing-experiment';host_root=base/'host-case/code';host_root.parent.mkdir()
+   receipt['source_snapshot_root']=str(host_root)
+   receipt['source_snapshot_store']=str(base/'host-store-not-mounted')
+   with mock.patch.dict('os.environ',{'SUREAL_SOURCE_SNAPSHOT_STORE':str(runtime_store)}):
+    with self.assertRaises(ValueError):validate_sources(mounted,receipt,lock,lock)
+   self.assertFalse(host_root.exists())
  def test_snapshot_without_required_sustained_file_refused(self):
   with tempfile.TemporaryDirectory() as tmp:
    names=sorted(name for name in REQUIRED if name!='training_execution/train_sustained.py')

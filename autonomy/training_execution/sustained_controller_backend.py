@@ -170,7 +170,7 @@ class NativeBackend:
    write(self.R/'run.json',{'run_id':run_id,'recipe':recipe,'manifest_sha256':self.manifest_sha,'source_hashes':self.pins,'host_source_pins':self.host_pins,'checkpoint_publisher_source_pins':self.checkpoint_publisher_pins,'source_package_root':str(self.package),'anchor_templates_sha256':self.anchor_sha,'scope':'training-only fixed16 one-factor case; no heldout promotion'})
   self.verifier_pins={str(p):sha(p) for p in self.verifier.iterdir()};self.guard()
  def guard(self):
-  validate_host_sources(P,self.host_pins);validate_checkpoint_publisher_sources(P,self.checkpoint_publisher_pins);validate_sources(self.package,self.pins,self.runtime,self.runtime)
+  validate_host_sources(P,self.host_pins);validate_checkpoint_publisher_sources(P,self.checkpoint_publisher_pins);validate_sources(self.package,self.pins,self.runtime,self.runtime,materialize_missing=True)
   admitted_anchor=json.loads((P/'research/training-anchor-candidate-verified.json').read_text())['expected']['candidate_sha256']
   if self.anchor_sha!=admitted_anchor or sha(self.source/'anchor-templates.json')!=self.anchor_sha:raise ValueError('externally admitted decoder anchors changed')
   source_pins=self.pins['source_pins']

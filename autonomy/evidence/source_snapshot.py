@@ -493,16 +493,27 @@ def store_from_receipt(
     return _store_from_descriptor(descriptor, waystone=waystone, runner=runner, timeout=timeout)
 
 
-def verify_materialized_sources(root, receipt, store: SnapshotStore | None = None) -> dict:
+def verify_materialized_sources(root, receipt, store: SnapshotStore | None = None, *, package: str | None = None) -> dict:
     receipt = read_receipt(receipt)
     if not isinstance(receipt, Mapping):
         raise ValueError("receipt object required")
     store = store if store is not None else store_from_receipt(receipt, env_var="SUREAL_SOURCE_SNAPSHOT_STORE")
     verified = verify_receipt_sources(receipt, store)
     root = Path(root)
+    prefix = None
+    if package is not None:
+        package = safe_member_name(package)
+        if "/" in package:
+            raise ValueError("top-level source package required")
+        prefix = package + "/"
     for name, digest in verified["source_pins"].items():
+        materialized_name = name
+        if prefix is not None:
+            if not name.startswith(prefix):
+                raise ValueError("materialized source outside package: " + name)
+            materialized_name = name.removeprefix(prefix)
         try:
-            found = file_sha256(root / name)
+            found = file_sha256(root / materialized_name)
         except ValueError as error:
             raise ValueError("materialized source missing or irregular: " + name) from error
         if found != digest:

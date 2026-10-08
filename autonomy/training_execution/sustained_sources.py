@@ -1,7 +1,7 @@
 """Execution package source-snapshot and externally admitted runtime-lock binding."""
 import re
 from pathlib import Path
-from evidence.source_snapshot import LocalSnapshotStore,receipt_snapshot_digest,snapshot_target_and_materialize,store_from_receipt,verify_or_materialize_receipt_sources
+from evidence.source_snapshot import LocalSnapshotStore,receipt_snapshot_digest,snapshot_target_and_materialize,store_from_receipt,verify_materialized_sources,verify_or_materialize_receipt_sources
 
 REQUIRED=frozenset('''training_execution/train_sustained.py detection/sustained_contract.py training_execution/sustained_loop.py detection/sustained_loss.py training_execution/sustained_state.py training_execution/sustained_sources.py evidence/source_snapshot.py insula/entry.py insula/runtime_identity.py detection/detector_recipe_catalog.py detection/detector_recipe_models.py resources/scientific_budget.py resources/scientific_payload.py resources/sustained_scoring_budget.py detection/pillar_detector.py detection/pillar_encoder.py detection/detector_loss.py geometry/geometry.py geometry/geometry_foundation.py detection/norm_variants.py detection/architecture_variants.py detection/architecture_followups.py resources/replay_values.py range_view/range_frontend.py range_view/range_pillar_hybrid.py range_view/sparse_window_attention.py range_view/sparse_windows.py'''.split())
 SNAPSHOT_TARGET='//autonomy/training_execution:train_sustained'
@@ -36,10 +36,22 @@ def source_pin(receipt,name):
  if found is None:raise ValueError('complete sustained execution source closure required')
  return found
 
-def validate_sources(root,receipt,runtime_lock,admitted_runtime_lock):
+def _host_materialization_root(root,receipt):
+ if receipt.get('schema_version')==2:
+  snapshot_root=Path(receipt.get('source_snapshot_root',root.parent))
+  if root!=snapshot_root/'autonomy':raise ValueError('mounted source root required: '+str(root))
+  return snapshot_root
+ return Path(receipt.get('source_snapshot_root',root))
+
+def validate_sources(root,receipt,runtime_lock,admitted_runtime_lock,*,materialize_missing=False):
  if not isinstance(runtime_lock,dict) or runtime_lock!=admitted_runtime_lock or re.fullmatch('[0-9a-f]{64}',str(runtime_lock.get('rootfs_sha256',''))) is None or not runtime_lock.get('image_id'):raise ValueError('matching externally admitted runtime lock required')
- snapshot_root=Path(receipt.get('source_snapshot_root',root))
- verified=verify_or_materialize_receipt_sources(receipt,snapshot_root,env_var='SUREAL_SOURCE_SNAPSHOT_STORE')
+ root=Path(root)
+ store=store_from_receipt(receipt,env_var='SUREAL_SOURCE_SNAPSHOT_STORE')
+ if not root.exists():
+  if not materialize_missing:raise ValueError('mounted source root required: '+str(root))
+  verify_or_materialize_receipt_sources(receipt,_host_materialization_root(root,receipt),store)
+  if not root.exists():raise ValueError('mounted source root required: '+str(root))
+ verified=verify_materialized_sources(root,receipt,store,package='autonomy' if receipt.get('schema_version')==2 else None)
  required={'autonomy/'+name for name in REQUIRED} if receipt.get('schema_version')==2 else REQUIRED
  if not required<=set(verified['source_pins']):raise ValueError('complete sustained execution source closure required')
  return {'source_files':verified['source_files'],'source_snapshot_sha256':verified['source_snapshot_sha256'],'source_snapshot_target':verified.get('source_snapshot_target'),'source_pins':verified['source_pins'],'rootfs_sha256':runtime_lock['rootfs_sha256'],'scope':'source snapshot and external lock equality; host must independently verify rootfs before launch'}
