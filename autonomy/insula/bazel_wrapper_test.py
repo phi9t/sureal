@@ -188,7 +188,7 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
     def run_wrapper_with_default_roots(self, temporary, *arguments, extra_env=None):
         root = Path(temporary)
         home = root / "home"
-        waymo_rootfs = home / ".cache/waystone/waymo-perception/insula/rootfs-v4"
+        waymo_rootfs = home / ".cache/waystone/waymo-perception/insula/rootfs-v5-t29-20261008T230657Z"
         curriculum_rootfs = home / ".cache/waystone/3d-pathway/insula/rootfs-v2"
         gpu_rootfs = home / ".cache/waystone/waymo-perception/gpu-rootfs-v6"
         for rootfs in (waymo_rootfs, curriculum_rootfs, gpu_rootfs):

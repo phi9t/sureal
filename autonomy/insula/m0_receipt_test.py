@@ -1,16 +1,24 @@
 """Tamper checks against real recorded evidence (no runtime mocking)."""
 import json
+import os
 import shutil
 import tempfile
 import unittest
 from pathlib import Path
-from insula.m0_receipt import validate_receipt
+from insula.m0_receipt import receipt_fixture_paths, validate_receipt
 
 HERE=Path(__file__).resolve().parents[1]
-ROOT=Path.home()/'.cache/waystone/waymo-perception/insula/rootfs-v2'
-EVIDENCE=ROOT.parent/'m0-live-20260930-c'
+ROOT,EVIDENCE=receipt_fixture_paths(os.environ)
 
 class ReceiptTests(unittest.TestCase):
+    def test_receipt_fixture_paths_accept_live_gate_environment(self):
+        root,evidence=receipt_fixture_paths({
+            'WAYMO_INSULA_ROOT':'/tmp/current-rootfs',
+            'WAYMO_M0_RECEIPT':'/tmp/current-receipt',
+        })
+        self.assertEqual(root,Path('/tmp/current-rootfs'))
+        self.assertEqual(evidence,Path('/tmp/current-receipt'))
+
     def test_valid_live_receipt(self):
         validate_receipt(EVIDENCE,ROOT,HERE)
 

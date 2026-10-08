@@ -9,7 +9,7 @@ from resources.stage import run_stage,validate_proof,write_new,require_separate
 CAP_BYTES=16*1024**3
 CURRENT=Path(__file__).resolve().parent
 PACKAGE_ROOT=CURRENT.parent
-CURRENT_CPU_ROOTFS_NAME='rootfs-v4'
+CURRENT_CPU_ROOTFS_NAME='rootfs-v5-t29-20261008T230657Z'
 
 
 def resource_cpu_root_for(owner,cache_root=None):
