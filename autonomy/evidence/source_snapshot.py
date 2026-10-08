@@ -242,6 +242,14 @@ def require_regular_file(path):
     return path
 
 
+def is_regular_file(path) -> bool:
+    try:
+        require_regular_file(path)
+    except (OSError, ValueError):
+        return False
+    return True
+
+
 def file_digest(path, algorithm: str) -> str:
     with require_regular_file(path).open("rb") as stream:
         return hashlib.file_digest(stream, algorithm).hexdigest()

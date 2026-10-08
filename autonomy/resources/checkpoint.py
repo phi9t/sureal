@@ -5,10 +5,11 @@ It preserves all seven stage proofs under one digest for progression/recovery.
 """
 import hashlib,json,os,tempfile
 from pathlib import Path,PurePosixPath
+from evidence.source_snapshot import is_regular_file
 from evidence.source_snapshot import safe_member_name
 from evidence.source_snapshot import receipt_snapshot_digest,store_from_receipt,verify_or_materialize_receipt_sources
 from resources.command import inspect_command
-from resources.sources import regular,sha
+from resources.sources import sha
 from resources.stage import write_new,require_separate
 from resources.retention_audit import EXTRA as PUBLICATION_EXTRA,validate_live_references,validate_union
 from resources.stage import validate_proof
@@ -18,7 +19,7 @@ STAGES=('train','audit','literal-loss','export','proposals','score','metrics-aud
 
 def reference(path):
     path=Path(path)
-    if not regular(path):raise ValueError('regular immutable resource parent required')
+    if not is_regular_file(path):raise ValueError('regular immutable resource parent required')
     return {'path':str(path),'sha256':sha(path)}
 
 
@@ -27,7 +28,7 @@ def _expected(backend,record):
     try:
         step=record['step'];target=record['target_step'];path=Path(record['final_path'])
         if (type(step) is not int or type(target) is not int or not 0<=step<=target<=32000 or
-            not regular(path) or sha(path)!=record['final_sha256']):
+            not is_regular_file(path) or sha(path)!=record['final_sha256']):
             raise ValueError('bounded checkpoint and exact native final required')
         final=json.loads(path.read_text());refs=final['stage_receipts']
         if final['step']!=step or final['manifest_sha256']!=backend.manifest_sha or set(refs)!=set(STAGES):
@@ -203,7 +204,7 @@ def _validate_independent_admission(pub,inventory,readback):
         if admission['exit_code']!=0 or admission['validation']['whole_member_union_exact'] is not True:
             raise ValueError('independent resource recovery admission required')
         proof_path=Path(admission['resource_proof_path'])
-        if not regular(proof_path) or sha(proof_path)!=admission['resource_proof_sha256']:
+        if not is_regular_file(proof_path) or sha(proof_path)!=admission['resource_proof_sha256']:
             raise ValueError('independent resource proof changed')
         proof=json.loads(proof_path.read_text())
         validate_proof(proof,command,Path(pub['resource_source_directory']),pub['resource_source_pins'],
@@ -252,7 +253,7 @@ def _validate_independent_admission(pub,inventory,readback):
         if set(names)!={'check.json','live.log'} or len(artifacts)!=2:
             raise ValueError('independent resource audit outputs required')
         for path,digest in artifacts.items():
-            if not regular(Path(path)) or sha(path)!=digest:
+            if not is_regular_file(Path(path)) or sha(path)!=digest:
                 raise ValueError('independent resource audit output changed')
         expected_validation={**result,'corrupt_resource_copies_refused':5}
         if admission['validation']!=expected_validation or json.loads(Path(names['check.json']).read_text())!=expected_validation:
@@ -268,7 +269,7 @@ def validate_publication_receipt(backend,record,receipt,expected_inventory=None)
     try:
         if receipt['kind']!='checkpoint':raise ValueError('checkpoint resource publication required')
         path=Path(receipt['path'])
-        if not regular(path) or sha(path)!=receipt['sha256']:raise ValueError('resource publication receipt changed')
+        if not is_regular_file(path) or sha(path)!=receipt['sha256']:raise ValueError('resource publication receipt changed')
         pub=json.loads(path.read_text())
         if (pub['kind']!='checkpoint' or pub['resource_identity_sha256']!=backend.resource_identity_sha256 or
             pub['native_manifest_sha256']!=backend.manifest_sha or
@@ -276,9 +277,9 @@ def validate_publication_receipt(backend,record,receipt,expected_inventory=None)
             raise ValueError('resource publication identity differs')
         _validate_publication_external_bindings(backend,pub)
         root=path.parent;expected_path=root/'expected.json';readback_path=root/'publication-readback.json'
-        if (not regular(expected_path) or sha(expected_path)!=pub['source_inventory_sha256'] or
+        if (not is_regular_file(expected_path) or sha(expected_path)!=pub['source_inventory_sha256'] or
             json.loads(expected_path.read_text())!=pub['source_inventory'] or
-            not regular(readback_path) or sha(readback_path)!=pub['publication_manifest_sha256'] or
+            not is_regular_file(readback_path) or sha(readback_path)!=pub['publication_manifest_sha256'] or
             json.loads(readback_path.read_text())!=_publication_readback(pub)):
             raise ValueError('resource publication exact readback evidence changed')
         readback=json.loads(readback_path.read_text())
@@ -317,7 +318,7 @@ def write_publication_record(backend,record,receipt,expected_inventory):
            'resource_receipt':receipt,
            'scope':'durable resource publication identity required before native release'}
     if path.exists():
-        if not regular(path) or json.loads(path.read_text())!=value:
+        if not is_regular_file(path) or json.loads(path.read_text())!=value:
             raise ValueError('resource publication sidecar identity changed')
     else:
         path.parent.mkdir(exist_ok=True);write_new(path,value)
@@ -328,7 +329,7 @@ def write_publication_record(backend,record,receipt,expected_inventory):
 def recover_publication_record(backend,record,expected_inventory=None):
     path=publication_record_path(backend,record)
     if not path.exists():return None
-    if not regular(path):raise ValueError('resource publication sidecar changed')
+    if not is_regular_file(path):raise ValueError('resource publication sidecar changed')
     value=json.loads(path.read_text())
     if (value.get('schema_version')!=1 or value.get('record_final_path')!=record['final_path'] or
         value.get('record_final_sha256')!=record['final_sha256'] or
@@ -350,7 +351,7 @@ def validate_publication_record(backend,record):
         identity=recover_publication_record(backend,record)
         if identity is None:raise ValueError('resource publication identity required before native release')
     path=Path(identity['sidecar_path'])
-    if path!=publication_record_path(backend,record) or not regular(path) or sha(path)!=identity['sidecar_sha256']:
+    if path!=publication_record_path(backend,record) or not is_regular_file(path) or sha(path)!=identity['sidecar_sha256']:
         raise ValueError('resource publication sidecar changed')
     value=json.loads(path.read_text())
     if value['source_inventory_digest']!=_stable_digest(json.loads(Path(value['resource_receipt']['path']).read_text())['source_inventory']):
@@ -372,7 +373,7 @@ def seal_checkpoint(backend,record):
 def validate_checkpoint(backend,record):
     try:
         path=Path(record['resource_companion_path'])
-        if (path!=_path(backend,record) or not regular(path) or sha(path)!=record['resource_companion_sha256'] or
+        if (path!=_path(backend,record) or not is_regular_file(path) or sha(path)!=record['resource_companion_sha256'] or
             record['resource_identity_sha256']!=backend.resource_identity_sha256 or
             json.loads(path.read_text())!=_expected(backend,record)):
             raise ValueError('immutable checkpoint resource companion changed')
@@ -402,7 +403,7 @@ def resource_inventory(backend,record):
         if reserve is None or accounting_root is None or archive_cache is None:raise ValueError('resource accounting reservation required')
         digest=receipt_snapshot_digest(receipt);archive=archive_cache/(prefix.replace('/','-')+'-'+digest+'.tar')
         if archive.exists() or archive.is_symlink():
-            if not regular(archive) or sha(archive)!=digest:raise ValueError('source snapshot archive sidecar changed')
+            if not is_regular_file(archive) or sha(archive)!=digest:raise ValueError('source snapshot archive sidecar changed')
             add(prefix+'/snapshot-object.tar',archive,digest);return
         archive_cache.mkdir(parents=True,exist_ok=True)
         if archive_cache.is_symlink():raise ValueError('regular source snapshot archive cache required')
@@ -419,7 +420,7 @@ def resource_inventory(backend,record):
             temporary.chmod(0o444)
             try:os.link(temporary,archive)
             except FileExistsError:
-                if not regular(archive) or sha(archive)!=digest:raise ValueError('source snapshot archive sidecar changed')
+                if not is_regular_file(archive) or sha(archive)!=digest:raise ValueError('source snapshot archive sidecar changed')
         finally:
             if temporary.exists():temporary.unlink()
         add(prefix+'/snapshot-object.tar',archive,digest)

@@ -6,8 +6,9 @@ This module alone grants neither native nor runner admission.
 """
 from pathlib import Path
 import re
+from evidence.source_snapshot import is_regular_file
 from resources.legacy_values import read_json, require_exact, compare_stage, CONTRACTS
-from resources.sources import regular, sha
+from resources.sources import sha
 from resources.stage import validate_proof, require_separate
 
 
@@ -15,7 +16,7 @@ def read_reference(reference):
     if type(reference) is not dict or set(reference) != {'path', 'sha256'}:
         raise ValueError('exact external evidence reference required')
     path = Path(reference['path'])
-    if not path.is_absolute() or not regular(path) or sha(path) != reference['sha256']:
+    if not path.is_absolute() or not is_regular_file(path) or sha(path) != reference['sha256']:
         raise ValueError('unchanged absolute regular evidence reference required')
     return path, read_json(path)
 
@@ -43,7 +44,7 @@ def validate_execution(native_reference, replay_reference, *, current_sources,
                                source_pins, fresh, cap_bytes, timeout)
     require_exact(admission, replay['resource_admission'], 'actual measured admission')
     artifacts = replay['output_artifacts']
-    paths = {str(path): sha(path) for path in fresh.rglob('*') if path.is_file() and regular(path)}
+    paths = {str(path): sha(path) for path in fresh.rglob('*') if path.is_file() and is_regular_file(path)}
     if any(path.is_symlink() for path in fresh.rglob('*')) or not paths or paths != artifacts:
         raise ValueError('complete unchanged regular replay artifact inventory required')
     if artifacts.get(str(fresh / 'live.log')) != proof['artifacts']['execution_log']['sha256']:

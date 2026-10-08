@@ -1,8 +1,8 @@
 """Separate exact-inventory admission for resource HDFS readback/recovery."""
 import json,re
 from pathlib import Path
-from evidence.source_snapshot import safe_member_name
-from resources.sources import package_member_path,regular,sha
+from evidence.source_snapshot import is_regular_file,safe_member_name
+from resources.sources import package_member_path,sha
 
 LIMIT=128*1024**2
 EXTRA={'manifest_readback_exact','publication_manifest_hdfs_uri','publication_manifest_sha256','independent_admission'}
@@ -13,7 +13,7 @@ def validate_archive_snapshot(pub,chunk,check,mode):
     from resources.command import inspect_command
     try:
         inputs=Path(check['input_directory']);job=inputs/'job.json'
-        if not regular(job) or check['input_hashes']!={str(job):sha(job)}:
+        if not is_regular_file(job) or check['input_hashes']!={str(job):sha(job)}:
             raise ValueError('exact retained archive job required')
         required={'source_sha256':{m['path']:m['sha256'] for m in chunk['manifest']['members']},
                   'max_bytes':LIMIT,'archive_module_path':'/tmp/resource-archive.py',
@@ -27,15 +27,15 @@ def validate_archive_snapshot(pub,chunk,check,mode):
                     if option in {'--ro-bind','--bind','--dev-bind','--proc','--dev','--tmpfs'} and values[-1]==alias]
             if mounts!=[('--ro-bind',source)]:raise ValueError('actual archive input/library/runtime/code mount differs')
         library=Path(pub['archive_library']['path'])
-        if not regular(library) or sha(library)!=pub['archive_library']['sha256']:raise ValueError('archive library bytes changed')
+        if not is_regular_file(library) or sha(library)!=pub['archive_library']['sha256']:raise ValueError('archive library bytes changed')
         for name in ['manifest_path','readback_path']:
             path=Path(chunk[name])
-            if not regular(path) or sha(path)!=chunk['manifest_sha256'] or json.loads(path.read_text())!=chunk['manifest']:
+            if not is_regular_file(path) or sha(path)!=chunk['manifest_sha256'] or json.loads(path.read_text())!=chunk['manifest']:
                 raise ValueError('retained/downloaded manifest differs from admitted chunk')
         artifacts=check['artifacts'];names={Path(p).name:p for p in artifacts}
         if set(names)!={'check.json','live.log'} or len(artifacts)!=2:raise ValueError('exact retained live archive outputs required')
         for path,digest in artifacts.items():
-            if not regular(Path(path)) or sha(path)!=digest:raise ValueError('retained archive live output changed')
+            if not is_regular_file(Path(path)) or sha(path)!=digest:raise ValueError('retained archive live output changed')
         if json.loads(Path(names['check.json']).read_text())!=check['validation']:
             raise ValueError('declared archive result differs from actual live output')
     except (KeyError,TypeError,OSError,AttributeError) as error:
@@ -77,7 +77,7 @@ def validate_union(pub,expected,readback,source=None):
                     raise ValueError('unique complete resource member bytes required')
                 if source is not None:
                     local=Path(source)/name
-                    if (not regular(local) or
+                    if (not is_regular_file(local) or
                         local.stat().st_size!=member['bytes'] or sha(local)!=member['sha256']):
                         raise ValueError('original resource source bytes differ')
                 union[name]=member['sha256']
@@ -95,15 +95,15 @@ def validate_live_references(pub):
     pins=pub['resource_source_pins'];current=Path(pub['resource_source_directory'])
     execution=Path(pub['execution_directory'])
     archive=execution/'resources/resource_archive.py'
-    if not regular(archive) or sha(archive)!=pub['archive_library']['sha256']:
+    if not is_regular_file(archive) or sha(archive)!=pub['archive_library']['sha256']:
         raise ValueError('executed archive helper differs from native pinned library')
     for name,digest in pins['source_pins'].items():
         path=package_member_path(execution,name)
-        if not regular(path) or sha(path)!=digest:raise ValueError('executed resource helper source changed')
+        if not is_regular_file(path) or sha(path)!=digest:raise ValueError('executed resource helper source changed')
     for chunk in pub['chunks']:
         for index,mode in [(0,'create'),(5,'verify'),(6,'rehydrate')]:
             check=chunk['checks'][index];path=Path(check['resource_proof_path'])
-            if not regular(path) or sha(path)!=check['resource_proof_sha256']:raise ValueError('live archive resource proof changed')
+            if not is_regular_file(path) or sha(path)!=check['resource_proof_sha256']:raise ValueError('live archive resource proof changed')
             proof=json.loads(path.read_text())
             if proof['worker_argv']!=['/experiment/resources/archive_worker.py',mode]:raise ValueError('wrong live archive worker')
             validate_proof(proof,check['command'],current,pins,Path(proof['native_output_directory']),16*1024**3,300)

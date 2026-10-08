@@ -1,9 +1,8 @@
 import json,tempfile,unittest
 from pathlib import Path
 from dataset.sidecar_eviction import evict_sidecars
-from evidence.source_snapshot import file_sha256
+from evidence.source_snapshot import file_sha256 as sha
 
-def sha(p):return file_sha256(p)
 class SidecarEvictionTests(unittest.TestCase):
  def fixture(self,root):
   p=root/'processing';s=p/'sidecars/lidar_pose';s.mkdir(parents=True);f=s/'row.npz';f.write_bytes(b'payload')

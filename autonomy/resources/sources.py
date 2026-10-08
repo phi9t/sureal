@@ -2,7 +2,7 @@
 from pathlib import Path
 from evidence.source_snapshot import (
     file_sha256 as sha,
-    require_regular_file,
+    is_regular_file,
     snapshot_target_and_materialize,
     verify_or_materialize_receipt_sources,
 )
@@ -11,14 +11,6 @@ REQUIRED=frozenset({'sources.py','command.py','stage.py','kernel_scope.py','scop
                     'stage_accounting.py','execute_worker.py','process_lifecycle.py'})
 EVIDENCE_REQUIRED=frozenset({'evidence/source_snapshot.py'})
 SNAPSHOT_TARGET='//autonomy/resources:execute_worker'
-
-
-def regular(path):
-    try:
-        require_regular_file(path)
-    except (OSError, ValueError):
-        return False
-    return True
 
 
 def inventory(root):
@@ -30,7 +22,7 @@ def inventory(root):
         if '__pycache__' in path.parts:continue
         if path.is_symlink():raise ValueError('resource source symlinks forbidden')
         if path.suffix=='.py' and path.is_file() and not (path.name.endswith('_test.py') or path.name.startswith('test_')):
-            if not regular(path):raise ValueError('regular resource source required')
+            if not is_regular_file(path):raise ValueError('regular resource source required')
             names.add(path.relative_to(root).as_posix())
     if not REQUIRED<=names:raise ValueError('complete resource execution helpers required')
     return names
@@ -42,7 +34,7 @@ def source_paths(current):
         raise ValueError('resource source directory required')
     names={'resources/'+name for name in inventory(current)}
     helper=current.parent/'evidence/source_snapshot.py'
-    if not regular(helper):
+    if not is_regular_file(helper):
         raise ValueError('complete resource evidence helpers required')
     return sorted(names|EVIDENCE_REQUIRED)
 
@@ -51,7 +43,7 @@ def _materialized_paths(root):
     root=Path(root)
     names={'resources/'+name for name in inventory(root/'resources')}
     helper=root/'evidence/source_snapshot.py'
-    if not regular(helper):
+    if not is_regular_file(helper):
         raise ValueError('complete resource evidence helpers required')
     return names|EVIDENCE_REQUIRED
 
@@ -69,7 +61,7 @@ def freeze_sources(current,destination,*,store=None,repo_root=None,bazel=None,ru
     current=Path(current);destination=Path(destination)
     inventory(current)
     helper=current.parent/'evidence/source_snapshot.py'
-    if not regular(helper):
+    if not is_regular_file(helper):
         raise ValueError('complete resource evidence helpers required')
     if repo_root is None:
         repo_root=_repo_root_for(current)

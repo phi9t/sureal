@@ -11,17 +11,9 @@ import subprocess
 import time
 
 from evidence.source_snapshot import file_sha256 as sha
-from evidence.source_snapshot import require_regular_file
+from evidence.source_snapshot import is_regular_file
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
-
-
-def regular_files(root):
-    for path in pathlib.Path(root).rglob("*"):
-        try:
-            yield require_regular_file(path)
-        except ValueError:
-            continue
 
 
 parser = argparse.ArgumentParser(description=__doc__)
@@ -85,7 +77,8 @@ verify_rootfs(rootfs, lock["rootfs_sha256"])
 pins = {
     str(path): sha(path)
     for directory in [code, inputs]
-    for path in regular_files(directory)
+    for path in pathlib.Path(directory).rglob("*")
+    if is_regular_file(path)
 }
 output = run_root / "output"
 output.mkdir()

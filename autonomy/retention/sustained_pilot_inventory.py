@@ -7,30 +7,26 @@ independent whole-member-union verification before any release.
 """
 import json
 from pathlib import Path
-from evidence.source_snapshot import file_sha256,require_regular_file
+from evidence.source_snapshot import file_sha256,is_regular_file
 STEPS=(0,19,35)
 STAGES=('train','audit','literal-loss','export','proposals','score','metrics-audit')
 sha=file_sha256
-def regular(path):
- try:require_regular_file(path)
- except ValueError:return False
- return True
 def freeze_pilot_inventory(root,final_path,expected_sha256):
  root=Path(root);final_path=Path(final_path)
- if root.is_symlink() or not root.is_dir() or not regular(final_path) or sha(final_path)!=expected_sha256:raise ValueError('regular pilot root and externally pinned final receipt required')
+ if root.is_symlink() or not root.is_dir() or not is_regular_file(final_path) or sha(final_path)!=expected_sha256:raise ValueError('regular pilot root and externally pinned final receipt required')
  final=json.loads(final_path.read_text());manifest=Path(final['run_directory'])/'input/manifest.json'
- if Path(final['output_directory'])!=root or not regular(manifest) or sha(manifest)!=final['manifest_sha256']:raise ValueError('original pilot root/manifest differs')
+ if Path(final['output_directory'])!=root or not is_regular_file(manifest) or sha(manifest)!=final['manifest_sha256']:raise ValueError('original pilot root/manifest differs')
  references=final['stage_receipts'];required={f'{name}-{step}' for step in STEPS for name in STAGES}
  if set(references)!=required:raise ValueError('complete21 pilot stage admissions required')
  expected={};parents={str(final_path):expected_sha256};seen=set();training={}
  for key,reference in references.items():
   receipt=Path(reference['path'])
-  if not regular(receipt) or receipt in seen or sha(receipt)!=reference['sha256']:raise ValueError('unique unchanged pilot stage receipt required')
+  if not is_regular_file(receipt) or receipt in seen or sha(receipt)!=reference['sha256']:raise ValueError('unique unchanged pilot stage receipt required')
   seen.add(receipt);parents[str(receipt)]=reference['sha256'];record=json.loads(receipt.read_text())
   if record['stage']!=key or record['exit_code']!=0 or record['manifest_sha256']!=final['manifest_sha256']:raise ValueError('pilot stage/manifest admission differs')
   for name,digest in record['artifacts'].items():
    artifact=Path(name)
-   if not regular(artifact) or sha(artifact)!=digest:raise ValueError('admitted stage artifact changed')
+   if not is_regular_file(artifact) or sha(artifact)!=digest:raise ValueError('admitted stage artifact changed')
    if artifact.is_relative_to(root):
     if key.split('-')[0]!='train' or str(artifact.relative_to(root)) in expected:raise ValueError('unexpected or duplicate payload admission')
     expected[str(artifact.relative_to(root))]=digest

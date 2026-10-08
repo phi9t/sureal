@@ -9,16 +9,17 @@ from pathlib import Path
 import numpy as np
 import torch
 
+from evidence.source_snapshot import is_regular_file
 from resources.replay_values import require_exact_state, require_exact_heads
 from resources.legacy_values import read_json, compare_producer_reports, measurement
-from resources.sources import regular, sha
+from resources.sources import sha
 
 
 def pinned(reference):
     if type(reference) is not dict or set(reference) != {'path', 'sha256'}:
         raise ValueError('external path and digest required')
     path = Path(reference['path'])
-    if not path.is_absolute() or not regular(path):
+    if not path.is_absolute() or not is_regular_file(path):
         raise ValueError('absolute regular evidence path required')
     if sha(path) != reference['sha256']:
         raise ValueError('externally pinned evidence bytes changed')

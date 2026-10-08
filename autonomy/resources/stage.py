@@ -5,9 +5,10 @@ import os
 from pathlib import Path
 import subprocess
 import shutil
+from evidence.source_snapshot import is_regular_file
 from resources.command import inspect_command,wrapped_command,wrap_command
 from resources.scoped_stage import run_scoped
-from resources.sources import regular,sha,validate_sources
+from resources.sources import sha,validate_sources
 from resources.stage_accounting import admit_worker
 
 
@@ -57,7 +58,7 @@ def validate_proof(proof,command,current_sources,source_pins,native_output,cap_b
             raise ValueError('actual wrapper, original worker, native output and resource mounts required')
         for artifact in proof['artifacts'].values():
             path=Path(artifact['path'])
-            if not regular(path) or sha(path)!=artifact['sha256']:
+            if not is_regular_file(path) or sha(path)!=artifact['sha256']:
                 raise ValueError('actual resource artifact changed')
         if json.loads(worker_path.read_text())!=proof['worker_measurement']:
             raise ValueError('worker measurement differs from executed output')
@@ -65,7 +66,7 @@ def validate_proof(proof,command,current_sources,source_pins,native_output,cap_b
         # Native checkpoint release is admitted by the backend/HDFS lifecycle.
         # This resource closure keeps its own bytes and remains independently
         # readable after that separately verified payload retirement.
-        if native_log.exists() and (not regular(native_log) or sha(native_log)!=proof['artifacts']['execution_log']['sha256']):
+        if native_log.exists() and (not is_regular_file(native_log) or sha(native_log)!=proof['artifacts']['execution_log']['sha256']):
             raise ValueError('native execution log differs from retained resource snapshot')
         admitted=admit_worker(proof['host_measurement'],proof['worker_measurement'],
                               command,proof['worker_argv'],cap_bytes)
@@ -112,7 +113,7 @@ def run_stage(command,cwd,env,stream,timeout,*,code,current_sources,source_pins,
         worker_path=worker_output/'worker-resource.json'
         proof['worker_measurement']=json.loads(worker_path.read_text())
         native_log=native_output/'live.log';retained_log=evidence/'execution.log'
-        if not regular(native_log):raise ValueError('regular native execution log required')
+        if not is_regular_file(native_log):raise ValueError('regular native execution log required')
         shutil.copyfile(native_log,retained_log)
         proof['artifacts']={name:{'path':str(path),'sha256':sha(path)} for name,path in
                             [('worker_resource',worker_path),('execution_log',retained_log)]}
@@ -125,7 +126,7 @@ def run_stage(command,cwd,env,stream,timeout,*,code,current_sources,source_pins,
     except BaseException as error:
         proof['admitted']=False;proof['error']={'type':type(error).__name__,'message':str(error)}
         native_log=native_output/'live.log';retained_log=evidence/'execution.log'
-        if regular(native_log):
+        if is_regular_file(native_log):
             if not retained_log.exists():shutil.copyfile(native_log,retained_log)
             proof['retained_failure_log']={'path':str(retained_log),'sha256':sha(retained_log),'native_path':str(native_log)}
         for field in ['timeout_seconds','cap_bytes']:

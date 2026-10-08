@@ -4,7 +4,7 @@ import json,resource,subprocess,tempfile,time
 from datetime import datetime,timezone
 from pathlib import Path
 from evidence.source_snapshot import file_sha256 as sha
-from evidence.source_snapshot import require_regular_file
+from evidence.source_snapshot import is_regular_file
 from insula.runtime_identity import rootfs_identity,verify_rootfs
 from insula.entry import launch_plan
 HERE=Path(__file__).resolve().parent
@@ -12,10 +12,6 @@ AUTONOMY=HERE.parent
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
 ROOT=CACHE/'motion-cli-rootfs'
 PARENT='sha256:84fb83dd874d0cfff8e9ee3df0759d89f9ad85e9538c0071c9eb606a13d8c233'
-def regular_children(path):
- for candidate in path.iterdir():
-  try:yield require_regular_file(candidate)
-  except ValueError:pass
 def main():
  import argparse
  parser=argparse.ArgumentParser();parser.add_argument('output',type=Path);args=parser.parse_args()
@@ -43,6 +39,6 @@ def main():
   print('PASS',name,flush=True)
  for n,h in recipes.items():
   if sha(HERE/'cli'/n)!=h:raise ValueError('Motion recipe changed')
- receipt={'status':'native Motion CLI initial analytic fixtures passed live; full parity and ingestion remain open','started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-tick,'peak_child_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'checks':checks,'runtime_lock':lock,'verifier_sha256':sha(Path(__file__)),'test_sha256':sha(HERE/'cli/motion_native_cli_test.py'),'artifacts':{p.name:sha(p) for p in regular_children(out)}}
+ receipt={'status':'native Motion CLI initial analytic fixtures passed live; full parity and ingestion remain open','started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-tick,'peak_child_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'checks':checks,'runtime_lock':lock,'verifier_sha256':sha(Path(__file__)),'test_sha256':sha(HERE/'cli/motion_native_cli_test.py'),'artifacts':{p.name:sha(p) for p in out.iterdir() if is_regular_file(p)}}
  (out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print('PASS native Motion regression receipt',out,flush=True)
 if __name__=='__main__':main()

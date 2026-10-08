@@ -1,5 +1,6 @@
 import copy,hashlib,tempfile,unittest
 from pathlib import Path
+from unittest.mock import patch
 from resources.resource_release_plan import release_plan
 class RetentionTests(unittest.TestCase):
  def fixture(self,root):
@@ -22,4 +23,13 @@ class RetentionTests(unittest.TestCase):
    with self.assertRaises(ValueError):release_plan(root,publication)
    (root/'unexpected.pt').unlink();(root/'checkpoint.pt').write_bytes(b'changed')
    with self.assertRaises(ValueError):release_plan(root,publication)
+ def test_payload_ancestor_symlink_is_rejected_independently_of_regular_file_helper(self):
+  with tempfile.TemporaryDirectory() as directory:
+   root=Path(directory);real=root/'real';real.mkdir();(real/'checkpoint.pt').write_bytes(b'Adam state')
+   link=root/'linked';link.symlink_to(real,target_is_directory=True)
+   digest=hashlib.sha256(b'Adam state').hexdigest()
+   publication={'closure_complete':True,'manifest_readback_exact':True,'chunks':[{'archive_hdfs_uri':'hdfs://example/unique/archive.tar.gz','manifest':{'members':[{'path':'linked/checkpoint.pt','bytes':10,'sha256':digest}]},'checks':[{'stage':s,'exit_code':0} for s in ['create-live','archive-put','archive-get','manifest-put','manifest-get','verify-live','rehydrate-live']]}]}
+   with patch('resources.resource_release_plan.require_regular_file', return_value=link/'checkpoint.pt'):
+    with self.assertRaisesRegex(ValueError,'regular payload without symlinks required'):
+     release_plan(root,publication)
 if __name__=='__main__':unittest.main()

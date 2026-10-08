@@ -6,29 +6,25 @@ HDFS readback, live recovery and separate union admission still precede release.
 """
 import json
 from pathlib import Path
-from evidence.source_snapshot import file_sha256,require_regular_file
+from evidence.source_snapshot import file_sha256,is_regular_file
 STAGES=('train','audit','literal-loss','export','proposals','score','metrics-audit')
 sha=file_sha256
-def regular(path):
- try:require_regular_file(path)
- except ValueError:return False
- return True
 def freeze_checkpoint_inventory(root,final_path,expected_sha256):
  root=Path(root);final_path=Path(final_path)
- if not root.is_dir() or any(p.is_symlink() for p in [root,*root.parents]) or not regular(final_path) or sha(final_path)!=expected_sha256:raise ValueError('regular checkpoint root and externally pinned admission required')
+ if not root.is_dir() or any(p.is_symlink() for p in [root,*root.parents]) or not is_regular_file(final_path) or sha(final_path)!=expected_sha256:raise ValueError('regular checkpoint root and externally pinned admission required')
  final=json.loads(final_path.read_text());step=final['step'];manifest=Path(final['manifest_path'])
- if type(step) is not int or not 0<=step<=32000 or Path(final['output_directory'])!=root or not regular(manifest) or sha(manifest)!=final['manifest_sha256']:raise ValueError('bounded checkpoint identity and unchanged manifest required')
+ if type(step) is not int or not 0<=step<=32000 or Path(final['output_directory'])!=root or not is_regular_file(manifest) or sha(manifest)!=final['manifest_sha256']:raise ValueError('bounded checkpoint identity and unchanged manifest required')
  references=final['stage_receipts']
  if set(references)!=set(STAGES):raise ValueError('all seven checkpoint stage admissions required')
  parents={str(final_path):expected_sha256};seen=set();expected={}
  for name in STAGES:
   reference=references[name];path=Path(reference['path'])
-  if path in seen or not regular(path) or sha(path)!=reference['sha256']:raise ValueError('unique unchanged stage receipt required')
+  if path in seen or not is_regular_file(path) or sha(path)!=reference['sha256']:raise ValueError('unique unchanged stage receipt required')
   seen.add(path);parents[str(path)]=reference['sha256'];record=json.loads(path.read_text())
   if record['stage']!=f'{name}-{step}' or type(record['exit_code']) is not int or record['exit_code']!=0 or record['manifest_sha256']!=final['manifest_sha256'] or not record['artifacts']:raise ValueError('completed stage with unchanged checkpoint manifest required')
   for artifact,digest in record['artifacts'].items():
    artifact=Path(artifact)
-   if not regular(artifact) or sha(artifact)!=digest:raise ValueError('stage artifact changed')
+   if not is_regular_file(artifact) or sha(artifact)!=digest:raise ValueError('stage artifact changed')
    if artifact.is_relative_to(root):
     member=str(artifact.relative_to(root))
     if name!='train' or member in expected:raise ValueError('foreign or duplicate checkpoint payload admission')

@@ -2,7 +2,8 @@
 import json
 from pathlib import Path
 import re
-from resources.sources import regular,sha,freeze_sources,validate_sources
+from evidence.source_snapshot import is_regular_file
+from resources.sources import sha,freeze_sources,validate_sources
 from resources.stage import run_stage,validate_proof,write_new,require_separate
 
 CAP_BYTES=16*1024**3
@@ -79,7 +80,7 @@ class ResourceBackend:
         super().guard()
         if self._resource_identity is None:return
         value=self._resource_identity;path=self.resource_identity_path
-        if (not regular(path) or sha(path)!=self.resource_identity_sha256 or json.loads(path.read_text())!=value or
+        if (not is_regular_file(path) or sha(path)!=self.resource_identity_sha256 or json.loads(path.read_text())!=value or
             path.name!='identity.json' or self.resource_root.parent!=self.R or
             type(value['schema_version']) is not int or value['schema_version']!=1 or value['native_case_directory']!=str(self.R) or
             value['native_run_path']!=str(self.R/'run.json') or sha(self.R/'run.json')!=value['native_run_sha256'] or
@@ -98,7 +99,7 @@ class ResourceBackend:
 
     def _resource_stage(self,receipt,*,require_binding=True):
         self.guard();evidence=self._evidence(receipt['requested_stage']);proof_path=evidence/'resource-admitted.json'
-        if not regular(proof_path):raise ValueError('missing live resource stage admission; legacy revalidation required')
+        if not is_regular_file(proof_path):raise ValueError('missing live resource stage admission; legacy revalidation required')
         proof=json.loads(proof_path.read_text());native=Path(receipt['output_directory'])
         metric=receipt['stage'].rsplit('-',1)[0] in {'score','metrics-audit'}
         if (proof['artifacts']['worker_resource']['path']!=str(evidence/'worker/worker-resource.json') or
@@ -106,12 +107,12 @@ class ResourceBackend:
             raise ValueError('resource proof is not bound to this native stage log/output')
         validate_proof(proof,receipt['command'],CURRENT,self.resource_identity['source_pins'],native,CAP_BYTES,_stage_timeout(self,metric))
         native_path=self.R/(receipt['requested_stage']+'-verified.json')
-        binding={'schema_version':1,'native_receipt_path':str(native_path),'native_receipt_sha256':sha(native_path) if regular(native_path) else None,
+        binding={'schema_version':1,'native_receipt_path':str(native_path),'native_receipt_sha256':sha(native_path) if is_regular_file(native_path) else None,
                  'resource_identity_sha256':self.resource_identity_sha256,'resource_proof_path':str(proof_path),
                  'resource_proof_sha256':sha(proof_path),'requested_stage':receipt['requested_stage'],'stage':receipt['stage']}
         if require_binding:
             path=evidence/'native-resource-binding.json'
-            if not regular(native_path) or json.loads(native_path.read_text())!=receipt or not regular(path) or json.loads(path.read_text())!=binding:
+            if not is_regular_file(native_path) or json.loads(native_path.read_text())!=receipt or not is_regular_file(path) or json.loads(path.read_text())!=binding:
                 raise ValueError('exact native/resource receipt binding required')
         return binding
 

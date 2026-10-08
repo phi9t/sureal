@@ -27,6 +27,7 @@ class SourceSnapshotTests(unittest.TestCase):
                 archive_sources,
                 file_digest,
                 file_sha256,
+                is_regular_file,
                 materialize_receipt_sources,
                 materialize_source_snapshot_archive,
                 require_regular_file,
@@ -47,6 +48,7 @@ class SourceSnapshotTests(unittest.TestCase):
             "archive_sources": archive_sources,
             "file_digest": file_digest,
             "file_sha256": file_sha256,
+            "is_regular_file": is_regular_file,
             "materialize_receipt_sources": materialize_receipt_sources,
             "materialize_source_snapshot_archive": materialize_source_snapshot_archive,
             "require_regular_file": require_regular_file,
@@ -836,6 +838,10 @@ class SourceSnapshotTests(unittest.TestCase):
             self.assertEqual(api["file_sha256"](source), hashlib.sha256(b"contents").hexdigest())
             self.assertEqual(api["file_digest"](source, "md5"), hashlib.md5(b"contents").hexdigest())
             self.assertEqual(api["require_regular_file"](source), source)
+            self.assertTrue(api["is_regular_file"](source))
+            self.assertFalse(api["is_regular_file"](link))
+            with mock.patch("evidence.source_snapshot.require_regular_file", side_effect=OSError("unreadable")):
+                self.assertFalse(api["is_regular_file"](source))
             with self.assertRaisesRegex(ValueError, "regular non-symlinked file required"):
                 api["require_regular_file"](link)
             with self.assertRaisesRegex(ValueError, "regular non-symlinked file required"):

@@ -1,6 +1,6 @@
 """Record the actual bwrap command; never pretend an unwrapped argv executed."""
 from pathlib import Path
-from resources.sources import regular
+from evidence.source_snapshot import is_regular_file
 
 ARITY={'--unshare-all':0,'--die-with-parent':0,'--clearenv':0,
        '--proc':1,'--dev':1,'--tmpfs':1,'--chdir':1,
@@ -46,8 +46,8 @@ def wrap_command(command,code,output):
     actual,worker_argv=wrapped_command(command,code,output)
     if (any(not p.is_absolute() or not p.is_dir() or any(q.is_symlink() for q in [p,*p.parents]) for p in [code,output]) or
         not (code/'resources').is_dir() or not (code/'evidence').is_dir() or
-        not regular(code/'resources/execute_worker.py') or
-        not regular(code/'evidence/source_snapshot.py') or
+        not is_regular_file(code/'resources/execute_worker.py') or
+        not is_regular_file(code/'evidence/source_snapshot.py') or
         any(output.iterdir())):
         raise ValueError('regular code and empty resource output required')
     command[:]=actual

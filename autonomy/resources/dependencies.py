@@ -5,8 +5,8 @@ their identities are in the native manifests/receipts, not checkpoint payloads.
 """
 import json
 from pathlib import Path
-from evidence.source_snapshot import safe_member_name
-from resources.sources import regular,sha
+from evidence.source_snapshot import is_regular_file,safe_member_name
+from resources.sources import sha
 
 
 def shared_inventory(backend):
@@ -17,7 +17,7 @@ def shared_inventory(backend):
         raise ValueError('unchanged native cohort manifest required')
     def add(name,path,digest):
         safe_member_name(name);path=Path(path)
-        if not regular(path) or sha(path)!=digest:
+        if not is_regular_file(path) or sha(path)!=digest:
             raise ValueError('unchanged shared dependency bytes required')
         value={'path':str(path),'sha256':digest,'bytes':path.stat().st_size}
         if name in files and files[name]!=value:raise ValueError('conflicting shared dependency member')

@@ -2,11 +2,7 @@
 import copy,errno,json,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch
-from evidence.source_snapshot import file_sha256
-
-
-def sha(path):
-    return file_sha256(path)
+from evidence.source_snapshot import file_sha256 as sha
 
 
 class ResourceRetentionTests(unittest.TestCase):

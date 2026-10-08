@@ -1,6 +1,6 @@
 """Freeze the host closure for sustained controller execution and retention."""
 from pathlib import Path
-from evidence.source_snapshot import file_sha256 as sha,require_regular_file,snapshot_target_and_materialize,verify_or_materialize_receipt_sources
+from evidence.source_snapshot import file_sha256 as sha,is_regular_file,snapshot_target_and_materialize,verify_or_materialize_receipt_sources
 from retention.checkpoint_retention_sources import HISTORICAL_REQUIRED as RETENTION_HISTORICAL_REQUIRED
 from retention.checkpoint_retention_sources import REQUIRED as RETENTION_REQUIRED
 REQUIRED=tuple(sorted(set(RETENTION_REQUIRED)|{
@@ -28,13 +28,9 @@ HISTORICAL_REQUIRED=tuple(sorted(set(RETENTION_HISTORICAL_REQUIRED)|{
  'studies/architecture/experiment_runner.py',
 }))
 SNAPSHOT_TARGET='//autonomy/training_execution:run_sustained'
-def regular(path):
- try:require_regular_file(path)
- except ValueError:return False
- return True
 def freeze_host_sources(repository,destination,*,store=None,repo_root=None,bazel=None,runner=None):
  repository=Path(repository);destination=Path(destination)
- if not all(regular(repository/name) for name in REQUIRED):raise ValueError('complete regular host source closure required')
+ if not all(is_regular_file(repository/name) for name in REQUIRED):raise ValueError('complete regular host source closure required')
  if repository.name!='autonomy':raise ValueError('Bazel target source snapshot context required')
  kwargs={'repo_root':Path(repo_root) if repo_root is not None else repository.parent}
  if store is not None:kwargs['store']=store

@@ -1,10 +1,10 @@
 """Bounded, measured HDFS preservation; never deletes model checkpoints."""
 import errno,json,os,re,shutil,signal,subprocess,uuid
 from pathlib import Path
-from evidence.source_snapshot import safe_member_name
+from evidence.source_snapshot import is_regular_file,safe_member_name
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
-from resources.sources import package_member_name,package_member_path,regular,sha,validate_sources
+from resources.sources import package_member_name,package_member_path,sha,validate_sources
 from resources.stage import run_stage,validate_proof,write_new,require_separate
 from resources.retention_audit import validate_union,LIMIT
 
@@ -38,14 +38,14 @@ def materialize_execution_package(code,execution,library,library_sha,pins):
         raise ValueError('complete admitted resource source pins required')
     if execution.exists() or execution.is_symlink():
         raise ValueError('fresh execution package required')
-    if not regular(library) or sha(library)!=library_sha:
+    if not is_regular_file(library) or sha(library)!=library_sha:
         raise ValueError('pinned archive library changed')
     execution.mkdir()
     try:
         for name,digest in sorted(source_pins.items()):
             safe_member_name(name)
             source=package_member_path(code,name)
-            if not regular(source) or sha(source)!=digest:
+            if not is_regular_file(source) or sha(source)!=digest:
                 raise ValueError('admitted resource source changed')
             target=package_member_path(execution,name);target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source,target)
             if sha(target)!=digest:raise ValueError('executed resource package changed')
@@ -73,7 +73,7 @@ def stage_member(entry,target,budget_root,*,reserve=None):
     """Copy only EXDEV inputs, charging new bytes to scientific staging."""
     if reserve is None:reserve=reserve_write
     source=Path(entry['path']);target=Path(target);budget_root=Path(budget_root)
-    if (not regular(source) or sha(source)!=entry['sha256'] or source.stat().st_size!=entry['bytes'] or
+    if (not is_regular_file(source) or sha(source)!=entry['sha256'] or source.stat().st_size!=entry['bytes'] or
         type(entry['bytes']) is not int or not 0<=entry['bytes']<=LIMIT or target.exists() or
         not target.is_relative_to(budget_root) or any(p.is_symlink() for p in [target,*target.parents])):
         raise ValueError('exact bounded source and fresh scientific staging destination required')
@@ -102,12 +102,12 @@ def publish_bundle(backend,kind,inventory):
     temp=work_root/('resource-retention-'+identifier);temp.mkdir();raw=temp/'raw';raw.mkdir()
     def guard():
         backend.guard();validate_sources(package_root/'resources',pins)
-        if not regular(library) or sha(library)!=library_sha:raise ValueError('pinned archive library changed')
+        if not is_regular_file(library) or sha(library)!=library_sha:raise ValueError('pinned archive library changed')
         if sha(execution/'resources/resource_archive.py')!=library_sha:raise ValueError('executed archive helper changed')
         for name,digest in pins['source_pins'].items():
             if sha(package_member_path(execution,name))!=digest:raise ValueError('executed resource package changed')
         for entry in inventory.values():
-            if not regular(Path(entry['path'])) or sha(entry['path'])!=entry['sha256'] or Path(entry['path']).stat().st_size!=entry['bytes']:
+            if not is_regular_file(Path(entry['path'])) or sha(entry['path'])!=entry['sha256'] or Path(entry['path']).stat().st_size!=entry['bytes']:
                 raise ValueError('exact resource source inventory changed')
     guard()
     staging={}

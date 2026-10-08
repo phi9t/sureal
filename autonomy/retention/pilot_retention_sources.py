@@ -1,6 +1,6 @@
 """Freeze the host closure that admits, archives and releases sustained pilot bytes."""
 from pathlib import Path
-from evidence.source_snapshot import file_sha256 as sha,require_regular_file,snapshot_target_and_materialize,verify_or_materialize_receipt_sources
+from evidence.source_snapshot import file_sha256 as sha,is_regular_file,snapshot_target_and_materialize,verify_or_materialize_receipt_sources
 REQUIRED=(
  'retention/publish_sustained_pilot.py','retention/sustained_pilot_inventory.py',
  'retention/pilot_retention_audit.py','retention/pilot_retention_sources.py','retention/publisher_runtime.py',
@@ -18,13 +18,9 @@ HISTORICAL_REQUIRED=(
  'evidence/source_snapshot.py','insula/entry.py','insula/runtime_identity.py',
 )
 SNAPSHOT_TARGET='//autonomy/retention:publish_sustained_pilot'
-def regular(path):
- try:require_regular_file(path)
- except ValueError:return False
- return True
 def freeze_host_sources(repository,destination,*,store=None,repo_root=None,bazel=None,runner=None):
  repository=Path(repository);destination=Path(destination)
- if not all(regular(repository/name) for name in REQUIRED):raise ValueError('complete regular host source closure required')
+ if not all(is_regular_file(repository/name) for name in REQUIRED):raise ValueError('complete regular host source closure required')
  if repository.name!='autonomy':raise ValueError('Bazel target source snapshot context required')
  kwargs={'repo_root':Path(repo_root) if repo_root is not None else repository.parent}
  if store is not None:kwargs['store']=store

@@ -15,7 +15,7 @@ def release_plan(root,publication):
    name=safe_name(member['path'])
    if name in records:raise ValueError('duplicate inventory member')
    records[name]=member;path=root/name
-   if not path.is_file() or any(p.is_symlink() for p in [path,*path.parents] if p!=root and root in p.parents):raise ValueError('regular payload without symlinks required')
+   if any(p.is_symlink() for p in [path,*path.parents] if p!=root and root in p.parents):raise ValueError('regular payload without symlinks required')
    try:require_regular_file(path)
    except ValueError as error:raise ValueError('regular payload without symlinks required') from error
    if path.stat().st_size!=member['bytes'] or sha(path)!=member['sha256']:raise ValueError('source payload differs')
