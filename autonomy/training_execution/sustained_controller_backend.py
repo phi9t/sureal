@@ -16,7 +16,7 @@ from training_execution.sustained_controller_sources import freeze_host_sources,
 from retention.checkpoint_retention_sources import freeze_host_sources as freeze_checkpoint_publisher_sources,validate_host_sources as validate_checkpoint_publisher_sources
 from evidence.source_snapshot import source_snapshot_package_root
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing'
-GPU_ROOT=C/'gpu-rootfs';CPU_ROOT=C/'insula/rootfs-v2';METRICS_ROOT=C/'metrics-rootfs'
+GPU_ROOT=C/'gpu-rootfs-v6';CPU_ROOT=C/'insula/rootfs-v4';METRICS_ROOT=C/'metrics-rootfs'
 WORKER_ENTRIES={
  'train_sustained.py':'/experiment/training_execution/train_sustained.py',
  'audit_sustained_loss.py':'/experiment/training_execution/audit_sustained_loss.py',

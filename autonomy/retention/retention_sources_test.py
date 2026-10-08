@@ -12,6 +12,11 @@ HISTORICAL_REQUIRED=(
 )
 HISTORICAL_TARGET='//autonomy:native-cache-retention-host'
 class RetentionSourcesTests(unittest.TestCase):
+ def test_publisher_uses_current_resource_cpu_root_binding(self):
+  source=(Path(__file__).with_name('publish_native_cache.py')).read_text()
+  self.assertIn('resource_cpu_root_for(None,C)',source)
+  self.assertNotIn("insula/rootfs-v2",source)
+
  def fixture(self,root,names=REQUIRED):
   for name in names:
    p=root/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(name)

@@ -2,12 +2,19 @@ import copy,hashlib,json,os,shutil,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch
 from evidence.source_snapshot import LocalSnapshotStore,archive_sources
+from training_execution import admit_sustained, sustained_controller_backend
 from training_execution.sustained_controller_backend import NativeBackend,sha
 from training_execution.sustained_controller_sources import REQUIRED as HOST_REQUIRED,freeze_host_sources
 from retention.checkpoint_retention_sources import REQUIRED as CHECKPOINT_PUBLISHER_REQUIRED
 from retention.checkpoint_retention_sources import freeze_host_sources as freeze_checkpoint_publisher_sources
 from training_execution.sustained_sources import REQUIRED as PACKAGE_REQUIRED,SNAPSHOT_TARGET
 class ControllerGuardTests(unittest.TestCase):
+ def test_live_admission_uses_current_locked_runtime_roots(self):
+  self.assertEqual(sustained_controller_backend.GPU_ROOT.name,'gpu-rootfs-v6')
+  self.assertEqual(sustained_controller_backend.CPU_ROOT.name,'rootfs-v4')
+  self.assertEqual(admit_sustained.GPU_ROOT.name,'gpu-rootfs-v6')
+  self.assertEqual(admit_sustained.CPU_ROOT.name,'rootfs-v4')
+
  def source_snapshot(self,root,names,store_root):
   archive,pins=archive_sources(root,names);digest=hashlib.sha256(archive).hexdigest();LocalSnapshotStore(store_root).store(digest,archive)
   return {'schema_version':1,'source_snapshot_sha256':digest,'source_snapshot_target':SNAPSHOT_TARGET,'source_snapshot_store':str(store_root),'source_pins':pins}

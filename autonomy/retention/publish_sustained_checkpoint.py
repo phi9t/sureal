@@ -6,6 +6,7 @@ from resources.resource_archive import sha,DEFAULT_LIMIT
 from resources.resource_release_plan import release_plan
 from resources.scientific_budget import reserve_write
 from resources.scientific_payload import unique_payload_bytes
+from resources.backend import resource_cpu_root_for
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
 from retention.publisher_runtime import admitted_host_sources,stage_audit_source
@@ -30,7 +31,7 @@ def main():
  identifier=a.case+'-step'+str(final['step'])+'-'+uuid.uuid4().hex;R=C/'insula'/('hdfs-retention-'+identifier);R.mkdir();host_pins,_=admitted_host_sources(a.host_source_receipt,P,R/'host-source',freeze_host_sources,validate_host_sources);source=R/'source';source.mkdir()
  for folder in ('resources','evidence'):
   shutil.copytree(P/folder,source/folder,ignore=shutil.ignore_patterns('__pycache__'))
- pins={str(p):sha(p) for p in source.rglob('*') if p.is_file()};root=C/'insula/rootfs-v2';runtime=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,runtime['rootfs_sha256'])
+ pins={str(p):sha(p) for p in source.rglob('*') if p.is_file()};root=resource_cpu_root_for(None,C);runtime=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,runtime['rootfs_sha256'])
  cli_pin=sha(CLI)
  waystone=CLI.parents[1];tool_pins={str(CLI):cli_pin}
  for relative in ['rust/target/debug/waystone','native/libhdfs_client/dist/lib/libhdfs_client.so','native/libhdfs_client/dist/bin/hdfs.bin']:

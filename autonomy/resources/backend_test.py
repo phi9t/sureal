@@ -68,6 +68,19 @@ class ResourceBackendTests(unittest.TestCase):
             path.write_bytes(original);(b.R/'run.json').write_text('changed original run')
             with self.assertRaises(ValueError):b.guard()
 
+    def test_default_resource_cpu_root_tracks_current_locked_cpu_image(self):
+        try:
+            from resources.backend import resource_cpu_root_for
+        except ImportError:
+            self.fail('resource publication needs a shared current CPU rootfs binding')
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp)
+            class Backend: pass
+            backend=Backend();backend.resource_cache_root=root/'cache'
+            self.assertEqual(resource_cpu_root_for(backend),root/'cache/insula/rootfs-v4')
+            backend.resource_cpu_root=root/'custom-rootfs'
+            self.assertEqual(resource_cpu_root_for(backend),root/'custom-rootfs')
+
     def test_native_stage_requires_exact_separate_proof_and_receipt_binding(self):
         self.api()
         with tempfile.TemporaryDirectory() as temp:

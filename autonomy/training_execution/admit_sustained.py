@@ -17,7 +17,7 @@ from training_execution.sustained_sources import cache_snapshot_for_runtime,snap
 from training_execution.sustained_stage_inputs import freeze_inputs,bind_stage_paths
 
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing'
-GPU_ROOT=C/'gpu-rootfs';CPU_ROOT=C/'insula/rootfs-v2';METRICS_ROOT=C/'metrics-rootfs'
+GPU_ROOT=C/'gpu-rootfs-v6';CPU_ROOT=C/'insula/rootfs-v4';METRICS_ROOT=C/'metrics-rootfs'
 WORKER_ENTRIES={
  'train_sustained.py':'/experiment/training_execution/train_sustained.py',
  'replay_sustained.py':'/experiment/training_execution/replay_sustained.py',

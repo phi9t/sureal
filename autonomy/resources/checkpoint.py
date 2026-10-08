@@ -9,6 +9,7 @@ from evidence.source_snapshot import is_regular_file
 from evidence.source_snapshot import safe_member_name
 from evidence.source_snapshot import receipt_snapshot_digest,store_from_receipt,verify_or_materialize_receipt_sources
 from resources.command import inspect_command
+from resources.backend import resource_cpu_root_for
 from resources.sources import sha
 from resources.stage import write_new,require_separate
 from resources.retention_audit import EXTRA as PUBLICATION_EXTRA,validate_live_references,validate_union
@@ -172,10 +173,10 @@ def _validate_publication_external_bindings(backend,pub):
         cpu_runtime=getattr(backend,'cpu_runtime',None)
         if cpu_runtime is not None and pub['runtime_lock']!=cpu_runtime:
             raise ValueError('resource publication runtime identity differs from backend')
-        cpu_root=getattr(backend,'resource_cpu_root',None)
-        if cpu_root is None and getattr(backend,'resource_cache_root',None) is not None:
-            cpu_root=Path(backend.resource_cache_root)/'insula/rootfs-v2'
-        if cpu_root is not None and Path(pub['rootfs_path'])!=Path(cpu_root):
+        cpu_root=None
+        if getattr(backend,'resource_cpu_root',None) is not None or getattr(backend,'resource_cache_root',None) is not None:
+            cpu_root=resource_cpu_root_for(backend)
+        if cpu_root is not None and Path(pub['rootfs_path'])!=cpu_root:
             raise ValueError('resource publication rootfs identity differs from backend')
         host=getattr(backend,'host_pins',None)
         if host is not None:

@@ -4,6 +4,7 @@ from pathlib import Path
 from evidence.source_snapshot import is_regular_file,safe_member_name
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
+from resources.backend import resource_cpu_root_for
 from resources.sources import package_member_name,package_member_path,sha,validate_sources
 from resources.stage import run_stage,validate_proof,write_new,require_separate
 from resources.retention_audit import validate_union,LIMIT
@@ -115,7 +116,7 @@ def publish_bundle(backend,kind,inventory):
         safe_member_name(name);target=raw/name;target.parent.mkdir(parents=True,exist_ok=True);staging[name]=stage_member(entry,target,work_root,reserve=reserve)
     write_new(root/'staging.json',staging)
     expected=root/'expected.json';write_new(expected,inventory)
-    runtime_root=cache_root/'insula/rootfs-v2';runtime=json.loads(Path(str(runtime_root)+'.lock.json').read_text());verify_rootfs(runtime_root,runtime['rootfs_sha256'])
+    runtime_root=resource_cpu_root_for(backend,cache_root);runtime=json.loads(Path(str(runtime_root)+'.lock.json').read_text());verify_rootfs(runtime_root,runtime['rootfs_sha256'])
     masked={'experiment','source','outputs','dev','proc','tmp'}
     entries=sorted(runtime_root.iterdir(),key=lambda p:p.name)
     audit_bindings=[item for path in entries if path.name not in masked for item in ['--ro-bind',str(path),'/'+path.name]]

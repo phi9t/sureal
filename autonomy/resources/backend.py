@@ -9,6 +9,18 @@ from resources.stage import run_stage,validate_proof,write_new,require_separate
 CAP_BYTES=16*1024**3
 CURRENT=Path(__file__).resolve().parent
 PACKAGE_ROOT=CURRENT.parent
+CURRENT_CPU_ROOTFS_NAME='rootfs-v4'
+
+
+def resource_cpu_root_for(owner,cache_root=None):
+    root=getattr(owner,'resource_cpu_root',None)
+    if root is not None:
+        return Path(root)
+    if cache_root is None:
+        cache_root=getattr(owner,'resource_cache_root',None)
+    if cache_root is None:
+        raise ValueError('resource cache root required')
+    return Path(cache_root)/'insula'/CURRENT_CPU_ROOTFS_NAME
 
 
 def default_stage_timeout(metrics):
