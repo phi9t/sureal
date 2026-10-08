@@ -26,6 +26,7 @@ LEGACY_NATIVE_TOOL_TESTS = [
 
 MOTION_VISIBILITY = [
     "//autonomy:__pkg__",
+    "//autonomy/evaluation:__pkg__",
     "//autonomy/studies:__pkg__",
 ]
 

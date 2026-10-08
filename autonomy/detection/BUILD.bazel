@@ -5,6 +5,9 @@ LIB_MODULES = glob(
     ["*.py"],
     exclude = ["*_test.py"],
 )
+LIVE_GATE_TESTS = [
+    "native_detection_breakdowns_live_test.py",
+]
 DETECTION_VISIBILITY = [
     "//autonomy:__pkg__",
     "//autonomy/detection/architecture_adaptations:__pkg__",
@@ -65,7 +68,7 @@ filegroup(
                 "sustained_loss_test.py",
             ]
             else []
-        ),
+        ) + (["requires_live_gate"] if test in LIVE_GATE_TESTS else []),
     )
     for test in TEST_MODULES
 ]
