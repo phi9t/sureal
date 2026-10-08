@@ -11,7 +11,7 @@
 - [x] Exactly one file-digest function and one regular-file check exist outside procedure records
 - [x] The import-layering script is removed and Bazel visibility rejects an upward dependency, shown by a deliberately failing example in the ticket
 - [x] The architecture note describes the concept directories and the snapshot model, and uses the glossary's 'pinned' wording
-- [ ] The full default run and the full GPU-configuration run pass, and their module counts are recorded against the baseline
+- [x] The full default run and the full GPU-configuration run pass, and their module counts are recorded against the baseline
 
 ## Comments
 
@@ -34,3 +34,27 @@ Broad final checks: `bazel-autonomy-all-final.log` ran `./bazelw test --nocache_
 GPU-config limitation: `bazel-autonomy-cuda-final.log` ran `./bazelw test --config=cuda --nocache_test_results --test_output=all //autonomy/...` and exited 1 before Bazel test execution because `autonomy/insula/bazel_launcher.py` could not find `/dev/nvidia1` (`ValueError: GPU device not found: /dev/nvidia1`). No tags, images, sandbox bindings or device paths were changed to bypass this host limitation; parent owns actual GPU execution on the final combined candidate.
 
 Pin impact and hygiene: `pins-check-final2.log` ran `(cd autonomy && python3 -m evidence.pins check --base b47edbc236e2ef1172a66f436b3f006184f7b711)` and exited 1 with the expected measured pin impact: 16 changed files pinned by retained receipts. Moved pinned recipe paths are the four association runtime files and two motion Dockerfiles; additionally modified pinned active files are `dataset/tracer.py`, `dataset/tracer_contracts.py`, `detection/diagnostics/balanced16-coverage-causes.py`, `detection/diagnostics/balanced16-coverage-oracles.py`, `evaluation/prepare-real-boxes.py`, `evaluation/validate-real-box-source.py`, `geometry/r0_compare.py`, `resources/hdfs_auth_keepalive.py`, `segmentation/sam-native-image-all-probe.py`, and `segmentation/sam-native-image-probe.py`. `diff-check-final.log` reports `git diff --check` exit 0. `research-procedure-unchanged-final.log` reports no dirty paths under `autonomy/research/**` or `**/procedure_records/**`.
+
+2026-10-08 closeout by the coordinating Claude session (5f8f6972). Evidence root E = `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007`.
+
+GPU gate on `916f8c0`, now that the session sees `/dev/nvidia1`, `/dev/nvidiactl`, `/dev/nvidia-uvm` (8× B200). Command: `./bazelw test --config=cuda --noexperimental_collect_system_network_usage --nocache_test_results --test_output=all //autonomy/...`. Exit 0. 28/28 targets passed, 84 unittest methods, 0 skips. The target set is identical to the ticket 25 baseline (`25-parent-gpu-case-counts.json`: 28 / 84 / 0). The extra flag only disables Bazel's optional network profiler. Caveat: `test:cuda` selects `requires_gpu` targets in the GPU rootfs. None asserts `torch.cuda.is_available()`, and two assert it is false under their guards. This is the ticket 25 gate identity, not a proof that kernels ran on a device. Log: `E/26-final-parent-cuda-v3.log`. `916f8c0` was then fast-forwarded onto this branch from the verified bundle (`refactor-916f8c0.bundle`, sha256 `7a0a0016…c928bc`).
+
+Checklist audit (TraeCLI worker `t26-checklist-audit`, CLEAN, `E/final26-review-worker-t26-checklist-audit/docs/refactor-finish/t26-checklist-audit.{md,json}`) found two gaps at `916f8c0` that the earlier ticks missed:
+- Active library code still sat under study-stage names: `detection/expanded_batch/`, `detection/fixed_batch_{catalog,models}.py`, `dataset/expanded_batch_observations.py`. Spec story 7 forbids this.
+- Seven local `regular()` wrappers plus `regular_children` / `regular_files` duplicated the evidence module's check.
+The open driver-runfile / test-fallback finding was confirmed closed at `916f8c0`.
+
+Closeout fixes (TraeCLI workers `t26-closeout-fixes` and `t26-closeout-followup`, both CLEAN). Report: `docs/refactor-finish/t26-closeout-fixes.md`.
+- `7e418a3` renames: `detection/expanded_batch/` → `detection/architecture_adaptations/`; `detection/fixed_batch_{catalog,models}.py` → `detection/detector_recipe_{catalog,models}.py`; `dataset/expanded_batch_observations.py` → `dataset/detector_observations.py`. Frozen catalog/model files are byte-identical after the move (sha256 in the report).
+- `bdf5437` adds `evidence.source_snapshot.is_regular_file` as a thin predicate over `require_regular_file` and removes every local copy. `resource_release_plan.py` keeps its distinct ancestor-symlink check, with a test proving it is independent.
+- `85633c0` makes the association contract's baseline-source keys and provenance map, and the expanded-batch study README, follow the rename. The historical manifest is unedited.
+- Residual-reference grep over the active tree: no hits.
+
+Final verification by the coordinator, in a clean private clone:
+- `38bdd76`: full default run 152/152 passed (`E/26-closeout-cpu.log`). Full `--config=cuda` run 28/28 passed, 84 methods, 0 skips, 0 cached (`E/26-closeout-cuda.log`).
+- `85633c0`: full default run 152/152 passed (`E/26-closeout-final-cpu.log`). `bazel query` shows no `requires_gpu` test depends on the files changed after `38bdd76`, so the GPU result carries.
+- Module counts against baseline: CPU 152 targets (baseline 152; method-level parity in `E/26-final-parity-report-v2.json`, 191 original modules survive); GPU 28 targets / 84 methods (baseline 28 / 84).
+- This branch was fast-forwarded `916f8c0` → `85633c0`.
+
+Pin impact remains an explicitly failing check, not relabeled green. `evidence.pins check --base b47edbc` exits 1 with 16 historically pinned changed paths (`E/26-final-parent-pins-v2.json`). The closeout renames and source-closure edits change further source identities (`*_sources.py`, detector recipe paths). All of these are re-admitted under ticket 27; no historical receipt was edited.
+
