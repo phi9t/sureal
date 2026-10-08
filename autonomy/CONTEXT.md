@@ -49,3 +49,6 @@ verifiers and acceptance criteria. The [overall goal](../docs/research/tasks/pro
 - **Training improvement:** a controlled gain in the declared task metric with support and resource evidence; a lower aggregate loss alone is insufficient.
 - **Source pin:** the SHA-256 digest of one source file recorded in a receipt; the file is *pinned* by that receipt. Avoid: code hash, source hash, citation.
 - **Source snapshot:** the frozen copy of the sources taken when a gate or study stage runs, which is what a source pin refers to. The working tree is not required to keep matching it.
+- **Blob store:** where sureal keeps files that evidence must be able to fetch again. Sureal asks only to store, fetch and check a blob; what sits underneath (HDFS through Waystone, a local file system, any other blob storage) and where the project's root lives are the store's business. Avoid: HDFS, Waystone (when you mean the store itself).
+- **Blob:** a file kept in the blob store. It is written once and never replaced or deleted, so a receipt that cites it stays true. Avoid: remote object, HDFS file, upload.
+- **Blob key:** a blob's name inside the blob store, relative to the root the store gives the project, as in `runs/perception-resource-closures/…`. Avoid: HDFS URI, HDFS path, object key.
