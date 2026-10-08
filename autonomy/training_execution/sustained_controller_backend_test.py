@@ -11,9 +11,9 @@ from training_execution.sustained_sources import REQUIRED as PACKAGE_REQUIRED,SN
 class ControllerGuardTests(unittest.TestCase):
  def test_live_admission_uses_current_locked_runtime_roots(self):
   self.assertEqual(sustained_controller_backend.GPU_ROOT.name,'gpu-rootfs-v6')
-  self.assertEqual(sustained_controller_backend.CPU_ROOT.name,'rootfs-v4')
+  self.assertEqual(sustained_controller_backend.CPU_ROOT.name,'rootfs-v5-t29-20261008T230657Z')
   self.assertEqual(admit_sustained.GPU_ROOT.name,'gpu-rootfs-v6')
-  self.assertEqual(admit_sustained.CPU_ROOT.name,'rootfs-v4')
+  self.assertEqual(admit_sustained.CPU_ROOT.name,'rootfs-v5-t29-20261008T230657Z')
 
  def test_current_gpu_runtime_lock_comes_from_v6_lock_not_historical_receipt(self):
   with tempfile.TemporaryDirectory() as temp:

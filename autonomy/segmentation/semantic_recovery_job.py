@@ -7,6 +7,7 @@ from evidence.source_snapshot import file_sha256 as sha, require_regular_file
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
 from insula.staging_lease import staging_lease
+from segmentation.semantic_recovery_runtime import recovery_rootfs, validate_recovery_output
 from segmentation.staged_derived_archive import staged_derived_archive
 
 
@@ -21,13 +22,13 @@ def artifact_hashes(root):
     return artifacts
 
 
-def recover_semantic_archive(record,*,cache,code_root,output,transfer_command=None):
+def recover_semantic_archive(record,*,cache,code_root,output,transfer_command=None,staging_cache=None):
     cache,code_root,output=map(Path,(cache,code_root,output))
+    staging_cache=Path(staging_cache) if staging_cache is not None else cache
     # Refuse the active queue before touching source metadata/output. The stage
     # later reacquires and holds exclusion through the actual offline consumer.
     with staging_lease(cache/'scientific-processing/cohort-queue.lock'):pass
-    if output.exists() or output.is_symlink() or (cache/'scientific-processing').resolve() not in output.resolve().parents:
-        raise ValueError('new accounted semantic recovery output required')
+    validate_recovery_output(output)
     publication=Path(record['publication_manifest'])
     if sha(publication)!=record['publication_manifest_sha256']:
         raise ValueError('externally admitted publication changed')
@@ -39,14 +40,15 @@ def recover_semantic_archive(record,*,cache,code_root,output,transfer_command=No
             or pub['archive']['archive_bytes']!=record['archive_bytes']
             or pub['archive']['report_sha256']!=record['report_sha256']):
         raise ValueError('recovery publication source/membership differs')
-    root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text())
+    root=recovery_rootfs(cache);lock=json.loads(Path(str(root)+'.lock.json').read_text())
     verify_rootfs(root,lock['rootfs_sha256'])
     names=['segmentation/semantic_recovery_job.py','segmentation/semantic_archive_support.py',
            'dataset/scientific_dataset.py','dataset/scene_archive_validate.py',
            'segmentation/semantic_support.py','segmentation/staged_derived_archive.py',
+           'segmentation/semantic_recovery_runtime.py',
            'insula/staging_lease.py','insula/entry.py','insula/runtime_identity.py']
     pins={n:sha(code_root/n) for n in names}
-    with staged_derived_archive(record,cache,working_limit_bytes=15*1024**3,
+    with staged_derived_archive(record,staging_cache,working_limit_bytes=15*1024**3,
                                 transfer_command=transfer_command) as (archive,transfer):
         output.mkdir(parents=True,exist_ok=False);inputs=output/'input';inputs.mkdir();worker_output=output/'output';worker_output.mkdir()
         (inputs/'publication.json').write_bytes(publication.read_bytes())
