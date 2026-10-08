@@ -12,10 +12,17 @@
     "phase_e_t27f3_after_failure_unique_payload_bytes": 11348603596,
     "phase_e_t27f3_after_failure_unique_plus_reservation_bytes": 13496087244,
     "phase_e_t27f3_after_failure_data02_free_bytes": 129211478016,
-    "phase_e_t27f3_within_cap_after_failure": true
+    "phase_e_t27f3_within_cap_after_failure": true,
+    "phase_e_t27f4_preflight_unique_payload_bytes": 11348603596,
+    "phase_e_t27f4_preflight_unique_plus_reservation_bytes": 13496087244,
+    "phase_e_t27f4_preflight_data02_free_bytes": 117929287680,
+    "phase_e_t27f4_after_run_unique_payload_bytes": 12182779587,
+    "phase_e_t27f4_after_run_unique_plus_reservation_bytes": 14330263235,
+    "phase_e_t27f4_after_run_data02_free_bytes": 161911095296,
+    "phase_e_t27f4_within_cap_after_run": true
   },
-  "base_context": "started at 2154c0b per coordinator; includes d3499e1 sandbox source-root fix in history; this report update was generated before the final worker commit",
-  "branch": "worker/t27f3-live-admission",
+  "base_context": "started at b7221f8 per coordinator; includes reviewed verifier sibling-import fix 3e50f6a, t27f3 report, and reviewed sandbox source-root fix d3499e1; this report update was generated before the final worker commit",
+  "branch": "worker/t27f4-live-admission",
   "commands": {
     "count": 64,
     "ledger": {
@@ -1648,8 +1655,8 @@
       }
     ]
   },
-  "generated_utc": "2026-10-08T07:57:14.261928Z",
-  "head": "2154c0b6ff7ac459c59a351ef8a54c5bf6b52751",
+  "generated_utc": "2026-10-08T10:17:15Z",
+  "head": "b7221f8db9092d42e467922c145bcc1014a924bb",
   "input_documents": {
     "admission_plan": {
       "exists": true,
@@ -1673,8 +1680,8 @@
   "not_checked": [
     "No scientific result is claimed.",
     "No full balanced16 sweep was run.",
-    "No accepted ticket-27 live admission was emitted; only train-0 was verified as partial failure evidence before audit-1000 failed.",
-    "No journal entry was appended and evidence.publish was not run.",
+    "No unqualified clean-GPU ticket-27 admission is claimed; Phase E is passed_with_gpu_sharing and awaits user decision.",
+    "No Phase F journal entry or evidence.publish receipt is committed; Phase F is held pending user decision on GPU sharing.",
     "No issue file or task index was edited.",
     "No push, merge, rebase, reset, stash, or branch switch was performed."
   ],
@@ -1848,36 +1855,20 @@
       "unique_payload_bytes": 10939980061
     },
     "E": {
-      "status": "failed_retry_after_train0_before_audit_resource_admission",
-      "worker": "t27f3-live-admission",
-      "run_id": "t27f20261008T074202Z",
-      "previous_admission_summary": {
-        "exists": true,
-        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T071007Z/admission-summary.json",
-        "sha256": "ee0f6cd627df011e6455e0d7d6ec252b73d82677c15bfae623d3f9701a357e91",
-        "size_bytes": 33988
-      },
+      "status": "passed_with_gpu_sharing",
+      "worker": "t27f4-live-admission",
+      "run_id": "t27f20261008T081353Z",
       "admission_summary": {
-        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/admission-summary.json",
+        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/admission-summary.json",
         "exists": true,
-        "sha256": "fabe38e1b6aecb6eff3a37f8c5b2b76c6cb9e9078795ef64151225729e258540",
-        "size_bytes": 37835
+        "sha256": "df8e5c8f579b17a686f0c2b31316be35d209f44539c4e5c52c5e66e26db7d737",
+        "size_bytes": 226402
       },
-      "guard_refusal_attempt": {
-        "run_id": "t27f20261008T073704Z",
-        "status": "not_launched_gpu1_busy_guard",
-        "admission_summary": {
-          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T073704Z/admission-summary.json",
-          "exists": true,
-          "sha256": "ed0c94754e76f43b3005847fc9d00b1115d07c84e1775bbc7086c4eed59e1c84",
-          "size_bytes": 1462
-        },
-        "preflight_summary": {
-          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T073704Z/preflight-summary.json",
-          "exists": true,
-          "sha256": "51060c189f21fb95a822c642ef63b3e9e984ada69eabcb29b69df492954273ff",
-          "size_bytes": 43171
-        }
+      "verification_summary": {
+        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/verification-summary.json",
+        "exists": true,
+        "sha256": "df8e5c8f579b17a686f0c2b31316be35d209f44539c4e5c52c5e66e26db7d737",
+        "size_bytes": 226402
       },
       "attempts": [
         {
@@ -1913,51 +1904,55 @@
         {
           "run_id": "t27f20261008T074202Z",
           "status": "failed_after_train0_before_audit_resource_admission",
-          "reason": "scoped run admitted train-0 then audit stage failed importing sustained_chunk_reference before resource admission"
+          "reason": "scoped run admitted train-0 then audit stage failed importing sustained_chunk_reference before resource admission; fixed by 3e50f6a"
+        },
+        {
+          "run_id": "t27f20261008T081353Z",
+          "status": "passed_with_gpu_sharing",
+          "reason": "scoped command exited 0 and replay audits passed; GPU 1 sharing observed mid-run"
         }
       ],
       "preflight": {
         "summary": {
-          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/preflight-summary.json",
+          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/preflight-summary.json",
           "exists": true,
-          "sha256": "7603345c8007030f6198f728280dbc8177e01d97c65a1f4c39107db0ee583b35",
-          "size_bytes": 43171
+          "sha256": "cdece39aa8aaf36946154815c4d4e8040eeec9f68891c6669f9a707c15ac0f87",
+          "size_bytes": 25152
         },
         "passed": true,
-        "data02_free_bytes": 134240997376,
-        "unique_payload_bytes": 10939982374,
-        "unique_plus_reservation_bytes": 13087466022,
+        "data02_free_bytes": 117929287680,
+        "unique_payload_bytes": 11348603596,
+        "unique_plus_reservation_bytes": 13496087244,
         "cap_bytes": 16106127360,
         "hdfs_read_only_listing_passed": true,
         "preregistration_passed": true,
         "rootfs_locks": [
           {
-            "name": "cpu",
-            "root": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v4",
-            "rootfs_identity": "429e7c76ff605dc634e21836e72c40f2ee9d756b0269b031f4e6ec222b057cbb",
-            "lock_rootfs_sha256": "429e7c76ff605dc634e21836e72c40f2ee9d756b0269b031f4e6ec222b057cbb",
-            "passed": true
-          },
-          {
-            "name": "gpu",
-            "root": "/data02/home/philip.yang/.cache/waystone/waymo-perception/gpu-rootfs-v6",
-            "rootfs_identity": "5a1af6a165eb3d59781eda28fee6acd2672b6a53e3645252eeb6579beb720eb4",
+            "lock_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/gpu-rootfs-v6.lock.json",
             "lock_rootfs_sha256": "5a1af6a165eb3d59781eda28fee6acd2672b6a53e3645252eeb6579beb720eb4",
-            "passed": true
+            "lock_sha256": "a59052a958c12de56ce1846e260a90def8f9967f94e1f9215dc832cd83396bca",
+            "name": "gpu",
+            "passed": true,
+            "root": "/data02/home/philip.yang/.cache/waystone/waymo-perception/gpu-rootfs-v6",
+            "rootfs_identity": "5a1af6a165eb3d59781eda28fee6acd2672b6a53e3645252eeb6579beb720eb4"
           },
           {
-            "name": "metrics",
-            "root": "/data02/home/philip.yang/.cache/waystone/waymo-perception/metrics-rootfs",
-            "rootfs_identity": "831a5955ce709cb46b82688ba0f0371c37e1af707ffb870b24c555d53d4f5542",
+            "lock_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v4.lock.json",
+            "lock_rootfs_sha256": "429e7c76ff605dc634e21836e72c40f2ee9d756b0269b031f4e6ec222b057cbb",
+            "lock_sha256": "5205722f5228f0099b9a8fbbc4212fb750a905ce01e73ad99bb891b6d166d6ee",
+            "name": "cpu",
+            "passed": true,
+            "root": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v4",
+            "rootfs_identity": "429e7c76ff605dc634e21836e72c40f2ee9d756b0269b031f4e6ec222b057cbb"
+          },
+          {
+            "lock_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/metrics-rootfs.lock.json",
             "lock_rootfs_sha256": "831a5955ce709cb46b82688ba0f0371c37e1af707ffb870b24c555d53d4f5542",
-            "passed": true
-          },
-          {
-            "name": "motion_cli",
-            "root": "/data02/home/philip.yang/.cache/waystone/waymo-perception/motion-cli-rootfs-v2",
-            "rootfs_identity": "c471473b944157119d0d6440a9e95515dfda4d4c554d4cfafa4374da40bf9c8e",
-            "lock_rootfs_sha256": "c471473b944157119d0d6440a9e95515dfda4d4c554d4cfafa4374da40bf9c8e",
-            "passed": true
+            "lock_sha256": "40927a7cdc915c2195670dd77335d889cf36745060155ce5663dc44f56c942eb",
+            "name": "metrics",
+            "passed": true,
+            "root": "/data02/home/philip.yang/.cache/waystone/waymo-perception/metrics-rootfs",
+            "rootfs_identity": "831a5955ce709cb46b82688ba0f0371c37e1af707ffb870b24c555d53d4f5542"
           }
         ],
         "source_closures": [
@@ -2013,120 +2008,228 @@
       },
       "gpu1_wait": {
         "summary": {
-          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/gpu1-wait-summary.json",
+          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/gpu1-wait-summary.json",
           "exists": true,
-          "sha256": "70d71952203797afd2d5fd6ec3e2e42f9113bb11694f7ba3546a5322cc8b0101",
-          "size_bytes": 2418
+          "sha256": "6dbfefaef7c4b0edf5d7d299df6522f6388df45a741861cea009541b3e858124",
+          "size_bytes": 401
         },
-        "passed": true,
-        "samples": 10,
-        "busy_samples": 6,
-        "settle_reason": "gpu1-free-settled",
-        "seen_process_count": 6
+        "status": "free",
+        "samples": 37,
+        "jsonl_sha256": "04a78a1de584fe1cd8f085a065ffea5775cbdbef0b16d3d11d9bf13f94df58b9"
       },
       "immediate_guard": {
         "summary": {
-          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/gpu1-immediate-guard.json",
+          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/gpu1-immediate-guard.json",
           "exists": true,
-          "sha256": "918df649a4978d9439ac51bc8f815b20933fd7fe36fd23be68c1b19acea5229d",
-          "size_bytes": 251
+          "sha256": "451961cce4d1c5510facd37412cfe843f529c2bd8e61b497e2cb90abd581e335",
+          "size_bytes": 407
         },
         "passed": true
       },
-      "command": "systemd-run --user --scope --unit=sureal-sustained-t27f20261008T074202Z -p MemoryMax=17179869184 -p MemorySwapMax=0 -p MemoryAccounting=yes env HADOOP_CONF_DIR=/opt/tiger/yarn_deploy/hadoop/conf PYTHONPATH=autonomy python3 -m training_execution.run_sustained --run-id t27f20261008T074202Z --admission-only",
-      "exit_code": 1,
-      "wall_seconds": 225.487,
+      "command": "systemd-run --user --scope --unit=sureal-sustained-t27f20261008T081353Z -p MemoryMax=17179869184 -p MemorySwapMax=0 -p MemoryAccounting=yes env HADOOP_CONF_DIR=/opt/tiger/yarn_deploy/hadoop/conf PYTHONPATH=autonomy python3 -m training_execution.run_sustained --run-id t27f20261008T081353Z --admission-only",
+      "exit_code": 0,
+      "wall_seconds": 3903.866,
       "scope": {
-        "unit_scope": "sureal-sustained-t27f20261008T074202Z.scope",
-        "scope_path": "/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-t27f20261008T074202Z.scope",
+        "unit": "sureal-sustained-t27f20261008T081353Z",
+        "unit_scope": "sureal-sustained-t27f20261008T081353Z.scope",
+        "scope_path": "/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-t27f20261008T081353Z.scope",
         "memory_max": "17179869184",
         "memory_swap_max": "0",
         "memory_accounting": "yes",
-        "memory_max_file": "17179869184",
-        "memory_swap_max_file": "0",
-        "cap_bytes": 17179869184
-      },
-      "gpu1_occupancy": {
-        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/gpu1-occupancy.jsonl",
-        "sha256": "525f742c490201ee99bff56491b4163760ae2728ac45c653152f1819cbf27410",
-        "samples": 9,
-        "foreign_gpu1_process_seen": false,
-        "foreign_process_count": 0
-      },
-      "train0_partial_evidence": {
-        "receipt": {
-          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-t27f20261008T074202Z/train-0-verified.json",
+        "cap_bytes": 17179869184,
+        "launch_scope_evidence": {
+          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/launch-scope-at-start.json",
           "exists": true,
-          "sha256": "f2d022da931be0442cbd7dd020ad5e91923fef2add6c6de6d6c0c8670c95d080",
-          "size_bytes": 41706
+          "sha256": "bef6f89ee124ca15673cb9e21401a4494a9da18cd0b05fe0e02007487f7ced9c",
+          "size_bytes": 767
         },
-        "receipt_verification": {
-          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/train0-receipt-verification.json",
+        "launch_summary": {
+          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/launch-systemd-scope.json",
           "exists": true,
-          "sha256": "a9aa722ab99103efd6e6aa135604bb5370b1072ba121c2d8f57e6d6cb6071cca",
-          "size_bytes": 823
-        },
-        "receipt_verification_passed": true,
-        "source_snapshot_sha256": "15491ff278f0cb3001dc55947520297e377447d8408550b67fa0dfc02637312d",
-        "source_files": 248,
-        "runtime_lock_rootfs_sha256": "5a1af6a165eb3d59781eda28fee6acd2672b6a53e3645252eeb6579beb720eb4",
-        "resource_admitted": {
-          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-t27f20261008T074202Z/resource-layer/stages/train-0/resource-admitted.json",
-          "exists": true,
-          "sha256": "e9c9f04e30b7d919b4e4ff04889c8ea8c6f63e0de995f67a92b7e0711c1c3c02",
-          "size_bytes": 23465
-        },
-        "native_resource_binding": {
-          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-t27f20261008T074202Z/resource-layer/stages/train-0/native-resource-binding.json",
-          "exists": true,
-          "sha256": "b6c937cd5385c3f4ecfe079a8802ab88c47da2b7ab0097db69dd8ea3403cf2ae",
-          "size_bytes": 731
+          "sha256": "3a88dd25bbd1cbc21b3094e5ed39e1ab13951c593c9006d7028e6d7a43ce97b4",
+          "size_bytes": 14883
         }
       },
-      "failure": {
-        "blocking_error": "ValueError: failed or incomplete scoped stage cannot be admitted",
-        "raw_worker_error": "ModuleNotFoundError: No module named 'sustained_chunk_reference'",
-        "diagnosis": "train-0 completed and resource-admitted; audit_sustained_transition.py then ran from /tmp/verifier while PYTHONPATH remained /experiment, so its sibling sustained_chunk_reference.py was not importable; audit stage failed before resource admission.",
-        "worker_log": {
-          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-t27f20261008T074202Z/audit-00/live.log",
-          "exists": true,
-          "sha256": "cd8c0660912ddfac0bf0df22c1af3c092e39f938b5d288c691fac5ee66558802",
-          "size_bytes": 862
-        },
-        "audit_attempt": {
-          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-t27f20261008T074202Z/resource-layer/stages/audit-0/attempt.json",
-          "exists": true,
-          "sha256": "033d4e4fb05b5727d67fa5b2f6840f3fc34d0bc07b1213dd060b06370f6b6b16",
-          "size_bytes": 23138
-        },
-        "coordinator_handles_fix": true
+      "gpu1_occupancy": {
+        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/gpu1-occupancy.jsonl",
+        "sha256": "2b24ed5297264f4259f023906db2ce3acdae2a6f127c22bc40d146caae9fc1a8",
+        "samples": 132,
+        "flag": "foreign_gpu1_process_seen_mid_run",
+        "foreign_process_sample_count": 74,
+        "own_and_foreign_overlap_samples": 4,
+        "foreign_processes_seen_count": 25,
+        "foreign_process_owners": [
+          "philip.yang",
+          "root",
+          "ziqi.yin"
+        ],
+        "foreign_process_pids": [
+          "2828287",
+          "2858210",
+          "2897643",
+          "2923178",
+          "2953186",
+          "2954348",
+          "2991929",
+          "3038851",
+          "3062914",
+          "3074623",
+          "3105045",
+          "3186310",
+          "3236037",
+          "3369383",
+          "3386464",
+          "3404445",
+          "3416357",
+          "3463313",
+          "3491315",
+          "3494438",
+          "3499961",
+          "3510385",
+          "3524272",
+          "3560512",
+          "3655459"
+        ]
       },
-      "storage_gate_after_failure": {
-        "evidence": {
-          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/post-failure-storage.json",
-          "exists": true,
-          "sha256": "ecfb5b5016f053be4b6face8674b0bb927b77656b3b1668ff319af4cfff1e86b",
-          "size_bytes": 359
+      "stage_verification": {
+        "stages_completed": 14,
+        "stage_counts": {
+          "audit": 2,
+          "export": 2,
+          "literal-loss": 2,
+          "metrics-audit": 2,
+          "proposals": 2,
+          "score": 2,
+          "train": 2
         },
-        "unique_payload_bytes": 11348603596,
+        "records": [
+          {
+            "actual_step": 0,
+            "target_step": 0,
+            "checkpoint_sha256": "64d031fbced9b0ff76d0ed0aebc51093522d7ef50bcbde9dc33b1101a65cf6f8",
+            "final_receipt_sha256": "b029c217c994f113f837aed4d00a740a12e4e7758fdfb3c9465265c8aeca3e5c",
+            "report_sha256": "373d6f648e99c670693ec967730d2b3e9ad88d8e339f1a7c5025c0fb4b7194a1",
+            "head_file_count": 16,
+            "head_files_all_passed": true
+          },
+          {
+            "actual_step": 1000,
+            "target_step": 1000,
+            "checkpoint_sha256": "89dc7d2bfccb45549d757ea9b488cc1ee1656f20a2e80a3dfb75e3c072d37fc3",
+            "final_receipt_sha256": "45093d2246502c309e49c5db41f4f079126f2d269c388cf0a1a84a32b86448ca",
+            "report_sha256": "7d4ff8936a525e067d8fe5d1e00176243cadb43a3416622a5da7f9e86620b326",
+            "head_file_count": 16,
+            "head_files_all_passed": true
+          }
+        ],
+        "all_stage_receipts_verified": true,
+        "source_snapshot_readback": {
+          "summary": {
+            "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/source-snapshot-readback-summary.json",
+            "exists": true,
+            "sha256": "30f0d6e3a34a4bf3459b31f41ae15a5a20201fc1cc32de5cd5ed53c977912592",
+            "size_bytes": 127583
+          },
+          "status": "pass",
+          "unique_readbacks": [
+            {
+              "digest": "908882175aa0204bb422e835e4b013daf66e2af8493a80e0a2dc9d72e72dcb5e",
+              "source_snapshot_target": "//autonomy/training_execution:train_sustained",
+              "source_files": 248,
+              "archive_bytes": 1228800,
+              "cache_sha256": "908882175aa0204bb422e835e4b013daf66e2af8493a80e0a2dc9d72e72dcb5e"
+            },
+            {
+              "digest": "6cbd23d0dab142fb93eac2b176df5088a41b120a6695e9ecde069d7aa4c917fd",
+              "source_snapshot_target": "//autonomy/retention:publish_sustained_checkpoint",
+              "source_files": 66,
+              "archive_bytes": 399360,
+              "cache_sha256": "6cbd23d0dab142fb93eac2b176df5088a41b120a6695e9ecde069d7aa4c917fd"
+            },
+            {
+              "digest": "109cb168991ac140ca099a10ea51d8c5ec63731356d620bc027dc7ef040574a9",
+              "source_snapshot_target": "//autonomy/resources:execute_worker",
+              "source_files": 49,
+              "archive_bytes": 276480,
+              "cache_sha256": "109cb168991ac140ca099a10ea51d8c5ec63731356d620bc027dc7ef040574a9"
+            }
+          ]
+        },
+        "backend_resume_validation": {
+          "summary": {
+            "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/backend-resume-validation.json",
+            "exists": true,
+            "sha256": "7506b8e498c370445a201e14d17ce4eccc2c75b388af6d3863f83a5c4b8b97a8",
+            "size_bytes": 1735
+          },
+          "status": "pass",
+          "wall_seconds": 127.779,
+          "records": [
+            {
+              "checkpoint_sha256": "64d031fbced9b0ff76d0ed0aebc51093522d7ef50bcbde9dc33b1101a65cf6f8",
+              "final_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-t27f20261008T081353Z/checkpoint-00-admitted.json",
+              "final_sha256": "b029c217c994f113f837aed4d00a740a12e4e7758fdfb3c9465265c8aeca3e5c",
+              "report_sha256": "373d6f648e99c670693ec967730d2b3e9ad88d8e339f1a7c5025c0fb4b7194a1",
+              "step": 0,
+              "target_step": 0
+            },
+            {
+              "checkpoint_sha256": "89dc7d2bfccb45549d757ea9b488cc1ee1656f20a2e80a3dfb75e3c072d37fc3",
+              "final_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-t27f20261008T081353Z/checkpoint-1000-admitted.json",
+              "final_sha256": "45093d2246502c309e49c5db41f4f079126f2d269c388cf0a1a84a32b86448ca",
+              "report_sha256": "7d4ff8936a525e067d8fe5d1e00176243cadb43a3416622a5da7f9e86620b326",
+              "step": 1000,
+              "target_step": 1000
+            }
+          ],
+          "source_snapshot_store_override": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/source-snapshot-readback-cache"
+        }
+      },
+      "controller_outputs": {
+        "live_receipt": {
+          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f4-live-admission/autonomy/research/balanced16-sustained-t27f20261008T081353Z-live.json",
+          "exists": true,
+          "sha256": "e12b003aa0c4012213cdbcd6ebc15dcfe4de85606c8f2681e17e4dbdead5ecf5",
+          "size_bytes": 1346
+        },
+        "progress_receipt": {
+          "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f4-live-admission/autonomy/research/balanced16-sustained-t27f20261008T081353Z-progress.json",
+          "exists": true,
+          "sha256": "868866e8a73baa9cee9c6601bd21c331e004ca3695eb72ff9f739e8a183ff23a",
+          "size_bytes": 550283
+        }
+      },
+      "storage_gate_after_run": {
+        "unique_payload_bytes": 12182779587,
         "reservation_bytes": 2147483648,
         "cap_bytes": 16106127360,
-        "unique_plus_reservation_bytes": 13496087244,
-        "within_cap_after_failure": true,
-        "data02_free_bytes": 129211478016
+        "unique_plus_reservation_bytes": 14330263235,
+        "within_cap_after_run": true,
+        "data02_free_bytes": 161911095296
       },
-      "receipts_verified": "train-0 only as partial failure evidence; not accepted as ticket live admission"
+      "claims": {
+        "gate_relaxed": false,
+        "live_admission_command_succeeded": true,
+        "live_admission_receipts_verified": true,
+        "scientific_result_claimed": false
+      },
+      "receipts_verified": "all 14 emitted stage receipts plus source snapshot readback and backend resume validation passed; GPU sharing remains a caveat"
     },
     "F": {
-      "status": "skipped",
-      "reason": "Phase E failed; research journal bytes were not modified, no journal note was appended, evidence.publish was not run, and no readback/second verify-journal was attempted."
+      "status": "held_pending_user_decision_on_gpu_sharing",
+      "reason": "Coordinator HOLD at 2026-10-08T09:57:15Z: user must decide whether the GPU-shared run counts before anything is published to the append-only journal.",
+      "coordinator_reply": {
+        "utc": "2026-10-08T09:57:15Z",
+        "priority": "HOLD"
+      },
+      "repo_effect": "No Phase F journal append, evidence.publish receipt, or research-journal-hdfs-verified update is committed. A premature local append was reverted before commit; the attempted publisher did not complete a receipt."
     },
     "G": {
+      "status": "reported",
       "evidence": {
-        "json": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission/docs/ticket27/execution-report.json",
-        "markdown": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission/docs/ticket27/execution-report.md"
-      },
-      "status": "reported"
+        "markdown": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f4-live-admission/docs/ticket27/execution-report.md",
+        "json": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f4-live-admission/docs/ticket27/execution-report.json"
+      }
     }
   },
   "schema_version": 1,
@@ -2136,79 +2239,121 @@
     "repo_root": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission",
     "scientific_root": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing"
   },
-  "status": "stopped_at_phase_e_retry_failed_after_train0_before_audit_resource_admission",
+  "status": "phase_e_passed_with_gpu_sharing_phase_f_held_pending_user_decision",
   "ticket27_box_verdicts": [
     {
       "box": "The sweep recipes, frames and anchor templates are unchanged from the preregistration",
+      "verdict": "pass",
       "evidence": {
-        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/preflight-summary.json",
-        "sha256": "7603345c8007030f6198f728280dbc8177e01d97c65a1f4c39107db0ee583b35"
+        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/preflight-summary.json",
+        "exists": true,
+        "sha256": "cdece39aa8aaf36946154815c4d4e8040eeec9f68891c6669f9a707c15ac0f87",
+        "size_bytes": 25152
       },
-      "note": "t27f3 Phase E preflight repeated preregistration/rootfs/source checks before launch; candidate, anchors, recipes, seed, frame count and input digest count matched.",
-      "verdict": "pass"
+      "note": "t27f4 Phase E preflight repeated preregistration/rootfs/source checks before launch; candidate, anchors, recipes, seed, frame count and input digest count matched."
     },
     {
       "box": "Each recipe admission pins a source snapshot stored in HDFS and the new rootfs digest",
+      "verdict": "pass_with_gpu_sharing_caveat",
       "evidence": {
-        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/train0-receipt-verification.json",
-        "sha256": "a9aa722ab99103efd6e6aa135604bb5370b1072ba121c2d8f57e6d6cb6071cca"
+        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/source-snapshot-readback-summary.json",
+        "exists": true,
+        "sha256": "30f0d6e3a34a4bf3459b31f41ae15a5a20201fc1cc32de5cd5ed53c977912592",
+        "size_bytes": 127583
       },
-      "note": "The retry verified the train-0 receipt source snapshot and GPU rootfs lock after it completed, but the overall live admission failed in the next audit stage before full checkpoint/admission acceptance.",
-      "verdict": "partial"
+      "note": "All emitted receipts replayed against read-back source snapshots and rootfs locks; the live command itself had GPU-sharing caveat."
     },
     {
       "box": "Every runtime-lock check listed in ticket 01 is re-admitted on the new images",
+      "verdict": "not_fully_admitted",
       "evidence": {
-        "exists": true,
         "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission/docs/ticket27/readmission-report.md",
         "sha256": "16da877604277e2c3cb6d937f27c6fe7d86f07eff2686cf74cc8de9f9062d424",
+        "exists": true,
         "size_bytes": 16888
       },
-      "note": "Required live-gate status remains: 7 real live-gate passes, 3 semantic rows contract-only on synthesized receipts, M0 blocked on a rootfs rebuild. This is not counted as full ticket admission.",
-      "verdict": "not_fully_admitted"
+      "note": "Box 3: 7 real live-gate passes, 3 semantic rows contract-only on synthesized receipts, M0 blocked on a rootfs rebuild. This is not counted as full ticket admission."
     },
     {
       "box": "A live gate executes the admitted candidate in the new rootfs and its receipt verifies against the snapshot",
+      "verdict": "passed_with_gpu_sharing",
       "evidence": {
-        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/admission-summary.json",
-        "sha256": "fabe38e1b6aecb6eff3a37f8c5b2b76c6cb9e9078795ef64151225729e258540"
+        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/admission-summary.json",
+        "exists": true,
+        "sha256": "df8e5c8f579b17a686f0c2b31316be35d209f44539c4e5c52c5e66e26db7d737",
+        "size_bytes": 226402
       },
-      "note": "Scoped live command exited 1 after 225.487 seconds. train-0 completed and verified as partial evidence; audit-1000 failed before resource admission with ModuleNotFoundError for sustained_chunk_reference, so no accepted live admission was produced.",
-      "verdict": "failed_after_train0_before_audit_resource_admission"
+      "note": "Scoped live command exited 0 after 3903.866 seconds and replay verification passed for all 14 stages, records 0 and 1000, and both 16-head sets. GPU 1 sharing was observed, so user decision is required before journal publication or unqualified acceptance."
     },
     {
       "box": "The journal records the re-admission and what changed since the original admission",
+      "verdict": "held_pending_user_decision_on_gpu_sharing",
       "evidence": {
-        "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/admission-summary.json",
-        "sha256": "fabe38e1b6aecb6eff3a37f8c5b2b76c6cb9e9078795ef64151225729e258540"
+        "coordinator_reply_utc": "2026-10-08T09:57:15Z",
+        "priority": "HOLD"
       },
-      "note": "Phase F was skipped because Phase E did not pass; no journal append or evidence.publish run occurred.",
-      "verdict": "not_run"
+      "note": "Phase F is held; no journal append, evidence.publish receipt, or HDFS journal publication is committed."
     },
     {
       "box": "The task index states the sweep new status",
+      "verdict": "not_changed_by_worker",
       "evidence": {
-        "not_edited_by_worker": true,
-        "path": ".scratch/semantic-layout/issues/27-readmit-balanced16.md"
+        "path": ".scratch/semantic-layout/issues/27-readmit-balanced16.md",
+        "not_edited_by_worker": true
       },
-      "note": "The task explicitly forbade editing the ticket file or task index.",
-      "verdict": "not_changed_by_worker"
+      "note": "The task explicitly forbade editing the ticket file or task index."
     }
   ],
-  "worker": "t27f3-live-admission",
+  "worker": "t27f4-live-admission",
   "current_worker_evidence": {
-    "t27f20261008T073704Z_guard_refusal": {
-      "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T073704Z/admission-summary.json",
+    "t27f20261008T081353Z_admission_summary": {
+      "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/admission-summary.json",
       "exists": true,
-      "sha256": "ed0c94754e76f43b3005847fc9d00b1115d07c84e1775bbc7086c4eed59e1c84",
-      "size_bytes": 1462
+      "sha256": "df8e5c8f579b17a686f0c2b31316be35d209f44539c4e5c52c5e66e26db7d737",
+      "size_bytes": 226402
     },
-    "t27f20261008T074202Z_admission_summary": {
-      "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/admission-summary.json",
+    "t27f20261008T081353Z_verification_summary": {
+      "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/verification-summary.json",
       "exists": true,
-      "sha256": "fabe38e1b6aecb6eff3a37f8c5b2b76c6cb9e9078795ef64151225729e258540",
-      "size_bytes": 37835
+      "sha256": "df8e5c8f579b17a686f0c2b31316be35d209f44539c4e5c52c5e66e26db7d737",
+      "size_bytes": 226402
     },
-    "phase_e_issue_channel": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/claude-worker-runs/workers/t27f3-live-admission-20261008T073335Z/tmp/claude-issues.jsonl"
+    "t27f20261008T081353Z_launch_summary": {
+      "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/launch-systemd-scope.json",
+      "exists": true,
+      "sha256": "3a88dd25bbd1cbc21b3094e5ed39e1ab13951c593c9006d7028e6d7a43ce97b4",
+      "size_bytes": 14883
+    },
+    "t27f20261008T081353Z_source_snapshot_readback": {
+      "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/source-snapshot-readback-summary.json",
+      "exists": true,
+      "sha256": "30f0d6e3a34a4bf3459b31f41ae15a5a20201fc1cc32de5cd5ed53c977912592",
+      "size_bytes": 127583
+    },
+    "t27f20261008T081353Z_backend_resume_validation": {
+      "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/backend-resume-validation.json",
+      "exists": true,
+      "sha256": "7506b8e498c370445a201e14d17ce4eccc2c75b388af6d3863f83a5c4b8b97a8",
+      "size_bytes": 1735
+    },
+    "t27f20261008T081353Z_gpu1_occupancy": {
+      "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/gpu1-occupancy.jsonl",
+      "exists": true,
+      "sha256": "2b24ed5297264f4259f023906db2ce3acdae2a6f127c22bc40d146caae9fc1a8",
+      "size_bytes": 87320
+    },
+    "controller_live_receipt": {
+      "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f4-live-admission/autonomy/research/balanced16-sustained-t27f20261008T081353Z-live.json",
+      "exists": true,
+      "sha256": "e12b003aa0c4012213cdbcd6ebc15dcfe4de85606c8f2681e17e4dbdead5ecf5",
+      "size_bytes": 1346
+    },
+    "controller_progress_receipt": {
+      "path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f4-live-admission/autonomy/research/balanced16-sustained-t27f20261008T081353Z-progress.json",
+      "exists": true,
+      "sha256": "868866e8a73baa9cee9c6601bd21c331e004ca3695eb72ff9f739e8a183ff23a",
+      "size_bytes": 550283
+    },
+    "phase_e_issue_channel": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/claude-worker-runs/workers/t27f4-live-admission-20261008T081103Z/tmp/claude-issues.jsonl"
   }
 }

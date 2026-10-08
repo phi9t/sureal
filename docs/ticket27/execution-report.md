@@ -1,11 +1,11 @@
 # Ticket 27 Storage And Admission Execution Report
 
-Generated: 2026-10-08T07:57:14.261928Z
+Generated: 2026-10-08T10:17:15Z
 
-Status: stopped at Phase E after the live retry admitted `train-0` but failed before `audit-1000` resource admission. Storage recovery passed; no scientific result or ticket-27 admission completion is claimed.
+Status: Phase E live balanced16 admission retry `t27f20261008T081353Z` completed with `passed_with_gpu_sharing`. The command exited 0 and the receipt replay audits passed, but GPU 1 sharing was observed mid-run, so Phase F is held pending user decision on whether a GPU-shared run counts. Storage recovery remains passed. No scientific result is claimed.
 
-Worker branch: `worker/t27f3-live-admission`
-HEAD before this report commit: `2154c0b6ff7ac459c59a351ef8a54c5bf6b52751`
+Worker branch: `worker/t27f4-live-admission`
+HEAD before this report commit: `b7221f8db9092d42e467922c145bcc1014a924bb`
 Evidence root: `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution`
 
 ## Phase Verdicts
@@ -16,8 +16,8 @@ Evidence root: `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-
 | B | `pass` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B/phase-B-summary.json` | `8d9cf0ca53a50cd0bcfc27910661569ad1d9b3391033854bfe9a1515698f6fe5` |
 | C | `pass` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-C/phase-C-summary.json` | `c64613a08eefc1e6d5100f8e68dca22e685f07a7d9f6e1a00b5076fa1e4271c1` |
 | D | `pass` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/storage-gate.json` | `a98f8a47d91c25f6504a247ae4bfe2521aac14f31329d49afd90a7aea9167541` |
-| E | `failed_retry_after_train0_before_audit_resource_admission` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/admission-summary.json` | `fabe38e1b6aecb6eff3a37f8c5b2b76c6cb9e9078795ef64151225729e258540` |
-| F | `skipped` | Phase E failed; no journal append or publish was run |  |
+| E | `passed_with_gpu_sharing` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/admission-summary.json` | `df8e5c8f579b17a686f0c2b31316be35d209f44539c4e5c52c5e66e26db7d737` |
+| F | `held_pending_user_decision_on_gpu_sharing` | Coordinator HOLD at `2026-10-08T09:57:15Z`; no Phase F journal publication is committed |  |
 
 ## Storage Accounting
 
@@ -30,6 +30,10 @@ Evidence root: `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-
 | t27f3 preflight strict `unique_payload_bytes(W)` | 10939982374 |
 | t27f3 after failed train-0/audit retry strict accounting | 11348603596 |
 | t27f3 after failed retry plus 2 GiB reservation | 13496087244 |
+| t27f4 preflight strict `unique_payload_bytes(W)` | 11348603596 |
+| t27f4 preflight plus 2 GiB reservation | 13496087244 |
+| t27f4 after passed-with-sharing retry strict accounting | 12182779587 |
+| t27f4 after passed-with-sharing retry plus 2 GiB reservation | 14330263235 |
 | Target | 11811160064 |
 | Ticket 27 reservation | 2147483648 |
 | Cap | 16106127360 |
@@ -61,12 +65,13 @@ Earlier aborted/failed run directories were left in place and are part of the at
 | `t27f20261008T071007Z` | `failed_scoped_before_resource_admission` | `train-0` failed with the sandbox source-root defect later fixed by `d3499e1`. |
 | `t27f20261008T073704Z` | `guard_refused` | Preflight passed; immediate guard found GPU1 compute PID `1874488`, so nothing launched. Summary sha256 `ed0c94754e76f43b3005847fc9d00b1115d07c84e1775bbc7086c4eed59e1c84`. |
 | `t27f20261008T074202Z` | `failed_after_train0_before_audit_resource_admission` | Scoped retry ran, admitted `train-0`, then failed before `audit-1000` resource admission. |
+| `t27f20261008T081353Z` | `passed_with_gpu_sharing` | Scoped retry exited 0 and receipt replay audits passed; GPU 1 sharing was observed mid-run and Phase F is held pending user decision. |
 
-### t27f20261008T074202Z
+### t27f20261008T081353Z
 
-Preflight passed in `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/preflight-summary.json` sha256 `7603345c8007030f6198f728280dbc8177e01d97c65a1f4c39107db0ee583b35`.
+Preflight passed in `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/preflight-summary.json` sha256 `cdece39aa8aaf36946154815c4d4e8040eeec9f68891c6669f9a707c15ac0f87`.
 
-Key preflight values: `/data02` free `134240997376` bytes; strict `unique_payload_bytes(W)` `10939982374`; `unique_payload_bytes(W) + 2 GiB = 13087466022`, under the 15 GiB cap. HDFS read-only listing succeeded. CPU, GPU, metrics, and motion rootfs lock verification passed. Preregistration matched. Source closure counts/digests were:
+Key preflight values: `/data02` free `117929287680` bytes; strict `unique_payload_bytes(W)` `11348603596`; `unique_payload_bytes(W) + 2 GiB = 13496087244`, under the 15 GiB cap. HDFS read-only listing succeeded. CPU, GPU, metrics, and motion rootfs lock verification passed. Preregistration matched. Source closure counts/digests were:
 
 | Target | Labels | Sorted-label sha256 |
 | --- | ---: | --- |
@@ -79,49 +84,53 @@ Key preflight values: `/data02` free `134240997376` bytes; strict `unique_payloa
 | `//autonomy/studies:architecture_experiment_runner` | 329 | `8ffa87b4571a620fc102b6d6c987639321dde11ebc086cecd329998234fad118` |
 | `//autonomy/studies:scientific_cohort` | 131 | `9c19c11c1d865766a136be6f9e5811f34ecf08e18c4e4187071162722868dab5` |
 
-GPU1 wait settled after 10 samples, 6 busy samples, and 272.351 seconds; wait summary sha256 `70d71952203797afd2d5fd6ec3e2e42f9113bb11694f7ba3546a5322cc8b0101`. The immediate guard was clear; guard sha256 `918df649a4978d9439ac51bc8f815b20933fd7fe36fd23be68c1b19acea5229d`.
+GPU1 wait ended free after 37 samples; wait summary sha256 `6dbfefaef7c4b0edf5d7d299df6522f6388df45a741861cea009541b3e858124`. The immediate guard was clear; guard sha256 `451961cce4d1c5510facd37412cfe843f529c2bd8e61b497e2cb90abd581e335`.
 
 Command:
 
 ```bash
-systemd-run --user --scope --unit=sureal-sustained-t27f20261008T074202Z -p MemoryMax=17179869184 -p MemorySwapMax=0 -p MemoryAccounting=yes env HADOOP_CONF_DIR=/opt/tiger/yarn_deploy/hadoop/conf PYTHONPATH=autonomy python3 -m training_execution.run_sustained --run-id t27f20261008T074202Z --admission-only
+systemd-run --user --scope --unit=sureal-sustained-t27f20261008T081353Z -p MemoryMax=17179869184 -p MemorySwapMax=0 -p MemoryAccounting=yes env HADOOP_CONF_DIR=/opt/tiger/yarn_deploy/hadoop/conf PYTHONPATH=autonomy python3 -m training_execution.run_sustained --run-id t27f20261008T081353Z --admission-only
 ```
 
-Exit: `1`. Wall clock: `225.487` seconds.
+Exit: `0`. Wall clock: `3903.866` seconds.
 
-Scope at launch: `/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-t27f20261008T074202Z.scope` with `MemoryMax=17179869184`, `MemorySwapMax=0`, `memory.max=17179869184`, and `memory.swap.max=0`.
+Scope at launch: `/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-t27f20261008T081353Z.scope` with `MemoryMax=17179869184`, `MemorySwapMax=0`, `memory.max=17179869184`, and `memory.swap.max=0`. Launch summary: `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/launch-systemd-scope.json` sha256 `3a88dd25bbd1cbc21b3094e5ed39e1ab13951c593c9006d7028e6d7a43ce97b4`.
 
-GPU1 occupancy: `9` samples in `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/gpu1-occupancy.jsonl` sha256 `525f742c490201ee99bff56491b4163760ae2728ac45c653152f1819cbf27410`. No foreign GPU1 process was detected mid-run. One compute process was observed inside the launch scope at 150.720 seconds: PID `2101154`, `/opt/waymo/bin/python`, 1758 MiB.
+GPU1 occupancy: `132` samples in `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/gpu1-occupancy.jsonl` sha256 `2b24ed5297264f4259f023906db2ce3acdae2a6f127c22bc40d146caae9fc1a8`. Foreign GPU1 sharing was observed: `74` foreign-process samples, `25` distinct foreign PIDs, owners `philip.yang`, `root`, and `ziqi.yin`, and `4` samples overlapped the scoped admission process. This is the reason the run is reported as `passed_with_gpu_sharing` rather than a clean unqualified pass.
 
-`train-0` completed and resource-admitted:
+All 14 admission stages completed and were replay-verified for records 0 and 1000. Stage coverage: `train`, `audit`, `literal-loss`, `export`, `proposals`, `score`, and `metrics-audit` at both target steps.
 
-- `train-0-verified.json` sha256 `f2d022da931be0442cbd7dd020ad5e91923fef2add6c6de6d6c0c8670c95d080`.
-- Receipt verification file sha256 `a9aa722ab99103efd6e6aa135604bb5370b1072ba121c2d8f57e6d6cb6071cca`: source snapshot `15491ff278f0cb3001dc55947520297e377447d8408550b67fa0dfc02637312d`, 248 source files, GPU rootfs digest `5a1af6a165eb3d59781eda28fee6acd2672b6a53e3645252eeb6579beb720eb4`, verification passed.
-- `resource-layer/stages/train-0/resource-admitted.json` sha256 `e9c9f04e30b7d919b4e4ff04889c8ea8c6f63e0de995f67a92b7e0711c1c3c02`.
-- Native resource binding sha256 `b6c937cd5385c3f4ecfe079a8802ab88c47da2b7ab0097db69dd8ea3403cf2ae`.
+Receipt replay details:
 
-Failure: `ValueError: failed or incomplete scoped stage cannot be admitted`.
+- Source snapshot HDFS readback verified three unique digests: `908882175aa0204bb422e835e4b013daf66e2af8493a80e0a2dc9d72e72dcb5e` for `//autonomy/training_execution:train_sustained` (248 files), `6cbd23d0dab142fb93eac2b176df5088a41b120a6695e9ecde069d7aa4c917fd` for `//autonomy/retention:publish_sustained_checkpoint` (66 files), and `109cb168991ac140ca099a10ea51d8c5ec63731356d620bc027dc7ef040574a9` for `//autonomy/resources:execute_worker` (49 files). Evidence: `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/source-snapshot-readback-summary.json` sha256 `30f0d6e3a34a4bf3459b31f41ae15a5a20201fc1cc32de5cd5ed53c977912592`.
+- Backend resume validation passed for records `0` and `1000` using the run-local verified snapshot cache. Evidence: `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/backend-resume-validation.json` sha256 `7506b8e498c370445a201e14d17ce4eccc2c75b388af6d3863f83a5c4b8b97a8`.
+- Step 0 checkpoint sha256 `64d031fbced9b0ff76d0ed0aebc51093522d7ef50bcbde9dc33b1101a65cf6f8`, admitted checkpoint receipt sha256 `b029c217c994f113f837aed4d00a740a12e4e7758fdfb3c9465265c8aeca3e5c`, report sha256 `373d6f648e99c670693ec967730d2b3e9ad88d8e339f1a7c5025c0fb4b7194a1`, and all 16 head files matched `check.json`.
+- Step 1000 checkpoint sha256 `89dc7d2bfccb45549d757ea9b488cc1ee1656f20a2e80a3dfb75e3c072d37fc3`, admitted checkpoint receipt sha256 `45093d2246502c309e49c5db41f4f079126f2d269c388cf0a1a84a32b86448ca`, report sha256 `7d4ff8936a525e067d8fe5d1e00176243cadb43a3416622a5da7f9e86620b326`, and all 16 head files matched `check.json`.
+- Final verification/admission summary: `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/verification-summary.json` sha256 `df8e5c8f579b17a686f0c2b31316be35d209f44539c4e5c52c5e66e26db7d737`.
 
-Diagnosis: `audit_sustained_transition.py` was executed from `/tmp/verifier`, but it imports sibling module `sustained_chunk_reference` while `PYTHONPATH` remains `/experiment`. The stage command mounted `/tmp/verifier`, but that directory was not importable, so the audit worker raised `ModuleNotFoundError: No module named 'sustained_chunk_reference'` before the resource wrapper could emit `resource_admission`. Raw audit log: `/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-t27f20261008T074202Z/audit-00/live.log` sha256 `cd8c0660912ddfac0bf0df22c1af3c092e39f938b5d288c691fac5ee66558802`. Audit attempt receipt: `/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-t27f20261008T074202Z/resource-layer/stages/audit-0/attempt.json` sha256 `033d4e4fb05b5727d67fa5b2f6840f3fc34d0bc07b1213dd060b06370f6b6b16`.
+Controller-written run records to commit:
 
-Post-failure storage: strict `unique_payload_bytes(W)` is `11348603596`; with the 2 GiB reservation this is `13496087244`, still under cap. Evidence: `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/post-failure-storage.json` sha256 `ecfb5b5016f053be4b6face8674b0bb927b77656b3b1668ff319af4cfff1e86b`.
+- `autonomy/research/balanced16-sustained-t27f20261008T081353Z-live.json` sha256 `e12b003aa0c4012213cdbcd6ebc15dcfe4de85606c8f2681e17e4dbdead5ecf5`.
+- `autonomy/research/balanced16-sustained-t27f20261008T081353Z-progress.json` sha256 `868866e8a73baa9cee9c6601bd21c331e004ca3695eb72ff9f739e8a183ff23a`.
 
-Phase F was skipped because Phase E did not pass. No journal bytes were preserved, no journal note was appended, no `evidence.publish` command was run, and no readback or second `verify-journal` was attempted.
+Post-run storage: strict `unique_payload_bytes(W)` is `12182779587`; with the 2 GiB reservation this is `14330263235`, still under the 15 GiB cap. `/data02` free at summary time was `161911095296` bytes.
+
+Phase F is held pending user decision on GPU sharing. The coordinator issued a HOLD at `2026-10-08T09:57:15Z` before publication should proceed. A premature local journal append was reverted from the repo, and the attempted publisher did not emit a committed publication receipt; no Phase F journal change or `research-journal-hdfs-verified.json` update is included in this commit.
 
 ## Ticket 27 Box Verdicts
 
 | Ticket 27 box | Verdict | Evidence | Note |
 | --- | --- | --- | --- |
-| The sweep recipes, frames and anchor templates are unchanged from the preregistration | `pass` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/preflight-summary.json sha256 7603345c8007030f6198f728280dbc8177e01d97c65a1f4c39107db0ee583b35` | t27f3 Phase E preflight repeated preregistration/rootfs/source checks before launch; candidate, anchors, recipes, seed, frame count and input digest count matched. |
-| Each recipe admission pins a source snapshot stored in HDFS and the new rootfs digest | `partial` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/train0-receipt-verification.json sha256 a9aa722ab99103efd6e6aa135604bb5370b1072ba121c2d8f57e6d6cb6071cca` | The retry verified the `train-0` receipt source snapshot and GPU rootfs lock after it completed, but the overall live admission failed in the next audit stage before full checkpoint/admission acceptance. |
-| Every runtime-lock check listed in ticket 01 is re-admitted on the new images | `not_fully_admitted` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission/docs/ticket27/readmission-report.md sha256 16da877604277e2c3cb6d937f27c6fe7d86f07eff2686cf74cc8de9f9062d424` | Required live-gate status remains: 7 real live-gate passes, 3 semantic rows contract-only on synthesized receipts, M0 blocked on a rootfs rebuild. This is not counted as full ticket admission. |
-| A live gate executes the admitted candidate in the new rootfs and its receipt verifies against the snapshot | `failed_after_train0_before_audit_resource_admission` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/admission-summary.json sha256 fabe38e1b6aecb6eff3a37f8c5b2b76c6cb9e9078795ef64151225729e258540` | The scoped live command exited 1 after 225.487 seconds. `train-0` completed and verified as partial evidence; `audit-1000` failed before resource admission with `ModuleNotFoundError` for `sustained_chunk_reference`, so no accepted live admission was produced. |
-| The journal records the re-admission and what changed since the original admission | `not_run` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/admission-summary.json sha256 fabe38e1b6aecb6eff3a37f8c5b2b76c6cb9e9078795ef64151225729e258540` | Phase F was skipped because Phase E did not pass; no journal append or `evidence.publish` run occurred. |
+| The sweep recipes, frames and anchor templates are unchanged from the preregistration | `pass` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/preflight-summary.json sha256 cdece39aa8aaf36946154815c4d4e8040eeec9f68891c6669f9a707c15ac0f87` | t27f4 Phase E preflight repeated preregistration/rootfs/source checks before launch; candidate, anchors, recipes, seed, frame count and input digest count matched. |
+| Each recipe admission pins a source snapshot stored in HDFS and the new rootfs digest | `pass_with_gpu_sharing_caveat` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/source-snapshot-readback-summary.json sha256 30f0d6e3a34a4bf3459b31f41ae15a5a20201fc1cc32de5cd5ed53c977912592` | All emitted receipts replayed against read-back source snapshots and rootfs locks; the live command itself had GPU-sharing caveat. |
+| Every runtime-lock check listed in ticket 01 is re-admitted on the new images | `not_fully_admitted` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f2-storage-and-admission/docs/ticket27/readmission-report.md sha256 16da877604277e2c3cb6d937f27c6fe7d86f07eff2686cf74cc8de9f9062d424` | Box 3: 7 real live-gate passes, 3 semantic rows contract-only on synthesized receipts, M0 blocked on a rootfs rebuild. This is not counted as full ticket admission. |
+| A live gate executes the admitted candidate in the new rootfs and its receipt verifies against the snapshot | `passed_with_gpu_sharing` | `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/admission-summary.json sha256 df8e5c8f579b17a686f0c2b31316be35d209f44539c4e5c52c5e66e26db7d737` | The scoped live command exited 0 after 3903.866 seconds and replay verification passed for all 14 stages, records 0 and 1000, and both 16-head sets. GPU 1 sharing was observed, so user decision is required before journal publication or unqualified acceptance. |
+| The journal records the re-admission and what changed since the original admission | `held_pending_user_decision_on_gpu_sharing` | Coordinator HOLD at `2026-10-08T09:57:15Z` | Phase F is held; no journal append, `evidence.publish` receipt, or HDFS journal publication is committed. |
 | The task index states the sweep new status | `not_changed_by_worker` | `.scratch/semantic-layout/issues/27-readmit-balanced16.md (not edited by worker)` | The task explicitly forbade editing the ticket file or task index. |
 
 ## Command Ledger
 
-The structured JSON report preserves the inherited t27f2 `64`-record command ledger for phases A-D and the earlier Phase E attempts. The t27f3 retry evidence is recorded directly under `phase_results.E` and `current_worker_evidence`, with raw files under `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T073704Z/` and `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T074202Z/`. Inherited ledger: `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/command-ledger.jsonl` sha256 `54a8bc7ef56ee006770707463900edc0f8f076ca1b961a61e18677c3bae3da41`.
+The structured JSON report preserves the inherited t27f2 `64`-record command ledger for phases A-D and the earlier Phase E attempts. The t27f4 retry evidence is recorded directly under `phase_results.E` and `current_worker_evidence`, with raw files under `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/`. Inherited ledger: `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/command-ledger.jsonl` sha256 `54a8bc7ef56ee006770707463900edc0f8f076ca1b961a61e18677c3bae3da41`.
 
 | # | Phase | Label | Command | Cwd | Exit | Wall seconds | Evidence | sha256 |
 | ---: | --- | --- | --- | --- | ---: | ---: | --- | --- |
@@ -194,9 +203,9 @@ The structured JSON report preserves the inherited t27f2 `64`-record command led
 
 - No scientific result is claimed.
 - No full balanced16 sweep was run.
-- No accepted ticket-27 live admission was emitted; only `train-0` was verified as partial failure evidence before `audit-1000` failed.
-- No journal entry was appended and evidence.publish was not run.
+- No unqualified clean-GPU ticket-27 admission is claimed; Phase E is `passed_with_gpu_sharing` and awaits user decision.
+- No Phase F journal entry or `evidence.publish` receipt is committed; Phase F is held pending user decision on GPU sharing.
 - No issue file or task index was edited.
 - No push, merge, rebase, reset, stash, or branch switch was performed.
 
-JSON report: `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f3-live-admission/docs/ticket27/execution-report.json` sha256 `1d72eec27515303adfb8a87e1f672b311cdd4b1c32dc8b146275282984a6e9f8`.
+JSON report: `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t27f4-live-admission/docs/ticket27/execution-report.json` sha256 `c83ea7fbb013453ed10811185d552c706bd28eb07b8a0a6a9d9c00d18fcdb30f`.
