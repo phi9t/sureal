@@ -16,3 +16,5 @@
 ## Comments
 
 Done: added `//autonomy/geometry:oriented_box` as a numpy-only geometry library plus module tests for inclusive membership, validation, heading wrap, BEV corners, BEV rectangles and IoU. Added `//autonomy/geometry:oriented_box_parity_harness` and demonstrated it against the existing `segmentation.foreground_support` copy without migrating that copy. Gates: `//autonomy/...` CPU 157/157 pass; `//parallax/...` 17/17 pass; GPU 1 was free and `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda //autonomy/...` passed 28/28.
+
+Review fix: strengthened `oriented_box_parity_harness` with shared near-surface parity cases for faces, edges and corners, including exact local-boundary points, one-ulp inward/outward nudges, exact headings `-pi`, `pi`, `+/-pi/2` and large `2pi` multiples. Added `assert_membership_parity` using the same cases and demonstrated it on `segmentation.foreground_support` without migrating the copy. Fresh gates: focused harness/module/parity targets 3/3 pass; `//autonomy/...` CPU 158/158 pass; `//parallax/...` 17/17 pass; GPU 1 was free and `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda //autonomy/...` passed 28/28.

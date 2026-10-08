@@ -28,6 +28,7 @@ TEST_EXTRA_SRCS = {
 }
 TEST_DEPS = {
     "oriented_box_test.py": [":oriented_box"],
+    "oriented_box_test_support_test.py": [":oriented_box_parity_harness"],
 }
 
 package(default_visibility = ["//visibility:private"])
