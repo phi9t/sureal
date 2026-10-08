@@ -4,7 +4,7 @@
 
 **Blocked by:** 20 (Concept batch: `camera`), 21 (Concept batch: `motion`), 23 (Concept batch: `inspection`), 25 (Studies batch: the 16-scene cohort study)
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] No `sys.path` insertion remains outside procedure records of closed gates
 - [x] No legacy directory named after a runtime, a file kind or a study stage remains
