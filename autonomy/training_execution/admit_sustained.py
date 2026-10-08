@@ -28,6 +28,16 @@ WORKER_ENTRIES={
  'audit_metrics_sustained_v3.py':'/experiment/evaluation/audit_metrics_sustained_v3.py',
 }
 
+def current_gpu_runtime_lock(_historical_receipt=None):
+ lock=json.loads(Path(str(GPU_ROOT)+'.lock.json').read_text());verify_rootfs(GPU_ROOT,lock['rootfs_sha256']);return lock
+
+def rebind_rootfs_mount(command,root):
+ command=list(command)
+ for index in range(len(command)-2):
+  if command[index]=='--ro-bind' and command[index+2]=='/':
+   command[index+1]=str(root);return command
+ raise ValueError('rootfs mount required in native GPU command')
+
 def worker_entry(worker):
  try:return WORKER_ENTRIES[worker]
  except KeyError as error:raise ValueError('declared sustained worker required') from error
@@ -50,7 +60,7 @@ def main():
   if parts.is_absolute() or '..' in parts.parts:raise ValueError('unsafe native frame path')
   for name,digest in frame['sha256'].items():
    if sha(native/parts/name)!=digest:raise ValueError('original native frame changed')
- old=json.loads((C/'detector-gpu-live-a/receipt.json').read_text());runtime=old['runtime_lock'];verify_rootfs(GPU_ROOT,runtime['rootfs_sha256'])
+ old=json.loads((C/'detector-gpu-live-a/receipt.json').read_text());runtime=current_gpu_runtime_lock(old)
  cpu_runtime=json.loads(Path(str(CPU_ROOT)+'.lock.json').read_text());verify_rootfs(CPU_ROOT,cpu_runtime['rootfs_sha256'])
  metric_runtime=json.loads(Path(str(METRICS_ROOT)+'.lock.json').read_text());verify_rootfs(METRICS_ROOT,metric_runtime['rootfs_sha256'])
  for path,digest in old['driver_hashes'].items():
@@ -65,6 +75,7 @@ def main():
  def stage(name,worker,directory,extra,gpu=True,metrics=False):
   directory.mkdir();stage_source,input_hashes=freeze_inputs(source,R/(name+'-input'));command=old['checks'][0]['command'].copy()
   if gpu:
+   command=rebind_rootfs_mount(command,GPU_ROOT)
    for target,path in [('/experiment',package),('/source',stage_source),('/outputs',directory)]:command[command.index(target)-1]=str(path)
    command[-1]=worker_entry(worker)
   elif metrics:command=launch_plan(METRICS_ROOT,package,stage_source,directory,['python',worker_entry(worker)])

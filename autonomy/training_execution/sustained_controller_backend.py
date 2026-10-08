@@ -26,6 +26,16 @@ WORKER_ENTRIES={
  'audit_metrics_sustained_v3.py':'/experiment/evaluation/audit_metrics_sustained_v3.py',
 }
 
+def current_gpu_runtime_lock(_historical_receipt=None):
+ lock=json.loads(Path(str(GPU_ROOT)+'.lock.json').read_text());verify_rootfs(GPU_ROOT,lock['rootfs_sha256']);return lock
+
+def rebind_rootfs_mount(command,root):
+ command=list(command)
+ for index in range(len(command)-2):
+  if command[index]=='--ro-bind' and command[index+2]=='/':
+   command[index+1]=str(root);return command
+ raise ValueError('rootfs mount required in native GPU command')
+
 def _native_release_plan(publication,release=None):
  plan=publication.get('release_plan')
  if plan is None and release is not None:plan=release.get('released')
@@ -142,8 +152,8 @@ class NativeBackend:
    if directory.is_absolute() or '..' in directory.parts:raise ValueError('safe native frame required')
    for name,digest in frame['sha256'].items():
     if sha(self.native/directory/name)!=digest:raise ValueError('original native frame changed')
-  self.old=json.loads((C/'detector-gpu-live-a/receipt.json').read_text());self.runtime=self.old['runtime_lock'];self.cpu_runtime=json.loads(Path(str(CPU_ROOT)+'.lock.json').read_text());self.metric_runtime=json.loads(Path(str(METRICS_ROOT)+'.lock.json').read_text())
-  verify_rootfs(GPU_ROOT,self.runtime['rootfs_sha256']);verify_rootfs(CPU_ROOT,self.cpu_runtime['rootfs_sha256']);verify_rootfs(METRICS_ROOT,self.metric_runtime['rootfs_sha256'])
+  self.old=json.loads((C/'detector-gpu-live-a/receipt.json').read_text());self.runtime=current_gpu_runtime_lock(self.old);self.cpu_runtime=json.loads(Path(str(CPU_ROOT)+'.lock.json').read_text());self.metric_runtime=json.loads(Path(str(METRICS_ROOT)+'.lock.json').read_text())
+  verify_rootfs(CPU_ROOT,self.cpu_runtime['rootfs_sha256']);verify_rootfs(METRICS_ROOT,self.metric_runtime['rootfs_sha256'])
   for path,digest in self.old['driver_hashes'].items():
    if sha(path)!=digest:raise ValueError('original GPU driver changed')
   self.package=self.R/'code';self.source=self.R/'input';self.runtime_path=self.R/'runtime-lock.json';self.verifier=self.R/'verifier'
@@ -176,6 +186,7 @@ class NativeBackend:
   if directory.exists():raise RuntimeError('unfinished stage retained; automatic restart forbidden: '+str(directory))
   directory.mkdir();stage_source,input_hashes=freeze_inputs(self.source,self.R/(name+'-input'));command=self.old['checks'][0]['command'].copy()
   if gpu:
+   command=rebind_rootfs_mount(command,GPU_ROOT)
    for target,path in [('/experiment',self.package),('/source',stage_source),('/outputs',directory)]:command[command.index(target)-1]=str(path)
    command[-1]='/tmp/verifier/audit_sustained_transition.py' if worker=='audit_sustained_transition.py' else worker_entry(worker)
   else:command=launch_plan(METRICS_ROOT if metrics else CPU_ROOT,self.package,stage_source,directory,['python',worker_entry(worker)])
@@ -192,6 +203,7 @@ class NativeBackend:
   if stage not in workers:raise ValueError('unknown native stage')
   metric=stage in {'score','metrics-audit'};gpu=stage in {'train','audit'};command=receipt['command'];entry='/tmp/verifier/'+workers[stage] if stage=='audit' else worker_entry(workers[stage]);stage_runtime=self.metric_runtime if metric else self.runtime if gpu else self.cpu_runtime
   if command[-1]!=entry or receipt['runtime_lock']!=stage_runtime or receipt['driver_hashes']!=(self.old['driver_hashes'] if gpu else {}) or receipt['verifier_source_pins']!=(self.verifier_pins if stage=='audit' else {}):raise ValueError('native worker/runtime/driver/verifier differs')
+  if gpu and rebind_rootfs_mount(command,GPU_ROOT)!=command:raise ValueError('native GPU rootfs mount differs')
   if command[command.index('/experiment')-1]!=str(self.package) or command[command.index('/outputs')-1]!=receipt['output_directory']:raise ValueError('native code/output mount differs')
   if command[command.index('/tmp/source-snapshots')-1]!=str(self.R/'source-snapshots') or command[command.index('SUREAL_SOURCE_SNAPSHOT_STORE')+1]!='/tmp/source-snapshots':raise ValueError('source snapshot store mount differs')
   inputs=self.R/(receipt['requested_stage']+'-input')

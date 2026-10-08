@@ -15,6 +15,29 @@ class ControllerGuardTests(unittest.TestCase):
   self.assertEqual(admit_sustained.GPU_ROOT.name,'gpu-rootfs-v6')
   self.assertEqual(admit_sustained.CPU_ROOT.name,'rootfs-v4')
 
+ def test_current_gpu_runtime_lock_comes_from_v6_lock_not_historical_receipt(self):
+  with tempfile.TemporaryDirectory() as temp:
+   root=Path(temp);gpu=root/'gpu-rootfs-v6';gpu.mkdir()
+   lock={'schema_version':1,'rootfs_sha256':'5'*64,'image_id':'current-v6'}
+   Path(str(gpu)+'.lock.json').write_text(json.dumps(lock))
+   old={'runtime_lock':{'rootfs_sha256':'4'*64,'image_id':'old'}}
+   with patch('training_execution.sustained_controller_backend.GPU_ROOT',gpu),patch('training_execution.sustained_controller_backend.verify_rootfs') as verify:
+    self.assertEqual(sustained_controller_backend.current_gpu_runtime_lock(old),lock)
+   verify.assert_called_once_with(gpu,lock['rootfs_sha256'])
+   with patch('training_execution.admit_sustained.GPU_ROOT',gpu),patch('training_execution.admit_sustained.verify_rootfs') as verify:
+    self.assertEqual(admit_sustained.current_gpu_runtime_lock(old),lock)
+   verify.assert_called_once_with(gpu,lock['rootfs_sha256'])
+
+ def test_gpu_stage_command_rebinds_historical_rootfs_to_current_gpu_root(self):
+  command=['bwrap','--ro-bind','/old/gpu-rootfs','/','--ro-bind','/old/code','/experiment','--bind','/old/out','/outputs','--','python','old.py']
+  expected_root='/current/gpu-rootfs-v6'
+  rewritten=sustained_controller_backend.rebind_rootfs_mount(command,expected_root)
+  self.assertEqual(command[2],'/old/gpu-rootfs')
+  self.assertEqual(rewritten[2],expected_root)
+  self.assertEqual(rewritten[5],'/old/code')
+  with self.assertRaises(ValueError):
+   sustained_controller_backend.rebind_rootfs_mount(['bwrap','--','python'],expected_root)
+
  def source_snapshot(self,root,names,store_root):
   archive,pins=archive_sources(root,names);digest=hashlib.sha256(archive).hexdigest();LocalSnapshotStore(store_root).store(digest,archive)
   return {'schema_version':1,'source_snapshot_sha256':digest,'source_snapshot_target':SNAPSHOT_TARGET,'source_snapshot_store':str(store_root),'source_pins':pins}
@@ -94,7 +117,7 @@ class ControllerGuardTests(unittest.TestCase):
    with self.assertRaises(ValueError):self.guard(b)
  def test_foreign_stage_runtime_worker_and_code_mount_refused(self):
   with tempfile.TemporaryDirectory() as temp:
-   b=self.backend(Path(temp));inputs=b.R/'train-1000-input';inputs.mkdir();manifest=inputs/'manifest.json';manifest.write_text('{}');artifact=b.output/'live.log';artifact.write_text('fixture');receipt={'stage':'train-1000','requested_stage':'train-1000','exit_code':0,'manifest_sha256':b.manifest_sha,'source_hashes':b.pins,'runtime_lock':b.runtime,'driver_hashes':{},'verifier_source_pins':{},'input_hashes':{str(manifest):sha(manifest)},'artifacts':{str(artifact):sha(artifact)},'output_directory':str(b.output),'command':['bwrap','--ro-bind',str(b.package),'/experiment','--ro-bind',str(inputs),'/source','--ro-bind',str(inputs),'/tmp/inputs','--bind',str(b.output),'/outputs','--ro-bind',str(b.R/'source-snapshots'),'/tmp/source-snapshots','--setenv','SUREAL_SOURCE_SNAPSHOT_STORE','/tmp/source-snapshots','--','/experiment/training_execution/train_sustained.py']};b.check_stage(receipt)
+   b=self.backend(Path(temp));inputs=b.R/'train-1000-input';inputs.mkdir();manifest=inputs/'manifest.json';manifest.write_text('{}');artifact=b.output/'live.log';artifact.write_text('fixture');receipt={'stage':'train-1000','requested_stage':'train-1000','exit_code':0,'manifest_sha256':b.manifest_sha,'source_hashes':b.pins,'runtime_lock':b.runtime,'driver_hashes':{},'verifier_source_pins':{},'input_hashes':{str(manifest):sha(manifest)},'artifacts':{str(artifact):sha(artifact)},'output_directory':str(b.output),'command':['bwrap','--ro-bind',str(sustained_controller_backend.GPU_ROOT),'/','--ro-bind',str(b.package),'/experiment','--ro-bind',str(inputs),'/source','--ro-bind',str(inputs),'/tmp/inputs','--bind',str(b.output),'/outputs','--ro-bind',str(b.R/'source-snapshots'),'/tmp/source-snapshots','--setenv','SUREAL_SOURCE_SNAPSHOT_STORE','/tmp/source-snapshots','--','/experiment/training_execution/train_sustained.py']};b.check_stage(receipt)
    for fault in ['runtime','worker','mount','snapshot-store','empty-inputs','empty-artifacts']:
     bad=copy.deepcopy(receipt)
     if fault=='runtime':bad['runtime_lock']=b.metric_runtime

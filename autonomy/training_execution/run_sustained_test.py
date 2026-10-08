@@ -14,6 +14,7 @@ from resources.retention_audit import LIMIT, validate_union
 from resources.sources import sha,validate_sources as validate_resource_sources
 from resources.stage import validate_proof
 from resources.stage_accounting import MEASUREMENT, admit_worker
+from training_execution import sustained_controller_backend
 from training_execution.run_sustained import ResourceNativeBackend, open_backend
 
 
@@ -222,6 +223,7 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
   inputs=backend.R/(requested+'-input');inputs.mkdir()
   (inputs/'manifest.json').write_text((backend.source/'manifest.json').read_text())
   return (inputs,['bwrap','--unshare-all','--die-with-parent',
+                  '--ro-bind',str(sustained_controller_backend.GPU_ROOT),'/',
                   '--ro-bind',str(backend.package),'/experiment',
                   '--bind',str(output),'/outputs',
                   '--ro-bind',str(backend.R/'source-snapshots'),'/tmp/source-snapshots',
