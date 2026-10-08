@@ -1,0 +1,61 @@
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+
+TEST_MODULES = glob(["*_test.py"])
+LIB_MODULES = glob(
+    ["*.py"],
+    exclude = ["*_test.py"],
+)
+
+BLOB_STORE_VISIBILITY = [
+    "//autonomy:__pkg__",
+    "//autonomy/camera:__pkg__",
+    "//autonomy/dataset:__pkg__",
+    "//autonomy/evidence:__pkg__",
+    "//autonomy/evaluation:__pkg__",
+    "//autonomy/geometry:__pkg__",
+    "//autonomy/inspection:__pkg__",
+    "//autonomy/retention:__pkg__",
+    "//autonomy/resources:__pkg__",
+    "//autonomy/segmentation:__pkg__",
+    "//autonomy/studies:__pkg__",
+    "//autonomy/training_execution:__pkg__",
+]
+
+package(default_visibility = ["//visibility:private"])
+
+py_library(
+    name = "blob_store",
+    srcs = LIB_MODULES,
+    imports = [".."],
+    visibility = BLOB_STORE_VISIBILITY,
+)
+
+filegroup(
+    name = "all_py",
+    srcs = glob(["*.py"]),
+    visibility = ["//autonomy:__pkg__"],
+)
+
+filegroup(
+    name = "tests",
+    srcs = TEST_MODULES,
+)
+
+[
+    py_test(
+        name = test[:-3],
+        srcs = [test],
+        deps = [":blob_store"],
+        imports = [".."],
+        legacy_create_init = 0,
+        size = "small",
+        tags = ["perception_unit"],
+    )
+    for test in TEST_MODULES
+]
+
+test_suite(
+    name = "all_tests",
+    tests = [test[:-3] for test in TEST_MODULES],
+    visibility = ["//autonomy:__pkg__"],
+)
