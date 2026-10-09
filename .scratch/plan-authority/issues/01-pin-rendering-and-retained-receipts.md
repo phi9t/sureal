@@ -11,6 +11,12 @@ No behaviour changes.
 
 **Status:** ready-for-agent
 
+- [ ] **Live baseline on the base code, run first.** Real runs (GPU 1 only, when it is free) of:
+  - the three motion verifiers and `replay_motion_foundation.py`;
+  - one resource-measured stage;
+  - the GPU live gate.
+
+  Record the commands, receipts, sha256 values and durations. These fresh receipts join the sweep, and they are the before picture that tickets 02-04 must reproduce.
 - [ ] **Golden argv test.** A test renders representative plans and asserts byte-identical argv: CPU, GPU with driver pins, symlink rootfs entries, `/tmp` tmpfs with mounts under `/tmp/`, resource-wrapped, and a sustained stage.
   - The expected values are generated at the base commit and checked in.
   - The test uses fixtures, not host-specific paths, so it runs on any machine and in the hermetic Bazel sandbox.

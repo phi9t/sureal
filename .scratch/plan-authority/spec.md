@@ -60,6 +60,7 @@ These decisions were made by the coordinator, under the user's standing delegati
 
 ## Testing Decisions
 
+- **Live runs come first and drive validation; tests come after.** Each ticket first proves its change with real runs on its own code: the motion verifiers, one resource-measured stage, and the GPU live gate on GPU 1 when it is free. It then backfills unit tests and goldens that pin what the live run showed. These are cheap regression checks, not the proof. Fresh receipts from the live runs must verify, and a tampered copy must fail.
 - **Good tests check external behaviour:** the plan a builder returns, the record `record_plan` writes, whether a receipt verifies, and the rendered argv for a fixed plan.
 - **Golden argv test:** representative plans (CPU, GPU with driver pins, symlink rootfs entries, `/tmp` tmpfs plus mounts under `/tmp/`, resource-wrapped, sustained stage) render to the exact argv rendered at the base commit.
 - **Retained-receipt sweep:** run every active receipt verifier over the retained receipts it covers today, offline, and record pass counts before and after. The counts must match exactly.

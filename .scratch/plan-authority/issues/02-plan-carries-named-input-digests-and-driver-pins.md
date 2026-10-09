@@ -18,6 +18,7 @@
   - Any `driver_hashes` field still written is derived from the plan record when the receipt is written.
   - `resources.dependencies` and `admit_sustained` read pins through one launch-plan function.
 - [ ] A mismatched driver digest in a new receipt fails with one clear error. A test covers a tampered record.
+- [ ] **Live acceptance comes first.** Real runs on this ticket's code: the ticket 01 live set, including a GPU live gate on GPU 1 whose fresh receipt carries driver pins only through the plan record. The fresh receipts must verify, and a tampered driver digest must fail. Record the results in Comments.
 - [ ] The golden argv test from 01 is unchanged and passes.
 - [ ] The retained-receipt sweep's counts match ticket 01's baseline exactly.
 - [ ] **Gates pass:** CPU, parallax, and CUDA on GPU 1 when it is free. Counts recorded.
