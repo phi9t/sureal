@@ -1,3 +1,4 @@
+# Deliberate independent checker: oriented-box field rereads stay separate from producer export code.
 from resources.sustained_scoring_budget import DEFAULT_NATIVE_SECONDS
 import json,math,re,subprocess
 from pathlib import Path

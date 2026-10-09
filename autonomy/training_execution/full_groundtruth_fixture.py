@@ -1,4 +1,7 @@
-"""Live original16 native GT export, with independent direct row comparison."""
+"""Live original16 native GT export, with independent direct row comparison.
+
+Deliberate independent checker: atan2 periodic heading comparison stays separate from producer oriented-box wrap.
+"""
 import json,math,resource,time
 from pathlib import Path
 from detection.sustained_groundtruth import groundtruth_records
