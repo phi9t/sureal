@@ -11,17 +11,13 @@ import time
 
 HERE=Path(__file__).resolve().parents[1]
 from evidence.source_snapshot import file_sha256 as sha
-from insula.entry import launch_plan
-from insula.runtime_identity import verify_rootfs
-from insula.runtime_roots import current_metrics_rootfs
+from evaluation.launches import build_evaluation_plan, load_current_metrics_runtime, plan_receipt, run_evaluation_plan
 from detection.native_detection_adapter import parse_result
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
-ROOT=current_metrics_rootfs(CACHE)
 
 def main():
     out=Path(sys.argv[1]).resolve();out.mkdir(parents=True,exist_ok=False)
-    lock=json.loads(Path(str(ROOT)+'.lock.json').read_text())
-    verify_rootfs(ROOT,lock['rootfs_sha256'])
+    runtime=load_current_metrics_runtime(CACHE);lock=runtime.data
     sourcefile=CACHE/'metrics-source/src/waymo_open_dataset/metrics/tools/compute_detection_metrics_main.cc'
     expected={m.group(1):(float(m.group(2)),float(m.group(3))) for m in re.finditer(r'^// (.+): \[mAP ([^\]]+)\] \[mAPH ([^\]]+)\]',sourcefile.read_text(),re.M)}
     assert len(expected)==32
@@ -33,10 +29,10 @@ def main():
                   ('valid',['/metrics-build/compute_detection_metrics',base+'fake_predictions.bin',base+'fake_ground_truths.bin']),
                   ('malformed',['/metrics-build/compute_detection_metrics','/source/malformed.bin',base+'fake_ground_truths.bin'])]
         for name,command in commands:
-            plan=launch_plan(ROOT,HERE,source,out,command)
-            result=subprocess.run(plan,capture_output=True,text=True)
+            plan=build_evaluation_plan(runtime,code=HERE,source=source,output=out,command=command)
+            result=run_evaluation_plan(plan,capture_output=True,text=True)
             (out/(name+'.stdout')).write_text(result.stdout);(out/(name+'.stderr')).write_text(result.stderr)
-            checks.append({'name':name,'command':plan,'exit_code':result.returncode})
+            checks.append({'name':name,'launch_plan':plan_receipt(plan),'exit_code':result.returncode})
             if name=='fixtures':assert result.returncode==0,result.stderr
             elif name=='valid':
                 parsed=parse_result(result.returncode,result.stdout,result.stderr,set(expected))
