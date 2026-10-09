@@ -60,6 +60,15 @@ class LiveGateTests(unittest.TestCase):
             self.assertEqual(receipt['executed_tests'],3)
             self.assertEqual(receipt['label'],'//autonomy/example:gate_test')
             self.assertEqual(receipt['fixture'],str(fixture.resolve()))
+            self.assertNotIn('argv',receipt)
+            self.assertNotIn('mounts',receipt)
+            self.assertIn('launch_plan',receipt)
+            self.assertEqual(receipt['launch_plan']['command'],gate.command)
+            raw_plan=json.dumps(receipt['launch_plan'],sort_keys=True)
+            self.assertNotIn(str(root),raw_plan)
+            mounts={mount['role']:mount for mount in receipt['launch_plan']['mounts']}
+            self.assertEqual(mounts['code']['inside_path'],'/experiment')
+            self.assertEqual(mounts['source']['inside_path'],'/source')
             self.assertTrue(Path(receipt['raw_log']).is_file())
             self.assertTrue((records/'autonomy_example__gate_test.json').is_file())
 

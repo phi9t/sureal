@@ -13,9 +13,20 @@ from datetime import datetime,timezone
 
 HERE=Path(__file__).resolve().parents[1]
 from evidence.source_snapshot import file_sha256 as sha
+from insula.launch_plan import build_plan, load_runtime_lock, render_plan
 from insula.m0_receipt import candidate_files, validate_receipt
-ROOT=Path(os.environ.get('WAYMO_INSULA_ROOT',str(Path.home()/'.cache/waystone/waymo-perception/insula/rootfs-v2')))
+from insula.runtime_roots import current_cpu_rootfs, default_lock
+ROOT=Path(os.environ.get('WAYMO_INSULA_ROOT',str(current_cpu_rootfs())))
 CACHE=ROOT.parent
+
+def build_m0_plan(rootfs,source,output,command,*,lock=None,experiment=HERE):
+    rootfs=Path(rootfs)
+    lock_path=Path(lock) if lock is not None else default_lock(rootfs)
+    runtime=load_runtime_lock(rootfs,lock_path)
+    return build_plan(runtime,code=Path(experiment),source=Path(source),output=Path(output),command=command)
+
+def m0_command(rootfs,source,output,command,*,lock=None,experiment=HERE):
+    return render_plan(build_m0_plan(rootfs,source,output,command,lock=lock,experiment=experiment))
 
 def main():
     destination=Path(sys.argv[1])
@@ -29,14 +40,21 @@ def main():
         records=[]
         def run(name,command,expected=0):
             before=time.monotonic()
-            p=subprocess.run(command,text=True,capture_output=True)
-            (stage/(name+'.log')).write_text(p.stdout+p.stderr)
-            records.append({'name':name,'command':command,'exit_code':p.returncode,'expected':expected,'seconds':time.monotonic()-before})
-            assert (p.returncode==0 if expected==0 else p.returncode!=0),(name,p.stdout,p.stderr)
+            try:
+                argv=command() if callable(command) else command
+                p=subprocess.run(argv,text=True,capture_output=True)
+                log=p.stdout+p.stderr
+                exit_code=p.returncode
+                record={'name':name,'command':argv,'exit_code':exit_code,'expected':expected,'seconds':time.monotonic()-before}
+            except Exception as exc:
+                log=repr(exc)+'\n'
+                exit_code=1
+                record={'name':name,'command':[],'exit_code':exit_code,'expected':expected,'error':repr(exc),'seconds':time.monotonic()-before}
+            (stage/(name+'.log')).write_text(log)
+            records.append(record)
+            assert (exit_code==0 if expected==0 else exit_code!=0),(name,log)
         def cmd(out,*tail,root=ROOT,lock=None):
-            args=[str(HERE/'enter.sh'),'--rootfs',str(root),'--source',str(source),'--output',str(out),'--offline']
-            if lock:args+=['--lock',str(lock)]
-            return args+['--',*tail]
+            return lambda:m0_command(root,source,out,list(tail),lock=lock)
         with socket.socket() as listener:
             listener.bind(('127.0.0.1',0));listener.listen(16)
             port=listener.getsockname()[1]
@@ -57,8 +75,9 @@ def main():
         for number in range(2):
             artifacts[str(number)]={p.name:sha(p) for p in (stage/f'run-{number}').iterdir()}
         assert artifacts['0']==artifacts['1']
+        runtime=load_runtime_lock(ROOT,default_lock(ROOT))
         receipt={'schema_version':1,'milestone':'M0','started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),
-                 'runtime_lock':json.loads(Path(str(ROOT)+'.lock.json').read_text()),
+                 'runtime_lock':runtime.data,
                  'code_hashes':{str(p.relative_to(HERE)):sha(p) for p in candidate_files(HERE)},
                  'log_hashes':{p.name:sha(p) for p in stage.glob('*.log')},
                  'checks':records,'artifacts':artifacts,'elapsed_seconds':time.monotonic()-began,
