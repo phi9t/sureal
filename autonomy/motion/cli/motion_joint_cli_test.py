@@ -36,11 +36,10 @@ class MotionJointCliTests(unittest.TestCase):
             result = subprocess.run(self.fixture(root), capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stderr)
             output = json.loads((root/'result.json').read_text())
-            vehicle = next(x for x in output['metrics']['metricsBundles']
-                           if x.get('objectFilter') == 'TYPE_VEHICLE')
-            self.assertAlmostEqual(float(vehicle['minAde']), 2, places=5)
-            self.assertAlmostEqual(float(vehicle['minFde']), 2, places=5)
-            count = next(x for x in output['counts'] if x['object_type'] == 1)
+            vehicle = single_cli.vehicle_metrics(output)
+            self.assertAlmostEqual(vehicle['minAde'], 2, places=5)
+            self.assertAlmostEqual(vehicle['minFde'], 2, places=5)
+            count = vehicle['counts']
             self.assertEqual(count['min_ade'], 1)
             self.assertEqual(count['min_fde'], 1)
 

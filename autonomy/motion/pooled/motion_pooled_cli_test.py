@@ -25,10 +25,10 @@ class MotionPooledCliTests(unittest.TestCase):
             self.assertEqual(run.returncode,0,run.stderr)
             report=json.loads(result.read_text())
             self.assertEqual(report['scenarios'],2)
-            vehicle=next(b for b in report['metrics']['metricsBundles'] if b.get('objectFilter')=='TYPE_VEHICLE')
-            self.assertAlmostEqual(float(vehicle['minFde']),10,places=5)
-            self.assertAlmostEqual(float(vehicle['meanAveragePrecision']),.25,places=5)
-            count=next(c for c in report['counts'] if c['object_type']==1)
+            vehicle=single_cli.vehicle_metrics(report)
+            self.assertAlmostEqual(vehicle['minFde'],10,places=5)
+            self.assertAlmostEqual(vehicle['meanAveragePrecision'],.25,places=5)
+            count=vehicle['counts']
             self.assertEqual(count['min_fde'],2)
 
     def test_duplicate_missing_and_malformed_pairs_refuse_output(self):
@@ -59,9 +59,9 @@ class MotionPooledCliTests(unittest.TestCase):
             run=subprocess.run([BINARY,str(catalog),str(root/'measured/config.textproto'),str(result)],capture_output=True,text=True)
             self.assertEqual(run.returncode,0,run.stderr)
             report=json.loads(result.read_text())
-            vehicle=next(b for b in report['metrics']['metricsBundles'] if b.get('objectFilter')=='TYPE_VEHICLE')
-            self.assertAlmostEqual(float(vehicle['minFde']),2,places=5)
-            self.assertEqual(next(c for c in report['counts'] if c['object_type']==1)['min_fde'],1)
+            vehicle=single_cli.vehicle_metrics(report)
+            self.assertAlmostEqual(vehicle['minFde'],2,places=5)
+            self.assertEqual(vehicle['counts']['min_fde'],1)
 
     def test_unequal_agent_support_weights_measurements_not_scenarios(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -81,10 +81,10 @@ class MotionPooledCliTests(unittest.TestCase):
             run=subprocess.run([BINARY,str(catalog),str(root/'two_correct/config.textproto'),str(result)],capture_output=True,text=True)
             self.assertEqual(run.returncode,0,run.stderr)
             report=json.loads(result.read_text())
-            vehicle=next(b for b in report['metrics']['metricsBundles'] if b.get('objectFilter')=='TYPE_VEHICLE')
-            self.assertAlmostEqual(float(vehicle['minFde']),1,places=5)
-            self.assertAlmostEqual(float(vehicle['minAde']),1,places=5)
-            self.assertEqual(next(c for c in report['counts'] if c['object_type']==1)['min_fde'],3)
+            vehicle=single_cli.vehicle_metrics(report)
+            self.assertAlmostEqual(vehicle['minFde'],1,places=5)
+            self.assertAlmostEqual(vehicle['minAde'],1,places=5)
+            self.assertEqual(vehicle['counts']['min_fde'],3)
 
     def test_pooled_overlap_of_predicted_boxes_with_other_agent_truth(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -101,9 +101,9 @@ class MotionPooledCliTests(unittest.TestCase):
             run=subprocess.run([BINARY,str(catalog),str(root/'collision/config.textproto'),str(result)],capture_output=True,text=True)
             self.assertEqual(run.returncode,0,run.stderr)
             report=json.loads(result.read_text())
-            vehicle=next(b for b in report['metrics']['metricsBundles'] if b.get('objectFilter')=='TYPE_VEHICLE')
-            self.assertAlmostEqual(float(vehicle['overlapRate']),.5,places=5)
-            self.assertEqual(next(c for c in report['counts'] if c['object_type']==1)['overlap_rate'],2)
+            vehicle=single_cli.vehicle_metrics(report)
+            self.assertAlmostEqual(vehicle['overlapRate'],.5,places=5)
+            self.assertEqual(vehicle['counts']['overlap_rate'],2)
 
     def test_overlap_uses_most_confident_mode_while_error_uses_best_mode(self):
         for collision_confidence in [.9,.1]:
@@ -123,9 +123,9 @@ class MotionPooledCliTests(unittest.TestCase):
                 run=subprocess.run([BINARY,str(pairs),str(config),str(result)],capture_output=True,text=True)
                 self.assertEqual(run.returncode,0,run.stderr)
                 report=json.loads(result.read_text())
-                vehicle=next(b for b in report['metrics']['metricsBundles'] if b.get('objectFilter')=='TYPE_VEHICLE')
-                self.assertAlmostEqual(float(vehicle['minFde']),0,places=5)
-                self.assertAlmostEqual(float(vehicle['overlapRate']),1 if collision_confidence>.5 else 0,places=5)
+                vehicle=single_cli.vehicle_metrics(report)
+                self.assertAlmostEqual(vehicle['minFde'],0,places=5)
+                self.assertAlmostEqual(vehicle['overlapRate'],1 if collision_confidence>.5 else 0,places=5)
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,4 +1,5 @@
 import pathlib,json,csv,copy,time,resource,math
+from motion.ingestion.strict_metric_reader import parse_result
 start=time.monotonic();mapping={1:'TYPE_VEHICLE',2:'TYPE_PEDESTRIAN',3:'TYPE_CYCLIST'}
 def aggregate(rows):
  result={}
@@ -9,18 +10,17 @@ def aggregate(rows):
 
 def verify(score,reference):
  if score['scenarios']!=2:raise ValueError('scenario count')
- counts={int(r['object_type']):r for r in score['counts']};bundles={r['objectFilter']:r for r in score['metrics']['metricsBundles']}
- if len(counts)!=len(score['counts']) or len(bundles)!=len(score['metrics']['metricsBundles']) or set(counts)!=set(reference) or set(bundles)!={mapping[k] for k in reference}:raise ValueError('class identity/duplicate')
+ classes=parse_result(score)['classes']
+ if set(classes)!=set(reference):raise ValueError('class identity/duplicate')
  result=[]
  for kind,expect in reference.items():
-  count,bundle=counts[kind],bundles[mapping[kind]]
-  if count['measurement_step']!=15 or bundle['measurementStep']!=15:raise ValueError('horizon')
+  metrics=classes[kind];count=metrics['counts']
   for metric in ['ade','fde']:
    n=expect[metric+'_count'];value=expect[metric+'_sum']/max(n,1);key='minAde' if metric=='ade' else 'minFde'
-   observed=float(bundle[key])
-   if not math.isfinite(value) or not math.isfinite(observed):raise ValueError('nonfinite pooled displacement')
+   observed=metrics[key]
+   if not math.isfinite(value):raise ValueError('nonfinite pooled displacement')
    if count['min_'+metric]!=n or abs(observed-value)>1e-3:raise ValueError('pooled support or displacement')
-  result.append({'object_type':kind,'ADE_measurements':expect['ade_count'],'FDE_measurements':expect['fde_count'],'missing_endpoint_measurements':expect['ade_count']-expect['fde_count'],'minADE':bundle['minAde'],'minFDE':bundle['minFde']})
+  result.append({'object_type':kind,'ADE_measurements':expect['ade_count'],'FDE_measurements':expect['fde_count'],'missing_endpoint_measurements':expect['ade_count']-expect['fde_count'],'minADE':metrics['minAde'],'minFDE':metrics['minFde']})
  return result
 rows=[];refused=0
 for train,val in [(0,0),(0,2),(2,0),(2,2)]:
