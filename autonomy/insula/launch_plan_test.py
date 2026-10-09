@@ -16,6 +16,8 @@ from insula.launch_plan import (
     PlanError,
     RuntimeLockError,
     build_plan,
+    gpu_driver_hashes_from_plan_record,
+    gpu_driver_paths_from_plan_record,
     load_default_runtime_lock,
     load_runtime_lock,
     plan_data,
@@ -24,6 +26,7 @@ from insula.launch_plan import (
     run_plan,
     read_receipt_mounts,
     read_receipt_mount_sequence,
+    verify_gpu_driver_hashes_from_plan_record,
 )
 from insula.runtime_identity import rootfs_identity
 from insula.runtime_roots import (
@@ -313,6 +316,53 @@ class LaunchPlanTests(unittest.TestCase):
             self.assertRegex(mounts["input:/tmp/fixture"]["digest"], r"^[0-9a-f]{64}$")
             self.assertNotIn("digest", mounts["output"])
             self.assertEqual(record["command"], ["python", "main.py"])
+
+    def test_record_plan_keeps_declared_named_input_digest(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            runtime = self.load_fixture_runtime(root)
+            code = root / "code"
+            scientific = root / "scientific"
+            output = scientific / "run-output"
+            for path in (code, output):
+                path.mkdir(parents=True)
+            (scientific / "actual.txt").write_text("actual scientific bytes\n")
+            source_snapshot_digest = "1" * 64
+            scientific_root_digest = "2" * 64
+
+            plan = build_plan(
+                runtime,
+                code=code,
+                output=output,
+                named_inputs={"/tmp/scientific": scientific},
+                named_input_digests={"/tmp/scientific": scientific_root_digest},
+                source_snapshot_digest=source_snapshot_digest,
+                allow_readonly_inputs_cover_output=True,
+                command=["python", "main.py"],
+            )
+
+            mounts = {mount["role"]: mount for mount in record_plan(plan)["mounts"]}
+            self.assertEqual(plan.named_input_digests, (("/tmp/scientific", scientific_root_digest),))
+            self.assertEqual(mounts["code"]["digest"], source_snapshot_digest)
+            self.assertEqual(mounts["input:/tmp/scientific"]["digest"], scientific_root_digest)
+
+    def test_declared_named_input_digest_requires_matching_named_input(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            runtime = self.load_fixture_runtime(root)
+            code = root / "code"
+            output = root / "output"
+            for path in (code, output):
+                path.mkdir()
+
+            with self.assertRaisesRegex(PlanError, "declared digest requires a named input"):
+                build_plan(
+                    runtime,
+                    code=code,
+                    output=output,
+                    named_input_digests={"/tmp/scientific": "2" * 64},
+                    command=["python", "main.py"],
+                )
 
     def test_receipt_reader_normalizes_old_command_and_new_plan_mounts(self):
         retained = json.loads(
@@ -714,6 +764,29 @@ class LaunchPlanTests(unittest.TestCase):
             }
             for name, digest in driver_hashes.items():
                 self.assertEqual(record_driver_mounts[f"gpu-driver:{name}"]["digest"], digest)
+            expected_driver_hashes = {
+                f"gpu-driver:{name}": digest for name, digest in driver_hashes.items()
+            }
+            self.assertEqual(gpu_driver_hashes_from_plan_record(record), expected_driver_hashes)
+            with patch.dict(os.environ, environment, clear=False):
+                self.assertEqual(
+                    verify_gpu_driver_hashes_from_plan_record({"launch_plan": record}),
+                    expected_driver_hashes,
+                )
+                self.assertEqual(
+                    {
+                        name: digest
+                        for name, (_path, digest) in gpu_driver_paths_from_plan_record(record).items()
+                    },
+                    driver_hashes,
+                )
+                tampered = copy.deepcopy(record)
+                for mount in tampered["mounts"]:
+                    if mount["role"] == "gpu-driver:libcuda.so":
+                        mount["digest"] = "0" * 64
+                        break
+                with self.assertRaisesRegex(ValueError, "gpu-driver:libcuda.so.*differs"):
+                    verify_gpu_driver_hashes_from_plan_record(tampered)
             (driver_dir / "libcuda.so").write_text("swapped libcuda")
             with self.assertRaisesRegex(PlanError, "gpu-driver:libcuda.so.*changed"):
                 render_plan(plan)
@@ -1143,6 +1216,7 @@ class LaunchPlanTests(unittest.TestCase):
                 named_inputs={"/tmp/scientific": scientific},
                 command=["python", "/experiment/a.py"],
                 source_snapshot_digest="snapshot-fixture",
+                named_input_digests={"/tmp/scientific": "3" * 64},
                 allow_readonly_inputs_cover_output=True,
             )
 
@@ -1153,6 +1227,7 @@ class LaunchPlanTests(unittest.TestCase):
             mounts = {mount["role"]: mount for mount in record_plan(extended)["mounts"]}
 
             self.assertEqual(mounts["code"]["digest"], "snapshot-fixture")
+            self.assertEqual(mounts["input:/tmp/scientific"]["digest"], "3" * 64)
             self.assertEqual(mounts["input:/tmp/scientific"]["inside_path"], "/tmp/scientific")
 
     def test_render_plan_never_renders_the_same_inside_path_twice(self):

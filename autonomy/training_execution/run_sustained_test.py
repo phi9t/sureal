@@ -1,6 +1,7 @@
 import copy
 import hashlib
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -8,7 +9,7 @@ from unittest.mock import patch
 
 from blob_store.core import BlobStore, BlobStoreError, InMemoryBlobAdapter, LocalFileBlobAdapter
 from evidence.source_snapshot import LocalSnapshotStore
-from insula.launch_plan import RuntimeLock
+from insula.launch_plan import RuntimeLock, record_plan, render_plan
 from resources.backend import ResourceBackend
 from resources.command import wrapped_command
 from resources.sources import sha,validate_sources as validate_resource_sources
@@ -146,6 +147,96 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
                   '--ro-bind',str(inputs),'/source',
                   '--ro-bind',str(inputs),'/tmp/inputs',
                   '--','python',entry])
+
+ def write_gpu_plan_environment(self,root):
+  devices=root/'devices';drivers=root/'driver-libs'
+  devices.mkdir();drivers.mkdir()
+  pairs=[]
+  for guest in ['/dev/nvidia1','/dev/nvidiactl','/dev/nvidia-uvm']:
+   host=devices/Path(guest).name;host.write_text('');pairs.append(f'{host}={guest}')
+  for name in ['libcuda.so','libnvidia-ptxjitcompiler.so','libnvidia-nvvm.so']:
+   (drivers/name).write_text(name+'\n')
+  return {
+   'SUREAL_BAZEL_GPU_DEVICES':','.join(pairs),
+   'SUREAL_BAZEL_GPU_DRIVER_LIBRARY_DIRS':str(drivers),
+   'SUREAL_BAZEL_GPU_DEVICE_UUIDS':'1=GPU-fixture-1',
+  }
+
+ def stage_plan_paths(self,root):
+  paths={}
+  for name in ['case','package','scientific','native','physical','boxes']:
+   paths[name]=root/name;paths[name].mkdir(parents=True)
+  paths['source-snapshots']=paths['case']/'source-snapshots';paths['source-snapshots'].mkdir()
+  paths['output']=paths['scientific']/'out';paths['output'].mkdir()
+  paths['stage_source']=paths['case']/'train-1000-input';paths['stage_source'].mkdir()
+  (paths['stage_source']/'manifest.json').write_text('{"frames":[]}\n')
+  paths['runtime_lock']=paths['case']/'runtime-lock.json';paths['runtime_lock'].write_text('{"fixture":true}\n')
+  return paths
+
+ def test_sustained_stage_plan_records_public_source_and_scientific_digests(self):
+  with tempfile.TemporaryDirectory() as temp:
+   root=Path(temp);paths=self.stage_plan_paths(root)
+   runtime=RuntimeLock(root/'rootfs',paths['runtime_lock'],{'rootfs_sha256':'a'*64},'fixture','b'*64)
+   source_snapshot_digest='1'*64;scientific_root_digest='2'*64
+
+   plan=sustained_controller_backend.build_sustained_stage_plan(
+    runtime,
+    package=paths['package'],
+    stage_source=paths['stage_source'],
+    output=paths['output'],
+    worker='train_sustained.py',
+    native=paths['native'],
+    physical=paths['physical'],
+    boxes=paths['boxes'],
+    runtime_lock_path=paths['runtime_lock'],
+    scientific_root=paths['scientific'],
+    source_snapshot_store=paths['source-snapshots'],
+    source_snapshot_digest=source_snapshot_digest,
+    scientific_root_digest=scientific_root_digest,
+   )
+
+   record=record_plan(plan);mounts={mount['role']:mount for mount in record['mounts']}
+   self.assertFalse(hasattr(plan,'_sustained_scientific_root_digest'))
+   self.assertEqual(mounts['code']['digest'],source_snapshot_digest)
+   self.assertEqual(mounts['input:/tmp/scientific']['digest'],scientific_root_digest)
+
+ def test_new_gpu_stage_receipt_checks_driver_pins_from_launch_plan(self):
+  with tempfile.TemporaryDirectory() as temp:
+   root=Path(temp);paths=self.stage_plan_paths(root);environment=self.write_gpu_plan_environment(root)
+   backend=sustained_controller_backend.NativeBackend.__new__(sustained_controller_backend.NativeBackend)
+   backend.R=paths['case'];backend.package=paths['package'];backend.gpu_index=1
+   backend.runtime={'rootfs_sha256':'a'*64};backend.runtime_lock=RuntimeLock(root/'rootfs',paths['runtime_lock'],backend.runtime,'fixture','b'*64)
+   backend.manifest_sha=sha(paths['stage_source']/'manifest.json');backend.pins={'source_snapshot_sha256':'1'*64}
+   backend.verifier_pins={}
+   output=paths['output'];(output/'live.log').write_text('ok\n')
+   with patch.dict(os.environ,environment,clear=False):
+    plan=sustained_controller_backend.build_sustained_stage_plan(
+     backend.runtime_lock,
+     package=backend.package,
+     stage_source=paths['stage_source'],
+     output=output,
+     worker='train_sustained.py',
+     native=paths['native'],
+     physical=paths['physical'],
+     boxes=paths['boxes'],
+     runtime_lock_path=paths['runtime_lock'],
+     scientific_root=paths['scientific'],
+     source_snapshot_store=paths['source-snapshots'],
+     gpu_index=1,
+     source_snapshot_digest='1'*64,
+     scientific_root_digest='2'*64,
+    )
+    command=render_plan(plan);launch_record=record_plan(plan)
+    receipt={'stage':'train-1000','requested_stage':'train-1000','command':command,'launch_plan':launch_record,'output_directory':str(output),'exit_code':0,'source_hashes':backend.pins,'runtime_lock':backend.runtime,'driver_hashes':{'/missing/legacy-libcuda.so':'0'*64},'verifier_source_pins':{},'manifest_sha256':backend.manifest_sha,'input_hashes':{str(paths['stage_source']/'manifest.json'):backend.manifest_sha},'artifacts':{str(output/'live.log'):sha(output/'live.log')},'scope':'fixture'}
+
+    backend.check_stage(receipt)
+    tampered=copy.deepcopy(receipt)
+    for mount in tampered['launch_plan']['mounts']:
+     if mount['role']=='gpu-driver:libcuda.so':
+      mount['digest']='0'*64
+      break
+    with self.assertRaisesRegex(ValueError,'gpu-driver:libcuda.so.*differs'):
+     backend.check_stage(tampered)
 
  def add_resource_binding(self,root,backend,receipt_path,receipt):
   evidence=backend.resource_root/'stages'/receipt['requested_stage'];evidence.mkdir(parents=True)

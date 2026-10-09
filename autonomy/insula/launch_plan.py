@@ -119,6 +119,7 @@ class LaunchPlan:
     unshare_flags: tuple[str, ...]
     gpu: "GPURequest | None" = None
     source_snapshot_digest: str | None = None
+    named_input_digests: tuple[tuple[str, str], ...] = ()
     allow_readonly_inputs_cover_output: bool = False
     clear_environment: bool = True
 
@@ -188,6 +189,7 @@ def build_plan(
     command: Iterable[object],
     source: Path | None = None,
     named_inputs: Mapping[str, Path] | None = None,
+    named_input_digests: Mapping[str, str] | None = None,
     writable_inputs: Mapping[str, Path] | None = None,
     extra_environment: Mapping[str, object] | None = None,
     gpu_index: int | None = None,
@@ -236,6 +238,7 @@ def build_plan(
         unshare_flags=("--unshare-all", "--die-with-parent"),
         gpu=gpu,
         source_snapshot_digest=source_snapshot_digest,
+        named_input_digests=named_input_digests,
         allow_readonly_inputs_cover_output=allow_readonly_inputs_cover_output,
     )
     return plan
@@ -251,6 +254,7 @@ def build_custom_plan(
     unshare_flags: Iterable[object],
     gpu_index: int | None = None,
     gpu: GPURequest | None = None,
+    named_input_digests: Mapping[str, str] | None = None,
     allow_readonly_inputs_cover_output: bool = False,
 ) -> LaunchPlan:
     """Build a validated launch plan for callers with non-standard mount layouts."""
@@ -275,6 +279,7 @@ def build_custom_plan(
         working_directory=working_directory,
         unshare_flags=unshare_flags,
         gpu=gpu,
+        named_input_digests=named_input_digests,
         allow_readonly_inputs_cover_output=allow_readonly_inputs_cover_output,
     )
 
@@ -294,7 +299,7 @@ def plan_data(plan: LaunchPlan) -> dict:
             "lock_sha256": plan.runtime.lock_sha256,
             "form": plan.runtime.form,
         },
-        "mounts": [_mount_data(mount, include_host=True) for mount in plan.mounts],
+        "mounts": [_plan_mount_data(plan, mount, include_host=True) for mount in plan.mounts],
         "devices": [_mount_data(mount, include_host=True) for mount in plan.mounts if mount.kind == "dev-bind"],
         "environment": [list(item) for item in plan.environment],
         "working_directory": plan.working_directory,
@@ -362,6 +367,7 @@ def with_mounts(
         unshare_flags=plan.unshare_flags,
         gpu=plan.gpu,
         source_snapshot_digest=plan.source_snapshot_digest,
+        named_input_digests=dict(plan.named_input_digests),
         allow_readonly_inputs_cover_output=plan.allow_readonly_inputs_cover_output,
         clear_environment=plan.clear_environment,
     )
@@ -385,6 +391,55 @@ def record_plan(plan: LaunchPlan) -> dict:
     if plan.gpu is not None:
         record["gpu"] = _gpu_request_data(plan.gpu, include_minor=True)
     return record
+
+
+def gpu_driver_hashes_from_plan_record(record: Mapping[str, object]) -> dict[str, str]:
+    """Return role-keyed GPU driver digests recorded in a launch plan."""
+    plan_record = _extract_launch_plan_record(record)
+    if plan_record is None:
+        raise ValueError("launch plan record required")
+    mounts = plan_record.get("mounts")
+    if not isinstance(mounts, list):
+        raise ValueError("launch plan mounts required")
+    hashes: dict[str, str] = {}
+    for mount in mounts:
+        if not isinstance(mount, Mapping):
+            raise ValueError("launch plan mount record required")
+        role = mount.get("role")
+        if not isinstance(role, str) or not role.startswith("gpu-driver:"):
+            continue
+        digest = mount.get("digest")
+        if not isinstance(digest, str) or re.fullmatch(r"[0-9a-f]{64}", digest) is None:
+            raise ValueError(f"{role}: GPU driver digest required")
+        if role in hashes:
+            raise ValueError(f"{role}: duplicate GPU driver digest")
+        hashes[role] = digest
+    return hashes
+
+
+def gpu_driver_paths_from_plan_record(record: Mapping[str, object]) -> dict[str, tuple[Path, str]]:
+    """Return current host driver paths checked against a launch-plan record."""
+    by_role = gpu_driver_hashes_from_plan_record(record)
+    if not by_role:
+        return {}
+    paths = {path.name: path for path in _gpu_driver_paths()}
+    result: dict[str, tuple[Path, str]] = {}
+    for role, digest in by_role.items():
+        name = role.split(":", 1)[1]
+        path = paths.get(name)
+        if path is None:
+            raise ValueError(f"{role}: GPU driver library not found")
+        actual = _mounted_file_sha256(path, role)
+        if actual != digest:
+            raise ValueError(f"{role}: GPU driver digest differs")
+        result[name] = (path, digest)
+    return result
+
+
+def verify_gpu_driver_hashes_from_plan_record(record: Mapping[str, object]) -> dict[str, str]:
+    """Verify recorded GPU driver digests and return the role-keyed pins."""
+    gpu_driver_paths_from_plan_record(record)
+    return gpu_driver_hashes_from_plan_record(record)
 
 
 def read_receipt_mounts(
@@ -463,6 +518,7 @@ def _assemble_plan(
     gpu: GPURequest | None = None,
     allow_readonly_inputs_cover_output: bool = False,
     source_snapshot_digest: str | None = None,
+    named_input_digests: Mapping[str, str] | None = None,
     clear_environment: bool = True,
 ) -> LaunchPlan:
     mount_tuple = tuple(mounts)
@@ -479,6 +535,7 @@ def _assemble_plan(
         unshare_flags=tuple(str(flag) for flag in unshare_flags),
         gpu=gpu,
         source_snapshot_digest=source_snapshot_digest,
+        named_input_digests=_normalise_named_input_digests(mount_tuple, named_input_digests),
         allow_readonly_inputs_cover_output=allow_readonly_inputs_cover_output,
         clear_environment=clear_environment,
     )
@@ -919,6 +976,29 @@ def _validate_named_input_path(path: str) -> None:
         raise PlanError(f"{path}: named input must be under /tmp, /opt, /srv or /mnt")
 
 
+def _normalise_named_input_digests(
+    mounts: tuple[Mount, ...],
+    named_input_digests: Mapping[str, str] | None,
+) -> tuple[tuple[str, str], ...]:
+    if not named_input_digests:
+        return ()
+    named_mounts = {
+        mount.inside_path
+        for mount in mounts
+        if mount.kind == "bind" and mount.role == f"input:{mount.inside_path}"
+    }
+    normalised = []
+    for inside, digest in named_input_digests.items():
+        inside_path = str(PurePosixPath(inside))
+        _validate_named_input_path(inside_path)
+        if inside_path not in named_mounts:
+            raise PlanError(f"{inside_path}: declared digest requires a named input mount")
+        if not isinstance(digest, str) or re.fullmatch(r"[0-9a-f]{64}", digest) is None:
+            raise PlanError(f"{inside_path}: declared named input digest required")
+        normalised.append((inside_path, digest))
+    return tuple(sorted(normalised))
+
+
 def _validate_mounts(
     mounts: tuple[Mount, ...],
     *,
@@ -1012,8 +1092,23 @@ def _mount_data(mount: Mount, *, include_host: bool) -> dict:
     return data
 
 
+def _declared_named_input_digest(plan: LaunchPlan, mount: Mount) -> str | None:
+    if mount.role != f"input:{mount.inside_path}":
+        return None
+    return dict(plan.named_input_digests).get(mount.inside_path)
+
+
+def _plan_mount_data(plan: LaunchPlan, mount: Mount, *, include_host: bool) -> dict:
+    data = _mount_data(mount, include_host=include_host)
+    digest = _declared_named_input_digest(plan, mount)
+    if digest is not None:
+        data["digest"] = digest
+    return data
+
+
 def _record_mount(plan: LaunchPlan, mount: Mount) -> dict:
     data = _mount_data(mount, include_host=False)
+    declared_input_digest = _declared_named_input_digest(plan, mount)
     if mount.digest is not None:
         data["digest"] = mount.digest
     elif mount.role == "runtime":
@@ -1022,6 +1117,8 @@ def _record_mount(plan: LaunchPlan, mount: Mount) -> dict:
         data["digest"] = plan.runtime.data.get("rootfs_sha256", "")
     elif mount.role == "code" and plan.source_snapshot_digest is not None:
         data["digest"] = plan.source_snapshot_digest
+    elif declared_input_digest is not None:
+        data["digest"] = declared_input_digest
     elif mount.host_path is not None and mount.mode == "read_only":
         data["digest"] = _content_digest(Path(mount.host_path))
     if mount.phase != "before_devices":
@@ -1215,6 +1312,9 @@ __all__ = [
     "build_plan",
     "build_custom_plan",
     "gpu_mounts_environment_and_request",
+    "gpu_driver_hashes_from_plan_record",
+    "gpu_driver_paths_from_plan_record",
+    "verify_gpu_driver_hashes_from_plan_record",
     "plan_data",
     "render_plan",
     "legacy_receipt_command_argv",
