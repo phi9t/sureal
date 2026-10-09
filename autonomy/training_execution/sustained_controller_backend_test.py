@@ -3,7 +3,7 @@ from pathlib import Path
 from unittest.mock import patch
 from blob_store.core import BlobStore,LocalFileBlobAdapter
 from evidence.source_snapshot import LocalSnapshotStore,archive_sources
-from insula.launch_plan import RuntimeLock
+from insula.launch_plan import LaunchPlan, RuntimeLock
 from insula.runtime_roots import CURRENT_CPU_ROOTFS_NAME, CURRENT_GPU_ROOTFS_NAME
 from training_execution import admit_sustained, sustained_controller_backend
 from training_execution.sustained_controller_backend import NativeBackend,sha
@@ -120,6 +120,7 @@ class ControllerGuardTests(unittest.TestCase):
  def test_gpu_stage_receipt_rechecks_driver_hashes_from_launch_plan(self):
   with tempfile.TemporaryDirectory() as temp:
    root=Path(temp);b=self.backend(root/'run',root/'checkout');b.gpu_index=1
+   b.recipe='baseline'
    runtime=RuntimeLock(root/'gpu-rootfs-v7',root/'gpu.lock',b.runtime,'recipe-digest','r'*64);runtime.rootfs.mkdir();b.runtime_lock=runtime
    inputs=b.R/'train-1000-input';inputs.mkdir();manifest=inputs/'manifest.json';manifest.write_text('{}')
    for name in ['native','physical','boxes','scientific']:
@@ -138,8 +139,55 @@ class ControllerGuardTests(unittest.TestCase):
    b.check_stage(receipt)
    missing=copy.deepcopy(receipt);missing['driver_hashes']={}
    with self.assertRaises(ValueError):b.check_stage(missing)
+   for fault in ['extra-env','extra-dev-bind']:
+    bad=copy.deepcopy(receipt)
+    separator=bad['command'].index('--')
+    if fault=='extra-env':
+     bad['command'][separator:separator]=['--setenv','FOREIGN','1']
+    else:
+     bad['command'][separator:separator]=['--dev-bind',str(drivers/'libcuda.so.fixture'),'/dev/extra-fixture']
+    with self.subTest(fault=fault),self.assertRaises(ValueError):
+     b.check_stage(bad)
    (drivers/'libcuda.so.fixture').write_text('swapped libcuda')
    with self.assertRaises(ValueError):b.check_stage(receipt)
+
+ def test_resource_bound_stage_passes_launch_plan_to_launcher_hook(self):
+  with tempfile.TemporaryDirectory() as temp:
+   root=Path(temp);b=self.backend(root/'run',root/'checkout');b.gpu_index=1
+   b.recipe='baseline'
+   runtime=RuntimeLock(root/'gpu-rootfs-v7',root/'gpu.lock',b.runtime,'recipe-digest','r'*64);runtime.rootfs.mkdir();b.runtime_lock=runtime
+   for name in ['native','physical','boxes','scientific']:
+    path=b.R/name;path.mkdir();setattr(b,name,path)
+   (b.scientific/'balanced16-physical-v2').mkdir(parents=True)
+   (b.scientific/'balanced16-labels-v2').mkdir(parents=True)
+   (b.R/'source-snapshots').mkdir(exist_ok=True)
+   devices=root/'devices';drivers=root/'drivers';devices.mkdir();drivers.mkdir()
+   for name in ['nvidia1','nvidiactl','nvidia-uvm']:(devices/name).write_text(name)
+   for name in ['libcuda.so.fixture','libnvidia-ptxjitcompiler.so.fixture','libnvidia-nvvm.so.fixture']:(drivers/name).write_text(name)
+   env={'SUREAL_BAZEL_GPU_DEVICES':f"{devices/'nvidia1'}=/dev/nvidia1,{devices/'nvidiactl'}=/dev/nvidiactl,{devices/'nvidia-uvm'}=/dev/nvidia-uvm",'SUREAL_BAZEL_GPU_DRIVER_LIBRARY_DIRS':str(drivers),'SUREAL_BAZEL_GPU_DEVICE_UUIDS':'1=GPU-fixture-1'}
+   observed={}
+   def fake_run_stage(command,cwd,run_env,stream,timeout):
+    observed['is_plan']=isinstance(command,LaunchPlan)
+    observed['command']=command
+    stream.write('stage log\n');stream.flush()
+    output=Path(stream.name).parent
+    (output/'checkpoint.pt').write_text('checkpoint\n')
+    (output/'check.json').write_text(json.dumps({'updates':1000,'requested_updates':1000,
+                                                 'head_hashes':{},'checkpoint_sha256':sha(output/'checkpoint.pt'),
+                                                 'resource_gate_passed':True},sort_keys=True))
+    class Result:
+     returncode=0
+    return Result()
+   with patch.dict(os.environ,env,clear=False),patch('training_execution.sustained_controller_backend.W',b.scientific),patch.object(NativeBackend,'guard'),patch.object(NativeBackend,'check_stage'),patch('studies.architecture.experiment_runner.run_stage',side_effect=fake_run_stage):
+    b._launching_stage='train-1000'
+    try:
+     path=b.stage('train-1000','train_sustained.py',b.R/'stage-output',{},logical_step=1000)
+    finally:
+     b._launching_stage=None
+   receipt=json.loads(path.read_text())
+   self.assertTrue(observed['is_plan'])
+   self.assertIsInstance(observed['command'],LaunchPlan)
+   self.assertEqual(receipt['launch_plan']['command'],['python','/experiment/training_execution/train_sustained.py'])
 
  def source_snapshot(self,root,names,store_root):
   archive,pins=archive_sources(root,names);digest=hashlib.sha256(archive).hexdigest();LocalSnapshotStore(store_root).store(digest,archive)

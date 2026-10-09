@@ -1,11 +1,13 @@
 """Source-frozen live native backend for the four-case sustained workflow."""
-import json,os,re,shutil,subprocess,sys,time
+import hashlib,json,os,re,shutil,subprocess,sys,time
+from dataclasses import replace
 from pathlib import Path
 P=Path(__file__).resolve().parents[1]
 from blob_store.core import BlobStore,blob_adapter_from_descriptor
-from insula.launch_plan import build_plan,load_default_runtime_lock,read_receipt_mounts,record_plan,render_plan
+from insula.launch_plan import Mount,build_plan,load_default_runtime_lock,read_receipt_mounts,record_plan as _record_launch_plan,render_plan
 from insula.runtime_roots import current_cpu_rootfs, current_gpu_rootfs, current_metrics_rootfs
 from retention.publication import audit as audit_publication
+from resources.checkpoint import _is_blob_publication
 from resources.scientific_payload import sha,unique_payload_bytes
 from resources.scientific_budget import reserve_write
 from detection.sustained_contract import validate_contract
@@ -17,7 +19,7 @@ from training_execution.sustained_admission import admit_sample
 from training_execution.sustained_controller_sources import freeze_host_sources,validate_host_sources
 from retention.publication_sources import freeze_checkpoint_sources as freeze_checkpoint_publisher_sources,validate_checkpoint_sources as validate_checkpoint_publisher_sources
 from evidence.source_snapshot import source_snapshot_package_root
-from resources.command import inspect_legacy_receipt_command
+from resources.command import inspect_legacy_receipt_command,rendered_command_matches_record
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing'
 GPU_ROOT=current_gpu_rootfs(C);CPU_ROOT=current_cpu_rootfs(C);METRICS_ROOT=current_metrics_rootfs(C)
 GPU_INDEX=1
@@ -39,9 +41,6 @@ def _native_release_plan(publication,release=None):
 def publication_matches_record(record,publication):
  try:return publication['parent_receipts'].get(record['final_path'])==record['final_sha256']
  except (KeyError,TypeError,AttributeError):return False
-
-def _is_blob_publication(publication):
- return isinstance(publication,dict) and {'schema_version','store_descriptor','tool_sha256','verified_by_readback','blobs'}<=set(publication)
 
 def _expected_release_members(record):
  try:
@@ -167,7 +166,7 @@ def sustained_worker_command(worker=None,command=None):
  if worker=='audit_sustained_transition.py':return ['python','/tmp/verifier/audit_sustained_transition.py']
  return ['python',worker_entry(worker)]
 
-def build_sustained_stage_plan(runtime,*,package,stage_source,output,worker,native,physical,boxes,runtime_lock_path,scientific_root,source_snapshot_store,extra=(),gpu_index=None,source_snapshot_digest=None,command=None,input_source=None):
+def build_sustained_stage_plan(runtime,*,package,stage_source,output,worker,native,physical,boxes,runtime_lock_path,scientific_root,source_snapshot_store,extra=(),gpu_index=None,source_snapshot_digest=None,command=None,input_source=None,scientific_root_digest=None):
  source_mount,extra_inputs=split_stage_plan_inputs(extra,stage_source if input_source is None else input_source,stage_source)
  named_inputs={
   '/tmp/inputs':stage_source,
@@ -179,7 +178,7 @@ def build_sustained_stage_plan(runtime,*,package,stage_source,output,worker,nati
   '/tmp/source-snapshots':source_snapshot_store,
   **extra_inputs,
  }
- return build_plan(
+ plan=build_plan(
   runtime,
   code=package,
   source=source_mount,
@@ -194,6 +193,37 @@ def build_sustained_stage_plan(runtime,*,package,stage_source,output,worker,nati
   source_snapshot_digest=source_snapshot_digest,
   allow_readonly_inputs_cover_output=True,
  )
+ if scientific_root_digest is None:
+  scientific_root_digest=_scientific_root_identity_digest(scientific_root,native,physical,boxes,runtime_lock_path,source_snapshot_store)
+ return _with_named_input_digest(plan,'/tmp/scientific',scientific_root_digest)
+
+def _scientific_root_identity_digest(scientific_root,*identified_inputs):
+ value={'scientific_root':str(Path(scientific_root).resolve()),
+        'identified_inputs':[str(Path(path).resolve()) for path in identified_inputs]}
+ return hashlib.sha256(json.dumps(value,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+
+def _with_named_input_digest(plan,inside,digest):
+ if re.fullmatch('[0-9a-f]{64}',digest or '') is None:raise ValueError('declared scientific input digest required')
+ found=False
+ for mount in plan.mounts:
+  if mount.inside_path==inside and mount.role==f'input:{inside}':
+   found=True
+ if not found:raise ValueError('scientific root mount required')
+ object.__setattr__(plan,'_sustained_scientific_root_digest',digest)
+ return plan
+
+def record_plan(plan):
+ digest=getattr(plan,'_sustained_scientific_root_digest',None)
+ if digest is None:return _record_launch_plan(plan)
+ mounts=[]
+ for mount in plan.mounts:
+  if mount.inside_path=='/tmp/scientific' and mount.role=='input:/tmp/scientific':
+   mount=Mount(mount.role,mount.kind,mount.inside_path,mount.mode,mount.host_path,mount.phase,digest,mount.symlink_target)
+  mounts.append(mount)
+ recorded=replace(plan,mounts=tuple(mounts))
+ if hasattr(plan,'_source_snapshot_digest'):
+  object.__setattr__(recorded,'_source_snapshot_digest',getattr(plan,'_source_snapshot_digest'))
+ return _record_launch_plan(recorded)
 
 def _plan_mounts(record):
  return {mount['inside_path']:mount for mount in record.get('mounts',[])}
@@ -207,6 +237,14 @@ def _legacy_command_data(command):
  environment={values[0]:values[1] for option,values in options if option=='--setenv'}
  mounts=read_receipt_mounts({'command':command},include_digests=False,require_python_worker=True)
  return argv,environment,mounts
+
+def _unwrapped_plan_worker_command(command):
+ command=list(command)
+ if (len(command)>=4 and command[0] in {'python','/opt/waymo/bin/python'} and
+     command[1]=='/tmp/resource-layer/resources/execute_worker.py' and
+     command[2]=='/tmp/resource-output'):
+  return [command[0],*command[3:]]
+ return command
 
 def _mount_host(mounts,inside):
  try:return mounts[inside]['host_path']
@@ -283,8 +321,17 @@ class NativeBackend:
   directory.mkdir();stage_source,input_hashes=freeze_inputs(self.source,self.R/(name+'-input'));stage_runtime_lock=self.metric_runtime_lock if metrics else self.runtime_lock if gpu else self.cpu_runtime_lock
   plan=build_sustained_stage_plan(stage_runtime_lock,package=self.package,stage_source=stage_source,output=directory,worker=worker,native=self.native,physical=W/'balanced16-physical-v2',boxes=W/'balanced16-labels-v2',runtime_lock_path=self.runtime_path,scientific_root=W,source_snapshot_store=self.R/'source-snapshots',extra=extra,gpu_index=self.gpu_index if gpu else None,source_snapshot_digest=self.pins['source_snapshot_sha256'],input_source=self.source)
   command=render_plan(plan);launch_record=record_plan(plan)
-  with (directory/'live.log').open('w') as log:result=run_stage(command,self.package,dict(os.environ),log,timeout=stage_timeout(metrics))
+  resource_launch=getattr(self,'_launching_stage',None)==name
+  launch_input=plan if resource_launch else command
+  with (directory/'live.log').open('w') as log:result=run_stage(launch_input,self.package,dict(os.environ),log,timeout=stage_timeout(metrics))
   if result.returncode:raise RuntimeError('failed native stage retained: '+name)
+  proof_getter=getattr(self,'_evidence',None)
+  if resource_launch and callable(proof_getter):
+   proof_path=proof_getter(name)/'resource-admitted.json'
+   if proof_path.exists():
+    proof=json.loads(proof_path.read_text());command=proof['command'];launch_record=proof.get('launch_plan',launch_record)
+   elif isinstance(getattr(result,'args',None),list):
+    command=list(result.args)
   self.guard();actual_step=json.loads((directory/'check.json').read_text())['updates'] if worker=='train_sustained.py' else logical_step
   semantic=name if actual_step is None else name.rsplit('-',1)[0]+'-'+str(actual_step)
   stage_runtime=self.metric_runtime if metrics else self.runtime if gpu else self.cpu_runtime
@@ -300,8 +347,10 @@ class NativeBackend:
   if worker_argv!=['python',entry] or receipt['runtime_lock']!=stage_runtime or receipt['verifier_source_pins']!=(self.verifier_pins if stage=='audit' else {}):raise ValueError('native worker/runtime/verifier differs')
   if receipt.get('launch_plan') is not None:
    plan=receipt['launch_plan'];mounts=_plan_mounts(plan);environment=plan.get('environment',{})
+   if not rendered_command_matches_record(command,plan):raise ValueError('native launch command differs from recorded plan')
+   plan_worker_command=_unwrapped_plan_worker_command(plan.get('command',[]))
    if stage_lock is not None and plan.get('runtime')!={'lock_sha256':stage_lock.lock_sha256,'form':stage_lock.form}:raise ValueError('native launch plan runtime differs')
-   if plan.get('command')!=['python',entry] or environment.get('SUREAL_SOURCE_SNAPSHOT_STORE')!='/tmp/source-snapshots' or environment.get('CUBLAS_WORKSPACE_CONFIG')!=':4096:8':raise ValueError('native launch plan worker/environment differs')
+   if plan_worker_command!=['python',entry] or environment.get('SUREAL_SOURCE_SNAPSHOT_STORE')!='/tmp/source-snapshots' or environment.get('CUBLAS_WORKSPACE_CONFIG')!=':4096:8':raise ValueError('native launch plan worker/environment differs')
    if gpu:
     if plan.get('gpu',{}).get('requested_index')!=self.gpu_index or not receipt['driver_hashes'] or _receipt_driver_hashes_by_name(receipt['driver_hashes'])!=_plan_driver_hashes_by_name(plan):raise ValueError('native GPU launch plan differs')
    elif 'gpu' in plan or receipt['driver_hashes']!={} or _plan_driver_hashes_by_name(plan)!={}:raise ValueError('native non-GPU launch plan differs')

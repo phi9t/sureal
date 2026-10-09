@@ -11,11 +11,9 @@ from insula.launch_plan import (
     legacy_receipt_command_argv,
     read_receipt_mounts,
     record_plan,
-    recorded_resource_mounts_match,
     render_plan,
-    rendered_command_matches_record,
 )
-from resources.command import wrapped_command,wrapped_rendered_plan_command,wrap_command,wrap_plan
+from resources.command import recorded_resource_mounts_match,rendered_command_matches_record,wrapped_command,wrapped_rendered_plan_command,wrap_command,wrap_plan
 from resources.scoped_stage import run_scoped
 from resources.sources import sha,validate_sources
 from resources.stage_accounting import admit_worker

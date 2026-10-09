@@ -43,10 +43,15 @@ ALLOWED_EXACT = {
     "insula/build_gpu_bazel_rootfs_v6.sh",
 }
 
-# The only active legacy receipt reader outside the module is the named
-# resources.command.inspect_legacy_receipt_command shim. It delegates parsing to
-# insula.launch_plan and is not a path exclusion; any local bwrap argv
-# construction in resources/command.py is still reported.
+# The only active resource-specific old-receipt reconstruction outside the
+# module lives in these named resources.command helpers. New launches must use
+# launch-plan data and with_mounts; the allowlist is only for retained receipts.
+RESOURCE_COMMAND_LEGACY_HELPERS = {
+    "wrap_legacy_receipt_command",
+    "wrap_rendered_plan_command",
+    "rendered_command_matches_record",
+    "_require_resource_aliases_unused",
+}
 
 ALLOWED_PREFIXES = (
     "research/",
@@ -86,8 +91,14 @@ def scan_launch_plan_boundary(root: Path = AUTONOMY_ROOT) -> list[Violation]:
             lines = path.read_text(errors="replace").splitlines()
         except OSError:
             continue
+        function = None
         for line_number, line in enumerate(lines, start=1):
+            match = re.match(r"def ([A-Za-z_][A-Za-z0-9_]*)\(", line)
+            if match:
+                function = match.group(1)
             for kind, pattern in (*BWRAP_ARGV_PATTERNS, *RUNTIME_LOCK_PATTERNS):
+                if relative == "resources/command.py" and function in RESOURCE_COMMAND_LEGACY_HELPERS:
+                    continue
                 if pattern.search(line):
                     violations.append(Violation(relative, line_number, kind))
     return violations
@@ -139,6 +150,21 @@ class LaunchPlanBoundaryTests(unittest.TestCase):
                 Violation("dataset/planted.py", 4, "direct runtime lock JSON load"),
             ],
         )
+
+    def test_resource_wrapper_helpers_are_not_public_launch_plan_api(self):
+        import insula.launch_plan as launch_plan
+
+        resource_helpers = {
+            "wrap_legacy_receipt_command",
+            "wrap_rendered_plan_command",
+            "wrap_resource_plan",
+            "rendered_command_matches_record",
+            "recorded_resource_mounts_match",
+        }
+        public = set(getattr(launch_plan, "__all__", ()))
+        self.assertFalse(resource_helpers & public)
+        for name in resource_helpers:
+            self.assertFalse(hasattr(launch_plan, name), name)
 
 
 if __name__ == "__main__":
