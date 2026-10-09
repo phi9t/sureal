@@ -6,7 +6,7 @@ WAYMO_CACHE_RELATIVE = ".cache/waystone/waymo-perception"
 PATHWAY_CACHE_RELATIVE = ".cache/waystone/3d-pathway"
 
 CURRENT_CPU_ROOTFS_NAME = "rootfs-v5-t29-20261008T230657Z"
-CURRENT_GPU_ROOTFS_NAME = "gpu-rootfs-v6"
+CURRENT_GPU_ROOTFS_NAME = "gpu-rootfs-v7"
 CURRENT_METRICS_ROOTFS_NAME = "metrics-rootfs"
 CURRENT_MOTION_METRICS_ROOTFS_NAME = "motion-metrics-rootfs"
 CURRENT_MOTION_CLI_ROOTFS_NAME = "motion-cli-rootfs-v2"

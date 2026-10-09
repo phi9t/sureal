@@ -383,18 +383,18 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
                 device_pairs.append(f"{host}={guest}")
             driver_dir = root / "driver-libs"
             driver_dir.mkdir()
-            for name in (
-                "libcuda.so",
-                "libcuda.so.1",
-                "libcuda.so.580.105.08",
-                "libnvidia-ptxjitcompiler.so",
-                "libnvidia-ptxjitcompiler.so.1",
-                "libnvidia-ptxjitcompiler.so.580.105.08",
-                "libnvidia-nvvm.so",
-                "libnvidia-nvvm.so.4",
-                "libnvidia-nvvm.so.580.105.08",
-            ):
-                (driver_dir / name).write_text(name)
+            driver_aliases = {
+                "libcuda.so": "libcuda.so.580.105.08",
+                "libcuda.so.1": "libcuda.so.580.105.08",
+                "libnvidia-ptxjitcompiler.so": "libnvidia-ptxjitcompiler.so.580.105.08",
+                "libnvidia-ptxjitcompiler.so.1": "libnvidia-ptxjitcompiler.so.580.105.08",
+                "libnvidia-nvvm.so": "libnvidia-nvvm.so.580.105.08",
+                "libnvidia-nvvm.so.4": "libnvidia-nvvm.so.580.105.08",
+            }
+            for target in sorted(set(driver_aliases.values())):
+                (driver_dir / target).write_text(target)
+            for alias, target in driver_aliases.items():
+                (driver_dir / alias).symlink_to(target)
 
             result, marker, _, waymo_rootfs, _, gpu_rootfs = self.run_wrapper_with_default_roots(
                 temporary,
@@ -409,6 +409,7 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
             )
 
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertEqual(gpu_rootfs.name, "gpu-rootfs-v7")
             plan = json.loads(result.stdout)
             self.assertEqual(plan["rootfs"], str(gpu_rootfs.resolve()))
             self.assertNotEqual(plan["rootfs"], str(waymo_rootfs.resolve()))
@@ -426,6 +427,10 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
                 self.assertIn(["--dev-bind", host, guest], plan["mounts"])
             self.assertIn(
                 ["--ro-bind", str((driver_dir / "libcuda.so").resolve()), "/driver/libcuda.so"],
+                plan["mounts"],
+            )
+            self.assertIn(
+                ["--ro-bind", str((driver_dir / "libcuda.so.1").resolve()), "/driver/libcuda.so.1"],
                 plan["mounts"],
             )
             self.assertIn(

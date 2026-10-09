@@ -427,6 +427,8 @@ def _validate_mounts(mounts: tuple[Mount, ...]) -> None:
     for index, (left, left_path) in enumerate(host_mounts):
         for right, right_path in host_mounts[index + 1 :]:
             if left_path == right_path:
+                if left.mode == right.mode == "read_only" and left_path.is_file():
+                    continue
                 raise PlanError(f"{left.role} and {right.role}: host path mounted twice")
             overlaps = left_path in right_path.parents or right_path in left_path.parents
             if overlaps and ("writable" in (left.mode, right.mode)):
@@ -556,7 +558,7 @@ def _gpu_driver_paths() -> list[Path]:
         if not found:
             searched = ", ".join(str(directory) for directory in directories)
             raise PlanError(f"GPU driver library {prefix} not found in {searched}")
-        found_paths.extend(path.resolve() for path in found)
+        found_paths.extend(found)
     return found_paths
 
 
