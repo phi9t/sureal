@@ -1,9 +1,11 @@
 """Pre-write scientific budget admission and sampled sustained-fit timing."""
 from resources.scientific_payload import unique_payload_bytes
 
-def reserve_write(root,maximum_new_bytes,limit=15*1024**3):
+SCIENTIFIC_WORKING_CAP_BYTES = 20*1024**3
+
+def reserve_write(root,maximum_new_bytes,limit=SCIENTIFIC_WORKING_CAP_BYTES):
  used=unique_payload_bytes(root)
- if used+maximum_new_bytes>limit:raise ValueError(f'Scientific write refused before allocation: {used}+{maximum_new_bytes}>{limit}')
+ if used+maximum_new_bytes>=limit:raise ValueError(f'Scientific write refused before allocation: {used}+{maximum_new_bytes}>={limit}')
  return {'used_bytes_before':used,'maximum_new_bytes':maximum_new_bytes,'limit':limit}
 
 def fit_interval(curve):

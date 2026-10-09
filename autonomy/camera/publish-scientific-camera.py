@@ -8,6 +8,7 @@ from dataset.blob_storage import blob_transfer_check
 from insula.launch_plan import build_plan, load_default_runtime_lock, record_plan, run_plan
 from insula.runtime_roots import current_cpu_rootfs
 from evidence.source_snapshot import file_sha256 as sha
+from resources.scientific_budget import SCIENTIFIC_WORKING_CAP_BYTES
 HERE=Path(__file__).resolve().parents[1]
 COMPONENTS=['camera_image','camera_segmentation','camera_box']
 def total(p):return sum(f.stat().st_size for f in p.rglob('*') if f.is_file())
@@ -34,13 +35,13 @@ def main():
  for p in (inputs,packed,checked):p.mkdir()
  provenance={'scene':scene,'official_split':membership[0],'research_splits':membership[1],'camera_evidence_sha256':args.expected_evidence_sha256,'source_receipt_hashes':evidence['receipt_hashes'],'sources':sources}
  store,store_descriptor=publication_blob_store()
- (inputs/'trusted.json').write_text(json.dumps({'files':expected,'provenance':provenance},indent=2)+'\n');names=['camera/publish-scientific-camera.py','camera/blob_publication.py','blob_store/core.py','dataset/component_archive.py','dataset/component_archive_validate.py','insula/launch_plan.py','insula/runtime_roots.py'];candidates={n:sha(HERE/n) for n in names};checks=[];started=datetime.now(timezone.utc).isoformat();tick=time.monotonic()
+ (inputs/'trusted.json').write_text(json.dumps({'files':expected,'provenance':provenance},indent=2)+'\n');names=['camera/publish-scientific-camera.py','camera/blob_publication.py','blob_store/core.py','dataset/component_archive.py','dataset/component_archive_validate.py','insula/launch_plan.py','insula/runtime_roots.py','resources/scientific_budget.py'];candidates={n:sha(HERE/n) for n in names};checks=[];started=datetime.now(timezone.utc).isoformat();tick=time.monotonic()
  def call(stage,plan):
   t=time.monotonic();r=run_plan(plan,capture_output=True,text=True);(base/(stage+'.log')).write_text(r.stdout+r.stderr);checks.append({'stage':stage,'launch_plan':record_plan(plan),'exit_code':r.returncode,'elapsed_seconds':time.monotonic()-t})
   if r.returncode:raise RuntimeError(r.stderr)
   print('PASS',stage,flush=True)
  other=total(working)-total(processing/'sidecars')
- code="import json; from pathlib import Path; from dataset.component_archive import create_component_archive; d=json.loads(Path('/mnt/trusted.json').read_text()); r=create_component_archive('/source/sidecars','/outputs/camera.tar',expected_files=d['files'],provenance=d['provenance'],other_bytes="+str(other)+",budget_bytes=15*1024**3); Path('/outputs/archive.json').write_text(json.dumps(r)); print('PASS camera bundle',r['files'])"
+ code="import json; from pathlib import Path; from dataset.component_archive import create_component_archive; from resources.scientific_budget import SCIENTIFIC_WORKING_CAP_BYTES; d=json.loads(Path('/mnt/trusted.json').read_text()); r=create_component_archive('/source/sidecars','/outputs/camera.tar',expected_files=d['files'],provenance=d['provenance'],other_bytes="+str(other)+",budget_bytes=SCIENTIFIC_WORKING_CAP_BYTES); Path('/outputs/archive.json').write_text(json.dumps(r)); print('PASS camera bundle',r['files'])"
  plan=build_plan(runtime,code=HERE,source=processing,output=packed,command=['python','-c',code],named_inputs={'/mnt':inputs});call('pack-live',plan)
  meta=json.loads((packed/'archive.json').read_text());archive=packed/'camera.tar';archive_key=camera_blob_key(scene,'archive','camera.tar');readback=packed/'camera-readback.tar';archive_blob=dict(store.put(archive_key,archive),verified_by_readback=True);checks.append(blob_transfer_check('archive-blob-put',archive_blob));archive.unlink();store.get(archive_blob['key'],readback,archive_blob['sha256'],expected_bytes=archive_blob['bytes']);checks.append(blob_transfer_check('archive-blob-download',archive_blob));readback.replace(archive)
  if sha(archive)!=meta['sha256']:raise ValueError('camera mirror differs')
@@ -51,6 +52,6 @@ def main():
  if sha(checked/'publication.json')!=manifest_sha:raise ValueError('camera manifest mirror differs')
  for n,h in candidates.items():
   if sha(HERE/n)!=h:raise ValueError('camera publication candidate changed')
- if sha(args.evidence)!=args.expected_evidence_sha256 or total(working)>15*1024**3:raise ValueError('camera evidence or final working cap differs')
+ if sha(args.evidence)!=args.expected_evidence_sha256 or total(working)>=SCIENTIFIC_WORKING_CAP_BYTES:raise ValueError('camera evidence or final working cap differs')
  receipt={'status':'scientific native camera bundle independently mirrored live','scene':scene,'checks':checks,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-tick,'peak_child_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'runtime_lock':lock,'candidate_hashes':candidates,'camera_evidence_sha256':args.expected_evidence_sha256,'component_receipt_hashes':evidence['receipt_hashes'],'store_descriptor':store_descriptor,'archive':meta,'archive_blob':archive_blob,'publication_manifest_blob':manifest_blob,'publication_manifest_sha256':manifest_sha,'validation':validation,'combined_working_set_bytes':total(working),'artifacts':{str(p.relative_to(base)):sha(p) for p in base.rglob('*') if p.is_file()},'scope':'native camera binary/scalar/key bundle; replay, verified eviction, image/mask decoding and scientific task/protocol readiness remain open'};(base/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print('PASS immutable camera publication',scene,flush=True)
 if __name__=='__main__':main()

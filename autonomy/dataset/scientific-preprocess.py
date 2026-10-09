@@ -12,10 +12,11 @@ from dataset.scientific_admission import admit_scene
 from dataset.staged_source import staged_source
 from insula.staging_lease import staging_lease
 from dataset.scientific_preparation import verified_sidecar_hashes
+from resources.scientific_budget import SCIENTIFIC_WORKING_CAP_BYTES
 
 HERE=Path(__file__).resolve().parents[1]
 COMPONENTS=['lidar_calibration','camera_calibration','vehicle_pose','lidar_pose','lidar_camera_projection','lidar_segmentation','lidar_box']
-CANDIDATES=['dataset/scientific-preprocess.py','dataset/scientific_component.py','dataset/scientific_sidecars.py','dataset/scientific_sidecar_validate.py','dataset/scientific_admission.py','dataset/staged_source.py','dataset/source_integrity.py','insula/staging_lease.py','dataset/sensor_records.py','dataset/scientific_preparation.py','geometry/scientific_scene_command.py','geometry/scientific_scene_validate.py','geometry/scientific_reconstruction.py','dataset/scientific_sidecar_reader.py','geometry/reconstruction_validate.py','geometry/geometry.py','geometry/geometry_foundation.py']
+CANDIDATES=['dataset/scientific-preprocess.py','dataset/scientific_component.py','dataset/scientific_sidecars.py','dataset/scientific_sidecar_validate.py','dataset/scientific_admission.py','dataset/staged_source.py','dataset/source_integrity.py','insula/staging_lease.py','dataset/sensor_records.py','dataset/scientific_preparation.py','geometry/scientific_scene_command.py','geometry/scientific_scene_validate.py','geometry/scientific_reconstruction.py','dataset/scientific_sidecar_reader.py','geometry/reconstruction_validate.py','geometry/geometry.py','geometry/geometry_foundation.py','resources/scientific_budget.py']
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--scene',required=True);parser.add_argument('--output',type=Path,required=True)
@@ -35,7 +36,7 @@ def main():
     destination=args.output.resolve();destination.mkdir(parents=True,exist_ok=True)
     candidate={name:sha(HERE/name) for name in CANDIDATES};components=args.component or COMPONENTS
     if len(set(components))!=len(components):raise ValueError('duplicate requested component')
-    limit=15*1024**3
+    limit=SCIENTIFIC_WORKING_CAP_BYTES
     for component in components:
         base=destination/'evidence'/component;receipt_path=base/'receipt.json';record=admitted['components'][component]
         if receipt_path.exists():
