@@ -1,6 +1,9 @@
 """Box-derived detection targets; never substitutes for point semantics."""
 import numpy as np
 
+from geometry.oriented_box import point_membership_many
+
+
 def foreground_support(xyz,boxes,native_classes):
     xyz=np.asarray(xyz,dtype=np.float64);boxes=np.asarray(boxes,dtype=np.float64);classes=np.asarray(native_classes)
     if (xyz.ndim!=2 or xyz.shape[1]!=3 or boxes.ndim!=2 or boxes.shape[1]!=7
@@ -9,11 +12,7 @@ def foreground_support(xyz,boxes,native_classes):
         or not np.isfinite(boxes).all() or np.any(boxes[:,3:6]<=0)):
         raise ValueError('finite XYZ/native upright XYZLWHyaw boxes and native box classes1..4 required')
     membership=np.zeros((len(xyz),4),dtype=bool);indices=[]
-    for box,category in zip(boxes,classes):
-        delta=xyz-box[:3];c,s=np.cos(box[6]),np.sin(box[6])
-        local_x=delta[:,0]*c+delta[:,1]*s;local_y=-delta[:,0]*s+delta[:,1]*c
-        # Inclusive mathematical box surfaces; no implicit dilation/tolerance.
-        inside=(np.abs(local_x)<=box[3]/2)&(np.abs(local_y)<=box[4]/2)&(np.abs(delta[:,2])<=box[5]/2)
+    for inside,category in zip(point_membership_many(xyz,boxes),classes):
         support=np.flatnonzero(inside);indices.append(support);membership[:,int(category)-1]|=inside
     return {'class_membership':membership,'object_point_indices':indices,'native_classes':classes.copy(),
             'scope':'native box membership targets only; coarse box taxonomy, not full-scene point semantics'}
