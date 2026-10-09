@@ -1,4 +1,4 @@
-# 13: Review fixes for blob-store core
+# 14: Review fixes for blob-store core
 
 **What to build:** Close the coordinator review findings in the blob-store core and its in-scope callers without weakening retained evidence verification.
 
