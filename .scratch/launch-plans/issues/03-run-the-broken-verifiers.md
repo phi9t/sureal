@@ -49,3 +49,49 @@ Blocked acceptance item:
 - I did not run a fresh `studies/scientific_cohort.py` lifecycle. Its publication stages invoke Waystone `put` to HDFS, and this worker was explicitly forbidden from HDFS writes. The script also requires output under the accounted scientific working root, while this run allows outside-repo writes only under `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/lp03-runs`.
 - I checked for a no-write resume path through existing `cohort-v1` checkpoints and a trusted checkpoint registry. Existing checkpoint receipts use an older runtime lock, and `dataset.cohort_checkpoint.verify_checkpoint` compares `cp['runtime_lock']` exactly against the current `load_runtime_lock` result, so those retained checkpoints cannot satisfy this ticket's current-lock acceptance without a separate re-admission decision.
 - The blocker is also recorded in the worker issue channel at `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/claude-worker-runs/workers/lp03-broken-verifiers-20261009T010152Z/tmp/claude-issues.jsonl`.
+
+### 2026-10-09 live cohort preflight blocker
+
+The live scientific cohort run was planned in
+`docs/launch-plans/scientific-cohort-live-run.md` and committed before any live
+execution. The selected one-scene run was
+`6183008573786657189_5414_000_5434_000`, the smallest candidate with complete
+source-audit records (`470536846` summed source object bytes), with fresh output
+root:
+
+`/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/lp03-live-20261009T214131Z-6183008573786657189`
+
+Planned command, not launched:
+
+`systemd-run --user --scope --unit=sureal-cohort-20261009T214131Z-6183008573786657189 -p MemoryMax=17179869184 -p MemorySwapMax=0 -p MemoryAccounting=yes env HADOOP_CONF_DIR=/opt/tiger/yarn_deploy/hadoop/conf PYTHONPATH=autonomy python3 autonomy/studies/scientific_cohort.py --scene 6183008573786657189_5414_000_5434_000 --output /data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/lp03-live-20261009T214131Z-6183008573786657189`
+
+Preflight evidence:
+
+- JSON: `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/lp03-live/20261009T214131Z-6183008573786657189/preflight.json`, sha256 `20c01f12eea5c5fce350450e42964637488a9a71d5f6490bb46c6e20a100c9d5`.
+- `/data02` free space passed: `130884612096` bytes free, above the `45` GiB requirement.
+- Current CPU runtime lock loaded and verified through `load_runtime_lock`; lock sha256 `318e827c4832cbf2e6d02657c17bbda0ec696f5a7e2747b277922db364739403`.
+- All source-audit records for the selected scene existed and `admit_scene` passed.
+- `cohort-queue.lock` was not held by another cohort driver.
+- Read-only Waystone `ls` checks showed all six planned publication blob keys absent:
+  `datasets/scene-records-v1/6183008573786657189_5414_000_5434_000/scientific/archive.tar`,
+  `datasets/scene-records-v1/6183008573786657189_5414_000_5434_000/scientific/publication.json`,
+  `datasets/component-bundles-v1/6183008573786657189_5414_000_5434_000/scientific/archive.tar`,
+  `datasets/component-bundles-v1/6183008573786657189_5414_000_5434_000/scientific/publication.json`,
+  `runs/scientific-camera/6183008573786657189_5414_000_5434_000/archive/camera.tar`,
+  `runs/scientific-camera/6183008573786657189_5414_000_5434_000/manifest/publication.json`.
+- Fresh-output checks passed: the output root and scene checkpoint did not exist.
+
+Blocking preflight result:
+
+- The driver-accounted scientific working tree was already `17116464147` bytes
+  before this run, above the `15` GiB cap of `16106127360` bytes by
+  `1010336787` bytes.
+- Including the selected scene's conservative source-size margin left
+  `-1497668257` bytes of cap room.
+- Because `studies/scientific_cohort.py` calls the same `total(WORKING)` cap
+  logic and this worker is forbidden to modify or delete retained evidence,
+  receipts, locks or shared cache contents outside this run's fresh output root,
+  the live command was not launched and no HDFS writes were performed.
+- Worker issue-channel copy:
+  `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/lp03-live/20261009T214131Z-6183008573786657189/claude-issues.jsonl`,
+  sha256 `b9770ea026f8d018b72abf8a3c1699db74b8a911d7c17fe55387f912efc2c4ed`.
