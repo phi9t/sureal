@@ -295,6 +295,7 @@ class NativeBackend:
   if stage not in workers:raise ValueError('unknown native stage')
   metric=stage in {'score','metrics-audit'};gpu=stage in {'train','audit'};command=receipt['command'];entry='/tmp/verifier/'+workers[stage] if stage=='audit' else worker_entry(workers[stage]);stage_runtime=self.metric_runtime if metric else self.runtime if gpu else self.cpu_runtime
   stage_lock=getattr(self,'metric_runtime_lock' if metric else 'runtime_lock' if gpu else 'cpu_runtime_lock',None)
+  expected_rootfs=stage_lock.rootfs if stage_lock is not None else METRICS_ROOT if metric else GPU_ROOT if gpu else CPU_ROOT
   worker_argv,command_environment,command_mounts=_legacy_command_data(command)
   if worker_argv!=['python',entry] or receipt['runtime_lock']!=stage_runtime or receipt['verifier_source_pins']!=(self.verifier_pins if stage=='audit' else {}):raise ValueError('native worker/runtime/verifier differs')
   if receipt.get('launch_plan') is not None:
@@ -307,7 +308,7 @@ class NativeBackend:
    for inside in ['/experiment','/outputs','/tmp/inputs','/tmp/native','/tmp/physical','/tmp/boxes','/tmp/runtime-lock.json','/tmp/scientific','/tmp/source-snapshots']:
     if inside not in mounts:raise ValueError('native launch plan mount missing: '+inside)
   elif gpu and not receipt['driver_hashes']:raise ValueError('native GPU driver hashes required')
-  if stage_lock is not None and _mount_host(command_mounts,'/')!=str(stage_lock.rootfs):raise ValueError('native rootfs mount differs')
+  if _mount_host(command_mounts,'/')!=str(expected_rootfs):raise ValueError('native rootfs mount differs')
   if _mount_host(command_mounts,'/experiment')!=str(self.package) or _mount_host(command_mounts,'/outputs')!=receipt['output_directory']:raise ValueError('native code/output mount differs')
   if _mount_host(command_mounts,'/tmp/source-snapshots')!=str(self.R/'source-snapshots') or command_environment.get('SUREAL_SOURCE_SNAPSHOT_STORE')!='/tmp/source-snapshots':raise ValueError('source snapshot store mount differs')
   inputs=self.R/(receipt['requested_stage']+'-input')

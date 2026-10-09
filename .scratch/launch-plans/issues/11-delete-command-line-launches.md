@@ -80,3 +80,56 @@ Verification:
 - CUDA suite on GPU 1 only: `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...` passed `30/30`, including
   `//autonomy/insula:launch_plan_gpu_live_test` and
   `//autonomy/training_execution:sustained_launch_plan_gpu_smoke_test`.
+
+### 2026-10-09 coordinator review follow-up
+
+Merged LP07 from `base/a3fb2cc` as separate commit
+`270fa03 Merge branch 'base/a3fb2cc' into
+worker/lp11-delete-command-line-launches`, then removed the temporary
+`LP07_OWNED_EXACT` boundary allowlist. The active scanner now reports LP07
+survivors in `resources/command.py`, `resources/stage.py`, and retention code
+unless they go through `insula.launch_plan`. `resources.command` keeps only the
+narrow named `inspect_legacy_receipt_command(...)` compatibility shim for old
+receipts, and that shim delegates to `insula.launch_plan`.
+
+Kept the LP07 mount-order resolution when moving checks into the launch-plan
+module: resource wrapper rendering and rendered-record comparison now follow
+`render_plan` order, with non-`/tmp` mounts first, then the `/tmp` tmpfs, then
+mounts under `/tmp`. The strict resource proof checks moved from
+`resources/command.py` / `resources/stage.py` into `insula.launch_plan`; the
+check set is unchanged.
+
+Restored strict legacy rootfs checking in
+`training_execution.sustained_controller_backend.check_stage(...)`. The new
+all-stage check remains, and when a stage lock object is unavailable legacy
+receipts now fall back to the stage root (`GPU_ROOT`, `CPU_ROOT`, or
+`METRICS_ROOT`) instead of skipping `/`. Added a regression case that tampers a
+GPU stage rootfs to `CPU_ROOT`; it was proven red on `729a8ef` and green after
+the fix. The `run_sustained_test.py` fixture was tightened to give fake resumed
+backends per-stage runtime locks and matching command root mounts.
+
+Review verification:
+
+- Focused repaired target:
+  `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/training_execution:run_sustained_test`
+  passed `1/1`.
+- Default CPU suite:
+  `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...`
+  passed `185/185`. Count unchanged from the LP11 baseline.
+- Parallax suite:
+  `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //parallax/...`
+  passed `17/17`. Count unchanged.
+- Storage-boundary check:
+  `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/blob_store:storage_boundary_test`
+  passed `1/1`.
+- Planted-red boundary proof:
+  `SUREAL_LAUNCH_PLAN_PLANT_VIOLATION=1 PYTHONPATH=autonomy python3 -m unittest autonomy.insula.launch_plan_boundary_test.LaunchPlanBoundaryTests.test_active_code_uses_only_launch_plan_module_for_sandbox_and_lock_boundaries`
+  failed as expected on 5 planted violations.
+- GPU 1 precheck before CUDA: GPU 1 UUID
+  `GPU-eaed2f0d-2541-8ca8-b6c4-3e2e45e86619` was absent from
+  `nvidia-smi --query-compute-apps=gpu_uuid --format=csv,noheader`, and GPU 1
+  memory was `4 MiB`.
+- CUDA suite on GPU 1 only:
+  `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...`
+  passed `30/30`. Count unchanged.
+- `git diff --check` was clean.

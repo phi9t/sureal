@@ -79,6 +79,12 @@ _SPLIT_RUNTIME_MASKED_ENTRIES = {
     "source",
     "tmp",
 }
+_RESOURCE_WRAPPER_ALIASES = {
+    "/tmp/resource-layer",
+    "/tmp/resource-output",
+    "/experiment/resources",
+    "/experiment/evidence",
+}
 
 
 class RuntimeLockError(ValueError):
@@ -358,6 +364,170 @@ def read_receipt_mounts(
     return _legacy_receipt_mounts(command, parsed["options"], include_digests=include_digests)
 
 
+def legacy_receipt_command_argv(command: list[str]) -> list[str]:
+    """Return the worker argv from an old rendered command receipt."""
+    parsed = _parse_legacy_receipt_command(command, require_python_worker=True)
+    return list(parsed["argv"])
+
+
+def inspect_legacy_receipt_command(command: list[str]) -> tuple[int, list[str], list[tuple[str, tuple[str, ...]]]]:
+    """Parse an old command receipt for legacy receipt readers."""
+    parsed = _parse_legacy_receipt_command(command, require_python_worker=True)
+    return parsed["separator"], list(parsed["argv"]), list(parsed["options"])
+
+
+def wrap_legacy_receipt_command(command: list[str], code: Path, output: Path) -> tuple[list[str], list[str]]:
+    """Render a resource wrapper around an old command receipt."""
+    parsed = _parse_legacy_receipt_command(command, require_python_worker=True)
+    _require_resource_aliases_unused(parsed["options"])
+    separator = parsed["separator"]
+    argv = list(parsed["argv"])
+    wrapper_mounts = _resource_wrapper_mounts(Path(code), Path(output))
+    bindings = [item for mount in wrapper_mounts for item in _render_mount(mount)]
+    return (
+        [
+            *command[:separator],
+            *bindings,
+            "--",
+            argv[0],
+            "/tmp/resource-layer/resources/execute_worker.py",
+            "/tmp/resource-output",
+            *argv[1:],
+        ],
+        argv[1:],
+    )
+
+
+def wrap_rendered_plan_command(command: list[str], code: Path, output: Path) -> tuple[list[str], list[str]]:
+    """Render a resource wrapper into an already-rendered launch plan command."""
+    parsed = _parse_legacy_receipt_command(command, require_python_worker=True)
+    _require_resource_aliases_unused(parsed["options"])
+    separator = parsed["separator"]
+    argv = list(parsed["argv"])
+    devices_at = _plan_device_insertion_index(command, separator)
+    tmp_at = _plan_tmp_mounts_index(command, devices_at)
+    resource_mounts = _resource_wrapper_mounts(Path(code), Path(output))
+    experiment = [
+        item
+        for mount in resource_mounts
+        if not _mount_under_tmp(mount)
+        for item in _render_mount(mount)
+    ]
+    under_tmp = [
+        item
+        for mount in resource_mounts
+        if _mount_under_tmp(mount)
+        for item in _render_mount(mount)
+    ]
+    return (
+        [
+            *command[:tmp_at],
+            *experiment,
+            *command[tmp_at:devices_at],
+            *under_tmp,
+            *command[devices_at:separator],
+            "--",
+            argv[0],
+            "/tmp/resource-layer/resources/execute_worker.py",
+            "/tmp/resource-output",
+            *argv[1:],
+        ],
+        argv[1:],
+    )
+
+
+def wrap_resource_plan(plan: LaunchPlan, code: Path, output: Path) -> tuple[LaunchPlan, list[str]]:
+    """Return a launch plan wrapped with the resource layer."""
+    if not isinstance(plan, LaunchPlan):
+        raise PlanError("launch plan required")
+    argv = list(plan.command)
+    if (
+        len(argv) < 2
+        or argv[0] not in {"python", "/opt/waymo/bin/python"}
+        or not Path(argv[1]).is_absolute()
+        or not argv[1].endswith(".py")
+    ):
+        raise PlanError("declared original Python worker required")
+    if any(mount.kind in {"bind", "dev-bind", "tmpfs", "symlink"} and mount.inside_path in _RESOURCE_WRAPPER_ALIASES for mount in plan.mounts):
+        raise PlanError("resource mount aliases must be unused")
+    wrapped = with_mounts(
+        plan,
+        before_devices=_resource_wrapper_mounts(Path(code), Path(output)),
+        command=[
+            argv[0],
+            "/tmp/resource-layer/resources/execute_worker.py",
+            "/tmp/resource-output",
+            *argv[1:],
+        ],
+    )
+    return wrapped, argv[1:]
+
+
+def rendered_command_matches_record(command: list[str], record: Mapping[str, object]) -> bool:
+    """Return whether a rendered command matches a recorded launch plan."""
+    try:
+        parsed = _parse_legacy_receipt_command(command, require_python_worker=True)
+        mounts = []
+        environment = {}
+        working_directory = None
+        for option, values in parsed["options"]:
+            if option == "--ro-bind":
+                mounts.append({"kind": "bind", "inside_path": values[1], "mode": "read_only"})
+            elif option == "--bind":
+                mounts.append({"kind": "bind", "inside_path": values[1], "mode": "writable"})
+            elif option == "--tmpfs":
+                mounts.append({"kind": "tmpfs", "inside_path": values[0], "mode": "writable"})
+            elif option == "--symlink":
+                mounts.append(
+                    {
+                        "kind": "symlink",
+                        "inside_path": values[1],
+                        "mode": "read_only",
+                        "symlink_target": values[0],
+                    }
+                )
+            elif option == "--setenv":
+                environment[values[0]] = values[1]
+            elif option == "--chdir":
+                working_directory = values[0]
+        recorded_mounts = [
+            {key: mount[key] for key in ("kind", "inside_path", "mode", "symlink_target") if key in mount}
+            for mount in _render_ordered_record_mounts(record["mounts"])
+        ]
+        return (
+            mounts == recorded_mounts
+            and environment == record["environment"]
+            and working_directory == record["working_directory"]
+            and list(parsed["argv"]) == record["command"]
+        )
+    except (KeyError, TypeError, ValueError) as error:
+        raise ValueError("actual wrapper, original worker, native output and resource mounts required") from error
+
+
+def recorded_resource_mounts_match(mounts: Iterable[Mapping[str, object]]) -> bool:
+    """Return whether a launch-plan record contains the resource wrapper mounts."""
+    expected = [
+        {"role": "resource-layer", "kind": "bind", "inside_path": "/tmp/resource-layer", "mode": "read_only"},
+        {
+            "role": "resource-experiment-resources",
+            "kind": "bind",
+            "inside_path": "/experiment/resources",
+            "mode": "read_only",
+        },
+        {
+            "role": "resource-experiment-evidence",
+            "kind": "bind",
+            "inside_path": "/experiment/evidence",
+            "mode": "read_only",
+        },
+        {"role": "resource-output", "kind": "bind", "inside_path": "/tmp/resource-output", "mode": "writable"},
+    ]
+    return all(
+        sum(1 for mount in mounts if all(mount.get(key) == value for key, value in required.items())) == 1
+        for required in expected
+    )
+
+
 def _assemble_plan(
     runtime: RuntimeLock,
     *,
@@ -563,6 +733,55 @@ def _legacy_role(inside_path: str) -> str:
     if inside_path in roles:
         return roles[inside_path]
     return f"input:{inside_path}"
+
+
+def _require_resource_aliases_unused(options: Iterable[tuple[str, tuple[str, ...]]]) -> None:
+    for option, values in options:
+        if option in {"--ro-bind", "--bind", "--dev-bind", "--proc", "--dev", "--tmpfs", "--symlink"} and values[-1] in _RESOURCE_WRAPPER_ALIASES:
+            raise PlanError("resource mount aliases must be unused")
+
+
+def _resource_wrapper_mounts(code: Path, output: Path) -> list[Mount]:
+    return [
+        Mount("resource-layer", "bind", "/tmp/resource-layer", "read_only", code),
+        Mount("resource-experiment-resources", "bind", "/experiment/resources", "read_only", code / "resources"),
+        Mount("resource-experiment-evidence", "bind", "/experiment/evidence", "read_only", code / "evidence"),
+        Mount("resource-output", "bind", "/tmp/resource-output", "writable", output),
+    ]
+
+
+def _plan_tmp_mounts_index(command: list[str], devices_at: int) -> int:
+    index = 1
+    while index < devices_at:
+        option = command[index]
+        arity = _LEGACY_COMMAND_ARITY.get(option)
+        if arity is None:
+            raise PlanError("rendered launch plan option required")
+        target = command[index + arity] if arity else None
+        if option in {"--ro-bind", "--bind", "--dev-bind", "--tmpfs", "--symlink"} and (
+            target == "/tmp" or str(target).startswith("/tmp/")
+        ):
+            return index
+        index += 1 + arity
+    return devices_at
+
+
+def _plan_device_insertion_index(command: list[str], separator: int) -> int:
+    for index in range(1, separator - 1):
+        if command[index : index + 2] == ["--proc", "/proc"]:
+            return index
+    raise PlanError("rendered launch plan device mounts required")
+
+
+def _render_ordered_record_mounts(mounts: Iterable[Mapping[str, object]]) -> list[Mapping[str, object]]:
+    """Recorded mounts in render_plan order: other mounts, the /tmp tmpfs, then mounts under /tmp."""
+
+    def group(mount: Mapping[str, object]) -> int:
+        if mount.get("role") == "tmp":
+            return 1
+        return 2 if str(mount.get("inside_path", "")).startswith("/tmp/") else 0
+
+    return sorted(mounts, key=group)
 
 
 def _unchecked_runtime(rootfs: Path) -> RuntimeLock:
@@ -1038,6 +1257,13 @@ __all__ = [
     "build_plan",
     "plan_data",
     "render_plan",
+    "wrap_legacy_receipt_command",
+    "wrap_rendered_plan_command",
+    "wrap_resource_plan",
+    "legacy_receipt_command_argv",
+    "inspect_legacy_receipt_command",
+    "rendered_command_matches_record",
+    "recorded_resource_mounts_match",
     "run_plan",
     "with_mounts",
     "record_plan",

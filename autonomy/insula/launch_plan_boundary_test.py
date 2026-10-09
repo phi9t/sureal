@@ -43,11 +43,10 @@ ALLOWED_EXACT = {
     "insula/build_gpu_bazel_rootfs_v6.sh",
 }
 
-LP07_OWNED_EXACT = {
-    "resources/command.py",
-    "resources/stage.py",
-    "retention/publish_sustained_checkpoint.py",
-}
+# The only active legacy receipt reader outside the module is the named
+# resources.command.inspect_legacy_receipt_command shim. It delegates parsing to
+# insula.launch_plan and is not a path exclusion; any local bwrap argv
+# construction in resources/command.py is still reported.
 
 ALLOWED_PREFIXES = (
     "research/",
@@ -70,7 +69,7 @@ def _is_frozen_path(relative: str) -> bool:
 def _is_active_path(relative: str) -> bool:
     if relative.endswith("_test.py"):
         return False
-    if relative in ALLOWED_EXACT or relative in LP07_OWNED_EXACT:
+    if relative in ALLOWED_EXACT:
         return False
     return not _is_frozen_path(relative)
 

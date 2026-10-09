@@ -8,6 +8,7 @@ from unittest.mock import patch
 
 from blob_store.core import BlobStore, BlobStoreError, InMemoryBlobAdapter
 from evidence.source_snapshot import LocalSnapshotStore
+from insula.launch_plan import RuntimeLock
 from resources.backend import ResourceBackend
 from resources.command import wrapped_command
 from resources.sources import sha,validate_sources as validate_resource_sources
@@ -132,8 +133,12 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
  def native_stage_command(self,backend,requested,output,entry):
   inputs=backend.R/(requested+'-input');inputs.mkdir()
   (inputs/'manifest.json').write_text((backend.source/'manifest.json').read_text())
+  stage=requested.rsplit('-',1)[0]
+  rootfs=(backend.metric_runtime_lock.rootfs if stage in {'score','metrics-audit'} else
+          backend.runtime_lock.rootfs if stage in {'train','audit'} else
+          backend.cpu_runtime_lock.rootfs)
   return (inputs,['bwrap','--unshare-all','--die-with-parent',
-                  '--ro-bind',str(sustained_controller_backend.GPU_ROOT),'/',
+                  '--ro-bind',str(rootfs),'/',
                   '--ro-bind',str(backend.package),'/experiment',
                   '--bind',str(output),'/outputs',
                   '--ro-bind',str(backend.R/'source-snapshots'),'/tmp/source-snapshots',
@@ -164,6 +169,14 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
   from training_execution.sustained_admission import admit_sample
   backend=self.backend(root);backend.output=root/'case-output';backend.output.mkdir();backend.source=backend.R/'input';backend.source.mkdir();backend.package=backend.R/'code';backend.package.mkdir();backend.verifier=backend.R/'verifier';backend.verifier.mkdir();(backend.R/'source-snapshots').mkdir()
   backend.runtime={'rootfs_sha256':'a'*64,'image_id':'gpu'};backend.cpu_runtime={'rootfs_sha256':'b'*64,'image_id':'cpu'};backend.metric_runtime={'rootfs_sha256':'c'*64,'image_id':'metrics'};backend.old={'driver_hashes':{}}
+  backend.runtime_path=backend.R/'runtime-lock.json';backend.cpu_runtime_path=backend.R/'cpu-runtime-lock.json';backend.metric_runtime_path=backend.R/'metric-runtime-lock.json'
+  for path,value in [(backend.runtime_path,backend.runtime),(backend.cpu_runtime_path,backend.cpu_runtime),(backend.metric_runtime_path,backend.metric_runtime)]:
+   path.write_text(json.dumps(value,sort_keys=True))
+  runtime_root=backend.R/'gpu-rootfs';cpu_runtime_root=backend.R/'cpu-rootfs';metric_runtime_root=backend.R/'metric-rootfs'
+  for rootfs in [runtime_root,cpu_runtime_root,metric_runtime_root]:rootfs.mkdir()
+  backend.runtime_lock=RuntimeLock(runtime_root,backend.runtime_path,backend.runtime,'fixture','g'*64)
+  backend.cpu_runtime_lock=RuntimeLock(cpu_runtime_root,backend.cpu_runtime_path,backend.cpu_runtime,'fixture','c'*64)
+  backend.metric_runtime_lock=RuntimeLock(metric_runtime_root,backend.metric_runtime_path,backend.metric_runtime,'fixture','m'*64)
   driver=backend.R/'fixture-libcuda.so';driver.write_text('driver\n');driver_hashes={str(driver):sha(driver)}
   package_file=backend.package/'training_execution/fixture.py';package_file.parent.mkdir(parents=True);package_file.write_text('fixture=1\n')
   backend.pins=source_snapshot_receipt(backend.package,['training_execution/fixture.py'],LocalSnapshotStore(backend.R/'native-package-snapshots'),target='fixture:native-package',materialized_root=backend.package)
@@ -172,7 +185,6 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
   backend.verifier_pins={};backend.anchor_sha='e'*64
   frames=[{'identity':str(i)} for i in range(16)];backend.manifest={'frames':frames,'recipe':'baseline'};(backend.source/'manifest.json').write_text(json.dumps(backend.manifest,sort_keys=True));backend.manifest_sha=sha(backend.source/'manifest.json')
   (backend.R/'run.json').write_text(json.dumps({'run':'fixture'},sort_keys=True))
-  backend.runtime_path=backend.R/'runtime-lock.json';backend.runtime_path.write_text(json.dumps(backend.runtime,sort_keys=True))
   repo,runner=self.resource_snapshot_query()
   path,digest=prepare_identity(backend,backend.R/'resource-layer-full',source_snapshot_store=LocalSnapshotStore(backend.R/'resource-source-snapshots'),repo_root=repo,bazel=repo/'bazelw',runner=runner);backend.attach_resources(path,digest)
   step=1000;target=1000;payload=backend.output/f'update-{target:02d}';(payload/'heads').mkdir(parents=True)
