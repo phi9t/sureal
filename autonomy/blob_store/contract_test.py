@@ -1,6 +1,8 @@
 import contextlib
+from datetime import datetime, timezone
 import hashlib
 import inspect
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -32,6 +34,7 @@ class BlobStoreContractTests(unittest.TestCase):
                 Missing,
                 Unauthenticated,
                 Unavailable,
+                WaystoneBlobAdapter,
             )
         except ImportError:
             self.fail("blob_store core module must provide the blob store interface and adapters")
@@ -45,10 +48,32 @@ class BlobStoreContractTests(unittest.TestCase):
             "Missing": Missing,
             "Unauthenticated": Unauthenticated,
             "Unavailable": Unavailable,
+            "WaystoneBlobAdapter": WaystoneBlobAdapter,
         }
 
     @contextlib.contextmanager
     def store_cases(self, api):
+        contract_adapter = os.environ.get("SUREAL_BLOB_STORE_CONTRACT_ADAPTER")
+        if contract_adapter == "waystone":
+            run_id = os.environ.get("SUREAL_BLOB_STORE_CONTRACT_RUN_ID")
+            if not run_id:
+                run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+            scratch_prefix = "tmp/blob-store-contract/" + run_id
+            yield [
+                (
+                    "waystone",
+                    api["BlobStore"](
+                        api["WaystoneBlobAdapter"](
+                            project="sureal",
+                            key_prefix=scratch_prefix,
+                        ),
+                        backoff_seconds=(0.0, 0.0),
+                    ),
+                )
+            ]
+            return
+        if contract_adapter not in (None, "", "offline"):
+            self.fail("unsupported blob store contract adapter: " + contract_adapter)
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             yield [
