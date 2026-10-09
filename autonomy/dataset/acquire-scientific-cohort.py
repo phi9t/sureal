@@ -4,13 +4,13 @@ from datetime import datetime,timezone
 import base64,hashlib,json
 from pathlib import Path
 import subprocess,tempfile
+from dataset.blob_storage import default_blob_store, default_store_descriptor, put_blob, source_blob_key
 from evidence.source_snapshot import file_sha256
 from insula.staging_lease import staging_lease
 
 HERE=Path(__file__).resolve().parents[1]
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
 RECORDS=CACHE/'scientific-source-audit'
-WAYSTONE='/data02/home/philip.yang/workspace/waystone/scripts/waystone'
 
 def call(args):
     r=subprocess.run(args,capture_output=True,text=True)
@@ -28,6 +28,7 @@ def main():
     retained=sum(o['size_bytes'] for o in json.loads((HERE/'dataset/dataset.lock.json').read_text())['objects'])
     maximum=min(manifest['per_object_limit_bytes'],manifest['local_staging_limit_bytes']-retained)
     if maximum<=0:raise ValueError('no bounded raw staging capacity')
+    blob_store=default_blob_store();store_descriptor=default_store_descriptor()
     for scene,group in manifest['scenes'].items():
         official=group['official_split']
         for component in manifest['components']:
@@ -42,16 +43,12 @@ def main():
                 call([str(HERE/'dataset/gcs.sh'),'--','storage','cp',metadata['storage_url'],str(payload)])
                 sha,md5=hashes(payload)
                 if payload.stat().st_size!=int(metadata['size']) or md5!=metadata['md5_hash']:raise ValueError('source integrity')
-                target=manifest['hdfs_root']+f'/{official}/{component}/{scene}.parquet'
-                transfer=subprocess.run([WAYSTONE,'put','--mkdir-parents',str(payload),target],capture_output=True,text=True)
-                # Existing identical mirrors are accepted only after download-back
-                # verification. Conflicting content is never overwritten.
+                blob=put_blob(blob_store,source_blob_key(official,component,scene),payload)
                 payload.unlink()
-                try:call([WAYSTONE,'get',target,str(payload)])
-                except RuntimeError as error:raise RuntimeError(transfer.stderr[-1000:]+'\n'+str(error))
-                if payload.stat().st_size!=int(metadata['size']) or hashes(payload)[0]!=sha:raise ValueError('HDFS download-back integrity; mirror not overwritten')
+                blob_store.get(blob['key'],payload,blob['sha256'])
+                if payload.stat().st_size!=int(metadata['size']) or hashes(payload)[0]!=sha:raise ValueError('blob download-back integrity; stored source changed')
                 log=call([str(HERE/'enter.sh'),'--source',str(inputs),'--output',str(out),'--offline','--','python','-m','dataset.shard_inventory','/source/source.parquet',scene,'/outputs/inventory.json'])
-                result={'scene':scene,'component':component,'official_split':official,'research_splits':group['research_splits'],'source_metadata':metadata,'sha256':sha,'hdfs_uri':target,'hdfs_roundtrip_sha256':sha,'inventory':json.loads((out/'inventory.json').read_text()),'live_log':log,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'inventory_code_sha256':file_sha256(HERE/'dataset/shard_inventory.py'),'raw_peak_bytes_including_retained_engineering':retained+int(metadata['size'])}
+                result={'scene':scene,'component':component,'official_split':official,'research_splits':group['research_splits'],'source_metadata':metadata,'sha256':sha,'blob':blob,'store_descriptor':store_descriptor,'inventory':json.loads((out/'inventory.json').read_text()),'live_log':log,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'inventory_code_sha256':file_sha256(HERE/'dataset/shard_inventory.py'),'raw_peak_bytes_including_retained_engineering':retained+int(metadata['size'])}
                 record.write_text(json.dumps(result,indent=2)+'\n')
             print('verified',official,component,scene,result['inventory']['rows'],flush=True)
 

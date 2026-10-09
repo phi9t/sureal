@@ -1,6 +1,7 @@
 """Evict only mirrored/replayed decoded point bytes, preserving recovery evidence."""
 import json
 from pathlib import Path
+from dataset.blob_storage import publication_archive_reference
 from evidence.source_snapshot import file_sha256 as digest
 
 
@@ -12,8 +13,7 @@ def evict_points(processing,publication,replay,*,expected_publication_sha256,exp
     pub=json.loads(pp.read_text());checked=json.loads(rp.read_text())
     if checked['publication_receipt_sha256']!=expected_publication_sha256 or checked['scene']!=pub['scene']:raise ValueError('replay publication linkage differs')
     if len(checked['checks'])!=2 or any(c['exit_code']!=0 for c in checked['checks']) or not pub['checks'] or any(c['exit_code']!=0 for c in pub['checks']):raise ValueError('successful mirror/replay checks required')
-    target=pub['archive_hdfs_uri']
-    if not isinstance(target,str) or not target.startswith('hdfs://'):raise ValueError('HDFS recovery source required')
+    target=publication_archive_reference(pub)
     points=processing/'points';report=points/'report.json'
     if digest(report)!=pub['archive']['report_sha256']:raise ValueError('native point manifest changed')
     native=json.loads(report.read_text())
@@ -30,7 +30,9 @@ def evict_points(processing,publication,replay,*,expected_publication_sha256,exp
     archive=publication/'packed/scene.tar'
     if digest(archive)!=pub['archive']['sha256']:raise ValueError('local mirrored archive changed')
     files.append({'path':str(archive),'sha256':pub['archive']['sha256'],'size_bytes':archive.stat().st_size,'recovery_member':None})
-    result={'status':'verified point eviction admitted','scene':pub['scene'],'archive_hdfs_uri':target,'archive_sha256':pub['archive']['sha256'],'publication_receipt_sha256':expected_publication_sha256,'replay_receipt_sha256':expected_replay_sha256,'files':files,'bytes_evicted':sum(r['size_bytes'] for r in files),'scope':'mirrored/replayed point payloads only; source sidecars and receipts retained'}
+    result={'status':'verified point eviction admitted','scene':pub['scene'],'archive_sha256':pub['archive']['sha256'],'publication_receipt_sha256':expected_publication_sha256,'replay_receipt_sha256':expected_replay_sha256,'files':files,'bytes_evicted':sum(r['size_bytes'] for r in files),'scope':'mirrored/replayed point payloads only; source sidecars and receipts retained'}
+    if isinstance(target,dict):result['archive_blob']=target
+    else:result['archive_hdfs_uri']=target
     with record.open('x') as stream:stream.write(json.dumps(result,indent=2)+'\n')
     for row in files:Path(row['path']).unlink()
     result['status']='verified point eviction completed';record.write_text(json.dumps(result,indent=2)+'\n');return result

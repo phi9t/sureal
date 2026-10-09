@@ -8,9 +8,19 @@ class CohortCheckpointTests(unittest.TestCase):
   sha=lambda p:file_sha256(p)
   receipt.write_text(json.dumps({'checks':[{'exit_code':0}],'candidate_hashes':{'worker.py':sha(worker)},'runtime_lock':lock,'artifacts':{}}))
   cp=base/'receipt.json';cp.write_text(json.dumps({'scene':'scene','manifest_sha256':'manifest','source_record_hashes':{'camera_image':'source'},'runtime_lock':lock,'checks':[{'exit_code':0}],'retained_evidence_hashes':{str(receipt):sha(receipt)}}));return cp,code,lock,sha(cp),receipt
+ def blob_lifecycle_fixture(self,root):
+  code=root/'code';code.mkdir();worker=code/'worker.py';worker.write_text('pass\n');base=root/'scene';base.mkdir();publication=base/'publication.json';eviction=base/'sidecar-eviction.json';lock={'rootfs_sha256':'locked'}
+  sha=lambda p:file_sha256(p)
+  blob={'key':'datasets/component-bundles-v1/scene/scientific/archive.tar','sha256':'a'*64,'bytes':7,'verified_by_readback':True}
+  publication.write_text(json.dumps({'checks':[{'exit_code':0}],'candidate_hashes':{'worker.py':sha(worker)},'runtime_lock':lock,'archive_blob':blob,'archive':{'sha256':'a'*64},'artifacts':{}}))
+  eviction.write_text(json.dumps({'status':'verified sidecar eviction completed','archive_blob':blob,'archive_sha256':'a'*64,'publication_receipt_sha256':sha(publication),'files':[]}))
+  cp=base/'receipt.json';cp.write_text(json.dumps({'scene':'scene','manifest_sha256':'manifest','source_record_hashes':{'camera_image':'source'},'runtime_lock':lock,'checks':[{'exit_code':0}],'retained_evidence_hashes':{str(publication):sha(publication),str(eviction):sha(eviction)}}));return cp,code,lock,sha(cp)
  def test_current_nested_candidate_and_runtime_verified(self):
   with tempfile.TemporaryDirectory() as tmp:
    p,code,lock,h,_=self.fixture(Path(tmp));r=verify_checkpoint(p,expected_checkpoint_sha256=h,code_root=code,expected_runtime_lock=lock,expected_manifest_sha256='manifest',expected_source_hashes={'camera_image':'source'});self.assertEqual(r['scene'],'scene')
+ def test_blob_publication_and_eviction_lineage_verified(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   p,code,lock,h=self.blob_lifecycle_fixture(Path(tmp));r=verify_checkpoint(p,expected_checkpoint_sha256=h,code_root=code,expected_runtime_lock=lock,expected_manifest_sha256='manifest',expected_source_hashes={'camera_image':'source'});self.assertEqual(r['verified_evictions'],1)
  def test_external_registry_required_and_historical_driver_preserved(self):
   from dataset.cohort_resume import verify_registered_checkpoint
   with tempfile.TemporaryDirectory() as tmp:

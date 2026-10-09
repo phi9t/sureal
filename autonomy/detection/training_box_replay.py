@@ -9,7 +9,7 @@ import sys
 from insula.launch_plan import build_plan, load_runtime_lock, record_plan, render_plan
 from insula.runtime_roots import default_lock
 from insula.staging_lease import staging_lease
-from dataset.staged_source import staged_source, WAYSTONE
+from dataset.staged_source import staged_source
 from evidence.source_snapshot import file_sha256, require_regular_file
 from .training_box_process import run_source_worker
 
@@ -135,8 +135,7 @@ def replay(*, cache, output, code_root, expected_candidate_sha256):
                     raise ValueError('execution header differs')
                 record = json.loads((audit / f"training-lidar_box-{header['scene']}.json").read_text())
                 with staged_source(record, cache, retained_bytes=retained_raw_bytes(cache, code_root),
-                                   limit_bytes=candidate['raw_limit_bytes'],
-                                   transfer_command=['timeout', '--kill-after=10s', '120s', WAYSTONE]) as (path, evidence):
+                                   limit_bytes=candidate['raw_limit_bytes']) as (path, evidence):
                     with path.open('rb') as reader:
                         yield reader
                     transfers.append(dict(scene=header['scene'], **evidence))
