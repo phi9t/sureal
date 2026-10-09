@@ -2,14 +2,25 @@ import copy
 import hashlib
 import json
 import tempfile
+import tarfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
-from blob_store.core import BlobStore, Conflict, InMemoryBlobAdapter
+from blob_store.core import BlobStore, Conflict, Corrupt, InMemoryBlobAdapter, Missing, Unauthenticated
 
 
 TOOL_DIGEST = {
-    "waystone": "a" * 64,
+    "/opt/waystone/scripts/waystone": "a" * 64,
+    "/opt/waystone/rust/target/debug/waystone": "b" * 64,
+    "/opt/waystone/native/libhdfs_client/dist/lib/libhdfs_client.so": "c" * 64,
+    "/opt/waystone/native/libhdfs_client/dist/bin/hdfs.bin": "d" * 64,
+}
+RECEIPT_TOOL_DIGEST = {
+    "waystone-cli": "a" * 64,
+    "waystone-binary": "b" * 64,
+    "libhdfs-client": "c" * 64,
+    "hdfs-bin": "d" * 64,
 }
 STORE_DESCRIPTOR = {
     "kind": "in-memory",
@@ -28,6 +39,19 @@ class PublicationModuleTests(unittest.TestCase):
         except ImportError:
             self.fail("retention publication module must expose publish, audit and resource_bundle_spec")
         return publish, audit, resource_bundle_spec
+
+    def assert_no_receipt_path_strings(self, value, *, blob_key=False):
+        if isinstance(value, dict):
+            for key, child in value.items():
+                self.assertNotIn("/", str(key))
+                self.assertNotIn("\\", str(key))
+                self.assert_no_receipt_path_strings(child, blob_key=(key == "key"))
+        elif isinstance(value, list):
+            for child in value:
+                self.assert_no_receipt_path_strings(child, blob_key=blob_key)
+        elif isinstance(value, str) and not blob_key:
+            self.assertNotIn("/", value)
+            self.assertNotIn("\\", value)
 
     def fixture(self, root, *, run_id="run-007", chunk_size_bytes=8):
         files = root / "files"
@@ -67,7 +91,7 @@ class PublicationModuleTests(unittest.TestCase):
 
             self.assertEqual(receipt["schema_version"], 1)
             self.assertEqual(receipt["store_descriptor"], STORE_DESCRIPTOR)
-            self.assertEqual(receipt["tool_sha256"], TOOL_DIGEST)
+            self.assertEqual(receipt["tool_sha256"], RECEIPT_TOOL_DIGEST)
             self.assertIs(receipt["verified_by_readback"], True)
             self.assertEqual(
                 [chunk["key"] for chunk in receipt["blobs"]["chunks"]],
@@ -86,6 +110,7 @@ class PublicationModuleTests(unittest.TestCase):
             self.assertNotIn(str(root), rendered)
             self.assertNotIn("command", rendered)
             self.assertNotIn("log_path", rendered)
+            self.assert_no_receipt_path_strings(receipt)
 
             result = audit(receipt, store=store)
             self.assertEqual(result["files"], 2)
@@ -105,6 +130,37 @@ class PublicationModuleTests(unittest.TestCase):
                 manifest["inventory"],
                 {name: {"sha256": item["sha256"], "bytes": item["bytes"]} for name, item in inventory.items()},
             )
+
+    def test_publish_streams_staged_members_without_reading_each_file_whole(self):
+        publish, _, _ = self.api()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            spec, _, _, _, _ = self.fixture(root, chunk_size_bytes=1024)
+            original = Path.read_bytes
+
+            def guarded_read_bytes(path):
+                if path.name in {"alpha.txt", "beta.txt"}:
+                    raise AssertionError("archive members must be streamed from open files")
+                return original(path)
+
+            with patch.object(Path, "read_bytes", guarded_read_bytes):
+                publish(spec)
+
+    def test_audit_hashes_archive_members_with_bounded_reads(self):
+        publish, audit, _ = self.api()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            spec, store, _, _, _ = self.fixture(root, chunk_size_bytes=1024)
+            receipt = publish(spec)
+            original = tarfile.ExFileObject.read
+
+            def guarded_read(stream, size=-1):
+                if size is None or size < 0:
+                    raise AssertionError("archive member audit must read fixed-size blocks")
+                return original(stream, size)
+
+            with patch.object(tarfile.ExFileObject, "read", guarded_read):
+                audit(receipt, store=store)
 
     def test_repeat_publication_with_same_key_and_different_bytes_is_refused(self):
         publish, _, _ = self.api()
@@ -143,10 +199,28 @@ class PublicationModuleTests(unittest.TestCase):
                 with self.subTest(fault=fault), self.assertRaises(ValueError):
                     audit(bad, store=store)
 
+            adapter._blobs[receipt["blobs"]["chunks"][0]["key"]] = b"changed archive bytes"
+            with self.assertRaises(Corrupt):
+                audit(receipt, store=store)
+
             missing = copy.deepcopy(receipt)
             adapter._blobs.pop(receipt["blobs"]["chunks"][0]["key"])
-            with self.assertRaises(ValueError):
+            with self.assertRaises(Missing):
                 audit(missing, store=store)
+
+    def test_audit_propagates_blob_store_typed_failures(self):
+        publish, audit, _ = self.api()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            spec, _, _, _, _ = self.fixture(root)
+            receipt = publish(spec)
+            unauthenticated = BlobStore(
+                InMemoryBlobAdapter(unauthenticated=True, authentication_action="run refresh"),
+                backoff_seconds=(),
+            )
+
+            with self.assertRaises(Unauthenticated):
+                audit(receipt, store=unauthenticated)
 
     def test_resource_bundle_spec_declares_hardlink_archive_without_release(self):
         with tempfile.TemporaryDirectory() as temp:

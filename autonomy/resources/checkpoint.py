@@ -8,6 +8,7 @@ from pathlib import Path,PurePosixPath
 from evidence.source_snapshot import is_regular_file
 from evidence.source_snapshot import safe_member_name
 from evidence.source_snapshot import receipt_snapshot_digest,store_from_receipt,verify_or_materialize_receipt_sources
+from blob_store.core import BlobStoreError
 from retention.publication import audit as audit_publication
 from resources.command import inspect_command
 from resources.backend import resource_cpu_root_for
@@ -226,6 +227,8 @@ def _inventory_public_facts(value):
 def _audit_blob_publication(pub,store):
     try:
         result=audit_publication(pub,store=store)
+    except BlobStoreError:
+        raise
     except Exception as error:
         raise ValueError('complete blob publication receipt required') from error
     return {'manifest':result['manifest'],'inventory':result['inventory']}

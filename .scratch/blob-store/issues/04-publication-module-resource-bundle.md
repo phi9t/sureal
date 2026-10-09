@@ -34,3 +34,18 @@ Done 2026-10-09:
   - Parallax gate: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //parallax/...` passed: 17 out of 17 tests.
   - GPU 1 check before CUDA: attempts 1-4 showed GPU 1 busy; attempt 5 at 2026-10-09T04:40:10Z showed GPU 1 at 4 MiB used, 0% utilization and no `pmon` process.
   - CUDA gate: `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...` passed: 29 out of 29 tests.
+
+Review 1 fixes 2026-10-09:
+
+- Receipt tool pins now normalize absolute Waystone tool paths into stable role names (`waystone-cli`, `waystone-binary`, `libhdfs-client`, `hdfs-bin`) before writing `tool_sha256`; receipt normalization rejects path-like tool keys while keeping role-to-digest pairs auditable.
+- Added receipt sanitation coverage asserting no receipt key or string value contains a path separator except blob key values.
+- `_write_archive` now streams staged files into tar members with `archive.addfile(info, fileobj)` instead of reading each member into memory.
+- `_archive_inventory` now hashes extracted tar members with fixed-size reads and checks the streamed byte count against the tar member size.
+- Blob-store typed failures from audit readback (`Missing`, `Corrupt`, `Unauthenticated`, `Unavailable`, `Conflict`) now propagate unchanged; `ValueError` remains for malformed receipt, manifest, digest and byte-count shapes.
+- Verification:
+  - Review red check: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/retention:publication_test` failed for path-keyed `tool_sha256`, whole-file archive member reads, unbounded archive audit reads and flattened `Unauthenticated`.
+  - Focused review check: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/retention:publication_test //autonomy/resources:checkpoint_blob_publication_test //autonomy:source_snapshot_targets_test //autonomy/training_execution:run_sustained_test` passed: 4 out of 4 tests.
+  - Default CPU gate: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...` passed: 178 out of 178 tests.
+  - Parallax gate: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //parallax/...` passed: 17 out of 17 tests.
+  - GPU 1 check before CUDA: `nvidia-smi` showed GPU 1 UUID `GPU-eaed2f0d-2541-8ca8-b6c4-3e2e45e86619`, 4 MiB used, 0% utilization and no `pmon` compute process.
+  - CUDA gate: `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...` passed: 29 out of 29 tests.

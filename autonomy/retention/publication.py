@@ -1,7 +1,7 @@
 """Blob-store backed publication workflow for retained evidence bundles."""
 
 import gzip
-import io
+import hashlib
 import json
 import os
 import shutil
@@ -13,6 +13,7 @@ from typing import Callable, Mapping
 
 from blob_store.core import (
     BlobStore,
+    BlobStoreError,
     blob_adapter_from_descriptor,
     validate_blob_key,
     waystone_tool_pins,
@@ -24,6 +25,13 @@ DEFAULT_RESOURCE_AREA = "runs"
 DEFAULT_RESOURCE_CHILD = "perception-resource-closures"
 DEFAULT_CHUNK_SIZE_BYTES = 128 * 1024 * 1024
 WAYSTONE_DESCRIPTOR = {"kind": "waystone", "project": "sureal"}
+STREAM_CHUNK_BYTES = 1024 * 1024
+WAYSTONE_TOOL_ROLES_BY_RELATIVE = {
+    "scripts/waystone": "waystone-cli",
+    "rust/target/debug/waystone": "waystone-binary",
+    "native/libhdfs_client/dist/lib/libhdfs_client.so": "libhdfs-client",
+    "native/libhdfs_client/dist/bin/hdfs.bin": "hdfs-bin",
+}
 
 
 @dataclass(frozen=True)
@@ -317,18 +325,19 @@ def _write_archive(path: Path, staged, names) -> None:
             with tarfile.open(fileobj=gzip_file, mode="w") as archive:
                 for name in sorted(names):
                     entry = staged[name]
-                    data = Path(entry["path"]).read_bytes()
-                    if len(data) != entry["bytes"]:
+                    source = Path(entry["path"])
+                    if source.stat().st_size != entry["bytes"]:
                         raise ValueError("staged publication member size changed")
                     info = tarfile.TarInfo(name)
-                    info.size = len(data)
+                    info.size = entry["bytes"]
                     info.mtime = 0
                     info.mode = 0o444
                     info.uid = 0
                     info.gid = 0
                     info.uname = ""
                     info.gname = ""
-                    archive.addfile(info, io.BytesIO(data))
+                    with source.open("rb") as input_file:
+                        archive.addfile(info, input_file)
 
 
 def _archive_inventory(path: Path):
@@ -342,11 +351,8 @@ def _archive_inventory(path: Path):
                 stream = archive.extractfile(member)
                 if stream is None:
                     raise ValueError("publication archive member bytes required")
-                data = stream.read()
-                digest = _sha256_bytes(data)
-                if member.size != len(data):
-                    raise ValueError("publication archive member size differs")
-                result[name] = {"sha256": digest, "bytes": len(data)}
+                digest, size = _stream_sha256_and_size(stream, member.size)
+                result[name] = {"sha256": digest, "bytes": size}
     except (tarfile.TarError, OSError) as error:
         raise ValueError("publication archive unreadable") from error
     return result
@@ -366,6 +372,8 @@ def _fetch_blob(store, blob, destination: Path) -> None:
     blob = _normalize_blob(blob)
     try:
         store.get(blob["key"], destination, blob["sha256"])
+    except BlobStoreError:
+        raise
     except Exception as error:
         raise ValueError("publication blob cannot be read back") from error
     if destination.stat().st_size != blob["bytes"]:
@@ -388,7 +396,7 @@ def _normalize_receipt(receipt):
     return {
         "schema_version": 1,
         "store_descriptor": dict(receipt["store_descriptor"]),
-        "tool_sha256": _normalize_tool_digest(receipt["tool_sha256"]),
+        "tool_sha256": _normalize_receipt_tool_digest(receipt["tool_sha256"]),
         "verified_by_readback": True,
         "blobs": {
             "manifest": _normalize_blob(blobs["manifest"]),
@@ -410,7 +418,40 @@ def _normalize_blob(value):
 def _normalize_tool_digest(value):
     if not isinstance(value, Mapping) or not value:
         raise ValueError("publication tool digest required")
-    return {str(path): require_digest(digest) for path, digest in sorted(value.items())}
+    result = {}
+    for tool, digest in sorted(value.items()):
+        role = _tool_digest_role(tool)
+        digest = require_digest(digest)
+        if role in result and result[role] != digest:
+            raise ValueError("publication tool digest role conflict")
+        result[role] = digest
+    return result
+
+
+def _normalize_receipt_tool_digest(value):
+    if not isinstance(value, Mapping) or not value:
+        raise ValueError("publication tool digest required")
+    return {_validate_tool_role(role): require_digest(digest) for role, digest in sorted(value.items())}
+
+
+def _tool_digest_role(value) -> str:
+    if not isinstance(value, str):
+        raise ValueError("publication tool digest role required")
+    if "/" not in value and "\\" not in value:
+        return _validate_tool_role(value)
+    normalized = value.replace("\\", "/").strip()
+    for relative, role in WAYSTONE_TOOL_ROLES_BY_RELATIVE.items():
+        if normalized == relative or normalized.endswith("/" + relative):
+            return role
+    raise ValueError("publication tool digest path must name a known Waystone tool")
+
+
+def _validate_tool_role(value) -> str:
+    if not isinstance(value, str) or not value or value != value.strip():
+        raise ValueError("publication tool digest role required")
+    if "/" in value or "\\" in value or value in {".", ".."}:
+        raise ValueError("publication tool digest role must not be a path")
+    return value
 
 
 def _require_nonnegative_int(value, message):
@@ -449,7 +490,17 @@ def _write_json_idempotent(path: Path, value) -> None:
     path.write_text(data)
 
 
-def _sha256_bytes(data: bytes) -> str:
-    import hashlib
-
-    return hashlib.sha256(data).hexdigest()
+def _stream_sha256_and_size(stream, expected_size: int) -> tuple[str, int]:
+    digest = hashlib.sha256()
+    size = 0
+    while True:
+        chunk = stream.read(STREAM_CHUNK_BYTES)
+        if not chunk:
+            break
+        size += len(chunk)
+        if size > expected_size:
+            raise ValueError("publication archive member size differs")
+        digest.update(chunk)
+    if size != expected_size:
+        raise ValueError("publication archive member size differs")
+    return digest.hexdigest(), size
