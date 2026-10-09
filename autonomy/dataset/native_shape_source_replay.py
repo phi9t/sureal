@@ -5,10 +5,8 @@ module does not authorize scientific membership or close the full cohort.
 """
 import json
 from pathlib import Path
-import subprocess
 from evidence.source_snapshot import file_sha256 as sha
-from insula.entry import launch_plan
-from insula.runtime_identity import verify_rootfs
+from dataset.launches import build_dataset_plan, load_pinned_dataset_runtime, plan_receipt, rendered_command, run_dataset_plan
 from insula.staging_lease import staging_lease
 from dataset.staged_source import staged_source
 
@@ -35,14 +33,12 @@ def replay_shape_source(job_path,source_receipt,*,expected_job_sha256,
             or job['inventory']['rows']!=source['inventory']['rows']
             or job['inventory']['key_sha256']!=source['inventory']['key_sha256']):
             raise ValueError('shape job and admitted source differ')
-        lock=json.loads(Path(str(runtime_root)+'.lock.json').read_text())
-        if lock!=expected_runtime_lock:raise ValueError('external runtime lock differs')
-        verify_rootfs(runtime_root,lock['rootfs_sha256'])
+        runtime=load_pinned_dataset_runtime(runtime_root,expected_runtime_lock);lock=runtime.data
         names=['dataset/native_shape_source_replay.py','geometry/native_shape_transfer.py',
                'geometry/native_range_shape_worker.py','geometry/native_range_shape_file.py',
                'geometry/native_range_shapes.py','geometry/native_range_shape_reference.py',
                'dataset/staged_source.py','dataset/source_integrity.py','insula/staging_lease.py',
-               'insula/entry.py','insula/runtime_identity.py']
+               'dataset/launches.py','insula/launch_plan.py','insula/runtime_roots.py']
         pins={n:sha(code_root/n) for n in names}
         with staged_source(source,cache,retained_bytes=retained_bytes,
                 limit_bytes=limit_bytes,blob_store=blob_store,transfer_command=transfer_command) as (staged,transfer):
@@ -50,14 +46,15 @@ def replay_shape_source(job_path,source_receipt,*,expected_job_sha256,
             (inputs/'job.json').write_bytes(job_path.read_bytes())
             (inputs/'source-receipt.json').write_bytes(source_receipt.read_bytes())
             worker=output/'worker';worker.mkdir();audit=output/'audit';audit.mkdir();checks=[]
-            command=launch_plan(runtime_root,code_root,staged.parent,worker,
-                ['python','-m','geometry.native_range_shape_worker','/source/source.parquet',
-                 '/tmp/job/job.json','/outputs/shapes.json','--expected-job-sha256',expected_job_sha256])
-            at=command.index('--');command[at:at]=['--ro-bind',str(inputs),'/tmp/job']
-            result=subprocess.run(command,capture_output=True,text=True,timeout=300)
+            plan=build_dataset_plan(runtime,code_root=code_root,source=staged.parent,output=worker,
+                command=['python','-m','geometry.native_range_shape_worker','/source/source.parquet',
+                 '/tmp/job/job.json','/outputs/shapes.json','--expected-job-sha256',expected_job_sha256],
+                named_inputs={'/tmp/job':inputs})
+            command=rendered_command(plan)
+            result=run_dataset_plan(plan,capture_output=True,text=True,timeout=300)
             (output/'worker.log').write_text(result.stdout+result.stderr)
             if result.returncode:raise ValueError('shape producer failed; retain worker log')
-            checks.append({'command':command,'exit_code':result.returncode})
+            checks.append({'command':command,'launch_plan':plan_receipt(plan),'exit_code':result.returncode})
             report_sha=sha(worker/'shapes.json')
             program="""import json,math
 from pathlib import Path
@@ -73,12 +70,14 @@ assert checked==r['independent'] and checked['records_verified']==2*j['inventory
 usage=r['worker_resources'];assert usage['rss_scope']=='worker_process_peak' and type(usage['peak_rss_kib']) is int and usage['peak_rss_kib']>0 and math.isfinite(usage['elapsed_seconds']) and usage['elapsed_seconds']>=0
 Path('/outputs/check.json').write_text(json.dumps(dict(checked,worker_resources=usage),indent=2));print('PASS independently admitted native shape source',j['scene'],checked['records_verified'])
 """.replace('JOBPIN',repr(expected_job_sha256)).replace('OUTPUTPIN',repr(report_sha))
-            command=launch_plan(runtime_root,code_root,staged.parent,audit,['python','-c',program])
-            at=command.index('--');command[at:at]=['--ro-bind',str(inputs),'/tmp/job','--ro-bind',str(worker),'/tmp/replayed']
-            result=subprocess.run(command,capture_output=True,text=True,timeout=300)
+            plan=build_dataset_plan(runtime,code_root=code_root,source=staged.parent,output=audit,
+                command=['python','-c',program],
+                named_inputs={'/tmp/job':inputs,'/tmp/replayed':worker})
+            command=rendered_command(plan)
+            result=run_dataset_plan(plan,capture_output=True,text=True,timeout=300)
             (output/'audit.log').write_text(result.stdout+result.stderr)
             if result.returncode:raise ValueError('shape independent admission failed; retain audit log')
-            checks.append({'command':command,'exit_code':result.returncode})
+            checks.append({'command':command,'launch_plan':plan_receipt(plan),'exit_code':result.returncode})
             if (sha(job_path)!=expected_job_sha256 or sha(source_receipt)!=expected_source_receipt_sha256
                 or pins!={n:sha(code_root/n) for n in names}
                 or sha(staged)!=source['sha256']):

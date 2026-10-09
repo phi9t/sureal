@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """Two independent scientific archive replays against verified native records."""
-import argparse,json,resource,runpy,subprocess,time
+import argparse,json,resource,runpy,time
 from datetime import datetime,timezone
 from pathlib import Path
 from evidence.source_snapshot import file_sha256 as sha
-from insula.entry import launch_plan
-from insula.runtime_identity import verify_rootfs
+from dataset.launches import build_dataset_plan, load_dataset_runtime, plan_receipt, rendered_command, run_dataset_plan
 HERE=Path(__file__).resolve().parents[1]
 
 def main():
@@ -19,12 +18,12 @@ def main():
         if sha(published/n)!=v:raise ValueError('publication artifact changed')
     reference=processing/'points';reconstruction=processing/'evidence/reconstruction/receipt.json'
     if sha(reconstruction)!=pubreceipt['scene_receipt_sha256'] or sha(reference/'report.json')!=pubreceipt['archive']['report_sha256']:raise ValueError('native reconstruction reference changed')
-    cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
+    cache=Path.home()/'.cache/waystone/waymo-perception';runtime=load_dataset_runtime(cache);lock=runtime.data
     replay=runpy.run_path(str(HERE/'dataset/verify-archive-dataset.py'))['REPLAY'].replace("usage='engineering'",'usage='+repr(args.usage)).replace('PUBLICATION_HASH',repr(pubreceipt['publication_manifest_sha256']))
     names=['dataset/verify-scientific-replay.py','dataset/verify-archive-dataset.py','dataset/scientific_dataset.py','dataset/scene_archive_validate.py'];candidates={n:sha(HERE/n) for n in names}
     base.mkdir(parents=True,exist_ok=False);checks=[];results=[];started=datetime.now(timezone.utc).isoformat();tick=time.monotonic()
     for index in (1,2):
-        out=base/f'replay-{index}';out.mkdir();plan=launch_plan(root,HERE,published/'packed',out,['python','-c',replay]);i=plan.index('--');plan[i:i]=['--ro-bind',str(reference),'/opt'];t=time.monotonic();r=subprocess.run(plan,capture_output=True,text=True);(base/f'replay-{index}.log').write_text(r.stdout+r.stderr);checks.append({'stage':f'replay-{index}','command':plan,'exit_code':r.returncode,'elapsed_seconds':time.monotonic()-t})
+        out=base/f'replay-{index}';out.mkdir();plan=build_dataset_plan(runtime,code_root=HERE,source=published/'packed',output=out,command=['python','-c',replay],named_inputs={'/opt':reference});command=rendered_command(plan);t=time.monotonic();r=run_dataset_plan(plan,capture_output=True,text=True);(base/f'replay-{index}.log').write_text(r.stdout+r.stderr);checks.append({'stage':f'replay-{index}','command':command,'launch_plan':plan_receipt(plan),'exit_code':r.returncode,'elapsed_seconds':time.monotonic()-t})
         if r.returncode:raise RuntimeError(r.stderr)
         results.append(json.loads((out/'replay.json').read_text()));print('PASS scientific replay',index,results[-1]['records'],results[-1]['points'],flush=True)
     if results[0]!=results[1]:raise ValueError('scientific replay results differ')
