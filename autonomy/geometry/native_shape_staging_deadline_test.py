@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from blob_store.core import BlobStore, InMemoryBlobAdapter
+from blob_store.core import BlobStore, InMemoryBlobAdapter, Unavailable
 from geometry.native_shape_transfer import fetch_blob
 
 
@@ -20,7 +20,7 @@ class StagingDeadlineTests(unittest.TestCase):
             )
             destination = Path(tmp) / "source.parquet"
 
-            with self.assertRaisesRegex(ValueError, "native shape blob fetch failed"):
+            with self.assertRaises(Unavailable):
                 fetch_blob(key, destination, hashlib.sha256(b"x" * 64).hexdigest(), blob_store=store)
 
             self.assertFalse(destination.exists())

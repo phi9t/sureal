@@ -288,6 +288,70 @@ class SourceSnapshotTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "snapshot digest differs"):
                 api["materialize_receipt_sources"](receipt, root / "corrupt")
 
+    def test_receipt_blob_byte_count_is_passed_to_blob_store_fetch(self):
+        api = self.api()
+        archive = self.archive_bytes([("autonomy/evidence/source_snapshot.py", "module\n")])
+        digest = hashlib.sha256(archive).hexdigest()
+        pins = api["snapshot_source_pins"](archive)
+        calls = []
+
+        class RecordingBlobStore:
+            def get(self, key, destination, sha256, *, expected_bytes=None):
+                calls.append(
+                    {
+                        "key": key,
+                        "sha256": sha256,
+                        "expected_bytes": expected_bytes,
+                    }
+                )
+                Path(destination).write_bytes(archive)
+
+        class SnapshotStoreWithBlob:
+            _store = RecordingBlobStore()
+
+            def fetch(self, digest):
+                raise AssertionError("receipt blob path should use the blob store")
+
+        receipt = {
+            "schema_version": 2,
+            "source_snapshot_sha256": digest,
+            "source_snapshot_target": "//autonomy:target",
+            "source_snapshot_store": {"kind": "local", "root": "/unused"},
+            "source_snapshot_blob": {"key": self.snapshot_blob_key(digest), "sha256": digest, "bytes": len(archive)},
+            "source_pins": pins,
+        }
+
+        self.assertEqual(api["verify_receipt_sources"](receipt, SnapshotStoreWithBlob())["source_files"], 1)
+        self.assertEqual(
+            calls,
+            [
+                {
+                    "key": self.snapshot_blob_key(digest),
+                    "sha256": digest,
+                    "expected_bytes": len(archive),
+                }
+            ],
+        )
+
+    def test_retained_hdfs_snapshot_store_descriptor_constructs_without_local_waystone(self):
+        api = self.api()
+        digest = "0" * 64
+        receipt = {
+            "schema_version": 2,
+            "source_snapshot_sha256": digest,
+            "source_snapshot_target": "//autonomy:target",
+            "source_snapshot_store": {
+                "schema_version": 1,
+                "kind": "hdfs",
+                "prefix": "hdfs://harunava/user/tiger/waystone/sureal",
+            },
+            "source_pins": {"autonomy/evidence/source_snapshot.py": "1" * 64},
+        }
+
+        store = api["store_from_receipt"](receipt, command_prefix=["/definitely/missing/waystone"])
+
+        self.assertEqual(store._key_for_digest(digest), "source-snapshots/" + digest)
+
     def test_retained_source_snapshot_receipts_keep_resolving(self):
         api = self.api()
         schema1_publication = json.loads((RETAINED_FIXTURES / "schema1" / "receipt.json").read_text())

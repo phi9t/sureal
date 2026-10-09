@@ -12,13 +12,11 @@ from blob_store.core import (
     BlobStoreError,
     blob_adapter_from_descriptor,
     blob_key_from_uri,
+    default_waystone_descriptor,
     validate_blob_key,
 )
 from evidence.source_snapshot import file_sha256, require_regular_file
 from insula.staging_lease import staging_lease
-
-DEFAULT_STORE_DESCRIPTOR={'kind':'waystone','project':'sureal'}
-
 
 def working_bytes(root):
     total=0
@@ -41,7 +39,7 @@ def _archive_identity(record):
 def _record_store_descriptor(record):
     descriptor=record.get('store_descriptor') or record.get('blob_store_descriptor')
     if descriptor is None:
-        return DEFAULT_STORE_DESCRIPTOR
+        return default_waystone_descriptor()
     return descriptor
 
 
