@@ -5,7 +5,14 @@ import itertools
 
 import numpy as np
 
-from geometry.oriented_box import count_points_in_box, point_membership
+from geometry.oriented_box import (
+    axis_aligned_bev_iou,
+    count_points_in_box,
+    enclosing_bev_rectangles,
+    nearest_bev_rectangles,
+    point_membership,
+    wrap_heading,
+)
 
 
 _BOUNDARY_HEADINGS = (
@@ -40,6 +47,38 @@ def assert_membership_parity(testcase, old_mask, *, seed=20261008):
         testcase.assertTrue(_rejects(point_membership, points, box))
 
 
+def assert_heading_wrap_parity(testcase, old_wrap, *, seed=20261008):
+    """Assert an old heading-wrap copy matches geometry exactly on edge cases."""
+    for angles in _heading_cases(seed):
+        np.testing.assert_array_equal(old_wrap(angles), wrap_heading(angles))
+
+
+def assert_bev_rectangle_parity(testcase, old_nearest, old_enclosing, old_iou, *, seed=20261008):
+    """Assert old nearest/enclosing BEV rectangle and IoU copies match geometry."""
+    for first, second in _box_set_cases(seed):
+        old_nearest_first = old_nearest(first)
+        old_nearest_second = old_nearest(second)
+        new_nearest_first = nearest_bev_rectangles(first)
+        new_nearest_second = nearest_bev_rectangles(second)
+        np.testing.assert_array_equal(old_nearest_first, new_nearest_first)
+        np.testing.assert_array_equal(old_nearest_second, new_nearest_second)
+        np.testing.assert_array_equal(old_iou(old_nearest_first, old_nearest_second), axis_aligned_bev_iou(new_nearest_first, new_nearest_second))
+
+        old_enclosing_first = old_enclosing(first)
+        old_enclosing_second = old_enclosing(second)
+        new_enclosing_first = enclosing_bev_rectangles(first)
+        new_enclosing_second = enclosing_bev_rectangles(second)
+        np.testing.assert_array_equal(old_enclosing_first, new_enclosing_first)
+        np.testing.assert_array_equal(old_enclosing_second, new_enclosing_second)
+        np.testing.assert_array_equal(old_iou(old_enclosing_first, old_enclosing_second), axis_aligned_bev_iou(new_enclosing_first, new_enclosing_second))
+
+    for boxes in _invalid_box_sets():
+        testcase.assertTrue(_rejects_unary(old_nearest, boxes))
+        testcase.assertTrue(_rejects_unary(nearest_bev_rectangles, boxes))
+        testcase.assertTrue(_rejects_unary(old_enclosing, boxes))
+        testcase.assertTrue(_rejects_unary(enclosing_bev_rectangles, boxes))
+
+
 def _parity_cases(seed):
     rng = np.random.default_rng(seed)
     cases = []
@@ -68,6 +107,65 @@ def _parity_cases(seed):
         points = np.vstack((uniform, _surface_points(box)))
         cases.append((points, box))
     return cases
+
+
+def _heading_cases(seed):
+    rng = np.random.default_rng(seed)
+    return [
+        np.array([], dtype=np.float64),
+        np.array(
+            [
+                -math.pi,
+                math.pi,
+                0.0,
+                np.nextafter(-math.pi, -math.inf),
+                np.nextafter(-math.pi, math.inf),
+                np.nextafter(math.pi, -math.inf),
+                np.nextafter(math.pi, math.inf),
+                -3.0 * math.pi,
+                3.0 * math.pi,
+                4096.0 * 2.0 * math.pi,
+                -4096.0 * 2.0 * math.pi,
+            ],
+            dtype=np.float64,
+        ),
+        rng.uniform(-64.0 * math.pi, 64.0 * math.pi, size=64).astype(np.float64),
+    ]
+
+
+def _box_set_cases(seed):
+    rng = np.random.default_rng(seed)
+    first = np.array(
+        [
+            [0.0, 0.0, 0.0, 4.0, 2.0, 2.0, 0.0],
+            [0.0, 0.0, 0.0, 4.0, 2.0, 2.0, math.pi / 4],
+            [0.0, 0.0, 0.0, 4.0, 2.0, 2.0, math.pi / 2],
+            [5.0, 0.0, 0.0, 4.0, 2.0, 2.0, math.pi],
+            [8.0, -3.0, 0.0, 1e-6, 1e6, 2.0, -math.pi],
+        ],
+        dtype=np.float64,
+    )
+    second = np.array(
+        [
+            [0.0, 0.0, 0.0, 4.0, 2.0, 2.0, 0.0],
+            [2.0, 0.0, 0.0, 4.0, 2.0, 2.0, -math.pi / 4],
+            [20.0, 0.0, 0.0, 4.0, 2.0, 2.0, math.pi / 2],
+        ],
+        dtype=np.float64,
+    )
+    cases = [(first, second), (first, np.empty((0, 7), dtype=np.float64))]
+    for _ in range(8):
+        a = _random_boxes(rng, 9)
+        b = _random_boxes(rng, 7)
+        cases.append((a, b))
+    return cases
+
+
+def _random_boxes(rng, count):
+    centers = rng.uniform([-20.0, -20.0, -2.0], [20.0, 20.0, 4.0], size=(count, 3))
+    sizes = rng.uniform([0.2, 0.2, 0.2], [12.0, 6.0, 4.0], size=(count, 3))
+    headings = rng.uniform(-8.0 * math.pi, 8.0 * math.pi, size=(count, 1))
+    return np.concatenate((centers, sizes, headings), axis=1).astype(np.float64)
 
 
 def _surface_points(box):
@@ -110,9 +208,25 @@ def _invalid_cases():
     ]
 
 
+def _invalid_box_sets():
+    return [
+        np.array([[math.nan, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0]], dtype=np.float64),
+        np.array([[0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0]], dtype=np.float64),
+        np.zeros((1, 6), dtype=np.float64),
+    ]
+
+
 def _rejects(fn, points, box):
     try:
         fn(points, box)
+    except Exception:
+        return True
+    return False
+
+
+def _rejects_unary(fn, value):
+    try:
+        fn(value)
     except Exception:
         return True
     return False

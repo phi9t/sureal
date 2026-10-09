@@ -5,6 +5,11 @@ LIB_MODULES = glob(
     ["*.py"],
     exclude = ["*_test.py"],
 )
+TEST_EXTRA_DEPS = {
+    "box_geometry_parity_test.py": [
+        "//autonomy/geometry:oriented_box_parity_harness",
+    ],
+}
 LIVE_GATE_TESTS = [
     "native_detection_breakdowns_live_test.py",
 ]
@@ -32,6 +37,7 @@ py_library(
     deps = [
         "//autonomy/dataset:dataset",
         "//autonomy/evidence:evidence",
+        "//autonomy/geometry:oriented_box",
         "//autonomy/insula:insula",
         "//autonomy/segmentation:segmentation",
     ],
@@ -50,7 +56,7 @@ filegroup(
     py_test(
         name = test[:-3],
         srcs = [test],
-        deps = [":detection"],
+        deps = [":detection"] + TEST_EXTRA_DEPS.get(test, []),
         legacy_create_init = 0,
         size = "small",
         tags = ["perception_unit"] + (

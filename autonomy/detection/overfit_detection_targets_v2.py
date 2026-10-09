@@ -4,6 +4,7 @@ import numpy as np
 from detection.anchor_assignment import assign_overlaps
 from detection.detector_geometry import nearest_bev_iou
 from detection.box_coding import encode_boxes
+from geometry.oriented_box import wrap_heading
 
 def build_targets(anchors,rows,*,scene,timestamp,roi,positive,negative):
  anchors=np.asarray(anchors,dtype=np.float64);roi=np.asarray(roi,dtype=np.float64)
@@ -20,11 +21,11 @@ def build_targets(anchors,rows,*,scene,timestamp,roi,positive,negative):
   reasons[reason]+=1
  eligible.sort(key=lambda row:row['object_id']);gt=np.asarray([r['box'] for r in eligible],dtype=np.float64).reshape(-1,7);classes=np.asarray([r['type'] for r in eligible],dtype=np.int64)
  # Keep residual encoding and binary direction labels in the same heading branch.
- gt[:,6]=(gt[:,6]+np.pi)%(2*np.pi)-np.pi
+ gt[:,6]=wrap_heading(gt[:,6])
  overlaps=nearest_bev_iou(anchors,gt);assigned=assign_overlaps(overlaps,classes,positive=positive,negative=negative);labels=assigned['labels'];indices=assigned['target_indices'];mask=labels>0
  residuals=np.zeros((len(anchors),7),dtype=np.float64);directions=np.zeros(len(anchors),dtype=np.int64)
  if mask.any():
-  matched=gt[indices[mask]];residuals[mask]=encode_boxes(matched,anchors[mask]);canonical=(matched[:,6]+np.pi)%(2*np.pi)-np.pi;directions[mask]=(canonical>0).astype(np.int64)
+  matched=gt[indices[mask]];residuals[mask]=encode_boxes(matched,anchors[mask]);canonical=wrap_heading(matched[:,6]);directions[mask]=(canonical>0).astype(np.int64)
  covered=set(indices[mask].tolist());uncovered=[row['object_id'] for i,row in enumerate(eligible) if i not in covered]
  report={'native_box_rows':len(rows),'target_reasons':reasons,'eligible_targets':len(eligible),'positive_anchors':int(mask.sum()),'negative_anchors':int((labels==0).sum()),'ignored_anchors':int((labels<0).sum()),'positive_anchor_counts_by_class':{str(c):int((labels==c).sum()) for c in range(1,5)},'eligible_targets_without_positive_anchor':len(uncovered),'uncovered_object_ids':uncovered,'direction_rule':'canonical native heading in[-pi,pi); bin1 iff strictly positive','scope':'native target tensors only; source admission and model-input isolation external; no optimizer/quality claim'}
  assert sum(reasons.values())==len(rows) and report['positive_anchors']+report['negative_anchors']+report['ignored_anchors']==len(anchors)
