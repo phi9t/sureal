@@ -1,0 +1,23 @@
+{
+  "scene": "1730266523558914470_305_260_325_260",
+  "membership": {
+    "official_split": "training",
+    "research_splits": [
+      "train"
+    ]
+  },
+  "lifecycle_evidence": "scientific-training-replay-evidence.json",
+  "lifecycle_evidence_sha256": "cadfd370bf17fb1413da99e56ed57d1edd6daaa7170535049b885b51c373f201",
+  "live_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/training-replay-a/receipt.json",
+  "live_receipt_sha256": "76cf197644a5baf497f666e34b00809295d9e07dad19ccf7fd08756dbcc125d1",
+  "publication_receipt": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/training-publication-a/receipt.json",
+  "publication_receipt_sha256": "248dfa385a5d540e2d7863e22777f5f439d77a4e13c1e74533a7b7682c07407f",
+  "publication_manifest": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/training-publication-a/packed/publication.json",
+  "publication_manifest_sha256": "e8dbff0a4e74b003b615dbc1dae508078aec59dad5db5334bf3b9c84eada151e",
+  "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/1730266523558914470_305_260_325_260/fae12ded2bb31c2e87a5d91811e09f9c45234a249a44f103bf82cf730abd1a6f.tar",
+  "archive_sha256": "fae12ded2bb31c2e87a5d91811e09f9c45234a249a44f103bf82cf730abd1a6f",
+  "archive_bytes": 3022008320,
+  "report_sha256": "e18b2576b5e1aa40e538b6a20b46f49e6eec0e662472c32873f8f908fc7e0a0d",
+  "records": 1970,
+  "points": 32547972
+}

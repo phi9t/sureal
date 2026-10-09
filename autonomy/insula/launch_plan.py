@@ -56,6 +56,19 @@ _GPU_CONTROL_DEVICES = {
     "/dev/nvidia-modeset",
 }
 _DEFAULT_GPU_DRIVER_LIBRARY_DIRS = (Path("/usr/lib/x86_64-linux-gnu"),)
+_LEGACY_COMMAND_ARITY = {
+    "--unshare-all": 0,
+    "--die-with-parent": 0,
+    "--clearenv": 0,
+    "--proc": 1,
+    "--dev": 1,
+    "--tmpfs": 1,
+    "--chdir": 1,
+    "--ro-bind": 2,
+    "--bind": 2,
+    "--dev-bind": 2,
+    "--setenv": 2,
+}
 
 
 class RuntimeLockError(ValueError):
@@ -273,6 +286,31 @@ def record_plan(plan: LaunchPlan) -> dict:
     return record
 
 
+def read_receipt_mounts(
+    receipt: Mapping[str, object],
+    *,
+    include_digests: bool = True,
+    require_cleared_environment: bool = False,
+    require_python_worker: bool = False,
+) -> dict[str, dict[str, object]]:
+    """Return launch mounts by inside path from a plan record or old command receipt."""
+    plan_record = _extract_launch_plan_record(receipt)
+    if plan_record is not None:
+        _validate_plan_record_requirements(
+            plan_record,
+            require_cleared_environment=require_cleared_environment,
+            require_python_worker=require_python_worker,
+        )
+        return _read_plan_record_mounts(plan_record)
+    command = _extract_legacy_receipt_command(receipt)
+    parsed = _parse_legacy_receipt_command(
+        command,
+        require_cleared_environment=require_cleared_environment,
+        require_python_worker=require_python_worker,
+    )
+    return _legacy_receipt_mounts(command, parsed["options"], include_digests=include_digests)
+
+
 def _assemble_plan(
     runtime: RuntimeLock,
     *,
@@ -294,6 +332,186 @@ def _assemble_plan(
         unshare_flags=tuple(str(flag) for flag in unshare_flags),
         gpu=gpu,
     )
+
+
+def _extract_launch_plan_record(receipt: Mapping[str, object]) -> Mapping[str, object] | None:
+    if not isinstance(receipt, Mapping):
+        raise ValueError("receipt record required")
+    launch_plan = receipt.get("launch_plan")
+    if isinstance(launch_plan, Mapping):
+        return launch_plan
+    if {"runtime", "mounts", "environment", "command"} <= set(receipt):
+        return receipt
+    return None
+
+
+def _read_plan_record_mounts(record: Mapping[str, object]) -> dict[str, dict[str, object]]:
+    mounts = record.get("mounts")
+    if not isinstance(mounts, list):
+        raise ValueError("launch plan mounts required")
+    by_inside: dict[str, dict[str, object]] = {}
+    for mount in mounts:
+        if not isinstance(mount, Mapping):
+            raise ValueError("launch plan mount record required")
+        inside = mount.get("inside_path")
+        mode = mount.get("mode")
+        if not isinstance(inside, str) or not inside.startswith("/") or not isinstance(mode, str):
+            raise ValueError("launch plan mount inside path and mode required")
+        if inside in by_inside:
+            raise ValueError(f"duplicate receipt mount {inside}")
+        data = {
+            "inside_path": inside,
+            "mode": mode,
+        }
+        for field in ("role", "kind", "digest"):
+            if field in mount:
+                value = mount[field]
+                if not isinstance(value, str):
+                    raise ValueError(f"launch plan mount {field} must be a string")
+                data[field] = value
+        by_inside[inside] = data
+    return by_inside
+
+
+def _validate_plan_record_requirements(
+    record: Mapping[str, object],
+    *,
+    require_cleared_environment: bool,
+    require_python_worker: bool,
+) -> None:
+    if require_cleared_environment:
+        environment = record.get("environment")
+        if not isinstance(environment, Mapping) or environment.get("PYTHONPATH") != "/experiment":
+            raise ValueError("launch plan record cleared environment required")
+    if require_python_worker:
+        command = record.get("command")
+        if (
+            not isinstance(command, list)
+            or len(command) < 2
+            or command[0] not in {"python", "/opt/waymo/bin/python"}
+            or not isinstance(command[1], str)
+            or not Path(command[1]).is_absolute()
+            or not command[1].endswith(".py")
+        ):
+            raise ValueError("launch plan record Python worker required")
+
+
+def _extract_legacy_receipt_command(receipt: Mapping[str, object]) -> list[str]:
+    command = receipt.get("command")
+    if isinstance(command, list):
+        return command
+    checks = receipt.get("checks")
+    if isinstance(checks, list) and len(checks) == 1 and isinstance(checks[0], Mapping):
+        command = checks[0].get("command")
+        if isinstance(command, list):
+            return command
+    raise ValueError("receipt command or launch plan required")
+
+
+def _parse_legacy_receipt_command(
+    command: list[str],
+    *,
+    require_cleared_environment: bool = False,
+    require_python_worker: bool = False,
+) -> dict[str, object]:
+    if (
+        not isinstance(command, list)
+        or not command
+        or command[0] != "bwrap"
+        or any(not isinstance(item, str) or not item for item in command)
+        or command.count("--") != 1
+    ):
+        raise ValueError("literal legacy bwrap command required")
+    separator = command.index("--")
+    flags = set()
+    options = []
+    index = 1
+    while index < separator:
+        option = command[index]
+        arity = _LEGACY_COMMAND_ARITY.get(option)
+        if arity is None or index + arity >= separator:
+            raise ValueError("declared legacy bwrap options required")
+        values = tuple(command[index + 1 : index + 1 + arity])
+        options.append((option, values))
+        flags.add(option)
+        index += arity + 1
+    argv = command[separator + 1 :]
+    if require_cleared_environment and not {"--unshare-all", "--clearenv"} <= flags:
+        raise ValueError("legacy receipt cleared namespace required")
+    if require_python_worker and (
+        not {"--unshare-all", "--die-with-parent"} <= flags
+        or len(argv) < 2
+        or argv[0] not in {"python", "/opt/waymo/bin/python"}
+        or not Path(argv[1]).is_absolute()
+        or not argv[1].endswith(".py")
+    ):
+        raise ValueError("isolated namespace and declared original Python worker required")
+    return {"separator": separator, "argv": argv, "options": options, "flags": flags}
+
+
+def _legacy_receipt_mounts(
+    command: list[str],
+    options: Iterable[tuple[str, tuple[str, ...]]],
+    *,
+    include_digests: bool,
+) -> dict[str, dict[str, object]]:
+    by_inside: dict[str, dict[str, object]] = {}
+    for option, values in options:
+        mount = _legacy_mount_from_option(option, values, include_digests=include_digests)
+        if mount is None:
+            continue
+        inside = mount["inside_path"]
+        if not isinstance(inside, str):
+            raise ValueError("legacy receipt mount inside path required")
+        if inside in by_inside:
+            raise ValueError(f"duplicate receipt mount {inside}")
+        by_inside[inside] = mount
+    if not by_inside:
+        raise ValueError("legacy receipt mounts required")
+    return by_inside
+
+
+def _legacy_mount_from_option(
+    option: str,
+    values: tuple[str, ...],
+    *,
+    include_digests: bool,
+) -> dict[str, object] | None:
+    if option in {"--proc", "--dev", "--setenv", "--chdir"}:
+        return None
+    if option == "--tmpfs":
+        inside = values[0]
+        return {"inside_path": inside, "mode": "writable", "kind": "tmpfs", "role": _legacy_role(inside)}
+    if option not in {"--ro-bind", "--bind", "--dev-bind"}:
+        return None
+    host, inside = values
+    mode = "read_only" if option == "--ro-bind" else "writable"
+    kind = "dev-bind" if option == "--dev-bind" else "bind"
+    mount: dict[str, object] = {
+        "inside_path": inside,
+        "mode": mode,
+        "kind": kind,
+        "role": _legacy_role(inside),
+        "host_path": host,
+    }
+    if include_digests and mode == "read_only" and kind == "bind" and inside != "/":
+        host_path = Path(host)
+        if host_path.exists():
+            mount["digest"] = _content_digest(host_path)
+    return mount
+
+
+def _legacy_role(inside_path: str) -> str:
+    roles = {
+        "/": "runtime",
+        "/experiment": "code",
+        "/source": "source",
+        "/outputs": "output",
+        "/tmp": "tmp",
+    }
+    if inside_path in roles:
+        return roles[inside_path]
+    return f"input:{inside_path}"
 
 
 def _unchecked_runtime(rootfs: Path) -> RuntimeLock:
@@ -670,4 +888,5 @@ __all__ = [
     "render_plan",
     "run_plan",
     "record_plan",
+    "read_receipt_mounts",
 ]

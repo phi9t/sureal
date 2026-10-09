@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "role": "scientific",
+  "scene": "1730266523558914470_305_260_325_260",
+  "official_split": "training",
+  "research_splits": [
+    "train"
+  ],
+  "source_lidar_sha256": "353a45f3e82059ed2dc5aace569e0eb4bae3ece4991b43c166befbc08d6500b8",
+  "sources": {
+    "camera_box": {
+      "sha256": "8b5c6c0fb878029b8b99b733e703ceb22cd6389daf2a651b59f460bd23f3e7dc",
+      "generation": "1709077975231739",
+      "source_uri": "gs://waymo_open_dataset_v_2_0_1/training/camera_box/1730266523558914470_305_260_325_260.parquet#1709077975231739",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/camera_box/1730266523558914470_305_260_325_260.parquet"
+    },
+    "camera_calibration": {
+      "sha256": "5ba37cbab3b556fbb6422f8e262cd88ea4cf22da44c4681d7a2690d6b4f78920",
+      "generation": "1709075777310951",
+      "source_uri": "gs://waymo_open_dataset_v_2_0_1/training/camera_calibration/1730266523558914470_305_260_325_260.parquet#1709075777310951",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/camera_calibration/1730266523558914470_305_260_325_260.parquet"
+    },
+    "camera_hkp": {
+      "sha256": "382a3b55a9cf37dd070db021e3a82904ef8511208f8d6aa88d68e0f085d39f6e",
+      "generation": "1709075479056941",
+      "source_uri": "gs://waymo_open_dataset_v_2_0_1/training/camera_hkp/1730266523558914470_305_260_325_260.parquet#1709075479056941",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/camera_hkp/1730266523558914470_305_260_325_260.parquet"
+    },
+    "camera_image": {
+      "sha256": "5ef990a481176a0fd23476eac06fecf597023264bb70675b5046e5ae0d4c3ca0",
+      "generation": "1709077391448434",
+      "source_uri": "gs://waymo_open_dataset_v_2_0_1/training/camera_image/1730266523558914470_305_260_325_260.parquet#1709077391448434",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/camera_image/1730266523558914470_305_260_325_260.parquet"
+    },
+    "camera_segmentation": {
+      "sha256": "d0803b427c98fe3633edaf09402fbbb5cc916e5e57d5a17323c22616903d0e15",
+      "generation": "1709075473063702",
+      "source_uri": "gs://waymo_open_dataset_v_2_0_1/training/camera_segmentation/1730266523558914470_305_260_325_260.parquet#1709075473063702",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/camera_segmentation/1730266523558914470_305_260_325_260.parquet"
+    },
+    "camera_to_lidar_box_association": {
+      "sha256": "1853c9b0626007c33e256d22ebd108d87c7a6250d08101a3653b551b8e24a78b",
+      "generation": "1709076399098647",
+      "source_uri": "gs://waymo_open_dataset_v_2_0_1/training/camera_to_lidar_box_association/1730266523558914470_305_260_325_260.parquet#1709076399098647",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/camera_to_lidar_box_association/1730266523558914470_305_260_325_260.parquet"
+    },
+    "lidar": {
+      "sha256": "353a45f3e82059ed2dc5aace569e0eb4bae3ece4991b43c166befbc08d6500b8",
+      "generation": "1709076101944568",
+      "source_uri": "gs://waymo_open_dataset_v_2_0_1/training/lidar/1730266523558914470_305_260_325_260.parquet#1709076101944568",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar/1730266523558914470_305_260_325_260.parquet"
+    },
+    "lidar_box": {
+      "sha256": "1bc2ae79df83b61dcdf4c76a9dd1878503d3642a7d6147333f26171b7a5f30ad",
+      "generation": "1709075788896758",
+      "source_uri": "gs://waymo_open_dataset_v_2_0_1/training/lidar_box/1730266523558914470_305_260_325_260.parquet#1709075788896758",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar_box/1730266523558914470_305_260_325_260.parquet"
+    },
+    "lidar_calibration": {
+      "sha256": "35d34a81d3459835dca1ebe9249512c9881a182e03a02b429673c3b834bc2bd5",
+      "generation": "1709075752217908",
+      "source_uri": "gs://waymo_open_dataset_v_2_0_1/training/lidar_calibration/1730266523558914470_305_260_325_260.parquet#1709075752217908",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar_calibration/1730266523558914470_305_260_325_260.parquet"
+    },
+    "lidar_camera_projection": {
+      "sha256": "d3748944aaa1e23927ccc209d68ba29cf817de77b3eb62c9bad2a88c918c6760",
+      "generation": "1709076657315236",
+      "source_uri": "gs://waymo_open_dataset_v_2_0_1/training/lidar_camera_projection/1730266523558914470_305_260_325_260.parquet#1709076657315236",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar_camera_projection/1730266523558914470_305_260_325_260.parquet"
+    },
+    "lidar_camera_synced_box": {
+      "sha256": "50bed403321f060515dc9326a6078b13f92f3ed2a19a7140345820960dae1851",
+      "generation": "1709076791036057",
+      "source_uri": "gs://waymo_open_dataset_v_2_0_1/training/lidar_camera_synced_box/1730266523558914470_305_260_325_260.parquet#1709076791036057",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar_camera_synced_box/1730266523558914470_305_260_325_260.parquet"
+    },
+    "lidar_hkp": {
+      "sha256": "bda9c39c67507dd2f403007759e0005bf427497ac4e23e8af404745630f877cc",
+      "generation": "1709076446652088",
+      "source_uri": "gs://waymo_open_dataset_v_2_0_1/training/lidar_hkp/1730266523558914470_305_260_325_260.parquet#1709076446652088",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar_hkp/1730266523558914470_305_260_325_260.parquet"
+    },
+    "lidar_pose": {
+      "sha256": "86e149b12f107e9efd39f97e882ce351f85bae5a917225e9220022d86a49c50c",
+      "generation": "1709076491364103",
+      "source_uri": "gs://waymo_open_dataset_v_2_0_1/training/lidar_pose/1730266523558914470_305_260_325_260.parquet#1709076491364103",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar_pose/1730266523558914470_305_260_325_260.parquet"
+    },
+    "lidar_segmentation": {
+      "sha256": "362a165bdb217d59f2e97f735c4111a993daed4976827b3ae0f3d9e361ae9f10",
+      "generation": "1709078375793244",
+      "source_uri": "gs://waymo_open_dataset_v_2_0_1/training/lidar_segmentation/1730266523558914470_305_260_325_260.parquet#1709078375793244",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/lidar_segmentation/1730266523558914470_305_260_325_260.parquet"
+    },
+    "projected_lidar_box": {
+      "sha256": "ea40a109a61d3c76c4b75777fc4c63c9bcf53ab99c9fd032d8d7017d1018f6b8",
+      "generation": "1709078429233309",
+      "source_uri": "gs://waymo_open_dataset_v_2_0_1/training/projected_lidar_box/1730266523558914470_305_260_325_260.parquet#1709078429233309",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/projected_lidar_box/1730266523558914470_305_260_325_260.parquet"
+    },
+    "stats": {
+      "sha256": "3ff41af48e68bf91f570cd51aa036094884d7877897c7ea13e85fbf79fcdac01",
+      "generation": "1709078417324739",
+      "source_uri": "gs://waymo_open_dataset_v_2_0_1/training/stats/1730266523558914470_305_260_325_260.parquet#1709078417324739",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/stats/1730266523558914470_305_260_325_260.parquet"
+    },
+    "vehicle_pose": {
+      "sha256": "f74b7ce2a47927a4de52887865b1219d70dad5e828d964ab25de98af430b0e42",
+      "generation": "1709078389472807",
+      "source_uri": "gs://waymo_open_dataset_v_2_0_1/training/vehicle_pose/1730266523558914470_305_260_325_260.parquet#1709078389472807",
+      "hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/raw/training/vehicle_pose/1730266523558914470_305_260_325_260.parquet"
+    }
+  },
+  "archive": {
+    "sha256": "fae12ded2bb31c2e87a5d91811e09f9c45234a249a44f103bf82cf730abd1a6f",
+    "archive_bytes": 3022008320,
+    "members": 1971,
+    "working_set_bytes": 13060236114,
+    "report_sha256": "e18b2576b5e1aa40e538b6a20b46f49e6eec0e662472c32873f8f908fc7e0a0d"
+  },
+  "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/1730266523558914470_305_260_325_260/fae12ded2bb31c2e87a5d91811e09f9c45234a249a44f103bf82cf730abd1a6f.tar",
+  "source_reconstruction_receipt_sha256": "fc0fcef6859cf6afb243855fe9a82ab51e0a3e34371a3c76143acaa7d60bbab4",
+  "coverage": {
+    "records": 1970,
+    "points": 32547972
+  }
+}

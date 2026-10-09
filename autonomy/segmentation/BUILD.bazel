@@ -18,6 +18,12 @@ TEST_EXTRA_DATA = {
     "semantic_archive_support_test.py": [
         "//autonomy/dataset:scientific_dataset_test_fixture",
     ],
+    "semantic_recovery_receipt_test.py": [
+        ":semantic_receipt_testdata",
+    ],
+    "semantic_recovery_receipt_aligned_test.py": [
+        ":semantic_receipt_testdata",
+    ],
 }
 
 TEST_EXTRA_DEPS = {
@@ -76,6 +82,11 @@ filegroup(
     name = "runfiles",
     srcs = COMMAND_SCRIPTS,
     visibility = SEGMENTATION_VISIBILITY,
+)
+
+filegroup(
+    name = "semantic_receipt_testdata",
+    srcs = glob(["testdata/semantic_receipts/**"]),
 )
 
 [
