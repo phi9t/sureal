@@ -3,7 +3,7 @@ import json,os,re,shutil,subprocess,sys,time
 from pathlib import Path
 P=Path(__file__).resolve().parents[1]
 from blob_store.core import BlobStore,blob_adapter_from_descriptor
-from insula.launch_plan import build_plan,load_default_runtime_lock,record_plan,render_plan
+from insula.launch_plan import build_plan,load_default_runtime_lock,read_receipt_mounts,record_plan,render_plan
 from insula.runtime_roots import current_cpu_rootfs, current_gpu_rootfs, current_metrics_rootfs
 from retention.publication import audit as audit_publication
 from resources.scientific_payload import sha,unique_payload_bytes
@@ -17,6 +17,7 @@ from training_execution.sustained_admission import admit_sample
 from training_execution.sustained_controller_sources import freeze_host_sources,validate_host_sources
 from retention.publication_sources import freeze_checkpoint_sources as freeze_checkpoint_publisher_sources,validate_checkpoint_sources as validate_checkpoint_publisher_sources
 from evidence.source_snapshot import source_snapshot_package_root
+from resources.command import inspect_legacy_receipt_command
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing'
 GPU_ROOT=current_gpu_rootfs(C);CPU_ROOT=current_cpu_rootfs(C);METRICS_ROOT=current_metrics_rootfs(C)
 GPU_INDEX=1
@@ -194,23 +195,22 @@ def build_sustained_stage_plan(runtime,*,package,stage_source,output,worker,nati
   allow_readonly_inputs_cover_output=True,
  )
 
-def _legacy_root_mount(command):
- for index in range(len(command)-2):
-  if command[index]=='--ro-bind' and command[index+2]=='/':return command[index+1]
- raise ValueError('rootfs mount required in native GPU command')
-
-def _command_mount(command,inside):
- for index in range(len(command)-2):
-  if command[index] in {'--ro-bind','--bind','--dev-bind'} and command[index+2]==inside:return command[index+1]
- raise ValueError('launch command mount required: '+inside)
-
-def _command_env(command,name):
- for index in range(len(command)-2):
-  if command[index]=='--setenv' and command[index+1]==name:return command[index+2]
- raise ValueError('launch command environment required: '+name)
-
 def _plan_mounts(record):
  return {mount['inside_path']:mount for mount in record.get('mounts',[])}
+
+def _legacy_command_data(command):
+ _,argv,options=inspect_legacy_receipt_command(command)
+ if (len(argv)>=4 and argv[0] in {'python','/opt/waymo/bin/python'} and
+     argv[1]=='/tmp/resource-layer/resources/execute_worker.py' and
+     argv[2]=='/tmp/resource-output'):
+  argv=[argv[0],*argv[3:]]
+ environment={values[0]:values[1] for option,values in options if option=='--setenv'}
+ mounts=read_receipt_mounts({'command':command},include_digests=False,require_python_worker=True)
+ return argv,environment,mounts
+
+def _mount_host(mounts,inside):
+ try:return mounts[inside]['host_path']
+ except KeyError as error:raise ValueError('launch command mount required: '+inside) from error
 
 def driver_hashes_from_plan(plan):
  return {str(mount.host_path):mount.digest for mount in plan.mounts if mount.role.startswith('gpu-driver:') and mount.digest is not None}
@@ -295,7 +295,8 @@ class NativeBackend:
   if stage not in workers:raise ValueError('unknown native stage')
   metric=stage in {'score','metrics-audit'};gpu=stage in {'train','audit'};command=receipt['command'];entry='/tmp/verifier/'+workers[stage] if stage=='audit' else worker_entry(workers[stage]);stage_runtime=self.metric_runtime if metric else self.runtime if gpu else self.cpu_runtime
   stage_lock=getattr(self,'metric_runtime_lock' if metric else 'runtime_lock' if gpu else 'cpu_runtime_lock',None)
-  if command[-1]!=entry or receipt['runtime_lock']!=stage_runtime or receipt['verifier_source_pins']!=(self.verifier_pins if stage=='audit' else {}):raise ValueError('native worker/runtime/verifier differs')
+  worker_argv,command_environment,command_mounts=_legacy_command_data(command)
+  if worker_argv!=['python',entry] or receipt['runtime_lock']!=stage_runtime or receipt['verifier_source_pins']!=(self.verifier_pins if stage=='audit' else {}):raise ValueError('native worker/runtime/verifier differs')
   if receipt.get('launch_plan') is not None:
    plan=receipt['launch_plan'];mounts=_plan_mounts(plan);environment=plan.get('environment',{})
    if stage_lock is not None and plan.get('runtime')!={'lock_sha256':stage_lock.lock_sha256,'form':stage_lock.form}:raise ValueError('native launch plan runtime differs')
@@ -305,13 +306,12 @@ class NativeBackend:
    elif 'gpu' in plan or receipt['driver_hashes']!={} or _plan_driver_hashes_by_name(plan)!={}:raise ValueError('native non-GPU launch plan differs')
    for inside in ['/experiment','/outputs','/tmp/inputs','/tmp/native','/tmp/physical','/tmp/boxes','/tmp/runtime-lock.json','/tmp/scientific','/tmp/source-snapshots']:
     if inside not in mounts:raise ValueError('native launch plan mount missing: '+inside)
-  elif gpu:
-   if _legacy_root_mount(command)!=str(GPU_ROOT):raise ValueError('native GPU rootfs mount differs')
-   if not receipt['driver_hashes']:raise ValueError('native GPU driver hashes required')
-  if _command_mount(command,'/experiment')!=str(self.package) or _command_mount(command,'/outputs')!=receipt['output_directory']:raise ValueError('native code/output mount differs')
-  if _command_mount(command,'/tmp/source-snapshots')!=str(self.R/'source-snapshots') or _command_env(command,'SUREAL_SOURCE_SNAPSHOT_STORE')!='/tmp/source-snapshots':raise ValueError('source snapshot store mount differs')
+  elif gpu and not receipt['driver_hashes']:raise ValueError('native GPU driver hashes required')
+  if stage_lock is not None and _mount_host(command_mounts,'/')!=str(stage_lock.rootfs):raise ValueError('native rootfs mount differs')
+  if _mount_host(command_mounts,'/experiment')!=str(self.package) or _mount_host(command_mounts,'/outputs')!=receipt['output_directory']:raise ValueError('native code/output mount differs')
+  if _mount_host(command_mounts,'/tmp/source-snapshots')!=str(self.R/'source-snapshots') or command_environment.get('SUREAL_SOURCE_SNAPSHOT_STORE')!='/tmp/source-snapshots':raise ValueError('source snapshot store mount differs')
   inputs=self.R/(receipt['requested_stage']+'-input')
-  if receipt['input_hashes'].get(str(inputs/'manifest.json'))!=self.manifest_sha or _command_mount(command,'/tmp/inputs')!=str(inputs):raise ValueError('exact immutable stage manifest/input mounts required')
+  if receipt['input_hashes'].get(str(inputs/'manifest.json'))!=self.manifest_sha or _mount_host(command_mounts,'/tmp/inputs')!=str(inputs):raise ValueError('exact immutable stage manifest/input mounts required')
   for group in ['input_hashes','driver_hashes','verifier_source_pins','artifacts']:
    for path,digest in receipt[group].items():
     if released_root is not None and Path(path).is_relative_to(released_root):continue
@@ -322,16 +322,18 @@ class NativeBackend:
  def train_and_admit(self,previous,target):
   previous_root=Path(previous['root']) if previous else None;previous_sha=previous['checkpoint_sha256'] if previous else None;start=previous['step'] if previous else 0
   write(self.source/'job.json',{'target_step':target,'retained_sha256':previous_sha});directory=self.output/f'update-{target:02d}';refs={}
-  refs['train']=self.stage(f'train-{target}','train_sustained.py',directory,['--ro-bind',str(previous_root),'/tmp/retained'] if previous else [])
+  refs['train']=self.stage(f'train-{target}','train_sustained.py',directory,{'/tmp/retained':previous_root} if previous else {})
   report=json.loads((directory/'check.json').read_text());step=report['updates']
   if not report['resource_gate_passed']:raise RuntimeError('resource-censored producer retained; no quality promotion')
   checkpoint_sha=sha(directory/'checkpoint.pt');audit={'checkpoint_sha256':checkpoint_sha,'head_hashes':report['head_hashes'],'pilot_reference':False};write(self.source/'audit.json',audit);write(self.source/'transition.json',{'manifest_sha256':self.manifest_sha,'checkpoint_sha256':checkpoint_sha,'previous_checkpoint_sha256':previous_sha,'report_sha256':sha(directory/'check.json'),'start_step':start,'terminal_step':step})
-  audited=self.R/f'audit-{target:02d}';refs['audit']=self.stage(f'audit-{target}','audit_sustained_transition.py',audited,['--ro-bind',str(self.verifier),'/tmp/verifier','--ro-bind',str(directory),'/tmp/retained',*(['--ro-bind',str(previous_root),'/tmp/previous'] if previous else [])],logical_step=step)
-  write(self.source/'loss-audit.json',{'manifest_sha256':self.manifest_sha,'report_sha256':sha(directory/'check.json'),'head_hashes':report['head_hashes']});lossdir=self.R/f'loss-{target:02d}';refs['literal-loss']=self.stage(f'literal-loss-{target}','audit_sustained_loss.py',lossdir,['--ro-bind',str(directory),'/source'],gpu=False,logical_step=step)
-  write(self.source/'export-audit.json',{'manifest_sha256':self.manifest_sha,'anchor_templates_sha256':self.anchor_sha,'head_hashes':report['head_hashes']});prepared=self.R/f'prepared-{target:02d}';refs['export']=self.stage(f'export-{target}','prepare_sustained_v3.py',prepared,['--ro-bind',str(directory/'heads'),'/source'],gpu=False,logical_step=step)
-  export=json.loads(refs['export'].read_text());export['inputs']={p:h for p,h in export['input_hashes'].items() if Path(p).name in {'manifest.json','anchor-templates.json','export-audit.json'}};export['validation']=json.loads((prepared/'preparation.json').read_text());write(self.source/'score-receipt.json',export);write(self.source/'expected.json',{'receipt':export,'receipt_sha256':sha(self.source/'score-receipt.json')});proposals=self.R/f'proposal-audit-{target:02d}';refs['proposals']=self.stage(f'proposals-{target}','audit_proposals_sustained_v3.py',proposals,['--ro-bind',str(prepared),'/source','--ro-bind',str(directory/'heads'),'/tmp/heads','--ro-bind',str(self.source/'score-receipt.json'),'/tmp/score-receipt.json','--ro-bind',str(self.source/'expected.json'),'/tmp/expected.json'],gpu=False,logical_step=step)
-  scored=self.R/f'scored-{target:02d}';refs['score']=self.stage(f'score-{target}','metrics_sustained_v3.py',scored,['--ro-bind',str(prepared),'/source'],gpu=False,metrics=True,logical_step=step)
-  score=json.loads(refs['score'].read_text());score['parent_artifacts']=export['artifacts'];score['validation']=json.loads((scored/'check.json').read_text());write(self.source/'score-receipt.json',score);write(self.source/'expected.json',{'receipt':score,'receipt_sha256':sha(self.source/'score-receipt.json')});metricdir=self.R/f'metric-audit-{target:02d}';refs['metrics-audit']=self.stage(f'metrics-audit-{target}','audit_metrics_sustained_v3.py',metricdir,['--ro-bind',str(prepared),'/source','--ro-bind',str(scored),'/tmp/scored','--ro-bind',str(self.source/'score-receipt.json'),'/tmp/score-receipt.json','--ro-bind',str(self.source/'expected.json'),'/tmp/expected.json'],gpu=False,metrics=True,logical_step=step)
+  audited=self.R/f'audit-{target:02d}';audit_inputs={'/tmp/verifier':self.verifier,'/tmp/retained':directory}
+  if previous:audit_inputs['/tmp/previous']=previous_root
+  refs['audit']=self.stage(f'audit-{target}','audit_sustained_transition.py',audited,audit_inputs,logical_step=step)
+  write(self.source/'loss-audit.json',{'manifest_sha256':self.manifest_sha,'report_sha256':sha(directory/'check.json'),'head_hashes':report['head_hashes']});lossdir=self.R/f'loss-{target:02d}';refs['literal-loss']=self.stage(f'literal-loss-{target}','audit_sustained_loss.py',lossdir,{'/source':directory},gpu=False,logical_step=step)
+  write(self.source/'export-audit.json',{'manifest_sha256':self.manifest_sha,'anchor_templates_sha256':self.anchor_sha,'head_hashes':report['head_hashes']});prepared=self.R/f'prepared-{target:02d}';refs['export']=self.stage(f'export-{target}','prepare_sustained_v3.py',prepared,{'/source':directory/'heads'},gpu=False,logical_step=step)
+  export=json.loads(refs['export'].read_text());export['inputs']={p:h for p,h in export['input_hashes'].items() if Path(p).name in {'manifest.json','anchor-templates.json','export-audit.json'}};export['validation']=json.loads((prepared/'preparation.json').read_text());write(self.source/'score-receipt.json',export);write(self.source/'expected.json',{'receipt':export,'receipt_sha256':sha(self.source/'score-receipt.json')});proposals=self.R/f'proposal-audit-{target:02d}';refs['proposals']=self.stage(f'proposals-{target}','audit_proposals_sustained_v3.py',proposals,{'/source':prepared,'/tmp/heads':directory/'heads','/tmp/score-receipt.json':self.source/'score-receipt.json','/tmp/expected.json':self.source/'expected.json'},gpu=False,logical_step=step)
+  scored=self.R/f'scored-{target:02d}';refs['score']=self.stage(f'score-{target}','metrics_sustained_v3.py',scored,{'/source':prepared},gpu=False,metrics=True,logical_step=step)
+  score=json.loads(refs['score'].read_text());score['parent_artifacts']=export['artifacts'];score['validation']=json.loads((scored/'check.json').read_text());write(self.source/'score-receipt.json',score);write(self.source/'expected.json',{'receipt':score,'receipt_sha256':sha(self.source/'score-receipt.json')});metricdir=self.R/f'metric-audit-{target:02d}';refs['metrics-audit']=self.stage(f'metrics-audit-{target}','audit_metrics_sustained_v3.py',metricdir,{'/source':prepared,'/tmp/scored':scored,'/tmp/score-receipt.json':self.source/'score-receipt.json','/tmp/expected.json':self.source/'expected.json'},gpu=False,metrics=True,logical_step=step)
   sample=admit_sample(manifest=self.manifest,manifest_sha256=self.manifest_sha,producer=report,producer_sha256=sha(directory/'check.json'),replay=json.loads((audited/'replay.json').read_text()),transition=json.loads((audited/'transition.json').read_text()),previous_checkpoint_sha256=previous_sha,start_step=start,loss=json.loads((lossdir/'check.json').read_text()),proposals=json.loads((proposals/'check.json').read_text()),score=score['validation'],metric=json.loads((metricdir/'check.json').read_text()))
   final=self.R/f'checkpoint-{target:02d}-admitted.json';write(final,{'output_directory':str(directory),'manifest_path':str(self.source/'manifest.json'),'manifest_sha256':self.manifest_sha,'step':step,'stage_receipts':{name:{'path':str(path),'sha256':sha(path)} for name,path in refs.items()},'scope':'full seven-stage native engineering checkpoint; no heldout promotion'});freeze_checkpoint_inventory(directory,final,sha(final));reportcopy=self.R/f'producer-report-{target:02d}.json';shutil.copyfile(directory/'check.json',reportcopy)
   return {'step':step,'target_step':target,'root':str(directory),'checkpoint_sha256':checkpoint_sha,'final_path':str(final),'final_sha256':sha(final),'report':report,'report_snapshot':str(reportcopy),'report_sha256':sha(reportcopy),'sample':sample,'released':False}

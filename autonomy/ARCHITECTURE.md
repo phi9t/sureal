@@ -27,7 +27,7 @@ default and grant visibility only to actual consumers.
 | `camera/` | Camera data, sidecars, publication, replay and eviction |
 | `geometry/` | Coordinate transforms, reconstruction, visibility and native range-grid shape math |
 | `dataset/` | Scientific source admission, point/sidecar data, archives, tracer contracts and cloud setup |
-| `insula/` | Sandbox entry, rootfs recipes, Bazel launcher planning, M0 checks and staging leases |
+| `insula/` | Launch-plan boundary, sandbox entry, rootfs recipes, Bazel launcher planning, M0 checks and staging leases |
 | `evidence/` | Source snapshots, digests, regular-file checks, journal, tracker and publication |
 
 Cross-concept workflows live at the concept level that owns the workflow. A
@@ -81,6 +81,12 @@ regular-file check, source snapshot creation and source pin verification.
 Source closure tests assert behavior for executable targets; one-time migration
 audits, not unit tests, check for old path hacks and duplicate helpers.
 
+`autonomy/insula/launch_plan.py` is the only active code path that loads and
+checks runtime locks, builds Insula launch plans, reads receipt mounts, renders
+sandbox arguments, runs plans and records plan receipts. Callers pass structured
+mounts, devices, environment and command data to that module; they do not splice
+`bwrap` arguments or parse runtime locks themselves.
+
 ## Checks
 
 Run source-pin commands from the `autonomy/` package root. Run Bazel component
@@ -91,7 +97,7 @@ cd autonomy
 python3 -m evidence.pins status [PATH ...]  # which receipts pin a file
 python3 -m evidence.pins check [--base REV] # source pins a change touches
 cd ..
-./bazelw --emit-plan test //autonomy/...          # inspect the Insula command
+./bazelw --emit-plan test //autonomy/...          # inspect structured Insula launch-plan data
 ./bazelw test //autonomy/...                      # default perception tests
 ```
 

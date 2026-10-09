@@ -121,15 +121,31 @@ def bazel_command(arguments, output_base, update_lock=False, test_environment=No
 
 
 def repo_workspace_mounts(update_lock=False):
-    mounts = [["--tmpfs", "/experiment"]]
+    mounts = [Mount("workspace:/experiment", "tmpfs", "/experiment", "writable")]
     for path in sorted(REPO.iterdir(), key=lambda item: item.name):
         if path.name == ".bazel-cache":
             continue
         if update_lock and path.name == "MODULE.bazel.lock":
             continue
-        mounts.append(["--ro-bind", str(path.resolve()), "/experiment/" + path.name])
+        mounts.append(
+            Mount(
+                f"workspace:/{path.name}",
+                "bind",
+                "/experiment/" + path.name,
+                "read_only",
+                path.resolve(),
+            )
+        )
     if update_lock:
-        mounts.append(["--bind", str((REPO / "MODULE.bazel.lock").resolve()), "/experiment/MODULE.bazel.lock"])
+        mounts.append(
+            Mount(
+                "workspace:/MODULE.bazel.lock",
+                "bind",
+                "/experiment/MODULE.bazel.lock",
+                "writable",
+                (REPO / "MODULE.bazel.lock").resolve(),
+            )
+        )
     return mounts
 
 
@@ -140,7 +156,7 @@ def sandbox_plan(runtime, cache, arguments, update_lock=False):
     mounts = [
         Mount("runtime", "bind", "/", "read_only", rootfs),
         Mount("resolver", "bind", "/etc/resolv.conf", "read_only", Path("/etc/resolv.conf")),
-        *[_mount_from_argv("workspace", mount) for mount in repo_workspace_mounts(update_lock)],
+        *repo_workspace_mounts(update_lock),
         Mount("outputs", "tmpfs", "/outputs", "writable"),
         Mount("tmp", "tmpfs", "/tmp", "writable"),
         Mount("bazel-cache", "bind", "/tmp/bazel-cache", "writable", cache),
@@ -204,7 +220,7 @@ def sandbox_plan(runtime, cache, arguments, update_lock=False):
         "argv": render_plan(plan),
         "bazel": bazel,
         "environment": data["environment"],
-        "mounts": [_mount_to_argv(mount) for mount in data["mounts"]],
+        "mounts": data["mounts"],
         "update_lock": update_lock,
     }
     if "gpu" in data:
@@ -218,22 +234,6 @@ def _add_nested_launch_support(mounts):
         mounts.append(Mount("waymo-cache", "bind", LIVE_GATE_CACHE_MOUNT, "read_only", AUTONOMY_CACHE))
     if LIVE_GATE_BWRAP not in inside_paths:
         mounts.append(Mount("live-gate-bwrap", "bind", LIVE_GATE_BWRAP, "read_only", Path("/usr/bin/bwrap")))
-
-
-def _mount_from_argv(role_prefix, mount):
-    if len(mount) == 2 and mount[0] == "--tmpfs":
-        return Mount(f"{role_prefix}:{mount[1]}", "tmpfs", mount[1], "writable")
-    flag, host, inside = mount
-    kind = "dev-bind" if flag == "--dev-bind" else "bind"
-    mode = "writable" if flag == "--bind" else "read_only"
-    return Mount(f"{role_prefix}:{inside}", kind, inside, mode, Path(host))
-
-
-def _mount_to_argv(mount):
-    if mount["kind"] == "tmpfs":
-        return ["--tmpfs", mount["inside_path"]]
-    flag = "--dev-bind" if mount["kind"] == "dev-bind" else "--bind" if mount["mode"] == "writable" else "--ro-bind"
-    return [flag, mount["host_path"], mount["inside_path"]]
 
 
 def parse(argv):

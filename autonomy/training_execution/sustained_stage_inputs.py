@@ -1,4 +1,4 @@
-"""Immutable per-stage command inputs, so old receipts remain replayable."""
+"""Immutable per-stage plan inputs."""
 import shutil
 from pathlib import Path
 from evidence.source_snapshot import file_sha256,require_regular_file
@@ -19,21 +19,23 @@ def freeze_inputs(source,destination):
   hashes[str(path)]=file_sha256(path)
  return destination,hashes
 
-def bind_stage_paths(arguments,source,frozen):
+def bind_stage_paths(inputs,source,frozen):
  """Redirect every template input alias to this stage's immutable snapshot."""
  source=Path(source);frozen=Path(frozen)
- return [str(frozen/Path(value).relative_to(source)) if Path(value).is_absolute() and Path(value).is_relative_to(source) else value for value in arguments]
+ return {
+  inside: frozen/Path(host).relative_to(source)
+  if Path(host).is_absolute() and Path(host).is_relative_to(source)
+  else Path(host)
+  for inside,host in dict(inputs).items()
+ }
 
-def split_stage_plan_inputs(arguments,source,frozen):
- """Convert legacy read-only stage bindings into launch-plan inputs."""
- bound=bind_stage_paths(arguments,source,frozen)
+def split_stage_plan_inputs(inputs,source,frozen):
+ """Split a stage input map into the source mount and named launch-plan inputs."""
+ bound=bind_stage_paths(inputs,source,frozen)
  source_mount=None
  named_inputs={}
- index=0
- while index<len(bound):
-  if index+2>=len(bound) or bound[index]!='--ro-bind':raise ValueError('declared read-only stage input required')
-  host=Path(bound[index+1]);inside=bound[index+2]
+ for inside,host in bound.items():
+  if not isinstance(inside,str) or not inside.startswith('/'):raise ValueError('declared stage input path required')
   if inside=='/source':source_mount=host
   else:named_inputs[inside]=host
-  index+=3
  return source_mount,named_inputs
