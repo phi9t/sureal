@@ -27,7 +27,9 @@ def recover_semantic_archive(record,*,cache,code_root,output,transfer_command=No
     staging_cache=Path(staging_cache) if staging_cache is not None else cache
     # Refuse the active queue before touching source metadata/output. The stage
     # later reacquires and holds exclusion through the actual offline consumer.
-    with staging_lease(staging_cache/'scientific-processing/cohort-queue.lock'):pass
+    # The shared cache's lock refuses a live cohort queue; the staging cache's
+    # lock is the one the stage itself holds.
+    with staging_lease(cache/'scientific-processing/cohort-queue.lock'),staging_lease(staging_cache/'scientific-processing/cohort-queue.lock'):pass
     validate_recovery_output(output)
     publication=Path(record['publication_manifest'])
     if sha(publication)!=record['publication_manifest_sha256']:

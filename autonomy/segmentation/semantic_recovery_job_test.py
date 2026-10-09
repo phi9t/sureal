@@ -48,7 +48,7 @@ class SemanticRecoveryJobGateTests(unittest.TestCase):
                  patch('segmentation.semantic_recovery_job.staged_derived_archive',side_effect=fake_staged):
                 with self.assertRaises(RuntimeError):
                     recover_semantic_archive(record,cache=cache,staging_cache=staging,code_root=root,output=root/'output')
-            self.assertFalse((cache/'scientific-processing/cohort-queue.lock').exists())
+            self.assertTrue((cache/'scientific-processing/cohort-queue.lock').exists())
             self.assertTrue((staging/'scientific-processing/cohort-queue.lock').exists())
 
     def test_queue_refused_before_output_or_source_access(self):
@@ -58,6 +58,17 @@ class SemanticRecoveryJobGateTests(unittest.TestCase):
             with staging_lease(working/'cohort-queue.lock'):
                 with self.assertRaises(ValueError):
                     recover_semantic_archive({},cache=cache,code_root=cache/'missing',output=output)
+            self.assertFalse(output.exists())
+
+    def test_live_shared_queue_refused_with_separate_staging_cache(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);cache=root/'cache';staging=root/'ticket-execution-cache'
+            (cache/'scientific-processing').mkdir(parents=True)
+            (staging/'scientific-processing').mkdir(parents=True)
+            output=root/'output'
+            with staging_lease(cache/'scientific-processing/cohort-queue.lock'):
+                with self.assertRaises(ValueError):
+                    recover_semantic_archive({},cache=cache,staging_cache=staging,code_root=root/'missing',output=output)
             self.assertFalse(output.exists())
 
 if __name__ == '__main__':
