@@ -212,6 +212,27 @@ def _command_env(command,name):
 def _plan_mounts(record):
  return {mount['inside_path']:mount for mount in record.get('mounts',[])}
 
+def driver_hashes_from_plan(plan):
+ return {str(mount.host_path):mount.digest for mount in plan.mounts if mount.role.startswith('gpu-driver:') and mount.digest is not None}
+
+def _plan_driver_hashes_by_name(record):
+ hashes={}
+ for mount in record.get('mounts',[]):
+  role=mount.get('role','')
+  if role.startswith('gpu-driver:') and 'digest' in mount:hashes[role.split(':',1)[1]]=mount['digest']
+ return hashes
+
+def _receipt_driver_hashes_by_name(driver_hashes):
+ hashes={}
+ for path,digest in driver_hashes.items():
+  name=Path(path).name
+  if name in hashes:raise ValueError('native GPU driver hash names must be unique')
+  hashes[name]=digest
+ return hashes
+
+def _driver_sha(path):
+ return sha(Path(path).resolve(strict=True))
+
 def write(path,value):
  path=Path(path);temporary=path.with_suffix(path.suffix+'.tmp')
  with temporary.open('w') as stream:json.dump(value,stream,indent=2);stream.write('\n');stream.flush();os.fsync(stream.fileno())
@@ -267,7 +288,7 @@ class NativeBackend:
   self.guard();actual_step=json.loads((directory/'check.json').read_text())['updates'] if worker=='train_sustained.py' else logical_step
   semantic=name if actual_step is None else name.rsplit('-',1)[0]+'-'+str(actual_step)
   stage_runtime=self.metric_runtime if metrics else self.runtime if gpu else self.cpu_runtime
-  receipt={'stage':semantic,'requested_stage':name,'command':command,'launch_plan':launch_record,'output_directory':str(directory),'exit_code':0,'source_hashes':self.pins,'runtime_lock':stage_runtime,'driver_hashes':{},'verifier_source_pins':self.verifier_pins if worker=='audit_sustained_transition.py' else {},'manifest_sha256':self.manifest_sha,'input_hashes':input_hashes,'artifacts':{str(p):sha(p) for p in directory.rglob('*') if p.is_file()},'scope':'source-frozen live checkpoint stage; full downstream admission required'};self.check_stage(receipt);write(receipt_path,receipt);print('ADMITTED',self.recipe,name,flush=True);return receipt_path
+  receipt={'stage':semantic,'requested_stage':name,'command':command,'launch_plan':launch_record,'output_directory':str(directory),'exit_code':0,'source_hashes':self.pins,'runtime_lock':stage_runtime,'driver_hashes':driver_hashes_from_plan(plan) if gpu else {},'verifier_source_pins':self.verifier_pins if worker=='audit_sustained_transition.py' else {},'manifest_sha256':self.manifest_sha,'input_hashes':input_hashes,'artifacts':{str(p):sha(p) for p in directory.rglob('*') if p.is_file()},'scope':'source-frozen live checkpoint stage; full downstream admission required'};self.check_stage(receipt);write(receipt_path,receipt);print('ADMITTED',self.recipe,name,flush=True);return receipt_path
  def check_stage(self,receipt,*,released_root=None):
   if type(receipt['exit_code']) is not int or receipt['exit_code']!=0 or receipt['manifest_sha256']!=self.manifest_sha or receipt['source_hashes']!=self.pins or not receipt['artifacts'] or not receipt['input_hashes']:raise ValueError('complete stage identity/input/output bindings required')
   stage=receipt['stage'].rsplit('-',1)[0];workers={'train':'train_sustained.py','audit':'audit_sustained_transition.py','literal-loss':'audit_sustained_loss.py','export':'prepare_sustained_v3.py','proposals':'audit_proposals_sustained_v3.py','score':'metrics_sustained_v3.py','metrics-audit':'audit_metrics_sustained_v3.py'}
@@ -280,11 +301,13 @@ class NativeBackend:
    if stage_lock is not None and plan.get('runtime')!={'lock_sha256':stage_lock.lock_sha256,'form':stage_lock.form}:raise ValueError('native launch plan runtime differs')
    if plan.get('command')!=['python',entry] or environment.get('SUREAL_SOURCE_SNAPSHOT_STORE')!='/tmp/source-snapshots' or environment.get('CUBLAS_WORKSPACE_CONFIG')!=':4096:8':raise ValueError('native launch plan worker/environment differs')
    if gpu:
-    if plan.get('gpu',{}).get('requested_index')!=self.gpu_index or receipt['driver_hashes']!={}:raise ValueError('native GPU launch plan differs')
-   elif 'gpu' in plan or receipt['driver_hashes']!={}:raise ValueError('native non-GPU launch plan differs')
+    if plan.get('gpu',{}).get('requested_index')!=self.gpu_index or not receipt['driver_hashes'] or _receipt_driver_hashes_by_name(receipt['driver_hashes'])!=_plan_driver_hashes_by_name(plan):raise ValueError('native GPU launch plan differs')
+   elif 'gpu' in plan or receipt['driver_hashes']!={} or _plan_driver_hashes_by_name(plan)!={}:raise ValueError('native non-GPU launch plan differs')
    for inside in ['/experiment','/outputs','/tmp/inputs','/tmp/native','/tmp/physical','/tmp/boxes','/tmp/runtime-lock.json','/tmp/scientific','/tmp/source-snapshots']:
     if inside not in mounts:raise ValueError('native launch plan mount missing: '+inside)
-  elif gpu and _legacy_root_mount(command)!=str(GPU_ROOT):raise ValueError('native GPU rootfs mount differs')
+  elif gpu:
+   if _legacy_root_mount(command)!=str(GPU_ROOT):raise ValueError('native GPU rootfs mount differs')
+   if not receipt['driver_hashes']:raise ValueError('native GPU driver hashes required')
   if _command_mount(command,'/experiment')!=str(self.package) or _command_mount(command,'/outputs')!=receipt['output_directory']:raise ValueError('native code/output mount differs')
   if _command_mount(command,'/tmp/source-snapshots')!=str(self.R/'source-snapshots') or _command_env(command,'SUREAL_SOURCE_SNAPSHOT_STORE')!='/tmp/source-snapshots':raise ValueError('source snapshot store mount differs')
   inputs=self.R/(receipt['requested_stage']+'-input')
@@ -293,7 +316,9 @@ class NativeBackend:
    for path,digest in receipt[group].items():
     if released_root is not None and Path(path).is_relative_to(released_root):continue
     value=Path(path)
-    if not value.is_file() or any(p.is_symlink() for p in [value,*value.parents]) or sha(value)!=digest:raise ValueError('stage evidence changed: '+path)
+    if not value.is_file() or group!='driver_hashes' and any(p.is_symlink() for p in [value,*value.parents]):raise ValueError('stage evidence changed: '+path)
+    actual=_driver_sha(value) if group=='driver_hashes' else sha(value)
+    if actual!=digest:raise ValueError('stage evidence changed: '+path)
  def train_and_admit(self,previous,target):
   previous_root=Path(previous['root']) if previous else None;previous_sha=previous['checkpoint_sha256'] if previous else None;start=previous['step'] if previous else 0
   write(self.source/'job.json',{'target_step':target,'retained_sha256':previous_sha});directory=self.output/f'update-{target:02d}';refs={}

@@ -448,6 +448,21 @@ class LaunchPlanTests(unittest.TestCase):
                 )
 
             data = plan_data(plan)
+            driver_hashes = {
+                name: file_sha256(driver_dir / name)
+                for name in (
+                    "libcuda.so",
+                    "libnvidia-ptxjitcompiler.so",
+                    "libnvidia-nvvm.so",
+                )
+            }
+            driver_mounts = {
+                mount["role"]: mount
+                for mount in data["mounts"]
+                if mount["role"].startswith("gpu-driver:")
+            }
+            for name, digest in driver_hashes.items():
+                self.assertEqual(driver_mounts[f"gpu-driver:{name}"]["digest"], digest)
             self.assertEqual(
                 data["devices"],
                 [
@@ -485,6 +500,24 @@ class LaunchPlanTests(unittest.TestCase):
             self.assertEqual(
                 record["gpu"],
                 {"requested_index": 1, "device_uuid": "GPU-fixture-1"},
+            )
+            record_driver_mounts = {
+                mount["role"]: mount
+                for mount in record["mounts"]
+                if mount["role"].startswith("gpu-driver:")
+            }
+            for name, digest in driver_hashes.items():
+                self.assertEqual(record_driver_mounts[f"gpu-driver:{name}"]["digest"], digest)
+            (driver_dir / "libcuda.so").write_text("swapped libcuda")
+            with self.assertRaisesRegex(PlanError, "gpu-driver:libcuda.so.*changed"):
+                render_plan(plan)
+            self.assertEqual(
+                {
+                    mount["role"]: mount["digest"]
+                    for mount in record_plan(plan)["mounts"]
+                    if mount["role"].startswith("gpu-driver:")
+                },
+                {f"gpu-driver:{name}": digest for name, digest in driver_hashes.items()},
             )
             raw_record = json.dumps(record, sort_keys=True)
             self.assertNotIn(str(devices), raw_record)

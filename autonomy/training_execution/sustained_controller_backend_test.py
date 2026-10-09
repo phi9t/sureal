@@ -117,6 +117,30 @@ class ControllerGuardTests(unittest.TestCase):
    self.assertEqual(record['gpu']['requested_index'],1)
    self.assertEqual(record['command'],['python','/experiment/training_execution/train_sustained.py'])
 
+ def test_gpu_stage_receipt_rechecks_driver_hashes_from_launch_plan(self):
+  with tempfile.TemporaryDirectory() as temp:
+   root=Path(temp);b=self.backend(root/'run',root/'checkout');b.gpu_index=1
+   runtime=RuntimeLock(root/'gpu-rootfs-v7',root/'gpu.lock',b.runtime,'recipe-digest','r'*64);runtime.rootfs.mkdir();b.runtime_lock=runtime
+   inputs=b.R/'train-1000-input';inputs.mkdir();manifest=inputs/'manifest.json';manifest.write_text('{}')
+   for name in ['native','physical','boxes','scientific']:
+    path=b.R/name;path.mkdir();setattr(b,name,path)
+   devices=root/'devices';drivers=root/'drivers';devices.mkdir();drivers.mkdir()
+   for name in ['nvidia1','nvidiactl','nvidia-uvm']:(devices/name).write_text(name)
+   for name in ['libcuda.so.fixture','libnvidia-ptxjitcompiler.so.fixture','libnvidia-nvvm.so.fixture']:(drivers/name).write_text(name)
+   env={'SUREAL_BAZEL_GPU_DEVICES':f"{devices/'nvidia1'}=/dev/nvidia1,{devices/'nvidiactl'}=/dev/nvidiactl,{devices/'nvidia-uvm'}=/dev/nvidia-uvm",'SUREAL_BAZEL_GPU_DRIVER_LIBRARY_DIRS':str(drivers),'SUREAL_BAZEL_GPU_DEVICE_UUIDS':'1=GPU-fixture-1'}
+   with patch.dict(os.environ,env,clear=False):
+    plan=sustained_controller_backend.build_sustained_stage_plan(runtime,package=b.package,stage_source=inputs,output=b.output,worker='train_sustained.py',native=b.native,physical=b.physical,boxes=b.boxes,runtime_lock_path=b.runtime_path,scientific_root=b.scientific,source_snapshot_store=b.R/'source-snapshots',gpu_index=1,source_snapshot_digest=b.pins['source_snapshot_sha256'])
+   command=sustained_controller_backend.render_plan(plan);launch_record=sustained_controller_backend.record_plan(plan)
+   driver_hashes={str(path):sha(path) for path in sorted(drivers.iterdir())}
+   artifact=b.output/'live.log';artifact.write_text('fixture')
+   receipt={'stage':'train-1000','requested_stage':'train-1000','exit_code':0,'manifest_sha256':b.manifest_sha,'source_hashes':b.pins,'runtime_lock':b.runtime,'driver_hashes':driver_hashes,'verifier_source_pins':{},'input_hashes':{str(manifest):sha(manifest)},'artifacts':{str(artifact):sha(artifact)},'output_directory':str(b.output),'command':command,'launch_plan':launch_record}
+
+   b.check_stage(receipt)
+   missing=copy.deepcopy(receipt);missing['driver_hashes']={}
+   with self.assertRaises(ValueError):b.check_stage(missing)
+   (drivers/'libcuda.so.fixture').write_text('swapped libcuda')
+   with self.assertRaises(ValueError):b.check_stage(receipt)
+
  def source_snapshot(self,root,names,store_root):
   archive,pins=archive_sources(root,names);digest=hashlib.sha256(archive).hexdigest();LocalSnapshotStore(store_root).store(digest,archive)
   return {'schema_version':1,'source_snapshot_sha256':digest,'source_snapshot_target':SNAPSHOT_TARGET,'source_snapshot_store':str(store_root),'source_pins':pins}
@@ -196,7 +220,7 @@ class ControllerGuardTests(unittest.TestCase):
    with self.assertRaises(ValueError):self.guard(b)
  def test_foreign_stage_runtime_worker_and_code_mount_refused(self):
   with tempfile.TemporaryDirectory() as temp:
-   b=self.backend(Path(temp));inputs=b.R/'train-1000-input';inputs.mkdir();manifest=inputs/'manifest.json';manifest.write_text('{}');artifact=b.output/'live.log';artifact.write_text('fixture');receipt={'stage':'train-1000','requested_stage':'train-1000','exit_code':0,'manifest_sha256':b.manifest_sha,'source_hashes':b.pins,'runtime_lock':b.runtime,'driver_hashes':{},'verifier_source_pins':{},'input_hashes':{str(manifest):sha(manifest)},'artifacts':{str(artifact):sha(artifact)},'output_directory':str(b.output),'command':['bwrap','--ro-bind',str(sustained_controller_backend.GPU_ROOT),'/','--ro-bind',str(b.package),'/experiment','--ro-bind',str(inputs),'/source','--ro-bind',str(inputs),'/tmp/inputs','--bind',str(b.output),'/outputs','--ro-bind',str(b.R/'source-snapshots'),'/tmp/source-snapshots','--setenv','SUREAL_SOURCE_SNAPSHOT_STORE','/tmp/source-snapshots','--','/experiment/training_execution/train_sustained.py']};b.check_stage(receipt)
+   b=self.backend(Path(temp));inputs=b.R/'train-1000-input';inputs.mkdir();manifest=inputs/'manifest.json';manifest.write_text('{}');artifact=b.output/'live.log';artifact.write_text('fixture');driver=b.R/'libcuda.so.fixture';driver.write_text('driver');receipt={'stage':'train-1000','requested_stage':'train-1000','exit_code':0,'manifest_sha256':b.manifest_sha,'source_hashes':b.pins,'runtime_lock':b.runtime,'driver_hashes':{str(driver):sha(driver)},'verifier_source_pins':{},'input_hashes':{str(manifest):sha(manifest)},'artifacts':{str(artifact):sha(artifact)},'output_directory':str(b.output),'command':['bwrap','--ro-bind',str(sustained_controller_backend.GPU_ROOT),'/','--ro-bind',str(b.package),'/experiment','--ro-bind',str(inputs),'/source','--ro-bind',str(inputs),'/tmp/inputs','--bind',str(b.output),'/outputs','--ro-bind',str(b.R/'source-snapshots'),'/tmp/source-snapshots','--setenv','SUREAL_SOURCE_SNAPSHOT_STORE','/tmp/source-snapshots','--','/experiment/training_execution/train_sustained.py']};b.check_stage(receipt)
    for fault in ['runtime','worker','mount','snapshot-store','empty-inputs','empty-artifacts']:
     bad=copy.deepcopy(receipt)
     if fault=='runtime':bad['runtime_lock']=b.metric_runtime

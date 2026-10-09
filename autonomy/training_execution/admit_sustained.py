@@ -15,7 +15,7 @@ from detection.sustained_contract import validate_contract
 from resources.sustained_scoring_budget import stage_timeout
 from training_execution.sustained_sources import cache_snapshot_for_runtime,snapshot_sources,validate_sources
 from training_execution.sustained_stage_inputs import freeze_inputs
-from training_execution.sustained_controller_backend import GPU_INDEX,build_sustained_stage_plan
+from training_execution.sustained_controller_backend import GPU_INDEX,build_sustained_stage_plan,driver_hashes_from_plan
 
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing'
 GPU_ROOT=current_gpu_rootfs(C);CPU_ROOT=current_cpu_rootfs(C);METRICS_ROOT=current_metrics_rootfs(C)
@@ -70,7 +70,7 @@ def main():
   if any(sha(path)!=digest for path,digest in input_hashes.items()):raise ValueError('immutable stage inputs changed')
   if sha(manifest_path)!=manifest_sha or unique_payload_bytes(W)>15*1024**3 or unique_payload_bytes(output)>2*1024**3:raise ValueError('manifest or storage admission violated')
   stage_runtime=metric_runtime if metrics else runtime if gpu else cpu_runtime
-  receipt={'stage':name,'command':command,'launch_plan':launch_record,'exit_code':0,'source_hashes':pins,'runtime_lock':stage_runtime,'driver_hashes':{},'manifest_sha256':manifest_sha,'expanded_closure_sha256':sha(closure),'historical_manifest_sha256':sha(historical),'input_hashes':input_hashes,'job_sha256':sha(stage_source/'job.json') if worker=='train_sustained.py' else None,'artifacts':{str(p):sha(p) for p in directory.rglob('*') if p.is_file()},'scope':'native engineering pilot only; sustained fitting/science/native APH pending'}
+  receipt={'stage':name,'command':command,'launch_plan':launch_record,'exit_code':0,'source_hashes':pins,'runtime_lock':stage_runtime,'driver_hashes':driver_hashes_from_plan(plan) if gpu else {},'manifest_sha256':manifest_sha,'expanded_closure_sha256':sha(closure),'historical_manifest_sha256':sha(historical),'input_hashes':input_hashes,'job_sha256':sha(stage_source/'job.json') if worker=='train_sustained.py' else None,'artifacts':{str(p):sha(p) for p in directory.rglob('*') if p.is_file()},'scope':'native engineering pilot only; sustained fitting/science/native APH pending'}
   receipt_path=R/(name+'-verified.json');receipt_path.write_text(json.dumps(receipt,indent=2)+'\n');receipts[name]={'path':str(receipt_path),'sha256':sha(receipt_path)};print('ADMITTED',name,flush=True)
  previous=None
  for step in [0,19,35]:

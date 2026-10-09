@@ -83,6 +83,7 @@ class Mount:
     mode: str
     host_path: Path | None = None
     phase: str = "before_devices"
+    digest: str | None = None
 
 
 @dataclass(frozen=True)
@@ -514,6 +515,8 @@ def _render_mount(mount: Mount) -> list[str]:
         return ["--tmpfs", mount.inside_path]
     if mount.host_path is None:
         raise PlanError(f"{mount.role}: host path required")
+    if mount.digest is not None and _mounted_file_sha256(mount.host_path, mount.role) != mount.digest:
+        raise PlanError(f"{mount.role}: mounted file changed")
     if mount.kind == "dev-bind":
         return ["--dev-bind", str(mount.host_path), mount.inside_path]
     if mount.kind != "bind":
@@ -533,6 +536,8 @@ def _mount_data(mount: Mount, *, include_host: bool) -> dict:
         "mode": mount.mode,
         "kind": mount.kind,
     }
+    if mount.digest is not None:
+        data["digest"] = mount.digest
     if include_host and mount.host_path is not None:
         data["host_path"] = str(Path(mount.host_path).resolve())
     return data
@@ -540,7 +545,9 @@ def _mount_data(mount: Mount, *, include_host: bool) -> dict:
 
 def _record_mount(plan: LaunchPlan, mount: Mount) -> dict:
     data = _mount_data(mount, include_host=False)
-    if mount.role == "runtime":
+    if mount.digest is not None:
+        data["digest"] = mount.digest
+    elif mount.role == "runtime":
         data["digest"] = plan.runtime.data.get("rootfs_sha256", "")
     elif mount.role == "code" and hasattr(plan, "_source_snapshot_digest"):
         data["digest"] = getattr(plan, "_source_snapshot_digest")
@@ -592,6 +599,7 @@ def _gpu_mounts_environment_and_request(gpu_index: int):
                 "/driver/" + path.name,
                 "read_only",
                 path,
+                digest=_mounted_file_sha256(path, f"gpu-driver:{path.name}"),
             )
         )
     for host, guest in _gpu_device_pairs(gpu_index):
@@ -697,6 +705,16 @@ def _gpu_driver_paths() -> list[Path]:
             raise PlanError(f"GPU driver library {prefix} not found in {searched}")
         found_paths.extend(found)
     return found_paths
+
+
+def _mounted_file_sha256(path: Path, role: str) -> str:
+    try:
+        resolved = Path(path).resolve(strict=True)
+    except FileNotFoundError as exc:
+        raise PlanError(f"{role}: mounted file missing: {path}") from exc
+    if not resolved.is_file():
+        raise PlanError(f"{role}: mounted file required: {path}")
+    return file_sha256(resolved)
 
 
 __all__ = [

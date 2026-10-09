@@ -45,3 +45,21 @@ Required gates:
 - GPU 1 became occupied after the smoke, so the CUDA gate waited and rechecked. It was free again at `2026-10-09T11:16:47Z` with memory used `4 MiB` and no compute app on the GPU 1 UUID.
 - `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...`: passed, 30/30 tests in 118.974s. The count increases from the ticket-12 launch-plan base of 29 because this ticket adds `//autonomy/training_execution:sustained_launch_plan_gpu_smoke_test`.
 - `git diff --check`: passed.
+
+### 2026-10-09 review fix evidence
+
+Coordinator review found that GPU driver pinning was weaker than the old sustained-run path. Fixed this at the launch-plan seam: GPU driver mounts now carry build-time file sha256 digests in the plan, `record_plan()` records those digests, and `render_plan()` refuses a plan if a pinned driver file changes before execution. Sustained admission and controller receipts copy those plan driver pins into `driver_hashes` as path-to-sha256 evidence for GPU stages; non-GPU stages keep `{}`. `check_stage()` now requires non-empty GPU `driver_hashes`, checks that they equal the recorded GPU driver mount digests by mounted driver filename, and re-verifies the driver files from the receipt paths.
+
+Added red/green coverage:
+
+- `autonomy.insula.launch_plan_test.LaunchPlanTests.test_gpu_plan_uses_requested_device_only_and_records_uuid_not_paths`: initially failed because GPU driver mounts had no plan digest; now passes and also proves `render_plan()` rejects a changed driver file.
+- `autonomy.training_execution.sustained_controller_backend_test.ControllerGuardTests.test_gpu_stage_receipt_rechecks_driver_hashes_from_launch_plan`: initially failed because non-empty `driver_hashes` were rejected; now passes and proves a changed driver file fails `check_stage()`.
+
+The `/tmp` render-ordering change remains scoped to plans with before-device mounts under `/tmp/*`. I checked the non-sustained launch-plan callers by scanning `build_plan` uses and rerunning their Bazel coverage in the full CPU gate (`//autonomy/...`), including dataset, camera, geometry, inspection, segmentation, evaluation and Insula launch tests. Plans without `/tmp/*` named inputs render the same relative non-`/tmp` mount order; plans with `/tmp/*` now render the `/tmp` tmpfs first so bwrap can create those mountpoints. `allow_readonly_inputs_cover_output=True` is still limited to sustained stages: it permits the old-command-equivalent read-only `/tmp/scientific` mount over the scientific-processing root while stage outputs remain writable descendants under that same tree.
+
+Review-fix verification:
+
+- `PYTHONPATH=autonomy python3 -m unittest autonomy.insula.launch_plan_test autonomy.training_execution.sustained_controller_backend_test autonomy.training_execution.sustained_launch_plan_test autonomy.training_execution.run_sustained_test`: passed, 43 tests.
+- `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...`: passed, 185/185 tests.
+- `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //parallax/...`: passed, 17/17 tests.
+- CUDA smoke and full CUDA gate were deferred on this review-fix rerun because GPU 1 stayed occupied for the full one-hour wait. Checks at `2026-10-09T11:40:45Z`, `11:50:45Z`, `12:00:45Z`, `12:10:46Z`, `12:20:47Z` and `12:30:48Z` all listed GPU 1 UUID `GPU-eaed2f0d-2541-8ca8-b6c4-3e2e45e86619` in `nvidia-smi --query-compute-apps=gpu_uuid --format=csv,noheader`; memory went from `175859 MiB` down to `26 MiB`, but the UUID remained present in compute apps.
