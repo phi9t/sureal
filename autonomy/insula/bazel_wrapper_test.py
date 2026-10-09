@@ -405,6 +405,7 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
                 extra_env={
                     "SUREAL_BAZEL_GPU_DEVICES": ",".join(device_pairs),
                     "SUREAL_BAZEL_GPU_DRIVER_LIBRARY_DIRS": str(driver_dir),
+                    "SUREAL_BAZEL_GPU_DEVICE_UUIDS": "1=GPU-fixture-1",
                 },
             )
 
@@ -421,10 +422,27 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
             )
             self.assertIn("--output_base=/tmp/bazel-cache/output-base-gpu", plan["bazel"])
             self.assertIn("--config=cuda", plan["bazel"])
+            self.assertIn(
+                "--test_env=SUREAL_BAZEL_GPU_DEVICE_UUIDS=1=GPU-fixture-1",
+                plan["bazel"],
+            )
+            self.assertIn(
+                ["--ro-bind", str(waymo_rootfs.parents[1].resolve()), LIVE_GATE_CACHE_MOUNT],
+                plan["mounts"],
+            )
+            gpu_live_root = f"{LIVE_GATE_CACHE_MOUNT}/{gpu_rootfs.name}"
+            self.assertIn(f"--test_env=WAYMO_GPU_INSULA_ROOT={gpu_live_root}", plan["bazel"])
+            self.assertIn(f"--test_env=WAYMO_GPU_INSULA_LOCK={gpu_live_root}.lock.json", plan["bazel"])
+            self.assertIn(f"--test_env=SUREAL_LIVE_GATE_BWRAP={LIVE_GATE_BWRAP}", plan["bazel"])
             self.assertIn(["--tmpfs", "/driver"], plan["mounts"])
             for pair in device_pairs:
                 host, guest = pair.split("=", 1)
                 self.assertIn(["--dev-bind", host, guest], plan["mounts"])
+            self.assertNotIn("/dev/nvidia0", json.dumps(plan, sort_keys=True))
+            self.assertEqual(
+                plan["gpu"],
+                {"requested_index": 1, "device_uuid": "GPU-fixture-1"},
+            )
             self.assertIn(
                 ["--ro-bind", str((driver_dir / "libcuda.so").resolve()), "/driver/libcuda.so"],
                 plan["mounts"],

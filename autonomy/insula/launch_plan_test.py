@@ -1,4 +1,5 @@
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -16,7 +17,11 @@ from insula.launch_plan import (
     render_plan,
 )
 from insula.runtime_identity import rootfs_identity
-from insula.runtime_roots import CURRENT_CPU_ROOTFS_NAME, CURRENT_MOTION_CLI_ROOTFS_NAME
+from insula.runtime_roots import (
+    CURRENT_CPU_ROOTFS_NAME,
+    CURRENT_GPU_ROOTFS_NAME,
+    CURRENT_MOTION_CLI_ROOTFS_NAME,
+)
 
 
 AUTONOMY = Path(__file__).resolve().parents[1]
@@ -40,6 +45,20 @@ def write_cpu_recipe_lock(path: Path, rootfs: Path, **overrides):
         "test_tools_requirements_sha256": file_sha256(
             AUTONOMY / "insula/cpu-test-tools-requirements.lock"
         ),
+        "bazel_version": BAZEL_VERSION,
+        "bazel_linux_x86_64_sha256": BAZEL_LINUX_X86_64_SHA256,
+    }
+    lock.update(overrides)
+    path.write_text(json.dumps(lock, indent=2) + "\n")
+    return lock
+
+
+def write_gpu_recipe_lock(path: Path, rootfs: Path, **overrides):
+    lock = {
+        "schema_version": 1,
+        "rootfs_sha256": rootfs_identity(rootfs),
+        "dockerfile_sha256": file_sha256(AUTONOMY / "insula/Dockerfile.gpu-bazel-rootfs-v6"),
+        "requirements_sha256": file_sha256(AUTONOMY / "insula/gpu-requirements.lock"),
         "bazel_version": BAZEL_VERSION,
         "bazel_linux_x86_64_sha256": BAZEL_LINUX_X86_64_SHA256,
     }
@@ -292,6 +311,90 @@ class LaunchPlanTests(unittest.TestCase):
                     extra_environment={"PATH": "/tmp/bin"},
                     command=["true"],
                 )
+
+    def test_gpu_plan_uses_requested_device_only_and_records_uuid_not_paths(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            rootfs = root / CURRENT_GPU_ROOTFS_NAME
+            write_rootfs(rootfs)
+            lock = rootfs.with_name(rootfs.name + ".lock.json")
+            write_gpu_recipe_lock(lock, rootfs)
+            runtime = load_runtime_lock(rootfs, lock)
+
+            code = root / "code"
+            output = root / "output"
+            devices = root / "devices"
+            driver_dir = root / "driver-libs"
+            for path in (code, output, devices, driver_dir):
+                path.mkdir()
+            device_pairs = []
+            for guest in ("/dev/nvidia1", "/dev/nvidiactl", "/dev/nvidia-uvm"):
+                host = devices / Path(guest).name
+                host.write_text("")
+                device_pairs.append(f"{host}={guest}")
+            for name in (
+                "libcuda.so",
+                "libnvidia-ptxjitcompiler.so",
+                "libnvidia-nvvm.so",
+            ):
+                (driver_dir / name).write_text(name)
+
+            environment = {
+                "SUREAL_BAZEL_GPU_DEVICES": ",".join(device_pairs),
+                "SUREAL_BAZEL_GPU_DRIVER_LIBRARY_DIRS": str(driver_dir),
+                "SUREAL_BAZEL_GPU_DEVICE_UUIDS": "1=GPU-fixture-1",
+            }
+            with patch.dict(os.environ, environment, clear=False):
+                plan = build_plan(
+                    runtime,
+                    code=code,
+                    output=output,
+                    gpu_index=1,
+                    command=["python", "-c", "pass"],
+                )
+
+            data = plan_data(plan)
+            self.assertEqual(
+                data["devices"],
+                [
+                    {
+                        "role": "gpu-device:/dev/nvidia1",
+                        "host_path": str((devices / "nvidia1").resolve()),
+                        "inside_path": "/dev/nvidia1",
+                        "mode": "writable",
+                        "kind": "dev-bind",
+                    },
+                    {
+                        "role": "gpu-device:/dev/nvidiactl",
+                        "host_path": str((devices / "nvidiactl").resolve()),
+                        "inside_path": "/dev/nvidiactl",
+                        "mode": "writable",
+                        "kind": "dev-bind",
+                    },
+                    {
+                        "role": "gpu-device:/dev/nvidia-uvm",
+                        "host_path": str((devices / "nvidia-uvm").resolve()),
+                        "inside_path": "/dev/nvidia-uvm",
+                        "mode": "writable",
+                        "kind": "dev-bind",
+                    },
+                ],
+            )
+            self.assertNotIn("/dev/nvidia0", json.dumps(data, sort_keys=True))
+            self.assertIn(["--setenv", "CUDA_VISIBLE_DEVICES", "0"], data["environment"])
+            self.assertEqual(
+                data["gpu"],
+                {"requested_index": 1, "device_uuid": "GPU-fixture-1"},
+            )
+
+            record = record_plan(plan)
+            self.assertEqual(
+                record["gpu"],
+                {"requested_index": 1, "device_uuid": "GPU-fixture-1"},
+            )
+            raw_record = json.dumps(record, sort_keys=True)
+            self.assertNotIn(str(devices), raw_record)
+            self.assertNotIn("/dev/nvidia", raw_record)
 
 
 if __name__ == "__main__":
