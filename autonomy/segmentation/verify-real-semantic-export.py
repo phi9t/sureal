@@ -29,7 +29,7 @@ def main():
     cpu=cache/'insula/rootfs-v2';metrics=current_metrics_rootfs(cache)
     cpulock=json.loads(Path(str(cpu)+'.lock.json').read_text());metriclock=json.loads(Path(str(metrics)+'.lock.json').read_text())
     verify_rootfs(cpu,cpulock['rootfs_sha256']);verify_rootfs(metrics,metriclock['rootfs_sha256'])
-    candidates=['segmentation/verify-real-semantic-export.py','segmentation/prepare-real-semantics.py','segmentation/segmentation_export.py','segmentation/validate-real-semantic-wire.py']
+    candidates=['segmentation/verify-real-semantic-export.py','segmentation/prepare-real-semantics.py','segmentation/segmentation_export.py','segmentation/validate-real-semantic-wire.py','segmentation/strict_metric_reader.py']
     hashes={name:sha(HERE/name) for name in candidates};checks=[];started=datetime.now(timezone.utc).isoformat();begin=time.monotonic()
     stages=[('prepare',cpu,geometry,prepared,['python','/experiment/segmentation/prepare-real-semantics.py']),
             ('export',metrics,prepared,scored,['python','-m','segmentation.segmentation_export','/source/real-semantics.json','/outputs/real-semantics.bin']),

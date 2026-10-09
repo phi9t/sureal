@@ -1,6 +1,7 @@
 """Independently decode native semantic export and compare ordered vectors."""
 import ast,json,re,subprocess,zlib
 from pathlib import Path
+from segmentation.strict_metric_reader import require_perfect_self_score
 
 out=Path('/outputs');original=json.loads(Path('/source/real-semantics.json').read_text())
 def decode(message,proto,payload):
@@ -27,6 +28,7 @@ for escaped,values in zip(payloads,[r for frame in original for r in frame['retu
     points+=len(actual)
 result=subprocess.run(['/metrics-build/compute_segmentation_metrics','/outputs/real-semantics.bin','/outputs/real-semantics.bin'],capture_output=True,text=True)
 (out/'native-self-score.stdout').write_text(result.stdout);(out/'native-self-score.stderr').write_text(result.stderr)
-assert result.returncode==0 and not result.stderr and 'miou=1\n' in result.stdout
+assert result.returncode==0 and not result.stderr
+require_perfect_self_score(result.stdout)
 (out/'wire-validation.json').write_text(json.dumps({'frames':60,'returns':120,'ordered_points':points,'result':'decoded frame identities and semantic vectors match source; native self-score mIoU 1','scope':'evaluation-only label replay, no model inference'},indent=2)+'\n')
 print('PASS independent semantic wire decode',points,'points')

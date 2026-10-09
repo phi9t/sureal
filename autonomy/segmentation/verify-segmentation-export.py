@@ -8,6 +8,7 @@ from evidence.source_snapshot import file_sha256 as sha, require_regular_file
 from insula.runtime_identity import verify_rootfs
 from insula.entry import launch_plan
 from insula.runtime_roots import current_metrics_rootfs
+from segmentation.strict_metric_reader import require_perfect_self_score
 
 HERE=Path(__file__).resolve().parents[1]
 
@@ -36,9 +37,12 @@ def main():
             plan=launch_plan(root,HERE,source,out,command);r=subprocess.run(plan,capture_output=True,text=True)
             (out/(name+'.stdout')).write_text(r.stdout);(out/(name+'.stderr')).write_text(r.stderr)
             assert r.returncode==0,r.stderr
-            if name=='native-score':assert 'miou=1\n' in r.stdout and not r.stderr
+            if name=='native-score':
+                assert not r.stderr
+                require_perfect_self_score(r.stdout)
             checks.append({'name':name,'command':plan,'exit_code':r.returncode})
-    receipt={'stage':'structured-segmentation-export','runtime_lock':lock,'checks':checks,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'candidate_hashes':{str(p.relative_to(HERE)):sha(p) for p in [Path(__file__),HERE/'segmentation/segmentation_export.py',HERE/'segmentation/segmentation_export_test.py']},'artifacts':artifact_hashes(out),'scope':'structured exporter analytic integration; real-source identity and export checks pending'}
+    candidates=[Path(__file__),HERE/'segmentation/segmentation_export.py',HERE/'segmentation/segmentation_export_test.py',HERE/'segmentation/strict_metric_reader.py']
+    receipt={'stage':'structured-segmentation-export','runtime_lock':lock,'checks':checks,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'candidate_hashes':{str(p.relative_to(HERE)):sha(p) for p in candidates},'artifacts':artifact_hashes(out),'scope':'structured exporter analytic integration; real-source identity and export checks pending'}
     (out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print('PASS live semantic exporter integration')
 
 if __name__=='__main__':main()

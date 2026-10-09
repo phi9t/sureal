@@ -32,7 +32,8 @@ def main():
     for record in records:
         assert record['classes']==22 and record['exit_code']==0
         assert abs(record['observed_miou']-expected[record['fixture']])<1e-6
-    receipt={'stage':'native-segmentation-contract','command':command,'exit_code':r.returncode,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-begin,'runtime_lock':lock,'candidate_hashes':{str(p.relative_to(HERE)):sha(p) for p in [Path(__file__),HERE/'segmentation/segmentation-contract-fixtures.py']},'artifacts':artifact_hashes(out),'scope':'native semantic protobuf/zlib export fixtures; real source export adapter not yet verified'}
+    candidates=[Path(__file__),HERE/'segmentation/segmentation-contract-fixtures.py',HERE/'segmentation/strict_metric_reader.py']
+    receipt={'stage':'native-segmentation-contract','command':command,'exit_code':r.returncode,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-begin,'runtime_lock':lock,'candidate_hashes':{str(p.relative_to(HERE)):sha(p) for p in candidates},'artifacts':artifact_hashes(out),'scope':'native semantic protobuf/zlib export fixtures; real source export adapter not yet verified'}
     (out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print('PASS native segmentation fixtures and independent manifest reconciliation')
 
 if __name__=='__main__':main()

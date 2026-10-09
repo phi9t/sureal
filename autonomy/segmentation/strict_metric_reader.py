@@ -82,3 +82,11 @@ def parse_result(stdout, expected_classes=EXPECTED_CLASSES):
         raise ValueError('missing segmentation miou')
     return {'frames':frames,'examples_processed':[index for index,_ in processed],
             'classes':classes,'miou':miou}
+
+def require_perfect_self_score(stdout, expected_classes=EXPECTED_CLASSES):
+    parsed=parse_result(stdout,expected_classes)
+    if abs(parsed['miou']-1.0)>1e-6:
+        raise ValueError('segmentation self-score miou is not one')
+    if any(abs(value-1.0)>1e-6 for value in parsed['classes'].values()):
+        raise ValueError('segmentation self-score class metric is not one')
+    return parsed
