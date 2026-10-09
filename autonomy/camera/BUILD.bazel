@@ -37,6 +37,7 @@ py_library(
     imports = [".."],
     visibility = CAMERA_VISIBILITY,
     deps = [
+        "//autonomy/blob_store:blob_store",
         "//autonomy/dataset:dataset",
         "//autonomy/evidence:evidence",
         "//autonomy/insula:insula",

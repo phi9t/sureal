@@ -39,6 +39,7 @@ py_library(
     imports = [".."],
     visibility = GEOMETRY_VISIBILITY,
     deps = [
+        "//autonomy/blob_store:blob_store",
         "//autonomy/dataset:dataset",
         "//autonomy/evidence:evidence",
     ],

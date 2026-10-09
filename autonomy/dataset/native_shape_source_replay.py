@@ -46,7 +46,8 @@ def replay_shape_source(job_path,source_receipt,*,expected_job_sha256,
                'insula/entry.py','insula/runtime_identity.py']
         pins={n:sha(code_root/n) for n in names}
         transfer_prefix=transfer_command if transfer_command is not None else [
-            sys.executable,str(code_root/'geometry/native_shape_transfer.py'),'--timeout-seconds','600']
+            sys.executable,str(code_root/'geometry/native_shape_transfer.py'),
+            '--expected-sha256',source['sha256'],'--timeout-seconds','600']
         with staged_source(source,cache,retained_bytes=retained_bytes,
                 limit_bytes=limit_bytes,transfer_command=transfer_prefix) as (staged,transfer):
             output.mkdir(parents=True,exist_ok=False);inputs=output/'input';inputs.mkdir()
