@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import stat
 import subprocess
 from dataclasses import dataclass
@@ -48,6 +49,12 @@ _GPU_DRIVER_PREFIXES = (
     "libnvidia-ptxjitcompiler.so",
     "libnvidia-nvvm.so",
 )
+_GPU_CONTROL_DEVICES = {
+    "/dev/nvidiactl",
+    "/dev/nvidia-uvm",
+    "/dev/nvidia-uvm-tools",
+    "/dev/nvidia-modeset",
+}
 _DEFAULT_GPU_DRIVER_LIBRARY_DIRS = (Path("/usr/lib/x86_64-linux-gnu"),)
 
 
@@ -559,6 +566,8 @@ def _gpu_device_pairs(gpu_index: int) -> list[tuple[Path, str]]:
                 host, guest = item.split("=", 1)
             else:
                 host = guest = item
+            _validate_gpu_device_override_path(item, host, gpu_index, side="host")
+            _validate_gpu_device_override_path(item, guest, gpu_index, side="guest")
             pairs.append((Path(host), guest))
     else:
         pairs = [
@@ -570,6 +579,25 @@ def _gpu_device_pairs(gpu_index: int) -> list[tuple[Path, str]]:
         if not host.exists():
             raise PlanError(f"GPU device not found: {host}")
     return pairs
+
+
+def _validate_gpu_device_override_path(
+    entry: str,
+    path: str,
+    gpu_index: int,
+    *,
+    side: str,
+) -> None:
+    requested_gpu = f"/dev/nvidia{gpu_index}"
+    if path == requested_gpu or path in _GPU_CONTROL_DEVICES:
+        return
+    if re.fullmatch(r"/dev/nvidia\d+", path):
+        raise PlanError(
+            f"{entry}: GPU override {side} path {path} does not match requested {requested_gpu}"
+        )
+    if side == "guest" or path.startswith("/dev/nvidia"):
+        allowed = ", ".join(sorted([requested_gpu, *_GPU_CONTROL_DEVICES]))
+        raise PlanError(f"{entry}: GPU override {side} path {path} is not allowed; expected {allowed}")
 
 
 def _gpu_device_uuid(gpu_index: int) -> str:

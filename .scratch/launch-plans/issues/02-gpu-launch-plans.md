@@ -30,3 +30,16 @@ Verification run from this worker worktree, with logs under `/data02/home/philip
 - Default CPU suite: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...`: passed, 169/169 tests. Ticket baseline was 168; new count is 169.
 - Parallax suite: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //parallax/...`: passed, 17/17 tests.
 - CUDA suite on GPU 1 only: `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...`: passed, 29/29 tests including `//autonomy/insula:launch_plan_gpu_live_test`. GPU 1 was checked before the full CUDA run at `4 MiB / 183359 MiB, 0%` and after the run at `4 MiB / 183359 MiB, 0%`.
+
+### 2026-10-09 coordinator review fix evidence
+
+Fixed the reviewed safety issue where `SUREAL_BAZEL_GPU_DEVICES` could override a GPU 1 plan with a different `/dev/nvidiaN` node. Override entries now reject any host or guest path that names a per-GPU node other than the requested index, allow only the requested per-GPU node plus NVIDIA control/UVM/modeset nodes as inside device paths, and still allow remapped host paths for tests and nonstandard host layouts.
+
+Verification run from this worker worktree, with logs under `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/claude-worker-runs/workers/lp02-gpu-plans-20261009T010151Z/tmp`:
+
+- Red/green focused test: `PYTHONPATH=autonomy python3 -m unittest autonomy.insula.launch_plan_test.LaunchPlanTests.test_gpu_device_override_rejects_different_gpu_index autonomy.insula.launch_plan_test.LaunchPlanTests.test_gpu_device_override_accepts_remapped_host_paths_for_requested_index` failed first because host and guest `/dev/nvidia0` overrides were accepted for a GPU 1 plan, then passed after the validation fix.
+- Focused Python coverage: `PYTHONPATH=autonomy python3 -m unittest autonomy.insula.launch_plan_test autonomy.insula.bazel_wrapper_test autonomy.insula.gpu_verifier_plan_test`: passed, 24/24 tests.
+- Focused Bazel coverage: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/insula:launch_plan_test //autonomy/insula:bazel_wrapper_test //autonomy/insula:gpu_verifier_plan_test`: passed, 3/3 tests.
+- Default CPU suite: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...`: passed, 169/169 tests.
+- Parallax suite: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //parallax/...`: passed, 17/17 tests.
+- CUDA suite on GPU 1 only: `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...`: passed, 29/29 tests including `//autonomy/insula:launch_plan_gpu_live_test`. GPU 1 was checked before the run at `4 MiB / 183359 MiB, 0%` and after the run at `4 MiB / 183359 MiB, 0%`.
