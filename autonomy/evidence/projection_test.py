@@ -1,5 +1,5 @@
 import unittest
-from evidence.projection import project_experiments
+from evidence.projection import project_experiments, quality
 class ProjectionTests(unittest.TestCase):
  def run_case(self):
   point={'step':500,'LEVEL2_per_class':{str(i):{'AP':.9,'APH':.9} for i in range(1,5)},'all_class_quality_passed':True}
@@ -41,12 +41,23 @@ class ProjectionTests(unittest.TestCase):
   row=project_experiments('run',definitions,result,'a',None,None)[0]
   self.assertEqual(set(row['terminal_LEVEL2_per_class']),{'1','2','3'})
   self.assertEqual(row['worst_terminal_APH'],.6)
- def test_summary_only_populated_score_record_uses_native_keys(self):
+ def test_populated_class_score_record_displays_without_passing_quality(self):
   definitions={'baseline':{'architecture':'baseline'}}
-  point={'step':500,'LEVEL2_per_class':{'1':{'AP':.9,'APH':.8},'2':{'AP':.9,'APH':.7},'3':{'AP':.9,'APH':.6}}}
+  point={'step':500,
+         'groundtruth_by_class':{'1':3,'2':3,'3':11,'4':0},
+         'LEVEL2_per_class':{'1':{'AP':.9,'APH':.81},'2':{'AP':.9,'APH':.82},'3':{'AP':.9,'APH':.83}}}
   result={'_run_metadata':{'matrix':definitions},'cases':{'baseline':{'status':'training in progress','curve':[point]}}}
   row=project_experiments('run',definitions,result,'a',None,None)[0]
   self.assertEqual(set(row['terminal_LEVEL2_per_class']),{'1','2','3'})
+  self.assertEqual(row['worst_terminal_APH'],.81)
+  self.assertFalse(quality(point))
+  overfit={'_run_metadata':{'matrix':definitions},'cases':{'baseline':{'status':'sustained native overfit','updates':750,'curve':[point,{**point,'step':750}]}}}
+  with self.assertRaises(ValueError):project_experiments('run',definitions,overfit,'a',None,None)
+ def test_three_class_score_record_without_class_source_is_refused(self):
+  definitions={'baseline':{'architecture':'baseline'}}
+  point={'step':500,'LEVEL2_per_class':{'1':{'AP':.9,'APH':.8},'2':{'AP':.9,'APH':.7},'3':{'AP':.9,'APH':.6}}}
+  result={'_run_metadata':{'matrix':definitions},'cases':{'baseline':{'status':'training in progress','curve':[point]}}}
+  with self.assertRaises(ValueError):project_experiments('run',definitions,result,'a',None,None)
  def test_all_class_quality_points_still_require_all_classes(self):
   definitions={'baseline':{'architecture':'baseline'}}
   point={'step':500,'all_class_quality_passed':False,'LEVEL2_per_class':{'1':{'AP':.9,'APH':.8},'2':{'AP':.9,'APH':.7},'3':{'AP':.9,'APH':.6}}}

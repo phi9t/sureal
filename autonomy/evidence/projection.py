@@ -10,18 +10,13 @@ def score_record_classes(point):
    return populated_level2_classes(source)
  if isinstance(point,dict) and point.get('all_class_quality_passed') is not None:
   return LEVEL2_CLASS_KEYS
- record=point.get('LEVEL2_per_class') if isinstance(point,dict) else None
- if isinstance(record,dict):
-  keys=tuple(key for key in LEVEL2_CLASS_KEYS if key in record)
-  if keys and set(record)==set(keys):
-   return keys
  return LEVEL2_CLASS_KEYS
 def score_record(point):
  if 'LEVEL2_per_class' not in point:return None
  return read_level2_per_class(point['LEVEL2_per_class'],classes=score_record_classes(point))
 def quality(point):
  values=score_record(point)
- return values is not None and all(v['APH']>=.8 for v in values.values())
+ return values is not None and set(values)==set(LEVEL2_CLASS_KEYS) and all(v['APH']>=.8 for v in values.values())
 def project_experiments(run_id,recipes,result,result_sha256,closure,admission):
  result=result or {'cases':{}}
  if set(result['cases'])-set(recipes):raise ValueError('result contains unknown experiment recipes')

@@ -124,14 +124,18 @@ class StrictMetricReplayTests(unittest.TestCase):
             result={'cases':{'baseline':{'status':'training in progress','curve':[{
                 'step':1,
                 'LEVEL2_per_class':{'1':{'APH':.9},'2':{'APH':.9},'3':{'APH':.9},'4':{'APH':.9}},
+            },{
+                'step':2,
+                'LEVEL2_per_class':{'1':{'AP':.9,'APH':.9},'2':{'AP':.9,'APH':.9},'3':{'AP':.9,'APH':.9}},
             }]}}}
             (research/'experiment-registry.json').write_text(json.dumps({'runs':[{'id':'run','results':'research/result.json','closure':'research/missing.json','recipes':{'baseline':{}}}]}))
             (research/'result.json').write_text(json.dumps(result))
 
             report=score_record_replay_roots([research],root_labels=['autonomy/research'],repo=repo)
 
-            self.assertEqual(report['consumers']['evidence_projection']['rejected'],1)
+            self.assertEqual(report['consumers']['evidence_projection']['rejected'],2)
             self.assertEqual(report['rejections'][0]['consumer'],'evidence_projection')
             self.assertEqual(report['rejections'][0]['path'],'autonomy/research/result.json')
+            self.assertEqual(report['rejections'][1]['classes'],['1','2','3','4'])
 
 if __name__=='__main__':unittest.main()

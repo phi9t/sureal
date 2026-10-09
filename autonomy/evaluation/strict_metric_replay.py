@@ -145,7 +145,7 @@ def _score_consumer_template():
             'records':0,'accepted':0,'rejected':0,
         },
         'evidence_projection':{
-            'class_rule':'classes with positive groundtruth_by_class when present; otherwise all-class points require 1, 2, 3, 4 and summary-only points use their retained key set',
+            'class_rule':'classes with positive groundtruth_by_class when present; otherwise all points require native LEVEL_2 classes 1, 2, 3, 4',
             'records':0,'accepted':0,'rejected':0,
         },
         'fixed_batch_verifier':{
@@ -427,7 +427,8 @@ def score_record_markdown_report(report):
         '## Compatibility Decision',
         '',
         '- Sustained admission, sustained contract and fixed-batch verifier require all four native LEVEL_2 classes because their retained inputs are all-class gates.',
-        '- Evidence projection accepts populated-class records only when the consumer context names that populated set via `groundtruth_by_class`; all-class gate points still require all four classes.',
+        '- Evidence projection accepts populated-class records only when the consumer context names that populated set via `groundtruth_by_class`; otherwise records require all four classes.',
+        '- Projection quality remains the all-four acceptance rule: populated-class records can populate display fields, but cannot satisfy overfit quality.',
         '- Old mis-keyed range entries under `metrics` are tolerated here only because these migrated readers read `LEVEL2_per_class`, not the historical range rows.',
         '- The odd retained records above are not consumed by any migrated reader, so the score-record reader was not loosened for them.',
     ])
