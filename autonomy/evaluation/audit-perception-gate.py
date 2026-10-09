@@ -6,7 +6,8 @@ from pathlib import Path
 import subprocess,sys,time
 HERE=Path(__file__).resolve().parents[1]
 from evidence.source_snapshot import file_sha256 as sha
-from evaluation.launches import build_evaluation_plan, load_current_cpu_runtime, load_current_metrics_runtime, plan_receipt, run_evaluation_plan
+from insula.launch_plan import build_plan, load_default_runtime_lock, record_plan, run_plan
+from insula.runtime_roots import current_cpu_rootfs, current_metrics_rootfs
 
 def main():
     cache=Path.home()/'.cache/waystone/waymo-perception';out=Path(sys.argv[1]).resolve();out.mkdir(parents=True,exist_ok=False)
@@ -25,7 +26,7 @@ def main():
             checker={'real-camera-source-check-a':'camera/validate-real-camera-source.py','real-box-source-check-a':'evaluation/validate-real-box-source.py'}[name]
             assert sha(HERE/checker)==record['checker_sha256']
         receipts[name]={'receipt_sha256':sha(folder/'receipt.json'),'path':str(folder/'receipt.json')}
-    cpu_runtime=load_current_cpu_runtime(cache);metrics_runtime=load_current_metrics_runtime(cache)
+    cpu_runtime=load_default_runtime_lock(current_cpu_rootfs(cache));metrics_runtime=load_default_runtime_lock(current_metrics_rootfs(cache))
     cpulock=cpu_runtime.data;metriclock=metrics_runtime.data
     contracts=json.loads((HERE/'evaluation/contracts.json').read_text());source=cache/'metrics-source/src/waymo_open_dataset'
     assert subprocess.check_output(['git','-C',str(cache/'metrics-source'),'rev-parse','FETCH_HEAD'],text=True).strip()==contracts['upstream_commit']
@@ -37,9 +38,9 @@ def main():
     commands=[('current-boundaries',cpu_runtime,['python','/experiment/evaluation/evaluator-unit-checks.py']),
               ('native-runtime-closure',metrics_runtime,['python','-c','import importlib.util,subprocess; assert importlib.util.find_spec("tensorflow") is None;\nfor name in ["compute_detection_metrics","compute_segmentation_metrics"]:\n data=subprocess.check_output(["ldd","/metrics-build/"+name],text=True); assert "not found" not in data and "tensorflow" not in data.lower(); print(name,data)'])]
     for name,runtime,command in commands:
-        plan=build_evaluation_plan(runtime,code=HERE,source=cache/'insula/m0-live-20260930-c/input',output=out,command=command);result=run_evaluation_plan(plan,capture_output=True,text=True)
+        plan=build_plan(runtime,code=HERE,source=cache/'insula/m0-live-20260930-c/input',output=out,command=command);result=run_plan(plan,capture_output=True,text=True)
         (out/(name+'.log')).write_text(result.stdout+result.stderr);assert result.returncode==0,result.stderr
-        checks.append({'name':name,'launch_plan':plan_receipt(plan),'exit_code':result.returncode})
+        checks.append({'name':name,'launch_plan':record_plan(plan),'exit_code':result.returncode})
     unit=json.loads((out/'evaluator-unit-results.json').read_text());assert unit['tests']==15 and unit['failures']==unit['errors']==unit['skips']==0
     build=(HERE/'evaluation/CMakeLists.txt').read_text();assert 'tensorflow' not in build.lower()
     resources={}

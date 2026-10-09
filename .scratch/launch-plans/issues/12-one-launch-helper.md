@@ -32,3 +32,19 @@ Verification:
 - GPU 1 precheck before CUDA: GPU 1 UUID `GPU-eaed2f0d-2541-8ca8-b6c4-3e2e45e86619` was absent from `nvidia-smi --query-compute-apps=gpu_uuid --format=csv,noheader`, and GPU 1 memory was `4 MiB`.
 - CUDA suite on GPU 1 only: `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...`: passed `29/29`, including `//autonomy/insula:launch_plan_gpu_live_test`.
 - GPU 1 postcheck after CUDA: the same UUID was absent from compute apps, and GPU 1 memory was `4 MiB`.
+
+### 2026-10-09 review 1 evidence
+
+Done. Review 1 found one remaining launch helper copy from ticket 06: `autonomy/evaluation/launches.py`. Deleted that facade and moved the evaluation callers (`audit-perception-gate.py`, `verify-detection-adapter.py`, `verify-detection-contract.py`, `verify-native-metrics.py`, `verify-real-detection-export.py`) plus `evaluation/launches_test.py` directly onto `insula.launch_plan` and `insula.runtime_roots`. The metrics-root selection now happens at the caller/test boundary with `current_metrics_rootfs(...)`; the CPU audit path uses `current_cpu_rootfs(...)`. The evaluation fixture-lock plan test is retained and retargeted to the shared launch-plan module.
+
+Verification:
+
+- Red check: `git grep -n "launches import\\|/launches.py" -- autonomy` found the remaining evaluation imports before this fix.
+- Final grep: `git grep -n "launches import\\|/launches.py" -- autonomy` produced no output.
+- Focused Python coverage: `PYTHONPATH=autonomy python3 -m unittest autonomy.evaluation.launches_test`: passed `2/2`.
+- Focused Bazel coverage: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/evaluation:launches_test`: passed `1/1`.
+- Default CPU suite: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...`: passed `185/185`.
+- Parallax suite: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //parallax/...`: passed `17/17`.
+- GPU 1 precheck before CUDA: GPU 1 UUID `GPU-eaed2f0d-2541-8ca8-b6c4-3e2e45e86619` was absent from `nvidia-smi --query-compute-apps=gpu_uuid --format=csv,noheader`, and GPU 1 memory was `4 MiB`.
+- CUDA suite on GPU 1 only: `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...`: passed `29/29`, including `//autonomy/insula:launch_plan_gpu_live_test`.
+- GPU 1 postcheck after CUDA: GPU 1 UUID `GPU-eaed2f0d-2541-8ca8-b6c4-3e2e45e86619` was present in compute apps and GPU 1 memory was `36618 MiB`; no GPU process was touched.
