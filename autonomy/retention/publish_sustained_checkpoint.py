@@ -7,7 +7,7 @@ import uuid
 from pathlib import Path
 
 from blob_store.core import BlobStore, blob_adapter_from_descriptor, waystone_tool_pins
-from insula.runtime_identity import verify_rootfs
+from insula.launch_plan import load_default_runtime_lock
 from resources.backend import resource_cpu_root_for
 from resources.scientific_budget import reserve_write
 from resources.scientific_payload import unique_payload_bytes
@@ -132,10 +132,7 @@ def _tool_digest(value, store):
 
 def _verify_default_resource_root(cache_root: Path) -> None:
     root = resource_cpu_root_for(None,C) if cache_root == C else resource_cpu_root_for(None, cache_root)
-    lock_path = Path(str(root) + ".lock.json")
-    if lock_path.exists():
-        runtime = json.loads(lock_path.read_text())
-        verify_rootfs(root, runtime["rootfs_sha256"])
+    load_default_runtime_lock(root)
 
 
 def _write_json(path: Path, value) -> None:

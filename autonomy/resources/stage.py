@@ -6,8 +6,8 @@ from pathlib import Path
 import subprocess
 import shutil
 from evidence.source_snapshot import is_regular_file
-from insula.launch_plan import read_receipt_mounts
-from resources.command import wrapped_command,wrap_command
+from insula.launch_plan import LaunchPlan, read_receipt_mounts, record_plan, render_plan
+from resources.command import inspect_legacy_receipt_command,wrapped_command,wrapped_rendered_plan_command,wrap_command,wrap_plan
 from resources.scoped_stage import run_scoped
 from resources.sources import sha,validate_sources
 from resources.stage_accounting import admit_worker
@@ -47,9 +47,18 @@ def validate_proof(proof,command,current_sources,source_pins,native_output,cap_b
             raise ValueError('complete exact resource stage identity required')
         worker_path=Path(proof['artifacts']['worker_resource']['path']);worker_output=worker_path.parent
         require_separate(native_output,worker_output.parent,code,current_sources)
-        expected,worker_argv=wrapped_command(proof['original_command'],code,worker_output)
+        _,_,options=inspect_legacy_receipt_command(command)
         output_mount=read_receipt_mounts({'command':command},include_digests=False,require_python_worker=True).get('/outputs')
-        if (proof['worker_argv']!=worker_argv or command!=expected or
+        native_mounts=[(option,values) for option,values in options
+                       if option in {'--ro-bind','--bind','--dev-bind','--proc','--dev','--tmpfs'} and values[-1]=='/outputs']
+        if 'launch_plan' in proof:
+            expected,worker_argv=_validate_plan_wrapped_proof(proof,code,worker_output)
+            command_matches=command==expected
+        else:
+            expected,worker_argv=wrapped_command(proof['original_command'],code,worker_output)
+            command_matches=command==expected
+        if (proof['worker_argv']!=worker_argv or not command_matches or
+            native_mounts!=[('--bind',(str(native_output),'/outputs'))] or
             output_mount!={'inside_path':'/outputs','mode':'writable','kind':'bind',
                            'role':'output','host_path':str(native_output)} or
             worker_path.name!='worker-resource.json' or worker_output.name!='worker' or
@@ -80,6 +89,81 @@ def validate_proof(proof,command,current_sources,source_pins,native_output,cap_b
     return admitted
 
 
+def _validate_plan_wrapped_proof(proof,code,worker_output):
+    try:
+        _,original_argv,_=inspect_legacy_receipt_command(proof['original_command'])
+        expected,worker_argv=wrapped_rendered_plan_command(proof['original_command'],code,worker_output)
+        _,wrapped_argv,_=inspect_legacy_receipt_command(expected)
+        expected_mounts=[
+            ('--ro-bind',(str(code),'/tmp/resource-layer')),
+            ('--ro-bind',(str(code/'resources'),'/experiment/resources')),
+            ('--ro-bind',(str(code/'evidence'),'/experiment/evidence')),
+            ('--bind',(str(worker_output),'/tmp/resource-output')),
+        ]
+        _,_,options=inspect_legacy_receipt_command(expected)
+        mount_options=[(option,values) for option,values in options if option in {'--ro-bind','--bind'}]
+        if (proof['original_launch_plan']['command']!=original_argv or
+            not _rendered_command_matches_record(proof['original_command'],proof['original_launch_plan']) or
+            proof['launch_plan']['command']!=wrapped_argv or
+            not _rendered_command_matches_record(expected,proof['launch_plan']) or
+            not _recorded_resource_mounts_match(proof['launch_plan']['mounts']) or
+            any(mount_options.count(expected)!=1 for expected in expected_mounts)):
+            raise ValueError('actual wrapper, original worker, native output and resource mounts required')
+        return expected,worker_argv
+    except (KeyError,TypeError,ValueError) as error:
+        raise ValueError('actual wrapper, original worker, native output and resource mounts required') from error
+
+
+def _render_ordered(mounts):
+    """Recorded mounts in render_plan order: other mounts, the /tmp tmpfs, then mounts under /tmp."""
+    def group(mount):
+        if mount.get('role')=='tmp':return 1
+        return 2 if str(mount.get('inside_path','')).startswith('/tmp/') else 0
+    return sorted(mounts,key=group)
+
+
+def _rendered_command_matches_record(command,record):
+    try:
+        separator,argv,options=inspect_legacy_receipt_command(command)
+        del separator
+        mounts=[];environment={};working_directory=None
+        for option,values in options:
+            if option=='--ro-bind':
+                mounts.append({'kind':'bind','inside_path':values[1],'mode':'read_only'})
+            elif option=='--bind':
+                mounts.append({'kind':'bind','inside_path':values[1],'mode':'writable'})
+            elif option=='--tmpfs':
+                mounts.append({'kind':'tmpfs','inside_path':values[0],'mode':'writable'})
+            elif option=='--symlink':
+                mounts.append({'kind':'symlink','inside_path':values[1],'mode':'read_only','symlink_target':values[0]})
+            elif option=='--setenv':
+                environment[values[0]]=values[1]
+            elif option=='--chdir':
+                working_directory=values[0]
+        recorded_mounts=[
+            {key:mount[key] for key in ('kind','inside_path','mode','symlink_target') if key in mount}
+            for mount in _render_ordered(record['mounts'])
+        ]
+        return (mounts==recorded_mounts and environment==record['environment'] and
+                working_directory==record['working_directory'] and list(argv)==record['command'])
+    except (KeyError,TypeError,ValueError) as error:
+        raise ValueError('actual wrapper, original worker, native output and resource mounts required') from error
+
+
+def _recorded_resource_mounts_match(mounts):
+    expected=[
+        {'role':'resource-layer','kind':'bind','inside_path':'/tmp/resource-layer','mode':'read_only'},
+        {'role':'resource-experiment-resources','kind':'bind','inside_path':'/experiment/resources','mode':'read_only'},
+        {'role':'resource-experiment-evidence','kind':'bind','inside_path':'/experiment/evidence','mode':'read_only'},
+        {'role':'resource-output','kind':'bind','inside_path':'/tmp/resource-output','mode':'writable'},
+    ]
+    return all(
+        sum(1 for mount in mounts
+            if all(mount.get(key)==value for key,value in required.items()))==1
+        for required in expected
+    )
+
+
 def run_stage(command,cwd,env,stream,timeout,*,code,current_sources,source_pins,
               evidence_directory,native_output,cap_bytes):
     """Launcher hook: mutate the argv actually stored by the native backend.
@@ -93,10 +177,14 @@ def run_stage(command,cwd,env,stream,timeout,*,code,current_sources,source_pins,
         not evidence.parent.is_dir()):
         raise ValueError('regular owned evidence parent required')
     evidence.mkdir(exist_ok=False)
-    proof={'schema_version':1,'admitted':False,'original_command':command.copy(),
-           'command':command.copy(),'source_pins':source_pins,
+    original_plan=command if isinstance(command,LaunchPlan) else None
+    original_command=render_plan(command) if original_plan is not None else command.copy()
+    proof={'schema_version':1,'admitted':False,'original_command':original_command.copy(),
+           'command':original_command.copy(),'source_pins':source_pins,
            'native_output_directory':str(native_output),'cap_bytes':cap_bytes,
            'timeout_seconds':timeout}
+    if original_plan is not None:
+        proof['original_launch_plan']=record_plan(original_plan)
     try:
         if (type(timeout) not in (int,float) or not math.isfinite(timeout) or timeout<=0 or
             type(cap_bytes) is not int or cap_bytes<=0 or
@@ -105,9 +193,15 @@ def run_stage(command,cwd,env,stream,timeout,*,code,current_sources,source_pins,
         frozen=validate_sources(current_sources,source_pins)
         if frozen!=Path(code):raise ValueError('actual resource code differs from frozen closure')
         worker_output=evidence/'worker';worker_output.mkdir()
-        proof['worker_argv']=wrap_command(command,frozen,worker_output)
-        proof['command']=command.copy()
-        host=run_scoped(command,cwd=cwd,stream=stream,timeout=timeout,cap_bytes=cap_bytes,env=env)
+        if original_plan is None:
+            execution_command=command
+            proof['worker_argv']=wrap_command(execution_command,frozen,worker_output)
+        else:
+            wrapped,proof['worker_argv']=wrap_plan(original_plan,frozen,worker_output)
+            proof['launch_plan']=record_plan(wrapped)
+            execution_command=render_plan(wrapped)
+        proof['command']=execution_command.copy()
+        host=run_scoped(execution_command,cwd=cwd,stream=stream,timeout=timeout,cap_bytes=cap_bytes,env=env)
         proof['host_measurement']=host
         if 'resource_admission' not in host:raise ValueError('failed or incomplete scoped stage cannot be admitted')
         worker_path=worker_output/'worker-resource.json'
@@ -118,9 +212,9 @@ def run_stage(command,cwd,env,stream,timeout,*,code,current_sources,source_pins,
         proof['artifacts']={name:{'path':str(path),'sha256':sha(path)} for name,path in
                             [('worker_resource',worker_path),('execution_log',retained_log)]}
         proof['artifacts']['execution_log']['native_path']=str(native_log)
-        proof['resource_admission']=admit_worker(host,proof['worker_measurement'],command,proof['worker_argv'],cap_bytes)
+        proof['resource_admission']=admit_worker(host,proof['worker_measurement'],execution_command,proof['worker_argv'],cap_bytes)
         proof['admitted']=True
-        admitted=validate_proof(proof,command,current_sources,source_pins,native_output,cap_bytes,timeout)
+        admitted=validate_proof(proof,execution_command,current_sources,source_pins,native_output,cap_bytes,timeout)
         proof['resource_admission']=admitted
         write_new(evidence/'resource-admitted.json',proof)
     except BaseException as error:
@@ -133,4 +227,4 @@ def run_stage(command,cwd,env,stream,timeout,*,code,current_sources,source_pins,
             if type(proof[field]) not in (int,float) or not math.isfinite(proof[field]):proof[field]=repr(proof[field])
         write_new(evidence/'attempt.json',proof)
         raise
-    return subprocess.CompletedProcess(command,0)
+    return subprocess.CompletedProcess(execution_command,0)
