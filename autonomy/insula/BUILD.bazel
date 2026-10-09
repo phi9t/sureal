@@ -17,6 +17,7 @@ INSULA_VISIBILITY = [
     "//autonomy/dataset:__pkg__",
     "//autonomy/detection:__pkg__",
     "//autonomy/evaluation:__pkg__",
+    "//autonomy/geometry:__pkg__",
     "//autonomy/resources:__pkg__",
     "//autonomy/retention:__pkg__",
     "//autonomy/motion:__pkg__",

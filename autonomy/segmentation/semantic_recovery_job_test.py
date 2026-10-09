@@ -1,6 +1,7 @@
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 from segmentation.semantic_recovery_job import recover_semantic_archive
 from segmentation.semantic_recovery_runtime import recovery_rootfs, validate_recovery_output
@@ -25,8 +26,7 @@ class SemanticRecoveryJobGateTests(unittest.TestCase):
             root=Path(tmp);cache=root/'cache';staging=root/'ticket-execution-cache'
             (cache/'scientific-processing').mkdir(parents=True)
             (staging/'scientific-processing').mkdir(parents=True)
-            rootfs=recovery_rootfs(cache);rootfs.mkdir(parents=True)
-            Path(str(rootfs)+'.lock.json').write_text('{"schema_version":1,"rootfs_sha256":"%s"}' % ('c'*64))
+            runtime=SimpleNamespace(data={'schema_version':1,'rootfs_sha256':'c'*64})
             publication=root/'publication.json'
             publication.write_text('{"scene":"scene-a","role":"scientific","official_split":"validation","research_splits":["validation"],"archive":{"sha256":"%s","archive_bytes":1,"report_sha256":"%s"}}' % ('a'*64,'b'*64))
             record={
@@ -44,7 +44,7 @@ class SemanticRecoveryJobGateTests(unittest.TestCase):
                 self.assertEqual(Path(cache_arg),staging)
                 raise RuntimeError('stop before live transfer')
             with patch('segmentation.semantic_recovery_job.sha',return_value='pub-sha'), \
-                 patch('segmentation.semantic_recovery_job.verify_rootfs'), \
+                 patch('segmentation.semantic_recovery_job.load_runtime_for_root',return_value=runtime), \
                  patch('segmentation.semantic_recovery_job.staged_derived_archive',side_effect=fake_staged):
                 with self.assertRaises(RuntimeError):
                     recover_semantic_archive(record,cache=cache,staging_cache=staging,code_root=root,output=root/'output')
