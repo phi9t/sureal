@@ -10,6 +10,7 @@ from evidence.source_snapshot import file_sha256
 from insula.launch_plan import (
     BAZEL_LINUX_X86_64_SHA256,
     BAZEL_VERSION,
+    Mount,
     PlanError,
     RuntimeLockError,
     build_plan,
@@ -422,6 +423,48 @@ class LaunchPlanTests(unittest.TestCase):
             )
             self.assertEqual(plan_data(plan)["command"], ["true"])
 
+    def test_split_runtime_root_preserves_top_level_symlink_entries(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            rootfs = root / CURRENT_CPU_ROOTFS_NAME
+            (rootfs / "usr/bin").mkdir(parents=True)
+            (rootfs / "usr/lib").mkdir(parents=True)
+            (rootfs / "usr/bin/python").write_text("#!/bin/sh\n")
+            (rootfs / "usr/bin/python").chmod(0o755)
+            os.symlink("usr/bin", rootfs / "bin")
+            os.symlink("usr/lib", rootfs / "lib")
+            lock = rootfs.with_name(rootfs.name + ".lock.json")
+            write_cpu_recipe_lock(lock, rootfs)
+            runtime = load_runtime_lock(rootfs, lock)
+            code = root / "code"
+            output = root / "output"
+            for path in (code, output):
+                path.mkdir()
+
+            plan = build_plan(
+                runtime,
+                code=code,
+                output=output,
+                command=["true"],
+                split_runtime_root=True,
+            )
+            mounts = {mount["role"]: mount for mount in plan_data(plan)["mounts"]}
+            argv = render_plan(plan)
+
+            self.assertEqual(
+                mounts["runtime-entry:bin"],
+                {
+                    "role": "runtime-entry:bin",
+                    "inside_path": "/bin",
+                    "mode": "read_only",
+                    "kind": "symlink",
+                    "symlink_target": "usr/bin",
+                },
+            )
+            self.assertEqual(mounts["runtime-entry:lib"]["kind"], "symlink")
+            self.assertIn("--symlink", argv)
+            self.assertNotIn(str((rootfs / "bin").resolve()), argv)
+
     def test_split_runtime_root_reuses_overlap_rules_for_writable_inputs(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -448,6 +491,47 @@ class LaunchPlanTests(unittest.TestCase):
                     writable_inputs={"/opt/cache": writable},
                     command=["true"],
                     split_runtime_root=True,
+                )
+
+    def test_with_mounts_extends_existing_plan_through_public_validation(self):
+        from insula.launch_plan import with_mounts
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            runtime = self.load_fixture_runtime(root)
+            code = root / "code"
+            output = root / "output"
+            resource = root / "resource"
+            for path in (code, output, resource):
+                path.mkdir()
+            plan = build_plan(runtime, code=code, output=output, command=["python", "/experiment/a.py"])
+
+            extended = with_mounts(
+                plan,
+                before_devices=[
+                    Mount("resource-layer", "bind", "/tmp/resource-layer", "read_only", resource)
+                ],
+                command=["python", "/tmp/resource-layer/wrap.py", "/experiment/a.py"],
+            )
+            data = plan_data(extended)
+
+            self.assertEqual(data["command"], ["python", "/tmp/resource-layer/wrap.py", "/experiment/a.py"])
+            self.assertIn(
+                {
+                    "role": "resource-layer",
+                    "host_path": str(resource.resolve()),
+                    "inside_path": "/tmp/resource-layer",
+                    "mode": "read_only",
+                    "kind": "bind",
+                },
+                data["mounts"],
+            )
+            with self.assertRaisesRegex(PlanError, "writable mount overlaps"):
+                with_mounts(
+                    plan,
+                    before_devices=[
+                        Mount("overlap", "bind", "/tmp/overlap", "writable", output / "child")
+                    ],
                 )
 
     def test_extra_environment_cannot_replace_module_owned_variables(self):

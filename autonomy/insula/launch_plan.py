@@ -7,7 +7,7 @@ import os
 import re
 import stat
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path, PurePosixPath
 from typing import Iterable, Mapping
 
@@ -92,6 +92,7 @@ class Mount:
     mode: str
     host_path: Path | None = None
     phase: str = "before_devices"
+    symlink_target: str | None = None
 
 
 @dataclass(frozen=True)
@@ -263,6 +264,34 @@ def run_plan(plan: LaunchPlan, **kwargs) -> subprocess.CompletedProcess:
     return subprocess.run(render_plan(plan), **kwargs)
 
 
+def with_mounts(
+    plan: LaunchPlan,
+    *,
+    before_devices: Iterable[Mount] = (),
+    after_devices: Iterable[Mount] = (),
+    command: Iterable[object] | None = None,
+) -> LaunchPlan:
+    """Return a plan with extra mounts, reusing launch-plan validation."""
+    if not isinstance(plan, LaunchPlan):
+        raise PlanError("launch plan required")
+    before = [mount for mount in plan.mounts if mount.phase == "before_devices"]
+    after = [mount for mount in plan.mounts if mount.phase != "before_devices"]
+    return _assemble_plan(
+        plan.runtime,
+        mounts=[
+            *before,
+            *[replace(mount, phase="before_devices") for mount in before_devices],
+            *after,
+            *[replace(mount, phase="after_devices") for mount in after_devices],
+        ],
+        environment=plan.environment,
+        command=plan.command if command is None else command,
+        working_directory=plan.working_directory,
+        unshare_flags=plan.unshare_flags,
+        gpu=plan.gpu,
+    )
+
+
 def record_plan(plan: LaunchPlan) -> dict:
     """Return the host-path-free receipt record for a launch plan."""
     record = {
@@ -324,7 +353,18 @@ def _runtime_mounts(runtime: RuntimeLock, split_runtime_root: bool) -> list[Moun
         if entry.name in _SPLIT_RUNTIME_MASKED_ENTRIES:
             continue
         inside_path = "/" + _safe_rootfs_entry_name(entry.name)
-        mounts.append(Mount(f"runtime-entry:{entry.name}", "bind", inside_path, "read_only", entry))
+        if entry.is_symlink():
+            mounts.append(
+                Mount(
+                    f"runtime-entry:{entry.name}",
+                    "symlink",
+                    inside_path,
+                    "read_only",
+                    symlink_target=_safe_symlink_target(os.readlink(entry)),
+                )
+            )
+        else:
+            mounts.append(Mount(f"runtime-entry:{entry.name}", "bind", inside_path, "read_only", entry))
     if not mounts:
         raise PlanError("split_runtime_root: runtime rootfs has no mountable entries")
     return mounts
@@ -334,6 +374,12 @@ def _safe_rootfs_entry_name(name: str) -> str:
     if not name or name in {".", ".."} or "/" in name or "\x00" in name:
         raise PlanError(f"{name!r}: runtime rootfs entry name must be a safe path component")
     return name
+
+
+def _safe_symlink_target(target: str) -> str:
+    if not isinstance(target, str) or not target or "\x00" in target:
+        raise PlanError("symlink target must be non-empty text")
+    return target
 
 
 def _check_recipe_lock(rootfs: Path, data: Mapping[str, object]) -> None:
@@ -487,6 +533,16 @@ def _validate_mounts(mounts: tuple[Mount, ...]) -> None:
     host_mounts = []
     inside_roles: dict[str, str] = {}
     for mount in mounts:
+        if mount.kind not in {"bind", "dev-bind", "tmpfs", "symlink"}:
+            raise PlanError(f"{mount.role}: unsupported mount kind {mount.kind}")
+        if mount.mode not in {"read_only", "writable"}:
+            raise PlanError(f"{mount.role}: unsupported mount mode {mount.mode}")
+        if mount.kind == "symlink":
+            if mount.mode != "read_only" or mount.host_path is not None:
+                raise PlanError(f"{mount.role}: symlink mount must be read-only without host path")
+            _safe_symlink_target(mount.symlink_target)
+        elif mount.symlink_target is not None:
+            raise PlanError(f"{mount.role}: symlink target only valid for symlink mounts")
         previous = inside_roles.get(mount.inside_path)
         if previous is not None:
             raise PlanError(f"{previous} and {mount.role}: duplicate inside mount {mount.inside_path}")
@@ -505,6 +561,10 @@ def _validate_mounts(mounts: tuple[Mount, ...]) -> None:
 
 
 def _render_mount(mount: Mount) -> list[str]:
+    if mount.kind == "symlink":
+        if mount.symlink_target is None:
+            raise PlanError(f"{mount.role}: symlink target required")
+        return ["--symlink", mount.symlink_target, mount.inside_path]
     if mount.kind == "tmpfs":
         return ["--tmpfs", mount.inside_path]
     if mount.host_path is None:
@@ -526,6 +586,8 @@ def _mount_data(mount: Mount, *, include_host: bool) -> dict:
     }
     if include_host and mount.host_path is not None:
         data["host_path"] = str(Path(mount.host_path).resolve())
+    if mount.kind == "symlink":
+        data["symlink_target"] = mount.symlink_target
     return data
 
 
@@ -701,5 +763,6 @@ __all__ = [
     "plan_data",
     "render_plan",
     "run_plan",
+    "with_mounts",
     "record_plan",
 ]

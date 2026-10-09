@@ -155,6 +155,31 @@ class ResourceStageTests(unittest.TestCase):
             bad['launch_plan']['mounts']=[mount for mount in bad['launch_plan']['mounts'] if mount['role']!='resource-layer']
             with self.assertRaises(ValueError):
                 validate(bad,bad['command'],current,pins,native,1024**3,10)
+            for fault in ['extra-mount','reordered-mount','changed-mount-mode']:
+                bad=copy.deepcopy(proof)
+                if fault=='extra-mount':
+                    separator=bad['command'].index('--')
+                    bad['command'][separator:separator]=['--bind',str(root),'/host']
+                elif fault=='reordered-mount':
+                    resource_output=str(evidence/'worker')
+                    output_index=bad['command'].index(resource_output)-1
+                    output_mount=bad['command'][output_index:output_index+3]
+                    del bad['command'][output_index:output_index+3]
+                    layer_index=bad['command'].index('/tmp/resource-layer')-2
+                    bad['command'][layer_index:layer_index]=output_mount
+                else:
+                    bad['command'][bad['command'].index('/tmp/resource-layer')-2]='--bind'
+                bad['host_measurement']['command']=bad['command'].copy()
+                with self.subTest(fault=fault),self.assertRaises(ValueError):
+                    validate(bad,bad['command'],current,pins,native,1024**3,10)
+            bad=copy.deepcopy(proof)
+            original_insert=bad['original_command'].index('--proc')
+            wrapped_insert=bad['command'].index('/tmp/resource-layer')-2
+            bad['original_command'][original_insert:original_insert]=['--bind',str(root),'/host']
+            bad['command'][wrapped_insert:wrapped_insert]=['--bind',str(root),'/host']
+            bad['host_measurement']['command']=bad['command'].copy()
+            with self.assertRaises(ValueError):
+                validate(bad,bad['command'],current,pins,native,1024**3,10)
 
     def test_exact_command_source_output_and_measured_worker_proof_required(self):
         _,validate=self.api()

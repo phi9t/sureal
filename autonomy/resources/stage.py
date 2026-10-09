@@ -7,7 +7,7 @@ import subprocess
 import shutil
 from evidence.source_snapshot import is_regular_file
 from insula.launch_plan import LaunchPlan, record_plan, render_plan
-from resources.command import inspect_command,wrapped_command,wrap_command,wrap_plan
+from resources.command import inspect_command,wrapped_command,wrapped_rendered_plan_command,wrap_command,wrap_plan
 from resources.scoped_stage import run_scoped
 from resources.sources import sha,validate_sources
 from resources.stage_accounting import admit_worker
@@ -51,8 +51,8 @@ def validate_proof(proof,command,current_sources,source_pins,native_output,cap_b
         native_mounts=[(option,values) for option,values in options
                        if option in {'--ro-bind','--bind','--dev-bind','--proc','--dev','--tmpfs'} and values[-1]=='/outputs']
         if 'launch_plan' in proof:
-            worker_argv=_validate_plan_wrapped_proof(proof,command,options,code,worker_output)
-            command_matches=True
+            expected,worker_argv=_validate_plan_wrapped_proof(proof,code,worker_output)
+            command_matches=command==expected
         else:
             expected,worker_argv=wrapped_command(proof['original_command'],code,worker_output)
             command_matches=command==expected
@@ -86,23 +86,55 @@ def validate_proof(proof,command,current_sources,source_pins,native_output,cap_b
     return admitted
 
 
-def _validate_plan_wrapped_proof(proof,command,options,code,worker_output):
+def _validate_plan_wrapped_proof(proof,code,worker_output):
     try:
         _,original_argv,_=inspect_command(proof['original_command'])
-        _,wrapped_argv,_=inspect_command(command)
+        expected,worker_argv=wrapped_rendered_plan_command(proof['original_command'],code,worker_output)
+        _,wrapped_argv,_=inspect_command(expected)
         expected_mounts=[
             ('--ro-bind',(str(code),'/tmp/resource-layer')),
             ('--ro-bind',(str(code/'resources'),'/experiment/resources')),
             ('--ro-bind',(str(code/'evidence'),'/experiment/evidence')),
             ('--bind',(str(worker_output),'/tmp/resource-output')),
         ]
+        _,_,options=inspect_command(expected)
         mount_options=[(option,values) for option,values in options if option in {'--ro-bind','--bind'}]
         if (proof['original_launch_plan']['command']!=original_argv or
+            not _rendered_command_matches_record(proof['original_command'],proof['original_launch_plan']) or
             proof['launch_plan']['command']!=wrapped_argv or
+            not _rendered_command_matches_record(expected,proof['launch_plan']) or
             not _recorded_resource_mounts_match(proof['launch_plan']['mounts']) or
             any(mount_options.count(expected)!=1 for expected in expected_mounts)):
             raise ValueError('actual wrapper, original worker, native output and resource mounts required')
-        return original_argv[1:]
+        return expected,worker_argv
+    except (KeyError,TypeError,ValueError) as error:
+        raise ValueError('actual wrapper, original worker, native output and resource mounts required') from error
+
+
+def _rendered_command_matches_record(command,record):
+    try:
+        separator,argv,options=inspect_command(command)
+        del separator
+        mounts=[];environment={};working_directory=None
+        for option,values in options:
+            if option=='--ro-bind':
+                mounts.append({'kind':'bind','inside_path':values[1],'mode':'read_only'})
+            elif option=='--bind':
+                mounts.append({'kind':'bind','inside_path':values[1],'mode':'writable'})
+            elif option=='--tmpfs':
+                mounts.append({'kind':'tmpfs','inside_path':values[0],'mode':'writable'})
+            elif option=='--symlink':
+                mounts.append({'kind':'symlink','inside_path':values[1],'mode':'read_only','symlink_target':values[0]})
+            elif option=='--setenv':
+                environment[values[0]]=values[1]
+            elif option=='--chdir':
+                working_directory=values[0]
+        recorded_mounts=[
+            {key:mount[key] for key in ('kind','inside_path','mode','symlink_target') if key in mount}
+            for mount in record['mounts']
+        ]
+        return (mounts==recorded_mounts and environment==record['environment'] and
+                working_directory==record['working_directory'] and list(argv)==record['command'])
     except (KeyError,TypeError,ValueError) as error:
         raise ValueError('actual wrapper, original worker, native output and resource mounts required') from error
 

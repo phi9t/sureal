@@ -1,11 +1,11 @@
 """Record the actual bwrap command; never pretend an unwrapped argv executed."""
 from pathlib import Path
 from evidence.source_snapshot import is_regular_file
-from insula.launch_plan import LaunchPlan, Mount, _assemble_plan
+from insula.launch_plan import LaunchPlan, Mount, with_mounts
 
 ARITY={'--unshare-all':0,'--die-with-parent':0,'--clearenv':0,
        '--proc':1,'--dev':1,'--tmpfs':1,'--chdir':1,
-       '--ro-bind':2,'--bind':2,'--dev-bind':2,'--setenv':2}
+       '--ro-bind':2,'--bind':2,'--dev-bind':2,'--setenv':2,'--symlink':2}
 ALIASES={'/tmp/resource-layer','/tmp/resource-output','/experiment/resources','/experiment/evidence'}
 
 
@@ -32,7 +32,7 @@ def inspect_command(command):
 def wrapped_command(command,code,output):
     """Construct the recorded wrapper without changing or executing anything."""
     separator,argv,options=inspect_command(command)
-    if any(option in {'--ro-bind','--bind','--dev-bind','--proc','--dev','--tmpfs'} and
+    if any(option in {'--ro-bind','--bind','--dev-bind','--proc','--dev','--tmpfs','--symlink'} and
            values[-1] in ALIASES for option,values in options):
         raise ValueError('resource mount aliases must be unused')
     bindings=['--ro-bind',str(code),'/tmp/resource-layer',
@@ -40,6 +40,27 @@ def wrapped_command(command,code,output):
               '--ro-bind',str(code/'evidence'),'/experiment/evidence',
               '--bind',str(output),'/tmp/resource-output']
     return command[:separator]+bindings+['--',argv[0],'/tmp/resource-layer/resources/execute_worker.py','/tmp/resource-output',*argv[1:]],argv[1:]
+
+
+def wrapped_rendered_plan_command(command,code,output):
+    """Construct the resource wrapper in launch-plan render order."""
+    separator,argv,options=inspect_command(command)
+    if any(option in {'--ro-bind','--bind','--dev-bind','--proc','--dev','--tmpfs','--symlink'} and
+           values[-1] in ALIASES for option,values in options):
+        raise ValueError('resource mount aliases must be unused')
+    insert_at=_plan_device_insertion_index(command,separator)
+    bindings=['--ro-bind',str(code),'/tmp/resource-layer',
+              '--ro-bind',str(code/'resources'),'/experiment/resources',
+              '--ro-bind',str(code/'evidence'),'/experiment/evidence',
+              '--bind',str(output),'/tmp/resource-output']
+    return command[:insert_at]+bindings+command[insert_at:separator]+['--',argv[0],'/tmp/resource-layer/resources/execute_worker.py','/tmp/resource-output',*argv[1:]],argv[1:]
+
+
+def _plan_device_insertion_index(command,separator):
+    for index in range(1,separator-1):
+        if command[index:index+2]==['--proc','/proc']:
+            return index
+    raise ValueError('rendered launch plan device mounts required')
 
 
 def wrapped_plan(plan,code,output):
@@ -50,7 +71,7 @@ def wrapped_plan(plan,code,output):
     if (len(argv)<2 or argv[0] not in {'python','/opt/waymo/bin/python'} or
         not Path(argv[1]).is_absolute() or not argv[1].endswith('.py')):
         raise ValueError('declared original Python worker required')
-    if any(mount.kind in {'bind','dev-bind','tmpfs'} and mount.inside_path in ALIASES for mount in plan.mounts):
+    if any(mount.kind in {'bind','dev-bind','tmpfs','symlink'} and mount.inside_path in ALIASES for mount in plan.mounts):
         raise ValueError('resource mount aliases must be unused')
     code=Path(code);output=Path(output)
     additions=[
@@ -59,16 +80,10 @@ def wrapped_plan(plan,code,output):
         Mount('resource-experiment-evidence','bind','/experiment/evidence','read_only',code/'evidence'),
         Mount('resource-output','bind','/tmp/resource-output','writable',output),
     ]
-    before=[mount for mount in plan.mounts if mount.phase=='before_devices']
-    after=[mount for mount in plan.mounts if mount.phase!='before_devices']
-    wrapped=_assemble_plan(
-        plan.runtime,
-        mounts=[*before,*additions,*after],
-        environment=plan.environment,
+    wrapped=with_mounts(
+        plan,
+        before_devices=additions,
         command=[argv[0],'/tmp/resource-layer/resources/execute_worker.py','/tmp/resource-output',*argv[1:]],
-        working_directory=plan.working_directory,
-        unshare_flags=plan.unshare_flags,
-        gpu=plan.gpu,
     )
     return wrapped,argv[1:]
 
