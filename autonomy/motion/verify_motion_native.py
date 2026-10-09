@@ -7,10 +7,11 @@ from evidence.source_snapshot import file_sha256 as sha
 from evidence.source_snapshot import is_regular_file
 from insula.runtime_identity import rootfs_identity,verify_rootfs
 from insula.entry import launch_plan
+from insula.runtime_roots import current_metrics_rootfs, current_motion_metrics_rootfs
 HERE=Path(__file__).resolve().parent
 AUTONOMY=HERE.parent
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
-ROOT=CACHE/'motion-metrics-rootfs'
+ROOT=current_motion_metrics_rootfs(CACHE)
 PARENT='sha256:c0018cf57e482c6a9e6623ea32f29c6039f22f5dafb0f3311bad6d411a7bb135'
 def main():
  import argparse
@@ -21,7 +22,7 @@ def main():
   lock=json.loads(lockpath.read_text());verify_rootfs(ROOT,lock['rootfs_sha256'])
   if lock['recipe_hashes']!=recipes or lock['parent_image_id']!=PARENT:raise ValueError('locked Motion recipe identity differs')
  else:
-  parent=json.loads((CACHE/'metrics-rootfs.lock.json').read_text())
+  parent=json.loads(Path(str(current_metrics_rootfs(CACHE))+'.lock.json').read_text())
   if parent['image_id']!=PARENT:raise ValueError('trusted parent differs')
   image=subprocess.check_output(['docker','image','inspect','sureal-waymo-motion-metrics:source-pinned','--format','{{.Id}}'],text=True).strip()
   with tempfile.TemporaryDirectory(dir=CACHE,prefix='.motion-rootfs-') as tmp:

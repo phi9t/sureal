@@ -2,6 +2,7 @@
 import copy,json,shutil,tempfile,types,unittest
 from pathlib import Path
 from unittest.mock import patch
+from insula.runtime_roots import CURRENT_CPU_ROOTFS_NAME
 from evidence.source_snapshot import LocalSnapshotStore
 from resources.sources import sha,validate_sources
 
@@ -79,7 +80,7 @@ class ResourceBackendTests(unittest.TestCase):
             backend=Backend();backend.resource_cache_root=root/'cache'
             self.assertEqual(
                 resource_cpu_root_for(backend),
-                root/'cache/insula/rootfs-v5-t29-20261008T230657Z',
+                root/'cache/insula'/CURRENT_CPU_ROOTFS_NAME,
             )
             backend.resource_cpu_root=root/'custom-rootfs'
             self.assertEqual(resource_cpu_root_for(backend),root/'custom-rootfs')

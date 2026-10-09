@@ -3,13 +3,13 @@ import json
 from pathlib import Path
 import re
 from evidence.source_snapshot import is_regular_file
+from insula.runtime_roots import CURRENT_CPU_ROOTFS_NAME
 from resources.sources import sha,freeze_sources,validate_sources
 from resources.stage import run_stage,validate_proof,write_new,require_separate
 
 CAP_BYTES=16*1024**3
 CURRENT=Path(__file__).resolve().parent
 PACKAGE_ROOT=CURRENT.parent
-CURRENT_CPU_ROOTFS_NAME='rootfs-v5-t29-20261008T230657Z'
 
 
 def resource_cpu_root_for(owner,cache_root=None):

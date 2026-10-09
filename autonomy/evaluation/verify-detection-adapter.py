@@ -13,9 +13,10 @@ HERE=Path(__file__).resolve().parents[1]
 from evidence.source_snapshot import file_sha256 as sha
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
+from insula.runtime_roots import current_metrics_rootfs
 from detection.native_detection_adapter import parse_result
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
-ROOT=CACHE/'metrics-rootfs'
+ROOT=current_metrics_rootfs(CACHE)
 
 def main():
     out=Path(sys.argv[1]).resolve();out.mkdir(parents=True,exist_ok=False)

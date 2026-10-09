@@ -8,9 +8,10 @@ HERE=Path(__file__).resolve().parents[1]
 from evidence.source_snapshot import file_sha256 as sha
 from insula.runtime_identity import verify_rootfs
 from insula.entry import launch_plan
+from insula.runtime_roots import current_metrics_rootfs
 
 def main():
-    cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'metrics-rootfs'
+    cache=Path.home()/'.cache/waystone/waymo-perception';root=current_metrics_rootfs(cache)
     lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
     out=Path(sys.argv[1]).resolve();out.mkdir(parents=True,exist_ok=False)
     names=['detection/detection_export.py','segmentation/segmentation_export.py','evaluation/real-detection-export-check.py','evaluation/verify-real-detection-export.py']

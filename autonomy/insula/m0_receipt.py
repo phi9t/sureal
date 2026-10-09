@@ -4,16 +4,16 @@ import os
 from pathlib import Path
 from evidence.source_snapshot import file_sha256
 from insula.runtime_identity import verify_rootfs
+from insula.runtime_roots import current_cpu_rootfs
 
-CURRENT_CPU_ROOTFS_NAME = "rootfs-v5-t29-20261008T230657Z"
-CURRENT_M0_RECEIPT_NAME = "m0-live-rootfs-v5-t29-20261008T230657Z"
+CURRENT_M0_RECEIPT_NAME = f"m0-live-{current_cpu_rootfs().name}"
 
 
 def receipt_fixture_paths(env=os.environ):
     root = Path(
         env.get(
             "WAYMO_INSULA_ROOT",
-            str(Path.home() / ".cache/waystone/waymo-perception/insula" / CURRENT_CPU_ROOTFS_NAME),
+            str(current_cpu_rootfs()),
         )
     )
     evidence = Path(env.get("WAYMO_M0_RECEIPT", str(root.parent / CURRENT_M0_RECEIPT_NAME)))

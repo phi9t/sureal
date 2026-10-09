@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from evidence.source_snapshot import file_sha256
-from insula.sandbox_plan import live_gate_plan
+from insula.launch_plan import build_plan, load_runtime_lock, plan_data, render_plan
 
 
 @dataclass(frozen=True)
@@ -58,10 +58,13 @@ def run_live_gate(gate: LiveGate, evidence_root: Path, *, output: Path | None = 
     lock = Path(gate.lock).resolve()
     experiment = Path(gate.experiment).resolve()
     fixture = Path(gate.fixture).resolve()
-    plan = live_gate_plan(rootfs, experiment, fixture, output.resolve(), gate.command)
+    runtime = load_runtime_lock(rootfs, lock)
+    plan = build_plan(runtime, code=experiment, source=fixture, output=output.resolve(), command=gate.command)
+    data = plan_data(plan)
+    argv = render_plan(plan)
 
     started = time.monotonic()
-    result = subprocess.run(plan.argv, text=True, capture_output=True, timeout=timeout)
+    result = subprocess.run(argv, text=True, capture_output=True, timeout=timeout)
     raw_log.write_text(result.stdout + result.stderr)
     executed = parse_unittest_count(result.stdout + result.stderr)
     verdict = "pass" if result.returncode == 0 and executed == gate.expected_tests else "fail"
@@ -74,10 +77,14 @@ def run_live_gate(gate: LiveGate, evidence_root: Path, *, output: Path | None = 
         "rootfs_lock_sha256": file_sha256(lock),
         "fixture": str(fixture),
         "output": str(output.resolve()),
-        "argv": plan.argv,
-        "mounts": plan.mounts,
-        "environment": plan.environment,
-        "command": plan.command,
+        "argv": argv,
+        "mounts": [
+            _mount_to_argv(mount)
+            for mount in data["mounts"]
+            if mount["kind"] in {"bind", "dev-bind", "tmpfs"}
+        ],
+        "environment": data["environment"],
+        "command": data["command"],
         "exit_code": result.returncode,
         "expected_tests": gate.expected_tests,
         "executed_tests": executed,
@@ -90,3 +97,10 @@ def run_live_gate(gate: LiveGate, evidence_root: Path, *, output: Path | None = 
     if verdict != "pass":
         raise ValueError(f"live gate failed: {gate.label}; see {record}")
     return receipt
+
+
+def _mount_to_argv(mount):
+    if mount["kind"] == "tmpfs":
+        return ["--tmpfs", mount["inside_path"]]
+    flag = "--dev-bind" if mount["kind"] == "dev-bind" else "--bind" if mount["mode"] == "writable" else "--ro-bind"
+    return [flag, mount["host_path"], mount["inside_path"]]

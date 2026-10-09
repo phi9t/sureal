@@ -4,15 +4,31 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from evidence.source_snapshot import file_sha256
+from insula.launch_plan import BAZEL_LINUX_X86_64_SHA256, BAZEL_VERSION
 from insula.live_gate import LiveGate, run_live_gate
+from insula.runtime_identity import rootfs_identity
+from insula.runtime_roots import CURRENT_CPU_ROOTFS_NAME
+
+
+AUTONOMY = Path(__file__).resolve().parents[1]
 
 
 class LiveGateTests(unittest.TestCase):
     def test_plan_uses_structured_mounts_and_records_receipt(self):
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary)
-            rootfs=root/'rootfs';rootfs.mkdir()
-            lock=root/'rootfs.lock.json';lock.write_text(json.dumps({'rootfs_sha256':'1'*64}))
+            rootfs=root/CURRENT_CPU_ROOTFS_NAME;rootfs.mkdir()
+            lock=rootfs.with_name(rootfs.name+'.lock.json')
+            lock.write_text(json.dumps({
+                'schema_version':1,
+                'rootfs_sha256':rootfs_identity(rootfs),
+                'dockerfile_sha256':file_sha256(AUTONOMY/'insula/Dockerfile'),
+                'requirements_sha256':file_sha256(AUTONOMY/'requirements-tracer.lock'),
+                'test_tools_requirements_sha256':file_sha256(AUTONOMY/'insula/cpu-test-tools-requirements.lock'),
+                'bazel_version':BAZEL_VERSION,
+                'bazel_linux_x86_64_sha256':BAZEL_LINUX_X86_64_SHA256,
+            }))
             experiment=root/'experiment';experiment.mkdir()
             fixture=root/'fixture';fixture.mkdir()
             output=root/'output'

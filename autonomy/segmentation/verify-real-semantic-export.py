@@ -7,6 +7,7 @@ import resource,subprocess,sys,time
 from evidence.source_snapshot import file_sha256 as sha, require_regular_file
 from insula.runtime_identity import verify_rootfs
 from insula.entry import launch_plan
+from insula.runtime_roots import current_metrics_rootfs
 
 HERE=Path(__file__).resolve().parents[1]
 
@@ -25,7 +26,7 @@ def main():
     base=Path(sys.argv[1]).resolve();base.mkdir(parents=True,exist_ok=False)
     prepared=base/'prepared';prepared.mkdir();scored=base/'scored';scored.mkdir()
     geometry=cache/'insula/m3-live-c/reconstruction'
-    cpu=cache/'insula/rootfs-v2';metrics=cache/'metrics-rootfs'
+    cpu=cache/'insula/rootfs-v2';metrics=current_metrics_rootfs(cache)
     cpulock=json.loads(Path(str(cpu)+'.lock.json').read_text());metriclock=json.loads(Path(str(metrics)+'.lock.json').read_text())
     verify_rootfs(cpu,cpulock['rootfs_sha256']);verify_rootfs(metrics,metriclock['rootfs_sha256'])
     candidates=['segmentation/verify-real-semantic-export.py','segmentation/prepare-real-semantics.py','segmentation/segmentation_export.py','segmentation/validate-real-semantic-wire.py']

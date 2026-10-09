@@ -9,6 +9,7 @@ P=Path(__file__).resolve().parents[1]
 from studies.architecture.experiment_runner import run_stage
 from insula.runtime_identity import verify_rootfs
 from insula.entry import launch_plan
+from insula.runtime_roots import current_cpu_rootfs, current_gpu_rootfs, current_metrics_rootfs
 from resources.scientific_payload import sha,unique_payload_bytes
 from resources.scientific_budget import reserve_write
 from detection.sustained_contract import validate_contract
@@ -17,7 +18,7 @@ from training_execution.sustained_sources import cache_snapshot_for_runtime,snap
 from training_execution.sustained_stage_inputs import freeze_inputs,bind_stage_paths
 
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing'
-GPU_ROOT=C/'gpu-rootfs-v6';CPU_ROOT=C/'insula/rootfs-v5-t29-20261008T230657Z';METRICS_ROOT=C/'metrics-rootfs'
+GPU_ROOT=current_gpu_rootfs(C);CPU_ROOT=current_cpu_rootfs(C);METRICS_ROOT=current_metrics_rootfs(C)
 WORKER_ENTRIES={
  'train_sustained.py':'/experiment/training_execution/train_sustained.py',
  'replay_sustained.py':'/experiment/training_execution/replay_sustained.py',
