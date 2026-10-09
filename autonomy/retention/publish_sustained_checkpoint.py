@@ -20,7 +20,7 @@ from retention.publication import (
 from retention.publisher_runtime import admitted_host_sources
 from retention.sustained_checkpoint_inventory import freeze_checkpoint_inventory
 from retention.checkpoint_retention_policy import checkpoint_case
-from retention.checkpoint_retention_sources import freeze_host_sources, validate_host_sources
+from retention.publication_sources import freeze_checkpoint_sources, validate_checkpoint_sources
 
 
 P = Path(__file__).resolve().parents[1]
@@ -55,8 +55,8 @@ def publish_checkpoint(args):
             args.host_source_receipt,
             P,
             args.cache_root / "insula/checkpoint-publisher-host-source",
-            freeze_host_sources,
-            validate_host_sources,
+            freeze_checkpoint_sources,
+            validate_checkpoint_sources,
         )
     final = json.loads(args.receipt.read_text())
     payload = Path(final["output_directory"])

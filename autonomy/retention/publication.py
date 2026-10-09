@@ -28,6 +28,12 @@ DEFAULT_RESOURCE_AREA = "runs"
 DEFAULT_RESOURCE_CHILD = "perception-resource-closures"
 DEFAULT_CHECKPOINT_AREA = "checkpoints"
 DEFAULT_CHECKPOINT_CHILD = "perception-sustained-checkpoints"
+DEFAULT_NATIVE_CACHE_AREA = "runs"
+DEFAULT_NATIVE_CACHE_CHILD = "perception-native-cache"
+DEFAULT_NATIVE_CACHE_KIND = "cache"
+DEFAULT_SUSTAINED_PILOT_AREA = "runs"
+DEFAULT_SUSTAINED_PILOT_CHILD = "perception-sustained-pilot"
+DEFAULT_SUSTAINED_PILOT_KIND = "pilot"
 DEFAULT_RESEARCH_JOURNAL_AREA = "runs"
 DEFAULT_RESEARCH_JOURNAL_CHILD = "perception-research-journal"
 DEFAULT_RESEARCH_JOURNAL_KIND = "snapshot"
@@ -137,6 +143,72 @@ def research_journal_spec(
         staging_style="copy",
         mode="direct",
         release=False,
+        store=store,
+        store_descriptor=dict(store_descriptor),
+        tool_digest=dict(tool_digest),
+        staging_root=Path(staging_root),
+        reserve=reserve,
+        chunk_size_bytes=chunk_size_bytes,
+    )
+
+
+def native_cache_spec(
+    *,
+    payload,
+    run_id,
+    release,
+    store,
+    store_descriptor,
+    tool_digest,
+    staging_root,
+    reserve,
+    chunk_size_bytes=DEFAULT_CHUNK_SIZE_BYTES,
+):
+    """Build the archive-mode publication spec for a native input cache."""
+
+    return PublicationSpec(
+        payload=payload,
+        inventory=lambda value: value,
+        area=DEFAULT_NATIVE_CACHE_AREA,
+        child=DEFAULT_NATIVE_CACHE_CHILD,
+        run_id=run_id,
+        kind=DEFAULT_NATIVE_CACHE_KIND,
+        staging_style="copy",
+        mode="archive",
+        release=release,
+        store=store,
+        store_descriptor=dict(store_descriptor),
+        tool_digest=dict(tool_digest),
+        staging_root=Path(staging_root),
+        reserve=reserve,
+        chunk_size_bytes=chunk_size_bytes,
+    )
+
+
+def sustained_pilot_spec(
+    *,
+    payload,
+    run_id,
+    release,
+    store,
+    store_descriptor,
+    tool_digest,
+    staging_root,
+    reserve,
+    chunk_size_bytes=DEFAULT_CHUNK_SIZE_BYTES,
+):
+    """Build the archive-mode publication spec for a sustained pilot payload."""
+
+    return PublicationSpec(
+        payload=payload,
+        inventory=lambda value: value,
+        area=DEFAULT_SUSTAINED_PILOT_AREA,
+        child=DEFAULT_SUSTAINED_PILOT_CHILD,
+        run_id=run_id,
+        kind=DEFAULT_SUSTAINED_PILOT_KIND,
+        staging_style="copy",
+        mode="archive",
+        release=release,
         store=store,
         store_descriptor=dict(store_descriptor),
         tool_digest=dict(tool_digest),

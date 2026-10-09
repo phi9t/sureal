@@ -3,7 +3,11 @@ load("@rules_python//python:defs.bzl", "py_binary", "py_library", "py_test")
 TEST_MODULES = glob(["*_test.py"])
 LIB_MODULES = glob(
     ["*.py"],
-    exclude = ["*_test.py"],
+    exclude = [
+        "*_test.py",
+        "retention.py",
+        "retention_audit.py",
+    ],
 )
 TORCH_TEST_MODULES = [
     "compare_state_test.py",
@@ -81,10 +85,7 @@ py_library(
 py_binary(
     name = "execute_worker",
     srcs = ["execute_worker.py"],
-    data = [
-        "archive_worker.py",
-        "retention_audit.py",
-    ],
+    data = ["archive_worker.py"],
     imports = [".."],
     main = "execute_worker.py",
     deps = [":resource_source_layer"],

@@ -2,17 +2,13 @@ import unittest
 import os
 from pathlib import Path
 
-from retention.checkpoint_retention_sources import (
-    REQUIRED as CHECKPOINT_RETENTION_REQUIRED,
-    SNAPSHOT_TARGET as CHECKPOINT_RETENTION_TARGET,
-)
-from retention.pilot_retention_sources import (
-    REQUIRED as PILOT_RETENTION_REQUIRED,
-    SNAPSHOT_TARGET as PILOT_RETENTION_TARGET,
-)
-from retention.retention_sources import (
-    REQUIRED as NATIVE_CACHE_RETENTION_REQUIRED,
-    SNAPSHOT_TARGET as NATIVE_CACHE_RETENTION_TARGET,
+from retention.publication_sources import (
+    CHECKPOINT_REQUIRED as CHECKPOINT_RETENTION_REQUIRED,
+    CHECKPOINT_TARGET as CHECKPOINT_RETENTION_TARGET,
+    NATIVE_CACHE_REQUIRED as NATIVE_CACHE_RETENTION_REQUIRED,
+    NATIVE_CACHE_TARGET as NATIVE_CACHE_RETENTION_TARGET,
+    PILOT_REQUIRED as PILOT_RETENTION_REQUIRED,
+    PILOT_TARGET as PILOT_RETENTION_TARGET,
 )
 from training_execution.sustained_controller_sources import (
     REQUIRED as CONTROLLER_REQUIRED,
