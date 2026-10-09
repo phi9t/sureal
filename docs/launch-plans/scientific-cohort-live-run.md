@@ -1,6 +1,6 @@
 # Scientific Cohort Live Run Plan
 
-Run id: `20261009T214131Z-6183008573786657189`
+Run id: `20261009T222923Z-6183008573786657189`
 
 Ticket: `.scratch/launch-plans/issues/03-run-the-broken-verifiers.md`
 
@@ -22,7 +22,7 @@ records, measured by summed source object sizes in
 
 Use a fresh cohort output root under the accounted scientific working tree:
 
-`/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/lp03-live-20261009T214131Z-6183008573786657189/`
+`/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/lp03-live-20261009T222923Z-6183008573786657189/`
 
 The preflight must fail if this directory already exists or if the scene
 checkpoint under it already exists. No historical `cohort-v1` or other retained
@@ -33,13 +33,17 @@ checkpoint is reused.
 Run from the repository root:
 
 ```bash
-systemd-run --user --scope --unit=sureal-cohort-20261009T214131Z-6183008573786657189 -p MemoryMax=17179869184 -p MemorySwapMax=0 -p MemoryAccounting=yes env HADOOP_CONF_DIR=/opt/tiger/yarn_deploy/hadoop/conf PYTHONPATH=autonomy python3 autonomy/studies/scientific_cohort.py --scene 6183008573786657189_5414_000_5434_000 --output /data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/lp03-live-20261009T214131Z-6183008573786657189
+systemd-run --user --scope --unit=sureal-cohort-20261009T222923Z-6183008573786657189 -p MemoryMax=17179869184 -p MemorySwapMax=0 -p MemoryAccounting=yes env HADOOP_CONF_DIR=/opt/tiger/yarn_deploy/hadoop/conf PYTHONPATH=autonomy python3 autonomy/studies/scientific_cohort.py --scene 6183008573786657189_5414_000_5434_000 --output /data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/lp03-live-20261009T222923Z-6183008573786657189
 ```
 
 The driver already documents and implements this direct Python invocation. It
 loads the current CPU runtime lock through `load_runtime_lock`, builds
 launch-plan based eviction stages, and delegates live inner stages to module
 entrypoints through `PYTHONPATH=autonomy`.
+
+The active scientific working cap is `21474836480` bytes (20 GiB), raised by
+user decision on 2026-10-09 after the sanctioned release audit found zero
+release-safe bytes. The independent `/data02` free-space gate remains `45` GiB.
 
 ## Publication Keys
 
@@ -72,7 +76,7 @@ The publishers derive those keys through
 Record preflight JSON, live stdout/stderr, command metadata, verification JSON,
 and gate logs under:
 
-`/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/lp03-live/20261009T214131Z-6183008573786657189/`
+`/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/lp03-live/20261009T222923Z-6183008573786657189/`
 
 The ticket comment will cite command lines, receipt paths, sha256 values, and
 durations from that evidence directory.
