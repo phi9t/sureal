@@ -16,5 +16,6 @@
 - [ ] **One copy of each:** the Python-worker check exists once, and so does the GPU device list.
 - [ ] **No other check is weakened.** The boundary test's other patterns and exclusions are unchanged, except where they become stricter.
 - [ ] The `insula` and `autonomy/ARCHITECTURE.md` docs describe the receipt-checking rule: compare plans for new receipts, use the legacy parser only for receipts with no plan record.
+- [ ] **Live acceptance** is repeated on the final code with the same runs as ticket 03, and the fresh receipts verify. Record the results in Comments.
 - [ ] The golden argv test is unchanged and passes, and the retained-receipt sweep matches the baseline exactly.
 - [ ] **Gates pass:** CPU, parallax, and CUDA on GPU 1 when it is free. Counts recorded.

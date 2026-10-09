@@ -19,5 +19,11 @@
   Receipts without one still go through the legacy parser.
 - [ ] **The ordering rule exists only in the renderer.** The `/tmp`, `/tmp/*` and device mount order is defined only in `render_plan`, and the private index helpers used for splicing are deleted or used only by the legacy path.
 - [ ] **Tampering tests:** for a new receipt, a record with a changed mount digest, a changed role, or a reordered argv each fails verification.
+- [ ] **Live acceptance**, run for real on this ticket's code (GPU 1 only, and only when it is free). Record the commands, receipts and durations in Comments, and report failures as found:
+  - the three motion verifiers and `replay_motion_foundation.py`;
+  - one resource-measured stage through `resources.stage`;
+  - the GPU live gate (`insula/verify_gpu_live.py` or its current equivalent) on GPU 1.
+
+  Their fresh receipts must verify through the new plan comparison, and a tampered copy of one must fail.
 - [ ] The golden argv test is unchanged and passes, and the retained-receipt sweep matches the baseline exactly.
 - [ ] **Gates pass:** CPU, parallax, and CUDA on GPU 1 when it is free. Counts recorded.

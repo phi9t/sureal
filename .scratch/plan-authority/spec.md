@@ -73,7 +73,7 @@ These decisions were made by the coordinator, under the user's standing delegati
 
 - One stage-execution module replacing the launcher swap in `resources.backend` (review candidate 3).
 - The publication module owning receipt classification and release checks (candidate 4), and deduplicating the publisher helpers (candidate 5).
-- Any live GPU run, HDFS write, re-admission or rootfs rebuild.
+- HDFS writes, re-admission and rootfs rebuilds. Live acceptance runs (motion verifiers, a resource stage, the GPU live gate on GPU 1) are in scope from ticket 03 on.
 - Frozen code under `research/`, `studies/*/procedure_records/` and `studies/architecture/harness/`.
 
 ## Further Notes
