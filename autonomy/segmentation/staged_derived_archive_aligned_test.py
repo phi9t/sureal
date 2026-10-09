@@ -58,4 +58,20 @@ class AlignedStageTests(unittest.TestCase):
                     with staged_derived_archive(record,cache,working_limit_bytes=10000,
                                                 blob_store=store):pass
 
+    def test_oversized_blob_refused_before_download(self):
+        class CountingAdapter(InMemoryBlobAdapter):
+            downloads = 0
+            def _download_blob(self, key, destination, context):
+                type(self).downloads += 1
+                return super()._download_blob(key, destination, context)
+        with tempfile.TemporaryDirectory() as tmp:
+            record, _ = self.fixture()
+            key = record['archive_blob_key']
+            store = BlobStore(CountingAdapter({key: b'\0' * 8192}), backoff_seconds=())
+            with self.assertRaises(ValueError):
+                with staged_derived_archive(record, Path(tmp) / 'cache', working_limit_bytes=1 << 20, blob_store=store):
+                    pass
+            self.assertEqual(CountingAdapter.downloads, 0)
+
+
 if __name__ == '__main__': unittest.main()

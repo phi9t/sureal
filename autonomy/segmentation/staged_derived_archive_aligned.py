@@ -95,7 +95,7 @@ def staged_derived_archive(record,cache,*,working_limit_bytes,blob_store=None,bl
         with tempfile.TemporaryDirectory(dir=stages,prefix='stage-') as tmp:
             path=Path(tmp)/'scene.tar'
             try:
-                store.get(key,path,expected)
+                store.get(key,path,expected,expected_bytes=size)
             except BlobStoreError as error:
                 raise ValueError('derived blob fetch failed') from error
             path = require_regular_file(path)

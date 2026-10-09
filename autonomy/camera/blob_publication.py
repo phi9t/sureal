@@ -15,5 +15,5 @@ def publication_blob_store(descriptor=None):
 
 def put_and_fetch_blob(store, key, source, destination):
     result = store.put(key, source)
-    store.get(result["key"], destination, result["sha256"])
+    store.get(result["key"], destination, result["sha256"], expected_bytes=result["bytes"])
     return dict(result, verified_by_readback=True)
