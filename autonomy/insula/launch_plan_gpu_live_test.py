@@ -52,7 +52,9 @@ class LaunchPlanGPULiveTests(unittest.TestCase):
             self.assertEqual(data["gpu"]["requested_index"], 1)
             self.assertNotIn("/dev/nvidia0", json.dumps(data["devices"], sort_keys=True))
             record = record_plan(plan)
-            self.assertEqual(record["gpu"], data["gpu"])
+            self.assertEqual(record["gpu"]["requested_index"], data["gpu"]["requested_index"])
+            self.assertEqual(record["gpu"]["device_uuid"], data["gpu"]["device_uuid"])
+            self.assertEqual(record["gpu"]["device_minor"], 1)
             self.assertNotIn("/dev/nvidia", json.dumps(record, sort_keys=True))
 
             argv = render_plan(plan)

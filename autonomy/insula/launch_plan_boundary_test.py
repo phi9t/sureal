@@ -26,7 +26,12 @@ BWRAP_ARGV_PATTERNS = (
     ("legacy live_gate_plan command-line face", re.compile(r"\blive_gate_plan\b|insula\.sandbox_plan|def compose_bwrap_plan\(")),
     ("direct bwrap argv construction", re.compile(r"""\[[^\n#]*["']bwrap["']""")),
     ("direct bwrap mount argv", re.compile(r"""["']--(?:ro-bind|bind|dev-bind)["']""")),
+    ("direct bwrap environment argv", re.compile(r"""^\s*\w+(?:\[[^\]]+\])?\s*(?:=|\+=)\s*\[[^\n#]*["']--setenv["']""")),
+    ("direct bwrap tmpfs argv", re.compile(r"""^\s*\w+(?:\[[^\]]+\])?\s*(?:=|\+=)\s*\[[^\n#]*["']--tmpfs["']""")),
+    ("direct bwrap symlink argv", re.compile(r"""^\s*\w+(?:\[[^\]]+\])?\s*(?:=|\+=)\s*\[[^\n#]*["']--symlink["']""")),
+    ("direct bwrap working-directory argv", re.compile(r"""^\s*\w+(?:\[[^\]]+\])?\s*(?:=|\+=)\s*\[[^\n#]*["']--chdir["']""")),
     ("direct bwrap namespace argv", re.compile(r"""["']--(?:unshare-all|clearenv)["']""")),
+    ("direct shell bwrap execution", re.compile(r"""(^|[;&|]\s*)(exec\s+)?bwrap(\s|$)""")),
 )
 
 RUNTIME_LOCK_PATTERNS = (
@@ -35,12 +40,18 @@ RUNTIME_LOCK_PATTERNS = (
     ("direct rootfs content verification", re.compile(r"(?<!def )\bverify_rootfs\(")),
 )
 
+PRIVATE_LAUNCH_PLAN_PATTERNS = (
+    ("private launch_plan import outside insula", re.compile(r"""from\s+insula\.launch_plan\s+import\s+.*\b_\w+""")),
+)
+
 ALLOWED_EXACT = {
     "insula/launch_plan.py",
+    "insula/tracer.sh",
     "insula/runtime_roots.py",
     "insula/runtime_identity.py",
     "insula/build_cpu_rootfs.sh",
     "insula/build_gpu_bazel_rootfs_v6.sh",
+    "tracer.sh",
 }
 
 # The only active legacy receipt reader outside the module is the named
@@ -87,7 +98,7 @@ def scan_launch_plan_boundary(root: Path = AUTONOMY_ROOT) -> list[Violation]:
         except OSError:
             continue
         for line_number, line in enumerate(lines, start=1):
-            for kind, pattern in (*BWRAP_ARGV_PATTERNS, *RUNTIME_LOCK_PATTERNS):
+            for kind, pattern in (*BWRAP_ARGV_PATTERNS, *RUNTIME_LOCK_PATTERNS, *PRIVATE_LAUNCH_PLAN_PATTERNS):
                 if pattern.search(line):
                     violations.append(Violation(relative, line_number, kind))
     return violations
@@ -138,6 +149,44 @@ class LaunchPlanBoundaryTests(unittest.TestCase):
                 Violation("dataset/planted.py", 4, "direct runtime lock JSON path"),
                 Violation("dataset/planted.py", 4, "direct runtime lock JSON load"),
             ],
+        )
+
+    def test_scanner_reports_planted_bwrap_option_splicing_and_private_imports(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            planted = root / "dataset" / "planted.py"
+            planted.parent.mkdir(parents=True)
+            planted.write_text(
+                "from insula.launch_plan import _assemble_plan\n"
+                "cmd = []\n"
+                "cmd[0:0] = ['--setenv', 'A', 'B', '--tmpfs', '/tmp/x', '--symlink', 'usr/lib', '/lib', '--chdir', '/experiment']\n"
+            )
+
+            violations = scan_launch_plan_boundary(root)
+
+        self.assertEqual(
+            violations,
+            [
+                Violation("dataset/planted.py", 1, "private launch_plan import outside insula"),
+                Violation("dataset/planted.py", 3, "direct bwrap environment argv"),
+                Violation("dataset/planted.py", 3, "direct bwrap tmpfs argv"),
+                Violation("dataset/planted.py", 3, "direct bwrap symlink argv"),
+                Violation("dataset/planted.py", 3, "direct bwrap working-directory argv"),
+            ],
+        )
+
+    def test_scanner_reports_planted_unquoted_shell_bwrap_call(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            planted = root / "dataset" / "planted.sh"
+            planted.parent.mkdir(parents=True)
+            planted.write_text("#!/usr/bin/env bash\nexec bwrap \"$@\"\n")
+
+            violations = scan_launch_plan_boundary(root)
+
+        self.assertEqual(
+            violations,
+            [Violation("dataset/planted.sh", 2, "direct shell bwrap execution")],
         )
 
 

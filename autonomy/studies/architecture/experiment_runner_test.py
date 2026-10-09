@@ -98,6 +98,23 @@ class RunnerTests(unittest.TestCase):
    receipt={'artifacts':{},'manifest_sha256':module.sha(p),'checks':[{'exit_code':0,'command':['bwrap','--unshare-all','--die-with-parent','--ro-bind',str(directory),'/tmp/inputs','--','python','/experiment/worker.py']}]}
    module.verify_receipt(receipt,directory);p.write_text('{"changed":true}')
    with self.assertRaises(ValueError):module.verify_receipt(receipt,directory)
+ def test_plan_form_manifest_receipts_verify_recorded_digest_without_host_paths(self):
+  receipt={'artifacts':{},'manifest_sha256':'digest-fixture','checks':[{'exit_code':0,'launch_plan':{'runtime':{'lock_sha256':'r','form':'recipe-digest'},'mounts':[{'role':'input:/tmp/inputs','kind':'bind','inside_path':'/tmp/inputs','mode':'read_only','digest':'digest-fixture'}],'environment':{},'working_directory':'/experiment','command':['python','/experiment/worker.py']}}]}
+  module.verify_receipt(receipt,Path('/unused'))
+  receipt['checks'][0]['launch_plan']['mounts'][0]['digest']='changed'
+  with self.assertRaisesRegex(ValueError,'Missing or changed evidence'):
+   module.verify_receipt(receipt,Path('/unused'))
+ def test_plan_form_worker_receipts_verify_recorded_digest_without_host_paths(self):
+  receipt={'artifacts':{},'worker_sha256':'worker-digest','checks':[{'exit_code':0,'launch_plan':{'runtime':{'lock_sha256':'r','form':'recipe-digest'},'mounts':[{'role':'input:/tmp/worker.py','kind':'bind','inside_path':'/tmp/worker.py','mode':'read_only','digest':'worker-digest'}],'environment':{},'working_directory':'/experiment','command':['python','/experiment/worker.py']}}]}
+  module.verify_receipt(receipt,Path('/unused'))
+  receipt['checks'][0]['launch_plan']['mounts'][0]['digest']='changed'
+  with self.assertRaisesRegex(ValueError,'Cannot locate pinned receipt worker|Missing or changed evidence'):
+   module.verify_receipt(receipt,Path('/unused'))
+ def test_rows_with_command_and_launch_plan_prefer_command_mount_hosts(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   directory=Path(tmp);manifest=directory/'manifest.json';manifest.write_text('{}')
+   receipt={'artifacts':{},'manifest_sha256':module.sha(manifest),'checks':[{'exit_code':0,'command':['bwrap','--unshare-all','--die-with-parent','--ro-bind',str(directory),'/tmp/inputs','--','python','/experiment/worker.py'],'launch_plan':{'runtime':{'lock_sha256':'r','form':'recipe-digest'},'mounts':[{'role':'input:/tmp/inputs','kind':'bind','inside_path':'/tmp/inputs','mode':'read_only','digest':'not-the-manifest'}],'environment':{},'working_directory':'/experiment','command':['python','/experiment/worker.py']}}]}
+   module.verify_receipt(receipt,directory)
  def test_summary_requires_contracts(self):
   with tempfile.TemporaryDirectory() as tmp:
    package=Path(tmp);research=package/'research';research.mkdir();label='residual_bev--test'
