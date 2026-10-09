@@ -90,19 +90,32 @@ def append_log(verb, argv, options, flags, positional):
         stream.write(json.dumps(record, sort_keys=True) + "\n")
 
 
+def emit_error(message, exit_code, error_class=None):
+    stderr_prefix = os.environ.get("FAKE_WAYSTONE_STDERR_PREFIX")
+    if stderr_prefix:
+        print(stderr_prefix, file=sys.stderr)
+    payload = {
+        "schema_version": 1,
+        "type": "error",
+        "exit_code": exit_code,
+        "message": message,
+    }
+    if error_class:
+        payload["class"] = error_class
+    print(json.dumps(payload, sort_keys=True), file=sys.stderr)
+    raise SystemExit(exit_code)
+
+
 def fail_auth():
-    print('{"error":"Kerberos token expired: secret stderr"}', file=sys.stderr)
-    raise SystemExit(17)
+    emit_error("Kerberos token expired: secret stderr", 10, "auth")
 
 
 def fail_missing():
-    print('{"error":"FileNotFound: missing secret stderr"}', file=sys.stderr)
-    raise SystemExit(44)
+    emit_error("file not found: secret stderr", 44)
 
 
 def fail_conflict():
-    print('{"error":"already exists: secret stderr"}', file=sys.stderr)
-    raise SystemExit(49)
+    emit_error("already exists: secret stderr", 49)
 
 
 def hang_with_child():
@@ -137,6 +150,15 @@ def main():
     append_log(verb, sys.argv[1:], options, flags, positional[1:])
     if os.environ.get("FAKE_WAYSTONE_AUTH_FAIL") == "1" and verb in {"ls", "get", "put"}:
         fail_auth()
+    forced_class = os.environ.get("FAKE_WAYSTONE_ERROR_CLASS")
+    forced_verbs = set(os.environ.get("FAKE_WAYSTONE_ERROR_VERBS", "ls,get,put").split(","))
+    if forced_class and verb in forced_verbs:
+        exit_code = int(os.environ.get("FAKE_WAYSTONE_ERROR_EXIT", "12"))
+        message = os.environ.get("FAKE_WAYSTONE_ERROR_MESSAGE", "structured secret stderr")
+        emit_error(message, exit_code, forced_class)
+    if os.environ.get("FAKE_WAYSTONE_RAW_STDERR") and verb in forced_verbs:
+        print(os.environ["FAKE_WAYSTONE_RAW_STDERR"], file=sys.stderr)
+        raise SystemExit(int(os.environ.get("FAKE_WAYSTONE_ERROR_EXIT", "12")))
     if os.environ.get("FAKE_WAYSTONE_HANG_VERB") == verb:
         hang_with_child()
 
@@ -199,8 +221,7 @@ def main():
             )
         )
         return
-    print('{"error":"unexpected verb"}', file=sys.stderr)
-    raise SystemExit(3)
+    emit_error("unexpected verb", 3, "usage")
 
 
 if __name__ == "__main__":
@@ -328,6 +349,13 @@ class WaystoneAdapterTests(unittest.TestCase):
                     {"kind": "waystone", "project": "sureal", "waystone": "/receipt-controlled/executable"},
                     command_prefix=[str(fake)],
                 )
+            with self.with_environment(env):
+                with self.assertRaises(ValueError):
+                    blob_adapter_from_descriptor(
+                        {"schema_version": 1, "kind": "hdfs", "prefix": "hdfs://fixture/storage/legacy-sureal"},
+                        command_prefix=[str(fake)],
+                        tool_pins={str(fake): self.sha256(fake)},
+                    )
 
     def test_missing_authentication_and_conflict_classification_do_not_leak_backend_output(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -371,6 +399,131 @@ class WaystoneAdapterTests(unittest.TestCase):
                 self.assertNotIn("Kerberos", str(auth.exception))
                 self.assertNotIn("secret stderr", str(auth.exception))
 
+    def test_structured_waystone_error_can_follow_non_json_stderr_prelude(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            fake = self.install_fake_waystone(root)
+            env = self.fake_environment(root)
+            env["FAKE_WAYSTONE_STDERR_PREFIX"] = "wrapper prelude secret stderr"
+            with self.with_environment(env):
+                adapter = WaystoneBlobAdapter(
+                    project="sureal",
+                    command_prefix=[str(fake)],
+                    tool_pins={str(fake): self.sha256(fake)},
+                )
+                store = BlobStore(adapter, backoff_seconds=(0.0, 0.0))
+                first = self.write_file(root, "first.bin", b"first")
+                second = self.write_file(root, "second.bin", b"second")
+                key = "runs/prefix-conflict/run-20261009/output/blob.bin"
+                store.put(key, first)
+                with self.assertRaises(Conflict) as conflict:
+                    store.put(key, second)
+
+            self.assertNotIn("wrapper prelude", str(conflict.exception))
+            self.assertNotIn("secret stderr", str(conflict.exception))
+
+    def test_structured_waystone_error_classes_drive_failure_mapping(self):
+        cases = (
+            ("auth", 10, Unauthenticated, 1),
+            ("timeout", 11, Unavailable, 3),
+            ("usage", 2, Unavailable, 1),
+            ("external", 12, Unavailable, 3),
+            ("transfer", 20, Unavailable, 3),
+            ("verification", 21, Unavailable, 1),
+        )
+        for error_class, exit_code, expected_error, expected_attempts in cases:
+            with self.subTest(error_class=error_class):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    fake = self.install_fake_waystone(root)
+                    env = self.fake_environment(root)
+                    env.update(
+                        {
+                            "FAKE_WAYSTONE_ERROR_CLASS": error_class,
+                            "FAKE_WAYSTONE_ERROR_EXIT": str(exit_code),
+                            "FAKE_WAYSTONE_ERROR_MESSAGE": (
+                                "structured secret stderr for "
+                                + error_class
+                                + " at hdfs://fixture/storage/sureal/runs/token-file-exists/blob.bin"
+                            ),
+                        }
+                    )
+                    with self.with_environment(env):
+                        adapter = WaystoneBlobAdapter(
+                            project="sureal",
+                            command_prefix=[str(fake)],
+                            tool_pins={str(fake): self.sha256(fake)},
+                        )
+                        store = BlobStore(adapter, backoff_seconds=(0.0, 0.0))
+                        with self.assertRaises(expected_error) as caught:
+                            store.exists("runs/classes/run-20261009/output/blob.bin")
+
+                    self.assertNotIn("structured secret stderr", str(caught.exception))
+                    self.assertNotIn("exit_code", str(caught.exception))
+                    records = self.log_records(root)
+                    attempts = [record for record in records if record["verb"] == "ls"]
+                    self.assertEqual(len(attempts), expected_attempts)
+
+    def test_transient_structured_message_with_token_file_and_exists_is_not_auth_or_conflict(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            fake = self.install_fake_waystone(root)
+            env = self.fake_environment(root)
+            env.update(
+                {
+                    "FAKE_WAYSTONE_ERROR_CLASS": "external",
+                    "FAKE_WAYSTONE_ERROR_EXIT": "12",
+                    "FAKE_WAYSTONE_ERROR_VERBS": "put",
+                    "FAKE_WAYSTONE_ERROR_MESSAGE": (
+                        "transfer failed for hdfs://fixture/storage/sureal/runs/token-file-exists/blob.bin "
+                        "with --auth-source token-file"
+                    ),
+                }
+            )
+            with self.with_environment(env):
+                adapter = WaystoneBlobAdapter(
+                    project="sureal",
+                    command_prefix=[str(fake)],
+                    tool_pins={str(fake): self.sha256(fake)},
+                )
+                store = BlobStore(adapter, backoff_seconds=(0.0, 0.0))
+                source = self.write_file(root, "source.bin", b"retryable")
+                with self.assertRaises(Unavailable) as caught:
+                    store.put("runs/token-file-exists/run-20261009/output/blob.bin", source)
+
+            self.assertNotIn("token-file", str(caught.exception))
+            records = self.log_records(root)
+            attempts = [record for record in records if record["verb"] == "put"]
+            self.assertEqual(len(attempts), 3)
+
+    def test_unparseable_waystone_error_is_unavailable_without_marker_classification(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            fake = self.install_fake_waystone(root)
+            env = self.fake_environment(root)
+            env.update(
+                {
+                    "FAKE_WAYSTONE_RAW_STDERR": "not-json secret stderr with token-file and already exists",
+                    "FAKE_WAYSTONE_ERROR_EXIT": "12",
+                    "FAKE_WAYSTONE_ERROR_VERBS": "put",
+                }
+            )
+            with self.with_environment(env):
+                adapter = WaystoneBlobAdapter(
+                    project="sureal",
+                    command_prefix=[str(fake)],
+                    tool_pins={str(fake): self.sha256(fake)},
+                )
+                store = BlobStore(adapter, backoff_seconds=(0.0, 0.0))
+                source = self.write_file(root, "source.bin", b"not retryable without structure")
+                with self.assertRaises(Unavailable) as caught:
+                    store.put("runs/raw-error/run-20261009/output/blob.bin", source)
+
+            self.assertNotIn("secret stderr", str(caught.exception))
+            records = self.log_records(root)
+            attempts = [record for record in records if record["verb"] == "put"]
+            self.assertEqual(len(attempts), 1)
+
     def test_waystone_adapter_checks_tool_digest_before_every_operation(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -412,6 +565,36 @@ class WaystoneAdapterTests(unittest.TestCase):
                 )
                 with self.assertRaises(Unavailable):
                     store.exists("runs/hang/run-20261009/output/blob.bin")
+
+            child_pid = int((root / "child.pid").read_text())
+            deadline = time.monotonic() + 2.0
+            while self.process_is_running(child_pid) and time.monotonic() < deadline:
+                time.sleep(0.05)
+            self.assertFalse(self.process_is_running(child_pid))
+
+    def test_waystone_adapter_enforces_deadline_when_layout_profile_hangs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            fake = self.install_fake_waystone(root)
+            env = self.fake_environment(root)
+            env["FAKE_WAYSTONE_HANG_VERB"] = "layout-profile"
+            env["FAKE_WAYSTONE_PARENT_PID"] = str(root / "parent.pid")
+            env["FAKE_WAYSTONE_CHILD_PID"] = str(root / "child.pid")
+            with self.with_environment(env):
+                adapter = WaystoneBlobAdapter(
+                    project="sureal",
+                    command_prefix=[str(fake)],
+                    tool_pins={str(fake): self.sha256(fake)},
+                )
+                store = BlobStore(
+                    adapter,
+                    deadline_base_seconds=0.5,
+                    minimum_throughput_bytes_per_second=1024 * 1024,
+                    max_attempts=1,
+                    backoff_seconds=(),
+                )
+                with self.assertRaises(Unavailable):
+                    store.exists("runs/layout-hang/run-20261009/output/blob.bin")
 
             child_pid = int((root / "child.pid").read_text())
             deadline = time.monotonic() + 2.0

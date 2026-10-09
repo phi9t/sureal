@@ -33,3 +33,25 @@ Done 2026-10-09:
   - `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...` passed: 174 out of 174 tests. New count is 174. One prior full rerun exposed a transient pre-existing `/proc/<pid>/stat` race in `//autonomy/studies:architecture__experiment_runner_test`; that target passed on immediate focused rerun before the final full-suite pass.
   - `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //parallax/...` passed: 17 out of 17 tests.
   - GPU 1 was free (`4 MiB` used, `0%` utilization, no `pmon` process), so `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...` passed: 29 out of 29 tests.
+
+Review follow-up 2026-10-09:
+
+- Changed Waystone failure classification to parse the structured `--error-format json` stderr payload and map `auth` to `Unauthenticated`, `timeout`/`external`/`transfer` to retryable primitives, and `usage`/`verification`/unparseable output to non-retried `Unavailable`; missing/conflict are recognized only from narrow markers in the parsed payload message.
+- Routed `layout-profile` through the same new-session `Popen`/deadline/kill-process-group path used by storage primitives. Operation-time layout calls use the operation context deadline; descriptor/URI helper calls use a bounded default layout deadline.
+- Legacy `hdfs` descriptors now validate that their normalized prefix matches the resolved Waystone project root before being accepted, so keys stay relative to the project root.
+- Kept tool-pin checks before each primitive while caching `(st_dev, st_ino, st_size, st_mtime_ns, st_ctime_ns)` after a successful full hash; files whose stat tuple changes are rehashed and refused if their digest changed.
+- Added offline fake-Waystone regression tests for all review items, including structured error classes, a transient message containing `token-file` and `exists` that must not become auth/conflict, layout timeout process-group killing, mismatched legacy-prefix rejection, non-JSON stderr prelude plus structured JSON, unparseable stderr, and changed tool-pin refusal.
+- Live HDFS follow-up runs:
+  - First retry command: `TMPDIR=... PYTHONPATH=autonomy SUREAL_WAYSTONE=$HOME/workspace/waystone/scripts/waystone SUREAL_BLOB_STORE_CONTRACT_ADAPTER=waystone SUREAL_BLOB_STORE_CONTRACT_RUN_ID=20261009T025300Z python3 autonomy/blob_store/contract_test.py`
+  - First retry result: failed, 13 tests in 31.729s, exposing duplicate `put` as a structured `transfer` error with an `already exists` message after Waystone wrapper prelude text.
+  - Final command: `TMPDIR=... PYTHONPATH=autonomy SUREAL_WAYSTONE=$HOME/workspace/waystone/scripts/waystone SUREAL_BLOB_STORE_CONTRACT_ADAPTER=waystone SUREAL_BLOB_STORE_CONTRACT_RUN_ID=20261009T025559Z python3 autonomy/blob_store/contract_test.py`
+  - Final result: passed, 13 tests in 36.285s.
+  - HDFS write prefixes: `tmp/blob-store-contract/20261009T025300Z/...` and `tmp/blob-store-contract/20261009T025559Z/...`; no delete operation was used.
+  - Keys exercised under each prefix included `runs/resource-closures/run-20261008/checkpoint/archive-000.tar.gz`, `artifacts/source-snapshots/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`, `datasets/scientific-cohort/run-20261008/components/scene.tar`, `checkpoints/child/run-20261008/model/checkpoint.pt`, `runs/symlinked-caller/run-20261008/output/blob.bin`, `runs/existence/run-20261008/output/blob.bin`, `runs/deadline/run-20261008/output/blob.bin` and retry/auth contract keys.
+- Review follow-up verification:
+  - Red check before patch: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/blob_store:waystone_test` failed for structured-error, legacy-prefix, and layout-timeout regressions.
+  - `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/blob_store:waystone_test` passed after fixes.
+  - `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/blob_store:all_tests` passed: 3 out of 3 tests.
+  - `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...` passed: 174 out of 174 tests. New count remains 174.
+  - `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //parallax/...` passed: 17 out of 17 tests.
+  - GPU 1 was free (`4 MiB` used, `0%` utilization, no `pmon` process), so `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...` passed: 29 out of 29 tests.

@@ -21,34 +21,18 @@ DEFAULT_MINIMUM_THROUGHPUT_BYTES_PER_SECOND = 1024 * 1024
 DEFAULT_BACKOFF_SECONDS = (0.25, 1.0)
 HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 BLOB_KEY_SEGMENT = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._=-]*$")
-AUTHENTICATION_MARKERS = (
-    "authentication",
-    "authenticate",
-    "authorization",
-    "credential",
-    "forbidden",
-    "gss",
-    "kerberos",
-    "permission denied",
-    "ticket",
-    "token",
-    "unauthorized",
-)
+DEFAULT_WAYSTONE_LAYOUT_DEADLINE_SECONDS = 30.0
 MISSING_MARKERS = (
     "does not exist",
-    "filenotfound",
     "file not found",
-    "missing",
     "no such file",
-    "not found",
-    "not_exist",
 )
 CONFLICT_MARKERS = (
     "already exists",
-    "destination exists",
     "file exists",
-    "exists",
 )
+WAYSTONE_TRANSIENT_ERROR_CLASSES = ("external", "transfer")
+WAYSTONE_PERMANENT_UNAVAILABLE_ERROR_CLASSES = ("usage", "verification")
 WAYSTONE_SIZE_KEYS = (
     "bytes",
     "size",
@@ -113,6 +97,10 @@ class _PrimitiveUnauthenticated(_PrimitiveError):
 
 
 class _PrimitiveTransient(_PrimitiveError):
+    pass
+
+
+class _PrimitivePermanentUnavailable(_PrimitiveError):
     pass
 
 
@@ -291,6 +279,8 @@ class BlobStore:
                 raise Unauthenticated(
                     "blob store authentication failed; " + self._authentication_action()
                 ) from error
+            except _PrimitivePermanentUnavailable as error:
+                raise Unavailable("blob store " + operation_name + " unavailable") from error
             except (_PrimitiveTransient, TimeoutError, OSError) as error:
                 if attempt == self._max_attempts:
                     raise Unavailable(
@@ -499,12 +489,14 @@ class WaystoneBlobAdapter:
         self.authentication_action = str(authentication_action or DEFAULT_HDFS_AUTH_REFRESH)
         self._clock = clock
         self._layout = None
+        self._tool_pin_stats = {}
 
     @property
     def tool_sha256(self) -> dict[str, str]:
         return dict(self._tool_pins)
 
     def _upload_blob(self, key: str, source: Path, context: _OperationContext) -> None:
+        uri = self._uri_for_key(key, context)
         result = self._run(
             [
                 "put",
@@ -514,7 +506,7 @@ class WaystoneBlobAdapter:
                 str(self._command_timeout_seconds(context)),
                 "--mkdir-parents",
                 str(source),
-                self._uri_for_key(key),
+                uri,
             ],
             context,
         )
@@ -522,6 +514,7 @@ class WaystoneBlobAdapter:
             self._raise_waystone_failure(result, missing=False, conflict=True)
 
     def _download_blob(self, key: str, destination: Path, context: _OperationContext) -> None:
+        uri = self._uri_for_key(key, context)
         result = self._run(
             [
                 "get",
@@ -530,7 +523,7 @@ class WaystoneBlobAdapter:
                 "--command-timeout-secs",
                 str(self._command_timeout_seconds(context)),
                 "--overwrite",
-                self._uri_for_key(key),
+                uri,
                 str(destination),
             ],
             context,
@@ -539,6 +532,7 @@ class WaystoneBlobAdapter:
             self._raise_waystone_failure(result, missing=True, conflict=False)
 
     def _blob_size(self, key: str, context: _OperationContext) -> int:
+        uri = self._uri_for_key(key, context)
         result = self._run(
             [
                 "ls",
@@ -548,7 +542,7 @@ class WaystoneBlobAdapter:
                 str(self._command_timeout_seconds(context)),
                 "--output",
                 "json",
-                self._uri_for_key(key),
+                uri,
             ],
             context,
         )
@@ -557,6 +551,7 @@ class WaystoneBlobAdapter:
         return _waystone_blob_size(result.stdout)
 
     def _blob_exists(self, key: str, context: _OperationContext) -> bool:
+        uri = self._uri_for_key(key, context)
         result = self._run(
             [
                 "ls",
@@ -566,15 +561,16 @@ class WaystoneBlobAdapter:
                 str(self._command_timeout_seconds(context)),
                 "--output",
                 "json",
-                self._uri_for_key(key),
+                uri,
             ],
             context,
         )
         if result.returncode == 0:
             return _waystone_blob_exists(result.stdout)
-        if _waystone_output_has_marker(result, MISSING_MARKERS):
+        try:
+            self._raise_waystone_failure(result, missing=True, conflict=False)
+        except _PrimitiveMissing:
             return False
-        self._raise_waystone_failure(result, missing=False, conflict=False)
         return False
 
     def blob_key_from_uri(self, value: str) -> str:
@@ -586,6 +582,7 @@ class WaystoneBlobAdapter:
         if self._legacy_prefix is not None:
             prefixes.append(self._legacy_prefix)
         layout = self._layout_profile()
+        self._validate_legacy_prefix(layout)
         prefixes.append(_normalize_hdfs_prefix(layout["project_root"]))
         prefixes.append(_normalize_hdfs_prefix(layout["storage_root"]) + "/" + self.project)
         for prefix in sorted(set(prefixes), key=len, reverse=True):
@@ -596,33 +593,24 @@ class WaystoneBlobAdapter:
                 return validate_blob_key(value[len(candidate_prefix) :])
         raise ValueError("absolute HDFS URI is outside the Waystone project root")
 
-    def _uri_for_key(self, key: str) -> str:
+    def _uri_for_key(self, key: str, context: _OperationContext | None = None) -> str:
         key = validate_blob_key(key)
         if self._key_prefix is not None:
             key = self._key_prefix + "/" + key
-        return _normalize_hdfs_prefix(self._layout_profile()["project_root"]) + "/" + key
+        return _normalize_hdfs_prefix(self._layout_profile(context)["project_root"]) + "/" + key
 
-    def _layout_profile(self) -> dict:
+    def _layout_profile(self, context: _OperationContext | None = None) -> dict:
         if self._layout is None:
-            self._check_tool_pins()
-            command = [
-                *self.command_prefix,
-                "layout-profile",
-                "--project",
-                self.project,
-                "--json",
-            ]
-            try:
-                result = subprocess.run(
-                    command,
-                    capture_output=True,
-                    text=True,
-                    timeout=30,
-                    check=False,
-                    env=self._environment(),
-                )
-            except (subprocess.TimeoutExpired, OSError) as error:
-                raise _PrimitiveUnavailable("Waystone layout unavailable") from error
+            context = self._layout_context(context)
+            result = self._run(
+                [
+                    "layout-profile",
+                    "--project",
+                    self.project,
+                    "--json",
+                ],
+                context,
+            )
             if result.returncode != 0:
                 self._raise_waystone_failure(result, missing=False, conflict=False)
             try:
@@ -640,21 +628,42 @@ class WaystoneBlobAdapter:
                 "storage_root": storage_root,
                 "project_root": project_root,
             }
+            self._validate_legacy_prefix(self._layout)
         return dict(self._layout)
+
+    def _layout_context(self, context: _OperationContext | None) -> _OperationContext:
+        if context is not None:
+            return context
+        return _OperationContext(
+            deadline_at=self._clock() + DEFAULT_WAYSTONE_LAYOUT_DEADLINE_SECONDS,
+            clock=self._clock,
+            sleep=time.sleep,
+        )
+
+    def _validate_legacy_prefix(self, layout: Mapping[str, str] | None = None) -> None:
+        if self._legacy_prefix is None:
+            return
+        if layout is None:
+            layout = self._layout_profile()
+        if self._legacy_prefix != _normalize_hdfs_prefix(layout["project_root"]):
+            raise ValueError("legacy HDFS prefix must match the Waystone project root")
 
     def _run(self, arguments: list[str], context: _OperationContext) -> subprocess.CompletedProcess:
         self._check_tool_pins()
         context.check_deadline()
         command = [*self.command_prefix, "--error-format", "json", *arguments]
-        process = subprocess.Popen(
-            command,
-            stdin=subprocess.DEVNULL,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            start_new_session=True,
-            env=self._environment(),
-        )
+        try:
+            process = subprocess.Popen(
+                command,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                start_new_session=True,
+                env=self._environment(),
+            )
+        except OSError as error:
+            raise _PrimitiveUnavailable("Waystone command unavailable") from error
         try:
             stdout, stderr = process.communicate(timeout=self._remaining_seconds(context))
         except subprocess.TimeoutExpired as error:
@@ -681,8 +690,12 @@ class WaystoneBlobAdapter:
 
     def _check_tool_pins(self) -> None:
         for path, expected in self._tool_pins.items():
+            stat_tuple = _file_stat_tuple(Path(path))
+            if self._tool_pin_stats.get(path) == stat_tuple:
+                continue
             if _file_sha256_and_size(Path(path))[0] != expected:
                 raise RuntimeError("pinned Waystone tool digest changed")
+            self._tool_pin_stats[path] = stat_tuple
 
     def _command_timeout_seconds(self, context: _OperationContext) -> int:
         return max(1, int(self._remaining_seconds(context) + 0.999))
@@ -699,13 +712,25 @@ class WaystoneBlobAdapter:
         return environment
 
     def _raise_waystone_failure(self, result, *, missing: bool, conflict: bool) -> None:
-        if _waystone_output_has_marker(result, AUTHENTICATION_MARKERS):
+        payload = _waystone_error_payload(result)
+        if payload is None:
+            raise _PrimitivePermanentUnavailable("Waystone command failed")
+        error_class = payload.get("class")
+        if error_class == "auth":
             raise _PrimitiveUnauthenticated("Waystone authentication failed")
-        if missing and _waystone_output_has_marker(result, MISSING_MARKERS):
+        if error_class == "timeout":
+            raise _PrimitiveTimeout("Waystone command timed out")
+        if error_class in WAYSTONE_PERMANENT_UNAVAILABLE_ERROR_CLASSES:
+            raise _PrimitivePermanentUnavailable("Waystone command failed")
+        if missing and _waystone_error_message_has_marker(payload, MISSING_MARKERS):
             raise _PrimitiveMissing("Waystone blob missing")
-        if conflict and _waystone_output_has_marker(result, CONFLICT_MARKERS):
+        if conflict and _waystone_error_message_has_marker(payload, CONFLICT_MARKERS):
             raise _PrimitiveConflict("Waystone blob exists")
-        raise _PrimitiveUnavailable("Waystone command failed")
+        if error_class in WAYSTONE_TRANSIENT_ERROR_CLASSES:
+            raise _PrimitiveUnavailable("Waystone command failed")
+        if error_class:
+            raise _PrimitivePermanentUnavailable("Waystone command failed")
+        raise _PrimitivePermanentUnavailable("Waystone command failed")
 
 
 def blob_store_descriptor(adapter) -> dict[str, str]:
@@ -747,13 +772,15 @@ def blob_adapter_from_descriptor(
         allowed = {"kind", "prefix", "project", "schema_version"}
         if not set(descriptor).issubset(allowed) or "prefix" not in descriptor:
             raise ValueError("blob store descriptor required")
-        return WaystoneBlobAdapter(
+        adapter = WaystoneBlobAdapter(
             project=descriptor.get("project", "sureal"),
             command_prefix=_descriptor_command_prefix(command_prefix, waystone),
             tool_pins=tool_pins,
             legacy_prefix=descriptor["prefix"],
             hadoop_conf_dir=hadoop_conf_dir,
         )
+        adapter._validate_legacy_prefix()
+        return adapter
     raise ValueError("blob store descriptor kind required")
 
 
@@ -817,6 +844,17 @@ def _file_sha256_and_size(path: Path) -> tuple[str, int]:
             size += len(chunk)
             digest.update(chunk)
     return digest.hexdigest(), size
+
+
+def _file_stat_tuple(path: Path) -> tuple[int, int, int, int, int]:
+    stat_result = _require_regular_file(path).stat()
+    return (
+        stat_result.st_dev,
+        stat_result.st_ino,
+        stat_result.st_size,
+        stat_result.st_mtime_ns,
+        stat_result.st_ctime_ns,
+    )
 
 
 def _path_ancestry(root: Path, path: Path) -> list[Path]:
@@ -904,9 +942,26 @@ def _normalize_hdfs_prefix(value: str) -> str:
     return value
 
 
-def _waystone_output_has_marker(result, markers: tuple[str, ...]) -> bool:
-    output = "\n".join(str(part) for part in (getattr(result, "stdout", ""), getattr(result, "stderr", "")) if part)
-    lowered = output.lower()
+def _waystone_error_payload(result) -> Mapping[str, object] | None:
+    stderr = getattr(result, "stderr", "") or ""
+    for line in reversed(stderr.splitlines()):
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            payload = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(payload, Mapping) and payload.get("type") == "error":
+            return payload
+    return None
+
+
+def _waystone_error_message_has_marker(payload: Mapping[str, object], markers: tuple[str, ...]) -> bool:
+    message = payload.get("message")
+    if not isinstance(message, str):
+        return False
+    lowered = message.lower()
     return any(marker in lowered for marker in markers)
 
 
