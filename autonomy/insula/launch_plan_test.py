@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 import subprocess
@@ -19,6 +20,7 @@ from insula.launch_plan import (
     record_plan,
     render_plan,
     run_plan,
+    read_receipt_mounts,
 )
 from insula.runtime_identity import rootfs_identity
 from insula.runtime_roots import (
@@ -307,6 +309,86 @@ class LaunchPlanTests(unittest.TestCase):
             self.assertRegex(mounts["input:/tmp/fixture"]["digest"], r"^[0-9a-f]{64}$")
             self.assertNotIn("digest", mounts["output"])
             self.assertEqual(record["command"], ["python", "main.py"])
+
+    def test_receipt_reader_normalizes_old_command_and_new_plan_mounts(self):
+        retained = json.loads(
+            (
+                AUTONOMY
+                / "research/balanced16-sustained-contract-red-verified.json"
+            ).read_text()
+        )
+        retained_mounts = read_receipt_mounts(
+            retained,
+            include_digests=False,
+            require_cleared_environment=True,
+        )
+        command = retained["command"]
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            runtime = self.load_fixture_runtime(root)
+            code = root / "code"
+            source = root / "source"
+            output = root / "output"
+            for path in (code, source, output):
+                path.mkdir()
+            (code / "worker.py").write_text("print('fixture')\n")
+            (source / "input.json").write_text("{}\n")
+            local_command = list(command)
+            for index, item in enumerate(local_command):
+                if item in {"--ro-bind", "--bind"}:
+                    inside = local_command[index + 2]
+                    if inside == "/experiment":
+                        local_command[index + 1] = str(code)
+                    elif inside == "/source":
+                        local_command[index + 1] = str(source)
+                    elif inside == "/outputs":
+                        local_command[index + 1] = str(output)
+            old_mounts = read_receipt_mounts(
+                {"command": local_command},
+                require_cleared_environment=True,
+            )
+            plan = build_plan(
+                runtime,
+                code=code,
+                source=source,
+                output=output,
+                command=local_command[local_command.index("--") + 1 :],
+            )
+            plan_record = record_plan(plan)
+            new_mounts = read_receipt_mounts(
+                {"launch_plan": plan_record},
+                require_cleared_environment=True,
+            )
+            without_clean_environment = copy.deepcopy(plan_record)
+            without_clean_environment["environment"].pop("PYTHONPATH")
+            with self.assertRaisesRegex(ValueError, "cleared environment"):
+                read_receipt_mounts(
+                    {"launch_plan": without_clean_environment},
+                    require_cleared_environment=True,
+                )
+            worker_plan = build_plan(
+                runtime,
+                code=code,
+                source=source,
+                output=output,
+                command=["python", "/experiment/worker.py"],
+            )
+            read_receipt_mounts({"launch_plan": record_plan(worker_plan)}, require_python_worker=True)
+            with self.assertRaisesRegex(ValueError, "Python worker"):
+                read_receipt_mounts({"launch_plan": plan_record}, require_python_worker=True)
+
+        comparable = {"/experiment", "/source", "/tmp"}
+        self.assertEqual(
+            {inside: retained_mounts[inside]["mode"] for inside in comparable | {"/outputs"}},
+            {inside: new_mounts[inside]["mode"] for inside in comparable | {"/outputs"}},
+        )
+        self.assertEqual(
+            {inside: {key: old_mounts[inside].get(key) for key in ("mode", "digest")} for inside in comparable},
+            {inside: {key: new_mounts[inside].get(key) for key in ("mode", "digest")} for inside in comparable},
+        )
+        self.assertEqual(old_mounts["/outputs"]["mode"], new_mounts["/outputs"]["mode"])
+        self.assertNotIn("digest", old_mounts["/outputs"])
+        self.assertNotIn("digest", new_mounts["/outputs"])
 
     def test_mount_rules_name_the_colliding_roles(self):
         with tempfile.TemporaryDirectory() as temporary:

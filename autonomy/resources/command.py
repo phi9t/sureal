@@ -8,8 +8,8 @@ ARITY={'--unshare-all':0,'--die-with-parent':0,'--clearenv':0,
 ALIASES={'/tmp/resource-layer','/tmp/resource-output','/experiment/resources','/experiment/evidence'}
 
 
-def inspect_command(command):
-    """Parse option values as values, never as isolation flags or mounts."""
+def inspect_legacy_receipt_command(command):
+    """Parse old command receipts as values, never as isolation flags or mounts."""
     if (not isinstance(command,list) or not command or command[0]!='bwrap' or
         any(not isinstance(x,str) or not x for x in command) or command.count('--')!=1):
         raise ValueError('literal bwrap command required')
@@ -28,9 +28,12 @@ def inspect_command(command):
     return separator,argv,options
 
 
+inspect_command=inspect_legacy_receipt_command
+
+
 def wrapped_command(command,code,output):
     """Construct the recorded wrapper without changing or executing anything."""
-    separator,argv,options=inspect_command(command)
+    separator,argv,options=inspect_legacy_receipt_command(command)
     if any(option in {'--ro-bind','--bind','--dev-bind','--proc','--dev','--tmpfs'} and
            values[-1] in ALIASES for option,values in options):
         raise ValueError('resource mount aliases must be unused')

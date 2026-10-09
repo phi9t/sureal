@@ -2,6 +2,7 @@
 import json
 from pathlib import Path
 from evidence.source_snapshot import file_sha256 as sha, require_regular_file
+from insula.launch_plan import read_receipt_mounts
 from segmentation.semantic_recovery_accounting import verify_accounting
 
 def verify_transfer_location(transfer,expected):
@@ -11,6 +12,13 @@ def verify_transfer_location(transfer,expected):
     if 'archive_blob_key' in expected:
         return transfer.get('blob_key')==expected['archive_blob_key']
     return transfer.get('hdfs_uri')==expected.get('archive_hdfs_uri')
+
+def verify_launch_mounts(check):
+    mounts=read_receipt_mounts(check,require_cleared_environment=True)
+    required={'/experiment':'read_only','/source':'read_only','/outputs':'writable'}
+    for inside,mode in required.items():
+        if mounts.get(inside,{}).get('mode')!=mode:
+            raise ValueError('semantic recovery receipt identity/integrity differs')
 
 def verify_receipt(root,*,expected_sha256,expected_record,expected_runtime,expected_code,code_root):
     root=Path(root); code_root=Path(code_root)
@@ -34,7 +42,7 @@ def verify_receipt(root,*,expected_sha256,expected_record,expected_runtime,expec
     require(pub['official_split']==d['membership']['official_split'] and pub['research_splits']==d['membership']['research_splits'])
     require(pub['archive']['sha256']==d['archive_sha256'] and pub['archive']['archive_bytes']==d['archive_bytes'] and pub['archive']['report_sha256']==d['report_sha256'])
     checks=r['checks'];require(len(checks)==1 and type(checks[0]['exit_code']) is int and checks[0]['exit_code']==0)
-    command=checks[0]['command'];require(command[0]=='bwrap' and '--unshare-all' in command and '--clearenv' in command)
+    verify_launch_mounts(checks[0])
     t=r['transfer']
     require(t['sha256']==d['archive_sha256'] and t['archive_bytes']==d['archive_bytes'] and verify_transfer_location(t,d))
     require(type(t['transfer_exit_code']) is int and t['transfer_exit_code']==0)

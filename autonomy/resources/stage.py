@@ -6,7 +6,8 @@ from pathlib import Path
 import subprocess
 import shutil
 from evidence.source_snapshot import is_regular_file
-from resources.command import inspect_command,wrapped_command,wrap_command
+from insula.launch_plan import read_receipt_mounts
+from resources.command import wrapped_command,wrap_command
 from resources.scoped_stage import run_scoped
 from resources.sources import sha,validate_sources
 from resources.stage_accounting import admit_worker
@@ -47,11 +48,10 @@ def validate_proof(proof,command,current_sources,source_pins,native_output,cap_b
         worker_path=Path(proof['artifacts']['worker_resource']['path']);worker_output=worker_path.parent
         require_separate(native_output,worker_output.parent,code,current_sources)
         expected,worker_argv=wrapped_command(proof['original_command'],code,worker_output)
-        _,_,options=inspect_command(command)
-        native_mounts=[(option,values) for option,values in options
-                       if option in {'--ro-bind','--bind','--dev-bind','--proc','--dev','--tmpfs'} and values[-1]=='/outputs']
+        output_mount=read_receipt_mounts({'command':command},include_digests=False,require_python_worker=True).get('/outputs')
         if (proof['worker_argv']!=worker_argv or command!=expected or
-            native_mounts!=[('--bind',(str(native_output),'/outputs'))] or
+            output_mount!={'inside_path':'/outputs','mode':'writable','kind':'bind',
+                           'role':'output','host_path':str(native_output)} or
             worker_path.name!='worker-resource.json' or worker_output.name!='worker' or
             proof['artifacts']['execution_log']['native_path']!=str(native_output/'live.log') or
             proof['artifacts']['execution_log']['path']!=str(worker_output.parent/'execution.log')):
