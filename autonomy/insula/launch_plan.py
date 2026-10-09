@@ -4,7 +4,9 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import stat
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import Iterable, Mapping
@@ -47,6 +49,12 @@ _GPU_DRIVER_PREFIXES = (
     "libnvidia-ptxjitcompiler.so",
     "libnvidia-nvvm.so",
 )
+_GPU_CONTROL_DEVICES = {
+    "/dev/nvidiactl",
+    "/dev/nvidia-uvm",
+    "/dev/nvidia-uvm-tools",
+    "/dev/nvidia-modeset",
+}
 _DEFAULT_GPU_DRIVER_LIBRARY_DIRS = (Path("/usr/lib/x86_64-linux-gnu"),)
 
 
@@ -85,6 +93,13 @@ class LaunchPlan:
     working_directory: str
     command: tuple[str, ...]
     unshare_flags: tuple[str, ...]
+    gpu: "GPURequest | None" = None
+
+
+@dataclass(frozen=True)
+class GPURequest:
+    requested_index: int
+    device_uuid: str
 
 
 @dataclass(frozen=True)
@@ -166,12 +181,14 @@ def build_plan(
         ("--setenv", "PYTHONPATH", "/experiment"),
     ]
     if gpu_index is not None:
-        gpu_mounts, gpu_environment = _gpu_mounts_and_environment(gpu_index)
+        gpu_mounts, gpu_environment, gpu = _gpu_mounts_environment_and_request(gpu_index)
         mounts.extend(gpu_mounts)
         environment = [
             item for item in environment if not (item[0] == "--setenv" and item[1] == "PATH")
         ]
         environment.extend(gpu_environment)
+    else:
+        gpu = None
     environment = _merge_environment(environment, extra_environment)
     mounts.append(Mount("tmp", "tmpfs", "/tmp", "writable", None, "after_devices"))
     plan = _assemble_plan(
@@ -181,6 +198,7 @@ def build_plan(
         command=command,
         working_directory="/experiment",
         unshare_flags=("--unshare-all", "--die-with-parent"),
+        gpu=gpu,
     )
     if source_snapshot_digest is not None:
         object.__setattr__(plan, "_source_snapshot_digest", source_snapshot_digest)
@@ -189,7 +207,7 @@ def build_plan(
 
 def plan_data(plan: LaunchPlan) -> dict:
     """Return a data view of a launch plan without rendering argv."""
-    return {
+    data = {
         "runtime": {
             "rootfs": str(plan.runtime.rootfs),
             "lock": str(plan.runtime.lock_path) if plan.runtime.lock_path is not None else None,
@@ -202,6 +220,9 @@ def plan_data(plan: LaunchPlan) -> dict:
         "working_directory": plan.working_directory,
         "command": list(plan.command),
     }
+    if plan.gpu is not None:
+        data["gpu"] = _gpu_request_data(plan.gpu)
+    return data
 
 
 def render_plan(plan: LaunchPlan) -> list[str]:
@@ -223,17 +244,20 @@ def render_plan(plan: LaunchPlan) -> list[str]:
 
 def record_plan(plan: LaunchPlan) -> dict:
     """Return the host-path-free receipt record for a launch plan."""
-    return {
+    record = {
         "runtime": {
             "lock_sha256": plan.runtime.lock_sha256,
             "form": plan.runtime.form,
         },
-        "mounts": [_record_mount(plan, mount) for mount in plan.mounts],
-        "devices": [_record_device(mount) for mount in plan.mounts if mount.kind == "dev-bind"],
+        "mounts": [_record_mount(plan, mount) for mount in plan.mounts if mount.kind != "dev-bind"],
+        "devices": [_record_device(mount) for mount in plan.mounts if _record_device_mount(plan, mount)],
         "environment": {item[1]: item[2] for item in plan.environment if item[0] == "--setenv"},
         "working_directory": plan.working_directory,
         "command": list(plan.command),
     }
+    if plan.gpu is not None:
+        record["gpu"] = _gpu_request_data(plan.gpu)
+    return record
 
 
 def _assemble_plan(
@@ -244,6 +268,7 @@ def _assemble_plan(
     command: Iterable[object],
     working_directory: str,
     unshare_flags: Iterable[object],
+    gpu: GPURequest | None = None,
 ) -> LaunchPlan:
     mount_tuple = tuple(mounts)
     _validate_mounts(mount_tuple)
@@ -254,6 +279,7 @@ def _assemble_plan(
         working_directory=str(working_directory),
         command=tuple(str(item) for item in command),
         unshare_flags=tuple(str(flag) for flag in unshare_flags),
+        gpu=gpu,
     )
 
 
@@ -475,6 +501,12 @@ def _record_device(mount: Mount) -> dict:
     return {"role": mount.role, "inside_path": mount.inside_path}
 
 
+def _record_device_mount(plan: LaunchPlan, mount: Mount) -> bool:
+    if mount.kind != "dev-bind":
+        return False
+    return not (plan.gpu is not None and mount.role.startswith("gpu-device:"))
+
+
 def _content_digest(path: Path) -> str:
     path = Path(path)
     if path.is_file():
@@ -496,7 +528,7 @@ def _content_digest(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _gpu_mounts_and_environment(gpu_index: int):
+def _gpu_mounts_environment_and_request(gpu_index: int):
     if type(gpu_index) is not int or gpu_index < 0:
         raise PlanError("gpu_index: non-negative integer required")
     mounts = [Mount("gpu-driver-root", "tmpfs", "/driver", "writable", None)]
@@ -516,7 +548,11 @@ def _gpu_mounts_and_environment(gpu_index: int):
         ("--setenv", "PATH", _GPU_PATH),
         ("--setenv", "LD_LIBRARY_PATH", "/driver:/usr/local/cuda/lib64"),
         ("--setenv", "CUDA_VISIBLE_DEVICES", "0"),
-    ]
+    ], GPURequest(gpu_index, _gpu_device_uuid(gpu_index))
+
+
+def _gpu_request_data(gpu: GPURequest) -> dict:
+    return {"requested_index": gpu.requested_index, "device_uuid": gpu.device_uuid}
 
 
 def _gpu_device_pairs(gpu_index: int) -> list[tuple[Path, str]]:
@@ -530,6 +566,8 @@ def _gpu_device_pairs(gpu_index: int) -> list[tuple[Path, str]]:
                 host, guest = item.split("=", 1)
             else:
                 host = guest = item
+            _validate_gpu_device_override_path(item, host, gpu_index, side="host")
+            _validate_gpu_device_override_path(item, guest, gpu_index, side="guest")
             pairs.append((Path(host), guest))
     else:
         pairs = [
@@ -541,6 +579,53 @@ def _gpu_device_pairs(gpu_index: int) -> list[tuple[Path, str]]:
         if not host.exists():
             raise PlanError(f"GPU device not found: {host}")
     return pairs
+
+
+def _validate_gpu_device_override_path(
+    entry: str,
+    path: str,
+    gpu_index: int,
+    *,
+    side: str,
+) -> None:
+    requested_gpu = f"/dev/nvidia{gpu_index}"
+    if path == requested_gpu or path in _GPU_CONTROL_DEVICES:
+        return
+    if re.fullmatch(r"/dev/nvidia\d+", path):
+        raise PlanError(
+            f"{entry}: GPU override {side} path {path} does not match requested {requested_gpu}"
+        )
+    if side == "guest" or path.startswith("/dev/nvidia"):
+        allowed = ", ".join(sorted([requested_gpu, *_GPU_CONTROL_DEVICES]))
+        raise PlanError(f"{entry}: GPU override {side} path {path} is not allowed; expected {allowed}")
+
+
+def _gpu_device_uuid(gpu_index: int) -> str:
+    configured = os.environ.get("SUREAL_BAZEL_GPU_DEVICE_UUIDS")
+    if configured:
+        mapping = {}
+        for item in configured.split(","):
+            if not item:
+                continue
+            index, uuid = item.split("=", 1)
+            mapping[int(index)] = uuid
+        try:
+            return mapping[gpu_index]
+        except KeyError as exc:
+            raise PlanError(f"gpu_index {gpu_index}: device UUID override missing") from exc
+    try:
+        return subprocess.check_output(
+            [
+                "nvidia-smi",
+                f"--id={gpu_index}",
+                "--query-gpu=uuid",
+                "--format=csv,noheader,nounits",
+            ],
+            text=True,
+            stderr=subprocess.PIPE,
+        ).strip()
+    except (FileNotFoundError, subprocess.CalledProcessError) as exc:
+        raise PlanError(f"gpu_index {gpu_index}: device UUID lookup failed") from exc
 
 
 def _gpu_driver_paths() -> list[Path]:

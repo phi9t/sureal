@@ -19,6 +19,7 @@ LIVE_GATE_BWRAP = "/tmp/live-gate-bwrap"
 from insula.launch_plan import (
     Mount,
     _assemble_plan,
+    _gpu_mounts_environment_and_request,
     load_runtime_lock,
     plan_data,
     render_plan,
@@ -146,8 +147,7 @@ def sandbox_plan(runtime, cache, arguments, update_lock=False):
     ]
     test_environment = {}
     if uses_live_gate_filter(arguments):
-        mounts.append(Mount("waymo-cache", "bind", LIVE_GATE_CACHE_MOUNT, "read_only", AUTONOMY_CACHE))
-        mounts.append(Mount("live-gate-bwrap", "bind", LIVE_GATE_BWRAP, "read_only", Path("/usr/bin/bwrap")))
+        _add_nested_launch_support(mounts)
         live_root = LIVE_GATE_CACHE_MOUNT + "/insula/" + current_cpu_rootfs().name
         test_environment = {
             "SUREAL_LIVE_GATE_BWRAP": LIVE_GATE_BWRAP,
@@ -164,15 +164,20 @@ def sandbox_plan(runtime, cache, arguments, update_lock=False):
         ("--setenv", "PYTHONDONTWRITEBYTECODE", "1"),
     ]
     if gpu:
-        mounts.extend(_bazel_gpu_mounts(gpu_index=1))
+        gpu_mounts, gpu_environment, gpu_request = _gpu_mounts_environment_and_request(gpu_index=1)
+        mounts.extend(gpu_mounts)
         environment = [item for item in environment if not (item[0] == "--setenv" and item[1] == "PATH")]
-        environment.extend(
-            [
-                ("--setenv", "PATH", "/opt/waymo/bin:/usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin"),
-                ("--setenv", "LD_LIBRARY_PATH", "/driver:/usr/local/cuda/lib64"),
-                ("--setenv", "CUDA_VISIBLE_DEVICES", "0"),
-            ]
+        environment.extend(gpu_environment)
+        test_environment["SUREAL_BAZEL_GPU_DEVICE_UUIDS"] = (
+            f"{gpu_request.requested_index}={gpu_request.device_uuid}"
         )
+        _add_nested_launch_support(mounts)
+        gpu_live_root = LIVE_GATE_CACHE_MOUNT + "/" + current_gpu_rootfs().name
+        test_environment["SUREAL_LIVE_GATE_BWRAP"] = LIVE_GATE_BWRAP
+        test_environment["WAYMO_GPU_INSULA_ROOT"] = gpu_live_root
+        test_environment["WAYMO_GPU_INSULA_LOCK"] = gpu_live_root + ".lock.json"
+    else:
+        gpu_request = None
     bazel = bazel_command(
         arguments,
         output_base_for(rootfs, arguments),
@@ -192,15 +197,27 @@ def sandbox_plan(runtime, cache, arguments, update_lock=False):
             "--unshare-uts",
             "--die-with-parent",
         ],
+        gpu=gpu_request,
     )
     data = plan_data(plan)
-    return {
+    result = {
         "argv": render_plan(plan),
         "bazel": bazel,
         "environment": data["environment"],
         "mounts": [_mount_to_argv(mount) for mount in data["mounts"]],
         "update_lock": update_lock,
     }
+    if "gpu" in data:
+        result["gpu"] = data["gpu"]
+    return result
+
+
+def _add_nested_launch_support(mounts):
+    inside_paths = {mount.inside_path for mount in mounts}
+    if LIVE_GATE_CACHE_MOUNT not in inside_paths:
+        mounts.append(Mount("waymo-cache", "bind", LIVE_GATE_CACHE_MOUNT, "read_only", AUTONOMY_CACHE))
+    if LIVE_GATE_BWRAP not in inside_paths:
+        mounts.append(Mount("live-gate-bwrap", "bind", LIVE_GATE_BWRAP, "read_only", Path("/usr/bin/bwrap")))
 
 
 def _mount_from_argv(role_prefix, mount):
@@ -217,21 +234,6 @@ def _mount_to_argv(mount):
         return ["--tmpfs", mount["inside_path"]]
     flag = "--dev-bind" if mount["kind"] == "dev-bind" else "--bind" if mount["mode"] == "writable" else "--ro-bind"
     return [flag, mount["host_path"], mount["inside_path"]]
-
-
-def _bazel_gpu_mounts(gpu_index):
-    from insula.launch_plan import _gpu_device_pairs, _gpu_driver_paths
-
-    mounts = [Mount("gpu-driver-root", "tmpfs", "/driver", "writable")]
-    mounts.extend(
-        Mount(f"gpu-driver:{path.name}", "bind", "/driver/" + path.name, "read_only", path)
-        for path in _gpu_driver_paths()
-    )
-    mounts.extend(
-        Mount(f"gpu-device:{guest}", "dev-bind", guest, "writable", host, "after_devices")
-        for host, guest in _gpu_device_pairs(gpu_index)
-    )
-    return mounts
 
 
 def parse(argv):
