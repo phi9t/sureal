@@ -77,6 +77,60 @@ class ScientificDirectoryPublisherTests(unittest.TestCase):
             self.assertEqual(audit(receipt, store=store)["files"], 2)
             self.assertEqual(reservations, [(evidence / "blob-publication-cohort16-baseline-fit20261002a-run" / "stage", 25)])
 
+    def test_requires_tool_digest_when_store_adapter_does_not_provide_one(self):
+        from retention.publish_scientific_directory import publish
+
+        with tempfile.TemporaryDirectory() as directory:
+            working, payload = self.make_payload(directory)
+            with self.assertRaisesRegex(ValueError, "tool digest"):
+                publish(
+                    case=payload.name,
+                    root=payload,
+                    hdfs_namespace="perception-closed-scientific-processing",
+                    evidence=Path(directory) / "evidence",
+                    release=False,
+                    scientific_processing=working,
+                    store=self.make_store(),
+                    store_descriptor=STORE_DESCRIPTOR,
+                    reserve=lambda path, maximum_new_bytes: None,
+                    host_source_admitter=fake_host_admitter,
+                    identifier="missing-tool-digest",
+                )
+
+    def test_release_keeps_publication_module_release_disabled_until_module_owns_release(self):
+        from retention import publish_scientific_directory as publisher
+
+        with tempfile.TemporaryDirectory() as directory:
+            working, payload = self.make_payload(directory)
+            observed = []
+            original_publish = publisher.publish_publication
+
+            def capture_spec(spec):
+                observed.append(spec.release)
+                return original_publish(spec)
+
+            publisher.publish_publication = capture_spec
+            try:
+                publisher.publish(
+                    case=payload.name,
+                    root=payload,
+                    hdfs_namespace="perception-closed-scientific-processing",
+                    evidence=Path(directory) / "evidence",
+                    release=True,
+                    scientific_processing=working,
+                    store=self.make_store(),
+                    store_descriptor=STORE_DESCRIPTOR,
+                    tool_digest=TOOL_DIGEST,
+                    reserve=lambda path, maximum_new_bytes: None,
+                    host_source_admitter=fake_host_admitter,
+                    release_planner=lambda root, audit_result: [],
+                    identifier="caller-owned-release",
+                )
+            finally:
+                publisher.publish_publication = original_publish
+
+            self.assertEqual(observed, [False])
+
     def test_release_after_blob_store_audit_unlinks_only_planned_files(self):
         from retention.publish_scientific_directory import publish
 

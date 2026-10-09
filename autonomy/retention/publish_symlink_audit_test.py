@@ -93,6 +93,27 @@ class SymlinkAuditPublisherTests(unittest.TestCase):
             self.assertNotIn("archive_hdfs_uri", json.dumps(receipt, sort_keys=True))
             self.assertTrue((payload / "red" / "mutants" / "frame.bin").is_symlink())
 
+    def test_requires_tool_digest_when_store_adapter_does_not_provide_one(self):
+        from retention.publish_symlink_audit import publish
+
+        with tempfile.TemporaryDirectory() as directory:
+            working, payload = self.make_audit(directory)
+            with self.assertRaisesRegex(ValueError, "tool digest"):
+                publish(
+                    case=payload.name,
+                    root=payload,
+                    hdfs_namespace="perception-motion",
+                    evidence=Path(directory) / "evidence",
+                    preserve_symlinks=True,
+                    readback=True,
+                    write_receipt=True,
+                    scientific_processing=working,
+                    store=self.make_store(),
+                    store_descriptor=STORE_DESCRIPTOR,
+                    host_source_admitter=fake_host_admitter,
+                    identifier="missing-tool-digest",
+                )
+
     def test_move_to_renames_same_filesystem_and_verifies_listing_again(self):
         from retention.publish_symlink_audit import audit, publish
 

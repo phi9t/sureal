@@ -3,8 +3,6 @@
 import argparse
 import json
 import re
-import shutil
-import subprocess
 import sys
 from fnmatch import fnmatchcase
 from pathlib import Path
@@ -17,11 +15,7 @@ from evidence.source_snapshot import (
     snapshot_target_and_materialize,
     verify_or_materialize_receipt_sources,
 )
-from insula.entry import launch_plan
-from insula.runtime_identity import verify_rootfs
-from resources.backend import resource_cpu_root_for
-from resources.resource_archive import DEFAULT_LIMIT, create_archive, safe_name, verify_archive
-from resources.resource_rehydrate import rehydrate_archive
+from resources.resource_archive import DEFAULT_LIMIT, safe_name
 from resources.scientific_budget import reserve_write
 from retention.publication import (
     WAYSTONE_DESCRIPTOR,
@@ -37,20 +31,6 @@ PACKAGE_ROOT = Path(__file__).resolve().parents[1]
 CACHE_ROOT = Path.home() / ".cache/waystone/waymo-perception"
 SCIENTIFIC_PROCESSING = CACHE_ROOT / "scientific-processing"
 SNAPSHOT_TARGET = "//autonomy/retention:publish_scientific_directory"
-REQUIRED_CHUNK_STAGES = [
-    "create-live",
-    "archive-put",
-    "archive-get",
-    "manifest-put",
-    "manifest-get",
-    "verify-live",
-    "rehydrate-live",
-]
-REQUIRED_RELEASE_STAGES = REQUIRED_CHUNK_STAGES + [
-    "independent",
-    "release-plan",
-    "release-completed",
-]
 PROTECTED_NAMES = frozenset(
     [
         "balanced16-native-v2",
@@ -72,17 +52,11 @@ PROTECTED_PATTERNS = (
 HOST_SOURCE_REQUIRED = (
     "retention/publish_scientific_directory.py",
     "retention/publisher_runtime.py",
-    "resources/backend.py",
     "resources/resource_archive.py",
-    "resources/resource_archive_cli.py",
-    "resources/resource_rehydrate.py",
-    "resources/resource_release_plan.py",
     "resources/scientific_budget.py",
     "retention/publication.py",
     "evidence/source_snapshot.py",
     "blob_store/core.py",
-    "insula/entry.py",
-    "insula/runtime_identity.py",
 )
 SAFE_COMPONENT = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
 
@@ -162,24 +136,6 @@ def _publication_inventory(root):
     }
 
 
-def _chunks(records, max_bytes):
-    chunks = []
-    current = []
-    size = 0
-    for record in records:
-        if record["bytes"] > max_bytes:
-            raise ValueError("single source file exceeds archive bound")
-        if current and size + record["bytes"] > max_bytes:
-            chunks.append(current)
-            current = []
-            size = 0
-        current.append(record)
-        size += record["bytes"]
-    if current:
-        chunks.append(current)
-    return chunks
-
-
 def _freeze_host_sources(repository, destination):
     repository = Path(repository)
     if not all(is_regular_file(repository / name) for name in HOST_SOURCE_REQUIRED):
@@ -212,232 +168,6 @@ def _admit_host_sources(receipt_path, current_package, destination):
     )
 
 
-class DirectArchiveRunner:
-    def run(self, mode, input_dir, source_root, output_dir, evidence_dir, *, max_bytes):
-        input_dir = Path(input_dir)
-        source_root = Path(source_root)
-        output_dir = Path(output_dir)
-        evidence_dir = Path(evidence_dir)
-        output_dir.mkdir(exist_ok=False)
-        job = json.loads((input_dir / "job.json").read_text())
-        if mode == "create":
-            for name, digest in job["source_sha256"].items():
-                if file_sha256(source_root / name) != digest:
-                    raise ValueError("source payload differs")
-            manifest = create_archive(source_root, job["source_sha256"], output_dir / "archive.tar.gz", max_bytes=max_bytes)
-            (output_dir / "manifest.json").write_text(json.dumps(manifest, sort_keys=True, indent=2))
-            check = verify_archive(output_dir / "archive.tar.gz", manifest, max_bytes=max_bytes)
-        elif mode in {"verify", "rehydrate"}:
-            if file_sha256(source_root / "manifest.json") != job["manifest_sha256"]:
-                raise ValueError("manifest readback differs")
-            manifest = json.loads((source_root / "manifest.json").read_text())
-            check = verify_archive(source_root / "archive.tar.gz", manifest, max_bytes=max_bytes)
-            if mode == "rehydrate":
-                check = rehydrate_archive(
-                    source_root / "archive.tar.gz",
-                    manifest,
-                    output_dir / "restored",
-                    max_bytes=max_bytes,
-                )
-        else:
-            raise ValueError("unknown archive operation")
-        (output_dir / "check.json").write_text(json.dumps(check, indent=2))
-        (output_dir / "live.log").write_text("PASS archive " + mode + "\n")
-        evidence_dir.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(output_dir / "check.json", evidence_dir / "check.json")
-        shutil.copyfile(output_dir / "live.log", evidence_dir / "live.log")
-        return {
-            "stage": {"create": "create-live", "verify": "verify-live", "rehydrate": "rehydrate-live"}[mode],
-            "command": ["python", "/experiment/resources/resource_archive_cli.py", mode],
-            "exit_code": 0,
-            "validation": check,
-            "artifacts": {str(path): file_sha256(path) for path in sorted(evidence_dir.iterdir())},
-        }
-
-
-class InsulaArchiveRunner:
-    def __init__(self, rootfs, source_tree, source_pins, validate_sources):
-        self.rootfs = Path(rootfs)
-        self.source_tree = Path(source_tree)
-        self.source_pins = dict(source_pins)
-        self.validate_sources = validate_sources
-
-    def run(self, mode, input_dir, source_root, output_dir, evidence_dir, *, max_bytes):
-        del max_bytes
-        self.validate_sources()
-        input_dir = Path(input_dir)
-        source_root = Path(source_root)
-        output_dir = Path(output_dir)
-        evidence_dir = Path(evidence_dir)
-        output_dir.mkdir(exist_ok=False)
-        command = launch_plan(
-            self.rootfs,
-            self.source_tree,
-            source_root,
-            output_dir,
-            ["python", "/experiment/resources/resource_archive_cli.py", mode],
-        )
-        separator = command.index("--")
-        command[separator:separator] = ["--ro-bind", str(input_dir), "/tmp/inputs"]
-        result = subprocess.run(command, capture_output=True, text=True, timeout=300)
-        (output_dir / "live.log").write_text(result.stdout + result.stderr)
-        if result.returncode != 0:
-            raise RuntimeError("live archive operation failed: " + str(output_dir / "live.log"))
-        for path, digest in self.source_pins.items():
-            if file_sha256(path) != digest:
-                raise ValueError("staged source changed")
-        evidence_dir.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(output_dir / "check.json", evidence_dir / "check.json")
-        shutil.copyfile(output_dir / "live.log", evidence_dir / "live.log")
-        return {
-            "stage": {"create": "create-live", "verify": "verify-live", "rehydrate": "rehydrate-live"}[mode],
-            "command": command,
-            "exit_code": 0,
-            "validation": json.loads((output_dir / "check.json").read_text()),
-            "artifacts": {str(path): file_sha256(path) for path in sorted(evidence_dir.iterdir())},
-        }
-
-
-class InsulaIndependentRunner:
-    def __init__(self, rootfs, source_tree, source_pins, validate_sources):
-        self.rootfs = Path(rootfs)
-        self.source_tree = Path(source_tree)
-        self.source_pins = dict(source_pins)
-        self.validate_sources = validate_sources
-
-    def run(self, source_root, chunks, output_dir, *, max_bytes):
-        self.validate_sources()
-        output_dir = Path(output_dir)
-        input_dir = output_dir.parent / "independent-input"
-        input_dir.mkdir(exist_ok=False)
-        chunk_root = input_dir / "chunks"
-        chunk_root.mkdir()
-        for index, chunk in enumerate(chunks):
-            target = chunk_root / str(index)
-            target.mkdir()
-            shutil.copyfile(chunk["downloaded_archive"], target / "archive.tar.gz")
-            (target / "manifest.json").write_text(json.dumps(chunk["manifest"], sort_keys=True, indent=2))
-        (input_dir / "job.json").write_text(
-            json.dumps({"chunks": len(chunks), "max_bytes": max_bytes}, sort_keys=True)
-        )
-        output_dir.mkdir(exist_ok=False)
-        command = launch_plan(
-            self.rootfs,
-            self.source_tree,
-            source_root,
-            output_dir,
-            ["python", "/experiment/retention/publish_scientific_directory.py", "--independent-audit"],
-        )
-        separator = command.index("--")
-        command[separator:separator] = [
-            "--ro-bind",
-            str(input_dir),
-            "/tmp/inputs",
-            "--setenv",
-            "PYTHONPATH",
-            "/experiment",
-        ]
-        result = subprocess.run(command, capture_output=True, text=True, timeout=300)
-        (output_dir / "live.log").write_text(result.stdout + result.stderr)
-        if result.returncode != 0:
-            raise RuntimeError("independent scientific directory audit failed: " + str(output_dir / "live.log"))
-        for path, digest in self.source_pins.items():
-            if file_sha256(path) != digest:
-                raise ValueError("staged source changed")
-        return {
-            "stage": "independent",
-            "command": command,
-            "exit_code": 0,
-            "validation": json.loads((output_dir / "check.json").read_text()),
-            "artifacts": {str(path): file_sha256(path) for path in sorted(output_dir.iterdir()) if path.is_file()},
-            "inputs": {str(path): file_sha256(path) for path in sorted(input_dir.rglob("*")) if path.is_file()},
-        }
-
-    def __call__(self, source_root, chunks, output_dir, *, max_bytes):
-        return self.run(source_root, chunks, output_dir, max_bytes=max_bytes)
-
-
-def _default_live_runners(run_dir, cache_root, host_pins, admitted_package):
-    source = run_dir / "source"
-    source.mkdir()
-    for folder in ("resources", "evidence", "insula", "retention"):
-        shutil.copytree(admitted_package / folder, source / folder, ignore=shutil.ignore_patterns("__pycache__"))
-    source_pins = {str(path): file_sha256(path) for path in sorted(source.rglob("*")) if path.is_file()}
-    rootfs = resource_cpu_root_for(None, cache_root)
-    runtime = json.loads(Path(str(rootfs) + ".lock.json").read_text())
-    verify_rootfs(rootfs, runtime["rootfs_sha256"])
-
-    def validate_sources():
-        _validate_host_sources(admitted_package, host_pins)
-
-    return (
-        InsulaArchiveRunner(rootfs, source, source_pins, validate_sources),
-        InsulaIndependentRunner(rootfs, source, source_pins, validate_sources),
-        runtime,
-        source_pins,
-    )
-
-
-def _independent_restore(source_root, chunks, output_dir, *, max_bytes):
-    output_dir = Path(output_dir)
-    restored = output_dir / "restored"
-    restored.mkdir(parents=True, exist_ok=False)
-    for index, chunk in enumerate(chunks):
-        destination = restored / str(index)
-        rehydrate_archive(
-            chunk["downloaded_archive"],
-            chunk["manifest"],
-            destination,
-            max_bytes=max_bytes,
-        )
-    source = {record["path"]: record for record in _source_inventory(source_root)}
-    recovered = {}
-    for path in sorted(restored.rglob("*")):
-        if path.is_dir():
-            continue
-        if path.is_symlink() or not is_regular_file(path):
-            raise ValueError("independent restore contains nonregular file")
-        relative = path.relative_to(restored).as_posix()
-        _, member = relative.split("/", 1)
-        recovered[member] = {
-            "path": member,
-            "bytes": path.stat().st_size,
-            "sha256": file_sha256(path),
-        }
-    if recovered != source:
-        raise ValueError("independent restored inventory differs")
-    check = {
-        "exact_restored_inventory": True,
-        "members": len(recovered),
-        "payload_bytes": sum(record["bytes"] for record in recovered.values()),
-    }
-    (output_dir / "check.json").write_text(json.dumps(check, indent=2))
-    (output_dir / "live.log").write_text("PASS independent scientific directory retention\n")
-    return {
-        "stage": "independent",
-        "command": ["python", "-m", "retention.publish_scientific_directory", "independent"],
-        "exit_code": 0,
-        "validation": check,
-        "artifacts": {str(path): file_sha256(path) for path in sorted(output_dir.iterdir()) if path.is_file()},
-    }
-
-
-def _independent_audit_cli():
-    input_dir = Path("/tmp/inputs")
-    job = json.loads((input_dir / "job.json").read_text())
-    chunks = []
-    for index in range(job["chunks"]):
-        chunk_dir = input_dir / "chunks" / str(index)
-        chunks.append(
-            {
-                "downloaded_archive": chunk_dir / "archive.tar.gz",
-                "manifest": json.loads((chunk_dir / "manifest.json").read_text()),
-            }
-        )
-    _independent_restore("/source", chunks, "/outputs", max_bytes=job["max_bytes"])
-    print("PASS independent scientific directory retention", flush=True)
-
-
 def _safe_release(root, plan):
     root = Path(root).resolve()
     verified = []
@@ -467,6 +197,15 @@ def _release_plan_from_audit(root, audit_result):
             raise ValueError("source payload differs")
         plan.append({"path": name, "bytes": entry["bytes"], "sha256": entry["sha256"], "local_path": str(path)})
     return plan
+
+
+def _require_tool_digest(store, tool_digest):
+    if tool_digest is not None:
+        return tool_digest
+    adapter_digest = getattr(getattr(store, "_adapter", None), "tool_sha256", None)
+    if adapter_digest is None:
+        raise ValueError("tool digest required when blob store adapter does not expose tool_sha256")
+    return adapter_digest
 
 
 def publish(
@@ -501,9 +240,7 @@ def publish(
     descriptor = dict(store_descriptor or WAYSTONE_DESCRIPTOR)
     if store is None:
         store = BlobStore(blob_adapter_from_descriptor(descriptor))
-    if tool_digest is None:
-        adapter_digest = getattr(getattr(store, "_adapter", None), "tool_sha256", None)
-        tool_digest = adapter_digest if adapter_digest is not None else {"blob-store-adapter": "0" * 64}
+    tool_digest = _require_tool_digest(store, tool_digest)
     if reserve is None:
         reserve = reserve_write
     spec = PublicationSpec(
@@ -515,7 +252,7 @@ def publish(
         kind="scientific-directory",
         staging_style="copy",
         mode="archive",
-        release=release,
+        release=False,  # Blob-store 05 moves this caller-side release into publication.publish().
         store=store,
         store_descriptor=descriptor,
         tool_digest=tool_digest,
@@ -543,9 +280,6 @@ def publish(
 
 def main(argv=None):
     argv = list(sys.argv[1:] if argv is None else argv)
-    if argv == ["--independent-audit"]:
-        _independent_audit_cli()
-        return
     parser = argparse.ArgumentParser()
     parser.add_argument("--case", required=True)
     parser.add_argument("--root", type=Path, required=True)

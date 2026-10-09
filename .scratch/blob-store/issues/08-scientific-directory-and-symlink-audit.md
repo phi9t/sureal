@@ -29,3 +29,16 @@ Done 2026-10-09:
   - Parallax gate: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //parallax/...` passed: 17 out of 17 tests.
   - GPU 1 check before CUDA: `nvidia-smi` showed GPU 1 at 4 MiB used, 0% utilization and no `pmon` compute process.
   - CUDA gate: `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...` passed: 29 out of 29 tests.
+
+Review 1 follow-up 2026-10-09:
+
+- Removed the dead scientific-directory live runner stack (`DirectArchiveRunner`, `InsulaArchiveRunner`, `InsulaIndependentRunner`, `_default_live_runners`, independent audit CLI/restore helpers, chunk/release stage constants, and host-source entries only used by that path). `publish_symlink_audit.py` had no matching dead runner path; its local symlink listing helpers remain part of archive readback/audit.
+- Removed the fake `{"blob-store-adapter": "0"*64}` digest fallback. Both publishers now use `store._adapter.tool_sha256` when available and otherwise require an explicit `tool_digest`.
+- Built the scientific-directory `PublicationSpec` with `release=False` while keeping the current caller-side audit-derived release path, with a comment for the blob-store 05 handoff.
+- Verification:
+  - Review red check: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/retention:publish_scientific_directory_test //autonomy/retention:publish_symlink_audit_test` failed before the fix because missing `tool_digest` was accepted and `PublicationSpec.release` was still true for caller-side release.
+  - Focused check: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/retention:publish_scientific_directory_test //autonomy/retention:publish_symlink_audit_test` passed: 2 out of 2 tests.
+  - Default CPU gate: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...` passed: 181 out of 181 tests.
+  - Parallax gate: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //parallax/...` passed: 17 out of 17 tests.
+  - GPU 1 check before CUDA: `nvidia-smi` showed GPU 1 UUID `GPU-eaed2f0d-2541-8ca8-b6c4-3e2e45e86619` at 4 MiB used, 0% utilization and no `pmon` compute process.
+  - CUDA gate: `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...` passed: 29 out of 29 tests.

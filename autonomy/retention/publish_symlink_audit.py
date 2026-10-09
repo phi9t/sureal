@@ -19,11 +19,11 @@ from evidence.source_snapshot import (
 )
 from resources.resource_archive import safe_name
 from retention.publish_scientific_directory import (
-    CACHE_ROOT,
     PACKAGE_ROOT,
     SCIENTIFIC_PROCESSING,
     _require_evidence_root,
     _safe_component,
+    _require_tool_digest,
 )
 from retention.publication import (
     WAYSTONE_DESCRIPTOR,
@@ -352,9 +352,7 @@ def publish(
     descriptor = dict(store_descriptor or WAYSTONE_DESCRIPTOR)
     if store is None:
         store = BlobStore(blob_adapter_from_descriptor(descriptor))
-    if tool_digest is None:
-        adapter_digest = getattr(getattr(store, "_adapter", None), "tool_sha256", None)
-        tool_digest = adapter_digest if adapter_digest is not None else {"blob-store-adapter": "0" * 64}
+    tool_digest = _require_tool_digest(store, tool_digest)
     packed = run_dir / "packed"
     packed.mkdir()
     archive = packed / "audit.tar.gz"
