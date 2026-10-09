@@ -1,5 +1,6 @@
 """Frozen training-only continuation gate; no model-quality promotion by loss."""
-import copy,math,re
+import copy,re
+from evidence.score_records import LEVEL2_CLASS_KEYS, read_level2_per_class
 
 GRID=(0,1000,2000,4000,8000,12000,16000,24000,32000)
 RECIPES=('baseline','residual_bev','class_balanced','prior_bias')
@@ -27,15 +28,19 @@ def next_checkpoint(step,first_pass_step):
   if step<confirmation<=32000:candidates.append(confirmation)
  return min(candidates) if candidates else None
 
+def sample_aph(sample):
+ if 'LEVEL2_per_class' in sample:return {key:row['APH'] for key,row in read_level2_per_class(sample['LEVEL2_per_class'],classes=LEVEL2_CLASS_KEYS).items()}
+ if 'APH' in sample:return {key:row['APH'] for key,row in read_level2_per_class({key:{'AP':value,'APH':value} for key,value in sample['APH'].items()},classes=LEVEL2_CLASS_KEYS).items()}
+ raise ValueError('native score record required')
+
 def fit_status(samples,terminal_step,stop_reason):
  if type(terminal_step) is not int or not 0<=terminal_step<=32000 or stop_reason not in {'gate','update_cap','time_cap'}:raise ValueError('bounded stop reason required')
  if stop_reason=='update_cap' and terminal_step!=32000:raise ValueError('update cap not reached')
  if not samples or samples[-1]['step']!=terminal_step:raise ValueError('terminal scored checkpoint required')
  passing=[];previous=-1;first_pass=None
  for sample in samples:
-  step=sample['step'];aph=sample['APH']
-  if type(step) is not int or not previous<step<=terminal_step or not isinstance(aph,dict) or set(aph)!={'1','2','3','4'}:raise ValueError('ordered class-complete checkpoints required')
-  if any(isinstance(x,bool) or not isinstance(x,(float,int)) or not math.isfinite(x) or not 0<=x<=1 for x in aph.values()):raise ValueError('finite native APH required')
+  step=sample['step'];aph=sample_aph(sample)
+  if type(step) is not int or not previous<step<=terminal_step:raise ValueError('ordered class-complete checkpoints required')
   expected=0 if previous==-1 else next_checkpoint(previous,first_pass)
   forced_time_terminal=previous>=0 and stop_reason=='time_cap' and step==terminal_step and expected is not None and previous<step<expected
   if step!=expected and not forced_time_terminal:raise ValueError('missing or premature checkpoint')
