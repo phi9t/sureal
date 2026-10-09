@@ -1,6 +1,7 @@
 """Pure scientific source admission; this is not a transfer or payload verifier."""
 import copy
 import re
+from dataset.blob_storage import source_blob_key
 
 
 def check_raw_capacity(retained_bytes, source_bytes, limit_bytes, *, active_objects):
@@ -43,8 +44,6 @@ def admit_scene(manifest, records, scene):
             digest = record['sha256']
             if not isinstance(digest, str) or not re.fullmatch('[0-9a-f]{64}', digest):
                 raise ValueError('invalid source SHA256')
-            if record['hdfs_roundtrip_sha256'] != digest:
-                raise ValueError('source/HDFS digest conflict')
             metadata = record['source_metadata']
             generation = metadata['generation']
             if type(generation) not in (str, int) or not re.fullmatch('[1-9][0-9]*', str(generation)):
@@ -55,8 +54,21 @@ def admit_scene(manifest, records, scene):
             relative = f'{official}/{component}/{scene}.parquet'
             if metadata['storage_url'] != f'gs://waymo_open_dataset_v_2_0_1/{relative}#{generation}':
                 raise ValueError('source URI/generation conflict')
-            if record['hdfs_uri'] != manifest['hdfs_root'].rstrip('/') + '/' + relative:
-                raise ValueError('HDFS destination conflict')
+            if 'blob' in record:
+                blob = record['blob']
+                if (blob.get('key') != source_blob_key(official, component, scene)
+                        or blob.get('sha256') != digest
+                        or blob.get('bytes') != int(size)
+                        or blob.get('verified_by_readback') is not True):
+                    raise ValueError('source blob identity conflict')
+                descriptor = record.get('store_descriptor')
+                if not isinstance(descriptor, dict) or descriptor.get('kind') not in ('waystone', 'local'):
+                    raise ValueError('source store descriptor required')
+            else:
+                if record['hdfs_roundtrip_sha256'] != digest:
+                    raise ValueError('source/HDFS digest conflict')
+                if record['hdfs_uri'] != manifest['hdfs_root'].rstrip('/') + '/' + relative:
+                    raise ValueError('HDFS destination conflict')
             rows = record['inventory']['rows']
             if type(rows) is not int or rows < 0:
                 raise ValueError('invalid native inventory count')

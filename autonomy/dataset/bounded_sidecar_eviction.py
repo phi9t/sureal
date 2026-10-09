@@ -1,16 +1,18 @@
 """Remove only independently published decoded sidecar payloads."""
 import json,gzip,hashlib,os
 from pathlib import Path
+from dataset.blob_storage import publication_archive_reference
 from evidence.source_snapshot import file_sha256 as digest
 
 STAGES=['pack-live','hdfs-put','hdfs-download','independent-bundle-live','manifest-put-last','manifest-download']
+BLOB_STAGES=['pack-live','archive-blob-put','archive-blob-fetch','independent-bundle-live','manifest-blob-put-last','manifest-blob-fetch']
 def evict_sidecars(processing,publication,*,expected_publication_sha256,expected_trusted_sha256,available_metadata_bytes):
  processing,publication=map(Path,(processing,publication));record=processing/'sidecar-eviction.json'
  if record.exists():raise ValueError('existing eviction evidence must be preserved')
  receipt=publication/'receipt.json'
  if digest(receipt)!=expected_publication_sha256:raise ValueError('trusted publication receipt differs')
  pub=json.loads(receipt.read_text())
- if [c['stage'] for c in pub['checks']]!=STAGES or any(c['exit_code']!=0 for c in pub['checks']):raise ValueError('complete successful publication required')
+ if [c['stage'] for c in pub['checks']] not in (STAGES,BLOB_STAGES) or any(c['exit_code']!=0 for c in pub['checks']):raise ValueError('complete successful publication required')
  for name,h in pub['artifacts'].items():
   relative=Path(name)
   if relative.is_absolute() or '..' in relative.parts:raise ValueError('unsafe publication artifact')
@@ -22,8 +24,7 @@ def evict_sidecars(processing,publication,*,expected_publication_sha256,expected
  trusted=json.loads(data);provenance=trusted['provenance']
  if provenance!=pub['validation']['provenance'] or provenance['scene']!=pub['scene'] or provenance['scene_receipt_sha256']!=pub['scene_receipt_sha256'] or provenance['source_receipt_hashes']!=pub['component_receipt_hashes']:raise ValueError('source lineage differs')
  if pub['validation']['files']!=len(trusted['files']):raise ValueError('bundle inventory differs')
- target=pub['archive_hdfs_uri']
- if not isinstance(target,str) or not target.startswith('hdfs://'):raise ValueError('HDFS recovery source required')
+ target=publication_archive_reference(pub)
  source=processing/'sidecars';files=[];names=set()
  for name,h in trusted['files'].items():
   parts=Path(name).parts
@@ -35,7 +36,9 @@ def evict_sidecars(processing,publication,*,expected_publication_sha256,expected
  archive=publication/'packed/sidecars.tar'
  if digest(archive)!=pub['archive']['sha256']:raise ValueError('mirrored archive changed')
  files.append({'path':str(archive),'sha256':pub['archive']['sha256'],'size_bytes':archive.stat().st_size,'recovery_member':None})
- result={'status':'verified sidecar eviction admitted','scene':pub['scene'],'archive_hdfs_uri':target,'archive_sha256':pub['archive']['sha256'],'publication_receipt_sha256':expected_publication_sha256,'files':files,'bytes_evicted':sum(x['size_bytes'] for x in files)}
+ result={'status':'verified sidecar eviction admitted','scene':pub['scene'],'archive_sha256':pub['archive']['sha256'],'publication_receipt_sha256':expected_publication_sha256,'files':files,'bytes_evicted':sum(x['size_bytes'] for x in files)}
+ if isinstance(target,dict):result['archive_blob']=target
+ else:result['archive_hdfs_uri']=target
  intent=processing/'sidecar-eviction-intent.json.gz'
  encoded=gzip.compress((json.dumps(result,separators=(',',':'))+'\n').encode(),mtime=0)
  if type(available_metadata_bytes) is not int or available_metadata_bytes<=0 or len(encoded)+65536>available_metadata_bytes:raise ValueError('eviction intent exceeds available aggregate metadata capacity')

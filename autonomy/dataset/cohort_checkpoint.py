@@ -1,6 +1,7 @@
 """Independently audit trusted retained lifecycle evidence after explicit eviction."""
 import json
 from pathlib import Path
+from dataset.blob_storage import publication_archive_reference
 from evidence.source_snapshot import file_sha256 as digest
 
 def verify_checkpoint(path,*,expected_checkpoint_sha256,code_root,expected_runtime_lock,expected_manifest_sha256,expected_source_hashes,path_remap=None):
@@ -21,10 +22,14 @@ def verify_checkpoint(path,*,expected_checkpoint_sha256,code_root,expected_runti
   p=relocated(name)
   if digest(p)!=h:raise ValueError('retained evidence changed')
   if p.suffix=='.json':documents[p]=json.loads(p.read_text())
- publications={d['archive_hdfs_uri']:(p,d) for p,d in documents.items() if 'archive_hdfs_uri' in d and 'archive' in d and 'checks' in d};deleted={};evictions=0;workers=0
+ def recovery_key(document):
+  value=publication_archive_reference(document)
+  if isinstance(value,dict):return value['key']
+  return value
+ publications={recovery_key(d):(p,d) for p,d in documents.items() if ('archive_hdfs_uri' in d or 'archive_blob' in d) and 'archive' in d and 'checks' in d};deleted={};evictions=0;workers=0
  for p,d in documents.items():
   if d.get('status','').startswith('verified ') and d.get('status','').endswith(' eviction completed'):
-   target=d['archive_hdfs_uri']
+   target=recovery_key(d)
    if target not in publications:raise ValueError('eviction publication missing')
    publication,pub=publications[target]
    if digest(publication)!=d['publication_receipt_sha256'] or d['archive_sha256']!=pub['archive']['sha256']:raise ValueError('eviction recovery lineage differs')

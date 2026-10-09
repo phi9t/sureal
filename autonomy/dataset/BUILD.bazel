@@ -49,6 +49,7 @@ py_library(
     imports = [".."],
     visibility = DATASET_VISIBILITY,
     deps = [
+        "//autonomy/blob_store:blob_store",
         "//autonomy/evidence:evidence",
         "//autonomy/insula:insula",
     ],
@@ -91,7 +92,10 @@ filegroup(
         name = test[:-3],
         srcs = [test] + TEST_EXTRA_SRCS.get(test, []),
         data = [":runfiles"] + TEST_EXTRA_DATA.get(test, []),
-        deps = [":dataset"],
+        deps = [
+            ":dataset",
+            "//autonomy/blob_store:blob_store",
+        ],
         imports = [".."],
         legacy_create_init = 0,
         size = "small",

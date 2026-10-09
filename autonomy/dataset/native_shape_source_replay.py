@@ -6,7 +6,6 @@ module does not authorize scientific membership or close the full cohort.
 import json
 from pathlib import Path
 import subprocess
-import sys
 from evidence.source_snapshot import file_sha256 as sha
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
@@ -16,7 +15,7 @@ from dataset.staged_source import staged_source
 
 def replay_shape_source(job_path,source_receipt,*,expected_job_sha256,
         expected_source_receipt_sha256,cache,code_root,output,runtime_root,
-        expected_runtime_lock,retained_bytes,limit_bytes,transfer_command=None):
+        expected_runtime_lock,retained_bytes,limit_bytes,blob_store=None,transfer_command=None):
     cache,code_root,output,runtime_root,job_path,source_receipt=map(Path,
         (cache,code_root,output,runtime_root,job_path,source_receipt))
     with staging_lease(cache/'scientific-processing/cohort-queue.lock'):
@@ -45,10 +44,8 @@ def replay_shape_source(job_path,source_receipt,*,expected_job_sha256,
                'dataset/staged_source.py','dataset/source_integrity.py','insula/staging_lease.py',
                'insula/entry.py','insula/runtime_identity.py']
         pins={n:sha(code_root/n) for n in names}
-        transfer_prefix=transfer_command if transfer_command is not None else [
-            sys.executable,str(code_root/'geometry/native_shape_transfer.py'),'--timeout-seconds','600']
         with staged_source(source,cache,retained_bytes=retained_bytes,
-                limit_bytes=limit_bytes,transfer_command=transfer_prefix) as (staged,transfer):
+                limit_bytes=limit_bytes,blob_store=blob_store,transfer_command=transfer_command) as (staged,transfer):
             output.mkdir(parents=True,exist_ok=False);inputs=output/'input';inputs.mkdir()
             (inputs/'job.json').write_bytes(job_path.read_bytes())
             (inputs/'source-receipt.json').write_bytes(source_receipt.read_bytes())

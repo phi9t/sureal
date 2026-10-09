@@ -168,6 +168,59 @@ class BlobStoreContractTests(unittest.TestCase):
                         store.get(key, destination, wrong_sha)
                     self.assertFalse(destination.exists())
 
+    @contextlib.contextmanager
+    def offline_adapter_cases(self, api):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            yield [
+                ("memory", api["InMemoryBlobAdapter"]()),
+                ("local", api["LocalFileBlobAdapter"](root / "store")),
+            ]
+
+    def test_get_rejects_wrong_expected_size_as_corrupt_before_downloading(self):
+        api = self.api()
+        with tempfile.TemporaryDirectory() as directory, self.offline_adapter_cases(api) as adapters:
+            root = Path(directory)
+            source = self.write_file(root, "source.bin", b"trusted bytes")
+            source_sha = hashlib.sha256(b"trusted bytes").hexdigest()
+            key = "datasets/size-check/run-20261009/raw/source.parquet"
+
+            for name, adapter in adapters:
+                with self.subTest(adapter=name):
+                    store = api["BlobStore"](adapter)
+                    store.put(key, source)
+                    download_calls = []
+                    original_download = adapter._download_blob
+
+                    def download_blob(*args, **kwargs):
+                        download_calls.append(args[0])
+                        return original_download(*args, **kwargs)
+
+                    adapter._download_blob = download_blob
+                    destination = root / name / "oversized.bin"
+
+                    with self.assertRaises(api["Corrupt"]):
+                        store.get(key, destination, source_sha, expected_bytes=len(b"trusted bytes") - 1)
+
+                    self.assertEqual(download_calls, [])
+                    self.assertFalse(destination.exists())
+
+    def test_get_accepts_matching_expected_size(self):
+        api = self.api()
+        with tempfile.TemporaryDirectory() as directory, self.store_cases(api) as stores:
+            root = Path(directory)
+            source = self.write_file(root, "source.bin", b"trusted bytes")
+            source_sha = hashlib.sha256(b"trusted bytes").hexdigest()
+            key = "datasets/size-check/run-20261009/raw/source.parquet"
+
+            for name, store in stores:
+                with self.subTest(adapter=name):
+                    destination = root / name / "source.bin"
+                    store.put(key, source)
+                    store.get(key, destination, source_sha, expected_bytes=len(b"trusted bytes"))
+
+                    self.assertEqual(destination.read_bytes(), b"trusted bytes")
+
     def test_missing_blob_fetch_raises_missing_and_exists_is_false(self):
         api = self.api()
         with tempfile.TemporaryDirectory() as directory, self.store_cases(api) as stores:
