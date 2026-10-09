@@ -4,6 +4,15 @@ import tempfile,unittest
 from blob_store.core import BlobStore, InMemoryBlobAdapter
 from dataset.staged_source import staged_source
 
+class CountingInMemoryBlobAdapter(InMemoryBlobAdapter):
+    def __init__(self, blobs):
+        super().__init__(blobs)
+        self.downloads = 0
+
+    def _download_blob(self, key, destination, context):
+        self.downloads += 1
+        return super()._download_blob(key, destination, context)
+
 class StagedSourceTests(unittest.TestCase):
     def fixture(self,root,*,stored=None):
         data=b'sensor-source-fixture'
@@ -43,6 +52,19 @@ class StagedSourceTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     with staged_source(record,cache,retained_bytes=1000,limit_bytes=10000,blob_store=store):pass
                 self.assertFalse(list((cache/'scientific-processing-staging').glob('stage-*')))
+
+    def test_oversized_blob_is_rejected_before_staging_write(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);record,_,key=self.fixture(root);cache=root/'cache'
+            adapter=CountingInMemoryBlobAdapter({key:b'sensor-source-fixture with trailing bytes'})
+            store=BlobStore(adapter)
+
+            with self.assertRaises(ValueError):
+                with staged_source(record,cache,retained_bytes=1000,limit_bytes=10000,blob_store=store):pass
+
+            self.assertEqual(adapter.downloads,0)
+            processing=cache/'scientific-processing-staging'
+            self.assertFalse([path for path in processing.rglob('*') if path.is_file()])
 
     def test_capacity_and_orphan_staging_rejected_before_transfer(self):
         for orphan in (False,True):

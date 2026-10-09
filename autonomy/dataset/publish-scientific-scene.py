@@ -37,14 +37,14 @@ def main():
     cmd=['python','-c',"import json; from pathlib import Path; from dataset.scene_archive import create_scene_archive; r=create_scene_archive('/source/points','/outputs/scene.tar',expected_report_sha256="+repr(trusted)+",sidecar_bytes="+str(used-pointbytes)+",budget_bytes=15*1024**3); Path('/outputs/archive.json').write_text(json.dumps(r)); print('PASS deterministic scientific archive',r['archive_bytes'])"]
     call('pack-live',launch_plan(root,HERE,processing,packed,cmd));meta=json.loads((packed/'archive.json').read_text());archive=packed/'scene.tar';target=scene_archive_blob_key(scene)
     archive_blob=put_blob(blob_store,target,archive);checks.append(blob_transfer_check('archive-blob-put',archive_blob));archive.unlink()
-    blob_store.get(archive_blob['key'],archive,archive_blob['sha256']);checks.append(blob_transfer_check('archive-blob-fetch',archive_blob))
+    blob_store.get(archive_blob['key'],archive,archive_blob['sha256'],expected_bytes=archive_blob['bytes']);checks.append(blob_transfer_check('archive-blob-fetch',archive_blob))
     if sha(archive)!=meta['sha256']:raise ValueError('archive mirror SHA differs')
     cmd=['python','-c',"import json; from pathlib import Path; from dataset.scene_archive_validate import validate_archive; r=validate_archive('/source/scene.tar',expected_report_sha256="+repr(trusted)+",expected_archive_sha256="+repr(meta['sha256'])+"); Path('/outputs/archive-check.json').write_text(json.dumps(r)); print('PASS independent mirrored archive',r['members'])"]
     call('independent-archive-live',launch_plan(root,HERE,packed,checked,cmd));validation=json.loads((checked/'archive-check.json').read_text())
     pub=publication_manifest(admitted,receipt,meta,validation,mirror_sha256=sha(archive),scene_receipt_sha256=args.expected_receipt_sha256,archive_blob=archive_blob,store_descriptor=store_descriptor)
     if pub['archive_blob']['key']!=target:raise ValueError('publication destination differs')
     p=packed/'publication.json';p.write_text(json.dumps(pub,indent=2)+'\n');expected=sha(p)
-    manifest_blob=put_blob(blob_store,scene_manifest_blob_key(scene),p);checks.append(blob_transfer_check('manifest-blob-put-last',manifest_blob));mirror=checked/'publication.json';blob_store.get(manifest_blob['key'],mirror,manifest_blob['sha256']);checks.append(blob_transfer_check('manifest-blob-fetch',manifest_blob))
+    manifest_blob=put_blob(blob_store,scene_manifest_blob_key(scene),p);checks.append(blob_transfer_check('manifest-blob-put-last',manifest_blob));mirror=checked/'publication.json';blob_store.get(manifest_blob['key'],mirror,manifest_blob['sha256'],expected_bytes=manifest_blob['bytes']);checks.append(blob_transfer_check('manifest-blob-fetch',manifest_blob))
     if sha(mirror)!=expected:raise ValueError('publication mirror differs')
     for n,v in candidates.items():
         if sha(HERE/n)!=v:raise ValueError('publication code changed')

@@ -20,3 +20,12 @@ Done 2026-10-09:
 - Verification: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...` passed 176 out of 176 tests.
 - Verification: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //parallax/...` passed 17 out of 17 tests.
 - Verification: `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...` passed 29 out of 29 tests after GPU 1 was observed free.
+
+Review 1 fix 2026-10-09:
+
+- `BlobStore.get` now accepts optional `expected_bytes`; mismatched adapter-reported size raises `Corrupt` before download, and downloaded temp files also have their byte count checked before publication.
+- Dataset raw-source fetches and scene/sidecar/acquisition blob mirror reads now pass declared receipt byte counts into `BlobStore.get`.
+- Regression coverage: blob-store contract tests cover in-memory and local adapters refusing a size mismatch before download and accepting matching sizes; staged-source coverage verifies an oversized stored blob leaves no staging file.
+- Verification: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...` passed 176 out of 176 tests.
+- Verification: `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //parallax/...` passed 17 out of 17 tests.
+- Verification: `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...` passed 29 out of 29 tests after GPU 1 was observed free.

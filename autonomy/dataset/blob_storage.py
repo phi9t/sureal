@@ -74,7 +74,7 @@ def put_blob(blob_store, key, source):
 def fetch_record_blob(record, destination, *, blob_store=None):
     blob = record_blob(record)
     store = blob_store if blob_store is not None else _blob_store_for_record(record)
-    store.get(blob["key"], destination, blob["sha256"])
+    store.get(blob["key"], destination, blob["sha256"], expected_bytes=blob["bytes"])
     return blob
 
 

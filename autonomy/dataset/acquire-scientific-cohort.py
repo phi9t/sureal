@@ -45,7 +45,7 @@ def main():
                 if payload.stat().st_size!=int(metadata['size']) or md5!=metadata['md5_hash']:raise ValueError('source integrity')
                 blob=put_blob(blob_store,source_blob_key(official,component,scene),payload)
                 payload.unlink()
-                blob_store.get(blob['key'],payload,blob['sha256'])
+                blob_store.get(blob['key'],payload,blob['sha256'],expected_bytes=blob['bytes'])
                 if payload.stat().st_size!=int(metadata['size']) or hashes(payload)[0]!=sha:raise ValueError('blob download-back integrity; stored source changed')
                 log=call([str(HERE/'enter.sh'),'--source',str(inputs),'--output',str(out),'--offline','--','python','-m','dataset.shard_inventory','/source/source.parquet',scene,'/outputs/inventory.json'])
                 result={'scene':scene,'component':component,'official_split':official,'research_splits':group['research_splits'],'source_metadata':metadata,'sha256':sha,'blob':blob,'store_descriptor':store_descriptor,'inventory':json.loads((out/'inventory.json').read_text()),'live_log':log,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'inventory_code_sha256':file_sha256(HERE/'dataset/shard_inventory.py'),'raw_peak_bytes_including_retained_engineering':retained+int(metadata['size'])}

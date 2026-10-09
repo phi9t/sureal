@@ -54,13 +54,13 @@ def main():
     (inputs/'trusted.json').unlink()
     if aggregate_bytes()+1024**2>=15*1024**3:raise ValueError('post-pack receipt reserve cannot fit aggregate cap')
     meta=json.loads((packed/'archive.json').read_text());archive=packed/'sidecars.tar';target=sidecar_archive_blob_key(scene)
-    archive_blob=put_blob(blob_store,target,archive);checks.append(blob_transfer_check('archive-blob-put',archive_blob));archive.unlink();blob_store.get(archive_blob['key'],archive,archive_blob['sha256']);checks.append(blob_transfer_check('archive-blob-fetch',archive_blob))
+    archive_blob=put_blob(blob_store,target,archive);checks.append(blob_transfer_check('archive-blob-put',archive_blob));archive.unlink();blob_store.get(archive_blob['key'],archive,archive_blob['sha256'],expected_bytes=archive_blob['bytes']);checks.append(blob_transfer_check('archive-blob-fetch',archive_blob))
     if sha(archive)!=meta['sha256']:raise ValueError('sidecar mirror differs')
     code="import json; from pathlib import Path; from dataset.component_archive_validate import validate_component_archive; r=validate_component_archive('/source/sidecars.tar',expected_archive_sha256="+repr(meta['sha256'])+",expected_manifest_sha256="+repr(meta['manifest_sha256'])+"); Path('/outputs/bundle-check.json').write_text(json.dumps(r)); print('PASS independent native sidecar bundle',r['files'])"
     call('independent-bundle-live',launch_plan(root,HERE,packed,checked,['python','-c',code]));validation=json.loads((checked/'bundle-check.json').read_text())
     if validation['provenance']!=provenance or validation['files']!=len(expected):raise ValueError('bundle source lineage differs')
     publication={'schema_version':1,'role':'scientific-decoded-components','scene':scene,'official_split':native['official_split'],'research_splits':native['research_splits'],'archive_blob':archive_blob,'store_descriptor':store_descriptor,'archive':meta,'provenance':provenance}
-    p=packed/'publication.json';p.write_text(json.dumps(publication,indent=2)+'\n');manifest_sha=sha(p);manifest_blob=put_blob(blob_store,sidecar_manifest_blob_key(scene),p);checks.append(blob_transfer_check('manifest-blob-put-last',manifest_blob));mirror=checked/'publication.json';blob_store.get(manifest_blob['key'],mirror,manifest_blob['sha256']);checks.append(blob_transfer_check('manifest-blob-fetch',manifest_blob))
+    p=packed/'publication.json';p.write_text(json.dumps(publication,indent=2)+'\n');manifest_sha=sha(p);manifest_blob=put_blob(blob_store,sidecar_manifest_blob_key(scene),p);checks.append(blob_transfer_check('manifest-blob-put-last',manifest_blob));mirror=checked/'publication.json';blob_store.get(manifest_blob['key'],mirror,manifest_blob['sha256'],expected_bytes=manifest_blob['bytes']);checks.append(blob_transfer_check('manifest-blob-fetch',manifest_blob))
     if sha(mirror)!=manifest_sha:raise ValueError('sidecar publication mirror differs')
     for n,v in candidates.items():
         if sha(HERE/n)!=v:raise ValueError('publication candidate changed')

@@ -204,13 +204,17 @@ class BlobStore:
 
         return self._with_retries("put", key, attempt)
 
-    def get(self, key, dest, sha256):
+    def get(self, key, dest, sha256, *, expected_bytes=None):
         key = validate_blob_key(key)
         expected_sha256 = _require_sha256(sha256)
+        if expected_bytes is not None and (type(expected_bytes) is not int or expected_bytes < 0):
+            raise ValueError("expected byte count must be a non-negative integer")
         destination = Path(dest)
 
         def attempt():
             size = self._call_primitive(0, lambda context: self._adapter._blob_size(key, context))
+            if expected_bytes is not None and size != expected_bytes:
+                raise _PrimitiveCorrupt("blob byte count mismatch")
             destination.parent.mkdir(parents=True, exist_ok=True)
             temporary = None
             try:
@@ -225,8 +229,10 @@ class BlobStore:
                     size,
                     lambda context: self._adapter._download_blob(key, temporary, context),
                 )
-                actual_sha256, _ = _file_sha256_and_size(temporary)
-                if actual_sha256 != expected_sha256:
+                actual_sha256, actual_bytes = _file_sha256_and_size(temporary)
+                if actual_sha256 != expected_sha256 or (
+                    expected_bytes is not None and actual_bytes != expected_bytes
+                ):
                     raise _PrimitiveCorrupt("blob digest mismatch")
                 os.replace(temporary, destination)
                 temporary = None
