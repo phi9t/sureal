@@ -54,6 +54,24 @@ filegroup(
     for test in TEST_MODULES
 ]
 
+py_test(
+    name = "waystone_contract_test",
+    srcs = ["contract_test.py"],
+    main = "contract_test.py",
+    deps = [":blob_store"],
+    imports = [".."],
+    legacy_create_init = 0,
+    size = "medium",
+    tags = [
+        "manual",
+        "perception_unit",
+        "requires_hdfs",
+    ],
+    env = {
+        "SUREAL_BLOB_STORE_CONTRACT_ADAPTER": "waystone",
+    },
+)
+
 test_suite(
     name = "all_tests",
     tests = [test[:-3] for test in TEST_MODULES],
