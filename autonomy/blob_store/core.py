@@ -45,6 +45,7 @@ WAYSTONE_SIZE_KEYS = (
 DEFAULT_WAYSTONE_RELATIVE = "workspace/waystone/scripts/waystone"
 DEFAULT_HADOOP_CONF_DIR = "/opt/tiger/yarn_deploy/hadoop/conf"
 DEFAULT_HDFS_AUTH_REFRESH = Path(__file__).resolve().parents[1] / "resources/refresh-hdfs-auth.sh"
+LEGACY_WAYSTONE_PROJECT_ROOT = "hdfs://harunava/user/tiger/waystone/sureal"
 WAYSTONE_TOOL_RELATIVES = (
     "rust/target/debug/waystone",
     "native/libhdfs_client/dist/lib/libhdfs_client.so",
@@ -805,6 +806,19 @@ def blob_key_from_uri(value: str, adapter_or_descriptor, **factory_kwargs) -> st
     if hasattr(adapter, "blob_key_from_uri"):
         return adapter.blob_key_from_uri(value)
     return validate_blob_key(value)
+
+
+def legacy_project_uri_to_key(uri: str) -> str:
+    """Translate old retained HDFS URIs without consulting Waystone layout."""
+    if not isinstance(uri, str):
+        raise ValueError("legacy project URI required")
+    root = LEGACY_WAYSTONE_PROJECT_ROOT
+    prefix = root + "/"
+    if uri == root:
+        raise ValueError("legacy project URI does not name a blob")
+    if not uri.startswith(prefix):
+        raise ValueError("legacy project URI is outside the Waystone project root")
+    return validate_blob_key(uri[len(prefix) :])
 
 
 def waystone_tool_pins(waystone=None) -> dict[str, str]:

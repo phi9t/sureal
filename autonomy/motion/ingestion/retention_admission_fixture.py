@@ -1,11 +1,13 @@
 import pathlib,json,copy,time,resource
+from blob_store.core import legacy_project_uri_to_key
 from evidence.source_snapshot import file_sha256 as sha
 start=time.monotonic();base=pathlib.Path('/source')
 PREFIX='runs/perception-motion/'
 def blob_key(value):
- marker='/'+PREFIX
- if not isinstance(value,str) or marker not in value:raise ValueError('namespace')
- return PREFIX+value.split(marker,1)[1].lstrip('/')
+ try:key=legacy_project_uri_to_key(value)
+ except ValueError as error:raise ValueError('namespace') from error
+ if not key.startswith(PREFIX):raise ValueError('namespace')
+ return key
 def validate(pub,original,expected,check_local=True):
  if not pub['manifest_readback_exact'] or pub['chunk_limit_bytes']!=32*1024**2:raise ValueError('readback/chunk admission')
  for key in ['chunks','source_sha256','parent_receipts','runtime_lock','source_pins','tool_pins','hdfs_prefix']:

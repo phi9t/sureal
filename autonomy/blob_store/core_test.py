@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from blob_store.core import BlobStore, Corrupt, InMemoryBlobAdapter, Unavailable
+from blob_store.core import BlobStore, Corrupt, InMemoryBlobAdapter, Unavailable, legacy_project_uri_to_key
 
 
 class ManualClock:
@@ -64,6 +64,23 @@ class BlobStoreCoreTests(unittest.TestCase):
         self.assertIsInstance(caught.exception.__cause__, RuntimeError)
         self.assertEqual(adapter.calls, 1)
         self.assertEqual(clock.sleeps, [])
+
+    def test_legacy_project_uri_to_key_requires_the_exact_legacy_project_root(self):
+        self.assertEqual(
+            legacy_project_uri_to_key(
+                "hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-a"
+            ),
+            "runs/perception-resource-closures/balanced16-a",
+        )
+
+        for uri in [
+            "hdfs://other-cluster/x/runs/perception-resource-closures/balanced16-a",
+            "hdfs://harunava/user/tiger/waystone/sureal",
+            "hdfs://harunava/user/tiger/waystone/surealish/runs/perception-resource-closures/balanced16-a",
+        ]:
+            with self.subTest(uri=uri):
+                with self.assertRaises(ValueError):
+                    legacy_project_uri_to_key(uri)
 
 
 if __name__ == "__main__":

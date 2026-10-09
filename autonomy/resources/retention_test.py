@@ -42,6 +42,27 @@ class ResourceRetentionTests(unittest.TestCase):
                 if fault not in {'readback','changed_input'}:readback={k:v for k,v in bad.items() if k not in {'manifest_readback_exact','publication_manifest_hdfs_uri','publication_manifest_sha256'}}
                 with self.assertRaises(ValueError):validate(bad,expected,readback,raw)
 
+    def test_foreign_root_resource_uris_are_refused_even_with_matching_blob_key_suffix(self):
+        validate=self.api()
+        with tempfile.TemporaryDirectory() as temp:
+            pub,expected,original,raw=self.fixture(Path(temp))
+            old_root='hdfs://harunava/user/tiger/waystone/sureal'
+            foreign_root='hdfs://other-cluster/x'
+
+            def rewrite(value):
+                return value.replace(old_root,foreign_root)
+
+            bad=copy.deepcopy(pub)
+            bad['hdfs_prefix']=rewrite(bad['hdfs_prefix'])
+            bad['publication_manifest_hdfs_uri']=rewrite(bad['publication_manifest_hdfs_uri'])
+            for chunk in bad['chunks']:
+                chunk['archive_hdfs_uri']=rewrite(chunk['archive_hdfs_uri'])
+                chunk['manifest_hdfs_uri']=rewrite(chunk['manifest_hdfs_uri'])
+            readback={k:v for k,v in bad.items() if k not in {'manifest_readback_exact','publication_manifest_hdfs_uri','publication_manifest_sha256'}}
+
+            with self.assertRaises(ValueError):
+                validate(bad,expected,readback,raw)
+
     def test_chunk_partition_is_complete_bounded_and_order_independent(self):
         try:from resources.retention_audit import partition
         except ImportError:self.fail('resource retention needs bounded chunk partitioning before writes')

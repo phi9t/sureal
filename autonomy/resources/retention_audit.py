@@ -1,6 +1,7 @@
 """Compatibility checks for old resource publication receipts."""
 import errno,json,os,re,shutil
 from pathlib import Path
+from blob_store.core import legacy_project_uri_to_key
 from evidence.source_snapshot import is_regular_file,safe_member_name
 from resources.sources import package_member_path,sha
 
@@ -80,12 +81,12 @@ def _reserve_write(root,maximum_new_bytes):
 
 
 def _legacy_resource_blob_key(value):
-    if not isinstance(value,str):
-        raise ValueError('resource publication URI required')
-    marker='/'+RESOURCE_CLOSURE_BLOB_PREFIX
-    if marker not in value:
+    try:key=legacy_project_uri_to_key(value)
+    except ValueError as error:
+        raise ValueError('resource publication URI required') from error
+    if not key.startswith(RESOURCE_CLOSURE_BLOB_PREFIX):
         raise ValueError('declared resource closure namespace required')
-    return RESOURCE_CLOSURE_BLOB_PREFIX+value.split(marker,1)[1].lstrip('/')
+    return key
 
 def validate_archive_snapshot(pub,chunk,check,mode):
     """Reconcile retained worker inputs/results with its exact chunk contract."""

@@ -1,6 +1,7 @@
 """Independent whole-checkpoint membership/readback/live-recovery admission."""
 import copy,json,resource,time
 from pathlib import Path,PurePosixPath
+from blob_store.core import legacy_project_uri_to_key
 from evidence.source_snapshot import file_sha256,require_regular_file
 start=time.monotonic()
 sha=file_sha256
@@ -10,9 +11,10 @@ assert sha(base/'readback.json')==pub['publication_manifest_sha256']
 assert sha(base/'expected.json')==pub['checkpoint_inventory_sha256']
 PREFIX='runs/perception-sustained-checkpoints/'
 def blob_key(value):
- marker='/'+PREFIX
- if not isinstance(value,str) or marker not in value:raise ValueError('wrong checkpoint namespace')
- return PREFIX+value.split(marker,1)[1].lstrip('/')
+ try:key=legacy_project_uri_to_key(value)
+ except ValueError as error:raise ValueError('wrong checkpoint namespace') from error
+ if not key.startswith(PREFIX):raise ValueError('wrong checkpoint namespace')
+ return key
 
 def validate(candidate,check_local=True):
  if candidate.get('manifest_readback_exact') is not True or candidate.get('source_admission_complete') is not True:raise ValueError('readback/source admission required')
