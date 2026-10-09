@@ -4,10 +4,9 @@ import argparse
 from datetime import datetime,timezone
 import json
 from pathlib import Path
-import resource,subprocess,time
+import resource,time
 from evidence.source_snapshot import file_sha256 as sha
-from insula.entry import launch_plan
-from insula.runtime_identity import verify_rootfs
+from dataset.launches import build_dataset_plan, load_dataset_runtime, plan_receipt, rendered_command, run_dataset_plan
 from dataset.scientific_admission import admit_scene
 from dataset.staged_source import staged_source
 from insula.staging_lease import staging_lease
@@ -30,7 +29,7 @@ def main():
     # Refuse the live owner before creating a partial scene directory. Individual
     # transfers reacquire this same lease for their entire processing lifetime.
     with staging_lease(cache/'raw-staging.lock'):pass
-    root=cache/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
+    runtime=load_dataset_runtime(cache);lock=runtime.data
     retained=sum(o['size_bytes'] for o in json.loads((HERE/'dataset/dataset.lock.json').read_text())['objects'])
     destination=args.output.resolve();destination.mkdir(parents=True,exist_ok=True)
     candidate={name:sha(HERE/name) for name in CANDIDATES};components=args.component or COMPONENTS
@@ -54,12 +53,12 @@ def main():
             stages=[('decode',prepared,['python','-m','dataset.scientific_component','decode','/source/source.parquet',component,args.scene,'/outputs/'+component,str(limit-used)]),
                     ('independent-check',checked,['python','-m','dataset.scientific_component','validate','/source/source.parquet','/opt/'+component,'/outputs/check.json'])]
             for name,out,command in stages:
-                plan=launch_plan(root,HERE,source.parent,out,command)
-                if name=='independent-check':
-                    i=plan.index('--');plan[i:i]=['--ro-bind',str(prepared),'/opt']
-                t=time.monotonic();result=subprocess.run(plan,capture_output=True,text=True)
+                named_inputs={'/opt':prepared} if name=='independent-check' else None
+                plan=build_dataset_plan(runtime,code_root=HERE,source=source.parent,output=out,command=command,named_inputs=named_inputs)
+                rendered=rendered_command(plan)
+                t=time.monotonic();result=run_dataset_plan(plan,capture_output=True,text=True)
                 (base/(name+'.log')).write_text(result.stdout+result.stderr)
-                checks.append({'stage':name,'command':plan,'exit_code':result.returncode,'elapsed_seconds':time.monotonic()-t})
+                checks.append({'stage':name,'command':rendered,'launch_plan':plan_receipt(plan),'exit_code':result.returncode,'elapsed_seconds':time.monotonic()-t})
                 if result.returncode:raise RuntimeError(result.stderr)
             validation=json.loads((checked/'check.json').read_text())
             if validation['source_sha256']!=record['sha256']:raise ValueError('independent source identity differs')
@@ -70,10 +69,10 @@ def main():
         if sum(p.stat().st_size for p in destination.rglob('*') if p.is_file())+len(encoded)>limit:raise ValueError('receipt exceeds derived working-set cap')
         receipt_path.write_bytes(encoded);print('verified scientific component',component,validation['rows'],flush=True)
     if args.reconstruct:
-        reconstruct(admitted,paths,args.scene,destination,candidate,cache,root,lock,retained,manifest['local_staging_limit_bytes'],limit)
+        reconstruct(admitted,paths,args.scene,destination,candidate,cache,runtime,lock,retained,manifest['local_staging_limit_bytes'],limit)
 
 
-def reconstruct(admitted,paths,scene,destination,candidate,cache,root,lock,retained,raw_limit,derived_limit):
+def reconstruct(admitted,paths,scene,destination,candidate,cache,runtime,lock,retained,raw_limit,derived_limit):
     hashes=verified_sidecar_hashes(destination,COMPONENTS,scene,candidate)
     base=destination/'evidence/reconstruction';receipt_path=base/'receipt.json';record=admitted['components']['lidar']
     if receipt_path.exists():
@@ -85,7 +84,8 @@ def reconstruct(admitted,paths,scene,destination,candidate,cache,root,lock,retai
         print('verified reconstruction resume',scene,flush=True);return
     if base.exists() or (destination/'points').exists():raise ValueError('unpromoted reconstruction exists; preserve evidence and use a new output directory')
     base.mkdir(parents=True);checked=base/'checked';checked.mkdir()
-    (base/'trusted-sidecar-hashes.json').write_text(json.dumps(hashes,indent=2)+'\n')
+    trusted=base/'trusted-input';trusted.mkdir()
+    (trusted/'trusted-sidecar-hashes.json').write_text(json.dumps(hashes,indent=2)+'\n')
     prepared=destination/'sidecars';sidecar_bytes=sum(p.stat().st_size for p in prepared.rglob('*') if p.is_file())
     used=sum(p.stat().st_size for p in destination.rglob('*') if p.is_file());budget=derived_limit-used+sidecar_bytes
     if budget<=sidecar_bytes:raise ValueError('no remaining reconstruction capacity')
@@ -94,12 +94,17 @@ def reconstruct(admitted,paths,scene,destination,candidate,cache,root,lock,retai
         stages=[('reconstruct',destination,['python','-m','geometry.scientific_scene_command','reconstruct','/source/source.parquet','/opt','/mnt/trusted-sidecar-hashes.json','/outputs/points',str(budget)]),
                 ('independent-scene-check',checked,['python','-m','geometry.scientific_scene_command','validate','/source/source.parquet','/opt','/mnt/trusted-sidecar-hashes.json','/srv','/outputs/check.json'])]
         for name,out,command in stages:
-            plan=launch_plan(root,HERE,source.parent,out,command);i=plan.index('--')
-            extra=['--ro-bind',str(prepared),'/opt','--ro-bind',str(base),'/mnt']
-            if name=='independent-scene-check':extra+=['--ro-bind',str(destination/'points'),'/srv']
-            plan[i:i]=extra;t=time.monotonic();result=subprocess.run(plan,capture_output=True,text=True)
-            (base/(name+'.log')).write_text(result.stdout+result.stderr);checks.append({'stage':name,'command':plan,'exit_code':result.returncode,'elapsed_seconds':time.monotonic()-t})
+            output=out
+            if name=='reconstruct':
+                output=destination/'.reconstruct-output';output.mkdir()
+            named_inputs={'/opt':prepared,'/mnt':trusted}
+            if name=='independent-scene-check':named_inputs['/srv']=destination/'points'
+            plan=build_dataset_plan(runtime,code_root=HERE,source=source.parent,output=output,command=command,named_inputs=named_inputs)
+            rendered=rendered_command(plan);t=time.monotonic();result=run_dataset_plan(plan,capture_output=True,text=True)
+            (base/(name+'.log')).write_text(result.stdout+result.stderr);checks.append({'stage':name,'command':rendered,'launch_plan':plan_receipt(plan),'exit_code':result.returncode,'elapsed_seconds':time.monotonic()-t})
             if result.returncode:raise RuntimeError(result.stderr)
+            if name=='reconstruct':
+                (output/'points').rename(destination/'points');output.rmdir()
         validation=json.loads((checked/'check.json').read_text())
         if validation['source_lidar_sha256']!=record['sha256'] or validation['scene']!=scene or validation['sidecar_manifest_hashes']!=hashes:raise ValueError('independent scene source differs')
     for name,digest in candidate.items():
