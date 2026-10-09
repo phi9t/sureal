@@ -1,36 +1,63 @@
-"""Deadline for one owned Waystone readback; caller retains staging ownership."""
+"""Fetch one native shape source through the blob store."""
 import argparse
-import math
-import os
-import signal
-import subprocess
-import sys
-import time
+import json
+from pathlib import Path
 
-WAYSTONE='/data02/home/philip.yang/workspace/waystone/scripts/waystone'
+from blob_store.core import (
+    BlobStore,
+    BlobStoreError,
+    blob_adapter_from_descriptor,
+    blob_key_from_uri,
+    validate_blob_key,
+)
 
-def bounded_transfer(command,*,timeout_seconds):
-    if (isinstance(timeout_seconds,bool) or not isinstance(timeout_seconds,(int,float))
-        or not math.isfinite(timeout_seconds) or timeout_seconds<=0
-        or not isinstance(command,(list,tuple)) or not command
-        or any(not isinstance(v,str) or not v for v in command)):
-        raise ValueError('explicit command and finite positive deadline required')
-    start=time.monotonic();child=subprocess.Popen(command,start_new_session=True)
+DEFAULT_STORE_DESCRIPTOR = {"kind": "waystone", "project": "sureal"}
+
+
+def _key_for_source(source, blob_adapter, store_descriptor):
+    source = str(source)
+    if not source.startswith("hdfs://"):
+        return validate_blob_key(source)
+    return blob_key_from_uri(source, blob_adapter if blob_adapter is not None else store_descriptor)
+
+
+def fetch_blob(source, destination, expected_sha256, *, blob_store=None, blob_adapter=None, store_descriptor=None):
+    descriptor = store_descriptor or DEFAULT_STORE_DESCRIPTOR
+    adapter = blob_adapter
+    if blob_store is None and adapter is None:
+        adapter = blob_adapter_from_descriptor(descriptor)
+    key = _key_for_source(source, adapter, descriptor)
+    if blob_store is None:
+        blob_store = BlobStore(adapter)
     try:
-        code=child.wait(timeout=timeout_seconds)
-    except BaseException as error:
-        try:os.killpg(child.pid,signal.SIGKILL)
-        except ProcessLookupError:pass
-        child.wait()
-        if isinstance(error,subprocess.TimeoutExpired):
-            raise ValueError('source transfer deadline expired; owned process killed and reaped') from error
-        raise
-    return {'exit_code':code,'pid':child.pid,'deadline_seconds':timeout_seconds,
-            'elapsed_seconds':time.monotonic()-start}
+        blob_store.get(key, destination, expected_sha256)
+    except BlobStoreError as error:
+        raise ValueError("native shape blob fetch failed") from error
+    path = Path(destination)
+    return {"blob_key": key, "sha256": expected_sha256, "bytes": path.stat().st_size}
+
+
+def _parse_source_destination(args):
+    if args.destination is None:
+        return args.operation_or_source, args.source_or_destination
+    if args.operation_or_source != "get":
+        raise ValueError("only blob get is supported")
+    return args.source_or_destination, args.destination
+
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--timeout-seconds',type=float,default=600);parser.add_argument('operation',choices=['get']);parser.add_argument('source');parser.add_argument('destination');args=parser.parse_args()
-    if not args.source.startswith('hdfs://'):parser.error('explicit HDFS source required')
-    result=bounded_transfer([WAYSTONE,args.operation,args.source,args.destination],timeout_seconds=args.timeout_seconds)
-    raise SystemExit(result['exit_code'] if result['exit_code']>=0 else 1)
-if __name__=='__main__':main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--expected-sha256", required=True)
+    parser.add_argument("--store-descriptor-json")
+    parser.add_argument("--timeout-seconds", type=float, default=None, help=argparse.SUPPRESS)
+    parser.add_argument("operation_or_source")
+    parser.add_argument("source_or_destination")
+    parser.add_argument("destination", nargs="?")
+    args = parser.parse_args()
+    source, destination = _parse_source_destination(args)
+    descriptor = json.loads(args.store_descriptor_json) if args.store_descriptor_json else DEFAULT_STORE_DESCRIPTOR
+    fetch_blob(source, destination, args.expected_sha256, store_descriptor=descriptor)
+
+
+if __name__ == "__main__":
+    main()

@@ -22,7 +22,9 @@ def artifact_hashes(root):
     return artifacts
 
 
-def recover_semantic_archive(record,*,cache,code_root,output,transfer_command=None,staging_cache=None):
+def recover_semantic_archive(record,*,cache,code_root,output,blob_store=None,blob_adapter=None,transfer_command=None,staging_cache=None):
+    if transfer_command is not None:
+        raise ValueError('transfer command injection retired; inject a blob store')
     cache,code_root,output=map(Path,(cache,code_root,output))
     staging_cache=Path(staging_cache) if staging_cache is not None else cache
     # Refuse the active queue before touching source metadata/output. The stage
@@ -51,7 +53,7 @@ def recover_semantic_archive(record,*,cache,code_root,output,transfer_command=No
            'insula/staging_lease.py','insula/entry.py','insula/runtime_identity.py']
     pins={n:sha(code_root/n) for n in names}
     with staged_derived_archive(record,staging_cache,working_limit_bytes=15*1024**3,
-                                transfer_command=transfer_command) as (archive,transfer):
+                                blob_store=blob_store,blob_adapter=blob_adapter) as (archive,transfer):
         output.mkdir(parents=True,exist_ok=False);inputs=output/'input';inputs.mkdir();worker_output=output/'output';worker_output.mkdir()
         (inputs/'publication.json').write_bytes(publication.read_bytes())
         (inputs/'trusted.json').write_text(json.dumps(record,indent=2)+'\n')

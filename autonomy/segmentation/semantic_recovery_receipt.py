@@ -4,6 +4,14 @@ from pathlib import Path
 from evidence.source_snapshot import file_sha256 as sha, require_regular_file
 from segmentation.semantic_recovery_accounting import verify_accounting
 
+def verify_transfer_location(transfer,expected):
+    blob=expected.get('archive_blob') if isinstance(expected,dict) else None
+    if isinstance(blob,dict) and 'key' in blob:
+        return transfer.get('blob_key')==blob['key'] and transfer.get('store_descriptor')==expected.get('store_descriptor')
+    if 'archive_blob_key' in expected:
+        return transfer.get('blob_key')==expected['archive_blob_key']
+    return transfer.get('hdfs_uri')==expected.get('archive_hdfs_uri')
+
 def verify_receipt(root,*,expected_sha256,expected_record,expected_runtime,expected_code,code_root):
     root=Path(root); code_root=Path(code_root)
     def require(ok):
@@ -28,7 +36,7 @@ def verify_receipt(root,*,expected_sha256,expected_record,expected_runtime,expec
     checks=r['checks'];require(len(checks)==1 and type(checks[0]['exit_code']) is int and checks[0]['exit_code']==0)
     command=checks[0]['command'];require(command[0]=='bwrap' and '--unshare-all' in command and '--clearenv' in command)
     t=r['transfer']
-    require(t['sha256']==d['archive_sha256'] and t['archive_bytes']==d['archive_bytes'] and t['hdfs_uri']==d['archive_hdfs_uri'])
+    require(t['sha256']==d['archive_sha256'] and t['archive_bytes']==d['archive_bytes'] and verify_transfer_location(t,d))
     require(type(t['transfer_exit_code']) is int and t['transfer_exit_code']==0)
     for key in ['working_bytes_before','working_peak_bytes_before_consumer','working_limit_bytes','file_size_limit_bytes']:
         require(type(t[key]) is int and t[key]>=0)

@@ -52,6 +52,7 @@ py_library(
     imports = [".."],
     visibility = SEGMENTATION_VISIBILITY,
     deps = [
+        "//autonomy/blob_store:blob_store",
         "//autonomy/dataset:dataset",
         "//autonomy/evidence:evidence",
         "//autonomy/geometry:oriented_box",
