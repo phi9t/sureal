@@ -22,6 +22,7 @@ from retention.publication import (
     PublicationSpec,
     publish as publish_publication,
     release_plan as publication_release_plan,
+    store_tool_digest,
     _write_json_idempotent,
 )
 from retention.publisher_runtime import admitted_host_sources
@@ -169,12 +170,7 @@ def _admit_host_sources(receipt_path, current_package, destination):
 
 
 def _require_tool_digest(store, tool_digest):
-    if tool_digest is not None:
-        return tool_digest
-    adapter_digest = getattr(getattr(store, "_adapter", None), "tool_sha256", None)
-    if adapter_digest is None:
-        raise ValueError("tool digest required when blob store adapter does not expose tool_sha256")
-    return adapter_digest
+    return store_tool_digest(store, tool_digest, fallback_to_waystone=False)
 
 
 def publish(

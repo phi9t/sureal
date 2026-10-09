@@ -8,13 +8,23 @@ class CameraEvictionTests(unittest.TestCase):
   processing=root/'processing';source=processing/'sidecars/camera_image';source.mkdir(parents=True);payload=source/'row.bin';payload.write_bytes(b'jpeg');publication=root/'publication';(publication/'packed').mkdir(parents=True);(publication/'input').mkdir();archive=publication/'packed/camera.tar';archive.write_bytes(b'archive');replay=root/'replay';replay.mkdir()
   sha=lambda p:file_sha256(p)
   trusted={'files':{'camera_image/row.bin':sha(payload)},'provenance':{'scene':'scene'}};t=publication/'input/trusted.json';t.write_text(json.dumps(trusted))
-  checks=['pack-live','hdfs-put','hdfs-download','independent-bundle-live','manifest-put-last','manifest-download'] if legacy else ['pack-live','archive-blob-put','archive-blob-download','independent-bundle-live','manifest-blob-put-last','manifest-blob-download']
-  pub={'scene':'scene','checks':[{'stage':s,'exit_code':0} for s in checks],'archive':{'sha256':sha(archive)},'artifacts':{'input/trusted.json':sha(t)},'validation':{'files':1,'provenance':trusted['provenance']}}
+  old_checks=['pack-live','hdfs-put','hdfs-download','independent-bundle-live','manifest-put-last','manifest-download']
+  blob={'key':'runs/scientific-camera/scene/archive/camera.tar','sha256':sha(archive),'bytes':len(b'archive'),'verified_by_readback':True}
+  blob_fields={'blob_key':blob['key'],'sha256':blob['sha256'],'bytes':blob['bytes'],'verified_by_readback':True}
+  checks=[{'stage':s,'exit_code':0} for s in old_checks] if legacy else [
+   {'stage':'pack-live','exit_code':0},
+   dict({'stage':'archive-blob-put'},**blob_fields),
+   dict({'stage':'archive-blob-download'},**blob_fields),
+   {'stage':'independent-bundle-live','exit_code':0},
+   dict({'stage':'manifest-blob-put-last'},**blob_fields),
+   dict({'stage':'manifest-blob-download'},**blob_fields),
+  ]
+  pub={'scene':'scene','checks':checks,'archive':{'sha256':sha(archive)},'artifacts':{'input/trusted.json':sha(t)},'validation':{'files':1,'provenance':trusted['provenance']}}
   if legacy:
    pub['archive_hdfs_uri']='hdfs://fixture/root/sureal/runs/scientific-camera/scene/archive/camera.tar'
    pub['store_descriptor']={'kind':'waystone','project':'sureal'}
   else:
-   pub['archive_blob']={'key':'runs/scientific-camera/scene/archive/camera.tar','sha256':sha(archive),'bytes':len(b'archive')}
+   pub['archive_blob']=blob
    pub['store_descriptor']={'kind':'waystone','project':'sureal'}
   p=publication/'receipt.json';p.write_text(json.dumps(pub))
   rr={'scene':'scene','publication_receipt_sha256':sha(p),'checks':[{'exit_code':0},{'exit_code':0}]};r=replay/'receipt.json';r.write_text(json.dumps(rr));return processing,publication,replay,sha(p),sha(r),payload,archive

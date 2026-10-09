@@ -246,6 +246,43 @@ class PublicationModuleTests(unittest.TestCase):
             with self.assertRaises(Unauthenticated):
                 audit(receipt, store=unauthenticated)
 
+    def test_generic_publication_receipt_refuses_symlink_audit_blob_shape(self):
+        _, audit, _, _, _ = self.api()
+        receipt = {
+            "schema_version": 1,
+            "store_descriptor": STORE_DESCRIPTOR,
+            "tool_sha256": RECEIPT_TOOL_DIGEST,
+            "verified_by_readback": True,
+            "blobs": {
+                "manifest": {
+                    "key": "runs/perception-motion/case/symlink-audit/manifest.json",
+                    "sha256": "1" * 64,
+                    "bytes": 10,
+                },
+                "archive": {
+                    "key": "runs/perception-motion/case/symlink-audit/audit.tar.gz",
+                    "sha256": "2" * 64,
+                    "bytes": 20,
+                },
+            },
+        }
+
+        with self.assertRaisesRegex(ValueError, "publication blob records"):
+            audit(receipt, store=BlobStore(InMemoryBlobAdapter(), backoff_seconds=()))
+
+    def test_store_tool_digest_rejects_explicit_digest_that_differs_from_adapter_pins(self):
+        from retention.publication import store_tool_digest
+
+        class PinnedAdapter(InMemoryBlobAdapter):
+            @property
+            def tool_sha256(self):
+                return {"waystone-cli": "a" * 64}
+
+        store = BlobStore(PinnedAdapter(), backoff_seconds=())
+
+        with self.assertRaisesRegex(ValueError, "publication tool digest"):
+            store_tool_digest(store, {"waystone-cli": "b" * 64})
+
     def test_resource_bundle_spec_declares_hardlink_archive_without_release(self):
         with tempfile.TemporaryDirectory() as temp:
             spec, _, _, _, _ = self.fixture(Path(temp))

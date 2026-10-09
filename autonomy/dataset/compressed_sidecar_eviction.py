@@ -1,7 +1,7 @@
 """Remove only independently published decoded sidecar payloads."""
 import json
 from pathlib import Path
-from dataset.blob_storage import publication_archive_reference
+from dataset.blob_storage import publication_archive_reference, publication_checks_succeeded
 from evidence.source_snapshot import file_sha256 as digest
 
 STAGES=['pack-live','hdfs-put','hdfs-download','independent-bundle-live','manifest-put-last','manifest-download']
@@ -16,7 +16,7 @@ def evict_sidecars(processing,publication,*,expected_publication_sha256,availabl
  for key in ['format','uncompressed_bytes','uncompressed_sha256','archive_bytes','manifest_sha256','files']:
   if pub['archive'].get(key)!=pub['validation'].get(key):raise ValueError('compressed validation identity differs')
  if pub['archive']['format']!=pub['format'] or pub['archive']['sha256']!=pub['validation']['archive_sha256']:raise ValueError('compressed archive identity differs')
- if [c['stage'] for c in pub['checks']] not in (STAGES,BLOB_STAGES) or any(c['exit_code']!=0 for c in pub['checks']):raise ValueError('complete successful publication required')
+ if not publication_checks_succeeded(pub['checks'],legacy_stages=STAGES,blob_stages=BLOB_STAGES):raise ValueError('complete successful publication required')
  for name,h in pub['artifacts'].items():
   relative=Path(name)
   if relative.is_absolute() or '..' in relative.parts:raise ValueError('unsafe publication artifact')
@@ -35,6 +35,7 @@ def evict_sidecars(processing,publication,*,expected_publication_sha256,availabl
  if {str(p.relative_to(source)) for p in source.rglob('*') if p.is_file() or p.is_symlink()}!=names:raise ValueError('unexpected sidecar artifacts')
  archive=publication/'packed/sidecars.tar.gz'
  if digest(archive)!=pub['archive']['sha256']:raise ValueError('mirrored archive changed')
+ if isinstance(target,dict) and (target['sha256']!=pub['archive']['sha256'] or target['bytes']!=archive.stat().st_size):raise ValueError('publication archive blob differs')
  files.append({'path':str(archive),'sha256':pub['archive']['sha256'],'size_bytes':archive.stat().st_size,'recovery_member':None})
  result={'archive_format':pub['format'],'uncompressed_sha256':pub['archive']['uncompressed_sha256'],'uncompressed_bytes':pub['archive']['uncompressed_bytes'],'status':'verified sidecar eviction admitted','scene':pub['scene'],'archive_sha256':pub['archive']['sha256'],'publication_receipt_sha256':expected_publication_sha256,'files':files,'bytes_evicted':sum(x['size_bytes'] for x in files)}
  if isinstance(target,dict):result['archive_blob']=target

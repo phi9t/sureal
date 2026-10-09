@@ -37,6 +37,14 @@ class SymlinkAuditPublisherTests(unittest.TestCase):
     def make_store(self):
         return BlobStore(InMemoryBlobAdapter(), backoff_seconds=())
 
+    def make_pinned_store(self):
+        class PinnedAdapter(InMemoryBlobAdapter):
+            @property
+            def tool_sha256(self):
+                return {"waystone-cli": "a" * 64}
+
+        return BlobStore(PinnedAdapter(), backoff_seconds=())
+
     def test_archive_preserves_symlink_members_through_in_memory_blob_store(self):
         from retention.publish_symlink_audit import audit, publish
 
@@ -112,6 +120,48 @@ class SymlinkAuditPublisherTests(unittest.TestCase):
                     store_descriptor=STORE_DESCRIPTOR,
                     host_source_admitter=fake_host_admitter,
                     identifier="missing-tool-digest",
+                )
+
+    def test_publish_does_not_require_legacy_noop_flags(self):
+        from retention.publish_symlink_audit import publish
+
+        with tempfile.TemporaryDirectory() as directory:
+            working, payload = self.make_audit(directory)
+            receipt = publish(
+                case=payload.name,
+                root=payload,
+                hdfs_namespace="perception-motion",
+                evidence=Path(directory) / "evidence",
+                scientific_processing=working,
+                store=self.make_store(),
+                store_descriptor=STORE_DESCRIPTOR,
+                tool_digest=TOOL_DIGEST,
+                host_source_admitter=fake_host_admitter,
+                identifier="motion-audit-noop-flags",
+            )
+
+            self.assertTrue(receipt["verified_by_readback"])
+
+    def test_explicit_tool_digest_must_match_adapter_pins(self):
+        from retention.publish_symlink_audit import publish
+
+        with tempfile.TemporaryDirectory() as directory:
+            working, payload = self.make_audit(directory)
+            with self.assertRaisesRegex(ValueError, "tool digest"):
+                publish(
+                    case=payload.name,
+                    root=payload,
+                    hdfs_namespace="perception-motion",
+                    evidence=Path(directory) / "evidence",
+                    preserve_symlinks=True,
+                    readback=True,
+                    write_receipt=True,
+                    scientific_processing=working,
+                    store=self.make_pinned_store(),
+                    store_descriptor=STORE_DESCRIPTOR,
+                    tool_digest={"waystone-cli": "b" * 64},
+                    host_source_admitter=fake_host_admitter,
+                    identifier="mismatched-tool-digest",
                 )
 
     def test_move_to_renames_same_filesystem_and_verifies_listing_again(self):
@@ -211,6 +261,30 @@ class SymlinkAuditPublisherTests(unittest.TestCase):
                     host_source_admitter=fake_host_admitter,
                     identifier="motion-audit-repeat",
                 )
+
+    def test_symlink_audit_receipt_refuses_generic_publication_blob_shapes(self):
+        from retention.publish_symlink_audit import audit
+
+        for shape, blobs in {
+            "chunks": {
+                "manifest": {"key": "runs/perception-motion/case/symlink-audit/manifest.json", "sha256": "1" * 64, "bytes": 10},
+                "chunks": [{"key": "runs/perception-motion/case/symlink-audit/archive-000.tar.gz", "sha256": "2" * 64, "bytes": 20}],
+            },
+            "files": {
+                "manifest": {"key": "runs/perception-motion/case/symlink-audit/manifest.json", "sha256": "1" * 64, "bytes": 10},
+                "files": [{"key": "runs/perception-motion/case/symlink-audit/file.json", "sha256": "2" * 64, "bytes": 20}],
+            },
+        }.items():
+            with self.subTest(shape=shape):
+                receipt = {
+                    "schema_version": 1,
+                    "store_descriptor": STORE_DESCRIPTOR,
+                    "tool_sha256": TOOL_DIGEST,
+                    "verified_by_readback": True,
+                    "blobs": blobs,
+                }
+                with self.assertRaisesRegex(ValueError, "symlink audit blob records"):
+                    audit(receipt, store=self.make_store())
 
 
 if __name__ == "__main__":

@@ -32,7 +32,9 @@ def _verify_journal_publication_record(path):
  raise ValueError('journal publication record shape required')
 
 def _is_new_journal_publication_record(value):
- if not isinstance(value,dict) or value.get('schema_version')!=1 or value.get('verified_by_readback') is not True:return False
+ if not isinstance(value,dict) or set(value)!={'schema_version','store_descriptor','tool_sha256','verified_by_readback','blobs'}:return False
+ if value.get('schema_version')!=1 or value.get('verified_by_readback') is not True:return False
+ if not _is_store_descriptor(value.get('store_descriptor')) or not _is_tool_digest(value.get('tool_sha256')):return False
  blobs=value.get('blobs')
  if not isinstance(blobs,dict) or set(blobs)!={'manifest','files'}:return False
  if not _is_blob_record(blobs['manifest']):return False
@@ -50,6 +52,12 @@ def _is_legacy_journal_hdfs_record(value):
 
 def _is_blob_record(value):
  return isinstance(value,dict) and set(value)=={'key','sha256','bytes'} and isinstance(value['key'],str) and value['key'].startswith('runs/perception-research-journal/') and _is_sha256(value['sha256']) and isinstance(value['bytes'],int) and value['bytes']>=0
+
+def _is_store_descriptor(value):
+ return isinstance(value,dict) and isinstance(value.get('kind'),str) and bool(value['kind'])
+
+def _is_tool_digest(value):
+ return isinstance(value,dict) and bool(value) and all(isinstance(role,str) and role and _is_sha256(digest) for role,digest in value.items())
 
 def _is_sha256(value):
  return isinstance(value,str) and len(value)==64 and all(character in '0123456789abcdef' for character in value)

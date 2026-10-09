@@ -34,6 +34,14 @@ class ScientificDirectoryPublisherTests(unittest.TestCase):
     def make_store(self):
         return BlobStore(InMemoryBlobAdapter(), backoff_seconds=())
 
+    def make_pinned_store(self):
+        class PinnedAdapter(InMemoryBlobAdapter):
+            @property
+            def tool_sha256(self):
+                return {"waystone-cli": "a" * 64}
+
+        return BlobStore(PinnedAdapter(), backoff_seconds=())
+
     def test_publish_uses_publication_module_receipt_and_in_memory_blob_store(self):
         from retention.publication import audit
         from retention.publish_scientific_directory import publish
@@ -95,6 +103,27 @@ class ScientificDirectoryPublisherTests(unittest.TestCase):
                     reserve=lambda path, maximum_new_bytes: None,
                     host_source_admitter=fake_host_admitter,
                     identifier="missing-tool-digest",
+                )
+
+    def test_explicit_tool_digest_must_match_adapter_pins(self):
+        from retention.publish_scientific_directory import publish
+
+        with tempfile.TemporaryDirectory() as directory:
+            working, payload = self.make_payload(directory)
+            with self.assertRaisesRegex(ValueError, "tool digest"):
+                publish(
+                    case=payload.name,
+                    root=payload,
+                    hdfs_namespace="perception-closed-scientific-processing",
+                    evidence=Path(directory) / "evidence",
+                    release=False,
+                    scientific_processing=working,
+                    store=self.make_pinned_store(),
+                    store_descriptor=STORE_DESCRIPTOR,
+                    tool_digest={"waystone-cli": "b" * 64},
+                    reserve=lambda path, maximum_new_bytes: None,
+                    host_source_admitter=fake_host_admitter,
+                    identifier="mismatched-tool-digest",
                 )
 
     def test_release_is_owned_by_publication_module(self):

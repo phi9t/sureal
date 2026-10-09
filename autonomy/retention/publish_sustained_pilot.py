@@ -5,14 +5,17 @@ import json
 import uuid
 from pathlib import Path
 
-from blob_store.core import BlobStore, blob_adapter_from_descriptor, waystone_tool_pins
+from blob_store.core import BlobStore, blob_adapter_from_descriptor
 from resources.scientific_budget import reserve_write
 from resources.scientific_payload import unique_payload_bytes
 from retention.publication import (
-    WAYSTONE_DESCRIPTOR,
     publish,
+    publication_store_descriptor,
     release_plan as publication_release_plan,
+    store_tool_digest_from_json,
     sustained_pilot_spec,
+    write_publication_json,
+    write_release_completed,
 )
 from retention.publication_sources import freeze_pilot_sources, validate_pilot_sources
 from retention.publisher_runtime import admitted_host_sources
@@ -57,9 +60,9 @@ def publish_sustained_pilot(args):
     if payload.parent != args.work_root or not payload.name.startswith("balanced16-sustained-admission-"):
         raise ValueError("pilot-only scientific payload required")
     inventory = freeze_pilot_inventory(payload, args.receipt, args.receipt_sha256)
-    descriptor = _store_descriptor(args.store_descriptor)
+    descriptor = publication_store_descriptor(args.store_descriptor)
     store = BlobStore(blob_adapter_from_descriptor(descriptor))
-    tool_digest = _tool_digest(args.tool_digest, store)
+    tool_digest = store_tool_digest_from_json(args.tool_digest, store)
     run_id = payload.name
     publication_root = args.cache_root / "insula" / ("hdfs-retention-" + run_id + "-" + uuid.uuid4().hex)
     publication_root.mkdir(parents=True)
@@ -76,12 +79,9 @@ def publish_sustained_pilot(args):
     plan = publication_release_plan(spec)
     receipt = publish(spec)
     receipt_path = publication_root / "verified-publication.json"
-    _write_json(receipt_path, receipt)
+    write_publication_json(receipt_path, receipt)
     if args.release:
-        _write_json(
-            publication_root / "release-completed.json",
-            {"publication_receipt_sha256": _sha256(receipt_path), "released": plan},
-        )
+        write_release_completed(publication_root / "release-completed.json", receipt_path, plan)
     if unique_payload_bytes(args.work_root) > 15 * 1024**3:
         raise ValueError("scientific payload budget exceeded")
     return receipt_path
@@ -92,38 +92,6 @@ def _publication_inventory(payload: Path, frozen_inventory):
         name: {"path": str(payload / name), "sha256": digest, "bytes": (payload / name).stat().st_size}
         for name, digest in sorted(frozen_inventory["source_sha256"].items())
     }
-
-
-def _store_descriptor(value):
-    if value is None:
-        return dict(WAYSTONE_DESCRIPTOR)
-    descriptor = json.loads(value)
-    if not isinstance(descriptor, dict):
-        raise ValueError("store descriptor object required")
-    return descriptor
-
-
-def _tool_digest(value, store):
-    if value is not None:
-        digest = json.loads(value)
-        if not isinstance(digest, dict):
-            raise ValueError("tool digest object required")
-        return digest
-    adapter = getattr(store, "_adapter", None)
-    digest = getattr(adapter, "tool_sha256", None)
-    if digest is not None:
-        return digest
-    return waystone_tool_pins()
-
-
-def _write_json(path: Path, value) -> None:
-    path.write_text(json.dumps(value, sort_keys=True, separators=(",", ":")) + "\n")
-
-
-def _sha256(path: Path) -> str:
-    import hashlib
-
-    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 if __name__ == "__main__":

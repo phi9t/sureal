@@ -22,17 +22,32 @@ def verify_checkpoint(path,*,expected_checkpoint_sha256,code_root,expected_runti
   p=relocated(name)
   if digest(p)!=h:raise ValueError('retained evidence changed')
   if p.suffix=='.json':documents[p]=json.loads(p.read_text())
- def recovery_key(document):
-  value=publication_archive_reference(document)
+ def reference_key(value):
   if isinstance(value,dict):return value['key']
   return value
- publications={recovery_key(d):(p,d) for p,d in documents.items() if ('archive_hdfs_uri' in d or 'archive_blob' in d) and 'archive' in d and 'checks' in d};deleted={};evictions=0;workers=0
+ def eviction_recovery_reference(document):
+  blob=document.get('archive_blob')
+  if isinstance(blob,dict):
+   if blob.get('verified_by_readback') is not True:raise ValueError('eviction blob readback required')
+   key=blob.get('key');sha=blob.get('sha256');size=blob.get('bytes')
+   if not isinstance(key,str) or not isinstance(sha,str) or len(sha)!=64 or type(size) is not int or size<0:raise ValueError('eviction blob identity required')
+   return {'key':key,'sha256':sha,'bytes':size,'verified_by_readback':True}
+  uri=document.get('archive_hdfs_uri')
+  if not isinstance(uri,str) or not uri.startswith('hdfs://'):raise ValueError('eviction recovery source required')
+  return uri
+ publications={}
+ for p,d in documents.items():
+  if ('archive_hdfs_uri' in d or 'archive_blob' in d) and 'archive' in d and 'checks' in d:
+   value=publication_archive_reference(d);publications[reference_key(value)]=(p,d,value)
+ deleted={};evictions=0;workers=0
  for p,d in documents.items():
   if d.get('status','').startswith('verified ') and d.get('status','').endswith(' eviction completed'):
-   target=recovery_key(d)
-   if target not in publications:raise ValueError('eviction publication missing')
-   publication,pub=publications[target]
+   target=eviction_recovery_reference(d);key=reference_key(target)
+   if key not in publications:raise ValueError('eviction publication missing')
+   publication,pub,pub_target=publications[key]
    if digest(publication)!=d['publication_receipt_sha256'] or d['archive_sha256']!=pub['archive']['sha256']:raise ValueError('eviction recovery lineage differs')
+   if isinstance(pub_target,dict):
+    if not isinstance(target,dict) or target['sha256']!=pub_target['sha256'] or target['bytes']!=pub_target['bytes']:raise ValueError('eviction recovery lineage differs')
    if 'replay_receipt_sha256' in d and d['replay_receipt_sha256'] not in retained.values():raise ValueError('eviction replay evidence missing')
    for f in d['files']:
     value=f['path']
