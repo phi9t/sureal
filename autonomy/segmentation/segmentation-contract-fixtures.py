@@ -1,9 +1,9 @@
 """Live native protobuf/compression/segmentation scoring contract fixtures."""
 import json
 from pathlib import Path
-import re
 import subprocess
 import zlib
+from segmentation.strict_metric_reader import parse_result
 
 PROTO='/upstream/src'
 OUT=Path('/outputs')
@@ -38,12 +38,10 @@ def main():
         run=subprocess.run(['/metrics-build/compute_segmentation_metrics',str(predpath),str(gtpath)],capture_output=True,text=True)
         (OUT/(name+'.stdout')).write_text(run.stdout);(OUT/(name+'.stderr')).write_text(run.stderr)
         assert run.returncode==0 and not run.stderr,run.stderr
-        ious={name:float(value) for name,value in re.findall(r'^(TYPE_[A-Z_]+):([0-9.eE+-]+)$',run.stdout,re.M)}
-        match=re.search(r'^miou=([0-9.eE+-]+)$',run.stdout,re.M)
-        assert len(ious)==22 and match is not None
-        assert abs(float(match[1])-mean)<1e-6,(name,run.stdout)
-        assert all(abs(v-mean)<1e-6 for v in ious.values()),(name,ious)
-        results.append({'fixture':name,'expected_miou':mean,'observed_miou':float(match[1]),'classes':len(ious),'exit_code':run.returncode})
+        parsed=parse_result(run.stdout)
+        assert abs(parsed['miou']-mean)<1e-6,(name,run.stdout)
+        assert all(abs(v-mean)<1e-6 for v in parsed['classes'].values()),(name,parsed['classes'])
+        results.append({'fixture':name,'expected_miou':mean,'observed_miou':parsed['miou'],'classes':len(parsed['classes']),'exit_code':run.returncode})
     (OUT/'fixture-results.json').write_text(json.dumps(results,indent=2)+'\n')
     print('PASS five native segmentation contract fixtures')
 

@@ -1,5 +1,5 @@
 import unittest
-from segmentation.strict_metric_reader import EXPECTED_CLASSES,parse_result
+from segmentation.strict_metric_reader import EXPECTED_CLASSES,parse_result,require_perfect_self_score
 
 REAL_REPORT='''1 frames found in prediction.
 1 frames found in groundtruth.
@@ -74,5 +74,19 @@ class SegmentationStrictMetricReaderTests(unittest.TestCase):
         for report in cases:
             with self.subTest(report=report),self.assertRaises(ValueError):
                 parse_result(report)
+
+    def test_perfect_self_score_rejects_nan_even_when_miou_is_one(self):
+        perfect='\n'.join([
+            '1 frames found in prediction.',
+            '1 frames found in groundtruth.',
+            'Processing example 0 out of 1',
+            *(f'{name}:1' for name in EXPECTED_CLASSES),
+            'miou=1',
+        ])+'\n'
+        self.assertEqual(require_perfect_self_score(perfect)['miou'],1.0)
+        with self.assertRaises(ValueError):
+            require_perfect_self_score(perfect.replace('TYPE_POLE:1','TYPE_POLE:nan'))
+        with self.assertRaises(ValueError):
+            require_perfect_self_score(perfect.replace('TYPE_POLE:1','TYPE_POLE:0.5'))
 
 if __name__=='__main__':unittest.main()
