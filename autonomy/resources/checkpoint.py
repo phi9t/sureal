@@ -8,6 +8,8 @@ from pathlib import Path,PurePosixPath
 from evidence.source_snapshot import is_regular_file
 from evidence.source_snapshot import safe_member_name
 from evidence.source_snapshot import receipt_snapshot_digest,store_from_receipt,verify_or_materialize_receipt_sources
+from blob_store.core import BlobStoreError
+from retention.publication import audit as audit_publication
 from resources.command import inspect_command
 from resources.backend import resource_cpu_root_for
 from resources.sources import sha
@@ -82,14 +84,23 @@ def _publication_identity(path):
     path=Path(path)
     value=json.loads(path.read_text())
     receipt=value['resource_receipt']
-    return {'sidecar_path':str(path),'sidecar_sha256':sha(path),
-            'receipt_path':receipt['path'],'receipt_sha256':receipt['sha256'],
-            'hdfs_manifest_uri':receipt['hdfs_manifest_uri'],'kind':receipt['kind']}
+    identity={'sidecar_path':str(path),'sidecar_sha256':sha(path),
+              'receipt_path':receipt['path'],'receipt_sha256':receipt['sha256'],
+              'kind':receipt['kind']}
+    if 'manifest_key' in receipt:
+        identity['manifest_key']=receipt['manifest_key']
+    else:
+        identity['hdfs_manifest_uri']=receipt['hdfs_manifest_uri']
+    return identity
 
 
 def _receipt_from_identity(identity):
-    return {'path':identity['receipt_path'],'sha256':identity['receipt_sha256'],
-            'hdfs_manifest_uri':identity['hdfs_manifest_uri'],'kind':identity['kind']}
+    receipt={'path':identity['receipt_path'],'sha256':identity['receipt_sha256'],'kind':identity['kind']}
+    if 'manifest_key' in identity:
+        receipt['manifest_key']=identity['manifest_key']
+    else:
+        receipt['hdfs_manifest_uri']=identity['hdfs_manifest_uri']
+    return receipt
 
 
 def _without_independent(pub):
@@ -199,6 +210,56 @@ def _validate_publication_external_bindings(backend,pub):
         raise ValueError('complete backend-bound resource publication identity required') from error
 
 
+def _is_blob_publication(pub):
+    return isinstance(pub,dict) and {'store_descriptor','tool_sha256','verified_by_readback','blobs'}<=set(pub)
+
+
+def _store_for_blob_publication(backend,pub):
+    store=getattr(backend,'resource_blob_store',None)
+    if store is not None:return store
+    return None
+
+
+def _inventory_public_facts(value):
+    return {name:{'sha256':entry['sha256'],'bytes':entry['bytes']} for name,entry in sorted(value.items())}
+
+
+def _audit_blob_publication(pub,store):
+    try:
+        result=audit_publication(pub,store=store)
+    except BlobStoreError:
+        raise
+    except Exception as error:
+        raise ValueError('complete blob publication receipt required') from error
+    return {'manifest':result['manifest'],'inventory':result['inventory']}
+
+
+def _validate_blob_publication_receipt(backend,record,receipt,pub,expected_inventory=None):
+    if receipt['kind']!='checkpoint':raise ValueError('checkpoint resource publication required')
+    result=_audit_blob_publication(pub,_store_for_blob_publication(backend,pub))
+    inventory=result['inventory']
+    if receipt.get('manifest_key')!=pub['blobs']['manifest']['key']:
+        raise ValueError('resource publication identity differs')
+    required={'identity.json':backend.resource_identity_sha256,
+              'checkpoint.json':record['resource_companion_sha256'],
+              'native-final.json':record['final_sha256'],
+              'producer-report.json':record['report_sha256'],
+              'native-manifest.json':backend.manifest_sha}
+    for name,digest in required.items():
+        if inventory.get(name,{}).get('sha256')!=digest:
+            raise ValueError('resource publication retained wrong checkpoint identity')
+    if expected_inventory is not None and inventory!=_inventory_public_facts(expected_inventory):
+        raise ValueError('resource publication inventory differs from live companion closure')
+    return {**pub,'source_inventory':inventory}
+
+
+def _receipt_inventory_digest(pub,expected_inventory=None):
+    if _is_blob_publication(pub):
+        if expected_inventory is None:raise ValueError('publication expected inventory required')
+        return _stable_digest(_inventory_public_facts(expected_inventory))
+    return _stable_digest(expected_inventory)
+
+
 def _validate_independent_admission(pub,inventory,readback):
     try:
         admission=pub['independent_admission'];command=admission['command']
@@ -272,6 +333,8 @@ def validate_publication_receipt(backend,record,receipt,expected_inventory=None)
         path=Path(receipt['path'])
         if not is_regular_file(path) or sha(path)!=receipt['sha256']:raise ValueError('resource publication receipt changed')
         pub=json.loads(path.read_text())
+        if _is_blob_publication(pub):
+            return _validate_blob_publication_receipt(backend,record,receipt,pub,expected_inventory)
         if (pub['kind']!='checkpoint' or pub['resource_identity_sha256']!=backend.resource_identity_sha256 or
             pub['native_manifest_sha256']!=backend.manifest_sha or
             receipt['hdfs_manifest_uri']!=pub['publication_manifest_hdfs_uri']):
@@ -309,13 +372,14 @@ def validate_publication_receipt(backend,record,receipt,expected_inventory=None)
 
 def write_publication_record(backend,record,receipt,expected_inventory):
     validate_publication_receipt(backend,record,receipt,expected_inventory)
+    receipt_value=json.loads(Path(receipt['path']).read_text())
     path=publication_record_path(backend,record)
     value={'schema_version':1,'record_final_path':record['final_path'],
            'record_final_sha256':record['final_sha256'],'target_step':record['target_step'],
            'resource_identity_sha256':backend.resource_identity_sha256,
            'resource_companion_path':record['resource_companion_path'],
            'resource_companion_sha256':record['resource_companion_sha256'],
-           'source_inventory_digest':_stable_digest(expected_inventory),
+           'source_inventory_digest':_receipt_inventory_digest(receipt_value,expected_inventory),
            'resource_receipt':receipt,
            'scope':'durable resource publication identity required before native release'}
     if path.exists():
@@ -338,10 +402,13 @@ def recover_publication_record(backend,record,expected_inventory=None):
         value.get('resource_identity_sha256')!=backend.resource_identity_sha256 or
         value.get('resource_companion_sha256')!=record['resource_companion_sha256']):
         raise ValueError('resource publication sidecar identity differs')
-    if expected_inventory is not None and value.get('source_inventory_digest')!=_stable_digest(expected_inventory):
-        raise ValueError('resource publication sidecar inventory differs')
     identity=_publication_identity(path)
-    validate_publication_receipt(backend,record,_receipt_from_identity(identity),expected_inventory)
+    pub=validate_publication_receipt(backend,record,_receipt_from_identity(identity),expected_inventory)
+    if expected_inventory is not None and value.get('source_inventory_digest') not in {
+        _stable_digest(expected_inventory),
+        _receipt_inventory_digest(pub,expected_inventory),
+    }:
+        raise ValueError('resource publication sidecar inventory differs')
     record['resource_publication']=identity
     return identity
 
@@ -355,11 +422,14 @@ def validate_publication_record(backend,record):
     if path!=publication_record_path(backend,record) or not is_regular_file(path) or sha(path)!=identity['sidecar_sha256']:
         raise ValueError('resource publication sidecar changed')
     value=json.loads(path.read_text())
-    if value['source_inventory_digest']!=_stable_digest(json.loads(Path(value['resource_receipt']['path']).read_text())['source_inventory']):
-        raise ValueError('resource publication inventory digest changed')
     receipt=_receipt_from_identity(identity)
     if receipt!=value['resource_receipt']:raise ValueError('resource publication receipt identity changed')
-    validate_publication_receipt(backend,record,receipt)
+    pub=validate_publication_receipt(backend,record,receipt)
+    if _is_blob_publication(pub):
+        if value['source_inventory_digest']!=_stable_digest(pub['source_inventory']):
+            raise ValueError('resource publication inventory digest changed')
+    elif value['source_inventory_digest']!=_stable_digest(pub['source_inventory']):
+        raise ValueError('resource publication inventory digest changed')
     return identity
 
 

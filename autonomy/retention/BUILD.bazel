@@ -3,7 +3,10 @@ load("@rules_python//python:defs.bzl", "py_binary", "py_library", "py_test")
 TEST_MODULES = glob(["*_test.py"])
 LIB_MODULES = glob(
     ["*.py"],
-    exclude = ["*_test.py"],
+    exclude = [
+        "*_test.py",
+        "publication.py",
+    ],
 )
 
 package(default_visibility = ["//visibility:private"])
@@ -32,6 +35,22 @@ exports_files(
 )
 
 py_library(
+    name = "publication",
+    srcs = ["publication.py"],
+    imports = [".."],
+    visibility = [
+        "//autonomy:__pkg__",
+        "//autonomy/resources:__pkg__",
+        "//autonomy/retention:__pkg__",
+        "//autonomy/training_execution:__pkg__",
+    ],
+    deps = [
+        "//autonomy/blob_store:blob_store",
+        "//autonomy/evidence:evidence",
+    ],
+)
+
+py_library(
     name = "retention",
     srcs = LIB_MODULES,
     imports = [".."],
@@ -40,6 +59,7 @@ py_library(
         "//autonomy/training_execution:__pkg__",
     ],
     deps = [
+        ":publication",
         "//autonomy/evidence:evidence",
         "//autonomy/insula:insula",
         "//autonomy/resources:resources",

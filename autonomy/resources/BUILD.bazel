@@ -51,8 +51,10 @@ py_library(
     srcs = LIB_MODULES,
     imports = [".."],
     deps = [
+        "//autonomy/blob_store:blob_store",
         "//autonomy/evidence:evidence",
         "//autonomy/insula:insula",
+        "//autonomy/retention:publication",
     ],
     visibility = RESOURCE_VISIBILITY,
 )
@@ -69,6 +71,7 @@ py_library(
     data = ["//autonomy/evidence:source_snapshot_py"],
     imports = [".."],
     deps = [
+        "//autonomy/blob_store:blob_store",
         "//autonomy/evidence:evidence",
         "//autonomy/insula:insula",
     ],

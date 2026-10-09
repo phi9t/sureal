@@ -6,7 +6,7 @@ from resources.scientific_payload import sha
 from resources.scientific_budget import reserve_write
 from resources.backend import ResourceBackend,prepare_identity
 from resources.checkpoint import recover_publication_record,resource_inventory,validate_publication_record,write_publication_record
-from resources.retention import publish_bundle
+from retention.publication import publish_bundle
 from retention.sustained_controller_lock import acquire_experiment_lock
 from training_execution.sustained_controller_backend import NativeBackend,publication_matches_record,validate_native_publication_release,write,C,W
 from training_execution.sustained_workflow import execute_case
