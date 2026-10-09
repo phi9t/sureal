@@ -1,0 +1,365 @@
+{
+  "checks": {
+    "backend_resume_validation": {
+      "live_sha256": "32d2a385f92dade3be58d1e52f6f73ab4fcfa6dbaffc30e6aedcc2c2bbe0c5b9",
+      "ok": true,
+      "progress_sha256": "9182756ec83a16f867b33db573610a6e2d5b152b93eb91322e81debf57f31032",
+      "record_count": 2,
+      "records": [
+        0,
+        1000
+      ]
+    },
+    "blob_publication_receipts": {
+      "count": 0,
+      "emitted_receipts": [],
+      "note": "admission-only records retained local checkpoints; no resource/checkpoint publication receipt was emitted by this current entry point",
+      "ok": true
+    },
+    "checkpoint_records": {
+      "ok": true,
+      "records": [
+        {
+          "checkpoint_sha256": "921a5e34971454003d7828a87d19eea6024c83e9b6a4e8e9f01493f85e586688",
+          "final_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z/checkpoint-00-admitted.json",
+          "final_sha256": "6a1850e676ead55d368d35329802efab85e96abd8c09a93aa8c3fa199f6f5826",
+          "head_files": 16,
+          "native_publication_emitted": false,
+          "ok": true,
+          "released": false,
+          "report_sha256": "23741fc08e766c3a0cda914c7ec310cc09e7260fede40874456b0516d58bdcbd",
+          "resource_companion_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z/resource-layer/checkpoints/checkpoint-00.json",
+          "resource_companion_sha256": "48b5c579721dc8e5b5610728fc76b6207549081b6d6a3b90f47b84872bdc6d65",
+          "resource_publication_emitted": false,
+          "root": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-bs1220261009T154234Z/update-00",
+          "step": 0,
+          "target_step": 0
+        },
+        {
+          "checkpoint_sha256": "c31098e8f3eabab1e52874b03f004093c63d51eddeab3bea8896481a6446efb9",
+          "final_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z/checkpoint-1000-admitted.json",
+          "final_sha256": "4110dfad0fd536bc5a1921eb26f30a003c5ed0623ed3203b0c7c3b1e1f1b0c64",
+          "head_files": 16,
+          "native_publication_emitted": false,
+          "ok": true,
+          "released": false,
+          "report_sha256": "8986f41d421530dcee9850d31783bc4c95f569605dc2ff6cb20fb4aab1b9149b",
+          "resource_companion_path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z/resource-layer/checkpoints/checkpoint-1000.json",
+          "resource_companion_sha256": "5bf46f996b7c31f2dfc008c894c26ea4536fb071443481fadb97719857b7a6b7",
+          "resource_publication_emitted": false,
+          "root": "/data02/home/philip.yang/.cache/waystone/waymo-perception/scientific-processing/balanced16-sustained-baseline-bs1220261009T154234Z/update-1000",
+          "step": 1000,
+          "target_step": 1000
+        }
+      ]
+    },
+    "source_snapshot_readback": {
+      "ok": true,
+      "receipts": [
+        {
+          "blob_bytes": 1443840,
+          "blob_key": "artifacts/source-snapshots/0cf17f0697a66e66e82193786b88b1c854a2eaae6464a220b114c0f225eb0d1e",
+          "ok": true,
+          "role": "sustained_train",
+          "source_files": 267,
+          "source_snapshot_sha256": "0cf17f0697a66e66e82193786b88b1c854a2eaae6464a220b114c0f225eb0d1e",
+          "source_snapshot_target": "//autonomy/training_execution:train_sustained"
+        },
+        {
+          "blob_bytes": 1443840,
+          "blob_key": "artifacts/source-snapshots/0cf17f0697a66e66e82193786b88b1c854a2eaae6464a220b114c0f225eb0d1e",
+          "ok": true,
+          "role": "sustained_controller_host",
+          "source_files": 267,
+          "source_snapshot_sha256": "0cf17f0697a66e66e82193786b88b1c854a2eaae6464a220b114c0f225eb0d1e",
+          "source_snapshot_target": "//autonomy/training_execution:run_sustained"
+        },
+        {
+          "blob_bytes": 491520,
+          "blob_key": "artifacts/source-snapshots/982fac70165d7c4f40fbf971ed33b9ab3c04d585c9beead08aa63615c1f48742",
+          "ok": true,
+          "role": "checkpoint_publisher",
+          "source_files": 65,
+          "source_snapshot_sha256": "982fac70165d7c4f40fbf971ed33b9ab3c04d585c9beead08aa63615c1f48742",
+          "source_snapshot_target": "//autonomy/retention:publish_sustained_checkpoint"
+        },
+        {
+          "blob_bytes": 378880,
+          "blob_key": "artifacts/source-snapshots/d7446ea9cd3a142571bec0e7e6344a88e94fb2550c43108cd4c2f484718d8eaf",
+          "ok": true,
+          "role": "resource_worker",
+          "source_files": 50,
+          "source_snapshot_sha256": "d7446ea9cd3a142571bec0e7e6344a88e94fb2550c43108cd4c2f484718d8eaf",
+          "source_snapshot_target": "//autonomy/resources:execute_worker"
+        }
+      ],
+      "unique_snapshots": {
+        "0cf17f0697a66e66e82193786b88b1c854a2eaae6464a220b114c0f225eb0d1e": {
+          "blob_key": "artifacts/source-snapshots/0cf17f0697a66e66e82193786b88b1c854a2eaae6464a220b114c0f225eb0d1e",
+          "roles": [
+            "sustained_train",
+            "sustained_controller_host"
+          ],
+          "source_files": 267,
+          "target": "//autonomy/training_execution:train_sustained"
+        },
+        "982fac70165d7c4f40fbf971ed33b9ab3c04d585c9beead08aa63615c1f48742": {
+          "blob_key": "artifacts/source-snapshots/982fac70165d7c4f40fbf971ed33b9ab3c04d585c9beead08aa63615c1f48742",
+          "roles": [
+            "checkpoint_publisher"
+          ],
+          "source_files": 65,
+          "target": "//autonomy/retention:publish_sustained_checkpoint"
+        },
+        "d7446ea9cd3a142571bec0e7e6344a88e94fb2550c43108cd4c2f484718d8eaf": {
+          "blob_key": "artifacts/source-snapshots/d7446ea9cd3a142571bec0e7e6344a88e94fb2550c43108cd4c2f484718d8eaf",
+          "roles": [
+            "resource_worker"
+          ],
+          "source_files": 50,
+          "target": "//autonomy/resources:execute_worker"
+        }
+      }
+    },
+    "stage_receipts": {
+      "driver_pin_count": 36,
+      "gpu_stage_count": 4,
+      "non_gpu_driver_hashes_empty": true,
+      "ok": true,
+      "stage_count": 14,
+      "stages": [
+        {
+          "artifacts": 3,
+          "driver_hashes": 9,
+          "gpu_stage": true,
+          "launch_plan_runtime": {
+            "form": "recipe-digest",
+            "lock_sha256": "c68df2817045b7a947e454a849005f26b8fece30613db77f6dee5d13bcdbb131"
+          },
+          "ok": true,
+          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z/audit-0-verified.json",
+          "record_step": 0,
+          "requested_stage": "audit-0",
+          "runtime_rootfs_sha256": "14908ff0fa2c9a712ea106de684b261bee9bbcf296bd52c3dc24685592044941",
+          "sha256": "a8259492a1a6f1c112a2ad09a1a6caf296969e2501f4a1c9c2761f54be458b0d",
+          "stage": "audit-0"
+        },
+        {
+          "artifacts": 4,
+          "driver_hashes": 0,
+          "gpu_stage": false,
+          "launch_plan_runtime": {
+            "form": "recipe-digest",
+            "lock_sha256": "318e827c4832cbf2e6d02657c17bbda0ec696f5a7e2747b277922db364739403"
+          },
+          "ok": true,
+          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z/export-0-verified.json",
+          "record_step": 0,
+          "requested_stage": "export-0",
+          "runtime_rootfs_sha256": "09b794f6fb2797f9f798bcb09e97478a04044536f87f636eddc85c82361d1962",
+          "sha256": "96a410f734e628dc6ab3fbd6dd6fbbde7670efcfd66b53b4cee760af35dc0c7b",
+          "stage": "export-0"
+        },
+        {
+          "artifacts": 2,
+          "driver_hashes": 0,
+          "gpu_stage": false,
+          "launch_plan_runtime": {
+            "form": "recipe-digest",
+            "lock_sha256": "318e827c4832cbf2e6d02657c17bbda0ec696f5a7e2747b277922db364739403"
+          },
+          "ok": true,
+          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z/literal-loss-0-verified.json",
+          "record_step": 0,
+          "requested_stage": "literal-loss-0",
+          "runtime_rootfs_sha256": "09b794f6fb2797f9f798bcb09e97478a04044536f87f636eddc85c82361d1962",
+          "sha256": "b8682c72e6caaf098d7ac6da80a1719747f882dc37a8538ba8e549a2ac3f985c",
+          "stage": "literal-loss-0"
+        },
+        {
+          "artifacts": 4,
+          "driver_hashes": 0,
+          "gpu_stage": false,
+          "launch_plan_runtime": {
+            "form": "image",
+            "lock_sha256": "40927a7cdc915c2195670dd77335d889cf36745060155ce5663dc44f56c942eb"
+          },
+          "ok": true,
+          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z/metrics-audit-0-verified.json",
+          "record_step": 0,
+          "requested_stage": "metrics-audit-0",
+          "runtime_rootfs_sha256": "831a5955ce709cb46b82688ba0f0371c37e1af707ffb870b24c555d53d4f5542",
+          "sha256": "57c8d821c88e2f29397540289395be7d3c2361d72e01d9116b48ddd3a3852741",
+          "stage": "metrics-audit-0"
+        },
+        {
+          "artifacts": 2,
+          "driver_hashes": 0,
+          "gpu_stage": false,
+          "launch_plan_runtime": {
+            "form": "recipe-digest",
+            "lock_sha256": "318e827c4832cbf2e6d02657c17bbda0ec696f5a7e2747b277922db364739403"
+          },
+          "ok": true,
+          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z/proposals-0-verified.json",
+          "record_step": 0,
+          "requested_stage": "proposals-0",
+          "runtime_rootfs_sha256": "09b794f6fb2797f9f798bcb09e97478a04044536f87f636eddc85c82361d1962",
+          "sha256": "c4e35bd8cbdbccd505af8364718dbd8c252f19295d0c9e30a401ba681d3c0934",
+          "stage": "proposals-0"
+        },
+        {
+          "artifacts": 6,
+          "driver_hashes": 0,
+          "gpu_stage": false,
+          "launch_plan_runtime": {
+            "form": "image",
+            "lock_sha256": "40927a7cdc915c2195670dd77335d889cf36745060155ce5663dc44f56c942eb"
+          },
+          "ok": true,
+          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z/score-0-verified.json",
+          "record_step": 0,
+          "requested_stage": "score-0",
+          "runtime_rootfs_sha256": "831a5955ce709cb46b82688ba0f0371c37e1af707ffb870b24c555d53d4f5542",
+          "sha256": "6d7ca33123f68774c7bc66ad0ec8d783b3e06bd03970827d3c5ab7d44d429c24",
+          "stage": "score-0"
+        },
+        {
+          "artifacts": 19,
+          "driver_hashes": 9,
+          "gpu_stage": true,
+          "launch_plan_runtime": {
+            "form": "recipe-digest",
+            "lock_sha256": "c68df2817045b7a947e454a849005f26b8fece30613db77f6dee5d13bcdbb131"
+          },
+          "ok": true,
+          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z/train-0-verified.json",
+          "record_step": 0,
+          "requested_stage": "train-0",
+          "runtime_rootfs_sha256": "14908ff0fa2c9a712ea106de684b261bee9bbcf296bd52c3dc24685592044941",
+          "sha256": "a7a0e57a3ef11de12e3dd0c17451f0653a0125118cae5b4b814e56908f7ecebf",
+          "stage": "train-0"
+        },
+        {
+          "artifacts": 3,
+          "driver_hashes": 9,
+          "gpu_stage": true,
+          "launch_plan_runtime": {
+            "form": "recipe-digest",
+            "lock_sha256": "c68df2817045b7a947e454a849005f26b8fece30613db77f6dee5d13bcdbb131"
+          },
+          "ok": true,
+          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z/audit-1000-verified.json",
+          "record_step": 1000,
+          "requested_stage": "audit-1000",
+          "runtime_rootfs_sha256": "14908ff0fa2c9a712ea106de684b261bee9bbcf296bd52c3dc24685592044941",
+          "sha256": "7598135d51fad5305ab66cb3a0228c57c7995f8e3ac756b5dda71f1472993976",
+          "stage": "audit-1000"
+        },
+        {
+          "artifacts": 4,
+          "driver_hashes": 0,
+          "gpu_stage": false,
+          "launch_plan_runtime": {
+            "form": "recipe-digest",
+            "lock_sha256": "318e827c4832cbf2e6d02657c17bbda0ec696f5a7e2747b277922db364739403"
+          },
+          "ok": true,
+          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z/export-1000-verified.json",
+          "record_step": 1000,
+          "requested_stage": "export-1000",
+          "runtime_rootfs_sha256": "09b794f6fb2797f9f798bcb09e97478a04044536f87f636eddc85c82361d1962",
+          "sha256": "1d23577dd6add14244d23379c08892ff84ad374b631ac6db4119bf5ad71cf36d",
+          "stage": "export-1000"
+        },
+        {
+          "artifacts": 2,
+          "driver_hashes": 0,
+          "gpu_stage": false,
+          "launch_plan_runtime": {
+            "form": "recipe-digest",
+            "lock_sha256": "318e827c4832cbf2e6d02657c17bbda0ec696f5a7e2747b277922db364739403"
+          },
+          "ok": true,
+          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z/literal-loss-1000-verified.json",
+          "record_step": 1000,
+          "requested_stage": "literal-loss-1000",
+          "runtime_rootfs_sha256": "09b794f6fb2797f9f798bcb09e97478a04044536f87f636eddc85c82361d1962",
+          "sha256": "17e67c3135a7878d6b94e8debc8d05cbb10200eec0b15648e9a2612d5356c4e4",
+          "stage": "literal-loss-1000"
+        },
+        {
+          "artifacts": 4,
+          "driver_hashes": 0,
+          "gpu_stage": false,
+          "launch_plan_runtime": {
+            "form": "image",
+            "lock_sha256": "40927a7cdc915c2195670dd77335d889cf36745060155ce5663dc44f56c942eb"
+          },
+          "ok": true,
+          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z/metrics-audit-1000-verified.json",
+          "record_step": 1000,
+          "requested_stage": "metrics-audit-1000",
+          "runtime_rootfs_sha256": "831a5955ce709cb46b82688ba0f0371c37e1af707ffb870b24c555d53d4f5542",
+          "sha256": "511fb7a24314322c4ca3a95dead2c7a0c7da8bea35c1a8f66f636eca89a86998",
+          "stage": "metrics-audit-1000"
+        },
+        {
+          "artifacts": 2,
+          "driver_hashes": 0,
+          "gpu_stage": false,
+          "launch_plan_runtime": {
+            "form": "recipe-digest",
+            "lock_sha256": "318e827c4832cbf2e6d02657c17bbda0ec696f5a7e2747b277922db364739403"
+          },
+          "ok": true,
+          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z/proposals-1000-verified.json",
+          "record_step": 1000,
+          "requested_stage": "proposals-1000",
+          "runtime_rootfs_sha256": "09b794f6fb2797f9f798bcb09e97478a04044536f87f636eddc85c82361d1962",
+          "sha256": "aacf73d980fcc9dd444b167062154498d1ba3e36767fd2e39095f308715ffb14",
+          "stage": "proposals-1000"
+        },
+        {
+          "artifacts": 6,
+          "driver_hashes": 0,
+          "gpu_stage": false,
+          "launch_plan_runtime": {
+            "form": "image",
+            "lock_sha256": "40927a7cdc915c2195670dd77335d889cf36745060155ce5663dc44f56c942eb"
+          },
+          "ok": true,
+          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z/score-1000-verified.json",
+          "record_step": 1000,
+          "requested_stage": "score-1000",
+          "runtime_rootfs_sha256": "831a5955ce709cb46b82688ba0f0371c37e1af707ffb870b24c555d53d4f5542",
+          "sha256": "625148edf27b8dfbf2c8956c5246d88a167ce24280c5db084eabe94385b5c179",
+          "stage": "score-1000"
+        },
+        {
+          "artifacts": 19,
+          "driver_hashes": 9,
+          "gpu_stage": true,
+          "launch_plan_runtime": {
+            "form": "recipe-digest",
+            "lock_sha256": "c68df2817045b7a947e454a849005f26b8fece30613db77f6dee5d13bcdbb131"
+          },
+          "ok": true,
+          "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z/train-1000-verified.json",
+          "record_step": 1000,
+          "requested_stage": "train-1000",
+          "runtime_rootfs_sha256": "14908ff0fa2c9a712ea106de684b261bee9bbcf296bd52c3dc24685592044941",
+          "sha256": "5fdb52add9fd8c95bb507c6beece3a736e1f6a5775859c0a9a831fd1f6b9967b",
+          "stage": "train-1000"
+        }
+      ]
+    }
+  },
+  "finished_utc": "2026-10-09T17:23:12Z",
+  "ok": true,
+  "phase": "D",
+  "run_id": "bs1220261009T154234Z",
+  "run_root": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z",
+  "schema_version": 1,
+  "started_utc": "2026-10-09T17:15:58Z"
+}

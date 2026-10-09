@@ -1,0 +1,43 @@
+{
+  "run_id": "bs1220261009T154234Z",
+  "cases": {
+    "baseline": {
+      "case_directory": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z",
+      "manifest_sha256": "fd1825fb7c9e9ab8e0dbc8ce76178249b7efada6ced8bfa733b7e0478c5898d2",
+      "samples": [
+        {
+          "step": 0,
+          "APH": {
+            "1": 0.0,
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0
+          }
+        },
+        {
+          "step": 1000,
+          "APH": {
+            "1": 0.0166233,
+            "2": 0.00270372,
+            "3": 0.0,
+            "4": 0.0
+          }
+        }
+      ],
+      "cumulative_train_seconds": 66.67455395171419,
+      "decision": {
+        "action": "await engineering review",
+        "status": "native0/1000 interface admission; no terminal fit or scientific outcome"
+      },
+      "retained_checkpoints": [
+        0,
+        1000
+      ],
+      "latest_source_admission": {
+        "path": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/balanced16-sustained-baseline-bs1220261009T154234Z/checkpoint-1000-admitted.json",
+        "sha256": "4110dfad0fd536bc5a1921eb26f30a003c5ed0623ed3203b0c7c3b1e1f1b0c64"
+      }
+    }
+  },
+  "scope": "fixed16 training-only live checkpoint status; no heldout scientific claim"
+}

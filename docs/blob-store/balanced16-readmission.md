@@ -223,4 +223,99 @@ weakened.
 
 Phase A: planned, committed before heavy work.
 
-Phases B-E: pending.
+Phase B: passed preflight. Corrected summary:
+`/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/bs12-execution/bs1220261009T154234Z/phaseB-preflight-corrected-summary.json`
+
+- `/data02` free: `93500452864` bytes, above the 45 GB floor.
+- `unique_payload_bytes(W)`: `12182779587`; plus 2 GiB:
+  `14330263235`, under the 15 GiB cap (`16106127360`).
+- Runtime locks verified through `insula.launch_plan.load_default_runtime_lock`:
+  CPU `rootfs-v5-t29-20261008T230657Z`, GPU `gpu-rootfs-v7`,
+  `metrics-rootfs`, and `motion-cli-rootfs-v2`.
+- Blob-store read-only HDFS access and the four Waystone tool pins verified.
+- The first raw preflight JSON had `ok: false` only because the reducer treated
+  nested `runtime_locks` as missing a top-level `ok`; the corrected summary
+  records all nested checks as passing and preserves the raw artifact path.
+
+Phase C: passed live admission. Summary:
+`/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/bs12-execution/bs1220261009T154234Z/launch-summary.json`
+
+- Command: the Phase A `systemd-run --user --scope` command ran from the repo
+  root with `--unit=sureal-sustained-bs1220261009T154234Z`,
+  `MemoryMax=17179869184`, `MemorySwapMax=0`, and
+  `MemoryAccounting=yes`.
+- Scope evidence:
+  `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/bs12-execution/bs1220261009T154234Z/launch-systemd-scope.json`
+  captured `sureal-sustained-bs1220261009T154234Z.scope`, cgroup
+  `/user.slice/user-1018.slice/user@1018.service/app.slice/sureal-sustained-bs1220261009T154234Z.scope`,
+  `memory.max=17179869184`, and `memory.swap.max=0`.
+- Exit code: `0`.
+- Duration: `5105.171` seconds, from `2026-10-09T15:48:03Z` to
+  `2026-10-09T17:13:08Z`.
+- GPU 1 guard before launch: passed with GPU UUID
+  `GPU-eaed2f0d-2541-8ca8-b6c4-3e2e45e86619`, no GPU 1 compute apps, and
+  `4` MiB used.
+- GPU occupancy evidence:
+  `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/bs12-execution/bs1220261009T154234Z/gpu1-occupancy.jsonl`
+  recorded `170` samples. `14` samples contained a GPU 1 app and `6` samples
+  contained foreign GPU 1 processes, all owned by `philip.yang`, with one
+  sample each for PIDs `1793412`, `1855512`, `2150914`, `2190211`, `2326685`
+  and `2416086`. This is a passed admission with a recorded GPU-sharing caveat,
+  not an unqualified clean-GPU run.
+
+Phase D: passed receipt and journal verification. Evidence:
+`/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/bs12-execution/bs1220261009T154234Z/receipt-verification.json`
+and
+`/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/bs12-execution/bs1220261009T154234Z/journal-publication-audit.json`
+
+- Backend resume validation passed for records `0` and `1000`;
+  progress sha256
+  `9182756ec83a16f867b33db573610a6e2d5b152b93eb91322e81debf57f31032`
+  and live sha256
+  `32d2a385f92dade3be58d1e52f6f73ab4fcfa6dbaffc30e6aedcc2c2bbe0c5b9`.
+- Source snapshots read back through the blob store:
+  `artifacts/source-snapshots/0cf17f0697a66e66e82193786b88b1c854a2eaae6464a220b114c0f225eb0d1e`
+  (`267` files),
+  `artifacts/source-snapshots/982fac70165d7c4f40fbf971ed33b9ab3c04d585c9beead08aa63615c1f48742`
+  (`65` files), and
+  `artifacts/source-snapshots/d7446ea9cd3a142571bec0e7e6344a88e94fb2550c43108cd4c2f484718d8eaf`
+  (`50` files).
+- Stage receipts verified: `14` stage receipts total, `4` GPU stages, and
+  `36` GPU driver pins. CPU, GPU and metrics runtime locks matched their
+  recorded lock data.
+- Checkpoint records for steps `0` and `1000` verified their admitted records,
+  16 head files per record, report digests and resource companions.
+- The current admission-only entry point retained local checkpoints and did not
+  emit separate resource or checkpoint publication receipts, so the planned
+  resource/checkpoint publication prefixes were not written by this run.
+- Journal before append verified at `134` entries; after append verified at
+  `135` entries. The prior journal publication receipt was preserved at
+  `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/bs12-execution/bs1220261009T154234Z/research-journal-hdfs-verified.before-bs12-publish.json`.
+- Journal publication used
+  `python3 -m retention.publish_research_journal --run-id
+  bs1220261009T154234Z --staging-root <fresh-dir> --legacy-receipt <preserved
+  prior receipt>` and wrote
+  `runs/perception-research-journal/bs1220261009T154234Z/snapshot/manifest.json`.
+- Journal publication audit passed by blob-store readback: `403` direct files,
+  `0` chunks, `30753610` payload bytes, receipt sha256
+  `690eb059e39e0938457a59f9823c28d98fd6b815355158011d91c2e4d871db2a`.
+
+Phase E: gates passed.
+
+- Default CPU `//autonomy/...`: `186` out of `186` tests passed in `80`
+  seconds. Summary:
+  `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/bs12-execution/bs1220261009T154234Z/gate-autonomy-cpu.json`
+- Default CPU `//parallax/...`: `17` out of `17` tests passed in `382`
+  seconds. Summary:
+  `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/bs12-execution/bs1220261009T154234Z/gate-parallax-cpu.json`
+- CUDA `//autonomy/...`: GPU 1 guard passed first with no compute apps and
+  `4` MiB used, then `30` out of `30` tests passed in `148` seconds with
+  `CUDA_VISIBLE_DEVICES=1`. Summaries:
+  `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/bs12-execution/bs1220261009T154234Z/cuda-gate-gpu1-guard.json`
+  and
+  `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/bs12-execution/bs1220261009T154234Z/gate-autonomy-cuda.json`
+
+What was not checked: this was an admission-only engineering readmission, not a
+full balanced16 sweep; it does not claim a scientific result. No separate
+resource/checkpoint publication receipt was audited because the current
+admission-only entry point did not emit one.
