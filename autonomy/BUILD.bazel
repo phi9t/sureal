@@ -1,4 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_library", "py_test")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library", "py_test")
 
 package(default_visibility = ["//visibility:private"])
 
@@ -162,6 +162,21 @@ py_library(
     visibility = ["//visibility:public"],
 )
 
+py_binary(
+    name = "retained_receipt_sweep",
+    srcs = ["retained_receipt_sweep.py"],
+    imports = ["."],
+    legacy_create_init = 0,
+    main = "retained_receipt_sweep.py",
+    deps = [
+        "//autonomy/evidence:evidence",
+        "//autonomy/insula:insula",
+        "//autonomy/resources:resources",
+        "//autonomy/training_execution:training_execution",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 genquery(
     name = "sustained_run_sources_query",
     expression = 'kind("source file", filter("^//", labels("srcs", deps(//autonomy/training_execution:train_sustained)) union labels("data", deps(//autonomy/training_execution:train_sustained))))',
@@ -232,6 +247,28 @@ py_test(
         "//autonomy/resources:resources",
         "//autonomy/retention:retention",
         "//autonomy/studies:studies",
+        "//autonomy/training_execution:training_execution",
+    ],
+)
+
+py_test(
+    name = "retained_receipt_sweep_host_test",
+    srcs = [
+        "retained_receipt_sweep_host_test.py",
+        "retained_receipt_sweep.py",
+    ],
+    imports = ["."],
+    legacy_create_init = 0,
+    size = "large",
+    tags = [
+        "manual",
+        "no-sandbox",
+        "requires_host_retained_receipts",
+    ],
+    deps = [
+        "//autonomy/evidence:evidence",
+        "//autonomy/insula:insula",
+        "//autonomy/resources:resources",
         "//autonomy/training_execution:training_execution",
     ],
 )
