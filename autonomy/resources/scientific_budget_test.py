@@ -1,7 +1,14 @@
 import tempfile,unittest
 from pathlib import Path
+from resources import scientific_budget
 from resources.scientific_budget import reserve_write,fit_interval
 class AdmissionTests(unittest.TestCase):
+ def test_scientific_working_cap_is_20_gib_and_rejects_boundary(self):
+  cap=20*1024**3
+  self.assertEqual(getattr(scientific_budget,'SCIENTIFIC_WORKING_CAP_BYTES',None),cap)
+  with tempfile.TemporaryDirectory() as d:
+   self.assertEqual(reserve_write(d,cap-1)['limit'],cap)
+   with self.assertRaises(ValueError):reserve_write(d,cap)
  def test_refuse_before_write(self):
   with tempfile.TemporaryDirectory() as d:
    p=Path(d)/'existing';p.write_bytes(b'x'*90)

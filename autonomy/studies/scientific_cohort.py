@@ -8,6 +8,7 @@ from insula.launch_plan import build_plan, load_runtime_lock, record_plan, rende
 from insula.runtime_roots import current_cpu_rootfs, default_lock
 from dataset.scientific_admission import admit_scene
 from dataset.cohort_resume import verify_registered_checkpoint
+from resources.scientific_budget import SCIENTIFIC_WORKING_CAP_BYTES
 DRIVER=Path(__file__).resolve()
 HERE=DRIVER.parents[1]
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
@@ -55,7 +56,7 @@ def main():
   def remember(p):retained[str(p)]=sha(p)
   def bundle_cap(processing):
    files=[p for p in (processing/'sidecars').rglob('*') if p.is_file()];upper=sum(p.stat().st_size for p in files)+len(files)*1024+16*1024**2
-   if total(WORKING)+upper>=15*1024**3:raise ValueError('aggregate component bundle working cap insufficient')
+   if total(WORKING)+upper>=SCIENTIFIC_WORKING_CAP_BYTES:raise ValueError('aggregate component bundle working cap insufficient')
   def evict(stage,module,function,processing,publication,replay,ph,rh=None):
    code='import json; from '+module+' import '+function+'; r='+function+"('/outputs','/opt'"+(",'/srv'" if replay else '')+',expected_publication_sha256='+repr(ph)+(',expected_replay_sha256='+repr(rh) if replay else '')+"); print(json.dumps({'status':r['status'],'bytes_evicted':r['bytes_evicted']}))"
    plan=build_eviction_plan(runtime,processing=processing,publication=publication,replay=replay,command=['python','-c',code]);call(stage,render_plan(plan));checks[-1]['launch_plan']=record_plan(plan)
@@ -83,7 +84,7 @@ def main():
   evict('camera-evict','camera.camera_eviction','evict_camera',camera,camera_pub,camera_replay,ch,crh)
   for c,p in paths.items():
    if sha(p)!=source_hashes[c]:raise ValueError('source admission changed during lifecycle')
-  if sha(DRIVER)!=driver_sha or sha(manifest_path)!=manifest_sha or total(WORKING)>15*1024**3:raise ValueError('driver/cohort/cap changed')
+  if sha(DRIVER)!=driver_sha or sha(manifest_path)!=manifest_sha or total(WORKING)>=SCIENTIFIC_WORKING_CAP_BYTES:raise ValueError('driver/cohort/cap changed')
   for p in scene_base.glob('*.log'):remember(p)
   save(checkpoint,{'status':'native scientific scene point/camera lifecycle independently verified; protocol remains open','scene':scene,'membership':membership,'checks':checks,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-tick,'peak_child_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'driver_sha256':driver_sha,'manifest_sha256':manifest_sha,'source_record_hashes':source_hashes,'runtime_lock':lock,'retained_evidence_hashes':retained,'point_validation':point_replay['validation'],'camera_validation':camera_result['validation'],'point_hdfs_uri':pub['archive_hdfs_uri'],'camera_hdfs_uri':json.loads((camera_pub/'receipt.json').read_text())['archive_hdfs_uri'],'scope':'native preprocessing only; independent full queue audit, class maps, full task/cohort/scientific protocol/model comparisons remain open'})
   print('PASS complete queued native scene',scene,flush=True)
