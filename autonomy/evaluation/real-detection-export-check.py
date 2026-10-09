@@ -2,6 +2,7 @@
 import json,re,subprocess,math
 from pathlib import Path
 from detection.detection_export import export_objects
+from detection.native_detection_adapter import parse_result
 
 out=Path('/outputs');records=json.loads(Path('/source/real-boxes.json').read_text())
 # Replay only evaluable ground truth as predictions: zero-support targets stay
@@ -26,10 +27,10 @@ for name,expected in [('groundtruth',records),('predictions',predictions)]:
         assert number('score')==1 and 'overlap_with_nlz: false' in block
 run=subprocess.run(['/metrics-build/compute_detection_metrics','/outputs/predictions.bin','/outputs/groundtruth.bin'],capture_output=True,text=True)
 (out/'metrics.stdout').write_text(run.stdout);(out/'metrics.stderr').write_text(run.stderr)
-assert run.returncode==0 and not run.stderr
+parsed=parse_result(run.returncode,run.stdout,run.stderr);metrics=parsed['metrics']
 for name,index in classes.items():
     if any(r['type']==index for r in predictions):
-        match=re.search('OBJECT_TYPE_'+name+r'_LEVEL_2: \[mAP ([^\]]+)\] \[mAPH ([^\]]+)\]',run.stdout)
-        assert match and abs(float(match[1])-1)<1e-6 and abs(float(match[2])-1)<1e-6,(name,match.groups() if match else None)
-(out/'real-detection-validation.json').write_text(json.dumps({'source_objects':len(records),'evaluable_predictions':len(predictions),'decoded_fields':'frame/object identities, dimensions, class, point count, score, NLZ fixture flag','result':'native self-replay AP/APH 1 for populated LEVEL_2 object classes','scope':'evaluation-only ground-truth replay; production NLZ derivation remains open'},indent=2)+'\n')
+        values=metrics['OBJECT_TYPE_'+name+'_LEVEL_2']
+        assert abs(values['AP']-1)<1e-6 and abs(values['APH']-1)<1e-6,(name,values)
+(out/'real-detection-validation.json').write_text(json.dumps({'source_objects':len(records),'evaluable_predictions':len(predictions),'decoded_fields':'frame/object identities, dimensions, class, point count, score, NLZ fixture flag','result':'native self-replay AP/APH 1 for populated LEVEL_2 object classes','diagnostics':parsed['diagnostics'],'scope':'evaluation-only ground-truth replay; production NLZ derivation remains open'},indent=2)+'\n')
 print('PASS real native detection export',len(records),'objects')

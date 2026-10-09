@@ -1,5 +1,6 @@
 import json,math,re,subprocess
 from pathlib import Path
+from detection.native_detection_adapter import parse_result
 from evidence.source_snapshot import file_sha256
 sha=file_sha256
 e=json.loads(Path('/tmp/expected.json').read_text());r=e['receipt'];assert sha('/tmp/score-receipt.json')==e['receipt_sha256']
@@ -19,7 +20,7 @@ for name in ['predictions','groundtruth']:
   difficulty=re.search(r'detection_difficulty_level: (\S+)',b)
   if record['difficulty'] is None:assert difficulty is None
   else:assert difficulty[1]=={0:'UNKNOWN',1:'LEVEL_1',2:'LEVEL_2'}[record['difficulty']]
-run=subprocess.run(['/metrics-build/compute_detection_metrics','/tmp/scored/predictions.bin','/tmp/scored/groundtruth.bin'],capture_output=True,text=True,timeout=600);assert run.returncode==0
-metrics={name:{'AP':float(ap),'APH':float(aph)} for name,ap,aph in re.findall(r'(\S+): \[mAP ([^\]]+)\] \[mAPH ([^\]]+)\]',run.stdout)};assert metrics==r['validation']['metrics']
+run=subprocess.run(['/metrics-build/compute_detection_metrics','/tmp/scored/predictions.bin','/tmp/scored/groundtruth.bin'],capture_output=True,text=True,timeout=600)
+parsed=parse_result(run.returncode,run.stdout,run.stderr);metrics=parsed['metrics'];assert metrics==r['validation']['metrics'];assert parsed['diagnostics']==r['validation']['diagnostics']
 values=r['validation']['LEVEL2_per_class'];mean=sum(x['APH'] for x in values.values())/len(values);assert math.isclose(mean,r['validation']['mean_populated_class_APH']) and r['validation']['APH_gate_passed']==(mean>=.8)
-Path('/outputs/metrics.stdout').write_text(run.stdout);Path('/outputs/check.json').write_text(json.dumps({'all_export_fields_independently_reread':True,'native_metric_replay_exact':True,'mean_populated_class_APH':mean,'APH_gate_passed':mean>=.8,'scope':'independent single-training-batch native export and scoring audit; no heldout claim'}));print('PASS independent one-batch native export and metric replay',mean)
+Path('/outputs/metrics.stdout').write_text(run.stdout);Path('/outputs/metrics.stderr').write_text(run.stderr);Path('/outputs/check.json').write_text(json.dumps({'all_export_fields_independently_reread':True,'native_metric_replay_exact':True,'mean_populated_class_APH':mean,'APH_gate_passed':mean>=.8,'diagnostics':parsed['diagnostics'],'scope':'independent single-training-batch native export and scoring audit; no heldout claim'}));print('PASS independent one-batch native export and metric replay',mean)
