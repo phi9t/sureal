@@ -54,8 +54,8 @@ clear by both checks: no compute app on GPU 1's UUID in
   the strict-metrics landed base, so the re-admission binds those sources.
 - Ticket 29 rootfs/lock: resource CPU work now binds the current t29 CPU runtime
   lock (`rootfs-v5-t29-20261008T230657Z`) through
-  `insula.launch_plan.load_default_runtime_lock`; GPU work still binds the
-  sustained GPU lock through the launch-plan module.
+  `insula.launch_plan.load_default_runtime_lock`; GPU work binds the current
+  sustained GPU lock (`gpu-rootfs-v7`) through the launch-plan module.
 - Old wrappers: active code outside the blob store and keepalive no longer owns
   the Waystone storage root or copied Waystone tool wrappers.
 
@@ -113,7 +113,7 @@ from insula.launch_plan import load_default_runtime_lock
 
 roots = {
     "cpu": Path.home() / ".cache/waystone/waymo-perception/insula/rootfs-v5-t29-20261008T230657Z",
-    "gpu": Path.home() / ".cache/waystone/waymo-perception/gpu-rootfs-v6",
+    "gpu": Path.home() / ".cache/waystone/waymo-perception/gpu-rootfs-v7",
     "metrics": Path.home() / ".cache/waystone/waymo-perception/metrics-rootfs",
     "motion": Path.home() / ".cache/waystone/waymo-perception/motion-cli-rootfs-v2",
 }
