@@ -5,42 +5,16 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from blob_store.core import BlobStore, Conflict, InMemoryBlobAdapter
 from evidence.source_snapshot import file_sha256
 
-
-class FakeWaystone:
-    def __init__(self):
-        self.objects = {}
-        self.commands = []
-
-    def layout_profile(self, evidence_dir):
-        self.commands.append(("layout-profile", str(evidence_dir)))
-        return {
-            "project": "sureal",
-            "project_root": "hdfs://test/sureal",
-            "paths": {"runs": "hdfs://test/sureal/runs"},
-        }
-
-    def authenticated_read(self, uri, evidence_dir):
-        self.commands.append(("ls", uri, str(evidence_dir)))
-        return {"stage": "authenticated-read", "command": ["waystone", "ls", uri], "exit_code": 0}
-
-    def put_new(self, source, uri, stage, evidence_dir):
-        self.commands.append(("put", uri, str(source), str(evidence_dir)))
-        if uri in self.objects:
-            raise FileExistsError("HDFS object already exists: " + uri)
-        self.objects[uri] = Path(source).read_bytes()
-        return {"stage": stage, "command": ["waystone", "put", str(source), uri], "exit_code": 0}
-
-    def get(self, uri, destination, stage, evidence_dir):
-        self.commands.append(("get", uri, str(destination), str(evidence_dir)))
-        Path(destination).write_bytes(self.objects[uri])
-        return {"stage": stage, "command": ["waystone", "get", uri, str(destination)], "exit_code": 0}
+STORE_DESCRIPTOR = {"kind": "in-memory", "project": "unit"}
+TOOL_DIGEST = {"waystone-cli": "a" * 64}
 
 
 def fake_host_admitter(receipt_path, current_package, destination):
     destination = Path(destination)
-    destination.mkdir(parents=True)
+    destination.mkdir(parents=True, exist_ok=True)
     marker = destination / "marker.py"
     marker.write_text("admitted\n")
     return {
@@ -60,12 +34,15 @@ class SymlinkAuditPublisherTests(unittest.TestCase):
         (payload / "red" / "mutants" / "frame.bin").symlink_to("/source/training/frame.bin")
         return working, payload
 
-    def test_archive_preserves_symlink_members_and_readback_listing_matches_source(self):
-        from retention.publish_symlink_audit import publish
+    def make_store(self):
+        return BlobStore(InMemoryBlobAdapter(), backoff_seconds=())
+
+    def test_archive_preserves_symlink_members_through_in_memory_blob_store(self):
+        from retention.publish_symlink_audit import audit, publish
 
         with tempfile.TemporaryDirectory() as directory:
             working, payload = self.make_audit(directory)
-            waystone = FakeWaystone()
+            store = self.make_store()
             receipt = publish(
                 case=payload.name,
                 root=payload,
@@ -75,34 +52,55 @@ class SymlinkAuditPublisherTests(unittest.TestCase):
                 readback=True,
                 write_receipt=True,
                 scientific_processing=working,
-                waystone=waystone,
+                store=store,
+                store_descriptor=STORE_DESCRIPTOR,
+                tool_digest=TOOL_DIGEST,
                 host_source_admitter=fake_host_admitter,
                 identifier="motion-audit-test",
             )
 
-            self.assertEqual(receipt["source_listing"], receipt["readback_listing"])
+            self.assertEqual(set(receipt), {"schema_version", "store_descriptor", "tool_sha256", "verified_by_readback", "blobs"})
+            self.assertEqual(receipt["store_descriptor"], STORE_DESCRIPTOR)
+            self.assertEqual(
+                receipt["blobs"]["archive"]["key"],
+                "runs/perception-motion/motion-audit-test/symlink-audit/audit.tar.gz",
+            )
+            self.assertEqual(
+                receipt["blobs"]["manifest"]["key"],
+                "runs/perception-motion/motion-audit-test/symlink-audit/manifest.json",
+            )
+            audit_result = audit(receipt, store=store)
             self.assertIn(
                 {
                     "path": "red/mutants/frame.bin",
                     "kind": "symlink",
                     "link_text": "/source/training/frame.bin",
                 },
-                receipt["source_listing"],
+                audit_result["listing"],
             )
-            archive_bytes = waystone.objects[receipt["archive_hdfs_uri"]]
+            archive_path = Path(directory) / "audit-readback.tar.gz"
+            store.get(
+                receipt["blobs"]["archive"]["key"],
+                archive_path,
+                receipt["blobs"]["archive"]["sha256"],
+                expected_bytes=receipt["blobs"]["archive"]["bytes"],
+            )
+            archive_bytes = archive_path.read_bytes()
             with tarfile.open(fileobj=io.BytesIO(archive_bytes), mode="r:gz") as archive:
                 member = archive.getmember("red/mutants/frame.bin")
                 self.assertTrue(member.issym())
                 self.assertEqual(member.linkname, "/source/training/frame.bin")
+            self.assertNotIn("archive_hdfs_uri", json.dumps(receipt, sort_keys=True))
             self.assertTrue((payload / "red" / "mutants" / "frame.bin").is_symlink())
 
     def test_move_to_renames_same_filesystem_and_verifies_listing_again(self):
-        from retention.publish_symlink_audit import publish
+        from retention.publish_symlink_audit import audit, publish
 
         with tempfile.TemporaryDirectory() as directory:
             working, payload = self.make_audit(directory)
             destination = Path(directory) / "retired-audits" / payload.name
             destination.parent.mkdir()
+            store = self.make_store()
             receipt = publish(
                 case=payload.name,
                 root=payload,
@@ -113,14 +111,17 @@ class SymlinkAuditPublisherTests(unittest.TestCase):
                 write_receipt=True,
                 move_to=destination,
                 scientific_processing=working,
-                waystone=FakeWaystone(),
+                store=store,
+                store_descriptor=STORE_DESCRIPTOR,
+                tool_digest=TOOL_DIGEST,
                 host_source_admitter=fake_host_admitter,
                 identifier="motion-audit-move",
             )
 
             self.assertFalse(payload.exists())
-            self.assertEqual(json.loads((Path(directory) / "evidence" / "hdfs-retention-motion-audit-move" / "move-completed.json").read_text())["moved_to"], str(destination))
-            self.assertEqual(receipt["source_listing"], receipt["moved_listing"])
+            completed = json.loads((Path(directory) / "evidence" / "blob-publication-motion-audit-move" / "move-completed.json").read_text())
+            self.assertEqual(completed["moved_to"], str(destination))
+            self.assertEqual(completed["listing"], audit(receipt, store=store)["listing"])
             self.assertEqual((destination / "red" / "mutants" / "frame.bin").readlink(), Path("/source/training/frame.bin"))
 
     def test_refuses_cross_device_move_without_deleting_source(self):
@@ -141,13 +142,54 @@ class SymlinkAuditPublisherTests(unittest.TestCase):
                     write_receipt=True,
                     move_to=destination,
                     scientific_processing=working,
-                    waystone=FakeWaystone(),
+                    store=self.make_store(),
+                    store_descriptor=STORE_DESCRIPTOR,
+                    tool_digest=TOOL_DIGEST,
                     host_source_admitter=fake_host_admitter,
                     identifier="motion-audit-cross-device",
                     same_device=lambda source, target: False,
                 )
             self.assertTrue(payload.exists())
             self.assertFalse(destination.exists())
+
+    def test_repeat_publication_with_different_archive_bytes_is_refused_by_blob_store(self):
+        from retention.publish_symlink_audit import publish
+
+        with tempfile.TemporaryDirectory() as directory:
+            working, payload = self.make_audit(directory)
+            store = self.make_store()
+            publish(
+                case=payload.name,
+                root=payload,
+                hdfs_namespace="perception-motion",
+                evidence=Path(directory) / "evidence-a",
+                preserve_symlinks=True,
+                readback=True,
+                write_receipt=True,
+                scientific_processing=working,
+                store=store,
+                store_descriptor=STORE_DESCRIPTOR,
+                tool_digest=TOOL_DIGEST,
+                host_source_admitter=fake_host_admitter,
+                identifier="motion-audit-repeat",
+            )
+            (payload / "green" / "report.json").write_text('{"ok": false}\n')
+            with self.assertRaises(Conflict):
+                publish(
+                    case=payload.name,
+                    root=payload,
+                    hdfs_namespace="perception-motion",
+                    evidence=Path(directory) / "evidence-b",
+                    preserve_symlinks=True,
+                    readback=True,
+                    write_receipt=True,
+                    scientific_processing=working,
+                    store=store,
+                    store_descriptor=STORE_DESCRIPTOR,
+                    tool_digest=TOOL_DIGEST,
+                    host_source_admitter=fake_host_admitter,
+                    identifier="motion-audit-repeat",
+                )
 
 
 if __name__ == "__main__":
