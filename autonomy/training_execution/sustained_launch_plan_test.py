@@ -2,8 +2,10 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+import re
 
 from insula.launch_plan import RuntimeLock, plan_data
+import insula.launch_plan as launch_plan_module
 from training_execution import admit_sustained, sustained_controller_backend
 
 
@@ -132,6 +134,44 @@ class SustainedLaunchPlanTests(unittest.TestCase):
                 data["command"],
                 ["python", "/experiment/training_execution/train_sustained.py"],
             )
+
+    def test_recording_sustained_plan_does_not_digest_live_scientific_tree(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            paths = self.inputs(root)
+            output = paths["scientific"] / "balanced16-sustained-baseline-run1" / "update-1000"
+            output.mkdir(parents=True)
+            (output / "just-created-output.tmp").write_text("new output must not enter input digest\n")
+            runtime = self.runtime(root, "gpu-rootfs-v7", "1" * 64)
+            original_content_digest = launch_plan_module._content_digest
+
+            def guarded_content_digest(path):
+                if Path(path) == paths["scientific"]:
+                    raise AssertionError("recording must not hash the live scientific root")
+                return original_content_digest(path)
+
+            with patch.dict("os.environ", self.fake_gpu_environment(root), clear=False):
+                plan = sustained_controller_backend.build_sustained_stage_plan(
+                    runtime,
+                    package=paths["package"],
+                    stage_source=paths["stage-input"],
+                    output=output,
+                    worker="train_sustained.py",
+                    native=paths["native"],
+                    physical=paths["physical"],
+                    boxes=paths["boxes"],
+                    runtime_lock_path=paths["runtime_lock"],
+                    scientific_root=paths["scientific"],
+                    source_snapshot_store=paths["source-snapshots"],
+                    gpu_index=sustained_controller_backend.GPU_INDEX,
+                    source_snapshot_digest="c" * 64,
+                )
+                with patch("insula.launch_plan._content_digest", side_effect=guarded_content_digest):
+                    record = sustained_controller_backend.record_plan(plan)
+
+            mounts = {mount["inside_path"]: mount for mount in record["mounts"]}
+            self.assertRegex(mounts["/tmp/scientific"]["digest"], re.compile(r"^[0-9a-f]{64}$"))
+            self.assertEqual(mounts["/tmp/scientific"]["mode"], "read_only")
 
     def test_each_sustained_stage_shape_has_a_structured_plan(self):
         with tempfile.TemporaryDirectory() as temp:

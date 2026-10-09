@@ -7,12 +7,26 @@ from resources.scientific_budget import reserve_write
 from resources.backend import ResourceBackend,prepare_identity
 from resources.checkpoint import recover_publication_record,resource_inventory,validate_publication_record,write_publication_record
 from retention.publication import publish_bundle
+from retention.checkpoint_retention_policy import checkpoint_case
 from retention.sustained_controller_lock import acquire_experiment_lock
 from training_execution.sustained_controller_backend import NativeBackend,publication_matches_record,validate_native_publication_release,write,C,W
 from training_execution.sustained_workflow import execute_case
 from detection.sustained_contract import RECIPES
 from resources.sustained_scoring_budget import stage_timeout
 from studies.architecture import experiment_runner
+
+def _looks_like_blob_publication(publication):
+ return isinstance(publication,dict) and 'blobs' in publication
+
+def _blob_publication_matches_record(record,publication):
+ try:
+  from resources.checkpoint import _is_blob_publication
+  if not _is_blob_publication(publication):return False
+  key=publication['blobs']['manifest']['key']
+  case=checkpoint_case(W,Path(record['root']),record['step'],requested_step=record['target_step'])
+  return key=='checkpoints/perception-sustained-checkpoints/'+case+'-step'+str(record['step'])+'/checkpoint/manifest.json'
+ except (KeyError,TypeError,ValueError,AttributeError):
+  return False
 
 class ResourceNativeBackend(ResourceBackend,NativeBackend):
  resource_launcher_module=experiment_runner
@@ -30,7 +44,8 @@ class ResourceNativeBackend(ResourceBackend,NativeBackend):
    if not publication.exists():continue
    try:
     value=json.loads(publication.read_text())
-    blob_publication='blobs' in value
+    blob_publication=_blob_publication_matches_record(record,value)
+    if _looks_like_blob_publication(value) and not blob_publication:continue
     if not blob_publication and not publication_matches_record(record,value):continue
     if release.exists():
      validate_native_publication_release(record,publication,release,completed=True)

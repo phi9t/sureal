@@ -16,6 +16,7 @@ exports_files(
         "cache_inventory.py",
         "checkpoint_retention_policy.py",
         "publish_native_cache.py",
+        "publish_research_journal.py",
         "publish_scientific_directory.py",
         "publish_sustained_checkpoint.py",
         "publish_sustained_pilot.py",
@@ -85,6 +86,7 @@ filegroup(
     )
     for publisher in [
         "publish_native_cache.py",
+        "publish_research_journal.py",
         "publish_scientific_directory.py",
         "publish_sustained_checkpoint.py",
         "publish_sustained_pilot.py",

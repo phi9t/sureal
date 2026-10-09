@@ -64,6 +64,13 @@ class PublicationModuleTests(unittest.TestCase):
             self.fail("retention publication module must expose native_cache_spec and sustained_pilot_spec")
         return publish, audit, native_cache_spec, sustained_pilot_spec
 
+    def journal_entry_api(self):
+        try:
+            from retention.publish_research_journal import main
+        except ImportError:
+            self.fail("research journal publication needs a CLI entry point")
+        return main
+
     def assert_no_receipt_path_strings(self, value, *, blob_key=False):
         if isinstance(value, dict):
             for key, child in value.items():
@@ -407,6 +414,41 @@ class PublicationModuleTests(unittest.TestCase):
 
             self.assertEqual(legacy.read_bytes(), old_bytes)
             self.assertEqual(json.loads(active.read_text()), receipt)
+
+    def test_research_journal_publish_entry_point_writes_auditable_local_receipt(self):
+        _, audit, _, _, _ = self.api()
+        main = self.journal_entry_api()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            research = self.journal_fixture(root)
+            receipt_path = root / "research-journal-verified.json"
+            store_root = root / "blob-store"
+
+            main(
+                [
+                    "--research-root",
+                    str(research),
+                    "--run-id",
+                    "journal-cli-001",
+                    "--store-descriptor",
+                    json.dumps({"kind": "local", "root": str(store_root)}),
+                    "--tool-digest",
+                    json.dumps(RECEIPT_TOOL_DIGEST),
+                    "--staging-root",
+                    str(root / "stage"),
+                    "--receipt",
+                    str(receipt_path),
+                ]
+            )
+
+            receipt = json.loads(receipt_path.read_text())
+            self.assertEqual(
+                receipt["blobs"]["manifest"]["key"],
+                "runs/perception-research-journal/journal-cli-001/snapshot/manifest.json",
+            )
+            result = audit(receipt)
+            self.assertEqual(result["chunks"], 0)
+            self.assertGreaterEqual(result["files"], 5)
 
     def test_sustained_checkpoint_spec_publishes_under_checkpoints_and_releases_after_audit(self):
         publish, audit, sustained_checkpoint_spec = self.sustained_api()

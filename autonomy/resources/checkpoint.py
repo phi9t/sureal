@@ -9,16 +9,32 @@ from evidence.source_snapshot import is_regular_file
 from evidence.source_snapshot import safe_member_name
 from evidence.source_snapshot import receipt_snapshot_digest,store_from_receipt,verify_or_materialize_receipt_sources
 from blob_store.core import BlobStoreError, legacy_project_uri_to_key
+from insula.launch_plan import read_receipt_mounts
 from retention.publication import audit as audit_publication
 from resources.backend import resource_cpu_root_for
-from resources.sources import sha
-from resources.stage import write_new,require_separate
+from resources.command import inspect_command
+from resources.sources import package_member_path,sha
+from resources.stage import validate_proof,write_new,require_separate
+from resources.stage_accounting import admit_worker
 
 STAGES=('train','audit','literal-loss','export','proposals','score','metrics-audit')
 LEGACY_PUBLICATION_EXTRA={'manifest_readback_exact','publication_manifest_hdfs_uri','publication_manifest_sha256','independent_admission'}
 LEGACY_RESOURCE_LIMIT=128*1024**2
 LEGACY_RESOURCE_CHECK_ORDER=('create-live','archive-put','archive-get','manifest-put','manifest-get','verify-live','rehydrate-live')
 LEGACY_RESOURCE_BLOB_PREFIX='runs/perception-resource-closures/'
+LEGACY_RESOURCE_CAP_BYTES=16*1024**3
+LEGACY_RESOURCE_TIMEOUT_SECONDS=300
+_LEGACY_OPT='--'
+_LEGACY_RO_BIND=_LEGACY_OPT+'ro-bind'
+_LEGACY_BIND=_LEGACY_OPT+'bind'
+_LEGACY_UNSHARE=_LEGACY_OPT+'unshare-all'
+_LEGACY_DIE=_LEGACY_OPT+'die-with-parent'
+_LEGACY_PROC=_LEGACY_OPT+'proc'
+_LEGACY_DEV=_LEGACY_OPT+'dev'
+_LEGACY_TMPFS=_LEGACY_OPT+'tmpfs'
+_LEGACY_CLEARENV=_LEGACY_OPT+'clearenv'
+_LEGACY_SETENV=_LEGACY_OPT+'setenv'
+_LEGACY_CHDIR=_LEGACY_OPT+'chdir'
 
 
 def reference(path):
@@ -143,7 +159,7 @@ def _validate_publication_external_bindings(backend,pub):
 
 
 def _is_blob_publication(pub):
-    return isinstance(pub,dict) and {'store_descriptor','tool_sha256','verified_by_readback','blobs'}<=set(pub)
+    return isinstance(pub,dict) and pub.get('schema_version')==1 and {'store_descriptor','tool_sha256','verified_by_readback','blobs'}<=set(pub)
 
 
 def _store_for_blob_publication(backend,pub):
@@ -193,16 +209,30 @@ def _receipt_inventory_digest(pub,expected_inventory=None):
 
 
 def _validate_independent_admission(pub,inventory,readback):
-    if not isinstance(pub.get('independent_admission'),dict):
+    admission=pub.get('independent_admission')
+    if not isinstance(admission,dict) or not admission:
         raise ValueError('complete independent resource admission evidence required')
     _verify_legacy_source_snapshot(pub)
     if pub.get('source_inventory')!=inventory or _publication_readback(pub)!=readback:
         raise ValueError('legacy resource publication readback evidence changed')
+    try:
+        validation=admission['validation']
+        if (admission['exit_code']!=0 or validation['whole_member_union_exact'] is not True or
+            validation['all_chunks_live_rehydrated'] is not True or
+            validation['files']!=len(inventory) or validation['chunks']!=len(pub['chunks']) or
+            type(validation['payload_bytes']) is not int or validation['payload_bytes']<0 or
+            validation.get('corrupt_resource_copies_refused')!=5):
+            raise ValueError('independent resource recovery admission required')
+    except (KeyError,TypeError) as error:
+        raise ValueError('complete independent resource admission evidence required') from error
+    _validate_independent_audit_inputs(pub,inventory,readback,admission)
+    _validate_independent_audit_command(pub,admission)
+    _validate_legacy_resource_proof(pub,admission,['/experiment/resources/retention_audit.py'])
 
 
 def _validate_legacy_union(pub,expected,readback):
     try:
-        if (pub.get('manifest_readback_exact') is not True or _publication_readback(pub)!=readback or
+        if (pub.get('schema_version')!=1 or pub.get('manifest_readback_exact') is not True or _publication_readback(pub)!=readback or
             pub['source_inventory']!=expected or not expected):
             raise ValueError('exact external inventory and unchanged global readback required')
         prefix_key=_legacy_resource_blob_key(pub['hdfs_prefix'])
@@ -217,17 +247,16 @@ def _validate_legacy_union(pub,expected,readback):
                 _legacy_resource_blob_key(chunk['archive_hdfs_uri'])!=prefix_key+'/'+digest+'/archive.tar.gz' or
                 _legacy_resource_blob_key(chunk['manifest_hdfs_uri'])!=prefix_key+'/'+digest+'/manifest.json'):
                 raise ValueError('bounded exact resource archive identity required')
-            checks=chunk.get('checks')
-            if checks is not None:
-                if ([check['stage'] for check in checks]!=list(LEGACY_RESOURCE_CHECK_ORDER) or
-                    any(type(check['exit_code']) is not int or check['exit_code']!=0 for check in checks)):
-                    raise ValueError('all measured live and exact transfer gates required')
-                for index in (0,5,6):
-                    value=checks[index]['validation']
-                    if (value['exact_members_and_hashes'] is not True or value['archive_sha256']!=digest or
-                        value['members']!=len(members) or value['payload_bytes']!=size or
-                        index==6 and value.get('verified_rehydration') is not True):
-                        raise ValueError('complete live archive recovery required')
+            checks=chunk['checks']
+            if ([check['stage'] for check in checks]!=list(LEGACY_RESOURCE_CHECK_ORDER) or
+                any(type(check['exit_code']) is not int or check['exit_code']!=0 for check in checks)):
+                raise ValueError('all measured live and exact transfer gates required')
+            for index in (0,5,6):
+                value=checks[index]['validation']
+                if (value['exact_members_and_hashes'] is not True or value['archive_sha256']!=digest or
+                    value['members']!=len(members) or value['payload_bytes']!=size or
+                    index==6 and value.get('verified_rehydration') is not True):
+                    raise ValueError('complete live archive recovery required')
             for member in members:
                 name=safe_member_name(member['path'])
                 if (name in union or name not in expected or type(member['bytes']) is not int or member['bytes']<0 or
@@ -241,6 +270,309 @@ def _validate_legacy_union(pub,expected,readback):
         raise ValueError('complete independent resource recovery evidence required') from error
     return {'files':len(union),'chunks':len(pub['chunks']),'payload_bytes':payload,
             'whole_member_union_exact':True,'all_chunks_live_rehydrated':True}
+
+
+def _validate_legacy_live_references(pub):
+    try:
+        _validate_executed_archive_helper(pub)
+        _validate_executed_resource_sources(pub)
+        for chunk in pub['chunks']:
+            for index,mode in [(0,'create'),(5,'verify'),(6,'rehydrate')]:
+                check=chunk['checks'][index]
+                _validate_legacy_resource_proof(pub,check,['/experiment/resources/archive_worker.py',mode])
+                _validate_archive_snapshot(pub,chunk,check,mode)
+            for check in chunk['checks'][1:5]:
+                if sha(check['log_path'])!=check['log_sha256']:
+                    raise ValueError('HDFS transfer log changed')
+    except (KeyError,TypeError,OSError,AttributeError) as error:
+        raise ValueError('complete live resource reference evidence required') from error
+
+
+def _validate_archive_snapshot(pub,chunk,check,mode):
+    try:
+        inputs=Path(check['input_directory']);job=inputs/'job.json'
+        if not is_regular_file(job) or check['input_hashes']!={str(job):sha(job)}:
+            raise ValueError('exact retained archive job required')
+        required={'source_sha256':{m['path']:m['sha256'] for m in chunk['manifest']['members']},
+                  'max_bytes':LEGACY_RESOURCE_LIMIT,'archive_module_path':'/tmp/resource-archive.py',
+                  'archive_module_sha256':pub['archive_library']['sha256']}
+        if mode!='create':required['manifest_sha256']=chunk['manifest_sha256']
+        if json.loads(job.read_text())!=required:
+            raise ValueError('archive job differs from exact chunk contract')
+        mounts=read_receipt_mounts({'command':check['command']},include_digests=False,require_python_worker=True)
+        _require_legacy_mount(mounts,'/',pub['rootfs_path'],'read_only','bind')
+        _require_legacy_mount(mounts,'/experiment',pub['execution_directory'],'read_only','bind')
+        _require_legacy_mount(mounts,'/tmp/inputs',str(inputs),'read_only','bind')
+        _require_legacy_mount(mounts,'/tmp/resource-archive.py',pub['archive_library']['path'],'read_only','bind')
+        library=Path(pub['archive_library']['path'])
+        if not is_regular_file(library) or sha(library)!=pub['archive_library']['sha256']:
+            raise ValueError('archive library bytes changed')
+        for name in ['manifest_path','readback_path']:
+            path=Path(chunk[name])
+            if not is_regular_file(path) or sha(path)!=chunk['manifest_sha256'] or json.loads(path.read_text())!=chunk['manifest']:
+                raise ValueError('retained/downloaded manifest differs from admitted chunk')
+        artifacts=check['artifacts'];names={Path(p).name:p for p in artifacts}
+        if set(names)!={'check.json','live.log'} or len(artifacts)!=2:
+            raise ValueError('exact retained live archive outputs required')
+        for path,digest in artifacts.items():
+            if not is_regular_file(Path(path)) or sha(path)!=digest:
+                raise ValueError('retained archive live output changed')
+        if json.loads(Path(names['check.json']).read_text())!=check['validation']:
+            raise ValueError('declared archive result differs from actual live output')
+    except (KeyError,TypeError,OSError,AttributeError) as error:
+        raise ValueError('complete live archive input/output binding required') from error
+
+
+def _validate_legacy_resource_proof(pub,check,worker_argv):
+    try:
+        path=Path(check['resource_proof_path'])
+        if not is_regular_file(path) or sha(path)!=check['resource_proof_sha256']:
+            raise ValueError('live archive resource proof changed')
+        proof=json.loads(path.read_text())
+        if proof['worker_argv']!=worker_argv:
+            raise ValueError('wrong live archive worker')
+        pins=pub['resource_source_pins']
+        if _uses_snapshot_source_receipt(pins):
+            validate_proof(proof,check['command'],Path(pub['resource_source_directory']),pins,
+                           Path(proof['native_output_directory']),LEGACY_RESOURCE_CAP_BYTES,
+                           LEGACY_RESOURCE_TIMEOUT_SECONDS)
+        else:
+            _validate_legacy_proof_equivalent(proof,check['command'],pins,
+                                              LEGACY_RESOURCE_CAP_BYTES,
+                                              LEGACY_RESOURCE_TIMEOUT_SECONDS)
+    except (KeyError,TypeError,OSError,AttributeError) as error:
+        raise ValueError('complete live archive resource proof required') from error
+
+
+def _validate_legacy_proof_equivalent(proof,command,pins,cap_bytes,timeout):
+    try:
+        if (type(timeout) not in (int,float) or timeout<=0 or
+            type(cap_bytes) is not int or cap_bytes<=0 or
+            type(proof['schema_version']) is not int or proof['schema_version']!=1 or
+            proof['admitted'] is not True or proof['command']!=command or
+            proof['source_pins']!=pins or proof['cap_bytes']!=cap_bytes or
+            proof['timeout_seconds']!=timeout or
+            set(proof['artifacts'])!={'worker_resource','execution_log'}):
+            raise ValueError('complete exact resource stage identity required')
+        worker_path=Path(proof['artifacts']['worker_resource']['path']);worker_output=worker_path.parent
+        command_mounts=read_receipt_mounts({'command':command},include_digests=False,require_python_worker=True)
+        original_mounts=read_receipt_mounts({'command':proof['original_command']},include_digests=False,require_python_worker=True)
+        _require_legacy_mount(command_mounts,'/tmp/resource-output',str(worker_output),'writable','bind')
+        layer=command_mounts.get('/tmp/resource-layer')
+        if not isinstance(layer,dict) or layer.get('mode')!='read_only' or layer.get('kind')!='bind':
+            raise ValueError('actual wrapper, original worker, native output and resource mounts required')
+        _validate_resource_layer_sources(Path(layer['host_path']),pins)
+        output_mount=command_mounts.get('/outputs')
+        if (output_mount!=original_mounts.get('/outputs') or output_mount!={'inside_path':'/outputs','mode':'writable',
+            'kind':'bind','role':'output','host_path':proof['native_output_directory']}):
+            raise ValueError('actual wrapper, original worker, native output and resource mounts required')
+        _,argv,options=inspect_command(command)
+        _,original_argv,original_options=inspect_command(proof['original_command'])
+        if (len(argv)<4 or argv[1] not in {'/tmp/resource-layer/execute_worker.py','/tmp/resource-layer/resources/execute_worker.py'} or
+            argv[2]!='/tmp/resource-output' or argv[3:]!=proof['worker_argv'] or
+            original_argv[:1]!=argv[:1] or original_argv[1:]!=proof['worker_argv']):
+            raise ValueError('actual wrapper, original worker, native output and resource mounts required')
+        if _without_wrapper_options(options,layer['host_path'],str(worker_output))!=original_options:
+            raise ValueError('actual wrapper, original worker, native output and resource mounts required')
+        for artifact in proof['artifacts'].values():
+            path=Path(artifact['path'])
+            if not is_regular_file(path) or sha(path)!=artifact['sha256']:
+                raise ValueError('actual resource artifact changed')
+        if json.loads(worker_path.read_text())!=proof['worker_measurement']:
+            raise ValueError('worker measurement differs from executed output')
+        native_log=Path(proof['artifacts']['execution_log']['native_path'])
+        if native_log.exists() and (not is_regular_file(native_log) or sha(native_log)!=proof['artifacts']['execution_log']['sha256']):
+            raise ValueError('native execution log differs from retained resource snapshot')
+        admitted=admit_worker(proof['host_measurement'],proof['worker_measurement'],command,proof['worker_argv'],cap_bytes)
+        if proof['resource_admission']!=admitted:
+            raise ValueError('stored resource admission differs from actual measurements')
+        if proof['host_measurement']['elapsed_seconds']>timeout or proof['worker_measurement']['elapsed_seconds']>timeout:
+            raise ValueError('actual stage elapsed resource bound exceeded')
+    except (KeyError,TypeError,IndexError,OSError,AttributeError) as error:
+        raise ValueError('complete resource stage proof required') from error
+
+
+def _without_wrapper_options(options,layer,worker_output):
+    removed_layer=False;removed_output=False;kept=[]
+    for option,values in options:
+        if option==_LEGACY_RO_BIND and values==(layer,'/tmp/resource-layer') and not removed_layer:
+            removed_layer=True;continue
+        if option==_LEGACY_BIND and values==(worker_output,'/tmp/resource-output') and not removed_output:
+            removed_output=True;continue
+        kept.append((option,values))
+    if not (removed_layer and removed_output):
+        raise ValueError('actual wrapper, original worker, native output and resource mounts required')
+    return kept
+
+
+def _validate_independent_audit_inputs(pub,inventory,readback,admission):
+    try:
+        inputs=Path(admission['input_directory'])
+        expected_hashes={str(path):sha(path) for path in sorted(inputs.iterdir())}
+        if admission['input_hashes']!=expected_hashes:
+            raise ValueError('independent audit input hashes changed')
+        publication=inputs/'publication.json';expected=inputs/'expected.json';readback_path=inputs/'readback.json'
+        if (json.loads(publication.read_text())!=_without_independent(pub) or
+            json.loads(expected.read_text())!=inventory or json.loads(readback_path.read_text())!=readback):
+            raise ValueError('independent audit input artifacts changed')
+        artifacts=admission['artifacts'];names={Path(p).name:p for p in artifacts}
+        if set(names)!={'check.json','live.log'} or len(artifacts)!=2:
+            raise ValueError('exact retained independent audit outputs required')
+        for path,digest in artifacts.items():
+            if not is_regular_file(Path(path)) or sha(path)!=digest:
+                raise ValueError('retained independent audit output changed')
+        if json.loads(Path(names['check.json']).read_text())!=admission['validation']:
+            raise ValueError('declared independent audit result differs from actual output')
+    except (KeyError,TypeError,OSError,AttributeError) as error:
+        raise ValueError('complete independent audit input/output evidence required') from error
+
+
+def _validate_independent_audit_command(pub,admission):
+    try:
+        command=admission['command'];_,argv,options=inspect_command(command)
+        if argv not in (['python','/tmp/resource-layer/execute_worker.py','/tmp/resource-output','/experiment/resources/retention_audit.py'],
+                        ['python','/tmp/resource-layer/resources/execute_worker.py','/tmp/resource-output','/experiment/resources/retention_audit.py']):
+            raise ValueError('independent audit worker command changed')
+        rootfs_options=_legacy_binding_options(pub['audit_runtime_namespace']['readonly_entry_bindings'])
+        if options[:2+len(rootfs_options)]!=[(_LEGACY_UNSHARE,()),(_LEGACY_DIE,()),*rootfs_options]:
+            raise ValueError('independent audit rootfs mount order changed')
+        _validate_rootfs_entry_bindings(pub,rootfs_options)
+        mounts=read_receipt_mounts({'command':command},include_digests=False,require_cleared_environment=True,require_python_worker=True)
+        _require_legacy_mount(mounts,'/experiment',pub['execution_directory'],'read_only','bind')
+        _require_legacy_mount(mounts,'/source',_source_mount_from_audit_command(options),'read_only','bind')
+        _require_legacy_mount(mounts,'/outputs',_outputs_mount_from_audit_command(options),'writable','bind')
+        _require_legacy_mount(mounts,'/tmp/inputs',admission['input_directory'],'read_only','bind')
+        _require_legacy_mount(mounts,'/tmp/resource-archive.py',pub['archive_library']['path'],'read_only','bind')
+        _require_legacy_mount(mounts,'/tmp/resource-output',str(Path(admission['resource_proof_path']).parent/'worker'),'writable','bind')
+        _validate_audit_protected_mounts(pub,admission,options)
+    except (KeyError,TypeError,OSError,AttributeError,ValueError) as error:
+        raise ValueError('complete independent audit command binding required') from error
+
+
+def _legacy_binding_options(bindings):
+    if not isinstance(bindings,list) or len(bindings)%3:
+        raise ValueError('complete rootfs entry bindings required')
+    result=[]
+    for index in range(0,len(bindings),3):
+        option,source,target=bindings[index:index+3]
+        if option!=_LEGACY_RO_BIND or not isinstance(source,str) or not isinstance(target,str):
+            raise ValueError('complete rootfs entry bindings required')
+        result.append((option,(source,target)))
+    return result
+
+
+def _validate_rootfs_entry_bindings(pub,options):
+    root=Path(pub['rootfs_path'])
+    masked={'/'+name for name in pub['audit_runtime_namespace'].get('masked_role_entries',[])}
+    seen=set()
+    for option,(source,target) in options:
+        name=target.removeprefix('/')
+        if (option!=_LEGACY_RO_BIND or not target.startswith('/') or '/' in name or
+            target in masked or target in seen or Path(source)!=root/name):
+            raise ValueError('independent audit rootfs entry binding changed')
+        seen.add(target)
+    entry_types=pub['audit_runtime_namespace'].get('source_entry_types',{})
+    if isinstance(entry_types,dict):
+        expected={'/'+name for name in entry_types if '/'+name not in masked}
+        if expected and seen!=expected:
+            raise ValueError('independent audit rootfs entry binding changed')
+
+
+def _validate_audit_protected_mounts(pub,admission,options):
+    try:
+        marker=options.index((_LEGACY_TMPFS,('/data02',)))
+    except ValueError as error:
+        raise ValueError('independent audit protected tmpfs root required') from error
+    protected=[]
+    for option,values in options[marker+1:]:
+        if option==_LEGACY_RO_BIND and len(values)==2 and values[0]==values[1]:
+            protected.append(values[0])
+        elif option==_LEGACY_RO_BIND and len(values)==2 and values[1]=='/tmp/resource-layer':
+            break
+    publication_root=str(Path(admission['input_directory']).parent)
+    if (len(set(protected))!=len(protected) or publication_root not in protected or
+        pub['resource_source_directory'] not in protected or len(protected)<3):
+        raise ValueError('independent audit protected descendants changed')
+
+
+def _source_mount_from_audit_command(options):
+    for option,values in options:
+        if option==_LEGACY_RO_BIND and values[-1]=='/source':
+            return values[0]
+    raise ValueError('independent audit source mount required')
+
+
+def _outputs_mount_from_audit_command(options):
+    for option,values in options:
+        if option==_LEGACY_BIND and values[-1]=='/outputs':
+            return values[0]
+    raise ValueError('independent audit output mount required')
+
+
+def _require_legacy_mount(mounts,inside,host,mode,kind):
+    mount=mounts.get(inside)
+    if not isinstance(mount,dict) or mount.get('host_path')!=host or mount.get('mode')!=mode or mount.get('kind')!=kind:
+        raise ValueError('actual archive input/library/runtime/code mount differs')
+
+
+def _validate_executed_archive_helper(pub):
+    library=Path(pub['archive_library']['path'])
+    if not is_regular_file(library) or sha(library)!=pub['archive_library']['sha256']:
+        raise ValueError('archive library bytes changed')
+    if not any(is_regular_file(path) and sha(path)==pub['archive_library']['sha256'] for path in _archive_helper_candidates(pub)):
+        raise ValueError('executed archive helper differs from native pinned library')
+
+
+def _archive_helper_candidates(pub):
+    execution=Path(pub['execution_directory']);library=Path(pub['archive_library']['path'])
+    candidates=[execution/'resources/resource_archive.py']
+    parts=library.parts
+    for length in range(1,min(4,len(parts))+1):
+        candidates.append(execution.joinpath(*parts[-length:]))
+    result=[]
+    for path in candidates:
+        if path not in result:result.append(path)
+    return result
+
+
+def _validate_executed_resource_sources(pub):
+    execution=Path(pub['execution_directory'])
+    for name,digest in _legacy_source_pin_items(pub['resource_source_pins']):
+        if not any(is_regular_file(path) and sha(path)==digest for path in _source_pin_candidates(execution,name)):
+            raise ValueError('executed resource helper source changed')
+
+
+def _validate_resource_layer_sources(root,pins):
+    for name,digest in _legacy_source_pin_items(pins):
+        if not any(is_regular_file(path) and sha(path)==digest for path in _source_pin_candidates(root,name)):
+            raise ValueError('executed resource helper source changed')
+
+
+def _uses_snapshot_source_receipt(pins):
+    return isinstance(pins,dict) and isinstance(pins.get('source_pins'),dict)
+
+
+def _legacy_source_pin_items(pins):
+    if _uses_snapshot_source_receipt(pins):
+        return sorted((name,digest) for name,digest in pins['source_pins'].items())
+    if not isinstance(pins,dict):
+        raise ValueError('complete admitted resource source pins required')
+    result=[]
+    for name,entry in sorted(pins.items()):
+        if isinstance(entry,dict) and isinstance(entry.get('sha256'),str):
+            result.append((name,entry['sha256']))
+        else:
+            raise ValueError('complete admitted resource source pins required')
+    if not result:
+        raise ValueError('complete admitted resource source pins required')
+    return result
+
+
+def _source_pin_candidates(root,name):
+    root=Path(root);safe=safe_member_name(name);candidates=[package_member_path(root,safe)]
+    if '/' not in safe:
+        candidates.extend([root/'resources'/safe,root/'autonomy/resources'/safe])
+    return candidates
 
 
 def _legacy_resource_blob_key(value):
@@ -281,25 +613,34 @@ def validate_publication_receipt(backend,record,receipt,expected_inventory=None)
             raise ValueError('resource publication exact readback evidence changed')
         readback=json.loads(readback_path.read_text())
         result=_validate_legacy_union(pub,pub['source_inventory'],readback)
+        _validate_legacy_live_references(pub)
         admission=pub['independent_admission']
         _validate_independent_admission(pub,pub['source_inventory'],readback)
         if (admission['exit_code']!=0 or admission['validation']['whole_member_union_exact'] is not True or
             result['whole_member_union_exact'] is not True):
             raise ValueError('independent resource recovery admission required')
         inventory=pub['source_inventory']
-        required={'identity.json':backend.resource_identity_sha256,
-                  'checkpoint.json':record['resource_companion_sha256'],
-                  'native-final.json':record['final_sha256'],
-                  'producer-report.json':record['report_sha256'],
-                  'native-manifest.json':backend.manifest_sha}
-        for name,digest in required.items():
-            if inventory.get(name,{}).get('sha256')!=digest:
-                raise ValueError('resource publication retained wrong checkpoint identity')
+        _validate_current_checkpoint_inventory_shape(backend,record,inventory,expected_inventory)
         if expected_inventory is not None and (inventory!=expected_inventory or _stable_digest(inventory)!=_stable_digest(expected_inventory)):
             raise ValueError('resource publication inventory differs from live companion closure')
     except (KeyError,TypeError,OSError,AttributeError) as error:
         raise ValueError('complete resource publication receipt required') from error
     return pub
+
+
+def _validate_current_checkpoint_inventory_shape(backend,record,inventory,expected_inventory):
+    required={'identity.json':backend.resource_identity_sha256,
+              'checkpoint.json':record.get('resource_companion_sha256'),
+              'native-final.json':record.get('final_sha256'),
+              'producer-report.json':record.get('report_sha256'),
+              'native-manifest.json':backend.manifest_sha}
+    present=set(required)&set(inventory)
+    if present or expected_inventory is not None:
+        if present!=set(required):
+            raise ValueError('resource publication retained wrong checkpoint identity')
+        for name,digest in required.items():
+            if not isinstance(digest,str) or inventory.get(name,{}).get('sha256')!=digest:
+                raise ValueError('resource publication retained wrong checkpoint identity')
 
 
 def write_publication_record(backend,record,receipt,expected_inventory):
