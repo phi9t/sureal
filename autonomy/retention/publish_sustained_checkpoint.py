@@ -66,13 +66,14 @@ def publish_checkpoint(args):
     publication_root = args.cache_root / "insula" / ("hdfs-retention-" + run_id + "-" + uuid.uuid4().hex)
     publication_root.mkdir(parents=True)
     descriptor = _store_descriptor(args.store_descriptor)
-    store = BlobStore(blob_adapter_from_descriptor(descriptor), backoff_seconds=())
+    store = BlobStore(blob_adapter_from_descriptor(descriptor))
     tool_digest = _tool_digest(args.tool_digest, store)
     spec_inventory = _publication_inventory(payload, inventory)
     spec = sustained_checkpoint_spec(
         payload=spec_inventory,
         run_id=run_id,
         kind="checkpoint",
+        release=args.release,
         store=store,
         store_descriptor=descriptor,
         tool_digest=tool_digest,

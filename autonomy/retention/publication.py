@@ -106,6 +106,7 @@ def sustained_checkpoint_spec(
     payload,
     run_id,
     kind,
+    release,
     store,
     store_descriptor,
     tool_digest,
@@ -113,7 +114,7 @@ def sustained_checkpoint_spec(
     reserve,
     chunk_size_bytes=DEFAULT_CHUNK_SIZE_BYTES,
 ):
-    """Build the release-enabled sustained-checkpoint publication spec."""
+    """Build a caller-controlled sustained-checkpoint publication spec."""
 
     return PublicationSpec(
         payload=payload,
@@ -124,7 +125,7 @@ def sustained_checkpoint_spec(
         kind=kind,
         staging_style="copy",
         mode="archive",
-        release=True,
+        release=release,
         store=store,
         store_descriptor=dict(store_descriptor),
         tool_digest=dict(tool_digest),

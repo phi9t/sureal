@@ -76,6 +76,64 @@ class PublishSustainedCheckpointTests(unittest.TestCase):
         )
         return work, payload, final
 
+    def test_subprocess_entrypoint_without_release_keeps_payload_files(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            work, payload, final = self.fixture(root)
+            payload_files = sorted(path for path in payload.rglob("*") if path.is_file())
+            self.assertTrue(payload_files)
+            cache = root / "cache"
+            (cache / "insula").mkdir(parents=True)
+            blob_root = root / "blob-store"
+            lock_path = root / "architecture-experiments.lock"
+            command = [
+                sys.executable,
+                "-m",
+                "retention.publish_sustained_checkpoint",
+                "--receipt",
+                str(final),
+                "--receipt-sha256",
+                sha(final),
+                "--lock-path",
+                str(lock_path),
+                "--lock-fd",
+                "{fd}",
+                "--cache-root",
+                str(cache),
+                "--work-root",
+                str(work),
+                "--store-descriptor",
+                json.dumps({"kind": "local", "root": str(blob_root)}),
+                "--tool-digest",
+                json.dumps({"waystone-cli": "a" * 64}),
+            ]
+            env = {**os.environ, "PYTHONPATH": str(Path(__file__).resolve().parents[1])}
+            with acquire_experiment_lock(lock_path) as held:
+                command[command.index("{fd}")] = str(held.fileno())
+                result = subprocess.run(
+                    command,
+                    cwd=Path(__file__).resolve().parents[1],
+                    env=env,
+                    text=True,
+                    capture_output=True,
+                    pass_fds=(held.fileno(),),
+                    timeout=30,
+                )
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                with lock_path.open("a") as other:
+                    with self.assertRaises(BlockingIOError):
+                        fcntl.flock(other, fcntl.LOCK_EX | fcntl.LOCK_NB)
+
+            publications = list((cache / "insula").glob("hdfs-retention-*"))
+            self.assertEqual(len(publications), 1)
+            publication_path = publications[0] / "verified-publication.json"
+            release_path = publications[0] / "release-completed.json"
+            publication = json.loads(publication_path.read_text())
+            self.assertFalse(release_path.exists())
+            self.assertEqual(publication["store_descriptor"], {"kind": "local", "root": str(blob_root)})
+            self.assertEqual(publication["blobs"]["manifest"]["key"], "checkpoints/perception-sustained-checkpoints/balanced16-sustained-baseline-run1-step1000/checkpoint/manifest.json")
+            self.assertTrue(all(path.is_file() for path in payload_files))
+
     def test_subprocess_entrypoint_uses_lock_fd_and_local_blob_publication(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
