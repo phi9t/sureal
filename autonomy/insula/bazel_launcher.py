@@ -11,21 +11,29 @@ _THIS_FILE = Path(__file__).resolve()
 AUTONOMY = _THIS_FILE.parents[1]
 REPO = AUTONOMY.parent
 AUTONOMY_CACHE = Path.home() / ".cache/waystone/waymo-perception"
-DEFAULT_ROOTFS = AUTONOMY_CACHE / "insula/rootfs-v5-t29-20261008T230657Z"
-GPU_ROOTFS = AUTONOMY_CACHE / "gpu-rootfs-v6"
-CURRICULUM_ROOTFS = Path.home() / ".cache/waystone/3d-pathway/insula/rootfs-v2"
 DEFAULT_CACHE = REPO / ".bazel-cache"
 BAZEL_VERSION = "9.2.0"
-GPU_DEVICES = ("/dev/nvidia1", "/dev/nvidiactl", "/dev/nvidia-uvm")
-GPU_DRIVER_PREFIXES = (
-    "libcuda.so",
-    "libnvidia-ptxjitcompiler.so",
-    "libnvidia-nvvm.so",
-)
-DEFAULT_GPU_DRIVER_LIBRARY_DIRS = (Path("/usr/lib/x86_64-linux-gnu"),)
 ORIGINAL_CWD_FLAG = "--__sureal-bazelw-original-cwd"
-from insula.runtime_identity import rootfs_identity
-from insula.sandbox_plan import compose_bwrap_plan
+LIVE_GATE_CACHE_MOUNT = "/tmp/sureal-waymo-cache"
+LIVE_GATE_BWRAP = "/tmp/live-gate-bwrap"
+from insula.launch_plan import (
+    Mount,
+    _assemble_plan,
+    load_runtime_lock,
+    plan_data,
+    render_plan,
+)
+from insula.runtime_roots import (
+    current_cpu_rootfs,
+    current_curriculum_rootfs,
+    current_gpu_rootfs,
+    default_lock,
+)
+
+
+DEFAULT_ROOTFS = current_cpu_rootfs()
+GPU_ROOTFS = current_gpu_rootfs()
+CURRICULUM_ROOTFS = current_curriculum_rootfs()
 
 
 def restore_original_cwd(argv):
@@ -37,10 +45,6 @@ def restore_original_cwd(argv):
         os.chdir(argv[1])
         argv = argv[2:]
     return argv
-
-
-def default_lock(rootfs):
-    return Path(str(rootfs) + ".lock.json")
 
 
 def _is_parallax_target(argument):
@@ -73,6 +77,16 @@ def uses_gpu_config(arguments):
     return any(argument == "--config=cuda" for argument in arguments)
 
 
+def uses_live_gate_filter(arguments):
+    for argument in arguments:
+        if not argument.startswith("--test_tag_filters="):
+            continue
+        filters = argument.split("=", 1)[1].split(",")
+        if "requires_live_gate" in filters:
+            return True
+    return False
+
+
 def output_base_for(rootfs, arguments):
     if uses_gpu_config(arguments) or rootfs.resolve() == GPU_ROOTFS.resolve():
         return "/tmp/bazel-cache/output-base-gpu"
@@ -81,36 +95,17 @@ def output_base_for(rootfs, arguments):
     return "/tmp/bazel-cache/output-base"
 
 
-def read_lock(path):
-    try:
-        lock = json.loads(path.read_text())
-    except FileNotFoundError as exc:
-        raise ValueError(f"rootfs lock not found: {path}") from exc
-    if lock.get("schema_version") != 1:
-        raise ValueError("invalid rootfs lock schema")
-    return lock
-
-
-def verify_rootfs(rootfs, lock):
-    if lock.get("bazel_version") != BAZEL_VERSION:
-        raise ValueError(
-            f"rootfs lock records Bazel {lock.get('bazel_version')!r}, expected {BAZEL_VERSION}"
-        )
-    expected = lock.get("rootfs_sha256")
-    if not expected:
-        raise ValueError("rootfs lock is missing rootfs_sha256")
-    actual = rootfs_identity(rootfs)
-    if actual != expected:
-        raise ValueError(
-            f"rootfs content does not match rootfs lock: expected {expected}, found {actual}"
-        )
-
-
-def bazel_command(arguments, output_base, update_lock=False):
+def bazel_command(arguments, output_base, update_lock=False, test_environment=None):
     if not arguments:
         arguments = ["help"]
     command, *rest = arguments
     lockfile_mode = "update" if update_lock else "error"
+    test_environment = test_environment or {}
+    test_environment_flags = (
+        [f"--test_env={name}={value}" for name, value in sorted(test_environment.items())]
+        if command == "test"
+        else []
+    )
     return [
         "bazel",
         f"--output_base={output_base}",
@@ -119,6 +114,7 @@ def bazel_command(arguments, output_base, update_lock=False):
         f"--lockfile_mode={lockfile_mode}",
         "--repository_cache=/tmp/bazel-cache/repository-cache",
         "--disk_cache=/tmp/bazel-cache/disk-cache",
+        *test_environment_flags,
         *rest,
     ]
 
@@ -136,90 +132,59 @@ def repo_workspace_mounts(update_lock=False):
     return mounts
 
 
-def gpu_device_mounts():
-    configured = os.environ.get("SUREAL_BAZEL_GPU_DEVICES")
-    if configured:
-        pairs = []
-        for item in configured.split(","):
-            if not item:
-                continue
-            if "=" in item:
-                host, guest = item.split("=", 1)
-            else:
-                host = guest = item
-            pairs.append((Path(host), guest))
-    else:
-        pairs = [(Path(device), device) for device in GPU_DEVICES]
-    mounts = []
-    for host, guest in pairs:
-        if not host.exists():
-            raise ValueError(f"GPU device not found: {host}")
-        mounts.append(["--dev-bind", str(host), guest])
-    return mounts
-
-
-def gpu_driver_library_dirs():
-    configured = os.environ.get("SUREAL_BAZEL_GPU_DRIVER_LIBRARY_DIRS")
-    if not configured:
-        return DEFAULT_GPU_DRIVER_LIBRARY_DIRS
-    return tuple(Path(item) for item in configured.split(os.pathsep) if item)
-
-
-def gpu_driver_mounts():
-    mounts = []
-    directories = gpu_driver_library_dirs()
-    for prefix in GPU_DRIVER_PREFIXES:
-        found = []
-        for directory in directories:
-            found.extend(sorted(path for path in directory.glob(prefix + "*") if path.is_file()))
-        if not found:
-            searched = ", ".join(str(directory) for directory in directories)
-            raise ValueError(f"GPU driver library {prefix} not found in {searched}")
-        for path in found:
-            mounts.append(["--ro-bind", str(path.resolve()), "/driver/" + path.name])
-    return mounts
-
-
-def gpu_environment():
-    return [
-        ["--setenv", "PATH", "/opt/waymo/bin:/usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin"],
-        ["--setenv", "LD_LIBRARY_PATH", "/driver:/usr/local/cuda/lib64"],
-        ["--setenv", "CUDA_VISIBLE_DEVICES", "0"],
-    ]
-
-
-def sandbox_plan(rootfs, cache, arguments, update_lock=False):
-    rootfs = rootfs.resolve()
+def sandbox_plan(runtime, cache, arguments, update_lock=False):
+    rootfs = runtime.rootfs
     cache = cache.resolve()
     gpu = uses_gpu_config(arguments) or rootfs == GPU_ROOTFS.resolve()
     mounts = [
-        ["--ro-bind", str(rootfs), "/"],
-        ["--ro-bind", "/etc/resolv.conf", "/etc/resolv.conf"],
-        *repo_workspace_mounts(update_lock),
-        ["--tmpfs", "/outputs"],
-        ["--tmpfs", "/tmp"],
-        ["--bind", str(cache), "/tmp/bazel-cache"],
+        Mount("runtime", "bind", "/", "read_only", rootfs),
+        Mount("resolver", "bind", "/etc/resolv.conf", "read_only", Path("/etc/resolv.conf")),
+        *[_mount_from_argv("workspace", mount) for mount in repo_workspace_mounts(update_lock)],
+        Mount("outputs", "tmpfs", "/outputs", "writable"),
+        Mount("tmp", "tmpfs", "/tmp", "writable"),
+        Mount("bazel-cache", "bind", "/tmp/bazel-cache", "writable", cache),
     ]
-    pre_dev_mounts = []
-    post_dev_mounts = []
+    test_environment = {}
+    if uses_live_gate_filter(arguments):
+        mounts.append(Mount("waymo-cache", "bind", LIVE_GATE_CACHE_MOUNT, "read_only", AUTONOMY_CACHE))
+        mounts.append(Mount("live-gate-bwrap", "bind", LIVE_GATE_BWRAP, "read_only", Path("/usr/bin/bwrap")))
+        live_root = LIVE_GATE_CACHE_MOUNT + "/insula/" + current_cpu_rootfs().name
+        test_environment = {
+            "SUREAL_LIVE_GATE_BWRAP": LIVE_GATE_BWRAP,
+            "WAYMO_INSULA_ROOT": live_root,
+            "WAYMO_INSULA_LOCK": live_root + ".lock.json",
+        }
     environment = [
-        ["--setenv", "HOME", "/tmp/bazel-cache/home"],
-        ["--setenv", "USER", "sureal"],
-        ["--setenv", "LOGNAME", "sureal"],
-        ["--setenv", "PATH", "/usr/local/bin:/usr/bin:/bin"],
-        ["--setenv", "TMPDIR", "/tmp"],
-        ["--setenv", "PYTHONNOUSERSITE", "1"],
-        ["--setenv", "PYTHONDONTWRITEBYTECODE", "1"],
+        ("--setenv", "HOME", "/tmp/bazel-cache/home"),
+        ("--setenv", "USER", "sureal"),
+        ("--setenv", "LOGNAME", "sureal"),
+        ("--setenv", "PATH", "/usr/local/bin:/usr/bin:/bin"),
+        ("--setenv", "TMPDIR", "/tmp"),
+        ("--setenv", "PYTHONNOUSERSITE", "1"),
+        ("--setenv", "PYTHONDONTWRITEBYTECODE", "1"),
     ]
     if gpu:
-        pre_dev_mounts.extend([["--tmpfs", "/driver"], *gpu_driver_mounts()])
-        post_dev_mounts.extend(gpu_device_mounts())
-        environment = [
-            item for item in environment if not (item[0] == "--setenv" and item[1] == "PATH")
-        ]
-        environment.extend(gpu_environment())
-    bazel = bazel_command(arguments, output_base_for(rootfs, arguments), update_lock)
-    plan = compose_bwrap_plan(
+        mounts.extend(_bazel_gpu_mounts(gpu_index=1))
+        environment = [item for item in environment if not (item[0] == "--setenv" and item[1] == "PATH")]
+        environment.extend(
+            [
+                ("--setenv", "PATH", "/opt/waymo/bin:/usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin"),
+                ("--setenv", "LD_LIBRARY_PATH", "/driver:/usr/local/cuda/lib64"),
+                ("--setenv", "CUDA_VISIBLE_DEVICES", "0"),
+            ]
+        )
+    bazel = bazel_command(
+        arguments,
+        output_base_for(rootfs, arguments),
+        update_lock,
+        test_environment=test_environment,
+    )
+    plan = _assemble_plan(
+        runtime,
+        mounts=mounts,
+        environment=environment,
+        command=bazel,
+        working_directory="/experiment",
         unshare_flags=[
             "--unshare-user",
             "--unshare-pid",
@@ -227,19 +192,46 @@ def sandbox_plan(rootfs, cache, arguments, update_lock=False):
             "--unshare-uts",
             "--die-with-parent",
         ],
-        mounts_before_devices=[*mounts, *pre_dev_mounts],
-        mounts_after_devices=post_dev_mounts,
-        environment=environment,
-        chdir="/experiment",
-        command=bazel,
     )
+    data = plan_data(plan)
     return {
-        "argv": plan.argv,
+        "argv": render_plan(plan),
         "bazel": bazel,
-        "environment": plan.environment,
-        "mounts": plan.mounts,
+        "environment": data["environment"],
+        "mounts": [_mount_to_argv(mount) for mount in data["mounts"]],
         "update_lock": update_lock,
     }
+
+
+def _mount_from_argv(role_prefix, mount):
+    if len(mount) == 2 and mount[0] == "--tmpfs":
+        return Mount(f"{role_prefix}:{mount[1]}", "tmpfs", mount[1], "writable")
+    flag, host, inside = mount
+    kind = "dev-bind" if flag == "--dev-bind" else "bind"
+    mode = "writable" if flag == "--bind" else "read_only"
+    return Mount(f"{role_prefix}:{inside}", kind, inside, mode, Path(host))
+
+
+def _mount_to_argv(mount):
+    if mount["kind"] == "tmpfs":
+        return ["--tmpfs", mount["inside_path"]]
+    flag = "--dev-bind" if mount["kind"] == "dev-bind" else "--bind" if mount["mode"] == "writable" else "--ro-bind"
+    return [flag, mount["host_path"], mount["inside_path"]]
+
+
+def _bazel_gpu_mounts(gpu_index):
+    from insula.launch_plan import _gpu_device_pairs, _gpu_driver_paths
+
+    mounts = [Mount("gpu-driver-root", "tmpfs", "/driver", "writable")]
+    mounts.extend(
+        Mount(f"gpu-driver:{path.name}", "bind", "/driver/" + path.name, "read_only", path)
+        for path in _gpu_driver_paths()
+    )
+    mounts.extend(
+        Mount(f"gpu-device:{guest}", "dev-bind", guest, "writable", host, "after_devices")
+        for host, guest in _gpu_device_pairs(gpu_index)
+    )
+    return mounts
 
 
 def parse(argv):
@@ -278,12 +270,11 @@ def main(argv=None):
     argv = restore_original_cwd(argv)
     args = parse(argv)
     try:
-        lock = read_lock(args.lock)
-        verify_rootfs(args.rootfs, lock)
+        runtime = load_runtime_lock(args.rootfs, args.lock)
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         return 1
-    plan = sandbox_plan(args.rootfs, args.cache, args.bazel_args, args.update_lock)
+    plan = sandbox_plan(runtime, args.cache, args.bazel_args, args.update_lock)
     plan["rootfs"] = str(args.rootfs.resolve())
     plan["lock"] = str(args.lock.resolve())
     plan["cache"] = str(args.cache.resolve())

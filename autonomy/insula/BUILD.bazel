@@ -96,7 +96,11 @@ filegroup(
         deps = [":insula"],
         legacy_create_init = 0,
         size = "small",
-        tags = ["perception_unit"] + (["requires_live_gate"] if test == "m0_receipt_test.py" else []),
+        tags = ["perception_unit"] + (
+            ["requires_live_gate"]
+            if test in ["m0_receipt_test.py", "launch_plan_live_test.py"]
+            else []
+        ),
     )
     for test in TEST_MODULES
 ]

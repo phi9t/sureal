@@ -4,6 +4,7 @@ from pathlib import Path
 P=Path(__file__).resolve().parents[1]
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
+from insula.runtime_roots import current_cpu_rootfs, current_gpu_rootfs, current_metrics_rootfs
 from resources.scientific_payload import sha,unique_payload_bytes
 from resources.scientific_budget import reserve_write
 from detection.sustained_contract import validate_contract
@@ -16,7 +17,7 @@ from training_execution.sustained_controller_sources import freeze_host_sources,
 from retention.checkpoint_retention_sources import freeze_host_sources as freeze_checkpoint_publisher_sources,validate_host_sources as validate_checkpoint_publisher_sources
 from evidence.source_snapshot import source_snapshot_package_root
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing'
-GPU_ROOT=C/'gpu-rootfs-v6';CPU_ROOT=C/'insula/rootfs-v5-t29-20261008T230657Z';METRICS_ROOT=C/'metrics-rootfs'
+GPU_ROOT=current_gpu_rootfs(C);CPU_ROOT=current_cpu_rootfs(C);METRICS_ROOT=current_metrics_rootfs(C)
 WORKER_ENTRIES={
  'train_sustained.py':'/experiment/training_execution/train_sustained.py',
  'audit_sustained_loss.py':'/experiment/training_execution/audit_sustained_loss.py',

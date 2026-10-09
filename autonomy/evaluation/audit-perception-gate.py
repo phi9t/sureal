@@ -8,6 +8,7 @@ HERE=Path(__file__).resolve().parents[1]
 from evidence.source_snapshot import file_sha256 as sha
 from insula.runtime_identity import verify_rootfs
 from insula.entry import launch_plan
+from insula.runtime_roots import current_metrics_rootfs
 
 def main():
     cache=Path.home()/'.cache/waystone/waymo-perception';out=Path(sys.argv[1]).resolve();out.mkdir(parents=True,exist_ok=False)
@@ -26,7 +27,7 @@ def main():
             checker={'real-camera-source-check-a':'camera/validate-real-camera-source.py','real-box-source-check-a':'evaluation/validate-real-box-source.py'}[name]
             assert sha(HERE/checker)==record['checker_sha256']
         receipts[name]={'receipt_sha256':sha(folder/'receipt.json'),'path':str(folder/'receipt.json')}
-    cpu=cache/'insula/rootfs-v2';metrics=cache/'metrics-rootfs'
+    cpu=cache/'insula/rootfs-v2';metrics=current_metrics_rootfs(cache)
     cpulock=json.loads(Path(str(cpu)+'.lock.json').read_text());metriclock=json.loads(Path(str(metrics)+'.lock.json').read_text())
     verify_rootfs(cpu,cpulock['rootfs_sha256']);verify_rootfs(metrics,metriclock['rootfs_sha256'])
     contracts=json.loads((HERE/'evaluation/contracts.json').read_text());source=cache/'metrics-source/src/waymo_open_dataset'

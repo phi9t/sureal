@@ -2,6 +2,7 @@ import copy,hashlib,json,os,shutil,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch
 from evidence.source_snapshot import LocalSnapshotStore,archive_sources
+from insula.runtime_roots import CURRENT_CPU_ROOTFS_NAME, CURRENT_GPU_ROOTFS_NAME
 from training_execution import admit_sustained, sustained_controller_backend
 from training_execution.sustained_controller_backend import NativeBackend,sha
 from training_execution.sustained_controller_sources import REQUIRED as HOST_REQUIRED,freeze_host_sources
@@ -10,14 +11,14 @@ from retention.checkpoint_retention_sources import freeze_host_sources as freeze
 from training_execution.sustained_sources import REQUIRED as PACKAGE_REQUIRED,SNAPSHOT_TARGET
 class ControllerGuardTests(unittest.TestCase):
  def test_live_admission_uses_current_locked_runtime_roots(self):
-  self.assertEqual(sustained_controller_backend.GPU_ROOT.name,'gpu-rootfs-v6')
-  self.assertEqual(sustained_controller_backend.CPU_ROOT.name,'rootfs-v5-t29-20261008T230657Z')
-  self.assertEqual(admit_sustained.GPU_ROOT.name,'gpu-rootfs-v6')
-  self.assertEqual(admit_sustained.CPU_ROOT.name,'rootfs-v5-t29-20261008T230657Z')
+  self.assertEqual(sustained_controller_backend.GPU_ROOT.name,CURRENT_GPU_ROOTFS_NAME)
+  self.assertEqual(sustained_controller_backend.CPU_ROOT.name,CURRENT_CPU_ROOTFS_NAME)
+  self.assertEqual(admit_sustained.GPU_ROOT.name,CURRENT_GPU_ROOTFS_NAME)
+  self.assertEqual(admit_sustained.CPU_ROOT.name,CURRENT_CPU_ROOTFS_NAME)
 
  def test_current_gpu_runtime_lock_comes_from_v6_lock_not_historical_receipt(self):
   with tempfile.TemporaryDirectory() as temp:
-   root=Path(temp);gpu=root/'gpu-rootfs-v6';gpu.mkdir()
+   root=Path(temp);gpu=root/CURRENT_GPU_ROOTFS_NAME;gpu.mkdir()
    lock={'schema_version':1,'rootfs_sha256':'5'*64,'image_id':'current-v6'}
    Path(str(gpu)+'.lock.json').write_text(json.dumps(lock))
    old={'runtime_lock':{'rootfs_sha256':'4'*64,'image_id':'old'}}
@@ -30,7 +31,7 @@ class ControllerGuardTests(unittest.TestCase):
 
  def test_gpu_stage_command_rebinds_historical_rootfs_to_current_gpu_root(self):
   command=['bwrap','--ro-bind','/old/gpu-rootfs','/','--ro-bind','/old/code','/experiment','--bind','/old/out','/outputs','--','python','old.py']
-  expected_root='/current/gpu-rootfs-v6'
+  expected_root='/current/'+CURRENT_GPU_ROOTFS_NAME
   rewritten=sustained_controller_backend.rebind_rootfs_mount(command,expected_root)
   self.assertEqual(command[2],'/old/gpu-rootfs')
   self.assertEqual(rewritten[2],expected_root)

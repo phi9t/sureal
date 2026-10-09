@@ -14,6 +14,7 @@ from evidence.source_snapshot import file_sha256 as sha
 from evidence.source_snapshot import is_regular_file
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
+from insula.runtime_roots import current_motion_cli_rootfs
 
 
 parser = argparse.ArgumentParser(description=__doc__)
@@ -71,7 +72,7 @@ for split, folder in [
     parents[str(parent)] = sha(parent)
     os.link(CACHE / "insula" / folder / "output/merged.pb", inputs / (split + ".pb"))
 
-rootfs = CACHE / "motion-cli-rootfs-v2"
+rootfs = current_motion_cli_rootfs(CACHE)
 lock = json.loads(pathlib.Path(str(rootfs) + ".lock.json").read_text())
 verify_rootfs(rootfs, lock["rootfs_sha256"])
 pins = {

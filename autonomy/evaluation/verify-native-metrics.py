@@ -12,8 +12,9 @@ HERE=Path(__file__).resolve().parents[1]
 from evidence.source_snapshot import file_sha256 as sha
 from insula.runtime_identity import rootfs_identity,verify_rootfs
 from insula.entry import launch_plan
+from insula.runtime_roots import current_metrics_rootfs
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
-ROOT=CACHE/'metrics-rootfs'
+ROOT=current_metrics_rootfs(CACHE)
 IMAGE='sureal-waymo-metrics:source-pinned'
 
 def materialize():

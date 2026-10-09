@@ -4,13 +4,14 @@ from pathlib import Path
 from unittest.mock import patch
 from segmentation.semantic_recovery_job import recover_semantic_archive
 from segmentation.semantic_recovery_runtime import recovery_rootfs, validate_recovery_output
+from insula.runtime_roots import CURRENT_CPU_ROOTFS_NAME
 from insula.staging_lease import staging_lease
 
 class SemanticRecoveryJobGateTests(unittest.TestCase):
     def test_ticket29_recovery_runtime_uses_current_cpu_rootfs_and_execution_output(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);cache=root/'cache';output=root/'t29-execution/semantic-recovery/current'
-            self.assertEqual(recovery_rootfs(cache).name,'rootfs-v5-t29-20261008T230657Z')
+            self.assertEqual(recovery_rootfs(cache).name,CURRENT_CPU_ROOTFS_NAME)
             validate_recovery_output(output)
             output.mkdir(parents=True)
             with self.assertRaises(ValueError):validate_recovery_output(output)

@@ -2,6 +2,8 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+from insula.launch_plan import build_plan, plan_data, render_plan, _unchecked_runtime
+
 
 @dataclass(frozen=True)
 class SandboxPlan:
@@ -53,25 +55,24 @@ def reject_overlapping_mounts(*paths):
 
 
 def live_gate_plan(root, experiment, source, output, command):
-    root, experiment, source, output = reject_overlapping_mounts(root, experiment, source, output)
-    return compose_bwrap_plan(
-        unshare_flags=["--unshare-all", "--die-with-parent"],
-        mounts_before_devices=[
-            ["--ro-bind", root, "/"],
-            ["--ro-bind", experiment, "/experiment"],
-            ["--ro-bind", source, "/source"],
-            ["--bind", output, "/outputs"],
-        ],
-        mounts_after_devices=[
-            ["--tmpfs", "/tmp"],
-        ],
-        environment=[
-            ["--setenv", "HOME", "/tmp/private-home"],
-            ["--setenv", "PATH", "/usr/local/bin:/usr/bin:/bin"],
-            ["--setenv", "PYTHONNOUSERSITE", "1"],
-            ["--setenv", "PYTHONDONTWRITEBYTECODE", "1"],
-            ["--setenv", "PYTHONPATH", "/experiment"],
-        ],
-        chdir="/experiment",
+    plan = build_plan(
+        _unchecked_runtime(root),
+        code=experiment,
+        source=source,
+        output=output,
         command=command,
     )
+    data = plan_data(plan)
+    return SandboxPlan(
+        argv=render_plan(plan),
+        mounts=[_mount_to_argv(mount) for mount in data["mounts"]],
+        environment=data["environment"],
+        command=data["command"],
+    )
+
+
+def _mount_to_argv(mount):
+    if mount["kind"] == "tmpfs":
+        return ["--tmpfs", mount["inside_path"]]
+    flag = "--dev-bind" if mount["kind"] == "dev-bind" else "--bind" if mount["mode"] == "writable" else "--ro-bind"
+    return [flag, mount["host_path"], mount["inside_path"]]

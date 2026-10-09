@@ -1,12 +1,11 @@
 """Shared runtime choices for live semantic-recovery readmission."""
 from pathlib import Path
 
-
-CURRENT_CPU_ROOTFS_NAME = "rootfs-v5-t29-20261008T230657Z"
+from insula.runtime_roots import current_cpu_rootfs
 
 
 def recovery_rootfs(cache: Path) -> Path:
-    return Path(cache) / "insula" / CURRENT_CPU_ROOTFS_NAME
+    return current_cpu_rootfs(Path(cache))
 
 
 def validate_recovery_output(output: Path) -> None:

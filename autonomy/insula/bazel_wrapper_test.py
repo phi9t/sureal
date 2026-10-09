@@ -7,7 +7,16 @@ import textwrap
 import unittest
 from pathlib import Path
 
+from evidence.source_snapshot import file_sha256
+from insula.launch_plan import BAZEL_LINUX_X86_64_SHA256, BAZEL_VERSION
+from insula.bazel_launcher import LIVE_GATE_BWRAP, LIVE_GATE_CACHE_MOUNT
 from insula.runtime_identity import rootfs_identity
+from insula.runtime_roots import (
+    CURRENT_GPU_ROOTFS_NAME,
+    current_cpu_rootfs,
+    current_curriculum_rootfs,
+    current_gpu_rootfs,
+)
 
 
 REPO = Path(__file__).resolve().parents[2]
@@ -37,12 +46,33 @@ def write_rootfs(root):
 
 
 def write_lock(lock, root, rootfs_sha256=None):
+    root = Path(root)
+    if root.name == CURRENT_GPU_ROOTFS_NAME:
+        recipe = {
+            "dockerfile_sha256": file_sha256(AUTONOMY / "insula/Dockerfile.gpu-bazel-rootfs-v6"),
+            "requirements_sha256": file_sha256(AUTONOMY / "insula/gpu-requirements.lock"),
+        }
+    elif root.name == "rootfs-v2" and "3d-pathway" in root.as_posix():
+        recipe = {
+            "dockerfile_sha256": file_sha256(REPO / "parallax/insulas/bazel-rootfs.Dockerfile"),
+            "requirements_sha256": file_sha256(REPO / "parallax/insulas/bazel-requirements.lock"),
+        }
+    else:
+        recipe = {
+            "dockerfile_sha256": file_sha256(AUTONOMY / "insula/Dockerfile"),
+            "requirements_sha256": file_sha256(AUTONOMY / "requirements-tracer.lock"),
+            "test_tools_requirements_sha256": file_sha256(
+                AUTONOMY / "insula/cpu-test-tools-requirements.lock"
+            ),
+        }
     lock.write_text(
         json.dumps(
             {
                 "schema_version": 1,
                 "rootfs_sha256": rootfs_sha256 or rootfs_identity(root),
-                "bazel_version": "9.2.0",
+                "bazel_version": BAZEL_VERSION,
+                "bazel_linux_x86_64_sha256": BAZEL_LINUX_X86_64_SHA256,
+                **recipe,
             },
             indent=2,
         )
@@ -188,9 +218,9 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
     def run_wrapper_with_default_roots(self, temporary, *arguments, extra_env=None):
         root = Path(temporary)
         home = root / "home"
-        waymo_rootfs = home / ".cache/waystone/waymo-perception/insula/rootfs-v5-t29-20261008T230657Z"
-        curriculum_rootfs = home / ".cache/waystone/3d-pathway/insula/rootfs-v2"
-        gpu_rootfs = home / ".cache/waystone/waymo-perception/gpu-rootfs-v6"
+        waymo_rootfs = current_cpu_rootfs(home / ".cache/waystone/waymo-perception")
+        curriculum_rootfs = current_curriculum_rootfs(home / ".cache/waystone/3d-pathway")
+        gpu_rootfs = current_gpu_rootfs(home / ".cache/waystone/waymo-perception")
         for rootfs in (waymo_rootfs, curriculum_rootfs, gpu_rootfs):
             rootfs.mkdir(parents=True)
             write_rootfs(rootfs)
@@ -284,6 +314,26 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
             )
             self.assertIn(["--tmpfs", "/experiment"], plan["mounts"])
             self.assertIn(["--ro-bind", str((REPO / "MODULE.bazel").resolve()), "/experiment/MODULE.bazel"], plan["mounts"])
+            self.assertFalse(marker.exists())
+
+    def test_requires_live_gate_filter_projects_current_waymo_cache_to_tests(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            result, marker, _, waymo_rootfs, _, _ = self.run_wrapper_with_default_roots(
+                temporary,
+                "--emit-plan",
+                "test",
+                "--test_tag_filters=requires_live_gate,-requires_gpu,-known_failure",
+                "//autonomy/insula:launch_plan_live_test",
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            plan = json.loads(result.stdout)
+            waymo_cache = waymo_rootfs.parents[1]
+            live_root = f"{LIVE_GATE_CACHE_MOUNT}/insula/{waymo_rootfs.name}"
+            self.assertIn(["--ro-bind", str(waymo_cache.resolve()), LIVE_GATE_CACHE_MOUNT], plan["mounts"])
+            self.assertIn(["--ro-bind", "/usr/bin/bwrap", LIVE_GATE_BWRAP], plan["mounts"])
+            self.assertIn(f"--test_env=SUREAL_LIVE_GATE_BWRAP={LIVE_GATE_BWRAP}", plan["bazel"])
+            self.assertIn(f"--test_env=WAYMO_INSULA_ROOT={live_root}", plan["bazel"])
+            self.assertIn(f"--test_env=WAYMO_INSULA_LOCK={live_root}.lock.json", plan["bazel"])
             self.assertFalse(marker.exists())
 
     def test_rootfs_identity_mismatch_is_rejected_before_bwrap_runs(self):

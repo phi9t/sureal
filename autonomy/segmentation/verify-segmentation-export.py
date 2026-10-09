@@ -7,6 +7,7 @@ import subprocess,sys,tempfile
 from evidence.source_snapshot import file_sha256 as sha, require_regular_file
 from insula.runtime_identity import verify_rootfs
 from insula.entry import launch_plan
+from insula.runtime_roots import current_metrics_rootfs
 
 HERE=Path(__file__).resolve().parents[1]
 
@@ -20,7 +21,7 @@ def artifact_hashes(root):
     return artifacts
 
 def main():
-    cache=Path.home()/'.cache/waystone/waymo-perception';root=cache/'metrics-rootfs'
+    cache=Path.home()/'.cache/waystone/waymo-perception';root=current_metrics_rootfs(cache)
     lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256'])
     out=Path(sys.argv[1]).resolve();out.mkdir(parents=True,exist_ok=False)
     frames=[{'context_name':'semantic-export-fixture','frame_timestamp_micros':10,'returns':[list(range(1,23)),list(range(1,23))*2]}]
