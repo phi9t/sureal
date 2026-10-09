@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-10-09T02:37:04.857039+00:00",
+  "updated_utc": "2026-10-09T17:23:54.607177+00:00",
   "scope": "fixed all-class training batch; no heldout, segmentation or full-dataset completion claim",
   "experiments": [
     {
@@ -65,9 +65,9 @@
       "worst_terminal_APH": 0.92688,
       "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
       "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-overfit20261002b-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-closure-live-final-v4-verified.json",
-      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-results-hdfs-verified.json"
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-results-hdfs-verified.json"
     },
     {
       "id": "overfit20261002b/deep_pfn",
@@ -132,9 +132,9 @@
       "worst_terminal_APH": 0.927862,
       "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
       "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-overfit20261002b-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-closure-live-final-v4-verified.json",
-      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-results-hdfs-verified.json"
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-results-hdfs-verified.json"
     },
     {
       "id": "overfit20261002b/context_pfn",
@@ -199,9 +199,9 @@
       "worst_terminal_APH": 0.926738,
       "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
       "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-overfit20261002b-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-closure-live-final-v4-verified.json",
-      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-results-hdfs-verified.json"
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-results-hdfs-verified.json"
     },
     {
       "id": "overfit20261002b/masked_pfn",
@@ -266,9 +266,9 @@
       "worst_terminal_APH": 0.926735,
       "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
       "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-overfit20261002b-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-closure-live-final-v4-verified.json",
-      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-results-hdfs-verified.json"
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-results-hdfs-verified.json"
     },
     {
       "id": "overfit20261002b/residual_bev",
@@ -333,9 +333,9 @@
       "worst_terminal_APH": 0.927404,
       "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
       "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-overfit20261002b-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-closure-live-final-v4-verified.json",
-      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-results-hdfs-verified.json"
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-results-hdfs-verified.json"
     },
     {
       "id": "overfit20261002b/window_bev",
@@ -400,9 +400,9 @@
       "worst_terminal_APH": 0.928069,
       "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
       "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-overfit20261002b-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-closure-live-final-v4-verified.json",
-      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-results-hdfs-verified.json"
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-results-hdfs-verified.json"
     },
     {
       "id": "overfit20261002b/coarse_mlp",
@@ -467,9 +467,9 @@
       "worst_terminal_APH": 0.926117,
       "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
       "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-overfit20261002b-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-closure-live-final-v4-verified.json",
-      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-results-hdfs-verified.json"
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-results-hdfs-verified.json"
     },
     {
       "id": "overfit20261002b/retain64",
@@ -534,9 +534,9 @@
       "worst_terminal_APH": 0.927294,
       "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
       "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-overfit20261002b-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-closure-live-final-v4-verified.json",
-      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-results-hdfs-verified.json"
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-results-hdfs-verified.json"
     },
     {
       "id": "overfit20261002b/all_pillars",
@@ -572,9 +572,9 @@
       "worst_terminal_APH": null,
       "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
       "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-overfit20261002b-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-closure-live-final-v4-verified.json",
-      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-results-hdfs-verified.json"
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-results-hdfs-verified.json"
     },
     {
       "id": "overfit20261002b/full_bn",
@@ -639,9 +639,9 @@
       "worst_terminal_APH": 0.924655,
       "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
       "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-overfit20261002b-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-closure-live-final-v4-verified.json",
-      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-results-hdfs-verified.json"
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-results-hdfs-verified.json"
     },
     {
       "id": "overfit20261002b/point_ln",
@@ -706,9 +706,9 @@
       "worst_terminal_APH": 0.927689,
       "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
       "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-overfit20261002b-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-closure-live-final-v4-verified.json",
-      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-results-hdfs-verified.json"
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-results-hdfs-verified.json"
     },
     {
       "id": "overfit20261002b/no_norm",
@@ -773,9 +773,9 @@
       "worst_terminal_APH": 0.830212,
       "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
       "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-overfit20261002b-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-closure-live-final-v4-verified.json",
-      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-results-hdfs-verified.json"
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-results-hdfs-verified.json"
     },
     {
       "id": "overfit20261002b/foreground_prior",
@@ -840,9 +840,9 @@
       "worst_terminal_APH": 0.927387,
       "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
       "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-overfit20261002b-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-closure-live-final-v4-verified.json",
-      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-results-hdfs-verified.json"
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-results-hdfs-verified.json"
     },
     {
       "id": "overfit20261002b/lr3e4",
@@ -907,9 +907,9 @@
       "worst_terminal_APH": 0.926955,
       "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
       "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-overfit20261002b-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-closure-live-final-v4-verified.json",
-      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-results-hdfs-verified.json"
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-results-hdfs-verified.json"
     },
     {
       "id": "overfit20261002b/no_clip",
@@ -974,9 +974,9 @@
       "worst_terminal_APH": 0.925742,
       "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
       "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-overfit20261002b-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-closure-live-final-v4-verified.json",
-      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-results-hdfs-verified.json"
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-results-hdfs-verified.json"
     },
     {
       "id": "overfit20261002b/class_balanced_focal",
@@ -1041,9 +1041,9 @@
       "worst_terminal_APH": 0.92757,
       "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
       "closure_candidate_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-overfit20261002b-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-closure-live-final-v4-verified.json",
-      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-results-hdfs-verified.json"
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-overfit20261002b-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-closure-live-final-v4-verified.json",
+      "results_hdfs_receipt": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-results-hdfs-verified.json"
     },
     {
       "id": "expanded20261002a/grid_fine",
@@ -1109,8 +1109,8 @@
       "worst_terminal_APH": 0.927627,
       "result_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
       "closure_candidate_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/advanced-expanded20261002a-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/advanced-closure-expanded20261002a-verified.json",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/advanced-expanded20261002a-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/advanced-closure-expanded20261002a-verified.json",
       "results_hdfs_receipt": null
     },
     {
@@ -1177,8 +1177,8 @@
       "worst_terminal_APH": 0.926807,
       "result_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
       "closure_candidate_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/advanced-expanded20261002a-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/advanced-closure-expanded20261002a-verified.json",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/advanced-expanded20261002a-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/advanced-closure-expanded20261002a-verified.json",
       "results_hdfs_receipt": null
     },
     {
@@ -1245,8 +1245,8 @@
       "worst_terminal_APH": 0.927527,
       "result_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
       "closure_candidate_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/advanced-expanded20261002a-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/advanced-closure-expanded20261002a-verified.json",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/advanced-expanded20261002a-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/advanced-closure-expanded20261002a-verified.json",
       "results_hdfs_receipt": null
     },
     {
@@ -1313,8 +1313,8 @@
       "worst_terminal_APH": 0.926812,
       "result_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
       "closure_candidate_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/advanced-expanded20261002a-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/advanced-closure-expanded20261002a-verified.json",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/advanced-expanded20261002a-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/advanced-closure-expanded20261002a-verified.json",
       "results_hdfs_receipt": null
     },
     {
@@ -1381,8 +1381,8 @@
       "worst_terminal_APH": 0.811483,
       "result_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
       "closure_candidate_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/advanced-expanded20261002a-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/advanced-closure-expanded20261002a-verified.json",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/advanced-expanded20261002a-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/advanced-closure-expanded20261002a-verified.json",
       "results_hdfs_receipt": null
     },
     {
@@ -1449,8 +1449,8 @@
       "worst_terminal_APH": 0.926328,
       "result_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
       "closure_candidate_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/advanced-expanded20261002a-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/advanced-closure-expanded20261002a-verified.json",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/advanced-expanded20261002a-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/advanced-closure-expanded20261002a-verified.json",
       "results_hdfs_receipt": null
     },
     {
@@ -1517,8 +1517,8 @@
       "worst_terminal_APH": 0.92697,
       "result_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
       "closure_candidate_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/advanced-expanded20261002a-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/advanced-closure-expanded20261002a-verified.json",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/advanced-expanded20261002a-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/advanced-closure-expanded20261002a-verified.json",
       "results_hdfs_receipt": null
     },
     {
@@ -1577,19 +1577,19 @@
       "worst_terminal_APH": 0.741925,
       "result_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
       "closure_candidate_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/advanced-expanded20261002a-results.json",
-      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/advanced-closure-expanded20261002a-verified.json",
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/advanced-expanded20261002a-results.json",
+      "closure_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/advanced-closure-expanded20261002a-verified.json",
       "results_hdfs_receipt": null
     }
   ],
   "sources": {
     "overfit20261002b": {
       "result_sha256": "a0a09dfea639ee1151d6d10ca7511c4882b90579c8043738bed12ce799115ff8",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/tier1-overfit20261002b-results.json"
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/tier1-overfit20261002b-results.json"
     },
     "expanded20261002a": {
       "result_sha256": "bd2f550988d8875cd28b78f5857815dfd7eb12a0ef6417d518a256407ad2f381",
-      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy/research/advanced-expanded20261002a-results.json"
+      "result_path": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-bs12-readmit-balanced16-r2/autonomy/research/advanced-expanded20261002a-results.json"
     }
   }
 }
