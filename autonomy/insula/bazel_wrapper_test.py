@@ -92,8 +92,18 @@ def write_fake_bwrap(fakebin, marker):
     path.chmod(0o755)
 
 
-def has_mount_to(mounts, destination):
-    return any(len(mount) == 3 and mount[0] == "--ro-bind" and mount[2] == destination for mount in mounts)
+def has_mount(mounts, destination, *, host=None, mode=None, kind=None):
+    for mount in mounts:
+        if mount.get("inside_path") != destination:
+            continue
+        if host is not None and mount.get("host_path") != host:
+            continue
+        if mode is not None and mount.get("mode") != mode:
+            continue
+        if kind is not None and mount.get("kind") != kind:
+            continue
+        return True
+    return False
 
 
 LEGACY_AUTONOMY_ALIAS_DESTINATIONS = {
@@ -118,7 +128,7 @@ LEGACY_AUTONOMY_ALIAS_DESTINATIONS = {
 
 
 def mount_destinations(mounts):
-    return {mount[2] for mount in mounts if len(mount) == 3}
+    return {mount["inside_path"] for mount in mounts}
 
 
 class BazelWrapperTests(unittest.TestCase):
@@ -163,7 +173,14 @@ class BazelWrapperTests(unittest.TestCase):
                     self.assertEqual(plan["rootfs"], str(rootfs))
                     self.assertEqual(plan["lock"], str(lock))
                     self.assertEqual(plan["cache"], str(cache))
-                    self.assertIn(["--ro-bind", str(AUTONOMY.resolve()), "/experiment/autonomy"], plan["mounts"])
+                    self.assertTrue(
+                        has_mount(
+                            plan["mounts"],
+                            "/experiment/autonomy",
+                            host=str(AUTONOMY.resolve()),
+                            mode="read_only",
+                        )
+                    )
                     self.assertFalse(
                         LEGACY_AUTONOMY_ALIAS_DESTINATIONS & mount_destinations(plan["mounts"]),
                         plan["mounts"],
@@ -266,18 +283,46 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
                 argv[argv.index("--ro-bind") + 1 : argv.index("--ro-bind") + 3],
                 [str(rootfs.resolve()), "/"],
             )
-            self.assertIn(["--tmpfs", "/experiment"], plan["mounts"])
-            self.assertIn(["--ro-bind", str((REPO / "MODULE.bazel").resolve()), "/experiment/MODULE.bazel"], plan["mounts"])
-            self.assertIn(["--ro-bind", str(AUTONOMY.resolve()), "/experiment/autonomy"], plan["mounts"])
+            self.assertTrue(has_mount(plan["mounts"], "/experiment", kind="tmpfs"))
+            self.assertTrue(
+                has_mount(
+                    plan["mounts"],
+                    "/experiment/MODULE.bazel",
+                    host=str((REPO / "MODULE.bazel").resolve()),
+                    mode="read_only",
+                )
+            )
+            self.assertTrue(
+                has_mount(
+                    plan["mounts"],
+                    "/experiment/autonomy",
+                    host=str(AUTONOMY.resolve()),
+                    mode="read_only",
+                )
+            )
             self.assertFalse(
                 LEGACY_AUTONOMY_ALIAS_DESTINATIONS & mount_destinations(plan["mounts"]),
                 plan["mounts"],
             )
-            self.assertIn(["--bind", str(cache.resolve()), "/tmp/bazel-cache"], plan["mounts"])
-            self.assertIn(["--tmpfs", "/outputs"], plan["mounts"])
-            self.assertIn(["--tmpfs", "/tmp"], plan["mounts"])
-            self.assertNotIn(["--bind", str(cache.resolve()), "/outputs"], plan["mounts"])
-            self.assertIn(["--ro-bind", "/etc/resolv.conf", "/etc/resolv.conf"], plan["mounts"])
+            self.assertTrue(
+                has_mount(
+                    plan["mounts"],
+                    "/tmp/bazel-cache",
+                    host=str(cache.resolve()),
+                    mode="writable",
+                )
+            )
+            self.assertTrue(has_mount(plan["mounts"], "/outputs", kind="tmpfs"))
+            self.assertTrue(has_mount(plan["mounts"], "/tmp", kind="tmpfs"))
+            self.assertFalse(has_mount(plan["mounts"], "/outputs", host=str(cache.resolve())))
+            self.assertTrue(
+                has_mount(
+                    plan["mounts"],
+                    "/etc/resolv.conf",
+                    host="/etc/resolv.conf",
+                    mode="read_only",
+                )
+            )
             self.assertIn(["--setenv", "HOME", "/tmp/bazel-cache/home"], plan["environment"])
             self.assertNotIn(
                 ["--setenv", "PYTHONPATH", "/experiment/autonomy"],
@@ -308,12 +353,23 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
             self.assertIn("--ignore_dev_dependency", plan["bazel"])
             self.assertIn("--lockfile_mode=update", plan["bazel"])
             self.assertNotIn("--lockfile_mode=error", plan["bazel"])
-            self.assertIn(
-                ["--bind", str((REPO / "MODULE.bazel.lock").resolve()), "/experiment/MODULE.bazel.lock"],
-                plan["mounts"],
+            self.assertTrue(
+                has_mount(
+                    plan["mounts"],
+                    "/experiment/MODULE.bazel.lock",
+                    host=str((REPO / "MODULE.bazel.lock").resolve()),
+                    mode="writable",
+                )
             )
-            self.assertIn(["--tmpfs", "/experiment"], plan["mounts"])
-            self.assertIn(["--ro-bind", str((REPO / "MODULE.bazel").resolve()), "/experiment/MODULE.bazel"], plan["mounts"])
+            self.assertTrue(has_mount(plan["mounts"], "/experiment", kind="tmpfs"))
+            self.assertTrue(
+                has_mount(
+                    plan["mounts"],
+                    "/experiment/MODULE.bazel",
+                    host=str((REPO / "MODULE.bazel").resolve()),
+                    mode="read_only",
+                )
+            )
             self.assertFalse(marker.exists())
 
     def test_requires_live_gate_filter_projects_current_waymo_cache_to_tests(self):
@@ -329,8 +385,22 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
             plan = json.loads(result.stdout)
             waymo_cache = waymo_rootfs.parents[1]
             live_root = f"{LIVE_GATE_CACHE_MOUNT}/insula/{waymo_rootfs.name}"
-            self.assertIn(["--ro-bind", str(waymo_cache.resolve()), LIVE_GATE_CACHE_MOUNT], plan["mounts"])
-            self.assertIn(["--ro-bind", "/usr/bin/bwrap", LIVE_GATE_BWRAP], plan["mounts"])
+            self.assertTrue(
+                has_mount(
+                    plan["mounts"],
+                    LIVE_GATE_CACHE_MOUNT,
+                    host=str(waymo_cache.resolve()),
+                    mode="read_only",
+                )
+            )
+            self.assertTrue(
+                has_mount(
+                    plan["mounts"],
+                    LIVE_GATE_BWRAP,
+                    host="/usr/bin/bwrap",
+                    mode="read_only",
+                )
+            )
             self.assertIn(f"--test_env=SUREAL_LIVE_GATE_BWRAP={LIVE_GATE_BWRAP}", plan["bazel"])
             self.assertIn(f"--test_env=WAYMO_INSULA_ROOT={live_root}", plan["bazel"])
             self.assertIn(f"--test_env=WAYMO_INSULA_LOCK={live_root}.lock.json", plan["bazel"])
@@ -361,12 +431,23 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
             plan = json.loads(result.stdout)
             self.assertEqual(plan["rootfs"], str(curriculum_rootfs.resolve()))
             self.assertNotEqual(plan["rootfs"], str(waymo_rootfs.resolve()))
-            self.assertIn(
-                ["--ro-bind", str(curriculum_rootfs.resolve()), "/"],
-                plan["mounts"],
+            self.assertTrue(
+                has_mount(
+                    plan["mounts"],
+                    "/",
+                    host=str(curriculum_rootfs.resolve()),
+                    mode="read_only",
+                )
             )
-            self.assertIn(["--ro-bind", str((REPO / "parallax").resolve()), "/experiment/parallax"], plan["mounts"])
-            self.assertFalse(has_mount_to(plan["mounts"], "/experiment/3d-pathway"), plan["mounts"])
+            self.assertTrue(
+                has_mount(
+                    plan["mounts"],
+                    "/experiment/parallax",
+                    host=str((REPO / "parallax").resolve()),
+                    mode="read_only",
+                )
+            )
+            self.assertFalse(has_mount(plan["mounts"], "/experiment/3d-pathway"), plan["mounts"])
             self.assertIn("--output_base=/tmp/bazel-cache/output-base-3d-pathway", plan["bazel"])
             self.assertNotIn("--output_base=/tmp/bazel-cache/output-base", plan["bazel"])
             self.assertFalse(marker.exists())
@@ -414,8 +495,15 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
             plan = json.loads(result.stdout)
             self.assertEqual(plan["rootfs"], str(gpu_rootfs.resolve()))
             self.assertNotEqual(plan["rootfs"], str(waymo_rootfs.resolve()))
-            self.assertIn(["--ro-bind", str(gpu_rootfs.resolve()), "/"], plan["mounts"])
-            self.assertIn(["--tmpfs", "/experiment"], plan["mounts"])
+            self.assertTrue(
+                has_mount(
+                    plan["mounts"],
+                    "/",
+                    host=str(gpu_rootfs.resolve()),
+                    mode="read_only",
+                )
+            )
+            self.assertTrue(has_mount(plan["mounts"], "/experiment", kind="tmpfs"))
             self.assertFalse(
                 LEGACY_AUTONOMY_ALIAS_DESTINATIONS & mount_destinations(plan["mounts"]),
                 plan["mounts"],
@@ -426,38 +514,53 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
                 "--test_env=SUREAL_BAZEL_GPU_DEVICE_UUIDS=1=GPU-fixture-1",
                 plan["bazel"],
             )
-            self.assertIn(
-                ["--ro-bind", str(waymo_rootfs.parents[1].resolve()), LIVE_GATE_CACHE_MOUNT],
-                plan["mounts"],
+            self.assertTrue(
+                has_mount(
+                    plan["mounts"],
+                    LIVE_GATE_CACHE_MOUNT,
+                    host=str(waymo_rootfs.parents[1].resolve()),
+                    mode="read_only",
+                )
             )
             gpu_live_root = f"{LIVE_GATE_CACHE_MOUNT}/{gpu_rootfs.name}"
             self.assertIn(f"--test_env=WAYMO_GPU_INSULA_ROOT={gpu_live_root}", plan["bazel"])
             self.assertIn(f"--test_env=WAYMO_GPU_INSULA_LOCK={gpu_live_root}.lock.json", plan["bazel"])
             self.assertIn(f"--test_env=SUREAL_LIVE_GATE_BWRAP={LIVE_GATE_BWRAP}", plan["bazel"])
-            self.assertIn(["--tmpfs", "/driver"], plan["mounts"])
+            self.assertTrue(has_mount(plan["mounts"], "/driver", kind="tmpfs"))
             for pair in device_pairs:
                 host, guest = pair.split("=", 1)
-                self.assertIn(["--dev-bind", host, guest], plan["mounts"])
+                self.assertTrue(
+                    has_mount(plan["mounts"], guest, host=host, kind="dev-bind"),
+                    plan["mounts"],
+                )
             self.assertNotIn("/dev/nvidia0", json.dumps(plan, sort_keys=True))
             self.assertEqual(
                 plan["gpu"],
                 {"requested_index": 1, "device_uuid": "GPU-fixture-1"},
             )
-            self.assertIn(
-                ["--ro-bind", str((driver_dir / "libcuda.so").resolve()), "/driver/libcuda.so"],
-                plan["mounts"],
+            self.assertTrue(
+                has_mount(
+                    plan["mounts"],
+                    "/driver/libcuda.so",
+                    host=str((driver_dir / "libcuda.so").resolve()),
+                    mode="read_only",
+                )
             )
-            self.assertIn(
-                ["--ro-bind", str((driver_dir / "libcuda.so.1").resolve()), "/driver/libcuda.so.1"],
-                plan["mounts"],
+            self.assertTrue(
+                has_mount(
+                    plan["mounts"],
+                    "/driver/libcuda.so.1",
+                    host=str((driver_dir / "libcuda.so.1").resolve()),
+                    mode="read_only",
+                )
             )
-            self.assertIn(
-                [
-                    "--ro-bind",
-                    str((driver_dir / "libnvidia-ptxjitcompiler.so.580.105.08").resolve()),
+            self.assertTrue(
+                has_mount(
+                    plan["mounts"],
                     "/driver/libnvidia-ptxjitcompiler.so.580.105.08",
-                ],
-                plan["mounts"],
+                    host=str((driver_dir / "libnvidia-ptxjitcompiler.so.580.105.08").resolve()),
+                    mode="read_only",
+                )
             )
             self.assertIn(
                 ["--setenv", "PATH", "/opt/waymo/bin:/usr/local/cuda/bin:/usr/local/bin:/usr/bin:/bin"],

@@ -137,7 +137,7 @@ The producer is the semantic recovery job:
 - Both jobs stage the HDFS archive through
   `segmentation.staged_derived_archive` or
   `segmentation.staged_derived_archive_aligned`, then run the offline worker
-  through `insula.entry.launch_plan`.
+  through the structured `insula.launch_plan` boundary.
 - `autonomy/segmentation/staged_derived_archive.py:47-49` runs
   `timeout --kill-after=10s 600s /data02/home/philip.yang/workspace/waystone/scripts/waystone get <hdfs-uri> <scene.tar>`
   unless a transfer command is injected.
@@ -207,14 +207,14 @@ Use concept-owned live-gate support in `autonomy/insula`, not
 Implementation plan:
 
 1. Add reusable live-gate support under `autonomy/insula`, for example
-   `autonomy/insula/live_gate.py`, backed by
-   `insula.sandbox_plan.compose_bwrap_plan`.
+   `autonomy/insula/live_gate.py`, backed by `insula.launch_plan` for runtime
+   lock loading, plan construction and rendering.
 2. Add focused tests for the live-gate plan construction and receipt writer
    under `autonomy/insula/live_gate_test.py`.
 3. The live-gate helper records JSON evidence under `$E/t29-execution`:
-   label, rootfs path, lock path, rootfs lock digest, command argv, raw log path,
-   raw log SHA-256, expected/executed unittest count, fixture path, duration,
-   and verdict.
+   label, rootfs path, lock path, rootfs lock digest, structured launch-plan
+   data, rendered command argv, raw log path, raw log SHA-256,
+   expected/executed unittest count, fixture path, duration and verdict.
 4. The helper mounts current code read-only at `/experiment`, the real receipt
    fixture at `/source`, and an execution-local output directory under
    `$E/t29-execution` at `/outputs`.

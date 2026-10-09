@@ -65,7 +65,7 @@ class RunnerTests(unittest.TestCase):
  def test_worker_binding_is_not_confused_with_python_invocation(self):
   with tempfile.TemporaryDirectory() as tmp:
    p=Path(tmp)/'worker.py';p.write_text('worker')
-   receipt={'artifacts':{},'worker_sha256':module.sha(p),'checks':[{'exit_code':0,'command':['--ro-bind',str(p),'/tmp/worker.py','--','python','/tmp/worker.py']}]}
+   receipt={'artifacts':{},'worker_sha256':module.sha(p),'checks':[{'exit_code':0,'command':['bwrap','--unshare-all','--die-with-parent','--ro-bind',str(p),'/tmp/worker.py','--','python','/tmp/worker.py']}]}
    module.verify_receipt(receipt,Path(tmp))
  def test_source_worker_hashes_accept_detection_and_legacy_gpu_paths(self):
   with tempfile.TemporaryDirectory() as tmp:
@@ -95,7 +95,7 @@ class RunnerTests(unittest.TestCase):
  def test_manifest_tampering_is_rejected(self):
   with tempfile.TemporaryDirectory() as tmp:
    directory=Path(tmp);p=directory/'manifest.json';p.write_text('{}')
-   receipt={'artifacts':{},'manifest_sha256':module.sha(p),'checks':[{'exit_code':0,'command':['--ro-bind',str(directory),'/tmp/inputs']}]}
+   receipt={'artifacts':{},'manifest_sha256':module.sha(p),'checks':[{'exit_code':0,'command':['bwrap','--unshare-all','--die-with-parent','--ro-bind',str(directory),'/tmp/inputs','--','python','/experiment/worker.py']}]}
    module.verify_receipt(receipt,directory);p.write_text('{"changed":true}')
    with self.assertRaises(ValueError):module.verify_receipt(receipt,directory)
  def test_summary_requires_contracts(self):

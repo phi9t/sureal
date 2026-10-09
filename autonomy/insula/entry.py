@@ -3,14 +3,8 @@ import argparse
 import json
 import os
 from pathlib import Path
-from insula.launch_plan import build_plan, load_runtime_lock, render_plan, _unchecked_runtime
+from insula.launch_plan import build_plan, load_runtime_lock, plan_data, render_plan
 from insula.runtime_roots import current_cpu_rootfs, default_lock
-
-
-def launch_plan(root, experiment, source, output, command):
-    runtime = _unchecked_runtime(root)
-    plan = build_plan(runtime, code=experiment, source=source, output=output, command=command)
-    return render_plan(plan)
 
 
 def main():
@@ -26,13 +20,14 @@ def main():
     command=args.command
     if command and command[0]=='--': command=command[1:]
     if not command: p.error('command required')
-    lock_path=args.lock or Path(str(args.rootfs)+'.lock.json')
+    lock_path=args.lock or default_lock(args.rootfs)
     runtime=load_runtime_lock(args.rootfs,lock_path)
     here=Path(__file__).resolve().parents[1]
     if not args.source.is_dir() or not args.output.is_dir(): raise ValueError('mount directory missing')
-    plan=render_plan(build_plan(runtime,code=here,source=args.source,output=args.output,command=command))
+    plan=build_plan(runtime,code=here,source=args.source,output=args.output,command=command)
     if args.emit_plan:
-        print(json.dumps(plan));return
-    os.execvp(plan[0],plan)
+        print(json.dumps(plan_data(plan),sort_keys=True));return
+    argv=render_plan(plan)
+    os.execvp(argv[0],argv)
 
 if __name__=='__main__': main()

@@ -13,8 +13,8 @@ class StageInputTests(unittest.TestCase):
  def test_receipt_alias_binds_frozen_bytes_after_template_changes(self):
   with tempfile.TemporaryDirectory() as temp:
    root=Path(temp);source=root/'input';source.mkdir();(source/'manifest.json').write_text('{}');(source/'expected.json').write_text('original');frozen,_=freeze_inputs(source,root/'frozen');(source/'expected.json').write_text('later')
-   args=bind_stage_paths(['--ro-bind',str(source/'expected.json'),'/tmp/expected.json','--ro-bind','/unrelated/root','/tmp/root'],source,frozen)
-   self.assertEqual(Path(args[1]).read_text(),'original');self.assertEqual(args[2:],['/tmp/expected.json','--ro-bind','/unrelated/root','/tmp/root'])
+   inputs=bind_stage_paths({'/tmp/expected.json':source/'expected.json','/tmp/root':'/unrelated/root'},source,frozen)
+   self.assertEqual(Path(inputs['/tmp/expected.json']).read_text(),'original');self.assertEqual(inputs['/tmp/root'],Path('/unrelated/root'))
  def test_symlinked_or_missing_manifest_refused_before_copy(self):
   with tempfile.TemporaryDirectory() as temp:
    root=Path(temp);source=root/'source';source.mkdir()

@@ -75,25 +75,27 @@ def main():
  previous=None
  for step in [0,19,35]:
   (source/'job.json').write_text(json.dumps({'target_step':step,'retained_sha256':sha(previous/'checkpoint.pt') if previous else None}))
-  directory=output/f'update-{step:02d}';stage(f'train-{step}','train_sustained.py',directory,['--ro-bind',str(previous),'/tmp/retained'] if previous else [])
+  directory=output/f'update-{step:02d}';stage(f'train-{step}','train_sustained.py',directory,{'/tmp/retained':previous} if previous else {})
   report=json.loads((directory/'check.json').read_text())
   if report['updates']!=step or report['stop_reason']!='sample' or not report['resource_gate_passed']:raise ValueError('pilot chunk not admitted')
   audit={'checkpoint_sha256':sha(directory/'checkpoint.pt'),'head_hashes':report['head_hashes'],'pilot_reference':step==35}
   if step==35:audit['previous_checkpoint_sha256']=sha(previous/'checkpoint.pt')
-  (source/'audit.json').write_text(json.dumps(audit));audit_dir=R/f'audit-{step:02d}';stage(f'audit-{step}','replay_sustained.py',audit_dir,['--ro-bind',str(directory),'/tmp/retained',*(['--ro-bind',str(previous),'/tmp/previous'] if step==35 else [])])
+  (source/'audit.json').write_text(json.dumps(audit));audit_dir=R/f'audit-{step:02d}';audit_inputs={'/tmp/retained':directory}
+  if step==35:audit_inputs['/tmp/previous']=previous
+  stage(f'audit-{step}','replay_sustained.py',audit_dir,audit_inputs)
   replay=json.loads((audit_dir/'replay.json').read_text())
   if len(replay['checked_frames'])!=16 or step==35 and len(replay['pilot_reference_checks'])!=2:raise ValueError('mandatory full16/restart audit missing')
   (source/'loss-audit.json').write_text(json.dumps({'manifest_sha256':manifest_sha,'report_sha256':sha(directory/'check.json'),'head_hashes':report['head_hashes']}))
   # The loss worker reads retained report/heads through /source; stage inputs
   # remain separately immutable at /tmp/inputs.
-  stage(f'literal-loss-{step}','audit_sustained_loss.py',R/f'loss-{step:02d}',['--ro-bind',str(directory),'/source'],gpu=False)
+  stage(f'literal-loss-{step}','audit_sustained_loss.py',R/f'loss-{step:02d}',{'/source':directory},gpu=False)
   (source/'export-audit.json').write_text(json.dumps({'manifest_sha256':manifest_sha,'anchor_templates_sha256':sha(source/'anchor-templates.json'),'head_hashes':report['head_hashes']}))
-  prepared=R/f'prepared-{step:02d}';stage(f'export-{step}','prepare_sustained_v3.py',prepared,['--ro-bind',str(directory/'heads'),'/source'],gpu=False)
+  prepared=R/f'prepared-{step:02d}';stage(f'export-{step}','prepare_sustained_v3.py',prepared,{'/source':directory/'heads'},gpu=False)
   export_receipt=json.loads(Path(receipts[f'export-{step}']['path']).read_text());export_receipt['inputs']={p:h for p,h in export_receipt['input_hashes'].items() if Path(p).name in {'manifest.json','anchor-templates.json','export-audit.json'}};export_receipt['validation']=json.loads((prepared/'preparation.json').read_text());(source/'score-receipt.json').write_text(json.dumps(export_receipt,indent=2)+'\n');(source/'expected.json').write_text(json.dumps({'receipt':export_receipt,'receipt_sha256':sha(source/'score-receipt.json')}))
-  stage(f'proposals-{step}','audit_proposals_sustained_v3.py',R/f'proposal-audit-{step:02d}',['--ro-bind',str(prepared),'/source','--ro-bind',str(directory/'heads'),'/tmp/heads','--ro-bind',str(source/'score-receipt.json'),'/tmp/score-receipt.json','--ro-bind',str(source/'expected.json'),'/tmp/expected.json'],gpu=False)
-  scored=R/f'scored-{step:02d}';stage(f'score-{step}','metrics_sustained_v3.py',scored,['--ro-bind',str(prepared),'/source'],gpu=False,metrics=True)
+  stage(f'proposals-{step}','audit_proposals_sustained_v3.py',R/f'proposal-audit-{step:02d}',{'/source':prepared,'/tmp/heads':directory/'heads','/tmp/score-receipt.json':source/'score-receipt.json','/tmp/expected.json':source/'expected.json'},gpu=False)
+  scored=R/f'scored-{step:02d}';stage(f'score-{step}','metrics_sustained_v3.py',scored,{'/source':prepared},gpu=False,metrics=True)
   score_receipt=json.loads(Path(receipts[f'score-{step}']['path']).read_text());score_receipt['parent_artifacts']=export_receipt['artifacts'];score_receipt['validation']=json.loads((scored/'check.json').read_text());(source/'score-receipt.json').write_text(json.dumps(score_receipt,indent=2)+'\n');(source/'expected.json').write_text(json.dumps({'receipt':score_receipt,'receipt_sha256':sha(source/'score-receipt.json')}))
-  stage(f'metrics-audit-{step}','audit_metrics_sustained_v3.py',R/f'metric-audit-{step:02d}',['--ro-bind',str(prepared),'/source','--ro-bind',str(scored),'/tmp/scored','--ro-bind',str(source/'score-receipt.json'),'/tmp/score-receipt.json','--ro-bind',str(source/'expected.json'),'/tmp/expected.json'],gpu=False,metrics=True)
+  stage(f'metrics-audit-{step}','audit_metrics_sustained_v3.py',R/f'metric-audit-{step:02d}',{'/source':prepared,'/tmp/scored':scored,'/tmp/score-receipt.json':source/'score-receipt.json','/tmp/expected.json':source/'expected.json'},gpu=False,metrics=True)
   previous=directory
  final={'run_directory':str(R),'output_directory':str(output),'manifest_sha256':manifest_sha,'stage_receipts':receipts,'scope':'native baseline0/19/35 exact state/heads/reference pilot; no sustained-fit or scientific acceptance'}
  (P/'research'/f'balanced16-sustained-admission-{a.run_id}-verified.json').write_text(json.dumps(final,indent=2)+'\n');print('PASS native baseline admission pilot; sustained controller/HDFS gates remain',flush=True)

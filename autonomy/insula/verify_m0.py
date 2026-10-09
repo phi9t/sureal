@@ -65,7 +65,7 @@ def main():
                 run(f'producer-{number}',cmd(out,'python','-m','insula.m0_probe',str(port)))
                 run(f'validator-{number}',cmd(out,'python','-m','insula.m0_validate'))
         out=stage/'failed';out.mkdir()
-        bad=stage/'wrong.lock.json';lock=json.loads(Path(str(ROOT)+'.lock.json').read_text());lock['rootfs_sha256']='0'*64;bad.write_text(json.dumps(lock))
+        bad=stage/'wrong.lock.json';lock=load_runtime_lock(ROOT,default_lock(ROOT)).data;lock['rootfs_sha256']='0'*64;bad.write_text(json.dumps(lock))
         run('wrong-lock',cmd(out,'python','-c','pass',lock=bad),1)
         run('missing-rootfs',cmd(out,'python','-c','pass',root=stage/'missing'),1)
         run('failed-assertion',cmd(out,'python','-c','assert False, "injected check failure"'),1)

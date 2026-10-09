@@ -191,7 +191,8 @@ class SourceSnapshotTargetTests(unittest.TestCase):
                 "camera/publish-scientific-camera.py",
                 "camera/verify-camera-replay.py",
                 "camera/camera_eviction.py",
-                "insula/entry.py",
+                "insula/launch_plan.py",
+                "insula/runtime_roots.py",
             },
         )
 

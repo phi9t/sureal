@@ -7,6 +7,7 @@ PACKAGE=HERE.parents[1]
 REPO=PACKAGE.parent
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
 from evidence.source_snapshot import LocalSnapshotStore,file_sha256 as sha,require_regular_file,snapshot_target_and_materialize,store_from_receipt,verify_or_materialize_receipt_sources,verify_receipt_sources
+from insula.launch_plan import read_receipt_mounts
 
 ARCHITECTURE_SOURCE_SNAPSHOT_TARGET='//autonomy/studies:architecture_experiment_runner'
 ARCHITECTURE_STUDY_SPEC_SHA256='fef072b2737a4fda94a029944fb999d78be482669b1cd989af953d93b5e7ecf1'
@@ -84,6 +85,13 @@ def parameterize_driver(source):
   source=source.replace("pins={", "command[command.index('/experiment')-1]=str(code)\ncommand[command.index('/outputs')-1]=str(output)\npins={",1)
  return source
 
+def _receipt_mounts_if_present(row):
+ if 'launch_plan' in row:return read_receipt_mounts(row,include_digests=False)
+ command=row.get('command')
+ first=command[0] if isinstance(command,list) and command else None
+ if first=='bwrap':return read_receipt_mounts(row,include_digests=False)
+ return {}
+
 def verify_receipt(receipt,package,snapshot_store=None):
  if snapshot_store is not None or 'source_snapshot_sha256' in receipt:
   if snapshot_store is None:snapshot_store=snapshot_store_for_receipt(receipt)
@@ -101,20 +109,17 @@ def verify_receipt(receipt,package,snapshot_store=None):
  if 'manifest_sha256' in receipt:
   manifests=set()
   for row in receipt.get('checks',[]):
-   command=row['command']
-   for i,value in enumerate(command):
-    if value=='/tmp/inputs' and i>=2 and command[i-2]=='--ro-bind':
-     manifests.add(str(Path(command[i-1])/'manifest.json'))
+   mount=_receipt_mounts_if_present(row).get('/tmp/inputs')
+   if mount is not None:manifests.add(str(Path(mount['host_path'])/'manifest.json'))
   if len(manifests)!=1:raise ValueError('Cannot locate unique pinned manifest')
   check(next(iter(manifests)),receipt['manifest_sha256'])
  if 'worker_sha256' in receipt:
   # Worker digest is retained in the command's read-only binding.
   found=False
   for row in receipt.get('checks',[]):
-   command=row['command']
-   for i,value in enumerate(command):
-    if value=='/tmp/worker.py' and i>=2 and command[i-2]=='--ro-bind':
-     check(command[i-1],receipt['worker_sha256']);found=True
+   command=row['command'];mount=_receipt_mounts_if_present(row).get('/tmp/worker.py')
+   if mount is not None:
+    check(mount['host_path'],receipt['worker_sha256']);found=True
    # Legacy GPU receipts and current detection receipts both pin source workers.
    if not found:
     for value in command:
