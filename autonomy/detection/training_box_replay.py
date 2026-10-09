@@ -4,10 +4,10 @@ from contextlib import contextmanager
 import json
 from pathlib import Path
 import shutil
-import subprocess
 import sys
 
-from insula.runtime_identity import verify_rootfs
+from insula.launch_plan import build_plan, load_runtime_lock, record_plan, render_plan
+from insula.runtime_roots import default_lock
 from insula.staging_lease import staging_lease
 from dataset.staged_source import staged_source, WAYSTONE
 from evidence.source_snapshot import file_sha256, require_regular_file
@@ -35,6 +35,38 @@ def retained_raw_bytes(cache, code_root):
     return total
 
 
+def load_pinned_runtime(root, expected_lock):
+    runtime = load_runtime_lock(Path(root), default_lock(root))
+    if runtime.data != expected_lock:
+        raise ValueError('production runtime lock changed')
+    return runtime
+
+
+def worker_launch_plan(runtime, *, code_root, source_audit, replay_inputs, output,
+                       worker_job, worker_job_sha256, mode):
+    return build_plan(
+        runtime,
+        code=code_root,
+        output=output,
+        named_inputs={
+            '/tmp/source-audit': source_audit,
+            '/tmp/replay-inputs': replay_inputs,
+        },
+        command=[
+            'python', '-m', 'detection.training_box_job',
+            '--job', worker_job,
+            '--expected-job-sha256', worker_job_sha256,
+            '--mode', mode,
+            '--output', '/outputs/report.json',
+        ],
+    )
+
+
+def measured_worker_command(plan, *, code_root, phase):
+    return [sys.executable, str(Path(code_root) / 'detection/training_box_resources.py'),
+            str(Path(phase) / 'resources.json'), *render_plan(plan)]
+
+
 def replay(*, cache, output, code_root, expected_candidate_sha256):
     cache, output, code_root = map(Path, (cache, output, code_root))
     with staging_lease(cache / 'scientific-processing/cohort-queue.lock'):
@@ -46,11 +78,9 @@ def replay(*, cache, output, code_root, expected_candidate_sha256):
         if file_sha256(job_path) != candidate['job_sha256']:
             raise ValueError('production job identity changed')
         job = json.loads(job_path.read_text())
-        root = cache / 'insula/rootfs-v2'
-        lock = json.loads(Path(str(root) + '.lock.json').read_text())
-        if lock != candidate['runtime_lock']:
-            raise ValueError('production runtime lock changed')
-        verify_rootfs(root, lock['rootfs_sha256'])
+        root = cache / 'insula' / Path(candidate.get('runtime_root', 'rootfs-v2')).name
+        runtime = load_pinned_runtime(root, candidate['runtime_lock'])
+        lock = runtime.data
         audit = cache / 'scientific-source-audit'
         def revalidate():
             for key in ('acquisition', 'cohort'):
@@ -89,20 +119,12 @@ def replay(*, cache, output, code_root, expected_candidate_sha256):
                 save(inputs / 'reference.json', reference_job)
                 worker_job = '/tmp/replay-inputs/reference.json'
                 worker_job_sha = file_sha256(inputs / 'reference.json')
-            base = ['bwrap', '--unshare-all', '--die-with-parent',
-                    '--ro-bind', str(root), '/', '--ro-bind', str(code_root), '/experiment',
-                    '--bind', str(phase), '/outputs', '--proc', '/proc', '--dev', '/dev',
-                    '--tmpfs', '/tmp', '--ro-bind', str(audit), '/tmp/source-audit',
-                    '--ro-bind', str(inputs), '/tmp/replay-inputs', '--clearenv',
-                    '--setenv', 'HOME', '/tmp/private-home', '--setenv', 'PATH', '/usr/local/bin:/usr/bin:/bin',
-                    '--setenv', 'PYTHONNOUSERSITE', '1', '--setenv', 'PYTHONDONTWRITEBYTECODE', '1',
-                    '--chdir', '/experiment', '--']
             # Fresh metadata admission occurs inside each worker before source consumption.
-            command = [sys.executable, str(code_root / 'detection/training_box_resources.py'),
-                       str(phase / 'resources.json'), *base, 'python', '-m',
-                       'detection.training_box_job', '--job', worker_job,
-                       '--expected-job-sha256', worker_job_sha, '--mode', role,
-                       '--output', '/outputs/report.json']
+            plan = worker_launch_plan(runtime, code_root=code_root, source_audit=audit,
+                                      replay_inputs=inputs, output=phase,
+                                      worker_job=worker_job, worker_job_sha256=worker_job_sha,
+                                      mode=role)
+            command = measured_worker_command(plan, code_root=code_root, phase=phase)
             transfers = []
             by_scene = {s['scene']: s for s in candidate['sources']}
             @contextmanager
@@ -129,6 +151,7 @@ def replay(*, cache, output, code_root, expected_candidate_sha256):
                 raise ValueError('worker memory measurement required')
             result.update(report_sha256=file_sha256(report), transfers=transfers,
                           worker_resources=worker_resources,
+                          launch_plan=record_plan(plan),
                           resources=json.loads((phase / 'resources.json').read_text()))
             save(phase / 'receipt.json', result)
             phases.append(result)

@@ -55,7 +55,7 @@ filegroup(
     py_test(
         name = test[:-3],
         srcs = [test],
-        data = [":commands"] if test == "metrics_test.py" else [],
+        data = [":commands"] if test in ["launches_test.py", "metrics_test.py"] else [],
         deps = [":evaluation"],
         imports = [".."],
         legacy_create_init = 0,

@@ -4,39 +4,15 @@ import sys
 from datetime import datetime,timezone
 import json
 from pathlib import Path
-import subprocess
-import tempfile
 import time
 
 HERE=Path(__file__).resolve().parents[1]
 from evidence.source_snapshot import file_sha256 as sha
-from insula.runtime_identity import rootfs_identity,verify_rootfs
-from insula.entry import launch_plan
-from insula.runtime_roots import current_metrics_rootfs
+from evaluation.launches import build_evaluation_plan, load_current_metrics_runtime, plan_receipt, run_evaluation_plan
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
-ROOT=current_metrics_rootfs(CACHE)
-IMAGE='sureal-waymo-metrics:source-pinned'
-
-def materialize():
-    lockpath=Path(str(ROOT)+'.lock.json')
-    if ROOT.exists():
-        lock=json.loads(lockpath.read_text());verify_rootfs(ROOT,lock['rootfs_sha256']);return lock
-    image=subprocess.check_output(['docker','image','inspect',IMAGE,'--format','{{.Id}}'],text=True).strip()
-    with tempfile.TemporaryDirectory(dir=CACHE,prefix='.metrics-rootfs-') as tmp:
-        stage=Path(tmp);cid=subprocess.check_output(['docker','create',image,'/bin/true'],text=True).strip()
-        try:
-            export=subprocess.Popen(['docker','export',cid],stdout=subprocess.PIPE)
-            result=subprocess.run(['tar','-C',str(stage),'-xf','-'],stdin=export.stdout)
-            export.stdout.close()
-            if export.wait() or result.returncode:raise RuntimeError('rootfs export failed')
-        finally:subprocess.run(['docker','rm',cid],check=True,capture_output=True)
-        lock={'schema_version':1,'image_id':image,'rootfs_sha256':rootfs_identity(stage),'upstream_commit':'99a4cb3ff07e2fe06c2ce73da001f850f628e45a',
-              'recipe_hashes':{name:sha(HERE/'evaluation'/name) for name in ['Dockerfile','CMakeLists.txt']}}
-        stage.rename(ROOT);lockpath.write_text(json.dumps(lock,indent=2)+'\n')
-        return lock
 
 def main():
-    out=Path(sys.argv[1]);out.mkdir(parents=True,exist_ok=False);lock=materialize();records=[]
+    out=Path(sys.argv[1]);out.mkdir(parents=True,exist_ok=False);runtime=load_current_metrics_runtime(CACHE);lock=runtime.data;records=[]
     for name,h in lock['recipe_hashes'].items():
         if sha(HERE/'evaluation'/name)!=h:raise ValueError('metrics recipe changed')
     source=CACHE/'insula/m0-live-20260930-c/input';base='/upstream/src/waymo_open_dataset/metrics/tools/'
@@ -47,9 +23,8 @@ def main():
               ('dependency-check',['python','-c','import importlib.util, subprocess; assert importlib.util.find_spec("tensorflow") is None; output=subprocess.check_output(["ldd","/metrics-build/compute_detection_metrics"],text=True); assert "tensorflow" not in output.lower(); print(output)'])]
     started=datetime.now(timezone.utc).isoformat();begin=time.monotonic()
     for name,command in commands:
-        verify_rootfs(ROOT,lock['rootfs_sha256'])
-        plan=launch_plan(ROOT,HERE,source,out,command);p=subprocess.run(plan,text=True,capture_output=True)
-        (out/(name+'.log')).write_text(p.stdout+p.stderr);records.append({'name':name,'command':plan,'exit_code':p.returncode});print(name,p.returncode,flush=True)
+        plan=build_evaluation_plan(runtime,code=HERE,source=source,output=out,command=command);p=run_evaluation_plan(plan,text=True,capture_output=True)
+        (out/(name+'.log')).write_text(p.stdout+p.stderr);records.append({'name':name,'launch_plan':plan_receipt(plan),'exit_code':p.returncode});print(name,p.returncode,flush=True)
         if p.returncode:raise RuntimeError('native metric live check failed')
     for name in ['detection','segmentation']:
         report=json.loads((out/(name+'-tests.json')).read_text());assert report['failures']==0 and report['tests']>0
