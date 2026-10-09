@@ -22,3 +22,17 @@ Verification:
 - Required autonomy gate: 185/185 tests passed
 - Required parallax gate: 17/17 tests passed
 - CUDA gate: GPU 1 was free (`GPU-eaed2f0d-2541-8ca8-b6c4-3e2e45e86619`, 4 MiB used, no compute process on that UUID); `CUDA_VISIBLE_DEVICES=1` autonomy CUDA gate passed 30/30 tests
+
+Done follow-up: restored the deeper legacy non-blob checkpoint publication validation that the coordinator identified as still missing. The active validator now runs an equivalent of the frozen live-reference audit and independent-admission checks without importing `studies` back into `resources` (that dependency would create a Bazel cycle). The equivalent uses `insula.launch_plan.read_receipt_mounts` / `resources.command.inspect_command` for old command receipts, verifies executed archive helper/source pins for both retained legacy pin schemas, validates create/verify/rehydrate proofs, archive snapshot jobs and outputs, HDFS transfer log digests, independent audit input hashes/check.json identity, rootfs split-entry mount order, protected identity binds, and admission proof identity.
+
+Red first: `//autonomy/resources:checkpoint_test` failed on the current head for the intended reasons before production edits: changed admission proof bytes, changed transfer log bytes, and reordered audit command mounts all raised `AssertionError: ValueError not raised`.
+
+Retained receipts: read-only scan found 9 retained legacy checkpoint publications under `~/.cache/waystone/waymo-perception/insula/` with original proof roots; 9/9 validated, 0 failures. No retained legacy publications were present under `autonomy/research`.
+
+Verification rerun:
+
+- Focused checkpoint suite: `//autonomy/resources:checkpoint_test` passed
+- Launch-plan boundary focused check: `//autonomy/insula:launch_plan_boundary_test` passed
+- Required autonomy gate: 185/185 tests passed
+- Required parallax gate: 17/17 tests passed
+- CUDA gate: GPU 1 was free (`GPU-eaed2f0d-2541-8ca8-b6c4-3e2e45e86619`, 4 MiB used, no compute process on that UUID); `CUDA_VISIBLE_DEVICES=1` autonomy CUDA gate passed 30/30 tests

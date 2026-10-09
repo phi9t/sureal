@@ -1,5 +1,5 @@
 """The native final must have an immutable resource companion before resume."""
-import copy,json,tempfile,unittest
+import copy,json,shutil,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch
 from resources.sources import sha
@@ -317,23 +317,306 @@ class ResourceCheckpointTests(unittest.TestCase):
 
     def test_retained_legacy_resource_publication_receipt_still_validates_read_only(self):
         from resources.checkpoint import validate_publication_receipt
-        path=Path('/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-checkpoint-a570042b0bb346998d80d8c9e64e9eab/verified-publication.json')
-        if not path.exists():
-            self.skipTest('retained legacy resource receipt is not present on this host')
-        pub=json.loads(path.read_text())
+        paths=self.retained_legacy_publications()
+        if not paths:
+            self.skipTest('retained legacy resource receipts are not present on this host')
+        validated=0
+        for path in paths:
+            with self.subTest(path=path):
+                pub=json.loads(path.read_text())
+                backend,record,receipt=self.legacy_publication_context(path,pub)
+                value=validate_publication_receipt(backend,record,receipt)
+                self.assertEqual(value['publication_manifest_hdfs_uri'],pub['publication_manifest_hdfs_uri'])
+                validated+=1
+        self.assertGreaterEqual(validated,1)
+
+    def test_legacy_publication_refuses_changed_admission_proof_log_and_audit_mount_order(self):
+        from resources.checkpoint import validate_publication_receipt
+        with tempfile.TemporaryDirectory() as temp:
+            source,backend,record,receipt=self.legacy_publication_fixture(Path(temp))
+            validate_publication_receipt(backend,record,receipt)
+            publication_sha=receipt['sha256']
+            for fault in ['proof-digest','transfer-log','audit-mount-order']:
+                with self.subTest(fault=fault):
+                    path=source
+                    pub=json.loads(path.read_text())
+                    if fault=='proof-digest':
+                        proof=Path(pub['independent_admission']['resource_proof_path'])
+                        proof.write_text(proof.read_text()+'\nchanged proof bytes\n')
+                    elif fault=='transfer-log':
+                        check=pub['chunks'][0]['checks'][1]
+                        log=Path(check['log_path'])
+                        log.write_text(log.read_text()+'\nchanged transfer log\n')
+                    else:
+                        command=pub['independent_admission']['command']
+                        left=command.index('--ro-bind')
+                        right=left+3
+                        next_left=right
+                        command[left:right],command[next_left:next_left+3]=command[next_left:next_left+3],command[left:right]
+                        self.rewrite_legacy_publication(path,pub)
+                        receipt['sha256']=sha(path)
+                    with self.assertRaises(ValueError):
+                        validate_publication_receipt(backend,record,receipt)
+                    if fault=='proof-digest':
+                        proof.write_text(proof.read_text().removesuffix('\nchanged proof bytes\n'))
+                    elif fault=='transfer-log':
+                        log.write_text(log.read_text().removesuffix('\nchanged transfer log\n'))
+                    else:
+                        pub=json.loads(path.read_text())
+                        command=pub['independent_admission']['command']
+                        command[left:right],command[next_left:next_left+3]=command[next_left:next_left+3],command[left:right]
+                        self.rewrite_legacy_publication(path,pub)
+                        receipt['sha256']=publication_sha
+
+    def retained_legacy_publication(self):
+        paths=self.retained_legacy_publications()
+        return paths[0] if paths else None
+
+    def retained_legacy_publications(self):
+        roots=[Path.home()/'.cache/waystone/waymo-perception/insula',Path(__file__).resolve().parents[1]/'research']
+        paths=[]
+        for root in roots:
+            if not root.exists():
+                continue
+            for path in sorted(root.rglob('verified-publication.json')):
+                try:
+                    value=json.loads(path.read_text())
+                except (OSError,json.JSONDecodeError):
+                    continue
+                proof=value.get('independent_admission',{}).get('resource_proof_path')
+                try:
+                    original_root=Path(proof).parents[2]
+                except (TypeError,IndexError):
+                    original_root=None
+                if (value.get('schema_version')==1 and value.get('kind')=='checkpoint' and
+                    'resource_identity_sha256' in value and 'independent_admission' in value and
+                    'blobs' not in value and original_root==path.parent):
+                    paths.append(path)
+        return paths
+
+    def legacy_publication_context(self,path,pub):
         inventory=pub['source_inventory']
         backend=type('Backend',(),{})()
         backend.resource_identity_sha256=pub['resource_identity_sha256']
         backend.manifest_sha=pub['native_manifest_sha256']
         backend.resource_identity={'source_pins':pub['resource_source_pins']}
-        record={'resource_companion_sha256':inventory['checkpoint.json']['sha256'],
-                'final_sha256':inventory['native-final.json']['sha256'],
-                'report_sha256':inventory['producer-report.json']['sha256']}
-        receipt={'path':str(path),'sha256':sha(path),'hdfs_manifest_uri':pub['publication_manifest_hdfs_uri'],'kind':'checkpoint'}
+        record={'resource_companion_sha256':inventory.get('checkpoint.json',{}).get('sha256'),
+                'final_sha256':inventory.get('native-final.json',{}).get('sha256'),
+                'report_sha256':inventory.get('producer-report.json',{}).get('sha256')}
+        receipt={'path':str(path),'sha256':sha(path),'hdfs_manifest_uri':pub['publication_manifest_hdfs_uri'],'kind':pub['kind']}
+        return backend,record,receipt
 
-        validated=validate_publication_receipt(backend,record,receipt)
+    def legacy_publication_fixture(self,root):
+        root.mkdir(exist_ok=True)
+        publication=root/'publication';publication.mkdir()
+        raw=root/'raw';raw.mkdir()
+        execution=publication/'execution';(execution/'resources').mkdir(parents=True);(execution/'advanced').mkdir()
+        code=publication/'resource-layer-code';code.mkdir()
+        source=root/'resources';source.mkdir()
+        for name in ['archive_worker.py','execute_worker.py','retention_audit.py','stage.py']:
+            (source/name).write_text('source '+name+'\n')
+            (execution/'resources'/name).write_text('source '+name+'\n')
+            (code/name).write_text('source '+name+'\n')
+        archive_library=publication/'host-source/advanced/archive.py';archive_library.parent.mkdir(parents=True);archive_library.write_text('archive helper\n')
+        (execution/'advanced/archive.py').write_bytes(archive_library.read_bytes())
+        pins={name:{'original':str(source/name),'snapshot':str(code/name),'sha256':sha(source/name)}
+              for name in ['archive_worker.py','execute_worker.py','retention_audit.py','stage.py']}
+        rootfs=root/'rootfs';rootfs.mkdir()
+        readonly=[]
+        for name in ['bin','etc','usr']:
+            entry=rootfs/name;entry.mkdir()
+            readonly.extend(['--ro-bind',str(entry),'/'+name])
+        for name in ['dev','proc','tmp']:
+            (rootfs/name).mkdir()
+        audit_namespace={'private_tmpfs_root':True,'source_rootfs_sha256':'r'*64,
+                         'readonly_entry_bindings':readonly,'masked_role_entries':['dev','proc','tmp'],
+                         'source_entry_types':{name:{'kind':'directory','symlink_target':None}
+                                               for name in ['bin','dev','etc','proc','tmp','usr']}}
+        payload={}
+        for name,body in [('identity.json','identity'),('checkpoint.json','checkpoint'),
+                          ('native-final.json','final'),('producer-report.json','report'),
+                          ('native-manifest.json','manifest')]:
+            path=raw/name;path.write_text(body+'\n')
+            payload[name]={'path':str(path),'sha256':sha(path),'bytes':path.stat().st_size}
+        prefix='hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-fixture'
+        archive='a'*64
+        members=[{'path':name,'sha256':entry['sha256'],'bytes':entry['bytes']}
+                 for name,entry in sorted(payload.items())]
+        size=sum(member['bytes'] for member in members)
+        manifest={'members':members,'payload_bytes':size,'archive_sha256':archive}
+        manifest_path=publication/'0/manifest.json';manifest_path.parent.mkdir(exist_ok=True);manifest_path.write_text(json.dumps(manifest,sort_keys=True)+'\n')
+        readback_path=publication/'0/readback.json';readback_path.write_bytes(manifest_path.read_bytes())
+        pub={'schema_version':1,'kind':'checkpoint','hdfs_prefix':prefix,'source_inventory':payload,
+             'resource_identity_sha256':payload['identity.json']['sha256'],
+             'native_manifest_sha256':payload['native-manifest.json']['sha256'],
+             'resource_source_pins':pins,'resource_source_directory':str(source),
+             'execution_directory':str(execution),'runtime_lock':{},'rootfs_path':str(rootfs),
+             'audit_runtime_namespace':audit_namespace,
+             'archive_library':{'path':str(archive_library),'sha256':sha(archive_library)},'chunks':[]}
+        checks=[
+            self.legacy_live_check(pub,publication,code,raw,manifest,archive,'create',0),
+            self.legacy_transfer_check(publication,'archive-put'),
+            self.legacy_transfer_check(publication,'archive-get'),
+            self.legacy_transfer_check(publication,'manifest-put'),
+            self.legacy_transfer_check(publication,'manifest-get'),
+            self.legacy_live_check(pub,publication,code,raw,manifest,archive,'verify',5),
+            self.legacy_live_check(pub,publication,code,raw,manifest,archive,'rehydrate',6),
+        ]
+        chunk={'manifest':manifest,'manifest_sha256':sha(manifest_path),'manifest_path':str(manifest_path),
+               'readback_path':str(readback_path),'archive_hdfs_uri':prefix+'/'+archive+'/archive.tar.gz',
+               'manifest_hdfs_uri':prefix+'/'+archive+'/manifest.json','checks':checks}
+        pub['chunks'].append(chunk)
+        expected=publication/'expected.json';expected.write_text(json.dumps(payload,sort_keys=True)+'\n')
+        pub['source_inventory_sha256']=sha(expected)
+        readback={key:value for key,value in pub.items() if key not in {'manifest_readback_exact','publication_manifest_hdfs_uri','publication_manifest_sha256','independent_admission'}}
+        readback_path=publication/'publication-readback.json';readback_path.write_text(json.dumps(readback,sort_keys=True)+'\n')
+        pub.update({'manifest_readback_exact':True,'publication_manifest_hdfs_uri':prefix+'/publication-manifest.json',
+                    'publication_manifest_sha256':sha(readback_path)})
+        audit_inputs=publication/'audit-input';audit_inputs.mkdir()
+        (audit_inputs/'publication.json').write_text(json.dumps(pub,sort_keys=True)+'\n')
+        (audit_inputs/'expected.json').write_bytes(expected.read_bytes())
+        (audit_inputs/'readback.json').write_bytes(readback_path.read_bytes())
+        validation={'files':len(payload),'chunks':1,'payload_bytes':size,'whole_member_union_exact':True,
+                    'all_chunks_live_rehydrated':True,'corrupt_resource_copies_refused':5}
+        pub['independent_admission']=self.legacy_admission_check(pub,publication,code,raw,audit_inputs,validation)
+        self.rewrite_legacy_publication(publication/'verified-publication.json',pub)
+        backend=type('Backend',(),{})()
+        backend.resource_identity_sha256=pub['resource_identity_sha256']
+        backend.manifest_sha=pub['native_manifest_sha256']
+        backend.resource_identity={'source_pins':pub['resource_source_pins']}
+        record={'resource_companion_sha256':payload['checkpoint.json']['sha256'],
+                'final_sha256':payload['native-final.json']['sha256'],
+                'report_sha256':payload['producer-report.json']['sha256']}
+        receipt={'path':str(publication/'verified-publication.json'),'sha256':sha(publication/'verified-publication.json'),
+                 'hdfs_manifest_uri':pub['publication_manifest_hdfs_uri'],'kind':'checkpoint'}
+        return publication/'verified-publication.json',backend,record,receipt
 
-        self.assertEqual(validated['publication_manifest_hdfs_uri'],pub['publication_manifest_hdfs_uri'])
+    def legacy_live_check(self,pub,publication,code,raw,manifest,archive,mode,index):
+        inputdir=publication/str(index)/mode;inputdir.mkdir(parents=True)
+        job={'source_sha256':{m['path']:m['sha256'] for m in manifest['members']},
+             'max_bytes':128*1024**2,'archive_module_path':'/tmp/resource-archive.py',
+             'archive_module_sha256':pub['archive_library']['sha256']}
+        if mode!='create':
+            manifest_path=publication/'0/readback.json'
+            job['manifest_sha256']=sha(manifest_path)
+        (inputdir/'job.json').write_text(json.dumps(job,sort_keys=True)+'\n')
+        output=publication/'native-output'/mode;output.mkdir(parents=True)
+        validation={'archive_sha256':archive,'exact_members_and_hashes':True,
+                    'members':len(manifest['members']),'payload_bytes':manifest['payload_bytes']}
+        if mode=='rehydrate':
+            validation['verified_rehydration']=True
+        (output/'check.json').write_text(json.dumps(validation,sort_keys=True)+'\n')
+        (output/'live.log').write_text(mode+' live log\n')
+        proof_dir=publication/'proofs'/f'{index}-{mode}-live';worker=proof_dir/'worker';worker.mkdir(parents=True)
+        original,command=self.legacy_wrapped_command(pub,code,raw,output,inputdir,worker,['/experiment/resources/archive_worker.py',mode])
+        proof=self.legacy_proof(pub,original,command,output,worker,['/experiment/resources/archive_worker.py',mode])
+        proof_path=proof_dir/'resource-admitted.json';proof_path.write_text(json.dumps(proof,sort_keys=True)+'\n')
+        retained=publication/f'{index}-{mode}-live';retained.mkdir()
+        for filename in ['check.json','live.log']:
+            shutil.copyfile(output/filename,retained/filename)
+        return {'stage':mode+'-live','command':command,'exit_code':0,
+                'resource_proof_path':str(proof_path),'resource_proof_sha256':sha(proof_path),
+                'input_directory':str(inputdir),'input_hashes':{str(inputdir/'job.json'):sha(inputdir/'job.json')},
+                'validation':validation,'artifacts':{str(path):sha(path) for path in retained.iterdir()}}
+
+    def legacy_admission_check(self,pub,publication,code,raw,inputdir,validation):
+        output=publication/'independent-output';output.mkdir()
+        (output/'check.json').write_text(json.dumps(validation,sort_keys=True)+'\n')
+        (output/'live.log').write_text('independent audit log\n')
+        proof_dir=publication/'proofs/independent';worker=proof_dir/'worker';worker.mkdir(parents=True)
+        original,command=self.legacy_audit_command(pub,publication,code,raw,output,inputdir,worker)
+        proof=self.legacy_proof(pub,original,command,output,worker,['/experiment/resources/retention_audit.py'])
+        proof_path=proof_dir/'resource-admitted.json';proof_path.write_text(json.dumps(proof,sort_keys=True)+'\n')
+        retained=publication/'independent';retained.mkdir()
+        for filename in ['check.json','live.log']:
+            shutil.copyfile(output/filename,retained/filename)
+        return {'stage':'independent','command':command,'exit_code':0,
+                'resource_proof_path':str(proof_path),'resource_proof_sha256':sha(proof_path),
+                'input_directory':str(inputdir),'input_hashes':{str(path):sha(path) for path in inputdir.iterdir()},
+                'validation':validation,'artifacts':{str(path):sha(path) for path in retained.iterdir()}}
+
+    def legacy_transfer_check(self,publication,stage):
+        log=publication/(stage+'.log');log.write_text(stage+' transfer log\n')
+        return {'stage':stage,'command':['waystone',stage],'exit_code':0,'log_path':str(log),'log_sha256':sha(log)}
+
+    def legacy_base_command(self,pub,source,output,extra):
+        return ['bwrap','--unshare-all','--die-with-parent','--ro-bind',pub['rootfs_path'],'/',
+                '--ro-bind',pub['execution_directory'],'/experiment','--ro-bind',str(source),'/source',
+                '--bind',str(output),'/outputs','--proc','/proc','--dev','/dev','--tmpfs','/tmp',
+                '--clearenv','--setenv','PYTHONPATH','/experiment','--chdir','/experiment',*extra]
+
+    def legacy_wrapped_command(self,pub,code,source,output,inputdir,worker,worker_argv):
+        base=self.legacy_base_command(pub,source,output,['--ro-bind',str(inputdir),'/tmp/inputs',
+                                      '--ro-bind',pub['archive_library']['path'],'/tmp/resource-archive.py',
+                                      '--','python',*worker_argv])
+        at=base.index('--')
+        return base,[*base[:at],'--ro-bind',str(code),'/tmp/resource-layer','--bind',str(worker),
+                     '/tmp/resource-output','--','python','/tmp/resource-layer/execute_worker.py',
+                     '/tmp/resource-output',*worker_argv]
+
+    def legacy_audit_command(self,pub,publication,code,source,output,inputdir,worker):
+        bindings=pub['audit_runtime_namespace']['readonly_entry_bindings']
+        case_root=publication.parent/'native-case-root';case_root.mkdir(exist_ok=True)
+        command=['bwrap','--unshare-all','--die-with-parent',*bindings,
+                 '--ro-bind',pub['execution_directory'],'/experiment','--ro-bind',str(source),'/source',
+                 '--bind',str(output),'/outputs','--proc','/proc','--dev','/dev','--tmpfs','/tmp',
+                 '--clearenv','--setenv','PYTHONPATH','/experiment','--chdir','/experiment',
+                 '--ro-bind',str(inputdir),'/tmp/inputs','--ro-bind',pub['archive_library']['path'],
+                 '/tmp/resource-archive.py','--tmpfs','/data02','--ro-bind',str(publication),str(publication),
+                 '--ro-bind',str(case_root),str(case_root),'--ro-bind',
+                 pub['resource_source_directory'],pub['resource_source_directory']]
+        return [*command,'--','python','/experiment/resources/retention_audit.py'],[*command,'--ro-bind',str(code),'/tmp/resource-layer','--bind',str(worker),
+                '/tmp/resource-output','--','python','/tmp/resource-layer/execute_worker.py',
+                '/tmp/resource-output','/experiment/resources/retention_audit.py']
+
+    def legacy_proof(self,pub,original,command,output,worker,worker_argv):
+        worker_measurement={'worker_argv':worker_argv,'worker_pid':123,
+                            'measurement':'in-runtime getrusage SELF and waited CHILDREN KiB',
+                            'self_peak_rss_kib':150,'waited_child_peak_rss_kib':100,
+                            'peak_rss_kib':150,'elapsed_seconds':.8,'exit_code':0,
+                            'child_lifecycle':{'subreaper_verified':True,'remaining_children':[]}}
+        worker_path=worker/'worker-resource.json';worker_path.write_text(json.dumps(worker_measurement,sort_keys=True)+'\n')
+        retained_log=worker.parent/'execution.log';retained_log.write_bytes((output/'live.log').read_bytes())
+        host={'command':command,'exit_code':0,'timed_out':False,'peak_rss_kib':100,'elapsed_seconds':1.,
+              'measurement':'wait4.ru_maxrss_KiB_largest_waited_child',
+              'kernel_scope':{'path':'/user.slice/sureal-sustained-fixture.scope','memory_max_bytes':16*1024**3,
+                              'memory_swap_max_bytes':0,'oom':0,'oom_kill':0,'members_verified':True,
+                              'process_ids':[111]},
+              'stage_lifecycle':{'caller_pid':111,'scope_members_before':[111],
+                                 'scope_members_after':[111],'subreaper_verified':True,
+                                 'remaining_children':[]}}
+        return {'schema_version':1,'admitted':True,'command':command,'original_command':original,
+                'worker_argv':worker_argv,'source_pins':pub['resource_source_pins'],
+                'native_output_directory':str(output),'cap_bytes':16*1024**3,'timeout_seconds':300,
+                'host_measurement':host,'worker_measurement':worker_measurement,
+                'resource_admission':{'peak_rss_bytes':153600,'aggregate_cap_bytes':16*1024**3,
+                                      'scope':'separate launcher and in-runtime worker/waited-child peaks under aggregate kernel cap; not summed tree RSS'},
+                'artifacts':{'worker_resource':{'path':str(worker_path),'sha256':sha(worker_path)},
+                             'execution_log':{'path':str(retained_log),'native_path':str(output/'live.log'),
+                                              'sha256':sha(retained_log)}}}
+
+    def copy_legacy_publication_tree(self,source,temp):
+        destination=temp/source.parent.name
+        shutil.copytree(source.parent,destination,symlinks=True)
+        receipt=destination/'verified-publication.json'
+        pub=json.loads(receipt.read_text())
+        self.rewrite_legacy_publication(receipt,pub)
+        return receipt
+
+    def copied_artifact(self,temp,source):
+        destination=Path(temp)/'copied-artifacts'/source.name
+        destination.parent.mkdir(parents=True,exist_ok=True)
+        shutil.copyfile(source,destination)
+        return destination
+
+    def rewrite_legacy_publication(self,path,pub):
+        path=Path(path)
+        readback={key:value for key,value in pub.items() if key not in {'manifest_readback_exact','publication_manifest_hdfs_uri','publication_manifest_sha256','independent_admission'}}
+        readback_path=path.parent/'publication-readback.json'
+        if not readback_path.exists() or json.loads(readback_path.read_text())!=readback:
+            readback_path.write_text(json.dumps(readback,indent=2,sort_keys=True)+'\n')
+        pub['publication_manifest_sha256']=sha(readback_path)
+        path.write_text(json.dumps(pub,indent=2,sort_keys=True)+'\n')
 
     def test_blob_publication_shape_requires_schema_version(self):
         from resources.checkpoint import _is_blob_publication
