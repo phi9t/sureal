@@ -86,10 +86,10 @@ def parameterize_driver(source):
  return source
 
 def _receipt_mounts_if_present(row):
- if 'launch_plan' in row:return read_receipt_mounts(row,include_digests=False)
  command=row.get('command')
  first=command[0] if isinstance(command,list) and command else None
- if first=='bwrap':return read_receipt_mounts(row,include_digests=False)
+ if first=='bwrap':return read_receipt_mounts({'command':command},include_digests=False)
+ if 'launch_plan' in row:return read_receipt_mounts(row,include_digests=False)
  return {}
 
 def verify_receipt(receipt,package,snapshot_store=None):
@@ -107,23 +107,32 @@ def verify_receipt(receipt,package,snapshot_store=None):
   path=Path(p) if Path(p).is_absolute() else package.parent/'.scratch'/p
   check(path,h)
  if 'manifest_sha256' in receipt:
+  expected=receipt['manifest_sha256']
   manifests=set()
+  verified_by_record=False
   for row in receipt.get('checks',[]):
    mount=_receipt_mounts_if_present(row).get('/tmp/inputs')
-   if mount is not None:manifests.add(str(Path(mount['host_path'])/'manifest.json'))
-  if len(manifests)!=1:raise ValueError('Cannot locate unique pinned manifest')
-  check(next(iter(manifests)),receipt['manifest_sha256'])
+   if mount is None:continue
+   if 'host_path' in mount:manifests.add(str(Path(mount['host_path'])/'manifest.json'))
+   elif mount.get('digest')==expected:verified_by_record=True
+   elif 'digest' in mount:raise ValueError('Missing or changed evidence: manifest')
+  if manifests:
+   if len(manifests)!=1:raise ValueError('Cannot locate unique pinned manifest')
+   check(next(iter(manifests)),expected)
+  elif not verified_by_record:raise ValueError('Cannot locate unique pinned manifest')
  if 'worker_sha256' in receipt:
   # Worker digest is retained in the command's read-only binding.
   found=False
   for row in receipt.get('checks',[]):
-   command=row['command'];mount=_receipt_mounts_if_present(row).get('/tmp/worker.py')
+   command=row.get('command',[]);mount=_receipt_mounts_if_present(row).get('/tmp/worker.py')
    if mount is not None:
-    check(mount['host_path'],receipt['worker_sha256']);found=True
+    if 'host_path' in mount:check(mount['host_path'],receipt['worker_sha256']);found=True
+    elif mount.get('digest')==receipt['worker_sha256']:found=True
+    elif 'digest' in mount:raise ValueError('Missing or changed evidence: worker')
    # Legacy GPU receipts and current detection receipts both pin source workers.
    if not found:
-    for value in command:
-     if value.startswith(('/experiment/gpu/','/experiment/detection/')) and value.endswith('.py'):
+    for value in command if isinstance(command,list) else []:
+     if isinstance(value,str) and value.startswith(('/experiment/gpu/','/experiment/detection/')) and value.endswith('.py'):
       check(package/value.removeprefix('/experiment/'),receipt['worker_sha256']);found=True
   if not found:raise ValueError('Cannot locate pinned receipt worker')
  if any(row.get('exit_code')!=0 for row in receipt.get('checks',[])):raise ValueError('Receipt has failed checks')

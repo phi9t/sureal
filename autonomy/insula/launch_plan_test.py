@@ -11,6 +11,7 @@ from evidence.source_snapshot import file_sha256
 from insula.launch_plan import (
     BAZEL_LINUX_X86_64_SHA256,
     BAZEL_VERSION,
+    LaunchPlan,
     Mount,
     PlanError,
     RuntimeLockError,
@@ -22,6 +23,7 @@ from insula.launch_plan import (
     render_plan,
     run_plan,
     read_receipt_mounts,
+    read_receipt_mount_sequence,
 )
 from insula.runtime_identity import rootfs_identity
 from insula.runtime_roots import (
@@ -321,7 +323,7 @@ class LaunchPlanTests(unittest.TestCase):
         )
         retained_mounts = read_receipt_mounts(
             retained,
-            include_digests=False,
+            include_digests=True,
             require_cleared_environment=True,
         )
         command = retained["command"]
@@ -347,6 +349,7 @@ class LaunchPlanTests(unittest.TestCase):
                         local_command[index + 1] = str(output)
             old_mounts = read_receipt_mounts(
                 {"command": local_command},
+                include_digests=True,
                 require_cleared_environment=True,
             )
             plan = build_plan(
@@ -391,6 +394,126 @@ class LaunchPlanTests(unittest.TestCase):
         self.assertEqual(old_mounts["/outputs"]["mode"], new_mounts["/outputs"]["mode"])
         self.assertNotIn("digest", old_mounts["/outputs"])
         self.assertNotIn("digest", new_mounts["/outputs"])
+
+    def test_legacy_receipt_reader_uses_last_mount_for_duplicate_inside_path(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            first_source = root / "first-source"
+            last_source = root / "last-source"
+            for path in (first_source, last_source):
+                path.mkdir()
+
+            command = [
+                "bwrap",
+                "--unshare-all",
+                "--die-with-parent",
+                "--clearenv",
+                "--ro-bind",
+                str(first_source),
+                "/source",
+                "--ro-bind",
+                str(last_source),
+                "/source",
+                "--",
+                "python",
+                "/experiment/worker.py",
+            ]
+
+            mounts = read_receipt_mounts({"command": command}, include_digests=False)
+
+            self.assertEqual(mounts["/source"]["host_path"], str(last_source))
+            self.assertEqual(mounts["/source"]["mode"], "read_only")
+
+            ordered = read_receipt_mount_sequence({"command": command}, include_digests=False)
+            self.assertEqual([mount["host_path"] for mount in ordered], [str(first_source), str(last_source)])
+
+    def test_legacy_receipt_reader_defaults_to_not_hashing_old_mounts(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source"
+            source.mkdir()
+            symlink = root / "source-link"
+            symlink.symlink_to(source, target_is_directory=True)
+            command = [
+                "bwrap",
+                "--unshare-all",
+                "--die-with-parent",
+                "--clearenv",
+                "--ro-bind",
+                str(symlink),
+                "/source",
+                "--",
+                "python",
+                "/experiment/worker.py",
+            ]
+
+            mounts = read_receipt_mounts({"command": command})
+
+            self.assertEqual(mounts["/source"]["host_path"], str(symlink))
+            self.assertNotIn("digest", mounts["/source"])
+
+    def test_retained_bwrap_receipts_all_read_without_rewriting_evidence(self):
+        cache_receipt = (
+            Path.home()
+            / ".cache/waystone/waymo-perception/insula/resource-legacy-seven-controller20261003a-v5/export-1000-resources/resource-admitted.json"
+        )
+        receipt_paths = sorted(AUTONOMY.rglob("*.json"))
+        if cache_receipt.exists():
+            receipt_paths.append(cache_receipt)
+        checked = 0
+        failures = []
+
+        def visit(value):
+            nonlocal checked
+            if isinstance(value, dict):
+                command = value.get("command")
+                if isinstance(command, list) and command and command[0] == "bwrap":
+                    checked += 1
+                    try:
+                        read_receipt_mounts(value, include_digests=False)
+                    except ValueError as error:
+                        failures.append(str(error))
+                for child in value.values():
+                    visit(child)
+            elif isinstance(value, list):
+                for child in value:
+                    visit(child)
+
+        for path in receipt_paths:
+            with self.subTest(path=path):
+                visit(json.loads(path.read_text()))
+
+        self.assertGreater(checked, 0)
+        self.assertEqual(failures, [], f"{len(failures)} of {checked} retained bwrap receipts failed")
+
+    def test_plan_records_require_unshare_flags_and_clearenv_for_clean_environment(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            runtime = self.load_fixture_runtime(root)
+            code = root / "code"
+            output = root / "output"
+            for path in (code, output):
+                path.mkdir()
+            plan = build_plan(runtime, code=code, output=output, command=["python", "/experiment/a.py"])
+            record = record_plan(plan)
+
+            self.assertEqual(record["unshare_flags"], ["--unshare-all", "--die-with-parent"])
+            self.assertTrue(record["clear_environment"])
+            read_receipt_mounts({"launch_plan": record}, require_cleared_environment=True)
+
+            for name, mutate in {
+                "clearenv": lambda candidate: candidate.pop("clear_environment"),
+                "unshare": lambda candidate: candidate.update({"unshare_flags": ["--die-with-parent"]}),
+                "pythonpath": lambda candidate: candidate["environment"].pop("PYTHONPATH"),
+            }.items():
+                with self.subTest(name=name):
+                    candidate = copy.deepcopy(record)
+                    mutate(candidate)
+                    with self.assertRaisesRegex(ValueError, "cleared environment"):
+                        read_receipt_mounts(
+                            {"launch_plan": candidate},
+                            require_cleared_environment=True,
+                        )
 
     def test_mount_rules_name_the_colliding_roles(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -582,7 +705,7 @@ class LaunchPlanTests(unittest.TestCase):
             record = record_plan(plan)
             self.assertEqual(
                 record["gpu"],
-                {"requested_index": 1, "device_uuid": "GPU-fixture-1"},
+                {"requested_index": 1, "device_minor": 1, "device_uuid": "GPU-fixture-1"},
             )
             record_driver_mounts = {
                 mount["role"]: mount
@@ -661,6 +784,107 @@ class LaunchPlanTests(unittest.TestCase):
                                 command=["python", "-c", "pass"],
                             )
 
+    def test_gpu_device_override_must_include_requested_device(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            rootfs = root / CURRENT_GPU_ROOTFS_NAME
+            write_rootfs(rootfs)
+            lock = rootfs.with_name(rootfs.name + ".lock.json")
+            write_gpu_recipe_lock(lock, rootfs)
+            runtime = load_runtime_lock(rootfs, lock)
+
+            code = root / "code"
+            output = root / "output"
+            devices = root / "devices"
+            driver_dir = root / "driver-libs"
+            for path in (code, output, devices, driver_dir):
+                path.mkdir()
+            for name in ("nvidiactl", "nvidia-uvm"):
+                (devices / name).write_text("")
+            for name in (
+                "libcuda.so",
+                "libnvidia-ptxjitcompiler.so",
+                "libnvidia-nvvm.so",
+            ):
+                (driver_dir / name).write_text(name)
+
+            environment = {
+                "SUREAL_BAZEL_GPU_DEVICES": ",".join(
+                    [
+                        f"{devices / 'nvidiactl'}=/dev/nvidiactl",
+                        f"{devices / 'nvidia-uvm'}=/dev/nvidia-uvm",
+                    ]
+                ),
+                "SUREAL_BAZEL_GPU_DRIVER_LIBRARY_DIRS": str(driver_dir),
+                "SUREAL_BAZEL_GPU_DEVICE_UUIDS": "1=GPU-fixture-1",
+            }
+            with patch.dict(os.environ, environment, clear=False):
+                with self.assertRaisesRegex(PlanError, "omits requested /dev/nvidia1"):
+                    build_plan(
+                        runtime,
+                        code=code,
+                        output=output,
+                        gpu_index=1,
+                        command=["python", "-c", "pass"],
+                    )
+
+    def test_gpu_uuid_lookup_uses_device_minor_not_nvidia_smi_index(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            rootfs = root / CURRENT_GPU_ROOTFS_NAME
+            write_rootfs(rootfs)
+            lock = rootfs.with_name(rootfs.name + ".lock.json")
+            write_gpu_recipe_lock(lock, rootfs)
+            runtime = load_runtime_lock(rootfs, lock)
+
+            code = root / "code"
+            output = root / "output"
+            devices = root / "devices"
+            driver_dir = root / "driver-libs"
+            for path in (code, output, devices, driver_dir):
+                path.mkdir()
+            device_pairs = []
+            for guest in ("/dev/nvidia1", "/dev/nvidiactl", "/dev/nvidia-uvm"):
+                host = devices / Path(guest).name
+                host.write_text("")
+                device_pairs.append(f"{host}={guest}")
+            for name in (
+                "libcuda.so",
+                "libnvidia-ptxjitcompiler.so",
+                "libnvidia-nvvm.so",
+            ):
+                (driver_dir / name).write_text(name)
+
+            environment = {
+                "SUREAL_BAZEL_GPU_DEVICES": ",".join(device_pairs),
+                "SUREAL_BAZEL_GPU_DRIVER_LIBRARY_DIRS": str(driver_dir),
+            }
+            proc_gpus = root / "proc/driver/nvidia/gpus"
+            for bus, minor, uuid in (
+                ("0000:8f:00.0", 0, "GPU-zero"),
+                ("0000:90:00.0", 1, "GPU-one"),
+            ):
+                info = proc_gpus / bus / "information"
+                info.parent.mkdir(parents=True)
+                info.write_text(f"GPU UUID: \t {uuid}\nBus Location: \t {bus}\nDevice Minor: \t {minor}\n")
+
+            with patch.dict(os.environ, environment, clear=False):
+                with patch("insula.launch_plan._GPU_DRIVER_INFO_ROOT", proc_gpus):
+                    with patch("insula.launch_plan.subprocess.check_output") as check_output:
+                        plan = build_plan(
+                            runtime,
+                            code=code,
+                            output=output,
+                            gpu_index=1,
+                            command=["python", "-c", "pass"],
+                        )
+
+            self.assertEqual(
+                record_plan(plan)["gpu"],
+                {"requested_index": 1, "device_minor": 1, "device_uuid": "GPU-one"},
+            )
+            check_output.assert_not_called()
+
     def test_gpu_device_override_accepts_remapped_host_paths_for_requested_index(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -717,7 +941,10 @@ class LaunchPlanTests(unittest.TestCase):
                 devices_by_inside,
                 {guest: str((devices / host_name).resolve()) for guest, host_name in remaps.items()},
             )
-            self.assertEqual(data["gpu"], {"requested_index": 1, "device_uuid": "GPU-fixture-1"})
+            self.assertEqual(
+                data["gpu"],
+                {"requested_index": 1, "device_uuid": "GPU-fixture-1"},
+            )
 
     def test_split_runtime_root_mounts_checked_entries_instead_of_whole_root(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -896,6 +1123,74 @@ class LaunchPlanTests(unittest.TestCase):
                         Mount("overlap", "bind", "/tmp/overlap", "writable", output / "child")
                     ],
                 )
+
+    def test_with_mounts_preserves_plan_recording_options(self):
+        from insula.launch_plan import with_mounts
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            runtime = self.load_fixture_runtime(root)
+            code = root / "code"
+            scientific = root / "scientific"
+            output = scientific / "run-output"
+            extra = root / "extra"
+            for path in (code, output, extra):
+                path.mkdir(parents=True)
+            plan = build_plan(
+                runtime,
+                code=code,
+                output=output,
+                named_inputs={"/tmp/scientific": scientific},
+                command=["python", "/experiment/a.py"],
+                source_snapshot_digest="snapshot-fixture",
+                allow_readonly_inputs_cover_output=True,
+            )
+
+            extended = with_mounts(
+                plan,
+                before_devices=[Mount("extra", "bind", "/tmp/extra", "read_only", extra)],
+            )
+            mounts = {mount["role"]: mount for mount in record_plan(extended)["mounts"]}
+
+            self.assertEqual(mounts["code"]["digest"], "snapshot-fixture")
+            self.assertEqual(mounts["input:/tmp/scientific"]["inside_path"], "/tmp/scientific")
+
+    def test_render_plan_never_renders_the_same_inside_path_twice(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            runtime = self.load_fixture_runtime(root)
+            plan = LaunchPlan(
+                runtime=runtime,
+                mounts=(
+                    Mount("runtime", "bind", "/", "read_only", runtime.rootfs),
+                    Mount("tmp", "tmpfs", "/tmp", "writable"),
+                ),
+                environment=(),
+                working_directory="/",
+                command=("true",),
+                unshare_flags=("--unshare-all",),
+            )
+
+            argv = render_plan(plan)
+            rendered = []
+            index = 1
+            while index < argv.index("--"):
+                option = argv[index]
+                if option in {"--ro-bind", "--bind", "--dev-bind", "--symlink"}:
+                    rendered.append(argv[index + 2])
+                    index += 3
+                elif option in {"--proc", "--dev", "--tmpfs"}:
+                    rendered.append(argv[index + 1])
+                    index += 2
+                elif option == "--chdir":
+                    index += 2
+                elif option == "--setenv":
+                    index += 3
+                else:
+                    index += 1
+
+            duplicates = sorted({inside for inside in rendered if rendered.count(inside) > 1})
+            self.assertEqual(duplicates, [])
 
 
 if __name__ == "__main__":

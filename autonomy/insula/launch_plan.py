@@ -56,6 +56,7 @@ _GPU_CONTROL_DEVICES = {
     "/dev/nvidia-modeset",
 }
 _DEFAULT_GPU_DRIVER_LIBRARY_DIRS = (Path("/usr/lib/x86_64-linux-gnu"),)
+_GPU_DRIVER_INFO_ROOT = Path("/proc/driver/nvidia/gpus")
 _LEGACY_COMMAND_ARITY = {
     "--unshare-all": 0,
     "--die-with-parent": 0,
@@ -125,11 +126,15 @@ class LaunchPlan:
     command: tuple[str, ...]
     unshare_flags: tuple[str, ...]
     gpu: "GPURequest | None" = None
+    source_snapshot_digest: str | None = None
+    allow_readonly_inputs_cover_output: bool = False
+    clear_environment: bool = True
 
 
 @dataclass(frozen=True)
 class GPURequest:
     requested_index: int
+    device_minor: int
     device_uuid: str
 
 
@@ -238,11 +243,54 @@ def build_plan(
         working_directory="/experiment",
         unshare_flags=("--unshare-all", "--die-with-parent"),
         gpu=gpu,
+        source_snapshot_digest=source_snapshot_digest,
         allow_readonly_inputs_cover_output=allow_readonly_inputs_cover_output,
     )
-    if source_snapshot_digest is not None:
-        object.__setattr__(plan, "_source_snapshot_digest", source_snapshot_digest)
     return plan
+
+
+def build_custom_plan(
+    runtime: RuntimeLock,
+    *,
+    mounts: Iterable[Mount],
+    environment: Mapping[str, object],
+    command: Iterable[object],
+    working_directory: str,
+    unshare_flags: Iterable[object],
+    gpu_index: int | None = None,
+    gpu: GPURequest | None = None,
+    allow_readonly_inputs_cover_output: bool = False,
+) -> LaunchPlan:
+    """Build a validated launch plan for callers with non-standard mount layouts."""
+    if gpu_index is not None and gpu is not None:
+        raise PlanError("gpu_index and gpu request are mutually exclusive")
+    plan_mounts = list(mounts)
+    environment_items = _environment_from_mapping(environment)
+    if gpu_index is not None:
+        gpu_mounts, gpu_environment, gpu = _gpu_mounts_environment_and_request(gpu_index)
+        plan_mounts.extend(gpu_mounts)
+        environment_items = [
+            item for item in environment_items if not (item[0] == "--setenv" and item[1] == "PATH")
+        ]
+        environment_items.extend(gpu_environment)
+    elif gpu is None:
+        gpu = None
+    return _assemble_plan(
+        runtime,
+        mounts=plan_mounts,
+        environment=environment_items,
+        command=command,
+        working_directory=working_directory,
+        unshare_flags=unshare_flags,
+        gpu=gpu,
+        allow_readonly_inputs_cover_output=allow_readonly_inputs_cover_output,
+    )
+
+
+def gpu_mounts_environment_and_request(gpu_index: int) -> tuple[list[Mount], dict[str, str], GPURequest]:
+    """Return validated GPU mounts, environment, and identity for a requested GPU."""
+    mounts, environment, gpu = _gpu_mounts_environment_and_request(gpu_index)
+    return mounts, {name: value for _, name, value in environment}, gpu
 
 
 def plan_data(plan: LaunchPlan) -> dict:
@@ -259,9 +307,11 @@ def plan_data(plan: LaunchPlan) -> dict:
         "environment": [list(item) for item in plan.environment],
         "working_directory": plan.working_directory,
         "command": list(plan.command),
+        "unshare_flags": list(plan.unshare_flags),
+        "clear_environment": plan.clear_environment,
     }
     if plan.gpu is not None:
-        data["gpu"] = _gpu_request_data(plan.gpu)
+        data["gpu"] = _gpu_request_data(plan.gpu, include_minor=False)
     return data
 
 
@@ -269,7 +319,7 @@ def render_plan(plan: LaunchPlan) -> list[str]:
     """Render a launch plan to bwrap argv at the execution boundary."""
     argv = ["bwrap", *plan.unshare_flags]
     for mount in plan.mounts:
-        if mount.phase == "before_devices" and not _mount_under_tmp(mount):
+        if mount.phase == "before_devices" and mount.role != "tmp" and not _mount_under_tmp(mount):
             argv.extend(_render_mount(mount))
     for mount in plan.mounts:
         if mount.role == "tmp":
@@ -281,7 +331,8 @@ def render_plan(plan: LaunchPlan) -> list[str]:
     for mount in plan.mounts:
         if mount.phase == "after_devices" and mount.role != "tmp":
             argv.extend(_render_mount(mount))
-    argv.append("--clearenv")
+    if plan.clear_environment:
+        argv.append("--clearenv")
     for item in plan.environment:
         argv.extend(item)
     argv.extend(["--chdir", plan.working_directory, "--", *plan.command])
@@ -318,6 +369,9 @@ def with_mounts(
         working_directory=plan.working_directory,
         unshare_flags=plan.unshare_flags,
         gpu=plan.gpu,
+        source_snapshot_digest=plan.source_snapshot_digest,
+        allow_readonly_inputs_cover_output=plan.allow_readonly_inputs_cover_output,
+        clear_environment=plan.clear_environment,
     )
 
 
@@ -333,16 +387,18 @@ def record_plan(plan: LaunchPlan) -> dict:
         "environment": {item[1]: item[2] for item in plan.environment if item[0] == "--setenv"},
         "working_directory": plan.working_directory,
         "command": list(plan.command),
+        "unshare_flags": list(plan.unshare_flags),
+        "clear_environment": plan.clear_environment,
     }
     if plan.gpu is not None:
-        record["gpu"] = _gpu_request_data(plan.gpu)
+        record["gpu"] = _gpu_request_data(plan.gpu, include_minor=True)
     return record
 
 
 def read_receipt_mounts(
     receipt: Mapping[str, object],
     *,
-    include_digests: bool = True,
+    include_digests: bool = False,
     require_cleared_environment: bool = False,
     require_python_worker: bool = False,
 ) -> dict[str, dict[str, object]]:
@@ -362,6 +418,34 @@ def read_receipt_mounts(
         require_python_worker=require_python_worker,
     )
     return _legacy_receipt_mounts(command, parsed["options"], include_digests=include_digests)
+
+
+def read_receipt_mount_sequence(
+    receipt: Mapping[str, object],
+    *,
+    include_digests: bool = False,
+    require_cleared_environment: bool = False,
+    require_python_worker: bool = False,
+) -> list[dict[str, object]]:
+    """Return receipt mounts in recorded/rendered order, preserving legacy duplicates."""
+    plan_record = _extract_launch_plan_record(receipt)
+    if plan_record is not None:
+        _validate_plan_record_requirements(
+            plan_record,
+            require_cleared_environment=require_cleared_environment,
+            require_python_worker=require_python_worker,
+        )
+        mounts = plan_record.get("mounts")
+        if not isinstance(mounts, list):
+            raise ValueError("launch plan mounts required")
+        return list(_read_plan_record_mounts({"mounts": mounts}).values())
+    command = _extract_legacy_receipt_command(receipt)
+    parsed = _parse_legacy_receipt_command(
+        command,
+        require_cleared_environment=require_cleared_environment,
+        require_python_worker=require_python_worker,
+    )
+    return _legacy_receipt_mount_sequence(parsed["options"], include_digests=include_digests)
 
 
 def legacy_receipt_command_argv(command: list[str]) -> list[str]:
@@ -538,6 +622,8 @@ def _assemble_plan(
     unshare_flags: Iterable[object],
     gpu: GPURequest | None = None,
     allow_readonly_inputs_cover_output: bool = False,
+    source_snapshot_digest: str | None = None,
+    clear_environment: bool = True,
 ) -> LaunchPlan:
     mount_tuple = tuple(mounts)
     _validate_mounts(
@@ -552,6 +638,9 @@ def _assemble_plan(
         command=tuple(str(item) for item in command),
         unshare_flags=tuple(str(flag) for flag in unshare_flags),
         gpu=gpu,
+        source_snapshot_digest=source_snapshot_digest,
+        allow_readonly_inputs_cover_output=allow_readonly_inputs_cover_output,
+        clear_environment=clear_environment,
     )
 
 
@@ -602,7 +691,15 @@ def _validate_plan_record_requirements(
 ) -> None:
     if require_cleared_environment:
         environment = record.get("environment")
-        if not isinstance(environment, Mapping) or environment.get("PYTHONPATH") != "/experiment":
+        unshare_flags = record.get("unshare_flags")
+        if (
+            not isinstance(environment, Mapping)
+            or environment.get("PYTHONPATH") != "/experiment"
+            or record.get("clear_environment") is not True
+            or not isinstance(unshare_flags, list)
+            or "--unshare-all" not in unshare_flags
+            or "--die-with-parent" not in unshare_flags
+        ):
             raise ValueError("launch plan record cleared environment required")
     if require_python_worker:
         command = record.get("command")
@@ -677,19 +774,27 @@ def _legacy_receipt_mounts(
     include_digests: bool,
 ) -> dict[str, dict[str, object]]:
     by_inside: dict[str, dict[str, object]] = {}
-    for option, values in options:
-        mount = _legacy_mount_from_option(option, values, include_digests=include_digests)
-        if mount is None:
-            continue
+    for mount in _legacy_receipt_mount_sequence(options, include_digests=include_digests):
         inside = mount["inside_path"]
         if not isinstance(inside, str):
             raise ValueError("legacy receipt mount inside path required")
-        if inside in by_inside:
-            raise ValueError(f"duplicate receipt mount {inside}")
         by_inside[inside] = mount
     if not by_inside:
         raise ValueError("legacy receipt mounts required")
     return by_inside
+
+
+def _legacy_receipt_mount_sequence(
+    options: Iterable[tuple[str, tuple[str, ...]]],
+    *,
+    include_digests: bool,
+) -> list[dict[str, object]]:
+    mounts = []
+    for option, values in options:
+        mount = _legacy_mount_from_option(option, values, include_digests=include_digests)
+        if mount is not None:
+            mounts.append(mount)
+    return mounts
 
 
 def _legacy_mount_from_option(
@@ -774,24 +879,18 @@ def _plan_device_insertion_index(command: list[str], separator: int) -> int:
 
 
 def _render_ordered_record_mounts(mounts: Iterable[Mapping[str, object]]) -> list[Mapping[str, object]]:
-    """Recorded mounts in render_plan order: other mounts, the /tmp tmpfs, then mounts under /tmp."""
+    """Recorded mounts in render_plan order."""
 
     def group(mount: Mapping[str, object]) -> int:
+        if mount.get("phase") == "after_devices" and mount.get("role") != "tmp":
+            return 3
         if mount.get("role") == "tmp":
             return 1
-        return 2 if str(mount.get("inside_path", "")).startswith("/tmp/") else 0
+        if str(mount.get("inside_path", "")).startswith("/tmp/"):
+            return 2
+        return 0
 
     return sorted(mounts, key=group)
-
-
-def _unchecked_runtime(rootfs: Path) -> RuntimeLock:
-    return RuntimeLock(
-        rootfs=Path(rootfs).resolve(),
-        lock_path=None,
-        data={},
-        form="unchecked",
-        lock_sha256="",
-    )
 
 
 def _runtime_mounts(runtime: RuntimeLock, split_runtime_root: bool) -> list[Mount]:
@@ -970,6 +1069,21 @@ def _merge_environment(
     return environment
 
 
+def _environment_from_mapping(environment: Mapping[str, object]) -> list[tuple[str, str, str]]:
+    if not isinstance(environment, Mapping):
+        raise PlanError("environment mapping required")
+    items = []
+    for name, value in environment.items():
+        name = str(name)
+        if not name or "=" in name or "\x00" in name:
+            raise PlanError(f"{name!r}: invalid environment variable name")
+        value = str(value)
+        if "\x00" in value:
+            raise PlanError(f"{name}: environment value contains NUL")
+        items.append(("--setenv", name, value))
+    return items
+
+
 def _validate_named_input_path(path: str) -> None:
     inside = PurePosixPath(path)
     if not inside.is_absolute() or ".." in inside.parts:
@@ -1081,10 +1195,12 @@ def _record_mount(plan: LaunchPlan, mount: Mount) -> dict:
         data["digest"] = plan.runtime.data.get("rootfs_sha256", "")
     elif mount.role.startswith("runtime-entry:"):
         data["digest"] = plan.runtime.data.get("rootfs_sha256", "")
-    elif mount.role == "code" and hasattr(plan, "_source_snapshot_digest"):
-        data["digest"] = getattr(plan, "_source_snapshot_digest")
+    elif mount.role == "code" and plan.source_snapshot_digest is not None:
+        data["digest"] = plan.source_snapshot_digest
     elif mount.host_path is not None and mount.mode == "read_only":
         data["digest"] = _content_digest(Path(mount.host_path))
+    if mount.phase != "before_devices":
+        data["phase"] = mount.phase
     return data
 
 
@@ -1122,6 +1238,7 @@ def _content_digest(path: Path) -> str:
 def _gpu_mounts_environment_and_request(gpu_index: int):
     if type(gpu_index) is not int or gpu_index < 0:
         raise PlanError("gpu_index: non-negative integer required")
+    device_minor = gpu_index
     mounts = [Mount("gpu-driver-root", "tmpfs", "/driver", "writable", None)]
     for path in _gpu_driver_paths():
         mounts.append(
@@ -1134,17 +1251,26 @@ def _gpu_mounts_environment_and_request(gpu_index: int):
                 digest=_mounted_file_sha256(path, f"gpu-driver:{path.name}"),
             )
         )
-    for host, guest in _gpu_device_pairs(gpu_index):
+    device_pairs = _gpu_device_pairs(gpu_index)
+    if not any(guest == f"/dev/nvidia{device_minor}" for _, guest in device_pairs):
+        raise PlanError(f"GPU override omits requested /dev/nvidia{device_minor}")
+    for host, guest in device_pairs:
         mounts.append(Mount(f"gpu-device:{guest}", "dev-bind", guest, "writable", host, "after_devices"))
     return mounts, [
         ("--setenv", "PATH", _GPU_PATH),
         ("--setenv", "LD_LIBRARY_PATH", "/driver:/usr/local/cuda/lib64"),
         ("--setenv", "CUDA_VISIBLE_DEVICES", "0"),
-    ], GPURequest(gpu_index, _gpu_device_uuid(gpu_index))
+    ], GPURequest(gpu_index, device_minor, _gpu_device_uuid(device_minor))
 
 
-def _gpu_request_data(gpu: GPURequest) -> dict:
-    return {"requested_index": gpu.requested_index, "device_uuid": gpu.device_uuid}
+def _gpu_request_data(gpu: GPURequest, *, include_minor: bool) -> dict:
+    data = {
+        "requested_index": gpu.requested_index,
+        "device_uuid": gpu.device_uuid,
+    }
+    if include_minor:
+        data["device_minor"] = gpu.device_minor
+    return data
 
 
 def _gpu_device_pairs(gpu_index: int) -> list[tuple[Path, str]]:
@@ -1205,19 +1331,26 @@ def _gpu_device_uuid(gpu_index: int) -> str:
             return mapping[gpu_index]
         except KeyError as exc:
             raise PlanError(f"gpu_index {gpu_index}: device UUID override missing") from exc
-    try:
-        return subprocess.check_output(
-            [
-                "nvidia-smi",
-                f"--id={gpu_index}",
-                "--query-gpu=uuid",
-                "--format=csv,noheader,nounits",
-            ],
-            text=True,
-            stderr=subprocess.PIPE,
-        ).strip()
-    except (FileNotFoundError, subprocess.CalledProcessError) as exc:
-        raise PlanError(f"gpu_index {gpu_index}: device UUID lookup failed") from exc
+    for info in sorted(_GPU_DRIVER_INFO_ROOT.glob("*/information")):
+        try:
+            fields = _parse_gpu_driver_information(info.read_text())
+        except OSError:
+            continue
+        if fields.get("Device Minor") != str(gpu_index):
+            continue
+        uuid = fields.get("GPU UUID")
+        if uuid:
+            return uuid
+    raise PlanError(f"gpu_index {gpu_index}: device UUID lookup failed")
+
+
+def _parse_gpu_driver_information(text: str) -> dict[str, str]:
+    fields = {}
+    for line in text.splitlines():
+        name, separator, value = line.partition(":")
+        if separator:
+            fields[name.strip()] = value.strip()
+    return fields
 
 
 def _gpu_driver_paths() -> list[Path]:
@@ -1255,6 +1388,8 @@ __all__ = [
     "load_runtime_lock",
     "load_default_runtime_lock",
     "build_plan",
+    "build_custom_plan",
+    "gpu_mounts_environment_and_request",
     "plan_data",
     "render_plan",
     "wrap_legacy_receipt_command",
@@ -1268,4 +1403,5 @@ __all__ = [
     "with_mounts",
     "record_plan",
     "read_receipt_mounts",
+    "read_receipt_mount_sequence",
 ]
