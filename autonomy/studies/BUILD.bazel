@@ -10,6 +10,7 @@ ACTIVE_MODULES = [
 ACTIVE_TESTS = [
     "architecture/experiment_runner_test.py",
     "expanded_batch/expanded_verifier_test.py",
+    "fixed_batch/fixed_batch_verifier_test.py",
     "scientific_cohort_test.py",
 ]
 

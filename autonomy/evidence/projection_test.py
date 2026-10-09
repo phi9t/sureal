@@ -2,7 +2,7 @@ import unittest
 from evidence.projection import project_experiments
 class ProjectionTests(unittest.TestCase):
  def run_case(self):
-  point={'step':500,'LEVEL2_per_class':{str(i):{'APH':.9} for i in range(1,5)},'all_class_quality_passed':True}
+  point={'step':500,'LEVEL2_per_class':{str(i):{'AP':.9,'APH':.9} for i in range(1,5)},'all_class_quality_passed':True}
   return {'_run_metadata':{'matrix':{'baseline':{'architecture':'baseline'}}},'finished':True,'cases':{'baseline':{'status':'sustained native overfit','updates':750,'curve':[point,{**point,'step':750}]}}}
  def test_native_fit_requires_matching_final_closure(self):
   result=self.run_case();definitions={'baseline':{'architecture':'baseline'}}
@@ -19,6 +19,19 @@ class ProjectionTests(unittest.TestCase):
  def test_loss_reduction_cannot_promote_invalid_native_pass(self):
   result=self.run_case();result['cases']['baseline']['curve'][-1]['LEVEL2_per_class']['4']['APH']=.2
   with self.assertRaises(ValueError):project_experiments('run',{'baseline':{'architecture':'baseline'}},result,'a',None,None)
+ def test_running_case_without_score_stays_running(self):
+  definitions={'baseline':{'architecture':'baseline'}}
+  result={'_run_metadata':{'matrix':definitions},'cases':{'baseline':{'status':'training in progress','curve':[{'step':500}]}}}
+  row=project_experiments('run',definitions,result,'a',None,None)[0]
+  self.assertEqual(row['stage'],'running_or_verifying')
+  self.assertEqual(row['terminal_LEVEL2_per_class'],{})
+  self.assertIsNone(row['worst_terminal_APH'])
+ def test_malformed_running_score_record_is_refused(self):
+  definitions={'baseline':{'architecture':'baseline'}}
+  malformed={str(i):{'AP':.9,'APH':.9} for i in range(1,5)}
+  del malformed['4']['AP']
+  result={'_run_metadata':{'matrix':definitions},'cases':{'baseline':{'status':'training in progress','curve':[{'step':500,'LEVEL2_per_class':malformed}]}}}
+  with self.assertRaises(ValueError):project_experiments('run',definitions,result,'a',None,None)
  def test_registry_recipe_cannot_relabel_existing_evidence(self):
   result=self.run_case();closure={'candidate_sha256':'a','validation':{'all_cases_finished':True},'checks':[{'exit_code':0}]}
   with self.assertRaises(ValueError):project_experiments('run',{'baseline':{'architecture':'different','learning_rate':.1}},result,'a',closure,None)

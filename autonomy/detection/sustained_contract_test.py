@@ -24,6 +24,8 @@ class SustainedContractTests(unittest.TestCase):
   with self.assertRaises(ValueError):next_checkpoint(32001,None)
  def samples(self,steps,passing=()):
   return [{'step':step,'APH':{str(i):(.9 if step in passing else .1) for i in range(1,5)}} for step in steps]
+ def score_record_samples(self,steps,passing=()):
+  return [{'step':step,'LEVEL2_per_class':{str(i):{'AP':.9 if step in passing else .1,'APH':.9 if step in passing else .1} for i in range(1,5)}} for step in steps]
  def test_all_classes_two_consecutive_terminal_samples(self):
   samples=self.samples([0,1000,2000],{1000,2000})
   self.assertEqual(fit_status(samples,2000,'gate'),'sustained native overfit')
@@ -31,6 +33,11 @@ class SustainedContractTests(unittest.TestCase):
    bad=copy.deepcopy(samples);bad[-1]['APH']['4']=value
    with self.assertRaises(ValueError):fit_status(bad,2000,'gate')
   bad=copy.deepcopy(samples);del bad[-1]['APH']['4']
+  with self.assertRaises(ValueError):fit_status(bad,2000,'gate')
+ def test_contract_reads_complete_score_record_samples(self):
+  samples=self.score_record_samples([0,1000,2000],{1000,2000})
+  self.assertEqual(fit_status(samples,2000,'gate'),'sustained native overfit')
+  bad=copy.deepcopy(samples);del bad[-1]['LEVEL2_per_class']['4']['AP']
   with self.assertRaises(ValueError):fit_status(bad,2000,'gate')
  def test_cap_reason_and_sample_order_cannot_be_faked(self):
   steps=[0,1000,2000,4000,8000,12000,16000,24000,32000]
