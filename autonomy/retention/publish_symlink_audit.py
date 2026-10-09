@@ -6,9 +6,10 @@ import json
 import os
 import shutil
 import tarfile
-import uuid
+import tempfile
 from pathlib import Path
 
+from blob_store.core import BlobStore, blob_adapter_from_descriptor, validate_blob_key
 from evidence.source_snapshot import (
     file_sha256,
     is_regular_file,
@@ -18,13 +19,17 @@ from evidence.source_snapshot import (
 )
 from resources.resource_archive import safe_name
 from retention.publish_scientific_directory import (
-    CACHE_ROOT,
     PACKAGE_ROOT,
     SCIENTIFIC_PROCESSING,
-    WaystoneClient,
     _require_evidence_root,
     _safe_component,
-    _waystone_tool_pins,
+    _require_tool_digest,
+)
+from retention.publication import (
+    WAYSTONE_DESCRIPTOR,
+    _normalize_receipt_tool_digest,
+    _normalize_tool_digest,
+    _write_json_idempotent,
 )
 from retention.publisher_runtime import admitted_host_sources
 
@@ -36,6 +41,8 @@ HOST_SOURCE_REQUIRED = (
     "retention/publisher_runtime.py",
     "resources/resource_archive.py",
     "evidence/source_snapshot.py",
+    "blob_store/core.py",
+    "retention/publication.py",
 )
 
 
@@ -227,6 +234,89 @@ def _move_tree(root, destination, expected_listing, same_device):
     return moved
 
 
+def _blob_key_prefix(child, run_id):
+    return validate_blob_key("/".join(["runs", child, run_id, "symlink-audit"]))
+
+
+def _blob_key(child, run_id, name):
+    return _blob_key_prefix(child, run_id) + "/" + validate_blob_key(name)
+
+
+def _fetch_blob(store, blob, destination):
+    blob = _normalize_blob(blob)
+    store.get(blob["key"], destination, blob["sha256"], expected_bytes=blob["bytes"])
+
+
+def _fetch_json_blob(store, blob, destination):
+    _fetch_blob(store, blob, destination)
+    try:
+        return json.loads(Path(destination).read_text())
+    except json.JSONDecodeError as error:
+        raise ValueError("symlink audit manifest JSON required") from error
+
+
+def _normalize_blob(value):
+    if not isinstance(value, dict) or set(value) != {"key", "sha256", "bytes"}:
+        raise ValueError("symlink audit blob record required")
+    digest = value["sha256"]
+    if not isinstance(digest, str) or len(digest) != 64 or any(char not in "0123456789abcdef" for char in digest):
+        raise ValueError("symlink audit blob digest required")
+    size = value["bytes"]
+    if type(size) is not int or size < 0:
+        raise ValueError("symlink audit blob byte count required")
+    return {"key": validate_blob_key(value["key"]), "sha256": digest, "bytes": size}
+
+
+def _normalize_receipt(receipt):
+    if not isinstance(receipt, dict):
+        raise ValueError("symlink audit receipt required")
+    if set(receipt) != {"schema_version", "store_descriptor", "tool_sha256", "verified_by_readback", "blobs"}:
+        raise ValueError("symlink audit receipt shape required")
+    if receipt["schema_version"] != 1 or receipt["verified_by_readback"] is not True:
+        raise ValueError("symlink audit readback receipt required")
+    blobs = receipt["blobs"]
+    if not isinstance(blobs, dict) or set(blobs) != {"archive", "manifest"}:
+        raise ValueError("symlink audit blob records required")
+    return {
+        "schema_version": 1,
+        "store_descriptor": dict(receipt["store_descriptor"]),
+        "tool_sha256": _normalize_receipt_tool_digest(receipt["tool_sha256"]),
+        "verified_by_readback": True,
+        "blobs": {
+            "archive": _normalize_blob(blobs["archive"]),
+            "manifest": _normalize_blob(blobs["manifest"]),
+        },
+    }
+
+
+def audit(receipt, *, store=None):
+    receipt = _normalize_receipt(receipt)
+    if store is None:
+        store = BlobStore(blob_adapter_from_descriptor(receipt["store_descriptor"]))
+    with tempfile.TemporaryDirectory(prefix="symlink-audit.") as directory:
+        root = Path(directory)
+        manifest_path = root / "manifest.json"
+        manifest = _fetch_json_blob(store, receipt["blobs"]["manifest"], manifest_path)
+        if manifest.get("schema_version") != 1 or manifest.get("kind") != "symlink-audit":
+            raise ValueError("symlink audit manifest shape required")
+        expected_prefix = _blob_key_prefix(manifest["child"], manifest["run_id"])
+        if receipt["blobs"]["manifest"]["key"] != expected_prefix + "/manifest.json":
+            raise ValueError("symlink audit manifest key differs")
+        if receipt["blobs"]["archive"]["key"] != expected_prefix + "/audit.tar.gz":
+            raise ValueError("symlink audit archive key differs")
+        if manifest.get("archive") != receipt["blobs"]["archive"]:
+            raise ValueError("symlink audit archive record differs from manifest")
+        archive_path = root / "audit.tar.gz"
+        _fetch_blob(store, receipt["blobs"]["archive"], archive_path)
+        listing = extract_symlink_archive(archive_path, manifest, root / "readback")
+    return {
+        "entries": len(listing),
+        "listing": listing,
+        "manifest": manifest,
+        "whole_listing_exact": True,
+    }
+
+
 def publish(
     *,
     case,
@@ -240,7 +330,9 @@ def publish(
     write_receipt=False,
     move_to=None,
     scientific_processing=SCIENTIFIC_PROCESSING,
-    waystone=None,
+    store=None,
+    store_descriptor=None,
+    tool_digest=None,
     host_source_admitter=_admit_host_sources,
     identifier=None,
     same_device=_same_device,
@@ -252,91 +344,48 @@ def publish(
     hdfs_namespace = _safe_component(hdfs_namespace, "HDFS namespace")
     root, scientific_processing = _require_case_root(case, root, scientific_processing)
     evidence = _require_evidence_root(evidence, scientific_processing)
-    identifier = identifier or (case + "-" + uuid.uuid4().hex)
-    run_dir = evidence / ("hdfs-retention-" + identifier)
+    identifier = identifier or case
+    run_dir = evidence / ("blob-publication-" + identifier)
     run_dir.mkdir(exist_ok=False)
     host_pins, admitted_package = host_source_admitter(host_source_receipt, PACKAGE_ROOT, run_dir / "host-source")
-    waystone_tool_pins = {}
-    if waystone is None:
-        waystone_tool_pins = _waystone_tool_pins()
-
-        def validate_external():
-            _validate_host_sources(admitted_package, host_pins)
-
-        waystone = WaystoneClient(auth_source=auth_source, before_run=validate_external, tool_pins=waystone_tool_pins)
-    layout = waystone.layout_profile(run_dir)
-    remote = layout["paths"]["runs"].rstrip("/") + "/" + hdfs_namespace + "/" + identifier
-    authenticated_read = waystone.authenticated_read(layout["project_root"], run_dir)
+    del host_pins, admitted_package
+    descriptor = dict(store_descriptor or WAYSTONE_DESCRIPTOR)
+    if store is None:
+        store = BlobStore(blob_adapter_from_descriptor(descriptor))
+    tool_digest = _require_tool_digest(store, tool_digest)
     packed = run_dir / "packed"
     packed.mkdir()
     archive = packed / "audit.tar.gz"
     manifest = create_symlink_archive(root, archive)
-    manifest_path = packed / "manifest.json"
-    manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2))
-    archive_uri = remote + "/" + manifest["archive_sha256"] + "/audit.tar.gz"
-    manifest_uri = remote + "/" + manifest["archive_sha256"] + "/manifest.json"
-    checks = [
+    archive_blob = store.put(_blob_key(hdfs_namespace, identifier, "audit.tar.gz"), archive)
+    manifest.update(
         {
-            "stage": "create-live",
-            "command": ["tar", "--preserve-symlinks", str(root)],
-            "exit_code": 0,
-            "validation": {
-                "members": len(manifest["listing"]),
-                "archive_sha256": manifest["archive_sha256"],
-            },
-        },
-        waystone.put_new(archive, archive_uri, "archive-put", run_dir),
-    ]
-    download = run_dir / "download"
-    download.mkdir()
-    checks.append(waystone.get(archive_uri, download / "audit.tar.gz", "archive-get", run_dir))
-    if (download / "audit.tar.gz").read_bytes() != archive.read_bytes():
-        raise ValueError("archive readback differs")
-    checks.append(waystone.put_new(manifest_path, manifest_uri, "manifest-put", run_dir))
-    checks.append(waystone.get(manifest_uri, download / "manifest.json", "manifest-get", run_dir))
-    if file_sha256(download / "manifest.json") != file_sha256(manifest_path):
-        raise ValueError("manifest readback differs")
-    readback_manifest = json.loads((download / "manifest.json").read_text())
-    readback_listing = extract_symlink_archive(download / "audit.tar.gz", readback_manifest, run_dir / "readback")
-    checks.append(
-        {
-            "stage": "readback-listing",
-            "command": ["extract", "audit.tar.gz"],
-            "exit_code": 0,
-            "validation": {"listing_equal": readback_listing == manifest["listing"]},
+            "area": "runs",
+            "child": hdfs_namespace,
+            "run_id": identifier,
+            "kind": "symlink-audit",
+            "archive": archive_blob,
         }
     )
+    manifest_path = packed / "manifest.json"
+    manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2))
+    manifest_blob = store.put(_blob_key(hdfs_namespace, identifier, "manifest.json"), manifest_path)
     receipt = {
         "schema_version": 1,
-        "case": case,
-        "root": str(root),
-        "hdfs_namespace": hdfs_namespace,
-        "host_source_pins": host_pins,
-        "waystone_tool_sha256": waystone_tool_pins,
-        "authenticated_read": authenticated_read,
-        "archive_hdfs_uri": archive_uri,
-        "manifest_hdfs_uri": manifest_uri,
-        "archive_sha256": manifest["archive_sha256"],
-        "manifest_sha256": file_sha256(manifest_path),
-        "source_listing": manifest["listing"],
-        "readback_listing": readback_listing,
-        "checks": checks,
+        "store_descriptor": descriptor,
+        "tool_sha256": _normalize_tool_digest(tool_digest),
+        "verified_by_readback": True,
+        "blobs": {"archive": archive_blob, "manifest": manifest_blob},
     }
+    audit_result = audit(receipt, store=store)
+    receipt_path = run_dir / "verified-publication.json"
+    _write_json_idempotent(receipt_path, receipt)
     if move_to is not None:
-        moved_listing = _move_tree(root, move_to, manifest["listing"], same_device)
+        moved_listing = _move_tree(root, move_to, audit_result["listing"], same_device)
         completed = {"moved_from": str(root), "moved_to": str(move_to), "listing": moved_listing}
         completed_path = run_dir / "move-completed.json"
         completed_path.write_text(json.dumps(completed, indent=2))
-        receipt["moved_listing"] = moved_listing
-        receipt["move"] = {
-            "stage": "move-completed",
-            "command": ["rename", str(root), str(move_to)],
-            "exit_code": 0,
-            "move_completed_sha256": file_sha256(completed_path),
-        }
-    receipt_path = run_dir / "verified-publication.json"
-    receipt_path.write_text(json.dumps(receipt, indent=2))
-    print("ADMITTED HDFS symlink audit retention", receipt_path, "moved", move_to is not None, flush=True)
+    print("ADMITTED blob-store symlink audit publication", receipt_path, "moved", move_to is not None, flush=True)
     return receipt
 
 
