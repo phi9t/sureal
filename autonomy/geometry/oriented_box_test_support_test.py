@@ -6,6 +6,7 @@ import numpy as np
 from geometry import oriented_box_test_support as support
 from geometry.oriented_box import (
     axis_aligned_bev_iou,
+    bev_corners,
     count_points_in_box,
     enclosing_bev_rectangles,
     nearest_bev_rectangles,
@@ -56,6 +57,14 @@ def _wrong_iou(first, second):
     return iou
 
 
+def _wrong_bev_corners_at_pi_half(box):
+    corners = bev_corners(box).copy()
+    box = np.asarray(box, dtype=np.float64)
+    if box[6] == math.pi / 2:
+        corners[0, 0] = np.nextafter(corners[0, 0], math.inf)
+    return corners
+
+
 def _has_boundary_point(points, box):
     delta = points - box[:3]
     c, s = math.cos(box[6]), math.sin(box[6])
@@ -99,6 +108,14 @@ class OrientedBoxParityHarnessTests(unittest.TestCase):
             helper(self, nearest_bev_rectangles, _wrong_enclosing_rectangles_at_pi_quarter, axis_aligned_bev_iou)
         with self.assertRaises(AssertionError):
             helper(self, nearest_bev_rectangles, enclosing_bev_rectangles, _wrong_iou)
+
+    def test_bev_corners_parity_helper_uses_boundary_headings(self):
+        helper = getattr(support, "assert_bev_corners_parity", None)
+        if helper is None:
+            self.fail("assert_bev_corners_parity missing")
+
+        with self.assertRaises(AssertionError):
+            helper(self, _wrong_bev_corners_at_pi_half)
 
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@ import numpy as np
 from PIL import Image,ImageDraw
 from dataset.sensor_records import select_rows,array_field
 from evidence.source_snapshot import file_sha256
+from geometry.oriented_box import bev_corners
 job=json.loads(Path('/tmp/input/job.json').read_text());mode=sys.argv[1];t=job['timestamp'];scene=job['scene']
 source=Path('/source/lidar_camera_projection.parquet')
 assert file_sha256(source)==job['source']['sha256']
@@ -52,6 +53,6 @@ else:
  for r in frame['rows']:
   x,y,z,l,w,h,a=r['box']
   if r['num_lidar_points_in_box']<=0 or not (-60<x<60 and -60<y<60):continue
-  c,s=np.cos(a),np.sin(a);corners=[pos((x+c*u-s*v,y+s*u+c*v)) for u,v in [(-l/2,-w/2),(l/2,-w/2),(l/2,w/2),(-l/2,w/2)]];draw.line(corners+[corners[0]],fill=(240,240,230),width=1)
+  corners=[pos(p) for p in bev_corners([x,y,z,l,w,h,a])];draw.line(corners+[corners[0]],fill=(240,240,230),width=1)
  draw.polygon([(450,438),(444,459),(456,459)],fill=(255,255,255));draw.text((463,455),'Ego',fill=(235,240,245));draw.text((80,25),'BEV | X forward up / Y left left | axes in meters',fill=(235,240,245));draw.text((80,45),'Gray: all five LiDARs | colored: FRONT correspondences | white: native boxes',fill=(235,240,245));canvas.save('/outputs/bev.jpg',quality=90)
 Path('/outputs/check.json').write_text(json.dumps({'scene':scene,'timestamp':t,'physical_points':len(xyz),'front_correspondences':len(indexes),'all_correspondences_scalar_checked':True,'mode':mode,'scope':'supplied native projections, all sensors/returns; not independent rolling-shutter reprojection; non-TOP geometry uncompensated'},indent=2));print('PASS joint render',mode,len(indexes))

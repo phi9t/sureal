@@ -3,6 +3,8 @@ from collections import defaultdict
 
 import numpy as np
 
+from geometry.oriented_box import count_points_in_box
+
 TRACK_COLUMNS = [
     "frame", "cx", "cy", "cz", "length", "width", "height", "heading",
     "vx", "vy", "vz", "ax", "ay", "az", "num_points", "num_top_points",
@@ -94,9 +96,5 @@ def associations(rows):
 
 def points_in_box(xyz, center, size, heading):
     """Count points inside an axis-aligned-in-box-frame box (length x, width y, height z)."""
-    d = np.asarray(xyz, dtype=np.float64) - np.asarray(center, dtype=np.float64)
-    c, s = np.cos(heading), np.sin(heading)
-    lx = d[:, 0] * c + d[:, 1] * s
-    ly = -d[:, 0] * s + d[:, 1] * c
-    inside = (np.abs(lx) <= size[0] / 2) & (np.abs(ly) <= size[1] / 2) & (np.abs(d[:, 2]) <= size[2] / 2)
-    return int(inside.sum())
+    box = np.concatenate((np.asarray(center, dtype=np.float64), np.asarray(size, dtype=np.float64), [heading]))
+    return count_points_in_box(xyz, box)
