@@ -16,7 +16,9 @@ PILOT_TARGET = "//autonomy/retention:publish_sustained_pilot"
 CHECKPOINT_REQUIRED = (
     "blob_store/core.py",
     "evidence/source_snapshot.py",
+    "insula/launch_plan.py",
     "insula/runtime_identity.py",
+    "insula/runtime_roots.py",
     "resources/backend.py",
     "resources/scientific_budget.py",
     "resources/scientific_payload.py",

@@ -7,7 +7,7 @@ import os
 import re
 import stat
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path, PurePosixPath
 from typing import Iterable, Mapping
 
@@ -68,6 +68,16 @@ _LEGACY_COMMAND_ARITY = {
     "--bind": 2,
     "--dev-bind": 2,
     "--setenv": 2,
+    "--symlink": 2,
+}
+_SPLIT_RUNTIME_MASKED_ENTRIES = {
+    "dev",
+    "driver",
+    "experiment",
+    "outputs",
+    "proc",
+    "source",
+    "tmp",
 }
 
 
@@ -97,6 +107,7 @@ class Mount:
     host_path: Path | None = None
     phase: str = "before_devices"
     digest: str | None = None
+    symlink_target: str | None = None
 
 
 @dataclass(frozen=True)
@@ -179,11 +190,10 @@ def build_plan(
     gpu_index: int | None = None,
     source_snapshot_digest: str | None = None,
     allow_readonly_inputs_cover_output: bool = False,
+    split_runtime_root: bool = False,
 ) -> LaunchPlan:
-    mounts = [
-        Mount("runtime", "bind", "/", "read_only", runtime.rootfs),
-        Mount("code", "bind", "/experiment", "read_only", Path(code)),
-    ]
+    mounts = [*_runtime_mounts(runtime, split_runtime_root)]
+    mounts.append(Mount("code", "bind", "/experiment", "read_only", Path(code)))
     if source is not None:
         mounts.append(Mount("source", "bind", "/source", "read_only", Path(source)))
     mounts.append(Mount("output", "bind", "/outputs", "writable", Path(output)))
@@ -275,6 +285,34 @@ def render_plan(plan: LaunchPlan) -> list[str]:
 def run_plan(plan: LaunchPlan, **kwargs) -> subprocess.CompletedProcess:
     """Run a rendered launch plan as a subprocess."""
     return subprocess.run(render_plan(plan), **kwargs)
+
+
+def with_mounts(
+    plan: LaunchPlan,
+    *,
+    before_devices: Iterable[Mount] = (),
+    after_devices: Iterable[Mount] = (),
+    command: Iterable[object] | None = None,
+) -> LaunchPlan:
+    """Return a plan with extra mounts, reusing launch-plan validation."""
+    if not isinstance(plan, LaunchPlan):
+        raise PlanError("launch plan required")
+    before = [mount for mount in plan.mounts if mount.phase == "before_devices"]
+    after = [mount for mount in plan.mounts if mount.phase != "before_devices"]
+    return _assemble_plan(
+        plan.runtime,
+        mounts=[
+            *before,
+            *[replace(mount, phase="before_devices") for mount in before_devices],
+            *after,
+            *[replace(mount, phase="after_devices") for mount in after_devices],
+        ],
+        environment=plan.environment,
+        command=plan.command if command is None else command,
+        working_directory=plan.working_directory,
+        unshare_flags=plan.unshare_flags,
+        gpu=plan.gpu,
+    )
 
 
 def record_plan(plan: LaunchPlan) -> dict:
@@ -537,6 +575,45 @@ def _unchecked_runtime(rootfs: Path) -> RuntimeLock:
     )
 
 
+def _runtime_mounts(runtime: RuntimeLock, split_runtime_root: bool) -> list[Mount]:
+    if type(split_runtime_root) is not bool:
+        raise PlanError("split_runtime_root: boolean required")
+    if not split_runtime_root:
+        return [Mount("runtime", "bind", "/", "read_only", runtime.rootfs)]
+    mounts = []
+    for entry in sorted(runtime.rootfs.iterdir(), key=lambda path: path.name):
+        if entry.name in _SPLIT_RUNTIME_MASKED_ENTRIES:
+            continue
+        inside_path = "/" + _safe_rootfs_entry_name(entry.name)
+        if entry.is_symlink():
+            mounts.append(
+                Mount(
+                    f"runtime-entry:{entry.name}",
+                    "symlink",
+                    inside_path,
+                    "read_only",
+                    symlink_target=_safe_symlink_target(os.readlink(entry)),
+                )
+            )
+        else:
+            mounts.append(Mount(f"runtime-entry:{entry.name}", "bind", inside_path, "read_only", entry))
+    if not mounts:
+        raise PlanError("split_runtime_root: runtime rootfs has no mountable entries")
+    return mounts
+
+
+def _safe_rootfs_entry_name(name: str) -> str:
+    if not name or name in {".", ".."} or "/" in name or "\x00" in name:
+        raise PlanError(f"{name!r}: runtime rootfs entry name must be a safe path component")
+    return name
+
+
+def _safe_symlink_target(target: str) -> str:
+    if not isinstance(target, str) or not target or "\x00" in target:
+        raise PlanError("symlink target must be non-empty text")
+    return target
+
+
 def _check_recipe_lock(rootfs: Path, data: Mapping[str, object]) -> None:
     spec = _recipe_spec_for(rootfs)
     for field, path in spec.fields.items():
@@ -692,6 +769,16 @@ def _validate_mounts(
     host_mounts = []
     inside_roles: dict[str, str] = {}
     for mount in mounts:
+        if mount.kind not in {"bind", "dev-bind", "tmpfs", "symlink"}:
+            raise PlanError(f"{mount.role}: unsupported mount kind {mount.kind}")
+        if mount.mode not in {"read_only", "writable"}:
+            raise PlanError(f"{mount.role}: unsupported mount mode {mount.mode}")
+        if mount.kind == "symlink":
+            if mount.mode != "read_only" or mount.host_path is not None:
+                raise PlanError(f"{mount.role}: symlink mount must be read-only without host path")
+            _safe_symlink_target(mount.symlink_target)
+        elif mount.symlink_target is not None:
+            raise PlanError(f"{mount.role}: symlink target only valid for symlink mounts")
         previous = inside_roles.get(mount.inside_path)
         if previous is not None:
             raise PlanError(f"{previous} and {mount.role}: duplicate inside mount {mount.inside_path}")
@@ -729,6 +816,10 @@ def _readonly_input_covers_output(left: Mount, right: Mount, left_path: Path, ri
 
 
 def _render_mount(mount: Mount) -> list[str]:
+    if mount.kind == "symlink":
+        if mount.symlink_target is None:
+            raise PlanError(f"{mount.role}: symlink target required")
+        return ["--symlink", mount.symlink_target, mount.inside_path]
     if mount.kind == "tmpfs":
         return ["--tmpfs", mount.inside_path]
     if mount.host_path is None:
@@ -758,6 +849,8 @@ def _mount_data(mount: Mount, *, include_host: bool) -> dict:
         data["digest"] = mount.digest
     if include_host and mount.host_path is not None:
         data["host_path"] = str(Path(mount.host_path).resolve())
+    if mount.kind == "symlink":
+        data["symlink_target"] = mount.symlink_target
     return data
 
 
@@ -766,6 +859,8 @@ def _record_mount(plan: LaunchPlan, mount: Mount) -> dict:
     if mount.digest is not None:
         data["digest"] = mount.digest
     elif mount.role == "runtime":
+        data["digest"] = plan.runtime.data.get("rootfs_sha256", "")
+    elif mount.role.startswith("runtime-entry:"):
         data["digest"] = plan.runtime.data.get("rootfs_sha256", "")
     elif mount.role == "code" and hasattr(plan, "_source_snapshot_digest"):
         data["digest"] = getattr(plan, "_source_snapshot_digest")
@@ -944,6 +1039,7 @@ __all__ = [
     "plan_data",
     "render_plan",
     "run_plan",
+    "with_mounts",
     "record_plan",
     "read_receipt_mounts",
 ]
