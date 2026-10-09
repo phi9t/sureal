@@ -20,8 +20,8 @@ from resources.scientific_budget import reserve_write
 from retention.publication import (
     WAYSTONE_DESCRIPTOR,
     PublicationSpec,
-    audit as audit_publication,
     publish as publish_publication,
+    release_plan as publication_release_plan,
     _write_json_idempotent,
 )
 from retention.publisher_runtime import admitted_host_sources
@@ -168,37 +168,6 @@ def _admit_host_sources(receipt_path, current_package, destination):
     )
 
 
-def _safe_release(root, plan):
-    root = Path(root).resolve()
-    verified = []
-    for entry in plan:
-        path = Path(entry["local_path"])
-        resolved = path.resolve()
-        if root not in resolved.parents:
-            raise ValueError("release plan path escapes --root")
-        file = require_regular_file(path)
-        if file.stat().st_size != entry["bytes"] or file_sha256(file) != entry["sha256"]:
-            raise ValueError("release plan source changed")
-        verified.append((file, entry))
-    for file, _ in verified:
-        file.unlink()
-    return [entry for _, entry in verified]
-
-
-def _release_plan_from_audit(root, audit_result):
-    root = Path(root)
-    if not isinstance(audit_result, dict) or audit_result.get("whole_member_union_exact") is not True:
-        raise ValueError("passing publication audit required before release")
-    plan = []
-    for name, entry in sorted(audit_result["inventory"].items()):
-        path = root / safe_name(name)
-        file = require_regular_file(path)
-        if file.stat().st_size != entry["bytes"] or file_sha256(file) != entry["sha256"]:
-            raise ValueError("source payload differs")
-        plan.append({"path": name, "bytes": entry["bytes"], "sha256": entry["sha256"], "local_path": str(path)})
-    return plan
-
-
 def _require_tool_digest(store, tool_digest):
     if tool_digest is not None:
         return tool_digest
@@ -223,7 +192,6 @@ def publish(
     tool_digest=None,
     reserve=None,
     host_source_admitter=_admit_host_sources,
-    release_planner=_release_plan_from_audit,
     identifier=None,
     max_bytes=DEFAULT_LIMIT,
 ):
@@ -252,7 +220,7 @@ def publish(
         kind="scientific-directory",
         staging_style="copy",
         mode="archive",
-        release=False,  # Blob-store 05 moves this caller-side release into publication.publish().
+        release=release,
         store=store,
         store_descriptor=descriptor,
         tool_digest=tool_digest,
@@ -260,17 +228,17 @@ def publish(
         reserve=reserve,
         chunk_size_bytes=max_bytes,
     )
+    plan = publication_release_plan(spec) if release else None
+    # publication.publish() releases the inventory only after store, readback
+    # and a passing audit, re-checking each file's digest before unlinking it.
     receipt = publish_publication(spec)
-    audit_result = audit_publication(receipt, store=store)
     receipt_path = run_dir / "verified-publication.json"
     _write_json_idempotent(receipt_path, receipt)
     if release:
-        plan = release_planner(root, audit_result)
-        released = _safe_release(root, plan)
         completed = {
             "publication_receipt_sha256": file_sha256(receipt_path),
-            "released_count": len(released),
-            "released": released,
+            "released_count": len(plan),
+            "released": plan,
         }
         completed_path = run_dir / "release-completed.json"
         completed_path.write_text(json.dumps(completed, indent=2))

@@ -97,7 +97,7 @@ class ScientificDirectoryPublisherTests(unittest.TestCase):
                     identifier="missing-tool-digest",
                 )
 
-    def test_release_keeps_publication_module_release_disabled_until_module_owns_release(self):
+    def test_release_is_owned_by_publication_module(self):
         from retention import publish_scientific_directory as publisher
 
         with tempfile.TemporaryDirectory() as directory:
@@ -123,13 +123,12 @@ class ScientificDirectoryPublisherTests(unittest.TestCase):
                     tool_digest=TOOL_DIGEST,
                     reserve=lambda path, maximum_new_bytes: None,
                     host_source_admitter=fake_host_admitter,
-                    release_planner=lambda root, audit_result: [],
-                    identifier="caller-owned-release",
+                    identifier="module-owned-release",
                 )
             finally:
                 publisher.publish_publication = original_publish
 
-            self.assertEqual(observed, [False])
+            self.assertEqual(observed, [True])
 
     def test_release_after_blob_store_audit_unlinks_only_planned_files(self):
         from retention.publish_scientific_directory import publish
@@ -272,81 +271,39 @@ class ScientificDirectoryPublisherTests(unittest.TestCase):
                 )
             self.assertTrue((payload / "nested" / "checkpoint.pt").exists())
 
-    def test_release_plan_escape_is_rejected_before_any_unlink(self):
+    def test_failed_audit_releases_nothing(self):
+        from retention import publication
         from retention.publish_scientific_directory import publish
 
         with tempfile.TemporaryDirectory() as directory:
             working, payload = self.make_payload(directory)
-            outside = Path(directory) / "outside.bin"
-            outside.write_bytes(b"outside")
-            inside = payload / "metrics.json"
+            original_audit = publication.audit
 
-            def bad_release_plan(root, publication):
-                del publication
-                return [
-                    {
-                        "path": "metrics.json",
-                        "bytes": inside.stat().st_size,
-                        "sha256": file_sha256(inside),
-                        "local_path": str(inside),
-                        "blob_key": "runs/test/inside/archive.tar.gz",
-                    },
-                    {
-                        "path": "outside.bin",
-                        "bytes": outside.stat().st_size,
-                        "sha256": file_sha256(outside),
-                        "local_path": str(outside),
-                        "blob_key": "runs/test/outside/archive.tar.gz",
-                    },
-                ]
+            def failing_audit(receipt, *, store=None):
+                raise ValueError("tampered publication")
 
-            with self.assertRaisesRegex(ValueError, "escapes"):
-                publish(
-                    case=payload.name,
-                    root=payload,
-                    hdfs_namespace="perception-closed-scientific-processing",
-                    evidence=Path(directory) / "evidence",
-                    release=True,
-                    scientific_processing=working,
-                    store=self.make_store(),
-                    store_descriptor=STORE_DESCRIPTOR,
-                    tool_digest=TOOL_DIGEST,
-                    reserve=lambda path, maximum_new_bytes: None,
-                    host_source_admitter=fake_host_admitter,
-                    release_planner=bad_release_plan,
-                    identifier="escape-test",
-                )
-            self.assertTrue(inside.exists())
-            self.assertTrue(outside.exists())
-
-    def test_release_uses_blob_store_audit_before_release_plan(self):
-        from retention.publish_scientific_directory import publish
-
-        with tempfile.TemporaryDirectory() as directory:
-            working, payload = self.make_payload(directory)
-            calls = []
-
-            def release_planner(root, audit_result):
-                calls.append((Path(root), audit_result["whole_member_union_exact"], audit_result["files"]))
-                return []
-
-            publish(
-                case=payload.name,
-                root=payload,
-                hdfs_namespace="perception-closed-scientific-processing",
-                evidence=Path(directory) / "evidence",
-                release=True,
-                scientific_processing=working,
-                store=self.make_store(),
-                store_descriptor=STORE_DESCRIPTOR,
-                tool_digest=TOOL_DIGEST,
-                reserve=lambda path, maximum_new_bytes: None,
-                host_source_admitter=fake_host_admitter,
-                release_planner=release_planner,
-                identifier="audit-before-release-test",
-            )
-
-            self.assertEqual(calls, [(payload, True, 2)])
+            publication.audit = failing_audit
+            try:
+                with self.assertRaisesRegex(ValueError, "tampered"):
+                    publish(
+                        case=payload.name,
+                        root=payload,
+                        hdfs_namespace="perception-closed-scientific-processing",
+                        evidence=Path(directory) / "evidence",
+                        release=True,
+                        scientific_processing=working,
+                        store=self.make_store(),
+                        store_descriptor=STORE_DESCRIPTOR,
+                        tool_digest=TOOL_DIGEST,
+                        reserve=lambda path, maximum_new_bytes: None,
+                        host_source_admitter=fake_host_admitter,
+                        identifier="failed-audit",
+                    )
+            finally:
+                publication.audit = original_audit
+            self.assertTrue((payload / "nested" / "checkpoint.pt").exists())
+            self.assertTrue((payload / "metrics.json").exists())
+            self.assertFalse((Path(directory) / "evidence" / "blob-publication-failed-audit" / "release-completed.json").exists())
 
 
 if __name__ == "__main__":
