@@ -1,5 +1,5 @@
 """The native final must have an immutable resource companion before resume."""
-import json,tempfile,unittest
+import copy,json,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch
 from resources.sources import sha
@@ -254,13 +254,20 @@ class ResourceCheckpointTests(unittest.TestCase):
         from resources.checkpoint import _validate_legacy_union
         expected={'input.json':{'sha256':'1'*64,'bytes':4}}
         archive='a'*64
+        checks=[]
+        for stage in ['create-live','archive-put','archive-get','manifest-put','manifest-get','verify-live','rehydrate-live']:
+            validation={'archive_sha256':archive,'exact_members_and_hashes':True,'members':1,'payload_bytes':4}
+            if stage=='rehydrate-live':
+                validation['verified_rehydration']=True
+            checks.append({'stage':stage,'exit_code':0,'validation':validation})
         prefix='hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-test'
-        pub={'manifest_readback_exact':True,'source_inventory':expected,'hdfs_prefix':prefix,
+        pub={'schema_version':1,'manifest_readback_exact':True,'source_inventory':expected,'hdfs_prefix':prefix,
              'publication_manifest_hdfs_uri':prefix+'/publication-manifest.json',
              'chunks':[{'manifest':{'members':[{'path':'input.json','sha256':'1'*64,'bytes':4}],
                                     'payload_bytes':4,'archive_sha256':archive},
                         'archive_hdfs_uri':prefix+'/'+archive+'/archive.tar.gz',
-                        'manifest_hdfs_uri':prefix+'/'+archive+'/manifest.json'}]}
+                        'manifest_hdfs_uri':prefix+'/'+archive+'/manifest.json',
+                        'checks':checks}]}
         readback={key:value for key,value in pub.items() if key not in {'manifest_readback_exact','publication_manifest_hdfs_uri','publication_manifest_sha256','independent_admission'}}
         self.assertEqual(_validate_legacy_union(pub,expected,readback)['files'],1)
 
@@ -273,6 +280,70 @@ class ResourceCheckpointTests(unittest.TestCase):
         foreign_readback={key:value for key,value in bad.items() if key not in {'manifest_readback_exact','publication_manifest_hdfs_uri','publication_manifest_sha256','independent_admission'}}
         with self.assertRaises(ValueError):
             _validate_legacy_union(bad,expected,foreign_readback)
+
+    def test_legacy_publication_requires_schema_ordered_checks_and_independent_audit(self):
+        from resources.checkpoint import _validate_independent_admission,_validate_legacy_union
+        expected={'input.json':{'sha256':'1'*64,'bytes':4}}
+        archive='a'*64
+        checks=[]
+        for stage in ['create-live','archive-put','archive-get','manifest-put','manifest-get','verify-live','rehydrate-live']:
+            validation={'archive_sha256':archive,'exact_members_and_hashes':True,'members':1,'payload_bytes':4}
+            if stage=='rehydrate-live':
+                validation['verified_rehydration']=True
+            checks.append({'stage':stage,'exit_code':0,'validation':validation})
+        prefix='hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-test'
+        pub={'schema_version':1,'kind':'checkpoint','manifest_readback_exact':True,'source_inventory':expected,'hdfs_prefix':prefix,
+             'publication_manifest_hdfs_uri':prefix+'/publication-manifest.json',
+             'chunks':[{'manifest':{'members':[{'path':'input.json','sha256':'1'*64,'bytes':4}],
+                                    'payload_bytes':4,'archive_sha256':archive},
+                        'archive_hdfs_uri':prefix+'/'+archive+'/archive.tar.gz',
+                        'manifest_hdfs_uri':prefix+'/'+archive+'/manifest.json',
+                        'checks':checks}]}
+        readback={key:value for key,value in pub.items() if key not in {'manifest_readback_exact','publication_manifest_hdfs_uri','publication_manifest_sha256','independent_admission'}}
+        self.assertEqual(_validate_legacy_union(pub,expected,readback)['files'],1)
+
+        for fault in ['schema','checks']:
+            bad=copy.deepcopy(pub)
+            if fault=='schema':
+                bad.pop('schema_version')
+            else:
+                bad['chunks'][0].pop('checks')
+            bad_readback={key:value for key,value in bad.items() if key not in {'manifest_readback_exact','publication_manifest_hdfs_uri','publication_manifest_sha256','independent_admission'}}
+            with self.subTest(fault=fault),self.assertRaises(ValueError):
+                _validate_legacy_union(bad,expected,bad_readback)
+        bad=copy.deepcopy(pub);bad['independent_admission']={}
+        with self.assertRaises(ValueError):
+            _validate_independent_admission(bad,expected,readback)
+
+    def test_retained_legacy_resource_publication_receipt_still_validates_read_only(self):
+        from resources.checkpoint import validate_publication_receipt
+        path=Path('/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/resource-retention-balanced16-sustained-baseline-controller20261003a-checkpoint-a570042b0bb346998d80d8c9e64e9eab/verified-publication.json')
+        if not path.exists():
+            self.skipTest('retained legacy resource receipt is not present on this host')
+        pub=json.loads(path.read_text())
+        inventory=pub['source_inventory']
+        backend=type('Backend',(),{})()
+        backend.resource_identity_sha256=pub['resource_identity_sha256']
+        backend.manifest_sha=pub['native_manifest_sha256']
+        backend.resource_identity={'source_pins':pub['resource_source_pins']}
+        record={'resource_companion_sha256':inventory['checkpoint.json']['sha256'],
+                'final_sha256':inventory['native-final.json']['sha256'],
+                'report_sha256':inventory['producer-report.json']['sha256']}
+        receipt={'path':str(path),'sha256':sha(path),'hdfs_manifest_uri':pub['publication_manifest_hdfs_uri'],'kind':'checkpoint'}
+
+        validated=validate_publication_receipt(backend,record,receipt)
+
+        self.assertEqual(validated['publication_manifest_hdfs_uri'],pub['publication_manifest_hdfs_uri'])
+
+    def test_blob_publication_shape_requires_schema_version(self):
+        from resources.checkpoint import _is_blob_publication
+        value={'store_descriptor':{'kind':'local','root':'/tmp/blob-store'},
+               'tool_sha256':{'waystone-cli':'1'*64},
+               'verified_by_readback':True,
+               'blobs':{'manifest':{'key':'runs/x/y/z/manifest.json','sha256':'2'*64,'bytes':1}}}
+        self.assertFalse(_is_blob_publication(value))
+        value['schema_version']=1
+        self.assertTrue(_is_blob_publication(value))
 
     def test_inventory_covers_raw_stage_inputs_nonproducer_outputs_and_verifiers(self):
         seal,_,inventory=self.api()

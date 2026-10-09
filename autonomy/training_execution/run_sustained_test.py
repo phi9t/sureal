@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from blob_store.core import BlobStore, BlobStoreError, InMemoryBlobAdapter
+from blob_store.core import BlobStore, BlobStoreError, InMemoryBlobAdapter, LocalFileBlobAdapter
 from evidence.source_snapshot import LocalSnapshotStore
 from insula.launch_plan import RuntimeLock
 from resources.backend import ResourceBackend
@@ -14,7 +14,7 @@ from resources.command import wrapped_command
 from resources.sources import sha,validate_sources as validate_resource_sources
 from resources.stage import validate_proof
 from resources.stage_accounting import MEASUREMENT, admit_worker
-from retention.publication import publish_bundle
+from retention.publication import native_cache_spec, publish, publish_bundle
 from training_execution import sustained_controller_backend
 from training_execution.run_sustained import ResourceNativeBackend, open_backend
 
@@ -232,6 +232,29 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
   if completed:release.write_text(json.dumps({'publication_receipt_sha256':sha(publication),'released':release_plan},sort_keys=True))
   return publication,release,release_plan
 
+ def write_unrelated_blob_publication(self,cache,root,*,completed=False,stored=True,manifest_key='runs/perception-native-cache/unrelated/cache/manifest.json'):
+  release_dir=cache/'insula/hdfs-retention-native-cache-unrelated';release_dir.mkdir(parents=True,exist_ok=True)
+  store_root=root/'unrelated-blob-store'
+  descriptor={'kind':'local','root':str(store_root)}
+  if stored:
+   source=root/'unrelated-cache.bin';source.write_text('unrelated native cache\n')
+   store=BlobStore(LocalFileBlobAdapter(store_root),backoff_seconds=())
+   inventory={'cache.bin':{'path':str(source),'sha256':sha(source),'bytes':source.stat().st_size}}
+   spec=native_cache_spec(payload=inventory,run_id='unrelated-native-cache',release=False,store=store,
+                          store_descriptor=descriptor,tool_digest={'waystone-cli':'a'*64},
+                          staging_root=root/'unrelated-stage',reserve=lambda *_: None,chunk_size_bytes=1024)
+   value=publish(spec)
+  else:
+   value={'schema_version':1,'store_descriptor':descriptor,'tool_sha256':{'waystone-cli':'a'*64},
+          'verified_by_readback':True,
+          'blobs':{'manifest':{'key':manifest_key,'sha256':'1'*64,'bytes':1},
+                   'chunks':[{'key':manifest_key.replace('/manifest.json','/archive-000.tar.gz'),'sha256':'2'*64,'bytes':1}]}}
+  publication=release_dir/'verified-publication.json';publication.write_text(json.dumps(value,sort_keys=True))
+  release=release_dir/'release-completed.json'
+  if completed:
+   release.write_text(json.dumps({'publication_receipt_sha256':sha(publication),'released':[]},sort_keys=True))
+  return publication,release
+
  def test_controller_opens_resource_bound_native_backend(self):
   with tempfile.TemporaryDirectory() as temp:
    root=Path(temp);identity=root/'case/resource-layer/identity.json';identity.parent.mkdir(parents=True)
@@ -338,6 +361,30 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
    Path(plan[0]['local_path']).unlink()
    with patch('training_execution.run_sustained.C',cache):
     with self.assertRaises(ValueError):backend.check_record(record,None)
+
+ def test_resume_ignores_unrelated_partial_blob_publication_without_completion(self):
+  with tempfile.TemporaryDirectory() as temp:
+   root=Path(temp);backend=self.backend(root);record=self.record(root);cache=root/'cache'
+   self.write_unrelated_blob_publication(cache,root,completed=False,stored=True)
+   with patch('training_execution.run_sustained.C',cache):
+    backend._recover_native_release(record)
+   self.assertFalse(record.get('released'))
+
+ def test_resume_does_not_audit_completed_unrelated_blob_publication(self):
+  with tempfile.TemporaryDirectory() as temp:
+   root=Path(temp);backend=self.backend(root);record=self.record(root);cache=root/'cache'
+   self.write_unrelated_blob_publication(cache,root,completed=True,stored=False)
+   with patch('training_execution.run_sustained.C',cache),patch('training_execution.run_sustained.validate_native_publication_release',side_effect=AssertionError('unrelated publication was audited')):
+    backend._recover_native_release(record)
+   self.assertFalse(record.get('released'))
+
+ def test_resume_skips_unrelated_blob_store_errors_before_audit(self):
+  with tempfile.TemporaryDirectory() as temp:
+   root=Path(temp);backend=self.backend(root);record=self.record(root);cache=root/'cache'
+   self.write_unrelated_blob_publication(cache,root,completed=False,stored=False)
+   with patch('training_execution.run_sustained.C',cache),patch('training_execution.sustained_controller_backend._expected_release_members',return_value={'checkpoint.pt':'c'*64}):
+    backend._recover_native_release(record)
+   self.assertFalse(record.get('released'))
 
  def test_check_record_refuses_tampered_completed_native_release(self):
   with tempfile.TemporaryDirectory() as temp:

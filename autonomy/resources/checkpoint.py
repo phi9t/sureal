@@ -143,7 +143,7 @@ def _validate_publication_external_bindings(backend,pub):
 
 
 def _is_blob_publication(pub):
-    return isinstance(pub,dict) and {'store_descriptor','tool_sha256','verified_by_readback','blobs'}<=set(pub)
+    return isinstance(pub,dict) and pub.get('schema_version')==1 and {'store_descriptor','tool_sha256','verified_by_readback','blobs'}<=set(pub)
 
 
 def _store_for_blob_publication(backend,pub):
@@ -193,16 +193,27 @@ def _receipt_inventory_digest(pub,expected_inventory=None):
 
 
 def _validate_independent_admission(pub,inventory,readback):
-    if not isinstance(pub.get('independent_admission'),dict):
+    admission=pub.get('independent_admission')
+    if not isinstance(admission,dict) or not admission:
         raise ValueError('complete independent resource admission evidence required')
     _verify_legacy_source_snapshot(pub)
     if pub.get('source_inventory')!=inventory or _publication_readback(pub)!=readback:
         raise ValueError('legacy resource publication readback evidence changed')
+    try:
+        validation=admission['validation']
+        if (admission['exit_code']!=0 or validation['whole_member_union_exact'] is not True or
+            validation['all_chunks_live_rehydrated'] is not True or
+            validation['files']!=len(inventory) or validation['chunks']!=len(pub['chunks']) or
+            type(validation['payload_bytes']) is not int or validation['payload_bytes']<0 or
+            validation.get('corrupt_resource_copies_refused')!=5):
+            raise ValueError('independent resource recovery admission required')
+    except (KeyError,TypeError) as error:
+        raise ValueError('complete independent resource admission evidence required') from error
 
 
 def _validate_legacy_union(pub,expected,readback):
     try:
-        if (pub.get('manifest_readback_exact') is not True or _publication_readback(pub)!=readback or
+        if (pub.get('schema_version')!=1 or pub.get('manifest_readback_exact') is not True or _publication_readback(pub)!=readback or
             pub['source_inventory']!=expected or not expected):
             raise ValueError('exact external inventory and unchanged global readback required')
         prefix_key=_legacy_resource_blob_key(pub['hdfs_prefix'])
@@ -217,17 +228,16 @@ def _validate_legacy_union(pub,expected,readback):
                 _legacy_resource_blob_key(chunk['archive_hdfs_uri'])!=prefix_key+'/'+digest+'/archive.tar.gz' or
                 _legacy_resource_blob_key(chunk['manifest_hdfs_uri'])!=prefix_key+'/'+digest+'/manifest.json'):
                 raise ValueError('bounded exact resource archive identity required')
-            checks=chunk.get('checks')
-            if checks is not None:
-                if ([check['stage'] for check in checks]!=list(LEGACY_RESOURCE_CHECK_ORDER) or
-                    any(type(check['exit_code']) is not int or check['exit_code']!=0 for check in checks)):
-                    raise ValueError('all measured live and exact transfer gates required')
-                for index in (0,5,6):
-                    value=checks[index]['validation']
-                    if (value['exact_members_and_hashes'] is not True or value['archive_sha256']!=digest or
-                        value['members']!=len(members) or value['payload_bytes']!=size or
-                        index==6 and value.get('verified_rehydration') is not True):
-                        raise ValueError('complete live archive recovery required')
+            checks=chunk['checks']
+            if ([check['stage'] for check in checks]!=list(LEGACY_RESOURCE_CHECK_ORDER) or
+                any(type(check['exit_code']) is not int or check['exit_code']!=0 for check in checks)):
+                raise ValueError('all measured live and exact transfer gates required')
+            for index in (0,5,6):
+                value=checks[index]['validation']
+                if (value['exact_members_and_hashes'] is not True or value['archive_sha256']!=digest or
+                    value['members']!=len(members) or value['payload_bytes']!=size or
+                    index==6 and value.get('verified_rehydration') is not True):
+                    raise ValueError('complete live archive recovery required')
             for member in members:
                 name=safe_member_name(member['path'])
                 if (name in union or name not in expected or type(member['bytes']) is not int or member['bytes']<0 or
