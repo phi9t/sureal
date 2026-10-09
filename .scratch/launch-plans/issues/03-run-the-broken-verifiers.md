@@ -95,3 +95,51 @@ Blocking preflight result:
 - Worker issue-channel copy:
   `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/lp03-live/20261009T214131Z-6183008573786657189/claude-issues.jsonl`,
   sha256 `b9770ea026f8d018b72abf8a3c1699db74b8a911d7c17fe55387f912efc2c4ed`.
+
+### 2026-10-09 release-audit blocker
+
+After the user authorized clearing room by releasing earlier already-published
+runs, I performed a read-only release eligibility audit and did not release any
+files. Evidence:
+
+- Release audit JSON:
+  `/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/lp03-live/20261009T220714Z-release-audit/release-log.json`,
+  sha256 `01fc75d5329b642f38d1685077261d69955491d6d046d0ced3d67b7a85627b23`.
+- Driver-style `total(WORKING)` before and after the audit remained
+  `17116464147` bytes. Nothing was unlinked.
+- With the selected scene's conservative bundle upper bound of `487331470`
+  bytes and the requested `1` GiB margin, the run still needs strictly more
+  than `2571410081` bytes released before the 15 GiB driver cap can hold.
+
+Candidate audit results:
+
+- `balanced16-sustained-baseline-controller20261003a`:
+  `1668358495` bytes, not released. Its sustained state has unreleased records,
+  so resume still depends on the local payload; matching receipts reference
+  current files, but no sanctioned release-only command in the repo releases
+  that mixed resource shape without also crossing protected inputs.
+- `balanced16-sustained-baseline-t27f20261008T081353Z`:
+  `834175991` bytes, not released. Its sustained state has unreleased records
+  and no publication receipt was found that references the live files.
+- `balanced16-sustained-baseline-t27f20261008T074202Z`:
+  `408621222` bytes, not released. No sustained state publication record and no
+  matching publication receipt were found.
+- `resource-retention-balanced16-sustained-baseline-controller20261003a-shared-5a74e356862244deb88a264e48f82908`:
+  `1381569292` bytes, not released. The generic publisher protects this pattern;
+  the live evidence root has no durable `verified-publication.json`; and
+  `resources.resource_release_plan.release_plan` failed against the available
+  receipt candidates.
+- `resource-retention-balanced16-sustained-baseline-controller20261003a-shared-ac7ee99e41b54b5d9b54b1a24e64d95d`:
+  `1381569470` bytes, not released for the same reasons as the `5a74...`
+  sibling.
+- `cohort-v1`: `1846777089` bytes, not released. Scene-level point, sidecar and
+  camera eviction receipts already exist; repeat eviction refuses to overwrite
+  evidence, and the remaining bytes are retained receipts/logs rather than
+  payloads named by a release plan.
+- Large architecture/norm/native-one-batch directories in the audit were not
+  released because no publication receipt was found that references their
+  current live files.
+
+Because no candidate could be released under the sanctioned release rules, the
+fresh preflight, live `scientific_cohort.py` run, post-run receipt verification
+and new gate pass were not executed.
