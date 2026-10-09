@@ -1,3 +1,4 @@
+# Deliberate independent checker: oriented-box decode, BEV suppression and point-in-box math stay separate from producer box math.
 import json,math
 from pathlib import Path
 import numpy as np

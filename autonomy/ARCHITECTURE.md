@@ -34,7 +34,9 @@ Cross-concept workflows live at the concept level that owns the workflow. A
 study that dispatches both `dataset` and `camera` commands belongs in
 `studies/`; `dataset/` does not depend upward on `camera/` to run it. The
 active range probes stay in `range_view/` and declare their downward
-`geometry/` and `evidence/` dependencies.
+`geometry/` and `evidence/` dependencies. Producers that operate on oriented
+boxes use the geometry box module; independent checkers keep their own second
+implementations so producer errors can still be caught.
 
 `research/` holds retained evidence, including frozen copies of sources, and is
 outside the active import graph. `studies/*/procedure_records/` holds closed
