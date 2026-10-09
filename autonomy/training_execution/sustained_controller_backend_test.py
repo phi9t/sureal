@@ -85,7 +85,7 @@ class ControllerGuardTests(unittest.TestCase):
  def test_altered_or_missing_source_snapshot_invalidates_guard(self):
   with tempfile.TemporaryDirectory() as temp:
    root=Path(temp);b=self.backend(root/'run',root/'checkout')
-   snapshot=Path(b.pins['source_snapshot_store'])/b.pins['source_snapshot_sha256']
+   snapshot=LocalSnapshotStore(b.pins['source_snapshot_store']).path_for(b.pins['source_snapshot_sha256'])
    with patch('training_execution.sustained_controller_backend.P',b.checkout_path),patch('training_execution.sustained_controller_backend.unique_payload_bytes',return_value=0):b.guard()
    snapshot.write_bytes(b'not the admitted snapshot')
    with patch('training_execution.sustained_controller_backend.P',b.checkout_path),patch('training_execution.sustained_controller_backend.unique_payload_bytes',return_value=0),self.assertRaises(ValueError):b.guard()

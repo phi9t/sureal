@@ -38,7 +38,8 @@ class ResourceSourceTests(unittest.TestCase):
             names=['autonomy/evidence/source_snapshot.py']+[f'autonomy/resources/{name}' for name in ['sources.py','command.py','stage.py','kernel_scope.py','scoped_stage.py','stage_accounting.py','execute_worker.py','process_lifecycle.py']]
             pins=freeze(current,root/'code',store=LocalSnapshotStore(root/'store'),repo_root=repo,bazel=repo/'bazelw',runner=self.query_runner(names))
             self.assertEqual(pins['schema_version'],2)
-            self.assertEqual(pins['source_snapshot_store'],{'schema_version':1,'kind':'local','root':str(root/'store')})
+            self.assertEqual(pins['source_snapshot_store'],{'kind':'local','root':str(root/'store')})
+            self.assertEqual(pins['source_snapshot_blob']['key'],'artifacts/source-snapshots/'+pins['source_snapshot_sha256'])
             self.assertIn('autonomy/evidence/source_snapshot.py',pins['source_pins'])
             self.assertIn('autonomy/resources/execute_worker.py',pins['source_pins'])
             self.assertEqual((root/'code/autonomy/evidence/source_snapshot.py').read_text(),'admitted helper')
@@ -56,7 +57,7 @@ class ResourceSourceTests(unittest.TestCase):
             root=Path(temp);repo=root/'repo';current=self.write_package(repo)
             names=['autonomy/evidence/source_snapshot.py']+[f'autonomy/resources/{name}' for name in ['sources.py','command.py','stage.py','kernel_scope.py','scoped_stage.py','stage_accounting.py','execute_worker.py','process_lifecycle.py']]
             pins=freeze(current,root/'code',store=LocalSnapshotStore(root/'store'),repo_root=repo,bazel=repo/'bazelw',runner=self.query_runner(names))
-            snapshot=root/'store'/pins['source_snapshot_sha256']
+            snapshot=LocalSnapshotStore(root/'store').path_for(pins['source_snapshot_sha256'])
             snapshot.write_bytes(b'not the admitted snapshot')
             with self.assertRaises(ValueError):validate(current,pins)
             snapshot.unlink()

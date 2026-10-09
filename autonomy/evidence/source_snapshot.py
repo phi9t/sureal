@@ -14,12 +14,28 @@ from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import Mapping, Protocol
 
+from blob_store.core import (
+    BlobStore,
+    Conflict,
+    Corrupt,
+    LocalFileBlobAdapter,
+    Missing,
+    Unauthenticated,
+    Unavailable,
+    WaystoneBlobAdapter,
+    blob_adapter_from_descriptor,
+    blob_store_descriptor,
+    validate_blob_key,
+)
+
 
 REPO = Path(__file__).resolve().parents[2]
 HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 DEFAULT_WAYSTONE = Path.home() / "workspace/waystone/scripts/waystone"
 DEFAULT_HADOOP_CONF_DIR = "/opt/tiger/yarn_deploy/hadoop/conf"
+SOURCE_SNAPSHOT_AREA = "artifacts"
 SOURCE_SNAPSHOT_CHILD = "source-snapshots"
+LEGACY_SOURCE_SNAPSHOT_CHILD = "source-snapshots"
 STORE_DESCRIPTOR_VERSION = 1
 TARGET_RECEIPT_SCHEMA_VERSION = 2
 AT_FDCWD = -100
@@ -28,30 +44,6 @@ RENAMEAT2_SYSCALLS = {
     "x86_64": 316,
     "aarch64": 276,
 }
-AUTHENTICATION_MARKERS = (
-    "authentication",
-    "authenticate",
-    "authorization",
-    "credential",
-    "forbidden",
-    "gss",
-    "kerberos",
-    "permission denied",
-    "ticket",
-    "token",
-    "unauthorized",
-)
-MISSING_MARKERS = (
-    "does not exist",
-    "filenotfound",
-    "file not found",
-    "missing",
-    "no such file",
-    "not found",
-    "not_exist",
-)
-
-
 @dataclass(frozen=True)
 class SourceSnapshot:
     target: str
@@ -77,13 +69,33 @@ class SnapshotMissingError(FileNotFoundError):
     pass
 
 
+def source_snapshot_blob_key(digest: str) -> str:
+    return f"{SOURCE_SNAPSHOT_AREA}/{SOURCE_SNAPSHOT_CHILD}/{require_digest(digest)}"
+
+
+def legacy_source_snapshot_blob_key(digest: str) -> str:
+    return f"{LEGACY_SOURCE_SNAPSHOT_CHILD}/{require_digest(digest)}"
+
+
+def source_snapshot_blob_record(digest: str, byte_count: int) -> dict:
+    return {
+        "key": source_snapshot_blob_key(digest),
+        "sha256": require_digest(digest),
+        "bytes": int(byte_count),
+    }
+
+
 class LocalSnapshotStore:
     def __init__(self, root):
         self.root = Path(root)
+        self._adapter = LocalFileBlobAdapter(self.root)
+        self._store = BlobStore(self._adapter)
 
     def path_for(self, digest: str) -> Path:
-        require_digest(digest)
-        return self.root / digest
+        return self.root.joinpath(*source_snapshot_blob_key(digest).split("/"))
+
+    def legacy_path_for(self, digest: str) -> Path:
+        return self.root / require_digest(digest)
 
     def store(self, digest: str, data: bytes) -> str:
         require_digest(digest)
@@ -91,30 +103,25 @@ class LocalSnapshotStore:
             raise ValueError("snapshot digest differs from key")
         if self.root.is_symlink():
             raise ValueError("regular snapshot store directory required")
-        self.root.mkdir(parents=True, exist_ok=True)
         path = self.path_for(digest)
         if path.is_symlink():
             raise ValueError("regular snapshot object required")
-        if path.exists():
-            if path.read_bytes() != data:
-                raise ValueError("snapshot digest differs from existing snapshot")
-            return digest
-        tmp = None
-        try:
-            with tempfile.NamedTemporaryFile(dir=self.root, prefix=path.name + ".", suffix=".tmp", delete=False) as output:
-                tmp = Path(output.name)
-                output.write(data)
-            tmp.replace(path)
-        finally:
-            if tmp is not None and tmp.exists():
-                tmp.unlink()
-        if file_sha256(path) != digest:
-            raise ValueError("snapshot digest differs after readback")
+        _put_snapshot_blob(self._store, digest, data)
         return digest
 
     def fetch(self, digest: str) -> bytes:
         path = self.path_for(digest)
         if self.root.is_symlink() or path.is_symlink():
+            raise ValueError("regular snapshot object required")
+        try:
+            return _get_snapshot_blob(self._store, digest)
+        except SnapshotMissingError:
+            pass
+        return self._fetch_legacy(digest)
+
+    def _fetch_legacy(self, digest: str) -> bytes:
+        path = self.legacy_path_for(digest)
+        if path.is_symlink():
             raise ValueError("regular snapshot object required")
         try:
             data = path.read_bytes()
@@ -133,86 +140,102 @@ class HdfsSnapshotStore:
         prefix: str | None = None,
         runner=subprocess.run,
         timeout: int = 90,
+        project: str = "sureal",
+        command_prefix=None,
+        tool_pins: Mapping[str, str] | None = None,
+        hadoop_conf_dir: str = DEFAULT_HADOOP_CONF_DIR,
+        legacy_layout: bool | None = None,
     ):
         self.waystone = str(waystone)
-        self._prefix = prefix.rstrip("/") if prefix is not None else None
-        self.runner = runner
         self.timeout = timeout
+        self.legacy_layout = prefix is not None if legacy_layout is None else bool(legacy_layout)
+        self._adapter = WaystoneBlobAdapter(
+            project=project,
+            command_prefix=command_prefix or [str(waystone)],
+            tool_pins=tool_pins,
+            legacy_prefix=prefix,
+            hadoop_conf_dir=hadoop_conf_dir,
+        )
+        self._store = BlobStore(self._adapter)
 
     @property
     def prefix(self) -> str:
-        if self._prefix is None:
-            self._prefix = self._run(["storage-prefix", "--child", "sureal"]).strip().rstrip("/")
-        return require_hdfs_prefix(self._prefix)
+        return require_hdfs_prefix(self._adapter._layout_profile()["project_root"])
 
     def uri_for(self, digest: str) -> str:
-        require_digest(digest)
-        return f"{self.prefix}/{SOURCE_SNAPSHOT_CHILD}/{digest}"
+        return f"{self.prefix}/{self._key_for_digest(digest)}"
+
+    def _key_for_digest(self, digest: str) -> str:
+        return legacy_source_snapshot_blob_key(digest) if self.legacy_layout else source_snapshot_blob_key(digest)
 
     def store(self, digest: str, data: bytes) -> str:
         require_digest(digest)
         if hashlib.sha256(data).hexdigest() != digest:
             raise ValueError("snapshot digest differs from key")
-        uri = self.uri_for(digest)
-        try:
-            existing = self.fetch(digest)
-        except SnapshotMissingError:
-            existing = None
-        if existing is not None:
-            if existing != data:
-                raise ValueError("snapshot digest differs from existing snapshot")
-            return digest
-        with tempfile.NamedTemporaryFile(prefix=digest + ".", suffix=".snapshot") as source:
-            source.write(data)
-            source.flush()
-            self._run(["put", "--mkdir-parents", source.name, uri])
-        readback = self._download(uri, digest)
-        if readback != data or hashlib.sha256(readback).hexdigest() != digest:
-            raise ValueError("snapshot digest differs after readback")
+        _put_snapshot_blob(self._store, digest, data, key=self._key_for_digest(digest))
         return digest
 
     def fetch(self, digest: str) -> bytes:
+        return _get_snapshot_blob(self._store, digest, key=self._key_for_digest(digest))
+
+
+class _BlobSnapshotStore:
+    def __init__(self, adapter, *, legacy_layout: bool = False):
+        self._adapter = adapter
+        self._store = BlobStore(adapter)
+        self.legacy_layout = bool(legacy_layout)
+
+    def _key_for_digest(self, digest: str) -> str:
+        return legacy_source_snapshot_blob_key(digest) if self.legacy_layout else source_snapshot_blob_key(digest)
+
+    def store(self, digest: str, data: bytes) -> str:
         require_digest(digest)
-        uri = self.uri_for(digest)
-        data = self._download(uri, digest)
         if hashlib.sha256(data).hexdigest() != digest:
-            raise ValueError("snapshot digest differs from requested digest")
-        return data
+            raise ValueError("snapshot digest differs from key")
+        _put_snapshot_blob(self._store, digest, data, key=self._key_for_digest(digest))
+        return digest
 
-    def _download(self, uri: str, digest: str) -> bytes:
-        with tempfile.TemporaryDirectory(prefix=digest + ".") as directory:
-            destination = Path(directory) / (digest + ".snapshot")
-            self._run(["get", uri, str(destination)], missing_digest=digest)
-            return destination.read_bytes()
+    def fetch(self, digest: str) -> bytes:
+        return _get_snapshot_blob(self._store, digest, key=self._key_for_digest(digest))
 
-    def _run(self, args: list[str], *, missing_digest: str | None = None) -> str:
-        command = [self.waystone, "--error-format", "json", "--auth-source", "token-file", *args]
-        environment = os.environ.copy()
-        environment.setdefault("HADOOP_CONF_DIR", DEFAULT_HADOOP_CONF_DIR)
+
+def _put_snapshot_blob(store: BlobStore, digest: str, data: bytes, *, key: str | None = None) -> dict:
+    key = source_snapshot_blob_key(digest) if key is None else validate_blob_key(key)
+    with tempfile.NamedTemporaryFile(prefix=digest + ".", suffix=".snapshot") as source:
+        source.write(data)
+        source.flush()
         try:
-            result = self.runner(
-                command,
-                capture_output=True,
-                text=True,
-                timeout=self.timeout,
-                env=environment,
-                check=False,
-            )
-        except subprocess.TimeoutExpired as error:
-            raise SnapshotStorageError("snapshot storage command timed out") from error
-        output = _waystone_output(result)
-        if result.returncode == 0:
-            return result.stdout
-        lowered = output.lower()
-        if any(marker in lowered for marker in AUTHENTICATION_MARKERS):
-            raise SnapshotAuthenticationError("snapshot storage authentication failed")
-        if missing_digest is not None and any(marker in lowered for marker in MISSING_MARKERS):
-            raise SnapshotMissingError(f"source snapshot missing: {missing_digest}")
-        raise SnapshotStorageError("snapshot storage command failed: " + output.strip())
+            result = store.put(key, source.name)
+        except Conflict as error:
+            raise ValueError("snapshot digest differs from existing snapshot") from error
+        except Corrupt as error:
+            raise ValueError("snapshot digest differs after readback") from error
+        except Unauthenticated as error:
+            raise SnapshotAuthenticationError(str(error)) from error
+        except Missing as error:
+            raise SnapshotMissingError(f"source snapshot missing: {digest}") from error
+        except Unavailable as error:
+            raise SnapshotStorageError("snapshot storage unavailable") from error
+    if result["sha256"] != digest or result["bytes"] != len(data):
+        raise ValueError("snapshot digest differs after readback")
+    return result
 
 
-def _waystone_output(result) -> str:
-    return "\n".join(str(part) for part in (getattr(result, "stdout", ""), getattr(result, "stderr", "")) if part)
+def _get_snapshot_blob(store: BlobStore, digest: str, *, key: str | None = None) -> bytes:
+    key = source_snapshot_blob_key(digest) if key is None else validate_blob_key(key)
+    with tempfile.TemporaryDirectory(prefix=digest + ".") as directory:
+        destination = Path(directory) / (digest + ".snapshot")
+        try:
+            store.get(key, destination, digest)
+        except Missing as error:
+            raise SnapshotMissingError(f"source snapshot missing: {digest}") from error
+        except Corrupt as error:
+            raise ValueError("snapshot digest differs from requested digest") from error
+        except Unauthenticated as error:
+            raise SnapshotAuthenticationError(str(error)) from error
+        except Unavailable as error:
+            raise SnapshotStorageError("snapshot storage unavailable") from error
+        return destination.read_bytes()
 
 
 def require_digest(digest: str) -> str:
@@ -387,18 +410,9 @@ def snapshot_bazel_target(target: str, store: SnapshotStore, *, repo_root=REPO, 
 
 
 def source_snapshot_store_descriptor(store: SnapshotStore) -> dict:
-    if isinstance(store, LocalSnapshotStore):
-        return {
-            "schema_version": STORE_DESCRIPTOR_VERSION,
-            "kind": "local",
-            "root": str(store.root),
-        }
-    if isinstance(store, HdfsSnapshotStore):
-        return {
-            "schema_version": STORE_DESCRIPTOR_VERSION,
-            "kind": "hdfs",
-            "prefix": store.prefix,
-        }
+    adapter = getattr(store, "_adapter", None)
+    if adapter is not None:
+        return blob_store_descriptor(adapter)
     raise ValueError("source snapshot store descriptor required")
 
 
@@ -410,10 +424,11 @@ def source_snapshot_receipt(root, source_paths, store: SnapshotStore, *, target:
         "schema_version": 1,
         "source_snapshot_sha256": digest,
         "source_snapshot_target": target,
+        "source_snapshot_archive_bytes": len(archive),
+        "source_snapshot_store": source_snapshot_store_descriptor(store),
+        "source_snapshot_blob": source_snapshot_blob_record(digest, len(archive)),
         "source_pins": pins,
     }
-    if isinstance(store, LocalSnapshotStore):
-        receipt["source_snapshot_store"] = str(store.root)
     if materialized_root is not None:
         receipt["source_snapshot_root"] = str(Path(materialized_root))
     return receipt
@@ -444,36 +459,56 @@ def copy_source_snapshot(root, source_paths, destination, store: SnapshotStore, 
         "schema_version": 1,
         "source_snapshot_sha256": digest,
         "source_snapshot_target": target,
-        "source_snapshot_store": str(store.root) if isinstance(store, LocalSnapshotStore) else None,
+        "source_snapshot_archive_bytes": len(archive),
+        "source_snapshot_store": source_snapshot_store_descriptor(store),
+        "source_snapshot_blob": source_snapshot_blob_record(digest, len(archive)),
         "source_snapshot_root": str(destination),
         "source_pins": pins,
     }
     return {key: value for key, value in receipt.items() if value is not None}
 
 
-def _store_from_descriptor(descriptor, *, waystone=DEFAULT_WAYSTONE, runner=subprocess.run, timeout: int = 90) -> SnapshotStore:
+def _store_from_descriptor(
+    descriptor,
+    *,
+    waystone=DEFAULT_WAYSTONE,
+    runner=subprocess.run,
+    timeout: int = 90,
+    command_prefix=None,
+    tool_pins: Mapping[str, str] | None = None,
+    hadoop_conf_dir: str = DEFAULT_HADOOP_CONF_DIR,
+) -> SnapshotStore:
     if isinstance(descriptor, str):
         if not descriptor:
             raise ValueError("source snapshot store required")
         return LocalSnapshotStore(descriptor)
     if not isinstance(descriptor, Mapping):
         raise ValueError("source snapshot store descriptor required")
-    schema_version = descriptor.get("schema_version")
     kind = descriptor.get("kind")
-    if schema_version != STORE_DESCRIPTOR_VERSION:
-        raise ValueError("source snapshot store descriptor schema required")
+    normalized = descriptor
     if kind == "local":
-        if set(descriptor) != {"schema_version", "kind", "root"}:
-            raise ValueError("source snapshot store descriptor fields required")
-        root = descriptor.get("root")
-        if not isinstance(root, str) or not root:
-            raise ValueError("local source snapshot root required")
-        return LocalSnapshotStore(root)
+        if "schema_version" in descriptor:
+            if descriptor.get("schema_version") != STORE_DESCRIPTOR_VERSION:
+                raise ValueError("source snapshot store descriptor schema required")
+            if set(descriptor) != {"schema_version", "kind", "root"}:
+                raise ValueError("source snapshot store descriptor fields required")
+            normalized = {"kind": "local", "root": descriptor.get("root")}
     if kind == "hdfs":
-        if set(descriptor) != {"schema_version", "kind", "prefix"}:
+        allowed = {"schema_version", "kind", "prefix", "project"}
+        if not set(descriptor).issubset(allowed) or "prefix" not in descriptor:
             raise ValueError("source snapshot store descriptor fields required")
-        return HdfsSnapshotStore(waystone, prefix=require_hdfs_prefix(descriptor.get("prefix")), runner=runner, timeout=timeout)
-    raise ValueError("source snapshot store kind required")
+        normalized = dict(descriptor)
+        normalized["prefix"] = require_hdfs_prefix(descriptor.get("prefix"))
+    adapter = blob_adapter_from_descriptor(
+        normalized,
+        waystone=waystone,
+        command_prefix=command_prefix,
+        tool_pins=tool_pins,
+        hadoop_conf_dir=hadoop_conf_dir,
+    )
+    if isinstance(adapter, LocalFileBlobAdapter):
+        return LocalSnapshotStore(adapter.root)
+    return _BlobSnapshotStore(adapter, legacy_layout=kind == "hdfs")
 
 
 def store_from_receipt(
@@ -483,6 +518,9 @@ def store_from_receipt(
     waystone=DEFAULT_WAYSTONE,
     runner=subprocess.run,
     timeout: int = 90,
+    command_prefix=None,
+    tool_pins: Mapping[str, str] | None = None,
+    hadoop_conf_dir: str = DEFAULT_HADOOP_CONF_DIR,
 ) -> SnapshotStore:
     override = os.environ.get(env_var) if env_var else None
     if override:
@@ -490,7 +528,15 @@ def store_from_receipt(
     descriptor = receipt.get("source_snapshot_store")
     if descriptor is None:
         raise ValueError("source snapshot store required")
-    return _store_from_descriptor(descriptor, waystone=waystone, runner=runner, timeout=timeout)
+    return _store_from_descriptor(
+        descriptor,
+        waystone=waystone,
+        runner=runner,
+        timeout=timeout,
+        command_prefix=command_prefix,
+        tool_pins=tool_pins,
+        hadoop_conf_dir=hadoop_conf_dir,
+    )
 
 
 def verify_materialized_sources(root, receipt, store: SnapshotStore | None = None, *, package: str | None = None) -> dict:
@@ -606,11 +652,49 @@ def receipt_source_pins(receipt: Mapping) -> dict[str, str]:
     return dict(sorted(pins.items()))
 
 
+def receipt_snapshot_blob(receipt: Mapping, digest: str | None = None) -> dict | None:
+    blob = receipt.get("source_snapshot_blob")
+    if blob is None:
+        return None
+    if not isinstance(blob, Mapping):
+        raise ValueError("receipt source snapshot blob required")
+    if set(blob) != {"key", "sha256", "bytes"}:
+        raise ValueError("receipt source snapshot blob fields required")
+    receipt_digest = receipt_snapshot_digest(receipt) if digest is None else require_digest(digest)
+    blob_digest = require_digest(blob["sha256"])
+    if blob_digest != receipt_digest:
+        raise ValueError("source snapshot blob digest differs from receipt")
+    byte_count = blob["bytes"]
+    if isinstance(byte_count, bool) or not isinstance(byte_count, int) or byte_count < 0:
+        raise ValueError("source snapshot blob bytes required")
+    return {
+        "key": validate_blob_key(blob["key"]),
+        "sha256": blob_digest,
+        "bytes": byte_count,
+    }
+
+
+def _fetch_receipt_archive(store: SnapshotStore, digest: str, blob: Mapping | None) -> bytes:
+    if blob is None:
+        return store.fetch(digest)
+    blob_store = getattr(store, "_store", None)
+    if blob_store is not None:
+        return _get_snapshot_blob(blob_store, digest, key=blob["key"])
+    return store.fetch(digest)
+
+
 def _verified_receipt_archive(receipt: Mapping, store: SnapshotStore) -> tuple[str, bytes, dict[str, str]]:
     digest = receipt_snapshot_digest(receipt)
-    archive = store.fetch(digest)
+    blob = receipt_snapshot_blob(receipt, digest)
+    archive = _fetch_receipt_archive(store, digest, blob)
     if hashlib.sha256(archive).hexdigest() != digest:
         raise ValueError("snapshot digest differs from receipt")
+    expected_bytes = blob["bytes"] if blob is not None else receipt.get("source_snapshot_archive_bytes")
+    if expected_bytes is not None:
+        if isinstance(expected_bytes, bool) or not isinstance(expected_bytes, int) or expected_bytes < 0:
+            raise ValueError("source snapshot archive bytes required")
+        if len(archive) != expected_bytes:
+            raise ValueError("snapshot bytes differ from receipt")
     actual = snapshot_source_pins(archive)
     expected = receipt_source_pins(receipt)
     if actual != expected:
@@ -685,6 +769,9 @@ def materialize_receipt_sources(
     waystone=DEFAULT_WAYSTONE,
     runner=subprocess.run,
     timeout: int = 90,
+    command_prefix=None,
+    tool_pins: Mapping[str, str] | None = None,
+    hadoop_conf_dir: str = DEFAULT_HADOOP_CONF_DIR,
 ) -> dict:
     receipt = read_receipt(receipt)
     if not isinstance(receipt, Mapping):
@@ -695,6 +782,9 @@ def materialize_receipt_sources(
         waystone=waystone,
         runner=runner,
         timeout=timeout,
+        command_prefix=command_prefix,
+        tool_pins=tool_pins,
+        hadoop_conf_dir=hadoop_conf_dir,
     )
     digest, archive, pins = _verified_receipt_archive(receipt, store)
     materialized = materialize_source_snapshot_archive(archive, destination, digest=digest, source_pins=pins)
@@ -702,6 +792,7 @@ def materialize_receipt_sources(
         "source_snapshot_sha256": digest,
         "source_snapshot_target": receipt.get("source_snapshot_target"),
         "source_snapshot_store": receipt.get("source_snapshot_store"),
+        "source_snapshot_blob": receipt.get("source_snapshot_blob"),
         "source_snapshot_root": materialized["source_snapshot_root"],
         "source_pins": pins,
         "source_files": len(pins),
@@ -717,6 +808,9 @@ def verify_or_materialize_receipt_sources(
     waystone=DEFAULT_WAYSTONE,
     runner=subprocess.run,
     timeout: int = 90,
+    command_prefix=None,
+    tool_pins: Mapping[str, str] | None = None,
+    hadoop_conf_dir: str = DEFAULT_HADOOP_CONF_DIR,
 ) -> dict:
     receipt = read_receipt(receipt)
     if not isinstance(receipt, Mapping):
@@ -731,6 +825,9 @@ def verify_or_materialize_receipt_sources(
         waystone=waystone,
         runner=runner,
         timeout=timeout,
+        command_prefix=command_prefix,
+        tool_pins=tool_pins,
+        hadoop_conf_dir=hadoop_conf_dir,
     )
     if root.exists():
         return verify_materialized_sources(root, receipt, resolved_store)
@@ -742,6 +839,9 @@ def verify_or_materialize_receipt_sources(
         waystone=waystone,
         runner=runner,
         timeout=timeout,
+        command_prefix=command_prefix,
+        tool_pins=tool_pins,
+        hadoop_conf_dir=hadoop_conf_dir,
     )
 
 
@@ -769,6 +869,7 @@ def snapshot_target_and_materialize(
         "source_snapshot_target": snapshot.target,
         "source_snapshot_archive_bytes": snapshot.archive_bytes,
         "source_snapshot_store": source_snapshot_store_descriptor(store),
+        "source_snapshot_blob": source_snapshot_blob_record(snapshot.digest, snapshot.archive_bytes),
         "source_snapshot_root": materialized["source_snapshot_root"],
         "source_pins": snapshot.source_pins,
     }
