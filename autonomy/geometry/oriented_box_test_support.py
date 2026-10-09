@@ -7,6 +7,7 @@ import numpy as np
 
 from geometry.oriented_box import (
     axis_aligned_bev_iou,
+    bev_corners,
     count_points_in_box,
     enclosing_bev_rectangles,
     nearest_bev_rectangles,
@@ -51,6 +52,12 @@ def assert_heading_wrap_parity(testcase, old_wrap, *, seed=20261008):
     """Assert an old heading-wrap copy matches geometry exactly on edge cases."""
     for angles in _heading_cases(seed):
         np.testing.assert_array_equal(old_wrap(angles), wrap_heading(angles))
+
+
+def assert_bev_corners_parity(testcase, old_corners, *, seed=20261008):
+    """Assert an old BEV corner copy matches geometry exactly on edge cases."""
+    for box in _corner_cases(seed):
+        np.testing.assert_array_equal(old_corners(box), bev_corners(box))
 
 
 def assert_bev_rectangle_parity(testcase, old_nearest, old_enclosing, old_iou, *, seed=20261008):
@@ -159,6 +166,17 @@ def _box_set_cases(seed):
         b = _random_boxes(rng, 7)
         cases.append((a, b))
     return cases
+
+
+def _corner_cases(seed):
+    cases = [
+        np.array([0.0, 0.0, 0.0, 4.0, 2.0, 2.0, 0.0], dtype=np.float64),
+        np.array([1.0, -2.0, 0.5, 4.0, 2.0, 3.0, math.pi / 2], dtype=np.float64),
+        np.array([5.0, 0.0, 0.0, 4.0, 2.0, 2.0, math.pi], dtype=np.float64),
+        np.array([8.0, -3.0, 0.0, 1e-6, 1e6, 2.0, -math.pi], dtype=np.float64),
+    ]
+    rng = np.random.default_rng(seed)
+    return cases + [box for box in _random_boxes(rng, 16)]
 
 
 def _random_boxes(rng, count):

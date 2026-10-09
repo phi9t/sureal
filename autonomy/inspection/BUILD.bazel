@@ -22,6 +22,11 @@ TEST_MODULES = glob([
     "viewer/*_test.py",
     "viewer/**/*_test.py",
 ])
+TEST_EXTRA_DEPS = {
+    "oriented_box_parity_test.py": [
+        "//autonomy/geometry:oriented_box_parity_harness",
+    ],
+}
 
 VIEWER_DATA = glob([
     "viewer/run.sh",
@@ -42,6 +47,7 @@ py_library(
         "//autonomy/dataset:dataset",
         "//autonomy/evidence:evidence",
         "//autonomy/geometry:geometry",
+        "//autonomy/geometry:oriented_box",
         "//autonomy/insula:insula",
     ],
 )
@@ -75,7 +81,7 @@ filegroup(
         name = test[:-3].replace("/", "__").replace("-", "_"),
         srcs = [test],
         data = [":runfiles"],
-        deps = [":inspection"],
+        deps = [":inspection"] + TEST_EXTRA_DEPS.get(test, []),
         imports = [".."],
         legacy_create_init = 0,
         main = test,
