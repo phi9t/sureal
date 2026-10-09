@@ -4,7 +4,8 @@ from evidence.source_snapshot import file_sha256 as sha,is_regular_file,snapshot
 REQUIRED=(
  'retention/publish_sustained_checkpoint.py','retention/sustained_checkpoint_inventory.py',
  'retention/checkpoint_retention_audit.py','retention/checkpoint_retention_sources.py',
- 'retention/publisher_runtime.py','retention/sustained_controller_lock.py','retention/checkpoint_retention_policy.py',
+ 'retention/publication.py','retention/publisher_runtime.py','retention/sustained_controller_lock.py','retention/checkpoint_retention_policy.py',
+ 'blob_store/core.py',
  'resources/scientific_budget.py','resources/scientific_payload.py',
  'resources/resource_archive.py','resources/resource_archive_cli.py',
  'resources/resource_rehydrate.py','resources/resource_release_plan.py',

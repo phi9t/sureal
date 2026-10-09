@@ -2,9 +2,11 @@
 import json,os,re,shutil,subprocess,sys,time
 from pathlib import Path
 P=Path(__file__).resolve().parents[1]
+from blob_store.core import BlobStore,blob_adapter_from_descriptor
 from insula.entry import launch_plan
 from insula.runtime_identity import verify_rootfs
 from insula.runtime_roots import current_cpu_rootfs, current_gpu_rootfs, current_metrics_rootfs
+from retention.publication import audit as audit_publication
 from resources.scientific_payload import sha,unique_payload_bytes
 from resources.scientific_budget import reserve_write
 from detection.sustained_contract import validate_contract
@@ -47,6 +49,9 @@ def publication_matches_record(record,publication):
  try:return publication['parent_receipts'].get(record['final_path'])==record['final_sha256']
  except (KeyError,TypeError,AttributeError):return False
 
+def _is_blob_publication(publication):
+ return isinstance(publication,dict) and {'schema_version','store_descriptor','tool_sha256','verified_by_readback','blobs'}<=set(publication)
+
 def _expected_release_members(record):
  try:
   root=Path(record['root']);final=json.loads(Path(record['final_path']).read_text())
@@ -88,25 +93,54 @@ def _publication_release_members(publication,expected):
  except (KeyError,TypeError,AttributeError) as error:
   raise ValueError('complete native publication chunk inventory required') from error
 
+def _blob_publication_release_members(publication,expected):
+ try:
+  store=BlobStore(blob_adapter_from_descriptor(publication['store_descriptor']))
+  result=audit_publication(publication,store=store)
+  inventory=result['inventory']
+  if set(inventory)!=set(expected):
+   raise ValueError('native publication inventory differs from admitted train receipt')
+  published={}
+  for chunk in result['chunk_inventories']:
+   blob=chunk['blob']
+   for name,member in chunk['inventory'].items():
+    if name in published or expected.get(name)!=member['sha256']:
+     raise ValueError('native publication chunk inventory differs from admitted train receipt')
+    published[name]={'path':name,'sha256':member['sha256'],'bytes':member['bytes'],'archive_blob_key':blob['key']}
+  if set(published)!=set(expected):
+   raise ValueError('native publication chunk inventory incomplete')
+  return published
+ except (KeyError,TypeError,AttributeError) as error:
+  raise ValueError('complete native blob publication receipt required') from error
+
+def _derived_blob_release_plan(record,published):
+ root=Path(record['root'])
+ return [{**published[name],'local_path':str(root/name)} for name in sorted(published)]
+
 def validate_native_publication_release(record,publication_path,release_path=None,*,completed):
  publication_path=Path(publication_path);release_path=Path(release_path) if release_path is not None else None
  try:
   if not publication_path.is_file() or publication_path.is_symlink():raise ValueError('regular native publication evidence required')
   publication=json.loads(publication_path.read_text())
-  if not publication_matches_record(record,publication):raise ValueError('native publication parent differs')
-  admission=publication['independent_admission']
-  if admission['exit_code']!=0 or admission['validation']['whole_member_union_exact'] is not True:raise ValueError('independent native recovery admission required')
   release=None
   if completed:
    if release_path is None or not release_path.is_file() or release_path.is_symlink():raise ValueError('regular native release completion evidence required')
    release=json.loads(release_path.read_text())
    if release['publication_receipt_sha256']!=sha(publication_path):raise ValueError('native release does not bind publication bytes')
-  plan=_native_release_plan(publication,release)
-  if completed and release['released']!=plan:raise ValueError('native release plan changed')
   root=Path(record['root'])
   if root.is_symlink():raise ValueError('regular native release root required')
   expected=_expected_release_members(record)
-  published=_publication_release_members(publication,expected)
+  if _is_blob_publication(publication):
+   published=_blob_publication_release_members(publication,expected)
+   plan=release['released'] if completed else _derived_blob_release_plan(record,published)
+   if not isinstance(plan,list) or not plan:raise ValueError('complete native release plan required')
+  else:
+   if not publication_matches_record(record,publication):raise ValueError('native publication parent differs')
+   admission=publication['independent_admission']
+   if admission['exit_code']!=0 or admission['validation']['whole_member_union_exact'] is not True:raise ValueError('independent native recovery admission required')
+   plan=_native_release_plan(publication,release)
+   if completed and release['released']!=plan:raise ValueError('native release plan changed')
+   published=_publication_release_members(publication,expected)
   seen=set()
   for entry in plan:
    local=Path(entry['local_path'])
@@ -115,7 +149,7 @@ def validate_native_publication_release(record,publication_path,release_path=Non
    except ValueError as error:raise ValueError('native release member outside checkpoint root') from error
    required=published.get(relative)
    if (entry.get('path',relative)!=relative or relative in seen or required is None or
-       {key:entry.get(key) for key in ['path','sha256','bytes','archive_hdfs_uri']}!=required or
+       {key:entry.get(key) for key in required}!=required or
        re.fullmatch('[0-9a-f]{64}',entry['sha256']) is None):
     raise ValueError('exact native release member identity required')
    seen.add(relative)
@@ -269,4 +303,5 @@ class NativeBackend:
   new={p for p in (C/'insula').glob('hdfs-retention-*')}-before
   if len(new)!=1:raise ValueError('unique current checkpoint publication required')
   directory=new.pop();publication=directory/'verified-publication.json';release=directory/'release-completed.json';value,_,_=validate_native_publication_release(record,publication,release,completed=True)
-  self.guard();return {'publication_path':str(publication),'publication_sha256':sha(publication),'release_path':str(release),'release_sha256':sha(release),'hdfs_manifest_uri':value['publication_manifest_hdfs_uri'],'command':command,'log_sha256':sha(log)}
+  identity={'manifest_key':value['blobs']['manifest']['key']} if _is_blob_publication(value) else {'hdfs_manifest_uri':value['publication_manifest_hdfs_uri']}
+  self.guard();return {'publication_path':str(publication),'publication_sha256':sha(publication),'release_path':str(release),'release_sha256':sha(release),**identity,'command':command,'log_sha256':sha(log)}

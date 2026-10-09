@@ -30,12 +30,13 @@ class ResourceNativeBackend(ResourceBackend,NativeBackend):
    if not publication.exists():continue
    try:
     value=json.loads(publication.read_text())
-    if not publication_matches_record(record,value):continue
+    blob_publication='blobs' in value
+    if not blob_publication and not publication_matches_record(record,value):continue
     if release.exists():
      validate_native_publication_release(record,publication,release,completed=True)
      candidates.append((publication,release,value))
     else:
-     if isinstance(value.get('release_plan'),list):
+     if blob_publication or isinstance(value.get('release_plan'),list):
       try:validate_native_publication_release(record,publication,None,completed=False)
       except ValueError:incomplete.append(publication)
    except (KeyError,ValueError,OSError,json.JSONDecodeError):
@@ -45,7 +46,8 @@ class ResourceNativeBackend(ResourceBackend,NativeBackend):
   if len(candidates)!=1:raise ValueError('ambiguous native release evidence for resumed record')
   publication,release,value=candidates[0]
   validate_publication_record(self,record)
-  record['publication']={'publication_path':str(publication),'publication_sha256':sha(publication),'release_path':str(release),'release_sha256':sha(release),'hdfs_manifest_uri':value['publication_manifest_hdfs_uri'],'command':value.get('command'),'log_sha256':None}
+  identity={'manifest_key':value['blobs']['manifest']['key']} if 'blobs' in value else {'hdfs_manifest_uri':value['publication_manifest_hdfs_uri']}
+  record['publication']={'publication_path':str(publication),'publication_sha256':sha(publication),'release_path':str(release),'release_sha256':sha(release),**identity,'command':value.get('command'),'log_sha256':None}
   record['released']=True
 
  def check_record(self,record,previous):

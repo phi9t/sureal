@@ -26,6 +26,8 @@ from evidence.journal import read_entries
 
 DEFAULT_RESOURCE_AREA = "runs"
 DEFAULT_RESOURCE_CHILD = "perception-resource-closures"
+DEFAULT_CHECKPOINT_AREA = "checkpoints"
+DEFAULT_CHECKPOINT_CHILD = "perception-sustained-checkpoints"
 DEFAULT_RESEARCH_JOURNAL_AREA = "runs"
 DEFAULT_RESEARCH_JOURNAL_CHILD = "perception-research-journal"
 DEFAULT_RESEARCH_JOURNAL_KIND = "snapshot"
@@ -212,14 +214,72 @@ def write_research_journal_receipt(path, receipt, *, legacy_path=None) -> None:
     target.write_bytes(data)
 
 
+def sustained_checkpoint_spec(
+    *,
+    payload,
+    run_id,
+    kind,
+    release,
+    store,
+    store_descriptor,
+    tool_digest,
+    staging_root,
+    reserve,
+    chunk_size_bytes=DEFAULT_CHUNK_SIZE_BYTES,
+):
+    """Build a caller-controlled sustained-checkpoint publication spec."""
+
+    return PublicationSpec(
+        payload=payload,
+        inventory=lambda value: value,
+        area=DEFAULT_CHECKPOINT_AREA,
+        child=DEFAULT_CHECKPOINT_CHILD,
+        run_id=run_id,
+        kind=kind,
+        staging_style="copy",
+        mode="archive",
+        release=release,
+        store=store,
+        store_descriptor=dict(store_descriptor),
+        tool_digest=dict(tool_digest),
+        staging_root=Path(staging_root),
+        reserve=reserve,
+        chunk_size_bytes=chunk_size_bytes,
+    )
+
+
+def release_plan(spec: PublicationSpec) -> list[dict[str, object]]:
+    """Return the local release plan implied by a publication spec."""
+
+    _validate_spec(spec)
+    inventory = spec.inventory_map()
+    plan = []
+    for index, names in enumerate(_partition_inventory(inventory, spec.chunk_size_bytes)):
+        archive_key = _blob_key(spec, f"archive-{index:03d}.tar.gz")
+        for name in sorted(names):
+            entry = inventory[name]
+            plan.append(
+                {
+                    "path": name,
+                    "local_path": entry["path"],
+                    "sha256": entry["sha256"],
+                    "bytes": entry["bytes"],
+                    "archive_blob_key": archive_key,
+                }
+            )
+    if not plan:
+        raise ValueError("publication release inventory required")
+    return plan
+
+
 def publish(spec: PublicationSpec) -> dict:
     """Stage, archive, store, read back, manifest and audit one publication."""
 
     _validate_spec(spec)
     inventory = spec.inventory_map()
     total_bytes = sum(entry["bytes"] for entry in inventory.values())
-    spec.reserve(Path(spec.staging_root), total_bytes)
     spec.staging_root.mkdir(parents=True, exist_ok=True)
+    spec.reserve(Path(spec.staging_root), total_bytes)
     with tempfile.TemporaryDirectory(prefix="publication.", dir=spec.staging_root) as directory:
         work = Path(directory)
         staged = _stage_inventory(spec, inventory, work / "raw")
@@ -266,6 +326,8 @@ def publish(spec: PublicationSpec) -> dict:
         "blobs": dict({"manifest": manifest_blob}, **receipt_blobs),
     }
     audit(receipt, store=spec.store)
+    if spec.release:
+        _release_inventory(inventory)
     return receipt
 
 
@@ -290,6 +352,7 @@ def audit(receipt, *, store=None) -> dict[str, object]:
     inventory = _normalize_manifest_inventory(manifest.get("inventory"))
     seen = {}
     payload_bytes = 0
+    chunk_inventories = []
     with tempfile.TemporaryDirectory(prefix="publication-audit.") as directory:
         root = Path(directory)
         for index, chunk in enumerate(receipt["blobs"]["chunks"]):
@@ -298,7 +361,9 @@ def audit(receipt, *, store=None) -> dict[str, object]:
                 raise ValueError("publication chunk key differs")
             archive = root / f"archive-{index:03d}.tar.gz"
             _fetch_blob(store, chunk, archive)
-            for name, entry in _archive_inventory(archive).items():
+            chunk_inventory = _archive_inventory(archive)
+            chunk_inventories.append({"blob": chunk, "inventory": chunk_inventory})
+            for name, entry in chunk_inventory.items():
                 if name in seen:
                     raise ValueError("publication inventory contains duplicate member")
                 if name not in inventory or inventory[name] != entry:
@@ -314,6 +379,7 @@ def audit(receipt, *, store=None) -> dict[str, object]:
         "whole_member_union_exact": True,
         "manifest": manifest,
         "inventory": inventory,
+        "chunk_inventories": chunk_inventories,
     }
 
 
@@ -497,6 +563,17 @@ def _stage_inventory(spec: PublicationSpec, inventory, destination: Path):
             raise ValueError("staged publication member differs from source")
         staged[name] = {"path": str(target), "sha256": entry["sha256"], "bytes": entry["bytes"]}
     return staged
+
+
+def _release_inventory(inventory) -> None:
+    plan = []
+    for name, entry in sorted(inventory.items()):
+        path = require_regular_file(entry["path"])
+        if path.stat().st_size != entry["bytes"] or file_sha256(path) != entry["sha256"]:
+            raise ValueError("publication release source bytes changed")
+        plan.append(path)
+    for path in plan:
+        path.unlink()
 
 
 def _partition_inventory(inventory, limit):

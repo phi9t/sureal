@@ -1,15 +1,73 @@
-import copy,hashlib,json,os,shutil,tempfile,unittest
+import copy,hashlib,json,os,shutil,tarfile,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch
+from blob_store.core import BlobStore,LocalFileBlobAdapter
 from evidence.source_snapshot import LocalSnapshotStore,archive_sources
 from insula.runtime_roots import CURRENT_CPU_ROOTFS_NAME, CURRENT_GPU_ROOTFS_NAME
 from training_execution import admit_sustained, sustained_controller_backend
 from training_execution.sustained_controller_backend import NativeBackend,sha
+from training_execution.sustained_controller_backend import validate_native_publication_release
 from training_execution.sustained_controller_sources import REQUIRED as HOST_REQUIRED,freeze_host_sources
 from retention.checkpoint_retention_sources import REQUIRED as CHECKPOINT_PUBLISHER_REQUIRED
 from retention.checkpoint_retention_sources import freeze_host_sources as freeze_checkpoint_publisher_sources
 from training_execution.sustained_sources import REQUIRED as PACKAGE_REQUIRED,SNAPSHOT_TARGET
 class ControllerGuardTests(unittest.TestCase):
+ def native_release_fixture(self,root):
+  payload=root/'payload';heads=payload/'heads';heads.mkdir(parents=True)
+  (payload/'checkpoint.pt').write_text('checkpoint bytes\n')
+  (payload/'live.log').write_text('producer log\n')
+  head_hashes={}
+  for index in range(16):
+   head=heads/f'heads-{index:02d}.npz';head.write_text(f'head {index}\n');head_hashes[head.name]=sha(head)
+  report={'head_hashes':head_hashes,'checkpoint_sha256':sha(payload/'checkpoint.pt')}
+  (payload/'check.json').write_text(json.dumps(report,sort_keys=True))
+  artifacts={str(path):sha(path) for path in sorted(payload.rglob('*')) if path.is_file()}
+  train=root/'train-1000.json';train.write_text(json.dumps({'stage':'train-1000','artifacts':artifacts},sort_keys=True))
+  final=root/'final.json';final.write_text(json.dumps({'stage_receipts':{'train':{'path':str(train),'sha256':sha(train)}}},sort_keys=True))
+  record={'step':1000,'root':str(payload),'checkpoint_sha256':sha(payload/'checkpoint.pt'),
+          'report_sha256':sha(payload/'check.json'),'report':report,
+          'final_path':str(final),'final_sha256':sha(final)}
+  return payload,record
+
+ def test_native_release_reader_accepts_blob_publication_receipt_shape(self):
+  with tempfile.TemporaryDirectory() as temp:
+   root=Path(temp);payload,record=self.native_release_fixture(root)
+   store_root=root/'blob-store';store=BlobStore(LocalFileBlobAdapter(store_root),backoff_seconds=())
+   entries={}
+   for path in sorted(payload.rglob('*')):
+    if path.is_file():
+     name=path.relative_to(payload).as_posix()
+     entries[name]={'sha256':sha(path),'bytes':path.stat().st_size}
+   archive=root/'archive-000.tar.gz'
+   with tarfile.open(archive,'w:gz') as output:
+    for name in sorted(entries):
+     output.add(payload/name,arcname=name)
+   chunk=store.put('checkpoints/perception-sustained-checkpoints/run-step1000/checkpoint/archive-000.tar.gz',archive)
+   manifest={'schema_version':1,'area':'checkpoints','child':'perception-sustained-checkpoints',
+             'run_id':'run-step1000','kind':'checkpoint','mode':'archive',
+             'inventory':entries,'chunks':[chunk]}
+   manifest_path=root/'manifest.json';manifest_path.write_text(json.dumps(manifest,sort_keys=True))
+   manifest_blob=store.put('checkpoints/perception-sustained-checkpoints/run-step1000/checkpoint/manifest.json',manifest_path)
+   publication=root/'verified-publication.json'
+   publication.write_text(json.dumps({'schema_version':1,'store_descriptor':{'kind':'local','root':str(store_root)},
+                                      'tool_sha256':{'waystone-cli':'a'*64},
+                                      'verified_by_readback':True,
+                                      'blobs':{'manifest':manifest_blob,'chunks':[chunk]}},sort_keys=True))
+   release_plan=[]
+   for name,entry in sorted(entries.items()):
+    local=payload/name
+    release_plan.append({'path':name,'local_path':str(local),'sha256':entry['sha256'],
+                         'bytes':entry['bytes'],'archive_blob_key':chunk['key']})
+   for entry in release_plan:Path(entry['local_path']).unlink()
+   release=root/'release-completed.json'
+   release.write_text(json.dumps({'publication_receipt_sha256':sha(publication),'released':release_plan},sort_keys=True))
+
+   value,release_value,plan=validate_native_publication_release(record,publication,release,completed=True)
+
+   self.assertEqual(value['blobs']['manifest']['key'],manifest_blob['key'])
+   self.assertEqual(release_value['released'],release_plan)
+   self.assertEqual(plan,release_plan)
+
  def test_live_admission_uses_current_locked_runtime_roots(self):
   self.assertEqual(sustained_controller_backend.GPU_ROOT.name,CURRENT_GPU_ROOTFS_NAME)
   self.assertEqual(sustained_controller_backend.CPU_ROOT.name,CURRENT_CPU_ROOTFS_NAME)
