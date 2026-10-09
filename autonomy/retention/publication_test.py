@@ -8,6 +8,7 @@ from unittest.mock import patch
 from pathlib import Path
 
 from blob_store.core import BlobStore, Conflict, Corrupt, InMemoryBlobAdapter, Missing, Unauthenticated
+from evidence.journal import append_entry
 
 
 TOOL_DIGEST = {
@@ -35,10 +36,19 @@ def sha(path):
 class PublicationModuleTests(unittest.TestCase):
     def api(self):
         try:
-            from retention.publication import audit, publish, resource_bundle_spec
+            from retention.publication import (
+                audit,
+                publish,
+                research_journal_spec,
+                resource_bundle_spec,
+                write_research_journal_receipt,
+            )
         except ImportError:
-            self.fail("retention publication module must expose publish, audit and resource_bundle_spec")
-        return publish, audit, resource_bundle_spec
+            self.fail(
+                "retention publication module must expose publish, audit, "
+                "resource_bundle_spec, research_journal_spec and write_research_journal_receipt"
+            )
+        return publish, audit, resource_bundle_spec, research_journal_spec, write_research_journal_receipt
 
     def assert_no_receipt_path_strings(self, value, *, blob_key=False):
         if isinstance(value, dict):
@@ -68,7 +78,7 @@ class PublicationModuleTests(unittest.TestCase):
         adapter = InMemoryBlobAdapter()
         store = BlobStore(adapter, backoff_seconds=())
         reservations = []
-        _, _, resource_bundle_spec = self.api()
+        _, _, resource_bundle_spec, _, _ = self.api()
         spec = resource_bundle_spec(
             payload=inventory,
             run_id=run_id,
@@ -83,7 +93,7 @@ class PublicationModuleTests(unittest.TestCase):
         return spec, store, adapter, inventory, reservations
 
     def test_resource_bundle_publishes_manifest_and_chunks_with_small_receipt(self):
-        publish, audit, _ = self.api()
+        publish, audit, _, _, _ = self.api()
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             spec, store, _, inventory, reservations = self.fixture(root)
@@ -132,7 +142,7 @@ class PublicationModuleTests(unittest.TestCase):
             )
 
     def test_publish_streams_staged_members_without_reading_each_file_whole(self):
-        publish, _, _ = self.api()
+        publish, _, _, _, _ = self.api()
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             spec, _, _, _, _ = self.fixture(root, chunk_size_bytes=1024)
@@ -147,7 +157,7 @@ class PublicationModuleTests(unittest.TestCase):
                 publish(spec)
 
     def test_audit_hashes_archive_members_with_bounded_reads(self):
-        publish, audit, _ = self.api()
+        publish, audit, _, _, _ = self.api()
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             spec, store, _, _, _ = self.fixture(root, chunk_size_bytes=1024)
@@ -163,7 +173,7 @@ class PublicationModuleTests(unittest.TestCase):
                 audit(receipt, store=store)
 
     def test_repeat_publication_with_same_key_and_different_bytes_is_refused(self):
-        publish, _, _ = self.api()
+        publish, _, _, _, _ = self.api()
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             spec, _, _, inventory, _ = self.fixture(root, chunk_size_bytes=1024)
@@ -182,7 +192,7 @@ class PublicationModuleTests(unittest.TestCase):
                 publish(changed_spec)
 
     def test_audit_rejects_tampered_key_digest_size_and_missing_chunk(self):
-        publish, audit, _ = self.api()
+        publish, audit, _, _, _ = self.api()
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             spec, store, adapter, _, _ = self.fixture(root)
@@ -209,7 +219,7 @@ class PublicationModuleTests(unittest.TestCase):
                 audit(missing, store=store)
 
     def test_audit_propagates_blob_store_typed_failures(self):
-        publish, audit, _ = self.api()
+        publish, audit, _, _, _ = self.api()
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             spec, _, _, _, _ = self.fixture(root)
@@ -230,6 +240,122 @@ class PublicationModuleTests(unittest.TestCase):
             self.assertEqual(spec.staging_style, "hardlink")
             self.assertEqual(spec.mode, "archive")
             self.assertFalse(spec.release)
+
+    def journal_fixture(self, root):
+        research = root / "research"
+        research.mkdir()
+        (research / "experiment-registry.json").write_text('{"runs":[]}\n')
+        (research / "experiments.json").write_text('{"experiments":[]}\n')
+        (research / "experiment-tracker.md").write_text("# Experiment tracker\n")
+        (research / "research-journal.md").write_text("# Research journal\n")
+        append_entry(
+            research / "research-journal.jsonl",
+            "observation",
+            ["journal-fixture"],
+            "Journal direct publication fixture.",
+            [research / "experiment-registry.json"],
+        )
+        return research
+
+    def test_research_journal_publishes_direct_files_and_audits_by_readback(self):
+        publish, audit, _, research_journal_spec, _ = self.api()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            research = self.journal_fixture(root)
+            adapter = InMemoryBlobAdapter()
+            store = BlobStore(adapter, backoff_seconds=())
+            reservations = []
+            spec = research_journal_spec(
+                research_root=research,
+                run_id="journal-run-001",
+                store=store,
+                store_descriptor=STORE_DESCRIPTOR,
+                tool_digest=TOOL_DIGEST,
+                staging_root=root / "stage",
+                reserve=lambda path, maximum_new_bytes: reservations.append((Path(path), maximum_new_bytes)),
+            )
+
+            self.assertEqual(spec.area, "runs")
+            self.assertEqual(spec.child, "perception-research-journal")
+            self.assertEqual(spec.kind, "snapshot")
+            self.assertEqual(spec.mode, "direct")
+            self.assertEqual(spec.staging_style, "copy")
+            self.assertFalse(spec.release)
+
+            receipt = publish(spec)
+            file_records = receipt["blobs"]["files"]
+            expected_names = sorted([
+                "experiment-registry.json",
+                "experiment-tracker.md",
+                "experiments.json",
+                "research-journal.jsonl",
+                "research-journal.md",
+                *("journal-evidence/" + path.name for path in sorted((research / "journal-evidence").iterdir())),
+            ])
+            self.assertEqual(
+                [blob["key"] for blob in file_records],
+                ["runs/perception-research-journal/journal-run-001/snapshot/" + name for name in expected_names],
+            )
+            self.assertEqual(
+                receipt["blobs"]["manifest"]["key"],
+                "runs/perception-research-journal/journal-run-001/snapshot/manifest.json",
+            )
+            for blob in [receipt["blobs"]["manifest"], *file_records]:
+                self.assertEqual(set(blob), {"key", "sha256", "bytes"})
+            rendered = json.dumps(receipt, sort_keys=True)
+            self.assertNotIn(str(root), rendered)
+            self.assertNotIn("hdfs://", rendered)
+            self.assertNotIn("command", rendered)
+            self.assert_no_receipt_path_strings(receipt)
+
+            result = audit(receipt, store=store)
+            self.assertEqual(result["files"], len(expected_names))
+            self.assertEqual(result["chunks"], 0)
+            self.assertEqual(
+                result["payload_bytes"],
+                sum((research / name).stat().st_size for name in expected_names),
+            )
+            self.assertEqual(reservations, [(root / "stage", result["payload_bytes"])])
+
+            manifest_path = root / "manifest-readback.json"
+            store.get(
+                receipt["blobs"]["manifest"]["key"],
+                manifest_path,
+                receipt["blobs"]["manifest"]["sha256"],
+                expected_bytes=receipt["blobs"]["manifest"]["bytes"],
+            )
+            manifest = json.loads(manifest_path.read_text())
+            self.assertEqual(manifest["mode"], "direct")
+            self.assertEqual(manifest["files"], file_records)
+            self.assertEqual(set(manifest["inventory"]), set(expected_names))
+
+            adapter._blobs[file_records[0]["key"]] = b"changed direct file"
+            with self.assertRaises(Corrupt):
+                audit(receipt, store=store)
+
+    def test_research_journal_receipt_writer_preserves_legacy_record_bytes_before_replace(self):
+        _, _, _, _, write_research_journal_receipt = self.api()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            active = root / "research-journal-hdfs-verified.json"
+            legacy = root / "research-journal-hdfs-legacy-verified.json"
+            old_bytes = b'{"all_results_uploaded_and_readback_exact":true}\n'
+            receipt = {
+                "schema_version": 1,
+                "store_descriptor": STORE_DESCRIPTOR,
+                "tool_sha256": RECEIPT_TOOL_DIGEST,
+                "verified_by_readback": True,
+                "blobs": {
+                    "manifest": {"key": "runs/perception-research-journal/r/snapshot/manifest.json", "sha256": "1" * 64, "bytes": 2},
+                    "files": [{"key": "runs/perception-research-journal/r/snapshot/research-journal.jsonl", "sha256": "2" * 64, "bytes": 3}],
+                },
+            }
+            active.write_bytes(old_bytes)
+
+            write_research_journal_receipt(active, receipt, legacy_path=legacy)
+
+            self.assertEqual(legacy.read_bytes(), old_bytes)
+            self.assertEqual(json.loads(active.read_text()), receipt)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,7 @@
 """Blob-store backed publication workflow for retained evidence bundles."""
 
+import datetime
+import fcntl
 import gzip
 import hashlib
 import json
@@ -19,10 +21,21 @@ from blob_store.core import (
     waystone_tool_pins,
 )
 from evidence.source_snapshot import file_sha256, require_digest, require_regular_file, safe_member_name
+from evidence.journal import read_entries
 
 
 DEFAULT_RESOURCE_AREA = "runs"
 DEFAULT_RESOURCE_CHILD = "perception-resource-closures"
+DEFAULT_RESEARCH_JOURNAL_AREA = "runs"
+DEFAULT_RESEARCH_JOURNAL_CHILD = "perception-research-journal"
+DEFAULT_RESEARCH_JOURNAL_KIND = "snapshot"
+RESEARCH_JOURNAL_FILE_NAMES = (
+    "experiment-registry.json",
+    "experiment-tracker.md",
+    "experiments.json",
+    "research-journal.jsonl",
+    "research-journal.md",
+)
 DEFAULT_CHUNK_SIZE_BYTES = 128 * 1024 * 1024
 WAYSTONE_DESCRIPTOR = {"kind": "waystone", "project": "sureal"}
 STREAM_CHUNK_BYTES = 1024 * 1024
@@ -99,6 +112,106 @@ def resource_bundle_spec(
     )
 
 
+def research_journal_spec(
+    *,
+    research_root,
+    run_id,
+    store,
+    store_descriptor,
+    tool_digest,
+    staging_root,
+    reserve,
+    chunk_size_bytes=DEFAULT_CHUNK_SIZE_BYTES,
+):
+    """Build the direct-files publication spec for the research journal."""
+
+    return PublicationSpec(
+        payload=Path(research_root),
+        inventory=_research_journal_inventory,
+        area=DEFAULT_RESEARCH_JOURNAL_AREA,
+        child=DEFAULT_RESEARCH_JOURNAL_CHILD,
+        run_id=run_id,
+        kind=DEFAULT_RESEARCH_JOURNAL_KIND,
+        staging_style="copy",
+        mode="direct",
+        release=False,
+        store=store,
+        store_descriptor=dict(store_descriptor),
+        tool_digest=dict(tool_digest),
+        staging_root=Path(staging_root),
+        reserve=reserve,
+        chunk_size_bytes=chunk_size_bytes,
+    )
+
+
+def publish_research_journal(
+    *,
+    research_root=None,
+    run_id=None,
+    store=None,
+    store_descriptor=None,
+    tool_digest=None,
+    staging_root=None,
+    receipt_path=None,
+    legacy_receipt_path=None,
+    reserve=None,
+):
+    """Publish the research journal through the publication module."""
+
+    research_root = Path(research_root) if research_root is not None else Path(__file__).resolve().parents[1] / "research"
+    if run_id is None:
+        run_id = "snapshot-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    descriptor = dict(store_descriptor or WAYSTONE_DESCRIPTOR)
+    if store is None:
+        store = BlobStore(blob_adapter_from_descriptor(descriptor))
+    if tool_digest is None:
+        adapter = getattr(store, "_adapter", None)
+        tool_digest = getattr(adapter, "tool_sha256", None)
+    if tool_digest is None:
+        tool_digest = waystone_tool_pins()
+    if staging_root is None:
+        staging_root = research_root / ".publication-stage" / run_id
+    if reserve is None:
+        reserve = lambda _path, _maximum_new_bytes: None
+    spec = research_journal_spec(
+        research_root=research_root,
+        run_id=run_id,
+        store=store,
+        store_descriptor=descriptor,
+        tool_digest=tool_digest,
+        staging_root=staging_root,
+        reserve=reserve,
+    )
+    receipt = publish(spec)
+    if receipt_path is not None:
+        write_research_journal_receipt(receipt_path, receipt, legacy_path=legacy_receipt_path)
+    return receipt
+
+
+def write_research_journal_receipt(path, receipt, *, legacy_path=None) -> None:
+    """Replace the active journal receipt after preserving old HDFS bytes."""
+
+    _normalize_receipt(receipt)
+    target = Path(path)
+    legacy = Path(legacy_path) if legacy_path is not None else target.with_name(
+        "research-journal-hdfs-legacy-verified.json"
+    )
+    data = _json_bytes(receipt)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if target.exists():
+        current = target.read_bytes()
+        if current == data:
+            return
+        if _is_new_publication_receipt(current):
+            raise ValueError("research journal publication receipt changed")
+        if legacy.exists():
+            if legacy.read_bytes() != current:
+                raise ValueError("research journal legacy receipt differs")
+        else:
+            legacy.write_bytes(current)
+    target.write_bytes(data)
+
+
 def publish(spec: PublicationSpec) -> dict:
     """Stage, archive, store, read back, manifest and audit one publication."""
 
@@ -110,21 +223,38 @@ def publish(spec: PublicationSpec) -> dict:
     with tempfile.TemporaryDirectory(prefix="publication.", dir=spec.staging_root) as directory:
         work = Path(directory)
         staged = _stage_inventory(spec, inventory, work / "raw")
-        chunks = []
-        for index, names in enumerate(_partition_inventory(inventory, spec.chunk_size_bytes)):
-            archive = work / f"archive-{index:03d}.tar.gz"
-            _write_archive(archive, staged, names)
-            chunks.append(spec.store.put(_blob_key(spec, f"archive-{index:03d}.tar.gz"), archive))
-        manifest = {
-            "schema_version": 1,
-            "area": spec.area,
-            "child": spec.child,
-            "run_id": spec.run_id,
-            "kind": spec.kind,
-            "mode": spec.mode,
-            "inventory": _public_inventory(inventory),
-            "chunks": chunks,
-        }
+        if spec.mode == "archive":
+            chunks = []
+            for index, names in enumerate(_partition_inventory(inventory, spec.chunk_size_bytes)):
+                archive = work / f"archive-{index:03d}.tar.gz"
+                _write_archive(archive, staged, names)
+                chunks.append(spec.store.put(_blob_key(spec, f"archive-{index:03d}.tar.gz"), archive))
+            manifest = {
+                "schema_version": 1,
+                "area": spec.area,
+                "child": spec.child,
+                "run_id": spec.run_id,
+                "kind": spec.kind,
+                "mode": spec.mode,
+                "inventory": _public_inventory(inventory),
+                "chunks": chunks,
+            }
+            receipt_blobs = {"chunks": chunks}
+        else:
+            files = []
+            for name in sorted(staged):
+                files.append(spec.store.put(_blob_key(spec, name), staged[name]["path"]))
+            manifest = {
+                "schema_version": 1,
+                "area": spec.area,
+                "child": spec.child,
+                "run_id": spec.run_id,
+                "kind": spec.kind,
+                "mode": spec.mode,
+                "inventory": _public_inventory(inventory),
+                "files": files,
+            }
+            receipt_blobs = {"files": files}
         manifest_path = work / "manifest.json"
         _write_json(manifest_path, manifest)
         manifest_blob = spec.store.put(_blob_key(spec, "manifest.json"), manifest_path)
@@ -133,10 +263,7 @@ def publish(spec: PublicationSpec) -> dict:
         "store_descriptor": dict(spec.store_descriptor),
         "tool_sha256": _normalize_tool_digest(spec.tool_digest),
         "verified_by_readback": True,
-        "blobs": {
-            "manifest": manifest_blob,
-            "chunks": chunks,
-        },
+        "blobs": dict({"manifest": manifest_blob}, **receipt_blobs),
     }
     audit(receipt, store=spec.store)
     return receipt
@@ -149,7 +276,11 @@ def audit(receipt, *, store=None) -> dict[str, object]:
     if store is None:
         store = BlobStore(blob_adapter_from_descriptor(receipt["store_descriptor"]))
     manifest = _fetch_json_blob(store, receipt["blobs"]["manifest"])
-    if manifest.get("schema_version") != 1 or manifest.get("mode") != "archive":
+    if manifest.get("schema_version") != 1:
+        raise ValueError("publication manifest shape required")
+    if manifest.get("mode") == "direct":
+        return _audit_direct_publication(receipt, manifest, store)
+    if manifest.get("mode") != "archive":
         raise ValueError("publication manifest shape required")
     expected_key_prefix = _manifest_key_prefix(manifest)
     if receipt["blobs"]["manifest"]["key"] != expected_key_prefix + "/manifest.json":
@@ -235,8 +366,8 @@ def _validate_spec(spec: PublicationSpec) -> None:
         raise ValueError("publication spec required")
     if spec.staging_style not in {"hardlink", "copy"}:
         raise ValueError("publication staging style required")
-    if spec.mode != "archive":
-        raise ValueError("publication archive mode required")
+    if spec.mode not in {"archive", "direct"}:
+        raise ValueError("publication mode required")
     if type(spec.release) is not bool:
         raise ValueError("publication release flag required")
     if type(spec.chunk_size_bytes) is not int or spec.chunk_size_bytes <= 0:
@@ -245,6 +376,71 @@ def _validate_spec(spec: PublicationSpec) -> None:
     _normalize_tool_digest(spec.tool_digest)
     if not isinstance(spec.store_descriptor, Mapping):
         raise ValueError("publication store descriptor required")
+
+
+def _audit_direct_publication(receipt, manifest, store) -> dict[str, object]:
+    expected_key_prefix = _manifest_key_prefix(manifest)
+    if receipt["blobs"]["manifest"]["key"] != expected_key_prefix + "/manifest.json":
+        raise ValueError("publication manifest key differs")
+    if manifest.get("files") != receipt["blobs"]["files"]:
+        raise ValueError("publication file records differ from manifest")
+    inventory = _normalize_manifest_inventory(manifest.get("inventory"))
+    files = receipt["blobs"]["files"]
+    if len(files) != len(inventory):
+        raise ValueError("publication direct inventory is incomplete")
+    payload_bytes = 0
+    with tempfile.TemporaryDirectory(prefix="publication-audit.") as directory:
+        root = Path(directory)
+        for name, blob in zip(sorted(inventory), files):
+            expected_key = expected_key_prefix + "/" + validate_blob_key(name)
+            if blob["key"] != expected_key:
+                raise ValueError("publication direct file key differs")
+            expected = inventory[name]
+            if blob["sha256"] != expected["sha256"] or blob["bytes"] != expected["bytes"]:
+                raise ValueError("publication direct file record differs from manifest inventory")
+            destination = root / name
+            _fetch_blob(store, blob, destination)
+            payload_bytes += blob["bytes"]
+    return {
+        "files": len(files),
+        "chunks": 0,
+        "payload_bytes": payload_bytes,
+        "whole_member_union_exact": True,
+        "manifest": manifest,
+        "inventory": inventory,
+    }
+
+
+def _research_journal_inventory(research_root) -> dict[str, dict[str, object]]:
+    root = Path(research_root)
+    if not root.is_dir() or root.is_symlink():
+        raise ValueError("research journal root must be a regular directory")
+    tracker_lock = root / "experiment-tracker.lock"
+    journal_lock = root / "research-journal.lock"
+    with tracker_lock.open("a") as tracker, journal_lock.open("a") as journal:
+        fcntl.flock(tracker, fcntl.LOCK_EX)
+        fcntl.flock(journal, fcntl.LOCK_SH)
+        read_entries(root / "research-journal.jsonl")
+        names = list(RESEARCH_JOURNAL_FILE_NAMES)
+        evidence_root = root / "journal-evidence"
+        if evidence_root.exists():
+            if not evidence_root.is_dir() or evidence_root.is_symlink():
+                raise ValueError("regular immutable evidence directory required")
+            names.extend(
+                "journal-evidence/" + child.name
+                for child in sorted(evidence_root.iterdir())
+                if child.is_file() and not child.is_symlink()
+            )
+        return _inventory_from_root(root, names)
+
+
+def _inventory_from_root(root: Path, names) -> dict[str, dict[str, object]]:
+    inventory = {}
+    for name in sorted(names):
+        name = safe_member_name(name)
+        path = require_regular_file(root / name)
+        inventory[name] = {"path": str(path), "sha256": file_sha256(path), "bytes": path.stat().st_size}
+    return inventory
 
 
 def _normalize_inventory(value) -> dict[str, dict[str, object]]:
@@ -371,7 +567,7 @@ def _fetch_json_blob(store, blob):
 def _fetch_blob(store, blob, destination: Path) -> None:
     blob = _normalize_blob(blob)
     try:
-        store.get(blob["key"], destination, blob["sha256"])
+        store.get(blob["key"], destination, blob["sha256"], expected_bytes=blob["bytes"])
     except BlobStoreError:
         raise
     except Exception as error:
@@ -388,21 +584,30 @@ def _normalize_receipt(receipt):
     if receipt["schema_version"] != 1 or receipt["verified_by_readback"] is not True:
         raise ValueError("publication readback receipt required")
     blobs = receipt["blobs"]
-    if not isinstance(blobs, Mapping) or set(blobs) != {"manifest", "chunks"}:
+    if not isinstance(blobs, Mapping) or "manifest" not in blobs:
         raise ValueError("publication blob records required")
-    chunks = blobs["chunks"]
-    if not isinstance(chunks, list) or not chunks:
-        raise ValueError("publication chunks required")
-    return {
+    result = {
         "schema_version": 1,
         "store_descriptor": dict(receipt["store_descriptor"]),
         "tool_sha256": _normalize_receipt_tool_digest(receipt["tool_sha256"]),
         "verified_by_readback": True,
         "blobs": {
             "manifest": _normalize_blob(blobs["manifest"]),
-            "chunks": [_normalize_blob(chunk) for chunk in chunks],
         },
     }
+    if set(blobs) == {"manifest", "chunks"}:
+        chunks = blobs["chunks"]
+        if not isinstance(chunks, list) or not chunks:
+            raise ValueError("publication chunks required")
+        result["blobs"]["chunks"] = [_normalize_blob(chunk) for chunk in chunks]
+        return result
+    if set(blobs) == {"manifest", "files"}:
+        files = blobs["files"]
+        if not isinstance(files, list) or not files:
+            raise ValueError("publication files required")
+        result["blobs"]["files"] = [_normalize_blob(blob) for blob in files]
+        return result
+    raise ValueError("publication blob records required")
 
 
 def _normalize_blob(value):
@@ -478,16 +683,29 @@ def _manifest_key_prefix(manifest) -> str:
 
 
 def _write_json(path: Path, value) -> None:
-    path.write_text(json.dumps(value, sort_keys=True, separators=(",", ":")) + "\n")
+    path.write_bytes(_json_bytes(value))
 
 
 def _write_json_idempotent(path: Path, value) -> None:
-    data = json.dumps(value, sort_keys=True, separators=(",", ":")) + "\n"
+    data = _json_bytes(value).decode()
     if path.exists():
         if path.read_text() != data:
             raise ValueError("publication receipt changed")
         return
     path.write_text(data)
+
+
+def _json_bytes(value) -> bytes:
+    return (json.dumps(value, sort_keys=True, separators=(",", ":")) + "\n").encode()
+
+
+def _is_new_publication_receipt(data: bytes) -> bool:
+    try:
+        value = json.loads(data)
+        _normalize_receipt(value)
+        return True
+    except (json.JSONDecodeError, TypeError, ValueError):
+        return False
 
 
 def _stream_sha256_and_size(stream, expected_size: int) -> tuple[str, int]:

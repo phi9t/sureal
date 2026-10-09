@@ -11,7 +11,6 @@ python -m evidence.tracker refresh
 python -m evidence.tracker watch --interval 60
 python -m evidence.tracker note --category hypothesis --experiment expanded20261002a/range_fusion --text 'State a falsifiable hypothesis here' --evidence path/to/receipt.json
 python -m evidence.tracker verify-journal
-python -m evidence.publish
 ```
 
 Read `research/experiment-tracker.md` and `research/research-journal.md`.
@@ -28,6 +27,7 @@ updates appear in the dashboard without flooding the journal. The watch command
 retries partial result writes and retains the previous dashboard. It fails
 explicitly on invalid evidence instead of silently declaring success.
 
-Results and journal snapshots can be retained on HDFS; use verified upload and
-readback receipts. TensorFlow is not required. The tracker is metadata-only and
-makes no claim of held-out, segmentation or full-dataset success.
+Results and journal snapshots are retained through publication specs owned by
+the retention concept; use verified blob-store readback receipts. TensorFlow is
+not required. The tracker is metadata-only and makes no claim of held-out,
+segmentation or full-dataset success.
