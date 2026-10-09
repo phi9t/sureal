@@ -40,6 +40,13 @@ class PublicationModuleTests(unittest.TestCase):
             self.fail("retention publication module must expose publish, audit and resource_bundle_spec")
         return publish, audit, resource_bundle_spec
 
+    def sustained_api(self):
+        try:
+            from retention.publication import audit, publish, sustained_checkpoint_spec
+        except ImportError:
+            self.fail("retention publication module must expose sustained_checkpoint_spec")
+        return publish, audit, sustained_checkpoint_spec
+
     def assert_no_receipt_path_strings(self, value, *, blob_key=False):
         if isinstance(value, dict):
             for key, child in value.items():
@@ -230,6 +237,103 @@ class PublicationModuleTests(unittest.TestCase):
             self.assertEqual(spec.staging_style, "hardlink")
             self.assertEqual(spec.mode, "archive")
             self.assertFalse(spec.release)
+
+    def test_sustained_checkpoint_spec_publishes_under_checkpoints_and_releases_after_audit(self):
+        publish, audit, sustained_checkpoint_spec = self.sustained_api()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            source = root / "checkpoint"
+            source.mkdir()
+            checkpoint = source / "checkpoint.pt"
+            report = source / "check.json"
+            checkpoint.write_bytes(b"checkpoint bytes")
+            report.write_text('{"ok": true}\n')
+            inventory = {
+                "checkpoint.pt": {
+                    "path": str(checkpoint),
+                    "sha256": sha(checkpoint),
+                    "bytes": checkpoint.stat().st_size,
+                },
+                "check.json": {
+                    "path": str(report),
+                    "sha256": sha(report),
+                    "bytes": report.stat().st_size,
+                },
+            }
+            store = BlobStore(InMemoryBlobAdapter(), backoff_seconds=())
+            reservations = []
+            spec = sustained_checkpoint_spec(
+                payload=inventory,
+                run_id="balanced16-sustained-baseline-run1-step1000",
+                kind="checkpoint",
+                store=store,
+                store_descriptor=STORE_DESCRIPTOR,
+                tool_digest=TOOL_DIGEST,
+                staging_root=root / "stage",
+                reserve=lambda path, maximum_new_bytes: reservations.append((Path(path), maximum_new_bytes)),
+                chunk_size_bytes=1024,
+            )
+
+            receipt = publish(spec)
+
+            self.assertTrue(spec.release)
+            self.assertEqual(spec.area, "checkpoints")
+            self.assertEqual(spec.child, "perception-sustained-checkpoints")
+            self.assertEqual(receipt["blobs"]["manifest"]["key"], "checkpoints/perception-sustained-checkpoints/balanced16-sustained-baseline-run1-step1000/checkpoint/manifest.json")
+            self.assertFalse(checkpoint.exists())
+            self.assertFalse(report.exists())
+            self.assert_no_receipt_path_strings(receipt)
+            result = audit(receipt, store=store)
+            self.assertEqual(result["files"], 2)
+            self.assertEqual(reservations, [(root / "stage", sum(item["bytes"] for item in inventory.values()))])
+
+    def test_sustained_checkpoint_audit_failure_releases_nothing(self):
+        class CorruptOnAuditSize(InMemoryBlobAdapter):
+            def __init__(self):
+                super().__init__()
+                self._puts = 0
+                self._corrupted = False
+
+            def _upload_blob(self, key, source, context):
+                super()._upload_blob(key, source, context)
+                self._puts += 1
+
+            def _blob_size(self, key, context):
+                if self._puts >= 2 and not self._corrupted:
+                    self._blobs[key] = b"corrupted after publication readback"
+                    self._corrupted = True
+                return super()._blob_size(key, context)
+
+        publish, _, sustained_checkpoint_spec = self.sustained_api()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            source = root / "checkpoint"
+            source.mkdir()
+            checkpoint = source / "checkpoint.pt"
+            report = source / "check.json"
+            checkpoint.write_bytes(b"checkpoint bytes")
+            report.write_text("report\n")
+            inventory = {
+                "checkpoint.pt": {"path": str(checkpoint), "sha256": sha(checkpoint), "bytes": checkpoint.stat().st_size},
+                "check.json": {"path": str(report), "sha256": sha(report), "bytes": report.stat().st_size},
+            }
+            spec = sustained_checkpoint_spec(
+                payload=inventory,
+                run_id="run-with-audit-failure",
+                kind="checkpoint",
+                store=BlobStore(CorruptOnAuditSize(), backoff_seconds=()),
+                store_descriptor=STORE_DESCRIPTOR,
+                tool_digest=TOOL_DIGEST,
+                staging_root=root / "stage",
+                reserve=lambda path, maximum_new_bytes: None,
+                chunk_size_bytes=1024,
+            )
+
+            with self.assertRaises(Corrupt):
+                publish(spec)
+
+            self.assertTrue(checkpoint.exists())
+            self.assertTrue(report.exists())
 
 
 if __name__ == "__main__":
