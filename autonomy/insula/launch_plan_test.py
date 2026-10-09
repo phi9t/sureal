@@ -1,8 +1,9 @@
 import json
 import os
+import subprocess
 import tempfile
 import unittest
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from unittest.mock import patch
 
 from evidence.source_snapshot import file_sha256
@@ -12,10 +13,12 @@ from insula.launch_plan import (
     PlanError,
     RuntimeLockError,
     build_plan,
+    load_default_runtime_lock,
     load_runtime_lock,
     plan_data,
     record_plan,
     render_plan,
+    run_plan,
 )
 from insula.runtime_identity import rootfs_identity
 from insula.runtime_roots import (
@@ -216,6 +219,63 @@ class LaunchPlanTests(unittest.TestCase):
             self.assertIn("--clearenv", argv)
             self.assertIn("/tmp/tables", argv)
             self.assertEqual(argv[-2:], ["python", "main.py"])
+
+    def test_default_lock_loader_uses_rootfs_default_lock_path(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            rootfs = Path(temporary) / CURRENT_CPU_ROOTFS_NAME
+            write_rootfs(rootfs)
+            lock = rootfs.with_name(rootfs.name + ".lock.json")
+            write_cpu_recipe_lock(lock, rootfs)
+
+            runtime = load_default_runtime_lock(rootfs)
+
+            self.assertEqual(runtime.rootfs, rootfs.resolve())
+            self.assertEqual(runtime.lock_path, lock.resolve())
+            self.assertEqual(runtime.data["rootfs_sha256"], rootfs_identity(rootfs))
+
+    def test_run_plan_executes_rendered_plan_as_subprocess(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            runtime = self.load_fixture_runtime(root)
+            code = root / "code"
+            output = root / "output"
+            for path in (code, output):
+                path.mkdir()
+            plan = build_plan(runtime, code=code, output=output, command=["python", "-c", "pass"])
+            completed = subprocess.CompletedProcess(render_plan(plan), 0, stdout="ok\n", stderr="")
+
+            with patch("insula.launch_plan.subprocess.run", return_value=completed) as run:
+                result = run_plan(plan, capture_output=True, text=True)
+
+            self.assertIs(result, completed)
+            run.assert_called_once_with(render_plan(plan), capture_output=True, text=True)
+
+    def test_build_plan_coerces_named_and_writable_input_paths(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            runtime = self.load_fixture_runtime(root)
+            code = root / "code"
+            output = root / "output"
+            read_only = root / "read-only"
+            scratch = root / "scratch"
+            for path in (code, output, read_only, scratch):
+                path.mkdir()
+
+            plan = build_plan(
+                runtime,
+                code=code,
+                output=output,
+                named_inputs={PurePosixPath("/tmp/tables"): str(read_only)},
+                writable_inputs={PurePosixPath("/tmp/scratch"): str(scratch)},
+                command=["true"],
+            )
+
+            mounts = {mount["role"]: mount for mount in plan_data(plan)["mounts"]}
+            self.assertEqual(mounts["input:/tmp/tables"]["inside_path"], "/tmp/tables")
+            self.assertEqual(mounts["input:/tmp/tables"]["host_path"], str(read_only.resolve()))
+            self.assertEqual(mounts["input:/tmp/scratch"]["inside_path"], "/tmp/scratch")
+            self.assertEqual(mounts["input:/tmp/scratch"]["host_path"], str(scratch.resolve()))
+            json.dumps(record_plan(plan), sort_keys=True)
 
     def test_receipt_record_has_digests_without_host_paths(self):
         with tempfile.TemporaryDirectory() as temporary:

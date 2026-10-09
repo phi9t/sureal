@@ -4,11 +4,16 @@ import unittest
 from pathlib import Path
 
 from evidence.source_snapshot import file_sha256
-from insula.launch_plan import BAZEL_LINUX_X86_64_SHA256, BAZEL_VERSION, plan_data
+from insula.launch_plan import (
+    BAZEL_LINUX_X86_64_SHA256,
+    BAZEL_VERSION,
+    build_plan,
+    load_default_runtime_lock,
+    plan_data,
+    record_plan,
+)
 from insula.runtime_identity import rootfs_identity
 from insula.runtime_roots import current_cpu_rootfs
-
-from geometry.launches import build_geometry_plan, load_current_cpu_runtime, plan_receipt
 
 
 AUTONOMY = Path(__file__).resolve().parents[1]
@@ -58,10 +63,10 @@ class GeometryLaunchTests(unittest.TestCase):
             for path in (code, source, output, prepared, points):
                 path.mkdir()
 
-            runtime = load_current_cpu_runtime(cache)
-            foundation = build_geometry_plan(
+            runtime = load_default_runtime_lock(current_cpu_rootfs(cache))
+            foundation = build_plan(
                 runtime,
-                code_root=code,
+                code=code,
                 source=source,
                 output=output / "foundation",
                 command=[
@@ -76,9 +81,9 @@ class GeometryLaunchTests(unittest.TestCase):
                     "-v",
                 ],
             )
-            scene = build_geometry_plan(
+            scene = build_plan(
                 runtime,
-                code_root=code,
+                code=code,
                 source=source,
                 output=output / "scene",
                 command=["python", "-c", "validate"],
@@ -92,7 +97,7 @@ class GeometryLaunchTests(unittest.TestCase):
             self.assertEqual(mounts["input:/srv"]["inside_path"], "/srv")
             self.assertEqual(mounts["input:/opt"]["mode"], "read_only")
             self.assertIn(["--setenv", "PYTHONPATH", "/experiment"], scene_data["environment"])
-            receipt = plan_receipt(scene)
+            receipt = record_plan(scene)
             self.assertEqual(receipt["command"], ["python", "-c", "validate"])
             self.assertNotIn(str(temporary), json.dumps(receipt, sort_keys=True))
 

@@ -6,7 +6,8 @@ import json
 from pathlib import Path
 import resource,time
 from evidence.source_snapshot import file_sha256 as sha
-from dataset.launches import build_dataset_plan, load_dataset_runtime, plan_receipt, rendered_command, run_dataset_plan
+from insula.launch_plan import build_plan, load_default_runtime_lock, record_plan, render_plan, run_plan
+from insula.runtime_roots import current_cpu_rootfs
 from dataset.scientific_admission import admit_scene
 from dataset.staged_source import staged_source
 from insula.staging_lease import staging_lease
@@ -29,7 +30,7 @@ def main():
     # Refuse the live owner before creating a partial scene directory. Individual
     # transfers reacquire this same lease for their entire processing lifetime.
     with staging_lease(cache/'raw-staging.lock'):pass
-    runtime=load_dataset_runtime(cache);lock=runtime.data
+    runtime=load_default_runtime_lock(current_cpu_rootfs(cache));lock=runtime.data
     retained=sum(o['size_bytes'] for o in json.loads((HERE/'dataset/dataset.lock.json').read_text())['objects'])
     destination=args.output.resolve();destination.mkdir(parents=True,exist_ok=True)
     candidate={name:sha(HERE/name) for name in CANDIDATES};components=args.component or COMPONENTS
@@ -54,11 +55,11 @@ def main():
                     ('independent-check',checked,['python','-m','dataset.scientific_component','validate','/source/source.parquet','/opt/'+component,'/outputs/check.json'])]
             for name,out,command in stages:
                 named_inputs={'/opt':prepared} if name=='independent-check' else None
-                plan=build_dataset_plan(runtime,code_root=HERE,source=source.parent,output=out,command=command,named_inputs=named_inputs)
-                rendered=rendered_command(plan)
-                t=time.monotonic();result=run_dataset_plan(plan,capture_output=True,text=True)
+                plan=build_plan(runtime,code=HERE,source=source.parent,output=out,command=command,named_inputs=named_inputs)
+                rendered=render_plan(plan)
+                t=time.monotonic();result=run_plan(plan,capture_output=True,text=True)
                 (base/(name+'.log')).write_text(result.stdout+result.stderr)
-                checks.append({'stage':name,'command':rendered,'launch_plan':plan_receipt(plan),'exit_code':result.returncode,'elapsed_seconds':time.monotonic()-t})
+                checks.append({'stage':name,'command':rendered,'launch_plan':record_plan(plan),'exit_code':result.returncode,'elapsed_seconds':time.monotonic()-t})
                 if result.returncode:raise RuntimeError(result.stderr)
             validation=json.loads((checked/'check.json').read_text())
             if validation['source_sha256']!=record['sha256']:raise ValueError('independent source identity differs')
@@ -99,9 +100,9 @@ def reconstruct(admitted,paths,scene,destination,candidate,cache,runtime,lock,re
                 output=destination/'.reconstruct-output';output.mkdir()
             named_inputs={'/opt':prepared,'/mnt':trusted}
             if name=='independent-scene-check':named_inputs['/srv']=destination/'points'
-            plan=build_dataset_plan(runtime,code_root=HERE,source=source.parent,output=output,command=command,named_inputs=named_inputs)
-            rendered=rendered_command(plan);t=time.monotonic();result=run_dataset_plan(plan,capture_output=True,text=True)
-            (base/(name+'.log')).write_text(result.stdout+result.stderr);checks.append({'stage':name,'command':rendered,'launch_plan':plan_receipt(plan),'exit_code':result.returncode,'elapsed_seconds':time.monotonic()-t})
+            plan=build_plan(runtime,code=HERE,source=source.parent,output=output,command=command,named_inputs=named_inputs)
+            rendered=render_plan(plan);t=time.monotonic();result=run_plan(plan,capture_output=True,text=True)
+            (base/(name+'.log')).write_text(result.stdout+result.stderr);checks.append({'stage':name,'command':rendered,'launch_plan':record_plan(plan),'exit_code':result.returncode,'elapsed_seconds':time.monotonic()-t})
             if result.returncode:raise RuntimeError(result.stderr)
             if name=='reconstruct':
                 (output/'points').rename(destination/'points');output.rmdir()

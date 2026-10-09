@@ -7,7 +7,8 @@ from pathlib import Path
 import resource
 import time
 from evidence.source_snapshot import file_sha256 as sha
-from dataset.launches import build_dataset_plan, load_dataset_runtime, plan_receipt, rendered_command, run_dataset_plan
+from insula.launch_plan import build_plan, load_default_runtime_lock, record_plan, render_plan, run_plan
+from insula.runtime_roots import current_cpu_rootfs
 
 HERE=Path(__file__).resolve().parents[1]
 
@@ -52,7 +53,7 @@ def main():
     refevidence=json.loads((HERE/'research/scientific-reconstruction-evidence.json').read_text())
     if sha(refreceipt)!=refevidence['receipt_sha256'] or sha(reference/'report.json')!=ref['artifacts']['produced/points/report.json']:
         raise ValueError('independent reconstruction reference changed')
-    runtime=load_dataset_runtime(cache);lock=runtime.data
+    runtime=load_default_runtime_lock(current_cpu_rootfs(cache));lock=runtime.data
     names=['dataset/verify-archive-dataset.py','dataset/scientific_dataset.py','dataset/scene_archive_validate.py','dataset/scientific_dataset_test.py']
     candidates={p:sha(HERE/p) for p in names};checks=[];outputs=[]
     start=datetime.now(timezone.utc).isoformat();tick=time.monotonic()
@@ -60,11 +61,11 @@ def main():
         out=base/('fixtures' if index==0 else f'replay-{index}');out.mkdir();outputs.append(out)
         command=['python','-m','unittest','discover','-s','dataset','-p','scientific_dataset_test.py','-v'] if index==0 else ['python','-c','PUBLICATION_HASH='+repr(expected)+'\n'+REPLAY]
         named_inputs={'/opt':reference} if index else None
-        plan=build_dataset_plan(runtime,code_root=HERE,source=published/'packed',output=out,command=command,named_inputs=named_inputs)
-        rendered=rendered_command(plan)
-        stage_start=datetime.now(timezone.utc).isoformat();t=time.monotonic();result=run_dataset_plan(plan,capture_output=True,text=True)
+        plan=build_plan(runtime,code=HERE,source=published/'packed',output=out,command=command,named_inputs=named_inputs)
+        rendered=render_plan(plan)
+        stage_start=datetime.now(timezone.utc).isoformat();t=time.monotonic();result=run_plan(plan,capture_output=True,text=True)
         (base/(out.name+'.log')).write_text(result.stdout+result.stderr)
-        checks.append({'stage':out.name,'command':rendered,'launch_plan':plan_receipt(plan),'started_utc':stage_start,'ended_utc':datetime.now(timezone.utc).isoformat(),'exit_code':result.returncode,'elapsed_seconds':time.monotonic()-t})
+        checks.append({'stage':out.name,'command':rendered,'launch_plan':record_plan(plan),'started_utc':stage_start,'ended_utc':datetime.now(timezone.utc).isoformat(),'exit_code':result.returncode,'elapsed_seconds':time.monotonic()-t})
         print(out.name,result.returncode,result.stdout.strip(),flush=True)
         if result.returncode:raise RuntimeError(result.stderr)
     a=json.loads((outputs[1]/'replay.json').read_text());b=json.loads((outputs[2]/'replay.json').read_text())

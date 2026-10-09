@@ -4,11 +4,16 @@ import unittest
 from pathlib import Path
 
 from evidence.source_snapshot import file_sha256
-from insula.launch_plan import BAZEL_LINUX_X86_64_SHA256, BAZEL_VERSION, plan_data
+from insula.launch_plan import (
+    BAZEL_LINUX_X86_64_SHA256,
+    BAZEL_VERSION,
+    build_plan,
+    load_default_runtime_lock,
+    plan_data,
+    record_plan,
+)
 from insula.runtime_identity import rootfs_identity
 from insula.runtime_roots import current_cpu_rootfs
-
-from camera.launches import build_camera_plan, load_current_cpu_runtime, plan_receipt
 
 
 AUTONOMY = Path(__file__).resolve().parents[1]
@@ -55,18 +60,18 @@ class CameraLaunchTests(unittest.TestCase):
             for path in (code, processing, publication, inputs, sidecars, output):
                 path.mkdir()
 
-            runtime = load_current_cpu_runtime(cache)
-            pack = build_camera_plan(
+            runtime = load_default_runtime_lock(current_cpu_rootfs(cache))
+            pack = build_plan(
                 runtime,
-                code_root=code,
+                code=code,
                 source=processing,
                 output=output / "packed",
                 command=["python", "-c", "pack"],
                 named_inputs={"/mnt": inputs},
             )
-            replay = build_camera_plan(
+            replay = build_plan(
                 runtime,
-                code_root=code,
+                code=code,
                 source=publication,
                 output=output / "replay",
                 command=["python", "-m", "camera.camera_replay_check"],
@@ -85,7 +90,7 @@ class CameraLaunchTests(unittest.TestCase):
             self.assertEqual(replay_mounts["input:/opt"]["inside_path"], "/opt")
             self.assertEqual(replay_mounts["input:/mnt"]["inside_path"], "/mnt")
 
-            receipt = plan_receipt(replay)
+            receipt = record_plan(replay)
             self.assertEqual(receipt["runtime"]["form"], "recipe-digest")
             self.assertEqual(receipt["command"], ["python", "-m", "camera.camera_replay_check"])
             self.assertNotIn(str(temporary), json.dumps(receipt, sort_keys=True))

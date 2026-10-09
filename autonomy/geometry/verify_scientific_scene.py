@@ -6,9 +6,10 @@ from pathlib import Path
 HERE=Path(__file__).resolve().parents[1]
 if str(HERE) not in sys.path: sys.path.insert(0,str(HERE))
 from evidence.source_snapshot import file_sha256 as sha
-from geometry.launches import build_geometry_plan, load_current_cpu_runtime, plan_receipt, run_geometry_plan
+from insula.launch_plan import build_plan, load_default_runtime_lock, record_plan, run_plan
+from insula.runtime_roots import current_cpu_rootfs
 
-CANDIDATES=['geometry/scientific_scene_validate.py','geometry/scientific_scene_validate_test.py','geometry/scientific_reconstruction_test.py','geometry/reconstruction_validate.py','dataset/scientific_sidecar_reader.py','dataset/sensor_records.py','geometry/scientific_reconstruction.py','dataset/scientific_sidecars.py','geometry/geometry.py','geometry/verify_scientific_scene.py','geometry/launches.py','insula/launch_plan.py','insula/runtime_roots.py']
+CANDIDATES=['geometry/scientific_scene_validate.py','geometry/scientific_scene_validate_test.py','geometry/scientific_reconstruction_test.py','geometry/reconstruction_validate.py','dataset/scientific_sidecar_reader.py','dataset/sensor_records.py','geometry/scientific_reconstruction.py','dataset/scientific_sidecars.py','geometry/geometry.py','geometry/verify_scientific_scene.py','insula/launch_plan.py','insula/runtime_roots.py']
 
 def main():
     destination=Path(sys.argv[1]).resolve();destination.mkdir(parents=True,exist_ok=False)
@@ -23,14 +24,14 @@ def main():
     manifest=json.loads((points/'report.json').read_text());hashes=manifest['sidecar_manifest_hashes']
     # Hashes below have already been anchored to the independent sidecar receipt.
     for c,h in hashes.items():assert sha(prepared/c/'manifest.json')==h
-    runtime=load_current_cpu_runtime(cache);lock=runtime.data
+    runtime=load_default_runtime_lock(current_cpu_rootfs(cache));lock=runtime.data
     source=cache/'slices/validation-two-scenes-20260929';dataset=json.loads((HERE/'dataset/dataset.lock.json').read_text());native=next(x for x in dataset['objects'] if x['component']=='lidar' and x['context']==manifest['scene']);assert sha(source/native['relative_path'])==native['sha256']==manifest['source_lidar_sha256']
     candidates={n:sha(HERE/n) for n in CANDIDATES};start=datetime.now(timezone.utc).isoformat();tick=time.monotonic();checks=[]
     commands=[('fixtures',['python','-m','unittest','discover','-s','geometry','-p','scientific_scene_validate_test.py','-v']),('native-reconciliation',['python','-c',"import json; from pathlib import Path; from geometry.scientific_scene_validate import validate_scene; r=validate_scene(Path('/source')/"+repr(native['relative_path'])+",Path('/opt'),Path('/srv'),verified_manifest_hashes="+repr(hashes)+"); Path('/outputs/validation.json').write_text(json.dumps(r,indent=2)); print('PASS independent native scene',r['records'],r['points'],r['scalar_max_error_m'])"])]
     for name,command in commands:
         named_inputs={'/opt':prepared,'/srv':points} if name!='fixtures' else None
-        plan=build_geometry_plan(runtime,code_root=HERE,source=source,output=checked,command=command,named_inputs=named_inputs)
-        t=time.monotonic();result=run_geometry_plan(plan,capture_output=True,text=True);(destination/(name+'.log')).write_text(result.stdout+result.stderr);checks.append({'stage':name,'launch_plan':plan_receipt(plan),'exit_code':result.returncode,'elapsed_seconds':time.monotonic()-t})
+        plan=build_plan(runtime,code=HERE,source=source,output=checked,command=command,named_inputs=named_inputs)
+        t=time.monotonic();result=run_plan(plan,capture_output=True,text=True);(destination/(name+'.log')).write_text(result.stdout+result.stderr);checks.append({'stage':name,'launch_plan':record_plan(plan),'exit_code':result.returncode,'elapsed_seconds':time.monotonic()-t})
         if result.returncode:raise RuntimeError(result.stderr)
     validation=json.loads((checked/'validation.json').read_text());assert validation['points']==manifest['points'] and validation['records']==len(manifest['rows']) and validation['source_lidar_sha256']==native['sha256'];assert validation['report_sha256']==sha(points/'report.json')
     for n,h in candidates.items():assert sha(HERE/n)==h

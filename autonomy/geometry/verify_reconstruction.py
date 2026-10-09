@@ -11,10 +11,11 @@ import time
 HERE=Path(__file__).resolve().parents[1]
 if str(HERE) not in sys.path: sys.path.insert(0,str(HERE))
 from evidence.source_snapshot import file_sha256 as sha
-from geometry.launches import build_geometry_plan, load_current_cpu_runtime, plan_receipt, run_geometry_plan
+from insula.launch_plan import build_plan, load_default_runtime_lock, record_plan, run_plan
+from insula.runtime_roots import current_cpu_rootfs
 from insula.m0_receipt import CURRENT_M0_RECEIPT_NAME, validate_receipt
 from insula.runtime_roots import waymo_cache
-FILES=['geometry/verify_reconstruction.py','geometry/launches.py','insula/launch_plan.py','insula/runtime_roots.py',
+FILES=['geometry/verify_reconstruction.py','insula/launch_plan.py','insula/runtime_roots.py',
        'geometry/geometry.py','geometry/geometry_foundation.py','dataset/sensor_records.py',
        'geometry/reconstruction_probe.py','geometry/reconstruction_validate.py','dataset/tracer.py',
        'dataset/tracer_contracts.py','geometry/geometry_test.py','dataset/sensor_records_test.py','geometry/reconstruction_validate_test.py']
@@ -22,7 +23,7 @@ FILES=['geometry/verify_reconstruction.py','geometry/launches.py','insula/launch
 def main():
     destination=Path(sys.argv[1])
     if destination.exists():raise ValueError('existing destination')
-    cache=waymo_cache();runtime=load_current_cpu_runtime(cache);source=cache/'slices/validation-two-scenes-20260929';m0=runtime.rootfs.parent/CURRENT_M0_RECEIPT_NAME
+    cache=waymo_cache();runtime=load_default_runtime_lock(current_cpu_rootfs(cache));source=cache/'slices/validation-two-scenes-20260929';m0=runtime.rootfs.parent/CURRENT_M0_RECEIPT_NAME
     validate_receipt(m0,runtime.rootfs,HERE)
     for milestone in ['m1','m2']:
         summary=json.loads((HERE/f'research/{milestone}-verified.json').read_text())
@@ -40,9 +41,9 @@ def main():
             ('validation-fixtures',['-m','unittest','discover','-s','/experiment/geometry','-p','reconstruction_validate_test.py','-v']),
         ]
         for name,tail in commands:
-            plan=build_geometry_plan(runtime,code_root=HERE,source=source,output=stage,command=['python',*tail]);p=run_geometry_plan(plan,text=True,capture_output=True)
+            plan=build_plan(runtime,code=HERE,source=source,output=stage,command=['python',*tail]);p=run_plan(plan,text=True,capture_output=True)
             (stage/(name+'.log')).write_text(p.stdout+p.stderr)
-            records.append({'name':name,'launch_plan':plan_receipt(plan),'exit_code':p.returncode})
+            records.append({'name':name,'launch_plan':record_plan(plan),'exit_code':p.returncode})
             print(name,p.returncode,flush=True)
             if p.returncode:
                 failure=destination.with_name(destination.name+'-failed')

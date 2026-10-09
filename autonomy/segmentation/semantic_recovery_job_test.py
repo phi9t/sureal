@@ -44,7 +44,7 @@ class SemanticRecoveryJobGateTests(unittest.TestCase):
                 self.assertEqual(Path(cache_arg),staging)
                 raise RuntimeError('stop before live transfer')
             with patch('segmentation.semantic_recovery_job.sha',return_value='pub-sha'), \
-                 patch('segmentation.semantic_recovery_job.load_runtime_for_root',return_value=runtime), \
+                 patch('segmentation.semantic_recovery_job.load_default_runtime_lock',return_value=runtime), \
                  patch('segmentation.semantic_recovery_job.staged_derived_archive',side_effect=fake_staged):
                 with self.assertRaises(RuntimeError):
                     recover_semantic_archive(record,cache=cache,staging_cache=staging,code_root=root,output=root/'output')
