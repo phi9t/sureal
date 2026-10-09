@@ -315,3 +315,7 @@ Current blocker:
   verification, scene checkpoint verification, and full Bazel gates were not
   rerun after this blocker because the scientific cohort acceptance prerequisite
   did not hold.
+
+### 2026-10-09 coordinator note
+
+Landed as-is at the user's decision ("stop here, land what we have"). The live attempts found and fixed a real audit bug (d434154). They also showed that one real scene peaks at about 31 GB in `scientific-processing`, with 17.1 GB of retained runs already there. So the 20 GiB working cap cannot hold one scene. Neither raising it to 32 GiB nor capping only the run's own bytes was chosen. The acceptance box stays open until the cap is resolved.
