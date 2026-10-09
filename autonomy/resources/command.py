@@ -1,6 +1,7 @@
 """Record the actual bwrap command; never pretend an unwrapped argv executed."""
 from pathlib import Path
 from evidence.source_snapshot import is_regular_file
+from insula.launch_plan import LaunchPlan, Mount, _assemble_plan
 
 ARITY={'--unshare-all':0,'--die-with-parent':0,'--clearenv':0,
        '--proc':1,'--dev':1,'--tmpfs':1,'--chdir':1,
@@ -41,14 +42,56 @@ def wrapped_command(command,code,output):
     return command[:separator]+bindings+['--',argv[0],'/tmp/resource-layer/resources/execute_worker.py','/tmp/resource-output',*argv[1:]],argv[1:]
 
 
+def wrapped_plan(plan,code,output):
+    """Construct the resource wrapper as launch-plan data."""
+    if not isinstance(plan,LaunchPlan):
+        raise ValueError('launch plan required')
+    argv=list(plan.command)
+    if (len(argv)<2 or argv[0] not in {'python','/opt/waymo/bin/python'} or
+        not Path(argv[1]).is_absolute() or not argv[1].endswith('.py')):
+        raise ValueError('declared original Python worker required')
+    if any(mount.kind in {'bind','dev-bind','tmpfs'} and mount.inside_path in ALIASES for mount in plan.mounts):
+        raise ValueError('resource mount aliases must be unused')
+    code=Path(code);output=Path(output)
+    additions=[
+        Mount('resource-layer','bind','/tmp/resource-layer','read_only',code),
+        Mount('resource-experiment-resources','bind','/experiment/resources','read_only',code/'resources'),
+        Mount('resource-experiment-evidence','bind','/experiment/evidence','read_only',code/'evidence'),
+        Mount('resource-output','bind','/tmp/resource-output','writable',output),
+    ]
+    before=[mount for mount in plan.mounts if mount.phase=='before_devices']
+    after=[mount for mount in plan.mounts if mount.phase!='before_devices']
+    wrapped=_assemble_plan(
+        plan.runtime,
+        mounts=[*before,*additions,*after],
+        environment=plan.environment,
+        command=[argv[0],'/tmp/resource-layer/resources/execute_worker.py','/tmp/resource-output',*argv[1:]],
+        working_directory=plan.working_directory,
+        unshare_flags=plan.unshare_flags,
+        gpu=plan.gpu,
+    )
+    return wrapped,argv[1:]
+
+
 def wrap_command(command,code,output):
     code=Path(code);output=Path(output)
     actual,worker_argv=wrapped_command(command,code,output)
+    _validate_resource_wrapper_inputs(code,output)
+    command[:]=actual
+    return worker_argv
+
+
+def wrap_plan(plan,code,output):
+    code=Path(code);output=Path(output)
+    wrapped,worker_argv=wrapped_plan(plan,code,output)
+    _validate_resource_wrapper_inputs(code,output)
+    return wrapped,worker_argv
+
+
+def _validate_resource_wrapper_inputs(code,output):
     if (any(not p.is_absolute() or not p.is_dir() or any(q.is_symlink() for q in [p,*p.parents]) for p in [code,output]) or
         not (code/'resources').is_dir() or not (code/'evidence').is_dir() or
         not is_regular_file(code/'resources/execute_worker.py') or
         not is_regular_file(code/'evidence/source_snapshot.py') or
         any(output.iterdir())):
         raise ValueError('regular code and empty resource output required')
-    command[:]=actual
-    return worker_argv

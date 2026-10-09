@@ -355,6 +355,101 @@ class LaunchPlanTests(unittest.TestCase):
                     command=["true"],
                 )
 
+    def test_split_runtime_root_mounts_checked_entries_instead_of_whole_root(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            rootfs = root / CURRENT_CPU_ROOTFS_NAME
+            write_rootfs(rootfs)
+            for name in ("experiment", "source", "outputs", "tmp", "proc", "dev", "opt"):
+                (rootfs / name).mkdir(exist_ok=True)
+            (rootfs / "opt" / "tool.txt").write_text("tool\n")
+            lock = rootfs.with_name(rootfs.name + ".lock.json")
+            write_cpu_recipe_lock(lock, rootfs)
+            runtime = load_runtime_lock(rootfs, lock)
+            code = root / "code"
+            source = root / "source"
+            output = root / "output"
+            readonly = rootfs / "opt" / "readonly"
+            for path in (code, source, output, readonly):
+                path.mkdir(parents=True, exist_ok=True)
+
+            plan = build_plan(
+                runtime,
+                code=code,
+                source=source,
+                output=output,
+                named_inputs={"/opt/readonly": readonly},
+                command=["true"],
+                split_runtime_root=True,
+            )
+            mounts = plan_data(plan)["mounts"]
+
+            self.assertNotIn(
+                {
+                    "role": "runtime",
+                    "host_path": str(rootfs.resolve()),
+                    "inside_path": "/",
+                    "mode": "read_only",
+                    "kind": "bind",
+                },
+                mounts,
+            )
+            self.assertIn(
+                {
+                    "role": "runtime-entry:bin",
+                    "host_path": str((rootfs / "bin").resolve()),
+                    "inside_path": "/bin",
+                    "mode": "read_only",
+                    "kind": "bind",
+                },
+                mounts,
+            )
+            self.assertIn(
+                {
+                    "role": "runtime-entry:opt",
+                    "host_path": str((rootfs / "opt").resolve()),
+                    "inside_path": "/opt",
+                    "mode": "read_only",
+                    "kind": "bind",
+                },
+                mounts,
+            )
+            runtime_entry_paths = {
+                mount["inside_path"] for mount in mounts if mount["role"].startswith("runtime-entry:")
+            }
+            self.assertFalse(
+                {"/experiment", "/source", "/outputs", "/tmp", "/proc", "/dev"} & runtime_entry_paths
+            )
+            self.assertEqual(plan_data(plan)["command"], ["true"])
+
+    def test_split_runtime_root_reuses_overlap_rules_for_writable_inputs(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            rootfs = root / CURRENT_CPU_ROOTFS_NAME
+            write_rootfs(rootfs)
+            writable = rootfs / "opt" / "cache"
+            writable.mkdir(parents=True)
+            lock = rootfs.with_name(rootfs.name + ".lock.json")
+            write_cpu_recipe_lock(lock, rootfs)
+            runtime = load_runtime_lock(rootfs, lock)
+            code = root / "code"
+            output = root / "output"
+            for path in (code, output):
+                path.mkdir()
+
+            with self.assertRaisesRegex(
+                PlanError,
+                "runtime-entry:opt.*input:/opt/cache|input:/opt/cache.*runtime-entry:opt",
+            ):
+                build_plan(
+                    runtime,
+                    code=code,
+                    output=output,
+                    writable_inputs={"/opt/cache": writable},
+                    command=["true"],
+                    split_runtime_root=True,
+                )
+
     def test_extra_environment_cannot_replace_module_owned_variables(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

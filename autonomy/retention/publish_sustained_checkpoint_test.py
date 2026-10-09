@@ -8,10 +8,38 @@ import unittest
 from pathlib import Path
 
 from evidence.source_snapshot import file_sha256
+from insula.launch_plan import BAZEL_LINUX_X86_64_SHA256, BAZEL_VERSION, RuntimeLockError
+from insula.runtime_identity import rootfs_identity
+from insula.runtime_roots import CURRENT_CPU_ROOTFS_NAME
 from retention.sustained_controller_lock import acquire_experiment_lock
 
 
 sha = file_sha256
+AUTONOMY = Path(__file__).resolve().parents[1]
+
+
+def write_rootfs(root: Path):
+    root.mkdir(parents=True)
+    (root / "bin").mkdir()
+    (root / "bin/python").write_text("#!/bin/sh\n")
+    (root / "bin/python").chmod(0o755)
+
+
+def write_cpu_lock(lock_path: Path, rootfs: Path, **overrides):
+    lock = {
+        "schema_version": 1,
+        "rootfs_sha256": rootfs_identity(rootfs),
+        "dockerfile_sha256": file_sha256(AUTONOMY / "insula/Dockerfile"),
+        "requirements_sha256": file_sha256(AUTONOMY / "requirements-tracer.lock"),
+        "test_tools_requirements_sha256": file_sha256(
+            AUTONOMY / "insula/cpu-test-tools-requirements.lock"
+        ),
+        "bazel_version": BAZEL_VERSION,
+        "bazel_linux_x86_64_sha256": BAZEL_LINUX_X86_64_SHA256,
+    }
+    lock.update(overrides)
+    lock_path.write_text(json.dumps(lock, sort_keys=True) + "\n")
+    return lock
 
 
 class PublishSustainedCheckpointTests(unittest.TestCase):
@@ -192,6 +220,22 @@ class PublishSustainedCheckpointTests(unittest.TestCase):
             self.assertEqual(release["publication_receipt_sha256"], sha(publication_path))
             self.assertEqual(len(release["released"]), 19)
             self.assertFalse(any(path.is_file() for path in payload.rglob("*")))
+
+    def test_default_resource_root_uses_strict_launch_plan_lock_checker(self):
+        from retention.publish_sustained_checkpoint import _verify_default_resource_root
+
+        with tempfile.TemporaryDirectory() as temp:
+            cache = Path(temp) / "cache"
+            rootfs = cache / "insula" / CURRENT_CPU_ROOTFS_NAME
+            write_rootfs(rootfs)
+            write_cpu_lock(
+                rootfs.with_name(rootfs.name + ".lock.json"),
+                rootfs,
+                dockerfile_sha256="0" * 64,
+            )
+
+            with self.assertRaisesRegex(RuntimeLockError, "dockerfile_sha256"):
+                _verify_default_resource_root(cache)
 
 
 if __name__ == "__main__":

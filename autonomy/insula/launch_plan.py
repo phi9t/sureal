@@ -56,6 +56,15 @@ _GPU_CONTROL_DEVICES = {
     "/dev/nvidia-modeset",
 }
 _DEFAULT_GPU_DRIVER_LIBRARY_DIRS = (Path("/usr/lib/x86_64-linux-gnu"),)
+_SPLIT_RUNTIME_MASKED_ENTRIES = {
+    "dev",
+    "driver",
+    "experiment",
+    "outputs",
+    "proc",
+    "source",
+    "tmp",
+}
 
 
 class RuntimeLockError(ValueError):
@@ -164,11 +173,10 @@ def build_plan(
     extra_environment: Mapping[str, object] | None = None,
     gpu_index: int | None = None,
     source_snapshot_digest: str | None = None,
+    split_runtime_root: bool = False,
 ) -> LaunchPlan:
-    mounts = [
-        Mount("runtime", "bind", "/", "read_only", runtime.rootfs),
-        Mount("code", "bind", "/experiment", "read_only", Path(code)),
-    ]
+    mounts = [*_runtime_mounts(runtime, split_runtime_root)]
+    mounts.append(Mount("code", "bind", "/experiment", "read_only", Path(code)))
     if source is not None:
         mounts.append(Mount("source", "bind", "/source", "read_only", Path(source)))
     mounts.append(Mount("output", "bind", "/outputs", "writable", Path(output)))
@@ -304,6 +312,28 @@ def _unchecked_runtime(rootfs: Path) -> RuntimeLock:
         form="unchecked",
         lock_sha256="",
     )
+
+
+def _runtime_mounts(runtime: RuntimeLock, split_runtime_root: bool) -> list[Mount]:
+    if type(split_runtime_root) is not bool:
+        raise PlanError("split_runtime_root: boolean required")
+    if not split_runtime_root:
+        return [Mount("runtime", "bind", "/", "read_only", runtime.rootfs)]
+    mounts = []
+    for entry in sorted(runtime.rootfs.iterdir(), key=lambda path: path.name):
+        if entry.name in _SPLIT_RUNTIME_MASKED_ENTRIES:
+            continue
+        inside_path = "/" + _safe_rootfs_entry_name(entry.name)
+        mounts.append(Mount(f"runtime-entry:{entry.name}", "bind", inside_path, "read_only", entry))
+    if not mounts:
+        raise PlanError("split_runtime_root: runtime rootfs has no mountable entries")
+    return mounts
+
+
+def _safe_rootfs_entry_name(name: str) -> str:
+    if not name or name in {".", ".."} or "/" in name or "\x00" in name:
+        raise PlanError(f"{name!r}: runtime rootfs entry name must be a safe path component")
+    return name
 
 
 def _check_recipe_lock(rootfs: Path, data: Mapping[str, object]) -> None:
@@ -502,6 +532,8 @@ def _mount_data(mount: Mount, *, include_host: bool) -> dict:
 def _record_mount(plan: LaunchPlan, mount: Mount) -> dict:
     data = _mount_data(mount, include_host=False)
     if mount.role == "runtime":
+        data["digest"] = plan.runtime.data.get("rootfs_sha256", "")
+    elif mount.role.startswith("runtime-entry:"):
         data["digest"] = plan.runtime.data.get("rootfs_sha256", "")
     elif mount.role == "code" and hasattr(plan, "_source_snapshot_digest"):
         data["digest"] = getattr(plan, "_source_snapshot_digest")
