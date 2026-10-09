@@ -4,8 +4,8 @@ import argparse,fcntl,json,resource,subprocess,time
 from datetime import datetime,timezone
 from pathlib import Path
 from evidence.source_snapshot import file_sha256 as sha
-from insula.entry import launch_plan
-from insula.runtime_identity import verify_rootfs
+from insula.launch_plan import build_plan, load_runtime_lock, record_plan, render_plan
+from insula.runtime_roots import current_cpu_rootfs, default_lock
 from dataset.scientific_admission import admit_scene
 from dataset.cohort_resume import verify_registered_checkpoint
 DRIVER=Path(__file__).resolve()
@@ -26,6 +26,10 @@ def audit(path,artifact_root=None):
  for n,h in receipt['artifacts'].items():
   if sha(root/n)!=h:raise ValueError('artifact differs: '+n)
  return receipt
+def build_eviction_plan(runtime,*,processing,publication,replay,command):
+ named_inputs={}
+ if replay:named_inputs['/srv']=Path(replay)
+ return build_plan(runtime,code=HERE,output=processing,command=command,named_inputs=named_inputs,writable_inputs={'/opt':Path(publication)})
 
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--scene',action='append',required=True);parser.add_argument('--output',type=Path,required=True);parser.add_argument('--initial-processing',type=Path);parser.add_argument('--trusted-checkpoints',type=Path);parser.add_argument('--expected-trusted-checkpoints-sha256');args=parser.parse_args()
@@ -36,7 +40,7 @@ def main():
  try:fcntl.flock(owner,fcntl.LOCK_EX|fcntl.LOCK_NB)
  except BlockingIOError:raise ValueError('another cohort driver is live')
  manifest_path=HERE/'dataset/scientific-acquisition.candidate.json';manifest=json.loads(manifest_path.read_text());manifest['excluded_engineering_segments']=json.loads((HERE/'dataset/scientific-cohort.candidate.json').read_text())['excluded_engineering_segments']
- root=CACHE/'insula/rootfs-v2';lock=json.loads(Path(str(root)+'.lock.json').read_text());verify_rootfs(root,lock['rootfs_sha256']);driver_sha=sha(DRIVER);manifest_sha=sha(manifest_path)
+ root=current_cpu_rootfs(CACHE);runtime=load_runtime_lock(root,default_lock(root));lock=runtime.data;driver_sha=sha(DRIVER);manifest_sha=sha(manifest_path)
  for index,scene in enumerate(args.scene):
   membership=manifest['scenes'][scene];paths={c:CACHE/'scientific-source-audit'/f"{membership['official_split']}-{c}-{scene}.json" for c in manifest['components']};records={c:json.loads(p.read_text()) for c,p in paths.items()};admit_scene(manifest,records,scene);source_hashes={c:sha(p) for c,p in paths.items()}
   scene_base=base/scene;checkpoint=scene_base/'receipt.json'
@@ -54,9 +58,7 @@ def main():
    if total(WORKING)+upper>=15*1024**3:raise ValueError('aggregate component bundle working cap insufficient')
   def evict(stage,module,function,processing,publication,replay,ph,rh=None):
    code='import json; from '+module+' import '+function+'; r='+function+"('/outputs','/opt'"+(",'/srv'" if replay else '')+',expected_publication_sha256='+repr(ph)+(',expected_replay_sha256='+repr(rh) if replay else '')+"); print(json.dumps({'status':r['status'],'bytes_evicted':r['bytes_evicted']}))"
-   plan=launch_plan(root,HERE,HERE,processing,['python','-c',code]);i=plan.index('--');mounts=['--bind',str(publication),'/opt']
-   if replay:mounts+=['--ro-bind',str(replay),'/srv']
-   plan[i:i]=mounts;call(stage,plan)
+   plan=build_eviction_plan(runtime,processing=processing,publication=publication,replay=replay,command=['python','-c',code]);call(stage,render_plan(plan));checks[-1]['launch_plan']=record_plan(plan)
    name={'point-evict':'point-eviction.json','sidecar-evict':'sidecar-eviction.json','camera-evict':'camera-eviction.json'}[stage];p=processing/name;ev=json.loads(p.read_text())
    if not ev['status'].endswith('completed'):raise ValueError('incomplete eviction')
    for f in ev['files']:
@@ -85,4 +87,5 @@ def main():
   for p in scene_base.glob('*.log'):remember(p)
   save(checkpoint,{'status':'native scientific scene point/camera lifecycle independently verified; protocol remains open','scene':scene,'membership':membership,'checks':checks,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-tick,'peak_child_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'driver_sha256':driver_sha,'manifest_sha256':manifest_sha,'source_record_hashes':source_hashes,'runtime_lock':lock,'retained_evidence_hashes':retained,'point_validation':point_replay['validation'],'camera_validation':camera_result['validation'],'point_hdfs_uri':pub['archive_hdfs_uri'],'camera_hdfs_uri':json.loads((camera_pub/'receipt.json').read_text())['archive_hdfs_uri'],'scope':'native preprocessing only; independent full queue audit, class maps, full task/cohort/scientific protocol/model comparisons remain open'})
   print('PASS complete queued native scene',scene,flush=True)
+ owner.close()
 if __name__=='__main__':main()
