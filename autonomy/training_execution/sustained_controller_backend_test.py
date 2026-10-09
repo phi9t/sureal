@@ -3,6 +3,7 @@ from pathlib import Path
 from unittest.mock import patch
 from blob_store.core import BlobStore,LocalFileBlobAdapter
 from evidence.source_snapshot import LocalSnapshotStore,archive_sources
+from insula.launch_plan import RuntimeLock
 from insula.runtime_roots import CURRENT_CPU_ROOTFS_NAME, CURRENT_GPU_ROOTFS_NAME
 from training_execution import admit_sustained, sustained_controller_backend
 from training_execution.sustained_controller_backend import NativeBackend,sha
@@ -74,28 +75,47 @@ class ControllerGuardTests(unittest.TestCase):
   self.assertEqual(admit_sustained.GPU_ROOT.name,CURRENT_GPU_ROOTFS_NAME)
   self.assertEqual(admit_sustained.CPU_ROOT.name,CURRENT_CPU_ROOTFS_NAME)
 
- def test_current_gpu_runtime_lock_comes_from_v6_lock_not_historical_receipt(self):
+ def test_sustained_runtime_locks_are_loaded_through_launch_plan_module(self):
   with tempfile.TemporaryDirectory() as temp:
-   root=Path(temp);gpu=root/CURRENT_GPU_ROOTFS_NAME;gpu.mkdir()
-   lock={'schema_version':1,'rootfs_sha256':'5'*64,'image_id':'current-v6'}
-   Path(str(gpu)+'.lock.json').write_text(json.dumps(lock))
-   old={'runtime_lock':{'rootfs_sha256':'4'*64,'image_id':'old'}}
-   with patch('training_execution.sustained_controller_backend.GPU_ROOT',gpu),patch('training_execution.sustained_controller_backend.verify_rootfs') as verify:
-    self.assertEqual(sustained_controller_backend.current_gpu_runtime_lock(old),lock)
-   verify.assert_called_once_with(gpu,lock['rootfs_sha256'])
-   with patch('training_execution.admit_sustained.GPU_ROOT',gpu),patch('training_execution.admit_sustained.verify_rootfs') as verify:
-    self.assertEqual(admit_sustained.current_gpu_runtime_lock(old),lock)
-   verify.assert_called_once_with(gpu,lock['rootfs_sha256'])
+   root=Path(temp);gpu=root/CURRENT_GPU_ROOTFS_NAME;cpu=root/CURRENT_CPU_ROOTFS_NAME;metrics=root/'metrics-rootfs-v2'
+   for path in [gpu,cpu,metrics]:path.mkdir()
+   values=[
+    RuntimeLock(gpu,Path(str(gpu)+'.lock.json'),{'rootfs_sha256':'5'*64},'recipe-digest','g'*64),
+    RuntimeLock(cpu,Path(str(cpu)+'.lock.json'),{'rootfs_sha256':'6'*64},'recipe-digest','c'*64),
+    RuntimeLock(metrics,Path(str(metrics)+'.lock.json'),{'rootfs_sha256':'7'*64,'image_id':'metrics'},'image','m'*64),
+   ]
+   with patch('training_execution.sustained_controller_backend.GPU_ROOT',gpu),patch('training_execution.sustained_controller_backend.CPU_ROOT',cpu),patch('training_execution.sustained_controller_backend.METRICS_ROOT',metrics),patch('training_execution.sustained_controller_backend.load_default_runtime_lock',side_effect=values) as load,patch.object(NativeBackend,'guard'),patch('training_execution.sustained_controller_backend.reserve_write'),patch('training_execution.sustained_controller_backend.freeze_host_sources',return_value={}),patch('training_execution.sustained_controller_backend.freeze_checkpoint_publisher_sources',return_value={}),patch('training_execution.sustained_controller_backend.snapshot_sources',return_value={'source_snapshot_sha256':'s'*64,'source_snapshot_root':str(root/'code'),'source_pins':{}}),patch('training_execution.sustained_controller_backend.cache_snapshot_for_runtime'),patch('training_execution.sustained_controller_backend.shutil.copyfile'):
+    (root/'code/autonomy/training_execution').mkdir(parents=True)
+    (root/'code/autonomy/training_execution/audit_sustained_transition.py').write_text('audit\n')
+    (root/'code/autonomy/training_execution/sustained_chunk_reference.py').write_text('reference\n')
+    (root/'research').mkdir()
+    (root/'research/training-anchor-templates.candidate.json').write_text('anchors\n')
+    (root/'research/training-anchor-candidate-verified.json').write_text(json.dumps({'expected':{'candidate_sha256':sha(root/'research/training-anchor-templates.candidate.json')}}))
+    (root/'research/balanced16-sustained.candidate.json').write_text('{}')
+    cache=root/'cache';scientific=cache/'scientific-processing';native=scientific/'balanced16-native-v2';native.mkdir(parents=True)
+    historical=cache/'insula/cohort16-baseline-balanced20261002a';historical.mkdir(parents=True)
+    (historical/'run.json').write_text(json.dumps({'manifest':{'frames':[]}}))
+    with patch('training_execution.sustained_controller_backend.C',cache),patch('training_execution.sustained_controller_backend.W',scientific),patch('training_execution.sustained_controller_backend.P',root),patch('training_execution.sustained_controller_backend.validate_contract'),patch('training_execution.sustained_controller_backend.validate_sources'):
+     backend=NativeBackend('run1','baseline',object())
+   self.assertEqual([call.args[0] for call in load.call_args_list],[gpu,cpu,metrics])
+   self.assertEqual(backend.runtime,values[0].data)
 
- def test_gpu_stage_command_rebinds_historical_rootfs_to_current_gpu_root(self):
-  command=['bwrap','--ro-bind','/old/gpu-rootfs','/','--ro-bind','/old/code','/experiment','--bind','/old/out','/outputs','--','python','old.py']
-  expected_root='/current/'+CURRENT_GPU_ROOTFS_NAME
-  rewritten=sustained_controller_backend.rebind_rootfs_mount(command,expected_root)
-  self.assertEqual(command[2],'/old/gpu-rootfs')
-  self.assertEqual(rewritten[2],expected_root)
-  self.assertEqual(rewritten[5],'/old/code')
-  with self.assertRaises(ValueError):
-   sustained_controller_backend.rebind_rootfs_mount(['bwrap','--','python'],expected_root)
+ def test_gpu_stage_plan_requests_configured_gpu_one_instead_of_replayed_root_mount(self):
+  with tempfile.TemporaryDirectory() as temp:
+   root=Path(temp);runtime=RuntimeLock(root/'gpu-rootfs-v7',root/'gpu.lock',{'rootfs_sha256':'1'*64},'recipe-digest','r'*64);runtime.rootfs.mkdir()
+   paths={}
+   for name in ['package','stage','output','native','physical','boxes','scientific','snapshots']:
+    path=root/name;path.mkdir();(path/'file').write_text(name);paths[name]=path
+   runtime_path=root/'runtime-lock.json';runtime_path.write_text('{}')
+   devices=root/'devices';drivers=root/'drivers';devices.mkdir();drivers.mkdir()
+   for name in ['nvidia1','nvidiactl','nvidia-uvm']:(devices/name).write_text(name)
+   for name in ['libcuda.so.fixture','libnvidia-ptxjitcompiler.so.fixture','libnvidia-nvvm.so.fixture']:(drivers/name).write_text(name)
+   env={'SUREAL_BAZEL_GPU_DEVICES':f"{devices/'nvidia1'}=/dev/nvidia1,{devices/'nvidiactl'}=/dev/nvidiactl,{devices/'nvidia-uvm'}=/dev/nvidia-uvm",'SUREAL_BAZEL_GPU_DRIVER_LIBRARY_DIRS':str(drivers),'SUREAL_BAZEL_GPU_DEVICE_UUIDS':'1=GPU-fixture-1'}
+   with patch.dict(os.environ,env,clear=False):
+    plan=sustained_controller_backend.build_sustained_stage_plan(runtime,package=paths['package'],stage_source=paths['stage'],output=paths['output'],worker='train_sustained.py',native=paths['native'],physical=paths['physical'],boxes=paths['boxes'],runtime_lock_path=runtime_path,scientific_root=paths['scientific'],source_snapshot_store=paths['snapshots'],gpu_index=1)
+   record=sustained_controller_backend.record_plan(plan)
+   self.assertEqual(record['gpu']['requested_index'],1)
+   self.assertEqual(record['command'],['python','/experiment/training_execution/train_sustained.py'])
 
  def source_snapshot(self,root,names,store_root):
   archive,pins=archive_sources(root,names);digest=hashlib.sha256(archive).hexdigest();LocalSnapshotStore(store_root).store(digest,archive)

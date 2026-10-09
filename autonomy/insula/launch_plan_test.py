@@ -218,6 +218,7 @@ class LaunchPlanTests(unittest.TestCase):
             self.assertEqual(argv[0], "bwrap")
             self.assertIn("--clearenv", argv)
             self.assertIn("/tmp/tables", argv)
+            self.assertLess(argv.index("/tmp"), argv.index("/tmp/tables"))
             self.assertEqual(argv[-2:], ["python", "main.py"])
 
     def test_default_lock_loader_uses_rootfs_default_lock_path(self):
@@ -354,6 +355,38 @@ class LaunchPlanTests(unittest.TestCase):
                     named_inputs={"/home/input": bad_input},
                     command=["true"],
                 )
+
+    def test_readonly_named_input_covering_output_requires_explicit_option(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            runtime = self.load_fixture_runtime(root)
+            code = root / "code"
+            scientific = root / "scientific"
+            output = scientific / "run-output"
+            code.mkdir()
+            output.mkdir(parents=True)
+
+            with self.assertRaisesRegex(ValueError, "input:/tmp/scientific.*output|output.*input:/tmp/scientific"):
+                build_plan(
+                    runtime,
+                    code=code,
+                    output=output,
+                    named_inputs={"/tmp/scientific": scientific},
+                    command=["true"],
+                )
+
+            plan = build_plan(
+                runtime,
+                code=code,
+                output=output,
+                named_inputs={"/tmp/scientific": scientific},
+                command=["true"],
+                allow_readonly_inputs_cover_output=True,
+            )
+
+            mounts = {mount["inside_path"]: mount for mount in plan_data(plan)["mounts"]}
+            self.assertEqual(mounts["/tmp/scientific"]["mode"], "read_only")
+            self.assertEqual(mounts["/outputs"]["mode"], "writable")
 
     def test_extra_environment_cannot_replace_module_owned_variables(self):
         with tempfile.TemporaryDirectory() as temporary:

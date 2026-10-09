@@ -23,3 +23,17 @@ def bind_stage_paths(arguments,source,frozen):
  """Redirect every template input alias to this stage's immutable snapshot."""
  source=Path(source);frozen=Path(frozen)
  return [str(frozen/Path(value).relative_to(source)) if Path(value).is_absolute() and Path(value).is_relative_to(source) else value for value in arguments]
+
+def split_stage_plan_inputs(arguments,source,frozen):
+ """Convert legacy read-only stage bindings into launch-plan inputs."""
+ bound=bind_stage_paths(arguments,source,frozen)
+ source_mount=None
+ named_inputs={}
+ index=0
+ while index<len(bound):
+  if index+2>=len(bound) or bound[index]!='--ro-bind':raise ValueError('declared read-only stage input required')
+  host=Path(bound[index+1]);inside=bound[index+2]
+  if inside=='/source':source_mount=host
+  else:named_inputs[inside]=host
+  index+=3
+ return source_mount,named_inputs
