@@ -45,25 +45,12 @@ ALLOWED_PREFIXES = (
     "studies/normalization/procedure_records/",
 )
 
-# Ticket 07 owns the native-cache and sustained-pilot publication migration on a
-# sibling branch. Keep these path-based so the coordinator can remove the
-# exclusions when that branch merges.
-BS07_OWNED = {
-    "retention/cache_retention_audit.py",
-    "retention/pilot_retention_audit.py",
-    "retention/pilot_retention_sources.py",
-    "retention/publish_native_cache.py",
-    "retention/publish_sustained_pilot.py",
-    "retention/retention_sources.py",
-}
-
-
 def _is_scanned_file(path: Path) -> bool:
     return path.name in TEXT_NAMES or path.suffix in TEXT_SUFFIXES
 
 
 def _is_active_path(relative: str) -> bool:
-    if relative in ALLOWED_EXACT or relative in BS07_OWNED:
+    if relative in ALLOWED_EXACT:
         return False
     if relative.endswith("_test.py"):
         return False

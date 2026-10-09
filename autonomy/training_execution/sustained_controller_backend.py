@@ -16,7 +16,7 @@ from resources.sustained_scoring_budget import stage_timeout
 from retention.sustained_checkpoint_inventory import freeze_checkpoint_inventory
 from training_execution.sustained_admission import admit_sample
 from training_execution.sustained_controller_sources import freeze_host_sources,validate_host_sources
-from retention.checkpoint_retention_sources import freeze_host_sources as freeze_checkpoint_publisher_sources,validate_host_sources as validate_checkpoint_publisher_sources
+from retention.publication_sources import freeze_checkpoint_sources as freeze_checkpoint_publisher_sources,validate_checkpoint_sources as validate_checkpoint_publisher_sources
 from evidence.source_snapshot import source_snapshot_package_root
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing'
 GPU_ROOT=current_gpu_rootfs(C);CPU_ROOT=current_cpu_rootfs(C);METRICS_ROOT=current_metrics_rootfs(C)

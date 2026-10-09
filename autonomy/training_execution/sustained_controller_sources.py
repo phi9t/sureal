@@ -1,8 +1,8 @@
 """Freeze the host closure for sustained controller execution and retention."""
 from pathlib import Path
 from evidence.source_snapshot import file_sha256 as sha,is_regular_file,snapshot_target_and_materialize,verify_or_materialize_receipt_sources
-from retention.checkpoint_retention_sources import HISTORICAL_REQUIRED as RETENTION_HISTORICAL_REQUIRED
-from retention.checkpoint_retention_sources import REQUIRED as RETENTION_REQUIRED
+from retention.publication_sources import HISTORICAL_CHECKPOINT_REQUIRED as RETENTION_HISTORICAL_REQUIRED
+from retention.publication_sources import CHECKPOINT_REQUIRED as RETENTION_REQUIRED
 REQUIRED=tuple(sorted(set(RETENTION_REQUIRED)|{
  'training_execution/run_sustained.py','training_execution/sustained_controller_backend.py',
  'training_execution/sustained_controller_sources.py','training_execution/sustained_workflow.py',

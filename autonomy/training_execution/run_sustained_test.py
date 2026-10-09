@@ -1,18 +1,19 @@
 import copy
+import hashlib
 import json
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from blob_store.core import BlobStore, BlobStoreError, InMemoryBlobAdapter
 from evidence.source_snapshot import LocalSnapshotStore
-from insula.entry import launch_plan
 from resources.backend import ResourceBackend
 from resources.command import wrapped_command
-from resources.retention_audit import LIMIT, materialize_execution_package, validate_union
 from resources.sources import sha,validate_sources as validate_resource_sources
 from resources.stage import validate_proof
 from resources.stage_accounting import MEASUREMENT, admit_worker
+from retention.publication import publish_bundle
 from training_execution import sustained_controller_backend
 from training_execution.run_sustained import ResourceNativeBackend, open_backend
 
@@ -54,6 +55,7 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
   backend=ResourceNativeBackend.__new__(ResourceNativeBackend)
   backend.R=root/'case';backend.R.mkdir(parents=True);backend.output=root/'payload';backend.output.mkdir()
   backend.resource_root=backend.R/'resource-layer';(backend.resource_root/'checkpoints').mkdir(parents=True)
+  backend.resource_cache_root=root/'cache'
   backend.resource_work_root=root/'scientific';backend.resource_work_root.mkdir()
   backend.resource_reservations=[]
   backend.resource_reserve_write=lambda path,maximum_new_bytes:backend.resource_reservations.append((Path(path),maximum_new_bytes)) or {'used_bytes_before':0,'maximum_new_bytes':maximum_new_bytes}
@@ -71,16 +73,6 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
   companion=root/'companion.json';companion.write_text('companion')
   payload=root/'payload-root';payload.mkdir()
   return {'step':1000,'target_step':1000,'root':str(payload),'final_path':str(final),'final_sha256':sha(final),'report_snapshot':str(report),'report_sha256':sha(report),'resource_companion_path':str(companion),'resource_companion_sha256':sha(companion),'resource_identity_sha256':'i'*64,'released':False}
-
- def resource_source_fixture(self,root):
-  from resources.sources import freeze_sources
-  root=Path(root);root.mkdir(parents=True,exist_ok=True)
-  package=Path(__file__).resolve().parents[1];source=package/'resources'
-  repo,runner=self.resource_snapshot_query()
-  pins=freeze_sources(source,root/'resource-source-receipt',store=LocalSnapshotStore(root/'resource-source-snapshots'),repo_root=repo,bazel=repo/'bazelw',runner=runner)
-  code=validate_resource_sources(source,pins);execution=root/'execution';library=source/'resource_archive.py'
-  materialize_execution_package(code,execution,library,sha(library),pins)
-  return source,pins,code,execution,library
 
  def resource_proof(self,root,code,pins,native_output,inputdir,script,label,argv=(),*,execution=None,library=None,command=None,timeout=300,evidence_dir=None):
   proof_dir=Path(evidence_dir) if evidence_dir is not None else root/'proofs'/label;worker_output=proof_dir/'worker'
@@ -123,100 +115,19 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
   proof_path=proof_dir/'resource-admitted.json';proof_path.write_text(json.dumps(proof,sort_keys=True))
   return proof_path,command
 
- def live_archive_check(self,root,pubroot,code,pins,execution,library,chunk,mode,index,validation):
-  inputs=pubroot/str(index)/mode;inputs.mkdir(parents=True)
-  job={'source_sha256':{m['path']:m['sha256'] for m in chunk['manifest']['members']},
-       'max_bytes':LIMIT,'archive_module_path':'/tmp/resource-archive.py','archive_module_sha256':sha(library)}
-  if mode!='create':job['manifest_sha256']=chunk['manifest_sha256']
-  job_path=inputs/'job.json';job_path.write_text(json.dumps(job,sort_keys=True))
-  native=pubroot/'native'/f'{index}-{mode}';proof,command=self.resource_proof(root,code,pins,native,inputs,'/experiment/resources/archive_worker.py',f'{index}-{mode}-live',(mode,),execution=execution,library=library)
-  (native/'check.json').write_text(json.dumps(validation,sort_keys=True))
-  retained=pubroot/f'{index}-{mode}-retained';retained.mkdir()
-  for filename in ['check.json','live.log']:(retained/filename).write_text((native/filename).read_text())
-  return {'stage':{'create':'create-live','verify':'verify-live','rehydrate':'rehydrate-live'}[mode],
-          'command':command,'exit_code':0,'resource_proof_path':str(proof),'resource_proof_sha256':sha(proof),
-          'input_directory':str(inputs),'input_hashes':{str(job_path):sha(job_path)},'validation':validation,
-          'artifacts':{str(p):sha(p) for p in retained.iterdir()}}
-
- def independent_admission(self,root,pubroot,code,pins,pub,expected,readback):
-  inputs=pubroot/'audit-input';inputs.mkdir()
-  publication_for_audit={key:value for key,value in pub.items() if key!='independent_admission'}
-  for name,value in [('publication.json',publication_for_audit),('expected.json',expected),('readback.json',readback)]:
-   (inputs/name).write_text(json.dumps(value,sort_keys=True))
-  native=pubroot/'native-independent'
-  readonly=pub['audit_runtime_namespace']['readonly_entry_bindings']
-  source_payload=pubroot/'raw-source'
-  source_payload.mkdir()
-  for name,entry in expected.items():
-   target=source_payload/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(Path(entry['path']).read_bytes())
-  original=launch_plan(Path(pub['rootfs_path']),Path(pub['execution_directory']),source_payload,native,
-                       ['python','/experiment/resources/retention_audit.py'])
-  index=original.index('--ro-bind')
-  original[index:index+3]=readonly
-  at=original.index('--')
-  original[at:at]=['--ro-bind',str(inputs),'/tmp/inputs',
-                   '--ro-bind',pub['archive_library']['path'],'/tmp/resource-archive.py']
-  proof,command=self.resource_proof(root,code,pins,native,inputs,'/experiment/resources/retention_audit.py','independent',execution=Path(pub['execution_directory']),library=Path(pub['archive_library']['path']),command=original)
-  validation=validate_union(pub,expected,readback);validation['corrupt_resource_copies_refused']=5
-  (native/'check.json').write_text(json.dumps(validation,sort_keys=True))
-  retained=pubroot/'independent';retained.mkdir()
-  for filename in ['check.json','live.log']:(retained/filename).write_text((native/filename).read_text())
-  return {'stage':'independent','command':command,'exit_code':0,'resource_proof_path':str(proof),
-          'resource_proof_sha256':sha(proof),'input_directory':str(inputs),
-          'input_hashes':{str(p):sha(p) for p in sorted(inputs.iterdir())},
-          'validation':validation,'artifacts':{str(p):sha(p) for p in retained.iterdir()}}
-
  def resource_receipt(self,root,backend,record,inventory,*,independent=True,readback=True):
-  pubroot=root/'resource-pub';pubroot.mkdir()
-  source=Path(__file__).resolve().parents[1]/'resources'
-  identity=getattr(backend,'_resource_identity',None)
-  if identity is not None and identity.get('source_pins'):
-   pins=identity['source_pins'];code=validate_resource_sources(source,pins);execution=root/'execution'
-   library=source/'resource_archive.py';materialize_execution_package(code,execution,library,sha(library),pins)
-  else:
-   source,pins,code,execution,library=self.resource_source_fixture(root);backend._resource_identity={'source_pins':pins}
-  if not (hasattr(backend,'host_pins') and 'resources/resource_archive.py' in backend.host_pins.get('source_pins',{})):
-   backend.host_pins={'source_snapshot_root':str(source.parent),'source_pins':{'resources/resource_archive.py':sha(source/'resource_archive.py')}}
-  library=Path(backend.host_pins['source_snapshot_root'])/'resources/resource_archive.py'
-  if not hasattr(backend,'cpu_runtime'):backend.cpu_runtime={'rootfs_sha256':'f'*64,'image_id':'cpu-fixture'}
-  if not hasattr(backend,'resource_cpu_root'):
-   backend.resource_cpu_root=root/'rootfs';backend.resource_cpu_root.mkdir(exist_ok=True)
-  for name in ['bin','usr','lib','experiment','source','outputs','dev','proc','tmp']:
-   (backend.resource_cpu_root/name).mkdir(exist_ok=True)
-  expected=pubroot/'expected.json';expected.write_text(json.dumps(inventory,sort_keys=True))
-  archive='a'*64;members=[{'path':name,'sha256':entry['sha256'],'bytes':entry['bytes']} for name,entry in sorted(inventory.items())]
-  payload=sum(member['bytes'] for member in members)
-  validation={'archive_sha256':archive,'exact_members_and_hashes':True,'members':len(members),'payload_bytes':payload}
-  prefix='hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-fixture'
-  manifest={'members':members,'payload_bytes':payload,'archive_sha256':archive}
-  manifest_path=pubroot/'0/manifest.json';readback_manifest=pubroot/'0/readback.json';manifest_path.parent.mkdir()
-  manifest_path.write_text(json.dumps(manifest,sort_keys=True));readback_manifest.write_text(json.dumps(manifest,sort_keys=True))
-  chunk={'manifest':manifest,'manifest_sha256':sha(manifest_path),'manifest_path':str(manifest_path),'readback_path':str(readback_manifest),'archive_hdfs_uri':prefix+'/'+archive+'/archive.tar.gz','manifest_hdfs_uri':prefix+'/'+archive+'/manifest.json','checks':[]}
-  chunk['checks'].append(self.live_archive_check(root,pubroot,code,pins,execution,library,chunk,'create',0,validation))
-  for stage in ['archive-put','archive-get','manifest-put','manifest-get']:
-   log=pubroot/(stage+'.log');log.write_text(stage+'\n');chunk['checks'].append({'stage':stage,'command':['waystone',stage],'exit_code':0,'log_path':str(log),'log_sha256':sha(log)})
-  chunk['checks'].append(self.live_archive_check(root,pubroot,code,pins,execution,library,chunk,'verify',0,validation))
-  chunk['checks'].append(self.live_archive_check(root,pubroot,code,pins,execution,library,chunk,'rehydrate',0,{**validation,'verified_rehydration':True}))
-  masked={'experiment','source','outputs','dev','proc','tmp'}
-  entries=sorted(backend.resource_cpu_root.iterdir(),key=lambda p:p.name)
-  readonly=[item for path in entries if path.name not in masked for item in ['--ro-bind',str(path),'/'+path.name]]
-  namespace={'private_tmpfs_root':True,'source_rootfs_sha256':backend.cpu_runtime['rootfs_sha256'],
-             'readonly_entry_bindings':readonly,
-             'masked_role_entries':[p.name for p in entries if p.name in masked],
-             'source_entry_types':{p.name:{'kind':'directory','symlink_target':None} for p in entries},
-             'scope':'readonly rootfs source entries over a private root; symlink source entries dereference to mounts; native roles override their original stubs'}
-  base={'schema_version':1,'kind':'checkpoint','hdfs_prefix':prefix,'source_inventory':inventory,'source_inventory_sha256':sha(expected),'resource_identity_sha256':backend.resource_identity_sha256,'native_manifest_sha256':backend.manifest_sha,'resource_source_pins':pins,'resource_source_directory':str(source),'execution_directory':str(execution),'runtime_lock':backend.cpu_runtime,'rootfs_path':str(backend.resource_cpu_root),'audit_runtime_namespace':namespace,'archive_library':{'path':str(library),'sha256':sha(library)},'chunks':[chunk]}
-  readback_value={**base}
-  readback_path=pubroot/'publication-readback.json';readback_path.write_text(json.dumps(readback_value,sort_keys=True))
-  pub={**base,'manifest_readback_exact':True,'publication_manifest_hdfs_uri':prefix+'/publication-manifest.json','publication_manifest_sha256':sha(readback_path)}
-  pub['independent_admission']=self.independent_admission(root,pubroot,code,pins,pub,inventory,readback_value)
-  if not independent:
-   pub['independent_admission']={**pub['independent_admission'],'exit_code':1,'validation':{**pub['independent_admission']['validation'],'whole_member_union_exact':False}}
-  if not readback:
-   readback_path.write_text(json.dumps({**readback_value,'kind':'shared'},sort_keys=True))
-   pub['publication_manifest_sha256']=sha(readback_path)
-  receipt=pubroot/'verified-publication.json';receipt.write_text(json.dumps(pub,sort_keys=True))
-  return {'path':str(receipt),'sha256':sha(receipt),'hdfs_manifest_uri':pub['publication_manifest_hdfs_uri'],'kind':'checkpoint'}
+   backend.resource_blob_store=BlobStore(InMemoryBlobAdapter(),backoff_seconds=())
+   backend.resource_blob_store_descriptor={'kind':'in-memory','project':'unit-test'}
+   backend.resource_blob_tool_digest={'waystone-cli':'a'*64}
+   receipt=publish_bundle(backend,'checkpoint',inventory)
+   if not independent:
+    receipt['manifest_key']=receipt['manifest_key'].replace('/manifest.json','/foreign-manifest.json')
+   if not readback:
+    publication=Path(receipt['path']);pub=json.loads(publication.read_text())
+    pub['blobs']['manifest']['sha256']='0'*64
+    publication.write_text(json.dumps(pub,sort_keys=True))
+    receipt['sha256']=sha(publication)
+   return receipt
 
  def native_stage_command(self,backend,requested,output,entry):
   inputs=backend.R/(requested+'-input');inputs.mkdir()
@@ -333,126 +244,42 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
     result=backend.publish_and_release(record)
    self.assertEqual(result,{'native':'released'});self.assertEqual(events,[('inventory',1000),('resource','checkpoint'),('native','checkpoint')]);self.assertEqual(record['resource_publication']['receipt_sha256'],sha(record['resource_publication']['receipt_path']))
 
- def test_resource_admission_or_readback_failure_blocks_native_release(self):
-  for fault in ['independent','readback']:
+ def test_resource_identity_or_blob_readback_failure_blocks_native_release(self):
+  for fault in ['identity','readback']:
    with self.subTest(fault=fault),tempfile.TemporaryDirectory() as temp:
     root=Path(temp);backend=self.backend(root);record=self.record(root);inventory=self.inventory(root,record)
-    receipt=self.resource_receipt(root,backend,record,inventory,independent=fault!='independent',readback=fault!='readback')
+    receipt=self.resource_receipt(root,backend,record,inventory,independent=fault!='identity',readback=fault!='readback')
     with patch('training_execution.run_sustained.resource_inventory',return_value=inventory),patch('training_execution.run_sustained.publish_bundle',return_value=receipt),patch('training_execution.run_sustained.NativeBackend.publish_and_release') as native:
-     with self.assertRaises(ValueError):backend.publish_and_release(record)
+     with self.assertRaises((ValueError,BlobStoreError)):backend.publish_and_release(record)
     native.assert_not_called();self.assertNotIn('resource_publication',record)
 
- def tamper_resource_receipt(self,receipt,fault):
+ def tamper_resource_receipt(self,backend,receipt,fault):
   publication=Path(receipt['path']);pub=json.loads(publication.read_text())
-  if fault=='chunk_proof':
-   Path(pub['chunks'][0]['checks'][0]['resource_proof_path']).write_text('{}')
-  elif fault=='independent_proof':
-   Path(pub['independent_admission']['resource_proof_path']).unlink()
-  elif fault=='independent_output':
-   artifacts=pub['independent_admission']['artifacts'];check=[Path(p) for p in artifacts if Path(p).name=='check.json'][0];check.write_text('{}')
-  elif fault=='independent_log':
-   artifacts=pub['independent_admission']['artifacts'];log=[Path(p) for p in artifacts if Path(p).name=='live.log'][0];log.write_text('tampered log\n')
-  elif fault=='independent_input':
-   (Path(pub['independent_admission']['input_directory'])/'expected.json').write_text('{}')
-  elif fault=='source':
-   source=Path(pub['resource_source_pins']['source_snapshot_root'])/'autonomy/resources/stage.py';source.chmod(0o644);source.write_text(source.read_text()+'\n# tampered\n')
-  elif fault=='missing_command':
-   del pub['independent_admission']['command'];publication.write_text(json.dumps(pub,sort_keys=True));receipt['sha256']=sha(publication)
+  if fault=='receipt_digest':
+   receipt['sha256']='0'*64
+  elif fault=='manifest_digest':
+   pub['blobs']['manifest']['sha256']='0'*64;publication.write_text(json.dumps(pub,sort_keys=True));receipt['sha256']=sha(publication)
+  elif fault=='chunk_digest':
+   pub['blobs']['chunks'][0]['sha256']='0'*64;publication.write_text(json.dumps(pub,sort_keys=True));receipt['sha256']=sha(publication)
+  elif fault=='manifest_inventory':
+   adapter=backend.resource_blob_store._adapter
+   manifest_blob=pub['blobs']['manifest'];manifest=json.loads(adapter._blobs[manifest_blob['key']].decode())
+   name=sorted(manifest['inventory'])[0];manifest['inventory'][name]['sha256']='0'*64
+   data=(json.dumps(manifest,sort_keys=True,separators=(',',':'))+'\n').encode()
+   adapter._blobs[manifest_blob['key']]=data
+   manifest_blob['sha256']=hashlib.sha256(data).hexdigest();manifest_blob['bytes']=len(data)
+   publication.write_text(json.dumps(pub,sort_keys=True));receipt['sha256']=sha(publication)
   else:
    raise AssertionError(fault)
 
- def rewrite_publication(self,receipt,pub,*,readback=True):
-  publication=Path(receipt['path']);pubroot=publication.parent
-  if readback:
-   value={key:value for key,value in pub.items() if key not in {'manifest_readback_exact','publication_manifest_hdfs_uri','publication_manifest_sha256','independent_admission'}}
-   readback_path=pubroot/'publication-readback.json';readback_path.write_text(json.dumps(value,sort_keys=True));pub['publication_manifest_sha256']=sha(readback_path)
-  publication.write_text(json.dumps(pub,sort_keys=True));receipt['sha256']=sha(publication)
-
- def replace_independent_proof(self,root,receipt,worker,*,input_mount=None,overlay_alias=None,late_tmpfs=False):
-  publication=Path(receipt['path']);pub=json.loads(publication.read_text());admission=pub['independent_admission']
-  inputs=Path(admission['input_directory']);mounted=inputs if input_mount is None else Path(input_mount)
-  native=publication.parent/('native-'+worker.replace('/','-'));readonly=pub['audit_runtime_namespace']['readonly_entry_bindings']
-  source_payload=publication.parent/'raw-source'
-  original=launch_plan(Path(pub['rootfs_path']),Path(pub['execution_directory']),source_payload,native,
-                       ['python',worker])
-  index=original.index('--ro-bind')
-  original[index:index+3]=readonly
-  at=original.index('--')
-  original[at:at]=['--ro-bind',str(mounted),'/tmp/inputs',
-                   '--ro-bind',pub['archive_library']['path'],'/tmp/resource-archive.py']
-  if overlay_alias is not None:
-   overlay=root/'overlay';overlay.mkdir()
-   original[original.index('--'):original.index('--')]=['--bind',str(overlay),overlay_alias]
-  if late_tmpfs:
-   temporary=original.index('--tmpfs');self.assertEqual(original[temporary+1],'/tmp')
-   del original[temporary:temporary+2]
-   original[original.index('--'):original.index('--')]=['--tmpfs','/tmp']
-  resource_source=Path(pub['resource_source_directory'])
-  proof,command=self.resource_proof(root,validate_resource_sources(resource_source,pub['resource_source_pins']),pub['resource_source_pins'],native,mounted,worker,'substitution',command=original,execution=Path(pub['execution_directory']),library=Path(pub['archive_library']['path']))
-  admission['resource_proof_path']=str(proof);admission['resource_proof_sha256']=sha(proof);admission['command']=command
-  log=[Path(path) for path in admission['artifacts'] if Path(path).name=='live.log'][0]
-  log.write_text((native/'live.log').read_text());admission['artifacts'][str(log)]=sha(log)
-  self.rewrite_publication(receipt,pub,readback=False)
-
- def test_coherent_independent_worker_or_mount_substitution_refused(self):
-  cases=['wrong_worker','wrong_input_mount','protected_alias_overlay','protected_alias_descendant_overlay','protected_alias_ancestor_overlay']
-  for case in cases:
-   with self.subTest(case=case),tempfile.TemporaryDirectory() as temp:
-    root=Path(temp);backend=self.backend(root);record=self.record(root);inventory=self.inventory(root,record);receipt=self.resource_receipt(root,backend,record,inventory)
-    if case=='wrong_worker':
-     self.replace_independent_proof(root,receipt,'/experiment/resources/archive_worker.py')
-    else:
-     if case in {'protected_alias_overlay','protected_alias_descendant_overlay','protected_alias_ancestor_overlay'}:
-      alias={'protected_alias_overlay':'/tmp/inputs','protected_alias_descendant_overlay':'/tmp/inputs/publication.json','protected_alias_ancestor_overlay':'/tmp'}[case]
-      self.replace_independent_proof(root,receipt,'/experiment/resources/retention_audit.py',overlay_alias=alias)
-      with patch('training_execution.run_sustained.resource_inventory',return_value=inventory),patch('training_execution.run_sustained.publish_bundle',return_value=receipt),patch('training_execution.run_sustained.NativeBackend.publish_and_release') as native:
-       with self.assertRaisesRegex(ValueError,'independent resource audit command mounts differ'):backend.publish_and_release(record)
-      native.assert_not_called()
-      continue
-     alternate=root/'alternate-audit-input';alternate.mkdir()
-     for source in Path(json.loads(Path(receipt['path']).read_text())['independent_admission']['input_directory']).iterdir():
-      (alternate/source.name).write_text(source.read_text())
-     self.replace_independent_proof(root,receipt,'/experiment/resources/retention_audit.py',input_mount=alternate)
-    with patch('training_execution.run_sustained.resource_inventory',return_value=inventory),patch('training_execution.run_sustained.publish_bundle',return_value=receipt),patch('training_execution.run_sustained.NativeBackend.publish_and_release') as native:
-     with self.assertRaises(ValueError):backend.publish_and_release(record)
-    native.assert_not_called()
-
- def test_tmpfs_mount_must_precede_audit_inputs(self):
-  with tempfile.TemporaryDirectory() as temp:
-   root=Path(temp);backend=self.backend(root);record=self.record(root);inventory=self.inventory(root,record);receipt=self.resource_receipt(root,backend,record,inventory)
-   self.replace_independent_proof(root,receipt,'/experiment/resources/retention_audit.py',late_tmpfs=True)
-   with patch('training_execution.run_sustained.resource_inventory',return_value=inventory),patch('training_execution.run_sustained.publish_bundle',return_value=receipt),patch('training_execution.run_sustained.NativeBackend.publish_and_release') as native:
-    with self.assertRaisesRegex(ValueError,'independent resource audit command mounts differ'):backend.publish_and_release(record)
-   native.assert_not_called()
-
- def test_coherent_foreign_source_runtime_or_log_substitution_refused(self):
-  cases=['foreign_source','foreign_runtime','rehash_log']
-  for case in cases:
-   with self.subTest(case=case),tempfile.TemporaryDirectory() as temp:
-    root=Path(temp);backend=self.backend(root);record=self.record(root);inventory=self.inventory(root,record);receipt=self.resource_receipt(root,backend,record,inventory);publication=Path(receipt['path']);pub=json.loads(publication.read_text())
-    if case=='foreign_source':
-     source,pins,code,execution,library=self.resource_source_fixture(root/'foreign')
-     pub['resource_source_pins']=pins;pub['resource_source_directory']=str(source);pub['execution_directory']=str(execution)
-     self.rewrite_publication(receipt,pub)
-    elif case=='foreign_runtime':
-     pub['runtime_lock']={'rootfs_sha256':'9'*64,'image_id':'foreign'};foreign=root/'foreign-rootfs';foreign.mkdir();pub['rootfs_path']=str(foreign)
-     self.rewrite_publication(receipt,pub)
-    else:
-     artifacts=pub['independent_admission']['artifacts'];log=[Path(p) for p in artifacts if Path(p).name=='live.log'][0]
-     log.write_text('coherently replaced retained audit log\n');pub['independent_admission']['artifacts'][str(log)]=sha(log)
-     self.rewrite_publication(receipt,pub,readback=False)
-    with patch('training_execution.run_sustained.resource_inventory',return_value=inventory),patch('training_execution.run_sustained.publish_bundle',return_value=receipt),patch('training_execution.run_sustained.NativeBackend.publish_and_release') as native:
-     with self.assertRaises(ValueError):backend.publish_and_release(record)
-    native.assert_not_called()
-
- def test_retained_resource_evidence_faults_block_native_release(self):
-  faults=['chunk_proof','independent_proof','independent_output','independent_log','independent_input','source','missing_command']
+ def test_retained_resource_publication_faults_block_native_release(self):
+  faults=['receipt_digest','manifest_digest','chunk_digest','manifest_inventory']
   for fault in faults:
    with self.subTest(fault=fault),tempfile.TemporaryDirectory() as temp:
     root=Path(temp);backend=self.backend(root);record=self.record(root);inventory=self.inventory(root,record)
-    receipt=self.resource_receipt(root,backend,record,inventory);self.tamper_resource_receipt(receipt,fault)
+    receipt=self.resource_receipt(root,backend,record,inventory);self.tamper_resource_receipt(backend,receipt,fault)
     with patch('training_execution.run_sustained.resource_inventory',return_value=inventory),patch('training_execution.run_sustained.publish_bundle',return_value=receipt),patch('training_execution.run_sustained.NativeBackend.publish_and_release') as native:
-     with self.assertRaises(ValueError):backend.publish_and_release(record)
+     with self.assertRaises((ValueError,BlobStoreError)):backend.publish_and_release(record)
     native.assert_not_called();self.assertNotIn('resource_publication',record)
 
  def test_native_release_failure_leaves_recoverable_resource_publication(self):
@@ -471,12 +298,12 @@ class RunSustainedBackendBindingTests(unittest.TestCase):
     self.assertEqual(backend.publish_and_release(record),{'native':'released'})
    publish.assert_not_called();self.assertIn('resource_publication',record)
 
- def test_tampered_retained_resource_proof_refuses_resume(self):
+ def test_tampered_retained_resource_publication_refuses_resume(self):
   with tempfile.TemporaryDirectory() as temp:
    root=Path(temp);backend=self.backend(root);record=self.record(root);inventory=self.inventory(root,record);receipt=self.resource_receipt(root,backend,record,inventory)
    from resources.checkpoint import write_publication_record
    write_publication_record(backend,record,receipt,inventory);record.pop('resource_publication')
-   publication=Path(receipt['path']);value=json.loads(publication.read_text());value['source_inventory']['native-final.json']['sha256']='0'*64;publication.write_text(json.dumps(value,sort_keys=True));receipt['sha256']=sha(publication)
+   publication=Path(receipt['path']);value=json.loads(publication.read_text());value['blobs']['manifest']['sha256']='0'*64;publication.write_text(json.dumps(value,sort_keys=True))
    with patch('training_execution.run_sustained.resource_inventory',return_value=inventory),patch('training_execution.run_sustained.publish_bundle') as publish,patch('training_execution.run_sustained.NativeBackend.publish_and_release') as native:
     with self.assertRaises(ValueError):backend.publish_and_release(record)
    publish.assert_not_called();native.assert_not_called()

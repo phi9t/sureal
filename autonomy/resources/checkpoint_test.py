@@ -250,6 +250,30 @@ class ResourceCheckpointTests(unittest.TestCase):
             backend.host_pins['source_pins']['autonomy/resources/resource_archive.py']=sha(archive)
             _validate_publication_external_bindings(backend,pub)
 
+    def test_legacy_publication_union_rejects_foreign_root_with_matching_blob_key_suffix(self):
+        from resources.checkpoint import _validate_legacy_union
+        expected={'input.json':{'sha256':'1'*64,'bytes':4}}
+        archive='a'*64
+        prefix='hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-test'
+        pub={'manifest_readback_exact':True,'source_inventory':expected,'hdfs_prefix':prefix,
+             'publication_manifest_hdfs_uri':prefix+'/publication-manifest.json',
+             'chunks':[{'manifest':{'members':[{'path':'input.json','sha256':'1'*64,'bytes':4}],
+                                    'payload_bytes':4,'archive_sha256':archive},
+                        'archive_hdfs_uri':prefix+'/'+archive+'/archive.tar.gz',
+                        'manifest_hdfs_uri':prefix+'/'+archive+'/manifest.json'}]}
+        readback={key:value for key,value in pub.items() if key not in {'manifest_readback_exact','publication_manifest_hdfs_uri','publication_manifest_sha256','independent_admission'}}
+        self.assertEqual(_validate_legacy_union(pub,expected,readback)['files'],1)
+
+        foreign='hdfs://other-cluster/x/runs/perception-resource-closures/balanced16-test'
+        bad=json.loads(json.dumps(pub))
+        bad['hdfs_prefix']=foreign
+        bad['publication_manifest_hdfs_uri']=foreign+'/publication-manifest.json'
+        bad['chunks'][0]['archive_hdfs_uri']=foreign+'/'+archive+'/archive.tar.gz'
+        bad['chunks'][0]['manifest_hdfs_uri']=foreign+'/'+archive+'/manifest.json'
+        foreign_readback={key:value for key,value in bad.items() if key not in {'manifest_readback_exact','publication_manifest_hdfs_uri','publication_manifest_sha256','independent_admission'}}
+        with self.assertRaises(ValueError):
+            _validate_legacy_union(bad,expected,foreign_readback)
+
     def test_inventory_covers_raw_stage_inputs_nonproducer_outputs_and_verifiers(self):
         seal,_,inventory=self.api()
         with tempfile.TemporaryDirectory() as temp:

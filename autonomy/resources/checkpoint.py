@@ -3,21 +3,22 @@
 This companion never substitutes for native math, model-state or metric gates.
 It preserves all seven stage proofs under one digest for progression/recovery.
 """
-import hashlib,json,os,tempfile
+import hashlib,json,os,re,tempfile
 from pathlib import Path,PurePosixPath
 from evidence.source_snapshot import is_regular_file
 from evidence.source_snapshot import safe_member_name
 from evidence.source_snapshot import receipt_snapshot_digest,store_from_receipt,verify_or_materialize_receipt_sources
-from blob_store.core import BlobStoreError
+from blob_store.core import BlobStoreError, legacy_project_uri_to_key
 from retention.publication import audit as audit_publication
-from resources.command import inspect_command
 from resources.backend import resource_cpu_root_for
 from resources.sources import sha
 from resources.stage import write_new,require_separate
-from resources.retention_audit import EXTRA as PUBLICATION_EXTRA,validate_live_references,validate_union
-from resources.stage import validate_proof
 
 STAGES=('train','audit','literal-loss','export','proposals','score','metrics-audit')
+LEGACY_PUBLICATION_EXTRA={'manifest_readback_exact','publication_manifest_hdfs_uri','publication_manifest_sha256','independent_admission'}
+LEGACY_RESOURCE_LIMIT=128*1024**2
+LEGACY_RESOURCE_CHECK_ORDER=('create-live','archive-put','archive-get','manifest-put','manifest-get','verify-live','rehydrate-live')
+LEGACY_RESOURCE_BLOB_PREFIX='runs/perception-resource-closures/'
 
 
 def reference(path):
@@ -77,7 +78,7 @@ def publication_record_path(backend,record):
 
 
 def _publication_readback(pub):
-    return {key:value for key,value in pub.items() if key not in PUBLICATION_EXTRA}
+    return {key:value for key,value in pub.items() if key not in LEGACY_PUBLICATION_EXTRA}
 
 
 def _publication_identity(path):
@@ -105,75 +106,6 @@ def _receipt_from_identity(identity):
 
 def _without_independent(pub):
     return {key:value for key,value in pub.items() if key!='independent_admission'}
-
-
-def _option_records(options):
-    return [tuple([option,*values]) for option,values in options]
-
-
-MOUNT_OPTIONS={'--ro-bind','--bind','--dev-bind','--proc','--dev','--tmpfs'}
-
-
-def _mounts(options,alias,option=None):
-    return [(found,values) for found,values in options
-            if found in MOUNT_OPTIONS and values and (option is None or found==option) and values[-1]==alias]
-
-
-MASKED_AUDIT_ROOT_ENTRIES={'dev','experiment','outputs','proc','source','tmp'}
-
-
-def _rootfs_entry_types(entries):
-    return {path.name:{'kind':'symlink' if path.is_symlink() else 'directory' if path.is_dir() else 'file',
-                       'symlink_target':os.readlink(path) if path.is_symlink() else None}
-            for path in entries}
-
-
-def _expected_audit_namespace(pub):
-    root=Path(pub['rootfs_path'])
-    if not root.is_dir() or root.is_symlink():
-        raise ValueError('regular admitted resource rootfs required')
-    entries=sorted(root.iterdir(),key=lambda p:p.name)
-    readonly=[item for path in entries if path.name not in MASKED_AUDIT_ROOT_ENTRIES
-              for item in ['--ro-bind',str(path),'/'+path.name]]
-    masked=[path.name for path in entries if path.name in MASKED_AUDIT_ROOT_ENTRIES]
-    return {'private_tmpfs_root':True,'source_rootfs_sha256':pub['runtime_lock']['rootfs_sha256'],
-            'readonly_entry_bindings':readonly,'masked_role_entries':masked,
-            'source_entry_types':_rootfs_entry_types(entries),
-            'scope':'readonly rootfs source entries over a private root; symlink source entries dereference to mounts; native roles override their original stubs'}
-
-
-def _single_mount(options,option,source,alias):
-    if _mounts(options,alias)!=[(option,(source,alias))]:
-        raise ValueError('independent resource audit command mounts differ')
-
-
-def _validate_audit_mount_order(options):
-    mounts=[]
-    for index,(option,values) in enumerate(options):
-        if option not in MOUNT_OPTIONS:
-            continue
-        alias=PurePosixPath(values[-1])
-        if (not alias.is_absolute() or str(alias)!=values[-1] or
-            '..' in alias.parts or values[-1].startswith('//')):
-            raise ValueError('independent resource audit command mounts differ')
-        mounts.append((index,option,values,alias))
-    temporary=[(index,option,values) for index,option,values,alias in mounts if alias==PurePosixPath('/tmp')]
-    if len(temporary)!=1 or temporary[0][1:]!=('--tmpfs',('/tmp',)):
-        raise ValueError('independent resource audit command mounts differ')
-    if any(index<temporary[0][0] and alias!=PurePosixPath('/tmp') and alias.is_relative_to('/tmp')
-           for index,_,_,alias in mounts):
-        raise ValueError('independent resource audit command mounts differ')
-
-
-def _reject_protected_descendant_mounts(options,aliases):
-    protected=[PurePosixPath(alias) for alias in aliases]
-    for option,values in options:
-        if option not in MOUNT_OPTIONS or not values:
-            continue
-        target=PurePosixPath(values[-1])
-        for alias in protected:
-            if target!=alias and target.is_relative_to(alias):
-                raise ValueError('independent resource audit command mounts differ')
 
 
 def _validate_publication_external_bindings(backend,pub):
@@ -261,69 +193,70 @@ def _receipt_inventory_digest(pub,expected_inventory=None):
 
 
 def _validate_independent_admission(pub,inventory,readback):
+    if not isinstance(pub.get('independent_admission'),dict):
+        raise ValueError('complete independent resource admission evidence required')
+    _verify_legacy_source_snapshot(pub)
+    if pub.get('source_inventory')!=inventory or _publication_readback(pub)!=readback:
+        raise ValueError('legacy resource publication readback evidence changed')
+
+
+def _validate_legacy_union(pub,expected,readback):
     try:
-        admission=pub['independent_admission'];command=admission['command']
-        if admission['exit_code']!=0 or admission['validation']['whole_member_union_exact'] is not True:
-            raise ValueError('independent resource recovery admission required')
-        proof_path=Path(admission['resource_proof_path'])
-        if not is_regular_file(proof_path) or sha(proof_path)!=admission['resource_proof_sha256']:
-            raise ValueError('independent resource proof changed')
-        proof=json.loads(proof_path.read_text())
-        validate_proof(proof,command,Path(pub['resource_source_directory']),pub['resource_source_pins'],
-                       Path(proof['native_output_directory']),16*1024**3,300)
-        if proof['worker_argv']!=['/experiment/resources/retention_audit.py']:
-            raise ValueError('independent resource audit worker required')
-        _,_,options=inspect_command(command)
-        _validate_audit_mount_order(options)
-        option_records=_option_records(options)
-        inputs=Path(admission['input_directory'])
-        required_mounts=[
-            ('--ro-bind',pub['execution_directory'],'/experiment'),
-            ('--ro-bind',str(inputs),'/tmp/inputs'),
-            ('--ro-bind',pub['archive_library']['path'],'/tmp/resource-archive.py'),
-            ('--bind',proof['native_output_directory'],'/outputs'),
-        ]
-        for option,source,alias in required_mounts:
-            _single_mount(options,option,source,alias)
-        source_mounts=_mounts(options,'/source')
-        if len(source_mounts)!=1 or source_mounts[0][0]!='--ro-bind':
-            raise ValueError('independent resource audit source mount differs')
-        source_root=Path(source_mounts[0][1][0])
-        if source_root.exists():
-            result=validate_union(pub,inventory,readback,source_root)
-        else:
-            result=validate_union(pub,inventory,readback)
-        namespace=pub['audit_runtime_namespace']
-        if namespace!=_expected_audit_namespace(pub):
-            raise ValueError('independent resource audit runtime namespace differs')
-        readonly=namespace['readonly_entry_bindings']
-        for index in range(0,len(readonly),3):
-            _single_mount(options,readonly[index],readonly[index+1],readonly[index+2])
-        protected=['/source','/tmp/inputs','/tmp/resource-archive.py','/outputs']
-        protected.extend(readonly[index+2] for index in range(0,len(readonly),3))
-        _reject_protected_descendant_mounts(options,protected)
-        if _mounts(options,'/') or ('--ro-bind',pub['rootfs_path'],'/') in option_records:
-            raise ValueError('independent audit must use private root with readonly runtime entries')
-        expected_inputs={str(inputs/name):sha(inputs/name) for name in ['publication.json','expected.json','readback.json']}
-        if admission['input_hashes']!=expected_inputs:
-            raise ValueError('independent resource audit inputs changed')
-        if (json.loads((inputs/'publication.json').read_text())!=_without_independent(pub) or
-            json.loads((inputs/'expected.json').read_text())!=inventory or
-            json.loads((inputs/'readback.json').read_text())!=readback):
-            raise ValueError('independent resource audit input identities differ')
-        artifacts=admission['artifacts'];names={Path(path).name:path for path in artifacts}
-        if set(names)!={'check.json','live.log'} or len(artifacts)!=2:
-            raise ValueError('independent resource audit outputs required')
-        for path,digest in artifacts.items():
-            if not is_regular_file(Path(path)) or sha(path)!=digest:
-                raise ValueError('independent resource audit output changed')
-        expected_validation={**result,'corrupt_resource_copies_refused':5}
-        if admission['validation']!=expected_validation or json.loads(Path(names['check.json']).read_text())!=expected_validation:
-            raise ValueError('independent resource audit output differs from receipt')
-        if artifacts[names['live.log']]!=proof['artifacts']['execution_log']['sha256']:
-            raise ValueError('independent resource audit log differs from execution proof')
+        if (pub.get('manifest_readback_exact') is not True or _publication_readback(pub)!=readback or
+            pub['source_inventory']!=expected or not expected):
+            raise ValueError('exact external inventory and unchanged global readback required')
+        prefix_key=_legacy_resource_blob_key(pub['hdfs_prefix'])
+        if (not prefix_key.startswith(LEGACY_RESOURCE_BLOB_PREFIX+'balanced16-') or
+            _legacy_resource_blob_key(pub['publication_manifest_hdfs_uri'])!=prefix_key+'/publication-manifest.json'):
+            raise ValueError('declared resource closure namespace required')
+        union={};payload=0
+        for chunk in pub['chunks']:
+            manifest=chunk['manifest'];members=manifest['members'];size=sum(m['bytes'] for m in members);digest=manifest['archive_sha256']
+            if (not members or type(size) is not int or not 0<=size<=LEGACY_RESOURCE_LIMIT or
+                size!=manifest['payload_bytes'] or re.fullmatch('[0-9a-f]{64}',digest) is None or
+                _legacy_resource_blob_key(chunk['archive_hdfs_uri'])!=prefix_key+'/'+digest+'/archive.tar.gz' or
+                _legacy_resource_blob_key(chunk['manifest_hdfs_uri'])!=prefix_key+'/'+digest+'/manifest.json'):
+                raise ValueError('bounded exact resource archive identity required')
+            checks=chunk.get('checks')
+            if checks is not None:
+                if ([check['stage'] for check in checks]!=list(LEGACY_RESOURCE_CHECK_ORDER) or
+                    any(type(check['exit_code']) is not int or check['exit_code']!=0 for check in checks)):
+                    raise ValueError('all measured live and exact transfer gates required')
+                for index in (0,5,6):
+                    value=checks[index]['validation']
+                    if (value['exact_members_and_hashes'] is not True or value['archive_sha256']!=digest or
+                        value['members']!=len(members) or value['payload_bytes']!=size or
+                        index==6 and value.get('verified_rehydration') is not True):
+                        raise ValueError('complete live archive recovery required')
+            for member in members:
+                name=safe_member_name(member['path'])
+                if (name in union or name not in expected or type(member['bytes']) is not int or member['bytes']<0 or
+                    member['sha256']!=expected[name]['sha256'] or member['bytes']!=expected[name]['bytes']):
+                    raise ValueError('unique complete resource member bytes required')
+                union[name]=member['sha256']
+            payload+=size
+        if union!={name:value['sha256'] for name,value in expected.items()}:
+            raise ValueError('incomplete whole resource recovery union')
     except (KeyError,TypeError,OSError,AttributeError) as error:
-        raise ValueError('complete independent resource admission evidence required') from error
+        raise ValueError('complete independent resource recovery evidence required') from error
+    return {'files':len(union),'chunks':len(pub['chunks']),'payload_bytes':payload,
+            'whole_member_union_exact':True,'all_chunks_live_rehydrated':True}
+
+
+def _legacy_resource_blob_key(value):
+    try:key=legacy_project_uri_to_key(value)
+    except ValueError as error:
+        raise ValueError('resource publication URI required') from error
+    if not key.startswith(LEGACY_RESOURCE_BLOB_PREFIX):
+        raise ValueError('declared resource closure namespace required')
+    return key
+
+
+def _verify_legacy_source_snapshot(pub):
+    for receipt_key in ('resource_source_pins','host_source_pins'):
+        receipt=pub.get(receipt_key)
+        if isinstance(receipt,dict) and 'source_snapshot_sha256' in receipt:
+            verify_or_materialize_receipt_sources(receipt,receipt.get('source_snapshot_root'))
 
 
 def validate_publication_receipt(backend,record,receipt,expected_inventory=None):
@@ -347,8 +280,7 @@ def validate_publication_receipt(backend,record,receipt,expected_inventory=None)
             json.loads(readback_path.read_text())!=_publication_readback(pub)):
             raise ValueError('resource publication exact readback evidence changed')
         readback=json.loads(readback_path.read_text())
-        validate_live_references(pub)
-        result=validate_union(pub,pub['source_inventory'],readback)
+        result=_validate_legacy_union(pub,pub['source_inventory'],readback)
         admission=pub['independent_admission']
         _validate_independent_admission(pub,pub['source_inventory'],readback)
         if (admission['exit_code']!=0 or admission['validation']['whole_member_union_exact'] is not True or
