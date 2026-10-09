@@ -339,6 +339,41 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
             self.assertEqual(plan["lock"], str(lock.resolve()))
             self.assertFalse(marker.exists())
 
+    def test_bazel_launcher_uses_public_launch_plan_api_and_renders_unique_mounts(self):
+        source = (AUTONOMY / "insula/bazel_launcher.py").read_text()
+        self.assertNotIn("_assemble_plan", source)
+        self.assertNotIn("_gpu_mounts_environment_and_request", source)
+        self.assertNotIn('("--setenv"', source)
+
+        with tempfile.TemporaryDirectory() as temporary:
+            result, _, _, _, _ = self.run_wrapper(
+                temporary,
+                "--emit-plan",
+                "test",
+                "//autonomy:source_snapshot_targets_test",
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            argv = json.loads(result.stdout)["argv"]
+            rendered = []
+            index = 1
+            while index < argv.index("--"):
+                option = argv[index]
+                if option in {"--ro-bind", "--bind", "--dev-bind", "--symlink"}:
+                    rendered.append(argv[index + 2])
+                    index += 3
+                elif option in {"--proc", "--dev", "--tmpfs"}:
+                    rendered.append(argv[index + 1])
+                    index += 2
+                elif option == "--chdir":
+                    index += 2
+                elif option == "--setenv":
+                    index += 3
+                else:
+                    index += 1
+
+            duplicates = sorted({inside for inside in rendered if rendered.count(inside) > 1})
+            self.assertEqual(duplicates, [])
+
     def test_update_lock_plan_makes_only_the_module_lock_writable(self):
         with tempfile.TemporaryDirectory() as temporary:
             result, marker, _, _, _ = self.run_wrapper(

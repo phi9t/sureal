@@ -18,8 +18,8 @@ LIVE_GATE_CACHE_MOUNT = "/tmp/sureal-waymo-cache"
 LIVE_GATE_BWRAP = "/tmp/live-gate-bwrap"
 from insula.launch_plan import (
     Mount,
-    _assemble_plan,
-    _gpu_mounts_environment_and_request,
+    build_custom_plan,
+    gpu_mounts_environment_and_request,
     load_runtime_lock,
     plan_data,
     render_plan,
@@ -170,22 +170,22 @@ def sandbox_plan(runtime, cache, arguments, update_lock=False):
             "WAYMO_INSULA_ROOT": live_root,
             "WAYMO_INSULA_LOCK": live_root + ".lock.json",
         }
-    environment = [
-        ("--setenv", "HOME", "/tmp/bazel-cache/home"),
-        ("--setenv", "USER", "sureal"),
-        ("--setenv", "LOGNAME", "sureal"),
-        ("--setenv", "PATH", "/usr/local/bin:/usr/bin:/bin"),
-        ("--setenv", "TMPDIR", "/tmp"),
-        ("--setenv", "PYTHONNOUSERSITE", "1"),
-        ("--setenv", "PYTHONDONTWRITEBYTECODE", "1"),
-    ]
+    environment = {
+        "HOME": "/tmp/bazel-cache/home",
+        "USER": "sureal",
+        "LOGNAME": "sureal",
+        "PATH": "/usr/local/bin:/usr/bin:/bin",
+        "TMPDIR": "/tmp",
+        "PYTHONNOUSERSITE": "1",
+        "PYTHONDONTWRITEBYTECODE": "1",
+    }
     if gpu:
-        gpu_mounts, gpu_environment, gpu_request = _gpu_mounts_environment_and_request(gpu_index=1)
+        gpu_mounts, gpu_environment, gpu_request = gpu_mounts_environment_and_request(gpu_index=1)
         mounts.extend(gpu_mounts)
-        environment = [item for item in environment if not (item[0] == "--setenv" and item[1] == "PATH")]
-        environment.extend(gpu_environment)
+        environment.pop("PATH", None)
+        environment.update(gpu_environment)
         test_environment["SUREAL_BAZEL_GPU_DEVICE_UUIDS"] = (
-            f"{gpu_request.requested_index}={gpu_request.device_uuid}"
+            f"{gpu_request.device_minor}={gpu_request.device_uuid}"
         )
         _add_nested_launch_support(mounts)
         gpu_live_root = LIVE_GATE_CACHE_MOUNT + "/" + current_gpu_rootfs().name
@@ -200,7 +200,7 @@ def sandbox_plan(runtime, cache, arguments, update_lock=False):
         update_lock,
         test_environment=test_environment,
     )
-    plan = _assemble_plan(
+    plan = build_custom_plan(
         runtime,
         mounts=mounts,
         environment=environment,
