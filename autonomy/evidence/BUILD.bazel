@@ -29,6 +29,7 @@ py_library(
     name = "evidence",
     srcs = LIB_MODULES,
     imports = [".."],
+    deps = ["//autonomy/blob_store:blob_store"],
     visibility = EVIDENCE_VISIBILITY,
 )
 
@@ -58,6 +59,7 @@ filegroup(
     py_test(
         name = test[:-3],
         srcs = [test],
+        data = glob(["testdata/**"]),
         deps = [":evidence"],
         legacy_create_init = 0,
         size = "small",

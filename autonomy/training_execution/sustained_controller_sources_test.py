@@ -101,7 +101,11 @@ class SustainedControllerSourceTests(unittest.TestCase):
             self.assertEqual(receipt["source_snapshot_target"], SNAPSHOT_TARGET)
             self.assertEqual(
                 receipt["source_snapshot_store"],
-                {"schema_version": 1, "kind": "local", "root": str(root / "store")},
+                {"kind": "local", "root": str(root / "store")},
+            )
+            self.assertEqual(
+                receipt["source_snapshot_blob"]["key"],
+                "artifacts/source-snapshots/" + receipt["source_snapshot_sha256"],
             )
             self.assertIn("autonomy/training_execution/run_sustained.py", receipt["source_pins"])
             validate_host_sources(autonomy, receipt)
@@ -136,7 +140,7 @@ class SustainedControllerSourceTests(unittest.TestCase):
                 target=HISTORICAL_TARGET,
             )
             before = copy.deepcopy(receipt)
-            archive = Path(receipt["source_snapshot_store"]) / receipt["source_snapshot_sha256"]
+            archive = LocalSnapshotStore(receipt["source_snapshot_store"]["root"]).path_for(receipt["source_snapshot_sha256"])
             archive_before = file_sha256(archive)
             shutil.rmtree(receipt["source_snapshot_root"])
             result = validate_host_sources(repo, receipt)

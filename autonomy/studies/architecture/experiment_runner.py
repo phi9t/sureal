@@ -172,7 +172,7 @@ def snapshot_receipt_fields(meta):
   'source_snapshot_target':meta['source_snapshot_target'],
   'source_pins':meta['source_pins'],
  }
- for key in ['schema_version','source_snapshot_archive_bytes','source_snapshot_bytes','source_snapshot_store']:
+ for key in ['schema_version','source_snapshot_archive_bytes','source_snapshot_bytes','source_snapshot_store','source_snapshot_blob']:
   if key in meta:fields[key]=meta[key]
  return fields
 

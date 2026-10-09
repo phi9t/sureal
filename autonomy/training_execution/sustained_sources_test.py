@@ -22,7 +22,7 @@ class SustainedSourceTests(unittest.TestCase):
   members=['autonomy/'+name for name in names]
   archive,pins=archive_sources(archive_root,members)
   digest=hashlib.sha256(archive).hexdigest();LocalSnapshotStore(store_root).store(digest,archive)
-  receipt={'schema_version':2,'source_snapshot_sha256':digest,'source_snapshot_target':SNAPSHOT_TARGET,'source_snapshot_store':str(store_root),'source_snapshot_root':str(archive_root),'source_pins':pins}
+  receipt={'schema_version':2,'source_snapshot_sha256':digest,'source_snapshot_target':SNAPSHOT_TARGET,'source_snapshot_store':{'kind':'local','root':str(store_root)},'source_snapshot_blob':{'key':'artifacts/source-snapshots/'+digest,'sha256':digest,'bytes':len(archive)},'source_snapshot_root':str(archive_root),'source_pins':pins}
   lock={'rootfs_sha256':'a'*64,'image_id':'sha256:'+'b'*64};return receipt,lock
  def query_runner(self,names):
   def run(command,**kwargs):
@@ -35,14 +35,14 @@ class SustainedSourceTests(unittest.TestCase):
  def test_runtime_cache_preserves_admitted_archive_and_receipt(self):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp);store=root/'admitted';receipt,_=self.fixture(root/'source',store)
-   digest=receipt['source_snapshot_sha256'];archive=(store/digest).read_bytes()
+   digest=receipt['source_snapshot_sha256'];archive=LocalSnapshotStore(store).path_for(digest).read_bytes()
    for index,descriptor in enumerate([str(store),{'schema_version':1,'kind':'local','root':str(store)}]):
     with self.subTest(descriptor=descriptor):
      receipt['source_snapshot_store']=descriptor;original=json.dumps(receipt,sort_keys=True)
      cache=root/('runtime-cache-'+str(index))
      cache_snapshot_for_runtime(receipt,cache)
      self.assertEqual(LocalSnapshotStore(cache).fetch(digest),archive)
-     self.assertEqual((store/digest).read_bytes(),archive)
+     self.assertEqual(LocalSnapshotStore(store).path_for(digest).read_bytes(),archive)
      self.assertEqual(json.dumps(receipt,sort_keys=True),original)
  def test_new_snapshot_creation_uses_target_query_and_explicit_destination(self):
   with tempfile.TemporaryDirectory() as tmp:
@@ -109,7 +109,7 @@ class SustainedSourceTests(unittest.TestCase):
  def test_altered_or_missing_snapshot_refused(self):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp)/'repo';store=Path(tmp)/'snapshots';receipt,lock=self.fixture(root,store)
-   snapshot=store/receipt['source_snapshot_sha256'];snapshot.write_bytes(b'altered snapshot')
+   snapshot=LocalSnapshotStore(store).path_for(receipt['source_snapshot_sha256']);snapshot.write_bytes(b'altered snapshot')
    with self.assertRaises(ValueError):validate_sources(root,receipt,lock,lock)
    snapshot.unlink()
    with self.assertRaises(FileNotFoundError):validate_sources(root,receipt,lock,lock)

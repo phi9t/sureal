@@ -52,7 +52,7 @@ class CheckpointRetentionSourcesTests(unittest.TestCase):
  def test_missing_or_altered_snapshot_refused(self):
   with tempfile.TemporaryDirectory() as temp:
    root,pins=self.historical_receipt(Path(temp))
-   snapshot=Path(pins['source_snapshot_store'])/pins['source_snapshot_sha256'];snapshot.write_bytes(b'altered snapshot')
+   snapshot=LocalSnapshotStore(pins['source_snapshot_store']['root']).path_for(pins['source_snapshot_sha256']);snapshot.write_bytes(b'altered snapshot')
    with self.assertRaises(ValueError):validate_host_sources(root,pins)
    snapshot.unlink()
    with self.assertRaises(FileNotFoundError):validate_host_sources(root,pins)
@@ -64,7 +64,7 @@ class CheckpointRetentionSourcesTests(unittest.TestCase):
  def test_historical_schema1_receipt_omits_publisher_runtime_and_rehydrates_unchanged(self):
   with tempfile.TemporaryDirectory() as temp:
    root,pins=self.historical_receipt(Path(temp));before=copy.deepcopy(pins)
-   archive=Path(pins['source_snapshot_store'])/pins['source_snapshot_sha256'];archive_before=file_sha256(archive)
+   archive=LocalSnapshotStore(pins['source_snapshot_store']['root']).path_for(pins['source_snapshot_sha256']);archive_before=file_sha256(archive)
    shutil.rmtree(pins['source_snapshot_root'])
    result=validate_host_sources(root,pins)
    self.assertEqual(result['source_files'],len(HISTORICAL_REQUIRED))
