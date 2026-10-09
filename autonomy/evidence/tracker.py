@@ -18,6 +18,42 @@ def snapshot(path):
  if digest(destination)!=h:raise ValueError('immutable journal evidence changed')
  return destination
 
+def verify_journal():
+ entries=read_entries(JOURNAL);records=[]
+ for name in ['research-journal-hdfs-legacy-verified.json','research-journal-hdfs-verified.json']:
+  path=R/name
+  if path.exists():
+   _verify_journal_publication_record(path);records.append(name)
+ return {'journal_entries':len(entries),'publication_records':records}
+
+def _verify_journal_publication_record(path):
+ value=json.loads(require_regular_file(path).read_text())
+ if _is_new_journal_publication_record(value) or _is_legacy_journal_hdfs_record(value):return
+ raise ValueError('journal publication record shape required')
+
+def _is_new_journal_publication_record(value):
+ if not isinstance(value,dict) or value.get('schema_version')!=1 or value.get('verified_by_readback') is not True:return False
+ blobs=value.get('blobs')
+ if not isinstance(blobs,dict) or set(blobs)!={'manifest','files'}:return False
+ if not _is_blob_record(blobs['manifest']):return False
+ files=blobs['files']
+ return isinstance(files,list) and bool(files) and all(_is_blob_record(blob) for blob in files)
+
+def _is_legacy_journal_hdfs_record(value):
+ if not isinstance(value,dict) or value.get('all_results_uploaded_and_readback_exact') is not True:return False
+ files=value.get('files')
+ if not isinstance(files,dict) or not files:return False
+ for entry in files.values():
+  if not isinstance(entry,dict) or not isinstance(entry.get('hdfs_uri'),str) or not entry['hdfs_uri'].startswith('hdfs://'):return False
+  if not _is_sha256(entry.get('sha256')) or not isinstance(entry.get('bytes'),int) or entry['bytes']<0:return False
+ return True
+
+def _is_blob_record(value):
+ return isinstance(value,dict) and set(value)=={'key','sha256','bytes'} and isinstance(value['key'],str) and value['key'].startswith('runs/perception-research-journal/') and _is_sha256(value['sha256']) and isinstance(value['bytes'],int) and value['bytes']>=0
+
+def _is_sha256(value):
+ return isinstance(value,str) and len(value)==64 and all(character in '0123456789abcdef' for character in value)
+
 def refresh():
  with (R/'experiment-tracker.lock').open('a') as lock:
   fcntl.flock(lock,fcntl.LOCK_EX);registry=json.loads(REGISTRY.read_text());rows=[];sources={};old,_=read_optional(R/'experiments.json');previous={row['id']:row['stage'] for row in (old or {}).get('experiments',[])}
@@ -52,7 +88,7 @@ def refresh():
 def main():
  parser=argparse.ArgumentParser();commands=parser.add_subparsers(dest='command',required=True);commands.add_parser('refresh');watch=commands.add_parser('watch');watch.add_argument('--interval',type=int,default=60);note=commands.add_parser('note');note.add_argument('--category',choices=['observation','hypothesis','decision','follow_up'],required=True);note.add_argument('--experiment',action='append',required=True);note.add_argument('--text',required=True);note.add_argument('--evidence',type=Path,action='append',default=[]);commands.add_parser('verify-journal');args=parser.parse_args()
  if args.command=='note':append_entry(JOURNAL,args.category,args.experiment,args.text,args.evidence);refresh()
- elif args.command=='verify-journal':print('VERIFIED journal entries',len(read_entries(JOURNAL)))
+ elif args.command=='verify-journal':print('VERIFIED journal entries',verify_journal()['journal_entries'])
  elif args.command=='watch':
   if args.interval<10:raise ValueError('poll at least10 seconds apart')
   while True:
