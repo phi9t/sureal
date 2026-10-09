@@ -1,8 +1,8 @@
 """Prediction evaluation metadata from measured points; no GT annotation fields."""
-import math
 import numpy as np
 from detection.detection_export import validate_object
 from segmentation.nlz_overlap import overlaps_nlz
+from geometry.oriented_box import count_points_in_box
 
 
 def prediction_records(proposals,*,context,timestamp,sensor_returns):
@@ -18,12 +18,7 @@ def prediction_records(proposals,*,context,timestamp,sensor_returns):
     records=[]
     for box,category,score,index in zip(boxes,classes,scores,indices):
         flag=overlaps_nlz(box,sensor_returns)
-        c,s=math.cos(box[6]),math.sin(box[6]);count=0
-        for points,_ in sensor_returns.values():
-            delta=np.asarray(points)-box[:3]
-            local_x=c*delta[:,0]+s*delta[:,1]
-            local_y=-s*delta[:,0]+c*delta[:,1]
-            count+=int(np.count_nonzero((np.abs(local_x)<=box[3]/2)&(np.abs(local_y)<=box[4]/2)&(np.abs(delta[:,2])<=box[5]/2)))
+        count=sum(count_points_in_box(points,box) for points,_ in sensor_returns.values())
         record={'context_name':context,'frame_timestamp_micros':timestamp,
                 'object_id':'prediction-anchor-'+str(int(index)),'type':int(category),
                 'box':box.tolist(),'score':float(score),'overlap_with_nlz':flag,

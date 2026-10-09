@@ -4,7 +4,14 @@ import unittest
 import numpy as np
 
 from geometry import oriented_box_test_support as support
-from geometry.oriented_box import count_points_in_box, point_membership
+from geometry.oriented_box import (
+    axis_aligned_bev_iou,
+    count_points_in_box,
+    enclosing_bev_rectangles,
+    nearest_bev_rectangles,
+    point_membership,
+    wrap_heading,
+)
 
 
 def _wrong_count_on_pi_boundary(points, box):
@@ -19,6 +26,34 @@ def _wrong_mask_on_pi_boundary(points, box):
     if box[6] == math.pi and _has_boundary_point(points, box):
         mask[0] = ~mask[0]
     return mask
+
+
+def _wrong_wrap_at_positive_pi(angles):
+    wrapped = np.asarray(wrap_heading(angles)).copy()
+    return np.where(np.asarray(angles) == math.pi, math.pi, wrapped)
+
+
+def _wrong_nearest_rectangles_at_pi_quarter(boxes):
+    rectangles = nearest_bev_rectangles(boxes).copy()
+    boxes = np.asarray(boxes, dtype=np.float64)
+    if np.any(boxes[:, 6] == math.pi / 4):
+        rectangles[:, 0] = np.nextafter(rectangles[:, 0], -math.inf)
+    return rectangles
+
+
+def _wrong_enclosing_rectangles_at_pi_quarter(boxes):
+    rectangles = enclosing_bev_rectangles(boxes).copy()
+    boxes = np.asarray(boxes, dtype=np.float64)
+    if np.any(boxes[:, 6] == math.pi / 4):
+        rectangles[:, 1] = np.nextafter(rectangles[:, 1], -math.inf)
+    return rectangles
+
+
+def _wrong_iou(first, second):
+    iou = axis_aligned_bev_iou(first, second).copy()
+    if iou.size:
+        iou[0, 0] = np.nextafter(iou[0, 0], math.inf)
+    return iou
 
 
 def _has_boundary_point(points, box):
@@ -44,6 +79,26 @@ class OrientedBoxParityHarnessTests(unittest.TestCase):
 
         with self.assertRaises(AssertionError):
             helper(self, _wrong_mask_on_pi_boundary)
+
+    def test_heading_wrap_parity_helper_uses_pi_boundaries(self):
+        helper = getattr(support, "assert_heading_wrap_parity", None)
+        if helper is None:
+            self.fail("assert_heading_wrap_parity missing")
+
+        with self.assertRaises(AssertionError):
+            helper(self, _wrong_wrap_at_positive_pi)
+
+    def test_bev_rectangle_parity_helper_uses_boundary_headings_and_iou(self):
+        helper = getattr(support, "assert_bev_rectangle_parity", None)
+        if helper is None:
+            self.fail("assert_bev_rectangle_parity missing")
+
+        with self.assertRaises(AssertionError):
+            helper(self, _wrong_nearest_rectangles_at_pi_quarter, enclosing_bev_rectangles, axis_aligned_bev_iou)
+        with self.assertRaises(AssertionError):
+            helper(self, nearest_bev_rectangles, _wrong_enclosing_rectangles_at_pi_quarter, axis_aligned_bev_iou)
+        with self.assertRaises(AssertionError):
+            helper(self, nearest_bev_rectangles, enclosing_bev_rectangles, _wrong_iou)
 
 
 if __name__ == "__main__":

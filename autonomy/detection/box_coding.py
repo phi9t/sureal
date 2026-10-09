@@ -4,6 +4,7 @@ Explicit Waymo center-Z adaptation: dimensions are never treated as bottom-Z.
 Yaw residuals remain additive; only decoded headings are canonicalized.
 """
 import numpy as np
+from geometry.oriented_box import wrap_heading
 
 
 def _pair(value,anchors,*,physical):
@@ -38,7 +39,7 @@ def decode_boxes(residuals,anchors):
         result[:,:2]=residuals[:,:2]*diagonal[:,None]+anchors[:,:2]
         result[:,2]=residuals[:,2]*anchors[:,5]+anchors[:,2]
         result[:,3:6]=np.exp(residuals[:,3:6])*anchors[:,3:6]
-        result[:,6]=(residuals[:,6]+anchors[:,6]+np.pi)%(2*np.pi)-np.pi
+        result[:,6]=wrap_heading(residuals[:,6]+anchors[:,6])
     if not np.isfinite(result).all() or np.any(result[:,3:6]<=0):
         raise ValueError('nonfinite or degenerate decoded box')
     return result
@@ -50,4 +51,4 @@ def direction_correct(yaw,bins):
     if yaw.shape!=bins.shape or not np.isfinite(yaw).all() or bins.dtype.kind not in 'iu' or np.any((bins!=0)&(bins!=1)):
         raise ValueError('finite headings and paired binary direction bins required')
     corrected=yaw+np.where((yaw>0)!=(bins==1),np.pi,0.)
-    return (corrected+np.pi)%(2*np.pi)-np.pi
+    return wrap_heading(corrected)

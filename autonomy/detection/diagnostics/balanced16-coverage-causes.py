@@ -1,4 +1,7 @@
-"""Literal whole-grid assignment reconciliation and uncovered-GT collision audit."""
+"""Literal whole-grid assignment reconciliation and uncovered-GT collision audit.
+
+This keeps a deliberate independent nearest-BEV rectangle implementation.
+"""
 import json,resource,time
 from pathlib import Path
 import numpy as np
