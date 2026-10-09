@@ -2,7 +2,7 @@
 import json,sys
 from pathlib import Path
 from evidence.source_snapshot import file_sha256
-from evidence.score_records import read_level2_per_class
+from evidence.score_records import LEVEL2_CLASS_KEYS, read_level2_per_class
 from resources.scientific_budget import fit_interval
 from evidence.artifact_lifecycle import admit_artifact
 from resources.scientific_payload import unique_payload_bytes
@@ -30,7 +30,7 @@ def verify(result_path):
     for p,h in control['source_and_input_sha256'].items():assert sha(p)==h
     for p,h in control['artifacts'].items():assert sha(p)==h
     assert control['validation']['initial_full_heads_exact_on_GPU'] and control['validation']['terminal_full_heads_exact_to_baseline_producer']
-    assert read_level2_per_class(control['validation']['inherited_native_LEVEL2_per_class'])==read_level2_per_class(result['cases']['baseline']['curve'][-1]['LEVEL2_per_class'])
+    assert read_level2_per_class(control['validation']['inherited_native_LEVEL2_per_class'],classes=LEVEL2_CLASS_KEYS)==read_level2_per_class(result['cases']['baseline']['curve'][-1]['LEVEL2_per_class'],classes=LEVEL2_CLASS_KEYS)
    continue
   if case['status'] not in ['sustained native overfit','failed to overfit by 10000 updates']:
    output.append({'case':name,'status':case['status'],'time_to_fit':fit_interval(case.get('curve',[]))});continue
@@ -48,7 +48,7 @@ def verify(result_path):
    if '-replay-' in stage and int(stage.rsplit('-',1)[1])==case['updates']:assert validation['exact_terminal_model_and_adam'] and validation['exact_all_checkpoint_heads'] and validation['exact_rng'];replay=True
    if '-proposal-audit-' in stage:assert validation['literal_score_first_decode_nms_and_measurement_metadata'] and validation['all_native_eligible_GT_retained'] and validation['eligible_groundtruth']==73;proposal_steps.add(int(stage.rsplit('-',1)[1]))
    if '-metric-audit-' in stage:assert validation['native_metric_replay_exact'] and validation['all_export_fields_independently_reread'];metric_steps.add(int(stage.rsplit('-',1)[1]))
-   if '-score-' in stage:native_scores[int(stage.rsplit('-',1)[1])]=read_level2_per_class(validation['LEVEL2_per_class'])
+   if '-score-' in stage:native_scores[int(stage.rsplit('-',1)[1])]=read_level2_per_class(validation['LEVEL2_per_class'],classes=LEVEL2_CLASS_KEYS)
    if '-loss-' in stage:
     count=validation['literal_checkpoint_losses'];assert count>0;losses=True;target=int(stage.rsplit('-',1)[1]);assert target not in loss_counts or loss_counts[target]==count;loss_counts[target]=count
    checked+=1
@@ -60,7 +60,7 @@ def verify(result_path):
    assert count==expected,(name,target,count,expected);loss_covered.update(new);previous=target
   assert loss_covered==steps
   for point in case['curve']:
-   values=read_level2_per_class(point['LEVEL2_per_class']);assert values==native_scores[point['step']];assert point['all_class_quality_passed']==all(v['APH']>=.8 for v in values.values())
+   values=read_level2_per_class(point['LEVEL2_per_class'],classes=LEVEL2_CLASS_KEYS);assert values==native_scores[point['step']];assert point['all_class_quality_passed']==all(v['APH']>=.8 for v in values.values())
   expected=len(case['curve'])>=2 and all(p['all_class_quality_passed'] for p in case['curve'][-2:]);assert (case['status']=='sustained native overfit')==expected
   directory=Path(case['output_directory']);training=json.loads(read(directory/'check.json'));assert sha(directory/'checkpoint.pt')==training['checkpoint_sha256'] and training['case']==meta['matrix'][name]
   assert training['updates']==case['updates']==case['curve'][-1]['step']
@@ -68,7 +68,7 @@ def verify(result_path):
   for point in case['curve']:
    for key,value in original_curve[point['step']].items():assert point[key]==value,(name,point['step'],key)
   assert case['parameters']==training['parameters'] and case['cumulative_train_seconds']==training['cumulative_train_seconds'] and case['clipped_steps']==training['clipped_steps']
-  terminal=read_level2_per_class(case['curve'][-1]['LEVEL2_per_class']);fit=fit_interval(case['curve']);train_stages=[json.loads(read(r['receipt'])) for r in case['verification_receipts']];native_seconds=sum(x['elapsed_seconds'] for x in train_stages if '-score-' in x['name'] or '-metric-audit-' in x['name']);output.append({'case':name,'status':case['status'],'parameters':case['parameters'],'updates':case['updates'],'time_to_fit':fit,'cumulative_train_seconds':case['cumulative_train_seconds'],'native_compute_seconds_sum':native_seconds,'terminal_LEVEL2_per_class':terminal,'clipped_steps':case['clipped_steps']})
+  terminal=read_level2_per_class(case['curve'][-1]['LEVEL2_per_class'],classes=LEVEL2_CLASS_KEYS);fit=fit_interval(case['curve']);train_stages=[json.loads(read(r['receipt'])) for r in case['verification_receipts']];native_seconds=sum(x['elapsed_seconds'] for x in train_stages if '-score-' in x['name'] or '-metric-audit-' in x['name']);output.append({'case':name,'status':case['status'],'parameters':case['parameters'],'updates':case['updates'],'time_to_fit':fit,'cumulative_train_seconds':case['cumulative_train_seconds'],'native_compute_seconds_sum':native_seconds,'terminal_LEVEL2_per_class':terminal,'clipped_steps':case['clipped_steps']})
  used=unique_payload_bytes(resolved(run.parents[1]/'scientific-processing'));assert used<=15*1024**3
  return {'rows':output,'verified_stage_receipts':checked,'unique_scientific_payload_bytes':used,'all_cases_finished':result.get('finished',False),'scope':'training-only fixed-one-frame fitting; two consecutive native four-class APH >= .8; no heldout claim'}
 if __name__=='__main__':

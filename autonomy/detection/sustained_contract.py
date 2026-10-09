@@ -1,6 +1,6 @@
 """Frozen training-only continuation gate; no model-quality promotion by loss."""
 import copy,re
-from evidence.score_records import read_level2_per_class
+from evidence.score_records import LEVEL2_CLASS_KEYS, read_level2_per_class
 
 GRID=(0,1000,2000,4000,8000,12000,16000,24000,32000)
 RECIPES=('baseline','residual_bev','class_balanced','prior_bias')
@@ -29,8 +29,8 @@ def next_checkpoint(step,first_pass_step):
  return min(candidates) if candidates else None
 
 def sample_aph(sample):
- if 'LEVEL2_per_class' in sample:return {key:row['APH'] for key,row in read_level2_per_class(sample['LEVEL2_per_class']).items()}
- if 'APH' in sample:return {key:row['APH'] for key,row in read_level2_per_class({key:{'AP':value,'APH':value} for key,value in sample['APH'].items()}).items()}
+ if 'LEVEL2_per_class' in sample:return {key:row['APH'] for key,row in read_level2_per_class(sample['LEVEL2_per_class'],classes=LEVEL2_CLASS_KEYS).items()}
+ if 'APH' in sample:return {key:row['APH'] for key,row in read_level2_per_class({key:{'AP':value,'APH':value} for key,value in sample['APH'].items()},classes=LEVEL2_CLASS_KEYS).items()}
  raise ValueError('native score record required')
 
 def fit_status(samples,terminal_step,stop_reason):

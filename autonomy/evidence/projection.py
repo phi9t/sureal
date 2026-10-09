@@ -1,12 +1,24 @@
 """Project immutable/native evidence into explicit experiment lifecycle stages."""
 import copy
-from evidence.score_records import read_level2_per_class
+from evidence.score_records import LEVEL2_CLASS_KEYS, populated_level2_classes, read_level2_per_class
 GOAL='Fit the fixed 73-object all-class frame; measure updates and synchronized training time under the declared recipe.'
 ACCEPTANCE='All four native LEVEL2 APH >= 0.80 at two consecutive sampled checkpoints including terminal; exact full replay and final live closure. Otherwise unchanged 10000-update censored result.'
 VERIFIERS=['live actual-frame architecture gradient/resource admission','independent literal losses','native proposal/GT/export/metric audits','exact model/Adam/RNG/head replay','final live Insula closure']
+def score_record_classes(point):
+ for source in [point,point.get('preparation') if isinstance(point,dict) else None]:
+  if isinstance(source,dict) and 'groundtruth_by_class' in source:
+   return populated_level2_classes(source)
+ if isinstance(point,dict) and point.get('all_class_quality_passed') is not None:
+  return LEVEL2_CLASS_KEYS
+ record=point.get('LEVEL2_per_class') if isinstance(point,dict) else None
+ if isinstance(record,dict):
+  keys=tuple(key for key in LEVEL2_CLASS_KEYS if key in record)
+  if keys and set(record)==set(keys):
+   return keys
+ return LEVEL2_CLASS_KEYS
 def score_record(point):
  if 'LEVEL2_per_class' not in point:return None
- return read_level2_per_class(point['LEVEL2_per_class'])
+ return read_level2_per_class(point['LEVEL2_per_class'],classes=score_record_classes(point))
 def quality(point):
  values=score_record(point)
  return values is not None and all(v['APH']>=.8 for v in values.values())

@@ -32,6 +32,26 @@ class ProjectionTests(unittest.TestCase):
   del malformed['4']['AP']
   result={'_run_metadata':{'matrix':definitions},'cases':{'baseline':{'status':'training in progress','curve':[{'step':500,'LEVEL2_per_class':malformed}]}}}
   with self.assertRaises(ValueError):project_experiments('run',definitions,result,'a',None,None)
+ def test_populated_class_score_record_uses_groundtruth_scope(self):
+  definitions={'baseline':{'architecture':'baseline'}}
+  point={'step':500,
+         'groundtruth_by_class':{'1':3,'2':3,'3':11,'4':0},
+         'LEVEL2_per_class':{'1':{'AP':.9,'APH':.8},'2':{'AP':.9,'APH':.7},'3':{'AP':.9,'APH':.6}}}
+  result={'_run_metadata':{'matrix':definitions},'cases':{'baseline':{'status':'training in progress','curve':[point]}}}
+  row=project_experiments('run',definitions,result,'a',None,None)[0]
+  self.assertEqual(set(row['terminal_LEVEL2_per_class']),{'1','2','3'})
+  self.assertEqual(row['worst_terminal_APH'],.6)
+ def test_summary_only_populated_score_record_uses_native_keys(self):
+  definitions={'baseline':{'architecture':'baseline'}}
+  point={'step':500,'LEVEL2_per_class':{'1':{'AP':.9,'APH':.8},'2':{'AP':.9,'APH':.7},'3':{'AP':.9,'APH':.6}}}
+  result={'_run_metadata':{'matrix':definitions},'cases':{'baseline':{'status':'training in progress','curve':[point]}}}
+  row=project_experiments('run',definitions,result,'a',None,None)[0]
+  self.assertEqual(set(row['terminal_LEVEL2_per_class']),{'1','2','3'})
+ def test_all_class_quality_points_still_require_all_classes(self):
+  definitions={'baseline':{'architecture':'baseline'}}
+  point={'step':500,'all_class_quality_passed':False,'LEVEL2_per_class':{'1':{'AP':.9,'APH':.8},'2':{'AP':.9,'APH':.7},'3':{'AP':.9,'APH':.6}}}
+  result={'_run_metadata':{'matrix':definitions},'cases':{'baseline':{'status':'training in progress','curve':[point]}}}
+  with self.assertRaises(ValueError):project_experiments('run',definitions,result,'a',None,None)
  def test_registry_recipe_cannot_relabel_existing_evidence(self):
   result=self.run_case();closure={'candidate_sha256':'a','validation':{'all_cases_finished':True},'checks':[{'exit_code':0}]}
   with self.assertRaises(ValueError):project_experiments('run',{'baseline':{'architecture':'different','learning_rate':.1}},result,'a',closure,None)
