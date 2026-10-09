@@ -3,8 +3,8 @@ import json
 import os
 from pathlib import Path
 from evidence.source_snapshot import file_sha256
-from insula.runtime_identity import verify_rootfs
-from insula.runtime_roots import current_cpu_rootfs
+from insula.launch_plan import load_runtime_lock
+from insula.runtime_roots import current_cpu_rootfs, default_lock
 
 CURRENT_M0_RECEIPT_NAME = f"m0-live-{current_cpu_rootfs().name}"
 
@@ -21,17 +21,17 @@ def receipt_fixture_paths(env=os.environ):
 
 
 def candidate_files(experiment):
-    names=['enter.sh','insula/verify_m0.py','insula/entry.py','insula/runtime_identity.py',
-           'insula/m0_probe.py','insula/m0_validate.py','insula/m0_receipt.py']
+    names=['insula/verify_m0.py','insula/launch_plan.py','insula/runtime_identity.py',
+           'insula/runtime_roots.py','insula/m0_probe.py','insula/m0_validate.py',
+           'insula/m0_receipt.py']
     return [experiment/name for name in names]
 
 
 def validate_receipt(run: Path, rootfs: Path, experiment: Path):
     receipt=json.loads((run/'receipt.json').read_text())
     if receipt['schema_version']!=1 or receipt['milestone']!='M0':raise ValueError('receipt schema')
-    lock=json.loads(Path(str(rootfs)+'.lock.json').read_text())
-    if receipt['runtime_lock']!=lock:raise ValueError('runtime identity mismatch')
-    verify_rootfs(rootfs,lock['rootfs_sha256'])
+    runtime=load_runtime_lock(rootfs,default_lock(rootfs))
+    if receipt['runtime_lock']!=runtime.data:raise ValueError('runtime identity mismatch')
     required={str(p.relative_to(experiment)) for p in candidate_files(experiment)}
     if set(receipt['code_hashes'])!=required:raise ValueError('incomplete candidate inventory')
     for relative,digest in receipt['code_hashes'].items():
