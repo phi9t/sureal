@@ -24,6 +24,7 @@ class SemanticRecoveryJobGateTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);cache=root/'cache';staging=root/'ticket-execution-cache'
             (cache/'scientific-processing').mkdir(parents=True)
+            (staging/'scientific-processing').mkdir(parents=True)
             rootfs=recovery_rootfs(cache);rootfs.mkdir(parents=True)
             Path(str(rootfs)+'.lock.json').write_text('{"schema_version":1,"rootfs_sha256":"%s"}' % ('c'*64))
             publication=root/'publication.json'
@@ -47,6 +48,8 @@ class SemanticRecoveryJobGateTests(unittest.TestCase):
                  patch('segmentation.semantic_recovery_job.staged_derived_archive',side_effect=fake_staged):
                 with self.assertRaises(RuntimeError):
                     recover_semantic_archive(record,cache=cache,staging_cache=staging,code_root=root,output=root/'output')
+            self.assertFalse((cache/'scientific-processing/cohort-queue.lock').exists())
+            self.assertTrue((staging/'scientific-processing/cohort-queue.lock').exists())
 
     def test_queue_refused_before_output_or_source_access(self):
         with tempfile.TemporaryDirectory() as tmp:

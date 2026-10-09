@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "label": "//autonomy/segmentation:semantic_recovery_receipt_aligned_test",
+  "verdict": "pass",
+  "rootfs": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v5-t29-20261008T230657Z",
+  "lock": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v5-t29-20261008T230657Z.lock.json",
+  "rootfs_lock_sha256": "318e827c4832cbf2e6d02657c17bbda0ec696f5a7e2747b277922db364739403",
+  "fixture": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/run-20261009T022117Z.FC5hCl/aligned-current",
+  "output": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/outputs/autonomy_segmentation__semantic_recovery_receipt_aligned_test",
+  "argv": [
+    "bwrap",
+    "--unshare-all",
+    "--die-with-parent",
+    "--ro-bind",
+    "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v5-t29-20261008T230657Z",
+    "/",
+    "--ro-bind",
+    "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy",
+    "/experiment",
+    "--ro-bind",
+    "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/run-20261009T022117Z.FC5hCl/aligned-current",
+    "/source",
+    "--bind",
+    "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/outputs/autonomy_segmentation__semantic_recovery_receipt_aligned_test",
+    "/outputs",
+    "--proc",
+    "/proc",
+    "--dev",
+    "/dev",
+    "--tmpfs",
+    "/tmp",
+    "--clearenv",
+    "--setenv",
+    "HOME",
+    "/tmp/private-home",
+    "--setenv",
+    "PATH",
+    "/usr/local/bin:/usr/bin:/bin",
+    "--setenv",
+    "PYTHONNOUSERSITE",
+    "1",
+    "--setenv",
+    "PYTHONDONTWRITEBYTECODE",
+    "1",
+    "--setenv",
+    "PYTHONPATH",
+    "/experiment",
+    "--chdir",
+    "/experiment",
+    "--",
+    "python3",
+    "-m",
+    "unittest",
+    "segmentation.semantic_recovery_receipt_aligned_test",
+    "-v"
+  ],
+  "mounts": [
+    [
+      "--ro-bind",
+      "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v5-t29-20261008T230657Z",
+      "/"
+    ],
+    [
+      "--ro-bind",
+      "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/final26-closeout-verify-worker-t29c-semantic-recovery/autonomy",
+      "/experiment"
+    ],
+    [
+      "--ro-bind",
+      "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/run-20261009T022117Z.FC5hCl/aligned-current",
+      "/source"
+    ],
+    [
+      "--bind",
+      "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/outputs/autonomy_segmentation__semantic_recovery_receipt_aligned_test",
+      "/outputs"
+    ],
+    [
+      "--tmpfs",
+      "/tmp"
+    ]
+  ],
+  "environment": [
+    [
+      "--setenv",
+      "HOME",
+      "/tmp/private-home"
+    ],
+    [
+      "--setenv",
+      "PATH",
+      "/usr/local/bin:/usr/bin:/bin"
+    ],
+    [
+      "--setenv",
+      "PYTHONNOUSERSITE",
+      "1"
+    ],
+    [
+      "--setenv",
+      "PYTHONDONTWRITEBYTECODE",
+      "1"
+    ],
+    [
+      "--setenv",
+      "PYTHONPATH",
+      "/experiment"
+    ]
+  ],
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "segmentation.semantic_recovery_receipt_aligned_test",
+    "-v"
+  ],
+  "exit_code": 0,
+  "expected_tests": 1,
+  "executed_tests": 1,
+  "duration_seconds": 0.17461363098118454,
+  "raw_log": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/logs/autonomy_segmentation__semantic_recovery_receipt_aligned_test.2026-10-09T02:24:02Z.log",
+  "raw_log_sha256": "08796186deff7ea23225b325424d1bba6174ca5d854e27049a74e3311c6986cb"
+}

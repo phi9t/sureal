@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "run_directory": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/run-20261009T022117Z.FC5hCl",
+  "selected_record": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/run-20261009T022117Z.FC5hCl/selected-point-publication-record.json",
+  "selected_summary": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/run-20261009T022117Z.FC5hCl/selected-point-publication-summary.json",
+  "exact_output": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/run-20261009T022117Z.FC5hCl/current",
+  "exact_receipt_sha256": "cd68ca461d8a55f8a80cef4dd6b3eb60b7a6fda45913828b2674ccea03df3264",
+  "exact_live_log_sha256": "c1b9bffb269b15f8f899d7e46cea6686b540f6783a5c46e013b30c7f5dde3581",
+  "exact_elapsed_seconds": 64.916166607989,
+  "aligned_output": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/run-20261009T022117Z.FC5hCl/aligned-current",
+  "aligned_receipt_sha256": "e55aa902be95907973f6e641a94a4707e61309369238fec71b5cc8af66a642c0",
+  "aligned_live_log_sha256": "c1b9bffb269b15f8f899d7e46cea6686b540f6783a5c46e013b30c7f5dde3581",
+  "aligned_elapsed_seconds": 73.40388943394646,
+  "archive_hdfs_uri": "hdfs://harunava/user/tiger/waystone/sureal/waymo/perception/v2.0.1/derived/scene-records-v1/scientific/1730266523558914470_305_260_325_260/fae12ded2bb31c2e87a5d91811e09f9c45234a249a44f103bf82cf730abd1a6f.tar",
+  "archive_sha256": "fae12ded2bb31c2e87a5d91811e09f9c45234a249a44f103bf82cf730abd1a6f",
+  "archive_bytes": 3022008320,
+  "auth_source": "token-file",
+  "hdfs_mode": "read-only",
+  "gpu_required": false,
+  "staging_exact": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/staging-exact.2m0FwU",
+  "staging_aligned": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/staging-aligned.Y9vRFU"
+}

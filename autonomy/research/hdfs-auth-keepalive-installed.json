@@ -1,13 +1,15 @@
 {
   "service": "/data02/home/philip.yang/.config/systemd/user/sureal-hdfs-auth.service",
-  "service_sha256": "8545528869b89203dad5c587af2bb8b1c98e3d10972b8eb4b9445d3b35f79da0",
+  "service_sha256": "d618dbc4455183bc5e33bf726fbef73641f400162c547a05d82add830c8256de",
   "timer": "/data02/home/philip.yang/.config/systemd/user/sureal-hdfs-auth.timer",
   "timer_sha256": "a89417d7e061bea7c05aaab5131d6decefded203aefcb5c4e317a598b08a9676",
   "installed_script": "/data02/home/philip.yang/.local/lib/sureal/hdfs_auth_keepalive.py",
-  "installed_script_sha256": "ff0b26bb1ecef4eff96d5a331da1cb3f66f71c7c420492fce502c4a73ec16d63",
-  "source_script_sha256": "ff0b26bb1ecef4eff96d5a331da1cb3f66f71c7c420492fce502c4a73ec16d63",
+  "installed_script_sha256": "6e07b433229b79db95bc7b997a3156338556f6611dea7f7661ddd0c881611ecc",
+  "installed_helper": "/data02/home/philip.yang/.local/lib/sureal/evidence/source_snapshot.py",
+  "installed_helper_sha256": "b547a119a8372e3c4ddf8ef4f4e034d0591c01c746d0a3b90925445b94172e2e",
+  "source_script_sha256": "6e07b433229b79db95bc7b997a3156338556f6611dea7f7661ddd0c881611ecc",
   "config_file": "/data02/home/philip.yang/.local/state/sureal/hdfs-auth/config.json",
-  "config_sha256": "ba2ade99723fb6c4efc54590d81071df995286c91e7c25bc8907bcfb6b88d6fd",
+  "config_sha256": "0977a370ca0314ed39b4a97e7a7ac7ae3dceaf38922cdb43a79775800b95a6be",
   "status": {
     "ok": true,
     "ticket_renewed": true,
@@ -15,8 +17,8 @@
     "renewal_window_warning": false,
     "stage": "token-refresh",
     "exit_code": 0,
-    "checked_unix_seconds": 1790980672,
-    "interactive_refresh_script": "/data02/home/philip.yang/workspace/sureal/.worktrees/waymo-tracer/experiments/waymo-perception/scripts/refresh-hdfs-auth.sh"
+    "checked_unix_seconds": 1791512016,
+    "interactive_refresh_script": "/data02/home/philip.yang/workspace/sureal/autonomy/resources/refresh-hdfs-auth.sh"
   },
   "scope": "renew existing tickets and cached token; interactive login required beyond Kerberos renewal window"
 }

@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "rootfs": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v5-t29-20261008T230657Z",
+  "lock": "/data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v5-t29-20261008T230657Z.lock.json",
+  "fixture_exact": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/run-20261009T022117Z.FC5hCl/current",
+  "fixture_aligned": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/run-20261009T022117Z.FC5hCl/aligned-current",
+  "receipts": [
+    {
+      "label": "//autonomy/segmentation:semantic_recovery_accounting_test",
+      "verdict": "pass",
+      "executed_tests": 2,
+      "record": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/autonomy_segmentation__semantic_recovery_accounting_test.json",
+      "raw_log": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/logs/autonomy_segmentation__semantic_recovery_accounting_test.2026-10-09T02:23:59Z.log",
+      "raw_log_sha256": "526bdfff73f3d7db70d6bae844abf0c93c94e1d236165f370a562ea1e159e4ce",
+      "duration_seconds": 0.12139302107971162
+    },
+    {
+      "label": "//autonomy/segmentation:semantic_recovery_receipt_test",
+      "verdict": "pass",
+      "executed_tests": 1,
+      "record": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/autonomy_segmentation__semantic_recovery_receipt_test.json",
+      "raw_log": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/logs/autonomy_segmentation__semantic_recovery_receipt_test.2026-10-09T02:24:02Z.log",
+      "raw_log_sha256": "f0d4a1130f1e4f73a9d743cdd18454842b192373f7d585ed732c78d1d61a55c2",
+      "duration_seconds": 0.15737199201248586
+    },
+    {
+      "label": "//autonomy/segmentation:semantic_recovery_receipt_aligned_test",
+      "verdict": "pass",
+      "executed_tests": 1,
+      "record": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/autonomy_segmentation__semantic_recovery_receipt_aligned_test.json",
+      "raw_log": "/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/logs/autonomy_segmentation__semantic_recovery_receipt_aligned_test.2026-10-09T02:24:02Z.log",
+      "raw_log_sha256": "08796186deff7ea23225b325424d1bba6174ca5d854e27049a74e3311c6986cb",
+      "duration_seconds": 0.17461363098118454
+    }
+  ]
+}

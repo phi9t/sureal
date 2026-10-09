@@ -1041,3 +1041,35 @@ balanced16-readmission-t27f20261008T081353Z
 Ticket 27 live balanced16 admission retry t27f20261008T081353Z passed the engineering admission path with a GPU-sharing caveat. The user accepted this GPU-shared run as sufficient for ticket 27 journal publication while preserving the GPU-sharing caveat. Preflight passed with /data02 free 117929287680 bytes and unique_payload_bytes 11348603596, within the 15 GiB plus 2 GiB storage gate; rootfs locks and HDFS read-only listing verified. The run launched only on GPU index 1 in systemd scope sureal-sustained-t27f20261008T081353Z with MemoryMax 17179869184, MemorySwapMax 0, and MemoryAccounting yes. All 14 admission stages completed for records 0 and 1000; source snapshots were read back from HDFS once into the run-local cache and backend resume validation passed against that cache. Prior attempts t27f20261008T064125Z, t27f20261008T064901Z, t27f20261008T070456Z, t27f20261008T070717Z, t27f20261008T071007Z, t27f20261008T073704Z, and t27f20261008T074202Z remain recorded as aborted or failed retries, including the sandbox source-root defect fixed by d3499e1 and the sustained_chunk_reference import defect fixed by 3e50f6a. Storage-release receipts are preserved from phase-B-regular-release.k8E4Ew. GPU occupancy sampling found foreign GPU 1 sharing during the run, with 74 foreign-process samples and 4 samples overlapping the scoped admission process, so this is an engineering readmission with sharing caveat, not a scientific outcome or completion of the full sweep.
 
 Evidence: [admission-su](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/admission-summary.json), [verification](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/verification-summary.json), [source-snaps](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/source-snapshot-readback-summary.json), [launch-syste](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/live-admission/t27f20261008T081353Z/launch-systemd-scope.json), [storage-gate](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/storage-gate.json), [expected.jso](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B-regular-release.k8E4Ew/cohort16-baseline-fit20261002a.WlSdnA/publication-only.O1MrSu/hdfs-retention-cohort16-baseline-fit20261002a-dec4ce2778a4401d8b42734f397823d5/expected.json), [check.json](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t27f-execution/phase-B-regular-release.k8E4Ew/cohort16-baseline-fit20261002a.WlSdnA/publication-only.O1MrSu/hdfs-retention-cohort16-baseline-fit20261002a-dec4ce2778a4401d8b42734f397823d5/0/packed/check.json)
+
+## 131. 2026-10-09T02:37:04.536699+00:00 — decision
+
+ticket29-m0-receipt-readmission
+
+Ticket 29 M0 readmission is recorded from the landed rootfs-v5 phase: rootfs-v5-t29-20261008T230657Z lock records Dockerfile sha256 8e6c2a38868c8ff8e01e205697955a2d2837d740bb1539d81b3825141c273ac6, the regenerated M0 receipt passed python3 -m insula.verify_m0 and insula.m0_receipt_test ran 7 tests successfully. This is a runtime-lock engineering readmission only.
+
+Evidence: [rootfs-v5-t2](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/rootfs-v5-t29-20261008T230657Z-build-summary.json), [m0-live-root](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/m0-live-rootfs-v5-t29-20261008T230657Z-summary.json), [receipt.json](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/m0-live-rootfs-v5-t29-20261008T230657Z/receipt.json)
+
+## 132. 2026-10-09T02:37:04.641094+00:00 — decision
+
+ticket29-semantic-recovery-accounting-readmission
+
+Ticket 29 semantic_recovery_accounting_test readmission passed on a fresh real semantic recovery receipt generated from retained scientific publication training-publication-a for scene 1730266523558914470_305_260_325_260. HDFS was read only with --auth-source token-file; no publication or HDFS write was attempted. Live gate executed 2 unittest tests inside the current CPU Insula rootfs.
+
+Evidence: [generation-s](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/run-20261009T022117Z.FC5hCl/generation-summary.json), [live-gate-su](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/run-20261009T022117Z.FC5hCl/live-gate-summary.json), [autonomy_seg](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/autonomy_segmentation__semantic_recovery_accounting_test.json), [receipt.json](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/run-20261009T022117Z.FC5hCl/current/receipt.json)
+
+## 133. 2026-10-09T02:37:04.744397+00:00 — decision
+
+ticket29-semantic-recovery-receipt-readmission
+
+Ticket 29 semantic_recovery_receipt_test readmission passed on the fresh exact semantic recovery receipt cd68ca461d8a55f8a80cef4dd6b3eb60b7a6fda45913828b2674ccea03df3264 generated from retained scientific publication training-publication-a. The live gate executed 1 unittest test against the real receipt under current source and rootfs pins.
+
+Evidence: [generation-s](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/run-20261009T022117Z.FC5hCl/generation-summary.json), [live-gate-su](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/run-20261009T022117Z.FC5hCl/live-gate-summary.json), [autonomy_seg](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/autonomy_segmentation__semantic_recovery_receipt_test.json), [receipt.json](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/run-20261009T022117Z.FC5hCl/current/receipt.json)
+
+## 134. 2026-10-09T02:37:04.845079+00:00 — decision
+
+ticket29-semantic-recovery-receipt-aligned-readmission
+
+Ticket 29 semantic_recovery_receipt_aligned_test readmission passed on the fresh aligned semantic recovery receipt e55aa902be95907973f6e641a94a4707e61309369238fec71b5cc8af66a642c0 generated from retained scientific publication training-publication-a. The aligned transfer contract was verified in a live gate with 1 unittest test, using token-file HDFS readback only and no HDFS writes.
+
+Evidence: [generation-s](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/run-20261009T022117Z.FC5hCl/generation-summary.json), [live-gate-su](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/run-20261009T022117Z.FC5hCl/live-gate-summary.json), [autonomy_seg](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/autonomy_segmentation__semantic_recovery_receipt_aligned_test.json), [receipt.json](/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/t29-execution/semantic-recovery/run-20261009T022117Z.FC5hCl/aligned-current/receipt.json)
