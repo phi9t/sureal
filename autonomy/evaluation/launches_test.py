@@ -8,11 +8,15 @@ from pathlib import Path
 from unittest.mock import patch
 
 from evidence.source_snapshot import file_sha256
-from insula.launch_plan import RuntimeLockError, plan_data
+from insula.launch_plan import (
+    RuntimeLockError,
+    build_plan,
+    load_default_runtime_lock,
+    plan_data,
+    record_plan,
+)
 from insula.runtime_identity import rootfs_identity
 from insula.runtime_roots import current_metrics_rootfs
-
-from evaluation.launches import build_evaluation_plan, load_current_metrics_runtime, plan_receipt
 
 
 AUTONOMY = Path(__file__).resolve().parents[1]
@@ -73,8 +77,8 @@ class EvaluationLaunchTests(unittest.TestCase):
             for path in (code, source, output):
                 path.mkdir()
 
-            runtime = load_current_metrics_runtime(cache)
-            plan = build_evaluation_plan(
+            runtime = load_default_runtime_lock(current_metrics_rootfs(cache))
+            plan = build_plan(
                 runtime,
                 code=code,
                 source=source,
@@ -99,7 +103,7 @@ class EvaluationLaunchTests(unittest.TestCase):
                 },
             )
 
-            receipt = plan_receipt(plan)
+            receipt = record_plan(plan)
             self.assertEqual(receipt["runtime"]["form"], "image")
             self.assertEqual(receipt["command"], data["command"])
             self.assertNotIn(str(cache), json.dumps(receipt, sort_keys=True))

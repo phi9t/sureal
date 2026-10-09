@@ -8,11 +8,12 @@ import time
 
 HERE=Path(__file__).resolve().parents[1]
 from evidence.source_snapshot import file_sha256 as sha
-from evaluation.launches import build_evaluation_plan, load_current_metrics_runtime, plan_receipt, run_evaluation_plan
+from insula.launch_plan import build_plan, load_default_runtime_lock, record_plan, run_plan
+from insula.runtime_roots import current_metrics_rootfs
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
 
 def main():
-    out=Path(sys.argv[1]);out.mkdir(parents=True,exist_ok=False);runtime=load_current_metrics_runtime(CACHE);lock=runtime.data;records=[]
+    out=Path(sys.argv[1]);out.mkdir(parents=True,exist_ok=False);runtime=load_default_runtime_lock(current_metrics_rootfs(CACHE));lock=runtime.data;records=[]
     for name,h in lock['recipe_hashes'].items():
         if sha(HERE/'evaluation'/name)!=h:raise ValueError('metrics recipe changed')
     source=CACHE/'insula/m0-live-20260930-c/input';base='/upstream/src/waymo_open_dataset/metrics/tools/'
@@ -23,8 +24,8 @@ def main():
               ('dependency-check',['python','-c','import importlib.util, subprocess; assert importlib.util.find_spec("tensorflow") is None; output=subprocess.check_output(["ldd","/metrics-build/compute_detection_metrics"],text=True); assert "tensorflow" not in output.lower(); print(output)'])]
     started=datetime.now(timezone.utc).isoformat();begin=time.monotonic()
     for name,command in commands:
-        plan=build_evaluation_plan(runtime,code=HERE,source=source,output=out,command=command);p=run_evaluation_plan(plan,text=True,capture_output=True)
-        (out/(name+'.log')).write_text(p.stdout+p.stderr);records.append({'name':name,'launch_plan':plan_receipt(plan),'exit_code':p.returncode});print(name,p.returncode,flush=True)
+        plan=build_plan(runtime,code=HERE,source=source,output=out,command=command);p=run_plan(plan,text=True,capture_output=True)
+        (out/(name+'.log')).write_text(p.stdout+p.stderr);records.append({'name':name,'launch_plan':record_plan(plan),'exit_code':p.returncode});print(name,p.returncode,flush=True)
         if p.returncode:raise RuntimeError('native metric live check failed')
     for name in ['detection','segmentation']:
         report=json.loads((out/(name+'-tests.json')).read_text());assert report['failures']==0 and report['tests']>0
