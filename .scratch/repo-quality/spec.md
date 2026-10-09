@@ -47,7 +47,9 @@ Governing decisions: `docs/adr/0001-directories-express-concepts.md`, `docs/adr/
 2. **One repo gate:** a single Bazel target that runs every static quality check.
 3. **A machine-identifier boundary test** with a baseline allowlist that only shrinks.
 4. **Versioned git hooks and a full AGENTS.md.**
-5. **Self-tests for every checker, and ruff as a Bazel test.** Ruff excludes pinned and minified sources.
+5. **Written style guides:** Python, adapted from the Google Python Style Guide, and shell, adapted from the Google Shell Style Guide as milano did. Each is enforced by a tool: ruff lint and format for Python, ShellCheck for shell, and an AST import checker.
+   - Every checker ships with its own tests.
+   - Sources whose hash a retained receipt checks are never reformatted. The exclusion list is derived from receipts.
 
 ## Decisions (coordinator, under the user's delegation, 2026-10-09)
 
@@ -71,5 +73,5 @@ Governing decisions: `docs/adr/0001-directories-express-concepts.md`, `docs/adr/
 ## Out of Scope
 
 - Deleting anything in the cache without an explicit decision by the user.
-- Rewriting pinned or minified legacy sources for style.
+- Reformatting pinned sources, meaning any file whose hash a retained receipt or current-candidate audit checks.
 - C++ formatting: sureal has almost no C++.
