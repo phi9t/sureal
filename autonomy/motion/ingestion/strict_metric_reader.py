@@ -86,3 +86,11 @@ def parse_result(report, expected_counts=None, *, expected_filters=OBJECT_FILTER
         parsed['customMetrics']=custom
         classes[kind]=parsed
     return {'measurement_step':measurement_step,'classes':classes}
+
+def class_metrics(report, object_type, expected_counts=None, *, expected_filters=OBJECT_FILTERS, measurement_step=15):
+    parsed=parse_result(report,expected_counts,expected_filters=expected_filters,measurement_step=measurement_step)
+    kind=_integer(object_type)
+    try:
+        return parsed['classes'][kind]
+    except KeyError as error:
+        raise ValueError('motion class missing') from error

@@ -1,7 +1,10 @@
 """Analytic CLI boundaries; execute only in the locked native Motion runtime."""
 import json,subprocess,tempfile,unittest
 from pathlib import Path
+from motion.ingestion.strict_metric_reader import class_metrics
 BINARY='/motion-cli-build/compute_motion_metrics'
+def vehicle_metrics(report):
+ return class_metrics(report,1)
 class MotionNativeCliTests(unittest.TestCase):
  def fixture(self,root,offset=0,mode_offsets=None):
   scene='scenario_id: "analytic" current_time_index: 10 '
@@ -24,10 +27,10 @@ class MotionNativeCliTests(unittest.TestCase):
  def test_perfect_and_constant_offset_have_analytic_errors_and_counts(self):
   for error in [0,2]:
    with self.subTest(error=error):
-    result=self.run_case(error);bundles=result['metrics']['metricsBundles'];vehicle=next(x for x in bundles if x.get('objectFilter')=='TYPE_VEHICLE');self.assertAlmostEqual(float(vehicle['minAde']),error,places=5);self.assertAlmostEqual(float(vehicle['minFde']),error,places=5)
-    count=next(x for x in result['counts'] if x['object_type']==1 and x['measurement_step']==15);self.assertEqual(count['min_ade'],1);self.assertEqual(count['min_fde'],1)
+    result=self.run_case(error);vehicle=vehicle_metrics(result);self.assertAlmostEqual(vehicle['minAde'],error,places=5);self.assertAlmostEqual(vehicle['minFde'],error,places=5)
+    count=vehicle['counts'];self.assertEqual(count['min_ade'],1);self.assertEqual(count['min_fde'],1)
  def test_first_serialized_k_modes_not_confidence_reranking(self):
-  result=self.run_case(mode_offsets=[2,0]);vehicle=next(x for x in result['metrics']['metricsBundles'] if x.get('objectFilter')=='TYPE_VEHICLE');self.assertAlmostEqual(float(vehicle['minFde']),2,places=5)
+  result=self.run_case(mode_offsets=[2,0]);vehicle=vehicle_metrics(result);self.assertAlmostEqual(vehicle['minFde'],2,places=5)
  def test_malformed_identity_and_endpoint_refuse_without_output(self):
   for kind in ['malformed','identity','endpoint']:
    with self.subTest(kind=kind),tempfile.TemporaryDirectory() as tmp:
@@ -39,12 +42,12 @@ class MotionNativeCliTests(unittest.TestCase):
  def test_missing_future_labels_have_zero_measurement_counts(self):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp);cmd=self.fixture(root);p=root/'scenario.textproto';text=p.read_text();prefix,tail=text.split('center_x: 1.1 ',1);p.write_text(prefix+'center_x: 1.1 '+tail.replace('valid: true','valid: false'))
-   r=subprocess.run(cmd,capture_output=True,text=True);self.assertEqual(r.returncode,0,r.stderr);result=json.loads((root/'result.json').read_text());count=next(x for x in result['counts'] if x['object_type']==1 and x['measurement_step']==15);self.assertEqual(count['min_ade'],0);self.assertEqual(count['min_fde'],0);self.assertEqual(count['miss_rate'],0)
+   r=subprocess.run(cmd,capture_output=True,text=True);self.assertEqual(r.returncode,0,r.stderr);result=json.loads((root/'result.json').read_text());count=vehicle_metrics(result)['counts'];self.assertEqual(count['min_ade'],0);self.assertEqual(count['min_fde'],0);self.assertEqual(count['miss_rate'],0)
  def test_confident_wrong_mode_reduces_map_while_best_error_is_zero(self):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp);cmd=self.fixture(root,mode_offsets=[20,0]);p=root/'config.textproto';p.write_text(p.read_text().replace('max_predictions: 1','max_predictions: 2'))
    p=root/'predictions.textproto';p.write_text(p.read_text().replace('confidence: 1','confidence: 0.9',1).replace('confidence: 1','confidence: 0.1',1))
-   r=subprocess.run(cmd,capture_output=True,text=True);self.assertEqual(r.returncode,0,r.stderr);result=json.loads((root/'result.json').read_text());vehicle=next(x for x in result['metrics']['metricsBundles'] if x.get('objectFilter')=='TYPE_VEHICLE');self.assertAlmostEqual(float(vehicle['minFde']),0,places=5);self.assertAlmostEqual(float(vehicle['meanAveragePrecision']),0.5,places=5)
+   r=subprocess.run(cmd,capture_output=True,text=True);self.assertEqual(r.returncode,0,r.stderr);result=json.loads((root/'result.json').read_text());vehicle=vehicle_metrics(result);self.assertAlmostEqual(vehicle['minFde'],0,places=5);self.assertAlmostEqual(vehicle['meanAveragePrecision'],0.5,places=5)
  def test_nonfinite_speed_and_invalid_scaling_refused(self):
   for kind in ['velocity','scale']:
    with self.subTest(kind=kind),tempfile.TemporaryDirectory() as tmp:

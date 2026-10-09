@@ -1,6 +1,8 @@
 import copy
 import unittest
-from motion.ingestion.strict_metric_reader import parse_result
+from motion.ingestion import strict_metric_reader
+
+parse_result = strict_metric_reader.parse_result
 
 REAL_REPORT={
     'metrics':{'metricsBundles':[
@@ -36,6 +38,15 @@ class MotionStrictMetricReaderTests(unittest.TestCase):
                                     2:{'min_ade':1,'min_fde':1,'miss_rate':1,'overlap_rate':1}})
         self.assertEqual(parsed['classes'][1]['minAde'],0.0)
         self.assertEqual(parsed['classes'][1]['minFde'],0.0)
+
+    def test_class_metrics_selection_rejects_duplicate_object_filter(self):
+        selector=getattr(strict_metric_reader,'class_metrics',None)
+        self.assertIsNotNone(selector,'strict reader exposes a class metric selector')
+        self.assertEqual(selector(REAL_REPORT,1)['minFde'],0.0)
+        duplicate=copy.deepcopy(REAL_REPORT)
+        duplicate['metrics']['metricsBundles'].append(copy.deepcopy(duplicate['metrics']['metricsBundles'][0]))
+        with self.assertRaises(ValueError):
+            selector(duplicate,1)
 
     def test_missing_structural_field_unknown_duplicate_and_bad_step_fail(self):
         cases=[]

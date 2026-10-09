@@ -117,6 +117,7 @@ filegroup(
         deps = [":motion"] + (
             [":motion_native_cli_test_fixture"]
             if test in [
+                "cli/motion_cli_strict_reader_selection_test.py",
                 "cli/motion_joint_cli_test.py",
                 "pooled/motion_pooled_cli_test.py",
             ]

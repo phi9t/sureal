@@ -1,14 +1,18 @@
 import pathlib,json,csv,copy,time,resource
+from motion.ingestion.strict_metric_reader import parse_result
 start=time.monotonic();mapping={1:'TYPE_VEHICLE',2:'TYPE_PEDESTRIAN',3:'TYPE_CYCLIST'}
 def verify(score,expected):
- bundles={x['objectFilter']:x for x in score['metrics']['metricsBundles']};counts={x['object_type']:x for x in score['counts']};rows=[]
+ parsed=parse_result(score);classes=parsed['classes'];rows=[]
+ expected_kinds=set()
  for r in expected:
-  kind=int(r['object_type']);assert kind in mapping;bundle=bundles[mapping[kind]];count=counts[kind];ade=int(r['ade_count']);fde=int(r['fde_count'])
-  if int(bundle['measurementStep'])!=15 or count['measurement_step']!=15 or count['min_ade']!=ade or count['min_fde']!=fde:raise ValueError('count/horizon mismatch')
+  kind=int(r['object_type']);assert kind in mapping;expected_kinds.add(kind)
+  if kind not in classes:raise ValueError('extra native class')
+  metrics=classes[kind];count=metrics['counts'];ade=int(r['ade_count']);fde=int(r['fde_count'])
+  if count['min_ade']!=ade or count['min_fde']!=fde:raise ValueError('count/horizon mismatch')
   for key,value,number in [('minAde',float(r['ade']),ade),('minFde',float(r['fde']),fde)]:
-   if number and abs(float(bundle.get(key,0))-value)>1e-3:raise ValueError('literal displacement mismatch')
-  rows.append({'object_type':kind,'ADE_measurements':ade,'FDE_measurements':fde,'missing_endpoint_measurements':ade-fde,'minADE':float(bundle.get('minAde',0)),'minFDE':float(bundle.get('minFde',0))})
- if set(counts)!=set(int(r['object_type']) for r in expected):raise ValueError('extra native class')
+   if number and abs(metrics[key]-value)>1e-3:raise ValueError('literal displacement mismatch')
+  rows.append({'object_type':kind,'ADE_measurements':ade,'FDE_measurements':fde,'missing_endpoint_measurements':ade-fde,'minADE':metrics['minAde'],'minFDE':metrics['minFde']})
+ if set(classes)!=expected_kinds:raise ValueError('extra native class')
  return rows
 reports=[];refusals=0
 for split in ['training','validation']:
