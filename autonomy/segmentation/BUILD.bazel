@@ -54,6 +54,7 @@ py_library(
     deps = [
         "//autonomy/dataset:dataset",
         "//autonomy/evidence:evidence",
+        "//autonomy/geometry:oriented_box",
         "//autonomy/insula:insula",
     ],
 )

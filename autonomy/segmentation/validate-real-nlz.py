@@ -1,4 +1,7 @@
-"""Independent homogeneous-transform containment reconciliation."""
+"""Independent homogeneous-transform containment reconciliation.
+
+This copy deliberately stays independent of geometry.oriented_box so it can reconcile producer output.
+"""
 import json,math
 from pathlib import Path
 import numpy as np
