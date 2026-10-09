@@ -4,7 +4,7 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] `//autonomy/insula:m0_receipt_test` passes in a rebuilt rootfs whose lock records the current Dockerfile digest (ticket 27 found the lock at `61a783f4…` against the committed Dockerfile's `8e6c2a38…`)
 - [x] `//autonomy/segmentation:semantic_recovery_accounting_test`, `semantic_recovery_receipt_test` and `semantic_recovery_receipt_aligned_test` run on real semantic-recovery receipts, not the synthesized receipts ticket 27 used for its contract-only check
