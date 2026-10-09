@@ -19,9 +19,14 @@ SCIENTIFIC_COHORT_TARGET='//autonomy/studies:scientific_cohort'
 def save(p,data):
  p.write_text(json.dumps(data,indent=2)+'\n')
 def total(p):return sum(f.stat().st_size for f in p.rglob('*') if f.is_file())
+def check_succeeded(check):
+ if 'exit_code' in check:return check['exit_code']==0
+ return (check.get('verified_by_readback') is True and isinstance(check.get('blob_key'),str)
+         and isinstance(check.get('sha256'),str) and len(check.get('sha256'))==64
+         and type(check.get('bytes')) is int and check.get('bytes')>=0)
 def audit(path,artifact_root=None):
  receipt=json.loads(path.read_text());root=artifact_root or path.parent
- if not receipt.get('checks') or any(c['exit_code'] for c in receipt['checks']):raise ValueError('successful live checks required: '+str(path))
+ if not receipt.get('checks') or any(not check_succeeded(c) for c in receipt['checks']):raise ValueError('successful live checks required: '+str(path))
  for n,h in receipt['candidate_hashes'].items():
   if sha(HERE/n)!=h:raise ValueError('current candidate differs: '+n)
  for n,h in receipt['artifacts'].items():

@@ -89,6 +89,30 @@ class ScientificCohortWorkflowTests(unittest.TestCase):
             self.assertEqual(mounts["input:/srv"]["host_path"], str(replay.resolve()))
             self.assertNotIn("source", mounts)
 
+    def test_audit_accepts_blob_readback_checks_without_exit_code(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            artifact = root / "artifact.txt"
+            artifact.write_text("verified\n")
+            receipt = self.write_receipt(
+                root / "receipt.json",
+                checks=[
+                    {"stage": "pack-live", "exit_code": 0},
+                    {
+                        "stage": "archive-blob-fetch",
+                        "blob_key": "runs/test/blob",
+                        "sha256": "a" * 64,
+                        "bytes": 8,
+                        "verified_by_readback": True,
+                    },
+                ],
+                artifacts={"artifact.txt": file_sha256(artifact)},
+            )
+
+            audited = scientific_cohort.audit(receipt, root)
+
+            self.assertEqual(audited["checks"][1]["stage"], "archive-blob-fetch")
+
     def test_point_and_camera_lifecycle_dispatches_under_study_owner(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
