@@ -1,12 +1,10 @@
 """Host staging and offline recovery of one externally admitted point archive."""
 import json
 from pathlib import Path
-import subprocess
 import time
 from evidence.source_snapshot import file_sha256 as sha, require_regular_file
-from insula.entry import launch_plan
-from insula.runtime_identity import verify_rootfs
 from insula.staging_lease import staging_lease
+from segmentation.launches import build_segmentation_plan, load_runtime_for_root, plan_receipt, run_segmentation_plan
 from segmentation.semantic_recovery_runtime import recovery_rootfs, validate_recovery_output
 from segmentation.staged_derived_archive_aligned import staged_derived_archive
 
@@ -44,13 +42,12 @@ def recover_semantic_archive(record,*,cache,code_root,output,blob_store=None,blo
             or pub['archive']['archive_bytes']!=record['archive_bytes']
             or pub['archive']['report_sha256']!=record['report_sha256']):
         raise ValueError('recovery publication source/membership differs')
-    root=recovery_rootfs(cache);lock=json.loads(Path(str(root)+'.lock.json').read_text())
-    verify_rootfs(root,lock['rootfs_sha256'])
+    root=recovery_rootfs(cache);runtime=load_runtime_for_root(root);lock=runtime.data
     names=['segmentation/semantic_recovery_job_aligned.py','segmentation/semantic_archive_support.py',
            'dataset/scientific_dataset.py','dataset/scene_archive_validate.py',
            'segmentation/semantic_support.py','segmentation/staged_derived_archive_aligned.py',
            'segmentation/semantic_recovery_runtime.py',
-           'insula/staging_lease.py','insula/entry.py','insula/runtime_identity.py']
+           'segmentation/launches.py','insula/staging_lease.py','insula/launch_plan.py','insula/runtime_roots.py']
     pins={n:sha(code_root/n) for n in names}
     with staged_derived_archive(record,staging_cache,working_limit_bytes=15*1024**3,
                                 blob_store=blob_store,blob_adapter=blob_adapter) as (archive,transfer):
@@ -70,15 +67,14 @@ r['worker_resources']={'elapsed_seconds':time.monotonic()-started,'peak_rss_kib'
 Path('/outputs/support.json').write_text(json.dumps(r,indent=2)+'\\n')
 print('PASS recovered native semantic support',d['scene'],r['eligible_point_elements'])
 """
-        command=launch_plan(root,code_root,archive.parent,worker_output,['python','-c',program])
-        index=command.index('--');command[index:index]=['--ro-bind',str(inputs),'/mnt']
-        started=time.monotonic();result=subprocess.run(command,capture_output=True,text=True,timeout=3600)
+        plan=build_segmentation_plan(runtime,code_root=code_root,source=archive.parent,output=worker_output,command=['python','-c',program],named_inputs={'/mnt':inputs})
+        started=time.monotonic();result=run_segmentation_plan(plan,capture_output=True,text=True,timeout=3600)
         (output/'live.log').write_text(result.stdout+result.stderr)
         if result.returncode:raise ValueError('offline semantic recovery failed; preserve logs')
         if sha(publication)!=record['publication_manifest_sha256'] or pins!={n:sha(code_root/n) for n in pins}:
             raise ValueError('recovery source/code changed')
         validation=json.loads((worker_output/'support.json').read_text())
-        receipt={'checks':[{'command':command,'exit_code':0}],'runtime_lock':lock,
+        receipt={'checks':[{'launch_plan':plan_receipt(plan),'exit_code':0}],'runtime_lock':lock,
                  'elapsed_seconds':time.monotonic()-started,'candidate_hashes':pins,
                  'input_identity':record,'transfer':transfer,'validation':validation,
                  'artifacts':artifact_hashes(output),
