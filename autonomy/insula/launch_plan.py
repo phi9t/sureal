@@ -96,6 +96,7 @@ class Mount:
     mode: str
     host_path: Path | None = None
     phase: str = "before_devices"
+    digest: str | None = None
 
 
 @dataclass(frozen=True)
@@ -177,6 +178,7 @@ def build_plan(
     extra_environment: Mapping[str, object] | None = None,
     gpu_index: int | None = None,
     source_snapshot_digest: str | None = None,
+    allow_readonly_inputs_cover_output: bool = False,
 ) -> LaunchPlan:
     mounts = [
         Mount("runtime", "bind", "/", "read_only", runtime.rootfs),
@@ -220,6 +222,7 @@ def build_plan(
         working_directory="/experiment",
         unshare_flags=("--unshare-all", "--die-with-parent"),
         gpu=gpu,
+        allow_readonly_inputs_cover_output=allow_readonly_inputs_cover_output,
     )
     if source_snapshot_digest is not None:
         object.__setattr__(plan, "_source_snapshot_digest", source_snapshot_digest)
@@ -250,11 +253,17 @@ def render_plan(plan: LaunchPlan) -> list[str]:
     """Render a launch plan to bwrap argv at the execution boundary."""
     argv = ["bwrap", *plan.unshare_flags]
     for mount in plan.mounts:
-        if mount.phase == "before_devices":
+        if mount.phase == "before_devices" and not _mount_under_tmp(mount):
+            argv.extend(_render_mount(mount))
+    for mount in plan.mounts:
+        if mount.role == "tmp":
+            argv.extend(_render_mount(mount))
+    for mount in plan.mounts:
+        if mount.phase == "before_devices" and _mount_under_tmp(mount):
             argv.extend(_render_mount(mount))
     argv.extend(["--proc", "/proc", "--dev", "/dev"])
     for mount in plan.mounts:
-        if mount.phase == "after_devices":
+        if mount.phase == "after_devices" and mount.role != "tmp":
             argv.extend(_render_mount(mount))
     argv.append("--clearenv")
     for item in plan.environment:
@@ -320,9 +329,13 @@ def _assemble_plan(
     working_directory: str,
     unshare_flags: Iterable[object],
     gpu: GPURequest | None = None,
+    allow_readonly_inputs_cover_output: bool = False,
 ) -> LaunchPlan:
     mount_tuple = tuple(mounts)
-    _validate_mounts(mount_tuple)
+    _validate_mounts(
+        mount_tuple,
+        allow_readonly_inputs_cover_output=allow_readonly_inputs_cover_output,
+    )
     return LaunchPlan(
         runtime=runtime,
         mounts=mount_tuple,
@@ -671,7 +684,11 @@ def _validate_named_input_path(path: str) -> None:
         raise PlanError(f"{path}: named input must be under /tmp, /opt, /srv or /mnt")
 
 
-def _validate_mounts(mounts: tuple[Mount, ...]) -> None:
+def _validate_mounts(
+    mounts: tuple[Mount, ...],
+    *,
+    allow_readonly_inputs_cover_output: bool = False,
+) -> None:
     host_mounts = []
     inside_roles: dict[str, str] = {}
     for mount in mounts:
@@ -688,8 +705,27 @@ def _validate_mounts(mounts: tuple[Mount, ...]) -> None:
                     continue
                 raise PlanError(f"{left.role} and {right.role}: host path mounted twice")
             overlaps = left_path in right_path.parents or right_path in left_path.parents
+            if (
+                allow_readonly_inputs_cover_output
+                and overlaps
+                and _readonly_input_covers_output(left, right, left_path, right_path)
+            ):
+                continue
             if overlaps and ("writable" in (left.mode, right.mode)):
                 raise PlanError(f"{left.role} and {right.role}: writable mount overlaps another mount")
+
+def _readonly_input_covers_output(left: Mount, right: Mount, left_path: Path, right_path: Path) -> bool:
+    pairs = ((left, right, left_path, right_path), (right, left, right_path, left_path))
+    for input_mount, output_mount, input_path, output_path in pairs:
+        if (
+            input_mount.role.startswith("input:")
+            and input_mount.mode == "read_only"
+            and output_mount.role == "output"
+            and output_mount.mode == "writable"
+            and input_path in output_path.parents
+        ):
+            return True
+    return False
 
 
 def _render_mount(mount: Mount) -> list[str]:
@@ -697,12 +733,18 @@ def _render_mount(mount: Mount) -> list[str]:
         return ["--tmpfs", mount.inside_path]
     if mount.host_path is None:
         raise PlanError(f"{mount.role}: host path required")
+    if mount.digest is not None and _mounted_file_sha256(mount.host_path, mount.role) != mount.digest:
+        raise PlanError(f"{mount.role}: mounted file changed")
     if mount.kind == "dev-bind":
         return ["--dev-bind", str(mount.host_path), mount.inside_path]
     if mount.kind != "bind":
         raise PlanError(f"{mount.role}: unsupported mount kind {mount.kind}")
     flag = "--bind" if mount.mode == "writable" else "--ro-bind"
     return [flag, str(mount.host_path), mount.inside_path]
+
+
+def _mount_under_tmp(mount: Mount) -> bool:
+    return mount.inside_path.startswith("/tmp/")
 
 
 def _mount_data(mount: Mount, *, include_host: bool) -> dict:
@@ -712,6 +754,8 @@ def _mount_data(mount: Mount, *, include_host: bool) -> dict:
         "mode": mount.mode,
         "kind": mount.kind,
     }
+    if mount.digest is not None:
+        data["digest"] = mount.digest
     if include_host and mount.host_path is not None:
         data["host_path"] = str(Path(mount.host_path).resolve())
     return data
@@ -719,7 +763,9 @@ def _mount_data(mount: Mount, *, include_host: bool) -> dict:
 
 def _record_mount(plan: LaunchPlan, mount: Mount) -> dict:
     data = _mount_data(mount, include_host=False)
-    if mount.role == "runtime":
+    if mount.digest is not None:
+        data["digest"] = mount.digest
+    elif mount.role == "runtime":
         data["digest"] = plan.runtime.data.get("rootfs_sha256", "")
     elif mount.role == "code" and hasattr(plan, "_source_snapshot_digest"):
         data["digest"] = getattr(plan, "_source_snapshot_digest")
@@ -771,6 +817,7 @@ def _gpu_mounts_environment_and_request(gpu_index: int):
                 "/driver/" + path.name,
                 "read_only",
                 path,
+                digest=_mounted_file_sha256(path, f"gpu-driver:{path.name}"),
             )
         )
     for host, guest in _gpu_device_pairs(gpu_index):
@@ -876,6 +923,16 @@ def _gpu_driver_paths() -> list[Path]:
             raise PlanError(f"GPU driver library {prefix} not found in {searched}")
         found_paths.extend(found)
     return found_paths
+
+
+def _mounted_file_sha256(path: Path, role: str) -> str:
+    try:
+        resolved = Path(path).resolve(strict=True)
+    except FileNotFoundError as exc:
+        raise PlanError(f"{role}: mounted file missing: {path}") from exc
+    if not resolved.is_file():
+        raise PlanError(f"{role}: mounted file required: {path}")
+    return file_sha256(resolved)
 
 
 __all__ = [

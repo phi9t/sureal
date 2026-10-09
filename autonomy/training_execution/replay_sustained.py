@@ -21,7 +21,7 @@ def safe(root,name):
 
 def main():
  if importlib.util.find_spec('tensorflow') is not None or not torch.cuda.is_available() or torch.cuda.device_count()!=1:raise ValueError('one native GPU and TensorFlow absence required')
- torch.cuda.reset_peak_memory_stats();started=time.monotonic();manifest_path=Path('/source/manifest.json');manifest=json.loads(manifest_path.read_text());audit=json.loads(Path('/source/audit.json').read_text())
+ torch.cuda.reset_peak_memory_stats();started=time.monotonic();manifest_path=Path('/tmp/inputs/manifest.json');manifest=json.loads(manifest_path.read_text());audit=json.loads(Path('/tmp/inputs/audit.json').read_text())
  frames=manifest['frames'];validate_contract(manifest['candidate'],[{k:f[k] for k in ['identity','split','sha256']} for f in frames]);validate_sources('/experiment',manifest['source_hashes'],manifest['runtime_lock'],json.loads(Path('/tmp/runtime-lock.json').read_text()))
  identity={'manifest_sha256':sha(manifest_path),'source_hashes':manifest['source_hashes'],'runtime_lock':manifest['runtime_lock'],'recipe':manifest['recipe']}
  checkpoint=Path('/tmp/retained/checkpoint.pt')

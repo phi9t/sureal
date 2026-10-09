@@ -44,7 +44,7 @@ def _host_materialization_root(root,receipt):
  return Path(receipt.get('source_snapshot_root',root))
 
 def validate_sources(root,receipt,runtime_lock,admitted_runtime_lock,*,materialize_missing=False):
- if not isinstance(runtime_lock,dict) or runtime_lock!=admitted_runtime_lock or re.fullmatch('[0-9a-f]{64}',str(runtime_lock.get('rootfs_sha256',''))) is None or not runtime_lock.get('image_id'):raise ValueError('matching externally admitted runtime lock required')
+ if not isinstance(runtime_lock,dict) or runtime_lock!=admitted_runtime_lock or re.fullmatch('[0-9a-f]{64}',str(runtime_lock.get('rootfs_sha256',''))) is None:raise ValueError('matching externally admitted runtime lock required')
  root=Path(root)
  store=store_from_receipt(receipt,env_var='SUREAL_SOURCE_SNAPSHOT_STORE')
  if not root.exists():

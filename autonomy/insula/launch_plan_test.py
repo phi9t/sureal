@@ -220,6 +220,7 @@ class LaunchPlanTests(unittest.TestCase):
             self.assertEqual(argv[0], "bwrap")
             self.assertIn("--clearenv", argv)
             self.assertIn("/tmp/tables", argv)
+            self.assertLess(argv.index("/tmp"), argv.index("/tmp/tables"))
             self.assertEqual(argv[-2:], ["python", "main.py"])
 
     def test_default_lock_loader_uses_rootfs_default_lock_path(self):
@@ -437,6 +438,38 @@ class LaunchPlanTests(unittest.TestCase):
                     command=["true"],
                 )
 
+    def test_readonly_named_input_covering_output_requires_explicit_option(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            runtime = self.load_fixture_runtime(root)
+            code = root / "code"
+            scientific = root / "scientific"
+            output = scientific / "run-output"
+            code.mkdir()
+            output.mkdir(parents=True)
+
+            with self.assertRaisesRegex(ValueError, "input:/tmp/scientific.*output|output.*input:/tmp/scientific"):
+                build_plan(
+                    runtime,
+                    code=code,
+                    output=output,
+                    named_inputs={"/tmp/scientific": scientific},
+                    command=["true"],
+                )
+
+            plan = build_plan(
+                runtime,
+                code=code,
+                output=output,
+                named_inputs={"/tmp/scientific": scientific},
+                command=["true"],
+                allow_readonly_inputs_cover_output=True,
+            )
+
+            mounts = {mount["inside_path"]: mount for mount in plan_data(plan)["mounts"]}
+            self.assertEqual(mounts["/tmp/scientific"]["mode"], "read_only")
+            self.assertEqual(mounts["/outputs"]["mode"], "writable")
+
     def test_extra_environment_cannot_replace_module_owned_variables(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -497,6 +530,21 @@ class LaunchPlanTests(unittest.TestCase):
                 )
 
             data = plan_data(plan)
+            driver_hashes = {
+                name: file_sha256(driver_dir / name)
+                for name in (
+                    "libcuda.so",
+                    "libnvidia-ptxjitcompiler.so",
+                    "libnvidia-nvvm.so",
+                )
+            }
+            driver_mounts = {
+                mount["role"]: mount
+                for mount in data["mounts"]
+                if mount["role"].startswith("gpu-driver:")
+            }
+            for name, digest in driver_hashes.items():
+                self.assertEqual(driver_mounts[f"gpu-driver:{name}"]["digest"], digest)
             self.assertEqual(
                 data["devices"],
                 [
@@ -534,6 +582,24 @@ class LaunchPlanTests(unittest.TestCase):
             self.assertEqual(
                 record["gpu"],
                 {"requested_index": 1, "device_uuid": "GPU-fixture-1"},
+            )
+            record_driver_mounts = {
+                mount["role"]: mount
+                for mount in record["mounts"]
+                if mount["role"].startswith("gpu-driver:")
+            }
+            for name, digest in driver_hashes.items():
+                self.assertEqual(record_driver_mounts[f"gpu-driver:{name}"]["digest"], digest)
+            (driver_dir / "libcuda.so").write_text("swapped libcuda")
+            with self.assertRaisesRegex(PlanError, "gpu-driver:libcuda.so.*changed"):
+                render_plan(plan)
+            self.assertEqual(
+                {
+                    mount["role"]: mount["digest"]
+                    for mount in record_plan(plan)["mounts"]
+                    if mount["role"].startswith("gpu-driver:")
+                },
+                {f"gpu-driver:{name}": digest for name, digest in driver_hashes.items()},
             )
             raw_record = json.dumps(record, sort_keys=True)
             self.assertNotIn(str(devices), raw_record)

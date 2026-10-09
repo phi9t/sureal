@@ -34,7 +34,7 @@ def main():
  reference_chunk=sibling_reference_chunk()
  from training_execution.replay_sustained import main as replay_heads
  torch.cuda.reset_peak_memory_stats();started=time.monotonic()
- manifestpath=Path('/source/manifest.json');manifest=json.loads(manifestpath.read_text());expected=json.loads(Path('/source/transition.json').read_text())
+ manifestpath=Path('/tmp/inputs/manifest.json');manifest=json.loads(manifestpath.read_text());expected=json.loads(Path('/tmp/inputs/transition.json').read_text())
  if set(expected)!={'manifest_sha256','checkpoint_sha256','previous_checkpoint_sha256','report_sha256','start_step','terminal_step'} or sha(manifestpath)!=expected['manifest_sha256']:raise ValueError('complete external transition identity required')
  framesmeta=manifest['frames'];validate_contract(manifest['candidate'],[{k:f[k] for k in ['identity','split','sha256']} for f in framesmeta]);validate_sources('/experiment',manifest['source_hashes'],manifest['runtime_lock'],json.loads(Path('/tmp/runtime-lock.json').read_text()))
  identity={'manifest_sha256':sha(manifestpath),'source_hashes':manifest['source_hashes'],'runtime_lock':manifest['runtime_lock'],'recipe':manifest['recipe']}
@@ -70,7 +70,7 @@ def main():
  actual=reference_chunk(model,opt,frames,loss,identity,terminal,checkpoint=previous);require_exact_state(state,actual,exclude_training_seconds=True)
  peak=torch.cuda.max_memory_allocated();rss=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
  if peak>8*1024**3 or rss>16*1024**2:raise ValueError('transition verifier resource cap exceeded')
- audit=json.loads(Path('/source/audit.json').read_text())
+ audit=json.loads(Path('/tmp/inputs/audit.json').read_text())
  if audit.get('pilot_reference') or audit['checkpoint_sha256']!=expected['checkpoint_sha256'] or audit['head_hashes']!=report['head_hashes']:raise ValueError('exact checkpoint/head audit inputs required')
  del actual,model,opt,previous,state,frames
  replay_heads()

@@ -9,6 +9,7 @@ GPU_TESTS = [
     "audit_sustained_transition_test.py",
     "sustained_chunk_reference_test.py",
     "sustained_loop_test.py",
+    "sustained_launch_plan_gpu_smoke_test.py",
     "sustained_reference_test.py",
     "sustained_state_test.py",
     "sustained_worker_guard_test.py",

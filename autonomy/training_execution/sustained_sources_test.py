@@ -123,5 +123,16 @@ class SustainedSourceTests(unittest.TestCase):
    root=Path(tmp)/'repo';store=Path(tmp)/'snapshots';receipt,lock=self.fixture(root,store)
    for bad in [{},{**lock,'rootfs_sha256':'c'*64}]:
     with self.assertRaises(ValueError):validate_sources(root,receipt,bad,lock)
+ def test_runtime_admission_accepts_recipe_digest_lock_loaded_by_launch_plan(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   root=Path(tmp)/'repo';store=Path(tmp)/'snapshots';receipt,lock=self.fixture(root,store)
+   recipe_lock={
+    'schema_version':1,
+    'rootfs_sha256':lock['rootfs_sha256'],
+    'dockerfile_sha256':'d'*64,
+    'requirements_sha256':'e'*64,
+    'bazel_version':'9.2.0',
+   }
+   self.assertEqual(validate_sources(root,receipt,recipe_lock,recipe_lock)['rootfs_sha256'],lock['rootfs_sha256'])
 
 if __name__=='__main__':unittest.main()

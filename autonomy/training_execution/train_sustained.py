@@ -22,7 +22,7 @@ def relative(root,name):
 
 def main():
  if importlib.util.find_spec('tensorflow') is not None or not torch.cuda.is_available() or torch.cuda.device_count()!=1:raise ValueError('one native GPU and TensorFlow absence required')
- started=time.monotonic();manifest_path=Path('/source/manifest.json');manifest=json.loads(manifest_path.read_text());job=json.loads(Path('/source/job.json').read_text())
+ started=time.monotonic();manifest_path=Path('/tmp/inputs/manifest.json');manifest=json.loads(manifest_path.read_text());job=json.loads(Path('/tmp/inputs/job.json').read_text())
  frames_meta=manifest['frames'];admitted=[{k:f[k] for k in ['identity','split','sha256']} for f in frames_meta];validate_contract(manifest['candidate'],admitted)
  names={'baseline':'baseline','residual_bev':'residual_bev','class_balanced':'class_balanced_focal','prior_bias':'foreground_prior'}
  recipe=manifest['recipe']
