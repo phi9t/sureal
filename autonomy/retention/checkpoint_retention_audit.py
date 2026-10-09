@@ -8,18 +8,23 @@ base=Path('/tmp/inputs')
 pub=json.loads((base/'publication.json').read_text());original=json.loads((base/'readback.json').read_text());expected=json.loads((base/'expected.json').read_text())
 assert sha(base/'readback.json')==pub['publication_manifest_sha256']
 assert sha(base/'expected.json')==pub['checkpoint_inventory_sha256']
+PREFIX='runs/perception-sustained-checkpoints/'
+def blob_key(value):
+ marker='/'+PREFIX
+ if not isinstance(value,str) or marker not in value:raise ValueError('wrong checkpoint namespace')
+ return PREFIX+value.split(marker,1)[1].lstrip('/')
 
 def validate(candidate,check_local=True):
  if candidate.get('manifest_readback_exact') is not True or candidate.get('source_admission_complete') is not True:raise ValueError('readback/source admission required')
  for key in ['chunks','source_sha256','parent_receipts','checkpoint_inventory_sha256','runtime_lock','source_pins','waystone_tool_sha256','host_source_pins']:
   if candidate[key]!=original[key]:raise ValueError('global manifest differs')
  if candidate['source_sha256']!=expected['source_sha256'] or candidate['parent_receipts']!=expected['parent_receipts']:raise ValueError('independent parent inventory differs')
- uri=candidate['publication_manifest_hdfs_uri'];prefix=uri.rsplit('/',1)[0]
- if not prefix.startswith('hdfs://harunava/user/tiger/waystone/sureal/runs/perception-sustained-checkpoints/balanced16-sustained-') or uri!=prefix+'/publication-manifest.json':raise ValueError('wrong checkpoint namespace')
+ uri=candidate['publication_manifest_hdfs_uri'];prefix=uri.rsplit('/',1)[0];prefix_key=blob_key(prefix)
+ if not prefix_key.startswith(PREFIX+'balanced16-sustained-') or blob_key(uri)!=prefix_key+'/publication-manifest.json':raise ValueError('wrong checkpoint namespace')
  union={};payload=0
  for chunk in candidate['chunks']:
   manifest=chunk['manifest'];members=manifest['members'];size=sum(member['bytes'] for member in members);digest=manifest['archive_sha256']
-  if size!=manifest['payload_bytes'] or size>768*1024**2 or chunk['archive_hdfs_uri']!=prefix+'/'+digest+'/archive.tar.gz' or chunk['manifest_hdfs_uri']!=prefix+'/'+digest+'/manifest.json':raise ValueError('chunk identity/size differs')
+  if size!=manifest['payload_bytes'] or size>768*1024**2 or blob_key(chunk['archive_hdfs_uri'])!=prefix_key+'/'+digest+'/archive.tar.gz' or blob_key(chunk['manifest_hdfs_uri'])!=prefix_key+'/'+digest+'/manifest.json':raise ValueError('chunk identity/size differs')
   checks=chunk['checks']
   if [check['stage'] for check in checks]!=['create-live','archive-put','archive-get','manifest-put','manifest-get','verify-live','rehydrate-live'] or any(check['exit_code']!=0 for check in checks):raise ValueError('missing live or transfer gate')
   for index in (0,5,6):

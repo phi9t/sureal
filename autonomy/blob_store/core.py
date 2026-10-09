@@ -50,6 +50,12 @@ WAYSTONE_TOOL_RELATIVES = (
     "native/libhdfs_client/dist/lib/libhdfs_client.so",
     "native/libhdfs_client/dist/bin/hdfs.bin",
 )
+WAYSTONE_TOOL_ROLES_BY_RELATIVE = {
+    "scripts/waystone": "waystone-cli",
+    "rust/target/debug/waystone": "waystone-binary",
+    "native/libhdfs_client/dist/lib/libhdfs_client.so": "libhdfs-client",
+    "native/libhdfs_client/dist/bin/hdfs.bin": "hdfs-bin",
+}
 
 
 class BlobStoreError(RuntimeError):
@@ -813,6 +819,19 @@ def waystone_tool_pins(waystone=None) -> dict[str, str]:
     return pins
 
 
+def normalize_waystone_tool_digest(tool_digest: Mapping[str, str]) -> dict[str, str]:
+    if not isinstance(tool_digest, Mapping) or not tool_digest:
+        raise ValueError("Waystone tool digest required")
+    result = {}
+    for tool, digest in sorted(tool_digest.items()):
+        role = _waystone_tool_role(tool)
+        digest = _require_sha256(digest)
+        if role in result and result[role] != digest:
+            raise ValueError("Waystone tool digest role conflict")
+        result[role] = digest
+    return result
+
+
 def validate_blob_key(key: str) -> str:
     if not isinstance(key, str):
         raise ValueError("blob key must be a string")
@@ -911,6 +930,26 @@ def _default_waystone() -> Path:
     except KeyError:
         home = Path.home()
     return home / DEFAULT_WAYSTONE_RELATIVE
+
+
+def _waystone_tool_role(value) -> str:
+    if not isinstance(value, str):
+        raise ValueError("Waystone tool digest role required")
+    if "/" not in value and "\\" not in value:
+        return _validate_waystone_tool_role(value)
+    normalized = value.replace("\\", "/").strip()
+    for relative, role in WAYSTONE_TOOL_ROLES_BY_RELATIVE.items():
+        if normalized == relative or normalized.endswith("/" + relative):
+            return role
+    raise ValueError("Waystone tool digest path must name a known tool")
+
+
+def _validate_waystone_tool_role(value: str) -> str:
+    if not isinstance(value, str) or not value or value != value.strip():
+        raise ValueError("Waystone tool digest role required")
+    if "/" in value or "\\" in value or value in {".", ".."}:
+        raise ValueError("Waystone tool digest role must not be a path")
+    return value
 
 
 def _descriptor_command_prefix(command_prefix, waystone):

@@ -9,8 +9,7 @@ from evidence.source_snapshot import LocalSnapshotStore
 from insula.entry import launch_plan
 from resources.backend import ResourceBackend
 from resources.command import wrapped_command
-from resources.retention import materialize_execution_package
-from resources.retention_audit import LIMIT, validate_union
+from resources.retention_audit import LIMIT, materialize_execution_package, validate_union
 from resources.sources import sha,validate_sources as validate_resource_sources
 from resources.stage import validate_proof
 from resources.stage_accounting import MEASUREMENT, admit_worker

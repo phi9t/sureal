@@ -43,7 +43,7 @@ class ResourceRetentionTests(unittest.TestCase):
                 with self.assertRaises(ValueError):validate(bad,expected,readback,raw)
 
     def test_chunk_partition_is_complete_bounded_and_order_independent(self):
-        try:from resources.retention import partition
+        try:from resources.retention_audit import partition
         except ImportError:self.fail('resource retention needs bounded chunk partitioning before writes')
         values={'b':{'bytes':7},'a':{'bytes':5},'c':{'bytes':4}}
         result=partition(values,10);self.assertEqual(result,[['a'],['b'],['c']]);self.assertEqual(partition(dict(reversed(list(values.items()))),10),result)
@@ -78,21 +78,21 @@ class ResourceRetentionTests(unittest.TestCase):
                 with self.assertRaises(ValueError):validate_archive_snapshot(pub,candidate,bad,'rehydrate')
 
     def test_cross_filesystem_member_uses_verified_bounded_copy(self):
-        try:from resources.retention import stage_member
+        try:from resources.retention_audit import stage_member
         except ImportError:self.fail('driver inputs on another filesystem require bounded verified staging')
         with tempfile.TemporaryDirectory() as temp:
             root=Path(temp);source=root/'driver.so';source.write_bytes(b'driver bytes');entry={'path':str(source),'sha256':sha(source),'bytes':source.stat().st_size};destination=root/'staged.so'
-            with patch('resources.retention.os.link',side_effect=OSError(errno.EXDEV,'cross-device')):
+            with patch('resources.retention_audit.os.link',side_effect=OSError(errno.EXDEV,'cross-device')):
                 result=stage_member(entry,destination,root,reserve=lambda *_: None);self.assertEqual(destination.read_bytes(),source.read_bytes());self.assertEqual(result['storage'],'copied');self.assertEqual(result['bytes'],len(b'driver bytes'))
-            with patch('resources.retention.os.link',side_effect=OSError(errno.EACCES,'not permitted')):
+            with patch('resources.retention_audit.os.link',side_effect=OSError(errno.EACCES,'not permitted')):
                 with self.assertRaises(OSError):stage_member(entry,root/'refused.so',root)
             self.assertFalse((root/'refused.so').exists())
-            with patch('resources.retention.os.link',side_effect=OSError(errno.EXDEV,'cross-device')):
+            with patch('resources.retention_audit.os.link',side_effect=OSError(errno.EXDEV,'cross-device')):
                 with self.assertRaises(ValueError):stage_member(entry,root/'budget-refused.so',root,reserve=lambda *_: (_ for _ in ()).throw(ValueError('reserve refused')))
             self.assertFalse((root/'budget-refused.so').exists())
 
     def test_execution_package_uses_admitted_evidence_helper_not_current_tree(self):
-        try:from resources.retention import materialize_execution_package
+        try:from resources.retention_audit import materialize_execution_package
         except ImportError:self.fail('retained execution must materialize helper packages from the admitted source closure')
         with tempfile.TemporaryDirectory() as temp:
             root=Path(temp);code=root/'code';execution=root/'execution';archive=root/'archive.py'

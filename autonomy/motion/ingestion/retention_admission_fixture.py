@@ -1,17 +1,22 @@
 import pathlib,json,copy,time,resource
 from evidence.source_snapshot import file_sha256 as sha
 start=time.monotonic();base=pathlib.Path('/source')
+PREFIX='runs/perception-motion/'
+def blob_key(value):
+ marker='/'+PREFIX
+ if not isinstance(value,str) or marker not in value:raise ValueError('namespace')
+ return PREFIX+value.split(marker,1)[1].lstrip('/')
 def validate(pub,original,expected,check_local=True):
  if not pub['manifest_readback_exact'] or pub['chunk_limit_bytes']!=32*1024**2:raise ValueError('readback/chunk admission')
  for key in ['chunks','source_sha256','parent_receipts','runtime_lock','source_pins','tool_pins','hdfs_prefix']:
   if pub[key]!=original[key]:raise ValueError('global readback differs')
- prefix=pub['hdfs_prefix']
- if not prefix.startswith('hdfs://harunava/user/tiger/waystone/sureal/runs/perception-motion/') or pub['publication_manifest_hdfs_uri']!=prefix+'/publication-manifest.json':raise ValueError('namespace')
+ prefix=pub['hdfs_prefix'];prefix_key=blob_key(prefix)
+ if blob_key(pub['publication_manifest_hdfs_uri'])!=prefix_key+'/publication-manifest.json':raise ValueError('namespace')
  if pub['source_sha256']!=expected:raise ValueError('parent artifact set')
  union={};payload=0
  for i,chunk in enumerate(pub['chunks']):
-  manifest=chunk['manifest'];members=manifest['members'];size=sum(x['bytes'] for x in members);digest=manifest['archive_sha256'];uri=prefix+'/chunk-'+str(i).zfill(3)+'/'+digest
-  if chunk['index']!=i or chunk['archive_hdfs_uri']!=uri+'/archive.tar.gz' or chunk['manifest_hdfs_uri']!=uri+'/manifest.json' or size!=manifest['payload_bytes'] or size>pub['chunk_limit_bytes']:raise ValueError('chunk identity/size')
+  manifest=chunk['manifest'];members=manifest['members'];size=sum(x['bytes'] for x in members);digest=manifest['archive_sha256'];uri=prefix_key+'/chunk-'+str(i).zfill(3)+'/'+digest
+  if chunk['index']!=i or blob_key(chunk['archive_hdfs_uri'])!=uri+'/archive.tar.gz' or blob_key(chunk['manifest_hdfs_uri'])!=uri+'/manifest.json' or size!=manifest['payload_bytes'] or size>pub['chunk_limit_bytes']:raise ValueError('chunk identity/size')
   if [x['mode'] for x in chunk['live_proofs']]!=['create','verify','rehydrate']:raise ValueError('missing live proof')
   for proof in chunk['live_proofs']:
    v=proof['validation']

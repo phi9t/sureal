@@ -20,9 +20,7 @@ def artifact_hashes(root):
     return artifacts
 
 
-def recover_semantic_archive(record,*,cache,code_root,output,blob_store=None,blob_adapter=None,transfer_command=None,staging_cache=None):
-    if transfer_command is not None:
-        raise ValueError('transfer command injection retired; inject a blob store')
+def recover_semantic_archive(record,*,cache,code_root,output,blob_store=None,blob_adapter=None,staging_cache=None):
     cache,code_root,output=map(Path,(cache,code_root,output))
     staging_cache=Path(staging_cache) if staging_cache is not None else cache
     # Refuse the active queue before touching source metadata/output. The stage

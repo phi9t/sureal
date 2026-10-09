@@ -64,12 +64,15 @@ py_test(
     size = "medium",
     tags = [
         "manual",
+        "no-sandbox",
         "perception_unit",
         "requires_hdfs",
+        "requires-network",
     ],
     env = {
         "SUREAL_BLOB_STORE_CONTRACT_ADAPTER": "waystone",
     },
+    env_inherit = ["SUREAL_WAYSTONE"],
 )
 
 test_suite(

@@ -13,7 +13,7 @@ from dataset.staged_source import staged_source
 
 def replay_shape_source(job_path,source_receipt,*,expected_job_sha256,
         expected_source_receipt_sha256,cache,code_root,output,runtime_root,
-        expected_runtime_lock,retained_bytes,limit_bytes,blob_store=None,transfer_command=None):
+        expected_runtime_lock,retained_bytes,limit_bytes,blob_store=None):
     cache,code_root,output,runtime_root,job_path,source_receipt=map(Path,
         (cache,code_root,output,runtime_root,job_path,source_receipt))
     with staging_lease(cache/'scientific-processing/cohort-queue.lock'):
@@ -44,7 +44,7 @@ def replay_shape_source(job_path,source_receipt,*,expected_job_sha256,
                'insula/launch_plan.py','insula/runtime_roots.py']
         pins={n:sha(code_root/n) for n in names}
         with staged_source(source,cache,retained_bytes=retained_bytes,
-                limit_bytes=limit_bytes,blob_store=blob_store,transfer_command=transfer_command) as (staged,transfer):
+                limit_bytes=limit_bytes,blob_store=blob_store) as (staged,transfer):
             output.mkdir(parents=True,exist_ok=False);inputs=output/'input';inputs.mkdir()
             (inputs/'job.json').write_bytes(job_path.read_bytes())
             (inputs/'source-receipt.json').write_bytes(source_receipt.read_bytes())

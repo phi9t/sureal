@@ -1,5 +1,5 @@
-"""Separate exact-inventory admission for resource HDFS readback/recovery."""
-import json,re
+"""Compatibility checks for old resource publication receipts."""
+import errno,json,os,re,shutil
 from pathlib import Path
 from evidence.source_snapshot import is_regular_file,safe_member_name
 from resources.sources import package_member_path,sha
@@ -7,6 +7,85 @@ from resources.sources import package_member_path,sha
 LIMIT=128*1024**2
 EXTRA={'manifest_readback_exact','publication_manifest_hdfs_uri','publication_manifest_sha256','independent_admission'}
 ORDER=['create-live','archive-put','archive-get','manifest-put','manifest-get','verify-live','rehydrate-live']
+RESOURCE_CLOSURE_BLOB_PREFIX='runs/perception-resource-closures/'
+
+
+def materialize_execution_package(code,execution,library,library_sha,pins):
+    """Build the retained execution tree from already admitted source bytes."""
+    code=Path(code);execution=Path(execution);library=Path(library)
+    try:source_pins=pins['source_pins']
+    except (KeyError,TypeError) as error:
+        raise ValueError('complete admitted resource source pins required') from error
+    required={'resources/execute_worker.py','evidence/source_snapshot.py'}
+    if not isinstance(source_pins,dict) or not required<={package_member_name(name) for name in source_pins}:
+        raise ValueError('complete admitted resource source pins required')
+    if execution.exists() or execution.is_symlink():
+        raise ValueError('fresh execution package required')
+    if not is_regular_file(library) or sha(library)!=library_sha:
+        raise ValueError('pinned archive library changed')
+    execution.mkdir()
+    try:
+        for name,digest in sorted(source_pins.items()):
+            safe_member_name(name)
+            source=package_member_path(code,name)
+            if not is_regular_file(source) or sha(source)!=digest:
+                raise ValueError('admitted resource source changed')
+            target=package_member_path(execution,name);target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source,target)
+            if sha(target)!=digest:raise ValueError('executed resource package changed')
+        resources=execution/'resources';resources.mkdir(exist_ok=True);shutil.copyfile(library,resources/'resource_archive.py')
+        if sha(resources/'resource_archive.py')!=library_sha:raise ValueError('executed archive helper changed')
+    except BaseException:
+        shutil.rmtree(execution,ignore_errors=True)
+        raise
+    return execution
+
+
+def partition(inventory,limit=LIMIT):
+    if not inventory or type(limit) is not int or not 0<limit<=LIMIT:raise ValueError('nonempty bounded resource inventory required')
+    chunks=[];current=[];size=0
+    for name in sorted(inventory):
+        length=inventory[name]['bytes']
+        if type(length) is not int or not 0<=length<=limit:raise ValueError('resource member exceeds archive limit')
+        if current and size+length>limit:chunks.append(current);current=[];size=0
+        current.append(name);size+=length
+    if current:chunks.append(current)
+    return chunks
+
+
+def stage_member(entry,target,budget_root,*,reserve=None):
+    """Copy only EXDEV inputs, charging new bytes to scientific staging."""
+    if reserve is None:reserve=_reserve_write
+    source=Path(entry['path']);target=Path(target);budget_root=Path(budget_root)
+    if (not is_regular_file(source) or sha(source)!=entry['sha256'] or source.stat().st_size!=entry['bytes'] or
+        type(entry['bytes']) is not int or not 0<=entry['bytes']<=LIMIT or target.exists() or
+        not target.is_relative_to(budget_root) or any(p.is_symlink() for p in [target,*target.parents])):
+        raise ValueError('exact bounded source and fresh scientific staging destination required')
+    storage='hardlinked'
+    try:os.link(source,target)
+    except OSError as error:
+        if error.errno!=errno.EXDEV:raise
+        reserve(budget_root,entry['bytes']);shutil.copyfile(source,target);target.chmod(0o444);storage='copied'
+    if target.stat().st_size!=entry['bytes'] or sha(target)!=entry['sha256']:
+        raise ValueError('staged resource member differs from original input')
+    return {'storage':storage,'bytes':entry['bytes'],'sha256':entry['sha256']}
+
+
+def package_member_name(name):
+    name=str(name)
+    return name[len('autonomy/'):] if name.startswith('autonomy/') else name
+
+
+def _reserve_write(root,maximum_new_bytes):
+    raise ValueError('resource retention requires a study write-reservation callback')
+
+
+def _legacy_resource_blob_key(value):
+    if not isinstance(value,str):
+        raise ValueError('resource publication URI required')
+    marker='/'+RESOURCE_CLOSURE_BLOB_PREFIX
+    if marker not in value:
+        raise ValueError('declared resource closure namespace required')
+    return RESOURCE_CLOSURE_BLOB_PREFIX+value.split(marker,1)[1].lstrip('/')
 
 def validate_archive_snapshot(pub,chunk,check,mode):
     """Reconcile retained worker inputs/results with its exact chunk contract."""
@@ -49,17 +128,17 @@ def validate_union(pub,expected,readback,source=None):
             type(pub['schema_version']) is not int or pub['schema_version']!=1 or
             pub['kind'] not in {'shared','checkpoint'} or pub['source_inventory']!=expected or not expected):
             raise ValueError('exact external inventory and unchanged global readback required')
-        prefix=pub['hdfs_prefix']
-        if (not prefix.startswith('hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-') or
-            pub['publication_manifest_hdfs_uri']!=prefix+'/publication-manifest.json'):
+        prefix_key=_legacy_resource_blob_key(pub['hdfs_prefix'])
+        if (not prefix_key.startswith(RESOURCE_CLOSURE_BLOB_PREFIX+'balanced16-') or
+            _legacy_resource_blob_key(pub['publication_manifest_hdfs_uri'])!=prefix_key+'/publication-manifest.json'):
             raise ValueError('declared resource closure namespace required')
         union={};payload=0
         for chunk in pub['chunks']:
             manifest=chunk['manifest'];members=manifest['members'];size=sum(m['bytes'] for m in members);digest=manifest['archive_sha256']
             if (not members or type(size) is not int or not 0<=size<=LIMIT or size!=manifest['payload_bytes'] or
                 re.fullmatch('[0-9a-f]{64}',digest) is None or
-                chunk['archive_hdfs_uri']!=prefix+'/'+digest+'/archive.tar.gz' or
-                chunk['manifest_hdfs_uri']!=prefix+'/'+digest+'/manifest.json'):
+                _legacy_resource_blob_key(chunk['archive_hdfs_uri'])!=prefix_key+'/'+digest+'/archive.tar.gz' or
+                _legacy_resource_blob_key(chunk['manifest_hdfs_uri'])!=prefix_key+'/'+digest+'/manifest.json'):
                 raise ValueError('bounded exact resource archive identity required')
             checks=chunk['checks']
             if [c['stage'] for c in checks]!=ORDER or any(type(c['exit_code']) is not int or c['exit_code']!=0 for c in checks):
