@@ -55,6 +55,7 @@ py_library(
     ],
     deps = [
         ":publication",
+        "//autonomy/blob_store:blob_store",
         "//autonomy/evidence:evidence",
         "//autonomy/insula:insula",
         "//autonomy/resources:resources",

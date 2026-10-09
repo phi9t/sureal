@@ -31,7 +31,6 @@ from blob_store.core import (
 
 REPO = Path(__file__).resolve().parents[2]
 HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
-DEFAULT_WAYSTONE = Path.home() / "workspace/waystone/scripts/waystone"
 DEFAULT_HADOOP_CONF_DIR = "/opt/tiger/yarn_deploy/hadoop/conf"
 SOURCE_SNAPSHOT_AREA = "artifacts"
 SOURCE_SNAPSHOT_CHILD = "source-snapshots"
@@ -135,7 +134,7 @@ class LocalSnapshotStore:
 class HdfsSnapshotStore:
     def __init__(
         self,
-        waystone=DEFAULT_WAYSTONE,
+        waystone=None,
         *,
         prefix: str | None = None,
         runner=subprocess.run,
@@ -146,12 +145,15 @@ class HdfsSnapshotStore:
         hadoop_conf_dir: str = DEFAULT_HADOOP_CONF_DIR,
         legacy_layout: bool | None = None,
     ):
-        self.waystone = str(waystone)
+        self.waystone = None if waystone is None else str(waystone)
         self.timeout = timeout
         self.legacy_layout = prefix is not None if legacy_layout is None else bool(legacy_layout)
+        resolved_command_prefix = command_prefix
+        if resolved_command_prefix is None and waystone is not None:
+            resolved_command_prefix = [str(waystone)]
         self._adapter = WaystoneBlobAdapter(
             project=project,
-            command_prefix=command_prefix or [str(waystone)],
+            command_prefix=resolved_command_prefix,
             tool_pins=tool_pins,
             legacy_prefix=prefix,
             hadoop_conf_dir=hadoop_conf_dir,
@@ -471,7 +473,7 @@ def copy_source_snapshot(root, source_paths, destination, store: SnapshotStore, 
 def _store_from_descriptor(
     descriptor,
     *,
-    waystone=DEFAULT_WAYSTONE,
+    waystone=None,
     runner=subprocess.run,
     timeout: int = 90,
     command_prefix=None,
@@ -515,7 +517,7 @@ def store_from_receipt(
     receipt: Mapping,
     *,
     env_var: str | None = None,
-    waystone=DEFAULT_WAYSTONE,
+    waystone=None,
     runner=subprocess.run,
     timeout: int = 90,
     command_prefix=None,
@@ -766,7 +768,7 @@ def materialize_receipt_sources(
     store: SnapshotStore | None = None,
     *,
     env_var: str | None = None,
-    waystone=DEFAULT_WAYSTONE,
+    waystone=None,
     runner=subprocess.run,
     timeout: int = 90,
     command_prefix=None,
@@ -805,7 +807,7 @@ def verify_or_materialize_receipt_sources(
     store: SnapshotStore | None = None,
     *,
     env_var: str | None = None,
-    waystone=DEFAULT_WAYSTONE,
+    waystone=None,
     runner=subprocess.run,
     timeout: int = 90,
     command_prefix=None,

@@ -36,6 +36,7 @@ py_library(
     imports = [".."],
     visibility = MOTION_VISIBILITY,
     deps = [
+        "//autonomy/blob_store:blob_store",
         "//autonomy/evidence:evidence",
         "//autonomy/geometry:geometry",
         "//autonomy/insula:insula",

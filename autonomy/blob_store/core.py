@@ -45,11 +45,18 @@ WAYSTONE_SIZE_KEYS = (
 DEFAULT_WAYSTONE_RELATIVE = "workspace/waystone/scripts/waystone"
 DEFAULT_HADOOP_CONF_DIR = "/opt/tiger/yarn_deploy/hadoop/conf"
 DEFAULT_HDFS_AUTH_REFRESH = Path(__file__).resolve().parents[1] / "resources/refresh-hdfs-auth.sh"
+LEGACY_WAYSTONE_PROJECT_ROOT = "hdfs://harunava/user/tiger/waystone/sureal"
 WAYSTONE_TOOL_RELATIVES = (
     "rust/target/debug/waystone",
     "native/libhdfs_client/dist/lib/libhdfs_client.so",
     "native/libhdfs_client/dist/bin/hdfs.bin",
 )
+WAYSTONE_TOOL_ROLES_BY_RELATIVE = {
+    "scripts/waystone": "waystone-cli",
+    "rust/target/debug/waystone": "waystone-binary",
+    "native/libhdfs_client/dist/lib/libhdfs_client.so": "libhdfs-client",
+    "native/libhdfs_client/dist/bin/hdfs.bin": "hdfs-bin",
+}
 
 
 class BlobStoreError(RuntimeError):
@@ -801,6 +808,19 @@ def blob_key_from_uri(value: str, adapter_or_descriptor, **factory_kwargs) -> st
     return validate_blob_key(value)
 
 
+def legacy_project_uri_to_key(uri: str) -> str:
+    """Translate old retained HDFS URIs without consulting Waystone layout."""
+    if not isinstance(uri, str):
+        raise ValueError("legacy project URI required")
+    root = LEGACY_WAYSTONE_PROJECT_ROOT
+    prefix = root + "/"
+    if uri == root:
+        raise ValueError("legacy project URI does not name a blob")
+    if not uri.startswith(prefix):
+        raise ValueError("legacy project URI is outside the Waystone project root")
+    return validate_blob_key(uri[len(prefix) :])
+
+
 def waystone_tool_pins(waystone=None) -> dict[str, str]:
     if waystone is None:
         waystone = _default_waystone()
@@ -811,6 +831,19 @@ def waystone_tool_pins(waystone=None) -> dict[str, str]:
         path = root / relative
         pins[str(path)] = _file_sha256_and_size(path)[0]
     return pins
+
+
+def normalize_waystone_tool_digest(tool_digest: Mapping[str, str]) -> dict[str, str]:
+    if not isinstance(tool_digest, Mapping) or not tool_digest:
+        raise ValueError("Waystone tool digest required")
+    result = {}
+    for tool, digest in sorted(tool_digest.items()):
+        role = _waystone_tool_role(tool)
+        digest = _require_sha256(digest)
+        if role in result and result[role] != digest:
+            raise ValueError("Waystone tool digest role conflict")
+        result[role] = digest
+    return result
 
 
 def validate_blob_key(key: str) -> str:
@@ -911,6 +944,26 @@ def _default_waystone() -> Path:
     except KeyError:
         home = Path.home()
     return home / DEFAULT_WAYSTONE_RELATIVE
+
+
+def _waystone_tool_role(value) -> str:
+    if not isinstance(value, str):
+        raise ValueError("Waystone tool digest role required")
+    if "/" not in value and "\\" not in value:
+        return _validate_waystone_tool_role(value)
+    normalized = value.replace("\\", "/").strip()
+    for relative, role in WAYSTONE_TOOL_ROLES_BY_RELATIVE.items():
+        if normalized == relative or normalized.endswith("/" + relative):
+            return role
+    raise ValueError("Waystone tool digest path must name a known tool")
+
+
+def _validate_waystone_tool_role(value: str) -> str:
+    if not isinstance(value, str) or not value or value != value.strip():
+        raise ValueError("Waystone tool digest role required")
+    if "/" in value or "\\" in value or value in {".", ".."}:
+        raise ValueError("Waystone tool digest role must not be a path")
+    return value
 
 
 def _descriptor_command_prefix(command_prefix, waystone):

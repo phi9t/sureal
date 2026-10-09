@@ -17,6 +17,7 @@ from blob_store.core import (
     BlobStore,
     BlobStoreError,
     blob_adapter_from_descriptor,
+    normalize_waystone_tool_digest,
     validate_blob_key,
     waystone_tool_pins,
 )
@@ -47,12 +48,6 @@ RESEARCH_JOURNAL_FILE_NAMES = (
 DEFAULT_CHUNK_SIZE_BYTES = 128 * 1024 * 1024
 WAYSTONE_DESCRIPTOR = {"kind": "waystone", "project": "sureal"}
 STREAM_CHUNK_BYTES = 1024 * 1024
-WAYSTONE_TOOL_ROLES_BY_RELATIVE = {
-    "scripts/waystone": "waystone-cli",
-    "rust/target/debug/waystone": "waystone-binary",
-    "native/libhdfs_client/dist/lib/libhdfs_client.so": "libhdfs-client",
-    "native/libhdfs_client/dist/bin/hdfs.bin": "hdfs-bin",
-}
 
 
 @dataclass(frozen=True)
@@ -770,34 +765,16 @@ def _normalize_blob(value):
 
 
 def _normalize_tool_digest(value):
-    if not isinstance(value, Mapping) or not value:
-        raise ValueError("publication tool digest required")
-    result = {}
-    for tool, digest in sorted(value.items()):
-        role = _tool_digest_role(tool)
-        digest = require_digest(digest)
-        if role in result and result[role] != digest:
-            raise ValueError("publication tool digest role conflict")
-        result[role] = digest
-    return result
+    try:
+        return normalize_waystone_tool_digest(value)
+    except ValueError as error:
+        raise ValueError("publication tool digest required") from error
 
 
 def _normalize_receipt_tool_digest(value):
     if not isinstance(value, Mapping) or not value:
         raise ValueError("publication tool digest required")
     return {_validate_tool_role(role): require_digest(digest) for role, digest in sorted(value.items())}
-
-
-def _tool_digest_role(value) -> str:
-    if not isinstance(value, str):
-        raise ValueError("publication tool digest role required")
-    if "/" not in value and "\\" not in value:
-        return _validate_tool_role(value)
-    normalized = value.replace("\\", "/").strip()
-    for relative, role in WAYSTONE_TOOL_ROLES_BY_RELATIVE.items():
-        if normalized == relative or normalized.endswith("/" + relative):
-            return role
-    raise ValueError("publication tool digest path must name a known Waystone tool")
 
 
 def _validate_tool_role(value) -> str:

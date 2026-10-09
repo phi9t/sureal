@@ -8,7 +8,7 @@ from pathlib import Path,PurePosixPath
 from evidence.source_snapshot import is_regular_file
 from evidence.source_snapshot import safe_member_name
 from evidence.source_snapshot import receipt_snapshot_digest,store_from_receipt,verify_or_materialize_receipt_sources
-from blob_store.core import BlobStoreError
+from blob_store.core import BlobStoreError, legacy_project_uri_to_key
 from retention.publication import audit as audit_publication
 from resources.backend import resource_cpu_root_for
 from resources.sources import sha
@@ -18,6 +18,7 @@ STAGES=('train','audit','literal-loss','export','proposals','score','metrics-aud
 LEGACY_PUBLICATION_EXTRA={'manifest_readback_exact','publication_manifest_hdfs_uri','publication_manifest_sha256','independent_admission'}
 LEGACY_RESOURCE_LIMIT=128*1024**2
 LEGACY_RESOURCE_CHECK_ORDER=('create-live','archive-put','archive-get','manifest-put','manifest-get','verify-live','rehydrate-live')
+LEGACY_RESOURCE_BLOB_PREFIX='runs/perception-resource-closures/'
 
 
 def reference(path):
@@ -204,17 +205,17 @@ def _validate_legacy_union(pub,expected,readback):
         if (pub.get('manifest_readback_exact') is not True or _publication_readback(pub)!=readback or
             pub['source_inventory']!=expected or not expected):
             raise ValueError('exact external inventory and unchanged global readback required')
-        prefix=pub['hdfs_prefix']
-        if (not prefix.startswith('hdfs://harunava/user/tiger/waystone/sureal/runs/perception-resource-closures/balanced16-') or
-            pub['publication_manifest_hdfs_uri']!=prefix+'/publication-manifest.json'):
+        prefix_key=_legacy_resource_blob_key(pub['hdfs_prefix'])
+        if (not prefix_key.startswith(LEGACY_RESOURCE_BLOB_PREFIX+'balanced16-') or
+            _legacy_resource_blob_key(pub['publication_manifest_hdfs_uri'])!=prefix_key+'/publication-manifest.json'):
             raise ValueError('declared resource closure namespace required')
         union={};payload=0
         for chunk in pub['chunks']:
             manifest=chunk['manifest'];members=manifest['members'];size=sum(m['bytes'] for m in members);digest=manifest['archive_sha256']
             if (not members or type(size) is not int or not 0<=size<=LEGACY_RESOURCE_LIMIT or
                 size!=manifest['payload_bytes'] or re.fullmatch('[0-9a-f]{64}',digest) is None or
-                chunk['archive_hdfs_uri']!=prefix+'/'+digest+'/archive.tar.gz' or
-                chunk['manifest_hdfs_uri']!=prefix+'/'+digest+'/manifest.json'):
+                _legacy_resource_blob_key(chunk['archive_hdfs_uri'])!=prefix_key+'/'+digest+'/archive.tar.gz' or
+                _legacy_resource_blob_key(chunk['manifest_hdfs_uri'])!=prefix_key+'/'+digest+'/manifest.json'):
                 raise ValueError('bounded exact resource archive identity required')
             checks=chunk.get('checks')
             if checks is not None:
@@ -240,6 +241,15 @@ def _validate_legacy_union(pub,expected,readback):
         raise ValueError('complete independent resource recovery evidence required') from error
     return {'files':len(union),'chunks':len(pub['chunks']),'payload_bytes':payload,
             'whole_member_union_exact':True,'all_chunks_live_rehydrated':True}
+
+
+def _legacy_resource_blob_key(value):
+    try:key=legacy_project_uri_to_key(value)
+    except ValueError as error:
+        raise ValueError('resource publication URI required') from error
+    if not key.startswith(LEGACY_RESOURCE_BLOB_PREFIX):
+        raise ValueError('declared resource closure namespace required')
+    return key
 
 
 def _verify_legacy_source_snapshot(pub):
