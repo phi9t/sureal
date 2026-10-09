@@ -13,7 +13,7 @@ from pathlib import Path
 from types import MethodType, SimpleNamespace
 from typing import Iterable, Mapping
 
-from evidence.source_snapshot import LocalSnapshotStore, archive_sources
+from evidence.source_snapshot import LocalSnapshotStore, archive_sources, is_regular_file
 from insula.launch_plan import read_receipt_mount_sequence, read_receipt_mounts
 from resources.checkpoint import validate_checkpoint, validate_publication_receipt
 from resources.sources import sha
@@ -73,6 +73,171 @@ def _json_paths(root: Path) -> Iterable[Path]:
     if not root.exists():
         return
     yield from sorted(path for path in root.rglob("*.json") if path.is_file())
+
+
+def _extra_receipts_from_manifest(path: Path) -> list[Path]:
+    data = _load_json(path)
+    entries = data.get("receipts", []) if isinstance(data, Mapping) else data
+    if not isinstance(entries, list):
+        raise ValueError("receipt manifest must be a list or contain a receipts list")
+    result = []
+    for entry in entries:
+        raw = entry.get("path") if isinstance(entry, Mapping) else entry
+        if not isinstance(raw, str) or not raw:
+            raise ValueError("receipt manifest entries must name paths")
+        item = Path(raw)
+        result.append(item if item.is_absolute() else path.parent / item)
+    return result
+
+
+def _ordered_mount_keys(mounts: Iterable[Mapping[str, object]]) -> dict[tuple[str, str, str], list[Mapping[str, object]]]:
+    result: dict[tuple[str, str, str], list[Mapping[str, object]]] = {}
+    for mount in mounts:
+        try:
+            key = (str(mount["inside_path"]), str(mount["kind"]), str(mount["mode"]))
+        except KeyError as error:
+            raise ValueError("complete launch plan mount record required") from error
+        result.setdefault(key, []).append(mount)
+    return result
+
+
+def _verify_recorded_mount_digests_from_command(receipt: Mapping[str, object]) -> None:
+    """Check recorded read-only mount digests against the rendered command hosts."""
+    command = receipt.get("command")
+    launch_plan = receipt.get("launch_plan")
+    if not isinstance(command, list) or not isinstance(launch_plan, Mapping):
+        return
+    command_mounts = _ordered_mount_keys(
+        read_receipt_mount_sequence({"command": command}, include_digests=True)
+    )
+    for mount in read_receipt_mount_sequence({"launch_plan": launch_plan}):
+        digest = mount.get("digest")
+        if (
+            not isinstance(digest, str)
+            or mount.get("kind") != "bind"
+            or mount.get("mode") != "read_only"
+            or mount.get("inside_path") == "/"
+        ):
+            continue
+        key = (str(mount["inside_path"]), str(mount["kind"]), str(mount["mode"]))
+        matches = command_mounts.get(key, [])
+        if len(matches) != 1:
+            raise ValueError(f"rendered command mount missing for digest: {key[0]}")
+        actual = matches[0].get("digest")
+        if actual != digest:
+            raise ValueError(f"recorded launch plan mount digest differs: {key[0]}")
+
+
+def _iter_receipt_records(value):
+    if isinstance(value, dict):
+        yield value
+        for child in value.values():
+            yield from _iter_receipt_records(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from _iter_receipt_records(child)
+
+
+def _verify_artifacts(path: Path, receipt: Mapping[str, object]) -> None:
+    artifacts = receipt.get("artifacts")
+    if not isinstance(artifacts, Mapping):
+        return
+    for name, item in artifacts.items():
+        if isinstance(item, Mapping):
+            artifact_path = Path(item.get("path", ""))
+            digest = item.get("sha256")
+        else:
+            artifact_path = Path(str(name))
+            digest = item
+            if not artifact_path.is_absolute():
+                artifact_path = path.parent / artifact_path
+        if not isinstance(digest, str) or not is_regular_file(artifact_path) or sha(artifact_path) != digest:
+            raise ValueError(f"fresh receipt artifact differs: {artifact_path}")
+
+
+def _verify_exit_code(receipt: Mapping[str, object]) -> None:
+    if "exit_code" not in receipt:
+        return
+    expected = receipt.get("expected_exit_code", 0)
+    if receipt["exit_code"] != expected:
+        raise ValueError("fresh receipt exit code differs from expected")
+
+
+def _is_resource_stage_proof(receipt: Mapping[str, object]) -> bool:
+    return {
+        "schema_version",
+        "admitted",
+        "command",
+        "source_pins",
+        "native_output_directory",
+        "cap_bytes",
+        "timeout_seconds",
+        "host_measurement",
+        "worker_measurement",
+        "resource_admission",
+        "artifacts",
+    } <= set(receipt)
+
+
+def _verify_resource_stage_proof(path: Path, temp_root: Path) -> None:
+    proof = _load_json(path)
+    if not _is_resource_stage_proof(proof):
+        raise ValueError("resource stage proof receipt required")
+    with tempfile.TemporaryDirectory(prefix="fresh-resource-proof.", dir=temp_root) as temporary:
+        store = LocalSnapshotStore(temporary)
+        source_receipt = proof["source_pins"]
+        _seed_local_snapshot_store(source_receipt, store)
+        old_store = os.environ.get("SUREAL_SOURCE_SNAPSHOT_STORE")
+        os.environ["SUREAL_SOURCE_SNAPSHOT_STORE"] = temporary
+        try:
+            validate_proof(
+                proof,
+                proof["command"],
+                _stage_source_root(source_receipt),
+                source_receipt,
+                Path(proof["native_output_directory"]),
+                proof["cap_bytes"],
+                proof["timeout_seconds"],
+            )
+        finally:
+            if old_store is None:
+                os.environ.pop("SUREAL_SOURCE_SNAPSHOT_STORE", None)
+            else:
+                os.environ["SUREAL_SOURCE_SNAPSHOT_STORE"] = old_store
+    _verify_recorded_mount_digests_from_command(proof)
+
+
+def sweep_fresh_live_receipts(paths: Iterable[Path], temp_root: Path) -> VerifierReport:
+    report = VerifierReport("fresh_live_receipt_validation")
+    for path in paths:
+        try:
+            value = _load_json(path)
+            if not isinstance(value, Mapping):
+                raise ValueError("fresh receipt JSON object required")
+            _verify_artifacts(path, value)
+            for record in _iter_receipt_records(value):
+                _verify_exit_code(record)
+                if "launch_plan" in record:
+                    read_receipt_mounts(record, include_digests=False)
+                    read_receipt_mount_sequence(record, include_digests=False)
+            if _is_resource_stage_proof(value):
+                _verify_resource_stage_proof(path, temp_root)
+        except Exception as error:
+            report.fail_one(path, error)
+        else:
+            report.pass_one()
+    return report
+
+
+def _resource_stage_proof_paths(paths: Iterable[Path]) -> list[Path]:
+    result = []
+    for path in paths:
+        try:
+            if _is_resource_stage_proof(_load_json(path)):
+                result.append(path)
+        except Exception:
+            pass
+    return result
 
 
 def _case_entries(progress_path: Path) -> list[Mapping[str, object]]:
@@ -271,10 +436,11 @@ def _seed_local_snapshot_store(receipt: Mapping[str, object], store: LocalSnapsh
     store.store(digest, archive)
 
 
-def sweep_resource_stage_proofs(progress_path: Path, temp_root: Path) -> VerifierReport:
+def sweep_resource_stage_proofs(progress_path: Path, temp_root: Path, extra_proofs: Iterable[Path] = ()) -> VerifierReport:
     report = VerifierReport("resource_stage_proof_validation")
     case_dirs = _case_dirs(progress_path)
-    if not case_dirs:
+    extra_proofs = [Path(path) for path in extra_proofs]
+    if not case_dirs and not extra_proofs:
         report.skip_one(f"{progress_path}: progress case directories not found")
         return report
     with tempfile.TemporaryDirectory(prefix="retained-receipt-sweep.", dir=temp_root) as temporary:
@@ -309,6 +475,13 @@ def sweep_resource_stage_proofs(progress_path: Path, temp_root: Path) -> Verifie
                         report.fail_one(path, error)
                     else:
                         report.pass_one()
+            for path in extra_proofs:
+                try:
+                    _verify_resource_stage_proof(path, temp_root)
+                except Exception as error:
+                    report.fail_one(path, error)
+                else:
+                    report.pass_one()
         finally:
             if old_store is None:
                 os.environ.pop("SUREAL_SOURCE_SNAPSHOT_STORE", None)
@@ -412,21 +585,33 @@ def sweep_legacy_resource_publications(roots: Iterable[Path]) -> VerifierReport:
     return report
 
 
-def run_sweep(*, progress_path: Path, research_root: Path, host_cache: Path, temp_root: Path) -> dict:
+def run_sweep(
+    *,
+    progress_path: Path,
+    research_root: Path,
+    host_cache: Path,
+    temp_root: Path,
+    extra_receipts: Iterable[Path] = (),
+) -> dict:
     case_dirs = _case_dirs(progress_path)
-    receipt_roots = [research_root, *case_dirs]
+    extra_receipts = [Path(path) for path in extra_receipts]
+    extra_proofs = _resource_stage_proof_paths(extra_receipts)
+    receipt_roots = [research_root, *case_dirs, *extra_receipts]
     publication_roots = [host_cache / "insula", research_root]
     reports = [
         sweep_launch_plan_receipt_readers(receipt_roots),
         sweep_balanced16_stage_checks(progress_path, host_cache),
-        sweep_resource_stage_proofs(progress_path, temp_root),
+        sweep_resource_stage_proofs(progress_path, temp_root, extra_proofs),
         sweep_resource_checkpoints(progress_path, host_cache),
         sweep_legacy_resource_publications(publication_roots),
     ]
+    if extra_receipts:
+        reports.append(sweep_fresh_live_receipts(extra_receipts, temp_root))
     return {
         "progress_path": str(progress_path),
         "research_root": str(research_root),
         "host_cache": str(host_cache),
+        "extra_receipts": [str(path) for path in extra_receipts],
         "verifiers": {report.name: report.as_dict() for report in reports},
     }
 
@@ -455,14 +640,20 @@ def main(argv=None) -> int:
     parser.add_argument("--research-root", type=Path, default=DEFAULT_RECEIPT_RESEARCH)
     parser.add_argument("--host-cache", type=Path, default=DEFAULT_HOST_CACHE)
     parser.add_argument("--tmp-dir", type=Path, default=None)
+    parser.add_argument("--extra-receipt", type=Path, action="append", default=[])
+    parser.add_argument("--extra-receipt-manifest", type=Path, action="append", default=[])
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--require-host-data", action="store_true")
     args = parser.parse_args(argv)
+    extra_receipts = list(args.extra_receipt)
+    for manifest in args.extra_receipt_manifest:
+        extra_receipts.extend(_extra_receipts_from_manifest(manifest))
     report = run_sweep(
         progress_path=args.progress,
         research_root=args.research_root,
         host_cache=args.host_cache,
         temp_root=_temp_root(str(args.tmp_dir) if args.tmp_dir is not None else None),
+        extra_receipts=extra_receipts,
     )
     if args.json:
         print(json.dumps(report, indent=2, sort_keys=True))
