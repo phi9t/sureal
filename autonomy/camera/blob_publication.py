@@ -1,7 +1,5 @@
 """Blob-store helpers for scientific camera publication."""
-from blob_store.core import BlobStore, blob_adapter_from_descriptor, blob_store_descriptor, validate_blob_key
-
-DEFAULT_STORE_DESCRIPTOR = {"kind": "waystone", "project": "sureal"}
+from blob_store.core import BlobStore, blob_adapter_from_descriptor, blob_store_descriptor, default_waystone_descriptor, validate_blob_key
 
 
 def camera_blob_key(scene, kind, name):
@@ -9,7 +7,7 @@ def camera_blob_key(scene, kind, name):
 
 
 def publication_blob_store(descriptor=None):
-    adapter = blob_adapter_from_descriptor(descriptor or DEFAULT_STORE_DESCRIPTOR)
+    adapter = blob_adapter_from_descriptor(descriptor or default_waystone_descriptor())
     return BlobStore(adapter), blob_store_descriptor(adapter)
 
 

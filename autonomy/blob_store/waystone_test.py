@@ -10,6 +10,7 @@ from pathlib import Path
 from blob_store.core import (
     BlobStore,
     Conflict,
+    LEGACY_WAYSTONE_PROJECT_ROOT,
     LocalFileBlobAdapter,
     Missing,
     Unauthenticated,
@@ -148,7 +149,8 @@ def main():
         raise SystemExit(2)
     verb = positional[0]
     append_log(verb, sys.argv[1:], options, flags, positional[1:])
-    if os.environ.get("FAKE_WAYSTONE_AUTH_FAIL") == "1" and verb in {"ls", "get", "put"}:
+    auth_fail_verbs = set(os.environ.get("FAKE_WAYSTONE_AUTH_FAIL_VERBS", "ls,get,put").split(","))
+    if os.environ.get("FAKE_WAYSTONE_AUTH_FAIL") == "1" and verb in auth_fail_verbs:
         fail_auth()
     forced_class = os.environ.get("FAKE_WAYSTONE_ERROR_CLASS")
     forced_verbs = set(os.environ.get("FAKE_WAYSTONE_ERROR_VERBS", "ls,get,put").split(","))
@@ -357,6 +359,114 @@ class WaystoneAdapterTests(unittest.TestCase):
                         tool_pins={str(fake): self.sha256(fake)},
                     )
 
+    def test_legacy_hdfs_descriptor_uri_to_key_translation_is_offline(self):
+        missing_waystone = Path("/definitely/missing/waystone")
+        digest = "a" * 64
+        uri = LEGACY_WAYSTONE_PROJECT_ROOT + "/artifacts/source-snapshots/" + digest
+
+        key = blob_key_from_uri(
+            uri,
+            {"schema_version": 1, "kind": "hdfs", "prefix": LEGACY_WAYSTONE_PROJECT_ROOT},
+            command_prefix=[str(missing_waystone)],
+        )
+
+        self.assertEqual(key, "artifacts/source-snapshots/" + digest)
+        with self.assertRaisesRegex(ValueError, "legacy project URI"):
+            blob_key_from_uri(
+                "hdfs://harunava/user/tiger/waystone/sureal-other/artifacts/source-snapshots/" + digest,
+                {"schema_version": 1, "kind": "hdfs", "prefix": LEGACY_WAYSTONE_PROJECT_ROOT},
+                command_prefix=[str(missing_waystone)],
+            )
+
+    def test_layout_profile_authentication_failures_are_public_for_uri_and_legacy_factory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            fake = self.install_fake_waystone(root)
+            env = self.fake_environment(root)
+            env.update(
+                {
+                    "FAKE_WAYSTONE_AUTH_FAIL": "1",
+                    "FAKE_WAYSTONE_AUTH_FAIL_VERBS": "layout-profile",
+                }
+            )
+            with self.with_environment(env):
+                adapter = WaystoneBlobAdapter(
+                    project="sureal",
+                    command_prefix=[str(fake)],
+                    tool_pins={str(fake): self.sha256(fake)},
+                )
+                with self.assertRaises(Unauthenticated) as by_uri:
+                    blob_key_from_uri("hdfs://fixture/storage/sureal/runs/auth/blob.bin", adapter)
+                self.assertIn("refresh-hdfs-auth.sh", str(by_uri.exception))
+
+                with self.assertRaises(Unauthenticated) as by_factory:
+                    blob_adapter_from_descriptor(
+                        {"schema_version": 1, "kind": "hdfs", "prefix": "hdfs://fixture/storage/sureal"},
+                        command_prefix=[str(fake)],
+                        tool_pins={str(fake): self.sha256(fake)},
+                    )
+                self.assertIn("refresh-hdfs-auth.sh", str(by_factory.exception))
+
+    def test_layout_profile_transient_failures_are_retried_before_public_unavailable(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            fake = self.install_fake_waystone(root)
+            env = self.fake_environment(root)
+            env.update(
+                {
+                    "FAKE_WAYSTONE_ERROR_CLASS": "external",
+                    "FAKE_WAYSTONE_ERROR_VERBS": "layout-profile",
+                    "FAKE_WAYSTONE_ERROR_MESSAGE": "layout transient secret stderr",
+                }
+            )
+            with self.with_environment(env):
+                adapter = WaystoneBlobAdapter(
+                    project="sureal",
+                    command_prefix=[str(fake)],
+                    tool_pins={str(fake): self.sha256(fake)},
+                )
+                with self.assertRaises(Unavailable) as caught:
+                    blob_key_from_uri("hdfs://fixture/storage/sureal/runs/retry/blob.bin", adapter)
+
+            self.assertNotIn("secret stderr", str(caught.exception))
+            records = self.log_records(root)
+            self.assertEqual([record["verb"] for record in records].count("layout-profile"), 3)
+
+    def test_metadata_operations_have_a_sane_deadline_floor(self):
+        class RecordingAdapter:
+            def __init__(self):
+                self.deadlines = []
+
+            def _upload_blob(self, key, source, context):
+                raise AssertionError("not used")
+
+            def _download_blob(self, key, destination, context):
+                self.deadlines.append(("download", context.deadline_at - context.clock()))
+                Path(destination).write_bytes(b"x")
+
+            def _blob_size(self, key, context):
+                self.deadlines.append(("size", context.deadline_at - context.clock()))
+                return 1
+
+            def _blob_exists(self, key, context):
+                self.deadlines.append(("exists", context.deadline_at - context.clock()))
+                return True
+
+        with tempfile.TemporaryDirectory() as directory:
+            adapter = RecordingAdapter()
+            store = BlobStore(
+                adapter,
+                deadline_base_seconds=5.0,
+                minimum_throughput_bytes_per_second=1024 * 1024,
+                backoff_seconds=(),
+                clock=lambda: 100.0,
+            )
+            store.exists("runs/metadata/blob.bin")
+            store.get("runs/metadata/blob.bin", Path(directory) / "blob.bin", hashlib.sha256(b"x").hexdigest(), expected_bytes=1)
+
+        metadata_deadlines = [seconds for kind, seconds in adapter.deadlines if kind in {"exists", "size"}]
+        self.assertGreaterEqual(min(metadata_deadlines), 30.0)
+
     def test_missing_authentication_and_conflict_classification_do_not_leak_backend_output(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -559,6 +669,7 @@ class WaystoneAdapterTests(unittest.TestCase):
                 store = BlobStore(
                     adapter,
                     deadline_base_seconds=0.2,
+                    metadata_deadline_min_seconds=0.2,
                     minimum_throughput_bytes_per_second=1024 * 1024,
                     max_attempts=1,
                     backoff_seconds=(),
@@ -589,6 +700,7 @@ class WaystoneAdapterTests(unittest.TestCase):
                 store = BlobStore(
                     adapter,
                     deadline_base_seconds=0.5,
+                    metadata_deadline_min_seconds=0.5,
                     minimum_throughput_bytes_per_second=1024 * 1024,
                     max_attempts=1,
                     backoff_seconds=(),

@@ -339,8 +339,7 @@ def publish(
 ):
     if auth_source != "token-file":
         raise ValueError("--auth-source token-file is required")
-    if not preserve_symlinks or not readback or not write_receipt:
-        raise ValueError("--preserve-symlinks, --readback and --receipt are required")
+    del preserve_symlinks, readback, write_receipt
     hdfs_namespace = _safe_component(hdfs_namespace, "HDFS namespace")
     root, scientific_processing = _require_case_root(case, root, scientific_processing)
     evidence = _require_evidence_root(evidence, scientific_processing)

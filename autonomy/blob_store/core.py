@@ -17,6 +17,7 @@ from typing import Callable, Mapping, Protocol
 
 MAX_ATTEMPTS = 3
 DEFAULT_DEADLINE_BASE_SECONDS = 5.0
+DEFAULT_METADATA_DEADLINE_MIN_SECONDS = 30.0
 DEFAULT_MINIMUM_THROUGHPUT_BYTES_PER_SECOND = 1024 * 1024
 DEFAULT_BACKOFF_SECONDS = (0.25, 1.0)
 HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
@@ -46,6 +47,7 @@ DEFAULT_WAYSTONE_RELATIVE = "workspace/waystone/scripts/waystone"
 DEFAULT_HADOOP_CONF_DIR = "/opt/tiger/yarn_deploy/hadoop/conf"
 DEFAULT_HDFS_AUTH_REFRESH = Path(__file__).resolve().parents[1] / "resources/refresh-hdfs-auth.sh"
 LEGACY_WAYSTONE_PROJECT_ROOT = "hdfs://harunava/user/tiger/waystone/sureal"
+DEFAULT_WAYSTONE_DESCRIPTOR = {"kind": "waystone", "project": "sureal"}
 WAYSTONE_TOOL_RELATIVES = (
     "rust/target/debug/waystone",
     "native/libhdfs_client/dist/lib/libhdfs_client.so",
@@ -151,12 +153,74 @@ class _BlobAdapter(Protocol):
     def _blob_exists(self, key: str, context: _OperationContext) -> bool: ...
 
 
+def _with_public_blob_store_errors(
+    adapter,
+    operation_name: str,
+    key: str,
+    operation,
+    *,
+    max_attempts: int = MAX_ATTEMPTS,
+    backoff_seconds=DEFAULT_BACKOFF_SECONDS,
+    sleep: Callable[[float], None] = time.sleep,
+    catch_unexpected: bool = True,
+):
+    for attempt in range(1, max_attempts + 1):
+        try:
+            return operation()
+        except BlobStoreError:
+            raise
+        except _PrimitiveMissing as error:
+            raise Missing("blob missing: " + key) from error
+        except _PrimitiveConflict as error:
+            raise Conflict("blob key already exists: " + key) from error
+        except _PrimitiveCorrupt as error:
+            raise Corrupt("blob bytes failed verification: " + key) from error
+        except _PrimitiveUnauthenticated as error:
+            raise Unauthenticated(
+                "blob store authentication failed; " + _authentication_action(adapter)
+            ) from error
+        except _PrimitivePermanentUnavailable as error:
+            raise Unavailable("blob store " + operation_name + " unavailable") from error
+        except (_PrimitiveTransient, TimeoutError, OSError) as error:
+            if attempt == max_attempts:
+                raise Unavailable(
+                    "blob store "
+                    + operation_name
+                    + " unavailable after "
+                    + str(max_attempts)
+                    + " attempts"
+                ) from error
+            sleep(_backoff_for_attempt(backoff_seconds, attempt))
+        except Exception as error:
+            if catch_unexpected:
+                raise Unavailable("blob store " + operation_name + " unavailable") from error
+            raise
+    raise Unavailable("blob store " + operation_name + " unavailable")
+
+
+def _authentication_action(adapter) -> str:
+    action = getattr(adapter, "authentication_action", None)
+    if callable(action):
+        action = action()
+    if isinstance(action, str) and action.strip():
+        return action.strip()
+    return "refresh blob store credentials"
+
+
+def _backoff_for_attempt(backoff_seconds, attempt: int) -> float:
+    if not backoff_seconds:
+        return 0.0
+    index = min(attempt - 1, len(backoff_seconds) - 1)
+    return backoff_seconds[index]
+
+
 class BlobStore:
     def __init__(
         self,
         adapter: _BlobAdapter,
         *,
         deadline_base_seconds: float = DEFAULT_DEADLINE_BASE_SECONDS,
+        metadata_deadline_min_seconds: float = DEFAULT_METADATA_DEADLINE_MIN_SECONDS,
         minimum_throughput_bytes_per_second: float = DEFAULT_MINIMUM_THROUGHPUT_BYTES_PER_SECOND,
         max_attempts: int = MAX_ATTEMPTS,
         backoff_seconds=DEFAULT_BACKOFF_SECONDS,
@@ -165,12 +229,15 @@ class BlobStore:
     ):
         if deadline_base_seconds < 0:
             raise ValueError("deadline base seconds must be non-negative")
+        if metadata_deadline_min_seconds < 0:
+            raise ValueError("metadata deadline minimum seconds must be non-negative")
         if minimum_throughput_bytes_per_second <= 0:
             raise ValueError("minimum throughput must be positive")
         if max_attempts < 1:
             raise ValueError("max attempts must be positive")
         self._adapter = adapter
         self._deadline_base_seconds = float(deadline_base_seconds)
+        self._metadata_deadline_min_seconds = float(metadata_deadline_min_seconds)
         self._minimum_throughput_bytes_per_second = float(minimum_throughput_bytes_per_second)
         self._max_attempts = int(max_attempts)
         self._backoff_seconds = tuple(float(value) for value in backoff_seconds)
@@ -263,7 +330,10 @@ class BlobStore:
         return self._with_retries("exists", key, attempt)
 
     def _deadline_seconds(self, byte_count: int) -> float:
-        return self._deadline_base_seconds + max(0, int(byte_count)) / self._minimum_throughput_bytes_per_second
+        seconds = self._deadline_base_seconds + max(0, int(byte_count)) / self._minimum_throughput_bytes_per_second
+        if int(byte_count) == 0:
+            return max(seconds, self._metadata_deadline_min_seconds)
+        return seconds
 
     def _call_primitive(self, byte_count: int, operation):
         context = _OperationContext(
@@ -277,50 +347,22 @@ class BlobStore:
         return result
 
     def _with_retries(self, operation_name: str, key: str, operation):
-        for attempt in range(1, self._max_attempts + 1):
-            try:
-                return operation()
-            except BlobStoreError:
-                raise
-            except _PrimitiveMissing as error:
-                raise Missing("blob missing: " + key) from error
-            except _PrimitiveConflict as error:
-                raise Conflict("blob key already exists: " + key) from error
-            except _PrimitiveCorrupt as error:
-                raise Corrupt("blob bytes failed verification: " + key) from error
-            except _PrimitiveUnauthenticated as error:
-                raise Unauthenticated(
-                    "blob store authentication failed; " + self._authentication_action()
-                ) from error
-            except _PrimitivePermanentUnavailable as error:
-                raise Unavailable("blob store " + operation_name + " unavailable") from error
-            except (_PrimitiveTransient, TimeoutError, OSError) as error:
-                if attempt == self._max_attempts:
-                    raise Unavailable(
-                        "blob store "
-                        + operation_name
-                        + " unavailable after "
-                        + str(self._max_attempts)
-                        + " attempts"
-                    ) from error
-                self._sleep(self._backoff_for_attempt(attempt))
-            except Exception as error:
-                raise Unavailable("blob store " + operation_name + " unavailable") from error
-        raise Unavailable("blob store " + operation_name + " unavailable")
+        return _with_public_blob_store_errors(
+            self._adapter,
+            operation_name,
+            key,
+            operation,
+            max_attempts=self._max_attempts,
+            backoff_seconds=self._backoff_seconds,
+            sleep=self._sleep,
+            catch_unexpected=True,
+        )
 
     def _authentication_action(self) -> str:
-        action = getattr(self._adapter, "authentication_action", None)
-        if callable(action):
-            action = action()
-        if isinstance(action, str) and action.strip():
-            return action.strip()
-        return "refresh blob store credentials"
+        return _authentication_action(self._adapter)
 
     def _backoff_for_attempt(self, attempt: int) -> float:
-        if not self._backoff_seconds:
-            return 0.0
-        index = min(attempt - 1, len(self._backoff_seconds) - 1)
-        return self._backoff_seconds[index]
+        return _backoff_for_attempt(self._backoff_seconds, attempt)
 
 
 class InMemoryBlobAdapter:
@@ -493,9 +535,7 @@ class WaystoneBlobAdapter:
     ):
         self.project = _require_descriptor_name(project, "Waystone project")
         self.command_prefix = _waystone_command_prefix(command_prefix)
-        self._tool_pins = _validate_tool_pins(
-            waystone_tool_pins(Path(self.command_prefix[0])) if tool_pins is None else tool_pins
-        )
+        self._tool_pins = None if tool_pins is None else _validate_tool_pins(tool_pins)
         self._key_prefix = validate_blob_key(key_prefix) if key_prefix else None
         self._legacy_prefix = _normalize_hdfs_prefix(legacy_prefix) if legacy_prefix else None
         self._hadoop_conf_dir = str(hadoop_conf_dir)
@@ -506,7 +546,7 @@ class WaystoneBlobAdapter:
 
     @property
     def tool_sha256(self) -> dict[str, str]:
-        return dict(self._tool_pins)
+        return dict(self._resolved_tool_pins())
 
     def _upload_blob(self, key: str, source: Path, context: _OperationContext) -> None:
         uri = self._uri_for_key(key, context)
@@ -591,20 +631,32 @@ class WaystoneBlobAdapter:
             raise ValueError("blob key or HDFS URI required")
         if not value.startswith("hdfs://"):
             return validate_blob_key(value)
-        prefixes = []
-        if self._legacy_prefix is not None:
-            prefixes.append(self._legacy_prefix)
-        layout = self._layout_profile()
-        self._validate_legacy_prefix(layout)
-        prefixes.append(_normalize_hdfs_prefix(layout["project_root"]))
-        prefixes.append(_normalize_hdfs_prefix(layout["storage_root"]) + "/" + self.project)
-        for prefix in sorted(set(prefixes), key=len, reverse=True):
-            candidate_prefix = prefix + "/"
-            if value == prefix:
-                raise ValueError("absolute HDFS URI does not name a blob")
-            if value.startswith(candidate_prefix):
-                return validate_blob_key(value[len(candidate_prefix) :])
-        raise ValueError("absolute HDFS URI is outside the Waystone project root")
+        if self._legacy_prefix == LEGACY_WAYSTONE_PROJECT_ROOT and value.startswith(LEGACY_WAYSTONE_PROJECT_ROOT):
+            return legacy_project_uri_to_key(value)
+
+        def resolve():
+            prefixes = []
+            if self._legacy_prefix is not None:
+                prefixes.append(self._legacy_prefix)
+            layout = self._layout_profile()
+            self._validate_legacy_prefix(layout)
+            prefixes.append(_normalize_hdfs_prefix(layout["project_root"]))
+            prefixes.append(_normalize_hdfs_prefix(layout["storage_root"]) + "/" + self.project)
+            for prefix in sorted(set(prefixes), key=len, reverse=True):
+                candidate_prefix = prefix + "/"
+                if value == prefix:
+                    raise ValueError("absolute HDFS URI does not name a blob")
+                if value.startswith(candidate_prefix):
+                    return validate_blob_key(value[len(candidate_prefix) :])
+            raise ValueError("absolute HDFS URI is outside the Waystone project root")
+
+        return _with_public_blob_store_errors(
+            self,
+            "layout",
+            self.project,
+            resolve,
+            catch_unexpected=False,
+        )
 
     def _uri_for_key(self, key: str, context: _OperationContext | None = None) -> str:
         key = validate_blob_key(key)
@@ -702,13 +754,22 @@ class WaystoneBlobAdapter:
         process.communicate()
 
     def _check_tool_pins(self) -> None:
-        for path, expected in self._tool_pins.items():
+        try:
+            tool_pins = self._resolved_tool_pins()
+        except (OSError, ValueError) as error:
+            raise _PrimitiveUnavailable("Waystone tool pins unavailable") from error
+        for path, expected in tool_pins.items():
             stat_tuple = _file_stat_tuple(Path(path))
             if self._tool_pin_stats.get(path) == stat_tuple:
                 continue
             if _file_sha256_and_size(Path(path))[0] != expected:
                 raise RuntimeError("pinned Waystone tool digest changed")
             self._tool_pin_stats[path] = stat_tuple
+
+    def _resolved_tool_pins(self) -> dict[str, str]:
+        if self._tool_pins is None:
+            self._tool_pins = _validate_tool_pins(waystone_tool_pins(Path(self.command_prefix[0])))
+        return self._tool_pins
 
     def _command_timeout_seconds(self, context: _OperationContext) -> int:
         return max(1, int(self._remaining_seconds(context) + 0.999))
@@ -754,6 +815,10 @@ def blob_store_descriptor(adapter) -> dict[str, str]:
     raise ValueError("blob store adapter descriptor unsupported")
 
 
+def default_waystone_descriptor() -> dict[str, str]:
+    return dict(DEFAULT_WAYSTONE_DESCRIPTOR)
+
+
 def blob_adapter_from_descriptor(
     descriptor,
     *,
@@ -785,19 +850,31 @@ def blob_adapter_from_descriptor(
         allowed = {"kind", "prefix", "project", "schema_version"}
         if not set(descriptor).issubset(allowed) or "prefix" not in descriptor:
             raise ValueError("blob store descriptor required")
+        legacy_prefix = _normalize_hdfs_prefix(descriptor["prefix"])
         adapter = WaystoneBlobAdapter(
             project=descriptor.get("project", "sureal"),
             command_prefix=_descriptor_command_prefix(command_prefix, waystone),
             tool_pins=tool_pins,
-            legacy_prefix=descriptor["prefix"],
+            legacy_prefix=legacy_prefix,
             hadoop_conf_dir=hadoop_conf_dir,
         )
-        adapter._validate_legacy_prefix()
+        if legacy_prefix != LEGACY_WAYSTONE_PROJECT_ROOT:
+            _with_public_blob_store_errors(
+                adapter,
+                "layout",
+                adapter.project,
+                lambda: adapter._validate_legacy_prefix(),
+                catch_unexpected=False,
+            )
         return adapter
     raise ValueError("blob store descriptor kind required")
 
 
 def blob_key_from_uri(value: str, adapter_or_descriptor, **factory_kwargs) -> str:
+    if isinstance(adapter_or_descriptor, Mapping) and _is_legacy_hdfs_descriptor(adapter_or_descriptor):
+        if isinstance(value, str) and not value.startswith("hdfs://"):
+            return validate_blob_key(value)
+        return legacy_project_uri_to_key(value)
     adapter = (
         blob_adapter_from_descriptor(adapter_or_descriptor, **factory_kwargs)
         if isinstance(adapter_or_descriptor, Mapping)
@@ -819,6 +896,16 @@ def legacy_project_uri_to_key(uri: str) -> str:
     if not uri.startswith(prefix):
         raise ValueError("legacy project URI is outside the Waystone project root")
     return validate_blob_key(uri[len(prefix) :])
+
+
+def _is_legacy_hdfs_descriptor(descriptor: Mapping) -> bool:
+    allowed = {"kind", "prefix", "project", "schema_version"}
+    if descriptor.get("kind") != "hdfs" or not set(descriptor).issubset(allowed):
+        return False
+    try:
+        return _normalize_hdfs_prefix(descriptor.get("prefix")) == LEGACY_WAYSTONE_PROJECT_ROOT
+    except ValueError:
+        return False
 
 
 def waystone_tool_pins(waystone=None) -> dict[str, str]:

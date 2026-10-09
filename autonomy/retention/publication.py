@@ -17,6 +17,7 @@ from blob_store.core import (
     BlobStore,
     BlobStoreError,
     blob_adapter_from_descriptor,
+    default_waystone_descriptor,
     normalize_waystone_tool_digest,
     validate_blob_key,
     waystone_tool_pins,
@@ -46,7 +47,7 @@ RESEARCH_JOURNAL_FILE_NAMES = (
     "research-journal.md",
 )
 DEFAULT_CHUNK_SIZE_BYTES = 128 * 1024 * 1024
-WAYSTONE_DESCRIPTOR = {"kind": "waystone", "project": "sureal"}
+WAYSTONE_DESCRIPTOR = default_waystone_descriptor()
 STREAM_CHUNK_BYTES = 1024 * 1024
 
 
@@ -233,11 +234,7 @@ def publish_research_journal(
     descriptor = dict(store_descriptor or WAYSTONE_DESCRIPTOR)
     if store is None:
         store = BlobStore(blob_adapter_from_descriptor(descriptor))
-    if tool_digest is None:
-        adapter = getattr(store, "_adapter", None)
-        tool_digest = getattr(adapter, "tool_sha256", None)
-    if tool_digest is None:
-        tool_digest = waystone_tool_pins()
+    tool_digest = store_tool_digest(store, tool_digest)
     if staging_root is None:
         staging_root = research_root / ".publication-stage" / run_id
     if reserve is None:
@@ -459,11 +456,7 @@ def publish_bundle(backend, kind, inventory):
     if store is None:
         store = BlobStore(blob_adapter_from_descriptor(descriptor))
     tool_digest = getattr(backend, "resource_blob_tool_digest", None)
-    if tool_digest is None:
-        adapter = getattr(store, "_adapter", None)
-        tool_digest = getattr(adapter, "tool_sha256", None)
-    if tool_digest is None:
-        tool_digest = waystone_tool_pins()
+    tool_digest = store_tool_digest(store, tool_digest)
     cache_root = Path(getattr(backend, "resource_cache_root", backend.R.parent.parent))
     work_root = Path(getattr(backend, "resource_work_root", backend.output.parent))
     reserve = getattr(backend, "resource_reserve_write", None)
@@ -509,6 +502,61 @@ def _validate_spec(spec: PublicationSpec) -> None:
     _normalize_tool_digest(spec.tool_digest)
     if not isinstance(spec.store_descriptor, Mapping):
         raise ValueError("publication store descriptor required")
+
+
+def publication_store_descriptor(value):
+    if value is None:
+        return dict(WAYSTONE_DESCRIPTOR)
+    descriptor = json.loads(value)
+    if not isinstance(descriptor, dict):
+        raise ValueError("store descriptor object required")
+    return descriptor
+
+
+def store_tool_digest(store, tool_digest=None, *, fallback_to_waystone=True):
+    try:
+        adapter_digest = getattr(getattr(store, "_adapter", None), "tool_sha256", None)
+        normalized_adapter_digest = _normalize_tool_digest(adapter_digest) if adapter_digest is not None else None
+    except Exception as error:
+        if tool_digest is not None or not fallback_to_waystone:
+            raise ValueError("publication tool digest required from blob store adapter") from error
+        normalized_adapter_digest = None
+    if tool_digest is None:
+        if normalized_adapter_digest is not None:
+            return normalized_adapter_digest
+        if fallback_to_waystone:
+            try:
+                return _normalize_tool_digest(waystone_tool_pins())
+            except (OSError, RuntimeError, ValueError) as error:
+                raise ValueError("publication tool digest required") from error
+        raise ValueError("publication tool digest required when blob store adapter does not expose tool_sha256")
+    normalized = _normalize_tool_digest(tool_digest)
+    if normalized_adapter_digest is not None and normalized != normalized_adapter_digest:
+        raise ValueError("publication tool digest differs from blob store adapter")
+    return normalized
+
+
+def store_tool_digest_from_json(value, store):
+    if value is None:
+        return store_tool_digest(store)
+    digest = json.loads(value)
+    if not isinstance(digest, dict):
+        raise ValueError("tool digest object required")
+    return store_tool_digest(store, digest)
+
+
+def write_publication_json(path: Path, value) -> None:
+    path.write_text(json.dumps(value, sort_keys=True, separators=(",", ":")) + "\n")
+
+
+def write_release_completed(path: Path, receipt_path: Path, plan) -> None:
+    write_publication_json(
+        path,
+        {
+            "publication_receipt_sha256": file_sha256(receipt_path),
+            "released": plan,
+        },
+    )
 
 
 def _audit_direct_publication(receipt, manifest, store) -> dict[str, object]:

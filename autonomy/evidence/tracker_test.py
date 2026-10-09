@@ -111,6 +111,42 @@ class TrackerEvidenceTests(unittest.TestCase):
                 ],
             )
 
+    def test_new_journal_publication_record_requires_descriptor_tool_digest_and_readback(self):
+        valid = {
+            "schema_version": 1,
+            "store_descriptor": {"kind": "local", "root": "store"},
+            "tool_sha256": {"waystone-cli": "1" * 64},
+            "verified_by_readback": True,
+            "blobs": {
+                "manifest": {
+                    "key": "runs/perception-research-journal/r/snapshot/manifest.json",
+                    "sha256": "2" * 64,
+                    "bytes": 10,
+                },
+                "files": [
+                    {
+                        "key": "runs/perception-research-journal/r/snapshot/research-journal.jsonl",
+                        "sha256": "3" * 64,
+                        "bytes": 20,
+                    }
+                ],
+            },
+        }
+        cases = {
+            "missing descriptor": lambda value: value.pop("store_descriptor"),
+            "missing tool digest": lambda value: value.pop("tool_sha256"),
+            "missing readback": lambda value: value.pop("verified_by_readback"),
+            "false readback": lambda value: value.update(verified_by_readback=False),
+            "archive shape": lambda value: value["blobs"].update(chunks=[{"key": "runs/perception-research-journal/r/snapshot/archive.tar.gz", "sha256": "4" * 64, "bytes": 1}]),
+            "symlink shape": lambda value: value.update(blobs={"manifest": value["blobs"]["manifest"], "archive": {"key": "runs/perception-research-journal/r/snapshot/audit.tar.gz", "sha256": "4" * 64, "bytes": 1}}),
+        }
+        self.assertTrue(tracker._is_new_journal_publication_record(valid))
+        for name, mutate in cases.items():
+            with self.subTest(name=name):
+                candidate = json.loads(json.dumps(valid))
+                mutate(candidate)
+                self.assertFalse(tracker._is_new_journal_publication_record(candidate))
+
 
 if __name__ == "__main__":
     unittest.main()

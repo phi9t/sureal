@@ -34,7 +34,6 @@ HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 DEFAULT_HADOOP_CONF_DIR = "/opt/tiger/yarn_deploy/hadoop/conf"
 SOURCE_SNAPSHOT_AREA = "artifacts"
 SOURCE_SNAPSHOT_CHILD = "source-snapshots"
-LEGACY_SOURCE_SNAPSHOT_CHILD = "source-snapshots"
 STORE_DESCRIPTOR_VERSION = 1
 TARGET_RECEIPT_SCHEMA_VERSION = 2
 AT_FDCWD = -100
@@ -73,7 +72,7 @@ def source_snapshot_blob_key(digest: str) -> str:
 
 
 def legacy_source_snapshot_blob_key(digest: str) -> str:
-    return f"{LEGACY_SOURCE_SNAPSHOT_CHILD}/{require_digest(digest)}"
+    return f"{SOURCE_SNAPSHOT_CHILD}/{require_digest(digest)}"
 
 
 def source_snapshot_blob_record(digest: str, byte_count: int) -> dict:
@@ -137,8 +136,6 @@ class HdfsSnapshotStore:
         waystone=None,
         *,
         prefix: str | None = None,
-        runner=subprocess.run,
-        timeout: int = 90,
         project: str = "sureal",
         command_prefix=None,
         tool_pins: Mapping[str, str] | None = None,
@@ -146,7 +143,6 @@ class HdfsSnapshotStore:
         legacy_layout: bool | None = None,
     ):
         self.waystone = None if waystone is None else str(waystone)
-        self.timeout = timeout
         self.legacy_layout = prefix is not None if legacy_layout is None else bool(legacy_layout)
         resolved_command_prefix = command_prefix
         if resolved_command_prefix is None and waystone is not None:
@@ -223,12 +219,18 @@ def _put_snapshot_blob(store: BlobStore, digest: str, data: bytes, *, key: str |
     return result
 
 
-def _get_snapshot_blob(store: BlobStore, digest: str, *, key: str | None = None) -> bytes:
+def _get_snapshot_blob(
+    store: BlobStore,
+    digest: str,
+    *,
+    key: str | None = None,
+    expected_bytes: int | None = None,
+) -> bytes:
     key = source_snapshot_blob_key(digest) if key is None else validate_blob_key(key)
     with tempfile.TemporaryDirectory(prefix=digest + ".") as directory:
         destination = Path(directory) / (digest + ".snapshot")
         try:
-            store.get(key, destination, digest)
+            store.get(key, destination, digest, expected_bytes=expected_bytes)
         except Missing as error:
             raise SnapshotMissingError(f"source snapshot missing: {digest}") from error
         except Corrupt as error:
@@ -474,8 +476,6 @@ def _store_from_descriptor(
     descriptor,
     *,
     waystone=None,
-    runner=subprocess.run,
-    timeout: int = 90,
     command_prefix=None,
     tool_pins: Mapping[str, str] | None = None,
     hadoop_conf_dir: str = DEFAULT_HADOOP_CONF_DIR,
@@ -518,8 +518,6 @@ def store_from_receipt(
     *,
     env_var: str | None = None,
     waystone=None,
-    runner=subprocess.run,
-    timeout: int = 90,
     command_prefix=None,
     tool_pins: Mapping[str, str] | None = None,
     hadoop_conf_dir: str = DEFAULT_HADOOP_CONF_DIR,
@@ -533,8 +531,6 @@ def store_from_receipt(
     return _store_from_descriptor(
         descriptor,
         waystone=waystone,
-        runner=runner,
-        timeout=timeout,
         command_prefix=command_prefix,
         tool_pins=tool_pins,
         hadoop_conf_dir=hadoop_conf_dir,
@@ -681,7 +677,7 @@ def _fetch_receipt_archive(store: SnapshotStore, digest: str, blob: Mapping | No
         return store.fetch(digest)
     blob_store = getattr(store, "_store", None)
     if blob_store is not None:
-        return _get_snapshot_blob(blob_store, digest, key=blob["key"])
+        return _get_snapshot_blob(blob_store, digest, key=blob["key"], expected_bytes=blob["bytes"])
     return store.fetch(digest)
 
 
@@ -769,8 +765,6 @@ def materialize_receipt_sources(
     *,
     env_var: str | None = None,
     waystone=None,
-    runner=subprocess.run,
-    timeout: int = 90,
     command_prefix=None,
     tool_pins: Mapping[str, str] | None = None,
     hadoop_conf_dir: str = DEFAULT_HADOOP_CONF_DIR,
@@ -782,8 +776,6 @@ def materialize_receipt_sources(
         receipt,
         env_var=env_var,
         waystone=waystone,
-        runner=runner,
-        timeout=timeout,
         command_prefix=command_prefix,
         tool_pins=tool_pins,
         hadoop_conf_dir=hadoop_conf_dir,
@@ -808,8 +800,6 @@ def verify_or_materialize_receipt_sources(
     *,
     env_var: str | None = None,
     waystone=None,
-    runner=subprocess.run,
-    timeout: int = 90,
     command_prefix=None,
     tool_pins: Mapping[str, str] | None = None,
     hadoop_conf_dir: str = DEFAULT_HADOOP_CONF_DIR,
@@ -825,8 +815,6 @@ def verify_or_materialize_receipt_sources(
         receipt,
         env_var=env_var,
         waystone=waystone,
-        runner=runner,
-        timeout=timeout,
         command_prefix=command_prefix,
         tool_pins=tool_pins,
         hadoop_conf_dir=hadoop_conf_dir,
@@ -839,8 +827,6 @@ def verify_or_materialize_receipt_sources(
         resolved_store,
         env_var=env_var,
         waystone=waystone,
-        runner=runner,
-        timeout=timeout,
         command_prefix=command_prefix,
         tool_pins=tool_pins,
         hadoop_conf_dir=hadoop_conf_dir,

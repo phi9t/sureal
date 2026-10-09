@@ -1,23 +1,26 @@
 """Evict independently mirrored and replayed native camera bytes only."""
 import json
 from pathlib import Path
-from blob_store.core import blob_key_from_uri, validate_blob_key
+from blob_store.core import blob_key_from_uri, default_waystone_descriptor, validate_blob_key
+from dataset.blob_storage import publication_checks_succeeded
 from evidence.source_snapshot import file_sha256 as digest
 OLD_STAGES=['pack-live','hdfs-put','hdfs-download','independent-bundle-live','manifest-put-last','manifest-download']
 BLOB_STAGES=['pack-live','archive-blob-put','archive-blob-download','independent-bundle-live','manifest-blob-put-last','manifest-blob-download']
-DEFAULT_STORE_DESCRIPTOR={'kind':'waystone','project':'sureal'}
 
 def _archive_blob_key(publication,blob_adapter=None):
  blob=publication.get('archive_blob')
  if isinstance(blob,dict):
   key=validate_blob_key(blob.get('key'))
   archive=publication.get('archive',{})
-  if blob.get('sha256')!=archive.get('sha256') or type(blob.get('bytes')) is not int or blob['bytes']<=0:
+  if blob.get('verified_by_readback') is not True or blob.get('sha256')!=archive.get('sha256') or type(blob.get('bytes')) is not int or blob['bytes']<=0:
+   raise ValueError('camera archive blob identity differs')
+  expected_bytes=archive.get('bytes',archive.get('archive_bytes',blob['bytes']))
+  if type(expected_bytes) is int and expected_bytes>=0 and blob['bytes']!=expected_bytes:
    raise ValueError('camera archive blob identity differs')
   return key
  uri=publication.get('archive_hdfs_uri')
  if not isinstance(uri,str) or not uri.startswith('hdfs://'):raise ValueError('camera blob recovery required')
- descriptor=publication.get('store_descriptor') or publication.get('blob_store_descriptor') or DEFAULT_STORE_DESCRIPTOR
+ descriptor=publication.get('store_descriptor') or publication.get('blob_store_descriptor') or default_waystone_descriptor()
  return blob_key_from_uri(uri,blob_adapter if blob_adapter is not None else descriptor)
 
 def evict_camera(processing,publication,replay,*,expected_publication_sha256,expected_replay_sha256,blob_adapter=None):
@@ -27,8 +30,7 @@ def evict_camera(processing,publication,replay,*,expected_publication_sha256,exp
  if digest(pp)!=expected_publication_sha256 or digest(rp)!=expected_replay_sha256:raise ValueError('trusted camera receipts differ')
  pub=json.loads(pp.read_text());checked=json.loads(rp.read_text())
  if checked['scene']!=pub['scene'] or checked['publication_receipt_sha256']!=expected_publication_sha256:raise ValueError('camera replay/publication lineage differs')
- stages=[c['stage'] for c in pub['checks']]
- if stages not in (OLD_STAGES,BLOB_STAGES) or any(c['exit_code'] for c in pub['checks']) or len(checked['checks'])!=2 or any(c['exit_code'] for c in checked['checks']):raise ValueError('complete successful live publication/replay required')
+ if not publication_checks_succeeded(pub['checks'],legacy_stages=OLD_STAGES,blob_stages=BLOB_STAGES) or len(checked['checks'])!=2 or any(c['exit_code'] for c in checked['checks']):raise ValueError('complete successful live publication/replay required')
  for name,h in pub['artifacts'].items():
   p=Path(name)
   if p.is_absolute() or '..' in p.parts or digest(publication/p)!=h:raise ValueError('camera publication artifact changed')

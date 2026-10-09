@@ -4,6 +4,7 @@ import argparse,json,resource,time
 from datetime import datetime,timezone
 from pathlib import Path
 from camera.blob_publication import camera_blob_key, publication_blob_store
+from dataset.blob_storage import blob_transfer_check
 from insula.launch_plan import build_plan, load_default_runtime_lock, record_plan, run_plan
 from insula.runtime_roots import current_cpu_rootfs
 from evidence.source_snapshot import file_sha256 as sha
@@ -38,21 +39,15 @@ def main():
   t=time.monotonic();r=run_plan(plan,capture_output=True,text=True);(base/(stage+'.log')).write_text(r.stdout+r.stderr);checks.append({'stage':stage,'launch_plan':record_plan(plan),'exit_code':r.returncode,'elapsed_seconds':time.monotonic()-t})
   if r.returncode:raise RuntimeError(r.stderr)
   print('PASS',stage,flush=True)
- def blob_call(stage,operation):
-  t=time.monotonic()
-  try:
-   result=operation();checks.append({'stage':stage,'exit_code':0,'elapsed_seconds':time.monotonic()-t});print('PASS',stage,flush=True);return result
-  except Exception:
-   checks.append({'stage':stage,'exit_code':1,'elapsed_seconds':time.monotonic()-t});raise
  other=total(working)-total(processing/'sidecars')
  code="import json; from pathlib import Path; from dataset.component_archive import create_component_archive; d=json.loads(Path('/mnt/trusted.json').read_text()); r=create_component_archive('/source/sidecars','/outputs/camera.tar',expected_files=d['files'],provenance=d['provenance'],other_bytes="+str(other)+",budget_bytes=15*1024**3); Path('/outputs/archive.json').write_text(json.dumps(r)); print('PASS camera bundle',r['files'])"
  plan=build_plan(runtime,code=HERE,source=processing,output=packed,command=['python','-c',code],named_inputs={'/mnt':inputs});call('pack-live',plan)
- meta=json.loads((packed/'archive.json').read_text());archive=packed/'camera.tar';archive_key=camera_blob_key(scene,'archive','camera.tar');readback=packed/'camera-readback.tar';archive_blob=blob_call('archive-blob-put',lambda: store.put(archive_key,archive));archive.unlink();blob_call('archive-blob-download',lambda: store.get(archive_blob['key'],readback,archive_blob['sha256'],expected_bytes=archive_blob['bytes']));archive_blob=dict(archive_blob,verified_by_readback=True);readback.replace(archive)
+ meta=json.loads((packed/'archive.json').read_text());archive=packed/'camera.tar';archive_key=camera_blob_key(scene,'archive','camera.tar');readback=packed/'camera-readback.tar';archive_blob=dict(store.put(archive_key,archive),verified_by_readback=True);checks.append(blob_transfer_check('archive-blob-put',archive_blob));archive.unlink();store.get(archive_blob['key'],readback,archive_blob['sha256'],expected_bytes=archive_blob['bytes']);checks.append(blob_transfer_check('archive-blob-download',archive_blob));readback.replace(archive)
  if sha(archive)!=meta['sha256']:raise ValueError('camera mirror differs')
  code="import json; from pathlib import Path; from dataset.component_archive_validate import validate_component_archive; r=validate_component_archive('/source/camera.tar',expected_archive_sha256="+repr(meta['sha256'])+",expected_manifest_sha256="+repr(meta['manifest_sha256'])+"); Path('/outputs/bundle-check.json').write_text(json.dumps(r)); print('PASS camera bundle independent',r['files'])"
  call('independent-bundle-live',build_plan(runtime,code=HERE,source=packed,output=checked,command=['python','-c',code]));validation=json.loads((checked/'bundle-check.json').read_text())
  if validation['provenance']!=provenance or validation['files']!=len(expected):raise ValueError('camera lineage differs')
- publication={'schema_version':1,'role':'scientific-native-camera-components','scene':scene,'official_split':membership[0],'research_splits':membership[1],'store_descriptor':store_descriptor,'archive_blob':archive_blob,'archive':meta,'provenance':provenance};p=packed/'publication.json';p.write_text(json.dumps(publication,indent=2)+'\n');manifest_sha=sha(p);manifest_key=camera_blob_key(scene,'manifest','publication.json');manifest_blob=blob_call('manifest-blob-put-last',lambda: store.put(manifest_key,p));blob_call('manifest-blob-download',lambda: store.get(manifest_blob['key'],checked/'publication.json',manifest_blob['sha256'],expected_bytes=manifest_blob['bytes']));manifest_blob=dict(manifest_blob,verified_by_readback=True)
+ publication={'schema_version':1,'role':'scientific-native-camera-components','scene':scene,'official_split':membership[0],'research_splits':membership[1],'store_descriptor':store_descriptor,'archive_blob':archive_blob,'archive':meta,'provenance':provenance};p=packed/'publication.json';p.write_text(json.dumps(publication,indent=2)+'\n');manifest_sha=sha(p);manifest_key=camera_blob_key(scene,'manifest','publication.json');manifest_blob=dict(store.put(manifest_key,p),verified_by_readback=True);checks.append(blob_transfer_check('manifest-blob-put-last',manifest_blob));store.get(manifest_blob['key'],checked/'publication.json',manifest_blob['sha256'],expected_bytes=manifest_blob['bytes']);checks.append(blob_transfer_check('manifest-blob-download',manifest_blob))
  if sha(checked/'publication.json')!=manifest_sha:raise ValueError('camera manifest mirror differs')
  for n,h in candidates.items():
   if sha(HERE/n)!=h:raise ValueError('camera publication candidate changed')

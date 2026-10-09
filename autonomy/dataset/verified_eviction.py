@@ -1,8 +1,11 @@
 """Evict only mirrored/replayed decoded point bytes, preserving recovery evidence."""
 import json
 from pathlib import Path
-from dataset.blob_storage import publication_archive_reference
+from dataset.blob_storage import publication_archive_reference, publication_checks_succeeded
 from evidence.source_snapshot import file_sha256 as digest
+
+STAGES=['pack-live','hdfs-put','hdfs-download','independent-archive-live','manifest-put-last','manifest-download']
+BLOB_STAGES=['pack-live','archive-blob-put','archive-blob-fetch','independent-archive-live','manifest-blob-put-last','manifest-blob-fetch']
 
 
 def evict_points(processing,publication,replay,*,expected_publication_sha256,expected_replay_sha256):
@@ -12,7 +15,7 @@ def evict_points(processing,publication,replay,*,expected_publication_sha256,exp
     if digest(pp)!=expected_publication_sha256 or digest(rp)!=expected_replay_sha256:raise ValueError('independent receipt identity differs')
     pub=json.loads(pp.read_text());checked=json.loads(rp.read_text())
     if checked['publication_receipt_sha256']!=expected_publication_sha256 or checked['scene']!=pub['scene']:raise ValueError('replay publication linkage differs')
-    if len(checked['checks'])!=2 or any(c['exit_code']!=0 for c in checked['checks']) or not pub['checks'] or any(c['exit_code']!=0 for c in pub['checks']):raise ValueError('successful mirror/replay checks required')
+    if len(checked['checks'])!=2 or any(c['exit_code']!=0 for c in checked['checks']) or not _publication_checks_succeeded(pub['checks']):raise ValueError('successful mirror/replay checks required')
     target=publication_archive_reference(pub)
     points=processing/'points';report=points/'report.json'
     if digest(report)!=pub['archive']['report_sha256']:raise ValueError('native point manifest changed')
@@ -29,6 +32,7 @@ def evict_points(processing,publication,replay,*,expected_publication_sha256,exp
     if {p.name for p in points.iterdir()}!=names|{'report.json'}:raise ValueError('unexpected point artifacts')
     archive=publication/'packed/scene.tar'
     if digest(archive)!=pub['archive']['sha256']:raise ValueError('local mirrored archive changed')
+    if isinstance(target,dict) and (target['sha256']!=pub['archive']['sha256'] or target['bytes']!=archive.stat().st_size):raise ValueError('publication archive blob differs')
     files.append({'path':str(archive),'sha256':pub['archive']['sha256'],'size_bytes':archive.stat().st_size,'recovery_member':None})
     result={'status':'verified point eviction admitted','scene':pub['scene'],'archive_sha256':pub['archive']['sha256'],'publication_receipt_sha256':expected_publication_sha256,'replay_receipt_sha256':expected_replay_sha256,'files':files,'bytes_evicted':sum(r['size_bytes'] for r in files),'scope':'mirrored/replayed point payloads only; source sidecars and receipts retained'}
     if isinstance(target,dict):result['archive_blob']=target
@@ -36,3 +40,9 @@ def evict_points(processing,publication,replay,*,expected_publication_sha256,exp
     with record.open('x') as stream:stream.write(json.dumps(result,indent=2)+'\n')
     for row in files:Path(row['path']).unlink()
     result['status']='verified point eviction completed';record.write_text(json.dumps(result,indent=2)+'\n');return result
+
+def _publication_checks_succeeded(checks):
+    if publication_checks_succeeded(checks,legacy_stages=STAGES,blob_stages=BLOB_STAGES):return True
+    if not isinstance(checks,list) or not checks:return False
+    if any(not isinstance(check,dict) or 'stage' in check for check in checks):return False
+    return all(type(check.get('exit_code')) is int and check['exit_code']==0 for check in checks)
