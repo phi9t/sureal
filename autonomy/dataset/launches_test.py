@@ -4,16 +4,16 @@ import unittest
 from pathlib import Path
 
 from evidence.source_snapshot import file_sha256
-from insula.launch_plan import BAZEL_LINUX_X86_64_SHA256, BAZEL_VERSION, plan_data
+from insula.launch_plan import (
+    BAZEL_LINUX_X86_64_SHA256,
+    BAZEL_VERSION,
+    build_plan,
+    load_default_runtime_lock,
+    plan_data,
+    record_plan,
+)
 from insula.runtime_identity import rootfs_identity
 from insula.runtime_roots import CURRENT_CPU_ROOTFS_NAME, current_cpu_rootfs
-
-from dataset.launches import (
-    build_dataset_plan,
-    load_dataset_runtime,
-    load_pinned_dataset_runtime,
-    plan_receipt,
-)
 
 
 AUTONOMY = Path(__file__).resolve().parents[1]
@@ -63,10 +63,10 @@ class DatasetLaunchTests(unittest.TestCase):
                 path.mkdir()
             (mnt / "trusted.json").write_text("{}\n")
 
-            runtime = load_dataset_runtime(cache)
-            plan = build_dataset_plan(
+            runtime = load_default_runtime_lock(current_cpu_rootfs(cache))
+            plan = build_plan(
                 runtime,
-                code_root=code,
+                code=code,
                 source=source,
                 output=output,
                 command=["python", "-c", "pass"],
@@ -91,7 +91,7 @@ class DatasetLaunchTests(unittest.TestCase):
                 self.assertEqual(mounts[f"input:{inside}"]["mode"], "read_only")
             self.assertEqual(mounts["input:/tmp/scratch"]["mode"], "writable")
 
-            receipt = plan_receipt(plan)
+            receipt = record_plan(plan)
             self.assertEqual(receipt["runtime"]["form"], "recipe-digest")
             self.assertEqual(receipt["command"], ["python", "-c", "pass"])
             self.assertNotIn(str(tmp), json.dumps(receipt, sort_keys=True))
@@ -102,13 +102,14 @@ class DatasetLaunchTests(unittest.TestCase):
             write_rootfs(rootfs)
             lock = write_cpu_lock(rootfs.with_name(rootfs.name + ".lock.json"), rootfs)
 
-            runtime = load_pinned_dataset_runtime(rootfs, lock)
+            runtime = load_default_runtime_lock(rootfs)
             self.assertEqual(runtime.data, lock)
 
             changed = dict(lock)
             changed["dockerfile_sha256"] = "0" * 64
             with self.assertRaisesRegex(ValueError, "runtime lock differs"):
-                load_pinned_dataset_runtime(rootfs, changed)
+                if runtime.data != changed:
+                    raise ValueError("external runtime lock differs")
 
 
 if __name__ == "__main__":

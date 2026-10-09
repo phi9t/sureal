@@ -5,7 +5,8 @@ import base64,hashlib,json
 from pathlib import Path
 import subprocess,tempfile
 from dataset.blob_storage import default_blob_store, default_store_descriptor, put_blob, source_blob_key
-from dataset.launches import build_dataset_plan, load_dataset_runtime, plan_receipt, run_dataset_plan
+from insula.launch_plan import build_plan, load_default_runtime_lock, record_plan, run_plan
+from insula.runtime_roots import current_cpu_rootfs
 from evidence.source_snapshot import file_sha256
 from insula.staging_lease import staging_lease
 
@@ -29,7 +30,7 @@ def main():
     retained=sum(o['size_bytes'] for o in json.loads((HERE/'dataset/dataset.lock.json').read_text())['objects'])
     maximum=min(manifest['per_object_limit_bytes'],manifest['local_staging_limit_bytes']-retained)
     if maximum<=0:raise ValueError('no bounded raw staging capacity')
-    runtime=load_dataset_runtime(CACHE);lock=runtime.data
+    runtime=load_default_runtime_lock(current_cpu_rootfs(CACHE));lock=runtime.data
     blob_store=default_blob_store();store_descriptor=default_store_descriptor()
     for scene,group in manifest['scenes'].items():
         official=group['official_split']
@@ -49,10 +50,10 @@ def main():
                 payload.unlink()
                 blob_store.get(blob['key'],payload,blob['sha256'],expected_bytes=blob['bytes'])
                 if payload.stat().st_size!=int(metadata['size']) or hashes(payload)[0]!=sha:raise ValueError('blob download-back integrity; stored source changed')
-                plan=build_dataset_plan(runtime,code_root=HERE,source=inputs,output=out,command=['python','-m','dataset.shard_inventory','/source/source.parquet',scene,'/outputs/inventory.json'])
-                live=run_dataset_plan(plan,capture_output=True,text=True)
+                plan=build_plan(runtime,code=HERE,source=inputs,output=out,command=['python','-m','dataset.shard_inventory','/source/source.parquet',scene,'/outputs/inventory.json'])
+                live=run_plan(plan,capture_output=True,text=True)
                 if live.returncode:raise RuntimeError(live.stderr[-2000:])
-                result={'scene':scene,'component':component,'official_split':official,'research_splits':group['research_splits'],'source_metadata':metadata,'sha256':sha,'blob':blob,'store_descriptor':store_descriptor,'inventory':json.loads((out/'inventory.json').read_text()),'live_log':live.stdout,'runtime_lock':lock,'launch_plan':plan_receipt(plan),'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'inventory_code_sha256':file_sha256(HERE/'dataset/shard_inventory.py'),'raw_peak_bytes_including_retained_engineering':retained+int(metadata['size'])}
+                result={'scene':scene,'component':component,'official_split':official,'research_splits':group['research_splits'],'source_metadata':metadata,'sha256':sha,'blob':blob,'store_descriptor':store_descriptor,'inventory':json.loads((out/'inventory.json').read_text()),'live_log':live.stdout,'runtime_lock':lock,'launch_plan':record_plan(plan),'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'inventory_code_sha256':file_sha256(HERE/'dataset/shard_inventory.py'),'raw_peak_bytes_including_retained_engineering':retained+int(metadata['size'])}
                 record.write_text(json.dumps(result,indent=2)+'\n')
             print('verified',official,component,scene,result['inventory']['rows'],flush=True)
 

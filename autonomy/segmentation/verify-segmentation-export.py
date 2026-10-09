@@ -5,7 +5,8 @@ import json
 from pathlib import Path
 import sys,tempfile
 from evidence.source_snapshot import file_sha256 as sha, require_regular_file
-from segmentation.launches import build_segmentation_plan, load_current_metrics_runtime, plan_receipt, run_segmentation_plan
+from insula.launch_plan import build_plan, load_default_runtime_lock, record_plan, run_plan
+from insula.runtime_roots import current_metrics_rootfs
 from segmentation.strict_metric_reader import require_perfect_self_score
 
 HERE=Path(__file__).resolve().parents[1]
@@ -20,7 +21,7 @@ def artifact_hashes(root):
     return artifacts
 
 def main():
-    cache=Path.home()/'.cache/waystone/waymo-perception';runtime=load_current_metrics_runtime(cache);lock=runtime.data
+    cache=Path.home()/'.cache/waystone/waymo-perception';runtime=load_default_runtime_lock(current_metrics_rootfs(cache));lock=runtime.data
     out=Path(sys.argv[1]).resolve();out.mkdir(parents=True,exist_ok=False)
     frames=[{'context_name':'semantic-export-fixture','frame_timestamp_micros':10,'returns':[list(range(1,23)),list(range(1,23))*2]}]
     (out/'structured-input.json').write_text(json.dumps(frames)+'\n')
@@ -31,14 +32,14 @@ def main():
                   ('export',['python','-m','segmentation.segmentation_export','/source/frames.json','/outputs/semantic.bin']),
                   ('native-score',['/metrics-build/compute_segmentation_metrics','/outputs/semantic.bin','/outputs/semantic.bin'])]
         for name,command in commands:
-            plan=build_segmentation_plan(runtime,code_root=HERE,source=source,output=out,command=command);r=run_segmentation_plan(plan,capture_output=True,text=True)
+            plan=build_plan(runtime,code=HERE,source=source,output=out,command=command);r=run_plan(plan,capture_output=True,text=True)
             (out/(name+'.stdout')).write_text(r.stdout);(out/(name+'.stderr')).write_text(r.stderr)
             assert r.returncode==0,r.stderr
             if name=='native-score':
                 assert not r.stderr
                 require_perfect_self_score(r.stdout)
-            checks.append({'name':name,'launch_plan':plan_receipt(plan),'exit_code':r.returncode})
-    candidates=[Path(__file__),HERE/'segmentation/launches.py',HERE/'segmentation/segmentation_export.py',HERE/'segmentation/segmentation_export_test.py',HERE/'segmentation/strict_metric_reader.py',HERE/'insula/launch_plan.py',HERE/'insula/runtime_roots.py']
+            checks.append({'name':name,'launch_plan':record_plan(plan),'exit_code':r.returncode})
+    candidates=[Path(__file__),HERE/HERE/'segmentation/segmentation_export.py',HERE/'segmentation/segmentation_export_test.py',HERE/'segmentation/strict_metric_reader.py',HERE/'insula/launch_plan.py',HERE/'insula/runtime_roots.py']
     receipt={'stage':'structured-segmentation-export','runtime_lock':lock,'checks':checks,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'candidate_hashes':{str(p.relative_to(HERE)):sha(p) for p in candidates},'artifacts':artifact_hashes(out),'scope':'structured exporter analytic integration; real-source identity and export checks pending'}
     (out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print('PASS live semantic exporter integration')
 

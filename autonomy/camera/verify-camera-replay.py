@@ -3,7 +3,8 @@
 import argparse,json,resource,time
 from datetime import datetime,timezone
 from pathlib import Path
-from camera.launches import build_camera_plan, load_current_cpu_runtime, plan_receipt, run_camera_plan
+from insula.launch_plan import build_plan, load_default_runtime_lock, record_plan, run_plan
+from insula.runtime_roots import current_cpu_rootfs
 from evidence.source_snapshot import file_sha256 as sha
 HERE=Path(__file__).resolve().parents[1]
 def main():
@@ -22,9 +23,9 @@ def main():
   for n,v in r['artifacts'].items():
    if sha(processing/n)!=v:raise ValueError('original camera artifact differs')
   references[component]=r['artifacts']['sidecars/'+component+'/manifest.json']
- cache=Path.home()/'.cache/waystone/waymo-perception';runtime=load_current_cpu_runtime(cache);lock=runtime.data;base.mkdir(parents=True,exist_ok=False);inputs=base/'input';inputs.mkdir();(inputs/'reference.json').write_text(json.dumps(references)+'\n');checks=[];results=[];started=datetime.now(timezone.utc).isoformat();tick=time.monotonic();names=['camera/verify-camera-replay.py','camera/launches.py','camera/camera_replay_check.py','camera/camera_dataset.py','dataset/component_archive_validate.py','insula/launch_plan.py','insula/runtime_roots.py'];candidates={n:sha(HERE/n) for n in names}
+ cache=Path.home()/'.cache/waystone/waymo-perception';runtime=load_default_runtime_lock(current_cpu_rootfs(cache));lock=runtime.data;base.mkdir(parents=True,exist_ok=False);inputs=base/'input';inputs.mkdir();(inputs/'reference.json').write_text(json.dumps(references)+'\n');checks=[];results=[];started=datetime.now(timezone.utc).isoformat();tick=time.monotonic();names=['camera/verify-camera-replay.py','camera/camera_replay_check.py','camera/camera_dataset.py','dataset/component_archive_validate.py','insula/launch_plan.py','insula/runtime_roots.py'];candidates={n:sha(HERE/n) for n in names}
  for index in (1,2):
-  out=base/f'replay-{index}';out.mkdir();cmd=['python','-m','camera.camera_replay_check','--publication-sha',pub['publication_manifest_sha256'],'--usage',args.usage];plan=build_camera_plan(runtime,code_root=HERE,source=publication/'packed',output=out,command=cmd,named_inputs={'/opt':processing/'sidecars','/mnt':inputs});t=time.monotonic();r=run_camera_plan(plan,capture_output=True,text=True);(base/f'replay-{index}.log').write_text(r.stdout+r.stderr);checks.append({'stage':f'replay-{index}','launch_plan':plan_receipt(plan),'exit_code':r.returncode,'elapsed_seconds':time.monotonic()-t})
+  out=base/f'replay-{index}';out.mkdir();cmd=['python','-m','camera.camera_replay_check','--publication-sha',pub['publication_manifest_sha256'],'--usage',args.usage];plan=build_plan(runtime,code=HERE,source=publication/'packed',output=out,command=cmd,named_inputs={'/opt':processing/'sidecars','/mnt':inputs});t=time.monotonic();r=run_plan(plan,capture_output=True,text=True);(base/f'replay-{index}.log').write_text(r.stdout+r.stderr);checks.append({'stage':f'replay-{index}','launch_plan':record_plan(plan),'exit_code':r.returncode,'elapsed_seconds':time.monotonic()-t})
   if r.returncode:raise RuntimeError(r.stderr)
   results.append(json.loads((out/'replay.json').read_text()));print('PASS scientific camera replay',index,results[-1]['rows'],flush=True)
  if results[0]!=results[1]:raise ValueError('camera replays differ')

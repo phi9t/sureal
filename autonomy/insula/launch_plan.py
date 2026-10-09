@@ -146,6 +146,12 @@ def load_runtime_lock(rootfs: Path, lock_path: Path | None = None) -> RuntimeLoc
     )
 
 
+def load_default_runtime_lock(rootfs: Path) -> RuntimeLock:
+    """Load a root filesystem's runtime lock from its default lock path."""
+    rootfs = Path(rootfs)
+    return load_runtime_lock(rootfs, default_lock(rootfs))
+
+
 def build_plan(
     runtime: RuntimeLock,
     *,
@@ -167,11 +173,13 @@ def build_plan(
         mounts.append(Mount("source", "bind", "/source", "read_only", Path(source)))
     mounts.append(Mount("output", "bind", "/outputs", "writable", Path(output)))
     for inside, host in (named_inputs or {}).items():
-        _validate_named_input_path(inside)
-        mounts.append(Mount(f"input:{inside}", "bind", inside, "read_only", Path(host)))
+        inside_path = str(PurePosixPath(inside))
+        _validate_named_input_path(inside_path)
+        mounts.append(Mount(f"input:{inside_path}", "bind", inside_path, "read_only", Path(host)))
     for inside, host in (writable_inputs or {}).items():
-        _validate_named_input_path(inside)
-        mounts.append(Mount(f"input:{inside}", "bind", inside, "writable", Path(host)))
+        inside_path = str(PurePosixPath(inside))
+        _validate_named_input_path(inside_path)
+        mounts.append(Mount(f"input:{inside_path}", "bind", inside_path, "writable", Path(host)))
 
     environment = [
         ("--setenv", "HOME", "/tmp/private-home"),
@@ -240,6 +248,11 @@ def render_plan(plan: LaunchPlan) -> list[str]:
         argv.extend(item)
     argv.extend(["--chdir", plan.working_directory, "--", *plan.command])
     return [str(item) for item in argv]
+
+
+def run_plan(plan: LaunchPlan, **kwargs) -> subprocess.CompletedProcess:
+    """Run a rendered launch plan as a subprocess."""
+    return subprocess.run(render_plan(plan), **kwargs)
 
 
 def record_plan(plan: LaunchPlan) -> dict:
@@ -651,8 +664,10 @@ __all__ = [
     "RuntimeLockError",
     "PlanError",
     "load_runtime_lock",
+    "load_default_runtime_lock",
     "build_plan",
     "plan_data",
     "render_plan",
+    "run_plan",
     "record_plan",
 ]

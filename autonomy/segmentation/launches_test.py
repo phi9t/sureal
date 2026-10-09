@@ -4,16 +4,16 @@ import unittest
 from pathlib import Path
 
 from evidence.source_snapshot import file_sha256
-from insula.launch_plan import BAZEL_LINUX_X86_64_SHA256, BAZEL_VERSION, plan_data
+from insula.launch_plan import (
+    BAZEL_LINUX_X86_64_SHA256,
+    BAZEL_VERSION,
+    build_plan,
+    load_default_runtime_lock,
+    plan_data,
+    record_plan,
+)
 from insula.runtime_identity import rootfs_identity
 from insula.runtime_roots import current_cpu_rootfs, current_metrics_rootfs
-
-from segmentation.launches import (
-    build_segmentation_plan,
-    load_current_cpu_runtime,
-    load_current_metrics_runtime,
-    plan_receipt,
-)
 
 
 AUTONOMY = Path(__file__).resolve().parents[1]
@@ -80,10 +80,10 @@ class SegmentationLaunchTests(unittest.TestCase):
             for path in (code, archive, inputs, output):
                 path.mkdir()
 
-            runtime = load_current_cpu_runtime(cache)
-            plan = build_segmentation_plan(
+            runtime = load_default_runtime_lock(current_cpu_rootfs(cache))
+            plan = build_plan(
                 runtime,
-                code_root=code,
+                code=code,
                 source=archive,
                 output=output,
                 command=["python", "-c", "recover"],
@@ -97,7 +97,7 @@ class SegmentationLaunchTests(unittest.TestCase):
             self.assertEqual(mounts["input:/mnt"]["inside_path"], "/mnt")
             self.assertEqual(mounts["input:/mnt"]["mode"], "read_only")
             self.assertIn(["--setenv", "PYTHONPATH", "/experiment"], data["environment"])
-            self.assertNotIn(str(temporary), json.dumps(plan_receipt(plan), sort_keys=True))
+            self.assertNotIn(str(temporary), json.dumps(record_plan(plan), sort_keys=True))
 
     def test_metrics_export_plan_loads_image_form_lock(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -111,10 +111,10 @@ class SegmentationLaunchTests(unittest.TestCase):
             for path in (code, source, output):
                 path.mkdir()
 
-            runtime = load_current_metrics_runtime(cache)
-            plan = build_segmentation_plan(
+            runtime = load_default_runtime_lock(current_metrics_rootfs(cache))
+            plan = build_plan(
                 runtime,
-                code_root=code,
+                code=code,
                 source=source,
                 output=output,
                 command=["/metrics-build/compute_segmentation_metrics", "/source/a", "/source/a"],
