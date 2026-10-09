@@ -57,6 +57,13 @@ class PublicationModuleTests(unittest.TestCase):
             self.fail("retention publication module must expose sustained_checkpoint_spec")
         return publish, audit, sustained_checkpoint_spec
 
+    def native_and_pilot_api(self):
+        try:
+            from retention.publication import audit, native_cache_spec, publish, sustained_pilot_spec
+        except ImportError:
+            self.fail("retention publication module must expose native_cache_spec and sustained_pilot_spec")
+        return publish, audit, native_cache_spec, sustained_pilot_spec
+
     def assert_no_receipt_path_strings(self, value, *, blob_key=False):
         if isinstance(value, dict):
             for key, child in value.items():
@@ -462,6 +469,121 @@ class PublicationModuleTests(unittest.TestCase):
 
             self.assertTrue(checkpoint.exists())
             self.assertTrue(report.exists())
+
+    def test_native_cache_spec_publishes_archived_cache_with_in_memory_store(self):
+        publish, audit, native_cache_spec, _ = self.native_and_pilot_api()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            cache = root / "cache"
+            cache.mkdir()
+            tensor = cache / "scene-001.bin"
+            receipt = cache / "scene-001-receipt.json"
+            tensor.write_bytes(b"native cache bytes")
+            receipt.write_text('{"admitted": true}\n')
+            inventory = {
+                "scene-001.bin": {"path": str(tensor), "sha256": sha(tensor), "bytes": tensor.stat().st_size},
+                "scene-001-receipt.json": {
+                    "path": str(receipt),
+                    "sha256": sha(receipt),
+                    "bytes": receipt.stat().st_size,
+                },
+            }
+            store = BlobStore(InMemoryBlobAdapter(), backoff_seconds=())
+            reservations = []
+            spec = native_cache_spec(
+                payload=inventory,
+                run_id="overfit-native-cache-v1",
+                release=False,
+                store=store,
+                store_descriptor=STORE_DESCRIPTOR,
+                tool_digest=TOOL_DIGEST,
+                staging_root=root / "stage",
+                reserve=lambda path, maximum_new_bytes: reservations.append((Path(path), maximum_new_bytes)),
+                chunk_size_bytes=1024,
+            )
+
+            self.assertEqual(spec.area, "runs")
+            self.assertEqual(spec.child, "perception-native-cache")
+            self.assertEqual(spec.kind, "cache")
+            self.assertEqual(spec.mode, "archive")
+            self.assertEqual(spec.staging_style, "copy")
+
+            publication = publish(spec)
+
+            self.assertEqual(
+                publication["blobs"]["manifest"]["key"],
+                "runs/perception-native-cache/overfit-native-cache-v1/cache/manifest.json",
+            )
+            self.assertEqual(
+                [chunk["key"] for chunk in publication["blobs"]["chunks"]],
+                ["runs/perception-native-cache/overfit-native-cache-v1/cache/archive-000.tar.gz"],
+            )
+            self.assert_no_receipt_path_strings(publication)
+            result = audit(publication, store=store)
+            self.assertEqual(result["files"], 2)
+            self.assertEqual(reservations, [(root / "stage", sum(item["bytes"] for item in inventory.values()))])
+
+    def test_sustained_pilot_spec_publishes_archived_pilot_with_in_memory_store(self):
+        publish, audit, _, sustained_pilot_spec = self.native_and_pilot_api()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            pilot = root / "pilot"
+            update = pilot / "update-19"
+            heads = update / "heads"
+            heads.mkdir(parents=True)
+            checkpoint = update / "checkpoint.pt"
+            report = update / "check.json"
+            head = heads / "heads-00.npz"
+            checkpoint.write_bytes(b"checkpoint")
+            report.write_text('{"updates": 19}\n')
+            head.write_bytes(b"head")
+            inventory = {
+                "update-19/checkpoint.pt": {
+                    "path": str(checkpoint),
+                    "sha256": sha(checkpoint),
+                    "bytes": checkpoint.stat().st_size,
+                },
+                "update-19/check.json": {"path": str(report), "sha256": sha(report), "bytes": report.stat().st_size},
+                "update-19/heads/heads-00.npz": {
+                    "path": str(head),
+                    "sha256": sha(head),
+                    "bytes": head.stat().st_size,
+                },
+            }
+            store = BlobStore(InMemoryBlobAdapter(), backoff_seconds=())
+            spec = sustained_pilot_spec(
+                payload=inventory,
+                run_id="balanced16-sustained-admission-native20261003a",
+                release=False,
+                store=store,
+                store_descriptor=STORE_DESCRIPTOR,
+                tool_digest=TOOL_DIGEST,
+                staging_root=root / "stage",
+                reserve=lambda path, maximum_new_bytes: None,
+                chunk_size_bytes=1024,
+            )
+
+            self.assertEqual(spec.area, "runs")
+            self.assertEqual(spec.child, "perception-sustained-pilot")
+            self.assertEqual(spec.kind, "pilot")
+            self.assertEqual(spec.mode, "archive")
+            self.assertEqual(spec.staging_style, "copy")
+
+            publication = publish(spec)
+
+            self.assertEqual(
+                publication["blobs"]["manifest"]["key"],
+                "runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a/pilot/manifest.json",
+            )
+            self.assertEqual(
+                [chunk["key"] for chunk in publication["blobs"]["chunks"]],
+                [
+                    "runs/perception-sustained-pilot/balanced16-sustained-admission-native20261003a/pilot/archive-000.tar.gz"
+                ],
+            )
+            self.assert_no_receipt_path_strings(publication)
+            result = audit(publication, store=store)
+            self.assertEqual(result["files"], 3)
 
 
 if __name__ == "__main__":
