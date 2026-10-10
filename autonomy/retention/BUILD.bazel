@@ -18,6 +18,7 @@ exports_files(
         "publish_native_cache.py",
         "publish_research_journal.py",
         "publish_scientific_directory.py",
+        "scientific_retention_planner.py",
         "publish_sustained_checkpoint.py",
         "publish_sustained_pilot.py",
         "publish_symlink_audit.py",
