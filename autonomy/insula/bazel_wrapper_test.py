@@ -131,6 +131,20 @@ def mount_destinations(mounts):
     return {mount["inside_path"] for mount in mounts}
 
 
+def repository_git_dir():
+    path = REPO / ".git"
+    if path.is_dir():
+        return path.resolve()
+    content = path.read_text(encoding="utf-8").strip()
+    prefix = "gitdir: "
+    if content.startswith(prefix):
+        git_dir = Path(content[len(prefix):])
+        if not git_dir.is_absolute():
+            git_dir = path.parent / git_dir
+        return git_dir.resolve()
+    return path.resolve()
+
+
 class BazelWrapperTests(unittest.TestCase):
     def test_external_cwd_and_symlink_preserve_relative_options_and_environment(self):
         for options in ("arguments", "environment"):
@@ -184,6 +198,14 @@ class BazelWrapperTests(unittest.TestCase):
                     self.assertFalse(
                         LEGACY_AUTONOMY_ALIAS_DESTINATIONS & mount_destinations(plan["mounts"]),
                         plan["mounts"],
+                    )
+                    self.assertTrue(
+                        has_mount(
+                            plan["mounts"],
+                            "/experiment/.git",
+                            host=str(repository_git_dir()),
+                            mode="read_only",
+                        )
                     )
                     self.assertFalse(marker.exists())
                     result = subprocess.run(

@@ -125,6 +125,9 @@ def repo_workspace_mounts(update_lock=False):
     for path in sorted(REPO.iterdir(), key=lambda item: item.name):
         if path.name == ".bazel-cache":
             continue
+        if path.name == ".git":
+            mounts.extend(_git_metadata_mounts(path))
+            continue
         if update_lock and path.name == "MODULE.bazel.lock":
             continue
         mounts.append(
@@ -149,6 +152,103 @@ def repo_workspace_mounts(update_lock=False):
     return mounts
 
 
+def _git_metadata_mounts(path):
+    if path.is_dir():
+        git_dir = path
+    else:
+        content = path.read_text(encoding="utf-8").strip()
+        prefix = "gitdir: "
+        if not content.startswith(prefix):
+            return [Mount("workspace:/.git", "bind", "/experiment/.git", "read_only", path.resolve())]
+        git_dir = Path(content[len(prefix):])
+        if not git_dir.is_absolute():
+            git_dir = (path.parent / git_dir).resolve()
+    mounts = [Mount("workspace:/.git", "bind", "/experiment/.git", "read_only", git_dir.resolve())]
+    for index, object_dir in enumerate(_git_object_dirs(git_dir)):
+        mounts.extend(_git_object_view_mounts(object_dir, f"/tmp/sureal-git-objects/{index}", index))
+    mounts.append(Mount("git-empty-primary-objects", "tmpfs", "/tmp/sureal-git-objects/primary", "writable"))
+    return mounts
+
+
+def _git_object_dirs(git_dir):
+    primary = Path(git_dir).resolve() / "objects"
+    pending = [primary]
+    seen = set()
+    directories = []
+    while pending:
+        object_dir = pending.pop()
+        object_dir = object_dir.resolve()
+        if object_dir in seen:
+            continue
+        if not object_dir.is_dir():
+            continue
+        seen.add(object_dir)
+        directories.append(object_dir)
+        alternates_file = object_dir / "info" / "alternates"
+        try:
+            lines = alternates_file.read_text(encoding="utf-8").splitlines()
+        except FileNotFoundError:
+            continue
+        for line in lines:
+            raw = line.strip()
+            if not raw or raw.startswith("#"):
+                continue
+            alternate = Path(raw)
+            if not alternate.is_absolute():
+                alternate = object_dir / alternate
+            pending.append(alternate)
+    return directories
+
+
+def _git_object_view_mounts(object_dir, inside_root, index):
+    object_dir = Path(object_dir)
+    if not object_dir.is_dir():
+        return []
+    mounts = [Mount(f"git-objects-view:{index}", "tmpfs", inside_root, "writable")]
+    for child in sorted(object_dir.iterdir(), key=lambda item: item.name):
+        if child.name == "info":
+            continue
+        if child.is_dir():
+            mounts.append(
+                Mount(
+                    f"git-objects-view:{index}:{child.name}",
+                    "bind",
+                    f"{inside_root}/{child.name}",
+                    "read_only",
+                    child.resolve(),
+                )
+            )
+    return mounts
+
+
+def git_test_environment():
+    if not (REPO / ".git").exists():
+        return {}
+    git_dir = _git_dir(REPO / ".git")
+    object_dirs = _git_object_dirs(git_dir)
+    alternate_views = ":".join(
+        f"/tmp/sureal-git-objects/{index}"
+        for index, _ in enumerate(object_dirs)
+    )
+    return {
+        "SUREAL_REPO_GATE_GIT_ALTERNATE_OBJECT_DIRECTORIES": alternate_views,
+        "SUREAL_REPO_GATE_GIT_OBJECT_DIRECTORY": "/tmp/sureal-git-objects/primary",
+    }
+
+
+def _git_dir(path):
+    if path.is_dir():
+        return path.resolve()
+    content = path.read_text(encoding="utf-8").strip()
+    prefix = "gitdir: "
+    if not content.startswith(prefix):
+        return path.resolve()
+    git_dir = Path(content[len(prefix):])
+    if not git_dir.is_absolute():
+        git_dir = path.parent / git_dir
+    return git_dir.resolve()
+
+
 def sandbox_plan(runtime, cache, arguments, update_lock=False):
     rootfs = runtime.rootfs
     cache = cache.resolve()
@@ -161,7 +261,10 @@ def sandbox_plan(runtime, cache, arguments, update_lock=False):
         Mount("tmp", "tmpfs", "/tmp", "writable"),
         Mount("bazel-cache", "bind", "/tmp/bazel-cache", "writable", cache),
     ]
-    test_environment = {}
+    test_environment = {
+        "SUREAL_REPO_ROOT": "/experiment",
+        **git_test_environment(),
+    }
     if uses_live_gate_filter(arguments):
         _add_nested_launch_support(mounts)
         live_root = LIVE_GATE_CACHE_MOUNT + "/insula/" + current_cpu_rootfs().name
