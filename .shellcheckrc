@@ -1,0 +1,4 @@
+# Follow sourced files from each script directory and from the repository root.
+external-sources=true
+source-path=SCRIPTDIR
+source-path=.
