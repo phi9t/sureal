@@ -1,0 +1,1050 @@
+{
+  "schema_version": 1,
+  "description": "Allowed current machine-identifier hits. Counts must only shrink.",
+  "allowed": [
+    {
+      "path": ".scratch/blob-store/issues/07-native-cache-and-pilot-specs.md",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/blob-store/issues/07-native-cache-and-pilot-specs.md",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/blob-store/issues/11-delete-old-wrappers.md",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/blob-store/issues/11-delete-old-wrappers.md",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/launch-plans/issues/01-launch-plan-core.md",
+      "kind": "host data path",
+      "count": 5,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/launch-plans/issues/01-launch-plan-core.md",
+      "kind": "user home path",
+      "count": 5,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/launch-plans/issues/02-gpu-launch-plans.md",
+      "kind": "host data path",
+      "count": 2,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/launch-plans/issues/02-gpu-launch-plans.md",
+      "kind": "user home path",
+      "count": 2,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/launch-plans/issues/03-run-the-broken-verifiers.md",
+      "kind": "host data path",
+      "count": 40,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/launch-plans/issues/03-run-the-broken-verifiers.md",
+      "kind": "user home path",
+      "count": 40,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/launch-plans/issues/06-evaluation-and-detection-launches.md",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/launch-plans/issues/06-evaluation-and-detection-launches.md",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/launch-plans/issues/07-retention-and-resource-launches.md",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/launch-plans/issues/07-retention-and-resource-launches.md",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/launch-plans/issues/10-live-gates-on-launch-plans.md",
+      "kind": "host data path",
+      "count": 3,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/launch-plans/issues/10-live-gates-on-launch-plans.md",
+      "kind": "user home path",
+      "count": 3,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/plan-authority/issues/01-pin-rendering-and-retained-receipts.md",
+      "kind": "host data path",
+      "count": 34,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/plan-authority/issues/01-pin-rendering-and-retained-receipts.md",
+      "kind": "user home path",
+      "count": 34,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/plan-authority/issues/02-plan-carries-named-input-digests-and-driver-pins.md",
+      "kind": "host data path",
+      "count": 15,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/plan-authority/issues/02-plan-carries-named-input-digests-and-driver-pins.md",
+      "kind": "user home path",
+      "count": 15,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/plan-authority/issues/03-new-receipts-are-checked-by-plan-comparison.md",
+      "kind": "host data path",
+      "count": 18,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/plan-authority/issues/03-new-receipts-are-checked-by-plan-comparison.md",
+      "kind": "user home path",
+      "count": 18,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/plan-authority/issues/04-shrink-command-module-and-close-the-seam.md",
+      "kind": "host data path",
+      "count": 17,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/plan-authority/issues/04-shrink-command-module-and-close-the-seam.md",
+      "kind": "user home path",
+      "count": 17,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/plan-authority/spec.md",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/plan-authority/spec.md",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/repo-quality/issues/01-scientific-retention-planner.md",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/repo-quality/issues/01-scientific-retention-planner.md",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/repo-quality/issues/02-one-repo-gate.md",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/repo-quality/issues/02-one-repo-gate.md",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/01-cpu-rootfs-with-bazel.md",
+      "kind": "host data path",
+      "count": 3,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/01-cpu-rootfs-with-bazel.md",
+      "kind": "user home path",
+      "count": 3,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/03-perception-cpu-tests-under-bazel.md",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/03-perception-cpu-tests-under-bazel.md",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/04-gpu-rootfs-and-torch-tests.md",
+      "kind": "host data path",
+      "count": 5,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/04-gpu-rootfs-and-torch-tests.md",
+      "kind": "user home path",
+      "count": 5,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/05-curriculum-tests-under-bazel.md",
+      "kind": "host data path",
+      "count": 2,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/05-curriculum-tests-under-bazel.md",
+      "kind": "user home path",
+      "count": 2,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/06-rename-curriculum-to-parallax.md",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/06-rename-curriculum-to-parallax.md",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/08-living-docs-name-new-paths.md",
+      "kind": "host data path",
+      "count": 3,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/08-living-docs-name-new-paths.md",
+      "kind": "user home path",
+      "count": 3,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/10-snapshots-in-hdfs.md",
+      "kind": "host data path",
+      "count": 3,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/10-snapshots-in-hdfs.md",
+      "kind": "user home path",
+      "count": 3,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/17-concept-detection-variants.md",
+      "kind": "host data path",
+      "count": 15,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/17-concept-detection-variants.md",
+      "kind": "user home path",
+      "count": 15,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/19-concept-range-view.md",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/19-concept-range-view.md",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/20-concept-camera.md",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/20-concept-camera.md",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/21-concept-motion.md",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/21-concept-motion.md",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/22-concept-resources.md",
+      "kind": "host data path",
+      "count": 18,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/22-concept-resources.md",
+      "kind": "user home path",
+      "count": 18,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/23-concept-inspection.md",
+      "kind": "host data path",
+      "count": 2,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/23-concept-inspection.md",
+      "kind": "user home path",
+      "count": 2,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/24-studies-fixed-batch.md",
+      "kind": "host data path",
+      "count": 6,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/24-studies-fixed-batch.md",
+      "kind": "user home path",
+      "count": 6,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/25-studies-cohort.md",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/25-studies-cohort.md",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/26-remove-old-structure.md",
+      "kind": "host data path",
+      "count": 3,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/26-remove-old-structure.md",
+      "kind": "user home path",
+      "count": 3,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/28-rootfs-carries-test-tools.md",
+      "kind": "host data path",
+      "count": 9,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/28-rootfs-carries-test-tools.md",
+      "kind": "user home path",
+      "count": 9,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/29-finish-runtime-lock-readmission.md",
+      "kind": "host data path",
+      "count": 2,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/semantic-layout/issues/29-finish-runtime-lock-readmission.md",
+      "kind": "user home path",
+      "count": 2,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/strict-metrics/issues/05-motion-reports-on-strict-reader.md",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": ".scratch/strict-metrics/issues/05-motion-reports-on-strict-reader.md",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Historical local issue text copied from live worker evidence."
+    },
+    {
+      "path": "LICENSE.md",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Upstream license and third party attribution text."
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Upstream license and third party attribution text."
+    },
+    {
+      "path": "autonomy/requirements-tracer.lock",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Generated lock header preserves the interpreter used to compile it."
+    },
+    {
+      "path": "autonomy/requirements-tracer.lock",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Generated lock header preserves the interpreter used to compile it."
+    },
+    {
+      "path": "autonomy/resources/refresh-hdfs-auth.sh",
+      "kind": "host data path",
+      "count": 5,
+      "reason": "Manual credential refresh wizard pins host-local Waystone tool paths."
+    },
+    {
+      "path": "autonomy/resources/refresh-hdfs-auth.sh",
+      "kind": "user home path",
+      "count": 5,
+      "reason": "Manual credential refresh wizard pins host-local Waystone tool paths."
+    },
+    {
+      "path": "autonomy/tracer.sh",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Offline tracer script keeps a legacy cache sentinel for credential isolation."
+    },
+    {
+      "path": "autonomy/tracer.sh",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Offline tracer script keeps a legacy cache sentinel for credential isolation."
+    },
+    {
+      "path": "autonomy/training_execution/sustained_launch_plan_gpu_smoke_test.py",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Live GPU smoke test documents the host-local default runtime cache."
+    },
+    {
+      "path": "autonomy/training_execution/sustained_launch_plan_gpu_smoke_test.py",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Live GPU smoke test documents the host-local default runtime cache."
+    },
+    {
+      "path": "docs/blob-store/balanced16-readmission.md",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/blob-store/balanced16-readmission.md",
+      "kind": "host data path",
+      "count": 14,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/blob-store/balanced16-readmission.md",
+      "kind": "user home path",
+      "count": 14,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/blob-store/retired-publisher-receipts.md",
+      "kind": "host data path",
+      "count": 2,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/blob-store/retired-publisher-receipts.md",
+      "kind": "user home path",
+      "count": 2,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/launch-plans/scientific-cohort-live-run.md",
+      "kind": "host data path",
+      "count": 3,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/launch-plans/scientific-cohort-live-run.md",
+      "kind": "user home path",
+      "count": 3,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/refactor-finish/t26-closeout-fixes.md",
+      "kind": "host data path",
+      "count": 2,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/refactor-finish/t26-closeout-fixes.md",
+      "kind": "user home path",
+      "count": 2,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/mac-automation-completion-manifest.json",
+      "kind": "host data path",
+      "count": 5,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/mac-automation-completion-manifest.json",
+      "kind": "user home path",
+      "count": 5,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/mac-operating-recovery-guide.md",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/mac-operating-recovery-guide.md",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/pilots/58/failure-ledger/README.md",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/pilots/58/failure-ledger/README.md",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/pilots/58/failure-ledger/live-receipt.json",
+      "kind": "email address",
+      "count": 3,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/pilots/58/failure-ledger/live-receipt.json",
+      "kind": "host data path",
+      "count": 98,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/pilots/58/failure-ledger/live-receipt.json",
+      "kind": "user home path",
+      "count": 98,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/pilots/58/failure-ledger/provenance.json",
+      "kind": "host data path",
+      "count": 54,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/pilots/58/failure-ledger/provenance.json",
+      "kind": "user home path",
+      "count": 54,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/pilots/58/functional-results.json",
+      "kind": "host data path",
+      "count": 20,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/pilots/58/functional-results.json",
+      "kind": "user home path",
+      "count": 20,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/archived-evidence.json",
+      "kind": "host data path",
+      "count": 424,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/archived-evidence.json",
+      "kind": "user home path",
+      "count": 424,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/live-verified.json",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/live-verified.json",
+      "kind": "host data path",
+      "count": 9,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/live-verified.json",
+      "kind": "user home path",
+      "count": 9,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/provenance.json",
+      "kind": "host data path",
+      "count": 6,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/provenance.json",
+      "kind": "user home path",
+      "count": 6,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/source-pins.json",
+      "kind": "host data path",
+      "count": 16,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/source-pins.json",
+      "kind": "user home path",
+      "count": 16,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/verification.json",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/research/pilots/58/normalization-inventory/verification.json",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Historical pilot evidence record preserving recorded command paths."
+    },
+    {
+      "path": "docs/strict-metrics/replay-report.json",
+      "kind": "host data path",
+      "count": 4,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/strict-metrics/replay-report.json",
+      "kind": "user home path",
+      "count": 4,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/strict-metrics/replay-report.md",
+      "kind": "host data path",
+      "count": 4,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/strict-metrics/replay-report.md",
+      "kind": "user home path",
+      "count": 4,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-27-sureal-publication.md",
+      "kind": "host data path",
+      "count": 1,
+      "reason": "Historical planning document preserving previously discussed commands."
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-27-sureal-publication.md",
+      "kind": "user home path",
+      "count": 1,
+      "reason": "Historical planning document preserving previously discussed commands."
+    },
+    {
+      "path": "docs/ticket27/admission-plan.json",
+      "kind": "host data path",
+      "count": 23,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket27/admission-plan.json",
+      "kind": "user home path",
+      "count": 23,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket27/admission-plan.md",
+      "kind": "host data path",
+      "count": 13,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket27/admission-plan.md",
+      "kind": "user home path",
+      "count": 13,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket27/execution-report.json",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket27/execution-report.json",
+      "kind": "host data path",
+      "count": 414,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket27/execution-report.json",
+      "kind": "user home path",
+      "count": 414,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket27/execution-report.md",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket27/execution-report.md",
+      "kind": "host data path",
+      "count": 204,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket27/execution-report.md",
+      "kind": "user home path",
+      "count": 202,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket27/readmission-report.json",
+      "kind": "host data path",
+      "count": 813,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket27/readmission-report.json",
+      "kind": "user home path",
+      "count": 813,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket27/readmission-report.md",
+      "kind": "host data path",
+      "count": 46,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket27/readmission-report.md",
+      "kind": "user home path",
+      "count": 46,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket27/storage-plan.json",
+      "kind": "host data path",
+      "count": 13,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket27/storage-plan.json",
+      "kind": "user home path",
+      "count": 13,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket27/storage-plan.md",
+      "kind": "host data path",
+      "count": 14,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket27/storage-plan.md",
+      "kind": "user home path",
+      "count": 14,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket29/plan.md",
+      "kind": "host data path",
+      "count": 3,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket29/plan.md",
+      "kind": "user home path",
+      "count": 3,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket29/report.md",
+      "kind": "host data path",
+      "count": 23,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "docs/ticket29/report.md",
+      "kind": "user home path",
+      "count": 23,
+      "reason": "Historical live-run report or plan preserving recorded command paths."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/CMakeLists.txt",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/LICENSE.md",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/cuda_rasterizer/auxiliary.h",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/cuda_rasterizer/backward.cu",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/cuda_rasterizer/backward.h",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/cuda_rasterizer/config.h",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/cuda_rasterizer/forward.cu",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/cuda_rasterizer/forward.h",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/cuda_rasterizer/rasterizer.h",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/cuda_rasterizer/rasterizer_impl.cu",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/cuda_rasterizer/rasterizer_impl.h",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/cuda_rasterizer_occ/auxiliary.h",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/cuda_rasterizer_occ/config.h",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/cuda_rasterizer_occ/rasterizer.h",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/cuda_rasterizer_occ/rasterizer_impl.cu",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/cuda_rasterizer_occ/rasterizer_impl.h",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/cuda_rasterizer_occ/render_backward.cu",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/cuda_rasterizer_occ/render_backward.h",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/cuda_rasterizer_occ/render_forward.cu",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/cuda_rasterizer_occ/render_forward.h",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/diff_gaussian_rasterization_surflo/__init__.py",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/ext.cpp",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/rasterize_points.cu",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/rasterize_points.h",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/setup.py",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/third_party/glm/glm/gtx/dual_quaternion.hpp",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/third_party/glm/glm/gtx/io.hpp",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/third_party/glm/glm/gtx/io.inl",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/third_party/glm/glm/gtx/matrix_interpolation.hpp",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "submodules/diff-gaussian-rasterization-surflo/third_party/glm/manual.md",
+      "kind": "email address",
+      "count": 2,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "surflo/rendering/surflo.py",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "surflo/structures/cameras.py",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "surflo/structures/struct_utils.py",
+      "kind": "email address",
+      "count": 1,
+      "reason": "Vendored upstream source or license attribution."
+    },
+    {
+      "path": "tests/collab/audit_support/fixtures/kata-schema25-provenance.json",
+      "kind": "host data path",
+      "count": 2,
+      "reason": "Legacy collaboration fixture preserving recorded provenance paths."
+    },
+    {
+      "path": "tests/collab/audit_support/fixtures/kata-schema25-provenance.json",
+      "kind": "user home path",
+      "count": 2,
+      "reason": "Legacy collaboration fixture preserving recorded provenance paths."
+    }
+  ]
+}

@@ -3,6 +3,7 @@ load("@rules_python//python:defs.bzl", "py_library", "py_test")
 package(default_visibility = ["//visibility:private"])
 
 REPO_GATE_TESTS = [
+    "//:check_identifiers_test",
     "//autonomy/blob_store:storage_boundary_test",
     "//autonomy/insula:launch_plan_boundary_test",
     "//autonomy/resources:concept_boundary_test",
@@ -30,6 +31,27 @@ py_test(
     legacy_create_init = 0,
     size = "small",
     tags = [
+        "repo_gate",
+    ],
+)
+
+py_library(
+    name = "check_identifiers_lib",
+    srcs = ["scripts/check_identifiers.py"],
+    imports = ["."],
+)
+
+py_test(
+    name = "check_identifiers_test",
+    srcs = ["scripts/check_identifiers_test.py"],
+    data = [
+        "scripts/check_identifiers_baseline.json",
+    ],
+    deps = [":check_identifiers_lib"],
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "no-sandbox",
         "repo_gate",
     ],
 )
