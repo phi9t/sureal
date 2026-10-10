@@ -9,6 +9,7 @@ from insula.runtime_roots import current_cpu_rootfs, default_lock
 from dataset.scientific_admission import admit_scene
 from dataset.cohort_resume import verify_registered_checkpoint
 from resources.scientific_budget import SCIENTIFIC_WORKING_CAP_BYTES
+from resources.scientific_payload import unique_payload_bytes
 DRIVER=Path(__file__).resolve()
 HERE=DRIVER.parents[1]
 CACHE=Path.home()/'.cache/waystone/waymo-perception'
@@ -18,7 +19,7 @@ CAMERA_COMPONENTS=['camera_image','camera_segmentation','camera_box']
 SCIENTIFIC_COHORT_TARGET='//autonomy/studies:scientific_cohort'
 def save(p,data):
  p.write_text(json.dumps(data,indent=2)+'\n')
-def total(p):return sum(f.stat().st_size for f in p.rglob('*') if f.is_file())
+def total(p):return unique_payload_bytes(p)
 def check_succeeded(check):
  if 'exit_code' in check:return check['exit_code']==0
  return (check.get('verified_by_readback') is True and isinstance(check.get('blob_key'),str)

@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -112,6 +113,16 @@ class ScientificCohortWorkflowTests(unittest.TestCase):
             audited = scientific_cohort.audit(receipt, root)
 
             self.assertEqual(audited["checks"][1]["stage"], "archive-blob-fetch")
+
+    def test_total_counts_hard_links_once(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            first = root / "first.bin"
+            second = root / "second.bin"
+            first.write_bytes(b"abcdef")
+            os.link(first, second)
+
+            self.assertEqual(scientific_cohort.total(root), 6)
 
     def test_point_and_camera_lifecycle_dispatches_under_study_owner(self):
         with tempfile.TemporaryDirectory() as temporary:
