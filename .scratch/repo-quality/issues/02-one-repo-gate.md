@@ -73,3 +73,43 @@ Final verification on the finished tree:
 Shared-file overlaps: this ticket touched `AGENTS.md`, `BUILD.bazel`, and
 `autonomy/insula/bazel_launcher.py`. No retained receipts, root filesystems,
 locks, or evidence bytes were edited.
+
+### 2026-10-10 Linked-worktree follow-up
+
+Landing validation in a linked worktree exposed that the first wrapper fix
+mounted only the per-worktree gitdir and not the linked worktree's common Git
+dir. Fixed `autonomy/insula/bazel_launcher.py` to mount linked-worktree common
+metadata read-only, make `/experiment/.git` resolve to the per-worktree gitdir
+inside that common mount, and pass explicit repo-gate Git variables for
+`GIT_DIR`, `GIT_WORK_TREE`, `GIT_COMMON_DIR`, `GIT_OBJECT_DIRECTORY`, and
+`GIT_ALTERNATE_OBJECT_DIRECTORIES`.
+
+Backfilled `//autonomy/insula:bazel_wrapper_test` with plain, alternate-object
+clone, and linked-worktree-with-`commondir` fixtures. The test materializes the
+wrapper's mount/env plan in a temp sandbox and runs the gate Git commands:
+`git ls-files --stage -z`, boundary-test `git ls-files`, and
+`git diff --check HEAD --`.
+
+Verification:
+- `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/insula:bazel_wrapper_test`
+  first failed on the missing common-dir projection, then passed after the fix:
+  1/1 target, elapsed 19.245s.
+- `./bazelw test //:repo_gate` from this worker worktree passed: 7/7 tests,
+  elapsed 12.852s.
+- Created a fresh linked worktree under `$TMPDIR` with
+  `git worktree add --force <tmp>/worktree worker/rq02-repo-gate`, seeded its
+  local `.bazel-cache`, ran `./bazelw test //:repo_gate`, and removed it with
+  `git worktree remove --force`: 7/7 tests passed, elapsed 12.342s.
+- `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...`
+  passed: 188/188 tests, elapsed 94.181s. Count remains 188; the new
+  regression is an added case inside the existing wrapper test target.
+- `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //parallax/...`
+  passed: 17/17 tests, elapsed 391.673s.
+- GPU 1 availability was checked before CUDA. Required UUID
+  `GPU-eaed2f0d-2541-8ca8-b6c4-3e2e45e86619` had 4 MiB used and no compute
+  process in `nvidia-smi --query-compute-apps`.
+- `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...`
+  passed: 30/30 tests, elapsed 119.794s.
+
+Shared-file overlaps in this follow-up: `autonomy/insula/bazel_launcher.py`.
+No retained receipts, root filesystems, locks, or shared caches were edited.
