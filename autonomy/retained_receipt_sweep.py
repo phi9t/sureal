@@ -15,6 +15,7 @@ from typing import Iterable, Mapping
 
 from evidence.source_snapshot import LocalSnapshotStore, archive_sources, is_regular_file
 from insula.launch_plan import (
+    assert_record_matches_rendered_command,
     gpu_driver_hashes_from_plan_record,
     read_receipt_mount_sequence,
     read_receipt_mounts,
@@ -95,44 +96,6 @@ def _extra_receipts_from_manifest(path: Path) -> list[Path]:
     return result
 
 
-def _ordered_mount_keys(mounts: Iterable[Mapping[str, object]]) -> dict[tuple[str, str, str], list[Mapping[str, object]]]:
-    result: dict[tuple[str, str, str], list[Mapping[str, object]]] = {}
-    for mount in mounts:
-        try:
-            key = (str(mount["inside_path"]), str(mount["kind"]), str(mount["mode"]))
-        except KeyError as error:
-            raise ValueError("complete launch plan mount record required") from error
-        result.setdefault(key, []).append(mount)
-    return result
-
-
-def _verify_recorded_mount_digests_from_command(receipt: Mapping[str, object]) -> None:
-    """Check recorded read-only mount digests against the rendered command hosts."""
-    command = receipt.get("command")
-    launch_plan = receipt.get("launch_plan")
-    if not isinstance(command, list) or not isinstance(launch_plan, Mapping):
-        return
-    command_mounts = _ordered_mount_keys(
-        read_receipt_mount_sequence({"command": command}, include_digests=True)
-    )
-    for mount in read_receipt_mount_sequence({"launch_plan": launch_plan}):
-        digest = mount.get("digest")
-        if (
-            not isinstance(digest, str)
-            or mount.get("kind") != "bind"
-            or mount.get("mode") != "read_only"
-            or mount.get("inside_path") == "/"
-        ):
-            continue
-        key = (str(mount["inside_path"]), str(mount["kind"]), str(mount["mode"]))
-        matches = command_mounts.get(key, [])
-        if len(matches) != 1:
-            raise ValueError(f"rendered command mount missing for digest: {key[0]}")
-        actual = matches[0].get("digest")
-        if actual != digest:
-            raise ValueError(f"recorded launch plan mount digest differs: {key[0]}")
-
-
 def _iter_receipt_records(value):
     if isinstance(value, dict):
         yield value
@@ -185,7 +148,11 @@ def _verify_launch_plan_record(
 ) -> None:
     read_receipt_mounts(record, include_digests=False)
     read_receipt_mount_sequence(record, include_digests=False)
+    launch_plan = record.get("launch_plan")
     plan_record = _launch_plan_record(record)
+    command = record.get("command")
+    if isinstance(launch_plan, Mapping) and isinstance(command, list):
+        assert_record_matches_rendered_command(plan_record, command)
     if plan_record is not None and verify_gpu_driver_pins and gpu_driver_hashes_from_plan_record(plan_record):
         verify_gpu_driver_hashes_from_plan_record(plan_record)
         driver_hashes = record.get("driver_hashes")
@@ -237,7 +204,6 @@ def _verify_resource_stage_proof(path: Path, temp_root: Path) -> None:
                 os.environ.pop("SUREAL_SOURCE_SNAPSHOT_STORE", None)
             else:
                 os.environ["SUREAL_SOURCE_SNAPSHOT_STORE"] = old_store
-    _verify_recorded_mount_digests_from_command(proof)
 
 
 def sweep_fresh_live_receipts(paths: Iterable[Path], temp_root: Path) -> VerifierReport:

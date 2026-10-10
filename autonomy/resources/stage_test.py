@@ -1,7 +1,7 @@
 import copy,json,tempfile,unittest
 from pathlib import Path
 from evidence.source_snapshot import LocalSnapshotStore
-from insula.launch_plan import BAZEL_LINUX_X86_64_SHA256, BAZEL_VERSION, build_plan, load_runtime_lock, plan_data
+from insula.launch_plan import BAZEL_LINUX_X86_64_SHA256, BAZEL_VERSION, build_plan, load_runtime_lock, plan_data, record_plan, render_plan
 from insula.runtime_identity import rootfs_identity
 from insula.runtime_roots import CURRENT_CPU_ROOTFS_NAME
 from resources.sources import freeze_sources,sha
@@ -153,33 +153,70 @@ class ResourceStageTests(unittest.TestCase):
             self.assertEqual(plan_data(plan)['command'],['python','/experiment/worker.py'])
             bad=copy.deepcopy(proof)
             bad['launch_plan']['mounts']=[mount for mount in bad['launch_plan']['mounts'] if mount['role']!='resource-layer']
-            with self.assertRaises(ValueError):
+            with self.assertRaisesRegex(ValueError,'mount role differs'):
                 validate(bad,bad['command'],current,pins,native,1024**3,10)
-            for fault in ['extra-mount','reordered-mount','changed-mount-mode']:
+            for fault,expected in [
+                ('changed-mount-digest','mount digest differs'),
+                ('changed-mount-role','mount role differs'),
+                ('reordered-argv','command differs'),
+            ]:
                 bad=copy.deepcopy(proof)
-                if fault=='extra-mount':
-                    separator=bad['command'].index('--')
-                    bad['command'][separator:separator]=['--bind',str(root),'/host']
-                elif fault=='reordered-mount':
-                    resource_output=str(evidence/'worker')
-                    output_index=bad['command'].index(resource_output)-1
-                    output_mount=bad['command'][output_index:output_index+3]
-                    del bad['command'][output_index:output_index+3]
-                    layer_index=bad['command'].index('/tmp/resource-layer')-2
-                    bad['command'][layer_index:layer_index]=output_mount
+                if fault=='changed-mount-digest':
+                    mounts=bad['launch_plan']['mounts']
+                    next(mount for mount in mounts if mount['role']=='resource-layer')['digest']='0'*64
+                elif fault=='changed-mount-role':
+                    mounts=bad['launch_plan']['mounts']
+                    next(mount for mount in mounts if mount['role']=='resource-layer')['role']='resource-layer-renamed'
                 else:
-                    bad['command'][bad['command'].index('/tmp/resource-layer')-2]='--bind'
+                    command=bad['launch_plan']['command']
+                    command[-1],command[-2]=command[-2],command[-1]
+                    bad['command'][-1],bad['command'][-2]=bad['command'][-2],bad['command'][-1]
                 bad['host_measurement']['command']=bad['command'].copy()
-                with self.subTest(fault=fault),self.assertRaises(ValueError):
+                with self.subTest(fault=fault),self.assertRaisesRegex(ValueError,expected):
                     validate(bad,bad['command'],current,pins,native,1024**3,10)
-            bad=copy.deepcopy(proof)
-            original_insert=bad['original_command'].index('--proc')
-            wrapped_insert=bad['command'].index('/tmp/resource-layer')-2
-            bad['original_command'][original_insert:original_insert]=['--bind',str(root),'/host']
-            bad['command'][wrapped_insert:wrapped_insert]=['--bind',str(root),'/host']
-            bad['host_measurement']['command']=bad['command'].copy()
-            with self.assertRaises(ValueError):
-                validate(bad,bad['command'],current,pins,native,1024**3,10)
+
+    def test_new_plan_proof_does_not_parse_original_command(self):
+        _,validate=self.api()
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp);current,pins=self.sources(root);native=root/'native';native.mkdir()
+            rootfs=root/CURRENT_CPU_ROOTFS_NAME;write_rootfs(rootfs);lock=rootfs.with_name(rootfs.name+'.lock.json');write_cpu_lock(lock,rootfs)
+            runtime=load_runtime_lock(rootfs,lock)
+            native_code=root/'native-code';native_code.mkdir()
+            plan=build_plan(runtime,code=native_code,output=native,command=['python','/experiment/worker.py'])
+            proof_root=root/'proof';worker_dir=proof_root/'worker';worker_dir.mkdir(parents=True)
+            (native/'live.log').write_text('ok\n')
+            worker={'worker_argv':['/experiment/worker.py'],'worker_pid':123,
+                    'measurement':'in-runtime getrusage SELF and waited CHILDREN KiB',
+                    'self_peak_rss_kib':150,'waited_child_peak_rss_kib':100,
+                    'peak_rss_kib':150,'elapsed_seconds':.8,'exit_code':0,
+                    'child_lifecycle':{'subreaper_verified':True,'remaining_children':[]}}
+            from resources.command import wrap_plan
+            from resources.sources import validate_sources as validate_resource_sources
+            code=validate_resource_sources(current,pins)
+            wrapped,worker_argv=wrap_plan(plan,code,worker_dir)
+            command=render_plan(wrapped)
+            worker_path=worker_dir/'worker-resource.json';worker_path.write_text(json.dumps(worker))
+            log=proof_root/'execution.log';log.write_text('ok\n')
+            host={'command':command.copy(),'exit_code':0,'timed_out':False,'peak_rss_kib':100,'elapsed_seconds':1.,
+                  'measurement':'wait4.ru_maxrss_KiB_largest_waited_child',
+                  'kernel_scope':{'path':'/user.slice/sureal-sustained-fixture.scope','memory_max_bytes':1024**3,
+                                  'memory_swap_max_bytes':0,'oom':0,'oom_kill':0,'members_verified':True,
+                                  'process_ids':[111]},
+                  'stage_lifecycle':{'caller_pid':111,'scope_members_before':[111],
+                                     'scope_members_after':[111],
+                                     'subreaper_verified':True,'remaining_children':[]}}
+            proof={'schema_version':1,'admitted':True,
+                   'original_command':['this','is','not','bwrap'],
+                   'command':command,'source_pins':pins,'native_output_directory':str(native),
+                   'cap_bytes':1024**3,'timeout_seconds':10,
+                   'original_launch_plan':record_plan(plan),'launch_plan':record_plan(wrapped),
+                   'worker_argv':worker_argv,'host_measurement':host,'worker_measurement':worker,
+                   'resource_admission':{'peak_rss_bytes':153600,'aggregate_cap_bytes':1073741824,
+                                         'scope':'separate launcher and in-runtime worker/waited-child peaks under aggregate kernel cap; not summed tree RSS'},
+                   'artifacts':{'worker_resource':{'path':str(worker_path),'sha256':sha(worker_path)},
+                                'execution_log':{'path':str(log),'native_path':str(native/'live.log'),'sha256':sha(log)}}}
+            admitted=validate(proof,proof['command'],current,pins,native,1024**3,10)
+            self.assertEqual(admitted['peak_rss_bytes'],153600)
 
     def test_exact_command_source_output_and_measured_worker_proof_required(self):
         _,validate=self.api()

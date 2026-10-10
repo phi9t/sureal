@@ -15,6 +15,8 @@ from insula.launch_plan import (
     Mount,
     PlanError,
     RuntimeLockError,
+    assert_plan_matches_record,
+    assert_record_matches_rendered_command,
     build_plan,
     gpu_driver_hashes_from_plan_record,
     gpu_driver_paths_from_plan_record,
@@ -1229,6 +1231,94 @@ class LaunchPlanTests(unittest.TestCase):
             self.assertEqual(mounts["code"]["digest"], "snapshot-fixture")
             self.assertEqual(mounts["input:/tmp/scientific"]["digest"], "3" * 64)
             self.assertEqual(mounts["input:/tmp/scientific"]["inside_path"], "/tmp/scientific")
+
+    def test_plan_record_comparison_checks_structured_fields_by_role(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            runtime = self.load_fixture_runtime(root)
+            code = root / "code"
+            output = root / "output"
+            table = root / "table"
+            for path in (code, output, table):
+                path.mkdir()
+            (table / "rows.json").write_text("{}\n")
+            plan = build_plan(
+                runtime,
+                code=code,
+                output=output,
+                named_inputs={"/tmp/table": table},
+                command=["python", "/experiment/a.py", "--literal"],
+            )
+            record = record_plan(plan)
+
+            shuffled = copy.deepcopy(record)
+            shuffled["mounts"] = list(reversed(shuffled["mounts"]))
+            assert_plan_matches_record(plan, shuffled, rendered_command=render_plan(plan))
+
+            for field, pattern, mutate in [
+                (
+                    "digest",
+                    "mount digest differs: input:/tmp/table",
+                    lambda value: next(
+                        mount for mount in value["mounts"] if mount["role"] == "input:/tmp/table"
+                    ).__setitem__("digest", "0" * 64),
+                ),
+                (
+                    "role",
+                    "mount role differs",
+                    lambda value: next(
+                        mount for mount in value["mounts"] if mount["role"] == "input:/tmp/table"
+                    ).__setitem__("role", "input:/tmp/table-renamed"),
+                ),
+                (
+                    "argv",
+                    "command differs",
+                    lambda value: value["command"].reverse(),
+                ),
+                (
+                    "environment",
+                    "environment differs",
+                    lambda value: value["environment"].__setitem__("PYTHONPATH", "/other"),
+                ),
+            ]:
+                with self.subTest(field=field):
+                    tampered = copy.deepcopy(record)
+                    mutate(tampered)
+                    with self.assertRaisesRegex(ValueError, pattern):
+                        assert_plan_matches_record(plan, tampered)
+
+    def test_plan_record_comparison_checks_rendered_command_by_rendering_expected_plan(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            runtime = self.load_fixture_runtime(root)
+            code = root / "code"
+            output = root / "output"
+            for path in (code, output):
+                path.mkdir()
+            plan = build_plan(runtime, code=code, output=output, command=["python", "/experiment/a.py"])
+            command = render_plan(plan)
+            command[-1] = "/experiment/b.py"
+
+            with self.assertRaisesRegex(ValueError, "rendered command differs"):
+                assert_plan_matches_record(plan, record_plan(plan), rendered_command=command)
+
+    def test_record_command_comparison_treats_environment_mapping_order_as_data(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            runtime = self.load_fixture_runtime(root)
+            code = root / "code"
+            output = root / "output"
+            for path in (code, output):
+                path.mkdir()
+            plan = build_plan(runtime, code=code, output=output, command=["python", "/experiment/a.py"])
+            command = render_plan(plan)
+            record = record_plan(plan)
+            record["environment"] = {
+                name: record["environment"][name]
+                for name in sorted(record["environment"])
+            }
+
+            assert_record_matches_rendered_command(record, command)
 
     def test_render_plan_never_renders_the_same_inside_path_twice(self):
         with tempfile.TemporaryDirectory() as temporary:

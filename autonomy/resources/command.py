@@ -1,4 +1,5 @@
 """Resource-stage command wrapping and legacy receipt inspection."""
+import copy
 from pathlib import Path
 from typing import Iterable, Mapping
 
@@ -7,11 +8,11 @@ from insula.launch_plan import (
     LaunchPlan,
     Mount,
     PlanError,
+    mount_content_digest,
     _parse_legacy_receipt_command,
     _plan_device_insertion_index,
     _plan_tmp_mounts_index,
     _render_mount,
-    _render_ordered_record_mounts,
     inspect_legacy_receipt_command as _inspect_legacy_receipt_command,
     legacy_receipt_command_argv,
     with_mounts,
@@ -47,6 +48,11 @@ def wrapped_rendered_plan_command(command,code,output):
 def wrapped_plan(plan,code,output):
     """Construct the resource wrapper as launch-plan data."""
     return wrap_resource_plan(plan,code,output)
+
+
+def wrapped_plan_record(record,code,output):
+    """Construct the resource wrapper as recorded launch-plan data."""
+    return wrap_resource_plan_record(record,code,output)
 
 
 def wrap_command(command,code,output):
@@ -153,95 +159,68 @@ def wrap_resource_plan(plan: LaunchPlan, code: Path, output: Path) -> tuple[Laun
     return wrapped, argv[1:]
 
 
-def rendered_command_matches_record(command: list[str], record: Mapping[str, object]) -> bool:
-    """Return whether a rendered command matches a recorded launch plan."""
-    try:
-        parsed = _parse_legacy_receipt_command(command, require_cleared_environment=True, require_python_worker=True)
-        mounts = []
-        devices = []
-        environment = {}
-        working_directory = None
-        for option, values in parsed["options"]:
-            if option == "--ro-bind":
-                mounts.append({"kind": "bind", "inside_path": values[1], "mode": "read_only"})
-            elif option == "--bind":
-                mounts.append({"kind": "bind", "inside_path": values[1], "mode": "writable"})
-            elif option == "--dev-bind":
-                devices.append({"inside_path": values[1]})
-            elif option == "--tmpfs":
-                mounts.append({"kind": "tmpfs", "inside_path": values[0], "mode": "writable"})
-            elif option == "--symlink":
-                mounts.append(
-                    {
-                        "kind": "symlink",
-                        "inside_path": values[1],
-                        "mode": "read_only",
-                        "symlink_target": values[0],
-                    }
-                )
-            elif option == "--setenv":
-                environment[values[0]] = values[1]
-            elif option == "--chdir":
-                working_directory = values[0]
-        flag_options = [option for option, values in parsed["options"] if not values]
-        proc_options = [values for option, values in parsed["options"] if option == "--proc"]
-        dev_options = [values for option, values in parsed["options"] if option == "--dev"]
-        recorded_mounts = [
-            {key: mount[key] for key in ("kind", "inside_path", "mode", "symlink_target") if key in mount}
-            for mount in _render_ordered_record_mounts(record["mounts"])
-        ]
-        recorded_devices = _recorded_device_bindings(record)
-        return (
-            flag_options == ["--unshare-all", "--die-with-parent", "--clearenv"]
-            and proc_options == [("/proc",)]
-            and dev_options == [("/dev",)]
-            and mounts == recorded_mounts
-            and devices == recorded_devices
-            and environment == record["environment"]
-            and working_directory == record["working_directory"]
-            and list(parsed["argv"]) == record["command"]
-        )
-    except (KeyError, TypeError, ValueError) as error:
-        raise ValueError("actual wrapper, original worker, native output and resource mounts required") from error
+def wrap_resource_plan_record(record: Mapping[str, object], code: Path, output: Path) -> tuple[dict, list[str]]:
+    """Return a resource-wrapped launch-plan record without parsing argv."""
+    if not isinstance(record, Mapping):
+        raise PlanError("launch plan record required")
+    wrapped = copy.deepcopy(dict(record))
+    argv = wrapped.get("command")
+    mounts = wrapped.get("mounts")
+    if (
+        not isinstance(argv, list)
+        or len(argv) < 2
+        or argv[0] not in {"python", "/opt/waymo/bin/python"}
+        or not isinstance(argv[1], str)
+        or not Path(argv[1]).is_absolute()
+        or not argv[1].endswith(".py")
+        or not isinstance(mounts, list)
+        or any(not isinstance(mount, Mapping) for mount in mounts)
+    ):
+        raise PlanError("declared original Python worker required")
+    _require_resource_aliases_unused_record(mounts)
+    wrapped["mounts"] = [
+        *mounts,
+        *_resource_wrapper_mount_records(Path(code), Path(output)),
+    ]
+    wrapped["command"] = [
+        argv[0],
+        "/tmp/resource-layer/resources/execute_worker.py",
+        "/tmp/resource-output",
+        *argv[1:],
+    ]
+    return wrapped, argv[1:]
 
 
-def _recorded_device_bindings(record: Mapping[str, object]) -> list[dict[str, str]]:
-    devices = [{"inside_path": device["inside_path"]} for device in record.get("devices", [])]
-    gpu = record.get("gpu")
-    if isinstance(gpu, Mapping) and type(gpu.get("requested_index")) is int:
-        index = gpu["requested_index"]
-        devices.extend(
-            [
-                {"inside_path": f"/dev/nvidia{index}"},
-                {"inside_path": "/dev/nvidiactl"},
-                {"inside_path": "/dev/nvidia-uvm"},
-            ]
-        )
-    return devices
-
-
-def recorded_resource_mounts_match(mounts: Iterable[Mapping[str, object]]) -> bool:
-    """Return whether a launch-plan record contains the resource wrapper mounts."""
-    expected = [
-        {"role": "resource-layer", "kind": "bind", "inside_path": "/tmp/resource-layer", "mode": "read_only"},
+def _resource_wrapper_mount_records(code: Path, output: Path) -> list[dict[str, object]]:
+    return [
+        {
+            "role": "resource-layer",
+            "kind": "bind",
+            "inside_path": "/tmp/resource-layer",
+            "mode": "read_only",
+            "digest": mount_content_digest(code),
+        },
         {
             "role": "resource-experiment-resources",
             "kind": "bind",
             "inside_path": "/experiment/resources",
             "mode": "read_only",
+            "digest": mount_content_digest(code / "resources"),
         },
         {
             "role": "resource-experiment-evidence",
             "kind": "bind",
             "inside_path": "/experiment/evidence",
             "mode": "read_only",
+            "digest": mount_content_digest(code / "evidence"),
         },
-        {"role": "resource-output", "kind": "bind", "inside_path": "/tmp/resource-output", "mode": "writable"},
+        {
+            "role": "resource-output",
+            "kind": "bind",
+            "inside_path": "/tmp/resource-output",
+            "mode": "writable",
+        },
     ]
-    return all(
-        sum(1 for mount in mounts if all(mount.get(key) == value for key, value in required.items())) == 1
-        for required in expected
-    )
 
 
 def _validate_resource_wrapper_inputs(code,output):
@@ -256,6 +235,12 @@ def _validate_resource_wrapper_inputs(code,output):
 def _require_resource_aliases_unused(options: Iterable[tuple[str, tuple[str, ...]]]) -> None:
     for option, values in options:
         if option in {"--ro-bind", "--bind", "--dev-bind", "--proc", "--dev", "--tmpfs", "--symlink"} and values[-1] in _RESOURCE_WRAPPER_ALIASES:
+            raise PlanError("resource mount aliases must be unused")
+
+
+def _require_resource_aliases_unused_record(mounts: Iterable[Mapping[str, object]]) -> None:
+    for mount in mounts:
+        if mount.get("inside_path") in _RESOURCE_WRAPPER_ALIASES:
             raise PlanError("resource mount aliases must be unused")
 
 
