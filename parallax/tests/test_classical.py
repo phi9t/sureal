@@ -17,7 +17,7 @@ sys.path.insert(0, str(ROOT / "pipeline"))
 
 class CameraGeometryContractTest(unittest.TestCase):
     def test_projection_round_trip_and_camera_center_recovery(self) -> None:
-        from math3d import camera_center, project, unproject
+        from pipeline.math3d import camera_center, project, unproject
 
         K = np.array([[500.0, 0.0, 320.0], [0.0, 510.0, 240.0], [0.0, 0.0, 1.0]])
         R = np.eye(3)
@@ -29,7 +29,7 @@ class CameraGeometryContractTest(unittest.TestCase):
         np.testing.assert_allclose(camera_center(R, t), np.array([0.25, -0.1, 0.0]), atol=1e-12)
 
     def test_epipolar_residual_and_triangulation_are_numerically_consistent(self) -> None:
-        from math3d import fundamental_from_poses, project, symmetric_epipolar_distance, triangulate_point
+        from pipeline.math3d import fundamental_from_poses, project, symmetric_epipolar_distance, triangulate_point
 
         K = np.array([[600.0, 0.0, 320.0], [0.0, 600.0, 240.0], [0.0, 0.0, 1.0]])
         R1 = np.eye(3)
@@ -45,7 +45,7 @@ class CameraGeometryContractTest(unittest.TestCase):
         np.testing.assert_allclose(recovered, point[0], atol=1e-9)
 
     def test_point_bundle_refinement_reduces_reprojection_error(self) -> None:
-        from math3d import project, refine_point_gauss_newton, reprojection_rmse
+        from pipeline.math3d import project, refine_point_gauss_newton, reprojection_rmse
 
         K = np.array([[550.0, 0.0, 320.0], [0.0, 550.0, 240.0], [0.0, 0.0, 1.0]])
         cameras = [
@@ -63,7 +63,7 @@ class CameraGeometryContractTest(unittest.TestCase):
         self.assertLessEqual(history[-1], history[0])
 
     def test_coordinate_conversion_is_an_involution(self) -> None:
-        from math3d import opencv_opengl_camera_transform
+        from pipeline.math3d import opencv_opengl_camera_transform
 
         matrix = np.array(
             [[1.0, 0.0, 0.0, 0.2], [0.0, 1.0, 0.0, -0.4], [0.0, 0.0, 1.0, 1.5], [0.0, 0.0, 0.0, 1.0]]
@@ -73,7 +73,7 @@ class CameraGeometryContractTest(unittest.TestCase):
 
 class FusionContractTest(unittest.TestCase):
     def test_icp_converges_from_a_nearby_initialization(self) -> None:
-        from math3d import apply_transform, icp
+        from pipeline.math3d import apply_transform, icp
 
         rng = np.random.default_rng(9)
         source = rng.normal(size=(40, 3))
@@ -86,7 +86,7 @@ class FusionContractTest(unittest.TestCase):
         np.testing.assert_allclose(estimated_translation, np.array([0.12, -0.08, 0.04]), atol=2e-3)
 
     def test_tsdf_weighted_fusion_and_unit_normals(self) -> None:
-        from math3d import fuse_tsdf, normalize_rows
+        from pipeline.math3d import fuse_tsdf, normalize_rows
 
         fused, weight = fuse_tsdf(0.1, 2.0, -0.2, 1.0)
         self.assertAlmostEqual(fused, 0.0)

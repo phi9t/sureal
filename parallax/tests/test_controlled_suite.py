@@ -130,7 +130,7 @@ class ControlledSuiteTest(unittest.TestCase):
         self.assertGreaterEqual(len(record["consumers"]), 8)
 
     def test_validation_consumes_blender_depth_normals_and_sensor_contract(self) -> None:
-        import controlled_suite
+        import pipeline.controlled_suite as controlled_suite
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -157,7 +157,7 @@ class ControlledSuiteTest(unittest.TestCase):
                 controlled_suite.validate_controlled_suite(root, lock=lock)
 
     def test_cached_validation_rechecks_same_size_content_with_restored_mtime(self) -> None:
-        import controlled_suite
+        import pipeline.controlled_suite as controlled_suite
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

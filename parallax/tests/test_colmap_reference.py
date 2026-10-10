@@ -136,7 +136,7 @@ class ColmapReferenceAdapterTest(unittest.TestCase):
         from sys import path as import_path
 
         import_path.insert(0, str(ROOT / "pipeline"))
-        from reference_runner import _validate_sqlite_database
+        from pipeline.reference_runner import _validate_sqlite_database
 
         with tempfile.TemporaryDirectory() as temporary:
             database = Path(temporary) / "database.db"
@@ -157,8 +157,8 @@ class ColmapReferenceAdapterTest(unittest.TestCase):
     def test_generated_scene_is_deterministic_and_records_full_calibration(self) -> None:
         from sys import path as import_path
         import_path.insert(0, str(ROOT / "pipeline"))
-        from contracts import load_json
-        from reference_scene import generate_colmap_scene
+        from pipeline.contracts import load_json
+        from pipeline.reference_scene import generate_colmap_scene
 
         scene = load_json(ROOT / "shared-scene.json")
         with tempfile.TemporaryDirectory() as temporary:
@@ -231,7 +231,7 @@ class ColmapReferenceAdapterTest(unittest.TestCase):
 
             from sys import path as import_path
             import_path.insert(0, str(ROOT / "pipeline"))
-            from reference_runner import validate_reference_result
+            from pipeline.reference_runner import validate_reference_result
 
             validate_reference_result(run_dir, "colmap-sfm")
             points = run_dir / "output" / "sparse" / "0" / "points3D.txt"
@@ -259,8 +259,8 @@ class ColmapReferenceAdapterTest(unittest.TestCase):
 
             from sys import path as import_path
             import_path.insert(0, str(ROOT / "pipeline"))
-            from contracts import sha256_file
-            from reference_runner import validate_reference_result
+            from pipeline.contracts import sha256_file
+            from pipeline.reference_runner import validate_reference_result
 
             ply = run_dir / "output" / "sparse.ply"
             ply.write_text(ply.read_text().replace("element vertex 1200", "element vertex 1199"))
@@ -286,7 +286,7 @@ class ColmapReferenceAdapterTest(unittest.TestCase):
 
             from sys import path as import_path
             import_path.insert(0, str(ROOT / "pipeline"))
-            from reference_runner import validate_reference_result
+            from pipeline.reference_runner import validate_reference_result
 
             payload = json.loads(original)
             payload.pop("tool")
@@ -316,7 +316,7 @@ class ColmapReferenceAdapterTest(unittest.TestCase):
 
             from sys import path as import_path
             import_path.insert(0, str(ROOT / "pipeline"))
-            from reference_runner import validate_reference_result
+            from pipeline.reference_runner import validate_reference_result
 
             cases = (
                 ("module_ids", lambda payload: payload.__setitem__("module_ids", ["06"]), "module scope mismatch"),

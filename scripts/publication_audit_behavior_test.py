@@ -34,6 +34,14 @@ class PublicationAuditBehaviorTests(unittest.TestCase):
         self.assertIn("stdout details", message)
         self.assertIn("stderr details", message)
 
+    def test_portable_command_environment_uses_parallax_import_root(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            env = publication_audit._portable_command_environment(root)
+
+        self.assertEqual(env["PYTHONPATH"].split(":")[0], str(root / "parallax"))
+        self.assertNotIn("PYTHONSAFEPATH", env)
+
     def test_publication_audit_cli_accepts_tracked_testdata_log(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

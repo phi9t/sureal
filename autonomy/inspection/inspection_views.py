@@ -7,7 +7,7 @@ import numpy as np
 import pyarrow.parquet as pq
 from PIL import Image,ImageDraw
 from evidence.source_snapshot import file_sha256
-from .inspection import bev_raster,projection_samples,range_raster
+from inspection.inspection import bev_raster,projection_samples,range_raster
 from dataset.sensor_records import select_rows
 
 

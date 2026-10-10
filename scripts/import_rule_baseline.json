@@ -1,0 +1,172 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "path": "autonomy/training_execution/audit_sustained_transition_import_test.py",
+      "kind": "sys-path-edit",
+      "reason": "test intentionally changes cwd and sys.path to verify retained verifier sibling import behavior",
+      "lines": [
+        29,
+        32
+      ]
+    },
+    {
+      "path": "parallax/tests/test_classical.py",
+      "kind": "sys-path-edit",
+      "reason": "legacy Parallax unit-test harness injects temporary pipeline import roots; shrink as tests move to parallax-root imports",
+      "line": 15
+    },
+    {
+      "path": "parallax/tests/test_controlled_suite.py",
+      "kind": "sys-path-edit",
+      "reason": "legacy Parallax unit-test harness injects temporary pipeline import roots; shrink as tests move to parallax-root imports",
+      "line": 15
+    },
+    {
+      "path": "parallax/tests/test_depth_anything_reference.py",
+      "kind": "sys-path-edit",
+      "reason": "legacy Parallax unit-test harness injects temporary pipeline import roots; shrink as tests move to parallax-root imports",
+      "lines": [
+        117,
+        198,
+        224,
+        269,
+        289,
+        355,
+        386,
+        462,
+        490
+      ]
+    },
+    {
+      "path": "parallax/tests/test_documentation.py",
+      "kind": "sys-path-edit",
+      "reason": "legacy Parallax unit-test harness injects temporary pipeline import roots; shrink as tests move to parallax-root imports",
+      "line": 17
+    },
+    {
+      "path": "parallax/tests/test_e2e_completion.py",
+      "kind": "sys-path-edit",
+      "reason": "legacy Parallax unit-test harness injects temporary pipeline import roots; shrink as tests move to parallax-root imports",
+      "line": 16
+    },
+    {
+      "path": "parallax/tests/test_fetch.py",
+      "kind": "sys-path-edit",
+      "reason": "legacy Parallax unit-test harness injects temporary pipeline import roots; shrink as tests move to parallax-root imports",
+      "line": 13
+    },
+    {
+      "path": "parallax/tests/test_foundation.py",
+      "kind": "sys-path-edit",
+      "reason": "legacy Parallax unit-test harness injects temporary pipeline import roots; shrink as tests move to parallax-root imports",
+      "line": 17
+    },
+    {
+      "path": "parallax/tests/test_foundation_geometry_reference.py",
+      "kind": "sys-path-edit",
+      "reason": "legacy Parallax unit-test harness injects temporary pipeline import roots; shrink as tests move to parallax-root imports",
+      "lines": [
+        318,
+        415,
+        433,
+        447,
+        615,
+        640,
+        682,
+        794,
+        823,
+        894,
+        921,
+        956,
+        989,
+        1009
+      ]
+    },
+    {
+      "path": "parallax/tests/test_generation_dynamic_surflo.py",
+      "kind": "sys-path-edit",
+      "reason": "legacy Parallax unit-test harness injects temporary pipeline import roots; shrink as tests move to parallax-root imports",
+      "line": 18
+    },
+    {
+      "path": "parallax/tests/test_nerfacto_reference.py",
+      "kind": "sys-path-edit",
+      "reason": "legacy Parallax unit-test harness injects temporary pipeline import roots; shrink as tests move to parallax-root imports",
+      "lines": [
+        268,
+        427,
+        508,
+        538,
+        547,
+        571,
+        596,
+        619,
+        663,
+        725,
+        742
+      ]
+    },
+    {
+      "path": "parallax/tests/test_neus_facto_reference.py",
+      "kind": "sys-path-edit",
+      "reason": "legacy Parallax unit-test harness injects temporary pipeline import roots; shrink as tests move to parallax-root imports",
+      "lines": [
+        181,
+        288,
+        389,
+        403,
+        432,
+        532,
+        540,
+        562,
+        580,
+        594,
+        608,
+        626,
+        660
+      ]
+    },
+    {
+      "path": "parallax/tests/test_orb_slam_reference.py",
+      "kind": "sys-path-edit",
+      "reason": "legacy Parallax unit-test harness injects temporary pipeline import roots; shrink as tests move to parallax-root imports",
+      "lines": [
+        105,
+        133,
+        150,
+        164,
+        186,
+        206,
+        235,
+        268,
+        279,
+        298,
+        331,
+        345
+      ]
+    },
+    {
+      "path": "parallax/tests/test_review_fixes.py",
+      "kind": "sys-path-edit",
+      "reason": "legacy Parallax unit-test harness injects temporary pipeline import roots; shrink as tests move to parallax-root imports",
+      "line": 17
+    },
+    {
+      "path": "parallax/tests/test_splatfacto_reference.py",
+      "kind": "sys-path-edit",
+      "reason": "legacy Parallax unit-test harness injects temporary pipeline import roots; shrink as tests move to parallax-root imports",
+      "lines": [
+        251,
+        420,
+        525,
+        545,
+        574,
+        589,
+        612,
+        642,
+        661
+      ]
+    }
+  ]
+}

@@ -32,7 +32,7 @@ def run_cli(*args: str, cache: Path | None = None) -> subprocess.CompletedProces
 
 
 class RunnerBootstrapTest(unittest.TestCase):
-    def test_run_script_launches_cli_with_pipeline_on_pythonpath(self) -> None:
+    def test_run_script_launches_cli_with_parallax_on_pythonpath(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             fakebin = Path(temporary) / "bin"
             fakebin.mkdir()
@@ -70,13 +70,13 @@ class RunnerBootstrapTest(unittest.TestCase):
             self.assertEqual(invocation["argv"][1:], [str(PIPELINE / "cli.py"), "list", "--json"])
             self.assertEqual(
                 invocation["pythonpath"],
-                f"{PIPELINE}{os.pathsep}/existing",
+                f"{ROOT}{os.pathsep}/existing",
             )
 
 
 class RegistryContractTest(unittest.TestCase):
     def test_dependency_free_schema_validator_enforces_conditional_branches(self) -> None:
-        from contracts import validate_json_schema_instance
+        from pipeline.contracts import validate_json_schema_instance
 
         schema = {
             "type": "object",
@@ -96,7 +96,7 @@ class RegistryContractTest(unittest.TestCase):
             )
 
     def test_result_schema_pins_fixture_runtime_contract_values(self) -> None:
-        from contracts import validate_json_schema_instance
+        from pipeline.contracts import validate_json_schema_instance
 
         schema = json.loads((ROOT / "result.schema.json").read_text())
         resources = schema["properties"]["resources"]
@@ -204,7 +204,7 @@ class RegistryContractTest(unittest.TestCase):
 
 class DispatcherContractTest(unittest.TestCase):
     def test_gpu_selection_skips_reset_devices_and_validates_overrides(self) -> None:
-        from contracts import selected_gpu_device
+        from pipeline.contracts import selected_gpu_device
 
         completed = subprocess.CompletedProcess(
             ["nvidia-smi"],

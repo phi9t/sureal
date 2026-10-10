@@ -1,7 +1,7 @@
 """Lossy encodings used by the .wpc container, with exact inverses for verification."""
 import numpy as np
 
-from .constants import FLAG_HAS_PROJ, FLAG_NLZ, FLAG_RETURN2, FLAG_SENSOR_SHIFT, XYZ_SCALE_M
+from inspection.viewer.export.constants import FLAG_HAS_PROJ, FLAG_NLZ, FLAG_RETURN2, FLAG_SENSOR_SHIFT, XYZ_SCALE_M
 
 
 def quantize_xyz(xyz, scale=XYZ_SCALE_M):

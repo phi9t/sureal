@@ -75,9 +75,11 @@ class RepoGateMembershipTests(unittest.TestCase):
     def test_repo_gate_includes_publication_audit_and_whitespace_checks(self) -> None:
         gate_tests = repo_gate_tests(repository_root())
 
+        self.assertIn("//:import_rule_behavior_test", gate_tests)
         self.assertIn("//:repo_gate_publication_audit_test", gate_tests)
         self.assertIn("//:repo_gate_shellcheck_test", gate_tests)
         self.assertIn("//:shellcheck_repo_test", gate_tests)
+        self.assertIn("//:repo_gate_import_rule_test", gate_tests)
         self.assertIn("//:repo_gate_whitespace_test", gate_tests)
         self.assertIn("//autonomy/blob_store:storage_boundary_test", gate_tests)
 

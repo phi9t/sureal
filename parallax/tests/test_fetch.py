@@ -15,7 +15,7 @@ sys.path.insert(0, str(ROOT / "pipeline"))
 
 class FetchPromotionContractTest(unittest.TestCase):
     def test_foundation_model_fetch_commands_pin_revisions_and_files(self) -> None:
-        from fetch import huggingface_snapshot_commands
+        from pipeline.fetch import huggingface_snapshot_commands
 
         commands = huggingface_snapshot_commands(
             json.loads((ROOT / "foundation-models.lock.json").read_text())
@@ -48,7 +48,7 @@ class FetchPromotionContractTest(unittest.TestCase):
         )
 
     def test_locked_zip_extraction_is_safe_atomic_and_manifested(self) -> None:
-        from fetch import extract_locked_asset
+        from pipeline.fetch import extract_locked_asset
 
         asset = {
             "id": "zip-sample",
@@ -80,7 +80,7 @@ class FetchPromotionContractTest(unittest.TestCase):
             self.assertFalse((root / "escape").exists())
 
     def test_hash_mismatch_stays_quarantined_and_correct_hash_promotes(self) -> None:
-        from fetch import promote_candidate
+        from pipeline.fetch import promote_candidate
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

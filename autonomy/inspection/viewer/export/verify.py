@@ -16,12 +16,12 @@ from pathlib import Path
 
 import numpy as np
 
-from . import constants as C
-from .boxes import points_in_box
-from .manifest import sha256_file
-from .quantize import decode_elongation, decode_intensity, dequantize_xyz, unpack_flags
-from .slice_reader import FrameCursor, SliceReceipt, array_field
-from .wpc import read_wpc
+from inspection.viewer.export import constants as C
+from inspection.viewer.export.boxes import points_in_box
+from inspection.viewer.export.manifest import sha256_file
+from inspection.viewer.export.quantize import decode_elongation, decode_intensity, dequantize_xyz, unpack_flags
+from inspection.viewer.export.slice_reader import FrameCursor, SliceReceipt, array_field
+from inspection.viewer.export.wpc import read_wpc
 
 LI = "[LiDARComponent]."
 LP = "[LiDARPoseComponent]."
@@ -212,7 +212,7 @@ def verify(slice_dir, context, bundle, sample=20, frame_stride=10, log=print):
 
 
 def _rows_for(path):
-    from .slice_reader import read_rows
+    from inspection.viewer.export.slice_reader import read_rows
     return read_rows(path)
 
 

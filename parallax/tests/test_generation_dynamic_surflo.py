@@ -20,7 +20,7 @@ sys.path.insert(0, str(ROOT / "pipeline"))
 
 class AmbiguousSceneContractTest(unittest.TestCase):
     def test_shared_scene_latent_is_coherent_while_independent_points_hybridize(self) -> None:
-        from generative import evaluate_ambiguity_fixture, generate_ambiguity_fixture
+        from pipeline.generative import evaluate_ambiguity_fixture, generate_ambiguity_fixture
 
         fixture = generate_ambiguity_fixture(
             samples=128,
@@ -48,7 +48,7 @@ class AmbiguousSceneContractTest(unittest.TestCase):
         self.assertGreater(shared["coherent_scene_entropy_bits"], 0.9)
 
     def test_shared_scene_latent_is_resolution_persistent(self) -> None:
-        from generative import generate_ambiguity_fixture
+        from pipeline.generative import generate_ambiguity_fixture
 
         coarse = generate_ambiguity_fixture(
             samples=64,
@@ -66,7 +66,7 @@ class AmbiguousSceneContractTest(unittest.TestCase):
         )
 
     def test_ambiguity_fixture_is_seed_deterministic(self) -> None:
-        from generative import generate_ambiguity_fixture
+        from pipeline.generative import generate_ambiguity_fixture
 
         first = generate_ambiguity_fixture(
             samples=16,
@@ -84,7 +84,7 @@ class AmbiguousSceneContractTest(unittest.TestCase):
                 np.testing.assert_array_equal(first[name], second[name])
 
     def test_evidence_consistency_is_recomputed_from_predicted_points(self) -> None:
-        from generative import evaluate_ambiguity_fixture, generate_ambiguity_fixture
+        from pipeline.generative import evaluate_ambiguity_fixture, generate_ambiguity_fixture
 
         fixture = generate_ambiguity_fixture(
             samples=32,
@@ -99,7 +99,7 @@ class AmbiguousSceneContractTest(unittest.TestCase):
         self.assertEqual(independent["evidence_consistency"], 0.0)
 
     def test_fixture_rejects_degenerate_experiments(self) -> None:
-        from generative import generate_ambiguity_fixture
+        from pipeline.generative import generate_ambiguity_fixture
 
         for samples, points in ((1, 16), (8, 1)):
             with self.subTest(samples=samples, points=points):
@@ -111,7 +111,7 @@ class AmbiguousSceneContractTest(unittest.TestCase):
                     )
 
     def test_fixture_rejects_non_finite_observed_truth(self) -> None:
-        from generative import evaluate_ambiguity_fixture, generate_ambiguity_fixture
+        from pipeline.generative import evaluate_ambiguity_fixture, generate_ambiguity_fixture
 
         fixture = generate_ambiguity_fixture(
             samples=8,
@@ -123,7 +123,7 @@ class AmbiguousSceneContractTest(unittest.TestCase):
             evaluate_ambiguity_fixture(fixture)
 
     def test_module13_persists_recomputable_samples_and_visual_evidence(self) -> None:
-        from generative import evaluate_ambiguity_fixture
+        from pipeline.generative import evaluate_ambiguity_fixture
 
         with tempfile.TemporaryDirectory() as temporary:
             cache = Path(temporary)
@@ -274,7 +274,7 @@ class AmbiguousSceneContractTest(unittest.TestCase):
 
 class DynamicSceneContractTest(unittest.TestCase):
     def test_occlusion_can_preserve_set_geometry_while_switching_identity(self) -> None:
-        from dynamic import evaluate_dynamic_fixture, generate_dynamic_fixture
+        from pipeline.dynamic import evaluate_dynamic_fixture, generate_dynamic_fixture
 
         fixture = generate_dynamic_fixture(frame_count=65, occlusion_frames=16)
         static = evaluate_dynamic_fixture(fixture)["static_camera"]
@@ -283,7 +283,7 @@ class DynamicSceneContractTest(unittest.TestCase):
         self.assertEqual(static["post_occlusion_identity_accuracy"], 0.0)
 
     def test_known_camera_motion_does_not_create_object_drift(self) -> None:
-        from dynamic import evaluate_dynamic_fixture, generate_dynamic_fixture
+        from pipeline.dynamic import evaluate_dynamic_fixture, generate_dynamic_fixture
 
         comparison = evaluate_dynamic_fixture(
             generate_dynamic_fixture(frame_count=65, occlusion_frames=16)
@@ -299,7 +299,7 @@ class DynamicSceneContractTest(unittest.TestCase):
         )
 
     def test_dynamic_support_contaminates_camera_object_factorization(self) -> None:
-        from dynamic import evaluate_dynamic_fixture, generate_dynamic_fixture
+        from pipeline.dynamic import evaluate_dynamic_fixture, generate_dynamic_fixture
 
         comparison = evaluate_dynamic_fixture(
             generate_dynamic_fixture(frame_count=65, occlusion_frames=16)
@@ -314,7 +314,7 @@ class DynamicSceneContractTest(unittest.TestCase):
         self.assertGreater(joint["temporal_displacement_rmse_m"], 0.0)
 
     def test_set_aligned_error_uses_world_truth_not_biased_detections(self) -> None:
-        from dynamic import evaluate_dynamic_fixture, generate_dynamic_fixture
+        from pipeline.dynamic import evaluate_dynamic_fixture, generate_dynamic_fixture
 
         joint = evaluate_dynamic_fixture(
             generate_dynamic_fixture(frame_count=33, occlusion_frames=0)
@@ -325,7 +325,7 @@ class DynamicSceneContractTest(unittest.TestCase):
         )
 
     def test_dynamic_fixture_rejects_invalid_frame_and_occlusion_contracts(self) -> None:
-        from dynamic import generate_dynamic_fixture
+        from pipeline.dynamic import generate_dynamic_fixture
 
         for frames, occlusion in ((8, 2), (33, -1), (33, 30)):
             with self.subTest(frames=frames, occlusion=occlusion):
@@ -336,7 +336,7 @@ class DynamicSceneContractTest(unittest.TestCase):
                     )
 
     def test_dynamic_fixture_rejects_inconsistent_camera_and_visibility(self) -> None:
-        from dynamic import evaluate_dynamic_fixture, generate_dynamic_fixture
+        from pipeline.dynamic import evaluate_dynamic_fixture, generate_dynamic_fixture
 
         camera_tamper = generate_dynamic_fixture(33, 8)
         camera_tamper["estimated_camera_xyz"][0, 0, 0] += 0.1
@@ -354,7 +354,7 @@ class DynamicSceneContractTest(unittest.TestCase):
             evaluate_dynamic_fixture(prediction_tamper)
 
     def test_module14_persists_recomputable_dynamic_evidence(self) -> None:
-        from dynamic import evaluate_dynamic_fixture
+        from pipeline.dynamic import evaluate_dynamic_fixture
 
         with tempfile.TemporaryDirectory() as temporary:
             cache = Path(temporary)
@@ -480,7 +480,7 @@ class DynamicSceneContractTest(unittest.TestCase):
 
 class SurfloEndpointContractTest(unittest.TestCase):
     def test_endpoint_metrics_are_recomputed_from_seed_records(self) -> None:
-        from surflo_endpoint import build_surflo_endpoint
+        from pipeline.surflo_endpoint import build_surflo_endpoint
 
         source_path = REPO_ROOT / "experiments" / "photoreal-scenes" / "results.json"
         source = json.loads(source_path.read_text())
@@ -536,7 +536,7 @@ class SurfloEndpointContractTest(unittest.TestCase):
             build_surflo_endpoint(source, scout)
 
     def test_module15_persists_locked_recomputable_endpoint(self) -> None:
-        from surflo_endpoint import evaluate_surflo_evidence
+        from pipeline.surflo_endpoint import evaluate_surflo_evidence
 
         with tempfile.TemporaryDirectory() as temporary:
             cache = Path(temporary)

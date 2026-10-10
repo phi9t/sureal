@@ -17,7 +17,7 @@ import uuid
 
 import numpy as np
 
-from contracts import (
+from pipeline.contracts import (
     ROOT,
     canonical_json,
     ensure_finite,
@@ -28,15 +28,15 @@ from contracts import (
     validate_run_id,
     write_json,
 )
-from mvs_reference_runner import _gpu_hardware, _peak_cpu_memory_bytes, _run_monitored
-from reference_runner import (
+from pipeline.mvs_reference_runner import _gpu_hardware, _peak_cpu_memory_bytes, _run_monitored
+from pipeline.reference_runner import (
     _hash_tree,
     _inspect_image,
     _parse_key_value_manifest,
     _require_regular_file,
     _secure_directory,
 )
-from reference_scene import generate_learned_depth_scene
+from pipeline.reference_scene import generate_learned_depth_scene
 
 
 ADAPTER = "depth-anything-v2"

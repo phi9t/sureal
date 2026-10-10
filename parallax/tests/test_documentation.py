@@ -93,7 +93,7 @@ class AuditContractTest(unittest.TestCase):
         self.assertEqual(summary["errors"], [])
 
     def test_audit_rejects_unknown_citation_and_task_conflation(self) -> None:
-        from audit import audit_text
+        from pipeline.audit import audit_text
 
         known = {"known": "https://example.org/known"}
         errors = audit_text(
@@ -105,7 +105,7 @@ class AuditContractTest(unittest.TestCase):
         self.assertTrue(any("forbidden terminology" in error for error in errors))
 
     def test_offline_audit_checks_the_canonical_assessment(self) -> None:
-        import audit
+        import pipeline.audit as audit
 
         original_read_text = Path.read_text
 
@@ -125,7 +125,7 @@ class AuditContractTest(unittest.TestCase):
         self.assertTrue(any("forbidden terminology" in error for error in errors))
 
     def test_dotted_source_ids_are_audited_instead_of_skipped(self) -> None:
-        from audit import audit_text
+        from pipeline.audit import audit_text
 
         errors = audit_text(
             "[gsplat-1.4.0](https://example.org/wrong)",
@@ -163,7 +163,7 @@ class AuditContractTest(unittest.TestCase):
                 self.assertLessEqual(date.fromisoformat(source["first_public_date"]), cutoff)
 
     def test_audit_rejects_missing_or_post_cutoff_availability_dates(self) -> None:
-        import audit
+        import pipeline.audit as audit
 
         self.assertTrue(hasattr(audit, "source_metadata_errors"))
         errors = audit.source_metadata_errors(  # type: ignore[attr-defined]
@@ -191,7 +191,7 @@ class AuditContractTest(unittest.TestCase):
         )
 
     def test_audit_rejects_unregistered_descriptive_external_link(self) -> None:
-        import audit
+        import pipeline.audit as audit
 
         self.assertTrue(hasattr(audit, "external_link_errors"))
         self.assertEqual(

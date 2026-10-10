@@ -17,7 +17,7 @@ import uuid
 from urllib.request import urlopen
 import zipfile
 
-from contracts import ROOT, load_json, sha256_file
+from pipeline.contracts import ROOT, load_json, sha256_file
 
 
 def huggingface_snapshot_commands(lock: dict[str, object]) -> list[list[str]]:

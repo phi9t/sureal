@@ -8,7 +8,6 @@ import time
 
 HERE=Path(__file__).resolve().parent
 COMPONENT=HERE.parent
-if str(COMPONENT) not in sys.path: sys.path.insert(0,str(COMPONENT))
 from evidence.source_snapshot import file_sha256
 from insula.launch_plan import build_plan, load_default_runtime_lock, record_plan, run_plan
 from insula.runtime_roots import current_cpu_rootfs

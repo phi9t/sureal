@@ -19,7 +19,7 @@ import uuid
 
 import numpy as np
 
-from contracts import (
+from pipeline.contracts import (
     ROOT,
     canonical_json,
     ensure_finite,
@@ -30,10 +30,10 @@ from contracts import (
     validate_run_id,
     write_json,
 )
-from environment_manifest import environment_tree_manifest
-from mvs_reference_runner import _gpu_hardware, _peak_cpu_memory_bytes, _run_monitored
-from reference_runner import _hash_tree, _inspect_image, _require_regular_file, _secure_directory
-from reference_scene import _render_implicit_sphere, generate_implicit_surface_scene
+from pipeline.environment_manifest import environment_tree_manifest
+from pipeline.mvs_reference_runner import _gpu_hardware, _peak_cpu_memory_bytes, _run_monitored
+from pipeline.reference_runner import _hash_tree, _inspect_image, _require_regular_file, _secure_directory
+from pipeline.reference_scene import _render_implicit_sphere, generate_implicit_surface_scene
 
 
 ADAPTER = "foundation-geometry"
@@ -938,6 +938,7 @@ def _container_command(
         image_id,
         "bash",
         "-lc",
+        "PYTHONPATH=/workspace/surflo/parallax:/opt/vggt:/workspace/surflo/submodules/Depth-Anything-3/src${PYTHONPATH:+:$PYTHONPATH} "
         f"/cache/surflo/venv/bin/python {script} "
         "--input /input --output /output "
         "--vggt-source /opt/vggt "

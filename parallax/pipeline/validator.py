@@ -9,7 +9,7 @@ from typing import Any
 
 import numpy as np
 
-from contracts import (
+from pipeline.contracts import (
     IMPLEMENTATION_FILES,
     INPUT_FILES,
     ROOT,
@@ -23,8 +23,8 @@ from contracts import (
     sha256_file,
     validate_json_schema_instance,
 )
-from controlled_suite import COMPATIBLE_MODULES, controlled_suite_record
-from dynamic import (
+from pipeline.controlled_suite import COMPATIBLE_MODULES, controlled_suite_record
+from pipeline.dynamic import (
     DYNAMIC_ARRAY_SEMANTICS,
     DYNAMIC_CAMERA_CONTAMINATION,
     DYNAMIC_PROFILE_FRAMES,
@@ -35,7 +35,7 @@ from dynamic import (
     generate_dynamic_failure_sweep,
     generate_dynamic_fixture,
 )
-from generative import (
+from pipeline.generative import (
     AMBIGUITY_ARRAY_SEMANTICS,
     AMBIGUITY_PROFILE_POINTS,
     AMBIGUITY_RANDOM_SEED,
@@ -44,9 +44,9 @@ from generative import (
     evaluate_ambiguity_fixture,
     generate_ambiguity_failure_sweep,
 )
-from surflo_endpoint import build_surflo_endpoint, evaluate_surflo_evidence
-from reporting import aggregate_report, module_report
-from reference_runner import validate_landed_reference_result
+from pipeline.surflo_endpoint import build_surflo_endpoint, evaluate_surflo_evidence
+from pipeline.reporting import aggregate_report, module_report
+from pipeline.reference_runner import validate_landed_reference_result
 
 
 REQUIRED_TOP_LEVEL = {

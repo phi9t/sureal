@@ -249,7 +249,7 @@ def run_fake_splatfacto_reference(root: Path, run_id: str = "splatfacto-smoke") 
     import sys
 
     sys.path.insert(0, str(ROOT / "pipeline"))
-    import splatfacto_reference_runner
+    import pipeline.splatfacto_reference_runner as splatfacto_reference_runner
 
     checkpoint = root / "fixture-alexnet.pth"
     checkpoint.write_bytes(b"fixture")
@@ -418,8 +418,8 @@ class SplatfactoReferenceFoundationTest(unittest.TestCase):
         import sys
 
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from contracts import load_json
-        from reference_scene import generate_radiance_field_scene
+        from pipeline.contracts import load_json
+        from pipeline.reference_scene import generate_radiance_field_scene
 
         with tempfile.TemporaryDirectory() as temporary:
             destination = Path(temporary) / "scene"
@@ -523,7 +523,7 @@ class SplatfactoOutputContractTest(unittest.TestCase):
                 import sys
 
                 sys.path.insert(0, str(ROOT / "pipeline"))
-                from splatfacto_reference_runner import run_splatfacto_reference
+                from pipeline.splatfacto_reference_runner import run_splatfacto_reference
 
                 cache = Path(
                     os.environ.get(
@@ -543,7 +543,7 @@ class SplatfactoOutputContractTest(unittest.TestCase):
         import sys
 
         sys.path.insert(0, str(ROOT / "pipeline"))
-        import splatfacto_reference_runner
+        import pipeline.splatfacto_reference_runner as splatfacto_reference_runner
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -572,7 +572,7 @@ class SplatfactoOutputContractTest(unittest.TestCase):
         import sys
 
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from splatfacto_reference_runner import validate_splatfacto_reference_result
+        from pipeline.splatfacto_reference_runner import validate_splatfacto_reference_result
 
         with tempfile.TemporaryDirectory() as temporary:
             run_dir = run_fake_splatfacto_reference(Path(temporary), "tamper-splat")
@@ -587,7 +587,7 @@ class SplatfactoOutputContractTest(unittest.TestCase):
         import sys
 
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from splatfacto_reference_runner import validate_splatfacto_reference_result
+        from pipeline.splatfacto_reference_runner import validate_splatfacto_reference_result
 
         with tempfile.TemporaryDirectory() as temporary:
             run_dir = run_fake_splatfacto_reference(Path(temporary), "truncated-ply")
@@ -610,7 +610,7 @@ class SplatfactoOutputContractTest(unittest.TestCase):
         import sys
 
         sys.path.insert(0, str(ROOT / "pipeline"))
-        import splatfacto_reference_runner
+        import pipeline.splatfacto_reference_runner as splatfacto_reference_runner
 
         with tempfile.TemporaryDirectory() as temporary:
             run_dir = run_fake_splatfacto_reference(Path(temporary), "resource-tamper")
@@ -640,7 +640,7 @@ class SplatfactoOutputContractTest(unittest.TestCase):
         import sys
 
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from splatfacto_reference_runner import validate_gaussian_archive
+        from pipeline.splatfacto_reference_runner import validate_gaussian_archive
 
         with tempfile.TemporaryDirectory() as temporary:
             archive = Path(temporary) / "gaussians.npz"
@@ -659,7 +659,7 @@ class SplatfactoOutputContractTest(unittest.TestCase):
         import sys
 
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from splatfacto_reference_runner import validate_gaussian_archive
+        from pipeline.splatfacto_reference_runner import validate_gaussian_archive
 
         with tempfile.TemporaryDirectory() as temporary:
             archive = Path(temporary) / "gaussians.npz"
