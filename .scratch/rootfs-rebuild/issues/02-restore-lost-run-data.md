@@ -9,7 +9,7 @@ record unrecoverable paths without regenerating them.
 - [x] Inventory missing retained sweep, Motion foundation, lp03 cohort and
   Parallax paths.
 - [x] Check whether HDFS publications cover each missing path.
-- [ ] Restore every HDFS-covered path.
+- [x] Restore every HDFS-covered path.
 - [x] Leave unrecoverable paths unmodified and record the reason.
 - [x] Re-run the retained sweep and Motion foundation replay command.
 - [x] Re-run `//:repo_gate` before commit.
@@ -28,8 +28,8 @@ The temp-only readback verified the HDFS bytes:
 
 | Local path | HDFS publication covers it? | HDFS key | Expected digest | Size | Result |
 | --- | --- | --- | --- | --- | --- |
-| `~/.cache/waystone/waymo-perception/motion-pilot/training-extension-3ac2217db574457eb1835e7647e4aed3/source.tfrecord` | Yes | `datasets/waymo-motion/v1.2.1/pilot/training/1706642338741149-9da4602bee5c46d70ddae1e60b62c0c048252c1d4322c259b88a822f92a76832.tfrecord` | `9da4602bee5c46d70ddae1e60b62c0c048252c1d4322c259b88a822f92a76832` | 5081750 | Temp readback verified; not promoted because cache write was denied |
-| `~/.cache/waystone/waymo-perception/motion-pilot/validation-extension-a047963e2ccb4cc8877051b841c01f71/source.tfrecord` | Yes | `datasets/waymo-motion/v1.2.1/pilot/validation/1706641287836292-a33485f7936b39596a9948ad18d7bac17e594101a43cce88180450c79b653c6c.tfrecord` | `a33485f7936b39596a9948ad18d7bac17e594101a43cce88180450c79b653c6c` | 4810884 | Temp readback verified; not promoted because cache write was denied |
+| `~/.cache/waystone/waymo-perception/motion-pilot/training-extension-3ac2217db574457eb1835e7647e4aed3/source.tfrecord` | Yes | `datasets/waymo-motion/v1.2.1/pilot/training/1706642338741149-9da4602bee5c46d70ddae1e60b62c0c048252c1d4322c259b88a822f92a76832.tfrecord` | `9da4602bee5c46d70ddae1e60b62c0c048252c1d4322c259b88a822f92a76832` | 5081750 | Restored by the coordinator, sha256 verified |
+| `~/.cache/waystone/waymo-perception/motion-pilot/validation-extension-a047963e2ccb4cc8877051b841c01f71/source.tfrecord` | Yes | `datasets/waymo-motion/v1.2.1/pilot/validation/1706641287836292-a33485f7936b39596a9948ad18d7bac17e594101a43cce88180450c79b653c6c.tfrecord` | `a33485f7936b39596a9948ad18d7bac17e594101a43cce88180450c79b653c6c` | 4810884 | Restored by the coordinator, sha256 verified |
 
 Disk floor check before the attempted restore showed 311157260288 bytes free on
 `/data02`, above the 200 GB floor. No existing cache file was overwritten or
@@ -275,3 +275,23 @@ ValueError: regular non-symlinked file required:
 - No repository tooling was added.
 - No existing cache file, retained receipt, source snapshot, rootfs or lock was
   modified or deleted.
+
+### 2026-10-10 coordinator
+
+- The worker's sandbox could not write `~/.cache/waystone`, so the coordinator restored the two HDFS-covered Motion extension TFRecords. Each was fetched with Waystone `get` into a staging directory beside its target, its sha256 checked against the expected digest above, and then renamed into place. Both matched.
+- The supervisor's `rm-outside-worktree` findings were checked. Both were `rm -f /tmp/waystone-*.$$` scratch files the worker created itself, and nothing in the cache or in retained evidence was removed.
+- **Unrecoverable without rerunning research chains:**
+  - The balanced16 case directory, an unreleased training run.
+  - The Motion native-link outputs. Their inputs `code/base.pb` and `code/causal` were themselves outputs of earlier lost Motion runs, so regenerating them means rerunning the whole chain with no guarantee of byte-identical outputs.
+  - The lp03 source-audit records. Rebuilding them goes through the acquisition path, which can write to HDFS.
+
+  None of these were regenerated. The retained sweep therefore stays at 2101/0/0/0/0 passes with 0 failures. The missing counts are skips for absent host data, not verification failures.
+- **Parallax assets:** `//parallax/...` passes 17/17. The `depth-anything-v2` and LPIPS adapters were already missing their checkpoints, and `foundation-geometry` already had its environment lock mismatch, before the cache loss (repo-quality 07). Refetching from `parallax/assets.lock.json` is left for a human: `controlled-suite` is a Blender-generated asset and `run.sh fetch` needs a host Python with numpy.
+- **Live set on the restored rootfs** (`~/devx/tmp/sureal-refactor-20261007/pa-live/restore-20261010T173249Z`):
+  - `verify_motion_cli.py`: pass.
+  - `verify_motion_cli_expanded.py`: pass.
+  - `verify_motion_native.py`: pass.
+  - `verify_gpu_live.py` on GPU 1: pass.
+  - `replay_motion_foundation.py`: fails on the missing native-link `merged.pb` listed above.
+
+**Status:** ready-for-human. What remains is deciding whether to rerun the lost research chains.

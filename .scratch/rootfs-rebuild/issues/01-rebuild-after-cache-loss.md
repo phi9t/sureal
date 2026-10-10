@@ -14,8 +14,8 @@ sweep gates against the rebuilt locks.
 - [x] Build and lock the metrics, motion metrics and motion CLI image-form rootfs.
 - [x] Build and lock the Parallax curriculum rootfs.
 - [x] Update active rootfs pins only after the rebuilt locks pass `insula.launch_plan.load_runtime_lock`.
-- [ ] Run the CPU, GPU, repo, Parallax, live-set and retained-sweep gates. (CPU, GPU, repo and Parallax pass; live-set and retained-sweep not yet run.)
-- [ ] Restore or report missing Parallax data.
+- [ ] Run the CPU, GPU, repo, Parallax, live-set and retained-sweep gates. (CPU, GPU, repo and Parallax pass. Live set: 4/5 pass; the foundation replay needs lost run data. Retained sweep: 2101 passed, 0 failed, with the rest skipped for absent host data. See ticket 02.)
+- [x] Restore or report missing Parallax data. (Reported in ticket 02.)
 
 ## Comments
 
