@@ -9,16 +9,18 @@ from collections import Counter
 import json
 import os
 from pathlib import Path, PurePosixPath
-import re
 import subprocess
 import sys
-from typing import Iterable, Mapping, Sequence
+from typing import Mapping, Sequence
+
+try:
+    from scripts import pinned_sources
+except ModuleNotFoundError:  # pragma: no cover - direct script execution
+    import pinned_sources  # type: ignore[no-redef]
 
 
 IMPORT_ROOTS = ("autonomy", "parallax")
 BASELINE_PATH = Path("scripts/import_rule_baseline.json")
-PIN_FIELD_CONSTANT = "RETAINED_SOURCE_PIN_FIELDS"
-SHA256 = re.compile(r"^[0-9a-f]{64}$")
 Problem = tuple[str, str, int, str]
 ProblemKey = tuple[str, int, str]
 
@@ -102,93 +104,8 @@ def _is_frozen_path(relative: str) -> bool:
     )
 
 
-def _pin_field_names(root: Path) -> tuple[str, ...]:
-    source = root / "autonomy" / "retained_receipt_sweep.py"
-    try:
-        tree = ast.parse(source.read_text(encoding="utf-8"), filename=str(source))
-    except OSError:
-        return ()
-    for node in tree.body:
-        if not isinstance(node, ast.Assign):
-            continue
-        if not any(isinstance(target, ast.Name) and target.id == PIN_FIELD_CONSTANT for target in node.targets):
-            continue
-        value = ast.literal_eval(node.value)
-        if not isinstance(value, tuple) or not all(isinstance(item, str) for item in value):
-            raise ValueError(f"{PIN_FIELD_CONSTANT} must be a tuple of field names")
-        return value
-    return ()
-
-
-def _iter_receipt_values(value: object) -> Iterable[object]:
-    yield value
-    if isinstance(value, Mapping):
-        for child in value.values():
-            yield from _iter_receipt_values(child)
-    elif isinstance(value, list):
-        for child in value:
-            yield from _iter_receipt_values(child)
-
-
-def _iter_pin_mapping_paths(value: object) -> Iterable[str]:
-    if not isinstance(value, Mapping):
-        return
-    for key, item in value.items():
-        if isinstance(key, str) and isinstance(item, str) and SHA256.fullmatch(item):
-            yield key
-        elif isinstance(item, Mapping):
-            yield from _iter_pin_mapping_paths(item)
-        elif isinstance(item, list):
-            for child in item:
-                yield from _iter_pin_mapping_paths(child)
-
-
-def _normalize_pin_path(root: Path, raw_path: str) -> str | None:
-    raw_path = raw_path.strip().replace("\\", "/")
-    if not raw_path:
-        return None
-    path = Path(raw_path)
-    if path.is_absolute():
-        try:
-            raw_path = path.resolve(strict=False).relative_to(root.resolve(strict=False)).as_posix()
-        except ValueError:
-            return None
-    parts = PurePosixPath(raw_path).parts
-    while parts and parts[0] in ("", "."):
-        parts = parts[1:]
-    if not parts or any(part in ("", ".", "..") for part in parts):
-        return None
-    relative = PurePosixPath(*parts).as_posix()
-    if parts[0] in IMPORT_ROOTS and (root / relative).is_file():
-        return relative
-    for import_root in IMPORT_ROOTS:
-        candidate = PurePosixPath(import_root, relative).as_posix()
-        if (root / candidate).is_file():
-            return candidate
-    return None
-
-
 def pinned_source_paths(root: Path) -> set[str]:
-    fields = set(_pin_field_names(root))
-    if not fields:
-        return set()
-    pinned: set[str] = set()
-    for path in _tracked_files(root, ["autonomy/**/*.json", "parallax/**/*.json"]):
-        try:
-            data = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
-            continue
-        for value in _iter_receipt_values(data):
-            if not isinstance(value, Mapping):
-                continue
-            for field in fields:
-                if field not in value:
-                    continue
-                for raw in _iter_pin_mapping_paths(value[field]):
-                    normalized = _normalize_pin_path(root, raw)
-                    if normalized is not None:
-                        pinned.add(normalized)
-    return pinned
+    return set(pinned_sources.pinned_source_paths(root))
 
 
 def _top_level_local_modules(root: Path, import_root: str) -> set[str]:

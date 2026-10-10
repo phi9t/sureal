@@ -52,6 +52,10 @@ code. Historical receipts, frozen procedure records, and sources pinned by
 retained evidence are exempt from the import checker. Documented live commands
 and receipts may still set `PYTHONPATH=autonomy`.
 
+Python style follows `docs/guides/python-style.md`. Ruff lint and the current
+format batch run in `//:repo_gate`; do not reformat retained receipts, source
+snapshots or files protected by retained/current-candidate source pins.
+
 ## Cache rules
 
 Retained receipts and source snapshots are byte-exact evidence. Do not edit

@@ -10,12 +10,15 @@ REPO_GATE_TESTS = [
     "//autonomy/insula:launch_plan_boundary_test",
     "//autonomy/resources:concept_boundary_test",
     "//:import_rule_behavior_test",
+    "//:pinned_sources_test",
     "//:publication_audit_behavior_test",
     "//:repo_gate_import_rule_test",
     "//:repo_gate_membership_test",
     "//:repo_gate_publication_audit_test",
+    "//:repo_gate_ruff_test",
     "//:repo_gate_shellcheck_test",
     "//:repo_gate_whitespace_test",
+    "//:ruff_repo_test",
     "//:shellcheck_repo_test",
 ]
 
@@ -49,6 +52,7 @@ py_library(
     name = "check_imports_lib",
     srcs = ["scripts/check_imports.py"],
     imports = ["."],
+    deps = [":pinned_sources_lib"],
 )
 
 py_library(
@@ -116,9 +120,35 @@ py_library(
 )
 
 py_library(
+    name = "pinned_sources_lib",
+    srcs = ["scripts/pinned_sources.py"],
+    imports = ["."],
+)
+
+py_test(
+    name = "pinned_sources_test",
+    srcs = ["scripts/pinned_sources_test.py"],
+    deps = [":pinned_sources_lib"],
+    legacy_create_init = 0,
+    size = "medium",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+)
+
+py_library(
     name = "shellcheck_repo_lib",
     srcs = ["scripts/shellcheck_repo.py"],
     imports = ["."],
+    deps = [":pinned_sources_lib"],
+)
+
+py_library(
+    name = "ruff_repo_lib",
+    srcs = ["scripts/ruff_repo.py"],
+    imports = ["."],
+    deps = [":pinned_sources_lib"],
 )
 
 py_test(
@@ -187,6 +217,38 @@ py_test(
     size = "medium",
     tags = [
         "no-sandbox",
+        "repo_gate",
+    ],
+)
+
+py_test(
+    name = "repo_gate_ruff_test",
+    srcs = ["scripts/repo_gate_ruff_test.py"],
+    args = ["--ruff=$(location @ruff_linux_x86_64//:ruff)"],
+    data = [
+        "@ruff_linux_x86_64//:ruff",
+        "pyproject.toml",
+    ],
+    deps = [":ruff_repo_lib"],
+    legacy_create_init = 0,
+    size = "medium",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+)
+
+py_test(
+    name = "ruff_repo_test",
+    srcs = ["scripts/ruff_repo_test.py"],
+    args = ["--ruff=$(location @ruff_linux_x86_64//:ruff)"],
+    data = [
+        "@ruff_linux_x86_64//:ruff",
+    ],
+    deps = [":ruff_repo_lib"],
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
         "repo_gate",
     ],
 )

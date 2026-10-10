@@ -17,6 +17,14 @@ http_archive(
     urls = ["https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.linux.x86_64.tar.xz"],
 )
 
+http_archive(
+    name = "ruff_linux_x86_64",
+    build_file_content = """exports_files(["ruff"])""",
+    sha256 = "ed8ba4cac0c6dfc1c0e9c6c720daa5ea404a3bff0497a95d6e25293a7910e903",
+    strip_prefix = "ruff-x86_64-unknown-linux-gnu",
+    urls = ["https://github.com/astral-sh/ruff/releases/download/0.6.9/ruff-x86_64-unknown-linux-gnu.tar.gz"],
+)
+
 local_runtime_repo = use_repo_rule(
     "@rules_python//python/local_toolchains:repos.bzl",
     "local_runtime_repo",

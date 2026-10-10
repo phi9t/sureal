@@ -103,3 +103,12 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 include = ["surflo*"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+# Initial repo-quality batch from the 2026-10-10 live run: enforce syntax and
+# undefined-name failures across active Sureal Python, then widen in follow-ups.
+select = ["E9", "F821"]
