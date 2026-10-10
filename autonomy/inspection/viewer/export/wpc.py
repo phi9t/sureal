@@ -11,7 +11,7 @@ from collections import namedtuple
 
 import numpy as np
 
-from .constants import DTYPE_F32, DTYPE_I16, DTYPE_I32, DTYPE_U8, DTYPE_U16
+from inspection.viewer.export.constants import DTYPE_F32, DTYPE_I16, DTYPE_I32, DTYPE_U8, DTYPE_U16
 
 MAGIC = b"WPC1"
 VERSION = 1

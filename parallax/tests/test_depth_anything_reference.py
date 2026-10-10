@@ -115,7 +115,7 @@ def fake_depth_engine(path: Path) -> Path:
 
 def run_fake_depth_reference(root: Path, profile: str = "smoke", run_id: str = "depth-smoke") -> Path:
     sys.path.insert(0, str(ROOT / "pipeline"))
-    import depth_reference_runner
+    import pipeline.depth_reference_runner as depth_reference_runner
 
     cache = root / "cache"
     asset_dir = cache / "assets"
@@ -196,7 +196,7 @@ class DepthAnythingReferenceFoundationTest(unittest.TestCase):
 
     def test_depth_metrics_keep_raw_metric_error_separate_from_alignment(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from depth_reference_runner import _depth_metrics
+        from pipeline.depth_reference_runner import _depth_metrics
 
         truth = np.linspace(2.0, 6.0, 80, dtype=np.float32).reshape(8, 10)
         prediction = ((truth - 0.7) / 1.4).astype(np.float32)
@@ -222,8 +222,8 @@ class DepthAnythingReferenceFoundationTest(unittest.TestCase):
 
     def test_controlled_inputs_are_deterministic_visible_depth_not_completion(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from contracts import load_json, sha256_file
-        from reference_scene import generate_learned_depth_scene
+        from pipeline.contracts import load_json, sha256_file
+        from pipeline.reference_scene import generate_learned_depth_scene
 
         scene = load_json(ROOT / "shared-scene.json")
         with tempfile.TemporaryDirectory() as temporary:
@@ -267,7 +267,7 @@ class DepthAnythingReferenceFoundationTest(unittest.TestCase):
 class DepthAnythingReferenceAdapterTest(unittest.TestCase):
     def test_checkpoint_asset_directory_cannot_escape_the_cache_root(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from depth_reference_runner import _checkpoint_path
+        from pipeline.depth_reference_runner import _checkpoint_path
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -287,7 +287,7 @@ class DepthAnythingReferenceAdapterTest(unittest.TestCase):
 
     def test_checkpoint_hash_mismatch_fails_before_execution(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from depth_reference_runner import run_depth_reference
+        from pipeline.depth_reference_runner import run_depth_reference
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -353,7 +353,7 @@ class DepthAnythingReferenceAdapterTest(unittest.TestCase):
             self.assertFalse(any((root / "cache/reference-staging").glob("*")))
 
             sys.path.insert(0, str(ROOT / "pipeline"))
-            import depth_reference_runner
+            import pipeline.depth_reference_runner as depth_reference_runner
 
             checkpoint_record = json.loads((run_dir / "output/checkpoint.json").read_text())
             with (
@@ -384,7 +384,7 @@ class DepthAnythingReferenceAdapterTest(unittest.TestCase):
             original = json.loads((run_dir / "result.json").read_text())
             checkpoint_record = json.loads((run_dir / "output/checkpoint.json").read_text())
             sys.path.insert(0, str(ROOT / "pipeline"))
-            import depth_reference_runner
+            import pipeline.depth_reference_runner as depth_reference_runner
 
             mutations = (
                 ("tool-version", lambda result: result["tool"].__setitem__("version", "forged")),
@@ -460,7 +460,7 @@ class DepthAnythingReferenceAdapterTest(unittest.TestCase):
                 self.fail("required real Depth Anything V2 image/checkpoint is unavailable")
             self.skipTest("real Depth Anything V2 image/checkpoint is unavailable")
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from depth_reference_runner import run_depth_reference
+        from pipeline.depth_reference_runner import run_depth_reference
 
         run_id = f"depth-real-smoke-test-{os.getpid()}"
         run_dir = run_depth_reference(cache, "smoke", run_id)
@@ -488,7 +488,7 @@ class DepthAnythingReferenceAdapterTest(unittest.TestCase):
         if docker is None or image is None or image.returncode != 0 or not checkpoint.is_file():
             self.fail("required full Depth Anything V2 image/checkpoint is unavailable")
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from depth_reference_runner import run_depth_reference
+        from pipeline.depth_reference_runner import run_depth_reference
 
         run_id = f"depth-real-full-test-{os.getpid()}"
         run_dir = run_depth_reference(cache, "full", run_id)

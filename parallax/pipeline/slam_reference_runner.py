@@ -19,7 +19,7 @@ import uuid
 
 import numpy as np
 
-from contracts import (
+from pipeline.contracts import (
     ROOT,
     canonical_json,
     ensure_finite,
@@ -29,7 +29,7 @@ from contracts import (
     validate_run_id,
     write_json,
 )
-from fetch import _extraction_manifest
+from pipeline.fetch import _extraction_manifest
 
 
 ADAPTER = "orb-slam"

@@ -273,7 +273,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         from sys import path as import_path
 
         import_path.insert(0, str(ROOT / "pipeline"))
-        from mvs_reference_runner import _container_script, _prepare_middlebury_input
+        from pipeline.mvs_reference_runner import _container_script, _prepare_middlebury_input
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -364,7 +364,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         from sys import path as import_path
 
         import_path.insert(0, str(ROOT / "pipeline"))
-        from mvs_reference_runner import _canonical_sample
+        from pipeline.mvs_reference_runner import _canonical_sample
 
         points = np.array([[0.001, 0.001, 0.001], [0.002, 0.001, 0.001], [1, 2, 3]])
         first, first_support = _canonical_sample(points)
@@ -377,7 +377,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         from sys import path as import_path
 
         import_path.insert(0, str(ROOT / "pipeline"))
-        from mvs_reference_runner import _metrics_match
+        from pipeline.mvs_reference_runner import _metrics_match
 
         recomputed = {"dense_points": 1000, "accuracy_mean_m": 0.125}
         self.assertTrue(
@@ -400,7 +400,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         from sys import path as import_path
 
         import_path.insert(0, str(ROOT / "pipeline"))
-        from mvs_reference_runner import _read_colmap_dense_map
+        from pipeline.mvs_reference_runner import _read_colmap_dense_map
 
         with tempfile.TemporaryDirectory() as temporary:
             dense_map = Path(temporary) / "depth.bin"
@@ -412,7 +412,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         from sys import path as import_path
 
         import_path.insert(0, str(ROOT / "pipeline"))
-        from mvs_reference_runner import _read_ply_xyz
+        from pipeline.mvs_reference_runner import _read_ply_xyz
 
         with tempfile.TemporaryDirectory() as temporary:
             mesh = Path(temporary) / "mesh.ply"
@@ -430,7 +430,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         from sys import path as import_path
 
         import_path.insert(0, str(ROOT / "pipeline"))
-        from mvs_reference_runner import _read_ply_xyz
+        from pipeline.mvs_reference_runner import _read_ply_xyz
 
         header = (
             "ply\nformat ascii 1.0\nelement vertex 4\n"
@@ -462,7 +462,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         from sys import path as import_path
 
         import_path.insert(0, str(ROOT / "pipeline"))
-        from mvs_reference_runner import _manifest_input_path
+        from pipeline.mvs_reference_runner import _manifest_input_path
 
         with tempfile.TemporaryDirectory() as temporary:
             input_root = Path(temporary) / "input"
@@ -475,7 +475,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         from sys import path as import_path
 
         import_path.insert(0, str(ROOT / "pipeline"))
-        from mvs_reference_runner import _geometry_metrics
+        from pipeline.mvs_reference_runner import _geometry_metrics
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -508,7 +508,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         from sys import path as import_path
 
         import_path.insert(0, str(ROOT / "pipeline"))
-        from mvs_reference_runner import _geometry_metrics
+        from pipeline.mvs_reference_runner import _geometry_metrics
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -537,7 +537,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         from sys import path as import_path
 
         import_path.insert(0, str(ROOT / "pipeline"))
-        from mvs_reference_runner import _validate_colmap_binary_model, _validate_mvs_database
+        from pipeline.mvs_reference_runner import _validate_colmap_binary_model, _validate_mvs_database
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -561,7 +561,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         from sys import path as import_path
 
         import_path.insert(0, str(ROOT / "pipeline"))
-        from mvs_reference_runner import _read_ply_xyz
+        from pipeline.mvs_reference_runner import _read_ply_xyz
 
         with tempfile.TemporaryDirectory() as temporary:
             fused = Path(temporary) / "fused.ply"
@@ -579,7 +579,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
             f"""\
             import sys
             sys.path.insert(0, {str(ROOT / "pipeline")!r})
-            import mvs_reference_runner
+            import pipeline.mvs_reference_runner as mvs_reference_runner
             mvs_reference_runner._gpu_process_memory_bytes = lambda _container_id: 0
             command = [
                 sys.executable,
@@ -606,7 +606,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         from sys import path as import_path
 
         import_path.insert(0, str(ROOT / "pipeline"))
-        import mvs_reference_runner
+        import pipeline.mvs_reference_runner as mvs_reference_runner
 
         container_id = "a" * 64
         with tempfile.TemporaryDirectory() as temporary:
@@ -634,7 +634,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         from sys import path as import_path
 
         import_path.insert(0, str(ROOT / "pipeline"))
-        from mvs_reference_runner import _peak_cpu_memory_bytes
+        from pipeline.mvs_reference_runner import _peak_cpu_memory_bytes
 
         with tempfile.TemporaryDirectory() as temporary:
             resource = Path(temporary) / "resource-usage.txt"
@@ -645,7 +645,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         from sys import path as import_path
 
         import_path.insert(0, str(ROOT / "pipeline"))
-        from mvs_reference_runner import PINNED_COLMAP_COMMIT, PINNED_COLMAP_VERSION
+        from pipeline.mvs_reference_runner import PINNED_COLMAP_COMMIT, PINNED_COLMAP_VERSION
 
         self.assertEqual(PINNED_COLMAP_VERSION, "4.2.0")
         self.assertEqual(PINNED_COLMAP_COMMIT, "be5e29168d4aff238409d60424812df66aac919f")
@@ -663,7 +663,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         from sys import path as import_path
 
         import_path.insert(0, str(ROOT / "pipeline"))
-        from reference_scene import _scene_textures
+        from pipeline.reference_scene import _scene_textures
 
         textures = _scene_textures(scene)
         self.assertEqual(textures[0].shape, (1024, 1024))
@@ -703,7 +703,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         from sys import path as import_path
 
         import_path.insert(0, str(ROOT / "pipeline"))
-        from mvs_reference_runner import _container_script
+        from pipeline.mvs_reference_runner import _container_script
 
         script = _container_script(
             {
@@ -727,8 +727,8 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         from sys import path as import_path
 
         import_path.insert(0, str(ROOT / "pipeline"))
-        from contracts import load_json
-        import reference_scene
+        from pipeline.contracts import load_json
+        import pipeline.reference_scene as reference_scene
 
         self.assertTrue(hasattr(reference_scene, "generate_colmap_mvs_scene"))
         generate_colmap_mvs_scene = reference_scene.generate_colmap_mvs_scene
@@ -767,9 +767,9 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         from sys import path as import_path
 
         import_path.insert(0, str(ROOT / "pipeline"))
-        from contracts import load_json
-        from mvs_reference_runner import _validate_manifest_contract
-        from reference_scene import generate_colmap_mvs_scene
+        from pipeline.contracts import load_json
+        from pipeline.mvs_reference_runner import _validate_manifest_contract
+        from pipeline.reference_scene import generate_colmap_mvs_scene
 
         with tempfile.TemporaryDirectory() as temporary:
             manifest = generate_colmap_mvs_scene(
@@ -825,7 +825,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
             from sys import path as import_path
 
             import_path.insert(0, str(ROOT / "pipeline"))
-            from mvs_reference_runner import validate_mvs_reference_result
+            from pipeline.mvs_reference_runner import validate_mvs_reference_result
 
             validate_mvs_reference_result(run_dir)
             self.assertNotIn("visible-support failure", (run_dir / "report.md").read_text())
@@ -856,7 +856,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
             from sys import path as import_path
 
             import_path.insert(0, str(ROOT / "pipeline"))
-            import mvs_reference_runner
+            import pipeline.mvs_reference_runner as mvs_reference_runner
 
             extraction = {
                 "archive_sha256": "b4684adcfda53b47b0964355b4142c53cb28940bbb448e0e974f92748e428de9",

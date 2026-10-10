@@ -7,7 +7,7 @@ Rz(yaw) Ry(pitch) Rx(roll) per-pixel motion compensation for the TOP LiDAR.
 """
 import numpy as np
 
-from .manifest import inverse_rigid
+from inspection.viewer.export.manifest import inverse_rigid
 
 
 def inclinations(height, incl_min, incl_max, values=None):

@@ -75,8 +75,8 @@ def fake_nerfacto_engine(path: Path, fail: bool = False) -> Path:
             output = Path(sys.argv[2])
             canonical_root = Path(sys.argv[3]) if sys.argv[3] else None
             repository = Path("{ROOT}")
-            sys.path.insert(0, str(repository / "pipeline"))
-            from nerfacto_reference_runner import _component_count
+            sys.path.insert(0, str(repository))
+            from pipeline.nerfacto_reference_runner import _component_count
             manifest = json.loads((input_root / "manifest.json").read_text())
             resolution = 128 if manifest["profile"] == "smoke" else 256
             axis = np.linspace(-1.0, 1.0, resolution, dtype=np.float32)
@@ -266,7 +266,7 @@ def run_fake_nerfacto_reference(
     root: Path, run_id: str = "nerfacto-smoke", profile: str = "smoke"
 ) -> Path:
     sys.path.insert(0, str(ROOT / "pipeline"))
-    import nerfacto_reference_runner
+    import pipeline.nerfacto_reference_runner as nerfacto_reference_runner
 
     checkpoint = root / "fixture-alexnet-weights.pth"
     checkpoint.write_bytes(b"fixture weights")
@@ -425,9 +425,9 @@ class NerfactoReferenceFoundationTest(unittest.TestCase):
 class NerfactoReferenceExecutionContractTest(unittest.TestCase):
     def test_locked_nerf_example_recomputes_the_extracted_tree(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
-        import nerfacto_reference_runner
-        from contracts import load_json, sha256_file
-        from fetch import extract_locked_asset
+        import pipeline.nerfacto_reference_runner as nerfacto_reference_runner
+        from pipeline.contracts import load_json, sha256_file
+        from pipeline.fetch import extract_locked_asset
 
         self.assertTrue(hasattr(nerfacto_reference_runner, "_locked_nerf_example"))
         with tempfile.TemporaryDirectory() as temporary:
@@ -506,7 +506,7 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
             self.assertIn("## Rendering", (run_dir / "report.md").read_text())
 
             sys.path.insert(0, str(ROOT / "pipeline"))
-            from nerfacto_reference_runner import validate_nerfacto_reference_result
+            from pipeline.nerfacto_reference_runner import validate_nerfacto_reference_result
 
             validate_nerfacto_reference_result(run_dir)
 
@@ -536,7 +536,7 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
             values[0, 0, 0] += 0.1
             np.save(truth, values, allow_pickle=False)
             sys.path.insert(0, str(ROOT / "pipeline"))
-            from nerfacto_reference_runner import validate_nerfacto_reference_result
+            from pipeline.nerfacto_reference_runner import validate_nerfacto_reference_result
 
             with self.assertRaisesRegex(ValueError, "canonical|metric|artifact"):
                 validate_nerfacto_reference_result(run_dir)
@@ -545,7 +545,7 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             sys.path.insert(0, str(ROOT / "pipeline"))
-            import nerfacto_reference_runner
+            import pipeline.nerfacto_reference_runner as nerfacto_reference_runner
 
             checkpoint = root / "fixture-alexnet-weights.pth"
             checkpoint.write_bytes(b"fixture weights")
@@ -569,7 +569,7 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
             result["metrics"]["rendering"]["target_psnr_db"] = 0.0
             result_path.write_text(json.dumps(result))
             sys.path.insert(0, str(ROOT / "pipeline"))
-            from nerfacto_reference_runner import validate_nerfacto_reference_result
+            from pipeline.nerfacto_reference_runner import validate_nerfacto_reference_result
 
             with self.assertRaisesRegex(ValueError, "metric recomputation"):
                 validate_nerfacto_reference_result(run_dir)
@@ -594,7 +594,7 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
             result_path.write_text(json.dumps(result))
 
             sys.path.insert(0, str(ROOT / "pipeline"))
-            from nerfacto_reference_runner import validate_nerfacto_reference_result
+            from pipeline.nerfacto_reference_runner import validate_nerfacto_reference_result
 
             with self.assertRaisesRegex(ValueError, "resource summary mismatch"):
                 validate_nerfacto_reference_result(run_dir)
@@ -617,7 +617,7 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
                 )
                 self.assertEqual(inspected.returncode, 0, inspected.stderr)
                 sys.path.insert(0, str(ROOT / "pipeline"))
-                from nerfacto_reference_runner import run_nerfacto_reference
+                from pipeline.nerfacto_reference_runner import run_nerfacto_reference
 
                 cache = Path(
                     os.environ.get(
@@ -661,8 +661,8 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
 
     def test_scene_transform_contains_context_only_and_converts_opencv_axes(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from contracts import load_json, sha256_file
-        from reference_scene import generate_radiance_field_scene
+        from pipeline.contracts import load_json, sha256_file
+        from pipeline.reference_scene import generate_radiance_field_scene
 
         with tempfile.TemporaryDirectory() as temporary:
             destination = Path(temporary) / "scene"
@@ -723,7 +723,7 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
 
     def test_stale_container_entrypoint_is_rejected_before_training(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from nerfacto_reference_runner import _verify_container_entrypoint
+        from pipeline.nerfacto_reference_runner import _verify_container_entrypoint
 
         stale_hash = "0" * 64
         completed = subprocess.CompletedProcess(
@@ -740,8 +740,8 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
 
     def test_lpips_crop_uses_truth_mask_not_nonzero_rgb(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from contracts import load_json
-        from reference_scene import generate_radiance_field_scene
+        from pipeline.contracts import load_json
+        from pipeline.reference_scene import generate_radiance_field_scene
 
         with tempfile.TemporaryDirectory() as temporary:
             destination = Path(temporary) / "scene"

@@ -62,8 +62,8 @@ def fake_foundation_engine(path: Path) -> Path:
             import numpy as np
 
             evidence_root, output_root, repo = map(Path, sys.argv[1:])
-            sys.path.insert(0, str(repo / "parallax/pipeline"))
-            from reference_scene import _render_implicit_sphere
+            sys.path.insert(0, str(repo / "parallax"))
+            from pipeline.reference_scene import _render_implicit_sphere
 
             evidence = json.loads((evidence_root / "manifest.json").read_text())
             evaluation_root = evidence_root.parent / "evaluation"
@@ -316,7 +316,7 @@ def fake_foundation_engine(path: Path) -> Path:
 
 def run_fake_foundation_reference(root: Path, run_id: str = "foundation-smoke") -> Path:
     sys.path.insert(0, str(ROOT / "pipeline"))
-    import foundation_geometry_reference_runner as runner
+    import pipeline.foundation_geometry_reference_runner as runner
 
     scout_cache = root / "scout-cache"
     model_root = scout_cache / "models"
@@ -413,7 +413,7 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
     )
     def test_real_smoke_reference_runs_when_required(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from foundation_geometry_reference_runner import (
+        from pipeline.foundation_geometry_reference_runner import (
             run_foundation_geometry_reference,
             validate_foundation_geometry_reference_result,
         )
@@ -431,7 +431,7 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
     )
     def test_real_full_reference_runs_when_required(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from foundation_geometry_reference_runner import (
+        from pipeline.foundation_geometry_reference_runner import (
             run_foundation_geometry_reference,
             validate_foundation_geometry_reference_result,
         )
@@ -445,7 +445,7 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
 
     def test_container_command_uses_only_tools_in_the_surflo_insula(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from foundation_geometry_reference_runner import _container_command
+        from pipeline.foundation_geometry_reference_runner import _container_command
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -484,6 +484,7 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
                 )
         shell = command[-1]
         self.assertNotIn("/usr/bin/time", shell)
+        self.assertIn("PYTHONPATH=/workspace/surflo/parallax:/opt/vggt", shell)
         self.assertIn("run-foundation-models.py", shell)
 
     def test_fake_reference_is_scored_sealed_and_atomically_promoted(self) -> None:
@@ -612,7 +613,7 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
             self.assertIn("native_binaries", inference["environment"])
 
             sys.path.insert(0, str(ROOT / "pipeline"))
-            from foundation_geometry_reference_runner import validate_foundation_geometry_reference_result
+            from pipeline.foundation_geometry_reference_runner import validate_foundation_geometry_reference_result
 
             validate_foundation_geometry_reference_result(run_dir)
             archive = next((run_dir / "output").glob("*.npz"))
@@ -637,8 +638,8 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
 
     def test_controlled_scene_hides_evaluator_truth_from_model_inputs(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from contracts import load_json
-        from foundation_geometry_reference_runner import _prepare_reference_scene
+        from pipeline.contracts import load_json
+        from pipeline.foundation_geometry_reference_runner import _prepare_reference_scene
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -679,8 +680,8 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
 
     def test_full_scene_declares_complete_factorial_failure_sweep(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from contracts import load_json
-        from foundation_geometry_reference_runner import _prepare_reference_scene
+        from pipeline.contracts import load_json
+        from pipeline.foundation_geometry_reference_runner import _prepare_reference_scene
 
         with tempfile.TemporaryDirectory() as temporary:
             _, evidence = _prepare_reference_scene(
@@ -791,7 +792,7 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
 
     def test_dirty_source_checkout_is_rejected_before_execution(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from foundation_geometry_reference_runner import _tracked_source_manifest
+        from pipeline.foundation_geometry_reference_runner import _tracked_source_manifest
 
         with tempfile.TemporaryDirectory() as temporary:
             checkout = Path(temporary)
@@ -820,7 +821,7 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
 
     def test_tracked_source_manifest_includes_nested_gitlink_commit(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from foundation_geometry_reference_runner import _tracked_source_manifest
+        from pipeline.foundation_geometry_reference_runner import _tracked_source_manifest
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -891,7 +892,7 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
 
     def test_similarity_alignment_recovers_scale_rotation_and_translation(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from foundation_geometry_reference_runner import _fit_similarity
+        from pipeline.foundation_geometry_reference_runner import _fit_similarity
 
         source = np.array(
             [
@@ -918,7 +919,7 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
 
     def test_geometry_scores_do_not_hide_scale_error_in_rigid_alignment(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from foundation_geometry_reference_runner import _score_aligned_geometry
+        from pipeline.foundation_geometry_reference_runner import _score_aligned_geometry
 
         truth_centers = np.array(
             [[0.0, 0.0, 0.0], [2.0, 0.0, 0.0], [0.0, 3.0, 0.0], [0.0, 0.0, 4.0]],
@@ -953,7 +954,7 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
 
     def test_pose_constrained_alignment_is_defined_for_two_views(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from foundation_geometry_reference_runner import _fit_pose_alignment
+        from pipeline.foundation_geometry_reference_runner import _fit_pose_alignment
 
         truth_centers = np.array([[-1.0, 0.0, 0.25], [1.0, 0.0, 0.25]])
         truth_rotations = np.repeat(np.eye(3)[None], 2, axis=0)
@@ -986,7 +987,7 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
 
     def test_bidirectional_point_metrics_report_real_precision_recall_and_fscore(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from foundation_geometry_reference_runner import _bidirectional_cloud_metrics
+        from pipeline.foundation_geometry_reference_runner import _bidirectional_cloud_metrics
 
         predicted = np.array([[0.0, 0.0, 0.0], [10.0, 0.0, 0.0]])
         truth = np.array([[0.0, 0.0, 0.0], [0.05, 0.0, 0.0]])
@@ -1006,7 +1007,7 @@ class FoundationGeometryReferenceContractTest(unittest.TestCase):
 
     def test_relative_pose_auc_is_invariant_to_global_similarity_gauge(self) -> None:
         sys.path.insert(0, str(ROOT / "pipeline"))
-        from foundation_geometry_reference_runner import _pair_pose_auc
+        from pipeline.foundation_geometry_reference_runner import _pair_pose_auc
 
         truth_centers = np.array(
             [[-2.0, 0.0, 1.0], [0.0, 0.0, 3.0], [2.0, 0.0, 1.0]],

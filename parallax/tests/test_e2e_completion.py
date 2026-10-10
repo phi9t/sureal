@@ -15,10 +15,10 @@ ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = ROOT.parent
 sys.path.insert(0, str(ROOT / "pipeline"))
 
-from cli import dispatch_plan, parser, stage_reference_suite  # noqa: E402
-from contracts import full_acceptance_status, load_json  # noqa: E402
-from reporting import aggregate_report, module_report  # noqa: E402
-from validator import validate_report  # noqa: E402
+from pipeline.cli import dispatch_plan, parser, stage_reference_suite  # noqa: E402
+from pipeline.contracts import full_acceptance_status, load_json  # noqa: E402
+from pipeline.reporting import aggregate_report, module_report  # noqa: E402
+from pipeline.validator import validate_report  # noqa: E402
 
 
 EXPECTED_REFERENCE_ADAPTERS = [
@@ -117,12 +117,12 @@ class EndToEndCompletionContractTest(unittest.TestCase):
 
             with (
                 patch(
-                    "cli.landed_reference_adapter_names",
+                    "pipeline.cli.landed_reference_adapter_names",
                     return_value=["adapter-a", "adapter-b"],
                 ),
-                patch("cli.run_reference", side_effect=external_reference_run),
+                patch("pipeline.cli.run_reference", side_effect=external_reference_run),
                 patch(
-                    "cli.validate_landed_reference_result",
+                    "pipeline.cli.validate_landed_reference_result",
                     side_effect=lambda path, adapter: {
                         "adapter": adapter,
                         "path": str(path),

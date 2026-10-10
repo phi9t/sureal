@@ -569,8 +569,6 @@ def _loaded_module_files() -> list[dict[str, Any]]:
 
 def main() -> int:
     args = _parser().parse_args()
-    sys.path.insert(0, str(args.da3_source / "src"))
-    sys.path.insert(0, str(args.vggt_source))
     import numpy as np
     import torch
     import torchvision

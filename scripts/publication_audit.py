@@ -348,7 +348,7 @@ def portable_command_errors(root: Path) -> list[str]:
         commands.append([sys.executable, pathway_audit, "--offline"])
 
     errors: list[str] = []
-    env = _portable_command_environment()
+    env = _portable_command_environment(root)
     for command in commands:
         try:
             result = subprocess.run(
@@ -367,9 +367,12 @@ def portable_command_errors(root: Path) -> list[str]:
     return errors
 
 
-def _portable_command_environment() -> dict[str, str]:
+def _portable_command_environment(root: Path) -> dict[str, str]:
     env = os.environ.copy()
     env.pop("PYTHONSAFEPATH", None)
+    parallax = str(Path(root) / "parallax")
+    existing = env.get("PYTHONPATH")
+    env["PYTHONPATH"] = parallax if not existing else parallax + os.pathsep + existing
     return env
 
 

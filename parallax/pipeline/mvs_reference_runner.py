@@ -19,7 +19,7 @@ from typing import Any
 
 import numpy as np
 
-from contracts import (
+from pipeline.contracts import (
     ROOT,
     canonical_json,
     ensure_finite,
@@ -30,8 +30,8 @@ from contracts import (
     validate_run_id,
     write_json,
 )
-from fetch import extract_locked_asset
-from reference_runner import (
+from pipeline.fetch import extract_locked_asset
+from pipeline.reference_runner import (
     _format_shell_number,
     _hash_tree,
     _inspect_image,
@@ -41,7 +41,7 @@ from reference_runner import (
     _secure_directory,
     _validate_sqlite_database,
 )
-from reference_scene import generate_colmap_mvs_scene
+from pipeline.reference_scene import generate_colmap_mvs_scene
 
 
 ADAPTER = "colmap-mvs"

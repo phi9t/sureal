@@ -18,8 +18,8 @@ command -v "${ENGINE}" >/dev/null 2>&1 || {
 "${ENGINE}" build --network host --tag surflo-pathway-gaussian-splatting:1 --file "${HERE}/gaussian-splatting/Dockerfile" "${HERE}"
 
 FOUNDATION_GPU="$({
-    PYTHONPATH="${HERE}/../pipeline${PYTHONPATH:+:${PYTHONPATH}}" \
-        python3 -c 'from contracts import selected_gpu_device; print(selected_gpu_device())'
+    PYTHONPATH="${HERE}/..${PYTHONPATH:+:${PYTHONPATH}}" \
+        python3 -c 'from pipeline.contracts import selected_gpu_device; print(selected_gpu_device())'
 })"
 CUDA_VISIBLE_DEVICES="${FOUNDATION_GPU}" \
     SURFLO_PATHWAY_CONTAINER_ENGINE="${ENGINE}" \

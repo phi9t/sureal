@@ -49,7 +49,7 @@ class ReviewHardeningTest(unittest.TestCase):
             self.assertEqual(len(calls), 1, name)
 
     def test_multistage_insula_locks_cover_the_runtime_image(self) -> None:
-        from audit import _image_lock_errors
+        from pipeline.audit import _image_lock_errors
 
         lock = {
             "base_image": "example/builder:1",
@@ -101,7 +101,7 @@ class ReviewHardeningTest(unittest.TestCase):
         self.assertTrue(all(status == "not_landed" for adapter, status in statuses.items() if adapter not in landed))
 
         locks = json.loads((ROOT / "insulas" / "locks.json").read_text())["insulas"]
-        from audit import _image_lock_errors
+        from pipeline.audit import _image_lock_errors
 
         for name, lock in locks.items():
             dockerfile = ROOT / "insulas" / name / "Dockerfile"
@@ -117,7 +117,7 @@ class ReviewHardeningTest(unittest.TestCase):
         self.assertNotIn("Fangyun Wei", sources["hong-lrm-2023"]["authors"])
 
     def test_run_consumes_scene_profile_and_records_fixture_provenance(self) -> None:
-        from validator import validate_result
+        from pipeline.validator import validate_result
 
         with tempfile.TemporaryDirectory() as temporary:
             cache = Path(temporary)
@@ -159,7 +159,7 @@ class ReviewHardeningTest(unittest.TestCase):
             self.assertNotEqual(second_report.returncode, 0)
 
     def test_run_ids_are_confined_and_network_is_blocked_during_labs(self) -> None:
-        from runner import offline_network
+        from pipeline.runner import offline_network
 
         with tempfile.TemporaryDirectory() as temporary:
             cache = Path(temporary)

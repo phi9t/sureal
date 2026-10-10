@@ -11,7 +11,7 @@ from typing import Any
 
 import numpy as np
 
-from contracts import ROOT, canonical_json, load_json, sha256_file
+from pipeline.contracts import ROOT, canonical_json, load_json, sha256_file
 
 
 ASSET_ID = "controlled-suite"

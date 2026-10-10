@@ -13,7 +13,7 @@ from typing import Iterable
 from urllib.parse import quote
 from urllib.request import Request, urlopen
 
-from contracts import ROOT, load_json, sha256_file
+from pipeline.contracts import ROOT, load_json, sha256_file
 
 
 CITATION = re.compile(r"\[([a-z0-9][a-z0-9.-]*)\]\((https://[^)]+)\)")

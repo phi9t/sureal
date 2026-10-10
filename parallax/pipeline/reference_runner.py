@@ -15,7 +15,7 @@ import time
 import uuid
 from typing import Any
 
-from contracts import (
+from pipeline.contracts import (
     ROOT,
     canonical_json,
     ensure_finite,
@@ -25,7 +25,7 @@ from contracts import (
     validate_run_id,
     write_json,
 )
-from reference_scene import generate_colmap_scene
+from pipeline.reference_scene import generate_colmap_scene
 
 
 ADAPTER = "colmap-sfm"
@@ -463,33 +463,33 @@ def validate_reference_result(run_dir: Path, expected_adapter: str | None = None
 def validate_landed_reference_result(run_dir: Path, adapter: str) -> dict[str, Any]:
     """Dispatch validation for any maintained adapter exposed by ``run.sh``."""
     if adapter == "foundation-geometry":
-        from foundation_geometry_reference_runner import (
+        from pipeline.foundation_geometry_reference_runner import (
             validate_foundation_geometry_reference_result,
         )
 
         return validate_foundation_geometry_reference_result(run_dir)
     if adapter == "splatfacto":
-        from splatfacto_reference_runner import validate_splatfacto_reference_result
+        from pipeline.splatfacto_reference_runner import validate_splatfacto_reference_result
 
         return validate_splatfacto_reference_result(run_dir)
     if adapter == "nerfacto":
-        from nerfacto_reference_runner import validate_nerfacto_reference_result
+        from pipeline.nerfacto_reference_runner import validate_nerfacto_reference_result
 
         return validate_nerfacto_reference_result(run_dir)
     if adapter == "neus-facto":
-        from neus_reference_runner import validate_neus_reference_result
+        from pipeline.neus_reference_runner import validate_neus_reference_result
 
         return validate_neus_reference_result(run_dir)
     if adapter == "depth-anything-v2":
-        from depth_reference_runner import validate_depth_reference_result
+        from pipeline.depth_reference_runner import validate_depth_reference_result
 
         return validate_depth_reference_result(run_dir)
     if adapter == "orb-slam":
-        from slam_reference_runner import validate_slam_reference_result
+        from pipeline.slam_reference_runner import validate_slam_reference_result
 
         return validate_slam_reference_result(run_dir)
     if adapter == "colmap-mvs":
-        from mvs_reference_runner import validate_mvs_reference_result
+        from pipeline.mvs_reference_runner import validate_mvs_reference_result
 
         return validate_mvs_reference_result(run_dir)
     if adapter == ADAPTER:
@@ -515,31 +515,31 @@ def _secure_directory(root: Path, name: str) -> Path:
 def run_reference(cache_root: Path, adapter: str, profile: str, run_id: str) -> Path:
     validate_run_id(run_id)
     if adapter == "foundation-geometry":
-        from foundation_geometry_reference_runner import run_foundation_geometry_reference
+        from pipeline.foundation_geometry_reference_runner import run_foundation_geometry_reference
 
         return run_foundation_geometry_reference(cache_root, profile, run_id)
     if adapter == "splatfacto":
-        from splatfacto_reference_runner import run_splatfacto_reference
+        from pipeline.splatfacto_reference_runner import run_splatfacto_reference
 
         return run_splatfacto_reference(cache_root, profile, run_id)
     if adapter == "nerfacto":
-        from nerfacto_reference_runner import run_nerfacto_reference
+        from pipeline.nerfacto_reference_runner import run_nerfacto_reference
 
         return run_nerfacto_reference(cache_root, profile, run_id)
     if adapter == "neus-facto":
-        from neus_reference_runner import run_neus_reference
+        from pipeline.neus_reference_runner import run_neus_reference
 
         return run_neus_reference(cache_root, profile, run_id)
     if adapter == "depth-anything-v2":
-        from depth_reference_runner import run_depth_reference
+        from pipeline.depth_reference_runner import run_depth_reference
 
         return run_depth_reference(cache_root, profile, run_id)
     if adapter == "orb-slam":
-        from slam_reference_runner import run_slam_reference
+        from pipeline.slam_reference_runner import run_slam_reference
 
         return run_slam_reference(cache_root, profile, run_id)
     if adapter == "colmap-mvs":
-        from mvs_reference_runner import run_mvs_reference
+        from pipeline.mvs_reference_runner import run_mvs_reference
 
         return run_mvs_reference(cache_root, profile, run_id)
     if adapter != ADAPTER:

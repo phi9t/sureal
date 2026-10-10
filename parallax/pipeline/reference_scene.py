@@ -9,7 +9,7 @@ import zlib
 
 import numpy as np
 
-from contracts import canonical_json, sha256_file
+from pipeline.contracts import canonical_json, sha256_file
 
 
 def _write_png(path: Path, image: np.ndarray) -> None:

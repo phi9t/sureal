@@ -11,8 +11,8 @@ import zipfile
 
 import numpy as np
 
-from contracts import ROOT, load_json, sha256_file
-from dynamic import (
+from pipeline.contracts import ROOT, load_json, sha256_file
+from pipeline.dynamic import (
     DYNAMIC_ARRAY_SEMANTICS,
     DYNAMIC_CAMERA_CONTAMINATION,
     DYNAMIC_PROFILE_FRAMES,
@@ -23,7 +23,7 @@ from dynamic import (
     generate_dynamic_failure_sweep,
     generate_dynamic_fixture,
 )
-from generative import (
+from pipeline.generative import (
     AMBIGUITY_ARRAY_SEMANTICS,
     AMBIGUITY_PROFILE_POINTS,
     AMBIGUITY_RANDOM_SEED,
@@ -33,7 +33,7 @@ from generative import (
     generate_ambiguity_failure_sweep,
     generate_ambiguity_fixture,
 )
-from math3d import (
+from pipeline.math3d import (
     apply_transform,
     fundamental_from_poses,
     fuse_tsdf,
@@ -45,7 +45,7 @@ from math3d import (
     triangulate_point,
     unproject,
 )
-from surflo_endpoint import build_surflo_endpoint
+from pipeline.surflo_endpoint import build_surflo_endpoint
 
 
 def _write_sweep(path: Path, rows: list[dict[str, Any]]) -> None:
