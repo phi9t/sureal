@@ -34,6 +34,14 @@ class RepoGateWhitespaceTests(unittest.TestCase):
 
 
 def apply_repo_gate_git_environment(env: dict[str, str]) -> None:
+    for source, destination in (
+        ("SUREAL_REPO_GATE_GIT_DIR", "GIT_DIR"),
+        ("SUREAL_REPO_GATE_GIT_WORK_TREE", "GIT_WORK_TREE"),
+        ("SUREAL_REPO_GATE_GIT_COMMON_DIR", "GIT_COMMON_DIR"),
+    ):
+        value = env.get(source)
+        if value:
+            env[destination] = value
     alternate = env.get("SUREAL_REPO_GATE_GIT_ALTERNATE_OBJECT_DIRECTORIES")
     if alternate:
         env["GIT_ALTERNATE_OBJECT_DIRECTORIES"] = alternate
