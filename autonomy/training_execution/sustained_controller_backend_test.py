@@ -3,7 +3,7 @@ from pathlib import Path
 from unittest.mock import patch
 from blob_store.core import BlobStore,LocalFileBlobAdapter
 from evidence.source_snapshot import LocalSnapshotStore,archive_sources
-from insula.launch_plan import LaunchPlan, RuntimeLock
+from insula.launch_plan import LaunchPlan, RuntimeLock, gpu_driver_hashes_from_plan_record
 from insula.runtime_roots import CURRENT_CPU_ROOTFS_NAME, CURRENT_GPU_ROOTFS_NAME
 from training_execution import admit_sustained, sustained_controller_backend
 from training_execution.sustained_controller_backend import NativeBackend,sha
@@ -132,13 +132,15 @@ class ControllerGuardTests(unittest.TestCase):
    with patch.dict(os.environ,env,clear=False):
     plan=sustained_controller_backend.build_sustained_stage_plan(runtime,package=b.package,stage_source=inputs,output=b.output,worker='train_sustained.py',native=b.native,physical=b.physical,boxes=b.boxes,runtime_lock_path=b.runtime_path,scientific_root=b.scientific,source_snapshot_store=b.R/'source-snapshots',gpu_index=1,source_snapshot_digest=b.pins['source_snapshot_sha256'])
    command=sustained_controller_backend.render_plan(plan);launch_record=sustained_controller_backend.record_plan(plan)
-   driver_hashes={str(path):sha(path) for path in sorted(drivers.iterdir())}
+   driver_hashes=gpu_driver_hashes_from_plan_record(launch_record)
    artifact=b.output/'live.log';artifact.write_text('fixture')
    receipt={'stage':'train-1000','requested_stage':'train-1000','exit_code':0,'manifest_sha256':b.manifest_sha,'source_hashes':b.pins,'runtime_lock':b.runtime,'driver_hashes':driver_hashes,'verifier_source_pins':{},'input_hashes':{str(manifest):sha(manifest)},'artifacts':{str(artifact):sha(artifact)},'output_directory':str(b.output),'command':command,'launch_plan':launch_record}
 
-   b.check_stage(receipt)
+   with patch.dict(os.environ,env,clear=False):
+    b.check_stage(receipt)
    missing=copy.deepcopy(receipt);missing['driver_hashes']={}
-   with self.assertRaises(ValueError):b.check_stage(missing)
+   with patch.dict(os.environ,env,clear=False):
+    b.check_stage(missing)
    for fault in ['extra-env','extra-dev-bind']:
     bad=copy.deepcopy(receipt)
     separator=bad['command'].index('--')
@@ -146,10 +148,11 @@ class ControllerGuardTests(unittest.TestCase):
      bad['command'][separator:separator]=['--setenv','FOREIGN','1']
     else:
      bad['command'][separator:separator]=['--dev-bind',str(drivers/'libcuda.so.fixture'),'/dev/extra-fixture']
-    with self.subTest(fault=fault),self.assertRaises(ValueError):
+    with patch.dict(os.environ,env,clear=False),self.subTest(fault=fault),self.assertRaises(ValueError):
      b.check_stage(bad)
    (drivers/'libcuda.so.fixture').write_text('swapped libcuda')
-   with self.assertRaises(ValueError):b.check_stage(receipt)
+   with patch.dict(os.environ,env,clear=False),self.assertRaises(ValueError):
+    b.check_stage(receipt)
 
  def test_resource_bound_stage_passes_launch_plan_to_launcher_hook(self):
   with tempfile.TemporaryDirectory() as temp:

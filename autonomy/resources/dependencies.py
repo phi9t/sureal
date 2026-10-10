@@ -6,6 +6,7 @@ their identities are in the native manifests/receipts, not checkpoint payloads.
 import json
 from pathlib import Path
 from evidence.source_snapshot import is_regular_file,safe_member_name
+from insula.launch_plan import gpu_driver_paths_from_plan_record
 from resources.sources import sha
 
 
@@ -35,8 +36,17 @@ def shared_inventory(backend):
                 add('native/'+relative+'/'+name,backend.native/relative/name,digest)
             add('physical/'+scene+'/producer/'+timestamp+'.npz',backend.native.parent/'balanced16-physical-v2'/scene/'producer'/(timestamp+'.npz'),frame['physical_sha256'])
             add('boxes/'+scene+'/producer/targets.json',backend.native.parent/'balanced16-labels-v2'/scene/'producer/targets.json',frame['boxes_sha256'])
-        for path,digest in backend.old['driver_hashes'].items():
-            add('drivers/'+Path(path).name,path,digest)
+        driver_paths={}
+        for receipt_path in sorted(backend.R.glob('*-verified.json')):
+            receipt=json.loads(receipt_path.read_text())
+            if isinstance(receipt.get('launch_plan'),dict):
+                driver_paths.update(gpu_driver_paths_from_plan_record(receipt['launch_plan']))
+        if driver_paths:
+            for name,(path,digest) in sorted(driver_paths.items()):
+                add('drivers/'+name,path,digest)
+        else:
+            for path,digest in backend.old['driver_hashes'].items():
+                add('drivers/'+Path(path).name,path,digest)
     except (KeyError,TypeError,OSError) as error:
         raise ValueError('complete native cohort/driver dependency inventory required') from error
     return files

@@ -14,7 +14,12 @@ from types import MethodType, SimpleNamespace
 from typing import Iterable, Mapping
 
 from evidence.source_snapshot import LocalSnapshotStore, archive_sources, is_regular_file
-from insula.launch_plan import read_receipt_mount_sequence, read_receipt_mounts
+from insula.launch_plan import (
+    gpu_driver_hashes_from_plan_record,
+    read_receipt_mount_sequence,
+    read_receipt_mounts,
+    verify_gpu_driver_hashes_from_plan_record,
+)
 from resources.checkpoint import validate_checkpoint, validate_publication_receipt
 from resources.sources import sha
 from resources.stage import validate_proof
@@ -163,6 +168,34 @@ def _verify_exit_code(receipt: Mapping[str, object]) -> None:
         raise ValueError("fresh receipt exit code differs from expected")
 
 
+def _launch_plan_record(record: Mapping[str, object]) -> Mapping[str, object] | None:
+    launch_plan = record.get("launch_plan")
+    if isinstance(launch_plan, Mapping):
+        return launch_plan
+    if {"runtime", "mounts", "environment", "command"} <= set(record):
+        return record
+    return None
+
+
+def _verify_launch_plan_record(
+    record: Mapping[str, object],
+    *,
+    verify_gpu_driver_pins: bool = False,
+    require_derived_driver_hashes: bool = False,
+) -> None:
+    read_receipt_mounts(record, include_digests=False)
+    read_receipt_mount_sequence(record, include_digests=False)
+    plan_record = _launch_plan_record(record)
+    if plan_record is not None and verify_gpu_driver_pins and gpu_driver_hashes_from_plan_record(plan_record):
+        verify_gpu_driver_hashes_from_plan_record(plan_record)
+        driver_hashes = record.get("driver_hashes")
+        if (
+            require_derived_driver_hashes
+            and driver_hashes not in (None, {}, gpu_driver_hashes_from_plan_record(plan_record))
+        ):
+            raise ValueError("fresh GPU driver_hashes must derive from launch plan")
+
+
 def _is_resource_stage_proof(receipt: Mapping[str, object]) -> bool:
     return {
         "schema_version",
@@ -218,8 +251,17 @@ def sweep_fresh_live_receipts(paths: Iterable[Path], temp_root: Path) -> Verifie
             for record in _iter_receipt_records(value):
                 _verify_exit_code(record)
                 if "launch_plan" in record:
-                    read_receipt_mounts(record, include_digests=False)
-                    read_receipt_mount_sequence(record, include_digests=False)
+                    _verify_launch_plan_record(
+                        record,
+                        verify_gpu_driver_pins=True,
+                        require_derived_driver_hashes=True,
+                    )
+                elif {"runtime", "mounts", "environment", "command"} <= set(record):
+                    _verify_launch_plan_record(
+                        record,
+                        verify_gpu_driver_pins=True,
+                        require_derived_driver_hashes=True,
+                    )
             if _is_resource_stage_proof(value):
                 _verify_resource_stage_proof(path, temp_root)
         except Exception as error:
@@ -373,8 +415,7 @@ def sweep_launch_plan_receipt_readers(roots: Iterable[Path]) -> VerifierReport:
                     continue
                 seen.add(key)
                 try:
-                    read_receipt_mounts(receipt, include_digests=False)
-                    read_receipt_mount_sequence(receipt, include_digests=False)
+                    _verify_launch_plan_record(receipt)
                 except Exception as error:
                     report.fail_one(path, error)
                 else:
