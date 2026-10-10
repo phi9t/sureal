@@ -113,3 +113,51 @@ Verification:
 
 Shared-file overlaps in this follow-up: `autonomy/insula/bazel_launcher.py`.
 No retained receipts, root filesystems, locks, or shared caches were edited.
+
+### 2026-10-10 Linked-wrapper-test follow-up
+
+Mainline landing validation at `6271417` in the linked worktree
+`/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/land-mainline`
+passed `//:repo_gate` but failed four
+`//autonomy/insula:bazel_wrapper_test` subtests. The failure was in the
+external-cwd wrapper assertion: it expected `/experiment/.git` to be a direct
+read-only bind of the host gitdir, while linked worktrees intentionally expose
+`/experiment/.git` as a read-only symlink to the per-worktree gitdir inside the
+read-only common-dir mount.
+
+Fixed `autonomy/insula/bazel_wrapper_test.py` so the assertion derives the
+expected gitdir/common-dir layout through the same launcher resolution rules
+used by the nested `--emit-plan` process. The test still proves the exact Git
+metadata shape: plain repositories and alternate-object clones require a direct
+read-only `.git` bind, while linked worktrees require the read-only
+`/tmp/sureal-git-common` bind plus a read-only `/experiment/.git` symlink to
+the matching sandbox gitdir under that common mount.
+
+Verification from a fresh linked worktree under `$TMPDIR`, created with
+`git worktree add --force <tmp>/worktree worker/rq02-repo-gate`, with local
+`.bazel-cache` seeded, and removed afterwards with `git worktree remove --force`:
+- `./bazelw test //:repo_gate` passed: 7/7 tests, elapsed 11.646s.
+- `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...`
+  passed: 188/188 tests, elapsed 95.276s.
+- `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //parallax/...`
+  passed: 17/17 tests, elapsed 386.629s.
+
+Verification from this worker worktree:
+- `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/insula:bazel_wrapper_test`
+  passed: 1/1 target, elapsed 19.203s.
+- `./bazelw test //:repo_gate` passed: 7/7 tests from cache, elapsed 2.204s;
+  reran live with no-cache flags:
+  `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //:repo_gate`
+  passed: 7/7 tests, elapsed 11.603s.
+- `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...`
+  passed: 188/188 tests, elapsed 88.356s.
+- `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //parallax/...`
+  passed: 17/17 tests, elapsed 396.585s.
+- GPU 1 availability was checked before CUDA. Required UUID
+  `GPU-eaed2f0d-2541-8ca8-b6c4-3e2e45e86619` had 4 MiB used and no compute
+  process in `nvidia-smi --query-compute-apps`.
+- `CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...`
+  passed: 30/30 tests, elapsed 118.032s.
+
+Shared-file overlaps in this follow-up: `autonomy/insula/bazel_wrapper_test.py`.
+No retained receipts, root filesystems, locks, or shared caches were edited.
