@@ -6,7 +6,6 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 from dataclasses import dataclass
-import json
 import os
 from pathlib import Path
 import re
@@ -14,26 +13,10 @@ import subprocess
 import sys
 from typing import Iterable
 
-
-RECEIPT_ROOTS = (
-    Path("autonomy/research"),
-    Path("docs/research"),
-)
-
-SOURCE_PIN_FIELDS = frozenset(
-    {
-        "candidate_hashes",
-        "checkpoint_publisher_source_pins",
-        "host_source_pins",
-        "native_host_source_pins",
-        "native_source_hashes",
-        "original_verifier_source_pins",
-        "resource_source_pins",
-        "source_hashes",
-        "source_pins",
-        "verifier_source_pins",
-    }
-)
+try:
+    from scripts import pinned_sources
+except ModuleNotFoundError:  # pragma: no cover - direct script execution
+    import pinned_sources  # type: ignore[no-redef]
 
 
 @dataclass(frozen=True)
@@ -75,21 +58,7 @@ def repository_root() -> Path:
 
 
 def _git_ls_files(root: Path, patterns: Iterable[str]) -> tuple[str, ...]:
-    env = os.environ.copy()
-    env["GIT_OPTIONAL_LOCKS"] = "0"
-    if root.resolve() == repository_root().resolve():
-        apply_repo_gate_git_environment(env)
-    result = subprocess.run(
-        ["git", "-C", str(root), "ls-files", "-z", "--", *patterns],
-        env=env,
-        check=True,
-        stdout=subprocess.PIPE,
-    )
-    return tuple(
-        path.decode("utf-8", errors="surrogateescape")
-        for path in result.stdout.split(b"\0")
-        if path
-    )
+    return pinned_sources.git_ls_files(root, tuple(patterns))
 
 
 def tracked_shell_files(root: Path) -> tuple[str, ...]:
@@ -100,74 +69,9 @@ def tracked_shell_files(root: Path) -> tuple[str, ...]:
     return tuple(sorted(files))
 
 
-def _json_paths(root: Path) -> Iterable[Path]:
-    if root.is_file():
-        if root.suffix == ".json":
-            yield root
-        return
-    if root.exists():
-        yield from sorted(path for path in root.rglob("*.json") if path.is_file())
-
-
-def _source_pin_keys(value) -> Iterable[str]:
-    if isinstance(value, dict):
-        for key, child in value.items():
-            if key in SOURCE_PIN_FIELDS and isinstance(child, dict):
-                yield from (raw for raw in child if isinstance(raw, str))
-            yield from _source_pin_keys(child)
-    elif isinstance(value, list):
-        for child in value:
-            yield from _source_pin_keys(child)
-
-
-def _path_candidates(raw: str, root: Path) -> Iterable[str]:
-    path = Path(raw)
-    if path.is_absolute():
-        try:
-            yield path.resolve().relative_to(root.resolve()).as_posix()
-        except ValueError:
-            pass
-        for marker in (
-            "/experiment/",
-            "/source/experiment/",
-            "/source/gpu/",
-            "/source/",
-            "/code/",
-        ):
-            if marker in raw:
-                yield raw.split(marker, 1)[1]
-    yield raw
-
-
-def normalize_source_pin_path(raw: str, root: Path, tracked: set[str]) -> str | None:
-    for candidate in _path_candidates(raw, root):
-        candidate = candidate.lstrip("./")
-        if candidate in tracked:
-            return candidate
-        autonomy_candidate = "autonomy/" + candidate
-        if autonomy_candidate in tracked:
-            return autonomy_candidate
-
-    basename_matches = sorted(path for path in tracked if Path(path).name == Path(raw).name)
-    if len(basename_matches) == 1:
-        return basename_matches[0]
-    return None
-
-
 def receipt_pinned_shell_files(root: Path, tracked: Iterable[str] | None = None) -> tuple[str, ...]:
     tracked_set = set(tracked_shell_files(root) if tracked is None else tracked)
-    pinned: set[str] = set()
-    for receipt_root in RECEIPT_ROOTS:
-        for path in _json_paths(root / receipt_root):
-            try:
-                value = json.loads(path.read_text(encoding="utf-8"))
-            except (OSError, json.JSONDecodeError):
-                continue
-            for raw in _source_pin_keys(value):
-                normalized = normalize_source_pin_path(raw, root, tracked_set)
-                if normalized is not None:
-                    pinned.add(normalized)
-    return tuple(sorted(pinned))
+    return tuple(path for path in pinned_sources.protected_source_paths(root, tracked_set) if path in tracked_set)
 
 
 def shellcheck_target_files(root: Path) -> tuple[tuple[str, ...], tuple[str, ...]]:

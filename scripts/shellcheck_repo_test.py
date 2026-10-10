@@ -63,6 +63,10 @@ class ShellCheckRepoTests(unittest.TestCase):
         self.assertIn("SC2086", result.stdout + result.stderr)
 
     def test_file_list_includes_extensionless_hooks_and_excludes_receipt_pins(self) -> None:
+        self.write_tracked(
+            "autonomy/retained_receipt_sweep.py",
+            "RETAINED_SOURCE_PIN_FIELDS = ('source_pins', 'candidate_hashes')\n",
+        )
         self.write_tracked(".githooks/pre-commit", "#!/bin/bash\nset -euo pipefail\ntrue\n")
         self.write_tracked("autonomy/tracer.sh", "#!/bin/bash\nset -euo pipefail\ntrue\n")
         self.write_tracked("autonomy/run.sh", "#!/bin/bash\nset -euo pipefail\ntrue\n")

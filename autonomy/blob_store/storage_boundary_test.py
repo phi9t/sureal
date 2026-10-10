@@ -67,6 +67,7 @@ ALLOWED_PROCEDURE_RECORDS = {
     "studies/expanded_batch/procedure_records/expanded_publish.py",
 }
 
+
 def _is_scanned_file(path: Path) -> bool:
     return path.name in TEXT_NAMES or path.suffix in TEXT_SUFFIXES
 
@@ -156,10 +157,7 @@ class StorageBoundaryTests(unittest.TestCase):
             root = Path(temp)
             planted = root / "studies" / "balanced16" / "procedure_records" / "new_publisher.py"
             planted.parent.mkdir(parents=True)
-            planted.write_text(
-                "if __name__ == '__main__':\n"
-                "    command = 'hdfs dfs -ls /tmp'\n"
-            )
+            planted.write_text("if __name__ == '__main__':\n" "    command = 'hdfs dfs -ls /tmp'\n")
 
             violations = scan_storage_boundary(root)
 

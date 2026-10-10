@@ -344,7 +344,10 @@ class WaystoneAdapterTests(unittest.TestCase):
                     ),
                     "artifacts/source-snapshots/" + "a" * 64,
                 )
-                self.assertEqual(blob_key_from_uri("runs/already/run-1/output/blob.bin", waystone), "runs/already/run-1/output/blob.bin")
+                self.assertEqual(
+                    blob_key_from_uri("runs/already/run-1/output/blob.bin", waystone),
+                    "runs/already/run-1/output/blob.bin",
+                )
 
             with self.assertRaises(ValueError):
                 blob_adapter_from_descriptor(
@@ -462,7 +465,12 @@ class WaystoneAdapterTests(unittest.TestCase):
                 clock=lambda: 100.0,
             )
             store.exists("runs/metadata/blob.bin")
-            store.get("runs/metadata/blob.bin", Path(directory) / "blob.bin", hashlib.sha256(b"x").hexdigest(), expected_bytes=1)
+            store.get(
+                "runs/metadata/blob.bin",
+                Path(directory) / "blob.bin",
+                hashlib.sha256(b"x").hexdigest(),
+                expected_bytes=1,
+            )
 
         metadata_deadlines = [seconds for kind, seconds in adapter.deadlines if kind in {"exists", "size"}]
         self.assertGreaterEqual(min(metadata_deadlines), 30.0)

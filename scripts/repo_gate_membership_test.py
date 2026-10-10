@@ -77,6 +77,8 @@ class RepoGateMembershipTests(unittest.TestCase):
 
         self.assertIn("//:import_rule_behavior_test", gate_tests)
         self.assertIn("//:repo_gate_publication_audit_test", gate_tests)
+        self.assertIn("//:repo_gate_ruff_test", gate_tests)
+        self.assertIn("//:ruff_repo_test", gate_tests)
         self.assertIn("//:repo_gate_shellcheck_test", gate_tests)
         self.assertIn("//:shellcheck_repo_test", gate_tests)
         self.assertIn("//:repo_gate_import_rule_test", gate_tests)

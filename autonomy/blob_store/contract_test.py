@@ -92,9 +92,7 @@ class BlobStoreContractTests(unittest.TestCase):
         store = api["BlobStore"](api["InMemoryBlobAdapter"]())
 
         public_callables = {
-            name
-            for name, member in inspect.getmembers(store)
-            if callable(member) and not name.startswith("_")
+            name for name, member in inspect.getmembers(store) if callable(member) and not name.startswith("_")
         }
 
         self.assertEqual(public_callables, {"put", "get", "exists"})
@@ -393,6 +391,7 @@ class BlobStoreContractTests(unittest.TestCase):
         self.assertIn("run fixture-blob-auth-refresh", str(caught.exception))
         self.assertIsNotNone(caught.exception.__cause__)
         self.assertEqual(clock.sleeps, [])
+
 
 if __name__ == "__main__":
     unittest.main()
