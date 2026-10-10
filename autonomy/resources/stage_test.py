@@ -1,4 +1,4 @@
-import copy,json,tempfile,unittest
+import copy,json,os,subprocess,sys,tempfile,unittest
 from pathlib import Path
 from evidence.source_snapshot import LocalSnapshotStore
 from insula.launch_plan import BAZEL_LINUX_X86_64_SHA256, BAZEL_VERSION, build_plan, load_runtime_lock, plan_data, record_plan, render_plan, wrap_resource_plan
@@ -216,6 +216,22 @@ class ResourceStageTests(unittest.TestCase):
                                 'execution_log':{'path':str(log),'native_path':str(native/'live.log'),'sha256':sha(log)}}}
             admitted=validate(proof,proof['command'],current,pins,native,1024**3,10)
             self.assertEqual(admitted['peak_rss_bytes'],153600)
+
+    def test_execute_worker_loads_resource_layer_packages_without_pythonpath(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp);output=root/'output';worker=root/'worker.py'
+            output.mkdir()
+            worker.write_text("print('worker ok')\n")
+            env={key:value for key,value in os.environ.items() if key!='PYTHONPATH'}
+            result=subprocess.run(
+                [sys.executable,str(AUTONOMY/'resources/execute_worker.py'),str(output),str(worker)],
+                cwd=root,
+                env=env,
+                text=True,
+                capture_output=True,
+            )
+            self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+            self.assertTrue((output/'worker-resource.json').is_file())
 
     def test_exact_command_source_output_and_measured_worker_proof_required(self):
         _,validate=self.api()

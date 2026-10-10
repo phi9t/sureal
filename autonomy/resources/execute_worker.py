@@ -6,6 +6,11 @@ import resource
 import runpy
 import sys
 import time
+
+_RESOURCE_LAYER_ROOT=Path(__file__).resolve().parents[1]
+if str(_RESOURCE_LAYER_ROOT) not in sys.path:
+    sys.path.insert(0,str(_RESOURCE_LAYER_ROOT))
+
 from evidence.source_snapshot import require_regular_file
 from resources.process_lifecycle import enable_subreaper, completed_lifecycle
 
