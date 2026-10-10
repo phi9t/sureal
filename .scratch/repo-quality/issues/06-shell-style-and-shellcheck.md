@@ -13,7 +13,7 @@
 
 **Blocked by:** 02
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] **Live first.** ShellCheck runs over all tracked shell scripts. Findings are recorded by rule. Each script also runs for real (or `--help` / dry-run where running it would launch work) after it is fixed.
 - [x] **ShellCheck comes from the rootfs or a pinned Bazel dependency**, not from host packages.
