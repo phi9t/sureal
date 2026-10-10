@@ -25,6 +25,20 @@ http_archive(
     urls = ["https://github.com/astral-sh/ruff/releases/download/0.6.9/ruff-x86_64-unknown-linux-gnu.tar.gz"],
 )
 
+http_archive(
+    name = "clang_format_linux_x86_64",
+    build_file_content = """
+filegroup(
+    name = "clang-format",
+    srcs = ["clang_format/data/bin/clang-format"],
+    visibility = ["//visibility:public"],
+)
+""",
+    sha256 = "2de122b8aa78ba49e326f974131caab2c79f4ae877c227cd4e3e5d82a98d21e5",
+    type = "zip",
+    urls = ["https://files.pythonhosted.org/packages/05/a8/d94adc8025c6a313bed5da994c421fff7dc4288d20028b309b1d45e15032/clang_format-18.1.8-py2.py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"],
+)
+
 local_runtime_repo = use_repo_rule(
     "@rules_python//python/local_toolchains:repos.bzl",
     "local_runtime_repo",

@@ -1,8 +1,9 @@
-load("@rules_python//python:defs.bzl", "py_library", "py_test")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library", "py_test")
 
 package(default_visibility = ["//visibility:private"])
 
 REPO_GATE_TESTS = [
+    "//:clang_format_repo_test",
     "//:check_identifiers_test",
     "//:check_storage_boundary_test",
     "//:githooks_test",
@@ -13,6 +14,7 @@ REPO_GATE_TESTS = [
     "//:pinned_sources_test",
     "//:publication_audit_behavior_test",
     "//:repo_gate_import_rule_test",
+    "//:repo_gate_clang_format_test",
     "//:repo_gate_membership_test",
     "//:repo_gate_publication_audit_test",
     "//:repo_gate_ruff_test",
@@ -59,6 +61,28 @@ py_library(
     name = "check_storage_boundary_lib",
     srcs = ["scripts/check_storage_boundary.py"],
     imports = ["."],
+)
+
+py_library(
+    name = "clang_format_repo_lib",
+    srcs = ["scripts/clang_format_repo.py"],
+    imports = ["."],
+    deps = [":pinned_sources_lib"],
+)
+
+py_binary(
+    name = "clang_format_repo",
+    srcs = ["scripts/clang_format_repo.py"],
+    args = ["--clang-format=$(location @clang_format_linux_x86_64//:clang-format)"],
+    data = [
+        ".clang-format",
+        "@clang_format_linux_x86_64//:clang-format",
+    ],
+    imports = ["."],
+    legacy_create_init = 0,
+    main = "scripts/clang_format_repo.py",
+    deps = [":pinned_sources_lib"],
+    visibility = ["//visibility:public"],
 )
 
 py_test(
@@ -167,6 +191,26 @@ py_test(
 )
 
 py_test(
+    name = "repo_gate_clang_format_test",
+    srcs = ["scripts/repo_gate_clang_format_test.py"],
+    args = ["--clang-format=$(location @clang_format_linux_x86_64//:clang-format)"],
+    data = [
+        ".clang-format",
+        "@clang_format_linux_x86_64//:clang-format",
+    ],
+    deps = [
+        ":clang_format_repo_lib",
+        ":pinned_sources_lib",
+    ],
+    legacy_create_init = 0,
+    size = "medium",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+)
+
+py_test(
     name = "repo_gate_membership_test",
     srcs = ["scripts/repo_gate_membership_test.py"],
     data = [
@@ -261,6 +305,21 @@ py_test(
         "@shellcheck_linux_x86_64//:shellcheck",
     ],
     deps = [":shellcheck_repo_lib"],
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "repo_gate",
+    ],
+)
+
+py_test(
+    name = "clang_format_repo_test",
+    srcs = ["scripts/clang_format_repo_test.py"],
+    args = ["--clang-format=$(location @clang_format_linux_x86_64//:clang-format)"],
+    data = [
+        "@clang_format_linux_x86_64//:clang-format",
+    ],
+    deps = [":clang_format_repo_lib"],
     legacy_create_init = 0,
     size = "small",
     tags = [
