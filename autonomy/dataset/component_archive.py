@@ -2,6 +2,7 @@
 import hashlib,io,json,re,tarfile
 from pathlib import Path
 from evidence.source_snapshot import file_sha256, require_regular_file
+from resources.scientific_budget import check_working
 
 
 def create_component_archive(source,archive,*,expected_files,provenance,other_bytes,budget_bytes):
@@ -22,8 +23,8 @@ def create_component_archive(source,archive,*,expected_files,provenance,other_by
     data=(json.dumps(manifest,sort_keys=True,indent=2)+'\n').encode()
     if len(data)>16*1024**2:raise ValueError('bundle manifest exceeds resident cap')
     logical=sum(512+((n+511)//512)*512 for n in [len(data),*sizes.values()])+1024;archive_bytes=((logical+10239)//10240)*10240
-    working=other_bytes+sum(sizes.values())+archive_bytes
-    if working>budget_bytes:raise ValueError('component bundle exceeds combined working set')
+    new_bytes=sum(sizes.values())+archive_bytes;working=other_bytes+new_bytes
+    cap_record=check_working(other_bytes,new_bytes,where='dataset.component_archive.create_component_archive',limit=budget_bytes)
     def header(name,size):
         t=tarfile.TarInfo(name);t.size=size;t.mode=0o644;t.uid=t.gid=t.mtime=0;t.uname=t.gname='';return t
     with archive.open('xb') as f:
@@ -33,4 +34,4 @@ def create_component_archive(source,archive,*,expected_files,provenance,other_by
                 with (source/name).open('rb') as stream:tar.addfile(header(name,sizes[name]),stream)
     if archive.stat().st_size!=archive_bytes:raise ValueError('bundle byte accounting differs')
     digest=file_sha256(archive)
-    return {'sha256':digest,'manifest_sha256':hashlib.sha256(data).hexdigest(),'archive_bytes':archive_bytes,'files':len(sizes),'working_set_bytes':working}
+    return {'sha256':digest,'manifest_sha256':hashlib.sha256(data).hexdigest(),'archive_bytes':archive_bytes,'files':len(sizes),'working_set_bytes':working,'scientific_working_cap':cap_record}

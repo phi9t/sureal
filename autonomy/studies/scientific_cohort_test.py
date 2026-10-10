@@ -1,3 +1,5 @@
+import contextlib
+import io
 import json
 import os
 import subprocess
@@ -241,10 +243,13 @@ class ScientificCohortWorkflowTests(unittest.TestCase):
                     raise AssertionError(command)
                 return subprocess.CompletedProcess(command, 0, stage + "\n", "")
 
+            stderr = io.StringIO()
             with (
+                contextlib.redirect_stderr(stderr),
                 patch.object(scientific_cohort, "HERE", package),
                 patch.object(scientific_cohort, "CACHE", cache),
                 patch.object(scientific_cohort, "WORKING", working),
+                patch.object(scientific_cohort, "SCIENTIFIC_WORKING_CAP_BYTES", 1),
                 patch.object(scientific_cohort, "admit_scene"),
                 patch.object(scientific_cohort.subprocess, "run", side_effect=fake_run),
                 patch.object(sys, "argv", [
@@ -266,6 +271,21 @@ class ScientificCohortWorkflowTests(unittest.TestCase):
             self.assertTrue(any("camera.publish-scientific-camera" in call for call in flattened))
             self.assertTrue(any("camera.verify-camera-replay" in call for call in flattened))
             self.assertTrue(any("camera.camera_eviction" in call for call in flattened))
+            self.assertIn("WARNING: scientific working cap exceeded", stderr.getvalue())
+            records = receipt["scientific_working_cap_checks"]
+            self.assertEqual(
+                [record["where"] for record in records],
+                [
+                    "studies.scientific_cohort.bundle_cap",
+                    "studies.scientific_cohort.final_working",
+                ],
+            )
+            for record in records:
+                self.assertEqual(record["limit_bytes"], 1)
+                self.assertEqual(record["over_by_bytes"], record["used_bytes"] + record["new_bytes"] - 1)
+                self.assertTrue(record["exceeded"])
+                self.assertTrue(record["timestamp_utc"].endswith("+00:00"))
+            print("cohort over-cap records", json.dumps(records, sort_keys=True), flush=True)
 
 
 if __name__ == "__main__":

@@ -1,12 +1,34 @@
 """Pre-write scientific budget admission and sampled sustained-fit timing."""
+from datetime import datetime, timezone
+import sys
+
 from resources.scientific_payload import unique_payload_bytes
 
 SCIENTIFIC_WORKING_CAP_BYTES = 20*1024**3
 
+
+def check_working(used, new, *, where, limit=SCIENTIFIC_WORKING_CAP_BYTES, alert=True):
+ if any(type(v) is not int or v<0 for v in (used,new,limit)):
+  raise ValueError('scientific working cap check requires nonnegative byte counts')
+ if not isinstance(where,str) or not where:
+  raise ValueError('scientific working cap check requires a call site')
+ over=max(0,used+new-limit)
+ record={'where':where,'used_bytes':used,'new_bytes':new,'limit_bytes':limit,
+         'over_by_bytes':over,'timestamp_utc':datetime.now(timezone.utc).isoformat(timespec='microseconds'),
+         'exceeded':used+new>=limit}
+ if alert and record['exceeded']:
+  print('WARNING: scientific working cap exceeded '
+        f"where={where} used_bytes={used} new_bytes={new} "
+        f"limit_bytes={limit} over_by_bytes={over}",
+        file=sys.stderr,flush=True)
+ return record
+
+
 def reserve_write(root,maximum_new_bytes,limit=SCIENTIFIC_WORKING_CAP_BYTES):
  used=unique_payload_bytes(root)
- if used+maximum_new_bytes>=limit:raise ValueError(f'Scientific write refused before allocation: {used}+{maximum_new_bytes}>={limit}')
- return {'used_bytes_before':used,'maximum_new_bytes':maximum_new_bytes,'limit':limit}
+ record=check_working(used,maximum_new_bytes,where='resources.scientific_budget.reserve_write',limit=limit)
+ record.update({'used_bytes_before':used,'maximum_new_bytes':maximum_new_bytes,'limit':limit})
+ return record
 
 def fit_interval(curve):
  if not curve:return {'right_censored':True,'observed_updates':0,'reason':'no admitted checkpoints'}

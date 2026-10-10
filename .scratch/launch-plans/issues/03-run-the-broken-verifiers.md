@@ -319,3 +319,85 @@ Current blocker:
 ### 2026-10-09 coordinator note
 
 Landed as-is at the user's decision ("stop here, land what we have"). The live attempts found and fixed a real audit bug (d434154). They also showed that one real scene peaks at about 31 GB in `scientific-processing`, with 17.1 GB of retained runs already there. So the 20 GiB working cap cannot hold one scene. Neither raising it to 32 GiB nor capping only the run's own bytes was chosen. The acceptance box stays open until the cap is resolved.
+
+### 2026-10-10 scientific working cap made advisory
+
+Decision implemented from the user: keep
+`SCIENTIFIC_WORKING_CAP_BYTES = 21474836480` bytes as the 20 GiB alert
+threshold, but do not refuse a run only because the scientific working cap is
+met or exceeded. The cap now records and alerts; free-disk floors and host
+safety checks remain hard.
+
+What changed:
+
+- `resources.scientific_budget.check_working` is the shared advisory cap
+  interface. It returns a structured record with `where`, `used_bytes`,
+  `new_bytes`, `limit_bytes`, `over_by_bytes`, `timestamp_utc` and
+  `exceeded`. Over-cap checks emit one stderr line beginning
+  `WARNING: scientific working cap exceeded ...`. Under-cap checks still write
+  a record so receipts show the cap was checked.
+- `resources.scientific_budget.reserve_write` keeps its old return keys
+  (`used_bytes_before`, `maximum_new_bytes`, `limit`) and now also carries the
+  advisory record fields instead of raising for the cap.
+- The ticket 03 cohort path now routes working-cap checks through that
+  interface and persists the records in stage outputs or final receipts:
+  `studies/scientific_cohort.py`, `dataset/scientific-preprocess.py`,
+  `dataset/publish-scientific-scene.py`,
+  `dataset/publish-scientific-sidecars.py`,
+  `camera/scientific-camera-preprocess.py`,
+  `camera/publish-scientific-camera.py`,
+  `dataset/component_archive.py`, `dataset/scene_archive.py` and
+  `geometry/scientific_reconstruction.py`.
+- The cohort driver SHA check, cohort manifest SHA check, runtime-lock checks,
+  source-audit checks, fresh-output checks, blob absence/readback checks,
+  digest checks, existing-output checks, free-disk floors and input validation
+  remain hard. Cgroup/kernel memory limits and non-working-cap resource limits
+  were left unchanged.
+- `publish-scientific-sidecars-bounded.py` and
+  `publish-scientific-sidecars-compressed.py` were left unchanged because the
+  cohort calls `publish-scientific-sidecars.py`, not those variants.
+- The refusing "third lp03 run" preflight was found as external run evidence,
+  not as a checked-in preflight script in this worktree. The prior
+  `preflight.json` at
+  `~/devx/tmp/sureal-refactor-20261007/lp03-live/20261009T231155Z-small-uncompressed/preflight.json`
+  had sha256
+  `2e3045b12746767b9a8313700579dd2947b81f7b26ca4d12b810fa282b89cb04`,
+  current total `17131882429`, retained bundle upper `6151527356`, cap
+  `21474836480`, total plus bundle `23283409785`, over by `1808573305`, and
+  with the 1 GiB margin total `24357151609`, over by `2882315129`. Any future
+  checked-in or live preflight should record the same advisory cap fields in
+  `preflight.json` while keeping the other preflight checks hard.
+
+Focused evidence and final gate results:
+
+- `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //:pinned_sources_test`
+  passed, 1/1.
+- Focused advisory-cap targets passed, 6/6:
+  `//autonomy/resources:checkpoint_test`,
+  `//autonomy/resources:scientific_budget_test`,
+  `//autonomy/dataset:component_archive_test`,
+  `//autonomy/dataset:scene_archive_test`,
+  `//autonomy/geometry:scientific_reconstruction_test` and
+  `//autonomy/studies:scientific_cohort_test`.
+- Small-fixture visible-record run through Bazel/Insula passed, 4/4, and
+  printed over-cap records for
+  `dataset.component_archive.create_component_archive`,
+  `dataset.scene_archive.create_scene_archive`,
+  `geometry.scientific_reconstruction.reconstruct_scene`,
+  `studies.scientific_cohort.bundle_cap` and
+  `studies.scientific_cohort.final_working`.
+- Required repo gate passed after this tracker update:
+  `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //:repo_gate`,
+  17/17.
+- Required autonomy gate passed after this tracker update:
+  `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...`,
+  189/189.
+- CUDA gate was attempted because GPU 1
+  (`GPU-eaed2f0d-2541-8ca8-b6c4-3e2e45e86619`) had no compute process and only
+  `4` MiB used, but it did not reach Bazel test execution. The wrapper failed
+  while building the GPU launch plan with
+  `insula.launch_plan.PlanError: GPU device not found: /dev/nvidia1`; no
+  `/dev/nvidia*` device nodes were visible in this worker environment.
+
+The acceptance box stays open: a real cohort run still has to happen once the
+lost source-audit inputs are restored and a launch is authorized.

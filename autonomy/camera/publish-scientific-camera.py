@@ -8,7 +8,7 @@ from dataset.blob_storage import blob_transfer_check
 from insula.launch_plan import build_plan, load_default_runtime_lock, record_plan, run_plan
 from insula.runtime_roots import current_cpu_rootfs
 from evidence.source_snapshot import file_sha256 as sha
-from resources.scientific_budget import SCIENTIFIC_WORKING_CAP_BYTES
+from resources.scientific_budget import SCIENTIFIC_WORKING_CAP_BYTES, check_working
 HERE=Path(__file__).resolve().parents[1]
 COMPONENTS=['camera_image','camera_segmentation','camera_box']
 def total(p):return sum(f.stat().st_size for f in p.rglob('*') if f.is_file())
@@ -52,6 +52,7 @@ def main():
  if sha(checked/'publication.json')!=manifest_sha:raise ValueError('camera manifest mirror differs')
  for n,h in candidates.items():
   if sha(HERE/n)!=h:raise ValueError('camera publication candidate changed')
- if sha(args.evidence)!=args.expected_evidence_sha256 or total(working)>=SCIENTIFIC_WORKING_CAP_BYTES:raise ValueError('camera evidence or final working cap differs')
- receipt={'status':'scientific native camera bundle independently mirrored live','scene':scene,'checks':checks,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-tick,'peak_child_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'runtime_lock':lock,'candidate_hashes':candidates,'camera_evidence_sha256':args.expected_evidence_sha256,'component_receipt_hashes':evidence['receipt_hashes'],'store_descriptor':store_descriptor,'archive':meta,'archive_blob':archive_blob,'publication_manifest_blob':manifest_blob,'publication_manifest_sha256':manifest_sha,'validation':validation,'combined_working_set_bytes':total(working),'artifacts':{str(p.relative_to(base)):sha(p) for p in base.rglob('*') if p.is_file()},'scope':'native camera binary/scalar/key bundle; replay, verified eviction, image/mask decoding and scientific task/protocol readiness remain open'};(base/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print('PASS immutable camera publication',scene,flush=True)
+ if sha(args.evidence)!=args.expected_evidence_sha256:raise ValueError('camera evidence differs')
+ combined=total(working);cap_record=check_working(combined,0,where='camera.publish_scientific_camera.final_working',limit=SCIENTIFIC_WORKING_CAP_BYTES)
+ receipt={'status':'scientific native camera bundle independently mirrored live','scene':scene,'checks':checks,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-tick,'peak_child_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'runtime_lock':lock,'candidate_hashes':candidates,'camera_evidence_sha256':args.expected_evidence_sha256,'component_receipt_hashes':evidence['receipt_hashes'],'store_descriptor':store_descriptor,'archive':meta,'archive_blob':archive_blob,'publication_manifest_blob':manifest_blob,'publication_manifest_sha256':manifest_sha,'validation':validation,'combined_working_set_bytes':combined,'scientific_working_cap':cap_record,'scientific_working_cap_checks':[meta['scientific_working_cap'],cap_record],'artifacts':{str(p.relative_to(base)):sha(p) for p in base.rglob('*') if p.is_file()},'scope':'native camera binary/scalar/key bundle; replay, verified eviction, image/mask decoding and scientific task/protocol readiness remain open'};(base/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print('PASS immutable camera publication',scene,flush=True)
 if __name__=='__main__':main()

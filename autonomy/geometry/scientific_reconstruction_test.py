@@ -1,4 +1,4 @@
-import json
+import contextlib,io,json
 from pathlib import Path
 import tempfile,unittest
 import numpy as np
@@ -52,6 +52,8 @@ class ScientificReconstructionTests(unittest.TestCase):
             root=Path(tmp);source,sidecars,hashes=self.fixture(root);out=root/'points'
             report=reconstruct_scene(source,sidecars,out,10**7,verified_manifest_hashes=hashes)
             self.assertEqual(len(report['rows']),10);self.assertEqual(report['points'],10)
+            self.assertFalse(report['scientific_working_cap']['exceeded'])
+            self.assertEqual(report['scientific_working_cap']['where'],'geometry.scientific_reconstruction.reconstruct_scene')
             for row in report['rows']:
                 with np.load(out/row['artifact'],allow_pickle=False) as a:
                     np.testing.assert_array_equal(a['pixels'],[[0,0]])
@@ -69,11 +71,30 @@ class ScientificReconstructionTests(unittest.TestCase):
             missing=[x for x in r['rows'] if not x['return_present']]
             self.assertEqual(len(missing),1);self.assertIsNone(missing[0]['artifact']);self.assertEqual(r['points'],9)
 
-    def test_missing_top_pose_sensor_and_budget_rejected(self):
-        for kwargs in ({'missing_pose':True},{'missing_sensor':True},{}):
+    def test_missing_top_pose_and_sensor_rejected(self):
+        for kwargs in ({'missing_pose':True},{'missing_sensor':True}):
             with self.subTest(kwargs=kwargs),tempfile.TemporaryDirectory() as tmp:
                 root=Path(tmp);s,d,h=self.fixture(root,**kwargs);out=root/'points'
-                with self.assertRaises(ValueError):reconstruct_scene(s,d,out,1 if not kwargs else 10**7,verified_manifest_hashes=h)
+                with self.assertRaises(ValueError):reconstruct_scene(s,d,out,10**7,verified_manifest_hashes=h)
                 self.assertFalse((out/'report.json').exists())
+
+    def test_capacity_alert_is_recorded_without_refusing_reconstruction(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);s,d,h=self.fixture(root);out=root/'points'
+            stderr=io.StringIO()
+            with contextlib.redirect_stderr(stderr):
+                report=reconstruct_scene(s,d,out,1,verified_manifest_hashes=h)
+            self.assertTrue((out/'report.json').exists())
+            self.assertIn('WARNING: scientific working cap exceeded',stderr.getvalue())
+            record=report['scientific_working_cap']
+            self.assertEqual(record['where'],'geometry.scientific_reconstruction.reconstruct_scene')
+            self.assertEqual(record['used_bytes'],report['sidecar_bytes'])
+            self.assertEqual(record['new_bytes'],report['output_bytes'])
+            self.assertEqual(record['limit_bytes'],1)
+            self.assertEqual(record['over_by_bytes'],report['working_set_bytes']-1)
+            self.assertTrue(record['exceeded'])
+            persisted=json.loads((out/'report.json').read_text())
+            self.assertEqual(persisted['scientific_working_cap'],record)
+            print('reconstruction over-cap record',json.dumps(record,sort_keys=True),flush=True)
 
 if __name__=='__main__':unittest.main()

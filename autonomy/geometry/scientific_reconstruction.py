@@ -8,6 +8,7 @@ from dataset.scientific_sidecar_reader import iter_sidecar_rows
 from dataset.sensor_records import OrderedLookup, array_field, align_point_targets, select_rows
 from evidence.source_snapshot import file_sha256
 from geometry.geometry import range_to_points
+from resources.scientific_budget import check_working
 
 REQUIRED = {'lidar_calibration', 'vehicle_pose', 'lidar_pose',
             'lidar_camera_projection', 'lidar_segmentation'}
@@ -15,7 +16,7 @@ REQUIRED = {'lidar_calibration', 'vehicle_pose', 'lidar_pose',
 
 def reconstruct_scene(lidar_source, sidecars, output, budget_bytes, *, verified_manifest_hashes):
     lidar_source, sidecars, output = map(Path, (lidar_source, sidecars, output))
-    if type(budget_bytes) is not int or budget_bytes <= 0 or output.exists():
+    if type(budget_bytes) is not int or budget_bytes < 0 or output.exists():
         raise ValueError('invalid derived budget or existing output')
     if not REQUIRED <= set(verified_manifest_hashes):
         raise ValueError('missing verified sidecar component')
@@ -34,8 +35,7 @@ def reconstruct_scene(lidar_source, sidecars, output, budget_bytes, *, verified_
         raise ValueError('mixed source scenes')
     scene = scenes.pop()
     sidecar_bytes = sum(p.stat().st_size for p in sidecars.rglob('*') if p.is_file())
-    if sidecar_bytes >= budget_bytes:
-        raise ValueError('sidecars already exhaust derived capacity')
+    cap_checks = [check_working(sidecar_bytes,0,where='geometry.scientific_reconstruction.reconstruct_scene.sidecars',limit=budget_bytes)]
     def decoded(component):
         return iter_sidecar_rows(sidecars/component, expected_manifest_sha256=verified_manifest_hashes[component])
     calibration = {r['key.laser_name']: r for r in decoded('lidar_calibration')}
@@ -94,8 +94,7 @@ def reconstruct_scene(lidar_source, sidecars, output, budget_bytes, *, verified_
                        'physical_features':point['physical_features'],'nlz':ri[pixels[:,0],pixels[:,1],3]}
                 payload.update({name: value for name,value in targets.items() if value is not None})
                 buffer = io.BytesIO(); np.savez(buffer,**payload); data = buffer.getvalue()
-                if sidecar_bytes + used + len(data) > budget_bytes:
-                    raise ValueError('reconstruction exceeds combined derived working set')
+                cap_checks.append(check_working(sidecar_bytes+used,len(data),where='geometry.scientific_reconstruction.reconstruct_scene.record',limit=budget_bytes))
                 name = f'{scene}-{stamp}-{laser}-{ret}.npz'; (output/name).write_bytes(data); used += len(data)
                 record.update(points=len(pixels),artifact=name,sha256=hashlib.sha256(data).hexdigest())
             rows.append(record)
@@ -112,7 +111,20 @@ def reconstruct_scene(lidar_source, sidecars, output, budget_bytes, *, verified_
         data = (json.dumps(report,sort_keys=True,indent=2)+'\n').encode(); total = used+len(data)
         if report['output_bytes'] == total:break
         report['output_bytes'] = total; report['working_set_bytes'] = sidecar_bytes+total
-    if report['working_set_bytes'] > budget_bytes:
-        raise ValueError('manifest exceeds combined derived working set')
+    while True:
+        final_cap = check_working(sidecar_bytes,report['output_bytes'],
+                                  where='geometry.scientific_reconstruction.reconstruct_scene',
+                                  limit=budget_bytes,alert=False)
+        report['scientific_working_cap'] = final_cap
+        report['scientific_working_cap_checks'] = cap_checks+[final_cap]
+        data = (json.dumps(report,sort_keys=True,indent=2)+'\n').encode(); total = used+len(data)
+        if report['output_bytes'] == total:break
+        report['output_bytes'] = total; report['working_set_bytes'] = sidecar_bytes+total
+    final_cap = check_working(sidecar_bytes,report['output_bytes'],
+                              where='geometry.scientific_reconstruction.reconstruct_scene',
+                              limit=budget_bytes)
+    report['scientific_working_cap'] = final_cap
+    report['scientific_working_cap_checks'] = cap_checks+[final_cap]
+    data = (json.dumps(report,sort_keys=True,indent=2)+'\n').encode()
     (output/'report.json').write_bytes(data)
     return report

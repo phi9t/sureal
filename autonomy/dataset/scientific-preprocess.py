@@ -12,11 +12,27 @@ from dataset.scientific_admission import admit_scene
 from dataset.staged_source import staged_source
 from insula.staging_lease import staging_lease
 from dataset.scientific_preparation import verified_sidecar_hashes
-from resources.scientific_budget import SCIENTIFIC_WORKING_CAP_BYTES
+from resources.scientific_budget import SCIENTIFIC_WORKING_CAP_BYTES, check_working
 
 HERE=Path(__file__).resolve().parents[1]
 COMPONENTS=['lidar_calibration','camera_calibration','vehicle_pose','lidar_pose','lidar_camera_projection','lidar_segmentation','lidar_box']
 CANDIDATES=['dataset/scientific-preprocess.py','dataset/scientific_component.py','dataset/scientific_sidecars.py','dataset/scientific_sidecar_validate.py','dataset/scientific_admission.py','dataset/staged_source.py','dataset/source_integrity.py','insula/staging_lease.py','dataset/sensor_records.py','dataset/scientific_preparation.py','geometry/scientific_scene_command.py','geometry/scientific_scene_validate.py','geometry/scientific_reconstruction.py','dataset/scientific_sidecar_reader.py','geometry/reconstruction_validate.py','geometry/geometry.py','geometry/geometry_foundation.py','resources/scientific_budget.py']
+
+
+def encode_receipt_with_cap(receipt,used,where,limit,checks):
+    record=None
+    while True:
+        if record is not None:
+            receipt['scientific_working_cap']=record
+            receipt['scientific_working_cap_checks']=checks+[record]
+        data=(json.dumps(receipt,indent=2)+'\n').encode()
+        current=check_working(used,len(data),where=where,limit=limit,alert=False)
+        if record is not None and current['new_bytes']==record['new_bytes']:break
+        record=current
+    record=check_working(used,len(data),where=where,limit=limit)
+    receipt['scientific_working_cap']=record
+    receipt['scientific_working_cap_checks']=checks+[record]
+    return (json.dumps(receipt,indent=2)+'\n').encode()
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--scene',required=True);parser.add_argument('--output',type=Path,required=True)
@@ -48,11 +64,11 @@ def main():
             print('verified resume',component,flush=True);continue
         if base.exists() or (destination/'sidecars'/component).exists():raise ValueError('unpromoted partial component exists; preserve evidence and use a new output directory')
         used=sum(p.stat().st_size for p in destination.rglob('*') if p.is_file())
-        if used>=limit:raise ValueError('scientific sidecar working set exhausted')
+        cap_checks=[check_working(used,0,where='dataset.scientific_preprocess.'+component+'.before_decode',limit=limit)]
         base.mkdir(parents=True);prepared=destination/'sidecars';prepared.mkdir(exist_ok=True);checked=base/'checked';checked.mkdir()
         started=datetime.now(timezone.utc).isoformat();tick=time.monotonic();checks=[]
         with staged_source(record,cache,retained_bytes=retained,limit_bytes=manifest['local_staging_limit_bytes']) as (source,transfer):
-            stages=[('decode',prepared,['python','-m','dataset.scientific_component','decode','/source/source.parquet',component,args.scene,'/outputs/'+component,str(limit-used)]),
+            stages=[('decode',prepared,['python','-m','dataset.scientific_component','decode','/source/source.parquet',component,args.scene,'/outputs/'+component,str(limit)]),
                     ('independent-check',checked,['python','-m','dataset.scientific_component','validate','/source/source.parquet','/opt/'+component,'/outputs/check.json'])]
             for name,out,command in stages:
                 named_inputs={'/opt':prepared} if name=='independent-check' else None
@@ -67,8 +83,7 @@ def main():
         for name,digest in candidate.items():
             if sha(HERE/name)!=digest:raise ValueError('candidate changed during processing')
         receipt={'status':'scientific native component independently checked live','scene':args.scene,'component':component,'official_split':group['official_split'],'research_splits':group['research_splits'],'source_record_sha256':sha(paths[component]),'source_sha256':record['sha256'],'source_generation':record['source_metadata']['generation'],'transfer':transfer,'checks':checks,'validation':validation,'candidate_hashes':candidate,'runtime_lock':lock,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-tick,'peak_child_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'artifacts':{str(p.relative_to(destination)):sha(p) for folder in (base,prepared/component) for p in folder.rglob('*') if p.is_file()},'scope':'scientific component processing only; full scene reconstruction/publication and protocol freeze remain open'}
-        encoded=(json.dumps(receipt,indent=2)+'\n').encode()
-        if sum(p.stat().st_size for p in destination.rglob('*') if p.is_file())+len(encoded)>limit:raise ValueError('receipt exceeds derived working-set cap')
+        encoded=encode_receipt_with_cap(receipt,sum(p.stat().st_size for p in destination.rglob('*') if p.is_file()),'dataset.scientific_preprocess.'+component+'.receipt',limit,cap_checks)
         receipt_path.write_bytes(encoded);print('verified scientific component',component,validation['rows'],flush=True)
     if args.reconstruct:
         reconstruct(admitted,paths,args.scene,destination,candidate,cache,runtime,lock,retained,manifest['local_staging_limit_bytes'],limit)
@@ -89,8 +104,8 @@ def reconstruct(admitted,paths,scene,destination,candidate,cache,runtime,lock,re
     trusted=base/'trusted-input';trusted.mkdir()
     (trusted/'trusted-sidecar-hashes.json').write_text(json.dumps(hashes,indent=2)+'\n')
     prepared=destination/'sidecars';sidecar_bytes=sum(p.stat().st_size for p in prepared.rglob('*') if p.is_file())
-    used=sum(p.stat().st_size for p in destination.rglob('*') if p.is_file());budget=derived_limit-used+sidecar_bytes
-    if budget<=sidecar_bytes:raise ValueError('no remaining reconstruction capacity')
+    used=sum(p.stat().st_size for p in destination.rglob('*') if p.is_file());budget=max(0,derived_limit-used+sidecar_bytes)
+    cap_checks=[check_working(used-sidecar_bytes,sidecar_bytes,where='dataset.scientific_preprocess.reconstruction.before_decode',limit=derived_limit)]
     started=datetime.now(timezone.utc).isoformat();tick=time.monotonic();checks=[]
     with staged_source(record,cache,retained_bytes=retained,limit_bytes=raw_limit) as (source,transfer):
         stages=[('reconstruct',destination,['python','-m','geometry.scientific_scene_command','reconstruct','/source/source.parquet','/opt','/mnt/trusted-sidecar-hashes.json','/outputs/points',str(budget)]),
@@ -111,9 +126,10 @@ def reconstruct(admitted,paths,scene,destination,candidate,cache,runtime,lock,re
         if validation['source_lidar_sha256']!=record['sha256'] or validation['scene']!=scene or validation['sidecar_manifest_hashes']!=hashes:raise ValueError('independent scene source differs')
     for name,digest in candidate.items():
         if sha(HERE/name)!=digest:raise ValueError('candidate changed during reconstruction')
+    reconstruction=json.loads((destination/'points/report.json').read_text())
+    cap_checks+=reconstruction.get('scientific_working_cap_checks',[reconstruction['scientific_working_cap']])
     receipt={'status':'scientific native scene independently checked live','scene':scene,'official_split':admitted['official_split'],'research_splits':admitted['research_splits'],'source_record_sha256':sha(paths['lidar']),'source_sha256':record['sha256'],'source_generation':record['source_metadata']['generation'],'sidecar_manifest_hashes':hashes,'candidate_hashes':candidate,'runtime_lock':lock,'transfer':transfer,'checks':checks,'validation':validation,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-tick,'peak_child_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'artifacts':{str(p.relative_to(destination)):sha(p) for folder in (base,destination/'points') for p in folder.rglob('*') if p.is_file()},'scope':'scientific source reconstruction only; immutable publication/replay and protocol freeze remain open'}
-    encoded=(json.dumps(receipt,indent=2)+'\n').encode()
-    if sum(p.stat().st_size for p in destination.rglob('*') if p.is_file())+len(encoded)>derived_limit:raise ValueError('reconstruction evidence exceeds derived capacity')
+    encoded=encode_receipt_with_cap(receipt,sum(p.stat().st_size for p in destination.rglob('*') if p.is_file()),'dataset.scientific_preprocess.reconstruction.receipt',derived_limit,cap_checks)
     receipt_path.write_bytes(encoded);print('verified scientific scene',scene,validation['records'],validation['points'],flush=True)
 
 

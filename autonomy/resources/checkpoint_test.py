@@ -1,5 +1,5 @@
 """The native final must have an immutable resource companion before resume."""
-import copy,json,shutil,tempfile,unittest
+import contextlib,copy,io,json,shutil,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch
 from resources.sources import sha
@@ -196,7 +196,7 @@ class ResourceCheckpointTests(unittest.TestCase):
         from resources.scientific_payload import unique_payload_bytes
         with tempfile.TemporaryDirectory() as temp:
             b,record=self.fixture(Path(temp))
-            receipts=[b.resource_identity['source_pins'],b.pins]
+            receipts=[b.resource_identity['source_pins'],b.pins,b.host_pins]
             sizes=[len(store_from_receipt(receipt).fetch(receipt_snapshot_digest(receipt))) for receipt in receipts]
             self.assertNotEqual(receipts[0]['source_snapshot_sha256'],receipts[1]['source_snapshot_sha256'])
             initial=unique_payload_bytes(b.resource_work_root)
@@ -208,13 +208,14 @@ class ResourceCheckpointTests(unittest.TestCase):
                 return reserve_write(path,maximum_new_bytes,limit=limit)
             b.resource_reserve_write=capped
             native_base=type(b).__mro__[2]
-            with patch.object(native_base,'guard'),patch.object(native_base,'check_stage'):
+            stderr=io.StringIO()
+            with contextlib.redirect_stderr(stderr),patch.object(native_base,'guard'),patch.object(native_base,'check_stage'):
                 seal(b,record)
-                with self.assertRaisesRegex(ValueError,'Scientific write refused before allocation'):
-                    inventory(b,record)
+                inventory(b,record)
             self.assertGreater(unique_payload_bytes(b.resource_work_root),initial)
-            self.assertEqual(len(list(b.resource_work_root.rglob('*.tar'))),1)
-            self.assertEqual(len(reservations),2)
+            self.assertEqual(len(list(b.resource_work_root.rglob('*.tar'))),3)
+            self.assertEqual(len(reservations),3)
+            self.assertIn('WARNING: scientific working cap exceeded',stderr.getvalue())
 
     def test_existing_snapshot_archive_retry_reuses_verified_object_without_reservation(self):
         seal,_,inventory=self.api()

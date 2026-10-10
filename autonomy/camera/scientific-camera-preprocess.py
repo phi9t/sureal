@@ -8,11 +8,25 @@ from insula.runtime_roots import current_cpu_rootfs
 from evidence.source_snapshot import file_sha256 as sha
 from dataset.scientific_admission import admit_scene
 from dataset.staged_source import staged_source
-from resources.scientific_budget import SCIENTIFIC_WORKING_CAP_BYTES
+from resources.scientific_budget import SCIENTIFIC_WORKING_CAP_BYTES, check_working
 HERE=Path(__file__).resolve().parents[1]
 COMPONENTS=['camera_image','camera_segmentation','camera_box']
 CANDIDATES=['camera/scientific-camera-preprocess.py','camera/camera_sidecars.py','camera/camera_sidecar_validate.py','dataset/scientific_admission.py','dataset/staged_source.py','insula/staging_lease.py','dataset/source_integrity.py','insula/launch_plan.py','insula/runtime_roots.py','resources/scientific_budget.py']
 def total(root):return sum(p.stat().st_size for p in root.rglob('*') if p.is_file())
+
+def encode_receipt_with_cap(receipt,used,where,limit,checks):
+ record=None
+ while True:
+  if record is not None:
+   receipt['scientific_working_cap']=record;receipt['scientific_working_cap_checks']=checks+[record]
+  data=(json.dumps(receipt,indent=2)+'\n').encode()
+  current=check_working(used,len(data),where=where,limit=limit,alert=False)
+  if record is not None and current['new_bytes']==record['new_bytes']:break
+  record=current
+ record=check_working(used,len(data),where=where,limit=limit)
+ receipt['scientific_working_cap']=record;receipt['scientific_working_cap_checks']=checks+[record]
+ return (json.dumps(receipt,indent=2)+'\n').encode()
+
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--scene',required=True);parser.add_argument('--output',type=Path,required=True);args=parser.parse_args()
  cache=Path.home()/'.cache/waystone/waymo-perception';working=cache/'scientific-processing';destination=args.output.resolve()
@@ -31,11 +45,11 @@ def main():
     if sha(destination/n)!=h:raise ValueError('camera resume artifact differs')
    print('verified camera resume',component,flush=True);continue
   if base.exists() or decoded.exists():raise ValueError('preserve unpromoted partial camera output')
-  remaining=limit-total(working)
-  if remaining<=0:raise ValueError('combined scientific working-set exhausted')
+  used=total(working)
+  cap_checks=[check_working(used,0,where='camera.scientific_camera_preprocess.'+component+'.before_decode',limit=limit)]
   base.mkdir(parents=True);prepared.mkdir(exist_ok=True);checked=base/'checked';checked.mkdir();checks=[];started=datetime.now(timezone.utc).isoformat();tick=time.monotonic()
   with staged_source(record,cache,retained_bytes=retained,limit_bytes=manifest['local_staging_limit_bytes']) as (source,transfer):
-   produce="from camera.camera_sidecars import materialize_camera_component; r=materialize_camera_component('/source/source.parquet',"+repr(component)+","+repr(args.scene)+",'/outputs/"+component+"',"+str(remaining)+"); print('PASS native camera rows',len(r['rows']))"
+   produce="from camera.camera_sidecars import materialize_camera_component; r=materialize_camera_component('/source/source.parquet',"+repr(component)+","+repr(args.scene)+",'/outputs/"+component+"',"+str(limit)+"); print('PASS native camera rows',len(r['rows']))"
    check="import json; from pathlib import Path; from camera.camera_sidecar_validate import validate_camera_component; r=validate_camera_component('/source/source.parquet','/opt/"+component+"'); Path('/outputs/check.json').write_text(json.dumps(r)); print('PASS independent native camera rows',r['rows'])"
    for name,out,code in [('decode',prepared,produce),('independent-check',checked,check)]:
     named_inputs={'/opt':prepared} if name=='independent-check' else None
@@ -49,7 +63,6 @@ def main():
   for c,p in paths.items():
    if sha(p)!=source_identities[c]:raise ValueError('source admission identity changed')
   receipt={'status':'scientific camera component independently checked live','scene':args.scene,'component':component,'official_split':group['official_split'],'research_splits':group['research_splits'],'source_record_sha256':source_identities[component],'source_sha256':record['sha256'],'source_generation':record['source_metadata']['generation'],'admitted_source_record_hashes':source_identities,'transfer':transfer,'checks':checks,'validation':validation,'candidate_hashes':candidates,'runtime_lock':lock,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-tick,'peak_child_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'combined_working_set_bytes':total(working),'artifacts':{str(p.relative_to(destination)):sha(p) for folder in (base,decoded) for p in folder.rglob('*') if p.is_file()},'scope':'native camera bytes/keys retained; image/mask decoding, task assembly, immutable publication/replay and scientific protocol remain open'}
-  data=(json.dumps(receipt,indent=2)+'\n').encode()
-  if total(working)+len(data)>limit:raise ValueError('combined camera working-set cap exceeded')
+  data=encode_receipt_with_cap(receipt,total(working),'camera.scientific_camera_preprocess.'+component+'.receipt',limit,cap_checks)
   receipt_path.write_bytes(data);print('verified scientific camera component',component,validation['rows'],flush=True)
 if __name__=='__main__':main()

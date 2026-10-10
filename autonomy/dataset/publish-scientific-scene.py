@@ -9,7 +9,7 @@ from insula.runtime_roots import current_cpu_rootfs
 from dataset.blob_storage import blob_transfer_check, default_blob_store, default_store_descriptor, put_blob, scene_archive_blob_key, scene_manifest_blob_key
 from dataset.scientific_admission import admit_scene
 from dataset.scientific_publication import publication_manifest
-from resources.scientific_budget import SCIENTIFIC_WORKING_CAP_BYTES
+from resources.scientific_budget import SCIENTIFIC_WORKING_CAP_BYTES, check_working
 
 HERE=Path(__file__).resolve().parents[1]
 def main():
@@ -49,9 +49,10 @@ def main():
     if sha(mirror)!=expected:raise ValueError('publication mirror differs')
     for n,v in candidates.items():
         if sha(HERE/n)!=v:raise ValueError('publication code changed')
-    working=used+sum(p.stat().st_size for p in base.rglob('*') if p.is_file())
-    if working>=SCIENTIFIC_WORKING_CAP_BYTES:raise ValueError('publication working set exceeds cap')
-    result={'status':'scientific scene archive and manifest independently mirrored; replay remains open','scene':scene,'checks':checks,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-tick,'peak_child_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'working_set_bytes':working,'runtime_lock':lock,'candidate_hashes':candidates,'scene_receipt_sha256':args.expected_receipt_sha256,'publication_manifest_sha256':expected,'store_descriptor':store_descriptor,'archive_blob':archive_blob,'publication_manifest_blob':manifest_blob,'archive':meta,'archive_validation':validation,'artifacts':{str(p.relative_to(base)):sha(p) for p in base.rglob('*') if p.is_file()},'scope':'decoded point records only; camera images/native detector box assembly and full cohort acceptance remain open'}
+    base_bytes=sum(p.stat().st_size for p in base.rglob('*') if p.is_file())
+    working=used+base_bytes
+    cap_record=check_working(used,base_bytes,where='dataset.publish_scientific_scene.final_working',limit=SCIENTIFIC_WORKING_CAP_BYTES)
+    result={'status':'scientific scene archive and manifest independently mirrored; replay remains open','scene':scene,'checks':checks,'started_utc':started,'ended_utc':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-tick,'peak_child_rss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'working_set_bytes':working,'scientific_working_cap':cap_record,'scientific_working_cap_checks':[meta['scientific_working_cap'],cap_record],'runtime_lock':lock,'candidate_hashes':candidates,'scene_receipt_sha256':args.expected_receipt_sha256,'publication_manifest_sha256':expected,'store_descriptor':store_descriptor,'archive_blob':archive_blob,'publication_manifest_blob':manifest_blob,'archive':meta,'archive_validation':validation,'artifacts':{str(p.relative_to(base)):sha(p) for p in base.rglob('*') if p.is_file()},'scope':'decoded point records only; camera images/native detector box assembly and full cohort acceptance remain open'}
     (base/'receipt.json').write_text(json.dumps(result,indent=2)+'\n');print('PASS scientific immutable publication',scene,flush=True)
 
 if __name__=='__main__':main()
