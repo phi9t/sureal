@@ -9,7 +9,9 @@ REPO_GATE_TESTS = [
     "//:publication_audit_behavior_test",
     "//:repo_gate_membership_test",
     "//:repo_gate_publication_audit_test",
+    "//:repo_gate_shellcheck_test",
     "//:repo_gate_whitespace_test",
+    "//:shellcheck_repo_test",
 ]
 
 exports_files(
@@ -35,6 +37,12 @@ py_test(
 py_library(
     name = "publication_audit_lib",
     srcs = ["scripts/publication_audit.py"],
+    imports = ["."],
+)
+
+py_library(
+    name = "shellcheck_repo_lib",
+    srcs = ["scripts/shellcheck_repo.py"],
     imports = ["."],
 )
 
@@ -73,6 +81,37 @@ py_test(
     size = "small",
     tags = [
         "no-sandbox",
+        "repo_gate",
+    ],
+)
+
+py_test(
+    name = "repo_gate_shellcheck_test",
+    srcs = ["scripts/repo_gate_shellcheck_test.py"],
+    args = ["--shellcheck=$(location @shellcheck_linux_x86_64//:shellcheck)"],
+    data = [
+        "@shellcheck_linux_x86_64//:shellcheck",
+    ],
+    deps = [":shellcheck_repo_lib"],
+    legacy_create_init = 0,
+    size = "medium",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+)
+
+py_test(
+    name = "shellcheck_repo_test",
+    srcs = ["scripts/shellcheck_repo_test.py"],
+    args = ["--shellcheck=$(location @shellcheck_linux_x86_64//:shellcheck)"],
+    data = [
+        "@shellcheck_linux_x86_64//:shellcheck",
+    ],
+    deps = [":shellcheck_repo_lib"],
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
         "repo_gate",
     ],
 )

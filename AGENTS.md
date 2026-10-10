@@ -5,6 +5,8 @@
 Bazel is the verification boundary for this repository and must be launched
 through `./bazelw`, which enters the pinned Insula rootfs. Do not run host
 `bazel` directly or install dependencies on the host to satisfy a Bazel target.
+Shell scripts follow `docs/guides/shell-style.md`; ShellCheck runs in the
+repo gate from a Bazel-pinned release archive, not from host packages.
 
 Before landing, run the static repository gate:
 

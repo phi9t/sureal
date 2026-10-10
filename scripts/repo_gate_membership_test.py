@@ -76,6 +76,8 @@ class RepoGateMembershipTests(unittest.TestCase):
         gate_tests = repo_gate_tests(repository_root())
 
         self.assertIn("//:repo_gate_publication_audit_test", gate_tests)
+        self.assertIn("//:repo_gate_shellcheck_test", gate_tests)
+        self.assertIn("//:shellcheck_repo_test", gate_tests)
         self.assertIn("//:repo_gate_whitespace_test", gate_tests)
         self.assertIn("//autonomy/blob_store:storage_boundary_test", gate_tests)
 
