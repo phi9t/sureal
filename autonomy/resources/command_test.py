@@ -74,8 +74,8 @@ class ResourceCommandTests(unittest.TestCase):
                 with self.subTest(fault=fault),self.assertRaises(ValueError):wrap(command,code,out)
                 self.assertEqual(command,before)
 
-    def test_resource_wrapper_extends_launch_plan_as_data(self):
-        from resources.command import wrap_plan
+    def test_launch_plan_resource_wrapper_extends_plan_as_data(self):
+        from insula.launch_plan import wrap_resource_plan
 
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -108,7 +108,7 @@ class ResourceCommandTests(unittest.TestCase):
                 command=["python", "/experiment/cohort/worker.py", "literal$(touch bad)"],
             )
 
-            wrapped, worker_argv = wrap_plan(plan, resource_code, resource_output)
+            wrapped, worker_argv = wrap_resource_plan(plan, resource_code, resource_output)
             data = plan_data(wrapped)
             mounts = {mount["role"]: mount for mount in data["mounts"]}
 
@@ -131,8 +131,8 @@ class ResourceCommandTests(unittest.TestCase):
             self.assertEqual(mounts["resource-output"]["host_path"], str(resource_output.resolve()))
             self.assertFalse((root / "bad").exists())
 
-    def test_resource_wrapper_extends_plan_record_as_data(self):
-        from resources.command import wrap_resource_plan_record
+    def test_launch_plan_resource_wrapper_extends_plan_record_as_data(self):
+        from insula.launch_plan import wrap_resource_plan_record
 
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

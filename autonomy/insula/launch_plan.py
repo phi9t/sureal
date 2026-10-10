@@ -1,6 +1,7 @@
 """Checked runtime locks and structured Insula launch plans."""
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import os
@@ -11,7 +12,7 @@ from dataclasses import dataclass, replace
 from pathlib import Path, PurePosixPath
 from typing import Iterable, Mapping
 
-from evidence.source_snapshot import file_sha256
+from evidence.source_snapshot import file_sha256, is_regular_file
 from insula.runtime_identity import rootfs_identity
 from insula.runtime_roots import (
     CURRENT_CPU_ROOTFS_NAME,
@@ -49,9 +50,19 @@ _GPU_DRIVER_PREFIXES = (
     "libnvidia-ptxjitcompiler.so",
     "libnvidia-nvvm.so",
 )
+_PYTHON_WORKER_INTERPRETERS = {"python", "/opt/waymo/bin/python"}
+_RESOURCE_LAYER_INSIDE = "/tmp/resource-layer"
+_RESOURCE_OUTPUT_INSIDE = "/tmp/resource-output"
+_RESOURCE_WORKER = "/tmp/resource-layer/resources/execute_worker.py"
+_RESOURCE_WRAPPER_ALIASES = {
+    _RESOURCE_LAYER_INSIDE,
+    _RESOURCE_OUTPUT_INSIDE,
+    "/experiment/resources",
+    "/experiment/evidence",
+}
+_DEFAULT_GPU_CONTROL_DEVICE_PATHS = ("/dev/nvidiactl", "/dev/nvidia-uvm")
 _GPU_CONTROL_DEVICES = {
-    "/dev/nvidiactl",
-    "/dev/nvidia-uvm",
+    *_DEFAULT_GPU_CONTROL_DEVICE_PATHS,
     "/dev/nvidia-uvm-tools",
     "/dev/nvidia-modeset",
 }
@@ -370,6 +381,176 @@ def with_mounts(
         named_input_digests=dict(plan.named_input_digests),
         allow_readonly_inputs_cover_output=plan.allow_readonly_inputs_cover_output,
         clear_environment=plan.clear_environment,
+    )
+
+
+def python_worker_command(
+    command: Iterable[object],
+    *,
+    error_message: str = "declared Python worker required",
+) -> list[str]:
+    """Return a validated Python worker command."""
+    argv = _command_strings(command, error_message)
+    if (
+        len(argv) < 2
+        or argv[0] not in _PYTHON_WORKER_INTERPRETERS
+        or not Path(argv[1]).is_absolute()
+        or not argv[1].endswith(".py")
+    ):
+        raise PlanError(error_message)
+    return argv
+
+
+def original_python_worker_command(command: Iterable[object]) -> list[str]:
+    """Return the worker command, unwrapping the resource layer when present."""
+    argv = python_worker_command(command)
+    if _is_resource_wrapper_argv(argv):
+        return python_worker_command([argv[0], *argv[3:]])
+    return argv
+
+
+def is_resource_wrapped_python_worker_command(command: Iterable[object]) -> bool:
+    """Return whether command is the resource wrapper around a Python worker."""
+    try:
+        argv = python_worker_command(command)
+    except PlanError:
+        return False
+    if not _is_resource_wrapper_argv(argv):
+        return False
+    try:
+        python_worker_command([argv[0], *argv[3:]])
+    except PlanError:
+        return False
+    return True
+
+
+def wrap_resource_plan(plan: LaunchPlan, code: Path, output: Path) -> tuple[LaunchPlan, list[str]]:
+    """Return a launch plan wrapped with the resource layer as plan data."""
+    if not isinstance(plan, LaunchPlan):
+        raise PlanError("launch plan required")
+    code = Path(code)
+    output = Path(output)
+    argv = python_worker_command(plan.command, error_message="declared original Python worker required")
+    if any(
+        mount.kind in {"bind", "dev-bind", "tmpfs", "symlink"}
+        and mount.inside_path in _RESOURCE_WRAPPER_ALIASES
+        for mount in plan.mounts
+    ):
+        raise PlanError("resource mount aliases must be unused")
+    wrapped = with_mounts(
+        plan,
+        before_devices=_resource_wrapper_mounts(code, output),
+        command=[
+            argv[0],
+            _RESOURCE_WORKER,
+            _RESOURCE_OUTPUT_INSIDE,
+            *argv[1:],
+        ],
+    )
+    return wrapped, argv[1:]
+
+
+def wrap_resource_plan_record(
+    record: Mapping[str, object],
+    code: Path,
+    output: Path,
+) -> tuple[dict, list[str]]:
+    """Return a resource-wrapped launch-plan record without parsing rendered argv."""
+    if not isinstance(record, Mapping):
+        raise PlanError("launch plan record required")
+    code = Path(code)
+    output = Path(output)
+    wrapped = copy.deepcopy(dict(record))
+    argv = python_worker_command(
+        wrapped.get("command", ()),
+        error_message="declared original Python worker required",
+    )
+    mounts = wrapped.get("mounts")
+    if not isinstance(mounts, list) or any(not isinstance(mount, Mapping) for mount in mounts):
+        raise PlanError("launch plan record mounts required")
+    _require_resource_aliases_unused_record(mounts)
+    wrapped["mounts"] = [
+        *mounts,
+        *_resource_wrapper_mount_records(code, output),
+    ]
+    wrapped["command"] = [
+        argv[0],
+        _RESOURCE_WORKER,
+        _RESOURCE_OUTPUT_INSIDE,
+        *argv[1:],
+    ]
+    return wrapped, argv[1:]
+
+
+def wrap_legacy_receipt_command(
+    command: list[str],
+    code: Path,
+    output: Path,
+) -> tuple[list[str], list[str]]:
+    """Render a resource wrapper around a legacy command-only receipt."""
+    code = Path(code)
+    output = Path(output)
+    parsed = _parse_legacy_receipt_command(command, require_python_worker=True)
+    _require_resource_aliases_unused(parsed["options"])
+    separator = parsed["separator"]
+    argv = list(parsed["argv"])
+    wrapper_mounts = _resource_wrapper_mounts(code, output)
+    bindings = [item for mount in wrapper_mounts for item in _render_mount(mount)]
+    return (
+        [
+            *command[:separator],
+            *bindings,
+            "--",
+            argv[0],
+            _RESOURCE_WORKER,
+            _RESOURCE_OUTPUT_INSIDE,
+            *argv[1:],
+        ],
+        argv[1:],
+    )
+
+
+def wrap_rendered_plan_command(
+    command: list[str],
+    code: Path,
+    output: Path,
+) -> tuple[list[str], list[str]]:
+    """Render the resource wrapper into a rendered launch-plan command."""
+    code = Path(code)
+    output = Path(output)
+    parsed = _parse_legacy_receipt_command(command, require_python_worker=True)
+    _require_resource_aliases_unused(parsed["options"])
+    separator = parsed["separator"]
+    argv = list(parsed["argv"])
+    devices_at = _plan_device_insertion_index(command, separator)
+    tmp_at = _plan_tmp_mounts_index(command, devices_at)
+    resource_mounts = _resource_wrapper_mounts(code, output)
+    experiment = [
+        item
+        for mount in resource_mounts
+        if not _mount_under_tmp(mount)
+        for item in _render_mount(mount)
+    ]
+    under_tmp = [
+        item
+        for mount in resource_mounts
+        if _mount_under_tmp(mount)
+        for item in _render_mount(mount)
+    ]
+    return (
+        [
+            *command[:tmp_at],
+            *experiment,
+            *command[tmp_at:devices_at],
+            *under_tmp,
+            *command[devices_at:separator],
+            "--",
+            argv[0],
+            _RESOURCE_WORKER,
+            _RESOURCE_OUTPUT_INSIDE,
+            *argv[1:],
+        ],
+        argv[1:],
     )
 
 
@@ -767,7 +948,7 @@ def _record_mount_pattern(record: Mapping[str, object]) -> list[Mount]:
     gpu = record.get("gpu")
     if isinstance(gpu, Mapping) and type(gpu.get("requested_index")) is int:
         index = gpu["requested_index"]
-        for inside in (f"/dev/nvidia{index}", "/dev/nvidiactl", "/dev/nvidia-uvm"):
+        for inside in _default_gpu_device_inside_paths(index):
             result.append(
                 Mount(
                     f"gpu-device:{inside}",
@@ -812,6 +993,23 @@ def _record_gpu_request(record: Mapping[str, object]) -> GPURequest | None:
     if type(requested) is not int or type(minor) is not int or not isinstance(uuid, str):
         raise ValueError("launch plan gpu record required")
     return GPURequest(requested, minor, uuid)
+
+
+def _command_strings(command: Iterable[object], error_message: str) -> list[str]:
+    if not isinstance(command, (list, tuple)):
+        raise PlanError(error_message)
+    argv = list(command)
+    if any(not isinstance(item, str) or not item for item in argv):
+        raise PlanError(error_message)
+    return argv
+
+
+def _is_resource_wrapper_argv(argv: list[str]) -> bool:
+    return (
+        len(argv) >= 4
+        and argv[1] == _RESOURCE_WORKER
+        and argv[2] == _RESOURCE_OUTPUT_INSIDE
+    )
 
 
 def _read_plan_record_mounts(record: Mapping[str, object]) -> dict[str, dict[str, object]]:
@@ -862,15 +1060,10 @@ def _validate_plan_record_requirements(
             raise ValueError("launch plan record cleared environment required")
     if require_python_worker:
         command = record.get("command")
-        if (
-            not isinstance(command, list)
-            or len(command) < 2
-            or command[0] not in {"python", "/opt/waymo/bin/python"}
-            or not isinstance(command[1], str)
-            or not Path(command[1]).is_absolute()
-            or not command[1].endswith(".py")
-        ):
-            raise ValueError("launch plan record Python worker required")
+        try:
+            python_worker_command(command or (), error_message="launch plan record Python worker required")
+        except PlanError as exc:
+            raise ValueError("launch plan record Python worker required") from exc
 
 
 def _extract_legacy_receipt_command(receipt: Mapping[str, object]) -> list[str]:
@@ -915,14 +1108,16 @@ def _parse_legacy_receipt_command(
     argv = command[separator + 1 :]
     if require_cleared_environment and not {"--unshare-all", "--clearenv"} <= flags:
         raise ValueError("legacy receipt cleared namespace required")
-    if require_python_worker and (
-        not {"--unshare-all", "--die-with-parent"} <= flags
-        or len(argv) < 2
-        or argv[0] not in {"python", "/opt/waymo/bin/python"}
-        or not Path(argv[1]).is_absolute()
-        or not argv[1].endswith(".py")
-    ):
-        raise ValueError("isolated namespace and declared original Python worker required")
+    if require_python_worker:
+        if not {"--unshare-all", "--die-with-parent"} <= flags:
+            raise ValueError("isolated namespace and declared original Python worker required")
+        try:
+            python_worker_command(
+                argv,
+                error_message="isolated namespace and declared original Python worker required",
+            )
+        except PlanError as exc:
+            raise ValueError("isolated namespace and declared original Python worker required") from exc
     return {"separator": separator, "argv": argv, "options": options, "flags": flags}
 
 
@@ -1323,6 +1518,97 @@ def _mount_under_tmp(mount: Mount) -> bool:
     return mount.inside_path.startswith("/tmp/")
 
 
+def validate_resource_wrapper_inputs(code: Path, output: Path) -> None:
+    """Require resource wrapper code and a fresh output directory for launch."""
+    paths = [Path(code), Path(output)]
+    if (
+        any(
+            not path.is_absolute()
+            or not path.is_dir()
+            or any(candidate.is_symlink() for candidate in [path, *path.parents])
+            for path in paths
+        )
+        or not (code / "resources").is_dir()
+        or not (code / "evidence").is_dir()
+        or not is_regular_file(code / "resources/execute_worker.py")
+        or not is_regular_file(code / "evidence/source_snapshot.py")
+        or any(output.iterdir())
+    ):
+        raise ValueError("regular code and empty resource output required")
+
+
+def _require_resource_aliases_unused(
+    options: Iterable[tuple[str, tuple[str, ...]]],
+) -> None:
+    for option, values in options:
+        if (
+            option in {"--ro-bind", "--bind", "--dev-bind", "--proc", "--dev", "--tmpfs", "--symlink"}
+            and values[-1] in _RESOURCE_WRAPPER_ALIASES
+        ):
+            raise PlanError("resource mount aliases must be unused")
+
+
+def _require_resource_aliases_unused_record(
+    mounts: Iterable[Mapping[str, object]],
+) -> None:
+    for mount in mounts:
+        if mount.get("inside_path") in _RESOURCE_WRAPPER_ALIASES:
+            raise PlanError("resource mount aliases must be unused")
+
+
+def _resource_wrapper_mounts(code: Path, output: Path) -> list[Mount]:
+    return [
+        Mount("resource-layer", "bind", _RESOURCE_LAYER_INSIDE, "read_only", code),
+        Mount(
+            "resource-experiment-resources",
+            "bind",
+            "/experiment/resources",
+            "read_only",
+            code / "resources",
+        ),
+        Mount(
+            "resource-experiment-evidence",
+            "bind",
+            "/experiment/evidence",
+            "read_only",
+            code / "evidence",
+        ),
+        Mount("resource-output", "bind", _RESOURCE_OUTPUT_INSIDE, "writable", output),
+    ]
+
+
+def _resource_wrapper_mount_records(code: Path, output: Path) -> list[dict[str, object]]:
+    return [
+        {
+            "role": "resource-layer",
+            "kind": "bind",
+            "inside_path": _RESOURCE_LAYER_INSIDE,
+            "mode": "read_only",
+            "digest": mount_content_digest(code),
+        },
+        {
+            "role": "resource-experiment-resources",
+            "kind": "bind",
+            "inside_path": "/experiment/resources",
+            "mode": "read_only",
+            "digest": mount_content_digest(code / "resources"),
+        },
+        {
+            "role": "resource-experiment-evidence",
+            "kind": "bind",
+            "inside_path": "/experiment/evidence",
+            "mode": "read_only",
+            "digest": mount_content_digest(code / "evidence"),
+        },
+        {
+            "role": "resource-output",
+            "kind": "bind",
+            "inside_path": _RESOURCE_OUTPUT_INSIDE,
+            "mode": "writable",
+        },
+    ]
+
+
 def _mount_data(mount: Mount, *, include_host: bool) -> dict:
     data = {
         "role": mount.role,
@@ -1457,15 +1743,15 @@ def _gpu_device_pairs(gpu_index: int) -> list[tuple[Path, str]]:
             _validate_gpu_device_override_path(item, guest, gpu_index, side="guest")
             pairs.append((Path(host), guest))
     else:
-        pairs = [
-            (Path(f"/dev/nvidia{gpu_index}"), f"/dev/nvidia{gpu_index}"),
-            (Path("/dev/nvidiactl"), "/dev/nvidiactl"),
-            (Path("/dev/nvidia-uvm"), "/dev/nvidia-uvm"),
-        ]
+        pairs = [(Path(path), path) for path in _default_gpu_device_inside_paths(gpu_index)]
     for host, _ in pairs:
         if not host.exists():
             raise PlanError(f"GPU device not found: {host}")
     return pairs
+
+
+def _default_gpu_device_inside_paths(gpu_index: int) -> tuple[str, ...]:
+    return (f"/dev/nvidia{gpu_index}", *_DEFAULT_GPU_CONTROL_DEVICE_PATHS)
 
 
 def _validate_gpu_device_override_path(
@@ -1558,6 +1844,14 @@ __all__ = [
     "load_default_runtime_lock",
     "build_plan",
     "build_custom_plan",
+    "python_worker_command",
+    "original_python_worker_command",
+    "is_resource_wrapped_python_worker_command",
+    "validate_resource_wrapper_inputs",
+    "wrap_resource_plan",
+    "wrap_resource_plan_record",
+    "wrap_legacy_receipt_command",
+    "wrap_rendered_plan_command",
     "gpu_mounts_environment_and_request",
     "gpu_driver_hashes_from_plan_record",
     "gpu_driver_paths_from_plan_record",

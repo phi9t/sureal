@@ -1,7 +1,7 @@
 import copy,json,tempfile,unittest
 from pathlib import Path
 from evidence.source_snapshot import LocalSnapshotStore
-from insula.launch_plan import BAZEL_LINUX_X86_64_SHA256, BAZEL_VERSION, build_plan, load_runtime_lock, plan_data, record_plan, render_plan
+from insula.launch_plan import BAZEL_LINUX_X86_64_SHA256, BAZEL_VERSION, build_plan, load_runtime_lock, plan_data, record_plan, render_plan, wrap_resource_plan
 from insula.runtime_identity import rootfs_identity
 from insula.runtime_roots import CURRENT_CPU_ROOTFS_NAME
 from resources.sources import freeze_sources,sha
@@ -190,10 +190,9 @@ class ResourceStageTests(unittest.TestCase):
                     'self_peak_rss_kib':150,'waited_child_peak_rss_kib':100,
                     'peak_rss_kib':150,'elapsed_seconds':.8,'exit_code':0,
                     'child_lifecycle':{'subreaper_verified':True,'remaining_children':[]}}
-            from resources.command import wrap_plan
             from resources.sources import validate_sources as validate_resource_sources
             code=validate_resource_sources(current,pins)
-            wrapped,worker_argv=wrap_plan(plan,code,worker_dir)
+            wrapped,worker_argv=wrap_resource_plan(plan,code,worker_dir)
             command=render_plan(wrapped)
             worker_path=worker_dir/'worker-resource.json';worker_path.write_text(json.dumps(worker))
             log=proof_root/'execution.log';log.write_text('ok\n')

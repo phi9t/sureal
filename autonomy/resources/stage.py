@@ -12,8 +12,11 @@ from insula.launch_plan import (
     read_receipt_mounts,
     record_plan,
     render_plan,
+    validate_resource_wrapper_inputs,
+    wrap_resource_plan,
+    wrap_resource_plan_record,
 )
-from resources.command import wrap_resource_plan_record,wrapped_command,wrap_command,wrap_plan
+from resources.command import wrapped_command, wrap_command
 from resources.scoped_stage import run_scoped
 from resources.sources import sha,validate_sources
 from resources.stage_accounting import admit_worker
@@ -174,7 +177,8 @@ def run_stage(command,cwd,env,stream,timeout,*,code,current_sources,source_pins,
             execution_command=command
             proof['worker_argv']=wrap_command(execution_command,frozen,worker_output)
         else:
-            wrapped,proof['worker_argv']=wrap_plan(original_plan,frozen,worker_output)
+            validate_resource_wrapper_inputs(frozen,worker_output)
+            wrapped,proof['worker_argv']=wrap_resource_plan(original_plan,frozen,worker_output)
             proof['launch_plan']=record_plan(wrapped)
             execution_command=render_plan(wrapped)
         proof['command']=execution_command.copy()

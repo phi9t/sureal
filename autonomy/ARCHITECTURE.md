@@ -85,7 +85,10 @@ audits, not unit tests, check for old path hacks and duplicate helpers.
 checks runtime locks, builds Insula launch plans, reads receipt mounts, renders
 sandbox arguments, runs plans and records plan receipts. Callers pass structured
 mounts, devices, environment and command data to that module; they do not splice
-`bwrap` arguments or parse runtime locks themselves.
+`bwrap` arguments or parse runtime locks themselves. Receipts with a
+`launch_plan` record are checked by comparing that structured record with the
+expected plan; the legacy command parser is used only for receipts that have no
+plan record.
 
 ## Checks
 
