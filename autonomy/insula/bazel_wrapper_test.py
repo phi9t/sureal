@@ -148,6 +148,29 @@ def repository_git_dir():
     return path.resolve()
 
 
+def launcher_git_dirs():
+    git_dir = bazel_launcher._git_dir(bazel_launcher.REPO / ".git")
+    if not git_dir.is_dir():
+        return git_dir, git_dir, bazel_launcher.REPO_GATE_GIT_DIR
+    common_dir = bazel_launcher._git_common_dir(git_dir)
+    git_dir_inside = bazel_launcher._git_dir_inside_path(git_dir, common_dir)
+    return git_dir, common_dir, git_dir_inside or bazel_launcher.REPO_GATE_GIT_DIR
+
+
+def has_symlink_mount(mounts, destination, *, target, mode=None):
+    for mount in mounts:
+        if mount.get("inside_path") != destination:
+            continue
+        if mount.get("kind") != "symlink":
+            continue
+        if mount.get("symlink_target") != target:
+            continue
+        if mode is not None and mount.get("mode") != mode:
+            continue
+        return True
+    return False
+
+
 class BazelWrapperTests(unittest.TestCase):
     def test_external_cwd_and_symlink_preserve_relative_options_and_environment(self):
         for options in ("arguments", "environment"):
@@ -202,14 +225,42 @@ class BazelWrapperTests(unittest.TestCase):
                         LEGACY_AUTONOMY_ALIAS_DESTINATIONS & mount_destinations(plan["mounts"]),
                         plan["mounts"],
                     )
-                    self.assertTrue(
-                        has_mount(
+                    git_dir, common_dir, git_dir_inside = launcher_git_dirs()
+                    if git_dir_inside == bazel_launcher.REPO_GATE_GIT_DIR:
+                        self.assertTrue(
+                            has_mount(
+                                plan["mounts"],
+                                bazel_launcher.REPO_GATE_GIT_DIR,
+                                host=str(repository_git_dir()),
+                                mode="read_only",
+                                kind="bind",
+                            ),
                             plan["mounts"],
-                            "/experiment/.git",
-                            host=str(repository_git_dir()),
-                            mode="read_only",
                         )
-                    )
+                    else:
+                        self.assertTrue(
+                            has_mount(
+                                plan["mounts"],
+                                bazel_launcher.REPO_GATE_GIT_COMMON_DIR,
+                                host=str(common_dir),
+                                mode="read_only",
+                                kind="bind",
+                            ),
+                            plan["mounts"],
+                        )
+                        self.assertTrue(
+                            has_symlink_mount(
+                                plan["mounts"],
+                                bazel_launcher.REPO_GATE_GIT_DIR,
+                                target=git_dir_inside,
+                                mode="read_only",
+                            ),
+                            plan["mounts"],
+                        )
+                        self.assertEqual(
+                            Path(git_dir_inside).relative_to(bazel_launcher.REPO_GATE_GIT_COMMON_DIR),
+                            git_dir.relative_to(common_dir),
+                        )
                     self.assertFalse(marker.exists())
                     result = subprocess.run(
                         [str(entry), *arguments, "test", "//autonomy/..."],
