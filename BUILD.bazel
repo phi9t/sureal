@@ -6,7 +6,9 @@ REPO_GATE_TESTS = [
     "//autonomy/blob_store:storage_boundary_test",
     "//autonomy/insula:launch_plan_boundary_test",
     "//autonomy/resources:concept_boundary_test",
+    "//:import_rule_behavior_test",
     "//:publication_audit_behavior_test",
+    "//:repo_gate_import_rule_test",
     "//:repo_gate_membership_test",
     "//:repo_gate_publication_audit_test",
     "//:repo_gate_whitespace_test",
@@ -33,9 +35,41 @@ py_test(
 )
 
 py_library(
+    name = "check_imports_lib",
+    srcs = ["scripts/check_imports.py"],
+    imports = ["."],
+)
+
+py_test(
+    name = "import_rule_behavior_test",
+    srcs = ["scripts/import_rule_behavior_test.py"],
+    deps = [":check_imports_lib"],
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "repo_gate",
+    ],
+)
+
+py_library(
     name = "publication_audit_lib",
     srcs = ["scripts/publication_audit.py"],
     imports = ["."],
+)
+
+py_test(
+    name = "repo_gate_import_rule_test",
+    srcs = ["scripts/repo_gate_import_rule_test.py"],
+    data = [
+        "scripts/import_rule_baseline.json",
+    ],
+    deps = [":check_imports_lib"],
+    legacy_create_init = 0,
+    size = "medium",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
 )
 
 py_test(

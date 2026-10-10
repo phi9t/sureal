@@ -35,6 +35,15 @@ DEFAULT_RECEIPT_RESEARCH = AUTONOMY / "research"
 # This script only reads legacy receipts; split the token so the launch boundary
 # scan does not classify the comparison as a new sandbox command construction.
 LEGACY_SANDBOX_BINARY = "b" "wrap"
+RETAINED_SOURCE_PIN_FIELDS = (
+    "candidate_hashes",
+    "checkpoint_publisher_source_pins",
+    "host_source_pins",
+    "resource_source_pins",
+    "source_hashes",
+    "source_pins",
+    "verifier_source_pins",
+)
 
 
 @dataclass

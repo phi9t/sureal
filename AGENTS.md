@@ -23,6 +23,15 @@ CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_syst
 Use the CUDA command only when GPU 1 is actually free. The wrapper selects the
 CPU, GPU or Parallax rootfs from the target pattern and mounted configuration.
 
+## Python imports
+
+Python code under `autonomy/` and `parallax/` imports from that directory as
+the import root: use `from evidence...` or `from pipeline...`, not relative
+imports or sibling-directory import roots. Do not edit `sys.path` in active
+code. Historical receipts, frozen procedure records, and sources pinned by
+retained evidence are exempt from the import checker. Documented live commands
+and receipts may still set `PYTHONPATH=autonomy`.
+
 ## Agent skills
 
 ### Issue tracker
