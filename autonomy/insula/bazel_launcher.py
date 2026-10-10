@@ -16,6 +16,9 @@ BAZEL_VERSION = "9.2.0"
 ORIGINAL_CWD_FLAG = "--__sureal-bazelw-original-cwd"
 LIVE_GATE_CACHE_MOUNT = "/tmp/sureal-waymo-cache"
 LIVE_GATE_BWRAP = "/tmp/live-gate-bwrap"
+REPO_GATE_GIT_DIR = "/experiment/.git"
+REPO_GATE_GIT_COMMON_DIR = "/tmp/sureal-git-common"
+REPO_GATE_GIT_OBJECTS = "/tmp/sureal-git-objects"
 from insula.launch_plan import (
     Mount,
     build_custom_plan,
@@ -125,6 +128,9 @@ def repo_workspace_mounts(update_lock=False):
     for path in sorted(REPO.iterdir(), key=lambda item: item.name):
         if path.name == ".bazel-cache":
             continue
+        if path.name == ".git":
+            mounts.extend(_git_metadata_mounts(path))
+            continue
         if update_lock and path.name == "MODULE.bazel.lock":
             continue
         mounts.append(
@@ -149,6 +155,147 @@ def repo_workspace_mounts(update_lock=False):
     return mounts
 
 
+def _git_metadata_mounts(path):
+    git_dir = _git_dir(path)
+    if not git_dir.is_dir():
+        return [Mount("workspace:/.git", "bind", REPO_GATE_GIT_DIR, "read_only", path.resolve())]
+    common_dir = _git_common_dir(git_dir)
+    git_dir_inside = _git_dir_inside_path(git_dir, common_dir)
+    if common_dir == git_dir:
+        mounts = [Mount("workspace:/.git", "bind", REPO_GATE_GIT_DIR, "read_only", git_dir)]
+    elif git_dir_inside is not None:
+        mounts = [
+            Mount("git-common-dir", "bind", REPO_GATE_GIT_COMMON_DIR, "read_only", common_dir),
+            Mount(
+                "workspace:/.git",
+                "symlink",
+                REPO_GATE_GIT_DIR,
+                "read_only",
+                symlink_target=git_dir_inside,
+            ),
+        ]
+    else:
+        mounts = [Mount("workspace:/.git", "bind", REPO_GATE_GIT_DIR, "read_only", git_dir)]
+        mounts.append(Mount("git-common-dir", "bind", REPO_GATE_GIT_COMMON_DIR, "read_only", common_dir))
+    for index, object_dir in enumerate(_git_object_dirs(common_dir)):
+        mounts.extend(_git_object_view_mounts(object_dir, f"{REPO_GATE_GIT_OBJECTS}/{index}", index))
+    mounts.append(Mount("git-empty-primary-objects", "tmpfs", f"{REPO_GATE_GIT_OBJECTS}/primary", "writable"))
+    return mounts
+
+
+def _git_object_dirs(git_dir):
+    primary = Path(git_dir).resolve() / "objects"
+    pending = [primary]
+    seen = set()
+    directories = []
+    while pending:
+        object_dir = pending.pop()
+        object_dir = object_dir.resolve()
+        if object_dir in seen:
+            continue
+        if not object_dir.is_dir():
+            continue
+        seen.add(object_dir)
+        directories.append(object_dir)
+        alternates_file = object_dir / "info" / "alternates"
+        try:
+            lines = alternates_file.read_text(encoding="utf-8").splitlines()
+        except FileNotFoundError:
+            continue
+        for line in lines:
+            raw = line.strip()
+            if not raw or raw.startswith("#"):
+                continue
+            alternate = Path(raw)
+            if not alternate.is_absolute():
+                alternate = object_dir / alternate
+            pending.append(alternate)
+    return directories
+
+
+def _git_object_view_mounts(object_dir, inside_root, index):
+    object_dir = Path(object_dir)
+    if not object_dir.is_dir():
+        return []
+    mounts = [Mount(f"git-objects-view:{index}", "tmpfs", inside_root, "writable")]
+    for child in sorted(object_dir.iterdir(), key=lambda item: item.name):
+        if child.name == "info":
+            continue
+        if child.is_dir():
+            mounts.append(
+                Mount(
+                    f"git-objects-view:{index}:{child.name}",
+                    "bind",
+                    f"{inside_root}/{child.name}",
+                    "read_only",
+                    child.resolve(),
+                )
+            )
+    return mounts
+
+
+def git_test_environment():
+    if not (REPO / ".git").exists():
+        return {}
+    git_dir = _git_dir(REPO / ".git")
+    if not git_dir.is_dir():
+        return {}
+    common_dir = _git_common_dir(git_dir)
+    common_dir_inside = REPO_GATE_GIT_DIR if common_dir == git_dir else REPO_GATE_GIT_COMMON_DIR
+    git_dir_inside = _git_dir_inside_path(git_dir, common_dir) or REPO_GATE_GIT_DIR
+    object_dirs = _git_object_dirs(common_dir)
+    alternate_views = ":".join(
+        f"{REPO_GATE_GIT_OBJECTS}/{index}"
+        for index, _ in enumerate(object_dirs)
+    )
+    return {
+        "SUREAL_REPO_GATE_GIT_COMMON_DIR": common_dir_inside,
+        "SUREAL_REPO_GATE_GIT_DIR": git_dir_inside,
+        "SUREAL_REPO_GATE_GIT_ALTERNATE_OBJECT_DIRECTORIES": alternate_views,
+        "SUREAL_REPO_GATE_GIT_OBJECT_DIRECTORY": f"{REPO_GATE_GIT_OBJECTS}/primary",
+        "SUREAL_REPO_GATE_GIT_WORK_TREE": "/experiment",
+    }
+
+
+def _git_dir(path):
+    if path.is_dir():
+        return path.resolve()
+    content = path.read_text(encoding="utf-8").strip()
+    prefix = "gitdir: "
+    if not content.startswith(prefix):
+        return path.resolve()
+    git_dir = Path(content[len(prefix):])
+    if not git_dir.is_absolute():
+        git_dir = path.parent / git_dir
+    return git_dir.resolve()
+
+
+def _git_common_dir(git_dir):
+    git_dir = Path(git_dir).resolve()
+    try:
+        content = (git_dir / "commondir").read_text(encoding="utf-8").strip()
+    except FileNotFoundError:
+        return git_dir
+    if not content:
+        return git_dir
+    common_dir = Path(content)
+    if not common_dir.is_absolute():
+        common_dir = git_dir / common_dir
+    return common_dir.resolve()
+
+
+def _git_dir_inside_path(git_dir, common_dir):
+    git_dir = Path(git_dir).resolve()
+    common_dir = Path(common_dir).resolve()
+    if git_dir == common_dir:
+        return REPO_GATE_GIT_DIR
+    try:
+        relative = git_dir.relative_to(common_dir)
+    except ValueError:
+        return None
+    return f"{REPO_GATE_GIT_COMMON_DIR}/{relative.as_posix()}"
+
+
 def sandbox_plan(runtime, cache, arguments, update_lock=False):
     rootfs = runtime.rootfs
     cache = cache.resolve()
@@ -161,7 +308,10 @@ def sandbox_plan(runtime, cache, arguments, update_lock=False):
         Mount("tmp", "tmpfs", "/tmp", "writable"),
         Mount("bazel-cache", "bind", "/tmp/bazel-cache", "writable", cache),
     ]
-    test_environment = {}
+    test_environment = {
+        "SUREAL_REPO_ROOT": "/experiment",
+        **git_test_environment(),
+    }
     if uses_live_gate_filter(arguments):
         _add_nested_launch_support(mounts)
         live_root = LIVE_GATE_CACHE_MOUNT + "/insula/" + current_cpu_rootfs().name

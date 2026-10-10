@@ -1,13 +1,16 @@
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
 import textwrap
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from evidence.source_snapshot import file_sha256
+from insula import bazel_launcher
 from insula.launch_plan import BAZEL_LINUX_X86_64_SHA256, BAZEL_VERSION
 from insula.bazel_launcher import LIVE_GATE_BWRAP, LIVE_GATE_CACHE_MOUNT
 from insula.runtime_identity import rootfs_identity
@@ -131,6 +134,43 @@ def mount_destinations(mounts):
     return {mount["inside_path"] for mount in mounts}
 
 
+def repository_git_dir():
+    path = REPO / ".git"
+    if path.is_dir():
+        return path.resolve()
+    content = path.read_text(encoding="utf-8").strip()
+    prefix = "gitdir: "
+    if content.startswith(prefix):
+        git_dir = Path(content[len(prefix):])
+        if not git_dir.is_absolute():
+            git_dir = path.parent / git_dir
+        return git_dir.resolve()
+    return path.resolve()
+
+
+def launcher_git_dirs():
+    git_dir = bazel_launcher._git_dir(bazel_launcher.REPO / ".git")
+    if not git_dir.is_dir():
+        return git_dir, git_dir, bazel_launcher.REPO_GATE_GIT_DIR
+    common_dir = bazel_launcher._git_common_dir(git_dir)
+    git_dir_inside = bazel_launcher._git_dir_inside_path(git_dir, common_dir)
+    return git_dir, common_dir, git_dir_inside or bazel_launcher.REPO_GATE_GIT_DIR
+
+
+def has_symlink_mount(mounts, destination, *, target, mode=None):
+    for mount in mounts:
+        if mount.get("inside_path") != destination:
+            continue
+        if mount.get("kind") != "symlink":
+            continue
+        if mount.get("symlink_target") != target:
+            continue
+        if mode is not None and mount.get("mode") != mode:
+            continue
+        return True
+    return False
+
+
 class BazelWrapperTests(unittest.TestCase):
     def test_external_cwd_and_symlink_preserve_relative_options_and_environment(self):
         for options in ("arguments", "environment"):
@@ -185,6 +225,42 @@ class BazelWrapperTests(unittest.TestCase):
                         LEGACY_AUTONOMY_ALIAS_DESTINATIONS & mount_destinations(plan["mounts"]),
                         plan["mounts"],
                     )
+                    git_dir, common_dir, git_dir_inside = launcher_git_dirs()
+                    if git_dir_inside == bazel_launcher.REPO_GATE_GIT_DIR:
+                        self.assertTrue(
+                            has_mount(
+                                plan["mounts"],
+                                bazel_launcher.REPO_GATE_GIT_DIR,
+                                host=str(repository_git_dir()),
+                                mode="read_only",
+                                kind="bind",
+                            ),
+                            plan["mounts"],
+                        )
+                    else:
+                        self.assertTrue(
+                            has_mount(
+                                plan["mounts"],
+                                bazel_launcher.REPO_GATE_GIT_COMMON_DIR,
+                                host=str(common_dir),
+                                mode="read_only",
+                                kind="bind",
+                            ),
+                            plan["mounts"],
+                        )
+                        self.assertTrue(
+                            has_symlink_mount(
+                                plan["mounts"],
+                                bazel_launcher.REPO_GATE_GIT_DIR,
+                                target=git_dir_inside,
+                                mode="read_only",
+                            ),
+                            plan["mounts"],
+                        )
+                        self.assertEqual(
+                            Path(git_dir_inside).relative_to(bazel_launcher.REPO_GATE_GIT_COMMON_DIR),
+                            git_dir.relative_to(common_dir),
+                        )
                     self.assertFalse(marker.exists())
                     result = subprocess.run(
                         [str(entry), *arguments, "test", "//autonomy/..."],
@@ -262,6 +338,177 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
             capture_output=True,
         )
         return result, marker, cache, waymo_rootfs, curriculum_rootfs, gpu_rootfs
+
+    def run_git(self, cwd, *arguments):
+        result = subprocess.run(
+            ["git", *arguments],
+            cwd=cwd,
+            text=True,
+            capture_output=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        return result
+
+    def write_git_fixture(self, root):
+        root.mkdir(parents=True)
+        self.run_git(root, "init")
+        (root / "autonomy").mkdir()
+        (root / "autonomy" / "sample_boundary_test.py").write_text("# boundary\n")
+        (root / "BUILD.bazel").write_text(
+            'REPO_GATE_TESTS = ["//autonomy:sample_boundary_test"]\n'
+        )
+        self.run_git(root, "add", ".")
+        self.run_git(
+            root,
+            "-c",
+            "user.name=Sureal Test",
+            "-c",
+            "user.email=sureal@example.invalid",
+            "commit",
+            "-m",
+            "initial",
+        )
+        return root
+
+    def materialize_mounts(self, mounts, sandbox):
+        for mount in mounts:
+            inside = sandbox / mount.inside_path.lstrip("/")
+            if mount.kind == "tmpfs":
+                inside.mkdir(parents=True, exist_ok=True)
+                continue
+            if mount.kind == "symlink":
+                inside.parent.mkdir(parents=True, exist_ok=True)
+                if inside.exists() or inside.is_symlink():
+                    if inside.is_dir() and not inside.is_symlink():
+                        shutil.rmtree(inside)
+                    else:
+                        inside.unlink()
+                target = mount.symlink_target
+                if target is not None and target.startswith("/"):
+                    target = str((sandbox / target.lstrip("/")).resolve())
+                inside.symlink_to(target)
+                continue
+            if mount.kind != "bind":
+                continue
+            inside.parent.mkdir(parents=True, exist_ok=True)
+            if inside.exists() or inside.is_symlink():
+                if inside.is_dir() and not inside.is_symlink():
+                    shutil.rmtree(inside)
+                else:
+                    inside.unlink()
+            host = Path(mount.host_path)
+            if host.is_dir():
+                shutil.copytree(host, inside, symlinks=True)
+            else:
+                shutil.copy2(host, inside)
+
+    def translate_sandbox_path(self, sandbox, value):
+        return str((sandbox / value.lstrip("/")).resolve())
+
+    def repo_gate_git_environment(self, sandbox, wrapper_environment):
+        env = os.environ.copy()
+        env["GIT_OPTIONAL_LOCKS"] = "0"
+        scalar_paths = {
+            "SUREAL_REPO_GATE_GIT_DIR": "GIT_DIR",
+            "SUREAL_REPO_GATE_GIT_WORK_TREE": "GIT_WORK_TREE",
+            "SUREAL_REPO_GATE_GIT_COMMON_DIR": "GIT_COMMON_DIR",
+            "SUREAL_REPO_GATE_GIT_OBJECT_DIRECTORY": "GIT_OBJECT_DIRECTORY",
+        }
+        for source, destination in scalar_paths.items():
+            value = wrapper_environment.get(source)
+            if value:
+                env[destination] = self.translate_sandbox_path(sandbox, value)
+        alternates = wrapper_environment.get("SUREAL_REPO_GATE_GIT_ALTERNATE_OBJECT_DIRECTORIES")
+        if alternates:
+            env["GIT_ALTERNATE_OBJECT_DIRECTORIES"] = os.pathsep.join(
+                self.translate_sandbox_path(sandbox, path)
+                for path in alternates.split(os.pathsep)
+                if path
+            )
+        return env
+
+    def assert_repo_gate_git_commands(self, sandbox, env):
+        root = sandbox / "experiment"
+        commands = [
+            ["git", "-C", str(root), "ls-files", "--stage", "-z"],
+            [
+                "git",
+                "-C",
+                str(root),
+                "ls-files",
+                "-z",
+                "--",
+                "autonomy/*_boundary_test.py",
+                "autonomy/**/*_boundary_test.py",
+            ],
+            ["git", "-C", str(root), "diff", "--check", "HEAD", "--"],
+        ]
+        for command in commands:
+            result = subprocess.run(
+                command,
+                env=env,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            self.assertEqual(
+                result.returncode,
+                0,
+                result.stdout.decode("utf-8", "replace")
+                + result.stderr.decode("utf-8", "replace"),
+            )
+
+    def test_repo_gate_git_metadata_supports_plain_alternate_and_linked_worktrees(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            plain = self.write_git_fixture(root / "plain")
+
+            alternate_source = self.write_git_fixture(root / "alternate-source")
+            alternate = root / "alternate"
+            self.run_git(root, "clone", "--shared", str(alternate_source), str(alternate))
+
+            linked_source = self.write_git_fixture(root / "linked-source")
+            linked = root / "linked"
+            self.run_git(
+                linked_source,
+                "worktree",
+                "add",
+                "-b",
+                "repo-gate-linked-fixture",
+                str(linked),
+            )
+
+            for name, repository in (
+                ("plain", plain),
+                ("alternate", alternate),
+                ("linked", linked),
+            ):
+                with self.subTest(layout=name):
+                    sandbox = root / f"sandbox-{name}"
+                    with mock.patch.object(bazel_launcher, "REPO", repository):
+                        mounts = bazel_launcher.repo_workspace_mounts()
+                        wrapper_environment = bazel_launcher.git_test_environment()
+
+                    self.assertTrue(
+                        any(
+                            mount.inside_path == "/experiment/.git"
+                            and mount.mode == "read_only"
+                            for mount in mounts
+                        ),
+                        mounts,
+                    )
+                    common_dir = wrapper_environment["SUREAL_REPO_GATE_GIT_COMMON_DIR"]
+                    self.assertTrue(
+                        any(
+                            mount.inside_path == common_dir
+                            and mount.mode == "read_only"
+                            for mount in mounts
+                        ),
+                        mounts,
+                    )
+
+                    self.materialize_mounts(mounts, sandbox)
+                    env = self.repo_gate_git_environment(sandbox, wrapper_environment)
+                    self.assert_repo_gate_git_commands(sandbox, env)
 
     def test_emit_plan_prints_sandbox_command_data_without_running_bwrap(self):
         self.assertTrue(WRAPPER.is_file(), "repository-level Bazel wrapper is missing")

@@ -1,4 +1,16 @@
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+
 package(default_visibility = ["//visibility:private"])
+
+REPO_GATE_TESTS = [
+    "//autonomy/blob_store:storage_boundary_test",
+    "//autonomy/insula:launch_plan_boundary_test",
+    "//autonomy/resources:concept_boundary_test",
+    "//:publication_audit_behavior_test",
+    "//:repo_gate_membership_test",
+    "//:repo_gate_publication_audit_test",
+    "//:repo_gate_whitespace_test",
+]
 
 exports_files(
     [
@@ -7,4 +19,66 @@ exports_files(
         "bazelw",
     ],
     visibility = ["//autonomy/insula:__pkg__"],
+)
+
+py_test(
+    name = "publication_audit_behavior_test",
+    srcs = ["scripts/publication_audit_behavior_test.py"],
+    deps = [":publication_audit_lib"],
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "repo_gate",
+    ],
+)
+
+py_library(
+    name = "publication_audit_lib",
+    srcs = ["scripts/publication_audit.py"],
+    imports = ["."],
+)
+
+py_test(
+    name = "repo_gate_membership_test",
+    srcs = ["scripts/repo_gate_membership_test.py"],
+    data = [
+        "BUILD.bazel",
+    ],
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+)
+
+py_test(
+    name = "repo_gate_publication_audit_test",
+    srcs = ["scripts/repo_gate_publication_audit_test.py"],
+    data = [
+        "scripts/publication_audit.py",
+    ],
+    legacy_create_init = 0,
+    size = "medium",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+)
+
+py_test(
+    name = "repo_gate_whitespace_test",
+    srcs = ["scripts/repo_gate_whitespace_test.py"],
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+)
+
+test_suite(
+    name = "repo_gate",
+    tests = REPO_GATE_TESTS,
+    visibility = ["//visibility:public"],
 )

@@ -12,6 +12,7 @@ import argparse
 import configparser
 from dataclasses import dataclass
 import json
+import os
 from pathlib import Path, PurePosixPath
 import re
 import subprocess
@@ -131,6 +132,8 @@ def _declared_submodule_paths(data: bytes) -> tuple[set[str], list[str]]:
 def _is_generated_path(path: str) -> bool:
     parts = PurePosixPath(path).parts
     if not parts:
+        return False
+    if "testdata" in parts:
         return False
     if parts[0] in {
         ".eggs",
@@ -345,11 +348,13 @@ def portable_command_errors(root: Path) -> list[str]:
         commands.append([sys.executable, pathway_audit, "--offline"])
 
     errors: list[str] = []
+    env = _portable_command_environment()
     for command in commands:
         try:
             result = subprocess.run(
                 command,
                 cwd=root,
+                env=env,
                 check=False,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -358,11 +363,24 @@ def portable_command_errors(root: Path) -> list[str]:
             errors.append(f"portable command could not start: {' '.join(command)}")
             continue
         if result.returncode:
-            errors.append(
-                f"portable command failed (exit {result.returncode}): "
-                f"{' '.join(command)}"
-            )
+            errors.append(_portable_command_failure(command, result))
     return errors
+
+
+def _portable_command_environment() -> dict[str, str]:
+    env = os.environ.copy()
+    env.pop("PYTHONSAFEPATH", None)
+    return env
+
+
+def _portable_command_failure(
+    command: Sequence[str], result: subprocess.CompletedProcess[bytes]
+) -> str:
+    message = f"portable command failed (exit {result.returncode}): {' '.join(command)}"
+    details = (result.stdout + result.stderr).decode("utf-8", errors="replace").strip()
+    if details:
+        message += f": {details[-1000:]}"
+    return message
 
 
 def audit_repository(root: Path) -> dict[str, object]:
