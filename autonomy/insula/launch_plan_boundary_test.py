@@ -1,6 +1,7 @@
 """Static boundary checks for Insula launch plans."""
 from __future__ import annotations
 
+import ast
 import os
 import re
 import tempfile
@@ -40,10 +41,6 @@ RUNTIME_LOCK_PATTERNS = (
     ("direct rootfs content verification", re.compile(r"(?<!def )\bverify_rootfs\(")),
 )
 
-PRIVATE_LAUNCH_PLAN_PATTERNS = (
-    ("private launch_plan import outside insula", re.compile(r"""from\s+insula\.launch_plan\s+import\s+.*\b_\w+""")),
-)
-
 ALLOWED_EXACT = {
     "insula/launch_plan.py",
     "insula/tracer.sh",
@@ -52,16 +49,6 @@ ALLOWED_EXACT = {
     "insula/build_cpu_rootfs.sh",
     "insula/build_gpu_bazel_rootfs_v6.sh",
     "tracer.sh",
-}
-
-# The only active resource-specific old-receipt reconstruction outside the
-# module lives in these named resources.command helpers. New launches must use
-# launch-plan data and with_mounts; the allowlist is only for retained receipts.
-RESOURCE_COMMAND_LEGACY_HELPERS = {
-    "wrap_legacy_receipt_command",
-    "wrap_rendered_plan_command",
-    "rendered_command_matches_record",
-    "_require_resource_aliases_unused",
 }
 
 ALLOWED_PREFIXES = (
@@ -90,6 +77,19 @@ def _is_active_path(relative: str) -> bool:
     return not _is_frozen_path(relative)
 
 
+def _active_python_sources(root: Path = AUTONOMY_ROOT) -> dict[str, str]:
+    sources = {}
+    for path in sorted(Path(root).rglob("*.py")):
+        relative = path.relative_to(root).as_posix()
+        if not _is_active_path(relative):
+            continue
+        try:
+            sources[relative] = path.read_text(errors="replace")
+        except OSError:
+            continue
+    return sources
+
+
 def scan_launch_plan_boundary(root: Path = AUTONOMY_ROOT) -> list[Violation]:
     violations = []
     for path in sorted(Path(root).rglob("*")):
@@ -99,19 +99,37 @@ def scan_launch_plan_boundary(root: Path = AUTONOMY_ROOT) -> list[Violation]:
         if not _is_active_path(relative):
             continue
         try:
-            lines = path.read_text(errors="replace").splitlines()
+            source = path.read_text(errors="replace")
         except OSError:
             continue
-        function = None
+        violations.extend(_private_launch_plan_imports(relative, source) if path.suffix == ".py" else [])
+        lines = source.splitlines()
         for line_number, line in enumerate(lines, start=1):
-            match = re.match(r"def ([A-Za-z_][A-Za-z0-9_]*)\(", line)
-            if match:
-                function = match.group(1)
-            for kind, pattern in (*BWRAP_ARGV_PATTERNS, *RUNTIME_LOCK_PATTERNS, *PRIVATE_LAUNCH_PLAN_PATTERNS):
-                if relative == "resources/command.py" and function in RESOURCE_COMMAND_LEGACY_HELPERS:
-                    continue
+            for kind, pattern in (*BWRAP_ARGV_PATTERNS, *RUNTIME_LOCK_PATTERNS):
                 if pattern.search(line):
                     violations.append(Violation(relative, line_number, kind))
+    return violations
+
+
+def _private_launch_plan_imports(relative: str, source: str) -> list[Violation]:
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return []
+    violations = []
+    for node in ast.walk(tree):
+        if (
+            isinstance(node, ast.ImportFrom)
+            and node.module == "insula.launch_plan"
+            and any(alias.name.startswith("_") for alias in node.names)
+        ):
+            violations.append(
+                Violation(
+                    relative,
+                    node.lineno,
+                    "private launch_plan import outside insula",
+                )
+            )
     return violations
 
 
@@ -186,6 +204,71 @@ class LaunchPlanBoundaryTests(unittest.TestCase):
             ],
         )
 
+    def test_scanner_reports_parenthesized_private_imports(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            planted = root / "dataset" / "planted.py"
+            planted.parent.mkdir(parents=True)
+            planted.write_text(
+                "from insula.launch_plan import (\n"
+                "    build_plan,\n"
+                "    _assemble_plan,\n"
+                ")\n"
+            )
+
+            violations = scan_launch_plan_boundary(root)
+
+        self.assertEqual(
+            violations,
+            [Violation("dataset/planted.py", 1, "private launch_plan import outside insula")],
+        )
+
+    def test_scanner_reports_multiline_private_imports(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            planted = root / "dataset" / "planted.py"
+            planted.parent.mkdir(parents=True)
+            planted.write_text(
+                "from insula.launch_plan import \\\n"
+                "    _render_mount\n"
+            )
+
+            violations = scan_launch_plan_boundary(root)
+
+        self.assertEqual(
+            violations,
+            [Violation("dataset/planted.py", 1, "private launch_plan import outside insula")],
+        )
+
+    def test_python_worker_check_and_default_gpu_device_list_have_one_active_home(self):
+        sources = _active_python_sources()
+        launch_plan = (AUTONOMY_ROOT / "insula/launch_plan.py").read_text()
+
+        self.assertEqual(launch_plan.count("def python_worker_command("), 1)
+        self.assertEqual(launch_plan.count("_DEFAULT_GPU_CONTROL_DEVICE_PATHS ="), 1)
+        self.assertEqual(launch_plan.count('"/dev/nvidiactl"'), 1)
+        self.assertEqual(launch_plan.count('"/dev/nvidia-uvm"'), 1)
+        self.assertEqual(
+            [
+                relative
+                for relative, source in sources.items()
+                if (
+                    "declared original Python worker" in source
+                    or "launch plan record Python worker" in source
+                    or "isolated namespace and declared original Python worker" in source
+                )
+            ],
+            [],
+        )
+        self.assertEqual(
+            [
+                relative
+                for relative, source in sources.items()
+                if '"/dev/nvidiactl"' in source and '"/dev/nvidia-uvm"' in source
+            ],
+            [],
+        )
+
     def test_scanner_reports_planted_unquoted_shell_bwrap_call(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -199,21 +282,6 @@ class LaunchPlanBoundaryTests(unittest.TestCase):
             violations,
             [Violation("dataset/planted.sh", 2, "direct shell bwrap execution")],
         )
-
-    def test_resource_wrapper_helpers_are_not_public_launch_plan_api(self):
-        import insula.launch_plan as launch_plan
-
-        resource_helpers = {
-            "wrap_legacy_receipt_command",
-            "wrap_rendered_plan_command",
-            "wrap_resource_plan",
-            "rendered_command_matches_record",
-            "recorded_resource_mounts_match",
-        }
-        public = set(getattr(launch_plan, "__all__", ()))
-        self.assertFalse(resource_helpers & public)
-        for name in resource_helpers:
-            self.assertFalse(hasattr(launch_plan, name), name)
 
 
 if __name__ == "__main__":

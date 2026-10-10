@@ -3,7 +3,7 @@ import hashlib,json,os,re,shutil,subprocess,sys,time
 from pathlib import Path
 P=Path(__file__).resolve().parents[1]
 from blob_store.core import BlobStore,blob_adapter_from_descriptor
-from insula.launch_plan import assert_plan_matches_record,assert_record_matches_rendered_command,build_plan,gpu_driver_hashes_from_plan_record,gpu_driver_paths_from_plan_record,load_default_runtime_lock,read_receipt_mounts,record_plan,render_plan
+from insula.launch_plan import assert_plan_matches_record,assert_record_matches_rendered_command,build_plan,gpu_driver_hashes_from_plan_record,gpu_driver_paths_from_plan_record,is_resource_wrapped_python_worker_command,load_default_runtime_lock,original_python_worker_command,read_receipt_mounts,record_plan,render_plan,wrap_resource_plan_record
 from insula.runtime_roots import current_cpu_rootfs, current_gpu_rootfs, current_metrics_rootfs
 from retention.publication import audit as audit_publication
 from resources.checkpoint import _is_blob_publication
@@ -18,7 +18,7 @@ from training_execution.sustained_admission import admit_sample
 from training_execution.sustained_controller_sources import freeze_host_sources,validate_host_sources
 from retention.publication_sources import freeze_checkpoint_sources as freeze_checkpoint_publisher_sources,validate_checkpoint_sources as validate_checkpoint_publisher_sources
 from evidence.source_snapshot import source_snapshot_package_root
-from resources.command import inspect_legacy_receipt_command,wrap_resource_plan_record
+from resources.command import inspect_legacy_receipt_command
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing'
 GPU_ROOT=current_gpu_rootfs(C);CPU_ROOT=current_cpu_rootfs(C);METRICS_ROOT=current_metrics_rootfs(C)
 GPU_INDEX=1
@@ -210,27 +210,10 @@ def _plan_mounts_by_role(record):
 
 def _legacy_command_data(command):
  _,argv,options=inspect_legacy_receipt_command(command)
- if (len(argv)>=4 and argv[0] in {'python','/opt/waymo/bin/python'} and
-     argv[1]=='/tmp/resource-layer/resources/execute_worker.py' and
-     argv[2]=='/tmp/resource-output'):
-  argv=[argv[0],*argv[3:]]
+ argv=original_python_worker_command(argv)
  environment={values[0]:values[1] for option,values in options if option=='--setenv'}
  mounts=read_receipt_mounts({'command':command},include_digests=False,require_python_worker=True)
  return argv,environment,mounts
-
-def _unwrapped_plan_worker_command(command):
- command=list(command)
- if (len(command)>=4 and command[0] in {'python','/opt/waymo/bin/python'} and
-     command[1]=='/tmp/resource-layer/resources/execute_worker.py' and
-     command[2]=='/tmp/resource-output'):
-  return [command[0],*command[3:]]
- return command
-
-def _plan_is_resource_wrapped(command):
- command=list(command)
- return (len(command)>=4 and command[0] in {'python','/opt/waymo/bin/python'} and
-         command[1]=='/tmp/resource-layer/resources/execute_worker.py' and
-         command[2]=='/tmp/resource-output')
 
 def _require_plan_mount(mounts,inside,role,mode,kind):
  mount=mounts.get(inside)
@@ -350,7 +333,7 @@ class NativeBackend:
   if receipt.get('launch_plan') is not None:
    plan=receipt['launch_plan'];mounts=_plan_mounts(plan);environment=plan.get('environment',{})
    assert_record_matches_rendered_command(plan,command)
-   plan_worker_command=_unwrapped_plan_worker_command(plan.get('command',[]))
+   plan_worker_command=original_python_worker_command(plan.get('command',[]))
    if stage_lock is not None and plan.get('runtime')!={'lock_sha256':stage_lock.lock_sha256,'form':stage_lock.form}:raise ValueError('native launch plan runtime differs')
    if plan_worker_command!=['python',entry] or receipt['runtime_lock']!=stage_runtime or receipt['verifier_source_pins']!=(self.verifier_pins if stage=='audit' else {}) or environment.get('SUREAL_SOURCE_SNAPSHOT_STORE')!='/tmp/source-snapshots' or environment.get('CUBLAS_WORKSPACE_CONFIG')!=':4096:8':raise ValueError('native launch plan worker/environment differs')
    if isinstance(command,list) and isinstance(plan.get('command'),list) and command[-len(plan['command']):]!=plan['command']:raise ValueError('native launch command differs from recorded plan')
@@ -365,7 +348,7 @@ class NativeBackend:
    for inside in ['/tmp/inputs','/tmp/native','/tmp/physical','/tmp/boxes','/tmp/runtime-lock.json','/tmp/scientific','/tmp/source-snapshots']:
     _require_plan_mount(mounts,inside,'input:'+inside,'read_only','bind')
    if mounts['/experiment'].get('digest')!=self.pins.get('source_snapshot_sha256'):raise ValueError('native launch plan code digest differs')
-   if _plan_is_resource_wrapped(plan.get('command',[])):
+   if is_resource_wrapped_python_worker_command(plan.get('command',[])):
     roles=_plan_mounts_by_role(plan)
     _require_plan_role(roles,'resource-layer','/tmp/resource-layer','read_only','bind')
     _require_plan_role(roles,'resource-experiment-resources','/experiment/resources','read_only','bind')
