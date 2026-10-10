@@ -1,0 +1,10 @@
+#!/bin/bash
+# Versioned hook: cheap host-side static checks before a commit is created.
+set -euo pipefail
+
+root="$(git rev-parse --show-toplevel)"
+cd "$root"
+
+git diff --cached --check
+python3 scripts/check_identifiers.py --root "$root"
+python3 scripts/check_storage_boundary.py --root "$root/autonomy"

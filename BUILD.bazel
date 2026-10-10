@@ -4,6 +4,8 @@ package(default_visibility = ["//visibility:private"])
 
 REPO_GATE_TESTS = [
     "//:check_identifiers_test",
+    "//:check_storage_boundary_test",
+    "//:githooks_test",
     "//autonomy/blob_store:storage_boundary_test",
     "//autonomy/insula:launch_plan_boundary_test",
     "//autonomy/resources:concept_boundary_test",
@@ -49,6 +51,12 @@ py_library(
     imports = ["."],
 )
 
+py_library(
+    name = "check_storage_boundary_lib",
+    srcs = ["scripts/check_storage_boundary.py"],
+    imports = ["."],
+)
+
 py_test(
     name = "check_identifiers_test",
     srcs = ["scripts/check_identifiers_test.py"],
@@ -71,6 +79,32 @@ py_test(
     legacy_create_init = 0,
     size = "small",
     tags = [
+        "repo_gate",
+    ],
+)
+
+py_test(
+    name = "check_storage_boundary_test",
+    srcs = ["scripts/check_storage_boundary_test.py"],
+    deps = [":check_storage_boundary_lib"],
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+)
+
+py_test(
+    name = "githooks_test",
+    srcs = ["scripts/githooks_test.py"],
+    data = [
+        ".githooks/pre-commit",
+    ],
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "no-sandbox",
         "repo_gate",
     ],
 )
