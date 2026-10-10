@@ -66,3 +66,13 @@ Next compliant run needs a worker profile that permits the repository's Docker
 build recipes, or explicit human direction to add a new non-container rebuild
 path. The latter would be a recipe change and should not be treated as "use the
 repo's own build scripts and recipes unchanged."
+
+### 2026-10-10 coordinator note
+
+The user authorised container builds and then stopped the rebuild before anything was built. No rootfs, lock or cache file was written, and `runtime_roots.py` is unchanged.
+
+The Docker images behind the lost rootfs still exist locally:
+- `sureal-waymo-cpu:bazel-9.2.0-rootfs-v5-t29-20261008T230657Z`;
+- `sureal-waymo-gpu:bazel-9.2.0-rootfs-v7`.
+
+Re-exporting from them may restore the CPU and GPU rootfs without a full rebuild. Their content and recipe digests must still be checked against the retained locks before reuse. Left for the user.
