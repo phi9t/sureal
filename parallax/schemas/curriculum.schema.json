@@ -23,11 +23,12 @@
     "module": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "slug", "title", "evidence", "observable", "representation", "inference", "objectives", "metrics", "failure_sweep", "insula", "sources"],
+      "required": ["id", "slug", "title", "implementation", "evidence", "observable", "representation", "inference", "objectives", "metrics", "failure_sweep", "insula", "sources"],
       "properties": {
         "id": {"type": "string", "pattern": "^[0-9]{2}$"},
         "slug": {"type": "string", "pattern": "^[a-z0-9-]+$"},
         "title": {"type": "string", "minLength": 1},
+        "implementation": {"enum": ["synthetic", "real", "real+baseline"]},
         "evidence": {"$ref": "#/$defs/nonemptyStrings"},
         "observable": {"type": "string", "minLength": 1},
         "representation": {"type": "string", "minLength": 1},
@@ -35,7 +36,7 @@
         "objectives": {"$ref": "#/$defs/nonemptyStrings"},
         "metrics": {"$ref": "#/$defs/nonemptyStrings"},
         "failure_sweep": {"$ref": "#/$defs/nonemptyStrings"},
-        "insula": {"enum": ["classical", "neural-rendering", "blender", "surflo"]},
+        "insula": {"enum": ["classical", "orb-slam", "neural-rendering", "implicit-surface", "radiance-field", "gaussian-splatting", "blender", "surflo"]},
         "sources": {"$ref": "#/$defs/nonemptyStrings"}
       }
     }

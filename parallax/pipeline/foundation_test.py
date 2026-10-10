@@ -162,6 +162,7 @@ class RegistryContractTest(unittest.TestCase):
                 fixture = {
                     "schema_version": 1,
                     "module_id": "01",
+                    "module_implementation": "synthetic",
                     "profile": "smoke",
                     "status": "complete",
                     "network_mode": "offline",
@@ -190,8 +191,26 @@ class RegistryContractTest(unittest.TestCase):
         self.assertEqual(schema["properties"]["modules"]["minItems"], 15)
         self.assertEqual(schema["properties"]["modules"]["maxItems"], 15)
         self.assertLessEqual(
-            {"id", "slug", "title", "evidence", "observable", "representation", "inference", "objectives", "metrics", "failure_sweep", "insula", "sources"},
+            {
+                "id",
+                "slug",
+                "title",
+                "implementation",
+                "evidence",
+                "observable",
+                "representation",
+                "inference",
+                "objectives",
+                "metrics",
+                "failure_sweep",
+                "insula",
+                "sources",
+            },
             set(module["required"]),
+        )
+        self.assertEqual(
+            module["properties"]["implementation"]["enum"],
+            ["synthetic", "real", "real+baseline"],
         )
 
     def test_curriculum_has_fifteen_ordered_modules_with_stable_interfaces(self) -> None:
@@ -209,6 +228,76 @@ class RegistryContractTest(unittest.TestCase):
                 self.assertTrue(module["failure_sweep"])
                 self.assertTrue(module["sources"])
                 self.assertIn(module["insula"], curriculum["insulas"])
+                self.assertEqual(module["implementation"], "synthetic")
+
+    def test_metric_provenance_distinguishes_illustrative_and_synthetic_computed_metrics(self) -> None:
+        from pipeline.validator import validate_result
+
+        with tempfile.TemporaryDirectory() as temporary:
+            cache = Path(temporary)
+            for module_id, expected in {
+                "06": {
+                    ("geometry", "accuracy_mm"): "illustrative",
+                    ("geometry", "completeness"): "computed_synthetic",
+                    ("geometry", "f_score_2mm"): "illustrative",
+                },
+                "07": {
+                    ("geometry", "ate_before_loop_m"): "computed_synthetic",
+                    ("geometry", "ate_after_loop_m"): "computed_synthetic",
+                    ("geometry", "map_f_score"): "illustrative",
+                },
+            }.items():
+                with self.subTest(module=module_id):
+                    completed = run_cli(
+                        "run",
+                        "--module",
+                        module_id,
+                        "--profile",
+                        "smoke",
+                        "--run-id",
+                        f"metric-labels-{module_id}",
+                        cache=cache,
+                    )
+                    self.assertEqual(completed.returncode, 0, completed.stderr)
+                    result = validate_result(
+                        cache / "runs" / f"metric-labels-{module_id}" / module_id,
+                        module_id,
+                    )
+                    self.assertEqual(result["module_implementation"], "synthetic")
+                    for (family, metric), label in expected.items():
+                        self.assertEqual(
+                            result["metric_provenance"][family][metric],
+                            label,
+                        )
+
+    def test_validator_rejects_real_modules_with_noncomputed_metric_labels(self) -> None:
+        from pipeline.validator import validate_result
+
+        with tempfile.TemporaryDirectory() as temporary:
+            cache = Path(temporary)
+            completed = run_cli(
+                "run",
+                "--module",
+                "06",
+                "--profile",
+                "smoke",
+                "--run-id",
+                "real-provenance-check",
+                cache=cache,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            run_dir = cache / "runs" / "real-provenance-check" / "06"
+            result_path = run_dir / "result.json"
+            result = json.loads(result_path.read_text())
+            result["module_implementation"] = "real"
+            result["metric_provenance"]["geometry"]["accuracy_mm"] = "illustrative"
+            result_path.write_text(json.dumps(result, sort_keys=True) + "\n")
+
+            with self.assertRaisesRegex(
+                ValueError,
+                "real module metrics must be computed",
+            ):
+                validate_result(run_dir, "06")
 
     def test_source_registry_is_primary_unique_and_claim_bearing(self) -> None:
         sources = json.loads((ROOT / "assets" / "sources.json").read_text())["sources"]

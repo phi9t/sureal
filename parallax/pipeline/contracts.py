@@ -21,6 +21,7 @@ INPUT_FILES = (
     "assets/terminology.json",
     "curriculum/curriculum.json",
     "scene/shared-scene.json",
+    "schemas/curriculum.schema.json",
     "schemas/result.schema.json",
 )
 IMPLEMENTATION_FILES = (
@@ -88,7 +89,13 @@ def ensure_finite(value: Any, location: str = "root") -> None:
 
 
 def curriculum() -> dict[str, Any]:
-    return load_json(ROOT / "curriculum" / "curriculum.json")
+    result = load_json(ROOT / "curriculum" / "curriculum.json")
+    validate_json_schema_instance(
+        result,
+        load_json(ROOT / "schemas" / "curriculum.schema.json"),
+        "curriculum",
+    )
+    return result
 
 
 def reference_adapter_name(record: dict[str, Any]) -> str:

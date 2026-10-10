@@ -398,12 +398,15 @@ def _continuous_geometry_lab(artifacts: Path, profile: str, scene: dict[str, Any
     mlp_width = 512
     mlp_layers = 8
     implicit_parameter_count = 3 * mlp_width + (mlp_layers - 1) * mlp_width ** 2 + mlp_width
+    dense_grid_resolution = 512
     return {
         "metrics": {
             "geometry": {
-                "voxel_memory_at_512_mib": 512.0,
+                "voxel_memory_at_512_mib": float(
+                    dense_grid_resolution**3 * 4 / (1024.0**2)
+                ),
                 "implicit_model_mib": float(implicit_parameter_count * 4 / (1024.0 ** 2)),
-                "representations_compared": 3,
+                "representations_compared": len(comparison),
                 "voxel_surface_rmse_m": by_name["voxel"]["surface_rmse_m"],
                 "occupancy_surface_rmse_m": by_name["occupancy"]["surface_rmse_m"],
                 "sdf_surface_rmse_m": by_name["sdf"]["surface_rmse_m"],
@@ -907,13 +910,17 @@ def _foundation_geometry_lab(artifacts: Path, profile: str, scene: dict[str, Any
         point_error,
         "#2b8290",
     )
+    visible_surface_recall = float(len(aligned_visible) / len(truth_visible))
+    hidden_truth_count = int(np.count_nonzero(~visible_support))
+    hidden_predicted_count = 0
+    hidden_surface_recall = float(hidden_predicted_count / hidden_truth_count)
     return {
         "metrics": {
             "geometry": {
                 "raw_point_rmse_m": raw_rmse,
                 "similarity_aligned_point_rmse_m": aligned_rmse,
-                "visible_surface_recall": 1.0,
-                "hidden_surface_recall": 0.0,
+                "visible_surface_recall": visible_surface_recall,
+                "hidden_surface_recall": hidden_surface_recall,
             },
             "rendering": {},
             "generative": {},

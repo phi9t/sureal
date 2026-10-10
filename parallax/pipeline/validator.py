@@ -51,7 +51,14 @@ from scene.controlled_suite import COMPATIBLE_MODULES, controlled_suite_record
 
 REQUIRED_TOP_LEVEL = {
     "schema_version", "module_id", "profile", "status", "network_mode",
-    "measurement_kind", "metrics", "metric_provenance", "failure_sweep", "failure_sweep_provenance", "resources", "provenance",
+    "module_implementation", "measurement_kind", "metrics", "metric_provenance",
+    "failure_sweep", "failure_sweep_provenance", "resources", "provenance",
+}
+
+METRIC_LABELS_BY_IMPLEMENTATION = {
+    "synthetic": {"computed_synthetic", "illustrative"},
+    "real": {"computed_real"},
+    "real+baseline": {"computed_real", "computed_baseline"},
 }
 
 
@@ -359,6 +366,8 @@ def validate_result(run_dir: Path, expected_module: str | None = None) -> dict[s
         raise ValueError(f"expected module {expected_module}, got {result['module_id']}")
     if set(result["metrics"]) != {"geometry", "rendering", "generative"}:
         raise ValueError("metrics must retain geometry, rendering, and generative families")
+    module = module_by_id(result["module_id"])
+    implementation = result["module_implementation"]
     expected_measurement_kind = (
         "reused_measured_result"
         if result["module_id"] == "15"
@@ -374,11 +383,24 @@ def validate_result(run_dir: Path, expected_module: str | None = None) -> dict[s
         _require_type(metrics, dict, f"metrics.{family}")
         if set(result["metric_provenance"].get(family, {})) != set(metrics):
             raise ValueError(f"metric provenance mismatch for {family}")
-        if any(
-            value != expected_measurement_kind
-            for value in result["metric_provenance"][family].values()
-        ):
+    metric_labels = [
+        label
+        for family in result["metric_provenance"].values()
+        for label in family.values()
+    ]
+    if implementation == "real" and any(label != "computed_real" for label in metric_labels):
+        raise ValueError("real module metrics must be computed")
+    if implementation == "real+baseline" and any(
+        label not in {"computed_real", "computed_baseline"} for label in metric_labels
+    ):
+        raise ValueError("real+baseline module metrics must be computed")
+    for family in result["metric_provenance"]:
+        labels = set(result["metric_provenance"][family].values())
+        allowed_labels = METRIC_LABELS_BY_IMPLEMENTATION[implementation]
+        if not labels <= allowed_labels:
             raise ValueError(f"metric provenance value mismatch for {family}")
+    if implementation != module["implementation"]:
+        raise ValueError("module implementation does not match curriculum")
     if len(result["failure_sweep"]) < 2:
         raise ValueError("failure sweep is incomplete")
     for required in ("runtime_seconds", "peak_cpu_bytes", "peak_gpu_bytes"):
@@ -476,7 +498,7 @@ def validate_result(run_dir: Path, expected_module: str | None = None) -> dict[s
         ):
             raise ValueError("Blender controlled-suite sensor binding mismatch")
     if (run_dir / "report.md").read_text(encoding="utf-8") != module_report(
-        module_by_id(result["module_id"]), result
+        module, result
     ):
         raise ValueError("report content does not match result")
     ensure_finite(result)
@@ -540,7 +562,15 @@ def validate_report(run_root: Path) -> dict[str, Any]:
         "measurement_kinds": sorted(
             {result["measurement_kind"] for _, result in module_items}
         ),
+        "module_implementations": {
+            result["module_id"]: result["module_implementation"]
+            for _, result in module_items
+        },
         "metric_families": ["geometry", "rendering", "generative"],
+        "metric_provenance": {
+            result["module_id"]: result["metric_provenance"]
+            for _, result in module_items
+        },
         "assumptions": [
             "Metrics remain separated by task family.",
             "Controlled fixtures are not third-party benchmark reproductions.",

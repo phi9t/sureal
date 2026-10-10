@@ -26,6 +26,14 @@ systems also remain individually executable through explicit reference adapters.
 Controlled fixtures are teaching experiments, not reproduced third-party
 leaderboard values.
 
+Current module implementation status is intentionally conservative: all fifteen
+curriculum modules are marked `synthetic` in `curriculum/curriculum.json`.
+Metrics computed by the deterministic labs are labeled `computed_synthetic`.
+Fixed teaching numbers that are not recomputed from lab data are labeled
+`illustrative`, including the current dense-MVS accuracy/F-score examples and
+the SLAM map F-score. A module may not be marked `real` unless every metric in
+its result is labeled as computed from real execution.
+
 ```bash
 # No network:
 parallax/run.sh list
@@ -235,8 +243,10 @@ Runs default to `~/.cache/surflo/3d-pathway`. Set
 Every completed module contains:
 
 - `result.json`: metrics separated into geometry, rendering, and generative
-  families, resource use, environment, and input/config/artifact hashes;
-- `report.md`: a short interpretation with assumptions and observed trend;
+  families, the module implementation status, per-metric labels, resource use,
+  environment, and input/config/artifact hashes;
+- `report.md`: a short interpretation with assumptions, observed trend,
+  module implementation status, and per-metric labels;
 - `artifacts/failure_sweep.csv`: controlled intervention and response;
 - at least one SVG visualization plus any module-specific compact evidence.
 
@@ -253,8 +263,12 @@ runner process high-water mark and can include earlier work in that process; it
 is not an isolated per-module peak. Use subprocess isolation before treating
 fixture memory values as directly comparable per-module measurements.
 
-Every metric and artifact is labeled `controlled_fixture`, except module 15,
-which is labeled `reused_measured_result` and checked against its asset lock.
+Every metric is labeled separately from the coarse run measurement kind.
+Synthetic modules use `computed_synthetic` for values derived from fixture data
+and `illustrative` for fixed teaching values. Artifact provenance still records
+whether a run is a controlled fixture or a reused measured result; module 15's
+current source evidence remains `reused_measured_result` and checked against its
+asset lock.
 Module 13's controlled fixture persists two mutually exclusive hidden-scene
 hypotheses, all independent-point and shared-latent draws, repeat queries, and
 visible evidence in `ambiguity_samples.npz`. Validation recomputes its

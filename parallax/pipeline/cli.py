@@ -175,9 +175,17 @@ def write_aggregate(
         "schema_version": 1,
         "run_id": run_id,
         "module_ids": module_ids,
+        "module_implementations": {
+            result["module_id"]: result["module_implementation"]
+            for _, result in items
+        },
         "complete_curriculum": complete,
         "profiles": profiles,
         "measurement_kinds": sorted({result["measurement_kind"] for _, result in items}),
+        "metric_provenance": {
+            result["module_id"]: result["metric_provenance"]
+            for _, result in items
+        },
         "metric_families": ["geometry", "rendering", "generative"],
         "assumptions": ["Metrics remain separated by task family.", "Controlled fixtures are not third-party benchmark reproductions."],
         "failure_interpretations": {result["module_id"]: result.get("observations", []) for _, result in items},

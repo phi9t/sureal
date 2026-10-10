@@ -21,6 +21,18 @@ from pipeline.validator import validate_result
 from scene.controlled_suite import ensure_controlled_suite, write_module_binding
 
 
+SYNTHETIC_ILLUSTRATIVE_METRICS = {
+    "02": {"geometry": {"photometric_normal_error_deg", "visual_hull_iou", "concavity_recall"}},
+    "03": {"geometry": {"multipath_bias_m"}},
+    "04": {"geometry": {"mesh_completeness"}},
+    "05": {"geometry": {"inlier_fraction", "similarity_gauge_dof"}},
+    "06": {"geometry": {"accuracy_mm", "f_score_2mm", "hidden_surface_recall"}},
+    "07": {"geometry": {"map_f_score"}},
+    "08": {"geometry": {"unsupported_completion_fraction", "geometric_weak_match_rmse_m"}},
+    "11": {"geometry": {"mesh_extraction_supported"}},
+}
+
+
 def _peak_cpu_bytes() -> int:
     peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     return int(peak * 1024 if sys.platform != "darwin" else peak)
@@ -55,11 +67,37 @@ def offline_network():
         socket.create_connection = original_connection  # type: ignore[assignment]
 
 
-def _metric_provenance(metrics: dict[str, Any], kind: str) -> dict[str, dict[str, str]]:
-    return {
-        family: {name: kind for name in values}
+def _default_metric_label(implementation: str) -> str:
+    if implementation == "synthetic":
+        return "computed_synthetic"
+    if implementation == "real":
+        return "computed_real"
+    if implementation == "real+baseline":
+        return "computed_real"
+    raise ValueError(f"unknown implementation status: {implementation}")
+
+
+def _metric_provenance(
+    module_id: str,
+    metrics: dict[str, Any],
+    implementation: str,
+) -> dict[str, dict[str, str]]:
+    default = _default_metric_label(implementation)
+    provenance = {
+        family: {name: default for name in values}
         for family, values in metrics.items()
     }
+    if implementation == "synthetic":
+        for family, names in SYNTHETIC_ILLUSTRATIVE_METRICS.get(module_id, {}).items():
+            family_provenance = provenance.get(family, {})
+            missing = sorted(set(names) - set(family_provenance))
+            if missing:
+                raise ValueError(
+                    f"illustrative metric labels reference unknown metrics for {module_id}: {missing}"
+                )
+            for name in names:
+                family_provenance[name] = "illustrative"
+    return provenance
 
 
 def run_module(cache_root: Path, module_id: str, profile: str, run_id: str) -> Path:
@@ -94,8 +132,10 @@ def run_module(cache_root: Path, module_id: str, profile: str, run_id: str) -> P
                 )
         elapsed = time.perf_counter() - started
         profile_config = curriculum()["profiles"][profile]
+        module_implementation = module["implementation"]
         config = {
             "module_id": module_id,
+            "module_implementation": module_implementation,
             "profile": profile,
             "run_id": run_id,
             "seed": 260925,
@@ -108,12 +148,17 @@ def run_module(cache_root: Path, module_id: str, profile: str, run_id: str) -> P
             "schema_version": 1,
             "module_id": module_id,
             "module_slug": module["slug"],
+            "module_implementation": module_implementation,
             "profile": profile,
             "status": "complete",
             "network_mode": "offline",
             "measurement_kind": measurement_kind,
             "metrics": lab["metrics"],
-            "metric_provenance": _metric_provenance(lab["metrics"], measurement_kind),
+            "metric_provenance": _metric_provenance(
+                module_id,
+                lab["metrics"],
+                module_implementation,
+            ),
             "failure_sweep": lab["failure_sweep"],
             "failure_sweep_provenance": measurement_kind,
             "observations": lab.get("observations", []),

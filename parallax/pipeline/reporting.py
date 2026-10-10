@@ -18,6 +18,26 @@ def _format_metric(value: Any) -> str:
     return str(value)
 
 
+def _metric_label(result: dict[str, Any], family: str, name: str) -> str:
+    provenance = result.get("metric_provenance", {})
+    if isinstance(provenance, dict):
+        family_provenance = provenance.get(family, {})
+        if isinstance(family_provenance, dict):
+            label = family_provenance.get(name)
+            if isinstance(label, str):
+                return label
+    return "unlabelled"
+
+
+def _format_metric_with_label(
+    result: dict[str, Any],
+    family: str,
+    name: str,
+    value: Any,
+) -> str:
+    return f"{name}={_format_metric(value)} [{_metric_label(result, family, name)}]"
+
+
 def module_report(module: dict[str, Any], result: dict[str, Any]) -> str:
     banner = (
         "CONTROLLED FIXTURE — synthetic teaching measurements, not a third-party benchmark reproduction."
@@ -29,14 +49,18 @@ def module_report(module: dict[str, Any], result: dict[str, Any]) -> str:
         "",
         f"> **{banner}**",
         "",
-        f"Profile: `{result['profile']}`. Inference: `{module['inference']}`.",
+        f"Profile: `{result['profile']}`. Inference: `{module['inference']}`. "
+        f"Implementation: `{result['module_implementation']}`.",
         "",
     ]
     for family, heading in LABELS.items():
         lines.extend([f"## {heading}", ""])
         metrics = result["metrics"].get(family, {})
         if metrics:
-            lines.extend(f"- `{name}`: {_format_metric(value)}" for name, value in sorted(metrics.items()))
+            lines.extend(
+                f"- `{name}`: {_format_metric(value)} [{_metric_label(result, family, name)}]"
+                for name, value in sorted(metrics.items())
+            )
         else:
             lines.append("- Not applicable for this module.")
         lines.append("")
@@ -124,7 +148,29 @@ def aggregate_report(
 ) -> str:
     reference_results = reference_results or []
     kinds = sorted({result["measurement_kind"] for _, result in module_results})
-    lines = [f"# 3D reconstruction pathway: {run_id}", "", f"> Measurement provenance: {', '.join(kinds)}.", ""]
+    implementations = sorted(
+        {result.get("module_implementation", module.get("implementation", "unknown")) for module, result in module_results}
+    )
+    lines = [
+        f"# 3D reconstruction pathway: {run_id}",
+        "",
+        f"> Measurement provenance: {', '.join(kinds)}. Module implementations: {', '.join(implementations)}.",
+        "",
+        "## Module implementation status",
+        "",
+    ]
+    lines.extend(
+        f"- **{module['id']} {module['title']}**: "
+        f"implementation={result.get('module_implementation', module.get('implementation', 'unknown'))}"
+        for module, result in module_results
+    )
+    lines.append("")
+    lines.extend(
+        [
+            "## Metric status",
+            "",
+        ]
+    )
     for family, heading in LABELS.items():
         lines.extend([f"## {heading}", ""])
         found = False
@@ -133,8 +179,18 @@ def aggregate_report(
             if not metrics:
                 continue
             found = True
-            rendered = ", ".join(f"{key}={_format_metric(value)}" for key, value in sorted(metrics.items()))
-            lines.append(f"- **{module['id']} {module['title']}**: {rendered}")
+            rendered = ", ".join(
+                _format_metric_with_label(result, family, key, value)
+                for key, value in sorted(metrics.items())
+            )
+            implementation = result.get(
+                "module_implementation",
+                module.get("implementation", "unknown"),
+            )
+            lines.append(
+                f"- **{module['id']} {module['title']}** "
+                f"(implementation={implementation}): {rendered}"
+            )
         if not found:
             lines.append("- No applicable results in this run.")
         lines.append("")

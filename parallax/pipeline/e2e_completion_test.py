@@ -179,11 +179,20 @@ class EndToEndCompletionContractTest(unittest.TestCase):
         module = {
             "id": "05",
             "title": "Structure from motion and bundle adjustment",
+            "implementation": "synthetic",
         }
         module_result = {
+            "module_implementation": "synthetic",
             "measurement_kind": "controlled_fixture",
             "metrics": {
                 "geometry": {"ba_final_reprojection_rmse_px": 0.125},
+                "rendering": {},
+                "generative": {},
+            },
+            "metric_provenance": {
+                "geometry": {
+                    "ba_final_reprojection_rmse_px": "computed_synthetic",
+                },
                 "rendering": {},
                 "generative": {},
             },
@@ -229,6 +238,11 @@ class EndToEndCompletionContractTest(unittest.TestCase):
 
         self.assertIn("Maintained reference measurements", report)
         self.assertIn("colmap-sfm", report)
+        self.assertIn("implementation=synthetic", report)
+        self.assertIn(
+            "ba_final_reprojection_rmse_px=0.125 [computed_synthetic]",
+            report,
+        )
         self.assertIn("runtime_seconds=12.5", report)
         self.assertIn("peak_gpu_compute_memory_bytes=16384", report)
         self.assertIn("network_isolation=python_socket_guard", report)
@@ -266,6 +280,18 @@ class EndToEndCompletionContractTest(unittest.TestCase):
             self.assertEqual(set(manifest["module_results_sha256"]), {
                 f"{index:02d}/result.json" for index in range(1, 16)
             })
+            self.assertEqual(
+                manifest["module_implementations"],
+                {f"{index:02d}": "synthetic" for index in range(1, 16)},
+            )
+            self.assertEqual(
+                manifest["metric_provenance"]["06"]["geometry"]["accuracy_mm"],
+                "illustrative",
+            )
+            self.assertEqual(
+                manifest["metric_provenance"]["07"]["geometry"]["map_f_score"],
+                "illustrative",
+            )
             self.assertEqual(manifest["reference_adapters"], [])
             self.assertFalse(manifest["complete_reference_suite"])
             self.assertFalse(manifest["full_acceptance"])
