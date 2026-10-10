@@ -2,7 +2,7 @@ import copy,json,tempfile,unittest
 from pathlib import Path
 
 from evidence.source_snapshot import file_sha256
-from insula.launch_plan import BAZEL_LINUX_X86_64_SHA256, BAZEL_VERSION, build_plan, load_runtime_lock, plan_data
+from insula.launch_plan import BAZEL_LINUX_X86_64_SHA256, BAZEL_VERSION, build_plan, load_runtime_lock, plan_data, record_plan
 from insula.runtime_identity import rootfs_identity
 from insula.runtime_roots import CURRENT_CPU_ROOTFS_NAME
 
@@ -130,5 +130,61 @@ class ResourceCommandTests(unittest.TestCase):
             self.assertEqual(mounts["resource-output"]["mode"], "writable")
             self.assertEqual(mounts["resource-output"]["host_path"], str(resource_output.resolve()))
             self.assertFalse((root / "bad").exists())
+
+    def test_resource_wrapper_extends_plan_record_as_data(self):
+        from resources.command import wrap_resource_plan_record
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            rootfs = root / CURRENT_CPU_ROOTFS_NAME
+            write_rootfs(rootfs)
+            lock = rootfs.with_name(rootfs.name + ".lock.json")
+            write_cpu_lock(lock, rootfs)
+            runtime = load_runtime_lock(rootfs, lock)
+            native_code = root / "native-code"
+            native_output = root / "native-output"
+            resource_code = root / "resource-code"
+            resource_output = root / "resource-output"
+            for path in (
+                native_code,
+                native_output,
+                resource_code / "resources",
+                resource_code / "evidence",
+                resource_output,
+            ):
+                path.mkdir(parents=True)
+            (resource_code / "resources/execute_worker.py").write_text("wrapper\n")
+            (resource_code / "evidence/source_snapshot.py").write_text("helper\n")
+            plan = build_plan(
+                runtime,
+                code=native_code,
+                output=native_output,
+                command=["python", "/experiment/cohort/worker.py"],
+            )
+
+            wrapped, worker_argv = wrap_resource_plan_record(
+                record_plan(plan),
+                resource_code,
+                resource_output,
+            )
+            mounts = {mount["role"]: mount for mount in wrapped["mounts"]}
+
+            self.assertEqual(worker_argv, ["/experiment/cohort/worker.py"])
+            self.assertEqual(
+                wrapped["command"],
+                [
+                    "python",
+                    "/tmp/resource-layer/resources/execute_worker.py",
+                    "/tmp/resource-output",
+                    "/experiment/cohort/worker.py",
+                ],
+            )
+            self.assertRegex(mounts["resource-layer"]["digest"], r"^[0-9a-f]{64}$")
+            self.assertRegex(
+                mounts["resource-experiment-resources"]["digest"],
+                r"^[0-9a-f]{64}$",
+            )
+            self.assertEqual(mounts["resource-output"]["inside_path"], "/tmp/resource-output")
+            self.assertNotIn("host_path", mounts["resource-layer"])
 
 if __name__=='__main__':unittest.main()

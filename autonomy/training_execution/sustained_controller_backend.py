@@ -3,7 +3,7 @@ import hashlib,json,os,re,shutil,subprocess,sys,time
 from pathlib import Path
 P=Path(__file__).resolve().parents[1]
 from blob_store.core import BlobStore,blob_adapter_from_descriptor
-from insula.launch_plan import build_plan,gpu_driver_hashes_from_plan_record,gpu_driver_paths_from_plan_record,load_default_runtime_lock,read_receipt_mounts,record_plan,render_plan
+from insula.launch_plan import assert_plan_matches_record,assert_record_matches_rendered_command,build_plan,gpu_driver_hashes_from_plan_record,gpu_driver_paths_from_plan_record,load_default_runtime_lock,read_receipt_mounts,record_plan,render_plan
 from insula.runtime_roots import current_cpu_rootfs, current_gpu_rootfs, current_metrics_rootfs
 from retention.publication import audit as audit_publication
 from resources.checkpoint import _is_blob_publication
@@ -18,7 +18,7 @@ from training_execution.sustained_admission import admit_sample
 from training_execution.sustained_controller_sources import freeze_host_sources,validate_host_sources
 from retention.publication_sources import freeze_checkpoint_sources as freeze_checkpoint_publisher_sources,validate_checkpoint_sources as validate_checkpoint_publisher_sources
 from evidence.source_snapshot import source_snapshot_package_root
-from resources.command import inspect_legacy_receipt_command,rendered_command_matches_record
+from resources.command import inspect_legacy_receipt_command,wrap_resource_plan_record
 C=Path.home()/'.cache/waystone/waymo-perception';W=C/'scientific-processing'
 GPU_ROOT=current_gpu_rootfs(C);CPU_ROOT=current_cpu_rootfs(C);METRICS_ROOT=current_metrics_rootfs(C)
 GPU_INDEX=1
@@ -205,6 +205,9 @@ def _scientific_root_identity_digest(scientific_root,*identified_inputs):
 def _plan_mounts(record):
  return {mount['inside_path']:mount for mount in record.get('mounts',[])}
 
+def _plan_mounts_by_role(record):
+ return {mount['role']:mount for mount in record.get('mounts',[]) if isinstance(mount,dict) and isinstance(mount.get('role'),str)}
+
 def _legacy_command_data(command):
  _,argv,options=inspect_legacy_receipt_command(command)
  if (len(argv)>=4 and argv[0] in {'python','/opt/waymo/bin/python'} and
@@ -222,6 +225,26 @@ def _unwrapped_plan_worker_command(command):
      command[2]=='/tmp/resource-output'):
   return [command[0],*command[3:]]
  return command
+
+def _plan_is_resource_wrapped(command):
+ command=list(command)
+ return (len(command)>=4 and command[0] in {'python','/opt/waymo/bin/python'} and
+         command[1]=='/tmp/resource-layer/resources/execute_worker.py' and
+         command[2]=='/tmp/resource-output')
+
+def _require_plan_mount(mounts,inside,role,mode,kind):
+ mount=mounts.get(inside)
+ if (not isinstance(mount,dict) or mount.get('role')!=role or
+     mount.get('mode')!=mode or mount.get('kind')!=kind):
+  raise ValueError('native launch plan mount differs: '+inside)
+ return mount
+
+def _require_plan_role(mounts_by_role,role,inside,mode,kind):
+ mount=mounts_by_role.get(role)
+ if (not isinstance(mount,dict) or mount.get('inside_path')!=inside or
+     mount.get('mode')!=mode or mount.get('kind')!=kind):
+  raise ValueError('native launch plan mount differs: '+role)
+ return mount
 
 def _mount_host(mounts,inside):
  try:return mounts[inside]['host_path']
@@ -244,6 +267,13 @@ def _receipt_driver_hashes_by_name(driver_hashes):
 
 def _driver_sha(path):
  return sha(Path(path).resolve(strict=True))
+
+def _digest_for_plan_mount(plan,inside):
+ for mount in plan.get('mounts',[]):
+  if isinstance(mount,dict) and mount.get('inside_path')==inside:
+   digest=mount.get('digest')
+   return digest if isinstance(digest,str) else None
+ return None
 
 def write(path,value):
  path=Path(path);temporary=path.with_suffix(path.suffix+'.tmp')
@@ -317,27 +347,41 @@ class NativeBackend:
   metric=stage in {'score','metrics-audit'};gpu=stage in {'train','audit'};command=receipt['command'];entry='/tmp/verifier/'+workers[stage] if stage=='audit' else worker_entry(workers[stage]);stage_runtime=self.metric_runtime if metric else self.runtime if gpu else self.cpu_runtime
   stage_lock=getattr(self,'metric_runtime_lock' if metric else 'runtime_lock' if gpu else 'cpu_runtime_lock',None)
   expected_rootfs=stage_lock.rootfs if stage_lock is not None else METRICS_ROOT if metric else GPU_ROOT if gpu else CPU_ROOT
-  worker_argv,command_environment,command_mounts=_legacy_command_data(command)
-  if worker_argv!=['python',entry] or receipt['runtime_lock']!=stage_runtime or receipt['verifier_source_pins']!=(self.verifier_pins if stage=='audit' else {}):raise ValueError('native worker/runtime/verifier differs')
   if receipt.get('launch_plan') is not None:
    plan=receipt['launch_plan'];mounts=_plan_mounts(plan);environment=plan.get('environment',{})
-   if not rendered_command_matches_record(command,plan):raise ValueError('native launch command differs from recorded plan')
+   assert_record_matches_rendered_command(plan,command)
    plan_worker_command=_unwrapped_plan_worker_command(plan.get('command',[]))
    if stage_lock is not None and plan.get('runtime')!={'lock_sha256':stage_lock.lock_sha256,'form':stage_lock.form}:raise ValueError('native launch plan runtime differs')
-   if plan_worker_command!=['python',entry] or environment.get('SUREAL_SOURCE_SNAPSHOT_STORE')!='/tmp/source-snapshots' or environment.get('CUBLAS_WORKSPACE_CONFIG')!=':4096:8':raise ValueError('native launch plan worker/environment differs')
+   if plan_worker_command!=['python',entry] or receipt['runtime_lock']!=stage_runtime or receipt['verifier_source_pins']!=(self.verifier_pins if stage=='audit' else {}) or environment.get('SUREAL_SOURCE_SNAPSHOT_STORE')!='/tmp/source-snapshots' or environment.get('CUBLAS_WORKSPACE_CONFIG')!=':4096:8':raise ValueError('native launch plan worker/environment differs')
+   if isinstance(command,list) and isinstance(plan.get('command'),list) and command[-len(plan['command']):]!=plan['command']:raise ValueError('native launch command differs from recorded plan')
    if gpu:
     plan_driver_hashes=gpu_driver_hashes_from_plan_record(plan)
     if plan.get('gpu',{}).get('requested_index')!=self.gpu_index or not plan_driver_hashes:raise ValueError('native GPU launch plan differs')
     gpu_driver_paths_from_plan_record(plan)
    elif 'gpu' in plan or receipt['driver_hashes']!={} or _plan_driver_hashes_by_name(plan)!={}:raise ValueError('native non-GPU launch plan differs')
-   for inside in ['/experiment','/outputs','/tmp/inputs','/tmp/native','/tmp/physical','/tmp/boxes','/tmp/runtime-lock.json','/tmp/scientific','/tmp/source-snapshots']:
-    if inside not in mounts:raise ValueError('native launch plan mount missing: '+inside)
+   _require_plan_mount(mounts,'/','runtime','read_only','bind')
+   _require_plan_mount(mounts,'/experiment','code','read_only','bind')
+   _require_plan_mount(mounts,'/outputs','output','writable','bind')
+   for inside in ['/tmp/inputs','/tmp/native','/tmp/physical','/tmp/boxes','/tmp/runtime-lock.json','/tmp/scientific','/tmp/source-snapshots']:
+    _require_plan_mount(mounts,inside,'input:'+inside,'read_only','bind')
+   if mounts['/experiment'].get('digest')!=self.pins.get('source_snapshot_sha256'):raise ValueError('native launch plan code digest differs')
+   if _plan_is_resource_wrapped(plan.get('command',[])):
+    roles=_plan_mounts_by_role(plan)
+    _require_plan_role(roles,'resource-layer','/tmp/resource-layer','read_only','bind')
+    _require_plan_role(roles,'resource-experiment-resources','/experiment/resources','read_only','bind')
+    _require_plan_role(roles,'resource-experiment-evidence','/experiment/evidence','read_only','bind')
+    _require_plan_role(roles,'resource-output','/tmp/resource-output','writable','bind')
   elif gpu and not receipt['driver_hashes']:raise ValueError('native GPU driver hashes required')
-  if _mount_host(command_mounts,'/')!=str(expected_rootfs):raise ValueError('native rootfs mount differs')
-  if _mount_host(command_mounts,'/experiment')!=str(self.package) or _mount_host(command_mounts,'/outputs')!=receipt['output_directory']:raise ValueError('native code/output mount differs')
-  if _mount_host(command_mounts,'/tmp/source-snapshots')!=str(self.R/'source-snapshots') or command_environment.get('SUREAL_SOURCE_SNAPSHOT_STORE')!='/tmp/source-snapshots':raise ValueError('source snapshot store mount differs')
   inputs=self.R/(receipt['requested_stage']+'-input')
-  if receipt['input_hashes'].get(str(inputs/'manifest.json'))!=self.manifest_sha or _mount_host(command_mounts,'/tmp/inputs')!=str(inputs):raise ValueError('exact immutable stage manifest/input mounts required')
+  if receipt.get('launch_plan') is None:
+   worker_argv,command_environment,command_mounts=_legacy_command_data(command)
+   if worker_argv!=['python',entry] or receipt['runtime_lock']!=stage_runtime or receipt['verifier_source_pins']!=(self.verifier_pins if stage=='audit' else {}):raise ValueError('native worker/runtime/verifier differs')
+   if _mount_host(command_mounts,'/')!=str(expected_rootfs):raise ValueError('native rootfs mount differs')
+   if _mount_host(command_mounts,'/experiment')!=str(self.package) or _mount_host(command_mounts,'/outputs')!=receipt['output_directory']:raise ValueError('native code/output mount differs')
+   if _mount_host(command_mounts,'/tmp/source-snapshots')!=str(self.R/'source-snapshots') or command_environment.get('SUREAL_SOURCE_SNAPSHOT_STORE')!='/tmp/source-snapshots':raise ValueError('source snapshot store mount differs')
+   if receipt['input_hashes'].get(str(inputs/'manifest.json'))!=self.manifest_sha or _mount_host(command_mounts,'/tmp/inputs')!=str(inputs):raise ValueError('exact immutable stage manifest/input mounts required')
+  elif receipt['input_hashes'].get(str(inputs/'manifest.json'))!=self.manifest_sha:
+   raise ValueError('exact immutable stage manifest/input mounts required')
   evidence_groups=['input_hashes','verifier_source_pins','artifacts']
   if receipt.get('launch_plan') is None:evidence_groups.append('driver_hashes')
   for group in evidence_groups:

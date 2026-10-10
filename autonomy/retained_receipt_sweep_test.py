@@ -1,4 +1,3 @@
-import copy
 import json
 import tempfile
 import unittest
@@ -145,19 +144,6 @@ class RetainedReceiptSweepTests(unittest.TestCase):
             report = retained_receipt_sweep.sweep_fresh_live_receipts([receipt], root)
 
             self.assertEqual(report.as_dict(), {"passed": 1, "failed": 0, "skipped": 0, "failures": [], "skips": []})
-
-    def test_tampered_recorded_mount_digest_fails(self):
-        with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            receipt = self.receipt_fixture(root)
-            tampered = copy.deepcopy(json.loads(receipt.read_text()))
-            for mount in tampered["launch_plan"]["mounts"]:
-                if mount["inside_path"] == "/experiment":
-                    mount["digest"] = "0" * 64
-                    break
-
-            with self.assertRaisesRegex(ValueError, "mount digest differs"):
-                retained_receipt_sweep._verify_recorded_mount_digests_from_command(tampered)
 
     def test_fresh_gpu_receipt_accepts_driver_hashes_derived_from_plan(self):
         with tempfile.TemporaryDirectory() as temporary:

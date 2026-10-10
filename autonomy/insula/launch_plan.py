@@ -442,6 +442,60 @@ def verify_gpu_driver_hashes_from_plan_record(record: Mapping[str, object]) -> d
     return gpu_driver_hashes_from_plan_record(record)
 
 
+def assert_plan_matches_record(
+    expected: LaunchPlan | Mapping[str, object],
+    record: Mapping[str, object],
+    *,
+    rendered_command: Iterable[object] | None = None,
+) -> None:
+    """Raise if a launch-plan record differs from the expected plan data."""
+    expected_plan = expected if isinstance(expected, LaunchPlan) else None
+    expected_record = record_plan(expected) if expected_plan is not None else _extract_record_or_fail(expected, "expected")
+    actual_record = _extract_record_or_fail(record, "actual")
+    _compare_record_value(expected_record, actual_record, "runtime")
+    _compare_record_mounts(expected_record, actual_record)
+    _compare_record_devices(expected_record, actual_record)
+    for field in (
+        "environment",
+        "working_directory",
+        "command",
+        "unshare_flags",
+        "clear_environment",
+        "gpu",
+    ):
+        _compare_record_value(expected_record, actual_record, field)
+    if rendered_command is not None:
+        if expected_plan is None:
+            raise ValueError("launch plan rendered command comparison requires an expected plan")
+        expected_command = render_plan(expected_plan)
+        actual_command = [str(item) for item in rendered_command]
+        if actual_command != expected_command:
+            raise ValueError("launch plan rendered command differs")
+
+
+def assert_record_matches_rendered_command(
+    record: Mapping[str, object],
+    command: Iterable[object],
+) -> None:
+    """Raise if a rendered command differs from a launch-plan record."""
+    plan_record = _extract_record_or_fail(record, "expected")
+    expected = _normalize_rendered_environment_order(_render_record_command_pattern(plan_record))
+    actual = _normalize_rendered_environment_order([str(item) for item in command])
+    if len(actual) != len(expected):
+        raise ValueError("launch plan command differs")
+    for expected_item, actual_item in zip(expected, actual):
+        if expected_item is None:
+            if not actual_item:
+                raise ValueError("launch plan command differs")
+        elif expected_item != actual_item:
+            raise ValueError("launch plan command differs")
+
+
+def mount_content_digest(path: Path) -> str:
+    """Return the digest a read-only bind mount records for a file or directory."""
+    return _content_digest(Path(path))
+
+
 def read_receipt_mounts(
     receipt: Mapping[str, object],
     *,
@@ -550,6 +604,214 @@ def _extract_launch_plan_record(receipt: Mapping[str, object]) -> Mapping[str, o
     if {"runtime", "mounts", "environment", "command"} <= set(receipt):
         return receipt
     return None
+
+
+def _extract_record_or_fail(value: Mapping[str, object], label: str) -> Mapping[str, object]:
+    record = _extract_launch_plan_record(value)
+    if record is None:
+        raise ValueError(f"{label} launch plan record required")
+    return record
+
+
+def _compare_record_value(
+    expected: Mapping[str, object],
+    actual: Mapping[str, object],
+    field: str,
+) -> None:
+    if expected.get(field) != actual.get(field):
+        raise ValueError(f"launch plan {field} differs")
+
+
+def _record_items_by_role(
+    record: Mapping[str, object],
+    field: str,
+) -> dict[str, Mapping[str, object]]:
+    items = record.get(field, [])
+    if not isinstance(items, list):
+        raise ValueError(f"launch plan {field} required")
+    by_role: dict[str, Mapping[str, object]] = {}
+    for item in items:
+        if not isinstance(item, Mapping):
+            raise ValueError(f"launch plan {field} record required")
+        role = item.get("role")
+        if not isinstance(role, str) or not role:
+            raise ValueError(f"launch plan {field} role required")
+        if role in by_role:
+            raise ValueError(f"launch plan {field} role duplicate: {role}")
+        by_role[role] = item
+    return by_role
+
+
+def _compare_record_mounts(expected: Mapping[str, object], actual: Mapping[str, object]) -> None:
+    expected_by_role = _record_items_by_role(expected, "mounts")
+    actual_by_role = _record_items_by_role(actual, "mounts")
+    _compare_role_sets(expected_by_role, actual_by_role, "mount")
+    for role, expected_mount in expected_by_role.items():
+        actual_mount = actual_by_role[role]
+        for field in ("kind", "inside_path", "mode", "digest", "symlink_target", "phase"):
+            if expected_mount.get(field) != actual_mount.get(field):
+                raise ValueError(f"launch plan mount {field} differs: {role}")
+
+
+def _compare_record_devices(expected: Mapping[str, object], actual: Mapping[str, object]) -> None:
+    expected_by_role = _record_items_by_role(expected, "devices")
+    actual_by_role = _record_items_by_role(actual, "devices")
+    _compare_role_sets(expected_by_role, actual_by_role, "device")
+    for role, expected_device in expected_by_role.items():
+        actual_device = actual_by_role[role]
+        if expected_device.get("inside_path") != actual_device.get("inside_path"):
+            raise ValueError(f"launch plan device inside_path differs: {role}")
+
+
+def _compare_role_sets(
+    expected: Mapping[str, Mapping[str, object]],
+    actual: Mapping[str, Mapping[str, object]],
+    label: str,
+) -> None:
+    missing = sorted(set(expected) - set(actual))
+    unexpected = sorted(set(actual) - set(expected))
+    if missing or unexpected:
+        pieces = []
+        if missing:
+            pieces.append("missing " + ",".join(missing))
+        if unexpected:
+            pieces.append("unexpected " + ",".join(unexpected))
+        raise ValueError(f"launch plan {label} role differs: {'; '.join(pieces)}")
+
+
+def _render_record_command_pattern(record: Mapping[str, object]) -> list[str | None]:
+    plan = LaunchPlan(
+        runtime=RuntimeLock(
+            rootfs=Path("/__sureal_record_host__/runtime"),
+            lock_path=None,
+            data={},
+            form=str(record.get("runtime", {}).get("form", "")),
+            lock_sha256=str(record.get("runtime", {}).get("lock_sha256", "")),
+        ),
+        mounts=tuple(_record_mount_pattern(record)),
+        environment=tuple(_record_environment_pattern(record)),
+        working_directory=_record_text(record, "working_directory"),
+        command=tuple(_record_string_list(record, "command")),
+        unshare_flags=tuple(_record_string_list(record, "unshare_flags")),
+        clear_environment=record.get("clear_environment") is True,
+        gpu=_record_gpu_request(record),
+    )
+    rendered = render_plan(plan)
+    return [None if item.startswith("/__sureal_record_host__/") else item for item in rendered]
+
+
+def _normalize_rendered_environment_order(command: list[str | None]) -> list[str | None]:
+    result = list(command)
+    try:
+        chdir = result.index("--chdir")
+    except ValueError:
+        return result
+    index = 0
+    while index < chdir:
+        if result[index] != "--setenv":
+            index += 1
+            continue
+        start = index
+        triples = []
+        while index < chdir and result[index] == "--setenv" and index + 2 < chdir:
+            triples.append(tuple(result[index : index + 3]))
+            index += 3
+        if not triples:
+            index += 1
+            continue
+        result[start:index] = [
+            item
+            for triple in sorted(triples, key=lambda item: tuple("" if value is None else value for value in item))
+            for item in triple
+        ]
+    return result
+
+
+def _record_mount_pattern(record: Mapping[str, object]) -> list[Mount]:
+    result = []
+    for mount in record.get("mounts", []):
+        if not isinstance(mount, Mapping):
+            raise ValueError("launch plan mount record required")
+        role = _record_text(mount, "role")
+        kind = _record_text(mount, "kind")
+        inside = _record_text(mount, "inside_path")
+        mode = _record_text(mount, "mode")
+        phase = str(mount.get("phase", "before_devices"))
+        symlink_target = mount.get("symlink_target")
+        result.append(
+            Mount(
+                role,
+                kind,
+                inside,
+                mode,
+                None if kind in {"tmpfs", "symlink"} else Path("/__sureal_record_host__") / role.replace("/", "_"),
+                phase,
+                symlink_target=str(symlink_target) if symlink_target is not None else None,
+            )
+        )
+    for device in record.get("devices", []):
+        if not isinstance(device, Mapping):
+            raise ValueError("launch plan device record required")
+        role = _record_text(device, "role")
+        inside = _record_text(device, "inside_path")
+        result.append(
+            Mount(
+                role,
+                "dev-bind",
+                inside,
+                "writable",
+                Path("/__sureal_record_host__") / role.replace("/", "_"),
+                "after_devices",
+            )
+        )
+    gpu = record.get("gpu")
+    if isinstance(gpu, Mapping) and type(gpu.get("requested_index")) is int:
+        index = gpu["requested_index"]
+        for inside in (f"/dev/nvidia{index}", "/dev/nvidiactl", "/dev/nvidia-uvm"):
+            result.append(
+                Mount(
+                    f"gpu-device:{inside}",
+                    "dev-bind",
+                    inside,
+                    "writable",
+                    Path("/__sureal_record_host__") / inside.removeprefix("/").replace("/", "_"),
+                    "after_devices",
+                )
+            )
+    return result
+
+
+def _record_environment_pattern(record: Mapping[str, object]) -> list[tuple[str, str, str]]:
+    environment = record.get("environment")
+    if not isinstance(environment, Mapping):
+        raise ValueError("launch plan environment required")
+    return [("--setenv", str(name), str(value)) for name, value in environment.items()]
+
+
+def _record_string_list(record: Mapping[str, object], field: str) -> list[str]:
+    values = record.get(field)
+    if not isinstance(values, list) or any(not isinstance(item, str) for item in values):
+        raise ValueError(f"launch plan {field} required")
+    return list(values)
+
+
+def _record_text(record: Mapping[str, object], field: str) -> str:
+    value = record.get(field)
+    if not isinstance(value, str) or not value:
+        raise ValueError(f"launch plan {field} required")
+    return value
+
+
+def _record_gpu_request(record: Mapping[str, object]) -> GPURequest | None:
+    gpu = record.get("gpu")
+    if not isinstance(gpu, Mapping):
+        return None
+    requested = gpu.get("requested_index")
+    uuid = gpu.get("device_uuid")
+    minor = gpu.get("device_minor", requested)
+    if type(requested) is not int or type(minor) is not int or not isinstance(uuid, str):
+        raise ValueError("launch plan gpu record required")
+    return GPURequest(requested, minor, uuid)
 
 
 def _read_plan_record_mounts(record: Mapping[str, object]) -> dict[str, dict[str, object]]:
@@ -758,21 +1020,6 @@ def _plan_device_insertion_index(command: list[str], separator: int) -> int:
         if command[index : index + 2] == ["--proc", "/proc"]:
             return index
     raise PlanError("rendered launch plan device mounts required")
-
-
-def _render_ordered_record_mounts(mounts: Iterable[Mapping[str, object]]) -> list[Mapping[str, object]]:
-    """Recorded mounts in render_plan order."""
-
-    def group(mount: Mapping[str, object]) -> int:
-        if mount.get("phase") == "after_devices" and mount.get("role") != "tmp":
-            return 3
-        if mount.get("role") == "tmp":
-            return 1
-        if str(mount.get("inside_path", "")).startswith("/tmp/"):
-            return 2
-        return 0
-
-    return sorted(mounts, key=group)
 
 
 def _runtime_mounts(runtime: RuntimeLock, split_runtime_root: bool) -> list[Mount]:
@@ -1315,6 +1562,9 @@ __all__ = [
     "gpu_driver_hashes_from_plan_record",
     "gpu_driver_paths_from_plan_record",
     "verify_gpu_driver_hashes_from_plan_record",
+    "assert_plan_matches_record",
+    "assert_record_matches_rendered_command",
+    "mount_content_digest",
     "plan_data",
     "render_plan",
     "legacy_receipt_command_argv",

@@ -8,12 +8,12 @@ import shutil
 from evidence.source_snapshot import is_regular_file
 from insula.launch_plan import (
     LaunchPlan,
-    legacy_receipt_command_argv,
+    assert_plan_matches_record,
     read_receipt_mounts,
     record_plan,
     render_plan,
 )
-from resources.command import recorded_resource_mounts_match,rendered_command_matches_record,wrapped_command,wrapped_rendered_plan_command,wrap_command,wrap_plan
+from resources.command import wrap_resource_plan_record,wrapped_command,wrap_command,wrap_plan
 from resources.scoped_stage import run_scoped
 from resources.sources import sha,validate_sources
 from resources.stage_accounting import admit_worker
@@ -39,13 +39,25 @@ def require_separate(native_output,*resource_paths):
         raise ValueError('resource closure must be separate from native payload')
 
 
-def validate_proof(proof,command,current_sources,source_pins,native_output,cap_bytes,timeout):
+def validate_proof(
+    proof,
+    command,
+    current_sources,
+    source_pins,
+    native_output,
+    cap_bytes,
+    timeout,
+    *,
+    expected_original_plan=None,
+):
     code=validate_sources(current_sources,source_pins);native_output=Path(native_output)
+    expected_plan=command if isinstance(command,LaunchPlan) else None
+    command_value=render_plan(command) if expected_plan is not None else command
     try:
         if (type(timeout) not in (int,float) or not math.isfinite(timeout) or timeout<=0 or
             type(cap_bytes) is not int or cap_bytes<=0 or
             type(proof['schema_version']) is not int or proof['schema_version']!=1 or
-            proof['admitted'] is not True or proof['command']!=command or
+            proof['admitted'] is not True or proof['command']!=command_value or
             proof['source_pins']!=source_pins or proof['native_output_directory']!=str(native_output) or
             type(proof['cap_bytes']) is not int or proof['cap_bytes']!=cap_bytes or
             type(proof['timeout_seconds']) not in (int,float) or proof['timeout_seconds']!=timeout or
@@ -53,16 +65,25 @@ def validate_proof(proof,command,current_sources,source_pins,native_output,cap_b
             raise ValueError('complete exact resource stage identity required')
         worker_path=Path(proof['artifacts']['worker_resource']['path']);worker_output=worker_path.parent
         require_separate(native_output,worker_output.parent,code,current_sources)
-        output_mount=read_receipt_mounts({'command':command},include_digests=False,require_python_worker=True).get('/outputs')
         if 'launch_plan' in proof:
-            expected,worker_argv=_validate_plan_wrapped_proof(proof,code,worker_output)
-            command_matches=command==expected
+            worker_argv=_validate_plan_wrapped_proof(
+                proof,
+                code,
+                worker_output,
+                expected_plan=expected_plan,
+                expected_original_plan=expected_original_plan,
+            )
+            command_matches=True
+            output_mount=read_receipt_mounts({'launch_plan':proof['launch_plan']},include_digests=False,require_python_worker=True).get('/outputs')
+            expected_output_mount={'inside_path':'/outputs','mode':'writable','kind':'bind','role':'output'}
         else:
+            output_mount=read_receipt_mounts({'command':command_value},include_digests=False,require_python_worker=True).get('/outputs')
             expected,worker_argv=wrapped_command(proof['original_command'],code,worker_output)
-            command_matches=command==expected
+            command_matches=command_value==expected
+            expected_output_mount={'inside_path':'/outputs','mode':'writable','kind':'bind',
+                                   'role':'output','host_path':str(native_output)}
         if (proof['worker_argv']!=worker_argv or not command_matches or
-            output_mount!={'inside_path':'/outputs','mode':'writable','kind':'bind',
-                           'role':'output','host_path':str(native_output)} or
+            output_mount!=expected_output_mount or
             worker_path.name!='worker-resource.json' or worker_output.name!='worker' or
             proof['artifacts']['execution_log']['native_path']!=str(native_output/'live.log') or
             proof['artifacts']['execution_log']['path']!=str(worker_output.parent/'execution.log')):
@@ -80,7 +101,7 @@ def validate_proof(proof,command,current_sources,source_pins,native_output,cap_b
         if native_log.exists() and (not is_regular_file(native_log) or sha(native_log)!=proof['artifacts']['execution_log']['sha256']):
             raise ValueError('native execution log differs from retained resource snapshot')
         admitted=admit_worker(proof['host_measurement'],proof['worker_measurement'],
-                              command,proof['worker_argv'],cap_bytes)
+                              command_value,proof['worker_argv'],cap_bytes)
         if proof['resource_admission']!=admitted:
             raise ValueError('stored resource admission differs from actual measurements')
         if (proof['host_measurement']['elapsed_seconds']>timeout or
@@ -91,19 +112,32 @@ def validate_proof(proof,command,current_sources,source_pins,native_output,cap_b
     return admitted
 
 
-def _validate_plan_wrapped_proof(proof,code,worker_output):
+def _validate_plan_wrapped_proof(
+    proof,
+    code,
+    worker_output,
+    *,
+    expected_plan=None,
+    expected_original_plan=None,
+):
     try:
-        original_argv=legacy_receipt_command_argv(proof['original_command'])
-        expected,worker_argv=wrapped_rendered_plan_command(proof['original_command'],code,worker_output)
-        wrapped_argv=legacy_receipt_command_argv(expected)
-        if (proof['original_launch_plan']['command']!=original_argv or
-            not rendered_command_matches_record(proof['original_command'],proof['original_launch_plan']) or
-            proof['launch_plan']['command']!=wrapped_argv or
-            not rendered_command_matches_record(expected,proof['launch_plan']) or
-            not recorded_resource_mounts_match(proof['launch_plan']['mounts'])):
-            raise ValueError('actual wrapper, original worker, native output and resource mounts required')
-        return expected,worker_argv
-    except (KeyError,TypeError,ValueError) as error:
+        if expected_original_plan is not None:
+            assert_plan_matches_record(
+                expected_original_plan,
+                proof['original_launch_plan'],
+                rendered_command=proof['original_command'],
+            )
+        expected_record,worker_argv=wrap_resource_plan_record(
+            proof['original_launch_plan'],
+            code,
+            worker_output,
+        )
+        if expected_plan is not None:
+            assert_plan_matches_record(expected_plan,proof['launch_plan'],rendered_command=proof['command'])
+        else:
+            assert_plan_matches_record(expected_record,proof['launch_plan'])
+        return worker_argv
+    except (KeyError,TypeError) as error:
         raise ValueError('actual wrapper, original worker, native output and resource mounts required') from error
 
 
@@ -157,7 +191,8 @@ def run_stage(command,cwd,env,stream,timeout,*,code,current_sources,source_pins,
         proof['artifacts']['execution_log']['native_path']=str(native_log)
         proof['resource_admission']=admit_worker(host,proof['worker_measurement'],execution_command,proof['worker_argv'],cap_bytes)
         proof['admitted']=True
-        admitted=validate_proof(proof,execution_command,current_sources,source_pins,native_output,cap_bytes,timeout)
+        validation_command=wrapped if original_plan is not None else execution_command
+        admitted=validate_proof(proof,validation_command,current_sources,source_pins,native_output,cap_bytes,timeout,expected_original_plan=original_plan)
         proof['resource_admission']=admitted
         write_new(evidence/'resource-admitted.json',proof)
     except BaseException as error:
