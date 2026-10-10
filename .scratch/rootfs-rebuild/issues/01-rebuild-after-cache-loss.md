@@ -9,12 +9,12 @@ sweep gates against the rebuilt locks.
 **Status:** ready-for-human
 
 - [x] Inventory the active rootfs names, recipes, lock forms and dependents before building.
-- [ ] Build and lock the CPU rootfs.
-- [ ] Build and lock the GPU rootfs.
-- [ ] Build and lock the metrics, motion metrics and motion CLI image-form rootfs.
-- [ ] Build and lock the Parallax curriculum rootfs.
-- [ ] Update active rootfs pins only after the rebuilt locks pass `insula.launch_plan.load_runtime_lock`.
-- [ ] Run the CPU, GPU, repo, Parallax, live-set and retained-sweep gates.
+- [x] Build and lock the CPU rootfs.
+- [x] Build and lock the GPU rootfs.
+- [x] Build and lock the metrics, motion metrics and motion CLI image-form rootfs.
+- [x] Build and lock the Parallax curriculum rootfs.
+- [x] Update active rootfs pins only after the rebuilt locks pass `insula.launch_plan.load_runtime_lock`.
+- [ ] Run the CPU, GPU, repo, Parallax, live-set and retained-sweep gates. (CPU, GPU, repo and Parallax pass; live-set and retained-sweep not yet run.)
 - [ ] Restore or report missing Parallax data.
 
 ## Comments
@@ -36,14 +36,14 @@ rebuilding Sureal's Insula root filesystems, but this worker run also says
 
 Live cache evidence:
 
-- `/data02/home/philip.yang/.cache/waystone` is missing.
+- `~/.cache/waystone` is missing.
 - `/data02` has 422G free, so the stop is not the 200G disk-floor rule.
 - `./bazelw --emit-plan test //:repo_gate` exits before Bazel launch with
   `runtime lock missing:
-  /data02/home/philip.yang/.cache/waystone/waymo-perception/insula/rootfs-v5-t29-20261008T230657Z.lock.json`.
+  ~/.cache/waystone/waymo-perception/insula/rootfs-v5-t29-20261008T230657Z.lock.json`.
 
 Inventory was recorded under
-`/data02/home/philip.yang/devx/tmp/sureal-refactor-20261007/rootfs-rebuild/rebuild-20261010T080000Z/inventory.md`.
+`~/devx/tmp/sureal-refactor-20261007/rootfs-rebuild/rebuild-20261010T080000Z/inventory.md`.
 No rootfs, runtime lock, retained receipt, frozen code, active pin, cache or
 HDFS state was modified.
 
@@ -76,3 +76,20 @@ The Docker images behind the lost rootfs still exist locally:
 - `sureal-waymo-gpu:bazel-9.2.0-rootfs-v7`.
 
 Re-exporting from them may restore the CPU and GPU rootfs without a full rebuild. Their content and recipe digests must still be checked against the retained locks before reuse. Left for the user.
+
+### 2026-10-10 coordinator: restored from surviving images
+
+With the user's go-ahead, each active rootfs was re-exported (`docker create` + `docker export`) from its surviving local image. A lock was written only when the exported tree's `rootfs_identity` equalled the `rootfs_sha256` recorded for that rootfs in retained receipts or build logs. All six matched, and each passes `load_runtime_lock`:
+
+| Rootfs | Image | Lock form | Lock sha256 |
+| --- | --- | --- | --- |
+| CPU `rootfs-v5-t29-20261008T230657Z` | `e5c598e420ba` | recipe-digest | `318e827c…` (matches retained receipts) |
+| GPU `gpu-rootfs-v7` | `da548988f6d6` | recipe-digest | `c68df281…` (matches the v7 build record) |
+| `metrics-rootfs` | `c0018cf57e48` | image | `bfcf5f5e…` |
+| `motion-metrics-rootfs` | `84fb83dd874d` | image | `ede87353…` |
+| `motion-cli-rootfs-v2` | `49d07c49427a` (`sureal-waymo-motion-cli:expanded`) | image | `e165e1a1…` |
+| Parallax `rootfs-v2` | `69773e28b352` | recipe-digest | `598d5cab…` |
+
+No rebuild was needed and `runtime_roots.py` is unchanged. Gates on `main`: `//autonomy/...` 189/189, `//parallax/...` 17/17, CUDA `//autonomy/...` on GPU 1 30/30, and `//:repo_gate` 17/17 after this ticket's host paths were replaced with `~` paths.
+
+Still open: the live-set and retained-sweep gates, and the Parallax data lost with the cache.
