@@ -10,7 +10,7 @@ CURRENT_GPU_ROOTFS_NAME = "gpu-rootfs-v7"
 CURRENT_METRICS_ROOTFS_NAME = "metrics-rootfs"
 CURRENT_MOTION_METRICS_ROOTFS_NAME = "motion-metrics-rootfs"
 CURRENT_MOTION_CLI_ROOTFS_NAME = "motion-cli-rootfs-v2"
-CURRENT_CURRICULUM_ROOTFS_NAME = "rootfs-v2"
+CURRENT_CURRICULUM_ROOTFS_NAME = "rootfs-v3"
 
 
 def waymo_cache() -> Path:

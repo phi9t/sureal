@@ -15,6 +15,7 @@ from insula.launch_plan import BAZEL_LINUX_X86_64_SHA256, BAZEL_VERSION
 from insula.bazel_launcher import LIVE_GATE_BWRAP, LIVE_GATE_CACHE_MOUNT
 from insula.runtime_identity import rootfs_identity
 from insula.runtime_roots import (
+    CURRENT_CURRICULUM_ROOTFS_NAME,
     CURRENT_GPU_ROOTFS_NAME,
     current_cpu_rootfs,
     current_curriculum_rootfs,
@@ -55,7 +56,7 @@ def write_lock(lock, root, rootfs_sha256=None):
             "dockerfile_sha256": file_sha256(AUTONOMY / "insula/Dockerfile.gpu-bazel-rootfs-v6"),
             "requirements_sha256": file_sha256(AUTONOMY / "insula/gpu-requirements.lock"),
         }
-    elif root.name == "rootfs-v2" and "3d-pathway" in root.as_posix():
+    elif root.name == CURRENT_CURRICULUM_ROOTFS_NAME and "3d-pathway" in root.as_posix():
         recipe = {
             "dockerfile_sha256": file_sha256(REPO / "parallax/insulas/bazel-rootfs.Dockerfile"),
             "requirements_sha256": file_sha256(REPO / "parallax/insulas/bazel-requirements.lock"),

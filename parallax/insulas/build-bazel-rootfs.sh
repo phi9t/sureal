@@ -5,9 +5,9 @@ HERE="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 BAZEL_VERSION=9.2.0
 BAZEL_LINUX_X86_64_SHA256=7668a95db1250f12c40407251e4e203b4ec8bf39bc495d2f485b2d8c99048694
 CACHE_ROOT="${SURFLO_PATHWAY_BAZEL_ROOTFS_CACHE:-${HOME}/.cache/waystone/3d-pathway/insula}"
-PREVIOUS="${SURFLO_PATHWAY_PREVIOUS_BAZEL_ROOTFS:-${CACHE_ROOT}/rootfs-v1}"
-DEST="${SURFLO_PATHWAY_BAZEL_ROOTFS:-${CACHE_ROOT}/rootfs-v2}"
-IMAGE_TAG="${SURFLO_PATHWAY_BAZEL_IMAGE_TAG:-sureal-3d-pathway-cpu:bazel-${BAZEL_VERSION}-rootfs-v2}"
+PREVIOUS="${SURFLO_PATHWAY_PREVIOUS_BAZEL_ROOTFS:-${CACHE_ROOT}/rootfs-v2}"
+DEST="${SURFLO_PATHWAY_BAZEL_ROOTFS:-${CACHE_ROOT}/rootfs-v3}"
+IMAGE_TAG="${SURFLO_PATHWAY_BAZEL_IMAGE_TAG:-sureal-3d-pathway-cpu:bazel-${BAZEL_VERSION}-rootfs-v3}"
 
 die() {
     printf 'error: %s\n' "$*" >&2
@@ -18,7 +18,7 @@ rootfs_digest() {
     PYTHONPATH="${HERE}/../../autonomy" python3 - "$1" <<'PY'
 import sys
 from pathlib import Path
-from pipeline.runtime_identity import rootfs_identity
+from insula.runtime_identity import rootfs_identity
 
 print(rootfs_identity(Path(sys.argv[1])))
 PY
@@ -47,6 +47,7 @@ validate_rootfs() {
     local rootfs="$1"
     local bazel_version
     local numpy_version
+    local scipy_version
     local git_version
 
     command -v bwrap >/dev/null 2>&1 || die "bwrap is required to validate rootfs contents"
@@ -56,6 +57,9 @@ validate_rootfs() {
     numpy_version="$(run_in_rootfs "$rootfs" python -c 'import numpy; print(numpy.__version__)')"
     [[ "$numpy_version" == "1.26.4" ]] \
         || die "unexpected NumPy version in new rootfs: ${numpy_version}"
+    scipy_version="$(run_in_rootfs "$rootfs" python -c 'import scipy; print(scipy.__version__)')"
+    [[ "$scipy_version" == "1.14.1" ]] \
+        || die "unexpected SciPy version in new rootfs: ${scipy_version}"
     git_version="$(run_in_rootfs "$rootfs" git --version)"
     [[ "$git_version" == git\ version\ * ]] \
         || die "git is unavailable in new rootfs: ${git_version}"
@@ -100,7 +104,7 @@ import json
 import sys
 from pathlib import Path
 
-from pipeline.runtime_identity import rootfs_identity
+from insula.runtime_identity import rootfs_identity
 
 root, here, image, bazel_version, bazel_sha256 = (
     Path(sys.argv[1]),
@@ -120,6 +124,7 @@ lock = {
     "bazel_linux_x86_64_sha256": bazel_sha256,
     "python_version": "3.10",
     "numpy_version": "1.26.4",
+    "scipy_version": "1.14.1",
     "required_tools": ["ar", "bazel", "g++", "git", "python"],
 }
 (root.parent / (root.name + ".lock.json")).write_text(json.dumps(lock, indent=2) + "\n")

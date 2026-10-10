@@ -8,7 +8,7 @@ RUN apt-get update \
 RUN python -m pip install --no-cache-dir --require-hashes -r /opt/bazel-requirements.lock
 RUN python -c "import hashlib,pathlib,urllib.request; version='${BAZEL_VERSION}'; expected='${BAZEL_LINUX_X86_64_SHA256}'; url=f'https://github.com/bazelbuild/bazel/releases/download/{version}/bazel-{version}-linux-x86_64'; data=urllib.request.urlopen(url).read(); actual=hashlib.sha256(data).hexdigest(); assert actual == expected, f'{url} sha256 {actual} != {expected}'; path=pathlib.Path('/usr/local/bin/bazel'); path.write_bytes(data); path.chmod(0o755)"
 RUN bazel --version \
-    && python -c "import numpy; assert numpy.__version__ == '1.26.4', numpy.__version__" \
+    && python -c "import numpy, scipy; assert numpy.__version__ == '1.26.4', numpy.__version__; assert scipy.__version__ == '1.14.1', scipy.__version__" \
     && git --version \
     && g++ --version \
     && ar --version
