@@ -14,14 +14,13 @@ ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = ROOT.parent
 DOC = REPO_ROOT / "docs" / "3d-reconstruction-pathway.md"
 CANONICAL_DOC = REPO_ROOT / "docs" / "coherent-scene-hypotheses.md"
-sys.path.insert(0, str(ROOT / "pipeline"))
 
 
 class SurveyContractTest(unittest.TestCase):
     def test_every_module_has_reproduction_structure_sources_and_command(self) -> None:
         text = DOC.read_text()
-        curriculum = json.loads((ROOT / "curriculum.json").read_text())
-        source_map = {item["id"]: item for item in json.loads((ROOT / "sources.json").read_text())["sources"]}
+        curriculum = json.loads((ROOT / "curriculum" / "curriculum.json").read_text())
+        source_map = {item["id"]: item for item in json.loads((ROOT / "assets" / "sources.json").read_text())["sources"]}
         headings = [(text.index(f"## {int(module['id'])}. {module['title']}"), module) for module in curriculum["modules"]]
         self.assertEqual([module["id"] for _, module in headings], [f"{index:02d}" for index in range(1, 16)])
         required = (
@@ -139,8 +138,8 @@ class AuditContractTest(unittest.TestCase):
 
     def test_every_material_external_link_is_registered(self) -> None:
         survey = DOC.read_text(encoding="utf-8")
-        sources = json.loads((ROOT / "sources.json").read_text())["sources"]
-        assets = json.loads((ROOT / "assets.lock.json").read_text())["assets"]
+        sources = json.loads((ROOT / "assets" / "sources.json").read_text())["sources"]
+        assets = json.loads((ROOT / "assets" / "assets.lock.json").read_text())["assets"]
         registered = {source["primary_url"] for source in sources}
         registered.update(
             asset["source"]
@@ -152,9 +151,9 @@ class AuditContractTest(unittest.TestCase):
         self.assertEqual(linked - registered, set())
 
     def test_cutoff_year_sources_have_day_level_availability_dates_before_cutoff(self) -> None:
-        curriculum = json.loads((ROOT / "curriculum.json").read_text())
+        curriculum = json.loads((ROOT / "curriculum" / "curriculum.json").read_text())
         cutoff = date.fromisoformat(curriculum["cutoff"])
-        sources = json.loads((ROOT / "sources.json").read_text())["sources"]
+        sources = json.loads((ROOT / "assets" / "sources.json").read_text())["sources"]
         cutoff_year_sources = [source for source in sources if source["year"] == cutoff.year]
         self.assertGreater(len(cutoff_year_sources), 0)
         for source in cutoff_year_sources:

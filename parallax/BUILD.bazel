@@ -3,17 +3,79 @@ load("@rules_python//python:defs.bzl", "py_library", "py_test")
 package(default_visibility = ["//visibility:private"])
 
 py_library(
+    name = "camera_lib",
+    srcs = glob(["camera/*.py"]),
+    imports = ["."],
+)
+
+py_library(
+    name = "geometry_lib",
+    srcs = glob(["geometry/*.py"], exclude = ["geometry/*_test.py"]),
+    imports = ["."],
+)
+
+py_library(
+    name = "fusion_lib",
+    srcs = glob(["fusion/*.py"]),
+    imports = ["."],
+)
+
+py_library(
+    name = "scene_lib",
+    srcs = glob(["scene/*.py"], exclude = ["scene/*_test.py"]),
+    imports = ["."],
+)
+
+py_library(
+    name = "baselines_lib",
+    srcs = glob(["baselines/*.py"], exclude = ["baselines/*_test.py"]),
+    imports = ["."],
+)
+
+py_library(
+    name = "curriculum_lib",
+    srcs = glob(["curriculum/*.py"], exclude = ["curriculum/*_test.py"]),
+    imports = ["."],
+)
+
+py_library(
     name = "pipeline_lib",
-    srcs = glob(["pipeline/*.py"]),
+    srcs = glob(["pipeline/*.py"], exclude = ["pipeline/*_test.py"]),
+    imports = ["."],
+)
+
+py_library(
+    name = "parallax_lib",
+    srcs = glob(
+        [
+            "baselines/*.py",
+            "camera/*.py",
+            "curriculum/*.py",
+            "fusion/*.py",
+            "geometry/*.py",
+            "pipeline/*.py",
+            "scene/*.py",
+        ],
+        exclude = ["**/*_test.py"],
+    ),
     imports = ["."],
 )
 
 filegroup(
     name = "runtime_data",
     srcs = glob([
-        "*.json",
+        "assets/*.json",
+        "baselines/*.py",
+        "camera/*.py",
+        "curriculum/*.json",
+        "curriculum/*.py",
+        "fusion/*.py",
+        "geometry/*.py",
         "insulas/**",
         "pipeline/*.py",
+        "scene/*.json",
+        "scene/*.py",
+        "schemas/*.json",
     ]) + [
         "README.md",
         "run.sh",
@@ -22,44 +84,42 @@ filegroup(
 
 filegroup(
     name = "test_support",
-    srcs = ["tests/test_colmap_reference.py"],
+    srcs = ["baselines/colmap_reference_test.py"],
 )
 
-_CURRICULUM_TESTS = [
-    "test_classical",
-    "test_colmap_mvs_reference",
-    "test_colmap_reference",
-    "test_controlled_suite",
-    "test_depth_anything_reference",
-    "test_documentation",
-    "test_e2e_completion",
-    "test_fetch",
-    "test_foundation",
-    "test_foundation_geometry_reference",
-    "test_generation_dynamic_surflo",
-    "test_nerfacto_reference",
-    "test_neural_rendering",
-    "test_neus_facto_reference",
-    "test_orb_slam_reference",
-    "test_review_fixes",
-    "test_splatfacto_reference",
-]
+_PARALLAX_TESTS = {
+    "test_classical": "geometry/classical_test.py",
+    "test_colmap_mvs_reference": "baselines/colmap_mvs_reference_test.py",
+    "test_colmap_reference": "baselines/colmap_reference_test.py",
+    "test_controlled_suite": "scene/controlled_suite_test.py",
+    "test_depth_anything_reference": "baselines/depth_anything_reference_test.py",
+    "test_documentation": "curriculum/documentation_test.py",
+    "test_e2e_completion": "pipeline/e2e_completion_test.py",
+    "test_fetch": "pipeline/fetch_test.py",
+    "test_foundation": "pipeline/foundation_test.py",
+    "test_foundation_geometry_reference": "baselines/foundation_geometry_reference_test.py",
+    "test_generation_dynamic_surflo": "curriculum/generation_dynamic_surflo_test.py",
+    "test_nerfacto_reference": "baselines/nerfacto_reference_test.py",
+    "test_neural_rendering": "curriculum/neural_rendering_test.py",
+    "test_neus_facto_reference": "baselines/neus_facto_reference_test.py",
+    "test_orb_slam_reference": "baselines/orb_slam_reference_test.py",
+    "test_review_fixes": "pipeline/review_fixes_test.py",
+    "test_splatfacto_reference": "baselines/splatfacto_reference_test.py",
+}
 
 [
     py_test(
-        name = module,
-        srcs = ["tests/%s.py" % module],
+        name = name,
+        srcs = [source],
         data = [
             ":runtime_data",
             ":test_support",
         ],
-        imports = [
-            ".",
-        ],
+        imports = ["."],
         legacy_create_init = 0,
-        main = "tests/%s.py" % module,
+        main = source,
         size = "medium",
-        deps = [":pipeline_lib"],
+        deps = [":parallax_lib"],
     )
-    for module in _CURRICULUM_TESTS
+    for name, source in _PARALLAX_TESTS.items()
 ]

@@ -4,7 +4,6 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import sys
 import tempfile
 import unittest
 
@@ -12,7 +11,6 @@ import numpy as np
 
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "pipeline"))
 
 
 def _sha256(path: Path) -> str:
@@ -118,7 +116,7 @@ class ControlledSuiteTest(unittest.TestCase):
     def test_lock_binds_the_existing_blender_episode_and_consumers(self) -> None:
         assets = {
             item["id"]: item
-            for item in json.loads((ROOT / "assets.lock.json").read_text())["assets"]
+            for item in json.loads((ROOT / "assets" / "assets.lock.json").read_text())["assets"]
         }
         record = assets["controlled-suite"]
         self.assertEqual(record["source"], "../experiments/photoreal-scenes/recipe.json")
@@ -130,7 +128,7 @@ class ControlledSuiteTest(unittest.TestCase):
         self.assertGreaterEqual(len(record["consumers"]), 8)
 
     def test_validation_consumes_blender_depth_normals_and_sensor_contract(self) -> None:
-        import pipeline.controlled_suite as controlled_suite
+        import scene.controlled_suite as controlled_suite
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -157,7 +155,7 @@ class ControlledSuiteTest(unittest.TestCase):
                 controlled_suite.validate_controlled_suite(root, lock=lock)
 
     def test_cached_validation_rechecks_same_size_content_with_restored_mtime(self) -> None:
-        import pipeline.controlled_suite as controlled_suite
+        import scene.controlled_suite as controlled_suite
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

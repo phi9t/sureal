@@ -23,8 +23,7 @@ from pipeline.contracts import (
     sha256_file,
     validate_json_schema_instance,
 )
-from pipeline.controlled_suite import COMPATIBLE_MODULES, controlled_suite_record
-from pipeline.dynamic import (
+from curriculum.dynamic import (
     DYNAMIC_ARRAY_SEMANTICS,
     DYNAMIC_CAMERA_CONTAMINATION,
     DYNAMIC_PROFILE_FRAMES,
@@ -35,7 +34,7 @@ from pipeline.dynamic import (
     generate_dynamic_failure_sweep,
     generate_dynamic_fixture,
 )
-from pipeline.generative import (
+from curriculum.generative import (
     AMBIGUITY_ARRAY_SEMANTICS,
     AMBIGUITY_PROFILE_POINTS,
     AMBIGUITY_RANDOM_SEED,
@@ -44,9 +43,10 @@ from pipeline.generative import (
     evaluate_ambiguity_fixture,
     generate_ambiguity_failure_sweep,
 )
-from pipeline.surflo_endpoint import build_surflo_endpoint, evaluate_surflo_evidence
+from curriculum.surflo_endpoint import build_surflo_endpoint, evaluate_surflo_evidence
 from pipeline.reporting import aggregate_report, module_report
-from pipeline.reference_runner import validate_landed_reference_result
+from baselines.reference_runner import validate_landed_reference_result
+from scene.controlled_suite import COMPATIBLE_MODULES, controlled_suite_record
 
 
 REQUIRED_TOP_LEVEL = {
@@ -91,7 +91,7 @@ def _validate_module13(run_dir: Path, result: dict[str, Any]) -> None:
         raise ValueError("Module 13 ambiguity archive is invalid") from error
     recomputed = evaluate_ambiguity_fixture(fixture)
     comparison = load_json(comparison_path)
-    profile_config = load_json(ROOT / "curriculum.json")["profiles"][result["profile"]]
+    profile_config = load_json(ROOT / "curriculum" / "curriculum.json")["profiles"][result["profile"]]
     expected_assignment_shape = (
         int(profile_config["samples"]),
         AMBIGUITY_PROFILE_POINTS[result["profile"]],
@@ -260,7 +260,7 @@ def _validate_module14(run_dir: Path, result: dict[str, Any]) -> None:
     if result["metrics"]["rendering"] or result["metrics"]["generative"]:
         raise ValueError("Module 14 unsupported metric family is non-empty")
 
-    profile_config = load_json(ROOT / "curriculum.json")["profiles"][profile]
+    profile_config = load_json(ROOT / "curriculum" / "curriculum.json")["profiles"][profile]
     expected_sweep, _ = generate_dynamic_failure_sweep(
         frame_count,
         max_occlusion,
@@ -282,7 +282,7 @@ def _validate_module15(run_dir: Path, result: dict[str, Any]) -> None:
     paired_path = ROOT.parent / "experiments" / "photoreal-scenes" / "results.json"
     scout_path = ROOT.parent / "experiments" / "insula-scout" / "results.json"
     locks = {
-        item["id"]: item for item in load_json(ROOT / "assets.lock.json")["assets"]
+        item["id"]: item for item in load_json(ROOT / "assets" / "assets.lock.json")["assets"]
     }
     paired_hash = sha256_file(paired_path)
     scout_hash = sha256_file(scout_path)
@@ -345,7 +345,7 @@ def validate_result(run_dir: Path, expected_module: str | None = None) -> dict[s
         )
     ):
         raise ValueError("fixture runtime contract mismatch")
-    validate_json_schema_instance(result, load_json(ROOT / "result.schema.json"), "result")
+    validate_json_schema_instance(result, load_json(ROOT / "schemas" / "result.schema.json"), "result")
     missing = REQUIRED_TOP_LEVEL - set(result)
     if missing:
         raise ValueError(f"result missing keys: {sorted(missing)}")
@@ -488,7 +488,7 @@ def validate_report(run_root: Path) -> dict[str, Any]:
     if not manifest_path.is_file():
         raise ValueError(f"missing report manifest: {manifest_path}")
     manifest = load_json(manifest_path)
-    validate_json_schema_instance(manifest, load_json(ROOT / "report.schema.json"), "report")
+    validate_json_schema_instance(manifest, load_json(ROOT / "schemas" / "report.schema.json"), "report")
     if manifest["report_sha256"] != sha256_file(run_root / "report.md"):
         raise ValueError("aggregate report hash mismatch")
     module_paths = sorted(run_root.glob("[0-9][0-9]/result.json"))

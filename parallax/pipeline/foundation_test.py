@@ -14,7 +14,6 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 PIPELINE = ROOT / "pipeline"
-sys.path.insert(0, str(PIPELINE))
 
 
 def run_cli(*args: str, cache: Path | None = None) -> subprocess.CompletedProcess[str]:
@@ -32,6 +31,59 @@ def run_cli(*args: str, cache: Path | None = None) -> subprocess.CompletedProces
 
 
 class RunnerBootstrapTest(unittest.TestCase):
+    def test_parallax_concept_packages_own_moved_sources(self) -> None:
+        expected = {
+            "camera/pinhole.py",
+            "camera/pose.py",
+            "geometry/triangulate.py",
+            "geometry/align.py",
+            "fusion/tsdf.py",
+            "scene/reference_scene.py",
+            "scene/shared-scene.json",
+            "baselines/reference_runner.py",
+            "baselines/mvs_reference_runner.py",
+            "baselines/slam_reference_runner.py",
+            "baselines/depth_reference_runner.py",
+            "baselines/neus_reference_runner.py",
+            "baselines/nerfacto_reference_runner.py",
+            "baselines/splatfacto_reference_runner.py",
+            "baselines/foundation_geometry_reference_runner.py",
+            "curriculum/labs.py",
+            "curriculum/curriculum.json",
+            "assets/assets.lock.json",
+            "assets/foundation-models.lock.json",
+            "assets/reference-adapters.json",
+            "assets/sources.json",
+            "assets/terminology.json",
+            "schemas/curriculum.schema.json",
+            "schemas/reference-result.schema.json",
+            "schemas/report.schema.json",
+            "schemas/result.schema.json",
+        }
+        missing = sorted(path for path in expected if not (ROOT / path).is_file())
+        self.assertEqual(missing, [])
+
+    def test_legacy_math3d_imports_reexport_concept_functions(self) -> None:
+        from camera.pinhole import project, unproject
+        from camera.pose import camera_center, fundamental_from_poses
+        from fusion.tsdf import fuse_tsdf
+        from geometry.align import apply_transform, icp, normalize_rows, opencv_opengl_camera_transform
+        from geometry.triangulate import refine_point_gauss_newton, reprojection_rmse, triangulate_point
+        from pipeline import math3d
+
+        self.assertIs(math3d.project, project)
+        self.assertIs(math3d.unproject, unproject)
+        self.assertIs(math3d.camera_center, camera_center)
+        self.assertIs(math3d.fundamental_from_poses, fundamental_from_poses)
+        self.assertIs(math3d.triangulate_point, triangulate_point)
+        self.assertIs(math3d.refine_point_gauss_newton, refine_point_gauss_newton)
+        self.assertIs(math3d.reprojection_rmse, reprojection_rmse)
+        self.assertIs(math3d.apply_transform, apply_transform)
+        self.assertIs(math3d.icp, icp)
+        self.assertIs(math3d.normalize_rows, normalize_rows)
+        self.assertIs(math3d.opencv_opengl_camera_transform, opencv_opengl_camera_transform)
+        self.assertIs(math3d.fuse_tsdf, fuse_tsdf)
+
     def test_run_script_launches_cli_with_parallax_on_pythonpath(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             fakebin = Path(temporary) / "bin"
@@ -98,7 +150,7 @@ class RegistryContractTest(unittest.TestCase):
     def test_result_schema_pins_fixture_runtime_contract_values(self) -> None:
         from pipeline.contracts import validate_json_schema_instance
 
-        schema = json.loads((ROOT / "result.schema.json").read_text())
+        schema = json.loads((ROOT / "schemas" / "result.schema.json").read_text())
         resources = schema["properties"]["resources"]
         expected = {
             "network_isolation": "python_socket_guard",
@@ -133,7 +185,7 @@ class RegistryContractTest(unittest.TestCase):
                     validate_json_schema_instance(fixture, schema, "result")
 
     def test_curriculum_schema_declares_stable_module_contract(self) -> None:
-        schema = json.loads((ROOT / "curriculum.schema.json").read_text())
+        schema = json.loads((ROOT / "schemas" / "curriculum.schema.json").read_text())
         module = schema["$defs"]["module"]
         self.assertEqual(schema["properties"]["modules"]["minItems"], 15)
         self.assertEqual(schema["properties"]["modules"]["maxItems"], 15)
@@ -143,7 +195,7 @@ class RegistryContractTest(unittest.TestCase):
         )
 
     def test_curriculum_has_fifteen_ordered_modules_with_stable_interfaces(self) -> None:
-        curriculum = json.loads((ROOT / "curriculum.json").read_text())
+        curriculum = json.loads((ROOT / "curriculum" / "curriculum.json").read_text())
         modules = curriculum["modules"]
         self.assertEqual([item["id"] for item in modules], [f"{i:02d}" for i in range(1, 16)])
         for module in modules:
@@ -159,7 +211,7 @@ class RegistryContractTest(unittest.TestCase):
                 self.assertIn(module["insula"], curriculum["insulas"])
 
     def test_source_registry_is_primary_unique_and_claim_bearing(self) -> None:
-        sources = json.loads((ROOT / "sources.json").read_text())["sources"]
+        sources = json.loads((ROOT / "assets" / "sources.json").read_text())["sources"]
         ids = [source["id"] for source in sources]
         self.assertEqual(len(ids), len(set(ids)))
         self.assertGreaterEqual(len(sources), 45)
@@ -177,12 +229,12 @@ class RegistryContractTest(unittest.TestCase):
         self.assertIn("splatting", caveats)
 
     def test_curriculum_references_registered_sources_and_locked_assets(self) -> None:
-        curriculum = json.loads((ROOT / "curriculum.json").read_text())
-        source_ids = {item["id"] for item in json.loads((ROOT / "sources.json").read_text())["sources"]}
+        curriculum = json.loads((ROOT / "curriculum" / "curriculum.json").read_text())
+        source_ids = {item["id"] for item in json.loads((ROOT / "assets" / "sources.json").read_text())["sources"]}
         for module in curriculum["modules"]:
             self.assertLessEqual(set(module["sources"]), source_ids)
 
-        assets = json.loads((ROOT / "assets.lock.json").read_text())["assets"]
+        assets = json.loads((ROOT / "assets" / "assets.lock.json").read_text())["assets"]
         self.assertEqual(
             {item["id"] for item in assets},
             {

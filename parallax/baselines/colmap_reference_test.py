@@ -133,10 +133,7 @@ def run_cli(*args: str, cache: Path, engine: Path, extra_env: dict[str, str] | N
 class ColmapReferenceAdapterTest(unittest.TestCase):
     def test_sqlite_validation_does_not_create_wal_sidecars(self) -> None:
         import sqlite3
-        from sys import path as import_path
-
-        import_path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.reference_runner import _validate_sqlite_database
+        from baselines.reference_runner import _validate_sqlite_database
 
         with tempfile.TemporaryDirectory() as temporary:
             database = Path(temporary) / "database.db"
@@ -155,12 +152,10 @@ class ColmapReferenceAdapterTest(unittest.TestCase):
             self.assertFalse(Path(f"{database}-shm").exists())
 
     def test_generated_scene_is_deterministic_and_records_full_calibration(self) -> None:
-        from sys import path as import_path
-        import_path.insert(0, str(ROOT / "pipeline"))
         from pipeline.contracts import load_json
-        from pipeline.reference_scene import generate_colmap_scene
+        from scene.reference_scene import generate_colmap_scene
 
-        scene = load_json(ROOT / "shared-scene.json")
+        scene = load_json(ROOT / "scene" / "shared-scene.json")
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             first = generate_colmap_scene(root / "first", scene, "smoke")
@@ -229,9 +224,7 @@ class ColmapReferenceAdapterTest(unittest.TestCase):
             self.assertTrue((run_dir / "output" / "sparse.ply").is_file())
             self.assertFalse(any((cache / "reference-staging").glob("*")))
 
-            from sys import path as import_path
-            import_path.insert(0, str(ROOT / "pipeline"))
-            from pipeline.reference_runner import validate_reference_result
+            from baselines.reference_runner import validate_reference_result
 
             validate_reference_result(run_dir, "colmap-sfm")
             points = run_dir / "output" / "sparse" / "0" / "points3D.txt"
@@ -257,10 +250,8 @@ class ColmapReferenceAdapterTest(unittest.TestCase):
             for relative in required:
                 self.assertTrue((run_dir / relative).is_file(), relative)
 
-            from sys import path as import_path
-            import_path.insert(0, str(ROOT / "pipeline"))
             from pipeline.contracts import sha256_file
-            from pipeline.reference_runner import validate_reference_result
+            from baselines.reference_runner import validate_reference_result
 
             ply = run_dir / "output" / "sparse.ply"
             ply.write_text(ply.read_text().replace("element vertex 1200", "element vertex 1199"))
@@ -284,9 +275,7 @@ class ColmapReferenceAdapterTest(unittest.TestCase):
             result_path = run_dir / "result.json"
             original = result_path.read_bytes()
 
-            from sys import path as import_path
-            import_path.insert(0, str(ROOT / "pipeline"))
-            from pipeline.reference_runner import validate_reference_result
+            from baselines.reference_runner import validate_reference_result
 
             payload = json.loads(original)
             payload.pop("tool")
@@ -314,9 +303,7 @@ class ColmapReferenceAdapterTest(unittest.TestCase):
             result_path = run_dir / "result.json"
             original = result_path.read_bytes()
 
-            from sys import path as import_path
-            import_path.insert(0, str(ROOT / "pipeline"))
-            from pipeline.reference_runner import validate_reference_result
+            from baselines.reference_runner import validate_reference_result
 
             cases = (
                 ("module_ids", lambda payload: payload.__setitem__("module_ids", ["06"]), "module scope mismatch"),

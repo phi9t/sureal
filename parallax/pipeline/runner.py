@@ -15,10 +15,10 @@ from contextlib import contextmanager
 from typing import Any
 
 from pipeline.contracts import IMPLEMENTATION_FILES, INPUT_FILES, ROOT, canonical_json, curriculum, module_by_id, sha256_file, validate_run_id, write_json
-from pipeline.controlled_suite import ensure_controlled_suite, write_module_binding
-from pipeline.labs import run_lab
+from curriculum.labs import run_lab
 from pipeline.reporting import module_report
 from pipeline.validator import validate_result
+from scene.controlled_suite import ensure_controlled_suite, write_module_binding
 
 
 def _peak_cpu_bytes() -> int:

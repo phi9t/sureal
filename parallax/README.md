@@ -7,13 +7,22 @@ source and asset registries, a common controlled scene, seven local Insula
 definitions plus the reused Blender and Surflo environments, provenance-aware
 run storage, and citation/terminology auditing.
 
+Parallax is organized by reconstruction concept. Camera projection and pose
+helpers live in `camera/`, triangulation and alignment live in `geometry/`, TSDF
+fusion lives in `fusion/`, reference-scene generation lives in `scene/`, third
+party reference adapters live in `baselines/`, curriculum lab dispatch and
+module metadata live in `curriculum/`, and `pipeline/` contains only
+orchestration, validation, reporting, fetching, and compatibility shims. Locks
+and registries are under `assets/`; JSON schemas are under `schemas/`. Tests sit
+beside the code they cover as `*_test.py` files.
+
 The smoke profile is the numerical and CI contract. A full `all` run increases
 the deterministic repo-owned fixture workloads **and** executes every landed
 maintained reference adapter, then binds both evidence families into one atomic
 cross-era report. Use `all --profile full --fixture-only` only when deliberately
 testing the larger concept fixtures without claiming full acceptance. Maintained
 systems also remain individually executable through explicit reference adapters.
-`reference-adapters.json` is the source of truth for the landed suite.
+`assets/reference-adapters.json` is the source of truth for the landed suite.
 Controlled fixtures are teaching experiments, not reproduced third-party
 leaderboard values.
 
@@ -37,20 +46,20 @@ parallax/run.sh reference --adapter foundation-geometry --profile smoke --run-id
 python3 parallax/pipeline/audit.py --offline
 
 # Required real-container gates (the full gate is intentionally opt-in):
-(cd parallax && SURFLO_REQUIRE_COLMAP_MVS_REFERENCE=1 python3 -m unittest -q tests.test_colmap_mvs_reference.ColmapMvsReferenceAdapterTest.test_real_colmap_mvs_reconstructs_and_meshes_the_smoke_scene)
-(cd parallax && SURFLO_REQUIRE_COLMAP_MVS_FULL=1 python3 -m unittest -q tests.test_colmap_mvs_reference.ColmapMvsReferenceAdapterTest.test_real_colmap_mvs_full_profile_on_b200)
-(cd parallax && SURFLO_REQUIRE_ORB_SLAM_REFERENCE=1 python3 -m unittest -q tests.test_orb_slam_reference.OrbSlamReferenceContractTest.test_real_orb_slam_smoke_tracks_tum_rgbd_and_exports_a_map)
-(cd parallax && SURFLO_REQUIRE_ORB_SLAM_FULL=1 python3 -m unittest -q tests.test_orb_slam_reference.OrbSlamReferenceContractTest.test_real_orb_slam_full_profile)
-(cd parallax && SURFLO_REQUIRE_DEPTH_ANYTHING_REFERENCE=1 python3 -m unittest -q tests.test_depth_anything_reference.DepthAnythingReferenceAdapterTest.test_real_smoke_reference_runs_when_required)
-(cd parallax && SURFLO_REQUIRE_DEPTH_ANYTHING_FULL=1 python3 -m unittest -q tests.test_depth_anything_reference.DepthAnythingReferenceAdapterTest.test_real_full_reference_runs_when_required)
-(cd parallax && SURFLO_REQUIRE_NEUS_FACTO_REFERENCE=1 python3 -m unittest -q tests.test_neus_facto_reference.NeuSFactoReferenceAdapterTest.test_real_profiles_are_explicit_b200_gates)
-(cd parallax && SURFLO_REQUIRE_NEUS_FACTO_FULL=1 python3 -m unittest -q tests.test_neus_facto_reference.NeuSFactoReferenceAdapterTest.test_real_profiles_are_explicit_b200_gates)
-(cd parallax && SURFLO_REQUIRE_NERFACTO_REFERENCE=1 python3 -m unittest -q tests.test_nerfacto_reference.NerfactoReferenceExecutionContractTest.test_real_profiles_are_explicit_b200_gates)
-(cd parallax && SURFLO_REQUIRE_NERFACTO_FULL=1 python3 -m unittest -q tests.test_nerfacto_reference.NerfactoReferenceExecutionContractTest.test_real_profiles_are_explicit_b200_gates)
-(cd parallax && SURFLO_REQUIRE_SPLATFACTO_REFERENCE=1 python3 -m unittest -q tests.test_splatfacto_reference.SplatfactoOutputContractTest.test_real_profiles_are_explicit_b200_gates)
-(cd parallax && SURFLO_REQUIRE_SPLATFACTO_FULL=1 python3 -m unittest -q tests.test_splatfacto_reference.SplatfactoOutputContractTest.test_real_profiles_are_explicit_b200_gates)
-(cd parallax && SURFLO_REQUIRE_FOUNDATION_GEOMETRY_REFERENCE=1 python3 -m unittest -q tests.test_foundation_geometry_reference.FoundationGeometryReferenceContractTest.test_real_smoke_reference_runs_when_required)
-(cd parallax && SURFLO_REQUIRE_FOUNDATION_GEOMETRY_FULL=1 python3 -m unittest -q tests.test_foundation_geometry_reference.FoundationGeometryReferenceContractTest.test_real_full_reference_runs_when_required)
+(cd parallax && SURFLO_REQUIRE_COLMAP_MVS_REFERENCE=1 python3 -m unittest -q baselines.colmap_mvs_reference_test.ColmapMvsReferenceAdapterTest.test_real_colmap_mvs_reconstructs_and_meshes_the_smoke_scene)
+(cd parallax && SURFLO_REQUIRE_COLMAP_MVS_FULL=1 python3 -m unittest -q baselines.colmap_mvs_reference_test.ColmapMvsReferenceAdapterTest.test_real_colmap_mvs_full_profile_on_b200)
+(cd parallax && SURFLO_REQUIRE_ORB_SLAM_REFERENCE=1 python3 -m unittest -q baselines.orb_slam_reference_test.OrbSlamReferenceContractTest.test_real_orb_slam_smoke_tracks_tum_rgbd_and_exports_a_map)
+(cd parallax && SURFLO_REQUIRE_ORB_SLAM_FULL=1 python3 -m unittest -q baselines.orb_slam_reference_test.OrbSlamReferenceContractTest.test_real_orb_slam_full_profile)
+(cd parallax && SURFLO_REQUIRE_DEPTH_ANYTHING_REFERENCE=1 python3 -m unittest -q baselines.depth_anything_reference_test.DepthAnythingReferenceAdapterTest.test_real_smoke_reference_runs_when_required)
+(cd parallax && SURFLO_REQUIRE_DEPTH_ANYTHING_FULL=1 python3 -m unittest -q baselines.depth_anything_reference_test.DepthAnythingReferenceAdapterTest.test_real_full_reference_runs_when_required)
+(cd parallax && SURFLO_REQUIRE_NEUS_FACTO_REFERENCE=1 python3 -m unittest -q baselines.neus_facto_reference_test.NeuSFactoReferenceAdapterTest.test_real_profiles_are_explicit_b200_gates)
+(cd parallax && SURFLO_REQUIRE_NEUS_FACTO_FULL=1 python3 -m unittest -q baselines.neus_facto_reference_test.NeuSFactoReferenceAdapterTest.test_real_profiles_are_explicit_b200_gates)
+(cd parallax && SURFLO_REQUIRE_NERFACTO_REFERENCE=1 python3 -m unittest -q baselines.nerfacto_reference_test.NerfactoReferenceExecutionContractTest.test_real_profiles_are_explicit_b200_gates)
+(cd parallax && SURFLO_REQUIRE_NERFACTO_FULL=1 python3 -m unittest -q baselines.nerfacto_reference_test.NerfactoReferenceExecutionContractTest.test_real_profiles_are_explicit_b200_gates)
+(cd parallax && SURFLO_REQUIRE_SPLATFACTO_REFERENCE=1 python3 -m unittest -q baselines.splatfacto_reference_test.SplatfactoOutputContractTest.test_real_profiles_are_explicit_b200_gates)
+(cd parallax && SURFLO_REQUIRE_SPLATFACTO_FULL=1 python3 -m unittest -q baselines.splatfacto_reference_test.SplatfactoOutputContractTest.test_real_profiles_are_explicit_b200_gates)
+(cd parallax && SURFLO_REQUIRE_FOUNDATION_GEOMETRY_REFERENCE=1 python3 -m unittest -q baselines.foundation_geometry_reference_test.FoundationGeometryReferenceContractTest.test_real_smoke_reference_runs_when_required)
+(cd parallax && SURFLO_REQUIRE_FOUNDATION_GEOMETRY_FULL=1 python3 -m unittest -q baselines.foundation_geometry_reference_test.FoundationGeometryReferenceContractTest.test_real_full_reference_runs_when_required)
 
 # Explicit network boundaries:
 parallax/run.sh build
@@ -78,7 +87,7 @@ The Module 12 reference reuses the Surflo B200 Insula and its persistent model
 cache. `run.sh build` now prepares that Insula/rootfs/venv as well as the seven
 pathway images. `run.sh fetch --asset foundation-geometry-models` resolves the
 immutable VGGT-1B and DA3-BASE revisions plus the exact upstream VGGT source
-archive in `foundation-models.lock.json`, then checks every source, config, and
+archive in `assets/foundation-models.lock.json`, then checks every source, config, and
 weight byte. Preflight also rejects a dirty DA3 gitlink and verifies the full
 6.81 GB resolved venv tree against its lock. The environment is reconstructive:
 its recipe pins the CUDA base digest, dated Ubuntu snapshot, apt packages,
@@ -268,8 +277,8 @@ Markdown report hash. Full `all` runs stage all landed maintained adapters under
 reference suite validate. A report made from a partial or fixture-only run says
 so explicitly.
 
-`assets.lock.json` records the generated Blender controlled suite, selected
+`assets/assets.lock.json` records the generated Blender controlled suite, selected
 canonical dataset inputs, and the existing paired-scene result. Downloaded
-datasets and checkpoints stay outside Git. `sources.json` is the source of
+datasets and checkpoints stay outside Git. `assets/sources.json` is the source of
 truth for title, authors, year, venue, primary URL, themes, supported claims,
 and historical credit caveats.

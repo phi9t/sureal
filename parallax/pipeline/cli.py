@@ -25,9 +25,9 @@ from pipeline.contracts import (
     write_json,
 )
 from pipeline.reporting import aggregate_report
-from pipeline.reference_runner import run_reference, validate_landed_reference_result
 from pipeline.runner import run_module
 from pipeline.validator import validate_report, validate_result
+from baselines.reference_runner import run_reference, validate_landed_reference_result
 
 
 def cache_root() -> Path:

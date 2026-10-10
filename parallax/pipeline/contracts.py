@@ -15,13 +15,30 @@ from typing import Any, Iterable
 
 ROOT = Path(__file__).resolve().parents[1]
 INPUT_FILES = (
-    "assets.lock.json", "curriculum.json", "reference-adapters.json", "result.schema.json",
-    "shared-scene.json", "sources.json", "terminology.json",
+    "assets/assets.lock.json",
+    "assets/reference-adapters.json",
+    "assets/sources.json",
+    "assets/terminology.json",
+    "curriculum/curriculum.json",
+    "scene/shared-scene.json",
+    "schemas/result.schema.json",
 )
 IMPLEMENTATION_FILES = (
-    "pipeline/cli.py", "pipeline/contracts.py", "pipeline/controlled_suite.py", "pipeline/dynamic.py", "pipeline/generative.py",
-    "pipeline/labs.py", "pipeline/math3d.py", "pipeline/reporting.py", "pipeline/runner.py",
-    "pipeline/surflo_endpoint.py", "pipeline/validator.py",
+    "camera/pinhole.py",
+    "camera/pose.py",
+    "curriculum/dynamic.py",
+    "curriculum/generative.py",
+    "curriculum/labs.py",
+    "curriculum/surflo_endpoint.py",
+    "fusion/tsdf.py",
+    "geometry/align.py",
+    "geometry/triangulate.py",
+    "pipeline/cli.py",
+    "pipeline/contracts.py",
+    "pipeline/reporting.py",
+    "pipeline/runner.py",
+    "pipeline/validator.py",
+    "scene/controlled_suite.py",
 )
 
 
@@ -71,7 +88,7 @@ def ensure_finite(value: Any, location: str = "root") -> None:
 
 
 def curriculum() -> dict[str, Any]:
-    return load_json(ROOT / "curriculum.json")
+    return load_json(ROOT / "curriculum" / "curriculum.json")
 
 
 def reference_adapter_name(record: dict[str, Any]) -> str:
@@ -84,7 +101,7 @@ def reference_adapter_name(record: dict[str, Any]) -> str:
 
 
 def reference_adapters(*, landed_only: bool = False) -> list[dict[str, Any]]:
-    records = load_json(ROOT / "reference-adapters.json").get("adapters", [])
+    records = load_json(ROOT / "assets" / "reference-adapters.json").get("adapters", [])
     if not isinstance(records, list):
         raise ValueError("reference adapter registry is malformed")
     selected = [

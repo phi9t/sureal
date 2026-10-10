@@ -5,7 +5,6 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
-import sys
 import tempfile
 import textwrap
 import unittest
@@ -14,7 +13,7 @@ import zipfile
 
 import numpy as np
 
-from tests.test_colmap_reference import fake_engine, run_cli
+from baselines.colmap_reference_test import fake_engine, run_cli
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -62,7 +61,7 @@ def fake_nerfacto_engine(path: Path, fail: bool = False) -> Path:
             [[ -n "$input" && -n "$output" ]]
             [[ " $* " != *":/work "* ]]
             {failure}
-            python3 - "$input" "$output" "$canonical" <<'PY'
+            PYTHONPATH="{ROOT}${{PYTHONPATH:+:$PYTHONPATH}}" python3 - "$input" "$output" "$canonical" <<'PY'
             import json
             import math
             import csv
@@ -75,8 +74,7 @@ def fake_nerfacto_engine(path: Path, fail: bool = False) -> Path:
             output = Path(sys.argv[2])
             canonical_root = Path(sys.argv[3]) if sys.argv[3] else None
             repository = Path("{ROOT}")
-            sys.path.insert(0, str(repository))
-            from pipeline.nerfacto_reference_runner import _component_count
+            from baselines.nerfacto_reference_runner import _component_count
             manifest = json.loads((input_root / "manifest.json").read_text())
             resolution = 128 if manifest["profile"] == "smoke" else 256
             axis = np.linspace(-1.0, 1.0, resolution, dtype=np.float32)
@@ -265,8 +263,7 @@ def fake_nerfacto_engine(path: Path, fail: bool = False) -> Path:
 def run_fake_nerfacto_reference(
     root: Path, run_id: str = "nerfacto-smoke", profile: str = "smoke"
 ) -> Path:
-    sys.path.insert(0, str(ROOT / "pipeline"))
-    import pipeline.nerfacto_reference_runner as nerfacto_reference_runner
+    import baselines.nerfacto_reference_runner as nerfacto_reference_runner
 
     checkpoint = root / "fixture-alexnet-weights.pth"
     checkpoint.write_bytes(b"fixture weights")
@@ -296,7 +293,7 @@ class NerfactoReferenceFoundationTest(unittest.TestCase):
     def test_primary_source_is_registered_for_module_10(self) -> None:
         sources = {
             item["id"]: item
-            for item in json.loads((ROOT / "sources.json").read_text())["sources"]
+            for item in json.loads((ROOT / "assets" / "sources.json").read_text())["sources"]
         }
         self.assertIn("nerfstudio-nerfacto-2025", sources)
         implementation = sources["nerfstudio-nerfacto-2025"]
@@ -308,14 +305,14 @@ class NerfactoReferenceFoundationTest(unittest.TestCase):
 
         curriculum = {
             item["id"]: item
-            for item in json.loads((ROOT / "curriculum.json").read_text())["modules"]
+            for item in json.loads((ROOT / "curriculum" / "curriculum.json").read_text())["modules"]
         }
         self.assertIn("nerfstudio-nerfacto-2025", curriculum["10"]["sources"])
 
     def test_adapter_keeps_rendering_and_geometry_contracts_separate(self) -> None:
         adapters = {
             item["id"]: item
-            for item in json.loads((ROOT / "reference-adapters.json").read_text())["adapters"]
+            for item in json.loads((ROOT / "assets" / "reference-adapters.json").read_text())["adapters"]
         }
         self.assertIn("nerfstudio-nerfacto-reference", adapters)
         adapter = adapters["nerfstudio-nerfacto-reference"]
@@ -383,7 +380,7 @@ class NerfactoReferenceFoundationTest(unittest.TestCase):
     def test_nerf_synthetic_archive_has_a_verified_lock(self) -> None:
         assets = {
             item["id"]: item
-            for item in json.loads((ROOT / "assets.lock.json").read_text())["assets"]
+            for item in json.loads((ROOT / "assets" / "assets.lock.json").read_text())["assets"]
         }
         archive = assets["nerf-synthetic"]
         self.assertEqual(archive["sha256"], NERF_SYNTHETIC_SHA256)
@@ -424,8 +421,7 @@ class NerfactoReferenceFoundationTest(unittest.TestCase):
 
 class NerfactoReferenceExecutionContractTest(unittest.TestCase):
     def test_locked_nerf_example_recomputes_the_extracted_tree(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        import pipeline.nerfacto_reference_runner as nerfacto_reference_runner
+        import baselines.nerfacto_reference_runner as nerfacto_reference_runner
         from pipeline.contracts import load_json, sha256_file
         from pipeline.fetch import extract_locked_asset
 
@@ -505,8 +501,7 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
             self.assertIn("output/resolved-requirements.txt", result["provenance"]["artifacts_sha256"])
             self.assertIn("## Rendering", (run_dir / "report.md").read_text())
 
-            sys.path.insert(0, str(ROOT / "pipeline"))
-            from pipeline.nerfacto_reference_runner import validate_nerfacto_reference_result
+            from baselines.nerfacto_reference_runner import validate_nerfacto_reference_result
 
             validate_nerfacto_reference_result(run_dir)
 
@@ -535,8 +530,7 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
             values = np.load(truth, allow_pickle=False)
             values[0, 0, 0] += 0.1
             np.save(truth, values, allow_pickle=False)
-            sys.path.insert(0, str(ROOT / "pipeline"))
-            from pipeline.nerfacto_reference_runner import validate_nerfacto_reference_result
+            from baselines.nerfacto_reference_runner import validate_nerfacto_reference_result
 
             with self.assertRaisesRegex(ValueError, "canonical|metric|artifact"):
                 validate_nerfacto_reference_result(run_dir)
@@ -544,8 +538,7 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
     def test_failed_container_is_not_promoted(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            sys.path.insert(0, str(ROOT / "pipeline"))
-            import pipeline.nerfacto_reference_runner as nerfacto_reference_runner
+            import baselines.nerfacto_reference_runner as nerfacto_reference_runner
 
             checkpoint = root / "fixture-alexnet-weights.pth"
             checkpoint.write_bytes(b"fixture weights")
@@ -568,8 +561,7 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
             result = json.loads(result_path.read_text())
             result["metrics"]["rendering"]["target_psnr_db"] = 0.0
             result_path.write_text(json.dumps(result))
-            sys.path.insert(0, str(ROOT / "pipeline"))
-            from pipeline.nerfacto_reference_runner import validate_nerfacto_reference_result
+            from baselines.nerfacto_reference_runner import validate_nerfacto_reference_result
 
             with self.assertRaisesRegex(ValueError, "metric recomputation"):
                 validate_nerfacto_reference_result(run_dir)
@@ -593,8 +585,7 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
             result["resources"]["runtime_seconds"] += 1.0
             result_path.write_text(json.dumps(result))
 
-            sys.path.insert(0, str(ROOT / "pipeline"))
-            from pipeline.nerfacto_reference_runner import validate_nerfacto_reference_result
+            from baselines.nerfacto_reference_runner import validate_nerfacto_reference_result
 
             with self.assertRaisesRegex(ValueError, "resource summary mismatch"):
                 validate_nerfacto_reference_result(run_dir)
@@ -616,8 +607,7 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
                     check=False,
                 )
                 self.assertEqual(inspected.returncode, 0, inspected.stderr)
-                sys.path.insert(0, str(ROOT / "pipeline"))
-                from pipeline.nerfacto_reference_runner import run_nerfacto_reference
+                from baselines.nerfacto_reference_runner import run_nerfacto_reference
 
                 cache = Path(
                     os.environ.get(
@@ -660,15 +650,14 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
         )
 
     def test_scene_transform_contains_context_only_and_converts_opencv_axes(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
         from pipeline.contracts import load_json, sha256_file
-        from pipeline.reference_scene import generate_radiance_field_scene
+        from scene.reference_scene import generate_radiance_field_scene
 
         with tempfile.TemporaryDirectory() as temporary:
             destination = Path(temporary) / "scene"
             manifest = generate_radiance_field_scene(
                 destination,
-                load_json(ROOT / "shared-scene.json"),
+                load_json(ROOT / "scene" / "shared-scene.json"),
                 "smoke",
             )
             transforms_path = destination / manifest["nerfstudio_transforms_path"]
@@ -722,8 +711,7 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
         self.assertLess(text.index("trainer.train()"), text.index('manifest["target_frames"]'))
 
     def test_stale_container_entrypoint_is_rejected_before_training(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.nerfacto_reference_runner import _verify_container_entrypoint
+        from baselines.nerfacto_reference_runner import _verify_container_entrypoint
 
         stale_hash = "0" * 64
         completed = subprocess.CompletedProcess(
@@ -739,15 +727,14 @@ class NerfactoReferenceExecutionContractTest(unittest.TestCase):
                 _verify_container_entrypoint("docker", FIXTURE_IMAGE_ID)
 
     def test_lpips_crop_uses_truth_mask_not_nonzero_rgb(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
         from pipeline.contracts import load_json
-        from pipeline.reference_scene import generate_radiance_field_scene
+        from scene.reference_scene import generate_radiance_field_scene
 
         with tempfile.TemporaryDirectory() as temporary:
             destination = Path(temporary) / "scene"
             manifest = generate_radiance_field_scene(
                 destination,
-                load_json(ROOT / "shared-scene.json"),
+                load_json(ROOT / "scene" / "shared-scene.json"),
                 "smoke",
             )
             frame = manifest["target_frames"][0]

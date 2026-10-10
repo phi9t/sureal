@@ -8,7 +8,6 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
-import sys
 import tarfile
 import tempfile
 import textwrap
@@ -52,7 +51,7 @@ def real_test_temporary_directory() -> tempfile.TemporaryDirectory[str]:
 
 class OrbSlamReferenceContractTest(unittest.TestCase):
     def test_tum_asset_lock_uses_the_verified_archive_and_safe_extraction(self) -> None:
-        registry = json.loads((ROOT / "assets.lock.json").read_text())
+        registry = json.loads((ROOT / "assets" / "assets.lock.json").read_text())
         asset = next(item for item in registry["assets"] if item["id"] == "tum-rgbd")
         self.assertEqual(asset["sha256"], "a0236d97b8c30cd93b653656d2b6c293ff7c982a4130ef2a1a8beecdb124ef98")
         self.assertEqual(asset["digest_status"], "verified_2026-09-26")
@@ -102,8 +101,7 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
         )
 
     def test_tum_trajectory_metrics_recover_known_rigid_frame_change(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.slam_reference_runner import GROUND_TRUTH_MAX_DELTA_SECONDS, evaluate_trajectory
+        from baselines.slam_reference_runner import GROUND_TRUTH_MAX_DELTA_SECONDS, evaluate_trajectory
 
         self.assertEqual(GROUND_TRUTH_MAX_DELTA_SECONDS, 0.05)
 
@@ -130,8 +128,7 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
         self.assertTrue(np.allclose(transform["translation"], -rotation.T @ offset, atol=1e-12))
 
     def test_tum_parser_rejects_duplicate_or_non_unit_records(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.slam_reference_runner import parse_tum_trajectory
+        from baselines.slam_reference_runner import parse_tum_trajectory
 
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "trajectory.txt"
@@ -147,8 +144,7 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
                 parse_tum_trajectory(path)
 
     def test_rpe_translation_is_measured_in_the_origin_camera_frame(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.slam_reference_runner import evaluate_trajectory
+        from baselines.slam_reference_runner import evaluate_trajectory
 
         truth = [
             (float(index), np.array([float(index), 0.0, 0.0]), np.array([0.0, 0.0, 0.0, 1.0]))
@@ -161,8 +157,7 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
         self.assertAlmostEqual(metrics["rpe_translation_rmse_m"], 2**0.5)
 
     def test_endpoint_drift_is_first_pose_relative_not_final_aligned_residual(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.slam_reference_runner import evaluate_trajectory
+        from baselines.slam_reference_runner import evaluate_trajectory
 
         identity = np.array([0.0, 0.0, 0.0, 1.0])
         truth = [
@@ -183,8 +178,7 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
         self.assertAlmostEqual(metrics["endpoint_rotation_drift_deg"], 0.0)
 
     def test_one_frame_rpe_skips_nonconsecutive_source_frames(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.slam_reference_runner import evaluate_trajectory
+        from baselines.slam_reference_runner import evaluate_trajectory
 
         identity = np.array([0.0, 0.0, 0.0, 1.0])
         truth = [
@@ -203,8 +197,7 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
         self.assertAlmostEqual(metrics["rpe_rotation_rmse_deg"], 0.0)
 
     def test_failure_trajectory_omits_cross_map_aggregate_metrics(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.slam_reference_runner import summarize_failure_trajectory
+        from baselines.slam_reference_runner import summarize_failure_trajectory
 
         identity = np.array([0.0, 0.0, 0.0, 1.0])
         truth = [
@@ -232,8 +225,7 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
         self.assertTrue(all(segment["metrics"]["ate_rmse_m"] < 1e-12 for segment in summary["segments"]))
 
     def test_trajectory_context_is_positionally_bound_to_the_trajectory(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.slam_reference_runner import parse_trajectory_context, parse_tum_trajectory
+        from baselines.slam_reference_runner import parse_trajectory_context, parse_tum_trajectory
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -265,8 +257,7 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
                 parse_trajectory_context(context_path, trajectory, source_timeline)
 
     def test_estimated_poses_recover_original_source_frame_indices(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.slam_reference_runner import source_frame_indices
+        from baselines.slam_reference_runner import source_frame_indices
 
         identity = np.array([0.0, 0.0, 0.0, 1.0])
         truth = [
@@ -276,8 +267,7 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
         self.assertEqual(source_frame_indices([truth[0], truth[1], truth[3]], truth), [0, 1, 3])
 
     def test_nested_metric_comparison_is_float_tolerant_and_structure_exact(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.slam_reference_runner import values_match
+        from baselines.slam_reference_runner import values_match
 
         expected = {"segments": [{"map_id": 1, "metrics": {"ate_rmse_m": 0.01}}]}
         recorded = {"segments": [{"map_id": 1, "metrics": {"ate_rmse_m": 0.01 + 1e-13}}]}
@@ -295,7 +285,6 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
         self.assertIn("TrajectoryContext-dynamic-object.csv", source)
 
     def test_safe_tum_extraction_is_atomic_and_rejects_traversal(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
         from pipeline.fetch import extract_locked_asset
 
         with tempfile.TemporaryDirectory() as temporary:
@@ -328,8 +317,7 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
             self.assertFalse((root / "escape").exists())
 
     def test_point_cloud_metrics_keep_accuracy_and_completeness_directional(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.slam_reference_runner import evaluate_point_clouds
+        from baselines.slam_reference_runner import evaluate_point_clouds
 
         estimate = np.array([[0.0, 0.0, 0.0], [1.0, 0.0, 0.0]])
         truth = np.array([[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [4.0, 0.0, 0.0]])
@@ -342,8 +330,7 @@ class OrbSlamReferenceContractTest(unittest.TestCase):
         self.assertAlmostEqual(metrics["map_fscore_10cm"], 0.8)
 
     def test_reference_run_is_offline_hash_bound_and_atomically_promoted(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        import pipeline.slam_reference_runner as runner
+        import baselines.slam_reference_runner as runner
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

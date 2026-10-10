@@ -14,7 +14,7 @@ from unittest import mock
 
 import numpy as np
 
-from tests.test_colmap_reference import ROOT, fake_engine, run_cli
+from baselines.colmap_reference_test import ROOT, fake_engine, run_cli
 
 
 NERFSTUDIO_COMMIT = "50e0e3c70c775e89333256213363badbf074f29d"
@@ -178,8 +178,7 @@ def fake_neus_engine(path: Path, fail: bool = False) -> Path:
 
 
 def run_fake_neus_reference(root: Path, profile: str = "smoke", run_id: str = "neus-smoke") -> Path:
-    sys.path.insert(0, str(ROOT / "pipeline"))
-    import pipeline.neus_reference_runner as neus_reference_runner
+    import baselines.neus_reference_runner as neus_reference_runner
 
     checkpoint = root / "fixture-alexnet-weights.pth"
     checkpoint.write_bytes(b"fixture weights")
@@ -222,7 +221,7 @@ class NeuSFactoReferenceFoundationTest(unittest.TestCase):
     def test_sources_container_and_adapter_are_locked(self) -> None:
         adapters = {
             item["id"]: item
-            for item in json.loads((ROOT / "reference-adapters.json").read_text())["adapters"]
+            for item in json.loads((ROOT / "assets" / "reference-adapters.json").read_text())["adapters"]
         }
         adapter = adapters["nerfstudio-neus-facto-reference"]
         self.assertEqual(adapter["status"], "landed")
@@ -253,7 +252,7 @@ class NeuSFactoReferenceFoundationTest(unittest.TestCase):
 
         assets = {
             item["id"]: item
-            for item in json.loads((ROOT / "assets.lock.json").read_text())["assets"]
+            for item in json.loads((ROOT / "assets" / "assets.lock.json").read_text())["assets"]
         }
         lpips = assets["nerfstudio-lpips-alexnet"]
         self.assertEqual(lpips["sha256"], LPIPS_SHA256)
@@ -285,11 +284,10 @@ class NeuSFactoReferenceFoundationTest(unittest.TestCase):
         self.assertNotIn("not built yet", entrypoint)
 
     def test_controlled_sphere_inputs_are_deterministic_and_support_labelled(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
         from pipeline.contracts import load_json, sha256_file
-        from pipeline.reference_scene import generate_implicit_surface_scene
+        from scene.reference_scene import generate_implicit_surface_scene
 
-        scene = load_json(ROOT / "shared-scene.json")
+        scene = load_json(ROOT / "scene" / "shared-scene.json")
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             first = generate_implicit_surface_scene(root / "first", scene, "smoke")
@@ -386,8 +384,7 @@ class NeuSFactoReferenceFoundationTest(unittest.TestCase):
 
 class NeuSFactoNumericalContractTest(unittest.TestCase):
     def test_persisted_metric_comparison_is_float_tolerant_but_structurally_strict(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.neus_reference_runner import _values_match
+        from baselines.neus_reference_runner import _values_match
 
         expected = {"score": 1.0, "count": 7, "labels": ["visible", True]}
         self.assertTrue(
@@ -400,8 +397,7 @@ class NeuSFactoNumericalContractTest(unittest.TestCase):
         self.assertFalse(_values_match({"score": 1.0, "count": 7}, expected))
 
     def test_surface_metrics_exclude_unsupported_truth_from_geometry_score(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.neus_reference_runner import _surface_metrics
+        from baselines.neus_reference_runner import _surface_metrics
 
         truth_points = np.array(
             [[1, 0, 0], [0, 1, 0], [0, 0, 1], [-1, 0, 0], [0, -1, 0], [0, 0, -1]],
@@ -429,8 +425,7 @@ class NeuSFactoNumericalContractTest(unittest.TestCase):
         self.assertGreater(metrics["unsupported_accuracy_mean_m"], 0.39)
 
     def test_render_and_field_residual_metrics_are_distinct(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.neus_reference_runner import _eikonal_metrics, _render_metrics
+        from baselines.neus_reference_runner import _eikonal_metrics, _render_metrics
 
         truth_rgb = np.full((4, 5, 3), 100, dtype=np.uint8)
         predicted_rgb = np.full((4, 5, 3), 110, dtype=np.uint8)
@@ -529,16 +524,14 @@ class NeuSFactoReferenceAdapterTest(unittest.TestCase):
             self.assertIn("## Geometry", (run_dir / "report.md").read_text())
             self.assertIn("not a completion", (run_dir / "report.md").read_text())
 
-            sys.path.insert(0, str(ROOT / "pipeline"))
-            from pipeline.neus_reference_runner import validate_neus_reference_result
+            from baselines.neus_reference_runner import validate_neus_reference_result
 
             validate_neus_reference_result(run_dir)
 
     def test_failed_container_is_not_promoted(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            sys.path.insert(0, str(ROOT / "pipeline"))
-            import pipeline.neus_reference_runner as neus_reference_runner
+            import baselines.neus_reference_runner as neus_reference_runner
 
             checkpoint = root / "fixture-alexnet-weights.pth"
             checkpoint.write_bytes(b"fixture weights")
@@ -559,8 +552,7 @@ class NeuSFactoReferenceAdapterTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             run_dir = run_fake_neus_reference(root)
-            sys.path.insert(0, str(ROOT / "pipeline"))
-            from pipeline.neus_reference_runner import validate_neus_reference_result
+            from baselines.neus_reference_runner import validate_neus_reference_result
 
             result_path = run_dir / "result.json"
             result = json.loads(result_path.read_text())
@@ -577,8 +569,7 @@ class NeuSFactoReferenceAdapterTest(unittest.TestCase):
             run_dir = run_fake_neus_reference(Path(temporary))
             mesh = run_dir / "output/mesh.ply"
             mesh.write_text(mesh.read_text() + "\n")
-            sys.path.insert(0, str(ROOT / "pipeline"))
-            from pipeline.neus_reference_runner import validate_neus_reference_result
+            from baselines.neus_reference_runner import validate_neus_reference_result
 
             with self.assertRaisesRegex(ValueError, "artifact"):
                 validate_neus_reference_result(run_dir)
@@ -591,8 +582,7 @@ class NeuSFactoReferenceAdapterTest(unittest.TestCase):
             result["resources"]["runtime_seconds"] += 1.0
             result_path.write_text(json.dumps(result))
 
-            sys.path.insert(0, str(ROOT / "pipeline"))
-            from pipeline.neus_reference_runner import validate_neus_reference_result
+            from baselines.neus_reference_runner import validate_neus_reference_result
 
             with self.assertRaisesRegex(ValueError, "resource summary mismatch"):
                 validate_neus_reference_result(run_dir)
@@ -605,8 +595,7 @@ class NeuSFactoReferenceAdapterTest(unittest.TestCase):
             value["camera_model"] = "PINHOLE"
             metadata.write_text(json.dumps(value))
 
-            sys.path.insert(0, str(ROOT / "pipeline"))
-            from pipeline.neus_reference_runner import validate_neus_reference_result
+            from baselines.neus_reference_runner import validate_neus_reference_result
 
             with self.assertRaisesRegex(ValueError, "input hash mismatch: meta_data.json"):
                 validate_neus_reference_result(run_dir)
@@ -623,8 +612,7 @@ class NeuSFactoReferenceAdapterTest(unittest.TestCase):
             ).hexdigest()
             result_path.write_text(json.dumps(result))
 
-            sys.path.insert(0, str(ROOT / "pipeline"))
-            from pipeline.neus_reference_runner import validate_neus_reference_result
+            from baselines.neus_reference_runner import validate_neus_reference_result
 
             with self.assertRaisesRegex(ValueError, "config identity"):
                 validate_neus_reference_result(run_dir)
@@ -657,8 +645,7 @@ class NeuSFactoReferenceAdapterTest(unittest.TestCase):
                     check=False,
                 )
                 self.assertEqual(inspected.returncode, 0, inspected.stderr)
-                sys.path.insert(0, str(ROOT / "pipeline"))
-                from pipeline.neus_reference_runner import run_neus_reference
+                from baselines.neus_reference_runner import run_neus_reference
 
                 cache = Path(
                     os.environ.get(

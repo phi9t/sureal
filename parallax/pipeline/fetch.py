@@ -46,7 +46,7 @@ def huggingface_snapshot_commands(lock: dict[str, object]) -> list[list[str]]:
 
 
 def fetch_foundation_models(pathway_cache_root: Path) -> None:
-    lock = load_json(ROOT / "foundation-models.lock.json")
+    lock = load_json(ROOT / "assets" / "foundation-models.lock.json")
     launcher = ROOT.parent / "experiments" / "insula-scout" / "enter.sh"
     for command in huggingface_snapshot_commands(lock):
         subprocess.run([str(launcher), *command], cwd=ROOT.parent, check=True)
@@ -287,7 +287,7 @@ def main() -> int:
     args = parser.parse_args()
     destination = args.cache_root / "assets"
     destination.mkdir(parents=True, exist_ok=True)
-    registry = load_json(ROOT / "assets.lock.json")["assets"]
+    registry = load_json(ROOT / "assets" / "assets.lock.json")["assets"]
     known = {
         asset["id"]
         for asset in registry

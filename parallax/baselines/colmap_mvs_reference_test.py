@@ -14,7 +14,7 @@ from unittest import mock
 
 import numpy as np
 
-from tests.test_colmap_reference import ROOT, fake_engine, run_cli
+from baselines.colmap_reference_test import ROOT, fake_engine, run_cli
 
 
 COLMAP_MVS_COMMIT = "be5e29168d4aff238409d60424812df66aac919f"
@@ -243,7 +243,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
     def test_middlebury_archive_is_byte_and_tree_locked_to_the_mvs_adapter(self) -> None:
         assets = {
             item["id"]: item
-            for item in json.loads((ROOT / "assets.lock.json").read_text())["assets"]
+            for item in json.loads((ROOT / "assets" / "assets.lock.json").read_text())["assets"]
         }
         middlebury = assets["middlebury-mvs"]
         self.assertEqual(
@@ -270,10 +270,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
 
     def test_middlebury_import_declares_source_views_and_guards_empty_fusion(self) -> None:
         """Calibrated models without sparse tracks need an explicit MVS view graph."""
-        from sys import path as import_path
-
-        import_path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.mvs_reference_runner import _container_script, _prepare_middlebury_input
+        from baselines.mvs_reference_runner import _container_script, _prepare_middlebury_input
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -361,10 +358,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
             )
 
     def test_canonical_sampling_is_order_and_duplicate_invariant(self) -> None:
-        from sys import path as import_path
-
-        import_path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.mvs_reference_runner import _canonical_sample
+        from baselines.mvs_reference_runner import _canonical_sample
 
         points = np.array([[0.001, 0.001, 0.001], [0.002, 0.001, 0.001], [1, 2, 3]])
         first, first_support = _canonical_sample(points)
@@ -374,10 +368,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         self.assertGreater(int(second_support.max()), int(first_support.max()))
 
     def test_metric_validation_is_exact_for_counts_and_tolerant_for_floats(self) -> None:
-        from sys import path as import_path
-
-        import_path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.mvs_reference_runner import _metrics_match
+        from baselines.mvs_reference_runner import _metrics_match
 
         recomputed = {"dense_points": 1000, "accuracy_mean_m": 0.125}
         self.assertTrue(
@@ -397,10 +388,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         )
 
     def test_dense_map_parser_rejects_truncated_payload(self) -> None:
-        from sys import path as import_path
-
-        import_path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.mvs_reference_runner import _read_colmap_dense_map
+        from baselines.mvs_reference_runner import _read_colmap_dense_map
 
         with tempfile.TemporaryDirectory() as temporary:
             dense_map = Path(temporary) / "depth.bin"
@@ -409,10 +397,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
                 _read_colmap_dense_map(dense_map)
 
     def test_mesh_parser_rejects_forged_face_count(self) -> None:
-        from sys import path as import_path
-
-        import_path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.mvs_reference_runner import _read_ply_xyz
+        from baselines.mvs_reference_runner import _read_ply_xyz
 
         with tempfile.TemporaryDirectory() as temporary:
             mesh = Path(temporary) / "mesh.ply"
@@ -427,10 +412,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
                 _read_ply_xyz(mesh, validate_faces=True)
 
     def test_mesh_parser_counts_only_unique_nondegenerate_faces(self) -> None:
-        from sys import path as import_path
-
-        import_path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.mvs_reference_runner import _read_ply_xyz
+        from baselines.mvs_reference_runner import _read_ply_xyz
 
         header = (
             "ply\nformat ascii 1.0\nelement vertex 4\n"
@@ -459,10 +441,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
             self.assertEqual(valid_faces, 1)
 
     def test_manifest_paths_cannot_escape_the_input_directory(self) -> None:
-        from sys import path as import_path
-
-        import_path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.mvs_reference_runner import _manifest_input_path
+        from baselines.mvs_reference_runner import _manifest_input_path
 
         with tempfile.TemporaryDirectory() as temporary:
             input_root = Path(temporary) / "input"
@@ -472,10 +451,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
                 _manifest_input_path(input_root, "../outside.npy")
 
     def test_geometry_metrics_rejects_an_escaping_truth_manifest_path(self) -> None:
-        from sys import path as import_path
-
-        import_path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.mvs_reference_runner import _geometry_metrics
+        from baselines.mvs_reference_runner import _geometry_metrics
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -505,10 +481,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
                 _geometry_metrics(run_dir)
 
     def test_geometry_metrics_rejects_an_undeclared_registered_image(self) -> None:
-        from sys import path as import_path
-
-        import_path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.mvs_reference_runner import _geometry_metrics
+        from baselines.mvs_reference_runner import _geometry_metrics
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -534,10 +507,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
 
     def test_placeholder_database_and_binary_models_are_rejected(self) -> None:
         import sqlite3
-        from sys import path as import_path
-
-        import_path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.mvs_reference_runner import _validate_colmap_binary_model, _validate_mvs_database
+        from baselines.mvs_reference_runner import _validate_colmap_binary_model, _validate_mvs_database
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -558,10 +528,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
                 _validate_colmap_binary_model(model, {"frame-000.pgm"}, 1)
 
     def test_fused_points_require_oriented_normals(self) -> None:
-        from sys import path as import_path
-
-        import_path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.mvs_reference_runner import _read_ply_xyz
+        from baselines.mvs_reference_runner import _read_ply_xyz
 
         with tempfile.TemporaryDirectory() as temporary:
             fused = Path(temporary) / "fused.ply"
@@ -578,8 +545,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         helper = textwrap.dedent(
             f"""\
             import sys
-            sys.path.insert(0, {str(ROOT / "pipeline")!r})
-            import pipeline.mvs_reference_runner as mvs_reference_runner
+            import baselines.mvs_reference_runner as mvs_reference_runner
             mvs_reference_runner._gpu_process_memory_bytes = lambda _container_id: 0
             command = [
                 sys.executable,
@@ -595,6 +561,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         )
         completed = subprocess.run(
             [sys.executable, "-c", helper],
+            env={**os.environ, "PYTHONPATH": str(ROOT)},
             text=True,
             capture_output=True,
             timeout=5,
@@ -603,10 +570,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         self.assertEqual(completed.returncode, 0, completed.stderr)
 
     def test_gpu_memory_counts_only_processes_in_the_run_container(self) -> None:
-        from sys import path as import_path
-
-        import_path.insert(0, str(ROOT / "pipeline"))
-        import pipeline.mvs_reference_runner as mvs_reference_runner
+        import baselines.mvs_reference_runner as mvs_reference_runner
 
         container_id = "a" * 64
         with tempfile.TemporaryDirectory() as temporary:
@@ -631,10 +595,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         self.assertEqual(measured, 2048 * 1024 * 1024)
 
     def test_cpu_memory_parser_accepts_gnu_time_verbose_indentation(self) -> None:
-        from sys import path as import_path
-
-        import_path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.mvs_reference_runner import _peak_cpu_memory_bytes
+        from baselines.mvs_reference_runner import _peak_cpu_memory_bytes
 
         with tempfile.TemporaryDirectory() as temporary:
             resource = Path(temporary) / "resource-usage.txt"
@@ -642,10 +603,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
             self.assertEqual(_peak_cpu_memory_bytes(resource), 3412 * 1024)
 
     def test_pinned_release_contains_the_upstream_blackwell_patchmatch_fix(self) -> None:
-        from sys import path as import_path
-
-        import_path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.mvs_reference_runner import PINNED_COLMAP_COMMIT, PINNED_COLMAP_VERSION
+        from baselines.mvs_reference_runner import PINNED_COLMAP_COMMIT, PINNED_COLMAP_VERSION
 
         self.assertEqual(PINNED_COLMAP_VERSION, "4.2.0")
         self.assertEqual(PINNED_COLMAP_COMMIT, "be5e29168d4aff238409d60424812df66aac919f")
@@ -655,15 +613,12 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
         self.assertIn("RUN mkdir -p /usr/include/opencv4", dockerfile)
 
     def test_controlled_scene_uses_unique_tile_appearance_for_pose_observability(self) -> None:
-        scene = json.loads((ROOT / "shared-scene.json").read_text())
+        scene = json.loads((ROOT / "scene" / "shared-scene.json").read_text())
         fixture = scene["reference_fixture"]
         tile_count = len(fixture["tile_center_x_angles"]) * len(fixture["tile_center_y_angles"])
         self.assertEqual(fixture["texture_count"], tile_count + 1)
         self.assertEqual(fixture["tile_texture_assignment"], "unique-per-tile")
-        from sys import path as import_path
-
-        import_path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.reference_scene import _scene_textures
+        from scene.reference_scene import _scene_textures
 
         textures = _scene_textures(scene)
         self.assertEqual(textures[0].shape, (1024, 1024))
@@ -700,10 +655,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
 
     def test_mvs_gpu_stages_are_pinned_to_one_visible_device(self) -> None:
         """Auto-selecting every visible GPU is invalid on partitioned B200 hosts."""
-        from sys import path as import_path
-
-        import_path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.mvs_reference_runner import _container_script
+        from baselines.mvs_reference_runner import _container_script
 
         script = _container_script(
             {
@@ -724,16 +676,13 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
 
     def test_mvs_scene_emits_deterministic_metric_depth_and_visible_surface_truth(self) -> None:
         """Dropping metric GT generation must break the dense-geometry evaluation contract."""
-        from sys import path as import_path
-
-        import_path.insert(0, str(ROOT / "pipeline"))
         from pipeline.contracts import load_json
-        import pipeline.reference_scene as reference_scene
+        import scene.reference_scene as reference_scene
 
         self.assertTrue(hasattr(reference_scene, "generate_colmap_mvs_scene"))
         generate_colmap_mvs_scene = reference_scene.generate_colmap_mvs_scene
 
-        scene = load_json(ROOT / "shared-scene.json")
+        scene = load_json(ROOT / "scene" / "shared-scene.json")
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             first = generate_colmap_mvs_scene(root / "first", scene, "smoke")
@@ -764,16 +713,13 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
             )
 
     def test_full_manifest_cannot_be_validated_as_smoke(self) -> None:
-        from sys import path as import_path
-
-        import_path.insert(0, str(ROOT / "pipeline"))
         from pipeline.contracts import load_json
-        from pipeline.mvs_reference_runner import _validate_manifest_contract
-        from pipeline.reference_scene import generate_colmap_mvs_scene
+        from baselines.mvs_reference_runner import _validate_manifest_contract
+        from scene.reference_scene import generate_colmap_mvs_scene
 
         with tempfile.TemporaryDirectory() as temporary:
             manifest = generate_colmap_mvs_scene(
-                Path(temporary) / "scene", load_json(ROOT / "shared-scene.json"), "full"
+                Path(temporary) / "scene", load_json(ROOT / "scene" / "shared-scene.json"), "full"
             )
             with self.assertRaisesRegex(ValueError, "profile contract"):
                 _validate_manifest_contract(manifest, "smoke")
@@ -822,10 +768,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
                 self.assertTrue((run_dir / relative).is_file(), relative)
             self.assertFalse(any((cache / "reference-staging").glob("*")))
 
-            from sys import path as import_path
-
-            import_path.insert(0, str(ROOT / "pipeline"))
-            from pipeline.mvs_reference_runner import validate_mvs_reference_result
+            from baselines.mvs_reference_runner import validate_mvs_reference_result
 
             validate_mvs_reference_result(run_dir)
             self.assertNotIn("visible-support failure", (run_dir / "report.md").read_text())
@@ -853,10 +796,7 @@ class ColmapMvsReferenceAdapterTest(unittest.TestCase):
             (middlebury / "templeSR_par.txt").write_text(
                 "\n".join(calibration) + "\n", encoding="utf-8"
             )
-            from sys import path as import_path
-
-            import_path.insert(0, str(ROOT / "pipeline"))
-            import pipeline.mvs_reference_runner as mvs_reference_runner
+            import baselines.mvs_reference_runner as mvs_reference_runner
 
             extraction = {
                 "archive_sha256": "b4684adcfda53b47b0964355b4142c53cb28940bbb448e0e974f92748e428de9",

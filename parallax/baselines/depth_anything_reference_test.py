@@ -6,7 +6,6 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
-import sys
 import tempfile
 import textwrap
 import unittest
@@ -14,7 +13,7 @@ from unittest import mock
 
 import numpy as np
 
-from tests.test_colmap_reference import ROOT, fake_engine, run_cli
+from baselines.colmap_reference_test import ROOT, fake_engine, run_cli
 
 
 SOURCE_COMMIT = "a561b849ebae10a6f5ef49e26c83cbbcd36c71bf"
@@ -114,8 +113,7 @@ def fake_depth_engine(path: Path) -> Path:
 
 
 def run_fake_depth_reference(root: Path, profile: str = "smoke", run_id: str = "depth-smoke") -> Path:
-    sys.path.insert(0, str(ROOT / "pipeline"))
-    import pipeline.depth_reference_runner as depth_reference_runner
+    import baselines.depth_reference_runner as depth_reference_runner
 
     cache = root / "cache"
     asset_dir = cache / "assets"
@@ -124,7 +122,7 @@ def run_fake_depth_reference(root: Path, profile: str = "smoke", run_id: str = "
     checkpoint.write_bytes(b"fixture depth checkpoint")
     fixture_sha = hashlib.sha256(checkpoint.read_bytes()).hexdigest()
     official = {
-        item["id"]: item for item in json.loads((ROOT / "assets.lock.json").read_text())["assets"]
+        item["id"]: item for item in json.loads((ROOT / "assets" / "assets.lock.json").read_text())["assets"]
     }["depth-anything-v2-metric-hypersim-small"]
     record = {**official, "sha256": fixture_sha, "byte_size": checkpoint.stat().st_size}
     engine = fake_depth_engine(root)
@@ -167,7 +165,7 @@ class DepthAnythingReferenceFoundationTest(unittest.TestCase):
 
     def test_official_source_checkpoint_and_adapter_are_locked(self) -> None:
         assets = {
-            item["id"]: item for item in json.loads((ROOT / "assets.lock.json").read_text())["assets"]
+            item["id"]: item for item in json.loads((ROOT / "assets" / "assets.lock.json").read_text())["assets"]
         }
         checkpoint = assets["depth-anything-v2-metric-hypersim-small"]
         self.assertEqual(checkpoint["sha256"], CHECKPOINT_SHA256)
@@ -178,7 +176,7 @@ class DepthAnythingReferenceFoundationTest(unittest.TestCase):
 
         adapters = {
             item["id"]: item
-            for item in json.loads((ROOT / "reference-adapters.json").read_text())["adapters"]
+            for item in json.loads((ROOT / "assets" / "reference-adapters.json").read_text())["adapters"]
         }
         adapter = adapters["depth-anything-v2-reference"]
         self.assertEqual(adapter["status"], "landed")
@@ -195,8 +193,7 @@ class DepthAnythingReferenceFoundationTest(unittest.TestCase):
         self.assertIn("torchvision==0.28.0", dockerfile)
 
     def test_depth_metrics_keep_raw_metric_error_separate_from_alignment(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.depth_reference_runner import _depth_metrics
+        from baselines.depth_reference_runner import _depth_metrics
 
         truth = np.linspace(2.0, 6.0, 80, dtype=np.float32).reshape(8, 10)
         prediction = ((truth - 0.7) / 1.4).astype(np.float32)
@@ -221,11 +218,10 @@ class DepthAnythingReferenceFoundationTest(unittest.TestCase):
         self.assertGreater(constant["affine_aligned_rmse_m"], 1.0)
 
     def test_controlled_inputs_are_deterministic_visible_depth_not_completion(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
         from pipeline.contracts import load_json, sha256_file
-        from pipeline.reference_scene import generate_learned_depth_scene
+        from scene.reference_scene import generate_learned_depth_scene
 
-        scene = load_json(ROOT / "shared-scene.json")
+        scene = load_json(ROOT / "scene" / "shared-scene.json")
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             first = generate_learned_depth_scene(root / "first", scene, "smoke")
@@ -266,8 +262,7 @@ class DepthAnythingReferenceFoundationTest(unittest.TestCase):
 
 class DepthAnythingReferenceAdapterTest(unittest.TestCase):
     def test_checkpoint_asset_directory_cannot_escape_the_cache_root(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.depth_reference_runner import _checkpoint_path
+        from baselines.depth_reference_runner import _checkpoint_path
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -286,8 +281,7 @@ class DepthAnythingReferenceAdapterTest(unittest.TestCase):
                 _checkpoint_path(cache.resolve(), record)
 
     def test_checkpoint_hash_mismatch_fails_before_execution(self) -> None:
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.depth_reference_runner import run_depth_reference
+        from baselines.depth_reference_runner import run_depth_reference
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -352,8 +346,7 @@ class DepthAnythingReferenceAdapterTest(unittest.TestCase):
                 self.assertTrue((run_dir / relative).is_file(), relative)
             self.assertFalse(any((root / "cache/reference-staging").glob("*")))
 
-            sys.path.insert(0, str(ROOT / "pipeline"))
-            import pipeline.depth_reference_runner as depth_reference_runner
+            import baselines.depth_reference_runner as depth_reference_runner
 
             checkpoint_record = json.loads((run_dir / "output/checkpoint.json").read_text())
             with (
@@ -383,8 +376,7 @@ class DepthAnythingReferenceAdapterTest(unittest.TestCase):
             run_dir = run_fake_depth_reference(Path(temporary), run_id="depth-provenance")
             original = json.loads((run_dir / "result.json").read_text())
             checkpoint_record = json.loads((run_dir / "output/checkpoint.json").read_text())
-            sys.path.insert(0, str(ROOT / "pipeline"))
-            import pipeline.depth_reference_runner as depth_reference_runner
+            import baselines.depth_reference_runner as depth_reference_runner
 
             mutations = (
                 ("tool-version", lambda result: result["tool"].__setitem__("version", "forged")),
@@ -459,8 +451,7 @@ class DepthAnythingReferenceAdapterTest(unittest.TestCase):
             if required:
                 self.fail("required real Depth Anything V2 image/checkpoint is unavailable")
             self.skipTest("real Depth Anything V2 image/checkpoint is unavailable")
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.depth_reference_runner import run_depth_reference
+        from baselines.depth_reference_runner import run_depth_reference
 
         run_id = f"depth-real-smoke-test-{os.getpid()}"
         run_dir = run_depth_reference(cache, "smoke", run_id)
@@ -487,8 +478,7 @@ class DepthAnythingReferenceAdapterTest(unittest.TestCase):
         )
         if docker is None or image is None or image.returncode != 0 or not checkpoint.is_file():
             self.fail("required full Depth Anything V2 image/checkpoint is unavailable")
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.depth_reference_runner import run_depth_reference
+        from baselines.depth_reference_runner import run_depth_reference
 
         run_id = f"depth-real-full-test-{os.getpid()}"
         run_dir = run_depth_reference(cache, "full", run_id)

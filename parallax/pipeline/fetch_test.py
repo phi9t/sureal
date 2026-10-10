@@ -3,14 +3,12 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
-import sys
 import tempfile
 import unittest
 import zipfile
 
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "pipeline"))
 
 
 class FetchPromotionContractTest(unittest.TestCase):
@@ -18,7 +16,7 @@ class FetchPromotionContractTest(unittest.TestCase):
         from pipeline.fetch import huggingface_snapshot_commands
 
         commands = huggingface_snapshot_commands(
-            json.loads((ROOT / "foundation-models.lock.json").read_text())
+            json.loads((ROOT / "assets" / "foundation-models.lock.json").read_text())
         )
 
         self.assertEqual(len(commands), 2)

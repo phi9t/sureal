@@ -4,7 +4,6 @@ import json
 import os
 from pathlib import Path
 import subprocess
-import sys
 import tempfile
 import time
 import unittest
@@ -13,7 +12,6 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = ROOT.parent
-sys.path.insert(0, str(ROOT / "pipeline"))
 
 from pipeline.cli import dispatch_plan, parser, stage_reference_suite  # noqa: E402
 from pipeline.contracts import full_acceptance_status, load_json  # noqa: E402
@@ -280,7 +278,7 @@ class EndToEndCompletionContractTest(unittest.TestCase):
             result["metrics"]["geometry"]["camera_fx_px"] = 521.0
             report_path = run_root / "01" / "report.md"
             report_path.write_text(
-                module_report(load_json(ROOT / "curriculum.json")["modules"][0], result),
+                module_report(load_json(ROOT / "curriculum" / "curriculum.json")["modules"][0], result),
                 encoding="utf-8",
             )
             import hashlib

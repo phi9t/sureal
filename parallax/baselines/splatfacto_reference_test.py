@@ -19,7 +19,7 @@ NERFSTUDIO_COMMIT = "50e0e3c70c775e89333256213363badbf074f29d"
 GSPLAT_COMMIT = "4d3a3b69db4de0326f983ccf7b7b255271a17b01"
 FIXTURE_IMAGE_ID = next(
     item["baseline_environment"]["container_image_id"]
-    for item in json.loads((ROOT / "reference-adapters.json").read_text())["adapters"]
+    for item in json.loads((ROOT / "assets" / "reference-adapters.json").read_text())["adapters"]
     if item["id"] == "nerfstudio-splatfacto-reference"
 )
 
@@ -246,10 +246,7 @@ def fake_splatfacto_engine(path: Path, fail: bool = False) -> Path:
 
 
 def run_fake_splatfacto_reference(root: Path, run_id: str = "splatfacto-smoke") -> Path:
-    import sys
-
-    sys.path.insert(0, str(ROOT / "pipeline"))
-    import pipeline.splatfacto_reference_runner as splatfacto_reference_runner
+    import baselines.splatfacto_reference_runner as splatfacto_reference_runner
 
     checkpoint = root / "fixture-alexnet.pth"
     checkpoint.write_bytes(b"fixture")
@@ -270,7 +267,7 @@ class SplatfactoReferenceFoundationTest(unittest.TestCase):
     def test_primary_implementation_sources_are_registered_for_module_11(self) -> None:
         sources = {
             item["id"]: item
-            for item in json.loads((ROOT / "sources.json").read_text())["sources"]
+            for item in json.loads((ROOT / "assets" / "sources.json").read_text())["sources"]
         }
         self.assertEqual(
             sources["nerfstudio-splatfacto-2025"]["primary_url"],
@@ -282,7 +279,7 @@ class SplatfactoReferenceFoundationTest(unittest.TestCase):
         )
         curriculum = {
             item["id"]: item
-            for item in json.loads((ROOT / "curriculum.json").read_text())["modules"]
+            for item in json.loads((ROOT / "curriculum" / "curriculum.json").read_text())["modules"]
         }
         self.assertEqual(curriculum["11"]["insula"], "gaussian-splatting")
         self.assertIn("nerfstudio-splatfacto-2025", curriculum["11"]["sources"])
@@ -291,7 +288,7 @@ class SplatfactoReferenceFoundationTest(unittest.TestCase):
     def test_adapter_declares_rendering_scope_and_unsupported_surface_claims(self) -> None:
         adapters = {
             item["id"]: item
-            for item in json.loads((ROOT / "reference-adapters.json").read_text())[
+            for item in json.loads((ROOT / "assets" / "reference-adapters.json").read_text())[
                 "adapters"
             ]
         }
@@ -415,16 +412,13 @@ class SplatfactoReferenceFoundationTest(unittest.TestCase):
         )
 
     def test_scene_transform_contains_no_target_training_frames(self) -> None:
-        import sys
-
-        sys.path.insert(0, str(ROOT / "pipeline"))
         from pipeline.contracts import load_json
-        from pipeline.reference_scene import generate_radiance_field_scene
+        from scene.reference_scene import generate_radiance_field_scene
 
         with tempfile.TemporaryDirectory() as temporary:
             destination = Path(temporary) / "scene"
             manifest = generate_radiance_field_scene(
-                destination, load_json(ROOT / "shared-scene.json"), "smoke"
+                destination, load_json(ROOT / "scene" / "shared-scene.json"), "smoke"
             )
             transforms = json.loads((destination / "transforms.json").read_text())
             paths = [frame["file_path"] for frame in transforms["frames"]]
@@ -433,7 +427,7 @@ class SplatfactoReferenceFoundationTest(unittest.TestCase):
             self.assertTrue(all("target-" not in path for path in paths))
 
     def test_reference_schema_requires_gaussian_metric_families(self) -> None:
-        schema = json.loads((ROOT / "reference-result.schema.json").read_text())
+        schema = json.loads((ROOT / "schemas" / "reference-result.schema.json").read_text())
         self.assertIn("splatfacto", schema["properties"]["adapter"]["enum"])
         branch = next(
             item
@@ -520,10 +514,7 @@ class SplatfactoOutputContractTest(unittest.TestCase):
                     check=False,
                 )
                 self.assertEqual(inspected.returncode, 0, inspected.stderr)
-                import sys
-
-                sys.path.insert(0, str(ROOT / "pipeline"))
-                from pipeline.splatfacto_reference_runner import run_splatfacto_reference
+                from baselines.splatfacto_reference_runner import run_splatfacto_reference
 
                 cache = Path(
                     os.environ.get(
@@ -540,10 +531,7 @@ class SplatfactoOutputContractTest(unittest.TestCase):
                 self.assertEqual(result["support"]["triangle_mesh"], "unsupported")
 
     def test_failed_container_is_not_promoted(self) -> None:
-        import sys
-
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        import pipeline.splatfacto_reference_runner as splatfacto_reference_runner
+        import baselines.splatfacto_reference_runner as splatfacto_reference_runner
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -569,10 +557,7 @@ class SplatfactoOutputContractTest(unittest.TestCase):
             self.assertEqual(list((root / "cache/reference-staging").iterdir()), [])
 
     def test_tampered_gaussian_archive_is_rejected(self) -> None:
-        import sys
-
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.splatfacto_reference_runner import validate_splatfacto_reference_result
+        from baselines.splatfacto_reference_runner import validate_splatfacto_reference_result
 
         with tempfile.TemporaryDirectory() as temporary:
             run_dir = run_fake_splatfacto_reference(Path(temporary), "tamper-splat")
@@ -584,10 +569,7 @@ class SplatfactoOutputContractTest(unittest.TestCase):
                 validate_splatfacto_reference_result(run_dir)
 
     def test_truncated_or_nonfinite_gaussian_ply_is_rejected(self) -> None:
-        import sys
-
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.splatfacto_reference_runner import validate_splatfacto_reference_result
+        from baselines.splatfacto_reference_runner import validate_splatfacto_reference_result
 
         with tempfile.TemporaryDirectory() as temporary:
             run_dir = run_fake_splatfacto_reference(Path(temporary), "truncated-ply")
@@ -607,10 +589,7 @@ class SplatfactoOutputContractTest(unittest.TestCase):
                 validate_splatfacto_reference_result(run_dir)
 
     def test_tampered_resources_or_unapproved_image_are_rejected(self) -> None:
-        import sys
-
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        import pipeline.splatfacto_reference_runner as splatfacto_reference_runner
+        import baselines.splatfacto_reference_runner as splatfacto_reference_runner
 
         with tempfile.TemporaryDirectory() as temporary:
             run_dir = run_fake_splatfacto_reference(Path(temporary), "resource-tamper")
@@ -637,10 +616,7 @@ class SplatfactoOutputContractTest(unittest.TestCase):
                     )
 
     def test_gaussian_parameter_validator_rejects_non_unit_quaternions(self) -> None:
-        import sys
-
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.splatfacto_reference_runner import validate_gaussian_archive
+        from baselines.splatfacto_reference_runner import validate_gaussian_archive
 
         with tempfile.TemporaryDirectory() as temporary:
             archive = Path(temporary) / "gaussians.npz"
@@ -656,10 +632,7 @@ class SplatfactoOutputContractTest(unittest.TestCase):
                 validate_gaussian_archive(archive)
 
     def test_gaussian_parameter_validator_recomputes_representation_metrics(self) -> None:
-        import sys
-
-        sys.path.insert(0, str(ROOT / "pipeline"))
-        from pipeline.splatfacto_reference_runner import validate_gaussian_archive
+        from baselines.splatfacto_reference_runner import validate_gaussian_archive
 
         with tempfile.TemporaryDirectory() as temporary:
             archive = Path(temporary) / "gaussians.npz"

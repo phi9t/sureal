@@ -148,10 +148,10 @@ def _crossref_check(source: dict[str, object]) -> str | None:
 
 def audit(online: bool) -> dict[str, object]:
     errors: list[str] = []
-    curriculum = load_json(ROOT / "curriculum.json")
-    registry = load_json(ROOT / "sources.json")
-    assets = load_json(ROOT / "assets.lock.json")
-    terminology = load_json(ROOT / "terminology.json")
+    curriculum = load_json(ROOT / "curriculum" / "curriculum.json")
+    registry = load_json(ROOT / "assets" / "sources.json")
+    assets = load_json(ROOT / "assets" / "assets.lock.json")
+    terminology = load_json(ROOT / "assets" / "terminology.json")
     survey_path = ROOT.parent / "docs" / "3d-reconstruction-pathway.md"
     canonical_path = ROOT.parent / "docs" / "coherent-scene-hypotheses.md"
     if not survey_path.is_file():
@@ -238,7 +238,7 @@ def audit(online: bool) -> dict[str, object]:
             continue
         errors.extend(_image_lock_errors(name, lock, dockerfile.read_text(encoding="utf-8")))
 
-    adapters = load_json(ROOT / "reference-adapters.json").get("adapters", [])
+    adapters = load_json(ROOT / "assets" / "reference-adapters.json").get("adapters", [])
     if not adapters:
         errors.append("reference adapter registry is empty")
     for adapter in adapters:

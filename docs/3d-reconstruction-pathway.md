@@ -36,7 +36,7 @@ that persists across points, cameras, and time. No single scalar ranks all of
 these tasks.
 
 The machine-readable counterpart is
-[`curriculum.json`](../parallax/curriculum.json). The shared scene
+[`curriculum/curriculum.json`](../parallax/curriculum/curriculum.json). The shared scene
 uses metres, a right-handed world frame, and OpenCV cameras
 (x right, y down, z forward). All smoke labs are deterministic and offline;
 `build` and `fetch` are the only network-capable dispatches. Each run records
@@ -47,7 +47,7 @@ hidden-scene hypothesis, exact OpenCV cameras, metric depth and ray distance,
 normals, IDs, albedo, sampled geometry, and visibility. Deterministic RGB-D,
 time-of-flight, and sparse-LiDAR response summaries are derived from those
 rendered buffers. Full `all` also executes every adapter marked `landed` in
-`reference-adapters.json`; smoke remains the compact CI contract.
+`assets/reference-adapters.json`; smoke remains the compact CI contract.
 
 ```bash
 parallax/run.sh list
@@ -514,7 +514,7 @@ The verified B200 smoke baseline registers 5/5 views and produces 41,749 fused
 points and 257,274 unique non-degenerate mesh faces, with 0.034 m accuracy, 0.827 m completeness,
 and 0.387 F-score at 10 cm. Full registers 9/9 views and produces 105,548
 points and 628,823 such faces, with 0.046 m accuracy, 0.625 m completeness, and
-0.643 F-score. The tracked baselines live in `reference-adapters.json`; the
+0.643 F-score. The tracked baselines live in `assets/reference-adapters.json`; the
 large directed-error gap is retained as failure evidence rather than averaged
 away. COLMAP's GPU stages vary slightly, so acceptance is threshold-based
 rather than exact-output based. Smoke uses a
@@ -629,7 +629,7 @@ on a 5 cm voxel grid; the estimated map contains final, live, observation-suppor
 sparse landmarks on a 2 cm grid. Accordingly, its F-score is a sparse
 visible-map diagnostic, not a dense surface or complete-scene score.
 
-On the locked image and host recorded in `reference-adapters.json`, smoke
+On the locked image and host recorded in `assets/reference-adapters.json`, smoke
 tracked 300/300 frames with 0.0106 m ATE RMSE, 0.00595 m translational RPE,
 0.0277 m endpoint drift, 1,779 final landmarks, and 0.603 map F-score. Full
 tracked 798/798 frames with 0.0104 m ATE RMSE, 0.00585 m translational RPE,

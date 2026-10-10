@@ -7,14 +7,13 @@ import os
 from pathlib import Path
 import socket
 import subprocess
-import sys
 import tempfile
 import unittest
 
 
 ROOT = Path(__file__).resolve().parents[1]
 PIPELINE = ROOT / "pipeline"
-sys.path.insert(0, str(PIPELINE))
+BASELINES = ROOT / "baselines"
 
 
 def run_cli(*args: str, cache: Path) -> subprocess.CompletedProcess[str]:
@@ -38,7 +37,7 @@ class ReviewHardeningTest(unittest.TestCase):
             "splatfacto_reference_runner.py",
             "foundation_geometry_reference_runner.py",
         ):
-            tree = ast.parse((PIPELINE / name).read_text(encoding="utf-8"))
+            tree = ast.parse((BASELINES / name).read_text(encoding="utf-8"))
             calls = [
                 node
                 for node in ast.walk(tree)
@@ -74,10 +73,10 @@ class ReviewHardeningTest(unittest.TestCase):
         )
 
     def test_reference_scope_and_container_locks_are_honest(self) -> None:
-        curriculum = json.loads((ROOT / "curriculum.json").read_text())
+        curriculum = json.loads((ROOT / "curriculum" / "curriculum.json").read_text())
         self.assertIn("repo-owned concept", curriculum["profiles"]["full"]["purpose"].lower())
         self.assertNotIn("adapter", curriculum["profiles"]["full"]["purpose"].lower())
-        adapters = json.loads((ROOT / "reference-adapters.json").read_text())["adapters"]
+        adapters = json.loads((ROOT / "assets" / "reference-adapters.json").read_text())["adapters"]
         self.assertTrue(adapters)
         statuses = {item["id"]: item["status"] for item in adapters}
         self.assertEqual(statuses["colmap-sfm-reference"], "landed")
@@ -109,7 +108,7 @@ class ReviewHardeningTest(unittest.TestCase):
             self.assertEqual(lock["dockerfile_sha256"], hashlib.sha256(dockerfile.read_bytes()).hexdigest())
 
     def test_corrected_primary_source_metadata(self) -> None:
-        sources = {item["id"]: item for item in json.loads((ROOT / "sources.json").read_text())["sources"]}
+        sources = {item["id"]: item for item in json.loads((ROOT / "assets" / "sources.json").read_text())["sources"]}
         self.assertEqual(sources["marr-poggio-1979"]["primary_url"], "https://doi.org/10.1098/rspb.1979.0029")
         self.assertEqual(sources["salvi-2010"]["primary_url"], "https://doi.org/10.1016/j.patcog.2010.03.004")
         self.assertEqual(sources["luiten-dynamic3dgs-2024"]["primary_url"], "https://doi.org/10.1109/3DV62453.2024.00044")
@@ -125,16 +124,16 @@ class ReviewHardeningTest(unittest.TestCase):
             self.assertEqual(completed.returncode, 0, completed.stderr)
             run_dir = cache / "runs" / "review-01" / "01"
             result = validate_result(run_dir, "01")
-            scene = json.loads((ROOT / "shared-scene.json").read_text())
+            scene = json.loads((ROOT / "scene" / "shared-scene.json").read_text())
             self.assertEqual(result["metrics"]["geometry"]["camera_fx_px"], scene["cameras"]["intrinsics"]["fx"])
             self.assertEqual(len(result["failure_sweep"]), 5)
             self.assertEqual(result["measurement_kind"], "controlled_fixture")
             self.assertTrue(result["metric_provenance"])
             self.assertEqual(
-                result["provenance"]["inputs_sha256"]["shared-scene.json"],
-                hashlib.sha256((ROOT / "shared-scene.json").read_bytes()).hexdigest(),
+                result["provenance"]["inputs_sha256"]["scene/shared-scene.json"],
+                hashlib.sha256((ROOT / "scene" / "shared-scene.json").read_bytes()).hexdigest(),
             )
-            self.assertIn("pipeline/labs.py", result["provenance"]["implementation_sha256"])
+            self.assertIn("curriculum/labs.py", result["provenance"]["implementation_sha256"])
             self.assertIn("report.md", result["provenance"]["reports_sha256"])
 
     def test_validator_rejects_tampering_and_report_validates_inputs(self) -> None:
@@ -218,7 +217,7 @@ class ReviewHardeningTest(unittest.TestCase):
             self.assertEqual(endpoint["measurement_kind"], "reused_measured_result")
 
     def test_fetch_manifest_has_correct_tum_url_and_selection_contract(self) -> None:
-        assets = {item["id"]: item for item in json.loads((ROOT / "assets.lock.json").read_text())["assets"]}
+        assets = {item["id"]: item for item in json.loads((ROOT / "assets" / "assets.lock.json").read_text())["assets"]}
         self.assertIn("/freiburg1/", assets["tum-rgbd"]["source"])
         self.assertEqual(assets["tum-rgbd"]["digest_status"], "verified_2026-09-26")
         self.assertEqual(assets["tum-rgbd"]["extraction"]["mode"], "tar")
