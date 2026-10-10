@@ -42,3 +42,7 @@ Focused and gate evidence:
 - `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //:repo_gate`: passed, 19/19 tests, including `//:pinned_sources_test`.
 - `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...`: passed, 189/189 tests.
 - CUDA gate intentionally not run in this worker sandbox because it has no GPU devices; the coordinator runs CUDA.
+
+### 2026-10-10 coordinator review
+
+Accepted. Follow-up for ticket 06: the orbit varies only azimuth, about a single axis. Add elevation variation, or a second orbit ring, before incremental SfM claims general rotation.
