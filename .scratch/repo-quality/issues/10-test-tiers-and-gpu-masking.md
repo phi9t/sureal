@@ -43,3 +43,8 @@ Source: `../research/milano-conventions.md`, test tiers.
 - **ADR renumbered** to `docs/adr/0004-test-tiers-and-gpu-masking.md`, because `0003` was already taken by repo-quality 09's shell ADR. The digests above refer to the 0003 path at the worker commit.
 - **AGENTS.md** gains a "Test tiers" section. It was outside the worker's allowlist.
 - **Gates** are recorded in the landing commit's verification run, which includes CUDA on GPU 1.
+- **GPU guard probe fixed.** The coordinator's CUDA gate on GPU 1 failed 3 tests: `found 0`. The outer Insula exposes only `/dev/nvidia1`, so torch in the test process saw no device at `CUDA_VISIBLE_DEVICES=1`. The guard now checks `SUREAL_BAZEL_GPU_DEVICE_UUIDS`, which the launcher sets only after it mounts the device, and checks that the `/dev/nvidia<minor>` node exists. Unit tests cover:
+  - no device recorded;
+  - a missing node;
+  - a single mounted device;
+  - the CPU tier.
