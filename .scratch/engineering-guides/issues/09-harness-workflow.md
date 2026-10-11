@@ -1,7 +1,13 @@
 # 09: Collaboration tooling moves into `harness/workflow/`
 
 **What to build:** The multi-agent collaboration tooling lives in `harness/workflow/`, Milano's name for the
-same concept: `scripts/collab.py`, `scripts/collab_live.py` and `scripts/_collab/`. `scripts/` then holds only
+same concept:
+- `scripts/collab.py`, `scripts/collab_live.py` and `scripts/_collab/`;
+- its tests in `tests/collab/` (colocated beside the modules they test);
+- its runtime image `experiments/collaboration/runtime/`;
+- its docs and fixtures `docs/collaboration/`.
+
+After this ticket, `tests/` and `experiments/collaboration/` are gone. `scripts/` then holds only
 Surflo's inherited user entry points.
 
 **Blocked by:** 06, 07

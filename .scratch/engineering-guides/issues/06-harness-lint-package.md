@@ -22,7 +22,8 @@ Decisions (coordinator, 2026-10-11):
   - `check_cxx` (from ticket 01);
   - `clang_format_repo`, `ruff_repo`, `shellcheck_repo`, `shfmt_repo`;
   - `pinned_sources`, `publication_audit`;
-  - `githooks_test`.
+  - `githooks_test`;
+  - `tests/test_publication_audit.py` (colocated as `publication_audit_test.py`).
 - **Stays in `scripts/`:** Surflo's user entry points (`infer.py`, `evaluate.py`, `preprocess.py`,
   `repack_checkpoint.py`, `download_dl3dv_10k_meshed.py`) keep the upstream compatibility boundary. The
   collaboration tooling and the Insula core move in tickets 08 and 09.
