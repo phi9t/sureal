@@ -6,7 +6,26 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from pipeline.two_view_orbit import run_two_view_orbit
+import numpy as np
+
+from pipeline.two_view_orbit import estimate_two_view_orbit_pair, run_two_view_orbit
+from scene.orbit import generate_orbit_scene
+
+
+def _without_score_only_fields(frame: dict) -> dict:
+    stripped = dict(frame)
+    for key in (
+        "azimuth_degrees",
+        "R_world_to_camera",
+        "t_world_to_camera_m",
+        "camera_center_world_m",
+        "depth_path",
+        "normal_path",
+        "surface_points_path",
+        "surface_normals_path",
+    ):
+        stripped.pop(key)
+    return stripped
 
 
 class TwoViewOrbitTest(unittest.TestCase):
@@ -34,6 +53,31 @@ class TwoViewOrbitTest(unittest.TestCase):
         self.assertGreaterEqual(record["ground_truth_f_inlier_ratio"], 0.95)
         self.assertLess(record["rotation_error_deg"], 1.0)
         self.assertLess(record["translation_direction_error_deg"], 2.0)
+
+    def test_estimation_does_not_read_ground_truth_before_scoring(self) -> None:
+        """Ground truth pose and azimuth are score-only inputs."""
+        with tempfile.TemporaryDirectory() as temporary:
+            scene_root = Path(temporary) / "scene"
+            manifest = generate_orbit_scene(scene_root, "smoke")
+            first = manifest["frames"][0]
+            second = manifest["frames"][1]
+
+            clean = estimate_two_view_orbit_pair(scene_root, first, second, "smoke")
+            poisoned = estimate_two_view_orbit_pair(
+                scene_root,
+                _without_score_only_fields(first),
+                _without_score_only_fields(second),
+                "smoke",
+            )
+
+        self.assertEqual(clean.frame_pair, poisoned.frame_pair)
+        self.assertEqual(clean.keypoints, poisoned.keypoints)
+        self.assertEqual(clean.match_stages, poisoned.match_stages)
+        np.testing.assert_array_equal(clean.ransac_inliers, poisoned.ransac_inliers)
+        np.testing.assert_allclose(clean.points1, poisoned.points1)
+        np.testing.assert_allclose(clean.points2, poisoned.points2)
+        np.testing.assert_allclose(clean.pose.rotation, poisoned.pose.rotation)
+        np.testing.assert_allclose(clean.pose.translation, poisoned.pose.translation)
 
 
 if __name__ == "__main__":
