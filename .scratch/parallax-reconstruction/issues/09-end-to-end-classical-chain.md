@@ -80,3 +80,19 @@ Full-profile generated-orbit attribution after the gauge-relative fix:
 - Ground-truth poses, diagnostic only: `depth_absrel=0.015073275615504561`, `depth_delta_lt_1_25=0.9992009186892741`, `valid_pixel_fraction=0.9149357481486542`, `surface_chamfer_m=0.05713366939159721`, `surface_accuracy_m=0.06847667770992275`, `surface_completeness_m=0.04579066107327167`, `surface_f_score_tau=0.892759110980355`, `depth_hypothesis_count=160`, `voxel_size_sfm_gauge=0.07999999999999999`, `truncation_sfm_gauge=0.17999999999999997`, `padding_sfm_gauge=0.19999999999999998`, `median_camera_baseline_sfm_gauge=0.7110164636578616`, `reference_camera_baseline_m=0.7110164636578618`, `gauge_units_per_metric_meter=0.9999999999999999`, `mesh_vertex_count=24729`, `mesh_triangle_count=45484`, `observed_voxel_count=74053`.
 
 Conclusion: gauge-relative fusion parameters corrected the voxel-count mismatch (`74675` SfM-pose observed voxels vs `74053` diagnostic observed voxels), but the SfM-pose chain still misses the required full-profile surface quality (`F=0.8113436116749263 < 0.85`, `Chamfer=0.08989219631773226 > 0.08`). Per the instruction, thresholds were not loosened and `//parallax/...` was not rerun after this miss because it would include the red `//parallax:test_classical_chain_full` target.
+
+### 2026-10-11 coordinator review and landing
+
+- Landed as 85b3203 (squash of the worker branch). One rework was rejected along the way: the first gauge-relative rule divided by the generator's true camera baseline, which is a metric-scale prior. The landed rule uses fractions of the reconstruction's median sparse depth against a written nominal working distance (4.8 m), and a test makes the estimation path fail if it reaches the orbit camera centres.
+- Full 7-view generated-orbit chain (`//parallax:test_classical_chain_full`, tau 0.12 m), measured on the landing tree:
+
+  | Poses | Alignment | F-score | Chamfer (m) | Accuracy (m) | Completeness (m) |
+  | --- | --- | --- | --- | --- | --- |
+  | SfM | camera Sim(3) | 0.806 | 0.089 | 0.104 | 0.074 |
+  | SfM | + scoring ICP | 0.888 | 0.059 | 0.070 | 0.048 |
+  | Ground truth (diagnostic) | camera Sim(3) | 0.897 | 0.056 | 0.067 | 0.046 |
+  | Ground truth (diagnostic) | + scoring ICP | 0.897 | 0.056 | 0.067 | 0.046 |
+
+  The SfM ICP correction was 0.33 deg, 0.073 m, scale 0.9991 (the test bounds are 2 deg, 0.15 m and 3%). After that small registration correction, the SfM-pose surface is within 0.01 F-score of the ground-truth-pose surface. The camera-centre Sim(3) on 7 cameras is the main source of the camera-aligned gap.
+- Gates on the landing tree: `//:repo_gate` 23/23, `//autonomy/...` 191/191, CUDA 31/31 on GPU 1, `//parallax/...` 32/32.
+- Still open, deferred with the Parallax asset refetch: the Blender `--profile full` live run of module 06 and the COLMAP MVS comparison. Status stays ready-for-human for that live check only.
