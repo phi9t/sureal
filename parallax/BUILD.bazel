@@ -15,6 +15,12 @@ py_library(
 )
 
 py_library(
+    name = "features_lib",
+    srcs = glob(["features/*.py"], exclude = ["features/*_test.py"]),
+    imports = ["."],
+)
+
+py_library(
     name = "fusion_lib",
     srcs = glob(["fusion/*.py"]),
     imports = ["."],
@@ -61,6 +67,7 @@ py_library(
             "camera/*.py",
             "curriculum/*.py",
             "evaluation/*.py",
+            "features/*.py",
             "fusion/*.py",
             "geometry/*.py",
             "pipeline/*.py",
@@ -80,6 +87,7 @@ filegroup(
         "curriculum/*.json",
         "curriculum/*.py",
         "evaluation/*.py",
+        "features/*.py",
         "fusion/*.py",
         "geometry/*.py",
         "insulas/**",
@@ -105,13 +113,37 @@ py_binary(
     visibility = ["//visibility:public"],
 )
 
+py_binary(
+    name = "two_view_orbit",
+    srcs = ["pipeline/two_view_orbit.py"],
+    data = [":runtime_data"],
+    imports = ["."],
+    legacy_create_init = 0,
+    main = "pipeline/two_view_orbit.py",
+    deps = [":parallax_lib"],
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "run",
+    srcs = ["pipeline/cli.py"],
+    data = [":runtime_data"],
+    imports = ["."],
+    legacy_create_init = 0,
+    main = "pipeline/cli.py",
+    deps = [":parallax_lib"],
+    visibility = ["//visibility:public"],
+)
+
 filegroup(
     name = "test_support",
     srcs = ["baselines/colmap_reference_test.py"],
 )
 
 _PARALLAX_TESTS = {
+    "test_feature_matching": "features/feature_matching_test.py",
     "test_classical": "geometry/classical_test.py",
+    "test_two_view_geometry": "geometry/two_view_test.py",
     "test_colmap_mvs_reference": "baselines/colmap_mvs_reference_test.py",
     "test_colmap_reference": "baselines/colmap_reference_test.py",
     "test_controlled_suite": "scene/controlled_suite_test.py",

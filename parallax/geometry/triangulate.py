@@ -46,6 +46,38 @@ def triangulate_point(
     return homogeneous[:3] / homogeneous[3]
 
 
+def triangulate_points(
+    pixels1: ArrayLike,
+    pixels2: ArrayLike,
+    K1: ArrayLike,
+    R1: ArrayLike,
+    t1: ArrayLike,
+    K2: ArrayLike,
+    R2: ArrayLike,
+    t2: ArrayLike,
+) -> FloatArray:
+    """Linearly triangulate paired pixel observations."""
+    left = np.asarray(pixels1, dtype=np.float64)
+    right = np.asarray(pixels2, dtype=np.float64)
+    if left.ndim != 2 or left.shape[1] != 2 or right.shape != left.shape:
+        raise ValueError("pixels1 and pixels2 must share shape (N, 2)")
+    return np.vstack(
+        [
+            triangulate_point(
+                pixel1,
+                pixel2,
+                K1,
+                R1,
+                t1,
+                K2,
+                R2,
+                t2,
+            )
+            for pixel1, pixel2 in zip(left, right)
+        ]
+    )
+
+
 def reprojection_residuals(
     point: ArrayLike,
     observations: ArrayLike,
