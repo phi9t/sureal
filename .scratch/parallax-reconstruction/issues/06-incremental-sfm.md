@@ -2,7 +2,7 @@
 
 **What to build:** All orbit views are registered by our incremental SfM and refined by our Levenberg–Marquardt bundle adjustment. Curriculum module 05 reports measured results, compared with the COLMAP SfM baseline on the same images.
 
-**Blocked by:** 05
+**Blocked by:** 05, 11
 
 **Status:** ready-for-agent
 
