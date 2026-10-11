@@ -4,7 +4,7 @@
 `harness/`, not mixed into `scripts/` with Surflo's inherited user entry points. This ticket creates
 `harness/` and moves the repo-gate lint tooling into `harness/lint/`. `//:repo_gate` behaves exactly as before.
 
-**Blocked by:** 01, 02, 03, 04 (they add or name files under `scripts/`; moving after they land avoids conflicts)
+**Blocked by:** 01, 02, 03, 04, 07 (they add, name or unfreeze files under `scripts/`; moving after they land avoids conflicts)
 
 **Status:** ready-for-agent
 
@@ -23,16 +23,10 @@ Decisions (coordinator, 2026-10-11):
   - `clang_format_repo`, `ruff_repo`, `shellcheck_repo`, `shfmt_repo`;
   - `pinned_sources`, `publication_audit`;
   - `githooks_test`.
-- **Stays, and is listed in `harness/README.md` with the reason:**
-  - Surflo's user entry points in `scripts/` (`infer.py`, `evaluate.py`, `preprocess.py`,
-    `repack_checkpoint.py`, `download_dl3dv_10k_meshed.py`) keep the upstream compatibility boundary.
-  - `scripts/_collab/` and `collab*.py` stay because `_collab/admission.py` is source-pinned.
-  - The `autonomy/insula/` and `autonomy/evidence/` cores stay because they are source-pinned and owned by
-    autonomy ADRs.
-
-  These are named as future `harness/` candidates once re-pinning is possible.
-- No file protected by a source pin or retained receipt moves or changes bytes. Verify with
-  `pinned_sources.protected_source_paths` before and after.
+- **Stays in `scripts/`:** Surflo's user entry points (`infer.py`, `evaluate.py`, `preprocess.py`,
+  `repack_checkpoint.py`, `download_dl3dv_10k_meshed.py`) keep the upstream compatibility boundary. The
+  collaboration tooling and the Insula core move in tickets 08 and 09.
+- Retained receipts and evidence JSON are not edited. Ticket 07 has already retired the source freeze.
 
 - [ ] `git mv` the files above. History follows the renames: one commit of pure moves, then one commit of
   reference fixes. If the import-root change cannot stay green on its own, squash the two at landing.
@@ -42,9 +36,8 @@ Decisions (coordinator, 2026-10-11):
   paths. The hook still imports no repo runtime code.
 - [ ] Every active reference is updated: guides, ADRs (append a consequence note, never rewrite history),
   `CONTRIBUTING.md` and `docs/repo-structure.md`. `.scratch/` history and retained evidence are left alone.
-- [ ] `harness/README.md` (what harness owns, the map, what stays elsewhere and why) and
+- [ ] `harness/README.md` (what harness owns and the subpackage map) and
   `harness/lint/README.md` (owns, boundaries, entry points), in Milano's subpackage README shape.
-- [ ] A new ADR, `docs/adr/0005-harness-holds-repo-tooling.md`, records the decision, the import root, and the
-  pinned-code exception.
+- [ ] A new ADR, `docs/adr/0005-harness-holds-repo-tooling.md`, records the decision and the import root.
 - [ ] Live first: `./bazelw test //:repo_gate` is green after the move and shows the same test count plus any
   moved tests. Then `//autonomy/...` and `//parallax/...` pass.

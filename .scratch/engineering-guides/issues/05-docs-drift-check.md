@@ -4,7 +4,7 @@
 or when the README project map misses a top-level source directory. Moves and renames can then no longer leave
 the guides stale.
 
-**Blocked by:** 01, 02, 03, 04, 06 (the check must pass on the new guides and the `harness/` layout)
+**Blocked by:** 01, 02, 03, 04, 06, 08, 09 (the check must pass on the new guides and the `harness/` layout)
 
 **Status:** ready-for-agent
 
