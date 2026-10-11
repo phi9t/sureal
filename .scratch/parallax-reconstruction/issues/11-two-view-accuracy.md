@@ -185,3 +185,9 @@ Rework gate evidence:
 - `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...`: returned 0, passed 189/189 test targets in 88.896 seconds.
 - CUDA gate intentionally skipped because this worker sandbox has no GPU
   devices; the coordinator runs CUDA.
+
+### 2026-10-11 coordinator review
+
+The first version was sent back because `_match_bounds` derived the search window from ground-truth `azimuth_degrees`. The rework (`1b77071`) removes every ground-truth input from estimation and adds a test that hides the ground-truth fields and checks the estimate is unchanged. Accepted.
+
+Note for ticket 06: the default match window is asymmetric (`-4..+9` px in x), which is a mild directional prior that suits this orbit. Incremental SfM over general motion should use symmetric or coarse-to-fine bounds, or matching guided by the current pose estimate.

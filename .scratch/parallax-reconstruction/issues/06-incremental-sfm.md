@@ -16,6 +16,8 @@
   - Bundle adjustment reduces reprojection RMSE from a perturbed start, and recovers poses within tolerance on noise-free data.
   - Incremental SfM registers every view of the smoke orbit scene.
 - [ ] **Module 05 goes real.** The module routes to `sfm/`, its metrics come from `evaluation/`, and its status is `real+baseline`. The report includes the `baselines/colmap_sfm` result on the same images when the container gate is available.
+- [ ] **No ground-truth priors in estimation.** Matching, registration and bundle adjustment read no pose or azimuth metadata. Ground truth is used only for scoring. A test hides ground-truth fields and checks the estimate is unchanged, as in ticket 11. Use symmetric or coarse-to-fine match bounds, or matching guided by the current pose estimate, not the orbit-tuned `-4..+9` px window.
+- [ ] **General rotation.** Add elevation variation, or a second orbit ring, to the scene (see the ticket 04 review), so that SfM is not tested on single-axis rotation only.
 - [ ] **Live check.** `run.sh run --module 05 --profile smoke` and `--profile full` run inside the Insula. Record:
   - ATE;
   - rotation error;
