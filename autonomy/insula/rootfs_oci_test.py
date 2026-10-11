@@ -6,10 +6,12 @@ import os
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 from evidence.source_snapshot import file_sha256
 from insula.launch_plan import BAZEL_LINUX_X86_64_SHA256, BAZEL_VERSION, load_runtime_lock
+from insula import rootfs_oci
 from insula.rootfs_oci import (
     ArchiveTools,
     CommandError,
@@ -307,6 +309,41 @@ class RootfsOciTests(unittest.TestCase):
             )
         self.assertNotIn(secret, str(raised.exception))
         self.assertIn("<redacted>", str(raised.exception))
+
+
+class RemoteTagReplacementTests(unittest.TestCase):
+    def remote_push(self, root, *, replace_tag):
+        spec, tools = RootfsOciTests.fixture(self, root)
+        bundle = pack_rootfs_bundle(spec, root / "work", max_part_bytes=1024, tools=tools)
+        stale = {"annotations": {"org.opencontainers.image.created": "2026-10-11T01:33:43Z"}}
+        pushed = mock.Mock(stdout="Digest: sha256:" + "a" * 64 + "\n")
+        with mock.patch.object(rootfs_oci, "prepare_remote_auth", return_value={}), \
+                mock.patch.object(rootfs_oci, "_try_remote_manifest", return_value=stale), \
+                mock.patch.object(rootfs_oci, "run_oras", return_value=pushed) as run_oras, \
+                mock.patch.object(rootfs_oci, "resolve_remote_digest", return_value="sha256:" + "a" * 64), \
+                mock.patch.object(rootfs_oci, "check_ghcr_private"):
+            digest = rootfs_oci.push_remote_artifact(
+                ref="ghcr.io/example/sureal-rootfs-cpu:tag",
+                package="sureal-rootfs-cpu",
+                tag="tag",
+                bundle=bundle,
+                registry="ghcr.io/example",
+                oras_bin=None,
+                replace_tag=replace_tag,
+            )
+        return digest, run_oras
+
+    def test_existing_remote_tag_with_different_content_is_refused_by_default(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            with self.assertRaisesRegex(RootfsOciError, "tag already exists with different content"):
+                self.remote_push(Path(temporary), replace_tag=False)
+
+    def test_replace_tag_pushes_over_a_stale_remote_tag(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            with mock.patch("sys.stderr"):
+                digest, run_oras = self.remote_push(Path(temporary), replace_tag=True)
+            self.assertEqual(digest, "sha256:" + "a" * 64)
+            self.assertEqual(run_oras.call_args.args[0][0], "push")
 
 
 class OrasAnnotationDocumentTests(unittest.TestCase):

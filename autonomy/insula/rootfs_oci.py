@@ -304,8 +304,14 @@ def push_rootfs_artifact(
     max_part_bytes: int = DEFAULT_MAX_PART_BYTES,
     tools: ArchiveTools | None = None,
     oras_bin: Path | None = None,
+    replace_tag: bool = False,
 ) -> PushResult:
-    """Pack and publish a rootfs to either a local OCI layout or GHCR."""
+    """Pack and publish a rootfs to either a local OCI layout or GHCR.
+
+    `replace_tag` moves an existing remote tag that points at different content.
+    It is an explicit, coordinator-approved repair for a broken push; the old
+    manifest stays in the registry untagged.
+    """
     started = time.monotonic()
     bundle = pack_rootfs_bundle(spec, work_dir, max_part_bytes=max_part_bytes, tools=tools)
     package = package_for_role(spec.role)
@@ -328,6 +334,7 @@ def push_rootfs_artifact(
             bundle=bundle,
             registry=str(registry or DEFAULT_REGISTRY),
             oras_bin=oras_bin,
+            replace_tag=replace_tag,
         )
     return PushResult(
         role=spec.role,
@@ -566,6 +573,7 @@ def push_remote_artifact(
     bundle: PackedBundle,
     registry: str,
     oras_bin: Path | None,
+    replace_tag: bool = False,
 ) -> str:
     """Push a staged rootfs artifact to GHCR through ORAS."""
     auth_env = prepare_remote_auth(registry=registry, oras_bin=oras_bin)
@@ -574,7 +582,9 @@ def push_remote_artifact(
         annotations = _manifest_annotations(existing)
         if _same_artifact_annotations(annotations, bundle.oci_annotations()):
             return resolve_remote_digest(ref, oras_bin=oras_bin, env_extra=auth_env)
-        raise RootfsOciError(f"{ref}: tag already exists with different content")
+        if not replace_tag:
+            raise RootfsOciError(f"{ref}: tag already exists with different content")
+        print(f"WARNING: replacing existing tag {ref} with different content", file=sys.stderr, flush=True)
     annotations = bundle.oci_annotations()
     annotation_file = bundle.artifact_dir.parent.resolve() / "oras-annotations.json"
     annotation_file.write_text(
@@ -888,6 +898,11 @@ def _parser() -> argparse.ArgumentParser:
     push.add_argument("--role", required=True)
     push.add_argument("--rootfs", type=Path, required=True)
     push.add_argument("--lock", type=Path)
+    push.add_argument(
+        "--replace-tag",
+        action="store_true",
+        help="move an existing remote tag that points at different content (explicit repair only)",
+    )
     push.set_defaults(func=_main_push)
 
     push_active = sub.add_parser("push-active", help="pack and publish every active rootfs")
@@ -934,6 +949,7 @@ def _main_push(args: argparse.Namespace) -> PushResult:
         max_part_bytes=args.max_part_bytes,
         tools=_archive_tools(args),
         oras_bin=args.oras_bin,
+        replace_tag=args.replace_tag,
     )
 
 
