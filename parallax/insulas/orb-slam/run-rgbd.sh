@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
+# Runs the ORB-SLAM RGB-D adapter inside its Insula image.
 set -euo pipefail
 
 if [[ "$#" -ne 4 ]]; then
-    printf 'usage: run-rgbd.sh DATASET ASSOCIATIONS GROUND_TRUTH OUTPUT\n' >&2
-    exit 2
+  printf 'usage: run-rgbd.sh DATASET ASSOCIATIONS GROUND_TRUTH OUTPUT\n' >&2
+  exit 2
 fi
 
 dataset="$1"
@@ -12,10 +13,12 @@ ground_truth="$3"
 output="$4"
 mkdir -p "${output}"
 cp /etc/surflo-pathway-insula "${output}/insula-manifest.txt"
-printf '%s\n' '4452a3c4ab75b1cde34e5505a36ec3f9edcdc4c4' > "${output}/source-commit.txt"
-export LD_LIBRARY_PATH="/opt/ORB_SLAM3/lib:/opt/ORB_SLAM3/Thirdparty/DBoW2/lib:/opt/ORB_SLAM3/Thirdparty/g2o/lib:${LD_LIBRARY_PATH:-}"
+printf '%s\n' '4452a3c4ab75b1cde34e5505a36ec3f9edcdc4c4' >"${output}/source-commit.txt"
+ORB_SLAM_LIBRARY_PATH="/opt/ORB_SLAM3/lib:/opt/ORB_SLAM3/Thirdparty/DBoW2/lib"
+ORB_SLAM_LIBRARY_PATH="${ORB_SLAM_LIBRARY_PATH}:/opt/ORB_SLAM3/Thirdparty/g2o/lib"
+export LD_LIBRARY_PATH="${ORB_SLAM_LIBRARY_PATH}:${LD_LIBRARY_PATH:-}"
 /usr/bin/time -v -o "${output}/resource-summary.txt" \
-    /opt/ORB_SLAM3/bin/surflo_rgbd \
-    /opt/ORB_SLAM3/Vocabulary/ORBvoc.txt \
-    /opt/ORB_SLAM3/Examples/RGB-D/TUM1.yaml \
-    "${dataset}" "${associations}" "${ground_truth}" "${output}"
+  /opt/ORB_SLAM3/bin/surflo_rgbd \
+  /opt/ORB_SLAM3/Vocabulary/ORBvoc.txt \
+  /opt/ORB_SLAM3/Examples/RGB-D/TUM1.yaml \
+  "${dataset}" "${associations}" "${ground_truth}" "${output}"

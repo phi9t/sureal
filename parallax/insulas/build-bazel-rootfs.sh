@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Builds the Bazel-enabled Parallax rootfs.
 set -euo pipefail
 
 HERE="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
@@ -9,13 +10,15 @@ PREVIOUS="${SURFLO_PATHWAY_PREVIOUS_BAZEL_ROOTFS:-${CACHE_ROOT}/rootfs-v2}"
 DEST="${SURFLO_PATHWAY_BAZEL_ROOTFS:-${CACHE_ROOT}/rootfs-v3}"
 IMAGE_TAG="${SURFLO_PATHWAY_BAZEL_IMAGE_TAG:-sureal-3d-pathway-cpu:bazel-${BAZEL_VERSION}-rootfs-v3}"
 
+# Prints an error message and exits.
 die() {
-    printf 'error: %s\n' "$*" >&2
-    exit 1
+  printf 'error: %s\n' "$*" >&2
+  exit 1
 }
 
+# Computes the runtime identity for a rootfs.
 rootfs_digest() {
-    PYTHONPATH="${HERE}/../../autonomy" python3 - "$1" <<'PY'
+  PYTHONPATH="${HERE}/../../autonomy" python3 - "$1" <<'PY'
 import sys
 from pathlib import Path
 from insula.runtime_identity import rootfs_identity
@@ -24,47 +27,49 @@ print(rootfs_identity(Path(sys.argv[1])))
 PY
 }
 
+# Runs a command inside a candidate rootfs with a sealed environment.
 run_in_rootfs() {
-    local rootfs="$1"
-    shift
-    bwrap \
-        --ro-bind "$rootfs" / \
-        --proc /proc \
-        --dev /dev \
-        --tmpfs /tmp \
-        --tmpfs /run \
-        --dir /tmp/private-home \
-        --unshare-all \
-        --die-with-parent \
-        --clearenv \
-        --setenv HOME /tmp/private-home \
-        --setenv PATH /usr/local/bin:/usr/bin:/bin \
-        --setenv PYTHONNOUSERSITE 1 \
-        -- "$@"
+  local rootfs="$1"
+  shift
+  bwrap \
+    --ro-bind "$rootfs" / \
+    --proc /proc \
+    --dev /dev \
+    --tmpfs /tmp \
+    --tmpfs /run \
+    --dir /tmp/private-home \
+    --unshare-all \
+    --die-with-parent \
+    --clearenv \
+    --setenv HOME /tmp/private-home \
+    --setenv PATH /usr/local/bin:/usr/bin:/bin \
+    --setenv PYTHONNOUSERSITE 1 \
+    -- "$@"
 }
 
+# Verifies that the new rootfs has the expected Python and tool inventory.
 validate_rootfs() {
-    local rootfs="$1"
-    local bazel_version
-    local numpy_version
-    local scipy_version
-    local git_version
+  local rootfs="$1"
+  local bazel_version
+  local numpy_version
+  local scipy_version
+  local git_version
 
-    command -v bwrap >/dev/null 2>&1 || die "bwrap is required to validate rootfs contents"
-    bazel_version="$(run_in_rootfs "$rootfs" bazel --version)"
-    [[ "$bazel_version" == "bazel ${BAZEL_VERSION}" ]] \
-        || die "unexpected Bazel version in new rootfs: ${bazel_version}"
-    numpy_version="$(run_in_rootfs "$rootfs" python -c 'import numpy; print(numpy.__version__)')"
-    [[ "$numpy_version" == "1.26.4" ]] \
-        || die "unexpected NumPy version in new rootfs: ${numpy_version}"
-    scipy_version="$(run_in_rootfs "$rootfs" python -c 'import scipy; print(scipy.__version__)')"
-    [[ "$scipy_version" == "1.14.1" ]] \
-        || die "unexpected SciPy version in new rootfs: ${scipy_version}"
-    git_version="$(run_in_rootfs "$rootfs" git --version)"
-    [[ "$git_version" == git\ version\ * ]] \
-        || die "git is unavailable in new rootfs: ${git_version}"
-    run_in_rootfs "$rootfs" sh -lc "command -v g++ >/dev/null && command -v ar >/dev/null" \
-        || die "C++ compiler or binutils unavailable in new rootfs"
+  command -v bwrap >/dev/null 2>&1 || die "bwrap is required to validate rootfs contents"
+  bazel_version="$(run_in_rootfs "$rootfs" bazel --version)"
+  [[ "$bazel_version" == "bazel ${BAZEL_VERSION}" ]] \
+    || die "unexpected Bazel version in new rootfs: ${bazel_version}"
+  numpy_version="$(run_in_rootfs "$rootfs" python -c 'import numpy; print(numpy.__version__)')"
+  [[ "$numpy_version" == "1.26.4" ]] \
+    || die "unexpected NumPy version in new rootfs: ${numpy_version}"
+  scipy_version="$(run_in_rootfs "$rootfs" python -c 'import scipy; print(scipy.__version__)')"
+  [[ "$scipy_version" == "1.14.1" ]] \
+    || die "unexpected SciPy version in new rootfs: ${scipy_version}"
+  git_version="$(run_in_rootfs "$rootfs" git --version)"
+  [[ "$git_version" == git\ version\ * ]] \
+    || die "git is unavailable in new rootfs: ${git_version}"
+  run_in_rootfs "$rootfs" sh -lc "command -v g++ >/dev/null && command -v ar >/dev/null" \
+    || die "C++ compiler or binutils unavailable in new rootfs"
 }
 
 [[ -d "$PREVIOUS" ]] || die "previous rootfs missing: $PREVIOUS"
@@ -75,19 +80,21 @@ mkdir -p -- "$(dirname -- "$DEST")"
 STAGE="$(mktemp -d "$(dirname -- "$DEST")/.rootfs.XXXXXX")"
 STAGE_LOCK="$STAGE.lock.json"
 CID=""
+
+# Removes the temporary container and staged rootfs if the build stops early.
 cleanup() {
-    if [[ -n "$CID" ]]; then docker rm -f "$CID" >/dev/null; fi
-    if [[ -n "${STAGE:-}" ]]; then rm -rf -- "$STAGE"; fi
-    if [[ -n "${STAGE_LOCK:-}" ]]; then rm -f -- "$STAGE_LOCK"; fi
+  if [[ -n "$CID" ]]; then docker rm -f "$CID" >/dev/null; fi
+  if [[ -n "${STAGE:-}" ]]; then rm -rf -- "$STAGE"; fi
+  if [[ -n "${STAGE_LOCK:-}" ]]; then rm -f -- "$STAGE_LOCK"; fi
 }
 trap cleanup EXIT
 
 PREVIOUS_IDENTITY="$(rootfs_digest "$PREVIOUS")"
 PREVIOUS_LOCK_SHA256="$(sha256sum "$PREVIOUS.lock.json" | awk '{print $1}')"
 docker build --platform linux/amd64 \
-    --build-arg "BAZEL_VERSION=$BAZEL_VERSION" \
-    --build-arg "BAZEL_LINUX_X86_64_SHA256=$BAZEL_LINUX_X86_64_SHA256" \
-    -t "$IMAGE_TAG" -f "$HERE/bazel-rootfs.Dockerfile" "$HERE"
+  --build-arg "BAZEL_VERSION=$BAZEL_VERSION" \
+  --build-arg "BAZEL_LINUX_X86_64_SHA256=$BAZEL_LINUX_X86_64_SHA256" \
+  -t "$IMAGE_TAG" -f "$HERE/bazel-rootfs.Dockerfile" "$HERE"
 IMAGE="$(docker image inspect "$IMAGE_TAG" --format '{{.Id}}')"
 CID="$(docker create "$IMAGE" /bin/true)"
 docker export "$CID" | tar -C "$STAGE" -xf -
@@ -95,10 +102,11 @@ docker rm "$CID" >/dev/null
 CID=""
 validate_rootfs "$STAGE"
 [[ "$(rootfs_digest "$PREVIOUS")" == "$PREVIOUS_IDENTITY" ]] \
-    || die "previous rootfs identity changed during build"
+  || die "previous rootfs identity changed during build"
 [[ "$(sha256sum "$PREVIOUS.lock.json" | awk '{print $1}')" == "$PREVIOUS_LOCK_SHA256" ]] \
-    || die "previous rootfs lock changed during build"
-PYTHONPATH="${HERE}/../../autonomy" python3 - "$STAGE" "$HERE" "$IMAGE" "$BAZEL_VERSION" "$BAZEL_LINUX_X86_64_SHA256" <<'PY'
+  || die "previous rootfs lock changed during build"
+PYTHONPATH="${HERE}/../../autonomy" python3 - "$STAGE" "$HERE" "$IMAGE" \
+  "$BAZEL_VERSION" "$BAZEL_LINUX_X86_64_SHA256" <<'PY'
 import hashlib
 import json
 import sys

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Dispatches Parallax commands through the Python pipeline CLI.
 set -euo pipefail
 
 HERE="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"

@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "max_lines": 150,
+  "grandfathered_long_scripts": {
+    "autonomy/dataset/setup-gcs.sh": {
+      "lines": 252,
+      "reason": "existing wizard library; move policy logic to Python when substantially changed"
+    },
+    "autonomy/insula/build_cpu_rootfs.sh": {
+      "lines": 181,
+      "reason": "existing rootfs build wrapper; move policy logic to Python when substantially changed"
+    },
+    "autonomy/insula/build_gpu_bazel_rootfs_v6.sh": {
+      "lines": 151,
+      "reason": "existing rootfs build wrapper; move policy logic to Python when substantially changed"
+    },
+    "autonomy/resources/refresh-hdfs-auth.sh": {
+      "lines": 252,
+      "reason": "existing credential wizard; move policy logic to Python when substantially changed"
+    }
+  }
+}

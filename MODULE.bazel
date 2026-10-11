@@ -17,6 +17,19 @@ http_archive(
     urls = ["https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.linux.x86_64.tar.xz"],
 )
 
+http_file = use_repo_rule(
+    "@bazel_tools//tools/build_defs/repo:http.bzl",
+    "http_file",
+)
+
+http_file(
+    name = "shfmt_linux_x86_64",
+    downloaded_file_path = "shfmt",
+    executable = True,
+    sha256 = "d99b06506aee2ac9113daec3049922e70dc8cffb84658e3ae512c6a6cbe101b6",
+    urls = ["https://github.com/mvdan/sh/releases/download/v3.9.0/shfmt_v3.9.0_linux_amd64"],
+)
+
 http_archive(
     name = "ruff_linux_x86_64",
     build_file_content = """exports_files(["ruff"])""",

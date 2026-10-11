@@ -13,10 +13,21 @@ set -euo pipefail
 # ──────────────────────────────────────────────────────────────────────────
 
 if [[ -t 1 ]] && command -v tput >/dev/null 2>&1 && [[ "$(tput colors 2>/dev/null || echo 0)" -ge 8 ]]; then
-  BOLD=$(tput bold); DIM=$(tput dim); RESET=$(tput sgr0)
-  BLUE=$(tput setaf 4); GREEN=$(tput setaf 2); YELLOW=$(tput setaf 3); RED=$(tput setaf 1)
+  BOLD=$(tput bold)
+  DIM=$(tput dim)
+  RESET=$(tput sgr0)
+  BLUE=$(tput setaf 4)
+  GREEN=$(tput setaf 2)
+  YELLOW=$(tput setaf 3)
+  RED=$(tput setaf 1)
 else
-  BOLD=""; DIM=""; RESET=""; BLUE=""; GREEN=""; YELLOW=""; RED=""
+  BOLD=""
+  DIM=""
+  RESET=""
+  BLUE=""
+  GREEN=""
+  YELLOW=""
+  RED=""
 fi
 
 # Author sets this at the top of the stages section.
@@ -56,20 +67,27 @@ stage() {
 }
 
 # say "..." — a plain instruction line.
-say()  { printf '  %s\n' "$1"; }
+say() { printf '  %s\n' "$1"; }
 # step "..." — a numbered-feeling action the human takes in the browser.
 step() { printf '  %s•%s %s\n' "$BLUE" "$RESET" "$1"; }
+# note "..." — display dim supporting information.
 note() { printf '  %s%s%s\n' "$DIM" "$1" "$RESET"; }
+# warn "..." — display a warning.
 warn() { printf '  %s⚠ %s%s\n' "$YELLOW" "$1" "$RESET"; }
 
 # open_url URL — open in the human's browser, cross-platform incl. WSL.
 open_url() {
   local url="$1"
   printf '  %s↗ opening%s %s\n' "$GREEN" "$RESET" "$url"
-  { if   command -v wslview     >/dev/null 2>&1; then wslview "$url"
-    elif command -v explorer.exe >/dev/null 2>&1; then explorer.exe "$url"
-    elif command -v xdg-open    >/dev/null 2>&1; then xdg-open "$url"
-    elif command -v open        >/dev/null 2>&1; then open "$url"
+  {
+    if command -v wslview >/dev/null 2>&1; then
+      wslview "$url"
+    elif command -v explorer.exe >/dev/null 2>&1; then
+      explorer.exe "$url"
+    elif command -v xdg-open >/dev/null 2>&1; then
+      xdg-open "$url"
+    elif command -v open >/dev/null 2>&1; then
+      open "$url"
     else warn "couldn't open a browser — visit it manually: $url"; fi
   } >/dev/null 2>&1 || warn "couldn't open a browser — visit it manually: $url"
 }
@@ -91,7 +109,8 @@ confirm() {
 # _existing KEY — current value of KEY in ENV_FILE, if any.
 _existing() {
   [[ -f "$ENV_FILE" ]] || return 1
-  local line; line=$(grep -E "^${1}=" "$ENV_FILE" | tail -n1) || return 1
+  local line
+  line=$(grep -E "^${1}=" "$ENV_FILE" | tail -n1) || return 1
   printf '%s' "${line#*=}"
 }
 
@@ -131,8 +150,8 @@ write_env() {
   local key="$1" value="$2" tmp
   touch "$ENV_FILE"
   tmp=$(mktemp)
-  grep -vE "^${key}=" "$ENV_FILE" > "$tmp" || true
-  printf '%s=%s\n' "$key" "$value" >> "$tmp"
+  grep -vE "^${key}=" "$ENV_FILE" >"$tmp" || true
+  printf '%s=%s\n' "$key" "$value" >>"$tmp"
   mv "$tmp" "$ENV_FILE"
   WRITTEN_ENV+=("$key")
   printf '  %s✓ wrote%s %s → %s\n' "$GREEN" "$RESET" "$key" "$ENV_FILE"
@@ -170,10 +189,11 @@ set_var() {
 finish() {
   _clear
   printf '\n%s%s  ✓ Setup complete%s\n' "$BOLD" "$GREEN" "$RESET"
-  (( ${#WRITTEN_ENV[@]} ))    && note "wrote ${#WRITTEN_ENV[@]} value(s) to $ENV_FILE: ${WRITTEN_ENV[*]}"
-  (( ${#WRITTEN_SECRET[@]} )) && note "set ${#WRITTEN_SECRET[@]} GitHub secret(s): ${WRITTEN_SECRET[*]}"
-  if (( ${#SKIPPED[@]} )); then
-    printf '\n'; warn "still to do by hand:"
+  ((${#WRITTEN_ENV[@]})) && note "wrote ${#WRITTEN_ENV[@]} value(s) to $ENV_FILE: ${WRITTEN_ENV[*]}"
+  ((${#WRITTEN_SECRET[@]})) && note "set ${#WRITTEN_SECRET[@]} GitHub secret(s): ${WRITTEN_SECRET[*]}"
+  if ((${#SKIPPED[@]})); then
+    printf '\n'
+    warn "still to do by hand:"
     for s in "${SKIPPED[@]}"; do note "  - $s"; done
   fi
   printf '\n'
@@ -194,8 +214,14 @@ ${XDG_CACHE_HOME:-$HOME/.cache}/sureal/gcs. Requires Linux x86_64 and a terminal
 EOF
   exit 0
 fi
-[[ $# == 0 ]] || { printf '%serror:%s unexpected arguments\n' "$RED" "$RESET" >&2; exit 2; }
-[[ -t 0 && -t 1 ]] || { printf '%serror:%s run this wizard in an interactive terminal\n' "$RED" "$RESET" >&2; exit 1; }
+[[ $# == 0 ]] || {
+  printf '%serror:%s unexpected arguments\n' "$RED" "$RESET" >&2
+  exit 2
+}
+[[ -t 0 && -t 1 ]] || {
+  printf '%serror:%s run this wizard in an interactive terminal\n' "$RED" "$RESET" >&2
+  exit 1
+}
 HERE="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 TOTAL_STAGES=4
 banner "Waymo GCS access"

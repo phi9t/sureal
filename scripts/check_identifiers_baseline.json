@@ -435,18 +435,6 @@
       "reason": "Generated lock header preserves the interpreter used to compile it."
     },
     {
-      "path": "autonomy/resources/refresh-hdfs-auth.sh",
-      "kind": "host data path",
-      "count": 5,
-      "reason": "Manual credential refresh wizard pins host-local Waystone tool paths."
-    },
-    {
-      "path": "autonomy/resources/refresh-hdfs-auth.sh",
-      "kind": "user home path",
-      "count": 5,
-      "reason": "Manual credential refresh wizard pins host-local Waystone tool paths."
-    },
-    {
       "path": "autonomy/tracer.sh",
       "kind": "host data path",
       "count": 1,

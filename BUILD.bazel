@@ -18,10 +18,14 @@ REPO_GATE_TESTS = [
     "//:repo_gate_membership_test",
     "//:repo_gate_publication_audit_test",
     "//:repo_gate_ruff_test",
+    "//:repo_gate_shell_style_test",
     "//:repo_gate_shellcheck_test",
+    "//:repo_gate_shfmt_test",
     "//:repo_gate_whitespace_test",
     "//:ruff_repo_test",
+    "//:check_shell_style_test",
     "//:shellcheck_repo_test",
+    "//:shfmt_repo_test",
 ]
 
 exports_files(
@@ -169,6 +173,44 @@ py_library(
 )
 
 py_library(
+    name = "check_shell_style_lib",
+    srcs = ["scripts/check_shell_style.py"],
+    imports = ["."],
+    deps = [":pinned_sources_lib"],
+)
+
+py_binary(
+    name = "check_shell_style",
+    srcs = ["scripts/check_shell_style.py"],
+    imports = ["."],
+    legacy_create_init = 0,
+    main = "scripts/check_shell_style.py",
+    deps = [":pinned_sources_lib"],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "shfmt_repo_lib",
+    srcs = ["scripts/shfmt_repo.py"],
+    imports = ["."],
+    deps = [":pinned_sources_lib"],
+)
+
+py_binary(
+    name = "shfmt_repo",
+    srcs = ["scripts/shfmt_repo.py"],
+    args = ["--shfmt=$(location @shfmt_linux_x86_64//file)"],
+    data = [
+        "@shfmt_linux_x86_64//file",
+    ],
+    imports = ["."],
+    legacy_create_init = 0,
+    main = "scripts/shfmt_repo.py",
+    deps = [":pinned_sources_lib"],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
     name = "ruff_repo_lib",
     srcs = ["scripts/ruff_repo.py"],
     imports = ["."],
@@ -266,6 +308,37 @@ py_test(
 )
 
 py_test(
+    name = "repo_gate_shell_style_test",
+    srcs = ["scripts/repo_gate_shell_style_test.py"],
+    data = [
+        "scripts/shell_style_baseline.json",
+    ],
+    deps = [":check_shell_style_lib"],
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+)
+
+py_test(
+    name = "repo_gate_shfmt_test",
+    srcs = ["scripts/repo_gate_shfmt_test.py"],
+    args = ["--shfmt=$(location @shfmt_linux_x86_64//file)"],
+    data = [
+        "@shfmt_linux_x86_64//file",
+    ],
+    deps = [":shfmt_repo_lib"],
+    legacy_create_init = 0,
+    size = "medium",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+)
+
+py_test(
     name = "repo_gate_ruff_test",
     srcs = ["scripts/repo_gate_ruff_test.py"],
     args = ["--ruff=$(location @ruff_linux_x86_64//:ruff)"],
@@ -298,6 +371,20 @@ py_test(
 )
 
 py_test(
+    name = "check_shell_style_test",
+    srcs = ["scripts/check_shell_style_test.py"],
+    data = [
+        "scripts/shell_style_baseline.json",
+    ],
+    deps = [":check_shell_style_lib"],
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "repo_gate",
+    ],
+)
+
+py_test(
     name = "shellcheck_repo_test",
     srcs = ["scripts/shellcheck_repo_test.py"],
     args = ["--shellcheck=$(location @shellcheck_linux_x86_64//:shellcheck)"],
@@ -305,6 +392,21 @@ py_test(
         "@shellcheck_linux_x86_64//:shellcheck",
     ],
     deps = [":shellcheck_repo_lib"],
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "repo_gate",
+    ],
+)
+
+py_test(
+    name = "shfmt_repo_test",
+    srcs = ["scripts/shfmt_repo_test.py"],
+    args = ["--shfmt=$(location @shfmt_linux_x86_64//file)"],
+    data = [
+        "@shfmt_linux_x86_64//file",
+    ],
+    deps = [":shfmt_repo_lib"],
     legacy_create_init = 0,
     size = "small",
     tags = [
