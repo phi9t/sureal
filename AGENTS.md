@@ -60,13 +60,13 @@ skips, when no CUDA device is visible. The filename suffixes `_live_test.py` and
 ## Python imports
 
 Python code under `autonomy/` and `parallax/` imports from that directory as
-the import root: use `from evidence...` or `from pipeline...`, not relative
+the import root: use `from evidence...` or `from insula...`, not relative
 imports or sibling-directory import roots. Do not edit `sys.path` in active
 code. Historical receipts, frozen procedure records, and sources pinned by
 retained evidence are exempt from the import checker. Documented live commands
 and receipts may still set `PYTHONPATH=autonomy`.
 
-Python style follows `docs/guides/python-style.md`. Ruff lint and the current
+Python engineering follows `docs/guides/python-engineering.md`. Ruff lint and the current
 format batch run in `//:repo_gate`; do not reformat retained receipts, source
 snapshots or files protected by retained/current-candidate source pins.
 
