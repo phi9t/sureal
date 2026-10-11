@@ -22,7 +22,7 @@ py_library(
 
 py_library(
     name = "fusion_lib",
-    srcs = glob(["fusion/*.py"]),
+    srcs = glob(["fusion/*.py"], exclude = ["fusion/*_test.py"]),
     imports = ["."],
 )
 
@@ -140,6 +140,18 @@ py_binary(
 )
 
 py_binary(
+    name = "fusion_live_check",
+    srcs = ["fusion/live_check.py"],
+    imports = ["."],
+    legacy_create_init = 0,
+    main = "fusion/live_check.py",
+    deps = [
+        ":parallax_lib",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
     name = "generate_orbit_scene",
     srcs = ["scene/orbit.py"],
     imports = ["."],
@@ -180,6 +192,7 @@ filegroup(
 
 _PARALLAX_TESTS = {
     "test_feature_matching": "features/feature_matching_test.py",
+    "test_fusion": "fusion/fusion_test.py",
     "test_classical": "geometry/classical_test.py",
     "test_two_view_geometry": "geometry/two_view_test.py",
     "test_colmap_mvs_reference": "baselines/colmap_mvs_reference_test.py",
