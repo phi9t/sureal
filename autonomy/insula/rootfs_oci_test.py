@@ -15,6 +15,7 @@ from insula.rootfs_oci import (
     CommandError,
     RootfsOciError,
     RootfsSpec,
+    oras_annotation_document,
     pack_rootfs_bundle,
     pull_rootfs_artifact,
     push_rootfs_artifact,
@@ -118,12 +119,7 @@ class RootfsOciTests(unittest.TestCase):
             self.assertEqual(annotations["io.sureal.file.0001.path"], "manifest/rootfs-manifest.json")
             self.assertEqual(annotations["io.sureal.file.0002.path"], "rootfs/fixture-rootfs.tar.zst.part0000")
             self.assertEqual(annotations["io.sureal.rootfs.entry.count"], "3")
-            self.assertEqual(annotations["io.sureal.rootfs.entry.000000.path"], "bin/python")
-            self.assertEqual(
-                annotations["io.sureal.rootfs.entry.000000.sha256"],
-                file_sha256(spec.rootfs / "bin" / "python"),
-            )
-            self.assertEqual(annotations["io.sureal.rootfs.entry.000000.size"], "10")
+            self.assertFalse(any(key.startswith("io.sureal.rootfs.entry.0") for key in annotations))
             self.assertEqual(manifest["rootfs_sha256"], rootfs_identity(spec.rootfs))
             self.assertEqual(
                 manifest["rootfs_files"],
@@ -311,6 +307,12 @@ class RootfsOciTests(unittest.TestCase):
             )
         self.assertNotIn(secret, str(raised.exception))
         self.assertIn("<redacted>", str(raised.exception))
+
+
+class OrasAnnotationDocumentTests(unittest.TestCase):
+    def test_manifest_annotations_use_the_oras_manifest_key(self):
+        document = oras_annotation_document({"io.sureal.artifact.kind": "rootfs"})
+        self.assertEqual(document, {"$manifest": {"io.sureal.artifact.kind": "rootfs"}})
 
 
 if __name__ == "__main__":

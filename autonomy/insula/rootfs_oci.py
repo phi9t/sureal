@@ -112,7 +112,9 @@ class PackedBundle:
             "io.sureal.rootfs.part.count": str(len(self.parts)),
             "io.sureal.rootfs.file.count": str(len(self.files)),
             "io.sureal.rootfs.manifest.sha256": file_sha256(self.manifest_path),
-            **_rootfs_entry_annotations(self.files),
+            # Per-file rootfs entries live in the digest-checked rootfs-manifest.json
+            # layer; one annotation per file would exceed registry manifest limits.
+            "io.sureal.rootfs.entry.count": str(len(self.files)),
             **_artifact_file_annotations(_collect_artifact_files(self.artifact_dir)),
         }
 
@@ -547,6 +549,15 @@ def materialize_local_artifact(
         shutil.copy2(src, dst)
 
 
+def oras_annotation_document(annotations: Mapping[str, str]) -> dict[str, dict[str, str]]:
+    """Return an ORAS `--annotation-file` document that annotates the manifest.
+
+    ORAS reads manifest annotations only under the `$manifest` key; any other key
+    names a pushed file, so a wrong key silently drops every annotation.
+    """
+    return {"$manifest": dict(annotations)}
+
+
 def push_remote_artifact(
     *,
     ref: str,
@@ -567,7 +578,7 @@ def push_remote_artifact(
     annotations = bundle.oci_annotations()
     annotation_file = bundle.artifact_dir.parent.resolve() / "oras-annotations.json"
     annotation_file.write_text(
-        json.dumps({"manifest": annotations}, indent=2, sort_keys=True) + "\n",
+        json.dumps(oras_annotation_document(annotations), indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
     command = [
@@ -1306,18 +1317,6 @@ def _artifact_file_annotations(entries: Iterable[Mapping[str, object]]) -> dict[
     annotations["io.sureal.file.count"] = str(len(entries))
     for index, entry in enumerate(entries):
         prefix = f"io.sureal.file.{index:04d}"
-        annotations[f"{prefix}.path"] = str(entry["path"])
-        annotations[f"{prefix}.sha256"] = str(entry["sha256"])
-        annotations[f"{prefix}.size"] = str(entry["size"])
-    return annotations
-
-
-def _rootfs_entry_annotations(entries: Iterable[Mapping[str, object]]) -> dict[str, str]:
-    annotations = {}
-    entries = list(entries)
-    annotations["io.sureal.rootfs.entry.count"] = str(len(entries))
-    for index, entry in enumerate(entries):
-        prefix = f"io.sureal.rootfs.entry.{index:06d}"
         annotations[f"{prefix}.path"] = str(entry["path"])
         annotations[f"{prefix}.sha256"] = str(entry["sha256"])
         annotations[f"{prefix}.size"] = str(entry["size"])
