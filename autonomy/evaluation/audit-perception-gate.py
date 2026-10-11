@@ -26,7 +26,7 @@ def main():
             checker={'real-camera-source-check-a':'camera/validate-real-camera-source.py','real-box-source-check-a':'evaluation/validate-real-box-source.py'}[name]
             assert sha(HERE/checker)==record['checker_sha256']
         receipts[name]={'receipt_sha256':sha(folder/'receipt.json'),'path':str(folder/'receipt.json')}
-    cpu_runtime=load_default_runtime_lock(current_cpu_rootfs(cache));metrics_runtime=load_default_runtime_lock(current_metrics_rootfs(cache))
+    cpu_runtime=load_default_runtime_lock(current_cpu_rootfs(cache));metrics_runtime=load_default_runtime_lock(current_metrics_rootfs(cache));metrics=cache/'metrics-build'
     cpulock=cpu_runtime.data;metriclock=metrics_runtime.data
     contracts=json.loads((HERE/'evaluation/contracts.json').read_text());source=cache/'metrics-source/src/waymo_open_dataset'
     assert subprocess.check_output(['git','-C',str(cache/'metrics-source'),'rev-parse','FETCH_HEAD'],text=True).strip()==contracts['upstream_commit']

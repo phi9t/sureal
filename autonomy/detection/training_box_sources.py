@@ -8,7 +8,7 @@ from collections import Counter
 from collections.abc import Mapping
 import math
 
-from .training_box_statistics import training_box_statistics
+from detection.training_box_statistics import training_box_statistics
 
 
 _BOX_FIELDS = ('center.x', 'center.y', 'center.z', 'size.x', 'size.y', 'size.z', 'heading')

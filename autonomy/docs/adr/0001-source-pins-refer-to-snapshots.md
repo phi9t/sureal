@@ -17,3 +17,7 @@ Receipts used to pin the digests of files in the working tree, so editing or mov
 - Receipts written before this decision are historical records. Their pinned bytes are recoverable from git history but are not expected to match the tree.
 - Checks that compared tracked receipts with the working tree are retired in favour of verifying against the snapshot. `architecture.py verify` without `--run-id` is the one such command.
 - Verifying an old gate needs HDFS access to fetch its snapshot.
+- On 2026-10-11 the lint-side working-tree freeze was retired: repo-gate lint
+  wrappers no longer exclude active files merely because receipts, digest pins or
+  current-candidate declarations mention them. Historical archive directories
+  and `submodules/` remain outside active lint cleanup.

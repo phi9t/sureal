@@ -1,7 +1,7 @@
 # Shell Engineering
 
 This guide is Sureal's shell contract. It adapts Milano's shell engineering
-rules to this repository's Insula launcher, source-pin and receipt model, and
+rules to this repository's Insula launcher, historical receipt model, and
 Bazel-pinned repo gate.
 
 ## Use Shell Only For Glue
@@ -11,19 +11,18 @@ checking simple environment preconditions, setting environment variables close
 to the command that consumes them, entering Insula through `./bazelw`, invoking
 Python modules, and wiring process streams together.
 
-Policy, validation, launch-plan construction, source-pin handling, evidence
-parsing, retention decisions and structured state belong in Python modules where
-they can be unit-tested through Bazel. This follows
-[ADR 0003](../adr/0003-python-over-shell-for-policy.md).
+Policy, validation, launch-plan construction, evidence parsing, retention
+decisions and structured state belong in Python modules where they can be
+unit-tested through Bazel. This follows [ADR 0003](../adr/0003-python-over-shell-for-policy.md).
 
 New shell scripts stay below 150 lines. Existing longer scripts are recorded in
 `scripts/shell_style_baseline.json`; that baseline may only shrink. When a
 grandfathered script changes substantially, move decision-making and data
 handling into Python before allowing the shell wrapper to grow.
 
-Do not rewrite receipt-pinned scripts for style alone. Retained receipts and
-source-pinned scripts are byte-exact evidence; leave them untouched unless the
-owning task explicitly re-admits the evidence.
+Do not rewrite retained receipts, source snapshots or historical archive
+scripts for style alone. Active shell scripts remain editable even when older
+receipts mention their bytes.
 
 ## File Shape
 
@@ -121,8 +120,8 @@ Use two-space indentation. Keep lines at or below 120 columns.
 Put pipeline continuations at the beginning of the continued line when a
 pipeline must wrap. Prefer one command per line over dense compound statements.
 
-shfmt is pinned as a Bazel-fetched release archive and checks active, unpinned
-shell files with:
+shfmt is pinned as a Bazel-fetched release archive and checks active shell files
+outside historical archives with:
 
 ```bash
 shfmt -i 2 -ci -bn
@@ -134,8 +133,8 @@ and reviewable.
 ## ShellCheck
 
 ShellCheck runs at its default severity in `//:repo_gate` over every tracked
-`*.sh` file plus extensionless versioned hooks, excluding only files whose
-current bytes are pinned by retained receipts or current-candidate audits.
+`*.sh` file plus extensionless versioned hooks, excluding historical archives
+and submodules.
 
 ShellCheck comes from a Bazel-pinned release archive, not from host packages.
 Fix findings at the source. A disable is allowed only for a narrow rule at the
@@ -145,10 +144,10 @@ Do not add file-wide or wholesale disables.
 ## Mechanical Shell Lint
 
 The repo gate runs `scripts/check_shell_style.py` over active shell files under
-`autonomy/`, `parallax/` and `scripts/`, excluding source-pinned files. It
-enforces the `#!/usr/bin/env bash` shebang, a header comment, function comments,
-the 120-column limit, no backticks and the 150-line limit outside the checked-in
-baseline.
+`autonomy/`, `parallax/` and `scripts/`, excluding historical archives and
+submodules. It enforces the `#!/usr/bin/env bash` shebang, a header comment,
+function comments, the 120-column limit, no backticks and the 150-line limit
+outside the checked-in baseline.
 
 ## Sureal Deltas From Milano
 
@@ -157,8 +156,8 @@ baseline.
   `scripts/shell_style_baseline.json`.
 - ShellCheck and shfmt are Bazel-pinned and run through `./bazelw`, never host
   package installs.
-- Receipt-pinned, digest-pinned and current-candidate source files are exempt
-  from style rewrites until their owning evidence is re-admitted.
+- Active shell scripts are editable and linted even when historical receipts or
+  current-candidate declarations mention their bytes.
 
 ## Checklist
 

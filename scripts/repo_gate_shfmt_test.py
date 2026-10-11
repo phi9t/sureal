@@ -1,4 +1,4 @@
-"""Runs shfmt over tracked, unpinned shell files in active source roots."""
+"""Runs shfmt over tracked shell files in active source roots."""
 
 from __future__ import annotations
 

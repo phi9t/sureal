@@ -9,6 +9,30 @@
         29,
         32
       ]
+    },
+    {
+      "path": "autonomy/geometry/verify_geometry.py",
+      "kind": "sys-path-edit",
+      "reason": "direct live verifier script preserves module imports when launched by path from retained plans",
+      "line": 12
+    },
+    {
+      "path": "autonomy/geometry/verify_reconstruction.py",
+      "kind": "sys-path-edit",
+      "reason": "direct live verifier script preserves module imports when launched by path from retained plans",
+      "line": 12
+    },
+    {
+      "path": "autonomy/geometry/verify_scientific_scene.py",
+      "kind": "sys-path-edit",
+      "reason": "direct live verifier script preserves module imports when launched by path from retained plans",
+      "line": 7
+    },
+    {
+      "path": "autonomy/resources/execute_worker.py",
+      "kind": "sys-path-edit",
+      "reason": "resource wrapper is invoked directly from retained launch plans and imports sibling resource-layer packages",
+      "line": 12
     }
   ]
 }

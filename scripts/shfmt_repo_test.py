@@ -60,12 +60,12 @@ class ShfmtRepoTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(result.format_violation_count, 1)
 
-    def test_receipt_pinned_script_is_not_checked(self) -> None:
+    def test_receipt_pinned_active_script_is_checked(self) -> None:
         self.track(
             "autonomy/retained_receipt_sweep.py",
             "RETAINED_SOURCE_PIN_FIELDS = ('source_pins', 'candidate_hashes')\n",
         )
-        self.track("autonomy/pinned.sh", "#!/usr/bin/env bash\nif true; then echo pinned; fi\n")
+        self.track("autonomy/pinned.sh", "#!/usr/bin/env bash\nif true; then\n    echo pinned\nfi\n")
         self.track("autonomy/free.sh", "#!/usr/bin/env bash\n# Runs a command.\nset -euo pipefail\ntrue\n")
         receipt = self.root / "autonomy" / "research" / "live-audit.json"
         receipt.parent.mkdir(parents=True, exist_ok=True)
@@ -77,9 +77,9 @@ class ShfmtRepoTests(unittest.TestCase):
 
         result = shfmt_repo.run_shfmt(SHFMT, self.root)
 
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertEqual(result.excluded_files, ("autonomy/pinned.sh",))
-        self.assertEqual(result.checked_files, ("autonomy/free.sh",))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(result.excluded_files, ())
+        self.assertEqual(result.checked_files, ("autonomy/free.sh", "autonomy/pinned.sh"))
 
 
 if __name__ == "__main__":

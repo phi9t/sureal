@@ -63,8 +63,8 @@ class ClangFormatRepoTests(unittest.TestCase):
         subprocess.run(["git", "add", relative], cwd=self.root, check=True)
 
     def test_clean_active_cpp_passes_format_check(self) -> None:
-        self.track("autonomy/native/example.cc", "int main() {\n  return 0;\n}\n")
-        self.track("parallax/native/example.hh", "#pragma once\n\nint Value();\n")
+        self.track("autonomy/insula/example.cc", "int main() {\n  return 0;\n}\n")
+        self.track("parallax/insulas/orb-slam/example.hh", "#pragma once\n\nint Value();\n")
         self.track("submodules/vendor/ignored.cc", "int main(){return 0;}\n")
 
         result = clang_format_repo.run_clang_format(CLANG_FORMAT, self.root)
@@ -73,32 +73,28 @@ class ClangFormatRepoTests(unittest.TestCase):
         self.assertEqual(
             result.checked_files,
             (
-                "autonomy/native/example.cc",
-                "parallax/native/example.hh",
+                "autonomy/insula/example.cc",
+                "parallax/insulas/orb-slam/example.hh",
             ),
         )
 
     def test_misformatted_active_cpp_fails_with_violation_count(self) -> None:
-        self.track("autonomy/native/bad.cc", "int main(){return 0;}\n")
+        self.track("autonomy/insula/bad.cc", "int main(){return 0;}\n")
 
         result = clang_format_repo.run_clang_format(CLANG_FORMAT, self.root)
 
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(result.format_violation_count, 1)
 
-    def test_explicit_pinned_sources_are_not_checked(self) -> None:
-        self.track("autonomy/native/pinned.cc", "int main(){return 0;}\n")
-        self.track("autonomy/native/free.cc", "int main() {\n  return 0;\n}\n")
+    def test_receipt_pinned_active_sources_are_checked(self) -> None:
+        self.track("autonomy/insula/pinned.cc", "int main(){return 0;}\n")
+        self.track("autonomy/insula/free.cc", "int main() {\n  return 0;\n}\n")
 
-        result = clang_format_repo.run_clang_format(
-            CLANG_FORMAT,
-            self.root,
-            protected=("autonomy/native/pinned.cc",),
-        )
+        result = clang_format_repo.run_clang_format(CLANG_FORMAT, self.root)
 
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertEqual(result.excluded_files, ("autonomy/native/pinned.cc",))
-        self.assertEqual(result.checked_files, ("autonomy/native/free.cc",))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(result.excluded_files, ())
+        self.assertEqual(result.checked_files, ("autonomy/insula/free.cc", "autonomy/insula/pinned.cc"))
 
 
 if __name__ == "__main__":

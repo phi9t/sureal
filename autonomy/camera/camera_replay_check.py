@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 from evidence.source_snapshot import file_sha256
 from PIL import Image
-from .camera_dataset import iter_camera_records
+from camera.camera_dataset import iter_camera_records
 
 def main():
  p=argparse.ArgumentParser();p.add_argument('--publication-sha',required=True);p.add_argument('--usage',required=True);args=p.parse_args()

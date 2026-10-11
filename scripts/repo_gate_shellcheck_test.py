@@ -1,4 +1,4 @@
-"""Runs ShellCheck over tracked, unpinned shell files in the real repository."""
+"""Runs ShellCheck over tracked shell files in the real repository."""
 
 from __future__ import annotations
 

@@ -16,7 +16,7 @@ shell function contracts, and how a change travels from an edit to a gate.
 
 Adopt Milano's guides as Sureal engineering guides. Keep Sureal's recorded deltas: Bazel through `./bazelw`
 (ADR 0002), the `#!/usr/bin/env bash` shebang, the 150-line shell limit with its shrinking baseline,
-concept import roots, and source pins that keep retained evidence byte-frozen. Back each guide's
+concept import roots, and retained evidence that remains byte-frozen while active sources stay editable. Back each guide's
 mechanical rules with a lint in `//:repo_gate`. Make the front-door docs checkable.
 
 ## Decisions
@@ -26,7 +26,9 @@ mechanical rules with a lint in `//:repo_gate`. Make the front-door docs checkab
 - Each guide is self-contained and lists its known deviations rather than tolerating them silently,
   as Milano's guides do.
 - Tooling stays Bazel-pinned, never uv or host packages (ADR 0002).
-- Nothing protected by a source pin or retained receipt is edited or reformatted.
+- Retained receipts and source snapshots are not edited or reformatted. Active
+  working-tree sources remain editable even when historical receipts mention
+  their bytes.
 - Milano rules that conflict with Sureal are recorded as deltas, not adopted. Examples: the Milano commit
   trailer policy, uv as the dependency authority, `#!/bin/bash`, and the 100-line shell limit.
 - No feature work (Parallax, autonomy) lands while this feature is open.
@@ -37,6 +39,5 @@ mechanical rules with a lint in `//:repo_gate`. Make the front-door docs checkab
 ## Out of Scope
 
 - Widening the Ruff format batch or the lint rule set. That is a separate, already-offered follow-up.
-- Moving source-pinned code (`autonomy/insula/` core, `autonomy/evidence/`, `scripts/_collab/`) into `harness/`;
-  that waits until the deferred reruns can re-pin. Splitting `parallax/sfm/incremental.py`.
+- Splitting `parallax/sfm/incremental.py`.
 - clang-tidy, GoogleTest and Google Benchmark. These are deferred in Milano too.

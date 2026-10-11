@@ -1,8 +1,7 @@
-"""Tests for retained-receipt pinned source discovery."""
+"""Tests for active-lint source target discovery."""
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 import subprocess
 import tempfile
@@ -18,59 +17,52 @@ def write(root: Path, relative: str, text: str) -> None:
 
 
 class PinnedSourcesTests(unittest.TestCase):
-    def test_receipt_pin_fields_are_derived_from_retained_sweep(self) -> None:
-        with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            write(
-                root,
-                "autonomy/retained_receipt_sweep.py",
-                "RETAINED_SOURCE_PIN_FIELDS = ('source_pins', 'candidate_hashes')\n",
-            )
+    def test_archive_and_submodule_paths_are_excluded(self) -> None:
+        cases = {
+            "autonomy/research/receipt.py": True,
+            "parallax/research/receipt.py": True,
+            "autonomy/studies/balanced16/procedure_records/run.py": True,
+            "parallax/studies/example/procedure_records/run.py": True,
+            "autonomy/studies/architecture/harness/build.py": True,
+            "parallax/studies/architecture/harness/build.py": True,
+            "parallax/submodules/vendor/source.py": True,
+            "autonomy/active/source.py": False,
+            "parallax/studies/architecture/active.py": False,
+        }
 
-            self.assertEqual(
-                pinned_sources.retained_source_pin_fields(root),
-                ("source_pins", "candidate_hashes"),
-            )
+        for relative, excluded in cases.items():
+            with self.subTest(relative=relative):
+                self.assertEqual(pinned_sources.is_excluded_path(relative), excluded)
 
-    def test_receipt_pins_are_normalized_to_tracked_sources(self) -> None:
+    def test_source_targets_do_not_exclude_receipt_pinned_active_files(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             subprocess.run(["git", "init", "-q"], cwd=root, check=True)
-            write(
-                root,
-                "autonomy/retained_receipt_sweep.py",
-                "RETAINED_SOURCE_PIN_FIELDS = ('source_pins', 'candidate_hashes')\n",
-            )
-            write(root, "autonomy/pinned.py", "from .sibling import VALUE\n")
-            write(root, "autonomy/current_candidate.py", "VALUE = 1\n")
-            write(root, "autonomy/free.py", "VALUE = 2\n")
+            write(root, "autonomy/package/active.py", "VALUE = 1\n")
+            write(root, "autonomy/research/legacy.py", "from .sibling import VALUE\n")
             write(
                 root,
                 "autonomy/research/receipt.json",
-                json.dumps(
-                    {
-                        "source_pins": {"pinned.py": "a" * 64},
-                        "candidate_hashes": {
-                            "/source/autonomy/current_candidate.py": "b" * 64,
-                        },
-                    }
-                ),
+                '{"source_pins": {"autonomy/package/active.py": "' + "a" * 64 + '"}}\n',
             )
+            write(root, "parallax/submodules/vendor/source.py", "VALUE = 2\n")
             subprocess.run(["git", "add", "."], cwd=root, check=True)
 
-            self.assertEqual(pinned_sources.pinned_source_paths(root), ("autonomy/pinned.py",))
-            self.assertEqual(
-                pinned_sources.protected_source_paths(root),
-                ("autonomy/current_candidate.py", "autonomy/pinned.py"),
-            )
+            targets = pinned_sources.source_targets(root, ("autonomy/**/*.py", "parallax/**/*.py"))
 
-    def test_real_repository_pinned_count_matches_retained_sweep_contract(self) -> None:
+            self.assertIn("autonomy/package/active.py", targets.checked_files)
+            self.assertIn("autonomy/research/legacy.py", targets.archive_files)
+            self.assertIn("parallax/submodules/vendor/source.py", targets.submodule_files)
+            self.assertNotIn("autonomy/research/legacy.py", targets.checked_files)
+            self.assertNotIn("parallax/submodules/vendor/source.py", targets.checked_files)
+
+    def test_real_repository_excludes_archives_but_not_active_sources(self) -> None:
         root = Path(__file__).resolve().parents[1]
 
-        pinned = pinned_sources.pinned_source_paths(root)
+        targets = pinned_sources.source_targets(root, ("autonomy/**/*.py", "parallax/**/*.py"))
 
-        self.assertEqual(len(pinned), 267)
-        self.assertIn("autonomy/resources/checkpoint.py", pinned)
+        self.assertIn("autonomy/resources/checkpoint.py", targets.checked_files)
+        self.assertTrue(all(pinned_sources.is_excluded_path(path) for path in targets.excluded_files))
 
 
 if __name__ == "__main__":

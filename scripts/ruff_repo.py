@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run Ruff over unpinned Python sources owned by the repo gate."""
+"""Run Ruff over active Python sources owned by the repo gate."""
 
 from __future__ import annotations
 
@@ -64,11 +64,11 @@ def _resolved_executable(path: str) -> str:
 
 
 def _format_batch_files(root: Path, targets: pinned_sources.SourceTargets) -> tuple[str, ...]:
-    protected = set(targets.excluded_files)
+    excluded = set(targets.excluded_files)
     return tuple(
         path
         for path in targets.tracked_files
-        if path not in protected and any(path.startswith(prefix) for prefix in FORMAT_BATCH_DIRS)
+        if path not in excluded and any(path.startswith(prefix) for prefix in FORMAT_BATCH_DIRS)
     )
 
 
@@ -79,10 +79,8 @@ def ruff_target_files(root: Path, *, mode: Literal["check", "format"]) -> pinned
     checked = _format_batch_files(root, targets)
     return pinned_sources.SourceTargets(
         tracked_files=targets.tracked_files,
-        receipt_pinned_files=targets.receipt_pinned_files,
-        digest_pinned_files=targets.digest_pinned_files,
-        current_candidate_files=targets.current_candidate_files,
-        frozen_files=targets.frozen_files,
+        archive_files=targets.archive_files,
+        submodule_files=targets.submodule_files,
         checked_files=checked,
     )
 

@@ -5,7 +5,7 @@ import numpy as np
 from dataset.sensor_records import select_rows,OrderedLookup
 from dataset.scientific_sidecar_reader import iter_sidecar_rows
 from evidence.source_snapshot import file_sha256 as digest
-from .reconstruction_validate import raw,check_coordinates
+from geometry.reconstruction_validate import raw,check_coordinates
 
 
 def validate_scene(lidar_source,sidecars,records,*,verified_manifest_hashes):

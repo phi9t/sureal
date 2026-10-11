@@ -11,7 +11,7 @@ from insula.runtime_roots import default_lock
 from insula.staging_lease import staging_lease
 from dataset.staged_source import staged_source
 from evidence.source_snapshot import file_sha256, require_regular_file
-from .training_box_process import run_source_worker
+from detection.training_box_process import run_source_worker
 
 
 def save(path, value):

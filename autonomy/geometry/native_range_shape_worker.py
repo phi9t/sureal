@@ -7,8 +7,8 @@ from pathlib import Path
 import resource
 import time
 from evidence.source_snapshot import file_sha256, require_regular_file
-from .native_range_shape_file import read_native_range_shapes
-from .native_range_shape_reference import verify_native_range_shapes
+from geometry.native_range_shape_file import read_native_range_shapes
+from geometry.native_range_shape_reference import verify_native_range_shapes
 
 
 def run_shape_worker(source_path,job_path,*,expected_job_sha256,output):

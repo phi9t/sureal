@@ -4,7 +4,7 @@ No TensorFlow dependency. XYZ is vehicle-reference meters. TOP compensation
 uses world-from-acquisition pixel poses and inverse world-from-reference pose.
 """
 import numpy as np
-from .geometry_foundation import inverse, transform
+from geometry.geometry_foundation import inverse, transform
 
 
 def range_to_points(range_image, calibration, *, pixel_pose=None, frame_pose=None,

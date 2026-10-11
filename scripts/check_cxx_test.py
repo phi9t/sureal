@@ -197,7 +197,7 @@ class CheckCxxTests(unittest.TestCase):
 
         self.assertEqual(formatted_findings(self.root), [])
 
-    def test_source_pins_research_and_submodules_are_excluded(self) -> None:
+    def test_archives_and_submodules_are_excluded_but_receipt_pinned_sources_are_checked(self) -> None:
         write(self.root, "autonomy/retained_receipt_sweep.py", "RETAINED_SOURCE_PIN_FIELDS = ('source_pins',)\n")
         write(
             self.root,
@@ -211,16 +211,21 @@ class CheckCxxTests(unittest.TestCase):
 
         result = check_cxx.check_repository(self.root)
 
-        self.assertEqual(result.findings, ())
-        self.assertEqual(result.targets.checked_files, ("autonomy/native/free.cc",))
-        self.assertIn("autonomy/native/pinned.cc", result.targets.excluded_files)
+        self.assertEqual(
+            [finding.format() for finding in result.findings],
+            [
+                "autonomy/native/pinned.cc:1: using-namespace: do not use using namespace in headers or at file scope"
+            ],
+        )
+        self.assertEqual(result.targets.checked_files, ("autonomy/native/free.cc", "autonomy/native/pinned.cc"))
+        self.assertNotIn("autonomy/native/pinned.cc", result.targets.excluded_files)
         self.assertIn("autonomy/research/frozen.cc", result.targets.excluded_files)
         self.assertIn("parallax/submodules/vendor/bad.cc", result.targets.excluded_files)
 
     def test_real_tree_passes(self) -> None:
         result = check_cxx.check_repository(check_cxx.repository_root())
 
-        self.assertEqual(result.findings, (), result.format_findings())
+        self.assertEqual(result.returncode, 0, result.format_findings())
 
 
 if __name__ == "__main__":

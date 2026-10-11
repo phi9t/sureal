@@ -4,7 +4,7 @@ import subprocess
 import time
 from pathlib import Path
 
-from .training_box_sender import send_training_box_sources
+from detection.training_box_sender import send_training_box_sources
 
 
 def run_source_worker(command, inventory, *, stage, stderr_path,

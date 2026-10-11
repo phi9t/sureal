@@ -222,11 +222,11 @@ Look at `autonomy/insula/gpu_visibility.py`,
 fields. If no CUDA device is visible, the requested GPU test should fail with a
 message naming the device visibility problem.
 
-Stale source pin or retained evidence conflict: start with
+Stale source snapshot or retained evidence conflict: start with
 `//:pinned_sources_test` and `autonomy/evidence/source_snapshot.py`. Do not edit
 retained receipts, source snapshots, root filesystems or locks to make a check
-pass. Historical receipts may point at old bytes; current source pins are
-verified against source snapshots.
+pass. Historical receipts may point at old bytes; source pins are verified
+against source snapshots, not the current working tree.
 
 ShellCheck, Ruff, shfmt or clang-format scope surprise: inspect the repo-gate
 target named by the failure in `BUILD.bazel`, then inspect the owning script:
@@ -240,6 +240,6 @@ target named by the failure in `BUILD.bazel`, then inspect the owning script:
 - `scripts/ruff_repo.py`
 - `scripts/clang_format_repo.py`
 
-The scope is derived from tracked repository files with exclusions for retained
-or source-pinned bytes. Fix the active file or update the owning policy in the
-same change; do not reformat retained receipts or source snapshots.
+The scope is derived from tracked repository files with exclusions for
+historical archives and submodules. Fix the active file or update the owning
+policy in the same change; do not reformat retained receipts or source snapshots.

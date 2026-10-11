@@ -3,7 +3,7 @@ import re
 import pyarrow.parquet as pq
 from dataset.source_integrity import verify_source
 from evidence.source_snapshot import require_regular_file
-from .native_range_shapes import native_range_shapes,KEYS,SHAPES
+from geometry.native_range_shapes import native_range_shapes,KEYS,SHAPES
 
 
 def read_native_range_shapes(path,*,scene,source,inventory):

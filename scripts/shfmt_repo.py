@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run shfmt over unpinned tracked shell scripts in active source roots."""
+"""Run shfmt over tracked shell scripts in active source roots."""
 
 from __future__ import annotations
 
@@ -31,21 +31,13 @@ SHFMT_FLAGS = ("-i", "2", "-ci", "-bn")
 @dataclass(frozen=True)
 class ShfmtTargets:
     tracked_shell_files: tuple[str, ...]
-    receipt_pinned_files: tuple[str, ...]
-    digest_pinned_files: tuple[str, ...]
-    current_candidate_files: tuple[str, ...]
-    frozen_files: tuple[str, ...]
+    archive_files: tuple[str, ...]
+    submodule_files: tuple[str, ...]
     checked_files: tuple[str, ...]
 
     @property
-    def protected_files(self) -> tuple[str, ...]:
-        return tuple(
-            sorted(set(self.receipt_pinned_files) | set(self.digest_pinned_files) | set(self.current_candidate_files))
-        )
-
-    @property
     def excluded_files(self) -> tuple[str, ...]:
-        return tuple(sorted(set(self.protected_files) | set(self.frozen_files)))
+        return tuple(sorted(set(self.archive_files) | set(self.submodule_files)))
 
 
 @dataclass(frozen=True)
@@ -90,10 +82,8 @@ def shfmt_targets(root: Path) -> ShfmtTargets:
     targets = pinned_sources.source_targets(root, SHFMT_PATTERNS)
     return ShfmtTargets(
         tracked_shell_files=targets.tracked_files,
-        receipt_pinned_files=targets.receipt_pinned_files,
-        digest_pinned_files=targets.digest_pinned_files,
-        current_candidate_files=targets.current_candidate_files,
-        frozen_files=targets.frozen_files,
+        archive_files=targets.archive_files,
+        submodule_files=targets.submodule_files,
         checked_files=targets.checked_files,
     )
 
@@ -127,8 +117,8 @@ def run_shfmt(shfmt: str, root: Path, *, fix: bool = False) -> ShfmtResult:
 def _print_summary(result: ShfmtResult) -> None:
     targets = result.targets
     print(f"tracked_shfmt_shell={len(targets.tracked_shell_files)}")
-    print(f"protected_shfmt_shell={len(targets.protected_files)}")
-    print(f"frozen_shfmt_shell={len(targets.frozen_files)}")
+    print(f"archive_shfmt_shell={len(targets.archive_files)}")
+    print(f"submodule_shfmt_shell={len(targets.submodule_files)}")
     print(f"shfmt_scope={len(targets.checked_files)}")
     if targets.excluded_files:
         print("excluded:")
@@ -144,7 +134,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--shfmt", required=True)
     parser.add_argument("--fix", action="store_true", help="rewrite checked shell files in place")
     parser.add_argument("--list", action="store_true", help="print checked shell files and exit")
-    parser.add_argument("--list-excluded", action="store_true", help="print source-pin excluded shell files")
+    parser.add_argument("--list-excluded", action="store_true", help="print shell files excluded by archive policy")
     args = parser.parse_args(argv)
 
     targets = shfmt_targets(args.root)

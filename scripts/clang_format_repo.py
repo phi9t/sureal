@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run clang-format over unpinned tracked C++ sources."""
+"""Run clang-format over tracked active C++ sources."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
-from collections.abc import Iterable, Sequence
+from collections.abc import Sequence
 
 try:
     from scripts import pinned_sources
@@ -28,46 +28,21 @@ CPP_FORMAT_PATTERNS = (
     "parallax/**/*.cu",
     "parallax/**/*.cuh",
 )
-
-EXPLICIT_PINNED_CPP_EXCLUSIONS = (
-    "autonomy/camera/project_camera.cc",
-    "autonomy/motion/cli/motion_metrics_main.cc",
-    "autonomy/motion/ingestion/fnv_bytes_fixture.cc",
-    "autonomy/motion/ingestion/motion_causal_project.cc",
-    "autonomy/motion/ingestion/native_camera_token_fixture.cc",
-    "autonomy/motion/ingestion/native_current_geometry_reference.cc",
-    "autonomy/motion/ingestion/native_delta_component_fixture.cc",
-    "autonomy/motion/ingestion/native_delta_component_reference.cc",
-    "autonomy/motion/ingestion/native_geometry_corruption_fixture.cc",
-    "autonomy/motion/ingestion/native_geometry_metadata_fixture.cc",
-    "autonomy/motion/ingestion/native_metric_handoff_fixture.cc",
-    "autonomy/motion/ingestion/native_metric_handoff_reference.cc",
-    "autonomy/motion/ingestion/native_source_inventory.cc",
-    "autonomy/motion/ingestion/native_source_link_fixture.cc",
-    "autonomy/motion/pooled/motion_metrics_pooled_main.cc",
+CLANG_FORMAT_BATCH_PREFIXES = (
+    "autonomy/insula/",
+    "parallax/insulas/orb-slam/",
 )
-
 
 @dataclass(frozen=True)
 class ClangFormatTargets:
     tracked_cpp_files: tuple[str, ...]
-    receipt_pinned_files: tuple[str, ...]
-    digest_pinned_files: tuple[str, ...]
-    current_candidate_files: tuple[str, ...]
-    explicit_pinned_files: tuple[str, ...]
-    frozen_files: tuple[str, ...]
+    archive_files: tuple[str, ...]
+    submodule_files: tuple[str, ...]
     checked_files: tuple[str, ...]
 
     @property
-    def registry_protected_files(self) -> tuple[str, ...]:
-        return tuple(
-            sorted(set(self.receipt_pinned_files) | set(self.digest_pinned_files) | set(self.current_candidate_files))
-        )
-
-    @property
     def excluded_files(self) -> tuple[str, ...]:
-        tracked = set(self.tracked_cpp_files)
-        return tuple(sorted((set(self.explicit_pinned_files) & tracked) | set(self.frozen_files)))
+        return tuple(sorted(set(self.archive_files) | set(self.submodule_files)))
 
 
 @dataclass(frozen=True)
@@ -112,19 +87,18 @@ def _resolved_executable(path: str) -> str:
     return str((Path.cwd() / executable).resolve())
 
 
-def clang_format_targets(root: Path, *, protected: Iterable[str] | None = None) -> ClangFormatTargets:
+def clang_format_targets(root: Path) -> ClangFormatTargets:
     registry_targets = pinned_sources.source_targets(root, CPP_FORMAT_PATTERNS)
-    tracked = registry_targets.tracked_files
-    protected_files = tuple(sorted(EXPLICIT_PINNED_CPP_EXCLUSIONS if protected is None else protected))
-    excluded = (set(protected_files) & set(tracked)) | set(registry_targets.frozen_files)
-    checked = tuple(path for path in tracked if path not in excluded)
+    excluded = set(registry_targets.excluded_files)
+    checked = tuple(
+        path
+        for path in registry_targets.tracked_files
+        if path not in excluded and any(path.startswith(prefix) for prefix in CLANG_FORMAT_BATCH_PREFIXES)
+    )
     return ClangFormatTargets(
-        tracked_cpp_files=tracked,
-        receipt_pinned_files=registry_targets.receipt_pinned_files,
-        digest_pinned_files=registry_targets.digest_pinned_files,
-        current_candidate_files=registry_targets.current_candidate_files,
-        explicit_pinned_files=protected_files,
-        frozen_files=registry_targets.frozen_files,
+        tracked_cpp_files=registry_targets.tracked_files,
+        archive_files=registry_targets.archive_files,
+        submodule_files=registry_targets.submodule_files,
         checked_files=checked,
     )
 
@@ -144,10 +118,9 @@ def run_clang_format(
     root: Path,
     *,
     fix: bool = False,
-    protected: Iterable[str] | None = None,
 ) -> ClangFormatResult:
     root = Path(root).resolve()
-    targets = clang_format_targets(root, protected=protected)
+    targets = clang_format_targets(root)
     if not targets.checked_files:
         return ClangFormatResult(0, "", "", targets)
     result = subprocess.run(
@@ -164,9 +137,8 @@ def run_clang_format(
 def _print_summary(result: ClangFormatResult) -> None:
     targets = result.targets
     print(f"tracked_cpp={len(targets.tracked_cpp_files)}")
-    print(f"registry_protected_cpp={len(targets.registry_protected_files)}")
-    print(f"explicit_pinned_cpp={len(targets.explicit_pinned_files)}")
-    print(f"frozen_cpp={len(targets.frozen_files)}")
+    print(f"archive_cpp={len(targets.archive_files)}")
+    print(f"submodule_cpp={len(targets.submodule_files)}")
     print(f"clang_format_scope={len(targets.checked_files)}")
     if targets.excluded_files:
         print("excluded:")
@@ -185,8 +157,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--clang-format", required=True)
     parser.add_argument("--fix", action="store_true", help="rewrite checked C++ files in place")
     parser.add_argument("--list", action="store_true", help="print checked C++ files and exit")
-    parser.add_argument("--list-excluded", action="store_true", help="print C++ files excluded from formatting")
-    parser.add_argument("--list-registry-protected", action="store_true", help="print C++ files protected by pin registry")
+    parser.add_argument("--list-excluded", action="store_true", help="print C++ files excluded by archive policy")
     args = parser.parse_args(argv)
 
     targets = clang_format_targets(args.root)
@@ -195,9 +166,6 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
     if args.list_excluded:
         print("\n".join(targets.excluded_files))
-        return 0
-    if args.list_registry_protected:
-        print("\n".join(targets.registry_protected_files))
         return 0
 
     result = run_clang_format(args.clang_format, args.root, fix=args.fix)

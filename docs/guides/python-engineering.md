@@ -9,9 +9,10 @@ scripts.
 
 - Directories name concepts, not languages or runtime tiers. Put new code under
   the concept it implements; see `docs/adr/0001-directories-express-concepts.md`.
-- Python under `autonomy/` and `parallax/` is ordinary source. Historical
-  procedure records, retained receipts, source snapshots and files protected by
-  source pins are evidence bytes, not cleanup targets.
+- Python under `autonomy/` and `parallax/` is ordinary source and stays
+  editable even when older receipts mention its bytes. Historical procedure
+  records, retained receipts, source snapshots and the research archives are
+  evidence bytes, not cleanup targets.
 - Keep live command entry points separate from reusable library code. A live
   command launches nested Insula work, touches host state, reads external assets,
   publishes evidence or otherwise depends on a runtime boundary. Library code
@@ -57,7 +58,7 @@ The import checker in `scripts/check_imports.py` scans tracked Python under
 `autonomy/` and `parallax/`. It rejects relative imports, local imports that
 are not anchored at the concept import root and active `sys.path` edits. It
 skips `autonomy/research/**`, `parallax/research/**`, procedure records, the
-frozen architecture harness and source-pinned files.
+frozen architecture harness and `submodules/`.
 
 ## Tests
 
@@ -111,10 +112,9 @@ field names even when they are awkward Python names, and translate only at the
 typed boundary that owns the schema. When emitting JSON, make the schema and
 field spelling explicit in tests.
 
-Do not reformat or otherwise edit retained receipts, `autonomy/research/**`,
-`parallax/research/**`, source snapshots or files protected by retained or
-current-candidate source pins. The repo-gate wrappers derive source-pin
-exclusions from `scripts/pinned_sources.py`.
+Do not reformat or otherwise edit retained receipts, source snapshots,
+`autonomy/research/**`, `parallax/research/**` or procedure records. The
+repo-gate wrappers take those archive exclusions from `scripts/pinned_sources.py`.
 
 ## Errors
 
@@ -151,9 +151,8 @@ exclusions from `scripts/pinned_sources.py`.
 - Keep lines at or below 120 columns where practical.
 - Do not add minified one-liners in new or touched code. Prefer one statement
   per line and normal indentation even in scripts.
-- Do not reformat files whose bytes are protected by retained receipts,
-  current-candidate source declarations, digest-pinned source snapshots or
-  frozen evidence paths.
+- Do not reformat retained receipts, source snapshots or historical archives.
+  Active Python remains editable even when older receipts mention its bytes.
 
 ## Tooling
 
@@ -162,9 +161,9 @@ through `./bazelw`; do not install host packages to satisfy a Bazel target.
 
 The repo gate runs Ruff 0.6.9 from a Bazel-pinned release archive declared in
 `MODULE.bazel`. `pyproject.toml` sets Python 3.10, a 120-column line length and
-the initial lint rule set `E9` and `F821` over active unpinned Python in
+the initial lint rule set `E9` and `F821` over active Python in
 `autonomy/**/*.py`, `parallax/**/*.py`, `scripts/**/*.py` and `scripts/*.py`.
-The format check currently covers the unpinned batch under
+The format check currently covers the batch under
 `autonomy/association/` and `autonomy/blob_store/`. Later batches should expand
 the formatted directory list and then widen lint rules based on a fresh live
 run.

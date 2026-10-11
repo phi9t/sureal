@@ -89,25 +89,21 @@ def _relative_path(path: Path, root: Path) -> str:
 
 
 def _is_frozen_path(relative: str) -> bool:
-    parts = PurePosixPath(relative).parts
-    if len(parts) >= 2 and parts[0] in IMPORT_ROOTS and parts[1] == "research":
-        return True
-    if (
-        len(parts) >= 4
-        and parts[0] in IMPORT_ROOTS
-        and parts[1] == "studies"
-        and parts[3] == "procedure_records"
-    ):
-        return True
-    return (
-        len(parts) >= 4
-        and parts[0] in IMPORT_ROOTS
-        and parts[1:4] == ("studies", "architecture", "harness")
-    )
+    return pinned_sources.is_excluded_path(relative)
 
 
-def pinned_source_paths(root: Path) -> set[str]:
-    return set(pinned_sources.pinned_source_paths(root))
+def scan_target_paths(root: Path) -> list[str]:
+    root = Path(root)
+    targets: list[str] = []
+    for path in _tracked_files(root, [f"{import_root}/**/*.py" for import_root in IMPORT_ROOTS]):
+        relative = _relative_path(path, root)
+        parts = PurePosixPath(relative).parts
+        if not parts or parts[0] not in IMPORT_ROOTS:
+            continue
+        if _is_frozen_path(relative):
+            continue
+        targets.append(relative)
+    return sorted(targets)
 
 
 def _top_level_local_modules(root: Path, import_root: str) -> set[str]:
@@ -268,7 +264,6 @@ def read_baseline(path: Path) -> dict[ProblemKey, str]:
 
 def scan(root: Path) -> list[Problem]:
     root = Path(root)
-    pinned = pinned_source_paths(root)
     root_modules = {
         import_root: _top_level_local_modules(root, import_root)
         for import_root in IMPORT_ROOTS
@@ -279,13 +274,9 @@ def scan(root: Path) -> list[Problem]:
         for import_root in root_modules
     }
     problems: list[Problem] = []
-    for path in _tracked_files(root, [f"{import_root}/**/*.py" for import_root in IMPORT_ROOTS]):
-        relative = _relative_path(path, root)
+    for relative in scan_target_paths(root):
+        path = root / relative
         parts = PurePosixPath(relative).parts
-        if not parts or parts[0] not in root_modules:
-            continue
-        if _is_frozen_path(relative) or relative in pinned:
-            continue
         try:
             tree = ast.parse(path.read_text(encoding="utf-8"), filename=relative)
         except SyntaxError as error:
@@ -349,7 +340,7 @@ def check(root: Path, baseline_path: Path | None = None) -> dict[str, object]:
         "stale_baseline": stale,
         "baseline_hits": baseline_hits,
         "baseline": baseline,
-        "pinned_source_count": len(pinned_source_paths(root)),
+        "import_rule_scope": len(scan_target_paths(root)),
     }
 
 
@@ -375,7 +366,7 @@ def summary(report: Mapping[str, object]) -> dict[str, object]:
         "unexpected_count": len(unexpected),
         "baseline_count": len(baseline_hits) if isinstance(baseline_hits, list) else 0,
         "stale_baseline_count": len(stale) if isinstance(stale, list) else 0,
-        "pinned_source_count": report["pinned_source_count"],
+        "import_rule_scope": report["import_rule_scope"],
         "all": _summary_counts(problems),
         "unexpected": _summary_counts(unexpected),
     }
@@ -391,8 +382,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--baseline", type=Path, default=None)
+    parser.add_argument("--list", action="store_true", help="print checked Python files and exit")
     parser.add_argument("--summary-json", action="store_true")
     args = parser.parse_args(argv)
+    if args.list:
+        print("\n".join(scan_target_paths(args.root)))
+        return 0
     report = check(args.root, args.baseline)
     if args.summary_json:
         print(json.dumps(summary(report), indent=2, sort_keys=True))

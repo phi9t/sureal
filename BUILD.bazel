@@ -63,6 +63,19 @@ py_library(
     deps = [":pinned_sources_lib"],
 )
 
+py_binary(
+    name = "check_imports",
+    srcs = ["scripts/check_imports.py"],
+    data = [
+        "scripts/import_rule_baseline.json",
+    ],
+    imports = ["."],
+    legacy_create_init = 0,
+    main = "scripts/check_imports.py",
+    deps = [":pinned_sources_lib"],
+    visibility = ["//visibility:public"],
+)
+
 py_library(
     name = "check_storage_boundary_lib",
     srcs = ["scripts/check_storage_boundary.py"],
@@ -86,6 +99,9 @@ py_library(
 py_binary(
     name = "check_cxx",
     srcs = ["scripts/check_cxx.py"],
+    data = [
+        "scripts/cxx_lint_baseline.json",
+    ],
     imports = ["."],
     legacy_create_init = 0,
     main = "scripts/check_cxx.py",
@@ -126,6 +142,9 @@ py_test(
 py_test(
     name = "check_cxx_test",
     srcs = ["scripts/check_cxx_test.py"],
+    data = [
+        "scripts/cxx_lint_baseline.json",
+    ],
     deps = [":check_cxx_lib"],
     legacy_create_init = 0,
     size = "small",
@@ -184,6 +203,15 @@ py_library(
     imports = ["."],
 )
 
+py_binary(
+    name = "pinned_sources",
+    srcs = ["scripts/pinned_sources.py"],
+    imports = ["."],
+    legacy_create_init = 0,
+    main = "scripts/pinned_sources.py",
+    visibility = ["//visibility:public"],
+)
+
 py_test(
     name = "pinned_sources_test",
     srcs = ["scripts/pinned_sources_test.py"],
@@ -201,6 +229,20 @@ py_library(
     srcs = ["scripts/shellcheck_repo.py"],
     imports = ["."],
     deps = [":pinned_sources_lib"],
+)
+
+py_binary(
+    name = "shellcheck_repo",
+    srcs = ["scripts/shellcheck_repo.py"],
+    args = ["--shellcheck=$(location @shellcheck_linux_x86_64//:shellcheck)"],
+    data = [
+        "@shellcheck_linux_x86_64//:shellcheck",
+    ],
+    imports = ["."],
+    legacy_create_init = 0,
+    main = "scripts/shellcheck_repo.py",
+    deps = [":pinned_sources_lib"],
+    visibility = ["//visibility:public"],
 )
 
 py_library(
@@ -248,6 +290,21 @@ py_library(
     deps = [":pinned_sources_lib"],
 )
 
+py_binary(
+    name = "ruff_repo",
+    srcs = ["scripts/ruff_repo.py"],
+    args = ["--ruff=$(location @ruff_linux_x86_64//:ruff)"],
+    data = [
+        "@ruff_linux_x86_64//:ruff",
+        "pyproject.toml",
+    ],
+    imports = ["."],
+    legacy_create_init = 0,
+    main = "scripts/ruff_repo.py",
+    deps = [":pinned_sources_lib"],
+    visibility = ["//visibility:public"],
+)
+
 py_test(
     name = "repo_gate_import_rule_test",
     srcs = ["scripts/repo_gate_import_rule_test.py"],
@@ -286,6 +343,9 @@ py_test(
 py_test(
     name = "repo_gate_cxx_test",
     srcs = ["scripts/repo_gate_cxx_test.py"],
+    data = [
+        "scripts/cxx_lint_baseline.json",
+    ],
     deps = [
         ":check_cxx_lib",
         ":pinned_sources_lib",

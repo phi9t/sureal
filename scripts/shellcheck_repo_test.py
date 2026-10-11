@@ -62,7 +62,7 @@ class ShellCheckRepoTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("SC2086", result.stdout + result.stderr)
 
-    def test_file_list_includes_extensionless_hooks_and_excludes_receipt_pins(self) -> None:
+    def test_file_list_includes_extensionless_hooks_and_receipt_pinned_sources(self) -> None:
         self.write_tracked(
             "autonomy/retained_receipt_sweep.py",
             "RETAINED_SOURCE_PIN_FIELDS = ('source_pins', 'candidate_hashes')\n",
@@ -82,8 +82,8 @@ class ShellCheckRepoTests(unittest.TestCase):
 
         self.assertIn(".githooks/pre-commit", checked)
         self.assertIn("autonomy/run.sh", checked)
-        self.assertIn("autonomy/tracer.sh", excluded)
-        self.assertNotIn("autonomy/tracer.sh", checked)
+        self.assertIn("autonomy/tracer.sh", checked)
+        self.assertNotIn("autonomy/tracer.sh", excluded)
 
 
 if __name__ == "__main__":

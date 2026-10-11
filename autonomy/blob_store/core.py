@@ -176,19 +176,13 @@ def _with_public_blob_store_errors(
         except _PrimitiveCorrupt as error:
             raise Corrupt("blob bytes failed verification: " + key) from error
         except _PrimitiveUnauthenticated as error:
-            raise Unauthenticated(
-                "blob store authentication failed; " + _authentication_action(adapter)
-            ) from error
+            raise Unauthenticated("blob store authentication failed; " + _authentication_action(adapter)) from error
         except _PrimitivePermanentUnavailable as error:
             raise Unavailable("blob store " + operation_name + " unavailable") from error
         except (_PrimitiveTransient, TimeoutError, OSError) as error:
             if attempt == max_attempts:
                 raise Unavailable(
-                    "blob store "
-                    + operation_name
-                    + " unavailable after "
-                    + str(max_attempts)
-                    + " attempts"
+                    "blob store " + operation_name + " unavailable after " + str(max_attempts) + " attempts"
                 ) from error
             sleep(_backoff_for_attempt(backoff_seconds, attempt))
         except Exception as error:
@@ -304,9 +298,7 @@ class BlobStore:
                     lambda context: self._adapter._download_blob(key, temporary, context),
                 )
                 actual_sha256, actual_bytes = _file_sha256_and_size(temporary)
-                if actual_sha256 != expected_sha256 or (
-                    expected_bytes is not None and actual_bytes != expected_bytes
-                ):
+                if actual_sha256 != expected_sha256 or (expected_bytes is not None and actual_bytes != expected_bytes):
                     raise _PrimitiveCorrupt("blob digest mismatch")
                 os.replace(temporary, destination)
                 temporary = None

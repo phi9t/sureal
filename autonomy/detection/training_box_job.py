@@ -17,7 +17,7 @@ import time
 
 from dataset.scientific_admission import admit_scene
 from evidence.source_snapshot import file_sha256, require_regular_file
-from .training_box_wire import stream_training_box_sources
+from detection.training_box_wire import stream_training_box_sources
 
 
 _JSON_BYTES = 32 * 1024**2
@@ -147,10 +147,10 @@ def run_training_box_job(job_path, *, expected_job_sha256, mode, source_stream,
 
     sources = stream_training_box_sources(source_stream, inventory=inventory, acknowledge=acknowledge)
     if mode == 'producer':
-        from .training_box_sources import training_box_statistics_from_sources
+        from detection.training_box_sources import training_box_statistics_from_sources
         result = training_box_statistics_from_sources(sources, membership=membership, expected_scenes=order)
     else:
-        from .training_box_reference import verify_training_box_distributions
+        from detection.training_box_reference import verify_training_box_distributions
         result = verify_training_box_distributions(sources, reported=reported,
                                                    membership=membership, expected_scenes=order)
     result['job_identity'] = {'mode': mode, 'job_sha256': expected_job_sha256,

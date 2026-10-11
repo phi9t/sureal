@@ -1,8 +1,8 @@
 """Separate offline producer/checker commands with externally supplied provenance."""
 import json,sys
 from pathlib import Path
-from .scientific_reconstruction import reconstruct_scene
-from .scientific_scene_validate import validate_scene
+from geometry.scientific_reconstruction import reconstruct_scene
+from geometry.scientific_scene_validate import validate_scene
 
 
 def main():

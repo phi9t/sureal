@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -75,7 +74,7 @@ class RuffRepoTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("syntax", result.finding_counts)
 
-    def test_pinned_sources_are_excluded_from_lint_and_format_scope(self) -> None:
+    def test_receipt_pinned_active_sources_are_linted(self) -> None:
         self.track(
             "autonomy/retained_receipt_sweep.py",
             "RETAINED_SOURCE_PIN_FIELDS = ('source_pins',)\n",
@@ -90,9 +89,10 @@ class RuffRepoTests(unittest.TestCase):
         targets = ruff_repo.ruff_target_files(self.root, mode="check")
         lint = ruff_repo.run_ruff(RUFF, self.root, mode="check")
 
-        self.assertIn("autonomy/association/pinned.py", targets.excluded_files)
-        self.assertNotIn("autonomy/association/pinned.py", targets.checked_files)
-        self.assertEqual(lint.returncode, 0, lint.stdout + lint.stderr)
+        self.assertIn("autonomy/association/pinned.py", targets.checked_files)
+        self.assertNotIn("autonomy/association/pinned.py", targets.excluded_files)
+        self.assertNotEqual(lint.returncode, 0)
+        self.assertIn("syntax", lint.finding_counts)
 
     def test_deleted_tracked_python_files_are_not_linted_before_commit(self) -> None:
         self.track("parallax/pipeline/removed.py", "not python syntax :\n")
@@ -103,7 +103,7 @@ class RuffRepoTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertNotIn("parallax/pipeline/removed.py", result.checked_files)
 
-    def test_format_check_does_not_touch_receipt_pinned_file_bytes(self) -> None:
+    def test_format_check_includes_receipt_pinned_batch_files(self) -> None:
         self.track(
             "autonomy/retained_receipt_sweep.py",
             "RETAINED_SOURCE_PIN_FIELDS = ('source_pins',)\n",
@@ -114,14 +114,11 @@ class RuffRepoTests(unittest.TestCase):
             "autonomy/research/receipt.json",
             json.dumps({"source_pins": {"autonomy/association/pinned.py": "a" * 64}}),
         )
-        protected = self.root / "autonomy/association/pinned.py"
-        before = hashlib.sha256(protected.read_bytes()).hexdigest()
 
         result = ruff_repo.run_ruff(RUFF, self.root, mode="format")
-        after = hashlib.sha256(protected.read_bytes()).hexdigest()
 
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertEqual(after, before)
+        self.assertIn("autonomy/association/pinned.py", result.checked_files)
+        self.assertNotEqual(result.returncode, 0)
 
 
 if __name__ == "__main__":

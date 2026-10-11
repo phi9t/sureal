@@ -56,7 +56,7 @@ class ImportRuleBehaviorTests(unittest.TestCase):
                 ],
             )
 
-    def test_pinned_sources_are_exempted_from_the_active_scan(self) -> None:
+    def test_receipt_pinned_active_sources_are_scanned(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             write(
@@ -72,8 +72,10 @@ class ImportRuleBehaviorTests(unittest.TestCase):
                 json.dumps({"source_pins": {"autonomy/pinned.py": "a" * 64}}),
             )
 
-            self.assertEqual(check_imports.pinned_source_paths(root), {"autonomy/pinned.py"})
-            self.assertEqual(check_imports.scan(root), [])
+            self.assertEqual(
+                [check_imports.problem_key(problem) for problem in check_imports.scan(root)],
+                [("autonomy/pinned.py", 1, "relative-import")],
+            )
 
     def test_baseline_allows_current_hits_but_rejects_stale_entries(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -118,6 +120,7 @@ class ImportRuleBehaviorTests(unittest.TestCase):
                 "autonomy/research/legacy.py",
                 "autonomy/studies/example/procedure_records/legacy.py",
                 "autonomy/studies/architecture/harness/legacy.py",
+                "parallax/submodules/vendor/legacy.py",
             ):
                 write(root, relative, "from .sibling import VALUE\n")
 

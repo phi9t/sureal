@@ -6,8 +6,8 @@ boring, explicit, RAII-based and close to the scientific boundary it supports.
 
 This guide applies to active C++ and CUDA under `autonomy/` and `parallax/`.
 Do not edit retained evidence, source snapshots, `autonomy/research/**`,
-`parallax/research/**`, procedure records, or files protected by source pins to
-make a style check pass.
+`parallax/research/**`, procedure records, or archived harness files to make a
+style check pass.
 
 ## File Names And Suffixes
 
@@ -165,7 +165,7 @@ Write comments that preserve intent a future maintainer cannot read from the
 code alone:
 
 - Explain ownership transfers, lifetime constraints, synchronization
-  requirements, source-pin decisions and compatibility with external APIs.
+  requirements and compatibility with external APIs.
 - Put comments immediately above the code they justify, or on the same line for
   a short ownership note.
 - Public declarations in headers should document non-obvious contracts,
@@ -221,8 +221,8 @@ the Bazel target is the verification boundary.
 ## Mechanical Lint
 
 `scripts/check_cxx.py` scans tracked active C++ under `autonomy/` and
-`parallax/`. It is aware of comments and string literals, excludes source-pinned
-and frozen trees through `scripts/pinned_sources.py`, and rejects:
+`parallax/`. It is aware of comments and string literals, excludes historical
+archives and submodules through `scripts/pinned_sources.py`, and rejects:
 
 - forbidden suffixes: `.cpp`, `.h`, `.hpp`, `.hxx`;
 - headers without `#pragma once`;
@@ -237,8 +237,8 @@ and frozen trees through `scripts/pinned_sources.py`, and rejects:
 
 ## Known Deviations
 
-Source-pinned C++ is frozen and exempt from this guide's mechanical cleanup.
-These files are protected by the source-pin registry today:
+Existing C++ issues that entered lint scope when the lint-side source freeze was
+retired are recorded in the shrink-only `scripts/cxx_lint_baseline.json`:
 
 - `autonomy/camera/project_camera.cc`
 - `autonomy/motion/cli/motion_metrics_main.cc`
@@ -256,7 +256,7 @@ These files are protected by the source-pin registry today:
 - `autonomy/motion/ingestion/native_source_link_fixture.cc`
 - `autonomy/motion/pooled/motion_metrics_pooled_main.cc`
 
-Current unpinned deviations:
+Current unbaselined deviations:
 
 - `parallax/insulas/orb-slam/surflo_rgbd.cc` has `truth_cloud`,
   `run_sequence` and `main` functions longer than the target 40-line size. They

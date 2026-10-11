@@ -1,0 +1,628 @@
+{
+  "entries": [
+    {
+      "kind": "line-length",
+      "line": 23,
+      "message": "line has 143 columns, above 120",
+      "path": "autonomy/camera/project_camera.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 26,
+      "message": "line has 158 columns, above 120",
+      "path": "autonomy/camera/project_camera.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 33,
+      "message": "line has 195 columns, above 120",
+      "path": "autonomy/camera/project_camera.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 35,
+      "message": "line has 135 columns, above 120",
+      "path": "autonomy/camera/project_camera.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 37,
+      "message": "line has 194 columns, above 120",
+      "path": "autonomy/camera/project_camera.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 38,
+      "message": "line has 338 columns, above 120",
+      "path": "autonomy/camera/project_camera.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 39,
+      "message": "line has 136 columns, above 120",
+      "path": "autonomy/camera/project_camera.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 41,
+      "message": "line has 181 columns, above 120",
+      "path": "autonomy/camera/project_camera.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 43,
+      "message": "line has 127 columns, above 120",
+      "path": "autonomy/camera/project_camera.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 44,
+      "message": "line has 137 columns, above 120",
+      "path": "autonomy/camera/project_camera.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 49,
+      "message": "line has 169 columns, above 120",
+      "path": "autonomy/camera/project_camera.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "using-namespace",
+      "line": 14,
+      "message": "do not use using namespace in headers or at file scope",
+      "path": "autonomy/camera/project_camera.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 27,
+      "message": "line has 153 columns, above 120",
+      "path": "autonomy/motion/cli/motion_metrics_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 31,
+      "message": "line has 164 columns, above 120",
+      "path": "autonomy/motion/cli/motion_metrics_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 37,
+      "message": "line has 157 columns, above 120",
+      "path": "autonomy/motion/cli/motion_metrics_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 38,
+      "message": "line has 212 columns, above 120",
+      "path": "autonomy/motion/cli/motion_metrics_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 45,
+      "message": "line has 336 columns, above 120",
+      "path": "autonomy/motion/cli/motion_metrics_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 51,
+      "message": "line has 138 columns, above 120",
+      "path": "autonomy/motion/cli/motion_metrics_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 53,
+      "message": "line has 166 columns, above 120",
+      "path": "autonomy/motion/cli/motion_metrics_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 54,
+      "message": "line has 147 columns, above 120",
+      "path": "autonomy/motion/cli/motion_metrics_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 62,
+      "message": "line has 121 columns, above 120",
+      "path": "autonomy/motion/cli/motion_metrics_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 66,
+      "message": "line has 313 columns, above 120",
+      "path": "autonomy/motion/cli/motion_metrics_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 68,
+      "message": "line has 183 columns, above 120",
+      "path": "autonomy/motion/cli/motion_metrics_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 3,
+      "message": "line has 265 columns, above 120",
+      "path": "autonomy/motion/ingestion/fnv_bytes_fixture.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "c-style-cast",
+      "line": 3,
+      "message": "use an explicit C++ cast",
+      "path": "autonomy/motion/ingestion/fnv_bytes_fixture.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 12,
+      "message": "line has 128 columns, above 120",
+      "path": "autonomy/motion/ingestion/motion_causal_project.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 15,
+      "message": "line has 147 columns, above 120",
+      "path": "autonomy/motion/ingestion/motion_causal_project.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 33,
+      "message": "line has 287 columns, above 120",
+      "path": "autonomy/motion/ingestion/motion_causal_project.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 34,
+      "message": "line has 196 columns, above 120",
+      "path": "autonomy/motion/ingestion/motion_causal_project.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 36,
+      "message": "line has 191 columns, above 120",
+      "path": "autonomy/motion/ingestion/motion_causal_project.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 37,
+      "message": "line has 124 columns, above 120",
+      "path": "autonomy/motion/ingestion/motion_causal_project.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 38,
+      "message": "line has 139 columns, above 120",
+      "path": "autonomy/motion/ingestion/motion_causal_project.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 41,
+      "message": "line has 148 columns, above 120",
+      "path": "autonomy/motion/ingestion/motion_causal_project.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 51,
+      "message": "line has 145 columns, above 120",
+      "path": "autonomy/motion/ingestion/motion_causal_project.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 5,
+      "message": "line has 1200 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_camera_token_fixture.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 12,
+      "message": "line has 138 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_current_geometry_reference.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 13,
+      "message": "line has 1568 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_current_geometry_reference.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 14,
+      "message": "line has 692 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_current_geometry_reference.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 15,
+      "message": "line has 132 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_current_geometry_reference.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 16,
+      "message": "line has 124 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_current_geometry_reference.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 17,
+      "message": "line has 306 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_current_geometry_reference.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 18,
+      "message": "line has 147 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_current_geometry_reference.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 19,
+      "message": "line has 408 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_current_geometry_reference.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 20,
+      "message": "line has 177 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_current_geometry_reference.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 22,
+      "message": "line has 1087 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_current_geometry_reference.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 23,
+      "message": "line has 2624 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_current_geometry_reference.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 25,
+      "message": "line has 149 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_current_geometry_reference.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 27,
+      "message": "line has 889 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_current_geometry_reference.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 9,
+      "message": "line has 258 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_delta_component_fixture.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 10,
+      "message": "line has 139 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_delta_component_fixture.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 11,
+      "message": "line has 1331 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_delta_component_fixture.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 12,
+      "message": "line has 843 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_delta_component_fixture.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 13,
+      "message": "line has 1499 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_delta_component_fixture.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 10,
+      "message": "line has 258 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_delta_component_reference.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 11,
+      "message": "line has 139 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_delta_component_reference.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 12,
+      "message": "line has 1853 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_delta_component_reference.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 13,
+      "message": "line has 843 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_delta_component_reference.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 14,
+      "message": "line has 1499 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_delta_component_reference.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 10,
+      "message": "line has 2154 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_geometry_corruption_fixture.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "c-style-cast",
+      "line": 10,
+      "message": "use an explicit C++ cast",
+      "path": "autonomy/motion/ingestion/native_geometry_corruption_fixture.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 6,
+      "message": "line has 1282 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_geometry_metadata_fixture.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 7,
+      "message": "line has 750 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_metric_handoff_fixture.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 8,
+      "message": "line has 1134 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_metric_handoff_fixture.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 9,
+      "message": "line has 467 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_metric_handoff_fixture.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 9,
+      "message": "line has 1830 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_metric_handoff_reference.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 10,
+      "message": "line has 511 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_metric_handoff_reference.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 11,
+      "message": "line has 142 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_source_inventory.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 13,
+      "message": "line has 127 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_source_inventory.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 14,
+      "message": "line has 143 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_source_inventory.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 15,
+      "message": "line has 448 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_source_inventory.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 16,
+      "message": "line has 408 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_source_inventory.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 17,
+      "message": "line has 1381 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_source_inventory.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 18,
+      "message": "line has 326 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_source_inventory.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "c-style-cast",
+      "line": 13,
+      "message": "use an explicit C++ cast",
+      "path": "autonomy/motion/ingestion/native_source_inventory.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 5,
+      "message": "line has 335 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_source_link_fixture.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 6,
+      "message": "line has 241 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_source_link_fixture.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 7,
+      "message": "line has 2416 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_source_link_fixture.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 8,
+      "message": "line has 1692 columns, above 120",
+      "path": "autonomy/motion/ingestion/native_source_link_fixture.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 42,
+      "message": "line has 164 columns, above 120",
+      "path": "autonomy/motion/pooled/motion_metrics_pooled_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 48,
+      "message": "line has 157 columns, above 120",
+      "path": "autonomy/motion/pooled/motion_metrics_pooled_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 49,
+      "message": "line has 212 columns, above 120",
+      "path": "autonomy/motion/pooled/motion_metrics_pooled_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 56,
+      "message": "line has 336 columns, above 120",
+      "path": "autonomy/motion/pooled/motion_metrics_pooled_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 62,
+      "message": "line has 138 columns, above 120",
+      "path": "autonomy/motion/pooled/motion_metrics_pooled_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 64,
+      "message": "line has 166 columns, above 120",
+      "path": "autonomy/motion/pooled/motion_metrics_pooled_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 65,
+      "message": "line has 147 columns, above 120",
+      "path": "autonomy/motion/pooled/motion_metrics_pooled_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 74,
+      "message": "line has 121 columns, above 120",
+      "path": "autonomy/motion/pooled/motion_metrics_pooled_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 75,
+      "message": "line has 133 columns, above 120",
+      "path": "autonomy/motion/pooled/motion_metrics_pooled_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 78,
+      "message": "line has 313 columns, above 120",
+      "path": "autonomy/motion/pooled/motion_metrics_pooled_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    },
+    {
+      "kind": "line-length",
+      "line": 80,
+      "message": "line has 183 columns, above 120",
+      "path": "autonomy/motion/pooled/motion_metrics_pooled_main.cc",
+      "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired"
+    }
+  ],
+  "version": 1
+}

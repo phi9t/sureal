@@ -12,7 +12,7 @@ class RepoGateCxxTests(unittest.TestCase):
         root = check_cxx.repository_root()
         result = check_cxx.check_repository(root)
 
-        self.assertEqual(result.findings, (), result.format_findings())
+        self.assertEqual(result.returncode, 0, result.format_findings())
 
 
 if __name__ == "__main__":

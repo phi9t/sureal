@@ -22,8 +22,8 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from jsonschema import Draft202012Validator, ValidationError
 
-from .tracer_contracts import (FRAME, KEYS, canonical, native_keys, sha256_file,
-                               summarize_array, validate_transform)
+from dataset.tracer_contracts import (FRAME, KEYS, canonical, native_keys, sha256_file,
+                                      summarize_array, validate_transform)
 
 
 def _source_path(root, entry):

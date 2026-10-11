@@ -54,21 +54,13 @@ class ShellStyleFinding:
 @dataclass(frozen=True)
 class ShellStyleTargets:
     tracked_shell_files: tuple[str, ...]
-    receipt_pinned_files: tuple[str, ...]
-    digest_pinned_files: tuple[str, ...]
-    current_candidate_files: tuple[str, ...]
-    frozen_files: tuple[str, ...]
+    archive_files: tuple[str, ...]
+    submodule_files: tuple[str, ...]
     checked_files: tuple[str, ...]
 
     @property
-    def protected_files(self) -> tuple[str, ...]:
-        return tuple(
-            sorted(set(self.receipt_pinned_files) | set(self.digest_pinned_files) | set(self.current_candidate_files))
-        )
-
-    @property
     def excluded_files(self) -> tuple[str, ...]:
-        return tuple(sorted(set(self.protected_files) | set(self.frozen_files)))
+        return tuple(sorted(set(self.archive_files) | set(self.submodule_files)))
 
 
 @dataclass(frozen=True)
@@ -100,10 +92,8 @@ def shell_style_targets(root: Path) -> ShellStyleTargets:
     targets = pinned_sources.source_targets(root, SHELL_STYLE_PATTERNS)
     return ShellStyleTargets(
         tracked_shell_files=targets.tracked_files,
-        receipt_pinned_files=targets.receipt_pinned_files,
-        digest_pinned_files=targets.digest_pinned_files,
-        current_candidate_files=targets.current_candidate_files,
-        frozen_files=targets.frozen_files,
+        archive_files=targets.archive_files,
+        submodule_files=targets.submodule_files,
         checked_files=targets.checked_files,
     )
 
@@ -250,8 +240,8 @@ def check_repository(root: Path, *, baseline_path: Path | None = None) -> ShellS
 def _print_summary(result: ShellStyleResult) -> None:
     targets = result.targets
     print(f"tracked_shell_style={len(targets.tracked_shell_files)}")
-    print(f"protected_shell_style={len(targets.protected_files)}")
-    print(f"frozen_shell_style={len(targets.frozen_files)}")
+    print(f"archive_shell_style={len(targets.archive_files)}")
+    print(f"submodule_shell_style={len(targets.submodule_files)}")
     print(f"shell_style_scope={len(targets.checked_files)}")
     print(f"grandfathered_long_scripts={len(result.baseline.grandfathered_long_scripts)}")
     if targets.excluded_files:
@@ -269,7 +259,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--root", type=Path, default=repository_root())
     parser.add_argument("--baseline", type=Path, default=None)
     parser.add_argument("--list", action="store_true", help="print checked shell files and exit")
-    parser.add_argument("--list-excluded", action="store_true", help="print shell files excluded by source pins")
+    parser.add_argument("--list-excluded", action="store_true", help="print shell files excluded by archive policy")
     parser.add_argument("--summary-json", action="store_true", help="print a machine-readable summary")
     args = parser.parse_args(argv)
 
@@ -285,8 +275,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             json.dumps(
                 {
                     "tracked_shell_style": len(result.targets.tracked_shell_files),
-                    "protected_shell_style": len(result.targets.protected_files),
-                    "frozen_shell_style": len(result.targets.frozen_files),
+                    "archive_shell_style": len(result.targets.archive_files),
+                    "submodule_shell_style": len(result.targets.submodule_files),
                     "shell_style_scope": len(result.targets.checked_files),
                     "grandfathered_long_scripts": len(result.baseline.grandfathered_long_scripts),
                     "finding_counts": dict(sorted(result.finding_counts.items())),

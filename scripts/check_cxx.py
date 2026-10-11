@@ -10,7 +10,7 @@ from dataclasses import dataclass
 import hashlib
 import json
 import os
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 import re
 
 try:
@@ -28,8 +28,10 @@ CXX_PATTERNS = tuple(
     for suffix in (*ALLOWED_SUFFIXES, *FORBIDDEN_SUFFIXES)
     for pattern in (f"{root}/*{suffix}", f"{root}/**/*{suffix}")
 )
+BASELINE_PATH = Path("scripts/cxx_lint_baseline.json")
 OWNERSHIP_WORDS = ("owns", "ownership")
 MAX_COLUMNS = 120
+ProblemKey = tuple[str, int, str]
 
 CV_QUALIFIERS = r"(?:(?:const|volatile)\s+)*"
 SCALAR_TYPES = (
@@ -103,39 +105,35 @@ class CxxFinding:
 @dataclass(frozen=True)
 class CxxTargets:
     tracked_cxx_files: tuple[str, ...]
-    receipt_pinned_files: tuple[str, ...]
-    digest_pinned_files: tuple[str, ...]
-    current_candidate_files: tuple[str, ...]
-    frozen_files: tuple[str, ...]
+    archive_files: tuple[str, ...]
     submodule_files: tuple[str, ...]
     checked_files: tuple[str, ...]
 
     @property
-    def protected_files(self) -> tuple[str, ...]:
-        return tuple(
-            sorted(set(self.receipt_pinned_files) | set(self.digest_pinned_files) | set(self.current_candidate_files))
-        )
-
-    @property
     def excluded_files(self) -> tuple[str, ...]:
-        return tuple(sorted(set(self.protected_files) | set(self.frozen_files) | set(self.submodule_files)))
+        return tuple(sorted(set(self.archive_files) | set(self.submodule_files)))
 
 
 @dataclass(frozen=True)
 class CxxResult:
     targets: CxxTargets
     findings: tuple[CxxFinding, ...]
+    baseline: dict[ProblemKey, str]
+    unexpected: tuple[CxxFinding, ...]
+    stale_baseline: tuple[ProblemKey, ...]
 
     @property
     def returncode(self) -> int:
-        return 1 if self.findings else 0
+        return 1 if self.unexpected or self.stale_baseline else 0
 
     @property
     def finding_counts(self) -> Counter[str]:
         return Counter(finding.code for finding in self.findings)
 
     def format_findings(self) -> str:
-        return "\n".join(finding.format() for finding in self.findings)
+        lines = [finding.format() for finding in self.unexpected]
+        lines.extend(f"stale C++ lint baseline entry: {_format_key(key)}" for key in self.stale_baseline)
+        return "\n".join(lines)
 
 
 def repository_root() -> Path:
@@ -145,23 +143,13 @@ def repository_root() -> Path:
     return Path(__file__).resolve().parents[1]
 
 
-def _is_submodule_path(relative: str) -> bool:
-    return "submodules" in PurePosixPath(relative).parts
-
-
 def cxx_targets(root: Path) -> CxxTargets:
     targets = pinned_sources.source_targets(root, CXX_PATTERNS)
-    submodule_files = tuple(path for path in targets.tracked_files if _is_submodule_path(path))
-    submodule_set = set(submodule_files)
-    checked = tuple(path for path in targets.checked_files if path not in submodule_set)
     return CxxTargets(
         tracked_cxx_files=targets.tracked_files,
-        receipt_pinned_files=targets.receipt_pinned_files,
-        digest_pinned_files=targets.digest_pinned_files,
-        current_candidate_files=targets.current_candidate_files,
-        frozen_files=targets.frozen_files,
-        submodule_files=submodule_files,
-        checked_files=checked,
+        archive_files=targets.archive_files,
+        submodule_files=targets.submodule_files,
+        checked_files=targets.checked_files,
     )
 
 
@@ -382,23 +370,82 @@ def _digest_files(root: Path, paths: Iterable[str]) -> str:
     return digest.hexdigest()
 
 
-def check_repository(root: Path) -> CxxResult:
+def problem_key(finding: CxxFinding) -> ProblemKey:
+    return (finding.path, finding.line, finding.code)
+
+
+def _format_key(key: ProblemKey) -> str:
+    path, line, code = key
+    return f"{path}:{line}: {code}"
+
+
+def read_baseline(path: Path) -> dict[ProblemKey, str]:
+    if not path.is_file():
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict) or data.get("version") != 1:
+        raise ValueError(f"{path}: C++ lint baseline must have version 1")
+    entries = data.get("entries")
+    if not isinstance(entries, list):
+        raise ValueError(f"{path}: C++ lint baseline entries must be a list")
+    baseline: dict[ProblemKey, str] = {}
+    for index, entry in enumerate(entries):
+        if not isinstance(entry, dict):
+            raise ValueError(f"{path}: baseline entry {index} must be an object")
+        relative = entry.get("path")
+        line = entry.get("line")
+        code = entry.get("kind")
+        reason = entry.get("reason")
+        message = entry.get("message")
+        if (
+            not isinstance(relative, str)
+            or not isinstance(line, int)
+            or line < 1
+            or not isinstance(code, str)
+            or not isinstance(reason, str)
+            or not reason.strip()
+            or not isinstance(message, str)
+            or not message.strip()
+        ):
+            raise ValueError(f"{path}: invalid C++ lint baseline entry {index}")
+        key = (relative, line, code)
+        if key in baseline:
+            raise ValueError(f"{path}: duplicate C++ lint baseline entry {_format_key(key)}")
+        baseline[key] = message
+    return baseline
+
+
+def check_repository(root: Path, *, baseline_path: Path | None = None) -> CxxResult:
     root = Path(root).resolve()
     targets = cxx_targets(root)
     findings: list[CxxFinding] = []
     for path in targets.checked_files:
         findings.extend(_check_file(path, root))
-    return CxxResult(targets=targets, findings=tuple(findings))
+    baseline = read_baseline(root / BASELINE_PATH if baseline_path is None else baseline_path)
+    finding_keys = {problem_key(finding) for finding in findings}
+    unexpected = tuple(
+        finding for finding in findings if baseline.get(problem_key(finding)) != finding.message
+    )
+    stale = tuple(sorted(set(baseline) - finding_keys))
+    return CxxResult(
+        targets=targets,
+        findings=tuple(findings),
+        baseline=baseline,
+        unexpected=unexpected,
+        stale_baseline=stale,
+    )
 
 
 def _summary(result: CxxResult, root: Path) -> dict[str, object]:
     return {
         "tracked_cxx": len(result.targets.tracked_cxx_files),
-        "protected_cxx": len(result.targets.protected_files),
-        "frozen_cxx": len(result.targets.frozen_files),
+        "archive_cxx": len(result.targets.archive_files),
         "submodule_cxx": len(result.targets.submodule_files),
         "cxx_lint_scope": len(result.targets.checked_files),
         "finding_count": len(result.findings),
+        "unexpected_count": len(result.unexpected),
+        "baseline_count": len(result.findings) - len(result.unexpected),
+        "stale_baseline_count": len(result.stale_baseline),
         "finding_counts": dict(sorted(result.finding_counts.items())),
         "checked_digest": _digest_files(root, result.targets.checked_files),
         "excluded_digest": _digest_files(root, result.targets.excluded_files),
@@ -409,11 +456,13 @@ def _print_summary(result: CxxResult, root: Path) -> None:
     summary = _summary(result, root)
     for key in (
         "tracked_cxx",
-        "protected_cxx",
-        "frozen_cxx",
+        "archive_cxx",
         "submodule_cxx",
         "cxx_lint_scope",
         "finding_count",
+        "unexpected_count",
+        "baseline_count",
+        "stale_baseline_count",
         "checked_digest",
         "excluded_digest",
     ):
@@ -428,21 +477,43 @@ def _print_summary(result: CxxResult, root: Path) -> None:
             print(f"  {code} {count}")
 
 
+def render_baseline(findings: Sequence[CxxFinding]) -> str:
+    entries = [
+        {
+            "path": finding.path,
+            "line": finding.line,
+            "kind": finding.code,
+            "message": finding.message,
+            "reason": "existing source-frozen C++ issue exposed when lint-side source freeze was retired",
+        }
+        for finding in findings
+    ]
+    return json.dumps({"version": 1, "entries": entries}, indent=2, sort_keys=True) + "\n"
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=repository_root())
+    parser.add_argument("--baseline", type=Path, default=None)
     parser.add_argument("--list", action="store_true", help="print checked C++ files and exit")
     parser.add_argument("--list-excluded", action="store_true", help="print C++ files excluded by policy")
+    parser.add_argument("--print-baseline", action="store_true", help="print a baseline for current findings")
     parser.add_argument("--summary-json", action="store_true", help="print a machine-readable summary")
     args = parser.parse_args(argv)
 
     root = Path(args.root).resolve()
-    result = check_repository(root)
+    baseline_path = args.baseline
+    if args.print_baseline and baseline_path is None:
+        baseline_path = root / "scripts" / ".missing-cxx-lint-baseline.json"
+    result = check_repository(root, baseline_path=baseline_path)
     if args.list:
         print("\n".join(result.targets.checked_files))
         return 0
     if args.list_excluded:
         print("\n".join(result.targets.excluded_files))
+        return 0
+    if args.print_baseline:
+        print(render_baseline(result.findings), end="")
         return 0
     if args.summary_json:
         print(json.dumps(_summary(result, root), indent=2, sort_keys=True))
