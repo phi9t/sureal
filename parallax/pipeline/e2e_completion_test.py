@@ -282,11 +282,14 @@ class EndToEndCompletionContractTest(unittest.TestCase):
             })
             self.assertEqual(
                 manifest["module_implementations"],
-                {f"{index:02d}": "synthetic" for index in range(1, 16)},
+                {
+                    **{f"{index:02d}": "synthetic" for index in range(1, 16)},
+                    "06": "real",
+                },
             )
             self.assertEqual(
-                manifest["metric_provenance"]["06"]["geometry"]["accuracy_mm"],
-                "illustrative",
+                manifest["metric_provenance"]["06"]["geometry"]["depth_absrel"],
+                "computed_real",
             )
             self.assertEqual(
                 manifest["metric_provenance"]["07"]["geometry"]["map_f_score"],

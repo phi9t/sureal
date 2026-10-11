@@ -49,6 +49,11 @@ IMPLEMENTATION_FILES = (
     "pipeline/two_view_orbit.py",
     "pipeline/validator.py",
     "scene/controlled_suite.py",
+    "scene/ground_truth.py",
+    "scene/orbit.py",
+    "stereo/cost.py",
+    "stereo/depth_filter.py",
+    "stereo/plane_sweep.py",
 )
 
 

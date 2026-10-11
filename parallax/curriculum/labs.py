@@ -39,6 +39,7 @@ from curriculum.surflo_endpoint import build_surflo_endpoint
 from fusion.tsdf import fuse_tsdf
 from geometry.align import apply_transform, icp
 from geometry.triangulate import refine_point_gauss_newton, reprojection_rmse, triangulate_point
+from stereo.plane_sweep import run_orbit_mvs_profile
 
 
 def _write_sweep(path: Path, rows: list[dict[str, Any]]) -> None:
@@ -215,18 +216,61 @@ def _sfm_lab(artifacts: Path, profile: str, scene: dict[str, Any], profile_confi
 
 
 def _mvs_lab(artifacts: Path, profile: str, scene: dict[str, Any], profile_config: dict[str, Any]) -> dict[str, Any]:
-    maximum = len(scene["splits"]["context"]) + len(scene["splits"]["target"])
-    view_counts = np.unique(np.linspace(2, maximum, _steps(profile_config)).astype(int))
-    completeness = 1.0 - np.exp(-0.24 * (view_counts - 1))
-    view_rows = [{"parameter": "view_count", "value": int(count), "metric": "surface_completeness", "measurement": float(value)} for count, value in zip(view_counts, completeness)]
-    light_rows = [{"parameter": "exposure_shift_ev", "value": value, "metric": "surface_accuracy", "measurement": max(0.0, 0.96 - 0.16 * abs(value))} for value in (-2.0, -1.0, 0.0, 1.0, 2.0)]
-    sweep = view_rows + light_rows
+    del scene, profile_config
+    summary = run_orbit_mvs_profile(artifacts / "plane-sweep-mvs", profile)
+    depth_metrics = summary["metrics"]
+    sweep = []
+    for index, row in enumerate(depth_metrics["per_view"]):
+        sweep.extend(
+            [
+                {
+                    "parameter": "view_index",
+                    "value": index,
+                    "metric": "absrel",
+                    "measurement": float(row["absrel"]),
+                },
+                {
+                    "parameter": "view_index",
+                    "value": index,
+                    "metric": "delta_lt_1_25",
+                    "measurement": float(row["delta_lt_1_25"]),
+                },
+                {
+                    "parameter": "view_index",
+                    "value": index,
+                    "metric": "valid_pixel_fraction",
+                    "measurement": float(row["valid_pixel_fraction"]),
+                },
+            ]
+        )
     _write_sweep(artifacts / "failure_sweep.csv", sweep)
-    _write_chart(artifacts / "mvs_views.svg", "Visible-surface completeness versus view count", completeness.tolist(), "#4c7b37")
+    _write_chart(
+        artifacts / "mvs_depth_quality.svg",
+        "Plane-sweep depth quality by view",
+        [float(row["absrel"]) for row in depth_metrics["per_view"]],
+        "#4c7b37",
+    )
     return {
-        "metrics": {"geometry": {"accuracy_mm": 1.8, "completeness": float(completeness[-1]), "f_score_2mm": 0.86, "hidden_surface_recall": 0.0}, "rendering": {}, "generative": {}},
+        "metrics": {
+            "geometry": {
+                "depth_absrel": float(depth_metrics["mean_absrel"]),
+                "depth_delta_lt_1_25": float(depth_metrics["mean_delta_lt_1_25"]),
+                "valid_pixel_fraction": float(depth_metrics["mean_valid_pixel_fraction"]),
+                "evaluated_view_count": int(depth_metrics["evaluated_view_count"]),
+                "evaluated_pixel_count": int(depth_metrics["evaluated_pixel_count"]),
+                "valid_pixel_count": int(depth_metrics["valid_pixel_count"]),
+                "plane_sweep_runtime_seconds": float(summary["runtime_seconds"]),
+                "depth_hypothesis_count": int(summary["depth_hypothesis_count"]),
+            },
+            "rendering": {},
+            "generative": {},
+        },
         "failure_sweep": sweep,
-        "observations": ["More views improve coverage only where a surface becomes visible and matchable.", "Photometric consistency degrades under exposure change, specularity, and occlusion errors."],
+        "observations": [
+            "Plane-sweep MVS estimates per-view camera-axis depths from calibrated orbit images.",
+            "Depth metrics are computed on textured pixels against exact generated depth maps.",
+            "Cross-view geometric consistency filters photometric matches that do not reproject to matching depth.",
+        ],
     }
 
 

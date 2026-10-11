@@ -228,18 +228,19 @@ class RegistryContractTest(unittest.TestCase):
                 self.assertTrue(module["failure_sweep"])
                 self.assertTrue(module["sources"])
                 self.assertIn(module["insula"], curriculum["insulas"])
-                self.assertEqual(module["implementation"], "synthetic")
+                expected_implementation = "real" if module["id"] == "06" else "synthetic"
+                self.assertEqual(module["implementation"], expected_implementation)
 
-    def test_metric_provenance_distinguishes_illustrative_and_synthetic_computed_metrics(self) -> None:
+    def test_metric_provenance_distinguishes_real_illustrative_and_synthetic_metrics(self) -> None:
         from pipeline.validator import validate_result
 
         with tempfile.TemporaryDirectory() as temporary:
             cache = Path(temporary)
             for module_id, expected in {
                 "06": {
-                    ("geometry", "accuracy_mm"): "illustrative",
-                    ("geometry", "completeness"): "computed_synthetic",
-                    ("geometry", "f_score_2mm"): "illustrative",
+                    ("geometry", "depth_absrel"): "computed_real",
+                    ("geometry", "depth_delta_lt_1_25"): "computed_real",
+                    ("geometry", "valid_pixel_fraction"): "computed_real",
                 },
                 "07": {
                     ("geometry", "ate_before_loop_m"): "computed_synthetic",
@@ -263,7 +264,8 @@ class RegistryContractTest(unittest.TestCase):
                         cache / "runs" / f"metric-labels-{module_id}" / module_id,
                         module_id,
                     )
-                    self.assertEqual(result["module_implementation"], "synthetic")
+                    expected_implementation = "real" if module_id == "06" else "synthetic"
+                    self.assertEqual(result["module_implementation"], expected_implementation)
                     for (family, metric), label in expected.items():
                         self.assertEqual(
                             result["metric_provenance"][family][metric],
@@ -289,8 +291,7 @@ class RegistryContractTest(unittest.TestCase):
             run_dir = cache / "runs" / "real-provenance-check" / "06"
             result_path = run_dir / "result.json"
             result = json.loads(result_path.read_text())
-            result["module_implementation"] = "real"
-            result["metric_provenance"]["geometry"]["accuracy_mm"] = "illustrative"
+            result["metric_provenance"]["geometry"]["depth_absrel"] = "illustrative"
             result_path.write_text(json.dumps(result, sort_keys=True) + "\n")
 
             with self.assertRaisesRegex(

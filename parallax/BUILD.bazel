@@ -42,6 +42,18 @@ py_library(
 )
 
 py_library(
+    name = "stereo_lib",
+    srcs = glob(["stereo/*.py"], exclude = ["stereo/*_test.py"]),
+    imports = ["."],
+    deps = [
+        ":camera_lib",
+        ":evaluation_lib",
+        ":pipeline_lib",
+        ":scene_lib",
+    ],
+)
+
+py_library(
     name = "baselines_lib",
     srcs = glob(["baselines/*.py"], exclude = ["baselines/*_test.py"]),
     imports = ["."],
@@ -72,6 +84,7 @@ py_library(
             "geometry/*.py",
             "pipeline/*.py",
             "scene/*.py",
+            "stereo/*.py",
         ],
         exclude = ["**/*_test.py"],
     ),
@@ -94,11 +107,36 @@ filegroup(
         "pipeline/*.py",
         "scene/*.json",
         "scene/*.py",
+        "stereo/*.py",
         "schemas/*.json",
     ]) + [
         "README.md",
         "run.sh",
     ],
+)
+
+py_binary(
+    name = "parallax_cli",
+    srcs = ["pipeline/cli.py"],
+    imports = ["."],
+    legacy_create_init = 0,
+    main = "pipeline/cli.py",
+    deps = [
+        ":parallax_lib",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "mvs_live_check",
+    srcs = ["stereo/live_check.py"],
+    imports = ["."],
+    legacy_create_init = 0,
+    main = "stereo/live_check.py",
+    deps = [
+        ":parallax_lib",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 py_binary(
@@ -151,6 +189,9 @@ _PARALLAX_TESTS = {
     "test_documentation": "curriculum/documentation_test.py",
     "test_e2e_completion": "pipeline/e2e_completion_test.py",
     "test_orbit_scene": "scene/orbit_test.py",
+    "test_plane_sweep": "stereo/plane_sweep_test.py",
+    "test_depth_filter": "stereo/depth_filter_test.py",
+    "test_stereo_cost": "stereo/cost_test.py",
     "test_pose_metrics": "evaluation/pose_metrics_test.py",
     "test_surface_metrics": "evaluation/surface_metrics_test.py",
     "test_fetch": "pipeline/fetch_test.py",

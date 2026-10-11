@@ -447,9 +447,12 @@ parallax/run.sh run --module 06 --profile smoke --run-id pathway-06
 parallax/run.sh reference --adapter colmap-mvs --profile smoke --run-id colmap-mvs-06
 ```
 
-Inspect `result.json`, `report.md`, `artifacts/mvs_views.svg`, and
-`artifacts/failure_sweep.csv`. View count and exposure shift are separate
-sweeps; accuracy, completeness, and hidden-surface recall remain distinct.
+Inspect `result.json`, `report.md`, `artifacts/mvs_depth_quality.svg`,
+`artifacts/plane-sweep-mvs/depth-maps.npz`, and
+`artifacts/failure_sweep.csv`. The lab computes per-view camera-axis depth maps
+with the repository's plane-sweep implementation and reports AbsRel,
+\(\delta<1.25\), valid-pixel fraction, and runtime against exact orbit-scene
+depth on textured pixels.
 
 The maintained reference is a separate, offline COLMAP 4.2.0 execution pinned
 to source commit `be5e29168d4aff238409d60424812df66aac919f`. Its CUDA 12.9.1

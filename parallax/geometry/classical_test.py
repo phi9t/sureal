@@ -133,9 +133,19 @@ class ClassicalLabContractTest(unittest.TestCase):
             self.assertGreater(results["03"]["metrics"]["geometry"]["far_depth_std_m"], results["03"]["metrics"]["geometry"]["near_depth_std_m"])
             self.assertLess(results["04"]["metrics"]["geometry"]["icp_final_rmse_m"], results["04"]["metrics"]["geometry"]["icp_initial_rmse_m"])
             self.assertLess(results["05"]["metrics"]["geometry"]["ba_final_reprojection_rmse_px"], results["05"]["metrics"]["geometry"]["ba_initial_reprojection_rmse_px"])
+            mvs_geometry = results["06"]["metrics"]["geometry"]
+            self.assertLess(mvs_geometry["depth_absrel"], 0.08)
+            self.assertGreater(mvs_geometry["depth_delta_lt_1_25"], 0.94)
+            self.assertGreater(mvs_geometry["valid_pixel_fraction"], 0.65)
+            self.assertEqual(results["06"]["module_implementation"], "real")
             sweep_06 = results["06"]["failure_sweep"]
-            view_rows = [row for row in sweep_06 if row["parameter"] == "view_count"]
-            self.assertGreater(view_rows[-1]["measurement"], view_rows[0]["measurement"])
+            self.assertEqual(
+                {row["metric"] for row in sweep_06},
+                {"absrel", "delta_lt_1_25", "valid_pixel_fraction"},
+            )
+            self.assertTrue(
+                (cache / "runs" / "classical" / "06" / "artifacts" / "plane-sweep-mvs" / "depth-maps.npz").is_file()
+            )
             self.assertLess(results["07"]["metrics"]["geometry"]["ate_after_loop_m"], results["07"]["metrics"]["geometry"]["ate_before_loop_m"])
 
 

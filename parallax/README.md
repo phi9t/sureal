@@ -26,13 +26,15 @@ systems also remain individually executable through explicit reference adapters.
 Controlled fixtures are teaching experiments, not reproduced third-party
 leaderboard values.
 
-Current module implementation status is intentionally conservative: all fifteen
-curriculum modules are marked `synthetic` in `curriculum/curriculum.json`.
-Metrics computed by the deterministic labs are labeled `computed_synthetic`.
-Fixed teaching numbers that are not recomputed from lab data are labeled
-`illustrative`, including the current dense-MVS accuracy/F-score examples and
-the SLAM map F-score. A module may not be marked `real` unless every metric in
-its result is labeled as computed from real execution.
+Current module implementation status is intentionally conservative: module 06
+is marked `real` because its plane-sweep MVS depths are computed from calibrated
+orbit images and scored against exact generated depth; the remaining curriculum
+modules are marked `synthetic` in `curriculum/curriculum.json`. Metrics computed
+by deterministic synthetic labs are labeled `computed_synthetic`; module 06
+uses `computed_real`. Fixed teaching numbers that are not recomputed from lab
+data remain labeled `illustrative`, including the SLAM map F-score. A module
+may not be marked `real` unless every metric in its result is labeled as
+computed from real execution.
 
 ```bash
 # No network:
@@ -265,10 +267,11 @@ fixture memory values as directly comparable per-module measurements.
 
 Every metric is labeled separately from the coarse run measurement kind.
 Synthetic modules use `computed_synthetic` for values derived from fixture data
-and `illustrative` for fixed teaching values. Artifact provenance still records
-whether a run is a controlled fixture or a reused measured result; module 15's
-current source evidence remains `reused_measured_result` and checked against its
-asset lock.
+and `illustrative` for fixed teaching values. Real modules use `computed_real`
+for values derived from their live algorithm execution. Artifact provenance
+still records whether a run is a controlled fixture or a reused measured result;
+module 15's current source evidence remains `reused_measured_result` and checked
+against its asset lock.
 Module 13's controlled fixture persists two mutually exclusive hidden-scene
 hypotheses, all independent-point and shared-latent draws, repeat queries, and
 visible evidence in `ambiguity_samples.npz`. Validation recomputes its

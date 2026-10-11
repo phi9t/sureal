@@ -26,7 +26,6 @@ SYNTHETIC_ILLUSTRATIVE_METRICS = {
     "03": {"geometry": {"multipath_bias_m"}},
     "04": {"geometry": {"mesh_completeness"}},
     "05": {"geometry": {"inlier_fraction", "similarity_gauge_dof"}},
-    "06": {"geometry": {"accuracy_mm", "f_score_2mm", "hidden_surface_recall"}},
     "07": {"geometry": {"map_f_score"}},
     "08": {"geometry": {"unsupported_completion_fraction", "geometric_weak_match_rmse_m"}},
     "11": {"geometry": {"mesh_extraction_supported"}},
