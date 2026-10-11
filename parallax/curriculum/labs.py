@@ -38,7 +38,8 @@ from camera.pose import fundamental_from_poses, symmetric_epipolar_distance
 from curriculum.surflo_endpoint import build_surflo_endpoint
 from fusion.tsdf import fuse_tsdf
 from geometry.align import apply_transform, icp
-from geometry.triangulate import refine_point_gauss_newton, reprojection_rmse, triangulate_point
+from geometry.triangulate import triangulate_point
+from sfm.incremental import run_orbit_sfm_profile
 from stereo.plane_sweep import run_orbit_mvs_profile
 
 
@@ -194,24 +195,36 @@ def _registration_lab(artifacts: Path, profile: str, scene: dict[str, Any], prof
 
 
 def _sfm_lab(artifacts: Path, profile: str, scene: dict[str, Any], profile_config: dict[str, Any]) -> dict[str, Any]:
-    intrinsics = scene["cameras"]["intrinsics"]
-    K = np.array([[intrinsics["fx"], 0.0, intrinsics["cx"]], [0.0, intrinsics["fy"], intrinsics["cy"]], [0.0, 0.0, 1.0]])
-    baseline = float(scene["cameras"]["orbit_radius"]) / 14.0
-    cameras = [(K, np.eye(3), np.array([0.0, 0.0, 0.0])), (K, np.eye(3), np.array([-baseline, 0.0, 0.0])), (K, np.eye(3), np.array([0.0, -0.8 * baseline, 0.0]))]
-    truth = np.array([[0.1, -0.15, 2.8]])
-    observations = np.array([project(truth, *camera)[0][0] for camera in cameras])
-    initial = np.array([0.35, 0.15, 2.1])
-    before = reprojection_rmse(initial, observations, cameras)
-    _, history = refine_point_gauss_newton(initial, observations, cameras, iterations=12)
-    overlaps = np.linspace(0.15, 0.85, _steps(profile_config))
-    registered = 1.0 / (1.0 + np.exp(-12.0 * (overlaps - 0.42)))
-    sweep = [{"parameter": "image_overlap", "value": float(value), "metric": "registered_fraction", "measurement": float(fraction)} for value, fraction in zip(overlaps, registered)]
-    _write_sweep(artifacts / "failure_sweep.csv", sweep)
-    _write_chart(artifacts / "bundle_adjustment.svg", "Point bundle adjustment reduces reprojection error", history)
+    del scene, profile_config
+    summary = run_orbit_sfm_profile(artifacts / "incremental-sfm", profile)
+    sfm_metrics = summary["metrics"]
+    _write_sweep(artifacts / "failure_sweep.csv", summary["failure_sweep"])
+    _write_chart(
+        artifacts / "bundle_adjustment.svg",
+        "Bundle adjustment reduces reprojection error",
+        [
+            float(sfm_metrics["initial_reprojection_rmse_px"]),
+            float(sfm_metrics["final_reprojection_rmse_px"]),
+        ],
+    )
     return {
-        "metrics": {"geometry": {"ba_initial_reprojection_rmse_px": before, "ba_final_reprojection_rmse_px": history[-1], "inlier_fraction": 0.88, "similarity_gauge_dof": 7}, "rendering": {}, "generative": {}},
-        "failure_sweep": sweep,
-        "observations": ["Bundle adjustment refines an initialized solution; it does not solve repeated-texture correspondence on its own.", "Monocular SfM retains a global similarity gauge."],
+        "metrics": {
+            "geometry": {
+                "ate_m": float(sfm_metrics["ate_m"]),
+                "mean_rotation_error_deg": float(sfm_metrics["mean_rotation_error_deg"]),
+                "max_rotation_error_deg": float(sfm_metrics["max_rotation_error_deg"]),
+                "ba_initial_reprojection_rmse_px": float(sfm_metrics["initial_reprojection_rmse_px"]),
+                "ba_final_reprojection_rmse_px": float(sfm_metrics["final_reprojection_rmse_px"]),
+                "registered_view_count": int(sfm_metrics["registered_view_count"]),
+                "sparse_point_count": int(sfm_metrics["sparse_point_count"]),
+                "track_observation_count": int(sfm_metrics["track_observation_count"]),
+            },
+            "rendering": {},
+            "generative": {},
+        },
+        "failure_sweep": summary["failure_sweep"],
+        "observations": summary["observations"],
+        "extra_result": summary["extra_result"],
     }
 
 

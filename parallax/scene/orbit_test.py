@@ -82,6 +82,18 @@ class OrbitSceneTest(unittest.TestCase):
                 sha256_file(Path(temporary) / manifest["surface_truth"]["points_path"]),
             )
 
+    def test_orbit_cameras_include_elevation_variation(self) -> None:
+        """Catches scenes that test SfM with single-axis yaw motion only."""
+        with tempfile.TemporaryDirectory() as temporary:
+            manifest = generate_orbit_scene(Path(temporary), "full")
+
+        centers = np.array(
+            [frame["camera_center_world_m"] for frame in manifest["frames"]],
+            dtype=np.float64,
+        )
+        self.assertGreater(float(np.ptp(centers[:, 1])), 0.08)
+        self.assertIn("elevation", manifest["scene"]["camera_motion"])
+
 
 if __name__ == "__main__":
     unittest.main()

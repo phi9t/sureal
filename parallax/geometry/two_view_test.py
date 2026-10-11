@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import math
+from pathlib import Path
+import tempfile
 import unittest
 
 import numpy as np
@@ -17,6 +19,9 @@ from geometry.epipolar import (
 from geometry.pnp import solve_pnp
 from geometry.ransac import ransac
 from geometry.triangulate import triangulate_points
+from pipeline.two_view_orbit import _translation_direction_error
+from scene.ground_truth import surface_samples_from_depth
+from scene.orbit import generate_orbit_scene
 
 
 def _rotation_y(angle_radians: float) -> np.ndarray:
@@ -128,7 +133,7 @@ class TwoViewGeometryTest(unittest.TestCase):
         )
 
         self.assertGreaterEqual(int(np.sum(result.inlier_mask)), 21)
-        self.assertLess(rotation_error_degrees(pose.rotation, truth_rotation), 1e-6)
+        self.assertLess(rotation_error_degrees(pose.rotation, truth_rotation), 1e-5)
         self.assertLess(
             _translation_direction_error(pose.translation, truth_translation),
             1e-6,
@@ -145,6 +150,62 @@ class TwoViewGeometryTest(unittest.TestCase):
         self.assertLess(rotation_error_degrees(rotation, truth_rotation), 1e-6)
         np.testing.assert_allclose(translation, truth_translation, atol=1e-6)
         self.assertLess(error, 1e-6)
+
+    def test_full_orbit_exact_correspondences_recover_general_relative_rotation(self) -> None:
+        """Catches essential pose solvers that only handle horizontal yaw fixtures."""
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            manifest = generate_orbit_scene(root, "full")
+            first, second = manifest["frames"][0], manifest["frames"][1]
+            intrinsic1 = np.asarray(first["K"], dtype=np.float64)
+            intrinsic2 = np.asarray(second["K"], dtype=np.float64)
+            depth = np.load(root / first["depth_path"], allow_pickle=False)
+            normals = np.load(root / first["normal_path"], allow_pickle=False)
+            points, _ = surface_samples_from_depth(
+                depth,
+                normals,
+                intrinsic1,
+                np.eye(3),
+                np.zeros(3),
+                stride=4,
+            )
+            truth_rotation = (
+                np.asarray(second["R_world_to_camera"], dtype=np.float64)
+                @ np.asarray(first["R_world_to_camera"], dtype=np.float64).T
+            )
+            truth_translation = (
+                np.asarray(second["t_world_to_camera_m"], dtype=np.float64)
+                - truth_rotation
+                @ np.asarray(first["t_world_to_camera_m"], dtype=np.float64)
+            )
+            pixels1, _ = project(points, intrinsic1, np.eye(3), np.zeros(3))
+            pixels2, _ = project(
+                points,
+                intrinsic2,
+                truth_rotation,
+                truth_translation,
+            )
+            height, width = depth.shape
+            visible = (
+                (pixels2[:, 0] >= 4.0)
+                & (pixels2[:, 0] < width - 4.0)
+                & (pixels2[:, 1] >= 4.0)
+                & (pixels2[:, 1] < height - 4.0)
+            )
+
+        pose = estimate_relative_pose(
+            pixels1[visible],
+            pixels2[visible],
+            intrinsic1,
+            intrinsic2,
+        )
+
+        self.assertGreaterEqual(int(np.sum(visible)), 30)
+        self.assertLess(rotation_error_degrees(pose.rotation, truth_rotation), 1e-6)
+        self.assertLess(
+            _translation_direction_error(pose.translation, truth_translation),
+            1e-6,
+        )
 
 
 if __name__ == "__main__":

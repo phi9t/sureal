@@ -54,6 +54,19 @@ py_library(
 )
 
 py_library(
+    name = "sfm_lib",
+    srcs = glob(["sfm/*.py"], exclude = ["sfm/*_test.py"]),
+    imports = ["."],
+    deps = [
+        ":camera_lib",
+        ":evaluation_lib",
+        ":features_lib",
+        ":geometry_lib",
+        ":scene_lib",
+    ],
+)
+
+py_library(
     name = "baselines_lib",
     srcs = glob(["baselines/*.py"], exclude = ["baselines/*_test.py"]),
     imports = ["."],
@@ -84,6 +97,7 @@ py_library(
             "geometry/*.py",
             "pipeline/*.py",
             "scene/*.py",
+            "sfm/*.py",
             "stereo/*.py",
         ],
         exclude = ["**/*_test.py"],
@@ -107,6 +121,7 @@ filegroup(
         "pipeline/*.py",
         "scene/*.json",
         "scene/*.py",
+        "sfm/*.py",
         "stereo/*.py",
         "schemas/*.json",
     ]) + [
@@ -207,6 +222,9 @@ _PARALLAX_TESTS = {
     "test_depth_filter": "stereo/depth_filter_test.py",
     "test_stereo_cost": "stereo/cost_test.py",
     "test_pose_metrics": "evaluation/pose_metrics_test.py",
+    "test_sfm_bundle_adjust": "sfm/bundle_adjust_test.py",
+    "test_incremental_sfm": "sfm/incremental_test.py",
+    "test_sfm_tracks": "sfm/tracks_test.py",
     "test_surface_metrics": "evaluation/surface_metrics_test.py",
     "test_fetch": "pipeline/fetch_test.py",
     "test_foundation": "pipeline/foundation_test.py",
@@ -231,7 +249,7 @@ _PARALLAX_TESTS = {
         imports = ["."],
         legacy_create_init = 0,
         main = source,
-        size = "medium",
+        size = "large" if name == "test_incremental_sfm" else "medium",
         deps = [":parallax_lib"],
     )
     for name, source in _PARALLAX_TESTS.items()

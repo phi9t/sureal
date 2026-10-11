@@ -228,7 +228,10 @@ class RegistryContractTest(unittest.TestCase):
                 self.assertTrue(module["failure_sweep"])
                 self.assertTrue(module["sources"])
                 self.assertIn(module["insula"], curriculum["insulas"])
-                expected_implementation = "real" if module["id"] == "06" else "synthetic"
+                expected_implementation = {
+                    "05": "real+baseline",
+                    "06": "real",
+                }.get(module["id"], "synthetic")
                 self.assertEqual(module["implementation"], expected_implementation)
 
     def test_metric_provenance_distinguishes_real_illustrative_and_synthetic_metrics(self) -> None:
@@ -237,6 +240,12 @@ class RegistryContractTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             cache = Path(temporary)
             for module_id, expected in {
+                "05": {
+                    ("geometry", "ate_m"): "computed_real",
+                    ("geometry", "mean_rotation_error_deg"): "computed_real",
+                    ("geometry", "ba_final_reprojection_rmse_px"): "computed_real",
+                    ("geometry", "registered_view_count"): "computed_real",
+                },
                 "06": {
                     ("geometry", "depth_absrel"): "computed_real",
                     ("geometry", "depth_delta_lt_1_25"): "computed_real",
@@ -264,7 +273,10 @@ class RegistryContractTest(unittest.TestCase):
                         cache / "runs" / f"metric-labels-{module_id}" / module_id,
                         module_id,
                     )
-                    expected_implementation = "real" if module_id == "06" else "synthetic"
+                    expected_implementation = {
+                        "05": "real+baseline",
+                        "06": "real",
+                    }.get(module_id, "synthetic")
                     self.assertEqual(result["module_implementation"], expected_implementation)
                     for (family, metric), label in expected.items():
                         self.assertEqual(

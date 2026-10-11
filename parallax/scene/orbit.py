@@ -24,6 +24,7 @@ class OrbitProfile:
     height: int
     focal_px: float
     azimuth_degrees: tuple[float, ...]
+    elevation_degrees: tuple[float, ...]
     orbit_radius_m: float
     sample_stride_pixels: int
 
@@ -47,6 +48,7 @@ ORBIT_PROFILES = {
         height=48,
         focal_px=70.0,
         azimuth_degrees=(-15.0, 0.0, 15.0),
+        elevation_degrees=(-3.0, 0.0, 3.0),
         orbit_radius_m=4.8,
         sample_stride_pixels=1,
     ),
@@ -55,6 +57,7 @@ ORBIT_PROFILES = {
         height=96,
         focal_px=130.0,
         azimuth_degrees=(-24.0, -16.0, -8.0, 0.0, 8.0, 16.0, 24.0),
+        elevation_degrees=(-6.0, -4.0, -2.0, 0.0, 2.0, 4.0, 6.0),
         orbit_radius_m=4.8,
         sample_stride_pixels=2,
     ),
@@ -132,11 +135,20 @@ def _intrinsic_matrix(profile: OrbitProfile) -> FloatArray:
     )
 
 
-def _camera_to_world(azimuth_degrees: float, radius: float) -> FloatArray:
+def _camera_to_world(
+    azimuth_degrees: float,
+    elevation_degrees: float,
+    radius: float,
+) -> FloatArray:
     angle = np.deg2rad(float(azimuth_degrees))
+    elevation = np.deg2rad(float(elevation_degrees))
     effective_radius = radius + 0.35 * np.sin(angle + 0.4)
     center = np.array(
-        [effective_radius * np.sin(angle), 0.18, effective_radius * np.cos(angle)],
+        [
+            effective_radius * np.cos(elevation) * np.sin(angle),
+            0.18 + effective_radius * np.sin(elevation),
+            effective_radius * np.cos(elevation) * np.cos(angle),
+        ],
         dtype=np.float64,
     )
     target = np.array([0.0, 0.0, 0.12], dtype=np.float64)
@@ -233,8 +245,12 @@ def generate_orbit_scene(destination: Path, profile: str) -> dict[str, Any]:
     config = ORBIT_PROFILES[profile]
     K = _intrinsic_matrix(config)
     frames: list[dict[str, Any]] = []
-    for azimuth in config.azimuth_degrees:
-        camera_to_world = _camera_to_world(azimuth, config.orbit_radius_m)
+    for azimuth, elevation in zip(config.azimuth_degrees, config.elevation_degrees):
+        camera_to_world = _camera_to_world(
+            azimuth,
+            elevation,
+            config.orbit_radius_m,
+        )
         rotation = camera_to_world[:3, :3].T
         center = camera_to_world[:3, 3]
         translation = -rotation @ center
@@ -242,6 +258,7 @@ def generate_orbit_scene(destination: Path, profile: str) -> dict[str, Any]:
         frames.append(
             {
                 "azimuth_degrees": azimuth,
+                "elevation_degrees": elevation,
                 "R_world_to_camera": rotation,
                 "t_world_to_camera_m": translation,
                 "camera_center_world_m": center,
@@ -254,7 +271,7 @@ def generate_orbit_scene(destination: Path, profile: str) -> dict[str, Any]:
         "name": "orbit-textured-planes",
         "plane_count": len(_planes()),
         "planes": [plane.__dict__ for plane in _planes()],
-        "camera_motion": "azimuth orbit with changing rotation and translation",
+        "camera_motion": "azimuth orbit with elevation variation, changing rotation and translation",
     }
     return export_ground_truth(
         Path(destination),

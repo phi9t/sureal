@@ -51,7 +51,7 @@
     },
     {
       "id": "05", "slug": "structure-from-motion", "title": "Structure from motion and bundle adjustment",
-      "implementation": "synthetic",
+      "implementation": "real+baseline",
       "evidence": ["unordered overlapping RGB images"], "observable": "cameras and sparse structure up to gauge", "representation": "camera graph and sparse points",
       "inference": "hybrid", "objectives": ["robust reprojection error"], "metrics": ["rotation error", "translation-direction error", "reprojection RMSE"],
       "failure_sweep": ["repetition", "texture", "overlap", "outliers"], "insula": "classical",

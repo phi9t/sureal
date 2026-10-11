@@ -8,6 +8,7 @@ import unittest
 
 import numpy as np
 
+from evaluation.pose_metrics import rotation_error_degrees
 from pipeline.two_view_orbit import estimate_two_view_orbit_pair, run_two_view_orbit
 from scene.orbit import generate_orbit_scene
 
@@ -16,6 +17,7 @@ def _without_score_only_fields(frame: dict) -> dict:
     stripped = dict(frame)
     for key in (
         "azimuth_degrees",
+        "elevation_degrees",
         "R_world_to_camera",
         "t_world_to_camera_m",
         "camera_center_world_m",
@@ -24,7 +26,7 @@ def _without_score_only_fields(frame: dict) -> dict:
         "surface_points_path",
         "surface_normals_path",
     ):
-        stripped.pop(key)
+        stripped.pop(key, None)
     return stripped
 
 
@@ -78,6 +80,30 @@ class TwoViewOrbitTest(unittest.TestCase):
         np.testing.assert_allclose(clean.points2, poisoned.points2)
         np.testing.assert_allclose(clean.pose.rotation, poisoned.pose.rotation)
         np.testing.assert_allclose(clean.pose.translation, poisoned.pose.translation)
+
+    def test_full_profile_endpoint_pair_documents_fixed_window_alias(self) -> None:
+        """Documents the fixed-window endpoint alias that ticket 06 works around."""
+        with tempfile.TemporaryDirectory() as temporary:
+            scene_root = Path(temporary) / "scene"
+            manifest = generate_orbit_scene(scene_root, "full")
+            first = manifest["frames"][5]
+            second = manifest["frames"][6]
+
+            estimate = estimate_two_view_orbit_pair(
+                scene_root,
+                first,
+                second,
+                "full",
+            )
+
+        truth_rotation = (
+            np.asarray(second["R_world_to_camera"], dtype=np.float64)
+            @ np.asarray(first["R_world_to_camera"], dtype=np.float64).T
+        )
+        rotation_error = rotation_error_degrees(estimate.pose.rotation, truth_rotation)
+        print(f"full_endpoint_5_6_rotation_error_deg={rotation_error}")
+        self.assertTrue(np.isfinite(rotation_error))
+        self.assertGreater(rotation_error, 2.0)
 
 
 if __name__ == "__main__":

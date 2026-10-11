@@ -179,10 +179,10 @@ class EndToEndCompletionContractTest(unittest.TestCase):
         module = {
             "id": "05",
             "title": "Structure from motion and bundle adjustment",
-            "implementation": "synthetic",
+            "implementation": "real+baseline",
         }
         module_result = {
-            "module_implementation": "synthetic",
+            "module_implementation": "real+baseline",
             "measurement_kind": "controlled_fixture",
             "metrics": {
                 "geometry": {"ba_final_reprojection_rmse_px": 0.125},
@@ -191,7 +191,7 @@ class EndToEndCompletionContractTest(unittest.TestCase):
             },
             "metric_provenance": {
                 "geometry": {
-                    "ba_final_reprojection_rmse_px": "computed_synthetic",
+                    "ba_final_reprojection_rmse_px": "computed_real",
                 },
                 "rendering": {},
                 "generative": {},
@@ -238,9 +238,9 @@ class EndToEndCompletionContractTest(unittest.TestCase):
 
         self.assertIn("Maintained reference measurements", report)
         self.assertIn("colmap-sfm", report)
-        self.assertIn("implementation=synthetic", report)
+        self.assertIn("implementation=real+baseline", report)
         self.assertIn(
-            "ba_final_reprojection_rmse_px=0.125 [computed_synthetic]",
+            "ba_final_reprojection_rmse_px=0.125 [computed_real]",
             report,
         )
         self.assertIn("runtime_seconds=12.5", report)
@@ -284,8 +284,13 @@ class EndToEndCompletionContractTest(unittest.TestCase):
                 manifest["module_implementations"],
                 {
                     **{f"{index:02d}": "synthetic" for index in range(1, 16)},
+                    "05": "real+baseline",
                     "06": "real",
                 },
+            )
+            self.assertEqual(
+                manifest["metric_provenance"]["05"]["geometry"]["registered_view_count"],
+                "computed_real",
             )
             self.assertEqual(
                 manifest["metric_provenance"]["06"]["geometry"]["depth_absrel"],
