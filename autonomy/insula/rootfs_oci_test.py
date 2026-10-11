@@ -264,8 +264,9 @@ class RootfsOciTests(unittest.TestCase):
                     tools=tools,
                 )
 
-            staged = sorted(path for path in target.parent.glob(target.name + ".restore.*") if path.is_dir())
+            staged = sorted(path / target.name for path in target.parent.glob("." + target.name + ".restore.*"))
             self.assertEqual(len(staged), 1)
+            self.assertTrue(staged[0].is_dir())
             self.assertTrue(default_lock(staged[0]).is_file())
 
     def test_existing_tag_with_different_content_is_refused(self):

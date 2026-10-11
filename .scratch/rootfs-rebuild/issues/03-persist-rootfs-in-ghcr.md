@@ -159,3 +159,22 @@ The live-dry-run acceptance box remains unchecked. No dry-run OCI layout or
 restore scratch root was created, so there are no live rootfs package sizes,
 part counts, archive digests or durations from this worker. The
 coordinator-only real GHCR push/pull box also remains unchecked by design.
+
+### 2026-10-11 coordinator: live dry run
+
+The worker's sandbox could not write the dry-run root, so the coordinator ran the live dry run on the host with ORAS 1.3.4 (sha256-verified) and zstd 1.5.7.
+
+**Push.** `push-active --dry-run` packed all six active rootfs in 4807 s, 61 min of which was the GPU rootfs at `zstd -19`. The registry holds 6.3 GB.
+
+| Role | Archive bytes | Parts | Tag | Manifest digest |
+| --- | ---: | ---: | --- | --- |
+| cpu | 228022658 | 1 | `318e827c4832` | `sha256:9c0609c6cca7ccf4b115fddeba2e8fe1bd5f30f3fb88c6fd8e725539b75e5f66` |
+| gpu | 5834231161 | 6 | `c68df2817045` | `sha256:90061e3c1307217e6f483595bc80f4afdad6e161cc008e315b115a76d921c7fd` |
+| metrics | 135877302 | 1 | `bfcf5f5e6e91` | `sha256:732dad7bfb091de0d8b08f4529fce725ae8c6bb7808cb004420d459413febd33` |
+| motion-metrics | 139104107 | 1 | `ede873533967` | `sha256:3efede285940305d6123fb7118b8235e52c6e1b846788de23ce07e7b226eab93` |
+| motion-cli | 139387898 | 1 | `e165e1a10fa7` | `sha256:457d012328911232b4f7e33e6e0ba2850d9a764044be135b12ef5525ef153ff8` |
+| parallax-curriculum | 208429317 | 1 | `8df13a37ef3a` | `sha256:37a845b9c177530e7f87dd2d7c07e8a98f5ee7a162c75dd9fef7927443ab26e5` |
+
+**Bug found and fixed.** The first restore round trip failed 5 of 6 rootfs. The staged tree was named `<name>.restore.XXXX`, and `load_runtime_lock` selects the recipe spec from the rootfs name, so every non-CPU rootfs was checked against the CPU recipe. No restore was promoted, so the refusal rule held. A restore now stages at `<parent>/.<name>.restore.XXXX/<name>`, which keeps the basename and parent path, and the stage directory is removed after promotion. The test was updated to the new layout.
+
+**Restore after the fix.** All six restored into a scratch cache root in 176 s in total (95 s for gpu). Each passes `load_runtime_lock` with its original lock sha and `rootfs_sha256`, and no staged directories were left behind.

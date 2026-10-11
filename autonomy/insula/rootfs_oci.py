@@ -1129,7 +1129,11 @@ def _split_file(src: Path, dst_dir: Path, archive_name: str, max_bytes: int) -> 
 def _restore_payload(payload: Mapping[str, object], artifact_dir: Path, target: Path, tools: ArchiveTools) -> None:
     archive = _reassemble_archive(payload, artifact_dir)
     target.parent.mkdir(parents=True, exist_ok=True)
-    stage = Path(tempfile.mkdtemp(prefix=f"{target.name}.restore.", dir=target.parent))
+    # The staged tree keeps the target's basename (and parent path): load_runtime_lock
+    # selects the recipe spec from the rootfs name, so a renamed stage would be
+    # checked against the wrong recipe.
+    stage_root = Path(tempfile.mkdtemp(prefix=f".{target.name}.restore.", dir=target.parent))
+    stage = stage_root / target.name
     lock_stage = default_lock(stage)
     try:
         _extract_archive(archive, stage, tools)
@@ -1145,6 +1149,7 @@ def _restore_payload(payload: Mapping[str, object], artifact_dir: Path, target: 
             raise RootfsOciError(f"target lock exists: {default_lock(target)}")
         stage.rename(target)
         lock_stage.rename(default_lock(target))
+        stage_root.rmdir()
     except Exception:
         raise
 
