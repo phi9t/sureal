@@ -1,4 +1,4 @@
-"""Extract triangle meshes from scalar volumes."""
+"""Extract triangle meshes from scalar volumes by marching tetrahedra."""
 
 from __future__ import annotations
 
@@ -65,12 +65,42 @@ def _triangle_is_degenerate(points: list[FloatArray]) -> bool:
     return bool(np.linalg.norm(np.cross(edge_a, edge_b)) <= 1e-14)
 
 
-def _append_triangle(vertices: list[FloatArray], triangles: list[tuple[int, int, int]], points: list[FloatArray]) -> None:
+def _vertex_key(point: FloatArray, tolerance_m: float) -> tuple[int, int, int]:
+    return tuple(np.rint(point / tolerance_m).astype(np.int64).tolist())
+
+
+def _vertex_index(
+    vertices: list[FloatArray],
+    welded: dict[tuple[int, int, int], int],
+    point: FloatArray,
+    *,
+    tolerance_m: float,
+) -> int:
+    key = _vertex_key(point, tolerance_m)
+    existing = welded.get(key)
+    if existing is not None:
+        return existing
+    welded[key] = len(vertices)
+    vertices.append(point)
+    return welded[key]
+
+
+def _append_triangle(
+    vertices: list[FloatArray],
+    triangles: list[tuple[int, int, int]],
+    welded: dict[tuple[int, int, int], int],
+    points: list[FloatArray],
+    *,
+    tolerance_m: float,
+) -> None:
     if _triangle_is_degenerate(points):
         return
-    start = len(vertices)
-    vertices.extend(points)
-    triangles.append((start, start + 1, start + 2))
+    indices = tuple(
+        _vertex_index(vertices, welded, point, tolerance_m=tolerance_m)
+        for point in points
+    )
+    if len(set(indices)) == 3:
+        triangles.append(indices)
 
 
 def _polygonise_tetrahedron(
@@ -80,6 +110,8 @@ def _polygonise_tetrahedron(
     level: float,
     vertices: list[FloatArray],
     triangles: list[tuple[int, int, int]],
+    welded: dict[tuple[int, int, int], int],
+    weld_tolerance_m: float,
 ) -> None:
     inside = [index for index, value in enumerate(values) if value < level]
     outside = [index for index, value in enumerate(values) if value >= level]
@@ -91,7 +123,13 @@ def _polygonise_tetrahedron(
             _interpolate(points[inside_index], points[outside_index], values[inside_index], values[outside_index], level)
             for outside_index in outside
         ]
-        _append_triangle(vertices, triangles, triangle)
+        _append_triangle(
+            vertices,
+            triangles,
+            welded,
+            triangle,
+            tolerance_m=weld_tolerance_m,
+        )
         return
     if len(inside) == 3:
         outside_index = outside[0]
@@ -99,7 +137,13 @@ def _polygonise_tetrahedron(
             _interpolate(points[outside_index], points[inside_index], values[outside_index], values[inside_index], level)
             for inside_index in inside
         ]
-        _append_triangle(vertices, triangles, triangle[::-1])
+        _append_triangle(
+            vertices,
+            triangles,
+            welded,
+            triangle[::-1],
+            tolerance_m=weld_tolerance_m,
+        )
         return
 
     first_inside, second_inside = inside
@@ -110,11 +154,23 @@ def _polygonise_tetrahedron(
         _interpolate(points[second_inside], points[second_outside], values[second_inside], values[second_outside], level),
         _interpolate(points[second_inside], points[first_outside], values[second_inside], values[first_outside], level),
     ]
-    _append_triangle(vertices, triangles, [quad[0], quad[1], quad[2]])
-    _append_triangle(vertices, triangles, [quad[0], quad[2], quad[3]])
+    _append_triangle(
+        vertices,
+        triangles,
+        welded,
+        [quad[0], quad[1], quad[2]],
+        tolerance_m=weld_tolerance_m,
+    )
+    _append_triangle(
+        vertices,
+        triangles,
+        welded,
+        [quad[0], quad[2], quad[3]],
+        tolerance_m=weld_tolerance_m,
+    )
 
 
-def marching_cubes(
+def marching_tetrahedra(
     values: ArrayLike,
     *,
     origin_m: ArrayLike,
@@ -124,9 +180,8 @@ def marching_cubes(
 ) -> Mesh:
     """Extract an iso-surface mesh from a regular scalar grid.
 
-    The implementation decomposes each cube into tetrahedra. That keeps the
-    extractor compact, deterministic and free of lookup-table dependencies while
-    preserving the marching-cubes contract at the volume boundary.
+    The implementation decomposes each cube into tetrahedra, then welds repeated
+    edge intersections into a shared indexed mesh.
     """
     scalar = np.asarray(values, dtype=np.float64)
     if scalar.ndim != 3 or min(scalar.shape) < 2:
@@ -140,7 +195,9 @@ def marching_cubes(
         if mask.shape != scalar.shape:
             raise ValueError("valid_mask must have the same shape as values")
 
+    weld_tolerance_m = float(voxel_size_m) * 1e-10
     vertices: list[FloatArray] = []
+    welded: dict[tuple[int, int, int], int] = {}
     triangles: list[tuple[int, int, int]] = []
     for ix in range(scalar.shape[0] - 1):
         for iy in range(scalar.shape[1] - 1):
@@ -166,6 +223,8 @@ def marching_cubes(
                         level=level,
                         vertices=vertices,
                         triangles=triangles,
+                        welded=welded,
+                        weld_tolerance_m=weld_tolerance_m,
                     )
 
     if not vertices:

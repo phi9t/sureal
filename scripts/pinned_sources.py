@@ -445,7 +445,8 @@ def source_targets(
 ) -> SourceTargets:
     root = Path(root)
     tracked = git_ls_files(root, patterns)
-    tracked_set = set(tracked)
+    existing_tracked = tuple(path for path in tracked if (root / path).is_file())
+    tracked_set = set(existing_tracked)
     receipt_pinned = tuple(
         path
         for path in receipt_pinned_source_paths(root, tracked_set, allow_marker_paths=True, allow_basename=False)
@@ -456,11 +457,11 @@ def source_targets(
     protected_set = (
         set(protected) if protected is not None else set(receipt_pinned) | set(digest_pinned) | set(candidate_pinned)
     )
-    frozen = tuple(path for path in tracked if is_frozen_path(path))
+    frozen = tuple(path for path in existing_tracked if is_frozen_path(path))
     excluded = protected_set | (set() if include_frozen else set(frozen))
-    checked = tuple(path for path in tracked if path not in excluded)
+    checked = tuple(path for path in existing_tracked if path not in excluded)
     return SourceTargets(
-        tracked_files=tracked,
+        tracked_files=existing_tracked,
         receipt_pinned_files=tuple(sorted(receipt_pinned)),
         digest_pinned_files=tuple(sorted(digest_pinned)),
         current_candidate_files=tuple(sorted(candidate_pinned)),

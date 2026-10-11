@@ -14,7 +14,7 @@ from typing import Any
 import numpy as np
 
 from evaluation.surface_metrics import surface_metrics
-from fusion.marching_cubes import Mesh, marching_cubes
+from fusion.marching_tetrahedra import Mesh, marching_tetrahedra
 from fusion.tsdf import fuse_depth_maps
 from pipeline.contracts import canonical_json, sha256_file
 from scene.orbit import generate_orbit_scene
@@ -107,7 +107,7 @@ def _fuse_and_score(
     fusion_runtime_seconds = time.perf_counter() - started
 
     started = time.perf_counter()
-    mesh = marching_cubes(
+    mesh = marching_tetrahedra(
         volume.values,
         origin_m=volume.origin_m,
         voxel_size_m=volume.voxel_size_m,

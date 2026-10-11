@@ -94,6 +94,15 @@ class RuffRepoTests(unittest.TestCase):
         self.assertNotIn("autonomy/association/pinned.py", targets.checked_files)
         self.assertEqual(lint.returncode, 0, lint.stdout + lint.stderr)
 
+    def test_deleted_tracked_python_files_are_not_linted_before_commit(self) -> None:
+        self.track("parallax/pipeline/removed.py", "not python syntax :\n")
+        (self.root / "parallax/pipeline/removed.py").unlink()
+
+        result = ruff_repo.run_ruff(RUFF, self.root, mode="check")
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertNotIn("parallax/pipeline/removed.py", result.checked_files)
+
     def test_format_check_does_not_touch_receipt_pinned_file_bytes(self) -> None:
         self.track(
             "autonomy/retained_receipt_sweep.py",

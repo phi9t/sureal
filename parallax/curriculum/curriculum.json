@@ -43,7 +43,7 @@
     },
     {
       "id": "04", "slug": "registration-range-fusion", "title": "Registration and range fusion",
-      "implementation": "synthetic",
+      "implementation": "real",
       "evidence": ["overlapping range scans"], "observable": "relative rigid alignment and sampled surface", "representation": "registered points, TSDF, or mesh",
       "inference": "optimized", "objectives": ["point-to-plane distance", "truncated signed-distance agreement"], "metrics": ["pose error", "surface RMSE", "completeness"],
       "failure_sweep": ["initialization", "overlap", "outliers", "sensor noise"], "insula": "classical",
@@ -59,9 +59,9 @@
     },
     {
       "id": "06", "slug": "dense-mvs-meshing", "title": "Dense multi-view stereo and meshing",
-      "implementation": "real",
+      "implementation": "real+baseline",
       "evidence": ["calibrated multi-view RGB"], "observable": "photo-consistent visible surfaces", "representation": "depth maps, fused points, and mesh",
-      "inference": "optimized", "objectives": ["photometric consistency", "visibility-aware regularization"], "metrics": ["AbsRel", "delta<1.25", "valid pixel fraction"],
+      "inference": "optimized", "objectives": ["photometric consistency", "visibility-aware regularization"], "metrics": ["AbsRel", "delta<1.25", "valid pixel fraction", "Chamfer distance", "F-score"],
       "failure_sweep": ["view count", "lighting", "occlusion", "texture"], "insula": "classical",
       "sources": ["seitz-2006", "furukawa-ponce-2010", "schonberger-2017", "colmap-4.0.3-release", "colmap-install-2026"]
     },

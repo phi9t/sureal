@@ -63,26 +63,26 @@ class RunnerBootstrapTest(unittest.TestCase):
         missing = sorted(path for path in expected if not (ROOT / path).is_file())
         self.assertEqual(missing, [])
 
-    def test_legacy_math3d_imports_reexport_concept_functions(self) -> None:
+    def test_concept_imports_replace_legacy_math3d_shim(self) -> None:
         from camera.pinhole import project, unproject
         from camera.pose import camera_center, fundamental_from_poses
         from fusion.tsdf import fuse_tsdf
         from geometry.align import apply_transform, icp, normalize_rows, opencv_opengl_camera_transform
         from geometry.triangulate import refine_point_gauss_newton, reprojection_rmse, triangulate_point
-        from pipeline import math3d
 
-        self.assertIs(math3d.project, project)
-        self.assertIs(math3d.unproject, unproject)
-        self.assertIs(math3d.camera_center, camera_center)
-        self.assertIs(math3d.fundamental_from_poses, fundamental_from_poses)
-        self.assertIs(math3d.triangulate_point, triangulate_point)
-        self.assertIs(math3d.refine_point_gauss_newton, refine_point_gauss_newton)
-        self.assertIs(math3d.reprojection_rmse, reprojection_rmse)
-        self.assertIs(math3d.apply_transform, apply_transform)
-        self.assertIs(math3d.icp, icp)
-        self.assertIs(math3d.normalize_rows, normalize_rows)
-        self.assertIs(math3d.opencv_opengl_camera_transform, opencv_opengl_camera_transform)
-        self.assertIs(math3d.fuse_tsdf, fuse_tsdf)
+        self.assertFalse((ROOT / "pipeline" / "math3d.py").exists())
+        self.assertTrue(callable(project))
+        self.assertTrue(callable(unproject))
+        self.assertTrue(callable(camera_center))
+        self.assertTrue(callable(fundamental_from_poses))
+        self.assertTrue(callable(triangulate_point))
+        self.assertTrue(callable(refine_point_gauss_newton))
+        self.assertTrue(callable(reprojection_rmse))
+        self.assertTrue(callable(apply_transform))
+        self.assertTrue(callable(icp))
+        self.assertTrue(callable(normalize_rows))
+        self.assertTrue(callable(opencv_opengl_camera_transform))
+        self.assertTrue(callable(fuse_tsdf))
 
     def test_run_script_launches_cli_with_parallax_on_pythonpath(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -229,8 +229,9 @@ class RegistryContractTest(unittest.TestCase):
                 self.assertTrue(module["sources"])
                 self.assertIn(module["insula"], curriculum["insulas"])
                 expected_implementation = {
+                    "04": "real",
                     "05": "real+baseline",
-                    "06": "real",
+                    "06": "real+baseline",
                 }.get(module["id"], "synthetic")
                 self.assertEqual(module["implementation"], expected_implementation)
 
@@ -240,6 +241,11 @@ class RegistryContractTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             cache = Path(temporary)
             for module_id, expected in {
+                "04": {
+                    ("geometry", "icp_final_rmse_m"): "computed_real",
+                    ("geometry", "surface_chamfer_m"): "computed_real",
+                    ("geometry", "surface_f_score_tau"): "computed_real",
+                },
                 "05": {
                     ("geometry", "ate_m"): "computed_real",
                     ("geometry", "mean_rotation_error_deg"): "computed_real",
@@ -250,6 +256,8 @@ class RegistryContractTest(unittest.TestCase):
                     ("geometry", "depth_absrel"): "computed_real",
                     ("geometry", "depth_delta_lt_1_25"): "computed_real",
                     ("geometry", "valid_pixel_fraction"): "computed_real",
+                    ("geometry", "surface_chamfer_m"): "computed_real",
+                    ("geometry", "surface_f_score_tau"): "computed_real",
                 },
                 "07": {
                     ("geometry", "ate_before_loop_m"): "computed_synthetic",
@@ -274,8 +282,9 @@ class RegistryContractTest(unittest.TestCase):
                         module_id,
                     )
                     expected_implementation = {
+                        "04": "real",
                         "05": "real+baseline",
-                        "06": "real",
+                        "06": "real+baseline",
                     }.get(module_id, "synthetic")
                     self.assertEqual(result["module_implementation"], expected_implementation)
                     for (family, metric), label in expected.items():
@@ -292,7 +301,7 @@ class RegistryContractTest(unittest.TestCase):
             completed = run_cli(
                 "run",
                 "--module",
-                "06",
+                "04",
                 "--profile",
                 "smoke",
                 "--run-id",
@@ -300,17 +309,17 @@ class RegistryContractTest(unittest.TestCase):
                 cache=cache,
             )
             self.assertEqual(completed.returncode, 0, completed.stderr)
-            run_dir = cache / "runs" / "real-provenance-check" / "06"
+            run_dir = cache / "runs" / "real-provenance-check" / "04"
             result_path = run_dir / "result.json"
             result = json.loads(result_path.read_text())
-            result["metric_provenance"]["geometry"]["depth_absrel"] = "illustrative"
+            result["metric_provenance"]["geometry"]["surface_chamfer_m"] = "illustrative"
             result_path.write_text(json.dumps(result, sort_keys=True) + "\n")
 
             with self.assertRaisesRegex(
                 ValueError,
                 "real module metrics must be computed",
             ):
-                validate_result(run_dir, "06")
+                validate_result(run_dir, "04")
 
     def test_source_registry_is_primary_unique_and_claim_bearing(self) -> None:
         sources = json.loads((ROOT / "assets" / "sources.json").read_text())["sources"]

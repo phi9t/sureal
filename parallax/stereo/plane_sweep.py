@@ -207,6 +207,7 @@ def reconstruct_depth_maps(
     views: list[StereoView],
     *,
     depth_count: int,
+    depth_hypotheses_m: ArrayLike | None = None,
     max_neighbours: int = 2,
     window_radius: int = 2,
     consistency_neighbours: int = 1,
@@ -214,7 +215,17 @@ def reconstruct_depth_maps(
     """Estimate and geometrically filter a depth map for every view."""
     if len(views) < 2:
         raise ValueError("multi-view stereo requires at least two views")
-    hypotheses = _depth_hypotheses(views, depth_count)
+    hypotheses = (
+        _depth_hypotheses(views, depth_count)
+        if depth_hypotheses_m is None
+        else np.asarray(depth_hypotheses_m, dtype=np.float64).reshape(-1)
+    )
+    if (
+        len(hypotheses) != depth_count
+        or np.any(~np.isfinite(hypotheses))
+        or np.any(hypotheses <= 0.0)
+    ):
+        raise ValueError("depth_hypotheses_m must contain depth_count positive values")
     raw: dict[str, DepthMapResult] = {}
     selected_by_view: dict[str, list[StereoView]] = {}
     for view in views:

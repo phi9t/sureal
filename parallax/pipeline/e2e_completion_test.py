@@ -284,8 +284,9 @@ class EndToEndCompletionContractTest(unittest.TestCase):
                 manifest["module_implementations"],
                 {
                     **{f"{index:02d}": "synthetic" for index in range(1, 16)},
+                    "04": "real",
                     "05": "real+baseline",
-                    "06": "real",
+                    "06": "real+baseline",
                 },
             )
             self.assertEqual(
@@ -294,6 +295,10 @@ class EndToEndCompletionContractTest(unittest.TestCase):
             )
             self.assertEqual(
                 manifest["metric_provenance"]["06"]["geometry"]["depth_absrel"],
+                "computed_real",
+            )
+            self.assertEqual(
+                manifest["metric_provenance"]["06"]["geometry"]["surface_chamfer_m"],
                 "computed_real",
             )
             self.assertEqual(

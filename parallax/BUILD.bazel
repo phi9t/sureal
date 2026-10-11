@@ -213,6 +213,8 @@ _PARALLAX_TESTS = {
     "test_two_view_geometry": "geometry/two_view_test.py",
     "test_colmap_mvs_reference": "baselines/colmap_mvs_reference_test.py",
     "test_colmap_reference": "baselines/colmap_reference_test.py",
+    "test_classical_chain": "pipeline/classical_chain_test.py",
+    "test_classical_chain_full": "pipeline/classical_chain_full_test.py",
     "test_controlled_suite": "scene/controlled_suite_test.py",
     "test_depth_anything_reference": "baselines/depth_anything_reference_test.py",
     "test_documentation": "curriculum/documentation_test.py",
@@ -249,7 +251,7 @@ _PARALLAX_TESTS = {
         imports = ["."],
         legacy_create_init = 0,
         main = source,
-        size = "large" if name == "test_incremental_sfm" else "medium",
+        size = "large" if name in ["test_incremental_sfm", "test_classical_chain_full"] else "medium",
         deps = [":parallax_lib"],
     )
     for name, source in _PARALLAX_TESTS.items()

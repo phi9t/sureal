@@ -132,19 +132,23 @@ class ClassicalLabContractTest(unittest.TestCase):
             self.assertLess(results["02"]["metrics"]["geometry"]["concavity_recall"], 1.0)
             self.assertGreater(results["03"]["metrics"]["geometry"]["far_depth_std_m"], results["03"]["metrics"]["geometry"]["near_depth_std_m"])
             self.assertLess(results["04"]["metrics"]["geometry"]["icp_final_rmse_m"], results["04"]["metrics"]["geometry"]["icp_initial_rmse_m"])
+            self.assertLess(results["04"]["metrics"]["geometry"]["surface_chamfer_m"], 0.16)
+            self.assertGreater(results["04"]["metrics"]["geometry"]["surface_f_score_tau"], 0.80)
             self.assertLess(results["05"]["metrics"]["geometry"]["ba_final_reprojection_rmse_px"], results["05"]["metrics"]["geometry"]["ba_initial_reprojection_rmse_px"])
             mvs_geometry = results["06"]["metrics"]["geometry"]
             self.assertLess(mvs_geometry["depth_absrel"], 0.08)
             self.assertGreater(mvs_geometry["depth_delta_lt_1_25"], 0.94)
             self.assertGreater(mvs_geometry["valid_pixel_fraction"], 0.65)
-            self.assertEqual(results["06"]["module_implementation"], "real")
+            self.assertLess(mvs_geometry["surface_chamfer_m"], 0.35)
+            self.assertGreater(mvs_geometry["surface_f_score_tau"], 0.40)
+            self.assertEqual(results["06"]["module_implementation"], "real+baseline")
             sweep_06 = results["06"]["failure_sweep"]
-            self.assertEqual(
-                {row["metric"] for row in sweep_06},
-                {"absrel", "delta_lt_1_25", "valid_pixel_fraction"},
+            self.assertTrue(
+                {"absrel", "delta_lt_1_25", "valid_pixel_fraction", "surface_chamfer_m", "surface_f_score_tau"}
+                <= {row["metric"] for row in sweep_06}
             )
             self.assertTrue(
-                (cache / "runs" / "classical" / "06" / "artifacts" / "plane-sweep-mvs" / "depth-maps.npz").is_file()
+                (cache / "runs" / "classical" / "06" / "artifacts" / "classical-chain" / "depth-maps.npz").is_file()
             )
             self.assertLess(results["07"]["metrics"]["geometry"]["ate_after_loop_m"], results["07"]["metrics"]["geometry"]["ate_before_loop_m"])
 

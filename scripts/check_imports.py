@@ -75,9 +75,11 @@ def _tracked_files(root: Path, patterns: Sequence[str]) -> list[Path]:
     output = _git(root, "ls-files", "-z", "--", *patterns)
     if output:
         return [
-            root / raw.decode("utf-8", errors="surrogateescape")
+            path
             for raw in output.split(b"\0")
             if raw
+            for path in [root / raw.decode("utf-8", errors="surrogateescape")]
+            if path.is_file()
         ]
     return sorted(path for pattern in patterns for path in root.glob(pattern))
 

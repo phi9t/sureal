@@ -36,11 +36,15 @@ from curriculum.generative import (
 from camera.pinhole import project, unproject
 from camera.pose import fundamental_from_poses, symmetric_epipolar_distance
 from curriculum.surflo_endpoint import build_surflo_endpoint
-from fusion.tsdf import fuse_tsdf
+from evaluation.surface_metrics import surface_metrics
+from fusion.marching_tetrahedra import Mesh, marching_tetrahedra
+from fusion.tsdf import fuse_depth_maps, fuse_tsdf
 from geometry.align import apply_transform, icp
 from geometry.triangulate import triangulate_point
+from pipeline.classical_chain import run_classical_chain_profile
 from sfm.incremental import run_orbit_sfm_profile
-from stereo.plane_sweep import run_orbit_mvs_profile
+from scene.orbit import generate_orbit_scene
+from stereo.plane_sweep import load_orbit_views
 
 
 def _write_sweep(path: Path, rows: list[dict[str, Any]]) -> None:
@@ -83,8 +87,36 @@ def _write_npz_deterministic(path: Path, arrays: dict[str, np.ndarray]) -> None:
             archive.writestr(member, payload.getvalue())
 
 
+def _save_mesh_npz(path: Path, mesh: Mesh) -> None:
+    _write_npz_deterministic(
+        path,
+        {
+            "vertices": mesh.vertices.astype(np.float32),
+            "triangles": mesh.triangles.astype(np.int64),
+        },
+    )
+
+
 def _steps(profile_config: dict[str, Any]) -> int:
     return int(profile_config["sweep_steps"])
+
+
+def _fusion_settings(profile: str) -> dict[str, float]:
+    if profile == "smoke":
+        return {
+            "voxel_size_m": 0.12,
+            "truncation_m": 0.24,
+            "padding_m": 0.24,
+            "tau_m": 0.18,
+        }
+    if profile == "full":
+        return {
+            "voxel_size_m": 0.08,
+            "truncation_m": 0.18,
+            "padding_m": 0.20,
+            "tau_m": 0.12,
+        }
+    raise ValueError(f"unknown fusion profile: {profile}")
 
 
 def _projection_lab(artifacts: Path, profile: str, scene: dict[str, Any], profile_config: dict[str, Any]) -> dict[str, Any]:
@@ -185,10 +217,78 @@ def _registration_lab(artifacts: Path, profile: str, scene: dict[str, Any], prof
         for signed_distance in (-noise, noise * 0.5, -noise * 0.25):
             estimate, weight = fuse_tsdf(estimate, weight, float(signed_distance), 1.0)
         sweep.append({"parameter": "range_noise_std_m", "value": float(noise), "metric": "tsdf_surface_bias_m", "measurement": float(abs(estimate))})
+    settings = _fusion_settings(profile)
+    orbit_root = artifacts / "range-fusion-orbit"
+    manifest = generate_orbit_scene(orbit_root, profile)
+    views = load_orbit_views(orbit_root)
+    truth_depths = {view.view_id: view.truth_depth_m for view in views}
+    truth_masks = {
+        view.view_id: np.isfinite(view.truth_depth_m) & (view.truth_depth_m > 0.0)
+        for view in views
+        if view.truth_depth_m is not None
+    }
+    volume = fuse_depth_maps(
+        views,
+        truth_depths,
+        voxel_size_m=settings["voxel_size_m"],
+        truncation_m=settings["truncation_m"],
+        padding_m=settings["padding_m"],
+        valid_masks=truth_masks,
+    )
+    mesh = marching_tetrahedra(
+        volume.values,
+        origin_m=volume.origin_m,
+        voxel_size_m=volume.voxel_size_m,
+        valid_mask=volume.weights > 0.0,
+    )
+    mesh_path = artifacts / "range-fusion-mesh.npz"
+    _save_mesh_npz(mesh_path, mesh)
+    truth_points = np.load(
+        orbit_root / manifest["surface_truth"]["points_path"],
+        allow_pickle=False,
+    )
+    fusion_metrics = surface_metrics(
+        mesh.vertices,
+        truth_points,
+        tau=settings["tau_m"],
+    )
+    sweep.extend(
+        [
+            {
+                "parameter": "range_fusion",
+                "value": 0,
+                "metric": "surface_chamfer_m",
+                "measurement": float(fusion_metrics["chamfer_distance"]),
+            },
+            {
+                "parameter": "range_fusion",
+                "value": 0,
+                "metric": "surface_f_score_tau",
+                "measurement": float(fusion_metrics["f_score"]),
+            },
+        ]
+    )
     _write_sweep(artifacts / "failure_sweep.csv", sweep)
     _write_chart(artifacts / "icp_convergence.svg", "ICP convergence from a nearby initialization", history)
     return {
-        "metrics": {"geometry": {"icp_initial_rmse_m": history[0], "icp_final_rmse_m": history[-1], "tsdf_surface_bias_m": sweep[-1]["measurement"], "mesh_completeness": 0.92}, "rendering": {}, "generative": {}},
+        "metrics": {
+            "geometry": {
+                "icp_initial_rmse_m": history[0],
+                "icp_final_rmse_m": history[-1],
+                "tsdf_surface_bias_m": float(
+                    next(row for row in reversed(sweep) if row["metric"] == "tsdf_surface_bias_m")["measurement"]
+                ),
+                "surface_chamfer_m": float(fusion_metrics["chamfer_distance"]),
+                "surface_accuracy_m": float(fusion_metrics["accuracy"]),
+                "surface_completeness_m": float(fusion_metrics["completeness"]),
+                "surface_f_score_tau": float(fusion_metrics["f_score"]),
+                "observed_voxel_count": volume.observed_voxel_count,
+                "mesh_vertex_count": int(mesh.vertices.shape[0]),
+                "mesh_triangle_count": int(mesh.triangles.shape[0]),
+            },
+            "rendering": {},
+            "generative": {},
+        },
         "failure_sweep": sweep,
         "observations": ["ICP is a local optimizer; poor initialization or low overlap can settle on the wrong alignment.", "TSDF averaging suppresses zero-mean noise but does not recover never-observed surfaces."],
     }
@@ -230,60 +330,32 @@ def _sfm_lab(artifacts: Path, profile: str, scene: dict[str, Any], profile_confi
 
 def _mvs_lab(artifacts: Path, profile: str, scene: dict[str, Any], profile_config: dict[str, Any]) -> dict[str, Any]:
     del scene, profile_config
-    summary = run_orbit_mvs_profile(artifacts / "plane-sweep-mvs", profile)
-    depth_metrics = summary["metrics"]
-    sweep = []
-    for index, row in enumerate(depth_metrics["per_view"]):
-        sweep.extend(
-            [
-                {
-                    "parameter": "view_index",
-                    "value": index,
-                    "metric": "absrel",
-                    "measurement": float(row["absrel"]),
-                },
-                {
-                    "parameter": "view_index",
-                    "value": index,
-                    "metric": "delta_lt_1_25",
-                    "measurement": float(row["delta_lt_1_25"]),
-                },
-                {
-                    "parameter": "view_index",
-                    "value": index,
-                    "metric": "valid_pixel_fraction",
-                    "measurement": float(row["valid_pixel_fraction"]),
-                },
-            ]
-        )
-    _write_sweep(artifacts / "failure_sweep.csv", sweep)
+    summary = run_classical_chain_profile(artifacts / "classical-chain", profile)
+    _write_sweep(artifacts / "failure_sweep.csv", summary["failure_sweep"])
     _write_chart(
         artifacts / "mvs_depth_quality.svg",
-        "Plane-sweep depth quality by view",
-        [float(row["absrel"]) for row in depth_metrics["per_view"]],
+        "Classical chain depth quality by view",
+        [
+            float(row["absrel"])
+            for row in summary["depth_metrics"]["per_view"]
+        ],
         "#4c7b37",
     )
     return {
         "metrics": {
-            "geometry": {
-                "depth_absrel": float(depth_metrics["mean_absrel"]),
-                "depth_delta_lt_1_25": float(depth_metrics["mean_delta_lt_1_25"]),
-                "valid_pixel_fraction": float(depth_metrics["mean_valid_pixel_fraction"]),
-                "evaluated_view_count": int(depth_metrics["evaluated_view_count"]),
-                "evaluated_pixel_count": int(depth_metrics["evaluated_pixel_count"]),
-                "valid_pixel_count": int(depth_metrics["valid_pixel_count"]),
-                "plane_sweep_runtime_seconds": float(summary["runtime_seconds"]),
-                "depth_hypothesis_count": int(summary["depth_hypothesis_count"]),
-            },
+            "geometry": summary["metrics"],
             "rendering": {},
             "generative": {},
         },
-        "failure_sweep": sweep,
-        "observations": [
-            "Plane-sweep MVS estimates per-view camera-axis depths from calibrated orbit images.",
-            "Depth metrics are computed on textured pixels against exact generated depth maps.",
-            "Cross-view geometric consistency filters photometric matches that do not reproject to matching depth.",
-        ],
+        "failure_sweep": summary["failure_sweep"],
+        "observations": summary["observations"],
+        "extra_result": {
+            "classical_chain": {
+                "mesh_alignment": summary["mesh_alignment"],
+                "registered_view_ids": summary["registered_view_ids"],
+                "artifacts": summary["artifacts"],
+            }
+        },
     }
 
 

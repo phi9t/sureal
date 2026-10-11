@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import subprocess
 import tempfile
 import unittest
 
@@ -119,6 +120,20 @@ class ImportRuleBehaviorTests(unittest.TestCase):
                 "autonomy/studies/architecture/harness/legacy.py",
             ):
                 write(root, relative, "from .sibling import VALUE\n")
+
+            self.assertEqual(check_imports.scan(root), [])
+
+    def test_deleted_tracked_files_are_not_scanned_before_commit(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            write(root, "parallax/pipeline/removed.py", "from contracts import ROOT\n")
+            subprocess.run(
+                ["git", "add", "parallax/pipeline/removed.py"],
+                cwd=root,
+                check=True,
+            )
+            (root / "parallax/pipeline/removed.py").unlink()
 
             self.assertEqual(check_imports.scan(root), [])
 
