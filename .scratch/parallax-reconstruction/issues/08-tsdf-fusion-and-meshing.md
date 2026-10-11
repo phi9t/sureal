@@ -42,3 +42,9 @@
   - `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //:repo_gate` passed, 23/23.
   - `./bazelw test --noexperimental_collect_system_network_usage --nocache_test_results --test_output=errors //autonomy/...` passed, 189/189.
 - CUDA gate skipped as requested for this no-GPU sandbox.
+
+### 2026-10-11 coordinator review
+
+Accepted. Follow-ups for ticket 09:
+- `fusion/marching_cubes.py` decomposes cubes into tetrahedra, which is marching tetrahedra. Either rename it, or implement the classic case-table marching cubes.
+- It emits unshared vertices, about 3 per triangle. Welding vertices into an indexed mesh would help mesh export and the Chamfer sampling.
