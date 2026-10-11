@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check shell files against Sureal's mechanical shell-style rules."""
+"""Check shell files against docs/guides/shell-engineering.md mechanical rules."""
 
 from __future__ import annotations
 

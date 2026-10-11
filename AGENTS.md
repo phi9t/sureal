@@ -17,7 +17,7 @@ Insula gates remain the authority for claims about the tree.
 
 ## Commands
 
-Shell scripts follow `docs/guides/shell-style.md`; ShellCheck runs in the
+Shell scripts follow `docs/guides/shell-engineering.md`; ShellCheck runs in the
 repo gate from a Bazel-pinned release archive, not from host packages.
 
 Enable the versioned git hooks in a clone with:

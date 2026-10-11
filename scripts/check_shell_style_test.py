@@ -1,4 +1,4 @@
-"""Unit tests for the shell-style policy checker."""
+"""Unit tests for the docs/guides/shell-engineering.md policy checker."""
 
 from __future__ import annotations
 
