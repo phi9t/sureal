@@ -4,14 +4,14 @@
 or when the README project map misses a top-level source directory. Moves and renames can then no longer leave
 the guides stale.
 
-**Blocked by:** 01, 02, 03, 04 (the check must pass on the new guides)
+**Blocked by:** 01, 02, 03, 04, 06 (the check must pass on the new guides and the `harness/` layout)
 
 **Status:** ready-for-agent
 
 Source: `~/workspace/milano/harness/workflow/lint/check_docs.py` and `check_docs_test.py`. See also Milano commits
 `f7b4907` ("The README is the repo map and AGENTS.md is the rules") and `ed9a7fd`.
 
-- [ ] **Lint.** `scripts/check_docs.py` plus `scripts/check_docs_test.py` scan:
+- [ ] **Lint.** `harness/lint/check_docs.py` plus `harness/lint/check_docs_test.py` scan:
   - `README.md` and `AGENTS.md`;
   - `CONTEXT-MAP.md` and each `CONTEXT.md`;
   - `docs/guides/*.md`, `docs/adr/*.md`, `autonomy/docs/adr/*.md`;
@@ -23,7 +23,7 @@ Source: `~/workspace/milano/harness/workflow/lint/check_docs.py` and `check_docs
   - placeholders, globs and shell variables;
   - `~`/cache/Insula-internal paths;
   - historical directories such as `docs/ticket*/`, `docs/research/` and `.scratch/`.
-- [ ] **Repo map.** The README "Project map" names every top-level source directory: `autonomy/`, `parallax/`,
+- [ ] **Repo map.** The README "Project map" names every top-level source directory: `autonomy/`, `parallax/`, `harness/`,
   `scripts/`, `docs/` and the others the check discovers. Generated and tool-owned directories (`outputs/`,
   `.bazel-cache/`, `bazel-*`, `submodules/` if vendored) are skipped in one explicit list. The discovery uses
   `Path.iterdir()`, so it works inside Insula.

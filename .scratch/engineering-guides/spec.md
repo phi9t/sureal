@@ -30,9 +30,12 @@ mechanical rules with a lint in `//:repo_gate`. Make the front-door docs checkab
 - Milano rules that conflict with Sureal are recorded as deltas, not adopted. Examples: the Milano commit
   trailer policy, uv as the dependency authority, `#!/bin/bash`, and the 100-line shell limit.
 - No feature work (Parallax, autonomy) lands while this feature is open.
+- Repo tooling is grouped by concept: a top-level `harness/` component (its own import root) takes the
+  repo-gate lints from `scripts/` (ticket 06), following Milano's `harness/` package layout.
 
 ## Out of Scope
 
 - Widening the Ruff format batch or the lint rule set. That is a separate, already-offered follow-up.
-- Regrouping `scripts/` into subdirectories, and splitting `parallax/sfm/incremental.py`.
+- Moving source-pinned code (`autonomy/insula/` core, `autonomy/evidence/`, `scripts/_collab/`) into `harness/`;
+  that waits until the deferred reruns can re-pin. Splitting `parallax/sfm/incremental.py`.
 - clang-tidy, GoogleTest and Google Benchmark. These are deferred in Milano too.
