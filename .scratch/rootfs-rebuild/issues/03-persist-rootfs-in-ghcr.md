@@ -47,12 +47,12 @@ Approved by the user on 2026-10-10. Modelled on Vaso's `scripts/publish/artifact
   - a lock mismatch leaves the staged copy in place and fails;
   - an existing tag with different content is refused;
   - tokens are redacted from all output.
-- [ ] **Live dry run, first.** Push all active rootfs to a local OCI layout, outside the repo and outside `~/.cache/waystone`. Pull each one into a scratch cache root and show that `load_runtime_lock` accepts it. Record:
+- [x] **Live dry run, first.** Push all active rootfs to a local OCI layout, outside the repo and outside `~/.cache/waystone`. Pull each one into a scratch cache root and show that `load_runtime_lock` accepts it. Record:
   - sizes;
   - part counts;
   - archive digests;
   - durations.
-- [ ] **Coordinator-only real push.** The coordinator pushes to `ghcr.io/phi9t`, records the manifest digests in this ticket, and shows each package is private. The coordinator also does one real pull-and-verify of the smallest rootfs into a scratch cache root.
+- [x] **Coordinator-only real push.** The coordinator pushes to `ghcr.io/phi9t`, records the manifest digests in this ticket, and shows each package is private. The coordinator also does one real pull-and-verify of the smallest rootfs into a scratch cache root.
 - [x] `docs/agents/` gains a short "persist and restore rootfs" runbook.
 - [x] **Gates:** `//:repo_gate`, `//autonomy/...` and `//parallax/...`.
 
@@ -184,3 +184,20 @@ The worker's sandbox could not write the dry-run root, so the coordinator ran th
 - **Annotations dropped.** The real `metrics` push succeeded and the package is private (checked through the GitHub API). But the manifest carried no `io.sureal.*` annotations, so the real pull refused it with "manifest artifact kind is not rootfs". Cause: the ORAS `--annotation-file` used the key `manifest`, but ORAS reads manifest annotations only under `$manifest`. The dry run did not catch this because it writes the OCI layout without ORAS. Fixed through `oras_annotation_document`, which has a test.
 - **Manifests too large.** Dry-run manifests carried one annotation per rootfs file: 3.4 MB for cpu and 14.6 MB for gpu. That is over GHCR's 4 MiB manifest limit. Per-file entries now live only in the digest-checked `manifest/rootfs-manifest.json` layer, and the manifest keeps `io.sureal.rootfs.entry.count` plus summary annotations.
 - **Broken version left behind.** The broken `sureal-rootfs-metrics:bfcf5f5e6e91` version (`sha256:4933ad31…`, created 2026-10-11T01:33:43Z) cannot be deleted with the current token, which returned 403 for lack of `delete:packages`. The tool correctly refuses to overwrite the tag. The user needs to delete that version before `metrics` is pushed again.
+
+### 2026-10-11 coordinator: real GHCR push complete
+
+All six active rootfs are in `ghcr.io/phi9t`. They were pushed from `04db57a`, with `metrics` re-pushed using the code that added `--replace-tag`. Each package was pulled back from GHCR, restored into a scratch cache root, and accepted by `load_runtime_lock` with its original lock sha and `rootfs_sha256`. The GitHub package API reports every package as `private`.
+
+| Package | Tag | Manifest digest | Push | Pull |
+| --- | --- | --- | ---: | ---: |
+| `sureal-rootfs-cpu` | `318e827c4832` | `sha256:b3ecfa1ca61e4d7a862c496c97d68382071575bab1697fadea919bee3e661830` | 272 s | 11 s |
+| `sureal-rootfs-gpu` | `c68df2817045` | `sha256:12251373c19f0c3ed5bb5583d5ff347cf69fa1eb5d62b37b9211366906834d36` | 3490 s | 114 s |
+| `sureal-rootfs-metrics` | `bfcf5f5e6e91` | `sha256:1b63d5b06b0be90cbd0dfa8cb4bcc3f268141330dde83fe19b5e78f46543fd44` | 197 s | — |
+| `sureal-rootfs-motion-metrics` | `ede873533967` | `sha256:12ede83aab56f75a334be13a5a3acc6a284c292100f6366057f2e064ff9681b0` | 215 s | 10 s |
+| `sureal-rootfs-motion-cli` | `e165e1a10fa7` | `sha256:1ba881840802060fc56415e5790728d548a7f26071b5a743d7ec97aec9418563` | 215 s | 9 s |
+| `sureal-rootfs-parallax-curriculum` | `8df13a37ef3a` | `sha256:537f6b6720222e09633ac1900fbbc64f6d9e961a326f67701b1f8e905422033c` | 220 s | 11 s |
+
+`metrics` repair: the broken first push (`sha256:4933ad31…`) could not be deleted, because the token lacks `delete:packages`. On the user's instruction ("you can override this time"), the tag was moved with the new explicit `--replace-tag` flag. The default still refuses, and tests cover both cases. The broken manifest remains in the package, untagged. It can be deleted from the GitHub UI later.
+
+Restoring all six from GHCR takes about 3 minutes of pull time.
