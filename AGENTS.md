@@ -19,6 +19,8 @@ Insula gates remain the authority for claims about the tree.
 
 Shell scripts follow `docs/guides/shell-engineering.md`; ShellCheck runs in the
 repo gate from a Bazel-pinned release archive, not from host packages.
+The full build, rootfs and retained-evidence flow is documented in
+`docs/guides/build-and-verify.md`.
 
 Enable the versioned git hooks in a clone with:
 
@@ -67,6 +69,10 @@ and receipts may still set `PYTHONPATH=autonomy`.
 Python style follows `docs/guides/python-style.md`. Ruff lint and the current
 format batch run in `//:repo_gate`; do not reformat retained receipts, source
 snapshots or files protected by retained/current-candidate source pins.
+
+C++ and CUDA style follows `docs/guides/cpp-engineering.md`. The repo gate runs
+the pinned clang-format check and the mechanical C++ lint over tracked active
+C++ under `autonomy/` and `parallax/`, excluding source-pinned and frozen files.
 
 ## Cache rules
 
