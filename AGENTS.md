@@ -43,6 +43,18 @@ CUDA_VISIBLE_DEVICES=1 ./bazelw test --config=cuda --noexperimental_collect_syst
 Use the CUDA command only when GPU 1 is actually free. The wrapper selects the
 CPU, GPU or Parallax rootfs from the target pattern and mounted configuration.
 
+### Test tiers
+
+Bazel tags select test tiers (`docs/adr/0004-test-tiers-and-gpu-masking.md`):
+
+- `requires_gpu` runs only in the CUDA gate.
+- `requires_live_gate` runs only when a command asks for the live tier.
+- `known_failure` is excluded from landing gates until its ticket removes the tag.
+
+`--config=cuda` sets `SUREAL_REQUIRE_GPU=1`, so a GPU test fails, rather than
+skips, when no CUDA device is visible. The filename suffixes `_live_test.py` and
+`_host_test.py` mark tests that touch a live runtime or host-only data.
+
 ## Python imports
 
 Python code under `autonomy/` and `parallax/` imports from that directory as

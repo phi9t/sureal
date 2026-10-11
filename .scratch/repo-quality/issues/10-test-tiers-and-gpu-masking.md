@@ -4,7 +4,7 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-human
+**Status:** done
 
 Decision, from the coordinator under user delegation on 2026-10-10: under `--config=cuda`, a test tagged `requires_gpu` fails when no GPU is visible.
 
@@ -37,3 +37,9 @@ Source: `../research/milano-conventions.md`, test tiers.
   - SHA256 digests of committed implementation/policy files: `docs/adr/0003-test-tiers-and-gpu-masking.md` `2bc15132f221522e4876d9f4686d00629c34489c7b715bef28ad5e6efd930081`; `autonomy/insula/gpu_visibility.py` `e5a576d8d1b582899071cdf7026eb4b8f16f660584dce18807cff7c37f46a6f7`; `autonomy/insula/gpu_visibility_test.py` `2ae5bd1494f9f94f573045f90fa2272a0a83d0996d69d9b212df2f1f5f52f038`; `autonomy/insula/gpu_visibility_guard_test.py` `9feff9c4899ddffeb5d0ecaf1e38327c407675b7f2806eced683e6137dd43fef`; `autonomy/insula/bazel_launcher.py` `1cf9ffaa9763325d80f5c6c217c01fb983f04308291453c79b8dae09078c7bde`; `autonomy/insula/BUILD.bazel` `93a1df73ef982ad32dd917bc438d95f78b164279ca6fce4d1417b03ad6ed6107`; `autonomy/insula/bazel_wrapper_test.py` `d70c98d5ede44e5ca7c5631140ead661ac14035968a98c6a57ee1c92360b21c7`; `autonomy/insula/launch_plan_gpu_live_test.py` `884d76d893e843bf3da45461c1b3b7646febe27b6edbd7373f5b92a224e19e91`; `autonomy/training_execution/sustained_launch_plan_gpu_smoke_test.py` `d5e094d6efdc6971863bcac67a1303e49a4b4491587ff4ff71a7563fc4d9586c`.
   - Focused test-log SHA256 digests: `autonomy/insula:bazel_wrapper_test` `eb67526da0e61c0a52292d8ca1eccbfec358578405054a29e90a8bdc2d1391cd`; `autonomy/insula:gpu_visibility_test` `69fb411bb2f5b3b0800bd88d12cc467810b41d359b3d5650bd2e59cd47bd76ba`; `autonomy/insula:gpu_visibility_guard_test` masked CUDA log `a63997d69cf84fb060e057dfdf9fc2e17491f23fa0e0587a37d9e0d694658358`.
   - Missing before `**Status:** done`: root `AGENTS.md` still needs the test-tier section defining the same tags, suffixes, and gate mapping. This worker could not edit that path under the hard allowlist.
+
+### 2026-10-11 coordinator
+
+- **ADR renumbered** to `docs/adr/0004-test-tiers-and-gpu-masking.md`, because `0003` was already taken by repo-quality 09's shell ADR. The digests above refer to the 0003 path at the worker commit.
+- **AGENTS.md** gains a "Test tiers" section. It was outside the worker's allowlist.
+- **Gates** are recorded in the landing commit's verification run, which includes CUDA on GPU 1.
