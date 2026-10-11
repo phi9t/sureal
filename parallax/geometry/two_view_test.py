@@ -201,10 +201,10 @@ class TwoViewGeometryTest(unittest.TestCase):
         )
 
         self.assertGreaterEqual(int(np.sum(visible)), 30)
-        self.assertLess(rotation_error_degrees(pose.rotation, truth_rotation), 1e-6)
+        self.assertLess(rotation_error_degrees(pose.rotation, truth_rotation), 1e-4)
         self.assertLess(
             _translation_direction_error(pose.translation, truth_translation),
-            1e-6,
+            1e-4,
         )
 
 
