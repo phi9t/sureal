@@ -5,12 +5,11 @@ grouped by role:
 - the research programs (`autonomy/`, `parallax/`);
 - the repo harness (`harness/`);
 - repo-wide docs (`docs/`);
-- the inherited Surflo upstream tree (`surflo/`, `training/`, `configs/`, `scripts/`, `examples/`,
-  `install/`, `media/`, `submodules/`).
+- the inherited Surflo upstream component (`surflo/`, folded together by ticket 15).
 
 `AGENTS.md` carries the rules and links the map rather than repeating it.
 
-**Blocked by:** 10, 11, 12, 13
+**Blocked by:** 10, 11, 12, 13, 15
 
 **Status:** ready-for-agent
 
@@ -18,10 +17,10 @@ Source: Milano commit `f7b4907` ("The README is the repo map and AGENTS.md is th
 
 - [ ] **README.** The "Project map" section lists every top-level directory once, grouped as above, with
   one line each.
-- [ ] **ADR.** A new ADR, `docs/adr/0006-surflo-upstream-tree-keeps-its-layout.md`, records why the
-  inherited tree stays at the root unchanged. Its paths are Surflo's documented interface, upstream merges stay
-  mechanical, and the `surflo` package name is a compatibility boundary (`CONTRIBUTING.md`). It also records the
-  rejected alternative of nesting the tree under `upstream/`.
+- [ ] **ADR.** A new ADR, `docs/adr/0006-four-top-level-components.md`, records the final top level:
+  - the two research programs, the harness, and the inherited Surflo component;
+  - why Surflo is one component, while its package name and import paths stay the compatibility boundary;
+  - the rejected alternative of leaving the upstream tree loose at the root.
 - [ ] **Concept READMEs.** `docs/repo-structure.md` and ADR 0001 get a consequence note on the final top level.
   `CONTEXT-MAP.md` names a harness context if `harness/` grew domain terms.
 - [ ] **Concept READMEs.** Every concept directory under `autonomy/`, `parallax/` and `harness/` has a short
