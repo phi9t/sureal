@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from insula import gpu_visibility
 from insula.launch_plan import build_plan, load_runtime_lock, plan_data, record_plan, render_plan
 from insula.runtime_roots import current_gpu_rootfs, default_lock
 
@@ -14,6 +15,7 @@ AUTONOMY = Path(__file__).resolve().parents[1]
 
 class LaunchPlanGPULiveTests(unittest.TestCase):
     def test_trivial_cuda_query_runs_through_gpu_one_plan(self):
+        gpu_visibility.require_requested_gpu_visible()
         rootfs = Path(os.environ.get("WAYMO_GPU_INSULA_ROOT", current_gpu_rootfs())).resolve()
         lock = Path(os.environ.get("WAYMO_GPU_INSULA_LOCK", default_lock(rootfs))).resolve()
         runtime = load_runtime_lock(rootfs, lock)

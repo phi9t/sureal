@@ -797,6 +797,7 @@ with patch('os.chdir', side_effect=AssertionError('import changed cwd')):
                 "--test_env=SUREAL_BAZEL_GPU_DEVICE_UUIDS=1=GPU-fixture-1",
                 plan["bazel"],
             )
+            self.assertIn("--test_env=SUREAL_REQUIRE_GPU=1", plan["bazel"])
             self.assertTrue(
                 has_mount(
                     plan["mounts"],

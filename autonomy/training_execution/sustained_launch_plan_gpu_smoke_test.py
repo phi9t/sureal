@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from insula import gpu_visibility
 from insula.launch_plan import load_runtime_lock, plan_data, render_plan
 from insula.runtime_roots import default_lock
 from training_execution import sustained_controller_backend
@@ -15,6 +16,7 @@ HOST_GPU_ROOT = Path("/data02/home/philip.yang/.cache/waystone/waymo-perception/
 
 class SustainedLaunchPlanGPUSmokeTests(unittest.TestCase):
     def test_trivial_stage_runs_through_controller_gpu_one_plan(self):
+        gpu_visibility.require_requested_gpu_visible()
         rootfs = Path(os.environ.get("WAYMO_GPU_INSULA_ROOT", HOST_GPU_ROOT)).resolve()
         lock = Path(os.environ.get("WAYMO_GPU_INSULA_LOCK", default_lock(rootfs))).resolve()
         runtime = load_runtime_lock(rootfs, lock)

@@ -103,7 +103,10 @@ filegroup(
             else []
         ) + (
             ["requires_gpu"]
-            if test in ["launch_plan_gpu_live_test.py"]
+            if test in [
+                "gpu_visibility_guard_test.py",
+                "launch_plan_gpu_live_test.py",
+            ]
             else []
         ),
     )

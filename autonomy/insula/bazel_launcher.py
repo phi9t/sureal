@@ -21,6 +21,7 @@ REPO_GATE_GIT_COMMON_DIR = "/tmp/sureal-git-common"
 REPO_GATE_GIT_OBJECTS = "/tmp/sureal-git-objects"
 from insula.launch_plan import (
     Mount,
+    PlanError,
     build_custom_plan,
     gpu_mounts_environment_and_request,
     load_runtime_lock,
@@ -38,6 +39,7 @@ from insula.runtime_roots import (
 DEFAULT_ROOTFS = current_cpu_rootfs()
 GPU_ROOTFS = current_gpu_rootfs()
 CURRICULUM_ROOTFS = current_curriculum_rootfs()
+REQUIRE_GPU_TEST_ENV = "SUREAL_REQUIRE_GPU"
 
 
 def restore_original_cwd(argv):
@@ -299,7 +301,8 @@ def _git_dir_inside_path(git_dir, common_dir):
 def sandbox_plan(runtime, cache, arguments, update_lock=False):
     rootfs = runtime.rootfs
     cache = cache.resolve()
-    gpu = uses_gpu_config(arguments) or rootfs == GPU_ROOTFS.resolve()
+    gpu_config = uses_gpu_config(arguments)
+    gpu = gpu_config or rootfs == GPU_ROOTFS.resolve()
     mounts = [
         Mount("runtime", "bind", "/", "read_only", rootfs),
         Mount("resolver", "bind", "/etc/resolv.conf", "read_only", Path("/etc/resolv.conf")),
@@ -312,6 +315,8 @@ def sandbox_plan(runtime, cache, arguments, update_lock=False):
         "SUREAL_REPO_ROOT": "/experiment",
         **git_test_environment(),
     }
+    if gpu_config:
+        test_environment[REQUIRE_GPU_TEST_ENV] = "1"
     if uses_live_gate_filter(arguments):
         _add_nested_launch_support(mounts)
         live_root = LIVE_GATE_CACHE_MOUNT + "/insula/" + current_cpu_rootfs().name
@@ -330,13 +335,19 @@ def sandbox_plan(runtime, cache, arguments, update_lock=False):
         "PYTHONDONTWRITEBYTECODE": "1",
     }
     if gpu:
-        gpu_mounts, gpu_environment, gpu_request = gpu_mounts_environment_and_request(gpu_index=1)
-        mounts.extend(gpu_mounts)
-        environment.pop("PATH", None)
-        environment.update(gpu_environment)
-        test_environment["SUREAL_BAZEL_GPU_DEVICE_UUIDS"] = (
-            f"{gpu_request.device_minor}={gpu_request.device_uuid}"
-        )
+        try:
+            gpu_mounts, gpu_environment, gpu_request = gpu_mounts_environment_and_request(gpu_index=1)
+        except PlanError as exc:
+            if not gpu_config or not str(exc).startswith("GPU device not found: "):
+                raise
+            gpu_request = None
+        else:
+            mounts.extend(gpu_mounts)
+            environment.pop("PATH", None)
+            environment.update(gpu_environment)
+            test_environment["SUREAL_BAZEL_GPU_DEVICE_UUIDS"] = (
+                f"{gpu_request.device_minor}={gpu_request.device_uuid}"
+            )
         _add_nested_launch_support(mounts)
         gpu_live_root = LIVE_GATE_CACHE_MOUNT + "/" + current_gpu_rootfs().name
         test_environment["SUREAL_LIVE_GATE_BWRAP"] = LIVE_GATE_BWRAP
