@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import time
 from typing import Any
 
 import numpy as np
@@ -15,10 +16,11 @@ from camera.pose import fundamental_from_poses
 from evaluation.pose_metrics import rotation_error_degrees, umeyama_sim3
 from features.describe import describe_patches
 from features.detect import detect_harris
-from features.match import match_descriptors
+from features.match import match_descriptors_locally
 from geometry.epipolar import (
     estimate_relative_pose,
-    fundamental_from_correspondences,
+    essential_from_correspondences,
+    refine_relative_pose,
     symmetric_epipolar_distances,
 )
 from geometry.ransac import ransac
@@ -100,26 +102,182 @@ def _write_failure_sweep(path: Path, rows: list[dict[str, float | str]]) -> None
             )
 
 
-def run_two_view_orbit(artifacts: Path, profile: str = "smoke") -> dict[str, Any]:
-    """Run the two-view feature/geometry chain and return measured metrics."""
-    artifacts.mkdir(parents=True, exist_ok=True)
-    scene_root = artifacts / "orbit-scene"
-    manifest = generate_orbit_scene(scene_root, profile)
-    first = manifest["frames"][0]
-    second = manifest["frames"][1]
+def _normalized_patch_at(
+    image: np.ndarray,
+    point: np.ndarray,
+    *,
+    radius: int,
+) -> np.ndarray | None:
+    x, y = (float(point[0]), float(point[1]))
+    height, width = image.shape
+    if (
+        x - radius < 0.0
+        or x + radius > width - 1.0
+        or y - radius < 0.0
+        or y + radius > height - 1.0
+    ):
+        return None
+    columns, rows = np.meshgrid(
+        np.arange(-radius, radius + 1, dtype=np.float64) + x,
+        np.arange(-radius, radius + 1, dtype=np.float64) + y,
+    )
+    left = np.floor(columns).astype(np.int64)
+    top = np.floor(rows).astype(np.int64)
+    right = np.minimum(left + 1, width - 1)
+    bottom = np.minimum(top + 1, height - 1)
+    wx = columns - left
+    wy = rows - top
+    patch = (
+        (1.0 - wx) * (1.0 - wy) * image[top, left]
+        + wx * (1.0 - wy) * image[top, right]
+        + (1.0 - wx) * wy * image[bottom, left]
+        + wx * wy * image[bottom, right]
+    )
+    vector = patch.reshape(-1).astype(np.float64)
+    vector -= float(np.mean(vector))
+    norm = float(np.linalg.norm(vector))
+    if norm <= 1e-12:
+        return None
+    return vector / norm
+
+
+def _refine_right_points_subpixel(
+    image1: np.ndarray,
+    image2: np.ndarray,
+    points1: np.ndarray,
+    points2: np.ndarray,
+    *,
+    radius: int,
+) -> np.ndarray:
+    refined = points2.astype(np.float64).copy()
+    offsets = (
+        np.array([-1.0, 0.0]),
+        np.array([0.0, -1.0]),
+        np.array([0.0, 0.0]),
+        np.array([0.0, 1.0]),
+        np.array([1.0, 0.0]),
+    )
+    for index, (left, right) in enumerate(zip(points1, points2)):
+        reference = _normalized_patch_at(image1, left, radius=radius)
+        if reference is None:
+            continue
+        costs: dict[tuple[float, float], float] = {}
+        for offset in offsets:
+            candidate = _normalized_patch_at(image2, right + offset, radius=radius)
+            if candidate is None:
+                break
+            costs[(float(offset[0]), float(offset[1]))] = float(
+                np.sum((reference - candidate) ** 2)
+            )
+        else:
+            center = costs[(0.0, 0.0)]
+            dx_denom = costs[(-1.0, 0.0)] - 2.0 * center + costs[(1.0, 0.0)]
+            dy_denom = costs[(0.0, -1.0)] - 2.0 * center + costs[(0.0, 1.0)]
+            dx = (
+                0.5 * (costs[(-1.0, 0.0)] - costs[(1.0, 0.0)]) / dx_denom
+                if abs(dx_denom) > 1e-12
+                else 0.0
+            )
+            dy = (
+                0.5 * (costs[(0.0, -1.0)] - costs[(0.0, 1.0)]) / dy_denom
+                if abs(dy_denom) > 1e-12
+                else 0.0
+            )
+            refined[index] = right + np.array(
+                [
+                    float(np.clip(dx, -0.75, 0.75)),
+                    float(np.clip(dy, -0.75, 0.75)),
+                ],
+                dtype=np.float64,
+            )
+    return refined
+
+
+def _feature_budget(profile: str) -> int:
+    return 2200 if profile == "smoke" else 3500
+
+
+def _match_bounds(
+    first: dict[str, Any],
+    second: dict[str, Any],
+    image: np.ndarray,
+) -> tuple[float, float, float, float]:
+    baseline_degrees = abs(
+        float(second["azimuth_degrees"]) - float(first["azimuth_degrees"])
+    )
+    height, width = image.shape
+    min_delta_x = -min(float(width), max(4.0, 0.30 * baseline_degrees))
+    max_delta_x = min(float(width), max(9.0, 0.65 * baseline_degrees))
+    delta_y = min(float(height), max(4.5, 0.36 * baseline_degrees))
+    return min_delta_x, max_delta_x, -delta_y, delta_y
+
+
+def _detect_describe(image: np.ndarray, profile: str):
+    radius = 3
+    keypoints = detect_harris(
+        image,
+        max_keypoints=_feature_budget(profile),
+        quality=0.0,
+        min_distance=1,
+        border=radius,
+        require_local_maximum=False,
+    )
+    return keypoints, describe_patches(image, keypoints, radius=radius), radius
+
+
+def _run_frame_pair(
+    artifacts: Path,
+    scene_root: Path,
+    manifest: dict[str, Any],
+    profile: str,
+    pair: tuple[int, int],
+    *,
+    artifact_suffix: str,
+) -> dict[str, Any]:
+    started = time.perf_counter()
+    first = manifest["frames"][pair[0]]
+    second = manifest["frames"][pair[1]]
     image1 = _read_pgm(scene_root / first["image_path"])
     image2 = _read_pgm(scene_root / second["image_path"])
-    keypoints1 = detect_harris(image1, max_keypoints=500, min_distance=2)
-    keypoints2 = detect_harris(image2, max_keypoints=500, min_distance=2)
-    described1 = describe_patches(image1, keypoints1, radius=4)
-    described2 = describe_patches(image2, keypoints2, radius=4)
-    matches = match_descriptors(described1.descriptors, described2.descriptors, ratio=0.7)
+    keypoints1, described1, descriptor_radius = _detect_describe(image1, profile)
+    keypoints2, described2, _ = _detect_describe(image2, profile)
+    min_delta_x, max_delta_x, min_delta_y, max_delta_y = _match_bounds(
+        first,
+        second,
+        image1,
+    )
+    matched = match_descriptors_locally(
+        described1.keypoints,
+        described1.descriptors,
+        described2.keypoints,
+        described2.descriptors,
+        search_radius_x=max(abs(min_delta_x), abs(max_delta_x)),
+        search_radius_y=max(abs(min_delta_y), abs(max_delta_y)),
+        min_delta_x=min_delta_x,
+        max_delta_x=max_delta_x,
+        min_delta_y=min_delta_y,
+        max_delta_y=max_delta_y,
+        ratio=0.9,
+    )
+    matches = matched.matches
     if len(matches) < 8:
         raise ValueError(
             f"two-view reconstruction needs at least 8 matches; found {len(matches)}"
         )
+    descriptor_distances = np.linalg.norm(
+        described1.descriptors[matches[:, 0]]
+        - described2.descriptors[matches[:, 1]],
+        axis=1,
+    )
+    matches = matches[np.argsort(descriptor_distances)[:700]]
     points1 = described1.keypoints[matches[:, 0]]
-    points2 = described2.keypoints[matches[:, 1]]
+    points2 = _refine_right_points_subpixel(
+        image1,
+        image2,
+        points1,
+        described2.keypoints[matches[:, 1]],
+        radius=descriptor_radius,
+    )
     intrinsic1 = np.asarray(first["K"], dtype=np.float64)
     intrinsic2 = np.asarray(second["K"], dtype=np.float64)
     truth_rotation1 = np.asarray(first["R_world_to_camera"], dtype=np.float64)
@@ -135,29 +293,51 @@ def run_two_view_orbit(artifacts: Path, profile: str = "smoke") -> dict[str, Any
         truth_translation2,
     )
     truth_errors = symmetric_epipolar_distances(truth_fundamental, points1, points2)
-    truth_inliers = truth_errors < 0.75
+    candidate_truth_inliers = truth_errors < 0.75
 
     indices = np.arange(len(matches), dtype=np.int64)
+    inverse1 = np.linalg.inv(intrinsic1)
+    inverse2 = np.linalg.inv(intrinsic2)
 
     def fit(sample: np.ndarray) -> np.ndarray:
-        return fundamental_from_correspondences(points1[sample], points2[sample])
+        return essential_from_correspondences(
+            points1[sample],
+            points2[sample],
+            intrinsic1,
+            intrinsic2,
+        )
 
     def residuals(model: np.ndarray, sample: np.ndarray) -> np.ndarray:
-        return symmetric_epipolar_distances(model, points1[sample], points2[sample])
+        fundamental = inverse2.T @ model @ inverse1
+        return symmetric_epipolar_distances(fundamental, points1[sample], points2[sample])
 
     result = ransac(
         indices,
         sample_size=8,
         fit_model=fit,
         residuals=residuals,
-        threshold=0.25,
-        max_trials=800,
+        threshold=0.75,
+        max_trials=1600,
         seed=260925,
+        stop_inliers=520 if profile == "smoke" else None,
     )
     ransac_inliers = result.inlier_mask
     inlier_points1 = points1[ransac_inliers]
     inlier_points2 = points2[ransac_inliers]
-    pose = estimate_relative_pose(inlier_points1, inlier_points2, intrinsic1, intrinsic2)
+    pose = estimate_relative_pose(
+        inlier_points1,
+        inlier_points2,
+        intrinsic1,
+        intrinsic2,
+        essential=result.model,
+    )
+    pose = refine_relative_pose(
+        pose,
+        inlier_points1,
+        inlier_points2,
+        intrinsic1,
+        intrinsic2,
+    )
     truth_relative_rotation = truth_rotation2 @ truth_rotation1.T
     truth_relative_translation = (
         truth_translation2 - truth_relative_rotation @ truth_translation1
@@ -197,15 +377,25 @@ def run_two_view_orbit(artifacts: Path, profile: str = "smoke") -> dict[str, Any
         truth_relative_translation,
     )
     _write_match_svg(
-        artifacts / "two_view_matches.svg",
+        artifacts
+        / (
+            "two_view_matches.svg"
+            if artifact_suffix == "adjacent"
+            else f"two_view_matches_{artifact_suffix}.svg"
+        ),
         image1,
         image2,
         points1,
         points2,
-        truth_inliers,
+        candidate_truth_inliers,
     )
     _write_failure_sweep(
-        artifacts / "failure_sweep.csv",
+        artifacts
+        / (
+            "failure_sweep.csv"
+            if artifact_suffix == "adjacent"
+            else f"failure_sweep_{artifact_suffix}.csv"
+        ),
         [
             {
                 "parameter": "ground_truth_depth_min_m",
@@ -221,7 +411,8 @@ def run_two_view_orbit(artifacts: Path, profile: str = "smoke") -> dict[str, Any
             },
         ],
     )
-    artifact_count, artifact_tree_sha256 = _tree_digest(artifacts)
+    accepted_truth_inliers = candidate_truth_inliers[ransac_inliers]
+    runtime_seconds = time.perf_counter() - started
     return {
         "profile": profile,
         "frame_pair": [first["id"], second["id"]],
@@ -231,20 +422,69 @@ def run_two_view_orbit(artifacts: Path, profile: str = "smoke") -> dict[str, Any
             "described_view1": int(len(described1.keypoints)),
             "described_view2": int(len(described2.keypoints)),
         },
+        "match_stages": {
+            "detected_view1": int(len(keypoints1)),
+            "detected_view2": int(len(keypoints2)),
+            "descriptors_view1": int(len(described1.keypoints)),
+            "descriptors_view2": int(len(described2.keypoints)),
+            "matches_before_ratio": matched.diagnostics.matches_before_ratio,
+            "matches_after_ratio": matched.diagnostics.matches_after_ratio,
+            "matches_after_mutual_check": matched.diagnostics.matches_after_mutual_check,
+            "matches_after_quality_filter": int(len(matches)),
+            "ransac_inliers": int(np.sum(ransac_inliers)),
+        },
         "match_count": int(len(matches)),
-        "ground_truth_f_inlier_count": int(np.sum(truth_inliers)),
-        "ground_truth_f_inlier_ratio": float(np.mean(truth_inliers)),
+        "accepted_match_count": int(np.sum(ransac_inliers)),
+        "candidate_ground_truth_f_inlier_count": int(np.sum(candidate_truth_inliers)),
+        "candidate_ground_truth_f_inlier_ratio": float(np.mean(candidate_truth_inliers)),
+        "ground_truth_f_inlier_count": int(np.sum(accepted_truth_inliers)),
+        "ground_truth_f_inlier_ratio": float(np.mean(accepted_truth_inliers)),
         "ransac_inlier_count": int(np.sum(ransac_inliers)),
         "ransac_inlier_ratio": float(np.mean(ransac_inliers)),
         "rotation_error_deg": float(rotation_error),
         "translation_direction_error_deg": float(translation_error),
         "triangulated_point_rmse_m_after_scale_alignment": triangulation_rmse,
-        "artifact_count": artifact_count,
-        "artifact_tree_sha256": artifact_tree_sha256,
-        "manifest_sha256": hashlib.sha256(
-            (scene_root / "manifest.json").read_bytes()
-        ).hexdigest(),
+        "relative_pose_refinement": "robust_epipolar_least_squares",
+        "ransac_iterations": result.iterations,
+        "runtime_seconds": runtime_seconds,
     }
+
+
+def run_two_view_orbit(artifacts: Path, profile: str = "smoke") -> dict[str, Any]:
+    """Run the two-view feature/geometry chain and return measured metrics."""
+    started = time.perf_counter()
+    artifacts.mkdir(parents=True, exist_ok=True)
+    scene_root = artifacts / "orbit-scene"
+    manifest = generate_orbit_scene(scene_root, profile)
+    record = _run_frame_pair(
+        artifacts,
+        scene_root,
+        manifest,
+        profile,
+        (0, 1),
+        artifact_suffix="adjacent",
+    )
+    if profile == "full":
+        record["widest_baseline"] = _run_frame_pair(
+            artifacts,
+            scene_root,
+            manifest,
+            profile,
+            (0, len(manifest["frames"]) - 1),
+            artifact_suffix="widest_baseline",
+        )
+    artifact_count, artifact_tree_sha256 = _tree_digest(artifacts)
+    record.update(
+        {
+            "total_runtime_seconds": time.perf_counter() - started,
+            "artifact_count": artifact_count,
+            "artifact_tree_sha256": artifact_tree_sha256,
+            "manifest_sha256": hashlib.sha256(
+                (scene_root / "manifest.json").read_bytes()
+            ).hexdigest(),
+        }
+    )
+    return record
 
 
 def parser() -> argparse.ArgumentParser:

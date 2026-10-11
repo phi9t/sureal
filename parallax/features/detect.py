@@ -62,6 +62,7 @@ def detect_harris(
     border: int = 5,
     window_radius: int = 1,
     k: float = 0.04,
+    require_local_maximum: bool = True,
 ) -> FloatArray:
     """Detect Harris corners as ``(x, y)`` image coordinates."""
     if max_keypoints <= 0:
@@ -90,11 +91,10 @@ def detect_harris(
                 source_columns,
             ]
             local_maximum &= response >= shifted
-    candidates = np.argwhere(
-        valid
-        & local_maximum
-        & (response >= peak * float(quality))
-    )
+    candidate_mask = valid & (response >= peak * float(quality))
+    if require_local_maximum:
+        candidate_mask &= local_maximum
+    candidates = np.argwhere(candidate_mask)
     order = np.lexsort(
         (
             candidates[:, 1],

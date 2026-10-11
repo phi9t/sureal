@@ -194,6 +194,7 @@ _PARALLAX_TESTS = {
     "test_feature_matching": "features/feature_matching_test.py",
     "test_fusion": "fusion/fusion_test.py",
     "test_classical": "geometry/classical_test.py",
+    "test_two_view_orbit": "pipeline/two_view_orbit_test.py",
     "test_two_view_geometry": "geometry/two_view_test.py",
     "test_colmap_mvs_reference": "baselines/colmap_mvs_reference_test.py",
     "test_colmap_reference": "baselines/colmap_reference_test.py",

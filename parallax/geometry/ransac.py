@@ -31,6 +31,7 @@ def ransac(
     max_trials: int,
     seed: int,
     min_inliers: int | None = None,
+    stop_inliers: int | None = None,
 ) -> RansacResult[Model]:
     """Fit a model by seeded random sampling over item indices."""
     items = np.asarray(data)
@@ -72,7 +73,9 @@ def ransac(
                 best_model = model
                 best_mask = inliers
                 best_score = score
-                if inlier_count == count:
+                if inlier_count == count or (
+                    stop_inliers is not None and inlier_count >= stop_inliers
+                ):
                     return RansacResult(model, inliers, residual_sum, trial + 1)
     if best_model is None or best_mask is None:
         raise ValueError("RANSAC failed to find a model")

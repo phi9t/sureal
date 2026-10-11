@@ -6,8 +6,9 @@ from dataclasses import dataclass
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
+from scipy.optimize import least_squares
 
-from geometry.triangulate import triangulate_points
+from geometry.triangulate import triangulate_point
 
 
 FloatArray = NDArray[np.float64]
@@ -176,6 +177,105 @@ def decompose_essential(essential: ArrayLike) -> list[tuple[FloatArray, FloatArr
     return candidates
 
 
+def _skew(vector: ArrayLike) -> FloatArray:
+    x, y, z = np.asarray(vector, dtype=np.float64)
+    return np.array([[0.0, -z, y], [z, 0.0, -x], [-y, x, 0.0]], dtype=np.float64)
+
+
+def _rotation_vector_to_matrix(vector: ArrayLike) -> FloatArray:
+    omega = np.asarray(vector, dtype=np.float64)
+    angle = float(np.linalg.norm(omega))
+    if angle <= 1e-12:
+        return np.eye(3, dtype=np.float64) + _skew(omega)
+    axis = omega / angle
+    cross = _skew(axis)
+    return (
+        np.eye(3, dtype=np.float64)
+        + np.sin(angle) * cross
+        + (1.0 - np.cos(angle)) * (cross @ cross)
+    )
+
+
+def _orthonormal_basis(vector: FloatArray) -> tuple[FloatArray, FloatArray]:
+    direction = vector / np.linalg.norm(vector)
+    reference = (
+        np.array([1.0, 0.0, 0.0], dtype=np.float64)
+        if abs(float(direction[0])) < 0.9
+        else np.array([0.0, 1.0, 0.0], dtype=np.float64)
+    )
+    first = np.cross(direction, reference)
+    first /= np.linalg.norm(first)
+    second = np.cross(direction, first)
+    return first, second
+
+
+def _calibrated_homogeneous(points: FloatArray, intrinsic: ArrayLike) -> FloatArray:
+    homogeneous = np.c_[points, np.ones(len(points), dtype=np.float64)]
+    calibrated = (np.linalg.inv(np.asarray(intrinsic, dtype=np.float64)) @ homogeneous.T).T
+    return calibrated / calibrated[:, 2, None]
+
+
+def refine_relative_pose(
+    pose: RelativePose,
+    points1: ArrayLike,
+    points2: ArrayLike,
+    K1: ArrayLike,
+    K2: ArrayLike,
+    *,
+    max_nfev: int = 100,
+) -> RelativePose:
+    """Refine relative pose on the essential manifold by epipolar residuals."""
+    left = _points2(points1, "points1")
+    right = _points2(points2, "points2")
+    if left.shape != right.shape:
+        raise ValueError("point arrays must have the same shape")
+    base_translation = np.asarray(pose.translation, dtype=np.float64)
+    base_translation /= np.linalg.norm(base_translation)
+    basis1, basis2 = _orthonormal_basis(base_translation)
+    calibrated1 = _calibrated_homogeneous(left, K1)
+    calibrated2 = _calibrated_homogeneous(right, K2)
+
+    def residuals(parameters: np.ndarray) -> np.ndarray:
+        rotation = _rotation_vector_to_matrix(parameters[:3]) @ pose.rotation
+        translation = (
+            base_translation
+            + parameters[3] * basis1
+            + parameters[4] * basis2
+        )
+        translation /= np.linalg.norm(translation)
+        essential = _skew(translation) @ rotation
+        epipolar = np.sum(
+            calibrated2 * (essential @ calibrated1.T).T,
+            axis=1,
+        )
+        lines2 = (essential @ calibrated1.T).T
+        lines1 = (essential.T @ calibrated2.T).T
+        denominator = np.sqrt(
+            lines1[:, 0] * lines1[:, 0]
+            + lines1[:, 1] * lines1[:, 1]
+            + lines2[:, 0] * lines2[:, 0]
+            + lines2[:, 1] * lines2[:, 1]
+        )
+        return epipolar / np.maximum(denominator, 1e-12)
+
+    result = least_squares(
+        residuals,
+        np.zeros(5, dtype=np.float64),
+        loss="soft_l1",
+        f_scale=1e-3,
+        max_nfev=max_nfev,
+        xtol=1e-12,
+        ftol=1e-12,
+        gtol=1e-12,
+    )
+    rotation = _rotation_vector_to_matrix(result.x[:3]) @ pose.rotation
+    translation = base_translation + result.x[3] * basis1 + result.x[4] * basis2
+    translation /= np.linalg.norm(translation)
+    essential = _skew(translation) @ rotation
+    essential /= np.linalg.norm(essential)
+    return RelativePose(rotation, translation, essential)
+
+
 def estimate_relative_pose(
     points1: ArrayLike,
     points2: ArrayLike,
@@ -196,16 +296,26 @@ def estimate_relative_pose(
     )
     best: tuple[int, float, FloatArray, FloatArray] | None = None
     for rotation, translation in decompose_essential(matrix):
-        points = triangulate_points(
-            left,
-            right,
-            K1,
-            np.eye(3),
-            np.zeros(3),
-            K2,
-            rotation,
-            translation,
-        )
+        points = []
+        for pixel1, pixel2 in zip(left, right):
+            try:
+                points.append(
+                    triangulate_point(
+                        pixel1,
+                        pixel2,
+                        K1,
+                        np.eye(3),
+                        np.zeros(3),
+                        K2,
+                        rotation,
+                        translation,
+                    )
+                )
+            except ValueError:
+                continue
+        if not points:
+            continue
+        points = np.asarray(points, dtype=np.float64)
         depth1 = points[:, 2]
         depth2 = (rotation @ points.T).T[:, 2] + translation[2]
         positive = (depth1 > 0.0) & (depth2 > 0.0)
