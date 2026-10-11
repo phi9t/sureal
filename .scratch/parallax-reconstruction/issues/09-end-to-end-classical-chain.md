@@ -9,5 +9,6 @@
 - [ ] **Pipeline.** One entry composes `sfm/`, `stereo/` and `fusion/`. Its output is aligned to ground truth by Sim(3) before scoring.
 - [ ] **Module status.** Module 06 becomes `real+baseline`. Module 04's fusion metrics become real, and so does its registration part via `geometry/align.py`. The synthetic leftovers in those labs are removed.
 - [ ] **Live check.** `run.sh run --module 06` with smoke and full profiles, and `run.sh all --profile smoke`. Record the surface metrics for ours and for COLMAP MVS, if the container gate is available.
+- [ ] **Fusion follow-ups from ticket 08.** Either rename `fusion/marching_cubes.py` to marching tetrahedra or implement case-table marching cubes. Weld vertices into an indexed mesh, and use it for export and Chamfer sampling.
 - [ ] Shims left by ticket 01 that no longer have callers are deleted.
 - [ ] **Gates:** `//:repo_gate` and `//parallax/...`.

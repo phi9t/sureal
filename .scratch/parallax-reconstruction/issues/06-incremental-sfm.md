@@ -4,7 +4,7 @@
 
 **Blocked by:** 05, 11
 
-**Status:** ready-for-human
+**Status:** done
 
 - [x] **Code.**
   - `sfm/tracks.py`: the track graph.
@@ -116,3 +116,12 @@
 - `frame-006` pre-PnP stale-support filtering rejected `0` candidate points. Existing registered-view reprojection errors for the same 73 support points were low: overall max `0.30805297856316105 px`, median `0.05108551244166803 px`, p95 `0.24346736838054245 px`; for `frame-004`, count `73`, max `0.30805297856316105 px`, median `0.050830466030918946 px`, p95 `0.20202912236871554 px`; for `frame-005`, count `73`, max `0.2543217369015762 px`, median `0.04815601563342589 px`, p95 `0.16557387297728549 px`.
 - Current diagnosis after the two allowed full-profile runs: the remaining endpoint miss is not explained by same-view track conflation, stale high-error prior-view support, or an inherently hard `frame-005 -> frame-006` two-view geometry. The bad `frame-006` pose is low-RMSE against an internally consistent support set, so the remaining defect is still in endpoint correspondence/support selection, most likely the incremental `frame-005 -> frame-006` match window or track-growth path that selects wrong but self-consistent 2D-3D points.
 - Current status remains `ready-for-human`. The full-profile accuracy acceptance is still incomplete, the live full profile and COLMAP comparison remain blocked on the sandbox `bwrap`/controlled-suite environment, and the final `//:repo_gate` plus `//parallax/...` closeout gates were not rerun after this miss per the instruction to stop instead of spending a third full-profile attempt.
+
+### 2026-10-11 coordinator review and landing
+
+- Landed as 2f5fde1 (squash of the worker branch) plus 66d4c67 (numeric tolerance on the new exact full-orbit two-view test: 1.7e-6 deg on the landing host vs a 1e-6 bound, now 1e-4).
+- Root causes found across the reworks: integer-pixel seed correspondences (fixed by subpixel refinement); far-reference registration; PnP inliers replacing epipolar inliers in track growth; no BA gauge anchor; and a fixed +-5 px match window that aliases on the repeated-texture orbit scene at frame-005 -> frame-006. Registration growth now uses constant-velocity pose prediction from estimated poses and capture order, with 2D-3D matching around projected tracks; no ground-truth field is read outside scoring.
+- `//parallax:test_incremental_sfm` (6 tests) passes, including the full 7-view orbit targets: mean relative rotation error < 1 deg, max < 2 deg, Sim3 ATE < 0.05 m. The smoke profile is a registration and plumbing test only.
+- Gates on the landing tree: `//:repo_gate` 23/23, `//autonomy/...` 191/191, CUDA 31/31 on GPU 1, `//parallax/...` 30/30.
+- Deferred with the Parallax asset refetch: the Blender `--profile full` live check and the COLMAP same-image comparison. The unadopted two-pass guided matcher experiment is kept on the worker repo branch `wip/para06-guided-matcher-experiment`.
+- Follow-up: `sfm/incremental.py` is about 2,100 lines and should be split (prediction, registration, growth, scoring) when ticket 09 touches it.
